@@ -1,0 +1,31 @@
+#
+# Tests configuration
+#
+
+set(ENTT_SRC_DIR ${CMAKE_SOURCE_DIR}/${PROJECT_SRC_DIR})
+
+set(COMMON_INCLUDE_DIRS ${ENTT_SRC_DIR} ${GOOGLETEST_INCLUDE_DIRS})
+set(COMMON_LINK_LIBS ${GOOGLETEST_LIBRARIES} Threads::Threads)
+
+# List of available targets
+
+set(TARGET_ENTT entt)
+set(TARGET_BENCHMARK benchmark)
+
+# Test TARGET_ENTT
+
+set(TARGET_ENTT_SOURCES component_pool.cpp registry.cpp)
+add_executable(${TARGET_ENTT} ${TARGET_ENTT_SOURCES})
+target_include_directories(${TARGET_ENTT} PRIVATE ${COMMON_INCLUDE_DIRS})
+target_link_libraries(${TARGET_ENTT} PRIVATE ${COMMON_LINK_LIBS})
+add_test(NAME ${TARGET_ENTT} COMMAND ${TARGET_ENTT})
+
+# Test TARGET_BENCHMARK
+
+IF(CMAKE_BUILD_TYPE MATCHES Release)
+    set(TARGET_BENCHMARK_SOURCES benchmark.cpp)
+    add_executable(${TARGET_BENCHMARK} ${TARGET_BENCHMARK_SOURCES})
+    target_include_directories(${TARGET_BENCHMARK} PRIVATE ${COMMON_INCLUDE_DIRS})
+    target_link_libraries(${TARGET_BENCHMARK} PRIVATE ${COMMON_LINK_LIBS})
+    add_test(NAME ${TARGET_BENCHMARK} COMMAND ${TARGET_BENCHMARK})
+ENDIF(CMAKE_BUILD_TYPE MATCHES Release)
