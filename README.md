@@ -1,4 +1,4 @@
-# EnTT - entity-component system in modern C++
+# EnTT - Entity-Component System in modern C++
 
 # Introduction
 
@@ -79,12 +79,12 @@ int main() {
 I started using another well known Entity Component System named [entityx](https://github.com/alecthomas/entityx).<br/>
 While I was playing with it, I found that I didn't like that much the way it manages its memory.
 Moreover, I was pretty sure that one could achieve better performance with a slightly modified pool under the hood.<br/>
-That's also the reason for which the interface is quite similar to the one of _entityx_, so that *EnTT* can be used as a
+That's also the reason for which the interface is quite similar to the one of _entityx_, so that `EnTT` can be used as a
 drop-in replacement for it with a minimal effort.
 
 ### Performance
 
-As it stands right now, *EnTT* is just fast enough for my requirements if compared to my first choice (that was already
+As it stands right now, `EnTT` is just fast enough for my requirements if compared to my first choice (that was already
 amazingly fast):
 
 | Benchmark | EntityX (master) | EntityX (experimental/compile_time) | EnTT |
@@ -95,7 +95,7 @@ amazingly fast):
 | Iterating over 10M entities, unpacking two components | 0.0701693 | 0.0412988 | 0.0206747s |
 
 See [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp) for further details.<br/>
-Of course, I'll try to get out of it more features and better performance anyway in the future, mainly for fun.<br/>
+Of course, I'll try to get out of it more features and better performance anyway in the future, mainly for fun.
 If you want to contribute and have any suggestion, feel free to make a PR or open an issue to discuss them.
 
 # Build Instructions
@@ -107,9 +107,7 @@ CMake version 3.4 or later is mandatory to compile the tests, you don't have to 
 
 ## Library
 
-`EnTT` is a header-only library.<br/>
-This means that including the `registry.hpp` header is enough to use it.<br/>
-It's a matter of adding the following line at the top of a file:
+`EnTT` is a header-only library. This means that including the `registry.hpp` header is enough to use it. It's a matter of adding the following line at the top of a file:
 
     #include <registry.hpp>
 
@@ -119,9 +117,9 @@ Then pass the proper `-I` argument to the compiler to add the `src` directory to
 
 ### API Reference
 
-*EnTT* contains three main actors: the *registry*, the *view* and the *pool*.<br/>
+`EnTT` contains three main actors: the *registry*, the *view* and the *pool*.<br/>
 Unless you have specific requirements of memory management, the default registry (that used the pool provided with
-*EnTT*) should be good enough for any use. Customization is an option anyway, so that you can use your own pool as
+`EnTT`) should be good enough for any use. Customization is an option anyway, so that you can use your own pool as
 long as it offers the expected interface.
 
 #### The Registry
@@ -192,16 +190,16 @@ Both the views can be used more than once, for they return newly created and cor
 I'd suggest not to store them anywhere and to invoke the `Registry::view` member function at each iteration to get a properly
 initialized view over which to iterate.
 
-*Note*.<br/>
+**Note**.<br/>
 An important feature (usually missed by other well known ECS) is that users can create and destroy entities, as
 well as assign or remove components while iterating and neither the views nor the iterators will be invalidated.<br/>
 Therefore, unless one tries to access a destroyed entity through an iterator that hasn't been advanced (in this case, of course,
 it's an undefined behaviour), users can freely interact with the registry and keep views and iterators consistent.<br/>
-On the other side, iterators aren't thread safe, thus do no try to concurrently iterate over and modify a set of components at
-the same time. That being said, as long as a thread iterates over the entities that have the component `X` or assign and removes
+On the other side, iterators aren't thread safe. Do no try to iterate over a set of components and modify them concurrently.
+That being said, as long as a thread iterates over the entities that have the component `X` or assign and removes
 that component from a set of entities and another thread does something similar with components `Y` and `Z`, it shouldn't be a
 problem at all.<br/>
-As an example, that means that users can freely run the render system over the renderable entities and update the physics
+As an example, that means that users can freely run the rendering system over the renderable entities and update the physics
 concurrently on a separate thread if needed.
 
 #### The Pool
@@ -281,4 +279,4 @@ Check the [contributors list](https://github.com/skypjack/entt/blob/master/AUTHO
 # License
 
 Code and documentation Copyright (c) 2017 Michele Caini.<br/>
-Code released under [the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).<br/>
+Code released under [the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).
