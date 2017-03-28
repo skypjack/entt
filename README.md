@@ -89,10 +89,10 @@ amazingly fast):
 
 | Benchmark | EntityX (master) | EntityX (experimental/compile_time) | EnTT |
 |-----------|-------------|-------------|-------------|
-| Creating 10M entities | 0.281481 | 0.213988s | 0.00542235s |
-| Destroying 10M entities | 0.166156 | 0.0673857s | 0.0582367s |
-| Iterating over 10M entities, unpacking one component | 0.047039 | 0.0297941s | 9.3e-08s |
-| Iterating over 10M entities, unpacking two components | 0.0701693 | 0.0412988 | 0.0206747s |
+| Creating 10M entities | 0.281481s | 0.213988s | 0.00542235s |
+| Destroying 10M entities | 0.166156s | 0.0673857s | 0.0582367s |
+| Iterating over 10M entities, unpacking one component | 0.047039s | 0.0297941s | 9.3e-08s |
+| Iterating over 10M entities, unpacking two components | 0.0701693s | 0.0412988s | 0.0206747s |
 
 See [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp) for further details.<br/>
 Of course, I'll try to get out of it more features and better performance anyway in the future, mainly for fun.
