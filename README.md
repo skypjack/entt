@@ -89,10 +89,10 @@ amazingly fast):
 
 | Benchmark | EntityX (master) | EntityX (experimental/compile_time) | EnTT |
 |-----------|-------------|-------------|-------------|
-| Creating 10M entities | 0.281481 | 0.213988s | 0.00542235s |
-| Destroying 10M entities | 0.166156 | 0.0673857s | 0.0582367s |
-| Iterating over 10M entities, unpacking one component | 0.047039 | 0.0297941s | 9.3e-08s |
-| Iterating over 10M entities, unpacking two components | 0.0701693 | 0.0412988 | 0.0206747s |
+| Creating 10M entities | 0.281481s | 0.213988s | 0.00542235s |
+| Destroying 10M entities | 0.166156s | 0.0673857s | 0.0582367s |
+| Iterating over 10M entities, unpacking one component | 0.047039s | 0.0297941s | 9.3e-08s |
+| Iterating over 10M entities, unpacking two components | 0.0701693s | 0.0412988s | 0.0206747s |
 
 See [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp) for further details.<br/>
 Of course, I'll try to get out of it more features and better performance anyway in the future, mainly for fun.
@@ -107,7 +107,8 @@ CMake version 3.4 or later is mandatory to compile the tests, you don't have to 
 
 ## Library
 
-`EnTT` is a header-only library. This means that including the `registry.hpp` header is enough to use it. It's a matter of adding the following line at the top of a file:
+`EnTT` is a header-only library. This means that including the `registry.hpp` header is enough to use it.<br/>
+It's a matter of adding the following line at the top of a file:
 
     #include <registry.hpp>
 
@@ -168,7 +169,11 @@ Note that entities are numbers and nothing more. They are not classes and they h
 
 #### The View
 
-There are two different kinds of view, each one with a slighlty different interface: the single component view and the multi component view.<br/>
+There are two different kinds of view, each one with a slighlty different interface:
+
+* The _single component view_.
+* The _multi component view_.
+
 Both of them are iterable, that is both of them have `begin` and `end` member functions that are suitable for a range-based for loop:
 
 ```
@@ -180,18 +185,28 @@ for(auto entity: view) {
 ```
 
 Iterators are extremely poor, they are meant exclusively to be used to iterate over a set of entities.<br/>
-Exposed member functions are: `operator++()`, `operator++(int)`, `operator==()`, `operator!=()` and `operator*()`.
+Exposed member functions are:
 
-The single component view has also a member function named `size` that returns the exact number of expected entities.<br/>
-The multi component view has also a member function named `reset` that reorganizes internal data to create optimized iterators.
-Use it whenever the data within the registry are known to be changed.<br/>
-Both the views can be used more than once, for they return newly created and correctly initialized iterators whenever
+* `operator++()`
+* `operator++(int)`
+* `operator==()`
+* `operator!=()`
+* `operator*()`.
+
+The single component view has an additional member function:
+
+* `size()`: returns the exact number of expected entities.
+
+The multi component view has an additional member function:
+
+* `reset()`: reorganizes internal data so as to further create optimized iterators (use it whenever the data within the registry are known to be changed).
+
+Both the views can be used more than once. They return newly created and correctly initialized iterators whenever
 `begin` or `end` is invoked. Anyway views and iterators are tiny objects and the time to construct them can be safely ignored.
 I'd suggest not to store them anywhere and to invoke the `Registry::view` member function at each iteration to get a properly
 initialized view over which to iterate.
 
-**Note**.<br/>
-An important feature (usually missed by other well known ECS) is that users can create and destroy entities, as
+**Note**: An important feature (usually missed by other well known ECS) is that users can create and destroy entities, as
 well as assign or remove components while iterating and neither the views nor the iterators will be invalidated.<br/>
 Therefore, unless one tries to access a destroyed entity through an iterator that hasn't been advanced (in this case, of course,
 it's an undefined behaviour), users can freely interact with the registry and keep views and iterators consistent.<br/>
