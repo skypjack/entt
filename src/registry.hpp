@@ -256,6 +256,11 @@ public:
         return available.size() == count;
     }
 
+    template<typename Comp>
+    bool empty() const noexcept {
+        return pool.template empty<Comp>();
+    }
+
     entity_type create() noexcept {
         entity_type entity;
 

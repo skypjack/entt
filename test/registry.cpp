@@ -10,8 +10,14 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_EQ(registry.capacity(), registry_type::size_type{0});
     ASSERT_TRUE(registry.empty());
 
+    ASSERT_TRUE(registry.empty<int>());
+    ASSERT_TRUE(registry.empty<char>());
+
     registry_type::entity_type e1 = registry.create();
     registry_type::entity_type e2 = registry.create<int, char>();
+
+    ASSERT_FALSE(registry.empty<int>());
+    ASSERT_FALSE(registry.empty<char>());
 
     ASSERT_NE(e1, e2);
 
