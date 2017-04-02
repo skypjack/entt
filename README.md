@@ -1,5 +1,7 @@
 # EnTT - Entity-Component System in modern C++
 
+[![Build Status](https://travis-ci.org/skypjack/entt.svg?branch=master)](https://travis-ci.org/skypjack/uvw)
+
 # Introduction
 
 `EnTT` is a header-only, tiny and easy to use Entity-Component System in modern C++.<br/>
