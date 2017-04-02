@@ -2,7 +2,7 @@
 
 # Introduction
 
-`EnTT` is a header-only, tiny and easy to use entity-component system in modern C++.<br/>
+`EnTT` is a header-only, tiny and easy to use Entity-Component System in modern C++.<br/>
 ECS is an architectural pattern used mostly in game development. For further details:
 
 * [Entity Systems Wiki](http://entity-systems.wikidot.com/)
@@ -76,10 +76,10 @@ int main() {
 
 ## Motivation
 
-I started using another well known Entity Component System named [entityx](https://github.com/alecthomas/entityx).<br/>
+I started using another well known Entity-Component System named [`EntityX`](https://github.com/alecthomas/entityx).<br/>
 While I was playing with it, I found that I didn't like that much the way it manages its memory.
 Moreover, I was pretty sure that one could achieve better performance with a slightly modified pool under the hood.<br/>
-That's also the reason for which the interface is quite similar to the one of _entityx_, so that `EnTT` can be used as a
+That's also the reason for which the interface is quite similar to the one of `EntityX`, so that `EnTT` can be used as a
 drop-in replacement for it with a minimal effort.
 
 ### Performance
@@ -97,6 +97,11 @@ amazingly fast):
 See [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp) for further details.<br/>
 Of course, I'll try to get out of it more features and better performance anyway in the future, mainly for fun.
 If you want to contribute and have any suggestion, feel free to make a PR or open an issue to discuss them.
+
+### Benchmarks / Comparisons
+
+`EnTT` includes its own benchmarks, mostly similar to the ones of `EntityX` so as to compare them.<br/>
+On Github you can find also a [benchmark suite](https://github.com/abeimler/ecs_benchmark) testing `EntityX` (both the official version and the compile-time one), `Anax` and `Artemis C++` with up to 10M entities.
 
 # Build Instructions
 
