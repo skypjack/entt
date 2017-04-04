@@ -43,7 +43,7 @@ class View<Pool<Components...>, Type, Types...> final {
         ViewIterator(pool_type &pool, const entity_type *entities, typename pool_type::size_type pos) noexcept
             : pool{pool}, entities{entities}, pos{pos}
         {
-            if(pos) { while(!valid() && --pos); }
+            if(this->pos) { while(!valid() && --this->pos); }
         }
 
         ViewIterator & operator++() noexcept {
