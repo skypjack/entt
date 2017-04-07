@@ -148,5 +148,18 @@ TEST(ComponentPool, EntitiesReset) {
     ASSERT_EQ(pool.entities<int>()[1], typename pool_type::entity_type{1});
     ASSERT_EQ(pool.entities<int>()[2], typename pool_type::entity_type{3});
 
+    ASSERT_EQ(pool.construct<char>(0, 'c'), 'c');
+
+    ASSERT_FALSE(pool.empty<int>());
+    ASSERT_FALSE(pool.empty<char>());
+
+    ASSERT_NO_THROW(pool.reset<char>());
+
+    ASSERT_FALSE(pool.empty<int>());
+    ASSERT_TRUE(pool.empty<char>());
+
     ASSERT_NO_THROW(pool.reset());
+
+    ASSERT_TRUE(pool.empty<int>());
+    ASSERT_TRUE(pool.empty<char>());
 }

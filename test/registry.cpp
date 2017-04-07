@@ -78,6 +78,21 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_EQ(registry.size(), registry_type::size_type{0});
     ASSERT_EQ(registry.capacity(), registry_type::size_type{0});
     ASSERT_TRUE(registry.empty());
+
+    registry.create<int, char>();
+
+    ASSERT_FALSE(registry.empty<int>());
+    ASSERT_FALSE(registry.empty<char>());
+
+    ASSERT_NO_THROW(registry.reset<int>());
+
+    ASSERT_TRUE(registry.empty<int>());
+    ASSERT_FALSE(registry.empty<char>());
+
+    ASSERT_NO_THROW(registry.reset());
+
+    ASSERT_TRUE(registry.empty<int>());
+    ASSERT_TRUE(registry.empty<char>());
 }
 
 TEST(DefaultRegistry, ViewSingleComponent) {

@@ -176,6 +176,11 @@ struct  ComponentPool final {
         std::get<ComponentPool<Comp>>(pools).destroy(entity);
     }
 
+    template<typename Comp>
+    void reset() {
+        std::get<ComponentPool<Comp>>(pools).reset();
+    }
+
     void reset() {
         using accumulator_type = int[];
         std::get<ComponentPool<Component>>(pools).reset();

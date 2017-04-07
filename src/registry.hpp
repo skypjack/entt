@@ -252,13 +252,22 @@ public:
         return count;
     }
 
+    template<typename Comp>
+    bool empty() const noexcept {
+        return pool.template empty<Comp>();
+    }
+
     bool empty() const noexcept {
         return available.size() == count;
     }
 
-    template<typename Comp>
-    bool empty() const noexcept {
-        return pool.template empty<Comp>();
+    template<typename... Comp>
+    entity_type create() noexcept {
+        using accumulator_type = int[];
+        auto entity = create();
+        accumulator_type accumulator = { 0, (assign<Comp>(entity), 0)... };
+        (void)accumulator;
+        return entity;
     }
 
     entity_type create() noexcept {
@@ -271,15 +280,6 @@ public:
             available.pop_back();
         }
 
-        return entity;
-    }
-
-    template<typename... Comp>
-    entity_type create() noexcept {
-        using accumulator_type = int[];
-        auto entity = create();
-        accumulator_type accumulator = { 0, (assign<Comp>(entity), 0)... };
-        (void)accumulator;
         return entity;
     }
 
@@ -337,6 +337,11 @@ public:
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (sync<Components>(from, to), 0)... };
         (void)accumulator;
+    }
+
+    template<typename Comp>
+    void reset() {
+        pool.reset<Comp>();
     }
 
     void reset() {

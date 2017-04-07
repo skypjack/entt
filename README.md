@@ -157,9 +157,10 @@ Once you have created a registry, the followings are the exposed member function
 
 * `size`: returns the number of entities still alive.
 * `capacity`: returns the maximum number of entities created till now.
+* `empty<Component>`: returns `true` if at least an instance of `Component` exists, `false` otherwise.
 * `empty`: returns `true` if all the entities have been destroyed, `false` otherwise.
-* `create`: creates a new entity and returns it, no components assigned.
 * `create<Components...>`: creates a new entity and assigns it the given components, then returns the entity.
+* `create`: creates a new entity and returns it, no components assigned.
 * `destroy`: destroys the entity and all its components.
 * `assign<Component>(entity, args...)`: assigns the given component to the entity and uses `args...` to initialize it.
 * `remove<Component>(entity)`: removes the given component from the entity.
@@ -169,6 +170,7 @@ Once you have created a registry, the followings are the exposed member function
 * `clone(entity)`: clones an entity and all its components, then returns the new entity identifier.
 * `copy<Component>(from, to)`: copies a component from an entity to another one (both the entities must already have been assigned the component, undefined behaviour otherwise).
 * `copy(from, to)`: copies all the components and their contents from an entity to another one (comoonents are created or destroyed if needed).
+* `reset<Component>()`: destroys all the instances of `Component`.
 * `reset()`: resets the pool and destroys all the entities and their components.
 * `view<Components...>()`: gets a view of the entities that have the given components (see below for further details).
 
@@ -267,15 +269,16 @@ Even thoug the underlying pool doesn't store the components separately, the regi
 specific actions (like `destroy` or `copy`). That's why they must be explicitly specified.<br/>
 A generic pool should expose at least the following memeber functions:
 
-* `template<typename Comp> bool empty() const noexcept;`
-* `template<typename Comp> size_type capacity() const noexcept;`
-* `template<typename Comp> size_type size() const noexcept;`
-* `template<typename Comp> const entity_type * entities() const noexcept;`
-* `template<typename Comp> bool has(entity_type entity) const noexcept;`
-* `template<typename Comp> const Comp & get(entity_type entity) const noexcept;`
-* `template<typename Comp> Comp & get(entity_type entity) noexcept;`
-* `template<typename Comp, typename... Args> Comp & construct(entity_type entity, Args&&... args);`
-* `template<typename Comp> void destroy(entity_type entity);`
+* `template<typename Component> bool empty() const noexcept;`
+* `template<typename Component> size_type capacity() const noexcept;`
+* `template<typename Component> size_type size() const noexcept;`
+* `template<typename Component> const entity_type * entities() const noexcept;`
+* `template<typename Component> bool has(entity_type entity) const noexcept;`
+* `template<typename Component> const Comp & get(entity_type entity) const noexcept;`
+* `template<typename Component> Comp & get(entity_type entity) noexcept;`
+* `template<typename Component, typename... Args> Comp & construct(entity_type entity, Args&&... args);`
+* `template<typename Component> void destroy(entity_type entity);`
+* `template<typename Component> void reset();`
 * `void reset();`
 
 Good luck. If you come out with a more performant components pool, do not forget to make a PR so that I can add it to
