@@ -341,7 +341,7 @@ public:
 
     template<typename Comp>
     void reset() {
-        pool.reset<Comp>();
+        pool.template reset<Comp>();
     }
 
     void reset() {
