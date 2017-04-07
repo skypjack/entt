@@ -200,7 +200,7 @@ Exposed member functions are:
 * `operator++(int)`
 * `operator==()`
 * `operator!=()`
-* `operator*()`.
+* `operator*()`
 
 The single component view has an additional member function:
 
@@ -247,7 +247,7 @@ A custom pool should expose at least the following member functions:
 * `bool has(entity_type entity) const noexcept;`
 * `const component_type & get(entity_type entity) const noexcept;`
 * `component_type & get(entity_type entity) noexcept;`
-* template<typename... Args> component_type & construct(entity_type entity, Args&&... args);`
+* `template<typename... Args> component_type & construct(entity_type entity, Args&&... args);`
 * `void destroy(entity_type entity);`
 * `void reset();`
 
