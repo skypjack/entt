@@ -247,7 +247,7 @@ A custom pool should expose at least the following member functions:
 * `bool has(entity_type entity) const noexcept;`
 * `const component_type & get(entity_type entity) const noexcept;`
 * `component_type & get(entity_type entity) noexcept;`
-* `template<typename... Args> component_type & construct(entity_type entity, Args&&... args);`
+* `template<typename... Args> component_type & construct(entity_type entity, Args... args);`
 * `void destroy(entity_type entity);`
 * `void reset();`
 
@@ -276,7 +276,7 @@ A generic pool should expose at least the following memeber functions:
 * `template<typename Component> bool has(entity_type entity) const noexcept;`
 * `template<typename Component> const Comp & get(entity_type entity) const noexcept;`
 * `template<typename Component> Comp & get(entity_type entity) noexcept;`
-* `template<typename Component, typename... Args> Comp & construct(entity_type entity, Args&&... args);`
+* `template<typename Component, typename... Args> Comp & construct(entity_type entity, Args... args);`
 * `template<typename Component> void destroy(entity_type entity);`
 * `template<typename Component> void reset();`
 * `void reset();`

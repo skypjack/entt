@@ -74,7 +74,7 @@ public:
     }
 
     template<typename... Args>
-    component_type & construct(entity_type entity, Args&&... args) {
+    component_type & construct(entity_type entity, Args... args) {
         assert(!valid(entity));
 
         if(!(entity < reverse.size())) {
@@ -83,7 +83,7 @@ public:
 
         reverse[entity] = direct.size();
         direct.emplace_back(entity);
-        data.push_back({ std::forward<Args>(args)... });
+        data.push_back({ args... });
 
         return data.back();
     }
@@ -167,8 +167,8 @@ struct  ComponentPool final {
     }
 
     template<typename Comp, typename... Args>
-    Comp & construct(entity_type entity, Args&&... args) {
-        return std::get<ComponentPool<Comp>>(pools).construct(entity, std::forward<Args>(args)...);
+    Comp & construct(entity_type entity, Args... args) {
+        return std::get<ComponentPool<Comp>>(pools).construct(entity, args...);
     }
 
     template<typename Comp>

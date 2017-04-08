@@ -291,8 +291,8 @@ public:
     }
 
     template<typename Comp, typename... Args>
-    Comp & assign(entity_type entity, Args&&... args) {
-        return pool.template construct<Comp>(entity, std::forward<Args>(args)...);
+    Comp & assign(entity_type entity, Args... args) {
+        return pool.template construct<Comp>(entity, args...);
     }
 
     template<typename Comp>
@@ -316,8 +316,8 @@ public:
     }
 
     template<typename Comp, typename... Args>
-    void replace(entity_type entity, Args&&... args) {
-        pool.template get<Comp>(entity) = Comp{std::forward<Args>(args)...};
+    void replace(entity_type entity, Args... args) {
+        pool.template get<Comp>(entity) = Comp{args...};
     }
 
     entity_type clone(entity_type from) {
