@@ -172,7 +172,7 @@ Once you have created a registry, the followings are the exposed member function
 * `destroy`: destroys the entity and all its components.
 * `assign<Component>(entity, args...)`: assigns the given component to the entity and uses `args...` to initialize it.
 * `remove<Component>(entity)`: removes the given component from the entity.
-* `has<Component>(entity)`: returns `true` if the entity has the given component, `false` otherwise.
+* `has<Components...>(entity)`: returns `true` if the entity has the given components, `false` otherwise.
 * `get<Component>(entity)`: returns a reference to the given component for the entity (undefined behaviour if the entity has not the component).
 * `replace<Component>(entity, args...)`: replaces the given component for the entity, using `args...` to create the new component.
 * `clone(entity)`: clones an entity and all its components, then returns the new entity identifier.

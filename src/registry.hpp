@@ -301,9 +301,13 @@ public:
         pool.template destroy<Comp>(entity);
     }
 
-    template<typename Comp>
+    template<typename... Comp>
     bool has(entity_type entity) const noexcept {
-        return pool.template has<Comp>(entity);
+        using accumulator_type = bool[];
+        bool all = true;
+        accumulator_type accumulator = { true, (all = all && pool.template has<Comp>(entity))... };
+        (void)accumulator;
+        return all;
     }
 
     template<typename Comp>
