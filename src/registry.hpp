@@ -188,7 +188,7 @@ private:
 
 
 template<typename>
-struct Registry;
+class Registry;
 
 
 template<template<typename...> class Pool, typename Entity, typename... Components>

@@ -16,11 +16,12 @@ namespace entt {
 
 
 template<typename, typename, typename...>
-struct ComponentPool;
+class ComponentPool;
 
 
 template<typename Entity, typename Component>
-struct ComponentPool<Entity, Component> final {
+class ComponentPool<Entity, Component> final {
+public:
     using component_type = Component;
     using size_type = std::uint32_t;
     using entity_type = Entity;
@@ -115,7 +116,7 @@ private:
 
 
 template<typename Entity, typename Component, typename... Components>
-class  ComponentPool final {
+class ComponentPool final {
     template<typename Comp>
     using Pool = ComponentPool<Entity, Comp>;
 
