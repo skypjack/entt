@@ -1,8 +1,9 @@
+#include <cstddef>
 #include <gtest/gtest.h>
 #include <component_pool.hpp>
 
 TEST(ComponentPool, Functionalities) {
-    using pool_type = entt::ComponentPool<int, double>;
+    using pool_type = entt::ComponentPool<std::uint8_t, int, double>;
 
     pool_type pool{0};
 
@@ -19,7 +20,7 @@ TEST(ComponentPool, Functionalities) {
 }
 
 TEST(ComponentPool, ConstructDestroy) {
-    using pool_type = entt::ComponentPool<double, int>;
+    using pool_type = entt::ComponentPool<std::uint8_t, double, int>;
 
     pool_type pool{4};
 
@@ -107,7 +108,7 @@ TEST(ComponentPool, ConstructDestroy) {
 }
 
 TEST(ComponentPool, HasGet) {
-    using pool_type = entt::ComponentPool<int, char>;
+    using pool_type = entt::ComponentPool<std::uint8_t, int, char>;
 
     pool_type pool;
     const pool_type &cpool = pool;
@@ -126,7 +127,7 @@ TEST(ComponentPool, HasGet) {
 }
 
 TEST(ComponentPool, EntitiesReset) {
-    using pool_type = entt::ComponentPool<int, char>;
+    using pool_type = entt::ComponentPool<std::uint8_t, int, char>;
 
     pool_type pool{2};
 

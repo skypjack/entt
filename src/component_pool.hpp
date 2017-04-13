@@ -15,15 +15,15 @@
 namespace entt {
 
 
-template<typename, typename...>
+template<typename, typename, typename...>
 struct ComponentPool;
 
 
-template<typename Component>
-struct ComponentPool<Component> final {
+template<typename Entity, typename Component>
+struct ComponentPool<Entity, Component> final {
     using component_type = Component;
     using size_type = std::uint32_t;
-    using entity_type = std::uint32_t;
+    using entity_type = Entity;
 
 private:
     bool valid(entity_type entity) const noexcept {
@@ -114,13 +114,17 @@ private:
 };
 
 
-template<typename Component, typename... Components>
-struct  ComponentPool final {
-    using size_type = typename ComponentPool<Component>::size_type;
-    using entity_type = typename ComponentPool<Component>::entity_type;
+template<typename Entity, typename Component, typename... Components>
+class  ComponentPool final {
+    template<typename Comp>
+    using Pool = ComponentPool<Entity, Comp>;
+
+public:
+    using size_type = typename Pool<Component>::size_type;
+    using entity_type = typename Pool<Component>::entity_type;
 
     explicit ComponentPool(size_type dim = 4098) noexcept
-        : pools{ComponentPool<Component>{dim}, ComponentPool<Components>{dim}...}
+        : pools{Pool<Component>{dim}, Pool<Components>{dim}...}
     {
         assert(!(dim < 0));
     }
@@ -133,32 +137,32 @@ struct  ComponentPool final {
 
     template<typename Comp>
     bool empty() const noexcept {
-        return std::get<ComponentPool<Comp>>(pools).empty();
+        return std::get<Pool<Comp>>(pools).empty();
     }
 
     template<typename Comp>
     size_type capacity() const noexcept {
-        return std::get<ComponentPool<Comp>>(pools).capacity();
+        return std::get<Pool<Comp>>(pools).capacity();
     }
 
     template<typename Comp>
     size_type size() const noexcept {
-        return std::get<ComponentPool<Comp>>(pools).size();
+        return std::get<Pool<Comp>>(pools).size();
     }
 
     template<typename Comp>
     const entity_type * entities() const noexcept {
-        return std::get<ComponentPool<Comp>>(pools).entities();
+        return std::get<Pool<Comp>>(pools).entities();
     }
 
     template<typename Comp>
     bool has(entity_type entity) const noexcept {
-        return std::get<ComponentPool<Comp>>(pools).has(entity);
+        return std::get<Pool<Comp>>(pools).has(entity);
     }
 
     template<typename Comp>
     const Comp & get(entity_type entity) const noexcept {
-        return std::get<ComponentPool<Comp>>(pools).get(entity);
+        return std::get<Pool<Comp>>(pools).get(entity);
     }
 
     template<typename Comp>
@@ -168,28 +172,28 @@ struct  ComponentPool final {
 
     template<typename Comp, typename... Args>
     Comp & construct(entity_type entity, Args... args) {
-        return std::get<ComponentPool<Comp>>(pools).construct(entity, args...);
+        return std::get<Pool<Comp>>(pools).construct(entity, args...);
     }
 
     template<typename Comp>
     void destroy(entity_type entity) {
-        std::get<ComponentPool<Comp>>(pools).destroy(entity);
+        std::get<Pool<Comp>>(pools).destroy(entity);
     }
 
     template<typename Comp>
     void reset() {
-        std::get<ComponentPool<Comp>>(pools).reset();
+        std::get<Pool<Comp>>(pools).reset();
     }
 
     void reset() {
         using accumulator_type = int[];
-        std::get<ComponentPool<Component>>(pools).reset();
-        accumulator_type accumulator = { (std::get<ComponentPool<Components>>(pools).reset(), 0)... };
+        std::get<Pool<Component>>(pools).reset();
+        accumulator_type accumulator = { (std::get<Pool<Components>>(pools).reset(), 0)... };
         (void)accumulator;
     }
 
 private:
-    std::tuple<ComponentPool<Component>, ComponentPool<Components>...> pools;
+    std::tuple<Pool<Component>, Pool<Components>...> pools;
 };
 
 
