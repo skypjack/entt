@@ -148,8 +148,7 @@ There are three options to instantiate your own registry:
     auto registry = entt::StandardRegistry<std::uint16_t, Components...>{args...};
     ```
 
-  That is, you must provide the whole list of components to be registered with the default registry **and** the desired type for the entities.<br/>
-  Note that the default type is `std::uint32_t`, that is larger enough for almost all the games but also too big for the most of the games.
+  That is, you must provide the whole list of components to be registered with the default registry **and** the desired type for the entities. Note that the default type is `std::uint32_t`, that is larger enough for almost all the games but also too big for the most of the games.
 
 * By using your own pool:
 
