@@ -26,6 +26,7 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_FALSE(registry.has<char>(e1));
     ASSERT_TRUE(registry.has<char>(e2));
     ASSERT_TRUE((registry.has<int, char>(e2)));
+    ASSERT_FALSE((registry.has<int, char>(e1)));
 
     ASSERT_EQ(registry.assign<int>(e1, 42), 42);
     ASSERT_EQ(registry.assign<char>(e1, 'c'), 'c');
@@ -37,6 +38,7 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_TRUE(registry.has<char>(e1));
     ASSERT_FALSE(registry.has<char>(e2));
     ASSERT_TRUE((registry.has<int, char>(e1)));
+    ASSERT_FALSE((registry.has<int, char>(e2)));
 
     registry_type::entity_type e3 = registry.clone(e1);
 
