@@ -103,6 +103,12 @@ TEST(DefaultRegistry, Functionalities) {
 
     ASSERT_TRUE(registry.empty<int>());
     ASSERT_TRUE(registry.empty<char>());
+
+    e1 = registry.create<int>();
+
+    ASSERT_NO_THROW(registry.reset<int>(e1));
+    ASSERT_NO_THROW(registry.reset<int>(e2));
+    ASSERT_TRUE(registry.empty<int>());
 }
 
 TEST(DefaultRegistry, ViewSingleComponent) {

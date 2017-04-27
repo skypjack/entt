@@ -354,6 +354,13 @@ public:
     }
 
     template<typename Comp>
+    void reset(entity_type entity) {
+        if(pool.template has<Comp>(entity)) {
+            pool.template destroy<Comp>(entity);
+        }
+    }
+
+    template<typename Comp>
     void reset() {
         pool.template reset<Comp>();
     }

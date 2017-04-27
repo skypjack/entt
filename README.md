@@ -179,6 +179,7 @@ Once you have created a registry, the followings are the exposed member function
 * `clone(entity)`: clones an entity and all its components, then returns the new entity identifier.
 * `copy<Component>(from, to)`: copies a component from an entity to another one (both the entities must already have been assigned the component, undefined behaviour otherwise).
 * `copy(from, to)`: copies all the components and their contents from an entity to another one (comoonents are created or destroyed if needed).
+* `reset<Component>(entity)`: removes the given component from the entity if assigned.
 * `reset<Component>()`: destroys all the instances of `Component`.
 * `reset()`: resets the pool and destroys all the entities and their components.
 * `view<Components...>()`: gets a view of the entities that have the given components (see below for further details).
