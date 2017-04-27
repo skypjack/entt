@@ -67,6 +67,12 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_EQ(registry.get<int>(e2), 0);
     ASSERT_NE(&registry.get<int>(e1), &registry.get<int>(e2));
 
+    ASSERT_NO_THROW(registry.remove<int>(e2));
+    ASSERT_NO_THROW(registry.accomodate<int>(e1, 1));
+    ASSERT_NO_THROW(registry.accomodate<int>(e2, 1));
+    ASSERT_EQ(registry.get<int>(e1), 1);
+    ASSERT_EQ(registry.get<int>(e2), 1);
+
     ASSERT_EQ(registry.size(), registry_type::size_type{3});
     ASSERT_EQ(registry.capacity(), registry_type::size_type{3});
     ASSERT_FALSE(registry.empty());

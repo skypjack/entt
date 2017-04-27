@@ -175,6 +175,7 @@ Once you have created a registry, the followings are the exposed member function
 * `has<Components...>(entity)`: returns `true` if the entity has the given components, `false` otherwise.
 * `get<Component>(entity)`: returns a reference to the given component for the entity (undefined behaviour if the entity has not the component).
 * `replace<Component>(entity, args...)`: replaces the given component for the entity, using `args...` to create the new component.
+* `accomodate<Component>(entity, args...)`: replaces the given component for the entity if it exists, otherwise assigns it to the entity and uses `args...` to initialize it.
 * `clone(entity)`: clones an entity and all its components, then returns the new entity identifier.
 * `copy<Component>(from, to)`: copies a component from an entity to another one (both the entities must already have been assigned the component, undefined behaviour otherwise).
 * `copy(from, to)`: copies all the components and their contents from an entity to another one (comoonents are created or destroyed if needed).

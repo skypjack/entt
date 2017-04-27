@@ -325,6 +325,15 @@ public:
         pool.template get<Comp>(entity) = Comp{args...};
     }
 
+    template<typename Comp, typename... Args>
+    void accomodate(entity_type entity, Args... args) {
+        if(pool.template has<Comp>(entity)) {
+            this->template replace<Comp>(entity, std::forward<Args>(args)...);
+        } else {
+            this->template assign<Comp>(entity, std::forward<Args>(args)...);
+        }
+    }
+
     entity_type clone(entity_type from) {
         auto to = create();
         using accumulator_type = int[];
