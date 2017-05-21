@@ -321,17 +321,15 @@ public:
     }
 
     template<typename Comp, typename... Args>
-    void replace(entity_type entity, Args... args) {
-        pool.template get<Comp>(entity) = Comp{args...};
+    Comp & replace(entity_type entity, Args... args) {
+        return (pool.template get<Comp>(entity) = Comp{args...});
     }
 
     template<typename Comp, typename... Args>
-    void accomodate(entity_type entity, Args... args) {
-        if(pool.template has<Comp>(entity)) {
-            this->template replace<Comp>(entity, std::forward<Args>(args)...);
-        } else {
-            this->template assign<Comp>(entity, std::forward<Args>(args)...);
-        }
+    Comp & accomodate(entity_type entity, Args... args) {
+        return (pool.template has<Comp>(entity)
+                ? this->template replace<Comp>(entity, std::forward<Args>(args)...)
+                : this->template assign<Comp>(entity, std::forward<Args>(args)...));
     }
 
     entity_type clone(entity_type from) {
@@ -343,8 +341,8 @@ public:
     }
 
     template<typename Comp>
-    void copy(entity_type from, entity_type to) {
-        pool.template get<Comp>(to) = pool.template get<Comp>(from);
+    Comp & copy(entity_type from, entity_type to) {
+        return (pool.template get<Comp>(to) = pool.template get<Comp>(from));
     }
 
     void copy(entity_type from, entity_type to) {
