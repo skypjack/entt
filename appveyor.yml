@@ -8,7 +8,6 @@ environment:
 
 platform:
   - Win32
-  - x64
 
 configuration:
   - Release
