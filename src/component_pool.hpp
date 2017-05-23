@@ -125,7 +125,7 @@ public:
     using entity_type = typename Pool<Component>::entity_type;
 
     explicit ComponentPool(size_type dim = 4098) noexcept
-#ifdef WIN32
+#ifdef _MSC_VER
         : pools(Pool<Component>{dim}, Pool<Components>{dim}...)
 #else
         : pools{Pool<Component>{dim}, Pool<Components>{dim}...}
