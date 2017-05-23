@@ -210,21 +210,21 @@ private:
     }
 
     template<typename Comp>
-    void clone(entity_type from, entity_type to) {
+    void clone(entity_type to, entity_type from) {
         if(pool.template has<Comp>(from)) {
             pool.template construct<Comp>(to, pool.template get<Comp>(from));
         }
     }
 
     template<typename Comp>
-    void sync(entity_type from, entity_type to) {
+    void sync(entity_type to, entity_type from) {
         bool src = pool.template has<Comp>(from);
         bool dst = pool.template has<Comp>(to);
 
         if(src && dst) {
-            copy<Comp>(from, to);
+            copy<Comp>(to, from);
         } else if(src) {
-            clone<Comp>(from, to);
+            clone<Comp>(to, from);
         } else if(dst) {
             destroy(to);
         }
@@ -335,19 +335,19 @@ public:
     entity_type clone(entity_type from) {
         auto to = create();
         using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (clone<Components>(from, to), 0)... };
+        accumulator_type accumulator = { 0, (clone<Components>(to, from), 0)... };
         (void)accumulator;
         return to;
     }
 
     template<typename Comp>
-    Comp & copy(entity_type from, entity_type to) {
+    Comp & copy(entity_type to, entity_type from) {
         return (pool.template get<Comp>(to) = pool.template get<Comp>(from));
     }
 
-    void copy(entity_type from, entity_type to) {
+    void copy(entity_type to, entity_type from) {
         using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (sync<Components>(from, to), 0)... };
+        accumulator_type accumulator = { 0, (sync<Components>(to, from), 0)... };
         (void)accumulator;
     }
 
