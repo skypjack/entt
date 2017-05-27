@@ -20,7 +20,7 @@ class View;
 
 
 template<template<typename...> class Pool, typename Entity, typename... Components, typename Type, typename... Types>
-class View<Pool<Entity, Components...>, Type, Types...> final {
+class View<Pool<Entity, Components...>, Type, Types...> {
     using pool_type = Pool<Entity, Components...>;
     using entity_type = typename pool_type::entity_type;
 
@@ -122,7 +122,7 @@ private:
 
 
 template<template<typename...> class Pool, typename Entity, typename... Components, typename Type>
-class View<Pool<Entity, Components...>, Type> final {
+class View<Pool<Entity, Components...>, Type> {
     using pool_type = Pool<Entity, Components...>;
     using entity_type = typename pool_type::entity_type;
 
@@ -192,7 +192,7 @@ class Registry;
 
 
 template<template<typename...> class Pool, typename Entity, typename... Components>
-class Registry<Pool<Entity, Components...>> final {
+class Registry<Pool<Entity, Components...>> {
     using pool_type = Pool<Entity, Components...>;
 
 public:

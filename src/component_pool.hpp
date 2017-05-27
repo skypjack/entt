@@ -20,7 +20,7 @@ class ComponentPool;
 
 
 template<typename Entity, typename Component>
-class ComponentPool<Entity, Component> final {
+class ComponentPool<Entity, Component> {
 public:
     using component_type = Component;
     using size_type = std::uint32_t;
@@ -116,7 +116,7 @@ private:
 
 
 template<typename Entity, typename Component, typename... Components>
-class ComponentPool final {
+class ComponentPool {
     template<typename Comp>
     using Pool = ComponentPool<Entity, Comp>;
 
