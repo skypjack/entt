@@ -2,13 +2,10 @@
 #define ENTT_REGISTRY_HPP
 
 
-#include <cassert>
-#include <memory>
 #include <vector>
 #include <utility>
 #include <cstddef>
 #include <iterator>
-#include <algorithm>
 #include "component_pool.hpp"
 
 
@@ -71,7 +68,7 @@ class View<Pool<Entity, Components...>, Type, Types...> final {
     private:
         pool_type &pool;
         const entity_type *entities;
-        std::uint32_t pos;
+        typename pool_type::size_type pos;
     };
 
     template<typename Comp>
@@ -199,7 +196,7 @@ public:
     static_assert(sizeof...(Components) > 1, "!");
 
     using entity_type = typename pool_type::entity_type;
-    using size_type = std::size_t;
+    using size_type = typename std::vector<entity_type>::size_type;
 
 private:
     template<typename Comp>
@@ -246,11 +243,11 @@ public:
     Registry & operator=(Registry &&) = delete;
 
     size_type size() const noexcept {
-        return count - available.size();
+        return static_cast<size_type>(count - available.size());
     }
 
     size_type capacity() const noexcept {
-        return count;
+        return static_cast<size_type>(count);
     }
 
     template<typename Comp>
