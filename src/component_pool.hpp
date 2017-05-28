@@ -78,7 +78,7 @@ public:
             reverse.resize(entity+1);
         }
 
-        reverse[entity] = direct.size();
+        reverse[entity] = pos_type(direct.size());
         direct.emplace_back(entity);
         data.push_back({ args... });
 
@@ -124,7 +124,11 @@ public:
     using size_type = typename Pool<Component>::size_type;
 
     explicit ComponentPool(size_type dim = 4098) noexcept
+#ifdef _MSC_VER
+        : ComponentPool<Entity, Component>{dim}, ComponentPool<Entity, Components>{dim}...
+#else
         : Pool<Component>{dim}, Pool<Components>{dim}...
+#endif
     {
         assert(!(dim < 0));
     }

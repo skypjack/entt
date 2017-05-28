@@ -243,11 +243,11 @@ public:
     Registry & operator=(Registry &&) = delete;
 
     size_type size() const noexcept {
-        return static_cast<size_type>(count - available.size());
+        return count - available.size();
     }
 
     size_type capacity() const noexcept {
-        return static_cast<size_type>(count);
+        return count;
     }
 
     template<typename Comp>
