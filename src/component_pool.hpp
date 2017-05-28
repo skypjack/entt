@@ -50,11 +50,11 @@ public:
     }
 
     size_type capacity() const noexcept {
-        return data.capacity();
+        return static_cast<size_type>(data.capacity());
     }
 
     size_type size() const noexcept {
-        return data.size();
+        return static_cast<size_type>(data.size());
     }
 
     const entity_type * entities() const noexcept {
@@ -82,7 +82,7 @@ public:
             reverse.resize(entity+1);
         }
 
-        reverse[entity] = direct.size();
+        reverse[entity] = static_cast<size_type>(direct.size());
         direct.emplace_back(entity);
         data.push_back({ args... });
 
