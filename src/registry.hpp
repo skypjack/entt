@@ -192,7 +192,7 @@ class Registry;
 
 
 template<template<typename...> class Pool, typename Entity, typename... Components>
-class Registry<Pool<Entity, Components...>> final {
+class Registry<Pool<Entity, Components...>> {
     using pool_type = Pool<Entity, Components...>;
 
 public:
