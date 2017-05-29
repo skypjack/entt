@@ -2,6 +2,7 @@
 #define ENTT_REGISTRY_HPP
 
 
+#include <tuple>
 #include <vector>
 #include <utility>
 #include <cstddef>
@@ -16,8 +17,8 @@ template<typename...>
 class View;
 
 
-template<template<typename...> class Pool, typename Entity, typename... Components, typename Type, typename... Types>
-class View<Pool<Entity, Components...>, Type, Types...> final {
+template<template<typename...> class Pool, typename Entity, typename... Components, typename Type, typename... Types, typename... Filters>
+class View<Pool<Entity, Components...>, std::tuple<Type, Types...>, std::tuple<Filters...>> final {
     using pool_type = Pool<Entity, Components...>;
     using entity_type = typename pool_type::entity_type;
 
@@ -25,9 +26,9 @@ class View<Pool<Entity, Components...>, Type, Types...> final {
         bool valid() const noexcept {
             using accumulator_type = bool[];
             bool check = pool.template has<Type>(entities[pos-1]);
-            accumulator_type accumulator = { true, (check = check && pool.template has<Types>(entities[pos-1]))... };
-            (void)accumulator;
-            return check;
+            accumulator_type types = { true, (check = check && pool.template has<Types>(entities[pos-1]))... };
+            accumulator_type filters = { true, (check = check && not pool.template has<Filters>(entities[pos-1]))... };
+            return void(types), void(filters), check;
         }
 
     public:
@@ -85,6 +86,9 @@ public:
     using iterator_type = ViewIterator;
     using size_type = typename pool_type::size_type;
 
+    template<typename... Comp>
+    using view_type = View<pool_type, std::tuple<Type, Types...>, std::tuple<Comp...>>;
+
     explicit View(pool_type &pool) noexcept
         : entities{pool.template entities<Type>()},
           size{pool.template size<Type>()},
@@ -93,6 +97,11 @@ public:
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (prefer<Types>(), 0)... };
         (void)accumulator;
+    }
+
+    template<typename... Comp>
+    view_type<Comp...> exclude() noexcept {
+        return view_type<Comp...>{pool};
     }
 
     iterator_type begin() const noexcept {
@@ -119,7 +128,7 @@ private:
 
 
 template<template<typename...> class Pool, typename Entity, typename... Components, typename Type>
-class View<Pool<Entity, Components...>, Type> final {
+class View<Pool<Entity, Components...>, std::tuple<Type>, std::tuple<>> final {
     using pool_type = Pool<Entity, Components...>;
     using entity_type = typename pool_type::entity_type;
 
@@ -165,7 +174,15 @@ public:
     using iterator_type = ViewIterator;
     using size_type = typename pool_type::size_type;
 
+    template<typename... Comp>
+    using view_type = View<pool_type, std::tuple<Type>, std::tuple<Comp...>>;
+
     explicit View(pool_type &pool) noexcept: pool{pool} {}
+
+    template<typename... Comp>
+    view_type<Comp...> exclude() noexcept {
+        return view_type<Comp...>{pool};
+    }
 
     iterator_type begin() const noexcept {
         return ViewIterator{pool.template entities<Type>(), pool.template size<Type>()};
@@ -229,7 +246,7 @@ private:
 
 public:
     template<typename... Comp>
-    using view_type = View<pool_type, Comp...>;
+    using view_type = View<pool_type, std::tuple<Comp...>, std::tuple<>>;
 
     template<typename... Args>
     Registry(Args&&... args)
@@ -367,7 +384,7 @@ public:
     }
 
     template<typename... Comp>
-    view_type<Comp...> view() {
+    view_type<Comp...> view() noexcept {
         return view_type<Comp...>{pool};
     }
 

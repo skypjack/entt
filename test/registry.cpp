@@ -193,3 +193,45 @@ TEST(DefaultRegistry, EmptyViewMultipleComponent) {
 
     registry.reset();
 }
+
+TEST(DefaultRegistry, ViewSingleComponentWithExclude) {
+    using registry_type = entt::DefaultRegistry<int, char>;
+
+    registry_type registry;
+
+    registry_type::entity_type e1 = registry.create<char>();
+    registry_type::entity_type e2 = registry.create<int, char>();
+
+    auto view = registry.view<char>().exclude<int>();
+
+    ASSERT_NE(view.begin(), view.end());
+
+    ASSERT_EQ(*view.begin(), e1);
+    ASSERT_NE(*view.begin(), e2);
+    ASSERT_EQ(++view.begin(), view.end());
+    ASSERT_NO_THROW(registry.reset());
+
+    ASSERT_NO_THROW((registry.view<char>().exclude<int>().begin()++));
+    ASSERT_NO_THROW((++registry.view<char>().exclude<int>().begin()));
+}
+
+TEST(DefaultRegistry, ViewMultipleComponentWithExclude) {
+    using registry_type = entt::DefaultRegistry<int, char, double>;
+
+    registry_type registry;
+
+    registry_type::entity_type e1 = registry.create<int, char, double>();
+    registry_type::entity_type e2 = registry.create<char, double>();
+
+    auto view = registry.view<char, double>().exclude<int>();
+
+    ASSERT_NE(view.begin(), view.end());
+
+    ASSERT_NE(*view.begin(), e1);
+    ASSERT_EQ(*view.begin(), e2);
+    ASSERT_EQ(++view.begin(), view.end());
+    ASSERT_NO_THROW(registry.reset());
+
+    ASSERT_NO_THROW((registry.view<char>().exclude<int>().begin()++));
+    ASSERT_NO_THROW((++registry.view<char>().exclude<int>().begin()));
+}
