@@ -228,8 +228,8 @@ The multi component view has an additional member function:
 
 * `reset()`: reorganizes internal data so as to further create optimized iterators (use it whenever the data within the registry are known to be changed).
 
-The filtered view is nothing more than a multi component view with an additional set of components that act as filters.<br/>
-Users can create filtered view either from a single component view or from a multi component view by means of the `exclude` member function:
+A filtered view is nothing more than a multi component view with an additional set of components that act as filters.<br/>
+Users can create filtered views either from a single component view or from a multi component view by means of the `exclude` member function:
 
 ```
 auto view = registry.view<Position>().exclude<Velocity>();
