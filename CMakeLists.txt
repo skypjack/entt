@@ -81,7 +81,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_RUNTIME_OUTPUT_DIRECTORY})
 # Enable test support using ctest
 #
 
-include(CTest)
+enable_testing()
 
 #
 # Referenced packages
