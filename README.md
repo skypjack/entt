@@ -245,10 +245,23 @@ I'd suggest not to store them anywhere and to invoke the `Registry::view` member
 initialized view over which to iterate.
 
 **Note**: An important feature (usually missed by other well known ECS) is that users can create and destroy entities, as
-well as assign or remove components while iterating and neither the views nor the iterators will be invalidated.<br/>
-Therefore, unless one tries to access a destroyed entity through an iterator that hasn't been advanced (in this case, of course,
-it's an undefined behaviour), users can freely interact with the registry and keep views and iterators consistent.<br/>
-On the other side, iterators aren't thread safe. Do no try to iterate over a set of components and modify them concurrently.
+well as assign or remove components while iterating and neither the views nor the iterators will be invalidated.
+
+There are a few exceptions to the rule:
+
+* Trying to access a destroyed entity through an iterator that hasn't been advanced results in an undefined behavior.
+* Destroying an entity that isn't the one returned by the iterator in use results in an undefined behavior.
+* Removing a component from an entity that isn't the one returned by the iterator in use results in an undefined behavior.
+
+In other therms, users can freely interact with the registry and keep views and iterators consistent as long as:
+
+* They create new entities with their set of components or assign components of any type to an already existent entity.
+* They destroy the current entity (that is the one returned by the iterator in use) or remove its components.
+
+In any other case the behavior is undefined and additions and deletions should be managed externally in a batch or whatever.
+As an example, whenever there exists a parent-child relationship, one can incurr in the problem above mentioned.
+
+Note also that iterators aren't thread safe. Do no try to iterate over a set of components and modify them concurrently.
 That being said, as long as a thread iterates over the entities that have the component `X` or assign and removes
 that component from a set of entities and another thread does something similar with components `Y` and `Z`, it shouldn't be a
 problem at all.<br/>
