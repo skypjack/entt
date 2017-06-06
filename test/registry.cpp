@@ -105,6 +105,7 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_TRUE(registry.empty<char>());
 
     e1 = registry.create<int>();
+    e2 = registry.create();
 
     ASSERT_NO_THROW(registry.reset<int>(e1));
     ASSERT_NO_THROW(registry.reset<int>(e2));

@@ -94,14 +94,34 @@ drop-in replacement for it with a minimal effort.
 ### Performance
 
 As it stands right now, `EnTT` is just fast enough for my requirements if compared to my first choice (that was already
-amazingly fast):
+amazingly fast).
+These are the results of the twos when compiled with GCC 6.3:
 
-| Benchmark | EntityX (master) | EntityX (experimental/compile_time) | EnTT |
+| Benchmark | | EntityX (experimental/compile_time) | EnTT |
 |-----------|-------------|-------------|-------------|
-| Creating 10M entities | 0.281481s | 0.213988s | **0.00542235s** |
-| Destroying 10M entities | 0.166156s | 0.0673857s | **0.0582367s** |
-| Iterating over 10M entities, unpacking one component | 0.047039s | 0.0297941s | **9.3e-08s** |
-| Iterating over 10M entities, unpacking two components | 0.0701693s | 0.0412988s | **0.0206747s** |
+| Creating 10M entities | 0.187042s | **0.0928331s** |
+| Destroying 10M entities | 0.0735151s | **0.060166s** |
+| Iterating over 10M entities, unpacking one component | 0.00784801s | **1.02e-07s** |
+| Iterating over 10M entities, unpacking two components | 0.00865273s | **0.00326714s** |
+| Iterating over 10M entities, unpacking five components | 0.0122006s | **0.00323354s** |
+| Iterating over 10M entities, unpacking ten components | 0.0100089s | **0.00323615s** |
+| Iterating over 50M entities, unpacking one component | 0.0394404s | **1.14e-07s** |
+| Iterating over 50M entities, unpacking two components | 0.0400407s | **0.0179783s** |
+
+These are the results of the twos when compiled with Clang 3.8.1:
+
+| Benchmark | | EntityX (experimental/compile_time) | EnTT |
+|-----------|-------------|-------------|-------------|
+| Creating 10M entities | 0.268049s | **0.0899998s** |
+| Destroying 10M entities | **0.0713912s** | 0.078663s |
+| Iterating over 10M entities, unpacking one component | 0.00863192s | **3.05e-07s** |
+| Iterating over 10M entities, unpacking two components | 0.00780158s | **2.5434e-05s** |
+| Iterating over 10M entities, unpacking five components | 0.00829669s | **2.5497e-05s** |
+| Iterating over 10M entities, unpacking ten components | 0.00789789s | **2.5563e-05s** |
+| Iterating over 50M entities, unpacking one component | 0.0423244s | **1.94e-07s** |
+| Iterating over 50M entities, unpacking two components | 0.0435464s | **0.00012661s** |
+
+I don't know what Clang does to squeeze out of `EnTT` the performance above, but I'd say that it does it incredibly well.
 
 See [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp) for further details.<br/>
 Of course, I'll try to get out of it more features and better performance anyway in the future, mainly for fun.
@@ -172,6 +192,7 @@ Once you have created a registry, the followings are the exposed member function
 
 * `size`: returns the number of entities still alive.
 * `capacity`: returns the maximum number of entities created till now.
+* `valid`: returns true if the entity is still in use, false otherwise.
 * `empty<Component>`: returns `true` if at least an instance of `Component` exists, `false` otherwise.
 * `empty`: returns `true` if all the entities have been destroyed, `false` otherwise.
 * `create<Components...>`: creates a new entity and assigns it the given components, then returns the entity.
