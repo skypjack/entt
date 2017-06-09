@@ -97,8 +97,8 @@ As it stands right now, `EnTT` is just fast enough for my requirements if compar
 amazingly fast).
 These are the results of the twos when compiled with GCC 6.3:
 
-| Benchmark | | EntityX (experimental/compile_time) | EnTT |
-|-----------|-------------|-------------|-------------|
+| Benchmark | EntityX (experimental/compile_time) | EnTT |
+|-----------|-------------|-------------|
 | Creating 10M entities | 0.187042s | **0.0928331s** |
 | Destroying 10M entities | 0.0735151s | **0.060166s** |
 | Iterating over 10M entities, unpacking one component | 0.00784801s | **1.02e-07s** |
@@ -110,8 +110,8 @@ These are the results of the twos when compiled with GCC 6.3:
 
 These are the results of the twos when compiled with Clang 3.8.1:
 
-| Benchmark | | EntityX (experimental/compile_time) | EnTT |
-|-----------|-------------|-------------|-------------|
+| Benchmark | EntityX (experimental/compile_time) | EnTT |
+|-----------|-------------|-------------|
 | Creating 10M entities | 0.268049s | **0.0899998s** |
 | Destroying 10M entities | **0.0713912s** | 0.078663s |
 | Iterating over 10M entities, unpacking one component | 0.00863192s | **3.05e-07s** |
