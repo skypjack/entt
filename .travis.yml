@@ -20,7 +20,7 @@ matrix:
     osx_image: xcode8
     compiler: clang
     env: COMPILER=clang++
-- os: linux
+  - os: linux
     compiler: gcc
     addons:
       apt:
