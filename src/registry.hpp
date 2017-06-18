@@ -248,7 +248,7 @@ private:
         } else if(src) {
             clone<Comp>(to, from);
         } else if(dst) {
-            destroy(to);
+            remove<Comp>(to);
         }
     }
 
