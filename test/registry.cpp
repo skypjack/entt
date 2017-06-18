@@ -142,7 +142,11 @@ TEST(DefaultRegistry, Copy) {
     ASSERT_TRUE(registry.has<char>(e2));
     ASSERT_FALSE(registry.has<double>(e2));
 
+    ASSERT_FALSE(registry.empty<int>());
+    ASSERT_FALSE(registry.empty<char>());
     ASSERT_TRUE(registry.empty<double>());
+
+    registry.reset();
 }
 
 TEST(DefaultRegistry, ViewSingleComponent) {
