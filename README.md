@@ -77,7 +77,7 @@ int main() {
     std::cout << "filtered component view" << std::endl;
 
     for(auto entity: ecs.view<Position>().exclude<Velocity>()) {
-        std::cout << (registry.has<Position>(entity)) << "/" << (registry.has<Velocity>(entity)) << std::endl;
+        std::cout << (ecs.has<Position>(entity)) << "/" << (ecs.has<Velocity>(entity)) << std::endl;
     }
 
     ecs.reset();
