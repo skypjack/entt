@@ -1,4 +1,6 @@
 language: cpp
+dist: trusty
+sudo: false
 
 matrix:
   include:
@@ -13,11 +15,11 @@ matrix:
     compiler: clang
     addons:
       apt:
-        sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.8']
-        packages: ['clang-3.8']
-    env: COMPILER=clang++-3.8
+        sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-4.0']
+        packages: ['clang-4.0', 'libstdc++-4.9-dev']
+    env: COMPILER=clang++-4.0
   - os: osx
-    osx_image: xcode8
+    osx_image: xcode8.3
     compiler: clang
     env: COMPILER=clang++
   - os: linux
@@ -41,13 +43,11 @@ notifications:
 
 install:
 - echo ${PATH}
-- ./travis.sh
 - cmake --version
 - export CXX=${COMPILER}
 - echo ${CXX}
 - ${CXX} --version
 - ${CXX} -v
-- ./deps.sh
 
 script:
 - mkdir -p build && cd build
