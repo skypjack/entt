@@ -157,6 +157,9 @@ TEST(DefaultRegistry, ViewSingleComponent) {
     registry_type::entity_type e1 = registry.create();
     registry_type::entity_type e2 = registry.create<int, char>();
 
+    ASSERT_NO_THROW(registry.view<char>().begin()++);
+    ASSERT_NO_THROW(++registry.view<char>().begin());
+
     auto view = registry.view<char>();
 
     ASSERT_NE(view.begin(), view.end());
@@ -171,9 +174,6 @@ TEST(DefaultRegistry, ViewSingleComponent) {
 
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_NO_THROW(registry.reset());
-
-    ASSERT_NO_THROW(registry.view<char>().begin()++);
-    ASSERT_NO_THROW(++registry.view<char>().begin());
 }
 
 TEST(DefaultRegistry, ViewMultipleComponent) {
@@ -198,7 +198,7 @@ TEST(DefaultRegistry, ViewMultipleComponent) {
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_NO_THROW(registry.reset());
 }
-/*
+
 TEST(DefaultRegistry, EmptyViewSingleComponent) {
     using registry_type = entt::DefaultRegistry<char, int, double>;
 
@@ -231,4 +231,3 @@ TEST(DefaultRegistry, EmptyViewMultipleComponent) {
 
     registry.reset();
 }
-*/
