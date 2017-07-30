@@ -2,13 +2,13 @@
 #define ENTT_REGISTRY_HPP
 
 
-#include <tuple>
 #include <vector>
 #include <bitset>
 #include <utility>
 #include <cstddef>
 #include <iterator>
 #include <cassert>
+#include <type_traits>
 #include "component_pool.hpp"
 #include "ident.hpp"
 
@@ -20,20 +20,22 @@ template<typename...>
 class View;
 
 
-template<template<typename...> class Pool, typename Entity, typename... Components, typename Type, typename... Types, typename... Filters>
-class View<Pool<Entity, Components...>, std::tuple<Type, Types...>, std::tuple<Filters...>> final {
+template<template<typename...> class Pool, typename Entity, typename... Components, typename Type, typename... Types>
+class View<Pool<Entity, Components...>, Type, Types...> final {
     using pool_type = Pool<Entity, Components...>;
     using entity_type = typename pool_type::entity_type;
     using mask_type = std::bitset<sizeof...(Components)+1>;
 
+    class ViewIterator;
+
+public:
+    using iterator_type = ViewIterator;
+    using size_type = typename pool_type::size_type;
+
+private:
     class ViewIterator {
-        bool valid() const noexcept {
-            using accumulator_type = bool[];
-            auto &bitmask = mask[entities[pos-1]];
-            bool all = bitmask.test(ident<Components...>.template get<Type>());
-            accumulator_type types = { true, (all = all && bitmask.test(ident<Components...>.template get<Types>()))... };
-            accumulator_type filters = { true, (all = all && !bitmask.test(ident<Components...>.template get<Filters>()))... };
-            return void(types), void(filters), all;
+        inline bool valid() const noexcept {
+            return ((mask[entities[pos]] & bitmask) == bitmask);
         }
 
     public:
@@ -43,14 +45,15 @@ class View<Pool<Entity, Components...>, std::tuple<Type, Types...>, std::tuple<F
         using pointer = entity_type *;
         using iterator_category = std::input_iterator_tag;
 
-        ViewIterator(pool_type &pool, const entity_type *entities, typename pool_type::size_type pos, mask_type *mask) noexcept
-            : pool{pool}, entities{entities}, pos{pos}, mask{mask}
+        ViewIterator(const mask_type &bitmask, const entity_type *entities, const mask_type *mask, size_type pos, size_type last) noexcept
+            : bitmask{bitmask}, entities{entities}, mask{mask}, pos{pos}, last{last}
         {
-            if(this->pos) { while(!valid() && --this->pos); }
+            while(this->pos != last && !valid()) { ++this->pos; }
         }
 
         ViewIterator & operator++() noexcept {
-            if(pos) { while(--pos && !valid()); }
+            ++pos;
+            while(pos != last && !valid()) { ++pos; }
             return *this;
         }
 
@@ -60,7 +63,7 @@ class View<Pool<Entity, Components...>, std::tuple<Type, Types...>, std::tuple<F
         }
 
         bool operator==(const ViewIterator &other) const noexcept {
-            return other.entities == entities && other.pos == pos && other.mask == mask;
+            return other.pos == pos && other.entities == entities;
         }
 
         bool operator!=(const ViewIterator &other) const noexcept {
@@ -68,14 +71,15 @@ class View<Pool<Entity, Components...>, std::tuple<Type, Types...>, std::tuple<F
         }
 
         value_type operator*() const noexcept {
-            return *(entities+pos-1);
+            return entities[pos];
         }
 
     private:
-        pool_type &pool;
+        const mask_type bitmask;
         const entity_type *entities;
-        typename pool_type::size_type pos;
-        mask_type *mask;
+        const mask_type *mask;
+        size_type pos;
+        size_type last;
     };
 
     template<typename Comp>
@@ -89,34 +93,25 @@ class View<Pool<Entity, Components...>, std::tuple<Type, Types...>, std::tuple<F
     }
 
 public:
-    using iterator_type = ViewIterator;
-    using size_type = typename pool_type::size_type;
-
-    template<typename... Comp>
-    using view_type = View<pool_type, std::tuple<Type, Types...>, std::tuple<Comp...>>;
-
-    explicit View(pool_type &pool, mask_type *mask) noexcept
+    explicit View(const pool_type &pool, const mask_type *mask) noexcept
         : entities{pool.template entities<Type>()},
-          size{pool.template size<Type>()},
           pool{pool},
-          mask{mask}
+          mask{mask},
+          size{pool.template size<Type>()}
     {
         using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (prefer<Types>(), 0)... };
-        (void)accumulator;
-    }
-
-    template<typename... Comp>
-    view_type<Comp...> exclude() noexcept {
-        return view_type<Comp...>{pool, mask};
+        bitmask.set(ident<Components...>.template get<Type>());
+        accumulator_type types = { 0, (bitmask.set(ident<Components...>.template get<Types>()), 0)... };
+        accumulator_type pref = { 0, (prefer<Types>(), 0)... };
+        (void)types, (void)pref;
     }
 
     iterator_type begin() const noexcept {
-        return ViewIterator{pool, entities, size, mask};
+        return ViewIterator{bitmask, entities, mask, 0, size};
     }
 
     iterator_type end() const noexcept {
-        return ViewIterator{pool, entities, 0, mask};
+        return ViewIterator{bitmask, entities, mask, size, size};
     }
 
     void reset() noexcept {
@@ -129,18 +124,25 @@ public:
 
 private:
     const entity_type *entities;
+    const pool_type &pool;
+    const mask_type *mask;
     size_type size;
-    pool_type &pool;
-    mask_type *mask;
+    mask_type bitmask;
 };
 
 
-template<template<typename...> class Pool, typename Entity, typename... Components, typename Type>
-class View<Pool<Entity, Components...>, std::tuple<Type>, std::tuple<>> final {
+    template<template<typename...> class Pool, typename Entity, typename... Components, typename Type>
+class View<Pool<Entity, Components...>, Type> final {
     using pool_type = Pool<Entity, Components...>;
     using entity_type = typename pool_type::entity_type;
-    using mask_type = std::bitset<sizeof...(Components)+1>;
 
+    struct ViewIterator;
+
+public:
+    using size_type = typename pool_type::size_type;
+    using iterator_type = ViewIterator;
+
+private:
     struct ViewIterator {
         using value_type = entity_type;
         using difference_type = std::ptrdiff_t;
@@ -148,12 +150,12 @@ class View<Pool<Entity, Components...>, std::tuple<Type>, std::tuple<>> final {
         using pointer = entity_type *;
         using iterator_category = std::input_iterator_tag;
 
-        ViewIterator(const entity_type *entities, typename pool_type::size_type pos) noexcept
+        ViewIterator(const entity_type *entities, size_type pos) noexcept
             : entities{entities}, pos{pos}
         {}
 
         ViewIterator & operator++() noexcept {
-            --pos;
+            ++pos;
             return *this;
         }
 
@@ -163,7 +165,7 @@ class View<Pool<Entity, Components...>, std::tuple<Type>, std::tuple<>> final {
         }
 
         bool operator==(const ViewIterator &other) const noexcept {
-            return other.entities == entities && other.pos == pos;
+            return other.pos == pos && other.entities == entities;
         }
 
         bool operator!=(const ViewIterator &other) const noexcept {
@@ -171,36 +173,25 @@ class View<Pool<Entity, Components...>, std::tuple<Type>, std::tuple<>> final {
         }
 
         value_type operator*() const noexcept {
-            return *(entities+pos-1);
+            return entities[pos];
         }
 
     private:
         const entity_type *entities;
-        typename pool_type::size_type pos;
+        size_type pos;
     };
 
 public:
-    using iterator_type = ViewIterator;
-    using size_type = typename pool_type::size_type;
-
-    template<typename... Comp>
-    using view_type = View<pool_type, std::tuple<Type>, std::tuple<Comp...>>;
-
-    explicit View(pool_type &pool, mask_type *mask) noexcept
-        : pool{pool}, mask{mask}
+    explicit View(const pool_type &pool) noexcept
+        : pool{pool}
     {}
 
-    template<typename... Comp>
-    view_type<Comp...> exclude() noexcept {
-        return view_type<Comp...>{pool, mask};
-    }
-
     iterator_type begin() const noexcept {
-        return ViewIterator{pool.template entities<Type>(), pool.template size<Type>()};
+        return ViewIterator{pool.template entities<Type>(), 0};
     }
 
     iterator_type end() const noexcept {
-        return ViewIterator{pool.template entities<Type>(), 0};
+        return ViewIterator{pool.template entities<Type>(), pool.template size<Type>()};
     }
 
     size_type size() const noexcept {
@@ -208,8 +199,7 @@ public:
     }
 
 private:
-    pool_type &pool;
-    mask_type *mask;
+    const pool_type &pool;
 };
 
 
@@ -254,7 +244,7 @@ private:
 
 public:
     template<typename... Comp>
-    using view_type = View<pool_type, std::tuple<Comp...>, std::tuple<>>;
+    using view_type = View<pool_type, Comp...>;
 
     template<typename... Args>
     Registry(Args&&... args)
@@ -416,9 +406,12 @@ public:
     }
 
     template<typename... Comp>
-    view_type<Comp...> view() noexcept {
-        return view_type<Comp...>{pool, entities.data()};
-    }
+    std::enable_if_t<(sizeof...(Comp) == 1), view_type<Comp...>>
+    view() noexcept { return view_type<Comp...>{pool}; }
+
+    template<typename... Comp>
+    std::enable_if_t<(sizeof...(Comp) > 1), view_type<Comp...>>
+    view() noexcept { return view_type<Comp...>{pool, entities.data()}; }
 
 private:
     std::vector<mask_type> entities;

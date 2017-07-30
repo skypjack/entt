@@ -74,12 +74,6 @@ int main() {
         else { ecs.destroy(entity); }
     }
 
-    std::cout << "filtered component view" << std::endl;
-
-    for(auto entity: ecs.view<Position>().exclude<Velocity>()) {
-        std::cout << (ecs.has<Position>(entity)) << "/" << (ecs.has<Velocity>(entity)) << std::endl;
-    }
-
     ecs.reset();
 }
 ```
@@ -223,7 +217,6 @@ There are three different kinds of view, each one with a slighlty different inte
 
 * The _single component view_.
 * The _multi component view_.
-* The _filtered view_.
 
 All of them are iterable. In other terms they have `begin` and `end` member functions that are suitable for a range-based for loop:
 
@@ -251,17 +244,6 @@ The single component view has an additional member function:
 The multi component view has an additional member function:
 
 * `reset()`: reorganizes internal data so as to further create optimized iterators (use it whenever the data within the registry are known to be changed).
-
-A filtered view is nothing more than a multi component view with an additional set of components that act as filters.<br/>
-Users can create filtered views either from a single component view or from a multi component view by means of the `exclude` member function:
-
-```cpp
-auto view = registry.view<Position>().exclude<Velocity>();
-
-for(auto entity: view) {
-    // do whatever you want with your entities
-}
-```
 
 All the views can be used more than once. They return newly created and correctly initialized iterators whenever
 `begin` or `end` is invoked. Anyway views and iterators are tiny objects and the time to construct them can be safely ignored.
