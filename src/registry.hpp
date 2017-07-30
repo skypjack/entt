@@ -13,14 +13,6 @@
 #include "ident.hpp"
 
 
-/**
- * TODO
- *
- * * bitmask nella view azzera il bit di validità, va bene?
- * * invertire cammino su multiple, da 0 a size e non da size a 0
- */
-
-
 namespace entt {
 
 
@@ -139,114 +131,7 @@ private:
 };
 
 
-/*
-template<template<typename...> class Pool, typename Entity, typename... Components, typename Type, typename... Types>
-class View<Pool<Entity, Components...>, Type, Types...> final {
-    using pool_type = Pool<Entity, Components...>;
-    using entity_type = typename pool_type::entity_type;
-    using mask_type = std::bitset<sizeof...(Components)+1>;
-
-    class ViewIterator {
-        inline bool valid() const noexcept {
-            return ((mask[entities[pos-1]] & bitmask) == bitmask);
-        }
-
-    public:
-        using value_type = entity_type;
-        using difference_type = std::ptrdiff_t;
-        using reference = entity_type &;
-        using pointer = entity_type *;
-        using iterator_category = std::input_iterator_tag;
-
-        ViewIterator(const mask_type &bitmask, const entity_type *entities, const mask_type *mask, typename pool_type::size_type pos) noexcept
-            : bitmask{bitmask}, entities{entities}, mask{mask}, pos{pos}
-        {
-            if(this->pos) { while(!valid() && --this->pos); }
-        }
-
-        ViewIterator & operator++() noexcept {
-            while(pos && --pos && !valid());
-            return *this;
-        }
-
-        ViewIterator operator++(int) noexcept {
-            ViewIterator orig = *this;
-            return this->operator++(), orig;
-        }
-
-        bool operator==(const ViewIterator &other) const noexcept {
-            return other.pos == pos && other.entities == entities;
-        }
-
-        bool operator!=(const ViewIterator &other) const noexcept {
-            return !(*this == other);
-        }
-
-        value_type operator*() const noexcept {
-            return *(entities+pos-1);
-        }
-
-    private:
-        const mask_type bitmask;
-        const entity_type *entities;
-        const mask_type *mask;
-        typename pool_type::size_type pos;
-    };
-
-    template<typename Comp>
-    void prefer() noexcept {
-        auto sz = pool.template size<Comp>();
-
-        if(sz < size) {
-            entities = pool.template entities<Comp>();
-            size = sz;
-        }
-    }
-
-public:
-    using iterator_type = ViewIterator;
-    using size_type = typename pool_type::size_type;
-
-    explicit View(const pool_type &pool, const mask_type *mask) noexcept
-        : entities{pool.template entities<Type>()},
-          pool{pool},
-          mask{mask},
-          size{pool.template size<Type>()}
-    {
-        using accumulator_type = int[];
-        bitmask.set(ident<Components...>.template get<Type>());
-        accumulator_type types = { 0, (bitmask.set(ident<Components...>.template get<Types>()), 0)... };
-        accumulator_type pref = { 0, (prefer<Types>(), 0)... };
-        (void)types, (void)pref;
-    }
-
-    iterator_type begin() const noexcept {
-        return ViewIterator{bitmask, entities, mask, size};
-    }
-
-    iterator_type end() const noexcept {
-        return ViewIterator{bitmask, entities, mask, 0};
-    }
-
-    void reset() noexcept {
-        using accumulator_type = int[];
-        entities = pool.template entities<Type>();
-        size = pool.template size<Type>();
-        accumulator_type accumulator = { 0, (prefer<Types>(), 0)... };
-        (void)accumulator;
-    }
-
-private:
-    const entity_type *entities;
-    const pool_type &pool;
-    const mask_type *mask;
-    size_type size;
-    mask_type bitmask;
-};
-*/
-
-
-template<template<typename...> class Pool, typename Entity, typename... Components, typename Type>
+    template<template<typename...> class Pool, typename Entity, typename... Components, typename Type>
 class View<Pool<Entity, Components...>, Type> final {
     using pool_type = Pool<Entity, Components...>;
     using entity_type = typename pool_type::entity_type;
