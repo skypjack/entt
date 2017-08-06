@@ -23,7 +23,7 @@ public:
     using size_type = typename std::vector<component_type>::size_type;
 
 private:
-    bool valid(entity_type entity) const noexcept {
+    inline bool valid(entity_type entity) const noexcept {
         return entity < reverse.size() && reverse[entity] < direct.size() && direct[reverse[entity]] == entity;
     }
 
