@@ -21,6 +21,8 @@ public:
     using entity_type = Entity;
     using pos_type = entity_type;
     using size_type = typename std::vector<component_type>::size_type;
+    using iterator_type = typename std::vector<entity_type>::iterator;
+    using const_iterator_type = typename std::vector<entity_type>::const_iterator;
 
 private:
     inline bool valid(entity_type entity) const noexcept {
@@ -53,8 +55,20 @@ public:
         return data.size();
     }
 
-    const entity_type * entities() const noexcept {
-        return direct.data();
+    iterator_type begin() noexcept {
+        return direct.begin();
+    }
+
+    const_iterator_type begin() const noexcept {
+        return direct.begin();
+    }
+
+    iterator_type end() noexcept {
+        return direct.end();
+    }
+
+    const_iterator_type end() const noexcept {
+        return direct.end();
     }
 
     bool has(entity_type entity) const noexcept {
@@ -122,6 +136,8 @@ public:
     using entity_type = typename Pool<Component>::entity_type;
     using pos_type = typename Pool<Component>::pos_type;
     using size_type = typename Pool<Component>::size_type;
+    using iterator_type = typename Pool<Component>::iterator_type;
+    using const_iterator_type = typename Pool<Component>::const_iterator_type;
 
     explicit ComponentPool(size_type dim = 4098) noexcept
 #ifdef _MSC_VER
@@ -155,8 +171,23 @@ public:
     }
 
     template<typename Comp>
-    const entity_type * entities() const noexcept {
-        return Pool<Comp>::entities();
+    iterator_type begin() noexcept {
+        return Pool<Comp>::begin();
+    }
+
+    template<typename Comp>
+    const_iterator_type begin() const noexcept {
+        return Pool<Comp>::begin();
+    }
+
+    template<typename Comp>
+    iterator_type end() noexcept {
+        return Pool<Comp>::end();
+    }
+
+    template<typename Comp>
+    const_iterator_type end() const noexcept {
+        return Pool<Comp>::end();
     }
 
     template<typename Comp>

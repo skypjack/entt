@@ -209,7 +209,7 @@ Once you have created a registry, the followings are the exposed member function
 * `reset()`: resets the pool and destroys all the entities and their components.
 * `view<Components...>()`: gets a view of the entities that have the given components (see below for further details).
 
-Note that entities are numbers and nothing more. They are not classes and they have no memeber functions at all.
+Note that entities are numbers and nothing more. They are not classes and they have no member functions at all.
 
 #### The View
 
@@ -229,7 +229,7 @@ for(auto entity: view) {
 ```
 
 Iterators are extremely poor, they are meant exclusively to be used to iterate over a set of entities.<br/>
-Exposed member functions are:
+Guaranteed exposed member functions are:
 
 * `operator++()`
 * `operator++(int)`
@@ -250,24 +250,10 @@ All the views can be used more than once. They return newly created and correctl
 I'd suggest not to store them anywhere and to invoke the `Registry::view` member function at each iteration to get a properly
 initialized view over which to iterate.
 
-**Note**: An important feature (usually missed by other well known ECS) is that users can create and destroy entities, as
-well as assign or remove components while iterating and neither the views nor the iterators will be invalidated.
+**Note**: If underlying sets are modified, iterators are invalidated and using them is undefined behaviour.<br/>
+Do not try to assign or remove components on which you are iterating to entities. There are no guarantees.
 
-There are a few exceptions to the rule:
-
-* Trying to access a destroyed entity through an iterator that hasn't been advanced results in an undefined behavior.
-* Destroying an entity that isn't the one returned by the iterator in use results in an undefined behavior.
-* Removing a component from an entity that isn't the one returned by the iterator in use results in an undefined behavior.
-
-In other therms, users can freely interact with the registry and keep views and iterators consistent as long as:
-
-* They create new entities with their set of components or assign components of any type to an already existent entity.
-* They destroy the current entity (that is the one returned by the iterator in use) or remove its components.
-
-In any other case the behavior is undefined and additions and deletions should be managed externally in a batch or whatever.
-As an example, whenever there exists a parent-child relationship, one can incurr in the problem above mentioned.
-
-Note also that iterators aren't thread safe. Do no try to iterate over a set of components and modify them concurrently.
+**Note**: Iterators aren't thread safe. Do no try to iterate over a set of components and modify them concurrently.
 That being said, as long as a thread iterates over the entities that have the component `X` or assign and removes
 that component from a set of entities and another thread does something similar with components `Y` and `Z`, it shouldn't be a
 problem at all.<br/>
@@ -293,7 +279,10 @@ A custom pool should expose at least the following member functions:
 * `bool empty() const noexcept;`
 * `size_type capacity() const noexcept;`
 * `size_type size() const noexcept;`
-* `const entity_type * entities() const noexcept;`
+* `iterator_type begin() noexcept;`
+* `const_iterator_type begin() const noexcept;`
+* `iterator_type end() noexcept;`
+* `const_iterator_type end() const noexcept;`
 * `bool has(entity_type entity) const noexcept;`
 * `const component_type & get(entity_type entity) const noexcept;`
 * `component_type & get(entity_type entity) noexcept;`
@@ -322,7 +311,10 @@ A generic pool should expose at least the following memeber functions:
 * `template<typename Component> bool empty() const noexcept;`
 * `template<typename Component> size_type capacity() const noexcept;`
 * `template<typename Component> size_type size() const noexcept;`
-* `template<typename Component> const entity_type * entities() const noexcept;`
+* `template<typename Component> iterator_type begin() noexcept;`
+* `template<typename Component> const_iterator_type begin() const noexcept;`
+* `template<typename Component> iterator_type end() noexcept;`
+* `template<typename Component> const_iterator_type end() const noexcept;`
 * `template<typename Component> bool has(entity_type entity) const noexcept;`
 * `template<typename Component> const Comp & get(entity_type entity) const noexcept;`
 * `template<typename Component> Comp & get(entity_type entity) noexcept;`
