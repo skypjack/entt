@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <registry.hpp>
+#include <functional>
 #include <iostream>
 #include <cstddef>
 #include <chrono>
@@ -15,14 +16,8 @@ struct Velocity {
     uint64_t y;
 };
 
-struct Comp1 {};
-struct Comp2 {};
-struct Comp3 {};
-struct Comp4 {};
-struct Comp5 {};
-struct Comp6 {};
-struct Comp7 {};
-struct Comp8 {};
+template<std::size_t>
+struct Comp {};
 
 struct Timer final {
     Timer(): start{std::chrono::system_clock::now()} {}
@@ -255,26 +250,26 @@ TEST(DefaultRegistry, IterateTwoComponents50M) {
 }
 
 TEST(DefaultRegistry, IterateFiveComponents10M) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity, Comp1, Comp2, Comp3>;
+    using registry_type = entt::DefaultRegistry<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>;
 
     registry_type registry;
 
     std::cout << "Iterating over 10000000 entities, five components" << std::endl;
 
     for (uint64_t i = 0; i < 10000000L; i++) {
-        registry.create<Position, Velocity, Comp1, Comp2, Comp3>();
+        registry.create<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
     }
 
     Timer timer;
 
-    auto view = registry.view<Position, Velocity, Comp1, Comp2, Comp3>();
+    auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
         auto &velocity = registry.get<Velocity>(entity);
-        auto &comp1 = registry.get<Comp1>(entity);
-        auto &comp2 = registry.get<Comp2>(entity);
-        auto &comp3 = registry.get<Comp3>(entity);
+        auto &comp1 = registry.get<Comp<1>>(entity);
+        auto &comp2 = registry.get<Comp<2>>(entity);
+        auto &comp3 = registry.get<Comp<3>>(entity);
         (void)position;
         (void)velocity;
         (void)comp1;
@@ -287,31 +282,31 @@ TEST(DefaultRegistry, IterateFiveComponents10M) {
 }
 
 TEST(DefaultRegistry, IterateTenComponents10M) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity, Comp1, Comp2, Comp3, Comp4, Comp5, Comp6, Comp7, Comp8>;
+    using registry_type = entt::DefaultRegistry<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>;
 
     registry_type registry;
 
     std::cout << "Iterating over 10000000 entities, ten components" << std::endl;
 
     for (uint64_t i = 0; i < 10000000L; i++) {
-        registry.create<Position, Velocity, Comp1, Comp2, Comp3, Comp4, Comp5, Comp6, Comp7, Comp8>();
+        registry.create<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
     }
 
     Timer timer;
 
-    auto view = registry.view<Position, Velocity, Comp1, Comp2, Comp3, Comp4, Comp5, Comp6, Comp7, Comp8>();
+    auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
         auto &velocity = registry.get<Velocity>(entity);
-        auto &comp1 = registry.get<Comp1>(entity);
-        auto &comp2 = registry.get<Comp2>(entity);
-        auto &comp3 = registry.get<Comp3>(entity);
-        auto &comp4 = registry.get<Comp4>(entity);
-        auto &comp5 = registry.get<Comp5>(entity);
-        auto &comp6 = registry.get<Comp6>(entity);
-        auto &comp7 = registry.get<Comp7>(entity);
-        auto &comp8 = registry.get<Comp8>(entity);
+        auto &comp1 = registry.get<Comp<1>>(entity);
+        auto &comp2 = registry.get<Comp<2>>(entity);
+        auto &comp3 = registry.get<Comp<3>>(entity);
+        auto &comp4 = registry.get<Comp<4>>(entity);
+        auto &comp5 = registry.get<Comp<5>>(entity);
+        auto &comp6 = registry.get<Comp<6>>(entity);
+        auto &comp7 = registry.get<Comp<7>>(entity);
+        auto &comp8 = registry.get<Comp<8>>(entity);
         (void)position;
         (void)velocity;
         (void)comp1;
@@ -329,32 +324,32 @@ TEST(DefaultRegistry, IterateTenComponents10M) {
 }
 
 TEST(DefaultRegistry, IterateTenComponents10MHalf) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity, Comp1, Comp2, Comp3, Comp4, Comp5, Comp6, Comp7, Comp8>;
+    using registry_type = entt::DefaultRegistry<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>;
 
     registry_type registry;
 
     std::cout << "Iterating over 10000000 entities, ten components, half of the entities have all the components" << std::endl;
 
     for (uint64_t i = 0; i < 10000000L; i++) {
-        auto entity = registry.create<Velocity, Comp1, Comp2, Comp3, Comp4, Comp5, Comp6, Comp7, Comp8>();
+        auto entity = registry.create<Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
         if(i % 2) { registry.assign<Position>(entity); }
     }
 
     Timer timer;
 
-    auto view = registry.view<Position, Velocity, Comp1, Comp2, Comp3, Comp4, Comp5, Comp6, Comp7, Comp8>();
+    auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
         auto &velocity = registry.get<Velocity>(entity);
-        auto &comp1 = registry.get<Comp1>(entity);
-        auto &comp2 = registry.get<Comp2>(entity);
-        auto &comp3 = registry.get<Comp3>(entity);
-        auto &comp4 = registry.get<Comp4>(entity);
-        auto &comp5 = registry.get<Comp5>(entity);
-        auto &comp6 = registry.get<Comp6>(entity);
-        auto &comp7 = registry.get<Comp7>(entity);
-        auto &comp8 = registry.get<Comp8>(entity);
+        auto &comp1 = registry.get<Comp<1>>(entity);
+        auto &comp2 = registry.get<Comp<2>>(entity);
+        auto &comp3 = registry.get<Comp<3>>(entity);
+        auto &comp4 = registry.get<Comp<4>>(entity);
+        auto &comp5 = registry.get<Comp<5>>(entity);
+        auto &comp6 = registry.get<Comp<6>>(entity);
+        auto &comp7 = registry.get<Comp<7>>(entity);
+        auto &comp8 = registry.get<Comp<8>>(entity);
         (void)position;
         (void)velocity;
         (void)comp1;
@@ -372,32 +367,32 @@ TEST(DefaultRegistry, IterateTenComponents10MHalf) {
 }
 
 TEST(DefaultRegistry, IterateTenComponents10MOne) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity, Comp1, Comp2, Comp3, Comp4, Comp5, Comp6, Comp7, Comp8>;
+    using registry_type = entt::DefaultRegistry<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>;
 
     registry_type registry;
 
     std::cout << "Iterating over 10000000 entities, ten components, only one entity has all the components" << std::endl;
 
     for (uint64_t i = 0; i < 10000000L; i++) {
-        auto entity = registry.create<Velocity, Comp1, Comp2, Comp3, Comp4, Comp5, Comp6, Comp7, Comp8>();
+        auto entity = registry.create<Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
         if(i == 5000000L) { registry.assign<Position>(entity); }
     }
 
     Timer timer;
 
-    auto view = registry.view<Position, Velocity, Comp1, Comp2, Comp3, Comp4, Comp5, Comp6, Comp7, Comp8>();
+    auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
         auto &velocity = registry.get<Velocity>(entity);
-        auto &comp1 = registry.get<Comp1>(entity);
-        auto &comp2 = registry.get<Comp2>(entity);
-        auto &comp3 = registry.get<Comp3>(entity);
-        auto &comp4 = registry.get<Comp4>(entity);
-        auto &comp5 = registry.get<Comp5>(entity);
-        auto &comp6 = registry.get<Comp6>(entity);
-        auto &comp7 = registry.get<Comp7>(entity);
-        auto &comp8 = registry.get<Comp8>(entity);
+        auto &comp1 = registry.get<Comp<1>>(entity);
+        auto &comp2 = registry.get<Comp<2>>(entity);
+        auto &comp3 = registry.get<Comp<3>>(entity);
+        auto &comp4 = registry.get<Comp<4>>(entity);
+        auto &comp5 = registry.get<Comp<5>>(entity);
+        auto &comp6 = registry.get<Comp<6>>(entity);
+        auto &comp7 = registry.get<Comp<7>>(entity);
+        auto &comp8 = registry.get<Comp<8>>(entity);
         (void)position;
         (void)velocity;
         (void)comp1;
