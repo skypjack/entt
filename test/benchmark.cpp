@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <registry.hpp>
-#include <functional>
 #include <iostream>
 #include <cstddef>
 #include <chrono>

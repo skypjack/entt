@@ -60,7 +60,7 @@ public:
     }
 
     const_iterator_type begin() const noexcept {
-        return direct.begin();
+        return direct.cbegin();
     }
 
     iterator_type end() noexcept {
@@ -68,7 +68,7 @@ public:
     }
 
     const_iterator_type end() const noexcept {
-        return direct.end();
+        return direct.cend();
     }
 
     bool has(entity_type entity) const noexcept {
