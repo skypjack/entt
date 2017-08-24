@@ -56,7 +56,8 @@ private:
         }
 
         ViewIterator & operator++() noexcept {
-            while(++begin != end && !valid());
+            ++begin;
+            while(begin != end && !valid()) { ++begin; }
             return *this;
         }
 
@@ -157,20 +158,20 @@ public:
         : pool{pool}
     {}
 
-    const_iterator_type begin() const noexcept {
-        return pool.template begin<Type>();
+    const_iterator_type cbegin() const noexcept {
+        return pool.template cbegin<Type>();
     }
 
     iterator_type begin() noexcept {
-        return const_cast<const View *>(this)->begin();
+        return pool.template begin<Type>();
     }
 
-    const_iterator_type end() const noexcept {
-        return pool.template end<Type>();
+    const_iterator_type cend() const noexcept {
+        return pool.template cend<Type>();
     }
 
     iterator_type end() noexcept {
-        return const_cast<const View *>(this)->end();
+        return pool.template end<Type>();
     }
 
     size_type size() const noexcept {

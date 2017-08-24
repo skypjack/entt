@@ -59,7 +59,7 @@ public:
         return direct.begin();
     }
 
-    const_iterator_type begin() const noexcept {
+    const_iterator_type cbegin() const noexcept {
         return direct.cbegin();
     }
 
@@ -67,7 +67,7 @@ public:
         return direct.end();
     }
 
-    const_iterator_type end() const noexcept {
+    const_iterator_type cend() const noexcept {
         return direct.cend();
     }
 
@@ -176,8 +176,8 @@ public:
     }
 
     template<typename Comp>
-    const_iterator_type begin() const noexcept {
-        return Pool<Comp>::begin();
+    const_iterator_type cbegin() const noexcept {
+        return Pool<Comp>::cbegin();
     }
 
     template<typename Comp>
@@ -186,8 +186,8 @@ public:
     }
 
     template<typename Comp>
-    const_iterator_type end() const noexcept {
-        return Pool<Comp>::end();
+    const_iterator_type cend() const noexcept {
+        return Pool<Comp>::cend();
     }
 
     template<typename Comp>
