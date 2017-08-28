@@ -41,7 +41,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wconversion")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -DDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DRELEASE")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DRELEASE")
 
 #
 # CMake configuration
@@ -78,18 +78,3 @@ if(BUILD_TESTING)
     enable_testing()
     add_subdirectory(test)
 endif()
-
-#
-# I use QtCreator and I need the lines below, so do not ask. :-)
-#
-
-file(
-    GLOB_RECURSE PROJECT_FILES FOLLOW_SYMLINKS
-    *.txt *.c *.cpp *.hpp *.h *.in *.cmake *.sh *.md *.yml *.bat AUTHORS LICENSE
-)
-
-add_custom_target(
-    QTCREATOR_FALLBACK ALL
-    COMMENT "Feel free to ignore this target, but please do not remove it."
-    SOURCES ${PROJECT_FILES}
-)
