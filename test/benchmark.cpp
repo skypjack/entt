@@ -38,6 +38,7 @@ TEST(DefaultRegistry, Construct) {
     std::cout << "Constructing 10000000 entities" << std::endl;
 
     Timer timer;
+
     for (uint64_t i = 0; i < 10000000L; i++) {
         registry.create();
     }

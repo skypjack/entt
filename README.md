@@ -6,6 +6,9 @@
 
 # Introduction
 
+WIP. Documentation is coming soon.
+
+<!--
 `EnTT` is a header-only, tiny and easy to use Entity-Component System in modern C++.<br/>
 ECS is an architectural pattern used mostly in game development. For further details:
 
@@ -347,3 +350,4 @@ Check the [contributors list](https://github.com/skypjack/entt/blob/master/AUTHO
 
 Code and documentation Copyright (c) 2017 Michele Caini.<br/>
 Code released under [the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).
+-->

@@ -199,7 +199,7 @@ TEST(DefaultRegistry, ViewMultipleComponent) {
     ASSERT_NO_THROW(registry.reset());
 }
 
-TEST(DefaultRegistry, EmptyViewSingleComponent) {
+TEST(DefaultRegistry, ViewSingleComponentEmpty) {
     using registry_type = entt::DefaultRegistry<char, int, double>;
 
     registry_type registry;
@@ -211,10 +211,15 @@ TEST(DefaultRegistry, EmptyViewSingleComponent) {
 
     ASSERT_EQ(view.size(), registry_type::size_type{0});
 
+    for(auto entity: view) {
+        (void)entity;
+        FAIL();
+    }
+
     registry.reset();
 }
 
-TEST(DefaultRegistry, EmptyViewMultipleComponent) {
+TEST(DefaultRegistry, ViewMultipleComponentEmpty) {
     using registry_type = entt::DefaultRegistry<char, int, float, double>;
 
     registry_type registry;
