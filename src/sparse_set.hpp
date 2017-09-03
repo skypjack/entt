@@ -177,9 +177,9 @@ public:
     }
 
     template<typename... Args>
-    type & construct(index_type idx, Args... args) {
+    type & construct(index_type idx, Args&&... args) {
         SparseSet<Index>::construct(idx);
-        instances.push_back({ args... });
+        instances.push_back({ std::forward<Args>(args)... });
         return instances.back();
     }
 
