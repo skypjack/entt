@@ -2,6 +2,7 @@
 #define ENTT_COMPONENT_POOL_HPP
 
 
+#include <algorithm>
 #include <utility>
 #include <vector>
 #include <cstddef>
@@ -69,7 +70,7 @@ public:
     SparseSet(const SparseSet &) = delete;
     SparseSet(SparseSet &&) = default;
 
-    virtual ~SparseSet() noexcept {
+    ~SparseSet() noexcept {
         assert(empty());
     }
 
@@ -132,6 +133,14 @@ public:
         return pos;
     }
 
+    void swap(index_type lhs, index_type rhs) {
+        assert(valid(lhs));
+        assert(valid(rhs));
+
+        std::swap(direct[reverse[lhs]], direct[reverse[rhs]]);
+        std::swap(reverse[lhs], reverse[rhs]);
+    }
+
     void reset() {
         reverse.resize(0);
         direct.clear();
@@ -145,6 +154,22 @@ private:
 
 template<typename Index, typename Type>
 class SparseSet<Index, Type> final: public SparseSet<Index> {
+    template<typename Compare>
+    void arrange(Compare compare) {
+        const auto *data = SparseSet<Index>::data();
+        const auto size = SparseSet<Index>::size();
+        std::vector<pos_type> copy(size);
+        pos_type pos = 0;
+
+        std::generate(copy.begin(), copy.end(), [&pos]() { return pos++; });
+        std::sort(copy.begin(), copy.end(), compare);
+
+        for(pos_type i = 0; i < copy.size(); ++i) {
+            SparseSet<Index>::swap(data + copy[i], data + i);
+            std::swap(instances[copy[i]], instances[i]);
+        }
+    }
+
 public:
     using type = Type;
     using index_type = typename SparseSet<Index>::index_type;
@@ -187,6 +212,42 @@ public:
         auto pos = SparseSet<Index>::destroy(idx);
         instances[pos] = std::move(instances[SparseSet<Index>::size()]);
         instances.pop_back();
+    }
+
+    void swap(index_type lhs, index_type rhs) {
+        std::swap(SparseSet<Index>::get(lhs), SparseSet<Index>::get(rhs));
+        SparseSet<Index>::swap(lhs, rhs);
+    }
+
+    template<typename Compare>
+    void sort(Compare compare) {
+        arrange([this, compare = std::move(compare)](auto lhs, auto rhs) {
+            return !compare(instances[lhs], instances[rhs]);
+        });
+    }
+
+    template<typename Idx>
+    void sort(const SparseSet<Index> &other) {
+        const auto *data = SparseSet<Index>::data();
+
+        arrange([data, &other](auto lhs, auto rhs) {
+            auto eLhs = data + lhs;
+            auto eRhs = data + rhs;
+
+            bool bLhs = other.has(eLhs);
+            bool bRhs = other.has(eRhs);
+            bool compare = false;
+
+            if(bLhs && bRhs) {
+                compare = other.get(eLhs) < other.get(eRhs);
+            } else if(!bLhs && !bRhs) {
+                compare = eLhs < eRhs;
+            } else {
+                compare = bLhs;
+            }
+
+            return !compare;
+        });
     }
 
     void reset() {

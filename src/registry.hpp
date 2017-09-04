@@ -369,6 +369,23 @@ public:
     }
 
     template<typename Comp>
+    void swap(entity_type lhs, entity_type rhs) {
+        std::get<ident<Component...>.template get<Comp>()>(pool).swap(lhs, rhs);
+    }
+
+    template<typename Comp, typename Compare>
+    void sort(Compare compare) {
+        std::get<ident<Component...>.template get<Comp>()>(pool).sort(std::move(compare));
+    }
+
+    template<typename To, typename From, typename Compare>
+    void sort() {
+        auto &&to = std::get<ident<Component...>.template get<To>()>(pool);
+        auto &&from = std::get<ident<Component...>.template get<From>()>(pool);
+        to.sort(from);
+    }
+
+    template<typename Comp>
     void reset(entity_type entity) {
         assert(valid(entity));
 
