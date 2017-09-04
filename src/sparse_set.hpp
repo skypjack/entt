@@ -165,8 +165,11 @@ class SparseSet<Index, Type> final: public SparseSet<Index> {
         std::sort(copy.begin(), copy.end(), compare);
 
         for(pos_type i = 0; i < copy.size(); ++i) {
-            SparseSet<Index>::swap(data + copy[i], data + i);
-            std::swap(instances[copy[i]], instances[i]);
+            if(copy[i] != i) {
+                SparseSet<Index>::swap(*(data + copy[i]), *(data + i));
+                std::swap(instances[copy[i]], instances[i]);
+                std::swap(copy[copy[i]], copy[i]);
+            }
         }
     }
 
@@ -215,7 +218,7 @@ public:
     }
 
     void swap(index_type lhs, index_type rhs) {
-        std::swap(SparseSet<Index>::get(lhs), SparseSet<Index>::get(rhs));
+        std::swap(instances[SparseSet<Index>::get(lhs)], instances[SparseSet<Index>::get(rhs)]);
         SparseSet<Index>::swap(lhs, rhs);
     }
 
