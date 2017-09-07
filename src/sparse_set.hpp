@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <utility>
+#include <numeric>
 #include <vector>
 #include <cstddef>
 #include <cassert>
@@ -159,17 +160,21 @@ class SparseSet<Index, Type> final: public SparseSet<Index> {
         const auto *data = SparseSet<Index>::data();
         const auto size = SparseSet<Index>::size();
         std::vector<pos_type> copy(size);
-        pos_type pos = 0;
 
-        std::generate(copy.begin(), copy.end(), [&pos]() { return pos++; });
+        std::iota(copy.begin(), copy.end(), pos_type{});
         std::sort(copy.begin(), copy.end(), compare);
 
         for(pos_type i = 0; i < copy.size(); ++i) {
-            if(copy[i] != i) {
-                SparseSet<Index>::swap(*(data + copy[i]), *(data + i));
-                std::swap(instances[copy[i]], instances[i]);
-                std::swap(copy[copy[i]], copy[i]);
+            const auto target = i;
+            auto curr = i;
+
+            while(copy[curr] != target) {
+                SparseSet<Index>::swap(*(data + copy[curr]), *(data + curr));
+                std::swap(instances[copy[curr]], instances[curr]);
+                std::swap(copy[curr], curr);
             }
+
+            copy[curr] = curr;
         }
     }
 
@@ -230,12 +235,12 @@ public:
     }
 
     template<typename Idx>
-    void sort(const SparseSet<Index> &other) {
+    void respect(const SparseSet<Idx> &other) {
         const auto *data = SparseSet<Index>::data();
 
         arrange([data, &other](auto lhs, auto rhs) {
-            auto eLhs = data + lhs;
-            auto eRhs = data + rhs;
+            auto eLhs = *(data + lhs);
+            auto eRhs = *(data + rhs);
 
             bool bLhs = other.has(eLhs);
             bool bRhs = other.has(eRhs);
@@ -246,10 +251,10 @@ public:
             } else if(!bLhs && !bRhs) {
                 compare = eLhs < eRhs;
             } else {
-                compare = bLhs;
+                compare = bRhs;
             }
 
-            return !compare;
+            return compare;
         });
     }
 

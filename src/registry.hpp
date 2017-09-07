@@ -378,11 +378,11 @@ public:
         std::get<ident<Component...>.template get<Comp>()>(pool).sort(std::move(compare));
     }
 
-    template<typename To, typename From, typename Compare>
+    template<typename To, typename From>
     void sort() {
         auto &&to = std::get<ident<Component...>.template get<To>()>(pool);
         auto &&from = std::get<ident<Component...>.template get<From>()>(pool);
-        to.sort(from);
+        to.respect(from);
     }
 
     template<typename Comp>
