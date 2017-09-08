@@ -149,6 +149,33 @@ TEST(DefaultRegistry, Copy) {
     registry.reset();
 }
 
+TEST(DefaultRegistry, Swap) {
+    using registry_type = entt::DefaultRegistry<int, char>;
+
+    registry_type registry;
+
+    registry_type::entity_type e1 = registry.create<int, char>();
+    registry_type::entity_type e2 = registry.create<int, char>();
+
+    registry.get<int>(e1) = 0;
+    registry.get<char>(e1) = 'a';
+    registry.get<int>(e2) = 1;
+    registry.get<char>(e2) = 'b';
+
+    registry.swap<int>(e1, e2);
+
+    ASSERT_EQ(registry.get<int>(e1), 1);
+    ASSERT_EQ(registry.get<char>(e1), 'a');
+    ASSERT_EQ(registry.get<int>(e2), 0);
+    ASSERT_EQ(registry.get<char>(e2), 'b');
+
+    registry.reset();
+}
+
+TEST(DefaultRegistry, Sort) {
+    // TODO
+}
+
 TEST(DefaultRegistry, ViewSingleComponent) {
     using registry_type = entt::DefaultRegistry<int, char>;
 

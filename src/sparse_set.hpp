@@ -224,7 +224,6 @@ public:
 
     void swap(index_type lhs, index_type rhs) {
         std::swap(instances[SparseSet<Index>::get(lhs)], instances[SparseSet<Index>::get(rhs)]);
-        SparseSet<Index>::swap(lhs, rhs);
     }
 
     template<typename Compare>

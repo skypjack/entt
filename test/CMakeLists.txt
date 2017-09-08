@@ -11,7 +11,7 @@ set(TARGET_BENCHMARK benchmark)
 
 # Test TARGET_ENTT
 
-add_executable(${TARGET_ENTT} registry.cpp sparse_set.cpp tag_handler.cpp)
+add_executable(${TARGET_ENTT} ident.cpp registry.cpp sparse_set.cpp tag_handler.cpp)
 target_include_directories(${TARGET_ENTT} PRIVATE ${PROJECT_SRC_DIR})
 target_link_libraries(${TARGET_ENTT} PRIVATE ${COMMON_LINK_LIBS})
 add_test(NAME ${TARGET_ENTT} COMMAND ${TARGET_ENTT})
