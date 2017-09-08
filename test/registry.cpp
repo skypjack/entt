@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <registry.hpp>
+#include <functional>
 
 TEST(DefaultRegistry, Functionalities) {
     using registry_type = entt::DefaultRegistry<int, char>;
@@ -172,8 +173,74 @@ TEST(DefaultRegistry, Swap) {
     registry.reset();
 }
 
-TEST(DefaultRegistry, Sort) {
-    // TODO
+TEST(DefaultRegistry, SortSingle) {
+    using registry_type = entt::DefaultRegistry<int>;
+
+    registry_type registry;
+
+    registry_type::entity_type e1 = registry.create();
+    registry_type::entity_type e2 = registry.create();
+    registry_type::entity_type e3 = registry.create();
+
+    auto val = 0;
+
+    registry.assign<int>(e1, val++);
+    registry.assign<int>(e2, val++);
+    registry.assign<int>(e3, val++);
+
+    for(auto entity: registry.view<int>()) {
+        ASSERT_EQ(registry.get<int>(entity), --val);
+    }
+
+    registry.sort<int>(std::less<int>{});
+
+    for(auto entity: registry.view<int>()) {
+        ASSERT_EQ(registry.get<int>(entity), val++);
+    }
+
+    registry.reset();
+}
+
+TEST(DefaultRegistry, SortMulti) {
+    using registry_type = entt::DefaultRegistry<int, unsigned int>;
+
+    registry_type registry;
+
+    registry_type::entity_type e1 = registry.create();
+    registry_type::entity_type e2 = registry.create();
+    registry_type::entity_type e3 = registry.create();
+
+    auto uval = 0u;
+    auto ival = 0;
+
+    registry.assign<unsigned int>(e1, uval++);
+    registry.assign<unsigned int>(e2, uval++);
+    registry.assign<unsigned int>(e3, uval++);
+
+    registry.assign<int>(e1, ival++);
+    registry.assign<int>(e2, ival++);
+    registry.assign<int>(e3, ival++);
+
+    for(auto entity: registry.view<unsigned int>()) {
+        ASSERT_EQ(registry.get<unsigned int>(entity), --uval);
+    }
+
+    for(auto entity: registry.view<int>()) {
+        ASSERT_EQ(registry.get<int>(entity), --ival);
+    }
+
+    registry.sort<unsigned int>(std::less<unsigned int>{});
+    registry.sort<int, unsigned int>();
+
+    for(auto entity: registry.view<unsigned int>()) {
+        ASSERT_EQ(registry.get<unsigned int>(entity), uval++);
+    }
+
+    for(auto entity: registry.view<int>()) {
+        ASSERT_EQ(registry.get<int>(entity), ival++);
+    }
+
+    registry.reset();
 }
 
 TEST(DefaultRegistry, ViewSingleComponent) {
