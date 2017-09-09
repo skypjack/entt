@@ -8,6 +8,7 @@ TEST(SparseSetNoType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(set.capacity(), 0u);
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -16,6 +17,7 @@ TEST(SparseSetNoType, Functionalities) {
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
+    ASSERT_GE(set.capacity(), 1u);
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_TRUE(set.has(42));
@@ -25,6 +27,7 @@ TEST(SparseSetNoType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_GE(set.capacity(), 1u);
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -35,6 +38,7 @@ TEST(SparseSetNoType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_GE(set.capacity(), 0u);
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -90,6 +94,7 @@ TEST(SparseSetWithType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(set.capacity(), 0u);
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -98,6 +103,7 @@ TEST(SparseSetWithType, Functionalities) {
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
+    ASSERT_GE(set.capacity(), 1u);
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_TRUE(set.has(42));
@@ -107,6 +113,7 @@ TEST(SparseSetWithType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_GE(set.capacity(), 1u);
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -117,6 +124,7 @@ TEST(SparseSetWithType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_GE(set.capacity(), 0u);
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));

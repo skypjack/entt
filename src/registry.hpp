@@ -228,8 +228,20 @@ public:
     Registry & operator=(const Registry &) = delete;
     Registry & operator=(Registry &&) = delete;
 
+    template<typename Comp>
+    size_type size() const noexcept {
+        constexpr auto index = ident<Component...>.template get<Comp>();
+        return std::get<index>(pool).size();
+    }
+
     size_type size() const noexcept {
         return entities.size() - available.size();
+    }
+
+    template<typename Comp>
+    size_type capacity() const noexcept {
+        constexpr auto index = ident<Component...>.template get<Comp>();
+        return std::get<index>(pool).capacity();
     }
 
     size_type capacity() const noexcept {

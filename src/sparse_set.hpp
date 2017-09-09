@@ -78,16 +78,20 @@ public:
     SparseSet & operator=(const SparseSet &) = delete;
     SparseSet & operator=(SparseSet &&) = default;
 
+    size_type size() const noexcept {
+        return direct.size();
+    }
+
+    size_t capacity() const noexcept {
+        return direct.capacity();
+    }
+
     bool empty() const noexcept {
         return direct.empty();
     }
 
     const index_type * data() const noexcept {
         return direct.data();
-    }
-
-    size_type size() const noexcept {
-        return direct.size();
     }
 
     iterator_type begin() const noexcept {
@@ -143,7 +147,7 @@ public:
     }
 
     void reset() {
-        reverse.resize(0);
+        reverse.clear();
         direct.clear();
     }
 
