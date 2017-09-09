@@ -178,13 +178,9 @@ private:
 };
 
 
-template<typename...>
-class Registry;
-
-
-template<template<typename...> class... Pool, typename Entity, typename... Component>
-class Registry<Pool<Entity, Component>...> {
-    using pool_type = std::tuple<Pool<Entity, Component>...>;
+template<typename Entity, typename... Component>
+class Registry {
+    using pool_type = std::tuple<SparseSet<Entity, Component>...>;
     using mask_type = std::bitset<sizeof...(Component)+1>;
 
     static constexpr auto validity_bit = sizeof...(Component);
@@ -430,12 +426,8 @@ private:
 };
 
 
-template<typename Entity, typename... Component>
-using StandardRegistry = Registry<SparseSet<Entity, Component>...>;
-
-
 template<typename... Component>
-using DefaultRegistry = Registry<SparseSet<std::uint32_t, Component>...>;
+using DefaultRegistry = Registry<std::uint32_t, Component...>;
 
 
 }
