@@ -3,12 +3,10 @@
 [![Build Status](https://travis-ci.org/skypjack/entt.svg?branch=master)](https://travis-ci.org/skypjack/uvw)
 [![Build status](https://ci.appveyor.com/api/projects/status/rvhaabjmghg715ck?svg=true)](https://ci.appveyor.com/project/skypjack/entt)
 [![Coverage Status](https://coveralls.io/repos/github/skypjack/entt/badge.svg?branch=master)](https://coveralls.io/github/skypjack/entt?branch=master)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W2HF9FESD5LJY&lc=IT&item_name=Michele%20Caini&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
 
 # Introduction
 
-WIP. Documentation is coming soon.
-
-<!--
 `EnTT` is a header-only, tiny and easy to use Entity-Component System in modern C++.<br/>
 ECS is an architectural pattern used mostly in game development. For further details:
 
@@ -19,7 +17,6 @@ ECS is an architectural pattern used mostly in game development. For further det
 ## Code Example
 
 ```cpp
-#include <iostream>
 #include <registry.hpp>
 
 struct Position {
@@ -43,99 +40,66 @@ int main() {
         if(i % 2 == 0) { ecs.assign<Velocity>(entity, i * .1f, i * .1f); }
     }
 
-    std::cout << "single component view" << std::endl;
+    // single component view
 
     for(auto entity: ecs.view<Position>()) {
         auto &position = ecs.get<Position>(entity);
-        std::cout << position.x << "," << position.y << std::endl;
+        // do whatever you want with position
+        (void)position;
     }
 
-    std::cout << "multi component view" << std::endl;
+    // multi component view
 
     for(auto entity: ecs.view<Position, Velocity>()) {
         auto &position = ecs.get<Position>(entity);
         auto &velocity = ecs.get<Velocity>(entity);
-        std::cout << position.x << "," << position.y << " - " << velocity.dx << "," << velocity.dy << std::endl;
-        if(entity % 4) { ecs.remove<Velocity>(entity); }
-        else { ecs.destroy(entity); }
+        // do whatever you want with position and velocity
+        (void)position;
+        (void)velocity;
     }
-
-    std::cout << "single component view" << std::endl;
-
-    for(auto entity: ecs.view<Position>()) {
-        auto &position = ecs.get<Position>(entity);
-        std::cout << position.x << "," << position.y << std::endl;
-    }
-
-    std::cout << "multi component view" << std::endl;
-
-    for(auto entity: ecs.view<Position, Velocity>()) {
-        auto &position = ecs.get<Position>(entity);
-        auto &velocity = ecs.get<Velocity>(entity);
-        std::cout << position.x << "," << position.y << " - " << velocity.dx << "," << velocity.dy << std::endl;
-        if(entity % 4) { ecs.remove<Velocity>(entity); }
-        else { ecs.destroy(entity); }
-    }
-
-    ecs.reset();
 }
 ```
 
 ## Motivation
 
-I started using another well known Entity-Component System named [`EntityX`](https://github.com/alecthomas/entityx).<br/>
-While I was playing with it, I found that I didn't like that much the way it manages its memory.
-Moreover, I was pretty sure that one could achieve better performance with a slightly modified pool under the hood.<br/>
-That's also the reason for which the interface is quite similar to the one of `EntityX`, so that `EnTT` can be used as a
-drop-in replacement for it with a minimal effort.
+I started working on `EnTT` because of the wrong reason: my goal was to beat another well known open source ECS in terms of performance.<br>
+I did it, of course, but it wasn't much satisfying. Actually it wasn't satisfying at all. The fastest and nothing more, fairly little indeed.<br/>
+When I realized it, I tried hard to keep intact the great performance and to add all the features I want to see in my ECS at the same time.
+
+Today `EnTT` is finally what I was looking for: still faster than its rivals, a really good API and an amazing set of features.
 
 ### Performance
 
-As it stands right now, `EnTT` is just fast enough for my requirements if compared to my first choice (that was already
-amazingly fast).
-These are the results of the twos when compiled with GCC 6.3:
+As it stands right now, `EnTT` is just fast enough for my requirements if compared to my first choice (a well known open source ECS that was already amazingly fast).<br/>
+Here is a comparision (both of them compiled with GCC 7.2.0 on a Dell XPS 13 coming from the late 2014):
 
 | Benchmark | EntityX (experimental/compile_time) | EnTT |
 |-----------|-------------|-------------|
-| Creating 10M entities | 0.187042s | **0.0928331s** |
-| Destroying 10M entities | 0.0735151s | **0.060166s** |
-| Iterating over 10M entities, unpacking one component | 0.00784801s | **1.02e-07s** |
-| Iterating over 10M entities, unpacking two components | 0.00865273s | **0.00326714s** |
-| Iterating over 10M entities, unpacking five components | 0.0122006s | **0.00323354s** |
-| Iterating over 10M entities, unpacking ten components | 0.0100089s | **0.00323615s** |
-| Iterating over 50M entities, unpacking one component | 0.0394404s | **1.14e-07s** |
-| Iterating over 50M entities, unpacking two components | 0.0400407s | **0.0179783s** |
-
-These are the results of the twos when compiled with Clang 3.8.1:
-
-| Benchmark | EntityX (experimental/compile_time) | EnTT |
-|-----------|-------------|-------------|
-| Creating 10M entities | 0.268049s | **0.0899998s** |
-| Destroying 10M entities | **0.0713912s** | 0.078663s |
-| Iterating over 10M entities, unpacking one component | 0.00863192s | **3.05e-07s** |
-| Iterating over 10M entities, unpacking two components | 0.00780158s | **2.5434e-05s** |
-| Iterating over 10M entities, unpacking five components | 0.00829669s | **2.5497e-05s** |
-| Iterating over 10M entities, unpacking ten components | 0.00789789s | **2.5563e-05s** |
-| Iterating over 50M entities, unpacking one component | 0.0423244s | **1.94e-07s** |
-| Iterating over 50M entities, unpacking two components | 0.0435464s | **0.00012661s** |
-
-I don't know what Clang does to squeeze out of `EnTT` the performance above, but I'd say that it does it incredibly well.
+| Creating 10M entities | 0.290214s | **0.143111s** |
+| Destroying 10M entities | 0.104589s | **0.0917096s** |
+| Iterating over 10M entities, unpacking one component | 0.0165628ss | **1.37e-07ss** |
+| Iterating over 10M entities, unpacking two components | 0.0137463ss | **0.0052857ss** |
+| Iterating over 10M entities, unpacking two components, half of the entities have all the components | 0.011949ss | **0.00268133ss** |
+| Iterating over 10M entities, unpacking two components, one of the entities has all the components | 0.0115935ss | **6.4e-07ss** |
+| Iterating over 10M entities, unpacking five components | 0.0143905ss | **0.00527808ss** |
+| Iterating over 10M entities, unpacking ten components | 0.0165853ss | **0.00528096ss** |
+| Iterating over 10M entities, unpacking ten components, half of the entities have all the components | 0.0169309ss | **0.00327983ss** |
+| Iterating over 10M entities, unpacking ten components, one of the entities has all the components | 0.0110304ss | **8.11e-07ss** |
+| Iterating over 50M entities, unpacking one component | 0.0827622ss | **1.65e-07ss** |
+| Iterating over 50M entities, unpacking two components | 0.0830518ss | **0.0265629ss** |
 
 See [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp) for further details.<br/>
-Of course, I'll try to get out of it more features and better performance anyway in the future, mainly for fun.
-If you want to contribute and have any suggestion, feel free to make a PR or open an issue to discuss them.
+Even though `EnTT` includes its own tests and benchmarks, on Github there exists also a [benchmark suite](https://github.com/abeimler/ecs_benchmark) that compares a bunch of different projects, one of which is `EnTT`.
 
-### Benchmarks / Comparisons
-
-`EnTT` includes its own benchmarks, mostly similar to the ones of `EntityX` so as to compare them.<br/>
-On Github you can find also a [benchmark suite](https://github.com/abeimler/ecs_benchmark) testing `EntityX` (both the official version and the compile-time one), `Anax` and `Artemis C++` with up to 10M entities.
+Of course, I'll try to get out of `EnTT` more features and better performance anyway in the future, mainly for fun.<br/>
+If you want to contribute and/or have any suggestion, feel free to make a PR or open an issue to discuss your idea.
 
 # Build Instructions
 
 ## Requirements
 
 To be able to use `EnTT`, users must provide a full-featured compiler that supports at least C++14.<br/>
-CMake version 3.4 or later is mandatory to compile the tests, you don't have to install it otherwise.
+CMake version 3.2 or later is mandatory to compile the tests, users don't have to install it otherwise.
 
 ## Library
 
@@ -146,20 +110,24 @@ It's a matter of adding the following line at the top of a file:
 #include <registry.hpp>
 ```
 
-Then pass the proper `-I` argument to the compiler to add the `src` directory to the include paths.<br/>
+Then pass the proper `-I` argument to the compiler to add the `src` directory to the include paths.
 
 ## Documentation
 
 ### API Reference
 
-`EnTT` contains three main actors: the *registry*, the *view* and the *pool*.<br/>
-Unless you have specific requirements of memory management, the default registry (that used the pool provided with
-`EnTT`) should be good enough for any use. Customization is an option anyway, so that you can use your own pool as
-long as it offers the expected interface.
+Unfortunately `EnTT` isn't documented yet and thus users cannot rely on in-code documentation.<br/>
+Source code and names are self-documenting and I'm pretty sure that a glimpse to the API is enough for most of the users.<br/>
+For all the others, below is a crash course that guides them through the project and tries to fill the gap.
+
+### Crash Course
+
+`EnTT` has two main actors: the *Registry* and the *View*.<br/>
+The former can be used to manage components, entities and collections of components and entities. The latter allows users to iterate over the underlying collections.
 
 #### The Registry
 
-There are three options to instantiate your own registry:
+There are two options to instantiate your own registry:
 
 * By using the default one:
 
@@ -169,24 +137,71 @@ There are three options to instantiate your own registry:
 
   That is, you must provide the whole list of components to be registered with the default registry.
 
-* By using the standard one:
+* By using directly the `Registry` class:
 
     ```cpp
-    auto registry = entt::StandardRegistry<std::uint16_t, Components...>{args...};
+    auto registry = entt::Registry<std::uint16_t, Components...>{args...};
     ```
 
-  That is, you must provide the whole list of components to be registered with the default registry **and** the desired type for the entities. Note that the default type is `std::uint32_t`, that is larger enough for almost all the games but also too big for the most of the games.
+  That is, you must provide the whole list of components to be registered with the registry **and** the desired type for the entities. Note that the default type is `std::uint32_t`, that is larger enough for almost all the games but also too big for the most of the games.
 
-* By using your own pool:
+In both cases there are no requirements for the components but to be moveable, therefore POD types are just fine.
 
-    ```cpp
-    auto registry = entt::Registry<DesiredEntityType, YourOwnPool<Components...>>{args...};
-    ```
+The `Registry` class offers a bunch of basic functionalities to query the internal structures. In almost all cases those methods can be used to query either the entity list or the component lists.<br/>
+As an example, the member functions `empty` can be used to know if at least an entity exists and/or if at least one component of the given type has been assigned to an entity:
 
-  Note that the registry expects a class template where the template parameters are the components to be managed.
+```cpp
+bool b = registry.empty();
+// ...
+bool b = registry.empty<MyComponent>();
+```
 
-In both cases, `args...` parameters are forwarded to the underlying pool during the construction.<br/>
-There are no requirements for the components but to be moveable, therefore POD types are just fine.
+Similarly, `size` can be used to know the number of entities alive and/or the number of components of a given type still assigned to entities. `capacity` follows the same pattern and returns the storage capacity for the given element.
+
+TODO
+
+#### The View
+
+TODO (ricorda di menzionare aggiunte/cancellazioni durante iterazioni)
+
+#### The Pool
+
+TODO
+
+## Tests
+
+To compile and run the tests, `EnTT` requires *googletest*.<br/>
+`cmake` will download and compile the library before to compile anything else.
+
+Then, to build the tests:
+
+* `$ cd build`
+* `$ cmake ..`
+* `$ make`
+* `$ make test`
+
+To build the benchmarks, use the following line instead:
+
+* `$ cmake -DCMAKE_BUILD_TYPE=Release ..`
+
+Benchmarks are compiled only in release mode currently.
+
+# Contributors
+
+If you want to contribute, please send patches as pull requests against the branch master.<br/>
+Check the [contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to see who has partecipated so far.
+
+# License
+
+Code and documentation Copyright (c) 2017 Michele Caini.<br/>
+Code released under [the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).
+
+# Donation
+
+Developing and maintaining `EnTT` takes some time and lots of coffee. If you want to support this project, you can offer me an espresso. I'm from Italy, we're used to turning the best coffee ever in code.<br/>
+Take a look at the donation button at the top of the page for more details or just click [here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W2HF9FESD5LJY&lc=IT&item_name=Michele%20Caini&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted).
+
+<!--
 
 Once you have created a registry, the followings are the exposed member functions:
 
@@ -328,26 +343,4 @@ A generic pool should expose at least the following memeber functions:
 
 Good luck. If you come out with a more performant components pool, do not forget to make a PR so that I can add it to
 the list of available ones. I would be glad to have such a contribution to the project!!
-
-## Tests
-
-To compile and run the tests, `EnTT` requires *googletest*.<br/>
-Run the script `deps.sh` to download it. It is good practice to do it every time one pull the project.
-
-Then, to build the tests:
-
-* `$ cd build`
-* `$ cmake ..`
-* `$ make`
-* `$ make test`
-
-# Contributors
-
-If you want to contribute, please send patches as pull requests against the branch master.<br/>
-Check the [contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to see who has partecipated so far.
-
-# License
-
-Code and documentation Copyright (c) 2017 Michele Caini.<br/>
-Code released under [the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).
 -->
