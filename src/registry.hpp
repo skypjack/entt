@@ -219,10 +219,8 @@ private:
     }
 
 public:
-    template<typename... Args>
-    Registry(Args&&... args)
-        : pool{std::forward<Args>(args)...}
-    {}
+    explicit Registry() = default;
+    ~Registry() = default;
 
     Registry(const Registry &) = delete;
     Registry(Registry &&) = delete;
