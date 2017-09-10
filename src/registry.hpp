@@ -325,18 +325,21 @@ public:
 
     template<typename Comp>
     const Comp & get(entity_type entity) const noexcept {
+        assert(valid(entity));
         constexpr auto index = ident<Component...>.template get<Comp>();
         return std::get<index>(pool).get(entity);
     }
 
     template<typename Comp>
     Comp & get(entity_type entity) noexcept {
+        assert(valid(entity));
         constexpr auto index = ident<Component...>.template get<Comp>();
         return std::get<index>(pool).get(entity);
     }
 
     template<typename Comp, typename... Args>
     Comp & replace(entity_type entity, Args... args) {
+        assert(valid(entity));
         constexpr auto index = ident<Component...>.template get<Comp>();
         return (std::get<index>(pool).get(entity) = Comp{args...});
     }
@@ -363,12 +366,16 @@ public:
 
     template<typename Comp>
     Comp & copy(entity_type to, entity_type from) {
+        assert(valid(to));
+        assert(valid(from));
         constexpr auto index = ident<Component...>.template get<Comp>();
         auto &&cpool = std::get<index>(pool);
         return (cpool.get(to) = cpool.get(from));
     }
 
     void copy(entity_type to, entity_type from) {
+        assert(valid(to));
+        assert(valid(from));
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (sync<Component>(to, from), 0)... };
         (void)accumulator;
@@ -376,6 +383,8 @@ public:
 
     template<typename Comp>
     void swap(entity_type lhs, entity_type rhs) {
+        assert(valid(lhs));
+        assert(valid(rhs));
         std::get<ident<Component...>.template get<Comp>()>(pool).swap(lhs, rhs);
     }
 
