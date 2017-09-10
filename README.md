@@ -229,7 +229,7 @@ There exist also two more _versions_ of the `reset` member function:
     registry.reset();
     ```
 
-  **Note**: the registry has an assert in debug mode that verifies that entities are no longer valid when it's destructed. This function can be used to reset the registry to its initial state and thus satisfy the requirement.
+  **Note**: the registry has an assert in debug mode that verifies that entities are no longer valid when it's destructed. This function can be used to reset the registry to its initial state and thus to satisfy the requirement.
 
 To assign a component to an entity, users can rely on the `assign` member function template. It accepts a variable number of arguments that are used to construct the component itself if present:
 
@@ -241,7 +241,7 @@ velocity.dx = 0.;
 velocity.dy = 0.;
 ```
 
-It requires that `entity` is valid. Moreover, the entity does not have to have another instance of the component assigned to it.
+It requires that `entity` is valid. Moreover, the entity mustn't have another instance of the component assigned to it.
 If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.
 
 If the entity already has the given component and the user wants to replace it, the `replace` member function template is the way to go:
@@ -257,8 +257,8 @@ velocity.dy = 0.;
 It requires that `entity` is valid. Moreover, an instance of the component must have been previously assigned to the entity.
 If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.
 
-In case users want to assign a component to an entity, but it's unknown whether the entity already has it or not, `accomodote` does the work in a single call
-(of course with a performance penalty due to the fact that it must check if `entity` already has the given component or not):
+In case users want to assign a component to an entity, but it's unknown whether the entity already has it or not, `accomodate` does the work in a single call
+(of course, there is a performance penalty to pay for that mainly due to the fact that it must check if `entity` already has the given component or not):
 
 ```cpp
 registry.accomodate<Position>(entity, 0., 0.);
@@ -268,8 +268,7 @@ velocity.dx = 0.;
 velocity.dy = 0.;
 ```
 
-It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
-
+It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
 Note that `accomodate` is a sliglhty faster alternative for the following if/else statement and nothing more:
 
 ```cpp
@@ -304,7 +303,7 @@ In particular:
 * The `copy` member function template copies one component from an entity to another one.
 * The `copy` member function copies all the components from an entity to another one.
 
-All the function above mentioned require that the accepted entities are valid. In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+All the functions above mentioned require that entities provided as arguments are valid. In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
 
 There exists also an utility member function that can be used to `swap` components between entities:
 
@@ -313,6 +312,7 @@ registry.swap<Position>(e1, e2);
 ```
 
 As usual, it requires that the two entities are valid. In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+
 The `get` member function template (either the non-const or the const version) gives direct access to the component of an entity instead:
 
 ```cpp
@@ -335,7 +335,7 @@ Components can also be sorted in memory by means of the `sort` member function t
     registry.sort<Movement, Physics>();
     ```
 
-  In this case, `Movement` components are arranged in memory so that cache misses are minimized when the two components are iterated together.
+  In this case, instances of `Movement` are arranged in memory so that cache misses are minimized when the two components are iterated together.
 
 Finally, the `view` member function template returns an iterable portion of entities and components:
 
