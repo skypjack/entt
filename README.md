@@ -113,38 +113,40 @@ Then pass the proper `-I` argument to the compiler to add the `src` directory to
 
 ### API Reference
 
-Unfortunately `EnTT` isn't documented yet and thus users cannot rely on in-code documentation.
-Source code and names are self-documenting and I'm pretty sure that a glimpse to the API is enough for most of the users.
+Unfortunately `EnTT` isn't documented yet and thus users cannot rely on in-code documentation.<br/>
+Source code and names are self-documenting and I'm pretty sure that a glimpse to the API is enough for most of the users.<br/>
 For all the others, below is a crash course that guides them through the project and tries to fill the gap.
 
 ### Crash Course
 
 `EnTT` has two main actors: the **Registry** and the **View**.<br/>
-The former can be used to manage components, entities and collections of components and entities. The latter allows users to iterate over the underlying collections.
+The former can be used to manage components, entities and collections of components and entities. The latter allows users to iterate the underlying collections.
 
 #### The Registry
 
 There are two options to instantiate a registry:
 
-* By using the default one:
+* Use the `DefaultRegistry` alias:
 
     ```cpp
     auto registry = entt::DefaultRegistry<Components...>{args...};
     ```
 
-  That is, users must provide the whole list of components to be registered with the default registry.
+  Users must provide the whole list of components to be registered with the default registry and that's all.
 
-* By using directly the `Registry` class:
+* Use directly the `Registry` class template:
 
     ```cpp
     auto registry = entt::Registry<std::uint16_t, Components...>{args...};
     ```
 
-  That is, users must provide the whole list of components to be registered with the registry **and** the desired type for the entities. Note that the default type is `std::uint32_t`, that is larger enough for almost all the games but also too big for the most of the games.
+  Users must provide the whole list of components to be registered with the registry **and** the desired type for the entities.
+  Note that the default type (the one used by the default registry) is `std::uint32_t`, that is larger enough for almost all the games but also too big for the most of the games.
 
 In both cases there are no requirements for the components but to be moveable, therefore POD types are just fine.
 
-The `Registry` class offers a bunch of basic functionalities to query the internal data structures. In almost all the cases those member functions can be used to query either the entity list or the components lists.<br/>
+The `Registry` class offers a bunch of basic functionalities to query the internal data structures.
+In almost all the cases those member functions can be used to query either the entity list or the components lists.<br/>
 As an example, the member functions `empty` can be used to know if at least an entity exists and/or if at least one component of the given type has been assigned to an entity.<br/>
 
 ```cpp
