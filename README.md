@@ -8,7 +8,7 @@
 # Introduction
 
 `EnTT` is a header-only, tiny and easy to use Entity-Component System in modern C++.<br/>
-ECS is an architectural pattern used mostly in game development. For further details:
+_ECS_ is an architectural pattern used mostly in game development. For further details:
 
 * [Entity Systems Wiki](http://entity-systems.wikidot.com/)
 * [Evolve Your Hierarchy](http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/)
@@ -44,7 +44,7 @@ int main() {
 
     for(auto entity: ecs.view<Position>()) {
         auto &position = ecs.get<Position>(entity);
-        // do whatever you want with position
+        // do whatever is needed with position
         (void)position;
     }
 
@@ -53,7 +53,7 @@ int main() {
     for(auto entity: ecs.view<Position, Velocity>()) {
         auto &position = ecs.get<Position>(entity);
         auto &velocity = ecs.get<Velocity>(entity);
-        // do whatever you want with position and velocity
+        // do whatever is needed with position and velocity
         (void)position;
         (void)velocity;
     }
@@ -62,31 +62,31 @@ int main() {
 
 ## Motivation
 
-I started working on `EnTT` because of the wrong reason: my goal was to beat another well known open source ECS in terms of performance.<br>
+I started working on `EnTT` because of the wrong reason: my goal was to beat another well known open source _ECS_ in terms of performance.<br>
 I did it, of course, but it wasn't much satisfying. Actually it wasn't satisfying at all. The fastest and nothing more, fairly little indeed.<br/>
-When I realized it, I tried hard to keep intact the great performance and to add all the features I want to see in my ECS at the same time.
+When I realized it, I tried hard to keep intact the great performance and to add all the features I want to see in my _ECS_ at the same time.
 
 Today `EnTT` is finally what I was looking for: still faster than its rivals, a really good API and an amazing set of features.
 
 ### Performance
 
-As it stands right now, `EnTT` is just fast enough for my requirements if compared to my first choice (a well known open source ECS that was already amazingly fast).<br/>
+As it stands right now, `EnTT` is just fast enough for my requirements if compared to my first choice (a well known open source _ECS_ that was already amazingly fast).<br/>
 Here is a comparision (both of them compiled with GCC 7.2.0 on a Dell XPS 13 coming from the late 2014):
 
 | Benchmark | EntityX (experimental/compile_time) | EnTT |
 |-----------|-------------|-------------|
 | Creating 10M entities | 0.290214s | **0.143111s** |
 | Destroying 10M entities | 0.104589s | **0.0917096s** |
-| Iterating over 10M entities, unpacking one component | 0.0165628ss | **1.37e-07ss** |
-| Iterating over 10M entities, unpacking two components | 0.0137463ss | **0.0052857ss** |
-| Iterating over 10M entities, unpacking two components, half of the entities have all the components | 0.011949ss | **0.00268133ss** |
-| Iterating over 10M entities, unpacking two components, one of the entities has all the components | 0.0115935ss | **6.4e-07ss** |
-| Iterating over 10M entities, unpacking five components | 0.0143905ss | **0.00527808ss** |
-| Iterating over 10M entities, unpacking ten components | 0.0165853ss | **0.00528096ss** |
-| Iterating over 10M entities, unpacking ten components, half of the entities have all the components | 0.0169309ss | **0.00327983ss** |
-| Iterating over 10M entities, unpacking ten components, one of the entities has all the components | 0.0110304ss | **8.11e-07ss** |
-| Iterating over 50M entities, unpacking one component | 0.0827622ss | **1.65e-07ss** |
-| Iterating over 50M entities, unpacking two components | 0.0830518ss | **0.0265629ss** |
+| Iterating over 10M entities, unpacking one component | 0.0165628s | **1.37e-07s** |
+| Iterating over 10M entities, unpacking two components | 0.0137463s | **0.0052857s** |
+| Iterating over 10M entities, unpacking two components, half of the entities have all the components | 0.011949s | **0.00268133s** |
+| Iterating over 10M entities, unpacking two components, one of the entities has all the components | 0.0115935s | **6.4e-07s** |
+| Iterating over 10M entities, unpacking five components | 0.0143905s | **0.00527808s** |
+| Iterating over 10M entities, unpacking ten components | 0.0165853s | **0.00528096s** |
+| Iterating over 10M entities, unpacking ten components, half of the entities have all the components | 0.0169309s | **0.00327983s** |
+| Iterating over 10M entities, unpacking ten components, one of the entities has all the components | 0.0110304s | **8.11e-07s** |
+| Iterating over 50M entities, unpacking one component | 0.0827622s | **1.65e-07s** |
+| Iterating over 50M entities, unpacking two components | 0.0830518s | **0.0265629s** |
 
 See [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp) for further details.<br/>
 Even though `EnTT` includes its own tests and benchmarks, on Github there exists also a [benchmark suite](https://github.com/abeimler/ecs_benchmark) that compares a bunch of different projects, one of which is `EnTT`.
@@ -127,7 +127,7 @@ The former can be used to manage components, entities and collections of compone
 
 #### The Registry
 
-There are two options to instantiate your own registry:
+There are two options to instantiate a registry:
 
 * By using the default one:
 
@@ -135,7 +135,7 @@ There are two options to instantiate your own registry:
     auto registry = entt::DefaultRegistry<Components...>{args...};
     ```
 
-  That is, you must provide the whole list of components to be registered with the default registry.
+  That is, users must provide the whole list of components to be registered with the default registry.
 
 * By using directly the `Registry` class:
 
@@ -143,11 +143,11 @@ There are two options to instantiate your own registry:
     auto registry = entt::Registry<std::uint16_t, Components...>{args...};
     ```
 
-  That is, you must provide the whole list of components to be registered with the registry **and** the desired type for the entities. Note that the default type is `std::uint32_t`, that is larger enough for almost all the games but also too big for the most of the games.
+  That is, users must provide the whole list of components to be registered with the registry **and** the desired type for the entities. Note that the default type is `std::uint32_t`, that is larger enough for almost all the games but also too big for the most of the games.
 
 In both cases there are no requirements for the components but to be moveable, therefore POD types are just fine.
 
-The `Registry` class offers a bunch of basic functionalities to query the internal structures. In almost all cases those methods can be used to query either the entity list or the component lists.<br/>
+The `Registry` class offers a bunch of basic functionalities to query the internal structures. In almost all the cases those member functions can be used to query either the entity list or the component lists.<br/>
 As an example, the member functions `empty` can be used to know if at least an entity exists and/or if at least one component of the given type has been assigned to an entity:
 
 ```cpp
@@ -158,15 +158,222 @@ bool b = registry.empty<MyComponent>();
 
 Similarly, `size` can be used to know the number of entities alive and/or the number of components of a given type still assigned to entities. `capacity` follows the same pattern and returns the storage capacity for the given element.
 
-TODO
+To know if an entity is valid, the `valid` member function is part of the registry interface:
+
+```cpp
+bool b = registry.valid(entity);
+```
+
+Let's go to something more tasty.
+
+The `create` member function can be used to create a new entity and it comes in two flavors:
+
+* The plain version just creates a naked entity with no components assigned to it:
+
+    ```cpp
+    auto entity = registry.create();
+    ```
+
+* The member function template creates an entity and assign to it the given default-initialized components before to return it:
+
+    ```cpp
+    auto entity = registry.create<Position, Velocity>();
+    ```
+
+  It's a helper function, mostly syncactic sugar and it's equivalent to the following:
+
+    ```cpp
+    auto entity = registry.create();
+    registry.assign<Position>();
+    registry.assign<Velocity>();
+    ```
+
+  See below to find more about the `assign` member function.
+
+The `destroy` member function can be used instead to delete an entity and all its components (if any):
+
+    ```cpp
+    registry.destroy(entity);
+    ```
+
+On the other side, if the purpose is to remove a component, the `remove` member function template is the way to go:
+
+    ```cpp
+    registry.remove<Position>(entity);
+    ```
+
+The `reset` member function can be used to obtain the same result with a strictly defined behaviour (a performance penalty is the price to pay for that anyway). In particular it removes the component if and only if it exists, otherwise it safely returns to the caller:
+
+    ```cpp
+    registry.reset<Position>(entity);
+    ```
+
+There exist also two other _versions_ of the `reset` member function:
+
+* If no entity is passed to it, `reset` will remove the given component from each entity that has it:
+
+    ```cpp
+    registry.reset<Position>();
+    ```
+
+* If neither the entity nor the component are specified, all the entities and their components are destroyed:
+
+    ```cpp
+    registry.reset();
+    ```
+
+  *Note*: the registry has an assert in debug mode that verifies that entities are no longer valid when it's destructed. This function can be used to reset the registry to its initial state and thus satisfy the requirement.
+
+To assign a component to an entity, users can use the `assign` member function template. It accepts a variable number of arguments that, if present, are used to construct the component itself:
+
+    ```cpp
+    registry.assign<Position>(entity, 0., 0.);
+
+    // ...
+
+    auto &velocity = registr.assign<Velocity>(entity);
+
+    velocity.dx = 0.;
+    velocity.dy = 0.;
+    ```
+
+If the entity already has the given component and the user wants to replace it, the 'replace` member function template is the way to go. It works exactly as `assign`:
+
+    ```cpp
+    registry.replace<Position>(entity, 0., 0.);
+
+    // ...
+
+    auto &velocity = registr.replace<Velocity>(entity);
+
+    velocity.dx = 0.;
+    velocity.dy = 0.;
+    ```
+
+In case users want to assign a component to an entity, but it's unknown whether the entity already has it or not, `accomodote` does the work in a single call:
+
+    ```cpp
+    registry.accomodate<Position>(entity, 0., 0.);
+
+    // ...
+
+    auto &velocity = registr.accomodate<Velocity>(entity);
+
+    velocity.dx = 0.;
+    velocity.dy = 0.;
+    ```
+
+Note that `accomodate` is a sliglhty faster alternative for the following if/else statement:
+
+    ```cpp
+    if(registry.has<Comp>(entity)) {
+        registry.replace<Comp>(entity, arg1, argN);
+    } else {
+        registry.assign<Comp>(entity, arg1, argN);
+    }
+    ```
+
+As already shown, if in doubt about whether or not an entity has one or more components, the `has` member function template may be useful:
+
+    ```cpp
+    bool b = registry.has<Position, Velocity>(entity);
+    ```
+
+Entities can also be cloned and partially or fully copied:
+
+    ```cpp
+    auto entity = registry.clone(other);
+
+    // ...
+
+    auto &velocity = registry.copy<Velocity>(to, from);
+
+    // ...
+
+    registry.copy(dst, src);
+    ```
+
+In particular:
+
+* The `clone` member function creates a new entity and copy all the components from the given one.
+* The `copy` member function template copies one component from an entity to another one.
+* The `copy` member function copies all the components from an entity to another one.
+
+There exists also an utility member function that can be used to `swap` components between entities:
+
+    ```cpp
+    registry.swap<Position>(e1, e2);
+    ```
+
+The `get` member function template (either the non-const or the const version) gives direct access to the component of an entity instead:
+
+    ```cpp
+    auto &position = registry.get<Position>(entity);
+    ```
+
+Components can also be sorted in memory by means of the `sort` member function templates. In particular:
+
+* Components can be sorted according to a component:
+
+    ```cpp
+    registry.sort<Renderable>([](const auto &lhs, const auto &rhs) { return lhs.z < rhs.z; });
+    ```
+
+* Components can be sorted according to the order imposed by another component:
+
+    ```cpp
+    registry.sort<Movement, Physics>();
+    ```
+
+  In this case, `Movement` components are arranged in memory so that cache misses are minimized when the two components are iterated together.
+
+*Note*. Several functions require that entities received as arguments are valid. In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
+Here is the full list of functions for which the requirement applies:
+
+* `destroy`
+* `assign`
+* `remove`
+* `has`
+* `get`
+* `replace`
+* `accomodate`
+* `clone`
+* `copy`
+* `swap`
+* `reset`
+
+Finally, the `view` member function template returns an iterable portion of entities and components (see below for more details):
+
+    ```cpp
+    auto view = registry.view<Position, Velocity>();
+    ```
+
+Views are the other core component of `EnTT` and are usually extensively used by softwares that include it.
 
 #### The View
 
 TODO (ricorda di menzionare aggiunte/cancellazioni durante iterazioni)
 
-#### The Pool
+#### Side notes
 
-TODO
+* Entities are numbers and nothing more. They are not classes and they have no member functions at all.
+
+* Most of the _ECS_ available out there have an annoying limitation (at least from my point of view): entities and components cannot be created, assigned or deleted while users are iterating on them.<br/>
+  `EnTT` partially solves the problem with a few limitations:
+
+    * Entities can be created at any time while iterating on one or more components.
+    * Components can be assigned to any entity at any time while iterating on one or more components.
+    * During an iteration, the current entity (that is the one returned by the iterator) can be deleted and all its components can be removed safely.
+
+  Entities that are not the current one (that is the one returned by the iterator) cannot be deleted. Components assigned to entities that are not the current one (that is the one returned by the iterator) cannot be removed.<br/>
+  In this case, iterators are invalidated and the behaviour is undefined if one continues to use those iterators. Possible approaches are:
+
+    * Store aside the entities and components to be removed and perform the operations at the end of the iteration.
+    * Mark entities and components with a proper tag component that indicates that they must be purged, then perform a second iteration to clean them up one by one.
+
+* Iterators aren't thread safe. Do no try to iterate over a set of components and modify them concurrently.<br/>
+  That being said, as long as a thread iterates over the entities that have the component `X` or assign and removes that component from a set of entities and another thread does something similar with components `Y` and `Z`, it shouldn't be a problem at all.<br/>
+  As an example, that means that users can freely run the rendering system over the renderable entities and update the physics concurrently on a separate thread if needed.
 
 ## Tests
 
@@ -202,33 +409,6 @@ Developing and maintaining `EnTT` takes some time and lots of coffee. If you wan
 Take a look at the donation button at the top of the page for more details or just click [here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W2HF9FESD5LJY&lc=IT&item_name=Michele%20Caini&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted).
 
 <!--
-
-Once you have created a registry, the followings are the exposed member functions:
-
-* `size`: returns the number of entities still alive.
-* `capacity`: returns the maximum number of entities created till now.
-* `valid`: returns true if the entity is still in use, false otherwise.
-* `empty<Component>`: returns `true` if at least an instance of `Component` exists, `false` otherwise.
-* `empty`: returns `true` if all the entities have been destroyed, `false` otherwise.
-* `create<Components...>`: creates a new entity and assigns it the given components, then returns the entity.
-* `create`: creates a new entity and returns it, no components assigned.
-* `destroy`: destroys the entity and all its components.
-* `assign<Component>(entity, args...)`: assigns the given component to the entity and uses `args...` to initialize it.
-* `remove<Component>(entity)`: removes the given component from the entity.
-* `has<Components...>(entity)`: returns `true` if the entity has the given components, `false` otherwise.
-* `get<Component>(entity)`: returns a reference to the given component for the entity (undefined behaviour if the entity has not the component).
-* `replace<Component>(entity, args...)`: replaces the given component for the entity, using `args...` to create the new component.
-* `accomodate<Component>(entity, args...)`: replaces the given component for the entity if it exists, otherwise assigns it to the entity and uses `args...` to initialize it.
-* `clone(entity)`: clones an entity and all its components, then returns the new entity identifier.
-* `copy<Component>(to, from)`: copies a component from an entity to another one (both the entities must already have been assigned the component, undefined behaviour otherwise).
-* `copy(to, from)`: copies all the components and their contents from an entity to another one (comoonents are created or destroyed if needed).
-* `reset<Component>(entity)`: removes the given component from the entity if assigned.
-* `reset<Component>()`: destroys all the instances of `Component`.
-* `reset()`: resets the pool and destroys all the entities and their components.
-* `view<Components...>()`: gets a view of the entities that have the given components (see below for further details).
-
-Note that entities are numbers and nothing more. They are not classes and they have no member functions at all.
-
 #### The View
 
 There are three different kinds of view, each one with a slighlty different interface:
@@ -267,80 +447,4 @@ All the views can be used more than once. They return newly created and correctl
 `begin` or `end` is invoked. Anyway views and iterators are tiny objects and the time to construct them can be safely ignored.
 I'd suggest not to store them anywhere and to invoke the `Registry::view` member function at each iteration to get a properly
 initialized view over which to iterate.
-
-**Note**: If underlying sets are modified, iterators are invalidated and using them is undefined behaviour.<br/>
-Do not try to assign or remove components on which you are iterating to entities. There are no guarantees.
-
-**Note**: Iterators aren't thread safe. Do no try to iterate over a set of components and modify them concurrently.
-That being said, as long as a thread iterates over the entities that have the component `X` or assign and removes
-that component from a set of entities and another thread does something similar with components `Y` and `Z`, it shouldn't be a
-problem at all.<br/>
-As an example, that means that users can freely run the rendering system over the renderable entities and update the physics
-concurrently on a separate thread if needed.
-
-#### The Pool
-
-Custom pools for a given component can be defined as a specialization of the class template `ComponentPool`.<br/>
-In particular:
-
-```cpp
-template<>
-struct ComponentPool<Entity, MyComponent> final {
-    // ...
-};
-```
-
-Where `Entity` is the desired type for the entities, `MyComponent` the type of the component to be stored.
-
-A custom pool should expose at least the following member functions:
-
-* `bool empty() const noexcept;`
-* `size_type capacity() const noexcept;`
-* `size_type size() const noexcept;`
-* `iterator_type begin() noexcept;`
-* `const_iterator_type begin() const noexcept;`
-* `iterator_type end() noexcept;`
-* `const_iterator_type end() const noexcept;`
-* `bool has(entity_type entity) const noexcept;`
-* `const component_type & get(entity_type entity) const noexcept;`
-* `component_type & get(entity_type entity) noexcept;`
-* `template<typename... Args> component_type & construct(entity_type entity, Args... args);`
-* `void destroy(entity_type entity);`
-* `void reset();`
-
-This is a fast and easy way to define a custom pool specialization for a given component (as an example, if the
-component `X` requires to be ordered internally somehow during construction or destruction operations) and to use the
-default pool for all the other components.<br/>
-It's a mattrer of including the given specialization along with the registry, so that it can find it during the instantiation.<br/>
-In this case, users are not required to use the more explicit `Registry` class. Instead, they can still use `entt::DefaultRegistry`.
-
-In cases when the per-component pools are not good enough, the registry can be initialized with a custom pool.<br/>
-In other terms, `entt::Registry` has a template template parameter that can be used to provide both the pool and the list of
-components:
-
-```cpp
-auto registry = entt::Registry<Entity, MyCustomPool<Component1, Component2>>{};
-```
-
-Even though the underlying pool doesn't store the components separately, the registry must know them to be able to do
-specific actions (like `destroy` or `copy`). That's why they must be explicitly specified.<br/>
-A generic pool should expose at least the following memeber functions:
-
-* `template<typename Component> bool empty() const noexcept;`
-* `template<typename Component> size_type capacity() const noexcept;`
-* `template<typename Component> size_type size() const noexcept;`
-* `template<typename Component> iterator_type begin() noexcept;`
-* `template<typename Component> const_iterator_type begin() const noexcept;`
-* `template<typename Component> iterator_type end() noexcept;`
-* `template<typename Component> const_iterator_type end() const noexcept;`
-* `template<typename Component> bool has(entity_type entity) const noexcept;`
-* `template<typename Component> const Comp & get(entity_type entity) const noexcept;`
-* `template<typename Component> Comp & get(entity_type entity) noexcept;`
-* `template<typename Component, typename... Args> Comp & construct(entity_type entity, Args... args);`
-* `template<typename Component> void destroy(entity_type entity);`
-* `template<typename Component> void reset();`
-* `void reset();`
-
-Good luck. If you come out with a more performant components pool, do not forget to make a PR so that I can add it to
-the list of available ones. I would be glad to have such a contribution to the project!!
 -->
