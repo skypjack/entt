@@ -16,7 +16,7 @@ matrix:
     addons:
       apt:
         sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-4.0']
-        packages: ['clang-4.0', 'libstdc++-4.9-dev']
+        packages: ['clang-4.0', 'libc++-dev']
     env: COMPILER=clang++-4.0
   - os: osx
     osx_image: xcode8.3
