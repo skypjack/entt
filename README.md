@@ -74,18 +74,18 @@ Here is a comparision (both of them compiled with GCC 7.2.0 on a Dell XPS 13 com
 
 | Benchmark | EntityX (experimental/compile_time) | EnTT |
 |-----------|-------------|-------------|
-| Creating 10M entities | 0.290214s | **0.143111s** |
-| Destroying 10M entities | 0.104589s | **0.0917096s** |
-| Iterating over 10M entities, unpacking one component | 0.0165628s | **1.37e-07s** |
-| Iterating over 10M entities, unpacking two components | 0.0137463s | **0.0052857s** |
-| Iterating over 10M entities, unpacking two components, half of the entities have all the components | 0.011949s | **0.00268133s** |
-| Iterating over 10M entities, unpacking two components, one of the entities has all the components | 0.0115935s | **6.4e-07s** |
-| Iterating over 10M entities, unpacking five components | 0.0143905s | **0.00527808s** |
-| Iterating over 10M entities, unpacking ten components | 0.0165853s | **0.00528096s** |
-| Iterating over 10M entities, unpacking ten components, half of the entities have all the components | 0.0169309s | **0.00327983s** |
-| Iterating over 10M entities, unpacking ten components, one of the entities has all the components | 0.0110304s | **8.11e-07s** |
-| Iterating over 50M entities, unpacking one component | 0.0827622s | **1.65e-07s** |
-| Iterating over 50M entities, unpacking two components | 0.0830518s | **0.0265629s** |
+| Creating 10M entities | 0.177225s | **0.0881921s** |
+| Destroying 10M entities | 0.066419s | **0.0552661s** |
+| Iterating over 10M entities, unpacking one component | 0.0104935s | **8.8e-08s** |
+| Iterating over 10M entities, unpacking two components | 0.00835546s | **0.00323798s** |
+| Iterating over 10M entities, unpacking two components, half of the entities have all the components | 0.00772169s | **0.00162265s** |
+| Iterating over 10M entities, unpacking two components, one of the entities has all the components | 0.00751099s | **5.17e-07s** |
+| Iterating over 10M entities, unpacking five components | 0.00863762s | **0.00323384s** |
+| Iterating over 10M entities, unpacking ten components | 0.0105657s | **0.00323742s** |
+| Iterating over 10M entities, unpacking ten components, half of the entities have all the components | 0.00880251s | **0.00164593s** |
+| Iterating over 10M entities, unpacking ten components, one of the entities has all the components | 0.0067667s | **5.38e-07s** |
+| Iterating over 50M entities, unpacking one component | 0.0530271s | **7.7e-08s** |
+| Iterating over 50M entities, unpacking two components | 0.056233s | **0.0161715s** |
 
 See [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp) for further details.<br/>
 Even though `EnTT` includes its own tests and benchmarks, on Github there exists also a [benchmark suite](https://github.com/abeimler/ecs_benchmark) that compares a bunch of different projects, one of which is `EnTT`.
@@ -146,8 +146,8 @@ There are two options to instantiate a registry:
 
 In both cases there are no requirements for the components but to be moveable, therefore POD types are just fine.
 
-The `Registry` class offers a bunch of basic functionalities to query the internal structures. In almost all the cases those member functions can be used to query either the entity list or the component lists.<br/>
-As an example, the member functions `empty` can be used to know if at least an entity exists and/or if at least one component of the given type has been assigned to an entity:
+The `Registry` class offers a bunch of basic functionalities to query the internal data structures. In almost all the cases those member functions can be used to query either the entity list or the components lists.<br/>
+As an example, the member functions `empty` can be used to know if at least an entity exists and/or if at least one component of the given type has been assigned to an entity.<br/>
 
 ```cpp
 bool b = registry.empty();
@@ -157,15 +157,13 @@ bool b = registry.empty<MyComponent>();
 
 Similarly, `size` can be used to know the number of entities alive and/or the number of components of a given type still assigned to entities. `capacity` follows the same pattern and returns the storage capacity for the given element.
 
-To know if an entity is valid, the `valid` member function is part of the registry interface:
+The `valid` member function returns true if the entity is still in use, false otherwise:
 
 ```cpp
 bool b = registry.valid(entity);
 ```
 
-Let's go to something more tasty.
-
-The `create` member function can be used to create a new entity and it comes in two flavors:
+Let's go to something more tasty. The `create` member function can be used to create a new entity and it comes in two flavors:
 
 * The plain version just creates a naked entity with no components assigned to it:
 
@@ -189,19 +187,19 @@ The `create` member function can be used to create a new entity and it comes in 
 
   See below to find more about the `assign` member function.
 
-The `destroy` member function can be used instead to delete an entity and all its components (if any):
+On the other side, the `destroy` member function can be used to delete an entity and all its components (if any):
 
 ```cpp
 registry.destroy(entity);
 ```
 
-On the other side, if the purpose is to remove a component, the `remove` member function template is the way to go:
+If the purpose is to remove a single component instead, the `remove` member function template is the way to go:
 
 ```cpp
 registry.remove<Position>(entity);
 ```
 
-The `reset` member function can be used to obtain the same result with a strictly defined behaviour (a performance penalty is the price to pay for that anyway). In particular it removes the component if and only if it exists, otherwise it safely returns to the caller:
+The `reset` member function behaves similarly but with a strictly defined behaviour (and a performance penalty is the price to pay for that). In particular it removes the component if and only if it exists, otherwise it returns safely to the caller:
 
 ```cpp
 registry.reset<Position>(entity);
@@ -223,15 +221,12 @@ There exist also two other _versions_ of the `reset` member function:
 
   **Note**: the registry has an assert in debug mode that verifies that entities are no longer valid when it's destructed. This function can be used to reset the registry to its initial state and thus satisfy the requirement.
 
-To assign a component to an entity, users can use the `assign` member function template. It accepts a variable number of arguments that, if present, are used to construct the component itself:
+To assign a component to an entity, users can rely on the `assign` member function template. It accepts a variable number of arguments that are used to construct the component itself if present:
 
 ```cpp
 registry.assign<Position>(entity, 0., 0.);
-
 // ...
-
 auto &velocity = registr.assign<Velocity>(entity);
-
 velocity.dx = 0.;
 velocity.dy = 0.;
 ```
@@ -240,11 +235,8 @@ If the entity already has the given component and the user wants to replace it, 
 
 ```cpp
 registry.replace<Position>(entity, 0., 0.);
-
 // ...
-
 auto &velocity = registr.replace<Velocity>(entity);
-
 velocity.dx = 0.;
 velocity.dy = 0.;
 ```
@@ -253,16 +245,13 @@ In case users want to assign a component to an entity, but it's unknown whether 
 
 ```cpp
 registry.accomodate<Position>(entity, 0., 0.);
-
 // ...
-
 auto &velocity = registr.accomodate<Velocity>(entity);
-
 velocity.dx = 0.;
 velocity.dy = 0.;
 ```
 
-Note that `accomodate` is a sliglhty faster alternative for the following if/else statement:
+Note that `accomodate` is a sliglhty faster alternative for the following if/else statement and nothing more:
 
 ```cpp
 if(registry.has<Comp>(entity)) {
@@ -278,17 +267,13 @@ As already shown, if in doubt about whether or not an entity has one or more com
 bool b = registry.has<Position, Velocity>(entity);
 ```
 
-Entities can also be cloned and partially or fully copied:
+Entities can also be cloned and either partially or fully copied:
 
 ```cpp
 auto entity = registry.clone(other);
-
 // ...
-
 auto &velocity = registry.copy<Velocity>(to, from);
-
 // ...
-
 registry.copy(dst, src);
 ```
 
@@ -329,17 +314,99 @@ Components can also be sorted in memory by means of the `sort` member function t
 **Note**. Several functions require that entities received as arguments are valid. In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
 Here is the full list of functions for which the requirement applies: `destroy`, `assign`, `remove`, `has`, `get`, `replace`, `accomodate`, `clone`, `copy`, `swap`, `reset`.
 
-Finally, the `view` member function template returns an iterable portion of entities and components (see below for more details):
+Finally, the `view` member function template returns an iterable portion of entities and components:
 
 ```cpp
 auto view = registry.view<Position, Velocity>();
 ```
 
-Views are the other core component of `EnTT` and are usually extensively used by softwares that include it.
+Views are the other core component of `EnTT` and are usually extensively used by softwares that include it. See below for more details about the types of views.
 
 #### The View
 
-TODO (ricorda di menzionare aggiunte/cancellazioni durante iterazioni)
+There are two types of views:
+
+* **Single component view**.
+
+  A single component view gives direct access to both the components and the entities to which the components are assigned.<br/>
+  This kind of views are created from the `Registry` class by means of the `view` member function template as it follows:
+
+    ```cpp
+    // Actual type is Registry<Components...>::view_type<Comp>, where Comp is the component for which the view should be created ...
+    // ... well, auto is far easier to use in this case, isn't it?
+    auto view = registry.view<Sprite>();
+    ```
+
+  Components and entities are stored in tightly packed arrays and single component views are the fastest solution to iterate over them.<br/>
+  They have the _C++11-ish_ `begin` and `end` member function that allow users to use them in a typical range-for loop:
+
+    ```cpp
+    auto view = registry.view<Sprite>();
+
+    for(auto entity: view) {
+        auto &sprite = registry.get<Sprite>(entity);
+        // ...
+    }
+    ```
+
+  Iterating through a view this way returns entities that can be further used to get components or perform other types of operations.<br/>
+  There is also another method one can use to iterate through the array of entities, that is by using the `size` and `data` member functions:
+
+    ```cpp
+    auto view = registry.view<Sprite>();
+    const auto *data = view.data();
+
+    for(auto i = 0, end = view.size(); i < end; ++i) {
+        auto entity = *(data + i);
+        // ...
+    }
+    ```
+
+  Entites are good when the sole component isn't enough to perform a task. Anyway it comes with a cost: accessing components by entities has an extra level of indirection. It's pretty fast, but not that fast in some cases.<br/>
+  Direct access to the packed array of components is the other option around of a single component view. Member functions `size` and `raw` are there for that:
+
+    ```cpp
+    auto view = registry.view<Sprite>();
+    const auto *raw = view.raw();
+
+    for(auto i = 0, end = view.size(); i < end; ++i) {
+        auto &sprite = *(raw + i);
+        // ...
+    }
+    ```
+
+  This is the fastest approach to iterate over the components: they are packed together by construction and visit them in order will reduce to a minimum the number of cache misses.
+
+* **Multi components view**.
+
+  A multi components view gives access only to the entities to which the components are assigned.<br/>
+  This kind of views are created from the `Registry` class by means of the `view` member function template as it follows:
+
+    ```cpp
+    // Actual type is Registry<Components...>::view_type<Comp...>, where Comp... are the components for which the view should be created ...
+    // ... well, auto is far easier to use in this case, isn't it?
+    auto view = registry.view<Position, Velocity>();
+    ```
+
+  Multi components views can be iterated by means of the `begin` and `end` member functions in a typical range-for loop:
+
+    ```cpp
+    auto view = registry.view<Position, Velocity>();
+
+    for(auto entity: view) {
+        auto &position = registry.get<Position>(entity);
+        auto &velocity = registry.get<Velocity>(entity);
+        // ...
+    }
+    ```
+
+  Note that there exists a packed array of entities to which the component is assigned for each component. Iterators of a multi components view pick the shortest array up and use it to visit the smallest set of potential entities.<br/>
+  The choice is performed when the view is constructed. It's good enough as long as views are discarded once they have been used. For all the other cases, the `reset` member function can be used whenever the data within the registry are known to be changed and forcing the choice again could speed up the execution.
+
+  **Note**: one could argue that an iterator should return the set of references to components for each entity instead of the entity itself. Well, who wants to spend CPU cycles to get a reference to an useless tag component? This drove the design choice indeed.
+
+All the views can be used more than once. They return newly created and correctly initialized iterators whenever `begin` or `end` is invoked. Anyway views and iterators are tiny objects and the time spent to construct them can be safely ignored.<br/>
+I'd suggest not to store them anywhere and to invoke the `Registry::view` member function template at each iteration to get a properly initialized view through which to iterate.
 
 #### Side notes
 
@@ -394,44 +461,3 @@ Code released under [the MIT license](https://github.com/skypjack/entt/blob/mast
 
 Developing and maintaining `EnTT` takes some time and lots of coffee. If you want to support this project, you can offer me an espresso. I'm from Italy, we're used to turning the best coffee ever in code.<br/>
 Take a look at the donation button at the top of the page for more details or just click [here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W2HF9FESD5LJY&lc=IT&item_name=Michele%20Caini&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted).
-
-<!--
-#### The View
-
-There are three different kinds of view, each one with a slighlty different interface:
-
-* The _single component view_.
-* The _multi component view_.
-
-All of them are iterable. In other terms they have `begin` and `end` member functions that are suitable for a range-based for loop:
-
-```cpp
-auto view = registry.view<Position, Velocity>();
-
-for(auto entity: view) {
-    // do whatever you want with your entities
-}
-```
-
-Iterators are extremely poor, they are meant exclusively to be used to iterate over a set of entities.<br/>
-Guaranteed exposed member functions are:
-
-* `operator++()`
-* `operator++(int)`
-* `operator==()`
-* `operator!=()`
-* `operator*()`
-
-The single component view has an additional member function:
-
-* `size()`: returns the exact number of expected entities.
-
-The multi component view has an additional member function:
-
-* `reset()`: reorganizes internal data so as to further create optimized iterators (use it whenever the data within the registry are known to be changed).
-
-All the views can be used more than once. They return newly created and correctly initialized iterators whenever
-`begin` or `end` is invoked. Anyway views and iterators are tiny objects and the time to construct them can be safely ignored.
-I'd suggest not to store them anywhere and to invoke the `Registry::view` member function at each iteration to get a properly
-initialized view over which to iterate.
--->
