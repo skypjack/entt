@@ -196,7 +196,8 @@ On the other side, the `destroy` member function can be used to delete an entity
 registry.destroy(entity);
 ```
 
-It requires that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
+It requires that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+
 If the purpose is to remove a single component instead, the `remove` member function template is the way to go:
 
 ```cpp
@@ -204,14 +205,16 @@ registry.remove<Position>(entity);
 ```
 
 Again, it requires that `entity` is valid. Moreover, an instance of the component must have been previously assigned to the entity.
-If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
+If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+
 The `reset` member function behaves similarly but with a strictly defined behaviour (and a performance penalty is the price to pay for that). In particular it removes the component if and only if it exists, otherwise it returns safely to the caller:
 
 ```cpp
 registry.reset<Position>(entity);
 ```
 
-It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
+It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+
 There exist also two more _versions_ of the `reset` member function:
 
 * If no entity is passed to it, `reset` will remove the given component from each entity that has it:
@@ -239,7 +242,8 @@ velocity.dy = 0.;
 ```
 
 It requires that `entity` is valid. Moreover, the entity does not have to have another instance of the component assigned to it.
-If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
+If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+
 If the entity already has the given component and the user wants to replace it, the `replace` member function template is the way to go:
 
 ```cpp
@@ -251,7 +255,8 @@ velocity.dy = 0.;
 ```
 
 It requires that `entity` is valid. Moreover, an instance of the component must have been previously assigned to the entity.
-If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
+If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+
 In case users want to assign a component to an entity, but it's unknown whether the entity already has it or not, `accomodote` does the work in a single call
 (of course with a performance penalty due to the fact that it must check if `entity` already has the given component or not):
 
@@ -263,7 +268,8 @@ velocity.dx = 0.;
 velocity.dy = 0.;
 ```
 
-It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
+It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+
 Note that `accomodate` is a sliglhty faster alternative for the following if/else statement and nothing more:
 
 ```cpp
@@ -280,7 +286,8 @@ As already shown, if in doubt about whether or not an entity has one or more com
 bool b = registry.has<Position, Velocity>(entity);
 ```
 
-It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
+It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+
 Entities can also be cloned and either partially or fully copied:
 
 ```cpp
@@ -297,21 +304,23 @@ In particular:
 * The `copy` member function template copies one component from an entity to another one.
 * The `copy` member function copies all the components from an entity to another one.
 
-All the function above mentioned require that the accepted entities are valid. In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
+All the function above mentioned require that the accepted entities are valid. In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+
 There exists also an utility member function that can be used to `swap` components between entities:
 
 ```cpp
 registry.swap<Position>(e1, e2);
 ```
 
-As usual, it requires that the two entities are valid. In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
+As usual, it requires that the two entities are valid. In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
 The `get` member function template (either the non-const or the const version) gives direct access to the component of an entity instead:
 
 ```cpp
 auto &position = registry.get<Position>(entity);
 ```
 
-It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
+It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+
 Components can also be sorted in memory by means of the `sort` member function templates. In particular:
 
 * Components can be sorted according to a component:
