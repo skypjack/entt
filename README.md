@@ -62,8 +62,7 @@ int main() {
 
 ## Motivation
 
-I started working on `EnTT` because of the wrong reason: my goal was to beat another well known open source _ECS_ in terms of performance.<br>
-I did it, of course, but it wasn't much satisfying. Actually it wasn't satisfying at all. The fastest and nothing more, fairly little indeed.<br/>
+I started working on `EnTT` because of the wrong reason: my goal was to beat another well known open source _ECS_ in terms of performance. I did it, of course, but it wasn't much satisfying. Actually it wasn't satisfying at all. The fastest and nothing more, fairly little indeed.<br/>
 When I realized it, I tried hard to keep intact the great performance and to add all the features I want to see in my _ECS_ at the same time.
 
 Today `EnTT` is finally what I was looking for: still faster than its rivals, a really good API and an amazing set of features.
@@ -122,7 +121,7 @@ For all the others, below is a crash course that guides them through the project
 
 ### Crash Course
 
-`EnTT` has two main actors: the *Registry* and the *View*.<br/>
+`EnTT` has two main actors: the **Registry** and the **View**.<br/>
 The former can be used to manage components, entities and collections of components and entities. The latter allows users to iterate over the underlying collections.
 
 #### The Registry
@@ -174,13 +173,13 @@ The `create` member function can be used to create a new entity and it comes in 
     auto entity = registry.create();
     ```
 
-* The member function template creates an entity and assign to it the given default-initialized components before to return it:
+* The member function template creates an entity and assigns to it the given _default-initialized_ components:
 
     ```cpp
     auto entity = registry.create<Position, Velocity>();
     ```
 
-  It's a helper function, mostly syncactic sugar and it's equivalent to the following:
+  It's a helper function, mostly syncactic sugar and it's equivalent to the following snippet:
 
     ```cpp
     auto entity = registry.create();
@@ -192,21 +191,21 @@ The `create` member function can be used to create a new entity and it comes in 
 
 The `destroy` member function can be used instead to delete an entity and all its components (if any):
 
-    ```cpp
-    registry.destroy(entity);
-    ```
+```cpp
+registry.destroy(entity);
+```
 
 On the other side, if the purpose is to remove a component, the `remove` member function template is the way to go:
 
-    ```cpp
-    registry.remove<Position>(entity);
-    ```
+```cpp
+registry.remove<Position>(entity);
+```
 
 The `reset` member function can be used to obtain the same result with a strictly defined behaviour (a performance penalty is the price to pay for that anyway). In particular it removes the component if and only if it exists, otherwise it safely returns to the caller:
 
-    ```cpp
-    registry.reset<Position>(entity);
-    ```
+```cpp
+registry.reset<Position>(entity);
+```
 
 There exist also two other _versions_ of the `reset` member function:
 
@@ -222,76 +221,76 @@ There exist also two other _versions_ of the `reset` member function:
     registry.reset();
     ```
 
-  *Note*: the registry has an assert in debug mode that verifies that entities are no longer valid when it's destructed. This function can be used to reset the registry to its initial state and thus satisfy the requirement.
+  **Note**: the registry has an assert in debug mode that verifies that entities are no longer valid when it's destructed. This function can be used to reset the registry to its initial state and thus satisfy the requirement.
 
 To assign a component to an entity, users can use the `assign` member function template. It accepts a variable number of arguments that, if present, are used to construct the component itself:
 
-    ```cpp
-    registry.assign<Position>(entity, 0., 0.);
+```cpp
+registry.assign<Position>(entity, 0., 0.);
 
-    // ...
+// ...
 
-    auto &velocity = registr.assign<Velocity>(entity);
+auto &velocity = registr.assign<Velocity>(entity);
 
-    velocity.dx = 0.;
-    velocity.dy = 0.;
-    ```
+velocity.dx = 0.;
+velocity.dy = 0.;
+```
 
-If the entity already has the given component and the user wants to replace it, the 'replace` member function template is the way to go. It works exactly as `assign`:
+If the entity already has the given component and the user wants to replace it, the `replace` member function template is the way to go:
 
-    ```cpp
-    registry.replace<Position>(entity, 0., 0.);
+```cpp
+registry.replace<Position>(entity, 0., 0.);
 
-    // ...
+// ...
 
-    auto &velocity = registr.replace<Velocity>(entity);
+auto &velocity = registr.replace<Velocity>(entity);
 
-    velocity.dx = 0.;
-    velocity.dy = 0.;
-    ```
+velocity.dx = 0.;
+velocity.dy = 0.;
+```
 
 In case users want to assign a component to an entity, but it's unknown whether the entity already has it or not, `accomodote` does the work in a single call:
 
-    ```cpp
-    registry.accomodate<Position>(entity, 0., 0.);
+```cpp
+registry.accomodate<Position>(entity, 0., 0.);
 
-    // ...
+// ...
 
-    auto &velocity = registr.accomodate<Velocity>(entity);
+auto &velocity = registr.accomodate<Velocity>(entity);
 
-    velocity.dx = 0.;
-    velocity.dy = 0.;
-    ```
+velocity.dx = 0.;
+velocity.dy = 0.;
+```
 
 Note that `accomodate` is a sliglhty faster alternative for the following if/else statement:
 
-    ```cpp
-    if(registry.has<Comp>(entity)) {
-        registry.replace<Comp>(entity, arg1, argN);
-    } else {
-        registry.assign<Comp>(entity, arg1, argN);
-    }
-    ```
+```cpp
+if(registry.has<Comp>(entity)) {
+    registry.replace<Comp>(entity, arg1, argN);
+} else {
+    registry.assign<Comp>(entity, arg1, argN);
+}
+```
 
 As already shown, if in doubt about whether or not an entity has one or more components, the `has` member function template may be useful:
 
-    ```cpp
-    bool b = registry.has<Position, Velocity>(entity);
-    ```
+```cpp
+bool b = registry.has<Position, Velocity>(entity);
+```
 
 Entities can also be cloned and partially or fully copied:
 
-    ```cpp
-    auto entity = registry.clone(other);
+```cpp
+auto entity = registry.clone(other);
 
-    // ...
+// ...
 
-    auto &velocity = registry.copy<Velocity>(to, from);
+auto &velocity = registry.copy<Velocity>(to, from);
 
-    // ...
+// ...
 
-    registry.copy(dst, src);
-    ```
+registry.copy(dst, src);
+```
 
 In particular:
 
@@ -301,15 +300,15 @@ In particular:
 
 There exists also an utility member function that can be used to `swap` components between entities:
 
-    ```cpp
-    registry.swap<Position>(e1, e2);
-    ```
+```cpp
+registry.swap<Position>(e1, e2);
+```
 
 The `get` member function template (either the non-const or the const version) gives direct access to the component of an entity instead:
 
-    ```cpp
-    auto &position = registry.get<Position>(entity);
-    ```
+```cpp
+auto &position = registry.get<Position>(entity);
+```
 
 Components can also be sorted in memory by means of the `sort` member function templates. In particular:
 
@@ -327,26 +326,14 @@ Components can also be sorted in memory by means of the `sort` member function t
 
   In this case, `Movement` components are arranged in memory so that cache misses are minimized when the two components are iterated together.
 
-*Note*. Several functions require that entities received as arguments are valid. In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
-Here is the full list of functions for which the requirement applies:
-
-* `destroy`
-* `assign`
-* `remove`
-* `has`
-* `get`
-* `replace`
-* `accomodate`
-* `clone`
-* `copy`
-* `swap`
-* `reset`
+**Note**. Several functions require that entities received as arguments are valid. In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
+Here is the full list of functions for which the requirement applies: `destroy`, `assign`, `remove`, `has`, `get`, `replace`, `accomodate`, `clone`, `copy`, `swap`, `reset`.
 
 Finally, the `view` member function template returns an iterable portion of entities and components (see below for more details):
 
-    ```cpp
-    auto view = registry.view<Position, Velocity>();
-    ```
+```cpp
+auto view = registry.view<Position, Velocity>();
+```
 
 Views are the other core component of `EnTT` and are usually extensively used by softwares that include it.
 
