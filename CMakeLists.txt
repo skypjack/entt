@@ -44,13 +44,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DRELEASE")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -DDEBUG")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    # When using clang and libc++ on Travis CI, CMAKE_CXX_STANDARD and
-    # CMAKE_CXX_STANDARD_REQUIRED are ignored for unknown reasons, so... back to
-    # the dear, old way to do that and everything is up and running again.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
     # it seems that -O3 ruins the performance when using clang ...
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 else()
     # ... on the other side, GCC is incredibly comfortable with it.
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
