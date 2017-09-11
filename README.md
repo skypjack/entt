@@ -241,7 +241,7 @@ velocity.dx = 0.;
 velocity.dy = 0.;
 ```
 
-It requires that `entity` is valid. Moreover, the entity mustn't have another instance of the component assigned to it.
+It requires that `entity` is valid. Moreover, the entity shouldn't have another instance of the component assigned to it.
 If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.
 
 If the entity already has the given component and the user wants to replace it, the `replace` member function template is the way to go:
@@ -303,7 +303,8 @@ In particular:
 * The `copy` member function template copies one component from an entity to another one.
 * The `copy` member function copies all the components from an entity to another one.
 
-All the functions above mentioned require that entities provided as arguments are valid. In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+All the functions above mentioned require that entities provided as arguments are valid and components exist wherever they have to be accessed.
+In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
 
 There exists also an utility member function that can be used to `swap` components between entities:
 
@@ -311,7 +312,8 @@ There exists also an utility member function that can be used to `swap` componen
 registry.swap<Position>(e1, e2);
 ```
 
-As usual, it requires that the two entities are valid. In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+As usual, it requires that the two entities are valid and that two instances of the component have been previously assigned to them.
+In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
 
 The `get` member function template (either the non-const or the const version) gives direct access to the component of an entity instead:
 
@@ -319,7 +321,8 @@ The `get` member function template (either the non-const or the const version) g
 auto &position = registry.get<Position>(entity);
 ```
 
-It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+It requires that `entity` is valid. Moreover, an instance of the component must have been previously assigned to the entity.
+If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.
 
 Components can also be sorted in memory by means of the `sort` member function templates. In particular:
 
@@ -360,7 +363,7 @@ There are two types of views:
     auto view = registry.view<Sprite>();
     ```
 
-  Components and entities are stored in tightly packed arrays and single component views are the fastest solution to iterate over them.<br/>
+  Components and entities are stored in tightly packed arrays and single component views are the fastest solution to iterate them.<br/>
   They have the _C++11-ish_ `begin` and `end` member function that allow users to use them in a typical range-for loop:
 
     ```cpp
@@ -372,8 +375,8 @@ There are two types of views:
     }
     ```
 
-  Iterating through a view this way returns entities that can be further used to get components or perform other types of operations.<br/>
-  There is also another method one can use to iterate through the array of entities, that is by using the `size` and `data` member functions:
+  Iterating a view this way returns entities that can be further used to get components or perform other activities.<br/>
+  There is also another method one can use to iterate the array of entities, that is by using the `size` and `data` member functions:
 
     ```cpp
     auto view = registry.view<Sprite>();
@@ -385,7 +388,8 @@ There are two types of views:
     }
     ```
 
-  Entites are good when the sole component isn't enough to perform a task. Anyway it comes with a cost: accessing components by entities has an extra level of indirection. It's pretty fast, but not that fast in some cases.<br/>
+  Entites are good when the sole component isn't enough to perform a task.
+  Anyway they come with a cost: accessing components by entities has an extra level of indirection. It's pretty fast, but not that fast in some cases.<br/>
   Direct access to the packed array of components is the other option around of a single component view. Member functions `size` and `raw` are there for that:
 
     ```cpp
@@ -398,7 +402,7 @@ There are two types of views:
     }
     ```
 
-  This is the fastest approach to iterate over the components: they are packed together by construction and visit them in order will reduce to a minimum the number of cache misses.
+  This is the fastest solution to iterate over the components: they are packed together by construction and visit them in order will reduce to a minimum the number of cache misses.
 
 * **Multi component view**.
 
@@ -423,12 +427,16 @@ There are two types of views:
     }
     ```
 
-  Note that there exists a packed array of entities to which the component is assigned for each component. Iterators of a multi component view pick the shortest array up and use it to visit the smallest set of potential entities.<br/>
-  The choice is performed when the view is constructed. It's good enough as long as views are discarded once they have been used. For all the other cases, the `reset` member function can be used whenever the data within the registry are known to be changed and forcing the choice again could speed up the execution.
+  Note that there exists a packed array of entities to which the component is assigned for each component.
+  Iterators of a multi component view pick the shortest array up and use it to visit the smallest set of potential entities.<br/>
+  The choice is performed when the view is constructed. It's good enough as long as views are discarded once they have been used.
+  For all the other cases, the `reset` member function can be used whenever the data within the registry are known to be changed and forcing the choice again could speed up the execution.
 
-  **Note**: one could argue that an iterator should return the set of references to components for each entity instead of the entity itself. Well, who wants to spend CPU cycles to get a reference to an useless tag component? This drove the design choice indeed.
+  **Note**: one could argue that an iterator should return the set of references to components for each entity instead of the entity itself.
+  Well, who wants to spend CPU cycles to get a reference to an useless tag component? This drove the design choice indeed.
 
-All the views can be used more than once. They return newly created and correctly initialized iterators whenever `begin` or `end` is invoked. Anyway views and iterators are tiny objects and the time spent to construct them can be safely ignored.<br/>
+All the views can be used more than once. They return newly created and correctly initialized iterators whenever `begin` or `end` is invoked.
+The same is valid for `data` and `raw` too. Anyway views and iterators are tiny objects and the time spent to construct them can be safely ignored.<br/>
 I'd suggest not to store them anywhere and to invoke the `Registry::view` member function template at each iteration to get a properly initialized view through which to iterate.
 
 #### Side notes
@@ -438,11 +446,12 @@ I'd suggest not to store them anywhere and to invoke the `Registry::view` member
 * Most of the _ECS_ available out there have an annoying limitation (at least from my point of view): entities and components cannot be created, assigned or deleted while users are iterating on them.<br/>
   `EnTT` partially solves the problem with a few limitations:
 
-    * Entities can be created at any time while iterating on one or more components.
-    * Components can be assigned to any entity at any time while iterating on one or more components.
+    * Entities can be created at any time while iterating one or more components.
+    * Components can be assigned to any entity at any time while iterating one or more components.
     * During an iteration, the current entity (that is the one returned by the iterator) can be deleted and all its components can be removed safely.
 
-  Entities that are not the current one (that is the one returned by the iterator) cannot be deleted. Components assigned to entities that are not the current one (that is the one returned by the iterator) cannot be removed.<br/>
+  Entities that are not the current one (that is the one returned by the iterator) cannot be deleted from within a loop.<br/>
+  Components assigned to entities that are not the current one (that is the one returned by the iterator) cannot be removed from within a loop.<br/>
   In this case, iterators are invalidated and the behaviour is undefined if one continues to use those iterators. Possible approaches are:
 
     * Store aside the entities and components to be removed and perform the operations at the end of the iteration.
