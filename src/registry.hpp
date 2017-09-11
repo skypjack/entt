@@ -7,7 +7,6 @@
 #include <bitset>
 #include <utility>
 #include <cstddef>
-#include <iterator>
 #include <cassert>
 #include <type_traits>
 #include "sparse_set.hpp"
