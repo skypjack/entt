@@ -54,6 +54,8 @@ int main() {
         auto &velocity = ecs.get<Velocity>(entity);
         // ...
     }
+
+    ecs.reset();
 }
 ```
 
