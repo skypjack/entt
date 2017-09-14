@@ -1,7 +1,7 @@
 # can use variables like {build} and {branch}
 version: 1.0.{build}
 
-image: Visual Studio 2015
+image: Visual Studio 2017
 
 environment:
   BUILD_DIR: "%APPVEYOR_BUILD_FOLDER%\\build"
@@ -13,9 +13,8 @@ configuration:
   - Release
 
 before_build:
-  - deps.bat
   - cd %BUILD_DIR%
-  - cmake .. -G"%CMAKE_GENERATOR_NAME%"
+  - cmake .. -G"Visual Studio 15 2017"
 
 build:
   parallel: true
