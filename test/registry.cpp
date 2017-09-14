@@ -282,11 +282,11 @@ TEST(DefaultRegistry, ViewSingleComponent) {
     auto view = registry.view<char>();
 
     ASSERT_NE(view.begin(), view.end());
-    ASSERT_EQ(view.size(), typename registry_type::view_type<char>::size_type{1});
+    ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
 
     registry.assign<char>(e1);
 
-    ASSERT_EQ(view.size(), typename registry_type::view_type<char>::size_type{2});
+    ASSERT_EQ(view.size(), typename decltype(view)::size_type{2});
 
     registry.remove<char>(e1);
     registry.remove<char>(e2);

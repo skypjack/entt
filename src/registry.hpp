@@ -191,9 +191,6 @@ public:
     using entity_type = Entity;
     using size_type = typename std::vector<mask_type>::size_type;
 
-    template<typename... Comp>
-    using view_type = View<pool_type, identifier<Comp>...>;
-
 private:
     template<typename Comp>
     void clone(entity_type to, entity_type from) {
@@ -414,12 +411,12 @@ public:
     }
 
     template<typename... Comp>
-    std::enable_if_t<(sizeof...(Comp) == 1), view_type<Comp...>>
-    view() noexcept { return view_type<Comp...>{&pool}; }
+    std::enable_if_t<(sizeof...(Comp) == 1), View<pool_type, identifier<Comp>...>>
+    view() noexcept { return View<pool_type, identifier<Comp>...>{ &pool }; }
 
     template<typename... Comp>
-    std::enable_if_t<(sizeof...(Comp) > 1), view_type<Comp...>>
-    view() noexcept { return view_type<Comp...>{&pool, entities.data()}; }
+    std::enable_if_t<(sizeof...(Comp) > 1), View<pool_type, identifier<Comp>...>>
+    view() noexcept { return View<pool_type, identifier<Comp>...>{ &pool, entities.data() }; }
 
 private:
     std::vector<mask_type> entities;
