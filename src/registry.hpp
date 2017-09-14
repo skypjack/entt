@@ -184,31 +184,31 @@ class Registry {
 
     static constexpr auto validity_bit = sizeof...(Component);
 
+    // variable templates are fine as well, but for the fact that MSVC goes crazy
     template<typename Comp>
-    static constexpr auto identifier = ident<Component...>.template get<Comp>();
-
-    template<std::size_t... I>
-    static View<pool_type, I...> proto();
+    struct identifier {
+        static constexpr auto value = ident<Component...>.template get<Comp>();
+    };
 
 public:
     using entity_type = Entity;
     using size_type = typename std::vector<mask_type>::size_type;
 
     template<typename... Comp>
-    using view_type = decltype(Registry::proto<identifier<Comp>...>());
+    using view_type = View<pool_type, identifier<Comp>::value...>;
 
 private:
     template<typename Comp>
     void clone(entity_type to, entity_type from) {
-        if(entities[from].test(identifier<Comp>)) {
-            assign<Comp>(to, std::get<identifier<Comp>>(pool).get(from));
+        if(entities[from].test(identifier<Comp>::value)) {
+            assign<Comp>(to, std::get<identifier<Comp>::value>(pool).get(from));
         }
     }
 
     template<typename Comp>
     void sync(entity_type to, entity_type from) {
-        bool src = entities[from].test(identifier<Comp>);
-        bool dst = entities[to].test(identifier<Comp>);
+        bool src = entities[from].test(identifier<Comp>::value);
+        bool dst = entities[to].test(identifier<Comp>::value);
 
         if(src && dst) {
             copy<Comp>(to, from);
@@ -231,7 +231,7 @@ public:
 
     template<typename Comp>
     size_type size() const noexcept {
-        return std::get<identifier<Comp>>(pool).size();
+        return std::get<identifier<Comp>::value>(pool).size();
     }
 
     size_type size() const noexcept {
@@ -240,7 +240,7 @@ public:
 
     template<typename Comp>
     size_type capacity() const noexcept {
-        return std::get<identifier<Comp>>(pool).capacity();
+        return std::get<identifier<Comp>::value>(pool).capacity();
     }
 
     size_type capacity() const noexcept {
@@ -249,7 +249,7 @@ public:
 
     template<typename Comp>
     bool empty() const noexcept {
-        return std::get<identifier<Comp>>(pool).empty();
+        return std::get<identifier<Comp>::value>(pool).empty();
     }
 
     bool empty() const noexcept {
@@ -297,15 +297,15 @@ public:
     template<typename Comp, typename... Args>
     Comp & assign(entity_type entity, Args... args) {
         assert(valid(entity));
-        entities[entity].set(identifier<Comp>);
-        return std::get<identifier<Comp>>(pool).construct(entity, args...);
+        entities[entity].set(identifier<Comp>::value);
+        return std::get<identifier<Comp>::value>(pool).construct(entity, args...);
     }
 
     template<typename Comp>
     void remove(entity_type entity) {
         assert(valid(entity));
-        entities[entity].reset(identifier<Comp>);
-        std::get<identifier<Comp>>(pool).destroy(entity);
+        entities[entity].reset(identifier<Comp>::value);
+        std::get<identifier<Comp>::value>(pool).destroy(entity);
     }
 
     template<typename... Comp>
@@ -314,7 +314,7 @@ public:
         using accumulator_type = bool[];
         bool all = true;
         auto &mask = entities[entity];
-        accumulator_type accumulator = { true, (all = all && mask.test(identifier<Comp>))... };
+        accumulator_type accumulator = { true, (all = all && mask.test(identifier<Comp>::value))... };
         (void)accumulator;
         return all;
     }
@@ -322,26 +322,26 @@ public:
     template<typename Comp>
     const Comp & get(entity_type entity) const noexcept {
         assert(valid(entity));
-        return std::get<identifier<Comp>>(pool).get(entity);
+        return std::get<identifier<Comp>::value>(pool).get(entity);
     }
 
     template<typename Comp>
     Comp & get(entity_type entity) noexcept {
         assert(valid(entity));
-        return std::get<identifier<Comp>>(pool).get(entity);
+        return std::get<identifier<Comp>::value>(pool).get(entity);
     }
 
     template<typename Comp, typename... Args>
     Comp & replace(entity_type entity, Args... args) {
         assert(valid(entity));
-        return (std::get<identifier<Comp>>(pool).get(entity) = Comp{args...});
+        return (std::get<identifier<Comp>::value>(pool).get(entity) = Comp{args...});
     }
 
     template<typename Comp, typename... Args>
     Comp & accomodate(entity_type entity, Args... args) {
         assert(valid(entity));
 
-        return (entities[entity].test(identifier<Comp>)
+        return (entities[entity].test(identifier<Comp>::value)
                 ? this->template replace<Comp>(entity, std::forward<Args>(args)...)
                 : this->template assign<Comp>(entity, std::forward<Args>(args)...));
     }
@@ -359,7 +359,7 @@ public:
     Comp & copy(entity_type to, entity_type from) {
         assert(valid(to));
         assert(valid(from));
-        auto &&cpool = std::get<identifier<Comp>>(pool);
+        auto &&cpool = std::get<identifier<Comp>::value>(pool);
         return (cpool.get(to) = cpool.get(from));
     }
 
@@ -375,12 +375,12 @@ public:
     void swap(entity_type lhs, entity_type rhs) {
         assert(valid(lhs));
         assert(valid(rhs));
-        std::get<identifier<Comp>>(pool).swap(lhs, rhs);
+        std::get<identifier<Comp>::value>(pool).swap(lhs, rhs);
     }
 
     template<typename Comp, typename Compare>
     void sort(Compare compare) {
-        std::get<identifier<Comp>>(pool).sort(std::move(compare));
+        std::get<identifier<Comp>::value>(pool).sort(std::move(compare));
     }
 
     template<typename To, typename From>
@@ -394,7 +394,7 @@ public:
     void reset(entity_type entity) {
         assert(valid(entity));
 
-        if(entities[entity].test(identifier<Comp>)) {
+        if(entities[entity].test(identifier<Comp>::value)) {
             remove<Comp>(entity);
         }
     }
@@ -402,7 +402,7 @@ public:
     template<typename Comp>
     void reset() {
         for(entity_type entity = 0, last = entity_type(entities.size()); entity < last; ++entity) {
-            if(entities[entity].test(identifier<Comp>)) {
+            if(entities[entity].test(identifier<Comp>::value)) {
                 remove<Comp>(entity);
             }
         }
@@ -417,11 +417,13 @@ public:
     }
 
     template<typename... Comp>
-    std::enable_if_t<(sizeof...(Comp) == 1), view_type<Comp...>>
+    // view_type<Comp...> is fine as well, but for the fact that MSVC dislikes it
+    std::enable_if_t<(sizeof...(Comp) == 1), View<pool_type, identifier<Comp>::value...>>
     view() noexcept { return view_type<Comp...>{&pool}; }
 
     template<typename... Comp>
-    std::enable_if_t<(sizeof...(Comp) > 1), view_type<Comp...>>
+    // view_type<Comp...> is fine as well, but for the fact that MSVC dislikes it
+    std::enable_if_t<(sizeof...(Comp) > 1), View<pool_type, identifier<Comp>::value...>>
     view() noexcept { return view_type<Comp...>{&pool, entities.data()}; }
 
 private:
