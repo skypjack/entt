@@ -187,9 +187,15 @@ class Registry {
     template<typename Comp>
     static constexpr auto identifier = ident<Component...>.template get<Comp>();
 
+    template<std::size_t... I>
+    static View<pool_type, I...> proto();
+
 public:
     using entity_type = Entity;
     using size_type = typename std::vector<mask_type>::size_type;
+
+    template<typename... Comp>
+    using view_type = decltype(Registry::proto<identifier<Comp>...>());
 
 private:
     template<typename Comp>
@@ -411,12 +417,12 @@ public:
     }
 
     template<typename... Comp>
-    std::enable_if_t<(sizeof...(Comp) == 1), View<pool_type, identifier<Comp>...>>
-    view() noexcept { return View<pool_type, identifier<Comp>...>{ &pool }; }
+    std::enable_if_t<(sizeof...(Comp) == 1), view_type<Comp...>>
+    view() noexcept { return view_type<Comp...>{&pool}; }
 
     template<typename... Comp>
-    std::enable_if_t<(sizeof...(Comp) > 1), View<pool_type, identifier<Comp>...>>
-    view() noexcept { return View<pool_type, identifier<Comp>...>{ &pool, entities.data() }; }
+    std::enable_if_t<(sizeof...(Comp) > 1), view_type<Comp...>>
+    view() noexcept { return view_type<Comp...>{&pool, entities.data()}; }
 
 private:
     std::vector<mask_type> entities;
