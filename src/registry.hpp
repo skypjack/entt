@@ -184,29 +184,28 @@ class Registry {
 
     static constexpr auto validity_bit = sizeof...(Component);
 
+    template<typename Comp>
+    static constexpr auto identifier = ident<Component...>.template get<Comp>();
+
 public:
     using entity_type = Entity;
     using size_type = typename std::vector<mask_type>::size_type;
 
     template<typename... Comp>
-    using view_type = View<pool_type, ident<Component...>.template get<Comp>()...>;
+    using view_type = View<pool_type, identifier<Comp>...>;
 
 private:
     template<typename Comp>
     void clone(entity_type to, entity_type from) {
-        constexpr auto index = ident<Component...>.template get<Comp>();
-
-        if(entities[from].test(index)) {
-            assign<Comp>(to, std::get<index>(pool).get(from));
+        if(entities[from].test(identifier<Comp>)) {
+            assign<Comp>(to, std::get<identifier<Comp>>(pool).get(from));
         }
     }
 
     template<typename Comp>
     void sync(entity_type to, entity_type from) {
-        constexpr auto index = ident<Component...>.template get<Comp>();
-
-        bool src = entities[from].test(index);
-        bool dst = entities[to].test(index);
+        bool src = entities[from].test(identifier<Comp>);
+        bool dst = entities[to].test(identifier<Comp>);
 
         if(src && dst) {
             copy<Comp>(to, from);
@@ -229,8 +228,7 @@ public:
 
     template<typename Comp>
     size_type size() const noexcept {
-        constexpr auto index = ident<Component...>.template get<Comp>();
-        return std::get<index>(pool).size();
+        return std::get<identifier<Comp>>(pool).size();
     }
 
     size_type size() const noexcept {
@@ -239,8 +237,7 @@ public:
 
     template<typename Comp>
     size_type capacity() const noexcept {
-        constexpr auto index = ident<Component...>.template get<Comp>();
-        return std::get<index>(pool).capacity();
+        return std::get<identifier<Comp>>(pool).capacity();
     }
 
     size_type capacity() const noexcept {
@@ -249,8 +246,7 @@ public:
 
     template<typename Comp>
     bool empty() const noexcept {
-        constexpr auto index = ident<Component...>.template get<Comp>();
-        return std::get<index>(pool).empty();
+        return std::get<identifier<Comp>>(pool).empty();
     }
 
     bool empty() const noexcept {
@@ -298,17 +294,15 @@ public:
     template<typename Comp, typename... Args>
     Comp & assign(entity_type entity, Args... args) {
         assert(valid(entity));
-        constexpr auto index = ident<Component...>.template get<Comp>();
-        entities[entity].set(index);
-        return std::get<index>(pool).construct(entity, args...);
+        entities[entity].set(identifier<Comp>);
+        return std::get<identifier<Comp>>(pool).construct(entity, args...);
     }
 
     template<typename Comp>
     void remove(entity_type entity) {
         assert(valid(entity));
-        constexpr auto index = ident<Component...>.template get<Comp>();
-        entities[entity].reset(index);
-        std::get<index>(pool).destroy(entity);
+        entities[entity].reset(identifier<Comp>);
+        std::get<identifier<Comp>>(pool).destroy(entity);
     }
 
     template<typename... Comp>
@@ -317,7 +311,7 @@ public:
         using accumulator_type = bool[];
         bool all = true;
         auto &mask = entities[entity];
-        accumulator_type accumulator = { true, (all = all && mask.test(ident<Component...>.template get<Comp>()))... };
+        accumulator_type accumulator = { true, (all = all && mask.test(identifier<Comp>))... };
         (void)accumulator;
         return all;
     }
@@ -325,31 +319,26 @@ public:
     template<typename Comp>
     const Comp & get(entity_type entity) const noexcept {
         assert(valid(entity));
-        constexpr auto index = ident<Component...>.template get<Comp>();
-        return std::get<index>(pool).get(entity);
+        return std::get<identifier<Comp>>(pool).get(entity);
     }
 
     template<typename Comp>
     Comp & get(entity_type entity) noexcept {
         assert(valid(entity));
-        constexpr auto index = ident<Component...>.template get<Comp>();
-        return std::get<index>(pool).get(entity);
+        return std::get<identifier<Comp>>(pool).get(entity);
     }
 
     template<typename Comp, typename... Args>
     Comp & replace(entity_type entity, Args... args) {
         assert(valid(entity));
-        constexpr auto index = ident<Component...>.template get<Comp>();
-        return (std::get<index>(pool).get(entity) = Comp{args...});
+        return (std::get<identifier<Comp>>(pool).get(entity) = Comp{args...});
     }
 
     template<typename Comp, typename... Args>
     Comp & accomodate(entity_type entity, Args... args) {
         assert(valid(entity));
 
-        constexpr auto index = ident<Component...>.template get<Comp>();
-
-        return (entities[entity].test(index)
+        return (entities[entity].test(identifier<Comp>)
                 ? this->template replace<Comp>(entity, std::forward<Args>(args)...)
                 : this->template assign<Comp>(entity, std::forward<Args>(args)...));
     }
@@ -367,8 +356,7 @@ public:
     Comp & copy(entity_type to, entity_type from) {
         assert(valid(to));
         assert(valid(from));
-        constexpr auto index = ident<Component...>.template get<Comp>();
-        auto &&cpool = std::get<index>(pool);
+        auto &&cpool = std::get<identifier<Comp>>(pool);
         return (cpool.get(to) = cpool.get(from));
     }
 
@@ -384,18 +372,18 @@ public:
     void swap(entity_type lhs, entity_type rhs) {
         assert(valid(lhs));
         assert(valid(rhs));
-        std::get<ident<Component...>.template get<Comp>()>(pool).swap(lhs, rhs);
+        std::get<identifier<Comp>>(pool).swap(lhs, rhs);
     }
 
     template<typename Comp, typename Compare>
     void sort(Compare compare) {
-        std::get<ident<Component...>.template get<Comp>()>(pool).sort(std::move(compare));
+        std::get<identifier<Comp>>(pool).sort(std::move(compare));
     }
 
     template<typename To, typename From>
     void sort() {
-        auto &&to = std::get<ident<Component...>.template get<To>()>(pool);
-        auto &&from = std::get<ident<Component...>.template get<From>()>(pool);
+        auto &&to = std::get<identifier<To>>(pool);
+        auto &&from = std::get<identifier<From>>(pool);
         to.respect(from);
     }
 
@@ -403,19 +391,15 @@ public:
     void reset(entity_type entity) {
         assert(valid(entity));
 
-        constexpr auto index = ident<Component...>.template get<Comp>();
-
-        if(entities[entity].test(index)) {
+        if(entities[entity].test(identifier<Comp>)) {
             remove<Comp>(entity);
         }
     }
 
     template<typename Comp>
     void reset() {
-        constexpr auto index = ident<Component...>.template get<Comp>();
-
         for(entity_type entity = 0, last = entity_type(entities.size()); entity < last; ++entity) {
-            if(entities[entity].test(index)) {
+            if(entities[entity].test(identifier<Comp>)) {
                 remove<Comp>(entity);
             }
         }
@@ -423,7 +407,7 @@ public:
 
     void reset() {
         using accumulator_type = int[];
-        accumulator_type acc = { 0, (std::get<ident<Component...>.template get<Component>()>(pool).reset(), 0)... };
+        accumulator_type acc = { 0, (std::get<identifier<Component>>(pool).reset(), 0)... };
         entities.clear();
         available.clear();
         (void)acc;
