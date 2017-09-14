@@ -385,8 +385,8 @@ public:
 
     template<typename To, typename From>
     void sort() {
-        auto &&to = std::get<identifier<To>>(pool);
-        auto &&from = std::get<identifier<From>>(pool);
+        auto &&to = std::get<identifier<To>::value>(pool);
+        auto &&from = std::get<identifier<From>::value>(pool);
         to.respect(from);
     }
 
@@ -410,7 +410,7 @@ public:
 
     void reset() {
         using accumulator_type = int[];
-        accumulator_type acc = { 0, (std::get<identifier<Component>>(pool).reset(), 0)... };
+        accumulator_type acc = { 0, (std::get<identifier<Component>::value>(pool).reset(), 0)... };
         entities.clear();
         available.clear();
         (void)acc;
