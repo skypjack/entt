@@ -238,7 +238,7 @@ To assign a component to an entity, users can rely on the `assign` member functi
 ```cpp
 registry.assign<Position>(entity, 0., 0.);
 // ...
-auto &velocity = registr.assign<Velocity>(entity);
+auto &velocity = registry.assign<Velocity>(entity);
 velocity.dx = 0.;
 velocity.dy = 0.;
 ```
@@ -251,7 +251,7 @@ If the entity already has the given component and the user wants to replace it, 
 ```cpp
 registry.replace<Position>(entity, 0., 0.);
 // ...
-auto &velocity = registr.replace<Velocity>(entity);
+auto &velocity = registry.replace<Velocity>(entity);
 velocity.dx = 0.;
 velocity.dy = 0.;
 ```
@@ -265,7 +265,7 @@ In case users want to assign a component to an entity, but it's unknown whether 
 ```cpp
 registry.accomodate<Position>(entity, 0., 0.);
 // ...
-auto &velocity = registr.accomodate<Velocity>(entity);
+auto &velocity = registry.accomodate<Velocity>(entity);
 velocity.dx = 0.;
 velocity.dy = 0.;
 ```
