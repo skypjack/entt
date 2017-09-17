@@ -4,11 +4,10 @@
 
 #include <tuple>
 #include <vector>
-#include <bitset>
 #include <utility>
 #include <cstddef>
 #include <cassert>
-#include <type_traits>
+#include <algorithm>
 #include "sparse_set.hpp"
 #include "ident.hpp"
 
@@ -23,7 +22,6 @@ class View;
 template<typename Pool, std::size_t Ident, std::size_t... Other>
 class View<Pool, Ident, Other...> final {
     using pool_type = Pool;
-    using mask_type = std::bitset<std::tuple_size<Pool>::value + 1>;
     using underlying_iterator_type = typename std::tuple_element_t<Ident, Pool>::iterator_type;
 
     class ViewIterator;
@@ -36,14 +34,19 @@ public:
 private:
     class ViewIterator {
         inline bool valid() const noexcept {
-            return ((mask[*begin] & bitmask) == bitmask);
+            using accumulator_type = bool[];
+            auto entity = *begin;
+            bool all = std::get<Ident>(*pool).has(entity);
+            accumulator_type accumulator =  { all, (all = all && std::get<Other>(*pool).has(entity))... };
+            (void)accumulator;
+            return all;
         }
 
     public:
         using value_type = entity_type;
 
-        ViewIterator(underlying_iterator_type begin, underlying_iterator_type end, const mask_type &bitmask, const mask_type *mask) noexcept
-            : begin{begin}, end{end}, bitmask{bitmask}, mask{mask}
+        ViewIterator(const pool_type *pool, underlying_iterator_type begin, underlying_iterator_type end) noexcept
+            : pool{pool}, begin{begin}, end{end}
         {
             if(begin != end && !valid()) {
                 ++(*this);
@@ -74,10 +77,9 @@ private:
         }
 
     private:
+        const pool_type *pool;
         underlying_iterator_type begin;
         underlying_iterator_type end;
-        const mask_type bitmask;
-        const mask_type *mask;
     };
 
     template<std::size_t Idx>
@@ -93,26 +95,23 @@ private:
     }
 
 public:
-    explicit View(const pool_type *pool, const mask_type *mask) noexcept
+    explicit View(const pool_type *pool) noexcept
         : from{std::get<Ident>(*pool).begin()},
           to{std::get<Ident>(*pool).end()},
-          pool{pool},
-          mask{mask}
+          pool{pool}
     {
         using accumulator_type = int[];
         size_type size = std::get<Ident>(*pool).size();
-        bitmask.set(Ident);
-        accumulator_type types = { 0, (bitmask.set(Other), 0)... };
-        accumulator_type pref = { 0, (prefer<Other>(size), 0)... };
-        (void)types, (void)pref;
+        accumulator_type accumulator = { 0, (prefer<Other>(size), 0)... };
+        (void)accumulator;
     }
 
     iterator_type begin() const noexcept {
-        return ViewIterator{from, to, bitmask, mask};
+        return ViewIterator{pool, from, to};
     }
 
     iterator_type end() const noexcept {
-        return ViewIterator{to, to, bitmask, mask};
+        return ViewIterator{pool, to, to};
     }
 
     void reset() noexcept {
@@ -129,8 +128,6 @@ private:
     underlying_iterator_type from;
     underlying_iterator_type to;
     const pool_type *pool;
-    const mask_type *mask;
-    mask_type bitmask;
 };
 
 
@@ -180,9 +177,6 @@ private:
 template<typename Entity, typename... Component>
 class Registry {
     using pool_type = std::tuple<SparseSet<Entity, Component>...>;
-    using mask_type = std::bitset<sizeof...(Component)+1>;
-
-    static constexpr auto validity_bit = sizeof...(Component);
 
     // variable templates are fine as well, but for the fact that MSVC goes crazy
     template<typename Comp>
@@ -192,7 +186,7 @@ class Registry {
 
 public:
     using entity_type = Entity;
-    using size_type = typename std::vector<mask_type>::size_type;
+    using size_type = std::size_t;
 
     template<typename... Comp>
     using view_type = View<pool_type, identifier<Comp>::value...>;
@@ -200,15 +194,19 @@ public:
 private:
     template<typename Comp>
     void clone(entity_type to, entity_type from) {
-        if(entities[from].test(identifier<Comp>::value)) {
-            assign<Comp>(to, std::get<identifier<Comp>::value>(pool).get(from));
+        auto &&cpool = std::get<identifier<Comp>::value>(pool);
+
+        if(cpool.has(from)) {
+            assign<Comp>(to, cpool.get(from));
         }
     }
 
     template<typename Comp>
     void sync(entity_type to, entity_type from) {
-        bool src = entities[from].test(identifier<Comp>::value);
-        bool dst = entities[to].test(identifier<Comp>::value);
+        auto &&cpool = std::get<identifier<Comp>::value>(pool);
+
+        bool src = cpool.has(from);
+        bool dst = cpool.has(to);
 
         if(src && dst) {
             copy<Comp>(to, from);
@@ -235,7 +233,7 @@ public:
     }
 
     size_type size() const noexcept {
-        return entities.size() - available.size();
+        return next - available.size();
     }
 
     template<typename Comp>
@@ -244,7 +242,7 @@ public:
     }
 
     size_type capacity() const noexcept {
-        return entities.size();
+        return next;
     }
 
     template<typename Comp>
@@ -253,11 +251,11 @@ public:
     }
 
     bool empty() const noexcept {
-        return entities.empty();
+        return next == available.size();
     }
 
     bool valid(entity_type entity) const noexcept {
-        return (entity < entities.size() && entities[entity].test(validity_bit));
+        return (entity < next && std::find(available.cbegin(), available.cend(), entity) == available.cend());
     }
 
     template<typename... Comp>
@@ -273,14 +271,11 @@ public:
         entity_type entity;
 
         if(available.empty()) {
-            entity = entity_type(entities.size());
-            entities.emplace_back();
+            entity = next++;
         } else {
             entity = available.back();
             available.pop_back();
         }
-
-        entities[entity].set(validity_bit);
 
         return entity;
     }
@@ -290,21 +285,18 @@ public:
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (reset<Component>(entity), 0)... };
         available.push_back(entity);
-        entities[entity].reset();
         (void)accumulator;
     }
 
     template<typename Comp, typename... Args>
     Comp & assign(entity_type entity, Args... args) {
         assert(valid(entity));
-        entities[entity].set(identifier<Comp>::value);
         return std::get<identifier<Comp>::value>(pool).construct(entity, args...);
     }
 
     template<typename Comp>
     void remove(entity_type entity) {
         assert(valid(entity));
-        entities[entity].reset(identifier<Comp>::value);
         std::get<identifier<Comp>::value>(pool).destroy(entity);
     }
 
@@ -313,8 +305,7 @@ public:
         assert(valid(entity));
         using accumulator_type = bool[];
         bool all = true;
-        auto &mask = entities[entity];
-        accumulator_type accumulator = { true, (all = all && mask.test(identifier<Comp>::value))... };
+        accumulator_type accumulator = { all, (all = all && std::get<identifier<Comp>::value>(pool).has(entity))... };
         (void)accumulator;
         return all;
     }
@@ -341,7 +332,7 @@ public:
     Comp & accomodate(entity_type entity, Args... args) {
         assert(valid(entity));
 
-        return (entities[entity].test(identifier<Comp>::value)
+        return (std::get<identifier<Comp>::value>(pool).has(entity)
                 ? this->template replace<Comp>(entity, std::forward<Args>(args)...)
                 : this->template assign<Comp>(entity, std::forward<Args>(args)...));
     }
@@ -379,8 +370,8 @@ public:
     }
 
     template<typename Comp, typename Compare>
-    void sort(Compare compare) {
-        std::get<identifier<Comp>::value>(pool).sort(std::move(compare));
+    void sort(Compare &&compare) {
+        std::get<identifier<Comp>::value>(pool).sort(std::forward<Compare>(compare));
     }
 
     template<typename To, typename From>
@@ -394,15 +385,17 @@ public:
     void reset(entity_type entity) {
         assert(valid(entity));
 
-        if(entities[entity].test(identifier<Comp>::value)) {
+        if(std::get<identifier<Comp>::value>(pool).has(entity)) {
             remove<Comp>(entity);
         }
     }
 
     template<typename Comp>
     void reset() {
-        for(entity_type entity = 0, last = entity_type(entities.size()); entity < last; ++entity) {
-            if(entities[entity].test(identifier<Comp>::value)) {
+        auto &&cpool = std::get<identifier<Comp>::value>(pool);
+
+        for(entity_type entity = 0; entity < next; ++entity) {
+            if(cpool.has(entity)) {
                 remove<Comp>(entity);
             }
         }
@@ -411,24 +404,19 @@ public:
     void reset() {
         using accumulator_type = int[];
         accumulator_type acc = { 0, (std::get<identifier<Component>::value>(pool).reset(), 0)... };
-        entities.clear();
         available.clear();
+        next = entity_type{};
         (void)acc;
     }
 
     template<typename... Comp>
     // view_type<Comp...> is fine as well, but for the fact that MSVC dislikes it
-    std::enable_if_t<(sizeof...(Comp) == 1), View<pool_type, identifier<Comp>::value...>>
+    View<pool_type, identifier<Comp>::value...>
     view() noexcept { return view_type<Comp...>{&pool}; }
 
-    template<typename... Comp>
-    // view_type<Comp...> is fine as well, but for the fact that MSVC dislikes it
-    std::enable_if_t<(sizeof...(Comp) > 1), View<pool_type, identifier<Comp>::value...>>
-    view() noexcept { return view_type<Comp...>{&pool, entities.data()}; }
-
 private:
-    std::vector<mask_type> entities;
     std::vector<entity_type> available;
+    entity_type next{};
     pool_type pool;
 };
 
