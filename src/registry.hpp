@@ -9,7 +9,6 @@
 #include <cassert>
 #include <algorithm>
 #include "sparse_set.hpp"
-#include "ident.hpp"
 
 
 namespace entt {
@@ -174,47 +173,59 @@ private:
 };
 
 
-template<typename Entity, typename... Component>
-class Registry {
-    using pool_type = std::tuple<SparseSet<Entity, Component>...>;
-
-    // variable templates are fine as well, but for the fact that MSVC goes crazy
-    template<typename Comp>
-    struct identifier {
-        static constexpr auto value = ident<Component...>.template get<Comp>();
-    };
-
-public:
+template<typename Entity>
+struct Registry {
     using entity_type = Entity;
     using size_type = std::size_t;
 
-    template<typename... Comp>
-    using view_type = View<pool_type, identifier<Comp>::value...>;
-
 private:
-    template<typename Comp>
-    void clone(entity_type to, entity_type from) {
-        auto &&cpool = std::get<identifier<Comp>::value>(pool);
+    using base_pool_type = SparseSet<entity_type>;
 
-        if(cpool.has(from)) {
-            assign<Comp>(to, cpool.get(from));
-        }
+    template<typename Component>
+    using pool_type = SparseSet<entity_type, Component>;
+
+    static std::size_t identifier() noexcept {
+        static std::size_t value = 0;
+        return value++;
     }
 
-    template<typename Comp>
-    void sync(entity_type to, entity_type from) {
-        auto &&cpool = std::get<identifier<Comp>::value>(pool);
+    template<typename>
+    static std::size_t type() noexcept {
+        static const std::size_t value = identifier();
+        return value;
+    }
 
-        bool src = cpool.has(from);
-        bool dst = cpool.has(to);
+    template<typename Component>
+    bool managed() const noexcept {
+        auto ctype = type<Component>();
+        return ctype < pools.size() && pools[ctype];
+    }
 
-        if(src && dst) {
-            copy<Comp>(to, from);
-        } else if(src) {
-            clone<Comp>(to, from);
-        } else if(dst) {
-            remove<Comp>(to);
+    template<typename Component>
+    const pool_type<Component> & pool() const noexcept {
+        assert(managed<Component>());
+        return static_cast<pool_type<Component> &>(*pools[type<Component>()]);
+    }
+
+    template<typename Component>
+    pool_type<Component> & pool() noexcept {
+        assert(managed<Component>());
+        return const_cast<pool_type<Component> &>(const_cast<const Registry *>(this)->pool<Component>());
+    }
+
+    template<typename Component>
+    pool_type<Component> & ensure() {
+        auto ctype = type<Component>();
+
+        if(!(ctype < pools.size())) {
+            pools.resize(ctype + 1);
         }
+
+        if(!pools[ctype]) {
+            pools[ctype] = std::make_unique<pool_type<Component>>();
+        }
+
+        return pool<Component>();
     }
 
 public:
@@ -227,27 +238,27 @@ public:
     Registry & operator=(const Registry &) = delete;
     Registry & operator=(Registry &&) = delete;
 
-    template<typename Comp>
+    template<typename Component>
     size_type size() const noexcept {
-        return std::get<identifier<Comp>::value>(pool).size();
+        return managed<Component>() ? pool<Component>().size() : size_type{};
     }
 
     size_type size() const noexcept {
         return next - available.size();
     }
 
-    template<typename Comp>
+    template<typename Component>
     size_type capacity() const noexcept {
-        return std::get<identifier<Comp>::value>(pool).capacity();
+        return managed<Component>() ? pool<Component>().capacity() : size_type{};
     }
 
     size_type capacity() const noexcept {
         return next;
     }
 
-    template<typename Comp>
+    template<typename Component>
     bool empty() const noexcept {
-        return std::get<identifier<Comp>::value>(pool).empty();
+        return managed<Component>() ? pool<Component>().empty() : true;
     }
 
     bool empty() const noexcept {
@@ -258,11 +269,11 @@ public:
         return (entity < next && std::find(available.cbegin(), available.cend(), entity) == available.cend());
     }
 
-    template<typename... Comp>
+    template<typename... Component>
     entity_type create() noexcept {
         using accumulator_type = int[];
         auto entity = create();
-        accumulator_type accumulator = { 0, (assign<Comp>(entity), 0)... };
+        accumulator_type accumulator = { 0, (assign<Component>(entity), 0)... };
         (void)accumulator;
         return entity;
     }
@@ -282,147 +293,141 @@ public:
 
     void destroy(entity_type entity) {
         assert(valid(entity));
-        using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (reset<Component>(entity), 0)... };
+
+        for(auto &&cpool: pools) {
+            if(cpool && cpool->has(entity)) {
+                cpool->destroy(entity);
+            }
+        }
+
         available.push_back(entity);
-        (void)accumulator;
     }
 
-    template<typename Comp, typename... Args>
-    Comp & assign(entity_type entity, Args... args) {
+    template<typename Component, typename... Args>
+    Component & assign(entity_type entity, Args&&... args) {
         assert(valid(entity));
-        return std::get<identifier<Comp>::value>(pool).construct(entity, args...);
+        return ensure<Component>().construct(entity, std::forward<Args>(args)...);
     }
 
-    template<typename Comp>
+    template<typename Component>
     void remove(entity_type entity) {
         assert(valid(entity));
-        std::get<identifier<Comp>::value>(pool).destroy(entity);
+        assert(managed<Component>());
+        return pool<Component>().destroy(entity);
     }
 
-    template<typename... Comp>
+    template<typename... Component>
     bool has(entity_type entity) const noexcept {
         assert(valid(entity));
         using accumulator_type = bool[];
         bool all = true;
-        accumulator_type accumulator = { all, (all = all && std::get<identifier<Comp>::value>(pool).has(entity))... };
+        accumulator_type accumulator = { all, (all = all && managed<Component>() && pool<Component>().has(entity))... };
         (void)accumulator;
         return all;
     }
 
-    template<typename Comp>
-    const Comp & get(entity_type entity) const noexcept {
+    template<typename Component>
+    const Component & get(entity_type entity) const noexcept {
         assert(valid(entity));
-        return std::get<identifier<Comp>::value>(pool).get(entity);
+        assert(managed<Component>());
+        return pool<Component>().get(entity);
     }
 
-    template<typename Comp>
-    Comp & get(entity_type entity) noexcept {
+    template<typename Component>
+    Component & get(entity_type entity) noexcept {
         assert(valid(entity));
-        return std::get<identifier<Comp>::value>(pool).get(entity);
+        assert(managed<Component>());
+        return pool<Component>().get(entity);
     }
 
-    template<typename Comp, typename... Args>
-    Comp & replace(entity_type entity, Args... args) {
+    template<typename Component, typename... Args>
+    Component & replace(entity_type entity, Args&&... args) {
         assert(valid(entity));
-        return (std::get<identifier<Comp>::value>(pool).get(entity) = Comp{args...});
+        assert(managed<Component>());
+        return (pool<Component>().get(entity) = Component{std::forward<Args>(args)...});
     }
 
-    template<typename Comp, typename... Args>
-    Comp & accomodate(entity_type entity, Args... args) {
+    template<typename Component, typename... Args>
+    Component & accomodate(entity_type entity, Args&&... args) {
         assert(valid(entity));
+        auto &cpool = ensure<Component>();
 
-        return (std::get<identifier<Comp>::value>(pool).has(entity)
-                ? this->template replace<Comp>(entity, std::forward<Args>(args)...)
-                : this->template assign<Comp>(entity, std::forward<Args>(args)...));
+        return (cpool.has(entity)
+                ? (cpool.get(entity) = Component{std::forward<Args>(args)...})
+                : cpool.construct(entity, std::forward<Args>(args)...));
     }
 
-    entity_type clone(entity_type from) {
-        assert(valid(from));
-        using accumulator_type = int[];
-        auto to = create();
-        accumulator_type accumulator = { 0, (clone<Component>(to, from), 0)... };
-        (void)accumulator;
-        return to;
-    }
-
-    template<typename Comp>
-    Comp & copy(entity_type to, entity_type from) {
-        assert(valid(to));
-        assert(valid(from));
-        auto &&cpool = std::get<identifier<Comp>::value>(pool);
-        return (cpool.get(to) = cpool.get(from));
-    }
-
-    void copy(entity_type to, entity_type from) {
-        assert(valid(to));
-        assert(valid(from));
-        using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (sync<Component>(to, from), 0)... };
-        (void)accumulator;
-    }
-
-    template<typename Comp>
+    template<typename Component>
     void swap(entity_type lhs, entity_type rhs) {
         assert(valid(lhs));
         assert(valid(rhs));
-        std::get<identifier<Comp>::value>(pool).swap(lhs, rhs);
+        assert(managed<Component>());
+        pool<Component>().swap(lhs, rhs);
     }
 
-    template<typename Comp, typename Compare>
+    template<typename Component, typename Compare>
     void sort(Compare &&compare) {
-        std::get<identifier<Comp>::value>(pool).sort(std::forward<Compare>(compare));
+        ensure<Component>().sort(std::forward<Compare>(compare));
     }
 
     template<typename To, typename From>
     void sort() {
-        auto &&to = std::get<identifier<To>::value>(pool);
-        auto &&from = std::get<identifier<From>::value>(pool);
-        to.respect(from);
+        ensure<To>().respect(ensure<From>());
     }
 
-    template<typename Comp>
+    template<typename Component>
     void reset(entity_type entity) {
         assert(valid(entity));
 
-        if(std::get<identifier<Comp>::value>(pool).has(entity)) {
-            remove<Comp>(entity);
+        if(managed<Component>()) {
+            auto &cpool = pool<Component>();
+
+            if(cpool.has(entity)) {
+                cpool.destroy(entity);
+            }
         }
     }
 
-    template<typename Comp>
+    template<typename Component>
     void reset() {
-        auto &&cpool = std::get<identifier<Comp>::value>(pool);
+        if(managed<Component>()) {
+            auto &cpool = pool<Component>();
 
-        for(entity_type entity = 0; entity < next; ++entity) {
-            if(cpool.has(entity)) {
-                remove<Comp>(entity);
+            for(entity_type entity = 0; entity < next; ++entity) {
+                if(cpool.has(entity)) {
+                    cpool.destroy(entity);
+                }
             }
         }
     }
 
     void reset() {
-        using accumulator_type = int[];
-        accumulator_type acc = { 0, (std::get<identifier<Component>::value>(pool).reset(), 0)... };
-        available.clear();
+        for(auto &&cpool: pools) {
+            if(cpool) {
+                cpool->reset();
+            }
+        }
+
         next = entity_type{};
-        (void)acc;
+        available.clear();
+        pools.clear();
     }
 
+    /*
     template<typename... Comp>
     // view_type<Comp...> is fine as well, but for the fact that MSVC dislikes it
     View<pool_type, identifier<Comp>::value...>
     view() noexcept { return view_type<Comp...>{&pool}; }
+    */
 
 private:
+    std::vector<std::unique_ptr<base_pool_type>> pools;
     std::vector<entity_type> available;
     entity_type next{};
-    pool_type pool;
 };
 
 
-template<typename... Component>
-using DefaultRegistry = Registry<std::uint32_t, Component...>;
+using DefaultRegistry = Registry<std::uint32_t>;
 
 
 }

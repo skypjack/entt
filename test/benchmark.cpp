@@ -31,7 +31,7 @@ private:
 };
 
 TEST(DefaultRegistry, Construct) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -48,7 +48,7 @@ TEST(DefaultRegistry, Construct) {
 }
 
 TEST(DefaultRegistry, Destroy) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
     std::vector<registry_type::entity_type> entities{};
@@ -69,7 +69,7 @@ TEST(DefaultRegistry, Destroy) {
 }
 
 TEST(DefaultRegistry, IterateCreateDeleteSingleComponent) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -82,13 +82,13 @@ TEST(DefaultRegistry, IterateCreateDeleteSingleComponent) {
             registry.create<Position>();
         }
 
-        auto view = registry.view<Position>();
+        /*auto view = registry.view<Position>();
 
         for(auto entity: view) {
             if(rand() % 2 == 0) {
                 registry.destroy(entity);
             }
-        }
+        }*/
     }
 
     timer.elapsed();
@@ -96,7 +96,7 @@ TEST(DefaultRegistry, IterateCreateDeleteSingleComponent) {
 }
 
 TEST(DefaultRegistry, IterateSingleComponent10M) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -108,19 +108,19 @@ TEST(DefaultRegistry, IterateSingleComponent10M) {
 
     Timer timer;
 
-    auto view = registry.view<Position>();
+    /*auto view = registry.view<Position>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
         (void)position;
-    }
+    }*/
 
     timer.elapsed();
     registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTwoComponents10M) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -132,21 +132,21 @@ TEST(DefaultRegistry, IterateTwoComponents10M) {
 
     Timer timer;
 
-    auto view = registry.view<Position, Velocity>();
+    /*auto view = registry.view<Position, Velocity>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
         auto &velocity = registry.get<Velocity>(entity);
         (void)position;
         (void)velocity;
-    }
+    }*/
 
     timer.elapsed();
     registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTwoComponents10MHalf) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -159,21 +159,21 @@ TEST(DefaultRegistry, IterateTwoComponents10MHalf) {
 
     Timer timer;
 
-    auto view = registry.view<Position, Velocity>();
+    /*auto view = registry.view<Position, Velocity>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
         auto &velocity = registry.get<Velocity>(entity);
         (void)position;
         (void)velocity;
-    }
+    }*/
 
     timer.elapsed();
     registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTwoComponents10MOne) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -186,21 +186,21 @@ TEST(DefaultRegistry, IterateTwoComponents10MOne) {
 
     Timer timer;
 
-    auto view = registry.view<Position, Velocity>();
+    /*auto view = registry.view<Position, Velocity>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
         auto &velocity = registry.get<Velocity>(entity);
         (void)position;
         (void)velocity;
-    }
+    }*/
 
     timer.elapsed();
     registry.reset();
 }
 
 TEST(DefaultRegistry, IterateSingleComponent50M) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -212,19 +212,19 @@ TEST(DefaultRegistry, IterateSingleComponent50M) {
 
     Timer timer;
 
-    auto view = registry.view<Position>();
+    /*auto view = registry.view<Position>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
         (void)position;
-    }
+    }*/
 
     timer.elapsed();
     registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTwoComponents50M) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -236,21 +236,21 @@ TEST(DefaultRegistry, IterateTwoComponents50M) {
 
     Timer timer;
 
-    auto view = registry.view<Position, Velocity>();
+    /*auto view = registry.view<Position, Velocity>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
         auto &velocity = registry.get<Velocity>(entity);
         (void)position;
         (void)velocity;
-    }
+    }*/
 
     timer.elapsed();
     registry.reset();
 }
 
 TEST(DefaultRegistry, IterateFiveComponents10M) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -262,7 +262,7 @@ TEST(DefaultRegistry, IterateFiveComponents10M) {
 
     Timer timer;
 
-    auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
+    /*auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
@@ -275,14 +275,14 @@ TEST(DefaultRegistry, IterateFiveComponents10M) {
         (void)comp1;
         (void)comp2;
         (void)comp3;
-    }
+    }*/
 
     timer.elapsed();
     registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTenComponents10M) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -294,7 +294,7 @@ TEST(DefaultRegistry, IterateTenComponents10M) {
 
     Timer timer;
 
-    auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+    /*auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
@@ -317,14 +317,14 @@ TEST(DefaultRegistry, IterateTenComponents10M) {
         (void)comp6;
         (void)comp7;
         (void)comp8;
-    }
+    }*/
 
     timer.elapsed();
     registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTenComponents10MHalf) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -337,7 +337,7 @@ TEST(DefaultRegistry, IterateTenComponents10MHalf) {
 
     Timer timer;
 
-    auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+    /*auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
@@ -360,14 +360,14 @@ TEST(DefaultRegistry, IterateTenComponents10MHalf) {
         (void)comp6;
         (void)comp7;
         (void)comp8;
-    }
+    }*/
 
     timer.elapsed();
     registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTenComponents10MOne) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -380,7 +380,7 @@ TEST(DefaultRegistry, IterateTenComponents10MOne) {
 
     Timer timer;
 
-    auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+    /*auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
     for(auto entity: view) {
         auto &position = registry.get<Position>(entity);
@@ -403,14 +403,14 @@ TEST(DefaultRegistry, IterateTenComponents10MOne) {
         (void)comp6;
         (void)comp7;
         (void)comp8;
-    }
+    }*/
 
     timer.elapsed();
     registry.reset();
 }
 
 TEST(DefaultRegistry, SortSingle) {
-    using registry_type = entt::DefaultRegistry<Position>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
     std::vector<registry_type::entity_type> entities{};
@@ -433,7 +433,7 @@ TEST(DefaultRegistry, SortSingle) {
 }
 
 TEST(DefaultRegistry, SortMulti) {
-    using registry_type = entt::DefaultRegistry<Position, Velocity>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
     std::vector<registry_type::entity_type> entities{};

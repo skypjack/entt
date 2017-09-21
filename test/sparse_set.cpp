@@ -23,7 +23,7 @@ TEST(SparseSetNoType, Functionalities) {
     ASSERT_TRUE(set.has(42));
     ASSERT_EQ(set.get(42), 0u);
 
-    ASSERT_EQ(set.destroy(42), 0u);
+    set.destroy(42);
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);

@@ -71,7 +71,7 @@ public:
     SparseSet(const SparseSet &) = delete;
     SparseSet(SparseSet &&) = default;
 
-    ~SparseSet() noexcept {
+    virtual ~SparseSet() noexcept {
         assert(empty());
     }
 
@@ -125,28 +125,22 @@ public:
         return pos;
     }
 
-    pos_type destroy(index_type idx) {
+    virtual void destroy(index_type idx) {
         assert(valid(idx));
-
-        auto last = direct.size() - 1;
         auto pos = reverse[idx];
-
-        reverse[direct[last]] = pos;
-        direct[pos] = direct[last];
+        reverse[direct.back()] = pos;
+        direct[pos] = direct.back();
         direct.pop_back();
-
-        return pos;
     }
 
-    void swap(index_type lhs, index_type rhs) {
+    virtual void swap(index_type lhs, index_type rhs) {
         assert(valid(lhs));
         assert(valid(rhs));
-
         std::swap(direct[reverse[lhs]], direct[reverse[rhs]]);
         std::swap(reverse[lhs], reverse[rhs]);
     }
 
-    void reset() {
+    virtual void reset() {
         reverse.clear();
         direct.clear();
     }
@@ -220,13 +214,13 @@ public:
         return instances.back();
     }
 
-    void destroy(index_type idx) {
-        auto pos = SparseSet<Index>::destroy(idx);
-        instances[pos] = std::move(instances[SparseSet<Index>::size()]);
+    void destroy(index_type idx) override {
+        instances[SparseSet<Index>::get(idx)] = std::move(instances.back());
         instances.pop_back();
+        SparseSet<Index>::destroy(idx);
     }
 
-    void swap(index_type lhs, index_type rhs) {
+    void swap(index_type lhs, index_type rhs) override {
         std::swap(instances[SparseSet<Index>::get(lhs)], instances[SparseSet<Index>::get(rhs)]);
     }
 
@@ -261,7 +255,7 @@ public:
         });
     }
 
-    void reset() {
+    void reset() override {
         SparseSet<Index>::reset();
         instances.clear();
     }
