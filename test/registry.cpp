@@ -167,17 +167,17 @@ TEST(DefaultRegistry, SortSingle) {
     registry.assign<int>(e1, val++);
     registry.assign<int>(e2, val++);
     registry.assign<int>(e3, val++);
-/*
+
     for(auto entity: registry.view<int>()) {
         ASSERT_EQ(registry.get<int>(entity), --val);
     }
-*/
+
     registry.sort<int>(std::less<int>{});
-/*
+
     for(auto entity: registry.view<int>()) {
         ASSERT_EQ(registry.get<int>(entity), val++);
     }
-*/
+
     registry.reset();
 }
 
@@ -200,7 +200,7 @@ TEST(DefaultRegistry, SortMulti) {
     registry.assign<int>(e1, ival++);
     registry.assign<int>(e2, ival++);
     registry.assign<int>(e3, ival++);
-/*
+
     for(auto entity: registry.view<unsigned int>()) {
         ASSERT_EQ(registry.get<unsigned int>(entity), --uval);
     }
@@ -208,10 +208,10 @@ TEST(DefaultRegistry, SortMulti) {
     for(auto entity: registry.view<int>()) {
         ASSERT_EQ(registry.get<int>(entity), --ival);
     }
-*/
+
     registry.sort<unsigned int>(std::less<unsigned int>{});
     registry.sort<int, unsigned int>();
-/*
+
     for(auto entity: registry.view<unsigned int>()) {
         ASSERT_EQ(registry.get<unsigned int>(entity), uval++);
     }
@@ -219,12 +219,12 @@ TEST(DefaultRegistry, SortMulti) {
     for(auto entity: registry.view<int>()) {
         ASSERT_EQ(registry.get<int>(entity), ival++);
     }
-*/
+
     registry.reset();
 }
-/*
+
 TEST(DefaultRegistry, ViewSingleComponent) {
-    using registry_type = entt::DefaultRegistry<int, char>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -249,7 +249,7 @@ TEST(DefaultRegistry, ViewSingleComponent) {
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_NO_THROW(registry.reset());
 }
-
+/*
 TEST(DefaultRegistry, ViewMultipleComponent) {
     using registry_type = entt::DefaultRegistry<int, char>;
 
@@ -272,9 +272,9 @@ TEST(DefaultRegistry, ViewMultipleComponent) {
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_NO_THROW(registry.reset());
 }
-
+*/
 TEST(DefaultRegistry, ViewSingleComponentEmpty) {
-    using registry_type = entt::DefaultRegistry<char, int, double>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -292,7 +292,7 @@ TEST(DefaultRegistry, ViewSingleComponentEmpty) {
 
     registry.reset();
 }
-
+/*
 TEST(DefaultRegistry, ViewMultipleComponentEmpty) {
     using registry_type = entt::DefaultRegistry<char, int, float, double>;
 

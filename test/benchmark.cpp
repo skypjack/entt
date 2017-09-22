@@ -82,13 +82,13 @@ TEST(DefaultRegistry, IterateCreateDeleteSingleComponent) {
             registry.create<Position>();
         }
 
-        /*auto view = registry.view<Position>();
+        auto view = registry.view<Position>();
 
         for(auto entity: view) {
             if(rand() % 2 == 0) {
                 registry.destroy(entity);
             }
-        }*/
+        }
     }
 
     timer.elapsed();
@@ -108,12 +108,12 @@ TEST(DefaultRegistry, IterateSingleComponent10M) {
 
     Timer timer;
 
-    /*auto view = registry.view<Position>();
+    auto view = registry.view<Position>();
 
     for(auto entity: view) {
-        auto &position = registry.get<Position>(entity);
+        auto &position = view.get(entity);
         (void)position;
-    }*/
+    }
 
     timer.elapsed();
     registry.reset();
@@ -135,8 +135,8 @@ TEST(DefaultRegistry, IterateTwoComponents10M) {
     /*auto view = registry.view<Position, Velocity>();
 
     for(auto entity: view) {
-        auto &position = registry.get<Position>(entity);
-        auto &velocity = registry.get<Velocity>(entity);
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
         (void)position;
         (void)velocity;
     }*/
@@ -162,8 +162,8 @@ TEST(DefaultRegistry, IterateTwoComponents10MHalf) {
     /*auto view = registry.view<Position, Velocity>();
 
     for(auto entity: view) {
-        auto &position = registry.get<Position>(entity);
-        auto &velocity = registry.get<Velocity>(entity);
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
         (void)position;
         (void)velocity;
     }*/
@@ -189,8 +189,8 @@ TEST(DefaultRegistry, IterateTwoComponents10MOne) {
     /*auto view = registry.view<Position, Velocity>();
 
     for(auto entity: view) {
-        auto &position = registry.get<Position>(entity);
-        auto &velocity = registry.get<Velocity>(entity);
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
         (void)position;
         (void)velocity;
     }*/
@@ -212,12 +212,12 @@ TEST(DefaultRegistry, IterateSingleComponent50M) {
 
     Timer timer;
 
-    /*auto view = registry.view<Position>();
+    auto view = registry.view<Position>();
 
     for(auto entity: view) {
-        auto &position = registry.get<Position>(entity);
+        auto &position = view.get(entity);
         (void)position;
-    }*/
+    }
 
     timer.elapsed();
     registry.reset();
@@ -239,8 +239,8 @@ TEST(DefaultRegistry, IterateTwoComponents50M) {
     /*auto view = registry.view<Position, Velocity>();
 
     for(auto entity: view) {
-        auto &position = registry.get<Position>(entity);
-        auto &velocity = registry.get<Velocity>(entity);
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
         (void)position;
         (void)velocity;
     }*/
@@ -265,11 +265,11 @@ TEST(DefaultRegistry, IterateFiveComponents10M) {
     /*auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
 
     for(auto entity: view) {
-        auto &position = registry.get<Position>(entity);
-        auto &velocity = registry.get<Velocity>(entity);
-        auto &comp1 = registry.get<Comp<1>>(entity);
-        auto &comp2 = registry.get<Comp<2>>(entity);
-        auto &comp3 = registry.get<Comp<3>>(entity);
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
+        auto &comp1 = view.get<Comp<1>>(entity);
+        auto &comp2 = view.get<Comp<2>>(entity);
+        auto &comp3 = view.get<Comp<3>>(entity);
         (void)position;
         (void)velocity;
         (void)comp1;
@@ -297,16 +297,16 @@ TEST(DefaultRegistry, IterateTenComponents10M) {
     /*auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
     for(auto entity: view) {
-        auto &position = registry.get<Position>(entity);
-        auto &velocity = registry.get<Velocity>(entity);
-        auto &comp1 = registry.get<Comp<1>>(entity);
-        auto &comp2 = registry.get<Comp<2>>(entity);
-        auto &comp3 = registry.get<Comp<3>>(entity);
-        auto &comp4 = registry.get<Comp<4>>(entity);
-        auto &comp5 = registry.get<Comp<5>>(entity);
-        auto &comp6 = registry.get<Comp<6>>(entity);
-        auto &comp7 = registry.get<Comp<7>>(entity);
-        auto &comp8 = registry.get<Comp<8>>(entity);
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
+        auto &comp1 = view.get<Comp<1>>(entity);
+        auto &comp2 = view.get<Comp<2>>(entity);
+        auto &comp3 = view.get<Comp<3>>(entity);
+        auto &comp4 = view.get<Comp<4>>(entity);
+        auto &comp5 = view.get<Comp<5>>(entity);
+        auto &comp6 = view.get<Comp<6>>(entity);
+        auto &comp7 = view.get<Comp<7>>(entity);
+        auto &comp8 = view.get<Comp<8>>(entity);
         (void)position;
         (void)velocity;
         (void)comp1;
@@ -340,16 +340,16 @@ TEST(DefaultRegistry, IterateTenComponents10MHalf) {
     /*auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
     for(auto entity: view) {
-        auto &position = registry.get<Position>(entity);
-        auto &velocity = registry.get<Velocity>(entity);
-        auto &comp1 = registry.get<Comp<1>>(entity);
-        auto &comp2 = registry.get<Comp<2>>(entity);
-        auto &comp3 = registry.get<Comp<3>>(entity);
-        auto &comp4 = registry.get<Comp<4>>(entity);
-        auto &comp5 = registry.get<Comp<5>>(entity);
-        auto &comp6 = registry.get<Comp<6>>(entity);
-        auto &comp7 = registry.get<Comp<7>>(entity);
-        auto &comp8 = registry.get<Comp<8>>(entity);
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
+        auto &comp1 = view.get<Comp<1>>(entity);
+        auto &comp2 = view.get<Comp<2>>(entity);
+        auto &comp3 = view.get<Comp<3>>(entity);
+        auto &comp4 = view.get<Comp<4>>(entity);
+        auto &comp5 = view.get<Comp<5>>(entity);
+        auto &comp6 = view.get<Comp<6>>(entity);
+        auto &comp7 = view.get<Comp<7>>(entity);
+        auto &comp8 = view.get<Comp<8>>(entity);
         (void)position;
         (void)velocity;
         (void)comp1;
@@ -383,16 +383,16 @@ TEST(DefaultRegistry, IterateTenComponents10MOne) {
     /*auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
     for(auto entity: view) {
-        auto &position = registry.get<Position>(entity);
-        auto &velocity = registry.get<Velocity>(entity);
-        auto &comp1 = registry.get<Comp<1>>(entity);
-        auto &comp2 = registry.get<Comp<2>>(entity);
-        auto &comp3 = registry.get<Comp<3>>(entity);
-        auto &comp4 = registry.get<Comp<4>>(entity);
-        auto &comp5 = registry.get<Comp<5>>(entity);
-        auto &comp6 = registry.get<Comp<6>>(entity);
-        auto &comp7 = registry.get<Comp<7>>(entity);
-        auto &comp8 = registry.get<Comp<8>>(entity);
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
+        auto &comp1 = view.get<Comp<1>>(entity);
+        auto &comp2 = view.get<Comp<2>>(entity);
+        auto &comp3 = view.get<Comp<3>>(entity);
+        auto &comp4 = view.get<Comp<4>>(entity);
+        auto &comp5 = view.get<Comp<5>>(entity);
+        auto &comp6 = view.get<Comp<6>>(entity);
+        auto &comp7 = view.get<Comp<7>>(entity);
+        auto &comp8 = view.get<Comp<8>>(entity);
         (void)position;
         (void)velocity;
         (void)comp1;
@@ -415,7 +415,7 @@ TEST(DefaultRegistry, SortSingle) {
     registry_type registry;
     std::vector<registry_type::entity_type> entities{};
 
-    std::cout << "Sort 10000000 entities" << std::endl;
+    std::cout << "Sort 10000000 entities, one component" << std::endl;
 
     for (uint64_t i = 0; i < 10000000L; i++) {
         auto entity = registry.create();
@@ -438,7 +438,7 @@ TEST(DefaultRegistry, SortMulti) {
     registry_type registry;
     std::vector<registry_type::entity_type> entities{};
 
-    std::cout << "Sort 10000000 entities" << std::endl;
+    std::cout << "Sort 10000000 entities, two components" << std::endl;
 
     for (uint64_t i = 0; i < 10000000L; i++) {
         auto entity = registry.create();

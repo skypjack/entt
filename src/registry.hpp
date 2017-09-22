@@ -4,6 +4,7 @@
 
 #include <tuple>
 #include <vector>
+#include <memory>
 #include <utility>
 #include <cstddef>
 #include <cassert>
@@ -14,11 +15,11 @@
 namespace entt {
 
 
-template<typename, std::size_t...>
+template<typename, typename...>
 class View;
 
 
-template<typename Pool, std::size_t Ident, std::size_t... Other>
+/*template<typename Pool, std::size_t Ident, std::size_t... Other>
 class View<Pool, Ident, Other...> final {
     using pool_type = Pool;
     using underlying_iterator_type = typename std::tuple_element_t<Ident, Pool>::iterator_type;
@@ -127,12 +128,12 @@ private:
     underlying_iterator_type from;
     underlying_iterator_type to;
     const pool_type *pool;
-};
+};*/
 
 
-template<typename Pool, std::size_t Ident>
-class View<Pool, Ident> final {
-    using pool_type = std::tuple_element_t<Ident, Pool>;
+template<typename Entity, typename Component>
+class View<Entity, Component> final {
+    using pool_type = SparseSet<Entity, Component>;
 
 public:
     using iterator_type = typename pool_type::iterator_type;
@@ -140,36 +141,44 @@ public:
     using size_type = typename pool_type::size_type;
     using raw_type = typename pool_type::type;
 
-    explicit View(const Pool *pool) noexcept
-        : pool{&std::get<Ident>(*pool)}
+    explicit View(pool_type &pool) noexcept
+        : pool{pool}
     {}
 
+    size_type size() const noexcept {
+        return pool.size();
+    }
+
     raw_type * raw() noexcept {
-        return pool->raw();
+        return pool.raw();
     }
 
     const raw_type * raw() const noexcept {
-        return pool->raw();
+        return pool.raw();
     }
 
     const entity_type * data() const noexcept {
-        return pool->data();
-    }
-
-    size_type size() const noexcept {
-        return pool->size();
+        return pool.data();
     }
 
     iterator_type begin() const noexcept {
-        return pool->begin();
+        return pool.begin();
     }
 
     iterator_type end() const noexcept {
-        return pool->end();
+        return pool.end();
+    }
+
+    const Component & get(entity_type entity) const noexcept {
+        return pool.get(entity);
+    }
+
+    Component & get(entity_type entity) noexcept {
+        return pool.get(entity);
     }
 
 private:
-    const pool_type *pool;
+    pool_type &pool;
 };
 
 
@@ -335,9 +344,7 @@ public:
 
     template<typename Component>
     Component & get(entity_type entity) noexcept {
-        assert(valid(entity));
-        assert(managed<Component>());
-        return pool<Component>().get(entity);
+        return const_cast<Component &>(const_cast<const Registry *>(this)->get<Component>(entity));
     }
 
     template<typename Component, typename... Args>
@@ -412,6 +419,12 @@ public:
         available.clear();
         pools.clear();
     }
+
+    template<typename Component>
+    View<entity_type, Component> view() noexcept {
+        return View<entity_type, Component>{ensure<Component>()};
+    }
+
 
     /*
     template<typename... Comp>
