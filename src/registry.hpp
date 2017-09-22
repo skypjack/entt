@@ -19,25 +19,27 @@ template<typename, typename...>
 class View;
 
 
-/*template<typename Pool, std::size_t Ident, std::size_t... Other>
-class View<Pool, Ident, Other...> final {
-    using pool_type = Pool;
-    using underlying_iterator_type = typename std::tuple_element_t<Ident, Pool>::iterator_type;
+template<typename Entity, typename Component, typename... Other>
+class View<Entity, Component, Other...> final {
+    template<typename Comp>
+    using pool_type = SparseSet<Entity, Comp>;
+
+    using underlying_iterator_type = typename pool_type<Component>::iterator_type;
 
     class ViewIterator;
 
 public:
     using iterator_type = ViewIterator;
-    using entity_type = typename std::tuple_element_t<Ident, Pool>::index_type;
-    using size_type = typename std::tuple_element_t<Ident, Pool>::size_type;
+    using entity_type = typename pool_type<Component>::index_type;
+    using size_type = typename pool_type<Component>::size_type;
 
 private:
     class ViewIterator {
         inline bool valid() const noexcept {
             using accumulator_type = bool[];
             auto entity = *begin;
-            bool all = std::get<Ident>(*pool).has(entity);
-            accumulator_type accumulator =  { all, (all = all && std::get<Other>(*pool).has(entity))... };
+            bool all = std::get<pool_type<Component> &>(pools).has(entity);
+            accumulator_type accumulator =  { all, (all = all && std::get<pool_type<Other> &>(pools).has(entity))... };
             (void)accumulator;
             return all;
         }
@@ -45,8 +47,8 @@ private:
     public:
         using value_type = entity_type;
 
-        ViewIterator(const pool_type *pool, underlying_iterator_type begin, underlying_iterator_type end) noexcept
-            : pool{pool}, begin{begin}, end{end}
+        ViewIterator(const std::tuple<pool_type<Component> &, pool_type<Other> &...> &pools, underlying_iterator_type begin, underlying_iterator_type end) noexcept
+            : pools{pools}, begin{begin}, end{end}
         {
             if(begin != end && !valid()) {
                 ++(*this);
@@ -77,14 +79,14 @@ private:
         }
 
     private:
-        const pool_type *pool;
+        const std::tuple<pool_type<Component> &, pool_type<Other> &...> &pools;
         underlying_iterator_type begin;
         underlying_iterator_type end;
     };
 
-    template<std::size_t Idx>
+    template<typename Comp>
     void prefer(size_type &size) noexcept {
-        auto &&cpool = std::get<Idx>(*pool);
+        auto &cpool = std::get<pool_type<Comp> &>(pools);
         auto sz = cpool.size();
 
         if(sz < size) {
@@ -95,28 +97,38 @@ private:
     }
 
 public:
-    explicit View(const pool_type *pool) noexcept
-        : from{std::get<Ident>(*pool).begin()},
-          to{std::get<Ident>(*pool).end()},
-          pool{pool}
+    explicit View(pool_type<Component> &pool, pool_type<Other>&... other) noexcept
+        : from{pool.begin()},
+          to{pool.end()},
+          pools{pool, other...}
     {
         using accumulator_type = int[];
-        size_type size = std::get<Ident>(*pool).size();
+        size_type size = pool.size();
         accumulator_type accumulator = { 0, (prefer<Other>(size), 0)... };
         (void)accumulator;
     }
 
     iterator_type begin() const noexcept {
-        return ViewIterator{pool, from, to};
+        return ViewIterator{pools, from, to};
     }
 
     iterator_type end() const noexcept {
-        return ViewIterator{pool, to, to};
+        return ViewIterator{pools, to, to};
+    }
+
+    template<typename Comp>
+    const Comp & get(entity_type entity) const noexcept {
+        return std::get<pool_type<Comp> &>(pools).get(entity);
+    }
+
+    template<typename Comp>
+    Comp & get(entity_type entity) noexcept {
+        return const_cast<Comp &>(const_cast<const View *>(this)->get<Comp>(entity));
     }
 
     void reset() noexcept {
         using accumulator_type = int[];
-        auto &&cpool = std::get<Ident>(*pool);
+        auto &cpool = std::get<pool_type<Component> &>(pools);
         from = cpool.begin();
         to = cpool.end();
         size_type size = cpool.size();
@@ -127,8 +139,8 @@ public:
 private:
     underlying_iterator_type from;
     underlying_iterator_type to;
-    const pool_type *pool;
-};*/
+    std::tuple<pool_type<Component> &, pool_type<Other> &...> pools;
+};
 
 
 template<typename Entity, typename Component>
@@ -174,7 +186,7 @@ public:
     }
 
     Component & get(entity_type entity) noexcept {
-        return pool.get(entity);
+        return const_cast<Component &>(const_cast<const View *>(this)->get(entity));
     }
 
 private:
@@ -420,18 +432,10 @@ public:
         pools.clear();
     }
 
-    template<typename Component>
-    View<entity_type, Component> view() noexcept {
-        return View<entity_type, Component>{ensure<Component>()};
+    template<typename... Component>
+    View<entity_type, Component...> view() noexcept {
+        return View<entity_type, Component...>{ensure<Component>()...};
     }
-
-
-    /*
-    template<typename... Comp>
-    // view_type<Comp...> is fine as well, but for the fact that MSVC dislikes it
-    View<pool_type, identifier<Comp>::value...>
-    view() noexcept { return view_type<Comp...>{&pool}; }
-    */
 
 private:
     std::vector<std::unique_ptr<base_pool_type>> pools;

@@ -249,9 +249,9 @@ TEST(DefaultRegistry, ViewSingleComponent) {
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_NO_THROW(registry.reset());
 }
-/*
+
 TEST(DefaultRegistry, ViewMultipleComponent) {
-    using registry_type = entt::DefaultRegistry<int, char>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -272,7 +272,7 @@ TEST(DefaultRegistry, ViewMultipleComponent) {
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_NO_THROW(registry.reset());
 }
-*/
+
 TEST(DefaultRegistry, ViewSingleComponentEmpty) {
     using registry_type = entt::DefaultRegistry;
 
@@ -292,9 +292,9 @@ TEST(DefaultRegistry, ViewSingleComponentEmpty) {
 
     registry.reset();
 }
-/*
+
 TEST(DefaultRegistry, ViewMultipleComponentEmpty) {
-    using registry_type = entt::DefaultRegistry<char, int, float, double>;
+    using registry_type = entt::DefaultRegistry;
 
     registry_type registry;
 
@@ -310,4 +310,3 @@ TEST(DefaultRegistry, ViewMultipleComponentEmpty) {
 
     registry.reset();
 }
-*/
