@@ -14,6 +14,7 @@ _ECS_ is an architectural pattern used mostly in game development. For further d
 * [Evolve Your Hierarchy](http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/)
 * [ECS on Wikipedia](https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system)
 
+<!--
 ## Code Example
 
 ```cpp
@@ -495,3 +496,4 @@ Code released under [the MIT license](https://github.com/skypjack/entt/blob/mast
 
 Developing and maintaining `EnTT` takes some time and lots of coffee. If you want to support this project, you can offer me an espresso. I'm from Italy, we're used to turning the best coffee ever in code.<br/>
 Take a look at the donation button at the top of the page for more details or just click [here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W2HF9FESD5LJY&lc=IT&item_name=Michele%20Caini&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted).
+-->
