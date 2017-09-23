@@ -68,25 +68,6 @@ TEST(SparseSetNoType, DataBeginEnd) {
     set.reset();
 }
 
-TEST(SparseSetNoType, Swap) {
-    using SparseSet = entt::SparseSet<unsigned int>;
-
-    SparseSet set;
-
-    ASSERT_EQ(set.construct(3), 0u);
-    ASSERT_EQ(set.construct(12), 1u);
-
-    ASSERT_EQ(*(set.data() + 0u), 3u);
-    ASSERT_EQ(*(set.data() + 1u), 12u);
-
-    set.swap(3, 12);
-
-    ASSERT_EQ(*(set.data() + 0u), 12u);
-    ASSERT_EQ(*(set.data() + 1u), 3u);
-
-    set.reset();
-}
-
 TEST(SparseSetWithType, Functionalities) {
     using SparseSet = entt::SparseSet<unsigned int, int>;
 
@@ -154,25 +135,6 @@ TEST(SparseSetWithType, RawBeginEnd) {
     set.reset();
 }
 
-TEST(SparseSetWithType, Swap) {
-    using SparseSet = entt::SparseSet<unsigned int, int>;
-
-    SparseSet set;
-
-    ASSERT_EQ(set.construct(3, 3), 3);
-    ASSERT_EQ(set.construct(12, 6), 6);
-
-    ASSERT_EQ(*(set.raw() + 0u), 3);
-    ASSERT_EQ(*(set.raw() + 1u), 6);
-
-    set.swap(3, 12);
-
-    ASSERT_EQ(*(set.raw() + 0u), 6);
-    ASSERT_EQ(*(set.raw() + 1u), 3);
-
-    set.reset();
-}
-
 TEST(SparseSetWithType, SortOrdered) {
     using SparseSet = entt::SparseSet<unsigned int, int>;
 
@@ -184,8 +146,8 @@ TEST(SparseSetWithType, SortOrdered) {
     ASSERT_EQ(set.construct(3, 3), 3);
     ASSERT_EQ(set.construct(9, 1), 1);
 
-    set.sort([](auto lhs, auto rhs) {
-        return lhs < rhs;
+    set.sort([&set](auto lhs, auto rhs) {
+        return set.get(lhs) < set.get(rhs);
     });
 
     ASSERT_EQ(*(set.raw() + 0u), 12);
@@ -218,8 +180,8 @@ TEST(SparseSetWithType, SortReverse) {
     ASSERT_EQ(set.construct(3, 9), 9);
     ASSERT_EQ(set.construct(9, 12), 12);
 
-    set.sort([](auto lhs, auto rhs) {
-        return lhs < rhs;
+    set.sort([&set](auto lhs, auto rhs) {
+        return set.get(lhs) < set.get(rhs);
     });
 
     ASSERT_EQ(*(set.raw() + 0u), 12);
@@ -252,8 +214,8 @@ TEST(SparseSetWithType, SortUnordered) {
     ASSERT_EQ(set.construct(3, 9), 9);
     ASSERT_EQ(set.construct(9, 12), 12);
 
-    set.sort([](auto lhs, auto rhs) {
-        return lhs < rhs;
+    set.sort([&set](auto lhs, auto rhs) {
+        return set.get(lhs) < set.get(rhs);
     });
 
     ASSERT_EQ(*(set.raw() + 0u), 12);

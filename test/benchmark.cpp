@@ -415,9 +415,9 @@ TEST(DefaultRegistry, SortSingle) {
     registry_type registry;
     std::vector<registry_type::entity_type> entities{};
 
-    std::cout << "Sort 10000000 entities, one component" << std::endl;
+    std::cout << "Sort 150000 entities, one component" << std::endl;
 
-    for (uint64_t i = 0; i < 10000000L; i++) {
+    for (uint64_t i = 0; i < 150000L; i++) {
         auto entity = registry.create();
         entities.push_back(entity);
         registry.assign<Position>(entity, i, i);
@@ -425,7 +425,7 @@ TEST(DefaultRegistry, SortSingle) {
 
     Timer timer;
 
-    registry.sort<Position>([](const auto &lhs, const auto &rhs) {
+    registry.sort<Position>([&registry](const auto &lhs, const auto &rhs) {
         return lhs.x < rhs.x && lhs.y < rhs.y;
     });
 
@@ -438,16 +438,16 @@ TEST(DefaultRegistry, SortMulti) {
     registry_type registry;
     std::vector<registry_type::entity_type> entities{};
 
-    std::cout << "Sort 10000000 entities, two components" << std::endl;
+    std::cout << "Sort 150000 entities, two components" << std::endl;
 
-    for (uint64_t i = 0; i < 10000000L; i++) {
+    for (uint64_t i = 0; i < 150000L; i++) {
         auto entity = registry.create();
         entities.push_back(entity);
         registry.assign<Position>(entity, i, i);
         registry.assign<Velocity>(entity, i, i);
     }
 
-    registry.sort<Position>([](const auto &lhs, const auto &rhs) {
+    registry.sort<Position>([&registry](const auto &lhs, const auto &rhs) {
         return lhs.x < rhs.x && lhs.y < rhs.y;
     });
 

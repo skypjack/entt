@@ -4,7 +4,6 @@
 
 #include <algorithm>
 #include <utility>
-#include <numeric>
 #include <vector>
 #include <cstddef>
 #include <cassert>
@@ -19,19 +18,10 @@ class SparseSet;
 
 template<typename Index>
 class SparseSet<Index> {
-    struct SparseSetIterator;
-
-public:
-    using index_type = Index;
-    using pos_type = index_type;
-    using size_type = std::size_t;
-    using iterator_type = SparseSetIterator;
-
-private:
     struct SparseSetIterator {
-        using value_type = index_type;
+        using value_type = Index;
 
-        SparseSetIterator(const std::vector<index_type> *direct, size_type pos)
+        SparseSetIterator(const std::vector<Index> *direct, std::size_t pos)
             : direct{direct}, pos{pos}
         {}
 
@@ -57,8 +47,8 @@ private:
         }
 
     private:
-        const std::vector<index_type> *direct;
-        size_type pos;
+        const std::vector<Index> *direct;
+        std::size_t pos;
     };
 
     inline bool valid(Index idx) const noexcept {
@@ -66,6 +56,11 @@ private:
     }
 
 public:
+    using index_type = Index;
+    using pos_type = index_type;
+    using size_type = std::size_t;
+    using iterator_type = SparseSetIterator;
+
     explicit SparseSet() = default;
 
     SparseSet(const SparseSet &) = delete;
@@ -133,11 +128,51 @@ public:
         direct.pop_back();
     }
 
-    virtual void swap(index_type lhs, index_type rhs) {
+    virtual void swap(Index lhs, Index rhs) {
         assert(valid(lhs));
         assert(valid(rhs));
         std::swap(direct[reverse[lhs]], direct[reverse[rhs]]);
         std::swap(reverse[lhs], reverse[rhs]);
+    }
+
+    template<typename Compare>
+    void sort(Compare compare) {
+        std::vector<pos_type> copy{direct.cbegin(), direct.cend()};
+        std::sort(copy.begin(), copy.end(), [compare = std::move(compare)](auto... args) {
+            return not compare(args...);
+        });
+
+        for(pos_type i = 0; i < copy.size(); ++i) {
+            if(direct[i] != copy[i]) {
+                swap(direct[i], copy[i]);
+            }
+        }
+    }
+
+    template<typename Idx>
+    void respect(const SparseSet<Idx> &other) {
+        struct Bool { bool value{false}; };
+        std::vector<Bool> check(reverse.size());
+
+        for(auto entity: other.direct) {
+            check[entity].value = true;
+        }
+
+        sort([this, &other, &check](auto lhs, auto rhs) {
+            bool bLhs = check[lhs].value;
+            bool bRhs = check[rhs].value;
+            bool compare = false;
+
+            if(bLhs && bRhs) {
+                compare = other.get(rhs) < other.get(lhs);
+            } else if(!bLhs && !bRhs) {
+                compare = rhs < lhs;
+            } else {
+                compare = bLhs;
+            }
+
+            return compare;
+        });
     }
 
     virtual void reset() {
@@ -146,36 +181,13 @@ public:
     }
 
 private:
-    std::vector<pos_type> reverse;
-    std::vector<index_type> direct;
+    std::vector<Index> reverse;
+    std::vector<Index> direct;
 };
 
 
 template<typename Index, typename Type>
 class SparseSet<Index, Type> final: public SparseSet<Index> {
-    template<typename Compare>
-    void arrange(Compare compare) {
-        const auto *data = SparseSet<Index>::data();
-        const auto size = SparseSet<Index>::size();
-        std::vector<pos_type> copy(size);
-
-        std::iota(copy.begin(), copy.end(), pos_type{});
-        std::sort(copy.begin(), copy.end(), compare);
-
-        for(pos_type i = 0; i < copy.size(); ++i) {
-            const auto target = i;
-            auto curr = i;
-
-            while(copy[curr] != target) {
-                SparseSet<Index>::swap(*(data + copy[curr]), *(data + curr));
-                std::swap(instances[copy[curr]], instances[curr]);
-                std::swap(copy[curr], curr);
-            }
-
-            copy[curr] = curr;
-        }
-    }
-
 public:
     using type = Type;
     using index_type = typename SparseSet<Index>::index_type;
@@ -220,39 +232,9 @@ public:
         SparseSet<Index>::destroy(idx);
     }
 
-    void swap(index_type lhs, index_type rhs) override {
+    void swap(Index lhs, Index rhs) override {
         std::swap(instances[SparseSet<Index>::get(lhs)], instances[SparseSet<Index>::get(rhs)]);
-    }
-
-    template<typename Compare>
-    void sort(Compare compare) {
-        arrange([this, compare = std::move(compare)](auto lhs, auto rhs) {
-            return !compare(instances[lhs], instances[rhs]);
-        });
-    }
-
-    template<typename Idx>
-    void respect(const SparseSet<Idx> &other) {
-        const auto *data = SparseSet<Index>::data();
-
-        arrange([data, &other](auto lhs, auto rhs) {
-            auto eLhs = *(data + lhs);
-            auto eRhs = *(data + rhs);
-
-            bool bLhs = other.has(eLhs);
-            bool bRhs = other.has(eRhs);
-            bool compare = false;
-
-            if(bLhs && bRhs) {
-                compare = other.get(eLhs) < other.get(eRhs);
-            } else if(!bLhs && !bRhs) {
-                compare = eLhs < eRhs;
-            } else {
-                compare = bRhs;
-            }
-
-            return compare;
-        });
+        SparseSet<Index>::swap(lhs, rhs);
     }
 
     void reset() override {
@@ -261,7 +243,7 @@ public:
     }
 
 private:
-    std::vector<type> instances;
+    std::vector<Type> instances;
 };
 
 

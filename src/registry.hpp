@@ -9,13 +9,14 @@
 #include <cstddef>
 #include <cassert>
 #include <algorithm>
+#include <type_traits>
 #include "sparse_set.hpp"
 
 
 namespace entt {
 
 
-template<typename, typename...>
+template<typename...>
 class View;
 
 
@@ -191,6 +192,55 @@ public:
 
 private:
     pool_type &pool;
+};
+
+
+template<typename Entity, typename... Component>
+class WIPView final {
+    template<typename Comp>
+    using pool_type = SparseSet<Entity, Comp>;
+
+    using view_type = SparseSet<Entity>;
+    using underlying_iterator_type = typename view_type::iterator_type;
+
+public:
+    using iterator_type = typename view_type::iterator_type;
+    using entity_type = typename view_type::index_type;
+    using size_type = typename view_type::size_type;
+
+    WIPView(const view_type &view, pool_type<Component>&... pools)
+        : view{view}, pools{pools...}
+    {}
+
+    size_type size() const noexcept {
+        return view.size();
+    }
+
+    const entity_type * data() const noexcept {
+        return view.data();
+    }
+
+    iterator_type begin() const noexcept {
+        return view.begin();
+    }
+
+    iterator_type end() const noexcept {
+        return view.end();
+    }
+
+    template<typename Comp>
+    const Comp & get(entity_type entity) const noexcept {
+        return std::get<pool_type<Comp> &>(pools).get(entity);
+    }
+
+    template<typename Comp>
+    Comp & get(entity_type entity) noexcept {
+        return const_cast<Comp &>(const_cast<const WIPView *>(this)->get<Comp>(entity));
+    }
+
+private:
+    const view_type &view;
+    std::tuple<pool_type<Component> &...> pools;
 };
 
 
@@ -376,17 +426,13 @@ public:
                 : cpool.construct(entity, std::forward<Args>(args)...));
     }
 
-    template<typename Component>
-    void swap(entity_type lhs, entity_type rhs) {
-        assert(valid(lhs));
-        assert(valid(rhs));
-        assert(managed<Component>());
-        pool<Component>().swap(lhs, rhs);
-    }
-
     template<typename Component, typename Compare>
-    void sort(Compare &&compare) {
-        ensure<Component>().sort(std::forward<Compare>(compare));
+    void sort(Compare compare) {
+        auto &cpool = ensure<Component>();
+
+        cpool.sort([&cpool, compare = std::move(compare)](auto lhs, auto rhs) {
+            return compare(static_cast<const Component &>(cpool.get(lhs)), static_cast<const Component &>(cpool.get(rhs)));
+        });
     }
 
     template<typename To, typename From>
