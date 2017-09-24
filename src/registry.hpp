@@ -2,7 +2,6 @@
 #define ENTT_REGISTRY_HPP
 
 
-#include <tuple>
 #include <vector>
 #include <memory>
 #include <utility>
@@ -11,249 +10,18 @@
 #include <algorithm>
 #include <type_traits>
 #include "sparse_set.hpp"
+#include "view.hpp"
 
 
 namespace entt {
 
 
-template<typename...>
-class View;
-
-
-template<typename Entity, typename Component, typename... Other>
-class View<Entity, Component, Other...> final {
-    template<typename Comp>
-    using pool_type = SparseSet<Entity, Comp>;
-
-    using underlying_iterator_type = typename pool_type<Component>::iterator_type;
-
-    class ViewIterator;
-
-public:
-    using iterator_type = ViewIterator;
-    using entity_type = typename pool_type<Component>::index_type;
-    using size_type = typename pool_type<Component>::size_type;
-
-private:
-    class ViewIterator {
-        inline bool valid() const noexcept {
-            using accumulator_type = bool[];
-            auto entity = *begin;
-            bool all = std::get<pool_type<Component> &>(pools).has(entity);
-            accumulator_type accumulator =  { all, (all = all && std::get<pool_type<Other> &>(pools).has(entity))... };
-            (void)accumulator;
-            return all;
-        }
-
-    public:
-        using value_type = entity_type;
-
-        ViewIterator(const std::tuple<pool_type<Component> &, pool_type<Other> &...> &pools, underlying_iterator_type begin, underlying_iterator_type end) noexcept
-            : pools{pools}, begin{begin}, end{end}
-        {
-            if(begin != end && !valid()) {
-                ++(*this);
-            }
-        }
-
-        ViewIterator & operator++() noexcept {
-            ++begin;
-            while(begin != end && !valid()) { ++begin; }
-            return *this;
-        }
-
-        ViewIterator operator++(int) noexcept {
-            ViewIterator orig = *this;
-            return ++(*this), orig;
-        }
-
-        bool operator==(const ViewIterator &other) const noexcept {
-            return other.begin == begin;
-        }
-
-        bool operator!=(const ViewIterator &other) const noexcept {
-            return !(*this == other);
-        }
-
-        value_type operator*() const noexcept {
-            return *begin;
-        }
-
-    private:
-        const std::tuple<pool_type<Component> &, pool_type<Other> &...> &pools;
-        underlying_iterator_type begin;
-        underlying_iterator_type end;
-    };
-
-    template<typename Comp>
-    void prefer(size_type &size) noexcept {
-        auto &cpool = std::get<pool_type<Comp> &>(pools);
-        auto sz = cpool.size();
-
-        if(sz < size) {
-            from = cpool.begin();
-            to = cpool.end();
-            size = sz;
-        }
-    }
-
-public:
-    explicit View(pool_type<Component> &pool, pool_type<Other>&... other) noexcept
-        : from{pool.begin()},
-          to{pool.end()},
-          pools{pool, other...}
-    {
-        using accumulator_type = int[];
-        size_type size = pool.size();
-        accumulator_type accumulator = { 0, (prefer<Other>(size), 0)... };
-        (void)accumulator;
-    }
-
-    iterator_type begin() const noexcept {
-        return ViewIterator{pools, from, to};
-    }
-
-    iterator_type end() const noexcept {
-        return ViewIterator{pools, to, to};
-    }
-
-    template<typename Comp>
-    const Comp & get(entity_type entity) const noexcept {
-        return std::get<pool_type<Comp> &>(pools).get(entity);
-    }
-
-    template<typename Comp>
-    Comp & get(entity_type entity) noexcept {
-        return const_cast<Comp &>(const_cast<const View *>(this)->get<Comp>(entity));
-    }
-
-    void reset() noexcept {
-        using accumulator_type = int[];
-        auto &cpool = std::get<pool_type<Component> &>(pools);
-        from = cpool.begin();
-        to = cpool.end();
-        size_type size = cpool.size();
-        accumulator_type accumulator = { 0, (prefer<Other>(size), 0)... };
-        (void)accumulator;
-    }
-
-private:
-    underlying_iterator_type from;
-    underlying_iterator_type to;
-    std::tuple<pool_type<Component> &, pool_type<Other> &...> pools;
-};
-
-
-template<typename Entity, typename Component>
-class View<Entity, Component> final {
-    using pool_type = SparseSet<Entity, Component>;
-
-public:
-    using iterator_type = typename pool_type::iterator_type;
-    using entity_type = typename pool_type::index_type;
-    using size_type = typename pool_type::size_type;
-    using raw_type = typename pool_type::type;
-
-    explicit View(pool_type &pool) noexcept
-        : pool{pool}
-    {}
-
-    size_type size() const noexcept {
-        return pool.size();
-    }
-
-    raw_type * raw() noexcept {
-        return pool.raw();
-    }
-
-    const raw_type * raw() const noexcept {
-        return pool.raw();
-    }
-
-    const entity_type * data() const noexcept {
-        return pool.data();
-    }
-
-    iterator_type begin() const noexcept {
-        return pool.begin();
-    }
-
-    iterator_type end() const noexcept {
-        return pool.end();
-    }
-
-    const Component & get(entity_type entity) const noexcept {
-        return pool.get(entity);
-    }
-
-    Component & get(entity_type entity) noexcept {
-        return const_cast<Component &>(const_cast<const View *>(this)->get(entity));
-    }
-
-private:
-    pool_type &pool;
-};
-
-
-template<typename Entity, typename... Component>
-class WIPView final {
-    template<typename Comp>
-    using pool_type = SparseSet<Entity, Comp>;
-
-    using view_type = SparseSet<Entity>;
-    using underlying_iterator_type = typename view_type::iterator_type;
-
-public:
-    using iterator_type = typename view_type::iterator_type;
-    using entity_type = typename view_type::index_type;
-    using size_type = typename view_type::size_type;
-
-    WIPView(const view_type &view, pool_type<Component>&... pools)
-        : view{view}, pools{pools...}
-    {}
-
-    size_type size() const noexcept {
-        return view.size();
-    }
-
-    const entity_type * data() const noexcept {
-        return view.data();
-    }
-
-    iterator_type begin() const noexcept {
-        return view.begin();
-    }
-
-    iterator_type end() const noexcept {
-        return view.end();
-    }
-
-    template<typename Comp>
-    const Comp & get(entity_type entity) const noexcept {
-        return std::get<pool_type<Comp> &>(pools).get(entity);
-    }
-
-    template<typename Comp>
-    Comp & get(entity_type entity) noexcept {
-        return const_cast<Comp &>(const_cast<const WIPView *>(this)->get<Comp>(entity));
-    }
-
-private:
-    const view_type &view;
-    std::tuple<pool_type<Component> &...> pools;
-};
-
-
 template<typename Entity>
-struct Registry {
-    using entity_type = Entity;
-    using size_type = std::size_t;
-
-private:
-    using base_pool_type = SparseSet<entity_type>;
+class Registry {
+    using base_pool_type = SparseSet<Entity>;
 
     template<typename Component>
-    using pool_type = SparseSet<entity_type, Component>;
+    using pool_type = SparseSet<Entity, Component>;
 
     static std::size_t identifier() noexcept {
         static std::size_t value = 0;
@@ -300,6 +68,9 @@ private:
     }
 
 public:
+    using entity_type = Entity;
+    using size_type = std::size_t;
+
     explicit Registry() = default;
     ~Registry() = default;
 
@@ -479,9 +250,30 @@ public:
     }
 
     template<typename... Component>
-    View<entity_type, Component...> view() noexcept {
-        return View<entity_type, Component...>{ensure<Component>()...};
+    auto view() {
+        return DynamicView<Entity, Component...>{ensure<Component>()...};
     }
+
+    /*
+     * WIP: waiting for the persisten view... :-)
+     *
+    template<typename... Component>
+    std::enable_if_t<(sizeof...(Component) == 1), PersistentView<Entity, Component>>
+    view(persistent_view_type = {}) {
+        return PersistentView<Entity, Component>{ensure<Component>()};
+    }
+
+    template<typename... Component>
+    std::enable_if_t<(sizeof...(Component) > 1), PersistentView<Entity, Component>>
+    view(persistent_view_type = {}) {
+        // TODO
+    }
+
+    template<typename... Component>
+    DynamicView<Entity, Component...> view(dynamic_view_type) {
+        return DynamicView<Entity, Component...>{ensure<Component>()...};
+    }
+    */
 
 private:
     std::vector<std::unique_ptr<base_pool_type>> pools;
