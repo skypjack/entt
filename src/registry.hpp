@@ -11,6 +11,7 @@
 #include <type_traits>
 #include "sparse_set.hpp"
 #include "view.hpp"
+#include "entt.hpp"
 
 
 namespace entt {
@@ -18,6 +19,7 @@ namespace entt {
 
 template<typename Entity>
 class Registry {
+    using traits_type = entt_traits<Entity>;
     using base_pool_type = SparseSet<Entity>;
 
     template<typename Component>
@@ -69,6 +71,7 @@ class Registry {
 
 public:
     using entity_type = Entity;
+    using version_type = typename traits_type::version_type;
     using size_type = std::size_t;
 
     explicit Registry() = default;
@@ -86,7 +89,7 @@ public:
     }
 
     size_type size() const noexcept {
-        return next - available.size();
+        return entities.size() - available.size();
     }
 
     template<typename Component>
@@ -95,7 +98,7 @@ public:
     }
 
     size_type capacity() const noexcept {
-        return next;
+        return entities.capacity();
     }
 
     template<typename Component>
@@ -104,11 +107,20 @@ public:
     }
 
     bool empty() const noexcept {
-        return next == available.size();
+        return entities.size() == available.size();
     }
 
     bool valid(entity_type entity) const noexcept {
-        return (entity < next && std::find(available.cbegin(), available.cend(), entity) == available.cend());
+        const auto entt = entity & traits_type::entity_mask;
+        return (entt < entities.size() && entities[entt] == entity);
+    }
+
+    version_type version(entity_type entity) const noexcept {
+        return version_type((entity >> traits_type::version_shift) & traits_type::version_mask);
+    }
+
+    version_type current(entity_type entity) const noexcept {
+        return version_type((entities[entity & traits_type::entity_mask] >> traits_type::version_shift) & traits_type::version_mask);
     }
 
     template<typename... Component>
@@ -124,7 +136,9 @@ public:
         entity_type entity;
 
         if(available.empty()) {
-            entity = next++;
+            entity = entity_type(entities.size());
+            assert((entity >> traits_type::version_shift) == entity_type{});
+            entities.push_back(entity);
         } else {
             entity = available.back();
             available.pop_back();
@@ -142,6 +156,9 @@ public:
             }
         }
 
+        const auto entt = entity & traits_type::entity_mask;
+        auto version = 1 + ((entity >> traits_type::version_shift) & traits_type::version_mask);
+        entities[entt] = entt | (version << traits_type::version_shift);
         available.push_back(entity);
     }
 
@@ -229,7 +246,7 @@ public:
         if(managed<Component>()) {
             auto &cpool = pool<Component>();
 
-            for(entity_type entity = 0; entity < next; ++entity) {
+            for(auto entity: entities) {
                 if(cpool.has(entity)) {
                     cpool.destroy(entity);
                 }
@@ -238,15 +255,14 @@ public:
     }
 
     void reset() {
-        for(auto &&cpool: pools) {
-            if(cpool) {
-                cpool->reset();
-            }
-        }
-
-        next = entity_type{};
         available.clear();
         pools.clear();
+
+        for(auto &&entity: entities) {
+            auto version = 1 + ((entity >> traits_type::version_shift) & traits_type::version_mask);
+            entity = (entity & traits_type::entity_mask) | (version << traits_type::version_shift);
+            available.push_back(entity);
+        }
     }
 
     template<typename... Component>
@@ -278,7 +294,7 @@ public:
 private:
     std::vector<std::unique_ptr<base_pool_type>> pools;
     std::vector<entity_type> available;
-    entity_type next{};
+    std::vector<entity_type> entities;
 };
 
 

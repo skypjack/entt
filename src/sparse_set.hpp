@@ -7,6 +7,7 @@
 #include <vector>
 #include <cstddef>
 #include <cassert>
+#include "entt.hpp"
 
 
 namespace entt {
@@ -16,12 +17,14 @@ template<typename...>
 class SparseSet;
 
 
-template<typename Index>
-class SparseSet<Index> {
-    struct SparseSetIterator {
-        using value_type = Index;
+template<typename Entity>
+class SparseSet<Entity> {
+    using traits_type = entt_traits<Entity>;
 
-        SparseSetIterator(const std::vector<Index> *direct, std::size_t pos)
+    struct SparseSetIterator {
+        using value_type = Entity;
+
+        SparseSetIterator(const std::vector<Entity> *direct, std::size_t pos)
             : direct{direct}, pos{pos}
         {}
 
@@ -47,17 +50,18 @@ class SparseSet<Index> {
         }
 
     private:
-        const std::vector<Index> *direct;
+        const std::vector<Entity> *direct;
         std::size_t pos;
     };
 
-    inline bool valid(Index idx) const noexcept {
-        return idx < reverse.size() && reverse[idx] < direct.size() && direct[reverse[idx]] == idx;
+    inline bool valid(Entity entity) const noexcept {
+        const auto entt = entity & traits_type::entity_mask;
+        return entt < reverse.size() && reverse[entt] < direct.size() && direct[reverse[entt]] == entity;
     }
 
 public:
-    using index_type = Index;
-    using pos_type = index_type;
+    using entity_type = Entity;
+    using pos_type = entity_type;
     using size_type = std::size_t;
     using iterator_type = SparseSetIterator;
 
@@ -66,9 +70,7 @@ public:
     SparseSet(const SparseSet &) = delete;
     SparseSet(SparseSet &&) = default;
 
-    virtual ~SparseSet() noexcept {
-        assert(empty());
-    }
+    virtual ~SparseSet() noexcept = default;
 
     SparseSet & operator=(const SparseSet &) = delete;
     SparseSet & operator=(SparseSet &&) = default;
@@ -85,7 +87,7 @@ public:
         return direct.empty();
     }
 
-    const index_type * data() const noexcept {
+    const entity_type * data() const noexcept {
         return direct.data();
     }
 
@@ -97,42 +99,47 @@ public:
         return SparseSetIterator{&direct, 0};
     }
 
-    bool has(index_type idx) const noexcept {
-        return valid(idx);
+    bool has(entity_type entity) const noexcept {
+        return valid(entity);
     }
 
-    pos_type get(index_type idx) const noexcept {
-        assert(valid(idx));
-        return reverse[idx];
+    pos_type get(entity_type entity) const noexcept {
+        assert(valid(entity));
+        return reverse[entity & traits_type::entity_mask];
     }
 
-    pos_type construct(index_type idx) {
-        assert(!valid(idx));
+    pos_type construct(entity_type entity) {
+        assert(!valid(entity));
+        const auto entt = entity & traits_type::entity_mask;
 
-        if(!(idx < reverse.size())) {
-            reverse.resize(idx+1);
+        if(!(entt < reverse.size())) {
+            reverse.resize(entt+1);
         }
 
         auto pos = pos_type(direct.size());
-        reverse[idx] = pos;
-        direct.emplace_back(idx);
+        reverse[entt] = pos;
+        direct.emplace_back(entity);
 
         return pos;
     }
 
-    virtual void destroy(index_type idx) {
-        assert(valid(idx));
-        auto pos = reverse[idx];
-        reverse[direct.back()] = pos;
+    virtual void destroy(entity_type entity) {
+        assert(valid(entity));
+        const auto entt = entity & traits_type::entity_mask;
+        const auto back = direct.back() & traits_type::entity_mask;
+        auto pos = reverse[entt];
+        reverse[back] = pos;
         direct[pos] = direct.back();
         direct.pop_back();
     }
 
-    virtual void swap(Index lhs, Index rhs) {
+    virtual void swap(entity_type lhs, entity_type rhs) {
         assert(valid(lhs));
         assert(valid(rhs));
-        std::swap(direct[reverse[lhs]], direct[reverse[rhs]]);
-        std::swap(reverse[lhs], reverse[rhs]);
+        const auto le = lhs & traits_type::entity_mask;
+        const auto re = rhs & traits_type::entity_mask;
+        std::swap(direct[reverse[le]], direct[reverse[re]]);
+        std::swap(reverse[le], reverse[re]);
     }
 
     template<typename Compare>
@@ -149,24 +156,27 @@ public:
         }
     }
 
-    template<typename Idx>
-    void respect(const SparseSet<Idx> &other) {
+    template<typename EnTT>
+    void respect(const SparseSet<EnTT> &other) {
         struct Bool { bool value{false}; };
         std::vector<Bool> check(reverse.size());
 
         for(auto entity: other.direct) {
-            check[entity].value = true;
+            check[entity & traits_type::entity_mask].value = true;
         }
 
         sort([this, &other, &check](auto lhs, auto rhs) {
-            bool bLhs = check[lhs].value;
-            bool bRhs = check[rhs].value;
+            const auto le = lhs & traits_type::entity_mask;
+            const auto re = rhs & traits_type::entity_mask;
+
+            bool bLhs = check[le].value;
+            bool bRhs = check[re].value;
             bool compare = false;
 
             if(bLhs && bRhs) {
                 compare = other.get(rhs) < other.get(lhs);
             } else if(!bLhs && !bRhs) {
-                compare = rhs < lhs;
+                compare = re < le;
             } else {
                 compare = bLhs;
             }
@@ -181,19 +191,21 @@ public:
     }
 
 private:
-    std::vector<Index> reverse;
-    std::vector<Index> direct;
+    std::vector<entity_type> reverse;
+    std::vector<entity_type> direct;
 };
 
 
-template<typename Index, typename Type>
-class SparseSet<Index, Type> final: public SparseSet<Index> {
+template<typename Entity, typename Type>
+class SparseSet<Entity, Type> final: public SparseSet<Entity> {
+    using underlying_type = SparseSet<Entity>;
+
 public:
     using type = Type;
-    using index_type = typename SparseSet<Index>::index_type;
-    using pos_type = typename SparseSet<Index>::pos_type;
-    using size_type = typename SparseSet<Index>::size_type;
-    using iterator_type = typename SparseSet<Index>::iterator_type;
+    using entity_type = typename underlying_type::entity_type;
+    using pos_type = typename underlying_type::pos_type;
+    using size_type = typename underlying_type::size_type;
+    using iterator_type = typename underlying_type::iterator_type;
 
     explicit SparseSet() = default;
 
@@ -211,39 +223,39 @@ public:
         return instances.data();
     }
 
-    const type & get(index_type idx) const noexcept {
-        return instances[SparseSet<Index>::get(idx)];
+    const type & get(entity_type entity) const noexcept {
+        return instances[underlying_type::get(entity)];
     }
 
-    type & get(index_type idx) noexcept {
-        return const_cast<type &>(const_cast<const SparseSet *>(this)->get(idx));
+    type & get(entity_type entity) noexcept {
+        return const_cast<type &>(const_cast<const SparseSet *>(this)->get(entity));
     }
 
     template<typename... Args>
-    type & construct(index_type idx, Args&&... args) {
-        SparseSet<Index>::construct(idx);
+    type & construct(entity_type entity, Args&&... args) {
+        underlying_type::construct(entity);
         instances.push_back({ std::forward<Args>(args)... });
         return instances.back();
     }
 
-    void destroy(index_type idx) override {
-        instances[SparseSet<Index>::get(idx)] = std::move(instances.back());
+    void destroy(entity_type entity) override {
+        instances[underlying_type::get(entity)] = std::move(instances.back());
         instances.pop_back();
-        SparseSet<Index>::destroy(idx);
+        underlying_type::destroy(entity);
     }
 
-    void swap(Index lhs, Index rhs) override {
-        std::swap(instances[SparseSet<Index>::get(lhs)], instances[SparseSet<Index>::get(rhs)]);
-        SparseSet<Index>::swap(lhs, rhs);
+    void swap(entity_type lhs, entity_type rhs) override {
+        std::swap(instances[underlying_type::get(lhs)], instances[underlying_type::get(rhs)]);
+        underlying_type::swap(lhs, rhs);
     }
 
     void reset() override {
-        SparseSet<Index>::reset();
+        underlying_type::reset();
         instances.clear();
     }
 
 private:
-    std::vector<Type> instances;
+    std::vector<type> instances;
 };
 
 

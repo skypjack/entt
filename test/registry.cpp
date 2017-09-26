@@ -71,23 +71,27 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_EQ(static_cast<const registry_type &>(registry).get<int>(e2), 1);
 
     ASSERT_EQ(registry.size(), registry_type::size_type{3});
-    ASSERT_EQ(registry.capacity(), registry_type::size_type{3});
+    ASSERT_GE(registry.capacity(), registry_type::size_type{3});
     ASSERT_FALSE(registry.empty());
 
+    ASSERT_EQ(registry.version(e3), registry_type::version_type{0});
+    ASSERT_EQ(registry.current(e3), registry_type::version_type{0});
     ASSERT_NO_THROW(registry.destroy(e3));
+    ASSERT_EQ(registry.version(e3), registry_type::version_type{0});
+    ASSERT_EQ(registry.current(e3), registry_type::version_type{1});
 
     ASSERT_TRUE(registry.valid(e1));
     ASSERT_TRUE(registry.valid(e2));
     ASSERT_FALSE(registry.valid(e3));
 
     ASSERT_EQ(registry.size(), registry_type::size_type{2});
-    ASSERT_EQ(registry.capacity(), registry_type::size_type{3});
+    ASSERT_GE(registry.capacity(), registry_type::size_type{3});
     ASSERT_FALSE(registry.empty());
 
     ASSERT_NO_THROW(registry.reset());
 
     ASSERT_EQ(registry.size(), registry_type::size_type{0});
-    ASSERT_EQ(registry.capacity(), registry_type::size_type{0});
+    ASSERT_GE(registry.capacity(), registry_type::size_type{3});
     ASSERT_TRUE(registry.empty());
 
     registry.create<int, char>();

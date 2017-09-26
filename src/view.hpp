@@ -20,7 +20,7 @@ class PersistentView final {
 
 public:
     using iterator_type = typename view_type::iterator_type;
-    using entity_type = typename view_type::index_type;
+    using entity_type = typename view_type::entity_type;
     using size_type = typename view_type::size_type;
 
     explicit PersistentView(view_type &view, pool_type<Component>&... pools) noexcept
@@ -65,7 +65,7 @@ class PersistentView<Entity, Component> final {
 
 public:
     using iterator_type = typename pool_type::iterator_type;
-    using entity_type = typename pool_type::index_type;
+    using entity_type = typename pool_type::entity_type;
     using size_type = typename pool_type::size_type;
     using raw_type = typename pool_type::type;
 
@@ -130,7 +130,7 @@ class DynamicView final {
         }
 
     public:
-        using value_type = typename base_pool_type::index_type;
+        using value_type = typename base_pool_type::entity_type;
 
         ViewIterator(const repo_type &pools, underlying_iterator_type begin, underlying_iterator_type end) noexcept
             : pools{pools}, begin{begin}, end{end}
@@ -171,7 +171,7 @@ class DynamicView final {
 
 public:
     using iterator_type = ViewIterator;
-    using entity_type = typename base_pool_type::index_type;
+    using entity_type = typename base_pool_type::entity_type;
     using size_type = typename base_pool_type::size_type;
 
     explicit DynamicView(pool_type<First> pool, pool_type<Other>... other) noexcept
@@ -217,7 +217,7 @@ class DynamicView<Entity, Component> final {
 
 public:
     using iterator_type = typename pool_type::iterator_type;
-    using entity_type = typename pool_type::index_type;
+    using entity_type = typename pool_type::entity_type;
     using size_type = typename pool_type::size_type;
     using raw_type = typename pool_type::type;
 
