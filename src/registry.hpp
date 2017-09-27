@@ -270,26 +270,17 @@ public:
         return DynamicView<Entity, Component...>{ensure<Component>()...};
     }
 
-    /*
-     * WIP: waiting for the persisten view... :-)
-     *
     template<typename... Component>
-    std::enable_if_t<(sizeof...(Component) == 1), PersistentView<Entity, Component>>
-    view(persistent_view_type = {}) {
-        return PersistentView<Entity, Component>{ensure<Component>()};
+    std::enable_if_t<(sizeof...(Component) == 1), PersistentView<Entity, Component...>>
+    persistent() {
+        return PersistentView<Entity, Component...>{ensure<Component...>()};
     }
 
     template<typename... Component>
-    std::enable_if_t<(sizeof...(Component) > 1), PersistentView<Entity, Component>>
-    view(persistent_view_type = {}) {
+    std::enable_if_t<(sizeof...(Component) > 1), PersistentView<Entity, Component...>>
+    persistent() {
         // TODO
     }
-
-    template<typename... Component>
-    DynamicView<Entity, Component...> view(dynamic_view_type) {
-        return DynamicView<Entity, Component...>{ensure<Component>()...};
-    }
-    */
 
 private:
     std::vector<std::unique_ptr<base_pool_type>> pools;

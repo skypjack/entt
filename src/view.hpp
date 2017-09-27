@@ -262,10 +262,6 @@ private:
 };
 
 
-struct persistent_view_type {};
-struct dynamic_view_type {};
-
-
 }
 
 
