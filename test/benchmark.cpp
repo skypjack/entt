@@ -77,12 +77,12 @@ TEST(DefaultRegistry, IterateCreateDeleteSingleComponent) {
 
     Timer timer;
 
+    auto view = registry.view<Position>();
+
     for(int i = 0; i < 10000; i++) {
         for(int j = 0; j < 10000; j++) {
             registry.create<Position>();
         }
-
-        auto view = registry.view<Position>();
 
         for(auto entity: view) {
             if(rand() % 2 == 0) {

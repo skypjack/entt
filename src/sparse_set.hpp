@@ -116,7 +116,7 @@ public:
             reverse.resize(entt+1);
         }
 
-        auto pos = pos_type(direct.size());
+        const auto pos = pos_type(direct.size());
         reverse[entt] = pos;
         direct.emplace_back(entity);
 
@@ -127,7 +127,7 @@ public:
         assert(valid(entity));
         const auto entt = entity & traits_type::entity_mask;
         const auto back = direct.back() & traits_type::entity_mask;
-        auto pos = reverse[entt];
+        const auto pos = reverse[entt];
         reverse[back] = pos;
         direct[pos] = direct.back();
         direct.pop_back();
@@ -169,8 +169,8 @@ public:
             const auto le = lhs & traits_type::entity_mask;
             const auto re = rhs & traits_type::entity_mask;
 
-            bool bLhs = check[le].value;
-            bool bRhs = check[re].value;
+            const bool bLhs = check[le].value;
+            const bool bRhs = check[re].value;
             bool compare = false;
 
             if(bLhs && bRhs) {

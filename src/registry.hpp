@@ -38,7 +38,7 @@ class Registry {
 
     template<typename Component>
     bool managed() const noexcept {
-        auto ctype = type<Component>();
+        const auto ctype = type<Component>();
         return ctype < pools.size() && pools[ctype];
     }
 
@@ -56,7 +56,7 @@ class Registry {
 
     template<typename Component>
     pool_type<Component> & ensure() {
-        auto ctype = type<Component>();
+        const auto ctype = type<Component>();
 
         if(!(ctype < pools.size())) {
             pools.resize(ctype + 1);
@@ -126,7 +126,7 @@ public:
     template<typename... Component>
     entity_type create() noexcept {
         using accumulator_type = int[];
-        auto entity = create();
+        const auto entity = create();
         accumulator_type accumulator = { 0, (assign<Component>(entity), 0)... };
         (void)accumulator;
         return entity;
@@ -150,16 +150,16 @@ public:
     void destroy(entity_type entity) {
         assert(valid(entity));
 
+        const auto entt = entity & traits_type::entity_mask;
+        const auto version = 1 + ((entity >> traits_type::version_shift) & traits_type::version_mask);
+        entities[entt] = entt | (version << traits_type::version_shift);
+        available.push_back(entity);
+
         for(auto &&cpool: pools) {
             if(cpool && cpool->has(entity)) {
                 cpool->destroy(entity);
             }
         }
-
-        const auto entt = entity & traits_type::entity_mask;
-        auto version = 1 + ((entity >> traits_type::version_shift) & traits_type::version_mask);
-        entities[entt] = entt | (version << traits_type::version_shift);
-        available.push_back(entity);
     }
 
     template<typename Component, typename... Args>
@@ -259,7 +259,7 @@ public:
         pools.clear();
 
         for(auto &&entity: entities) {
-            auto version = 1 + ((entity >> traits_type::version_shift) & traits_type::version_mask);
+            const auto version = 1 + ((entity >> traits_type::version_shift) & traits_type::version_mask);
             entity = (entity & traits_type::entity_mask) | (version << traits_type::version_shift);
             available.push_back(entity);
         }
