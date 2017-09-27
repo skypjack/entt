@@ -127,7 +127,7 @@ public:
     entity_type create() noexcept {
         using accumulator_type = int[];
         const auto entity = create();
-        accumulator_type accumulator = { 0, (assign<Component>(entity), 0)... };
+        accumulator_type accumulator = { 0, (ensure<Component>().construct(entity), 0)... };
         (void)accumulator;
         return entity;
     }
