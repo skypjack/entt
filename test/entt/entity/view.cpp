@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <registry.hpp>
-#include <view.hpp>
+#include <entt/entity/registry.hpp>
+#include <entt/entity/view.hpp>
 
 TEST(DefaultRegistry, DynamicViewSingleComponent) {
     using registry_type = entt::DefaultRegistry;

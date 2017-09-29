@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <sparse_set.hpp>
+#include <entt/entity/sparse_set.hpp>
 
 TEST(SparseSetNoType, Functionalities) {
     using SparseSet = entt::SparseSet<unsigned int>;

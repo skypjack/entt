@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <registry.hpp>
 #include <iostream>
 #include <cstddef>
 #include <chrono>
 #include <vector>
+#include <entt/entity/registry.hpp>
 
 struct Position {
     uint64_t x;

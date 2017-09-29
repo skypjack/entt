@@ -3,24 +3,24 @@
 #
 
 set(COMMON_LINK_LIBS gtest_main Threads::Threads)
+include_directories(${PROJECT_SRC_DIR})
 
-# List of available targets
+# Test core
 
-set(TARGET_ENTT entt)
-set(TARGET_BENCHMARK benchmark)
+add_executable(core entt/core/ident.cpp odr.cpp)
+target_link_libraries(core PRIVATE ${COMMON_LINK_LIBS})
+add_test(NAME core COMMAND core)
 
-# Test TARGET_ENTT
+# Test entt
 
-add_executable(${TARGET_ENTT} registry.cpp sparse_set.cpp view.cpp)
-target_include_directories(${TARGET_ENTT} PRIVATE ${PROJECT_SRC_DIR})
-target_link_libraries(${TARGET_ENTT} PRIVATE ${COMMON_LINK_LIBS})
-add_test(NAME ${TARGET_ENTT} COMMAND ${TARGET_ENTT})
+add_executable(entity entt/entity/registry.cpp entt/entity/sparse_set.cpp entt/entity/view.cpp odr.cpp)
+target_link_libraries(entity PRIVATE ${COMMON_LINK_LIBS})
+add_test(NAME entity COMMAND entity)
 
-# Test TARGET_BENCHMARK
+# Test benchmark
 
 IF(CMAKE_BUILD_TYPE MATCHES Release)
-    add_executable(${TARGET_BENCHMARK} benchmark.cpp)
-    target_include_directories(${TARGET_BENCHMARK} PRIVATE ${PROJECT_SRC_DIR})
-    target_link_libraries(${TARGET_BENCHMARK} PRIVATE ${COMMON_LINK_LIBS})
-    add_test(NAME ${TARGET_BENCHMARK} COMMAND ${TARGET_BENCHMARK})
+    add_executable(benchmark entt/entity/benchmark.cpp odr.cpp)
+    target_link_libraries(benchmark PRIVATE ${COMMON_LINK_LIBS})
+    add_test(NAME benchmark COMMAND benchmark)
 ENDIF()

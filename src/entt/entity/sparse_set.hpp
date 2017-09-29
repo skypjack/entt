@@ -1,5 +1,5 @@
-#ifndef ENTT_COMPONENT_POOL_HPP
-#define ENTT_COMPONENT_POOL_HPP
+#ifndef ENTT_ENTITY_SPARSE_SET_HPP
+#define ENTT_ENTITY_SPARSE_SET_HPP
 
 
 #include <algorithm>
@@ -262,4 +262,4 @@ private:
 }
 
 
-#endif // ENTT_COMPONENT_POOL_HPP
+#endif // ENTT_ENTITY_SPARSE_SET_HPP

@@ -1,5 +1,5 @@
-#ifndef ENTT_VIEW_HPP
-#define ENTT_VIEW_HPP
+#ifndef ENTT_ENTITY_VIEW_HPP
+#define ENTT_ENTITY_VIEW_HPP
 
 
 #include <tuple>
@@ -265,4 +265,4 @@ private:
 }
 
 
-#endif // ENTT_VIEW_HPP
+#endif // ENTT_ENTITY_VIEW_HPP

@@ -1,5 +1,5 @@
-#ifndef ENTT_REGISTRY_HPP
-#define ENTT_REGISTRY_HPP
+#ifndef ENTT_ENTITY_REGISTRY_HPP
+#define ENTT_ENTITY_REGISTRY_HPP
 
 
 #include <vector>
@@ -295,4 +295,4 @@ using DefaultRegistry = Registry<std::uint32_t>;
 }
 
 
-#endif // ENTT_REGISTRY_HPP
+#endif // ENTT_ENTITY_REGISTRY_HPP
