@@ -21,10 +21,40 @@ namespace entt {
 
 template<typename Entity>
 class Registry {
-    using traits_type = entt_traits<Entity>;
-    using base_pool_type = SparseSet<Entity>;
+    /* >>> WIP */
+    /*
+    template<typename Component>
+    struct Pool: SigH<void(Entity, bool)>, SparseSet<Entity, Component> {
+        template<typename... Args>
+        Component & construct(Entity entity, Args&&... args) {
+            SparseSet<Entity, Component>::construct(entity, std::forward<Args>(args)...);
+            SigH<void(Entity, bool)>::publish(entity, false);
+        }
+
+        virtual void destroy(Entity entity) {
+            SparseSet<Entity, Component>::destroy(entity);
+            SigH<void(Entity, bool)>::publish(entity, true);
+        }
+    };
+
+    template<typename... Component>
+    struct Persistent: SparseSet<Entity> {
+        void update(Entity entity, bool removed) {
+            if(removed) {
+                SparseSet<Entity>::destroy(entity);
+            } else {
+                // TODO
+            }
+        }
+    };
+    */
+    /* <<< WIP */
 
     using component_family = Family<struct InternalRegistryComponentFamily>;
+    using view_family = Family<struct InternalRegistryViewFamily>;
+
+    using traits_type = entt_traits<Entity>;
+    using base_pool_type = SparseSet<Entity>;
 
     template<typename Component>
     using pool_type = SparseSet<Entity, Component>;
@@ -63,7 +93,7 @@ class Registry {
     }
 
 public:
-    using entity_type = Entity;
+    using entity_type = typename traits_type::entity_type;
     using version_type = typename traits_type::version_type;
     using size_type = std::size_t;
 
@@ -106,6 +136,10 @@ public:
     bool valid(entity_type entity) const noexcept {
         const auto entt = entity & traits_type::entity_mask;
         return (entt < entities.size() && entities[entt] == entity);
+    }
+
+    entity_type entity(entity_type entity) const noexcept {
+        return entity_type(entity & traits_type::entity_mask);
     }
 
     version_type version(entity_type entity) const noexcept {
@@ -164,7 +198,6 @@ public:
     template<typename Component>
     void remove(entity_type entity) {
         assert(valid(entity));
-        assert(managed<Component>());
         return pool<Component>().destroy(entity);
     }
 
@@ -181,7 +214,6 @@ public:
     template<typename Component>
     const Component & get(entity_type entity) const noexcept {
         assert(valid(entity));
-        assert(managed<Component>());
         return pool<Component>().get(entity);
     }
 
@@ -193,7 +225,6 @@ public:
     template<typename Component, typename... Args>
     Component & replace(entity_type entity, Args&&... args) {
         assert(valid(entity));
-        assert(managed<Component>());
         return (pool<Component>().get(entity) = Component{std::forward<Args>(args)...});
     }
 
@@ -260,18 +291,18 @@ public:
 
     template<typename... Component>
     auto view() {
-        return DynamicView<Entity, Component...>{ensure<Component>()...};
+        return View<Entity, Component...>{ensure<Component>()...};
     }
 
     template<typename... Component>
-    std::enable_if_t<(sizeof...(Component) == 1), PersistentView<Entity, Component...>>
-    persistent() {
-        return PersistentView<Entity, Component...>{ensure<Component...>()};
+    void prepare() {
+        static_assert(sizeof...(Component) > 1, "!");
+        // TODO
     }
 
     template<typename... Component>
-    std::enable_if_t<(sizeof...(Component) > 1), PersistentView<Entity, Component...>>
-    persistent() {
+    Group<Entity, Component...> group() {
+        static_assert(sizeof...(Component) > 1, "!");
         // TODO
     }
 

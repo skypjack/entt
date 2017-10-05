@@ -10,37 +10,37 @@ namespace entt {
 
 
 template<typename Entity, typename... Component>
-class PersistentView final {
-    static_assert(sizeof...(Component) > 0, "!");
+class Group final {
+    static_assert(sizeof...(Component) > 1, "!");
 
     template<typename Comp>
     using pool_type = SparseSet<Entity, Comp>;
 
-    using view_type = SparseSet<Entity>;
+    using group_type = SparseSet<Entity>;
 
 public:
-    using iterator_type = typename view_type::iterator_type;
-    using entity_type = typename view_type::entity_type;
-    using size_type = typename view_type::size_type;
+    using iterator_type = typename group_type::iterator_type;
+    using entity_type = typename group_type::entity_type;
+    using size_type = typename group_type::size_type;
 
-    explicit PersistentView(view_type &view, pool_type<Component>&... pools) noexcept
-        : view{view}, pools{pools...}
+    explicit Group(group_type &group, pool_type<Component>&... pools) noexcept
+        : group{group}, pools{pools...}
     {}
 
     size_type size() const noexcept {
-        return view.size();
+        return group.size();
     }
 
     const entity_type * data() const noexcept {
-        return view.data();
+        return group.data();
     }
 
     iterator_type begin() const noexcept {
-        return view.begin();
+        return group.begin();
     }
 
     iterator_type end() const noexcept {
-        return view.end();
+        return group.end();
     }
 
     template<typename Comp>
@@ -50,68 +50,17 @@ public:
 
     template<typename Comp>
     Comp & get(entity_type entity) noexcept {
-        return const_cast<Comp &>(const_cast<const PersistentView *>(this)->get<Comp>(entity));
+        return const_cast<Comp &>(const_cast<const Group *>(this)->get<Comp>(entity));
     }
 
 private:
-    view_type &view;
+    group_type &group;
     std::tuple<pool_type<Component> &...> pools;
 };
 
 
-template<typename Entity, typename Component>
-class PersistentView<Entity, Component> final {
-    using pool_type = SparseSet<Entity, Component>;
-
-public:
-    using iterator_type = typename pool_type::iterator_type;
-    using entity_type = typename pool_type::entity_type;
-    using size_type = typename pool_type::size_type;
-    using raw_type = typename pool_type::type;
-
-    explicit PersistentView(pool_type &pool) noexcept
-        : pool{pool}
-    {}
-
-    size_type size() const noexcept {
-        return pool.size();
-    }
-
-    raw_type * raw() noexcept {
-        return pool.raw();
-    }
-
-    const raw_type * raw() const noexcept {
-        return pool.raw();
-    }
-
-    const entity_type * data() const noexcept {
-        return pool.data();
-    }
-
-    iterator_type begin() const noexcept {
-        return pool.begin();
-    }
-
-    iterator_type end() const noexcept {
-        return pool.end();
-    }
-
-    const Component & get(entity_type entity) const noexcept {
-        return pool.get(entity);
-    }
-
-    Component & get(entity_type entity) noexcept {
-        return const_cast<Component &>(const_cast<const PersistentView *>(this)->get(entity));
-    }
-
-private:
-    pool_type &pool;
-};
-
-
 template<typename Entity, typename First, typename... Other>
-class DynamicView final {
+class View final {
     template<typename Component>
     using pool_type = SparseSet<Entity, Component> &;
 
@@ -119,7 +68,7 @@ class DynamicView final {
     using underlying_iterator_type = typename base_pool_type::iterator_type;
     using repo_type = std::tuple<pool_type<First>, pool_type<Other>...>;
 
-    class ViewIterator {
+    class Iterator {
         inline bool valid() const noexcept {
             using accumulator_type = bool[];
             auto entity = *begin;
@@ -132,7 +81,7 @@ class DynamicView final {
     public:
         using value_type = typename base_pool_type::entity_type;
 
-        ViewIterator(const repo_type &pools, underlying_iterator_type begin, underlying_iterator_type end) noexcept
+        Iterator(const repo_type &pools, underlying_iterator_type begin, underlying_iterator_type end) noexcept
             : pools{pools}, begin{begin}, end{end}
         {
             if(begin != end && !valid()) {
@@ -140,22 +89,22 @@ class DynamicView final {
             }
         }
 
-        ViewIterator & operator++() noexcept {
+        Iterator & operator++() noexcept {
             ++begin;
             while(begin != end && !valid()) { ++begin; }
             return *this;
         }
 
-        ViewIterator operator++(int) noexcept {
-            ViewIterator orig = *this;
+        Iterator operator++(int) noexcept {
+            Iterator orig = *this;
             return ++(*this), orig;
         }
 
-        bool operator==(const ViewIterator &other) const noexcept {
+        bool operator==(const Iterator &other) const noexcept {
             return other.begin == begin;
         }
 
-        bool operator!=(const ViewIterator &other) const noexcept {
+        bool operator!=(const Iterator &other) const noexcept {
             return !(*this == other);
         }
 
@@ -170,22 +119,22 @@ class DynamicView final {
     };
 
 public:
-    using iterator_type = ViewIterator;
+    using iterator_type = Iterator;
     using entity_type = typename base_pool_type::entity_type;
     using size_type = typename base_pool_type::size_type;
 
-    explicit DynamicView(pool_type<First> pool, pool_type<Other>... other) noexcept
+    explicit View(pool_type<First> pool, pool_type<Other>... other) noexcept
         : pools{pool, other...}, view{nullptr}
     {
         reset();
     }
 
     iterator_type begin() const noexcept {
-        return ViewIterator{pools, view->begin(), view->end()};
+        return Iterator{pools, view->begin(), view->end()};
     }
 
     iterator_type end() const noexcept {
-        return ViewIterator{pools, view->end(), view->end()};
+        return Iterator{pools, view->end(), view->end()};
     }
 
     template<typename Component>
@@ -195,7 +144,7 @@ public:
 
     template<typename Component>
     Component & get(entity_type entity) noexcept {
-        return const_cast<Component &>(const_cast<const DynamicView *>(this)->get<Component>(entity));
+        return const_cast<Component &>(const_cast<const View *>(this)->get<Component>(entity));
     }
 
     void reset() {
@@ -212,7 +161,7 @@ private:
 
 
 template<typename Entity, typename Component>
-class DynamicView<Entity, Component> final {
+class View<Entity, Component> final {
     using pool_type = SparseSet<Entity, Component>;
 
 public:
@@ -221,7 +170,7 @@ public:
     using size_type = typename pool_type::size_type;
     using raw_type = typename pool_type::type;
 
-    explicit DynamicView(pool_type &pool) noexcept
+    explicit View(pool_type &pool) noexcept
         : pool{pool}
     {}
 
@@ -254,7 +203,7 @@ public:
     }
 
     Component & get(entity_type entity) noexcept {
-        return const_cast<Component &>(const_cast<const DynamicView *>(this)->get(entity));
+        return const_cast<Component &>(const_cast<const View *>(this)->get(entity));
     }
 
 private:

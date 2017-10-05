@@ -21,27 +21,27 @@ template<typename Entity>
 class SparseSet<Entity> {
     using traits_type = entt_traits<Entity>;
 
-    struct SparseSetIterator {
+    struct Iterator {
         using value_type = Entity;
 
-        SparseSetIterator(const std::vector<Entity> *direct, std::size_t pos)
+        Iterator(const std::vector<Entity> *direct, std::size_t pos)
             : direct{direct}, pos{pos}
         {}
 
-        SparseSetIterator & operator++() noexcept {
+        Iterator & operator++() noexcept {
             return --pos, *this;
         }
 
-        SparseSetIterator operator++(int) noexcept {
-            SparseSetIterator orig = *this;
+        Iterator operator++(int) noexcept {
+            Iterator orig = *this;
             return ++(*this), orig;
         }
 
-        bool operator==(const SparseSetIterator &other) const noexcept {
+        bool operator==(const Iterator &other) const noexcept {
             return other.pos == pos && other.direct == direct;
         }
 
-        bool operator!=(const SparseSetIterator &other) const noexcept {
+        bool operator!=(const Iterator &other) const noexcept {
             return !(*this == other);
         }
 
@@ -63,7 +63,7 @@ public:
     using entity_type = Entity;
     using pos_type = entity_type;
     using size_type = std::size_t;
-    using iterator_type = SparseSetIterator;
+    using iterator_type = Iterator;
 
     explicit SparseSet() = default;
 
@@ -92,11 +92,11 @@ public:
     }
 
     iterator_type begin() const noexcept {
-        return SparseSetIterator{&direct, direct.size()};
+        return Iterator{&direct, direct.size()};
     }
 
     iterator_type end() const noexcept {
-        return SparseSetIterator{&direct, 0};
+        return Iterator{&direct, 0};
     }
 
     bool has(entity_type entity) const noexcept {
@@ -197,7 +197,7 @@ private:
 
 
 template<typename Entity, typename Type>
-class SparseSet<Entity, Type>: public SparseSet<Entity> {
+class SparseSet<Entity, Type> final: public SparseSet<Entity> {
     using underlying_type = SparseSet<Entity>;
 
 public:
