@@ -197,7 +197,7 @@ private:
 
 
 template<typename Entity, typename Type>
-class SparseSet<Entity, Type> final: public SparseSet<Entity> {
+class SparseSet<Entity, Type>: public SparseSet<Entity> {
     using underlying_type = SparseSet<Entity>;
 
 public:
