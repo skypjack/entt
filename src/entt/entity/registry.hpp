@@ -9,6 +9,8 @@
 #include <cassert>
 #include <algorithm>
 #include <type_traits>
+#include "../core/family.hpp"
+#include "../signal/sigh.hpp"
 #include "sparse_set.hpp"
 #include "view.hpp"
 #include "entt.hpp"
@@ -22,30 +24,21 @@ class Registry {
     using traits_type = entt_traits<Entity>;
     using base_pool_type = SparseSet<Entity>;
 
+    using component_family = Family<struct InternalRegistryComponentFamily>;
+
     template<typename Component>
     using pool_type = SparseSet<Entity, Component>;
 
-    static std::size_t identifier() noexcept {
-        static std::size_t value = 0;
-        return value++;
-    }
-
-    template<typename>
-    static std::size_t type() noexcept {
-        static const std::size_t value = identifier();
-        return value;
-    }
-
     template<typename Component>
     bool managed() const noexcept {
-        const auto ctype = type<Component>();
+        const auto ctype = component_family::type<Component>();
         return ctype < pools.size() && pools[ctype];
     }
 
     template<typename Component>
     const pool_type<Component> & pool() const noexcept {
         assert(managed<Component>());
-        return static_cast<pool_type<Component> &>(*pools[type<Component>()]);
+        return static_cast<pool_type<Component> &>(*pools[component_family::type<Component>()]);
     }
 
     template<typename Component>
@@ -56,7 +49,7 @@ class Registry {
 
     template<typename Component>
     pool_type<Component> & ensure() {
-        const auto ctype = type<Component>();
+        const auto ctype = component_family::type<Component>();
 
         if(!(ctype < pools.size())) {
             pools.resize(ctype + 1);
