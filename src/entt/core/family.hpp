@@ -10,7 +10,7 @@
 namespace entt {
 
 
-template<typename>
+template<typename...>
 class Family {
     static std::size_t identifier() noexcept {
         static std::size_t value = 0;
@@ -18,7 +18,7 @@ class Family {
     }
 
 public:
-    template<typename>
+    template<typename...>
     static std::size_t type() noexcept {
         static const std::size_t value = identifier();
         return value;

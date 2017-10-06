@@ -97,8 +97,9 @@ public:
     }
 
     void publish(Args... args) {
-        auto func = [&args...](call_type &call) { call.second(call.first, args...); };
-        std::for_each(calls.begin(), calls.end(), std::move(func));
+        for(auto &&call: calls) {
+            call.second(call.first, args...);
+        }
     }
 
     friend void swap(SigH &lhs, SigH &rhs) {

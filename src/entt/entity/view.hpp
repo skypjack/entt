@@ -10,37 +10,37 @@ namespace entt {
 
 
 template<typename Entity, typename... Component>
-class Group final {
+class PersistentView final {
     static_assert(sizeof...(Component) > 1, "!");
 
     template<typename Comp>
     using pool_type = SparseSet<Entity, Comp>;
 
-    using group_type = SparseSet<Entity>;
+    using view_type = SparseSet<Entity>;
 
 public:
-    using iterator_type = typename group_type::iterator_type;
-    using entity_type = typename group_type::entity_type;
-    using size_type = typename group_type::size_type;
+    using iterator_type = typename view_type::iterator_type;
+    using entity_type = typename view_type::entity_type;
+    using size_type = typename view_type::size_type;
 
-    explicit Group(group_type &group, pool_type<Component>&... pools) noexcept
-        : group{group}, pools{pools...}
+    explicit PersistentView(view_type &view, pool_type<Component>&... pools) noexcept
+        : view{view}, pools{pools...}
     {}
 
     size_type size() const noexcept {
-        return group.size();
+        return view.size();
     }
 
     const entity_type * data() const noexcept {
-        return group.data();
+        return view.data();
     }
 
     iterator_type begin() const noexcept {
-        return group.begin();
+        return view.begin();
     }
 
     iterator_type end() const noexcept {
-        return group.end();
+        return view.end();
     }
 
     template<typename Comp>
@@ -50,11 +50,11 @@ public:
 
     template<typename Comp>
     Comp & get(entity_type entity) noexcept {
-        return const_cast<Comp &>(const_cast<const Group *>(this)->get<Comp>(entity));
+        return const_cast<Comp &>(const_cast<const PersistentView *>(this)->get<Comp>(entity));
     }
 
 private:
-    group_type &group;
+    view_type &view;
     std::tuple<pool_type<Component> &...> pools;
 };
 
@@ -73,7 +73,7 @@ class View final {
             using accumulator_type = bool[];
             auto entity = *begin;
             bool all = std::get<pool_type<First>>(pools).has(entity);
-            accumulator_type accumulator =  { all, (all = all && std::get<pool_type<Other>>(pools).has(entity))... };
+            accumulator_type accumulator =  { (all = all && std::get<pool_type<Other>>(pools).has(entity))... };
             (void)accumulator;
             return all;
         }
@@ -150,7 +150,7 @@ public:
     void reset() {
         using accumulator_type = void *[];
         view = &std::get<pool_type<First>>(pools);
-        accumulator_type accumulator = { nullptr, (std::get<pool_type<Other>>(pools).size() < view->size() ? (view = &std::get<pool_type<Other>>(pools)) : nullptr)... };
+        accumulator_type accumulator = { (std::get<pool_type<Other>>(pools).size() < view->size() ? (view = &std::get<pool_type<Other>>(pools)) : nullptr)... };
         (void)accumulator;
     }
 

@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_REGISTRY_HPP
 
 
+#include <tuple>
 #include <vector>
 #include <memory>
 #include <utility>
@@ -21,43 +22,45 @@ namespace entt {
 
 template<typename Entity>
 class Registry {
-    /* >>> WIP */
-    /*
+    using component_family = Family<struct InternalRegistryComponentFamily>;
+    using view_family = Family<struct InternalRegistryViewFamily>;
+    using traits_type = entt_traits<Entity>;
+
     template<typename Component>
-    struct Pool: SigH<void(Entity, bool)>, SparseSet<Entity, Component> {
+    struct Pool: SparseSet<Entity, Component> {
+        SigH<void(Entity)> constructed;
+        SigH<void(Entity)> destroyed;
+
         template<typename... Args>
         Component & construct(Entity entity, Args&&... args) {
-            SparseSet<Entity, Component>::construct(entity, std::forward<Args>(args)...);
-            SigH<void(Entity, bool)>::publish(entity, false);
+            auto &component = SparseSet<Entity, Component>::construct(entity, std::forward<Args>(args)...);
+            constructed.publish(entity);
+            return component;
         }
 
-        virtual void destroy(Entity entity) {
+        void destroy(Entity entity) override {
             SparseSet<Entity, Component>::destroy(entity);
-            SigH<void(Entity, bool)>::publish(entity, true);
+            destroyed.publish(entity);
         }
     };
 
     template<typename... Component>
-    struct Persistent: SparseSet<Entity> {
-        void update(Entity entity, bool removed) {
-            if(removed) {
-                SparseSet<Entity>::destroy(entity);
-            } else {
-                // TODO
-            }
+    struct PoolHandler: SparseSet<Entity> {
+        static_assert(sizeof...(Component) > 1, "!");
+
+        const std::tuple<Pool<Component> &...> pools;
+
+        void candidate(Entity entity) {
+            using accumulator_type = bool[];
+            bool match = true;
+            accumulator_type accumulator =  { (match = match && std::get<Pool<Component> &>(pools).has(entity))... };
+            if(match) { SparseSet<Entity>::construct(entity); }
+            (void)accumulator;
         }
+
+        // TODO
+        // bind SparseSet<Entity>::destroy(entity); to signal destroy
     };
-    */
-    /* <<< WIP */
-
-    using component_family = Family<struct InternalRegistryComponentFamily>;
-    using view_family = Family<struct InternalRegistryViewFamily>;
-
-    using traits_type = entt_traits<Entity>;
-    using base_pool_type = SparseSet<Entity>;
-
-    template<typename Component>
-    using pool_type = SparseSet<Entity, Component>;
 
     template<typename Component>
     bool managed() const noexcept {
@@ -66,19 +69,19 @@ class Registry {
     }
 
     template<typename Component>
-    const pool_type<Component> & pool() const noexcept {
+    const Pool<Component> & pool() const noexcept {
         assert(managed<Component>());
-        return static_cast<pool_type<Component> &>(*pools[component_family::type<Component>()]);
+        return static_cast<Pool<Component> &>(*pools[component_family::type<Component>()]);
     }
 
     template<typename Component>
-    pool_type<Component> & pool() noexcept {
+    Pool<Component> & pool() noexcept {
         assert(managed<Component>());
-        return const_cast<pool_type<Component> &>(const_cast<const Registry *>(this)->pool<Component>());
+        return const_cast<Pool<Component> &>(const_cast<const Registry *>(this)->pool<Component>());
     }
 
     template<typename Component>
-    pool_type<Component> & ensure() {
+    Pool<Component> & ensure() {
         const auto ctype = component_family::type<Component>();
 
         if(!(ctype < pools.size())) {
@@ -86,7 +89,7 @@ class Registry {
         }
 
         if(!pools[ctype]) {
-            pools[ctype] = std::make_unique<pool_type<Component>>();
+            pools[ctype] = std::make_unique<Pool<Component>>();
         }
 
         return pool<Component>();
@@ -136,10 +139,6 @@ public:
     bool valid(entity_type entity) const noexcept {
         const auto entt = entity & traits_type::entity_mask;
         return (entt < entities.size() && entities[entt] == entity);
-    }
-
-    entity_type entity(entity_type entity) const noexcept {
-        return entity_type(entity & traits_type::entity_mask);
     }
 
     version_type version(entity_type entity) const noexcept {
@@ -203,10 +202,11 @@ public:
 
     template<typename... Component>
     bool has(entity_type entity) const noexcept {
+        static_assert(sizeof...(Component) > 0, "!");
         assert(valid(entity));
         using accumulator_type = bool[];
         bool all = true;
-        accumulator_type accumulator = { all, (all = all && managed<Component>() && pool<Component>().has(entity))... };
+        accumulator_type accumulator = { (all = all && managed<Component>() && pool<Component>().has(entity))... };
         (void)accumulator;
         return all;
     }
@@ -249,7 +249,8 @@ public:
 
     template<typename To, typename From>
     void sort() {
-        ensure<To>().respect(ensure<From>());
+        const SparseSet<Entity> &from = ensure<From>();
+        ensure<To>().respect(from);
     }
 
     template<typename Component>
@@ -290,24 +291,49 @@ public:
     }
 
     template<typename... Component>
-    auto view() {
+    View<Entity, Component...> view() {
         return View<Entity, Component...>{ensure<Component>()...};
     }
 
     template<typename... Component>
     void prepare() {
         static_assert(sizeof...(Component) > 1, "!");
-        // TODO
+        const auto vtype = view_family::type<Component...>();
+
+        if(!(vtype < handlers.size())) {
+            handlers.resize(vtype + 1);
+        }
+
+        if(!handlers[vtype]) {
+            auto handler = std::make_unique<PoolHandler<Component...>>(ensure<Component>()...);
+
+            for(auto entity: view<Component...>()) {
+                handler->construct(entity);
+            }
+
+            auto *ptr = handler.get();
+            handlers[vtype] = std::move(handler);
+
+            using accumulator_type = int[];
+            accumulator_type accumulator = {
+                (ensure<Component>().constructed.template connect<PoolHandler<Component>, &PoolHandler<Component>::candidate>(ptr), 0)...,
+                (ensure<Component>().destroyed.template connect<SparseSet<Entity>, &SparseSet<Entity>::destroy>(ptr), 0)...
+            };
+
+            (void)accumulator;
+        }
     }
 
     template<typename... Component>
-    Group<Entity, Component...> group() {
+    PersistentView<Entity, Component...> persistent() {
         static_assert(sizeof...(Component) > 1, "!");
-        // TODO
+        prepare<Component...>();
+        return PersistentView<Entity, Component...>{*handlers[view_family::type<Component...>()], ensure<Component>()...};
     }
 
 private:
-    std::vector<std::unique_ptr<base_pool_type>> pools;
+    std::vector<std::unique_ptr<SparseSet<Entity>>> handlers;
+    std::vector<std::unique_ptr<SparseSet<Entity>>> pools;
     std::vector<entity_type> available;
     std::vector<entity_type> entities;
 };
