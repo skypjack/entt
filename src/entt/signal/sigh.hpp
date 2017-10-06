@@ -16,7 +16,7 @@ class SigH;
 
 template<typename Ret, typename... Args>
 class SigH<Ret(Args...)> {
-    using proto_type = Ret(*)(void *, Args...);
+    using proto_type = void(*)(void *, Args...);
     using call_type = std::pair<void *, proto_type>;
 
     template<Ret(*Function)(Args...)>
@@ -69,24 +69,24 @@ public:
     template<Ret(*Function)(Args...)>
     void connect() {
         disconnect<Function>();
-        calls.emplace_back(std::make_pair(nullptr, &proto<Function>));
+        calls.emplace_back(call_type{nullptr, &proto<Function>});
     }
 
     template <typename Class, Ret(Class::*Member)(Args...)>
     void connect(Class *instance) {
         disconnect<Class, Member>(instance);
-        calls.emplace_back(std::make_pair(instance, &proto<Class, Member>));
+        calls.emplace_back(call_type{instance, &proto<Class, Member>});
     }
 
     template<Ret(*Function)(Args...)>
     void disconnect() {
-        auto target = std::make_pair(nullptr, &proto<Function>);
+        call_type target{nullptr, &proto<Function>};
         calls.erase(std::remove(calls.begin(), calls.end(), std::move(target)), calls.end());
     }
 
     template<typename Class, Ret(Class::*Member)(Args...)>
     void disconnect(Class *instance) {
-        auto target = std::make_pair(static_cast<void *>(instance), &proto<Class, Member>);
+        call_type target{instance, &proto<Class, Member>};
         calls.erase(std::remove(calls.begin(), calls.end(), std::move(target)), calls.end());
     }
 
@@ -107,9 +107,19 @@ public:
         swap(lhs.calls, rhs.calls);
     }
 
+    bool operator==(const SigH &other) const noexcept {
+        return calls.size() == other.calls.size() && std::equal(calls.cbegin(), calls.cend(), other.calls.cbegin());
+    }
+
 private:
     std::vector<call_type> calls;
 };
+
+
+template<typename Ret, typename... Args>
+bool operator!=(const SigH<Ret(Args...)> &lhs, const SigH<Ret(Args...)> &rhs) noexcept {
+    return !(lhs == rhs);
+}
 
 
 }

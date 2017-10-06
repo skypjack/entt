@@ -55,9 +55,15 @@ class Registry {
         void candidate(Entity entity) {
             using accumulator_type = bool[];
             bool match = true;
-            accumulator_type accumulator =  { (match = match && std::get<Pool<Component> &>(pools).has(entity))... };
+            accumulator_type accumulator = { (match = match && std::get<Pool<Component> &>(pools).has(entity))... };
             if(match) { SparseSet<Entity>::construct(entity); }
             (void)accumulator;
+        }
+
+        void release(Entity entity) {
+            if(SparseSet<Entity>::has(entity)) {
+                SparseSet<Entity>::destroy(entity);
+            }
         }
 
     private:
@@ -307,7 +313,10 @@ public:
         }
 
         if(!handlers[vtype]) {
-            auto handler = std::make_unique<PoolHandler<Component...>>(ensure<Component>()...);
+            using handler_type = PoolHandler<Component...>;
+            using accumulator_type = int[];
+
+            auto handler = std::make_unique<handler_type>(ensure<Component>()...);
 
             for(auto entity: view<Component...>()) {
                 handler->construct(entity);
@@ -316,10 +325,9 @@ public:
             auto *ptr = handler.get();
             handlers[vtype] = std::move(handler);
 
-            using accumulator_type = int[];
             accumulator_type accumulator = {
-                (ensure<Component>().constructed.template connect<PoolHandler<Component...>, &PoolHandler<Component...>::candidate>(ptr), 0)...,
-                (ensure<Component>().destroyed.template connect<SparseSet<Entity>, &SparseSet<Entity>::destroy>(ptr), 0)...
+                (ensure<Component>().constructed.template connect<handler_type, &handler_type::candidate>(ptr), 0)...,
+                (ensure<Component>().destroyed.template connect<handler_type, &handler_type::release>(ptr), 0)...
             };
 
             (void)accumulator;

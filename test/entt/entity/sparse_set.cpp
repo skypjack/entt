@@ -2,9 +2,7 @@
 #include <entt/entity/sparse_set.hpp>
 
 TEST(SparseSetNoType, Functionalities) {
-    using SparseSet = entt::SparseSet<unsigned int>;
-
-    SparseSet set;
+    entt::SparseSet<unsigned int> set;
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
@@ -45,9 +43,7 @@ TEST(SparseSetNoType, Functionalities) {
 }
 
 TEST(SparseSetNoType, DataBeginEnd) {
-    using SparseSet = entt::SparseSet<unsigned int>;
-
-    SparseSet set;
+    entt::SparseSet<unsigned int> set;
 
     ASSERT_EQ(set.construct(3), 0u);
     ASSERT_EQ(set.construct(12), 1u);
@@ -64,14 +60,10 @@ TEST(SparseSetNoType, DataBeginEnd) {
     ASSERT_EQ(*(begin++), 12u);
     ASSERT_EQ(*(begin++), 3u);
     ASSERT_EQ(begin, end);
-
-    set.reset();
 }
 
 TEST(SparseSetWithType, Functionalities) {
-    using SparseSet = entt::SparseSet<unsigned int, int>;
-
-    SparseSet set;
+    entt::SparseSet<unsigned int, int> set;
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
@@ -112,9 +104,7 @@ TEST(SparseSetWithType, Functionalities) {
 }
 
 TEST(SparseSetWithType, RawBeginEnd) {
-    using SparseSet = entt::SparseSet<unsigned int, int>;
-
-    SparseSet set;
+    entt::SparseSet<unsigned int, int> set;
 
     ASSERT_EQ(set.construct(3, 3), 3);
     ASSERT_EQ(set.construct(12, 6), 6);
@@ -131,14 +121,10 @@ TEST(SparseSetWithType, RawBeginEnd) {
     ASSERT_EQ(set.get(*(begin++)), 6);
     ASSERT_EQ(set.get(*(begin++)), 3);
     ASSERT_EQ(begin, end);
-
-    set.reset();
 }
 
 TEST(SparseSetWithType, SortOrdered) {
-    using SparseSet = entt::SparseSet<unsigned int, int>;
-
-    SparseSet set;
+    entt::SparseSet<unsigned int, int> set;
 
     ASSERT_EQ(set.construct(12, 12), 12);
     ASSERT_EQ(set.construct(42, 9), 9);
@@ -165,14 +151,10 @@ TEST(SparseSetWithType, SortOrdered) {
     ASSERT_EQ(set.get(*(begin++)), 9);
     ASSERT_EQ(set.get(*(begin++)), 12);
     ASSERT_EQ(begin, end);
-
-    set.reset();
 }
 
 TEST(SparseSetWithType, SortReverse) {
-    using SparseSet = entt::SparseSet<unsigned int, int>;
-
-    SparseSet set;
+    entt::SparseSet<unsigned int, int> set;
 
     ASSERT_EQ(set.construct(12, 1), 1);
     ASSERT_EQ(set.construct(42, 3), 3);
@@ -199,14 +181,10 @@ TEST(SparseSetWithType, SortReverse) {
     ASSERT_EQ(set.get(*(begin++)), 9);
     ASSERT_EQ(set.get(*(begin++)), 12);
     ASSERT_EQ(begin, end);
-
-    set.reset();
 }
 
 TEST(SparseSetWithType, SortUnordered) {
-    using SparseSet = entt::SparseSet<unsigned int, int>;
-
-    SparseSet set;
+    entt::SparseSet<unsigned int, int> set;
 
     ASSERT_EQ(set.construct(12, 6), 6);
     ASSERT_EQ(set.construct(42, 3), 3);
@@ -233,15 +211,11 @@ TEST(SparseSetWithType, SortUnordered) {
     ASSERT_EQ(set.get(*(begin++)), 9);
     ASSERT_EQ(set.get(*(begin++)), 12);
     ASSERT_EQ(begin, end);
-
-    set.reset();
 }
 
 TEST(SparseSetWithType, RespectOrdered) {
-    using SparseSet = entt::SparseSet<unsigned int, int>;
-
-    SparseSet lhs;
-    SparseSet rhs;
+    entt::SparseSet<unsigned int, int> lhs;
+    entt::SparseSet<unsigned int, int> rhs;
 
     ASSERT_EQ(lhs.construct(1, 0), 0);
     ASSERT_EQ(lhs.construct(2, 0), 0);
@@ -270,16 +244,11 @@ TEST(SparseSetWithType, RespectOrdered) {
     ASSERT_EQ(*(rhs.data() + 3u), 3u);
     ASSERT_EQ(*(rhs.data() + 4u), 4u);
     ASSERT_EQ(*(rhs.data() + 5u), 5u);
-
-    lhs.reset();
-    rhs.reset();
 }
 
 TEST(SparseSetWithType, RespectReverse) {
-    using SparseSet = entt::SparseSet<unsigned int, int>;
-
-    SparseSet lhs;
-    SparseSet rhs;
+    entt::SparseSet<unsigned int, int> lhs;
+    entt::SparseSet<unsigned int, int> rhs;
 
     ASSERT_EQ(lhs.construct(1, 0), 0);
     ASSERT_EQ(lhs.construct(2, 0), 0);
@@ -308,16 +277,11 @@ TEST(SparseSetWithType, RespectReverse) {
     ASSERT_EQ(*(rhs.data() + 3u), 3u);
     ASSERT_EQ(*(rhs.data() + 4u), 4u);
     ASSERT_EQ(*(rhs.data() + 5u), 5u);
-
-    lhs.reset();
-    rhs.reset();
 }
 
 TEST(SparseSetWithType, RespectUnordered) {
-    using SparseSet = entt::SparseSet<unsigned int, int>;
-
-    SparseSet lhs;
-    SparseSet rhs;
+    entt::SparseSet<unsigned int, int> lhs;
+    entt::SparseSet<unsigned int, int> rhs;
 
     ASSERT_EQ(lhs.construct(1, 0), 0);
     ASSERT_EQ(lhs.construct(2, 0), 0);
@@ -346,7 +310,4 @@ TEST(SparseSetWithType, RespectUnordered) {
     ASSERT_EQ(*(rhs.data() + 3u), 3u);
     ASSERT_EQ(*(rhs.data() + 4u), 4u);
     ASSERT_EQ(*(rhs.data() + 5u), 5u);
-
-    lhs.reset();
-    rhs.reset();
 }

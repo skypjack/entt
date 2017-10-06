@@ -7,7 +7,7 @@ include_directories(${PROJECT_SRC_DIR})
 
 # Test core
 
-add_executable(core entt/core/ident.cpp odr.cpp)
+add_executable(core entt/core/ident.cpp entt/core/family.cpp odr.cpp)
 target_link_libraries(core PRIVATE ${COMMON_LINK_LIBS})
 add_test(NAME core COMMAND core)
 
@@ -24,3 +24,9 @@ IF(CMAKE_BUILD_TYPE MATCHES Release)
     target_link_libraries(benchmark PRIVATE ${COMMON_LINK_LIBS})
     add_test(NAME benchmark COMMAND benchmark)
 ENDIF()
+
+# Test signal
+
+add_executable(signal entt/signal/sigh.cpp odr.cpp)
+target_link_libraries(signal PRIVATE ${COMMON_LINK_LIBS})
+add_test(NAME signal COMMAND signal)
