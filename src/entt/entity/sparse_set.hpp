@@ -146,7 +146,7 @@ public:
     void sort(Compare compare) {
         std::vector<pos_type> copy{direct.cbegin(), direct.cend()};
         std::sort(copy.begin(), copy.end(), [compare = std::move(compare)](auto... args) {
-            return not compare(args...);
+            return !compare(args...);
         });
 
         for(pos_type i = 0; i < copy.size(); ++i) {
