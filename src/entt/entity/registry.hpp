@@ -13,8 +13,8 @@
 #include "../core/family.hpp"
 #include "../signal/sigh.hpp"
 #include "sparse_set.hpp"
+#include "traits.hpp"
 #include "view.hpp"
-#include "entt.hpp"
 
 
 namespace entt {
@@ -48,7 +48,9 @@ class Registry {
     struct PoolHandler: SparseSet<Entity> {
         static_assert(sizeof...(Component) > 1, "!");
 
-        const std::tuple<Pool<Component> &...> pools;
+        PoolHandler(Pool<Component> &... pools)
+            : pools{pools...}
+        {}
 
         void candidate(Entity entity) {
             using accumulator_type = bool[];
@@ -58,8 +60,8 @@ class Registry {
             (void)accumulator;
         }
 
-        // TODO
-        // bind SparseSet<Entity>::destroy(entity); to signal destroy
+    private:
+        const std::tuple<Pool<Component> &...> pools;
     };
 
     template<typename Component>
@@ -316,7 +318,7 @@ public:
 
             using accumulator_type = int[];
             accumulator_type accumulator = {
-                (ensure<Component>().constructed.template connect<PoolHandler<Component>, &PoolHandler<Component>::candidate>(ptr), 0)...,
+                (ensure<Component>().constructed.template connect<PoolHandler<Component...>, &PoolHandler<Component...>::candidate>(ptr), 0)...,
                 (ensure<Component>().destroyed.template connect<SparseSet<Entity>, &SparseSet<Entity>::destroy>(ptr), 0)...
             };
 

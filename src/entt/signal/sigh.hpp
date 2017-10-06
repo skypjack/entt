@@ -86,7 +86,7 @@ public:
 
     template<typename Class, Ret(Class::*Member)(Args...)>
     void disconnect(Class *instance) {
-        auto target = std::make_pair(instance, &proto<Class, Member>);
+        auto target = std::make_pair(static_cast<void *>(instance), &proto<Class, Member>);
         calls.erase(std::remove(calls.begin(), calls.end(), std::move(target)), calls.end());
     }
 

@@ -53,6 +53,12 @@ public:
         return const_cast<Comp &>(const_cast<const PersistentView *>(this)->get<Comp>(entity));
     }
 
+    template<typename Comp>
+    void sort() {
+        const SparseSet<Entity> &pool = std::get<pool_type<Comp> &>(pools);
+        view.respect(pool);
+    }
+
 private:
     view_type &view;
     std::tuple<pool_type<Component> &...> pools;

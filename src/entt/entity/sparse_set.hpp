@@ -7,7 +7,7 @@
 #include <vector>
 #include <cstddef>
 #include <cassert>
-#include "entt.hpp"
+#include "traits.hpp"
 
 
 namespace entt {

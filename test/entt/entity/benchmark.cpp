@@ -199,6 +199,89 @@ TEST(DefaultRegistry, IterateTwoComponents10MOne) {
     registry.reset();
 }
 
+TEST(DefaultRegistry, IterateTwoComponentsPersistent10M) {
+    using registry_type = entt::DefaultRegistry;
+
+    registry_type registry;
+    registry.prepare<Position, Velocity>();
+
+    std::cout << "Iterating over 10000000 entities, two components, persistent view" << std::endl;
+
+    for (uint64_t i = 0; i < 10000000L; i++) {
+        registry.create<Position, Velocity>();
+    }
+
+    Timer timer;
+
+    auto view = registry.persistent<Position, Velocity>();
+
+    for(auto entity: view) {
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
+        (void)position;
+        (void)velocity;
+    }
+
+    timer.elapsed();
+    registry.reset();
+}
+
+TEST(DefaultRegistry, IterateTwoComponentsPersistent10MHalf) {
+    using registry_type = entt::DefaultRegistry;
+
+    registry_type registry;
+    registry.prepare<Position, Velocity>();
+
+    std::cout << "Iterating over 10000000 entities, two components, persistent view, half of the entities have all the components" << std::endl;
+
+    for (uint64_t i = 0; i < 10000000L; i++) {
+        auto entity = registry.create<Velocity>();
+        if(i % 2) { registry.assign<Position>(entity); }
+    }
+
+    Timer timer;
+
+    auto view = registry.persistent<Position, Velocity>();
+
+    for(auto entity: view) {
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
+        (void)position;
+        (void)velocity;
+    }
+
+    timer.elapsed();
+    registry.reset();
+}
+
+TEST(DefaultRegistry, IterateTwoComponentsPersistent10MOne) {
+    using registry_type = entt::DefaultRegistry;
+
+    registry_type registry;
+    registry.prepare<Position, Velocity>();
+
+    std::cout << "Iterating over 10000000 entities, two components, persistent view, only one entity has all the components" << std::endl;
+
+    for (uint64_t i = 0; i < 10000000L; i++) {
+        auto entity = registry.create<Velocity>();
+        if(i == 5000000L) { registry.assign<Position>(entity); }
+    }
+
+    Timer timer;
+
+    auto view = registry.persistent<Position, Velocity>();
+
+    for(auto entity: view) {
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
+        (void)position;
+        (void)velocity;
+    }
+
+    timer.elapsed();
+    registry.reset();
+}
+
 TEST(DefaultRegistry, IterateSingleComponent50M) {
     using registry_type = entt::DefaultRegistry;
 
@@ -237,6 +320,33 @@ TEST(DefaultRegistry, IterateTwoComponents50M) {
     Timer timer;
 
     auto view = registry.view<Position, Velocity>();
+
+    for(auto entity: view) {
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
+        (void)position;
+        (void)velocity;
+    }
+
+    timer.elapsed();
+    registry.reset();
+}
+
+TEST(DefaultRegistry, IterateTwoComponentsPersistent50M) {
+    using registry_type = entt::DefaultRegistry;
+
+    registry_type registry;
+    registry.prepare<Position, Velocity>();
+
+    std::cout << "Iterating over 50000000 entities, two components, persistent view" << std::endl;
+
+    for (uint64_t i = 0; i < 50000000L; i++) {
+        registry.create<Position, Velocity>();
+    }
+
+    Timer timer;
+
+    auto view = registry.persistent<Position, Velocity>();
 
     for(auto entity: view) {
         auto &position = view.get<Position>(entity);
@@ -381,6 +491,170 @@ TEST(DefaultRegistry, IterateTenComponents10MOne) {
     Timer timer;
 
     auto view = registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+
+    for(auto entity: view) {
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
+        auto &comp1 = view.get<Comp<1>>(entity);
+        auto &comp2 = view.get<Comp<2>>(entity);
+        auto &comp3 = view.get<Comp<3>>(entity);
+        auto &comp4 = view.get<Comp<4>>(entity);
+        auto &comp5 = view.get<Comp<5>>(entity);
+        auto &comp6 = view.get<Comp<6>>(entity);
+        auto &comp7 = view.get<Comp<7>>(entity);
+        auto &comp8 = view.get<Comp<8>>(entity);
+        (void)position;
+        (void)velocity;
+        (void)comp1;
+        (void)comp2;
+        (void)comp3;
+        (void)comp4;
+        (void)comp5;
+        (void)comp6;
+        (void)comp7;
+        (void)comp8;
+    }
+
+    timer.elapsed();
+    registry.reset();
+}
+
+TEST(DefaultRegistry, IterateFiveComponentsPersistent10M) {
+    using registry_type = entt::DefaultRegistry;
+
+    registry_type registry;
+    registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
+
+    std::cout << "Iterating over 10000000 entities, five components, persistent view" << std::endl;
+
+    for (uint64_t i = 0; i < 10000000L; i++) {
+        registry.create<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
+    }
+
+    Timer timer;
+
+    auto view = registry.persistent<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
+
+    for(auto entity: view) {
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
+        auto &comp1 = view.get<Comp<1>>(entity);
+        auto &comp2 = view.get<Comp<2>>(entity);
+        auto &comp3 = view.get<Comp<3>>(entity);
+        (void)position;
+        (void)velocity;
+        (void)comp1;
+        (void)comp2;
+        (void)comp3;
+    }
+
+    timer.elapsed();
+    registry.reset();
+}
+
+TEST(DefaultRegistry, IterateTenComponentsPersistent10M) {
+    using registry_type = entt::DefaultRegistry;
+
+    registry_type registry;
+    registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+
+    std::cout << "Iterating over 10000000 entities, ten components, persistent view" << std::endl;
+
+    for (uint64_t i = 0; i < 10000000L; i++) {
+        registry.create<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+    }
+
+    Timer timer;
+
+    auto view = registry.persistent<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+
+    for(auto entity: view) {
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
+        auto &comp1 = view.get<Comp<1>>(entity);
+        auto &comp2 = view.get<Comp<2>>(entity);
+        auto &comp3 = view.get<Comp<3>>(entity);
+        auto &comp4 = view.get<Comp<4>>(entity);
+        auto &comp5 = view.get<Comp<5>>(entity);
+        auto &comp6 = view.get<Comp<6>>(entity);
+        auto &comp7 = view.get<Comp<7>>(entity);
+        auto &comp8 = view.get<Comp<8>>(entity);
+        (void)position;
+        (void)velocity;
+        (void)comp1;
+        (void)comp2;
+        (void)comp3;
+        (void)comp4;
+        (void)comp5;
+        (void)comp6;
+        (void)comp7;
+        (void)comp8;
+    }
+
+    timer.elapsed();
+    registry.reset();
+}
+
+TEST(DefaultRegistry, IterateTenComponentsPersistent10MHalf) {
+    using registry_type = entt::DefaultRegistry;
+
+    registry_type registry;
+    registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+
+    std::cout << "Iterating over 10000000 entities, ten components, persistent view, half of the entities have all the components" << std::endl;
+
+    for (uint64_t i = 0; i < 10000000L; i++) {
+        auto entity = registry.create<Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+        if(i % 2) { registry.assign<Position>(entity); }
+    }
+
+    Timer timer;
+
+    auto view = registry.persistent<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+
+    for(auto entity: view) {
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
+        auto &comp1 = view.get<Comp<1>>(entity);
+        auto &comp2 = view.get<Comp<2>>(entity);
+        auto &comp3 = view.get<Comp<3>>(entity);
+        auto &comp4 = view.get<Comp<4>>(entity);
+        auto &comp5 = view.get<Comp<5>>(entity);
+        auto &comp6 = view.get<Comp<6>>(entity);
+        auto &comp7 = view.get<Comp<7>>(entity);
+        auto &comp8 = view.get<Comp<8>>(entity);
+        (void)position;
+        (void)velocity;
+        (void)comp1;
+        (void)comp2;
+        (void)comp3;
+        (void)comp4;
+        (void)comp5;
+        (void)comp6;
+        (void)comp7;
+        (void)comp8;
+    }
+
+    timer.elapsed();
+    registry.reset();
+}
+
+TEST(DefaultRegistry, IterateTenComponentsPersistent10MOne) {
+    using registry_type = entt::DefaultRegistry;
+
+    registry_type registry;
+    registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+
+    std::cout << "Iterating over 10000000 entities, ten components, persistent view, only one entity has all the components" << std::endl;
+
+    for (uint64_t i = 0; i < 10000000L; i++) {
+        auto entity = registry.create<Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+        if(i == 5000000L) { registry.assign<Position>(entity); }
+    }
+
+    Timer timer;
+
+    auto view = registry.persistent<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
     for(auto entity: view) {
         auto &position = view.get<Position>(entity);
