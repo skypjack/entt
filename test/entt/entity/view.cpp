@@ -25,7 +25,7 @@ TEST(View, SingleComponent) {
 
     for(auto entity: view) {
         const auto &cview = static_cast<const decltype(view) &>(view);
-        ASSERT_TRUE(cview.get(entity) == '1' or cview.get(entity) == '2');
+        ASSERT_TRUE(cview.get(entity) == '1' || cview.get(entity) == '2');
     }
 
     ASSERT_EQ(*(view.data() + 0), e2);
