@@ -126,11 +126,6 @@ public:
         return entities.size() - available.size();
     }
 
-    template<typename Component>
-    size_type capacity() const noexcept {
-        return managed<Component>() ? pool<Component>().capacity() : size_type{};
-    }
-
     size_type capacity() const noexcept {
         return entities.capacity();
     }

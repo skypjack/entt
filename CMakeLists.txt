@@ -33,7 +33,7 @@ message("* Copyright (c) 2017 ${PROJECT_AUTHOR} <${PROJECT_AUTHOR_EMAIL}>")
 message("*")
 
 #
-# Compile stuff
+# Compiler stuff
 #
 
 set(CMAKE_CXX_STANDARD 14)
@@ -65,14 +65,10 @@ set(PROJECT_SRC_DIR ${entt_SOURCE_DIR}/src)
 set(PROJECT_RUNTIME_OUTPUT_DIRECTORY bin)
 
 #
-# Enable test support using ctest-like interface
+# Tests
 #
 
 option(BUILD_TESTING "Enable testing with ctest." ON)
-
-#
-# build testing stuff if required
-#
 
 if(BUILD_TESTING)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -88,4 +84,14 @@ if(BUILD_TESTING)
 
     enable_testing()
     add_subdirectory(test)
+endif()
+
+#
+# Documentation
+#
+
+find_package(Doxygen 1.8)
+
+if(DOXYGEN_FOUND)
+    add_subdirectory(docs)
 endif()

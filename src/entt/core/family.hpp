@@ -10,6 +10,13 @@
 namespace entt {
 
 
+/**
+ * @brief Dynamic identifier generator.
+ *
+ * Utility class template that can be used to assign unique identifiers to types
+ * at runtime. Use different specializations to create separate sets of
+ * identifiers.
+ */
 template<typename...>
 class Family {
     static std::size_t identifier() noexcept {
@@ -18,6 +25,10 @@ class Family {
     }
 
 public:
+    /**
+     * @brief Returns an unique identifier for the given type.
+     * @return Statically generated unique identifier for the given type.
+     */
     template<typename...>
     static std::size_t type() noexcept {
         static const std::size_t value = identifier();

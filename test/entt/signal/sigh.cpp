@@ -91,7 +91,7 @@ TEST(SigH, Comparison) {
     sig2.connect<S, &S::g>(&s1);
     sig2.connect<S, &S::f>(&s1);
 
-    ASSERT_FALSE(sig1 == sig2);
+    ASSERT_TRUE(sig1 == sig2);
 }
 
 struct S {
