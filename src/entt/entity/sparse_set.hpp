@@ -47,12 +47,12 @@ class SparseSet;
  * order when iterate directly the internal packed array (see `data` and `size`
  * member functions for that). Use `begin` and `end` instead.
  *
- * \sa Registry
- * \sa View
- * \sa View<Entity, Component>
- * \sa PersistentView
+ * @sa Registry
+ * @sa View
+ * @sa View<Entity, Component>
+ * @sa PersistentView
  *
- * \tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
 class SparseSet<Entity> {
@@ -166,7 +166,7 @@ public:
      * @brief Returns an iterator to the beginning.
      *
      * The returned iterator points to the first element of the internal packed
-     * array. If the sparse set it empty, the returned iterator will be equal to
+     * array. If the sparse set is empty, the returned iterator will be equal to
      * `end()`.
      *
      * @note Input iterators stay true to the order imposed by a call to `sort`.
@@ -397,10 +397,10 @@ private:
  * order when iterate directly the internal packed array (see `raw` and `size`
  * member functions for that). Use `begin` and `end` instead.
  *
- * \sa SparseSet<Entity>
+ * @sa SparseSet<Entity>
  *
- * \tparam Entity A valid entity type (see entt_traits for more details).
- * \tparam Type The type of the objects assigned to the entities.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Type The type of the objects assigned to the entities.
  */
 template<typename Entity, typename Type>
 class SparseSet<Entity, Type>: public SparseSet<Entity> {
