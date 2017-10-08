@@ -31,9 +31,7 @@ private:
 };
 
 TEST(DefaultRegistry, Construct) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
 
     std::cout << "Constructing 10000000 entities" << std::endl;
 
@@ -48,10 +46,8 @@ TEST(DefaultRegistry, Construct) {
 }
 
 TEST(DefaultRegistry, Destroy) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
-    std::vector<registry_type::entity_type> entities{};
+    entt::DefaultRegistry registry;
+    std::vector<entt::DefaultRegistry::entity_type> entities{};
 
     std::cout << "Destroying 10000000 entities" << std::endl;
 
@@ -69,9 +65,7 @@ TEST(DefaultRegistry, Destroy) {
 }
 
 TEST(DefaultRegistry, IterateCreateDeleteSingleComponent) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
 
     std::cout << "Looping 10000 times creating and deleting a random number of entities" << std::endl;
 
@@ -96,9 +90,7 @@ TEST(DefaultRegistry, IterateCreateDeleteSingleComponent) {
 }
 
 TEST(DefaultRegistry, IterateSingleComponent10M) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, one component" << std::endl;
 
@@ -120,9 +112,7 @@ TEST(DefaultRegistry, IterateSingleComponent10M) {
 }
 
 TEST(DefaultRegistry, IterateTwoComponents10M) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, two components" << std::endl;
 
@@ -146,9 +136,7 @@ TEST(DefaultRegistry, IterateTwoComponents10M) {
 }
 
 TEST(DefaultRegistry, IterateTwoComponents10MHalf) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, two components, half of the entities have all the components" << std::endl;
 
@@ -173,9 +161,7 @@ TEST(DefaultRegistry, IterateTwoComponents10MHalf) {
 }
 
 TEST(DefaultRegistry, IterateTwoComponents10MOne) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, two components, only one entity has all the components" << std::endl;
 
@@ -200,9 +186,7 @@ TEST(DefaultRegistry, IterateTwoComponents10MOne) {
 }
 
 TEST(DefaultRegistry, IterateTwoComponentsPersistent10M) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity>();
 
     std::cout << "Iterating over 10000000 entities, two components, persistent view" << std::endl;
@@ -227,9 +211,7 @@ TEST(DefaultRegistry, IterateTwoComponentsPersistent10M) {
 }
 
 TEST(DefaultRegistry, IterateTwoComponentsPersistent10MHalf) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity>();
 
     std::cout << "Iterating over 10000000 entities, two components, persistent view, half of the entities have all the components" << std::endl;
@@ -255,9 +237,7 @@ TEST(DefaultRegistry, IterateTwoComponentsPersistent10MHalf) {
 }
 
 TEST(DefaultRegistry, IterateTwoComponentsPersistent10MOne) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity>();
 
     std::cout << "Iterating over 10000000 entities, two components, persistent view, only one entity has all the components" << std::endl;
@@ -283,9 +263,7 @@ TEST(DefaultRegistry, IterateTwoComponentsPersistent10MOne) {
 }
 
 TEST(DefaultRegistry, IterateSingleComponent50M) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 50000000 entities, one component" << std::endl;
 
@@ -307,9 +285,7 @@ TEST(DefaultRegistry, IterateSingleComponent50M) {
 }
 
 TEST(DefaultRegistry, IterateTwoComponents50M) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 50000000 entities, two components" << std::endl;
 
@@ -333,9 +309,7 @@ TEST(DefaultRegistry, IterateTwoComponents50M) {
 }
 
 TEST(DefaultRegistry, IterateTwoComponentsPersistent50M) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity>();
 
     std::cout << "Iterating over 50000000 entities, two components, persistent view" << std::endl;
@@ -360,9 +334,7 @@ TEST(DefaultRegistry, IterateTwoComponentsPersistent50M) {
 }
 
 TEST(DefaultRegistry, IterateFiveComponents10M) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, five components" << std::endl;
 
@@ -392,9 +364,7 @@ TEST(DefaultRegistry, IterateFiveComponents10M) {
 }
 
 TEST(DefaultRegistry, IterateTenComponents10M) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, ten components" << std::endl;
 
@@ -434,9 +404,7 @@ TEST(DefaultRegistry, IterateTenComponents10M) {
 }
 
 TEST(DefaultRegistry, IterateTenComponents10MHalf) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, ten components, half of the entities have all the components" << std::endl;
 
@@ -477,9 +445,7 @@ TEST(DefaultRegistry, IterateTenComponents10MHalf) {
 }
 
 TEST(DefaultRegistry, IterateTenComponents10MOne) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, ten components, only one entity has all the components" << std::endl;
 
@@ -520,9 +486,7 @@ TEST(DefaultRegistry, IterateTenComponents10MOne) {
 }
 
 TEST(DefaultRegistry, IterateFiveComponentsPersistent10M) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
 
     std::cout << "Iterating over 10000000 entities, five components, persistent view" << std::endl;
@@ -553,9 +517,7 @@ TEST(DefaultRegistry, IterateFiveComponentsPersistent10M) {
 }
 
 TEST(DefaultRegistry, IterateTenComponentsPersistent10M) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
     std::cout << "Iterating over 10000000 entities, ten components, persistent view" << std::endl;
@@ -596,9 +558,7 @@ TEST(DefaultRegistry, IterateTenComponentsPersistent10M) {
 }
 
 TEST(DefaultRegistry, IterateTenComponentsPersistent10MHalf) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
     std::cout << "Iterating over 10000000 entities, ten components, persistent view, half of the entities have all the components" << std::endl;
@@ -640,9 +600,7 @@ TEST(DefaultRegistry, IterateTenComponentsPersistent10MHalf) {
 }
 
 TEST(DefaultRegistry, IterateTenComponentsPersistent10MOne) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
+    entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
     std::cout << "Iterating over 10000000 entities, ten components, persistent view, only one entity has all the components" << std::endl;
@@ -684,10 +642,8 @@ TEST(DefaultRegistry, IterateTenComponentsPersistent10MOne) {
 }
 
 TEST(DefaultRegistry, SortSingle) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
-    std::vector<registry_type::entity_type> entities{};
+    entt::DefaultRegistry registry;
+    std::vector<entt::DefaultRegistry::entity_type> entities{};
 
     std::cout << "Sort 150000 entities, one component" << std::endl;
 
@@ -707,10 +663,8 @@ TEST(DefaultRegistry, SortSingle) {
 }
 
 TEST(DefaultRegistry, SortMulti) {
-    using registry_type = entt::DefaultRegistry;
-
-    registry_type registry;
-    std::vector<registry_type::entity_type> entities{};
+    entt::DefaultRegistry registry;
+    std::vector<entt::DefaultRegistry::entity_type> entities{};
 
     std::cout << "Sort 150000 entities, two components" << std::endl;
 

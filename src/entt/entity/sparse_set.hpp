@@ -91,11 +91,6 @@ class SparseSet<Entity> {
         std::size_t pos;
     };
 
-    inline bool valid(Entity entity) const noexcept {
-        const auto entt = entity & traits_type::entity_mask;
-        return entt < reverse.size() && reverse[entt] < direct.size() && direct[reverse[entt]] == entity;
-    }
-
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -199,7 +194,8 @@ public:
      * @return True if the sparse set contains the entity, false otherwise.
      */
     bool has(entity_type entity) const noexcept {
-        return valid(entity);
+        const auto entt = entity & traits_type::entity_mask;
+        return entt < reverse.size() && reverse[entt] < direct.size() && direct[reverse[entt]] == entity;
     }
 
     /**
@@ -215,7 +211,7 @@ public:
      * @return The position of the entity in the sparse set.
      */
     pos_type get(entity_type entity) const noexcept {
-        assert(valid(entity));
+        assert(has(entity));
         return reverse[entity & traits_type::entity_mask];
     }
 
@@ -232,7 +228,7 @@ public:
      * @return The position of the entity in the internal packed array.
      */
     pos_type construct(entity_type entity) {
-        assert(!valid(entity));
+        assert(!has(entity));
         const auto entt = entity & traits_type::entity_mask;
 
         if(!(entt < reverse.size())) {
@@ -258,7 +254,7 @@ public:
      * @param entity A valid entity identifier.
      */
     virtual void destroy(entity_type entity) {
-        assert(valid(entity));
+        assert(has(entity));
         const auto entt = entity & traits_type::entity_mask;
         const auto back = direct.back() & traits_type::entity_mask;
         const auto pos = reverse[entt];
@@ -282,8 +278,8 @@ public:
      * @param rhs A valid entity identifier.
      */
     virtual void swap(entity_type lhs, entity_type rhs) {
-        assert(valid(lhs));
-        assert(valid(rhs));
+        assert(has(lhs));
+        assert(has(rhs));
         const auto le = lhs & traits_type::entity_mask;
         const auto re = rhs & traits_type::entity_mask;
         std::swap(direct[reverse[le]], direct[reverse[re]]);
