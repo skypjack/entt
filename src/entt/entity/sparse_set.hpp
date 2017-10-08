@@ -47,11 +47,6 @@ class SparseSet;
  * order when iterate directly the internal packed array (see `data` and `size`
  * member functions for that). Use `begin` and `end` instead.
  *
- * @sa Registry
- * @sa View
- * @sa View<Entity, Component>
- * @sa PersistentView
- *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>

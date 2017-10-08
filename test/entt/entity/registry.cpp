@@ -8,6 +8,7 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{0});
     ASSERT_TRUE(registry.empty());
 
+    ASSERT_EQ(registry.capacity(), entt::DefaultRegistry::size_type{0});
     ASSERT_EQ(registry.size<int>(), entt::DefaultRegistry::size_type{0});
     ASSERT_EQ(registry.size<char>(), entt::DefaultRegistry::size_type{0});
     ASSERT_TRUE(registry.empty<int>());
@@ -16,6 +17,7 @@ TEST(DefaultRegistry, Functionalities) {
     auto e1 = registry.create();
     auto e2 = registry.create<int, char>();
 
+    ASSERT_EQ(registry.capacity(), entt::DefaultRegistry::size_type{2});
     ASSERT_EQ(registry.size<int>(), entt::DefaultRegistry::size_type{1});
     ASSERT_EQ(registry.size<char>(), entt::DefaultRegistry::size_type{1});
     ASSERT_FALSE(registry.empty<int>());
@@ -69,7 +71,9 @@ TEST(DefaultRegistry, Functionalities) {
 
     ASSERT_EQ(registry.version(e3), entt::DefaultRegistry::version_type{0});
     ASSERT_EQ(registry.current(e3), entt::DefaultRegistry::version_type{0});
+    ASSERT_EQ(registry.capacity(), entt::DefaultRegistry::size_type{3});
     ASSERT_NO_THROW(registry.destroy(e3));
+    ASSERT_EQ(registry.capacity(), entt::DefaultRegistry::size_type{3});
     ASSERT_EQ(registry.version(e3), entt::DefaultRegistry::version_type{0});
     ASSERT_EQ(registry.current(e3), entt::DefaultRegistry::version_type{1});
 

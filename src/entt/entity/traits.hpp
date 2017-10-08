@@ -27,9 +27,9 @@ struct entt_traits;
  */
 template<>
 struct entt_traits<std::uint16_t> {
-    /*! @brief Underlying entity type. @see Registry. */
+    /*! @brief Underlying entity type. */
     using entity_type = std::uint16_t;
-    /*! @brief Underlying version type. @see Registry. */
+    /*! @brief Underlying version type. */
     using version_type = std::uint8_t;
 
     /*! @brief Mask to use to get the entity number out of an identifier. */
@@ -50,9 +50,9 @@ struct entt_traits<std::uint16_t> {
  */
 template<>
 struct entt_traits<std::uint32_t> {
-    /*! @brief Underlying entity type. @see Registry. */
+    /*! @brief Underlying entity type. */
     using entity_type = std::uint32_t;
-    /*! @brief Underlying version type. @see Registry. */
+    /*! @brief Underlying version type. */
     using version_type = std::uint16_t;
 
     /*! @brief Mask to use to get the entity number out of an identifier. */
@@ -73,9 +73,9 @@ struct entt_traits<std::uint32_t> {
  */
 template<>
 struct entt_traits<std::uint64_t> {
-    /*! @brief Underlying entity type. @see Registry. */
+    /*! @brief Underlying entity type. */
     using entity_type = std::uint64_t;
-    /*! @brief Underlying version type. @see Registry. */
+    /*! @brief Underlying version type. */
     using version_type = std::uint32_t;
 
     /*! @brief Mask to use to get the entity number out of an identifier. */

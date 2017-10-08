@@ -29,12 +29,8 @@ namespace entt {
  * it. In any other case, attempting to use a view results in undefined
  * behavior.
  *
- * @sa Registry
  * @sa View
  * @sa View<Entity, Component>
- * @sa SparseSet
- * @sa SparseSet<Entity>
- * @sa SparseSet<Entity, Type>
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Component The types of the components iterated by the view.
@@ -219,12 +215,8 @@ private:
  * it. In any other case, attempting to use a view results in undefined
  * behavior.
  *
- * @sa Registry
  * @sa View<Entity, Component>
  * @sa PersistentView
- * @sa SparseSet
- * @sa SparseSet<Entity>
- * @sa SparseSet<Entity, Type>
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam First One of the components to iterate.
@@ -428,12 +420,8 @@ private:
  * it. In any other case, attempting to use a view results in undefined
  * behavior.
  *
- * @sa Registry
  * @sa View
  * @sa PersistentView
- * @sa SparseSet
- * @sa SparseSet<Entity>
- * @sa SparseSet<Entity, Type>
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Component The type of the component iterated by the view.
