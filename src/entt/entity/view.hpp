@@ -55,8 +55,7 @@ public:
 
     template<typename Comp>
     void sort() {
-        const SparseSet<Entity> &pool = std::get<pool_type<Comp> &>(pools);
-        view.respect(pool);
+        view.respect(std::get<pool_type<Comp> &>(pools));
     }
 
 private:
@@ -68,18 +67,18 @@ private:
 template<typename Entity, typename First, typename... Other>
 class View final {
     template<typename Component>
-    using pool_type = SparseSet<Entity, Component> &;
+    using pool_type = SparseSet<Entity, Component>;
 
     using base_pool_type = SparseSet<Entity>;
     using underlying_iterator_type = typename base_pool_type::iterator_type;
-    using repo_type = std::tuple<pool_type<First>, pool_type<Other>...>;
+    using repo_type = std::tuple<pool_type<First> &, pool_type<Other> &...>;
 
     class Iterator {
         inline bool valid() const noexcept {
             using accumulator_type = bool[];
             auto entity = *begin;
-            bool all = std::get<pool_type<First>>(pools).has(entity);
-            accumulator_type accumulator =  { (all = all && std::get<pool_type<Other>>(pools).has(entity))... };
+            bool all = std::get<pool_type<First> &>(pools).has(entity);
+            accumulator_type accumulator =  { (all = all && std::get<pool_type<Other> &>(pools).has(entity))... };
             (void)accumulator;
             return all;
         }
@@ -129,7 +128,7 @@ public:
     using entity_type = typename base_pool_type::entity_type;
     using size_type = typename base_pool_type::size_type;
 
-    explicit View(pool_type<First> pool, pool_type<Other>... other) noexcept
+    explicit View(pool_type<First> &pool, pool_type<Other>&... other) noexcept
         : pools{pool, other...}, view{nullptr}
     {
         reset();
@@ -145,7 +144,7 @@ public:
 
     template<typename Component>
     const Component & get(entity_type entity) const noexcept {
-        return std::get<pool_type<Component>>(pools).get(entity);
+        return std::get<pool_type<Component> &>(pools).get(entity);
     }
 
     template<typename Component>
@@ -155,8 +154,8 @@ public:
 
     void reset() {
         using accumulator_type = void *[];
-        view = &std::get<pool_type<First>>(pools);
-        accumulator_type accumulator = { (std::get<pool_type<Other>>(pools).size() < view->size() ? (view = &std::get<pool_type<Other>>(pools)) : nullptr)... };
+        view = &std::get<pool_type<First> &>(pools);
+        accumulator_type accumulator = { (std::get<pool_type<Other> &>(pools).size() < view->size() ? (view = &std::get<pool_type<Other> &>(pools)) : nullptr)... };
         (void)accumulator;
     }
 

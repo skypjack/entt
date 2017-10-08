@@ -336,13 +336,11 @@ public:
      * `data` gives no guarantees on the order, even though `sort` has been
      * invoked.
      *
-     * @tparam EnTT TODO.
-     * @param other TODO.
+     * @param other The sparse sets that imposes the order of the entities.
      */
-    template<typename EnTT>
-    void respect(const SparseSet<EnTT> &other) {
+    void respect(const SparseSet<Entity> &other) {
         struct Bool { bool value{false}; };
-        std::vector<Bool> check(reverse.size());
+        std::vector<Bool> check(std::max(other.reverse.size(), reverse.size()));
 
         for(auto entity: other.direct) {
             check[entity & traits_type::entity_mask].value = true;

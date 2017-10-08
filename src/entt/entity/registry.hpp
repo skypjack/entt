@@ -252,8 +252,7 @@ public:
 
     template<typename To, typename From>
     void sort() {
-        const SparseSet<Entity> &from = ensure<From>();
-        ensure<To>().respect(from);
+        ensure<To>().respect(ensure<From>());
     }
 
     template<typename Component>
