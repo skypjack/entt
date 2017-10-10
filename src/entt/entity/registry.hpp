@@ -21,9 +21,12 @@ namespace entt {
 
 
 /**
- * @brief TODO
+ * @brief A repository class for entities and components.
  *
- * TODO
+ * The registry is the core class of the entity-component framework.<br/>
+ * It stores entities and arranges pools of components on a per request basis.
+ * By means of a registry, users can manage entities and components and thus
+ * create views to iterate them.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
@@ -744,9 +747,10 @@ private:
 
 
 /**
- * @brief TODO
+ * @brief Default registry class.
  *
- * TODO
+ * The default registry is the best choice for almost all the applications.<br/>
+ * Users should have a really good reason to choose something different.
  */
 using DefaultRegistry = Registry<std::uint32_t>;
 
