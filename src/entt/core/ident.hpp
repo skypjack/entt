@@ -41,8 +41,9 @@ struct Identifier final: Wrapper<Types>... {
  * types. Use the `constexpr` `get` member function to know what's the
  * identifier associated to the specific type.
  *
- * @note Identifiers are constant expression and can be used in any context
- * where such an expression is required. As an example:
+ * @note
+ * Identifiers are constant expression and can be used in any context where such
+ * an expression is required. As an example:
  * @code{.cpp}
  * constexpr auto identifiers = entt::ident<AType, AnotherType>;
  *

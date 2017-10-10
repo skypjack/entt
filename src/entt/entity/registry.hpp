@@ -204,12 +204,12 @@ public:
      * know if they are still valid or the entity has been destroyed and
      * potentially recycled.
      *
+     * @warning
      * Attempting to use an entity that doesn't belong to the registry results
      * in undefined behavior. An entity belongs to the registry even if it has
-     * been previously destroyed and/or recycled.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the registry doesn't own the given entity.
+     * been previously destroyed and/or recycled.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * registry doesn't own the given entity.
      *
      * @param entity A valid entity identifier.
      * @return The actual version for the given entity identifier.
@@ -281,10 +281,10 @@ public:
      * the `current` member function can be used to know if they are still valid
      * or the entity has been destroyed and potentially recycled.
      *
-     * Attempting to use an invalid entity results in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode in
-     * case of invalid entity.
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
      *
      * @param entity A valid entity identifier
      */
@@ -310,13 +310,12 @@ public:
      * arguments provided (the component must have a proper constructor or be of
      * aggregate type). Then the component is assigned to the given entity.
      *
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * Attempting to assign a component to an entity that already owns it
-     * results in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode in
-     * case of invalid entity or if the entity already owns an instance of the
-     * given component.
+     * @warning
+     * Attempting to use an invalid entity or to assign a component to an entity
+     * that already owns it results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity already owns an instance of the given
+     * component.
      *
      * @tparam Component The type of the component to create.
      * @tparam Args The types of the arguments used to construct the component.
@@ -333,13 +332,12 @@ public:
     /**
      * @brief Removes the given component from the given entity.
      *
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * Attempting to remove a component from an entity that doesn't own it
-     * results in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode in
-     * case of invalid entity or if the entity doesn't own an instance of the
-     * given component.
+     * @warning
+     * Attempting to use an invalid entity or to remove a component from an
+     * entity that doesn't own it results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity doesn't own an instance of the given
+     * component.
      *
      * @tparam Component The type of the component to remove.
      * @param entity A valid entity identifier.
@@ -353,10 +351,10 @@ public:
     /**
      * @brief Checks if the given entity has all the given components.
      *
-     * Attempting to use an invalid entity results in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode in
-     * case of invalid entity.
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
      *
      * @tparam Component The components for which to perform the check.
      * @param entity A valid entity identifier.
@@ -376,13 +374,12 @@ public:
     /**
      * @brief Gets a reference to the given component owned by the given entity.
      *
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * Attempting to get a component from an entity that doesn't own it
-     * results in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode in
-     * case of invalid entity or if the entity doesn't own an instance of the
-     * given component.
+     * @warning
+     * Attempting to use an invalid entity or to get a component from an entity
+     * that doesn't own it results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity doesn't own an instance of the given
+     * component.
      *
      * @tparam Component The type of the component to get.
      * @param entity A valid entity identifier.
@@ -397,13 +394,12 @@ public:
     /**
      * @brief Gets a reference to the given component owned by the given entity.
      *
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * Attempting to get a component from an entity that doesn't own it
-     * results in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode in
-     * case of invalid entity or if the entity doesn't own an instance of the
-     * given component.
+     * @warning
+     * Attempting to use an invalid entity or to get a component from an entity
+     * that doesn't own it results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity doesn't own an instance of the given
+     * component.
      *
      * @tparam Component The type of the component to get.
      * @param entity A valid entity identifier.
@@ -421,13 +417,12 @@ public:
      * arguments provided (the component must have a proper constructor or be of
      * aggregate type). Then the component is assigned to the given entity.
      *
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * Attempting to replace a component of an entity that doesn't own it
-     * results in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode in
-     * case of invalid entity or if the entity doesn't own an instance of the
-     * given component.
+     * @warning
+     * Attempting to use an invalid entity or to replace a component of an
+     * entity that doesn't own it results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity doesn't own an instance of the given
+     * component.
      *
      * @tparam Component The type of the component to replace.
      * @tparam Args The types of the arguments used to construct the component.
@@ -445,6 +440,7 @@ public:
      * @brief Assigns or replaces the given component to the given entity.
      *
      * Equivalent to the following snippet (pseudocode):
+     *
      * @code{.cpp}
      * if(registry.has<Component>(entity)) {
      *     registry.replace<Component>(entity, args...);
@@ -453,7 +449,13 @@ public:
      * }
      * @endcode
      *
-     * Prefer this function anyway because it has slighlty better performance.
+     * Prefer this function anyway because it has slighlty better
+     * performance.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
      *
      * @tparam Component The type of the component to assign or replace.
      * @tparam Args The types of the arguments used to construct the component.
@@ -472,13 +474,29 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Sorts the pool of the given component.
      *
-     * TODO
+     * The order of the elements in a pool is highly affected by assignements
+     * of components to entities and deletions. Components are arranged to
+     * maximize the performance during iterations and users should not make any
+     * assumption on the order.<br/>
+     * This function can be used to impose an order to the elements in the pool
+     * for the given component. The order is kept valid until a component of the
+     * given type is assigned or removed from an entity.
      *
-     * @tparam Component TODO
-     * @tparam Compare TODO
-     * @param compare TODO
+     * The comparison function object must return `true` if the first element
+     * is _less_ than the second one, `false` otherwise. The signature of the
+     * comparison function should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * bool(auto e1, auto e2)
+     * @endcode
+     *
+     * Where `e1` and `e2` are valid entity identifiers.
+     *
+     * @tparam Component The type of the components to sort.
+     * @tparam Compare The type of the comparison function object.
+     * @param compare A valid comparison function object.
      */
     template<typename Component, typename Compare>
     void sort(Compare compare) {
@@ -490,12 +508,34 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Sorts two pools of components in the same way.
      *
-     * TODO
+     * The order of the elements in a pool is highly affected by assignements
+     * of components to entities and deletions. Components are arranged to
+     * maximize the performance during iterations and users should not make any
+     * assumption on the order.
      *
-     * @tparam To TODO
-     * @tparam From TODO
+     * It happens that different pools of components must be sorted the same way
+     * because of runtime and/or performance constraints. This function can be
+     * used to order a pool of components according to the order between the
+     * entities in another pool of components.
+     *
+     * @b How @b it @b works
+     *
+     * Being `A` and `B` the two sets where `B` is the master (the one the order
+     * of which rules) and `A` is the slave (the one to sort), after a call to
+     * this function an iterator for `A` will return the entities according to
+     * the following rules:
+     *
+     * * All the entities in `A` that are also in `B` are returned first
+     * according to the order they have in `B`.
+     * * All the entities in `A` that are not in `B` are returned in no
+     * particular order after all the other entities.
+     *
+     * Any subsequent change to `B` won't affect the order in `A`.
+     *
+     * @tparam To The type of the components to sort.
+     * @tparam From The type of the components to use to sort.
      */
     template<typename To, typename From>
     void sort() {
@@ -503,12 +543,18 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Resets the given component for the given entity.
      *
-     * TODO
+     * If the entity has an instance of the component, this function removes the
+     * component from the entity. Otherwise it does nothing.
      *
-     * @tparam Component TODO
-     * @param entity TODO
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @tparam Component The component to reset.
+     * @param entity A valid entity identifier.
      */
     template<typename Component>
     void reset(entity_type entity) {
@@ -524,11 +570,12 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Resets the pool of the given component.
      *
-     * TODO
+     * For each entity that has an instance of the given component, the
+     * component itself is removed and thus destroyed.
      *
-     * @tparam Component TODO
+     * @tparam Component The component whose pool must be reset.
      */
     template<typename Component>
     void reset() {
@@ -544,9 +591,12 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Resets the whole registry.
      *
-     * TODO
+     * Destroys all the entities. After a call to `reset`, all the entities
+     * previously created are recycled with a new version number. In case entity
+     * identifers are stored around, the `current` member function can be used
+     * to know if they are still valid.
      */
     void reset() {
         available.clear();
@@ -560,12 +610,35 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Returns a standard view for the given components.
      *
-     * TODO
+     * This kind of views are created on the fly and share with the registry its
+     * internal data structures.<br/>
+     * Feel free to discard a view after the use. Creating and destroying a view
+     * is an incredibly cheap operation because they do not require any type of
+     * initialization.<br/>
+     * As a rule of thumb, storing a view should never be an option.
      *
-     * @tparam Component TODO
-     * @return TODO
+     * Standard views do their best to iterate the smallest set of candidate
+     * entites. In particular:
+     * * Single component views are incredibly fast and iterate a packed array
+     * of entities, all of which has the given component.
+     * * Multi component views look at the number of entities available for each
+     * component and pick up a reference to the smallest set of candidates to
+     * test for the given components.
+     *
+     * @note
+     * Multi component views are pretty fast. However their performance tend to
+     * degenerate when the number of components grows up and the most of the
+     * entities have all the given components.<br/>
+     * To get a performance boost, consider using a PersistentView instead.
+     *
+     * @see View
+     * @see View<Entity, Component>
+     * @see PersistentView
+     *
+     * @tparam Component The type of the components used to construct the view.
+     * @return A newly created standard view.
      */
     template<typename... Component>
     View<Entity, Component...> view() {
@@ -573,11 +646,20 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Prepares the internal data structures used by persistent views.
      *
-     * TODO
+     * Persistent views are an incredibly fast tool used to iterate a packed
+     * array of entities all of which have specific components.<br/>
+     * The initialization of a persistent view is also a pretty cheap operation,
+     * but for the first time they are created. That's mainly because of the
+     * internal data structures of the registry that are dedicated to this kind
+     * of views and that don't exist yet the very first time they are
+     * requested.<br/>
+     * To avoid costly operations, internal data structures for persistent views
+     * can be prepared with this function. Just use the same set of components
+     * that would have been used otherwise to contruct the view.
      *
-     * @tparam Component TODO
+     * @tparam Component The types of the components used to prepare the view.
      */
     template<typename... Component>
     void prepare() {
@@ -611,12 +693,40 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Returns a persistent view for the given components.
      *
-     * TODO
+     * This kind of views are created on the fly and share with the registry its
+     * internal data structures.<br/>
+     * Feel free to discard a view after the use. Creating and destroying a view
+     * is an incredibly cheap operation because they do not require any type of
+     * initialization.<br/>
+     * As a rule of thumb, storing a view should never be an option.
      *
-     * @tparam Component TODO
-     * @return TODO
+     * Persistent views are the right choice to iterate entites when the number
+     * of components grows up and the most of the entities have all the given
+     * components.<br/>
+     * However they have also drawbacks:
+     * * Each kind of persistent view requires a dedicated data structure that
+     * is allocated within the registry and it increases memory pressure.
+     * * Internal data structures used to construct persistent views must be
+     * kept updated and it affects slightly construction and destruction of
+     * entities and components.
+     *
+     * That being said, persistent views are an incredibly powerful tool if used
+     * with care and offer a boost of performance undoubtely.
+     *
+     * @note
+     * Consider to use the `prepare` member function to initialize the internal
+     * data structures used by persistent views when the registry is still
+     * empty. Initialization could be a costly operation otherwise and it will
+     * be performed the very first time each view is created.
+     *
+     * @see View
+     * @see View<Entity, Component>
+     * @see PersistentView
+     *
+     * @tparam Component The types of the components used to construct the view.
+     * @return A newly created persistent view.
      */
     template<typename... Component>
     PersistentView<Entity, Component...> persistent() {

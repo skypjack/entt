@@ -116,8 +116,9 @@ public:
     /**
      * @brief Connects a free function to the signal.
      *
-     * @note The signal doesn't perform checks on multiple connections for free
-     * function.
+     * @warning
+     * The signal doesn't perform checks on multiple connections for free
+     * functions.
      *
      * @tparam Function A valid free function pointer.
      */
@@ -134,8 +135,9 @@ public:
      * guarantee that the lifetime of the instance overcomes the one of the
      * signal.
      *
-     * @note The signal doesn't perform checks on multiple connections for the
-     * same member method of a given instance.
+     * @warning
+     * The signal doesn't perform checks on multiple connections for the same
+     * member method of a given instance.
      *
      * @tparam Class The type of the class to which the member function belongs.
      * @tparam Member The member function to connect to the signal.
@@ -219,7 +221,8 @@ public:
      * Two signals are identical if they have the same size and the same
      * listeners have been connected to them.
      *
-     * @note This function is pretty expensive, use it carefully.
+     * @note
+     * This function is pretty expensive, use it carefully.
      *
      * @param other Signal with which to compare.
      * @return True if the two signals are identical, false otherwise.
@@ -241,7 +244,8 @@ private:
  * Two signals are identical if they have the same size and the same
  * listeners have been connected to them. They are different otherwiser.
  *
- * @note This function is pretty expensive, use it carefully.
+ * @note
+ * This function is pretty expensive, use it carefully.
  *
  * @tparam Ret Return type of a function type.
  * @tparam Args Types of the arguments of a function type.

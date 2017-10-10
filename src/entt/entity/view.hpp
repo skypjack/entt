@@ -18,16 +18,29 @@ namespace entt {
  * In general, persistent views don't stay true to the order of any set of
  * components unless users explicitly sort them.
  *
- * @note Views share references to the underlying data structures with the
- * Registry that generated them. Therefore any change to the entities and to the
- * components made by means of the registry are immediately reflected by views.
+ * @b Important
+ *
+ * Iterators aren't invalidated if:
+ *
+ * * New instances of the given components are created and assigned to entities.
+ * * The entity currently pointed is modified (as an example, if one of the
+ * given components is removed from the entity to which the iterator points).
+ *
+ * In all the other cases, modify the pools of the given components somehow
+ * invalidates all the iterators and using them results in undefined behavior.
+ *
+ * @note
+ * Views share references to the underlying data structures with the Registry
+ * that generated them. Therefore any change to the entities and to the
+ * components made by means of the registry are immediately reflected by
+ * views.<br/>
  * Moreover, sorting a persistent view affects all the other views of the same
  * type (it means that users don't have to call `sort` on each view to sort all
  * of them because they share the set of entities).
  *
- * @note Lifetime of a view must overcome the one of the registry that generated
- * it. In any other case, attempting to use a view results in undefined
- * behavior.
+ * @warning
+ * Lifetime of a view must overcome the one of the registry that generated it.
+ * In any other case, attempting to use a view results in undefined behavior.
  *
  * @sa View
  * @sa View<Entity, Component>
@@ -81,8 +94,9 @@ public:
      * The returned pointer is such that range `[data(), data() + size()]` is
      * always a valid range, even if the container is empty.
      *
-     * @note There are no guarantees on the order of the entities. Use `begin`
-     * and `end` if you want to iterate the view in the expected order.
+     * @note
+     * There are no guarantees on the order of the entities. Use `begin` and
+     * `end` if you want to iterate the view in the expected order.
      *
      * @return A pointer to the array of entities.
      */
@@ -98,8 +112,9 @@ public:
      * components. If the view is empty, the returned iterator will be equal to
      * `end()`.
      *
-     * @note Input iterators stay true to the order imposed to the underlying
-     * data structures.
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
      *
      * @return An iterator to the first entity that has the given components.
      */
@@ -115,8 +130,9 @@ public:
      * has the given components. Attempting to dereference the returned iterator
      * results in undefined behavior.
      *
-     * @note Input iterators stay true to the order imposed to the underlying
-     * data structures.
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
      *
      * @return An iterator to the entity following the last entity that has the
      * given components.
@@ -128,15 +144,15 @@ public:
     /**
      * @brief Returns the component assigned to the given entity.
      *
-     * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior. Attempting to use an invalid component type results
-     * in a compilation error.
+     * Prefer this function instead of `Registry::get` during iterations. It has
+     * far better performance than its companion function.
      *
-     * @note An assertion will abort the execution at runtime in debug mode if
+     * @warning
+     * Attempting to use an invalid component type results in a compilation
+     * error. Attempting to use an entity that doesn't belong to the view
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if
      * the view doesn't contain the given entity.
-     *
-     * @note Prefer this function instead of `Registry::get` during iterations.
-     * It has far better performance than its companion function.
      *
      * @tparam Comp The type of the component to get.
      * @param entity A valid entity identifier.
@@ -150,15 +166,15 @@ public:
     /**
      * @brief Returns the component assigned to the given entity.
      *
-     * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior. Attempting to use an invalid component type results
-     * in a compilation error.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the view doesn't contain the given entity.
-     *
-     * @note Prefer this function instead of `Registry::get` during iterations.
+     * Prefer this function instead of `Registry::get` during iterations.
      * It has far better performance than its companion function.
+     *
+     * @warning
+     * Attempting to use an invalid component type results in a compilation
+     * error. Attempting to use an entity that doesn't belong to the view
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if
+     * the view doesn't contain the given entity.
      *
      * @tparam Comp The type of the component to get.
      * @param entity A valid entity identifier.
@@ -177,10 +193,11 @@ public:
      * of components. Users can order the underlying data structure so that it
      * respects the order of the pool of the given component.
      *
-     * @note The shared pool of entities and thus its order is affected by the
-     * changes to each and every pool of components that it tracks. Therefore
-     * changes to the pools of components can quickly ruin the order imposed to
-     * the pool of entities shared between the persistent views.
+     * @note
+     * The shared pool of entities and thus its order is affected by the changes
+     * to each and every pool of components that it tracks. Therefore changes to
+     * the pools of components can quickly ruin the order imposed to the pool of
+     * entities shared between the persistent views.
      *
      * @tparam Comp The type of the component to use to impose the order.
      */
@@ -200,20 +217,32 @@ private:
  *
  * Multi component views iterate over those entities that have at least all the
  * given components in their bags. During initialization, a multi component view
- * looks at the number of entities available for each component and picks a
- * reference to the smallest set of candidate entities up in order to get a
+ * looks at the number of entities available for each component and picks up a
+ * reference to the smallest set of candidate entities in order to get a
  * performance boost when iterate.<br/>
  * Order of elements during iterations are highly dependent on the order of the
  * underlying data strctures. See SparseSet and its specializations for more
  * details.
  *
- * @note Views share references to the underlying data structures with the
- * Registry that generated them. Therefore any change to the entities and to the
+ * @b Important
+ *
+ * Iterators aren't invalidated if:
+ *
+ * * New instances of the given components are created and assigned to entities.
+ * * The entity currently pointed is modified (as an example, if one of the
+ * given components is removed from the entity to which the iterator points).
+ *
+ * In all the other cases, modify the pools of the given components somehow
+ * invalidates all the iterators and using them results in undefined behavior.
+ *
+ * @note
+ * Views share references to the underlying data structures with the Registry
+ * that generated them. Therefore any change to the entities and to the
  * components made by means of the registry are immediately reflected by views.
  *
- * @note Lifetime of a view must overcome the one of the registry that generated
- * it. In any other case, attempting to use a view results in undefined
- * behavior.
+ * @warning
+ * Lifetime of a view must overcome the one of the registry that generated it.
+ * In any other case, attempting to use a view results in undefined behavior.
  *
  * @sa View<Entity, Component>
  * @sa PersistentView
@@ -308,8 +337,9 @@ public:
      * components. If the view is empty, the returned iterator will be equal to
      * `end()`.
      *
-     * @note Input iterators stay true to the order imposed to the underlying
-     * data structures.
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
      *
      * @return An iterator to the first entity that has the given components.
      */
@@ -325,8 +355,9 @@ public:
      * has the given components. Attempting to dereference the returned iterator
      * results in undefined behavior.
      *
-     * @note Input iterators stay true to the order imposed to the underlying
-     * data structures.
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
      *
      * @return An iterator to the entity following the last entity that has the
      * given components.
@@ -338,15 +369,15 @@ public:
     /**
      * @brief Returns the component assigned to the given entity.
      *
-     * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior. Attempting to use an invalid component type results
-     * in a compilation error.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the view doesn't contain the given entity.
-     *
-     * @note Prefer this function instead of `Registry::get` during iterations.
+     * Prefer this function instead of `Registry::get` during iterations.
      * It has far better performance than its companion function.
+     *
+     * @warning
+     * Attempting to use an invalid component type results in a compilation
+     * error. Attempting to use an entity that doesn't belong to the view
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if
+     * the view doesn't contain the given entity.
      *
      * @tparam Component The type of the component to get.
      * @param entity A valid entity identifier.
@@ -360,15 +391,15 @@ public:
     /**
      * @brief Returns the component assigned to the given entity.
      *
-     * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior. Attempting to use an invalid component type results
-     * in a compilation error.
+     * Prefer this function instead of `Registry::get` during iterations. It has
+     * far better performance than its companion function.
      *
-     * @note An assertion will abort the execution at runtime in debug mode if
+     * @warning
+     * Attempting to use an invalid component type results in a compilation
+     * error. Attempting to use an entity that doesn't belong to the view
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if
      * the view doesn't contain the given entity.
-     *
-     * @note Prefer this function instead of `Registry::get` during iterations.
-     * It has far better performance than its companion function.
      *
      * @tparam Component The type of the component to get.
      * @param entity A valid entity identifier.
@@ -412,13 +443,25 @@ private:
  * underlying data structure. See SparseSet and its specializations for more
  * details.
  *
- * @note Views share a reference to the underlying data structure with the
- * Registry that generated them. Therefore any change to the entities and to the
+ * @b Important
+ *
+ * Iterators aren't invalidated if:
+ *
+ * * New instances of the given components are created and assigned to entities.
+ * * The entity currently pointed is modified (as an example, if one of the
+ * given components is removed from the entity to which the iterator points).
+ *
+ * In all the other cases, modify the pools of the given components somehow
+ * invalidates all the iterators and using them results in undefined behavior.
+ *
+ * @note
+ * Views share a reference to the underlying data structure with the Registry
+ * that generated them. Therefore any change to the entities and to the
  * components made by means of the registry are immediately reflected by views.
  *
- * @note Lifetime of a view must overcome the one of the registry that generated
- * it. In any other case, attempting to use a view results in undefined
- * behavior.
+ * @warning
+ * Lifetime of a view must overcome the one of the registry that generated it.
+ * In any other case, attempting to use a view results in undefined behavior.
  *
  * @sa View
  * @sa PersistentView
@@ -462,8 +505,9 @@ public:
      * The returned pointer is such that range `[raw(), raw() + size()]` is
      * always a valid range, even if the container is empty.
      *
-     * @note There are no guarantees on the order of the components. Use `begin`
-     * and `end` if you want to iterate the view in the expected order.
+     * @note
+     * There are no guarantees on the order of the components. Use `begin` and
+     * `end` if you want to iterate the view in the expected order.
      *
      * @return A pointer to the array of components.
      */
@@ -477,8 +521,9 @@ public:
      * The returned pointer is such that range `[raw(), raw() + size()]` is
      * always a valid range, even if the container is empty.
      *
-     * @note There are no guarantees on the order of the components. Use `begin`
-     * and `end` if you want to iterate the view in the expected order.
+     * @note
+     * There are no guarantees on the order of the components. Use `begin` and
+     * `end` if you want to iterate the view in the expected order.
      *
      * @return A pointer to the array of components.
      */
@@ -492,8 +537,9 @@ public:
      * The returned pointer is such that range `[data(), data() + size()]` is
      * always a valid range, even if the container is empty.
      *
-     * @note There are no guarantees on the order of the entities. Use `begin`
-     * and `end` if you want to iterate the view in the expected order.
+     * @note
+     * There are no guarantees on the order of the entities. Use `begin` and
+     * `end` if you want to iterate the view in the expected order.
      *
      * @return A pointer to the array of entities.
      */
@@ -509,8 +555,9 @@ public:
      * component. If the view is empty, the returned iterator will be equal to
      * `end()`.
      *
-     * @note Input iterators stay true to the order imposed to the underlying
-     * data structures.
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
      *
      * @return An iterator to the first entity that has the given component.
      */
@@ -526,8 +573,9 @@ public:
      * has the given component. Attempting to dereference the returned iterator
      * results in undefined behavior.
      *
-     * @note Input iterators stay true to the order imposed to the underlying
-     * data structures.
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
      *
      * @return An iterator to the entity following the last entity that has the
      * given component.
@@ -539,14 +587,14 @@ public:
     /**
      * @brief Returns the component assigned to the given entity.
      *
+     * Prefer this function instead of `Registry::get` during iterations. It has
+     * far better performance than its companion function.
+     *
+     * @warning
      * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the view doesn't contain the given entity.
-     *
-     * @note Prefer this function instead of `Registry::get` during iterations.
-     * It has far better performance than its companion function.
+     * undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * view doesn't contain the given entity.
      *
      * @param entity A valid entity identifier.
      * @return The component assigned to the entity.
@@ -558,14 +606,14 @@ public:
     /**
      * @brief Returns the component assigned to the given entity.
      *
+     * Prefer this function instead of `Registry::get` during iterations. It has
+     * far better performance than its companion function.
+     *
+     * @warning
      * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the view doesn't contain the given entity.
-     *
-     * @note Prefer this function instead of `Registry::get` during iterations.
-     * It has far better performance than its companion function.
+     * undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * view doesn't contain the given entity.
      *
      * @param entity A valid entity identifier.
      * @return The component assigned to the entity.

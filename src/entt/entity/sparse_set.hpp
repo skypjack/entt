@@ -38,14 +38,15 @@ class SparseSet;
  * web. This is nothing more than a customized implementation suitable for the
  * purpose of the framework.
  *
- * @note There are no guarantees that entities are returned in the insertion
- * order when iterate a sparse set. Do not make assumption on the order in any
- * case.
+ * @note
+ * There are no guarantees that entities are returned in the insertion order
+ * when iterate a sparse set. Do not make assumption on the order in any case.
  *
- * @note Internal data structures arrange elements to maximize performance.
- * Because of that, there are no guarantees that elements have the expected
- * order when iterate directly the internal packed array (see `data` and `size`
- * member functions for that). Use `begin` and `end` instead.
+ * @note
+ * Internal data structures arrange elements to maximize performance. Because of
+ * that, there are no guarantees that elements have the expected order when
+ * iterate directly the internal packed array (see `data` and `size` member
+ * functions for that). Use `begin` and `end` instead.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
@@ -140,7 +141,8 @@ public:
      * The returned pointer is such that range `[data(), data() + size()]` is
      * always a valid range, even if the container is empty.
      *
-     * @note There are no guarantees on the order, even though `sort` has been
+     * @note
+     * There are no guarantees on the order, even though `sort` has been
      * previously invoked. Internal data structures arrange elements to maximize
      * performance. Accessing them directly gives a performance boost but less
      * guarantees. Use `begin` and `end` if you want to iterate the sparse set
@@ -159,7 +161,8 @@ public:
      * array. If the sparse set is empty, the returned iterator will be equal to
      * `end()`.
      *
-     * @note Input iterators stay true to the order imposed by a call to `sort`.
+     * @note
+     * Input iterators stay true to the order imposed by a call to `sort`.
      *
      * @return An iterator to the first element of the internal packed array.
      */
@@ -174,7 +177,8 @@ public:
      * the internal packed array. Attempting to dereference the returned
      * iterator results in undefined behavior.
      *
-     * @note Input iterators stay true to the order imposed by a call to `sort`.
+     * @note
+     * Input iterators stay true to the order imposed by a call to `sort`.
      *
      * @return An iterator to the element following the last element of the
      * internal packed array.
@@ -196,11 +200,11 @@ public:
     /**
      * @brief Returns the position of the entity in the sparse set.
      *
+     * @warning
      * Attempting to get the position of an entity that doesn't belong to the
-     * sparse set results in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the sparse set doesn't contain the given entity.
+     * sparse set results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set doesn't contain the given entity.
      *
      * @param entity A valid entity identifier.
      * @return The position of the entity in the sparse set.
@@ -213,11 +217,11 @@ public:
     /**
      * @brief Assigns an entity to the sparse set.
      *
+     * @warning
      * Attempting to assign an entity that already belongs to the sparse set
-     * results in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the sparse set already contains the given entity.
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set already contains the given entity.
      *
      * @param entity A valid entity identifier.
      * @return The position of the entity in the internal packed array.
@@ -240,11 +244,11 @@ public:
     /**
      * @brief Removes the given entity from the sparse set.
      *
+     * @warning
      * Attempting to remove an entity that doesn't belong to the sparse set
-     * results in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the sparse set doesn't contain the given entity.
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set doesn't contain the given entity.
      *
      * @param entity A valid entity identifier.
      */
@@ -262,12 +266,13 @@ public:
      * @brief Swaps the position of the entities in the internal packed array.
      *
      * For what it's worth, this function affects both the internal sparse array
-     * and the internal packed array. Users should not care of that anyway.<br/>
-     * Attempting to swap entities that don't belong to the sparse set results
-     * in undefined behavior.
+     * and the internal packed array. Users should not care of that anyway.
      *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the sparse set doesn't contain the given entities.
+     * @warning
+     * Attempting to swap entities that don't belong to the sparse set results
+     * in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set doesn't contain the given entities.
      *
      * @param lhs A valid entity identifier.
      * @param rhs A valid entity identifier.
@@ -288,9 +293,9 @@ public:
      * iterators returns them in the expected order. See `begin` and `end` for
      * more details.
      *
-     * @note Attempting to iterate elements using the raw pointer returned by
-     * `data` gives no guarantees on the order, even though `sort` has been
-     * invoked.
+     * @note
+     * Attempting to iterate elements using the raw pointer returned by `data`
+     * gives no guarantees on the order, even though `sort` has been invoked.
      *
      * @tparam Compare The type of the comparison function.
      * @param compare A comparison function whose signature shall be equivalent
@@ -323,9 +328,9 @@ public:
      * the expected order after a call to `sort`. See `begin` and `end` for more
      * details.
      *
-     * @note Attempting to iterate elements using the raw pointer returned by
-     * `data` gives no guarantees on the order, even though `sort` has been
-     * invoked.
+     * @note
+     * Attempting to iterate elements using the raw pointer returned by `data`
+     * gives no guarantees on the order, even though `sort` has been invoked.
      *
      * @param other The sparse sets that imposes the order of the entities.
      */
@@ -378,13 +383,15 @@ private:
  * main purpose of this class is to use sparse sets to store components in a
  * Registry. It guarantees fast access both to the elements and to the entities.
  *
- * @note Entities and objects have the same order. It's guaranteed both in case
- * of raw access (either to entities or objects) and when using input iterators.
+ * @note
+ * Entities and objects have the same order. It's guaranteed both in case of raw
+ * access (either to entities or objects) and when using input iterators.
  *
- * @note Internal data structures arrange elements to maximize performance.
- * Because of that, there are no guarantees that elements have the expected
- * order when iterate directly the internal packed array (see `raw` and `size`
- * member functions for that). Use `begin` and `end` instead.
+ * @note
+ * Internal data structures arrange elements to maximize performance. Because of
+ * that, there are no guarantees that elements have the expected order when
+ * iterate directly the internal packed array (see `raw` and `size` member
+ * functions for that). Use `begin` and `end` instead.
  *
  * @sa SparseSet<Entity>
  *
@@ -426,7 +433,8 @@ public:
      * The returned pointer is such that range `[raw(), raw() + size()]` is
      * always a valid range, even if the container is empty.
      *
-     * @note There are no guarantees on the order, even though `sort` has been
+     * @note
+     * There are no guarantees on the order, even though `sort` has been
      * previously invoked. Internal data structures arrange elements to maximize
      * performance. Accessing them directly gives a performance boost but less
      * guarantees. Use `begin` and `end` if you want to iterate the sparse set
@@ -444,7 +452,8 @@ public:
      * The returned pointer is such that range `[raw(), raw() + size()]` is
      * always a valid range, even if the container is empty.
      *
-     * @note There are no guarantees on the order, even though `sort` has been
+     * @note
+     * There are no guarantees on the order, even though `sort` has been
      * previously invoked. Internal data structures arrange elements to maximize
      * performance. Accessing them directly gives a performance boost but less
      * guarantees. Use `begin` and `end` if you want to iterate the sparse set
@@ -459,11 +468,11 @@ public:
     /**
      * @brief Returns the object associated to the given entity.
      *
+     * @warning
      * Attempting to use an entity that doesn't belong to the sparse set results
-     * in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the sparse set doesn't contain the given entity.
+     * in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set doesn't contain the given entity.
      *
      * @param entity A valid entity identifier.
      * @return The object associated to the entity.
@@ -475,11 +484,11 @@ public:
     /**
      * @brief Returns the object associated to the given entity.
      *
+     * @warning
      * Attempting to use an entity that doesn't belong to the sparse set results
-     * in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the sparse set doesn't contain the given entity.
+     * in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set doesn't contain the given entity.
      *
      * @param entity A valid entity identifier.
      * @return The object associated to the entity.
@@ -491,11 +500,11 @@ public:
     /**
      * @brief Assigns an entity to the sparse set and constructs its object.
      *
+     * @warning
      * Attempting to use an entity that already belongs to the sparse set
-     * results in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the sparse set already contains the given entity.
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set already contains the given entity.
      *
      * @tparam Args The type of the params used to construct the object.
      * @param entity A valid entity identifier.
@@ -512,11 +521,11 @@ public:
     /**
      * @brief Removes an entity from the sparse set and destroies its object.
      *
+     * @warning
      * Attempting to use an entity that doesn't belong to the sparse set results
-     * in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the sparse set doesn't contain the given entity.
+     * in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set doesn't contain the given entity.
      *
      * @param entity A valid entity identifier.
      */
@@ -529,15 +538,15 @@ public:
     /**
      * @brief Swaps the two entities and their objects.
      *
+     * @note
+     * This function doesn't swap objects between entities. It exchanges entity
+     * and object positions in the sparse set. It's used mainly for sorting.
+     *
+     * @warning
      * Attempting to use entities that don't belong to the sparse set results
-     * in undefined behavior.
-     *
-     * @note An assertion will abort the execution at runtime in debug mode if
-     * the sparse set doesn't contain the given entities.
-     *
-     * @note This function doesn't swap objects between entities. It exchanges
-     * entity and object positions in the sparse set. It's used mainly for
-     * sorting.
+     * in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set doesn't contain the given entities.
      *
      * @param lhs A valid entity identifier.
      * @param rhs A valid entity identifier.
