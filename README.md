@@ -1,4 +1,4 @@
-# EnTT - Entity-Component System in modern C++
+# The EnTT Framework
 
 [![Build Status](https://travis-ci.org/skypjack/entt.svg?branch=master)](https://travis-ci.org/skypjack/uvw)
 [![Build status](https://ci.appveyor.com/api/projects/status/rvhaabjmghg715ck?svg=true)](https://ci.appveyor.com/project/skypjack/entt)
@@ -7,14 +7,16 @@
 
 # Introduction
 
-`EnTT` is a header-only, tiny and easy to use Entity-Component System in modern C++.<br/>
-_ECS_ is an architectural pattern used mostly in game development. For further details:
+`EnTT` is a header-only, tiny and easy to use framework written in modern C++.<br/>
+It's entirely designed around an architectural pattern pattern called _ECS_ that is used mostly in game development. For further details:
 
 * [Entity Systems Wiki](http://entity-systems.wikidot.com/)
 * [Evolve Your Hierarchy](http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/)
 * [ECS on Wikipedia](https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system)
 
-<!--
+Originally, `EnTT` was written as a faster alternative to other well known and open source entity-component systems.<br/>
+After a while the codebase has grown and more features have become part of the framework.
+
 ## Code Example
 
 ```cpp
@@ -30,43 +32,37 @@ struct Velocity {
     float dy;
 };
 
-using ECS = entt::DefaultRegistry<Position, Velocity>;
+void update(entt::DefaultRegistry &registry) {
+    auto view = ecs.view<Position, Velocity>();
+
+    for(auto entity: view) {
+        auto &position = view.get<Position>(entity);
+        auto &velocity = view.get<Velocity>(entity);
+        // ...
+    }
+}
 
 int main() {
-    ECS ecs;
+    entt::DefaultRegistry registry;
 
     for(auto i = 0; i < 10; ++i) {
-        auto entity = ecs.create();
-        ecs.assign<Position>(entity, i * 1.f, i * 1.f);
-        if(i % 2 == 0) { ecs.assign<Velocity>(entity, i * .1f, i * .1f); }
+        auto entity = registry.create();
+        registry.assign<Position>(entity, i * 1.f, i * 1.f);
+        if(i % 2 == 0) { registry.assign<Velocity>(entity, i * .1f, i * .1f); }
     }
 
-    // single component view
-
-    for(auto entity: ecs.view<Position>()) {
-        auto &position = ecs.get<Position>(entity);
-        // ...
-    }
-
-    // multi component view
-
-    for(auto entity: ecs.view<Position, Velocity>()) {
-        auto &position = ecs.get<Position>(entity);
-        auto &velocity = ecs.get<Velocity>(entity);
-        // ...
-    }
-
-    ecs.reset();
+    update(registry);
+    // ...
 }
 ```
 
 ## Motivation
 
-I started working on `EnTT` because of the wrong reason: my goal was to beat another well known open source _ECS_ in terms of performance.
+I started working on `EnTT` because of the wrong reason: my goal was to design an entity-component system that beated another well known open source solution in terms of performance.<br/>
 I did it, of course, but it wasn't much satisfying. Actually it wasn't satisfying at all. The fastest and nothing more, fairly little indeed.
-When I realized it, I tried hard to keep intact the great performance and to add all the features I want to see in my _ECS_ at the same time.
+When I realized it, I tried hard to keep intact the great performance of `EnTT` and to add all the features I wanted to see in *my* entity-component system at the same time.
 
-Today `EnTT` is finally what I was looking for: still faster than its _rivals_, a really good API and an amazing set of features.
+Today `EnTT` is finally what I was looking for: still faster than its _rivals_, a really good API and an amazing set of features. And even more, of course.
 
 ### Performance
 
@@ -75,18 +71,24 @@ Here is a comparision between the two (both of them compiled with GCC 7.2.0 on a
 
 | Benchmark | EntityX (experimental/compile_time) | EnTT |
 |-----------|-------------|-------------|
-| Creating 10M entities | 0.177225s | **0.0881921s** |
-| Destroying 10M entities | 0.066419s | **0.0552661s** |
-| Iterating over 10M entities, unpacking one component | 0.0104935s | **8.8e-08s** |
-| Iterating over 10M entities, unpacking two components | 0.00835546s | **0.00323798s** |
-| Iterating over 10M entities, unpacking two components, half of the entities have all the components | 0.00772169s | **0.00162265s** |
-| Iterating over 10M entities, unpacking two components, one of the entities has all the components | 0.00751099s | **5.17e-07s** |
-| Iterating over 10M entities, unpacking five components | 0.00863762s | **0.00323384s** |
-| Iterating over 10M entities, unpacking ten components | 0.0105657s | **0.00323742s** |
-| Iterating over 10M entities, unpacking ten components, half of the entities have all the components | 0.00880251s | **0.00164593s** |
-| Iterating over 10M entities, unpacking ten components, one of the entities has all the components | 0.0067667s | **5.38e-07s** |
-| Iterating over 50M entities, unpacking one component | 0.0530271s | **7.7e-08s** |
-| Iterating over 50M entities, unpacking two components | 0.056233s | **0.0161715s** |
+| Creating 10M entities | 0.128881s | **0.0408754s** |
+| Destroying 10M entities | **0.0531374s** | 0.0545839s |
+| Iterating over 10M entities, unpacking one component, standard view | 0.010661s | **1.58e-07s** |
+| Iterating over 10M entities, unpacking two components, standard view | **0.0112664s** | 0.0840068s |
+| Iterating over 10M entities, unpacking two components, standard view, half of the entities have all the components | **0.0077951s** | 0.042168s |
+| Iterating over 10M entities, unpacking two components, standard view, one of the entities has all the components | 0.00713398s | **8.93e-07s** |
+| Iterating over 10M entities, unpacking two components, persistent view | 0.0112664s | **5.68e-07s** |
+| Iterating over 10M entities, unpacking five components, standard view | **0.00905084s** | 0.137757s |
+| Iterating over 10M entities, unpacking five components, persistent view | 0.00905084s | **2.9e-07s** |
+| Iterating over 10M entities, unpacking ten components, standard view | **0.0104708s** | 0.388602s |
+| Iterating over 10M entities, unpacking ten components, standard view, half of the entities have all the components | **0.00899859s** | 0.200752s |
+| Iterating over 10M entities, unpacking ten components, standard view, one of the entities has all the components | 0.00700349s | **2.565e-06s** |
+| Iterating over 10M entities, unpacking ten components, persistent view | 0.0104708s | **6.23e-07s** |
+| Iterating over 50M entities, unpacking one component, standard view | 0.055194s | **2.87e-07s** |
+| Iterating over 50M entities, unpacking two components, standard view | **0.0533921s** | 0.243197s |
+| Iterating over 50M entities, unpacking two components, persistent view | 0.055194s | **4.47e-07s** |
+| Sort 150k entities, one component | - | **0.0080046s** |
+| Sort 150k entities, two components | - | **0.00608322s** |
 
 `EnTT` includes its own tests and benchmarks. See [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp) for further details.<br/>
 On Github users can find also a [benchmark suite](https://github.com/abeimler/ecs_benchmark) that compares a bunch of different projects, one of which is `EnTT`.
@@ -99,7 +101,10 @@ If you want to contribute and/or have any suggestion, feel free to make a PR or 
 ## Requirements
 
 To be able to use `EnTT`, users must provide a full-featured compiler that supports at least C++14.<br/>
-CMake version 3.2 or later is mandatory to compile the tests, users don't have to install it otherwise.
+The requirements below are mandatory to compile the tests and to extract the documentation:
+
+* CMake version 3.2 or later.
+* Doxygen version 1.8 or later.
 
 ## Library
 
@@ -116,10 +121,21 @@ Then pass the proper `-I` argument to the compiler to add the `src` directory to
 
 ### API Reference
 
-Unfortunately `EnTT` isn't documented yet and thus users cannot rely on in-code documentation.<br/>
-Source code and names are self-documenting and I'm pretty sure that a glimpse to the API is enough for most of the users.<br/>
-For all the others, below is a crash course that guides them through the project and tries to fill the gap.
+The documentation is based on [doxygen](http://www.stack.nl/~dimitri/doxygen/). To build it:
 
+$ cd build
+$ cmake ..
+$ make docs
+
+The API reference will be created in HTML format within the directory `build/docs/html`.
+To navigate it with your favorite browser:
+
+$ cd build
+$ your_favorite_browser docs/html/index.html
+
+The API reference is also available [online](https://skypjack.github.io/entt/) for the latest version.
+
+<!--
 ### Crash Course
 
 `EnTT` has two main actors: the **Registry** and the **View**.<br/>

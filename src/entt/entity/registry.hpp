@@ -716,7 +716,7 @@ public:
      * entities and components.
      *
      * That being said, persistent views are an incredibly powerful tool if used
-     * with care and offer a boost of performance undoubtely.
+     * with care and offer a boost of performance undoubtedly.
      *
      * @note
      * Consider to use the `prepare` member function to initialize the internal
