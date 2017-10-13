@@ -1,21 +1,25 @@
 # The EnTT Framework
 
-[![Build Status](https://travis-ci.org/skypjack/entt.svg?branch=master)](https://travis-ci.org/skypjack/uvw)
+[![Build Status](https://travis-ci.org/skypjack/entt.svg?branch=master)](https://travis-ci.org/skypjack/entt)
 [![Build status](https://ci.appveyor.com/api/projects/status/rvhaabjmghg715ck?svg=true)](https://ci.appveyor.com/project/skypjack/entt)
 [![Coverage Status](https://coveralls.io/repos/github/skypjack/entt/badge.svg?branch=master)](https://coveralls.io/github/skypjack/entt?branch=master)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W2HF9FESD5LJY&lc=IT&item_name=Michele%20Caini&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
 
 # Introduction
 
-`EnTT` is a header-only, tiny and easy to use framework written in modern C++.<br/>
-It's entirely designed around an architectural pattern pattern called _ECS_ that is used mostly in game development. For further details:
+`EnTT` is a header-only, tiny and easy to use framework written in modern
+C++.<br/>
+It's entirely designed around an architectural pattern pattern called _ECS_ that
+is used mostly in game development. For further details:
 
 * [Entity Systems Wiki](http://entity-systems.wikidot.com/)
 * [Evolve Your Hierarchy](http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/)
 * [ECS on Wikipedia](https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system)
 
-Originally, `EnTT` was written as a faster alternative to other well known and open source entity-component systems.<br/>
-After a while the codebase has grown and more features have become part of the framework.
+Originally, `EnTT` was written as a faster alternative to other well known and
+open source entity-component systems.<br/>
+After a while the codebase has grown and more features have become part of the
+framework.
 
 ## Code Example
 
@@ -58,16 +62,24 @@ int main() {
 
 ## Motivation
 
-I started working on `EnTT` because of the wrong reason: my goal was to design an entity-component system that beated another well known open source solution in terms of performance.<br/>
-I did it, of course, but it wasn't much satisfying. Actually it wasn't satisfying at all. The fastest and nothing more, fairly little indeed.
-When I realized it, I tried hard to keep intact the great performance of `EnTT` and to add all the features I wanted to see in *my* entity-component system at the same time.
+I started working on `EnTT` because of the wrong reason: my goal was to design
+an entity-component system that beated another well known open source solution
+in terms of performance.<br/>
+I did it, of course, but it wasn't much satisfying. Actually it wasn't
+satisfying at all. The fastest and nothing more, fairly little indeed. When I
+realized it, I tried hard to keep intact the great performance of `EnTT` and to
+add all the features I wanted to see in *my* entity-component system at the same
+time.
 
-Today `EnTT` is finally what I was looking for: still faster than its _rivals_, a really good API and an amazing set of features. And even more, of course.
+Today `EnTT` is finally what I was looking for: still faster than its _rivals_,
+a really good API and an amazing set of features. And even more, of course.
 
 ### Performance
 
-As it stands right now, `EnTT` is just fast enough for my requirements if compared to my first choice (that was already amazingly fast indeed).<br/>
-Here is a comparision between the two (both of them compiled with GCC 7.2.0 on a Dell XPS 13 out of the mid 2014):
+As it stands right now, `EnTT` is just fast enough for my requirements if
+compared to my first choice (that was already amazingly fast indeed).<br/>
+Here is a comparision between the two (both of them compiled with GCC 7.2.0 on a
+Dell XPS 13 out of the mid 2014):
 
 | Benchmark | EntityX (experimental/compile_time) | EnTT |
 |-----------|-------------|-------------|
@@ -88,207 +100,186 @@ Here is a comparision between the two (both of them compiled with GCC 7.2.0 on a
 | Iterating over 50M entities, unpacking two components, standard view | **0.0533921s** | 0.243197s |
 | Iterating over 50M entities, unpacking two components, persistent view | 0.055194s | **4.47e-07s** |
 | Sort 150k entities, one component | - | **0.0080046s** |
-| Sort 150k entities, two components | - | **0.00608322s** |
+| Sort 150k entities, match two components | - | **0.00608322s** |
 
-`EnTT` includes its own tests and benchmarks. See [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp) for further details.<br/>
-On Github users can find also a [benchmark suite](https://github.com/abeimler/ecs_benchmark) that compares a bunch of different projects, one of which is `EnTT`.
+`EnTT` includes its own tests and benchmarks. See
+[benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp)
+for further details.<br/>
+On Github users can find also a
+[benchmark suite](https://github.com/abeimler/ecs_benchmark) that compares a
+bunch of different projects, one of which is `EnTT`.
 
-Of course, probably I'll try to get out of `EnTT` more features and better performance in the future, mainly for fun.<br/>
-If you want to contribute and/or have any suggestion, feel free to make a PR or open an issue to discuss your idea.
+Of course, probably I'll try to get out of `EnTT` more features and better
+performance in the future, mainly for fun.<br/>
+If you want to contribute and/or have any suggestion, feel free to make a PR or
+open an issue to discuss your idea.
 
 # Build Instructions
 
 ## Requirements
 
-To be able to use `EnTT`, users must provide a full-featured compiler that supports at least C++14.<br/>
-The requirements below are mandatory to compile the tests and to extract the documentation:
+To be able to use `EnTT`, users must provide a full-featured compiler that
+supports at least C++14.<br/>
+The requirements below are mandatory to compile the tests and to extract the
+documentation:
 
 * CMake version 3.2 or later.
 * Doxygen version 1.8 or later.
 
 ## Library
 
-`EnTT` is a header-only library. This means that including the `registry.hpp` header is enough to use it.<br/>
+`EnTT` is a header-only library. This means that including the `registry.hpp`
+header is enough to use it.<br/>
 It's a matter of adding the following line at the top of a file:
 
 ```cpp
 #include <registry.hpp>
 ```
 
-Then pass the proper `-I` argument to the compiler to add the `src` directory to the include paths.
+Then pass the proper `-I` argument to the compiler to add the `src` directory to
+the include paths.
 
 ## Documentation
 
 ### API Reference
 
-The documentation is based on [doxygen](http://www.stack.nl/~dimitri/doxygen/). To build it:
+The documentation is based on [doxygen](http://www.stack.nl/~dimitri/doxygen/).
+To build it:
 
 $ cd build
 $ cmake ..
 $ make docs
 
-The API reference will be created in HTML format within the directory `build/docs/html`.
-To navigate it with your favorite browser:
+The API reference will be created in HTML format within the directory
+`build/docs/html`. To navigate it with your favorite browser:
 
 $ cd build
 $ your_favorite_browser docs/html/index.html
 
-The API reference is also available [online](https://skypjack.github.io/entt/) for the latest version.
+The API reference is also available [online](https://skypjack.github.io/entt/)
+for the latest version.
 
-<!--
 ### Crash Course
 
-`EnTT` has two main actors: the **Registry** and the **View**.<br/>
-The former can be used to manage components, entities and collections of components and entities. The latter allows users to iterate the underlying collections.
+#### Vademecum
 
-#### The Registry
+The `Registry` to store, the `View`s to iterate. That's all.
 
-There are two options to instantiate a registry:
+An entity (the _E_ of an _ECS_) is an opaque identifier that users should just
+use as-is and store around if needed. Do not try to inspect an entity
+identifier, its type can change in future and a registry offers all the
+functionalities to query them out-of-the-box. The underlying type of an entity
+(either `std::uint16_t`, `std::uint32_t` or `std::uint64_t`) can be specified
+when defining a registry (actually the DefaultRegistry is nothing more than a
+Registry where the type of the entities is `std::uint32_t`).<br/>
+Components (the _C_ of an _ECS_) should be plain old data structures or more
+complex and moveable data structures with a proper constructor. They are list
+initialized by using the parameters provided to construct the component. No need
+to register components or their types neither with the registry nor with the
+entity-component system at all.<br/>
+Systems (the _S_ of an _ECS_) are just plain functions, functors, lambdas or
+whatever the users want. They can accept a Registry, a View or a PersistentView
+and use them the way they prefer. No need to register systems or their types
+neither with the registry nor with the entity-component system at all.
 
-* Use the `DefaultRegistry` alias:
+The following sections will explain in short how to use the entity-component
+system, the core part of the `EnTT` framework.<br/>
+In fact, the framework is composed of many other classes in addition to those
+describe below. For more details, please refer to the
+[online documentation](https://skypjack.github.io/entt/).
 
-    ```cpp
-    auto registry = entt::DefaultRegistry<Components...>{args...};
-    ```
+#### The Registry, the Entity and the Component
 
-  Users must provide the whole list of components to be registered with the default registry and that's all.
+A registry is used to store and manage entities as well as to create views to
+iterate the underlying data structures.<br/>
+Registry is a class template that lets the users decide what's the preferred
+type to represent an entity. Because `std::uint32_t` is large enough for almost
+all the cases, there exists also an alias named DefaultRegistry for
+`Registry<std::uint32_t>`.
 
-* Use directly the `Registry` class template:
+Entities are represented by _entitiy identifiers_. An entity identifier is an
+opaque type that users should not inspect or modify in any way. It carries
+information about the entity itself and its version.
 
-    ```cpp
-    auto registry = entt::Registry<std::uint16_t, Components...>{args...};
-    ```
-
-  Users must provide the whole list of components to be registered with the registry **and** the desired type for the entities.
-  Note that the default type (the one used by the default registry) is `std::uint32_t`, that is larger enough for almost all the games but also too big for the most of the games.
-
-In both cases there are no requirements for the components but to be moveable, therefore POD types are just fine.
-
-The `Registry` class offers a bunch of basic functionalities to query the internal data structures.
-In almost all the cases those member functions can be used to query either the entity list or the components lists.<br/>
-As an example, the member functions `empty` can be used to know if at least an entity exists and/or if at least one component of the given type has been assigned to an entity.<br/>
-
-```cpp
-bool b = registry.empty();
-// ...
-bool b = registry.empty<MyComponent>();
-```
-
-Similarly, `size` can be used to know the number of entities alive and/or the number of components of a given type still assigned to entities. `capacity` follows the same pattern and returns the storage capacity for the given element.
-
-The `valid` member function returns true if `entity` is still in use, false otherwise:
-
-```cpp
-bool b = registry.valid(entity);
-```
-
-Boring, I agree. Let's go to something more tasty.
-The following functionalities are meant to give users the chance to play with entities and components within a registry.
-
-The `create` member function can be used to construct a new entity and it comes in two flavors:
-
-* The plain version just creates a _naked_ entity with no components assigned to it:
-
-    ```cpp
-    auto entity = registry.create();
-    ```
-
-* The member function template creates an entity and assigns to it the given _default-initialized_ components:
-
-    ```cpp
-    auto entity = registry.create<Position, Velocity>();
-    ```
-
-  It's a helper function, mostly syncactic sugar and it's equivalent to the following snippet:
-
-    ```cpp
-    auto entity = registry.create();
-    registry.assign<Position>();
-    registry.assign<Velocity>();
-    ```
-
-  See below to find more about the `assign` member function.
-
-On the other side, the `destroy` member function can be used to delete an entity and all its components (if any):
+A registry can be used both to construct and to destroy entities:
 
 ```cpp
+// constructs a naked entity with no components ad returns its identifier
+auto entity = registry.create();
+
+// constructs an entity and assigns it default-initialized components
+auto another = registry.create<Position, Velocity>();
+
+// destroys an entity and all its components
 registry.destroy(entity);
 ```
 
-It requires that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
-
-If the purpose is to remove a single component instead, the `remove` member function template is the way to go:
-
-```cpp
-registry.remove<Position>(entity);
-```
-
-Again, it requires that `entity` is valid. Moreover, an instance of the component must have been previously assigned to the entity.
-If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.
-
-The `reset` member function behaves similarly but with a strictly defined behaviour (and a performance penalty is the price to pay for that). In particular it removes the component if and only if it exists, otherwise it returns safely to the caller:
+Once an entity is deleted, the registry can freely reuse it internally with a
+slightly different identifier. In particular, the version of an entity is
+increased each and every time it's destroyed.<br/>
+In case entity identifiers are stored around, the registry offers all the
+functionalities required to test them and get out of the them all the
+information they carry:
 
 ```cpp
-registry.reset<Position>(entity);
+// returns true if the entity is still valid, false otherwise
+bool b = registry.valid(entity);
+
+// gets the version contained in the entity identifier
+auto version = registry.version(entity);
+
+// gets the actual version for the given entity
+auto curr = registry.current(entity);
 ```
 
-It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+Components can be assigned to or removed from entities at any time with a few
+calls to member functions of the registry. As for the entities, the registry
+offers also a set of functionalities users can use to work with the components.
 
-There exist also two more _versions_ of the `reset` member function:
-
-* If no entity is passed to it, `reset` will remove the given component from each entity that has it:
-
-    ```cpp
-    registry.reset<Position>();
-    ```
-
-* If neither the entity nor the component are specified, all the entities and their components are destroyed:
-
-    ```cpp
-    registry.reset();
-    ```
-
-  **Note**: the registry has an assert in debug mode that verifies that entities are no longer valid when it's destructed. This function can be used to reset the registry to its initial state and thus to satisfy the requirement.
-
-To assign a component to an entity, users can rely on the `assign` member function template. It accepts a variable number of arguments that are used to construct the component itself if present:
+The `assign` member function template creates, initializes and assigns to an
+entity the given component. It accepts a variable number of arguments that are
+used to construct the component itself if present:
 
 ```cpp
 registry.assign<Position>(entity, 0., 0.);
+
 // ...
+
 auto &velocity = registry.assign<Velocity>(entity);
 velocity.dx = 0.;
 velocity.dy = 0.;
 ```
 
-It requires that `entity` is valid. Moreover, the entity shouldn't have another instance of the component assigned to it.
-If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.
-
-If the entity already has the given component and the user wants to replace it, the `replace` member function template is the way to go:
+If the entity already has the given component, the `replace` member function
+template can be used to replace it:
 
 ```cpp
 registry.replace<Position>(entity, 0., 0.);
+
 // ...
+
 auto &velocity = registry.replace<Velocity>(entity);
 velocity.dx = 0.;
 velocity.dy = 0.;
 ```
 
-It requires that `entity` is valid. Moreover, an instance of the component must have been previously assigned to the entity.
-If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.
-
-In case users want to assign a component to an entity, but it's unknown whether the entity already has it or not, `accomodate` does the work in a single call
-(of course, there is a performance penalty to pay for that mainly due to the fact that it must check if `entity` already has the given component or not):
+In case users want to assign a component to an entity, but it's unknown whether
+the entity already has it or not, `accomodate` does the work in a single call
+(of course, there is a performance penalty to pay for that mainly due to the
+fact that it must check if `entity` already has the given component or not):
 
 ```cpp
 registry.accomodate<Position>(entity, 0., 0.);
+
 // ...
+
 auto &velocity = registry.accomodate<Velocity>(entity);
 velocity.dx = 0.;
 velocity.dy = 0.;
 ```
 
-It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.<br/>
-Note that `accomodate` is a sliglhty faster alternative for the following if/else statement and nothing more:
+Note that `accomodate` is a sliglhty faster alternative for the following
+`if`/`else` statement and nothing more:
 
 ```cpp
 if(registry.has<Comp>(entity)) {
@@ -298,57 +289,72 @@ if(registry.has<Comp>(entity)) {
 }
 ```
 
-As already shown, if in doubt about whether or not an entity has one or more components, the `has` member function template may be useful:
+As already shown, if in doubt about whether or not an entity has one or more
+components, the `has` member function template may be useful:
 
 ```cpp
 bool b = registry.has<Position, Velocity>(entity);
 ```
 
-It requires only that `entity` is valid. In case it is not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
-
-Entities can also be cloned and either partially or fully copied:
-
-```cpp
-auto entity = registry.clone(other);
-// ...
-auto &velocity = registry.copy<Velocity>(to, from);
-// ...
-registry.copy(dst, src);
-```
-
-In particular:
-
-* The `clone` member function creates a new entity and copy all the components from the given one.
-* The `copy` member function template copies one component from an entity to another one.
-* The `copy` member function copies all the components from an entity to another one.
-
-All the functions above mentioned require that entities provided as arguments are valid and components exist wherever they have to be accessed.
-In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
-
-There exists also an utility member function that can be used to `swap` components between entities:
+On the other side, if the goal is to delete a single component, the `remove`
+member function template is the way to go when it's certain that the entity owns
+a copy of the component:
 
 ```cpp
-registry.swap<Position>(e1, e2);
+registry.remove<Position>(entity);
 ```
 
-As usual, it requires that the two entities are valid and that two instances of the component have been previously assigned to them.
-In case they are not, an assertion will fail in debug mode and the behaviour is undefined in release mode.
-
-The `get` member function template (either the non-const or the const version) gives direct access to the component of an entity instead:
+Otherwise consider to use the `reset` member function. It behaves similarly to
+`remove` but with a strictly defined behaviour (and a performance penalty is the
+price to pay for that). In particular it removes the component if and only if it
+exists, otherwise it returns safely to the caller:
 
 ```cpp
-auto &position = registry.get<Position>(entity);
+registry.reset<Position>(entity);
 ```
 
-It requires that `entity` is valid. Moreover, an instance of the component must have been previously assigned to the entity.
-If one of the requirements isn't satisfied, an assertion will fail in debug mode and the behaviour is undefined in release mode.
+There exist also two other _versions_ of the `reset` member function:
 
-Components can also be sorted in memory by means of the `sort` member function templates. In particular:
-
-* Components can be sorted according to a component:
+* If no entity is passed to it, `reset` will remove the given component from
+each entity that has it:
 
     ```cpp
-    registry.sort<Renderable>([](const auto &lhs, const auto &rhs) { return lhs.z < rhs.z; });
+    registry.reset<Position>();
+    ```
+
+* If neither the entity nor the component are specified, all the entities and
+their components are destroyed:
+
+    ```cpp
+    registry.reset();
+    ```
+
+Finally, references to components can be retrieved by just doing this:
+
+```cpp
+// either a non-const reference ...
+DefaultRegistry registry;
+auto &position = registry.get<Position>(entity);
+
+// ... or a const one
+const auto &cregistry = registry;
+const auto &position = cregistry.get<Position>(entity);
+```
+
+The `get` member function template gives direct access to the component of an
+entity stored in the underlying data structures of the registry.
+
+##### Sorting: is it possible?
+
+Of course, sorting entities and components is an option with `EnTT`.<br/>
+In fact, there are two functions that respond to slightly different needs:
+
+* Components can be sorted directly:
+
+    ```cpp
+    registry.sort<Renderable>([](const auto &lhs, const auto &rhs) {
+        return lhs.z < rhs.z;
+    });
     ```
 
 * Components can be sorted according to the order imposed by another component:
@@ -357,8 +363,14 @@ Components can also be sorted in memory by means of the `sort` member function t
     registry.sort<Movement, Physics>();
     ```
 
-  In this case, instances of `Movement` are arranged in memory so that cache misses are minimized when the two components are iterated together.
+  In this case, instances of `Movement` are arranged in memory so that cache
+  misses are minimized when the two components are iterated together.
 
+#### View: to be or not to be (persistent)?
+
+TODO
+
+<!--
 Finally, the `view` member function template returns an iterable portion of entities and components:
 
 ```cpp
@@ -479,13 +491,14 @@ I'd suggest not to store them anywhere and to invoke the `Registry::view` member
 * Iterators aren't thread safe. Do no try to iterate over a set of components and modify them concurrently.<br/>
   That being said, as long as a thread iterates over the entities that have the component `X` or assign and removes that component from a set of entities and another thread does something similar with components `Y` and `Z`, it shouldn't be a problem at all.<br/>
   As an example, that means that users can freely run the rendering system over the renderable entities and update the physics concurrently on a separate thread if needed.
+-->
 
 ## Tests
 
 To compile and run the tests, `EnTT` requires *googletest*.<br/>
 `cmake` will download and compile the library before to compile anything else.
 
-Then, to build the tests:
+To build the tests:
 
 * `$ cd build`
 * `$ cmake ..`
@@ -507,9 +520,10 @@ Check the [contributors list](https://github.com/skypjack/entt/blob/master/AUTHO
 
 Code and documentation Copyright (c) 2017 Michele Caini.<br/>
 Code released under [the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).
+Docs released under [Creative Commons](https://github.com/skypjack/entt/blob/master/docs/LICENSE).
 
 # Donation
 
-Developing and maintaining `EnTT` takes some time and lots of coffee. If you want to support this project, you can offer me an espresso. I'm from Italy, we're used to turning the best coffee ever in code.<br/>
+Developing and maintaining `EnTT` takes some time and lots of coffee. It still lacks a proper test suite, documentation is partially incomplete and not all functionalities have been fully implemented yet.<br/>
+If you want to support this project, you can offer me an espresso. I'm from Italy, we're used to turning the best coffee ever in code.<br/>
 Take a look at the donation button at the top of the page for more details or just click [here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W2HF9FESD5LJY&lc=IT&item_name=Michele%20Caini&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted).
--->
