@@ -675,11 +675,11 @@ TEST(DefaultRegistry, SortMulti) {
         registry.assign<Velocity>(entity, i, i);
     }
 
-    Timer timer;
-
     registry.sort<Position>([&registry](const auto &lhs, const auto &rhs) {
         return lhs.x < rhs.x && lhs.y < rhs.y;
     });
+
+    Timer timer;
 
     registry.sort<Velocity, Position>();
 
