@@ -1,0 +1,7 @@
+var searchData=
+[
+  ['data',['data',['../classentt_1_1SparseSet_3_01Entity_01_4.html#a6e4dda542e3d725dd963dea57bfb9cb1',1,'entt::SparseSet&lt; Entity &gt;::data()'],['../classentt_1_1PersistentView.html#ac6f07a78cd7cac6dc9574877e1073a19',1,'entt::PersistentView::data()'],['../classentt_1_1View_3_01Entity_00_01Component_01_4.html#a78f5d9ebb636c6acb391d802ad13fede',1,'entt::View&lt; Entity, Component &gt;::data()']]],
+  ['defaultregistry',['DefaultRegistry',['../namespaceentt.html#aa56ef01a9c62f21d68dd60f005296b23',1,'entt']]],
+  ['destroy',['destroy',['../classentt_1_1Registry.html#afe1fc933ce101207a49b6bdeafa2ce41',1,'entt::Registry::destroy()'],['../classentt_1_1SparseSet_3_01Entity_01_4.html#ab4be1be8435da50621373c0bd737a1e8',1,'entt::SparseSet&lt; Entity &gt;::destroy()'],['../classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#a06b863abd1b457c48b7080e203b47a0f',1,'entt::SparseSet&lt; Entity, Type &gt;::destroy()']]],
+  ['disconnect',['disconnect',['../classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_4.html#a476a043603c4561fae32863e6103b2f1',1,'entt::SigH&lt; Ret(Args...)&gt;::disconnect()'],['../classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_4.html#a22891cefa259e475462242442b0fe55f',1,'entt::SigH&lt; Ret(Args...)&gt;::disconnect(Class *instance)'],['../classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_4.html#a802baad26c836da4d28d26e1142d7fec',1,'entt::SigH&lt; Ret(Args...)&gt;::disconnect(Class *instance)']]]
+];
