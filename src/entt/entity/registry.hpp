@@ -632,8 +632,8 @@ public:
      *
      * @note
      * Multi component views are pretty fast. However their performance tend to
-     * degenerate when the number of components grows up and the most of the
-     * entities have all the given components.<br/>
+     * degenerate when the number of components to iterate grows up and the most
+     * of the entities have all the given components.<br/>
      * To get a performance boost, consider using a PersistentView instead.
      *
      * @see View

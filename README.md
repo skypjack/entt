@@ -366,132 +366,247 @@ In fact, there are two functions that respond to slightly different needs:
   In this case, instances of `Movement` are arranged in memory so that cache
   misses are minimized when the two components are iterated together.
 
-#### View: to be or not to be (persistent)?
+#### View: to persist or not to persist?
 
-TODO
+There are mainly two kinds of views: standard (also known as View) and
+persistent (alsa known as PersistentView).<br/>
+Both of them have pros and cons to take in consideration. In particular:
 
-<!--
-Finally, the `view` member function template returns an iterable portion of entities and components:
+* Standard views:
+    Pros:
+        * They work out-of-the-box and don't require any dedicated data
+          structure.
+        * Creating and destroying them isn't expensive at all because they don't
+          have any type of initialization.
+        * They are the best tool to iterate single components.
+        * They are the best tool to iterate multiple components at once when
+          tags are involved or one of the component is assigned to a
+          significantly low number of entities.
+        * They don't affect any other operations of the registry.
+    Cons:
+        * Their performance tend to degenerate when the number of components
+          to iterate grows up and the most of the entities have all of them.
+
+* Persistent views:
+    Pros:
+        * Once prepared, creating and destroying them isn't expensive at all
+          because they don't have any type of initialization.
+        * They are the best tool to iterate multiple components at once when
+          the most of the entities have all of them.
+    Cons:
+        * They have dedicated data structures and thus affect the memory
+          pressure to a minimal extent.
+        * If not previously prepared, the first time they are used they go
+          through an initialization step that could take a while.
+        * They affect to a minimum the creation and destruction of entities and
+          components. In other terms: the more persistent views there will be,
+          the less performing will be creating and destroying entities and
+          components.
+
+To sum up and as a rule of thumb, use a standard view:
+    * To iterate entities for a single component.
+    * To iterate entities for multiple components when a significantly low
+      number of entities have one of the components.
+    * In all those cases where a persistent view would give a boost to
+      performance but the iteration isn't performed frequently.
+
+Use a persistent view in all the other cases.
+
+To easily iterate entities, all the views offer _C++-ish_ `begin` and `end`
+member functions that allow users to use them in a typical range-for loop.<br/>
+Continue reading for more details or refer to the
+[official documentation](https://skypjack.github.io/entt/).
+
+##### Standard View
+
+A standard view behaves differently if it's constructed for a single component
+or if it has been requested to iterate multiple components. Even the API is
+different in the two cases.<br/>
+All that they share is the way they are created by means of a registry:
+
+```cpp
+// single component standard view
+auto single = registry.view<Position>();
+
+// multi component standard view
+auto multi = registry.view<Position, Velocity>();
+```
+
+For all that remains, it's worth discussing them separately.<br/>
+
+###### Single component
+
+Single component standard views are specialized in order to give a boost in
+terms of performance in all the situation. This kind of views can access the
+underlying data structures directly and avoid superflous checks.<br/>
+They offer a bunch of functionalities to get the number of entities they are
+going to return and a raw access to the entity list as well as to the component
+list.<br/>
+Refer to the [official documentation](https://skypjack.github.io/entt/) for all
+the details.
+
+There is no need to store views around for they are extremely cheap to
+construct, even though they can be copied without problems and reused
+freely. In fact, they return newly created and correctly initialized iterators
+whenever `begin` or `end` are invoked.<br/>
+To iterate a single component standard view, just use it in range-for:
+
+```cpp
+auto view = registry.view<Renderable>();
+
+for(auto entity: view) {
+    auto &renderable = view.get(entity);
+
+    // ...
+}
+```
+
+**Note**: prefer the `get` member function of the view instead of the `get`
+member function template of the registry during iterations.
+
+###### Multi component
+
+Multi component standard views iterate entities that have at least all the given
+components in their bags. During construction, these views look at the number
+of entities available for each component and pick up a reference to the smallest
+set of candidates in order to speed up iterations.<br/>
+They offer fewer functionalities than their companion views for single
+component, the most important of which can be used to reset the view and refresh
+the reference to the set of candidate entities to iterate.<br/>
+Refer to the [official documentation](https://skypjack.github.io/entt/) for all
+the details.
+
+There is no need to store views around for they are extremely cheap to
+construct, even though they can be copied without problems and reused
+freely. In fact, they return newly created and correctly initialized iterators
+whenever `begin` or `end` are invoked.<br/>
+To iterate a multi component standard view, just use it in range-for:
 
 ```cpp
 auto view = registry.view<Position, Velocity>();
+
+for(auto entity: view) {
+    auto &position = view.get<Position>(entity);
+    auto &velocity = view.get<Velocity>(entity);
+
+    // ...
+}
 ```
 
-Views are the other core component of `EnTT` and are usually extensively used by softwares that include it. See below for more details about the types of views.
+**Note**: prefer the `get` member function template of the view instead of the
+`get` member function template of the registry during iterations.
 
-#### The View
+##### Persistent View
 
-There are two types of views:
+A persistent view returns all the entities and only the entities that have at
+least the given components. Moreover, it's guaranteed that the entity list is
+thightly packed in memory for fast iterations.<br/>
+In general, persistent views don't stay true to the order of any set of
+components unless users explicitly sort them.
 
-* **Single component view**.
+Persistent views can be used only to iterate multiple components. Create them
+as it follows:
 
-  A single component view gives direct access to both the components and the entities to which the components are assigned.<br/>
-  This kind of views are created from the `Registry` class by means of the `view` member function template as it follows:
+```cpp
+auto view = registry.persistent<Position, Velocity>();
+```
 
-    ```cpp
-    // Actual type is Registry<Components...>::view_type<Comp>, where Comp is the component for which the view should be created ...
-    // ... well, auto is far easier to use in this case, isn't it?
-    auto view = registry.view<Sprite>();
-    ```
+There is no need to store views around for they are extremely cheap to
+construct, even though they can be copied without problems and reused
+freely. In fact, they return newly created and correctly initialized iterators
+whenever `begin` or `end` are invoked.<br/>
+That being said, persistent views perform an initialization step the very first
+time they are constructed and this could be quite costly. To avoid it, consider
+asking to the registry to _prepare_ them when no entities have been created yet:
 
-  Components and entities are stored in tightly packed arrays and single component views are the fastest solution to iterate them.<br/>
-  They have the _C++11-ish_ `begin` and `end` member function that allow users to use them in a typical range-for loop:
+```cpp
+registry.prepare<Position, Velocity>();
+```
 
-    ```cpp
-    auto view = registry.view<Sprite>();
+If the registry is empty, preparation is extremely fast. Moreover the `prepare`
+member function template is idempotent. Feel free to invoke it even more than
+once: if the view has been alreadt prepared before, the function returns
+immediately and does nothing.
 
-    for(auto entity: view) {
-        auto &sprite = registry.get<Sprite>(entity);
-        // ...
-    }
-    ```
+A persistent view offers a bunch of functionalities to get the number of
+entities it's going to return, a raw access to the entity list and the
+possibility to sort the underlying data structures according to the order of one
+of the components for which it has been constructed.<br/>
+Refer to the [official documentation](https://skypjack.github.io/entt/) for all
+the details.
 
-  Iterating a view this way returns entities that can be further used to get components or perform other activities.<br/>
-  There is also another method one can use to iterate the array of entities, that is by using the `size` and `data` member functions:
+To iterate a persistent view, just use it in range-for:
 
-    ```cpp
-    auto view = registry.view<Sprite>();
-    const auto *data = view.data();
+```cpp
+auto view = registry.persistent<Position, Velocity>();
 
-    for(auto i = 0, end = view.size(); i < end; ++i) {
-        auto entity = *(data + i);
-        // ...
-    }
-    ```
+for(auto entity: view) {
+    auto &position = view.get<Position>(entity);
+    auto &velocity = view.get<Velocity>(entity);
 
-  Entites are good when the sole component isn't enough to perform a task.
-  Anyway they come with a cost: accessing components by entities has an extra level of indirection. It's pretty fast, but not that fast in some cases.<br/>
-  Direct access to the packed array of components is the other option around of a single component view. Member functions `size` and `raw` are there for that:
+    // ...
+}
+```
 
-    ```cpp
-    auto view = registry.view<Sprite>();
-    const auto *raw = view.raw();
-
-    for(auto i = 0, end = view.size(); i < end; ++i) {
-        auto &sprite = *(raw + i);
-        // ...
-    }
-    ```
-
-  This is the fastest solution to iterate over the components: they are packed together by construction and visit them in order will reduce to a minimum the number of cache misses.
-
-* **Multi component view**.
-
-  A multi component view gives access only to the entities to which the components are assigned.<br/>
-  This kind of views are created from the `Registry` class by means of the `view` member function template as it follows:
-
-    ```cpp
-    // Actual type is Registry<Components...>::view_type<Comp...>, where Comp... are the components for which the view should be created ...
-    // ... well, auto is far easier to use in this case, isn't it?
-    auto view = registry.view<Position, Velocity>();
-    ```
-
-  Multi component views can be iterated by means of the `begin` and `end` member functions in a typical range-for loop:
-
-    ```cpp
-    auto view = registry.view<Position, Velocity>();
-
-    for(auto entity: view) {
-        auto &position = registry.get<Position>(entity);
-        auto &velocity = registry.get<Velocity>(entity);
-        // ...
-    }
-    ```
-
-  Note that there exists a packed array of entities to which the component is assigned for each component.
-  Iterators of a multi component view pick the shortest array up and use it to visit the smallest set of potential entities.<br/>
-  The choice is performed when the view is constructed. It's good enough as long as views are discarded once they have been used.
-  For all the other cases, the `reset` member function can be used whenever the data within the registry are known to be changed and forcing the choice again could speed up the execution.
-
-  **Note**: one could argue that an iterator should return the set of references to components for each entity instead of the entity itself.
-  Well, who wants to spend CPU cycles to get a reference to an useless tag component? This drove the design choice indeed.
-
-All the views can be used more than once. They return newly created and correctly initialized iterators whenever `begin` or `end` is invoked.
-The same is valid for `data` and `raw` too. Anyway views and iterators are tiny objects and the time spent to construct them can be safely ignored.<br/>
-I'd suggest not to store them anywhere and to invoke the `Registry::view` member function template at each iteration to get a properly initialized view through which to iterate.
+**Note**: prefer the `get` member function template of the view instead of the
+`get` member function template of the registry during iterations.
 
 #### Side notes
 
-* Entities are numbers and nothing more. They are not classes and they have no member functions at all.
+* Entity identifiers are numbers and nothing more. They are not classes and they
+  have no member functions at all. As already mentioned, do no try to inspect or
+  modify an entity descriptor in any way.
 
-* Most of the _ECS_ available out there have an annoying limitation (at least from my point of view): entities and components cannot be created, assigned or deleted while users are iterating on them.<br/>
+* As shown in the examples above, the preferred way to get references to the
+  components while iterating a view is by using the view itself. It's a faster
+  alternative to the `get` member function template that is part of the API of
+  the Registry. That's because the registry must ensure that a pool for the
+  given component exists before to use it; on the other side, views force the
+  construction of the pools for all their components and access them directly,
+  thus avoiding all the checks.
+
+* Most of the _ECS_ available out there have an annoying limitation (at least
+  from my point of view): entities and components cannot be created and/or
+  deleted during iterations.<br/>
   `EnTT` partially solves the problem with a few limitations:
 
-    * Entities can be created at any time while iterating one or more components.
-    * Components can be assigned to any entity at any time while iterating one or more components.
-    * During an iteration, the current entity (that is the one returned by the iterator) can be deleted and all its components can be removed safely.
+      * Creating entities and components is allowed during iterations.
+      * Deleting an entity or removing its components is allowed during
+        iterations if it's the one currently returned by a view. For all the
+        other entities, destroying them or removing their components isn't
+        allowed and it can result in undefined behavior.
 
-  Entities that are not the current one (that is the one returned by the iterator) cannot be deleted from within a loop.<br/>
-  Components assigned to entities that are not the current one (that is the one returned by the iterator) cannot be removed from within a loop.<br/>
-  In this case, iterators are invalidated and the behaviour is undefined if one continues to use those iterators. Possible approaches are:
+  Iterators are invalidated and the behaviour is undefined if an entity is
+  modified or destroyed and it's not the one currently returned by the
+  view.<br/>
+  To work around it, possible approaches are:
 
-    * Store aside the entities and components to be removed and perform the operations at the end of the iteration.
-    * Mark entities and components with a proper tag component that indicates that they must be purged, then perform a second iteration to clean them up one by one.
+    * Store aside the entities and the components to be removed and perform the
+      operations at the end of the iteration.
+    * Mark entities and components with a proper tag component that indicates
+      they must be purged, then perform a second iteration to clean them up one
+      by one.
 
-* Iterators aren't thread safe. Do no try to iterate over a set of components and modify them concurrently.<br/>
-  That being said, as long as a thread iterates over the entities that have the component `X` or assign and removes that component from a set of entities and another thread does something similar with components `Y` and `Z`, it shouldn't be a problem at all.<br/>
-  As an example, that means that users can freely run the rendering system over the renderable entities and update the physics concurrently on a separate thread if needed.
--->
+* Views and thus their iterators aren't thread safe. Do no try to iterate a set
+  of components and modify the same set concurrently.<br/>
+  That being said, as long as a thread iterates the entities that have the
+  component `X` or assign and removes that component from a set of entities,
+  another thread can safely do the same with components `Y` and `Z` and
+  everything will work like a charm.<br/>
+  As an example, users can freely execute the rendering system and iterate the
+  renderable entities while updating a physic component concurrently on a
+  separate thread if needed.
+
+### What's then?
+
+The `EnTT` framework is moving its first steps. More and more will come in
+future and I plan to work on it for a long time.<br/>
+Here is a brief list of what it offers today (consider it a work in progress):
+
+TODO
+
+For more details, please refer directly to the
+[online documentation](https://skypjack.github.io/entt/).
 
 ## Tests
 
@@ -513,17 +628,27 @@ Benchmarks are compiled only in release mode currently.
 
 # Contributors
 
-If you want to contribute, please send patches as pull requests against the branch master.<br/>
-Check the [contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to see who has partecipated so far.
+If you want to contribute, please send patches as pull requests against the
+branch `master`.<br/>
+Check the
+[contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to see
+who has partecipated so far.
 
 # License
 
 Code and documentation Copyright (c) 2017 Michele Caini.<br/>
-Code released under [the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).
-Docs released under [Creative Commons](https://github.com/skypjack/entt/blob/master/docs/LICENSE).
+Code released under
+[the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).
+Docs released under
+[Creative Commons](https://github.com/skypjack/entt/blob/master/docs/LICENSE).
 
 # Donation
 
-Developing and maintaining `EnTT` takes some time and lots of coffee. It still lacks a proper test suite, documentation is partially incomplete and not all functionalities have been fully implemented yet.<br/>
-If you want to support this project, you can offer me an espresso. I'm from Italy, we're used to turning the best coffee ever in code.<br/>
-Take a look at the donation button at the top of the page for more details or just click [here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W2HF9FESD5LJY&lc=IT&item_name=Michele%20Caini&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted).
+Developing and maintaining `EnTT` takes some time and lots of coffee. I'd like
+to add more and more functionalities in future and turn it in a full-featured
+framework.<br/>
+If you want to support this project, you can offer me an espresso. I'm from
+Italy, we're used to turning the best coffee ever in code. If you find that
+it's not enough, feel free to support me the way you prefer.<br/>
+Take a look at the donation button at the top of the page for more details or
+just click [here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W2HF9FESD5LJY&lc=IT&item_name=Michele%20Caini&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted).
