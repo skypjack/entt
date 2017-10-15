@@ -2,7 +2,6 @@
 #define ENTT_ENTITY_REGISTRY_HPP
 
 
-#include <tuple>
 #include <vector>
 #include <memory>
 #include <utility>
