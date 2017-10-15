@@ -8,10 +8,7 @@
 #include <utility>
 #include <cstddef>
 #include <cassert>
-#include <algorithm>
-#include <type_traits>
 #include "../core/family.hpp"
-#include "../signal/sigh.hpp"
 #include "sparse_set.hpp"
 #include "traits.hpp"
 #include "view.hpp"
@@ -38,46 +35,39 @@ class Registry {
 
     template<typename Component>
     struct Pool: SparseSet<Entity, Component> {
-        SigH<void(Entity)> constructed;
-        SigH<void(Entity)> destroyed;
+        using test_fn_type = bool(Registry::*)(Entity) const;
 
         template<typename... Args>
-        Component & construct(Entity entity, Args&&... args) {
+        Component & construct(Registry &registry, Entity entity, Args&&... args) {
             auto &component = SparseSet<Entity, Component>::construct(entity, std::forward<Args>(args)...);
-            constructed.publish(entity);
+
+            for(auto &&listener: listeners) {
+                if((registry.*listener.second)(entity)) {
+                    listener.first.construct(entity);
+                }
+            }
+
             return component;
         }
 
         void destroy(Entity entity) override {
             SparseSet<Entity, Component>::destroy(entity);
-            destroyed.publish(entity);
-        }
-    };
 
-    template<typename... Component>
-    struct PoolHandler: SparseSet<Entity> {
-        static_assert(sizeof...(Component) > 1, "!");
+            for(auto &&listener: listeners) {
+                auto &handler = listener.first;
 
-        PoolHandler(Pool<Component> &... pools)
-            : pools{pools...}
-        {}
-
-        void candidate(Entity entity) {
-            using accumulator_type = bool[];
-            bool match = true;
-            accumulator_type accumulator = { (match = match && std::get<Pool<Component> &>(pools).has(entity))... };
-            if(match) { SparseSet<Entity>::construct(entity); }
-            (void)accumulator;
-        }
-
-        void release(Entity entity) {
-            if(SparseSet<Entity>::has(entity)) {
-                SparseSet<Entity>::destroy(entity);
+                if(handler.has(entity)) {
+                    handler.destroy(entity);
+                }
             }
         }
 
+        void append(SparseSet<Entity> &handler, test_fn_type fn) {
+            listeners.emplace_back(handler, fn);
+        }
+
     private:
-        const std::tuple<Pool<Component> &...> pools;
+        std::vector<std::pair<SparseSet<Entity> &, test_fn_type>> listeners;
     };
 
     template<typename Component>
@@ -242,7 +232,7 @@ public:
     entity_type create() noexcept {
         using accumulator_type = int[];
         const auto entity = create();
-        accumulator_type accumulator = { 0, (ensure<Component>().construct(entity), 0)... };
+        accumulator_type accumulator = { 0, (ensure<Component>().construct(*this, entity), 0)... };
         (void)accumulator;
         return entity;
     }
@@ -329,7 +319,7 @@ public:
     template<typename Component, typename... Args>
     Component & assign(entity_type entity, Args&&... args) {
         assert(valid(entity));
-        return ensure<Component>().construct(entity, std::forward<Args>(args)...);
+        return ensure<Component>().construct(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -473,7 +463,7 @@ public:
 
         return (cpool.has(entity)
                 ? (cpool.get(entity) = Component{std::forward<Args>(args)...})
-                : cpool.construct(entity, std::forward<Args>(args)...));
+                : cpool.construct(*this, entity, std::forward<Args>(args)...));
     }
 
     /**
@@ -674,23 +664,19 @@ public:
         }
 
         if(!handlers[vtype]) {
-            using handler_type = PoolHandler<Component...>;
             using accumulator_type = int[];
 
-            auto handler = std::make_unique<handler_type>(ensure<Component>()...);
+            auto handler = std::make_unique<SparseSet<Entity>>();
 
             for(auto entity: view<Component...>()) {
                 handler->construct(entity);
             }
 
-            auto *ptr = handler.get();
-            handlers[vtype] = std::move(handler);
-
             accumulator_type accumulator = {
-                (ensure<Component>().constructed.template connect<handler_type, &handler_type::candidate>(ptr), 0)...,
-                (ensure<Component>().destroyed.template connect<handler_type, &handler_type::release>(ptr), 0)...
+                (ensure<Component>().append(*handler, &Registry::has<Component...>), 0)...
             };
 
+            handlers[vtype] = std::move(handler);
             (void)accumulator;
         }
     }
