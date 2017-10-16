@@ -597,10 +597,10 @@ for(auto entity: view) {
   renderable entities while updating a physic component concurrently on a
   separate thread if needed.
 
-### What then?
+### What else?
 
-The `EnTT` framework is moving its first steps. More and more will come in
-future and I plan to work on it for a long time.<br/>
+The `EnTT` framework is moving its first steps. More and more will come in the
+future and hopefully I'm going to work on it for a long time.<br/>
 Here is a brief list of what it offers today (consider it a work in progress):
 
 TODO

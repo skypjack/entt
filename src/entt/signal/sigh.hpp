@@ -9,13 +9,74 @@
 
 namespace entt {
 
+
+namespace {
+
+
+template<typename, typename>
+struct Invoker;
+
+
+template<typename Ret, typename... Args, typename Collector>
+struct Invoker<Ret(Args...), Collector> {
+    using proto_type = Ret(*)(void *, Args...);
+    using call_type = std::pair<void *, proto_type>;
+
+    virtual ~Invoker() = default;
+
+    template<typename SFINAE = Ret>
+    typename std::enable_if<std::is_void<SFINAE>::value, bool>::type
+    invoke(Collector &, proto_type proto, void *instance, Args... args) {
+        proto(instance, args...);
+        return true;
+    }
+
+    template<typename SFINAE = Ret>
+    typename std::enable_if<not std::is_void<SFINAE>::value, bool>::type
+    invoke(Collector &collector, proto_type proto, void *instance, Args... args) {
+        return collector(proto(instance, args...));
+    }
+};
+
+
+template<typename Ret>
+struct NullCollector final {
+    using result_type = Ret;
+    bool operator()(result_type) const noexcept { return true; }
+};
+
+
+template<>
+struct NullCollector<void> final {
+    using result_type = void;
+    bool operator()() const noexcept { return true; }
+};
+
+
+template<typename>
+struct DefaultCollector;
+
+
+template<typename Ret, typename... Args>
+struct DefaultCollector<Ret(Args...)> final {
+    using collector_type = NullCollector<Ret>;
+};
+
+
+template<typename Function>
+using DefaultCollectorType = typename DefaultCollector<Function>::collector_type;
+
+
+}
+
+
 /**
  * @brief Signal handler.
  *
  * Primary template isn't defined on purpose. All the specializations give a
  * compile-time error unless the template parameter is a function type.
  */
-template<typename>
+template<typename Function, typename = DefaultCollectorType<Function>>
 class SigH;
 
 
@@ -26,27 +87,39 @@ class SigH;
  * and pointers to member functions as well as pointers to free functions. Users
  * of this class are in charge of disconnecting instances before deleting them.
  *
+ * This class serves mainly two purposes:
+ * * Creating signals to be used later to notify a bunch of listeners.
+ * * Collecting results from a set of functions like in a voting system.
+ *
+ * The default collector does nothing. To properly collect data, define and use
+ * a class that has a call operator the signature of which is `bool(Param)` and:
+ * * `Param` is a type to which `Ret` can be converted.
+ * * The return type is true if the handler must stop collecting data, false
+ *   otherwise.
+ *
  * @tparam Ret Return type of a function type.
  * @tparam Args Types of the arguments of a function type.
+ * @tparam Collector The type of the collector to use if any.
  */
-template<typename Ret, typename... Args>
-class SigH<Ret(Args...)> {
-    using proto_type = void(*)(void *, Args...);
-    using call_type = std::pair<void *, proto_type>;
+template<typename Ret, typename... Args, typename Collector>
+class SigH<Ret(Args...), Collector> final: private Invoker<Ret(Args...), Collector> {
+    using typename Invoker<Ret(Args...), Collector>::call_type;
 
     template<Ret(*Function)(Args...)>
-    static void proto(void *, Args... args) {
-        (Function)(args...);
+    static Ret proto(void *, Args... args) {
+        return (Function)(args...);
     }
 
-    template<typename Class, Ret(Class::*Member)(Args...)>
-    static void proto(void *instance, Args... args) {
-        (static_cast<Class *>(instance)->*Member)(args...);
+    template<typename Class, Ret(Class::*Member)(Args... args)>
+    static Ret proto(void *instance, Args... args) {
+        return (static_cast<Class *>(instance)->*Member)(args...);
     }
 
 public:
     /*! @brief Unsigned integer type. */
     using size_type = typename std::vector<call_type>::size_type;
+    /*! @brief Collector type. */
+    using collector_type = Collector;
 
     /*! @brief Default constructor, explicit on purpose. */
     explicit SigH() noexcept = default;
@@ -116,8 +189,8 @@ public:
     /**
      * @brief Connects a free function to the signal.
      *
-     * @warning
-     * The signal doesn't perform checks on multiple connections for free
+     * @note
+     * The signal handler performs checks to avoid multiple connections for free
      * functions.
      *
      * @tparam Function A valid free function pointer.
@@ -125,7 +198,7 @@ public:
     template<Ret(*Function)(Args...)>
     void connect() {
         disconnect<Function>();
-        calls.emplace_back(call_type{nullptr, &proto<Function>});
+        calls.emplace_back(nullptr, &proto<Function>);
     }
 
     /**
@@ -136,8 +209,8 @@ public:
      * signal.
      *
      * @warning
-     * The signal doesn't perform checks on multiple connections for the same
-     * member method of a given instance.
+     * The signal handler performs checks to avoid multiple connections for the
+     * same member function of a given instance.
      *
      * @tparam Class The type of the class to which the member function belongs.
      * @tparam Member The member function to connect to the signal.
@@ -146,15 +219,11 @@ public:
     template <typename Class, Ret(Class::*Member)(Args...)>
     void connect(Class *instance) {
         disconnect<Class, Member>(instance);
-        calls.emplace_back(call_type{instance, &proto<Class, Member>});
+        calls.emplace_back(instance, &proto<Class, Member>);
     }
 
     /**
      * @brief Disconnects a free function from the signal.
-     *
-     * If the free function has been connected more than once, all the
-     * connections are broken once the function returns.
-     *
      * @tparam Function A valid free function pointer.
      */
     template<Ret(*Function)(Args...)>
@@ -164,12 +233,7 @@ public:
     }
 
     /**
-     * @brief Disconnects the member function of the given instance from the
-     * signal.
-     *
-     * If the member function for the given instance has been connected more
-     * than once, all the connections are broken once the function returns.
-     *
+     * @brief Disconnects the given member function from the signal.
      * @tparam Class The type of the class to which the member function belongs.
      * @tparam Member The member function to connect to the signal.
      * @param instance A valid instance of type pointer to `Class`.
@@ -182,7 +246,6 @@ public:
 
     /**
      * @brief Removes all existing connections for the given instance.
-     *
      * @tparam Class The type of the class to which the member function belongs.
      * @param instance A valid instance of type pointer to `Class`.
      */
@@ -197,12 +260,29 @@ public:
      *
      * All the listeners are notified. Order isn't guaranteed.
      *
-     * @param args Arguments to use when invoking listeners.
+     * @param args Arguments to use to invoke listeners.
      */
     void publish(Args... args) {
         for(auto &&call: calls) {
             call.second(call.first, args...);
         }
+    }
+
+    /**
+     * @brief Collects return values from the listeners.
+     * @param args Arguments to use to invoke listeners.
+     * @return An instance of the collector filled with collected data.
+     */
+    collector_type collect(Args... args) {
+        collector_type collector;
+
+        for(auto &&call: calls) {
+            if(!this->invoke(collector, call.second, call.first, args...)) {
+                break;
+            }
+        }
+
+        return collector;
     }
 
     /**
@@ -219,18 +299,13 @@ public:
      * @brief Checks if the contents of the two signals are identical.
      *
      * Two signals are identical if they have the same size and the same
-     * listeners have been connected to them.
-     *
-     * @note
-     * This function is pretty expensive, use it carefully.
+     * listeners registered exactly in the same order.
      *
      * @param other Signal with which to compare.
      * @return True if the two signals are identical, false otherwise.
      */
     bool operator==(const SigH &other) const noexcept {
-        const auto &ref = other.calls;
-        auto pred = [&ref](const auto &call) { return (std::find(ref.cbegin(), ref.cend(), call) != ref.cend()); };
-        return (calls.size() == other.calls.size()) && std::all_of(calls.cbegin(), calls.cend(), std::move(pred));
+        return (calls.size() == other.calls.size()) && std::equal(calls.cbegin(), calls.cend(), other.calls.cbegin());
     }
 
 private:
@@ -242,10 +317,7 @@ private:
  * @brief Checks if the contents of the two signals are different.
  *
  * Two signals are identical if they have the same size and the same
- * listeners have been connected to them. They are different otherwiser.
- *
- * @note
- * This function is pretty expensive, use it carefully.
+ * listeners registered exactly in the same order.
  *
  * @tparam Ret Return type of a function type.
  * @tparam Args Types of the arguments of a function type.
@@ -257,6 +329,17 @@ template<typename Ret, typename... Args>
 bool operator!=(const SigH<Ret(Args...)> &lhs, const SigH<Ret(Args...)> &rhs) noexcept {
     return !(lhs == rhs);
 }
+
+
+/**
+ * @brief Event handler.
+ *
+ * Unmanaged event handler. Collecting data for this kind of signals doesn't
+ * make sense at all. Its sole purpose is to provide the listeners with the
+ * given event.
+ */
+template<typename Event>
+using EventH = SigH<void(const Event &)>;
 
 
 }

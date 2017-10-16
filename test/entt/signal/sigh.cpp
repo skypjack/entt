@@ -1,44 +1,21 @@
-#include <vector>
 #include <utility>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/signal/sigh.hpp>
 
-TEST(SigH, Functionalities) {
-    struct S {
-        void f() {}
-    };
+TEST(SigH, Lifetime) {
+    using signal = entt::SigH<void(void)>;
 
-    ASSERT_NO_THROW(entt::SigH<void(void)>{});
+    ASSERT_NO_THROW(signal{});
 
-    entt::SigH<void(void)> src{}, other{};
+    signal src{}, other{};
 
-    ASSERT_NO_THROW(entt::SigH<void(void)>{src});
-    ASSERT_NO_THROW(entt::SigH<void(void)>{std::move(other)});
+    ASSERT_NO_THROW(signal{src});
+    ASSERT_NO_THROW(signal{std::move(other)});
     ASSERT_NO_THROW(src = other);
     ASSERT_NO_THROW(src = std::move(other));
-    ASSERT_NO_THROW(std::swap(src, other));
 
-    ASSERT_EQ(src.size(), entt::SigH<void(void)>::size_type{0});
-    ASSERT_TRUE(src == other);
-    ASSERT_FALSE(src != other);
-    ASSERT_TRUE(src.empty());
-
-    S s;
-    src.connect<S, &S::f>(&s);
-
-    ASSERT_EQ(src.size(), entt::SigH<void(void)>::size_type{1});
-    ASSERT_FALSE(src == other);
-    ASSERT_TRUE(src != other);
-    ASSERT_FALSE(src.empty());
-
-    src.clear();
-
-    ASSERT_EQ(src.size(), entt::SigH<void(void)>::size_type{0});
-    ASSERT_TRUE(src == other);
-    ASSERT_FALSE(src != other);
-    ASSERT_TRUE(src.empty());
-
-    ASSERT_NO_THROW(delete new entt::SigH<void(void)>{});
+    ASSERT_NO_THROW(delete new signal{});
 }
 
 TEST(SigH, Comparison) {
@@ -91,7 +68,7 @@ TEST(SigH, Comparison) {
     sig2.connect<S, &S::g>(&s1);
     sig2.connect<S, &S::f>(&s1);
 
-    ASSERT_TRUE(sig1 == sig2);
+    ASSERT_FALSE(sig1 == sig2);
 }
 
 struct S {
@@ -153,4 +130,51 @@ TEST(SigH, Members) {
 
     ASSERT_TRUE(sigh.empty());
     ASSERT_EQ((entt::SigH<bool(int)>::size_type)0, sigh.size());
+}
+
+template<typename Ret>
+struct TestCollectAll {
+    std::vector<Ret> vec{};
+    static int f() { return 42; }
+    static int g() { return 42; }
+    bool operator()(Ret r) noexcept {
+        vec.push_back(r);
+        return true;
+    }
+};
+
+template<typename Ret>
+struct TestCollectFirst {
+    std::vector<Ret> vec{};
+    static int f() { return 42; }
+    bool operator()(Ret r) noexcept {
+        vec.push_back(r);
+        return false;
+    }
+};
+
+TEST(SigH, Collector) {
+    entt::SigH<int(), TestCollectAll<int>> sigh_all;
+
+    sigh_all.connect<&TestCollectAll<int>::f>();
+    sigh_all.connect<&TestCollectAll<int>::f>();
+    sigh_all.connect<&TestCollectAll<int>::g>();
+    auto collector_all = sigh_all.collect();
+
+    ASSERT_FALSE(sigh_all.empty());
+    ASSERT_FALSE(collector_all.vec.empty());
+    ASSERT_EQ((std::vector<int>::size_type)2, collector_all.vec.size());
+    ASSERT_EQ(42, collector_all.vec[0]);
+    ASSERT_EQ(42, collector_all.vec[1]);
+
+    entt::SigH<int(), TestCollectFirst<int>> sigh_first;
+
+    sigh_first.connect<&TestCollectFirst<int>::f>();
+    sigh_first.connect<&TestCollectFirst<int>::f>();
+    auto collector_first = sigh_first.collect();
+
+    ASSERT_FALSE(sigh_first.empty());
+    ASSERT_FALSE(collector_first.vec.empty());
+    ASSERT_EQ((std::vector<int>::size_type)1, collector_first.vec.size());
+    ASSERT_EQ(42, collector_first.vec[0]);
 }
