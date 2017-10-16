@@ -82,8 +82,8 @@ Motivation</h2>
 <p>I started working on <code>EnTT</code> because of the wrong reason: my goal was to design an entity-component system that beated another well known open source solution in terms of performance.<br />
  I did it, of course, but it wasn't much satisfying. Actually it wasn't satisfying at all. The fastest and nothing more, fairly little indeed. When I realized it, I tried hard to keep intact the great performance of <code>EnTT</code> and to add all the features I wanted to see in <em>my</em> entity-component system at the same time.</p>
 <p>Today <code>EnTT</code> is finally what I was looking for: still faster than its <em>rivals</em>, a really good API and an amazing set of features. And even more, of course.</p>
-<h3><a class="anchor" id="autotoc_md4"></a>
-Performance</h3>
+<h2><a class="anchor" id="autotoc_md4"></a>
+Performance</h2>
 <p>As it stands right now, <code>EnTT</code> is just fast enough for my requirements if compared to my first choice (that was already amazingly fast indeed).<br />
  Here is a comparision between the two (both of them compiled with GCC 7.2.0 on a Dell XPS 13 out of the mid 2014):</p>
 <table class="doxtable">
@@ -147,26 +147,40 @@ Library</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;registry.hpp&gt;</span></div></div><!-- fragment --><p>Then pass the proper <code>-I</code> argument to the compiler to add the <code>src</code> directory to the include paths.</p>
 <h2><a class="anchor" id="autotoc_md8"></a>
 Documentation</h2>
-<h3><a class="anchor" id="autotoc_md9"></a>
-API Reference</h3>
 <p>The documentation is based on <a href="http://www.stack.nl/~dimitri/doxygen/">doxygen</a>. To build it: </p><pre class="fragment">$ cd build
 $ cmake ..
 $ make docs
 </pre><p>The API reference will be created in HTML format within the directory <code>build/docs/html</code>. To navigate it with your favorite browser: </p><pre class="fragment">$ cd build
 $ your_favorite_browser docs/html/index.html
 </pre><p>The API reference is also available <a href="https://skypjack.github.io/entt/">online</a> for the latest version.</p>
-<h3><a class="anchor" id="autotoc_md10"></a>
-Crash Course</h3>
-<h4><a class="anchor" id="autotoc_md11"></a>
-Vademecum</h4>
+<h2><a class="anchor" id="autotoc_md9"></a>
+Tests</h2>
+<p>To compile and run the tests, <code>EnTT</code> requires <em>googletest</em>.<br />
+ <code>cmake</code> will download and compile the library before to compile anything else.</p>
+<p>To build the tests:</p>
+<ul>
+<li><code>$ cd build</code></li>
+<li><code>$ cmake ..</code></li>
+<li><code>$ make</code></li>
+<li><code>$ make test</code></li>
+</ul>
+<p>To build the benchmarks, use the following line instead:</p>
+<ul>
+<li><code>$ cmake -DCMAKE_BUILD_TYPE=Release ..</code></li>
+</ul>
+<p>Benchmarks are compiled only in release mode currently.</p>
+<h1><a class="anchor" id="autotoc_md10"></a>
+Crash Course</h1>
+<h2><a class="anchor" id="autotoc_md11"></a>
+Vademecum</h2>
 <p>The <code>Registry</code> to store, the <code>View</code>s to iterate. That's all.</p>
 <p>An entity (the <em>E</em> of an <em>ECS</em>) is an opaque identifier that users should just use as-is and store around if needed. Do not try to inspect an entity identifier, its type can change in future and a registry offers all the functionalities to query them out-of-the-box. The underlying type of an entity (either <code>std::uint16_t</code>, <code>std::uint32_t</code> or <code>std::uint64_t</code>) can be specified when defining a registry (actually the DefaultRegistry is nothing more than a Registry where the type of the entities is <code>std::uint32_t</code>).<br />
  Components (the <em>C</em> of an <em>ECS</em>) should be plain old data structures or more complex and moveable data structures with a proper constructor. They are list initialized by using the parameters provided to construct the component. No need to register components or their types neither with the registry nor with the entity-component system at all.<br />
  Systems (the <em>S</em> of an <em>ECS</em>) are just plain functions, functors, lambdas or whatever the users want. They can accept a Registry, a View or a PersistentView and use them the way they prefer. No need to register systems or their types neither with the registry nor with the entity-component system at all.</p>
 <p>The following sections will explain in short how to use the entity-component system, the core part of the <code>EnTT</code> framework.<br />
  In fact, the framework is composed of many other classes in addition to those describe below. For more details, please refer to the <a href="https://skypjack.github.io/entt/">online documentation</a>.</p>
-<h4><a class="anchor" id="autotoc_md12"></a>
-The Registry, the Entity and the Component</h4>
+<h2><a class="anchor" id="autotoc_md12"></a>
+The Registry, the Entity and the Component</h2>
 <p>A registry is used to store and manage entities as well as to create views to iterate the underlying data structures.<br />
  Registry is a class template that lets the users decide what's the preferred type to represent an entity. Because <code>std::uint32_t</code> is large enough for almost all the cases, there exists also an alias named DefaultRegistry for <code>Registry&lt;std::uint32_t&gt;</code>.</p>
 <p>Entities are represented by <em>entitiy identifiers</em>. An entity identifier is an opaque type that users should not inspect or modify in any way. It carries information about the entity itself and its version.</p>
@@ -190,7 +204,8 @@ The Registry, the Entity and the Component</h4>
 </ul>
 <div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#ae58d20711dabcd4959a89e0928974136">reset</a>();</div></div><!-- fragment --><p>Finally, references to components can be retrieved by just doing this:</p>
 <div class="fragment"><div class="line"><span class="comment">// either a non-const reference ...</span></div><div class="line"><a class="code" href="namespaceentt.html#aa56ef01a9c62f21d68dd60f005296b23">DefaultRegistry</a> registry;</div><div class="line"><span class="keyword">auto</span> &amp;position = registry.<a class="code" href="classentt_1_1Registry.html#a904b71bae3eaa69d534b4dc41c15e889">get</a>&lt;Position&gt;(entity);</div><div class="line"></div><div class="line"><span class="comment">// ... or a const one</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;cregistry = registry;</div><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;position = cregistry.get&lt;Position&gt;(entity);</div></div><!-- fragment --><p>The <code>get</code> member function template gives direct access to the component of an entity stored in the underlying data structures of the registry.</p>
-<h5>Sorting: is it possible?</h5>
+<h3><a class="anchor" id="autotoc_md13"></a>
+Sorting: is it possible?</h3>
 <p>Of course, sorting entities and components is an option with <code>EnTT</code>.<br />
  In fact, there are two functions that respond to slightly different needs:</p>
 <ul>
@@ -200,23 +215,29 @@ The Registry, the Entity and the Component</h4>
 <li>Components can be sorted according to the order imposed by another component:</li>
 </ul>
 <div class="fragment"><div class="line">registry.sort&lt;Movement, Physics&gt;();</div></div><!-- fragment --><p>In this case, instances of <code>Movement</code> are arranged in memory so that cache misses are minimized when the two components are iterated together.</p>
-<h4><a class="anchor" id="autotoc_md13"></a>
-View: to persist or not to persist?</h4>
+<h2><a class="anchor" id="autotoc_md14"></a>
+View: to persist or not to persist?</h2>
 <p>There are mainly two kinds of views: standard (also known as View) and persistent (alsa known as PersistentView).<br />
  Both of them have pros and cons to take in consideration. In particular:</p>
 <ul>
-<li>Standard views: Pros:<ul>
+<li><p class="startli">Standard views:</p>
+<p class="startli">Pros:</p><ul>
 <li>They work out-of-the-box and don't require any dedicated data structure.</li>
 <li>Creating and destroying them isn't expensive at all because they don't have any type of initialization.</li>
 <li>They are the best tool to iterate single components.</li>
 <li>They are the best tool to iterate multiple components at once when tags are involved or one of the component is assigned to a significantly low number of entities.</li>
-<li>They don't affect any other operations of the registry. Cons:</li>
+<li>They don't affect any other operations of the registry.</li>
+</ul>
+<p class="startli">Cons:</p><ul>
 <li>Their performance tend to degenerate when the number of components to iterate grows up and the most of the entities have all of them.</li>
 </ul>
 </li>
-<li>Persistent views: Pros:<ul>
+<li><p class="startli">Persistent views:</p>
+<p class="startli">Pros:</p><ul>
 <li>Once prepared, creating and destroying them isn't expensive at all because they don't have any type of initialization.</li>
-<li>They are the best tool to iterate multiple components at once when the most of the entities have all of them. Cons:</li>
+<li>They are the best tool to iterate multiple components at once when the most of the entities have all of them.</li>
+</ul>
+<p class="startli">Cons:</p><ul>
 <li>They have dedicated data structures and thus affect the memory pressure to a minimal extent.</li>
 <li>If not previously prepared, the first time they are used they go through an initialization step that could take a while.</li>
 <li>They affect to a minimum the creation and destruction of entities and components. In other terms: the more persistent views there will be, the less performing will be creating and destroying entities and components.</li>
@@ -231,26 +252,30 @@ View: to persist or not to persist?</h4>
 <p>Use a persistent view in all the other cases.</p>
 <p>To easily iterate entities, all the views offer <em>C++-ish</em> <code>begin</code> and <code>end</code> member functions that allow users to use them in a typical range-for loop.<br />
  Continue reading for more details or refer to the <a href="https://skypjack.github.io/entt/">official documentation</a>.</p>
-<h5>Standard View</h5>
+<h3><a class="anchor" id="autotoc_md15"></a>
+Standard View</h3>
 <p>A standard view behaves differently if it's constructed for a single component or if it has been requested to iterate multiple components. Even the API is different in the two cases.<br />
  All that they share is the way they are created by means of a registry:</p>
 <div class="fragment"><div class="line"><span class="comment">// single component standard view</span></div><div class="line"><span class="keyword">auto</span> single = registry.view&lt;Position&gt;();</div><div class="line"></div><div class="line"><span class="comment">// multi component standard view</span></div><div class="line"><span class="keyword">auto</span> multi = registry.view&lt;Position, Velocity&gt;();</div></div><!-- fragment --><p>For all that remains, it's worth discussing them separately.<br />
 </p>
-<h6>Single component</h6>
+<h4><a class="anchor" id="autotoc_md16"></a>
+Single component standard view</h4>
 <p>Single component standard views are specialized in order to give a boost in terms of performance in all the situation. This kind of views can access the underlying data structures directly and avoid superflous checks.<br />
  They offer a bunch of functionalities to get the number of entities they are going to return and a raw access to the entity list as well as to the component list.<br />
  Refer to the <a href="https://skypjack.github.io/entt/">official documentation</a> for all the details.</p>
 <p>There is no need to store views around for they are extremely cheap to construct, even though they can be copied without problems and reused freely. In fact, they return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.<br />
  To iterate a single component standard view, just use it in range-for:</p>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.view&lt;Renderable&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">    <span class="keyword">auto</span> &amp;renderable = view.get(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p><b>Note</b>: prefer the <code>get</code> member function of the view instead of the <code>get</code> member function template of the registry during iterations.</p>
-<h6>Multi component</h6>
+<h4><a class="anchor" id="autotoc_md17"></a>
+Multi component standard view</h4>
 <p>Multi component standard views iterate entities that have at least all the given components in their bags. During construction, these views look at the number of entities available for each component and pick up a reference to the smallest set of candidates in order to speed up iterations.<br />
  They offer fewer functionalities than their companion views for single component, the most important of which can be used to reset the view and refresh the reference to the set of candidate entities to iterate.<br />
  Refer to the <a href="https://skypjack.github.io/entt/">official documentation</a> for all the details.</p>
 <p>There is no need to store views around for they are extremely cheap to construct, even though they can be copied without problems and reused freely. In fact, they return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.<br />
  To iterate a multi component standard view, just use it in range-for:</p>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.view&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">    <span class="keyword">auto</span> &amp;position = view.get&lt;Position&gt;(entity);</div><div class="line">    <span class="keyword">auto</span> &amp;velocity = view.get&lt;Velocity&gt;(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p><b>Note</b>: prefer the <code>get</code> member function template of the view instead of the <code>get</code> member function template of the registry during iterations.</p>
-<h5>Persistent View</h5>
+<h3><a class="anchor" id="autotoc_md18"></a>
+Persistent View</h3>
 <p>A persistent view returns all the entities and only the entities that have at least the given components. Moreover, it's guaranteed that the entity list is thightly packed in memory for fast iterations.<br />
  In general, persistent views don't stay true to the order of any set of components unless users explicitly sort them.</p>
 <p>Persistent views can be used only to iterate multiple components. Create them as it follows:</p>
@@ -261,8 +286,8 @@ View: to persist or not to persist?</h4>
  Refer to the <a href="https://skypjack.github.io/entt/">official documentation</a> for all the details.</p>
 <p>To iterate a persistent view, just use it in range-for:</p>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.persistent&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">    <span class="keyword">auto</span> &amp;position = view.get&lt;Position&gt;(entity);</div><div class="line">    <span class="keyword">auto</span> &amp;velocity = view.get&lt;Velocity&gt;(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p><b>Note</b>: prefer the <code>get</code> member function template of the view instead of the <code>get</code> member function template of the registry during iterations.</p>
-<h4><a class="anchor" id="autotoc_md14"></a>
-Side notes</h4>
+<h2><a class="anchor" id="autotoc_md19"></a>
+Side notes</h2>
 <ul>
 <li>Entity identifiers are numbers and nothing more. They are not classes and they have no member functions at all. As already mentioned, do no try to inspect or modify an entity descriptor in any way.</li>
 <li>As shown in the examples above, the preferred way to get references to the components while iterating a view is by using the view itself. It's a faster alternative to the <code>get</code> member function template that is part of the API of the Registry. That's because the registry must ensure that a pool for the given component exists before to use it; on the other side, views force the construction of the pools for all their components and access them directly, thus avoiding all the checks.</li>
@@ -281,37 +306,27 @@ Side notes</h4>
  That being said, as long as a thread iterates the entities that have the component <code>X</code> or assign and removes that component from a set of entities, another thread can safely do the same with components <code>Y</code> and <code>Z</code> and everything will work like a charm.<br />
  As an example, users can freely execute the rendering system and iterate the renderable entities while updating a physic component concurrently on a separate thread if needed.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md15"></a>
-What else?</h3>
+<h2><a class="anchor" id="autotoc_md20"></a>
+What else?</h2>
 <p>The <code>EnTT</code> framework is moving its first steps. More and more will come in the future and hopefully I'm going to work on it for a long time.<br />
- Here is a brief list of what it offers today (consider it a work in progress):</p>
-<p>TODO</p>
-<p>For more details, please refer directly to the <a href="https://skypjack.github.io/entt/">online documentation</a>.</p>
-<h2><a class="anchor" id="autotoc_md16"></a>
-Tests</h2>
-<p>To compile and run the tests, <code>EnTT</code> requires <em>googletest</em>.<br />
- <code>cmake</code> will download and compile the library before to compile anything else.</p>
-<p>To build the tests:</p>
+ Here is a brief list of what it offers today:</p>
 <ul>
-<li><code>$ cd build</code></li>
-<li><code>$ cmake ..</code></li>
-<li><code>$ make</code></li>
-<li><code>$ make test</code></li>
+<li>Statically generated integer identifiers for types.</li>
+<li>An entity-component system based on sparse sets.</li>
+<li>Signal handlers and event emitters of any type.</li>
+<li>...</li>
+<li>Any other business.</li>
 </ul>
-<p>To build the benchmarks, use the following line instead:</p>
-<ul>
-<li><code>$ cmake -DCMAKE_BUILD_TYPE=Release ..</code></li>
-</ul>
-<p>Benchmarks are compiled only in release mode currently.</p>
-<h1><a class="anchor" id="autotoc_md17"></a>
+<p>Consider it a work in progress. For more details and an updated list, please refer to the <a href="https://skypjack.github.io/entt/">online documentation</a>.</p>
+<h1><a class="anchor" id="autotoc_md21"></a>
 Contributors</h1>
 <p>If you want to contribute, please send patches as pull requests against the branch <code>master</code>.<br />
  Check the <a href="https://github.com/skypjack/entt/blob/master/AUTHORS">contributors list</a> to see who has partecipated so far.</p>
-<h1><a class="anchor" id="autotoc_md18"></a>
+<h1><a class="anchor" id="autotoc_md22"></a>
 License</h1>
 <p>Code and documentation Copyright (c) 2017 Michele Caini.<br />
  Code released under <a href="https://github.com/skypjack/entt/blob/master/LICENSE">the MIT license</a>. Docs released under <a href="https://github.com/skypjack/entt/blob/master/docs/LICENSE">Creative Commons</a>.</p>
-<h1><a class="anchor" id="autotoc_md19"></a>
+<h1><a class="anchor" id="autotoc_md23"></a>
 Donation</h1>
 <p>Developing and maintaining <code>EnTT</code> takes some time and lots of coffee. I'd like to add more and more functionalities in future and turn it in a full-featured framework.<br />
  If you want to support this project, you can offer me an espresso. I'm from Italy, we're used to turning the best coffee ever in code. If you find that it's not enough, feel free to support me the way you prefer.<br />
