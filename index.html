@@ -149,11 +149,12 @@ Library</h2>
 Documentation</h2>
 <h3><a class="anchor" id="autotoc_md9"></a>
 API Reference</h3>
-<p>The documentation is based on <a href="http://www.stack.nl/~dimitri/doxygen/">doxygen</a>. To build it:</p>
-<p>$ cd build $ cmake .. $ make docs</p>
-<p>The API reference will be created in HTML format within the directory <code>build/docs/html</code>. To navigate it with your favorite browser:</p>
-<p>$ cd build $ your_favorite_browser docs/html/index.html</p>
-<p>The API reference is also available <a href="https://skypjack.github.io/entt/">online</a> for the latest version.</p>
+<p>The documentation is based on <a href="http://www.stack.nl/~dimitri/doxygen/">doxygen</a>. To build it: </p><pre class="fragment">$ cd build
+$ cmake ..
+$ make docs
+</pre><p>The API reference will be created in HTML format within the directory <code>build/docs/html</code>. To navigate it with your favorite browser: </p><pre class="fragment">$ cd build
+$ your_favorite_browser docs/html/index.html
+</pre><p>The API reference is also available <a href="https://skypjack.github.io/entt/">online</a> for the latest version.</p>
 <h3><a class="anchor" id="autotoc_md10"></a>
 Crash Course</h3>
 <h4><a class="anchor" id="autotoc_md11"></a>
@@ -272,12 +273,11 @@ Side notes</h4>
 <li>Entity identifiers are numbers and nothing more. They are not classes and they have no member functions at all. As already mentioned, do no try to inspect or modify an entity descriptor in any way.</li>
 <li>As shown in the examples above, the preferred way to get references to the components while iterating a view is by using the view itself. It's a faster alternative to the <code>get</code> member function template that is part of the API of the Registry. That's because the registry must ensure that a pool for the given component exists before to use it; on the other side, views force the construction of the pools for all their components and access them directly, thus avoiding all the checks.</li>
 <li><p class="startli">Most of the <em>ECS</em> available out there have an annoying limitation (at least from my point of view): entities and components cannot be created and/or deleted during iterations.<br />
- <code>EnTT</code> partially solves the problem with a few limitations: </p><pre class="fragment">* Creating entities and components is allowed during iterations.
-* Deleting an entity or removing its components is allowed during
-  iterations if it's the one currently returned by a view. For all the
-  other entities, destroying them or removing their components isn't
-  allowed and it can result in undefined behavior.
-</pre><p class="startli">Iterators are invalidated and the behaviour is undefined if an entity is modified or destroyed and it's not the one currently returned by the view.<br />
+ <code>EnTT</code> partially solves the problem with a few limitations:</p><ul>
+<li>Creating entities and components is allowed during iterations.</li>
+<li>Deleting an entity or removing its components is allowed during iterations if it's the one currently returned by a view. For all the other entities, destroying them or removing their components isn't allowed and it can result in undefined behavior.</li>
+</ul>
+<p class="startli">Iterators are invalidated and the behaviour is undefined if an entity is modified or destroyed and it's not the one currently returned by the view.<br />
  To work around it, possible approaches are:</p><ul>
 <li>Store aside the entities and the components to be removed and perform the operations at the end of the iteration.</li>
 <li>Mark entities and components with a proper tag component that indicates they must be purged, then perform a second iteration to clean them up one by one.</li>
