@@ -98,8 +98,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH.html">SigH</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal handler.  <a href="classentt_1_1SigH.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_4.html">SigH&lt; Ret(Args...)&gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal handler.  <a href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_4.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html">SigH&lt; Ret(Args...), Collector &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal handler.  <a href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet.html">SparseSet</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sparse set.  <a href="classentt_1_1SparseSet.html#details">More...</a><br /></td></tr>
@@ -122,6 +122,10 @@ Typedefs</h2></td></tr>
 <tr class="memitem:aa56ef01a9c62f21d68dd60f005296b23"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceentt.html#aa56ef01a9c62f21d68dd60f005296b23">DefaultRegistry</a> = <a class="el" href="classentt_1_1Registry.html">Registry</a>&lt; std::uint32_t &gt;</td></tr>
 <tr class="memdesc:aa56ef01a9c62f21d68dd60f005296b23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default registry class.  <a href="#aa56ef01a9c62f21d68dd60f005296b23">More...</a><br /></td></tr>
 <tr class="separator:aa56ef01a9c62f21d68dd60f005296b23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeba406e321af94eebdf1da0540a3ee03"><td class="memTemplParams" colspan="2">template&lt;typename Event &gt; </td></tr>
+<tr class="memitem:aeba406e321af94eebdf1da0540a3ee03"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceentt.html#aeba406e321af94eebdf1da0540a3ee03">EventH</a> = <a class="el" href="classentt_1_1SigH.html">SigH</a>&lt; void(const Event &amp;)&gt;</td></tr>
+<tr class="memdesc:aeba406e321af94eebdf1da0540a3ee03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Event handler.  <a href="#aeba406e321af94eebdf1da0540a3ee03">More...</a><br /></td></tr>
+<tr class="separator:aeba406e321af94eebdf1da0540a3ee03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -156,7 +160,28 @@ Variables</h2></td></tr>
 <p>The default registry is the best choice for almost all the applications.<br />
  Users should have a really good reason to choose something different. </p>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00755">755</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00740">740</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aeba406e321af94eebdf1da0540a3ee03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeba406e321af94eebdf1da0540a3ee03">&#9670;&nbsp;</a></span>EventH</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Event &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespaceentt.html#aeba406e321af94eebdf1da0540a3ee03">entt::EventH</a> = typedef <a class="el" href="classentt_1_1SigH.html">SigH</a>&lt;void(const Event &amp;)&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Event handler. </p>
+<p>Unmanaged event handler. Collecting data for this kind of signals doesn't make sense at all. Its sole purpose is to provide the listeners with the given event. </p>
+
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00342">342</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
@@ -198,8 +223,7 @@ template&lt;typename Ret , typename... Args&gt; </div>
 </div><div class="memdoc">
 
 <p>Checks if the contents of the two signals are different. </p>
-<p>Two signals are identical if they have the same size and the same listeners have been connected to them. They are different otherwiser.</p>
-<dl class="section note"><dt>Note</dt><dd>This function is pretty expensive, use it carefully.</dd></dl>
+<p>Two signals are identical if they have the same size and the same listeners registered exactly in the same order.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Ret</td><td>Return type of a function type. </td></tr>
@@ -216,7 +240,7 @@ template&lt;typename Ret , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the two signals are different, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00257">257</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00329">329</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
