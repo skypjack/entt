@@ -74,7 +74,7 @@ time.
 Today `EnTT` is finally what I was looking for: still faster than its _rivals_,
 a really good API and an amazing set of features. And even more, of course.
 
-### Performance
+## Performance
 
 As it stands right now, `EnTT` is just fast enough for my requirements if
 compared to my first choice (that was already amazingly fast indeed).<br/>
@@ -389,42 +389,46 @@ persistent (alsa known as PersistentView).<br/>
 Both of them have pros and cons to take in consideration. In particular:
 
 * Standard views:
-    Pros:
-        * They work out-of-the-box and don't require any dedicated data
-          structure.
-        * Creating and destroying them isn't expensive at all because they don't
-          have any type of initialization.
-        * They are the best tool to iterate single components.
-        * They are the best tool to iterate multiple components at once when
-          tags are involved or one of the component is assigned to a
-          significantly low number of entities.
-        * They don't affect any other operations of the registry.
-    Cons:
-        * Their performance tend to degenerate when the number of components
-          to iterate grows up and the most of the entities have all of them.
+
+  Pros:
+  * They work out-of-the-box and don't require any dedicated data
+    structure.
+  * Creating and destroying them isn't expensive at all because they don't
+    have any type of initialization.
+  * They are the best tool to iterate single components.
+  * They are the best tool to iterate multiple components at once when
+    tags are involved or one of the component is assigned to a
+    significantly low number of entities.
+  * They don't affect any other operations of the registry.
+
+  Cons:
+  * Their performance tend to degenerate when the number of components
+    to iterate grows up and the most of the entities have all of them.
 
 * Persistent views:
-    Pros:
-        * Once prepared, creating and destroying them isn't expensive at all
-          because they don't have any type of initialization.
-        * They are the best tool to iterate multiple components at once when
-          the most of the entities have all of them.
-    Cons:
-        * They have dedicated data structures and thus affect the memory
-          pressure to a minimal extent.
-        * If not previously prepared, the first time they are used they go
-          through an initialization step that could take a while.
-        * They affect to a minimum the creation and destruction of entities and
-          components. In other terms: the more persistent views there will be,
-          the less performing will be creating and destroying entities and
-          components.
+
+  Pros:
+  * Once prepared, creating and destroying them isn't expensive at all
+    because they don't have any type of initialization.
+  * They are the best tool to iterate multiple components at once when
+    the most of the entities have all of them.
+
+  Cons:
+    * They have dedicated data structures and thus affect the memory
+      pressure to a minimal extent.
+    * If not previously prepared, the first time they are used they go
+      through an initialization step that could take a while.
+    * They affect to a minimum the creation and destruction of entities and
+      components. In other terms: the more persistent views there will be,
+      the less performing will be creating and destroying entities and
+      components.
 
 To sum up and as a rule of thumb, use a standard view:
-    * To iterate entities for a single component.
-    * To iterate entities for multiple components when a significantly low
-      number of entities have one of the components.
-    * In all those cases where a persistent view would give a boost to
-      performance but the iteration isn't performed frequently.
+* To iterate entities for a single component.
+* To iterate entities for multiple components when a significantly low
+  number of entities have one of the components.
+* In all those cases where a persistent view would give a boost to
+  performance but the iteration isn't performed frequently.
 
 Use a persistent view in all the other cases.
 
@@ -617,12 +621,16 @@ for(auto entity: view) {
 
 The `EnTT` framework is moving its first steps. More and more will come in the
 future and hopefully I'm going to work on it for a long time.<br/>
-Here is a brief list of what it offers today (consider it a work in progress):
+Here is a brief list of what it offers today:
 
-TODO
+* Statically generated integer identifiers for types.
+* An entity-component system based on sparse sets.
+* Signal handlers and event emitters of any type.
+* ...
+* Any other business.
 
-For more details, please refer directly to the
-[online documentation](https://skypjack.github.io/entt/).
+Consider it a work in progress. For more details and an updated list, please
+refer to the [online documentation](https://skypjack.github.io/entt/).
 
 # Contributors
 
