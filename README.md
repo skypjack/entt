@@ -318,16 +318,16 @@ There exist also two other _versions_ of the `reset` member function:
 * If no entity is passed to it, `reset` will remove the given component from
 each entity that has it:
 
-    ```cpp
-    registry.reset<Position>();
-    ```
+  ```cpp
+  registry.reset<Position>();
+  ```
 
 * If neither the entity nor the component are specified, all the entities and
 their components are destroyed:
 
-    ```cpp
-    registry.reset();
-    ```
+  ```cpp
+  registry.reset();
+  ```
 
 Finally, references to components can be retrieved by just doing this:
 
@@ -351,17 +351,17 @@ In fact, there are two functions that respond to slightly different needs:
 
 * Components can be sorted directly:
 
-    ```cpp
-    registry.sort<Renderable>([](const auto &lhs, const auto &rhs) {
-        return lhs.z < rhs.z;
-    });
-    ```
+  ```cpp
+  registry.sort<Renderable>([](const auto &lhs, const auto &rhs) {
+      return lhs.z < rhs.z;
+  });
+  ```
 
 * Components can be sorted according to the order imposed by another component:
 
-    ```cpp
-    registry.sort<Movement, Physics>();
-    ```
+  ```cpp
+  registry.sort<Movement, Physics>();
+  ```
 
   In this case, instances of `Movement` are arranged in memory so that cache
   misses are minimized when the two components are iterated together.
