@@ -141,8 +141,6 @@ the include paths.
 
 ## Documentation
 
-### API Reference
-
 The documentation is based on [doxygen](http://www.stack.nl/~dimitri/doxygen/).
 To build it:
 
@@ -159,9 +157,27 @@ The API reference will be created in HTML format within the directory
 The API reference is also available [online](https://skypjack.github.io/entt/)
 for the latest version.
 
-### Crash Course
+## Tests
 
-#### Vademecum
+To compile and run the tests, `EnTT` requires *googletest*.<br/>
+`cmake` will download and compile the library before to compile anything else.
+
+To build the tests:
+
+* `$ cd build`
+* `$ cmake ..`
+* `$ make`
+* `$ make test`
+
+To build the benchmarks, use the following line instead:
+
+* `$ cmake -DCMAKE_BUILD_TYPE=Release ..`
+
+Benchmarks are compiled only in release mode currently.
+
+# Crash Course
+
+## Vademecum
 
 The `Registry` to store, the `View`s to iterate. That's all.
 
@@ -188,7 +204,7 @@ In fact, the framework is composed of many other classes in addition to those
 describe below. For more details, please refer to the
 [online documentation](https://skypjack.github.io/entt/).
 
-#### The Registry, the Entity and the Component
+## The Registry, the Entity and the Component
 
 A registry is used to store and manage entities as well as to create views to
 iterate the underlying data structures.<br/>
@@ -344,7 +360,7 @@ const auto &position = cregistry.get<Position>(entity);
 The `get` member function template gives direct access to the component of an
 entity stored in the underlying data structures of the registry.
 
-##### Sorting: is it possible?
+### Sorting: is it possible?
 
 Of course, sorting entities and components is an option with `EnTT`.<br/>
 In fact, there are two functions that respond to slightly different needs:
@@ -366,7 +382,7 @@ In fact, there are two functions that respond to slightly different needs:
   In this case, instances of `Movement` are arranged in memory so that cache
   misses are minimized when the two components are iterated together.
 
-#### View: to persist or not to persist?
+## View: to persist or not to persist?
 
 There are mainly two kinds of views: standard (also known as View) and
 persistent (alsa known as PersistentView).<br/>
@@ -417,7 +433,7 @@ member functions that allow users to use them in a typical range-for loop.<br/>
 Continue reading for more details or refer to the
 [official documentation](https://skypjack.github.io/entt/).
 
-##### Standard View
+### Standard View
 
 A standard view behaves differently if it's constructed for a single component
 or if it has been requested to iterate multiple components. Even the API is
@@ -434,7 +450,7 @@ auto multi = registry.view<Position, Velocity>();
 
 For all that remains, it's worth discussing them separately.<br/>
 
-###### Single component
+#### Single component standard view
 
 Single component standard views are specialized in order to give a boost in
 terms of performance in all the situation. This kind of views can access the
@@ -464,7 +480,7 @@ for(auto entity: view) {
 **Note**: prefer the `get` member function of the view instead of the `get`
 member function template of the registry during iterations.
 
-###### Multi component
+#### Multi component standard view
 
 Multi component standard views iterate entities that have at least all the given
 components in their bags. During construction, these views look at the number
@@ -496,7 +512,7 @@ for(auto entity: view) {
 **Note**: prefer the `get` member function template of the view instead of the
 `get` member function template of the registry during iterations.
 
-##### Persistent View
+### Persistent View
 
 A persistent view returns all the entities and only the entities that have at
 least the given components. Moreover, it's guaranteed that the entity list is
@@ -551,7 +567,7 @@ for(auto entity: view) {
 **Note**: prefer the `get` member function template of the view instead of the
 `get` member function template of the registry during iterations.
 
-#### Side notes
+## Side notes
 
 * Entity identifiers are numbers and nothing more. They are not classes and they
   have no member functions at all. As already mentioned, do no try to inspect or
@@ -597,7 +613,7 @@ for(auto entity: view) {
   renderable entities while updating a physic component concurrently on a
   separate thread if needed.
 
-### What else?
+## What else?
 
 The `EnTT` framework is moving its first steps. More and more will come in the
 future and hopefully I'm going to work on it for a long time.<br/>
@@ -607,24 +623,6 @@ TODO
 
 For more details, please refer directly to the
 [online documentation](https://skypjack.github.io/entt/).
-
-## Tests
-
-To compile and run the tests, `EnTT` requires *googletest*.<br/>
-`cmake` will download and compile the library before to compile anything else.
-
-To build the tests:
-
-* `$ cd build`
-* `$ cmake ..`
-* `$ make`
-* `$ make test`
-
-To build the benchmarks, use the following line instead:
-
-* `$ cmake -DCMAKE_BUILD_TYPE=Release ..`
-
-Benchmarks are compiled only in release mode currently.
 
 # Contributors
 
