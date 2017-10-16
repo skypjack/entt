@@ -146,15 +146,15 @@ the include paths.
 The documentation is based on [doxygen](http://www.stack.nl/~dimitri/doxygen/).
 To build it:
 
-$ cd build
-$ cmake ..
-$ make docs
+    $ cd build
+    $ cmake ..
+    $ make docs
 
 The API reference will be created in HTML format within the directory
 `build/docs/html`. To navigate it with your favorite browser:
 
-$ cd build
-$ your_favorite_browser docs/html/index.html
+    $ cd build
+    $ your_favorite_browser docs/html/index.html
 
 The API reference is also available [online](https://skypjack.github.io/entt/)
 for the latest version.
@@ -570,11 +570,11 @@ for(auto entity: view) {
   deleted during iterations.<br/>
   `EnTT` partially solves the problem with a few limitations:
 
-      * Creating entities and components is allowed during iterations.
-      * Deleting an entity or removing its components is allowed during
-        iterations if it's the one currently returned by a view. For all the
-        other entities, destroying them or removing their components isn't
-        allowed and it can result in undefined behavior.
+  * Creating entities and components is allowed during iterations.
+  * Deleting an entity or removing its components is allowed during
+    iterations if it's the one currently returned by a view. For all the
+    other entities, destroying them or removing their components isn't
+    allowed and it can result in undefined behavior.
 
   Iterators are invalidated and the behaviour is undefined if an entity is
   modified or destroyed and it's not the one currently returned by the
