@@ -129,20 +129,23 @@ documentation:
 ## Library
 
 `EnTT` is a header-only library. This means that including the `entt.hpp`
-header is enough to include the whole framework and use it.<br/>
-It's a matter of adding the following line at the top of a file:
+header is enough to include the whole framework and use it. For those who are
+interested only in the entity-component system, consider to include the sole
+`entity/registry.hpp` header instead.<br/>
+It's a matter of adding the following line to the top of a file:
 
 ```cpp
 #include <entt/entt.hpp>
 ```
 
+Use the line below to include only the entity-component system instead:
+
+```cpp
+#include <entt/entity/registry.hpp>
+```
+
 Then pass the proper `-I` argument to the compiler to add the `src` directory to
 the include paths.
-
-#### Note
-
-For those who are interested only in the entity-component system, consider to
-include the sole `entity/registry.hpp` header instead.
 
 ## Documentation
 
