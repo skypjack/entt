@@ -128,16 +128,21 @@ documentation:
 
 ## Library
 
-`EnTT` is a header-only library. This means that including the `registry.hpp`
-header is enough to use it.<br/>
+`EnTT` is a header-only library. This means that including the `entt.hpp`
+header is enough to include the whole framework and use it.<br/>
 It's a matter of adding the following line at the top of a file:
 
 ```cpp
-#include <registry.hpp>
+#include <entt/entt.hpp>
 ```
 
 Then pass the proper `-I` argument to the compiler to add the `src` directory to
 the include paths.
+
+#### Note
+
+For those who are interested only in the entity-component system, consider to
+include the sole `entity/registry.hpp` header instead.
 
 ## Documentation
 
@@ -362,7 +367,7 @@ entity stored in the underlying data structures of the registry.
 
 ### Sorting: is it possible?
 
-Of course, sorting entities and components is an option with `EnTT`.<br/>
+Of course, sorting entities and components is possible with `EnTT`.<br/>
 In fact, there are two functions that respond to slightly different needs:
 
 * Components can be sorted directly:
