@@ -38,7 +38,8 @@ TEST(SparseSetNoType, Functionalities) {
     ASSERT_FALSE(set.has(42));
 
     (void)entt::SparseSet<unsigned int>{std::move(set)};
-    set = std::move(set);
+    entt::SparseSet<unsigned int> other;
+    other = std::move(set);
 }
 
 TEST(SparseSetNoType, DataBeginEnd) {
@@ -98,7 +99,8 @@ TEST(SparseSetWithType, Functionalities) {
     ASSERT_FALSE(set.has(42));
 
     (void)entt::SparseSet<unsigned int>{std::move(set)};
-    set = std::move(set);
+    entt::SparseSet<unsigned int> other;
+    other = std::move(set);
 }
 
 TEST(SparseSetWithType, RawBeginEnd) {
