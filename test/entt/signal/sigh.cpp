@@ -143,6 +143,15 @@ struct TestCollectAll {
     }
 };
 
+template<>
+struct TestCollectAll<void> {
+    std::vector<int> vec{};
+    static void h() {}
+    bool operator()() noexcept {
+        return true;
+    }
+};
+
 template<typename Ret>
 struct TestCollectFirst {
     std::vector<Ret> vec{};
@@ -154,6 +163,14 @@ struct TestCollectFirst {
 };
 
 TEST(SigH, Collector) {
+    entt::SigH<void(), TestCollectAll<void>> sigh_void;
+
+    sigh_void.connect<&TestCollectAll<void>::h>();
+    auto collector_void = sigh_void.collect();
+
+    ASSERT_FALSE(sigh_void.empty());
+    ASSERT_TRUE(collector_void.vec.empty());
+
     entt::SigH<int(), TestCollectAll<int>> sigh_all;
 
     sigh_all.connect<&TestCollectAll<int>::f>();
