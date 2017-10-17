@@ -36,6 +36,9 @@ TEST(SparseSetNoType, Functionalities) {
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
+
+    (void)entt::SparseSet<unsigned int>{std::move(set)};
+    set = std::move(set);
 }
 
 TEST(SparseSetNoType, DataBeginEnd) {
@@ -93,6 +96,9 @@ TEST(SparseSetWithType, Functionalities) {
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
+
+    (void)entt::SparseSet<unsigned int>{std::move(set)};
+    set = std::move(set);
 }
 
 TEST(SparseSetWithType, RawBeginEnd) {
@@ -202,6 +208,55 @@ TEST(SparseSetWithType, SortUnordered) {
     ASSERT_EQ(set.get(*(begin++)), 6);
     ASSERT_EQ(set.get(*(begin++)), 9);
     ASSERT_EQ(set.get(*(begin++)), 12);
+    ASSERT_EQ(begin, end);
+}
+
+TEST(SparseSetWithType, RespectDisjoint) {
+    entt::SparseSet<unsigned int, int> lhs;
+    entt::SparseSet<unsigned int, int> rhs;
+    const auto &clhs = lhs;
+
+    ASSERT_EQ(lhs.construct(3, 3), 3);
+    ASSERT_EQ(lhs.construct(12, 6), 6);
+    ASSERT_EQ(lhs.construct(42, 9), 9);
+
+    lhs.respect(rhs);
+
+    ASSERT_EQ(*(clhs.raw() + 0u), 3);
+    ASSERT_EQ(*(clhs.raw() + 1u), 6);
+    ASSERT_EQ(*(clhs.raw() + 2u), 9);
+
+    auto begin = clhs.begin();
+    auto end = clhs.end();
+
+    ASSERT_EQ(clhs.get(*(begin++)), 9);
+    ASSERT_EQ(clhs.get(*(begin++)), 6);
+    ASSERT_EQ(clhs.get(*(begin++)), 3);
+    ASSERT_EQ(begin, end);
+}
+
+TEST(SparseSetWithType, RespectOverlap) {
+    entt::SparseSet<unsigned int, int> lhs;
+    entt::SparseSet<unsigned int, int> rhs;
+    const auto &clhs = lhs;
+
+    ASSERT_EQ(lhs.construct(3, 3), 3);
+    ASSERT_EQ(lhs.construct(12, 6), 6);
+    ASSERT_EQ(lhs.construct(42, 9), 9);
+    ASSERT_EQ(rhs.construct(12, 6), 6);
+
+    lhs.respect(rhs);
+
+    ASSERT_EQ(*(clhs.raw() + 0u), 3);
+    ASSERT_EQ(*(clhs.raw() + 1u), 9);
+    ASSERT_EQ(*(clhs.raw() + 2u), 6);
+
+    auto begin = clhs.begin();
+    auto end = clhs.end();
+
+    ASSERT_EQ(clhs.get(*(begin++)), 6);
+    ASSERT_EQ(clhs.get(*(begin++)), 9);
+    ASSERT_EQ(clhs.get(*(begin++)), 3);
     ASSERT_EQ(begin, end);
 }
 
