@@ -142,9 +142,10 @@ Requirements</h2>
 </ul>
 <h2><a class="anchor" id="autotoc_md7"></a>
 Library</h2>
-<p><code>EnTT</code> is a header-only library. This means that including the <code><a class="el" href="registry_8hpp_source.html">registry.hpp</a></code> header is enough to use it.<br />
- It's a matter of adding the following line at the top of a file:</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;registry.hpp&gt;</span></div></div><!-- fragment --><p>Then pass the proper <code>-I</code> argument to the compiler to add the <code>src</code> directory to the include paths.</p>
+<p><code>EnTT</code> is a header-only library. This means that including the <code><a class="el" href="entt_8hpp_source.html">entt.hpp</a></code> header is enough to include the whole framework and use it. For those who are interested only in the entity-component system, consider to include the sole <code><a class="el" href="registry_8hpp_source.html">entity/registry.hpp</a></code> header instead.<br />
+ It's a matter of adding the following line to the top of a file:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entt.hpp&gt;</span></div></div><!-- fragment --><p>Use the line below to include only the entity-component system instead:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entity/registry.hpp&gt;</span></div></div><!-- fragment --><p>Then pass the proper <code>-I</code> argument to the compiler to add the <code>src</code> directory to the include paths.</p>
 <h2><a class="anchor" id="autotoc_md8"></a>
 Documentation</h2>
 <p>The documentation is based on <a href="http://www.stack.nl/~dimitri/doxygen/">doxygen</a>. To build it: </p><pre class="fragment">$ cd build
@@ -206,7 +207,7 @@ The Registry, the Entity and the Component</h2>
 <div class="fragment"><div class="line"><span class="comment">// either a non-const reference ...</span></div><div class="line"><a class="code" href="namespaceentt.html#aa56ef01a9c62f21d68dd60f005296b23">DefaultRegistry</a> registry;</div><div class="line"><span class="keyword">auto</span> &amp;position = registry.<a class="code" href="classentt_1_1Registry.html#a904b71bae3eaa69d534b4dc41c15e889">get</a>&lt;Position&gt;(entity);</div><div class="line"></div><div class="line"><span class="comment">// ... or a const one</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;cregistry = registry;</div><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;position = cregistry.get&lt;Position&gt;(entity);</div></div><!-- fragment --><p>The <code>get</code> member function template gives direct access to the component of an entity stored in the underlying data structures of the registry.</p>
 <h3><a class="anchor" id="autotoc_md13"></a>
 Sorting: is it possible?</h3>
-<p>Of course, sorting entities and components is an option with <code>EnTT</code>.<br />
+<p>Of course, sorting entities and components is possible with <code>EnTT</code>.<br />
  In fact, there are two functions that respond to slightly different needs:</p>
 <ul>
 <li>Components can be sorted directly:</li>
