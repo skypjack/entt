@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <ident.hpp>
+#include <entt/core/ident.hpp>
 
 struct A {};
 struct B {};

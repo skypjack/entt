@@ -16,7 +16,7 @@ endif()
 # Project configuration
 #
 
-project(entt VERSION 1.1.0)
+project(entt VERSION 2.0.0)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
@@ -33,7 +33,7 @@ message("* Copyright (c) 2017 ${PROJECT_AUTHOR} <${PROJECT_AUTHOR_EMAIL}>")
 message("*")
 
 #
-# Compile stuff
+# Compiler stuff
 #
 
 set(CMAKE_CXX_STANDARD 14)
@@ -41,7 +41,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT MSVC)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wconversion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DRELEASE")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -DDEBUG")
 
@@ -65,14 +65,10 @@ set(PROJECT_SRC_DIR ${entt_SOURCE_DIR}/src)
 set(PROJECT_RUNTIME_OUTPUT_DIRECTORY bin)
 
 #
-# Enable test support using ctest-like interface
+# Tests
 #
 
 option(BUILD_TESTING "Enable testing with ctest." ON)
-
-#
-# build testing stuff if required
-#
 
 if(BUILD_TESTING)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -88,4 +84,14 @@ if(BUILD_TESTING)
 
     enable_testing()
     add_subdirectory(test)
+endif()
+
+#
+# Documentation
+#
+
+find_package(Doxygen 1.8)
+
+if(DOXYGEN_FOUND)
+    add_subdirectory(docs)
 endif()
