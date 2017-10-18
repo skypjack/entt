@@ -37,7 +37,7 @@ struct Velocity {
 };
 
 void update(entt::DefaultRegistry &registry) {
-    auto view = ecs.view<Position, Velocity>();
+    auto view = registry.view<Position, Velocity>();
 
     for(auto entity: view) {
         auto &position = view.get<Position>(entity);
