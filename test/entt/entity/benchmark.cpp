@@ -254,7 +254,7 @@ TEST(DefaultRegistry, IterateTwoComponentsPersistent10MOne) {
 }
 
 TEST(DefaultRegistry, IterateSingleComponent50M) {
-    entt::DefaultRegistry registry;
+    entt::Registry<std::uint64_t> registry;
 
     std::cout << "Iterating over 50000000 entities, one component" << std::endl;
 
@@ -275,7 +275,7 @@ TEST(DefaultRegistry, IterateSingleComponent50M) {
 }
 
 TEST(DefaultRegistry, IterateTwoComponents50M) {
-    entt::DefaultRegistry registry;
+    entt::Registry<std::uint64_t> registry;
 
     std::cout << "Iterating over 50000000 entities, two components" << std::endl;
 
@@ -298,7 +298,7 @@ TEST(DefaultRegistry, IterateTwoComponents50M) {
 }
 
 TEST(DefaultRegistry, IterateTwoComponentsPersistent50M) {
-    entt::DefaultRegistry registry;
+    entt::Registry<std::uint64_t> registry;
     registry.prepare<Position, Velocity>();
 
     std::cout << "Iterating over 50000000 entities, two components, persistent view" << std::endl;
