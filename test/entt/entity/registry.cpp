@@ -121,6 +121,19 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_TRUE(registry.empty<int>());
 }
 
+TEST(DefaultRegistry, CreateDestroyEntities) {
+    entt::DefaultRegistry registry;
+
+    auto pre = registry.create<double>();
+    registry.destroy(pre);
+    auto post = registry.create<double>();
+
+    ASSERT_FALSE(registry.valid(pre));
+    ASSERT_TRUE(registry.valid(post));
+    ASSERT_NE(registry.version(pre), registry.version(post));
+    ASSERT_EQ(registry.current(pre), registry.current(post));
+}
+
 TEST(DefaultRegistry, SortSingle) {
     entt::DefaultRegistry registry;
 

@@ -285,8 +285,9 @@ public:
 
         const auto entt = entity & traits_type::entity_mask;
         const auto version = 1 + ((entity >> traits_type::version_shift) & traits_type::version_mask);
-        entities[entt] = entt | (version << traits_type::version_shift);
-        available.push_back(entity);
+        const auto next = entt | (version << traits_type::version_shift);
+        entities[entt] = next;
+        available.push_back(next);
 
         for(auto &&cpool: pools) {
             if(cpool && cpool->has(entity)) {

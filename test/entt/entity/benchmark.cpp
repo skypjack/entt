@@ -42,7 +42,6 @@ TEST(DefaultRegistry, Construct) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, Destroy) {
@@ -86,7 +85,6 @@ TEST(DefaultRegistry, IterateCreateDeleteSingleComponent) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateSingleComponent10M) {
@@ -108,7 +106,6 @@ TEST(DefaultRegistry, IterateSingleComponent10M) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTwoComponents10M) {
@@ -132,7 +129,6 @@ TEST(DefaultRegistry, IterateTwoComponents10M) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTwoComponents10MHalf) {
@@ -157,7 +153,6 @@ TEST(DefaultRegistry, IterateTwoComponents10MHalf) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTwoComponents10MOne) {
@@ -182,7 +177,6 @@ TEST(DefaultRegistry, IterateTwoComponents10MOne) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTwoComponentsPersistent10M) {
@@ -207,7 +201,6 @@ TEST(DefaultRegistry, IterateTwoComponentsPersistent10M) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTwoComponentsPersistent10MHalf) {
@@ -233,7 +226,6 @@ TEST(DefaultRegistry, IterateTwoComponentsPersistent10MHalf) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTwoComponentsPersistent10MOne) {
@@ -259,7 +251,6 @@ TEST(DefaultRegistry, IterateTwoComponentsPersistent10MOne) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateSingleComponent50M) {
@@ -281,7 +272,6 @@ TEST(DefaultRegistry, IterateSingleComponent50M) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTwoComponents50M) {
@@ -305,7 +295,6 @@ TEST(DefaultRegistry, IterateTwoComponents50M) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTwoComponentsPersistent50M) {
@@ -330,7 +319,6 @@ TEST(DefaultRegistry, IterateTwoComponentsPersistent50M) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateFiveComponents10M) {
@@ -360,7 +348,6 @@ TEST(DefaultRegistry, IterateFiveComponents10M) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTenComponents10M) {
@@ -400,7 +387,6 @@ TEST(DefaultRegistry, IterateTenComponents10M) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTenComponents10MHalf) {
@@ -441,7 +427,6 @@ TEST(DefaultRegistry, IterateTenComponents10MHalf) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTenComponents10MOne) {
@@ -482,7 +467,6 @@ TEST(DefaultRegistry, IterateTenComponents10MOne) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateFiveComponentsPersistent10M) {
@@ -513,7 +497,6 @@ TEST(DefaultRegistry, IterateFiveComponentsPersistent10M) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTenComponentsPersistent10M) {
@@ -554,7 +537,6 @@ TEST(DefaultRegistry, IterateTenComponentsPersistent10M) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTenComponentsPersistent10MHalf) {
@@ -596,7 +578,6 @@ TEST(DefaultRegistry, IterateTenComponentsPersistent10MHalf) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, IterateTenComponentsPersistent10MOne) {
@@ -638,7 +619,6 @@ TEST(DefaultRegistry, IterateTenComponentsPersistent10MOne) {
     }
 
     timer.elapsed();
-    registry.reset();
 }
 
 TEST(DefaultRegistry, SortSingle) {
