@@ -96,9 +96,6 @@ Dell XPS 13 out of the mid 2014):
 | Iterating over 10M entities, unpacking ten components, standard view, half of the entities have all the components | **0.00899859s** | 0.200752s |
 | Iterating over 10M entities, unpacking ten components, standard view, one of the entities has all the components | 0.00700349s | **2.565e-06s** |
 | Iterating over 10M entities, unpacking ten components, persistent view | 0.0104708s | **6.23e-07s** |
-| Iterating over 50M entities, unpacking one component, standard view | 0.055194s | **2.87e-07s** |
-| Iterating over 50M entities, unpacking two components, standard view | **0.0533921s** | 0.243197s |
-| Iterating over 50M entities, unpacking two components, persistent view | 0.055194s | **4.47e-07s** |
 | Sort 150k entities, one component | - | **0.0080046s** |
 | Sort 150k entities, match two components | - | **0.00608322s** |
 
