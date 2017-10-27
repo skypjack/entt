@@ -137,15 +137,11 @@ TEST(DefaultRegistry, CreateDestroyEntities) {
 TEST(DefaultRegistry, SortSingle) {
     entt::DefaultRegistry registry;
 
-    auto e1 = registry.create();
-    auto e2 = registry.create();
-    auto e3 = registry.create();
+    int val = 0;
 
-    auto val = 0;
-
-    registry.assign<int>(e1, val++);
-    registry.assign<int>(e2, val++);
-    registry.assign<int>(e3, val++);
+    registry.create(val++);
+    registry.create(val++);
+    registry.create(val++);
 
     for(auto entity: registry.view<int>()) {
         ASSERT_EQ(registry.get<int>(entity), --val);
@@ -161,20 +157,12 @@ TEST(DefaultRegistry, SortSingle) {
 TEST(DefaultRegistry, SortMulti) {
     entt::DefaultRegistry registry;
 
-    auto e1 = registry.create();
-    auto e2 = registry.create();
-    auto e3 = registry.create();
+    unsigned int uval = 0u;
+    int ival = 0;
 
-    auto uval = 0u;
-    auto ival = 0;
-
-    registry.assign<unsigned int>(e1, uval++);
-    registry.assign<unsigned int>(e2, uval++);
-    registry.assign<unsigned int>(e3, uval++);
-
-    registry.assign<int>(e1, ival++);
-    registry.assign<int>(e2, ival++);
-    registry.assign<int>(e3, ival++);
+    registry.create(uval++, ival++);
+    registry.create(uval++, ival++);
+    registry.create(uval++, ival++);
 
     for(auto entity: registry.view<unsigned int>()) {
         ASSERT_EQ(registry.get<unsigned int>(entity), --uval);

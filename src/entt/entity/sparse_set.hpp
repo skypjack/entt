@@ -110,7 +110,7 @@ public:
 
     /*! @brief Copying a sparse set isn't allowed. @return This sparse set. */
     SparseSet & operator=(const SparseSet &) = delete;
-    /*! @brief Default move operator. @return This sparse set. */
+    /*! @brief Default move assignment operator. @return This sparse set. */
     SparseSet & operator=(SparseSet &&) = default;
 
     /**
@@ -121,7 +121,7 @@ public:
      * Usually the size of the internal sparse array is equal or greater than
      * the one of the internal packed array.
      *
-     * @return The number of elements.
+     * @return Number of elements.
      */
     size_type size() const noexcept {
         return direct.size();
@@ -297,7 +297,7 @@ public:
      * Attempting to iterate elements using the raw pointer returned by `data`
      * gives no guarantees on the order, even though `sort` has been invoked.
      *
-     * @tparam Compare The type of the comparison function.
+     * @tparam Compare Type of the comparison function.
      * @param compare A comparison function whose signature shall be equivalent
      * to: `bool(Entity, Entity)`.
      */
@@ -396,7 +396,7 @@ private:
  * @sa SparseSet<Entity>
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Type The type of the objects assigned to the entities.
+ * @tparam Type Type of objects assigned to the entities.
  */
 template<typename Entity, typename Type>
 class SparseSet<Entity, Type>: public SparseSet<Entity> {
@@ -424,7 +424,7 @@ public:
 
     /*! @brief Copying a sparse set isn't allowed. @return This sparse set. */
     SparseSet & operator=(const SparseSet &) = delete;
-    /*! @brief Default move operator. @return This sparse set. */
+    /*! @brief Default move assignment operator. @return This sparse set. */
     SparseSet & operator=(SparseSet &&) = default;
 
     /**
@@ -506,9 +506,9 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * sparse set already contains the given entity.
      *
-     * @tparam Args The type of the params used to construct the object.
+     * @tparam Args Types of arguments to use to construct the object.
      * @param entity A valid entity identifier.
-     * @param args The params to use to construct an object for the entity.
+     * @param args Parameters to use to construct an object for the entity.
      * @return The object associated to the entity.
      */
     template<typename... Args>

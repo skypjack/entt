@@ -56,6 +56,25 @@ TEST(View, SingleComponentEmpty) {
     }
 }
 
+TEST(View, SingleComponentEach) {
+    entt::DefaultRegistry registry;
+
+    registry.create<int, char>();
+    registry.create<int, char>();
+
+    auto view = registry.view<int>();
+    const auto &cview = static_cast<const decltype(view) &>(view);
+    std::size_t cnt = 0;
+
+    view.each([&cnt](auto, int &) { ++cnt; });
+
+    ASSERT_EQ(cnt, std::size_t{2});
+
+    cview.each([&cnt](auto, const int &) { --cnt; });
+
+    ASSERT_EQ(cnt, std::size_t{0});
+}
+
 TEST(View, MultipleComponent) {
     entt::DefaultRegistry registry;
 
@@ -98,7 +117,26 @@ TEST(View, MultipleComponentEmpty) {
     }
 }
 
-TEST(PersistentView, MultipleComponentPrepare) {
+TEST(View, MultipleComponentEach) {
+    entt::DefaultRegistry registry;
+
+    registry.create<int, char>();
+    registry.create<int, char>();
+
+    auto view = registry.view<int, char>();
+    const auto &cview = static_cast<const decltype(view) &>(view);
+    std::size_t cnt = 0;
+
+    view.each([&cnt](auto, int &, char &) { ++cnt; });
+
+    ASSERT_EQ(cnt, std::size_t{2});
+
+    cview.each([&cnt](auto, const int &, const char &) { --cnt; });
+
+    ASSERT_EQ(cnt, std::size_t{0});
+}
+
+TEST(PersistentView, Prepare) {
     entt::DefaultRegistry registry;
     registry.prepare<int, char>();
 
@@ -137,7 +175,7 @@ TEST(PersistentView, MultipleComponentPrepare) {
     ASSERT_EQ(view.begin(), view.end());
 }
 
-TEST(PersistentView, MultipleComponentNoPrepare) {
+TEST(PersistentView, NoPrepare) {
     entt::DefaultRegistry registry;
 
     auto e1 = registry.create<char>();
@@ -175,7 +213,7 @@ TEST(PersistentView, MultipleComponentNoPrepare) {
     ASSERT_EQ(view.begin(), view.end());
 }
 
-TEST(PersistentView, MultipleComponentEmpty) {
+TEST(PersistentView, Empty) {
     entt::DefaultRegistry registry;
 
     registry.create<double, int, float>();
@@ -190,6 +228,26 @@ TEST(PersistentView, MultipleComponentEmpty) {
         (void)entity;
         FAIL();
     }
+}
+
+TEST(PersistentView, Each) {
+    entt::DefaultRegistry registry;
+    registry.prepare<int, char>();
+
+    registry.create<int, char>();
+    registry.create<int, char>();
+
+    auto view = registry.persistent<int, char>();
+    const auto &cview = static_cast<const decltype(view) &>(view);
+    std::size_t cnt = 0;
+
+    view.each([&cnt](auto, int &, char &) { ++cnt; });
+
+    ASSERT_EQ(cnt, std::size_t{2});
+
+    cview.each([&cnt](auto, const int &, const char &) { --cnt; });
+
+    ASSERT_EQ(cnt, std::size_t{0});
 }
 
 TEST(PersistentView, Sort) {

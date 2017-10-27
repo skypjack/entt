@@ -17,7 +17,7 @@ namespace entt {
 
 
 /**
- * @brief A repository class for entities and components.
+ * @brief Fast and reliable entity-component system.
  *
  * The registry is the core class of the entity-component framework.<br/>
  * It stores entities and arranges pools of components on a per request basis.
@@ -61,7 +61,7 @@ class Registry {
             }
         }
 
-        void append(SparseSet<Entity> &handler, test_fn_type fn) {
+        inline void append(SparseSet<Entity> &handler, test_fn_type fn) {
             listeners.emplace_back(handler, fn);
         }
 
@@ -115,20 +115,20 @@ public:
     /*! @brief Default destructor. */
     ~Registry() = default;
 
-    /*! @brief Copying a sparse set isn't allowed. */
+    /*! @brief Copying a registry isn't allowed. */
     Registry(const Registry &) = delete;
-    /*! @brief Moving a sparse set isn't allowed. */
+    /*! @brief Moving a registry isn't allowed. */
     Registry(Registry &&) = delete;
 
-    /*! @brief Copying a sparse set isn't allowed. @return This sparse set. */
+    /*! @brief Copying a registry isn't allowed. @return This registry. */
     Registry & operator=(const Registry &) = delete;
-    /*! @brief Moving a sparse set isn't allowed. @return This sparse set. */
+    /*! @brief Moving a registry isn't allowed. @return This registry. */
     Registry & operator=(Registry &&) = delete;
 
     /**
      * @brief Returns the number of existing components of the given type.
-     * @tparam Component The type of the component to which to return the size.
-     * @return The number of existing components of the given type.
+     * @tparam Component Type of component of which to return the size.
+     * @return Number of existing components of the given type.
      */
     template<typename Component>
     size_type size() const noexcept {
@@ -137,7 +137,7 @@ public:
 
     /**
      * @brief Returns the number of entities still in use.
-     * @return The number of entities still in use.
+     * @return Number of entities still in use.
      */
     size_type size() const noexcept {
         return entities.size() - available.size();
@@ -145,7 +145,7 @@ public:
 
     /**
      * @brief Returns the number of entities ever created.
-     * @return The number of entities ever created.
+     * @return Number of entities ever created.
      */
     size_type capacity() const noexcept {
         return entities.size();
@@ -153,7 +153,7 @@ public:
 
     /**
      * @brief Checks whether the pool for the given component is empty.
-     * @tparam Component The type of the component in which one is interested.
+     * @tparam Component Type of component in which one is interested.
      * @return True if the pool for the given component is empty, false
      * otherwise.
      */
@@ -183,7 +183,7 @@ public:
     /**
      * @brief Returns the version stored along with the given entity identifier.
      * @param entity An entity identifier, either valid or not.
-     * @return The version stored along with the given entity identifier.
+     * @return Version stored along with the given entity identifier.
      */
     version_type version(entity_type entity) const noexcept {
         return version_type((entity >> traits_type::version_shift) & traits_type::version_mask);
@@ -204,12 +204,39 @@ public:
      * registry doesn't own the given entity.
      *
      * @param entity A valid entity identifier.
-     * @return The actual version for the given entity identifier.
+     * @return Actual version for the given entity identifier.
      */
     version_type current(entity_type entity) const noexcept {
         const auto entt = entity & traits_type::entity_mask;
         assert(entt < entities.size());
         return version_type((entities[entt] >> traits_type::version_shift) & traits_type::version_mask);
+    }
+
+    /**
+     * @brief Returns a new entity initialized with the given components.
+     *
+     * There are two kinds of entity identifiers:
+     * * Newly created ones in case no entities have been previously destroyed.
+     * * Recycled one with updated versions.
+     *
+     * Users should not care about the type of the returned entity identifier.
+     * In case entity identifers are stored around, the `current` member
+     * function can be used to know if they are still valid or the entity has
+     * been destroyed and potentially recycled.
+     *
+     * The returned entity has fully initialized components assigned.
+     *
+     * @tparam Component A list of components to assign to the entity.
+     * @param components Instances with which to initialize components.
+     * @return A valid entity identifier.
+     */
+    template<typename... Component>
+    entity_type create(Component&&... components) noexcept {
+        using accumulator_type = int[];
+        const auto entity = create();
+        accumulator_type accumulator = { 0, (ensure<Component>().construct(*this, entity, std::forward<Component>(components)), 0)... };
+        (void)accumulator;
+        return entity;
     }
 
     /**
@@ -223,6 +250,8 @@ public:
      * In case entity identifers are stored around, the `current` member
      * function can be used to know if they are still valid or the entity has
      * been destroyed and potentially recycled.
+     *
+     * The returned entity has default initialized components assigned.
      *
      * @tparam Component A list of components to assign to the entity.
      * @return A valid entity identifier.
@@ -248,6 +277,8 @@ public:
      * function can be used to know if they are still valid or the entity has
      * been destroyed and potentially recycled.
      *
+     * The returned entity has no components assigned.
+     *
      * @return A valid entity identifier.
      */
     entity_type create() noexcept {
@@ -255,6 +286,7 @@ public:
 
         if(available.empty()) {
             entity = entity_type(entities.size());
+            assert(entity < traits_type::entity_mask);
             assert((entity >> traits_type::version_shift) == entity_type{});
             entities.push_back(entity);
         } else {
@@ -310,10 +342,10 @@ public:
      * invalid entity or if the entity already owns an instance of the given
      * component.
      *
-     * @tparam Component The type of the component to create.
-     * @tparam Args The types of the arguments used to construct the component.
+     * @tparam Component Type of the component to create.
+     * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
-     * @param args The parameters to use to initialize the component.
+     * @param args Parameters to use to initialize the component.
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
@@ -332,7 +364,7 @@ public:
      * invalid entity or if the entity doesn't own an instance of the given
      * component.
      *
-     * @tparam Component The type of the component to remove.
+     * @tparam Component Type of the component to remove.
      * @param entity A valid entity identifier.
      */
     template<typename Component>
@@ -349,7 +381,7 @@ public:
      * An assertion will abort the execution at runtime in debug mode in case of
      * invalid entity.
      *
-     * @tparam Component The components for which to perform the check.
+     * @tparam Component Components for which to perform the check.
      * @param entity A valid entity identifier.
      * @return True if the entity has all the components, false otherwise.
      */
@@ -374,7 +406,7 @@ public:
      * invalid entity or if the entity doesn't own an instance of the given
      * component.
      *
-     * @tparam Component The type of the component to get.
+     * @tparam Component Type of the component to get.
      * @param entity A valid entity identifier.
      * @return A reference to the instance of the component owned by the entity.
      */
@@ -394,7 +426,7 @@ public:
      * invalid entity or if the entity doesn't own an instance of the given
      * component.
      *
-     * @tparam Component The type of the component to get.
+     * @tparam Component Type of the component to get.
      * @param entity A valid entity identifier.
      * @return A reference to the instance of the component owned by the entity.
      */
@@ -417,10 +449,10 @@ public:
      * invalid entity or if the entity doesn't own an instance of the given
      * component.
      *
-     * @tparam Component The type of the component to replace.
-     * @tparam Args The types of the arguments used to construct the component.
+     * @tparam Component Type of the component to replace.
+     * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
-     * @param args The parameters to use to initialize the component.
+     * @param args Parameters to use to initialize the component.
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
@@ -450,10 +482,10 @@ public:
      * An assertion will abort the execution at runtime in debug mode in case of
      * invalid entity.
      *
-     * @tparam Component The type of the component to assign or replace.
-     * @tparam Args The types of the arguments used to construct the component.
+     * @tparam Component Type of the component to assign or replace.
+     * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
-     * @param args The parameters to use to initialize the component.
+     * @param args Parameters to use to initialize the component.
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
@@ -487,8 +519,8 @@ public:
      *
      * Where `e1` and `e2` are valid entity identifiers.
      *
-     * @tparam Component The type of the components to sort.
-     * @tparam Compare The type of the comparison function object.
+     * @tparam Component Type of the components to sort.
+     * @tparam Compare Type of the comparison function object.
      * @param compare A valid comparison function object.
      */
     template<typename Component, typename Compare>
@@ -527,8 +559,8 @@ public:
      *
      * Any subsequent change to `B` won't affect the order in `A`.
      *
-     * @tparam To The type of the components to sort.
-     * @tparam From The type of the components to use to sort.
+     * @tparam To Type of the components to sort.
+     * @tparam From Type of the components to use to sort.
      */
     template<typename To, typename From>
     void sort() {
@@ -546,7 +578,7 @@ public:
      * An assertion will abort the execution at runtime in debug mode in case of
      * invalid entity.
      *
-     * @tparam Component The component to reset.
+     * @tparam Component Type of the component to reset.
      * @param entity A valid entity identifier.
      */
     template<typename Component>
@@ -568,7 +600,7 @@ public:
      * For each entity that has an instance of the given component, the
      * component itself is removed and thus destroyed.
      *
-     * @tparam Component The component whose pool must be reset.
+     * @tparam Component type of the component whose pool must be reset.
      */
     template<typename Component>
     void reset() {
@@ -630,7 +662,7 @@ public:
      * @see View<Entity, Component>
      * @see PersistentView
      *
-     * @tparam Component The type of the components used to construct the view.
+     * @tparam Component Type of the components used to construct the view.
      * @return A newly created standard view.
      */
     template<typename... Component>
@@ -652,7 +684,7 @@ public:
      * can be prepared with this function. Just use the same set of components
      * that would have been used otherwise to contruct the view.
      *
-     * @tparam Component The types of the components used to prepare the view.
+     * @tparam Component Types of the components used to prepare the view.
      */
     template<typename... Component>
     void prepare() {
@@ -714,7 +746,7 @@ public:
      * @see View<Entity, Component>
      * @see PersistentView
      *
-     * @tparam Component The types of the components used to construct the view.
+     * @tparam Component Types of the components used to construct the view.
      * @return A newly created persistent view.
      */
     template<typename... Component>
