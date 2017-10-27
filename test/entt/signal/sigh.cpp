@@ -75,6 +75,17 @@ struct S {
     static void f(int &v) { v = 42; }
 };
 
+TEST(SigH, Clear) {
+    entt::SigH<void(int &)> sigh;
+    sigh.connect<&S::f>();
+
+    ASSERT_FALSE(sigh.empty());
+
+    sigh.clear();
+
+    ASSERT_TRUE(sigh.empty());
+}
+
 TEST(SigH, Functions) {
     entt::SigH<void(int &)> sigh;
     int v = 0;
@@ -93,6 +104,8 @@ TEST(SigH, Functions) {
     ASSERT_TRUE(sigh.empty());
     ASSERT_EQ((entt::SigH<bool(int)>::size_type)0, sigh.size());
     ASSERT_EQ(0, v);
+
+    sigh.connect<&S::f>();
 }
 
 TEST(SigH, Members) {
