@@ -2,31 +2,66 @@
 # Tests configuration
 #
 
-set(COMMON_LINK_LIBS gtest_main Threads::Threads)
 include_directories(${PROJECT_SRC_DIR})
 
-# Test core
-
-add_executable(core entt/core/ident.cpp entt/core/family.cpp odr.cpp)
-target_link_libraries(core PRIVATE ${COMMON_LINK_LIBS})
-add_test(NAME core COMMAND core)
-
-# Test entt
-
-add_executable(entity entt/entity/registry.cpp entt/entity/sparse_set.cpp entt/entity/view.cpp odr.cpp)
-target_link_libraries(entity PRIVATE ${COMMON_LINK_LIBS})
-add_test(NAME entity COMMAND entity)
+add_library(odr OBJECT odr.cpp)
 
 # Test benchmark
 
-IF(CMAKE_BUILD_TYPE MATCHES Release)
-    add_executable(benchmark entt/entity/benchmark.cpp odr.cpp)
-    target_link_libraries(benchmark PRIVATE ${COMMON_LINK_LIBS})
+if(CMAKE_BUILD_TYPE MATCHES Release)
+    add_executable(
+        benchmark
+        $<TARGET_OBJECTS:odr>
+        entt/entity/benchmark.cpp
+    )
+    target_link_libraries(benchmark PRIVATE gtest_main Threads::Threads)
     add_test(NAME benchmark COMMAND benchmark)
-ENDIF()
+endif()
 
-# Test signal
+# Test core
 
-add_executable(signal entt/signal/sigh.cpp odr.cpp)
-target_link_libraries(signal PRIVATE ${COMMON_LINK_LIBS})
+add_executable(
+    core
+    $<TARGET_OBJECTS:odr>
+    entt/core/family.cpp
+    entt/core/ident.cpp
+)
+target_link_libraries(core PRIVATE gtest_main Threads::Threads)
+add_test(NAME core COMMAND core)
+
+# Test entity
+
+add_executable(
+    entity
+    $<TARGET_OBJECTS:odr>
+    entt/entity/registry.cpp
+    entt/entity/sparse_set.cpp
+    entt/entity/view.cpp
+)
+target_link_libraries(entity PRIVATE gtest_main Threads::Threads)
+add_test(NAME entity COMMAND entity)
+
+# Test locator
+
+add_executable(
+    locator
+    $<TARGET_OBJECTS:odr>
+    entt/locator/locator.cpp
+)
+target_link_libraries(locator PRIVATE gtest_main Threads::Threads)
+add_test(NAME locator COMMAND locator)
+
+# Test locator
+
+add_executable(
+    signal
+    $<TARGET_OBJECTS:odr>
+    entt/signal/bus.cpp
+    entt/signal/delegate.cpp
+    entt/signal/dispatcher.cpp
+    entt/signal/emitter.cpp
+    entt/signal/sigh.cpp
+    entt/signal/signal.cpp
+)
+target_link_libraries(signal PRIVATE gtest_main Threads::Threads)
 add_test(NAME signal COMMAND signal)
