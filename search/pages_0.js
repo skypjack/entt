@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['the_20entt_20framework',['The EnTT Framework',['../index.html',1,'']]]
+  ['entt_20framework',['EnTT Framework',['../index.html',1,'']]]
 ];

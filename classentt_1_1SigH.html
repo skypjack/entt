@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>entt: entt::SigH&lt; Function, typename &gt; Class Template Reference</title>
+<title>entt: entt::SigH&lt; Function, Collector &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.0.1</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -64,22 +64,29 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">entt::SigH&lt; Function, typename &gt; Class Template Reference</div>  </div>
+<div class="title">entt::SigH&lt; Function, Collector &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Signal handler.  
+<p>Unmanaged signal handler declaration.  
  <a href="classentt_1_1SigH.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>&gt;</code></p>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename Function, typename = DefaultCollectorType&lt;Function&gt;&gt;<br />
-class entt::SigH&lt; Function, typename &gt;</h3>
+<div class="textblock"><h3>template&lt;typename Function, typename Collector = DefaultCollectorType&lt;Function&gt;&gt;<br />
+class entt::SigH&lt; Function, Collector &gt;</h3>
 
-<p>Signal handler. </p>
-<p>Primary template isn't defined on purpose. All the specializations give a compile-time error unless the template parameter is a function type. </p>
+<p>Unmanaged signal handler declaration. </p>
+<p>Primary template isn't defined on purpose. All the specializations give a compile-time error unless the template parameter is a function type.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Function</td><td>A valid function type. </td></tr>
+    <tr><td class="paramname">Collector</td><td>Type of collector to use, if any. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00080">80</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00083">83</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/entt/signal/<a class="el" href="sigh_8hpp_source.html">sigh.hpp</a></li>
 </ul>

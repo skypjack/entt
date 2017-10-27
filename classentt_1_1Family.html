@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.0.1</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -64,6 +64,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classentt_1_1Family-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -76,12 +77,19 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="family_8hpp_source.html">family.hpp</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a263330fe09b437d3d91b8769f6a9fc77"><td class="memItemLeft" align="right" valign="top"><a id="a263330fe09b437d3d91b8769f6a9fc77"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Family.html#a263330fe09b437d3d91b8769f6a9fc77">family_type</a> = std::size_t</td></tr>
+<tr class="memdesc:a263330fe09b437d3d91b8769f6a9fc77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type. <br /></td></tr>
+<tr class="separator:a263330fe09b437d3d91b8769f6a9fc77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a221d31326ada546b679633235ef9494c"><td class="memTemplParams" colspan="2">template&lt;typename... &gt; </td></tr>
-<tr class="memitem:a221d31326ada546b679633235ef9494c"><td class="memTemplItemLeft" align="right" valign="top">static std::size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Family.html#a221d31326ada546b679633235ef9494c">type</a> () noexcept</td></tr>
-<tr class="memdesc:a221d31326ada546b679633235ef9494c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an unique identifier for the given type.  <a href="#a221d31326ada546b679633235ef9494c">More...</a><br /></td></tr>
-<tr class="separator:a221d31326ada546b679633235ef9494c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d54430410246e053bf7f18994db6848"><td class="memTemplParams" colspan="2">template&lt;typename... Type&gt; </td></tr>
+<tr class="memitem:a1d54430410246e053bf7f18994db6848"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="classentt_1_1Family.html#a263330fe09b437d3d91b8769f6a9fc77">family_type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Family.html#a1d54430410246e053bf7f18994db6848">type</a> () noexcept</td></tr>
+<tr class="memdesc:a1d54430410246e053bf7f18994db6848"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an unique identifier for the given type.  <a href="#a1d54430410246e053bf7f18994db6848">More...</a><br /></td></tr>
+<tr class="separator:a1d54430410246e053bf7f18994db6848"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename...&gt;<br />
@@ -90,23 +98,23 @@ class entt::Family&lt;... &gt;</h3>
 <p>Dynamic identifier generator. </p>
 <p>Utility class template that can be used to assign unique identifiers to types at runtime. Use different specializations to create separate sets of identifiers. </p>
 
-<p class="definition">Definition at line <a class="el" href="family_8hpp_source.html#l00021">21</a> of file <a class="el" href="family_8hpp_source.html">family.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="family_8hpp_source.html#l00020">20</a> of file <a class="el" href="family_8hpp_source.html">family.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a221d31326ada546b679633235ef9494c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a221d31326ada546b679633235ef9494c">&#9670;&nbsp;</a></span>type()</h2>
+<a id="a1d54430410246e053bf7f18994db6848"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d54430410246e053bf7f18994db6848">&#9670;&nbsp;</a></span>type()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename... &gt; </div>
 <div class="memtemplate">
-template&lt;typename... &gt; </div>
+template&lt;typename... Type&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static std::size_t <a class="el" href="classentt_1_1Family.html">entt::Family</a>&lt;... &gt;::type </td>
+          <td class="memname">static <a class="el" href="classentt_1_1Family.html#a263330fe09b437d3d91b8769f6a9fc77">family_type</a> <a class="el" href="classentt_1_1Family.html">entt::Family</a>&lt;... &gt;::type </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -122,7 +130,7 @@ template&lt;typename... &gt; </div>
 <p>Returns an unique identifier for the given type. </p>
 <dl class="section return"><dt>Returns</dt><dd>Statically generated unique identifier for the given type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="family_8hpp_source.html#l00033">33</a> of file <a class="el" href="family_8hpp_source.html">family.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="family_8hpp_source.html#l00041">41</a> of file <a class="el" href="family_8hpp_source.html">family.hpp</a>.</p>
 
 </div>
 </div>

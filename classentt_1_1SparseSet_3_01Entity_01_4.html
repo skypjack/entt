@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.0.1</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -127,7 +127,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memdesc:a34ffc79377cef381ef5af2e75d61cf4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copying a sparse set isn't allowed.  <a href="#a34ffc79377cef381ef5af2e75d61cf4d">More...</a><br /></td></tr>
 <tr class="separator:a34ffc79377cef381ef5af2e75d61cf4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24ddfc9e45d7b70639124fe7c2800384"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SparseSet.html">SparseSet</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a24ddfc9e45d7b70639124fe7c2800384">operator=</a> (<a class="el" href="classentt_1_1SparseSet.html">SparseSet</a> &amp;&amp;)=default</td></tr>
-<tr class="memdesc:a24ddfc9e45d7b70639124fe7c2800384"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move operator.  <a href="#a24ddfc9e45d7b70639124fe7c2800384">More...</a><br /></td></tr>
+<tr class="memdesc:a24ddfc9e45d7b70639124fe7c2800384"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move assignment operator.  <a href="#a24ddfc9e45d7b70639124fe7c2800384">More...</a><br /></td></tr>
 <tr class="separator:a24ddfc9e45d7b70639124fe7c2800384"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a337360e8d0f44c373acef65328a3e9f8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a337360e8d0f44c373acef65328a3e9f8">size</a> () const noexcept</td></tr>
 <tr class="memdesc:a337360e8d0f44c373acef65328a3e9f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of elements in the sparse set.  <a href="#a337360e8d0f44c373acef65328a3e9f8">More...</a><br /></td></tr>
@@ -178,7 +178,7 @@ class entt::SparseSet&lt; Entity &gt;</h3>
 <p>Basic sparse set implementation. </p>
 <p>Sparse set or packed array or whatever is the name users give it.<br />
  Two arrays: an <em>external</em> one and an <em>internal</em> one; a <em>sparse</em> one and a <em>packed</em> one; one used for direct access through contiguous memory, the other one used to get the data through an extra level of indirection.<br />
- This is largely used by the <a class="el" href="classentt_1_1Registry.html" title="A repository class for entities and components. ">Registry</a> to offer users the fastest access ever to the components. <a class="el" href="classentt_1_1View.html" title="Multi component view. ">View</a> and <a class="el" href="classentt_1_1PersistentView.html" title="Persistent view. ">PersistentView</a> are entirely designed around sparse sets.</p>
+ This is largely used by the <a class="el" href="classentt_1_1Registry.html" title="Fast and reliable entity-component system. ">Registry</a> to offer users the fastest access ever to the components. <a class="el" href="classentt_1_1View.html" title="Multi component view. ">View</a> and <a class="el" href="classentt_1_1PersistentView.html" title="Persistent view. ">PersistentView</a> are entirely designed around sparse sets.</p>
 <p>This type of data structure is widely documented in the literature and on the web. This is nothing more than a customized implementation suitable for the purpose of the framework.</p>
 <dl class="section note"><dt>Note</dt><dd>There are no guarantees that entities are returned in the insertion order when iterate a sparse set. Do not make assumption on the order in any case.</dd>
 <dd>
@@ -546,7 +546,7 @@ template&lt;typename Entity &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Default move operator. </p>
+<p>Default move assignment operator. </p>
 <dl class="section return"><dt>Returns</dt><dd>This sparse set. </dd></dl>
 
 </div>
@@ -620,7 +620,7 @@ template&lt;typename Entity &gt; </div>
 
 <p>Returns the number of elements in the sparse set. </p>
 <p>The number of elements is also the size of the internal packed array. There is no guarantee that the internal sparse array has the same size. Usually the size of the internal sparse array is equal or greater than the one of the internal packed array.</p>
-<dl class="section return"><dt>Returns</dt><dd>The number of elements. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Number of elements. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00126">126</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
@@ -659,7 +659,7 @@ template&lt;typename Compare &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Attempting to iterate elements using the raw pointer returned by <code>data</code> gives no guarantees on the order, even though <code>sort</code> has been invoked.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Compare</td><td>The type of the comparison function. </td></tr>
+    <tr><td class="paramname">Compare</td><td>Type of the comparison function. </td></tr>
   </table>
   </dd>
 </dl>

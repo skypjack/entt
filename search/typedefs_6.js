@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['size_5ftype',['size_type',['../classentt_1_1Registry.html#a741ffda6e06838c5593ba97adc7658e2',1,'entt::Registry::size_type()'],['../classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2',1,'entt::SparseSet&lt; Entity &gt;::size_type()'],['../classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#a27a88e2bb0822de41131741d9ffcded5',1,'entt::SparseSet&lt; Entity, Type &gt;::size_type()'],['../classentt_1_1PersistentView.html#ac2e81caacece38b84f46c4430cd8cf4e',1,'entt::PersistentView::size_type()'],['../classentt_1_1View.html#a1f398913dffcfcdc1200c1fc0f28b1dd',1,'entt::View::size_type()'],['../classentt_1_1View_3_01Entity_00_01Component_01_4.html#afa754b0f10b28dbdb2149b5b8d0fdf73',1,'entt::View&lt; Entity, Component &gt;::size_type()'],['../classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a7635c4c773fee73faf6eddda2d4abb87',1,'entt::SigH&lt; Ret(Args...), Collector &gt;::size_type()']]]
+  ['managedbus',['ManagedBus',['../namespaceentt.html#ab0f1cfc713909d1324ba76592e22bef5',1,'entt']]],
+  ['manageddispatcher',['ManagedDispatcher',['../namespaceentt.html#aa87d8c710e5a90c2a89d574d38f4b0b6',1,'entt']]]
 ];

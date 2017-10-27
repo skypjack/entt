@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['family',['Family',['../classentt_1_1Family.html',1,'entt']]]
+  ['connection',['Connection',['../structentt_1_1Emitter_1_1Connection.html',1,'entt::Emitter']]]
 ];

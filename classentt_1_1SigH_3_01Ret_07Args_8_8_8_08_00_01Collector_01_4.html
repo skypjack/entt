@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.0.1</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -73,7 +73,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Signal handler.  
+<p>Unmanaged signal handler definition.  
  <a href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>&gt;</code></p>
@@ -102,6 +102,10 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#ad0e4e34e41daec83437b1c607855079a">collector_type</a> = Collector</td></tr>
 <tr class="memdesc:ad0e4e34e41daec83437b1c607855079a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collector type. <br /></td></tr>
 <tr class="separator:ad0e4e34e41daec83437b1c607855079a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad306ac41adf5562740f5528bed80014"><td class="memTemplParams" colspan="2">template&lt;typename Class &gt; </td></tr>
+<tr class="memitem:aad306ac41adf5562740f5528bed80014"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aad306ac41adf5562740f5528bed80014">instance_type</a> = Class *</td></tr>
+<tr class="memdesc:aad306ac41adf5562740f5528bed80014"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instance type when it comes to connecting member functions.  <a href="#aad306ac41adf5562740f5528bed80014">More...</a><br /></td></tr>
+<tr class="separator:aad306ac41adf5562740f5528bed80014"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -120,43 +124,43 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:afe00dfad740a8b64a082799eb8b64e0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move constructor.  <a href="#afe00dfad740a8b64a082799eb8b64e0f">More...</a><br /></td></tr>
 <tr class="separator:afe00dfad740a8b64a082799eb8b64e0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8778e313cb524697a2161f9db0c331dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SigH.html">SigH</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a8778e313cb524697a2161f9db0c331dd">operator=</a> (const <a class="el" href="classentt_1_1SigH.html">SigH</a> &amp;other)</td></tr>
-<tr class="memdesc:a8778e313cb524697a2161f9db0c331dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assignment operator, listeners are also connected to this signal.  <a href="#a8778e313cb524697a2161f9db0c331dd">More...</a><br /></td></tr>
+<tr class="memdesc:a8778e313cb524697a2161f9db0c331dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy assignment operator.  <a href="#a8778e313cb524697a2161f9db0c331dd">More...</a><br /></td></tr>
 <tr class="separator:a8778e313cb524697a2161f9db0c331dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ff08c3c8ce19b988c1d1003deececf8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SigH.html">SigH</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a3ff08c3c8ce19b988c1d1003deececf8">operator=</a> (<a class="el" href="classentt_1_1SigH.html">SigH</a> &amp;&amp;other)</td></tr>
-<tr class="memdesc:a3ff08c3c8ce19b988c1d1003deececf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move operator.  <a href="#a3ff08c3c8ce19b988c1d1003deececf8">More...</a><br /></td></tr>
+<tr class="memdesc:a3ff08c3c8ce19b988c1d1003deececf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move assignment operator.  <a href="#a3ff08c3c8ce19b988c1d1003deececf8">More...</a><br /></td></tr>
 <tr class="separator:a3ff08c3c8ce19b988c1d1003deececf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae8ca8c4bddbebc4e3c2c75138b37cea8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a7635c4c773fee73faf6eddda2d4abb87">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#ae8ca8c4bddbebc4e3c2c75138b37cea8">size</a> () const noexcept</td></tr>
-<tr class="memdesc:ae8ca8c4bddbebc4e3c2c75138b37cea8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of listeners connected to the signal.  <a href="#ae8ca8c4bddbebc4e3c2c75138b37cea8">More...</a><br /></td></tr>
+<tr class="memdesc:ae8ca8c4bddbebc4e3c2c75138b37cea8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of listeners connected to the signal.  <a href="#ae8ca8c4bddbebc4e3c2c75138b37cea8">More...</a><br /></td></tr>
 <tr class="separator:ae8ca8c4bddbebc4e3c2c75138b37cea8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab04be7230a097d810ff1476d87c7ec30"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#ab04be7230a097d810ff1476d87c7ec30">empty</a> () const noexcept</td></tr>
-<tr class="memdesc:ab04be7230a097d810ff1476d87c7ec30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true is at least a listener is connected to the signal.  <a href="#ab04be7230a097d810ff1476d87c7ec30">More...</a><br /></td></tr>
+<tr class="memdesc:ab04be7230a097d810ff1476d87c7ec30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns false is at least a listener is connected to the signal.  <a href="#ab04be7230a097d810ff1476d87c7ec30">More...</a><br /></td></tr>
 <tr class="separator:ab04be7230a097d810ff1476d87c7ec30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:addb26bed0ae1287d7946d2a194118826"><td class="memItemLeft" align="right" valign="top"><a id="addb26bed0ae1287d7946d2a194118826"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#addb26bed0ae1287d7946d2a194118826">clear</a> () noexcept</td></tr>
-<tr class="memdesc:addb26bed0ae1287d7946d2a194118826"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disconnects all the listeners from the signal. <br /></td></tr>
+<tr class="memdesc:addb26bed0ae1287d7946d2a194118826"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disconnects all the listeners from a signal. <br /></td></tr>
 <tr class="separator:addb26bed0ae1287d7946d2a194118826"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa08b7a84d99e44a10b4843e4d866c9b1"><td class="memTemplParams" colspan="2">template&lt;Ret(*)(Args...) Function&gt; </td></tr>
 <tr class="memitem:aa08b7a84d99e44a10b4843e4d866c9b1"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aa08b7a84d99e44a10b4843e4d866c9b1">connect</a> ()</td></tr>
-<tr class="memdesc:aa08b7a84d99e44a10b4843e4d866c9b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connects a free function to the signal.  <a href="#aa08b7a84d99e44a10b4843e4d866c9b1">More...</a><br /></td></tr>
+<tr class="memdesc:aa08b7a84d99e44a10b4843e4d866c9b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connects a free function to a signal.  <a href="#aa08b7a84d99e44a10b4843e4d866c9b1">More...</a><br /></td></tr>
 <tr class="separator:aa08b7a84d99e44a10b4843e4d866c9b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf25e1699523e05fe36c1af931778d8f"><td class="memTemplParams" colspan="2">template&lt;typename Class , Ret(Class::*)(Args...) Member&gt; </td></tr>
-<tr class="memitem:abf25e1699523e05fe36c1af931778d8f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#abf25e1699523e05fe36c1af931778d8f">connect</a> (Class *instance)</td></tr>
-<tr class="memdesc:abf25e1699523e05fe36c1af931778d8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connects the member function for the given instance to the signal.  <a href="#abf25e1699523e05fe36c1af931778d8f">More...</a><br /></td></tr>
-<tr class="separator:abf25e1699523e05fe36c1af931778d8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a165bc11c6cc5ac6f2efad49e9fd361b3"><td class="memTemplParams" colspan="2">template&lt;typename Class , Ret(Class::*)(Args...) Member&gt; </td></tr>
+<tr class="memitem:a165bc11c6cc5ac6f2efad49e9fd361b3"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a165bc11c6cc5ac6f2efad49e9fd361b3">connect</a> (<a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aad306ac41adf5562740f5528bed80014">instance_type</a>&lt; Class &gt; instance)</td></tr>
+<tr class="memdesc:a165bc11c6cc5ac6f2efad49e9fd361b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connects a member function for a given instance to a signal.  <a href="#a165bc11c6cc5ac6f2efad49e9fd361b3">More...</a><br /></td></tr>
+<tr class="separator:a165bc11c6cc5ac6f2efad49e9fd361b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebdab9f1fb97228769e0383215be6097"><td class="memTemplParams" colspan="2">template&lt;Ret(*)(Args...) Function&gt; </td></tr>
 <tr class="memitem:aebdab9f1fb97228769e0383215be6097"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aebdab9f1fb97228769e0383215be6097">disconnect</a> ()</td></tr>
-<tr class="memdesc:aebdab9f1fb97228769e0383215be6097"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disconnects a free function from the signal.  <a href="#aebdab9f1fb97228769e0383215be6097">More...</a><br /></td></tr>
+<tr class="memdesc:aebdab9f1fb97228769e0383215be6097"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disconnects a free function from a signal.  <a href="#aebdab9f1fb97228769e0383215be6097">More...</a><br /></td></tr>
 <tr class="separator:aebdab9f1fb97228769e0383215be6097"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90b6048011b65144eaa35bf4d9b98063"><td class="memTemplParams" colspan="2">template&lt;typename Class , Ret(Class::*)(Args...) Member&gt; </td></tr>
-<tr class="memitem:a90b6048011b65144eaa35bf4d9b98063"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a90b6048011b65144eaa35bf4d9b98063">disconnect</a> (Class *instance)</td></tr>
-<tr class="memdesc:a90b6048011b65144eaa35bf4d9b98063"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disconnects the given member function from the signal.  <a href="#a90b6048011b65144eaa35bf4d9b98063">More...</a><br /></td></tr>
-<tr class="separator:a90b6048011b65144eaa35bf4d9b98063"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a336bc3fda2ca59f486d8eb2addf543e1"><td class="memTemplParams" colspan="2">template&lt;typename Class &gt; </td></tr>
-<tr class="memitem:a336bc3fda2ca59f486d8eb2addf543e1"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a336bc3fda2ca59f486d8eb2addf543e1">disconnect</a> (Class *instance)</td></tr>
-<tr class="memdesc:a336bc3fda2ca59f486d8eb2addf543e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all existing connections for the given instance.  <a href="#a336bc3fda2ca59f486d8eb2addf543e1">More...</a><br /></td></tr>
-<tr class="separator:a336bc3fda2ca59f486d8eb2addf543e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb9533e2cdeeae84cb3cb545a8924899"><td class="memTemplParams" colspan="2">template&lt;typename Class , Ret(Class::*)(Args...) Member&gt; </td></tr>
+<tr class="memitem:afb9533e2cdeeae84cb3cb545a8924899"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#afb9533e2cdeeae84cb3cb545a8924899">disconnect</a> (<a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aad306ac41adf5562740f5528bed80014">instance_type</a>&lt; Class &gt; instance)</td></tr>
+<tr class="memdesc:afb9533e2cdeeae84cb3cb545a8924899"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disconnects the given member function from a signal.  <a href="#afb9533e2cdeeae84cb3cb545a8924899">More...</a><br /></td></tr>
+<tr class="separator:afb9533e2cdeeae84cb3cb545a8924899"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91047d4855ac1daf429fa73728807f4a"><td class="memTemplParams" colspan="2">template&lt;typename Class &gt; </td></tr>
+<tr class="memitem:a91047d4855ac1daf429fa73728807f4a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a91047d4855ac1daf429fa73728807f4a">disconnect</a> (<a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aad306ac41adf5562740f5528bed80014">instance_type</a>&lt; Class &gt; instance)</td></tr>
+<tr class="memdesc:a91047d4855ac1daf429fa73728807f4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all existing connections for the given instance.  <a href="#a91047d4855ac1daf429fa73728807f4a">More...</a><br /></td></tr>
+<tr class="separator:a91047d4855ac1daf429fa73728807f4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09e4795c05a1ebac1c25a60e79d67507"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a09e4795c05a1ebac1c25a60e79d67507">publish</a> (Args... args)</td></tr>
-<tr class="memdesc:a09e4795c05a1ebac1c25a60e79d67507"><td class="mdescLeft">&#160;</td><td class="mdescRight">Triggers the signal.  <a href="#a09e4795c05a1ebac1c25a60e79d67507">More...</a><br /></td></tr>
+<tr class="memdesc:a09e4795c05a1ebac1c25a60e79d67507"><td class="mdescLeft">&#160;</td><td class="mdescRight">Triggers a signal.  <a href="#a09e4795c05a1ebac1c25a60e79d67507">More...</a><br /></td></tr>
 <tr class="separator:a09e4795c05a1ebac1c25a60e79d67507"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab6258af321b48bc2e70e09c68155b9bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#ad0e4e34e41daec83437b1c607855079a">collector_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#ab6258af321b48bc2e70e09c68155b9bc">collect</a> (Args... args)</td></tr>
 <tr class="memdesc:ab6258af321b48bc2e70e09c68155b9bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collects return values from the listeners.  <a href="#ab6258af321b48bc2e70e09c68155b9bc">More...</a><br /></td></tr>
@@ -175,10 +179,10 @@ Friends</h2></td></tr>
 <div class="textblock"><h3>template&lt;typename Ret, typename... Args, typename Collector&gt;<br />
 class entt::SigH&lt; Ret(Args...), Collector &gt;</h3>
 
-<p>Signal handler. </p>
+<p>Unmanaged signal handler definition. </p>
 <p>Unmanaged signal handler. It works directly with naked pointers to classes and pointers to member functions as well as pointers to free functions. Users of this class are in charge of disconnecting instances before deleting them.</p>
 <p>This class serves mainly two purposes:</p><ul>
-<li>Creating signals to be used later to notify a bunch of listeners.</li>
+<li>Creating signals used later to notify a bunch of listeners.</li>
 <li>Collecting results from a set of functions like in a voting system.</li>
 </ul>
 <p>The default collector does nothing. To properly collect data, define and use a class that has a call operator the signature of which is <code>bool(Param)</code> and:</p><ul>
@@ -188,14 +192,43 @@ class entt::SigH&lt; Ret(Args...), Collector &gt;</h3>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Ret</td><td>Return type of a function type. </td></tr>
-    <tr><td class="paramname">Args</td><td>Types of the arguments of a function type. </td></tr>
-    <tr><td class="paramname">Collector</td><td>The type of the collector to use if any. </td></tr>
+    <tr><td class="paramname">Args</td><td>Types of arguments of a function type. </td></tr>
+    <tr><td class="paramname">Collector</td><td>Type of collector to use, if any. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00105">105</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00108">108</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="aad306ac41adf5562740f5528bed80014"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad306ac41adf5562740f5528bed80014">&#9670;&nbsp;</a></span>instance_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Ret , typename... Args, typename Collector &gt; </div>
+<div class="memtemplate">
+template&lt;typename Class &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classentt_1_1SigH.html">entt::SigH</a>&lt; Ret(Args...), Collector &gt;::<a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aad306ac41adf5562740f5528bed80014">instance_type</a> =  Class *</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Instance type when it comes to connecting member functions. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Class</td><td>Type of class to which the member function belongs. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00132">132</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aaaa3e726e71219b8141aaa2a0e31f547"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aaaa3e726e71219b8141aaa2a0e31f547">&#9670;&nbsp;</a></span>SigH() <span class="overload">[1/2]</span></h2>
 
@@ -225,12 +258,12 @@ template&lt;typename Ret , typename... Args, typename Collector &gt; </div>
 <p>Copy constructor, listeners are also connected to this signal. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">other</td><td>A signal to be used as source to initialize this instance. </td></tr>
+    <tr><td class="paramname">other</td><td>A signal to use as source to initialize this instance. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00134">134</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00144">144</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
@@ -263,12 +296,12 @@ template&lt;typename Ret , typename... Args, typename Collector &gt; </div>
 <p>Default move constructor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">other</td><td>A signal to be used as source to initialize this instance. </td></tr>
+    <tr><td class="paramname">other</td><td>A signal to use as source to initialize this instance. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00142">142</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00152">152</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
@@ -308,7 +341,7 @@ template&lt;typename Ret , typename... Args, typename Collector &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An instance of the collector filled with collected data. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00276">276</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00285">285</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
@@ -339,8 +372,8 @@ template&lt;Ret(*)(Args...) Function&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Connects a free function to the signal. </p>
-<dl class="section note"><dt>Note</dt><dd>The signal handler performs checks to avoid multiple connections for free functions.</dd></dl>
+<p>Connects a free function to a signal. </p>
+<p>The signal handler performs checks to avoid multiple connections for free functions.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Function</td><td>A valid free function pointer. </td></tr>
@@ -348,12 +381,12 @@ template&lt;Ret(*)(Args...) Function&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00199">199</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00211">211</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
-<a id="abf25e1699523e05fe36c1af931778d8f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abf25e1699523e05fe36c1af931778d8f">&#9670;&nbsp;</a></span>connect() <span class="overload">[2/2]</span></h2>
+<a id="a165bc11c6cc5ac6f2efad49e9fd361b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a165bc11c6cc5ac6f2efad49e9fd361b3">&#9670;&nbsp;</a></span>connect() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -368,7 +401,7 @@ template&lt;typename Class , Ret(Class::*)(Args...) Member&gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classentt_1_1SigH.html">entt::SigH</a>&lt; Ret(Args...), Collector &gt;::connect </td>
           <td>(</td>
-          <td class="paramtype">Class *&#160;</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aad306ac41adf5562740f5528bed80014">instance_type</a>&lt; Class &gt;&#160;</td>
           <td class="paramname"><em>instance</em></td><td>)</td>
           <td></td>
         </tr>
@@ -380,13 +413,12 @@ template&lt;typename Class , Ret(Class::*)(Args...) Member&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Connects the member function for the given instance to the signal. </p>
-<p>The signal isn't responsible for the connected object. Users must guarantee that the lifetime of the instance overcomes the one of the signal.</p>
-<dl class="section warning"><dt>Warning</dt><dd>The signal handler performs checks to avoid multiple connections for the same member function of a given instance.</dd></dl>
+<p>Connects a member function for a given instance to a signal. </p>
+<p>The signal isn't responsible for the connected object. Users must guarantee that the lifetime of the instance overcomes the one of the signal. On the other side, the signal handler performs checks to avoid multiple connections for the same member function of a given instance.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Class</td><td>The type of the class to which the member function belongs. </td></tr>
-    <tr><td class="paramname">Member</td><td>The member function to connect to the signal. </td></tr>
+    <tr><td class="paramname">Class</td><td>Type of class to which the member function belongs. </td></tr>
+    <tr><td class="paramname">Member</td><td>Member function to connect to the signal. </td></tr>
   </table>
   </dd>
 </dl>
@@ -397,7 +429,7 @@ template&lt;typename Class , Ret(Class::*)(Args...) Member&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00220">220</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00229">229</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
@@ -428,7 +460,7 @@ template&lt;Ret(*)(Args...) Function&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Disconnects a free function from the signal. </p>
+<p>Disconnects a free function from a signal. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Function</td><td>A valid free function pointer. </td></tr>
@@ -436,12 +468,12 @@ template&lt;Ret(*)(Args...) Function&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00230">230</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00239">239</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a90b6048011b65144eaa35bf4d9b98063"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90b6048011b65144eaa35bf4d9b98063">&#9670;&nbsp;</a></span>disconnect() <span class="overload">[2/3]</span></h2>
+<a id="afb9533e2cdeeae84cb3cb545a8924899"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb9533e2cdeeae84cb3cb545a8924899">&#9670;&nbsp;</a></span>disconnect() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -456,7 +488,7 @@ template&lt;typename Class , Ret(Class::*)(Args...) Member&gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classentt_1_1SigH.html">entt::SigH</a>&lt; Ret(Args...), Collector &gt;::disconnect </td>
           <td>(</td>
-          <td class="paramtype">Class *&#160;</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aad306ac41adf5562740f5528bed80014">instance_type</a>&lt; Class &gt;&#160;</td>
           <td class="paramname"><em>instance</em></td><td>)</td>
           <td></td>
         </tr>
@@ -468,11 +500,11 @@ template&lt;typename Class , Ret(Class::*)(Args...) Member&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Disconnects the given member function from the signal. </p>
+<p>Disconnects the given member function from a signal. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Class</td><td>The type of the class to which the member function belongs. </td></tr>
-    <tr><td class="paramname">Member</td><td>The member function to connect to the signal. </td></tr>
+    <tr><td class="paramname">Class</td><td>Type of class to which the member function belongs. </td></tr>
+    <tr><td class="paramname">Member</td><td>Member function to connect to the signal. </td></tr>
   </table>
   </dd>
 </dl>
@@ -483,12 +515,12 @@ template&lt;typename Class , Ret(Class::*)(Args...) Member&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00242">242</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00251">251</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a336bc3fda2ca59f486d8eb2addf543e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a336bc3fda2ca59f486d8eb2addf543e1">&#9670;&nbsp;</a></span>disconnect() <span class="overload">[3/3]</span></h2>
+<a id="a91047d4855ac1daf429fa73728807f4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91047d4855ac1daf429fa73728807f4a">&#9670;&nbsp;</a></span>disconnect() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -503,7 +535,7 @@ template&lt;typename Class &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classentt_1_1SigH.html">entt::SigH</a>&lt; Ret(Args...), Collector &gt;::disconnect </td>
           <td>(</td>
-          <td class="paramtype">Class *&#160;</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aad306ac41adf5562740f5528bed80014">instance_type</a>&lt; Class &gt;&#160;</td>
           <td class="paramname"><em>instance</em></td><td>)</td>
           <td></td>
         </tr>
@@ -518,7 +550,7 @@ template&lt;typename Class &gt; </div>
 <p>Removes all existing connections for the given instance. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Class</td><td>The type of the class to which the member function belongs. </td></tr>
+    <tr><td class="paramname">Class</td><td>Type of class to which the member function belongs. </td></tr>
   </table>
   </dd>
 </dl>
@@ -529,7 +561,7 @@ template&lt;typename Class &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00253">253</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00262">262</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
@@ -558,10 +590,10 @@ template&lt;typename Ret , typename... Args, typename Collector &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Returns true is at least a listener is connected to the signal. </p>
+<p>Returns false is at least a listener is connected to the signal. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the signal has no listeners connected, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00178">178</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00191">191</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
@@ -591,16 +623,17 @@ template&lt;typename Ret , typename... Args, typename Collector &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Assignment operator, listeners are also connected to this signal. </p>
+<p>Copy assignment operator. </p>
+<p>Listeners are also connected to this signal.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">other</td><td>A signal to be used as source to initialize this instance. </td></tr>
+    <tr><td class="paramname">other</td><td>A signal to use as source to initialize this instance. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>This signal. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00151">151</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00164">164</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
@@ -630,16 +663,16 @@ template&lt;typename Ret , typename... Args, typename Collector &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Default move operator. </p>
+<p>Move assignment operator. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">other</td><td>A signal to be used as source to initialize this instance. </td></tr>
+    <tr><td class="paramname">other</td><td>A signal to use as source to initialize this instance. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>This signal. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00161">161</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00174">174</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
@@ -673,13 +706,13 @@ template&lt;typename Ret , typename... Args, typename Collector &gt; </div>
 <p>Two signals are identical if they have the same size and the same listeners registered exactly in the same order.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">other</td><td>Signal with which to compare. </td></tr>
+    <tr><td class="paramname">other</td><td><a class="el" href="classentt_1_1Signal.html" title="Managed signal handler declaration. ">Signal</a> with which to compare. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the two signals are identical, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00307">307</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00316">316</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
@@ -709,7 +742,7 @@ template&lt;typename Ret , typename... Args, typename Collector &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Triggers the signal. </p>
+<p>Triggers a signal. </p>
 <p>All the listeners are notified. Order isn't guaranteed.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -718,7 +751,7 @@ template&lt;typename Ret , typename... Args, typename Collector &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00265">265</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00274">274</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
@@ -747,10 +780,10 @@ template&lt;typename Ret , typename... Args, typename Collector &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>The number of listeners connected to the signal. </p>
-<dl class="section return"><dt>Returns</dt><dd>The number of listeners currently connected. </dd></dl>
+<p>Number of listeners connected to the signal. </p>
+<dl class="section return"><dt>Returns</dt><dd>Number of listeners currently connected. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00170">170</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00183">183</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>
@@ -800,7 +833,7 @@ template&lt;typename Ret , typename... Args, typename Collector &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00293">293</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sigh_8hpp_source.html#l00302">302</a> of file <a class="el" href="sigh_8hpp_source.html">sigh.hpp</a>.</p>
 
 </div>
 </div>

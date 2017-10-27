@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.0.1</span>
+   &#160;<span id="projectnumber">2.1.0</span>
    </div>
   </td>
  </tr>
@@ -78,6 +78,10 @@ $(function() {
 , <a class="el" href="classentt_1_1View.html#aecf54fad5f9fce08a3e452fcd304ed9c">entt::View&lt; Entity, First, Other &gt;</a>
 , <a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html#ae351dc5fef90e54a61187310d1e7d9ba">entt::View&lt; Entity, Component &gt;</a>
 </li>
+<li>Bus()
+: <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#ad310a34bfe28d2af2a4d67b101d39dac">entt::Bus&lt; Sig, Event &gt;</a>
+, <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#a4e055143522fedc9409157181e0dcb33">entt::Bus&lt; Sig, Event, Other... &gt;</a>
+</li>
 </ul>
 
 
@@ -86,20 +90,30 @@ $(function() {
 : <a class="el" href="classentt_1_1Registry.html#af51d1553722e555eb1557fc0c68f104a">entt::Registry&lt; Entity &gt;</a>
 </li>
 <li>clear()
-: <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#addb26bed0ae1287d7946d2a194118826">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+: <a class="el" href="classentt_1_1Emitter.html#a1ada75fa53cc433dd4d1aa5fcef32ecf">entt::Emitter&lt; Derived &gt;</a>
+, <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#addb26bed0ae1287d7946d2a194118826">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+, <a class="el" href="classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#adaa1914b3d748847cf693edb26da08b7">entt::Signal&lt; void(Args...)&gt;</a>
 </li>
 <li>collect()
 : <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#ab6258af321b48bc2e70e09c68155b9bc">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
 </li>
 <li>connect()
-: <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aa08b7a84d99e44a10b4843e4d866c9b1">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+: <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#af5b14be6bc080a3ed83fa2731d5d0e25">entt::Bus&lt; Sig, Event &gt;</a>
+, <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#af1ae094ee06303e7ce521c1f95cb6e35">entt::Bus&lt; Sig, Event, Other... &gt;</a>
+, <a class="el" href="classentt_1_1Delegate_3_01Ret_07Args_8_8_8_08_4.html#a6c5cf47394e3f12aeae6e3aaf628e111">entt::Delegate&lt; Ret(Args...)&gt;</a>
+, <a class="el" href="classentt_1_1Dispatcher.html#ac1625cbf5503c1b705b2215b9bf018d4">entt::Dispatcher&lt; Sig &gt;</a>
+, <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aa08b7a84d99e44a10b4843e4d866c9b1">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+, <a class="el" href="classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#acaf30dac70a27ffcbf635fd307868e24">entt::Signal&lt; void(Args...)&gt;</a>
+</li>
+<li>Connection()
+: <a class="el" href="structentt_1_1Emitter_1_1Connection.html#a1ccd273683a9fb65a7a4d0c9bf7d0543">entt::Emitter&lt; Derived &gt;::Connection&lt; Event &gt;</a>
 </li>
 <li>construct()
 : <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#abb58b7215e9c15cd705f66e4b233706d">entt::SparseSet&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#aaf02adad06199a55c618622c365c0287">entt::SparseSet&lt; Entity, Type &gt;</a>
 </li>
 <li>create()
-: <a class="el" href="classentt_1_1Registry.html#ae3c9cd27360a869f1e192d159447b5e4">entt::Registry&lt; Entity &gt;</a>
+: <a class="el" href="classentt_1_1Registry.html#a68363417c654ab36e68606c13deb850e">entt::Registry&lt; Entity &gt;</a>
 </li>
 <li>current()
 : <a class="el" href="classentt_1_1Registry.html#a4e1a07f4170764925864b162277485b6">entt::Registry&lt; Entity &gt;</a>
@@ -113,21 +127,44 @@ $(function() {
 , <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a6e4dda542e3d725dd963dea57bfb9cb1">entt::SparseSet&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html#a78f5d9ebb636c6acb391d802ad13fede">entt::View&lt; Entity, Component &gt;</a>
 </li>
+<li>Delegate()
+: <a class="el" href="classentt_1_1Delegate_3_01Ret_07Args_8_8_8_08_4.html#a8b504177dc08056d91ac4a6a79dd962b">entt::Delegate&lt; Ret(Args...)&gt;</a>
+</li>
 <li>destroy()
 : <a class="el" href="classentt_1_1Registry.html#afe1fc933ce101207a49b6bdeafa2ce41">entt::Registry&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab4be1be8435da50621373c0bd737a1e8">entt::SparseSet&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#a06b863abd1b457c48b7080e203b47a0f">entt::SparseSet&lt; Entity, Type &gt;</a>
 </li>
 <li>disconnect()
-: <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a90b6048011b65144eaa35bf4d9b98063">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+: <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#a7924274e47544c4e8b3153bc7f12ae2c">entt::Bus&lt; Sig, Event &gt;</a>
+, <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#aa0ebab2c6afdb51de1dfbb38ddd69c0a">entt::Bus&lt; Sig, Event, Other... &gt;</a>
+, <a class="el" href="classentt_1_1Dispatcher.html#a5b591111cbf2f92cf527e5c4b569b013">entt::Dispatcher&lt; Sig &gt;</a>
+, <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aebdab9f1fb97228769e0383215be6097">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+, <a class="el" href="classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#ab26e429a789825618aa6f5e789616b94">entt::Signal&lt; void(Args...)&gt;</a>
+</li>
+<li>Dispatcher()
+: <a class="el" href="classentt_1_1Dispatcher.html#ac3894ac80673d3f4504d8ba2e1ba2152">entt::Dispatcher&lt; Sig &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_e"></a>- e -</h3><ul>
+<li>each()
+: <a class="el" href="classentt_1_1PersistentView.html#ab54c38a7a90a563d84bcb8a5a4cb35f0">entt::PersistentView&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1View.html#a202a9758bbfc0494a7c19e501bbc292c">entt::View&lt; Entity, First, Other &gt;</a>
+, <a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html#a153a5d55844bdcbc91862a251bb0300f">entt::View&lt; Entity, Component &gt;</a>
+</li>
+<li>Emitter()
+: <a class="el" href="classentt_1_1Emitter.html#ab1f73c3d41106e3973dddf8f4ee63d5a">entt::Emitter&lt; Derived &gt;</a>
+</li>
 <li>empty()
-: <a class="el" href="classentt_1_1Registry.html#afccc9bc4af28b679d761f365655e1d42">entt::Registry&lt; Entity &gt;</a>
+: <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#a5f343d5c2736e49d36c4d3a88454ff80">entt::Bus&lt; Sig, Event &gt;</a>
+, <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#ac9da0b1cfbf9ef6f4397ba6e211f4aff">entt::Bus&lt; Sig, Event, Other... &gt;</a>
+, <a class="el" href="classentt_1_1Emitter.html#a0ec207193a1ef28b1dae5fbc32b1876e">entt::Emitter&lt; Derived &gt;</a>
+, <a class="el" href="classentt_1_1Registry.html#afccc9bc4af28b679d761f365655e1d42">entt::Registry&lt; Entity &gt;</a>
+, <a class="el" href="structentt_1_1ServiceLocator.html#a476a7ad8cad6527ccef22ca59bf829bd">entt::ServiceLocator&lt; Service &gt;</a>
 , <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#ab04be7230a097d810ff1476d87c7ec30">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+, <a class="el" href="classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#a02d62027f5ef8344e8d8e15d5037f30b">entt::Signal&lt; void(Args...)&gt;</a>
 , <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a9d6b9c98d2645d821c81ff7d3586ca27">entt::SparseSet&lt; Entity &gt;</a>
 </li>
 <li>end()
@@ -136,17 +173,24 @@ $(function() {
 , <a class="el" href="classentt_1_1View.html#a61dbd65a57f56771f6b9aff282592055">entt::View&lt; Entity, First, Other &gt;</a>
 , <a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html#af683298434cb58f86f0025cdb585eda2">entt::View&lt; Entity, Component &gt;</a>
 </li>
+<li>enqueue()
+: <a class="el" href="classentt_1_1Dispatcher.html#ac2ca8cabcdf32b7d017441edc1a937c5">entt::Dispatcher&lt; Sig &gt;</a>
+</li>
+<li>erase()
+: <a class="el" href="classentt_1_1Emitter.html#a7d9faf85644c506afc791b359f321f60">entt::Emitter&lt; Derived &gt;</a>
+</li>
 </ul>
 
 
 <h3><a id="index_g"></a>- g -</h3><ul>
 <li>get()
 : <a class="el" href="classentt_1_1PersistentView.html#a7b1ca9cc827871a1dbab18e5cbc0826a">entt::PersistentView&lt; Entity, Component &gt;</a>
-, <a class="el" href="classentt_1_1Registry.html#a904b71bae3eaa69d534b4dc41c15e889">entt::Registry&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1Registry.html#a6b1cd324d6d080c68f61def36a7a4668">entt::Registry&lt; Entity &gt;</a>
+, <a class="el" href="structentt_1_1ServiceLocator.html#a134e8a6d1e3697b7c67bdce9175a7c8b">entt::ServiceLocator&lt; Service &gt;</a>
 , <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7aa0a2c4f286228fc47d32761552bc13">entt::SparseSet&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#ae3c82ad4f376e67e8ccafede84942cf2">entt::SparseSet&lt; Entity, Type &gt;</a>
+, <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#a8da654fb96317df9b00ea48b75cf642a">entt::SparseSet&lt; Entity, Type &gt;</a>
 , <a class="el" href="classentt_1_1View.html#a180a7c5c8dc1974f4549ce3198e3fd97">entt::View&lt; Entity, First, Other &gt;</a>
-, <a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html#a97f303e914e114df37e12fd4556efff6">entt::View&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html#a831d0d782118c26ca8efe00c452f4b21">entt::View&lt; Entity, Component &gt;</a>
 </li>
 </ul>
 
@@ -160,14 +204,31 @@ $(function() {
 
 
 <h3><a id="index_o"></a>- o -</h3><ul>
+<li>on()
+: <a class="el" href="classentt_1_1Emitter.html#a1df9a54b806806add57c3168cbb2bdf1">entt::Emitter&lt; Derived &gt;</a>
+</li>
+<li>once()
+: <a class="el" href="classentt_1_1Emitter.html#a1145cc27235acf0e24e1956ba0b15393">entt::Emitter&lt; Derived &gt;</a>
+</li>
+<li>operator()()
+: <a class="el" href="classentt_1_1Delegate_3_01Ret_07Args_8_8_8_08_4.html#afd708468edef730ab00d8c1ebfb2913a">entt::Delegate&lt; Ret(Args...)&gt;</a>
+</li>
 <li>operator=()
-: <a class="el" href="classentt_1_1Registry.html#a6ff250745f1774984a9524d63855f26d">entt::Registry&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a8778e313cb524697a2161f9db0c331dd">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
-, <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a24ddfc9e45d7b70639124fe7c2800384">entt::SparseSet&lt; Entity &gt;</a>
+: <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#afd4cfd862be16f68163b13791f145a55">entt::Bus&lt; Sig, Event &gt;</a>
+, <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#a333538241afa5cc37c24f7d687ec295c">entt::Bus&lt; Sig, Event, Other... &gt;</a>
+, <a class="el" href="classentt_1_1Dispatcher.html#a202d90ba1b7672531dcd2b175bdef2bf">entt::Dispatcher&lt; Sig &gt;</a>
+, <a class="el" href="structentt_1_1Emitter_1_1Connection.html#aa1dba0de2aaa8426f4b42e6c52aa80ea">entt::Emitter&lt; Derived &gt;::Connection&lt; Event &gt;</a>
+, <a class="el" href="classentt_1_1Emitter.html#ace3403fe310953f720dbddff016fe715">entt::Emitter&lt; Derived &gt;</a>
+, <a class="el" href="classentt_1_1Registry.html#a6ff250745f1774984a9524d63855f26d">entt::Registry&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a3ff08c3c8ce19b988c1d1003deececf8">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+, <a class="el" href="classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#ab1c228277e1b4e2719123c2d83d0a072">entt::Signal&lt; void(Args...)&gt;</a>
+, <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a34ffc79377cef381ef5af2e75d61cf4d">entt::SparseSet&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#aa700bb907a18470dce144f84822c67ae">entt::SparseSet&lt; Entity, Type &gt;</a>
 </li>
 <li>operator==()
-: <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a2f86c641dcc58cd23f3763ef4a708b67">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+: <a class="el" href="classentt_1_1Delegate_3_01Ret_07Args_8_8_8_08_4.html#aa152d818f1df16bcd61ee16f2e4d3c2a">entt::Delegate&lt; Ret(Args...)&gt;</a>
+, <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a2f86c641dcc58cd23f3763ef4a708b67">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+, <a class="el" href="classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#a3d7c891425bffb3b95bcb8076d741579">entt::Signal&lt; void(Args...)&gt;</a>
 </li>
 </ul>
 
@@ -183,7 +244,11 @@ $(function() {
 : <a class="el" href="classentt_1_1Registry.html#ac05c9ccc5fe57df386d8104578fc9675">entt::Registry&lt; Entity &gt;</a>
 </li>
 <li>publish()
-: <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a09e4795c05a1ebac1c25a60e79d67507">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+: <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#a2975fdfe9cb3f86f2b80d0e783d99def">entt::Bus&lt; Sig, Event &gt;</a>
+, <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#a41a14fd388ffec149bd78b0fed58e54c">entt::Bus&lt; Sig, Event, Other... &gt;</a>
+, <a class="el" href="classentt_1_1Emitter.html#ab5141fd9793f53ef83af47c8c8a74b0e">entt::Emitter&lt; Derived &gt;</a>
+, <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a09e4795c05a1ebac1c25a60e79d67507">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+, <a class="el" href="classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#adfb4ac2d274f8ae3a2ad26b0538997c6">entt::Signal&lt; void(Args...)&gt;</a>
 </li>
 </ul>
 
@@ -191,7 +256,14 @@ $(function() {
 <h3><a id="index_r"></a>- r -</h3><ul>
 <li>raw()
 : <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#a05125091c25b7a3c62561c247e09c5a2">entt::SparseSet&lt; Entity, Type &gt;</a>
-, <a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html#aa5bfe21925dfd6af9bb8aba65d9bccd5">entt::View&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html#a1ad9504a013794b2e3f08feefc5b4c58">entt::View&lt; Entity, Component &gt;</a>
+</li>
+<li>ref()
+: <a class="el" href="structentt_1_1ServiceLocator.html#a1bf93009cea9bfb190a69ae940fe0001">entt::ServiceLocator&lt; Service &gt;</a>
+</li>
+<li>reg()
+: <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#a021d37b91dd259d2cb71ebcb3785f88e">entt::Bus&lt; Sig, Event &gt;</a>
+, <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#a71421d7774525a0f9428c4ffc9aef3c1">entt::Bus&lt; Sig, Event, Other... &gt;</a>
 </li>
 <li>Registry()
 : <a class="el" href="classentt_1_1Registry.html#ab5022bf3ac71d209cb9b85e686324f28">entt::Registry&lt; Entity &gt;</a>
@@ -203,7 +275,9 @@ $(function() {
 : <a class="el" href="classentt_1_1Registry.html#a5ce71508e824ea5ef0d95d4baef37503">entt::Registry&lt; Entity &gt;</a>
 </li>
 <li>reset()
-: <a class="el" href="classentt_1_1Registry.html#ae58d20711dabcd4959a89e0928974136">entt::Registry&lt; Entity &gt;</a>
+: <a class="el" href="classentt_1_1Delegate_3_01Ret_07Args_8_8_8_08_4.html#ac78d4694fd87d0ea899fb2fdead21af7">entt::Delegate&lt; Ret(Args...)&gt;</a>
+, <a class="el" href="classentt_1_1Registry.html#a613333e0a4acb227d08938ccc594e064">entt::Registry&lt; Entity &gt;</a>
+, <a class="el" href="structentt_1_1ServiceLocator.html#ac52892a5692c15c8b230a5020adb0847">entt::ServiceLocator&lt; Service &gt;</a>
 , <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ad1c62c65aeb0112e688f05d8f641cdab">entt::SparseSet&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#a3b138c121f11592a3f9e9f2fc2bb67fe">entt::SparseSet&lt; Entity, Type &gt;</a>
 , <a class="el" href="classentt_1_1View.html#a2a12951d1032876dd9c534cba78f0f14">entt::View&lt; Entity, First, Other &gt;</a>
@@ -215,19 +289,31 @@ $(function() {
 
 
 <h3><a id="index_s"></a>- s -</h3><ul>
+<li>ServiceLocator()
+: <a class="el" href="structentt_1_1ServiceLocator.html#a9806fa1d96f6edfb5b946b11acabc0da">entt::ServiceLocator&lt; Service &gt;</a>
+</li>
+<li>set()
+: <a class="el" href="structentt_1_1ServiceLocator.html#abf8d8b8d70ed082d54516def7500ec5c">entt::ServiceLocator&lt; Service &gt;</a>
+</li>
 <li>SigH()
 : <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a22ed13f3e224e826f6d4353162f47e4c">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
 </li>
+<li>Signal()
+: <a class="el" href="classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#ae081423a9b786c31e75ae9fe8b0f8b4c">entt::Signal&lt; void(Args...)&gt;</a>
+</li>
 <li>size()
-: <a class="el" href="classentt_1_1PersistentView.html#a416b2794ee8c13ac0f793e2a7a9ae769">entt::PersistentView&lt; Entity, Component &gt;</a>
+: <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#a8c94c5e481daf1188647dd8503408486">entt::Bus&lt; Sig, Event &gt;</a>
+, <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#a51a1621571305d247e5c9e2ade399b3e">entt::Bus&lt; Sig, Event, Other... &gt;</a>
+, <a class="el" href="classentt_1_1PersistentView.html#a416b2794ee8c13ac0f793e2a7a9ae769">entt::PersistentView&lt; Entity, Component &gt;</a>
 , <a class="el" href="classentt_1_1Registry.html#a16f0e2c46c7f95ce9f16561bbeb6c52c">entt::Registry&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#ae8ca8c4bddbebc4e3c2c75138b37cea8">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+, <a class="el" href="classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#a510fb3b6d13b03c46ddc23578e97d8e9">entt::Signal&lt; void(Args...)&gt;</a>
 , <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a337360e8d0f44c373acef65328a3e9f8">entt::SparseSet&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html#a6f5d49e4b67890cf53d1c3c25879fb81">entt::View&lt; Entity, Component &gt;</a>
 </li>
 <li>sort()
 : <a class="el" href="classentt_1_1PersistentView.html#accde3d4b4a904e79c832f6b05f324b05">entt::PersistentView&lt; Entity, Component &gt;</a>
-, <a class="el" href="classentt_1_1Registry.html#a625ada828ff48c153c7be14cc99eeca5">entt::Registry&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1Registry.html#aa3abb830a7ba342266b62ff1a2965754">entt::Registry&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ac222c5dcab4e40674dc0152cc2774409">entt::SparseSet&lt; Entity &gt;</a>
 </li>
 <li>SparseSet()
@@ -242,8 +328,22 @@ $(function() {
 
 
 <h3><a id="index_t"></a>- t -</h3><ul>
+<li>trigger()
+: <a class="el" href="classentt_1_1Dispatcher.html#ab80c2891d90e8ac83531913416f9b398">entt::Dispatcher&lt; Sig &gt;</a>
+</li>
 <li>type()
-: <a class="el" href="classentt_1_1Family.html#a221d31326ada546b679633235ef9494c">entt::Family&lt;... &gt;</a>
+: <a class="el" href="classentt_1_1Family.html#a1d54430410246e053bf7f18994db6848">entt::Family&lt;... &gt;</a>
+</li>
+</ul>
+
+
+<h3><a id="index_u"></a>- u -</h3><ul>
+<li>unreg()
+: <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#a4c47809bda9cb8b2f3ec8dfe0cc0ad2a">entt::Bus&lt; Sig, Event &gt;</a>
+, <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#aeef92adee9cce10859dbf484d13ebc7d">entt::Bus&lt; Sig, Event, Other... &gt;</a>
+</li>
+<li>update()
+: <a class="el" href="classentt_1_1Dispatcher.html#aa2d02c1137eb33a8a5e9368e943c07fa">entt::Dispatcher&lt; Sig &gt;</a>
 </li>
 </ul>
 
@@ -266,11 +366,30 @@ $(function() {
 
 
 <h3><a id="index_0x7e"></a>- ~ -</h3><ul>
+<li>~Bus()
+: <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#a46a1fb008e8ec113cad2e292ad486846">entt::Bus&lt; Sig, Event &gt;</a>
+, <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#adcdcd23e57ff4b6ed07f3b81c1e00fa6">entt::Bus&lt; Sig, Event, Other... &gt;</a>
+</li>
+<li>~Connection()
+: <a class="el" href="structentt_1_1Emitter_1_1Connection.html#a515aeaf496c50ef0ebed54660fc28129">entt::Emitter&lt; Derived &gt;::Connection&lt; Event &gt;</a>
+</li>
+<li>~Dispatcher()
+: <a class="el" href="classentt_1_1Dispatcher.html#ace2edb2e33f9a0c6b42c3b4e50190869">entt::Dispatcher&lt; Sig &gt;</a>
+</li>
+<li>~Emitter()
+: <a class="el" href="classentt_1_1Emitter.html#ae6099b7e17923f6380bc3d59d304851c">entt::Emitter&lt; Derived &gt;</a>
+</li>
 <li>~Registry()
 : <a class="el" href="classentt_1_1Registry.html#a82cdceea5721c9b227cdef6d69020047">entt::Registry&lt; Entity &gt;</a>
 </li>
+<li>~ServiceLocator()
+: <a class="el" href="structentt_1_1ServiceLocator.html#af0dc69f829f93c86b6537cf0c133ef75">entt::ServiceLocator&lt; Service &gt;</a>
+</li>
 <li>~SigH()
 : <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a36ba33443d9488023219c412caccd1fd">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+</li>
+<li>~Signal()
+: <a class="el" href="classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#a62b71f3a8a611e843fa5c085b3e774ef">entt::Signal&lt; void(Args...)&gt;</a>
 </li>
 <li>~SparseSet()
 : <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a6c078509aa5b611563c7d11f3a5114bf">entt::SparseSet&lt; Entity &gt;</a>

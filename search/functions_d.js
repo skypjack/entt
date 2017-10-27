@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['_7eregistry',['~Registry',['../classentt_1_1Registry.html#a82cdceea5721c9b227cdef6d69020047',1,'entt::Registry']]],
-  ['_7esigh',['~SigH',['../classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a36ba33443d9488023219c412caccd1fd',1,'entt::SigH&lt; Ret(Args...), Collector &gt;']]],
-  ['_7esparseset',['~SparseSet',['../classentt_1_1SparseSet_3_01Entity_01_4.html#a6c078509aa5b611563c7d11f3a5114bf',1,'entt::SparseSet&lt; Entity &gt;']]]
+  ['valid',['valid',['../classentt_1_1Registry.html#a11a759638bf2c28ac1670c7b533ca53f',1,'entt::Registry']]],
+  ['version',['version',['../classentt_1_1Registry.html#a773c2bb361f4e83aae1349ccfeede56b',1,'entt::Registry']]],
+  ['view',['view',['../classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d',1,'entt::Registry::view()'],['../classentt_1_1View.html#a87458191a9cffea5e9fc10e36f85cf3e',1,'entt::View::View()'],['../classentt_1_1View_3_01Entity_00_01Component_01_4.html#a24c7693fd64b152591a1a63d46f8e91f',1,'entt::View&lt; Entity, Component &gt;::View()']]]
 ];
