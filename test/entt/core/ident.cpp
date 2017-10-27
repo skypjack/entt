@@ -1,3 +1,4 @@
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/core/ident.hpp>
 
@@ -23,4 +24,10 @@ TEST(Identifier, Uniqueness) {
     case ID.get<B>():
         SUCCEED();
     }
+}
+
+TEST(Identifier, SingleType) {
+    constexpr auto ID = entt::ident<A>;
+    std::integral_constant<decltype(ID)::identifier_type, ID.get()> ic;
+    (void)ic;
 }

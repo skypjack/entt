@@ -13,21 +13,37 @@ namespace entt {
 namespace {
 
 
-template<typename Type>
-struct Wrapper {
-    using type = Type;
-    constexpr Wrapper(std::size_t index): index{index} {}
-    const std::size_t index;
+template<typename... Types>
+struct Identifier final: Identifier<Types>... {
+    using identifier_type = std::size_t;
+
+    template<std::size_t... Indexes>
+    constexpr Identifier(std::index_sequence<Indexes...>)
+        : Identifier<Types>{std::index_sequence<Indexes>{}}...
+    {}
+
+    template<typename Type>
+    constexpr std::size_t get() const {
+        return Identifier<std::decay_t<Type>>::get();
+    }
 };
 
 
-template<typename... Types>
-struct Identifier final: Wrapper<Types>... {
-    template<std::size_t... Indexes>
-    constexpr Identifier(std::index_sequence<Indexes...>): Wrapper<Types>{Indexes}... {}
+template<typename Type>
+struct Identifier<Type> {
+    using identifier_type = std::size_t;
 
-    template<typename Type>
-    constexpr std::size_t get() const { return Wrapper<std::decay_t<Type>>::index; }
+    template<std::size_t Index>
+    constexpr Identifier(std::index_sequence<Index>)
+        : index{Index}
+    {}
+
+    constexpr std::size_t get() const {
+        return index;
+    }
+
+private:
+    const std::size_t index;
 };
 
 
@@ -59,7 +75,16 @@ struct Identifier final: Wrapper<Types>... {
  * }
  * @endcode
  *
- * @tparam Types The list of types for which to generate identifiers.
+ * @note
+ * In case of single type list, `get` isn't a member function template:
+ * @code{.cpp}
+ * func(std::integral_constant<
+ *     entt::ident<AType>::identifier_type,
+ *     entt::ident<AType>::get()
+ * >{});
+ * @endcode
+ *
+ * @tparam Types List of types for which to generate identifiers.
  */
 template<typename... Types>
 constexpr auto ident = Identifier<std::decay_t<Types>...>{std::make_index_sequence<sizeof...(Types)>{}};

@@ -4,7 +4,6 @@
 
 #include<type_traits>
 #include<cstddef>
-#include<utility>
 
 
 namespace entt {
@@ -24,15 +23,23 @@ class Family {
         return value++;
     }
 
+    template<typename...>
+    static std::size_t family() noexcept {
+        static const std::size_t value = identifier();
+        return value;
+    }
+
 public:
+    /*! @brief Unsigned integer type. */
+    using family_type = std::size_t;
+
     /**
      * @brief Returns an unique identifier for the given type.
      * @return Statically generated unique identifier for the given type.
      */
-    template<typename...>
-    static std::size_t type() noexcept {
-        static const std::size_t value = identifier();
-        return value;
+    template<typename... Type>
+    static family_type type() noexcept {
+        return family<std::decay_t<Type>...>();
     }
 };
 
