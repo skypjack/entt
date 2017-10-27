@@ -1,4 +1,4 @@
-# The EnTT Framework
+# EnTT Framework
 
 [![Build Status](https://travis-ci.org/skypjack/entt.svg?branch=master)](https://travis-ci.org/skypjack/entt)
 [![Build status](https://ci.appveyor.com/api/projects/status/rvhaabjmghg715ck?svg=true)](https://ci.appveyor.com/project/skypjack/entt)
@@ -9,22 +9,66 @@
 
 `EnTT` is a header-only, tiny and easy to use framework written in modern
 C++.<br/>
-It's entirely designed around an architectural pattern pattern called _ECS_ that
-is used mostly in game development. For further details:
+It was originally designed entirely around an architectural pattern called _ECS_
+that is used mostly in game development. For further details:
 
 * [Entity Systems Wiki](http://entity-systems.wikidot.com/)
 * [Evolve Your Hierarchy](http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/)
 * [ECS on Wikipedia](https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system)
 
-Originally, `EnTT` was written as a faster alternative to other well known and
-open source entity-component systems.<br/>
-After a while the codebase has grown and more features have become part of the
-framework.
+A long time ago, the sole entity-component system was part of the project. After
+a while the codebase has grown and more and more classes have become part
+of the repository.<br/>
+That's why today it's called _the EnTT Framework_.
+
+## The framework
+
+`EnTT` was written initially as a faster alternative to other well known and
+open source entity-component systems. Nowadays the `EnTT` framework is moving
+its first steps. Much more will come in the future and hopefully I'm going to
+work on it for a long time.<br/>
+Requests for feature, PR, suggestions ad feedback are highly appreciated.
+
+If you find you can help me and want to contribute to the `EnTT` framework with
+your experience or you do want to get part of the project for some other
+reason, feel free to contact me directly (you can find the mail in the
+[profile](https://github.com/skypjack)).<br/>
+I can't promise that each and every contribution will be accepted, but I can
+assure that I'll do my best to take them all seriously.
+
+### State of the art
+
+Here is a brief list of what it offers today:
+
+* Statically generated integer identifiers for types (assigned either at
+compile-time or at runtime).
+* An incredibly fast entity-component system based on sparse sets, with its own
+views and a _pay for what you use_ policy to adjust performance and memory
+pressure according to the users' requirements.
+* Signal handlers of any type, delegates and an event bus.
+* A general purpose event emitter, that is a CRTP idiom based class template.
+* An event dispatcher for immediate and delayed events to integrate in loops.
+* The smallest and most basic implementation of a service locator ever seen.
+* ...
+* Any other business.
+
+Consider it a work in progress. For more details and an updated list, please
+refer to the [online documentation](https://skypjack.github.io/entt/).
+
+### A note about the README
+
+The README file stays true to the original project and it describes only the
+entity-component system. However, the whole API is fully documented in-code and
+the [online documentation](https://skypjack.github.io/entt/) contains much
+more.<br/>
+Continue reading to know how the core part of the project works or follow the
+link above to take a look at the API reference for all other available classes.
 
 ## Code Example
 
 ```cpp
-#include <registry.hpp>
+#include <entt/entt.hpp>
+#include <cstdint>
 
 struct Position {
     float x;
@@ -40,22 +84,40 @@ void update(entt::DefaultRegistry &registry) {
     auto view = registry.view<Position, Velocity>();
 
     for(auto entity: view) {
-        auto &position = view.get<Position>(entity);
+        // gets only the components that are going to be used ...
+
         auto &velocity = view.get<Velocity>(entity);
+
+        velocity.dx = 0.;
+        velocity.dy = 0.;
+
         // ...
     }
 }
 
+void update(std::uint64_t dt, entt::DefaultRegistry &registry) {
+    registry.view<Position, Velocity>().each([dt](auto entity, auto &position, auto &velocity) {
+        // gets all the components of the view at once ...
+
+        position.x += velocity.dx * dt;
+        position.y += velocity.dy * dt;
+
+        // ...
+    });
+}
+
 int main() {
     entt::DefaultRegistry registry;
+    std::uint64_t dt = 16;
 
     for(auto i = 0; i < 10; ++i) {
-        auto entity = registry.create();
-        registry.assign<Position>(entity, i * 1.f, i * 1.f);
+        auto entity = registry.create(Position{i * 1.f, i * 1.f});
         if(i % 2 == 0) { registry.assign<Velocity>(entity, i * .1f, i * .1f); }
     }
 
+    update(dt, registry);
     update(registry);
+
     // ...
 }
 ```
@@ -71,8 +133,9 @@ realized it, I tried hard to keep intact the great performance of `EnTT` and to
 add all the features I wanted to see in *my* entity-component system at the same
 time.
 
-Today `EnTT` is finally what I was looking for: still faster than its _rivals_,
-a really good API and an amazing set of features. And even more, of course.
+Today `EnTT` is finally what I was looking for: still faster than its
+_competitors_, a really good API and an amazing set of features. And even more,
+of course.
 
 ## Performance
 
@@ -182,6 +245,26 @@ Benchmarks are compiled only in release mode currently.
 
 # Crash Course
 
+## Design choices
+
+`EnTT` is entirely designed around the principle that users have to pay only for
+what they want.
+
+When it comes to use an entity-componet system, the tradeoff is usually between
+performance and memory usage. The faster it is, the more memory it uses.
+However, slightly worse performance along non-critical paths are the right price
+to pay to reduce memory usage and I've always wondered why this kind of tools do
+not leave me the choice.<br/>
+`EnTT` follows a completely different approach. It squezees the best from the
+basic data structures and gives users the possibility to pay more for higher
+performance where needed.<br/>
+The disadvantage of this approach is that users need to know the systems they
+are working on and the tools they are using. Otherwise, the risk to ruin the
+performance along critical paths is high.
+
+So far, this choice has proved to be a good one and I really hope it can be for
+many others besides me.
+
 ## Vademecum
 
 The `Registry` to store, the `View`s to iterate. That's all.
@@ -194,17 +277,18 @@ functionalities to query them out-of-the-box. The underlying type of an entity
 when defining a registry (actually the DefaultRegistry is nothing more than a
 Registry where the type of the entities is `std::uint32_t`).<br/>
 Components (the _C_ of an _ECS_) should be plain old data structures or more
-complex and moveable data structures with a proper constructor. They are list
-initialized by using the parameters provided to construct the component. No need
-to register components or their types neither with the registry nor with the
-entity-component system at all.<br/>
+complex and moveable data structures with a proper constructor. Actually, the
+sole requirement of a component type is that it must be both move constructible
+and move assignable. They are list initialized by using the parameters provided
+to construct the component itself. No need to register components or their types
+neither with the registry nor with the entity-component system at all.<br/>
 Systems (the _S_ of an _ECS_) are just plain functions, functors, lambdas or
 whatever the users want. They can accept a Registry, a View or a PersistentView
 and use them the way they prefer. No need to register systems or their types
 neither with the registry nor with the entity-component system at all.
 
 The following sections will explain in short how to use the entity-component
-system, the core part of the `EnTT` framework.<br/>
+system, the core part of the whole framework.<br/>
 In fact, the framework is composed of many other classes in addition to those
 describe below. For more details, please refer to the
 [online documentation](https://skypjack.github.io/entt/).
@@ -286,8 +370,8 @@ velocity.dy = 0.;
 
 In case users want to assign a component to an entity, but it's unknown whether
 the entity already has it or not, `accomodate` does the work in a single call
-(of course, there is a performance penalty to pay for that mainly due to the
-fact that it must check if `entity` already has the given component or not):
+(there is a performance penalty to pay for that mainly due to the fact that it
+must check if `entity` already has the given component or not):
 
 ```cpp
 registry.accomodate<Position>(entity, 0., 0.);
@@ -367,7 +451,8 @@ entity stored in the underlying data structures of the registry.
 
 ### Sorting: is it possible?
 
-Of course, sorting entities and components is possible with `EnTT`.<br/>
+It goes without saying that sorting entities and components is possible with
+`EnTT`.<br/>
 In fact, there are two functions that respond to slightly different needs:
 
 * Components can be sorted directly:
@@ -437,8 +522,9 @@ To sum up and as a rule of thumb, use a standard view:
 
 Use a persistent view in all the other cases.
 
-To easily iterate entities, all the views offer _C++-ish_ `begin` and `end`
-member functions that allow users to use them in a typical range-for loop.<br/>
+To easily iterate entities, all the views offer the common `begin` and `end`
+member functions that allow users to use a view in a typical range-for
+loop.<br/>
 Continue reading for more details or refer to the
 [official documentation](https://skypjack.github.io/entt/).
 
@@ -474,7 +560,7 @@ There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused
 freely. In fact, they return newly created and correctly initialized iterators
 whenever `begin` or `end` are invoked.<br/>
-To iterate a single component standard view, just use it in range-for:
+To iterate a single component standard view, either use it in range-for loop:
 
 ```cpp
 auto view = registry.view<Renderable>();
@@ -486,8 +572,21 @@ for(auto entity: view) {
 }
 ```
 
-**Note**: prefer the `get` member function of the view instead of the `get`
-member function template of the registry during iterations.
+Or rely on the `each` member function to iterate entities and get all their
+components at once:
+
+```cpp
+registry.view<Renderable>().each([](auto entity, auto &renderable) {
+    // ...
+});
+```
+
+Performance are more or less the same. The best approach depends mainly on
+whether all the components have to be accessed or not.
+
+**Note**: prefer the `get` member function of a view instead of the `get` member
+function template of a registry during iterations, if possible. However, keep in
+mind that it works only with the components of the view itself.
 
 #### Multi component standard view
 
@@ -505,7 +604,7 @@ There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused
 freely. In fact, they return newly created and correctly initialized iterators
 whenever `begin` or `end` are invoked.<br/>
-To iterate a multi component standard view, just use it in range-for:
+To iterate a multi component standard view, either use it in range-for loop:
 
 ```cpp
 auto view = registry.view<Position, Velocity>();
@@ -518,8 +617,21 @@ for(auto entity: view) {
 }
 ```
 
-**Note**: prefer the `get` member function template of the view instead of the
-`get` member function template of the registry during iterations.
+Or rely on the `each` member function to iterate entities and get all their
+components at once:
+
+```cpp
+registry.view<Position, Velocity>().each([](auto entity, auto &position, auto &velocity) {
+    // ...
+});
+```
+
+Performance are more or less the same. The best approach depends mainly on
+whether all the components have to be accessed or not.
+
+**Note**: prefer the `get` member function of a view instead of the `get` member
+function template of a registry during iterations, if possible. However, keep in
+mind that it works only with the components of the view itself.
 
 ### Persistent View
 
@@ -560,7 +672,7 @@ of the components for which it has been constructed.<br/>
 Refer to the [official documentation](https://skypjack.github.io/entt/) for all
 the details.
 
-To iterate a persistent view, just use it in range-for:
+To iterate a persistent view, either use it in range-for loop:
 
 ```cpp
 auto view = registry.persistent<Position, Velocity>();
@@ -573,8 +685,21 @@ for(auto entity: view) {
 }
 ```
 
-**Note**: prefer the `get` member function template of the view instead of the
-`get` member function template of the registry during iterations.
+Or rely on the `each` member function to iterate entities and get all their
+components at once:
+
+```cpp
+registry.persistent<Position, Velocity>().each([](auto entity, auto &position, auto &velocity) {
+    // ...
+});
+```
+
+Performance are more or less the same. The best approach depends mainly on
+whether all the components have to be accessed or not.
+
+**Note**: prefer the `get` member function of a view instead of the `get` member
+function template of a registry during iterations, if possible. However, keep in
+mind that it works only with the components of the view itself.
 
 ## Side notes
 
@@ -621,21 +746,6 @@ for(auto entity: view) {
   As an example, users can freely execute the rendering system and iterate the
   renderable entities while updating a physic component concurrently on a
   separate thread if needed.
-
-## What else?
-
-The `EnTT` framework is moving its first steps. More and more will come in the
-future and hopefully I'm going to work on it for a long time.<br/>
-Here is a brief list of what it offers today:
-
-* Statically generated integer identifiers for types.
-* An entity-component system based on sparse sets.
-* Signal handlers and event emitters of any type.
-* ...
-* Any other business.
-
-Consider it a work in progress. For more details and an updated list, please
-refer to the [online documentation](https://skypjack.github.io/entt/).
 
 # Contributors
 
