@@ -24,6 +24,7 @@ add_executable(
     core
     $<TARGET_OBJECTS:odr>
     entt/core/family.cpp
+    entt/core/hashed_string.cpp
     entt/core/ident.cpp
 )
 target_link_libraries(core PRIVATE gtest_main Threads::Threads)
@@ -51,7 +52,28 @@ add_executable(
 target_link_libraries(locator PRIVATE gtest_main Threads::Threads)
 add_test(NAME locator COMMAND locator)
 
-# Test locator
+# Test process
+
+add_executable(
+    process
+    $<TARGET_OBJECTS:odr>
+    entt/process/process.cpp
+    entt/process/scheduler.cpp
+)
+target_link_libraries(process PRIVATE gtest_main Threads::Threads)
+add_test(NAME process COMMAND process)
+
+# Test resource
+
+add_executable(
+    resource
+    $<TARGET_OBJECTS:odr>
+    entt/resource/resource.cpp
+)
+target_link_libraries(resource PRIVATE gtest_main Threads::Threads)
+add_test(NAME resource COMMAND resource)
+
+# Test signal
 
 add_executable(
     signal
