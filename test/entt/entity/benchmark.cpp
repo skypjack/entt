@@ -30,7 +30,7 @@ private:
     std::chrono::time_point<std::chrono::system_clock> start;
 };
 
-TEST(DefaultRegistry, Construct) {
+TEST(Benchmark, Construct) {
     entt::DefaultRegistry registry;
 
     std::cout << "Constructing 10000000 entities" << std::endl;
@@ -44,7 +44,7 @@ TEST(DefaultRegistry, Construct) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, Destroy) {
+TEST(Benchmark, Destroy) {
     entt::DefaultRegistry registry;
     std::vector<entt::DefaultRegistry::entity_type> entities{};
 
@@ -63,7 +63,7 @@ TEST(DefaultRegistry, Destroy) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateCreateDeleteSingleComponent) {
+TEST(Benchmark, IterateCreateDeleteSingleComponent) {
     entt::DefaultRegistry registry;
 
     std::cout << "Looping 10000 times creating and deleting a random number of entities" << std::endl;
@@ -87,7 +87,7 @@ TEST(DefaultRegistry, IterateCreateDeleteSingleComponent) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateSingleComponent10M) {
+TEST(Benchmark, IterateSingleComponent10M) {
     entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, one component" << std::endl;
@@ -101,7 +101,7 @@ TEST(DefaultRegistry, IterateSingleComponent10M) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateTwoComponents10M) {
+TEST(Benchmark, IterateTwoComponents10M) {
     entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, two components" << std::endl;
@@ -115,7 +115,7 @@ TEST(DefaultRegistry, IterateTwoComponents10M) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateTwoComponents10MHalf) {
+TEST(Benchmark, IterateTwoComponents10MHalf) {
     entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, two components, half of the entities have all the components" << std::endl;
@@ -130,7 +130,7 @@ TEST(DefaultRegistry, IterateTwoComponents10MHalf) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateTwoComponents10MOne) {
+TEST(Benchmark, IterateTwoComponents10MOne) {
     entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, two components, only one entity has all the components" << std::endl;
@@ -145,7 +145,7 @@ TEST(DefaultRegistry, IterateTwoComponents10MOne) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateTwoComponentsPersistent10M) {
+TEST(Benchmark, IterateTwoComponentsPersistent10M) {
     entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity>();
 
@@ -160,7 +160,7 @@ TEST(DefaultRegistry, IterateTwoComponentsPersistent10M) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateTwoComponentsPersistent10MHalf) {
+TEST(Benchmark, IterateTwoComponentsPersistent10MHalf) {
     entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity>();
 
@@ -176,7 +176,7 @@ TEST(DefaultRegistry, IterateTwoComponentsPersistent10MHalf) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateTwoComponentsPersistent10MOne) {
+TEST(Benchmark, IterateTwoComponentsPersistent10MOne) {
     entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity>();
 
@@ -192,7 +192,7 @@ TEST(DefaultRegistry, IterateTwoComponentsPersistent10MOne) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateFiveComponents10M) {
+TEST(Benchmark, IterateFiveComponents10M) {
     entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, five components" << std::endl;
@@ -206,7 +206,7 @@ TEST(DefaultRegistry, IterateFiveComponents10M) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateTenComponents10M) {
+TEST(Benchmark, IterateTenComponents10M) {
     entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, ten components" << std::endl;
@@ -220,7 +220,7 @@ TEST(DefaultRegistry, IterateTenComponents10M) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateTenComponents10MHalf) {
+TEST(Benchmark, IterateTenComponents10MHalf) {
     entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, ten components, half of the entities have all the components" << std::endl;
@@ -235,7 +235,7 @@ TEST(DefaultRegistry, IterateTenComponents10MHalf) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateTenComponents10MOne) {
+TEST(Benchmark, IterateTenComponents10MOne) {
     entt::DefaultRegistry registry;
 
     std::cout << "Iterating over 10000000 entities, ten components, only one entity has all the components" << std::endl;
@@ -250,7 +250,7 @@ TEST(DefaultRegistry, IterateTenComponents10MOne) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateFiveComponentsPersistent10M) {
+TEST(Benchmark, IterateFiveComponentsPersistent10M) {
     entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
 
@@ -265,7 +265,7 @@ TEST(DefaultRegistry, IterateFiveComponentsPersistent10M) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateTenComponentsPersistent10M) {
+TEST(Benchmark, IterateTenComponentsPersistent10M) {
     entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
@@ -280,7 +280,7 @@ TEST(DefaultRegistry, IterateTenComponentsPersistent10M) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateTenComponentsPersistent10MHalf) {
+TEST(Benchmark, IterateTenComponentsPersistent10MHalf) {
     entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
@@ -296,7 +296,7 @@ TEST(DefaultRegistry, IterateTenComponentsPersistent10MHalf) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, IterateTenComponentsPersistent10MOne) {
+TEST(Benchmark, IterateTenComponentsPersistent10MOne) {
     entt::DefaultRegistry registry;
     registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
 
@@ -312,7 +312,7 @@ TEST(DefaultRegistry, IterateTenComponentsPersistent10MOne) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, SortSingle) {
+TEST(Benchmark, SortSingle) {
     entt::DefaultRegistry registry;
     std::vector<entt::DefaultRegistry::entity_type> entities{};
 
@@ -332,7 +332,7 @@ TEST(DefaultRegistry, SortSingle) {
     timer.elapsed();
 }
 
-TEST(DefaultRegistry, SortMulti) {
+TEST(Benchmark, SortMulti) {
     entt::DefaultRegistry registry;
     std::vector<entt::DefaultRegistry::entity_type> entities{};
 

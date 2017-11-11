@@ -102,6 +102,35 @@ class Registry {
         return pool<Component>();
     }
 
+    template<typename... Component>
+    SparseSet<Entity> & handler() {
+        static_assert(sizeof...(Component) > 1, "!");
+        const auto vtype = view_family::type<Component...>();
+
+        if(!(vtype < handlers.size())) {
+            handlers.resize(vtype + 1);
+        }
+
+        if(!handlers[vtype]) {
+            using accumulator_type = int[];
+
+            auto set = std::make_unique<SparseSet<Entity>>();
+
+            for(auto entity: view<Component...>()) {
+                set->construct(entity);
+            }
+
+            accumulator_type accumulator = {
+                (ensure<Component>().append(*set, &Registry::has<Component...>), 0)...
+            };
+
+            handlers[vtype] = std::move(set);
+            (void)accumulator;
+        }
+
+        return *handlers[vtype];
+    }
+
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = typename traits_type::entity_type;
@@ -110,20 +139,18 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
 
-    /*! @brief Default constructor, explicit on purpose. */
-    explicit Registry() = default;
-    /*! @brief Default destructor. */
-    ~Registry() = default;
+    /*! @brief Default constructor. */
+    Registry() = default;
 
     /*! @brief Copying a registry isn't allowed. */
     Registry(const Registry &) = delete;
-    /*! @brief Moving a registry isn't allowed. */
-    Registry(Registry &&) = delete;
+    /*! @brief Default move constructor. */
+    Registry(Registry &&) = default;
 
     /*! @brief Copying a registry isn't allowed. @return This registry. */
     Registry & operator=(const Registry &) = delete;
-    /*! @brief Moving a registry isn't allowed. @return This registry. */
-    Registry & operator=(Registry &&) = delete;
+    /*! @brief Default move assignment operator. @return This registry. */
+    Registry & operator=(Registry &&) = default;
 
     /**
      * @brief Returns the number of existing components of the given type.
@@ -171,7 +198,7 @@ public:
     }
 
     /**
-     * @brief Verifies if the entity identifier still refers to a valid entity.
+     * @brief Verifies if an entity identifier still refers to a valid entity.
      * @param entity An entity identifier, either valid or not.
      * @return True if the identifier is still valid, false otherwise.
      */
@@ -181,16 +208,16 @@ public:
     }
 
     /**
-     * @brief Returns the version stored along with the given entity identifier.
+     * @brief Returns the version stored along with an entity identifier.
      * @param entity An entity identifier, either valid or not.
      * @return Version stored along with the given entity identifier.
      */
     version_type version(entity_type entity) const noexcept {
-        return version_type((entity >> traits_type::version_shift) & traits_type::version_mask);
+        return version_type((entity >> traits_type::entity_shift) & traits_type::version_mask);
     }
 
     /**
-     * @brief Returns the actual version for the given entity identifier.
+     * @brief Returns the actual version for an entity identifier.
      *
      * In case entity identifers are stored around, this function can be used to
      * know if they are still valid or the entity has been destroyed and
@@ -209,13 +236,14 @@ public:
     version_type current(entity_type entity) const noexcept {
         const auto entt = entity & traits_type::entity_mask;
         assert(entt < entities.size());
-        return version_type((entities[entt] >> traits_type::version_shift) & traits_type::version_mask);
+        return version_type((entities[entt] >> traits_type::entity_shift) & traits_type::version_mask);
     }
 
     /**
      * @brief Returns a new entity initialized with the given components.
      *
      * There are two kinds of entity identifiers:
+     *
      * * Newly created ones in case no entities have been previously destroyed.
      * * Recycled one with updated versions.
      *
@@ -243,6 +271,7 @@ public:
      * @brief Returns a new entity to which the given components are assigned.
      *
      * There are two kinds of entity identifiers:
+     *
      * * Newly created ones in case no entities have been previously destroyed.
      * * Recycled one with updated versions.
      *
@@ -269,6 +298,7 @@ public:
      * @brief Creates a new entity and returns it.
      *
      * There are two kinds of entity identifiers:
+     *
      * * Newly created ones in case no entities have been previously destroyed.
      * * Recycled one with updated versions.
      *
@@ -287,7 +317,7 @@ public:
         if(available.empty()) {
             entity = entity_type(entities.size());
             assert(entity < traits_type::entity_mask);
-            assert((entity >> traits_type::version_shift) == entity_type{});
+            assert((entity >> traits_type::entity_shift) == entity_type{});
             entities.push_back(entity);
         } else {
             entity = available.back();
@@ -316,8 +346,8 @@ public:
         assert(valid(entity));
 
         const auto entt = entity & traits_type::entity_mask;
-        const auto version = 1 + ((entity >> traits_type::version_shift) & traits_type::version_mask);
-        const auto next = entt | (version << traits_type::version_shift);
+        const auto version = 1 + ((entity >> traits_type::entity_shift) & traits_type::version_mask);
+        const auto next = entt | (version << traits_type::entity_shift);
         entities[entt] = next;
         available.push_back(next);
 
@@ -329,7 +359,7 @@ public:
     }
 
     /**
-     * @brief Assigns the given component to the given entity.
+     * @brief Assigns the given component to an entity.
      *
      * A new instance of the given component is created and initialized with the
      * arguments provided (the component must have a proper constructor or be of
@@ -355,7 +385,7 @@ public:
     }
 
     /**
-     * @brief Removes the given component from the given entity.
+     * @brief Removes the given component from an entity.
      *
      * @warning
      * Attempting to use an invalid entity or to remove a component from an
@@ -370,11 +400,11 @@ public:
     template<typename Component>
     void remove(entity_type entity) {
         assert(valid(entity));
-        return pool<Component>().destroy(entity);
+        pool<Component>().destroy(entity);
     }
 
     /**
-     * @brief Checks if the given entity has all the given components.
+     * @brief Checks if an entity has all the given components.
      *
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.<br/>
@@ -397,7 +427,7 @@ public:
     }
 
     /**
-     * @brief Gets a reference to the given component owned by the given entity.
+     * @brief Returns a reference to the given component for an entity.
      *
      * @warning
      * Attempting to use an invalid entity or to get a component from an entity
@@ -417,7 +447,7 @@ public:
     }
 
     /**
-     * @brief Gets a reference to the given component owned by the given entity.
+     * @brief Returns a reference to the given component for an entity.
      *
      * @warning
      * Attempting to use an invalid entity or to get a component from an entity
@@ -436,7 +466,7 @@ public:
     }
 
     /**
-     * @brief Replaces the given component for the given entity.
+     * @brief Replaces the given component for an entity.
      *
      * A new instance of the given component is created and initialized with the
      * arguments provided (the component must have a proper constructor or be of
@@ -462,7 +492,7 @@ public:
     }
 
     /**
-     * @brief Assigns or replaces the given component to the given entity.
+     * @brief Assigns or replaces the given component for an entity.
      *
      * Equivalent to the following snippet (pseudocode):
      *
@@ -499,7 +529,7 @@ public:
     }
 
     /**
-     * @brief Sorts the pool of the given component.
+     * @brief Sorts the pool of entities for the given component.
      *
      * The order of the elements in a pool is highly affected by assignements
      * of components to entities and deletions. Components are arranged to
@@ -568,7 +598,7 @@ public:
     }
 
     /**
-     * @brief Resets the given component for the given entity.
+     * @brief Resets the given component for an entity.
      *
      * If the entity has an instance of the component, this function removes the
      * component from the entity. Otherwise it does nothing.
@@ -616,7 +646,7 @@ public:
     }
 
     /**
-     * @brief Resets the whole registry.
+     * @brief Resets a whole registry.
      *
      * Destroys all the entities. After a call to `reset`, all the entities
      * previously created are recycled with a new version number. In case entity
@@ -628,8 +658,8 @@ public:
         pools.clear();
 
         for(auto &&entity: entities) {
-            const auto version = 1 + ((entity >> traits_type::version_shift) & traits_type::version_mask);
-            entity = (entity & traits_type::entity_mask) | (version << traits_type::version_shift);
+            const auto version = 1 + ((entity >> traits_type::entity_shift) & traits_type::version_mask);
+            entity = (entity & traits_type::entity_mask) | (version << traits_type::entity_shift);
             available.push_back(entity);
         }
     }
@@ -646,6 +676,7 @@ public:
      *
      * Standard views do their best to iterate the smallest set of candidate
      * entites. In particular:
+     *
      * * Single component views are incredibly fast and iterate a packed array
      * of entities, all of which has the given component.
      * * Multi component views look at the number of entities available for each
@@ -662,7 +693,7 @@ public:
      * @see View<Entity, Component>
      * @see PersistentView
      *
-     * @tparam Component Type of the components used to construct the view.
+     * @tparam Component Type of components used to construct the view.
      * @return A newly created standard view.
      */
     template<typename... Component>
@@ -684,33 +715,11 @@ public:
      * can be prepared with this function. Just use the same set of components
      * that would have been used otherwise to contruct the view.
      *
-     * @tparam Component Types of the components used to prepare the view.
+     * @tparam Component Types of components used to prepare the view.
      */
     template<typename... Component>
     void prepare() {
-        static_assert(sizeof...(Component) > 1, "!");
-        const auto vtype = view_family::type<Component...>();
-
-        if(!(vtype < handlers.size())) {
-            handlers.resize(vtype + 1);
-        }
-
-        if(!handlers[vtype]) {
-            using accumulator_type = int[];
-
-            auto handler = std::make_unique<SparseSet<Entity>>();
-
-            for(auto entity: view<Component...>()) {
-                handler->construct(entity);
-            }
-
-            accumulator_type accumulator = {
-                (ensure<Component>().append(*handler, &Registry::has<Component...>), 0)...
-            };
-
-            handlers[vtype] = std::move(handler);
-            (void)accumulator;
-        }
+        handler<Component...>();
     }
 
     /**
@@ -727,6 +736,7 @@ public:
      * of components grows up and the most of the entities have all the given
      * components.<br/>
      * However they have also drawbacks:
+     *
      * * Each kind of persistent view requires a dedicated data structure that
      * is allocated within the registry and it increases memory pressure.
      * * Internal data structures used to construct persistent views must be
@@ -746,14 +756,12 @@ public:
      * @see View<Entity, Component>
      * @see PersistentView
      *
-     * @tparam Component Types of the components used to construct the view.
+     * @tparam Component Types of components used to construct the view.
      * @return A newly created persistent view.
      */
     template<typename... Component>
     PersistentView<Entity, Component...> persistent() {
-        static_assert(sizeof...(Component) > 1, "!");
-        prepare<Component...>();
-        return PersistentView<Entity, Component...>{*handlers[view_family::type<Component...>()], ensure<Component>()...};
+        return PersistentView<Entity, Component...>{handler<Component...>(), ensure<Component>()...};
     }
 
 private:

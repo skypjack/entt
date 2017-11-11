@@ -22,6 +22,7 @@ struct entt_traits;
  * @brief Entity traits for a 16 bits entity identifier.
  *
  * A 16 bits entity identifier guarantees:
+ *
  * * 12 bits for the entity number (up to 4k entities).
  * * 4 bit for the version (resets in [0-15]).
  */
@@ -37,7 +38,7 @@ struct entt_traits<std::uint16_t> {
     /*! @brief Mask to use to get the version out of an identifier. */
     static constexpr auto version_mask = 0xF;
     /*! @brief Extent of the entity number within an identifier. */
-    static constexpr auto version_shift = 12;
+    static constexpr auto entity_shift = 12;
 };
 
 
@@ -45,6 +46,7 @@ struct entt_traits<std::uint16_t> {
  * @brief Entity traits for a 32 bits entity identifier.
  *
  * A 32 bits entity identifier guarantees:
+ *
  * * 24 bits for the entity number (suitable for almost all the games).
  * * 8 bit for the version (resets in [0-255]).
  */
@@ -60,7 +62,7 @@ struct entt_traits<std::uint32_t> {
     /*! @brief Mask to use to get the version out of an identifier. */
     static constexpr auto version_mask = 0xFF;
     /*! @brief Extent of the entity number within an identifier. */
-    static constexpr auto version_shift = 24;
+    static constexpr auto entity_shift = 24;
 };
 
 
@@ -68,6 +70,7 @@ struct entt_traits<std::uint32_t> {
  * @brief Entity traits for a 64 bits entity identifier.
  *
  * A 64 bits entity identifier guarantees:
+ *
  * * 40 bits for the entity number (an indecently large number).
  * * 24 bit for the version (an indecently large number).
  */
@@ -83,7 +86,7 @@ struct entt_traits<std::uint64_t> {
     /*! @brief Mask to use to get the version out of an identifier. */
     static constexpr auto version_mask = 0xFFFFFF;
     /*! @brief Extent of the entity number within an identifier. */
-    static constexpr auto version_shift = 40;
+    static constexpr auto entity_shift = 40;
 };
 
 

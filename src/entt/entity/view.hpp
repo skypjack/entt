@@ -70,6 +70,7 @@ public:
      * @brief Constructs a persistent view around a dedicated pool of entities.
      *
      * A persistent view is created out of:
+     *
      * * A dedicated pool of entities that is shared between all the persistent
      * views of the same type.
      * * A bunch of pools of components to which to refer to get instances.
@@ -77,7 +78,7 @@ public:
      * @param view Shared reference to a dedicated pool of entities.
      * @param pools References to pools of components.
      */
-    explicit PersistentView(view_type &view, pool_type<Component>&... pools) noexcept
+    PersistentView(view_type &view, pool_type<Component>&... pools) noexcept
         : view{view}, pools{pools...}
     {}
 
@@ -240,9 +241,9 @@ public:
      *
      * @note
      * The shared pool of entities and thus its order is affected by the changes
-     * to each and every pool of components that it tracks. Therefore changes to
-     * the pools of components can quickly ruin the order imposed to the pool of
-     * entities shared between the persistent views.
+     * to each and every pool that it tracks. Therefore changes to those pools
+     * can quickly ruin the order imposed to the pool of entities shared between
+     * the persistent views.
      *
      * @tparam Comp Type of the component to use to impose the order.
      */
@@ -368,7 +369,7 @@ public:
      * @param pool A reference to a pool of components.
      * @param other Other references to pools of components.
      */
-    explicit View(pool_type<First> &pool, pool_type<Other>&... other) noexcept
+    View(pool_type<First> &pool, pool_type<Other>&... other) noexcept
         : pools{pool, other...}, view{nullptr}
     {
         reset();
@@ -576,7 +577,7 @@ public:
      * @brief Constructs a view out of a pool of components.
      * @param pool A reference to a pool of components.
      */
-    explicit View(pool_type &pool) noexcept
+    View(pool_type &pool) noexcept
         : pool{pool}
     {}
 

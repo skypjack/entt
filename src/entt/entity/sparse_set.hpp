@@ -87,6 +87,8 @@ class SparseSet<Entity> {
         std::size_t pos;
     };
 
+    static constexpr Entity in_use = 1 << traits_type::entity_shift;
+
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -97,16 +99,16 @@ public:
     /*! @brief Input iterator type. */
     using iterator_type = Iterator;
 
-    /*! @brief Default constructor, explicit on purpose. */
-    explicit SparseSet() noexcept = default;
+    /*! @brief Default constructor. */
+    SparseSet() noexcept = default;
+
+    /*! @brief Default destructor. */
+    virtual ~SparseSet() noexcept = default;
 
     /*! @brief Copying a sparse set isn't allowed. */
     SparseSet(const SparseSet &) = delete;
     /*! @brief Default move constructor. */
     SparseSet(SparseSet &&) = default;
-
-    /*! @brief Default destructor. */
-    virtual ~SparseSet() noexcept = default;
 
     /*! @brief Copying a sparse set isn't allowed. @return This sparse set. */
     SparseSet & operator=(const SparseSet &) = delete;
@@ -114,7 +116,7 @@ public:
     SparseSet & operator=(SparseSet &&) = default;
 
     /**
-     * @brief Returns the number of elements in the sparse set.
+     * @brief Returns the number of elements in a sparse set.
      *
      * The number of elements is also the size of the internal packed array.
      * There is no guarantee that the internal sparse array has the same size.
@@ -128,8 +130,8 @@ public:
     }
 
     /**
-     * @brief Checks whether the sparse set is empty.
-     * @return True is the sparse set is empty, false otherwise.
+     * @brief Checks whether a sparse set is empty.
+     * @return True if the sparse set is empty, false otherwise.
      */
     bool empty() const noexcept {
         return direct.empty();
@@ -188,17 +190,18 @@ public:
     }
 
     /**
-     * @brief Checks if the sparse set contains the given entity.
+     * @brief Checks if a sparse set contains an entity.
      * @param entity A valid entity identifier.
      * @return True if the sparse set contains the entity, false otherwise.
      */
     bool has(entity_type entity) const noexcept {
         const auto entt = entity & traits_type::entity_mask;
-        return entt < reverse.size() && reverse[entt] < direct.size() && direct[reverse[entt]] == entity;
+        // the in-use control bit permits to avoid accessing the direct vector
+        return (entt < reverse.size()) && (reverse[entt] & in_use);
     }
 
     /**
-     * @brief Returns the position of the entity in the sparse set.
+     * @brief Returns the position of an entity in a sparse set.
      *
      * @warning
      * Attempting to get the position of an entity that doesn't belong to the
@@ -211,11 +214,13 @@ public:
      */
     pos_type get(entity_type entity) const noexcept {
         assert(has(entity));
-        return reverse[entity & traits_type::entity_mask];
+        const auto entt = entity & traits_type::entity_mask;
+        // we must get rid of the in-use bit for it's not part of the position
+        return reverse[entt] & ~in_use;
     }
 
     /**
-     * @brief Assigns an entity to the sparse set.
+     * @brief Assigns an entity to a sparse set.
      *
      * @warning
      * Attempting to assign an entity that already belongs to the sparse set
@@ -224,25 +229,23 @@ public:
      * sparse set already contains the given entity.
      *
      * @param entity A valid entity identifier.
-     * @return The position of the entity in the internal packed array.
      */
-    pos_type construct(entity_type entity) {
+    void construct(entity_type entity) {
         assert(!has(entity));
         const auto entt = entity & traits_type::entity_mask;
 
         if(!(entt < reverse.size())) {
-            reverse.resize(entt+1);
+            reverse.resize(entt+1, pos_type{});
         }
 
-        const auto pos = pos_type(direct.size());
-        reverse[entt] = pos;
+        // we exploit the fact that pos_type is equal to entity_type and pos has
+        // traits_type::version_mask bits unused we can use to mark it as in-use
+        reverse[entt] = pos_type(direct.size()) | in_use;
         direct.emplace_back(entity);
-
-        return pos;
     }
 
     /**
-     * @brief Removes the given entity from the sparse set.
+     * @brief Removes an entity from a sparse set.
      *
      * @warning
      * Attempting to remove an entity that doesn't belong to the sparse set
@@ -256,14 +259,18 @@ public:
         assert(has(entity));
         const auto entt = entity & traits_type::entity_mask;
         const auto back = direct.back() & traits_type::entity_mask;
-        const auto pos = reverse[entt];
-        reverse[back] = pos;
+        const auto pos = reverse[entt] & ~in_use;
+        // the order matters: if back and entt are the same (for the sparse set
+        // has size 1), switching the two lines below doesn't work as expected
+        reverse[back] = pos | in_use;
+        reverse[entt] = pos;
+        // swap-and-pop the last element with the selected ont
         direct[pos] = direct.back();
         direct.pop_back();
     }
 
     /**
-     * @brief Swaps the position of the entities in the internal packed array.
+     * @brief Swaps the position of two entities in the internal packed array.
      *
      * For what it's worth, this function affects both the internal sparse array
      * and the internal packed array. Users should not care of that anyway.
@@ -280,10 +287,11 @@ public:
     virtual void swap(entity_type lhs, entity_type rhs) {
         assert(has(lhs));
         assert(has(rhs));
-        const auto le = lhs & traits_type::entity_mask;
-        const auto re = rhs & traits_type::entity_mask;
-        std::swap(direct[reverse[le]], direct[reverse[re]]);
-        std::swap(reverse[le], reverse[re]);
+        auto &le = reverse[lhs & traits_type::entity_mask];
+        auto &re = reverse[rhs & traits_type::entity_mask];
+        // we must get rid of the in-use bit for it's not part of the position
+        std::swap(direct[le & ~in_use], direct[re & ~in_use]);
+        std::swap(le, re);
     }
 
     /**
@@ -316,7 +324,7 @@ public:
     }
 
     /**
-     * @brief Sort entities according to their order in the given sparse set.
+     * @brief Sort entities according to their order in a sparse set.
      *
      * Entities that are part of both the sparse sets are ordered internally
      * according to the order they have in `other`. All the other entities goes
@@ -363,7 +371,7 @@ public:
     }
 
     /**
-     * @brief Resets the sparse set.
+     * @brief Resets a sparse set.
      */
     virtual void reset() {
         reverse.clear();
@@ -371,7 +379,7 @@ public:
     }
 
 private:
-    std::vector<entity_type> reverse;
+    std::vector<pos_type> reverse;
     std::vector<entity_type> direct;
 };
 
@@ -414,8 +422,8 @@ public:
     /*! @brief Input iterator type. */
     using iterator_type = typename underlying_type::iterator_type;
 
-    /*! @brief Default constructor, explicit on purpose. */
-    explicit SparseSet() noexcept = default;
+    /*! @brief Default constructor. */
+    SparseSet() noexcept = default;
 
     /*! @brief Copying a sparse set isn't allowed. */
     SparseSet(const SparseSet &) = delete;
@@ -466,7 +474,7 @@ public:
     }
 
     /**
-     * @brief Returns the object associated to the given entity.
+     * @brief Returns the object associated to an entity.
      *
      * @warning
      * Attempting to use an entity that doesn't belong to the sparse set results
@@ -482,7 +490,7 @@ public:
     }
 
     /**
-     * @brief Returns the object associated to the given entity.
+     * @brief Returns the object associated to an entity.
      *
      * @warning
      * Attempting to use an entity that doesn't belong to the sparse set results
@@ -498,7 +506,7 @@ public:
     }
 
     /**
-     * @brief Assigns an entity to the sparse set and constructs its object.
+     * @brief Assigns an entity to a sparse set and constructs its object.
      *
      * @warning
      * Attempting to use an entity that already belongs to the sparse set
@@ -519,7 +527,7 @@ public:
     }
 
     /**
-     * @brief Removes an entity from the sparse set and destroies its object.
+     * @brief Removes an entity from a sparse set and destroies its object.
      *
      * @warning
      * Attempting to use an entity that doesn't belong to the sparse set results
@@ -530,13 +538,14 @@ public:
      * @param entity A valid entity identifier.
      */
     void destroy(entity_type entity) override {
+        // swaps isn't required here, we are getting rid of the last element
         instances[underlying_type::get(entity)] = std::move(instances.back());
         instances.pop_back();
         underlying_type::destroy(entity);
     }
 
     /**
-     * @brief Swaps the two entities and their objects.
+     * @brief Swaps two entities and their objects.
      *
      * @note
      * This function doesn't swap objects between entities. It exchanges entity
@@ -557,7 +566,7 @@ public:
     }
 
     /**
-     * @brief Resets the sparse set.
+     * @brief Resets a sparse set.
      */
     void reset() override {
         underlying_type::reset();
