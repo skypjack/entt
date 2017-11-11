@@ -91,11 +91,13 @@ class SigH;
  * of this class are in charge of disconnecting instances before deleting them.
  *
  * This class serves mainly two purposes:
+ *
  * * Creating signals used later to notify a bunch of listeners.
  * * Collecting results from a set of functions like in a voting system.
  *
  * The default collector does nothing. To properly collect data, define and use
  * a class that has a call operator the signature of which is `bool(Param)` and:
+ *
  * * `Param` is a type to which `Ret` can be converted.
  * * The return type is true if the handler must stop collecting data, false
  *   otherwise.
@@ -131,51 +133,6 @@ public:
     template<typename Class>
     using instance_type = Class *;
 
-    /*! @brief Default constructor, explicit on purpose. */
-    explicit SigH() noexcept = default;
-
-    /*! @brief Default destructor. */
-    ~SigH() noexcept = default;
-
-    /**
-     * @brief Copy constructor, listeners are also connected to this signal.
-     * @param other A signal to use as source to initialize this instance.
-     */
-    SigH(const SigH &other)
-        : calls{other.calls}
-    {}
-
-    /**
-     * @brief Default move constructor.
-     * @param other A signal to use as source to initialize this instance.
-     */
-    SigH(SigH &&other): SigH{} {
-        swap(*this, other);
-    }
-
-    /**
-     * @brief Copy assignment operator.
-     *
-     * Listeners are also connected to this signal.
-     *
-     * @param other A signal to use as source to initialize this instance.
-     * @return This signal.
-     */
-    SigH & operator=(const SigH &other) {
-        calls = other.calls;
-        return *this;
-    }
-
-    /**
-     * @brief Move assignment operator.
-     * @param other A signal to use as source to initialize this instance.
-     * @return This signal.
-     */
-    SigH & operator=(SigH &&other) {
-        swap(*this, other);
-        return *this;
-    }
-
     /**
      * @brief Number of listeners connected to the signal.
      * @return Number of listeners currently connected.
@@ -185,7 +142,7 @@ public:
     }
 
     /**
-     * @brief Returns false is at least a listener is connected to the signal.
+     * @brief Returns false if at least a listener is connected to the signal.
      * @return True if the signal has no listeners connected, false otherwise.
      */
     bool empty() const noexcept {

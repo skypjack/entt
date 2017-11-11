@@ -70,51 +70,6 @@ public:
     template<typename Class>
     using instance_type = std::shared_ptr<Class>;
 
-    /*! @brief Default constructor, explicit on purpose. */
-    explicit Signal() noexcept = default;
-
-    /*! @brief Default destructor. */
-    ~Signal() noexcept = default;
-
-    /**
-     * @brief Copy constructor, listeners are also connected to this signal.
-     * @param other A signal to use as source to initialize this instance.
-     */
-    Signal(const Signal &other)
-        : calls{other.calls}
-    {}
-
-    /**
-     * @brief Default move constructor.
-     * @param other A signal to use as source to initialize this instance.
-     */
-    Signal(Signal &&other): Signal{} {
-        swap(*this, other);
-    }
-
-    /**
-     * @brief Copy assignment operator.
-     *
-     * Listeners are also connected to this signal.
-     *
-     * @param other A signal to use as source to initialize this instance.
-     * @return This signal.
-     */
-    Signal & operator=(const Signal &other) {
-        calls = other.calls;
-        return *this;
-    }
-
-    /**
-     * @brief Move assignment operator.
-     * @param other A signal to use as source to initialize this instance.
-     * @return This signal.
-     */
-    Signal & operator=(Signal &&other) {
-        swap(*this, other);
-        return *this;
-    }
-
     /**
      * @brief Number of listeners connected to the signal.
      * @return Number of listeners currently connected.
@@ -124,7 +79,7 @@ public:
     }
 
     /**
-     * @brief Returns false is at least a listener is connected to the signal.
+     * @brief Returns false if at least a listener is connected to the signal.
      * @return True if the signal has no listeners connected, false otherwise.
      */
     bool empty() const noexcept {

@@ -156,16 +156,8 @@ public:
         /** @brief Event emitters are friend classes of connections. */
         friend class Emitter;
 
-        /*! @brief Default constructor, explicit on purpose. */
-        explicit Connection() = default;
-
-        /*! @brief Default copy constructor. */
-        Connection(const Connection &) = default;
-        /*! @brief Default move constructor. */
-        Connection(Connection &&) = default;
-
-        /*! @brief Default destructor. */
-        ~Connection() = default;
+        /*! @brief Default constructor. */
+        Connection() noexcept = default;
 
         /**
          * @brief Creates a connection that wraps its underlying instance.
@@ -174,6 +166,11 @@ public:
         Connection(typename Handler<Event>::connection_type conn)
             : Handler<Event>::connection_type{std::move(conn)}
         {}
+
+        /*! @brief Default copy constructor. */
+        Connection(const Connection &) = default;
+        /*! @brief Default move constructor. */
+        Connection(Connection &&) = default;
 
         /**
          * @brief Default copy assignament operator.
@@ -188,18 +185,18 @@ public:
         Connection & operator=(Connection &&) = default;
     };
 
-    /*! @brief Default constructor, explicit on purpose. */
-    explicit Emitter() noexcept = default;
-
-    /*! @brief Copying an emitter isn't allowed. */
-    Emitter(const Emitter &) = delete;
-    /*! @brief Default move constructor. */
-    Emitter(Emitter &&) = default;
+    /*! @brief Default constructor. */
+    Emitter() noexcept = default;
 
     /*! @brief Default destructor. */
     virtual ~Emitter() noexcept {
         static_assert(std::is_base_of<Emitter<Derived>, Derived>::value, "!");
     }
+
+    /*! @brief Copying an emitter isn't allowed. */
+    Emitter(const Emitter &) = delete;
+    /*! @brief Default move constructor. */
+    Emitter(Emitter &&) = default;
 
     /*! @brief Copying an emitter isn't allowed. @return This emitter. */
     Emitter & operator=(const Emitter &) = delete;

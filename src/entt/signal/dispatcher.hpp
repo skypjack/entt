@@ -93,23 +93,10 @@ class Dispatcher final {
     }
 
 public:
-    /*! @brief Default constructor, explicit on purpose. */
-    explicit Dispatcher() noexcept
+    /*! @brief Default constructor. */
+    Dispatcher() noexcept
         : wrappers{}, mode{false}
     {}
-
-    /*! @brief Default destructor. */
-    ~Dispatcher() = default;
-
-    /*! @brief Default copy constructor. */
-    Dispatcher(const Dispatcher &) = default;
-    /*! @brief Default move constructor. */
-    Dispatcher(Dispatcher &&) = default;
-
-    /*! @brief Default copy assignment operator. @return This dispatcher. */
-    Dispatcher & operator=(const Dispatcher &) = default;
-    /*! @brief Default move assignment operator. @return This dispatcher. */
-    Dispatcher & operator=(Dispatcher &&) = default;
 
     /**
      * @brief Registers a listener given in the form of a member function.

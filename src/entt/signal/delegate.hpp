@@ -19,7 +19,7 @@ class Delegate;
 
 
 /**
- * @brief A delegate class to send around functions and member functions.
+ * @brief Utility class to send around functions and member functions.
  *
  * Unmanaged delegate for function pointers and member functions. Users of this
  * class are in charge of disconnecting instances before deleting them.
@@ -49,8 +49,8 @@ class Delegate<Ret(Args...)> final {
     }
 
 public:
-    /*! @brief Default constructor, explicit on purpose. */
-    explicit Delegate() noexcept
+    /*! @brief Default constructor. */
+    Delegate() noexcept
         : stub{std::make_pair(nullptr, &fallback)}
     {}
 
