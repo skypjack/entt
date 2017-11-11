@@ -21,6 +21,11 @@ a while the codebase has grown and more and more classes have become part
 of the repository.<br/>
 That's why today it's called _the EnTT Framework_.
 
+Currently, `EnTT` is tested on Linux, Microsoft Windows and OS X. It has proven
+to work also on both Android and iOS.<br/>
+Most likely it will not be problematic on other systems as well, but has not
+been sufficiently tested so far.
+
 ## The framework
 
 `EnTT` was written initially as a faster alternative to other well known and
@@ -42,13 +47,16 @@ Here is a brief list of what it offers today:
 
 * Statically generated integer identifiers for types (assigned either at
 compile-time or at runtime).
+* A constexpr utility for human readable resource identifiers.
 * An incredibly fast entity-component system based on sparse sets, with its own
 views and a _pay for what you use_ policy to adjust performance and memory
 pressure according to the users' requirements.
+* The smallest and most basic implementation of a service locator ever seen.
+* A cooperative scheduler for processes of any type.
+* All what is needed for resource management (cache, loaders, handles).
 * Signal handlers of any type, delegates and an event bus.
 * A general purpose event emitter, that is a CRTP idiom based class template.
 * An event dispatcher for immediate and delayed events to integrate in loops.
-* The smallest and most basic implementation of a service locator ever seen.
 * ...
 * Any other business.
 
@@ -146,21 +154,21 @@ Dell XPS 13 out of the mid 2014):
 
 | Benchmark | EntityX (experimental/compile_time) | EnTT |
 |-----------|-------------|-------------|
-| Creating 10M entities | 0.128881s | **0.0408754s** |
-| Destroying 10M entities | **0.0531374s** | 0.0545839s |
-| Iterating over 10M entities, unpacking one component, standard view | 0.010661s | **1.58e-07s** |
-| Iterating over 10M entities, unpacking two components, standard view | **0.0112664s** | 0.0840068s |
-| Iterating over 10M entities, unpacking two components, standard view, half of the entities have all the components | **0.0077951s** | 0.042168s |
-| Iterating over 10M entities, unpacking two components, standard view, one of the entities has all the components | 0.00713398s | **8.93e-07s** |
-| Iterating over 10M entities, unpacking two components, persistent view | 0.0112664s | **5.68e-07s** |
-| Iterating over 10M entities, unpacking five components, standard view | **0.00905084s** | 0.137757s |
-| Iterating over 10M entities, unpacking five components, persistent view | 0.00905084s | **2.9e-07s** |
-| Iterating over 10M entities, unpacking ten components, standard view | **0.0104708s** | 0.388602s |
-| Iterating over 10M entities, unpacking ten components, standard view, half of the entities have all the components | **0.00899859s** | 0.200752s |
-| Iterating over 10M entities, unpacking ten components, standard view, one of the entities has all the components | 0.00700349s | **2.565e-06s** |
-| Iterating over 10M entities, unpacking ten components, persistent view | 0.0104708s | **6.23e-07s** |
-| Sort 150k entities, one component | - | **0.0080046s** |
-| Sort 150k entities, match two components | - | **0.00608322s** |
+| Creating 10M entities | 0.1289s | **0.0409s** |
+| Destroying 10M entities | **0.0531s** | 0.0546s |
+| Iterating over 10M entities, unpacking one component, standard view | 0.0107s | **1.6e-07s** |
+| Iterating over 10M entities, unpacking two components, standard view | **0.0113s** | 0.0295s |
+| Iterating over 10M entities, unpacking two components, standard view, half of the entities have all the components | **0.0078s** | 0.0150s |
+| Iterating over 10M entities, unpacking two components, standard view, one of the entities has all the components | 0.0071s | **8.8e-07s** |
+| Iterating over 10M entities, unpacking two components, persistent view | 0.0113s | **5.7e-07s** |
+| Iterating over 10M entities, unpacking five components, standard view | **0.0091s** | 0.0688s |
+| Iterating over 10M entities, unpacking five components, persistent view | 0.0091s | **2.9e-07s** |
+| Iterating over 10M entities, unpacking ten components, standard view | **0.0105s** | 0.1403s |
+| Iterating over 10M entities, unpacking ten components, standard view, half of the entities have all the components | **0.0090s** | 0.0620s |
+| Iterating over 10M entities, unpacking ten components, standard view, one of the entities has all the components | 0.0070s | **1.3e-06s** |
+| Iterating over 10M entities, unpacking ten components, persistent view | 0.0105s | **6.2e-07s** |
+| Sort 150k entities, one component | - | **0.0084s** |
+| Sort 150k entities, match two components | - | **0.0067s** |
 
 `EnTT` includes its own tests and benchmarks. See
 [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp)
@@ -247,6 +255,24 @@ Benchmarks are compiled only in release mode currently.
 
 ## Design choices
 
+### A bitset-free entity-component system
+
+`EnTT` is a _bitset-free_ entity-component system that doesn't require users to
+specify the component set at compile-time.<br/>
+That's the reason for which users can instantiate the core class simply as:
+
+```cpp
+entt::DefaultRegistry registry;
+```
+
+In place of its more annoying and error-prone counterpart:
+
+```cpp
+entt::DefaultRegistry<Comp0, Comp1, ..., CompN> registry;
+```
+
+### Pay per use
+
 `EnTT` is entirely designed around the principle that users have to pay only for
 what they want.
 
@@ -262,7 +288,7 @@ The disadvantage of this approach is that users need to know the systems they
 are working on and the tools they are using. Otherwise, the risk to ruin the
 performance along critical paths is high.
 
-So far, this choice has proved to be a good one and I really hope it can be for
+So far, this choice has proven to be a good one and I really hope it can be for
 many others besides me.
 
 ## Vademecum
@@ -438,7 +464,7 @@ Finally, references to components can be retrieved by just doing this:
 
 ```cpp
 // either a non-const reference ...
-DefaultRegistry registry;
+entt::DefaultRegistry registry;
 auto &position = registry.get<Position>(entity);
 
 // ... or a const one
