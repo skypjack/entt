@@ -51,6 +51,7 @@ compile-time or at runtime).
 * An incredibly fast entity-component system based on sparse sets, with its own
 views and a _pay for what you use_ policy to adjust performance and memory
 pressure according to the users' requirements.
+* Actor class for those who aren't confident with entity-component systems.
 * The smallest and most basic implementation of a service locator ever seen.
 * A cooperative scheduler for processes of any type.
 * All what is needed for resource management (cache, loaders, handles).
@@ -152,7 +153,7 @@ compared to my first choice (that was already amazingly fast indeed).<br/>
 Here is a comparision between the two (both of them compiled with GCC 7.2.0 on a
 Dell XPS 13 out of the mid 2014):
 
-| Benchmark | EntityX (experimental/compile_time) | EnTT |
+| Benchmark | EntityX (compile-time) | EnTT |
 |-----------|-------------|-------------|
 | Creating 10M entities | 0.1289s | **0.0409s** |
 | Destroying 10M entities | **0.0531s** | 0.0546s |
