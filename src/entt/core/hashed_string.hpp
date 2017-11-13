@@ -65,16 +65,6 @@ public:
         : hash{helper(offset, wrapper.str)}, str{wrapper.str}
     {}
 
-    /*! @brief Default copy constructor. */
-    constexpr HashedString(const HashedString &) noexcept = default;
-    /*! @brief Default move constructor. */
-    constexpr HashedString(HashedString &&) noexcept = default;
-
-    /*! @brief Default copy assignment operator. @return This hashed string. */
-    constexpr HashedString & operator=(const HashedString &) noexcept = default;
-    /*! @brief Default move assignment operator. @return This hashed string. */
-    constexpr HashedString & operator=(HashedString &&) noexcept = default;
-
     /**
      * @brief Returns the human-readable representation of a hashed string.
      * @return The string used to initialize the instance.
@@ -97,7 +87,7 @@ public:
     }
 
 private:
-    hash_type hash;
+    const hash_type hash;
     const char *str;
 };
 
