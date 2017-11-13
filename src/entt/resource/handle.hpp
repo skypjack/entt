@@ -11,7 +11,7 @@ namespace entt {
 
 
 template<typename Resource>
-struct ResourceCache;
+class ResourceCache;
 
 
 /**
