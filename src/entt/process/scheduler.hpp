@@ -114,8 +114,8 @@ class Scheduler final {
             using Proc = typename decltype(next)::type;
 
             if(handler) {
-                auto proc = typename ProcessHandler::instance_type{ new Proc{std::forward<decltype(args)>(args)...}, &deleter<Proc> };
-                handler->next.reset(new ProcessHandler{std::move(proc), &this->update<Proc>, &this->abort<Proc>, nullptr});
+                auto proc = typename ProcessHandler::instance_type{ new Proc{std::forward<decltype(args)>(args)...}, &Scheduler::deleter<Proc> };
+                handler->next.reset(new ProcessHandler{std::move(proc), &Scheduler::update<Proc>, &Scheduler::abort<Proc>, nullptr});
                 handler = handler->next.get();
             }
 
@@ -197,8 +197,8 @@ public:
     auto attach(Args&&... args) {
         static_assert(std::is_base_of<Process<Proc, Delta>, Proc>::value, "!");
 
-        auto proc = typename ProcessHandler::instance_type{ new Proc{std::forward<Args>(args)...}, &deleter<Proc> };
-        ProcessHandler handler{std::move(proc), &update<Proc>, &abort<Proc>, nullptr};
+        auto proc = typename ProcessHandler::instance_type{ new Proc{std::forward<Args>(args)...}, &Scheduler::deleter<Proc> };
+        ProcessHandler handler{std::move(proc), &Scheduler::update<Proc>, &Scheduler::abort<Proc>, nullptr};
         handlers.push_back(std::move(handler));
 
         return then(&handlers.back());
