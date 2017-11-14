@@ -655,12 +655,23 @@ public:
      */
     void reset() {
         available.clear();
-        pools.clear();
 
         for(auto &&entity: entities) {
             const auto version = 1 + ((entity >> traits_type::entity_shift) & traits_type::version_mask);
             entity = (entity & traits_type::entity_mask) | (version << traits_type::entity_shift);
             available.push_back(entity);
+        }
+
+        for(auto &&handler: handlers) {
+            if(handler) {
+                handler->reset();
+            }
+        }
+
+        for(auto &&pool: pools) {
+            if(pool) {
+                pool->reset();
+            }
         }
     }
 
