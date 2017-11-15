@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['swap',['swap',['../classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a77dd7bf9e63e5457c080416f31bb232b',1,'entt::SigH&lt; Ret(Args...), Collector &gt;::swap()'],['../classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#a441ea167a8f70ae075d91d40889cdb57',1,'entt::Signal&lt; void(Args...)&gt;::swap()']]]
+  ['resourcecache_3c_20resource_20_3e',['ResourceCache&lt; Resource &gt;',['../classentt_1_1ResourceHandle.html#a302c9d1bd54cf8e7e958d5e505773b23',1,'entt::ResourceHandle::ResourceCache&lt; Resource &gt;()'],['../classentt_1_1ResourceLoader.html#a302c9d1bd54cf8e7e958d5e505773b23',1,'entt::ResourceLoader::ResourceCache&lt; Resource &gt;()']]]
 ];

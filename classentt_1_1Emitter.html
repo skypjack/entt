@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.1.0</span>
+   &#160;<span id="projectnumber">2.2.0</span>
    </div>
   </td>
  </tr>
@@ -96,8 +96,12 @@ template&lt;typename Event &gt; </td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ab1f73c3d41106e3973dddf8f4ee63d5a"><td class="memItemLeft" align="right" valign="top"><a id="ab1f73c3d41106e3973dddf8f4ee63d5a"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Emitter.html#ab1f73c3d41106e3973dddf8f4ee63d5a">Emitter</a> () noexcept=default</td></tr>
-<tr class="memdesc:ab1f73c3d41106e3973dddf8f4ee63d5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor, explicit on purpose. <br /></td></tr>
+<tr class="memdesc:ab1f73c3d41106e3973dddf8f4ee63d5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
 <tr class="separator:ab1f73c3d41106e3973dddf8f4ee63d5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6099b7e17923f6380bc3d59d304851c"><td class="memItemLeft" align="right" valign="top"><a id="ae6099b7e17923f6380bc3d59d304851c"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Emitter.html#ae6099b7e17923f6380bc3d59d304851c">~Emitter</a> () noexcept</td></tr>
+<tr class="memdesc:ae6099b7e17923f6380bc3d59d304851c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor. <br /></td></tr>
+<tr class="separator:ae6099b7e17923f6380bc3d59d304851c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4ee1e31a476217c9c8c5a9b9dfe856b"><td class="memItemLeft" align="right" valign="top"><a id="ab4ee1e31a476217c9c8c5a9b9dfe856b"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Emitter.html#ab4ee1e31a476217c9c8c5a9b9dfe856b">Emitter</a> (const <a class="el" href="classentt_1_1Emitter.html">Emitter</a> &amp;)=delete</td></tr>
 <tr class="memdesc:ab4ee1e31a476217c9c8c5a9b9dfe856b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copying an emitter isn't allowed. <br /></td></tr>
@@ -106,10 +110,6 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Emitter.html#aef84a369260e86a006c151ab4a9041a8">Emitter</a> (<a class="el" href="classentt_1_1Emitter.html">Emitter</a> &amp;&amp;)=default</td></tr>
 <tr class="memdesc:aef84a369260e86a006c151ab4a9041a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move constructor. <br /></td></tr>
 <tr class="separator:aef84a369260e86a006c151ab4a9041a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6099b7e17923f6380bc3d59d304851c"><td class="memItemLeft" align="right" valign="top"><a id="ae6099b7e17923f6380bc3d59d304851c"></a>
-virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Emitter.html#ae6099b7e17923f6380bc3d59d304851c">~Emitter</a> () noexcept</td></tr>
-<tr class="memdesc:ae6099b7e17923f6380bc3d59d304851c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor. <br /></td></tr>
-<tr class="separator:ae6099b7e17923f6380bc3d59d304851c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace3403fe310953f720dbddff016fe715"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1Emitter.html">Emitter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Emitter.html#ace3403fe310953f720dbddff016fe715">operator=</a> (const <a class="el" href="classentt_1_1Emitter.html">Emitter</a> &amp;)=delete</td></tr>
 <tr class="memdesc:ace3403fe310953f720dbddff016fe715"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copying an emitter isn't allowed.  <a href="#ace3403fe310953f720dbddff016fe715">More...</a><br /></td></tr>
 <tr class="separator:ace3403fe310953f720dbddff016fe715"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -200,7 +200,7 @@ template&lt;typename Event &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00298">298</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00295">295</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -232,7 +232,7 @@ template&lt;typename Derived &gt; </div>
 <p>Disconnects all the listeners. </p>
 <p>All the connections previously returned are invalidated. Using them results in undefined behaviour. </p>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00308">308</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00305">305</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -272,7 +272,7 @@ template&lt;typename Event &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if there are no listeners registered, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00319">319</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00316">316</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -304,7 +304,7 @@ template&lt;typename Derived &gt; </div>
 <p>Checks if there are listeners registered with the event emitter. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if there are no listeners registered, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00331">331</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00328">328</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -351,7 +351,7 @@ template&lt;typename Event &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00285">285</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00282">282</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -402,7 +402,7 @@ template&lt;typename Event &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="structentt_1_1Emitter_1_1Connection.html" title="Generic connection type for events. ">Connection</a> object that can be used to disconnect the listener. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00246">246</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00243">243</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -453,7 +453,7 @@ template&lt;typename Event &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="structentt_1_1Emitter_1_1Connection.html" title="Generic connection type for events. ">Connection</a> object that can be used to disconnect the listener. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00271">271</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00268">268</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>
@@ -563,7 +563,7 @@ template&lt;typename Event , typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00221">221</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="emitter_8hpp_source.html#l00218">218</a> of file <a class="el" href="emitter_8hpp_source.html">emitter.hpp</a>.</p>
 
 </div>
 </div>

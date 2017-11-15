@@ -1,12 +1,7 @@
 var searchData=
 [
-  ['_7ebus',['~Bus',['../classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#adcdcd23e57ff4b6ed07f3b81c1e00fa6',1,'entt::Bus&lt; Sig, Event, Other... &gt;::~Bus()'],['../classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#a46a1fb008e8ec113cad2e292ad486846',1,'entt::Bus&lt; Sig, Event &gt;::~Bus()']]],
-  ['_7econnection',['~Connection',['../structentt_1_1Emitter_1_1Connection.html#a515aeaf496c50ef0ebed54660fc28129',1,'entt::Emitter::Connection']]],
-  ['_7edispatcher',['~Dispatcher',['../classentt_1_1Dispatcher.html#ace2edb2e33f9a0c6b42c3b4e50190869',1,'entt::Dispatcher']]],
-  ['_7eemitter',['~Emitter',['../classentt_1_1Emitter.html#ae6099b7e17923f6380bc3d59d304851c',1,'entt::Emitter']]],
-  ['_7eregistry',['~Registry',['../classentt_1_1Registry.html#a82cdceea5721c9b227cdef6d69020047',1,'entt::Registry']]],
-  ['_7eservicelocator',['~ServiceLocator',['../structentt_1_1ServiceLocator.html#af0dc69f829f93c86b6537cf0c133ef75',1,'entt::ServiceLocator']]],
-  ['_7esigh',['~SigH',['../classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a36ba33443d9488023219c412caccd1fd',1,'entt::SigH&lt; Ret(Args...), Collector &gt;']]],
-  ['_7esignal',['~Signal',['../classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#a62b71f3a8a611e843fa5c085b3e774ef',1,'entt::Signal&lt; void(Args...)&gt;']]],
-  ['_7esparseset',['~SparseSet',['../classentt_1_1SparseSet_3_01Entity_01_4.html#a6c078509aa5b611563c7d11f3a5114bf',1,'entt::SparseSet&lt; Entity &gt;']]]
+  ['unpause',['unpause',['../classentt_1_1Process.html#a59de73e844b4fcc0db760e1f03fcfa67',1,'entt::Process']]],
+  ['unreg',['unreg',['../classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#aeef92adee9cce10859dbf484d13ebc7d',1,'entt::Bus&lt; Sig, Event, Other... &gt;::unreg()'],['../classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#a4c47809bda9cb8b2f3ec8dfe0cc0ad2a',1,'entt::Bus&lt; Sig, Event &gt;::unreg()']]],
+  ['unset',['unset',['../structentt_1_1Actor.html#a8d655b4e1afe76293b4ef7524f51d81a',1,'entt::Actor']]],
+  ['update',['update',['../structentt_1_1Actor.html#ac83169b04dcdb12d8c3288eb48261ac6',1,'entt::Actor::update()'],['../structentt_1_1ProcessAdaptor.html#a8cb4f9f785dc393ad206feea529604b3',1,'entt::ProcessAdaptor::update()'],['../classentt_1_1Scheduler.html#a54dc94fe6946726cc8e8d973b8968c89',1,'entt::Scheduler::update()'],['../classentt_1_1Dispatcher.html#aa2d02c1137eb33a8a5e9368e943c07fa',1,'entt::Dispatcher::update()']]]
 ];

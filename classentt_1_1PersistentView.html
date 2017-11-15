@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.1.0</span>
+   &#160;<span id="projectnumber">2.2.0</span>
    </div>
   </td>
  </tr>
@@ -209,13 +209,14 @@ template&lt;typename Entity , typename... Component&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Constructs a persistent view around a dedicated pool of entities. </p>
-<p>A persistent view is created out of:</p><ul>
+<p>A persistent view is created out of:</p>
+<ul>
 <li>A dedicated pool of entities that is shared between all the persistent views of the same type.</li>
 <li>A bunch of pools of components to which to refer to get instances.</li>
 </ul>
@@ -227,7 +228,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00080">80</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00081">81</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -262,7 +263,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00122">122</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00123">123</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -296,7 +297,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>There are no guarantees on the order of the entities. Use <code>begin</code> and <code>end</code> if you want to iterate the view in the expected order.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the array of entities. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00104">104</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00105">105</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -344,7 +345,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00205">205</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00206">206</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -392,7 +393,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00227">227</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00228">228</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -426,7 +427,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the entity following the last entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00141">141</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00142">142</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -459,7 +460,7 @@ template&lt;typename Comp &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns the component assigned to the given entity. </p>
-<p>Prefer this function instead of <code><a class="el" href="classentt_1_1Registry.html#a904b71bae3eaa69d534b4dc41c15e889" title="Gets a reference to the given component owned by the given entity. ">Registry::get</a></code> during iterations. It has far better performance than its companion function.</p>
+<p>Prefer this function instead of <code><a class="el" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd" title="Returns a reference to a tag. ">Registry::get</a></code> during iterations. It has far better performance than its companion function.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid component type results in a compilation error. Attempting to use an entity that doesn't belong to the view results in undefined behavior.<br />
  An assertion will abort the execution at runtime in debug mode if the view doesn't contain the given entity.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -476,7 +477,7 @@ template&lt;typename Comp &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The component assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00163">163</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00164">164</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -509,7 +510,7 @@ template&lt;typename Comp &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns the component assigned to the given entity. </p>
-<p>Prefer this function instead of <code><a class="el" href="classentt_1_1Registry.html#a904b71bae3eaa69d534b4dc41c15e889" title="Gets a reference to the given component owned by the given entity. ">Registry::get</a></code> during iterations. It has far better performance than its companion function.</p>
+<p>Prefer this function instead of <code><a class="el" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd" title="Returns a reference to a tag. ">Registry::get</a></code> during iterations. It has far better performance than its companion function.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid component type results in a compilation error. Attempting to use an entity that doesn't belong to the view results in undefined behavior.<br />
  An assertion will abort the execution at runtime in debug mode if the view doesn't contain the given entity.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -526,7 +527,7 @@ template&lt;typename Comp &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The component assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00185">185</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00186">186</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -558,7 +559,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <p>Returns the number of entities that have the given components. </p>
 <dl class="section return"><dt>Returns</dt><dd>Number of entities that have the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00088">88</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00089">89</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -591,7 +592,7 @@ template&lt;typename Comp &gt; </div>
 
 <p>Sort the shared pool of entities according to the given component. </p>
 <p>Persistent views of the same type share with the <a class="el" href="classentt_1_1Registry.html" title="Fast and reliable entity-component system. ">Registry</a> a pool of entities with its own order that doesn't depend on the order of any pool of components. Users can order the underlying data structure so that it respects the order of the pool of the given component.</p>
-<dl class="section note"><dt>Note</dt><dd>The shared pool of entities and thus its order is affected by the changes to each and every pool of components that it tracks. Therefore changes to the pools of components can quickly ruin the order imposed to the pool of entities shared between the persistent views.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The shared pool of entities and thus its order is affected by the changes to each and every pool that it tracks. Therefore changes to those pools can quickly ruin the order imposed to the pool of entities shared between the persistent views.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Comp</td><td>Type of the component to use to impose the order. </td></tr>
@@ -599,7 +600,7 @@ template&lt;typename Comp &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00250">250</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00251">251</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>

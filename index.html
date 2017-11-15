@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.1.0</span>
+   &#160;<span id="projectnumber">2.2.0</span>
    </div>
   </td>
  </tr>
@@ -75,6 +75,8 @@ Introduction</h1>
 </ul>
 <p>A long time ago, the sole entity-component system was part of the project. After a while the codebase has grown and more and more classes have become part of the repository.<br />
  That's why today it's called <em>the EnTT Framework</em>.</p>
+<p>Currently, <code>EnTT</code> is tested on Linux, Microsoft Windows and OS X. It has proven to work also on both Android and iOS.<br />
+ Most likely it will not be problematic on other systems as well, but has not been sufficiently tested so far.</p>
 <h2><a class="anchor" id="autotoc_md2"></a>
 The framework</h2>
 <p><code>EnTT</code> was written initially as a faster alternative to other well known and open source entity-component systems. Nowadays the <code>EnTT</code> framework is moving its first steps. Much more will come in the future and hopefully I'm going to work on it for a long time.<br />
@@ -86,11 +88,15 @@ State of the art</h3>
 <p>Here is a brief list of what it offers today:</p>
 <ul>
 <li>Statically generated integer identifiers for types (assigned either at compile-time or at runtime).</li>
+<li>A constexpr utility for human readable resource identifiers.</li>
 <li>An incredibly fast entity-component system based on sparse sets, with its own views and a <em>pay for what you use</em> policy to adjust performance and memory pressure according to the users' requirements.</li>
+<li>Actor class for those who aren't confident with entity-component systems.</li>
+<li>The smallest and most basic implementation of a service locator ever seen.</li>
+<li>A cooperative scheduler for processes of any type.</li>
+<li>All what is needed for resource management (cache, loaders, handles).</li>
 <li>Signal handlers of any type, delegates and an event bus.</li>
 <li>A general purpose event emitter, that is a CRTP idiom based class template.</li>
 <li>An event dispatcher for immediate and delayed events to integrate in loops.</li>
-<li>The smallest and most basic implementation of a service locator ever seen.</li>
 <li>...</li>
 <li>Any other business.</li>
 </ul>
@@ -112,37 +118,41 @@ Performance</h2>
  Here is a comparision between the two (both of them compiled with GCC 7.2.0 on a Dell XPS 13 out of the mid 2014):</p>
 <table class="doxtable">
 <tr>
-<th>Benchmark </th><th>EntityX (experimental/compile_time) </th><th>EnTT  </th></tr>
+<th>Benchmark </th><th>EntityX (compile-time) </th><th>EnTT  </th></tr>
 <tr>
-<td>Creating 10M entities </td><td>0.128881s </td><td><b>0.0408754s</b> </td></tr>
+<td>Create 10M entities </td><td>0.1289s </td><td><b>0.0409s</b> </td></tr>
 <tr>
-<td>Destroying 10M entities </td><td><b>0.0531374s</b> </td><td>0.0545839s </td></tr>
+<td>Destroy 10M entities </td><td><b>0.0531s</b> </td><td>0.0546s </td></tr>
 <tr>
-<td>Iterating over 10M entities, unpacking one component, standard view </td><td>0.010661s </td><td><b>1.58e-07s</b> </td></tr>
+<td>Standard view, 10M entities, one component </td><td>0.0107s </td><td><b>1.6e-07s</b> </td></tr>
 <tr>
-<td>Iterating over 10M entities, unpacking two components, standard view </td><td><b>0.0112664s</b> </td><td>0.0840068s </td></tr>
+<td>Standard view, 10M entities, two components </td><td><b>0.0113s</b> </td><td>0.0295s </td></tr>
 <tr>
-<td>Iterating over 10M entities, unpacking two components, standard view, half of the entities have all the components </td><td><b>0.0077951s</b> </td><td>0.042168s </td></tr>
+<td>Standard view, 10M entities, two components<br />
+Half of the entities have all the components </td><td><b>0.0078s</b> </td><td>0.0150s </td></tr>
 <tr>
-<td>Iterating over 10M entities, unpacking two components, standard view, one of the entities has all the components </td><td>0.00713398s </td><td><b>8.93e-07s</b> </td></tr>
+<td>Standard view, 10M entities, two components<br />
+One of the entities has all the components </td><td>0.0071s </td><td><b>8.8e-07s</b> </td></tr>
 <tr>
-<td>Iterating over 10M entities, unpacking two components, persistent view </td><td>0.0112664s </td><td><b>5.68e-07s</b> </td></tr>
+<td>Persistent view, 10M entities, two components </td><td>0.0113s </td><td><b>5.7e-07s</b> </td></tr>
 <tr>
-<td>Iterating over 10M entities, unpacking five components, standard view </td><td><b>0.00905084s</b> </td><td>0.137757s </td></tr>
+<td>Standard view, 10M entities, five components </td><td><b>0.0091s</b> </td><td>0.0688s </td></tr>
 <tr>
-<td>Iterating over 10M entities, unpacking five components, persistent view </td><td>0.00905084s </td><td><b>2.9e-07s</b> </td></tr>
+<td>Persistent view, 10M entities, five components </td><td>0.0091s </td><td><b>2.9e-07s</b> </td></tr>
 <tr>
-<td>Iterating over 10M entities, unpacking ten components, standard view </td><td><b>0.0104708s</b> </td><td>0.388602s </td></tr>
+<td>Standard view, 10M entities, ten components </td><td><b>0.0105s</b> </td><td>0.1403s </td></tr>
 <tr>
-<td>Iterating over 10M entities, unpacking ten components, standard view, half of the entities have all the components </td><td><b>0.00899859s</b> </td><td>0.200752s </td></tr>
+<td>Standard view, 10M entities, ten components<br />
+Half of the entities have all the components </td><td><b>0.0090s</b> </td><td>0.0620s </td></tr>
 <tr>
-<td>Iterating over 10M entities, unpacking ten components, standard view, one of the entities has all the components </td><td>0.00700349s </td><td><b>2.565e-06s</b> </td></tr>
+<td>Standard view, 10M entities, ten components<br />
+One of the entities has all the components </td><td>0.0070s </td><td><b>1.3e-06s</b> </td></tr>
 <tr>
-<td>Iterating over 10M entities, unpacking ten components, persistent view </td><td>0.0104708s </td><td><b>6.23e-07s</b> </td></tr>
+<td>Persistent view, 10M entities, ten components </td><td>0.0105s </td><td><b>6.2e-07s</b> </td></tr>
 <tr>
-<td>Sort 150k entities, one component </td><td>- </td><td><b>0.0080046s</b> </td></tr>
+<td>Sort 150k entities, one component </td><td>- </td><td><b>0.0084s</b> </td></tr>
 <tr>
-<td>Sort 150k entities, match two components </td><td>- </td><td><b>0.00608322s</b> </td></tr>
+<td>Sort 150k entities, enforce permutation </td><td>- </td><td><b>0.0067s</b> </td></tr>
 </table>
 <p><code>EnTT</code> includes its own tests and benchmarks. See <a href="https://github.com/skypjack/entt/blob/master/test/benchmark.cpp">benchmark.cpp</a> for further details.<br />
  On Github users can find also a <a href="https://github.com/abeimler/ecs_benchmark">benchmark suite</a> that compares a bunch of different projects, one of which is <code>EnTT</code>.</p>
@@ -192,12 +202,19 @@ Tests</h2>
 Crash Course</h1>
 <h2><a class="anchor" id="autotoc_md14"></a>
 Design choices</h2>
+<h3><a class="anchor" id="autotoc_md15"></a>
+A bitset-free entity-component system</h3>
+<p><code>EnTT</code> is a <em>bitset-free</em> entity-component system that doesn't require users to specify the component set at compile-time.<br />
+ That's the reason for which users can instantiate the core class simply as:</p>
+<div class="fragment"><div class="line"><a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a> registry;</div></div><!-- fragment --><p>In place of its more annoying and error-prone counterpart:</p>
+<div class="fragment"><div class="line"><a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a>&lt;Comp0, Comp1, ..., CompN&gt; registry;</div></div><!-- fragment --><h3><a class="anchor" id="autotoc_md16"></a>
+Pay per use</h3>
 <p><code>EnTT</code> is entirely designed around the principle that users have to pay only for what they want.</p>
 <p>When it comes to use an entity-componet system, the tradeoff is usually between performance and memory usage. The faster it is, the more memory it uses. However, slightly worse performance along non-critical paths are the right price to pay to reduce memory usage and I've always wondered why this kind of tools do not leave me the choice.<br />
  <code>EnTT</code> follows a completely different approach. It squezees the best from the basic data structures and gives users the possibility to pay more for higher performance where needed.<br />
  The disadvantage of this approach is that users need to know the systems they are working on and the tools they are using. Otherwise, the risk to ruin the performance along critical paths is high.</p>
-<p>So far, this choice has proved to be a good one and I really hope it can be for many others besides me.</p>
-<h2><a class="anchor" id="autotoc_md15"></a>
+<p>So far, this choice has proven to be a good one and I really hope it can be for many others besides me.</p>
+<h2><a class="anchor" id="autotoc_md17"></a>
 Vademecum</h2>
 <p>The <code>Registry</code> to store, the <code>View</code>s to iterate. That's all.</p>
 <p>An entity (the <em>E</em> of an <em>ECS</em>) is an opaque identifier that users should just use as-is and store around if needed. Do not try to inspect an entity identifier, its type can change in future and a registry offers all the functionalities to query them out-of-the-box. The underlying type of an entity (either <code>std::uint16_t</code>, <code>std::uint32_t</code> or <code>std::uint64_t</code>) can be specified when defining a registry (actually the DefaultRegistry is nothing more than a Registry where the type of the entities is <code>std::uint32_t</code>).<br />
@@ -205,43 +222,55 @@ Vademecum</h2>
  Systems (the <em>S</em> of an <em>ECS</em>) are just plain functions, functors, lambdas or whatever the users want. They can accept a Registry, a View or a PersistentView and use them the way they prefer. No need to register systems or their types neither with the registry nor with the entity-component system at all.</p>
 <p>The following sections will explain in short how to use the entity-component system, the core part of the whole framework.<br />
  In fact, the framework is composed of many other classes in addition to those describe below. For more details, please refer to the <a href="https://skypjack.github.io/entt/">online documentation</a>.</p>
-<h2><a class="anchor" id="autotoc_md16"></a>
+<h2><a class="anchor" id="autotoc_md18"></a>
 The Registry, the Entity and the Component</h2>
 <p>A registry is used to store and manage entities as well as to create views to iterate the underlying data structures.<br />
  Registry is a class template that lets the users decide what's the preferred type to represent an entity. Because <code>std::uint32_t</code> is large enough for almost all the cases, there exists also an alias named DefaultRegistry for <code>Registry&lt;std::uint32_t&gt;</code>.</p>
 <p>Entities are represented by <em>entitiy identifiers</em>. An entity identifier is an opaque type that users should not inspect or modify in any way. It carries information about the entity itself and its version.</p>
 <p>A registry can be used both to construct and to destroy entities:</p>
-<div class="fragment"><div class="line"><span class="comment">// constructs a naked entity with no components ad returns its identifier</span></div><div class="line"><span class="keyword">auto</span> entity = registry.<a class="code" href="classentt_1_1Registry.html#a68363417c654ab36e68606c13deb850e">create</a>();</div><div class="line"></div><div class="line"><span class="comment">// constructs an entity and assigns it default-initialized components</span></div><div class="line"><span class="keyword">auto</span> another = registry.<a class="code" href="classentt_1_1Registry.html#a68363417c654ab36e68606c13deb850e">create</a>&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line"><span class="comment">// destroys an entity and all its components</span></div><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#afe1fc933ce101207a49b6bdeafa2ce41">destroy</a>(entity);</div></div><!-- fragment --><p>Once an entity is deleted, the registry can freely reuse it internally with a slightly different identifier. In particular, the version of an entity is increased each and every time it's destroyed.<br />
+<div class="fragment"><div class="line"><span class="comment">// constructs a naked entity with no components ad returns its identifier</span></div><div class="line"><span class="keyword">auto</span> entity = registry.create();</div><div class="line"></div><div class="line"><span class="comment">// constructs an entity and assigns it default-initialized components</span></div><div class="line"><span class="keyword">auto</span> another = registry.create&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line"><span class="comment">// destroys an entity and all its components</span></div><div class="line">registry.destroy(entity);</div></div><!-- fragment --><p>Once an entity is deleted, the registry can freely reuse it internally with a slightly different identifier. In particular, the version of an entity is increased each and every time it's destroyed.<br />
  In case entity identifiers are stored around, the registry offers all the functionalities required to test them and get out of the them all the information they carry:</p>
-<div class="fragment"><div class="line"><span class="comment">// returns true if the entity is still valid, false otherwise</span></div><div class="line"><span class="keywordtype">bool</span> b = registry.<a class="code" href="classentt_1_1Registry.html#a11a759638bf2c28ac1670c7b533ca53f">valid</a>(entity);</div><div class="line"></div><div class="line"><span class="comment">// gets the version contained in the entity identifier</span></div><div class="line"><span class="keyword">auto</span> version = registry.<a class="code" href="classentt_1_1Registry.html#a773c2bb361f4e83aae1349ccfeede56b">version</a>(entity);</div><div class="line"></div><div class="line"><span class="comment">// gets the actual version for the given entity</span></div><div class="line"><span class="keyword">auto</span> curr = registry.<a class="code" href="classentt_1_1Registry.html#a4e1a07f4170764925864b162277485b6">current</a>(entity);</div></div><!-- fragment --><p>Components can be assigned to or removed from entities at any time with a few calls to member functions of the registry. As for the entities, the registry offers also a set of functionalities users can use to work with the components.</p>
+<div class="fragment"><div class="line"><span class="comment">// returns true if the entity is still valid, false otherwise</span></div><div class="line"><span class="keywordtype">bool</span> b = registry.valid(entity);</div><div class="line"></div><div class="line"><span class="comment">// gets the version contained in the entity identifier</span></div><div class="line"><span class="keyword">auto</span> version = registry.version(entity);</div><div class="line"></div><div class="line"><span class="comment">// gets the actual version for the given entity</span></div><div class="line"><span class="keyword">auto</span> curr = registry.current(entity);</div></div><!-- fragment --><p>Components can be assigned to or removed from entities at any time with a few calls to member functions of the registry. As for the entities, the registry offers also a set of functionalities users can use to work with the components.</p>
 <p>The <code>assign</code> member function template creates, initializes and assigns to an entity the given component. It accepts a variable number of arguments that are used to construct the component itself if present:</p>
-<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#aa6b578d40a9305869e692167fc3dcddf">assign</a>&lt;Position&gt;(entity, 0., 0.);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><span class="keyword">auto</span> &amp;velocity = registry.<a class="code" href="classentt_1_1Registry.html#aa6b578d40a9305869e692167fc3dcddf">assign</a>&lt;Velocity&gt;(entity);</div><div class="line">velocity.dx = 0.;</div><div class="line">velocity.dy = 0.;</div></div><!-- fragment --><p>If the entity already has the given component, the <code>replace</code> member function template can be used to replace it:</p>
-<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a5ce71508e824ea5ef0d95d4baef37503">replace</a>&lt;Position&gt;(entity, 0., 0.);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><span class="keyword">auto</span> &amp;velocity = registry.<a class="code" href="classentt_1_1Registry.html#a5ce71508e824ea5ef0d95d4baef37503">replace</a>&lt;Velocity&gt;(entity);</div><div class="line">velocity.dx = 0.;</div><div class="line">velocity.dy = 0.;</div></div><!-- fragment --><p>In case users want to assign a component to an entity, but it's unknown whether the entity already has it or not, <code>accomodate</code> does the work in a single call (there is a performance penalty to pay for that mainly due to the fact that it must check if <code>entity</code> already has the given component or not):</p>
-<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a14524dac71cf528fcdccd74cdf230627">accomodate</a>&lt;Position&gt;(entity, 0., 0.);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><span class="keyword">auto</span> &amp;velocity = registry.<a class="code" href="classentt_1_1Registry.html#a14524dac71cf528fcdccd74cdf230627">accomodate</a>&lt;Velocity&gt;(entity);</div><div class="line">velocity.dx = 0.;</div><div class="line">velocity.dy = 0.;</div></div><!-- fragment --><p>Note that <code>accomodate</code> is a sliglhty faster alternative for the following <code>if</code>/<code>else</code> statement and nothing more:</p>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span>(registry.<a class="code" href="classentt_1_1Registry.html#ace82d0e0181bf0872174e1774d729db4">has</a>&lt;Comp&gt;(entity)) {</div><div class="line">    registry.<a class="code" href="classentt_1_1Registry.html#a5ce71508e824ea5ef0d95d4baef37503">replace</a>&lt;Comp&gt;(entity, arg1, argN);</div><div class="line">} <span class="keywordflow">else</span> {</div><div class="line">    registry.<a class="code" href="classentt_1_1Registry.html#aa6b578d40a9305869e692167fc3dcddf">assign</a>&lt;Comp&gt;(entity, arg1, argN);</div><div class="line">}</div></div><!-- fragment --><p>As already shown, if in doubt about whether or not an entity has one or more components, the <code>has</code> member function template may be useful:</p>
-<div class="fragment"><div class="line"><span class="keywordtype">bool</span> b = registry.<a class="code" href="classentt_1_1Registry.html#ace82d0e0181bf0872174e1774d729db4">has</a>&lt;Position, Velocity&gt;(entity);</div></div><!-- fragment --><p>On the other side, if the goal is to delete a single component, the <code>remove</code> member function template is the way to go when it's certain that the entity owns a copy of the component:</p>
-<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a856e1f92b8c1c523e66035481ef4ab8d">remove</a>&lt;Position&gt;(entity);</div></div><!-- fragment --><p>Otherwise consider to use the <code>reset</code> member function. It behaves similarly to <code>remove</code> but with a strictly defined behaviour (and a performance penalty is the price to pay for that). In particular it removes the component if and only if it exists, otherwise it returns safely to the caller:</p>
-<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#ae58d20711dabcd4959a89e0928974136">reset</a>&lt;Position&gt;(entity);</div></div><!-- fragment --><p>There exist also two other <em>versions</em> of the <code>reset</code> member function:</p>
+<div class="fragment"><div class="line">registry.assign&lt;Position&gt;(entity, 0., 0.);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><span class="keyword">auto</span> &amp;velocity = registry.assign&lt;Velocity&gt;(entity);</div><div class="line">velocity.dx = 0.;</div><div class="line">velocity.dy = 0.;</div></div><!-- fragment --><p>If the entity already has the given component, the <code>replace</code> member function template can be used to replace it:</p>
+<div class="fragment"><div class="line">registry.replace&lt;Position&gt;(entity, 0., 0.);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><span class="keyword">auto</span> &amp;velocity = registry.replace&lt;Velocity&gt;(entity);</div><div class="line">velocity.dx = 0.;</div><div class="line">velocity.dy = 0.;</div></div><!-- fragment --><p>In case users want to assign a component to an entity, but it's unknown whether the entity already has it or not, <code>accomodate</code> does the work in a single call (there is a performance penalty to pay for that mainly due to the fact that it must check if <code>entity</code> already has the given component or not):</p>
+<div class="fragment"><div class="line">registry.accomodate&lt;Position&gt;(entity, 0., 0.);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><span class="keyword">auto</span> &amp;velocity = registry.accomodate&lt;Velocity&gt;(entity);</div><div class="line">velocity.dx = 0.;</div><div class="line">velocity.dy = 0.;</div></div><!-- fragment --><p>Note that <code>accomodate</code> is a sliglhty faster alternative for the following <code>if</code>/<code>else</code> statement and nothing more:</p>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span>(registry.has&lt;Comp&gt;(entity)) {</div><div class="line">    registry.replace&lt;Comp&gt;(entity, arg1, argN);</div><div class="line">} <span class="keywordflow">else</span> {</div><div class="line">    registry.assign&lt;Comp&gt;(entity, arg1, argN);</div><div class="line">}</div></div><!-- fragment --><p>As already shown, if in doubt about whether or not an entity has one or more components, the <code>has</code> member function template may be useful:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">bool</span> b = registry.has&lt;Position, Velocity&gt;(entity);</div></div><!-- fragment --><p>On the other side, if the goal is to delete a single component, the <code>remove</code> member function template is the way to go when it's certain that the entity owns a copy of the component:</p>
+<div class="fragment"><div class="line">registry.remove&lt;Position&gt;(entity);</div></div><!-- fragment --><p>Otherwise consider to use the <code>reset</code> member function. It behaves similarly to <code>remove</code> but with a strictly defined behaviour (and a performance penalty is the price to pay for that). In particular it removes the component if and only if it exists, otherwise it returns safely to the caller:</p>
+<div class="fragment"><div class="line">registry.reset&lt;Position&gt;(entity);</div></div><!-- fragment --><p>There exist also two other <em>versions</em> of the <code>reset</code> member function:</p>
 <ul>
 <li>If no entity is passed to it, <code>reset</code> will remove the given component from each entity that has it:</li>
 </ul>
-<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#ae58d20711dabcd4959a89e0928974136">reset</a>&lt;Position&gt;();</div></div><!-- fragment --><ul>
+<div class="fragment"><div class="line">registry.reset&lt;Position&gt;();</div></div><!-- fragment --><ul>
 <li>If neither the entity nor the component are specified, all the entities and their components are destroyed:</li>
 </ul>
-<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#ae58d20711dabcd4959a89e0928974136">reset</a>();</div></div><!-- fragment --><p>Finally, references to components can be retrieved by just doing this:</p>
-<div class="fragment"><div class="line"><span class="comment">// either a non-const reference ...</span></div><div class="line"><a class="code" href="namespaceentt.html#aa56ef01a9c62f21d68dd60f005296b23">DefaultRegistry</a> registry;</div><div class="line"><span class="keyword">auto</span> &amp;position = registry.<a class="code" href="classentt_1_1Registry.html#a904b71bae3eaa69d534b4dc41c15e889">get</a>&lt;Position&gt;(entity);</div><div class="line"></div><div class="line"><span class="comment">// ... or a const one</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;cregistry = registry;</div><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;position = cregistry.get&lt;Position&gt;(entity);</div></div><!-- fragment --><p>The <code>get</code> member function template gives direct access to the component of an entity stored in the underlying data structures of the registry.</p>
-<h3><a class="anchor" id="autotoc_md17"></a>
+<div class="fragment"><div class="line">registry.reset();</div></div><!-- fragment --><p>Finally, references to components can be retrieved simply by doing this:</p>
+<div class="fragment"><div class="line"><span class="comment">// either a non-const reference ...</span></div><div class="line"><a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a> registry;</div><div class="line"><span class="keyword">auto</span> &amp;position = registry.<a class="code" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd">get</a>&lt;Position&gt;(entity);</div><div class="line"></div><div class="line"><span class="comment">// ... or a const one</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;cregistry = registry;</div><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;position = cregistry.get&lt;Position&gt;(entity);</div></div><!-- fragment --><p>The <code>get</code> member function template gives direct access to the component of an entity stored in the underlying data structures of the registry.</p>
+<h3><a class="anchor" id="autotoc_md19"></a>
+Single instance components</h3>
+<p>In those cases where all what is needed is a single instance component, tags are the right tool to achieve the purpose.<br />
+ Tags undergo the same requirements of components. They can be either plain old data structures or more complex and moveable data structures with a proper constructor.<br />
+ Actually, the same type can be used both as a tag and as a component and the registry will not complain about it. It is up to the users to properly manage their own types.</p>
+<p>Attaching tags to entities and removing them is trivial:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> player = registry.<a class="code" href="classentt_1_1Registry.html#a68363417c654ab36e68606c13deb850e">create</a>();</div><div class="line"><span class="keyword">auto</span> camera = registry.<a class="code" href="classentt_1_1Registry.html#a68363417c654ab36e68606c13deb850e">create</a>();</div><div class="line"></div><div class="line"><span class="comment">// attaches a default-initialized tag to an entity</span></div><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#ad6aba3339872b3dccc722debcdf4d65c">attach</a>&lt;PlayingCharacter&gt;(player);</div><div class="line"></div><div class="line"><span class="comment">// attaches a tag to an entity and initializes it</span></div><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#ad6aba3339872b3dccc722debcdf4d65c">attach</a>&lt;Camera&gt;(camera, player);</div><div class="line"></div><div class="line"><span class="comment">// removes tags from their owners</span></div><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a957bcbdbf082f9767e5474a73be6ece4">remove</a>&lt;PlayingCharacter&gt;();</div><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a957bcbdbf082f9767e5474a73be6ece4">remove</a>&lt;Camera&gt;();</div></div><!-- fragment --><p>If in doubt about whether or not a tag has already an owner, the <code>has</code> member function template may be useful:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">bool</span> b = registry.<a class="code" href="classentt_1_1Registry.html#ac17c42321f66e42649d1b0e549828620">has</a>&lt;PlayingCharacter&gt;();</div></div><!-- fragment --><p>References to tags can be retrieved simply by doing this:</p>
+<div class="fragment"><div class="line"><span class="comment">// either a non-const reference ...</span></div><div class="line"><a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a> registry;</div><div class="line"><span class="keyword">auto</span> &amp;player = registry.<a class="code" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd">get</a>&lt;PlayingCharacter&gt;();</div><div class="line"></div><div class="line"><span class="comment">// ... or a const one</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;cregistry = registry;</div><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;camera = cregistry.<a class="code" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd">get</a>&lt;Camera&gt;();</div></div><!-- fragment --><p>The <code>get</code> member function template gives direct access to the tag as stored in the underlying data structures of the registry.</p>
+<p>As shown above, in almost all the cases the entity identifier isn't required, since a single instance component can have only one associated entity and therefore it doesn't make much sense to mention it explicitly.<br />
+ To find out who the owner is, just do the following:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> player = registry.<a class="code" href="classentt_1_1Registry.html#a9300c3ef37bc0abb7ebc5dac7b2fc873">attachee</a>&lt;PlayingCharacter&gt;();</div></div><!-- fragment --><p>Note that iterating tags isn't possible for obvious reasons. Tags give direct access to single entities and nothing more.</p>
+<h3><a class="anchor" id="autotoc_md20"></a>
 Sorting: is it possible?</h3>
 <p>It goes without saying that sorting entities and components is possible with <code>EnTT</code>.<br />
  In fact, there are two functions that respond to slightly different needs:</p>
 <ul>
 <li>Components can be sorted directly:</li>
 </ul>
-<div class="fragment"><div class="line">registry.sort&lt;Renderable&gt;([](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;lhs, <span class="keyword">const</span> <span class="keyword">auto</span> &amp;rhs) {</div><div class="line">    <span class="keywordflow">return</span> lhs.z &lt; rhs.z;</div><div class="line">});</div></div><!-- fragment --><ul>
+<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a625ada828ff48c153c7be14cc99eeca5">sort</a>&lt;Renderable&gt;([](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;lhs, <span class="keyword">const</span> <span class="keyword">auto</span> &amp;rhs) {</div><div class="line">    <span class="keywordflow">return</span> lhs.z &lt; rhs.z;</div><div class="line">});</div></div><!-- fragment --><ul>
 <li>Components can be sorted according to the order imposed by another component:</li>
 </ul>
-<div class="fragment"><div class="line">registry.sort&lt;Movement, Physics&gt;();</div></div><!-- fragment --><p>In this case, instances of <code>Movement</code> are arranged in memory so that cache misses are minimized when the two components are iterated together.</p>
-<h2><a class="anchor" id="autotoc_md18"></a>
+<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a625ada828ff48c153c7be14cc99eeca5">sort</a>&lt;Movement, Physics&gt;();</div></div><!-- fragment --><p>In this case, instances of <code>Movement</code> are arranged in memory so that cache misses are minimized when the two components are iterated together.</p>
+<h2><a class="anchor" id="autotoc_md21"></a>
 View: to persist or not to persist?</h2>
 <p>There are mainly two kinds of views: standard (also known as View) and persistent (alsa known as PersistentView).<br />
  Both of them have pros and cons to take in consideration. In particular:</p>
@@ -278,47 +307,47 @@ View: to persist or not to persist?</h2>
 <p>Use a persistent view in all the other cases.</p>
 <p>To easily iterate entities, all the views offer the common <code>begin</code> and <code>end</code> member functions that allow users to use a view in a typical range-for loop.<br />
  Continue reading for more details or refer to the <a href="https://skypjack.github.io/entt/">official documentation</a>.</p>
-<h3><a class="anchor" id="autotoc_md19"></a>
+<h3><a class="anchor" id="autotoc_md22"></a>
 Standard View</h3>
 <p>A standard view behaves differently if it's constructed for a single component or if it has been requested to iterate multiple components. Even the API is different in the two cases.<br />
  All that they share is the way they are created by means of a registry:</p>
-<div class="fragment"><div class="line"><span class="comment">// single component standard view</span></div><div class="line"><span class="keyword">auto</span> single = registry.view&lt;Position&gt;();</div><div class="line"></div><div class="line"><span class="comment">// multi component standard view</span></div><div class="line"><span class="keyword">auto</span> multi = registry.view&lt;Position, Velocity&gt;();</div></div><!-- fragment --><p>For all that remains, it's worth discussing them separately.<br />
+<div class="fragment"><div class="line"><span class="comment">// single component standard view</span></div><div class="line"><span class="keyword">auto</span> single = registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Position&gt;();</div><div class="line"></div><div class="line"><span class="comment">// multi component standard view</span></div><div class="line"><span class="keyword">auto</span> multi = registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Position, Velocity&gt;();</div></div><!-- fragment --><p>For all that remains, it's worth discussing them separately.<br />
 </p>
-<h4><a class="anchor" id="autotoc_md20"></a>
+<h4><a class="anchor" id="autotoc_md23"></a>
 Single component standard view</h4>
 <p>Single component standard views are specialized in order to give a boost in terms of performance in all the situation. This kind of views can access the underlying data structures directly and avoid superflous checks.<br />
  They offer a bunch of functionalities to get the number of entities they are going to return and a raw access to the entity list as well as to the component list.<br />
  Refer to the <a href="https://skypjack.github.io/entt/">official documentation</a> for all the details.</p>
 <p>There is no need to store views around for they are extremely cheap to construct, even though they can be copied without problems and reused freely. In fact, they return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.<br />
  To iterate a single component standard view, either use it in range-for loop:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.view&lt;Renderable&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">    <span class="keyword">auto</span> &amp;renderable = view.get(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>Or rely on the <code>each</code> member function to iterate entities and get all their components at once:</p>
-<div class="fragment"><div class="line">registry.view&lt;Renderable&gt;().each([](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;renderable) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>Performance are more or less the same. The best approach depends mainly on whether all the components have to be accessed or not.</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Renderable&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">    <span class="keyword">auto</span> &amp;renderable = view.get(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>Or rely on the <code>each</code> member function to iterate entities and get all their components at once:</p>
+<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Renderable&gt;().each([](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;renderable) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>Performance are more or less the same. The best approach depends mainly on whether all the components have to be accessed or not.</p>
 <p><b>Note</b>: prefer the <code>get</code> member function of a view instead of the <code>get</code> member function template of a registry during iterations, if possible. However, keep in mind that it works only with the components of the view itself.</p>
-<h4><a class="anchor" id="autotoc_md21"></a>
+<h4><a class="anchor" id="autotoc_md24"></a>
 Multi component standard view</h4>
 <p>Multi component standard views iterate entities that have at least all the given components in their bags. During construction, these views look at the number of entities available for each component and pick up a reference to the smallest set of candidates in order to speed up iterations.<br />
  They offer fewer functionalities than their companion views for single component, the most important of which can be used to reset the view and refresh the reference to the set of candidate entities to iterate.<br />
  Refer to the <a href="https://skypjack.github.io/entt/">official documentation</a> for all the details.</p>
 <p>There is no need to store views around for they are extremely cheap to construct, even though they can be copied without problems and reused freely. In fact, they return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.<br />
  To iterate a multi component standard view, either use it in range-for loop:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.view&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">    <span class="keyword">auto</span> &amp;position = view.get&lt;Position&gt;(entity);</div><div class="line">    <span class="keyword">auto</span> &amp;velocity = view.get&lt;Velocity&gt;(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>Or rely on the <code>each</code> member function to iterate entities and get all their components at once:</p>
-<div class="fragment"><div class="line">registry.view&lt;Position, Velocity&gt;().each([](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;position, <span class="keyword">auto</span> &amp;velocity) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>Performance are more or less the same. The best approach depends mainly on whether all the components have to be accessed or not.</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">    <span class="keyword">auto</span> &amp;position = view.get&lt;Position&gt;(entity);</div><div class="line">    <span class="keyword">auto</span> &amp;velocity = view.get&lt;Velocity&gt;(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>Or rely on the <code>each</code> member function to iterate entities and get all their components at once:</p>
+<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Position, Velocity&gt;().each([](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;position, <span class="keyword">auto</span> &amp;velocity) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>Performance are more or less the same. The best approach depends mainly on whether all the components have to be accessed or not.</p>
 <p><b>Note</b>: prefer the <code>get</code> member function of a view instead of the <code>get</code> member function template of a registry during iterations, if possible. However, keep in mind that it works only with the components of the view itself.</p>
-<h3><a class="anchor" id="autotoc_md22"></a>
+<h3><a class="anchor" id="autotoc_md25"></a>
 Persistent View</h3>
 <p>A persistent view returns all the entities and only the entities that have at least the given components. Moreover, it's guaranteed that the entity list is thightly packed in memory for fast iterations.<br />
  In general, persistent views don't stay true to the order of any set of components unless users explicitly sort them.</p>
 <p>Persistent views can be used only to iterate multiple components. Create them as it follows:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.persistent&lt;Position, Velocity&gt;();</div></div><!-- fragment --><p>There is no need to store views around for they are extremely cheap to construct, even though they can be copied without problems and reused freely. In fact, they return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.<br />
+<div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1Registry.html#a139a4d7b711fc1813c6c4520b9e79c09">persistent</a>&lt;Position, Velocity&gt;();</div></div><!-- fragment --><p>There is no need to store views around for they are extremely cheap to construct, even though they can be copied without problems and reused freely. In fact, they return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.<br />
  That being said, persistent views perform an initialization step the very first time they are constructed and this could be quite costly. To avoid it, consider asking to the registry to <em>prepare</em> them when no entities have been created yet:</p>
-<div class="fragment"><div class="line">registry.prepare&lt;Position, Velocity&gt;();</div></div><!-- fragment --><p>If the registry is empty, preparation is extremely fast. Moreover the <code>prepare</code> member function template is idempotent. Feel free to invoke it even more than once: if the view has been alreadt prepared before, the function returns immediately and does nothing.</p>
+<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#ac05c9ccc5fe57df386d8104578fc9675">prepare</a>&lt;Position, Velocity&gt;();</div></div><!-- fragment --><p>If the registry is empty, preparation is extremely fast. Moreover the <code>prepare</code> member function template is idempotent. Feel free to invoke it even more than once: if the view has been alreadt prepared before, the function returns immediately and does nothing.</p>
 <p>A persistent view offers a bunch of functionalities to get the number of entities it's going to return, a raw access to the entity list and the possibility to sort the underlying data structures according to the order of one of the components for which it has been constructed.<br />
  Refer to the <a href="https://skypjack.github.io/entt/">official documentation</a> for all the details.</p>
 <p>To iterate a persistent view, either use it in range-for loop:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.persistent&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">    <span class="keyword">auto</span> &amp;position = view.get&lt;Position&gt;(entity);</div><div class="line">    <span class="keyword">auto</span> &amp;velocity = view.get&lt;Velocity&gt;(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>Or rely on the <code>each</code> member function to iterate entities and get all their components at once:</p>
-<div class="fragment"><div class="line">registry.persistent&lt;Position, Velocity&gt;().each([](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;position, <span class="keyword">auto</span> &amp;velocity) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>Performance are more or less the same. The best approach depends mainly on whether all the components have to be accessed or not.</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1Registry.html#a139a4d7b711fc1813c6c4520b9e79c09">persistent</a>&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">    <span class="keyword">auto</span> &amp;position = view.get&lt;Position&gt;(entity);</div><div class="line">    <span class="keyword">auto</span> &amp;velocity = view.get&lt;Velocity&gt;(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>Or rely on the <code>each</code> member function to iterate entities and get all their components at once:</p>
+<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a139a4d7b711fc1813c6c4520b9e79c09">persistent</a>&lt;Position, Velocity&gt;().each([](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;position, <span class="keyword">auto</span> &amp;velocity) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>Performance are more or less the same. The best approach depends mainly on whether all the components have to be accessed or not.</p>
 <p><b>Note</b>: prefer the <code>get</code> member function of a view instead of the <code>get</code> member function template of a registry during iterations, if possible. However, keep in mind that it works only with the components of the view itself.</p>
-<h2><a class="anchor" id="autotoc_md23"></a>
+<h2><a class="anchor" id="autotoc_md26"></a>
 Side notes</h2>
 <ul>
 <li>Entity identifiers are numbers and nothing more. They are not classes and they have no member functions at all. As already mentioned, do no try to inspect or modify an entity descriptor in any way.</li>
@@ -338,15 +367,15 @@ Side notes</h2>
  That being said, as long as a thread iterates the entities that have the component <code>X</code> or assign and removes that component from a set of entities, another thread can safely do the same with components <code>Y</code> and <code>Z</code> and everything will work like a charm.<br />
  As an example, users can freely execute the rendering system and iterate the renderable entities while updating a physic component concurrently on a separate thread if needed.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md24"></a>
+<h1><a class="anchor" id="autotoc_md27"></a>
 Contributors</h1>
 <p>If you want to contribute, please send patches as pull requests against the branch <code>master</code>.<br />
  Check the <a href="https://github.com/skypjack/entt/blob/master/AUTHORS">contributors list</a> to see who has partecipated so far.</p>
-<h1><a class="anchor" id="autotoc_md25"></a>
+<h1><a class="anchor" id="autotoc_md28"></a>
 License</h1>
 <p>Code and documentation Copyright (c) 2017 Michele Caini.<br />
  Code released under <a href="https://github.com/skypjack/entt/blob/master/LICENSE">the MIT license</a>. Docs released under <a href="https://github.com/skypjack/entt/blob/master/docs/LICENSE">Creative Commons</a>.</p>
-<h1><a class="anchor" id="autotoc_md26"></a>
+<h1><a class="anchor" id="autotoc_md29"></a>
 Donation</h1>
 <p>Developing and maintaining <code>EnTT</code> takes some time and lots of coffee. I'd like to add more and more functionalities in future and turn it in a full-featured framework.<br />
  If you want to support this project, you can offer me an espresso. I'm from Italy, we're used to turning the best coffee ever in code. If you find that it's not enough, feel free to support me the way you prefer.<br />

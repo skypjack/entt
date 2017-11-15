@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['pos_5ftype',['pos_type',['../classentt_1_1SparseSet_3_01Entity_01_4.html#a20c218a69cf339371251ffa5580d7aa0',1,'entt::SparseSet&lt; Entity &gt;::pos_type()'],['../classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#ad161a395ca3979154a333520662c7737',1,'entt::SparseSet&lt; Entity, Type &gt;::pos_type()']]]
+  ['managedbus',['ManagedBus',['../namespaceentt.html#ab0f1cfc713909d1324ba76592e22bef5',1,'entt']]],
+  ['manageddispatcher',['ManagedDispatcher',['../namespaceentt.html#aa87d8c710e5a90c2a89d574d38f4b0b6',1,'entt']]]
 ];

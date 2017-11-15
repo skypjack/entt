@@ -1,12 +1,7 @@
 var searchData=
 [
-  ['servicelocator',['ServiceLocator',['../structentt_1_1ServiceLocator.html',1,'entt']]],
-  ['sigh',['SigH',['../classentt_1_1SigH.html',1,'entt']]],
-  ['sigh_3c_20ret_28args_2e_2e_2e_29_2c_20collector_20_3e',['SigH&lt; Ret(Args...), Collector &gt;',['../classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html',1,'entt']]],
-  ['signal',['Signal',['../classentt_1_1Signal.html',1,'entt']]],
-  ['signal_3c_20void_28args_2e_2e_2e_29_3e',['Signal&lt; void(Args...)&gt;',['../classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html',1,'entt']]],
-  ['sparseset',['SparseSet',['../classentt_1_1SparseSet.html',1,'entt']]],
-  ['sparseset_3c_20entity_20_3e',['SparseSet&lt; Entity &gt;',['../classentt_1_1SparseSet_3_01Entity_01_4.html',1,'entt']]],
-  ['sparseset_3c_20entity_2c_20component_20_3e',['SparseSet&lt; Entity, Component &gt;',['../classentt_1_1SparseSet.html',1,'entt']]],
-  ['sparseset_3c_20entity_2c_20type_20_3e',['SparseSet&lt; Entity, Type &gt;',['../classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html',1,'entt']]]
+  ['persistentview',['PersistentView',['../classentt_1_1PersistentView.html',1,'entt']]],
+  ['process',['Process',['../classentt_1_1Process.html',1,'entt']]],
+  ['process_3c_20processadaptor_3c_20func_2c_20delta_20_3e_2c_20delta_20_3e',['Process&lt; ProcessAdaptor&lt; Func, Delta &gt;, Delta &gt;',['../classentt_1_1Process.html',1,'entt']]],
+  ['processadaptor',['ProcessAdaptor',['../structentt_1_1ProcessAdaptor.html',1,'entt']]]
 ];
