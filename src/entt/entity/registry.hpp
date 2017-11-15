@@ -7,6 +7,7 @@
 #include <utility>
 #include <cstddef>
 #include <cassert>
+#include <algorithm>
 #include "../core/family.hpp"
 #include "sparse_set.hpp"
 #include "traits.hpp"
@@ -28,9 +29,25 @@ namespace entt {
  */
 template<typename Entity>
 class Registry {
+    using tag_family = Family<struct InternalRegistryTagFamily>;
     using component_family = Family<struct InternalRegistryComponentFamily>;
     using view_family = Family<struct InternalRegistryViewFamily>;
     using traits_type = entt_traits<Entity>;
+
+    struct Attachee {
+        Entity entity;
+    };
+
+    template<typename Tag>
+    struct Attaching: Attachee {
+        // requirements for aggregates are relaxed only since C++17
+        template<typename... Args>
+        Attaching(Entity entity, Tag tag)
+            : Attachee{entity}, tag{std::move(tag)}
+        {}
+
+        Tag tag;
+    };
 
     template<typename Component>
     struct Pool: SparseSet<Entity, Component> {
@@ -42,7 +59,7 @@ class Registry {
 
             for(auto &&listener: listeners) {
                 if((registry.*listener.second)(entity)) {
-                    listener.first.construct(entity);
+                    listener.first->construct(entity);
                 }
             }
 
@@ -53,20 +70,26 @@ class Registry {
             SparseSet<Entity, Component>::destroy(entity);
 
             for(auto &&listener: listeners) {
-                auto &handler = listener.first;
+                auto *handler = listener.first;
 
-                if(handler.has(entity)) {
-                    handler.destroy(entity);
+                if(handler->has(entity)) {
+                    handler->destroy(entity);
                 }
             }
         }
 
-        inline void append(SparseSet<Entity> &handler, test_fn_type fn) {
+        inline void append(SparseSet<Entity> *handler, test_fn_type fn) {
             listeners.emplace_back(handler, fn);
         }
 
+        inline void remove(SparseSet<Entity> *handler) {
+            listeners.erase(std::remove_if(listeners.begin(), listeners.end(), [handler](auto &listener) {
+                return listener.first == handler;
+            }), listeners.end());
+        }
+
     private:
-        std::vector<std::pair<SparseSet<Entity> &, test_fn_type>> listeners;
+        std::vector<std::pair<SparseSet<Entity> *, test_fn_type>> listeners;
     };
 
     template<typename Component>
@@ -121,7 +144,7 @@ class Registry {
             }
 
             accumulator_type accumulator = {
-                (ensure<Component>().append(*set, &Registry::has<Component...>), 0)...
+                (ensure<Component>().append(set.get(), &Registry::has<Component...>), 0)...
             };
 
             handlers[vtype] = std::move(set);
@@ -359,6 +382,122 @@ public:
     }
 
     /**
+     * @brief Attaches a tag to an entity.
+     *
+     * Usually, pools of components allocate enough memory to store a bunch of
+     * elements even if only one of them is used. On the other hand, there are
+     * cases where all what is needed is a single instance component to attach
+     * to an entity.<br/>
+     * Tags are the right tool to achieve the purpose.
+     *
+     * @warning
+     * Attempting to use an invalid entity or to attach to an entity a tag that
+     * already has an owner results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the tag has been already attached to another entity.
+     *
+     * @tparam Tag Type of tag to create.
+     * @tparam Args Types of arguments to use to construct the tag.
+     * @param entity A valid entity identifier
+     * @param args Parameters to use to initialize the tag.
+     * @return A reference to the newly created tag.
+     */
+    template<typename Tag, typename... Args>
+    Tag & attach(entity_type entity, Args&&... args) {
+        assert(valid(entity));
+        assert(!has<Tag>());
+        const auto ttype = tag_family::type<Tag>();
+
+        if(!(ttype < tags.size())) {
+            tags.resize(ttype + 1);
+        }
+
+        tags[ttype].reset(new Attaching<Tag>{entity, { std::forward<Args>(args)... }});
+        tags[ttype]->entity = entity;
+
+        return static_cast<Attaching<Tag> *>(tags[ttype].get())->tag;
+    }
+
+    /**
+     * @brief Removes a tag from its owner, if any.
+     * @tparam Tag Type of tag to remove.
+     */
+    template<typename Tag>
+    void remove() {
+        if(has<Tag>()) {
+            tags[tag_family::type<Tag>()].reset();
+        }
+    }
+
+    /**
+     * @brief Checks if a tag has an owner.
+     * @tparam Tag Type of tag for which to perform the check.
+     * @return True if the tag already has an owner, false otherwise.
+     */
+    template<typename Tag>
+    bool has() const noexcept {
+        const auto ttype = tag_family::type<Tag>();
+        return (ttype < tags.size() &&
+                // it's a valid tag
+                tags[ttype] &&
+                // the associated entity hasn't been destroyed in the meantime
+                tags[ttype]->entity == (entities[tags[ttype]->entity & traits_type::entity_mask]));
+    }
+
+    /**
+     * @brief Returns a reference to a tag.
+     *
+     * @warning
+     * Attempting to get a tag that hasn't an owner results in undefined
+     * behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * tag hasn't been previously attached to an entity.
+     *
+     * @tparam Tag Type of tag to get.
+     * @return A reference to the tag.
+     */
+    template<typename Tag>
+    const Tag & get() const noexcept {
+        assert(has<Tag>());
+        return static_cast<Attaching<Tag> *>(tags[tag_family::type<Tag>()].get())->tag;
+    }
+
+    /**
+     * @brief Returns a reference to a tag.
+     *
+     * @warning
+     * Attempting to get a tag that hasn't an owner results in undefined
+     * behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * tag hasn't been previously attached to an entity.
+     *
+     * @tparam Tag Type of tag to get.
+     * @return A reference to the tag.
+     */
+    template<typename Tag>
+    Tag & get() noexcept {
+        return const_cast<Tag &>(const_cast<const Registry *>(this)->get<Tag>());
+    }
+
+    /**
+     * @brief Gets the owner of a tag, if any.
+     *
+     * @warning
+     * Attempting to get the owner of a tag that hasn't been previously attached
+     * to an entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * tag hasn't an owner.
+     *
+     * @tparam Tag Type of tag of which to get the owner.
+     * @return A valid entity identifier.
+     */
+    template<typename Tag>
+    entity_type attachee() const noexcept {
+        assert(has<Tag>());
+        return tags[tag_family::type<Tag>()]->entity;
+    }
+
+    /**
      * @brief Assigns the given component to an entity.
      *
      * A new instance of the given component is created and initialized with the
@@ -372,7 +511,7 @@ public:
      * invalid entity or if the entity already owns an instance of the given
      * component.
      *
-     * @tparam Component Type of the component to create.
+     * @tparam Component Type of component to create.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the component.
@@ -394,7 +533,7 @@ public:
      * invalid entity or if the entity doesn't own an instance of the given
      * component.
      *
-     * @tparam Component Type of the component to remove.
+     * @tparam Component Type of component to remove.
      * @param entity A valid entity identifier.
      */
     template<typename Component>
@@ -436,7 +575,7 @@ public:
      * invalid entity or if the entity doesn't own an instance of the given
      * component.
      *
-     * @tparam Component Type of the component to get.
+     * @tparam Component Type of component to get.
      * @param entity A valid entity identifier.
      * @return A reference to the instance of the component owned by the entity.
      */
@@ -456,7 +595,7 @@ public:
      * invalid entity or if the entity doesn't own an instance of the given
      * component.
      *
-     * @tparam Component Type of the component to get.
+     * @tparam Component Type of component to get.
      * @param entity A valid entity identifier.
      * @return A reference to the instance of the component owned by the entity.
      */
@@ -479,7 +618,7 @@ public:
      * invalid entity or if the entity doesn't own an instance of the given
      * component.
      *
-     * @tparam Component Type of the component to replace.
+     * @tparam Component Type of component to replace.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the component.
@@ -512,7 +651,7 @@ public:
      * An assertion will abort the execution at runtime in debug mode in case of
      * invalid entity.
      *
-     * @tparam Component Type of the component to assign or replace.
+     * @tparam Component Type of component to assign or replace.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the component.
@@ -549,8 +688,8 @@ public:
      *
      * Where `e1` and `e2` are valid entity identifiers.
      *
-     * @tparam Component Type of the components to sort.
-     * @tparam Compare Type of the comparison function object.
+     * @tparam Component Type of components to sort.
+     * @tparam Compare Type of comparison function object.
      * @param compare A valid comparison function object.
      */
     template<typename Component, typename Compare>
@@ -589,8 +728,8 @@ public:
      *
      * Any subsequent change to `B` won't affect the order in `A`.
      *
-     * @tparam To Type of the components to sort.
-     * @tparam From Type of the components to use to sort.
+     * @tparam To Type of components to sort.
+     * @tparam From Type of components to use to sort.
      */
     template<typename To, typename From>
     void sort() {
@@ -608,7 +747,7 @@ public:
      * An assertion will abort the execution at runtime in debug mode in case of
      * invalid entity.
      *
-     * @tparam Component Type of the component to reset.
+     * @tparam Component Type of component to reset.
      * @param entity A valid entity identifier.
      */
     template<typename Component>
@@ -630,7 +769,7 @@ public:
      * For each entity that has an instance of the given component, the
      * component itself is removed and thus destroyed.
      *
-     * @tparam Component type of the component whose pool must be reset.
+     * @tparam Component Type of component whose pool must be reset.
      */
     template<typename Component>
     void reset() {
@@ -672,6 +811,10 @@ public:
             if(pool) {
                 pool->reset();
             }
+        }
+
+        for(auto &&tag: tags) {
+            tag.reset();
         }
     }
 
@@ -734,6 +877,46 @@ public:
     }
 
     /**
+     * @brief Discards all the data structures used for a given persitent view.
+     *
+     * Persistent views occupy memory, no matter if they are in use or not.<br/>
+     * This function can be used to discard all the internal data structures
+     * dedicated to a specific persisten view, with the goal of reducing the
+     * memory pressure.
+     *
+     * @warning
+     * Attempting to use a persistent view created before calling this function
+     * results in undefined behavior. No assertion available in this case,
+     * neither in debug mode nor in release mode.
+     *
+     * @tparam Component Types of components of the persistent view.
+     */
+    template<typename... Component>
+    void discard() {
+        if(contains<Component...>()) {
+            using accumulator_type = int[];
+            const auto vtype = view_family::type<Component...>();
+            auto *set = handlers[vtype].get();
+            // if a set exists, pools have already been created for it
+            accumulator_type accumulator = { (pool<Component>().remove(set), 0)... };
+            handlers[vtype].reset();
+            (void)accumulator;
+        }
+    }
+
+    /**
+     * @brief Checks if a persistent view has already been prepared.
+     * @tparam Component Types of components of the persistent view.
+     * @return True if the view has already been prepared, false otherwise.
+     */
+    template<typename... Component>
+    bool contains() const noexcept {
+        static_assert(sizeof...(Component) > 1, "!");
+        const auto vtype = view_family::type<Component...>();
+        return vtype < handlers.size() && handlers[vtype];
+    }
+
+    /**
      * @brief Returns a persistent view for the given components.
      *
      * This kind of views are created on the fly and share with the registry its
@@ -772,12 +955,14 @@ public:
      */
     template<typename... Component>
     PersistentView<Entity, Component...> persistent() {
-        return PersistentView<Entity, Component...>{handler<Component...>(), ensure<Component>()...};
+        // after the calls to handler, pools have already been created
+        return PersistentView<Entity, Component...>{handler<Component...>(), pool<Component>()...};
     }
 
 private:
     std::vector<std::unique_ptr<SparseSet<Entity>>> handlers;
     std::vector<std::unique_ptr<SparseSet<Entity>>> pools;
+    std::vector<std::unique_ptr<Attachee>> tags;
     std::vector<entity_type> available;
     std::vector<entity_type> entities;
 };

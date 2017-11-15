@@ -292,7 +292,7 @@ public:
      * Unless an immediate operation is requested, the abort is scheduled for
      * the next tick. Processes won't be executed anymore in any case.<br/>
      * Once a process is fully aborted and thus finished, it's discarded along
-     * with its child if any.
+     * with its child, if any.
      *
      * @param immediately Requests an immediate operation.
      */

@@ -571,7 +571,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = typename pool_type::size_type;
     /*! Type of the component iterated by the view. */
-    using raw_type = typename pool_type::type;
+    using raw_type = typename pool_type::object_type;
 
     /**
      * @brief Constructs a view out of a pool of components.

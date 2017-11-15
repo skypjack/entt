@@ -264,7 +264,7 @@ public:
         // has size 1), switching the two lines below doesn't work as expected
         reverse[back] = pos | in_use;
         reverse[entt] = pos;
-        // swap-and-pop the last element with the selected ont
+        // swapping isn't required here, we are getting rid of the last element
         direct[pos] = direct.back();
         direct.pop_back();
     }
@@ -412,7 +412,7 @@ class SparseSet<Entity, Type>: public SparseSet<Entity> {
 
 public:
     /*! @brief Type of the objects associated to the entities. */
-    using type = Type;
+    using object_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename underlying_type::entity_type;
     /*! @brief Entity dependent position type. */
@@ -450,7 +450,7 @@ public:
      *
      * @return A pointer to the array of objects.
      */
-    const type * raw() const noexcept {
+    const object_type * raw() const noexcept {
         return instances.data();
     }
 
@@ -469,7 +469,7 @@ public:
      *
      * @return A pointer to the array of objects.
      */
-    type * raw() noexcept {
+    object_type * raw() noexcept {
         return instances.data();
     }
 
@@ -485,7 +485,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The object associated to the entity.
      */
-    const type & get(entity_type entity) const noexcept {
+    const object_type & get(entity_type entity) const noexcept {
         return instances[underlying_type::get(entity)];
     }
 
@@ -501,8 +501,8 @@ public:
      * @param entity A valid entity identifier.
      * @return The object associated to the entity.
      */
-    type & get(entity_type entity) noexcept {
-        return const_cast<type &>(const_cast<const SparseSet *>(this)->get(entity));
+    object_type & get(entity_type entity) noexcept {
+        return const_cast<object_type &>(const_cast<const SparseSet *>(this)->get(entity));
     }
 
     /**
@@ -520,8 +520,9 @@ public:
      * @return The object associated to the entity.
      */
     template<typename... Args>
-    type & construct(entity_type entity, Args&&... args) {
+    object_type & construct(entity_type entity, Args&&... args) {
         underlying_type::construct(entity);
+        // emplace_back doesn't work well with PODs because of its placement new
         instances.push_back({ std::forward<Args>(args)... });
         return instances.back();
     }
@@ -538,7 +539,7 @@ public:
      * @param entity A valid entity identifier.
      */
     void destroy(entity_type entity) override {
-        // swaps isn't required here, we are getting rid of the last element
+        // swapping isn't required here, we are getting rid of the last element
         instances[underlying_type::get(entity)] = std::move(instances.back());
         instances.pop_back();
         underlying_type::destroy(entity);
@@ -574,7 +575,7 @@ public:
     }
 
 private:
-    std::vector<type> instances;
+    std::vector<object_type> instances;
 };
 
 

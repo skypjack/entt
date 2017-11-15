@@ -461,7 +461,7 @@ their components are destroyed:
   registry.reset();
   ```
 
-Finally, references to components can be retrieved by just doing this:
+Finally, references to components can be retrieved simply by doing this:
 
 ```cpp
 // either a non-const reference ...
@@ -475,6 +475,68 @@ const auto &position = cregistry.get<Position>(entity);
 
 The `get` member function template gives direct access to the component of an
 entity stored in the underlying data structures of the registry.
+
+### Single instance components
+
+In those cases where all what is needed is a single instance component, tags are
+the right tool to achieve the purpose.<br/>
+Tags undergo the same requirements of components. They can be either plain old
+data structures or more complex and moveable data structures with a proper
+constructor.<br/>
+Actually, the same type can be used both as a tag and as a component and the
+registry will not complain about it. It is up to the users to properly manage
+their own types.
+
+Attaching tags to entities and removing them is trivial:
+
+```cpp
+auto player = registry.create();
+auto camera = registry.create();
+
+// attaches a default-initialized tag to an entity
+registry.attach<PlayingCharacter>(player);
+
+// attaches a tag to an entity and initializes it
+registry.attach<Camera>(camera, player);
+
+// removes tags from their owners
+registry.remove<PlayingCharacter>();
+registry.remove<Camera>();
+```
+
+If in doubt about whether or not a tag has already an owner, the `has` member
+function template may be useful:
+
+```cpp
+bool b = registry.has<PlayingCharacter>();
+```
+
+References to tags can be retrieved simply by doing this:
+
+```cpp
+// either a non-const reference ...
+entt::DefaultRegistry registry;
+auto &player = registry.get<PlayingCharacter>();
+
+// ... or a const one
+const auto &cregistry = registry;
+const auto &camera = cregistry.get<Camera>();
+```
+
+The `get` member function template gives direct access to the tag as stored in
+the underlying data structures of the registry.
+
+As shown above, in almost all the cases the entity identifier isn't required,
+since a single instance component can have only one associated entity and
+therefore it doesn't make much sense to mention it explicitly.<br/>
+To find out who the owner is, just do the following:
+
+```cpp
+auto player = registry.attachee<PlayingCharacter>();
+```
+
+Note that iterating tags isn't possible for obvious reasons. Tags give direct
+access to single entities and nothing more.
 
 ### Sorting: is it possible?
 
