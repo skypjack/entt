@@ -55,14 +55,10 @@ if(NOT MSVC)
 endif()
 
 #
-# CMake configuration
+# Include EnTT
 #
 
-set(PROJECT_CMAKE_IN ${entt_SOURCE_DIR}/cmake/in)
-set(PROJECT_DEPS_DIR ${entt_SOURCE_DIR}/deps)
-set(PROJECT_SRC_DIR ${entt_SOURCE_DIR}/src)
-
-set(PROJECT_RUNTIME_OUTPUT_DIRECTORY bin)
+include_directories(${entt_SOURCE_DIR}/src)
 
 #
 # Tests
@@ -75,8 +71,8 @@ if(BUILD_TESTING)
     find_package(Threads REQUIRED)
 
     # gtest, gtest_main, gmock and gmock_main targets are available from now on
-    set(GOOGLETEST_DEPS_DIR ${PROJECT_DEPS_DIR}/googletest)
-    configure_file(${PROJECT_CMAKE_IN}/googletest.in ${GOOGLETEST_DEPS_DIR}/CMakeLists.txt)
+    set(GOOGLETEST_DEPS_DIR ${entt_SOURCE_DIR}/deps/googletest)
+    configure_file(${entt_SOURCE_DIR}/cmake/in/googletest.in ${GOOGLETEST_DEPS_DIR}/CMakeLists.txt)
     execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY ${GOOGLETEST_DEPS_DIR})
     execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${GOOGLETEST_DEPS_DIR})
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)

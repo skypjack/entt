@@ -2,8 +2,6 @@
 # Tests configuration
 #
 
-include_directories(${PROJECT_SRC_DIR})
-
 add_library(odr OBJECT odr.cpp)
 
 # Test benchmark
