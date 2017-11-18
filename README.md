@@ -168,8 +168,8 @@ Dell XPS 13 out of the mid 2014):
 | Standard view, 10M entities, ten components<br/>Half of the entities have all the components | **0.0090s** | 0.0620s |
 | Standard view, 10M entities, ten components<br/>One of the entities has all the components | 0.0070s | **1.3e-06s** |
 | Persistent view, 10M entities, ten components | 0.0105s | **6.2e-07s** |
-| Sort 150k entities, one component | - | **0.0084s** |
-| Sort 150k entities, enforce permutation | - | **0.0067s** |
+| Sort 150k entities, one component<br/>Arrays are in reverse order | - | **0.0043s** |
+| Sort 150k entities, enforce permutation<br/>Arrays are in reverse order | - | **0.0006s** |
 
 `EnTT` includes its own tests and benchmarks. See
 [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp)

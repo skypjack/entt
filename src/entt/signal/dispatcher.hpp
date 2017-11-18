@@ -40,7 +40,7 @@ class Dispatcher final {
 
     template<typename Event>
     struct SignalWrapper final: BaseSignalWrapper {
-        void publish(std::size_t current) final override {
+        void publish(std::size_t current) override {
             for(auto &&event: events[current]) {
                 signal.publish(event);
             }

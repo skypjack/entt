@@ -160,7 +160,7 @@ TEST(SparseSetWithType, SortOrdered) {
     ASSERT_EQ(set.get(9), 1);
 
     set.sort([&set](auto lhs, auto rhs) {
-        return set.get(lhs) < set.get(rhs);
+        return lhs < rhs;
     });
 
     ASSERT_EQ(*(set.raw() + 0u), 12);
@@ -196,7 +196,7 @@ TEST(SparseSetWithType, SortReverse) {
     ASSERT_EQ(set.get(9), 12);
 
     set.sort([&set](auto lhs, auto rhs) {
-        return set.get(lhs) < set.get(rhs);
+        return lhs < rhs;
     });
 
     ASSERT_EQ(*(set.raw() + 0u), 12);
@@ -232,7 +232,7 @@ TEST(SparseSetWithType, SortUnordered) {
     ASSERT_EQ(set.get(9), 12);
 
     set.sort([&set](auto lhs, auto rhs) {
-        return set.get(lhs) < set.get(rhs);
+        return lhs < rhs;
     });
 
     ASSERT_EQ(*(set.raw() + 0u), 12);

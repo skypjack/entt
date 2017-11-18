@@ -694,11 +694,7 @@ public:
      */
     template<typename Component, typename Compare>
     void sort(Compare compare) {
-        auto &cpool = ensure<Component>();
-
-        cpool.sort([&cpool, compare = std::move(compare)](auto lhs, auto rhs) {
-            return compare(static_cast<const Component &>(cpool.get(lhs)), static_cast<const Component &>(cpool.get(rhs)));
-        });
+        ensure<Component>().sort(std::move(compare));
     }
 
     /**

@@ -3,6 +3,7 @@
 
 
 #include <algorithm>
+#include <numeric>
 #include <utility>
 #include <vector>
 #include <cstddef>
@@ -281,50 +282,18 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * sparse set doesn't contain the given entities.
      *
-     * @param lhs A valid entity identifier.
-     * @param rhs A valid entity identifier.
+     * @param lhs A valid position within the sparse set.
+     * @param rhs A valid position within the sparse set.
      */
-    virtual void swap(entity_type lhs, entity_type rhs) {
-        assert(has(lhs));
-        assert(has(rhs));
-        auto &le = reverse[lhs & traits_type::entity_mask];
-        auto &re = reverse[rhs & traits_type::entity_mask];
-        // we must get rid of the in-use bit for it's not part of the position
-        std::swap(direct[le & ~in_use], direct[re & ~in_use]);
-        std::swap(le, re);
+    void swap(pos_type lhs, pos_type rhs) noexcept {
+        assert(lhs < direct.size());
+        assert(rhs < direct.size());
+        std::swap(reverse[direct[lhs]], reverse[direct[rhs]]);
+        std::swap(direct[lhs], direct[rhs]);
     }
 
     /**
-     * @brief Sort entities according to the given comparison function.
-     *
-     * Sort the elements so that iterating the sparse set with a couple of
-     * iterators returns them in the expected order. See `begin` and `end` for
-     * more details.
-     *
-     * @note
-     * Attempting to iterate elements using the raw pointer returned by `data`
-     * gives no guarantees on the order, even though `sort` has been invoked.
-     *
-     * @tparam Compare Type of the comparison function.
-     * @param compare A comparison function whose signature shall be equivalent
-     * to: `bool(Entity, Entity)`.
-     */
-    template<typename Compare>
-    void sort(Compare compare) {
-        std::vector<pos_type> copy{direct.cbegin(), direct.cend()};
-        std::sort(copy.begin(), copy.end(), [compare = std::move(compare)](auto... args) {
-            return !compare(args...);
-        });
-
-        for(pos_type i = 0; i < copy.size(); ++i) {
-            if(direct[i] != copy[i]) {
-                swap(direct[i], copy[i]);
-            }
-        }
-    }
-
-    /**
-     * @brief Sort entities according to their order in a sparse set.
+     * @brief Sort entities according to their order in another sparse set.
      *
      * Entities that are part of both the sparse sets are ordered internally
      * according to the order they have in `other`. All the other entities goes
@@ -342,32 +311,23 @@ public:
      *
      * @param other The sparse sets that imposes the order of the entities.
      */
-    void respect(const SparseSet<Entity> &other) {
-        struct Bool { bool value{false}; };
-        std::vector<Bool> check(std::max(other.reverse.size(), reverse.size()));
+    virtual void respect(const SparseSet<Entity> &other) noexcept {
+        auto from = other.begin();
+        auto to = other.end();
 
-        for(auto entity: other.direct) {
-            check[entity & traits_type::entity_mask].value = true;
-        }
+        pos_type pos = direct.size() - 1;
 
-        sort([this, &other, &check](auto lhs, auto rhs) {
-            const auto le = lhs & traits_type::entity_mask;
-            const auto re = rhs & traits_type::entity_mask;
+        while(pos > 0 && from != to) {
+            if(has(*from)) {
+                if(*from != direct[pos]) {
+                    swap(pos, get(*from));
+                }
 
-            const bool bLhs = check[le].value;
-            const bool bRhs = check[re].value;
-            bool compare = false;
-
-            if(bLhs && bRhs) {
-                compare = other.get(rhs) < other.get(lhs);
-            } else if(!bLhs && !bRhs) {
-                compare = re < le;
-            } else {
-                compare = bLhs;
+                --pos;
             }
 
-            return compare;
-        });
+            ++from;
+        }
     }
 
     /**
@@ -546,24 +506,87 @@ public:
     }
 
     /**
-     * @brief Swaps two entities and their objects.
+     * @brief Sort components according to the given comparison function.
+     *
+     * Sort the elements so that iterating the sparse set with a couple of
+     * iterators returns them in the expected order. See `begin` and `end` for
+     * more details.
      *
      * @note
-     * This function doesn't swap objects between entities. It exchanges entity
-     * and object positions in the sparse set. It's used mainly for sorting.
+     * Attempting to iterate elements using the raw pointer returned by `data`
+     * gives no guarantees on the order, even though `sort` has been invoked.
      *
-     * @warning
-     * Attempting to use entities that don't belong to the sparse set results
-     * in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * sparse set doesn't contain the given entities.
-     *
-     * @param lhs A valid entity identifier.
-     * @param rhs A valid entity identifier.
+     * @tparam Compare Type of the comparison function.
+     * @param compare A comparison function whose signature shall be equivalent
+     * to: `bool(const Type &, const Type &)`.
      */
-    void swap(entity_type lhs, entity_type rhs) override {
-        std::swap(instances[underlying_type::get(lhs)], instances[underlying_type::get(rhs)]);
-        underlying_type::swap(lhs, rhs);
+    template<typename Compare>
+    void sort(Compare compare) {
+        std::vector<pos_type> copy(instances.size());
+        std::iota(copy.begin(), copy.end(), 0);
+
+        std::sort(copy.begin(), copy.end(), [this, compare = std::move(compare)](auto lhs, auto rhs) {
+            return compare(const_cast<const object_type &>(instances[rhs]), const_cast<const object_type &>(instances[lhs]));
+        });
+
+        for(pos_type i = 0; i < copy.size(); ++i) {
+            auto curr = i;
+            auto next = copy[curr];
+
+            while(curr != next) {
+                auto lhs = copy[curr];
+                auto rhs = copy[next];
+                std::swap(instances[lhs], instances[rhs]);
+                underlying_type::swap(lhs, rhs);
+                copy[curr] = curr;
+                curr = next;
+                next = copy[curr];
+            }
+        }
+    }
+
+    /**
+     * @brief Sort components according to the order of the entities in another
+     * sparse set.
+     *
+     * Entities that are part of both the sparse sets are ordered internally
+     * according to the order they have in `other`. All the other entities goes
+     * to the end of the list and there are no guarantess on their order.
+     * Components are sorted according to the entities to which they
+     * belong.<br/>
+     * In other terms, this function can be used to impose the same order on two
+     * sets by using one of them as a master and the other one as a slave.
+     *
+     * Iterating the sparse set with a couple of iterators returns elements in
+     * the expected order after a call to `sort`. See `begin` and `end` for more
+     * details.
+     *
+     * @note
+     * Attempting to iterate elements using the raw pointer returned by `data`
+     * gives no guarantees on the order, even though `sort` has been invoked.
+     *
+     * @param other The sparse sets that imposes the order of the entities.
+     */
+    void respect(const SparseSet<Entity> &other) noexcept override {
+        auto from = other.begin();
+        auto to = other.end();
+
+        pos_type pos = underlying_type::size() - 1;
+        const auto *direct = underlying_type::data();
+
+        while(pos > 0 && from != to) {
+            if(underlying_type::has(*from)) {
+                if(*from != *(direct + pos)) {
+                    auto candidate = underlying_type::get(*from);
+                    std::swap(instances[pos], instances[candidate]);
+                    underlying_type::swap(pos, candidate);
+                }
+
+                --pos;
+            }
+
+            ++from;
+        }
     }
 
     /**
