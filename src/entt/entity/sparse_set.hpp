@@ -8,6 +8,7 @@
 #include <vector>
 #include <cstddef>
 #include <cassert>
+#include <type_traits>
 #include "traits.hpp"
 
 
@@ -88,7 +89,7 @@ class SparseSet<Entity> {
         std::size_t pos;
     };
 
-    static constexpr Entity in_use = 1 << traits_type::entity_shift;
+    static constexpr Entity in_use = (Entity{1} << traits_type::entity_shift);
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -196,7 +197,9 @@ public:
      * @return True if the sparse set contains the entity, false otherwise.
      */
     bool has(entity_type entity) const noexcept {
-        const auto entt = entity & traits_type::entity_mask;
+        using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
+        // explicit promotion to avoid warnings with std::uint16_t
+        const auto entt = promotion_type{entity} & traits_type::entity_mask;
         // the in-use control bit permits to avoid accessing the direct vector
         return (entt < reverse.size()) && (reverse[entt] & in_use);
     }
@@ -233,7 +236,9 @@ public:
      */
     void construct(entity_type entity) {
         assert(!has(entity));
-        const auto entt = entity & traits_type::entity_mask;
+        using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
+        // explicit promotion to avoid warnings with std::uint16_t
+        const auto entt = promotion_type{entity} & traits_type::entity_mask;
 
         if(!(entt < reverse.size())) {
             reverse.resize(entt+1, pos_type{});

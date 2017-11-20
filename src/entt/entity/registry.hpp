@@ -226,7 +226,9 @@ public:
      * @return True if the identifier is still valid, false otherwise.
      */
     bool valid(entity_type entity) const noexcept {
-        const auto entt = entity & traits_type::entity_mask;
+        using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
+        // explicit promotion to avoid warnings with std::uint16_t
+        const entity_type entt = promotion_type{entity} & traits_type::entity_mask;
         return (entt < entities.size() && entities[entt] == entity);
     }
 
@@ -257,7 +259,9 @@ public:
      * @return Actual version for the given entity identifier.
      */
     version_type current(entity_type entity) const noexcept {
-        const auto entt = entity & traits_type::entity_mask;
+        using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
+        // explicit promotion to avoid warnings with std::uint16_t
+        const auto entt = promotion_type{entity} & traits_type::entity_mask;
         assert(entt < entities.size());
         return version_type((entities[entt] >> traits_type::entity_shift) & traits_type::version_mask);
     }
@@ -367,10 +371,10 @@ public:
      */
     void destroy(entity_type entity) {
         assert(valid(entity));
-
         const auto entt = entity & traits_type::entity_mask;
-        const auto version = 1 + ((entity >> traits_type::entity_shift) & traits_type::version_mask);
+        const auto version = version_type{1} + ((entity >> traits_type::entity_shift) & traits_type::version_mask);
         const auto next = entt | (version << traits_type::entity_shift);
+
         entities[entt] = next;
         available.push_back(next);
 
@@ -792,7 +796,7 @@ public:
         available.clear();
 
         for(auto &&entity: entities) {
-            const auto version = 1 + ((entity >> traits_type::entity_shift) & traits_type::version_mask);
+            const auto version = version_type{1} + ((entity >> traits_type::entity_shift) & traits_type::version_mask);
             entity = (entity & traits_type::entity_mask) | (version << traits_type::entity_shift);
             available.push_back(entity);
         }
