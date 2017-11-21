@@ -277,8 +277,8 @@ entt::DefaultRegistry<Comp0, Comp1, ..., CompN> registry;
 `EnTT` is entirely designed around the principle that users have to pay only for
 what they want.
 
-When it comes to use an entity-componet system, the tradeoff is usually between
-performance and memory usage. The faster it is, the more memory it uses.
+When it comes to using an entity-componet system, the tradeoff is usually
+between performance and memory usage. The faster it is, the more memory it uses.
 However, slightly worse performance along non-critical paths are the right price
 to pay to reduce memory usage and I've always wondered why this kind of tools do
 not leave me the choice.<br/>
