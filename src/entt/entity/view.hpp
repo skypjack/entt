@@ -203,9 +203,9 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func &&func) {
+    void each(Func func) {
         for(auto entity: *this) {
-            std::forward<Func>(func)(entity, get<Component>(entity)...);
+            func(entity, get<Component>(entity)...);
         }
     }
 
@@ -225,9 +225,9 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func &&func) const {
+    void each(Func func) const {
         for(auto entity: *this) {
-            std::forward<Func>(func)(entity, get<Component>(entity)...);
+            func(entity, get<Component>(entity)...);
         }
     }
 
@@ -472,9 +472,9 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func &&func) {
+    void each(Func func) {
         for(auto entity: *this) {
-            std::forward<Func>(func)(entity, get<First>(entity), get<Other>(entity)...);
+            func(entity, get<First>(entity), get<Other>(entity)...);
         }
     }
 
@@ -494,9 +494,9 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func &&func) const {
+    void each(Func func) const {
         for(auto entity: *this) {
-            std::forward<Func>(func)(entity, get<First>(entity), get<Other>(entity)...);
+            func(entity, get<First>(entity), get<Other>(entity)...);
         }
     }
 
@@ -727,9 +727,9 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func &&func) {
+    void each(Func func) {
         for(auto entity: *this) {
-            std::forward<Func>(func)(entity, get(entity));
+            func(entity, get(entity));
         }
     }
 
@@ -748,9 +748,9 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func &&func) const {
+    void each(Func func) const {
         for(auto entity: *this) {
-            std::forward<Func>(func)(entity, get(entity));
+            func(entity, get(entity));
         }
     }
 

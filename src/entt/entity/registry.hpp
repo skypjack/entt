@@ -106,7 +106,6 @@ class Registry {
 
     template<typename Component>
     Pool<Component> & pool() noexcept {
-        assert(managed<Component>());
         return const_cast<Pool<Component> &>(const_cast<const Registry *>(this)->pool<Component>());
     }
 
@@ -417,7 +416,6 @@ public:
         }
 
         tags[ttype].reset(new Attaching<Tag>{entity, { std::forward<Args>(args)... }});
-        tags[ttype]->entity = entity;
 
         return static_cast<Attaching<Tag> *>(tags[ttype].get())->tag;
     }
