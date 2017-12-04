@@ -91,3 +91,17 @@ find_package(Doxygen 1.8)
 if(DOXYGEN_FOUND)
     add_subdirectory(docs)
 endif()
+
+#
+# AOB
+#
+
+add_custom_target(
+    entt_aob
+    SOURCES
+        appveyor.yml
+        AUTHORS
+        LICENSE
+        README.md
+        .travis.yml
+)
