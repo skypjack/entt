@@ -160,6 +160,10 @@ public:
     using version_type = typename traits_type::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+    /*! @brief Unsigned integer type. */
+    using tag_type = typename tag_family::family_type;
+    /*! @brief Unsigned integer type. */
+    using component_type = typename component_family::family_type;
 
     /*! @brief Default constructor. */
     Registry() = default;
@@ -173,6 +177,40 @@ public:
     Registry & operator=(const Registry &) = delete;
     /*! @brief Default move assignment operator. @return This registry. */
     Registry & operator=(Registry &&) = default;
+
+    /**
+     * @brief Returns the numeric identifier of a type of tag at runtime.
+     *
+     * The given tag doesn't need to be necessarily in use. However, the
+     * registry could decide to prepare internal data structures for it for
+     * later uses.<br/>
+     * Do not use this functionality to provide numeric identifiers to types at
+     * runtime.
+     *
+     * @tparam Tag Type of tag to query.
+     * @return Runtime numeric identifier of the given type of tag.
+     */
+    template<typename Tag>
+    tag_type tag() const noexcept {
+        return tag_family::type<Tag>();
+    }
+
+    /**
+     * @brief Returns the numeric identifier of a type of component at runtime.
+     *
+     * The given component doesn't need to be necessarily in use. However, the
+     * registry could decide to prepare internal data structures for it for
+     * later uses.<br/>
+     * Do not use this functionality to provide numeric identifiers to types at
+     * runtime.
+     *
+     * @tparam Component Type of component to query.
+     * @return Runtime numeric identifier of the given type of component.
+     */
+    template<typename Component>
+    component_type component() const noexcept {
+        return component_family::type<Component>();
+    }
 
     /**
      * @brief Returns the number of existing components of the given type.

@@ -121,6 +121,16 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_TRUE(registry.empty<int>());
 }
 
+TEST(DefaultRegistry, Types) {
+    entt::DefaultRegistry registry;
+
+    ASSERT_EQ(registry.tag<int>(), registry.tag<int>());
+    ASSERT_EQ(registry.component<int>(), registry.component<int>());
+
+    ASSERT_NE(registry.tag<int>(), registry.tag<double>());
+    ASSERT_NE(registry.component<int>(), registry.component<double>());
+}
+
 TEST(DefaultRegistry, CreateDestroyEntities) {
     entt::DefaultRegistry registry;
 
