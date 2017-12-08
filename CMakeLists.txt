@@ -70,6 +70,9 @@ if(BUILD_TESTING)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
 
+    option(BUILD_BENCHMARK "Build benchmark." OFF)
+    option(BUILD_MOD "Build mod example." OFF)
+
     # gtest, gtest_main, gmock and gmock_main targets are available from now on
     set(GOOGLETEST_DEPS_DIR ${entt_SOURCE_DIR}/deps/googletest)
     configure_file(${entt_SOURCE_DIR}/cmake/in/googletest.in ${GOOGLETEST_DEPS_DIR}/CMakeLists.txt)

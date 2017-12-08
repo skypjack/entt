@@ -6,14 +6,27 @@ add_library(odr OBJECT odr.cpp)
 
 # Test benchmark
 
-if(CMAKE_BUILD_TYPE MATCHES Release)
+if(BUILD_BENCHMARK)
     add_executable(
         benchmark
         $<TARGET_OBJECTS:odr>
-        entt/entity/benchmark.cpp
+        benchmark/benchmark.cpp
     )
     target_link_libraries(benchmark PRIVATE gtest_main Threads::Threads)
     add_test(NAME benchmark COMMAND benchmark)
+endif()
+
+# Test mod
+
+if(BUILD_MOD)
+    add_executable(
+        mod
+        $<TARGET_OBJECTS:odr>
+        mod/duktape.c
+        mod/mod.cpp
+    )
+    target_link_libraries(mod PRIVATE gtest_main Threads::Threads m)
+    add_test(NAME mod COMMAND mod)
 endif()
 
 # Test core

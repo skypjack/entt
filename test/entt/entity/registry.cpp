@@ -17,6 +17,9 @@ TEST(DefaultRegistry, Functionalities) {
     auto e1 = registry.create();
     auto e2 = registry.create<int, char>();
 
+    ASSERT_TRUE(registry.has<>(e1));
+    ASSERT_TRUE(registry.has<>(e2));
+
     ASSERT_EQ(registry.capacity(), entt::DefaultRegistry::size_type{2});
     ASSERT_EQ(registry.size<int>(), entt::DefaultRegistry::size_type{1});
     ASSERT_EQ(registry.size<char>(), entt::DefaultRegistry::size_type{1});
@@ -120,6 +123,51 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_EQ(registry.size<char>(), entt::DefaultRegistry::size_type{0});
     ASSERT_TRUE(registry.empty<int>());
 }
+
+TEST(DefaultRegistry, Each) {
+    entt::DefaultRegistry registry;
+    entt::DefaultRegistry::size_type tot;
+    entt::DefaultRegistry::size_type match;
+
+    registry.create<int>();
+    registry.create<int>();
+
+    tot = 0u;
+    match = 0u;
+
+    registry.each([&](auto entity) {
+        if(registry.has<int>(entity)) { ++match; }
+        registry.create();
+        ++tot;
+    });
+
+    ASSERT_EQ(tot, 2u);
+    ASSERT_EQ(match, 2u);
+
+    tot = 0u;
+    match = 0u;
+
+    registry.each([&](auto entity) {
+        if(registry.has<int>(entity)) { ++match; }
+        registry.destroy(entity);
+        ++tot;
+    });
+
+    ASSERT_EQ(tot, 4u);
+    ASSERT_EQ(match, 2u);
+
+    tot = 0u;
+    match = 0u;
+
+    registry.each([&](auto entity) {
+        if(registry.has<int>(entity)) { ++match; }
+        ++tot;
+    });
+
+    ASSERT_EQ(tot, 4u);
+    ASSERT_EQ(match, 0u);
+}
+
 
 TEST(DefaultRegistry, Types) {
     entt::DefaultRegistry registry;

@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <cstdint>
 #include <entt/process/process.hpp>
 
 struct FakeProcess: entt::Process<FakeProcess, int> {
@@ -131,13 +132,13 @@ TEST(Process, AbortImmediately) {
 
 TEST(ProcessAdaptor, Resolved) {
     bool updated = false;
-    auto lambda = [&updated](uint64_t, auto resolve, auto) {
+    auto lambda = [&updated](std::uint64_t, auto resolve, auto) {
         ASSERT_FALSE(updated);
         updated = true;
         resolve();
     };
 
-    auto process = entt::ProcessAdaptor<decltype(lambda), uint64_t>{lambda};
+    auto process = entt::ProcessAdaptor<decltype(lambda), std::uint64_t>{lambda};
 
     process.tick(0);
 
@@ -147,13 +148,13 @@ TEST(ProcessAdaptor, Resolved) {
 
 TEST(ProcessAdaptor, Rejected) {
     bool updated = false;
-    auto lambda = [&updated](uint64_t, auto, auto rejected) {
+    auto lambda = [&updated](std::uint64_t, auto, auto rejected) {
         ASSERT_FALSE(updated);
         updated = true;
         rejected();
     };
 
-    auto process = entt::ProcessAdaptor<decltype(lambda), uint64_t>{lambda};
+    auto process = entt::ProcessAdaptor<decltype(lambda), std::uint64_t>{lambda};
 
     process.tick(0);
 

@@ -6,6 +6,7 @@
 #include <memory>
 #include <utility>
 #include <cstddef>
+#include <cstdint>
 #include <cassert>
 #include <algorithm>
 #include "../core/family.hpp"
@@ -596,11 +597,10 @@ public:
      */
     template<typename... Component>
     bool has(entity_type entity) const noexcept {
-        static_assert(sizeof...(Component) > 0, "!");
         assert(valid(entity));
         using accumulator_type = bool[];
         bool all = true;
-        accumulator_type accumulator = { (all = all && managed<Component>() && pool<Component>().has(entity))... };
+        accumulator_type accumulator = { all, (all = all && managed<Component>() && pool<Component>().has(entity))... };
         (void)accumulator;
         return all;
     }
@@ -851,6 +851,31 @@ public:
 
         for(auto &&tag: tags) {
             tag.reset();
+        }
+    }
+
+    /**
+     * @brief Iterate entities and applies them the given function object.
+     *
+     * The function object is invoked for each entity, no matter if it's in use
+     * or not.<br/>
+     * The signature of the function should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * void(entity_type);
+     * @endcode
+     *
+     * Consider using a view if the goal is to iterate entities that have a
+     * determinate set of components. A view is usually faster than combining
+     * this function with a bunch of custom tests.
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void each(Func func) const {
+        for(auto pos = entities.size(); pos > size_type{0}; --pos) {
+            func(entities[pos-1]);
         }
     }
 
