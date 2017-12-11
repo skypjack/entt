@@ -1,9 +1,7 @@
 #include <gtest/gtest.h>
 #include <cassert>
 #include <map>
-#include <memory>
-#include <cstdint>
-#include <cstddef>
+#include <string>
 #include <entt/entity/registry.hpp>
 #include "duktape.h"
 
