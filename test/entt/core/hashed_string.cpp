@@ -21,8 +21,8 @@ TEST(HashedString, Functionalities) {
 
     const char *bar = "bar";
 
-    auto fooHs = entt::HashedString("foo");
-    auto barHs = entt::HashedString(bar);
+    auto fooHs = entt::HashedString{"foo"};
+    auto barHs = entt::HashedString{bar};
 
     ASSERT_NE(static_cast<hash_type>(fooHs), static_cast<hash_type>(barHs));
     ASSERT_EQ(static_cast<const char *>(fooHs), "foo");

@@ -24,8 +24,8 @@ class HashedString final {
         const char *str;
     };
 
-    static constexpr std::uint64_t offset = 14695981039346656037u;
-    static constexpr std::uint64_t prime = 1099511628211u;
+    static constexpr std::uint64_t offset = 14695981039346656037ull;
+    static constexpr std::uint64_t prime = 1099511628211ull;
 
     // Fowler–Noll–Vo hash function v. 1a - the good
     static constexpr std::uint64_t helper(std::uint64_t partial, const char *str) noexcept {

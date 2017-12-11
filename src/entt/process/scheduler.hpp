@@ -110,7 +110,7 @@ class Scheduler final {
     }
 
     auto then(ProcessHandler *handler) {
-        auto lambda = [this](ProcessHandler *handler, auto next, auto... args) {
+        auto lambda = [](ProcessHandler *handler, auto next, auto... args) {
             using Proc = typename decltype(next)::type;
 
             if(handler) {
@@ -280,7 +280,7 @@ public:
         }
 
         if(clean) {
-            handlers.erase(std::remove_if(handlers.begin(), handlers.end(), [delta](auto &handler) {
+            handlers.erase(std::remove_if(handlers.begin(), handlers.end(), [](auto &handler) {
                 return !handler.instance;
             }), handlers.end());
         }

@@ -159,7 +159,7 @@ TEST(SparseSetWithType, SortOrdered) {
     ASSERT_EQ(set.get(3), 3);
     ASSERT_EQ(set.get(9), 1);
 
-    set.sort([&set](auto lhs, auto rhs) {
+    set.sort([](auto lhs, auto rhs) {
         return lhs < rhs;
     });
 
@@ -195,7 +195,7 @@ TEST(SparseSetWithType, SortReverse) {
     ASSERT_EQ(set.get(3), 9);
     ASSERT_EQ(set.get(9), 12);
 
-    set.sort([&set](auto lhs, auto rhs) {
+    set.sort([](auto lhs, auto rhs) {
         return lhs < rhs;
     });
 
@@ -231,7 +231,7 @@ TEST(SparseSetWithType, SortUnordered) {
     ASSERT_EQ(set.get(3), 9);
     ASSERT_EQ(set.get(9), 12);
 
-    set.sort([&set](auto lhs, auto rhs) {
+    set.sort([](auto lhs, auto rhs) {
         return lhs < rhs;
     });
 
