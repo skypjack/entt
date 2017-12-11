@@ -325,7 +325,7 @@ TEST(Mod, Duktape) {
     exportDuktapeRegistry(ctx, dreg);
 
     const char *s0 = ""
-            "Types[\"PC\"] = Registry.identifier();"
+            "Types[\"PLAYING_CHARACTER\"] = Registry.identifier();"
             "Types[\"VELOCITY\"] = Registry.identifier();"
             "";
 
@@ -369,7 +369,7 @@ TEST(Mod, Duktape) {
             "Registry.entities(Types.POSITION).forEach(function(entity) {"
                 "if(!Registry.has(entity, Types.RENDERABLE)) {"
                     "Registry.set(entity, Types.VELOCITY, { \"dx\": -100., \"dy\": -100. });"
-                    "Registry.set(entity, Types.PC, {});"
+                    "Registry.set(entity, Types.PLAYING_CHARACTER, {});"
                 "}"
             "});"
             "";
@@ -387,7 +387,7 @@ TEST(Mod, Duktape) {
     });
 
     const char *s3 = ""
-            "Registry.entities(Types.POSITION, Types.RENDERABLE, Types.VELOCITY, Types.PC).forEach(function(entity) {"
+            "Registry.entities(Types.POSITION, Types.RENDERABLE, Types.VELOCITY, Types.PLAYING_CHARACTER).forEach(function(entity) {"
                 "var velocity = Registry.get(entity, Types.VELOCITY);"
                 "Registry.set(entity, Types.POSITION, velocity.dx, velocity.dy)"
             "});"
@@ -407,9 +407,9 @@ TEST(Mod, Duktape) {
     });
 
     const char *s4 = ""
-            "Registry.entities(Types.VELOCITY, Types.PC).forEach(function(entity) {"
+            "Registry.entities(Types.VELOCITY, Types.PLAYING_CHARACTER).forEach(function(entity) {"
                 "Registry.unset(entity, Types.VELOCITY);"
-                "Registry.unset(entity, Types.PC);"
+                "Registry.unset(entity, Types.PLAYING_CHARACTER);"
             "});"
             "Registry.entities(Types.POSITION).forEach(function(entity) {"
                 "Registry.unset(entity, Types.POSITION);"

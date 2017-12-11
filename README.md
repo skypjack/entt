@@ -136,7 +136,7 @@ int main() {
 I started working on `EnTT` because of the wrong reason: my goal was to design
 an entity-component system that beated another well known open source solution
 in terms of performance.<br/>
-I did it, of course, but it wasn't much satisfying. Actually it wasn't
+In the end, I did it, but it wasn't much satisfying. Actually it wasn't
 satisfying at all. The fastest and nothing more, fairly little indeed. When I
 realized it, I tried hard to keep intact the great performance of `EnTT` and to
 add all the features I wanted to see in *my* entity-component system at the same
@@ -149,7 +149,7 @@ of course.
 ## Performance
 
 As it stands right now, `EnTT` is just fast enough for my requirements if
-compared to my first choice (that was already amazingly fast indeed).<br/>
+compared to my first choice (it was already amazingly fast actually).<br/>
 Here is a comparision between the two (both of them compiled with GCC 7.2.0 on a
 Dell XPS 13 out of the mid 2014):
 
@@ -178,8 +178,8 @@ On Github users can find also a
 [benchmark suite](https://github.com/abeimler/ecs_benchmark) that compares a
 bunch of different projects, one of which is `EnTT`.
 
-Of course, probably I'll try to get out of `EnTT` more features and better
-performance in the future, mainly for fun.<br/>
+Probably I'll try to get out of `EnTT` more features and better performance in
+the future, mainly for fun.<br/>
 If you want to contribute and/or have any suggestion, feel free to make a PR or
 open an issue to discuss your idea.
 
@@ -260,7 +260,7 @@ Benchmarks are compiled only in release mode currently.
 
 `EnTT` is a _bitset-free_ entity-component system that doesn't require users to
 specify the component set at compile-time.<br/>
-That's the reason for which users can instantiate the core class simply as:
+This is why users can instantiate the core class simply like:
 
 ```cpp
 entt::DefaultRegistry registry;
@@ -397,8 +397,8 @@ velocity.dy = 0.;
 
 In case users want to assign a component to an entity, but it's unknown whether
 the entity already has it or not, `accomodate` does the work in a single call
-(there is a performance penalty to pay for that mainly due to the fact that it
-must check if `entity` already has the given component or not):
+(there is a performance penalty to pay for this mainly due to the fact that it
+has to check if `entity` already has the given component or not):
 
 ```cpp
 registry.accomodate<Position>(entity, 0., 0.);
@@ -438,7 +438,7 @@ registry.remove<Position>(entity);
 
 Otherwise consider to use the `reset` member function. It behaves similarly to
 `remove` but with a strictly defined behaviour (and a performance penalty is the
-price to pay for that). In particular it removes the component if and only if it
+price to pay for this). In particular it removes the component if and only if it
 exists, otherwise it returns safely to the caller:
 
 ```cpp
@@ -537,6 +537,56 @@ auto player = registry.attachee<PlayingCharacter>();
 
 Note that iterating tags isn't possible for obvious reasons. Tags give direct
 access to single entities and nothing more.
+
+### Runtime components
+
+Defining components at runtime is useful to support plugins and mods in general.
+However, it seems impossible with a tool designed around a bunch of templates.
+Indeed it's not that difficult.<br/>
+Of course, some features cannot be easily exported into a runtime
+environment. As an example, sorting a group of components defined at runtime
+isn't for free if compared to most of the other operations. However, the basic
+functionalities of an entity-component system such as `EnTT` fit the problem
+perfectly and can also be used to manage runtime components if required.<br/>
+All that is necessary to do it is to know the identifiers of the components. An
+identifier is nothing more than a number or similar that can be used at runtime
+to work with the type system.
+
+In `EnTT`, identifiers are easily accessible:
+
+```cpp
+entt::DefaultRegistry registry;
+
+// standard component identifier
+auto ctype = registry.component<Position>();
+
+// single instance component identifier
+auto ttype = registry.tag<PlayingCharacter>();
+```
+
+Once the identifiers are made available, almost everything becomes pretty
+simple.
+
+#### A journey through a plugin
+
+`EnTT` comes with an example (actually a test) that shows how to integrate
+compile-time and runtime components in a stack based JavaScript environment. It
+uses [`duktape`](https://github.com/svaarala/duktape) under the hood, mainly
+because I wanted to learn how it works at the time I was writing the code.
+
+It's not production-ready and overall performance can be highly improved.
+However, I sacrificed optimizations in favor of a more readable piece of
+code. I hope I succeeded.<br/>
+Note also that this isn't neither the only nor (probably) the best way to do it.
+In fact, the right way depends on the scripting language and the problem one is
+facing in general.
+
+The basic idea is that of creating a compile-time component aimed to map all the
+runtime components assigned to an entity.<br/>
+Identifiers come in use to address the right function from a map when invoked
+from the runtime environment and to filter entities when iterating.<br/>
+With a bit of gymnastic, one can narrow views and improve the performance to
+some extent but it was not the goal of the example.
 
 ### Sorting: is it possible?
 
@@ -799,7 +849,7 @@ mind that it works only with the components of the view itself.
 * As shown in the examples above, the preferred way to get references to the
   components while iterating a view is by using the view itself. It's a faster
   alternative to the `get` member function template that is part of the API of
-  the Registry. That's because the registry must ensure that a pool for the
+  the Registry. This is because the registry must ensure that a pool for the
   given component exists before to use it; on the other side, views force the
   construction of the pools for all their components and access them directly,
   thus avoiding all the checks.
