@@ -227,7 +227,7 @@ public:
      */
     template<typename Func>
     void each(Func func) {
-        const_cast<const PersistentView *>(this)->each([&func](auto entity, const Component &... component) {
+        const_cast<const PersistentView *>(this)->each([&func](entity_type entity, const Component &... component) {
             func(entity, const_cast<Component &>(component)...);
         });
     }
@@ -497,7 +497,7 @@ public:
      */
     template<typename Func>
     void each(Func func) {
-        const_cast<const View *>(this)->each([&func](auto entity, const Component &... component) {
+        const_cast<const View *>(this)->each([&func](entity_type entity, const Component &... component) {
             func(entity, const_cast<Component &>(component)...);
         });
     }
@@ -752,7 +752,7 @@ public:
      */
     template<typename Func>
     void each(Func func) {
-        const_cast<const View *>(this)->each([&func](auto entity, const Component &component) {
+        const_cast<const View *>(this)->each([&func](entity_type entity, const Component &component) {
             func(entity, const_cast<Component &>(component));
         });
     }

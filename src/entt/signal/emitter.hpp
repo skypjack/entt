@@ -124,7 +124,7 @@ class Emitter {
 
     template<typename Event>
     Handler<Event> & handler() noexcept {
-        std::size_t family = type<Event>();
+        const std::size_t family = type<Event>();
 
         if(!(family < handlers.size())) {
             handlers.resize(family+1);
@@ -314,7 +314,7 @@ public:
      */
     template<typename Event>
     bool empty() const noexcept {
-        std::size_t family = type<Event>();
+        const std::size_t family = type<Event>();
 
         return (!(family < handlers.size()) ||
                 !handlers[family] ||
