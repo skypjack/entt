@@ -723,10 +723,8 @@ public:
      * comparison function should be equivalent to the following:
      *
      * @code{.cpp}
-     * bool(auto e1, auto e2)
+     * bool(const Component &, const Component &)
      * @endcode
-     *
-     * Where `e1` and `e2` are valid entity identifiers.
      *
      * @tparam Component Type of components to sort.
      * @tparam Compare Type of comparison function object.

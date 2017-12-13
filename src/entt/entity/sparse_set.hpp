@@ -517,13 +517,20 @@ public:
      * iterators returns them in the expected order. See `begin` and `end` for
      * more details.
      *
+     * The comparison function object must return `true` if the first element
+     * is _less_ than the second one, `false` otherwise. The signature of the
+     * comparison function should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * bool(const Type &, const Type &)
+     * @endcode
+     *
      * @note
      * Attempting to iterate elements using the raw pointer returned by `data`
      * gives no guarantees on the order, even though `sort` has been invoked.
      *
-     * @tparam Compare Type of the comparison function.
-     * @param compare A comparison function whose signature shall be equivalent
-     * to: `bool(const Type &, const Type &)`.
+     * @tparam Compare Type of comparison function object.
+     * @param compare A valid comparison function object.
      */
     template<typename Compare>
     void sort(Compare compare) {
