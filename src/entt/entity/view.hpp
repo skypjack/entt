@@ -368,8 +368,7 @@ public:
 
     /**
      * @brief Constructs a view out of a bunch of pools of components.
-     * @param pool A reference to a pool of components.
-     * @param other Other references to pools of components.
+     * @param pools References to pools of components.
      */
     View(pool_type<Component>&... pools) noexcept
         : pools{pools...}, view{nullptr}
