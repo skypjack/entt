@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['unmanagedbus',['UnmanagedBus',['../namespaceentt.html#ab295bb17c301c400a626b465eaec81f1',1,'entt']]],
-  ['unmanageddispatcher',['UnmanagedDispatcher',['../namespaceentt.html#a827f0ad530965c885a8383fcdfb41f36',1,'entt']]]
+  ['tag_5ftype',['tag_type',['../classentt_1_1Registry.html#a357cfdc1b3c5abc7a36e8eddbd6ce5c7',1,'entt::Registry']]]
 ];
