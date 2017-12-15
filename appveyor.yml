@@ -14,7 +14,7 @@ configuration:
 
 before_build:
   - cd %BUILD_DIR%
-  - cmake .. -G"Visual Studio 15 2017"
+  - cmake .. -DCMAKE_CXX_FLAGS=/D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING -G"Visual Studio 15 2017"
 
 build:
   parallel: true
