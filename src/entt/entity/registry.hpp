@@ -154,6 +154,13 @@ class Registry {
         return *handlers[vtype];
     }
 
+    Entity candidate() const noexcept {
+        auto entity = entity_type(entities.size());
+        assert(entity < traits_type::entity_mask);
+        assert((entity >> traits_type::entity_shift) == entity_type{});
+        return entity;
+    }
+
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = typename traits_type::entity_type;
@@ -229,6 +236,36 @@ public:
      */
     size_type size() const noexcept {
         return entities.size() - available.size();
+    }
+
+    /**
+     * @brief Increases the capacity of the pool for a given component.
+     *
+     * If the new capacity is greater than the current capacity, new storage is
+     * allocated, otherwise the method does nothing.
+     *
+     * @tparam Component Type of component for which to reserve storage.
+     * @tparam cap Desired capacity.
+     */
+    template<typename Component>
+    void reserve(size_type cap) {
+        ensure<Component>().reserve(cap);
+    }
+
+    /**
+     * @brief Increases the capacity of a registry in terms of entities.
+     *
+     * If the new capacity is greater than the current capacity, new storage is
+     * allocated, otherwise the method does nothing.
+     *
+     * @tparam cap Desired capacity.
+     */
+    void reserve(size_type cap) {
+        const auto last = entity_type(cap);
+
+        for(auto entity = candidate(); entity < last; ++entity) {
+            available.push_back(entity);
+        }
     }
 
     /**
@@ -380,9 +417,7 @@ public:
         entity_type entity;
 
         if(available.empty()) {
-            entity = entity_type(entities.size());
-            assert(entity < traits_type::entity_mask);
-            assert((entity >> traits_type::entity_shift) == entity_type{});
+            entity = candidate();
             entities.push_back(entity);
         } else {
             entity = available.back();

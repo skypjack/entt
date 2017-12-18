@@ -118,6 +118,19 @@ public:
     SparseSet & operator=(SparseSet &&) = default;
 
     /**
+     * @brief Increases the capacity of a sparse set.
+     *
+     * If the new capacity is greater than the current capacity, new storage is
+     * allocated, otherwise the method does nothing.
+     *
+     * @tparam cap Desired capacity.
+     */
+    void reserve(size_type cap) {
+        reverse.reserve(cap);
+        direct.reserve(cap);
+    }
+
+    /**
      * @brief Returns the number of elements in a sparse set.
      *
      * The number of elements is also the size of the internal packed array.
@@ -401,6 +414,19 @@ public:
     SparseSet & operator=(SparseSet &&) = default;
 
     /**
+     * @brief Increases the capacity of a sparse set.
+     *
+     * If the new capacity is greater than the current capacity, new storage is
+     * allocated, otherwise the method does nothing.
+     *
+     * @tparam cap Desired capacity.
+     */
+    void reserve(size_type cap) {
+        underlying_type::reserve(cap);
+        instances.reserve(cap);
+    }
+
+    /**
      * @brief Direct access to the array of objects.
      *
      * The returned pointer is such that range `[raw(), raw() + size()]` is
@@ -541,8 +567,8 @@ public:
             return compare(const_cast<const object_type &>(instances[rhs]), const_cast<const object_type &>(instances[lhs]));
         });
 
-        for(pos_type i = 0; i < copy.size(); ++i) {
-            auto curr = i;
+        for(pos_type pos = 0, last = copy.size(); pos < last; ++pos) {
+            auto curr = pos;
             auto next = copy[curr];
 
             while(curr != next) {

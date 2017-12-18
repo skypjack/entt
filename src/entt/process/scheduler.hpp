@@ -273,8 +273,8 @@ public:
     void update(Delta delta) {
         bool clean = false;
 
-        for(auto i = handlers.size(); i > 0; --i) {
-            auto &handler = handlers[i-1];
+        for(auto pos = handlers.size(); pos > 0; --pos) {
+            auto &handler = handlers[pos-1];
             const bool dead = handler.update(handler, delta);
             clean = clean || dead;
         }
