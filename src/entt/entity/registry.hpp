@@ -261,11 +261,8 @@ public:
      * @tparam cap Desired capacity.
      */
     void reserve(size_type cap) {
-        const auto last = entity_type(cap);
-
-        for(auto entity = candidate(); entity < last; ++entity) {
-            available.push_back(entity);
-        }
+        entities.reserve(cap);
+        available.reserve(cap);
     }
 
     /**

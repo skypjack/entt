@@ -6,6 +6,7 @@ TEST(DefaultRegistry, Functionalities) {
     entt::DefaultRegistry registry;
 
     ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{0});
+    ASSERT_NO_THROW(registry.reserve(42));
     ASSERT_TRUE(registry.empty());
 
     ASSERT_EQ(registry.capacity(), entt::DefaultRegistry::size_type{0});

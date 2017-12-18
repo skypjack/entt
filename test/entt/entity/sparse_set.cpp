@@ -4,6 +4,7 @@
 TEST(SparseSetNoType, Functionalities) {
     entt::SparseSet<unsigned int> set;
 
+    ASSERT_NO_THROW(set.reserve(42));
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
     ASSERT_EQ(set.begin(), set.end());
@@ -79,6 +80,7 @@ TEST(SparseSetWithType, AggregatesMustWork) {
 TEST(SparseSetWithType, Functionalities) {
     entt::SparseSet<unsigned int, int> set;
 
+    ASSERT_NO_THROW(set.reserve(42));
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
     ASSERT_EQ(set.begin(), set.end());
