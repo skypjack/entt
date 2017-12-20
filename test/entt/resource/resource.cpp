@@ -77,4 +77,7 @@ TEST(ResourceCache, Functionalities) {
 
     ASSERT_EQ(cache.size(), entt::ResourceCache<Resource>::size_type{});
     ASSERT_TRUE(cache.empty());
+
+    ASSERT_TRUE(cache.temp<Loader>(42));
+    ASSERT_TRUE(cache.empty());
 }

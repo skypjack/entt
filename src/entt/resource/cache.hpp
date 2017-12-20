@@ -74,7 +74,7 @@ public:
     }
 
     /**
-     * @brief Loads the resource that corresponds to the given identifier.
+     * @brief Loads the resource that corresponds to a given identifier.
      *
      * In case an identifier isn't already present in the cache, it loads its
      * resource and stores it aside for future uses. Arguments are forwarded
@@ -130,7 +130,24 @@ public:
     }
 
     /**
-     * @brief Creates a handle for the given resource identifier.
+     * @brief Creates a temporary handle for a resource.
+     *
+     * Arguments are forwarded directly to the loader in order to construct
+     * properly the requested resource. The handle isn't stored aside and the
+     * cache isn't in charge of the lifetime of the resource itself.
+     *
+     * @tparam Loader Type of loader to use to load the resource.
+     * @tparam Args Types of arguments to use to load the resource.
+     * @param args Arguments to use to load the resource.
+     * @return A handle for the given resource.
+     */
+    template<typename Loader, typename... Args>
+    ResourceHandle<Resource> temp(Args&&... args) const {
+        return { Loader{}.get(std::forward<Args>(args)...) };
+    }
+
+    /**
+     * @brief Creates a handle for a given resource identifier.
      *
      * A resource handle can be in a either valid or invalid state. In other
      * terms, a resource handle is properly initialized with a resource if the
@@ -148,7 +165,7 @@ public:
     }
 
     /**
-     * @brief Checks if a cache contains the given identifier.
+     * @brief Checks if a cache contains a given identifier.
      * @param id Unique resource identifier.
      * @return True if the cache contains the resource, false otherwise.
      */
@@ -157,7 +174,7 @@ public:
     }
 
     /**
-     * @brief Discards the resource that corresponds to the given identifier.
+     * @brief Discards the resource that corresponds to a given identifier.
      *
      * Handles are not invalidated and the memory used by the resource isn't
      * freed as long as at least a handle keeps the resource itself alive.
