@@ -10,7 +10,7 @@ struct FakeProcess: entt::Process<FakeProcess, int> {
     void pause() noexcept { process_type::pause(); }
     void unpause() noexcept { process_type::unpause(); }
 
-    void init() { initInvoked = true; }
+    void init(void *) { initInvoked = true; }
     void succeeded() { succeededInvoked = true; }
     void failed() { failedInvoked = true; }
     void aborted() { abortedInvoked = true; }

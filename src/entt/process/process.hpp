@@ -75,9 +75,9 @@ class Process {
     using tag = std::integral_constant<State, state>;
 
     template<typename Target = Derived>
-    auto tick(int, tag<State::UNINITIALIZED>)
-    -> decltype(std::declval<Target>().init()) {
-        static_cast<Target *>(this)->init();
+    auto tick(int, tag<State::UNINITIALIZED>, void *data)
+    -> decltype(std::declval<Target>().init(data)) {
+        static_cast<Target *>(this)->init(data);
     }
 
     template<typename Target = Derived>
@@ -223,7 +223,7 @@ public:
     void tick(Delta delta, void *data = nullptr) {
         switch (current) {
         case State::UNINITIALIZED:
-            tick(0, tag<State::UNINITIALIZED>{});
+            tick(0, tag<State::UNINITIALIZED>{}, data);
             current = State::RUNNING;
             // no break on purpose, tasks are executed immediately
         case State::RUNNING:
