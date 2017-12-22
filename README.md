@@ -840,6 +840,28 @@ whether all the components have to be accessed or not.
 function template of a registry during iterations, if possible. However, keep in
 mind that it works only with the components of the view itself.
 
+### Give me everything
+
+Views are narrow windows on the entire list of entities. They work by filtering
+entities according to their components.<br/>
+In some cases there may be the need to iterate all the entities regardless of
+their components. The registry offers a specific member function to do that:
+
+```cpp
+registry.each([](auto entity) {
+    // ...
+});
+```
+
+Each entity ever created is returned, no matter if it's in use or not.<br/>
+Usually, filtering entities that aren't currently in use is more expensive than
+iterating them all and filtering out those in which one isn't interested.
+
+As a rule of thumb, consider using a view if the goal is to iterate entities
+that have a determinate set of components. A view is usually faster than
+combining this function with a bunch of custom tests.<br/>
+In all the other cases, this is the way to go.
+
 ## Side notes
 
 * Entity identifiers are numbers and nothing more. They are not classes and they
