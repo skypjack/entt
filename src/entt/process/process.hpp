@@ -10,28 +10,6 @@
 namespace entt {
 
 
-namespace details {
-
-
-struct BaseProcess {
-    enum class State: unsigned int {
-        UNINITIALIZED = 0,
-        RUNNING,
-        PAUSED,
-        SUCCEEDED,
-        FAILED,
-        ABORTED,
-        FINISHED
-    };
-
-    template<State state>
-    using tag = std::integral_constant<State, state>;
-};
-
-
-}
-
-
 /**
  * @brief Base class for processes.
  *
@@ -82,7 +60,20 @@ struct BaseProcess {
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Derived, typename Delta>
-class Process: private details::BaseProcess {
+class Process {
+    enum class State: unsigned int {
+        UNINITIALIZED = 0,
+        RUNNING,
+        PAUSED,
+        SUCCEEDED,
+        FAILED,
+        ABORTED,
+        FINISHED
+    };
+
+    template<State state>
+    using tag = std::integral_constant<State, state>;
+
     template<typename Target = Derived>
     auto tick(int, tag<State::UNINITIALIZED>)
     -> decltype(std::declval<Target>().init()) {
