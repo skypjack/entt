@@ -154,13 +154,6 @@ class Registry {
         return *handlers[vtype];
     }
 
-    Entity candidate() const noexcept {
-        auto entity = entity_type(entities.size());
-        assert(entity < traits_type::entity_mask);
-        assert((entity >> traits_type::entity_shift) == entity_type{});
-        return entity;
-    }
-
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = typename traits_type::entity_type;
@@ -414,7 +407,9 @@ public:
         entity_type entity;
 
         if(available.empty()) {
-            entity = candidate();
+            entity = entity_type(entities.size());
+            assert(entity < traits_type::entity_mask);
+            assert((entity >> traits_type::entity_shift) == entity_type{});
             entities.push_back(entity);
         } else {
             entity = available.back();
