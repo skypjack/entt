@@ -11,10 +11,17 @@ struct FakeProcess: entt::Process<FakeProcess, int> {
     void unpause() noexcept { process_type::unpause(); }
 
     void init() { initInvoked = true; }
-    void update(delta_type) { updateInvoked = true; }
     void succeeded() { succeededInvoked = true; }
     void failed() { failedInvoked = true; }
     void aborted() { abortedInvoked = true; }
+
+    void update(delta_type, void *data) {
+        if(data) {
+            (*static_cast<int *>(data))++;
+        }
+
+        updateInvoked = true;
+    }
 
     bool initInvoked{false};
     bool updateInvoked{false};
@@ -95,6 +102,26 @@ TEST(Process, Fail) {
     ASSERT_FALSE(process.abortedInvoked);
 }
 
+TEST(Process, Data) {
+    FakeProcess process;
+    int value = 0;
+
+    process.tick(0, &value);
+    process.succeed();
+    process.tick(0, &value);
+
+    ASSERT_FALSE(process.alive());
+    ASSERT_TRUE(process.dead());
+    ASSERT_FALSE(process.paused());
+
+    ASSERT_EQ(value, 1);
+    ASSERT_TRUE(process.initInvoked);
+    ASSERT_TRUE(process.updateInvoked);
+    ASSERT_TRUE(process.succeededInvoked);
+    ASSERT_FALSE(process.failedInvoked);
+    ASSERT_FALSE(process.abortedInvoked);
+}
+
 TEST(Process, AbortNextTick) {
     FakeProcess process;
 
@@ -132,7 +159,7 @@ TEST(Process, AbortImmediately) {
 
 TEST(ProcessAdaptor, Resolved) {
     bool updated = false;
-    auto lambda = [&updated](std::uint64_t, auto resolve, auto) {
+    auto lambda = [&updated](std::uint64_t, void *, auto resolve, auto) {
         ASSERT_FALSE(updated);
         updated = true;
         resolve();
@@ -148,7 +175,7 @@ TEST(ProcessAdaptor, Resolved) {
 
 TEST(ProcessAdaptor, Rejected) {
     bool updated = false;
-    auto lambda = [&updated](std::uint64_t, auto, auto rejected) {
+    auto lambda = [&updated](std::uint64_t, void *, auto, auto rejected) {
         ASSERT_FALSE(updated);
         updated = true;
         rejected();
@@ -160,4 +187,20 @@ TEST(ProcessAdaptor, Rejected) {
 
     ASSERT_TRUE(process.rejected());
     ASSERT_TRUE(updated);
+}
+
+TEST(ProcessAdaptor, Data) {
+    int value = 0;
+
+    auto lambda = [](std::uint64_t, void *data, auto resolve, auto) {
+        *static_cast<int *>(data) = 42;
+        resolve();
+    };
+
+    auto process = entt::ProcessAdaptor<decltype(lambda), std::uint64_t>{lambda};
+
+    process.tick(0, &value);
+
+    ASSERT_TRUE(process.dead());
+    ASSERT_EQ(value, 42);
 }

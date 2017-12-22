@@ -8,7 +8,7 @@ struct FooProcess: entt::Process<FooProcess, int> {
         : onUpdate{onUpdate}, onAborted{onAborted}
     {}
 
-    void update(delta_type) { onUpdate(); }
+    void update(delta_type, void *) { onUpdate(); }
     void aborted() { onAborted(); }
 
     std::function<void()> onUpdate;
@@ -16,7 +16,7 @@ struct FooProcess: entt::Process<FooProcess, int> {
 };
 
 struct SucceededProcess: entt::Process<SucceededProcess, int> {
-    void update(delta_type) {
+    void update(delta_type, void *) {
         ASSERT_FALSE(updated);
         updated = true;
         ++invoked;
@@ -30,7 +30,7 @@ struct SucceededProcess: entt::Process<SucceededProcess, int> {
 unsigned int SucceededProcess::invoked = 0;
 
 struct FailedProcess: entt::Process<FailedProcess, int> {
-    void update(delta_type) {
+    void update(delta_type, void *) {
         ASSERT_FALSE(updated);
         updated = true;
         fail();
@@ -92,11 +92,11 @@ TEST(Scheduler, Functor) {
     bool firstFunctor = false;
     bool secondFunctor = false;
 
-    scheduler.attach([&firstFunctor](auto, auto resolve, auto){
+    scheduler.attach([&firstFunctor](auto, void *, auto resolve, auto){
         ASSERT_FALSE(firstFunctor);
         firstFunctor = true;
         resolve();
-    }).then([&secondFunctor](auto, auto, auto reject){
+    }).then([&secondFunctor](auto, void *, auto, auto reject){
         ASSERT_FALSE(secondFunctor);
         secondFunctor = true;
         reject();

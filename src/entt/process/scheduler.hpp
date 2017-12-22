@@ -47,7 +47,7 @@ class Scheduler final {
 
     struct ProcessHandler final {
         using instance_type = std::unique_ptr<void, void(*)(void *)>;
-        using update_type = bool(*)(ProcessHandler &, Delta);
+        using update_type = bool(*)(ProcessHandler &, Delta, void *);
         using abort_type = void(*)(ProcessHandler &, bool);
         using next_type = std::unique_ptr<ProcessHandler>;
 
@@ -81,16 +81,16 @@ class Scheduler final {
     };
 
     template<typename Proc>
-    static bool update(ProcessHandler &handler, Delta delta) {
+    static bool update(ProcessHandler &handler, Delta delta, void *data) {
         auto *process = static_cast<Proc *>(handler.instance.get());
-        process->tick(delta);
+        process->tick(delta, data);
 
         auto dead = process->dead();
 
         if(dead) {
             if(handler.next && !process->rejected()) {
                 handler = std::move(*handler.next);
-                dead = handler.update(handler, delta);
+                dead = handler.update(handler, delta, data);
             } else {
                 handler.instance.reset();
             }
@@ -269,13 +269,14 @@ public:
      * with its child.
      *
      * @param delta Elapsed time.
+     * @param data Optional data.
      */
-    void update(Delta delta) {
+    void update(Delta delta, void *data = nullptr) {
         bool clean = false;
 
         for(auto pos = handlers.size(); pos > 0; --pos) {
             auto &handler = handlers[pos-1];
-            const bool dead = handler.update(handler, delta);
+            const bool dead = handler.update(handler, delta, data);
             clean = clean || dead;
         }
 
