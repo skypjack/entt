@@ -10,7 +10,7 @@
 namespace entt {
 
 
-namespace {
+namespace details {
 
 
 struct BaseProcess {
@@ -82,7 +82,7 @@ struct BaseProcess {
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Derived, typename Delta>
-class Process: private BaseProcess {
+class Process: private details::BaseProcess {
     template<typename Target = Derived>
     auto tick(int, tag<State::UNINITIALIZED>)
     -> decltype(std::declval<Target>().init()) {
