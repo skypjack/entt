@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">2.4.0</span>
    </div>
   </td>
  </tr>
@@ -77,20 +77,6 @@ $(function() {
  <a href="classentt_1_1Process.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="process_8hpp_source.html">process.hpp</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for entt::Process&lt; Derived, Delta &gt;:</div>
-<div class="dyncontent">
-<div class="center"><img src="classentt_1_1Process__inherit__graph.png" border="0" usemap="#entt_1_1Process_3_01Derived_00_01Delta_01_4_inherit__map" alt="Inheritance graph"/></div>
-<map name="entt_1_1Process_3_01Derived_00_01Delta_01_4_inherit__map" id="entt_1_1Process_3_01Derived_00_01Delta_01_4_inherit__map">
-</map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
-<div class="dynheader">
-Collaboration diagram for entt::Process&lt; Derived, Delta &gt;:</div>
-<div class="dyncontent">
-<div class="center"><img src="classentt_1_1Process__coll__graph.png" border="0" usemap="#entt_1_1Process_3_01Derived_00_01Delta_01_4_coll__map" alt="Collaboration graph"/></div>
-<map name="entt_1_1Process_3_01Derived_00_01Delta_01_4_coll__map" id="entt_1_1Process_3_01Derived_00_01Delta_01_4_coll__map">
-</map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
@@ -120,9 +106,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2333d8cb6c488f8f3d50aed2c3997d28"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Process.html#a2333d8cb6c488f8f3d50aed2c3997d28">rejected</a> () const noexcept</td></tr>
 <tr class="memdesc:a2333d8cb6c488f8f3d50aed2c3997d28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if a process terminated with errors.  <a href="#a2333d8cb6c488f8f3d50aed2c3997d28">More...</a><br /></td></tr>
 <tr class="separator:a2333d8cb6c488f8f3d50aed2c3997d28"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad5ba5510fd647c7381de1bc02e8763c2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Process.html#ad5ba5510fd647c7381de1bc02e8763c2">tick</a> (Delta delta)</td></tr>
-<tr class="memdesc:ad5ba5510fd647c7381de1bc02e8763c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates a process and its internal state if required.  <a href="#ad5ba5510fd647c7381de1bc02e8763c2">More...</a><br /></td></tr>
-<tr class="separator:ad5ba5510fd647c7381de1bc02e8763c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d2bd2fb6112a8df87d873102c20f462"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Process.html#a6d2bd2fb6112a8df87d873102c20f462">tick</a> (Delta delta, void *data=nullptr)</td></tr>
+<tr class="memdesc:a6d2bd2fb6112a8df87d873102c20f462"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates a process and its internal state if required.  <a href="#a6d2bd2fb6112a8df87d873102c20f462">More...</a><br /></td></tr>
+<tr class="separator:a6d2bd2fb6112a8df87d873102c20f462"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -163,7 +149,7 @@ class entt::Process&lt; Derived, Delta &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00085">85</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00063">63</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a3678846862a819a23361bca2982251d5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3678846862a819a23361bca2982251d5">&#9670;&nbsp;</a></span>abort()</h2>
@@ -200,7 +186,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00185">185</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00176">176</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -232,7 +218,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Returns true if a process is either running or paused. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the process is still alive, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00199">199</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00190">190</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -264,7 +250,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Returns true if a process is already terminated. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the process is terminated, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00207">207</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00198">198</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -296,7 +282,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Terminates a process with errors if it's still alive. </p>
 <p>The function is idempotent and it does nothing if the process isn't alive. </p>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00138">138</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00129">129</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -328,7 +314,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Stops a process if it's in a running state. </p>
 <p>The function is idempotent and it does nothing if the process isn't running. </p>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00150">150</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00141">141</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -360,7 +346,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Returns true if a process is currently paused. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the process is paused, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00215">215</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00206">206</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -392,7 +378,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Returns true if a process terminated with errors. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the process terminated with errors, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00223">223</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00214">214</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -424,12 +410,12 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Terminates a process with success if it's still alive. </p>
 <p>The function is idempotent and it does nothing if the process isn't alive. </p>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00126">126</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00117">117</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ad5ba5510fd647c7381de1bc02e8763c2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad5ba5510fd647c7381de1bc02e8763c2">&#9670;&nbsp;</a></span>tick()</h2>
+<a id="a6d2bd2fb6112a8df87d873102c20f462"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d2bd2fb6112a8df87d873102c20f462">&#9670;&nbsp;</a></span>tick()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -443,8 +429,18 @@ template&lt;typename Derived, typename Delta&gt; </div>
           <td class="memname">void <a class="el" href="classentt_1_1Process.html">entt::Process</a>&lt; Derived, Delta &gt;::tick </td>
           <td>(</td>
           <td class="paramtype">Delta&#160;</td>
-          <td class="paramname"><em>delta</em></td><td>)</td>
+          <td class="paramname"><em>delta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>data</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -458,11 +454,12 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">delta</td><td>Elapsed time. </td></tr>
+    <tr><td class="paramname">data</td><td>Optional data. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00231">231</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00223">223</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -494,7 +491,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Restarts a process if it's paused. </p>
 <p>The function is idempotent and it does nothing if the process isn't paused. </p>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00162">162</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00153">153</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>

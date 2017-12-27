@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">2.4.0</span>
    </div>
   </td>
  </tr>
@@ -122,9 +122,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5915b9783b278a6006d4857feefc0e3b"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Scheduler.html#a5915b9783b278a6006d4857feefc0e3b">attach</a> (Func &amp;&amp;func)</td></tr>
 <tr class="memdesc:a5915b9783b278a6006d4857feefc0e3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Schedules a process for the next tick.  <a href="#a5915b9783b278a6006d4857feefc0e3b">More...</a><br /></td></tr>
 <tr class="separator:a5915b9783b278a6006d4857feefc0e3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54dc94fe6946726cc8e8d973b8968c89"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Scheduler.html#a54dc94fe6946726cc8e8d973b8968c89">update</a> (Delta delta)</td></tr>
-<tr class="memdesc:a54dc94fe6946726cc8e8d973b8968c89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates all scheduled processes.  <a href="#a54dc94fe6946726cc8e8d973b8968c89">More...</a><br /></td></tr>
-<tr class="separator:a54dc94fe6946726cc8e8d973b8968c89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a107dd9c4e4498ed3b20271e8d57f83aa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Scheduler.html#a107dd9c4e4498ed3b20271e8d57f83aa">update</a> (Delta delta, void *data=nullptr)</td></tr>
+<tr class="memdesc:a107dd9c4e4498ed3b20271e8d57f83aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates all scheduled processes.  <a href="#a107dd9c4e4498ed3b20271e8d57f83aa">More...</a><br /></td></tr>
+<tr class="separator:a107dd9c4e4498ed3b20271e8d57f83aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb2a74ce41dbb7c9109531b751f73cc4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Scheduler.html#acb2a74ce41dbb7c9109531b751f73cc4">abort</a> (bool immediately=false)</td></tr>
 <tr class="memdesc:acb2a74ce41dbb7c9109531b751f73cc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aborts all scheduled processes.  <a href="#acb2a74ce41dbb7c9109531b751f73cc4">More...</a><br /></td></tr>
 <tr class="separator:acb2a74ce41dbb7c9109531b751f73cc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -185,7 +185,7 @@ template&lt;typename Delta &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="scheduler_8hpp_source.html#l00299">299</a> of file <a class="el" href="scheduler_8hpp_source.html">scheduler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scheduler_8hpp_source.html#l00300">300</a> of file <a class="el" href="scheduler_8hpp_source.html">scheduler.hpp</a>.</p>
 
 </div>
 </div>
@@ -456,8 +456,8 @@ template&lt;typename Delta &gt; </div>
 
 </div>
 </div>
-<a id="a54dc94fe6946726cc8e8d973b8968c89"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54dc94fe6946726cc8e8d973b8968c89">&#9670;&nbsp;</a></span>update()</h2>
+<a id="a107dd9c4e4498ed3b20271e8d57f83aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a107dd9c4e4498ed3b20271e8d57f83aa">&#9670;&nbsp;</a></span>update()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -471,8 +471,18 @@ template&lt;typename Delta &gt; </div>
           <td class="memname">void <a class="el" href="classentt_1_1Scheduler.html">entt::Scheduler</a>&lt; Delta &gt;::update </td>
           <td>(</td>
           <td class="paramtype">Delta&#160;</td>
-          <td class="paramname"><em>delta</em></td><td>)</td>
+          <td class="paramname"><em>delta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>data</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -488,11 +498,12 @@ template&lt;typename Delta &gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">delta</td><td>Elapsed time. </td></tr>
+    <tr><td class="paramname">data</td><td>Optional data. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="scheduler_8hpp_source.html#l00273">273</a> of file <a class="el" href="scheduler_8hpp_source.html">scheduler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="scheduler_8hpp_source.html#l00274">274</a> of file <a class="el" href="scheduler_8hpp_source.html">scheduler.hpp</a>.</p>
 
 </div>
 </div>

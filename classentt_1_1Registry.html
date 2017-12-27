@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">2.4.0</span>
    </div>
   </td>
  </tr>
@@ -136,6 +136,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a19f832202e918acd5e3708c1c7f33951"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1Registry.html#a741ffda6e06838c5593ba97adc7658e2">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a19f832202e918acd5e3708c1c7f33951">size</a> () const noexcept</td></tr>
 <tr class="memdesc:a19f832202e918acd5e3708c1c7f33951"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of entities still in use.  <a href="#a19f832202e918acd5e3708c1c7f33951">More...</a><br /></td></tr>
 <tr class="separator:a19f832202e918acd5e3708c1c7f33951"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1d6e3ca38070d338751ebec3122f925"><td class="memTemplParams" colspan="2">template&lt;typename Component &gt; </td></tr>
+<tr class="memitem:ae1d6e3ca38070d338751ebec3122f925"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#ae1d6e3ca38070d338751ebec3122f925">reserve</a> (<a class="el" href="classentt_1_1Registry.html#a741ffda6e06838c5593ba97adc7658e2">size_type</a> cap)</td></tr>
+<tr class="memdesc:ae1d6e3ca38070d338751ebec3122f925"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases the capacity of the pool for a given component.  <a href="#ae1d6e3ca38070d338751ebec3122f925">More...</a><br /></td></tr>
+<tr class="separator:ae1d6e3ca38070d338751ebec3122f925"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bc10ce4df6ad535dd39b5d8024184cf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a7bc10ce4df6ad535dd39b5d8024184cf">reserve</a> (<a class="el" href="classentt_1_1Registry.html#a741ffda6e06838c5593ba97adc7658e2">size_type</a> cap)</td></tr>
+<tr class="memdesc:a7bc10ce4df6ad535dd39b5d8024184cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases the capacity of a registry in terms of entities.  <a href="#a7bc10ce4df6ad535dd39b5d8024184cf">More...</a><br /></td></tr>
+<tr class="separator:a7bc10ce4df6ad535dd39b5d8024184cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af51d1553722e555eb1557fc0c68f104a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1Registry.html#a741ffda6e06838c5593ba97adc7658e2">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#af51d1553722e555eb1557fc0c68f104a">capacity</a> () const noexcept</td></tr>
 <tr class="memdesc:af51d1553722e555eb1557fc0c68f104a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of entities ever created.  <a href="#af51d1553722e555eb1557fc0c68f104a">More...</a><br /></td></tr>
 <tr class="separator:af51d1553722e555eb1557fc0c68f104a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -340,7 +347,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00701">701</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00728">728</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -402,7 +409,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00562">562</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00589">589</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -465,7 +472,7 @@ template&lt;typename Tag , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created tag. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00448">448</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00475">475</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -507,7 +514,7 @@ template&lt;typename Tag &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00536">536</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00563">563</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -539,7 +546,7 @@ template&lt;typename Entity&gt; </div>
 <p>Returns the number of entities ever created. </p>
 <dl class="section return"><dt>Returns</dt><dd>Number of entities ever created. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00238">238</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00265">265</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -621,7 +628,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the view has already been prepared, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00972">972</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00999">999</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -675,7 +682,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00327">327</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00354">354</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -722,7 +729,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00354">354</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00381">381</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -761,7 +768,7 @@ template&lt;typename Entity&gt; </div>
 <p>The returned entity has no components assigned.</p>
 <dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00379">379</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00406">406</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -803,7 +810,7 @@ template&lt;typename Entity&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Actual version for the given entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00299">299</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00326">326</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -844,7 +851,7 @@ template&lt;typename Entity&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00410">410</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00437">437</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -886,7 +893,7 @@ template&lt;typename... Component&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00954">954</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00981">981</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -935,7 +942,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00874">874</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00901">901</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -975,7 +982,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the pool for the given component is empty, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00249">249</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00276">276</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1007,7 +1014,7 @@ template&lt;typename Entity&gt; </div>
 <p>Checks if there exists at least an entity still in use. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if at least an entity is still in use, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00257">257</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00284">284</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1049,7 +1056,7 @@ template&lt;typename Tag &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the tag. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00501">501</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00528">528</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1091,7 +1098,7 @@ template&lt;typename Tag &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the tag. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00519">519</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00546">546</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1140,7 +1147,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the instance of the component owned by the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00623">623</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00650">650</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1189,7 +1196,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the instance of the component owned by the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00643">643</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00670">670</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1229,7 +1236,7 @@ template&lt;typename Tag &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the tag already has an owner, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00479">479</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00506">506</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1278,7 +1285,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the entity has all the components, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00599">599</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00626">626</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1396,7 +1403,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly created persistent view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01016">1016</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01043">1043</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1438,7 +1445,7 @@ template&lt;typename... Component&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00934">934</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00961">961</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1477,7 +1484,7 @@ template&lt;typename Tag &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00467">467</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00494">494</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1525,7 +1532,7 @@ template&lt;typename Component &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00581">581</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00608">608</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1587,7 +1594,93 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00668">668</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00695">695</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ae1d6e3ca38070d338751ebec3122f925"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1d6e3ca38070d338751ebec3122f925">&#9670;&nbsp;</a></span>reserve() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity&gt; </div>
+<div class="memtemplate">
+template&lt;typename Component &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classentt_1_1Registry.html">entt::Registry</a>&lt; Entity &gt;::reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1Registry.html#a741ffda6e06838c5593ba97adc7658e2">size_type</a>&#160;</td>
+          <td class="paramname"><em>cap</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Increases the capacity of the pool for a given component. </p>
+<p>If the new capacity is greater than the current capacity, new storage is allocated, otherwise the method does nothing.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Component</td><td>Type of component for which to reserve storage. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cap</td><td>Desired capacity. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00244">244</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a7bc10ce4df6ad535dd39b5d8024184cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7bc10ce4df6ad535dd39b5d8024184cf">&#9670;&nbsp;</a></span>reserve() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classentt_1_1Registry.html">entt::Registry</a>&lt; Entity &gt;::reserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1Registry.html#a741ffda6e06838c5593ba97adc7658e2">size_type</a>&#160;</td>
+          <td class="paramname"><em>cap</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Increases the capacity of a registry in terms of entities. </p>
+<p>If the new capacity is greater than the current capacity, new storage is allocated, otherwise the method does nothing.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cap</td><td>Desired capacity. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00256">256</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1636,7 +1729,7 @@ template&lt;typename Component &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00788">788</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00815">815</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1676,7 +1769,7 @@ template&lt;typename Component &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00809">809</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00836">836</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1708,7 +1801,7 @@ template&lt;typename Entity&gt; </div>
 <p>Resets a whole registry. </p>
 <p>Destroys all the entities. After a call to <code>reset</code>, all the entities previously created are recycled with a new version number. In case entity identifers are stored around, the <code>current</code> member function can be used to know if they are still valid. </p>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00829">829</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00856">856</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1830,7 +1923,7 @@ template&lt;typename Component , typename Compare &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00734">734</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00761">761</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1879,7 +1972,7 @@ template&lt;typename To , typename From &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00769">769</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00796">796</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1960,7 +2053,7 @@ template&lt;typename Entity&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the identifier is still valid, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00266">266</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00293">293</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1999,7 +2092,7 @@ template&lt;typename Entity&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Version stored along with the given entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00278">278</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00305">305</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2054,7 +2147,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly created standard view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00913">913</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00940">940</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>

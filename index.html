@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">2.4.0</span>
    </div>
   </td>
  </tr>
@@ -364,7 +364,15 @@ Persistent View</h3>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1Registry.html#a139a4d7b711fc1813c6c4520b9e79c09">persistent</a>&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">    <span class="keyword">auto</span> &amp;position = view.get&lt;Position&gt;(entity);</div><div class="line">    <span class="keyword">auto</span> &amp;velocity = view.get&lt;Velocity&gt;(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>Or rely on the <code>each</code> member function to iterate entities and get all their components at once:</p>
 <div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a139a4d7b711fc1813c6c4520b9e79c09">persistent</a>&lt;Position, Velocity&gt;().each([](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;position, <span class="keyword">auto</span> &amp;velocity) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>Performance are more or less the same. The best approach depends mainly on whether all the components have to be accessed or not.</p>
 <p><b>Note</b>: prefer the <code>get</code> member function of a view instead of the <code>get</code> member function template of a registry during iterations, if possible. However, keep in mind that it works only with the components of the view itself.</p>
-<h2><a class="anchor" id="autotoc_md28"></a>
+<h3><a class="anchor" id="autotoc_md28"></a>
+Give me everything</h3>
+<p>Views are narrow windows on the entire list of entities. They work by filtering entities according to their components.<br />
+ In some cases there may be the need to iterate all the entities regardless of their components. The registry offers a specific member function to do that:</p>
+<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a1d7547f6d8503265480d235fe48dfb1d">each</a>([](<span class="keyword">auto</span> entity) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>Each entity ever created is returned, no matter if it's in use or not.<br />
+ Usually, filtering entities that aren't currently in use is more expensive than iterating them all and filtering out those in which one isn't interested.</p>
+<p>As a rule of thumb, consider using a view if the goal is to iterate entities that have a determinate set of components. A view is usually faster than combining this function with a bunch of custom tests.<br />
+ In all the other cases, this is the way to go.</p>
+<h2><a class="anchor" id="autotoc_md29"></a>
 Side notes</h2>
 <ul>
 <li>Entity identifiers are numbers and nothing more. They are not classes and they have no member functions at all. As already mentioned, do no try to inspect or modify an entity descriptor in any way.</li>
@@ -384,15 +392,15 @@ Side notes</h2>
  That being said, as long as a thread iterates the entities that have the component <code>X</code> or assign and removes that component from a set of entities, another thread can safely do the same with components <code>Y</code> and <code>Z</code> and everything will work like a charm.<br />
  As an example, users can freely execute the rendering system and iterate the renderable entities while updating a physic component concurrently on a separate thread if needed.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md29"></a>
+<h1><a class="anchor" id="autotoc_md30"></a>
 Contributors</h1>
 <p>If you want to contribute, please send patches as pull requests against the branch <code>master</code>.<br />
  Check the <a href="https://github.com/skypjack/entt/blob/master/AUTHORS">contributors list</a> to see who has partecipated so far.</p>
-<h1><a class="anchor" id="autotoc_md30"></a>
+<h1><a class="anchor" id="autotoc_md31"></a>
 License</h1>
 <p>Code and documentation Copyright (c) 2017 Michele Caini.<br />
  Code released under <a href="https://github.com/skypjack/entt/blob/master/LICENSE">the MIT license</a>. Docs released under <a href="https://github.com/skypjack/entt/blob/master/docs/LICENSE">Creative Commons</a>.</p>
-<h1><a class="anchor" id="autotoc_md31"></a>
+<h1><a class="anchor" id="autotoc_md32"></a>
 Donation</h1>
 <p>Developing and maintaining <code>EnTT</code> takes some time and lots of coffee. I'd like to add more and more functionalities in future and turn it in a full-featured framework.<br />
  If you want to support this project, you can offer me an espresso. I'm from Italy, we're used to turning the best coffee ever in code. If you find that it's not enough, feel free to support me the way you prefer.<br />
