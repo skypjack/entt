@@ -306,7 +306,9 @@ public:
     void swap(pos_type lhs, pos_type rhs) noexcept {
         assert(lhs < direct.size());
         assert(rhs < direct.size());
-        std::swap(reverse[direct[lhs]], reverse[direct[rhs]]);
+        const auto src = direct[lhs] & traits_type::entity_mask;
+        const auto dst = direct[rhs] & traits_type::entity_mask;
+        std::swap(reverse[src], reverse[dst]);
         std::swap(direct[lhs], direct[rhs]);
     }
 
