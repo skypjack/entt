@@ -123,7 +123,7 @@ public:
      * If the new capacity is greater than the current capacity, new storage is
      * allocated, otherwise the method does nothing.
      *
-     * @tparam cap Desired capacity.
+     * @param cap Desired capacity.
      */
     void reserve(size_type cap) {
         reverse.reserve(cap);
@@ -421,7 +421,7 @@ public:
      * If the new capacity is greater than the current capacity, new storage is
      * allocated, otherwise the method does nothing.
      *
-     * @tparam cap Desired capacity.
+     * @param cap Desired capacity.
      */
     void reserve(size_type cap) {
         underlying_type::reserve(cap);

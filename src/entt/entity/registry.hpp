@@ -238,7 +238,7 @@ public:
      * allocated, otherwise the method does nothing.
      *
      * @tparam Component Type of component for which to reserve storage.
-     * @tparam cap Desired capacity.
+     * @param cap Desired capacity.
      */
     template<typename Component>
     void reserve(size_type cap) {
@@ -251,7 +251,7 @@ public:
      * If the new capacity is greater than the current capacity, new storage is
      * allocated, otherwise the method does nothing.
      *
-     * @tparam cap Desired capacity.
+     * @param cap Desired capacity.
      */
     void reserve(size_type cap) {
         entities.reserve(cap);
