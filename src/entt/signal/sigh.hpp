@@ -229,7 +229,8 @@ public:
      * @param args Arguments to use to invoke listeners.
      */
     void publish(Args... args) {
-        for(auto &&call: calls) {
+        for(auto pos = calls.size(); pos > size_type{0}; --pos) {
+            auto &call = calls[pos-1];
             call.second(call.first, args...);
         }
     }
@@ -242,7 +243,9 @@ public:
     collector_type collect(Args... args) {
         collector_type collector;
 
-        for(auto &&call: calls) {
+        for(auto pos = calls.size(); pos > size_type{0}; --pos) {
+            auto &call = calls[pos-1];
+
             if(!this->invoke(collector, call.second, call.first, args...)) {
                 break;
             }

@@ -167,11 +167,17 @@ public:
      * @param args Arguments to use to invoke listeners.
      */
     void publish(Args... args) {
-        for(auto it = calls.rbegin(), end = calls.rend(); it != end; it++) {
-            if(!(it->second)(it->first, args...)) {
-                calls.erase(std::next(it).base());
+        std::vector<call_type> next;
+
+        for(auto pos = calls.size(); pos > size_type{0}; --pos) {
+            auto &call = calls[pos-1];
+
+            if((call.second)(call.first, args...)) {
+                next.push_back(call);
             }
         }
+
+        calls.swap(next);
     }
 
     /**
