@@ -252,7 +252,7 @@ To build the benchmarks, use the following line instead:
 
 Benchmarks are compiled only in release mode currently.
 
-# Crash Course
+# Crash Course: entity-component system
 
 ## Design choices
 
@@ -907,6 +907,149 @@ In all the other cases, this is the way to go.
   As an example, users can freely execute the rendering system and iterate the
   renderable entities while updating a physic component concurrently on a
   separate thread if needed.
+
+# Crash Course: core functionalities
+
+The `EnTT` framework comes with a bunch of core functionalities mostly used by
+the other parts of the library itself.<br/>
+Hardly users of the framework will include these features in their code, but
+it's worth describing what `EnTT` offers so as not to reinvent the wheel in case
+of need.
+
+## Compile-time identifiers
+
+Sometimes it's useful to be able to give unique identifiers to types at
+compile-time.<br/>
+There are plenty of different solutions out there and I could have used one of
+them. However, I decided to spend my time to define a compact and versatile tool
+that fully embraces what the modern C++ has to offer.
+
+The _result of my efforts_ is the `ident` `constexpr` variable:
+
+```cpp
+#include <ident.hpp>
+
+// defines the identifiers for the given types
+constexpr auto identifiers = entt::ident<AType, AnotherType>;
+
+// ...
+
+switch(aTypeIdentifier) {
+case identifers.get<AType>():
+    // ...
+    break;
+case identifers.get<AnotherType>():
+    // ...
+    break;
+default:
+    // ...
+}
+```
+
+This is all what the variable has to offer: a `get` member function that returns
+a numerical identifier for the given type. It can be used in any context where
+constant expressions are required.
+
+As long as the list remains unchanged, identifiers are also guaranteed to be the
+same for every run. In case they have been used in a production environment and
+a type has to be removed, one can just use a placeholder to left the other
+identifiers unchanged:
+
+```cpp
+template<typename> struct IgnoreType {};
+
+constexpr auto identifiers = entt::ident<
+    ATypeStillValid,
+    IgnoreType<ATypeNoLongerValid>,
+    AnotherTypeStillValid
+>;
+```
+
+A bit ugly to see, but it works at least.
+
+## Runtime identifiers
+
+Sometimes it's useful to be able to give unique identifiers to types at
+runtime.<br/>
+There are plenty of different solutions out there and I could have used one of
+them. In fact, I adapted the most common one to my requirements and used it
+extensively within the entire framework.
+
+It's the `Family` class. Here is an example of use directly from the
+entity-component system:
+
+```cpp
+using component_family = Family<struct InternalRegistryComponentFamily>;
+
+// ...
+
+template<typename Component>
+component_type component() const noexcept {
+    return component_family::type<Component>();
+}
+```
+
+This is all what a _family_ has to offer: a `type` member function that returns
+a numerical identifier for the given type.
+
+Please, note that identifiers aren't guaranteed to be the same for every run.
+Indeed it mostly depends on the flow of execution.
+
+## Hashed strings
+
+TODO
+
+# Crash Course: service locator
+
+TODO
+
+# Crash Course: cooperative scheduler
+
+TODO
+
+## The process
+
+TODO
+
+## The scheduler
+
+TODO
+
+# Crash Course: resource cache
+
+TODO
+
+## The loader, the resource and the cache
+
+TODO
+
+## Tiny handle
+
+TODO
+
+# Crash Course: events, signals and everything in between
+
+TODO
+
+## Signals
+
+TODO
+
+## Compile-time event bus
+
+TODO
+
+## Delegate
+
+TODO
+
+## Event dispatcher
+
+TODO
+
+## Event emitter
+
+TODO
 
 # Contributors
 
