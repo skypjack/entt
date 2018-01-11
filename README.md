@@ -979,7 +979,7 @@ It's the `Family` class. Here is an example of use directly from the
 entity-component system:
 
 ```cpp
-using component_family = Family<struct InternalRegistryComponentFamily>;
+using component_family = entt::Family<struct InternalRegistryComponentFamily>;
 
 // ...
 
@@ -997,7 +997,38 @@ Indeed it mostly depends on the flow of execution.
 
 ## Hashed strings
 
-TODO
+A hashed string is a zero overhead resource identifier. Users can use
+human-readable identifiers in the codebase while using their numeric
+counterparts at runtime, thus without affecting performance.<br/>
+The class has an implicit `constexpr` constructor that chews a bunch of
+characters. Once created, all what one can do with it is getting back the
+original string or converting it into a number.<br/>
+The good part is that a hashed string can be used wherever a constant expression
+is required and no _string-to-number_ conversion will take place at runtime if
+used carefully.
+
+Example of use:
+
+```cpp
+auto load(entt::HashedString::hash_type resource) {
+    // use the numeric representation of the resource to load and return it
+}
+
+auto resource = load(entt::HashedString{"gui/background"});
+```
+
+### Conflicts
+
+The hashed string class uses internally FNV-1a to compute the numeric
+counterpart of a string. Because of the _pigeonhole principle_, conflicts are
+possible. This is a fact.<br/>
+There is no silver bullet to solve the problem of conflicts when dealing with
+hashing functions. In this case, the best solution seemed to be to give up.
+That's all.<br/>
+After all, human-readable resource identifiers aren't something strictly defined
+and over which users have not the control. Choosing a slightly different
+identifier is probably the best solution to make the conflict disappear in this
+case.
 
 # Crash Course: service locator
 
