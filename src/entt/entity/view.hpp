@@ -209,7 +209,7 @@ public:
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<const Comp &...>>
     get(entity_type entity) const noexcept {
-        return { get<Comp>(entity)... };
+        return std::tuple<const Comp &...>{ get<Comp>(entity)... };
     }
 
     /**
@@ -232,7 +232,7 @@ public:
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<Comp &...>>
     get(entity_type entity) noexcept {
-        return { get<Comp>(entity)... };
+        return std::tuple<Comp &...>{ get<Comp>(entity)... };
     }
 
     /**
@@ -524,7 +524,7 @@ public:
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<const Comp &...>>
     get(entity_type entity) const noexcept {
-        return { get<Comp>(entity)... };
+        return std::tuple<const Comp &...>{ get<Comp>(entity)... };
     }
 
     /**
@@ -547,7 +547,7 @@ public:
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<Comp &...>>
     get(entity_type entity) noexcept {
-        return { get<Comp>(entity)... };
+        return std::tuple<Comp &...>{ get<Comp>(entity)... };
     }
 
     /**
