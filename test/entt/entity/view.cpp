@@ -90,10 +90,13 @@ TEST(View, MultipleComponent) {
 
     view.get<char>(e1) = '1';
     view.get<char>(e2) = '2';
+    view.get<int>(e2) = 42;
 
     for(auto entity: view) {
         const auto &cview = static_cast<const decltype(view) &>(view);
-        ASSERT_TRUE(cview.get<char>(entity) == '2');
+        ASSERT_EQ(std::get<0>(cview.get<int, char>(entity)), 42);
+        ASSERT_EQ(std::get<1>(view.get<int, char>(entity)), '2');
+        ASSERT_EQ(cview.get<char>(entity), '2');
     }
 
     registry.remove<char>(e1);
@@ -161,10 +164,13 @@ TEST(PersistentView, Prepare) {
 
     view.get<char>(e1) = '1';
     view.get<char>(e2) = '2';
+    view.get<int>(e2) = 42;
 
     for(auto entity: view) {
         const auto &cview = static_cast<const decltype(view) &>(view);
-        ASSERT_TRUE(cview.get<char>(entity) == '2');
+        ASSERT_EQ(std::get<0>(cview.get<int, char>(entity)), 42);
+        ASSERT_EQ(std::get<1>(view.get<int, char>(entity)), '2');
+        ASSERT_EQ(cview.get<char>(entity), '2');
     }
 
     ASSERT_EQ(*(view.data() + 0), e2);
@@ -199,10 +205,13 @@ TEST(PersistentView, NoPrepare) {
 
     view.get<char>(e1) = '1';
     view.get<char>(e2) = '2';
+    view.get<int>(e2) = 42;
 
     for(auto entity: view) {
         const auto &cview = static_cast<const decltype(view) &>(view);
-        ASSERT_TRUE(cview.get<char>(entity) == '2');
+        ASSERT_EQ(std::get<0>(cview.get<int, char>(entity)), 42);
+        ASSERT_EQ(std::get<1>(view.get<int, char>(entity)), '2');
+        ASSERT_EQ(cview.get<char>(entity), '2');
     }
 
     ASSERT_EQ(*(view.data() + 0), e2);

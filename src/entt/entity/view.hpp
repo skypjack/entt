@@ -5,6 +5,7 @@
 #include <tuple>
 #include <utility>
 #include <algorithm>
+#include <type_traits>
 #include "sparse_set.hpp"
 
 
@@ -186,6 +187,52 @@ public:
     template<typename Comp>
     Comp & get(entity_type entity) noexcept {
         return const_cast<Comp &>(const_cast<const PersistentView *>(this)->get<Comp>(entity));
+    }
+
+    /**
+     * @brief Returns the components assigned to the given entity.
+     *
+     * Prefer this function instead of `Registry::get` during iterations. It has
+     * far better performance than its companion function.
+     *
+     * @warning
+     * Attempting to use invalid component types results in a compilation error.
+     * Attempting to use an entity that doesn't belong to the view results in
+     * undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if
+     * the view doesn't contain the given entity.
+     *
+     * @tparam Comp Types of the components to get.
+     * @param entity A valid entity identifier.
+     * @return The components assigned to the entity.
+     */
+    template<typename... Comp>
+    std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<const Comp &...>>
+    get(entity_type entity) const noexcept {
+        return { get<Comp>(entity)... };
+    }
+
+    /**
+     * @brief Returns the components assigned to the given entity.
+     *
+     * Prefer this function instead of `Registry::get` during iterations. It has
+     * far better performance than its companion function.
+     *
+     * @warning
+     * Attempting to use invalid component types results in a compilation error.
+     * Attempting to use an entity that doesn't belong to the view results in
+     * undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if
+     * the view doesn't contain the given entity.
+     *
+     * @tparam Comp Types of the components to get.
+     * @param entity A valid entity identifier.
+     * @return The components assigned to the entity.
+     */
+    template<typename... Comp>
+    std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<Comp &...>>
+    get(entity_type entity) noexcept {
+        return { get<Comp>(entity)... };
     }
 
     /**
@@ -455,6 +502,52 @@ public:
     template<typename Comp>
     Comp & get(entity_type entity) noexcept {
         return const_cast<Comp &>(const_cast<const View *>(this)->get<Comp>(entity));
+    }
+
+    /**
+     * @brief Returns the components assigned to the given entity.
+     *
+     * Prefer this function instead of `Registry::get` during iterations. It has
+     * far better performance than its companion function.
+     *
+     * @warning
+     * Attempting to use invalid component types results in a compilation error.
+     * Attempting to use an entity that doesn't belong to the view results in
+     * undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if
+     * the view doesn't contain the given entity.
+     *
+     * @tparam Comp Types of the components to get.
+     * @param entity A valid entity identifier.
+     * @return The components assigned to the entity.
+     */
+    template<typename... Comp>
+    std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<const Comp &...>>
+    get(entity_type entity) const noexcept {
+        return { get<Comp>(entity)... };
+    }
+
+    /**
+     * @brief Returns the components assigned to the given entity.
+     *
+     * Prefer this function instead of `Registry::get` during iterations. It has
+     * far better performance than its companion function.
+     *
+     * @warning
+     * Attempting to use invalid component types results in a compilation error.
+     * Attempting to use an entity that doesn't belong to the view results in
+     * undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if
+     * the view doesn't contain the given entity.
+     *
+     * @tparam Comp Types of the components to get.
+     * @param entity A valid entity identifier.
+     * @return The components assigned to the entity.
+     */
+    template<typename... Comp>
+    std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<Comp &...>>
+    get(entity_type entity) noexcept {
+        return { get<Comp>(entity)... };
     }
 
     /**

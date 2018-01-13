@@ -377,7 +377,7 @@ registry.assign<Position>(entity, 0., 0.);
 
 // ...
 
-auto &velocity = registry.assign<Velocity>(entity);
+Velocity &velocity = registry.assign<Velocity>(entity);
 velocity.dx = 0.;
 velocity.dy = 0.;
 ```
@@ -390,7 +390,7 @@ registry.replace<Position>(entity, 0., 0.);
 
 // ...
 
-auto &velocity = registry.replace<Velocity>(entity);
+Velocity &velocity = registry.replace<Velocity>(entity);
 velocity.dx = 0.;
 velocity.dy = 0.;
 ```
@@ -405,7 +405,7 @@ registry.accomodate<Position>(entity, 0., 0.);
 
 // ...
 
-auto &velocity = registry.accomodate<Velocity>(entity);
+Velocity &velocity = registry.accomodate<Velocity>(entity);
 velocity.dx = 0.;
 velocity.dy = 0.;
 ```
@@ -464,13 +464,16 @@ their components are destroyed:
 Finally, references to components can be retrieved simply by doing this:
 
 ```cpp
-// either a non-const reference ...
 entt::DefaultRegistry registry;
-auto &position = registry.get<Position>(entity);
-
-// ... or a const one
 const auto &cregistry = registry;
-const auto &position = cregistry.get<Position>(entity);
+
+// const and non-const reference
+const Position &position = cregistry.get<Position>(entity);
+Position &position = registry.get<Position>(entity);
+
+// const and non-const references
+std::tuple<const Position &, const Velocity &> tup = cregistry.get<Position, Velocity>(entity);
+std::tuple<Position &, Velocity &> tup = registry.get<Position, Velocity>(entity);
 ```
 
 The `get` member function template gives direct access to the component of an
@@ -516,11 +519,11 @@ References to tags can be retrieved simply by doing this:
 ```cpp
 // either a non-const reference ...
 entt::DefaultRegistry registry;
-auto &player = registry.get<PlayingCharacter>();
+PlayingCharacter &player = registry.get<PlayingCharacter>();
 
 // ... or a const one
 const auto &cregistry = registry;
-const auto &camera = cregistry.get<Camera>();
+const Camera &camera = cregistry.get<Camera>();
 ```
 
 The `get` member function template gives direct access to the tag as stored in
@@ -705,7 +708,7 @@ To iterate a single component standard view, either use it in range-for loop:
 auto view = registry.view<Renderable>();
 
 for(auto entity: view) {
-    auto &renderable = view.get(entity);
+    Renderable &renderable = view.get(entity);
 
     // ...
 }
@@ -749,8 +752,12 @@ To iterate a multi component standard view, either use it in range-for loop:
 auto view = registry.view<Position, Velocity>();
 
 for(auto entity: view) {
-    auto &position = view.get<Position>(entity);
-    auto &velocity = view.get<Velocity>(entity);
+    // a component at a time ...
+    Position &position = view.get<Position>(entity);
+    Velocity &velocity = view.get<Velocity>(entity);
+
+    // ... or multiple components at once
+    std::tuple<Position &, Velocity &> tup = view.get<Position, Velocity>(entity);
 
     // ...
 }
@@ -817,8 +824,12 @@ To iterate a persistent view, either use it in range-for loop:
 auto view = registry.persistent<Position, Velocity>();
 
 for(auto entity: view) {
-    auto &position = view.get<Position>(entity);
-    auto &velocity = view.get<Velocity>(entity);
+    // a component at a time ...
+    Position &position = view.get<Position>(entity);
+    Velocity &velocity = view.get<Velocity>(entity);
+
+    // ... or multiple components at once
+    std::tuple<Position &, Velocity &> tup = view.get<Position, Velocity>(entity);
 
     // ...
 }
