@@ -57,6 +57,10 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_TRUE(registry.has<char>(e3));
     ASSERT_EQ(registry.get<int>(e1), 42);
     ASSERT_EQ(registry.get<char>(e1), 'c');
+
+    ASSERT_EQ(std::get<0>(registry.get<int, char>(e1)), 42);
+    ASSERT_EQ(std::get<1>(static_cast<const entt::DefaultRegistry &>(registry).get<int, char>(e1)), 'c');
+
     ASSERT_EQ(registry.get<int>(e1), registry.get<int>(e3));
     ASSERT_EQ(registry.get<char>(e1), registry.get<char>(e3));
     ASSERT_NE(&registry.get<int>(e1), &registry.get<int>(e3));
