@@ -19,17 +19,21 @@ namespace entt {
  * required:
  *
  * * @code{.cpp}
- *   void update(Delta);
+ *   void update(Delta, void *);
  *   @endcode
  *   It's invoked once per tick until a process is explicitly aborted or it
  *   terminates either with or without errors. Even though it's not mandatory to
  *   declare this member function, as a rule of thumb each process should at
- *   least define it to work properly.
+ *   least define it to work properly. The `void *` parameter is an opaque
+ *   pointer to user data (if any) forwarded directly to the process during an
+ *   update.
  *
  * * @code{.cpp}
- *   void init();
+ *   void init(void *);
  *   @endcode
- *   It's invoked at the first tick, immediately before an update.
+ *   It's invoked at the first tick, immediately before an update. The `void *`
+ *   parameter is an opaque pointer to user data (if any) forwarded directly to
+ *   the process during an update.
  *
  * * @code{.cpp}
  *   void succeeded();
@@ -273,12 +277,13 @@ private:
  * following:
  *
  * @code{.cpp}
- * void(Delta delta, auto succeed, auto fail);
+ * void(Delta delta, void *data, auto succeed, auto fail);
  * @endcode
  *
  * Where:
  *
  * * `delta` is the elapsed time.
+ * * `data` is an opaque pointer to user data if any, `nullptr` otherwise.
  * * `succeed` is a function to call when a process terminates with success.
  * * `fail` is a function to call when a process terminates with errors.
  *
