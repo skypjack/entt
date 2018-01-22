@@ -1313,9 +1313,95 @@ TODO
 
 # Crash Course: events, signals and everything in between
 
-TODO
+Signals are usually a core part of games and software architectures in
+general.<br/>
+Roughly speaking, they help to decouple the various parts of a system while
+allowing them to communicate with each other somehow.
+
+The so called _modern C++_ comes wih a tool that can be useful in these terms,
+the `std::function`. As an example, it can be used to create delegates.<br/>
+However, there is no guarantee that an `std::function` does not perform
+allocations under the hood and this could be problematic sometimes. Furthermore,
+it solves a problem but may not adapt well to other requirements that may arise
+from time to time.
+
+In case that the flexibility and potential of an `std::function` are not
+required or where you are looking for something different, the `EnTT` framework
+offers a full set of classes to solve completely different problems.
 
 ## Signals
+
+There are two types of signal handlers in `EnTT`, internally called _managed_
+and _unmanaged_.<br/>
+They differ in the way they work around the tradeoff between performance, memory
+usage and safety. In one case, listeners can be any kind of objects and the
+client is in charge of connecting and disconnecting them from the sink to avoid
+crashes due to different lifetimes. In the other case, listeners must be wrapped
+in an `std::shared_ptr` and the sink will take care of disconneting them
+whenever they die.
+
+### Managed signal handler
+
+A managed signal handler works with weak pointers to classes and pointers to
+member functions as well as pointers to free functions. References are
+automatically removed when the instances to which they point are freed.<br/>
+In other terms, users can simply connect a listener and forget about it, getting
+rid of the burden of controlling its lifetime. The drawback is that listeners
+must be allocated on the dynamic storage and wrapped into an `std::shared_ptr`.
+Performance and memory management can suffer from this in real world softwares.
+
+To create an instance of this type of handler, the function type is all what is
+needed:
+
+```cpp
+entt::Signal<void(int, char)> signal;
+```
+
+From now on, free functions and member functions that respect the given
+signature can be easily connected to and disconnected from the signal:
+
+```cpp
+void foo(int, char) { /* ... */ }
+
+struct S {
+    void bar(int, char) { /* ... */ }
+};
+
+// ...
+
+auto instance = std::make_shared<S>();
+
+signal.connect<&foo>();
+signal.connect<S, &S::bar>(instance);
+
+// ...
+
+signal.disconnect<&foo>();
+
+// disconnect a specific member function of an instance ...
+signal.disconnect<S, &S::bar>(instance);
+
+// ... or an instance as a whole
+signal.disconnect(instance);
+```
+
+Once listeners are attached (or even if there are no listeners at all), events
+and data in general can be published through a signal by means of the `publish`
+member function:
+
+```cpp
+signal.publish(42, 'c');
+```
+
+This is more or less all what a managed signal handler has to offer.<br/>
+A bunch of other member functions are exposed actually. As an example, there is
+a method to use to know how many listeners a managed signal handler contains
+(`size`) or if it contains at least a listener (`empty`), to reset it to its
+initial state (`clear`) and even to swap two handlers (`swap`).<br/>
+Refer to the [official documentation](https://skypjack.github.io/entt/) for all
+the details.
+
+### Unmanaged signal handler
 
 TODO
 
