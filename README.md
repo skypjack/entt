@@ -1403,7 +1403,108 @@ the details.
 
 ### Unmanaged signal handler
 
-TODO
+An unmanaged signal handler works with naked pointers to classes and pointers to
+member functions as well as pointers to free functions. Removing references when
+the instances to which they point are freed is in charge to the users.<br/>
+In other terms, users must explicitly disconnect a listener before to delete the
+class to which it belongs, thus taking care of the lifetime of each instance. On
+the other side, performance shouldn't be affected that much by the presence of
+such a signal handler.
+
+The API of an unmanaged signal handler is similar to the one of a managed signal
+handler.<br/>
+The most important difference is that it comes in two forms: with and without a
+collector. In case it is associated with a collector, all the values returned by
+the listenrs can be literally _collected_ and used later by the caller.<br/>
+
+**Note**: collectors are allowed only in case of function types whose the return
+type isn't `void` for obvious reasons.
+
+To create instances of this type of handler there exist mainly two ways:
+
+```cpp
+// no collector type
+entt::SigH<void(int, char)> signal;
+
+// explicit collector type
+entt::SigH<void(int, char), MyCollector<bool>> collector;
+```
+
+As expected, an unmanaged signal handler offers all the basic functionalities
+required to know how many listeners it contains (`size`) or if it contains at
+least a listener (`empty`), to reset it to its initial state (`clear`) and even
+to swap two handlers (`swap`).
+
+Besides them, there are member functions to use both to connect and disconnect
+listeners in all their forms:
+
+```cpp
+void foo(int, char) { /* ... */ }
+
+struct S {
+    void bar(int, char) { /* ... */ }
+};
+
+// ...
+
+S instance;
+
+signal.connect<&foo>();
+signal.connect<S, &S::bar>(&instance);
+
+// ...
+
+signal.disconnect<&foo>();
+
+// disconnect a specific member function of an instance ...
+signal.disconnect<S, &S::bar>(&instance);
+
+// ... or an instance as a whole
+signal.disconnect(&instance);
+```
+
+Once listeners are attached (or even if there are no listeners at all), events
+and data in general can be published through a signal by means of the `publish`
+member function:
+
+```cpp
+signal.publish(42, 'c');
+```
+
+To collect data, the `collect` member function should be used instead. Below is
+a minimal example to show how to use it:
+
+```cpp
+struct MyCollector {
+    std::vector<int> vec{};
+
+    bool operator()(int v) noexcept {
+        vec.push_back(v);
+        return true;
+    }
+};
+
+int f() { return 0; }
+int g() { return 1; }
+
+// ...
+
+entt::SigH<int(), MyCollector<int>> signal;
+
+signal.connect<&f>();
+signal.connect<&g>();
+
+MyCollector collector = signal.collect();
+
+assert(collector.vec[0] == 0);
+assert(collector.vec[1] == 1);
+```
+
+As shown above, a collector must expose a function operator that accepts as an
+argument a type to which the return type of the listeners can be converted.
+Moreover, it has to return a boolean value that is `false` to stop collecting
+data, `true` otherwise. This way one can avoid calling all the listeners in case
+it isn't necessary.
 
 ## Compile-time event bus
 
