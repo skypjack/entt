@@ -29,7 +29,7 @@ set(PROJECT_AUTHOR_EMAIL "michele.caini@gmail.com")
 
 message("*")
 message("* ${PROJECT_NAME} v${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
-message("* Copyright (c) 2017 ${PROJECT_AUTHOR} <${PROJECT_AUTHOR_EMAIL}>")
+message("* Copyright (c) 2018 ${PROJECT_AUTHOR} <${PROJECT_AUTHOR_EMAIL}>")
 message("*")
 
 #

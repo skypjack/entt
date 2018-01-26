@@ -929,7 +929,7 @@ who has partecipated so far.
 
 # License
 
-Code and documentation Copyright (c) 2017 Michele Caini.<br/>
+Code and documentation Copyright (c) 2018 Michele Caini.<br/>
 Code released under
 [the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).
 Docs released under
