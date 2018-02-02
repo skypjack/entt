@@ -1508,6 +1508,11 @@ it isn't necessary.
 
 ## Compile-time event bus
 
+A bus can be used to create a compile-time backbone for event management.<br/>
+The intended use is as a base class, which is the opposite of what the signals
+are meant for. Internally it uses either managed or unmanaged signal handlers,
+that is why there exist both a managed and an unmanaged event bus.
+
 TODO
 
 ## Delegate
