@@ -851,12 +851,15 @@ whether all the components have to be accessed or not.
 function template of a registry during iterations, if possible. However, keep in
 mind that it works only with the components of the view itself.
 
-### Give me everything
+### Give me everything, whatever it means
 
 Views are narrow windows on the entire list of entities. They work by filtering
 entities according to their components.<br/>
 In some cases there may be the need to iterate all the entities regardless of
-their components. The registry offers a specific member function to do that:
+their components. The registry offers a couple of member functions to do that.
+
+The former returns all the entities ever created, no matter if they are still in
+use or not:
 
 ```cpp
 registry.each([](auto entity) {
@@ -864,14 +867,33 @@ registry.each([](auto entity) {
 });
 ```
 
-Each entity ever created is returned, no matter if it's in use or not.<br/>
-Usually, filtering entities that aren't currently in use is more expensive than
-iterating them all and filtering out those in which one isn't interested.
+The latter returns an entity only if it's still in use (in other words, the
+entity is returned only if it hasn't been destroyed):
+
+```cpp
+registry.alive([](auto entity) {
+    // ...
+});
+```
 
 As a rule of thumb, consider using a view if the goal is to iterate entities
 that have a determinate set of components. A view is usually faster than
-combining this function with a bunch of custom tests.<br/>
+combining these functions with a bunch of custom tests.<br/>
 In all the other cases, this is the way to go.
+
+There exists also another function to use to retrieve orphans. An orphan is an
+entity that is in use and has no assigned components.<br/>
+The signature of the function is the same of `each` and `alive`:
+
+```cpp
+registry.orphans([](auto entity) {
+    // ...
+});
+```
+
+In general, `each` is pretty fast to run while `alive` is a bit slower because
+of the check it must perform on each and every entity. For similar reasons,
+`orphans` can be very slow and should not be used frequently.
 
 ## Side notes
 

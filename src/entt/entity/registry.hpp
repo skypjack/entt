@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cassert>
+#include <numeric>
 #include <algorithm>
 #include <type_traits>
 #include "../core/family.hpp"
@@ -401,7 +402,7 @@ public:
      * function can be used to know if they are still valid or the entity has
      * been destroyed and potentially recycled.
      *
-     * The returned entity has no components assigned.
+     * The returned entity has no assigned components.
      *
      * @return A valid entity identifier.
      */
@@ -922,7 +923,7 @@ public:
     }
 
     /**
-     * @brief Iterate entities and applies them the given function object.
+     * @brief Iterate all the entities ever created.
      *
      * The function object is invoked for each entity, no matter if it's in use
      * or not.<br/>
@@ -941,9 +942,72 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        for(auto pos = entities.size(); pos > size_type{0}; --pos) {
-            func(entities[pos-1]);
+        for(size_type pos{}, last = entities.size(); pos < last; ++pos) {
+            func(entities[pos]);
         }
+    }
+
+    /**
+     * @brief Iterate all the entities still in use.
+     *
+     * The function object is invoked for each entity that is still in use.<br/>
+     * The signature of the function should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * void(entity_type);
+     * @endcode
+     *
+     * This function is fairly slow and should not be used frequently.<br/>
+     * Consider using a view if the goal is to iterate entities that have a
+     * determinate set of components. A view is usually faster than combining
+     * this function with a bunch of custom tests.
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void alive(Func func) {
+        std::sort(available.begin(), available.end());
+
+        const auto end= available.cend();
+        auto it = available.cbegin();
+
+        each([func = std::move(func), it, end](auto entity) mutable {
+            if(it != end && *it == entity) {
+                ++it;
+            } else {
+                func(entity);
+            }
+        });
+    }
+
+    /**
+     * @brief Iterate orphans and applies them the given function object.
+     *
+     * The function object is invoked for each entity that is still in use and
+     * has no assigned components.<br/>
+     * The signature of the function should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * void(entity_type);
+     * @endcode
+     *
+     * This function can be very slow and should not be used frequently.
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void orphans(Func func) {
+        alive([func = std::move(func), this](auto entity) {
+            for(const auto &pool: pools) {
+                if(pool && pool->has(entity)) {
+                    return;
+                }
+            }
+
+            func(entity);
+        });
     }
 
     /**
