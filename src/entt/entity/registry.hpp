@@ -12,8 +12,8 @@
 #include <algorithm>
 #include <type_traits>
 #include "../core/family.hpp"
+#include "entt_traits.hpp"
 #include "sparse_set.hpp"
-#include "traits.hpp"
 #include "view.hpp"
 
 

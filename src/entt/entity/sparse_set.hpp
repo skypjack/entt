@@ -9,7 +9,7 @@
 #include <cstddef>
 #include <cassert>
 #include <type_traits>
-#include "traits.hpp"
+#include "entt_traits.hpp"
 
 
 namespace entt {
@@ -56,10 +56,10 @@ template<typename Entity>
 class SparseSet<Entity> {
     using traits_type = entt_traits<Entity>;
 
-    struct Iterator {
+    struct Iterator final {
         using value_type = Entity;
 
-        Iterator(const std::vector<Entity> *direct, std::size_t pos)
+        Iterator(const std::vector<value_type> *direct, std::size_t pos)
             : direct{direct}, pos{pos}
         {}
 
@@ -85,7 +85,7 @@ class SparseSet<Entity> {
         }
 
     private:
-        const std::vector<Entity> *direct;
+        const std::vector<value_type> *direct;
         std::size_t pos;
     };
 
