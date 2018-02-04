@@ -14,6 +14,7 @@
 #include <type_traits>
 #include "../core/family.hpp"
 #include "entt_traits.hpp"
+#include "snapshot.hpp"
 #include "sparse_set.hpp"
 #include "view.hpp"
 
@@ -1149,6 +1150,56 @@ public:
     PersistentView<Entity, Component...> persistent() {
         // after the calls to handler, pools have already been created
         return PersistentView<Entity, Component...>{handler<Component...>(), pool<Component>()...};
+    }
+
+    /**
+     * TODO private
+     */
+    void force(entity_type entity) {
+        const auto entt = entity & traits_type::entity_mask;
+        const auto curr = entities.size();
+        const auto size = entt + 1;
+
+        if(curr < size) {
+            entities.resize(size);
+            std::iota(entities.data(), (size - curr), Entity{curr});
+        } else {
+            auto it = std::find_if(available.begin(), available.end(), [entt](auto entity) {
+                return entt == (entity & traits_type::entity_mask);
+            });
+
+            if(it != available.cend()) {
+                *it = entity;
+            }
+        }
+
+        entities[entt] = entity;
+    }
+
+    /**
+     * TODO
+     */
+    void drop(entity_type entity) {
+        const auto entt = entity & traits_type::entity_mask;
+
+        auto it = std::find_if(available.begin(), available.end(), [entt](auto entity) {
+            return entt == (entity & traits_type::entity_mask);
+        });
+
+        entities[entt] = entity;
+
+        if(it == available.cend()) {
+            available.push_back(entity);
+        } else {
+            *it = entity;
+        }
+    }
+
+    /**
+     * TODO private
+     */
+    Snapshot<entity_type> snapshot() {
+        return { *this, &Registry::force, &Registry::drop };
     }
 
 private:
