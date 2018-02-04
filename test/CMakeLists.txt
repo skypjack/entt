@@ -19,12 +19,19 @@ endif()
 # Test mod
 
 if(BUILD_MOD)
+    set(DUKTAPE_DEPS_DIR ${entt_SOURCE_DIR}/deps/duktape)
+    configure_file(${entt_SOURCE_DIR}/cmake/in/duktape.in ${DUKTAPE_DEPS_DIR}/CMakeLists.txt)
+    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY ${DUKTAPE_DEPS_DIR})
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${DUKTAPE_DEPS_DIR})
+    set(DUKTAPE_SRC_DIR ${DUKTAPE_DEPS_DIR}/src/src)
+
     add_executable(
         mod
         $<TARGET_OBJECTS:odr>
-        mod/duktape.c
+        ${DUKTAPE_SRC_DIR}/duktape.c
         mod/mod.cpp
     )
+    target_include_directories(mod PRIVATE ${DUKTAPE_SRC_DIR})
     target_link_libraries(mod PRIVATE gtest_main Threads::Threads m)
     add_test(NAME mod COMMAND mod)
 endif()
