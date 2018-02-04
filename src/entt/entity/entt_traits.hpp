@@ -1,5 +1,5 @@
-#ifndef ENTT_ENTITY_ENTT_HPP
-#define ENTT_ENTITY_ENTT_HPP
+#ifndef ENTT_ENTITY_ENTT_TRAITS_HPP
+#define ENTT_ENTITY_ENTT_TRAITS_HPP
 
 
 #include <cstdint>
@@ -93,4 +93,4 @@ struct entt_traits<std::uint64_t> {
 }
 
 
-#endif // ENTT_ENTITY_ENTT_HPP
+#endif // ENTT_ENTITY_ENTT_TRAITS_HPP

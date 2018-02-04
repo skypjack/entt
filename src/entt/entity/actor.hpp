@@ -22,6 +22,8 @@ template<typename Entity, typename Delta>
 struct Actor {
     /*! @brief Type of registry used internally. */
     using registry_type = Registry<Entity>;
+    /*! @brief Underlying entity identifier. */
+    using entity_type = Entity;
     /*! @brief Type used to provide elapsed time. */
     using delta_type = Delta;
 

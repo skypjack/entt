@@ -2,6 +2,7 @@
 #define ENTT_CORE_HASHED_STRING_HPP
 
 
+#include <cstddef>
 #include <cstdint>
 
 
