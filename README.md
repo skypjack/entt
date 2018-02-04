@@ -856,7 +856,8 @@ mind that it works only with the components of the view itself.
 Views are narrow windows on the entire list of entities. They work by filtering
 entities according to their components.<br/>
 In some cases there may be the need to iterate all the entities regardless of
-their components. The registry offers a couple of member functions to do that.
+their components. The registry offers a couple of member functions to do that:
+`each` and `alive`.
 
 The former returns all the entities ever created, no matter if they are still in
 use or not:
@@ -882,7 +883,7 @@ combining these functions with a bunch of custom tests.<br/>
 In all the other cases, this is the way to go.
 
 There exists also another function to use to retrieve orphans. An orphan is an
-entity that is in use and has no assigned components.<br/>
+entity that is still in use and has no assigned components.<br/>
 The signature of the function is the same of `each` and `alive`:
 
 ```cpp
