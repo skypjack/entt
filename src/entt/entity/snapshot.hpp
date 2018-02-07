@@ -96,9 +96,9 @@ class SnapshotRestore final {
 
     using func_type = void(Registry<Entity>::*)(Entity, bool);
 
-    SnapshotRestore(Registry<Entity> &registry, func_type restore_fn)
+    SnapshotRestore(Registry<Entity> &registry, func_type force_fn)
         : registry{registry},
-          restore_fn{restore_fn}
+          force_fn{force_fn}
     {
         // restore a snapshot as a whole requires a clean registry
         assert(!registry.capacity());
@@ -118,7 +118,7 @@ class SnapshotRestore final {
         while(length) {
             Entity entity{};
             archive(entity);
-            (registry.*restore_fn)(entity, destroyed);
+            (registry.*force_fn)(entity, destroyed);
             --length;
         }
     }
@@ -131,7 +131,7 @@ class SnapshotRestore final {
         while(length) {
             Entity entity{};
             archive(entity);
-            (registry.*restore_fn)(entity, false);
+            (registry.*force_fn)(entity, false);
             archive(registry.template assign<Component>(entity));
             --length;
         }
@@ -145,7 +145,7 @@ class SnapshotRestore final {
         if(has) {
             Entity entity{};
             archive(entity);
-            (registry.*restore_fn)(entity, false);
+            (registry.*force_fn)(entity, false);
             archive(registry.template attach<Tag>(entity));
         }
     }
@@ -187,7 +187,7 @@ public:
 
 private:
     Registry<Entity> &registry;
-    func_type restore_fn;
+    func_type force_fn;
 };
 
 
@@ -228,6 +228,7 @@ private:
 //    }
 //
 //private:
+//    std::unordered_map<Entity, Entity> remloc;
 //    Registry<Entity> &reg;
 //};
 

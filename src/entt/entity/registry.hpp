@@ -1132,7 +1132,7 @@ public:
     /**
      * TODO it will be private
      */
-    void restore(entity_type entity, bool destroyed) {
+    void force(entity_type entity, bool destroyed) {
         using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
         // explicit promotion to avoid warnings with std::uint16_t
         const auto entt = promotion_type{entity} & traits_type::entity_mask;
@@ -1175,7 +1175,7 @@ public:
      * TODO
      */
     SnapshotRestore<Entity> restore() {
-        return { *this, &Registry::restore };
+        return { *this, &Registry::force };
     }
 
 private:
