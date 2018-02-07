@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_SNAPSHOT_HPP
 
 
+#include <cassert>
 #include <utility>
 
 
@@ -95,23 +96,26 @@ private:
 
 
 template<typename Entity, typename Archive>
-class Loader final {
+class SnapshotRestore final {
     friend class Registry<Entity>;
 
     using func_type = void(*)(Registry<Entity> &, Entity);
 
-    Loader(Registry<Entity> &registry, Archive &archive, func_type ensure_fn, func_type destroyed_fn)
+    SnapshotRestore(Registry<Entity> &registry, Archive &archive, func_type ensure_fn, func_type destroyed_fn)
         : registry{registry},
           archive{archive},
           ensure_fn{ensure_fn},
           destroyed_fn{destroyed_fn}
-    {}
+    {
+        // restore a snapshot as a whole requires the registry is empty
+        assert(registry.empty());
+    }
 
-    Loader(const Loader &) = default;
-    Loader(Loader &&) = default;
+    SnapshotRestore(const SnapshotRestore &) = default;
+    SnapshotRestore(SnapshotRestore &&) = default;
 
-    Loader & operator=(const Loader &) = default;
-    Loader & operator=(Loader &&) = default;
+    SnapshotRestore & operator=(const SnapshotRestore &) = default;
+    SnapshotRestore & operator=(SnapshotRestore &&) = default;
 
     void push(func_type func) {
         Entity length{};
@@ -153,24 +157,24 @@ class Loader final {
     }
 
 public:
-    ~Loader() {
+    ~SnapshotRestore() {
         registry.orphans([this](auto entity) {
             registry.destroy(entity);
         });
     }
 
-    Loader entities() && {
+    SnapshotRestore entities() && {
         push(ensure_fn);
         return *this;
     }
 
-    Loader destroyed() && {
+    SnapshotRestore destroyed() && {
         push(destroyed_fn);
         return *this;
     }
 
     template<typename... Component>
-    Loader component() && {
+    SnapshotRestore component() && {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (restore<Component>(), 0)... };
         (void)accumulator;
@@ -178,7 +182,7 @@ public:
     }
 
     template<typename... Tag>
-    Loader tag() && {
+    SnapshotRestore tag() && {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (attach<Tag>(), 0)... };
         (void)accumulator;

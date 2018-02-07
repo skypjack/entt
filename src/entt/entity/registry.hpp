@@ -1148,7 +1148,7 @@ public:
      * TODO
      */
     template<typename Archive>
-    Loader<Entity, Archive> restore(Archive &archive) {
+    SnapshotRestore<Entity, Archive> restore(Archive &archive) {
         using fn_type = void(*)(Registry<Entity> &, Entity);
 
         fn_type ensure_fn = [](Registry<Entity> &registry, Entity entity) {
