@@ -3,108 +3,193 @@
 
 
 #include <utility>
-#include "registry.hpp"
 
 
 namespace entt {
 
 
 template<typename Entity>
+class Registry;
+
+
+template<typename Entity, typename Archive>
 class Snapshot final {
     friend class Registry<Entity>;
 
-    using registry_type = Registry<Entity>;
-    using entity_type = registry_type::entity_type;
-    using basic_fn_type = void(registry_type::*)(entity_type);
+    using func_type = void(*)(const Registry<Entity> &, Snapshot &);
 
-    Snapshot(Registry<Entity> &registry, basic_fn_type ensure, basic_fn_type drop)
-        : registry{registry}, ensure{ensure}, drop{drop}
+    Snapshot(Registry<Entity> &registry, Archive &archive, func_type destroyed_fn)
+        : registry{registry},
+          archive{archive},
+          destroyed_fn{destroyed_fn}
     {}
 
-    Snapshot(const Snapshot &) = delete;
-    Snapshot(Snapshot &&) = delete;
+    Snapshot(const Snapshot &) = default;
+    Snapshot(Snapshot &&) = default;
 
-    Snapshot & operator=(const Snapshot &) = delete;
-    Snapshot & operator=(Snapshot &&) = delete;
+    Snapshot & operator=(const Snapshot &) = default;
+    Snapshot & operator=(Snapshot &&) = default;
+
+    template<typename View>
+    void component(const View &view) {
+        archive(static_cast<Entity>(view.size()));
+
+        for(typename View::size_type i{}; i < view.size(); ++i) {
+            archive(view.data()[i]);
+            archive(view.raw()[i]);
+        };
+    }
+
+    template<typename Tag>
+    void tag(bool has) {
+        archive(has);
+
+        if(has) {
+            archive(registry.template attachee<Tag>());
+            archive(registry.template get<Tag>());
+        }
+    }
+
+    template<typename It>
+    void destroyed(It begin, It end) {
+        archive(static_cast<Entity>(end - begin));
+
+        while(begin != end) {
+            archive(*begin++);
+        }
+    }
 
 public:
-    template<typename... Component, typename Archive>
-    void component(Archive &archive) && {
-        auto save = [](const auto &view, auto &archive) {
-            const std::uint32_t length = view.size();
+    Snapshot entities() && {
+        archive(static_cast<Entity>(registry.size()));
+        registry.each([this](auto entity) { archive(entity); });
+        return *this;
+    }
 
-            archive(length);
+    Snapshot destroyed() && {
+        (destroyed_fn)(registry, *this);
+        return *this;
+    }
 
-            for(std::uint32_t i{}; i < length; ++i) {
-                archive(view.data()[i]);
-                archive(view.raw()[i]);
-            }
-        };
-
+    template<typename... Component>
+    Snapshot component() && {
         using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (save(registry.template view<Component>(), archive), 0)... };
+        accumulator_type accumulator = { 0, (component(registry.template view<Component>()), 0)... };
         (void)accumulator;
+        return *this;
     }
 
-    template<typename... Tag, typename Archive>
-    void tag(Archive &archive) && {
+    template<typename... Tag>
+    Snapshot tag() && {
         using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (archive(registry.template attachee<Tag>()), archive(registry.template get<Tag>()), 0)... };
+        accumulator_type accumulator = { 0, (tag<Tag>(registry.template has<Tag>()), 0)... };
         (void)accumulator;
-    }
-
-    template<typename... Component, typename Archive>
-    void restore(Archive &archive) {
-        auto load = [this](basic_fn_type accomodate, auto &archive) {
-            std::uint32_t length;
-
-            archive(length);
-
-            for(std::uint32_t i = {}; i < length; ++i) {
-                Entity entity;
-                archive(entity);
-                (registry.*ensure)(entity);
-                archive((registry.*accomodate)(entity));
-            }
-        };
-
-        using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (load(&Registry::accomodate<Component>, archive), 0)... };
-        (void)accumulator;
-    }
-
-    template<typename... Tag, typename Archive>
-    void attach(Archive &archive) {
-        auto load = [this](basic_fn_type get, auto &archive) {
-            Entity entity;
-            archive(entity);
-            (registry.*ensure)(entity);
-            archive((registry.*get)(entity));
-        };
-
-        using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (load(&Registry::attach<Component>, archive), 0)... };
-        (void)accumulator;
-    }
-
-    template<typename Archive>
-    void dump(Archive &archive) {
-        // TODO
-    }
-
-    template<typename Archive>
-    void import(Archive &archive) {
-        // TODO
-    }
-
-    void finalize() {
-        registry.orphans([this](auto entity) { (registry.*discard)(entity); });
+        return *this;
     }
 
 private:
     Registry<Entity> &registry;
-    basic_fn_type ensure;
-    basic_fn_type drop;
+    Archive &archive;
+    func_type destroyed_fn;
+};
+
+
+template<typename Entity, typename Archive>
+class Loader final {
+    friend class Registry<Entity>;
+
+    using func_type = void(*)(Registry<Entity> &, Entity);
+
+    Loader(Registry<Entity> &registry, Archive &archive, func_type ensure_fn, func_type destroyed_fn)
+        : registry{registry},
+          archive{archive},
+          ensure_fn{ensure_fn},
+          destroyed_fn{destroyed_fn}
+    {}
+
+    Loader(const Loader &) = default;
+    Loader(Loader &&) = default;
+
+    Loader & operator=(const Loader &) = default;
+    Loader & operator=(Loader &&) = default;
+
+    void push(func_type func) {
+        Entity length{};
+        archive(length);
+
+        while(length) {
+            Entity entity{};
+            archive(entity);
+            func(registry, entity);
+            --length;
+        }
+    }
+
+    template<typename Component>
+    void restore() {
+        Entity length{};
+        archive(length);
+
+        while(length) {
+            Entity entity{};
+            archive(entity);
+            ensure_fn(registry, entity);
+            archive(registry.template assign<Component>(entity));
+            --length;
+        }
+    }
+
+    template<typename Tag>
+    void attach() {
+        bool has{};
+        archive(has);
+
+        if(has) {
+            Entity entity{};
+            archive(entity);
+            ensure_fn(registry, entity);
+            archive(registry.template attach<Tag>(entity));
+        }
+    }
+
+public:
+    ~Loader() {
+        registry.orphans([this](auto entity) {
+            registry.destroy(entity);
+        });
+    }
+
+    Loader entities() && {
+        push(ensure_fn);
+        return *this;
+    }
+
+    Loader destroyed() && {
+        push(destroyed_fn);
+        return *this;
+    }
+
+    template<typename... Component>
+    Loader component() && {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { 0, (restore<Component>(), 0)... };
+        (void)accumulator;
+        return *this;
+    }
+
+    template<typename... Tag>
+    Loader tag() && {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { 0, (attach<Tag>(), 0)... };
+        (void)accumulator;
+        return *this;
+    }
+
+private:
+    Registry<Entity> &registry;
+    Archive &archive;
+    func_type ensure_fn;
+    func_type destroyed_fn;
 };
 
 

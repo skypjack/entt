@@ -297,7 +297,7 @@ public:
     bool valid(entity_type entity) const noexcept {
         using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
         // explicit promotion to avoid warnings with std::uint16_t
-        const entity_type entt = promotion_type{entity} & traits_type::entity_mask;
+        const auto entt = promotion_type{entity} & traits_type::entity_mask;
         return (entt < entities.size() && entities[entt] == entity);
     }
 
@@ -924,31 +924,6 @@ public:
     }
 
     /**
-     * @brief Iterate all the entities ever created.
-     *
-     * The function object is invoked for each entity, no matter if it's in use
-     * or not.<br/>
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(entity_type);
-     * @endcode
-     *
-     * Consider using a view if the goal is to iterate entities that have a
-     * determinate set of components. A view is usually faster than combining
-     * this function with a bunch of custom tests.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void each(Func func) const {
-        for(size_type pos{}, last = entities.size(); pos < last; ++pos) {
-            func(entities[pos]);
-        }
-    }
-
-    /**
      * @brief Iterate all the entities still in use.
      *
      * The function object is invoked for each entity that is still in use.<br/>
@@ -967,19 +942,18 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void alive(Func func) {
+    void each(Func func) {
         std::sort(available.begin(), available.end());
 
-        const auto end= available.cend();
-        auto it = available.cbegin();
+        for(size_type pos = entities.size(), curr = available.size(); pos; --pos) {
+            auto entity = entities[pos-1];
 
-        each([func = std::move(func), it, end](auto entity) mutable {
-            if(it != end && *it == entity) {
-                ++it;
+            if(curr && available[curr-1] == entity) {
+                --curr;
             } else {
                 func(entity);
             }
-        });
+        }
     }
 
     /**
@@ -1000,14 +974,17 @@ public:
      */
     template<typename Func>
     void orphans(Func func) {
-        alive([func = std::move(func), this](auto entity) {
-            for(const auto &pool: pools) {
-                if(pool && pool->has(entity)) {
-                    return;
-                }
+        each([func = std::move(func), this](auto entity) {
+            bool orphan = true;
+
+            for(std::size_t i = 0; i < pools.size() && orphan; ++i) {
+                const auto &pool = pools[i];
+                orphan = !(pool && pool->has(entity));
             }
 
-            func(entity);
+            if(orphan) {
+                func(entity);
+            }
         });
     }
 
@@ -1155,51 +1132,45 @@ public:
     /**
      * TODO private
      */
-    void force(entity_type entity) {
-        const auto entt = entity & traits_type::entity_mask;
-        const auto curr = entities.size();
-        const auto size = entt + 1;
+    template<typename Archive>
+    Snapshot<Entity, Archive> snapshot(Archive &archive) {
+        auto destroyed_fn = [](const Registry &registry, Snapshot<Entity, Archive> &snapshot) {
+            const auto &available = registry.available;
+            snapshot.destroyed(available.cbegin(), available.cend());
+        };
 
-        if(curr < size) {
-            entities.resize(size);
-            std::iota(entities.data(), (size - curr), Entity{curr});
-        } else {
-            auto it = std::find_if(available.begin(), available.end(), [entt](auto entity) {
-                return entt == (entity & traits_type::entity_mask);
-            });
-
-            if(it != available.cend()) {
-                *it = entity;
-            }
-        }
-
-        entities[entt] = entity;
+        return { *this, archive, +destroyed_fn };
     }
 
     /**
      * TODO
      */
-    void drop(entity_type entity) {
-        const auto entt = entity & traits_type::entity_mask;
+    template<typename Archive>
+    Loader<Entity, Archive> restore(Archive &archive) {
+        auto ensure_fn = [](Registry<Entity> &registry, Entity entity) {
+            auto &entities = registry.entities;
 
-        auto it = std::find_if(available.begin(), available.end(), [entt](auto entity) {
-            return entt == (entity & traits_type::entity_mask);
-        });
+            using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
+            // explicit promotion to avoid warnings with std::uint16_t
+            const auto entt = promotion_type{entity} & traits_type::entity_mask;
 
-        entities[entt] = entity;
+            if(!(entt < entities.size())) {
+                auto curr = promotion_type{entities.size()};
+                entities.resize(entt + 1);
+                std::iota(entities.data() + curr, entities.data() + entt, entity_type{curr});
+            }
 
-        if(it == available.cend()) {
-            available.push_back(entity);
-        } else {
-            *it = entity;
-        }
-    }
+            entities[entt] = entity;
+        };
 
-    /**
-     * TODO private
-     */
-    Snapshot<entity_type> snapshot() {
-        return { *this, &Registry::force, &Registry::drop };
+        auto destroyed_fn = [](Registry<Entity> &registry, Entity entity) {
+            assert(registry.valid(entity));
+            const auto entt = entity & traits_type::entity_mask;
+            registry.entities[entt] = entity;
+            registry.available.push_back(entity);
+        };
+
+        return { *this, archive, +ensure_fn, +destroyed_fn };
     }
 
 private:

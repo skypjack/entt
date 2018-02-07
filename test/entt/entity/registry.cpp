@@ -153,50 +153,6 @@ TEST(DefaultRegistry, Each) {
     match = 0u;
 
     registry.each([&](auto entity) {
-        if(registry.has<int>(entity)) { ++match; }
-        registry.destroy(entity);
-        ++tot;
-    });
-
-    ASSERT_EQ(tot, 4u);
-    ASSERT_EQ(match, 2u);
-
-    tot = 0u;
-    match = 0u;
-
-    registry.each([&](auto entity) {
-        if(registry.has<int>(entity)) { ++match; }
-        ++tot;
-    });
-
-    ASSERT_EQ(tot, 4u);
-    ASSERT_EQ(match, 0u);
-}
-
-TEST(DefaultRegistry, Alive) {
-    entt::DefaultRegistry registry;
-    entt::DefaultRegistry::size_type tot;
-    entt::DefaultRegistry::size_type match;
-
-    registry.create<int>();
-    registry.create<int>();
-
-    tot = 0u;
-    match = 0u;
-
-    registry.alive([&](auto entity) {
-        if(registry.has<int>(entity)) { ++match; }
-        registry.create();
-        ++tot;
-    });
-
-    ASSERT_EQ(tot, 2u);
-    ASSERT_EQ(match, 2u);
-
-    tot = 0u;
-    match = 0u;
-
-    registry.alive([&](auto entity) {
         if(registry.has<int>(entity)) {
             registry.destroy(entity);
             ++match;
@@ -211,7 +167,7 @@ TEST(DefaultRegistry, Alive) {
     tot = 0u;
     match = 0u;
 
-    registry.alive([&](auto entity) {
+    registry.each([&](auto entity) {
         if(registry.has<int>(entity)) { ++match; }
         ++tot;
     });
@@ -434,4 +390,53 @@ TEST(DefaultRegistry, SortMulti) {
     for(auto entity: registry.view<int>()) {
         ASSERT_EQ(registry.get<int>(entity), ival++);
     }
+}
+
+struct Archive {
+    template<typename T>
+    void operator()(T) {}
+};
+
+TEST(DefaultRegistry, Snapshot) {
+    entt::DefaultRegistry registry;
+
+    auto e1 = registry.create();
+    registry.assign<int>(e1, 42);
+    registry.assign<char>(e1, 'c');
+    registry.assign<double>(e1, .1);
+
+    auto e2 = registry.create();
+
+    auto e3 = registry.create();
+    registry.assign<int>(e3, 3);
+
+    auto e4 = registry.create();
+    registry.assign<char>(e4, '0');
+    registry.attach<float>(e4, .3f);
+
+    auto e5 = registry.create();
+
+    registry.destroy(e2);
+
+    Archive archive;
+
+    registry.snapshot(archive)
+            .entities()
+            .destroyed()
+            .component<char, int>()
+            .tag<bool, float>()
+            ;
+
+    registry.restore(archive)
+            .entities()
+            .destroyed()
+            .component<char, int>()
+            .tag<bool, float>()
+            ;
+
+    ASSERT_TRUE(registry.valid(e1));
+    ASSERT_FALSE(registry.valid(e2));
+    ASSERT_TRUE(registry.valid(e3));
+    ASSERT_TRUE(registry.valid(e4));
+    ASSERT_FALSE(registry.valid(e5));
 }
