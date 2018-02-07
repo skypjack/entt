@@ -131,87 +131,55 @@ TEST(DefaultRegistry, Functionalities) {
 
 TEST(DefaultRegistry, Each) {
     entt::DefaultRegistry registry;
-    entt::DefaultRegistry::size_type tot;
-    entt::DefaultRegistry::size_type match;
+    const auto &cregistry = registry;
+
+    entt::DefaultRegistry::size_type tot{};
 
     registry.create<int>();
     registry.create<int>();
 
-    tot = 0u;
-    match = 0u;
-
-    registry.each([&](auto entity) {
-        if(registry.has<int>(entity)) { ++match; }
-        registry.create();
-        ++tot;
-    });
-
+    registry.each([&](auto) { ++tot; });
     ASSERT_EQ(tot, 2u);
-    ASSERT_EQ(match, 2u);
-
     tot = 0u;
-    match = 0u;
 
-    registry.each([&](auto entity) {
-        if(registry.has<int>(entity)) {
-            registry.destroy(entity);
-            ++match;
-        }
-
-        ++tot;
-    });
-
-    ASSERT_EQ(tot, 4u);
-    ASSERT_EQ(match, 2u);
-
-    tot = 0u;
-    match = 0u;
-
-    registry.each([&](auto entity) {
-        if(registry.has<int>(entity)) { ++match; }
-        ++tot;
-    });
-
+    registry.each<int>([&](auto, auto &) { ++tot; });
     ASSERT_EQ(tot, 2u);
-    ASSERT_EQ(match, 0u);
+    tot = 0u;
+
+    cregistry.each<int>([&](auto, const auto &) { ++tot; });
+    ASSERT_EQ(tot, 2u);
+    tot = 0u;
+
+    registry.each([&](auto) { registry.create(); });
+    registry.each<int>([&](auto entity, auto &) { registry.destroy(entity); });
+
+    cregistry.each<int>([&](auto, const auto &) { ++tot; });
+    ASSERT_EQ(tot, 0u);
+
+    cregistry.each([&](auto) { ++tot; });
+    ASSERT_EQ(tot, 2u);
 }
 
 TEST(DefaultRegistry, Orphans) {
     entt::DefaultRegistry registry;
-    entt::DefaultRegistry::size_type tot;
+    entt::DefaultRegistry::size_type tot{};
 
     registry.create<int>();
     registry.create();
     registry.create<int>();
     registry.create();
 
-    tot = 0u;
-
-    registry.orphans([&](auto) {
-        ++tot;
-    });
-
+    registry.orphans([&](auto) { ++tot; });
     ASSERT_EQ(tot, 2u);
-
-    registry.each([&](auto entity) {
-        registry.reset<int>(entity);
-    });
-
     tot = 0u;
 
-    registry.orphans([&](auto) {
-        ++tot;
-    });
-
+    registry.each([&](auto entity) { registry.reset<int>(entity); });
+    registry.orphans([&](auto) { ++tot; });
     ASSERT_EQ(tot, 4u);
-
     registry.reset();
     tot = 0u;
 
-    registry.orphans([&](auto) {
-        ++tot;
-    });
-
+    registry.orphans([&](auto) { ++tot; });
     ASSERT_EQ(tot, 0u);
 }
 
@@ -391,6 +359,10 @@ TEST(DefaultRegistry, SortMulti) {
         ASSERT_EQ(registry.get<int>(entity), ival++);
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+/// TODO temporary test
+///
 
 struct Archive {
     template<typename T>

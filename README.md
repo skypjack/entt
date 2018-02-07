@@ -464,7 +464,6 @@ their components are destroyed:
 Finally, references to components can be retrieved simply by doing this:
 
 ```cpp
-entt::DefaultRegistry registry;
 const auto &cregistry = registry;
 
 // const and non-const reference
@@ -517,12 +516,12 @@ bool b = registry.has<PlayingCharacter>();
 References to tags can be retrieved simply by doing this:
 
 ```cpp
+const auto &cregistry = registry;
+
 // either a non-const reference ...
-entt::DefaultRegistry registry;
 PlayingCharacter &player = registry.get<PlayingCharacter>();
 
 // ... or a const one
-const auto &cregistry = registry;
 const Camera &camera = cregistry.get<Camera>();
 ```
 
@@ -866,13 +865,24 @@ registry.each([](auto entity) {
 
 It returns to the caller all the entities that are still in use by means of the
 given function.<br/>
+The same method can be used also to iterate entities that have a specific set of
+components without creating a view:
+
+```cpp
+const auto &cregistry = registry;
+
+// const and non-const references
+registry.each<Position, Velocity>([](auto entity, auto &position, auto &velocity) { /* ... */ });
+cregistry.each<Position, Velocity>([](auto entity, const auto &position, const auto &velocity) { /* ... */ });
+```
+
 As a rule of thumb, consider using a view if the goal is to iterate entities
-that have a determinate set of components. A view is usually faster than
+that have a determinate set of components. A view is usually much faster than
 combining this function with a bunch of custom tests.<br/>
 In all the other cases, this is the way to go.
 
-There exists also another function to use to retrieve orphans. An orphan is an
-entity that is still in use and has no assigned components.<br/>
+There exists also another member function to use to retrieve orphans. An orphan
+is an entity that is still in use and has no assigned components.<br/>
 The signature of the function is the same of `each`:
 
 ```cpp
@@ -881,7 +891,7 @@ registry.orphans([](auto entity) {
 });
 ```
 
-In general, `each` is fairly slow because of the check it performs on each and
+In general, `each` is fairly slow because of some checks it performs on each and
 every entity. For similar reasons, `orphans` can be even slower.<br/>
 Both functions should not be used frequently to avoid the risk of a performance
 hit.
