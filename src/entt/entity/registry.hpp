@@ -1134,12 +1134,12 @@ public:
      */
     template<typename Archive>
     Snapshot<Entity, Archive> snapshot(Archive &archive) {
-        auto destroyed_fn = [](const Registry &registry, Snapshot<Entity, Archive> &snapshot) {
+        auto *destroyed_fn = +[](const Registry &registry, Snapshot<Entity, Archive> &snapshot) {
             const auto &available = registry.available;
             snapshot.destroyed(available.cbegin(), available.cend());
         };
 
-        return { *this, archive, +destroyed_fn };
+        return { *this, archive, destroyed_fn };
     }
 
     /**
@@ -1147,7 +1147,7 @@ public:
      */
     template<typename Archive>
     Loader<Entity, Archive> restore(Archive &archive) {
-        auto ensure_fn = [](Registry<Entity> &registry, Entity entity) {
+        auto *ensure_fn = +[](Registry<Entity> &registry, Entity entity) {
             auto &entities = registry.entities;
 
             using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
@@ -1157,20 +1157,20 @@ public:
             if(!(entt < entities.size())) {
                 auto curr = promotion_type{entities.size()};
                 entities.resize(entt + 1);
-                std::iota(entities.data() + curr, entities.data() + entt, entity_type{curr});
+                std::iota(entities.data() + curr, entities.data() + entt, entity_type(curr));
             }
 
             entities[entt] = entity;
         };
 
-        auto destroyed_fn = [](Registry<Entity> &registry, Entity entity) {
+        auto *destroyed_fn = +[](Registry<Entity> &registry, Entity entity) {
             assert(registry.valid(entity));
             const auto entt = entity & traits_type::entity_mask;
             registry.entities[entt] = entity;
             registry.available.push_back(entity);
         };
 
-        return { *this, archive, +ensure_fn, +destroyed_fn };
+        return { *this, archive, ensure_fn, destroyed_fn };
     }
 
 private:
