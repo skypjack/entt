@@ -32,20 +32,18 @@ class Snapshot final {
     Snapshot & operator=(const Snapshot &) = default;
     Snapshot & operator=(Snapshot &&) = default;
 
-    template<typename Component, typename Archive>
-    void component(Archive &archive) {
-        const auto view = registry.template view<Component>();
-
+    template<typename View, typename Archive>
+    void get(const View &view, Archive &archive) {
         archive(static_cast<Entity>(view.size()));
 
-        for(decltype(view.size()) i{}, sz = view.size(); i < sz; ++i) {
+        for(typename View::size_type i{}, sz = view.size(); i < sz; ++i) {
             archive(view.data()[i]);
             archive(view.raw()[i]);
         };
     }
 
     template<typename Tag, typename Archive>
-    void tag(Archive &archive) {
+    void get(Archive &archive) {
         const bool has = registry.template has<Tag>();
 
         archive(has);
@@ -74,7 +72,7 @@ public:
     template<typename... Component, typename Archive>
     Snapshot component(Archive &archive) && {
         using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (component<Component>(archive), 0)... };
+        accumulator_type accumulator = { 0, (get(registry.template view<Component>(), archive), 0)... };
         (void)accumulator;
         return *this;
     }
@@ -82,7 +80,7 @@ public:
     template<typename... Tag, typename Archive>
     Snapshot tag(Archive &archive) && {
         using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (tag<Tag>(archive), 0)... };
+        accumulator_type accumulator = { 0, (get<Tag>(archive), 0)... };
         (void)accumulator;
         return *this;
     }
