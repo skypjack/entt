@@ -437,7 +437,7 @@ registry.remove<Position>(entity);
 ```
 
 Otherwise consider to use the `reset` member function. It behaves similarly to
-`remove` but with a strictly defined behaviour (and a performance penalty is the
+`remove` but with a strictly defined behavior (and a performance penalty is the
 price to pay for this). In particular it removes the component if and only if it
 exists, otherwise it returns safely to the caller:
 
@@ -921,7 +921,7 @@ hit.
     other entities, destroying them or removing their components isn't
     allowed and it can result in undefined behavior.
 
-  Iterators are invalidated and the behaviour is undefined if an entity is
+  Iterators are invalidated and the behavior is undefined if an entity is
   modified or destroyed and it's not the one currently returned by the
   view.<br/>
   To work around it, possible approaches are:

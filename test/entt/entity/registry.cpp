@@ -369,6 +369,11 @@ struct Archive {
     void operator()(T) {}
 };
 
+struct Foo {
+    entt::DefaultRegistry::entity_type bar;
+    entt::DefaultRegistry::entity_type quux;
+};
+
 TEST(DefaultRegistry, Snapshot) {
     entt::DefaultRegistry registry;
 
@@ -407,6 +412,17 @@ TEST(DefaultRegistry, Snapshot) {
             .component<char, int>(archive)
             .tag<bool, float>(archive)
             ;
+
+    entt::SnapshotAppend<entt::DefaultRegistry::entity_type> append{registry};
+
+    append.entities(archive)
+            .destroyed(archive)
+            .component<char, int>(archive)
+            .component<Foo>(archive, &Foo::bar, &Foo::quux)
+            .tag<bool, float>(archive)
+            .tag<Foo>(archive, &Foo::bar, &Foo::quux)
+            ;
+
 
     // ASSERT_TRUE(registry.valid(e1));
     // ASSERT_FALSE(registry.valid(e2));

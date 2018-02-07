@@ -1188,7 +1188,7 @@ public:
                 return curr == entity;
             }), available.end());
 
-            if(curr != entity) {
+            if(destroyed || curr != entity) {
                 for(auto &&cpool: pools) {
                     if(cpool && cpool->has(curr)) {
                         cpool->destroy(curr);

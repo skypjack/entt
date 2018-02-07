@@ -287,7 +287,7 @@ public:
      * @brief Disconnects all the listeners for the given event type.
      *
      * All the connections previously returned for the given event are
-     * invalidated. Using them results in undefined behaviour.
+     * invalidated. Using them results in undefined behavior.
      *
      * @tparam Event Type of event to reset.
      */
@@ -300,7 +300,7 @@ public:
      * @brief Disconnects all the listeners.
      *
      * All the connections previously returned are invalidated. Using them
-     * results in undefined behaviour.
+     * results in undefined behavior.
      */
     void clear() noexcept {
         std::for_each(handlers.begin(), handlers.end(),

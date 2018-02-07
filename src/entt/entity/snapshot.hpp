@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <utility>
 #include <cassert>
+#include "entt_traits.hpp"
 
 
 namespace entt {
@@ -33,7 +34,7 @@ class Snapshot final {
     Snapshot & operator=(Snapshot &&) = default;
 
     template<typename View, typename Archive>
-    void get(const View &view, Archive &archive) {
+    void get(Archive &archive, const View &view) {
         archive(static_cast<Entity>(view.size()));
 
         for(typename View::size_type i{}, sz = view.size(); i < sz; ++i) {
@@ -72,7 +73,7 @@ public:
     template<typename... Component, typename Archive>
     Snapshot component(Archive &archive) && {
         using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (get(registry.template view<Component>(), archive), 0)... };
+        accumulator_type accumulator = { 0, (get(archive, registry.template view<Component>()), 0)... };
         (void)accumulator;
         return *this;
     }
@@ -113,7 +114,7 @@ class SnapshotRestore final {
     SnapshotRestore & operator=(SnapshotRestore &&) = default;
 
     template<typename Archive>
-    void restore(bool destroyed, Archive &archive) {
+    void restore(Archive &archive, bool destroyed) {
         Entity length{};
         archive(length);
 
@@ -161,13 +162,13 @@ public:
 
     template<typename Archive>
     SnapshotRestore entities(Archive &archive) && {
-        restore(false, archive);
+        restore(archive, false);
         return *this;
     }
 
     template<typename Archive>
     SnapshotRestore destroyed(Archive &archive) && {
-        restore(true, archive);
+        restore(archive, true);
         return *this;
     }
 
@@ -193,46 +194,147 @@ private:
 };
 
 
-//template<typename Entity>
-//class SnapshotAppend {
-//
-//public:
-//    SnapshotAppend(Registry<Entity> &reg)
-//        : reg{reg}
-//    {}
-//
-//    const Registry<Entity> & registry() const noexcept {
-//        return reg;
-//    }
-//
-//    Registry<Entity> & registry() noexcept {
-//        return const_cast<Registry<Entity> &>(const_cast<const SnapshotAppend *>(this)->registry());
-//    }
-//
-//    template<typename Archive>
-//    SnapshotAppend entities(Archive &archive) {
-//        // TODO
-//    }
-//
-//    template<typename Archive>
-//    SnapshotAppend destroyed(Archive &archive) {
-//        // TODO
-//    }
-//
-//    template<typename... Component, typename Archive>
-//    SnapshotAppend component(Archive &archive) {
-//        // TODO
-//    }
-//
-//    template<typename... Tag, typename Archive>
-//    SnapshotAppend tag(Archive &archive) {
-//        // TODO
-//    }
-//
-//private:
-//    std::unordered_map<Entity, Entity> remloc;
-//    Registry<Entity> &reg;
-//};
+template<typename Entity>
+class SnapshotAppend {
+    using traits_type = entt_traits<Entity>;
+
+    template<typename Archive>
+    void prepare(Archive &archive, bool destroyed) {
+        Entity length{};
+        archive(length);
+
+        while(length) {
+            Entity entity{};
+            archive(entity);
+
+            const auto entt = entity & traits_type::entity_mask;
+            auto it = remloc.find(entt);
+
+            if(destroyed) {
+                if(it != remloc.cend()) {
+                    registry.destroy(it->second.second);
+                    remloc.erase(it);
+                }
+            } else {
+                if(it == remloc.cend()) {
+                    remloc.emplace(entt, std::make_pair(entity, registry.create()));
+                } else if(entity != it->second.first) {
+                    registry.destroy(it->second.second);
+                    remloc[entt] = { entity, registry.create() };
+                }
+            }
+
+            --length;
+        }
+    }
+
+    template<typename Component, typename Archive>
+    void assign(Archive &archive) {
+        Entity length{};
+        archive(length);
+
+        while(length) {
+            Entity entity{};
+            archive(entity);
+
+            // TODO
+
+            --length;
+        }
+    }
+
+    template<typename Component, typename Archive, typename... Type>
+    void assign(Archive &archive, Type Component::*... member) {
+        Entity length{};
+        archive(length);
+
+        while(length) {
+            Entity entity{};
+            archive(entity);
+
+            // TODO
+
+            --length;
+        }
+    }
+
+    template<typename Tag, typename Archive>
+    void attach(Archive &archive) {
+        bool has{};
+        archive(has);
+
+        if(has) {
+            Entity entity{};
+            archive(entity);
+
+            // TODO
+        }
+    }
+
+    template<typename Tag, typename Archive, typename... Type>
+    void attach(Archive &archive, Type Tag::*... member) {
+        bool has{};
+        archive(has);
+
+        if(has) {
+            Entity entity{};
+            archive(entity);
+
+            // TODO
+        }
+    }
+
+public:
+    using registry_type = Registry<Entity>;
+
+    SnapshotAppend(registry_type &registry)
+        : registry{registry}
+    {}
+
+    template<typename Archive>
+    SnapshotAppend & entities(Archive &archive) {
+        prepare(archive, false);
+        return *this;
+    }
+
+    template<typename Archive>
+    SnapshotAppend & destroyed(Archive &archive) {
+        prepare(archive, true);
+        return *this;
+    }
+
+    template<typename... Component, typename Archive>
+    SnapshotAppend & component(Archive &archive) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { 0, (assign<Component>(archive), 0)... };
+        (void)accumulator;
+        return *this;
+    }
+
+    template<typename Component, typename Archive, typename... Type>
+    SnapshotAppend & component(Archive &archive, Type Component::*... member) {
+        assign(archive, member...);
+        return *this;
+    }
+
+    template<typename... Tag, typename Archive>
+    SnapshotAppend & tag(Archive &archive) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { 0, (attach<Tag>(archive), 0)... };
+        (void)accumulator;
+        return *this;
+    }
+
+    template<typename Tag, typename Archive, typename... Type>
+    SnapshotAppend & tag(Archive &archive, Type Tag::*... member) {
+        attach<Tag>(archive, member...);
+        return *this;
+    }
+
+private:
+    std::unordered_map<Entity, std::pair<Entity, Entity>> remloc;
+    Registry<Entity> &registry;
+};
 
 
 }
