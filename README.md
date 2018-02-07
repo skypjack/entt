@@ -336,7 +336,7 @@ information about the entity itself and its version.
 A registry can be used both to construct and to destroy entities:
 
 ```cpp
-// constructs a naked entity with no components ad returns its identifier
+// constructs a naked entity with no components and returns its identifier
 auto entity = registry.create();
 
 // constructs an entity and assigns it default-initialized components
@@ -808,7 +808,7 @@ registry.prepare<Position, Velocity>();
 
 If the registry is empty, preparation is extremely fast. Moreover the `prepare`
 member function template is idempotent. Feel free to invoke it even more than
-once: if the view has been alreadt prepared before, the function returns
+once: if the view has been already prepared before, the function returns
 immediately and does nothing.
 
 A persistent view offers a bunch of functionalities to get the number of
