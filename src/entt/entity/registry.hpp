@@ -1130,51 +1130,52 @@ public:
     }
 
     /**
+     * TODO it will be private
+     */
+    void restore(entity_type entity, bool destroyed) {
+        using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
+        // explicit promotion to avoid warnings with std::uint16_t
+        const auto entt = promotion_type{entity} & traits_type::entity_mask;
+
+        if(entt < entities.size()) {
+            auto curr = entities[entt];
+
+            available.erase(std::remove_if(available.begin(), available.end(), [curr](auto entity) {
+                return curr == entity;
+            }), available.end());
+
+            if(curr != entity) {
+                for(auto &&cpool: pools) {
+                    if(cpool && cpool->has(curr)) {
+                        cpool->destroy(curr);
+                    }
+                }
+            }
+        } else {
+            auto curr = entities.size();
+            entities.resize(entt + 1);
+            std::iota(entities.data() + curr, entities.data() + entt, entity_type(curr));
+        }
+
+        entities[entt] = entity;
+
+        if(destroyed) {
+            available.push_back(entity);
+        }
+    }
+
+    /**
      * TODO private
      */
-    template<typename Archive>
-    Snapshot<Entity, Archive> snapshot(Archive &archive) {
-        using fn_type = void(*)(const Registry<Entity> &, Snapshot<Entity, Archive> &);
-
-        fn_type destroyed_fn = [](const Registry &registry, Snapshot<Entity, Archive> &snapshot) {
-            const auto &available = registry.available;
-            snapshot.destroyed(available.cbegin(), available.cend());
-        };
-
-        return { *this, archive, destroyed_fn };
+    Snapshot<Entity> snapshot() {
+        return { *this, available.data(), available.size() };
     }
 
     /**
      * TODO
      */
-    template<typename Archive>
-    SnapshotRestore<Entity, Archive> restore(Archive &archive) {
-        using fn_type = void(*)(Registry<Entity> &, Entity);
-
-        fn_type ensure_fn = [](Registry<Entity> &registry, Entity entity) {
-            auto &entities = registry.entities;
-
-            using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
-            // explicit promotion to avoid warnings with std::uint16_t
-            const auto entt = promotion_type{entity} & traits_type::entity_mask;
-
-            if(!(entt < entities.size())) {
-                auto curr = promotion_type{entities.size()};
-                entities.resize(entt + 1);
-                std::iota(entities.data() + curr, entities.data() + entt, entity_type(curr));
-            }
-
-            entities[entt] = entity;
-        };
-
-        fn_type destroyed_fn = [](Registry<Entity> &registry, Entity entity) {
-            assert(registry.valid(entity));
-            const auto entt = entity & traits_type::entity_mask;
-            registry.entities[entt] = entity;
-            registry.available.push_back(entity);
-        };
-
-        return { *this, archive, ensure_fn, destroyed_fn };
+    SnapshotRestore<Entity> restore() {
+        return { *this, &Registry::restore };
     }
 
 private:
