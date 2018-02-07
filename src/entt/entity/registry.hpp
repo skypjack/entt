@@ -1134,7 +1134,7 @@ public:
      */
     template<typename Archive>
     Snapshot<Entity, Archive> snapshot(Archive &archive) {
-        using fn_type = void(*)(const Registry<Entity> &, Entity);
+        using fn_type = void(*)(const Registry<Entity> &, Snapshot<Entity, Archive> &);
 
         fn_type destroyed_fn = [](const Registry &registry, Snapshot<Entity, Archive> &snapshot) {
             const auto &available = registry.available;
