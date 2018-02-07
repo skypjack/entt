@@ -1136,7 +1136,7 @@ public:
     Snapshot<Entity, Archive> snapshot(Archive &archive) {
         using fn_type = void(*)(Registry<Entity> &, Entity);
 
-        fn_type destroyed_fn = +[](const Registry &registry, Snapshot<Entity, Archive> &snapshot) {
+        fn_type destroyed_fn = [](const Registry &registry, Snapshot<Entity, Archive> &snapshot) {
             const auto &available = registry.available;
             snapshot.destroyed(available.cbegin(), available.cend());
         };
@@ -1151,7 +1151,7 @@ public:
     Loader<Entity, Archive> restore(Archive &archive) {
         using fn_type = void(*)(Registry<Entity> &, Entity);
 
-        fn_type ensure_fn = +[](Registry<Entity> &registry, Entity entity) {
+        fn_type ensure_fn = [](Registry<Entity> &registry, Entity entity) {
             auto &entities = registry.entities;
 
             using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
@@ -1167,7 +1167,7 @@ public:
             entities[entt] = entity;
         };
 
-        fn_type destroyed_fn = +[](Registry<Entity> &registry, Entity entity) {
+        fn_type destroyed_fn = [](Registry<Entity> &registry, Entity entity) {
             assert(registry.valid(entity));
             const auto entt = entity & traits_type::entity_mask;
             registry.entities[entt] = entity;
