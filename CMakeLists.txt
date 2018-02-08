@@ -16,7 +16,7 @@ endif()
 # Project configuration
 #
 
-project(entt VERSION 2.4.1)
+project(entt VERSION 2.4.2)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)

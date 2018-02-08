@@ -516,7 +516,7 @@ public:
     object_type & construct(entity_type entity, Args&&... args) {
         underlying_type::construct(entity);
         // emplace_back doesn't work well with PODs because of its placement new
-        instances.push_back({ std::forward<Args>(args)... });
+        instances.push_back(object_type{ std::forward<Args>(args)... });
         return instances.back();
     }
 
@@ -533,7 +533,9 @@ public:
      */
     void destroy(entity_type entity) override {
         // swapping isn't required here, we are getting rid of the last element
-        instances[underlying_type::get(entity)] = std::move(instances.back());
+        // however, we must protect ourselves from self assignments (see #37)
+        auto tmp = std::move(instances.back());
+        instances[underlying_type::get(entity)] = std::move(tmp);
         instances.pop_back();
         underlying_type::destroy(entity);
     }
