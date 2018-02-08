@@ -533,7 +533,9 @@ public:
      */
     void destroy(entity_type entity) override {
         // swapping isn't required here, we are getting rid of the last element
-        instances[underlying_type::get(entity)] = std::move(instances.back());
+        // however, we must protect ourselves from self assignments (see #37)
+        auto tmp = std::move(instances.back());
+        instances[underlying_type::get(entity)] = std::move(tmp);
         instances.pop_back();
         underlying_type::destroy(entity);
     }

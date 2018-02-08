@@ -1,3 +1,4 @@
+#include <unordered_set>
 #include <functional>
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
@@ -434,4 +435,12 @@ TEST(DefaultRegistry, SortMulti) {
     for(auto entity: registry.view<int>()) {
         ASSERT_EQ(registry.get<int>(entity), ival++);
     }
+}
+
+TEST(DefaultRegistry, ComponentsWithTypesFromStandardTemplateLibrary) {
+    // see #37 - the test shouldn't crash, that's all
+    entt::DefaultRegistry registry;
+    auto entity = registry.create();
+    registry.assign<std::unordered_set<int>>(entity).insert(42);
+    registry.destroy(entity);
 }
