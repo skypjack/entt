@@ -47,7 +47,8 @@ class Snapshot final {
     void get(Archive &archive) {
         const bool has = registry.template has<Tag>();
 
-        archive(has);
+        // numerical length is forced for tags to facilitate loading
+        archive(has ? Entity(1): Entity{});
 
         if(has) {
             archive(registry.template attachee<Tag>());
@@ -113,44 +114,35 @@ class SnapshotRestore final {
     SnapshotRestore & operator=(const SnapshotRestore &) = default;
     SnapshotRestore & operator=(SnapshotRestore &&) = default;
 
-    template<typename Archive>
-    void restore(Archive &archive, bool destroyed) {
+    template<typename Archive, typename Func>
+    void each(Archive &archive, Func func) {
         Entity length{};
         archive(length);
 
         while(length) {
             Entity entity{};
             archive(entity);
-            (registry.*force_fn)(entity, destroyed);
+            func(entity);
             --length;
         }
     }
 
     template<typename Component, typename Archive>
     void assign(Archive &archive) {
-        Entity length{};
-        archive(length);
-
-        while(length) {
-            Entity entity{};
-            archive(entity);
-            (registry.*force_fn)(entity, false);
+        each(archive, [&archive, this](auto entity) {
+            const bool destroyed = false;
+            (registry.*force_fn)(entity, destroyed);
             archive(registry.template assign<Component>(entity));
-            --length;
-        }
+        });
     }
 
     template<typename Tag, typename Archive>
     void attach(Archive &archive) {
-        bool has{};
-        archive(has);
-
-        if(has) {
-            Entity entity{};
-            archive(entity);
-            (registry.*force_fn)(entity, false);
+        each(archive, [&archive, this](auto entity) {
+            const bool destroyed = false;
+            (registry.*force_fn)(entity, destroyed);
             archive(registry.template attach<Tag>(entity));
-        }
+        });
     }
 
 public:
@@ -162,13 +154,21 @@ public:
 
     template<typename Archive>
     SnapshotRestore entities(Archive &archive) && {
-        restore(archive, false);
+        each(archive, [this](auto entity) {
+            const bool destroyed = false;
+            (registry.*force_fn)(entity, destroyed);
+        });
+
         return *this;
     }
 
     template<typename Archive>
     SnapshotRestore destroyed(Archive &archive) && {
-        restore(archive, true);
+        each(archive, [this](auto entity) {
+            const bool destroyed = true;
+            (registry.*force_fn)(entity, destroyed);
+        });
+
         return *this;
     }
 
@@ -198,91 +198,102 @@ template<typename Entity>
 class SnapshotAppend {
     using traits_type = entt_traits<Entity>;
 
-    template<typename Archive>
-    void prepare(Archive &archive, bool destroyed) {
-        Entity length{};
-        archive(length);
+    void prepare(Entity entity, bool destroyed) {
+        const auto it = remloc.find(entity);
 
-        while(length) {
-            Entity entity{};
-            archive(entity);
-
-            const auto entt = entity & traits_type::entity_mask;
-            auto it = remloc.find(entt);
+        if(it == remloc.cend()) {
+            remloc.emplace(entity, std::make_pair(registry.create(), true));
 
             if(destroyed) {
-                if(it != remloc.cend()) {
-                    registry.destroy(it->second.second);
-                    remloc.erase(it);
-                }
-            } else {
-                if(it == remloc.cend()) {
-                    remloc.emplace(entt, std::make_pair(entity, registry.create()));
-                } else if(entity != it->second.first) {
-                    registry.destroy(it->second.second);
-                    remloc[entt] = { entity, registry.create() };
-                }
+                registry.destroy(remloc[entity].first);
             }
+        } else {
+            const auto local = remloc[entity].first;
 
-            --length;
+            // set the dirty flag
+            remloc[entity].second = true;
+
+            if(destroyed && registry.valid(local)) {
+                registry.destroy(local);
+            } else if(!destroyed && !registry.valid(local)) {
+                remloc[entity].first = registry.create();
+            }
         }
     }
 
-    template<typename Component, typename Archive>
-    void assign(Archive &archive) {
+
+    template<typename Archive, typename Func>
+    void each(Archive &archive, Func func) {
         Entity length{};
         archive(length);
 
         while(length) {
             Entity entity{};
             archive(entity);
-
-            // TODO
-
+            func(entity);
             --length;
         }
     }
 
-    template<typename Component, typename Archive, typename... Type>
-    void assign(Archive &archive, Type Component::*... member) {
-        Entity length{};
-        archive(length);
-
-        while(length) {
-            Entity entity{};
-            archive(entity);
-
-            // TODO
-
-            --length;
-        }
-    }
-
-    template<typename Tag, typename Archive>
-    void attach(Archive &archive) {
-        bool has{};
-        archive(has);
-
-        if(has) {
-            Entity entity{};
-            archive(entity);
-
-            // TODO
-        }
-    }
-
-    template<typename Tag, typename Archive, typename... Type>
-    void attach(Archive &archive, Type Tag::*... member) {
-        bool has{};
-        archive(has);
-
-        if(has) {
-            Entity entity{};
-            archive(entity);
-
-            // TODO
-        }
-    }
+    // template<typename Component, typename Archive>
+    // void assign(Archive &archive) {
+    //     Entity length{};
+    //     archive(length);
+    //
+    //     while(length) {
+    //         Entity entity{};
+    //         archive(entity);
+    //         prepare(entity, false);
+    //
+    //         // TODO
+    //
+    //         --length;
+    //     }
+    // }
+    //
+    // template<typename Component, typename Archive, typename... Type>
+    // void assign(Archive &archive, Type Component::*... member) {
+    //     Entity length{};
+    //     archive(length);
+    //
+    //     while(length) {
+    //         Entity entity{};
+    //         archive(entity);
+    //         prepare(entity, false);
+    //
+    //         // TODO
+    //
+    //         --length;
+    //     }
+    // }
+    //
+    // template<typename Tag, typename Archive>
+    // void attach(Archive &archive) {
+    //     bool has{};
+    //     archive(has);
+    //
+    //     if(has) {
+    //         Entity entity{};
+    //         archive(entity);
+    //         prepare(entity, false);
+    //
+    //         // TODO
+    //     }
+    // }
+    //
+    // template<typename Tag, typename Archive, typename... Type>
+    // void attach(Archive &archive, Type Tag::*... member) {
+    //     bool has{};
+    //     archive(has);
+    //
+    //     if(has) {
+    //         Entity entity{};
+    //         archive(entity);
+    //         prepare(entity, false);
+    //
+    //         // TODO
+    //     }
+    // }
 
 public:
     using registry_type = Registry<Entity>;
@@ -293,46 +304,54 @@ public:
 
     template<typename Archive>
     SnapshotAppend & entities(Archive &archive) {
-        prepare(archive, false);
+        each(archive, [this](auto entity) {
+            const bool destroyed = false;
+            prepare(entity, destroyed);
+        });
+
         return *this;
     }
 
     template<typename Archive>
     SnapshotAppend & destroyed(Archive &archive) {
-        prepare(archive, true);
+        each(archive, [this](auto entity) {
+            const bool destroyed = true;
+            prepare(entity, destroyed);
+        });
+
         return *this;
     }
 
     template<typename... Component, typename Archive>
     SnapshotAppend & component(Archive &archive) {
-        using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (assign<Component>(archive), 0)... };
-        (void)accumulator;
+        // using accumulator_type = int[];
+        // accumulator_type accumulator = { 0, (assign<Component>(archive), 0)... };
+        // (void)accumulator;
         return *this;
     }
 
     template<typename Component, typename Archive, typename... Type>
     SnapshotAppend & component(Archive &archive, Type Component::*... member) {
-        assign(archive, member...);
+        // assign(archive, member...);
         return *this;
     }
 
     template<typename... Tag, typename Archive>
     SnapshotAppend & tag(Archive &archive) {
-        using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (attach<Tag>(archive), 0)... };
-        (void)accumulator;
+        // using accumulator_type = int[];
+        // accumulator_type accumulator = { 0, (attach<Tag>(archive), 0)... };
+        // (void)accumulator;
         return *this;
     }
 
     template<typename Tag, typename Archive, typename... Type>
     SnapshotAppend & tag(Archive &archive, Type Tag::*... member) {
-        attach<Tag>(archive, member...);
+        // attach<Tag>(archive, member...);
         return *this;
     }
 
 private:
-    std::unordered_map<Entity, std::pair<Entity, Entity>> remloc;
+    std::unordered_map<Entity, std::pair<Entity, bool>> remloc;
     Registry<Entity> &registry;
 };
 
