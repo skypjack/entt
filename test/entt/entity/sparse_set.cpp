@@ -1,3 +1,4 @@
+#include <unordered_set>
 #include <gtest/gtest.h>
 #include <entt/entity/sparse_set.hpp>
 
@@ -71,12 +72,6 @@ TEST(SparseSetNoType, DataBeginEnd) {
     ASSERT_EQ(begin, end);
 }
 
-TEST(SparseSetWithType, AggregatesMustWork) {
-    struct AggregateType { int value; };
-    // the goal of this test is to enforce the requirements for aggregate types
-    entt::SparseSet<unsigned int, AggregateType>{}.construct(0, 42);
-}
-
 TEST(SparseSetWithType, Functionalities) {
     entt::SparseSet<unsigned int, int> set;
 
@@ -120,6 +115,19 @@ TEST(SparseSetWithType, Functionalities) {
     (void)entt::SparseSet<unsigned int>{std::move(set)};
     entt::SparseSet<unsigned int> other;
     other = std::move(set);
+}
+
+TEST(SparseSetWithType, AggregatesMustWork) {
+    struct AggregateType { int value; };
+    // the goal of this test is to enforce the requirements for aggregate types
+    entt::SparseSet<unsigned int, AggregateType>{}.construct(0, 42);
+}
+
+TEST(SparseSetWithType, TypesFromStandardTemplateLibraryMustWork) {
+    // see #37 - this test shouldn't crash, that's all
+    entt::SparseSet<unsigned int, std::unordered_set<int>> set;
+    set.construct(0).insert(42);
+    set.destroy(0);
 }
 
 TEST(SparseSetWithType, RawBeginEnd) {

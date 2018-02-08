@@ -9,7 +9,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <cassert>
-#include <numeric>
 #include <algorithm>
 #include <type_traits>
 #include "../core/family.hpp"
@@ -403,7 +402,7 @@ public:
      * function can be used to know if they are still valid or the entity has
      * been destroyed and potentially recycled.
      *
-     * The returned entity has no assigned components.
+     * The returned entity has no components assigned.
      *
      * @return A valid entity identifier.
      */
