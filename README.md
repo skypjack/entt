@@ -1513,7 +1513,81 @@ The intended use is as a base class, which is the opposite of what the signals
 are meant for. Internally it uses either managed or unmanaged signal handlers,
 that is why there exist both a managed and an unmanaged event bus.
 
-TODO
+The API of a bus is a kind of subset of the one of a signal. First of all, it
+requires all the types of the events are specified when the bus is declared:
+
+```cpp
+struct AnEvent { int value; };
+struct AnotherEvent {};
+
+// define a managed bus that works with std::shared_ptr/std::weak_ptr
+entt::ManagedBus<AnEvent, AnotherEventC> mbus;
+
+// define an unmanaged bus that works with naked pointers
+entt::UnmanagedBus<AnEvent, AnotherEventC> bus;
+```
+
+For the sake of brevity, below is described the interface of the sole unmanaged
+bus. The interface of the managed bus is almost the same, but for the fact that
+it accepts smart pointers instead of naked pointers.
+
+In order to register an instance of a class to a bus, its type must expose one
+or more member functions named `receive` of which the return types are `void`
+and the argument lists are `const E &`, for each type of event `E`.<br/>
+The `reg` member function is the way to go to register such an instance:
+
+```cpp
+struct Listener
+{
+    void receive(const AnEvent &) { /* ... */ }
+    void receive(const AnotherEvent &) { /* ... */ }
+};
+
+// ...
+
+Listener listener;
+bus.reg(&listener);
+```
+
+To disconnect an instance of a class from a bus, use the `unreg` member
+function instead:
+
+```cpp
+bus.unreg(&listener);
+```
+
+Each function that respects the accepted signature is automatically registered
+and/or unregistered. Note that invoking `unreg` with an instance of a class that
+hasn't been previously registered is a perfectly valid operation.
+
+Free functions can be registered and unregisterd as well by means of the
+dedicated member functions `connect` and `disconnect`:
+
+```cpp
+void foo(const AnEvent &) { /* ... */ }
+void bar(const AnotherEvent &) { /* ... */ }
+
+// ...
+
+bus.connect<AnEvent, &foo>();
+bus.connect<AnotherEvent, &bar>();
+
+// ...
+
+bus.disconnect<AnEvent, &foo>();
+bus.disconnect<AnotherEvent, &bar>();
+```
+
+Whenever the need to send an event arises, it can be done through the `publish`
+member function:
+
+```cpp
+bus.publish<AnEvent>(42);
+bus.publish<AnotherEvent>();
+```
+
+Finally, there are another few functions to use to query the internal state of a
+bus like `empty` and `size` whose meaning is quite intuitive.
 
 ## Delegate
 
