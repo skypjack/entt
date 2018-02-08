@@ -516,7 +516,7 @@ public:
     object_type & construct(entity_type entity, Args&&... args) {
         underlying_type::construct(entity);
         // emplace_back doesn't work well with PODs because of its placement new
-        instances.push_back({ std::forward<Args>(args)... });
+        instances.push_back(object_type{ std::forward<Args>(args)... });
         return instances.back();
     }
 
