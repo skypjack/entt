@@ -1591,7 +1591,56 @@ bus like `empty` and `size` whose meaning is quite intuitive.
 
 ## Delegate
 
-TODO
+A delegate can be used as general purpose invoker with no memory overhead for
+free functions and member functions provided along with an instance on which
+to invoke them.<br/>
+It does not claim to be a drop-in replacement for an `std::function`, so do not
+expect to use it whenever an `std::function` fits well. However, it can be used
+to send opaque delegates around to be used to invoke functions as needed.
+
+The interface is trivial. It offers a default constructor to create empty
+delegates:
+
+```cpp
+entt::Delegate<int(int)> delegate{};
+```
+
+All what is needed to create an instance is to specify the type of the function
+the delegate will _contain_, that is the signature of the free function or the
+member function one wants to assign to it.
+
+Attempting to use an empty delegate by invoking its function call operator
+results in an undefined behavior, most likely a crash actually. Before to use a
+delegate, it must be initialized.<br/>
+There exist two functions to do that, both named `connect`:
+
+```cpp
+int f(int i) { return i; }
+
+struct MyStruct {
+    int f(int i) { return i }
+};
+
+// bind a free function to the delegate
+delegate.connect<&f>();
+
+// bind a member function to the delegate
+MyStruct instance;
+delegate.connect<MyStruct, &MyStruct::f>(&instance);
+```
+
+It hasn't a `disconnect` counterpart. Instead, there exists a `reset` member
+function to clear it.<br/>
+Finally, to invoke a delegate, the function call operator is the way to go as
+usual:
+
+```cpp
+auto ret = delegate(42);
+```
+
+Probably too much small and pretty poor of functionalities, but the delegate
+class can help in a lot of cases and it has shown that it is worth keeping it
+within the framework.
 
 ## Event dispatcher
 
