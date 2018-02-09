@@ -484,7 +484,7 @@ public:
             tags.resize(ttype + 1);
         }
 
-        tags[ttype].reset(new Attaching<Tag>{entity, { std::forward<Args>(args)... }});
+        tags[ttype].reset(new Attaching<Tag>{entity, Tag{ std::forward<Args>(args)... }});
 
         return static_cast<Attaching<Tag> *>(tags[ttype].get())->tag;
     }
