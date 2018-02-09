@@ -100,7 +100,7 @@ template<typename Entity>
 class SnapshotDumpLoader final {
     friend class Registry<Entity>;
 
-    using func_type = void(Registry<Entity>::*)(Entity, bool);
+    using func_type = void(*)(Registry<Entity> &, Entity, bool);
 
     SnapshotDumpLoader(Registry<Entity> &registry, func_type force_fn) noexcept
         : registry{registry},
@@ -133,7 +133,7 @@ class SnapshotDumpLoader final {
     void assign(Archive &archive) {
         each(archive, [&archive, this](auto entity) {
             const bool destroyed = false;
-            (registry.*force_fn)(entity, destroyed);
+            force_fn(registry, entity, destroyed);
             archive(registry.template assign<Component>(entity));
         });
     }
@@ -142,7 +142,7 @@ class SnapshotDumpLoader final {
     void attach(Archive &archive) {
         each(archive, [&archive, this](auto entity) {
             const bool destroyed = false;
-            (registry.*force_fn)(entity, destroyed);
+            force_fn(registry, entity, destroyed);
             archive(registry.template attach<Tag>(entity));
         });
     }
@@ -152,7 +152,7 @@ public:
     SnapshotDumpLoader entities(Archive &archive) && {
         each(archive, [this](auto entity) {
             const bool destroyed = false;
-            (registry.*force_fn)(entity, destroyed);
+            force_fn(registry, entity, destroyed);
         });
 
         return *this;
@@ -162,7 +162,7 @@ public:
     SnapshotDumpLoader destroyed(Archive &archive) && {
         each(archive, [this](auto entity) {
             const bool destroyed = true;
-            (registry.*force_fn)(entity, destroyed);
+            force_fn(registry, entity, destroyed);
         });
 
         return *this;
@@ -200,8 +200,12 @@ private:
 
 
 template<typename Entity>
-class SnapshotProgressiveLoader {
+class SnapshotProgressiveLoader final {
     using traits_type = entt_traits<Entity>;
+
+    SnapshotProgressiveLoader(Registry<Entity> &registry) noexcept
+        : registry{registry}
+    {}
 
     void prepare(Entity entity, bool destroyed) {
         const auto it = remloc.find(entity);
@@ -228,7 +232,7 @@ class SnapshotProgressiveLoader {
 
     void map(Entity &entity) {
         auto it = remloc.find(entity);
-        assert(it != remloc.cend());
+        assert(!(it == remloc.cend()));
         entity = it->second.first;
     }
 
@@ -306,12 +310,11 @@ class SnapshotProgressiveLoader {
     }
 
 public:
-    using registry_type = Registry<Entity>;
-    using entity_type = Entity;
+    SnapshotProgressiveLoader(const SnapshotProgressiveLoader &) = default;
+    SnapshotProgressiveLoader(SnapshotProgressiveLoader &&) = default;
 
-    SnapshotProgressiveLoader(registry_type &registry) noexcept
-        : registry{registry}
-    {}
+    SnapshotProgressiveLoader & operator=(const SnapshotProgressiveLoader &) = default;
+    SnapshotProgressiveLoader & operator=(SnapshotProgressiveLoader &&) = default;
 
     template<typename Archive>
     SnapshotProgressiveLoader & entities(Archive &archive) {

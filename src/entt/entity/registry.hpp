@@ -1192,41 +1192,6 @@ public:
     }
 
     /**
-     * TODO it will be private
-     */
-    void force(entity_type entity, bool destroyed) {
-        using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
-        // explicit promotion to avoid warnings with std::uint16_t
-        const auto entt = promotion_type{entity} & traits_type::entity_mask;
-
-        if(entt < entities.size()) {
-            auto curr = entities[entt];
-
-            available.erase(std::remove_if(available.begin(), available.end(), [curr](auto entity) {
-                return curr == entity;
-            }), available.end());
-
-            if(destroyed || curr != entity) {
-                for(auto &&cpool: pools) {
-                    if(cpool && cpool->has(curr)) {
-                        cpool->destroy(curr);
-                    }
-                }
-            }
-        } else {
-            auto curr = entities.size();
-            entities.resize(entt + 1);
-            std::iota(entities.data() + curr, entities.data() + entt, entity_type(curr));
-        }
-
-        entities[entt] = entity;
-
-        if(destroyed) {
-            available.push_back(entity);
-        }
-    }
-
-    /**
      * TODO private
      */
     Snapshot<Entity> snapshot() {
@@ -1237,7 +1202,59 @@ public:
      * TODO
      */
     SnapshotDumpLoader<Entity> restore() {
-        return { *this, &Registry::force };
+        using func_type = void(*)(Registry &, entity_type, bool);
+
+        func_type force = [](Registry &registry, entity_type entity, bool destroyed) {
+            using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
+            // explicit promotion to avoid warnings with std::uint16_t
+            const auto entt = promotion_type{entity} & traits_type::entity_mask;
+
+            auto &available = registry.available;
+            auto &entities = registry.entities;
+            auto &pools = registry.pools;
+            auto &tags = registry.tags;
+
+            if(entt < entities.size()) {
+                auto curr = entities[entt];
+
+                available.erase(std::remove_if(available.begin(), available.end(), [curr](auto entity) {
+                    return curr == entity;
+                }), available.end());
+
+                if(destroyed || curr != entity) {
+                    for(auto &&cpool: pools) {
+                        if(cpool && cpool->has(curr)) {
+                            cpool->destroy(curr);
+                        }
+                    }
+
+                    for(auto &&tag: tags) {
+                        if(tag && tag->entity == entity) {
+                            tag.reset();
+                        }
+                    }
+                }
+            } else {
+                auto curr = entities.size();
+                entities.resize(entt + 1);
+                std::iota(entities.data() + curr, entities.data() + entt, entity_type(curr));
+            }
+
+            entities[entt] = entity;
+
+            if(destroyed) {
+                available.push_back(entity);
+            }
+        };
+
+        return { *this, force };
+    }
+
+    /**
+     * TODO
+     */
+    SnapshotProgressiveLoader<Entity> progressive() {
+        return { *this };
     }
 
 private:
