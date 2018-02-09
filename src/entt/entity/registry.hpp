@@ -953,9 +953,7 @@ public:
     void each(Func func) const {
         std::vector<entity_type> copy{available.cbegin(), available.cend()};
         std::sort(copy.begin(), copy.end(), [](auto lhs, auto rhs) {
-            lhs = lhs & traits_type::entity_mask;
-            rhs = rhs & traits_type::entity_mask;
-            return (lhs < rhs);
+            return ((lhs & traits_type::entity_mask) < (rhs & traits_type::entity_mask));
         });
 
         for(size_type pos = entities.size(), curr = copy.size(); pos; --pos) {

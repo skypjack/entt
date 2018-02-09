@@ -257,8 +257,21 @@ class ProgressiveLoader final {
         }
     }
 
+    template<typename Component>
+    void reset() {
+        for(auto &&ref: remloc) {
+            const auto local = ref.second.first;
+
+            if(registry.valid(local)) {
+                registry.template reset<Component>(local);
+            }
+        }
+    }
+
     template<typename Component, typename Archive>
     void assign(Archive &archive) {
+        reset<Component>();
+
         each(archive, [&archive, this](auto entity) {
             const bool destroyed = false;
             entity = prepare(entity, destroyed);
@@ -268,6 +281,8 @@ class ProgressiveLoader final {
 
     template<typename Component, typename Archive, typename... Type>
     void assign(Archive &archive, Type Component::*... member) {
+        reset<Component>();
+
         each(archive, [&archive, member..., this](auto entity) {
             const bool destroyed = false;
             entity = prepare(entity, destroyed);
@@ -282,8 +297,9 @@ class ProgressiveLoader final {
 
     template<typename Tag, typename Archive>
     void attach(Archive &archive) {
+        registry.template remove<Tag>();
+
         each(archive, [&archive, this](auto entity) {
-            registry.template remove<Tag>();
             const bool destroyed = false;
             entity = prepare(entity, destroyed);
             archive(registry.template attach<Tag>(entity));
@@ -292,9 +308,9 @@ class ProgressiveLoader final {
 
     template<typename Tag, typename Archive, typename... Type>
     void attach(Archive &archive, Type Tag::*... member) {
-        each(archive, [&archive, member..., this](auto entity) {
-            registry.template remove<Tag>();
+        registry.template remove<Tag>();
 
+        each(archive, [&archive, member..., this](auto entity) {
             const bool destroyed = false;
             entity = prepare(entity, destroyed);
             auto &tag = registry.template attach<Tag>(entity);
@@ -376,6 +392,7 @@ public:
 
             if(dirty) {
                 dirty = false;
+                ++it;
             } else {
                 if(registry.valid(local)) {
                     registry.destroy(local);

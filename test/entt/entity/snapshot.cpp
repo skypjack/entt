@@ -395,7 +395,42 @@ TEST(Snapshot, Progressive) {
         ASSERT_EQ(component.bar, loader.map(entity));
     });
 
+    entities.clear();
+    for(auto entity: src.view<AComponent>()) {
+        entities.push_back(entity);
+    }
+
     src.destroy(entity);
+    loader.shrink();
+
+    src.snapshot()
+            .entities(output)
+            .destroyed(output)
+            .component<AComponent, AnotherComponent, Foo>(output)
+            .tag<double>(output);
+
+    loader.entities(input)
+            .destroyed(input)
+            .component<AComponent, AnotherComponent>(input)
+            .component<Foo>(input, &Foo::bar, &Foo::quux)
+            .tag<double>(input)
+            .orphans()
+            .shrink();
+
+    dst.view<Foo>().each([&dst, &loader, entity](auto, auto &component) {
+        ASSERT_FALSE(dst.valid(component.bar));
+    });
+
+    ASSERT_FALSE(loader.has(entity));
+
+    entity = src.create();
+
+    src.view<Foo>().each([entity](auto, auto &component) {
+        component.bar = entity;
+    });
+
+    dst.reset<AComponent>();
+    aComponentCnt = src.size<AComponent>();
 
     src.snapshot()
             .entities(output)
@@ -410,9 +445,26 @@ TEST(Snapshot, Progressive) {
             .tag<double>(input)
             .orphans();
 
-    dst.view<Foo>().each([&dst, &loader, entity](auto, auto &component) {
-        ASSERT_FALSE(dst.valid(component.bar));
-    });
+    ASSERT_EQ(dst.size<AComponent>(), aComponentCnt);
+    ASSERT_TRUE(dst.has<double>());
 
-    // TODO
+    src.reset<AComponent>();
+    src.remove<double>();
+    aComponentCnt = {};
+
+    src.snapshot()
+            .entities(output)
+            .destroyed(output)
+            .component<AComponent, AnotherComponent, Foo>(output)
+            .tag<double>(output);
+
+    loader.entities(input)
+            .destroyed(input)
+            .component<AComponent, AnotherComponent>(input)
+            .component<Foo>(input, &Foo::bar, &Foo::quux)
+            .tag<double>(input)
+            .orphans();
+
+    ASSERT_EQ(dst.size<AComponent>(), aComponentCnt);
+    ASSERT_FALSE(dst.has<double>());
 }
