@@ -882,7 +882,8 @@ combining this function with a bunch of custom tests.<br/>
 In all the other cases, this is the way to go.
 
 There exists also another member function to use to retrieve orphans. An orphan
-is an entity that is still in use and has no assigned components.<br/>
+is an entity that is still in use and has neither assigned components nor
+tags.<br/>
 The signature of the function is the same of `each`:
 
 ```cpp
@@ -891,10 +892,14 @@ registry.orphans([](auto entity) {
 });
 ```
 
-In general, `each` is fairly slow because of some checks it performs on each and
-every entity. For similar reasons, `orphans` can be even slower.<br/>
-Both functions should not be used frequently to avoid the risk of a performance
-hit.
+To test the _orphanity_ of a single entity, use the member function `orphan`
+instead. It accepts a valid entity identifer as an argument and returns true in
+case the entity is an orphan, false otherwise.
+
+In general, all these functions can result in poor performance.<br/>
+`each` is fairly slow because of some checks it performs on each and every
+entity. For similar reasons, `orphans` can be even slower. Both functions should
+not be used frequently to avoid the risk of a performance hit.
 
 ## Side notes
 

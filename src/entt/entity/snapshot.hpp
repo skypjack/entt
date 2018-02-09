@@ -148,12 +148,6 @@ class SnapshotDumpLoader final {
     }
 
 public:
-    ~SnapshotDumpLoader() {
-        registry.orphans([this](auto entity) {
-            registry.destroy(entity);
-        });
-    }
-
     template<typename Archive>
     SnapshotDumpLoader entities(Archive &archive) && {
         each(archive, [this](auto entity) {
@@ -187,6 +181,15 @@ public:
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (attach<Tag>(archive), 0)... };
         (void)accumulator;
+        return *this;
+    }
+
+
+    SnapshotDumpLoader orphans() {
+        registry.orphans([this](auto entity) {
+            registry.destroy(entity);
+        });
+
         return *this;
     }
 
@@ -358,18 +361,33 @@ public:
         return *this;
     }
 
-    void shrink() {
+    SnapshotProgressiveLoader & shrink() {
         auto it = remloc.begin();
 
         while(it != remloc.cend()) {
+            const auto local = it->second.first;
             bool &dirty = it->second.second;
 
             if(dirty) {
                 dirty = false;
             } else {
+                if(registry.valid(local)) {
+                    registry.destroy(local);
+                }
+
                 it = remloc.erase(it);
             }
         }
+
+        return *this;
+    }
+
+    SnapshotProgressiveLoader & orphans() {
+        registry.orphans([this](auto entity) {
+            registry.destroy(entity);
+        });
+
+        return *this;
     }
 
 private:

@@ -923,7 +923,7 @@ public:
     }
 
     /**
-     * @brief Iterate all the entities that have the given components.
+     * @brief Iterates all the entities that have the given components.
      *
      * The function object is invoked for each entity that is still in use and
      * has the given components assigned.<br/>
@@ -966,7 +966,7 @@ public:
     }
 
     /**
-     * @brief Iterate all the entities that have the given components.
+     * @brief Iterates all the entities that have the given components.
      *
      * The function object is invoked for each entity that is still in use and
      * has the given components assigned.<br/>
@@ -1000,10 +1000,36 @@ public:
     }
 
     /**
-     * @brief Iterate orphans and applies them the given function object.
+     * @brief Checks if an entity is an orphan.
+     *
+     * An orphan is an entity that has neither assigned components nor
+     * tags.
+     *
+     * @param entity A valid entity identifier.
+     * @return True if the entity is an orphan, false otherwise.
+     */
+    bool orphan(entity_type entity) const {
+        assert(valid(entity));
+        bool orphan = true;
+
+        for(std::size_t i = 0; i < pools.size() && orphan; ++i) {
+            const auto &pool = pools[i];
+            orphan = !(pool && pool->has(entity));
+        }
+
+        for(std::size_t i = 0; i < tags.size() && orphan; ++i) {
+            const auto &tag = tags[i];
+            orphan = !(tag && (tag->entity == entity));
+        }
+
+        return orphan;
+    }
+
+    /**
+     * @brief Iterates orphans and applies them the given function object.
      *
      * The function object is invoked for each entity that is still in use and
-     * has no assigned components.<br/>
+     * has neither assigned components nor tags.<br/>
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
@@ -1018,14 +1044,7 @@ public:
     template<typename Func>
     void orphans(Func func) const {
         each([func = std::move(func), this](auto entity) {
-            bool orphan = true;
-
-            for(std::size_t i = 0; i < pools.size() && orphan; ++i) {
-                const auto &pool = pools[i];
-                orphan = !(pool && pool->has(entity));
-            }
-
-            if(orphan) {
+            if(orphan(entity)) {
                 func(entity);
             }
         });
