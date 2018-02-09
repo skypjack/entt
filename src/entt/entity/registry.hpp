@@ -951,7 +951,7 @@ public:
      */
     template<typename... Component, typename Func>
     void each(Func func) const {
-        std::vector<entity_type> copy(available.cbegin(), available.cend());
+        std::vector<entity_type> copy{available.cbegin(), available.cend()};
         std::sort(copy.begin(), copy.end());
 
         for(size_type pos = entities.size(), curr = copy.size(); pos; --pos) {
@@ -1201,7 +1201,7 @@ public:
     /**
      * TODO
      */
-    SnapshotDumpLoader<Entity> restore() {
+    SnapshotLoader<Entity> restore() {
         using func_type = void(*)(Registry &, entity_type, bool);
 
         func_type force = [](Registry &registry, entity_type entity, bool destroyed) {
@@ -1248,13 +1248,6 @@ public:
         };
 
         return { *this, force };
-    }
-
-    /**
-     * TODO
-     */
-    SnapshotProgressiveLoader<Entity> progressive() {
-        return { *this };
     }
 
 private:

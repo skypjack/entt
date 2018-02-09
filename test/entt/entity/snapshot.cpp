@@ -250,14 +250,18 @@ TEST(Snapshot, Partial) {
 }
 
 TEST(Snapshot, Progressive) {
+    using entity_type = entt::DefaultRegistry::entity_type;
+
     entt::DefaultRegistry src;
     entt::DefaultRegistry dst;
 
-    std::vector<entt::DefaultRegistry::entity_type> entities;
-    entt::DefaultRegistry::entity_type entity;
+    auto loader = entt::ProgressiveLoader<entity_type>{dst};
+
+    std::vector<entity_type> entities;
+    entity_type entity;
 
     using storage_type = std::tuple<
-        std::queue<entt::DefaultRegistry::entity_type>,
+        std::queue<entity_type>,
         std::queue<AComponent>,
         std::queue<AnotherComponent>,
         std::queue<Foo>,
@@ -268,6 +272,14 @@ TEST(Snapshot, Progressive) {
     OutputArchive<storage_type> output{storage};
     InputArchive<storage_type> input{storage};
 
+    for(int i = 0; i < 10; ++i) {
+        src.create();
+    }
+
+    src.each([&src](auto entity) {
+        src.destroy(entity);
+    });
+
     for(int i = 0; i < 5; ++i) {
         entity = src.create();
         entities.push_back(entity);
@@ -277,7 +289,7 @@ TEST(Snapshot, Progressive) {
 
         if(i % 2) {
             src.assign<Foo>(entity, entity);
-        } else if(i == 1) {
+        } else if(i == 2) {
             src.attach<double>(entity, .3);
         }
     }
@@ -296,13 +308,61 @@ TEST(Snapshot, Progressive) {
             .component<AComponent, AnotherComponent, Foo>(output)
             .tag<double>(output);
 
-    dst.progressive()
-            .entities(input)
+    loader.entities(input)
             .destroyed(input)
             .component<AComponent, AnotherComponent>(input)
             .component<Foo>(input, &Foo::bar, &Foo::quux)
             .tag<double>(input)
             .orphans();
+
+    decltype(dst.size()) aComponentCnt{};
+    decltype(dst.size()) anotherComponentCnt{};
+    decltype(dst.size()) fooCnt{};
+
+    dst.each([&dst, &aComponentCnt](auto entity) {
+        ASSERT_TRUE(dst.has<AComponent>(entity));
+        ++aComponentCnt;
+    });
+
+    dst.view<AnotherComponent>().each([&anotherComponentCnt](auto, const auto &component) {
+        ASSERT_EQ(component.value, component.key < 0 ? -1 : component.key);
+        ++anotherComponentCnt;
+    });
+
+    dst.view<Foo>().each([&dst, &fooCnt](auto entity, const auto &component) {
+        ASSERT_EQ(entity, component.bar);
+
+        for(auto entity: component.quux) {
+            ASSERT_TRUE(dst.valid(entity));
+        }
+
+        ++fooCnt;
+    });
+
+    ASSERT_TRUE(dst.has<double>());
+    ASSERT_EQ(dst.get<double>(), .3);
+
+    auto size = dst.size();
+
+    src.snapshot()
+            .entities(output)
+            .destroyed(output)
+            .component<AComponent, AnotherComponent, Foo>(output)
+            .tag<double>(output);
+
+    loader.entities(input)
+            .destroyed(input)
+            .component<AComponent, AnotherComponent>(input)
+            .component<Foo>(input, &Foo::bar, &Foo::quux)
+            .tag<double>(input)
+            .orphans();
+
+    ASSERT_EQ(size, dst.size());
+
+    ASSERT_EQ(dst.size<AComponent>(), aComponentCnt);
+    ASSERT_EQ(dst.size<AnotherComponent>(), anotherComponentCnt);
+    ASSERT_EQ(dst.size<Foo>(), fooCnt);
+    ASSERT_TRUE(dst.has<double>());
 
     // TODO
 }
