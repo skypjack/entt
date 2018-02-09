@@ -23,7 +23,7 @@ template<typename Entity>
 class Snapshot final {
     friend class Registry<Entity>;
 
-    Snapshot(Registry<Entity> &registry, const Entity *available, std::size_t size)
+    Snapshot(Registry<Entity> &registry, const Entity *available, std::size_t size) noexcept
         : registry{registry},
           available{available},
           size{size}
@@ -97,12 +97,12 @@ private:
 
 
 template<typename Entity>
-class SnapshotRestore final {
+class SnapshotDumpLoader final {
     friend class Registry<Entity>;
 
     using func_type = void(Registry<Entity>::*)(Entity, bool);
 
-    SnapshotRestore(Registry<Entity> &registry, func_type force_fn)
+    SnapshotDumpLoader(Registry<Entity> &registry, func_type force_fn) noexcept
         : registry{registry},
           force_fn{force_fn}
     {
@@ -110,11 +110,11 @@ class SnapshotRestore final {
         assert(!registry.capacity());
     }
 
-    SnapshotRestore(const SnapshotRestore &) = default;
-    SnapshotRestore(SnapshotRestore &&) = default;
+    SnapshotDumpLoader(const SnapshotDumpLoader &) = default;
+    SnapshotDumpLoader(SnapshotDumpLoader &&) = default;
 
-    SnapshotRestore & operator=(const SnapshotRestore &) = default;
-    SnapshotRestore & operator=(SnapshotRestore &&) = default;
+    SnapshotDumpLoader & operator=(const SnapshotDumpLoader &) = default;
+    SnapshotDumpLoader & operator=(SnapshotDumpLoader &&) = default;
 
     template<typename Archive, typename Func>
     void each(Archive &archive, Func func) {
@@ -148,14 +148,14 @@ class SnapshotRestore final {
     }
 
 public:
-    ~SnapshotRestore() {
+    ~SnapshotDumpLoader() {
         registry.orphans([this](auto entity) {
             registry.destroy(entity);
         });
     }
 
     template<typename Archive>
-    SnapshotRestore entities(Archive &archive) && {
+    SnapshotDumpLoader entities(Archive &archive) && {
         each(archive, [this](auto entity) {
             const bool destroyed = false;
             (registry.*force_fn)(entity, destroyed);
@@ -165,7 +165,7 @@ public:
     }
 
     template<typename Archive>
-    SnapshotRestore destroyed(Archive &archive) && {
+    SnapshotDumpLoader destroyed(Archive &archive) && {
         each(archive, [this](auto entity) {
             const bool destroyed = true;
             (registry.*force_fn)(entity, destroyed);
@@ -175,7 +175,7 @@ public:
     }
 
     template<typename... Component, typename Archive>
-    SnapshotRestore component(Archive &archive) && {
+    SnapshotDumpLoader component(Archive &archive) && {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (assign<Component>(archive), 0)... };
         (void)accumulator;
@@ -183,7 +183,7 @@ public:
     }
 
     template<typename... Tag, typename Archive>
-    SnapshotRestore tag(Archive &archive) && {
+    SnapshotDumpLoader tag(Archive &archive) && {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (attach<Tag>(archive), 0)... };
         (void)accumulator;
@@ -197,7 +197,7 @@ private:
 
 
 template<typename Entity>
-class SnapshotAppend {
+class SnapshotProgressiveLoader {
     using traits_type = entt_traits<Entity>;
 
     void prepare(Entity entity, bool destroyed) {
@@ -306,12 +306,12 @@ public:
     using registry_type = Registry<Entity>;
     using entity_type = Entity;
 
-    SnapshotAppend(registry_type &registry)
+    SnapshotProgressiveLoader(registry_type &registry) noexcept
         : registry{registry}
     {}
 
     template<typename Archive>
-    SnapshotAppend & entities(Archive &archive) {
+    SnapshotProgressiveLoader & entities(Archive &archive) {
         each(archive, [this](auto entity) {
             const bool destroyed = false;
             prepare(entity, destroyed);
@@ -321,7 +321,7 @@ public:
     }
 
     template<typename Archive>
-    SnapshotAppend & destroyed(Archive &archive) {
+    SnapshotProgressiveLoader & destroyed(Archive &archive) {
         each(archive, [this](auto entity) {
             const bool destroyed = true;
             prepare(entity, destroyed);
@@ -331,7 +331,7 @@ public:
     }
 
     template<typename... Component, typename Archive>
-    SnapshotAppend & component(Archive &archive) {
+    SnapshotProgressiveLoader & component(Archive &archive) {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (assign<Component>(archive), 0)... };
         (void)accumulator;
@@ -339,13 +339,13 @@ public:
     }
 
     template<typename Component, typename Archive, typename... Type>
-    SnapshotAppend & component(Archive &archive, Type Component::*... member) {
+    SnapshotProgressiveLoader & component(Archive &archive, Type Component::*... member) {
         assign(archive, member...);
         return *this;
     }
 
     template<typename... Tag, typename Archive>
-    SnapshotAppend & tag(Archive &archive) {
+    SnapshotProgressiveLoader & tag(Archive &archive) {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (attach<Tag>(archive), 0)... };
         (void)accumulator;
@@ -353,9 +353,23 @@ public:
     }
 
     template<typename Tag, typename Archive, typename... Type>
-    SnapshotAppend & tag(Archive &archive, Type Tag::*... member) {
+    SnapshotProgressiveLoader & tag(Archive &archive, Type Tag::*... member) {
         attach<Tag>(archive, member...);
         return *this;
+    }
+
+    void shrink() {
+        auto it = remloc.begin();
+
+        while(it != remloc.cend()) {
+            bool &dirty = it->second.second;
+
+            if(dirty) {
+                dirty = false;
+            } else {
+                it = remloc.erase(it);
+            }
+        }
     }
 
 private:

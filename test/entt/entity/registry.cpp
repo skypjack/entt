@@ -1,3 +1,4 @@
+#include <tuple>
 #include <functional>
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
@@ -358,75 +359,4 @@ TEST(DefaultRegistry, SortMulti) {
     for(auto entity: registry.view<int>()) {
         ASSERT_EQ(registry.get<int>(entity), ival++);
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// TODO temporary test
-///
-
-struct Archive {
-    template<typename T>
-    void operator()(T) {}
-};
-
-struct Foo {
-    entt::DefaultRegistry::entity_type bar;
-    entt::DefaultRegistry::entity_type quux;
-};
-
-TEST(DefaultRegistry, Snapshot) {
-    entt::DefaultRegistry registry;
-
-    auto e1 = registry.create();
-    registry.assign<int>(e1, 42);
-    registry.assign<char>(e1, 'c');
-    registry.assign<double>(e1, .1);
-
-    auto e2 = registry.create();
-
-    auto e3 = registry.create();
-    registry.assign<int>(e3, 3);
-
-    auto e4 = registry.create();
-    registry.assign<char>(e4, '0');
-    registry.attach<float>(e4, .3f);
-
-    auto e5 = registry.create();
-
-    registry.destroy(e2);
-
-    Archive archive;
-
-    registry.snapshot()
-            .entities(archive)
-            .destroyed(archive)
-            .component<char, int>(archive)
-            .tag<bool, float>(archive)
-            ;
-
-    registry = {};
-
-    registry.restore()
-            .entities(archive)
-            .destroyed(archive)
-            .component<char, int>(archive)
-            .tag<bool, float>(archive)
-            ;
-
-    entt::SnapshotAppend<entt::DefaultRegistry::entity_type> append{registry};
-
-    append.entities(archive)
-            .destroyed(archive)
-            .component<char, int>(archive)
-            .component<Foo>(archive, &Foo::bar, &Foo::quux)
-            .tag<bool, float>(archive)
-            .tag<Foo>(archive, &Foo::bar, &Foo::quux)
-            ;
-
-
-    // ASSERT_TRUE(registry.valid(e1));
-    // ASSERT_FALSE(registry.valid(e2));
-    // ASSERT_TRUE(registry.valid(e3));
-    // ASSERT_TRUE(registry.valid(e4));
-    // ASSERT_FALSE(registry.valid(e5));
 }

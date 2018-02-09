@@ -1217,7 +1217,7 @@ public:
     /**
      * TODO
      */
-    SnapshotRestore<Entity> restore() {
+    SnapshotDumpLoader<Entity> restore() {
         return { *this, &Registry::force };
     }
 
