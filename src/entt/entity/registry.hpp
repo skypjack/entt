@@ -952,7 +952,11 @@ public:
     template<typename... Component, typename Func>
     void each(Func func) const {
         std::vector<entity_type> copy{available.cbegin(), available.cend()};
-        std::sort(copy.begin(), copy.end());
+        std::sort(copy.begin(), copy.end(), [](auto lhs, auto rhs) {
+            lhs = lhs & traits_type::entity_mask;
+            rhs = rhs & traits_type::entity_mask;
+            return (lhs < rhs);
+        });
 
         for(size_type pos = entities.size(), curr = copy.size(); pos; --pos) {
             auto entity = entities[pos-1];
