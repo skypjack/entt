@@ -201,13 +201,15 @@ private:
 
 template<typename Entity>
 class SnapshotProgressiveLoader final {
+    friend class Registry<Entity>;
+
     using traits_type = entt_traits<Entity>;
 
     SnapshotProgressiveLoader(Registry<Entity> &registry) noexcept
         : registry{registry}
     {}
 
-    void prepare(Entity entity, bool destroyed) {
+    Entity prepare(Entity entity, bool destroyed) {
         const auto it = remloc.find(entity);
 
         if(it == remloc.cend()) {
@@ -228,6 +230,8 @@ class SnapshotProgressiveLoader final {
                 remloc[entity].first = registry.create();
             }
         }
+
+        return remloc[entity].first;
     }
 
     void map(Entity &entity) {
@@ -267,7 +271,7 @@ class SnapshotProgressiveLoader final {
     void assign(Archive &archive) {
         each(archive, [&archive, this](auto entity) {
             const bool destroyed = false;
-            prepare(entity, destroyed);
+            entity = prepare(entity, destroyed);
             archive(registry.template assign<Component>(entity));
         });
     }
@@ -276,7 +280,7 @@ class SnapshotProgressiveLoader final {
     void assign(Archive &archive, Type Component::*... member) {
         each(archive, [&archive, member..., this](auto entity) {
             const bool destroyed = false;
-            prepare(entity, destroyed);
+            entity = prepare(entity, destroyed);
             auto &component = registry.template assign<Component>(entity);
             archive(component);
 
@@ -290,7 +294,7 @@ class SnapshotProgressiveLoader final {
     void attach(Archive &archive) {
         each(archive, [&archive, this](auto entity) {
             const bool destroyed = false;
-            prepare(entity, destroyed);
+            entity = prepare(entity, destroyed);
             archive(registry.template attach<Tag>(entity));
         });
     }
@@ -299,7 +303,7 @@ class SnapshotProgressiveLoader final {
     void attach(Archive &archive, Type Tag::*... member) {
         each(archive, [&archive, member..., this](auto entity) {
             const bool destroyed = false;
-            prepare(entity, destroyed);
+            entity = prepare(entity, destroyed);
             auto &tag = registry.template attach<Tag>(entity);
             archive(tag);
 

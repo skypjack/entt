@@ -37,7 +37,11 @@ private:
 };
 
 struct AComponent {};
-struct AnotherComponent {};
+
+struct AnotherComponent {
+    int key;
+    int value;
+};
 
 struct Foo {
     entt::DefaultRegistry::entity_type bar;
@@ -87,8 +91,7 @@ TEST(Snapshot, Dump) {
             .entities(output)
             .destroyed(output)
             .component<int, char, AnotherComponent, double>(output)
-            .tag<float, bool, AComponent>(output)
-            ;
+            .tag<float, bool, AComponent>(output);
 
     registry = {};
 
@@ -106,8 +109,7 @@ TEST(Snapshot, Dump) {
             .destroyed(input)
             .component<int, char, AnotherComponent, double>(input)
             .tag<float, bool, AComponent>(input)
-            .orphans()
-            ;
+            .orphans();
 
     ASSERT_TRUE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -180,8 +182,7 @@ TEST(Snapshot, Partial) {
             .entities(output)
             .destroyed(output)
             .component<char, int>(output)
-            .tag<bool, float>(output)
-            ;
+            .tag<bool, float>(output);
 
     registry = {};
 
@@ -198,8 +199,7 @@ TEST(Snapshot, Partial) {
             .entities(input)
             .destroyed(input)
             .component<char, int>(input)
-            .tag<bool, float>(input)
-            ;
+            .tag<bool, float>(input);
 
     ASSERT_TRUE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -223,8 +223,7 @@ TEST(Snapshot, Partial) {
     registry.snapshot()
             .tag<float>(output)
             .destroyed(output)
-            .entities(output)
-            ;
+            .entities(output);
 
     registry = {};
 
@@ -241,8 +240,7 @@ TEST(Snapshot, Partial) {
             .tag<float>(input)
             .destroyed(input)
             .entities(input)
-            .orphans()
-            ;
+            .orphans();
 
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -252,5 +250,59 @@ TEST(Snapshot, Partial) {
 }
 
 TEST(Snapshot, Progressive) {
+    entt::DefaultRegistry src;
+    entt::DefaultRegistry dst;
+
+    std::vector<entt::DefaultRegistry::entity_type> entities;
+    entt::DefaultRegistry::entity_type entity;
+
+    using storage_type = std::tuple<
+        std::queue<entt::DefaultRegistry::entity_type>,
+        std::queue<AComponent>,
+        std::queue<AnotherComponent>,
+        std::queue<Foo>,
+        std::queue<double>
+    >;
+
+    storage_type storage;
+    OutputArchive<storage_type> output{storage};
+    InputArchive<storage_type> input{storage};
+
+    for(int i = 0; i < 5; ++i) {
+        entity = src.create();
+        entities.push_back(entity);
+
+        src.assign<AComponent>(entity);
+        src.assign<AnotherComponent>(entity, i, i);
+
+        if(i % 2) {
+            src.assign<Foo>(entity, entity);
+        } else if(i == 1) {
+            src.attach<double>(entity, .3);
+        }
+    }
+
+    src.view<Foo>().each([&entities](auto, auto &foo) {
+        foo.quux.insert(foo.quux.begin(), entities.begin(), entities.end());
+    });
+
+    entity = dst.create();
+    dst.assign<AComponent>(entity);
+    dst.assign<AnotherComponent>(entity, -1, -1);
+
+    src.snapshot()
+            .entities(output)
+            .destroyed(output)
+            .component<AComponent, AnotherComponent, Foo>(output)
+            .tag<double>(output);
+
+    dst.progressive()
+            .entities(input)
+            .destroyed(input)
+            .component<AComponent, AnotherComponent>(input)
+            .component<Foo>(input, &Foo::bar, &Foo::quux)
+            .tag<double>(input)
+            .orphans();
+
     // TODO
 }
