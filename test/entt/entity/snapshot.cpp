@@ -342,6 +342,10 @@ TEST(Snapshot, Progressive) {
     ASSERT_TRUE(dst.has<double>());
     ASSERT_EQ(dst.get<double>(), .3);
 
+    src.view<AnotherComponent>().each([](auto, auto &component) {
+        component.value = 2 * component.key;
+    });
+
     auto size = dst.size();
 
     src.snapshot()
@@ -363,6 +367,52 @@ TEST(Snapshot, Progressive) {
     ASSERT_EQ(dst.size<AnotherComponent>(), anotherComponentCnt);
     ASSERT_EQ(dst.size<Foo>(), fooCnt);
     ASSERT_TRUE(dst.has<double>());
+
+    dst.view<AnotherComponent>().each([](auto, auto &component) {
+        ASSERT_EQ(component.value, component.key < 0 ? -1 : (2 * component.key));
+    });
+
+    entity = src.create();
+
+    src.view<Foo>().each([entity](auto, auto &component) {
+        component.bar = entity;
+    });
+
+    src.snapshot()
+            .entities(output)
+            .destroyed(output)
+            .component<AComponent, AnotherComponent, Foo>(output)
+            .tag<double>(output);
+
+    loader.entities(input)
+            .destroyed(input)
+            .component<AComponent, AnotherComponent>(input)
+            .component<Foo>(input, &Foo::bar, &Foo::quux)
+            .tag<double>(input)
+            .orphans();
+
+    dst.view<Foo>().each([&loader, entity](auto, auto &component) {
+        ASSERT_EQ(component.bar, loader.map(entity));
+    });
+
+    src.destroy(entity);
+
+    src.snapshot()
+            .entities(output)
+            .destroyed(output)
+            .component<AComponent, AnotherComponent, Foo>(output)
+            .tag<double>(output);
+
+    loader.entities(input)
+            .destroyed(input)
+            .component<AComponent, AnotherComponent>(input)
+            .component<Foo>(input, &Foo::bar, &Foo::quux)
+            .tag<double>(input)
+            .orphans();
+
+    dst.view<Foo>().each([&dst, &loader, entity](auto, auto &component) {
+        ASSERT_FALSE(dst.valid(component.bar));
+    });
 
     // TODO
 }
