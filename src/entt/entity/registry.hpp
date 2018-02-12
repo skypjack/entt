@@ -1194,14 +1194,30 @@ public:
     }
 
     /**
-     * TODO private
+     * @brief Returns a temporary object to use to create snapshots.
+     *
+     * A snapshot is either a full or a partial dump of a registry.<br/>
+     * It can be used to save and restore its internal state or to keep two or
+     * more instances of this class in sync, as an example in a client-server
+     * architecture.
+     *
+     * @return A not movable and not copyable object to use to take snasphosts.
      */
     Snapshot<Entity> snapshot() {
         return { *this, available.data(), available.size() };
     }
 
     /**
-     * TODO
+     * @brief Returns a temporary object to use to load snapshots.
+     *
+     * A snapshot is either a full or a partial dump of a registry.<br/>
+     * It can be used to save and restore its internal state or to keep two or
+     * more instances of this class in sync, as an example in a client-server
+     * architecture.
+     *
+     * The loader returned by this function requires that the registry be empty.
+     *
+     * @return A not movable and not copyable object to use to load snasphosts.
      */
     SnapshotLoader<Entity> restore() {
         using func_type = void(*)(Registry &, entity_type, bool);

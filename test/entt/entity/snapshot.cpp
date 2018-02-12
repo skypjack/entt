@@ -255,7 +255,7 @@ TEST(Snapshot, Progressive) {
     entt::DefaultRegistry src;
     entt::DefaultRegistry dst;
 
-    auto loader = entt::ProgressiveLoader<entity_type>{dst};
+    entt::ProgressiveLoader<entity_type> loader{dst};
 
     std::vector<entity_type> entities;
     entity_type entity;

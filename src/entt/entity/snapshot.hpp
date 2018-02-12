@@ -15,10 +15,24 @@
 namespace entt {
 
 
+/**
+ * @brief TODO
+ *
+ * TODO
+ *
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
 template<typename Entity>
 class Registry;
 
 
+/**
+ * @brief TODO
+ *
+ * TODO
+ *
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
 template<typename Entity>
 class Snapshot final {
     friend class Registry<Entity>;
@@ -59,6 +73,15 @@ class Snapshot final {
     }
 
 public:
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Archive TODO
+     * @param archive TODO
+     * @return TODO
+     */
     template<typename Archive>
     Snapshot entities(Archive archive) && {
         archive(static_cast<Entity>(registry.size()));
@@ -66,6 +89,15 @@ public:
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Archive TODO
+     * @param archive TODO
+     * @return TODO
+     */
     template<typename Archive>
     Snapshot destroyed(Archive archive) && {
         archive(static_cast<Entity>(size));
@@ -73,6 +105,16 @@ public:
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Component Types of components to serialize.
+     * @tparam Archive TODO
+     * @param archive TODO
+     * @return TODO
+     */
     template<typename... Component, typename Archive>
     Snapshot component(Archive &archive) && {
         using accumulator_type = int[];
@@ -81,6 +123,16 @@ public:
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Tag Types of tags to serialize.
+     * @tparam Archive TODO
+     * @param archive TODO
+     * @return TODO
+     */
     template<typename... Tag, typename Archive>
     Snapshot tag(Archive &archive) && {
         using accumulator_type = int[];
@@ -96,6 +148,13 @@ private:
 };
 
 
+/**
+ * @brief TODO
+ *
+ * TODO
+ *
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
 template<typename Entity>
 class SnapshotLoader final {
     friend class Registry<Entity>;
@@ -148,6 +207,15 @@ class SnapshotLoader final {
     }
 
 public:
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Archive TODO
+     * @param archive TODO
+     * @return TODO
+     */
     template<typename Archive>
     SnapshotLoader entities(Archive &archive) && {
         each(archive, [this](auto entity) {
@@ -158,6 +226,15 @@ public:
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Archive TODO
+     * @param archive TODO
+     * @return TODO
+     */
     template<typename Archive>
     SnapshotLoader destroyed(Archive &archive) && {
         each(archive, [this](auto entity) {
@@ -168,6 +245,16 @@ public:
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Component Types of components to restore.
+     * @tparam Archive TODO
+     * @param archive TODO
+     * @return TODO
+     */
     template<typename... Component, typename Archive>
     SnapshotLoader component(Archive &archive) && {
         using accumulator_type = int[];
@@ -176,6 +263,16 @@ public:
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Tag Types of tags to restore.
+     * @tparam Archive TODO
+     * @param archive TODO
+     * @return TODO
+     */
     template<typename... Tag, typename Archive>
     SnapshotLoader tag(Archive &archive) && {
         using accumulator_type = int[];
@@ -185,6 +282,13 @@ public:
     }
 
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @return TODO
+     */
     SnapshotLoader orphans() {
         registry.orphans([this](auto entity) {
             registry.destroy(entity);
@@ -199,6 +303,13 @@ private:
 };
 
 
+/**
+ * @brief TODO
+ *
+ * TODO
+ *
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
 template<typename Entity>
 class ProgressiveLoader final {
     friend class Registry<Entity>;
@@ -323,18 +434,39 @@ class ProgressiveLoader final {
     }
 
 public:
+    /*! @brief TODO */
     using entity_type = Entity;
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @param registry TODO
+     */
     ProgressiveLoader(Registry<entity_type> &registry) noexcept
         : registry{registry}
     {}
 
+    /*! @brief Default copy constructor. */
     ProgressiveLoader(const ProgressiveLoader &) = default;
+    /*! @brief Default move constructor. */
     ProgressiveLoader(ProgressiveLoader &&) = default;
 
+    /*! @brief Default copy assignment operator. @return This loader. */
     ProgressiveLoader & operator=(const ProgressiveLoader &) = default;
+    /*! @brief Default move assignment operator. @return This loader. */
     ProgressiveLoader & operator=(ProgressiveLoader &&) = default;
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Archive TODO
+     * @param archive TODO
+     * @return TODO
+     */
     template<typename Archive>
     ProgressiveLoader & entities(Archive &archive) {
         each(archive, [this](auto entity) {
@@ -345,6 +477,15 @@ public:
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Archive TODO
+     * @param archive TODO
+     * @return TODO
+     */
     template<typename Archive>
     ProgressiveLoader & destroyed(Archive &archive) {
         each(archive, [this](auto entity) {
@@ -355,6 +496,16 @@ public:
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Component Types of components to restore.
+     * @tparam Archive TODO
+     * @param archive TODO
+     * @return TODO
+     */
     template<typename... Component, typename Archive>
     ProgressiveLoader & component(Archive &archive) {
         using accumulator_type = int[];
@@ -363,12 +514,34 @@ public:
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Component Type of component to restore.
+     * @tparam Archive TODO
+     * @tparam Type TODO
+     * @param archive TODO
+     * @param member TODO
+     * @return TODO
+     */
     template<typename Component, typename Archive, typename... Type>
     ProgressiveLoader & component(Archive &archive, Type Component::*... member) {
         assign(archive, member...);
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Tag Types of tags to restore.
+     * @tparam Archive TODO
+     * @param archive TODO
+     * @return TODO
+     */
     template<typename... Tag, typename Archive>
     ProgressiveLoader & tag(Archive &archive) {
         using accumulator_type = int[];
@@ -377,12 +550,31 @@ public:
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @tparam Tag Type of tag to restore.
+     * @tparam Archive TODO
+     * @tparam Type TODO
+     * @param archive TODO
+     * @param member TODO
+     * @return TODO
+     */
     template<typename Tag, typename Archive, typename... Type>
     ProgressiveLoader & tag(Archive &archive, Type Tag::*... member) {
         attach<Tag>(archive, member...);
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @return TODO
+     */
     ProgressiveLoader & shrink() {
         auto it = remloc.begin();
 
@@ -405,6 +597,13 @@ public:
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @return TODO
+     */
     ProgressiveLoader & orphans() {
         registry.orphans([this](auto entity) {
             registry.destroy(entity);
@@ -413,10 +612,26 @@ public:
         return *this;
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @param entity TODO
+     * @return TODO
+     */
     bool has(entity_type entity) {
         return !(remloc.find(entity) == remloc.cend());
     }
 
+    /**
+     * @brief TODO
+     *
+     * TODO
+     *
+     * @param entity TODO
+     * @return TODO
+     */
     entity_type map(entity_type entity) {
         assert(has(entity));
         return remloc[entity].first;
