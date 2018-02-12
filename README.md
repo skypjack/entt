@@ -155,19 +155,19 @@ Dell XPS 13 out of the mid 2014):
 
 | Benchmark | EntityX (compile-time) | EnTT |
 |-----------|-------------|-------------|
-| Create 10M entities | 0.1289s | **0.0409s** |
-| Destroy 10M entities | **0.0531s** | 0.0546s |
-| Standard view, 10M entities, one component | 0.0107s | **1.6e-07s** |
-| Standard view, 10M entities, two components | **0.0113s** | 0.0295s |
-| Standard view, 10M entities, two components<br/>Half of the entities have all the components | **0.0078s** | 0.0150s |
-| Standard view, 10M entities, two components<br/>One of the entities has all the components | 0.0071s | **8.8e-07s** |
-| Persistent view, 10M entities, two components | 0.0113s | **5.7e-07s** |
-| Standard view, 10M entities, five components | **0.0091s** | 0.0688s |
-| Persistent view, 10M entities, five components | 0.0091s | **2.9e-07s** |
-| Standard view, 10M entities, ten components | **0.0105s** | 0.1403s |
-| Standard view, 10M entities, ten components<br/>Half of the entities have all the components | **0.0090s** | 0.0620s |
+| Create 10M entities | 0.1289s | **0.0388s** |
+| Destroy 10M entities | **0.0531s** | 0.0828s |
+| Standard view, 10M entities, one component | 0.0107s | **7.8e-08s** |
+| Standard view, 10M entities, two components | **0.0113s** | 0.0244s |
+| Standard view, 10M entities, two components<br/>Half of the entities have all the components | **0.0078s** | 0.0129s |
+| Standard view, 10M entities, two components<br/>One of the entities has all the components | 0.0071s | **5.5e-07s** |
+| Persistent view, 10M entities, two components | 0.0113s | **1.1e-07s** |
+| Standard view, 10M entities, five components | **0.0091s** | 0.0672s |
+| Persistent view, 10M entities, five components | 0.0091s | **2.5e-07s** |
+| Standard view, 10M entities, ten components | **0.0105s** | 0.1306s |
+| Standard view, 10M entities, ten components<br/>Half of the entities have all the components | **0.0090s** | 0.0629s |
 | Standard view, 10M entities, ten components<br/>One of the entities has all the components | 0.0070s | **1.3e-06s** |
-| Persistent view, 10M entities, ten components | 0.0105s | **6.2e-07s** |
+| Persistent view, 10M entities, ten components | 0.0105s | **5.0e-07s** |
 | Sort 150k entities, one component<br/>Arrays are in reverse order | - | **0.0043s** |
 | Sort 150k entities, enforce permutation<br/>Arrays are in reverse order | - | **0.0006s** |
 
