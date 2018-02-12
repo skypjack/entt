@@ -59,7 +59,7 @@ class SparseSet<Entity> {
     struct Iterator final {
         using value_type = Entity;
 
-        Iterator(const std::vector<value_type> *direct, std::size_t pos)
+        Iterator(const std::vector<value_type> &direct, std::size_t pos)
             : direct{direct}, pos{pos}
         {}
 
@@ -73,7 +73,7 @@ class SparseSet<Entity> {
         }
 
         bool operator==(const Iterator &other) const noexcept {
-            return other.pos == pos && other.direct == direct;
+            return other.pos == pos;
         }
 
         bool operator!=(const Iterator &other) const noexcept {
@@ -81,11 +81,11 @@ class SparseSet<Entity> {
         }
 
         value_type operator*() const noexcept {
-            return (*direct)[pos-1];
+            return direct[pos-1];
         }
 
     private:
-        const std::vector<value_type> *direct;
+        const std::vector<value_type> &direct;
         std::size_t pos;
     };
 
@@ -184,7 +184,7 @@ public:
      * @return An iterator to the first element of the internal packed array.
      */
     iterator_type begin() const noexcept {
-        return Iterator{&direct, direct.size()};
+        return Iterator{direct, direct.size()};
     }
 
     /**
@@ -201,7 +201,7 @@ public:
      * internal packed array.
      */
     iterator_type end() const noexcept {
-        return Iterator{&direct, 0};
+        return Iterator{direct, 0};
     }
 
     /**

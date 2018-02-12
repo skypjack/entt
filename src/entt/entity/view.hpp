@@ -358,7 +358,7 @@ class View final {
     class Iterator {
         inline bool valid() const noexcept {
             using accumulator_type = bool[];
-            auto entity = *begin;
+            const auto entity = *begin;
             bool all = true;
             accumulator_type accumulator =  { all, (all = all && std::get<pool_type<Component> &>(pools).has(entity))... };
             (void)accumulator;
@@ -377,9 +377,7 @@ class View final {
         }
 
         Iterator & operator++() noexcept {
-            ++begin;
-            while(begin != end && !valid()) { ++begin; }
-            return *this;
+            return (++begin != end && !valid()) ? ++(*this) : *this;
         }
 
         Iterator operator++(int) noexcept {
