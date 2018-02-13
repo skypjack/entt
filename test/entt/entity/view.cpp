@@ -5,8 +5,8 @@
 TEST(View, SingleComponent) {
     entt::DefaultRegistry registry;
 
-    auto e1 = registry.create();
-    auto e2 = registry.create<int, char>();
+    auto e0 = registry.create();
+    auto e1 = registry.create<int, char>();
 
     ASSERT_NO_THROW(registry.view<char>().begin()++);
     ASSERT_NO_THROW(++registry.view<char>().begin());
@@ -16,26 +16,26 @@ TEST(View, SingleComponent) {
     ASSERT_NE(view.begin(), view.end());
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
 
-    registry.assign<char>(e1);
+    registry.assign<char>(e0);
 
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{2});
 
-    view.get(e1) = '1';
-    view.get(e2) = '2';
+    view.get(e0) = '1';
+    view.get(e1) = '2';
 
     for(auto entity: view) {
         const auto &cview = static_cast<const decltype(view) &>(view);
         ASSERT_TRUE(cview.get(entity) == '1' || cview.get(entity) == '2');
     }
 
-    ASSERT_EQ(*(view.data() + 0), e2);
-    ASSERT_EQ(*(view.data() + 1), e1);
+    ASSERT_EQ(*(view.data() + 0), e1);
+    ASSERT_EQ(*(view.data() + 1), e0);
 
     ASSERT_EQ(*(view.raw() + 0), '2');
     ASSERT_EQ(*(static_cast<const decltype(view) &>(view).raw() + 1), '1');
 
+    registry.remove<char>(e0);
     registry.remove<char>(e1);
-    registry.remove<char>(e2);
 
     ASSERT_EQ(view.begin(), view.end());
 }
@@ -78,8 +78,8 @@ TEST(View, SingleComponentEach) {
 TEST(View, MultipleComponent) {
     entt::DefaultRegistry registry;
 
-    auto e1 = registry.create<char>();
-    auto e2 = registry.create<int, char>();
+    auto e0 = registry.create<char>();
+    auto e1 = registry.create<int, char>();
 
     ASSERT_NO_THROW((registry.view<int, char>().begin()++));
     ASSERT_NO_THROW((++registry.view<int, char>().begin()));
@@ -88,9 +88,9 @@ TEST(View, MultipleComponent) {
 
     ASSERT_NE(view.begin(), view.end());
 
-    view.get<char>(e1) = '1';
-    view.get<char>(e2) = '2';
-    view.get<int>(e2) = 42;
+    view.get<char>(e0) = '1';
+    view.get<char>(e1) = '2';
+    view.get<int>(e1) = 42;
 
     for(auto entity: view) {
         const auto &cview = static_cast<const decltype(view) &>(view);
@@ -99,8 +99,8 @@ TEST(View, MultipleComponent) {
         ASSERT_EQ(cview.get<char>(entity), '2');
     }
 
+    registry.remove<char>(e0);
     registry.remove<char>(e1);
-    registry.remove<char>(e2);
     view.reset();
 
     ASSERT_EQ(view.begin(), view.end());
@@ -143,8 +143,8 @@ TEST(PersistentView, Prepare) {
     entt::DefaultRegistry registry;
     registry.prepare<int, char>();
 
-    auto e1 = registry.create<char>();
-    auto e2 = registry.create<int, char>();
+    auto e0 = registry.create<char>();
+    auto e1 = registry.create<int, char>();
 
     ASSERT_NO_THROW((registry.persistent<int, char>().begin()++));
     ASSERT_NO_THROW((++registry.persistent<int, char>().begin()));
@@ -154,17 +154,17 @@ TEST(PersistentView, Prepare) {
     ASSERT_NE(view.begin(), view.end());
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
 
-    registry.assign<int>(e1);
+    registry.assign<int>(e0);
 
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{2});
 
-    registry.remove<int>(e1);
+    registry.remove<int>(e0);
 
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
 
-    view.get<char>(e1) = '1';
-    view.get<char>(e2) = '2';
-    view.get<int>(e2) = 42;
+    view.get<char>(e0) = '1';
+    view.get<char>(e1) = '2';
+    view.get<int>(e1) = 42;
 
     for(auto entity: view) {
         const auto &cview = static_cast<const decltype(view) &>(view);
@@ -173,10 +173,10 @@ TEST(PersistentView, Prepare) {
         ASSERT_EQ(cview.get<char>(entity), '2');
     }
 
-    ASSERT_EQ(*(view.data() + 0), e2);
+    ASSERT_EQ(*(view.data() + 0), e1);
 
+    registry.remove<char>(e0);
     registry.remove<char>(e1);
-    registry.remove<char>(e2);
 
     ASSERT_EQ(view.begin(), view.end());
 }
@@ -184,8 +184,8 @@ TEST(PersistentView, Prepare) {
 TEST(PersistentView, NoPrepare) {
     entt::DefaultRegistry registry;
 
-    auto e1 = registry.create<char>();
-    auto e2 = registry.create<int, char>();
+    auto e0 = registry.create<char>();
+    auto e1 = registry.create<int, char>();
 
     ASSERT_NO_THROW((registry.persistent<int, char>().begin()++));
     ASSERT_NO_THROW((++registry.persistent<int, char>().begin()));
@@ -195,17 +195,17 @@ TEST(PersistentView, NoPrepare) {
     ASSERT_NE(view.begin(), view.end());
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
 
-    registry.assign<int>(e1);
+    registry.assign<int>(e0);
 
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{2});
 
-    registry.remove<int>(e1);
+    registry.remove<int>(e0);
 
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
 
-    view.get<char>(e1) = '1';
-    view.get<char>(e2) = '2';
-    view.get<int>(e2) = 42;
+    view.get<char>(e0) = '1';
+    view.get<char>(e1) = '2';
+    view.get<int>(e1) = 42;
 
     for(auto entity: view) {
         const auto &cview = static_cast<const decltype(view) &>(view);
@@ -214,10 +214,10 @@ TEST(PersistentView, NoPrepare) {
         ASSERT_EQ(cview.get<char>(entity), '2');
     }
 
-    ASSERT_EQ(*(view.data() + 0), e2);
+    ASSERT_EQ(*(view.data() + 0), e1);
 
+    registry.remove<char>(e0);
     registry.remove<char>(e1);
-    registry.remove<char>(e2);
 
     ASSERT_EQ(view.begin(), view.end());
 }
@@ -263,20 +263,20 @@ TEST(PersistentView, Sort) {
     entt::DefaultRegistry registry;
     registry.prepare<int, unsigned int>();
 
+    auto e0 = registry.create();
     auto e1 = registry.create();
     auto e2 = registry.create();
-    auto e3 = registry.create();
 
     auto uval = 0u;
     auto ival = 0;
 
+    registry.assign<unsigned int>(e0, uval++);
     registry.assign<unsigned int>(e1, uval++);
     registry.assign<unsigned int>(e2, uval++);
-    registry.assign<unsigned int>(e3, uval++);
 
+    registry.assign<int>(e0, ival++);
     registry.assign<int>(e1, ival++);
     registry.assign<int>(e2, ival++);
-    registry.assign<int>(e3, ival++);
 
     auto view = registry.persistent<int, unsigned int>();
 
