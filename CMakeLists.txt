@@ -72,6 +72,7 @@ if(BUILD_TESTING)
 
     option(BUILD_BENCHMARK "Build benchmark." OFF)
     option(BUILD_MOD "Build mod example." OFF)
+    option(BUILD_SNAPSHOT "Build snapshot example." OFF)
 
     # gtest, gtest_main, gmock and gmock_main targets are available from now on
     set(GOOGLETEST_DEPS_DIR ${entt_SOURCE_DIR}/deps/googletest)

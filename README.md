@@ -573,15 +573,16 @@ simple.
 
 `EnTT` comes with an example (actually a test) that shows how to integrate
 compile-time and runtime components in a stack based JavaScript environment. It
-uses [`duktape`](https://github.com/svaarala/duktape) under the hood, mainly
+uses [`Duktape`](https://github.com/svaarala/duktape) under the hood, mainly
 because I wanted to learn how it works at the time I was writing the code.
 
-It's not production-ready and overall performance can be highly improved.
-However, I sacrificed optimizations in favor of a more readable piece of
-code. I hope I succeeded.<br/>
+The code is not production-ready and overall performance can be highly improved.
+However, I sacrificed optimizations in favor of a more readable piece of code. I
+hope I succeeded.<br/>
 Note also that this isn't neither the only nor (probably) the best way to do it.
 In fact, the right way depends on the scripting language and the problem one is
-facing in general.
+facing in general.<br/>
+That being said, feel free to use it at your own risk.
 
 The basic idea is that of creating a compile-time component aimed to map all the
 runtime components assigned to an entity.<br/>
@@ -843,8 +844,13 @@ In particular:
   Every time such an operator is invoked, the archive must read the next element
   from the underlying storage and copy it in the given variable.
 
-This API is freely inspired by a well known
-[library for serialization](https://uscilab.github.io/cereal/).
+`EnTT` comes with some examples (actually some tests) that show how to integrate
+a well known library for serialization as an archive. It uses
+[`Cereal C++`](https://uscilab.github.io/cereal/) under the hood, mainly
+because I wanted to learn how it works at the time I was writing the code.
+
+The code is not production-ready and it isn't neither the only nor (probably)
+the best way to do it. However, feel free to use it at your own risk.
 
 ## View: to persist or not to persist?
 
