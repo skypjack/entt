@@ -16,20 +16,19 @@ namespace entt {
 
 
 /**
- * @brief TODO
- *
- * TODO
- *
- * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @brief Forward declaration of the registry class.
  */
-template<typename Entity>
+template<typename>
 class Registry;
 
 
 /**
- * @brief TODO
+ * @brief Utility class to create snapshots from a registry.
  *
- * TODO
+ * A _snapshot_ can be either a dump of the entire registry or a narrower
+ * selection of components and tags of interest.<br/>
+ * This type can be used in both cases if provided with a correctly configured
+ * output archive.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
@@ -74,46 +73,49 @@ class Snapshot final {
 
 public:
     /**
-     * @brief TODO
+     * @brief Puts aside all the entities that are still in use.
      *
-     * TODO
+     * Entities are serialized along with their versions. Destroyed entities are
+     * not taken in consideration by this function.
      *
-     * @tparam Archive TODO
-     * @param archive TODO
-     * @return TODO
+     * @tparam Archive Type of output archive.
+     * @param archive A valid reference to an output archive.
+     * @return An object of this type to continue creating the snapshot.
      */
     template<typename Archive>
-    Snapshot entities(Archive archive) && {
+    Snapshot entities(Archive &archive) && {
         archive(static_cast<Entity>(registry.size()));
         registry.each([&archive, this](auto entity) { archive(entity); });
         return *this;
     }
 
     /**
-     * @brief TODO
+     * @brief Puts aside destroyed entities.
      *
-     * TODO
+     * Entities are serialized along with their versions. Entities that are
+     * still in use are not taken in consideration by this function.
      *
-     * @tparam Archive TODO
-     * @param archive TODO
-     * @return TODO
+     * @tparam Archive Type of output archive.
+     * @param archive A valid reference to an output archive.
+     * @return An object of this type to continue creating the snapshot.
      */
     template<typename Archive>
-    Snapshot destroyed(Archive archive) && {
+    Snapshot destroyed(Archive &archive) && {
         archive(static_cast<Entity>(size));
         std::for_each(available, available+size, [&archive, this](auto entity) { archive(entity); });
         return *this;
     }
 
     /**
-     * @brief TODO
+     * @brief Puts aside the given components.
      *
-     * TODO
+     * Each component is serialized together with the entity to which it
+     * belongs. Entities are serialized along with their versions.
      *
      * @tparam Component Types of components to serialize.
-     * @tparam Archive TODO
-     * @param archive TODO
-     * @return TODO
+     * @tparam Archive Type of output archive.
+     * @param archive A valid reference to an output archive.
+     * @return An object of this type to continue creating the snapshot.
      */
     template<typename... Component, typename Archive>
     Snapshot component(Archive &archive) && {
@@ -124,14 +126,15 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Puts aside the given tags.
      *
-     * TODO
+     * Each tag is serialized together with the entity to which it belongs.
+     * Entities are serialized along with their versions.
      *
      * @tparam Tag Types of tags to serialize.
-     * @tparam Archive TODO
-     * @param archive TODO
-     * @return TODO
+     * @tparam Archive Type of output archive.
+     * @param archive A valid reference to an output archive.
+     * @return An object of this type to continue creating the snapshot.
      */
     template<typename... Tag, typename Archive>
     Snapshot tag(Archive &archive) && {
@@ -149,9 +152,18 @@ private:
 
 
 /**
- * @brief TODO
+ * @brief Utility class to restore a snapshot as a whole.
  *
- * TODO
+ * A snapshot loader requires that the destination registry be empty and loads
+ * all the data at once while keeping intact the identifiers that the entities
+ * originally had.<br/>
+ * An example of use is the implementation of a save/restore feature.
+ *
+ * @warning
+ * Attempting to use a snapshot loader with a registry that isn't empty results
+ * in undefined behavior.<br/>
+ * An assertion will abort the execution at runtime in debug mode if the
+ * registry isn't empty.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
@@ -208,13 +220,14 @@ class SnapshotLoader final {
 
 public:
     /**
-     * @brief TODO
+     * @brief Restores entities that were in use during serialization.
      *
-     * TODO
+     * This function restores the entities that were in use during serialization
+     * and gives them the versions they originally had.
      *
-     * @tparam Archive TODO
-     * @param archive TODO
-     * @return TODO
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A valid loader to continue restoring data.
      */
     template<typename Archive>
     SnapshotLoader entities(Archive &archive) && {
@@ -227,13 +240,14 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Restores entities that were destroyed during serialization.
      *
-     * TODO
+     * This function restores the entities that were destroyed during
+     * serialization and gives them the versions they originally had.
      *
-     * @tparam Archive TODO
-     * @param archive TODO
-     * @return TODO
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A valid loader to continue restoring data.
      */
     template<typename Archive>
     SnapshotLoader destroyed(Archive &archive) && {
@@ -246,14 +260,17 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Restores components and assigns them to the right entities.
      *
-     * TODO
+     * The template parameter list must be exactly the same used during
+     * serialization. In the event that the entity to which the component is
+     * assigned doesn't exist yet, the loader will take care to create it with
+     * the version it originally had.
      *
      * @tparam Component Types of components to restore.
-     * @tparam Archive TODO
-     * @param archive TODO
-     * @return TODO
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A valid loader to continue restoring data.
      */
     template<typename... Component, typename Archive>
     SnapshotLoader component(Archive &archive) && {
@@ -264,14 +281,17 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Restores tags and assigns them to the right entities.
      *
-     * TODO
+     * The template parameter list must be exactly the same used during
+     * serialization. In the event that the entity to which the tag is assigned
+     * doesn't exist yet, the loader will take care to create it with the
+     * version it originally had.
      *
      * @tparam Tag Types of tags to restore.
-     * @tparam Archive TODO
-     * @param archive TODO
-     * @return TODO
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A valid loader to continue restoring data.
      */
     template<typename... Tag, typename Archive>
     SnapshotLoader tag(Archive &archive) && {
@@ -283,13 +303,16 @@ public:
 
 
     /**
-     * @brief TODO
+     * @brief Destroys those entities that have neither components nor tags.
      *
-     * TODO
+     * In case all the entities were serialized but only part of the components
+     * and tags was saved, it could happen that some of the entities have
+     * neither components nor tags once restored.<br/>
+     * This functions helps to identify and destroy those entities.
      *
-     * @return TODO
+     * @return A valid loader to continue restoring data.
      */
-    SnapshotLoader orphans() {
+    SnapshotLoader orphans() && {
         registry.orphans([this](auto entity) {
             registry.destroy(entity);
         });
@@ -304,9 +327,18 @@ private:
 
 
 /**
- * @brief TODO
+ * @brief Utility class for _progressive loading_.
  *
- * TODO
+ * A progressive loader is designed to load data from a source registry to a
+ * (possibly) non-empty destination. The loader can accomodate in a registry
+ * more than one snapshot in a sort of _progressive loading_ that updates the
+ * destination one step at a time.<br/>
+ * Identifiers that entities originally had are not transferred to the target.
+ * Instead, the loader maps remote identifiers to local ones while restoring a
+ * snapshot.<br/>
+ * An example of use is the implementation of a client-server applications with
+ * the requirement of transferring somehow parts of the representation side to
+ * side.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
@@ -316,29 +348,42 @@ class ProgressiveLoader final {
 
     using traits_type = entt_traits<Entity>;
 
-    Entity prepare(Entity entity, bool destroyed) {
+    template<typename Init, typename Update>
+    Entity prepare(Entity entity, Init init, Update update) {
         const auto it = remloc.find(entity);
 
         if(it == remloc.cend()) {
-            remloc.emplace(entity, std::make_pair(registry.create(), true));
-
-            if(destroyed) {
-                registry.destroy(remloc[entity].first);
-            }
+            const auto local = registry.create();
+            remloc.emplace(entity, std::make_pair(local, true));
+            init(local);
         } else {
-            const auto local = remloc[entity].first;
-
             // set the dirty flag
             remloc[entity].second = true;
-
-            if(destroyed && registry.valid(local)) {
-                registry.destroy(local);
-            } else if(!destroyed && !registry.valid(local)) {
-                remloc[entity].first = registry.create();
-            }
+            // then update the entity (whatever it means)
+            update(remloc[entity].first);
         }
 
         return remloc[entity].first;
+    }
+
+    Entity destroy(Entity entity) {
+        return prepare(entity, [this](auto entity) {
+            registry.destroy(entity);
+        }, [this](auto entity) {
+            if(registry.valid(entity)) {
+                registry.destroy(entity);
+            }
+        });
+    }
+
+    Entity restore(Entity entity) {
+        return prepare(entity, [this](auto) {
+            // nothing to do here...
+        }, [this](auto entity) {
+            if(!registry.valid(entity)) {
+                remloc[entity].first = registry.create();
+            }
+        });
     }
 
     template<typename Instance, typename Type>
@@ -384,8 +429,7 @@ class ProgressiveLoader final {
         reset<Component>();
 
         each(archive, [&archive, this](auto entity) {
-            const bool destroyed = false;
-            entity = prepare(entity, destroyed);
+            entity = restore(entity);
             archive(registry.template accomodate<Component>(entity));
         });
     }
@@ -395,8 +439,7 @@ class ProgressiveLoader final {
         reset<Component>();
 
         each(archive, [&archive, member..., this](auto entity) {
-            const bool destroyed = false;
-            entity = prepare(entity, destroyed);
+            entity = restore(entity);
             auto &component = registry.template accomodate<Component>(entity);
             archive(component);
 
@@ -411,8 +454,7 @@ class ProgressiveLoader final {
         registry.template remove<Tag>();
 
         each(archive, [&archive, this](auto entity) {
-            const bool destroyed = false;
-            entity = prepare(entity, destroyed);
+            entity = restore(entity);
             archive(registry.template attach<Tag>(entity));
         });
     }
@@ -422,8 +464,7 @@ class ProgressiveLoader final {
         registry.template remove<Tag>();
 
         each(archive, [&archive, member..., this](auto entity) {
-            const bool destroyed = false;
-            entity = prepare(entity, destroyed);
+            entity = restore(entity);
             auto &tag = registry.template attach<Tag>(entity);
             archive(tag);
 
@@ -434,15 +475,12 @@ class ProgressiveLoader final {
     }
 
 public:
-    /*! @brief TODO */
+    /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
 
     /**
-     * @brief TODO
-     *
-     * TODO
-     *
-     * @param registry TODO
+     * @brief Constructs a loader that is bound to a given registry.
+     * @param registry A valid reference to a registry.
      */
     ProgressiveLoader(Registry<entity_type> &registry) noexcept
         : registry{registry}
@@ -459,52 +497,49 @@ public:
     ProgressiveLoader & operator=(ProgressiveLoader &&) = default;
 
     /**
-     * @brief TODO
+     * @brief Restores entities that were in use during serialization.
      *
-     * TODO
+     * This function restores the entities that were in use during serialization
+     * and creates local counterparts for them if required.
      *
-     * @tparam Archive TODO
-     * @param archive TODO
-     * @return TODO
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A non-const reference to this loader.
      */
     template<typename Archive>
     ProgressiveLoader & entities(Archive &archive) {
-        each(archive, [this](auto entity) {
-            const bool destroyed = false;
-            prepare(entity, destroyed);
-        });
-
+        each(archive, [this](auto entity) { restore(entity); });
         return *this;
     }
 
     /**
-     * @brief TODO
+     * @brief Restores entities that were destroyed during serialization.
      *
-     * TODO
+     * This function restores the entities that were destroyed during
+     * serialization and creates local counterparts for them if required.
      *
-     * @tparam Archive TODO
-     * @param archive TODO
-     * @return TODO
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A non-const reference to this loader.
      */
     template<typename Archive>
     ProgressiveLoader & destroyed(Archive &archive) {
-        each(archive, [this](auto entity) {
-            const bool destroyed = true;
-            prepare(entity, destroyed);
-        });
-
+        each(archive, [this](auto entity) { destroy(entity); });
         return *this;
     }
 
     /**
-     * @brief TODO
+     * @brief Restores components and assigns them to the right entities.
      *
-     * TODO
+     * The template parameter list must be exactly the same used during
+     * serialization. In the event that the entity to which the component is
+     * assigned doesn't exist yet, the loader will take care to create a local
+     * counterpart for it.
      *
      * @tparam Component Types of components to restore.
-     * @tparam Archive TODO
-     * @param archive TODO
-     * @return TODO
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A non-const reference to this loader.
      */
     template<typename... Component, typename Archive>
     ProgressiveLoader & component(Archive &archive) {
@@ -515,16 +550,22 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Restores components and assigns them to the right entities.
      *
-     * TODO
+     * The template parameter list must be exactly the same used during
+     * serialization. In the event that the entity to which the component is
+     * assigned doesn't exist yet, the loader will take care to create a local
+     * counterpart for it.<br/>
+     * Members can be either data members of type entity_type or containers of
+     * entities. In both cases, the loader will visit them and update the
+     * entities by replacing each one with its local counterpart.
      *
      * @tparam Component Type of component to restore.
-     * @tparam Archive TODO
-     * @tparam Type TODO
-     * @param archive TODO
-     * @param member TODO
-     * @return TODO
+     * @tparam Archive Type of input archive.
+     * @tparam Type Types of members to update with their local counterparts.
+     * @param archive A valid reference to an input archive.
+     * @param member Members to update with their local counterparts.
+     * @return A non-const reference to this loader.
      */
     template<typename Component, typename Archive, typename... Type>
     ProgressiveLoader & component(Archive &archive, Type Component::*... member) {
@@ -533,14 +574,17 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Restores tags and assigns them to the right entities.
      *
-     * TODO
+     * The template parameter list must be exactly the same used during
+     * serialization. In the event that the entity to which the tag is assigned
+     * doesn't exist yet, the loader will take care to create a local
+     * counterpart for it.
      *
      * @tparam Tag Types of tags to restore.
-     * @tparam Archive TODO
-     * @param archive TODO
-     * @return TODO
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A non-const reference to this loader.
      */
     template<typename... Tag, typename Archive>
     ProgressiveLoader & tag(Archive &archive) {
@@ -551,16 +595,22 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Restores tags and assigns them to the right entities.
      *
-     * TODO
+     * The template parameter list must be exactly the same used during
+     * serialization. In the event that the entity to which the tag is assigned
+     * doesn't exist yet, the loader will take care to create a local
+     * counterpart for it.<br/>
+     * Members can be either data members of type entity_type or containers of
+     * entities. In both cases, the loader will visit them and update the
+     * entities by replacing each one with its local counterpart.
      *
      * @tparam Tag Type of tag to restore.
-     * @tparam Archive TODO
-     * @tparam Type TODO
-     * @param archive TODO
-     * @param member TODO
-     * @return TODO
+     * @tparam Archive Type of input archive.
+     * @tparam Type Types of members to update with their local counterparts.
+     * @param archive A valid reference to an input archive.
+     * @param member Members to update with their local counterparts.
+     * @return A non-const reference to this loader.
      */
     template<typename Tag, typename Archive, typename... Type>
     ProgressiveLoader & tag(Archive &archive, Type Tag::*... member) {
@@ -569,11 +619,12 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Helps to purge entities that no longer have a conterpart.
      *
-     * TODO
+     * Users should invoke this member function after restoring each snapshot,
+     * unless they know exactly what they are doing.
      *
-     * @return TODO
+     * @return A non-const reference to this loader.
      */
     ProgressiveLoader & shrink() {
         auto it = remloc.begin();
@@ -598,11 +649,14 @@ public:
     }
 
     /**
-     * @brief TODO
+     * @brief Destroys those entities that have neither components nor tags.
      *
-     * TODO
+     * In case all the entities were serialized but only part of the components
+     * and tags was saved, it could happen that some of the entities have
+     * neither components nor tags once restored.<br/>
+     * This functions helps to identify and destroy those entities.
      *
-     * @return TODO
+     * @return A non-const reference to this loader.
      */
     ProgressiveLoader & orphans() {
         registry.orphans([this](auto entity) {
@@ -613,24 +667,25 @@ public:
     }
 
     /**
-     * @brief TODO
-     *
-     * TODO
-     *
-     * @param entity TODO
-     * @return TODO
+     * @brief Tests if a loader knows about a given entity.
+     * @param entity An entity identifier.
+     * @return True if `entity` is managed by the loader, false otherwise.
      */
     bool has(entity_type entity) {
         return !(remloc.find(entity) == remloc.cend());
     }
 
     /**
-     * @brief TODO
+     * @brief Returns the identifier to which an entity refers.
      *
-     * TODO
+     * @warning
+     * Attempting to use an entity that isn't managed by the loader results in
+     * undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * loader doesn't knows about the entity.
      *
-     * @param entity TODO
-     * @return TODO
+     * @param entity An entity identifier.
+     * @return The identifier to which `entity` refers in the target registry.
      */
     entity_type map(entity_type entity) {
         assert(has(entity));
