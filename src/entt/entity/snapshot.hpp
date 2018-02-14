@@ -171,11 +171,12 @@ template<typename Entity>
 class SnapshotLoader final {
     friend class Registry<Entity>;
 
-    using func_type = void(*)(Registry<Entity> &, Entity, bool);
+    using func_type = void(*)(Registry<Entity> &, Entity);
 
-    SnapshotLoader(Registry<Entity> &registry, func_type force_fn) noexcept
+    SnapshotLoader(Registry<Entity> &registry, func_type ensure_fn, func_type destroy_fn) noexcept
         : registry{registry},
-          force_fn{force_fn}
+          ensure_fn{ensure_fn},
+          destroy_fn{destroy_fn}
     {
         // restore a snapshot as a whole requires a clean registry
         assert(!registry.capacity());
@@ -203,8 +204,7 @@ class SnapshotLoader final {
     template<typename Component, typename Archive>
     void assign(Archive &archive) {
         each(archive, [&archive, this](auto entity) {
-            const bool destroyed = false;
-            force_fn(registry, entity, destroyed);
+            ensure_fn(registry, entity);
             archive(registry.template assign<Component>(entity));
         });
     }
@@ -212,8 +212,7 @@ class SnapshotLoader final {
     template<typename Tag, typename Archive>
     void attach(Archive &archive) {
         each(archive, [&archive, this](auto entity) {
-            const bool destroyed = false;
-            force_fn(registry, entity, destroyed);
+            ensure_fn(registry, entity);
             archive(registry.template attach<Tag>(entity));
         });
     }
@@ -232,8 +231,7 @@ public:
     template<typename Archive>
     SnapshotLoader entities(Archive &archive) && {
         each(archive, [this](auto entity) {
-            const bool destroyed = false;
-            force_fn(registry, entity, destroyed);
+            ensure_fn(registry, entity);
         });
 
         return *this;
@@ -252,8 +250,8 @@ public:
     template<typename Archive>
     SnapshotLoader destroyed(Archive &archive) && {
         each(archive, [this](auto entity) {
-            const bool destroyed = true;
-            force_fn(registry, entity, destroyed);
+            ensure_fn(registry, entity);
+            destroy_fn(registry, entity);
         });
 
         return *this;
@@ -322,7 +320,8 @@ public:
 
 private:
     Registry<Entity> &registry;
-    func_type force_fn;
+    func_type ensure_fn;
+    func_type destroy_fn;
 };
 
 
@@ -348,42 +347,35 @@ class ProgressiveLoader final {
 
     using traits_type = entt_traits<Entity>;
 
-    template<typename Init, typename Update>
-    Entity prepare(Entity entity, Init init, Update update) {
+    Entity destroy(Entity entity) {
         const auto it = remloc.find(entity);
 
         if(it == remloc.cend()) {
             const auto local = registry.create();
             remloc.emplace(entity, std::make_pair(local, true));
-            init(local);
-        } else {
-            // set the dirty flag
-            remloc[entity].second = true;
-            // then update the entity (whatever it means)
-            update(remloc[entity].first);
+            registry.destroy(local);
         }
 
         return remloc[entity].first;
     }
 
-    Entity destroy(Entity entity) {
-        return prepare(entity, [this](auto entity) {
-            registry.destroy(entity);
-        }, [this](auto entity) {
-            if(registry.valid(entity)) {
-                registry.destroy(entity);
-            }
-        });
-    }
-
     Entity restore(Entity entity) {
-        return prepare(entity, [this](auto) {
-            // nothing to do here...
-        }, [this](auto entity) {
-            if(!registry.valid(entity)) {
-                remloc[entity].first = registry.create();
-            }
-        });
+        const auto it = remloc.find(entity);
+
+        if(it == remloc.cend()) {
+            const auto local = registry.create();
+            remloc.emplace(entity, std::make_pair(local, true));
+        } else {
+            remloc[entity].first =
+                    registry.valid(remloc[entity].first)
+                    ? remloc[entity].first
+                    : registry.create();
+
+            // set the dirty flag
+            remloc[entity].second = true;
+        }
+
+        return remloc[entity].first;
     }
 
     template<typename Instance, typename Type>

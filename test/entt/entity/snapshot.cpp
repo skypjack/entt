@@ -468,3 +468,31 @@ TEST(Snapshot, Progressive) {
     ASSERT_EQ(dst.size<AComponent>(), aComponentCnt);
     ASSERT_FALSE(dst.has<double>());
 }
+
+TEST(Snapshot, ProgressiveMoreOnShrink) {
+    using entity_type = entt::DefaultRegistry::entity_type;
+
+    entt::DefaultRegistry src;
+    entt::DefaultRegistry dst;
+
+    entt::ProgressiveLoader<entity_type> loader{dst};
+
+    using storage_type = std::tuple<
+        std::queue<entity_type>,
+        std::queue<AComponent>
+    >;
+
+    storage_type storage;
+    OutputArchive<storage_type> output{storage};
+    InputArchive<storage_type> input{storage};
+
+    auto entity = src.create();
+    src.snapshot().entities(output);
+    loader.entities(input).shrink();
+
+    ASSERT_TRUE(dst.valid(entity));
+
+    loader.shrink();
+
+    ASSERT_FALSE(dst.valid(entity));
+}
