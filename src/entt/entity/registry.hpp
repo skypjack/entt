@@ -923,14 +923,13 @@ public:
     }
 
     /**
-     * @brief Iterates all the entities that have the given components.
+     * @brief Iterates all the entities that are still in use.
      *
-     * The function object is invoked for each entity that is still in use and
-     * has the given components assigned.<br/>
+     * The function object is invoked for each entity that is still in use.<br/>
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(entity_type, const Component &...);
+     * void(entity_type);
      * @endcode
      *
      * This function is fairly slow and should not be used frequently.<br/>
@@ -949,7 +948,7 @@ public:
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
      */
-    template<typename... Component, typename Func>
+    template<typename Func>
     void each(Func func) const {
         std::vector<entity_type> copy{available.cbegin(), available.cend()};
         std::sort(copy.begin(), copy.end(), [](auto lhs, auto rhs) {
@@ -961,44 +960,10 @@ public:
 
             if(curr && copy[curr-1] == entity) {
                 --curr;
-            } else if(has<Component...>(entity)) {
-                func(entity, get<Component>(entity)...);
+            } else {
+                func(entity);
             }
         }
-    }
-
-    /**
-     * @brief Iterates all the entities that have the given components.
-     *
-     * The function object is invoked for each entity that is still in use and
-     * has the given components assigned.<br/>
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(entity_type, Component &...);
-     * @endcode
-     *
-     * This function is fairly slow and should not be used frequently.<br/>
-     * Consider using a view if the goal is to iterate entities that have a
-     * determinate set of components. A view is usually faster than combining
-     * this function with a bunch of custom tests.<br/>
-     * On the other side, this function can be used to iterate all the entities
-     * that are in use, regardless of their components:
-     *
-     * @code{.cpp}
-     * registry.each([](auto entity) {
-     *     // ...
-     * });
-     * @endcode
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename... Component, typename Func>
-    void each(Func func) {
-        const_cast<const Registry *>(this)->each<Component...>([&func](entity_type entity, const Component &... component) {
-            func(entity, const_cast<Component &>(component)...);
-        });
     }
 
     /**

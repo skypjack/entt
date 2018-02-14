@@ -1104,17 +1104,6 @@ registry.each([](auto entity) {
 
 It returns to the caller all the entities that are still in use by means of the
 given function.<br/>
-The same method can be used also to iterate entities that have a specific set of
-components without creating a view:
-
-```cpp
-const auto &cregistry = registry;
-
-// const and non-const references
-registry.each<Position, Velocity>([](auto entity, auto &position, auto &velocity) { /* ... */ });
-cregistry.each<Position, Velocity>([](auto entity, const auto &position, const auto &velocity) { /* ... */ });
-```
-
 As a rule of thumb, consider using a view if the goal is to iterate entities
 that have a determinate set of components. A view is usually much faster than
 combining this function with a bunch of custom tests.<br/>

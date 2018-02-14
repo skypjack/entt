@@ -136,29 +136,28 @@ TEST(DefaultRegistry, Each) {
 
     entt::DefaultRegistry::size_type tot{};
 
-    registry.create<int>();
-    registry.create<int>();
+    registry.create();
+    registry.create();
 
-    registry.each([&](auto) { ++tot; });
+    registry.each([&](auto) {
+        registry.create();
+        ++tot;
+    });
+
     ASSERT_EQ(tot, 2u);
     tot = 0u;
 
-    registry.each<int>([&](auto, auto &) { ++tot; });
-    ASSERT_EQ(tot, 2u);
+    registry.each([&](auto entity) {
+        registry.destroy(entity);
+        ++tot;
+    });
+
+    ASSERT_EQ(tot, 4u);
     tot = 0u;
-
-    cregistry.each<int>([&](auto, const auto &) { ++tot; });
-    ASSERT_EQ(tot, 2u);
-    tot = 0u;
-
-    registry.each([&](auto) { registry.create(); });
-    registry.each<int>([&](auto entity, auto &) { registry.destroy(entity); });
-
-    cregistry.each<int>([&](auto, const auto &) { ++tot; });
-    ASSERT_EQ(tot, 0u);
 
     cregistry.each([&](auto) { ++tot; });
-    ASSERT_EQ(tot, 2u);
+
+    ASSERT_EQ(tot, 0u);
 }
 
 TEST(DefaultRegistry, Orphans) {
