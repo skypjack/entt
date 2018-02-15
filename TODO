@@ -1,0 +1,14 @@
+* FilteredView (decorator with a member method that accepts a filter function to apply to the entities returned by the underlying view)
+* custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
+* document the whole framework (long term feature, it makes sense but I've not much time to spend on it unfortunately) - see #28
+* to analyze, long term feature: systems organizer based on dependency graphs for implicit parallelism (I don't want to think anymore in future :-))
+* save/restore functionalities - see #27
+
+* AOB
+
+---> candidate
+we can get rid of the available vector and use an entt_traits::entity_type element and a boolean in place of it.
+the idea is to create an implicit next-list in the entt_traits::entity_mask part of an entity, so that it doesn't affect the version.
+the each member function can the iterate all the entities and check if the mask return the entity position to test for validity.
+in all the other cases (mask different from the position or mask equal to the available start point) the entity isn't valid.
+it sounds good indeed, experimental feature to be tested.
