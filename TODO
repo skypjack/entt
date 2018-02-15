@@ -4,6 +4,16 @@
 * to analyze, long term feature: systems organizer based on dependency graphs for implicit parallelism (I don't want to think anymore in future :-))
 * save/restore functionalities - see #27
 
+* blueprint registry to manage object templates when creating entities, something along this line:
+
+  template<typename R>
+  struct BlueprintRegistry: public R {
+  template<typename... Component> void blueprint(); // register a blueprint
+  template<typename... Component> void create(); // use the underlying create and looks for a blueprint if any
+  };
+
+  It will help creating entities with predefined sets of components and getting rid of the annoying factories all around the codebase.
+
 * AOB
 
 ---> candidate
