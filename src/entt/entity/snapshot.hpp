@@ -326,11 +326,11 @@ private:
 
 
 /**
- * @brief Utility class for _progressive loading_.
+ * @brief Utility class for _continuous loading_.
  *
- * A progressive loader is designed to load data from a source registry to a
+ * A _continuous loader_ is designed to load data from a source registry to a
  * (possibly) non-empty destination. The loader can accomodate in a registry
- * more than one snapshot in a sort of _progressive loading_ that updates the
+ * more than one snapshot in a sort of _continuous loading_ that updates the
  * destination one step at a time.<br/>
  * Identifiers that entities originally had are not transferred to the target.
  * Instead, the loader maps remote identifiers to local ones while restoring a
@@ -342,7 +342,7 @@ private:
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class ProgressiveLoader final {
+class ContinuousLoader final {
     friend class Registry<Entity>;
 
     using traits_type = entt_traits<Entity>;
@@ -474,19 +474,19 @@ public:
      * @brief Constructs a loader that is bound to a given registry.
      * @param registry A valid reference to a registry.
      */
-    ProgressiveLoader(Registry<entity_type> &registry) noexcept
+    ContinuousLoader(Registry<entity_type> &registry) noexcept
         : registry{registry}
     {}
 
     /*! @brief Default copy constructor. */
-    ProgressiveLoader(const ProgressiveLoader &) = default;
+    ContinuousLoader(const ContinuousLoader &) = default;
     /*! @brief Default move constructor. */
-    ProgressiveLoader(ProgressiveLoader &&) = default;
+    ContinuousLoader(ContinuousLoader &&) = default;
 
     /*! @brief Default copy assignment operator. @return This loader. */
-    ProgressiveLoader & operator=(const ProgressiveLoader &) = default;
+    ContinuousLoader & operator=(const ContinuousLoader &) = default;
     /*! @brief Default move assignment operator. @return This loader. */
-    ProgressiveLoader & operator=(ProgressiveLoader &&) = default;
+    ContinuousLoader & operator=(ContinuousLoader &&) = default;
 
     /**
      * @brief Restores entities that were in use during serialization.
@@ -499,7 +499,7 @@ public:
      * @return A non-const reference to this loader.
      */
     template<typename Archive>
-    ProgressiveLoader & entities(Archive &archive) {
+    ContinuousLoader & entities(Archive &archive) {
         each(archive, [this](auto entity) { restore(entity); });
         return *this;
     }
@@ -515,7 +515,7 @@ public:
      * @return A non-const reference to this loader.
      */
     template<typename Archive>
-    ProgressiveLoader & destroyed(Archive &archive) {
+    ContinuousLoader & destroyed(Archive &archive) {
         each(archive, [this](auto entity) { destroy(entity); });
         return *this;
     }
@@ -534,7 +534,7 @@ public:
      * @return A non-const reference to this loader.
      */
     template<typename... Component, typename Archive>
-    ProgressiveLoader & component(Archive &archive) {
+    ContinuousLoader & component(Archive &archive) {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (assign<Component>(archive), 0)... };
         (void)accumulator;
@@ -560,7 +560,7 @@ public:
      * @return A non-const reference to this loader.
      */
     template<typename Component, typename Archive, typename... Type>
-    ProgressiveLoader & component(Archive &archive, Type Component::*... member) {
+    ContinuousLoader & component(Archive &archive, Type Component::*... member) {
         assign(archive, member...);
         return *this;
     }
@@ -579,7 +579,7 @@ public:
      * @return A non-const reference to this loader.
      */
     template<typename... Tag, typename Archive>
-    ProgressiveLoader & tag(Archive &archive) {
+    ContinuousLoader & tag(Archive &archive) {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (attach<Tag>(archive), 0)... };
         (void)accumulator;
@@ -605,7 +605,7 @@ public:
      * @return A non-const reference to this loader.
      */
     template<typename Tag, typename Archive, typename... Type>
-    ProgressiveLoader & tag(Archive &archive, Type Tag::*... member) {
+    ContinuousLoader & tag(Archive &archive, Type Tag::*... member) {
         attach<Tag>(archive, member...);
         return *this;
     }
@@ -618,7 +618,7 @@ public:
      *
      * @return A non-const reference to this loader.
      */
-    ProgressiveLoader & shrink() {
+    ContinuousLoader & shrink() {
         auto it = remloc.begin();
 
         while(it != remloc.cend()) {
@@ -650,7 +650,7 @@ public:
      *
      * @return A non-const reference to this loader.
      */
-    ProgressiveLoader & orphans() {
+    ContinuousLoader & orphans() {
         registry.orphans([this](auto entity) {
             registry.destroy(entity);
         });

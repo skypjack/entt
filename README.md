@@ -614,7 +614,7 @@ In fact, there are two functions that respond to slightly different needs:
   In this case, instances of `Movement` are arranged in memory so that cache
   misses are minimized when the two components are iterated together.
 
-### Snapshot: complete vs progressive
+### Snapshot: complete vs continuous
 
 The `Registry` class offers basic support to serialization.<br/>
 It doesn't convert components and tags to bytes directly, there wasn't the need
@@ -680,7 +680,7 @@ Note also that both `component` and `tag` store items along with entities. It
 means that they work properly without a call to the `entities` member function.
 
 Once a snapshot is created, there exist main two _ways_ to load it: as a whole
-and in a kind of _progressive mode_.<br/>
+and in a kind of _continuous mode_.<br/>
 The following sections describe both loaders and archives in details.
 
 #### Snapshot loader
@@ -724,18 +724,18 @@ of the components and tags was saved, it could happen that some of the entities
 have neither components nor tags once restored. The best one can do to deal with
 them is to destroy those entities and thus update their versions.
 
-#### Progressive loader
+#### Continuous loader
 
-A progressive loader is designed to load data from a source registry to a
+A continuous loader is designed to load data from a source registry to a
 (possibly) non-empty destination. The loader can accomodate in a registry more
-than one snapshot in a sort of _progressive loading_ that updates the
+than one snapshot in a sort of _continuous loading_ that updates the
 destination one step at a time.<br/>
 Identifiers that entities originally had are not transferred to the target.
 Instead, the loader maps remote identifiers to local ones while restoring a
 snapshot. Because of that, this kind of loader offers a way to update
 automatically identifiers that are part of components or tags (as an example, as
 data members or gathered in a container).<br/>
-Another difference with the snapshot loader is that the progressive loader does
+Another difference with the snapshot loader is that the continuous loader does
 not need to work with the private data structures of a registry. Furthermore, it
 has an internal state that must persist over time. Therefore, there is no reason
 to create it by means of a registry, or to limit its lifetime to that of a
@@ -744,7 +744,7 @@ temporary object.
 Example of use:
 
 ```cpp
-entt::ProgressiveLoader<entity_type> loader{registry};
+entt::ContinuousLoader<entity_type> loader{registry};
 InputArchive input;
 
 loader.entities(input)

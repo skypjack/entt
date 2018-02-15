@@ -249,13 +249,13 @@ TEST(Snapshot, Partial) {
     ASSERT_FALSE(registry.valid(e4));
 }
 
-TEST(Snapshot, Progressive) {
+TEST(Snapshot, Continuous) {
     using entity_type = entt::DefaultRegistry::entity_type;
 
     entt::DefaultRegistry src;
     entt::DefaultRegistry dst;
 
-    entt::ProgressiveLoader<entity_type> loader{dst};
+    entt::ContinuousLoader<entity_type> loader{dst};
 
     std::vector<entity_type> entities;
     entity_type entity;
@@ -469,13 +469,13 @@ TEST(Snapshot, Progressive) {
     ASSERT_FALSE(dst.has<double>());
 }
 
-TEST(Snapshot, ProgressiveMoreOnShrink) {
+TEST(Snapshot, ContinuousMoreOnShrink) {
     using entity_type = entt::DefaultRegistry::entity_type;
 
     entt::DefaultRegistry src;
     entt::DefaultRegistry dst;
 
-    entt::ProgressiveLoader<entity_type> loader{dst};
+    entt::ContinuousLoader<entity_type> loader{dst};
 
     using storage_type = std::tuple<
         std::queue<entity_type>,

@@ -88,7 +88,7 @@ TEST(Snapshot, Full) {
     ASSERT_EQ(destination.get<Timer>(e3).elapsed, 0);
 }
 
-TEST(Snapshot, Progressive) {
+TEST(Snapshot, Continuous) {
     std::stringstream storage;
 
     entt::DefaultRegistry source;
@@ -126,7 +126,7 @@ TEST(Snapshot, Progressive) {
     }
 
     cereal::JSONInputArchive input{storage};
-    entt::ProgressiveLoader<entt::DefaultRegistry::entity_type> loader{destination};
+    entt::ContinuousLoader<entt::DefaultRegistry::entity_type> loader{destination};
     loader.entities(input)
             .component<Position>(input)
             .component<Relationship>(input, &Relationship::parent)
