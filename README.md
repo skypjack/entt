@@ -1514,17 +1514,17 @@ are meant for. Internally it uses either managed or unmanaged signal handlers,
 that is why there exist both a managed and an unmanaged event bus.
 
 The API of a bus is a kind of subset of the one of a signal. First of all, it
-requires all the types of the events are specified when the bus is declared:
+requires all the types of events are specified when the bus is declared:
 
 ```cpp
 struct AnEvent { int value; };
 struct AnotherEvent {};
 
 // define a managed bus that works with std::shared_ptr/std::weak_ptr
-entt::ManagedBus<AnEvent, AnotherEventC> mbus;
+entt::ManagedBus<AnEvent, AnotherEventC> managed;
 
 // define an unmanaged bus that works with naked pointers
-entt::UnmanagedBus<AnEvent, AnotherEventC> bus;
+entt::UnmanagedBus<AnEvent, AnotherEventC> unmanaged;
 ```
 
 For the sake of brevity, below is described the interface of the sole unmanaged
@@ -1644,7 +1644,97 @@ within the framework.
 
 ## Event dispatcher
 
-TODO
+The event dispatcher class is designed so as to be used in a loop. It allows
+users both to trigger immediate events or to enqueue events to be published all
+together once per tick.<br/>
+Internally it uses either managed or unmanaged signal handlers, that is why
+there exist both a managed and an unmanaged event dispatcher.
+
+This class shares part of its API with the one of the signals, but it doesn't
+require that all the types of events are specified when declared:
+
+```cpp
+// define a managed dispatcher that works with std::shared_ptr/std::weak_ptr
+entt::Dispatcher<entt::Signal> managed{};
+
+// define an unmanaged dispatcher that works with naked pointers
+entt::Dispatcher<entt::SigH> unmanaged{};
+```
+
+Actually there exist two aliases for the classes shown in the previous example:
+`entt::ManagedDispatcher` and `entt::UnmanagedDispatcher`.
+
+For the sake of brevity, below is described the interface of the sole unmanaged
+dispatcher. The interface of the managed dispatcher is almost the same, but for
+the fact that it accepts smart pointers instead of naked pointers.
+
+In order to register an instance of a class to a dispatcher, its type must
+expose one or more member functions of which the return types are `void` and the
+argument lists are `const E &`, for each type of event `E`.<br/>
+To ease the development, member functions that are named `receive` are
+automatically detected and have not to be explicitly specified when registered.
+In all the other cases, the name of the member function aimed to receive the
+event must be provided to the `connect` member function:
+
+```cpp
+struct AnEvent { int value; };
+struct AnotherEvent {};
+
+struct Listener
+{
+    void receive(const AnEvent &) { /* ... */ }
+    void method(const AnotherEvent &) { /* ... */ }
+};
+
+// ...
+
+Listener listener;
+dispatcher.connect<AnEvent>(&listener);
+dispatcher.connect<AnotherEvent, Listener, &Listener::method>(&listener);
+```
+
+The `disconnect` member function follows the same pattern and can be used to
+selectively remove listeners:
+
+```cpp
+dispatcher.disconnect<AnEvent>(&listener);
+dispatcher.disconnect<AnotherEvent, Listener, &Listener::method>(&listener);
+```
+
+The `trigger` member function serves the purpose of sending an immediate event
+to all the listeners registered so far. It offers a convenient approach that
+relieves the user from having to create the event itself. Instead, it's enough
+to specify the type of event and provide all the parameters required to
+construct it.<br/>
+As an example:
+
+```cpp
+dispatcher.trigger<AnEvent>(42);
+dispatcher.trigget<AnotherEvent>();
+```
+
+Listeners are invoked immediately, order of execution isn't guaranteed. This
+method can be used to push around urgent messages like an _is terminating_
+notification on a mobile app.
+
+On the other hand, the `enqueue` member function queues messages together and
+allows to maintain control over the moment they are sent to listeners. The
+signature of this method is more or less the same of `trigger`:
+
+```cpp
+dispatcher.enqueue<AnEvent>(42);
+dispatcher.enqueue<AnotherEvent>();
+```
+
+Events are stored aside until the `update` member function is invoked, then all
+the messages that are still pending are sent to the listeners at once:
+
+```cpp
+dispatcher.update();
+```
+
+This way users can embed the dispatcher in a loop and literally dispatch events
+once per tick to their systems.
 
 ## Event emitter
 
