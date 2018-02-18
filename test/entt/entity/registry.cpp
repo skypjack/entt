@@ -130,13 +130,31 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_TRUE(registry.empty<int>());
 }
 
+TEST(DefaultRegistry, CreateDestroyCornerCase) {
+    entt::DefaultRegistry registry;
+
+    auto e0 = registry.create();
+    auto e1 = registry.create();
+
+    registry.destroy(e0);
+    registry.destroy(e1);
+
+    registry.each([](auto) { FAIL(); });
+
+    ASSERT_EQ(registry.current(e0), entt::DefaultRegistry::version_type{1});
+    ASSERT_EQ(registry.current(e1), entt::DefaultRegistry::version_type{1});
+}
+
 TEST(DefaultRegistry, Each) {
     entt::DefaultRegistry registry;
     entt::DefaultRegistry::size_type tot;
     entt::DefaultRegistry::size_type match;
 
+    registry.create();
     registry.create<int>();
+    registry.create();
     registry.create<int>();
+    registry.create();
 
     tot = 0u;
     match = 0u;
@@ -147,7 +165,22 @@ TEST(DefaultRegistry, Each) {
         ++tot;
     });
 
-    ASSERT_EQ(tot, 2u);
+    ASSERT_EQ(tot, 5u);
+    ASSERT_EQ(match, 2u);
+
+    tot = 0u;
+    match = 0u;
+
+    registry.each([&](auto entity) {
+        if(registry.has<int>(entity)) {
+            registry.destroy(entity);
+            ++match;
+        }
+
+        ++tot;
+    });
+
+    ASSERT_EQ(tot, 10u);
     ASSERT_EQ(match, 2u);
 
     tot = 0u;
@@ -159,19 +192,10 @@ TEST(DefaultRegistry, Each) {
         ++tot;
     });
 
-    ASSERT_EQ(tot, 4u);
-    ASSERT_EQ(match, 2u);
-
-    tot = 0u;
-    match = 0u;
-
-    registry.each([&](auto entity) {
-        if(registry.has<int>(entity)) { ++match; }
-        ++tot;
-    });
-
-    ASSERT_EQ(tot, 4u);
+    ASSERT_EQ(tot, 8u);
     ASSERT_EQ(match, 0u);
+
+    registry.each([&](auto) { FAIL(); });
 }
 
 
@@ -187,14 +211,30 @@ TEST(DefaultRegistry, Types) {
 
 TEST(DefaultRegistry, CreateDestroyEntities) {
     entt::DefaultRegistry registry;
+    entt::DefaultRegistry::entity_type pre{}, post{};
 
-    auto pre = registry.create<double>();
-    registry.destroy(pre);
-    auto post = registry.create<double>();
+    for(int i = 0; i < 10; ++i) {
+        registry.create<double>();
+    }
+
+    registry.reset();
+
+    for(int i = 0; i < 7; ++i) {
+        auto entity = registry.create<int>();
+        if(i == 3) { pre = entity; }
+    }
+
+    registry.reset();
+
+    for(int i = 0; i < 5; ++i) {
+        auto entity = registry.create();
+        if(i == 3) { post = entity; }
+    }
 
     ASSERT_FALSE(registry.valid(pre));
     ASSERT_TRUE(registry.valid(post));
     ASSERT_NE(registry.version(pre), registry.version(post));
+    ASSERT_EQ(registry.version(pre) + 1, registry.version(post));
     ASSERT_EQ(registry.current(pre), registry.current(post));
 }
 
