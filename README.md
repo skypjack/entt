@@ -865,9 +865,6 @@ registry.each([](auto entity) {
 });
 ```
 
-Usually, filtering entities that aren't currently in use is more expensive than
-iterating them all and filtering out those in which one isn't interested.
-
 As a rule of thumb, consider using a view if the goal is to iterate entities
 that have a determinate set of components. A view is usually faster than
 combining this function with a bunch of custom tests.<br/>
