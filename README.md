@@ -1301,6 +1301,18 @@ scheduler.abort();
 
 # Crash Course: resource cache
 
+Resource management is usually one of the most critical part of a software like
+a game. Solutions are often tuned to the particular application. There exists
+several approaches and all of them are perfectly fine as long as they fit the
+requirements of the piece of software in which they are embedded.<br/>
+Examples are loading everything on start, loading on request, predictive
+loading, and so on.
+
+This class doens't pretend to be a _one fits all_ solution for the different
+cases. Instead, it offers a minimal and perhaps trivial cache that can be useful
+most of the time during prototyping and sometimes even in a production
+environment.
+
 TODO
 
 ## The loader, the resource and the cache
