@@ -139,7 +139,6 @@ class Registry {
 
         if(!handlers[vtype]) {
             using accumulator_type = int[];
-
             auto set = std::make_unique<SparseSet<Entity>>();
 
             for(auto entity: view<Component...>()) {
@@ -231,7 +230,7 @@ public:
      * @return Number of entities still in use.
      */
     size_type size() const noexcept {
-        return entities.size() - available.size();
+        return entities.size() - available;
     }
 
     /**
@@ -258,7 +257,6 @@ public:
      */
     void reserve(size_type cap) {
         entities.reserve(cap);
-        available.reserve(cap);
     }
 
     /**
@@ -285,7 +283,7 @@ public:
      * @return True if at least an entity is still in use, false otherwise.
      */
     bool empty() const noexcept {
-        return entities.size() == available.size();
+        return entities.size() == available;
     }
 
     /**
@@ -409,14 +407,18 @@ public:
     entity_type create() noexcept {
         entity_type entity;
 
-        if(available.empty()) {
+        if(available) {
+            const auto entt = next;
+            const auto version = entities[entt] & (~traits_type::entity_mask);
+
+            entity = entt | version;
+            next = entities[entt] & traits_type::entity_mask;
+            entities[entt] = entity;
+            --available;
+        } else {
             entity = entity_type(entities.size());
             assert(entity < traits_type::entity_mask);
-            assert((entity >> traits_type::entity_shift) == entity_type{});
             entities.push_back(entity);
-        } else {
-            entity = available.back();
-            available.pop_back();
         }
 
         return entity;
@@ -440,11 +442,12 @@ public:
     void destroy(entity_type entity) {
         assert(valid(entity));
         const auto entt = entity & traits_type::entity_mask;
-        const auto version = version_type{1} + ((entity >> traits_type::entity_shift) & traits_type::version_mask);
-        const auto next = entt | (version << traits_type::entity_shift);
+        const auto version = (entity & (~traits_type::entity_mask)) + (typename traits_type::entity_type{1} << traits_type::entity_shift);
+        const auto node = (available ? next : ((entt + 1) & traits_type::entity_mask)) | version;
 
-        entities[entt] = next;
-        available.push_back(next);
+        entities[entt] = node;
+        next = entt;
+        ++available;
 
         for(auto &&cpool: pools) {
             if(cpool && cpool->has(entity)) {
@@ -880,11 +883,11 @@ public:
         if(managed<Component>()) {
             auto &cpool = pool<Component>();
 
-            for(auto entity: entities) {
+            each([&cpool](auto entity) {
                 if(cpool.has(entity)) {
                     cpool.destroy(entity);
                 }
-            }
+            });
         }
     }
 
@@ -892,34 +895,14 @@ public:
      * @brief Resets a whole registry.
      *
      * Destroys all the entities. After a call to `reset`, all the entities
-     * previously created are recycled with a new version number. In case entity
+     * still in use are recycled with a new version number. In case entity
      * identifers are stored around, the `current` member function can be used
      * to know if they are still valid.
      */
     void reset() {
-        available.clear();
-
-        for(auto &&entity: entities) {
-            const auto version = version_type{1} + ((entity >> traits_type::entity_shift) & traits_type::version_mask);
-            entity = (entity & traits_type::entity_mask) | (version << traits_type::entity_shift);
-            available.push_back(entity);
-        }
-
-        for(auto &&handler: handlers) {
-            if(handler) {
-                handler->reset();
-            }
-        }
-
-        for(auto &&pool: pools) {
-            if(pool) {
-                pool->reset();
-            }
-        }
-
-        for(auto &&tag: tags) {
-            tag.reset();
-        }
+        each([this](auto entity) {
+            destroy(entity);
+        });
     }
 
     /**
@@ -937,31 +920,25 @@ public:
      * determinate set of components. A view is usually faster than combining
      * this function with a bunch of custom tests.<br/>
      * On the other side, this function can be used to iterate all the entities
-     * that are in use, regardless of their components:
-     *
-     * @code{.cpp}
-     * registry.each([](auto entity) {
-     *     // ...
-     * });
-     * @endcode
+     * that are in use, regardless of their components.
      *
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
     void each(Func func) const {
-        std::vector<entity_type> copy{available.cbegin(), available.cend()};
-        std::sort(copy.begin(), copy.end(), [](auto lhs, auto rhs) {
-            return ((lhs & traits_type::entity_mask) < (rhs & traits_type::entity_mask));
-        });
+        if(available) {
+            for(auto pos = entities.size(); pos > size_type{0}; --pos) {
+                const entity_type curr = pos - 1;
+                const auto entt = entities[curr] & traits_type::entity_mask;
 
-        for(size_type pos = entities.size(), curr = copy.size(); pos; --pos) {
-            auto entity = entities[pos-1];
-
-            if(curr && copy[curr-1] == entity) {
-                --curr;
-            } else {
-                func(entity);
+                if(curr == entt) {
+                    func(entities[curr]);
+                }
+            }
+        } else {
+            for(auto pos = entities.size(); pos > size_type{0}; --pos) {
+                func(entities[pos-1]);
             }
         }
     }
@@ -1169,7 +1146,17 @@ public:
      * @return A not movable and not copyable object to use to take snasphosts.
      */
     Snapshot<Entity> snapshot() {
-        return { *this, available.data(), available.size() };
+        using func_type = entity_type(*)(Registry &, entity_type);
+        const auto seed = available ? (next | (entities[next] & ~traits_type::entity_mask)) : next;
+
+        func_type follow = [](Registry &registry, entity_type entity) {
+            const auto &entities = registry.entities;
+            const auto entt = entity & traits_type::entity_mask;
+            const auto next = entities[entt] & traits_type::entity_mask;
+            return (next | (entities[next] & ~traits_type::entity_mask));
+        };
+
+        return { *this, seed, available, follow };
     }
 
     /**
@@ -1185,13 +1172,12 @@ public:
      * @return A not movable and not copyable object to use to load snasphosts.
      */
     SnapshotLoader<Entity> restore() {
-        using func_type = void(*)(Registry &, entity_type);
+        using func_type = void(*)(Registry &, entity_type, bool);
 
-        func_type ensure = [](Registry &registry, entity_type entity) {
+        func_type ensure = [](Registry &registry, entity_type entity, bool destroyed) {
             using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
             // explicit promotion to avoid warnings with std::uint16_t
             const auto entt = promotion_type{entity} & traits_type::entity_mask;
-
             auto &entities = registry.entities;
 
             if(!(entt < entities.size())) {
@@ -1201,23 +1187,24 @@ public:
             }
 
             entities[entt] = entity;
+
+            if(destroyed) {
+                registry.destroy(entity);
+                const auto version = (entity & (~traits_type::entity_mask));
+                entities[entt] = ((entities[entt] & traits_type::entity_mask) | version);
+            }
         };
 
-        func_type destroy = [](Registry &registry, entity_type entity) {
-            auto &available = registry.available;
-            available.push_back(entity);
-        };
-
-
-        return { *this, ensure, destroy };
+        return { *this, ensure };
     }
 
 private:
     std::vector<std::unique_ptr<SparseSet<Entity>>> handlers;
     std::vector<std::unique_ptr<SparseSet<Entity>>> pools;
     std::vector<std::unique_ptr<Attachee>> tags;
-    std::vector<entity_type> available;
     std::vector<entity_type> entities;
+    size_type available{};
+    entity_type next{};
 };
 
 

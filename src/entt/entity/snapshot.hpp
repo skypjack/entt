@@ -36,10 +36,13 @@ template<typename Entity>
 class Snapshot final {
     friend class Registry<Entity>;
 
-    Snapshot(Registry<Entity> &registry, const Entity *available, std::size_t size) noexcept
+    using func_type = Entity(*)(Registry<Entity> &, Entity);
+
+    Snapshot(Registry<Entity> &registry, Entity seed, std::size_t size, func_type follow) noexcept
         : registry{registry},
-          available{available},
-          size{size}
+          seed{seed},
+          size{size},
+          follow{follow}
     {}
 
     Snapshot(const Snapshot &) = default;
@@ -102,7 +105,17 @@ public:
     template<typename Archive>
     Snapshot destroyed(Archive &archive) && {
         archive(static_cast<Entity>(size));
-        std::for_each(available, available+size, [&archive, this](auto entity) { archive(entity); });
+
+        if(size) {
+            auto curr = seed;
+            archive(curr);
+
+            for(auto i = size - 1; i; --i) {
+                curr = follow(registry, curr);
+                archive(curr);
+            }
+        }
+
         return *this;
     }
 
@@ -146,8 +159,9 @@ public:
 
 private:
     Registry<Entity> &registry;
-    const Entity *available;
-    std::size_t size;
+    const Entity seed;
+    const std::size_t size;
+    func_type follow;
 };
 
 
@@ -171,12 +185,11 @@ template<typename Entity>
 class SnapshotLoader final {
     friend class Registry<Entity>;
 
-    using func_type = void(*)(Registry<Entity> &, Entity);
+    using func_type = void(*)(Registry<Entity> &, Entity, bool);
 
-    SnapshotLoader(Registry<Entity> &registry, func_type ensure_fn, func_type destroy_fn) noexcept
+    SnapshotLoader(Registry<Entity> &registry, func_type ensure_fn) noexcept
         : registry{registry},
-          ensure_fn{ensure_fn},
-          destroy_fn{destroy_fn}
+          ensure_fn{ensure_fn}
     {
         // restore a snapshot as a whole requires a clean registry
         assert(!registry.capacity());
@@ -204,7 +217,8 @@ class SnapshotLoader final {
     template<typename Component, typename Archive>
     void assign(Archive &archive) {
         each(archive, [&archive, this](auto entity) {
-            ensure_fn(registry, entity);
+            static constexpr auto destroyed = false;
+            ensure_fn(registry, entity, destroyed);
             archive(registry.template assign<Component>(entity));
         });
     }
@@ -212,7 +226,8 @@ class SnapshotLoader final {
     template<typename Tag, typename Archive>
     void attach(Archive &archive) {
         each(archive, [&archive, this](auto entity) {
-            ensure_fn(registry, entity);
+            static constexpr auto destroyed = false;
+            ensure_fn(registry, entity, destroyed);
             archive(registry.template attach<Tag>(entity));
         });
     }
@@ -231,7 +246,8 @@ public:
     template<typename Archive>
     SnapshotLoader entities(Archive &archive) && {
         each(archive, [this](auto entity) {
-            ensure_fn(registry, entity);
+            static constexpr auto destroyed = false;
+            ensure_fn(registry, entity, destroyed);
         });
 
         return *this;
@@ -250,8 +266,8 @@ public:
     template<typename Archive>
     SnapshotLoader destroyed(Archive &archive) && {
         each(archive, [this](auto entity) {
-            ensure_fn(registry, entity);
-            destroy_fn(registry, entity);
+            static constexpr auto destroyed = true;
+            ensure_fn(registry, entity, destroyed);
         });
 
         return *this;
@@ -321,7 +337,6 @@ public:
 private:
     Registry<Entity> &registry;
     func_type ensure_fn;
-    func_type destroy_fn;
 };
 
 
