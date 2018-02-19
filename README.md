@@ -62,16 +62,11 @@ pressure according to the users' requirements.
 * Any other business.
 
 Consider it a work in progress. For more details and an updated list, please
-refer to the [online documentation](https://skypjack.github.io/entt/).
-
-### A note about the README
-
-The README file stays true to the original project and it describes only the
-entity-component system. However, the whole API is fully documented in-code and
-the [online documentation](https://skypjack.github.io/entt/) contains much
-more.<br/>
-Continue reading to know how the core part of the project works or follow the
-link above to take a look at the API reference for all other available classes.
+refer to the [online documentation](https://skypjack.github.io/entt/). It
+probably contains much more. Moreover, the whole API is fully documented
+in-code for those who are brave enough to read it.<br/>
+Continue reading to know how the different parts of the project work or follow
+the link above to take a look at the API reference.
 
 ## Code Example
 
@@ -150,7 +145,7 @@ of course.
 
 As it stands right now, `EnTT` is just fast enough for my requirements if
 compared to my first choice (it was already amazingly fast actually).<br/>
-Here is a comparision between the two (both of them compiled with GCC 7.2.0 on a
+Here is a comparison between the two (both of them compiled with GCC 7.2.0 on a
 Dell XPS 13 out of the mid 2014):
 
 | Benchmark | EntityX (compile-time) | EnTT |
@@ -277,12 +272,12 @@ entt::DefaultRegistry<Comp0, Comp1, ..., CompN> registry;
 `EnTT` is entirely designed around the principle that users have to pay only for
 what they want.
 
-When it comes to using an entity-componet system, the tradeoff is usually
+When it comes to using an entity-component system, the tradeoff is usually
 between performance and memory usage. The faster it is, the more memory it uses.
 However, slightly worse performance along non-critical paths are the right price
 to pay to reduce memory usage and I've always wondered why this kind of tools do
 not leave me the choice.<br/>
-`EnTT` follows a completely different approach. It squezees the best from the
+`EnTT` follows a completely different approach. It squeezes the best from the
 basic data structures and gives users the possibility to pay more for higher
 performance where needed.<br/>
 The disadvantage of this approach is that users need to know the systems they
@@ -329,7 +324,7 @@ type to represent an entity. Because `std::uint32_t` is large enough for almost
 all the cases, there exists also an alias named DefaultRegistry for
 `Registry<std::uint32_t>`.
 
-Entities are represented by _entitiy identifiers_. An entity identifier is an
+Entities are represented by _entity identifiers_. An entity identifier is an
 opaque type that users should not inspect or modify in any way. It carries
 information about the entity itself and its version.
 
@@ -616,8 +611,8 @@ In fact, there are two functions that respond to slightly different needs:
 
 ## View: to persist or not to persist?
 
-There are mainly two kinds of views: standard (also known as View) and
-persistent (alsa known as PersistentView).<br/>
+There are mainly two kinds of views: standard (also known as `View`) and
+persistent (also known as `PersistentView`).<br/>
 Both of them have pros and cons to take in consideration. In particular:
 
 * Standard views:
@@ -691,7 +686,7 @@ For all that remains, it's worth discussing them separately.<br/>
 
 Single component standard views are specialized in order to give a boost in
 terms of performance in all the situation. This kind of views can access the
-underlying data structures directly and avoid superflous checks.<br/>
+underlying data structures directly and avoid superfluous checks.<br/>
 They offer a bunch of functionalities to get the number of entities they are
 going to return and a raw access to the entity list as well as to the component
 list.<br/>
@@ -783,7 +778,7 @@ mind that it works only with the components of the view itself.
 
 A persistent view returns all the entities and only the entities that have at
 least the given components. Moreover, it's guaranteed that the entity list is
-thightly packed in memory for fast iterations.<br/>
+tightly packed in memory for fast iterations.<br/>
 In general, persistent views don't stay true to the order of any set of
 components unless users explicitly sort them.
 
@@ -808,7 +803,7 @@ registry.prepare<Position, Velocity>();
 
 If the registry is empty, preparation is extremely fast. Moreover the `prepare`
 member function template is idempotent. Feel free to invoke it even more than
-once: if the view has been alreadt prepared before, the function returns
+once: if the view has been already prepared before, the function returns
 immediately and does nothing.
 
 A persistent view offers a bunch of functionalities to get the number of
@@ -1043,7 +1038,7 @@ case.
 
 # Crash Course: service locator
 
-Usually service locators are tighly bound to the services they expose and it's
+Usually service locators are tightly bound to the services they expose and it's
 hard to define a general purpose solution. This template based implementation
 tries to fill the gap and to get rid of the burden of defining a different
 specific locator for each application.<br/>
@@ -1206,7 +1201,7 @@ Parameters have the following meaning:
 Both `succeed` and `fail` accept no parameters at all.
 
 Note that usually users shouldn't worry about creating adaptors at all. A
-scheduler creates them internally each and avery time a lambda or a functor is
+scheduler creates them internally each and every time a lambda or a functor is
 used as a process.
 
 ## The scheduler
@@ -1245,7 +1240,7 @@ scheduler.clear();
 
 To attach a process to a scheduler there are mainly two ways:
 
-* If the process inheriths from the `Process` class template, it's enough to
+* If the process inherits from the `Process` class template, it's enough to
   indicate its type and submit all the parameters required to construct it to
   the `attach` member function:
 
@@ -1330,7 +1325,7 @@ general.<br/>
 Roughly speaking, they help to decouple the various parts of a system while
 allowing them to communicate with each other somehow.
 
-The so called _modern C++_ comes wih a tool that can be useful in these terms,
+The so called _modern C++_ comes with a tool that can be useful in these terms,
 the `std::function`. As an example, it can be used to create delegates.<br/>
 However, there is no guarantee that an `std::function` does not perform
 allocations under the hood and this could be problematic sometimes. Furthermore,
@@ -1346,11 +1341,10 @@ offers a full set of classes to solve completely different problems.
 There are two types of signal handlers in `EnTT`, internally called _managed_
 and _unmanaged_.<br/>
 They differ in the way they work around the tradeoff between performance, memory
-usage and safety. In one case, listeners can be any kind of objects and the
-client is in charge of connecting and disconnecting them from the sink to avoid
-crashes due to different lifetimes. In the other case, listeners must be wrapped
-in an `std::shared_ptr` and the sink will take care of disconneting them
-whenever they die.
+usage and safety. Managed listeners must be wrapped in an `std::shared_ptr` and
+the sink will take care of disconneting them whenever they die. Unmanaged
+listeners can be any kind of objects and the client is in charge of connecting
+and disconnecting them from a sink to avoid crashes due to different lifetimes.
 
 ### Managed signal handler
 
@@ -1427,7 +1421,7 @@ The API of an unmanaged signal handler is similar to the one of a managed signal
 handler.<br/>
 The most important difference is that it comes in two forms: with and without a
 collector. In case it is associated with a collector, all the values returned by
-the listenrs can be literally _collected_ and used later by the caller.<br/>
+the listeners can be literally _collected_ and used later by the caller.<br/>
 
 **Note**: collectors are allowed only in case of function types whose the return
 type isn't `void` for obvious reasons.
@@ -1533,10 +1527,10 @@ struct AnEvent { int value; };
 struct AnotherEvent {};
 
 // define a managed bus that works with std::shared_ptr/std::weak_ptr
-entt::ManagedBus<AnEvent, AnotherEventC> managed;
+entt::ManagedBus<AnEvent, AnotherEvent> managed;
 
 // define an unmanaged bus that works with naked pointers
-entt::UnmanagedBus<AnEvent, AnotherEventC> unmanaged;
+entt::UnmanagedBus<AnEvent, AnotherEvent> unmanaged;
 ```
 
 For the sake of brevity, below is described the interface of the sole unmanaged
@@ -1572,7 +1566,7 @@ Each function that respects the accepted signature is automatically registered
 and/or unregistered. Note that invoking `unreg` with an instance of a class that
 hasn't been previously registered is a perfectly valid operation.
 
-Free functions can be registered and unregisterd as well by means of the
+Free functions can be registered and unregistered as well by means of the
 dedicated member functions `connect` and `disconnect`:
 
 ```cpp
@@ -1657,7 +1651,7 @@ within the framework.
 ## Event dispatcher
 
 The event dispatcher class is designed so as to be used in a loop. It allows
-users both to trigger immediate events or to enqueue events to be published all
+users both to trigger immediate events or to queue events to be published all
 together once per tick.<br/>
 Internally it uses either managed or unmanaged signal handlers, that is why
 there exist both a managed and an unmanaged event dispatcher.
@@ -1768,7 +1762,7 @@ Whenever an event is published, an emitter provides the listeners with a
 reference to itself along with a const reference to the event. Therefore
 listeners have an handy way to work with it without incurring in the need of
 capturing a reference to the emitter itself.<br/>
-Every time a connection between an emitter and a listener is estabilished, an
+Every time a connection between an emitter and a listener is established, an
 opaque object is returned to allow the caller to disconnect them later.
 
 The opaque object used to handle connections is both movable and copyable. An
@@ -1788,7 +1782,7 @@ void(const Event &, MyEmitter &)
 
 Where `Event` is the type of event they want to listen.<br/>
 There are two ways to attach a listener to an event emitter that differ
-slighlty from each other:
+slightly from each other:
 
 * To register a long-lived listener, use the `on` member function. It is meant
   to register a listener designed to be invoked more than once for the given
@@ -1807,7 +1801,7 @@ slighlty from each other:
 * To register a short-lived listener, use the `once` member function. It is
   meant to register a listener designed to be invoked only once for the given
   event type. The listener is automatically disconnected after the first
-  invokation.<br/>
+  invocation.<br/>
   As an example:
 
   ```cpp
@@ -1871,9 +1865,9 @@ it is not limited to such uses.
 
 If you want to contribute, please send patches as pull requests against the
 branch `master`.<br/>
-Check the
-[contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to see
-who has partecipated so far.
+See the
+[contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to
+know who has participated so far.
 
 # License
 
