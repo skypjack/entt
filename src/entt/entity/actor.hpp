@@ -145,7 +145,7 @@ private:
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Delta>
-using DefaultActor = Actor<std::uint32_t, Delta>;
+using DefaultActor = Actor<DefaultRegistry::entity_type, Delta>;
 
 
 }
