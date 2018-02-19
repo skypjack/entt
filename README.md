@@ -1294,7 +1294,7 @@ scheduler.abort(true);
 scheduler.abort();
 ```
 
-# Crash Course: resource cache
+# Crash Course: resource management
 
 Resource management is usually one of the most critical part of a software like
 a game. Solutions are often tuned to the particular application. There exists
