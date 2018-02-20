@@ -4,21 +4,6 @@
 * to analyze, long term feature: systems organizer based on dependency graphs for implicit parallelism (I don't want to think anymore in future :-))
 * save/restore functionalities - see #27
 
-* blueprint registry to manage object templates when creating entities, something along this line:
-
-  template<typename R>
-  struct BlueprintRegistry: public R {
-  template<typename... Component> void blueprint(); // register a blueprint
-  template<typename... Component> void create(); // use the underlying create and looks for a blueprint if any
-  };
-
-  It will help creating entities with predefined sets of components and getting rid of the annoying factories all around the codebase.
+* parent-child relationships between entities directly managed by the registry. is it possible to do that in a clean and safe way?
 
 * AOB
-
----> candidate
-we can get rid of the available vector and use an entt_traits::entity_type element and a boolean in place of it.
-the idea is to create an implicit next-list in the entt_traits::entity_mask part of an entity, so that it doesn't affect the version.
-the each member function can the iterate all the entities and check if the mask return the entity position to test for validity.
-in all the other cases (mask different from the position or mask equal to the available start point) the entity isn't valid.
-it sounds good indeed, experimental feature to be tested.

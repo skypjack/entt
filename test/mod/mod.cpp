@@ -2,8 +2,8 @@
 #include <cassert>
 #include <map>
 #include <string>
+#include <duktape.h>
 #include <entt/entity/registry.hpp>
-#include "duktape.h"
 
 template<typename Type>
 struct tag { using type = Type; };
