@@ -1299,18 +1299,60 @@ scheduler.abort();
 Resource management is usually one of the most critical part of a software like
 a game. Solutions are often tuned to the particular application. There exists
 several approaches and all of them are perfectly fine as long as they fit the
-requirements of the piece of software in which they are embedded.<br/>
+requirements of the piece of software in which they are used.<br/>
 Examples are loading everything on start, loading on request, predictive
 loading, and so on.
 
-This class doens't pretend to be a _one fits all_ solution for the different
-cases. Instead, it offers a minimal and perhaps trivial cache that can be useful
-most of the time during prototyping and sometimes even in a production
-environment.
+The `EnTT` framework doesn't pretend to offer a _one fits all_ solution for the
+different cases. Instead, it offers a minimal and perhaps trivial cache that can
+be useful most of the time during prototyping and sometimes even in a production
+environment.<br/>
+For those interested in the subject, the plan is to improve it considerably over
+time both in terms of performance and in terms of functionalities. Hoping to
+make it, of course, one step at a time.
 
-TODO
+## The resource, the loader and the cache
 
-## The loader, the resource and the cache
+There are three main actors in the model.
+
+The _resource_ is whatever the user wants it to be. An image, a video, an audio,
+whatever. There are no limits.<br/>
+As a minimal example:
+
+```cpp
+struct MyResource {};
+```
+
+A _loader_ is a class the aim of which is to load a specific resource. It must
+inherit directly from the dedicated base class as in the following example:
+
+```cpp
+struct MyLoader final: public entt::ResourceLoader<MyLoader, MyResource> {
+    // ...
+};
+```
+
+Where `MyResource` is the type of resources it creates.<br/>
+A resource loader must also expose a public, const member function named `load`
+that accepts a variable number of arguments and returns a shared pointer to the
+resource just created.<br/>
+As an example:
+
+```cpp
+struct MyLoader: entt::ResourceLoader<MyLoader, MyResource> {
+    std::shared_ptr<MyResource> load(int) const {
+        // use the integer value somehow
+        return std::make_shared<MyResource>();
+    }
+};
+```
+
+In general, resource loaders should not have a state or retain data of any type.
+They should let the cache manage their resources instead.<br/>
+As a side note, base class and CRTP idiom aren't strictly required with the
+current implementation. One could argue that a cache can easily work with
+loaders of any type. However, future changes won't be breaking ones by forcing
+the use of a base class today and that's why the model is already in its place.
 
 TODO
 
