@@ -15,10 +15,3 @@
   It will help creating entities with predefined sets of components and getting rid of the annoying factories all around the codebase.
 
 * AOB
-
----> candidate
-we can get rid of the available vector and use an entt_traits::entity_type element and a boolean in place of it.
-the idea is to create an implicit next-list in the entt_traits::entity_mask part of an entity, so that it doesn't affect the version.
-the each member function can the iterate all the entities and check if the mask return the entity position to test for validity.
-in all the other cases (mask different from the position or mask equal to the available start point) the entity isn't valid.
-it sounds good indeed, experimental feature to be tested.

@@ -171,13 +171,7 @@ private:
  * A snapshot loader requires that the destination registry be empty and loads
  * all the data at once while keeping intact the identifiers that the entities
  * originally had.<br/>
- * An example of use is the implementation of a save/restore feature.
- *
- * @warning
- * Attempting to use a snapshot loader with a registry that isn't empty results
- * in undefined behavior.<br/>
- * An assertion will abort the execution at runtime in debug mode if the
- * registry isn't empty.
+ * An example of use is the implementation of a save/restore utility.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */

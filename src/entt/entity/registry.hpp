@@ -1167,7 +1167,10 @@ public:
      * more instances of this class in sync, as an example in a client-server
      * architecture.
      *
+     * @warning
      * The loader returned by this function requires that the registry be empty.
+     * In case it isn't, all the data will be automatically deleted before to
+     * return.
      *
      * @return A not movable and not copyable object to use to load snasphosts.
      */
@@ -1195,7 +1198,7 @@ public:
             }
         };
 
-        return { *this, ensure };
+        return { (*this = {}), ensure };
     }
 
 private:

@@ -93,10 +93,7 @@ TEST(Snapshot, Dump) {
             .component<int, char, AnotherComponent, double>(output)
             .tag<float, bool, AComponent>(output);
 
-    registry = {};
-
-    ASSERT_TRUE(registry.empty());
-    ASSERT_EQ(registry.capacity(), entt::DefaultRegistry::size_type{});
+    registry.reset();
 
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -184,10 +181,7 @@ TEST(Snapshot, Partial) {
             .component<char, int>(output)
             .tag<bool, float>(output);
 
-    registry = {};
-
-    ASSERT_TRUE(registry.empty());
-    ASSERT_EQ(registry.capacity(), entt::DefaultRegistry::size_type{});
+    registry.reset();
 
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -225,10 +219,7 @@ TEST(Snapshot, Partial) {
             .destroyed(output)
             .entities(output);
 
-    registry = {};
-
-    ASSERT_TRUE(registry.empty());
-    ASSERT_EQ(registry.capacity(), entt::DefaultRegistry::size_type{});
+    registry.reset();
 
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
