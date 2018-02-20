@@ -155,8 +155,8 @@ Dell XPS 13 out of the mid 2014):
 
 | Benchmark | EntityX (compile-time) | EnTT |
 |-----------|-------------|-------------|
-| Create 10M entities | 0.1289s | **0.0388s** |
-| Destroy 10M entities | **0.0531s** | 0.0828s |
+| Create 10M entities | 0.1289s | **0.0423s** |
+| Destroy 10M entities | 0.0531s | **0.0221s** |
 | Standard view, 10M entities, one component | 0.0107s | **7.8e-08s** |
 | Standard view, 10M entities, two components | **0.0113s** | 0.0244s |
 | Standard view, 10M entities, two components<br/>Half of the entities have all the components | **0.0078s** | 0.0129s |
@@ -454,8 +454,8 @@ each entity that has it:
   registry.reset<Position>();
   ```
 
-* If neither the entity nor the component are specified, all the entities and
-their components are destroyed:
+* If neither the entity nor the component are specified, all the entities still
+in use and their components are destroyed:
 
   ```cpp
   registry.reset();
@@ -855,18 +855,15 @@ mind that it works only with the components of the view itself.
 
 Views are narrow windows on the entire list of entities. They work by filtering
 entities according to their components.<br/>
-In some cases there may be the need to iterate all the entities regardless of
-their components. The registry offers a specific member function to do that:
+In some cases there may be the need to iterate all the entities still in use
+regardless of their components. The registry offers a specific member function
+to do that:
 
 ```cpp
 registry.each([](auto entity) {
     // ...
 });
 ```
-
-Each entity ever created is returned, no matter if it's in use or not.<br/>
-Usually, filtering entities that aren't currently in use is more expensive than
-iterating them all and filtering out those in which one isn't interested.
 
 As a rule of thumb, consider using a view if the goal is to iterate entities
 that have a determinate set of components. A view is usually faster than
