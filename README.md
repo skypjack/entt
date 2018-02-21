@@ -679,7 +679,7 @@ that it works with tags and not with components.<br/>
 Note also that both `component` and `tag` store items along with entities. It
 means that they work properly without a call to the `entities` member function.
 
-Once a snapshot is created, there exist main two _ways_ to load it: as a whole
+Once a snapshot is created, there exist mainly two _ways_ to load it: as a whole
 and in a kind of _continuous mode_.<br/>
 The following sections describe both loaders and archives in details.
 
@@ -689,7 +689,7 @@ A snapshot loader requires that the destination registry be empty and loads all
 the data at once while keeping intact the identifiers that the entities
 originally had.<br/>
 To do that, the registry offers a member function named `restore` that returns a
-temporary object properly initialized to _restore_ a snapshot:
+temporary object properly initialized to _restore_ a snapshot.
 
 Example of use:
 
@@ -851,10 +851,6 @@ because I wanted to learn how it works at the time I was writing the code.
 
 The code is not production-ready and it isn't neither the only nor (probably)
 the best way to do it. However, feel free to use it at your own risk.
-
-#### Knwon limitations
-
-There are some known limitations
 
 ## View: to persist or not to persist?
 
