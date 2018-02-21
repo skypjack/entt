@@ -28,7 +28,7 @@ namespace entt {
  * Example of use (pseudocode):
  *
  * @code{.cpp}
- * scheduler.attach([](auto delta, auto succeed, auto fail) {
+ * scheduler.attach([](auto delta, void *, auto succeed, auto fail) {
  *     // code
  * }).then<MyProcess>(arguments...);
  * @endcode
@@ -181,7 +181,7 @@ public:
      * // schedules a task in the form of a process class
      * scheduler.attach<MyProcess>(arguments...)
      * // appends a child in the form of a lambda function
-     * .then([](auto delta, auto succeed, auto fail) {
+     * .then([](auto delta, void *, auto succeed, auto fail) {
      *     // code
      * })
      * // appends a child in the form of another process class
@@ -237,11 +237,11 @@ public:
      *
      * @code{.cpp}
      * // schedules a task in the form of a lambda function
-     * scheduler.attach([](auto delta, auto succeed, auto fail) {
+     * scheduler.attach([](auto delta, void *, auto succeed, auto fail) {
      *     // code
      * })
      * // appends a child in the form of another lambda function
-     * .then([](auto delta, auto succeed, auto fail) {
+     * .then([](auto delta, void *, auto succeed, auto fail) {
      *     // code
      * })
      * // appends a child in the form of a process class

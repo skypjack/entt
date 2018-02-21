@@ -17,7 +17,7 @@ class ResourceCache;
  *
  * Resource loaders must inherit from this class and stay true to the CRTP
  * idiom. Moreover, a resource loader must expose a public, const member
- * function named `load` that accepts a variable number of arguments and return
+ * function named `load` that accepts a variable number of arguments and returns
  * a shared pointer to the resource just created.<br/>
  * As an example:
  *

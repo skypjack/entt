@@ -5,6 +5,49 @@
 [![Coverage Status](https://coveralls.io/repos/github/skypjack/entt/badge.svg?branch=master)](https://coveralls.io/github/skypjack/entt?branch=master)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W2HF9FESD5LJY&lc=IT&item_name=Michele%20Caini&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
 
+# Table of Contents
+
+   * [Introduction](#introduction)
+   * [Build Instructions](#build-instructions)
+   * [Crash Course: entity-component system](#crash-course-entity-component-system)
+      * [Design choices](#design-choices)
+         * [A bitset-free entity-component system](#a-bitset-free-entity-component-system)
+         * [Pay per use](#pay-per-use)
+      * [Vademecum](#vademecum)
+      * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
+         * [Single instance components](#single-instance-components)
+         * [Runtime components](#runtime-components)
+            * [A journey through a plugin](#a-journey-through-a-plugin)
+         * [Sorting: is it possible?](#sorting-is-it-possible)
+      * [View: to persist or not to persist?](#view-to-persist-or-not-to-persist)
+         * [Standard View](#standard-view)
+            * [Single component standard view](#single-component-standard-view)
+            * [Multi component standard view](#multi-component-standard-view)
+         * [Persistent View](#persistent-view)
+         * [Give me everything](#give-me-everything)
+      * [Side notes](#side-notes)
+   * [Crash Course: core functionalities](#crash-course-core-functionalities)
+      * [Compile-time identifiers](#compile-time-identifiers)
+      * [Runtime identifiers](#runtime-identifiers)
+      * [Hashed strings](#hashed-strings)
+         * [Conflicts](#conflicts)
+   * [Crash Course: service locator](#crash-course-service-locator)
+   * [Crash Course: cooperative scheduler](#crash-course-cooperative-scheduler)
+      * [The process](#the-process)
+         * [Adaptor](#adaptor)
+      * [The scheduler](#the-scheduler)
+   * [Crash Course: resource management](#crash-course-resource-management)
+      * [The resource, the loader and the cache](#the-resource-the-loader-and-the-cache)
+   * [Crash Course: events, signals and everything in between](#crash-course-events-signals-and-everything-in-between)
+      * [Signals](#signals)
+         * [Managed signal handler](#managed-signal-handler)
+         * [Unmanaged signal handler](#unmanaged-signal-handler)
+      * [Compile-time event bus](#compile-time-event-bus)
+      * [Delegate](#delegate)
+      * [Event dispatcher](#event-dispatcher)
+      * [Event emitter](#event-emitter)
+   * [License](#license)
+
 # Introduction
 
 `EnTT` is a header-only, tiny and easy to use framework written in modern
@@ -49,8 +92,8 @@ Here is a brief list of what it offers today:
 compile-time or at runtime).
 * A constexpr utility for human readable resource identifiers.
 * An incredibly fast entity-component system based on sparse sets, with its own
-views and a _pay for what you use_ policy to adjust performance and memory
-pressure according to the users' requirements.
+views and a _pay for what you use_ policy to adjust performance and memory usage
+according to the users' requirements.
 * Actor class for those who aren't confident with entity-component systems.
 * The smallest and most basic implementation of a service locator ever seen.
 * A cooperative scheduler for processes of any type.
@@ -62,16 +105,11 @@ pressure according to the users' requirements.
 * Any other business.
 
 Consider it a work in progress. For more details and an updated list, please
-refer to the [online documentation](https://skypjack.github.io/entt/).
-
-### A note about the README
-
-The README file stays true to the original project and it describes only the
-entity-component system. However, the whole API is fully documented in-code and
-the [online documentation](https://skypjack.github.io/entt/) contains much
-more.<br/>
-Continue reading to know how the core part of the project works or follow the
-link above to take a look at the API reference for all other available classes.
+refer to the [online documentation](https://skypjack.github.io/entt/). It
+probably contains much more. Moreover, the whole API is fully documented
+in-code for those who are brave enough to read it.<br/>
+Continue reading to know how the different parts of the project work or follow
+the link above to take a look at the API reference.
 
 ## Code Example
 
@@ -135,7 +173,8 @@ int main() {
 
 I started working on `EnTT` because of the wrong reason: my goal was to design
 an entity-component system that beated another well known open source solution
-in terms of performance.<br/>
+in terms of performance and used (possibly) less memory in the average
+case.<br/>
 In the end, I did it, but it wasn't much satisfying. Actually it wasn't
 satisfying at all. The fastest and nothing more, fairly little indeed. When I
 realized it, I tried hard to keep intact the great performance of `EnTT` and to
@@ -143,14 +182,14 @@ add all the features I wanted to see in *my* entity-component system at the same
 time.
 
 Today `EnTT` is finally what I was looking for: still faster than its
-_competitors_, a really good API and an amazing set of features. And even more,
-of course.
+_competitors_, lower memory usage in the average case, a really good API and an
+amazing set of features. And even more, of course.
 
 ## Performance
 
 As it stands right now, `EnTT` is just fast enough for my requirements if
 compared to my first choice (it was already amazingly fast actually).<br/>
-Here is a comparision between the two (both of them compiled with GCC 7.2.0 on a
+Here is a comparison between the two (both of them compiled with GCC 7.2.0 on a
 Dell XPS 13 out of the mid 2014):
 
 | Benchmark | EntityX (compile-time) | EnTT |
@@ -239,20 +278,16 @@ for the latest version.
 To compile and run the tests, `EnTT` requires *googletest*.<br/>
 `cmake` will download and compile the library before to compile anything else.
 
-To build the tests:
+To build the most basic set of tests:
 
 * `$ cd build`
 * `$ cmake ..`
 * `$ make`
 * `$ make test`
 
-To build the benchmarks, use the following line instead:
+Note that benchmarks are not part of this set.
 
-* `$ cmake -DCMAKE_BUILD_TYPE=Release ..`
-
-Benchmarks are compiled only in release mode currently.
-
-# Crash Course
+# Crash Course: entity-component system
 
 ## Design choices
 
@@ -277,12 +312,12 @@ entt::DefaultRegistry<Comp0, Comp1, ..., CompN> registry;
 `EnTT` is entirely designed around the principle that users have to pay only for
 what they want.
 
-When it comes to using an entity-componet system, the tradeoff is usually
+When it comes to using an entity-component system, the tradeoff is usually
 between performance and memory usage. The faster it is, the more memory it uses.
 However, slightly worse performance along non-critical paths are the right price
 to pay to reduce memory usage and I've always wondered why this kind of tools do
 not leave me the choice.<br/>
-`EnTT` follows a completely different approach. It squezees the best from the
+`EnTT` follows a completely different approach. It squeezes the best from the
 basic data structures and gives users the possibility to pay more for higher
 performance where needed.<br/>
 The disadvantage of this approach is that users need to know the systems they
@@ -294,25 +329,26 @@ many others besides me.
 
 ## Vademecum
 
-The `Registry` to store, the `View`s to iterate. That's all.
+The `Registry` to store, the `View` to iterate. That's all.
 
 An entity (the _E_ of an _ECS_) is an opaque identifier that users should just
 use as-is and store around if needed. Do not try to inspect an entity
 identifier, its type can change in future and a registry offers all the
 functionalities to query them out-of-the-box. The underlying type of an entity
 (either `std::uint16_t`, `std::uint32_t` or `std::uint64_t`) can be specified
-when defining a registry (actually the DefaultRegistry is nothing more than a
-Registry where the type of the entities is `std::uint32_t`).<br/>
+when defining a registry (actually the `DefaultRegistry` is nothing more than a
+`Registry` where the type of the entities is `std::uint32_t`).<br/>
 Components (the _C_ of an _ECS_) should be plain old data structures or more
-complex and moveable data structures with a proper constructor. Actually, the
+complex and movable data structures with a proper constructor. Actually, the
 sole requirement of a component type is that it must be both move constructible
 and move assignable. They are list initialized by using the parameters provided
 to construct the component itself. No need to register components or their types
 neither with the registry nor with the entity-component system at all.<br/>
 Systems (the _S_ of an _ECS_) are just plain functions, functors, lambdas or
-whatever the users want. They can accept a Registry, a View or a PersistentView
-and use them the way they prefer. No need to register systems or their types
-neither with the registry nor with the entity-component system at all.
+whatever the users want. They can accept a `Registry`, a `View` or a
+`PersistentView` and use them the way they prefer. No need to register systems
+or their types neither with the registry nor with the entity-component system at
+all.
 
 The following sections will explain in short how to use the entity-component
 system, the core part of the whole framework.<br/>
@@ -324,12 +360,12 @@ describe below. For more details, please refer to the
 
 A registry is used to store and manage entities as well as to create views to
 iterate the underlying data structures.<br/>
-Registry is a class template that lets the users decide what's the preferred
+`Registry` is a class template that lets the users decide what's the preferred
 type to represent an entity. Because `std::uint32_t` is large enough for almost
-all the cases, there exists also an alias named DefaultRegistry for
+all the cases, there exists also an alias named `DefaultRegistry` for
 `Registry<std::uint32_t>`.
 
-Entities are represented by _entitiy identifiers_. An entity identifier is an
+Entities are represented by _entity identifiers_. An entity identifier is an
 opaque type that users should not inspect or modify in any way. It carries
 information about the entity itself and its version.
 
@@ -382,7 +418,7 @@ velocity.dx = 0.;
 velocity.dy = 0.;
 ```
 
-If the entity already has the given component, the `replace` member function
+If an entity already has the given component, the `replace` member function
 template can be used to replace it:
 
 ```cpp
@@ -398,7 +434,7 @@ velocity.dy = 0.;
 In case users want to assign a component to an entity, but it's unknown whether
 the entity already has it or not, `accomodate` does the work in a single call
 (there is a performance penalty to pay for this mainly due to the fact that it
-has to check if `entity` already has the given component or not):
+has to check if the entity already has the given component or not):
 
 ```cpp
 registry.accomodate<Position>(entity, 0., 0.);
@@ -484,7 +520,7 @@ entity stored in the underlying data structures of the registry.
 In those cases where all what is needed is a single instance component, tags are
 the right tool to achieve the purpose.<br/>
 Tags undergo the same requirements of components. They can be either plain old
-data structures or more complex and moveable data structures with a proper
+data structures or more complex and movable data structures with a proper
 constructor.<br/>
 Actually, the same type can be used both as a tag and as a component and the
 registry will not complain about it. It is up to the users to properly manage
@@ -529,9 +565,9 @@ const Camera &camera = cregistry.get<Camera>();
 The `get` member function template gives direct access to the tag as stored in
 the underlying data structures of the registry.
 
-As shown above, in almost all the cases the entity identifier isn't required,
-since a single instance component can have only one associated entity and
-therefore it doesn't make much sense to mention it explicitly.<br/>
+As shown above, in almost all the cases the entity identifier isn't required.
+Since a single instance component can have only one associated entity, it
+doesn't make much sense to mention it explicitly.<br/>
 To find out who the owner is, just do the following:
 
 ```cpp
@@ -616,8 +652,8 @@ In fact, there are two functions that respond to slightly different needs:
 
 ## View: to persist or not to persist?
 
-There are mainly two kinds of views: standard (also known as View) and
-persistent (alsa known as PersistentView).<br/>
+There are mainly two kinds of views: standard (also known as `View`) and
+persistent (also known as `PersistentView`).<br/>
 Both of them have pros and cons to take in consideration. In particular:
 
 * Standard views:
@@ -628,9 +664,8 @@ Both of them have pros and cons to take in consideration. In particular:
   * Creating and destroying them isn't expensive at all because they don't
     have any type of initialization.
   * They are the best tool to iterate single components.
-  * They are the best tool to iterate multiple components at once when
-    tags are involved or one of the component is assigned to a
-    significantly low number of entities.
+  * They are the best tool to iterate multiple components at once when one of
+    the components is assigned to a significantly low number of entities.
   * They don't affect any other operations of the registry.
 
   Cons:
@@ -646,8 +681,8 @@ Both of them have pros and cons to take in consideration. In particular:
     the most of the entities have all of them.
 
   Cons:
-    * They have dedicated data structures and thus affect the memory
-      pressure to a minimal extent.
+    * They have dedicated data structures and thus affect the memory usage to a
+      minimal extent.
     * If not previously prepared, the first time they are used they go
       through an initialization step that could take a while.
     * They affect to a minimum the creation and destruction of entities and
@@ -691,7 +726,7 @@ For all that remains, it's worth discussing them separately.<br/>
 
 Single component standard views are specialized in order to give a boost in
 terms of performance in all the situation. This kind of views can access the
-underlying data structures directly and avoid superflous checks.<br/>
+underlying data structures directly and avoid superfluous checks.<br/>
 They offer a bunch of functionalities to get the number of entities they are
 going to return and a raw access to the entity list as well as to the component
 list.<br/>
@@ -783,7 +818,7 @@ mind that it works only with the components of the view itself.
 
 A persistent view returns all the entities and only the entities that have at
 least the given components. Moreover, it's guaranteed that the entity list is
-thightly packed in memory for fast iterations.<br/>
+tightly packed in memory for fast iterations.<br/>
 In general, persistent views don't stay true to the order of any set of
 components unless users explicitly sort them.
 
@@ -808,7 +843,7 @@ registry.prepare<Position, Velocity>();
 
 If the registry is empty, preparation is extremely fast. Moreover the `prepare`
 member function template is idempotent. Feel free to invoke it even more than
-once: if the view has been alreadt prepared before, the function returns
+once: if the view has been already prepared before, the function returns
 immediately and does nothing.
 
 A persistent view offers a bunch of functionalities to get the number of
@@ -879,14 +914,14 @@ In all the other cases, this is the way to go.
 * As shown in the examples above, the preferred way to get references to the
   components while iterating a view is by using the view itself. It's a faster
   alternative to the `get` member function template that is part of the API of
-  the Registry. This is because the registry must ensure that a pool for the
+  the `Registry`. This is because the registry must ensure that a pool for the
   given component exists before to use it; on the other side, views force the
   construction of the pools for all their components and access them directly,
   thus avoiding all the checks.
 
 * Most of the _ECS_ available out there have an annoying limitation (at least
   from my point of view): entities and components cannot be created and/or
-  deleted during iterations.<br/>
+  destroyed during iterations.<br/>
   `EnTT` partially solves the problem with a few limitations:
 
   * Creating entities and components is allowed during iterations.
@@ -912,17 +947,1174 @@ In all the other cases, this is the way to go.
   component `X` or assign and removes that component from a set of entities,
   another thread can safely do the same with components `Y` and `Z` and
   everything will work like a charm.<br/>
-  As an example, users can freely execute the rendering system and iterate the
-  renderable entities while updating a physic component concurrently on a
-  separate thread if needed.
+  As a trivial example, users can freely execute the rendering system and
+  iterate the renderable entities while updating a physic component concurrently
+  on a separate thread.
+
+# Crash Course: core functionalities
+
+The `EnTT` framework comes with a bunch of core functionalities mostly used by
+the other parts of the library itself.<br/>
+Hardly users of the framework will include these features in their code, but
+it's worth describing what `EnTT` offers so as not to reinvent the wheel in case
+of need.
+
+## Compile-time identifiers
+
+Sometimes it's useful to be able to give unique identifiers to types at
+compile-time.<br/>
+There are plenty of different solutions out there and I could have used one of
+them. However, I decided to spend my time to define a compact and versatile tool
+that fully embraces what the modern C++ has to offer.
+
+The _result of my efforts_ is the `ident` `constexpr` variable:
+
+```cpp
+#include <ident.hpp>
+
+// defines the identifiers for the given types
+constexpr auto identifiers = entt::ident<AType, AnotherType>;
+
+// ...
+
+switch(aTypeIdentifier) {
+case identifers.get<AType>():
+    // ...
+    break;
+case identifers.get<AnotherType>():
+    // ...
+    break;
+default:
+    // ...
+}
+```
+
+This is all what the variable has to offer: a `get` member function that returns
+a numerical identifier for the given type. It can be used in any context where
+constant expressions are required.
+
+As long as the list remains unchanged, identifiers are also guaranteed to be the
+same for every run. In case they have been used in a production environment and
+a type has to be removed, one can just use a placeholder to left the other
+identifiers unchanged:
+
+```cpp
+template<typename> struct IgnoreType {};
+
+constexpr auto identifiers = entt::ident<
+    ATypeStillValid,
+    IgnoreType<ATypeNoLongerValid>,
+    AnotherTypeStillValid
+>;
+```
+
+A bit ugly to see, but it works at least.
+
+## Runtime identifiers
+
+Sometimes it's useful to be able to give unique identifiers to types at
+runtime.<br/>
+There are plenty of different solutions out there and I could have used one of
+them. In fact, I adapted the most common one to my requirements and used it
+extensively within the entire framework.
+
+It's the `Family` class. Here is an example of use directly from the
+entity-component system:
+
+```cpp
+using component_family = entt::Family<struct InternalRegistryComponentFamily>;
+
+// ...
+
+template<typename Component>
+component_type component() const noexcept {
+    return component_family::type<Component>();
+}
+```
+
+This is all what a _family_ has to offer: a `type` member function that returns
+a numerical identifier for the given type.
+
+Please, note that identifiers aren't guaranteed to be the same for every run.
+Indeed it mostly depends on the flow of execution.
+
+## Hashed strings
+
+A hashed string is a zero overhead resource identifier. Users can use
+human-readable identifiers in the codebase while using their numeric
+counterparts at runtime, thus without affecting performance.<br/>
+The class has an implicit `constexpr` constructor that chews a bunch of
+characters. Once created, all what one can do with it is getting back the
+original string or converting it into a number.<br/>
+The good part is that a hashed string can be used wherever a constant expression
+is required and no _string-to-number_ conversion will take place at runtime if
+used carefully.
+
+Example of use:
+
+```cpp
+auto load(entt::HashedString::hash_type resource) {
+    // uses the numeric representation of the resource to load and return it
+}
+
+auto resource = load(entt::HashedString{"gui/background"});
+```
+
+### Conflicts
+
+The hashed string class uses internally FNV-1a to compute the numeric
+counterpart of a string. Because of the _pigeonhole principle_, conflicts are
+possible. This is a fact.<br/>
+There is no silver bullet to solve the problem of conflicts when dealing with
+hashing functions. In this case, the best solution seemed to be to give up.
+That's all.<br/>
+After all, human-readable resource identifiers aren't something strictly defined
+and over which users have not the control. Choosing a slightly different
+identifier is probably the best solution to make the conflict disappear in this
+case.
+
+# Crash Course: service locator
+
+Usually service locators are tightly bound to the services they expose and it's
+hard to define a general purpose solution. This template based implementation
+tries to fill the gap and to get rid of the burden of defining a different
+specific locator for each application.<br/>
+This class is tiny, partially unsafe and thus risky to use. Moreover it doesn't
+fit probably most of the scenarios in which a service locator is required. Look
+at it as a small tool that can sometimes be useful if the user knows how to
+handle it.
+
+The API is straightforward. The basic idea is that services are implemented by
+means of interfaces and rely on polymorphism.<br/>
+The locator is instantiated with the base type of the service if any and a
+concrete implementation is provided along with all the parameters required to
+initialize it. As an example:
+
+```cpp
+// the service has no base type, a locator is used to treat it as a kind of singleton
+entt::ServiceLocator<MyService>::set(params...);
+
+// sets up an opaque service
+entt::ServiceLocator<AudioInterface>::set<AudioImplementation>(params...);
+
+// resets (destroys) the service
+entt::ServiceLocator<AudioInterface>::reset();
+```
+
+The locator can also be queried to know if an active service is currently set
+and to retrieve it if necessary (either as a pointer or as a reference):
+
+```cpp
+// no service currently set
+auto empty = entt::ServiceLocator<AudioInterface>::empty();
+
+// gets a (possibly empty) shared pointer to the service ...
+std::shared_ptr<AudioInterface> ptr = entt::ServiceLocator<AudioInterface>::get();
+
+// ... or a reference, but it's undefined behaviour if the service isn't set yet
+AudioInterface &ref = entt::ServiceLocator<AudioInterface>::ref();
+```
+
+A common use is to wrap the different locators in a container class, creating
+aliases for the various services:
+
+```cpp
+struct Locator {
+    using Camera = entt::ServiceLocator<CameraInterface>;
+    using Audio = entt::ServiceLocator<AudioInterface>;
+    // ...
+};
+
+// ...
+
+void init() {
+    Locator::Camera::set<CameraNull>();
+    Locator::Audio::set<AudioImplementation>(params...);
+    // ...
+}
+```
+
+# Crash Course: cooperative scheduler
+
+Sometimes processes are a useful tool to work around the strict definition of a
+system and introduce logic in a different way, usually without resorting to the
+introduction of other components.
+
+The `EnTT` framework offers a minimal support to this paradigm by introducing a
+few classes that users can use to define and execute cooperative processes.
+
+## The process
+
+A typical process must inherit from the `Process` class template that stays true
+to the CRTP idiom. Moreover, derived classes must specify what's the intended
+type for elapsed times.
+
+A process should expose publicly the following member functions whether
+required (note that it isn't required to define a function unless the derived
+class wants to _override_ the default behavior):
+
+* `void update(Delta, void *);`
+
+  It's invoked once per tick until a process is explicitly aborted or it
+  terminates either with or without errors. Even though it's not mandatory to
+  declare this member function, as a rule of thumb each process should at
+  least define it to work properly. The `void *` parameter is an opaque pointer
+  to user data (if any) forwarded directly to the process during an update.
+
+* `void init(void *);`
+
+  It's invoked at the first tick, immediately before an update. The `void *`
+  parameter is an opaque pointer to user data (if any) forwarded directly to the
+  process during an update.
+
+* `void succeeded();`
+
+  It's invoked in case of success, immediately after an update and during the
+  same tick.
+
+* `void failed();`
+
+  It's invoked in case of errors, immediately after an update and during the
+  same tick.
+
+* `void aborted();`
+
+  It's invoked only if a process is explicitly aborted. There is no guarantee
+  that it executes in the same tick, this depends solely on whether the
+  process is aborted immediately or not.
+
+Derived classes can also change the internal state of a process by invoking
+`succeed` and `fail`, as well as `pause` and `unpause` the process itself. All
+these are protected member functions made available to be able to manage the
+life cycle of a process from a derived class.
+
+Here is a minimal example for the sake of curiosity:
+
+```cpp
+struct MyProcess: entt::Process<MyProcess, std::uint32_t> {
+    using delta_type = std::uint32_t;
+
+    void update(delta_type delta, void *) {
+        remaining = delta > remaining ? delta_type{] : (remaining - delta);
+
+        // ...
+
+        if(!remaining) {
+            succeed();
+        }
+    }
+
+    void init(void *data) {
+        remaining = *static_cast<delta_type *>(data);
+    }
+
+private:
+    delta_type remaining;
+};
+```
+
+### Adaptor
+
+Lambdas and functors can't be used directly with a scheduler for they are not
+properly defined processes with managed life cycles.<br/>
+This class helps in filling the gap and turning lambdas and functors into
+full featured processes usable by a scheduler.
+
+The function call operator has a signature similar to the one of the `update`
+function of a process but for the fact that it receives two extra arguments to
+call whenever a process is terminated with success or with an error:
+
+```cpp
+void(Delta delta, void *data, auto succeed, auto fail);
+```
+
+Parameters have the following meaning:
+
+* `delta` is the elapsed time.
+* `data` is an opaque pointer to user data if any, `nullptr` otherwise.
+* `succeed` is a function to call when a process terminates with success.
+* `fail` is a function to call when a process terminates with errors.
+
+Both `succeed` and `fail` accept no parameters at all.
+
+Note that usually users shouldn't worry about creating adaptors at all. A
+scheduler creates them internally each and every time a lambda or a functor is
+used as a process.
+
+## The scheduler
+
+A cooperative scheduler runs different processes and helps managing their life
+cycles.
+
+Each process is invoked once per tick. If it terminates, it's removed
+automatically from the scheduler and it's never invoked again. Otherwise it's
+a good candidate to run once more the next tick.<br/>
+A process can also have a child. In this case, the process is replaced with
+its child when it terminates if it returns with success. In case of errors,
+both the process and its child are discarded. This way, it's easy to create
+chain of processes to run sequentially.
+
+Using a scheduler is straightforward. To create it, users must provide only the
+type for the elapsed times and no arguments at all:
+
+```cpp
+Scheduler<std::uint32_t> scheduler;
+```
+
+It has member functions to query its internal data structures, like `empty` or
+`size`, as well as a `clear` utility to reset it to a clean state:
+
+```cpp
+// checks if there are processes still running
+bool empty = scheduler.empty();
+
+// gets the number of processes still running
+Scheduler<std::uint32_t>::size_type size = scheduler.size();
+
+// resets the scheduler to its initial state and discards all the processes
+scheduler.clear();
+```
+
+To attach a process to a scheduler there are mainly two ways:
+
+* If the process inherits from the `Process` class template, it's enough to
+  indicate its type and submit all the parameters required to construct it to
+  the `attach` member function:
+
+  ```cpp
+  scheduler.attach<MyProcess>("foobar");
+  ```
+
+* Otherwise, in case of a lambda or a functor, it's enough to provide an
+  instance of the class to the `attach` member function:
+
+  ```cpp
+  scheduler.attach([](auto...){ /* ... */ });
+  ```
+
+In both cases, the return value is an opaque object that offers a `then` member
+function to use to create chains of processes to run sequentially.<br/>
+As a minimal example of use:
+
+```cpp
+// schedules a task in the form of a lambda function
+scheduler.attach([](auto delta, void *, auto succeed, auto fail) {
+    // ...
+})
+// appends a child in the form of another lambda function
+.then([](auto delta, void *, auto succeed, auto fail) {
+    // ...
+})
+// appends a child in the form of a process class
+.then<MyProcess>();
+```
+
+To update a scheduler and thus all its processes, the `update` member function
+is the way to go:
+
+```cpp
+// updates all the processes, no user data are provided
+scheduler.update(delta);
+
+// updates all the processes and provides them with custom data
+scheduler.update(delta, &data);
+```
+
+In addition to these functions, the scheduler offers an `abort` member function
+that can be used to discard all the running processes at once:
+
+```cpp
+// aborts all the processes abruptly ...
+scheduler.abort(true);
+
+// ... or gracefully during the next tick
+scheduler.abort();
+```
+
+# Crash Course: resource management
+
+Resource management is usually one of the most critical part of a software like
+a game. Solutions are often tuned to the particular application. There exist
+several approaches and all of them are perfectly fine as long as they fit the
+requirements of the piece of software in which they are used.<br/>
+Examples are loading everything on start, loading on request, predictive
+loading, and so on.
+
+The `EnTT` framework doesn't pretend to offer a _one-fits-all_ solution for the
+different cases. Instead, it offers a minimal and perhaps trivial cache that can
+be useful most of the time during prototyping and sometimes even in a production
+environment.<br/>
+For those interested in the subject, the plan is to improve it considerably over
+time in terms of performance, memory usage and functionalities. Hoping to make
+it, of course, one step at a time.
+
+## The resource, the loader and the cache
+
+There are three main actors in the model: the resource, the loader and the
+cache.
+
+The _resource_ is whatever the user wants it to be. An image, a video, an audio,
+whatever. There are no limits.<br/>
+As a minimal example:
+
+```cpp
+struct MyResource { const int value; };
+```
+
+A _loader_ is a class the aim of which is to load a specific resource. It has to
+inherit directly from the dedicated base class as in the following example:
+
+```cpp
+struct MyLoader final: entt::ResourceLoader<MyLoader, MyResource> {
+    // ...
+};
+```
+
+Where `MyResource` is the type of resources it creates.<br/>
+A resource loader must also expose a public const member function named `load`
+that accepts a variable number of arguments and returns a shared pointer to a
+resource.<br/>
+As an example:
+
+```cpp
+struct MyLoader: entt::ResourceLoader<MyLoader, MyResource> {
+    std::shared_ptr<MyResource> load(int value) const {
+        // ...
+        return std::shared_ptr<MyResource>(new MyResource{ value });
+    }
+};
+```
+
+In general, resource loaders should not have a state or retain data of any type.
+They should let the cache manage their resources instead.<br/>
+As a side note, base class and CRTP idiom aren't strictly required with the
+current implementation. One could argue that a cache can easily work with
+loaders of any type. However, future changes won't be breaking ones by forcing
+the use of a base class today and that's why the model is already in its place.
+
+Finally, a cache is a specialization of a class template tailored to a specific
+resource:
+
+```cpp
+using MyResourceCache = entt::ResourceCache<MyResource>;
+
+// ...
+
+MyResourceCache cache{};
+```
+
+The idea is to create different caches for different types of resources and to
+manage each one independently and in the most appropriate way.<br/>
+As a (very) trivial example, audio tracks can survive in most of the scenes of
+an application while meshes can be associated with a single scene and then
+discarded when the user leaves it.
+
+A cache offers a set of basic functionalities to query its internal state and to
+_organize_ it:
+
+```cpp
+// gets the number of resources managed by a cache
+auto size = cache.size();
+
+// checks if a cache contains at least a valid resource
+auto empty = cache.empty();
+
+// clears a cache and discards its content
+cache.clear();
+```
+
+Besides these member functions, it contains what is needed to load, use and
+discard resources of the given type.<br/>
+Before to explore this part of the interface, it makes sense to mention how
+resources are identified. The type of the identifiers to use is defined as:
+
+```cpp
+entt::ResourceCache<Resource>::resource_type
+```
+
+Where `resource_type` is an alias for `entt::HashedString`. Therefore, resource
+identifiers are created explicitly as in the following example:
+
+```cpp
+constexpr auto identifier = entt::ResourceCache<Resource>::resource_type{"my/resource/identifier"};
+// this is equivalent to the following
+constexpr auto hs = entt::HashedString{"my/resource/identifier"};
+```
+
+The class `HashedString` is described in a dedicated section, so I won't do in
+details here.
+
+Resources are loaded and thus stored in a cache through the `load` member
+function. It accepts the loader to use as a template parameter, the resource
+identifier and the parameters used to construct the resource as arguments:
+
+```cpp
+// uses the identifier declared above
+cache.load<MyLoader>(identifier, 0);
+
+// uses a const char * directly as an identifier
+cache.load<MyLoader>("another/identifier", 42);
+```
+
+The return value can be used to know if the resource has been loaded correctly.
+In case the loader returns an invalid pointer or the resource already exists in
+the cache, a false value is returned:
+
+```cpp
+if(!cache.load<MyLoader>("another/identifier", 42)) {
+    // ...
+}
+```
+
+Unfortunately, in this case there is no way to know what was the problem
+exactly. However, before trying to load a resource or after an error, one can
+use the `contains` member function to know if a cache already contains a
+specific resource:
+
+```cpp
+auto exists = cache.contains("my/identifier");
+```
+
+There exists also a member function to use to force a reload of an already
+existing resource if needed:
+
+```cpp
+auto result = cache.reload<MyLoader>("another/identifier", 42);
+```
+
+As above, the function returns true in case of success, false otherwise. The
+sole difference in this case is that an error necessarily means that the loader
+has failed for some reasons to load the resource.<br/>
+Note that the `reload` member function is a kind of alias of the following
+snippet:
+
+```cpp
+cache.discard(identifier);
+cache.load<MyLoader>(identifier, 42);
+```
+
+Where the `discard` member function is used to get rid of a resource if loaded.
+In case the cache doesn't contain a resource for the given identifier, the
+function does nothing and returns immediately.
+
+So far, so good. Resources are finally loaded and stored within the cache.<br/>
+They are returned to the users in the form of handles. To get one of them:
+
+```cpp
+auto handle = cache.handle("my/identifier");
+```
+
+The idea behind a handle is the same of the flyweight pattern. In other terms,
+resources aren't copied around. Instead, instances are shared between handles.
+Users of a resource owns a handle and it guarantees that a resource isn't
+destroyed until all the handles are destroyed, even if the resource itself is
+removed from the cache.<br/>
+Handles are tiny objects both movable and copyable. They returns the contained
+resource as a const reference on request:
+
+* By means of the `get` member function:
+
+  ```cpp
+  const auto &resource = handle.get();
+  ```
+
+* Using the proper cast operator:
+
+  ```cpp
+  const auto &resource = handle;
+  ```
+
+* Through the dereference operator:
+
+  ```cpp
+  const auto &resource = *handle;
+  ```
+
+The resource can also be accessed directly using the arrow operator if required:
+
+```cpp
+auto value = handle->value;
+```
+
+To test if a handle is still valid, the cast operator to `bool` allows the users
+to use it in a guard:
+
+```cpp
+if(handle) {
+    // ...
+}
+```
+
+Finally, in case there is the need to load a resource and thus to get a handle
+without storing the resource itself in the cache, users can rely on the `temp`
+member function template.<br/>
+The declaration is similar to the one of `load` but for the fact that it doesn't
+return a boolean value. Instead, it returns a (possibly invalid) handle for the
+resource:
+
+```cpp
+auto handle = cache.temp<MyLoader>("another/identifier", 42);
+```
+
+Do not forget to test the handle for validity. Otherwise, getting the reference
+to the resource it points may result in undefined behavior.
+
+# Crash Course: events, signals and everything in between
+
+Signals are usually a core part of games and software architectures in
+general.<br/>
+Roughly speaking, they help to decouple the various parts of a system while
+allowing them to communicate with each other somehow.
+
+The so called _modern C++_ comes with a tool that can be useful in these terms,
+the `std::function`. As an example, it can be used to create delegates.<br/>
+However, there is no guarantee that an `std::function` does not perform
+allocations under the hood and this could be problematic sometimes. Furthermore,
+it solves a problem but may not adapt well to other requirements that may arise
+from time to time.
+
+In case that the flexibility and potential of an `std::function` are not
+required or where you are looking for something different, the `EnTT` framework
+offers a full set of classes to solve completely different problems.
+
+## Signals
+
+There are two types of signal handlers in `EnTT`, internally called _managed_
+and _unmanaged_.<br/>
+They differ in the way they work around the tradeoff between performance, memory
+usage and safety. Managed listeners must be wrapped in an `std::shared_ptr` and
+the sink will take care of disconneting them whenever they die. Unmanaged
+listeners can be any kind of objects and the client is in charge of connecting
+and disconnecting them from a sink to avoid crashes due to different lifetimes.
+
+### Managed signal handler
+
+A managed signal handler works with weak pointers to classes and pointers to
+member functions as well as pointers to free functions. References are
+automatically removed when the instances to which they point are freed.<br/>
+In other terms, users can simply connect a listener and forget about it, thus
+getting rid of the burden of controlling its lifetime. The drawback is that
+listeners must be allocated on the dynamic storage and wrapped into an
+`std::shared_ptr`. Performance and memory management can suffer from this in
+real world softwares.
+
+To create an instance of this type of handler, the function type is all what is
+needed:
+
+```cpp
+entt::Signal<void(int, char)> signal;
+```
+
+From now on, free functions and member functions that respect the given
+signature can be easily connected to and disconnected from the signal:
+
+```cpp
+void foo(int, char) { /* ... */ }
+
+struct S {
+    void bar(int, char) { /* ... */ }
+};
+
+// ...
+
+auto instance = std::make_shared<S>();
+
+signal.connect<&foo>();
+signal.connect<S, &S::bar>(instance);
+
+// ...
+
+signal.disconnect<&foo>();
+
+// disconnect a specific member function of an instance ...
+signal.disconnect<S, &S::bar>(instance);
+
+// ... or an instance as a whole
+signal.disconnect(instance);
+```
+
+Once listeners are attached (or even if there are no listeners at all), events
+and data in general can be published through a signal by means of the `publish`
+member function:
+
+```cpp
+signal.publish(42, 'c');
+```
+
+This is more or less all what a managed signal handler has to offer.<br/>
+A bunch of other member functions are exposed actually. As an example, there is
+a method to use to know how many listeners a managed signal handler contains
+(`size`) or if it contains at least a listener (`empty`), to reset it to its
+initial state (`clear`) and even to swap two handlers (`swap`).<br/>
+Refer to the [official documentation](https://skypjack.github.io/entt/) for all
+the details.
+
+### Unmanaged signal handler
+
+An unmanaged signal handler works with naked pointers to classes and pointers to
+member functions as well as pointers to free functions. Removing references when
+the instances to which they point are freed is in charge to the users.<br/>
+In other terms, users must explicitly disconnect a listener before to delete the
+class to which it belongs, thus taking care of the lifetime of each instance. On
+the other side, performance shouldn't be affected that much by the presence of
+such a signal handler.
+
+The API of an unmanaged signal handler is similar to the one of a managed signal
+handler.<br/>
+The most important difference is that it comes in two forms: with and without a
+collector. In case it is associated with a collector, all the values returned by
+the listeners can be literally _collected_ and used later by the caller.<br/>
+
+**Note**: collectors are allowed only in case of function types whose the return
+type isn't `void` for obvious reasons.
+
+To create instances of this type of handler there exist mainly two ways:
+
+```cpp
+// no collector type
+entt::SigH<void(int, char)> signal;
+
+// explicit collector type
+entt::SigH<void(int, char), MyCollector<bool>> collector;
+```
+
+As expected, an unmanaged signal handler offers all the basic functionalities
+required to know how many listeners it contains (`size`) or if it contains at
+least a listener (`empty`), to reset it to its initial state (`clear`) and even
+to swap two handlers (`swap`).
+
+Besides them, there are member functions to use both to connect and disconnect
+listeners in all their forms:
+
+```cpp
+void foo(int, char) { /* ... */ }
+
+struct S {
+    void bar(int, char) { /* ... */ }
+};
+
+// ...
+
+S instance;
+
+signal.connect<&foo>();
+signal.connect<S, &S::bar>(&instance);
+
+// ...
+
+signal.disconnect<&foo>();
+
+// disconnect a specific member function of an instance ...
+signal.disconnect<S, &S::bar>(&instance);
+
+// ... or an instance as a whole
+signal.disconnect(&instance);
+```
+
+Once listeners are attached (or even if there are no listeners at all), events
+and data in general can be published through a signal by means of the `publish`
+member function:
+
+```cpp
+signal.publish(42, 'c');
+```
+
+To collect data, the `collect` member function should be used instead. Below is
+a minimal example to show how to use it:
+
+```cpp
+struct MyCollector {
+    std::vector<int> vec{};
+
+    bool operator()(int v) noexcept {
+        vec.push_back(v);
+        return true;
+    }
+};
+
+int f() { return 0; }
+int g() { return 1; }
+
+// ...
+
+entt::SigH<int(), MyCollector<int>> signal;
+
+signal.connect<&f>();
+signal.connect<&g>();
+
+MyCollector collector = signal.collect();
+
+assert(collector.vec[0] == 0);
+assert(collector.vec[1] == 1);
+```
+
+As shown above, a collector must expose a function operator that accepts as an
+argument a type to which the return type of the listeners can be converted.
+Moreover, it has to return a boolean value that is false to stop collecting
+data, true otherwise. This way one can avoid calling all the listeners in case
+it isn't necessary.
+
+## Compile-time event bus
+
+A bus can be used to create a compile-time backbone for event management.<br/>
+The intended use is as a base class, which is the opposite of what the signals
+are meant for. Internally it uses either managed or unmanaged signal handlers,
+that is why there exist both a managed and an unmanaged event bus.
+
+The API of a bus is a kind of subset of the one of a signal. First of all, it
+requires that all the types of events are specified when the bus is declared:
+
+```cpp
+struct AnEvent { int value; };
+struct AnotherEvent {};
+
+// define a managed bus that works with std::shared_ptr/std::weak_ptr
+entt::ManagedBus<AnEvent, AnotherEvent> managed;
+
+// define an unmanaged bus that works with naked pointers
+entt::UnmanagedBus<AnEvent, AnotherEvent> unmanaged;
+```
+
+For the sake of brevity, below is described the interface of the sole unmanaged
+bus. The interface of the managed bus is almost the same but for the fact that
+it accepts smart pointers instead of naked pointers.
+
+In order to register an instance of a class to a bus, its type must expose one
+or more member functions named `receive` of which the return types are `void`
+and the argument lists are `const E &`, for each type of event `E`.<br/>
+The `reg` member function is the way to go to register such an instance:
+
+```cpp
+struct Listener
+{
+    void receive(const AnEvent &) { /* ... */ }
+    void receive(const AnotherEvent &) { /* ... */ }
+};
+
+// ...
+
+Listener listener;
+bus.reg(&listener);
+```
+
+To disconnect an instance of a class from a bus, use the `unreg` member
+function instead:
+
+```cpp
+bus.unreg(&listener);
+```
+
+Each function that respects the accepted signature is automatically registered
+and/or unregistered. Note that invoking `unreg` with an instance of a class that
+hasn't been previously registered is a perfectly valid operation.
+
+Free functions can be registered and unregistered as well by means of the
+dedicated member functions, namely `connect` and `disconnect`:
+
+```cpp
+void foo(const AnEvent &) { /* ... */ }
+void bar(const AnotherEvent &) { /* ... */ }
+
+// ...
+
+bus.connect<AnEvent, &foo>();
+bus.connect<AnotherEvent, &bar>();
+
+// ...
+
+bus.disconnect<AnEvent, &foo>();
+bus.disconnect<AnotherEvent, &bar>();
+```
+
+Whenever the need to send an event arises, it can be done through the `publish`
+member function:
+
+```cpp
+bus.publish<AnEvent>(42);
+bus.publish<AnotherEvent>();
+```
+
+Finally, there are another few functions to use to query the internal state of a
+bus like `empty` and `size` whose meaning is quite intuitive.
+
+## Delegate
+
+A delegate can be used as general purpose invoker with no memory overhead for
+free functions and member functions provided along with an instance on which
+to invoke them.<br/>
+It does not claim to be a drop-in replacement for an `std::function`, so do not
+expect to use it whenever an `std::function` fits well. However, it can be used
+to send opaque delegates around to be used to invoke functions as needed.
+
+The interface is trivial. It offers a default constructor to create empty
+delegates:
+
+```cpp
+entt::Delegate<int(int)> delegate{};
+```
+
+All what is needed to create an instance is to specify the type of the function
+the delegate will _contain_, that is the signature of the free function or the
+member function one wants to assign to it.
+
+Attempting to use an empty delegate by invoking its function call operator
+results in undefined behavior, most likely a crash actually. Before to use a
+delegate, it must be initialized.<br/>
+There exist two functions to do that, both named `connect`:
+
+```cpp
+int f(int i) { return i; }
+
+struct MyStruct {
+    int f(int i) { return i }
+};
+
+// bind a free function to the delegate
+delegate.connect<&f>();
+
+// bind a member function to the delegate
+MyStruct instance;
+delegate.connect<MyStruct, &MyStruct::f>(&instance);
+```
+
+It hasn't a `disconnect` counterpart. Instead, there exists a `reset` member
+function to clear it.<br/>
+Finally, to invoke a delegate, the function call operator is the way to go as
+usual:
+
+```cpp
+auto ret = delegate(42);
+```
+
+Probably too much small and pretty poor of functionalities, but the delegate
+class can help in a lot of cases and it has shown that it is worth keeping it
+within the framework.
+
+## Event dispatcher
+
+The event dispatcher class is designed so as to be used in a loop. It allows
+users both to trigger immediate events or to queue events to be published all
+together once per tick.<br/>
+Internally it uses either managed or unmanaged signal handlers, that is why
+there exist both a managed and an unmanaged event dispatcher.
+
+This class shares part of its API with the one of the signals, but it doesn't
+require that all the types of events are specified when declared:
+
+```cpp
+// define a managed dispatcher that works with std::shared_ptr/std::weak_ptr
+entt::Dispatcher<entt::Signal> managed{};
+
+// define an unmanaged dispatcher that works with naked pointers
+entt::Dispatcher<entt::SigH> unmanaged{};
+```
+
+Actually there exist two aliases for the classes shown in the previous example:
+`entt::ManagedDispatcher` and `entt::UnmanagedDispatcher`.
+
+For the sake of brevity, below is described the interface of the sole unmanaged
+dispatcher. The interface of the managed dispatcher is almost the same but for
+the fact that it accepts smart pointers instead of naked pointers.
+
+In order to register an instance of a class to a dispatcher, its type must
+expose one or more member functions of which the return types are `void` and the
+argument lists are `const E &`, for each type of event `E`.<br/>
+To ease the development, member functions that are named `receive` are
+automatically detected and have not to be explicitly specified when registered.
+In all the other cases, the name of the member function aimed to receive the
+event must be provided to the `connect` member function:
+
+```cpp
+struct AnEvent { int value; };
+struct AnotherEvent {};
+
+struct Listener
+{
+    void receive(const AnEvent &) { /* ... */ }
+    void method(const AnotherEvent &) { /* ... */ }
+};
+
+// ...
+
+Listener listener;
+dispatcher.connect<AnEvent>(&listener);
+dispatcher.connect<AnotherEvent, Listener, &Listener::method>(&listener);
+```
+
+The `disconnect` member function follows the same pattern and can be used to
+selectively remove listeners:
+
+```cpp
+dispatcher.disconnect<AnEvent>(&listener);
+dispatcher.disconnect<AnotherEvent, Listener, &Listener::method>(&listener);
+```
+
+The `trigger` member function serves the purpose of sending an immediate event
+to all the listeners registered so far. It offers a convenient approach that
+relieves the user from having to create the event itself. Instead, it's enough
+to specify the type of event and provide all the parameters required to
+construct it.<br/>
+As an example:
+
+```cpp
+dispatcher.trigger<AnEvent>(42);
+dispatcher.trigget<AnotherEvent>();
+```
+
+Listeners are invoked immediately, order of execution isn't guaranteed. This
+method can be used to push around urgent messages like an _is terminating_
+notification on a mobile app.
+
+On the other hand, the `enqueue` member function queues messages together and
+allows to maintain control over the moment they are sent to listeners. The
+signature of this method is more or less the same of `trigger`:
+
+```cpp
+dispatcher.enqueue<AnEvent>(42);
+dispatcher.enqueue<AnotherEvent>();
+```
+
+Events are stored aside until the `update` member function is invoked, then all
+the messages that are still pending are sent to the listeners at once:
+
+```cpp
+dispatcher.update();
+```
+
+This way users can embed the dispatcher in a loop and literally dispatch events
+once per tick to their systems.
+
+## Event emitter
+
+A general purpose event emitter thought mainly for those cases where it comes to
+working with asynchronous stuff.<br/>
+Originally designed to fit the requirements of
+[`uvw`](https://github.com/skypjack/uvw) (a wrapper for `libuv` written in
+modern C++), it was adapted later to be included in this library.
+
+To create a custom emitter type, derived classes must inherit directly from the
+base class as:
+
+```cpp
+struct MyEmitter: Emitter<MyEmitter> {
+    // ...
+}
+```
+
+The full list of accepted types of events isn't required. Handlers are created
+internally on the fly and thus each type of event is accepted by default.
+
+Whenever an event is published, an emitter provides the listeners with a
+reference to itself along with a const reference to the event. Therefore
+listeners have an handy way to work with it without incurring in the need of
+capturing a reference to the emitter itself.<br/>
+In addition, an opaque object is returned each time a connection is established
+between an emitter and a listener, allowing the caller to disconnect them at a
+later time.<br/>
+The opaque object used to handle connections is both movable and copyable. On
+the other side, an event emitter is movable but not copyable by default.
+
+To create new instances of an emitter, no arguments are required:
+
+```cpp
+MyEmitter emitter{};
+```
+
+Listeners must be movable and callable objects (free functions, lambdas,
+functors, `std::function`s, whatever) whose function type is:
+
+```cpp
+void(const Event &, MyEmitter &)
+```
+
+Where `Event` is the type of event they want to listen.<br/>
+There are two ways to attach a listener to an event emitter that differ
+slightly from each other:
+
+* To register a long-lived listener, use the `on` member function. It is meant
+  to register a listener designed to be invoked more than once for the given
+  event type.<br/>
+  As an example:
+
+  ```cpp
+  auto conn = emitter.on<MyEvent>([](const MyEvent &event, MyEmitter &emitter) {
+      // ...
+  });
+  ```
+
+  The connection object can be freely discarded. Otherwise, it can be used later
+  to disconnect the listener if required.
+
+* To register a short-lived listener, use the `once` member function. It is
+  meant to register a listener designed to be invoked only once for the given
+  event type. The listener is automatically disconnected after the first
+  invocation.<br/>
+  As an example:
+
+  ```cpp
+  auto conn = emitter.once<MyEvent>([](const MyEvent &event, MyEmitter &emitter) {
+      // ...
+  });
+  ```
+
+  The connection object can be freely discarded. Otherwise, it can be used later
+  to disconnect the listener if required.
+
+In both cases, the connection object can be used with the `erase` member
+function:
+
+```cpp
+emitter.erase(conn);
+```
+
+There are also two member functions to use either to disconnect all the
+listeners for a given type of event or to clear the emitter:
+
+```cpp
+// removes all the listener for the specific event
+emitter.clear<MyEvent>();
+
+// removes all the listeners registered so far
+emitter.clear();
+```
+
+To send an event to all the listeners that are interested in it, the `publish`
+member function offers a convenient approach that relieves the user from having
+to create the event:
+
+```cpp
+struct MyEvent { int i; };
+
+// ...
+
+emitter.publish<MyEvent>(42);
+```
+
+Finally, the `empty` member function tests if there exists at least either a
+listener registered with the event emitter or to a given type of event:
+
+```cpp
+bool empty;
+
+// checks if there is any listener registered for the specific event
+empty = emitter.empty<MyEvent>();
+
+// checks it there are listeners registered with the event emitter
+empty = emitter.empty();
+```
+
+In general, the event emitter is a handy tool when the derived classes _wrap_
+asynchronous operations, because it introduces a _nice-to-have_ model based on
+events and listeners that kindly hides the complexity behind the scenes. However
+it is not limited to such uses.
 
 # Contributors
 
 If you want to contribute, please send patches as pull requests against the
 branch `master`.<br/>
-Check the
-[contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to see
-who has partecipated so far.
+See the
+[contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to
+know who has participated so far.
 
 # License
 
