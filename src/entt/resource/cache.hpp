@@ -125,8 +125,8 @@ public:
      * @return True if the resource is ready to use, false otherwise.
      */
     template<typename Loader, typename... Args>
-    void reload(resource_type id, Args&&... args) {
-        return (discard(id), load(id, std::forward<Args>(args)...));
+    bool reload(resource_type id, Args&&... args) {
+        return (discard(id), load<Loader>(id, std::forward<Args>(args)...));
     }
 
     /**
