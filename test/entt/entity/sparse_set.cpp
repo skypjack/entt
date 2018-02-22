@@ -71,6 +71,168 @@ TEST(SparseSetNoType, DataBeginEnd) {
     ASSERT_EQ(begin, end);
 }
 
+TEST(SparseSetNoType, RespectDisjoint) {
+    entt::SparseSet<unsigned int> lhs;
+    entt::SparseSet<unsigned int> rhs;
+    const auto &clhs = lhs;
+
+    lhs.construct(3);
+    lhs.construct(12);
+    lhs.construct(42);
+
+    ASSERT_EQ(lhs.get(3), 0u);
+    ASSERT_EQ(lhs.get(12), 1u);
+    ASSERT_EQ(lhs.get(42), 2u);
+
+    lhs.respect(rhs);
+
+    ASSERT_EQ(clhs.get(3), 0u);
+    ASSERT_EQ(clhs.get(12), 1u);
+    ASSERT_EQ(clhs.get(42), 2u);
+}
+
+TEST(SparseSetNoType, RespectOverlap) {
+    entt::SparseSet<unsigned int> lhs;
+    entt::SparseSet<unsigned int> rhs;
+    const auto &clhs = lhs;
+
+    lhs.construct(3);
+    lhs.construct(12);
+    lhs.construct(42);
+
+    rhs.construct(12);
+
+    ASSERT_EQ(lhs.get(3), 0u);
+    ASSERT_EQ(lhs.get(12), 1u);
+    ASSERT_EQ(lhs.get(42), 2u);
+
+    lhs.respect(rhs);
+
+    ASSERT_EQ(clhs.get(3), 0u);
+    ASSERT_EQ(clhs.get(12), 2u);
+    ASSERT_EQ(clhs.get(42), 1u);
+}
+
+TEST(SparseSetNoType, RespectOrdered) {
+    entt::SparseSet<unsigned int> lhs;
+    entt::SparseSet<unsigned int> rhs;
+
+    lhs.construct(1);
+    lhs.construct(2);
+    lhs.construct(3);
+    lhs.construct(4);
+    lhs.construct(5);
+
+    ASSERT_EQ(lhs.get(1), 0u);
+    ASSERT_EQ(lhs.get(2), 1u);
+    ASSERT_EQ(lhs.get(3), 2u);
+    ASSERT_EQ(lhs.get(4), 3u);
+    ASSERT_EQ(lhs.get(5), 4u);
+
+    rhs.construct(6);
+    rhs.construct(1);
+    rhs.construct(2);
+    rhs.construct(3);
+    rhs.construct(4);
+    rhs.construct(5);
+
+    ASSERT_EQ(rhs.get(6), 0u);
+    ASSERT_EQ(rhs.get(1), 1u);
+    ASSERT_EQ(rhs.get(2), 2u);
+    ASSERT_EQ(rhs.get(3), 3u);
+    ASSERT_EQ(rhs.get(4), 4u);
+    ASSERT_EQ(rhs.get(5), 5u);
+
+    rhs.respect(lhs);
+
+    ASSERT_EQ(rhs.get(6), 0u);
+    ASSERT_EQ(rhs.get(1), 1u);
+    ASSERT_EQ(rhs.get(2), 2u);
+    ASSERT_EQ(rhs.get(3), 3u);
+    ASSERT_EQ(rhs.get(4), 4u);
+    ASSERT_EQ(rhs.get(5), 5u);
+}
+
+TEST(SparseSetNoType, RespectReverse) {
+    entt::SparseSet<unsigned int> lhs;
+    entt::SparseSet<unsigned int> rhs;
+
+    lhs.construct(1);
+    lhs.construct(2);
+    lhs.construct(3);
+    lhs.construct(4);
+    lhs.construct(5);
+
+    ASSERT_EQ(lhs.get(1), 0u);
+    ASSERT_EQ(lhs.get(2), 1u);
+    ASSERT_EQ(lhs.get(3), 2u);
+    ASSERT_EQ(lhs.get(4), 3u);
+    ASSERT_EQ(lhs.get(5), 4u);
+
+    rhs.construct(5);
+    rhs.construct(4);
+    rhs.construct(3);
+    rhs.construct(2);
+    rhs.construct(1);
+    rhs.construct(6);
+
+    ASSERT_EQ(rhs.get(5), 0u);
+    ASSERT_EQ(rhs.get(4), 1u);
+    ASSERT_EQ(rhs.get(3), 2u);
+    ASSERT_EQ(rhs.get(2), 3u);
+    ASSERT_EQ(rhs.get(1), 4u);
+    ASSERT_EQ(rhs.get(6), 5u);
+
+    rhs.respect(lhs);
+
+    ASSERT_EQ(rhs.get(6), 0u);
+    ASSERT_EQ(rhs.get(1), 1u);
+    ASSERT_EQ(rhs.get(2), 2u);
+    ASSERT_EQ(rhs.get(3), 3u);
+    ASSERT_EQ(rhs.get(4), 4u);
+    ASSERT_EQ(rhs.get(5), 5u);
+}
+
+TEST(SparseSetNoType, RespectUnordered) {
+    entt::SparseSet<unsigned int> lhs;
+    entt::SparseSet<unsigned int> rhs;
+
+    lhs.construct(1);
+    lhs.construct(2);
+    lhs.construct(3);
+    lhs.construct(4);
+    lhs.construct(5);
+
+    ASSERT_EQ(lhs.get(1), 0u);
+    ASSERT_EQ(lhs.get(2), 1u);
+    ASSERT_EQ(lhs.get(3), 2u);
+    ASSERT_EQ(lhs.get(4), 3u);
+    ASSERT_EQ(lhs.get(5), 4u);
+
+    rhs.construct(3);
+    rhs.construct(2);
+    rhs.construct(6);
+    rhs.construct(1);
+    rhs.construct(4);
+    rhs.construct(5);
+
+    ASSERT_EQ(rhs.get(3), 0u);
+    ASSERT_EQ(rhs.get(2), 1u);
+    ASSERT_EQ(rhs.get(6), 2u);
+    ASSERT_EQ(rhs.get(1), 3u);
+    ASSERT_EQ(rhs.get(4), 4u);
+    ASSERT_EQ(rhs.get(5), 5u);
+
+    rhs.respect(lhs);
+
+    ASSERT_EQ(rhs.get(6), 0u);
+    ASSERT_EQ(rhs.get(1), 1u);
+    ASSERT_EQ(rhs.get(2), 2u);
+    ASSERT_EQ(rhs.get(3), 3u);
+    ASSERT_EQ(rhs.get(4), 4u);
+    ASSERT_EQ(rhs.get(5), 5u);
+}
+
 TEST(SparseSetWithType, AggregatesMustWork) {
     struct AggregateType { int value; };
     // the goal of this test is to enforce the requirements for aggregate types
