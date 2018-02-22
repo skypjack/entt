@@ -614,11 +614,11 @@ public:
         auto to = other.end();
 
         pos_type pos = underlying_type::size() - 1;
-        const auto *direct = underlying_type::data();
+        const auto *local = underlying_type::data();
 
         while(pos > 0 && from != to) {
             if(underlying_type::has(*from)) {
-                if(*from != *(direct + pos)) {
+                if(*from != *(local + pos)) {
                     auto candidate = underlying_type::get(*from);
                     std::swap(instances[pos], instances[candidate]);
                     underlying_type::swap(pos, candidate);
