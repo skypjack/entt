@@ -192,17 +192,17 @@ Dell XPS 13 out of the mid 2014):
 | Create 10M entities | 0.1289s | **0.0423s** |
 | Destroy 10M entities | 0.0531s | **0.0221s** |
 | Standard view, 10M entities, one component | 0.0107s | **7.8e-08s** |
-| Standard view, 10M entities, two components | **0.0113s** | 0.0244s |
-| Standard view, 10M entities, two components<br/>Half of the entities have all the components | **0.0078s** | 0.0129s |
+| Standard view, 10M entities, two components | **0.0113s** | 0.0142s |
+| Standard view, 10M entities, two components<br/>Half of the entities have all the components | 0.0078s | **0.0072s** |
 | Standard view, 10M entities, two components<br/>One of the entities has all the components | 0.0071s | **5.5e-07s** |
 | Persistent view, 10M entities, two components | 0.0113s | **1.1e-07s** |
-| Standard view, 10M entities, five components | **0.0091s** | 0.0672s |
+| Standard view, 10M entities, five components | **0.0091s** | 0.0352s |
 | Persistent view, 10M entities, five components | 0.0091s | **2.5e-07s** |
-| Standard view, 10M entities, ten components | **0.0105s** | 0.1306s |
-| Standard view, 10M entities, ten components<br/>Half of the entities have all the components | **0.0090s** | 0.0629s |
+| Standard view, 10M entities, ten components | **0.0105s** | 0.0780s |
+| Standard view, 10M entities, ten components<br/>Half of the entities have all the components | **0.0090s** | 0.0407s |
 | Standard view, 10M entities, ten components<br/>One of the entities has all the components | 0.0070s | **1.3e-06s** |
 | Persistent view, 10M entities, ten components | 0.0105s | **5.0e-07s** |
-| Sort 150k entities, one component<br/>Arrays are in reverse order | - | **0.0043s** |
+| Sort 150k entities, one component<br/>Arrays are in reverse order | - | **0.0040s** |
 | Sort 150k entities, enforce permutation<br/>Arrays are in reverse order | - | **0.0006s** |
 
 `EnTT` includes its own tests and benchmarks. See

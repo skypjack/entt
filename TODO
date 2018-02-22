@@ -3,4 +3,5 @@
 * to analyze, long term feature: systems organizer based on dependency graphs for implicit parallelism (I don't want to think anymore in future :-))
 * save/restore functionalities - see #27
 * parent-child relationships between entities directly managed by the registry. is it possible to do that in a clean and safe way?
+* standard multi component view: avoid testing (has) with candidates' pool
 * AOB
