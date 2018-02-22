@@ -30,23 +30,18 @@
       * [Compile-time identifiers](#compile-time-identifiers)
       * [Runtime identifiers](#runtime-identifiers)
       * [Hashed strings](#hashed-strings)
-         * [Conflicts](#conflicts)
    * [Crash Course: service locator](#crash-course-service-locator)
    * [Crash Course: cooperative scheduler](#crash-course-cooperative-scheduler)
       * [The process](#the-process)
-         * [Adaptor](#adaptor)
       * [The scheduler](#the-scheduler)
    * [Crash Course: resource management](#crash-course-resource-management)
       * [The resource, the loader and the cache](#the-resource-the-loader-and-the-cache)
    * [Crash Course: events, signals and everything in between](#crash-course-events-signals-and-everything-in-between)
       * [Signals](#signals)
-         * [Managed signal handler](#managed-signal-handler)
-         * [Unmanaged signal handler](#unmanaged-signal-handler)
       * [Compile-time event bus](#compile-time-event-bus)
       * [Delegate](#delegate)
       * [Event dispatcher](#event-dispatcher)
       * [Event emitter](#event-emitter)
-   * [License](#license)
 
 # Introduction
 
