@@ -1,7 +1,7 @@
-* FilteredView (decorator with a member method that accepts a filter function to apply to the entities returned by the underlying view)
+* filtered each (apply a filter to the entities before to return them, it heps separating checks from logic)
 * custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
 * to analyze, long term feature: systems organizer based on dependency graphs for implicit parallelism (I don't want to think anymore in future :-))
 * save/restore functionalities - see #27
 * parent-child relationships between entities directly managed by the registry. is it possible to do that in a clean and safe way?
-* standard multi component view: avoid testing (has) with candidates' pool
+* blueprint registry - external tool, kind of factory to create entitites template for initialization
 * AOB
