@@ -86,6 +86,21 @@ TEST(SigH, Clear) {
     ASSERT_TRUE(sigh.empty());
 }
 
+TEST(SigH, Swap) {
+    entt::SigH<void(int &)> sigh1;
+    entt::SigH<void(int &)> sigh2;
+
+    sigh1.connect<&S::f>();
+
+    ASSERT_FALSE(sigh1.empty());
+    ASSERT_TRUE(sigh2.empty());
+
+    std::swap(sigh1, sigh2);
+
+    ASSERT_TRUE(sigh1.empty());
+    ASSERT_FALSE(sigh2.empty());
+}
+
 TEST(SigH, Functions) {
     entt::SigH<void(int &)> sigh;
     int v = 0;

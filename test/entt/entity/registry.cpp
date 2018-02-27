@@ -8,6 +8,8 @@ TEST(DefaultRegistry, Functionalities) {
 
     ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{0});
     ASSERT_NO_THROW(registry.reserve(42));
+    ASSERT_NO_THROW(registry.reserve<int>(8));
+    ASSERT_NO_THROW(registry.reserve<char>(8));
     ASSERT_TRUE(registry.empty());
 
     ASSERT_EQ(registry.capacity(), entt::DefaultRegistry::size_type{0});

@@ -1,7 +1,18 @@
+#include <cstddef>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 
-constexpr bool check(const char *str) {
+constexpr bool ptr(const char *str) {
+    using hash_type = entt::HashedString::hash_type;
+
+    return (static_cast<hash_type>(entt::HashedString{str}) == entt::HashedString{str}
+            && static_cast<const char *>(entt::HashedString{str}) == str
+            && entt::HashedString{str} == entt::HashedString{str}
+            && !(entt::HashedString{str} != entt::HashedString{str}));
+}
+
+template<std::size_t N>
+constexpr bool ref(const char (&str)[N]) {
     using hash_type = entt::HashedString::hash_type;
 
     return (static_cast<hash_type>(entt::HashedString{str}) == entt::HashedString{str}
@@ -12,7 +23,8 @@ constexpr bool check(const char *str) {
 
 TEST(HashedString, Constexprness) {
     // how would you test a constepxr otherwise?
-    static_assert(check("foobar"), "!");
+    static_assert(ptr("foo"), "!");
+    static_assert(ref("bar"), "!");
     ASSERT_TRUE(true);
 }
 
@@ -29,7 +41,7 @@ TEST(HashedString, Functionalities) {
     ASSERT_EQ(static_cast<const char *>(barHs), bar);
 
     ASSERT_TRUE(fooHs == fooHs);
-    ASSERT_FALSE(fooHs == barHs);
+    ASSERT_TRUE(fooHs != barHs);
 
     entt::HashedString hs{"foobar"};
 

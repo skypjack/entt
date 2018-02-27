@@ -27,6 +27,7 @@ TEST(ResourceCache, Functionalities) {
     ASSERT_FALSE(cache.contains(hs2));
 
     ASSERT_FALSE(cache.load<BrokenLoader>(hs1, 42));
+    ASSERT_FALSE(cache.reload<BrokenLoader>(hs1, 42));
 
     ASSERT_EQ(cache.size(), entt::ResourceCache<Resource>::size_type{});
     ASSERT_TRUE(cache.empty());
@@ -34,6 +35,7 @@ TEST(ResourceCache, Functionalities) {
     ASSERT_FALSE(cache.contains(hs2));
 
     ASSERT_TRUE(cache.load<Loader>(hs1, 42));
+    ASSERT_TRUE(cache.reload<Loader>(hs1, 42));
 
     ASSERT_NE(cache.size(), entt::ResourceCache<Resource>::size_type{});
     ASSERT_FALSE(cache.empty());

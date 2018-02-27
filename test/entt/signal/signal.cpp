@@ -91,6 +91,21 @@ TEST(Signal, Clear) {
     ASSERT_TRUE(signal.empty());
 }
 
+TEST(Signal, Swap) {
+    entt::Signal<void(const int &)> sig1;
+    entt::Signal<void(const int &)> sig2;
+
+    sig1.connect<&S::f>();
+
+    ASSERT_FALSE(sig1.empty());
+    ASSERT_TRUE(sig2.empty());
+
+    std::swap(sig1, sig2);
+
+    ASSERT_TRUE(sig1.empty());
+    ASSERT_FALSE(sig2.empty());
+}
+
 TEST(Signal, Functions) {
     entt::Signal<void(const int &)> signal;
     auto val = S::i + 1;
