@@ -47,7 +47,7 @@ if(NOT MSVC)
 
     check_cxx_source_compiles("
         #include<type_traits>
-        int main() { static_assert(std::is_same<int, int>::value, \"!\"); }
+        int main() { return std::is_same<int, int>::value ? 0 : 1; }
     " HAS_LIBCPP)
 
     if(NOT HAS_LIBCPP)
