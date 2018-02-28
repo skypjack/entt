@@ -40,10 +40,24 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT MSVC)
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
+    include(CheckCXXSourceCompiles)
+
+    set(OLD_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+
+    check_cxx_source_compiles("
+        #include<type_traits>
+        int main() { return std::is_same<int, int>::value ? 0 : 1; }
+    " HAS_LIBCPP)
+
+    if(NOT HAS_LIBCPP)
+        set(CMAKE_CXX_FLAGS "${OLD_CMAKE_CXX_FLAGS}")
+    endif()
+
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DRELEASE")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -DDEBUG")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         # it seems that -O3 ruins the performance when using clang ...
