@@ -45,6 +45,16 @@ if(NOT MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DRELEASE")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -DDEBUG")
 
+    include(CheckCXXSourceCompiles)
+
+    set(CURR_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+    check_cxx_source_compiles("#include<type_traits> int main() { static_assert(std::is_same<int, int>::value, \"!\"); }" LIBCPP_FOUND)
+
+    if(NOT LIBCPP_FOUND)
+        set(CMAKE_CXX_FLAGS "${CURR_CMAKE_CXX_FLAGS}")
+    endif()
+
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         # it seems that -O3 ruins the performance when using clang ...
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
