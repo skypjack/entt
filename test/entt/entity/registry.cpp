@@ -401,3 +401,10 @@ TEST(DefaultRegistry, ComponentsWithTypesFromStandardTemplateLibrary) {
     registry.assign<std::unordered_set<int>>(entity).insert(42);
     registry.destroy(entity);
 }
+
+TEST(DefaultRegistry, ConstructWithComponents) {
+    // it should compile, that's all
+    entt::DefaultRegistry registry;
+    const auto value = 0;
+    registry.create(value);
+}

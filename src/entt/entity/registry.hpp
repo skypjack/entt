@@ -355,7 +355,7 @@ public:
     entity_type create(Component&&... components) noexcept {
         using accumulator_type = int[];
         const auto entity = create();
-        accumulator_type accumulator = { 0, (ensure<Component>().construct(*this, entity, std::forward<Component>(components)), 0)... };
+        accumulator_type accumulator = { 0, (ensure<std::decay_t<Component>>().construct(*this, entity, std::forward<Component>(components)), 0)... };
         (void)accumulator;
         return entity;
     }
