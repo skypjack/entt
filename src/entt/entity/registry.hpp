@@ -138,7 +138,6 @@ class Registry {
 
         if(!handlers[vtype]) {
             using accumulator_type = int[];
-
             auto set = std::make_unique<SparseSet<Entity>>();
 
             for(auto entity: view<Component...>()) {
@@ -294,7 +293,7 @@ public:
     bool valid(entity_type entity) const noexcept {
         using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
         // explicit promotion to avoid warnings with std::uint16_t
-        const entity_type entt = promotion_type{entity} & traits_type::entity_mask;
+        const auto entt = promotion_type{entity} & traits_type::entity_mask;
         return (entt < entities.size() && entities[entt] == entity);
     }
 
@@ -487,7 +486,7 @@ public:
             tags.resize(ttype + 1);
         }
 
-        tags[ttype].reset(new Attaching<Tag>{entity, { std::forward<Args>(args)... }});
+        tags[ttype].reset(new Attaching<Tag>{entity, Tag{ std::forward<Args>(args)... }});
 
         return static_cast<Attaching<Tag> *>(tags[ttype].get())->tag;
     }
@@ -906,18 +905,21 @@ public:
     }
 
     /**
-     * @brief Iterate entities and applies them the given function object.
+     * @brief Iterates all the entities that are still in use.
      *
-     * The function object is invoked for each entity still in use.<br/>
+     * The function object is invoked for each entity that is still in use.<br/>
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
      * void(entity_type);
      * @endcode
      *
+     * This function is fairly slow and should not be used frequently.<br/>
      * Consider using a view if the goal is to iterate entities that have a
      * determinate set of components. A view is usually faster than combining
-     * this function with a bunch of custom tests.
+     * this function with a bunch of custom tests.<br/>
+     * On the other side, this function can be used to iterate all the entities
+     * that are in use, regardless of their components.
      *
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
@@ -938,6 +940,57 @@ public:
                 func(entities[pos-1]);
             }
         }
+    }
+
+    /**
+     * @brief Checks if an entity is an orphan.
+     *
+     * An orphan is an entity that has neither assigned components nor
+     * tags.
+     *
+     * @param entity A valid entity identifier.
+     * @return True if the entity is an orphan, false otherwise.
+     */
+    bool orphan(entity_type entity) const {
+        assert(valid(entity));
+        bool orphan = true;
+
+        for(std::size_t i = 0; i < pools.size() && orphan; ++i) {
+            const auto &pool = pools[i];
+            orphan = !(pool && pool->has(entity));
+        }
+
+        for(std::size_t i = 0; i < tags.size() && orphan; ++i) {
+            const auto &tag = tags[i];
+            orphan = !(tag && (tag->entity == entity));
+        }
+
+        return orphan;
+    }
+
+    /**
+     * @brief Iterates orphans and applies them the given function object.
+     *
+     * The function object is invoked for each entity that is still in use and
+     * has neither assigned components nor tags.<br/>
+     * The signature of the function should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * void(entity_type);
+     * @endcode
+     *
+     * This function can be very slow and should not be used frequently.
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void orphans(Func func) const {
+        each([func = std::move(func), this](auto entity) {
+            if(orphan(entity)) {
+                func(entity);
+            }
+        });
     }
 
     /**

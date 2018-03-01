@@ -353,8 +353,8 @@ describe below. For more details, please refer to the
 
 ## The Registry, the Entity and the Component
 
-A registry is used to store and manage entities as well as to create views to
-iterate the underlying data structures.<br/>
+A registry can store and manage entities, as well as create views to iterate the
+underlying data structures.<br/>
 `Registry` is a class template that lets the users decide what's the preferred
 type to represent an entity. Because `std::uint32_t` is large enough for almost
 all the cases, there exists also an alias named `DefaultRegistry` for
@@ -367,7 +367,7 @@ information about the entity itself and its version.
 A registry can be used both to construct and to destroy entities:
 
 ```cpp
-// constructs a naked entity with no components ad returns its identifier
+// constructs a naked entity with no components and returns its identifier
 auto entity = registry.create();
 
 // constructs an entity and assigns it default-initialized components
@@ -400,8 +400,8 @@ calls to member functions of the registry. As for the entities, the registry
 offers also a set of functionalities users can use to work with the components.
 
 The `assign` member function template creates, initializes and assigns to an
-entity the given component. It accepts a variable number of arguments that are
-used to construct the component itself if present:
+entity the given component. It accepts a variable number of arguments to
+construct the component itself if present:
 
 ```cpp
 registry.assign<Position>(entity, 0., 0.);
@@ -468,7 +468,7 @@ registry.remove<Position>(entity);
 ```
 
 Otherwise consider to use the `reset` member function. It behaves similarly to
-`remove` but with a strictly defined behaviour (and a performance penalty is the
+`remove` but with a strictly defined behavior (and a performance penalty is the
 price to pay for this). In particular it removes the component if and only if it
 exists, otherwise it returns safely to the caller:
 
@@ -495,7 +495,6 @@ in use and their components are destroyed:
 Finally, references to components can be retrieved simply by doing this:
 
 ```cpp
-entt::DefaultRegistry registry;
 const auto &cregistry = registry;
 
 // const and non-const reference
@@ -548,12 +547,12 @@ bool b = registry.has<PlayingCharacter>();
 References to tags can be retrieved simply by doing this:
 
 ```cpp
+const auto &cregistry = registry;
+
 // either a non-const reference ...
-entt::DefaultRegistry registry;
 PlayingCharacter &player = registry.get<PlayingCharacter>();
 
 // ... or a const one
-const auto &cregistry = registry;
 const Camera &camera = cregistry.get<Camera>();
 ```
 
@@ -605,15 +604,16 @@ simple.
 
 `EnTT` comes with an example (actually a test) that shows how to integrate
 compile-time and runtime components in a stack based JavaScript environment. It
-uses [`duktape`](https://github.com/svaarala/duktape) under the hood, mainly
+uses [`Duktape`](https://github.com/svaarala/duktape) under the hood, mainly
 because I wanted to learn how it works at the time I was writing the code.
 
-It's not production-ready and overall performance can be highly improved.
-However, I sacrificed optimizations in favor of a more readable piece of
-code. I hope I succeeded.<br/>
+The code is not production-ready and overall performance can be highly improved.
+However, I sacrificed optimizations in favor of a more readable piece of code. I
+hope I succeeded.<br/>
 Note also that this isn't neither the only nor (probably) the best way to do it.
 In fact, the right way depends on the scripting language and the problem one is
-facing in general.
+facing in general.<br/>
+That being said, feel free to use it at your own risk.
 
 The basic idea is that of creating a compile-time component aimed to map all the
 runtime components assigned to an entity.<br/>
@@ -895,10 +895,32 @@ registry.each([](auto entity) {
 });
 ```
 
+It returns to the caller all the entities that are still in use by means of the
+given function.<br/>
 As a rule of thumb, consider using a view if the goal is to iterate entities
-that have a determinate set of components. A view is usually faster than
+that have a determinate set of components. A view is usually much faster than
 combining this function with a bunch of custom tests.<br/>
 In all the other cases, this is the way to go.
+
+There exists also another member function to use to retrieve orphans. An orphan
+is an entity that is still in use and has neither assigned components nor
+tags.<br/>
+The signature of the function is the same of `each`:
+
+```cpp
+registry.orphans([](auto entity) {
+    // ...
+});
+```
+
+To test the _orphanity_ of a single entity, use the member function `orphan`
+instead. It accepts a valid entity identifer as an argument and returns true in
+case the entity is an orphan, false otherwise.
+
+In general, all these functions can result in poor performance.<br/>
+`each` is fairly slow because of some checks it performs on each and every
+entity. For similar reasons, `orphans` can be even slower. Both functions should
+not be used frequently to avoid the risk of a performance hit.
 
 ## Side notes
 
@@ -925,7 +947,7 @@ In all the other cases, this is the way to go.
     other entities, destroying them or removing their components isn't
     allowed and it can result in undefined behavior.
 
-  Iterators are invalidated and the behaviour is undefined if an entity is
+  Iterators are invalidated and the behavior is undefined if an entity is
   modified or destroyed and it's not the one currently returned by the
   view.<br/>
   To work around it, possible approaches are:

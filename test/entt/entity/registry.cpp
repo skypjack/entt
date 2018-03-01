@@ -18,11 +18,11 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_TRUE(registry.empty<int>());
     ASSERT_TRUE(registry.empty<char>());
 
-    auto e1 = registry.create();
-    auto e2 = registry.create<int, char>();
+    auto e0 = registry.create();
+    auto e1 = registry.create<int, char>();
 
+    ASSERT_TRUE(registry.has<>(e0));
     ASSERT_TRUE(registry.has<>(e1));
-    ASSERT_TRUE(registry.has<>(e2));
 
     ASSERT_EQ(registry.capacity(), entt::DefaultRegistry::size_type{2});
     ASSERT_EQ(registry.size<int>(), entt::DefaultRegistry::size_type{1});
@@ -30,67 +30,67 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_FALSE(registry.empty<int>());
     ASSERT_FALSE(registry.empty<char>());
 
-    ASSERT_NE(e1, e2);
+    ASSERT_NE(e0, e1);
 
-    ASSERT_FALSE(registry.has<int>(e1));
-    ASSERT_TRUE(registry.has<int>(e2));
-    ASSERT_FALSE(registry.has<char>(e1));
-    ASSERT_TRUE(registry.has<char>(e2));
-    ASSERT_FALSE((registry.has<int, char>(e1)));
-    ASSERT_TRUE((registry.has<int, char>(e2)));
-
-    ASSERT_EQ(registry.assign<int>(e1, 42), 42);
-    ASSERT_EQ(registry.assign<char>(e1, 'c'), 'c');
-    ASSERT_NO_THROW(registry.remove<int>(e2));
-    ASSERT_NO_THROW(registry.remove<char>(e2));
-
+    ASSERT_FALSE(registry.has<int>(e0));
     ASSERT_TRUE(registry.has<int>(e1));
-    ASSERT_FALSE(registry.has<int>(e2));
+    ASSERT_FALSE(registry.has<char>(e0));
     ASSERT_TRUE(registry.has<char>(e1));
-    ASSERT_FALSE(registry.has<char>(e2));
+    ASSERT_FALSE((registry.has<int, char>(e0)));
     ASSERT_TRUE((registry.has<int, char>(e1)));
-    ASSERT_FALSE((registry.has<int, char>(e2)));
 
-    auto e3 = registry.create();
+    ASSERT_EQ(registry.assign<int>(e0, 42), 42);
+    ASSERT_EQ(registry.assign<char>(e0, 'c'), 'c');
+    ASSERT_NO_THROW(registry.remove<int>(e1));
+    ASSERT_NO_THROW(registry.remove<char>(e1));
 
-    registry.accomodate<int>(e3, registry.get<int>(e1));
-    registry.accomodate<char>(e3, registry.get<char>(e1));
+    ASSERT_TRUE(registry.has<int>(e0));
+    ASSERT_FALSE(registry.has<int>(e1));
+    ASSERT_TRUE(registry.has<char>(e0));
+    ASSERT_FALSE(registry.has<char>(e1));
+    ASSERT_TRUE((registry.has<int, char>(e0)));
+    ASSERT_FALSE((registry.has<int, char>(e1)));
 
-    ASSERT_TRUE(registry.has<int>(e3));
-    ASSERT_TRUE(registry.has<char>(e3));
-    ASSERT_EQ(registry.get<int>(e1), 42);
-    ASSERT_EQ(registry.get<char>(e1), 'c');
+    auto e2 = registry.create();
 
-    ASSERT_EQ(std::get<0>(registry.get<int, char>(e1)), 42);
-    ASSERT_EQ(std::get<1>(static_cast<const entt::DefaultRegistry &>(registry).get<int, char>(e1)), 'c');
+    registry.accomodate<int>(e2, registry.get<int>(e0));
+    registry.accomodate<char>(e2, registry.get<char>(e0));
 
-    ASSERT_EQ(registry.get<int>(e1), registry.get<int>(e3));
-    ASSERT_EQ(registry.get<char>(e1), registry.get<char>(e3));
-    ASSERT_NE(&registry.get<int>(e1), &registry.get<int>(e3));
-    ASSERT_NE(&registry.get<char>(e1), &registry.get<char>(e3));
+    ASSERT_TRUE(registry.has<int>(e2));
+    ASSERT_TRUE(registry.has<char>(e2));
+    ASSERT_EQ(registry.get<int>(e0), 42);
+    ASSERT_EQ(registry.get<char>(e0), 'c');
 
-    ASSERT_NO_THROW(registry.replace<int>(e1, 0));
-    ASSERT_EQ(registry.get<int>(e1), 0);
+    ASSERT_EQ(std::get<0>(registry.get<int, char>(e0)), 42);
+    ASSERT_EQ(std::get<1>(static_cast<const entt::DefaultRegistry &>(registry).get<int, char>(e0)), 'c');
 
+    ASSERT_EQ(registry.get<int>(e0), registry.get<int>(e2));
+    ASSERT_EQ(registry.get<char>(e0), registry.get<char>(e2));
+    ASSERT_NE(&registry.get<int>(e0), &registry.get<int>(e2));
+    ASSERT_NE(&registry.get<char>(e0), &registry.get<char>(e2));
+
+    ASSERT_NO_THROW(registry.replace<int>(e0, 0));
+    ASSERT_EQ(registry.get<int>(e0), 0);
+
+    ASSERT_NO_THROW(registry.accomodate<int>(e0, 1));
     ASSERT_NO_THROW(registry.accomodate<int>(e1, 1));
-    ASSERT_NO_THROW(registry.accomodate<int>(e2, 1));
+    ASSERT_EQ(static_cast<const entt::DefaultRegistry &>(registry).get<int>(e0), 1);
     ASSERT_EQ(static_cast<const entt::DefaultRegistry &>(registry).get<int>(e1), 1);
-    ASSERT_EQ(static_cast<const entt::DefaultRegistry &>(registry).get<int>(e2), 1);
 
     ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{3});
     ASSERT_FALSE(registry.empty());
 
-    ASSERT_EQ(registry.version(e3), entt::DefaultRegistry::version_type{0});
-    ASSERT_EQ(registry.current(e3), entt::DefaultRegistry::version_type{0});
+    ASSERT_EQ(registry.version(e2), entt::DefaultRegistry::version_type{0});
+    ASSERT_EQ(registry.current(e2), entt::DefaultRegistry::version_type{0});
     ASSERT_EQ(registry.capacity(), entt::DefaultRegistry::size_type{3});
-    ASSERT_NO_THROW(registry.destroy(e3));
+    ASSERT_NO_THROW(registry.destroy(e2));
     ASSERT_EQ(registry.capacity(), entt::DefaultRegistry::size_type{3});
-    ASSERT_EQ(registry.version(e3), entt::DefaultRegistry::version_type{0});
-    ASSERT_EQ(registry.current(e3), entt::DefaultRegistry::version_type{1});
+    ASSERT_EQ(registry.version(e2), entt::DefaultRegistry::version_type{0});
+    ASSERT_EQ(registry.current(e2), entt::DefaultRegistry::version_type{1});
 
+    ASSERT_TRUE(registry.valid(e0));
     ASSERT_TRUE(registry.valid(e1));
-    ASSERT_TRUE(registry.valid(e2));
-    ASSERT_FALSE(registry.valid(e3));
+    ASSERT_FALSE(registry.valid(e2));
 
     ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{2});
     ASSERT_FALSE(registry.empty());
@@ -121,11 +121,11 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_TRUE(registry.empty<int>());
     ASSERT_TRUE(registry.empty<char>());
 
-    e1 = registry.create<int>();
-    e2 = registry.create();
+    e0 = registry.create<int>();
+    e1 = registry.create();
 
+    ASSERT_NO_THROW(registry.reset<int>(e0));
     ASSERT_NO_THROW(registry.reset<int>(e1));
-    ASSERT_NO_THROW(registry.reset<int>(e2));
 
     ASSERT_EQ(registry.size<int>(), entt::DefaultRegistry::size_type{0});
     ASSERT_EQ(registry.size<char>(), entt::DefaultRegistry::size_type{0});
@@ -200,6 +200,28 @@ TEST(DefaultRegistry, Each) {
     registry.each([&](auto) { FAIL(); });
 }
 
+TEST(DefaultRegistry, Orphans) {
+    entt::DefaultRegistry registry;
+    entt::DefaultRegistry::size_type tot{};
+
+    registry.create<int>();
+    registry.create();
+    registry.create<int>();
+    registry.create();
+
+    registry.orphans([&](auto) { ++tot; });
+    ASSERT_EQ(tot, 2u);
+    tot = 0u;
+
+    registry.each([&](auto entity) { registry.reset<int>(entity); });
+    registry.orphans([&](auto) { ++tot; });
+    ASSERT_EQ(tot, 4u);
+    registry.reset();
+    tot = 0u;
+
+    registry.orphans([&](auto) { ++tot; });
+    ASSERT_EQ(tot, 0u);
+}
 
 TEST(DefaultRegistry, Types) {
     entt::DefaultRegistry registry;
