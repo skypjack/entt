@@ -501,6 +501,12 @@ public:
     /**
      * @brief Assigns an entity to a sparse set and constructs its object.
      *
+     * @note
+     * _Sfinae'd_ function.<br/>
+     * This version is used for types that can be constructed in place directly.
+     * It doesn't work well with aggregates because of the placement new usually
+     * performed under the hood during an _emplace back_.
+     *
      * @warning
      * Attempting to use an entity that already belongs to the sparse set
      * results in undefined behavior.<br/>
@@ -513,10 +519,38 @@ public:
      * @return The object associated to the entity.
      */
     template<typename... Args>
-    object_type & construct(entity_type entity, Args&&... args) {
+    std::enable_if_t<std::is_constructible<Type, Args...>::value, object_type &>
+    construct(entity_type entity, Args&&... args) {
         underlying_type::construct(entity);
-        // emplace_back doesn't work well with PODs because of its placement new
-        instances.push_back(object_type{ std::forward<Args>(args)... });
+        instances.emplace_back(std::forward<Args>(args)...);
+        return instances.back();
+    }
+
+    /**
+     * @brief Assigns an entity to a sparse set and constructs its object.
+     *
+     * @note
+     * _Sfinae'd_ function.<br/>
+     * Fallback for aggregates and types in general that do not work well with a
+     * placement new as performed usually under the hood during an
+     * _emplace back_.
+     *
+     * @warning
+     * Attempting to use an entity that already belongs to the sparse set
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set already contains the given entity.
+     *
+     * @tparam Args Types of arguments to use to construct the object.
+     * @param entity A valid entity identifier.
+     * @param args Parameters to use to construct an object for the entity.
+     * @return The object associated to the entity.
+     */
+    template<typename... Args>
+    std::enable_if_t<!std::is_constructible<Type, Args...>::value, object_type &>
+    construct(entity_type entity, Args&&... args) {
+        underlying_type::construct(entity);
+        instances.emplace_back(Type{ std::forward<Args>(args)... });
         return instances.back();
     }
 
