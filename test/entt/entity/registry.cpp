@@ -208,6 +208,7 @@ TEST(DefaultRegistry, Orphans) {
     registry.create();
     registry.create<int>();
     registry.create();
+    registry.attach<double>(registry.create());
 
     registry.orphans([&](auto) { ++tot; });
     ASSERT_EQ(tot, 2u);
