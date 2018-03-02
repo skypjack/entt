@@ -515,8 +515,25 @@ public:
     template<typename... Args>
     object_type & construct(entity_type entity, Args&&... args) {
         underlying_type::construct(entity);
+
+        auto const create_object = [&args...]() {
+          return object_type{ std::forward<Args>(args)... };
+        };
+
+// https://stackoverflow.com/a/38456243
+#define CXX17 (__cplusplus == 201703L)
+#if CXX17
+        bool constexpr object_is_pod = std::is_pod<object_type>::value;
+        if constexpr (object_is_pod) {
+          // emplace_back doesn't work well with PODs because of its placement new
+          instances.push_back(create_object());
+        } else {
+          instances.emplace_back(create_object());
+        }
+#else
         // emplace_back doesn't work well with PODs because of its placement new
-        instances.push_back(object_type{ std::forward<Args>(args)... });
+        instances.push_back(create_object());
+#endif
         return instances.back();
     }
 
