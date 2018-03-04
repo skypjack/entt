@@ -81,6 +81,12 @@ TEST(View, MultipleComponent) {
     auto e0 = registry.create<char>();
     auto e1 = registry.create<int, char>();
 
+    auto it = registry.view<char>().begin();
+
+    ASSERT_EQ(*it, e1);
+    ASSERT_EQ(*(it+1), e0);
+    ASSERT_EQ(it += 2, registry.view<char>().end());
+
     ASSERT_NO_THROW((registry.view<int, char>().begin()++));
     ASSERT_NO_THROW((++registry.view<int, char>().begin()));
 

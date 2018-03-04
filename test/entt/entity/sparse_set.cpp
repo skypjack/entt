@@ -63,12 +63,20 @@ TEST(SparseSetNoType, DataBeginEnd) {
     ASSERT_EQ(*(set.data() + 1u), 12u);
     ASSERT_EQ(*(set.data() + 2u), 42u);
 
+    auto it = set.begin();
+
+    ASSERT_EQ(*it, 42u);
+    ASSERT_EQ(*(it+1), 12u);
+    ASSERT_EQ(*(it+2), 3u);
+    ASSERT_EQ(it += 3, set.end());
+
     auto begin = set.begin();
     auto end = set.end();
 
     ASSERT_EQ(*(begin++), 42u);
     ASSERT_EQ(*(begin++), 12u);
     ASSERT_EQ(*(begin++), 3u);
+
     ASSERT_EQ(begin, end);
 }
 

@@ -366,6 +366,7 @@ class View final {
         }
 
     public:
+        using difference_type = typename underlying_iterator_type::difference_type;
         using value_type = typename view_type::entity_type;
 
         Iterator(unchecked_type unchecked, underlying_iterator_type begin, underlying_iterator_type end) noexcept
@@ -383,6 +384,15 @@ class View final {
         Iterator operator++(int) noexcept {
             Iterator orig = *this;
             return ++(*this), orig;
+        }
+
+        Iterator & operator+=(difference_type value) noexcept {
+            begin += value;
+            return *this;
+        }
+
+        Iterator operator+(difference_type value) noexcept {
+            return Iterator{unchecked, begin+value, end};
         }
 
         bool operator==(const Iterator &other) const noexcept {

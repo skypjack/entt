@@ -7,5 +7,4 @@
 * scene management (I prefer the concept of spaces, that is a kind of scene anyway)
 * raw view (affects sparse sets - custom iterator in derived one - and introduces a new kind of view): single component view to iterate components only instead of entities (in the right order!!)
   it should speed up systems like rendering or whatever requires a single component and isn't interested in the entity, for it avoids the double check of the get
-* operator+/operator+= (-/-=) on sparse set iterators (required to partition arrays and split iteration on multiple threads)
 * AOB

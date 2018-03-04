@@ -57,6 +57,7 @@ class SparseSet<Entity> {
     using traits_type = entt_traits<Entity>;
 
     struct Iterator final {
+        using difference_type = std::size_t;
         using value_type = Entity;
 
         Iterator(const std::vector<value_type> &direct, std::size_t pos)
@@ -70,6 +71,15 @@ class SparseSet<Entity> {
         Iterator operator++(int) noexcept {
             Iterator orig = *this;
             return ++(*this), orig;
+        }
+
+        Iterator & operator+=(difference_type value) noexcept {
+            pos -= value;
+            return *this;
+        }
+
+        Iterator operator+(difference_type value) noexcept {
+            return Iterator{direct, pos-value};
         }
 
         bool operator==(const Iterator &other) const noexcept {
