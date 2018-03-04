@@ -441,7 +441,7 @@ public:
     void destroy(entity_type entity) {
         assert(valid(entity));
         const auto entt = entity & traits_type::entity_mask;
-        const auto version = (entity & (~traits_type::entity_mask)) + (typename traits_type::entity_type{1} << traits_type::entity_shift);
+        const auto version = (((entity >> traits_type::entity_shift) + 1) & traits_type::version_mask) << traits_type::entity_shift;
         const auto node = (available ? next : ((entt + 1) & traits_type::entity_mask)) | version;
 
         entities[entt] = node;

@@ -549,7 +549,7 @@ public:
     std::enable_if_t<!std::is_constructible<Type, Args...>::value, object_type &>
     construct(entity_type entity, Args&&... args) {
         underlying_type::construct(entity);
-        instances.emplace_back(Type{ std::forward<Args>(args)... });
+        instances.emplace_back(Type{std::forward<Args>(args)...});
         return instances.back();
     }
 
