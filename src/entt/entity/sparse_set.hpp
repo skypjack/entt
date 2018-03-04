@@ -233,7 +233,7 @@ public:
         assert(has(entity));
         const auto entt = entity & traits_type::entity_mask;
         // we must get rid of the in-use bit for it's not part of the position
-        return reverse[entt] & ~in_use;
+        return reverse[entt] & traits_type::entity_mask;
     }
 
     /**
@@ -278,10 +278,9 @@ public:
         assert(has(entity));
         const auto entt = entity & traits_type::entity_mask;
         const auto back = direct.back() & traits_type::entity_mask;
-        const auto pos = reverse[entt] & ~in_use;
-        // the order matters: if back and entt are the same (for the sparse set
-        // has size 1), switching the two lines below doesn't work as expected
-        reverse[back] = pos | in_use;
+        // we must get rid of the in-use bit for it's not part of the position
+        const auto pos = reverse[entt] & traits_type::entity_mask;
+        reverse[back] = reverse[entt];
         reverse[entt] = pos;
         // swapping isn't required here, we are getting rid of the last element
         direct[pos] = direct.back();

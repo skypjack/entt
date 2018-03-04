@@ -58,11 +58,11 @@ struct entt_traits<std::uint32_t> {
     using version_type = std::uint16_t;
 
     /*! @brief Mask to use to get the entity number out of an identifier. */
-    static constexpr auto entity_mask = 0xFFFFFF;
+    static constexpr auto entity_mask = 0xFFFFF;
     /*! @brief Mask to use to get the version out of an identifier. */
-    static constexpr auto version_mask = 0xFF;
+    static constexpr auto version_mask = 0xFFF;
     /*! @brief Extent of the entity number within an identifier. */
-    static constexpr auto entity_shift = 24;
+    static constexpr auto entity_shift = 20;
 };
 
 

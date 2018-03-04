@@ -3,6 +3,7 @@
 #include <functional>
 #include <type_traits>
 #include <gtest/gtest.h>
+#include <entt/entity/entt_traits.hpp>
 #include <entt/entity/registry.hpp>
 
 TEST(DefaultRegistry, Functionalities) {
@@ -147,6 +148,22 @@ TEST(DefaultRegistry, CreateDestroyCornerCase) {
 
     ASSERT_EQ(registry.current(e0), entt::DefaultRegistry::version_type{1});
     ASSERT_EQ(registry.current(e1), entt::DefaultRegistry::version_type{1});
+}
+
+TEST(DefaultRegistry, VersionOverflow) {
+    entt::DefaultRegistry registry;
+
+    auto entity = registry.create();
+    registry.destroy(entity);
+
+    ASSERT_EQ(registry.version(entity), entt::DefaultRegistry::version_type{});
+
+    for(auto i = entt::entt_traits<entt::DefaultRegistry::entity_type>::version_mask; i; --i) {
+        ASSERT_NE(registry.current(entity), registry.version(entity));
+        registry.destroy(registry.create());
+    }
+
+    ASSERT_EQ(registry.current(entity), registry.version(entity));
 }
 
 TEST(DefaultRegistry, Each) {
