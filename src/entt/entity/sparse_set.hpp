@@ -331,7 +331,7 @@ public:
      *
      * @param other The sparse sets that imposes the order of the entities.
      */
-    virtual void respect(const SparseSet<Entity> &other) noexcept {
+    void respect(const SparseSet<Entity> &other) noexcept {
         auto from = other.begin();
         auto to = other.end();
 
@@ -610,8 +610,8 @@ public:
             auto next = copy[curr];
 
             while(curr != next) {
-                auto lhs = copy[curr];
-                auto rhs = copy[next];
+                const auto lhs = copy[curr];
+                const auto rhs = copy[next];
                 std::swap(instances[lhs], instances[rhs]);
                 underlying_type::swap(lhs, rhs);
                 copy[curr] = curr;
@@ -643,7 +643,7 @@ public:
      *
      * @param other The sparse sets that imposes the order of the entities.
      */
-    void respect(const SparseSet<Entity> &other) noexcept override {
+    void respect(const SparseSet<Entity> &other) noexcept {
         auto from = other.begin();
         auto to = other.end();
 
@@ -651,9 +651,11 @@ public:
         const auto *local = underlying_type::data();
 
         while(pos > 0 && from != to) {
-            if(underlying_type::has(*from)) {
-                if(*from != *(local + pos)) {
-                    auto candidate = underlying_type::get(*from);
+            const auto curr = *from;
+
+            if(underlying_type::has(curr)) {
+                if(curr != *(local + pos)) {
+                    auto candidate = underlying_type::get(curr);
                     std::swap(instances[pos], instances[candidate]);
                     underlying_type::swap(pos, candidate);
                 }

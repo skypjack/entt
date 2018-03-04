@@ -1,5 +1,7 @@
+#include <unordered_map>
 #include <unordered_set>
 #include <functional>
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
 
@@ -430,4 +432,44 @@ TEST(DefaultRegistry, ConstructWithComponents) {
     entt::DefaultRegistry registry;
     const auto value = 0;
     registry.create(value);
+}
+
+TEST(DefaultRegistry, MergeTwoRegistries) {
+    using entity_type = typename entt::DefaultRegistry::entity_type;
+
+    entt::DefaultRegistry src;
+    entt::DefaultRegistry dst;
+
+    std::unordered_map<entity_type, entity_type> ref;
+
+    auto merge = [&ref](const auto &view, auto &dst) {
+        view.each([&](auto entity, const auto &component) {
+            if(ref.find(entity) == ref.cend()) {
+                ref.emplace(entity, dst.create(component));
+            } else {
+                using component_type = std::decay_t<decltype(component)>;
+                dst.template assign<component_type>(ref[entity], component);
+            }
+        });
+    };
+
+    src.create<int, float, double>();
+    src.create<char, float, int>();
+
+    dst.create<int, char, double>();
+    dst.create<float, int>();
+
+    auto eq = [](auto begin, auto end) { ASSERT_EQ(begin, end); };
+    auto ne = [](auto begin, auto end) { ASSERT_NE(begin, end); };
+
+    eq(dst.view<int, float, double>().begin(), dst.view<int, float, double>().end());
+    eq(dst.view<char, float, int>().begin(), dst.view<char, float, int>().end());
+
+    merge(src.view<int>(), dst);
+    merge(src.view<char>(), dst);
+    merge(src.view<double>(), dst);
+    merge(src.view<float>(), dst);
+
+    ne(dst.view<int, float, double>().begin(), dst.view<int, float, double>().end());
+    ne(dst.view<char, float, int>().begin(), dst.view<char, float, int>().end());
 }
