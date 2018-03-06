@@ -59,12 +59,12 @@ class Dispatcher final {
         }
 
         template<typename... Args>
-        inline void trigger(Args&&... args) {
+        inline void trigger(Args &&... args) {
             signal.publish({ std::forward<Args>(args)... });
         }
 
         template<typename... Args>
-        inline void enqueue(std::size_t current, Args&&... args) {
+        inline void enqueue(std::size_t current, Args &&... args) {
             events[current].push_back({ std::forward<Args>(args)... });
         }
 
@@ -151,7 +151,7 @@ public:
      * @param args Arguments to use to construct the event.
      */
     template<typename Event, typename... Args>
-    void trigger(Args&&... args) {
+    void trigger(Args &&... args) {
         wrapper<Event>().trigger(std::forward<Args>(args)...);
     }
 
@@ -166,7 +166,7 @@ public:
      * @param args Arguments to use to construct the event.
      */
     template<typename Event, typename... Args>
-    void enqueue(Args&&... args) {
+    void enqueue(Args &&... args) {
         wrapper<Event>().enqueue(buffer(mode), std::forward<Args>(args)...);
     }
 

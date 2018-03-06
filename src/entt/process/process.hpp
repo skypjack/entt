@@ -109,7 +109,7 @@ class Process {
     }
 
     template<State S, typename... Args>
-    void tick(char, tag<S>, Args&&...) {}
+    void tick(char, tag<S>, Args &&...) {}
 
 protected:
     /**
@@ -312,7 +312,7 @@ struct ProcessAdaptor: Process<ProcessAdaptor<Func, Delta>, Delta>, private Func
      * @param args Parameters to use to initialize the actual process.
      */
     template<typename... Args>
-    ProcessAdaptor(Args&&... args)
+    ProcessAdaptor(Args &&... args)
         : Func{std::forward<Args>(args)...}
     {}
 

@@ -215,7 +215,7 @@ public:
      * @param args Parameters to use to initialize the event.
      */
     template<typename Event, typename... Args>
-    void publish(Args&&... args) {
+    void publish(Args &&... args) {
         handler<Event>().publish({ std::forward<Args>(args)... }, *static_cast<Derived *>(this));
     }
 

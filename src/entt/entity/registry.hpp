@@ -57,7 +57,7 @@ class Registry {
         using test_fn_type = bool(Registry::*)(Entity) const;
 
         template<typename... Args>
-        Component & construct(Registry &registry, Entity entity, Args&&... args) {
+        Component & construct(Registry &registry, Entity entity, Args &&... args) {
             auto &component = SparseSet<Entity, Component>::construct(entity, std::forward<Args>(args)...);
 
             for(auto &&listener: listeners) {
@@ -351,7 +351,7 @@ public:
      * @return A valid entity identifier.
      */
     template<typename... Component>
-    entity_type create(Component&&... components) noexcept {
+    entity_type create(Component &&... components) noexcept {
         using accumulator_type = int[];
         const auto entity = create();
         accumulator_type accumulator = { 0, (ensure<std::decay_t<Component>>().construct(*this, entity, std::forward<Component>(components)), 0)... };
@@ -477,7 +477,7 @@ public:
      * @return A reference to the newly created tag.
      */
     template<typename Tag, typename... Args>
-    Tag & attach(entity_type entity, Args&&... args) {
+    Tag & attach(entity_type entity, Args &&... args) {
         assert(valid(entity));
         assert(!has<Tag>());
         const auto ttype = tag_family::type<Tag>();
@@ -591,7 +591,7 @@ public:
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    Component & assign(entity_type entity, Args&&... args) {
+    Component & assign(entity_type entity, Args &&... args) {
         assert(valid(entity));
         return ensure<Component>().construct(*this, entity, std::forward<Args>(args)...);
     }
@@ -737,7 +737,7 @@ public:
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    Component & replace(entity_type entity, Args&&... args) {
+    Component & replace(entity_type entity, Args &&... args) {
         assert(valid(entity));
         return (pool<Component>().get(entity) = Component{std::forward<Args>(args)...});
     }
@@ -770,7 +770,7 @@ public:
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    Component & accomodate(entity_type entity, Args&&... args) {
+    Component & accomodate(entity_type entity, Args &&... args) {
         assert(valid(entity));
         auto &cpool = ensure<Component>();
 

@@ -64,7 +64,7 @@ class Scheduler final {
         {}
 
         template<typename Proc, typename... Args>
-        decltype(auto) then(Args&&... args) && {
+        decltype(auto) then(Args &&... args) && {
             static_assert(std::is_base_of<Process<Proc, Delta>, Proc>::value, "!");
             handler = Lambda::operator()(handler, tag<Proc>{}, std::forward<Args>(args)...);
             return std::move(*this);
@@ -194,7 +194,7 @@ public:
      * @return An opaque object to use to concatenate processes.
      */
     template<typename Proc, typename... Args>
-    auto attach(Args&&... args) {
+    auto attach(Args &&... args) {
         static_assert(std::is_base_of<Process<Proc, Delta>, Proc>::value, "!");
 
         auto proc = typename ProcessHandler::instance_type{new Proc{std::forward<Args>(args)...}, &Scheduler::deleter<Proc>};

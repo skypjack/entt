@@ -50,7 +50,7 @@ class ResourceLoader {
     friend class ResourceCache<Resource>;
 
     template<typename... Args>
-    std::shared_ptr<Resource> get(Args&&... args) const {
+    std::shared_ptr<Resource> get(Args &&... args) const {
         return static_cast<const Loader *>(this)->load(std::forward<Args>(args)...);
     }
 };

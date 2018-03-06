@@ -78,7 +78,7 @@ struct ServiceLocator final {
      * @param args Parameters to use to construct the service.
      */
     template<typename Impl = Service, typename... Args>
-    inline static void set(Args&&... args) {
+    inline static void set(Args &&... args) {
         service = std::make_shared<Impl>(std::forward<Args>(args)...);
     }
 

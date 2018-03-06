@@ -142,7 +142,7 @@ public:
      * @param args Arguments to use to construct the event.
      */
     template<typename Type, typename... Args>
-    void publish(Args&&... args) {
+    void publish(Args &&... args) {
         Bus<Sig, Type>::publish(std::forward<Args>(args)...);
     }
 };
@@ -263,7 +263,7 @@ public:
      * @param args Arguments to use to construct the event.
      */
     template<typename... Args>
-    void publish(Args&&... args) {
+    void publish(Args &&... args) {
         signal.publish({ std::forward<Args>(args)... });
     }
 

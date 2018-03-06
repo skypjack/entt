@@ -92,7 +92,7 @@ public:
      * @return True if the resource is ready to use, false otherwise.
      */
     template<typename Loader, typename... Args>
-    bool load(resource_type id, Args&&... args) {
+    bool load(resource_type id, Args &&... args) {
         static_assert(std::is_base_of<ResourceLoader<Loader, Resource>, Loader>::value, "!");
 
         bool loaded = true;
@@ -125,7 +125,7 @@ public:
      * @return True if the resource is ready to use, false otherwise.
      */
     template<typename Loader, typename... Args>
-    bool reload(resource_type id, Args&&... args) {
+    bool reload(resource_type id, Args &&... args) {
         return (discard(id), load<Loader>(id, std::forward<Args>(args)...));
     }
 
@@ -142,7 +142,7 @@ public:
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    ResourceHandle<Resource> temp(Args&&... args) const {
+    ResourceHandle<Resource> temp(Args &&... args) const {
         return { Loader{}.get(std::forward<Args>(args)...) };
     }
 

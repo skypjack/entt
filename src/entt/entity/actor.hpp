@@ -65,7 +65,7 @@ struct Actor {
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    Component & set(Args&&... args) {
+    Component & set(Args &&... args) {
         return reg.template accomodate<Component>(entity, std::forward<Args>(args)...);
     }
 
