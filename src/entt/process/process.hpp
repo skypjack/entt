@@ -165,7 +165,7 @@ public:
     using delta_type = Delta;
 
     /*! @brief Default destructor. */
-    ~Process() noexcept {
+    virtual ~Process() noexcept {
         static_assert(std::is_base_of<Process, Derived>::value, "!");
     }
 
