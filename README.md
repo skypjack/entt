@@ -42,6 +42,8 @@
       * [Delegate](#delegate)
       * [Event dispatcher](#event-dispatcher)
       * [Event emitter](#event-emitter)
+   * [License](#license)
+   * [Support](#support)
 
 # Introduction
 
@@ -2141,7 +2143,9 @@ Code released under
 Docs released under
 [Creative Commons](https://github.com/skypjack/entt/blob/master/docs/LICENSE).
 
-# Donation
+# Support
+
+## Donation
 
 Developing and maintaining `EnTT` takes some time and lots of coffee. I'd like
 to add more and more functionalities in future and turn it in a full-featured
@@ -2151,3 +2155,11 @@ Italy, we're used to turning the best coffee ever in code. If you find that
 it's not enough, feel free to support me the way you prefer.<br/>
 Take a look at the donation button at the top of the page for more details or
 just click [here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W2HF9FESD5LJY&lc=IT&item_name=Michele%20Caini&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted).
+
+## Hire me
+
+If you start using `EnTT` and need help, if you want a new feature and want me
+to give it the highest priority, or for any other reason, I'm available for
+hiring.<br/>
+Feel free to take a look at my [profile](https://github.com/skypjack) and
+contact me by mail.
