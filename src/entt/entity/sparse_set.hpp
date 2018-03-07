@@ -136,7 +136,6 @@ public:
      * @param cap Desired capacity.
      */
     void reserve(size_type cap) {
-        reverse.reserve(cap);
         direct.reserve(cap);
     }
 
