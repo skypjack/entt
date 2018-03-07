@@ -93,6 +93,8 @@ TEST(View, MultipleComponent) {
     auto view = registry.view<int, char>();
 
     ASSERT_NE(view.begin(), view.end());
+    ASSERT_EQ(view.begin()+1, view.end());
+    ASSERT_EQ(view.size(), decltype(view.size()){1});
 
     view.get<char>(e0) = '1';
     view.get<char>(e1) = '2';

@@ -429,6 +429,14 @@ public:
     using size_type = typename view_type::size_type;
 
     /**
+     * @brief Estimates the number of entities that have the given components.
+     * @return Estimated number of entities that have the given components.
+     */
+    size_type size() const noexcept {
+        return view->size();
+    }
+
+    /**
      * @brief Returns an iterator to the first entity that has the given
      * components.
      *

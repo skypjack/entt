@@ -769,8 +769,9 @@ components in their bags. During construction, these views look at the number
 of entities available for each component and pick up a reference to the smallest
 set of candidates in order to speed up iterations.<br/>
 They offer fewer functionalities than their companion views for single
-component, the most important of which can be used to reset the view and refresh
-the reference to the set of candidate entities to iterate.<br/>
+component. In particular, a multi component standard view exposes utility
+functions to reset its internal state (optimization purposes) and to get the
+estimated number of entities it is going to return.<br/>
 Refer to the [official documentation](https://skypjack.github.io/entt/) for all
 the details.
 
