@@ -186,7 +186,7 @@ amazing set of features. And even more, of course.
 
 As it stands right now, `EnTT` is just fast enough for my requirements if
 compared to my first choice (it was already amazingly fast actually).<br/>
-Here is a comparison between the two (both of them compiled with GCC 7.2.0 on a
+Here is a comparison between the two (both of them compiled with GCC 7.3.0 on a
 Dell XPS 13 out of the mid 2014):
 
 | Benchmark | EntityX (compile-time) | EnTT |
@@ -194,18 +194,21 @@ Dell XPS 13 out of the mid 2014):
 | Create 1M entities | 0.0167s | **0.0046s** |
 | Destroy 1M entities | 0.0053s | **0.0022s** |
 | Standard view, 1M entities, one component | 0.0012s | **1.9e-07s** |
-| Standard view, 1M entities, two components | **0.0012s** | 0.0013s |
-| Standard view, 1M entities, two components<br/>Half of the entities have all the components | 0.0009s | **0.0007s** |
-| Standard view, 1M entities, two components<br/>One of the entities has all the components | 0.0008s | **1.3e-06s** |
+| Standard view, 1M entities, two components | 0.0012s | **0.0010s** |
+| Standard view, 1M entities, two components<br/>Half of the entities have all the components | 0.0009s | **0.0006s** |
+| Standard view, 1M entities, two components<br/>One of the entities has all the components | 0.0008s | **1.0e-06s** |
 | Persistent view, 1M entities, two components | 0.0012s | **2.8e-07s** |
-| Standard view, 1M entities, five components | **0.0010s** | 0.0034s |
+| Standard view, 1M entities, five components | **0.0010s** | 0.0024s |
 | Persistent view, 1M entities, five components | 0.0010s | **2.8e-07s** |
-| Standard view, 1M entities, ten components | **0.0011s** | 0.0075s |
-| Standard view, 1M entities, ten components<br/>Half of the entities have all the components | **0.0010s** | 0.0041s |
+| Standard view, 1M entities, ten components | **0.0011s** | 0.0058s |
+| Standard view, 1M entities, ten components<br/>Half of the entities have all the components | **0.0010s** | 0.0032s |
 | Standard view, 1M entities, ten components<br/>One of the entities has all the components | 0.0008s | **1.7e-06s** |
 | Persistent view, 1M entities, ten components | 0.0011s | **3.0e-07s** |
-| Sort 150k entities, one component<br/>Arrays are in reverse order | - | **0.0040s** |
-| Sort 150k entities, enforce permutation<br/>Arrays are in reverse order | - | **0.0006s** |
+| Sort 150k entities, one component<br/>Arrays are in reverse order | - | **0.0036s** |
+| Sort 150k entities, enforce permutation<br/>Arrays are in reverse order | - | **0.0005s** |
+
+Note: The default version of `EntityX` (`master` branch) wasn't added to the
+comparison because it's already much slower than its compile-time counterpart.
 
 `EnTT` includes its own tests and benchmarks. See
 [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp)

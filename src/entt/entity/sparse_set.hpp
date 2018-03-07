@@ -140,6 +140,20 @@ public:
     }
 
     /**
+     * @brief Returns the extent of a sparse set.
+     *
+     * The extent of a sparse set is also the size of the internal sparse array.
+     * There is no guarantee that the internal packed array has the same size.
+     * Usually the size of the internal sparse array is equal or greater than
+     * the one of the internal packed array.
+     *
+     * @return Extent of the sparse set.
+     */
+    size_type extent() const noexcept {
+        return reverse.size();
+    }
+
+    /**
      * @brief Returns the number of elements in a sparse set.
      *
      * The number of elements is also the size of the internal packed array.
@@ -219,11 +233,33 @@ public:
      * @return True if the sparse set contains the entity, false otherwise.
      */
     bool has(entity_type entity) const noexcept {
-        using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
-        // explicit promotion to avoid warnings with std::uint16_t
-        const auto entt = promotion_type{entity} & traits_type::entity_mask;
+        const auto pos = size_type(entity & traits_type::entity_mask);
         // the in-use control bit permits to avoid accessing the direct vector
-        return (entt < reverse.size()) && (reverse[entt] & in_use);
+        return (pos < reverse.size()) && (reverse[pos] & in_use);
+    }
+
+    /**
+     * @brief Checks if a sparse set contains an entity (unsafe).
+     *
+     * Alternative version of `has`. It accesses the underlying data structures
+     * without bounds checking and thus it's both unsafe and risky to use.<br/>
+     * You should not invoke directly this function unless you know exactly what
+     * you are doing. Prefer the `has` member function instead.
+     *
+     * @warning
+     * Attempting to use an entity that doesn't belong to the sparse set can
+     * result in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * bounds violation.
+     *
+     * @param entity A valid entity identifier.
+     * @return True if the sparse set contains the entity, false otherwise.
+     */
+    bool fast(entity_type entity) const noexcept {
+        const auto pos = size_type(entity & traits_type::entity_mask);
+        assert(pos < reverse.size());
+        // the in-use control bit permits to avoid accessing the direct vector
+        return (reverse[pos] & in_use);
     }
 
     /**
@@ -258,17 +294,15 @@ public:
      */
     void construct(entity_type entity) {
         assert(!has(entity));
-        using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
-        // explicit promotion to avoid warnings with std::uint16_t
-        const auto entt = promotion_type{entity} & traits_type::entity_mask;
+        const auto pos = size_type(entity & traits_type::entity_mask);
 
-        if(!(entt < reverse.size())) {
-            reverse.resize(entt+1, pos_type{});
+        if(!(pos < reverse.size())) {
+            reverse.resize(pos+1, pos_type{});
         }
 
         // we exploit the fact that pos_type is equal to entity_type and pos has
         // traits_type::version_mask bits unused we can use to mark it as in-use
-        reverse[entt] = pos_type(direct.size()) | in_use;
+        reverse[pos] = pos_type(direct.size()) | in_use;
         direct.emplace_back(entity);
     }
 

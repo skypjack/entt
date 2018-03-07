@@ -7,6 +7,7 @@
 #include <utility>
 #include <algorithm>
 #include <type_traits>
+#include "entt_traits.hpp"
 #include "sparse_set.hpp"
 
 
@@ -209,7 +210,7 @@ public:
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<const Comp &...>>
     get(entity_type entity) const noexcept {
-        return std::tuple<const Comp &...>{ get<Comp>(entity)... };
+        return std::tuple<const Comp &...>{get<Comp>(entity)...};
     }
 
     /**
@@ -232,7 +233,7 @@ public:
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<Comp &...>>
     get(entity_type entity) noexcept {
-        return std::tuple<Comp &...>{ get<Comp>(entity)... };
+        return std::tuple<Comp &...>{get<Comp>(entity)...};
     }
 
     /**
@@ -302,7 +303,7 @@ public:
 
 private:
     view_type &view;
-    pattern_type pools;
+    const pattern_type pools;
 };
 
 
@@ -358,11 +359,20 @@ class View final {
     using underlying_iterator_type = typename view_type::iterator_type;
     using unchecked_type = std::array<const view_type *, (sizeof...(Component) - 1)>;
     using pattern_type = std::tuple<pool_type<Component> &...>;
+    using traits_type = entt_traits<Entity>;
 
     class Iterator {
+        using size_type = typename view_type::size_type;
+
         inline bool valid() const noexcept {
+            const auto entity = *begin;
+            const auto sz = size_type(entity & traits_type::entity_mask);
             auto i = unchecked.size();
-            for(const auto entity = *begin; i && unchecked[i-1]->has(entity); --i);
+
+            if(sz < extent) {
+                for(; i && unchecked[i-1]->fast(entity); --i);
+            }
+
             return !i;
         }
 
@@ -370,8 +380,11 @@ class View final {
         using difference_type = typename underlying_iterator_type::difference_type;
         using value_type = typename view_type::entity_type;
 
-        Iterator(unchecked_type unchecked, underlying_iterator_type begin, underlying_iterator_type end) noexcept
-            : unchecked{unchecked}, begin{begin}, end{end}
+        Iterator(unchecked_type unchecked, size_type extent, underlying_iterator_type begin, underlying_iterator_type end) noexcept
+            : unchecked{unchecked},
+              extent{extent},
+              begin{begin},
+              end{end}
         {
             if(begin != end && !valid()) {
                 ++(*this);
@@ -393,7 +406,7 @@ class View final {
         }
 
         Iterator operator+(difference_type value) noexcept {
-            return Iterator{unchecked, begin+value, end};
+            return Iterator{unchecked, extent, begin+value, end};
         }
 
         bool operator==(const Iterator &other) const noexcept {
@@ -409,7 +422,8 @@ class View final {
         }
 
     private:
-        unchecked_type unchecked;
+        const unchecked_type unchecked;
+        const size_type extent;
         underlying_iterator_type begin;
         underlying_iterator_type end;
     };
@@ -451,7 +465,8 @@ public:
      * @return An iterator to the first entity that has the given components.
      */
     iterator_type begin() const noexcept {
-        return Iterator{unchecked, view->begin(), view->end()};
+        const auto extent = std::min({ std::get<pool_type<Component> &>(pools).extent()... });
+        return Iterator{unchecked, extent, view->begin(), view->end()};
     }
 
     /**
@@ -470,7 +485,8 @@ public:
      * given components.
      */
     iterator_type end() const noexcept {
-        return Iterator{unchecked, view->end(), view->end()};
+        const auto extent = std::min({ std::get<pool_type<Component> &>(pools).extent()... });
+        return Iterator{unchecked, extent, view->end(), view->end()};
     }
 
     /**
@@ -537,7 +553,7 @@ public:
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<const Comp &...>>
     get(entity_type entity) const noexcept {
-        return std::tuple<const Comp &...>{ get<Comp>(entity)... };
+        return std::tuple<const Comp &...>{get<Comp>(entity)...};
     }
 
     /**
@@ -560,7 +576,7 @@ public:
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<Comp &...>>
     get(entity_type entity) noexcept {
-        return std::tuple<Comp &...>{ get<Comp>(entity)... };
+        return std::tuple<Comp &...>{get<Comp>(entity)...};
     }
 
     /**
@@ -638,7 +654,7 @@ public:
     }
 
 private:
-    pattern_type pools;
+    const pattern_type pools;
     const view_type *view;
     unchecked_type unchecked;
 };
