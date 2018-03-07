@@ -52,7 +52,7 @@ class Emitter {
         using connection_type = typename container_type::iterator;
 
         bool empty() const noexcept override {
-            auto pred = [](auto &&element){ return element.first; };
+            auto pred = [](auto &&element) { return element.first; };
 
             return std::all_of(onceL.cbegin(), onceL.cend(), pred) &&
                     std::all_of(onL.cbegin(), onL.cend(), pred);
@@ -60,7 +60,7 @@ class Emitter {
 
         void clear() noexcept override {
             if(publishing) {
-                auto func = [](auto &&element){ element.first = true; };
+                auto func = [](auto &&element) { element.first = true; };
                 std::for_each(onceL.begin(), onceL.end(), func);
                 std::for_each(onL.begin(), onL.end(), func);
             } else {
@@ -81,7 +81,7 @@ class Emitter {
             conn->first = true;
 
             if(!publishing) {
-                auto pred = [](auto &&element){ return element.first; };
+                auto pred = [](auto &&element) { return element.first; };
                 onceL.remove_if(pred);
                 onL.remove_if(pred);
             }
@@ -102,7 +102,7 @@ class Emitter {
 
             publishing = false;
 
-            onL.remove_if([](auto &&element){ return element.first; });
+            onL.remove_if([](auto &&element) { return element.first; });
         }
 
     private:
@@ -304,7 +304,7 @@ public:
      */
     void clear() noexcept {
         std::for_each(handlers.begin(), handlers.end(),
-                      [](auto &&handler){ if(handler) { handler->clear(); } });
+                      [](auto &&handler) { if(handler) { handler->clear(); } });
     }
 
     /**
@@ -327,7 +327,7 @@ public:
      */
     bool empty() const noexcept {
         return std::all_of(handlers.cbegin(), handlers.cend(),
-                           [](auto &&handler){ return !handler || handler->empty(); });
+                           [](auto &&handler) { return !handler || handler->empty(); });
     }
 
 private:

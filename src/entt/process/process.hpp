@@ -322,7 +322,7 @@ struct ProcessAdaptor: Process<ProcessAdaptor<Func, Delta>, Delta>, private Func
      * @param data Optional data.
      */
     void update(Delta delta, void *data) {
-        Func::operator()(delta, data, [this](){ this->succeed(); }, [this](){ this->fail(); });
+        Func::operator()(delta, data, [this]() { this->succeed(); }, [this]() { this->fail(); });
     }
 };
 

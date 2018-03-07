@@ -291,10 +291,8 @@ public:
      * @return True if the identifier is still valid, false otherwise.
      */
     bool valid(entity_type entity) const noexcept {
-        using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
-        // explicit promotion to avoid warnings with std::uint16_t
-        const auto entt = promotion_type{entity} & traits_type::entity_mask;
-        return (entt < entities.size() && entities[entt] == entity);
+        const auto pos = size_type(entity & traits_type::entity_mask);
+        return (pos < entities.size() && entities[pos] == entity);
     }
 
     /**
@@ -324,11 +322,9 @@ public:
      * @return Actual version for the given entity identifier.
      */
     version_type current(entity_type entity) const noexcept {
-        using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
-        // explicit promotion to avoid warnings with std::uint16_t
-        const auto entt = promotion_type{entity} & traits_type::entity_mask;
-        assert(entt < entities.size());
-        return version_type((entities[entt] >> traits_type::entity_shift) & traits_type::version_mask);
+        const auto pos = size_type(entity & traits_type::entity_mask);
+        assert(pos < entities.size());
+        return version_type((entities[pos] >> traits_type::entity_shift) & traits_type::version_mask);
     }
 
     /**
@@ -486,7 +482,7 @@ public:
             tags.resize(ttype + 1);
         }
 
-        tags[ttype].reset(new Attaching<Tag>{entity, Tag{ std::forward<Args>(args)... }});
+        tags[ttype].reset(new Attaching<Tag>{entity, Tag{std::forward<Args>(args)...}});
 
         return static_cast<Attaching<Tag> *>(tags[ttype].get())->tag;
     }
@@ -693,7 +689,7 @@ public:
     template<typename... Component>
     std::enable_if_t<(sizeof...(Component) > 1), std::tuple<const Component &...>>
     get(entity_type entity) const noexcept {
-        return std::tuple<const Component &...>{ get<Component>(entity)... };
+        return std::tuple<const Component &...>{get<Component>(entity)...};
     }
 
     /**
@@ -713,7 +709,7 @@ public:
     template<typename... Component>
     std::enable_if_t<(sizeof...(Component) > 1), std::tuple<Component &...>>
     get(entity_type entity) noexcept {
-        return std::tuple<Component &...>{ get<Component>(entity)... };
+        return std::tuple<Component &...>{get<Component>(entity)...};
     }
 
     /**
