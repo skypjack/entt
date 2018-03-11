@@ -21,6 +21,7 @@ TEST(SparseSetNoType, Functionalities) {
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_TRUE(set.has(42));
+    ASSERT_TRUE(set.fast(42));
     ASSERT_EQ(set.get(42), 0u);
 
     set.destroy(42);
@@ -260,6 +261,7 @@ TEST(SparseSetWithType, Functionalities) {
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_TRUE(set.has(42));
+    ASSERT_TRUE(set.fast(42));
     ASSERT_EQ(set.get(42), 3);
 
     set.destroy(42);
