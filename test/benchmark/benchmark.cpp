@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
 #include <iostream>
 #include <cstddef>
 #include <cstdint>
 #include <chrono>
-#include <vector>
+#include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/space.hpp>
 
 struct Position {
     std::uint64_t x;
@@ -17,7 +17,7 @@ struct Velocity {
 };
 
 template<std::size_t>
-struct Comp {};
+struct Comp { int x; };
 
 struct Timer final {
     Timer(): start{std::chrono::system_clock::now()} {}
@@ -47,17 +47,16 @@ TEST(Benchmark, Construct) {
 
 TEST(Benchmark, Destroy) {
     entt::DefaultRegistry registry;
-    std::vector<entt::DefaultRegistry::entity_type> entities{};
 
     std::cout << "Destroying 1000000 entities" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        entities.push_back(registry.create());
+        registry.create<int>();
     }
 
     Timer timer;
 
-    for(auto entity: entities) {
+    for(auto entity: registry.view<int>()) {
         registry.destroy(entity);
     }
 
@@ -281,13 +280,11 @@ TEST(Benchmark, IterateTenComponentsPersistent1M) {
 
 TEST(Benchmark, SortSingle) {
     entt::DefaultRegistry registry;
-    std::vector<entt::DefaultRegistry::entity_type> entities{};
 
     std::cout << "Sort 150000 entities, one component" << std::endl;
 
     for(std::uint64_t i = 0; i < 150000L; i++) {
-        auto entity = registry.create<Position>({ i, i });
-        entities.push_back(entity);
+        registry.create<Position>({ i, i });
     }
 
     Timer timer;
@@ -301,13 +298,11 @@ TEST(Benchmark, SortSingle) {
 
 TEST(Benchmark, SortMulti) {
     entt::DefaultRegistry registry;
-    std::vector<entt::DefaultRegistry::entity_type> entities{};
 
     std::cout << "Sort 150000 entities, two components" << std::endl;
 
     for(std::uint64_t i = 0; i < 150000L; i++) {
-        auto entity = registry.create<Position, Velocity>({ i, i }, { i, i });
-        entities.push_back(entity);
+        registry.create<Position, Velocity>({ i, i }, { i, i });
     }
 
     registry.sort<Position>([](const auto &lhs, const auto &rhs) {
@@ -318,5 +313,154 @@ TEST(Benchmark, SortMulti) {
 
     registry.sort<Velocity, Position>();
 
+    timer.elapsed();
+}
+
+TEST(Benchmark, SpaceConstruct) {
+    entt::DefaultRegistry registry;
+    entt::DefaultSpace space{registry};
+
+    std::cout << "Constructing 1000000 entities" << std::endl;
+
+    Timer timer;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        space.create();
+    }
+
+    timer.elapsed();
+}
+
+TEST(Benchmark, SpaceAssign) {
+    entt::DefaultRegistry registry;
+    entt::DefaultSpace space{registry};
+
+    std::cout << "Assigning 1000000 entities" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        registry.create<int>();
+    }
+
+    Timer timer;
+
+    for(auto entity: registry.view<int>()) {
+        space.assign(entity);
+    }
+
+    timer.elapsed();
+}
+
+TEST(Benchmark, SpaceIterateSingleComponent1M) {
+    entt::DefaultRegistry registry;
+    entt::DefaultSpace space{registry};
+
+    std::cout << "Iterating over 1000000 entities, one component" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create<Position>();
+        space.assign(entity);
+    }
+
+    Timer timer;
+    space.view<Position>([](auto, auto &) {});
+    timer.elapsed();
+}
+
+TEST(Benchmark, SpaceIterateTwoComponents1M) {
+    entt::DefaultRegistry registry;
+    entt::DefaultSpace space{registry};
+
+    std::cout << "Iterating over 1000000 entities, two components" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create<Position, Velocity>();
+        space.assign(entity);
+    }
+
+    Timer timer;
+    space.view<Position, Velocity>([](auto, auto &...) {});
+    timer.elapsed();
+}
+
+TEST(Benchmark, SpaceIterateTwoComponentsPersistent1M) {
+    entt::DefaultRegistry registry;
+    entt::DefaultSpace space{registry};
+    registry.prepare<Position, Velocity>();
+
+    std::cout << "Iterating over 1000000 entities, two components, persistent view" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create<Position, Velocity>();
+        space.assign(entity);
+    }
+
+    Timer timer;
+    space.persistent<Position, Velocity>([](auto, auto &...) {});
+    timer.elapsed();
+}
+
+TEST(Benchmark, SpaceIterateFiveComponents1M) {
+    entt::DefaultRegistry registry;
+    entt::DefaultSpace space{registry};
+
+    std::cout << "Iterating over 1000000 entities, five components" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
+        space.assign(entity);
+    }
+
+    Timer timer;
+    space.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>([](auto, auto &...) {});
+    timer.elapsed();
+}
+
+TEST(Benchmark, SpaceIterateFiveComponentsPersistent1M) {
+    entt::DefaultRegistry registry;
+    entt::DefaultSpace space{registry};
+    registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
+
+    std::cout << "Iterating over 1000000 entities, five components, persistent view" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
+        space.assign(entity);
+    }
+
+    Timer timer;
+    space.persistent<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>([](auto, auto &...) {});
+    timer.elapsed();
+}
+
+TEST(Benchmark, SpaceIterateTenComponents1M) {
+    entt::DefaultRegistry registry;
+    entt::DefaultSpace space{registry};
+
+    std::cout << "Iterating over 1000000 entities, ten components" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+        space.assign(entity);
+    }
+
+    Timer timer;
+    space.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>([](auto, auto &...) {});
+    timer.elapsed();
+}
+
+TEST(Benchmark, SpaceIterateTenComponentsPersistent1M) {
+    entt::DefaultRegistry registry;
+    entt::DefaultSpace space{registry};
+    registry.prepare<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+
+    std::cout << "Iterating over 1000000 entities, ten components, persistent view" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+        space.assign(entity);
+    }
+
+    Timer timer;
+    space.persistent<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>([](auto, auto &...) {});
     timer.elapsed();
 }

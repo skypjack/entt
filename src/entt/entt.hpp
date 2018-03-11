@@ -4,6 +4,7 @@
 #include "entity/actor.hpp"
 #include "entity/entt_traits.hpp"
 #include "entity/registry.hpp"
+#include "entity/space.hpp"
 #include "entity/sparse_set.hpp"
 #include "entity/view.hpp"
 #include "locator/locator.hpp"

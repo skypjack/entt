@@ -25,6 +25,7 @@
             * [Multi component standard view](#multi-component-standard-view)
          * [Persistent View](#persistent-view)
          * [Give me everything](#give-me-everything)
+      * [Spaces](#spaces)
       * [Side notes](#side-notes)
    * [Crash Course: core functionalities](#crash-course-core-functionalities)
       * [Compile-time identifiers](#compile-time-identifiers)
@@ -76,7 +77,7 @@ Requests for feature, PR, suggestions ad feedback are highly appreciated.
 
 If you find you can help me and want to contribute to the `EnTT` framework with
 your experience or you do want to get part of the project for some other
-reason, feel free to contact me directly (you can find the mail in the
+reasons, feel free to contact me directly (you can find the mail in the
 [profile](https://github.com/skypjack)).<br/>
 I can't promise that each and every contribution will be accepted, but I can
 assure that I'll do my best to take them all seriously.
@@ -91,6 +92,7 @@ compile-time or at runtime).
 * An incredibly fast entity-component system based on sparse sets, with its own
 views and a _pay for what you use_ policy to adjust performance and memory usage
 according to the users' requirements.
+* Spaces, a nice and easy way to create partitions between entities.
 * Actor class for those who aren't confident with entity-component systems.
 * The smallest and most basic implementation of a service locator ever seen.
 * A cooperative scheduler for processes of any type.
@@ -175,8 +177,7 @@ case.<br/>
 In the end, I did it, but it wasn't much satisfying. Actually it wasn't
 satisfying at all. The fastest and nothing more, fairly little indeed. When I
 realized it, I tried hard to keep intact the great performance of `EnTT` and to
-add all the features I wanted to see in *my* entity-component system at the same
-time.
+add all the features I wanted to see in *my own library* at the same time.
 
 Today `EnTT` is finally what I was looking for: still faster than its
 _competitors_, lower memory usage in the average case, a really good API and an
@@ -194,21 +195,32 @@ Dell XPS 13 out of the mid 2014):
 | Create 1M entities | 0.0167s | **0.0046s** |
 | Destroy 1M entities | 0.0053s | **0.0022s** |
 | Standard view, 1M entities, one component | 0.0012s | **1.9e-07s** |
-| Standard view, 1M entities, two components | 0.0012s | **0.0010s** |
-| Standard view, 1M entities, two components<br/>Half of the entities have all the components | 0.0009s | **0.0006s** |
+| Standard view, 1M entities, two components | 0.0012s | **3.8e-07s** |
+| Standard view, 1M entities, two components<br/>Half of the entities have all the components | 0.0009s | **3.8e-07s** |
 | Standard view, 1M entities, two components<br/>One of the entities has all the components | 0.0008s | **1.0e-06s** |
 | Persistent view, 1M entities, two components | 0.0012s | **2.8e-07s** |
-| Standard view, 1M entities, five components | **0.0010s** | 0.0024s |
+| Standard view, 1M entities, five components | 0.0010s | **7.0e-07s** |
 | Persistent view, 1M entities, five components | 0.0010s | **2.8e-07s** |
-| Standard view, 1M entities, ten components | **0.0011s** | 0.0058s |
-| Standard view, 1M entities, ten components<br/>Half of the entities have all the components | **0.0010s** | 0.0032s |
-| Standard view, 1M entities, ten components<br/>One of the entities has all the components | 0.0008s | **1.7e-06s** |
+| Standard view, 1M entities, ten components | 0.0011s | **1.2e-06s** |
+| Standard view, 1M entities, ten components<br/>Half of the entities have all the components | 0.0010s | **1.2e-06s** |
+| Standard view, 1M entities, ten components<br/>One of the entities has all the components | 0.0008s | **1.2e-06s** |
 | Persistent view, 1M entities, ten components | 0.0011s | **3.0e-07s** |
 | Sort 150k entities, one component<br/>Arrays are in reverse order | - | **0.0036s** |
 | Sort 150k entities, enforce permutation<br/>Arrays are in reverse order | - | **0.0005s** |
 
 Note: The default version of `EntityX` (`master` branch) wasn't added to the
-comparison because it's already much slower than its compile-time counterpart.
+comparison because it's already much slower than its compile-time
+counterpart.
+
+Pretty interesting, aren't them? In fact, these benchmarks are the same used by
+`EntityX` to show _how good it is_. To be honest, they aren't so good and these
+results shouldn't be taken much seriously.<br/>
+The proposed entity-component system is incredibly fast to iterate entities and
+the compiler can make a lot of optimizations as long as components aren't used.
+Similarly, its extra level of indirection pulls in a lot of interesting features
+(as an example, it's possible to create/destroy entities and components during
+iterations) with the risk of slowing down everything if users do not use it
+carefully and choose the right tool (namely the best _view_) in each case.
 
 `EnTT` includes its own tests and benchmarks. See
 [benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp)
@@ -333,7 +345,7 @@ The `Registry` to store, the `View` to iterate. That's all.
 
 An entity (the _E_ of an _ECS_) is an opaque identifier that users should just
 use as-is and store around if needed. Do not try to inspect an entity
-identifier, its type can change in future and a registry offers all the
+identifier, its format can change in future and a registry offers all the
 functionalities to query them out-of-the-box. The underlying type of an entity
 (either `std::uint16_t`, `std::uint32_t` or `std::uint64_t`) can be specified
 when defining a registry (actually the `DefaultRegistry` is nothing more than a
@@ -652,6 +664,14 @@ In fact, there are two functions that respond to slightly different needs:
 
 ## View: to persist or not to persist?
 
+First of all, it is worth answering an obvious question: why views?<br/>
+Roughly speaking, they are a good tool to enforce single responsibility. A
+system that has access to a registry can create and destroy entities, as well as
+assign and remove components. On the other side, a system that has access to a
+view can only iterate entities and their components as well as modify their data
+members.<br/>
+It is a subtle difference that can help designing a better software sometimes.
+
 There are mainly two kinds of views: standard (also known as `View`) and
 persistent (also known as `PersistentView`).<br/>
 Both of them have pros and cons to take in consideration. In particular:
@@ -729,7 +749,7 @@ terms of performance in all the situation. This kind of views can access the
 underlying data structures directly and avoid superfluous checks.<br/>
 They offer a bunch of functionalities to get the number of entities they are
 going to return and a raw access to the entity list as well as to the component
-list.<br/>
+list. It's also possible to ask a view if it contains a given entity.<br/>
 Refer to the [official documentation](https://skypjack.github.io/entt/) for all
 the details.
 
@@ -774,7 +794,8 @@ set of candidates in order to speed up iterations.<br/>
 They offer fewer functionalities than their companion views for single
 component. In particular, a multi component standard view exposes utility
 functions to reset its internal state (optimization purposes) and to get the
-estimated number of entities it is going to return.<br/>
+estimated number of entities it is going to return. It's also possible to ask a
+view if it contains a given entity.<br/>
 Refer to the [official documentation](https://skypjack.github.io/entt/) for all
 the details.
 
@@ -850,7 +871,8 @@ immediately and does nothing.
 A persistent view offers a bunch of functionalities to get the number of
 entities it's going to return, a raw access to the entity list and the
 possibility to sort the underlying data structures according to the order of one
-of the components for which it has been constructed.<br/>
+of the components for which it has been constructed. It's also possible to ask a
+view if it contains a given entity.<br/>
 Refer to the [official documentation](https://skypjack.github.io/entt/) for all
 the details.
 
@@ -927,6 +949,119 @@ In general, all these functions can result in poor performance.<br/>
 `each` is fairly slow because of some checks it performs on each and every
 entity. For similar reasons, `orphans` can be even slower. Both functions should
 not be used frequently to avoid the risk of a performance hit.
+
+## Spaces
+
+Spaces are sort of partitions of a registry. They can be used to easily get a
+subset of the entities of a view or a registry without recurring to multiple
+registries to separate them explicitly.<br/>
+To learn more about their intended use,
+[here](https://gamedevelopment.tutsplus.com/tutorials/spaces-useful-game-object-containers--gamedev-14091)
+is an interesting article that goes deep into the topic.
+
+Spaces aren't for free. In most of the cases, the cost isn't relevant. However,
+keep in mind that they add an extra check during iterations and it could slow
+down a bit the whole thing.<br/>
+Alternatives to spaces exist, but they have their own problems:
+
+* Multiple registries: memory usage tends to grow up and some tasks are just
+  more difficult to accomplish (as an example, putting an entity logically in
+  more than one registry requires syncing them and it can quickly become a
+  problem).
+
+* Dedicated components: memory usage tends to grow up and the number of spaces
+  is fixed and defined at compile-time (at least, it ought to be for performance
+  reasons), moreover the solution is much more error-prone.
+
+Another benefit of spaces defined as an external class is that users of a space
+do not have access to the whole registry, thus separation of responsibility is
+automatically enforced. In both the alternatives described above, systems have
+access to the whole set of entities instead and can easily break the contract
+with the callers.
+
+The `EnTT` framework offers support to spaces out of the box. Spaces are
+constructed using a registry to which they refer:
+
+```cpp
+entt::DefaultRegistry registry;
+entt::Space<typename entt::DefaultRegistry::entity_type> space{registry};
+```
+
+They offer the classical set of member functions to know the estimated number of
+entities and to check if a space has a given entity.<br/>
+Refer to the [official documentation](https://skypjack.github.io/entt/) for all
+the details.
+
+In addition, they expose two member functions to create an entity through a
+space or to assign to a space an already existent entity, other than member
+functions to remove entities from a space:
+
+```cpp
+// creates an entity using a space
+auto entity = space.create();
+
+// assigns an already existent entity to a space
+space.assign(registry.create());
+
+// removes an entity from the given space
+space.remove(entity);
+
+// removes all the entities from a space
+space.reset();
+```
+
+Entities returned through the `create` member function are created directly into
+the underlying registry and assigned immediately to the space.<br/>
+Removing an entity from a space doesn't mean that it's destroyed within the
+underlying registry in any case.
+
+Spaces and thus the entities they contain can be easily iterated in a range-for
+loop:
+
+```cpp
+for(auto entity: space) {
+    // ...
+}
+```
+
+However, this isn't the best way to iterate entities in a space, mainly because
+this member function returns all the entities it contains, no matter what are
+their components. To iterate entities that have specific components, spaces
+expose two dedicated member functions that differ for the view they use under
+the hood:
+
+```cpp
+// uses a standard view internally
+space.view<AComponent, AnotherComponent>([](auto entity, auto &aComponent, auto &anotherComponent) {
+    // ...
+});
+
+// uses a persistent view internally
+space.persisten<AComponent, AnotherComponent>([](auto entity, auto &aComponent, auto &anotherComponent) {
+    // ...
+});
+```
+
+Spaces get rid of entities that are no longer in use during iterations. They
+aren't kept in sync with a registry each and every time an entity is destroyed
+so as to avoid penalties in terms of performance. Instead, spaces remove invalid
+entities as soon as they are detected during iterations.
+
+Because of the _lazy clean_ policy, the size of a space could grow up if
+destroyed entities are never detected for some reasons. To avoid it, spaces has
+a member function named `shrink` that forces a clean up and reduce the size to a
+minimum:
+
+```cpp
+// gets rid of all the invalid entities still tracked by a space
+space.shrink();
+```
+
+Note that the size of a space isn't a problem in terms of performance. Views
+rule during iterations, mainly because of the order which may have been imposed
+by the user for some reasons and must be respected. Therefore unused entities
+are never visited and thus they don't affect iterations. However, memory usage
+can be reduced by shrinking spaces every so often.
 
 ## Side notes
 
