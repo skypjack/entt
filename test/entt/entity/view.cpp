@@ -40,6 +40,20 @@ TEST(View, SingleComponent) {
     ASSERT_EQ(view.begin(), view.end());
 }
 
+TEST(View, SingleComponentContains) {
+    entt::DefaultRegistry registry;
+
+    auto e0 = registry.create<int>();
+    auto e1 = registry.create<int>();
+
+    registry.destroy(e0);
+
+    auto view = registry.view<int>();
+
+    ASSERT_FALSE(view.contains(e0));
+    ASSERT_TRUE(view.contains(e1));
+}
+
 TEST(View, SingleComponentEmpty) {
     entt::DefaultRegistry registry;
 
@@ -96,9 +110,9 @@ TEST(View, MultipleComponent) {
     ASSERT_EQ(view.begin()+1, view.end());
     ASSERT_EQ(view.size(), decltype(view.size()){1});
 
-    view.get<char>(e0) = '1';
-    view.get<char>(e1) = '2';
-    view.get<int>(e1) = 42;
+    registry.get<char>(e0) = '1';
+    registry.get<char>(e1) = '2';
+    registry.get<int>(e1) = 42;
 
     for(auto entity: view) {
         const auto &cview = static_cast<const decltype(view) &>(view);
@@ -112,6 +126,20 @@ TEST(View, MultipleComponent) {
     view.reset();
 
     ASSERT_EQ(view.begin(), view.end());
+}
+
+TEST(View, MultipleComponentContains) {
+    entt::DefaultRegistry registry;
+
+    auto e0 = registry.create<int, char>();
+    auto e1 = registry.create<int, char>();
+
+    registry.destroy(e0);
+
+    auto view = registry.view<int, char>();
+
+    ASSERT_FALSE(view.contains(e0));
+    ASSERT_TRUE(view.contains(e1));
 }
 
 TEST(View, MultipleComponentEmpty) {
@@ -170,9 +198,9 @@ TEST(PersistentView, Prepare) {
 
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
 
-    view.get<char>(e0) = '1';
-    view.get<char>(e1) = '2';
-    view.get<int>(e1) = 42;
+    registry.get<char>(e0) = '1';
+    registry.get<char>(e1) = '2';
+    registry.get<int>(e1) = 42;
 
     for(auto entity: view) {
         const auto &cview = static_cast<const decltype(view) &>(view);
@@ -211,9 +239,9 @@ TEST(PersistentView, NoPrepare) {
 
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
 
-    view.get<char>(e0) = '1';
-    view.get<char>(e1) = '2';
-    view.get<int>(e1) = 42;
+    registry.get<char>(e0) = '1';
+    registry.get<char>(e1) = '2';
+    registry.get<int>(e1) = 42;
 
     for(auto entity: view) {
         const auto &cview = static_cast<const decltype(view) &>(view);
@@ -228,6 +256,20 @@ TEST(PersistentView, NoPrepare) {
     registry.remove<char>(e1);
 
     ASSERT_EQ(view.begin(), view.end());
+}
+
+TEST(PersistentView, Contains) {
+    entt::DefaultRegistry registry;
+
+    auto e0 = registry.create<int, char>();
+    auto e1 = registry.create<int, char>();
+
+    registry.destroy(e0);
+
+    auto view = registry.persistent<int, char>();
+
+    ASSERT_FALSE(view.contains(e0));
+    ASSERT_TRUE(view.contains(e1));
 }
 
 TEST(PersistentView, Empty) {
