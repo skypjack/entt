@@ -92,8 +92,11 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_EQ(registry.current(e2), entt::DefaultRegistry::version_type{1});
 
     ASSERT_TRUE(registry.valid(e0));
+    ASSERT_TRUE(registry.fast(e0));
     ASSERT_TRUE(registry.valid(e1));
+    ASSERT_TRUE(registry.fast(e1));
     ASSERT_FALSE(registry.valid(e2));
+    ASSERT_FALSE(registry.fast(e2));
 
     ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{2});
     ASSERT_FALSE(registry.empty());
@@ -452,7 +455,7 @@ TEST(DefaultRegistry, ConstructWithComponents) {
 }
 
 TEST(DefaultRegistry, MergeTwoRegistries) {
-    using entity_type = typename entt::DefaultRegistry::entity_type;
+    using entity_type = entt::DefaultRegistry::entity_type;
 
     entt::DefaultRegistry src;
     entt::DefaultRegistry dst;
