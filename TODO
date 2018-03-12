@@ -6,4 +6,5 @@
 * blueprint registry - kind of factory to create entitites template for initialization (get rid of the extra versions of Registry::create)
 * raw view (affects sparse sets - custom iterator in derived one - and introduces a new kind of view): single component view to iterate components only instead of entities (in the right order!!)
   it should speed up systems like rendering or whatever requires a single component and isn't interested in the entity, for it avoids the double check of the get
+* review doc: separate it in multiple md/dox files, reduce the readme to a minimum and provide users with links to the online documentation on gh-pages
 * AOB
