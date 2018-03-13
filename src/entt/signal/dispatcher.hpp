@@ -181,7 +181,7 @@ public:
         const auto buf = buffer(mode);
         mode = !mode;
 
-        for(auto pos = wrappers.size(); pos > decltype(pos){0}; --pos) {
+        for(auto pos = wrappers.size(); pos; --pos) {
             auto &wrapper = wrappers[pos-1];
 
             if(wrapper) {

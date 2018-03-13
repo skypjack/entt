@@ -947,7 +947,7 @@ public:
     template<typename Func>
     void each(Func func) const {
         if(available) {
-            for(auto pos = entities.size(); pos > size_type{0}; --pos) {
+            for(auto pos = entities.size(); pos; --pos) {
                 const entity_type curr = pos - 1;
                 const auto entt = entities[curr] & traits_type::entity_mask;
 
@@ -956,7 +956,7 @@ public:
                 }
             }
         } else {
-            for(auto pos = entities.size(); pos > size_type{0}; --pos) {
+            for(auto pos = entities.size(); pos; --pos) {
                 func(entities[pos-1]);
             }
         }

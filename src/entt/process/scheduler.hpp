@@ -274,7 +274,7 @@ public:
     void update(Delta delta, void *data = nullptr) {
         bool clean = false;
 
-        for(auto pos = handlers.size(); pos > 0; --pos) {
+        for(auto pos = handlers.size(); pos; --pos) {
             auto &handler = handlers[pos-1];
             const bool dead = handler.update(handler, delta, data);
             clean = clean || dead;
