@@ -187,13 +187,13 @@ amazing set of features. And even more, of course.
 
 As it stands right now, `EnTT` is just fast enough for my requirements if
 compared to my first choice (it was already amazingly fast actually).<br/>
-Here is a comparison between the two (both of them compiled with GCC 7.3.0 on a
+Below is a comparison between the two (both of them compiled with GCC 7.3.0 on a
 Dell XPS 13 out of the mid 2014):
 
 | Benchmark | EntityX (compile-time) | EnTT |
 |-----------|-------------|-------------|
 | Create 1M entities | 0.0167s | **0.0046s** |
-| Destroy 1M entities | 0.0053s | **0.0022s** |
+| Destroy 1M entities | 0.0053s | **2.8e-06s** |
 | Standard view, 1M entities, one component | 0.0012s | **1.9e-07s** |
 | Standard view, 1M entities, two components | 0.0012s | **3.8e-07s** |
 | Standard view, 1M entities, two components<br/>Half of the entities have all the components | 0.0009s | **3.8e-07s** |
@@ -213,24 +213,21 @@ comparison because it's already much slower than its compile-time
 counterpart.
 
 Pretty interesting, aren't them? In fact, these benchmarks are the same used by
-`EntityX` to show _how good it is_. To be honest, they aren't so good and these
-results shouldn't be taken much seriously.<br/>
-The proposed entity-component system is incredibly fast to iterate entities and
-the compiler can make a lot of optimizations as long as components aren't used.
-Similarly, its extra level of indirection pulls in a lot of interesting features
-(as an example, it's possible to create/destroy entities and components during
-iterations) with the risk of slowing down everything if users do not use it
-carefully and choose the right tool (namely the best _view_) in each case.
+`EntityX` to show _how fast it is_. To be honest, they aren't so good and these
+results shouldn't be taken much seriously (they are completely unrealistic
+indeed).<br/>
+The proposed entity-component system is incredibly fast to iterate entities,
+this is a fact. The compiler can make a lot of optimizations because of how
+`EnTT` works, even more when components aren't used at all. This is exactly the
+case for these benchmarks.<br/>
+This is why they are completely wrong and cannot be used to evaluate any of the
+entity-component systems.
 
-`EnTT` includes its own tests and benchmarks. See
-[benchmark.cpp](https://github.com/skypjack/entt/blob/master/test/benchmark.cpp)
-for further details.<br/>
-On Github users can find also a
-[benchmark suite](https://github.com/abeimler/ecs_benchmark) that compares a
-bunch of different projects, one of which is `EnTT`.
+If you decide to use `EnTT`, choose it because of its API and its performance,
+not because there is a benchmark somewhere that makes it seem the fastest.
 
-Probably I'll try to get out of `EnTT` more features and better performance in
-the future, mainly for fun.<br/>
+Probably I'll try to get out of `EnTT` more features and even better performance
+in the future, mainly for fun.<br/>
 If you want to contribute and/or have any suggestion, feel free to make a PR or
 open an issue to discuss your idea.
 

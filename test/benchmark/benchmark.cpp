@@ -51,7 +51,7 @@ TEST(Benchmark, Destroy) {
     std::cout << "Destroying 1000000 entities" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        registry.create<int>();
+        registry.create();
     }
 
     Timer timer;
@@ -77,11 +77,11 @@ TEST(Benchmark, IterateCreateDeleteSingleComponent) {
             registry.create<Position>();
         }
 
-        for(auto entity: view) {
+        view.each([&registry](auto entity, auto &&...) {
             if(rand() % 2 == 0) {
                 registry.destroy(entity);
             }
-        }
+        });
     }
 
     timer.elapsed();
