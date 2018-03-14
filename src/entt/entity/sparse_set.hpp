@@ -379,7 +379,7 @@ public:
 
         pos_type pos = direct.size() - 1;
 
-        while(pos > 0 && from != to) {
+        while(pos && from != to) {
             if(has(*from)) {
                 if(*from != direct[pos]) {
                     swap(pos, get(*from));
@@ -692,7 +692,7 @@ public:
         pos_type pos = underlying_type::size() - 1;
         const auto *local = underlying_type::data();
 
-        while(pos > 0 && from != to) {
+        while(pos && from != to) {
             const auto curr = *from;
 
             if(underlying_type::has(curr)) {

@@ -169,7 +169,7 @@ public:
     void publish(Args... args) {
         std::vector<call_type> next;
 
-        for(auto pos = calls.size(); pos > size_type{0}; --pos) {
+        for(auto pos = calls.size(); pos; --pos) {
             auto &call = calls[pos-1];
 
             if((call.second)(call.first, args...)) {
