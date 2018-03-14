@@ -55,9 +55,9 @@ TEST(Benchmark, Destroy) {
 
     Timer timer;
 
-    for(auto entity: registry.view<int>()) {
+    registry.each([&registry](auto entity) {
         registry.destroy(entity);
-    }
+    });
 
     timer.elapsed();
 }
