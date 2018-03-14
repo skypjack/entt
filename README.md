@@ -91,7 +91,6 @@ compile-time or at runtime).
 * An incredibly fast entity-component system based on sparse sets, with its own
 views and a _pay for what you use_ policy to adjust performance and memory usage
 according to the users' requirements.
-* Spaces, a nice and easy way to create partitions between entities.
 * Actor class for those who aren't confident with entity-component systems.
 * The smallest and most basic implementation of a service locator ever seen.
 * A cooperative scheduler for processes of any type.
