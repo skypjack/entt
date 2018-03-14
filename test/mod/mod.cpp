@@ -22,7 +22,7 @@ struct DuktapeRuntime {
 template<typename Comp>
 duk_ret_t set(duk_context *ctx, entt::DefaultRegistry &registry) {
     const auto entity = duk_require_uint(ctx, 0);
-    registry.accomodate<Comp>(entity);
+    registry.accommodate<Comp>(entity);
     return 0;
 }
 
@@ -31,7 +31,7 @@ duk_ret_t set<Position>(duk_context *ctx, entt::DefaultRegistry &registry) {
     const auto entity = duk_require_uint(ctx, 0);
     const auto x = duk_require_number(ctx, 2);
     const auto y = duk_require_number(ctx, 3);
-    registry.accomodate<Position>(entity, x, y);
+    registry.accommodate<Position>(entity, x, y);
     return 0;
 }
 

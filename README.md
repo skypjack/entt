@@ -439,21 +439,21 @@ velocity.dy = 0.;
 ```
 
 In case users want to assign a component to an entity, but it's unknown whether
-the entity already has it or not, `accomodate` does the work in a single call
+the entity already has it or not, `accommodate` does the work in a single call
 (there is a performance penalty to pay for this mainly due to the fact that it
 has to check if the entity already has the given component or not):
 
 ```cpp
-registry.accomodate<Position>(entity, 0., 0.);
+registry.accommodate<Position>(entity, 0., 0.);
 
 // ...
 
-Velocity &velocity = registry.accomodate<Velocity>(entity);
+Velocity &velocity = registry.accommodate<Velocity>(entity);
 velocity.dx = 0.;
 velocity.dy = 0.;
 ```
 
-Note that `accomodate` is a sliglhty faster alternative for the following
+Note that `accommodate` is a slightly faster alternative for the following
 `if`/`else` statement and nothing more:
 
 ```cpp
@@ -1623,7 +1623,7 @@ There are two types of signal handlers in `EnTT`, internally called _managed_
 and _unmanaged_.<br/>
 They differ in the way they work around the tradeoff between performance, memory
 usage and safety. Managed listeners must be wrapped in an `std::shared_ptr` and
-the sink will take care of disconneting them whenever they die. Unmanaged
+the sink will take care of disconnecting them whenever they die. Unmanaged
 listeners can be any kind of objects and the client is in charge of connecting
 and disconnecting them from a sink to avoid crashes due to different lifetimes.
 
@@ -1998,7 +1998,7 @@ As an example:
 
 ```cpp
 dispatcher.trigger<AnEvent>(42);
-dispatcher.trigget<AnotherEvent>();
+dispatcher.trigger<AnotherEvent>();
 ```
 
 Listeners are invoked immediately, order of execution isn't guaranteed. This

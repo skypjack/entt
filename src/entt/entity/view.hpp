@@ -27,7 +27,7 @@ class Registry;
  *
  * A persistent view returns all the entities and only the entities that have
  * at least the given components. Moreover, it's guaranteed that the entity list
- * is thightly packed in memory for fast iterations.<br/>
+ * is tightly packed in memory for fast iterations.<br/>
  * In general, persistent views don't stay true to the order of any set of
  * components unless users explicitly sort them.
  *
@@ -710,7 +710,7 @@ private:
  *
  * Single component views are specialized in order to get a boost in terms of
  * performance. This kind of views can access the underlying data structure
- * directly and avoid superflous checks.<br/>
+ * directly and avoid superfluous checks.<br/>
  * Order of elements during iterations are highly dependent on the order of the
  * underlying data structure. See SparseSet and its specializations for more
  * details.

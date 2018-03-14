@@ -775,7 +775,7 @@ public:
      * }
      * @endcode
      *
-     * Prefer this function anyway because it has slighlty better
+     * Prefer this function anyway because it has slightly better
      * performance.
      *
      * @warning
@@ -790,7 +790,7 @@ public:
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    Component & accomodate(entity_type entity, Args &&... args) {
+    Component & accommodate(entity_type entity, Args &&... args) {
         assert(valid(entity));
         auto &cpool = ensure<Component>();
 
@@ -802,7 +802,7 @@ public:
     /**
      * @brief Sorts the pool of entities for the given component.
      *
-     * The order of the elements in a pool is highly affected by assignements
+     * The order of the elements in a pool is highly affected by assignments
      * of components to entities and deletions. Components are arranged to
      * maximize the performance during iterations and users should not make any
      * assumption on the order.<br/>
@@ -830,7 +830,7 @@ public:
     /**
      * @brief Sorts two pools of components in the same way.
      *
-     * The order of the elements in a pool is highly affected by assignements
+     * The order of the elements in a pool is highly affected by assignments
      * of components to entities and deletions. Components are arranged to
      * maximize the performance during iterations and users should not make any
      * assumption on the order.
@@ -1024,7 +1024,7 @@ public:
      * As a rule of thumb, storing a view should never be an option.
      *
      * Standard views do their best to iterate the smallest set of candidate
-     * entites. In particular:
+     * entities. In particular:
      *
      * * Single component views are incredibly fast and iterate a packed array
      * of entities, all of which has the given component.
@@ -1062,7 +1062,7 @@ public:
      * requested.<br/>
      * To avoid costly operations, internal data structures for persistent views
      * can be prepared with this function. Just use the same set of components
-     * that would have been used otherwise to contruct the view.
+     * that would have been used otherwise to construct the view.
      *
      * @tparam Component Types of components used to prepare the view.
      */
@@ -1121,7 +1121,7 @@ public:
      * initialization.<br/>
      * As a rule of thumb, storing a view should never be an option.
      *
-     * Persistent views are the right choice to iterate entites when the number
+     * Persistent views are the right choice to iterate entities when the number
      * of components grows up and the most of the entities have all the given
      * components.<br/>
      * However they have also drawbacks:

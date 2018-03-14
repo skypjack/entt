@@ -22,7 +22,7 @@ constexpr bool ref(const char (&str)[N]) {
 }
 
 TEST(HashedString, Constexprness) {
-    // how would you test a constepxr otherwise?
+    // how would you test a constexpr otherwise?
     static_assert(ptr("foo"), "!");
     static_assert(ref("bar"), "!");
     ASSERT_TRUE(true);

@@ -56,8 +56,8 @@ TEST(DefaultRegistry, Functionalities) {
 
     auto e2 = registry.create();
 
-    registry.accomodate<int>(e2, registry.get<int>(e0));
-    registry.accomodate<char>(e2, registry.get<char>(e0));
+    registry.accommodate<int>(e2, registry.get<int>(e0));
+    registry.accommodate<char>(e2, registry.get<char>(e0));
 
     ASSERT_TRUE(registry.has<int>(e2));
     ASSERT_TRUE(registry.has<char>(e2));
@@ -75,8 +75,8 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_NO_THROW(registry.replace<int>(e0, 0));
     ASSERT_EQ(registry.get<int>(e0), 0);
 
-    ASSERT_NO_THROW(registry.accomodate<int>(e0, 1));
-    ASSERT_NO_THROW(registry.accomodate<int>(e1, 1));
+    ASSERT_NO_THROW(registry.accommodate<int>(e0, 1));
+    ASSERT_NO_THROW(registry.accommodate<int>(e1, 1));
     ASSERT_EQ(static_cast<const entt::DefaultRegistry &>(registry).get<int>(e0), 1);
     ASSERT_EQ(static_cast<const entt::DefaultRegistry &>(registry).get<int>(e1), 1);
 
