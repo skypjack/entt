@@ -166,8 +166,8 @@ public:
      * Attempting to use an invalid component type results in a compilation
      * error. Attempting to use an entity that doesn't belong to the view
      * results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if
-     * the view doesn't contain the given entity.
+     * An assertion will abort the execution at runtime in debug mode if the
+     * view doesn't contain the given entity.
      *
      * @tparam Comp Type of the component to get.
      * @param entity A valid entity identifier.
@@ -182,15 +182,15 @@ public:
     /**
      * @brief Returns the component assigned to the given entity.
      *
-     * Prefer this function instead of `Registry::get` during iterations.
-     * It has far better performance than its companion function.
+     * Prefer this function instead of `Registry::get` during iterations. It has
+     * far better performance than its companion function.
      *
      * @warning
      * Attempting to use an invalid component type results in a compilation
      * error. Attempting to use an entity that doesn't belong to the view
      * results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if
-     * the view doesn't contain the given entity.
+     * An assertion will abort the execution at runtime in debug mode if the
+     * view doesn't contain the given entity.
      *
      * @tparam Comp Type of the component to get.
      * @param entity A valid entity identifier.
@@ -211,8 +211,8 @@ public:
      * Attempting to use invalid component types results in a compilation error.
      * Attempting to use an entity that doesn't belong to the view results in
      * undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if
-     * the view doesn't contain the given entity.
+     * An assertion will abort the execution at runtime in debug mode if the
+     * view doesn't contain the given entity.
      *
      * @tparam Comp Types of the components to get.
      * @param entity A valid entity identifier.
@@ -235,8 +235,8 @@ public:
      * Attempting to use invalid component types results in a compilation error.
      * Attempting to use an entity that doesn't belong to the view results in
      * undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if
-     * the view doesn't contain the given entity.
+     * An assertion will abort the execution at runtime in debug mode if the
+     * view doesn't contain the given entity.
      *
      * @tparam Comp Types of the components to get.
      * @param entity A valid entity identifier.
@@ -522,15 +522,15 @@ public:
     /**
      * @brief Returns the component assigned to the given entity.
      *
-     * Prefer this function instead of `Registry::get` during iterations.
-     * It has far better performance than its companion function.
+     * Prefer this function instead of `Registry::get` during iterations. It has
+     * far better performance than its companion function.
      *
      * @warning
      * Attempting to use an invalid component type results in a compilation
      * error. Attempting to use an entity that doesn't belong to the view
      * results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if
-     * the view doesn't contain the given entity.
+     * An assertion will abort the execution at runtime in debug mode if the
+     * view doesn't contain the given entity.
      *
      * @tparam Comp Type of the component to get.
      * @param entity A valid entity identifier.
@@ -552,8 +552,8 @@ public:
      * Attempting to use an invalid component type results in a compilation
      * error. Attempting to use an entity that doesn't belong to the view
      * results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if
-     * the view doesn't contain the given entity.
+     * An assertion will abort the execution at runtime in debug mode if the
+     * view doesn't contain the given entity.
      *
      * @tparam Comp Type of the component to get.
      * @param entity A valid entity identifier.
@@ -574,8 +574,8 @@ public:
      * Attempting to use invalid component types results in a compilation error.
      * Attempting to use an entity that doesn't belong to the view results in
      * undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if
-     * the view doesn't contain the given entity.
+     * An assertion will abort the execution at runtime in debug mode if the
+     * view doesn't contain the given entity.
      *
      * @tparam Comp Types of the components to get.
      * @param entity A valid entity identifier.
@@ -598,8 +598,8 @@ public:
      * Attempting to use invalid component types results in a compilation error.
      * Attempting to use an entity that doesn't belong to the view results in
      * undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if
-     * the view doesn't contain the given entity.
+     * An assertion will abort the execution at runtime in debug mode if the
+     * view doesn't contain the given entity.
      *
      * @tparam Comp Types of the components to get.
      * @param entity A valid entity identifier.

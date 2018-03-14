@@ -21,38 +21,37 @@ namespace entt {
  * * @code{.cpp}
  *   void update(Delta, void *);
  *   @endcode
- *   It's invoked once per tick until a process is explicitly aborted or it
- *   terminates either with or without errors. Even though it's not mandatory to
- *   declare this member function, as a rule of thumb each process should at
- *   least define it to work properly. The `void *` parameter is an opaque
- *   pointer to user data (if any) forwarded directly to the process during an
- *   update.
+ * It's invoked once per tick until a process is explicitly aborted or it
+ * terminates either with or without errors. Even though it's not mandatory to
+ * declare this member function, as a rule of thumb each process should at least
+ * define it to work properly. The `void *` parameter is an opaque pointer to
+ * user data (if any) forwarded directly to the process during an update.
  *
  * * @code{.cpp}
  *   void init(void *);
  *   @endcode
- *   It's invoked at the first tick, immediately before an update. The `void *`
- *   parameter is an opaque pointer to user data (if any) forwarded directly to
- *   the process during an update.
+ * It's invoked at the first tick, immediately before an update. The `void *`
+ * parameter is an opaque pointer to user data (if any) forwarded directly to
+ * the process during an update.
  *
  * * @code{.cpp}
  *   void succeeded();
  *   @endcode
- *   It's invoked in case of success, immediately after an update and during the
- *   same tick.
+ * It's invoked in case of success, immediately after an update and during the
+ * same tick.
  *
  * * @code{.cpp}
  *   void failed();
  *   @endcode
- *   It's invoked in case of errors, immediately after an update and during the
- *   same tick.
+ * It's invoked in case of errors, immediately after an update and during the
+ * same tick.
  *
  * * @code{.cpp}
  *   void aborted();
  *   @endcode
- *   It's invoked only if a process is explicitly aborted. There is no guarantee
- *   that it executes in the same tick, this depends solely on whether the
- *   process is aborted immediately or not.
+ * It's invoked only if a process is explicitly aborted. There is no guarantee
+ * that it executes in the same tick, this depends solely on whether the process
+ * is aborted immediately or not.
  *
  * Derived classes can change the internal state of a process by invoking the
  * `succeed` and `fail` protected member functions and even pause or unpause the
