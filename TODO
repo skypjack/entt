@@ -3,6 +3,7 @@
 * to analyze, long term feature: systems organizer based on dependency graphs for implicit parallelism (I don't want to think anymore in future :-))
 * save/restore functionalities - see #27
 * parent-child relationships between entities directly managed by the registry. is it possible to do that in a clean and safe way?
+* scene management (I prefer the concept of spaces, that is a kind of scene anyway)
 * blueprint registry - kind of factory to create entitites template for initialization (get rid of the extra versions of Registry::create)
 * raw view (affects sparse sets - custom iterator in derived one - and introduces a new kind of view): single component view to iterate components only instead of entities (in the right order!!)
   it should speed up systems like rendering or whatever requires a single component and isn't interested in the entity, for it avoids the double check of the get
