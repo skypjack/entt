@@ -775,7 +775,7 @@ public:
      * }
      * @endcode
      *
-     * Prefer this function anyway because it has slightlty better
+     * Prefer this function anyway because it has slightly better
      * performance.
      *
      * @warning
