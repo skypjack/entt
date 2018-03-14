@@ -66,7 +66,7 @@ struct Actor {
      */
     template<typename Component, typename... Args>
     Component & set(Args &&... args) {
-        return reg.template accomodate<Component>(entity, std::forward<Args>(args)...);
+        return reg.template accommodate<Component>(entity, std::forward<Args>(args)...);
     }
 
     /**

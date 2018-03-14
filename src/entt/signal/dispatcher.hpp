@@ -127,7 +127,7 @@ public:
      * automatically detected and unregistered if available.
      *
      * @warning
-     * Disonnecting a listener during an update may lead to unexpected behavior.
+     * Disconnecting a listener during an update may lead to unexpected behavior.
      * Unregister listeners before or after invoking the update if possible.
      *
      * @tparam Event Type of event from which to disconnect the function.

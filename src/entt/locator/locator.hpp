@@ -14,7 +14,7 @@ namespace entt {
  * @brief Service locator, nothing more.
  *
  * A service locator can be used to do what it promises: locate services.<br/>
- * Usually service locators are tighly bound to the services they expose and
+ * Usually service locators are tightly bound to the services they expose and
  * thus it's hard to define a general purpose class to do that. This template
  * based implementation tries to fill the gap and to get rid of the burden of
  * defining a different specific locator for each application.
