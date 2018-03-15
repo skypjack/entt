@@ -343,3 +343,64 @@ TEST(PersistentView, Sort) {
         ASSERT_EQ(view.get<int>(entity), ival++);
     }
 }
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+TEST(RawView, Functionalities) {
+    entt::DefaultRegistry registry;
+
+    auto e0 = registry.create();
+    auto e1 = registry.create<int, char>();
+
+    ASSERT_NO_THROW(registry.raw<char>().begin()++);
+    ASSERT_NO_THROW(++registry.raw<char>().begin());
+
+    auto view = registry.raw<char>();
+
+    ASSERT_NE(view.begin(), view.end());
+    ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
+
+    registry.assign<char>(e0);
+
+    ASSERT_EQ(view.size(), typename decltype(view)::size_type{2});
+
+    registry.get<char>(e0) = '1';
+    registry.get<char>(e1) = '2';
+
+    for(auto &&component: view) {
+        ASSERT_TRUE(component == '1' || component == '2');
+    }
+
+    ASSERT_EQ(*(view.data() + 0), e1);
+    ASSERT_EQ(*(view.data() + 1), e0);
+
+    ASSERT_EQ(*(view.raw() + 0), '2');
+    ASSERT_EQ(*(static_cast<const decltype(view) &>(view).raw() + 1), '1');
+
+    registry.remove<char>(e0);
+    registry.remove<char>(e1);
+
+    ASSERT_EQ(view.begin(), view.end());
+}
+
+TEST(RawView, Empty) {
+    entt::DefaultRegistry registry;
+
+    registry.create<char, double>();
+    registry.create<char>();
+
+    auto view = registry.raw<int>();
+
+    ASSERT_EQ(view.size(), entt::DefaultRegistry::size_type{0});
+
+    for(auto &&component: view) {
+        (void)component;
+        FAIL();
+    }
+}

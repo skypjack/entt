@@ -182,7 +182,7 @@ public:
      * always a valid range, even if the container is empty.
      *
      * @note
-     * There are no guarantees on the order, even though `sort` has been
+     * There are no guarantees on the order, even though `respect` has been
      * previously invoked. Internal data structures arrange elements to maximize
      * performance. Accessing them directly gives a performance boost but less
      * guarantees. Use `begin` and `end` if you want to iterate the sparse set
@@ -197,14 +197,14 @@ public:
     /**
      * @brief Returns an iterator to the beginning.
      *
-     * The returned iterator points to the first element of the internal packed
+     * The returned iterator points to the first entity of the internal packed
      * array. If the sparse set is empty, the returned iterator will be equal to
      * `end()`.
      *
      * @note
-     * Input iterators stay true to the order imposed by a call to `sort`.
+     * Input iterators stay true to the order imposed by a call to `respect`.
      *
-     * @return An iterator to the first element of the internal packed array.
+     * @return An iterator to the first entity of the internal packed array.
      */
     iterator_type begin() const noexcept {
         return Iterator{direct, direct.size()};
@@ -213,14 +213,14 @@ public:
     /**
      * @brief Returns an iterator to the end.
      *
-     * The returned iterator points to the element following the last element in
+     * The returned iterator points to the element following the last entity in
      * the internal packed array. Attempting to dereference the returned
      * iterator results in undefined behavior.
      *
      * @note
-     * Input iterators stay true to the order imposed by a call to `sort`.
+     * Input iterators stay true to the order imposed by a call to `respect`.
      *
-     * @return An iterator to the element following the last element of the
+     * @return An iterator to the element following the last entity of the
      * internal packed array.
      */
     iterator_type end() const noexcept {
@@ -364,12 +364,12 @@ public:
      * sets by using one of them as a master and the other one as a slave.
      *
      * Iterating the sparse set with a couple of iterators returns elements in
-     * the expected order after a call to `sort`. See `begin` and `end` for more
-     * details.
+     * the expected order after a call to `respect`. See `begin` and `end` for
+     * more details.
      *
      * @note
      * Attempting to iterate elements using the raw pointer returned by `data`
-     * gives no guarantees on the order, even though `sort` has been invoked.
+     * gives no guarantees on the order, even though `respect` has been invoked.
      *
      * @param other The sparse sets that imposes the order of the entities.
      */
@@ -432,6 +432,49 @@ template<typename Entity, typename Type>
 class SparseSet<Entity, Type>: public SparseSet<Entity> {
     using underlying_type = SparseSet<Entity>;
 
+    struct Iterator final {
+        using difference_type = std::size_t;
+        using value_type = Type;
+
+        Iterator(const std::vector<value_type> &instances, std::size_t pos)
+            : instances{instances}, pos{pos}
+        {}
+
+        Iterator & operator++() noexcept {
+            return --pos, *this;
+        }
+
+        Iterator operator++(int) noexcept {
+            Iterator orig = *this;
+            return ++(*this), orig;
+        }
+
+        Iterator & operator+=(difference_type value) noexcept {
+            pos -= value;
+            return *this;
+        }
+
+        Iterator operator+(difference_type value) noexcept {
+            return Iterator{instances, pos-value};
+        }
+
+        bool operator==(const Iterator &other) const noexcept {
+            return other.pos == pos;
+        }
+
+        bool operator!=(const Iterator &other) const noexcept {
+            return !(*this == other);
+        }
+
+        value_type operator*() const noexcept {
+            return instances[pos-1];
+        }
+
+    private:
+        const std::vector<value_type> &instances;
+        std::size_t pos;
+    };
+
 public:
     /*! @brief Type of the objects associated to the entities. */
     using object_type = Type;
@@ -442,7 +485,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = typename underlying_type::size_type;
     /*! @brief Input iterator type. */
-    using iterator_type = typename underlying_type::iterator_type;
+    using iterator_type = Iterator;
 
     /*! @brief Default constructor. */
     SparseSet() noexcept = default;
@@ -477,11 +520,11 @@ public:
      * always a valid range, even if the container is empty.
      *
      * @note
-     * There are no guarantees on the order, even though `sort` has been
-     * previously invoked. Internal data structures arrange elements to maximize
-     * performance. Accessing them directly gives a performance boost but less
-     * guarantees. Use `begin` and `end` if you want to iterate the sparse set
-     * in the expected order.
+     * There are no guarantees on the order, even though either `sort` or
+     * `respect` has been previously invoked. Internal data structures arrange
+     * elements to maximize performance. Accessing them directly gives a
+     * performance boost but less guarantees. Use `begin` and `end` if you want
+     * to iterate the sparse set in the expected order.
      *
      * @return A pointer to the array of objects.
      */
@@ -496,16 +539,50 @@ public:
      * always a valid range, even if the container is empty.
      *
      * @note
-     * There are no guarantees on the order, even though `sort` has been
-     * previously invoked. Internal data structures arrange elements to maximize
-     * performance. Accessing them directly gives a performance boost but less
-     * guarantees. Use `begin` and `end` if you want to iterate the sparse set
-     * in the expected order.
+     * There are no guarantees on the order, even though either `sort` or
+     * `respect` has been previously invoked. Internal data structures arrange
+     * elements to maximize performance. Accessing them directly gives a
+     * performance boost but less guarantees. Use `begin` and `end` if you want
+     * to iterate the sparse set in the expected order.
      *
      * @return A pointer to the array of objects.
      */
     object_type * raw() noexcept {
         return instances.data();
+    }
+
+    /**
+     * @brief Returns an iterator to the beginning.
+     *
+     * The returned iterator points to the first instance of the given type. If
+     * the sparse set is empty, the returned iterator will be equal to `end()`.
+     *
+     * @note
+     * Input iterators stay true to the order imposed by a call to either `sort`
+     * or `respect`.
+     *
+     * @return An iterator to the first instance of the given type.
+     */
+    iterator_type begin() const noexcept {
+        return Iterator{instances, instances.size()};
+    }
+
+    /**
+     * @brief Returns an iterator to the end.
+     *
+     * The returned iterator points to the element following the last instance
+     * of the given type. Attempting to dereference the returned iterator
+     * results in undefined behavior.
+     *
+     * @note
+     * Input iterators stay true to the order imposed by a call to either `sort`
+     * or `respect`.
+     *
+     * @return An iterator to the element following the last instance of the
+     * given type.
+     */
+    iterator_type end() const noexcept {
+        return Iterator{instances, 0};
     }
 
     /**
@@ -632,8 +709,9 @@ public:
      * @endcode
      *
      * @note
-     * Attempting to iterate elements using the raw pointer returned by `data`
-     * gives no guarantees on the order, even though `sort` has been invoked.
+     * Attempting to iterate elements using a raw pointer returned by a call to
+     * either `data` or `raw` gives no guarantees on the order, even though
+     * `sort` has been invoked.
      *
      * @tparam Compare Type of comparison function object.
      * @param compare A valid comparison function object.
@@ -676,12 +754,13 @@ public:
      * sets by using one of them as a master and the other one as a slave.
      *
      * Iterating the sparse set with a couple of iterators returns elements in
-     * the expected order after a call to `sort`. See `begin` and `end` for more
-     * details.
+     * the expected order after a call to `respect`. See `begin` and `end` for
+     * more details.
      *
      * @note
-     * Attempting to iterate elements using the raw pointer returned by `data`
-     * gives no guarantees on the order, even though `sort` has been invoked.
+     * Attempting to iterate elements using a raw pointer returned by a call to
+     * either `data` or `raw` gives no guarantees on the order, even though
+     * `respect` has been invoked.
      *
      * @param other The sparse sets that imposes the order of the entities.
      */

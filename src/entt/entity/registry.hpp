@@ -848,9 +848,9 @@ public:
      * the following rules:
      *
      * * All the entities in `A` that are also in `B` are returned first
-     * according to the order they have in `B`.
+     *   according to the order they have in `B`.
      * * All the entities in `A` that are not in `B` are returned in no
-     * particular order after all the other entities.
+     *   particular order after all the other entities.
      *
      * Any subsequent change to `B` won't affect the order in `A`.
      *
@@ -1027,10 +1027,10 @@ public:
      * entities. In particular:
      *
      * * Single component views are incredibly fast and iterate a packed array
-     * of entities, all of which has the given component.
+     *   of entities, all of which has the given component.
      * * Multi component views look at the number of entities available for each
-     * component and pick up a reference to the smallest set of candidates to
-     * test for the given components.
+     *   component and pick up a reference to the smallest set of candidates to
+     *   test for the given components.
      *
      * @note
      * Multi component views are pretty fast. However their performance tend to
@@ -1041,6 +1041,7 @@ public:
      * @see View
      * @see View<Entity, Component>
      * @see PersistentView
+     * @see RawView
      *
      * @tparam Component Type of components used to construct the view.
      * @return A newly created standard view.
@@ -1127,10 +1128,10 @@ public:
      * However they have also drawbacks:
      *
      * * Each kind of persistent view requires a dedicated data structure that
-     * is allocated within the registry and it increases memory pressure.
+     *   is allocated within the registry and it increases memory pressure.
      * * Internal data structures used to construct persistent views must be
-     * kept updated and it affects slightly construction and destruction of
-     * entities and components.
+     *   kept updated and it affects slightly construction and destruction of
+     *   entities and components.
      *
      * That being said, persistent views are an incredibly powerful tool if used
      * with care and offer a boost of performance undoubtedly.
@@ -1144,6 +1145,7 @@ public:
      * @see View
      * @see View<Entity, Component>
      * @see PersistentView
+     * @see RawView
      *
      * @tparam Component Types of components used to construct the view.
      * @return A newly created persistent view.
@@ -1153,6 +1155,34 @@ public:
         // after the calls to handler, pools have already been created
         return PersistentView<Entity, Component...>{handler<Component...>(), pool<Component>()...};
     }
+
+    /**
+     * @brief Returns a raw view for the given component.
+     *
+     * This kind of views are created on the fly and share with the registry its
+     * internal data structures.<br/>
+     * Feel free to discard a view after the use. Creating and destroying a view
+     * is an incredibly cheap operation because they do not require any type of
+     * initialization.<br/>
+     * As a rule of thumb, storing a view should never be an option.
+     *
+     * Raw views are incredibly fast and must be considered the best tool to
+     * iterate components whenever knowing the entities to which they belong
+     * isn't required.
+     *
+     * @see View
+     * @see View<Entity, Component>
+     * @see PersistentView
+     * @see RawView
+     *
+     * @tparam Component Type of component used to construct the view.
+     * @return A newly created raw view.
+     */
+    template<typename Component>
+    RawView<Entity, Component> raw() {
+        return RawView<Entity, Component>{ensure<Component>()};
+    }
+
 
 private:
     std::vector<std::unique_ptr<SparseSet<Entity>>> handlers;

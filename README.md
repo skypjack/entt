@@ -7,43 +7,44 @@
 
 # Table of Contents
 
-   * [Introduction](#introduction)
-   * [Build Instructions](#build-instructions)
-   * [Crash Course: entity-component system](#crash-course-entity-component-system)
-      * [Design choices](#design-choices)
-         * [A bitset-free entity-component system](#a-bitset-free-entity-component-system)
-         * [Pay per use](#pay-per-use)
-      * [Vademecum](#vademecum)
-      * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
-         * [Single instance components](#single-instance-components)
-         * [Runtime components](#runtime-components)
-            * [A journey through a plugin](#a-journey-through-a-plugin)
-         * [Sorting: is it possible?](#sorting-is-it-possible)
-      * [View: to persist or not to persist?](#view-to-persist-or-not-to-persist)
-         * [Standard View](#standard-view)
-            * [Single component standard view](#single-component-standard-view)
-            * [Multi component standard view](#multi-component-standard-view)
-         * [Persistent View](#persistent-view)
-         * [Give me everything](#give-me-everything)
-      * [Side notes](#side-notes)
-   * [Crash Course: core functionalities](#crash-course-core-functionalities)
-      * [Compile-time identifiers](#compile-time-identifiers)
-      * [Runtime identifiers](#runtime-identifiers)
-      * [Hashed strings](#hashed-strings)
-   * [Crash Course: service locator](#crash-course-service-locator)
-   * [Crash Course: cooperative scheduler](#crash-course-cooperative-scheduler)
-      * [The process](#the-process)
-      * [The scheduler](#the-scheduler)
-   * [Crash Course: resource management](#crash-course-resource-management)
-      * [The resource, the loader and the cache](#the-resource-the-loader-and-the-cache)
-   * [Crash Course: events, signals and everything in between](#crash-course-events-signals-and-everything-in-between)
-      * [Signals](#signals)
-      * [Compile-time event bus](#compile-time-event-bus)
-      * [Delegate](#delegate)
-      * [Event dispatcher](#event-dispatcher)
-      * [Event emitter](#event-emitter)
-   * [License](#license)
-   * [Support](#support)
+* [Introduction](#introduction)
+* [Build Instructions](#build-instructions)
+* [Crash Course: entity-component system](#crash-course-entity-component-system)
+   * [Design choices](#design-choices)
+      * [A bitset-free entity-component system](#a-bitset-free-entity-component-system)
+      * [Pay per use](#pay-per-use)
+   * [Vademecum](#vademecum)
+   * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
+      * [Single instance components](#single-instance-components)
+      * [Runtime components](#runtime-components)
+         * [A journey through a plugin](#a-journey-through-a-plugin)
+      * [Sorting: is it possible?](#sorting-is-it-possible)
+   * [View: to persist or not to persist?](#view-to-persist-or-not-to-persist)
+      * [Standard View](#standard-view)
+         * [Single component standard view](#single-component-standard-view)
+         * [Multi component standard view](#multi-component-standard-view)
+      * [Persistent View](#persistent-view)
+      * [Raw View](#raw-view)
+      * [Give me everything](#give-me-everything)
+   * [Side notes](#side-notes)
+* [Crash Course: core functionalities](#crash-course-core-functionalities)
+   * [Compile-time identifiers](#compile-time-identifiers)
+   * [Runtime identifiers](#runtime-identifiers)
+   * [Hashed strings](#hashed-strings)
+* [Crash Course: service locator](#crash-course-service-locator)
+* [Crash Course: cooperative scheduler](#crash-course-cooperative-scheduler)
+   * [The process](#the-process)
+   * [The scheduler](#the-scheduler)
+* [Crash Course: resource management](#crash-course-resource-management)
+   * [The resource, the loader and the cache](#the-resource-the-loader-and-the-cache)
+* [Crash Course: events, signals and everything in between](#crash-course-events-signals-and-everything-in-between)
+   * [Signals](#signals)
+   * [Compile-time event bus](#compile-time-event-bus)
+   * [Delegate](#delegate)
+   * [Event dispatcher](#event-dispatcher)
+   * [Event emitter](#event-emitter)
+* [License](#license)
+* [Support](#support)
 
 # Introduction
 
@@ -57,8 +58,8 @@ that is used mostly in game development. For further details:
 * [ECS on Wikipedia](https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system)
 
 A long time ago, the sole entity-component system was part of the project. After
-a while the codebase has grown and more and more classes have become part
-of the repository.<br/>
+a while the codebase has grown and more and more classes have become part of the
+repository.<br/>
 That's why today it's called _the EnTT Framework_.
 
 Currently, `EnTT` is tested on Linux, Microsoft Windows and OS X. It has proven
@@ -86,11 +87,11 @@ assure that I'll do my best to take them all seriously.
 Here is a brief list of what it offers today:
 
 * Statically generated integer identifiers for types (assigned either at
-compile-time or at runtime).
+  compile-time or at runtime).
 * A constexpr utility for human readable resource identifiers.
 * An incredibly fast entity-component system based on sparse sets, with its own
-views and a _pay for what you use_ policy to adjust performance and memory usage
-according to the users' requirements.
+  views and a _pay for what you use_ policy to adjust performance and memory
+  usage according to the users' requirements.
 * Actor class for those who aren't confident with entity-component systems.
 * The smallest and most basic implementation of a service locator ever seen.
 * A cooperative scheduler for processes of any type.
@@ -103,8 +104,8 @@ according to the users' requirements.
 
 Consider it a work in progress. For more details and an updated list, please
 refer to the [online documentation](https://skypjack.github.io/entt/). It
-probably contains much more. Moreover, the whole API is fully documented
-in-code for those who are brave enough to read it.<br/>
+probably contains much more. Moreover, the whole API is fully documented in-code
+for those who are brave enough to read it.<br/>
 Continue reading to know how the different parts of the project work or follow
 the link above to take a look at the API reference.
 
@@ -203,12 +204,12 @@ Dell XPS 13 out of the mid 2014):
 | Standard view, 1M entities, ten components<br/>Half of the entities have all the components | 0.0010s | **1.2e-06s** |
 | Standard view, 1M entities, ten components<br/>One of the entities has all the components | 0.0008s | **1.2e-06s** |
 | Persistent view, 1M entities, ten components | 0.0011s | **3.0e-07s** |
+| Raw view, 1M entities | - | **2.2e-07s** |
 | Sort 150k entities, one component<br/>Arrays are in reverse order | - | **0.0036s** |
 | Sort 150k entities, enforce permutation<br/>Arrays are in reverse order | - | **0.0005s** |
 
 Note: The default version of `EntityX` (`master` branch) wasn't added to the
-comparison because it's already much slower than its compile-time
-counterpart.
+comparison because it's already much slower than its compile-time counterpart.
 
 Pretty interesting, aren't them? In fact, these benchmarks are the same used by
 `EntityX` to show _how fast it is_. To be honest, they aren't so good and these
@@ -336,7 +337,7 @@ many others besides me.
 
 ## Vademecum
 
-The `Registry` to store, the `View` to iterate. That's all.
+The `Registry` to store, the views to iterate. That's all.
 
 An entity (the _E_ of an _ECS_) is an opaque identifier that users should just
 use as-is and store around if needed. Do not try to inspect an entity
@@ -352,10 +353,9 @@ and move assignable. They are list initialized by using the parameters provided
 to construct the component itself. No need to register components or their types
 neither with the registry nor with the entity-component system at all.<br/>
 Systems (the _S_ of an _ECS_) are just plain functions, functors, lambdas or
-whatever the users want. They can accept a `Registry`, a `View` or a
-`PersistentView` and use them the way they prefer. No need to register systems
-or their types neither with the registry nor with the entity-component system at
-all.
+whatever the users want. They can accept a `Registry` or a view of any type and
+use them the way they prefer. No need to register systems or their types neither
+with the registry nor with the entity-component system at all.
 
 The following sections will explain in short how to use the entity-component
 system, the core part of the whole framework.<br/>
@@ -491,14 +491,14 @@ registry.reset<Position>(entity);
 There exist also two other _versions_ of the `reset` member function:
 
 * If no entity is passed to it, `reset` will remove the given component from
-each entity that has it:
+  each entity that has it:
 
   ```cpp
   registry.reset<Position>();
   ```
 
 * If neither the entity nor the component are specified, all the entities still
-in use and their components are destroyed:
+  in use and their components are destroyed:
 
   ```cpp
   registry.reset();
@@ -663,60 +663,74 @@ First of all, it is worth answering an obvious question: why views?<br/>
 Roughly speaking, they are a good tool to enforce single responsibility. A
 system that has access to a registry can create and destroy entities, as well as
 assign and remove components. On the other side, a system that has access to a
-view can only iterate entities and their components as well as modify their data
-members.<br/>
+view can only iterate entities and their components, then read or update the
+data members of the latter.<br/>
 It is a subtle difference that can help designing a better software sometimes.
 
-There are mainly two kinds of views: standard (also known as `View`) and
-persistent (also known as `PersistentView`).<br/>
-Both of them have pros and cons to take in consideration. In particular:
+There are mainly three kinds of views: standard (also known as `View`),
+persistent (also known as `PersistentView`) and raw (also known as
+`RawView`).<br/>
+All of them have pros and cons to take in consideration. In particular:
 
 * Standard views:
 
   Pros:
-  * They work out-of-the-box and don't require any dedicated data
-    structure.
-  * Creating and destroying them isn't expensive at all because they don't
-    have any type of initialization.
-  * They are the best tool to iterate single components.
-  * They are the best tool to iterate multiple components at once when one of
-    the components is assigned to a significantly low number of entities.
+  * They work out-of-the-box and don't require any dedicated data structure.
+  * Creating and destroying them isn't expensive at all because they don't have
+    any type of initialization.
+  * They are the best tool for iterating entities for a single component.
+  * They are the best tool for iterating entities for multiple components when
+    one of the components is assigned to a significantly low number of entities.
   * They don't affect any other operations of the registry.
 
   Cons:
-  * Their performance tend to degenerate when the number of components
-    to iterate grows up and the most of the entities have all of them.
+  * Their performance tend to degenerate when the number of components to
+    iterate grows up and the most of the entities have all of them.
 
 * Persistent views:
 
   Pros:
-  * Once prepared, creating and destroying them isn't expensive at all
-    because they don't have any type of initialization.
-  * They are the best tool to iterate multiple components at once when
-    the most of the entities have all of them.
+  * Once prepared, creating and destroying them isn't expensive at all because
+    they don't have any type of initialization.
+  * They are the best tool for iterating entities for mmultiple components and
+    most entities have them all.
 
   Cons:
-    * They have dedicated data structures and thus affect the memory usage to a
-      minimal extent.
-    * If not previously prepared, the first time they are used they go
-      through an initialization step that could take a while.
-    * They affect to a minimum the creation and destruction of entities and
-      components. In other terms: the more persistent views there will be,
-      the less performing will be creating and destroying entities and
-      components.
+  * They have dedicated data structures and thus affect the memory usage to a
+    minimal extent.
+  * If not previously prepared, the first time they are used they go through an
+    initialization step that could take a while.
+  * They affect to a minimum the creation and destruction of entities and
+    components. In other terms: the more persistent views there will be, the
+    less performing will be creating and destroying entities and components.
 
-To sum up and as a rule of thumb, use a standard view:
-* To iterate entities for a single component.
-* To iterate entities for multiple components when a significantly low
-  number of entities have one of the components.
-* In all those cases where a persistent view would give a boost to
-  performance but the iteration isn't performed frequently.
+* Raw views:
 
-Use a persistent view in all the other cases.
+  Pros:
+  * They work out-of-the-box and don't require any dedicated data structure.
+  * Creating and destroying them isn't expensive at all because they don't have
+    any type of initialization.
+  * They are the best tool for iterating components when it is not necessary to
+    know which entities they belong to.
+  * They don't affect any other operations of the registry.
 
-To easily iterate entities, all the views offer the common `begin` and `end`
-member functions that allow users to use a view in a typical range-for
-loop.<br/>
+  Cons:
+  * They can be used to iterate only one type of component at a time.
+  * They don't return the entity to which a component belongs to the caller.
+
+To sum up and as a rule of thumb:
+* Use a raw view to iterate components only (no entities) for a given type.
+* Use a standard view to iterate entities for a single component.
+* Use a standard view to iterate entities for multiple components when a
+  significantly low number of entities have one of the components.
+* Use a standard view in all those cases where a persistent view would give a
+  boost to performance but the iteration isn't performed frequently.
+* Prepare and use a persistent view in all the other cases.
+
+To easily iterate entities and components, all the views offer the common
+`begin` and `end` member functions that allow users to use a view in a typical
+range-for loop. Almost all the views offer also a *more functional* `each`
+member function that accepts a callback for convenience.<br/>
 Continue reading for more details or refer to the
 [official documentation](https://skypjack.github.io/entt/).
 
@@ -749,9 +763,9 @@ Refer to the [official documentation](https://skypjack.github.io/entt/) for all
 the details.
 
 There is no need to store views around for they are extremely cheap to
-construct, even though they can be copied without problems and reused
-freely. In fact, they return newly created and correctly initialized iterators
-whenever `begin` or `end` are invoked.<br/>
+construct, even though they can be copied without problems and reused freely. In
+fact, they return newly created and correctly initialized iterators whenever
+`begin` or `end` are invoked.<br/>
 To iterate a single component standard view, either use it in range-for loop:
 
 ```cpp
@@ -783,8 +797,8 @@ mind that it works only with the components of the view itself.
 #### Multi component standard view
 
 Multi component standard views iterate entities that have at least all the given
-components in their bags. During construction, these views look at the number
-of entities available for each component and pick up a reference to the smallest
+components in their bags. During construction, these views look at the number of
+entities available for each component and pick up a reference to the smallest
 set of candidates in order to speed up iterations.<br/>
 They offer fewer functionalities than their companion views for single
 component. In particular, a multi component standard view exposes utility
@@ -795,9 +809,9 @@ Refer to the [official documentation](https://skypjack.github.io/entt/) for all
 the details.
 
 There is no need to store views around for they are extremely cheap to
-construct, even though they can be copied without problems and reused
-freely. In fact, they return newly created and correctly initialized iterators
-whenever `begin` or `end` are invoked.<br/>
+construct, even though they can be copied without problems and reused freely. In
+fact, they return newly created and correctly initialized iterators whenever
+`begin` or `end` are invoked.<br/>
 To iterate a multi component standard view, either use it in range-for loop:
 
 ```cpp
@@ -847,9 +861,9 @@ auto view = registry.persistent<Position, Velocity>();
 ```
 
 There is no need to store views around for they are extremely cheap to
-construct, even though they can be copied without problems and reused
-freely. In fact, they return newly created and correctly initialized iterators
-whenever `begin` or `end` are invoked.<br/>
+construct, even though they can be copied without problems and reused freely. In
+fact, they return newly created and correctly initialized iterators whenever
+`begin` or `end` are invoked.<br/>
 That being said, persistent views perform an initialization step the very first
 time they are constructed and this could be quite costly. To avoid it, consider
 asking to the registry to _prepare_ them when no entities have been created yet:
@@ -903,6 +917,35 @@ whether all the components have to be accessed or not.
 **Note**: prefer the `get` member function of a view instead of the `get` member
 function template of a registry during iterations, if possible. However, keep in
 mind that it works only with the components of the view itself.
+
+### Raw View
+
+Raw views return all the components of a given type. This kind of views can
+access components directly and avoid extra indirections as if components were
+accessed via an entity identifier.<br/>
+They offer a bunch of functionalities to get the number of instances they are
+going to return and a raw access to the entity list as well as to the component
+list.<br/>
+Refer to the [official documentation](https://skypjack.github.io/entt/) for all
+the details.
+
+There is no need to store views around for they are extremely cheap to
+construct, even though they can be copied without problems and reused freely. In
+fact, they return newly created and correctly initialized iterators whenever
+`begin` or `end` are invoked.<br/>
+To iterate a raw view, use it in range-for loop:
+
+```cpp
+auto view = registry.raw<Renderable>();
+
+for(auto &&component: raw) {
+    // ...
+}
+```
+
+**Note**: raw views don't have the `each` nor the `get` member function for
+obvious reasons. The former would only return the components and therefore it
+would be redundant, the latter isn't required at all.
 
 ### Give me everything
 

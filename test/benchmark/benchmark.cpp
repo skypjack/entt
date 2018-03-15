@@ -76,11 +76,14 @@ TEST(Benchmark, IterateCreateDeleteSingleComponent) {
             registry.create<Position>();
         }
 
-        view.each([&registry](auto entity, auto &&...) {
+        for(auto entity: view) {
+            const auto &position = view.get(entity);
+            (void)position;
+
             if(rand() % 2 == 0) {
                 registry.destroy(entity);
             }
-        });
+        };
     }
 
     timer.elapsed();
@@ -97,6 +100,22 @@ TEST(Benchmark, IterateSingleComponent1M) {
 
     Timer timer;
     registry.view<Position>().each([](auto, auto &) {});
+    timer.elapsed();
+}
+
+TEST(Benchmark, IterateSingleComponentRaw1M) {
+    entt::DefaultRegistry registry;
+
+    std::cout << "Iterating over 1000000 entities, one component, raw view" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        registry.create<Position>();
+    }
+
+    Timer timer;
+    for(auto &&component: registry.raw<Position>()) {
+        (void)component;
+    }
     timer.elapsed();
 }
 
