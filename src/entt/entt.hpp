@@ -17,3 +17,4 @@
 #include "signal/emitter.hpp"
 #include "signal/sigh.hpp"
 #include "signal/signal.hpp"
+#include "signal/dispatcher.hpp"
