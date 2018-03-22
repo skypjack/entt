@@ -14,6 +14,7 @@
 #include "resource/loader.hpp"
 #include "signal/bus.hpp"
 #include "signal/delegate.hpp"
+#include "signal/dispatcher.hpp"
 #include "signal/emitter.hpp"
 #include "signal/sigh.hpp"
 #include "signal/signal.hpp"
