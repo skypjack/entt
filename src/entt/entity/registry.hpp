@@ -13,6 +13,7 @@
 #include <type_traits>
 #include "../core/family.hpp"
 #include "entt_traits.hpp"
+#include "snapshot.hpp"
 #include "sparse_set.hpp"
 #include "view.hpp"
 
@@ -949,10 +950,11 @@ public:
         if(available) {
             for(auto pos = entities.size(); pos; --pos) {
                 const entity_type curr = pos - 1;
-                const auto entt = entities[curr] & traits_type::entity_mask;
+                const auto entity = entities[curr];
+                const auto entt = entity & traits_type::entity_mask;
 
                 if(curr == entt) {
-                    func(entities[curr]);
+                    func(entity);
                 }
             }
         } else {
@@ -1183,6 +1185,77 @@ public:
         return RawView<Entity, Component>{ensure<Component>()};
     }
 
+    /**
+     * @brief Returns a temporary object to use to create snapshots.
+     *
+     * A snapshot is either a full or a partial dump of a registry.<br/>
+     * It can be used to save and restore its internal state or to keep two or
+     * more instances of this class in sync, as an example in a client-server
+     * architecture.
+     *
+     * @return A not movable and not copyable object to use to take snasphosts.
+     */
+    Snapshot<Entity> snapshot() const {
+        using follow_fn_type = entity_type(*)(const Registry &, entity_type);
+        using raw_fn_type = const entity_type *(*)(const Registry &, component_type);
+        const entity_type seed = available ? (next | (entities[next] & ~traits_type::entity_mask)) : next;
+
+        follow_fn_type follow = [](const Registry &registry, entity_type entity) -> entity_type {
+            const auto &entities = registry.entities;
+            const auto entt = entity & traits_type::entity_mask;
+            const auto next = entities[entt] & traits_type::entity_mask;
+            return (next | (entities[next] & ~traits_type::entity_mask));
+        };
+
+        raw_fn_type raw = [](const Registry &registry, component_type component) -> const entity_type * {
+            const auto &pools = registry.pools;
+            return (component < pools.size() && pools[component]) ? pools[component]->data() : nullptr;
+        };
+
+        return { *this, seed, available, follow, raw };
+    }
+
+    /**
+     * @brief Returns a temporary object to use to load snapshots.
+     *
+     * A snapshot is either a full or a partial dump of a registry.<br/>
+     * It can be used to save and restore its internal state or to keep two or
+     * more instances of this class in sync, as an example in a client-server
+     * architecture.
+     *
+     * @warning
+     * The loader returned by this function requires that the registry be empty.
+     * In case it isn't, all the data will be automatically deleted before to
+     * return.
+     *
+     * @return A not movable and not copyable object to use to load snasphosts.
+     */
+    SnapshotLoader<Entity> restore() {
+        using ensure_fn_type = void(*)(Registry &, entity_type, bool);
+
+        ensure_fn_type ensure = [](Registry &registry, entity_type entity, bool destroyed) {
+            using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
+            // explicit promotion to avoid warnings with std::uint16_t
+            const auto entt = promotion_type{entity} & traits_type::entity_mask;
+            auto &entities = registry.entities;
+
+            if(!(entt < entities.size())) {
+                auto curr = entities.size();
+                entities.resize(entt + 1);
+                std::iota(entities.data() + curr, entities.data() + entt, entity_type(curr));
+            }
+
+            entities[entt] = entity;
+
+            if(destroyed) {
+                registry.destroy(entity);
+                const auto version = (entity & (~traits_type::entity_mask));
+                entities[entt] = ((entities[entt] & traits_type::entity_mask) | version);
+            }
+        };
+
+        return { (*this = {}), ensure };
+    }
 
 private:
     std::vector<std::unique_ptr<SparseSet<Entity>>> handlers;

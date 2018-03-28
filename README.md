@@ -19,6 +19,10 @@
       * [Runtime components](#runtime-components)
          * [A journey through a plugin](#a-journey-through-a-plugin)
       * [Sorting: is it possible?](#sorting-is-it-possible)
+      * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
+         * [Snapshot loader](#snapshot-loader)
+         * [Continuous loader](#continuous-loader)
+         * [Archives](#archives)
    * [View: to persist or not to persist?](#view-to-persist-or-not-to-persist)
       * [Standard View](#standard-view)
          * [Single component standard view](#single-component-standard-view)
@@ -45,6 +49,8 @@
    * [Event emitter](#event-emitter)
 * [License](#license)
 * [Support](#support)
+   * [Donation](#donation)
+   * [Hire me](#hire-me)
 
 # Introduction
 
@@ -656,6 +662,244 @@ In fact, there are two functions that respond to slightly different needs:
 
   In this case, instances of `Movement` are arranged in memory so that cache
   misses are minimized when the two components are iterated together.
+
+### Snapshot: complete vs continuous
+
+The `Registry` class offers basic support to serialization.<br/>
+It doesn't convert components and tags to bytes directly, there wasn't the need
+of another tool for serialization out there. Instead, it accepts an opaque
+object with a suitable interface (namely an _archive_) to serialize its internal
+data structures and restore them later. The way types and instances are
+converted to a bunch of bytes is completely in charge to the archive and thus to
+the users.
+
+The goal of the serialization part is to allow users to make both a dump of the
+entire registry or a narrower snapshot, that is to select only the components
+and the tags in which they are interested.<br/>
+Intuitively, the use cases are different. As an example, the first approach is
+suitable for local save/restore functionalities while the latter is suitable for
+creating client-server applications and for transferring somehow parts of the
+representation side to side.
+
+To take a snapshot of the registry, use the `snapshot` member function. It
+returns a temporary object properly initialized to _save_ the whole registry or
+parts of it.
+
+Example of use:
+
+```cpp
+OutputArchive output;
+
+registry.snapshot()
+    .entities(output)
+    .destroyed(output)
+    .component<AComponent, AnotherComponent>(output)
+    .tag<MyTag>(output);
+```
+
+It isn't necessary to invoke all these functions each and every time. What
+functions to use in which case mostly depends on the goal and there is not a
+golden rule to do that.
+
+The `entities` member function asks to the registry to serialize all the
+entities that are still in use along with their versions. On the other side, the
+`destroyed` member function tells to the registry to serialize the entities that
+have been destroyed and are no longer in use.<br/>
+These two functions can be used to save and restore the whole set of entities
+with the versions they had during serialization.
+
+The `component` member function is a function template the aim of which is to
+store aside components. The presence of a template parameter list is a
+consequence of a couple of design choices from the past and in the present:
+
+* First of all, there is no reason to force an user to serialize all the
+  components at once and most of the times it isn't desiderable. As an example,
+  in case the stuff for the HUD in a game is put into the registry for some
+  reasons, its components can be freely discarded during a serialization step
+  because probably the software already knows how to reconstruct the HUD
+  correctly from scratch.
+
+* Furthermore, the registry makes heavy use of _type-erasure_ techniques
+  internally and doesn't know at any time what types of components it contains.
+  Therefore being explicit at the call point is mandatory.
+
+The `tag` member function is similar to the previous one, apart from the fact
+that it works with tags and not with components.<br/>
+Note also that both `component` and `tag` store items along with entities. It
+means that they work properly without a call to the `entities` member function.
+
+Once a snapshot is created, there exist mainly two _ways_ to load it: as a whole
+and in a kind of _continuous mode_.<br/>
+The following sections describe both loaders and archives in details.
+
+#### Snapshot loader
+
+A snapshot loader requires that the destination registry be empty and loads all
+the data at once while keeping intact the identifiers that the entities
+originally had.<br/>
+To do that, the registry offers a member function named `restore` that returns a
+temporary object properly initialized to _restore_ a snapshot.
+
+Example of use:
+
+```cpp
+InputArchive input;
+
+registry.restore()
+    .entities()
+    .destroyed()
+    .component<AComponent, AnotherComponent>(output)
+    .tag<MyTag>(output)
+    .orphans();
+```
+
+It isn't necessary to invoke all these functions each and every time. What
+functions to use in which case mostly depends on the goal and there is not a
+golden rule to do that. For obvious reasons, what is important is that the data
+are restored in exactly the same order in which they were serialized.
+
+The `entities` and `destroyed` member functions restore the sets of entities and
+the versions that the entities originally had at the source.
+
+The `component` member function restores all and only the components specified
+and assigns them to the right entities. Note that the template parameter list
+must be exactly the same used during the serialization. The same applies to the
+`tag` member function.
+
+The `orphans` member function literally destroys those entities that have
+neither components nor tags. It's usually useless if the snapshot is a full dump
+of the source. However, in case all the entities are serialized but only few
+components and tags are saved, it could happen that some of the entities have
+neither components nor tags once restored. The best users can do to deal with
+them is to destroy those entities and thus update their versions.
+
+#### Continuous loader
+
+A continuous loader is designed to load data from a source registry to a
+(possibly) non-empty destination. The loader can accomodate in a registry more
+than one snapshot in a sort of _continuous loading_ that updates the
+destination one step at a time.<br/>
+Identifiers that entities originally had are not transferred to the target.
+Instead, the loader maps remote identifiers to local ones while restoring a
+snapshot. Because of that, this kind of loader offers a way to update
+automatically identifiers that are part of components or tags (as an example, as
+data members or gathered in a container).<br/>
+Another difference with the snapshot loader is that the continuous loader does
+not need to work with the private data structures of a registry. Furthermore, it
+has an internal state that must persist over time. Therefore, there is no reason
+to create it by means of a registry, or to limit its lifetime to that of a
+temporary object.
+
+Example of use:
+
+```cpp
+entt::ContinuousLoader<entity_type> loader{registry};
+InputArchive input;
+
+loader.entities(input)
+    .destroyed(input)
+    .component<AComponent, AnotherComponent>(input)
+    .component<DirtyComponent>(input, &DirtyComponent::parent, &DirtyComponent::child)
+    .tag<MyTag>(input)
+    .tag<DirtyTag>(input, &DirtyTag::container)
+    .orphans()
+    .shrink();
+```
+
+It isn't necessary to invoke all these functions each and every time. What
+functions to use in which case mostly depends on the goal and there is not a
+golden rule to do that. For obvious reasons, what is important is that the data
+are restored in exactly the same order in which they were serialized.
+
+The `entities` and `destroyed` member functions restore groups of entities and
+map each entity to a local counterpart when required. In other terms, for each
+remote entity identifier not yet registered by the loader, the latter creates a
+local identifier so that it can keep the local entity in sync with the remote
+one.
+
+The `component` and `tag` member functions restore all and only the components
+and the tags specified and assign them to the right entities.<br/>
+In case the component or the tag contains entities itself (either as data
+members of type `entity_type` or as containers of entities), the loader can
+update them automatically. To do that, it's enough to specify the data members
+to update as shown in the example. If the component or the tag was in the middle
+of the template parameter list during serialization, multiple commands are
+required during a restore:
+
+```cpp
+registry.snapshot().component<ASimpleComponent, AnotherSimpleComponent, AMoreComplexComponent, TheLastComponent>();
+
+// ...
+
+loader
+    .component<ASimpleComponent, AnotherSimpleComponent>(input)
+    .component<AMoreComplexComponent>(input, &AMoreComplexComponent::entity);
+    .component<TheLastComponent>(input);
+```
+
+The `orphans` member function literally destroys those entities that have
+neither components nor tags after a restore. It has exactly the same purpose
+described in the previous section and works the same way.
+
+Finally, `shrink` helps to purge local entities that no longer have a remote
+conterpart. Users should invoke this member function after restoring each
+snapshot, unless they know exactly what they are doing.
+
+#### Archives
+
+Archives must publicly expose a predefined set of member functions. The API is
+straightforward and consists only of a group of function call operators that
+are invoked by the registry.
+
+In particular:
+
+* An output archive, the one used when creating a snapshot, must expose a
+  function call operator with the following signature to store entities:
+
+  ```cpp
+  void operator()(Entity);
+  ```
+
+  Where `Entity` is the type of the entities used by the registry.<br/>
+  In addition, it must accept the types of both the components and the tags to
+  serialize. Therefore, given a type `T` (either a component or a tag), it must
+  contain a function call operator with the following signature:
+
+  ```cpp
+  void operator()(const T &);
+  ```
+
+  The output archive can freely decide how to serialize the data. The register
+  is not affected at all by the decision.
+
+* An input archive, the one used when restoring a snapshot, must expose a
+  function call operator with the following signature to load entities:
+
+  ```cpp
+  void operator()(Entity &);
+  ```
+
+  Where `Entity` is the type of the entities used by the registry. Each time the
+  function is invoked, the archive must read the next element from the
+  underlying storage and copy it in the given variable.<br/>
+  In addition, it must accept the types of both the components and the tags to
+  restore. Therefore, given a type `T` (either a component or a tag), it must
+  contain a function call operator with the following signature:
+
+  ```cpp
+  void operator()(T &);
+  ```
+
+  Every time such an operator is invoked, the archive must read the next element
+  from the underlying storage and copy it in the given variable.
+
+`EnTT` comes with some examples (actually some tests) that show how to integrate
+a well known library for serialization as an archive. It uses
+[`Cereal C++`](https://uscilab.github.io/cereal/) under the hood, mainly
+because I wanted to learn how it works at the time I was writing the code.
+
+The code is not production-ready and it isn't neither the only nor (probably)
+the best way to do it. However, feel free to use it at your own risk.
 
 ## View: to persist or not to persist?
 
@@ -2223,7 +2467,7 @@ just click [here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=
 ## Hire me
 
 If you start using `EnTT` and need help, if you want a new feature and want me
-to give it the highest priority, or for any other reason, I'm available for
-hiring.<br/>
+to give it the highest priority, if you have any other reason to contact me:
+do not hesitate. I'm available for hiring.<br/>
 Feel free to take a look at my [profile](https://github.com/skypjack) and
 contact me by mail.

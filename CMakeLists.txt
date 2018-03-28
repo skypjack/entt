@@ -16,7 +16,7 @@ endif()
 # Project configuration
 #
 
-project(entt VERSION 2.4.2)
+project(entt VERSION 2.5.0)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
@@ -86,6 +86,7 @@ if(BUILD_TESTING)
 
     option(BUILD_BENCHMARK "Build benchmark." OFF)
     option(BUILD_MOD "Build mod example." OFF)
+    option(BUILD_SNAPSHOT "Build snapshot example." OFF)
 
     # gtest, gtest_main, gmock and gmock_main targets are available from now on
     set(GOOGLETEST_DEPS_DIR ${entt_SOURCE_DIR}/deps/googletest)

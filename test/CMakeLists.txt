@@ -36,6 +36,25 @@ if(BUILD_MOD)
     add_test(NAME mod COMMAND mod)
 endif()
 
+# Test snapshot
+
+if(BUILD_SNAPSHOT)
+    set(CEREAL_DEPS_DIR ${entt_SOURCE_DIR}/deps/cereal)
+    configure_file(${entt_SOURCE_DIR}/cmake/in/cereal.in ${CEREAL_DEPS_DIR}/CMakeLists.txt)
+    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY ${CEREAL_DEPS_DIR})
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${CEREAL_DEPS_DIR})
+    set(CEREAL_SRC_DIR ${CEREAL_DEPS_DIR}/src/include)
+
+    add_executable(
+        snapshot
+        $<TARGET_OBJECTS:odr>
+        snapshot/snapshot.cpp
+    )
+    target_include_directories(snapshot PRIVATE ${CEREAL_SRC_DIR})
+    target_link_libraries(snapshot PRIVATE gtest_main Threads::Threads)
+    add_test(NAME snapshot COMMAND snapshot)
+endif()
+
 # Test core
 
 add_executable(
@@ -55,6 +74,7 @@ add_executable(
     $<TARGET_OBJECTS:odr>
     entt/entity/actor.cpp
     entt/entity/registry.cpp
+    entt/entity/snapshot.cpp
     entt/entity/sparse_set.cpp
     entt/entity/view.cpp
 )

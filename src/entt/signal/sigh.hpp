@@ -100,7 +100,7 @@ class SigH;
  *
  * * `Param` is a type to which `Ret` can be converted.
  * * The return type is true if the handler must stop collecting data, false
- *   otherwise.
+ * otherwise.
  *
  * @tparam Ret Return type of a function type.
  * @tparam Args Types of arguments of a function type.
