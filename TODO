@@ -1,9 +1,11 @@
-* filtered each (apply a filter to the entities before to return them, it helps separating checks from logic)
 * custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
 * to analyze, long term feature: systems organizer based on dependency graphs for implicit parallelism (I don't want to think anymore in future :-))
 * save/restore functionalities - see #27
-* parent-child relationships between entities directly managed by the registry. is it possible to do that in a clean and safe way?
 * scene management (I prefer the concept of spaces, that is a kind of scene anyway)
 * blueprint registry - kind of factory to create entitites template for initialization (get rid of the extra versions of Registry::create)
 * review doc: separate it in multiple md/dox files, reduce the readme to a minimum and provide users with links to the online documentation on gh-pages
+* debugging tools (#60): the issue online already contains interesting tips on this, look at it
+* signals on component creation/destruction: crtp + internal detection, probably it works - test it!!
+* rename Registry::ensure, it creates problems with UE4
+* define a macro for the noexcept policy, so as to provide users with an easy way to disable exception handling
 * AOB
