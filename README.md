@@ -23,6 +23,7 @@
          * [Snapshot loader](#snapshot-loader)
          * [Continuous loader](#continuous-loader)
          * [Archives](#archives)
+         * [One example to rule them all](one-example-to-rule-them-all)
    * [View: to persist or not to persist?](#view-to-persist-or-not-to-persist)
       * [Standard View](#standard-view)
          * [Single component standard view](#single-component-standard-view)
@@ -893,6 +894,8 @@ In particular:
   Every time such an operator is invoked, the archive must read the next element
   from the underlying storage and copy it in the given variable.
 
+#### One example to rule them all
+
 `EnTT` comes with some examples (actually some tests) that show how to integrate
 a well known library for serialization as an archive. It uses
 [`Cereal C++`](https://uscilab.github.io/cereal/) under the hood, mainly
@@ -900,6 +903,9 @@ because I wanted to learn how it works at the time I was writing the code.
 
 The code is not production-ready and it isn't neither the only nor (probably)
 the best way to do it. However, feel free to use it at your own risk.
+
+The basic idea is to store everything in a group of queues in memory, then bring
+everything back to the registry with different loaders.
 
 ## View: to persist or not to persist?
 
