@@ -114,7 +114,7 @@ class Registry {
     }
 
     template<typename Component>
-    Pool<Component> & ensure() {
+    Pool<Component> & assure() {
         const auto ctype = component_family::type<Component>();
 
         if(!(ctype < pools.size())) {
@@ -146,7 +146,7 @@ class Registry {
             }
 
             accumulator_type accumulator = {
-                (ensure<Component>().append(set.get(), &Registry::has<Component...>), 0)...
+                (assure<Component>().append(set.get(), &Registry::has<Component...>), 0)...
             };
 
             handlers[vtype] = std::move(set);
@@ -244,7 +244,7 @@ public:
      */
     template<typename Component>
     void reserve(size_type cap) {
-        ensure<Component>().reserve(cap);
+        assure<Component>().reserve(cap);
     }
 
     /**
@@ -375,7 +375,7 @@ public:
     entity_type create(Component &&... components) noexcept {
         using accumulator_type = int[];
         const auto entity = create();
-        accumulator_type accumulator = { 0, (ensure<std::decay_t<Component>>().construct(*this, entity, std::forward<Component>(components)), 0)... };
+        accumulator_type accumulator = { 0, (assure<std::decay_t<Component>>().construct(*this, entity, std::forward<Component>(components)), 0)... };
         (void)accumulator;
         return entity;
     }
@@ -402,7 +402,7 @@ public:
     entity_type create() noexcept {
         using accumulator_type = int[];
         const auto entity = create();
-        accumulator_type accumulator = { 0, (ensure<Component>().construct(*this, entity), 0)... };
+        accumulator_type accumulator = { 0, (assure<Component>().construct(*this, entity), 0)... };
         (void)accumulator;
         return entity;
     }
@@ -614,7 +614,7 @@ public:
     template<typename Component, typename... Args>
     Component & assign(entity_type entity, Args &&... args) {
         assert(valid(entity));
-        return ensure<Component>().construct(*this, entity, std::forward<Args>(args)...);
+        return assure<Component>().construct(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -793,7 +793,7 @@ public:
     template<typename Component, typename... Args>
     Component & accommodate(entity_type entity, Args &&... args) {
         assert(valid(entity));
-        auto &cpool = ensure<Component>();
+        auto &cpool = assure<Component>();
 
         return (cpool.has(entity)
                 ? (cpool.get(entity) = Component{std::forward<Args>(args)...})
@@ -825,7 +825,7 @@ public:
      */
     template<typename Component, typename Compare>
     void sort(Compare compare) {
-        ensure<Component>().sort(std::move(compare));
+        assure<Component>().sort(std::move(compare));
     }
 
     /**
@@ -860,7 +860,7 @@ public:
      */
     template<typename To, typename From>
     void sort() {
-        ensure<To>().respect(ensure<From>());
+        assure<To>().respect(assure<From>());
     }
 
     /**
@@ -1050,7 +1050,7 @@ public:
      */
     template<typename... Component>
     View<Entity, Component...> view() {
-        return View<Entity, Component...>{ensure<Component>()...};
+        return View<Entity, Component...>{assure<Component>()...};
     }
 
     /**
@@ -1182,7 +1182,7 @@ public:
      */
     template<typename Component>
     RawView<Entity, Component> raw() {
-        return RawView<Entity, Component>{ensure<Component>()};
+        return RawView<Entity, Component>{assure<Component>()};
     }
 
     /**
@@ -1231,9 +1231,9 @@ public:
      * @return A not movable and not copyable object to use to load snasphosts.
      */
     SnapshotLoader<Entity> restore() {
-        using ensure_fn_type = void(*)(Registry &, entity_type, bool);
+        using assure_fn_type = void(*)(Registry &, entity_type, bool);
 
-        ensure_fn_type ensure = [](Registry &registry, entity_type entity, bool destroyed) {
+        assure_fn_type assure = [](Registry &registry, entity_type entity, bool destroyed) {
             using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
             // explicit promotion to avoid warnings with std::uint16_t
             const auto entt = promotion_type{entity} & traits_type::entity_mask;
@@ -1254,7 +1254,7 @@ public:
             }
         };
 
-        return { (*this = {}), ensure };
+        return { (*this = {}), assure };
     }
 
 private:

@@ -189,11 +189,11 @@ class SnapshotLoader final {
     /*! @brief A registry is allowed to create snapshot loaders. */
     friend class Registry<Entity>;
 
-    using ensure_fn_type = void(*)(Registry<Entity> &, Entity, bool);
+    using assure_fn_type = void(*)(Registry<Entity> &, Entity, bool);
 
-    SnapshotLoader(Registry<Entity> &registry, ensure_fn_type ensure_fn) noexcept
+    SnapshotLoader(Registry<Entity> &registry, assure_fn_type assure_fn) noexcept
         : registry{registry},
-          ensure_fn{ensure_fn}
+          assure_fn{assure_fn}
     {
         // restore a snapshot as a whole requires a clean registry
         assert(!registry.capacity());
@@ -222,7 +222,7 @@ class SnapshotLoader final {
     void assign(Archive &archive) {
         each(archive, [&archive, this](auto entity) {
             static constexpr auto destroyed = false;
-            ensure_fn(registry, entity, destroyed);
+            assure_fn(registry, entity, destroyed);
             archive(registry.template assign<Component>(entity));
         });
     }
@@ -231,7 +231,7 @@ class SnapshotLoader final {
     void attach(Archive &archive) {
         each(archive, [&archive, this](auto entity) {
             static constexpr auto destroyed = false;
-            ensure_fn(registry, entity, destroyed);
+            assure_fn(registry, entity, destroyed);
             archive(registry.template attach<Tag>(entity));
         });
     }
@@ -251,7 +251,7 @@ public:
     SnapshotLoader entities(Archive &archive) && {
         each(archive, [this](auto entity) {
             static constexpr auto destroyed = false;
-            ensure_fn(registry, entity, destroyed);
+            assure_fn(registry, entity, destroyed);
         });
 
         return *this;
@@ -271,7 +271,7 @@ public:
     SnapshotLoader destroyed(Archive &archive) && {
         each(archive, [this](auto entity) {
             static constexpr auto destroyed = true;
-            ensure_fn(registry, entity, destroyed);
+            assure_fn(registry, entity, destroyed);
         });
 
         return *this;
@@ -340,7 +340,7 @@ public:
 
 private:
     Registry<Entity> &registry;
-    ensure_fn_type ensure_fn;
+    assure_fn_type assure_fn;
 };
 
 
