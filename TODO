@@ -8,4 +8,5 @@
 * signals on component creation/destruction: crtp + internal detection, probably it works - test it!!
 * rename Registry::ensure, it creates problems with UE4
 * define a macro for the noexcept policy, so as to provide users with an easy way to disable exception handling
+* explore a way to safely define a "replace" function for tags (mainly for consistency with components)
 * AOB
