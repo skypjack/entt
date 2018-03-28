@@ -23,7 +23,7 @@
          * [Snapshot loader](#snapshot-loader)
          * [Continuous loader](#continuous-loader)
          * [Archives](#archives)
-         * [One example to rule them all](one-example-to-rule-them-all)
+         * [One example to rule them all](#one-example-to-rule-them-all)
    * [View: to persist or not to persist?](#view-to-persist-or-not-to-persist)
       * [Standard View](#standard-view)
          * [Single component standard view](#single-component-standard-view)
