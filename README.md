@@ -1296,6 +1296,17 @@ not be used frequently to avoid the risk of a performance hit.
   iterate the renderable entities while updating a physic component concurrently
   on a separate thread.
 
+* In general, the entire registry isn't thread safe as it is. Thread safety
+  isn't something that users should want out of the box for several reasons.
+  Just to mention one of them: performance.<br/>
+  This kind of entity-component systems can be used in single threaded
+  applications as well as along with async stuff. Moreover, typical thread based
+  models for ECS don't require a fully thread safe registry to work. Actually
+  one could reach the goal with the registry as it is while working with most of
+  the common models, after all.<br/>
+  Because of the few reasons mentioned above and many others not mentioned,
+  users are completely responsible for synchronization whether required.
+
 # Crash Course: core functionalities
 
 The `EnTT` framework comes with a bunch of core functionalities mostly used by
