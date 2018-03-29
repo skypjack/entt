@@ -477,7 +477,7 @@ public:
     }
 
     /**
-     * @brief Attaches a tag to an entity.
+     * @brief Attaches the given tag to an entity.
      *
      * Usually, pools of components allocate enough memory to store a bunch of
      * elements even if only one of them is used. On the other hand, there are
@@ -513,7 +513,7 @@ public:
     }
 
     /**
-     * @brief Removes a tag from its owner, if any.
+     * @brief Removes the given tag from its owner, if any.
      * @tparam Tag Type of tag to remove.
      */
     template<typename Tag>
@@ -524,7 +524,7 @@ public:
     }
 
     /**
-     * @brief Checks if a tag has an owner.
+     * @brief Checks if the given tag has an owner.
      * @tparam Tag Type of tag for which to perform the check.
      * @return True if the tag already has an owner, false otherwise.
      */
@@ -539,7 +539,7 @@ public:
     }
 
     /**
-     * @brief Returns a reference to a tag.
+     * @brief Returns a reference to the given tag.
      *
      * @warning
      * Attempting to get a tag that hasn't an owner results in undefined
@@ -557,7 +557,7 @@ public:
     }
 
     /**
-     * @brief Returns a reference to a tag.
+     * @brief Returns a reference to the given tag.
      *
      * @warning
      * Attempting to get a tag that hasn't an owner results in undefined
@@ -574,7 +574,56 @@ public:
     }
 
     /**
-     * @brief Gets the owner of a tag, if any.
+     * @brief Replaces the given tag.
+     *
+     * A new instance of the given tag is created and initialized with the
+     * arguments provided (the tag must have a proper constructor or be of
+     * aggregate type).
+     *
+     * @warning
+     * Attempting to replace a tag that hasn't an owner results in undefined
+     * behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * tag hasn't been previously attached to an entity.
+     *
+     * @tparam Tag Type of tag to replace.
+     * @tparam Args Types of arguments to use to construct the tag.
+     * @param args Parameters to use to initialize the tag.
+     * @return A reference to the tag.
+     */
+    template<typename Tag, typename... Args>
+    Tag & set(Args &&... args) {
+        return get<Tag>() = Tag{std::forward<Args>(args)...};
+    }
+
+    /**
+     * @brief Changes the owner of the given tag.
+     *
+     * The ownership of the tag is transferred from one entity to another.
+     *
+     * @warning
+     * Attempting to use an invalid entity or to transfer the ownership of a tag
+     * that hasn't an owner results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the tag hasn't been previously attached to an
+     * entity.
+     *
+     * @tparam Tag Type of tag of which to transfer the ownership.
+     * @param entity A valid entity identifier.
+     * @return A valid entity identifier.
+     */
+    template<typename Tag>
+    entity_type move(entity_type entity) {
+        assert(valid(entity));
+        assert(has<Tag>());
+        const auto ttype = tag_family::type<Tag>();
+        const auto owner = tags[ttype]->entity;
+        tags[ttype]->entity = entity;
+        return owner;
+    }
+
+    /**
+     * @brief Gets the owner of the given tag, if any.
      *
      * @warning
      * Attempting to get the owner of a tag that hasn't been previously attached
@@ -759,8 +808,7 @@ public:
      */
     template<typename Component, typename... Args>
     Component & replace(entity_type entity, Args &&... args) {
-        assert(valid(entity));
-        return (pool<Component>().get(entity) = Component{std::forward<Args>(args)...});
+        return (get<Component>(entity) = Component{std::forward<Args>(args)...});
     }
 
     /**

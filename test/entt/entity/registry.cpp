@@ -285,7 +285,7 @@ TEST(DefaultRegistry, CreateDestroyEntities) {
     ASSERT_EQ(registry.current(pre), registry.current(post));
 }
 
-TEST(DefaultRegistry, AttachRemoveTags) {
+TEST(DefaultRegistry, AttachSetRemoveTags) {
     entt::DefaultRegistry registry;
     const auto &cregistry = registry;
 
@@ -298,6 +298,21 @@ TEST(DefaultRegistry, AttachRemoveTags) {
     ASSERT_EQ(registry.get<int>(), 42);
     ASSERT_EQ(cregistry.get<int>(), 42);
     ASSERT_EQ(registry.attachee<int>(), entity);
+
+    registry.set<int>(3);
+
+    ASSERT_TRUE(registry.has<int>());
+    ASSERT_EQ(registry.get<int>(), 3);
+    ASSERT_EQ(cregistry.get<int>(), 3);
+    ASSERT_EQ(registry.attachee<int>(), entity);
+
+    auto other = registry.create();
+    registry.move<int>(other);
+
+    ASSERT_TRUE(registry.has<int>());
+    ASSERT_EQ(registry.get<int>(), 3);
+    ASSERT_EQ(cregistry.get<int>(), 3);
+    ASSERT_EQ(registry.attachee<int>(), other);
 
     registry.remove<int>();
 

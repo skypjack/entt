@@ -24,17 +24,21 @@ struct Invoker<Ret(Args...), Collector> {
 
     virtual ~Invoker() = default;
 
-    template<typename SFINAE = Ret>
-    typename std::enable_if_t<std::is_void<SFINAE>::value, bool>
-    invoke(Collector &, proto_type proto, void *instance, Args... args) {
-        proto(instance, args...);
-        return true;
-    }
-
-    template<typename SFINAE = Ret>
-    typename std::enable_if_t<!std::is_void<SFINAE>::value, bool>
-    invoke(Collector &collector, proto_type proto, void *instance, Args... args) {
+    bool invoke(Collector &collector, proto_type proto, void *instance, Args... args) {
         return collector(proto(instance, args...));
+    }
+};
+
+
+template<typename... Args, typename Collector>
+struct Invoker<void(Args...), Collector> {
+    using proto_type = void(*)(void *, Args...);
+    using call_type = std::pair<void *, proto_type>;
+
+    virtual ~Invoker() = default;
+
+    bool invoke(Collector &, proto_type proto, void *instance, Args... args) {
+        return (proto(instance, args...), true);
     }
 };
 

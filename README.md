@@ -556,7 +556,19 @@ registry.remove<PlayingCharacter>();
 registry.remove<Camera>();
 ```
 
-If in doubt about whether or not a tag has already an owner, the `has` member
+In case a tag already has an owner, its content can be updated by means of the
+`set` member function template and the ownership of the tag can be transferred
+to another entity using the `move` member function template:
+
+```
+// replaces the content of the given tag
+Point &point = registry.set<Point>(1.f, 1.f);
+
+// transfers the ownership of the tag to another entity
+entity_type prev = registry.move<Point>(next);
+```
+
+If in doubt about whether or not a tag already has an owner, the `has` member
 function template may be useful:
 
 ```cpp
