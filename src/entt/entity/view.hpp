@@ -397,7 +397,10 @@ class View final {
 
     public:
         using difference_type = typename underlying_iterator_type::difference_type;
-        using value_type = typename view_type::entity_type;
+        using value_type = typename underlying_iterator_type::value_type;
+        using pointer = typename underlying_iterator_type::pointer;
+        using reference = typename underlying_iterator_type::reference;
+        using iterator_category = typename underlying_iterator_type::iterator_category;
 
         Iterator(unchecked_type unchecked, size_type extent, underlying_iterator_type begin, underlying_iterator_type end) noexcept
             : unchecked{unchecked},
@@ -420,8 +423,7 @@ class View final {
         }
 
         Iterator & operator+=(difference_type value) noexcept {
-            begin += value;
-            return *this;
+            return ((begin += value) != end && !valid()) ? ++(*this) : *this;
         }
 
         Iterator operator+(difference_type value) noexcept {

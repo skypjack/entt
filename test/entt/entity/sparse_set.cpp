@@ -453,8 +453,8 @@ TEST(SparseSetWithType, RespectDisjoint) {
     ASSERT_EQ(*(clhs.raw() + 1u), 6);
     ASSERT_EQ(*(clhs.raw() + 2u), 9);
 
-    auto begin = clhs.begin();
-    auto end = clhs.end();
+    auto begin = lhs.begin();
+    auto end = lhs.end();
 
     ASSERT_EQ(*(begin++), 9);
     ASSERT_EQ(*(begin++), 6);
@@ -483,8 +483,8 @@ TEST(SparseSetWithType, RespectOverlap) {
     ASSERT_EQ(*(clhs.raw() + 1u), 9);
     ASSERT_EQ(*(clhs.raw() + 2u), 6);
 
-    auto begin = clhs.begin();
-    auto end = clhs.end();
+    auto begin = lhs.begin();
+    auto end = lhs.end();
 
     ASSERT_EQ(*(begin++), 6);
     ASSERT_EQ(*(begin++), 9);
@@ -628,4 +628,34 @@ TEST(SparseSetWithType, RespectUnordered) {
     ASSERT_EQ(*(rhs.data() + 3u), 3u);
     ASSERT_EQ(*(rhs.data() + 4u), 4u);
     ASSERT_EQ(*(rhs.data() + 5u), 5u);
+}
+
+TEST(SparseSetWithType, ReferencesGuaranteed) {
+    struct Type { int value; };
+
+    entt::SparseSet<unsigned int, Type> set;
+
+    set.construct(0, 0);
+    set.construct(1, 1);
+
+    ASSERT_EQ(set.get(0).value, 0);
+    ASSERT_EQ(set.get(1).value, 1);
+
+    for(auto &&type: set) {
+        if(type.value) {
+            type.value = 42;
+        }
+    }
+
+    ASSERT_EQ(set.get(0).value, 0);
+    ASSERT_EQ(set.get(1).value, 42);
+
+    auto begin = set.begin();
+
+    while(begin != set.end()) {
+        (begin++)->value = 3;
+    }
+
+    ASSERT_EQ(set.get(0).value, 3);
+    ASSERT_EQ(set.get(1).value, 3);
 }

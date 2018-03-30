@@ -344,14 +344,6 @@ TEST(PersistentView, Sort) {
     }
 }
 
-
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-
 TEST(RawView, Functionalities) {
     entt::DefaultRegistry registry;
 
@@ -382,6 +374,15 @@ TEST(RawView, Functionalities) {
 
     ASSERT_EQ(*(view.raw() + 0), '2');
     ASSERT_EQ(*(static_cast<const decltype(view) &>(view).raw() + 1), '1');
+
+    for(auto &&component: view) {
+        // verifies that iterators return references to components
+        component = '0';
+    }
+
+    for(auto &&component: view) {
+        ASSERT_TRUE(component == '0');
+    }
 
     registry.remove<char>(e0);
     registry.remove<char>(e1);
