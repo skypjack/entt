@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.4.2</span>
+   &#160;<span id="projectnumber">2.5.0</span>
    </div>
   </td>
  </tr>
@@ -67,6 +67,7 @@ $(function() {
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="classentt_1_1View-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">entt::View&lt; Entity, Component &gt; Class Template Reference<span class="mlabels"><span class="mlabel">final</span></span></div>  </div>
@@ -80,55 +81,67 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a738fb04a466b1f858a1eb5d7bc8fd668"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a738fb04a466b1f858a1eb5d7bc8fd668">iterator_type</a> = Iterator</td></tr>
+<tr class="memitem:a738fb04a466b1f858a1eb5d7bc8fd668"><td class="memItemLeft" align="right" valign="top"><a id="a738fb04a466b1f858a1eb5d7bc8fd668"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a738fb04a466b1f858a1eb5d7bc8fd668">iterator_type</a> = Iterator</td></tr>
+<tr class="memdesc:a738fb04a466b1f858a1eb5d7bc8fd668"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input iterator type. <br /></td></tr>
 <tr class="separator:a738fb04a466b1f858a1eb5d7bc8fd668"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad167f4bc8202231d768a7b18218bae5b"><td class="memItemLeft" align="right" valign="top"><a id="ad167f4bc8202231d768a7b18218bae5b"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#ad167f4bc8202231d768a7b18218bae5b">entity_type</a> = typename <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">base_pool_type::entity_type</a></td></tr>
-<tr class="memdesc:ad167f4bc8202231d768a7b18218bae5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying entity identifier. <br /></td></tr>
-<tr class="separator:ad167f4bc8202231d768a7b18218bae5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e5dea5b319460081befdf84ec3aacf4"><td class="memItemLeft" align="right" valign="top"><a id="a5e5dea5b319460081befdf84ec3aacf4"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a5e5dea5b319460081befdf84ec3aacf4">size_type</a> = typename <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">base_pool_type::size_type</a></td></tr>
-<tr class="memdesc:a5e5dea5b319460081befdf84ec3aacf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type. <br /></td></tr>
-<tr class="separator:a5e5dea5b319460081befdf84ec3aacf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61be0e712de89d1eb275e14bbc59174e"><td class="memItemLeft" align="right" valign="top"><a id="a61be0e712de89d1eb275e14bbc59174e"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a> = typename <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">view_type::entity_type</a></td></tr>
+<tr class="memdesc:a61be0e712de89d1eb275e14bbc59174e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying entity identifier. <br /></td></tr>
+<tr class="separator:a61be0e712de89d1eb275e14bbc59174e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3f86ec55935bbbb00077bbe07f15c4b"><td class="memItemLeft" align="right" valign="top"><a id="ab3f86ec55935bbbb00077bbe07f15c4b"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#ab3f86ec55935bbbb00077bbe07f15c4b">size_type</a> = typename <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">view_type::size_type</a></td></tr>
+<tr class="memdesc:ab3f86ec55935bbbb00077bbe07f15c4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type. <br /></td></tr>
+<tr class="separator:ab3f86ec55935bbbb00077bbe07f15c4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8eb8d63c9db031af7203b5ca7801c7e3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a8eb8d63c9db031af7203b5ca7801c7e3">View</a> (<a class="el" href="classentt_1_1SparseSet.html">pool_type</a>&lt; Component &gt; &amp;... pools) noexcept</td></tr>
-<tr class="memdesc:a8eb8d63c9db031af7203b5ca7801c7e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a view out of a bunch of pools of components.  <a href="#a8eb8d63c9db031af7203b5ca7801c7e3">More...</a><br /></td></tr>
-<tr class="separator:a8eb8d63c9db031af7203b5ca7801c7e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f5d49e4b67890cf53d1c3c25879fb81"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1View.html#ab3f86ec55935bbbb00077bbe07f15c4b">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a6f5d49e4b67890cf53d1c3c25879fb81">size</a> () const noexcept</td></tr>
+<tr class="memdesc:a6f5d49e4b67890cf53d1c3c25879fb81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Estimates the number of entities that have the given components.  <a href="#a6f5d49e4b67890cf53d1c3c25879fb81">More...</a><br /></td></tr>
+<tr class="separator:a6f5d49e4b67890cf53d1c3c25879fb81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae351dc5fef90e54a61187310d1e7d9ba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1View.html#a738fb04a466b1f858a1eb5d7bc8fd668">iterator_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#ae351dc5fef90e54a61187310d1e7d9ba">begin</a> () const noexcept</td></tr>
 <tr class="memdesc:ae351dc5fef90e54a61187310d1e7d9ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the first entity that has the given components.  <a href="#ae351dc5fef90e54a61187310d1e7d9ba">More...</a><br /></td></tr>
 <tr class="separator:ae351dc5fef90e54a61187310d1e7d9ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af683298434cb58f86f0025cdb585eda2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1View.html#a738fb04a466b1f858a1eb5d7bc8fd668">iterator_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#af683298434cb58f86f0025cdb585eda2">end</a> () const noexcept</td></tr>
 <tr class="memdesc:af683298434cb58f86f0025cdb585eda2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator that is past the last entity that has the given components.  <a href="#af683298434cb58f86f0025cdb585eda2">More...</a><br /></td></tr>
 <tr class="separator:af683298434cb58f86f0025cdb585eda2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf75d690b32cda94b729b1af758e7c19"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#adf75d690b32cda94b729b1af758e7c19">contains</a> (<a class="el" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a> entity) const noexcept</td></tr>
+<tr class="memdesc:adf75d690b32cda94b729b1af758e7c19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a view contains an entity.  <a href="#adf75d690b32cda94b729b1af758e7c19">More...</a><br /></td></tr>
+<tr class="separator:adf75d690b32cda94b729b1af758e7c19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d304a255fae2eb2f027dcc7f8d9618d"><td class="memTemplParams" colspan="2">template&lt;typename Comp &gt; </td></tr>
-<tr class="memitem:a8d304a255fae2eb2f027dcc7f8d9618d"><td class="memTemplItemLeft" align="right" valign="top">const Comp &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a8d304a255fae2eb2f027dcc7f8d9618d">get</a> (<a class="el" href="classentt_1_1View.html#ad167f4bc8202231d768a7b18218bae5b">entity_type</a> entity) const noexcept</td></tr>
+<tr class="memitem:a8d304a255fae2eb2f027dcc7f8d9618d"><td class="memTemplItemLeft" align="right" valign="top">const Comp &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a8d304a255fae2eb2f027dcc7f8d9618d">get</a> (<a class="el" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a> entity) const noexcept</td></tr>
 <tr class="memdesc:a8d304a255fae2eb2f027dcc7f8d9618d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the component assigned to the given entity.  <a href="#a8d304a255fae2eb2f027dcc7f8d9618d">More...</a><br /></td></tr>
 <tr class="separator:a8d304a255fae2eb2f027dcc7f8d9618d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a643c0ea0a035790f7dc45b1a7c79429f"><td class="memTemplParams" colspan="2">template&lt;typename Comp &gt; </td></tr>
-<tr class="memitem:a643c0ea0a035790f7dc45b1a7c79429f"><td class="memTemplItemLeft" align="right" valign="top">Comp &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a643c0ea0a035790f7dc45b1a7c79429f">get</a> (<a class="el" href="classentt_1_1View.html#ad167f4bc8202231d768a7b18218bae5b">entity_type</a> entity) noexcept</td></tr>
+<tr class="memitem:a643c0ea0a035790f7dc45b1a7c79429f"><td class="memTemplItemLeft" align="right" valign="top">Comp &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a643c0ea0a035790f7dc45b1a7c79429f">get</a> (<a class="el" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a> entity) noexcept</td></tr>
 <tr class="memdesc:a643c0ea0a035790f7dc45b1a7c79429f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the component assigned to the given entity.  <a href="#a643c0ea0a035790f7dc45b1a7c79429f">More...</a><br /></td></tr>
 <tr class="separator:a643c0ea0a035790f7dc45b1a7c79429f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6c58ec0bc19424396162c76cc2cd532"><td class="memTemplParams" colspan="2">template&lt;typename... Comp&gt; </td></tr>
-<tr class="memitem:ad6c58ec0bc19424396162c76cc2cd532"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if_t&lt;(sizeof...(Comp) &gt; 1), std::tuple&lt; const Comp &amp;... &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#ad6c58ec0bc19424396162c76cc2cd532">get</a> (<a class="el" href="classentt_1_1View.html#ad167f4bc8202231d768a7b18218bae5b">entity_type</a> entity) const noexcept</td></tr>
+<tr class="memitem:ad6c58ec0bc19424396162c76cc2cd532"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if_t&lt;(sizeof...(Comp) &gt; 1), std::tuple&lt; const Comp &amp;... &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#ad6c58ec0bc19424396162c76cc2cd532">get</a> (<a class="el" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a> entity) const noexcept</td></tr>
 <tr class="memdesc:ad6c58ec0bc19424396162c76cc2cd532"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the components assigned to the given entity.  <a href="#ad6c58ec0bc19424396162c76cc2cd532">More...</a><br /></td></tr>
 <tr class="separator:ad6c58ec0bc19424396162c76cc2cd532"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade775c6862a9305f732d6ddac97b0431"><td class="memTemplParams" colspan="2">template&lt;typename... Comp&gt; </td></tr>
-<tr class="memitem:ade775c6862a9305f732d6ddac97b0431"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if_t&lt;(sizeof...(Comp) &gt; 1), std::tuple&lt; Comp &amp;... &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#ade775c6862a9305f732d6ddac97b0431">get</a> (<a class="el" href="classentt_1_1View.html#ad167f4bc8202231d768a7b18218bae5b">entity_type</a> entity) noexcept</td></tr>
+<tr class="memitem:ade775c6862a9305f732d6ddac97b0431"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if_t&lt;(sizeof...(Comp) &gt; 1), std::tuple&lt; Comp &amp;... &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#ade775c6862a9305f732d6ddac97b0431">get</a> (<a class="el" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a> entity) noexcept</td></tr>
 <tr class="memdesc:ade775c6862a9305f732d6ddac97b0431"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the components assigned to the given entity.  <a href="#ade775c6862a9305f732d6ddac97b0431">More...</a><br /></td></tr>
 <tr class="separator:ade775c6862a9305f732d6ddac97b0431"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85eea1ef9655368de8da355019fbeaa0"><td class="memTemplParams" colspan="2">template&lt;typename Func &gt; </td></tr>
 <tr class="memitem:a85eea1ef9655368de8da355019fbeaa0"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a85eea1ef9655368de8da355019fbeaa0">each</a> (Func func) const</td></tr>
-<tr class="memdesc:a85eea1ef9655368de8da355019fbeaa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterate the entities and applies them the given function object.  <a href="#a85eea1ef9655368de8da355019fbeaa0">More...</a><br /></td></tr>
+<tr class="memdesc:a85eea1ef9655368de8da355019fbeaa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates entities and components and applies the given function object to them.  <a href="#a85eea1ef9655368de8da355019fbeaa0">More...</a><br /></td></tr>
 <tr class="separator:a85eea1ef9655368de8da355019fbeaa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c540ac6937e6e9cf931cccaabcec745"><td class="memTemplParams" colspan="2">template&lt;typename Func &gt; </td></tr>
 <tr class="memitem:a6c540ac6937e6e9cf931cccaabcec745"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a6c540ac6937e6e9cf931cccaabcec745">each</a> (Func func)</td></tr>
-<tr class="memdesc:a6c540ac6937e6e9cf931cccaabcec745"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterate the entities and applies them the given function object.  <a href="#a6c540ac6937e6e9cf931cccaabcec745">More...</a><br /></td></tr>
+<tr class="memdesc:a6c540ac6937e6e9cf931cccaabcec745"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates entities and components and applies the given function object to them.  <a href="#a6c540ac6937e6e9cf931cccaabcec745">More...</a><br /></td></tr>
 <tr class="separator:a6c540ac6937e6e9cf931cccaabcec745"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba5aedb326adfcc24d6a6d8d0c7d21b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#aba5aedb326adfcc24d6a6d8d0c7d21b3">reset</a> ()</td></tr>
 <tr class="memdesc:aba5aedb326adfcc24d6a6d8d0c7d21b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resets the view and reinitializes it.  <a href="#aba5aedb326adfcc24d6a6d8d0c7d21b3">More...</a><br /></td></tr>
 <tr class="separator:aba5aedb326adfcc24d6a6d8d0c7d21b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a200646cfe88496da691aab5f61c0fa69"><td class="memItemLeft" align="right" valign="top"><a id="a200646cfe88496da691aab5f61c0fa69"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a200646cfe88496da691aab5f61c0fa69">Registry&lt; Entity &gt;</a></td></tr>
+<tr class="memdesc:a200646cfe88496da691aab5f61c0fa69"><td class="mdescLeft">&#160;</td><td class="mdescRight">A registry is allowed to create views. <br /></td></tr>
+<tr class="separator:a200646cfe88496da691aab5f61c0fa69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Entity, typename... Component&gt;<br />
@@ -143,12 +156,14 @@ class entt::View&lt; Entity, Component &gt;</h3>
 <li>New instances of the given components are created and assigned to entities.</li>
 <li>The entity currently pointed is modified (as an example, if one of the given components is removed from the entity to which the iterator points).</li>
 </ul>
-<p>In all the other cases, modify the pools of the given components somehow invalidates all the iterators and using them results in undefined behavior.</p>
+<p>In all the other cases, modifying the pools of the given components in any way invalidates all the iterators and using them results in undefined behavior.</p>
 <dl class="section note"><dt>Note</dt><dd>Views share references to the underlying data structures with the <a class="el" href="classentt_1_1Registry.html" title="Fast and reliable entity-component system. ">Registry</a> that generated them. Therefore any change to the entities and to the components made by means of the registry are immediately reflected by views.</dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>Lifetime of a view must overcome the one of the registry that generated it. In any other case, attempting to use a view results in undefined behavior.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html" title="Single component view specialization. ">View&lt;Entity, Component&gt;</a> </dd>
 <dd>
-<a class="el" href="classentt_1_1PersistentView.html" title="Persistent view. ">PersistentView</a></dd></dl>
+<a class="el" href="classentt_1_1PersistentView.html" title="Persistent view. ">PersistentView</a> </dd>
+<dd>
+<a class="el" href="classentt_1_1RawView.html" title="Raw view. ">RawView</a></dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Entity</td><td>A valid entity type (see <a class="el" href="structentt_1_1entt__traits.html" title="Entity traits. ">entt_traits</a> for more details). </td></tr>
@@ -157,67 +172,8 @@ class entt::View&lt; Entity, Component &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00348">348</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
-</div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a738fb04a466b1f858a1eb5d7bc8fd668"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a738fb04a466b1f858a1eb5d7bc8fd668">&#9670;&nbsp;</a></span>iterator_type</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Entity , typename... Component&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">using <a class="el" href="classentt_1_1View.html">entt::View</a>&lt; Entity, Component &gt;::<a class="el" href="classentt_1_1View.html#a738fb04a466b1f858a1eb5d7bc8fd668">iterator_type</a> =  Iterator</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Input iterator type. </p>
-
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00410">410</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a8eb8d63c9db031af7203b5ca7801c7e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8eb8d63c9db031af7203b5ca7801c7e3">&#9670;&nbsp;</a></span>View()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Entity , typename... Component&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classentt_1_1View.html">entt::View</a>&lt; Entity, Component &gt;::<a class="el" href="classentt_1_1View.html">View</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classentt_1_1SparseSet.html">pool_type</a>&lt; Component &gt; &amp;...&#160;</td>
-          <td class="paramname"><em>pools</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Constructs a view out of a bunch of pools of components. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">pools</td><td>References to pools of components. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00420">420</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00368">368</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ae351dc5fef90e54a61187310d1e7d9ba"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae351dc5fef90e54a61187310d1e7d9ba">&#9670;&nbsp;</a></span>begin()</h2>
 
@@ -248,7 +204,46 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00440">440</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00488">488</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+
+</div>
+</div>
+<a id="adf75d690b32cda94b729b1af758e7c19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf75d690b32cda94b729b1af758e7c19">&#9670;&nbsp;</a></span>contains()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename... Component&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classentt_1_1View.html">entt::View</a>&lt; Entity, Component &gt;::contains </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a>&#160;</td>
+          <td class="paramname"><em>entity</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if a view contains an entity. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entity</td><td>A valid entity identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the view contains the given entity, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00518">518</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -280,10 +275,10 @@ template&lt;typename Func &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Iterate the entities and applies them the given function object. </p>
+<p>Iterates entities and components and applies the given function object to them. </p>
 <p>The function object is invoked for each entity. It is provided with the entity itself and a set of const references to all the components of the view.<br />
  The signature of the function should be equivalent to the following:</p>
-<div class="fragment"><div class="line">void(<a class="code" href="classentt_1_1View.html#ad167f4bc8202231d768a7b18218bae5b">entity_type</a>, <span class="keyword">const</span> Component &amp;...);</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
+<div class="fragment"><div class="line">void(<a class="code" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a>, <span class="keyword">const</span> Component &amp;...);</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Func</td><td>Type of the function object to invoke. </td></tr>
   </table>
@@ -296,7 +291,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00569">569</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00640">640</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -328,10 +323,10 @@ template&lt;typename Func &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Iterate the entities and applies them the given function object. </p>
+<p>Iterates entities and components and applies the given function object to them. </p>
 <p>The function object is invoked for each entity. It is provided with the entity itself and a set of references to all the components of the view.<br />
  The signature of the function should be equivalent to the following:</p>
-<div class="fragment"><div class="line">void(<a class="code" href="classentt_1_1View.html#ad167f4bc8202231d768a7b18218bae5b">entity_type</a>, Component &amp;...);</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
+<div class="fragment"><div class="line">void(<a class="code" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a>, Component &amp;...);</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Func</td><td>Type of the function object to invoke. </td></tr>
   </table>
@@ -344,7 +339,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00591">591</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00675">675</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -378,7 +373,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the entity following the last entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00459">459</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00508">508</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -398,7 +393,7 @@ template&lt;typename Comp &gt; </div>
         <tr>
           <td class="memname">const Comp&amp; <a class="el" href="classentt_1_1View.html">entt::View</a>&lt; Entity, Component &gt;::get </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classentt_1_1View.html#ad167f4bc8202231d768a7b18218bae5b">entity_type</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a>&#160;</td>
           <td class="paramname"><em>entity</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -411,12 +406,12 @@ template&lt;typename Comp &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns the component assigned to the given entity. </p>
-<p>Prefer this function instead of <code><a class="el" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd" title="Returns a reference to a tag. ">Registry::get</a></code> during iterations. It has far better performance than its companion function.</p>
+<p>Prefer this function instead of <code><a class="el" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd" title="Returns a reference to the given tag. ">Registry::get</a></code> during iterations. It has far better performance than its companion function.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid component type results in a compilation error. Attempting to use an entity that doesn't belong to the view results in undefined behavior.<br />
  An assertion will abort the execution at runtime in debug mode if the view doesn't contain the given entity.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Comp</td><td>Type of the component to get. </td></tr>
+    <tr><td class="paramname">Comp</td><td>Type of component to get. </td></tr>
   </table>
   </dd>
 </dl>
@@ -428,7 +423,7 @@ template&lt;typename Comp &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The component assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00481">481</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00548">548</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -448,7 +443,7 @@ template&lt;typename Comp &gt; </div>
         <tr>
           <td class="memname">Comp&amp; <a class="el" href="classentt_1_1View.html">entt::View</a>&lt; Entity, Component &gt;::get </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classentt_1_1View.html#ad167f4bc8202231d768a7b18218bae5b">entity_type</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a>&#160;</td>
           <td class="paramname"><em>entity</em></td><td>)</td>
           <td></td>
         </tr>
@@ -461,12 +456,12 @@ template&lt;typename Comp &gt; </div>
 </div><div class="memdoc">
 
 <p>Returns the component assigned to the given entity. </p>
-<p>Prefer this function instead of <code><a class="el" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd" title="Returns a reference to a tag. ">Registry::get</a></code> during iterations. It has far better performance than its companion function.</p>
+<p>Prefer this function instead of <code><a class="el" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd" title="Returns a reference to the given tag. ">Registry::get</a></code> during iterations. It has far better performance than its companion function.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid component type results in a compilation error. Attempting to use an entity that doesn't belong to the view results in undefined behavior.<br />
  An assertion will abort the execution at runtime in debug mode if the view doesn't contain the given entity.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Comp</td><td>Type of the component to get. </td></tr>
+    <tr><td class="paramname">Comp</td><td>Type of component to get. </td></tr>
   </table>
   </dd>
 </dl>
@@ -478,7 +473,7 @@ template&lt;typename Comp &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The component assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00503">503</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00571">571</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -498,7 +493,7 @@ template&lt;typename... Comp&gt; </div>
         <tr>
           <td class="memname">std::enable_if_t&lt;(sizeof...(Comp) &gt; 1), std::tuple&lt;const Comp &amp;...&gt; &gt; <a class="el" href="classentt_1_1View.html">entt::View</a>&lt; Entity, Component &gt;::get </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classentt_1_1View.html#ad167f4bc8202231d768a7b18218bae5b">entity_type</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a>&#160;</td>
           <td class="paramname"><em>entity</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -511,7 +506,7 @@ template&lt;typename... Comp&gt; </div>
 </div><div class="memdoc">
 
 <p>Returns the components assigned to the given entity. </p>
-<p>Prefer this function instead of <code><a class="el" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd" title="Returns a reference to a tag. ">Registry::get</a></code> during iterations. It has far better performance than its companion function.</p>
+<p>Prefer this function instead of <code><a class="el" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd" title="Returns a reference to the given tag. ">Registry::get</a></code> during iterations. It has far better performance than its companion function.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to use invalid component types results in a compilation error. Attempting to use an entity that doesn't belong to the view results in undefined behavior.<br />
  An assertion will abort the execution at runtime in debug mode if the view doesn't contain the given entity.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -528,7 +523,7 @@ template&lt;typename... Comp&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The components assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00526">526</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00594">594</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -548,7 +543,7 @@ template&lt;typename... Comp&gt; </div>
         <tr>
           <td class="memname">std::enable_if_t&lt;(sizeof...(Comp) &gt; 1), std::tuple&lt;Comp &amp;...&gt; &gt; <a class="el" href="classentt_1_1View.html">entt::View</a>&lt; Entity, Component &gt;::get </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classentt_1_1View.html#ad167f4bc8202231d768a7b18218bae5b">entity_type</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a>&#160;</td>
           <td class="paramname"><em>entity</em></td><td>)</td>
           <td></td>
         </tr>
@@ -561,7 +556,7 @@ template&lt;typename... Comp&gt; </div>
 </div><div class="memdoc">
 
 <p>Returns the components assigned to the given entity. </p>
-<p>Prefer this function instead of <code><a class="el" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd" title="Returns a reference to a tag. ">Registry::get</a></code> during iterations. It has far better performance than its companion function.</p>
+<p>Prefer this function instead of <code><a class="el" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd" title="Returns a reference to the given tag. ">Registry::get</a></code> during iterations. It has far better performance than its companion function.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to use invalid component types results in a compilation error. Attempting to use an entity that doesn't belong to the view results in undefined behavior.<br />
  An assertion will abort the execution at runtime in debug mode if the view doesn't contain the given entity.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -578,7 +573,7 @@ template&lt;typename... Comp&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The components assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00549">549</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00618">618</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -611,7 +606,39 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <p>A multi component view keeps a reference to the smallest set of candidate entities to iterate. Resetting a view means querying the underlying data structures and reinitializing the view.<br />
  Use it only if copies of views are stored around and there is a possibility that a component has become the best candidate in the meantime. </p>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00607">607</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00691">691</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a6f5d49e4b67890cf53d1c3c25879fb81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f5d49e4b67890cf53d1c3c25879fb81">&#9670;&nbsp;</a></span>size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename... Component&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1View.html#ab3f86ec55935bbbb00077bbe07f15c4b">size_type</a> <a class="el" href="classentt_1_1View.html">entt::View</a>&lt; Entity, Component &gt;::size </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Estimates the number of entities that have the given components. </p>
+<dl class="section return"><dt>Returns</dt><dd>Estimated number of entities that have the given components. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00470">470</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>

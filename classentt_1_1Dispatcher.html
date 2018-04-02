@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.4.2</span>
+   &#160;<span id="projectnumber">2.5.0</span>
    </div>
   </td>
  </tr>
@@ -199,7 +199,7 @@ template&lt;typename Event , typename Class , void(Class::*)(const Event &amp;) 
 
 <p>Unregisters a listener given in the form of a member function. </p>
 <p>A matching member function has the following signature: <code>void receive(const Event &amp;)</code>. Member functions named <code>receive</code> are automatically detected and unregistered if available.</p>
-<dl class="section warning"><dt>Warning</dt><dd>Disonnecting a listener during an update may lead to unexpected behavior. Unregister listeners before or after invoking the update if possible.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Disconnecting a listener during an update may lead to unexpected behavior. Unregister listeners before or after invoking the update if possible.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Event</td><td>Type of event from which to disconnect the function. </td></tr>
@@ -215,7 +215,7 @@ template&lt;typename Event , typename Class , void(Class::*)(const Event &amp;) 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00139">139</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00140">140</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -263,7 +263,7 @@ template&lt;typename Event , typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00169">169</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00170">170</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -311,7 +311,7 @@ template&lt;typename Event , typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00154">154</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00155">155</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -343,7 +343,7 @@ template&lt;template&lt; typename... &gt; class Sig&gt; </div>
 <p>Delivers all the pending events. </p>
 <p>This method is blocking and it doesn't return until all the events are delivered to the registered listeners. It's responsability of the users to reduce at a minimum the time spent in the bodies of the listeners. </p>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00180">180</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00181">181</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>

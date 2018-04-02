@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.4.2</span>
+   &#160;<span id="projectnumber">2.5.0</span>
    </div>
   </td>
  </tr>
@@ -87,10 +87,10 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab57f21bb526920b97ac6250003c5255a"><td class="memItemLeft" align="right" valign="top"><a id="ab57f21bb526920b97ac6250003c5255a"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Process.html#ab57f21bb526920b97ac6250003c5255a">~Process</a> () noexcept</td></tr>
-<tr class="memdesc:ab57f21bb526920b97ac6250003c5255a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor. <br /></td></tr>
-<tr class="separator:ab57f21bb526920b97ac6250003c5255a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9647243342243908a1c024d6ca015a9d"><td class="memItemLeft" align="right" valign="top"><a id="a9647243342243908a1c024d6ca015a9d"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Process.html#a9647243342243908a1c024d6ca015a9d">~Process</a> () noexcept</td></tr>
+<tr class="memdesc:a9647243342243908a1c024d6ca015a9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor. <br /></td></tr>
+<tr class="separator:a9647243342243908a1c024d6ca015a9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3678846862a819a23361bca2982251d5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Process.html#a3678846862a819a23361bca2982251d5">abort</a> (bool immediately=false) noexcept</td></tr>
 <tr class="memdesc:a3678846862a819a23361bca2982251d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aborts a process if it's still alive.  <a href="#a3678846862a819a23361bca2982251d5">More...</a><br /></td></tr>
 <tr class="separator:a3678846862a819a23361bca2982251d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -133,11 +133,16 @@ class entt::Process&lt; Derived, Delta &gt;</h3>
 <p>This class stays true to the CRTP idiom. Derived classes must specify what's the intended type for elapsed times.<br />
  A process should expose publicly the following member functions whether required:</p>
 <ul>
-<li><div class="fragment"><div class="line"><span class="keywordtype">void</span> update(Delta);</div></div><!-- fragment --> It's invoked once per tick until a process is explicitly aborted or it terminates either with or without errors. Even though it's not mandatory to declare this member function, as a rule of thumb each process should at least define it to work properly.</li>
-<li><div class="fragment"><div class="line"><span class="keywordtype">void</span> init();</div></div><!-- fragment --> It's invoked at the first tick, immediately before an update.</li>
-<li><div class="fragment"><div class="line"><span class="keywordtype">void</span> succeeded();</div></div><!-- fragment --> It's invoked in case of success, immediately after an update and during the same tick.</li>
-<li><div class="fragment"><div class="line"><span class="keywordtype">void</span> failed();</div></div><!-- fragment --> It's invoked in case of errors, immediately after an update and during the same tick.</li>
-<li><div class="fragment"><div class="line"><span class="keywordtype">void</span> aborted();</div></div><!-- fragment --> It's invoked only if a process is explicitly aborted. There is no guarantee that it executes in the same tick, this depends solely on whether the process is aborted immediately or not.</li>
+<li><div class="fragment"><div class="line"><span class="keywordtype">void</span> update(Delta, <span class="keywordtype">void</span> *);</div></div><!-- fragment --><p class="startli">It's invoked once per tick until a process is explicitly aborted or it terminates either with or without errors. Even though it's not mandatory to declare this member function, as a rule of thumb each process should at least define it to work properly. The <code>void *</code> parameter is an opaque pointer to user data (if any) forwarded directly to the process during an update.</p>
+</li>
+<li><div class="fragment"><div class="line"><span class="keywordtype">void</span> init(<span class="keywordtype">void</span> *);</div></div><!-- fragment --><p class="startli">It's invoked at the first tick, immediately before an update. The <code>void *</code> parameter is an opaque pointer to user data (if any) forwarded directly to the process during an update.</p>
+</li>
+<li><div class="fragment"><div class="line"><span class="keywordtype">void</span> succeeded();</div></div><!-- fragment --><p class="startli">It's invoked in case of success, immediately after an update and during the same tick.</p>
+</li>
+<li><div class="fragment"><div class="line"><span class="keywordtype">void</span> failed();</div></div><!-- fragment --><p class="startli">It's invoked in case of errors, immediately after an update and during the same tick.</p>
+</li>
+<li><div class="fragment"><div class="line"><span class="keywordtype">void</span> aborted();</div></div><!-- fragment --><p class="startli">It's invoked only if a process is explicitly aborted. There is no guarantee that it executes in the same tick, this depends solely on whether the process is aborted immediately or not.</p>
+</li>
 </ul>
 <p>Derived classes can change the internal state of a process by invoking the <code>succeed</code> and <code>fail</code> protected member functions and even pause or unpause the process itself.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1Scheduler.html" title="Cooperative scheduler for processes. ">Scheduler</a></dd></dl>
@@ -149,7 +154,7 @@ class entt::Process&lt; Derived, Delta &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00063">63</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00072">72</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a3678846862a819a23361bca2982251d5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3678846862a819a23361bca2982251d5">&#9670;&nbsp;</a></span>abort()</h2>
@@ -186,7 +191,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00176">176</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00185">185</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -218,7 +223,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Returns true if a process is either running or paused. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the process is still alive, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00190">190</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00199">199</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -250,7 +255,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Returns true if a process is already terminated. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the process is terminated, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00198">198</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00207">207</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -282,7 +287,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Terminates a process with errors if it's still alive. </p>
 <p>The function is idempotent and it does nothing if the process isn't alive. </p>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00129">129</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00138">138</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -314,7 +319,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Stops a process if it's in a running state. </p>
 <p>The function is idempotent and it does nothing if the process isn't running. </p>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00141">141</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00150">150</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -346,7 +351,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Returns true if a process is currently paused. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the process is paused, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00206">206</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00215">215</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -378,7 +383,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Returns true if a process terminated with errors. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the process terminated with errors, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00214">214</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00223">223</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -410,7 +415,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Terminates a process with success if it's still alive. </p>
 <p>The function is idempotent and it does nothing if the process isn't alive. </p>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00117">117</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00126">126</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -459,7 +464,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00223">223</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00232">232</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -491,7 +496,7 @@ template&lt;typename Derived, typename Delta&gt; </div>
 <p>Restarts a process if it's paused. </p>
 <p>The function is idempotent and it does nothing if the process isn't paused. </p>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00153">153</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00162">162</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>

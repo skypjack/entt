@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.4.2</span>
+   &#160;<span id="projectnumber">2.5.0</span>
    </div>
   </td>
  </tr>
@@ -154,8 +154,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a75ed5006f4be9ea8489a48ef40247e29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if there exists at least an entity still in use.  <a href="#a75ed5006f4be9ea8489a48ef40247e29">More...</a><br /></td></tr>
 <tr class="separator:a75ed5006f4be9ea8489a48ef40247e29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11a759638bf2c28ac1670c7b533ca53f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a11a759638bf2c28ac1670c7b533ca53f">valid</a> (<a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a> entity) const noexcept</td></tr>
-<tr class="memdesc:a11a759638bf2c28ac1670c7b533ca53f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verifies if an entity identifier still refers to a valid entity.  <a href="#a11a759638bf2c28ac1670c7b533ca53f">More...</a><br /></td></tr>
+<tr class="memdesc:a11a759638bf2c28ac1670c7b533ca53f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if an entity identifier refers to a valid entity.  <a href="#a11a759638bf2c28ac1670c7b533ca53f">More...</a><br /></td></tr>
 <tr class="separator:a11a759638bf2c28ac1670c7b533ca53f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fac03bc57208cdbc36c62bf8f08408c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a1fac03bc57208cdbc36c62bf8f08408c">fast</a> (<a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a> entity) const noexcept</td></tr>
+<tr class="memdesc:a1fac03bc57208cdbc36c62bf8f08408c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if an entity identifier refers to a valid entity.  <a href="#a1fac03bc57208cdbc36c62bf8f08408c">More...</a><br /></td></tr>
+<tr class="separator:a1fac03bc57208cdbc36c62bf8f08408c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a773c2bb361f4e83aae1349ccfeede56b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1Registry.html#a82c8996277034df5e72b5f30a70ebb2d">version_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a773c2bb361f4e83aae1349ccfeede56b">version</a> (<a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a> entity) const noexcept</td></tr>
 <tr class="memdesc:a773c2bb361f4e83aae1349ccfeede56b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the version stored along with an entity identifier.  <a href="#a773c2bb361f4e83aae1349ccfeede56b">More...</a><br /></td></tr>
 <tr class="separator:a773c2bb361f4e83aae1349ccfeede56b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -178,27 +181,35 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:afe1fc933ce101207a49b6bdeafa2ce41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6aba3339872b3dccc722debcdf4d65c"><td class="memTemplParams" colspan="2">template&lt;typename Tag , typename... Args&gt; </td></tr>
 <tr class="memitem:ad6aba3339872b3dccc722debcdf4d65c"><td class="memTemplItemLeft" align="right" valign="top">Tag &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#ad6aba3339872b3dccc722debcdf4d65c">attach</a> (<a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a> entity, Args &amp;&amp;... args)</td></tr>
-<tr class="memdesc:ad6aba3339872b3dccc722debcdf4d65c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attaches a tag to an entity.  <a href="#ad6aba3339872b3dccc722debcdf4d65c">More...</a><br /></td></tr>
+<tr class="memdesc:ad6aba3339872b3dccc722debcdf4d65c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attaches the given tag to an entity.  <a href="#ad6aba3339872b3dccc722debcdf4d65c">More...</a><br /></td></tr>
 <tr class="separator:ad6aba3339872b3dccc722debcdf4d65c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a957bcbdbf082f9767e5474a73be6ece4"><td class="memTemplParams" colspan="2">template&lt;typename Tag &gt; </td></tr>
 <tr class="memitem:a957bcbdbf082f9767e5474a73be6ece4"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a957bcbdbf082f9767e5474a73be6ece4">remove</a> ()</td></tr>
-<tr class="memdesc:a957bcbdbf082f9767e5474a73be6ece4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes a tag from its owner, if any.  <a href="#a957bcbdbf082f9767e5474a73be6ece4">More...</a><br /></td></tr>
+<tr class="memdesc:a957bcbdbf082f9767e5474a73be6ece4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the given tag from its owner, if any.  <a href="#a957bcbdbf082f9767e5474a73be6ece4">More...</a><br /></td></tr>
 <tr class="separator:a957bcbdbf082f9767e5474a73be6ece4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac17c42321f66e42649d1b0e549828620"><td class="memTemplParams" colspan="2">template&lt;typename Tag &gt; </td></tr>
 <tr class="memitem:ac17c42321f66e42649d1b0e549828620"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#ac17c42321f66e42649d1b0e549828620">has</a> () const noexcept</td></tr>
-<tr class="memdesc:ac17c42321f66e42649d1b0e549828620"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a tag has an owner.  <a href="#ac17c42321f66e42649d1b0e549828620">More...</a><br /></td></tr>
+<tr class="memdesc:ac17c42321f66e42649d1b0e549828620"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the given tag has an owner.  <a href="#ac17c42321f66e42649d1b0e549828620">More...</a><br /></td></tr>
 <tr class="separator:ac17c42321f66e42649d1b0e549828620"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aad2f79d8d9637a5f666a7121f379a0dd"><td class="memTemplParams" colspan="2">template&lt;typename Tag &gt; </td></tr>
 <tr class="memitem:aad2f79d8d9637a5f666a7121f379a0dd"><td class="memTemplItemLeft" align="right" valign="top">const Tag &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd">get</a> () const noexcept</td></tr>
-<tr class="memdesc:aad2f79d8d9637a5f666a7121f379a0dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to a tag.  <a href="#aad2f79d8d9637a5f666a7121f379a0dd">More...</a><br /></td></tr>
+<tr class="memdesc:aad2f79d8d9637a5f666a7121f379a0dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the given tag.  <a href="#aad2f79d8d9637a5f666a7121f379a0dd">More...</a><br /></td></tr>
 <tr class="separator:aad2f79d8d9637a5f666a7121f379a0dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ff6b9887a50279aec9f463f908924f0"><td class="memTemplParams" colspan="2">template&lt;typename Tag &gt; </td></tr>
 <tr class="memitem:a1ff6b9887a50279aec9f463f908924f0"><td class="memTemplItemLeft" align="right" valign="top">Tag &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a1ff6b9887a50279aec9f463f908924f0">get</a> () noexcept</td></tr>
-<tr class="memdesc:a1ff6b9887a50279aec9f463f908924f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to a tag.  <a href="#a1ff6b9887a50279aec9f463f908924f0">More...</a><br /></td></tr>
+<tr class="memdesc:a1ff6b9887a50279aec9f463f908924f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the given tag.  <a href="#a1ff6b9887a50279aec9f463f908924f0">More...</a><br /></td></tr>
 <tr class="separator:a1ff6b9887a50279aec9f463f908924f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacc7a70b089cde28a48ef5e284cff585"><td class="memTemplParams" colspan="2">template&lt;typename Tag , typename... Args&gt; </td></tr>
+<tr class="memitem:aacc7a70b089cde28a48ef5e284cff585"><td class="memTemplItemLeft" align="right" valign="top">Tag &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#aacc7a70b089cde28a48ef5e284cff585">set</a> (Args &amp;&amp;... args)</td></tr>
+<tr class="memdesc:aacc7a70b089cde28a48ef5e284cff585"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the given tag.  <a href="#aacc7a70b089cde28a48ef5e284cff585">More...</a><br /></td></tr>
+<tr class="separator:aacc7a70b089cde28a48ef5e284cff585"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f549d8146da785e231ea641e44b6956"><td class="memTemplParams" colspan="2">template&lt;typename Tag &gt; </td></tr>
+<tr class="memitem:a2f549d8146da785e231ea641e44b6956"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a2f549d8146da785e231ea641e44b6956">move</a> (<a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a> entity)</td></tr>
+<tr class="memdesc:a2f549d8146da785e231ea641e44b6956"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the owner of the given tag.  <a href="#a2f549d8146da785e231ea641e44b6956">More...</a><br /></td></tr>
+<tr class="separator:a2f549d8146da785e231ea641e44b6956"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9300c3ef37bc0abb7ebc5dac7b2fc873"><td class="memTemplParams" colspan="2">template&lt;typename Tag &gt; </td></tr>
 <tr class="memitem:a9300c3ef37bc0abb7ebc5dac7b2fc873"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a9300c3ef37bc0abb7ebc5dac7b2fc873">attachee</a> () const noexcept</td></tr>
-<tr class="memdesc:a9300c3ef37bc0abb7ebc5dac7b2fc873"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the owner of a tag, if any.  <a href="#a9300c3ef37bc0abb7ebc5dac7b2fc873">More...</a><br /></td></tr>
+<tr class="memdesc:a9300c3ef37bc0abb7ebc5dac7b2fc873"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the owner of the given tag, if any.  <a href="#a9300c3ef37bc0abb7ebc5dac7b2fc873">More...</a><br /></td></tr>
 <tr class="separator:a9300c3ef37bc0abb7ebc5dac7b2fc873"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa6b578d40a9305869e692167fc3dcddf"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Args&gt; </td></tr>
 <tr class="memitem:aa6b578d40a9305869e692167fc3dcddf"><td class="memTemplItemLeft" align="right" valign="top">Component &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#aa6b578d40a9305869e692167fc3dcddf">assign</a> (<a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a> entity, Args &amp;&amp;... args)</td></tr>
@@ -232,10 +243,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5ce71508e824ea5ef0d95d4baef37503"><td class="memTemplItemLeft" align="right" valign="top">Component &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a5ce71508e824ea5ef0d95d4baef37503">replace</a> (<a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a> entity, Args &amp;&amp;... args)</td></tr>
 <tr class="memdesc:a5ce71508e824ea5ef0d95d4baef37503"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the given component for an entity.  <a href="#a5ce71508e824ea5ef0d95d4baef37503">More...</a><br /></td></tr>
 <tr class="separator:a5ce71508e824ea5ef0d95d4baef37503"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a14524dac71cf528fcdccd74cdf230627"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Args&gt; </td></tr>
-<tr class="memitem:a14524dac71cf528fcdccd74cdf230627"><td class="memTemplItemLeft" align="right" valign="top">Component &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a14524dac71cf528fcdccd74cdf230627">accomodate</a> (<a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a> entity, Args &amp;&amp;... args)</td></tr>
-<tr class="memdesc:a14524dac71cf528fcdccd74cdf230627"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns or replaces the given component for an entity.  <a href="#a14524dac71cf528fcdccd74cdf230627">More...</a><br /></td></tr>
-<tr class="separator:a14524dac71cf528fcdccd74cdf230627"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05b872df10bc6ca6f1a11f74eb6f824a"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Args&gt; </td></tr>
+<tr class="memitem:a05b872df10bc6ca6f1a11f74eb6f824a"><td class="memTemplItemLeft" align="right" valign="top">Component &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a05b872df10bc6ca6f1a11f74eb6f824a">accommodate</a> (<a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a> entity, Args &amp;&amp;... args)</td></tr>
+<tr class="memdesc:a05b872df10bc6ca6f1a11f74eb6f824a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns or replaces the given component for an entity.  <a href="#a05b872df10bc6ca6f1a11f74eb6f824a">More...</a><br /></td></tr>
+<tr class="separator:a05b872df10bc6ca6f1a11f74eb6f824a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a625ada828ff48c153c7be14cc99eeca5"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename Compare &gt; </td></tr>
 <tr class="memitem:a625ada828ff48c153c7be14cc99eeca5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a625ada828ff48c153c7be14cc99eeca5">sort</a> (Compare compare)</td></tr>
 <tr class="memdesc:a625ada828ff48c153c7be14cc99eeca5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sorts the pool of entities for the given component.  <a href="#a625ada828ff48c153c7be14cc99eeca5">More...</a><br /></td></tr>
@@ -257,8 +268,15 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a1b6ec743e9a62389cf2bba9a25ee09d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d7547f6d8503265480d235fe48dfb1d"><td class="memTemplParams" colspan="2">template&lt;typename Func &gt; </td></tr>
 <tr class="memitem:a1d7547f6d8503265480d235fe48dfb1d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a1d7547f6d8503265480d235fe48dfb1d">each</a> (Func func) const</td></tr>
-<tr class="memdesc:a1d7547f6d8503265480d235fe48dfb1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterate entities and applies them the given function object.  <a href="#a1d7547f6d8503265480d235fe48dfb1d">More...</a><br /></td></tr>
+<tr class="memdesc:a1d7547f6d8503265480d235fe48dfb1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates all the entities that are still in use.  <a href="#a1d7547f6d8503265480d235fe48dfb1d">More...</a><br /></td></tr>
 <tr class="separator:a1d7547f6d8503265480d235fe48dfb1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ef600a8f843a0f90cfa6b636d3bc63a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a1ef600a8f843a0f90cfa6b636d3bc63a">orphan</a> (<a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a> entity) const</td></tr>
+<tr class="memdesc:a1ef600a8f843a0f90cfa6b636d3bc63a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if an entity is an orphan.  <a href="#a1ef600a8f843a0f90cfa6b636d3bc63a">More...</a><br /></td></tr>
+<tr class="separator:a1ef600a8f843a0f90cfa6b636d3bc63a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada2900e50f66573c14821baac03bbd68"><td class="memTemplParams" colspan="2">template&lt;typename Func &gt; </td></tr>
+<tr class="memitem:ada2900e50f66573c14821baac03bbd68"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#ada2900e50f66573c14821baac03bbd68">orphans</a> (Func func) const</td></tr>
+<tr class="memdesc:ada2900e50f66573c14821baac03bbd68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates orphans and applies them the given function object.  <a href="#ada2900e50f66573c14821baac03bbd68">More...</a><br /></td></tr>
+<tr class="separator:ada2900e50f66573c14821baac03bbd68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed83d4c8f80ae647ee73f2a8440fa09d"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
 <tr class="memitem:aed83d4c8f80ae647ee73f2a8440fa09d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1View.html">View</a>&lt; Entity, Component... &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a> ()</td></tr>
 <tr class="memdesc:aed83d4c8f80ae647ee73f2a8440fa09d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a standard view for the given components.  <a href="#aed83d4c8f80ae647ee73f2a8440fa09d">More...</a><br /></td></tr>
@@ -279,12 +297,23 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a139a4d7b711fc1813c6c4520b9e79c09"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1PersistentView.html">PersistentView</a>&lt; Entity, Component... &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a139a4d7b711fc1813c6c4520b9e79c09">persistent</a> ()</td></tr>
 <tr class="memdesc:a139a4d7b711fc1813c6c4520b9e79c09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a persistent view for the given components.  <a href="#a139a4d7b711fc1813c6c4520b9e79c09">More...</a><br /></td></tr>
 <tr class="separator:a139a4d7b711fc1813c6c4520b9e79c09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abfcf4b93ce00f98f06c5ef522981e2dd"><td class="memTemplParams" colspan="2">template&lt;typename Component &gt; </td></tr>
+<tr class="memitem:abfcf4b93ce00f98f06c5ef522981e2dd"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1RawView.html">RawView</a>&lt; Entity, Component &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#abfcf4b93ce00f98f06c5ef522981e2dd">raw</a> ()</td></tr>
+<tr class="memdesc:abfcf4b93ce00f98f06c5ef522981e2dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a raw view for the given component.  <a href="#abfcf4b93ce00f98f06c5ef522981e2dd">More...</a><br /></td></tr>
+<tr class="separator:abfcf4b93ce00f98f06c5ef522981e2dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69bdf0c5645f2049e8dee9e0c4de53ca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1Snapshot.html">Snapshot</a>&lt; Entity &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a69bdf0c5645f2049e8dee9e0c4de53ca">snapshot</a> () const</td></tr>
+<tr class="memdesc:a69bdf0c5645f2049e8dee9e0c4de53ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a temporary object to use to create snapshots.  <a href="#a69bdf0c5645f2049e8dee9e0c4de53ca">More...</a><br /></td></tr>
+<tr class="separator:a69bdf0c5645f2049e8dee9e0c4de53ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a925e91c4f1904d5104a0c5e9e9f70223"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&lt; Entity &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Registry.html#a925e91c4f1904d5104a0c5e9e9f70223">restore</a> ()</td></tr>
+<tr class="memdesc:a925e91c4f1904d5104a0c5e9e9f70223"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a temporary object to use to load snapshots.  <a href="#a925e91c4f1904d5104a0c5e9e9f70223">More...</a><br /></td></tr>
+<tr class="separator:a925e91c4f1904d5104a0c5e9e9f70223"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Entity&gt;<br />
 class entt::Registry&lt; Entity &gt;</h3>
 
 <p>Fast and reliable entity-component system. </p>
+<p>Forward declaration of the registry class.</p>
 <p>The registry is the core class of the entity-component framework.<br />
  It stores entities and arranges pools of components on a per request basis. By means of a registry, users can manage entities and components and thus create views to iterate them.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -294,10 +323,10 @@ class entt::Registry&lt; Entity &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00034">34</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00035">35</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a14524dac71cf528fcdccd74cdf230627"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a14524dac71cf528fcdccd74cdf230627">&#9670;&nbsp;</a></span>accomodate()</h2>
+<a id="a05b872df10bc6ca6f1a11f74eb6f824a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05b872df10bc6ca6f1a11f74eb6f824a">&#9670;&nbsp;</a></span>accommodate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -310,7 +339,7 @@ template&lt;typename Component , typename... Args&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">Component&amp; <a class="el" href="classentt_1_1Registry.html">entt::Registry</a>&lt; Entity &gt;::accomodate </td>
+          <td class="memname">Component&amp; <a class="el" href="classentt_1_1Registry.html">entt::Registry</a>&lt; Entity &gt;::accommodate </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a>&#160;</td>
           <td class="paramname"><em>entity</em>, </td>
@@ -336,7 +365,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 
 <p>Assigns or replaces the given component for an entity. </p>
 <p>Equivalent to the following snippet (pseudocode):</p>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span>(registry.has&lt;Component&gt;(entity)) {</div><div class="line">    registry.replace&lt;Component&gt;(entity, args...);</div><div class="line">} <span class="keywordflow">else</span> {</div><div class="line">    registry.assign&lt;Component&gt;(entity, args...);</div><div class="line">}</div></div><!-- fragment --><p>Prefer this function anyway because it has slighlty better performance.</p>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span>(registry.has&lt;Component&gt;(entity)) {</div><div class="line">    registry.replace&lt;Component&gt;(entity, args...);</div><div class="line">} <span class="keywordflow">else</span> {</div><div class="line">    registry.assign&lt;Component&gt;(entity, args...);</div><div class="line">}</div></div><!-- fragment --><p>Prefer this function anyway because it has slightly better performance.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br />
  An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -355,7 +384,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00770">770</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00842">842</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -417,7 +446,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00591">591</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00664">664</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -459,7 +488,7 @@ template&lt;typename Tag , typename... Args&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Attaches a tag to an entity. </p>
+<p>Attaches the given tag to an entity. </p>
 <p>Usually, pools of components allocate enough memory to store a bunch of elements even if only one of them is used. On the other hand, there are cases where all what is needed is a single instance component to attach to an entity.<br />
  Tags are the right tool to achieve the purpose.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to attach to an entity a tag that already has an owner results in undefined behavior.<br />
@@ -480,7 +509,7 @@ template&lt;typename Tag , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created tag. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00477">477</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00501">501</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -511,7 +540,7 @@ template&lt;typename Tag &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Gets the owner of a tag, if any. </p>
+<p>Gets the owner of the given tag, if any. </p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to get the owner of a tag that hasn't been previously attached to an entity results in undefined behavior.<br />
  An assertion will abort the execution at runtime in debug mode if the tag hasn't an owner.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -522,7 +551,7 @@ template&lt;typename Tag &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00565">565</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00638">638</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -554,7 +583,7 @@ template&lt;typename Entity&gt; </div>
 <p>Returns the number of entities ever created. </p>
 <dl class="section return"><dt>Returns</dt><dd>Number of entities ever created. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00267">267</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00266">266</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -636,7 +665,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the view has already been prepared, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01041">1041</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01159">1159</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -690,7 +719,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00356">356</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00375">375</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -737,7 +766,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00383">383</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00402">402</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -776,7 +805,7 @@ template&lt;typename Entity&gt; </div>
 <p>The returned entity has no components assigned.</p>
 <dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00408">408</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00427">427</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -818,7 +847,7 @@ template&lt;typename Entity&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Actual version for the given entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00328">328</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00349">349</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -859,7 +888,7 @@ template&lt;typename Entity&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00439">439</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00462">462</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -901,7 +930,7 @@ template&lt;typename... Component&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01023">1023</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01141">1141</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -933,10 +962,12 @@ template&lt;typename Func &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Iterate entities and applies them the given function object. </p>
-<p>The function object is invoked for each entity, no matter if it's in use or not.<br />
+<p>Iterates all the entities that are still in use. </p>
+<p>The function object is invoked for each entity that is still in use.<br />
  The signature of the function should be equivalent to the following:</p>
-<div class="fragment"><div class="line">void(<a class="code" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a>);</div></div><!-- fragment --><p>Consider using a view if the goal is to iterate entities that have a determinate set of components. A view is usually faster than combining this function with a bunch of custom tests.</p>
+<div class="fragment"><div class="line">void(<a class="code" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a>);</div></div><!-- fragment --><p>This function is fairly slow and should not be used frequently.<br />
+ Consider using a view if the goal is to iterate entities that have a determinate set of components. A view is usually faster than combining this function with a bunch of custom tests.<br />
+ On the other side, this function can be used to iterate all the entities that are in use, regardless of their components.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Func</td><td>Type of the function object to invoke. </td></tr>
@@ -950,7 +981,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00943">943</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00997">997</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -990,7 +1021,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the pool for the given component is empty, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00278">278</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00277">277</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1022,7 +1053,50 @@ template&lt;typename Entity&gt; </div>
 <p>Checks if there exists at least an entity still in use. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if at least an entity is still in use, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00286">286</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00285">285</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a1fac03bc57208cdbc36c62bf8f08408c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fac03bc57208cdbc36c62bf8f08408c">&#9670;&nbsp;</a></span>fast()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classentt_1_1Registry.html">entt::Registry</a>&lt; Entity &gt;::fast </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a>&#160;</td>
+          <td class="paramname"><em>entity</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if an entity identifier refers to a valid entity. </p>
+<p>Alternative version of <code>valid</code>. It accesses the internal data structures without bounds checking and thus it's both unsafe and risky to use.<br />
+ You should not invoke directly this function unless you know exactly what you are doing. Prefer the <code>valid</code> member function instead.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an entity that doesn't belong to the registry can result in undefined behavior.<br />
+ An assertion will abort the execution at runtime in debug mode in case of bounds violation.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entity</td><td>A valid entity identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the identifier is valid, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00316">316</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1053,7 +1127,7 @@ template&lt;typename Tag &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Returns a reference to a tag. </p>
+<p>Returns a reference to the given tag. </p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to get a tag that hasn't an owner results in undefined behavior.<br />
  An assertion will abort the execution at runtime in debug mode if the tag hasn't been previously attached to an entity.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -1064,7 +1138,7 @@ template&lt;typename Tag &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the tag. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00530">530</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00554">554</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1095,7 +1169,7 @@ template&lt;typename Tag &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Returns a reference to a tag. </p>
+<p>Returns a reference to the given tag. </p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to get a tag that hasn't an owner results in undefined behavior.<br />
  An assertion will abort the execution at runtime in debug mode if the tag hasn't been previously attached to an entity.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -1106,7 +1180,7 @@ template&lt;typename Tag &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the tag. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00548">548</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00572">572</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1155,7 +1229,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the component owned by the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00652">652</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00725">725</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1204,7 +1278,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the component owned by the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00672">672</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00745">745</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1253,7 +1327,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>References to the components owned by the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00692">692</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00765">765</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1302,7 +1376,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>References to the components owned by the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00712">712</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00785">785</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1333,7 +1407,7 @@ template&lt;typename Tag &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Checks if a tag has an owner. </p>
+<p>Checks if the given tag has an owner. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Tag</td><td>Type of tag for which to perform the check. </td></tr>
@@ -1342,7 +1416,7 @@ template&lt;typename Tag &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the tag already has an owner, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00508">508</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00532">532</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1391,7 +1465,57 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the entity has all the components, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00628">628</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00701">701</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a2f549d8146da785e231ea641e44b6956"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f549d8146da785e231ea641e44b6956">&#9670;&nbsp;</a></span>move()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity&gt; </div>
+<div class="memtemplate">
+template&lt;typename Tag &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a> <a class="el" href="classentt_1_1Registry.html">entt::Registry</a>&lt; Entity &gt;::move </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a>&#160;</td>
+          <td class="paramname"><em>entity</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Changes the owner of the given tag. </p>
+<p>The ownership of the tag is transferred from one entity to another.</p>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity or to transfer the ownership of a tag that hasn't an owner results in undefined behavior.<br />
+ An assertion will abort the execution at runtime in debug mode in case of invalid entity or if the tag hasn't been previously attached to an entity.</dd></dl>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Tag</td><td>Type of tag of which to transfer the ownership. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entity</td><td>A valid entity identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00616">616</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1457,6 +1581,95 @@ template&lt;typename Entity&gt; </div>
 
 </div>
 </div>
+<a id="a1ef600a8f843a0f90cfa6b636d3bc63a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ef600a8f843a0f90cfa6b636d3bc63a">&#9670;&nbsp;</a></span>orphan()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classentt_1_1Registry.html">entt::Registry</a>&lt; Entity &gt;::orphan </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a>&#160;</td>
+          <td class="paramname"><em>entity</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if an entity is an orphan. </p>
+<p>An orphan is an entity that has neither assigned components nor tags.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entity</td><td>A valid entity identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the entity is an orphan, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01024">1024</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ada2900e50f66573c14821baac03bbd68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada2900e50f66573c14821baac03bbd68">&#9670;&nbsp;</a></span>orphans()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity&gt; </div>
+<div class="memtemplate">
+template&lt;typename Func &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classentt_1_1Registry.html">entt::Registry</a>&lt; Entity &gt;::orphans </td>
+          <td>(</td>
+          <td class="paramtype">Func&#160;</td>
+          <td class="paramname"><em>func</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Iterates orphans and applies them the given function object. </p>
+<p>The function object is invoked for each entity that is still in use and has neither assigned components nor tags.<br />
+ The signature of the function should be equivalent to the following:</p>
+<div class="fragment"><div class="line">void(<a class="code" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entity_type</a>);</div></div><!-- fragment --><p>This function can be very slow and should not be used frequently.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Func</td><td>Type of the function object to invoke. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">func</td><td>A valid function object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01058">1058</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a139a4d7b711fc1813c6c4520b9e79c09"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a139a4d7b711fc1813c6c4520b9e79c09">&#9670;&nbsp;</a></span>persistent()</h2>
 
@@ -1488,7 +1701,7 @@ template&lt;typename... Component&gt; </div>
 <p>This kind of views are created on the fly and share with the registry its internal data structures.<br />
  Feel free to discard a view after the use. Creating and destroying a view is an incredibly cheap operation because they do not require any type of initialization.<br />
  As a rule of thumb, storing a view should never be an option.</p>
-<p>Persistent views are the right choice to iterate entites when the number of components grows up and the most of the entities have all the given components.<br />
+<p>Persistent views are the right choice to iterate entities when the number of components grows up and the most of the entities have all the given components.<br />
  However they have also drawbacks:</p>
 <ul>
 <li>Each kind of persistent view requires a dedicated data structure that is allocated within the registry and it increases memory pressure.</li>
@@ -1500,7 +1713,9 @@ template&lt;typename... Component&gt; </div>
 <dd>
 <a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html" title="Single component view specialization. ">View&lt;Entity, Component&gt;</a> </dd>
 <dd>
-<a class="el" href="classentt_1_1PersistentView.html" title="Persistent view. ">PersistentView</a></dd></dl>
+<a class="el" href="classentt_1_1PersistentView.html" title="Persistent view. ">PersistentView</a> </dd>
+<dd>
+<a class="el" href="classentt_1_1RawView.html" title="Raw view. ">RawView</a></dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Types of components used to construct the view. </td></tr>
@@ -1509,7 +1724,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly created persistent view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01085">1085</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01204">1204</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1543,7 +1758,7 @@ template&lt;typename... Component&gt; </div>
 <p>Prepares the internal data structures used by persistent views. </p>
 <p>Persistent views are an incredibly fast tool used to iterate a packed array of entities all of which have specific components.<br />
  The initialization of a persistent view is also a pretty cheap operation, but for the first time they are created. That's mainly because of the internal data structures of the registry that are dedicated to this kind of views and that don't exist yet the very first time they are requested.<br />
- To avoid costly operations, internal data structures for persistent views can be prepared with this function. Just use the same set of components that would have been used otherwise to contruct the view.</p>
+ To avoid costly operations, internal data structures for persistent views can be prepared with this function. Just use the same set of components that would have been used otherwise to construct the view.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Types of components used to prepare the view. </td></tr>
@@ -1551,7 +1766,58 @@ template&lt;typename... Component&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01003">1003</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01121">1121</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="abfcf4b93ce00f98f06c5ef522981e2dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfcf4b93ce00f98f06c5ef522981e2dd">&#9670;&nbsp;</a></span>raw()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity&gt; </div>
+<div class="memtemplate">
+template&lt;typename Component &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1RawView.html">RawView</a>&lt;Entity, Component&gt; <a class="el" href="classentt_1_1Registry.html">entt::Registry</a>&lt; Entity &gt;::raw </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a raw view for the given component. </p>
+<p>This kind of views are created on the fly and share with the registry its internal data structures.<br />
+ Feel free to discard a view after the use. Creating and destroying a view is an incredibly cheap operation because they do not require any type of initialization.<br />
+ As a rule of thumb, storing a view should never be an option.</p>
+<p>Raw views are incredibly fast and must be considered the best tool to iterate components whenever knowing the entities to which they belong isn't required.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1View.html" title="Multi component view. ">View</a> </dd>
+<dd>
+<a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html" title="Single component view specialization. ">View&lt;Entity, Component&gt;</a> </dd>
+<dd>
+<a class="el" href="classentt_1_1PersistentView.html" title="Persistent view. ">PersistentView</a> </dd>
+<dd>
+<a class="el" href="classentt_1_1RawView.html" title="Raw view. ">RawView</a></dd></dl>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Component</td><td>Type of component used to construct the view. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A newly created raw view. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01232">1232</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1582,7 +1848,7 @@ template&lt;typename Tag &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Removes a tag from its owner, if any. </p>
+<p>Removes the given tag from its owner, if any. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Tag</td><td>Type of tag to remove. </td></tr>
@@ -1590,7 +1856,7 @@ template&lt;typename Tag &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00496">496</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00520">520</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1638,7 +1904,7 @@ template&lt;typename Component &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00610">610</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00683">683</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1700,7 +1966,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00737">737</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00810">810</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1835,7 +2101,7 @@ template&lt;typename Component &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00857">857</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00929">929</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1875,7 +2141,7 @@ template&lt;typename Component &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00878">878</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00950">950</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1905,9 +2171,95 @@ template&lt;typename Entity&gt; </div>
 </div><div class="memdoc">
 
 <p>Resets a whole registry. </p>
-<p>Destroys all the entities. After a call to <code>reset</code>, all the entities previously created are recycled with a new version number. In case entity identifers are stored around, the <code>current</code> member function can be used to know if they are still valid. </p>
+<p>Destroys all the entities. After a call to <code>reset</code>, all the entities still in use are recycled with a new version number. In case entity identifers are stored around, the <code>current</code> member function can be used to know if they are still valid. </p>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00898">898</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00970">970</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a925e91c4f1904d5104a0c5e9e9f70223"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a925e91c4f1904d5104a0c5e9e9f70223">&#9670;&nbsp;</a></span>restore()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&lt;Entity&gt; <a class="el" href="classentt_1_1Registry.html">entt::Registry</a>&lt; Entity &gt;::restore </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a temporary object to use to load snapshots. </p>
+<p>A snapshot is either a full or a partial dump of a registry.<br />
+ It can be used to save and restore its internal state or to keep two or more instances of this class in sync, as an example in a client-server architecture.</p>
+<dl class="section warning"><dt>Warning</dt><dd>The loader returned by this function requires that the registry be empty. In case it isn't, all the data will be automatically deleted before to return.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A not movable and not copyable object to use to load snasphosts. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01281">1281</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aacc7a70b089cde28a48ef5e284cff585"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aacc7a70b089cde28a48ef5e284cff585">&#9670;&nbsp;</a></span>set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity&gt; </div>
+<div class="memtemplate">
+template&lt;typename Tag , typename... Args&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Tag&amp; <a class="el" href="classentt_1_1Registry.html">entt::Registry</a>&lt; Entity &gt;::set </td>
+          <td>(</td>
+          <td class="paramtype">Args &amp;&amp;...&#160;</td>
+          <td class="paramname"><em>args</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Replaces the given tag. </p>
+<p>A new instance of the given tag is created and initialized with the arguments provided (the tag must have a proper constructor or be of aggregate type).</p>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to replace a tag that hasn't an owner results in undefined behavior.<br />
+ An assertion will abort the execution at runtime in debug mode if the tag hasn't been previously attached to an entity.</dd></dl>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Tag</td><td>Type of tag to replace. </td></tr>
+    <tr><td class="paramname">Args</td><td>Types of arguments to use to construct the tag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">args</td><td>Parameters to use to initialize the tag. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the tag. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00595">595</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -1983,6 +2335,40 @@ template&lt;typename Entity&gt; </div>
 
 </div>
 </div>
+<a id="a69bdf0c5645f2049e8dee9e0c4de53ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69bdf0c5645f2049e8dee9e0c4de53ca">&#9670;&nbsp;</a></span>snapshot()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1Snapshot.html">Snapshot</a>&lt;Entity&gt; <a class="el" href="classentt_1_1Registry.html">entt::Registry</a>&lt; Entity &gt;::snapshot </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a temporary object to use to create snapshots. </p>
+<p>A snapshot is either a full or a partial dump of a registry.<br />
+ It can be used to save and restore its internal state or to keep two or more instances of this class in sync, as an example in a client-server architecture.</p>
+<dl class="section return"><dt>Returns</dt><dd>A not movable and not copyable object to use to take snasphosts. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01246">1246</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a625ada828ff48c153c7be14cc99eeca5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a625ada828ff48c153c7be14cc99eeca5">&#9670;&nbsp;</a></span>sort() <span class="overload">[1/2]</span></h2>
 
@@ -2012,7 +2398,7 @@ template&lt;typename Component , typename Compare &gt; </div>
 </div><div class="memdoc">
 
 <p>Sorts the pool of entities for the given component. </p>
-<p>The order of the elements in a pool is highly affected by assignements of components to entities and deletions. Components are arranged to maximize the performance during iterations and users should not make any assumption on the order.<br />
+<p>The order of the elements in a pool is highly affected by assignments of components to entities and deletions. Components are arranged to maximize the performance during iterations and users should not make any assumption on the order.<br />
  This function can be used to impose an order to the elements in the pool for the given component. The order is kept valid until a component of the given type is assigned or removed from an entity.</p>
 <p>The comparison function object must return <code>true</code> if the first element is <em>less</em> than the second one, <code>false</code> otherwise. The signature of the comparison function should be equivalent to the following:</p>
 <div class="fragment"><div class="line">bool(<span class="keyword">const</span> Component &amp;, <span class="keyword">const</span> Component &amp;)</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
@@ -2029,7 +2415,7 @@ template&lt;typename Component , typename Compare &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00803">803</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00875">875</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2061,7 +2447,7 @@ template&lt;typename To , typename From &gt; </div>
 </div><div class="memdoc">
 
 <p>Sorts two pools of components in the same way. </p>
-<p>The order of the elements in a pool is highly affected by assignements of components to entities and deletions. Components are arranged to maximize the performance during iterations and users should not make any assumption on the order.</p>
+<p>The order of the elements in a pool is highly affected by assignments of components to entities and deletions. Components are arranged to maximize the performance during iterations and users should not make any assumption on the order.</p>
 <p>It happens that different pools of components must be sorted the same way because of runtime and/or performance constraints. This function can be used to order a pool of components according to the order between the entities in another pool of components.</p>
 <p><b>How</b> <b>it</b> <b>works</b> </p>
 <p>Being <code>A</code> and <code>B</code> the two sets where <code>B</code> is the master (the one the order of which rules) and <code>A</code> is the slave (the one to sort), after a call to this function an iterator for <code>A</code> will return the entities according to the following rules:</p>
@@ -2078,7 +2464,7 @@ template&lt;typename To , typename From &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00838">838</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00910">910</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2150,16 +2536,16 @@ template&lt;typename Entity&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Verifies if an entity identifier still refers to a valid entity. </p>
+<p>Checks if an entity identifier refers to a valid entity. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">entity</td><td>An entity identifier, either valid or not. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>True if the identifier is still valid, false otherwise. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the identifier is valid, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00295">295</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00294">294</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2198,7 +2584,7 @@ template&lt;typename Entity&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Version stored along with the given entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00307">307</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00328">328</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>
@@ -2233,7 +2619,7 @@ template&lt;typename... Component&gt; </div>
 <p>This kind of views are created on the fly and share with the registry its internal data structures.<br />
  Feel free to discard a view after the use. Creating and destroying a view is an incredibly cheap operation because they do not require any type of initialization.<br />
  As a rule of thumb, storing a view should never be an option.</p>
-<p>Standard views do their best to iterate the smallest set of candidate entites. In particular:</p>
+<p>Standard views do their best to iterate the smallest set of candidate entities. In particular:</p>
 <ul>
 <li>Single component views are incredibly fast and iterate a packed array of entities, all of which has the given component.</li>
 <li>Multi component views look at the number of entities available for each component and pick up a reference to the smallest set of candidates to test for the given components.</li>
@@ -2244,7 +2630,9 @@ template&lt;typename... Component&gt; </div>
 <dd>
 <a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html" title="Single component view specialization. ">View&lt;Entity, Component&gt;</a> </dd>
 <dd>
-<a class="el" href="classentt_1_1PersistentView.html" title="Persistent view. ">PersistentView</a></dd></dl>
+<a class="el" href="classentt_1_1PersistentView.html" title="Persistent view. ">PersistentView</a> </dd>
+<dd>
+<a class="el" href="classentt_1_1RawView.html" title="Raw view. ">RawView</a></dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Component</td><td>Type of components used to construct the view. </td></tr>
@@ -2253,7 +2641,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly created standard view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l00982">982</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01100">1100</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
 
 </div>
 </div>

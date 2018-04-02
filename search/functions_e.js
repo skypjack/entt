@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['unpause',['unpause',['../classentt_1_1Process.html#a59de73e844b4fcc0db760e1f03fcfa67',1,'entt::Process']]],
-  ['unreg',['unreg',['../classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#aeef92adee9cce10859dbf484d13ebc7d',1,'entt::Bus&lt; Sig, Event, Other... &gt;::unreg()'],['../classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#a4c47809bda9cb8b2f3ec8dfe0cc0ad2a',1,'entt::Bus&lt; Sig, Event &gt;::unreg()']]],
-  ['unset',['unset',['../structentt_1_1Actor.html#a8d655b4e1afe76293b4ef7524f51d81a',1,'entt::Actor']]],
-  ['update',['update',['../structentt_1_1Actor.html#ac83169b04dcdb12d8c3288eb48261ac6',1,'entt::Actor::update()'],['../structentt_1_1ProcessAdaptor.html#a1ef0d81b3d04a9dc5caa5e60eeba55b7',1,'entt::ProcessAdaptor::update()'],['../classentt_1_1Scheduler.html#a107dd9c4e4498ed3b20271e8d57f83aa',1,'entt::Scheduler::update()'],['../classentt_1_1Dispatcher.html#aa2d02c1137eb33a8a5e9368e943c07fa',1,'entt::Dispatcher::update()']]]
+  ['tag',['tag',['../classentt_1_1Registry.html#a307aa3a1d24923f34d1e8a595c82649f',1,'entt::Registry::tag()'],['../classentt_1_1Snapshot.html#a3bb6e46e94b21266d26fdc643dc88d9a',1,'entt::Snapshot::tag()'],['../classentt_1_1SnapshotLoader.html#a7218fc0747446219914c67c9bcf55ade',1,'entt::SnapshotLoader::tag()'],['../classentt_1_1ContinuousLoader.html#a11f333456b6657ee26aadee8ea276c24',1,'entt::ContinuousLoader::tag(Archive &amp;archive)'],['../classentt_1_1ContinuousLoader.html#abb45d38d0d9187772b0326bdb0710e70',1,'entt::ContinuousLoader::tag(Archive &amp;archive, Type Tag::*... member)']]],
+  ['temp',['temp',['../classentt_1_1ResourceCache.html#a00ad6d9478d2f6721f0a846b49adec07',1,'entt::ResourceCache']]],
+  ['tick',['tick',['../classentt_1_1Process.html#a6d2bd2fb6112a8df87d873102c20f462',1,'entt::Process']]],
+  ['trigger',['trigger',['../classentt_1_1Dispatcher.html#ab80c2891d90e8ac83531913416f9b398',1,'entt::Dispatcher']]],
+  ['type',['type',['../classentt_1_1Family.html#a1d54430410246e053bf7f18994db6848',1,'entt::Family']]]
 ];

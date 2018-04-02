@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.4.2</span>
+   &#160;<span id="projectnumber">2.5.0</span>
    </div>
   </td>
  </tr>
@@ -65,6 +65,79 @@ $(function() {
 <div class="contents">
 <div class="textblock"><p><a href="https://travis-ci.org/skypjack/entt"></a> <a href="https://ci.appveyor.com/project/skypjack/entt"></a> <a href="https://coveralls.io/github/skypjack/entt?branch=master"></a> <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=W2HF9FESD5LJY&amp;lc=IT&amp;item_name=Michele%20Caini&amp;currency_code=EUR&amp;bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted"></a></p>
 <h1><a class="anchor" id="autotoc_md1"></a>
+Table of Contents</h1>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#build-instructions">Build Instructions</a></li>
+<li><a href="#crash-course-entity-component-system">Crash Course: entity-component system</a><ul>
+<li><a href="#design-choices">Design choices</a><ul>
+<li><a href="#a-bitset-free-entity-component-system">A bitset-free entity-component system</a></li>
+<li><a href="#pay-per-use">Pay per use</a></li>
+</ul>
+</li>
+<li><a href="#vademecum">Vademecum</a></li>
+<li><a href="#the-registry-the-entity-and-the-component">The Registry, the Entity and the Component</a><ul>
+<li><a href="#single-instance-components">Single instance components</a></li>
+<li><a href="#runtime-components">Runtime components</a><ul>
+<li><a href="#a-journey-through-a-plugin">A journey through a plugin</a></li>
+</ul>
+</li>
+<li><a href="#sorting-is-it-possible">Sorting: is it possible?</a></li>
+<li><a href="#snapshot-complete-vs-continuous">Snapshot: complete vs continuous</a><ul>
+<li><a href="#snapshot-loader">Snapshot loader</a></li>
+<li><a href="#continuous-loader">Continuous loader</a></li>
+<li><a href="#archives">Archives</a></li>
+<li><a href="#one-example-to-rule-them-all">One example to rule them all</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#view-to-persist-or-not-to-persist">View: to persist or not to persist?</a><ul>
+<li><a href="#standard-view">Standard View</a><ul>
+<li><a href="#single-component-standard-view">Single component standard view</a></li>
+<li><a href="#multi-component-standard-view">Multi component standard view</a></li>
+</ul>
+</li>
+<li><a href="#persistent-view">Persistent View</a></li>
+<li><a href="#raw-view">Raw View</a></li>
+<li><a href="#give-me-everything">Give me everything</a></li>
+</ul>
+</li>
+<li><a href="#side-notes">Side notes</a></li>
+</ul>
+</li>
+<li><a href="#crash-course-core-functionalities">Crash Course: core functionalities</a><ul>
+<li><a href="#compile-time-identifiers">Compile-time identifiers</a></li>
+<li><a href="#runtime-identifiers">Runtime identifiers</a></li>
+<li><a href="#hashed-strings">Hashed strings</a></li>
+</ul>
+</li>
+<li><a href="#crash-course-service-locator">Crash Course: service locator</a></li>
+<li><a href="#crash-course-cooperative-scheduler">Crash Course: cooperative scheduler</a><ul>
+<li><a href="#the-process">The process</a></li>
+<li><a href="#the-scheduler">The scheduler</a></li>
+</ul>
+</li>
+<li><a href="#crash-course-resource-management">Crash Course: resource management</a><ul>
+<li><a href="#the-resource-the-loader-and-the-cache">The resource, the loader and the cache</a></li>
+</ul>
+</li>
+<li><a href="#crash-course-events-signals-and-everything-in-between">Crash Course: events, signals and everything in between</a><ul>
+<li><a href="#signals">Signals</a></li>
+<li><a href="#compile-time-event-bus">Compile-time event bus</a></li>
+<li><a href="#delegate">Delegate</a></li>
+<li><a href="#event-dispatcher">Event dispatcher</a></li>
+<li><a href="#event-emitter">Event emitter</a></li>
+</ul>
+</li>
+<li><a href="#license">License</a></li>
+<li><a href="#support">Support</a><ul>
+<li><a href="#donation">Donation</a></li>
+<li><a href="#hire-me">Hire me</a></li>
+</ul>
+</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md2"></a>
 Introduction</h1>
 <p><code>EnTT</code> is a header-only, tiny and easy to use framework written in modern C++.<br />
  It was originally designed entirely around an architectural pattern called <em>ECS</em> that is used mostly in game development. For further details:</p>
@@ -77,19 +150,19 @@ Introduction</h1>
  That's why today it's called <em>the EnTT Framework</em>.</p>
 <p>Currently, <code>EnTT</code> is tested on Linux, Microsoft Windows and OS X. It has proven to work also on both Android and iOS.<br />
  Most likely it will not be problematic on other systems as well, but has not been sufficiently tested so far.</p>
-<h2><a class="anchor" id="autotoc_md2"></a>
+<h2><a class="anchor" id="autotoc_md3"></a>
 The framework</h2>
 <p><code>EnTT</code> was written initially as a faster alternative to other well known and open source entity-component systems. Nowadays the <code>EnTT</code> framework is moving its first steps. Much more will come in the future and hopefully I'm going to work on it for a long time.<br />
  Requests for feature, PR, suggestions ad feedback are highly appreciated.</p>
-<p>If you find you can help me and want to contribute to the <code>EnTT</code> framework with your experience or you do want to get part of the project for some other reason, feel free to contact me directly (you can find the mail in the <a href="https://github.com/skypjack">profile</a>).<br />
+<p>If you find you can help me and want to contribute to the <code>EnTT</code> framework with your experience or you do want to get part of the project for some other reasons, feel free to contact me directly (you can find the mail in the <a href="https://github.com/skypjack">profile</a>).<br />
  I can't promise that each and every contribution will be accepted, but I can assure that I'll do my best to take them all seriously.</p>
-<h3><a class="anchor" id="autotoc_md3"></a>
+<h3><a class="anchor" id="autotoc_md4"></a>
 State of the art</h3>
 <p>Here is a brief list of what it offers today:</p>
 <ul>
 <li>Statically generated integer identifiers for types (assigned either at compile-time or at runtime).</li>
 <li>A constexpr utility for human readable resource identifiers.</li>
-<li>An incredibly fast entity-component system based on sparse sets, with its own views and a <em>pay for what you use</em> policy to adjust performance and memory pressure according to the users' requirements.</li>
+<li>An incredibly fast entity-component system based on sparse sets, with its own views and a <em>pay for what you use</em> policy to adjust performance and memory usage according to the users' requirements.</li>
 <li>Actor class for those who aren't confident with entity-component systems.</li>
 <li>The smallest and most basic implementation of a service locator ever seen.</li>
 <li>A cooperative scheduler for processes of any type.</li>
@@ -100,65 +173,67 @@ State of the art</h3>
 <li>...</li>
 <li>Any other business.</li>
 </ul>
-<p>Consider it a work in progress. For more details and an updated list, please refer to the <a href="https://skypjack.github.io/entt/">online documentation</a>.</p>
-<h3><a class="anchor" id="autotoc_md4"></a>
-A note about the README</h3>
-<p>The README file stays true to the original project and it describes only the entity-component system. However, the whole API is fully documented in-code and the <a href="https://skypjack.github.io/entt/">online documentation</a> contains much more.<br />
- Continue reading to know how the core part of the project works or follow the link above to take a look at the API reference for all other available classes.</p>
+<p>Consider it a work in progress. For more details and an updated list, please refer to the <a href="https://skypjack.github.io/entt/">online documentation</a>. It probably contains much more. Moreover, the whole API is fully documented in-code for those who are brave enough to read it.<br />
+ Continue reading to know how the different parts of the project work or follow the link above to take a look at the API reference.</p>
 <h2><a class="anchor" id="autotoc_md5"></a>
 Code Example</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entt.hpp&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;cstdint&gt;</span></div><div class="line"></div><div class="line"><span class="keyword">struct </span>Position {</div><div class="line">    <span class="keywordtype">float</span> x;</div><div class="line">    <span class="keywordtype">float</span> y;</div><div class="line">};</div><div class="line"></div><div class="line"><span class="keyword">struct </span>Velocity {</div><div class="line">    <span class="keywordtype">float</span> dx;</div><div class="line">    <span class="keywordtype">float</span> dy;</div><div class="line">};</div><div class="line"></div><div class="line"><span class="keywordtype">void</span> update(<a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a> &amp;registry) {</div><div class="line">    <span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line">    <span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">        <span class="comment">// gets only the components that are going to be used ...</span></div><div class="line"></div><div class="line">        <span class="keyword">auto</span> &amp;velocity = view.get&lt;Velocity&gt;(entity);</div><div class="line"></div><div class="line">        velocity.dx = 0.;</div><div class="line">        velocity.dy = 0.;</div><div class="line"></div><div class="line">        <span class="comment">// ...</span></div><div class="line">    }</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">void</span> update(std::uint64_t dt, <a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a> &amp;registry) {</div><div class="line">    registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Position, Velocity&gt;().each([dt](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;position, <span class="keyword">auto</span> &amp;velocity) {</div><div class="line">        <span class="comment">// gets all the components of the view at once ...</span></div><div class="line"></div><div class="line">        position.x += velocity.dx * dt;</div><div class="line">        position.y += velocity.dy * dt;</div><div class="line"></div><div class="line">        <span class="comment">// ...</span></div><div class="line">    });</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> main() {</div><div class="line">    <a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a> registry;</div><div class="line">    std::uint64_t dt = 16;</div><div class="line"></div><div class="line">    <span class="keywordflow">for</span>(<span class="keyword">auto</span> i = 0; i &lt; 10; ++i) {</div><div class="line">        <span class="keyword">auto</span> entity = registry.<a class="code" href="classentt_1_1Registry.html#a68363417c654ab36e68606c13deb850e">create</a>(Position{i * 1.f, i * 1.f});</div><div class="line">        <span class="keywordflow">if</span>(i % 2 == 0) { registry.<a class="code" href="classentt_1_1Registry.html#aa6b578d40a9305869e692167fc3dcddf">assign</a>&lt;Velocity&gt;(entity, i * .1f, i * .1f); }</div><div class="line">    }</div><div class="line"></div><div class="line">    update(dt, registry);</div><div class="line">    update(registry);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><h2><a class="anchor" id="autotoc_md6"></a>
 Motivation</h2>
-<p>I started working on <code>EnTT</code> because of the wrong reason: my goal was to design an entity-component system that beated another well known open source solution in terms of performance.<br />
- In the end, I did it, but it wasn't much satisfying. Actually it wasn't satisfying at all. The fastest and nothing more, fairly little indeed. When I realized it, I tried hard to keep intact the great performance of <code>EnTT</code> and to add all the features I wanted to see in <em>my</em> entity-component system at the same time.</p>
-<p>Today <code>EnTT</code> is finally what I was looking for: still faster than its <em>competitors</em>, a really good API and an amazing set of features. And even more, of course.</p>
+<p>I started working on <code>EnTT</code> because of the wrong reason: my goal was to design an entity-component system that beated another well known open source solution in terms of performance and used (possibly) less memory in the average case.<br />
+ In the end, I did it, but it wasn't much satisfying. Actually it wasn't satisfying at all. The fastest and nothing more, fairly little indeed. When I realized it, I tried hard to keep intact the great performance of <code>EnTT</code> and to add all the features I wanted to see in <em>my own library</em> at the same time.</p>
+<p>Today <code>EnTT</code> is finally what I was looking for: still faster than its <em>competitors</em>, lower memory usage in the average case, a really good API and an amazing set of features. And even more, of course.</p>
 <h2><a class="anchor" id="autotoc_md7"></a>
 Performance</h2>
 <p>As it stands right now, <code>EnTT</code> is just fast enough for my requirements if compared to my first choice (it was already amazingly fast actually).<br />
- Here is a comparision between the two (both of them compiled with GCC 7.2.0 on a Dell XPS 13 out of the mid 2014):</p>
+ Below is a comparison between the two (both of them compiled with GCC 7.3.0 on a Dell XPS 13 out of the mid 2014):</p>
 <table class="doxtable">
 <tr>
 <th>Benchmark </th><th>EntityX (compile-time) </th><th>EnTT  </th></tr>
 <tr>
-<td>Create 10M entities </td><td>0.1289s </td><td><b>0.0409s</b> </td></tr>
+<td>Create 1M entities </td><td>0.0167s </td><td><b>0.0046s</b> </td></tr>
 <tr>
-<td>Destroy 10M entities </td><td><b>0.0531s</b> </td><td>0.0546s </td></tr>
+<td>Destroy 1M entities </td><td>0.0053s </td><td><b>0.0039s</b> </td></tr>
 <tr>
-<td>Standard view, 10M entities, one component </td><td>0.0107s </td><td><b>1.6e-07s</b> </td></tr>
+<td>Standard view, 1M entities, one component </td><td>0.0012s </td><td><b>1.9e-07s</b> </td></tr>
 <tr>
-<td>Standard view, 10M entities, two components </td><td><b>0.0113s</b> </td><td>0.0295s </td></tr>
+<td>Standard view, 1M entities, two components </td><td>0.0012s </td><td><b>3.8e-07s</b> </td></tr>
 <tr>
-<td>Standard view, 10M entities, two components<br />
-Half of the entities have all the components </td><td><b>0.0078s</b> </td><td>0.0150s </td></tr>
+<td>Standard view, 1M entities, two components<br />
+Half of the entities have all the components </td><td>0.0009s </td><td><b>3.8e-07s</b> </td></tr>
 <tr>
-<td>Standard view, 10M entities, two components<br />
-One of the entities has all the components </td><td>0.0071s </td><td><b>8.8e-07s</b> </td></tr>
+<td>Standard view, 1M entities, two components<br />
+One of the entities has all the components </td><td>0.0008s </td><td><b>1.0e-06s</b> </td></tr>
 <tr>
-<td>Persistent view, 10M entities, two components </td><td>0.0113s </td><td><b>5.7e-07s</b> </td></tr>
+<td>Persistent view, 1M entities, two components </td><td>0.0012s </td><td><b>2.8e-07s</b> </td></tr>
 <tr>
-<td>Standard view, 10M entities, five components </td><td><b>0.0091s</b> </td><td>0.0688s </td></tr>
+<td>Standard view, 1M entities, five components </td><td>0.0010s </td><td><b>7.0e-07s</b> </td></tr>
 <tr>
-<td>Persistent view, 10M entities, five components </td><td>0.0091s </td><td><b>2.9e-07s</b> </td></tr>
+<td>Persistent view, 1M entities, five components </td><td>0.0010s </td><td><b>2.8e-07s</b> </td></tr>
 <tr>
-<td>Standard view, 10M entities, ten components </td><td><b>0.0105s</b> </td><td>0.1403s </td></tr>
+<td>Standard view, 1M entities, ten components </td><td>0.0011s </td><td><b>1.2e-06s</b> </td></tr>
 <tr>
-<td>Standard view, 10M entities, ten components<br />
-Half of the entities have all the components </td><td><b>0.0090s</b> </td><td>0.0620s </td></tr>
+<td>Standard view, 1M entities, ten components<br />
+Half of the entities have all the components </td><td>0.0010s </td><td><b>1.2e-06s</b> </td></tr>
 <tr>
-<td>Standard view, 10M entities, ten components<br />
-One of the entities has all the components </td><td>0.0070s </td><td><b>1.3e-06s</b> </td></tr>
+<td>Standard view, 1M entities, ten components<br />
+One of the entities has all the components </td><td>0.0008s </td><td><b>1.2e-06s</b> </td></tr>
 <tr>
-<td>Persistent view, 10M entities, ten components </td><td>0.0105s </td><td><b>6.2e-07s</b> </td></tr>
+<td>Persistent view, 1M entities, ten components </td><td>0.0011s </td><td><b>3.0e-07s</b> </td></tr>
+<tr>
+<td>Raw view, 1M entities </td><td>- </td><td><b>2.2e-07s</b> </td></tr>
 <tr>
 <td>Sort 150k entities, one component<br />
-Arrays are in reverse order </td><td>- </td><td><b>0.0043s</b> </td></tr>
+Arrays are in reverse order </td><td>- </td><td><b>0.0036s</b> </td></tr>
 <tr>
 <td>Sort 150k entities, enforce permutation<br />
-Arrays are in reverse order </td><td>- </td><td><b>0.0006s</b> </td></tr>
+Arrays are in reverse order </td><td>- </td><td><b>0.0005s</b> </td></tr>
 </table>
-<p><code>EnTT</code> includes its own tests and benchmarks. See <a href="https://github.com/skypjack/entt/blob/master/test/benchmark.cpp">benchmark.cpp</a> for further details.<br />
- On Github users can find also a <a href="https://github.com/abeimler/ecs_benchmark">benchmark suite</a> that compares a bunch of different projects, one of which is <code>EnTT</code>.</p>
-<p>Probably I'll try to get out of <code>EnTT</code> more features and better performance in the future, mainly for fun.<br />
+<p>Note: The default version of <code>EntityX</code> (<code>master</code> branch) wasn't added to the comparison because it's already much slower than its compile-time counterpart.</p>
+<p>Pretty interesting, aren't them? In fact, these benchmarks are the same used by <code>EntityX</code> to show <em>how fast it is</em>. To be honest, they aren't so good and these results shouldn't be taken much seriously (they are completely unrealistic indeed).<br />
+ The proposed entity-component system is incredibly fast to iterate entities, this is a fact. The compiler can make a lot of optimizations because of how <code>EnTT</code> works, even more when components aren't used at all. This is exactly the case for these benchmarks.<br />
+ This is why they are completely wrong and cannot be used to evaluate any of the entity-component systems.</p>
+<p>If you decide to use <code>EnTT</code>, choose it because of its API and its performance, not because there is a benchmark somewhere that makes it seem the fastest.</p>
+<p>Probably I'll try to get out of <code>EnTT</code> more features and even better performance in the future, mainly for fun.<br />
  If you want to contribute and/or have any suggestion, feel free to make a PR or open an issue to discuss your idea.</p>
 <h1><a class="anchor" id="autotoc_md8"></a>
 Build Instructions</h1>
@@ -188,20 +263,16 @@ $ your_favorite_browser docs/html/index.html
 Tests</h2>
 <p>To compile and run the tests, <code>EnTT</code> requires <em>googletest</em>.<br />
  <code>cmake</code> will download and compile the library before to compile anything else.</p>
-<p>To build the tests:</p>
+<p>To build the most basic set of tests:</p>
 <ul>
 <li><code>$ cd build</code></li>
 <li><code>$ cmake ..</code></li>
 <li><code>$ make</code></li>
 <li><code>$ make test</code></li>
 </ul>
-<p>To build the benchmarks, use the following line instead:</p>
-<ul>
-<li><code>$ cmake -DCMAKE_BUILD_TYPE=Release ..</code></li>
-</ul>
-<p>Benchmarks are compiled only in release mode currently.</p>
+<p>Note that benchmarks are not part of this set.</p>
 <h1><a class="anchor" id="autotoc_md13"></a>
-Crash Course</h1>
+Crash Course: entity-component system</h1>
 <h2><a class="anchor" id="autotoc_md14"></a>
 Design choices</h2>
 <h3><a class="anchor" id="autotoc_md15"></a>
@@ -212,55 +283,56 @@ A bitset-free entity-component system</h3>
 <div class="fragment"><div class="line"><a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a>&lt;Comp0, Comp1, ..., CompN&gt; registry;</div></div><!-- fragment --><h3><a class="anchor" id="autotoc_md16"></a>
 Pay per use</h3>
 <p><code>EnTT</code> is entirely designed around the principle that users have to pay only for what they want.</p>
-<p>When it comes to using an entity-componet system, the tradeoff is usually between performance and memory usage. The faster it is, the more memory it uses. However, slightly worse performance along non-critical paths are the right price to pay to reduce memory usage and I've always wondered why this kind of tools do not leave me the choice.<br />
- <code>EnTT</code> follows a completely different approach. It squezees the best from the basic data structures and gives users the possibility to pay more for higher performance where needed.<br />
+<p>When it comes to using an entity-component system, the tradeoff is usually between performance and memory usage. The faster it is, the more memory it uses. However, slightly worse performance along non-critical paths are the right price to pay to reduce memory usage and I've always wondered why this kind of tools do not leave me the choice.<br />
+ <code>EnTT</code> follows a completely different approach. It squeezes the best from the basic data structures and gives users the possibility to pay more for higher performance where needed.<br />
  The disadvantage of this approach is that users need to know the systems they are working on and the tools they are using. Otherwise, the risk to ruin the performance along critical paths is high.</p>
 <p>So far, this choice has proven to be a good one and I really hope it can be for many others besides me.</p>
 <h2><a class="anchor" id="autotoc_md17"></a>
 Vademecum</h2>
-<p>The <code>Registry</code> to store, the <code>View</code>s to iterate. That's all.</p>
-<p>An entity (the <em>E</em> of an <em>ECS</em>) is an opaque identifier that users should just use as-is and store around if needed. Do not try to inspect an entity identifier, its type can change in future and a registry offers all the functionalities to query them out-of-the-box. The underlying type of an entity (either <code>std::uint16_t</code>, <code>std::uint32_t</code> or <code>std::uint64_t</code>) can be specified when defining a registry (actually the DefaultRegistry is nothing more than a Registry where the type of the entities is <code>std::uint32_t</code>).<br />
- Components (the <em>C</em> of an <em>ECS</em>) should be plain old data structures or more complex and moveable data structures with a proper constructor. Actually, the sole requirement of a component type is that it must be both move constructible and move assignable. They are list initialized by using the parameters provided to construct the component itself. No need to register components or their types neither with the registry nor with the entity-component system at all.<br />
- Systems (the <em>S</em> of an <em>ECS</em>) are just plain functions, functors, lambdas or whatever the users want. They can accept a Registry, a View or a PersistentView and use them the way they prefer. No need to register systems or their types neither with the registry nor with the entity-component system at all.</p>
+<p>The <code>Registry</code> to store, the views to iterate. That's all.</p>
+<p>An entity (the <em>E</em> of an <em>ECS</em>) is an opaque identifier that users should just use as-is and store around if needed. Do not try to inspect an entity identifier, its format can change in future and a registry offers all the functionalities to query them out-of-the-box. The underlying type of an entity (either <code>std::uint16_t</code>, <code>std::uint32_t</code> or <code>std::uint64_t</code>) can be specified when defining a registry (actually the <code>DefaultRegistry</code> is nothing more than a <code>Registry</code> where the type of the entities is <code>std::uint32_t</code>).<br />
+ Components (the <em>C</em> of an <em>ECS</em>) should be plain old data structures or more complex and movable data structures with a proper constructor. Actually, the sole requirement of a component type is that it must be both move constructible and move assignable. They are list initialized by using the parameters provided to construct the component itself. No need to register components or their types neither with the registry nor with the entity-component system at all.<br />
+ Systems (the <em>S</em> of an <em>ECS</em>) are just plain functions, functors, lambdas or whatever the users want. They can accept a <code>Registry</code> or a view of any type and use them the way they prefer. No need to register systems or their types neither with the registry nor with the entity-component system at all.</p>
 <p>The following sections will explain in short how to use the entity-component system, the core part of the whole framework.<br />
  In fact, the framework is composed of many other classes in addition to those describe below. For more details, please refer to the <a href="https://skypjack.github.io/entt/">online documentation</a>.</p>
 <h2><a class="anchor" id="autotoc_md18"></a>
 The Registry, the Entity and the Component</h2>
-<p>A registry is used to store and manage entities as well as to create views to iterate the underlying data structures.<br />
- Registry is a class template that lets the users decide what's the preferred type to represent an entity. Because <code>std::uint32_t</code> is large enough for almost all the cases, there exists also an alias named DefaultRegistry for <code>Registry&lt;std::uint32_t&gt;</code>.</p>
-<p>Entities are represented by <em>entitiy identifiers</em>. An entity identifier is an opaque type that users should not inspect or modify in any way. It carries information about the entity itself and its version.</p>
+<p>A registry can store and manage entities, as well as create views to iterate the underlying data structures.<br />
+ <code>Registry</code> is a class template that lets the users decide what's the preferred type to represent an entity. Because <code>std::uint32_t</code> is large enough for almost all the cases, there exists also an alias named <code>DefaultRegistry</code> for <code>Registry&lt;std::uint32_t&gt;</code>.</p>
+<p>Entities are represented by <em>entity identifiers</em>. An entity identifier is an opaque type that users should not inspect or modify in any way. It carries information about the entity itself and its version.</p>
 <p>A registry can be used both to construct and to destroy entities:</p>
-<div class="fragment"><div class="line"><span class="comment">// constructs a naked entity with no components ad returns its identifier</span></div><div class="line"><span class="keyword">auto</span> entity = registry.create();</div><div class="line"></div><div class="line"><span class="comment">// constructs an entity and assigns it default-initialized components</span></div><div class="line"><span class="keyword">auto</span> another = registry.create&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line"><span class="comment">// destroys an entity and all its components</span></div><div class="line">registry.destroy(entity);</div></div><!-- fragment --><p>Once an entity is deleted, the registry can freely reuse it internally with a slightly different identifier. In particular, the version of an entity is increased each and every time it's destroyed.<br />
+<div class="fragment"><div class="line"><span class="comment">// constructs a naked entity with no components and returns its identifier</span></div><div class="line"><span class="keyword">auto</span> entity = registry.create();</div><div class="line"></div><div class="line"><span class="comment">// constructs an entity and assigns it default-initialized components</span></div><div class="line"><span class="keyword">auto</span> another = registry.create&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line"><span class="comment">// destroys an entity and all its components</span></div><div class="line">registry.destroy(entity);</div></div><!-- fragment --><p>Once an entity is deleted, the registry can freely reuse it internally with a slightly different identifier. In particular, the version of an entity is increased each and every time it's destroyed.<br />
  In case entity identifiers are stored around, the registry offers all the functionalities required to test them and get out of the them all the information they carry:</p>
 <div class="fragment"><div class="line"><span class="comment">// returns true if the entity is still valid, false otherwise</span></div><div class="line"><span class="keywordtype">bool</span> b = registry.valid(entity);</div><div class="line"></div><div class="line"><span class="comment">// gets the version contained in the entity identifier</span></div><div class="line"><span class="keyword">auto</span> version = registry.version(entity);</div><div class="line"></div><div class="line"><span class="comment">// gets the actual version for the given entity</span></div><div class="line"><span class="keyword">auto</span> curr = registry.current(entity);</div></div><!-- fragment --><p>Components can be assigned to or removed from entities at any time with a few calls to member functions of the registry. As for the entities, the registry offers also a set of functionalities users can use to work with the components.</p>
-<p>The <code>assign</code> member function template creates, initializes and assigns to an entity the given component. It accepts a variable number of arguments that are used to construct the component itself if present:</p>
-<div class="fragment"><div class="line">registry.assign&lt;Position&gt;(entity, 0., 0.);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">Velocity &amp;velocity = registry.assign&lt;Velocity&gt;(entity);</div><div class="line">velocity.dx = 0.;</div><div class="line">velocity.dy = 0.;</div></div><!-- fragment --><p>If the entity already has the given component, the <code>replace</code> member function template can be used to replace it:</p>
-<div class="fragment"><div class="line">registry.replace&lt;Position&gt;(entity, 0., 0.);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">Velocity &amp;velocity = registry.replace&lt;Velocity&gt;(entity);</div><div class="line">velocity.dx = 0.;</div><div class="line">velocity.dy = 0.;</div></div><!-- fragment --><p>In case users want to assign a component to an entity, but it's unknown whether the entity already has it or not, <code>accomodate</code> does the work in a single call (there is a performance penalty to pay for this mainly due to the fact that it has to check if <code>entity</code> already has the given component or not):</p>
-<div class="fragment"><div class="line">registry.accomodate&lt;Position&gt;(entity, 0., 0.);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">Velocity &amp;velocity = registry.accomodate&lt;Velocity&gt;(entity);</div><div class="line">velocity.dx = 0.;</div><div class="line">velocity.dy = 0.;</div></div><!-- fragment --><p>Note that <code>accomodate</code> is a sliglhty faster alternative for the following <code>if</code>/<code>else</code> statement and nothing more:</p>
+<p>The <code>assign</code> member function template creates, initializes and assigns to an entity the given component. It accepts a variable number of arguments to construct the component itself if present:</p>
+<div class="fragment"><div class="line">registry.assign&lt;Position&gt;(entity, 0., 0.);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">Velocity &amp;velocity = registry.assign&lt;Velocity&gt;(entity);</div><div class="line">velocity.dx = 0.;</div><div class="line">velocity.dy = 0.;</div></div><!-- fragment --><p>If an entity already has the given component, the <code>replace</code> member function template can be used to replace it:</p>
+<div class="fragment"><div class="line">registry.replace&lt;Position&gt;(entity, 0., 0.);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">Velocity &amp;velocity = registry.replace&lt;Velocity&gt;(entity);</div><div class="line">velocity.dx = 0.;</div><div class="line">velocity.dy = 0.;</div></div><!-- fragment --><p>In case users want to assign a component to an entity, but it's unknown whether the entity already has it or not, <code>accommodate</code> does the work in a single call (there is a performance penalty to pay for this mainly due to the fact that it has to check if the entity already has the given component or not):</p>
+<div class="fragment"><div class="line">registry.accommodate&lt;Position&gt;(entity, 0., 0.);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">Velocity &amp;velocity = registry.accommodate&lt;Velocity&gt;(entity);</div><div class="line">velocity.dx = 0.;</div><div class="line">velocity.dy = 0.;</div></div><!-- fragment --><p>Note that <code>accommodate</code> is a slightly faster alternative for the following <code>if</code>/<code>else</code> statement and nothing more:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span>(registry.has&lt;Comp&gt;(entity)) {</div><div class="line">    registry.replace&lt;Comp&gt;(entity, arg1, argN);</div><div class="line">} <span class="keywordflow">else</span> {</div><div class="line">    registry.assign&lt;Comp&gt;(entity, arg1, argN);</div><div class="line">}</div></div><!-- fragment --><p>As already shown, if in doubt about whether or not an entity has one or more components, the <code>has</code> member function template may be useful:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">bool</span> b = registry.has&lt;Position, Velocity&gt;(entity);</div></div><!-- fragment --><p>On the other side, if the goal is to delete a single component, the <code>remove</code> member function template is the way to go when it's certain that the entity owns a copy of the component:</p>
-<div class="fragment"><div class="line">registry.remove&lt;Position&gt;(entity);</div></div><!-- fragment --><p>Otherwise consider to use the <code>reset</code> member function. It behaves similarly to <code>remove</code> but with a strictly defined behaviour (and a performance penalty is the price to pay for this). In particular it removes the component if and only if it exists, otherwise it returns safely to the caller:</p>
+<div class="fragment"><div class="line">registry.remove&lt;Position&gt;(entity);</div></div><!-- fragment --><p>Otherwise consider to use the <code>reset</code> member function. It behaves similarly to <code>remove</code> but with a strictly defined behavior (and a performance penalty is the price to pay for this). In particular it removes the component if and only if it exists, otherwise it returns safely to the caller:</p>
 <div class="fragment"><div class="line">registry.reset&lt;Position&gt;(entity);</div></div><!-- fragment --><p>There exist also two other <em>versions</em> of the <code>reset</code> member function:</p>
 <ul>
 <li>If no entity is passed to it, <code>reset</code> will remove the given component from each entity that has it:</li>
 </ul>
 <div class="fragment"><div class="line">registry.reset&lt;Position&gt;();</div></div><!-- fragment --><ul>
-<li>If neither the entity nor the component are specified, all the entities and their components are destroyed:</li>
+<li>If neither the entity nor the component are specified, all the entities still in use and their components are destroyed:</li>
 </ul>
 <div class="fragment"><div class="line">registry.reset();</div></div><!-- fragment --><p>Finally, references to components can be retrieved simply by doing this:</p>
-<div class="fragment"><div class="line"><a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a> registry;</div><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;cregistry = registry;</div><div class="line"></div><div class="line"><span class="comment">// const and non-const reference</span></div><div class="line"><span class="keyword">const</span> Position &amp;position = cregistry.<a class="code" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd">get</a>&lt;Position&gt;(entity);</div><div class="line">Position &amp;position = registry.<a class="code" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd">get</a>&lt;Position&gt;(entity);</div><div class="line"></div><div class="line"><span class="comment">// const and non-const references</span></div><div class="line">std::tuple&lt;const Position &amp;, const Velocity &amp;&gt; tup = cregistry.get&lt;Position, Velocity&gt;(entity);</div><div class="line">std::tuple&lt;Position &amp;, Velocity &amp;&gt; tup = registry.<a class="code" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd">get</a>&lt;Position, Velocity&gt;(entity);</div></div><!-- fragment --><p>The <code>get</code> member function template gives direct access to the component of an entity stored in the underlying data structures of the registry.</p>
+<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;cregistry = registry;</div><div class="line"></div><div class="line"><span class="comment">// const and non-const reference</span></div><div class="line"><span class="keyword">const</span> Position &amp;position = cregistry.get&lt;Position&gt;(entity);</div><div class="line">Position &amp;position = registry.get&lt;Position&gt;(entity);</div><div class="line"></div><div class="line"><span class="comment">// const and non-const references</span></div><div class="line">std::tuple&lt;const Position &amp;, const Velocity &amp;&gt; tup = cregistry.get&lt;Position, Velocity&gt;(entity);</div><div class="line">std::tuple&lt;Position &amp;, Velocity &amp;&gt; tup = registry.get&lt;Position, Velocity&gt;(entity);</div></div><!-- fragment --><p>The <code>get</code> member function template gives direct access to the component of an entity stored in the underlying data structures of the registry.</p>
 <h3><a class="anchor" id="autotoc_md19"></a>
 Single instance components</h3>
 <p>In those cases where all what is needed is a single instance component, tags are the right tool to achieve the purpose.<br />
- Tags undergo the same requirements of components. They can be either plain old data structures or more complex and moveable data structures with a proper constructor.<br />
+ Tags undergo the same requirements of components. They can be either plain old data structures or more complex and movable data structures with a proper constructor.<br />
  Actually, the same type can be used both as a tag and as a component and the registry will not complain about it. It is up to the users to properly manage their own types.</p>
 <p>Attaching tags to entities and removing them is trivial:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> player = registry.<a class="code" href="classentt_1_1Registry.html#a68363417c654ab36e68606c13deb850e">create</a>();</div><div class="line"><span class="keyword">auto</span> camera = registry.<a class="code" href="classentt_1_1Registry.html#a68363417c654ab36e68606c13deb850e">create</a>();</div><div class="line"></div><div class="line"><span class="comment">// attaches a default-initialized tag to an entity</span></div><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#ad6aba3339872b3dccc722debcdf4d65c">attach</a>&lt;PlayingCharacter&gt;(player);</div><div class="line"></div><div class="line"><span class="comment">// attaches a tag to an entity and initializes it</span></div><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#ad6aba3339872b3dccc722debcdf4d65c">attach</a>&lt;Camera&gt;(camera, player);</div><div class="line"></div><div class="line"><span class="comment">// removes tags from their owners</span></div><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a957bcbdbf082f9767e5474a73be6ece4">remove</a>&lt;PlayingCharacter&gt;();</div><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a957bcbdbf082f9767e5474a73be6ece4">remove</a>&lt;Camera&gt;();</div></div><!-- fragment --><p>If in doubt about whether or not a tag has already an owner, the <code>has</code> member function template may be useful:</p>
-<div class="fragment"><div class="line"><span class="keywordtype">bool</span> b = registry.<a class="code" href="classentt_1_1Registry.html#ac17c42321f66e42649d1b0e549828620">has</a>&lt;PlayingCharacter&gt;();</div></div><!-- fragment --><p>References to tags can be retrieved simply by doing this:</p>
-<div class="fragment"><div class="line"><span class="comment">// either a non-const reference ...</span></div><div class="line"><a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a> registry;</div><div class="line">PlayingCharacter &amp;player = registry.<a class="code" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd">get</a>&lt;PlayingCharacter&gt;();</div><div class="line"></div><div class="line"><span class="comment">// ... or a const one</span></div><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;cregistry = registry;</div><div class="line"><span class="keyword">const</span> Camera &amp;camera = cregistry.<a class="code" href="classentt_1_1Registry.html#aad2f79d8d9637a5f666a7121f379a0dd">get</a>&lt;Camera&gt;();</div></div><!-- fragment --><p>The <code>get</code> member function template gives direct access to the tag as stored in the underlying data structures of the registry.</p>
-<p>As shown above, in almost all the cases the entity identifier isn't required, since a single instance component can have only one associated entity and therefore it doesn't make much sense to mention it explicitly.<br />
+<div class="fragment"><div class="line"><span class="keyword">auto</span> player = registry.create();</div><div class="line"><span class="keyword">auto</span> camera = registry.create();</div><div class="line"></div><div class="line"><span class="comment">// attaches a default-initialized tag to an entity</span></div><div class="line">registry.attach&lt;PlayingCharacter&gt;(player);</div><div class="line"></div><div class="line"><span class="comment">// attaches a tag to an entity and initializes it</span></div><div class="line">registry.attach&lt;Camera&gt;(camera, player);</div><div class="line"></div><div class="line"><span class="comment">// removes tags from their owners</span></div><div class="line">registry.remove&lt;PlayingCharacter&gt;();</div><div class="line">registry.remove&lt;Camera&gt;();</div></div><!-- fragment --><p>In case a tag already has an owner, its content can be updated by means of the <code>set</code> member function template and the ownership of the tag can be transferred to another entity using the <code>move</code> member function template:</p>
+<div class="fragment"><div class="line">// replaces the content of the given tag</div><div class="line">Point &amp;point = registry.set&lt;Point&gt;(1.f, 1.f);</div><div class="line"></div><div class="line">// transfers the ownership of the tag to another entity</div><div class="line">entity_type prev = registry.move&lt;Point&gt;(next);</div></div><!-- fragment --><p>If in doubt about whether or not a tag already has an owner, the <code>has</code> member function template may be useful:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">bool</span> b = registry.has&lt;PlayingCharacter&gt;();</div></div><!-- fragment --><p>References to tags can be retrieved simply by doing this:</p>
+<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;cregistry = registry;</div><div class="line"></div><div class="line"><span class="comment">// either a non-const reference ...</span></div><div class="line">PlayingCharacter &amp;player = registry.get&lt;PlayingCharacter&gt;();</div><div class="line"></div><div class="line"><span class="comment">// ... or a const one</span></div><div class="line"><span class="keyword">const</span> Camera &amp;camera = cregistry.get&lt;Camera&gt;();</div></div><!-- fragment --><p>The <code>get</code> member function template gives direct access to the tag as stored in the underlying data structures of the registry.</p>
+<p>As shown above, in almost all the cases the entity identifier isn't required. Since a single instance component can have only one associated entity, it doesn't make much sense to mention it explicitly.<br />
  To find out who the owner is, just do the following:</p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> player = registry.<a class="code" href="classentt_1_1Registry.html#a9300c3ef37bc0abb7ebc5dac7b2fc873">attachee</a>&lt;PlayingCharacter&gt;();</div></div><!-- fragment --><p>Note that iterating tags isn't possible for obvious reasons. Tags give direct access to single entities and nothing more.</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> player = registry.attachee&lt;PlayingCharacter&gt;();</div></div><!-- fragment --><p>Note that iterating tags isn't possible for obvious reasons. Tags give direct access to single entities and nothing more.</p>
 <h3><a class="anchor" id="autotoc_md20"></a>
 Runtime components</h3>
 <p>Defining components at runtime is useful to support plugins and mods in general. However, it seems impossible with a tool designed around a bunch of templates. Indeed it's not that difficult.<br />
@@ -270,9 +342,10 @@ Runtime components</h3>
 <div class="fragment"><div class="line"><a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a> registry;</div><div class="line"></div><div class="line"><span class="comment">// standard component identifier</span></div><div class="line"><span class="keyword">auto</span> ctype = registry.<a class="code" href="classentt_1_1Registry.html#ab284cde58cbc42cf0e929edc857f5182">component</a>&lt;Position&gt;();</div><div class="line"></div><div class="line"><span class="comment">// single instance component identifier</span></div><div class="line"><span class="keyword">auto</span> ttype = registry.<a class="code" href="classentt_1_1Registry.html#a307aa3a1d24923f34d1e8a595c82649f">tag</a>&lt;PlayingCharacter&gt;();</div></div><!-- fragment --><p>Once the identifiers are made available, almost everything becomes pretty simple.</p>
 <h4><a class="anchor" id="autotoc_md21"></a>
 A journey through a plugin</h4>
-<p><code>EnTT</code> comes with an example (actually a test) that shows how to integrate compile-time and runtime components in a stack based JavaScript environment. It uses <a href="https://github.com/svaarala/duktape"><code>duktape</code></a> under the hood, mainly because I wanted to learn how it works at the time I was writing the code.</p>
-<p>It's not production-ready and overall performance can be highly improved. However, I sacrificed optimizations in favor of a more readable piece of code. I hope I succeeded.<br />
- Note also that this isn't neither the only nor (probably) the best way to do it. In fact, the right way depends on the scripting language and the problem one is facing in general.</p>
+<p><code>EnTT</code> comes with an example (actually a test) that shows how to integrate compile-time and runtime components in a stack based JavaScript environment. It uses <a href="https://github.com/svaarala/duktape"><code>Duktape</code></a> under the hood, mainly because I wanted to learn how it works at the time I was writing the code.</p>
+<p>The code is not production-ready and overall performance can be highly improved. However, I sacrificed optimizations in favor of a more readable piece of code. I hope I succeeded.<br />
+ Note also that this isn't neither the only nor (probably) the best way to do it. In fact, the right way depends on the scripting language and the problem one is facing in general.<br />
+ That being said, feel free to use it at your own risk.</p>
 <p>The basic idea is that of creating a compile-time component aimed to map all the runtime components assigned to an entity.<br />
  Identifiers come in use to address the right function from a map when invoked from the runtime environment and to filter entities when iterating.<br />
  With a bit of gymnastic, one can narrow views and improve the performance to some extent but it was not the goal of the example.</p>
@@ -287,17 +360,82 @@ Sorting: is it possible?</h3>
 <li>Components can be sorted according to the order imposed by another component:</li>
 </ul>
 <div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a625ada828ff48c153c7be14cc99eeca5">sort</a>&lt;Movement, Physics&gt;();</div></div><!-- fragment --><p>In this case, instances of <code>Movement</code> are arranged in memory so that cache misses are minimized when the two components are iterated together.</p>
-<h2><a class="anchor" id="autotoc_md23"></a>
+<h3><a class="anchor" id="autotoc_md23"></a>
+Snapshot: complete vs continuous</h3>
+<p>The <code>Registry</code> class offers basic support to serialization.<br />
+ It doesn't convert components and tags to bytes directly, there wasn't the need of another tool for serialization out there. Instead, it accepts an opaque object with a suitable interface (namely an <em>archive</em>) to serialize its internal data structures and restore them later. The way types and instances are converted to a bunch of bytes is completely in charge to the archive and thus to the users.</p>
+<p>The goal of the serialization part is to allow users to make both a dump of the entire registry or a narrower snapshot, that is to select only the components and the tags in which they are interested.<br />
+ Intuitively, the use cases are different. As an example, the first approach is suitable for local save/restore functionalities while the latter is suitable for creating client-server applications and for transferring somehow parts of the representation side to side.</p>
+<p>To take a snapshot of the registry, use the <code>snapshot</code> member function. It returns a temporary object properly initialized to <em>save</em> the whole registry or parts of it.</p>
+<p>Example of use:</p>
+<div class="fragment"><div class="line">OutputArchive output;</div><div class="line"></div><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a69bdf0c5645f2049e8dee9e0c4de53ca">snapshot</a>()</div><div class="line">    .entities(output)</div><div class="line">    .destroyed(output)</div><div class="line">    .component&lt;AComponent, AnotherComponent&gt;(output)</div><div class="line">    .tag&lt;MyTag&gt;(output);</div></div><!-- fragment --><p>It isn't necessary to invoke all these functions each and every time. What functions to use in which case mostly depends on the goal and there is not a golden rule to do that.</p>
+<p>The <code>entities</code> member function asks to the registry to serialize all the entities that are still in use along with their versions. On the other side, the <code>destroyed</code> member function tells to the registry to serialize the entities that have been destroyed and are no longer in use.<br />
+ These two functions can be used to save and restore the whole set of entities with the versions they had during serialization.</p>
+<p>The <code>component</code> member function is a function template the aim of which is to store aside components. The presence of a template parameter list is a consequence of a couple of design choices from the past and in the present:</p>
+<ul>
+<li>First of all, there is no reason to force an user to serialize all the components at once and most of the times it isn't desiderable. As an example, in case the stuff for the HUD in a game is put into the registry for some reasons, its components can be freely discarded during a serialization step because probably the software already knows how to reconstruct the HUD correctly from scratch.</li>
+<li>Furthermore, the registry makes heavy use of <em>type-erasure</em> techniques internally and doesn't know at any time what types of components it contains. Therefore being explicit at the call point is mandatory.</li>
+</ul>
+<p>The <code>tag</code> member function is similar to the previous one, apart from the fact that it works with tags and not with components.<br />
+ Note also that both <code>component</code> and <code>tag</code> store items along with entities. It means that they work properly without a call to the <code>entities</code> member function.</p>
+<p>Once a snapshot is created, there exist mainly two <em>ways</em> to load it: as a whole and in a kind of <em>continuous mode</em>.<br />
+ The following sections describe both loaders and archives in details.</p>
+<h4><a class="anchor" id="autotoc_md24"></a>
+Snapshot loader</h4>
+<p>A snapshot loader requires that the destination registry be empty and loads all the data at once while keeping intact the identifiers that the entities originally had.<br />
+ To do that, the registry offers a member function named <code>restore</code> that returns a temporary object properly initialized to <em>restore</em> a snapshot.</p>
+<p>Example of use:</p>
+<div class="fragment"><div class="line">InputArchive input;</div><div class="line"></div><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a925e91c4f1904d5104a0c5e9e9f70223">restore</a>()</div><div class="line">    .entities()</div><div class="line">    .destroyed()</div><div class="line">    .component&lt;AComponent, AnotherComponent&gt;(output)</div><div class="line">    .tag&lt;MyTag&gt;(output)</div><div class="line">    .orphans();</div></div><!-- fragment --><p>It isn't necessary to invoke all these functions each and every time. What functions to use in which case mostly depends on the goal and there is not a golden rule to do that. For obvious reasons, what is important is that the data are restored in exactly the same order in which they were serialized.</p>
+<p>The <code>entities</code> and <code>destroyed</code> member functions restore the sets of entities and the versions that the entities originally had at the source.</p>
+<p>The <code>component</code> member function restores all and only the components specified and assigns them to the right entities. Note that the template parameter list must be exactly the same used during the serialization. The same applies to the <code>tag</code> member function.</p>
+<p>The <code>orphans</code> member function literally destroys those entities that have neither components nor tags. It's usually useless if the snapshot is a full dump of the source. However, in case all the entities are serialized but only few components and tags are saved, it could happen that some of the entities have neither components nor tags once restored. The best users can do to deal with them is to destroy those entities and thus update their versions.</p>
+<h4><a class="anchor" id="autotoc_md25"></a>
+Continuous loader</h4>
+<p>A continuous loader is designed to load data from a source registry to a (possibly) non-empty destination. The loader can accomodate in a registry more than one snapshot in a sort of <em>continuous loading</em> that updates the destination one step at a time.<br />
+ Identifiers that entities originally had are not transferred to the target. Instead, the loader maps remote identifiers to local ones while restoring a snapshot. Because of that, this kind of loader offers a way to update automatically identifiers that are part of components or tags (as an example, as data members or gathered in a container).<br />
+ Another difference with the snapshot loader is that the continuous loader does not need to work with the private data structures of a registry. Furthermore, it has an internal state that must persist over time. Therefore, there is no reason to create it by means of a registry, or to limit its lifetime to that of a temporary object.</p>
+<p>Example of use:</p>
+<div class="fragment"><div class="line"><a class="code" href="classentt_1_1ContinuousLoader.html">entt::ContinuousLoader&lt;entity_type&gt;</a> loader{registry};</div><div class="line">InputArchive input;</div><div class="line"></div><div class="line">loader.entities(input)</div><div class="line">    .destroyed(input)</div><div class="line">    .component&lt;AComponent, AnotherComponent&gt;(input)</div><div class="line">    .component&lt;DirtyComponent&gt;(input, &amp;DirtyComponent::parent, &amp;DirtyComponent::child)</div><div class="line">    .tag&lt;MyTag&gt;(input)</div><div class="line">    .tag&lt;DirtyTag&gt;(input, &amp;DirtyTag::container)</div><div class="line">    .orphans()</div><div class="line">    .shrink();</div></div><!-- fragment --><p>It isn't necessary to invoke all these functions each and every time. What functions to use in which case mostly depends on the goal and there is not a golden rule to do that. For obvious reasons, what is important is that the data are restored in exactly the same order in which they were serialized.</p>
+<p>The <code>entities</code> and <code>destroyed</code> member functions restore groups of entities and map each entity to a local counterpart when required. In other terms, for each remote entity identifier not yet registered by the loader, the latter creates a local identifier so that it can keep the local entity in sync with the remote one.</p>
+<p>The <code>component</code> and <code>tag</code> member functions restore all and only the components and the tags specified and assign them to the right entities.<br />
+ In case the component or the tag contains entities itself (either as data members of type <code>entity_type</code> or as containers of entities), the loader can update them automatically. To do that, it's enough to specify the data members to update as shown in the example. If the component or the tag was in the middle of the template parameter list during serialization, multiple commands are required during a restore:</p>
+<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a69bdf0c5645f2049e8dee9e0c4de53ca">snapshot</a>().component&lt;ASimpleComponent, AnotherSimpleComponent, AMoreComplexComponent, TheLastComponent&gt;();</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">loader</div><div class="line">    .component&lt;ASimpleComponent, AnotherSimpleComponent&gt;(input)</div><div class="line">    .component&lt;AMoreComplexComponent&gt;(input, &amp;AMoreComplexComponent::entity);</div><div class="line">    .component&lt;TheLastComponent&gt;(input);</div></div><!-- fragment --><p>The <code>orphans</code> member function literally destroys those entities that have neither components nor tags after a restore. It has exactly the same purpose described in the previous section and works the same way.</p>
+<p>Finally, <code>shrink</code> helps to purge local entities that no longer have a remote conterpart. Users should invoke this member function after restoring each snapshot, unless they know exactly what they are doing.</p>
+<h4><a class="anchor" id="autotoc_md26"></a>
+Archives</h4>
+<p>Archives must publicly expose a predefined set of member functions. The API is straightforward and consists only of a group of function call operators that are invoked by the registry.</p>
+<p>In particular:</p>
+<ul>
+<li>An output archive, the one used when creating a snapshot, must expose a function call operator with the following signature to store entities:</li>
+</ul>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> operator()(Entity);</div></div><!-- fragment --><p>Where <code>Entity</code> is the type of the entities used by the registry.<br />
+ In addition, it must accept the types of both the components and the tags to serialize. Therefore, given a type <code>T</code> (either a component or a tag), it must contain a function call operator with the following signature:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> operator()(<span class="keyword">const</span> T &amp;);</div></div><!-- fragment --><p>The output archive can freely decide how to serialize the data. The register is not affected at all by the decision.</p>
+<ul>
+<li>An input archive, the one used when restoring a snapshot, must expose a function call operator with the following signature to load entities:</li>
+</ul>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> operator()(Entity &amp;);</div></div><!-- fragment --><p>Where <code>Entity</code> is the type of the entities used by the registry. Each time the function is invoked, the archive must read the next element from the underlying storage and copy it in the given variable.<br />
+ In addition, it must accept the types of both the components and the tags to restore. Therefore, given a type <code>T</code> (either a component or a tag), it must contain a function call operator with the following signature:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> operator()(T &amp;);</div></div><!-- fragment --><p>Every time such an operator is invoked, the archive must read the next element from the underlying storage and copy it in the given variable.</p>
+<h4><a class="anchor" id="autotoc_md27"></a>
+One example to rule them all</h4>
+<p><code>EnTT</code> comes with some examples (actually some tests) that show how to integrate a well known library for serialization as an archive. It uses <a href="https://uscilab.github.io/cereal/"><code>Cereal C++</code></a> under the hood, mainly because I wanted to learn how it works at the time I was writing the code.</p>
+<p>The code is not production-ready and it isn't neither the only nor (probably) the best way to do it. However, feel free to use it at your own risk.</p>
+<p>The basic idea is to store everything in a group of queues in memory, then bring everything back to the registry with different loaders.</p>
+<h2><a class="anchor" id="autotoc_md28"></a>
 View: to persist or not to persist?</h2>
-<p>There are mainly two kinds of views: standard (also known as View) and persistent (alsa known as PersistentView).<br />
- Both of them have pros and cons to take in consideration. In particular:</p>
+<p>First of all, it is worth answering an obvious question: why views?<br />
+ Roughly speaking, they are a good tool to enforce single responsibility. A system that has access to a registry can create and destroy entities, as well as assign and remove components. On the other side, a system that has access to a view can only iterate entities and their components, then read or update the data members of the latter.<br />
+ It is a subtle difference that can help designing a better software sometimes.</p>
+<p>There are mainly three kinds of views: standard (also known as <code>View</code>), persistent (also known as <code>PersistentView</code>) and raw (also known as <code>RawView</code>).<br />
+ All of them have pros and cons to take in consideration. In particular:</p>
 <ul>
 <li><p class="startli">Standard views:</p>
 <p class="startli">Pros:</p><ul>
 <li>They work out-of-the-box and don't require any dedicated data structure.</li>
 <li>Creating and destroying them isn't expensive at all because they don't have any type of initialization.</li>
-<li>They are the best tool to iterate single components.</li>
-<li>They are the best tool to iterate multiple components at once when tags are involved or one of the component is assigned to a significantly low number of entities.</li>
+<li>They are the best tool for iterating entities for a single component.</li>
+<li>They are the best tool for iterating entities for multiple components when one of the components is assigned to a significantly low number of entities.</li>
 <li>They don't affect any other operations of the registry.</li>
 </ul>
 <p class="startli">Cons:</p><ul>
@@ -307,82 +445,107 @@ View: to persist or not to persist?</h2>
 <li><p class="startli">Persistent views:</p>
 <p class="startli">Pros:</p><ul>
 <li>Once prepared, creating and destroying them isn't expensive at all because they don't have any type of initialization.</li>
-<li>They are the best tool to iterate multiple components at once when the most of the entities have all of them.</li>
+<li>They are the best tool for iterating entities for mmultiple components and most entities have them all.</li>
 </ul>
 <p class="startli">Cons:</p><ul>
-<li>They have dedicated data structures and thus affect the memory pressure to a minimal extent.</li>
+<li>They have dedicated data structures and thus affect the memory usage to a minimal extent.</li>
 <li>If not previously prepared, the first time they are used they go through an initialization step that could take a while.</li>
 <li>They affect to a minimum the creation and destruction of entities and components. In other terms: the more persistent views there will be, the less performing will be creating and destroying entities and components.</li>
 </ul>
 </li>
+<li><p class="startli">Raw views:</p>
+<p class="startli">Pros:</p><ul>
+<li>They work out-of-the-box and don't require any dedicated data structure.</li>
+<li>Creating and destroying them isn't expensive at all because they don't have any type of initialization.</li>
+<li>They are the best tool for iterating components when it is not necessary to know which entities they belong to.</li>
+<li>They don't affect any other operations of the registry.</li>
 </ul>
-<p>To sum up and as a rule of thumb, use a standard view:</p><ul>
-<li>To iterate entities for a single component.</li>
-<li>To iterate entities for multiple components when a significantly low number of entities have one of the components.</li>
-<li>In all those cases where a persistent view would give a boost to performance but the iteration isn't performed frequently.</li>
+<p class="startli">Cons:</p><ul>
+<li>They can be used to iterate only one type of component at a time.</li>
+<li>They don't return the entity to which a component belongs to the caller.</li>
 </ul>
-<p>Use a persistent view in all the other cases.</p>
-<p>To easily iterate entities, all the views offer the common <code>begin</code> and <code>end</code> member functions that allow users to use a view in a typical range-for loop.<br />
+</li>
+</ul>
+<p>To sum up and as a rule of thumb:</p><ul>
+<li>Use a raw view to iterate components only (no entities) for a given type.</li>
+<li>Use a standard view to iterate entities for a single component.</li>
+<li>Use a standard view to iterate entities for multiple components when a significantly low number of entities have one of the components.</li>
+<li>Use a standard view in all those cases where a persistent view would give a boost to performance but the iteration isn't performed frequently.</li>
+<li>Prepare and use a persistent view in all the other cases.</li>
+</ul>
+<p>To easily iterate entities and components, all the views offer the common <code>begin</code> and <code>end</code> member functions that allow users to use a view in a typical range-for loop. Almost all the views offer also a <em>more functional</em> <code>each</code> member function that accepts a callback for convenience.<br />
  Continue reading for more details or refer to the <a href="https://skypjack.github.io/entt/">official documentation</a>.</p>
-<h3><a class="anchor" id="autotoc_md24"></a>
+<h3><a class="anchor" id="autotoc_md29"></a>
 Standard View</h3>
 <p>A standard view behaves differently if it's constructed for a single component or if it has been requested to iterate multiple components. Even the API is different in the two cases.<br />
  All that they share is the way they are created by means of a registry:</p>
 <div class="fragment"><div class="line"><span class="comment">// single component standard view</span></div><div class="line"><span class="keyword">auto</span> single = registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Position&gt;();</div><div class="line"></div><div class="line"><span class="comment">// multi component standard view</span></div><div class="line"><span class="keyword">auto</span> multi = registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Position, Velocity&gt;();</div></div><!-- fragment --><p>For all that remains, it's worth discussing them separately.<br />
 </p>
-<h4><a class="anchor" id="autotoc_md25"></a>
+<h4><a class="anchor" id="autotoc_md30"></a>
 Single component standard view</h4>
-<p>Single component standard views are specialized in order to give a boost in terms of performance in all the situation. This kind of views can access the underlying data structures directly and avoid superflous checks.<br />
- They offer a bunch of functionalities to get the number of entities they are going to return and a raw access to the entity list as well as to the component list.<br />
+<p>Single component standard views are specialized in order to give a boost in terms of performance in all the situation. This kind of views can access the underlying data structures directly and avoid superfluous checks.<br />
+ They offer a bunch of functionalities to get the number of entities they are going to return and a raw access to the entity list as well as to the component list. It's also possible to ask a view if it contains a given entity.<br />
  Refer to the <a href="https://skypjack.github.io/entt/">official documentation</a> for all the details.</p>
 <p>There is no need to store views around for they are extremely cheap to construct, even though they can be copied without problems and reused freely. In fact, they return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.<br />
  To iterate a single component standard view, either use it in range-for loop:</p>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Renderable&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">    Renderable &amp;renderable = view.get(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>Or rely on the <code>each</code> member function to iterate entities and get all their components at once:</p>
 <div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Renderable&gt;().each([](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;renderable) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>Performance are more or less the same. The best approach depends mainly on whether all the components have to be accessed or not.</p>
 <p><b>Note</b>: prefer the <code>get</code> member function of a view instead of the <code>get</code> member function template of a registry during iterations, if possible. However, keep in mind that it works only with the components of the view itself.</p>
-<h4><a class="anchor" id="autotoc_md26"></a>
+<h4><a class="anchor" id="autotoc_md31"></a>
 Multi component standard view</h4>
 <p>Multi component standard views iterate entities that have at least all the given components in their bags. During construction, these views look at the number of entities available for each component and pick up a reference to the smallest set of candidates in order to speed up iterations.<br />
- They offer fewer functionalities than their companion views for single component, the most important of which can be used to reset the view and refresh the reference to the set of candidate entities to iterate.<br />
+ They offer fewer functionalities than their companion views for single component. In particular, a multi component standard view exposes utility functions to reset its internal state (optimization purposes) and to get the estimated number of entities it is going to return. It's also possible to ask a view if it contains a given entity.<br />
  Refer to the <a href="https://skypjack.github.io/entt/">official documentation</a> for all the details.</p>
 <p>There is no need to store views around for they are extremely cheap to construct, even though they can be copied without problems and reused freely. In fact, they return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.<br />
  To iterate a multi component standard view, either use it in range-for loop:</p>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">    <span class="comment">// a component at a time ...</span></div><div class="line">    Position &amp;position = view.get&lt;Position&gt;(entity);</div><div class="line">    Velocity &amp;velocity = view.get&lt;Velocity&gt;(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ... or multiple components at once</span></div><div class="line">    std::tuple&lt;Position &amp;, Velocity &amp;&gt; tup = view.get&lt;Position, Velocity&gt;(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>Or rely on the <code>each</code> member function to iterate entities and get all their components at once:</p>
 <div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Position, Velocity&gt;().each([](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;position, <span class="keyword">auto</span> &amp;velocity) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>Performance are more or less the same. The best approach depends mainly on whether all the components have to be accessed or not.</p>
 <p><b>Note</b>: prefer the <code>get</code> member function of a view instead of the <code>get</code> member function template of a registry during iterations, if possible. However, keep in mind that it works only with the components of the view itself.</p>
-<h3><a class="anchor" id="autotoc_md27"></a>
+<h3><a class="anchor" id="autotoc_md32"></a>
 Persistent View</h3>
-<p>A persistent view returns all the entities and only the entities that have at least the given components. Moreover, it's guaranteed that the entity list is thightly packed in memory for fast iterations.<br />
+<p>A persistent view returns all the entities and only the entities that have at least the given components. Moreover, it's guaranteed that the entity list is tightly packed in memory for fast iterations.<br />
  In general, persistent views don't stay true to the order of any set of components unless users explicitly sort them.</p>
 <p>Persistent views can be used only to iterate multiple components. Create them as it follows:</p>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1Registry.html#a139a4d7b711fc1813c6c4520b9e79c09">persistent</a>&lt;Position, Velocity&gt;();</div></div><!-- fragment --><p>There is no need to store views around for they are extremely cheap to construct, even though they can be copied without problems and reused freely. In fact, they return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.<br />
  That being said, persistent views perform an initialization step the very first time they are constructed and this could be quite costly. To avoid it, consider asking to the registry to <em>prepare</em> them when no entities have been created yet:</p>
-<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#ac05c9ccc5fe57df386d8104578fc9675">prepare</a>&lt;Position, Velocity&gt;();</div></div><!-- fragment --><p>If the registry is empty, preparation is extremely fast. Moreover the <code>prepare</code> member function template is idempotent. Feel free to invoke it even more than once: if the view has been alreadt prepared before, the function returns immediately and does nothing.</p>
-<p>A persistent view offers a bunch of functionalities to get the number of entities it's going to return, a raw access to the entity list and the possibility to sort the underlying data structures according to the order of one of the components for which it has been constructed.<br />
+<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#ac05c9ccc5fe57df386d8104578fc9675">prepare</a>&lt;Position, Velocity&gt;();</div></div><!-- fragment --><p>If the registry is empty, preparation is extremely fast. Moreover the <code>prepare</code> member function template is idempotent. Feel free to invoke it even more than once: if the view has been already prepared before, the function returns immediately and does nothing.</p>
+<p>A persistent view offers a bunch of functionalities to get the number of entities it's going to return, a raw access to the entity list and the possibility to sort the underlying data structures according to the order of one of the components for which it has been constructed. It's also possible to ask a view if it contains a given entity.<br />
  Refer to the <a href="https://skypjack.github.io/entt/">official documentation</a> for all the details.</p>
 <p>To iterate a persistent view, either use it in range-for loop:</p>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1Registry.html#a139a4d7b711fc1813c6c4520b9e79c09">persistent</a>&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">    <span class="comment">// a component at a time ...</span></div><div class="line">    Position &amp;position = view.get&lt;Position&gt;(entity);</div><div class="line">    Velocity &amp;velocity = view.get&lt;Velocity&gt;(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ... or multiple components at once</span></div><div class="line">    std::tuple&lt;Position &amp;, Velocity &amp;&gt; tup = view.get&lt;Position, Velocity&gt;(entity);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>Or rely on the <code>each</code> member function to iterate entities and get all their components at once:</p>
 <div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a139a4d7b711fc1813c6c4520b9e79c09">persistent</a>&lt;Position, Velocity&gt;().each([](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;position, <span class="keyword">auto</span> &amp;velocity) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>Performance are more or less the same. The best approach depends mainly on whether all the components have to be accessed or not.</p>
 <p><b>Note</b>: prefer the <code>get</code> member function of a view instead of the <code>get</code> member function template of a registry during iterations, if possible. However, keep in mind that it works only with the components of the view itself.</p>
-<h3><a class="anchor" id="autotoc_md28"></a>
+<h3><a class="anchor" id="autotoc_md33"></a>
+Raw View</h3>
+<p>Raw views return all the components of a given type. This kind of views can access components directly and avoid extra indirections as if components were accessed via an entity identifier.<br />
+ They offer a bunch of functionalities to get the number of instances they are going to return and a raw access to the entity list as well as to the component list.<br />
+ Refer to the <a href="https://skypjack.github.io/entt/">official documentation</a> for all the details.</p>
+<p>There is no need to store views around for they are extremely cheap to construct, even though they can be copied without problems and reused freely. In fact, they return newly created and correctly initialized iterators whenever <code>begin</code> or <code>end</code> are invoked.<br />
+ To iterate a raw view, use it in range-for loop:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1Registry.html#abfcf4b93ce00f98f06c5ef522981e2dd">raw</a>&lt;Renderable&gt;();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> &amp;&amp;component: raw) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p><b>Note</b>: raw views don't have the <code>each</code> nor the <code>get</code> member function for obvious reasons. The former would only return the components and therefore it would be redundant, the latter isn't required at all.</p>
+<h3><a class="anchor" id="autotoc_md34"></a>
 Give me everything</h3>
 <p>Views are narrow windows on the entire list of entities. They work by filtering entities according to their components.<br />
- In some cases there may be the need to iterate all the entities regardless of their components. The registry offers a specific member function to do that:</p>
-<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a1d7547f6d8503265480d235fe48dfb1d">each</a>([](<span class="keyword">auto</span> entity) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>Each entity ever created is returned, no matter if it's in use or not.<br />
- Usually, filtering entities that aren't currently in use is more expensive than iterating them all and filtering out those in which one isn't interested.</p>
-<p>As a rule of thumb, consider using a view if the goal is to iterate entities that have a determinate set of components. A view is usually faster than combining this function with a bunch of custom tests.<br />
+ In some cases there may be the need to iterate all the entities still in use regardless of their components. The registry offers a specific member function to do that:</p>
+<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a1d7547f6d8503265480d235fe48dfb1d">each</a>([](<span class="keyword">auto</span> entity) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>It returns to the caller all the entities that are still in use by means of the given function.<br />
+ As a rule of thumb, consider using a view if the goal is to iterate entities that have a determinate set of components. A view is usually much faster than combining this function with a bunch of custom tests.<br />
  In all the other cases, this is the way to go.</p>
-<h2><a class="anchor" id="autotoc_md29"></a>
+<p>There exists also another member function to use to retrieve orphans. An orphan is an entity that is still in use and has neither assigned components nor tags.<br />
+ The signature of the function is the same of <code>each</code>:</p>
+<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#ada2900e50f66573c14821baac03bbd68">orphans</a>([](<span class="keyword">auto</span> entity) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>To test the <em>orphanity</em> of a single entity, use the member function <code>orphan</code> instead. It accepts a valid entity identifer as an argument and returns true in case the entity is an orphan, false otherwise.</p>
+<p>In general, all these functions can result in poor performance.<br />
+ <code>each</code> is fairly slow because of some checks it performs on each and every entity. For similar reasons, <code>orphans</code> can be even slower. Both functions should not be used frequently to avoid the risk of a performance hit.</p>
+<h2><a class="anchor" id="autotoc_md35"></a>
 Side notes</h2>
 <ul>
 <li>Entity identifiers are numbers and nothing more. They are not classes and they have no member functions at all. As already mentioned, do no try to inspect or modify an entity descriptor in any way.</li>
-<li>As shown in the examples above, the preferred way to get references to the components while iterating a view is by using the view itself. It's a faster alternative to the <code>get</code> member function template that is part of the API of the Registry. This is because the registry must ensure that a pool for the given component exists before to use it; on the other side, views force the construction of the pools for all their components and access them directly, thus avoiding all the checks.</li>
-<li><p class="startli">Most of the <em>ECS</em> available out there have an annoying limitation (at least from my point of view): entities and components cannot be created and/or deleted during iterations.<br />
+<li>As shown in the examples above, the preferred way to get references to the components while iterating a view is by using the view itself. It's a faster alternative to the <code>get</code> member function template that is part of the API of the <code>Registry</code>. This is because the registry must ensure that a pool for the given component exists before to use it; on the other side, views force the construction of the pools for all their components and access them directly, thus avoiding all the checks.</li>
+<li><p class="startli">Most of the <em>ECS</em> available out there have an annoying limitation (at least from my point of view): entities and components cannot be created and/or destroyed during iterations.<br />
  <code>EnTT</code> partially solves the problem with a few limitations:</p><ul>
 <li>Creating entities and components is allowed during iterations.</li>
 <li>Deleting an entity or removing its components is allowed during iterations if it's the one currently returned by a view. For all the other entities, destroying them or removing their components isn't allowed and it can result in undefined behavior.</li>
 </ul>
-<p class="startli">Iterators are invalidated and the behaviour is undefined if an entity is modified or destroyed and it's not the one currently returned by the view.<br />
+<p class="startli">Iterators are invalidated and the behavior is undefined if an entity is modified or destroyed and it's not the one currently returned by the view.<br />
  To work around it, possible approaches are:</p><ul>
 <li>Store aside the entities and the components to be removed and perform the operations at the end of the iteration.</li>
 <li>Mark entities and components with a proper tag component that indicates they must be purged, then perform a second iteration to clean them up one by one.</li>
@@ -390,21 +553,280 @@ Side notes</h2>
 </li>
 <li>Views and thus their iterators aren't thread safe. Do no try to iterate a set of components and modify the same set concurrently.<br />
  That being said, as long as a thread iterates the entities that have the component <code>X</code> or assign and removes that component from a set of entities, another thread can safely do the same with components <code>Y</code> and <code>Z</code> and everything will work like a charm.<br />
- As an example, users can freely execute the rendering system and iterate the renderable entities while updating a physic component concurrently on a separate thread if needed.</li>
+ As a trivial example, users can freely execute the rendering system and iterate the renderable entities while updating a physic component concurrently on a separate thread.</li>
+<li>In general, the entire registry isn't thread safe as it is. Thread safety isn't something that users should want out of the box for several reasons. Just to mention one of them: performance.<br />
+ This kind of entity-component systems can be used in single threaded applications as well as along with async stuff. Moreover, typical thread based models for ECS don't require a fully thread safe registry to work. Actually one could reach the goal with the registry as it is while working with most of the common models, after all.<br />
+ Because of the few reasons mentioned above and many others not mentioned, users are completely responsible for synchronization whether required.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md30"></a>
+<h1><a class="anchor" id="autotoc_md36"></a>
+Crash Course: core functionalities</h1>
+<p>The <code>EnTT</code> framework comes with a bunch of core functionalities mostly used by the other parts of the library itself.<br />
+ Hardly users of the framework will include these features in their code, but it's worth describing what <code>EnTT</code> offers so as not to reinvent the wheel in case of need.</p>
+<h2><a class="anchor" id="autotoc_md37"></a>
+Compile-time identifiers</h2>
+<p>Sometimes it's useful to be able to give unique identifiers to types at compile-time.<br />
+ There are plenty of different solutions out there and I could have used one of them. However, I decided to spend my time to define a compact and versatile tool that fully embraces what the modern C++ has to offer.</p>
+<p>The <em>result of my efforts</em> is the <code>ident</code> <code>constexpr</code> variable:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;ident.hpp&gt;</span></div><div class="line"></div><div class="line"><span class="comment">// defines the identifiers for the given types</span></div><div class="line">constexpr <span class="keyword">auto</span> identifiers = entt::ident&lt;AType, AnotherType&gt;;</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><span class="keywordflow">switch</span>(aTypeIdentifier) {</div><div class="line"><span class="keywordflow">case</span> identifers.get&lt;AType&gt;():</div><div class="line">    <span class="comment">// ...</span></div><div class="line">    <span class="keywordflow">break</span>;</div><div class="line"><span class="keywordflow">case</span> identifers.get&lt;AnotherType&gt;():</div><div class="line">    <span class="comment">// ...</span></div><div class="line">    <span class="keywordflow">break</span>;</div><div class="line"><span class="keywordflow">default</span>:</div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>This is all what the variable has to offer: a <code>get</code> member function that returns a numerical identifier for the given type. It can be used in any context where constant expressions are required.</p>
+<p>As long as the list remains unchanged, identifiers are also guaranteed to be the same for every run. In case they have been used in a production environment and a type has to be removed, one can just use a placeholder to left the other identifiers unchanged:</p>
+<div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt; <span class="keyword">struct </span>IgnoreType {};</div><div class="line"></div><div class="line">constexpr <span class="keyword">auto</span> identifiers = <a class="code" href="namespaceentt.html#a02c0c4d37a2cdf573029814c1903de3c">entt::ident</a>&lt;</div><div class="line">    ATypeStillValid,</div><div class="line">    IgnoreType&lt;ATypeNoLongerValid&gt;,</div><div class="line">    AnotherTypeStillValid</div><div class="line">&gt;;</div></div><!-- fragment --><p>A bit ugly to see, but it works at least.</p>
+<h2><a class="anchor" id="autotoc_md38"></a>
+Runtime identifiers</h2>
+<p>Sometimes it's useful to be able to give unique identifiers to types at runtime.<br />
+ There are plenty of different solutions out there and I could have used one of them. In fact, I adapted the most common one to my requirements and used it extensively within the entire framework.</p>
+<p>It's the <code>Family</code> class. Here is an example of use directly from the entity-component system:</p>
+<div class="fragment"><div class="line"><span class="keyword">using</span> component_family = <a class="code" href="classentt_1_1Family.html">entt::Family&lt;struct InternalRegistryComponentFamily&gt;</a>;</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Component&gt;</div><div class="line">component_type component() const noexcept {</div><div class="line">    <span class="keywordflow">return</span> component_family::type&lt;Component&gt;();</div><div class="line">}</div></div><!-- fragment --><p>This is all what a <em>family</em> has to offer: a <code>type</code> member function that returns a numerical identifier for the given type.</p>
+<p>Please, note that identifiers aren't guaranteed to be the same for every run. Indeed it mostly depends on the flow of execution.</p>
+<h2><a class="anchor" id="autotoc_md39"></a>
+Hashed strings</h2>
+<p>A hashed string is a zero overhead resource identifier. Users can use human-readable identifiers in the codebase while using their numeric counterparts at runtime, thus without affecting performance.<br />
+ The class has an implicit <code>constexpr</code> constructor that chews a bunch of characters. Once created, all what one can do with it is getting back the original string or converting it into a number.<br />
+ The good part is that a hashed string can be used wherever a constant expression is required and no <em>string-to-number</em> conversion will take place at runtime if used carefully.</p>
+<p>Example of use:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> load(<a class="code" href="classentt_1_1HashedString.html#af511100177b5e0213bf5b0efb3f4f528">entt::HashedString::hash_type</a> resource) {</div><div class="line">    <span class="comment">// uses the numeric representation of the resource to load and return it</span></div><div class="line">}</div><div class="line"></div><div class="line"><span class="keyword">auto</span> resource = load(<a class="code" href="classentt_1_1HashedString.html">entt::HashedString</a>{<span class="stringliteral">&quot;gui/background&quot;</span>});</div></div><!-- fragment --><h3><a class="anchor" id="autotoc_md40"></a>
+Conflicts</h3>
+<p>The hashed string class uses internally FNV-1a to compute the numeric counterpart of a string. Because of the <em>pigeonhole principle</em>, conflicts are possible. This is a fact.<br />
+ There is no silver bullet to solve the problem of conflicts when dealing with hashing functions. In this case, the best solution seemed to be to give up. That's all.<br />
+ After all, human-readable resource identifiers aren't something strictly defined and over which users have not the control. Choosing a slightly different identifier is probably the best solution to make the conflict disappear in this case.</p>
+<h1><a class="anchor" id="autotoc_md41"></a>
+Crash Course: service locator</h1>
+<p>Usually service locators are tightly bound to the services they expose and it's hard to define a general purpose solution. This template based implementation tries to fill the gap and to get rid of the burden of defining a different specific locator for each application.<br />
+ This class is tiny, partially unsafe and thus risky to use. Moreover it doesn't fit probably most of the scenarios in which a service locator is required. Look at it as a small tool that can sometimes be useful if the user knows how to handle it.</p>
+<p>The API is straightforward. The basic idea is that services are implemented by means of interfaces and rely on polymorphism.<br />
+ The locator is instantiated with the base type of the service if any and a concrete implementation is provided along with all the parameters required to initialize it. As an example:</p>
+<div class="fragment"><div class="line"><span class="comment">// the service has no base type, a locator is used to treat it as a kind of singleton</span></div><div class="line"><a class="code" href="structentt_1_1ServiceLocator.html#abf8d8b8d70ed082d54516def7500ec5c">entt::ServiceLocator&lt;MyService&gt;::set</a>(params...);</div><div class="line"></div><div class="line"><span class="comment">// sets up an opaque service</span></div><div class="line"><a class="code" href="structentt_1_1ServiceLocator.html">entt::ServiceLocator&lt;AudioInterface&gt;::set</a>&lt;AudioImplementation&gt;(params...);</div><div class="line"></div><div class="line"><span class="comment">// resets (destroys) the service</span></div><div class="line"><a class="code" href="structentt_1_1ServiceLocator.html#ac52892a5692c15c8b230a5020adb0847">entt::ServiceLocator&lt;AudioInterface&gt;::reset</a>();</div></div><!-- fragment --><p>The locator can also be queried to know if an active service is currently set and to retrieve it if necessary (either as a pointer or as a reference):</p>
+<div class="fragment"><div class="line"><span class="comment">// no service currently set</span></div><div class="line"><span class="keyword">auto</span> empty = <a class="code" href="structentt_1_1ServiceLocator.html#a476a7ad8cad6527ccef22ca59bf829bd">entt::ServiceLocator&lt;AudioInterface&gt;::empty</a>();</div><div class="line"></div><div class="line"><span class="comment">// gets a (possibly empty) shared pointer to the service ...</span></div><div class="line">std::shared_ptr&lt;AudioInterface&gt; ptr = <a class="code" href="structentt_1_1ServiceLocator.html#a134e8a6d1e3697b7c67bdce9175a7c8b">entt::ServiceLocator&lt;AudioInterface&gt;::get</a>();</div><div class="line"></div><div class="line"><span class="comment">// ... or a reference, but it&#39;s undefined behaviour if the service isn&#39;t set yet</span></div><div class="line">AudioInterface &amp;ref = <a class="code" href="structentt_1_1ServiceLocator.html#a1bf93009cea9bfb190a69ae940fe0001">entt::ServiceLocator&lt;AudioInterface&gt;::ref</a>();</div></div><!-- fragment --><p>A common use is to wrap the different locators in a container class, creating aliases for the various services:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>Locator {</div><div class="line">    <span class="keyword">using</span> Camera = <a class="code" href="structentt_1_1ServiceLocator.html">entt::ServiceLocator&lt;CameraInterface&gt;</a>;</div><div class="line">    <span class="keyword">using</span> Audio = <a class="code" href="structentt_1_1ServiceLocator.html">entt::ServiceLocator&lt;AudioInterface&gt;</a>;</div><div class="line">    <span class="comment">// ...</span></div><div class="line">};</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><span class="keywordtype">void</span> init() {</div><div class="line">    Locator::Camera::set&lt;CameraNull&gt;();</div><div class="line">    Locator::Audio::set&lt;AudioImplementation&gt;(params...);</div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><h1><a class="anchor" id="autotoc_md42"></a>
+Crash Course: cooperative scheduler</h1>
+<p>Sometimes processes are a useful tool to work around the strict definition of a system and introduce logic in a different way, usually without resorting to the introduction of other components.</p>
+<p>The <code>EnTT</code> framework offers a minimal support to this paradigm by introducing a few classes that users can use to define and execute cooperative processes.</p>
+<h2><a class="anchor" id="autotoc_md43"></a>
+The process</h2>
+<p>A typical process must inherit from the <code>Process</code> class template that stays true to the CRTP idiom. Moreover, derived classes must specify what's the intended type for elapsed times.</p>
+<p>A process should expose publicly the following member functions whether required (note that it isn't required to define a function unless the derived class wants to <em>override</em> the default behavior):</p>
+<ul>
+<li><p class="startli"><code>void update(Delta, void *);</code></p>
+<p class="startli">It's invoked once per tick until a process is explicitly aborted or it terminates either with or without errors. Even though it's not mandatory to declare this member function, as a rule of thumb each process should at least define it to work properly. The <code>void *</code> parameter is an opaque pointer to user data (if any) forwarded directly to the process during an update.</p>
+</li>
+<li><p class="startli"><code>void init(void *);</code></p>
+<p class="startli">It's invoked at the first tick, immediately before an update. The <code>void *</code> parameter is an opaque pointer to user data (if any) forwarded directly to the process during an update.</p>
+</li>
+<li><p class="startli"><code>void succeeded();</code></p>
+<p class="startli">It's invoked in case of success, immediately after an update and during the same tick.</p>
+</li>
+<li><p class="startli"><code>void failed();</code></p>
+<p class="startli">It's invoked in case of errors, immediately after an update and during the same tick.</p>
+</li>
+<li><p class="startli"><code>void aborted();</code></p>
+<p class="startli">It's invoked only if a process is explicitly aborted. There is no guarantee that it executes in the same tick, this depends solely on whether the process is aborted immediately or not.</p>
+</li>
+</ul>
+<p>Derived classes can also change the internal state of a process by invoking <code>succeed</code> and <code>fail</code>, as well as <code>pause</code> and <code>unpause</code> the process itself. All these are protected member functions made available to be able to manage the life cycle of a process from a derived class.</p>
+<p>Here is a minimal example for the sake of curiosity:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>MyProcess: <a class="code" href="classentt_1_1Process.html">entt::Process</a>&lt;MyProcess, std::uint32_t&gt; {</div><div class="line">    <span class="keyword">using</span> delta_type = std::uint32_t;</div><div class="line"></div><div class="line">    <span class="keywordtype">void</span> update(delta_type delta, <span class="keywordtype">void</span> *) {</div><div class="line">        remaining = delta &gt; remaining ? delta_type{] : (remaining - delta);</div><div class="line"></div><div class="line">        <span class="comment">// ...</span></div><div class="line"></div><div class="line">        <span class="keywordflow">if</span>(!remaining) {</div><div class="line">            <a class="code" href="classentt_1_1Process.html#aa30460eaadd9a6f2a58f4a5b0cda2b87">succeed</a>();</div><div class="line">        }</div><div class="line">    }</div><div class="line"></div><div class="line">    <span class="keywordtype">void</span> init(<span class="keywordtype">void</span> *data) {</div><div class="line">        remaining = *<span class="keyword">static_cast&lt;</span>delta_type *<span class="keyword">&gt;</span>(data);</div><div class="line">    }</div><div class="line"></div><div class="line"><span class="keyword">private</span>:</div><div class="line">    delta_type remaining;</div><div class="line">};</div></div><!-- fragment --><h3><a class="anchor" id="autotoc_md44"></a>
+Adaptor</h3>
+<p>Lambdas and functors can't be used directly with a scheduler for they are not properly defined processes with managed life cycles.<br />
+ This class helps in filling the gap and turning lambdas and functors into full featured processes usable by a scheduler.</p>
+<p>The function call operator has a signature similar to the one of the <code>update</code> function of a process but for the fact that it receives two extra arguments to call whenever a process is terminated with success or with an error:</p>
+<div class="fragment"><div class="line">void(Delta delta, <span class="keywordtype">void</span> *data, <span class="keyword">auto</span> succeed, <span class="keyword">auto</span> fail);</div></div><!-- fragment --><p>Parameters have the following meaning:</p>
+<ul>
+<li><code>delta</code> is the elapsed time.</li>
+<li><code>data</code> is an opaque pointer to user data if any, <code>nullptr</code> otherwise.</li>
+<li><code>succeed</code> is a function to call when a process terminates with success.</li>
+<li><code>fail</code> is a function to call when a process terminates with errors.</li>
+</ul>
+<p>Both <code>succeed</code> and <code>fail</code> accept no parameters at all.</p>
+<p>Note that usually users shouldn't worry about creating adaptors at all. A scheduler creates them internally each and every time a lambda or a functor is used as a process.</p>
+<h2><a class="anchor" id="autotoc_md45"></a>
+The scheduler</h2>
+<p>A cooperative scheduler runs different processes and helps managing their life cycles.</p>
+<p>Each process is invoked once per tick. If it terminates, it's removed automatically from the scheduler and it's never invoked again. Otherwise it's a good candidate to run once more the next tick.<br />
+ A process can also have a child. In this case, the process is replaced with its child when it terminates if it returns with success. In case of errors, both the process and its child are discarded. This way, it's easy to create chain of processes to run sequentially.</p>
+<p>Using a scheduler is straightforward. To create it, users must provide only the type for the elapsed times and no arguments at all:</p>
+<div class="fragment"><div class="line">Scheduler&lt;std::uint32_t&gt; scheduler;</div></div><!-- fragment --><p>It has member functions to query its internal data structures, like <code>empty</code> or <code>size</code>, as well as a <code>clear</code> utility to reset it to a clean state:</p>
+<div class="fragment"><div class="line"><span class="comment">// checks if there are processes still running</span></div><div class="line"><span class="keywordtype">bool</span> empty = scheduler.empty();</div><div class="line"></div><div class="line"><span class="comment">// gets the number of processes still running</span></div><div class="line">Scheduler&lt;std::uint32_t&gt;::size_type size = scheduler.size();</div><div class="line"></div><div class="line"><span class="comment">// resets the scheduler to its initial state and discards all the processes</span></div><div class="line">scheduler.clear();</div></div><!-- fragment --><p>To attach a process to a scheduler there are mainly two ways:</p>
+<ul>
+<li>If the process inherits from the <code>Process</code> class template, it's enough to indicate its type and submit all the parameters required to construct it to the <code>attach</code> member function:</li>
+</ul>
+<div class="fragment"><div class="line">scheduler.attach&lt;MyProcess&gt;(<span class="stringliteral">&quot;foobar&quot;</span>);</div></div><!-- fragment --><ul>
+<li>Otherwise, in case of a lambda or a functor, it's enough to provide an instance of the class to the <code>attach</code> member function:</li>
+</ul>
+<div class="fragment"><div class="line">scheduler.attach([](<span class="keyword">auto</span>...){ <span class="comment">/* ... */</span> });</div></div><!-- fragment --><p>In both cases, the return value is an opaque object that offers a <code>then</code> member function to use to create chains of processes to run sequentially.<br />
+ As a minimal example of use:</p>
+<div class="fragment"><div class="line"><span class="comment">// schedules a task in the form of a lambda function</span></div><div class="line">scheduler.attach([](<span class="keyword">auto</span> delta, <span class="keywordtype">void</span> *, <span class="keyword">auto</span> succeed, <span class="keyword">auto</span> fail) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">})</div><div class="line"><span class="comment">// appends a child in the form of another lambda function</span></div><div class="line">.then([](<span class="keyword">auto</span> delta, <span class="keywordtype">void</span> *, <span class="keyword">auto</span> succeed, <span class="keyword">auto</span> fail) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">})</div><div class="line"><span class="comment">// appends a child in the form of a process class</span></div><div class="line">.then&lt;MyProcess&gt;();</div></div><!-- fragment --><p>To update a scheduler and thus all its processes, the <code>update</code> member function is the way to go:</p>
+<div class="fragment"><div class="line"><span class="comment">// updates all the processes, no user data are provided</span></div><div class="line">scheduler.update(delta);</div><div class="line"></div><div class="line"><span class="comment">// updates all the processes and provides them with custom data</span></div><div class="line">scheduler.update(delta, &amp;data);</div></div><!-- fragment --><p>In addition to these functions, the scheduler offers an <code>abort</code> member function that can be used to discard all the running processes at once:</p>
+<div class="fragment"><div class="line"><span class="comment">// aborts all the processes abruptly ...</span></div><div class="line">scheduler.abort(<span class="keyword">true</span>);</div><div class="line"></div><div class="line"><span class="comment">// ... or gracefully during the next tick</span></div><div class="line">scheduler.abort();</div></div><!-- fragment --><h1><a class="anchor" id="autotoc_md46"></a>
+Crash Course: resource management</h1>
+<p>Resource management is usually one of the most critical part of a software like a game. Solutions are often tuned to the particular application. There exist several approaches and all of them are perfectly fine as long as they fit the requirements of the piece of software in which they are used.<br />
+ Examples are loading everything on start, loading on request, predictive loading, and so on.</p>
+<p>The <code>EnTT</code> framework doesn't pretend to offer a <em>one-fits-all</em> solution for the different cases. Instead, it offers a minimal and perhaps trivial cache that can be useful most of the time during prototyping and sometimes even in a production environment.<br />
+ For those interested in the subject, the plan is to improve it considerably over time in terms of performance, memory usage and functionalities. Hoping to make it, of course, one step at a time.</p>
+<h2><a class="anchor" id="autotoc_md47"></a>
+The resource, the loader and the cache</h2>
+<p>There are three main actors in the model: the resource, the loader and the cache.</p>
+<p>The <em>resource</em> is whatever the user wants it to be. An image, a video, an audio, whatever. There are no limits.<br />
+ As a minimal example:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>MyResource { <span class="keyword">const</span> <span class="keywordtype">int</span> value; };</div></div><!-- fragment --><p>A <em>loader</em> is a class the aim of which is to load a specific resource. It has to inherit directly from the dedicated base class as in the following example:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>MyLoader final: <a class="code" href="classentt_1_1ResourceLoader.html">entt::ResourceLoader</a>&lt;MyLoader, MyResource&gt; {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">};</div></div><!-- fragment --><p>Where <code>MyResource</code> is the type of resources it creates.<br />
+ A resource loader must also expose a public const member function named <code>load</code> that accepts a variable number of arguments and returns a shared pointer to a resource.<br />
+ As an example:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>MyLoader: <a class="code" href="classentt_1_1ResourceLoader.html">entt::ResourceLoader</a>&lt;MyLoader, MyResource&gt; {</div><div class="line">    std::shared_ptr&lt;MyResource&gt; load(<span class="keywordtype">int</span> value)<span class="keyword"> const </span>{</div><div class="line">        <span class="comment">// ...</span></div><div class="line">        <span class="keywordflow">return</span> std::shared_ptr&lt;MyResource&gt;(<span class="keyword">new</span> MyResource{ value });</div><div class="line">    }</div><div class="line">};</div></div><!-- fragment --><p>In general, resource loaders should not have a state or retain data of any type. They should let the cache manage their resources instead.<br />
+ As a side note, base class and CRTP idiom aren't strictly required with the current implementation. One could argue that a cache can easily work with loaders of any type. However, future changes won't be breaking ones by forcing the use of a base class today and that's why the model is already in its place.</p>
+<p>Finally, a cache is a specialization of a class template tailored to a specific resource:</p>
+<div class="fragment"><div class="line"><span class="keyword">using</span> MyResourceCache = <a class="code" href="classentt_1_1ResourceCache.html">entt::ResourceCache&lt;MyResource&gt;</a>;</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">MyResourceCache cache{};</div></div><!-- fragment --><p>The idea is to create different caches for different types of resources and to manage each one independently and in the most appropriate way.<br />
+ As a (very) trivial example, audio tracks can survive in most of the scenes of an application while meshes can be associated with a single scene and then discarded when the user leaves it.</p>
+<p>A cache offers a set of basic functionalities to query its internal state and to <em>organize</em> it:</p>
+<div class="fragment"><div class="line"><span class="comment">// gets the number of resources managed by a cache</span></div><div class="line"><span class="keyword">auto</span> size = cache.size();</div><div class="line"></div><div class="line"><span class="comment">// checks if a cache contains at least a valid resource</span></div><div class="line"><span class="keyword">auto</span> empty = cache.empty();</div><div class="line"></div><div class="line"><span class="comment">// clears a cache and discards its content</span></div><div class="line">cache.clear();</div></div><!-- fragment --><p>Besides these member functions, it contains what is needed to load, use and discard resources of the given type.<br />
+ Before to explore this part of the interface, it makes sense to mention how resources are identified. The type of the identifiers to use is defined as:</p>
+<div class="fragment"><div class="line"><a class="code" href="classentt_1_1HashedString.html">entt::ResourceCache&lt;Resource&gt;::resource_type</a></div></div><!-- fragment --><p>Where <code>resource_type</code> is an alias for <code><a class="el" href="classentt_1_1HashedString.html" title="Zero overhead resource identifier. ">entt::HashedString</a></code>. Therefore, resource identifiers are created explicitly as in the following example:</p>
+<div class="fragment"><div class="line">constexpr <span class="keyword">auto</span> identifier = <a class="code" href="classentt_1_1HashedString.html">entt::ResourceCache&lt;Resource&gt;::resource_type</a>{<span class="stringliteral">&quot;my/resource/identifier&quot;</span>};</div><div class="line"><span class="comment">// this is equivalent to the following</span></div><div class="line">constexpr <span class="keyword">auto</span> hs = <a class="code" href="classentt_1_1HashedString.html">entt::HashedString</a>{<span class="stringliteral">&quot;my/resource/identifier&quot;</span>};</div></div><!-- fragment --><p>The class <code>HashedString</code> is described in a dedicated section, so I won't do in details here.</p>
+<p>Resources are loaded and thus stored in a cache through the <code>load</code> member function. It accepts the loader to use as a template parameter, the resource identifier and the parameters used to construct the resource as arguments:</p>
+<div class="fragment"><div class="line"><span class="comment">// uses the identifier declared above</span></div><div class="line">cache.load&lt;MyLoader&gt;(identifier, 0);</div><div class="line"></div><div class="line"><span class="comment">// uses a const char * directly as an identifier</span></div><div class="line">cache.load&lt;MyLoader&gt;(<span class="stringliteral">&quot;another/identifier&quot;</span>, 42);</div></div><!-- fragment --><p>The return value can be used to know if the resource has been loaded correctly. In case the loader returns an invalid pointer or the resource already exists in the cache, a false value is returned:</p>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span>(!cache.load&lt;MyLoader&gt;(<span class="stringliteral">&quot;another/identifier&quot;</span>, 42)) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>Unfortunately, in this case there is no way to know what was the problem exactly. However, before trying to load a resource or after an error, one can use the <code>contains</code> member function to know if a cache already contains a specific resource:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> exists = cache.contains(<span class="stringliteral">&quot;my/identifier&quot;</span>);</div></div><!-- fragment --><p>There exists also a member function to use to force a reload of an already existing resource if needed:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> result = cache.reload&lt;MyLoader&gt;(<span class="stringliteral">&quot;another/identifier&quot;</span>, 42);</div></div><!-- fragment --><p>As above, the function returns true in case of success, false otherwise. The sole difference in this case is that an error necessarily means that the loader has failed for some reasons to load the resource.<br />
+ Note that the <code>reload</code> member function is a kind of alias of the following snippet:</p>
+<div class="fragment"><div class="line">cache.discard(identifier);</div><div class="line">cache.load&lt;MyLoader&gt;(identifier, 42);</div></div><!-- fragment --><p>Where the <code>discard</code> member function is used to get rid of a resource if loaded. In case the cache doesn't contain a resource for the given identifier, the function does nothing and returns immediately.</p>
+<p>So far, so good. Resources are finally loaded and stored within the cache.<br />
+ They are returned to the users in the form of handles. To get one of them:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> handle = cache.handle(<span class="stringliteral">&quot;my/identifier&quot;</span>);</div></div><!-- fragment --><p>The idea behind a handle is the same of the flyweight pattern. In other terms, resources aren't copied around. Instead, instances are shared between handles. Users of a resource owns a handle and it guarantees that a resource isn't destroyed until all the handles are destroyed, even if the resource itself is removed from the cache.<br />
+ Handles are tiny objects both movable and copyable. They returns the contained resource as a const reference on request:</p>
+<ul>
+<li>By means of the <code>get</code> member function:</li>
+</ul>
+<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;resource = handle.get();</div></div><!-- fragment --><ul>
+<li>Using the proper cast operator:</li>
+</ul>
+<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;resource = handle;</div></div><!-- fragment --><ul>
+<li>Through the dereference operator:</li>
+</ul>
+<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;resource = *handle;</div></div><!-- fragment --><p>The resource can also be accessed directly using the arrow operator if required:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> value = handle-&gt;value;</div></div><!-- fragment --><p>To test if a handle is still valid, the cast operator to <code>bool</code> allows the users to use it in a guard:</p>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span>(handle) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>Finally, in case there is the need to load a resource and thus to get a handle without storing the resource itself in the cache, users can rely on the <code>temp</code> member function template.<br />
+ The declaration is similar to the one of <code>load</code> but for the fact that it doesn't return a boolean value. Instead, it returns a (possibly invalid) handle for the resource:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> handle = cache.temp&lt;MyLoader&gt;(<span class="stringliteral">&quot;another/identifier&quot;</span>, 42);</div></div><!-- fragment --><p>Do not forget to test the handle for validity. Otherwise, getting the reference to the resource it points may result in undefined behavior.</p>
+<h1><a class="anchor" id="autotoc_md48"></a>
+Crash Course: events, signals and everything in between</h1>
+<p>Signals are usually a core part of games and software architectures in general.<br />
+ Roughly speaking, they help to decouple the various parts of a system while allowing them to communicate with each other somehow.</p>
+<p>The so called _modern C++_ comes with a tool that can be useful in these terms, the <code>std::function</code>. As an example, it can be used to create delegates.<br />
+ However, there is no guarantee that an <code>std::function</code> does not perform allocations under the hood and this could be problematic sometimes. Furthermore, it solves a problem but may not adapt well to other requirements that may arise from time to time.</p>
+<p>In case that the flexibility and potential of an <code>std::function</code> are not required or where you are looking for something different, the <code>EnTT</code> framework offers a full set of classes to solve completely different problems.</p>
+<h2><a class="anchor" id="autotoc_md49"></a>
+Signals</h2>
+<p>There are two types of signal handlers in <code>EnTT</code>, internally called <em>managed</em> and <em>unmanaged</em>.<br />
+ They differ in the way they work around the tradeoff between performance, memory usage and safety. Managed listeners must be wrapped in an <code>std::shared_ptr</code> and the sink will take care of disconnecting them whenever they die. Unmanaged listeners can be any kind of objects and the client is in charge of connecting and disconnecting them from a sink to avoid crashes due to different lifetimes.</p>
+<h3><a class="anchor" id="autotoc_md50"></a>
+Managed signal handler</h3>
+<p>A managed signal handler works with weak pointers to classes and pointers to member functions as well as pointers to free functions. References are automatically removed when the instances to which they point are freed.<br />
+ In other terms, users can simply connect a listener and forget about it, thus getting rid of the burden of controlling its lifetime. The drawback is that listeners must be allocated on the dynamic storage and wrapped into an <code>std::shared_ptr</code>. Performance and memory management can suffer from this in real world softwares.</p>
+<p>To create an instance of this type of handler, the function type is all what is needed:</p>
+<div class="fragment"><div class="line"><a class="code" href="classentt_1_1Signal.html">entt::Signal&lt;void(int, char)&gt;</a> signal;</div></div><!-- fragment --><p>From now on, free functions and member functions that respect the given signature can be easily connected to and disconnected from the signal:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> foo(<span class="keywordtype">int</span>, <span class="keywordtype">char</span>) { <span class="comment">/* ... */</span> }</div><div class="line"></div><div class="line"><span class="keyword">struct </span>S {</div><div class="line">    <span class="keywordtype">void</span> bar(<span class="keywordtype">int</span>, <span class="keywordtype">char</span>) { <span class="comment">/* ... */</span> }</div><div class="line">};</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><span class="keyword">auto</span> instance = std::make_shared&lt;S&gt;();</div><div class="line"></div><div class="line">signal.connect&lt;&amp;foo&gt;();</div><div class="line">signal.connect&lt;S, &amp;S::bar&gt;(instance);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">signal.disconnect&lt;&amp;foo&gt;();</div><div class="line"></div><div class="line"><span class="comment">// disconnect a specific member function of an instance ...</span></div><div class="line">signal.disconnect&lt;S, &amp;S::bar&gt;(instance);</div><div class="line"></div><div class="line"><span class="comment">// ... or an instance as a whole</span></div><div class="line">signal.disconnect(instance);</div></div><!-- fragment --><p>Once listeners are attached (or even if there are no listeners at all), events and data in general can be published through a signal by means of the <code>publish</code> member function:</p>
+<div class="fragment"><div class="line">signal.publish(42, <span class="charliteral">&#39;c&#39;</span>);</div></div><!-- fragment --><p>This is more or less all what a managed signal handler has to offer.<br />
+ A bunch of other member functions are exposed actually. As an example, there is a method to use to know how many listeners a managed signal handler contains (<code>size</code>) or if it contains at least a listener (<code>empty</code>), to reset it to its initial state (<code>clear</code>) and even to swap two handlers (<code>swap</code>).<br />
+ Refer to the <a href="https://skypjack.github.io/entt/">official documentation</a> for all the details.</p>
+<h3><a class="anchor" id="autotoc_md51"></a>
+Unmanaged signal handler</h3>
+<p>An unmanaged signal handler works with naked pointers to classes and pointers to member functions as well as pointers to free functions. Removing references when the instances to which they point are freed is in charge to the users.<br />
+ In other terms, users must explicitly disconnect a listener before to delete the class to which it belongs, thus taking care of the lifetime of each instance. On the other side, performance shouldn't be affected that much by the presence of such a signal handler.</p>
+<p>The API of an unmanaged signal handler is similar to the one of a managed signal handler.<br />
+ The most important difference is that it comes in two forms: with and without a collector. In case it is associated with a collector, all the values returned by the listeners can be literally <em>collected</em> and used later by the caller.<br />
+</p>
+<p><b>Note</b>: collectors are allowed only in case of function types whose the return type isn't <code>void</code> for obvious reasons.</p>
+<p>To create instances of this type of handler there exist mainly two ways:</p>
+<div class="fragment"><div class="line"><span class="comment">// no collector type</span></div><div class="line"><a class="code" href="classentt_1_1SigH.html">entt::SigH&lt;void(int, char)&gt;</a> signal;</div><div class="line"></div><div class="line"><span class="comment">// explicit collector type</span></div><div class="line"><a class="code" href="classentt_1_1SigH.html">entt::SigH&lt;void(int, char), MyCollector&lt;bool&gt;</a>&gt; collector;</div></div><!-- fragment --><p>As expected, an unmanaged signal handler offers all the basic functionalities required to know how many listeners it contains (<code>size</code>) or if it contains at least a listener (<code>empty</code>), to reset it to its initial state (<code>clear</code>) and even to swap two handlers (<code>swap</code>).</p>
+<p>Besides them, there are member functions to use both to connect and disconnect listeners in all their forms:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> foo(<span class="keywordtype">int</span>, <span class="keywordtype">char</span>) { <span class="comment">/* ... */</span> }</div><div class="line"></div><div class="line"><span class="keyword">struct </span>S {</div><div class="line">    <span class="keywordtype">void</span> bar(<span class="keywordtype">int</span>, <span class="keywordtype">char</span>) { <span class="comment">/* ... */</span> }</div><div class="line">};</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">S instance;</div><div class="line"></div><div class="line">signal.connect&lt;&amp;foo&gt;();</div><div class="line">signal.connect&lt;S, &amp;S::bar&gt;(&amp;instance);</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">signal.disconnect&lt;&amp;foo&gt;();</div><div class="line"></div><div class="line"><span class="comment">// disconnect a specific member function of an instance ...</span></div><div class="line">signal.disconnect&lt;S, &amp;S::bar&gt;(&amp;instance);</div><div class="line"></div><div class="line"><span class="comment">// ... or an instance as a whole</span></div><div class="line">signal.disconnect(&amp;instance);</div></div><!-- fragment --><p>Once listeners are attached (or even if there are no listeners at all), events and data in general can be published through a signal by means of the <code>publish</code> member function:</p>
+<div class="fragment"><div class="line">signal.publish(42, <span class="charliteral">&#39;c&#39;</span>);</div></div><!-- fragment --><p>To collect data, the <code>collect</code> member function should be used instead. Below is a minimal example to show how to use it:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>MyCollector {</div><div class="line">    std::vector&lt;int&gt; vec{};</div><div class="line"></div><div class="line">    <span class="keywordtype">bool</span> operator()(<span class="keywordtype">int</span> v) noexcept {</div><div class="line">        vec.push_back(v);</div><div class="line">        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div><div class="line">    }</div><div class="line">};</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> f() { <span class="keywordflow">return</span> 0; }</div><div class="line"><span class="keywordtype">int</span> g() { <span class="keywordflow">return</span> 1; }</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><a class="code" href="classentt_1_1SigH.html">entt::SigH&lt;int(), MyCollector&lt;int&gt;</a>&gt; signal;</div><div class="line"></div><div class="line">signal.connect&lt;&amp;f&gt;();</div><div class="line">signal.connect&lt;&amp;g&gt;();</div><div class="line"></div><div class="line">MyCollector collector = signal.collect();</div><div class="line"></div><div class="line">assert(collector.vec[0] == 0);</div><div class="line">assert(collector.vec[1] == 1);</div></div><!-- fragment --><p>As shown above, a collector must expose a function operator that accepts as an argument a type to which the return type of the listeners can be converted. Moreover, it has to return a boolean value that is false to stop collecting data, true otherwise. This way one can avoid calling all the listeners in case it isn't necessary.</p>
+<h2><a class="anchor" id="autotoc_md52"></a>
+Compile-time event bus</h2>
+<p>A bus can be used to create a compile-time backbone for event management.<br />
+ The intended use is as a base class, which is the opposite of what the signals are meant for. Internally it uses either managed or unmanaged signal handlers, that is why there exist both a managed and an unmanaged event bus.</p>
+<p>The API of a bus is a kind of subset of the one of a signal. First of all, it requires that all the types of events are specified when the bus is declared:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>AnEvent { <span class="keywordtype">int</span> value; };</div><div class="line"><span class="keyword">struct </span>AnotherEvent {};</div><div class="line"></div><div class="line"><span class="comment">// define a managed bus that works with std::shared_ptr/std::weak_ptr</span></div><div class="line"><a class="code" href="classentt_1_1Bus.html">entt::ManagedBus&lt;AnEvent, AnotherEvent&gt;</a> managed;</div><div class="line"></div><div class="line"><span class="comment">// define an unmanaged bus that works with naked pointers</span></div><div class="line"><a class="code" href="classentt_1_1Bus.html">entt::UnmanagedBus&lt;AnEvent, AnotherEvent&gt;</a> unmanaged;</div></div><!-- fragment --><p>For the sake of brevity, below is described the interface of the sole unmanaged bus. The interface of the managed bus is almost the same but for the fact that it accepts smart pointers instead of naked pointers.</p>
+<p>In order to register an instance of a class to a bus, its type must expose one or more member functions named <code>receive</code> of which the return types are <code>void</code> and the argument lists are <code>const E &amp;</code>, for each type of event <code>E</code>.<br />
+ The <code>reg</code> member function is the way to go to register such an instance:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>Listener</div><div class="line">{</div><div class="line">    <span class="keywordtype">void</span> receive(<span class="keyword">const</span> AnEvent &amp;) { <span class="comment">/* ... */</span> }</div><div class="line">    <span class="keywordtype">void</span> receive(<span class="keyword">const</span> AnotherEvent &amp;) { <span class="comment">/* ... */</span> }</div><div class="line">};</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">Listener listener;</div><div class="line">bus.reg(&amp;listener);</div></div><!-- fragment --><p>To disconnect an instance of a class from a bus, use the <code>unreg</code> member function instead:</p>
+<div class="fragment"><div class="line">bus.unreg(&amp;listener);</div></div><!-- fragment --><p>Each function that respects the accepted signature is automatically registered and/or unregistered. Note that invoking <code>unreg</code> with an instance of a class that hasn't been previously registered is a perfectly valid operation.</p>
+<p>Free functions can be registered and unregistered as well by means of the dedicated member functions, namely <code>connect</code> and <code>disconnect</code>:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> foo(<span class="keyword">const</span> AnEvent &amp;) { <span class="comment">/* ... */</span> }</div><div class="line"><span class="keywordtype">void</span> bar(<span class="keyword">const</span> AnotherEvent &amp;) { <span class="comment">/* ... */</span> }</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">bus.connect&lt;AnEvent, &amp;foo&gt;();</div><div class="line">bus.connect&lt;AnotherEvent, &amp;bar&gt;();</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">bus.disconnect&lt;AnEvent, &amp;foo&gt;();</div><div class="line">bus.disconnect&lt;AnotherEvent, &amp;bar&gt;();</div></div><!-- fragment --><p>Whenever the need to send an event arises, it can be done through the <code>publish</code> member function:</p>
+<div class="fragment"><div class="line">bus.publish&lt;AnEvent&gt;(42);</div><div class="line">bus.publish&lt;AnotherEvent&gt;();</div></div><!-- fragment --><p>Finally, there are another few functions to use to query the internal state of a bus like <code>empty</code> and <code>size</code> whose meaning is quite intuitive.</p>
+<h2><a class="anchor" id="autotoc_md53"></a>
+Delegate</h2>
+<p>A delegate can be used as general purpose invoker with no memory overhead for free functions and member functions provided along with an instance on which to invoke them.<br />
+ It does not claim to be a drop-in replacement for an <code>std::function</code>, so do not expect to use it whenever an <code>std::function</code> fits well. However, it can be used to send opaque delegates around to be used to invoke functions as needed.</p>
+<p>The interface is trivial. It offers a default constructor to create empty delegates:</p>
+<div class="fragment"><div class="line"><a class="code" href="classentt_1_1Delegate.html">entt::Delegate&lt;int(int)&gt;</a> delegate{};</div></div><!-- fragment --><p>All what is needed to create an instance is to specify the type of the function the delegate will <em>contain</em>, that is the signature of the free function or the member function one wants to assign to it.</p>
+<p>Attempting to use an empty delegate by invoking its function call operator results in undefined behavior, most likely a crash actually. Before to use a delegate, it must be initialized.<br />
+ There exist two functions to do that, both named <code>connect</code>:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> f(<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> i; }</div><div class="line"></div><div class="line"><span class="keyword">struct </span>MyStruct {</div><div class="line">    <span class="keywordtype">int</span> f(<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> i }</div><div class="line">};</div><div class="line"></div><div class="line"><span class="comment">// bind a free function to the delegate</span></div><div class="line">delegate.connect&lt;&amp;f&gt;();</div><div class="line"></div><div class="line"><span class="comment">// bind a member function to the delegate</span></div><div class="line">MyStruct instance;</div><div class="line">delegate.connect&lt;MyStruct, &amp;MyStruct::f&gt;(&amp;instance);</div></div><!-- fragment --><p>It hasn't a <code>disconnect</code> counterpart. Instead, there exists a <code>reset</code> member function to clear it.<br />
+ Finally, to invoke a delegate, the function call operator is the way to go as usual:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> ret = delegate(42);</div></div><!-- fragment --><p>Probably too much small and pretty poor of functionalities, but the delegate class can help in a lot of cases and it has shown that it is worth keeping it within the framework.</p>
+<h2><a class="anchor" id="autotoc_md54"></a>
+Event dispatcher</h2>
+<p>The event dispatcher class is designed so as to be used in a loop. It allows users both to trigger immediate events or to queue events to be published all together once per tick.<br />
+ Internally it uses either managed or unmanaged signal handlers, that is why there exist both a managed and an unmanaged event dispatcher.</p>
+<p>This class shares part of its API with the one of the signals, but it doesn't require that all the types of events are specified when declared:</p>
+<div class="fragment"><div class="line"><span class="comment">// define a managed dispatcher that works with std::shared_ptr/std::weak_ptr</span></div><div class="line"><a class="code" href="classentt_1_1Dispatcher.html">entt::Dispatcher&lt;entt::Signal&gt;</a> managed{};</div><div class="line"></div><div class="line"><span class="comment">// define an unmanaged dispatcher that works with naked pointers</span></div><div class="line"><a class="code" href="classentt_1_1Dispatcher.html">entt::Dispatcher&lt;entt::SigH&gt;</a> unmanaged{};</div></div><!-- fragment --><p>Actually there exist two aliases for the classes shown in the previous example: <code><a class="el" href="namespaceentt.html#aa87d8c710e5a90c2a89d574d38f4b0b6" title="Managed dispatcher. ">entt::ManagedDispatcher</a></code> and <code><a class="el" href="namespaceentt.html#a827f0ad530965c885a8383fcdfb41f36" title="Unmanaged dispatcher. ">entt::UnmanagedDispatcher</a></code>.</p>
+<p>For the sake of brevity, below is described the interface of the sole unmanaged dispatcher. The interface of the managed dispatcher is almost the same but for the fact that it accepts smart pointers instead of naked pointers.</p>
+<p>In order to register an instance of a class to a dispatcher, its type must expose one or more member functions of which the return types are <code>void</code> and the argument lists are <code>const E &amp;</code>, for each type of event <code>E</code>.<br />
+ To ease the development, member functions that are named <code>receive</code> are automatically detected and have not to be explicitly specified when registered. In all the other cases, the name of the member function aimed to receive the event must be provided to the <code>connect</code> member function:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>AnEvent { <span class="keywordtype">int</span> value; };</div><div class="line"><span class="keyword">struct </span>AnotherEvent {};</div><div class="line"></div><div class="line"><span class="keyword">struct </span>Listener</div><div class="line">{</div><div class="line">    <span class="keywordtype">void</span> receive(<span class="keyword">const</span> AnEvent &amp;) { <span class="comment">/* ... */</span> }</div><div class="line">    <span class="keywordtype">void</span> method(<span class="keyword">const</span> AnotherEvent &amp;) { <span class="comment">/* ... */</span> }</div><div class="line">};</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">Listener listener;</div><div class="line">dispatcher.connect&lt;AnEvent&gt;(&amp;listener);</div><div class="line">dispatcher.connect&lt;AnotherEvent, Listener, &amp;Listener::method&gt;(&amp;listener);</div></div><!-- fragment --><p>The <code>disconnect</code> member function follows the same pattern and can be used to selectively remove listeners:</p>
+<div class="fragment"><div class="line">dispatcher.disconnect&lt;AnEvent&gt;(&amp;listener);</div><div class="line">dispatcher.disconnect&lt;AnotherEvent, Listener, &amp;Listener::method&gt;(&amp;listener);</div></div><!-- fragment --><p>The <code>trigger</code> member function serves the purpose of sending an immediate event to all the listeners registered so far. It offers a convenient approach that relieves the user from having to create the event itself. Instead, it's enough to specify the type of event and provide all the parameters required to construct it.<br />
+ As an example:</p>
+<div class="fragment"><div class="line">dispatcher.trigger&lt;AnEvent&gt;(42);</div><div class="line">dispatcher.trigger&lt;AnotherEvent&gt;();</div></div><!-- fragment --><p>Listeners are invoked immediately, order of execution isn't guaranteed. This method can be used to push around urgent messages like an <em>is terminating</em> notification on a mobile app.</p>
+<p>On the other hand, the <code>enqueue</code> member function queues messages together and allows to maintain control over the moment they are sent to listeners. The signature of this method is more or less the same of <code>trigger</code>:</p>
+<div class="fragment"><div class="line">dispatcher.enqueue&lt;AnEvent&gt;(42);</div><div class="line">dispatcher.enqueue&lt;AnotherEvent&gt;();</div></div><!-- fragment --><p>Events are stored aside until the <code>update</code> member function is invoked, then all the messages that are still pending are sent to the listeners at once:</p>
+<div class="fragment"><div class="line">dispatcher.update();</div></div><!-- fragment --><p>This way users can embed the dispatcher in a loop and literally dispatch events once per tick to their systems.</p>
+<h2><a class="anchor" id="autotoc_md55"></a>
+Event emitter</h2>
+<p>A general purpose event emitter thought mainly for those cases where it comes to working with asynchronous stuff.<br />
+ Originally designed to fit the requirements of <a href="https://github.com/skypjack/uvw"><code>uvw</code></a> (a wrapper for <code>libuv</code> written in modern C++), it was adapted later to be included in this library.</p>
+<p>To create a custom emitter type, derived classes must inherit directly from the base class as:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>MyEmitter: Emitter&lt;MyEmitter&gt; {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>The full list of accepted types of events isn't required. Handlers are created internally on the fly and thus each type of event is accepted by default.</p>
+<p>Whenever an event is published, an emitter provides the listeners with a reference to itself along with a const reference to the event. Therefore listeners have an handy way to work with it without incurring in the need of capturing a reference to the emitter itself.<br />
+ In addition, an opaque object is returned each time a connection is established between an emitter and a listener, allowing the caller to disconnect them at a later time.<br />
+ The opaque object used to handle connections is both movable and copyable. On the other side, an event emitter is movable but not copyable by default.</p>
+<p>To create new instances of an emitter, no arguments are required:</p>
+<div class="fragment"><div class="line">MyEmitter emitter{};</div></div><!-- fragment --><p>Listeners must be movable and callable objects (free functions, lambdas, functors, <code>std::function</code>s, whatever) whose function type is:</p>
+<div class="fragment"><div class="line">void(<span class="keyword">const</span> Event &amp;, MyEmitter &amp;)</div></div><!-- fragment --><p>Where <code>Event</code> is the type of event they want to listen.<br />
+ There are two ways to attach a listener to an event emitter that differ slightly from each other:</p>
+<ul>
+<li>To register a long-lived listener, use the <code>on</code> member function. It is meant to register a listener designed to be invoked more than once for the given event type.<br />
+ As an example:</li>
+</ul>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> conn = emitter.on&lt;MyEvent&gt;([](<span class="keyword">const</span> MyEvent &amp;event, MyEmitter &amp;emitter) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>The connection object can be freely discarded. Otherwise, it can be used later to disconnect the listener if required.</p>
+<ul>
+<li>To register a short-lived listener, use the <code>once</code> member function. It is meant to register a listener designed to be invoked only once for the given event type. The listener is automatically disconnected after the first invocation.<br />
+ As an example:</li>
+</ul>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> conn = emitter.once&lt;MyEvent&gt;([](<span class="keyword">const</span> MyEvent &amp;event, MyEmitter &amp;emitter) {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">});</div></div><!-- fragment --><p>The connection object can be freely discarded. Otherwise, it can be used later to disconnect the listener if required.</p>
+<p>In both cases, the connection object can be used with the <code>erase</code> member function:</p>
+<div class="fragment"><div class="line">emitter.erase(conn);</div></div><!-- fragment --><p>There are also two member functions to use either to disconnect all the listeners for a given type of event or to clear the emitter:</p>
+<div class="fragment"><div class="line"><span class="comment">// removes all the listener for the specific event</span></div><div class="line">emitter.clear&lt;MyEvent&gt;();</div><div class="line"></div><div class="line"><span class="comment">// removes all the listeners registered so far</span></div><div class="line">emitter.clear();</div></div><!-- fragment --><p>To send an event to all the listeners that are interested in it, the <code>publish</code> member function offers a convenient approach that relieves the user from having to create the event:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>MyEvent { <span class="keywordtype">int</span> i; };</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line">emitter.publish&lt;MyEvent&gt;(42);</div></div><!-- fragment --><p>Finally, the <code>empty</code> member function tests if there exists at least either a listener registered with the event emitter or to a given type of event:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">bool</span> empty;</div><div class="line"></div><div class="line"><span class="comment">// checks if there is any listener registered for the specific event</span></div><div class="line">empty = emitter.empty&lt;MyEvent&gt;();</div><div class="line"></div><div class="line"><span class="comment">// checks it there are listeners registered with the event emitter</span></div><div class="line">empty = emitter.empty();</div></div><!-- fragment --><p>In general, the event emitter is a handy tool when the derived classes <em>wrap</em> asynchronous operations, because it introduces a <em>nice-to-have</em> model based on events and listeners that kindly hides the complexity behind the scenes. However it is not limited to such uses.</p>
+<h1><a class="anchor" id="autotoc_md56"></a>
 Contributors</h1>
 <p>If you want to contribute, please send patches as pull requests against the branch <code>master</code>.<br />
- Check the <a href="https://github.com/skypjack/entt/blob/master/AUTHORS">contributors list</a> to see who has partecipated so far.</p>
-<h1><a class="anchor" id="autotoc_md31"></a>
+ See the <a href="https://github.com/skypjack/entt/blob/master/AUTHORS">contributors list</a> to know who has participated so far.</p>
+<h1><a class="anchor" id="autotoc_md57"></a>
 License</h1>
 <p>Code and documentation Copyright (c) 2018 Michele Caini.<br />
  Code released under <a href="https://github.com/skypjack/entt/blob/master/LICENSE">the MIT license</a>. Docs released under <a href="https://github.com/skypjack/entt/blob/master/docs/LICENSE">Creative Commons</a>.</p>
-<h1><a class="anchor" id="autotoc_md32"></a>
-Donation</h1>
+<h1><a class="anchor" id="autotoc_md58"></a>
+Support</h1>
+<h2><a class="anchor" id="autotoc_md59"></a>
+Donation</h2>
 <p>Developing and maintaining <code>EnTT</code> takes some time and lots of coffee. I'd like to add more and more functionalities in future and turn it in a full-featured framework.<br />
  If you want to support this project, you can offer me an espresso. I'm from Italy, we're used to turning the best coffee ever in code. If you find that it's not enough, feel free to support me the way you prefer.<br />
- Take a look at the donation button at the top of the page for more details or just click <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=W2HF9FESD5LJY&amp;lc=IT&amp;item_name=Michele%20Caini&amp;currency_code=EUR&amp;bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted">here</a>. </p>
+ Take a look at the donation button at the top of the page for more details or just click <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=W2HF9FESD5LJY&amp;lc=IT&amp;item_name=Michele%20Caini&amp;currency_code=EUR&amp;bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted">here</a>.</p>
+<h2><a class="anchor" id="autotoc_md60"></a>
+Hire me</h2>
+<p>If you start using <code>EnTT</code> and need help, if you want a new feature and want me to give it the highest priority, if you have any other reason to contact me: do not hesitate. I'm available for hiring.<br />
+ Feel free to take a look at my <a href="https://github.com/skypjack">profile</a> and contact me by mail. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

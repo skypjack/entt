@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.4.2</span>
+   &#160;<span id="projectnumber">2.5.0</span>
    </div>
   </td>
  </tr>
@@ -105,10 +105,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6d2bd2fb6112a8df87d873102c20f462 inherit pub_methods_classentt_1_1Process"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Process.html#a6d2bd2fb6112a8df87d873102c20f462">tick</a> (Delta delta, void *data=nullptr)</td></tr>
 <tr class="memdesc:a6d2bd2fb6112a8df87d873102c20f462 inherit pub_methods_classentt_1_1Process"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates a process and its internal state if required.  <a href="classentt_1_1Process.html#a6d2bd2fb6112a8df87d873102c20f462">More...</a><br /></td></tr>
 <tr class="separator:a6d2bd2fb6112a8df87d873102c20f462 inherit pub_methods_classentt_1_1Process"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab57f21bb526920b97ac6250003c5255a inherit pub_methods_classentt_1_1Process"><td class="memItemLeft" align="right" valign="top"><a id="ab57f21bb526920b97ac6250003c5255a"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Process.html#ab57f21bb526920b97ac6250003c5255a">~Process</a> () noexcept</td></tr>
-<tr class="memdesc:ab57f21bb526920b97ac6250003c5255a inherit pub_methods_classentt_1_1Process"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor. <br /></td></tr>
-<tr class="separator:ab57f21bb526920b97ac6250003c5255a inherit pub_methods_classentt_1_1Process"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9647243342243908a1c024d6ca015a9d inherit pub_methods_classentt_1_1Process"><td class="memItemLeft" align="right" valign="top"><a id="a9647243342243908a1c024d6ca015a9d"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Process.html#a9647243342243908a1c024d6ca015a9d">~Process</a> () noexcept</td></tr>
+<tr class="memdesc:a9647243342243908a1c024d6ca015a9d inherit pub_methods_classentt_1_1Process"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor. <br /></td></tr>
+<tr class="separator:a9647243342243908a1c024d6ca015a9d inherit pub_methods_classentt_1_1Process"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3678846862a819a23361bca2982251d5 inherit pub_methods_classentt_1_1Process"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Process.html#a3678846862a819a23361bca2982251d5">abort</a> (bool immediately=false) noexcept</td></tr>
 <tr class="memdesc:a3678846862a819a23361bca2982251d5 inherit pub_methods_classentt_1_1Process"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aborts a process if it's still alive.  <a href="classentt_1_1Process.html#a3678846862a819a23361bca2982251d5">More...</a><br /></td></tr>
 <tr class="separator:a3678846862a819a23361bca2982251d5 inherit pub_methods_classentt_1_1Process"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,9 +154,10 @@ struct entt::ProcessAdaptor&lt; Func, Delta &gt;</h3>
 <p>Lambdas and functors can't be used directly with a scheduler for they are not properly defined processes with managed life cycles.<br />
  This class helps in filling the gap and turning lambdas and functors into full featured processes usable by a scheduler.</p>
 <p>The signature of the function call operator should be equivalent to the following:</p>
-<div class="fragment"><div class="line">void(Delta delta, <span class="keyword">auto</span> <a class="code" href="classentt_1_1Process.html#aa30460eaadd9a6f2a58f4a5b0cda2b87">succeed</a>, <span class="keyword">auto</span> <a class="code" href="classentt_1_1Process.html#a74e4e8b18cbd68eee49458a3e39ed6de">fail</a>);</div></div><!-- fragment --><p>Where:</p>
+<div class="fragment"><div class="line">void(Delta delta, <span class="keywordtype">void</span> *data, <span class="keyword">auto</span> <a class="code" href="classentt_1_1Process.html#aa30460eaadd9a6f2a58f4a5b0cda2b87">succeed</a>, <span class="keyword">auto</span> <a class="code" href="classentt_1_1Process.html#a74e4e8b18cbd68eee49458a3e39ed6de">fail</a>);</div></div><!-- fragment --><p>Where:</p>
 <ul>
 <li><code>delta</code> is the elapsed time.</li>
+<li><code>data</code> is an opaque pointer to user data if any, <code>nullptr</code> otherwise.</li>
 <li><code>succeed</code> is a function to call when a process terminates with success.</li>
 <li><code>fail</code> is a function to call when a process terminates with errors.</li>
 </ul>
@@ -173,7 +174,7 @@ struct entt::ProcessAdaptor&lt; Func, Delta &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00303">303</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00313">313</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a16a0964a81c537fe16b937696e47358b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a16a0964a81c537fe16b937696e47358b">&#9670;&nbsp;</a></span>ProcessAdaptor()</h2>
@@ -217,7 +218,7 @@ template&lt;typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00310">310</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00320">320</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
@@ -267,7 +268,7 @@ template&lt;typename Func, typename Delta&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00319">319</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="process_8hpp_source.html#l00329">329</a> of file <a class="el" href="process_8hpp_source.html">process.hpp</a>.</p>
 
 </div>
 </div>
