@@ -13,7 +13,6 @@
 #include "resource/cache.hpp"
 #include "resource/handle.hpp"
 #include "resource/loader.hpp"
-#include "signal/bus.hpp"
 #include "signal/delegate.hpp"
 #include "signal/dispatcher.hpp"
 #include "signal/emitter.hpp"

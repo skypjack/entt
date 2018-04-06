@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <type_traits>
 #include "../core/family.hpp"
+#include "../signal/sigh.hpp"
 #include "entt_traits.hpp"
 #include "snapshot.hpp"
 #include "sparse_set.hpp"
@@ -35,8 +36,26 @@ template<typename Entity>
 class Registry {
     using tag_family = Family<struct InternalRegistryTagFamily>;
     using component_family = Family<struct InternalRegistryComponentFamily>;
-    using view_family = Family<struct InternalRegistryViewFamily>;
+    using handler_family = Family<struct InternalRegistryHandlerFamily>;
     using traits_type = entt_traits<Entity>;
+
+    template<typename... Component>
+    static void creating(Registry &registry, Entity entity) {
+        if(registry.has<Component...>(entity)) {
+            const auto htype = handler_family::type<Component...>();
+            registry.handlers[htype]->construct(entity);
+        }
+    }
+
+    template<typename... Component>
+    static void destroying(Registry &registry, Entity entity) {
+        const auto htype = handler_family::type<Component...>();
+        auto &handler = registry.handlers[htype];
+
+        if(handler->has(entity)) {
+            handler->destroy(entity);
+        }
+    }
 
     struct Attachee {
         Entity entity;
@@ -55,45 +74,38 @@ class Registry {
 
     template<typename Component>
     struct Pool: SparseSet<Entity, Component> {
-        using test_fn_type = bool(Registry::*)(Entity) const;
+        using sink_type = typename SigH<void(Registry &, Entity)>::Sink;
+
+        Pool(Registry &registry)
+            : registry{registry}
+        {}
 
         template<typename... Args>
-        Component & construct(Registry &registry, Entity entity, Args &&... args) {
+        Component & construct(Entity entity, Args &&... args) {
             auto &component = SparseSet<Entity, Component>::construct(entity, std::forward<Args>(args)...);
-
-            for(auto &&listener: listeners) {
-                if((registry.*listener.second)(entity)) {
-                    listener.first->construct(entity);
-                }
-            }
-
+            listeners.first.publish(registry, entity);
             return component;
         }
 
         void destroy(Entity entity) override {
+            listeners.second.publish(registry, entity);
             SparseSet<Entity, Component>::destroy(entity);
-
-            for(auto &&listener: listeners) {
-                auto *handler = listener.first;
-
-                if(handler->has(entity)) {
-                    handler->destroy(entity);
-                }
-            }
         }
 
-        inline void append(SparseSet<Entity> *handler, test_fn_type fn) {
-            listeners.emplace_back(handler, fn);
+        sink_type construction() noexcept {
+            return listeners.first.sink();
         }
 
-        inline void remove(SparseSet<Entity> *handler) {
-            listeners.erase(std::remove_if(listeners.begin(), listeners.end(), [handler](auto &listener) {
-                return listener.first == handler;
-            }), listeners.end());
+        sink_type destruction() noexcept {
+            return listeners.second.sink();
         }
 
     private:
-        std::vector<std::pair<SparseSet<Entity> *, test_fn_type>> listeners;
+        Registry &registry;
+        std::pair<
+            SigH<void(Registry &, Entity)>,
+            SigH<void(Registry &, Entity)>
+        > listeners;
     };
 
     template<typename Component>
@@ -122,38 +134,10 @@ class Registry {
         }
 
         if(!pools[ctype]) {
-            pools[ctype] = std::make_unique<Pool<Component>>();
+            pools[ctype] = std::make_unique<Pool<Component>>(*this);
         }
 
         return pool<Component>();
-    }
-
-    template<typename... Component>
-    SparseSet<Entity> & handler() {
-        static_assert(sizeof...(Component) > 1, "!");
-        const auto vtype = view_family::type<Component...>();
-
-        if(!(vtype < handlers.size())) {
-            handlers.resize(vtype + 1);
-        }
-
-        if(!handlers[vtype]) {
-            using accumulator_type = int[];
-            auto set = std::make_unique<SparseSet<Entity>>();
-
-            for(auto entity: view<Component...>()) {
-                set->construct(entity);
-            }
-
-            accumulator_type accumulator = {
-                (assure<Component>().append(set.get(), &Registry::has<Component...>), 0)...
-            };
-
-            handlers[vtype] = std::move(set);
-            (void)accumulator;
-        }
-
-        return *handlers[vtype];
     }
 
 public:
@@ -167,6 +151,10 @@ public:
     using tag_type = typename tag_family::family_type;
     /*! @brief Unsigned integer type. */
     using component_type = typename component_family::family_type;
+
+    /*! @brief Type of sink for the given component. */
+    template<typename Component>
+    using sink_type = typename Pool<Component>::sink_type;
 
     /*! @brief Default constructor. */
     Registry() = default;
@@ -316,7 +304,6 @@ public:
     bool fast(entity_type entity) const noexcept {
         const auto pos = size_type(entity & traits_type::entity_mask);
         assert(pos < entities.size());
-        // the in-use control bit permits to avoid accessing the direct vector
         return (entities[pos] == entity);
     }
 
@@ -375,7 +362,7 @@ public:
     entity_type create(Component &&... components) noexcept {
         using accumulator_type = int[];
         const auto entity = create();
-        accumulator_type accumulator = { 0, (assure<std::decay_t<Component>>().construct(*this, entity, std::forward<Component>(components)), 0)... };
+        accumulator_type accumulator = { 0, (assure<std::decay_t<Component>>().construct(entity, std::forward<Component>(components)), 0)... };
         (void)accumulator;
         return entity;
     }
@@ -402,7 +389,7 @@ public:
     entity_type create() noexcept {
         using accumulator_type = int[];
         const auto entity = create();
-        accumulator_type accumulator = { 0, (assure<Component>().construct(*this, entity), 0)... };
+        accumulator_type accumulator = { 0, (assure<Component>().construct(entity), 0)... };
         (void)accumulator;
         return entity;
     }
@@ -469,11 +456,11 @@ public:
         next = entt;
         ++available;
 
-        for(auto &&cpool: pools) {
+        std::for_each(pools.begin(), pools.end(), [entity](auto &cpool) {
             if(cpool && cpool->has(entity)) {
                 cpool->destroy(entity);
             }
-        }
+        });
     }
 
     /**
@@ -663,7 +650,7 @@ public:
     template<typename Component, typename... Args>
     Component & assign(entity_type entity, Args &&... args) {
         assert(valid(entity));
-        return assure<Component>().construct(*this, entity, std::forward<Args>(args)...);
+        return assure<Component>().construct(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -845,7 +832,59 @@ public:
 
         return (cpool.has(entity)
                 ? (cpool.get(entity) = Component{std::forward<Args>(args)...})
-                : cpool.construct(*this, entity, std::forward<Args>(args)...));
+                : cpool.construct(entity, std::forward<Args>(args)...));
+    }
+
+    /**
+     * @brief Returns a sink object for the given component.
+     *
+     * A sink is an opaque object used to connect listeners to components.<br/>
+     * The sink returned by this function can be used to receive notifications
+     * whenever a new instance of the given component is created and assigned to
+     * an entity.
+     *
+     * The function type for a listener is:
+     * @code{.cpp}
+     * void(Registry<Entity> &, Entity);
+     * @endcode
+     *
+     * Listeners are invoked **after** the component has been assigned to the
+     * entity. The order of invocation of the listeners isn't guaranteed.
+     *
+     * @sa SigH::Sink
+     *
+     * @tparam Component Type of component of which to get the sink.
+     * @return A temporary sink object.
+     */
+    template<typename Component>
+    sink_type<Component> construction() noexcept {
+        return assure<Component>().construction();
+    }
+
+    /**
+     * @brief Returns a sink object for the given component.
+     *
+     * A sink is an opaque object used to connect listeners to components.<br/>
+     * The sink returned by this function can be used to receive notifications
+     * whenever an instance of the given component is removed from an entity and
+     * thus destroyed.
+     *
+     * The function type for a listener is:
+     * @code{.cpp}
+     * void(Registry<Entity> &, Entity);
+     * @endcode
+     *
+     * Listeners are invoked **before** the component has been removed from the
+     * entity. The order of invocation of the listeners isn't guaranteed.
+     *
+     * @sa SigH::Sink
+     *
+     * @tparam Component Type of component of which to get the sink.
+     * @return A temporary sink object.
+     */
+    template<typename Component>
+    sink_type<Component> destruction() noexcept {
+        return assure<Component>().destruction();
     }
 
     /**
@@ -1119,7 +1158,30 @@ public:
      */
     template<typename... Component>
     void prepare() {
-        handler<Component...>();
+        static_assert(sizeof...(Component) > 1, "!");
+        const auto htype = handler_family::type<Component...>();
+
+        if(!(htype < handlers.size())) {
+            handlers.resize(htype + 1);
+        }
+
+        if(!handlers[htype]) {
+            using accumulator_type = int[];
+            handlers[htype] = std::make_unique<SparseSet<entity_type>>();
+            auto &handler = handlers[htype];
+
+            for(auto entity: view<Component...>()) {
+                handler->construct(entity);
+            }
+
+            auto connect = [](auto &pool) {
+                pool.construction().template connect<&Registry::creating<Component...>>();
+                pool.destruction().template connect<&Registry::destroying<Component...>>();
+            };
+
+            accumulator_type accumulator = { (connect(assure<Component>()), 0)... };
+            (void)accumulator;
+        }
     }
 
     /**
@@ -1141,11 +1203,16 @@ public:
     void discard() {
         if(contains<Component...>()) {
             using accumulator_type = int[];
-            const auto vtype = view_family::type<Component...>();
-            auto *set = handlers[vtype].get();
+            const auto htype = handler_family::type<Component...>();
+
+            auto disconnect = [](auto &pool) {
+                pool.construction().template disconnect<&Registry::creating<Component...>>();
+                pool.destruction().template disconnect<&Registry::destroying<Component...>>();
+            };
+
             // if a set exists, pools have already been created for it
-            accumulator_type accumulator = { (pool<Component>().remove(set), 0)... };
-            handlers[vtype].reset();
+            accumulator_type accumulator = { (disconnect(pool<Component>()), 0)... };
+            handlers[htype].reset();
             (void)accumulator;
         }
     }
@@ -1158,8 +1225,8 @@ public:
     template<typename... Component>
     bool contains() const noexcept {
         static_assert(sizeof...(Component) > 1, "!");
-        const auto vtype = view_family::type<Component...>();
-        return vtype < handlers.size() && handlers[vtype];
+        const auto htype = handler_family::type<Component...>();
+        return (htype < handlers.size() && handlers[htype]);
     }
 
     /**
@@ -1202,8 +1269,9 @@ public:
      */
     template<typename... Component>
     PersistentView<Entity, Component...> persistent() {
-        // after the calls to handler, pools have already been created
-        return PersistentView<Entity, Component...>{handler<Component...>(), pool<Component>()...};
+        prepare<Component...>();
+        const auto htype = handler_family::type<Component...>();
+        return PersistentView<Entity, Component...>{*handlers[htype], pool<Component>()...};
     }
 
     /**

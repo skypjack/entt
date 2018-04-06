@@ -40,6 +40,8 @@ class Dispatcher final {
 
     template<typename Event>
     struct SignalWrapper final: BaseSignalWrapper {
+        using sink_type = typename Sig<void(const Event &)>::Sink;
+
         void publish(std::size_t current) override {
             for(const auto &event: events[current]) {
                 signal.publish(event);
@@ -48,14 +50,8 @@ class Dispatcher final {
             events[current].clear();
         }
 
-        template<typename Class, void(Class::*Member)(const Event &)>
-        inline void connect(instance_type<Class, Event> instance) noexcept {
-            signal.template connect<Class, Member>(std::move(instance));
-        }
-
-        template<typename Class, void(Class::*Member)(const Event &)>
-        inline void disconnect(instance_type<Class, Event> instance) noexcept {
-            signal.template disconnect<Class, Member>(std::move(instance));
+        inline sink_type sink() noexcept {
+            return signal.sink();
         }
 
         template<typename... Args>
@@ -93,52 +89,36 @@ class Dispatcher final {
     }
 
 public:
+    /*! @brief Type of sink for the given event. */
+    template<typename Event>
+    using sink_type = typename SignalWrapper<Event>::sink_type;
+
     /*! @brief Default constructor. */
     Dispatcher() noexcept
         : wrappers{}, mode{false}
     {}
 
     /**
-     * @brief Registers a listener given in the form of a member function.
+     * @brief Returns a sink object for the given event.
      *
-     * A matching member function has the following signature:
-     * `void receive(const Event &)`. Member functions named `receive` are
-     * automatically detected and registered if available.
+     * A sink is an opaque object used to connect listeners to events.
      *
-     * @warning
-     * Connecting a listener during an update may lead to unexpected behavior.
-     * Register listeners before or after invoking the update if possible.
+     * The function type for a listener is:
+     * @code{.cpp}
+     * void(const Event &)
+     * @endcode
      *
-     * @tparam Event Type of event to which to connect the function.
-     * @tparam Class Type of class to which the member function belongs.
-     * @tparam Member Member function to connect to the signal.
-     * @param instance A valid instance of the right type.
+     * The order of invocation of the listeners isn't guaranteed.
+     *
+     * @sa Signal::Sink
+     * @sa SigH::Sink
+     *
+     * @tparam Event Type of event of which to get the sink.
+     * @return A temporary sink object.
      */
-    template<typename Event, typename Class, void(Class::*Member)(const Event &) = &Class::receive>
-    void connect(instance_type<Class, Event> instance) noexcept {
-        wrapper<Event>().template connect<Class, Member>(std::move(instance));
-    }
-
-    /**
-     * @brief Unregisters a listener given in the form of a member function.
-     *
-     * A matching member function has the following signature:
-     * `void receive(const Event &)`. Member functions named `receive` are
-     * automatically detected and unregistered if available.
-     *
-     * @warning
-     * Disconnecting a listener during an update may lead to unexpected
-     * behavior. Unregister listeners before or after invoking the update if
-     * possible.
-     *
-     * @tparam Event Type of event from which to disconnect the function.
-     * @tparam Class Type of class to which the member function belongs.
-     * @tparam Member Member function to connect to the signal.
-     * @param instance A valid instance of the right type.
-     */
-    template<typename Event, typename Class, void(Class::*Member)(const Event &) = &Class::receive>
-    void disconnect(instance_type<Class, Event> instance) noexcept {
-        wrapper<Event>().template disconnect<Class, Member>(std::move(instance));
+    template<typename Event>
+    sink_type<Event> sink() noexcept {
+        return wrapper<Event>().sink();
     }
 
     /**
@@ -182,9 +162,7 @@ public:
         const auto buf = buffer(mode);
         mode = !mode;
 
-        for(auto pos = wrappers.size(); pos; --pos) {
-            auto &wrapper = wrappers[pos-1];
-
+        for(auto &&wrapper: wrappers) {
             if(wrapper) {
                 wrapper->publish(buf);
             }

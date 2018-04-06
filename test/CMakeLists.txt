@@ -117,7 +117,6 @@ add_test(NAME resource COMMAND resource)
 add_executable(
     signal
     $<TARGET_OBJECTS:odr>
-    entt/signal/bus.cpp
     entt/signal/delegate.cpp
     entt/signal/dispatcher.cpp
     entt/signal/emitter.cpp

@@ -14,7 +14,7 @@ template<typename Dispatcher, typename Rec>
 void testDispatcher(Rec receiver) {
     Dispatcher dispatcher;
 
-    dispatcher.template connect<Event>(receiver);
+    dispatcher.template sink<Event>().connect(receiver);
     dispatcher.template trigger<Event>();
     dispatcher.template enqueue<Event>();
 
@@ -28,7 +28,7 @@ void testDispatcher(Rec receiver) {
 
     receiver->reset();
 
-    dispatcher.template disconnect<Event>(receiver);
+    dispatcher.template sink<Event>().disconnect(receiver);
     dispatcher.template trigger<Event>();
     dispatcher.template enqueue<Event>();
     dispatcher.update();

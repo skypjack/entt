@@ -10,7 +10,7 @@
 namespace entt {
 
 
-namespace {
+namespace details {
 
 
 template<typename, typename>
@@ -83,7 +83,7 @@ using DefaultCollectorType = typename DefaultCollector<Function>::collector_type
  * @tparam Function A valid function type.
  * @tparam Collector Type of collector to use, if any.
  */
-template<typename Function, typename Collector = DefaultCollectorType<Function>>
+template<typename Function, typename Collector = details::DefaultCollectorType<Function>>
 class SigH;
 
 
@@ -111,18 +111,8 @@ class SigH;
  * @tparam Collector Type of collector to use, if any.
  */
 template<typename Ret, typename... Args, typename Collector>
-class SigH<Ret(Args...), Collector> final: private Invoker<Ret(Args...), Collector> {
-    using typename Invoker<Ret(Args...), Collector>::call_type;
-
-    template<Ret(*Function)(Args...)>
-    static Ret proto(void *, Args... args) {
-        return (Function)(args...);
-    }
-
-    template<typename Class, Ret(Class::*Member)(Args... args)>
-    static Ret proto(void *instance, Args... args) {
-        return (static_cast<Class *>(instance)->*Member)(args...);
-    }
+class SigH<Ret(Args...), Collector> final: private details::Invoker<Ret(Args...), Collector> {
+    using call_type = typename details::Invoker<Ret(Args...), Collector>::call_type;
 
 public:
     /*! @brief Unsigned integer type. */
@@ -136,6 +126,112 @@ public:
      */
     template<typename Class>
     using instance_type = Class *;
+
+   /**
+    * @brief Sink implementation.
+    *
+    * A sink is an opaque object used to connect listeners to signals.<br/>
+    * The function type for a listener is the one of the signal to which it
+    * belongs.
+    *
+    * The clear separation between a signal and a sink permits to store the
+    * former as private data member without exposing the publish functionality
+    * to the users of a class.
+    */
+    class Sink final {
+        friend class SigH;
+
+        template<Ret(*Function)(Args...)>
+        static Ret proto(void *, Args... args) {
+            return (Function)(args...);
+        }
+
+        template<typename Class, Ret(Class::*Member)(Args... args)>
+        static Ret proto(void *instance, Args... args) {
+            return (static_cast<Class *>(instance)->*Member)(args...);
+        }
+
+        Sink(std::vector<call_type> &calls)
+            : calls{calls}
+        {}
+
+    public:
+        /**
+         * @brief Connects a free function to a signal.
+         *
+         * The signal handler performs checks to avoid multiple connections for
+         * free functions.
+         *
+         * @tparam Function A valid free function pointer.
+         */
+        template<Ret(*Function)(Args...)>
+        void connect() {
+            disconnect<Function>();
+            calls.emplace_back(nullptr, &proto<Function>);
+        }
+
+        /**
+         * @brief Connects a member function for a given instance to a signal.
+         *
+         * The signal isn't responsible for the connected object. Users must
+         * guarantee that the lifetime of the instance overcomes the one of the
+         * signal. On the other side, the signal handler performs checks to
+         * avoid multiple connections for the same member function of a given
+         * instance.
+         *
+         * @tparam Class Type of class to which the member function belongs.
+         * @tparam Member Member function to connect to the signal.
+         * @param instance A valid instance of type pointer to `Class`.
+         */
+        template <typename Class, Ret(Class::*Member)(Args...) = &Class::receive>
+        void connect(instance_type<Class> instance) {
+            disconnect<Class, Member>(instance);
+            calls.emplace_back(instance, &proto<Class, Member>);
+        }
+
+        /**
+         * @brief Disconnects a free function from a signal.
+         * @tparam Function A valid free function pointer.
+         */
+        template<Ret(*Function)(Args...)>
+        void disconnect() {
+            call_type target{nullptr, &proto<Function>};
+            calls.erase(std::remove(calls.begin(), calls.end(), std::move(target)), calls.end());
+        }
+
+        /**
+         * @brief Disconnects the given member function from a signal.
+         * @tparam Class Type of class to which the member function belongs.
+         * @tparam Member Member function to connect to the signal.
+         * @param instance A valid instance of type pointer to `Class`.
+         */
+        template<typename Class, Ret(Class::*Member)(Args...)>
+        void disconnect(instance_type<Class> instance) {
+            call_type target{instance, &proto<Class, Member>};
+            calls.erase(std::remove(calls.begin(), calls.end(), std::move(target)), calls.end());
+        }
+
+        /**
+         * @brief Removes all existing connections for the given instance.
+         * @tparam Class Type of class to which the member function belongs.
+         * @param instance A valid instance of type pointer to `Class`.
+         */
+        template<typename Class>
+        void disconnect(instance_type<Class> instance) {
+            auto func = [instance](const call_type &call) { return call.first == instance; };
+            calls.erase(std::remove_if(calls.begin(), calls.end(), std::move(func)), calls.end());
+        }
+
+        /**
+         * @brief Disconnects all the listeners from a signal.
+         */
+        void disconnect() {
+            calls.clear();
+        }
+
+    private:
+        std::vector<call_type> &calls;
+    };
 
     /**
      * @brief Number of listeners connected to the signal.
@@ -154,75 +250,16 @@ public:
     }
 
     /**
-     * @brief Disconnects all the listeners from a signal.
-     */
-    void clear() noexcept {
-        calls.clear();
-    }
-
-    /**
-     * @brief Connects a free function to a signal.
+     * @brief Returns a sink object for the given signal.
      *
-     * The signal handler performs checks to avoid multiple connections for free
-     * functions.
+     * A sink is an opaque object used to connect listeners to signals.<br/>
+     * The function type for a listener is the one of the signal to which it
+     * belongs. The order of invocation of the listeners isn't guaranteed.
      *
-     * @tparam Function A valid free function pointer.
+     * @return A temporary sink object.
      */
-    template<Ret(*Function)(Args...)>
-    void connect() {
-        disconnect<Function>();
-        calls.emplace_back(nullptr, &proto<Function>);
-    }
-
-    /**
-     * @brief Connects a member function for a given instance to a signal.
-     *
-     * The signal isn't responsible for the connected object. Users must
-     * guarantee that the lifetime of the instance overcomes the one of the
-     * signal. On the other side, the signal handler performs checks to avoid
-     * multiple connections for the same member function of a given instance.
-     *
-     * @tparam Class Type of class to which the member function belongs.
-     * @tparam Member Member function to connect to the signal.
-     * @param instance A valid instance of type pointer to `Class`.
-     */
-    template <typename Class, Ret(Class::*Member)(Args...)>
-    void connect(instance_type<Class> instance) {
-        disconnect<Class, Member>(instance);
-        calls.emplace_back(instance, &proto<Class, Member>);
-    }
-
-    /**
-     * @brief Disconnects a free function from a signal.
-     * @tparam Function A valid free function pointer.
-     */
-    template<Ret(*Function)(Args...)>
-    void disconnect() {
-        call_type target{nullptr, &proto<Function>};
-        calls.erase(std::remove(calls.begin(), calls.end(), std::move(target)), calls.end());
-    }
-
-    /**
-     * @brief Disconnects the given member function from a signal.
-     * @tparam Class Type of class to which the member function belongs.
-     * @tparam Member Member function to connect to the signal.
-     * @param instance A valid instance of type pointer to `Class`.
-     */
-    template<typename Class, Ret(Class::*Member)(Args...)>
-    void disconnect(instance_type<Class> instance) {
-        call_type target{instance, &proto<Class, Member>};
-        calls.erase(std::remove(calls.begin(), calls.end(), std::move(target)), calls.end());
-    }
-
-    /**
-     * @brief Removes all existing connections for the given instance.
-     * @tparam Class Type of class to which the member function belongs.
-     * @param instance A valid instance of type pointer to `Class`.
-     */
-    template<typename Class>
-    void disconnect(instance_type<Class> instance) {
-        auto func = [instance](const call_type &call) { return call.first == instance; };
-        calls.erase(std::remove_if(calls.begin(), calls.end(), std::move(func)), calls.end());
+    Sink sink() {
+        return { calls };
     }
 
     /**
@@ -233,8 +270,7 @@ public:
      * @param args Arguments to use to invoke listeners.
      */
     void publish(Args... args) {
-        for(auto pos = calls.size(); pos; --pos) {
-            auto &call = calls[pos-1];
+        for(auto &&call: calls) {
             call.second(call.first, args...);
         }
     }

@@ -6,6 +6,21 @@
 #include <entt/entity/entt_traits.hpp>
 #include <entt/entity/registry.hpp>
 
+struct Listener {
+    void incr(entt::DefaultRegistry &, entt::DefaultRegistry::entity_type entity) {
+        last = entity;
+        ++counter;
+    }
+
+    void decr(entt::DefaultRegistry &, entt::DefaultRegistry::entity_type entity) {
+        last = entity;
+        --counter;
+    }
+
+    entt::DefaultRegistry::entity_type last;
+    int counter{0};
+};
+
 TEST(DefaultRegistry, Functionalities) {
     entt::DefaultRegistry registry;
 
@@ -507,4 +522,39 @@ TEST(DefaultRegistry, MergeTwoRegistries) {
 
     ne(dst.view<int, float, double>().begin(), dst.view<int, float, double>().end());
     ne(dst.view<char, float, int>().begin(), dst.view<char, float, int>().end());
+}
+
+TEST(DefaultRegistry, Signals) {
+    entt::DefaultRegistry registry;
+    Listener listener;
+
+    registry.construction<int>().connect<Listener, &Listener::incr>(&listener);
+    registry.destruction<int>().connect<Listener, &Listener::decr>(&listener);
+
+    auto e0 = registry.create();
+    auto e1 = registry.create();
+
+    registry.assign<int>(e0);
+    registry.assign<int>(e1);
+
+    ASSERT_EQ(listener.counter, 2);
+    ASSERT_EQ(listener.last, e1);
+
+    registry.remove<int>(e0);
+
+    ASSERT_EQ(listener.counter, 1);
+    ASSERT_EQ(listener.last, e0);
+
+    registry.destruction<int>().disconnect<Listener, &Listener::decr>(&listener);
+    registry.remove<int>(e1);
+
+    ASSERT_EQ(listener.counter, 1);
+    ASSERT_EQ(listener.last, e0);
+
+    registry.construction<int>().disconnect<Listener, &Listener::incr>(&listener);
+    registry.assign<int>(e0);
+    registry.assign<int>(e1);
+
+    ASSERT_EQ(listener.counter, 1);
+    ASSERT_EQ(listener.last, e0);
 }

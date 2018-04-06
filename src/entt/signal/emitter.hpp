@@ -138,7 +138,7 @@ class Emitter {
     }
 
 public:
-    /** @brief Type of listeners accepted for the given type of event. */
+    /** @brief Type of listeners accepted for the given event. */
     template<typename Event>
     using Listener = typename Handler<Event>::listener_type;
 

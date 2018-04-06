@@ -15,6 +15,7 @@
       * [Pay per use](#pay-per-use)
    * [Vademecum](#vademecum)
    * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
+      * [Observe changes](#observe-changes)
       * [Single instance components](#single-instance-components)
       * [Runtime components](#runtime-components)
          * [A journey through a plugin](#a-journey-through-a-plugin)
@@ -44,7 +45,6 @@
    * [The resource, the loader and the cache](#the-resource-the-loader-and-the-cache)
 * [Crash Course: events, signals and everything in between](#crash-course-events-signals-and-everything-in-between)
    * [Signals](#signals)
-   * [Compile-time event bus](#compile-time-event-bus)
    * [Delegate](#delegate)
    * [Event dispatcher](#event-dispatcher)
    * [Event emitter](#event-emitter)
@@ -103,7 +103,7 @@ Here is a brief list of what it offers today:
 * The smallest and most basic implementation of a service locator ever seen.
 * A cooperative scheduler for processes of any type.
 * All what is needed for resource management (cache, loaders, handles).
-* Signal handlers of any type, delegates and an event bus.
+* Signal handlers of any type, delegates and a tiny event dispatcher.
 * A general purpose event emitter, that is a CRTP idiom based class template.
 * An event dispatcher for immediate and delayed events to integrate in loops.
 * ...
@@ -199,7 +199,7 @@ Dell XPS 13 out of the mid 2014):
 | Benchmark | EntityX (compile-time) | EnTT |
 |-----------|-------------|-------------|
 | Create 1M entities | 0.0167s | **0.0046s** |
-| Destroy 1M entities | 0.0053s | **0.0039s** |
+| Destroy 1M entities | 0.0053s | **0.0037s** |
 | Standard view, 1M entities, one component | 0.0012s | **1.9e-07s** |
 | Standard view, 1M entities, two components | 0.0012s | **3.8e-07s** |
 | Standard view, 1M entities, two components<br/>Half of the entities have all the components | 0.0009s | **3.8e-07s** |
@@ -527,6 +527,47 @@ std::tuple<Position &, Velocity &> tup = registry.get<Position, Velocity>(entity
 
 The `get` member function template gives direct access to the component of an
 entity stored in the underlying data structures of the registry.
+
+### Observe changes
+
+Because of how the registry works internally, it stores a couple of signal
+handlers for each pool in order to notify some of its data structures on the
+construction and destruction of components.<br/>
+These signal handlers are also exposed and made available to users. This is the
+basic brick to build fancy things like blueprints and reactive systems.
+
+To get a sink to be used to connect and disconnect listeners so as to be
+notified on the creation of a component, use the `construction` member function:
+
+```cpp
+// connects a free function
+registry.construction<Position>().connect<&MyFreeFunction>();
+
+// connects a member function
+registry.construction<Position>().connect<MyClass, &MyClass::member>(&instance);
+
+// disconnects a free function
+registry.construction<Position>().disconnect<&MyFreeFunction>();
+
+// disconnects a member function
+registry.construction<Position>().disconnect<MyClass, &MyClass::member>(&instance);
+```
+
+To be notified when components are destroyed, use the `destruction` member
+function instead.
+
+The function type of a listener is the same in both cases:
+
+```cpp
+void(Registry<Entity> &, Entity);
+```
+
+In other terms, a listener is provided with the registry that triggered the
+notification and the entity affected by the change. Note also that:
+
+* Listeners are invoked **after** components have been assigned to entities.
+* Listeners are invoked **before** components have been removed from entities.
+* The order of invocation of the listeners isn't guaranteed in any case.
 
 ### Single instance components
 
@@ -937,6 +978,7 @@ All of them have pros and cons to take in consideration. In particular:
 * Standard views:
 
   Pros:
+
   * They work out-of-the-box and don't require any dedicated data structure.
   * Creating and destroying them isn't expensive at all because they don't have
     any type of initialization.
@@ -946,18 +988,21 @@ All of them have pros and cons to take in consideration. In particular:
   * They don't affect any other operations of the registry.
 
   Cons:
+
   * Their performance tend to degenerate when the number of components to
     iterate grows up and the most of the entities have all of them.
 
 * Persistent views:
 
   Pros:
+
   * Once prepared, creating and destroying them isn't expensive at all because
     they don't have any type of initialization.
   * They are the best tool for iterating entities for mmultiple components and
     most entities have them all.
 
   Cons:
+
   * They have dedicated data structures and thus affect the memory usage to a
     minimal extent.
   * If not previously prepared, the first time they are used they go through an
@@ -969,6 +1014,7 @@ All of them have pros and cons to take in consideration. In particular:
 * Raw views:
 
   Pros:
+
   * They work out-of-the-box and don't require any dedicated data structure.
   * Creating and destroying them isn't expensive at all because they don't have
     any type of initialization.
@@ -977,10 +1023,12 @@ All of them have pros and cons to take in consideration. In particular:
   * They don't affect any other operations of the registry.
 
   Cons:
+
   * They can be used to iterate only one type of component at a time.
   * They don't return the entity to which a component belongs to the caller.
 
 To sum up and as a rule of thumb:
+
 * Use a raw view to iterate components only (no entities) for a given type.
 * Use a standard view to iterate entities for a single component.
 * Use a standard view to iterate entities for multiple components when a
@@ -1939,9 +1987,15 @@ There are two types of signal handlers in `EnTT`, internally called _managed_
 and _unmanaged_.<br/>
 They differ in the way they work around the tradeoff between performance, memory
 usage and safety. Managed listeners must be wrapped in an `std::shared_ptr` and
-the sink will take care of disconnecting them whenever they die. Unmanaged
+the signal will take care of disconnecting them whenever they die. Unmanaged
 listeners can be any kind of objects and the client is in charge of connecting
-and disconnecting them from a sink to avoid crashes due to different lifetimes.
+and disconnecting them from a signal to avoid crashes due to different
+lifetimes.<br/>
+Both solutions follow the same pattern to allow users to use a signal as a
+private data member and therefore not expose any publish functionality to the
+clients of their classes. The basic idea is to impose a clear separation between
+the signal itself and its _sink_ class, that is a tool to be used to connect and
+disconnect listeners on the fly.
 
 ### Managed signal handler
 
@@ -1962,7 +2016,8 @@ entt::Signal<void(int, char)> signal;
 ```
 
 From now on, free functions and member functions that respect the given
-signature can be easily connected to and disconnected from the signal:
+signature can be easily connected to and disconnected from the signal by means
+of a sink:
 
 ```cpp
 void foo(int, char) { /* ... */ }
@@ -1975,18 +2030,22 @@ struct S {
 
 auto instance = std::make_shared<S>();
 
-signal.connect<&foo>();
-signal.connect<S, &S::bar>(instance);
+signal.sink().connect<&foo>();
+signal.sink().connect<S, &S::bar>(instance);
 
 // ...
 
-signal.disconnect<&foo>();
+// disconnects a free function
+signal.sink().disconnect<&foo>();
 
-// disconnect a specific member function of an instance ...
-signal.disconnect<S, &S::bar>(instance);
+// disconnects a specific member function of an instance ...
+signal.sink().disconnect<S, &S::bar>(instance);
 
 // ... or an instance as a whole
-signal.disconnect(instance);
+signal.sink().disconnect(instance);
+
+// discards all the listeners at once
+signal.sink().disconnect();
 ```
 
 Once listeners are attached (or even if there are no listeners at all), events
@@ -2000,8 +2059,8 @@ signal.publish(42, 'c');
 This is more or less all what a managed signal handler has to offer.<br/>
 A bunch of other member functions are exposed actually. As an example, there is
 a method to use to know how many listeners a managed signal handler contains
-(`size`) or if it contains at least a listener (`empty`), to reset it to its
-initial state (`clear`) and even to swap two handlers (`swap`).<br/>
+(`size`) or if it contains at least a listener (`empty`) and even to swap two
+handlers (`swap`).<br/>
 Refer to the [official documentation](https://skypjack.github.io/entt/) for all
 the details.
 
@@ -2036,11 +2095,10 @@ entt::SigH<void(int, char), MyCollector<bool>> collector;
 
 As expected, an unmanaged signal handler offers all the basic functionalities
 required to know how many listeners it contains (`size`) or if it contains at
-least a listener (`empty`), to reset it to its initial state (`clear`) and even
-to swap two handlers (`swap`).
+least a listener (`empty`) and even to swap two handlers (`swap`).
 
 Besides them, there are member functions to use both to connect and disconnect
-listeners in all their forms:
+listeners in all their forms by means of a sink::
 
 ```cpp
 void foo(int, char) { /* ... */ }
@@ -2053,18 +2111,22 @@ struct S {
 
 S instance;
 
-signal.connect<&foo>();
-signal.connect<S, &S::bar>(&instance);
+signal.sink().connect<&foo>();
+signal.sink().connect<S, &S::bar>(&instance);
 
 // ...
 
-signal.disconnect<&foo>();
+// disconnects a free function
+signal.sink().disconnect<&foo>();
 
 // disconnect a specific member function of an instance ...
-signal.disconnect<S, &S::bar>(&instance);
+signal.sink().disconnect<S, &S::bar>(&instance);
 
 // ... or an instance as a whole
-signal.disconnect(&instance);
+signal.sink().disconnect(&instance);
+
+// discards all the listeners at once
+signal.sink().disconnect();
 ```
 
 Once listeners are attached (or even if there are no listeners at all), events
@@ -2095,8 +2157,8 @@ int g() { return 1; }
 
 entt::SigH<int(), MyCollector<int>> signal;
 
-signal.connect<&f>();
-signal.connect<&g>();
+signal.sink().connect<&f>();
+signal.sink().connect<&g>();
 
 MyCollector collector = signal.collect();
 
@@ -2109,89 +2171,6 @@ argument a type to which the return type of the listeners can be converted.
 Moreover, it has to return a boolean value that is false to stop collecting
 data, true otherwise. This way one can avoid calling all the listeners in case
 it isn't necessary.
-
-## Compile-time event bus
-
-A bus can be used to create a compile-time backbone for event management.<br/>
-The intended use is as a base class, which is the opposite of what the signals
-are meant for. Internally it uses either managed or unmanaged signal handlers,
-that is why there exist both a managed and an unmanaged event bus.
-
-The API of a bus is a kind of subset of the one of a signal. First of all, it
-requires that all the types of events are specified when the bus is declared:
-
-```cpp
-struct AnEvent { int value; };
-struct AnotherEvent {};
-
-// define a managed bus that works with std::shared_ptr/std::weak_ptr
-entt::ManagedBus<AnEvent, AnotherEvent> managed;
-
-// define an unmanaged bus that works with naked pointers
-entt::UnmanagedBus<AnEvent, AnotherEvent> unmanaged;
-```
-
-For the sake of brevity, below is described the interface of the sole unmanaged
-bus. The interface of the managed bus is almost the same but for the fact that
-it accepts smart pointers instead of naked pointers.
-
-In order to register an instance of a class to a bus, its type must expose one
-or more member functions named `receive` of which the return types are `void`
-and the argument lists are `const E &`, for each type of event `E`.<br/>
-The `reg` member function is the way to go to register such an instance:
-
-```cpp
-struct Listener
-{
-    void receive(const AnEvent &) { /* ... */ }
-    void receive(const AnotherEvent &) { /* ... */ }
-};
-
-// ...
-
-Listener listener;
-bus.reg(&listener);
-```
-
-To disconnect an instance of a class from a bus, use the `unreg` member
-function instead:
-
-```cpp
-bus.unreg(&listener);
-```
-
-Each function that respects the accepted signature is automatically registered
-and/or unregistered. Note that invoking `unreg` with an instance of a class that
-hasn't been previously registered is a perfectly valid operation.
-
-Free functions can be registered and unregistered as well by means of the
-dedicated member functions, namely `connect` and `disconnect`:
-
-```cpp
-void foo(const AnEvent &) { /* ... */ }
-void bar(const AnotherEvent &) { /* ... */ }
-
-// ...
-
-bus.connect<AnEvent, &foo>();
-bus.connect<AnotherEvent, &bar>();
-
-// ...
-
-bus.disconnect<AnEvent, &foo>();
-bus.disconnect<AnotherEvent, &bar>();
-```
-
-Whenever the need to send an event arises, it can be done through the `publish`
-member function:
-
-```cpp
-bus.publish<AnEvent>(42);
-bus.publish<AnotherEvent>();
-```
-
-Finally, there are another few functions to use to query the internal state of a
-bus like `empty` and `size` whose meaning is quite intuitive.
 
 ## Delegate
 
@@ -2278,7 +2257,8 @@ argument lists are `const E &`, for each type of event `E`.<br/>
 To ease the development, member functions that are named `receive` are
 automatically detected and have not to be explicitly specified when registered.
 In all the other cases, the name of the member function aimed to receive the
-event must be provided to the `connect` member function:
+event must be provided to the `connect` member function of the sink bound to the
+specific event:
 
 ```cpp
 struct AnEvent { int value; };
@@ -2293,16 +2273,16 @@ struct Listener
 // ...
 
 Listener listener;
-dispatcher.connect<AnEvent>(&listener);
-dispatcher.connect<AnotherEvent, Listener, &Listener::method>(&listener);
+dispatcher.sink<AnEvent>().connect(&listener);
+dispatcher.sink<AnotherEvent>().connect<Listener, &Listener::method>(&listener);
 ```
 
 The `disconnect` member function follows the same pattern and can be used to
 selectively remove listeners:
 
 ```cpp
-dispatcher.disconnect<AnEvent>(&listener);
-dispatcher.disconnect<AnotherEvent, Listener, &Listener::method>(&listener);
+dispatcher.sink<AnEvent>().disconnect(&listener);
+dispatcher.sink<AnotherEvent>().disconnect<Listener, &Listener::method>(&listener);
 ```
 
 The `trigger` member function serves the purpose of sending an immediate event
