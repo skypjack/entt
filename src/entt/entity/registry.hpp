@@ -1254,7 +1254,7 @@ public:
      * more instances of this class in sync, as an example in a client-server
      * architecture.
      *
-     * @return A not movable and not copyable object to use to take snasphosts.
+     * @return A temporary object to use to take snasphosts.
      */
     Snapshot<Entity> snapshot() const {
         using follow_fn_type = entity_type(*)(const Registry &, entity_type);
@@ -1289,7 +1289,7 @@ public:
      * In case it isn't, all the data will be automatically deleted before to
      * return.
      *
-     * @return A not movable and not copyable object to use to load snasphosts.
+     * @return A temporary object to use to load snasphosts.
      */
     SnapshotLoader<Entity> restore() {
         using assure_fn_type = void(*)(Registry &, entity_type, bool);

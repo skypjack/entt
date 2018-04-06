@@ -48,12 +48,6 @@ class Snapshot final {
           raw{raw}
     {}
 
-    Snapshot(const Snapshot &) = default;
-    Snapshot(Snapshot &&) = default;
-
-    Snapshot & operator=(const Snapshot &) = default;
-    Snapshot & operator=(Snapshot &&) = default;
-
     template<typename Component, typename Archive>
     void get(Archive &archive, const Registry<Entity> &registry) {
         const auto component = registry.template component<Component>();
@@ -83,6 +77,16 @@ class Snapshot final {
     }
 
 public:
+    /*! @brief Copying a snapshot isn't allowed. */
+    Snapshot(const Snapshot &) = delete;
+    /*! @brief Default move constructor. */
+    Snapshot(Snapshot &&) = default;
+
+    /*! @brief Copying a snapshot isn't allowed. @return This snapshot. */
+    Snapshot & operator=(const Snapshot &) = delete;
+    /*! @brief Default move assignment operator. @return This snapshot. */
+    Snapshot & operator=(Snapshot &&) = default;
+
     /**
      * @brief Puts aside all the entities that are still in use.
      *
@@ -94,7 +98,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename Archive>
-    Snapshot entities(Archive &archive) && {
+    Snapshot & entities(Archive &archive) {
         archive(static_cast<Entity>(registry.size()));
         registry.each([&archive, this](auto entity) { archive(entity); });
         return *this;
@@ -111,7 +115,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename Archive>
-    Snapshot destroyed(Archive &archive) && {
+    Snapshot & destroyed(Archive &archive) {
         archive(static_cast<Entity>(size));
 
         if(size) {
@@ -139,7 +143,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename... Component, typename Archive>
-    Snapshot component(Archive &archive) && {
+    Snapshot & component(Archive &archive) {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (get<Component>(archive, registry), 0)... };
         (void)accumulator;
@@ -158,7 +162,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename... Tag, typename Archive>
-    Snapshot tag(Archive &archive) && {
+    Snapshot & tag(Archive &archive) {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (get<Tag>(archive), 0)... };
         (void)accumulator;
@@ -199,12 +203,6 @@ class SnapshotLoader final {
         assert(!registry.capacity());
     }
 
-    SnapshotLoader(const SnapshotLoader &) = default;
-    SnapshotLoader(SnapshotLoader &&) = default;
-
-    SnapshotLoader & operator=(const SnapshotLoader &) = default;
-    SnapshotLoader & operator=(SnapshotLoader &&) = default;
-
     template<typename Archive, typename Func>
     void each(Archive &archive, Func func) {
         Entity length{};
@@ -237,6 +235,16 @@ class SnapshotLoader final {
     }
 
 public:
+    /*! @brief Copying a snapshot loader isn't allowed. */
+    SnapshotLoader(const SnapshotLoader &) = delete;
+    /*! @brief Default move constructor. */
+    SnapshotLoader(SnapshotLoader &&) = default;
+
+    /*! @brief Copying a snapshot loader isn't allowed. @return This loader. */
+    SnapshotLoader & operator=(const SnapshotLoader &) = delete;
+    /*! @brief Default move assignment operator. @return This loader. */
+    SnapshotLoader & operator=(SnapshotLoader &&) = default;
+
     /**
      * @brief Restores entities that were in use during serialization.
      *
@@ -248,7 +256,7 @@ public:
      * @return A valid loader to continue restoring data.
      */
     template<typename Archive>
-    SnapshotLoader entities(Archive &archive) && {
+    SnapshotLoader & entities(Archive &archive) {
         each(archive, [this](auto entity) {
             static constexpr auto destroyed = false;
             assure_fn(registry, entity, destroyed);
@@ -268,7 +276,7 @@ public:
      * @return A valid loader to continue restoring data.
      */
     template<typename Archive>
-    SnapshotLoader destroyed(Archive &archive) && {
+    SnapshotLoader & destroyed(Archive &archive) {
         each(archive, [this](auto entity) {
             static constexpr auto destroyed = true;
             assure_fn(registry, entity, destroyed);
@@ -291,7 +299,7 @@ public:
      * @return A valid loader to continue restoring data.
      */
     template<typename... Component, typename Archive>
-    SnapshotLoader component(Archive &archive) && {
+    SnapshotLoader & component(Archive &archive) {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (assign<Component>(archive), 0)... };
         (void)accumulator;
@@ -312,13 +320,12 @@ public:
      * @return A valid loader to continue restoring data.
      */
     template<typename... Tag, typename Archive>
-    SnapshotLoader tag(Archive &archive) && {
+    SnapshotLoader & tag(Archive &archive) {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (attach<Tag>(archive), 0)... };
         (void)accumulator;
         return *this;
     }
-
 
     /**
      * @brief Destroys those entities that have neither components nor tags.
@@ -330,7 +337,7 @@ public:
      *
      * @return A valid loader to continue restoring data.
      */
-    SnapshotLoader orphans() && {
+    SnapshotLoader & orphans() {
         registry.orphans([this](auto entity) {
             registry.destroy(entity);
         });
@@ -495,13 +502,13 @@ public:
         : registry{registry}
     {}
 
-    /*! @brief Default copy constructor. */
-    ContinuousLoader(const ContinuousLoader &) = default;
+    /*! @brief Copying a snapshot loader isn't allowed. */
+    ContinuousLoader(const ContinuousLoader &) = delete;
     /*! @brief Default move constructor. */
     ContinuousLoader(ContinuousLoader &&) = default;
 
-    /*! @brief Default copy assignment operator. @return This loader. */
-    ContinuousLoader & operator=(const ContinuousLoader &) = default;
+    /*! @brief Copying a snapshot loader isn't allowed. @return This loader. */
+    ContinuousLoader & operator=(const ContinuousLoader &) = delete;
     /*! @brief Default move assignment operator. @return This loader. */
     ContinuousLoader & operator=(ContinuousLoader &&) = default;
 
