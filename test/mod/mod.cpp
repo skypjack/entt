@@ -331,8 +331,12 @@ TEST(Mod, Duktape) {
         FAIL();
     }
 
-    registry.create(Position{ 0., 0. }, Renderable{});
-    registry.create(Position{ 0., 0. });
+    const auto e0 = registry.create();
+    registry.assign<Position>(e0, 0., 0.);
+    registry.assign<Renderable>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<Position>(e1, 0., 0.);
 
     const char *s1 = ""
             "Registry.entities(Types.POSITION, Types.RENDERABLE).forEach(function(entity) {"

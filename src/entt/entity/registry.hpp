@@ -340,61 +340,6 @@ public:
     }
 
     /**
-     * @brief Returns a new entity initialized with the given components.
-     *
-     * There are two kinds of entity identifiers:
-     *
-     * * Newly created ones in case no entities have been previously destroyed.
-     * * Recycled one with updated versions.
-     *
-     * Users should not care about the type of the returned entity identifier.
-     * In case entity identifers are stored around, the `current` member
-     * function can be used to know if they are still valid or the entity has
-     * been destroyed and potentially recycled.
-     *
-     * The returned entity has fully initialized components assigned.
-     *
-     * @tparam Component A list of components to assign to the entity.
-     * @param components Instances with which to initialize components.
-     * @return A valid entity identifier.
-     */
-    template<typename... Component>
-    entity_type create(Component &&... components) noexcept {
-        using accumulator_type = int[];
-        const auto entity = create();
-        accumulator_type accumulator = { 0, (assure<std::decay_t<Component>>().construct(entity, std::forward<Component>(components)), 0)... };
-        (void)accumulator;
-        return entity;
-    }
-
-    /**
-     * @brief Returns a new entity to which the given components are assigned.
-     *
-     * There are two kinds of entity identifiers:
-     *
-     * * Newly created ones in case no entities have been previously destroyed.
-     * * Recycled one with updated versions.
-     *
-     * Users should not care about the type of the returned entity identifier.
-     * In case entity identifers are stored around, the `current` member
-     * function can be used to know if they are still valid or the entity has
-     * been destroyed and potentially recycled.
-     *
-     * The returned entity has default initialized components assigned.
-     *
-     * @tparam Component A list of components to assign to the entity.
-     * @return A valid entity identifier.
-     */
-    template<typename... Component>
-    entity_type create() noexcept {
-        using accumulator_type = int[];
-        const auto entity = create();
-        accumulator_type accumulator = { 0, (assure<Component>().construct(entity), 0)... };
-        (void)accumulator;
-        return entity;
-    }
-
-    /**
      * @brief Creates a new entity and returns it.
      *
      * There are two kinds of entity identifiers:

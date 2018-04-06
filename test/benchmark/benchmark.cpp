@@ -73,17 +73,17 @@ TEST(Benchmark, IterateCreateDeleteSingleComponent) {
 
     for(int i = 0; i < 10000; i++) {
         for(int j = 0; j < 10000; j++) {
-            registry.create<Position>();
+            const auto entity = registry.create();
+            registry.assign<Position>(entity);
         }
 
-        for(auto entity: view) {
-            const auto &position = view.get(entity);
+        view.each([&](auto entity, auto &position) {
             (void)position;
 
             if(rand() % 2 == 0) {
                 registry.destroy(entity);
             }
-        };
+        });
     }
 
     timer.elapsed();
@@ -95,7 +95,8 @@ TEST(Benchmark, IterateSingleComponent1M) {
     std::cout << "Iterating over 1000000 entities, one component" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        registry.create<Position>();
+        const auto entity = registry.create();
+        registry.assign<Position>(entity);
     }
 
     Timer timer;
@@ -109,7 +110,8 @@ TEST(Benchmark, IterateSingleComponentRaw1M) {
     std::cout << "Iterating over 1000000 entities, one component, raw view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        registry.create<Position>();
+        const auto entity = registry.create();
+        registry.assign<Position>(entity);
     }
 
     Timer timer;
@@ -125,7 +127,9 @@ TEST(Benchmark, IterateTwoComponents1M) {
     std::cout << "Iterating over 1000000 entities, two components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        registry.create<Position, Velocity>();
+        const auto entity = registry.create();
+        registry.assign<Position>(entity);
+        registry.assign<Velocity>(entity);
     }
 
     Timer timer;
@@ -139,8 +143,12 @@ TEST(Benchmark, IterateTwoComponents1MHalf) {
     std::cout << "Iterating over 1000000 entities, two components, half of the entities have all the components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        auto entity = registry.create<Velocity>();
-        if(i % 2) { registry.assign<Position>(entity); }
+        const auto entity = registry.create();
+        registry.assign<Velocity>(entity);
+
+        if(i % 2) {
+            registry.assign<Position>(entity);
+        }
     }
 
     Timer timer;
@@ -154,8 +162,12 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
     std::cout << "Iterating over 1000000 entities, two components, only one entity has all the components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        auto entity = registry.create<Velocity>();
-        if(i == 5000000L) { registry.assign<Position>(entity); }
+        const auto entity = registry.create();
+        registry.assign<Velocity>(entity);
+
+        if(i == 5000000L) {
+            registry.assign<Position>(entity);
+        }
     }
 
     Timer timer;
@@ -170,7 +182,9 @@ TEST(Benchmark, IterateTwoComponentsPersistent1M) {
     std::cout << "Iterating over 1000000 entities, two components, persistent view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        registry.create<Position, Velocity>();
+        const auto entity = registry.create();
+        registry.assign<Position>(entity);
+        registry.assign<Velocity>(entity);
     }
 
     Timer timer;
@@ -184,7 +198,12 @@ TEST(Benchmark, IterateFiveComponents1M) {
     std::cout << "Iterating over 1000000 entities, five components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        registry.create<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
+        const auto entity = registry.create();
+        registry.assign<Position>(entity);
+        registry.assign<Velocity>(entity);
+        registry.assign<Comp<1>>(entity);
+        registry.assign<Comp<2>>(entity);
+        registry.assign<Comp<3>>(entity);
     }
 
     Timer timer;
@@ -198,8 +217,15 @@ TEST(Benchmark, IterateFiveComponents1MHalf) {
     std::cout << "Iterating over 1000000 entities, five components, half of the entities have all the components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        auto entity = registry.create<Velocity, Comp<1>, Comp<2>, Comp<3>>();
-        if(i % 2) { registry.assign<Position>(entity); }
+        const auto entity = registry.create();
+        registry.assign<Velocity>(entity);
+        registry.assign<Comp<1>>(entity);
+        registry.assign<Comp<2>>(entity);
+        registry.assign<Comp<3>>(entity);
+
+        if(i % 2) {
+            registry.assign<Position>(entity);
+        }
     }
 
     Timer timer;
@@ -213,8 +239,15 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
     std::cout << "Iterating over 1000000 entities, five components, only one entity has all the components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        auto entity = registry.create<Velocity, Comp<1>, Comp<2>, Comp<3>>();
-        if(i == 5000000L) { registry.assign<Position>(entity); }
+        const auto entity = registry.create();
+        registry.assign<Velocity>(entity);
+        registry.assign<Comp<1>>(entity);
+        registry.assign<Comp<2>>(entity);
+        registry.assign<Comp<3>>(entity);
+
+        if(i == 5000000L) {
+            registry.assign<Position>(entity);
+        }
     }
 
     Timer timer;
@@ -229,7 +262,12 @@ TEST(Benchmark, IterateFiveComponentsPersistent1M) {
     std::cout << "Iterating over 1000000 entities, five components, persistent view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        registry.create<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>();
+        const auto entity = registry.create();
+        registry.assign<Position>(entity);
+        registry.assign<Velocity>(entity);
+        registry.assign<Comp<1>>(entity);
+        registry.assign<Comp<2>>(entity);
+        registry.assign<Comp<3>>(entity);
     }
 
     Timer timer;
@@ -243,7 +281,17 @@ TEST(Benchmark, IterateTenComponents1M) {
     std::cout << "Iterating over 1000000 entities, ten components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        registry.create<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+        const auto entity = registry.create();
+        registry.assign<Position>(entity);
+        registry.assign<Velocity>(entity);
+        registry.assign<Comp<1>>(entity);
+        registry.assign<Comp<2>>(entity);
+        registry.assign<Comp<3>>(entity);
+        registry.assign<Comp<4>>(entity);
+        registry.assign<Comp<5>>(entity);
+        registry.assign<Comp<6>>(entity);
+        registry.assign<Comp<7>>(entity);
+        registry.assign<Comp<8>>(entity);
     }
 
     Timer timer;
@@ -257,8 +305,20 @@ TEST(Benchmark, IterateTenComponents1MHalf) {
     std::cout << "Iterating over 1000000 entities, ten components, half of the entities have all the components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        auto entity = registry.create<Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
-        if(i % 2) { registry.assign<Position>(entity); }
+        const auto entity = registry.create();
+        registry.assign<Velocity>(entity);
+        registry.assign<Comp<1>>(entity);
+        registry.assign<Comp<2>>(entity);
+        registry.assign<Comp<3>>(entity);
+        registry.assign<Comp<4>>(entity);
+        registry.assign<Comp<5>>(entity);
+        registry.assign<Comp<6>>(entity);
+        registry.assign<Comp<7>>(entity);
+        registry.assign<Comp<8>>(entity);
+
+        if(i % 2) {
+            registry.assign<Position>(entity);
+        }
     }
 
     Timer timer;
@@ -272,8 +332,20 @@ TEST(Benchmark, IterateTenComponents1MOne) {
     std::cout << "Iterating over 1000000 entities, ten components, only one entity has all the components" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        auto entity = registry.create<Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
-        if(i == 5000000L) { registry.assign<Position>(entity); }
+        const auto entity = registry.create();
+        registry.assign<Velocity>(entity);
+        registry.assign<Comp<1>>(entity);
+        registry.assign<Comp<2>>(entity);
+        registry.assign<Comp<3>>(entity);
+        registry.assign<Comp<4>>(entity);
+        registry.assign<Comp<5>>(entity);
+        registry.assign<Comp<6>>(entity);
+        registry.assign<Comp<7>>(entity);
+        registry.assign<Comp<8>>(entity);
+
+        if(i == 5000000L) {
+            registry.assign<Position>(entity);
+        }
     }
 
     Timer timer;
@@ -288,7 +360,17 @@ TEST(Benchmark, IterateTenComponentsPersistent1M) {
     std::cout << "Iterating over 1000000 entities, ten components, persistent view" << std::endl;
 
     for(std::uint64_t i = 0; i < 1000000L; i++) {
-        registry.create<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>();
+        const auto entity = registry.create();
+        registry.assign<Position>(entity);
+        registry.assign<Velocity>(entity);
+        registry.assign<Comp<1>>(entity);
+        registry.assign<Comp<2>>(entity);
+        registry.assign<Comp<3>>(entity);
+        registry.assign<Comp<4>>(entity);
+        registry.assign<Comp<5>>(entity);
+        registry.assign<Comp<6>>(entity);
+        registry.assign<Comp<7>>(entity);
+        registry.assign<Comp<8>>(entity);
     }
 
     Timer timer;
@@ -302,7 +384,8 @@ TEST(Benchmark, SortSingle) {
     std::cout << "Sort 150000 entities, one component" << std::endl;
 
     for(std::uint64_t i = 0; i < 150000L; i++) {
-        registry.create<Position>({ i, i });
+        const auto entity = registry.create();
+        registry.assign<Position>(entity, i, i);
     }
 
     Timer timer;
@@ -320,7 +403,9 @@ TEST(Benchmark, SortMulti) {
     std::cout << "Sort 150000 entities, two components" << std::endl;
 
     for(std::uint64_t i = 0; i < 150000L; i++) {
-        registry.create<Position, Velocity>({ i, i }, { i, i });
+        const auto entity = registry.create();
+        registry.assign<Position>(entity, i, i);
+        registry.assign<Velocity>(entity, i, i);
     }
 
     registry.sort<Position>([](const auto &lhs, const auto &rhs) {

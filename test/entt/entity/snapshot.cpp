@@ -51,21 +51,21 @@ struct Foo {
 TEST(Snapshot, Dump) {
     entt::DefaultRegistry registry;
 
-    auto e0 = registry.create();
+    const auto e0 = registry.create();
     registry.assign<int>(e0, 42);
     registry.assign<char>(e0, 'c');
     registry.assign<double>(e0, .1);
 
-    auto e1 = registry.create();
+    const auto e1 = registry.create();
 
-    auto e2 = registry.create();
+    const auto e2 = registry.create();
     registry.assign<int>(e2, 3);
 
-    auto e3 = registry.create();
+    const auto e3 = registry.create();
     registry.assign<char>(e3, '0');
     registry.attach<float>(e3, .3f);
 
-    auto e4 = registry.create();
+    const auto e4 = registry.create();
     registry.attach<AComponent>(e4);
 
     registry.destroy(e1);
@@ -140,21 +140,21 @@ TEST(Snapshot, Dump) {
 TEST(Snapshot, Partial) {
     entt::DefaultRegistry registry;
 
-    auto e0 = registry.create();
+    const auto e0 = registry.create();
     registry.assign<int>(e0, 42);
     registry.assign<char>(e0, 'c');
     registry.assign<double>(e0, .1);
 
-    auto e1 = registry.create();
+    const auto e1 = registry.create();
 
-    auto e2 = registry.create();
+    const auto e2 = registry.create();
     registry.assign<int>(e2, 3);
 
-    auto e3 = registry.create();
+    const auto e3 = registry.create();
     registry.assign<char>(e3, '0');
     registry.attach<float>(e3, .3f);
 
-    auto e4 = registry.create();
+    const auto e4 = registry.create();
     registry.attach<AComponent>(e4);
 
     registry.destroy(e1);

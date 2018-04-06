@@ -5,8 +5,11 @@
 TEST(View, SingleComponent) {
     entt::DefaultRegistry registry;
 
-    auto e0 = registry.create();
-    auto e1 = registry.create<int, char>();
+    const auto e0 = registry.create();
+    const auto e1 = registry.create();
+
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
 
     ASSERT_NO_THROW(registry.view<char>().begin()++);
     ASSERT_NO_THROW(++registry.view<char>().begin());
@@ -43,8 +46,11 @@ TEST(View, SingleComponent) {
 TEST(View, SingleComponentContains) {
     entt::DefaultRegistry registry;
 
-    auto e0 = registry.create<int>();
-    auto e1 = registry.create<int>();
+    const auto e0 = registry.create();
+    registry.assign<int>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
 
     registry.destroy(e0);
 
@@ -57,8 +63,12 @@ TEST(View, SingleComponentContains) {
 TEST(View, SingleComponentEmpty) {
     entt::DefaultRegistry registry;
 
-    registry.create<char, double>();
-    registry.create<char>();
+    const auto e0 = registry.create();
+    registry.assign<char>(e0);
+    registry.assign<double>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<char>(e1);
 
     auto view = registry.view<int>();
 
@@ -73,8 +83,13 @@ TEST(View, SingleComponentEmpty) {
 TEST(View, SingleComponentEach) {
     entt::DefaultRegistry registry;
 
-    registry.create<int, char>();
-    registry.create<int, char>();
+    const auto e0 = registry.create();
+    registry.assign<int>(e0);
+    registry.assign<char>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
 
     auto view = registry.view<int>();
     const auto &cview = static_cast<const decltype(view) &>(view);
@@ -92,8 +107,12 @@ TEST(View, SingleComponentEach) {
 TEST(View, MultipleComponent) {
     entt::DefaultRegistry registry;
 
-    auto e0 = registry.create<char>();
-    auto e1 = registry.create<int, char>();
+    const auto e0 = registry.create();
+    registry.assign<char>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
 
     auto it = registry.view<char>().begin();
 
@@ -131,8 +150,13 @@ TEST(View, MultipleComponent) {
 TEST(View, MultipleComponentContains) {
     entt::DefaultRegistry registry;
 
-    auto e0 = registry.create<int, char>();
-    auto e1 = registry.create<int, char>();
+    const auto e0 = registry.create();
+    registry.assign<int>(e0);
+    registry.assign<char>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
 
     registry.destroy(e0);
 
@@ -145,8 +169,14 @@ TEST(View, MultipleComponentContains) {
 TEST(View, MultipleComponentEmpty) {
     entt::DefaultRegistry registry;
 
-    registry.create<double, int, float>();
-    registry.create<char, float>();
+    const auto e0 = registry.create();
+    registry.assign<double>(e0);
+    registry.assign<int>(e0);
+    registry.assign<float>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<char>(e1);
+    registry.assign<float>(e1);
 
     auto view = registry.view<char, int, float>();
 
@@ -159,8 +189,13 @@ TEST(View, MultipleComponentEmpty) {
 TEST(View, MultipleComponentEach) {
     entt::DefaultRegistry registry;
 
-    registry.create<int, char>();
-    registry.create<int, char>();
+    const auto e0 = registry.create();
+    registry.assign<int>(e0);
+    registry.assign<char>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
 
     auto view = registry.view<int, char>();
     const auto &cview = static_cast<const decltype(view) &>(view);
@@ -179,8 +214,12 @@ TEST(PersistentView, Prepare) {
     entt::DefaultRegistry registry;
     registry.prepare<int, char>();
 
-    auto e0 = registry.create<char>();
-    auto e1 = registry.create<int, char>();
+    const auto e0 = registry.create();
+    registry.assign<char>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
 
     ASSERT_NO_THROW((registry.persistent<int, char>().begin()++));
     ASSERT_NO_THROW((++registry.persistent<int, char>().begin()));
@@ -220,8 +259,12 @@ TEST(PersistentView, Prepare) {
 TEST(PersistentView, NoPrepare) {
     entt::DefaultRegistry registry;
 
-    auto e0 = registry.create<char>();
-    auto e1 = registry.create<int, char>();
+    const auto e0 = registry.create();
+    registry.assign<char>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
 
     ASSERT_NO_THROW((registry.persistent<int, char>().begin()++));
     ASSERT_NO_THROW((++registry.persistent<int, char>().begin()));
@@ -261,8 +304,13 @@ TEST(PersistentView, NoPrepare) {
 TEST(PersistentView, Contains) {
     entt::DefaultRegistry registry;
 
-    auto e0 = registry.create<int, char>();
-    auto e1 = registry.create<int, char>();
+    const auto e0 = registry.create();
+    registry.assign<int>(e0);
+    registry.assign<char>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
 
     registry.destroy(e0);
 
@@ -275,8 +323,14 @@ TEST(PersistentView, Contains) {
 TEST(PersistentView, Empty) {
     entt::DefaultRegistry registry;
 
-    registry.create<double, int, float>();
-    registry.create<char, float>();
+    const auto e0 = registry.create();
+    registry.assign<double>(e0);
+    registry.assign<int>(e0);
+    registry.assign<float>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<char>(e1);
+    registry.assign<float>(e1);
 
     for(auto entity: registry.persistent<char, int, float>()) {
         (void)entity;
@@ -293,8 +347,13 @@ TEST(PersistentView, Each) {
     entt::DefaultRegistry registry;
     registry.prepare<int, char>();
 
-    registry.create<int, char>();
-    registry.create<int, char>();
+    const auto e0 = registry.create();
+    registry.assign<int>(e0);
+    registry.assign<char>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
 
     auto view = registry.persistent<int, char>();
     const auto &cview = static_cast<const decltype(view) &>(view);
@@ -313,9 +372,9 @@ TEST(PersistentView, Sort) {
     entt::DefaultRegistry registry;
     registry.prepare<int, unsigned int>();
 
-    auto e0 = registry.create();
-    auto e1 = registry.create();
-    auto e2 = registry.create();
+    const auto e0 = registry.create();
+    const auto e1 = registry.create();
+    const auto e2 = registry.create();
 
     auto uval = 0u;
     auto ival = 0;
@@ -347,8 +406,11 @@ TEST(PersistentView, Sort) {
 TEST(RawView, Functionalities) {
     entt::DefaultRegistry registry;
 
-    auto e0 = registry.create();
-    auto e1 = registry.create<int, char>();
+    const auto e0 = registry.create();
+    const auto e1 = registry.create();
+
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
 
     ASSERT_NO_THROW(registry.raw<char>().begin()++);
     ASSERT_NO_THROW(++registry.raw<char>().begin());
@@ -393,8 +455,12 @@ TEST(RawView, Functionalities) {
 TEST(RawView, Empty) {
     entt::DefaultRegistry registry;
 
-    registry.create<char, double>();
-    registry.create<char>();
+    const auto e0 = registry.create();
+    registry.assign<char>(e0);
+    registry.assign<double>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<char>(e1);
 
     auto view = registry.raw<int>();
 
