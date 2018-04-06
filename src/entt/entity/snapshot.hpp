@@ -10,6 +10,7 @@
 #include <iterator>
 #include <type_traits>
 #include "entt_traits.hpp"
+#include "utility.hpp"
 
 
 namespace entt {
@@ -50,7 +51,7 @@ class Snapshot final {
 
     template<typename Component, typename Archive>
     void get(Archive &archive, const Registry<Entity> &registry) {
-        const auto component = registry.template component<Component>();
+        const auto component = registry.template type<Component>();
         const auto sz = registry.template size<Component>();
         const auto *entities = raw(registry, component);
 
@@ -216,21 +217,12 @@ class SnapshotLoader final {
         }
     }
 
-    template<typename Component, typename Archive>
-    void assign(Archive &archive) {
-        each(archive, [&archive, this](auto entity) {
+    template<typename Type, typename Archive, typename... Args>
+    void assign(Archive &archive, Args... args) {
+        each(archive, [&archive, this, args...](auto entity) {
             static constexpr auto destroyed = false;
             assure_fn(registry, entity, destroyed);
-            archive(registry.template assign<Component>(entity));
-        });
-    }
-
-    template<typename Tag, typename Archive>
-    void attach(Archive &archive) {
-        each(archive, [&archive, this](auto entity) {
-            static constexpr auto destroyed = false;
-            assure_fn(registry, entity, destroyed);
-            archive(registry.template attach<Tag>(entity));
+            archive(registry.template assign<Type>(args..., entity));
         });
     }
 
@@ -322,7 +314,7 @@ public:
     template<typename... Tag, typename Archive>
     SnapshotLoader & tag(Archive &archive) {
         using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (attach<Tag>(archive), 0)... };
+        accumulator_type accumulator = { 0, (assign<Tag>(archive, tag_type_t{}), 0)... };
         (void)accumulator;
         return *this;
     }
@@ -471,7 +463,7 @@ class ContinuousLoader final {
 
         each(archive, [&archive, this](auto entity) {
             entity = restore(entity);
-            archive(registry.template attach<Tag>(entity));
+            archive(registry.template assign<Tag>(tag_type_t{}, entity));
         });
     }
 

@@ -253,7 +253,7 @@ TEST(DefaultRegistry, Orphans) {
     registry.create();
     registry.assign<int>(registry.create());
     registry.create();
-    registry.attach<double>(registry.create());
+    registry.assign<double>(entt::tag_type_t{}, registry.create());
 
     registry.orphans([&](auto) { ++tot; });
     ASSERT_EQ(tot, 2u);
@@ -272,11 +272,11 @@ TEST(DefaultRegistry, Orphans) {
 TEST(DefaultRegistry, Types) {
     entt::DefaultRegistry registry;
 
-    ASSERT_EQ(registry.tag<int>(), registry.tag<int>());
-    ASSERT_EQ(registry.component<int>(), registry.component<int>());
+    ASSERT_EQ(registry.type<int>(entt::tag_type_t{}), registry.type<int>(entt::tag_type_t{}));
+    ASSERT_EQ(registry.type<int>(), registry.type<int>());
 
-    ASSERT_NE(registry.tag<int>(), registry.tag<double>());
-    ASSERT_NE(registry.component<int>(), registry.component<double>());
+    ASSERT_NE(registry.type<int>(entt::tag_type_t{}), registry.type<double>(entt::tag_type_t{}));
+    ASSERT_NE(registry.type<int>(), registry.type<double>(entt::tag_type_t{}));
 }
 
 TEST(DefaultRegistry, CreateDestroyEntities) {
@@ -317,14 +317,14 @@ TEST(DefaultRegistry, AttachSetRemoveTags) {
     ASSERT_FALSE(registry.has<int>());
 
     const auto entity = registry.create();
-    registry.attach<int>(entity, 42);
+    registry.assign<int>(entt::tag_type_t{}, entity, 42);
 
     ASSERT_TRUE(registry.has<int>());
     ASSERT_EQ(registry.get<int>(), 42);
     ASSERT_EQ(cregistry.get<int>(), 42);
     ASSERT_EQ(registry.attachee<int>(), entity);
 
-    registry.set<int>(3);
+    registry.replace<int>(entt::tag_type_t{}, 3);
 
     ASSERT_TRUE(registry.has<int>());
     ASSERT_EQ(registry.get<int>(), 3);
@@ -343,7 +343,7 @@ TEST(DefaultRegistry, AttachSetRemoveTags) {
 
     ASSERT_FALSE(registry.has<int>());
 
-    registry.attach<int>(entity, 42);
+    registry.assign<int>(entt::tag_type_t{}, entity, 42);
     registry.destroy(entity);
 
     ASSERT_FALSE(registry.has<int>());
@@ -437,7 +437,7 @@ TEST(DefaultRegistry, CleanPersistentViewsAfterReset) {
 TEST(DefaultRegistry, CleanTagsAfterReset) {
     entt::DefaultRegistry registry;
     const auto entity = registry.create();
-    registry.attach<int>(entity);
+    registry.assign<int>(entt::tag_type_t{}, entity);
 
     ASSERT_TRUE(registry.has<int>());
 

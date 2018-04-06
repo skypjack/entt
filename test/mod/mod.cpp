@@ -157,7 +157,7 @@ class DuktapeRegistry {
     template<typename... Comp>
     void reg() {
         using accumulator_type = int[];
-        accumulator_type acc = { (func[registry.component<Comp>()] = {
+        accumulator_type acc = { (func[registry.type<Comp>()] = {
                                      &::set<Comp>,
                                      &::unset<Comp>,
                                      &::has<Comp>,
@@ -186,7 +186,7 @@ class DuktapeRegistry {
         auto type = duk_require_uint(ctx, 1);
 
         if(type >= udef) {
-            type = registry.component<DuktapeRuntime>();
+            type = registry.type<DuktapeRuntime>();
         }
 
         assert(func.find(type) != func.cend());
@@ -248,7 +248,7 @@ public:
                     assert(func.find(type) != func.cend());
                     match = (registry.*func[type].test)(entity);
                 } else {
-                    const auto ctype = registry.component<DuktapeRuntime>();
+                    const auto ctype = registry.type<DuktapeRuntime>();
                     assert(func.find(ctype) != func.cend());
                     match = (registry.*func[ctype].test)(entity);
 
@@ -287,7 +287,7 @@ const duk_function_list_entry js_DuktapeRegistry_methods[] = {
 void exportTypes(duk_context *ctx, entt::DefaultRegistry &registry) {
     auto exportType = [](auto *ctx, auto &registry, auto idx, auto type, const auto *name) {
         duk_push_string(ctx, name);
-        duk_push_uint(ctx, registry.template component<typename decltype(type)::type>());
+        duk_push_uint(ctx, registry.template type<typename decltype(type)::type>());
         duk_def_prop(ctx, idx, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE);
     };
 

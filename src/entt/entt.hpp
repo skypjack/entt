@@ -6,6 +6,7 @@
 #include "entity/registry.hpp"
 #include "entity/snapshot.hpp"
 #include "entity/sparse_set.hpp"
+#include "entity/utility.hpp"
 #include "entity/view.hpp"
 #include "locator/locator.hpp"
 #include "process/process.hpp"

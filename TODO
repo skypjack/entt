@@ -5,6 +5,5 @@
 * define a macro for the noexcept policy, so as to provide users with an easy way to disable exception handling
 * define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
 * blueprint registry - kind of factory to create entitites template for initialization (use signals, it's trivial this way)
-* use tag dispatching to disambiguate between standard components and single instance components, then provide users with an common API
 * remove Actor::update (it's application dependent), allow tag instead
 * AOB

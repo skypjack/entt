@@ -578,7 +578,8 @@ data structures or more complex and movable data structures with a proper
 constructor.<br/>
 Actually, the same type can be used both as a tag and as a component and the
 registry will not complain about it. It is up to the users to properly manage
-their own types.
+their own types. In some cases, the `tag_type_t` must also be used in order to
+disambiguate overloads of member functions.
 
 Attaching tags to entities and removing them is trivial:
 
@@ -587,10 +588,10 @@ auto player = registry.create();
 auto camera = registry.create();
 
 // attaches a default-initialized tag to an entity
-registry.attach<PlayingCharacter>(player);
+registry.assign<PlayingCharacter>(entt::tag_type_t{}, player);
 
 // attaches a tag to an entity and initializes it
-registry.attach<Camera>(camera, player);
+registry.assign<Camera>(entt::tag_type_t{}, camera, player);
 
 // removes tags from their owners
 registry.remove<PlayingCharacter>();
@@ -598,12 +599,12 @@ registry.remove<Camera>();
 ```
 
 In case a tag already has an owner, its content can be updated by means of the
-`set` member function template and the ownership of the tag can be transferred
-to another entity using the `move` member function template:
+`replace` member function template and the ownership of the tag can be
+transferred to another entity using the `move` member function template:
 
 ```
 // replaces the content of the given tag
-Point &point = registry.set<Point>(1.f, 1.f);
+Point &point = registry.replace<Point>(entt::tag_type_t{}, 1.f, 1.f);
 
 // transfers the ownership of the tag to another entity
 entity_type prev = registry.move<Point>(next);

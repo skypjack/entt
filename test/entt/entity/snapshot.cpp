@@ -63,10 +63,10 @@ TEST(Snapshot, Dump) {
 
     const auto e3 = registry.create();
     registry.assign<char>(e3, '0');
-    registry.attach<float>(e3, .3f);
+    registry.assign<float>(entt::tag_type_t{}, e3, .3f);
 
     const auto e4 = registry.create();
-    registry.attach<AComponent>(e4);
+    registry.assign<AComponent>(entt::tag_type_t{}, e4);
 
     registry.destroy(e1);
     auto v1 = registry.current(e1);
@@ -152,10 +152,10 @@ TEST(Snapshot, Partial) {
 
     const auto e3 = registry.create();
     registry.assign<char>(e3, '0');
-    registry.attach<float>(e3, .3f);
+    registry.assign<float>(entt::tag_type_t{}, e3, .3f);
 
     const auto e4 = registry.create();
-    registry.attach<AComponent>(e4);
+    registry.assign<AComponent>(entt::tag_type_t{}, e4);
 
     registry.destroy(e1);
     auto v1 = registry.current(e1);
@@ -281,7 +281,7 @@ TEST(Snapshot, Continuous) {
         if(i % 2) {
             src.assign<Foo>(entity, entity);
         } else if(i == 2) {
-            src.attach<double>(entity, .3);
+            src.assign<double>(entt::tag_type_t{}, entity, .3);
         }
     }
 

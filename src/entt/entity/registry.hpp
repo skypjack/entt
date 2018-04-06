@@ -16,6 +16,7 @@
 #include "entt_traits.hpp"
 #include "snapshot.hpp"
 #include "sparse_set.hpp"
+#include "utility.hpp"
 #include "view.hpp"
 
 
@@ -182,7 +183,7 @@ public:
      * @return Runtime numeric identifier of the given type of tag.
      */
     template<typename Tag>
-    tag_type tag() const noexcept {
+    tag_type type(tag_type_t) const noexcept {
         return tag_family::type<Tag>();
     }
 
@@ -199,7 +200,7 @@ public:
      * @return Runtime numeric identifier of the given type of component.
      */
     template<typename Component>
-    component_type component() const noexcept {
+    component_type type() const noexcept {
         return component_family::type<Component>();
     }
 
@@ -430,7 +431,7 @@ public:
      * @return A reference to the newly created tag.
      */
     template<typename Tag, typename... Args>
-    Tag & attach(entity_type entity, Args &&... args) {
+    Tag & assign(tag_type_t, entity_type entity, Args &&... args) {
         assert(valid(entity));
         assert(!has<Tag>());
         const auto ttype = tag_family::type<Tag>();
@@ -445,6 +446,32 @@ public:
     }
 
     /**
+     * @brief Assigns the given component to an entity.
+     *
+     * A new instance of the given component is created and initialized with the
+     * arguments provided (the component must have a proper constructor or be of
+     * aggregate type). Then the component is assigned to the given entity.
+     *
+     * @warning
+     * Attempting to use an invalid entity or to assign a component to an entity
+     * that already owns it results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity already owns an instance of the given
+     * component.
+     *
+     * @tparam Component Type of component to create.
+     * @tparam Args Types of arguments to use to construct the component.
+     * @param entity A valid entity identifier.
+     * @param args Parameters to use to initialize the component.
+     * @return A reference to the newly created component.
+     */
+    template<typename Component, typename... Args>
+    Component & assign(entity_type entity, Args &&... args) {
+        assert(valid(entity));
+        return assure<Component>().construct(entity, std::forward<Args>(args)...);
+    }
+
+    /**
      * @brief Removes the given tag from its owner, if any.
      * @tparam Tag Type of tag to remove.
      */
@@ -453,6 +480,25 @@ public:
         if(has<Tag>()) {
             tags[tag_family::type<Tag>()].reset();
         }
+    }
+
+    /**
+     * @brief Removes the given component from an entity.
+     *
+     * @warning
+     * Attempting to use an invalid entity or to remove a component from an
+     * entity that doesn't own it results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity doesn't own an instance of the given
+     * component.
+     *
+     * @tparam Component Type of component to remove.
+     * @param entity A valid entity identifier.
+     */
+    template<typename Component>
+    void remove(entity_type entity) {
+        assert(valid(entity));
+        pool<Component>().destroy(entity);
     }
 
     /**
@@ -468,6 +514,28 @@ public:
                 tags[ttype] &&
                 // the associated entity hasn't been destroyed in the meantime
                 tags[ttype]->entity == (entities[tags[ttype]->entity & traits_type::entity_mask]));
+    }
+
+    /**
+     * @brief Checks if an entity has all the given components.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @tparam Component Components for which to perform the check.
+     * @param entity A valid entity identifier.
+     * @return True if the entity has all the components, false otherwise.
+     */
+    template<typename... Component>
+    bool has(entity_type entity) const noexcept {
+        assert(valid(entity));
+        using accumulator_type = bool[];
+        bool all = true;
+        accumulator_type accumulator = { all, (all = all && managed<Component>() && pool<Component>().has(entity))... };
+        (void)accumulator;
+        return all;
     }
 
     /**
@@ -503,140 +571,6 @@ public:
     template<typename Tag>
     Tag & get() noexcept {
         return const_cast<Tag &>(const_cast<const Registry *>(this)->get<Tag>());
-    }
-
-    /**
-     * @brief Replaces the given tag.
-     *
-     * A new instance of the given tag is created and initialized with the
-     * arguments provided (the tag must have a proper constructor or be of
-     * aggregate type).
-     *
-     * @warning
-     * Attempting to replace a tag that hasn't an owner results in undefined
-     * behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * tag hasn't been previously attached to an entity.
-     *
-     * @tparam Tag Type of tag to replace.
-     * @tparam Args Types of arguments to use to construct the tag.
-     * @param args Parameters to use to initialize the tag.
-     * @return A reference to the tag.
-     */
-    template<typename Tag, typename... Args>
-    Tag & set(Args &&... args) {
-        return get<Tag>() = Tag{std::forward<Args>(args)...};
-    }
-
-    /**
-     * @brief Changes the owner of the given tag.
-     *
-     * The ownership of the tag is transferred from one entity to another.
-     *
-     * @warning
-     * Attempting to use an invalid entity or to transfer the ownership of a tag
-     * that hasn't an owner results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity or if the tag hasn't been previously attached to an
-     * entity.
-     *
-     * @tparam Tag Type of tag of which to transfer the ownership.
-     * @param entity A valid entity identifier.
-     * @return A valid entity identifier.
-     */
-    template<typename Tag>
-    entity_type move(entity_type entity) {
-        assert(valid(entity));
-        assert(has<Tag>());
-        const auto ttype = tag_family::type<Tag>();
-        const auto owner = tags[ttype]->entity;
-        tags[ttype]->entity = entity;
-        return owner;
-    }
-
-    /**
-     * @brief Gets the owner of the given tag, if any.
-     *
-     * @warning
-     * Attempting to get the owner of a tag that hasn't been previously attached
-     * to an entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * tag hasn't an owner.
-     *
-     * @tparam Tag Type of tag of which to get the owner.
-     * @return A valid entity identifier.
-     */
-    template<typename Tag>
-    entity_type attachee() const noexcept {
-        assert(has<Tag>());
-        return tags[tag_family::type<Tag>()]->entity;
-    }
-
-    /**
-     * @brief Assigns the given component to an entity.
-     *
-     * A new instance of the given component is created and initialized with the
-     * arguments provided (the component must have a proper constructor or be of
-     * aggregate type). Then the component is assigned to the given entity.
-     *
-     * @warning
-     * Attempting to use an invalid entity or to assign a component to an entity
-     * that already owns it results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity or if the entity already owns an instance of the given
-     * component.
-     *
-     * @tparam Component Type of component to create.
-     * @tparam Args Types of arguments to use to construct the component.
-     * @param entity A valid entity identifier.
-     * @param args Parameters to use to initialize the component.
-     * @return A reference to the newly created component.
-     */
-    template<typename Component, typename... Args>
-    Component & assign(entity_type entity, Args &&... args) {
-        assert(valid(entity));
-        return assure<Component>().construct(entity, std::forward<Args>(args)...);
-    }
-
-    /**
-     * @brief Removes the given component from an entity.
-     *
-     * @warning
-     * Attempting to use an invalid entity or to remove a component from an
-     * entity that doesn't own it results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity or if the entity doesn't own an instance of the given
-     * component.
-     *
-     * @tparam Component Type of component to remove.
-     * @param entity A valid entity identifier.
-     */
-    template<typename Component>
-    void remove(entity_type entity) {
-        assert(valid(entity));
-        pool<Component>().destroy(entity);
-    }
-
-    /**
-     * @brief Checks if an entity has all the given components.
-     *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
-     *
-     * @tparam Component Components for which to perform the check.
-     * @param entity A valid entity identifier.
-     * @return True if the entity has all the components, false otherwise.
-     */
-    template<typename... Component>
-    bool has(entity_type entity) const noexcept {
-        assert(valid(entity));
-        using accumulator_type = bool[];
-        bool all = true;
-        accumulator_type accumulator = { all, (all = all && managed<Component>() && pool<Component>().has(entity))... };
-        (void)accumulator;
-        return all;
     }
 
     /**
@@ -719,6 +653,29 @@ public:
     }
 
     /**
+     * @brief Replaces the given tag.
+     *
+     * A new instance of the given tag is created and initialized with the
+     * arguments provided (the tag must have a proper constructor or be of
+     * aggregate type).
+     *
+     * @warning
+     * Attempting to replace a tag that hasn't an owner results in undefined
+     * behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * tag hasn't been previously attached to an entity.
+     *
+     * @tparam Tag Type of tag to replace.
+     * @tparam Args Types of arguments to use to construct the tag.
+     * @param args Parameters to use to initialize the tag.
+     * @return A reference to the tag.
+     */
+    template<typename Tag, typename... Args>
+    Tag & replace(tag_type_t, Args &&... args) {
+        return get<Tag>() = Tag{std::forward<Args>(args)...};
+    }
+
+    /**
      * @brief Replaces the given component for an entity.
      *
      * A new instance of the given component is created and initialized with the
@@ -741,6 +698,50 @@ public:
     template<typename Component, typename... Args>
     Component & replace(entity_type entity, Args &&... args) {
         return (get<Component>(entity) = Component{std::forward<Args>(args)...});
+    }
+
+    /**
+     * @brief Changes the owner of the given tag.
+     *
+     * The ownership of the tag is transferred from one entity to another.
+     *
+     * @warning
+     * Attempting to use an invalid entity or to transfer the ownership of a tag
+     * that hasn't an owner results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the tag hasn't been previously attached to an
+     * entity.
+     *
+     * @tparam Tag Type of tag of which to transfer the ownership.
+     * @param entity A valid entity identifier.
+     * @return A valid entity identifier.
+     */
+    template<typename Tag>
+    entity_type move(entity_type entity) {
+        assert(valid(entity));
+        assert(has<Tag>());
+        const auto ttype = tag_family::type<Tag>();
+        const auto owner = tags[ttype]->entity;
+        tags[ttype]->entity = entity;
+        return owner;
+    }
+
+    /**
+     * @brief Gets the owner of the given tag, if any.
+     *
+     * @warning
+     * Attempting to get the owner of a tag that hasn't been previously attached
+     * to an entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * tag hasn't an owner.
+     *
+     * @tparam Tag Type of tag of which to get the owner.
+     * @return A valid entity identifier.
+     */
+    template<typename Tag>
+    entity_type attachee() const noexcept {
+        assert(has<Tag>());
+        return tags[tag_family::type<Tag>()]->entity;
     }
 
     /**
