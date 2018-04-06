@@ -63,6 +63,7 @@ public:
      * to the users of a class.
      */
     class Sink final {
+        /*! @brief A signal is allowed to create sinks. */
         friend class Signal;
 
         template<void(*Function)(Args...)>

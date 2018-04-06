@@ -43,7 +43,7 @@ namespace entt {
 template<typename Delta>
 class Scheduler final {
     template<typename T>
-    struct tag { using type = T; };
+    struct type_t { using type = T; };
 
     struct ProcessHandler final {
         using instance_type = std::unique_ptr<void, void(*)(void *)>;
@@ -66,7 +66,7 @@ class Scheduler final {
         template<typename Proc, typename... Args>
         decltype(auto) then(Args &&... args) && {
             static_assert(std::is_base_of<Process<Proc, Delta>, Proc>::value, "!");
-            handler = Lambda::operator()(handler, tag<Proc>{}, std::forward<Args>(args)...);
+            handler = Lambda::operator()(handler, type_t<Proc>{}, std::forward<Args>(args)...);
             return std::move(*this);
         }
 

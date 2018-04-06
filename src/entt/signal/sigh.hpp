@@ -10,7 +10,7 @@
 namespace entt {
 
 
-namespace details {
+namespace {
 
 
 template<typename, typename>
@@ -83,7 +83,7 @@ using DefaultCollectorType = typename DefaultCollector<Function>::collector_type
  * @tparam Function A valid function type.
  * @tparam Collector Type of collector to use, if any.
  */
-template<typename Function, typename Collector = details::DefaultCollectorType<Function>>
+template<typename Function, typename Collector = DefaultCollectorType<Function>>
 class SigH;
 
 
@@ -111,8 +111,8 @@ class SigH;
  * @tparam Collector Type of collector to use, if any.
  */
 template<typename Ret, typename... Args, typename Collector>
-class SigH<Ret(Args...), Collector> final: private details::Invoker<Ret(Args...), Collector> {
-    using call_type = typename details::Invoker<Ret(Args...), Collector>::call_type;
+class SigH<Ret(Args...), Collector> final: private Invoker<Ret(Args...), Collector> {
+    using call_type = typename Invoker<Ret(Args...), Collector>::call_type;
 
 public:
     /*! @brief Unsigned integer type. */
@@ -139,6 +139,7 @@ public:
     * to the users of a class.
     */
     class Sink final {
+        /*! @brief A signal is allowed to create sinks. */
         friend class SigH;
 
         template<Ret(*Function)(Args...)>
