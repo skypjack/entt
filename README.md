@@ -831,7 +831,7 @@ them is to destroy those entities and thus update their versions.
 #### Continuous loader
 
 A continuous loader is designed to load data from a source registry to a
-(possibly) non-empty destination. The loader can accomodate in a registry more
+(possibly) non-empty destination. The loader can accommodate in a registry more
 than one snapshot in a sort of _continuous loading_ that updates the
 destination one step at a time.<br/>
 Identifiers that entities originally had are not transferred to the target.
