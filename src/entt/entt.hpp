@@ -3,6 +3,7 @@
 #include "core/ident.hpp"
 #include "entity/actor.hpp"
 #include "entity/entt_traits.hpp"
+#include "entity/helper.hpp"
 #include "entity/registry.hpp"
 #include "entity/snapshot.hpp"
 #include "entity/sparse_set.hpp"
@@ -18,4 +19,3 @@
 #include "signal/dispatcher.hpp"
 #include "signal/emitter.hpp"
 #include "signal/sigh.hpp"
-#include "signal/signal.hpp"

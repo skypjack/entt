@@ -2,46 +2,39 @@
 #include <gtest/gtest.h>
 #include <entt/signal/dispatcher.hpp>
 
-struct Event {};
+struct AnEvent {};
+struct AnotherEvent {};
 
 struct Receiver {
-    void receive(const Event &) { ++cnt; }
+    void receive(const AnEvent &) { ++cnt; }
     void reset() { cnt = 0; }
-    std::size_t cnt{0};
+    int cnt{0};
 };
 
-template<typename Dispatcher, typename Rec>
-void testDispatcher(Rec receiver) {
-    Dispatcher dispatcher;
+TEST(Dispatcher, Functionalities) {
+    entt::Dispatcher dispatcher;
+    Receiver receiver;
 
-    dispatcher.template sink<Event>().connect(receiver);
-    dispatcher.template trigger<Event>();
-    dispatcher.template enqueue<Event>();
+    dispatcher.template sink<AnEvent>().connect(&receiver);
+    dispatcher.template trigger<AnEvent>();
+    dispatcher.template enqueue<AnEvent>();
+    dispatcher.template enqueue<AnotherEvent>();
+    dispatcher.update<AnotherEvent>();
 
-    ASSERT_EQ(receiver->cnt, static_cast<decltype(receiver->cnt)>(1));
+    ASSERT_EQ(receiver.cnt, 1);
 
+    dispatcher.update<AnEvent>();
+    dispatcher.template trigger<AnEvent>();
+
+    ASSERT_EQ(receiver.cnt, 3);
+
+    receiver.reset();
+
+    dispatcher.template sink<AnEvent>().disconnect(&receiver);
+    dispatcher.template trigger<AnEvent>();
+    dispatcher.template enqueue<AnEvent>();
     dispatcher.update();
-    dispatcher.update();
-    dispatcher.template trigger<Event>();
+    dispatcher.template trigger<AnEvent>();
 
-    ASSERT_EQ(receiver->cnt, static_cast<decltype(receiver->cnt)>(3));
-
-    receiver->reset();
-
-    dispatcher.template sink<Event>().disconnect(receiver);
-    dispatcher.template trigger<Event>();
-    dispatcher.template enqueue<Event>();
-    dispatcher.update();
-    dispatcher.template trigger<Event>();
-
-    ASSERT_EQ(receiver->cnt, static_cast<decltype(receiver->cnt)>(0));
-}
-
-TEST(ManagedDispatcher, Basics) {
-    testDispatcher<entt::ManagedDispatcher>(std::make_shared<Receiver>());
-}
-
-TEST(UnmanagedDispatcher, Basics) {
-    auto ptr = std::make_unique<Receiver>();
-    testDispatcher<entt::UnmanagedDispatcher>(ptr.get());
+    ASSERT_EQ(receiver.cnt, 0);
 }

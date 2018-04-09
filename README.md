@@ -25,6 +25,8 @@
          * [Continuous loader](#continuous-loader)
          * [Archives](#archives)
          * [One example to rule them all](#one-example-to-rule-them-all)
+      * [Helpers](#helpers)
+         * [Dependency function](#dependency-function)
    * [View: to persist or not to persist?](#view-to-persist-or-not-to-persist)
       * [Standard View](#standard-view)
          * [Single component standard view](#single-component-standard-view)
@@ -103,7 +105,8 @@ Here is a brief list of what it offers today:
 * The smallest and most basic implementation of a service locator ever seen.
 * A cooperative scheduler for processes of any type.
 * All what is needed for resource management (cache, loaders, handles).
-* Signal handlers of any type, delegates and a tiny event dispatcher.
+* Delegates, signal handlers (with built-in support for collectors) and a tiny
+  event dispatcher.
 * A general purpose event emitter, that is a CRTP idiom based class template.
 * An event dispatcher for immediate and delayed events to integrate in loops.
 * ...
@@ -960,6 +963,33 @@ the best way to do it. However, feel free to use it at your own risk.
 
 The basic idea is to store everything in a group of queues in memory, then bring
 everything back to the registry with different loaders.
+
+### Helpers
+
+The so called _helpers_ are small classes and functions mainly designed to offer
+built-in support for the most basic functionalities.<br/>
+The list of helpers will grow longer as time passes and new ideas come out.
+
+#### Dependency function
+
+A _dependency function_ is a predefined listener, actually a function template
+to use to automatically assign components to an entity when a type has a
+dependency on some other types.<br/>
+The following adds components `AType` and `AnotherType` whenever `MyType` is
+assigned to an entity:
+
+```cpp
+entt::dependency<AType, AnotherType>(registry.construction<MyType>());
+```
+
+A component is assigned to an entity and thus default initialized only in case
+the entity itself hasn't it yet. It means that already existent components won't
+be overriden.<br/>
+A dependency can easily be broken by means of the same function template:
+
+```cpp
+entt::dependency<AType, AnotherType>(entt::break_op_t{}, registry.construction<MyType>());
+```
 
 ## View: to persist or not to persist?
 
@@ -1984,107 +2014,26 @@ offers a full set of classes to solve completely different problems.
 
 ## Signals
 
-There are two types of signal handlers in `EnTT`, internally called _managed_
-and _unmanaged_.<br/>
-They differ in the way they work around the tradeoff between performance, memory
-usage and safety. Managed listeners must be wrapped in an `std::shared_ptr` and
-the signal will take care of disconnecting them whenever they die. Unmanaged
-listeners can be any kind of objects and the client is in charge of connecting
-and disconnecting them from a signal to avoid crashes due to different
-lifetimes.<br/>
-Both solutions follow the same pattern to allow users to use a signal as a
-private data member and therefore not expose any publish functionality to the
-clients of their classes. The basic idea is to impose a clear separation between
-the signal itself and its _sink_ class, that is a tool to be used to connect and
-disconnect listeners on the fly.
+Signal handlers work with naked pointers, function pointers and pointers to
+member functions. Listeners can be any kind of objects and the user is in charge
+of connecting and disconnecting them from a signal to avoid crashes due to
+different lifetimes. On the other side, performance shouldn't be affected that
+much by the presence of such a signal handler.<br/>
+A signal handler can be used as a private data member without exposing any
+_publish_ functionality to the clients of a class. The basic idea is to impose a
+clear separation between the signal itself and its _sink_ class, that is a tool
+to be used to connect and disconnect listeners on the fly.
 
-### Managed signal handler
-
-A managed signal handler works with weak pointers to classes and pointers to
-member functions as well as pointers to free functions. References are
-automatically removed when the instances to which they point are freed.<br/>
-In other terms, users can simply connect a listener and forget about it, thus
-getting rid of the burden of controlling its lifetime. The drawback is that
-listeners must be allocated on the dynamic storage and wrapped into an
-`std::shared_ptr`. Performance and memory management can suffer from this in
-real world softwares.
-
-To create an instance of this type of handler, the function type is all what is
-needed:
-
-```cpp
-entt::Signal<void(int, char)> signal;
-```
-
-From now on, free functions and member functions that respect the given
-signature can be easily connected to and disconnected from the signal by means
-of a sink:
-
-```cpp
-void foo(int, char) { /* ... */ }
-
-struct S {
-    void bar(int, char) { /* ... */ }
-};
-
-// ...
-
-auto instance = std::make_shared<S>();
-
-signal.sink().connect<&foo>();
-signal.sink().connect<S, &S::bar>(instance);
-
-// ...
-
-// disconnects a free function
-signal.sink().disconnect<&foo>();
-
-// disconnects a specific member function of an instance ...
-signal.sink().disconnect<S, &S::bar>(instance);
-
-// ... or an instance as a whole
-signal.sink().disconnect(instance);
-
-// discards all the listeners at once
-signal.sink().disconnect();
-```
-
-Once listeners are attached (or even if there are no listeners at all), events
-and data in general can be published through a signal by means of the `publish`
-member function:
-
-```cpp
-signal.publish(42, 'c');
-```
-
-This is more or less all what a managed signal handler has to offer.<br/>
-A bunch of other member functions are exposed actually. As an example, there is
-a method to use to know how many listeners a managed signal handler contains
-(`size`) or if it contains at least a listener (`empty`) and even to swap two
-handlers (`swap`).<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
-
-### Unmanaged signal handler
-
-An unmanaged signal handler works with naked pointers to classes and pointers to
-member functions as well as pointers to free functions. Removing references when
-the instances to which they point are freed is in charge to the users.<br/>
-In other terms, users must explicitly disconnect a listener before to delete the
-class to which it belongs, thus taking care of the lifetime of each instance. On
-the other side, performance shouldn't be affected that much by the presence of
-such a signal handler.
-
-The API of an unmanaged signal handler is similar to the one of a managed signal
-handler.<br/>
-The most important difference is that it comes in two forms: with and without a
-collector. In case it is associated with a collector, all the values returned by
-the listeners can be literally _collected_ and used later by the caller.<br/>
+The API of a signal handler is straightforward. The most important thing is that
+it comes in two forms: with and without a collector. In case a signal is
+associated with a collector, all the values returned by the listeners can be
+literally _collected_ and used later by the caller. Otherwise it works just like
+a plain signal that emits events from time to time.<br/>
 
 **Note**: collectors are allowed only in case of function types whose the return
 type isn't `void` for obvious reasons.
 
-To create instances of this type of handler there exist mainly two ways:
+To create instances of signal handlers there exist mainly two ways:
 
 ```cpp
 // no collector type
@@ -2094,9 +2043,9 @@ entt::SigH<void(int, char)> signal;
 entt::SigH<void(int, char), MyCollector<bool>> collector;
 ```
 
-As expected, an unmanaged signal handler offers all the basic functionalities
-required to know how many listeners it contains (`size`) or if it contains at
-least a listener (`empty`) and even to swap two handlers (`swap`).
+As expected, they offer all the basic functionalities required to know how many
+listeners they contain (`size`) or if they contain at least a listener (`empty`)
+and even to swap two signal handlers (`swap`).
 
 Besides them, there are member functions to use both to connect and disconnect
 listeners in all their forms by means of a sink::
@@ -2231,26 +2180,13 @@ within the framework.
 The event dispatcher class is designed so as to be used in a loop. It allows
 users both to trigger immediate events or to queue events to be published all
 together once per tick.<br/>
-Internally it uses either managed or unmanaged signal handlers, that is why
-there exist both a managed and an unmanaged event dispatcher.
-
-This class shares part of its API with the one of the signals, but it doesn't
-require that all the types of events are specified when declared:
+This class shares part of its API with the one of the signal handler, but it
+doesn't require that all the types of events are specified when declared:
 
 ```cpp
-// define a managed dispatcher that works with std::shared_ptr/std::weak_ptr
-entt::Dispatcher<entt::Signal> managed{};
-
-// define an unmanaged dispatcher that works with naked pointers
-entt::Dispatcher<entt::SigH> unmanaged{};
+// define a general purpose dispatcher that works with naked pointers
+entt::Dispatcher dispatcher{};
 ```
-
-Actually there exist two aliases for the classes shown in the previous example:
-`entt::ManagedDispatcher` and `entt::UnmanagedDispatcher`.
-
-For the sake of brevity, below is described the interface of the sole unmanaged
-dispatcher. The interface of the managed dispatcher is almost the same but for
-the fact that it accepts smart pointers instead of naked pointers.
 
 In order to register an instance of a class to a dispatcher, its type must
 expose one or more member functions of which the return types are `void` and the
@@ -2315,6 +2251,10 @@ Events are stored aside until the `update` member function is invoked, then all
 the messages that are still pending are sent to the listeners at once:
 
 ```cpp
+// emits all the events of the given type at once
+dispatcher.update<MyEvent>();
+
+// emits all the events queued so far at once
 dispatcher.update();
 ```
 

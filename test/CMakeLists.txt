@@ -73,6 +73,7 @@ add_executable(
     entity
     $<TARGET_OBJECTS:odr>
     entt/entity/actor.cpp
+    entt/entity/helper.cpp
     entt/entity/registry.cpp
     entt/entity/snapshot.cpp
     entt/entity/sparse_set.cpp
@@ -121,7 +122,6 @@ add_executable(
     entt/signal/dispatcher.cpp
     entt/signal/emitter.cpp
     entt/signal/sigh.cpp
-    entt/signal/signal.cpp
 )
 target_link_libraries(signal PRIVATE gtest_main Threads::Threads)
 add_test(NAME signal COMMAND signal)

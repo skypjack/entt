@@ -75,7 +75,7 @@ class Registry {
 
     template<typename Component>
     struct Pool: SparseSet<Entity, Component> {
-        using sink_type = typename SigH<void(Registry &, Entity)>::Sink;
+        using sink_type = typename SigH<void(Registry &, Entity)>::sink_type;
 
         Pool(Registry &registry)
             : registry{registry}
