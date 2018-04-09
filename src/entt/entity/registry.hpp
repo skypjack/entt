@@ -84,29 +84,27 @@ class Registry {
         template<typename... Args>
         Component & construct(Entity entity, Args &&... args) {
             auto &component = SparseSet<Entity, Component>::construct(entity, std::forward<Args>(args)...);
-            listeners.first.publish(registry, entity);
+            constructing.publish(registry, entity);
             return component;
         }
 
         void destroy(Entity entity) override {
-            listeners.second.publish(registry, entity);
+            destroying.publish(registry, entity);
             SparseSet<Entity, Component>::destroy(entity);
         }
 
         sink_type construction() noexcept {
-            return listeners.first.sink();
+            return constructing.sink();
         }
 
         sink_type destruction() noexcept {
-            return listeners.second.sink();
+            return destroying.sink();
         }
 
     private:
         Registry &registry;
-        std::pair<
-            SigH<void(Registry &, Entity)>,
-            SigH<void(Registry &, Entity)>
-        > listeners;
+        SigH<void(Registry &, Entity)> constructing;
+        SigH<void(Registry &, Entity)> destroying;
     };
 
     template<typename Component>
