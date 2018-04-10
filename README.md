@@ -166,7 +166,8 @@ int main() {
     std::uint64_t dt = 16;
 
     for(auto i = 0; i < 10; ++i) {
-        auto entity = registry.create(Position{i * 1.f, i * 1.f});
+        auto entity = registry.create();
+        registry.assign<Position>(entity, i * 1.f, i * 1.f);
         if(i % 2 == 0) { registry.assign<Velocity>(entity, i * .1f, i * .1f); }
     }
 
@@ -391,9 +392,6 @@ A registry can be used both to construct and to destroy entities:
 ```cpp
 // constructs a naked entity with no components and returns its identifier
 auto entity = registry.create();
-
-// constructs an entity and assigns it default-initialized components
-auto another = registry.create<Position, Velocity>();
 
 // destroys an entity and all its components
 registry.destroy(entity);

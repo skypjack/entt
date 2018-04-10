@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 
-constexpr bool ptr(const char *str) {
+static constexpr bool ptr(const char *str) {
     using hash_type = entt::HashedString::hash_type;
 
     return (static_cast<hash_type>(entt::HashedString{str}) == entt::HashedString{str}
@@ -12,7 +12,7 @@ constexpr bool ptr(const char *str) {
 }
 
 template<std::size_t N>
-constexpr bool ref(const char (&str)[N]) {
+static constexpr bool ref(const char (&str)[N]) {
     using hash_type = entt::HashedString::hash_type;
 
     return (static_cast<hash_type>(entt::HashedString{str}) == entt::HashedString{str}

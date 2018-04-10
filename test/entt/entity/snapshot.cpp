@@ -43,7 +43,7 @@ struct AnotherComponent {
     int value;
 };
 
-struct Foo {
+struct WhatAComponent {
     entt::DefaultRegistry::entity_type bar;
     std::vector<entt::DefaultRegistry::entity_type> quux;
 };
@@ -80,7 +80,7 @@ TEST(Snapshot, Dump) {
         std::queue<bool>,
         std::queue<AComponent>,
         std::queue<AnotherComponent>,
-        std::queue<Foo>
+        std::queue<WhatAComponent>
     >;
 
     storage_type storage;
@@ -168,7 +168,7 @@ TEST(Snapshot, Partial) {
         std::queue<float>,
         std::queue<bool>,
         std::queue<AComponent>,
-        std::queue<Foo>
+        std::queue<WhatAComponent>
     >;
 
     storage_type storage;
@@ -255,7 +255,7 @@ TEST(Snapshot, Continuous) {
         std::queue<entity_type>,
         std::queue<AComponent>,
         std::queue<AnotherComponent>,
-        std::queue<Foo>,
+        std::queue<WhatAComponent>,
         std::queue<double>
     >;
 
@@ -279,14 +279,14 @@ TEST(Snapshot, Continuous) {
         src.assign<AnotherComponent>(entity, i, i);
 
         if(i % 2) {
-            src.assign<Foo>(entity, entity);
+            src.assign<WhatAComponent>(entity, entity);
         } else if(i == 2) {
             src.assign<double>(entt::tag_type_t{}, entity, .3);
         }
     }
 
-    src.view<Foo>().each([&entities](auto, auto &foo) {
-        foo.quux.insert(foo.quux.begin(), entities.begin(), entities.end());
+    src.view<WhatAComponent>().each([&entities](auto, auto &whatAComponent) {
+        whatAComponent.quux.insert(whatAComponent.quux.begin(), entities.begin(), entities.end());
     });
 
     entity = dst.create();
@@ -296,19 +296,19 @@ TEST(Snapshot, Continuous) {
     src.snapshot()
             .entities(output)
             .destroyed(output)
-            .component<AComponent, AnotherComponent, Foo>(output)
+            .component<AComponent, AnotherComponent, WhatAComponent>(output)
             .tag<double>(output);
 
     loader.entities(input)
             .destroyed(input)
             .component<AComponent, AnotherComponent>(input)
-            .component<Foo>(input, &Foo::bar, &Foo::quux)
+            .component<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
             .tag<double>(input)
             .orphans();
 
     decltype(dst.size()) aComponentCnt{};
     decltype(dst.size()) anotherComponentCnt{};
-    decltype(dst.size()) fooCnt{};
+    decltype(dst.size()) whatAComponentCnt{};
 
     dst.each([&dst, &aComponentCnt](auto entity) {
         ASSERT_TRUE(dst.has<AComponent>(entity));
@@ -320,14 +320,14 @@ TEST(Snapshot, Continuous) {
         ++anotherComponentCnt;
     });
 
-    dst.view<Foo>().each([&dst, &fooCnt](auto entity, const auto &component) {
+    dst.view<WhatAComponent>().each([&dst, &whatAComponentCnt](auto entity, const auto &component) {
         ASSERT_EQ(entity, component.bar);
 
         for(auto entity: component.quux) {
             ASSERT_TRUE(dst.valid(entity));
         }
 
-        ++fooCnt;
+        ++whatAComponentCnt;
     });
 
     ASSERT_TRUE(dst.has<double>());
@@ -342,13 +342,13 @@ TEST(Snapshot, Continuous) {
     src.snapshot()
             .entities(output)
             .destroyed(output)
-            .component<AComponent, AnotherComponent, Foo>(output)
+            .component<AComponent, AnotherComponent, WhatAComponent>(output)
             .tag<double>(output);
 
     loader.entities(input)
             .destroyed(input)
             .component<AComponent, AnotherComponent>(input)
-            .component<Foo>(input, &Foo::bar, &Foo::quux)
+            .component<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
             .tag<double>(input)
             .orphans();
 
@@ -356,7 +356,7 @@ TEST(Snapshot, Continuous) {
 
     ASSERT_EQ(dst.size<AComponent>(), aComponentCnt);
     ASSERT_EQ(dst.size<AnotherComponent>(), anotherComponentCnt);
-    ASSERT_EQ(dst.size<Foo>(), fooCnt);
+    ASSERT_EQ(dst.size<WhatAComponent>(), whatAComponentCnt);
     ASSERT_TRUE(dst.has<double>());
 
     dst.view<AnotherComponent>().each([](auto, auto &component) {
@@ -365,24 +365,24 @@ TEST(Snapshot, Continuous) {
 
     entity = src.create();
 
-    src.view<Foo>().each([entity](auto, auto &component) {
+    src.view<WhatAComponent>().each([entity](auto, auto &component) {
         component.bar = entity;
     });
 
     src.snapshot()
             .entities(output)
             .destroyed(output)
-            .component<AComponent, AnotherComponent, Foo>(output)
+            .component<AComponent, AnotherComponent, WhatAComponent>(output)
             .tag<double>(output);
 
     loader.entities(input)
             .destroyed(input)
             .component<AComponent, AnotherComponent>(input)
-            .component<Foo>(input, &Foo::bar, &Foo::quux)
+            .component<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
             .tag<double>(input)
             .orphans();
 
-    dst.view<Foo>().each([&loader, entity](auto, auto &component) {
+    dst.view<WhatAComponent>().each([&loader, entity](auto, auto &component) {
         ASSERT_EQ(component.bar, loader.map(entity));
     });
 
@@ -397,18 +397,18 @@ TEST(Snapshot, Continuous) {
     src.snapshot()
             .entities(output)
             .destroyed(output)
-            .component<AComponent, AnotherComponent, Foo>(output)
+            .component<AComponent, AnotherComponent, WhatAComponent>(output)
             .tag<double>(output);
 
     loader.entities(input)
             .destroyed(input)
             .component<AComponent, AnotherComponent>(input)
-            .component<Foo>(input, &Foo::bar, &Foo::quux)
+            .component<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
             .tag<double>(input)
             .orphans()
             .shrink();
 
-    dst.view<Foo>().each([&dst, &loader, entity](auto, auto &component) {
+    dst.view<WhatAComponent>().each([&dst, &loader, entity](auto, auto &component) {
         ASSERT_FALSE(dst.valid(component.bar));
     });
 
@@ -416,7 +416,7 @@ TEST(Snapshot, Continuous) {
 
     entity = src.create();
 
-    src.view<Foo>().each([entity](auto, auto &component) {
+    src.view<WhatAComponent>().each([entity](auto, auto &component) {
         component.bar = entity;
     });
 
@@ -426,13 +426,13 @@ TEST(Snapshot, Continuous) {
     src.snapshot()
             .entities(output)
             .destroyed(output)
-            .component<AComponent, AnotherComponent, Foo>(output)
+            .component<AComponent, AnotherComponent, WhatAComponent>(output)
             .tag<double>(output);
 
     loader.entities(input)
             .destroyed(input)
             .component<AComponent, AnotherComponent>(input)
-            .component<Foo>(input, &Foo::bar, &Foo::quux)
+            .component<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
             .tag<double>(input)
             .orphans();
 
@@ -446,13 +446,13 @@ TEST(Snapshot, Continuous) {
     src.snapshot()
             .entities(output)
             .destroyed(output)
-            .component<AComponent, AnotherComponent, Foo>(output)
+            .component<AComponent, AnotherComponent, WhatAComponent>(output)
             .tag<double>(output);
 
     loader.entities(input)
             .destroyed(input)
             .component<AComponent, AnotherComponent>(input)
-            .component<Foo>(input, &Foo::bar, &Foo::quux)
+            .component<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
             .tag<double>(input)
             .orphans();
 

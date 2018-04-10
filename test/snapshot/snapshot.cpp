@@ -18,17 +18,17 @@ struct Relationship {
     entt::DefaultRegistry::entity_type parent;
 };
 
-template<class Archive>
+template<typename Archive>
 void serialize(Archive &archive, Position &position) {
   archive(position.x, position.y);
 }
 
-template<class Archive>
+template<typename Archive>
 void serialize(Archive &archive, Timer &timer) {
   archive(timer.duration);
 }
 
-template<class Archive>
+template<typename Archive>
 void serialize(Archive &archive, Relationship &relationship) {
   archive(relationship.parent);
 }

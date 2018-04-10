@@ -8,8 +8,8 @@ struct TestActor: entt::DefaultActor<unsigned int> {
     void update(unsigned int) {}
 };
 
-struct Position final {};
-struct Velocity final {};
+struct ActorPosition final {};
+struct ActorVelocity final {};
 
 TEST(Actor, Functionalities) {
     entt::DefaultRegistry registry;
@@ -18,40 +18,40 @@ TEST(Actor, Functionalities) {
 
     ASSERT_EQ(&registry, &actor->registry());
     ASSERT_EQ(&registry, &cactor.registry());
-    ASSERT_TRUE(registry.empty<Position>());
-    ASSERT_TRUE(registry.empty<Velocity>());
+    ASSERT_TRUE(registry.empty<ActorPosition>());
+    ASSERT_TRUE(registry.empty<ActorVelocity>());
     ASSERT_FALSE(registry.empty());
-    ASSERT_FALSE(actor->has<Position>());
-    ASSERT_FALSE(actor->has<Velocity>());
+    ASSERT_FALSE(actor->has<ActorPosition>());
+    ASSERT_FALSE(actor->has<ActorVelocity>());
 
-    const auto &position = actor->set<Position>();
+    const auto &position = actor->set<ActorPosition>();
 
-    ASSERT_EQ(&position, &actor->get<Position>());
-    ASSERT_EQ(&position, &cactor.get<Position>());
-    ASSERT_FALSE(registry.empty<Position>());
-    ASSERT_TRUE(registry.empty<Velocity>());
+    ASSERT_EQ(&position, &actor->get<ActorPosition>());
+    ASSERT_EQ(&position, &cactor.get<ActorPosition>());
+    ASSERT_FALSE(registry.empty<ActorPosition>());
+    ASSERT_TRUE(registry.empty<ActorVelocity>());
     ASSERT_FALSE(registry.empty());
-    ASSERT_TRUE(actor->has<Position>());
-    ASSERT_FALSE(actor->has<Velocity>());
+    ASSERT_TRUE(actor->has<ActorPosition>());
+    ASSERT_FALSE(actor->has<ActorVelocity>());
 
-    actor->unset<Position>();
+    actor->unset<ActorPosition>();
 
-    ASSERT_TRUE(registry.empty<Position>());
-    ASSERT_TRUE(registry.empty<Velocity>());
+    ASSERT_TRUE(registry.empty<ActorPosition>());
+    ASSERT_TRUE(registry.empty<ActorVelocity>());
     ASSERT_FALSE(registry.empty());
-    ASSERT_FALSE(actor->has<Position>());
-    ASSERT_FALSE(actor->has<Velocity>());
+    ASSERT_FALSE(actor->has<ActorPosition>());
+    ASSERT_FALSE(actor->has<ActorVelocity>());
 
-    actor->set<Position>();
-    actor->set<Velocity>();
+    actor->set<ActorPosition>();
+    actor->set<ActorVelocity>();
 
     ASSERT_FALSE(registry.empty());
-    ASSERT_FALSE(registry.empty<Position>());
-    ASSERT_FALSE(registry.empty<Velocity>());
+    ASSERT_FALSE(registry.empty<ActorPosition>());
+    ASSERT_FALSE(registry.empty<ActorVelocity>());
 
     delete actor;
 
     ASSERT_TRUE(registry.empty());
-    ASSERT_TRUE(registry.empty<Position>());
-    ASSERT_TRUE(registry.empty<Velocity>());
+    ASSERT_TRUE(registry.empty<ActorPosition>());
+    ASSERT_TRUE(registry.empty<ActorVelocity>());
 }

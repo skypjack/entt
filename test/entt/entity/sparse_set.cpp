@@ -631,9 +631,9 @@ TEST(SparseSetWithType, RespectUnordered) {
 }
 
 TEST(SparseSetWithType, ReferencesGuaranteed) {
-    struct Type { int value; };
+    struct InternalType { int value; };
 
-    entt::SparseSet<unsigned int, Type> set;
+    entt::SparseSet<unsigned int, InternalType> set;
 
     set.construct(0, 0);
     set.construct(1, 1);

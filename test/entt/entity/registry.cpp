@@ -6,7 +6,7 @@
 #include <entt/entity/entt_traits.hpp>
 #include <entt/entity/registry.hpp>
 
-struct Listener {
+struct ComponentListener {
     void incr(entt::DefaultRegistry &, entt::DefaultRegistry::entity_type entity) {
         last = entity;
         ++counter;
@@ -570,10 +570,10 @@ TEST(DefaultRegistry, MergeTwoRegistries) {
 
 TEST(DefaultRegistry, Signals) {
     entt::DefaultRegistry registry;
-    Listener listener;
+    ComponentListener listener;
 
-    registry.construction<int>().connect<Listener, &Listener::incr>(&listener);
-    registry.destruction<int>().connect<Listener, &Listener::decr>(&listener);
+    registry.construction<int>().connect<ComponentListener, &ComponentListener::incr>(&listener);
+    registry.destruction<int>().connect<ComponentListener, &ComponentListener::decr>(&listener);
 
     auto e0 = registry.create();
     auto e1 = registry.create();
@@ -589,13 +589,13 @@ TEST(DefaultRegistry, Signals) {
     ASSERT_EQ(listener.counter, 1);
     ASSERT_EQ(listener.last, e0);
 
-    registry.destruction<int>().disconnect<Listener, &Listener::decr>(&listener);
+    registry.destruction<int>().disconnect<ComponentListener, &ComponentListener::decr>(&listener);
     registry.remove<int>(e1);
 
     ASSERT_EQ(listener.counter, 1);
     ASSERT_EQ(listener.last, e0);
 
-    registry.construction<int>().disconnect<Listener, &Listener::incr>(&listener);
+    registry.construction<int>().disconnect<ComponentListener, &ComponentListener::incr>(&listener);
     registry.assign<int>(e0);
     registry.assign<int>(e1);
 

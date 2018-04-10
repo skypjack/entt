@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <entt/signal/sigh.hpp>
 
-struct S {
+struct SigHListener {
     static void f(int &v) { v = 42; }
 
     bool g(int) { k = !k; return true; }
@@ -64,53 +64,53 @@ TEST(SigH, Comparison) {
     entt::SigH<void()> sig1;
     entt::SigH<void()> sig2;
 
-    S s1;
-    S s2;
+    SigHListener s1;
+    SigHListener s2;
 
-    sig1.sink().connect<S, &S::i>(&s1);
-    sig2.sink().connect<S, &S::i>(&s2);
-
-    ASSERT_FALSE(sig1 == sig2);
-    ASSERT_TRUE(sig1 != sig2);
-
-    sig1.sink().disconnect<S, &S::i>(&s1);
-    sig2.sink().disconnect<S, &S::i>(&s2);
-
-    sig1.sink().connect<S, &S::i>(&s1);
-    sig2.sink().connect<S, &S::l>(&s1);
+    sig1.sink().connect<SigHListener, &SigHListener::i>(&s1);
+    sig2.sink().connect<SigHListener, &SigHListener::i>(&s2);
 
     ASSERT_FALSE(sig1 == sig2);
     ASSERT_TRUE(sig1 != sig2);
 
-    sig1.sink().disconnect<S, &S::i>(&s1);
-    sig2.sink().disconnect<S, &S::l>(&s1);
+    sig1.sink().disconnect<SigHListener, &SigHListener::i>(&s1);
+    sig2.sink().disconnect<SigHListener, &SigHListener::i>(&s2);
+
+    sig1.sink().connect<SigHListener, &SigHListener::i>(&s1);
+    sig2.sink().connect<SigHListener, &SigHListener::l>(&s1);
+
+    ASSERT_FALSE(sig1 == sig2);
+    ASSERT_TRUE(sig1 != sig2);
+
+    sig1.sink().disconnect<SigHListener, &SigHListener::i>(&s1);
+    sig2.sink().disconnect<SigHListener, &SigHListener::l>(&s1);
 
     ASSERT_TRUE(sig1 == sig2);
     ASSERT_FALSE(sig1 != sig2);
 
-    sig1.sink().connect<S, &S::i>(&s1);
-    sig1.sink().connect<S, &S::l>(&s1);
-    sig2.sink().connect<S, &S::i>(&s1);
-    sig2.sink().connect<S, &S::l>(&s1);
+    sig1.sink().connect<SigHListener, &SigHListener::i>(&s1);
+    sig1.sink().connect<SigHListener, &SigHListener::l>(&s1);
+    sig2.sink().connect<SigHListener, &SigHListener::i>(&s1);
+    sig2.sink().connect<SigHListener, &SigHListener::l>(&s1);
 
     ASSERT_TRUE(sig1 == sig2);
 
-    sig1.sink().disconnect<S, &S::i>(&s1);
-    sig1.sink().disconnect<S, &S::l>(&s1);
-    sig2.sink().disconnect<S, &S::i>(&s1);
-    sig2.sink().disconnect<S, &S::l>(&s1);
+    sig1.sink().disconnect<SigHListener, &SigHListener::i>(&s1);
+    sig1.sink().disconnect<SigHListener, &SigHListener::l>(&s1);
+    sig2.sink().disconnect<SigHListener, &SigHListener::i>(&s1);
+    sig2.sink().disconnect<SigHListener, &SigHListener::l>(&s1);
 
-    sig1.sink().connect<S, &S::i>(&s1);
-    sig1.sink().connect<S, &S::l>(&s1);
-    sig2.sink().connect<S, &S::l>(&s1);
-    sig2.sink().connect<S, &S::i>(&s1);
+    sig1.sink().connect<SigHListener, &SigHListener::i>(&s1);
+    sig1.sink().connect<SigHListener, &SigHListener::l>(&s1);
+    sig2.sink().connect<SigHListener, &SigHListener::l>(&s1);
+    sig2.sink().connect<SigHListener, &SigHListener::i>(&s1);
 
     ASSERT_FALSE(sig1 == sig2);
 }
 
 TEST(SigH, Clear) {
     entt::SigH<void(int &)> sigh;
-    sigh.sink().connect<&S::f>();
+    sigh.sink().connect<&SigHListener::f>();
 
     ASSERT_FALSE(sigh.empty());
 
@@ -123,7 +123,7 @@ TEST(SigH, Swap) {
     entt::SigH<void(int &)> sigh1;
     entt::SigH<void(int &)> sigh2;
 
-    sigh1.sink().connect<&S::f>();
+    sigh1.sink().connect<&SigHListener::f>();
 
     ASSERT_FALSE(sigh1.empty());
     ASSERT_TRUE(sigh2.empty());
@@ -138,7 +138,7 @@ TEST(SigH, Functions) {
     entt::SigH<void(int &)> sigh;
     int v = 0;
 
-    sigh.sink().connect<&S::f>();
+    sigh.sink().connect<&SigHListener::f>();
     sigh.publish(v);
 
     ASSERT_FALSE(sigh.empty());
@@ -146,37 +146,37 @@ TEST(SigH, Functions) {
     ASSERT_EQ(42, v);
 
     v = 0;
-    sigh.sink().disconnect<&S::f>();
+    sigh.sink().disconnect<&SigHListener::f>();
     sigh.publish(v);
 
     ASSERT_TRUE(sigh.empty());
     ASSERT_EQ((entt::SigH<bool(int)>::size_type)0, sigh.size());
     ASSERT_EQ(0, v);
 
-    sigh.sink().connect<&S::f>();
+    sigh.sink().connect<&SigHListener::f>();
 }
 
 TEST(SigH, Members) {
-    S s;
-    S *ptr = &s;
+    SigHListener s;
+    SigHListener *ptr = &s;
     entt::SigH<bool(int)> sigh;
 
-    sigh.sink().connect<S, &S::g>(ptr);
+    sigh.sink().connect<SigHListener, &SigHListener::g>(ptr);
     sigh.publish(42);
 
     ASSERT_TRUE(s.k);
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ((entt::SigH<bool(int)>::size_type)1, sigh.size());
 
-    sigh.sink().disconnect<S, &S::g>(ptr);
+    sigh.sink().disconnect<SigHListener, &SigHListener::g>(ptr);
     sigh.publish(42);
 
     ASSERT_TRUE(s.k);
     ASSERT_TRUE(sigh.empty());
     ASSERT_EQ((entt::SigH<bool(int)>::size_type)0, sigh.size());
 
-    sigh.sink().connect<S, &S::g>(ptr);
-    sigh.sink().connect<S, &S::h>(ptr);
+    sigh.sink().connect<SigHListener, &SigHListener::g>(ptr);
+    sigh.sink().connect<SigHListener, &SigHListener::h>(ptr);
 
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ((entt::SigH<bool(int)>::size_type)2, sigh.size());
