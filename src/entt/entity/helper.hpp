@@ -4,7 +4,7 @@
 
 #include "../signal/sigh.hpp"
 #include "registry.hpp"
-#include "utility"
+#include "utility.hpp"
 
 
 namespace entt {
@@ -51,8 +51,7 @@ void dependency(Registry<Entity> &registry, Entity entity) {
  */
 template<typename... Dependency, typename Entity>
 void dependency(Sink<void(Registry<Entity> &, Entity)> sink) {
-    using func_type = void(*)(Registry<Entity> &, Entity);
-    sink.template connect<static_cast<func_type>(&dependency<Entity, Dependency...>)>();
+    sink.template connect<dependency<Entity, Dependency...>>();
 }
 
 
@@ -75,8 +74,7 @@ void dependency(Sink<void(Registry<Entity> &, Entity)> sink) {
  */
 template<typename... Dependency, typename Entity>
 void dependency(break_op_t, Sink<void(Registry<Entity> &, Entity)> sink) {
-    using func_type = void(*)(Registry<Entity> &, Entity);
-    sink.template disconnect<static_cast<func_type>(&dependency<Entity, Dependency...>)>();
+    sink.template disconnect<dependency<Entity, Dependency...>>();
 }
 
 
