@@ -10,7 +10,13 @@
 namespace entt {
 
 
-namespace {
+namespace internal {
+
+
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
 
 
 template<typename... Types>
@@ -45,6 +51,12 @@ struct Identifier<Type> {
 private:
     const std::size_t index;
 };
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond TURN_OFF_DOXYGEN
+ */
 
 
 }

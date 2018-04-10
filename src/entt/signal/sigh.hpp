@@ -10,7 +10,13 @@
 namespace entt {
 
 
-namespace {
+namespace internal {
+
+
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
 
 
 template<typename, typename>
@@ -69,6 +75,12 @@ struct DefaultCollector<Ret(Args...)> final {
 
 template<typename Function>
 using DefaultCollectorType = typename DefaultCollector<Function>::collector_type;
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond TURN_OFF_DOXYGEN
+ */
 
 
 }

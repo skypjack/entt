@@ -5,7 +5,6 @@
 * define a macro for the noexcept policy, so as to provide users with an easy way to disable exception handling
 * define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
 * ease the assignment of tags as string (use a template class with a non-type template parameter behind the scene)
-* turn anonymous namespaces in details:: so as to avoid issues related to internal vs external linkage
 * dictionary based dependency class (templates copied over) + prefabs (shared state/copy-on-write)
 * remove Actor::update (it's application dependent), allow tag instead
 * "singleton mode" for tags (see #66)
