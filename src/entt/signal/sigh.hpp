@@ -107,7 +107,7 @@ class Sink;
  * @tparam Function A valid function type.
  * @tparam Collector Type of collector to use, if any.
  */
-template<typename Function, typename Collector = DefaultCollectorType<Function>>
+template<typename Function, typename Collector = internal::DefaultCollectorType<Function>>
 class SigH;
 
 
@@ -251,8 +251,8 @@ private:
  * @tparam Collector Type of collector to use, if any.
  */
 template<typename Ret, typename... Args, typename Collector>
-class SigH<Ret(Args...), Collector> final: private Invoker<Ret(Args...), Collector> {
-    using call_type = typename Invoker<Ret(Args...), Collector>::call_type;
+class SigH<Ret(Args...), Collector> final: private internal::Invoker<Ret(Args...), Collector> {
+    using call_type = typename internal::Invoker<Ret(Args...), Collector>::call_type;
 
 public:
     /*! @brief Unsigned integer type. */

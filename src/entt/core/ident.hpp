@@ -99,7 +99,7 @@ private:
  * @tparam Types List of types for which to generate identifiers.
  */
 template<typename... Types>
-constexpr auto ident = Identifier<std::decay_t<Types>...>{std::make_index_sequence<sizeof...(Types)>{}};
+constexpr auto ident = internal::Identifier<std::decay_t<Types>...>{std::make_index_sequence<sizeof...(Types)>{}};
 
 
 }
