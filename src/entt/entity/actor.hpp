@@ -2,8 +2,10 @@
 #define ENTT_ENTITY_ACTOR_HPP
 
 
+#include <cassert>
 #include <utility>
 #include "registry.hpp"
+#include "utility.hpp"
 
 
 namespace entt {
@@ -16,28 +18,25 @@ namespace entt {
  * with entity-component systems and prefer to iterate objects directly.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Delta Type to use to provide elapsed time.
  */
-template<typename Entity, typename Delta>
+template<typename Entity>
 struct Actor {
     /*! @brief Type of registry used internally. */
     using registry_type = Registry<Entity>;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
-    /*! @brief Type used to provide elapsed time. */
-    using delta_type = Delta;
 
     /**
      * @brief Constructs an actor by using the given registry.
      * @param reg An entity-component system properly initialized.
      */
     Actor(Registry<Entity> &reg)
-        : reg{reg}, entity{reg.create()}
+        : reg{reg}, entt{reg.create()}
     {}
 
     /*! @brief Default destructor. */
     virtual ~Actor() {
-        reg.destroy(entity);
+        reg.destroy(entt);
     }
 
     /*! @brief Default copy constructor. */
@@ -49,6 +48,24 @@ struct Actor {
     Actor & operator=(const Actor &) = default;
     /*! @brief Default move assignment operator. @return This actor. */
     Actor & operator=(Actor &&) = default;
+
+    /**
+     * @brief Assigns the given tag to an actor.
+     *
+     * A new instance of the given tag is created and initialized with the
+     * arguments provided (the tag must have a proper constructor or be of
+     * aggregate type). Then the tag is removed from its previous owner (if any)
+     * and assigned to the actor.
+     *
+     * @tparam Tag Type of the tag to create.
+     * @tparam Args Types of arguments to use to construct the tag.
+     * @param args Parameters to use to initialize the tag.
+     * @return A reference to the newly created tag.
+     */
+    template<typename Tag, typename... Args>
+    Tag & assign(tag_type_t, Args &&... args) {
+        return (reg.template remove<Tag>(), reg.template assign<Tag>(tag_type_t{}, entt, std::forward<Args>(args)...));
+    }
 
     /**
      * @brief Assigns the given component to an actor.
@@ -65,8 +82,18 @@ struct Actor {
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    Component & set(Args &&... args) {
-        return reg.template accommodate<Component>(entity, std::forward<Args>(args)...);
+    Component & assign(Args &&... args) {
+        return reg.template accommodate<Component>(entt, std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Removes the given tag from an actor.
+     * @tparam Tag Type of the tag to remove.
+     */
+    template<typename Tag>
+    void remove(tag_type_t) {
+        assert(has<Tag>(tag_type_t{}));
+        reg.template remove<Tag>();
     }
 
     /**
@@ -74,8 +101,18 @@ struct Actor {
      * @tparam Component Type of the component to remove.
      */
     template<typename Component>
-    void unset() {
-        reg.template remove<Component>(entity);
+    void remove() {
+        reg.template remove<Component>(entt);
+    }
+
+    /**
+     * @brief Checks if an actor owns the given tag.
+     * @tparam Tag Type of the tag for which to perform the check.
+     * @return True if the actor owns the tag, false otherwise.
+     */
+    template<typename Tag>
+    bool has(tag_type_t) const noexcept {
+        return (reg.template has<Tag>() && (reg.template attachee<Tag>() == entt));
     }
 
     /**
@@ -85,23 +122,44 @@ struct Actor {
      */
     template<typename Component>
     bool has() const noexcept {
-        return reg.template has<Component>(entity);
+        return reg.template has<Component>(entt);
+    }
+
+    /**
+     * @brief Returns a reference to the given tag for an actor.
+     * @tparam Tag Type of the tag to get.
+     * @return A reference to the instance of the tag owned by the actor.
+     */
+    template<typename Tag>
+    const Tag & get(tag_type_t) const noexcept {
+        assert(has<Tag>(tag_type_t{}));
+        return reg.template get<Tag>();
+    }
+
+    /**
+     * @brief Returns a reference to the given tag for an actor.
+     * @tparam Tag Type of the tag to get.
+     * @return A reference to the instance of the tag owned by the actor.
+     */
+    template<typename Tag>
+    Tag & get(tag_type_t) noexcept {
+        return const_cast<Tag &>(const_cast<const Actor *>(this)->get<Tag>(tag_type_t{}));
     }
 
     /**
      * @brief Returns a reference to the given component for an actor.
      * @tparam Component Type of the component to get.
-     * @return A reference to the instance of the component owned by the entity.
+     * @return A reference to the instance of the component owned by the actor.
      */
     template<typename Component>
     const Component & get() const noexcept {
-        return reg.template get<Component>(entity);
+        return reg.template get<Component>(entt);
     }
 
     /**
      * @brief Returns a reference to the given component for an actor.
      * @tparam Component Type of the component to get.
-     * @return A reference to the instance of the component owned by the entity.
+     * @return A reference to the instance of the component owned by the actor.
      */
     template<typename Component>
     Component & get() noexcept {
@@ -110,7 +168,7 @@ struct Actor {
 
     /**
      * @brief Returns a reference to the underlying registry.
-     * @return A reference to the underlying registry
+     * @return A reference to the underlying registry.
      */
     const registry_type & registry() const noexcept {
         return reg;
@@ -118,21 +176,23 @@ struct Actor {
 
     /**
      * @brief Returns a reference to the underlying registry.
-     * @return A reference to the underlying registry
+     * @return A reference to the underlying registry.
      */
     registry_type & registry() noexcept {
         return const_cast<registry_type &>(const_cast<const Actor *>(this)->registry());
     }
 
     /**
-     * @brief Updates an actor, whatever it means to update it.
-     * @param delta Elapsed time.
+     * @brief Returns the entity associated with an actor.
+     * @return The entity associated with the actor.
      */
-    virtual void update(delta_type delta) = 0;
+    entity_type entity() const noexcept {
+        return entt;
+    }
 
 private:
     registry_type &reg;
-    Entity entity;
+    Entity entt;
 };
 
 
@@ -141,11 +201,8 @@ private:
  *
  * The default actor is the best choice for almost all the applications.<br/>
  * Users should have a really good reason to choose something different.
- *
- * @tparam Delta Type to use to provide elapsed time.
  */
-template<typename Delta>
-using DefaultActor = Actor<DefaultRegistry::entity_type, Delta>;
+using DefaultActor = Actor<DefaultRegistry::entity_type>;
 
 
 }

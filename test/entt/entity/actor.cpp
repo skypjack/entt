@@ -3,55 +3,74 @@
 #include <entt/entity/actor.hpp>
 #include <entt/entity/registry.hpp>
 
-struct TestActor: entt::DefaultActor<unsigned int> {
-    using entt::DefaultActor<unsigned int>::DefaultActor;
-    void update(unsigned int) {}
-};
+struct ActorComponent final {};
+struct ActorTag final {};
 
-struct ActorPosition final {};
-struct ActorVelocity final {};
-
-TEST(Actor, Functionalities) {
+TEST(Actor, Component) {
     entt::DefaultRegistry registry;
-    TestActor *actor = new TestActor{registry};
-    const auto &cactor = *actor;
+    entt::DefaultActor actor{registry};
+    const auto &cactor = actor;
 
-    ASSERT_EQ(&registry, &actor->registry());
+    ASSERT_EQ(&registry, &actor.registry());
     ASSERT_EQ(&registry, &cactor.registry());
-    ASSERT_TRUE(registry.empty<ActorPosition>());
-    ASSERT_TRUE(registry.empty<ActorVelocity>());
+    ASSERT_TRUE(registry.empty<ActorComponent>());
     ASSERT_FALSE(registry.empty());
-    ASSERT_FALSE(actor->has<ActorPosition>());
-    ASSERT_FALSE(actor->has<ActorVelocity>());
+    ASSERT_FALSE(actor.has<ActorComponent>());
 
-    const auto &position = actor->set<ActorPosition>();
+    const auto &component = actor.assign<ActorComponent>();
 
-    ASSERT_EQ(&position, &actor->get<ActorPosition>());
-    ASSERT_EQ(&position, &cactor.get<ActorPosition>());
-    ASSERT_FALSE(registry.empty<ActorPosition>());
-    ASSERT_TRUE(registry.empty<ActorVelocity>());
+    ASSERT_EQ(&component, &actor.get<ActorComponent>());
+    ASSERT_EQ(&component, &cactor.get<ActorComponent>());
+    ASSERT_FALSE(registry.empty<ActorComponent>());
     ASSERT_FALSE(registry.empty());
-    ASSERT_TRUE(actor->has<ActorPosition>());
-    ASSERT_FALSE(actor->has<ActorVelocity>());
+    ASSERT_TRUE(actor.has<ActorComponent>());
 
-    actor->unset<ActorPosition>();
+    actor.remove<ActorComponent>();
 
-    ASSERT_TRUE(registry.empty<ActorPosition>());
-    ASSERT_TRUE(registry.empty<ActorVelocity>());
+    ASSERT_TRUE(registry.empty<ActorComponent>());
     ASSERT_FALSE(registry.empty());
-    ASSERT_FALSE(actor->has<ActorPosition>());
-    ASSERT_FALSE(actor->has<ActorVelocity>());
+    ASSERT_FALSE(actor.has<ActorComponent>());
+}
 
-    actor->set<ActorPosition>();
-    actor->set<ActorVelocity>();
+TEST(Actor, Tag) {
+    entt::DefaultRegistry registry;
+    entt::DefaultActor actor{registry};
+    const auto &cactor = actor;
 
+    ASSERT_EQ(&registry, &actor.registry());
+    ASSERT_EQ(&registry, &cactor.registry());
+    ASSERT_FALSE(registry.has<ActorTag>());
+    ASSERT_FALSE(actor.has<ActorTag>(entt::tag_type_t{}));
+
+    const auto &tag = actor.assign<ActorTag>(entt::tag_type_t{});
+
+    ASSERT_EQ(&tag, &actor.get<ActorTag>(entt::tag_type_t{}));
+    ASSERT_EQ(&tag, &cactor.get<ActorTag>(entt::tag_type_t{}));
+    ASSERT_TRUE(registry.has<ActorTag>());
     ASSERT_FALSE(registry.empty());
-    ASSERT_FALSE(registry.empty<ActorPosition>());
-    ASSERT_FALSE(registry.empty<ActorVelocity>());
+    ASSERT_TRUE(actor.has<ActorTag>(entt::tag_type_t{}));
+
+    actor.remove<ActorTag>(entt::tag_type_t{});
+
+    ASSERT_FALSE(registry.has<ActorTag>());
+    ASSERT_FALSE(registry.empty());
+    ASSERT_FALSE(actor.has<ActorTag>(entt::tag_type_t{}));
+}
+
+TEST(Actor, EntityLifetime) {
+    entt::DefaultRegistry registry;
+    auto *actor = new entt::DefaultActor{registry};
+    actor->assign<ActorComponent>();
+
+    ASSERT_FALSE(registry.empty<ActorComponent>());
+    ASSERT_FALSE(registry.empty());
+
+    registry.each([actor](const auto entity) {
+        ASSERT_EQ(actor->entity(), entity);
+    });
 
     delete actor;
 
+    ASSERT_TRUE(registry.empty<ActorComponent>());
     ASSERT_TRUE(registry.empty());
-    ASSERT_TRUE(registry.empty<ActorPosition>());
-    ASSERT_TRUE(registry.empty<ActorVelocity>());
 }

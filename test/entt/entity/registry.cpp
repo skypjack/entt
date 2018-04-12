@@ -21,6 +21,16 @@ struct ComponentListener {
     int counter{0};
 };
 
+TEST(DefaultRegistry, Types) {
+    entt::DefaultRegistry registry;
+
+    ASSERT_EQ(registry.type<int>(entt::tag_type_t{}), registry.type<int>(entt::tag_type_t{}));
+    ASSERT_EQ(registry.type<int>(), registry.type<int>());
+
+    ASSERT_NE(registry.type<int>(entt::tag_type_t{}), registry.type<double>(entt::tag_type_t{}));
+    ASSERT_NE(registry.type<int>(), registry.type<double>(entt::tag_type_t{}));
+}
+
 TEST(DefaultRegistry, Functionalities) {
     entt::DefaultRegistry registry;
 
@@ -267,16 +277,6 @@ TEST(DefaultRegistry, Orphans) {
 
     registry.orphans([&](auto) { ++tot; });
     ASSERT_EQ(tot, 0u);
-}
-
-TEST(DefaultRegistry, Types) {
-    entt::DefaultRegistry registry;
-
-    ASSERT_EQ(registry.type<int>(entt::tag_type_t{}), registry.type<int>(entt::tag_type_t{}));
-    ASSERT_EQ(registry.type<int>(), registry.type<int>());
-
-    ASSERT_NE(registry.type<int>(entt::tag_type_t{}), registry.type<double>(entt::tag_type_t{}));
-    ASSERT_NE(registry.type<int>(), registry.type<double>(entt::tag_type_t{}));
 }
 
 TEST(DefaultRegistry, CreateDestroyEntities) {

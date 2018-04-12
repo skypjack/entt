@@ -4,16 +4,16 @@
 
 add_library(odr OBJECT odr.cpp)
 
+macro(ADD_ENTT_TEST TEST_NAME TEST_SOURCE)
+    add_executable(${TEST_NAME} $<TARGET_OBJECTS:odr> ${TEST_SOURCE})
+    target_link_libraries(${TEST_NAME} PRIVATE gtest_main Threads::Threads)
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+endmacro()
+
 # Test benchmark
 
 if(BUILD_BENCHMARK)
-    add_executable(
-        benchmark
-        $<TARGET_OBJECTS:odr>
-        benchmark/benchmark.cpp
-    )
-    target_link_libraries(benchmark PRIVATE gtest_main Threads::Threads)
-    add_test(NAME benchmark COMMAND benchmark)
+    ADD_ENTT_TEST(benchmark benchmark/benchmark.cpp)
 endif()
 
 # Test mod
@@ -25,15 +25,9 @@ if(BUILD_MOD)
     execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${DUKTAPE_DEPS_DIR})
     set(DUKTAPE_SRC_DIR ${DUKTAPE_DEPS_DIR}/src/src)
 
-    add_executable(
-        mod
-        $<TARGET_OBJECTS:odr>
-        ${DUKTAPE_SRC_DIR}/duktape.c
-        mod/mod.cpp
-    )
+    set(MOD_TEST_SOURCE ${DUKTAPE_SRC_DIR}/duktape.c mod/mod.cpp)
+    ADD_ENTT_TEST(mod ${MOD_TEST_SOURCE})
     target_include_directories(mod PRIVATE ${DUKTAPE_SRC_DIR})
-    target_link_libraries(mod PRIVATE gtest_main Threads::Threads m)
-    add_test(NAME mod COMMAND mod)
 endif()
 
 # Test snapshot
@@ -45,83 +39,41 @@ if(BUILD_SNAPSHOT)
     execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${CEREAL_DEPS_DIR})
     set(CEREAL_SRC_DIR ${CEREAL_DEPS_DIR}/src/include)
 
-    add_executable(
-        snapshot
-        $<TARGET_OBJECTS:odr>
-        snapshot/snapshot.cpp
-    )
-    target_include_directories(snapshot PRIVATE ${CEREAL_SRC_DIR})
-    target_link_libraries(snapshot PRIVATE gtest_main Threads::Threads)
-    add_test(NAME snapshot COMMAND snapshot)
+    ADD_ENTT_TEST(cereal snapshot/snapshot.cpp)
+    target_include_directories(cereal PRIVATE ${CEREAL_SRC_DIR})
 endif()
 
 # Test core
 
-add_executable(
-    core
-    $<TARGET_OBJECTS:odr>
-    entt/core/family.cpp
-    entt/core/hashed_string.cpp
-    entt/core/ident.cpp
-)
-target_link_libraries(core PRIVATE gtest_main Threads::Threads)
-add_test(NAME core COMMAND core)
+ADD_ENTT_TEST(family entt/core/family.cpp)
+ADD_ENTT_TEST(hashed_string entt/core/hashed_string.cpp)
+ADD_ENTT_TEST(ident entt/core/ident.cpp)
 
 # Test entity
 
-add_executable(
-    entity
-    $<TARGET_OBJECTS:odr>
-    entt/entity/actor.cpp
-    entt/entity/helper.cpp
-    entt/entity/registry.cpp
-    entt/entity/snapshot.cpp
-    entt/entity/sparse_set.cpp
-    entt/entity/view.cpp
-)
-target_link_libraries(entity PRIVATE gtest_main Threads::Threads)
-add_test(NAME entity COMMAND entity)
+ADD_ENTT_TEST(actor entt/entity/actor.cpp)
+ADD_ENTT_TEST(helper entt/entity/helper.cpp)
+ADD_ENTT_TEST(registry entt/entity/registry.cpp)
+ADD_ENTT_TEST(snapshot entt/entity/snapshot.cpp)
+ADD_ENTT_TEST(sparse_set entt/entity/sparse_set.cpp)
+ADD_ENTT_TEST(view entt/entity/view.cpp)
 
 # Test locator
 
-add_executable(
-    locator
-    $<TARGET_OBJECTS:odr>
-    entt/locator/locator.cpp
-)
-target_link_libraries(locator PRIVATE gtest_main Threads::Threads)
-add_test(NAME locator COMMAND locator)
+ADD_ENTT_TEST(locator entt/locator/locator.cpp)
 
 # Test process
 
-add_executable(
-    process
-    $<TARGET_OBJECTS:odr>
-    entt/process/process.cpp
-    entt/process/scheduler.cpp
-)
-target_link_libraries(process PRIVATE gtest_main Threads::Threads)
-add_test(NAME process COMMAND process)
+ADD_ENTT_TEST(process entt/process/process.cpp)
+ADD_ENTT_TEST(scheduler entt/process/scheduler.cpp)
 
 # Test resource
 
-add_executable(
-    resource
-    $<TARGET_OBJECTS:odr>
-    entt/resource/resource.cpp
-)
-target_link_libraries(resource PRIVATE gtest_main Threads::Threads)
-add_test(NAME resource COMMAND resource)
+ADD_ENTT_TEST(resource entt/resource/resource.cpp)
 
 # Test signal
 
-add_executable(
-    signal
-    $<TARGET_OBJECTS:odr>
-    entt/signal/delegate.cpp
-    entt/signal/dispatcher.cpp
-    entt/signal/emitter.cpp
-    entt/signal/sigh.cpp
-)
-target_link_libraries(signal PRIVATE gtest_main Threads::Threads)
-add_test(NAME signal COMMAND signal)
+ADD_ENTT_TEST(delegate entt/signal/delegate.cpp)
+ADD_ENTT_TEST(dispatcher entt/signal/dispatcher.cpp)
+ADD_ENTT_TEST(emitter entt/signal/emitter.cpp)
+ADD_ENTT_TEST(sigh entt/signal/sigh.cpp)
