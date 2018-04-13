@@ -202,8 +202,8 @@ Dell XPS 13 out of the mid 2014):
 
 | Benchmark | EntityX (compile-time) | EnTT |
 |-----------|-------------|-------------|
-| Create 1M entities | 0.0167s | **0.0046s** |
-| Destroy 1M entities | 0.0053s | **0.0037s** |
+| Create 1M entities | 0.0147s | **0.0046s** |
+| Destroy 1M entities | 0.0053s | **0.0048s** |
 | Standard view, 1M entities, one component | 0.0012s | **1.9e-07s** |
 | Standard view, 1M entities, two components | 0.0012s | **3.8e-07s** |
 | Standard view, 1M entities, two components<br/>Half of the entities have all the components | 0.0009s | **3.8e-07s** |
@@ -461,8 +461,8 @@ velocity.dx = 0.;
 velocity.dy = 0.;
 ```
 
-Note that `accommodate` is a slightly faster alternative for the following
-`if`/`else` statement and nothing more:
+Note that `accommodate` is mostly syntactic sugar for the following `if`/`else`
+statement and nothing more:
 
 ```cpp
 if(registry.has<Comp>(entity)) {
@@ -569,6 +569,13 @@ notification and the entity affected by the change. Note also that:
 * Listeners are invoked **after** components have been assigned to entities.
 * Listeners are invoked **before** components have been removed from entities.
 * The order of invocation of the listeners isn't guaranteed in any case.
+
+There are also some limitations on what a listener can and cannot do. In
+particular, connecting and disconnecting other functions from within the body of
+a listener should be avoided. It can result in undefined behavior.<br/>
+In general, events and therefore listeners must not be used as replacements for
+systems. They should not contain much logic and interactions with a registry
+should be kept to a minimum, if possible.
 
 ### Single instance components
 
@@ -757,8 +764,8 @@ It isn't necessary to invoke all these functions each and every time. What
 functions to use in which case mostly depends on the goal and there is not a
 golden rule to do that.
 
-The `entities` member function asks to the registry to serialize all the
-entities that are still in use along with their versions. On the other side, the
+The `entities` member function asks the registry to serialize all the entities
+that are still in use along with their versions. On the other side, the
 `destroyed` member function tells to the registry to serialize the entities that
 have been destroyed and are no longer in use.<br/>
 These two functions can be used to save and restore the whole set of entities
@@ -802,10 +809,10 @@ Example of use:
 InputArchive input;
 
 registry.restore()
-    .entities()
-    .destroyed()
-    .component<AComponent, AnotherComponent>(output)
-    .tag<MyTag>(output)
+    .entities(input)
+    .destroyed(input)
+    .component<AComponent, AnotherComponent>(input)
+    .tag<MyTag>(input)
     .orphans();
 ```
 
@@ -1341,16 +1348,16 @@ not be used frequently to avoid the risk of a performance hit.
   construction of the pools for all their components and access them directly,
   thus avoiding all the checks.
 
-* Most of the _ECS_ available out there have an annoying limitation (at least
+* Most of the _ECS_ available out there have some annoying limitations (at least
   from my point of view): entities and components cannot be created and/or
   destroyed during iterations.<br/>
   `EnTT` partially solves the problem with a few limitations:
 
   * Creating entities and components is allowed during iterations.
-  * Deleting an entity or removing its components is allowed during
-    iterations if it's the one currently returned by a view. For all the
-    other entities, destroying them or removing their components isn't
-    allowed and it can result in undefined behavior.
+  * Deleting an entity or removing its components is allowed during iterations
+    if it's the one currently returned by a view. For all the other entities,
+    destroying them or removing their components isn't allowed and it can result
+    in undefined behavior.
 
   Iterators are invalidated and the behavior is undefined if an entity is
   modified or destroyed and it's not the one currently returned by the

@@ -59,6 +59,8 @@ class Registry {
     }
 
     struct Attachee {
+        Attachee(Entity entity): entity{entity} {}
+        virtual ~Attachee() = default;
         Entity entity;
     };
 
@@ -74,69 +76,20 @@ class Registry {
     };
 
     template<typename Component>
-    struct Pool: SparseSet<Entity, Component> {
-        using sink_type = typename SigH<void(Registry &, Entity)>::sink_type;
-
-        Pool(Registry &registry)
-            : registry{registry}
-        {}
-
-        template<typename... Args>
-        Component & construct(Entity entity, Args &&... args) {
-            auto &component = SparseSet<Entity, Component>::construct(entity, std::forward<Args>(args)...);
-            constructing.publish(registry, entity);
-            return component;
-        }
-
-        void destroy(Entity entity) override {
-            destroying.publish(registry, entity);
-            SparseSet<Entity, Component>::destroy(entity);
-        }
-
-        sink_type construction() noexcept {
-            return constructing.sink();
-        }
-
-        sink_type destruction() noexcept {
-            return destroying.sink();
-        }
-
-    private:
-        Registry &registry;
-        SigH<void(Registry &, Entity)> constructing;
-        SigH<void(Registry &, Entity)> destroying;
-    };
-
-    template<typename Component>
-    bool managed() const noexcept {
-        const auto ctype = component_family::type<Component>();
-        return ctype < pools.size() && pools[ctype];
-    }
-
-    template<typename Component>
-    const Pool<Component> & pool() const noexcept {
-        assert(managed<Component>());
-        return static_cast<Pool<Component> &>(*pools[component_family::type<Component>()]);
-    }
-
-    template<typename Component>
-    Pool<Component> & pool() noexcept {
-        return const_cast<Pool<Component> &>(const_cast<const Registry *>(this)->pool<Component>());
-    }
-
-    template<typename Component>
-    Pool<Component> & assure() {
+    SparseSet<Entity, Component> & assure() {
         const auto ctype = component_family::type<Component>();
 
         if(!(ctype < pools.size())) {
             pools.resize(ctype + 1);
         }
 
-        if(!pools[ctype]) {
-            pools[ctype] = std::make_unique<Pool<Component>>(*this);
+        auto &cpool = std::get<0>(pools[ctype]);
+
+        if(!cpool) {
+            cpool = std::make_unique<SparseSet<Entity, Component>>();
         }
 
-        return pool<Component>();
+        return static_cast<SparseSet<Entity, Component> &>(*cpool);
     }
 
 public:
@@ -150,10 +103,8 @@ public:
     using tag_type = typename tag_family::family_type;
     /*! @brief Unsigned integer type. */
     using component_type = typename component_family::family_type;
-
     /*! @brief Type of sink for the given component. */
-    template<typename Component>
-    using sink_type = typename Pool<Component>::sink_type;
+    using sink_type = typename SigH<void(Registry &, Entity)>::sink_type;
 
     /*! @brief Default constructor. */
     Registry() = default;
@@ -209,7 +160,8 @@ public:
      */
     template<typename Component>
     size_type size() const noexcept {
-        return managed<Component>() ? pool<Component>().size() : size_type{};
+        const auto ctype = component_family::type<Component>();
+        return ((ctype < pools.size()) && std::get<0>(pools[ctype])) ? std::get<0>(pools[ctype])->size() : size_type{};
     }
 
     /**
@@ -262,7 +214,8 @@ public:
      */
     template<typename Component>
     bool empty() const noexcept {
-        return managed<Component>() ? pool<Component>().empty() : true;
+        const auto ctype = component_family::type<Component>();
+        return (!(ctype < pools.size()) || !std::get<0>(pools[ctype]) || std::get<0>(pools[ctype])->empty());
     }
 
     /**
@@ -400,11 +353,15 @@ public:
         next = entt;
         ++available;
 
-        std::for_each(pools.begin(), pools.end(), [entity](auto &cpool) {
+        // changing the number of pools during a destroy is supported now
+        for(std::size_t pos = pools.size(); pos; --pos) {
+            auto &cpool = std::get<0>(pools[pos-1]);
+
             if(cpool && cpool->has(entity)) {
                 cpool->destroy(entity);
+                std::get<2>(pools[pos-1]).publish(*this, entity);
             }
-        });
+        }
     }
 
     /**
@@ -466,7 +423,10 @@ public:
     template<typename Component, typename... Args>
     Component & assign(entity_type entity, Args &&... args) {
         assert(valid(entity));
-        return assure<Component>().construct(entity, std::forward<Args>(args)...);
+        auto &pool = assure<Component>();
+        auto &component = pool.construct(entity, std::forward<Args>(args)...);
+        std::get<1>(pools[component_family::type<Component>()]).publish(*this, entity);
+        return component;
     }
 
     /**
@@ -496,7 +456,8 @@ public:
     template<typename Component>
     void remove(entity_type entity) {
         assert(valid(entity));
-        pool<Component>().destroy(entity);
+        assure<Component>().destroy(entity);
+        std::get<2>(pools[component_family::type<Component>()]).publish(*this, entity);
     }
 
     /**
@@ -531,8 +492,9 @@ public:
         assert(valid(entity));
         using accumulator_type = bool[];
         bool all = true;
-        accumulator_type accumulator = { all, (all = all && managed<Component>() && pool<Component>().has(entity))... };
-        (void)accumulator;
+        auto test = [entity, this](auto ctype) { return (ctype < pools.size()) && std::get<0>(pools[ctype]) && std::get<0>(pools[ctype])->has(entity); };
+        accumulator_type accumulator = { all, (all = all && test(component_family::type<Component>()))... };
+        (void)test, (void)accumulator;
         return all;
     }
 
@@ -588,7 +550,9 @@ public:
     template<typename Component>
     const Component & get(entity_type entity) const noexcept {
         assert(valid(entity));
-        return pool<Component>().get(entity);
+        const auto ctype = component_family::type<Component>();
+        assert((ctype < pools.size()) && std::get<0>(pools[ctype]));
+        return static_cast<SparseSet<Entity, Component> &>(*std::get<0>(pools[ctype])).get(entity);
     }
 
     /**
@@ -755,9 +719,6 @@ public:
      * }
      * @endcode
      *
-     * Prefer this function anyway because it has slightly better
-     * performance.
-     *
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.<br/>
      * An assertion will abort the execution at runtime in debug mode in case of
@@ -771,12 +732,9 @@ public:
      */
     template<typename Component, typename... Args>
     Component & accommodate(entity_type entity, Args &&... args) {
-        assert(valid(entity));
-        auto &cpool = assure<Component>();
-
-        return (cpool.has(entity)
-                ? (cpool.get(entity) = Component{std::forward<Args>(args)...})
-                : cpool.construct(entity, std::forward<Args>(args)...));
+        return (has<Component>(entity)
+                ? replace<Component>(entity, std::forward<Args>(args)...)
+                : assign<Component>(entity, std::forward<Args>(args)...));
     }
 
     /**
@@ -801,8 +759,8 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    sink_type<Component> construction() noexcept {
-        return assure<Component>().construction();
+    sink_type construction() noexcept {
+        return (assure<Component>(), std::get<1>(pools[component_family::type<Component>()]).sink());
     }
 
     /**
@@ -827,8 +785,8 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    sink_type<Component> destruction() noexcept {
-        return assure<Component>().destruction();
+    sink_type destruction() noexcept {
+        return (assure<Component>(), std::get<2>(pools[component_family::type<Component>()]).sink());
     }
 
     /**
@@ -911,13 +869,11 @@ public:
     template<typename Component>
     void reset(entity_type entity) {
         assert(valid(entity));
+        auto &cpool = assure<Component>();
 
-        if(managed<Component>()) {
-            auto &cpool = pool<Component>();
-
-            if(cpool.has(entity)) {
-                cpool.destroy(entity);
-            }
+        if(cpool.has(entity)) {
+            cpool.destroy(entity);
+            std::get<2>(pools[component_family::type<Component>()]).publish(*this, entity);
         }
     }
 
@@ -931,15 +887,15 @@ public:
      */
     template<typename Component>
     void reset() {
-        if(managed<Component>()) {
-            auto &cpool = pool<Component>();
+        auto &cpool = assure<Component>();
+        auto &sig = std::get<2>(pools[component_family::type<Component>()]);
 
-            each([&cpool](auto entity) {
-                if(cpool.has(entity)) {
-                    cpool.destroy(entity);
-                }
-            });
-        }
+        each([&cpool, &sig, this](auto entity) {
+            if(cpool.has(entity)) {
+                cpool.destroy(entity);
+                sig.publish(*this, entity);
+            }
+        });
     }
 
     /**
@@ -1009,7 +965,7 @@ public:
         bool orphan = true;
 
         for(std::size_t i = 0; i < pools.size() && orphan; ++i) {
-            const auto &pool = pools[i];
+            const auto &pool = std::get<0>(pools[i]);
             orphan = !(pool && pool->has(entity));
         }
 
@@ -1118,12 +1074,13 @@ public:
                 handler->construct(entity);
             }
 
-            auto connect = [](auto &pool) {
-                pool.construction().template connect<&Registry::creating<Component...>>();
-                pool.destruction().template connect<&Registry::destroying<Component...>>();
+            auto connect = [this](auto ctype) {
+                auto &cpool = pools[ctype];
+                std::get<1>(cpool).sink().template connect<&Registry::creating<Component...>>();
+                std::get<2>(cpool).sink().template connect<&Registry::destroying<Component...>>();
             };
 
-            accumulator_type accumulator = { (connect(assure<Component>()), 0)... };
+            accumulator_type accumulator = { (assure<Component>(), connect(component_family::type<Component>()), 0)... };
             (void)accumulator;
         }
     }
@@ -1149,13 +1106,14 @@ public:
             using accumulator_type = int[];
             const auto htype = handler_family::type<Component...>();
 
-            auto disconnect = [](auto &pool) {
-                pool.construction().template disconnect<&Registry::creating<Component...>>();
-                pool.destruction().template disconnect<&Registry::destroying<Component...>>();
+            auto disconnect = [this](auto ctype) {
+                auto &cpool = pools[ctype];
+                std::get<1>(cpool).sink().template disconnect<&Registry::creating<Component...>>();
+                std::get<2>(cpool).sink().template disconnect<&Registry::destroying<Component...>>();
             };
 
             // if a set exists, pools have already been created for it
-            accumulator_type accumulator = { (disconnect(pool<Component>()), 0)... };
+            accumulator_type accumulator = { (disconnect(component_family::type<Component>()), 0)... };
             handlers[htype].reset();
             (void)accumulator;
         }
@@ -1215,7 +1173,7 @@ public:
     PersistentView<Entity, Component...> persistent() {
         prepare<Component...>();
         const auto htype = handler_family::type<Component...>();
-        return PersistentView<Entity, Component...>{*handlers[htype], pool<Component>()...};
+        return PersistentView<Entity, Component...>{*handlers[htype], assure<Component>()...};
     }
 
     /**
@@ -1269,7 +1227,7 @@ public:
 
         raw_fn_type raw = [](const Registry &registry, component_type component) -> const entity_type * {
             const auto &pools = registry.pools;
-            return (component < pools.size() && pools[component]) ? pools[component]->data() : nullptr;
+            return (component < pools.size() && std::get<0>(pools[component])) ? std::get<0>(pools[component])->data() : nullptr;
         };
 
         return { *this, seed, available, follow, raw };
@@ -1319,7 +1277,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<SparseSet<Entity>>> handlers;
-    std::vector<std::unique_ptr<SparseSet<Entity>>> pools;
+    std::vector<std::tuple<std::unique_ptr<SparseSet<Entity>>, SigH<void(Registry &, Entity)>, SigH<void(Registry &, Entity)>>> pools;
     std::vector<std::unique_ptr<Attachee>> tags;
     std::vector<entity_type> entities;
     size_type available{};
