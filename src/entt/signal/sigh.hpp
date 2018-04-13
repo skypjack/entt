@@ -306,9 +306,9 @@ public:
      * @param args Arguments to use to invoke listeners.
      */
     void publish(Args... args) {
-        for(auto &&call: calls) {
+        std::for_each(calls.begin(), calls.end(), [&args...](auto &&call) {
             call.second(call.first, args...);
-        }
+        });
     }
 
     /**
@@ -319,9 +319,7 @@ public:
     collector_type collect(Args... args) {
         collector_type collector;
 
-        for(auto pos = calls.size(); pos; --pos) {
-            auto &call = calls[pos-1];
-
+        for(auto &&call: calls) {
             if(!this->invoke(collector, call.second, call.first, args...)) {
                 break;
             }

@@ -47,14 +47,10 @@ class Dispatcher final {
         using sink_type = typename SigH<void(const Event &)>::sink_type;
 
         void publish() override {
-            for(const auto &event: events[current]) {
-                signal.publish(event);
-            }
-
-            events[current].clear();
-
-            ++current;
+            const auto &curr = current++;
             current %= std::extent<decltype(events)>::value;
+            std::for_each(events[curr].cbegin(), events[curr].cend(), [this](const auto &event) { signal.publish(event); });
+            events[curr].clear();
         }
 
         inline sink_type sink() noexcept {
