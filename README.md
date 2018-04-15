@@ -15,8 +15,9 @@
       * [Pay per use](#pay-per-use)
    * [Vademecum](#vademecum)
    * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
-      * [Observe changes](#observe-changes)
       * [Single instance components](#single-instance-components)
+      * [Observe changes](#observe-changes)
+         * [Who let the tags out?](#who-let-the-tags-out?)
       * [Runtime components](#runtime-components)
          * [A journey through a plugin](#a-journey-through-a-plugin)
       * [Sorting: is it possible?](#sorting-is-it-possible)
@@ -529,54 +530,6 @@ std::tuple<Position &, Velocity &> tup = registry.get<Position, Velocity>(entity
 The `get` member function template gives direct access to the component of an
 entity stored in the underlying data structures of the registry.
 
-### Observe changes
-
-Because of how the registry works internally, it stores a couple of signal
-handlers for each pool in order to notify some of its data structures on the
-construction and destruction of components.<br/>
-These signal handlers are also exposed and made available to users. This is the
-basic brick to build fancy things like blueprints and reactive systems.
-
-To get a sink to be used to connect and disconnect listeners so as to be
-notified on the creation of a component, use the `construction` member function:
-
-```cpp
-// connects a free function
-registry.construction<Position>().connect<&MyFreeFunction>();
-
-// connects a member function
-registry.construction<Position>().connect<MyClass, &MyClass::member>(&instance);
-
-// disconnects a free function
-registry.construction<Position>().disconnect<&MyFreeFunction>();
-
-// disconnects a member function
-registry.construction<Position>().disconnect<MyClass, &MyClass::member>(&instance);
-```
-
-To be notified when components are destroyed, use the `destruction` member
-function instead.
-
-The function type of a listener is the same in both cases:
-
-```cpp
-void(Registry<Entity> &, Entity);
-```
-
-In other terms, a listener is provided with the registry that triggered the
-notification and the entity affected by the change. Note also that:
-
-* Listeners are invoked **after** components have been assigned to entities.
-* Listeners are invoked **before** components have been removed from entities.
-* The order of invocation of the listeners isn't guaranteed in any case.
-
-There are also some limitations on what a listener can and cannot do. In
-particular, connecting and disconnecting other functions from within the body of
-a listener should be avoided. It can result in undefined behavior.<br/>
-In general, events and therefore listeners must not be used as replacements for
-systems. They should not contain much logic and interactions with a registry
-should be kept to a minimum, if possible.
-
 ### Single instance components
 
 In those cases where all what is needed is a single instance component, tags are
@@ -651,6 +604,85 @@ auto player = registry.attachee<PlayingCharacter>();
 
 Note that iterating tags isn't possible for obvious reasons. Tags give direct
 access to single entities and nothing more.
+
+### Observe changes
+
+Because of how the registry works internally, it stores a couple of signal
+handlers for each pool in order to notify some of its data structures on the
+construction and destruction of components.<br/>
+These signal handlers are also exposed and made available to users. This is the
+basic brick to build fancy things like blueprints and reactive systems.
+
+To get a sink to be used to connect and disconnect listeners so as to be
+notified on the creation of a component, use the `construction` member function:
+
+```cpp
+// connects a free function
+registry.construction<Position>().connect<&MyFreeFunction>();
+
+// connects a member function
+registry.construction<Position>().connect<MyClass, &MyClass::member>(&instance);
+
+// disconnects a free function
+registry.construction<Position>().disconnect<&MyFreeFunction>();
+
+// disconnects a member function
+registry.construction<Position>().disconnect<MyClass, &MyClass::member>(&instance);
+```
+
+To be notified when components are destroyed, use the `destruction` member
+function instead.
+
+The function type of a listener is the same in both cases:
+
+```cpp
+void(Registry<Entity> &, Entity);
+```
+
+In other terms, a listener is provided with the registry that triggered the
+notification and the entity affected by the change. Note also that:
+
+* Listeners are invoked **after** components have been assigned to entities.
+* Listeners are invoked **before** components have been removed from entities.
+* The order of invocation of the listeners isn't guaranteed in any case.
+
+There are also some limitations on what a listener can and cannot do. In
+particular:
+
+* Connecting and disconnecting other functions from within the body of a
+  listener should be avoided. It can lead to undefined behavior.
+* Assigning and removing components and tags from within the body of a listener
+  that observes the destruction of instances of a given type should be avoided.
+  It can lead to undefined behavior. This type of listeners is intended to
+  provide users with an easy way to perform cleanup and nothing more.
+
+In general, events and therefore listeners must not be used as replacements for
+systems. They should not contain much logic and interactions with a registry
+should be kept to a minimum, if possible. Note also that the greater the number
+of listeners, the greater the performance hit when components are created or
+destroyed.
+
+#### Who let the tags out?
+
+As an extension, signals are also provided with tags. Although they are not
+strictly required internally, it makes sense that an user expects signal support
+even when it comes to tags actually.<br/>
+Signals for tags undergo exactly the same requirements of those introduced for
+components. Also the function type for a listener is the same and it's invoked
+with the same guarantees discussed above.
+
+To get the sinks for a tag just use `entt::tag_type_t` to disambiguate overloads
+of member functions as in the following example:
+
+```cpp
+registry.construction<MyTag>(entt::tag_type_t{}).connect<&MyFreeFunction>();
+registry.destruction<MyTag>(entt::tag_type_t{}).connect<MyClass, &MyClass::member>(&instance);
+```
+
+Listeners for tags and components are managed separately and do not influence
+each other in any case. Therefore, note that the greater the number of listeners
+for a type, the greater the performance hit when a tag of the given type is
+created or destroyed.
 
 ### Runtime components
 
