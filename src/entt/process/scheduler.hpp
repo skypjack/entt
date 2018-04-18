@@ -8,6 +8,7 @@
 #include <iterator>
 #include <algorithm>
 #include <type_traits>
+#include "../config/config.h"
 #include "process.hpp"
 
 
@@ -130,7 +131,7 @@ public:
     using size_type = typename std::vector<ProcessHandler>::size_type;
 
     /*! @brief Default constructor. */
-    Scheduler() noexcept= default;
+    Scheduler() ENTT_NOEXCEPT = default;
 
     /*! @brief Copying a scheduler isn't allowed. */
     Scheduler(const Scheduler &) = delete;
@@ -146,7 +147,7 @@ public:
      * @brief Number of processes currently scheduled.
      * @return Number of processes currently scheduled.
      */
-    size_type size() const noexcept {
+    size_type size() const ENTT_NOEXCEPT {
         return handlers.size();
     }
 
@@ -154,7 +155,7 @@ public:
      * @brief Returns true if at least a process is currently scheduled.
      * @return True if there are scheduled processes, false otherwise.
      */
-    bool empty() const noexcept {
+    bool empty() const ENTT_NOEXCEPT {
         return handlers.empty();
     }
 

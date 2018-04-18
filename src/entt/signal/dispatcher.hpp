@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <type_traits>
+#include "../config/config.h"
 #include "../core/family.hpp"
 #include "sigh.hpp"
 
@@ -53,7 +54,7 @@ class Dispatcher final {
             events[curr].clear();
         }
 
-        inline sink_type sink() noexcept {
+        inline sink_type sink() ENTT_NOEXCEPT {
             return signal.sink();
         }
 
@@ -111,7 +112,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Event>
-    inline sink_type<Event> sink() noexcept {
+    inline sink_type<Event> sink() ENTT_NOEXCEPT {
         return wrapper<Event>().sink();
     }
 

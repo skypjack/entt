@@ -5,6 +5,7 @@
 #include<type_traits>
 #include<cstddef>
 #include<atomic>
+#include "../config/config.h"
 
 
 namespace entt {
@@ -22,7 +23,7 @@ class Family {
     static std::atomic<std::size_t> identifier;
 
     template<typename...>
-    static std::size_t family() noexcept {
+    static std::size_t family() ENTT_NOEXCEPT {
         static const std::size_t value = identifier.fetch_add(1);
         return value;
     }
@@ -36,7 +37,7 @@ public:
      * @return Statically generated unique identifier for the given type.
      */
     template<typename... Type>
-    inline static family_type type() noexcept {
+    inline static family_type type() ENTT_NOEXCEPT {
         return family<std::decay_t<Type>...>();
     }
 };

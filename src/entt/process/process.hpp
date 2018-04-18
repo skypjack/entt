@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <functional>
 #include <utility>
+#include "../config/config.h"
 
 
 namespace entt {
@@ -123,7 +124,7 @@ protected:
      * The function is idempotent and it does nothing if the process isn't
      * alive.
      */
-    void succeed() noexcept {
+    void succeed() ENTT_NOEXCEPT {
         if(alive()) {
             current = State::SUCCEEDED;
         }
@@ -135,7 +136,7 @@ protected:
      * The function is idempotent and it does nothing if the process isn't
      * alive.
      */
-    void fail() noexcept {
+    void fail() ENTT_NOEXCEPT {
         if(alive()) {
             current = State::FAILED;
         }
@@ -147,7 +148,7 @@ protected:
      * The function is idempotent and it does nothing if the process isn't
      * running.
      */
-    void pause() noexcept {
+    void pause() ENTT_NOEXCEPT {
         if(current == State::RUNNING) {
             current = State::PAUSED;
         }
@@ -159,7 +160,7 @@ protected:
      * The function is idempotent and it does nothing if the process isn't
      * paused.
      */
-    void unpause() noexcept {
+    void unpause() ENTT_NOEXCEPT {
         if(current  == State::PAUSED) {
             current  = State::RUNNING;
         }
@@ -170,7 +171,7 @@ public:
     using delta_type = Delta;
 
     /*! @brief Default destructor. */
-    virtual ~Process() noexcept {
+    virtual ~Process() ENTT_NOEXCEPT {
         static_assert(std::is_base_of<Process, Derived>::value, "!");
     }
 
@@ -182,7 +183,7 @@ public:
      *
      * @param immediately Requests an immediate operation.
      */
-    void abort(bool immediately = false) noexcept {
+    void abort(bool immediately = false) ENTT_NOEXCEPT {
         if(alive()) {
             current = State::ABORTED;
 
@@ -196,7 +197,7 @@ public:
      * @brief Returns true if a process is either running or paused.
      * @return True if the process is still alive, false otherwise.
      */
-    bool alive() const noexcept {
+    bool alive() const ENTT_NOEXCEPT {
         return current == State::RUNNING || current == State::PAUSED;
     }
 
@@ -204,7 +205,7 @@ public:
      * @brief Returns true if a process is already terminated.
      * @return True if the process is terminated, false otherwise.
      */
-    bool dead() const noexcept {
+    bool dead() const ENTT_NOEXCEPT {
         return current == State::FINISHED;
     }
 
@@ -212,7 +213,7 @@ public:
      * @brief Returns true if a process is currently paused.
      * @return True if the process is paused, false otherwise.
      */
-    bool paused() const noexcept {
+    bool paused() const ENTT_NOEXCEPT {
         return current == State::PAUSED;
     }
 
@@ -220,7 +221,7 @@ public:
      * @brief Returns true if a process terminated with errors.
      * @return True if the process terminated with errors, false otherwise.
      */
-    bool rejected() const noexcept {
+    bool rejected() const ENTT_NOEXCEPT {
         return stopped;
     }
 

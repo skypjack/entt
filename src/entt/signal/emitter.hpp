@@ -10,6 +10,7 @@
 #include <memory>
 #include <vector>
 #include <list>
+#include "../config/config.h"
 
 
 namespace entt {
@@ -40,8 +41,8 @@ template<typename Derived>
 class Emitter {
     struct BaseHandler {
         virtual ~BaseHandler() = default;
-        virtual bool empty() const noexcept = 0;
-        virtual void clear() noexcept = 0;
+        virtual bool empty() const ENTT_NOEXCEPT = 0;
+        virtual void clear() ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
@@ -51,14 +52,14 @@ class Emitter {
         using container_type = std::list<element_type>;
         using connection_type = typename container_type::iterator;
 
-        bool empty() const noexcept override {
+        bool empty() const ENTT_NOEXCEPT override {
             auto pred = [](auto &&element) { return element.first; };
 
             return std::all_of(onceL.cbegin(), onceL.cend(), pred) &&
                     std::all_of(onL.cbegin(), onL.cend(), pred);
         }
 
-        void clear() noexcept override {
+        void clear() ENTT_NOEXCEPT override {
             if(publishing) {
                 auto func = [](auto &&element) { element.first = true; };
                 std::for_each(onceL.begin(), onceL.end(), func);
@@ -77,7 +78,7 @@ class Emitter {
             return onL.emplace(onL.cend(), false, std::move(listener));
         }
 
-        void erase(connection_type conn) noexcept {
+        void erase(connection_type conn) ENTT_NOEXCEPT {
             conn->first = true;
 
             if(!publishing) {
@@ -111,19 +112,19 @@ class Emitter {
         container_type onL{};
     };
 
-    static std::size_t next() noexcept {
+    static std::size_t next() ENTT_NOEXCEPT {
         static std::size_t counter = 0;
         return counter++;
     }
 
     template<typename>
-    static std::size_t type() noexcept {
+    static std::size_t type() ENTT_NOEXCEPT {
         static std::size_t value = next();
         return value;
     }
 
     template<typename Event>
-    Handler<Event> & handler() noexcept {
+    Handler<Event> & handler() ENTT_NOEXCEPT {
         const std::size_t family = type<Event>();
 
         if(!(family < handlers.size())) {
@@ -157,7 +158,7 @@ public:
         friend class Emitter;
 
         /*! @brief Default constructor. */
-        Connection() noexcept = default;
+        Connection() ENTT_NOEXCEPT = default;
 
         /**
          * @brief Creates a connection that wraps its underlying instance.
@@ -186,10 +187,10 @@ public:
     };
 
     /*! @brief Default constructor. */
-    Emitter() noexcept = default;
+    Emitter() ENTT_NOEXCEPT = default;
 
     /*! @brief Default destructor. */
-    virtual ~Emitter() noexcept {
+    virtual ~Emitter() ENTT_NOEXCEPT {
         static_assert(std::is_base_of<Emitter<Derived>, Derived>::value, "!");
     }
 
@@ -279,7 +280,7 @@ public:
      * @param conn A valid connection.
      */
     template<typename Event>
-    void erase(Connection<Event> conn) noexcept {
+    void erase(Connection<Event> conn) ENTT_NOEXCEPT {
         handler<Event>().erase(std::move(conn));
     }
 
@@ -292,7 +293,7 @@ public:
      * @tparam Event Type of event to reset.
      */
     template<typename Event>
-    void clear() noexcept {
+    void clear() ENTT_NOEXCEPT {
         handler<Event>().clear();
     }
 
@@ -302,7 +303,7 @@ public:
      * All the connections previously returned are invalidated. Using them
      * results in undefined behavior.
      */
-    void clear() noexcept {
+    void clear() ENTT_NOEXCEPT {
         std::for_each(handlers.begin(), handlers.end(),
                       [](auto &&handler) { if(handler) { handler->clear(); } });
     }
@@ -313,7 +314,7 @@ public:
      * @return True if there are no listeners registered, false otherwise.
      */
     template<typename Event>
-    bool empty() const noexcept {
+    bool empty() const ENTT_NOEXCEPT {
         const std::size_t family = type<Event>();
 
         return (!(family < handlers.size()) ||
@@ -325,7 +326,7 @@ public:
      * @brief Checks if there are listeners registered with the event emitter.
      * @return True if there are no listeners registered, false otherwise.
      */
-    bool empty() const noexcept {
+    bool empty() const ENTT_NOEXCEPT {
         return std::all_of(handlers.cbegin(), handlers.cend(),
                            [](auto &&handler) { return !handler || handler->empty(); });
     }

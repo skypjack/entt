@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <cassert>
 #include <type_traits>
+#include "../config/config.h"
 #include "entt_traits.hpp"
 
 
@@ -68,33 +69,33 @@ class SparseSet<Entity> {
             : direct{direct}, pos{pos}
         {}
 
-        Iterator & operator++() noexcept {
+        Iterator & operator++() ENTT_NOEXCEPT {
             return --pos, *this;
         }
 
-        Iterator operator++(int) noexcept {
+        Iterator operator++(int) ENTT_NOEXCEPT {
             Iterator orig = *this;
             return ++(*this), orig;
         }
 
-        Iterator & operator+=(difference_type value) noexcept {
+        Iterator & operator+=(difference_type value) ENTT_NOEXCEPT {
             pos -= value;
             return *this;
         }
 
-        Iterator operator+(difference_type value) noexcept {
+        Iterator operator+(difference_type value) ENTT_NOEXCEPT {
             return Iterator{direct, pos-value};
         }
 
-        bool operator==(const Iterator &other) const noexcept {
+        bool operator==(const Iterator &other) const ENTT_NOEXCEPT {
             return other.pos == pos;
         }
 
-        bool operator!=(const Iterator &other) const noexcept {
+        bool operator!=(const Iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
-        reference operator*() const noexcept {
+        reference operator*() const ENTT_NOEXCEPT {
             return direct[pos-1];
         }
 
@@ -116,10 +117,10 @@ public:
     using iterator_type = Iterator;
 
     /*! @brief Default constructor. */
-    SparseSet() noexcept = default;
+    SparseSet() ENTT_NOEXCEPT = default;
 
     /*! @brief Default destructor. */
-    virtual ~SparseSet() noexcept = default;
+    virtual ~SparseSet() ENTT_NOEXCEPT = default;
 
     /*! @brief Copying a sparse set isn't allowed. */
     SparseSet(const SparseSet &) = delete;
@@ -153,7 +154,7 @@ public:
      *
      * @return Extent of the sparse set.
      */
-    size_type extent() const noexcept {
+    size_type extent() const ENTT_NOEXCEPT {
         return reverse.size();
     }
 
@@ -167,7 +168,7 @@ public:
      *
      * @return Number of elements.
      */
-    size_type size() const noexcept {
+    size_type size() const ENTT_NOEXCEPT {
         return direct.size();
     }
 
@@ -175,7 +176,7 @@ public:
      * @brief Checks whether a sparse set is empty.
      * @return True if the sparse set is empty, false otherwise.
      */
-    bool empty() const noexcept {
+    bool empty() const ENTT_NOEXCEPT {
         return direct.empty();
     }
 
@@ -194,7 +195,7 @@ public:
      *
      * @return A pointer to the internal packed array.
      */
-    const entity_type * data() const noexcept {
+    const entity_type * data() const ENTT_NOEXCEPT {
         return direct.data();
     }
 
@@ -210,7 +211,7 @@ public:
      *
      * @return An iterator to the first entity of the internal packed array.
      */
-    iterator_type begin() const noexcept {
+    iterator_type begin() const ENTT_NOEXCEPT {
         return Iterator{direct, direct.size()};
     }
 
@@ -227,7 +228,7 @@ public:
      * @return An iterator to the element following the last entity of the
      * internal packed array.
      */
-    iterator_type end() const noexcept {
+    iterator_type end() const ENTT_NOEXCEPT {
         return Iterator{direct, 0};
     }
 
@@ -236,7 +237,7 @@ public:
      * @param entity A valid entity identifier.
      * @return True if the sparse set contains the entity, false otherwise.
      */
-    bool has(entity_type entity) const noexcept {
+    bool has(entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
         // the in-use control bit permits to avoid accessing the direct vector
         return (pos < reverse.size()) && (reverse[pos] != pending);
@@ -259,7 +260,7 @@ public:
      * @param entity A valid entity identifier.
      * @return True if the sparse set contains the entity, false otherwise.
      */
-    bool fast(entity_type entity) const noexcept {
+    bool fast(entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
         assert(pos < reverse.size());
         // the in-use control bit permits to avoid accessing the direct vector
@@ -278,7 +279,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The position of the entity in the sparse set.
      */
-    pos_type get(entity_type entity) const noexcept {
+    pos_type get(entity_type entity) const ENTT_NOEXCEPT {
         assert(has(entity));
         return reverse[entity & traits_type::entity_mask];
     }
@@ -344,7 +345,7 @@ public:
      * @param lhs A valid position within the sparse set.
      * @param rhs A valid position within the sparse set.
      */
-    void swap(pos_type lhs, pos_type rhs) noexcept {
+    void swap(pos_type lhs, pos_type rhs) ENTT_NOEXCEPT {
         assert(lhs < direct.size());
         assert(rhs < direct.size());
         auto &src = direct[lhs];
@@ -372,7 +373,7 @@ public:
      *
      * @param other The sparse sets that imposes the order of the entities.
      */
-    void respect(const SparseSet<Entity> &other) noexcept {
+    void respect(const SparseSet<Entity> &other) ENTT_NOEXCEPT {
         auto from = other.begin();
         auto to = other.end();
 
@@ -442,37 +443,37 @@ class SparseSet<Entity, Type>: public SparseSet<Entity> {
             : instances{instances}, pos{pos}
         {}
 
-        Iterator & operator++() noexcept {
+        Iterator & operator++() ENTT_NOEXCEPT {
             return --pos, *this;
         }
 
-        Iterator operator++(int) noexcept {
+        Iterator operator++(int) ENTT_NOEXCEPT {
             Iterator orig = *this;
             return ++(*this), orig;
         }
 
-        Iterator & operator+=(difference_type value) noexcept {
+        Iterator & operator+=(difference_type value) ENTT_NOEXCEPT {
             pos -= value;
             return *this;
         }
 
-        Iterator operator+(difference_type value) noexcept {
+        Iterator operator+(difference_type value) ENTT_NOEXCEPT {
             return Iterator{instances, pos-value};
         }
 
-        bool operator==(const Iterator &other) const noexcept {
+        bool operator==(const Iterator &other) const ENTT_NOEXCEPT {
             return other.pos == pos;
         }
 
-        bool operator!=(const Iterator &other) const noexcept {
+        bool operator!=(const Iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
-        reference operator*() noexcept {
+        reference operator*() ENTT_NOEXCEPT {
             return instances[pos-1];
         }
 
-        pointer operator->() noexcept {
+        pointer operator->() ENTT_NOEXCEPT {
             return &instances.data()[pos-1];
         }
 
@@ -494,7 +495,7 @@ public:
     using iterator_type = Iterator;
 
     /*! @brief Default constructor. */
-    SparseSet() noexcept = default;
+    SparseSet() ENTT_NOEXCEPT = default;
 
     /*! @brief Copying a sparse set isn't allowed. */
     SparseSet(const SparseSet &) = delete;
@@ -534,7 +535,7 @@ public:
      *
      * @return A pointer to the array of objects.
      */
-    const object_type * raw() const noexcept {
+    const object_type * raw() const ENTT_NOEXCEPT {
         return instances.data();
     }
 
@@ -553,7 +554,7 @@ public:
      *
      * @return A pointer to the array of objects.
      */
-    object_type * raw() noexcept {
+    object_type * raw() ENTT_NOEXCEPT {
         return instances.data();
     }
 
@@ -569,7 +570,7 @@ public:
      *
      * @return An iterator to the first instance of the given type.
      */
-    iterator_type begin() noexcept {
+    iterator_type begin() ENTT_NOEXCEPT {
         return Iterator{instances, instances.size()};
     }
 
@@ -587,7 +588,7 @@ public:
      * @return An iterator to the element following the last instance of the
      * given type.
      */
-    iterator_type end() noexcept {
+    iterator_type end() ENTT_NOEXCEPT {
         return Iterator{instances, 0};
     }
 
@@ -603,7 +604,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The object associated to the entity.
      */
-    const object_type & get(entity_type entity) const noexcept {
+    const object_type & get(entity_type entity) const ENTT_NOEXCEPT {
         return instances[underlying_type::get(entity)];
     }
 
@@ -619,7 +620,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The object associated to the entity.
      */
-    object_type & get(entity_type entity) noexcept {
+    object_type & get(entity_type entity) ENTT_NOEXCEPT {
         return const_cast<object_type &>(const_cast<const SparseSet *>(this)->get(entity));
     }
 
@@ -770,7 +771,7 @@ public:
      *
      * @param other The sparse sets that imposes the order of the entities.
      */
-    void respect(const SparseSet<Entity> &other) noexcept {
+    void respect(const SparseSet<Entity> &other) ENTT_NOEXCEPT {
         auto from = other.begin();
         auto to = other.end();
 

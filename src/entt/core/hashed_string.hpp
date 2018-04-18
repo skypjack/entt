@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include "../config/config.h"
 
 
 namespace entt {
@@ -21,7 +22,7 @@ namespace entt {
 class HashedString final {
     struct ConstCharWrapper final {
         // non-explicit constructor on purpose
-        constexpr ConstCharWrapper(const char *str) noexcept: str{str} {}
+        constexpr ConstCharWrapper(const char *str) ENTT_NOEXCEPT: str{str} {}
         const char *str;
     };
 
@@ -29,7 +30,7 @@ class HashedString final {
     static constexpr std::uint64_t prime = 1099511628211ull;
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    static constexpr std::uint64_t helper(std::uint64_t partial, const char *str) noexcept {
+    static constexpr std::uint64_t helper(std::uint64_t partial, const char *str) ENTT_NOEXCEPT {
         return str[0] == 0 ? partial : helper((partial^str[0])*prime, str+1);
     }
 
@@ -52,7 +53,7 @@ public:
      * @param str Human-readable identifer.
      */
     template <std::size_t N>
-    constexpr HashedString(const char (&str)[N]) noexcept
+    constexpr HashedString(const char (&str)[N]) ENTT_NOEXCEPT
         : hash{helper(offset, str)}, str{str}
     {}
 
@@ -62,7 +63,7 @@ public:
      *
      * @param wrapper Helps achieving the purpose by relying on overloading.
      */
-    explicit constexpr HashedString(ConstCharWrapper wrapper) noexcept
+    explicit constexpr HashedString(ConstCharWrapper wrapper) ENTT_NOEXCEPT
         : hash{helper(offset, wrapper.str)}, str{wrapper.str}
     {}
 
@@ -70,20 +71,20 @@ public:
      * @brief Returns the human-readable representation of a hashed string.
      * @return The string used to initialize the instance.
      */
-    constexpr operator const char *() const noexcept { return str; }
+    constexpr operator const char *() const ENTT_NOEXCEPT { return str; }
 
     /**
      * @brief Returns the numeric representation of a hashed string.
      * @return The numeric representation of the instance.
      */
-    constexpr operator hash_type() const noexcept { return hash; }
+    constexpr operator hash_type() const ENTT_NOEXCEPT { return hash; }
 
     /**
      * @brief Compares two hashed strings.
      * @param other Hashed string with which to compare.
      * @return True if the two hashed strings are identical, false otherwise.
      */
-    constexpr bool operator==(const HashedString &other) const noexcept {
+    constexpr bool operator==(const HashedString &other) const ENTT_NOEXCEPT {
         return hash == other.hash;
     }
 
@@ -99,7 +100,7 @@ private:
  * @param rhs A valid hashed string.
  * @return True if the two hashed strings are identical, false otherwise.
  */
-constexpr bool operator!=(const HashedString &lhs, const HashedString &rhs) noexcept {
+constexpr bool operator!=(const HashedString &lhs, const HashedString &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 

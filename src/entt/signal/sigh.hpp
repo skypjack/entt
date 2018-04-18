@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <utility>
 #include <vector>
+#include "../config/config.h"
 
 
 namespace entt {
@@ -52,14 +53,14 @@ struct Invoker<void(Args...), Collector> {
 template<typename Ret>
 struct NullCollector final {
     using result_type = Ret;
-    bool operator()(result_type) const noexcept { return true; }
+    bool operator()(result_type) const ENTT_NOEXCEPT { return true; }
 };
 
 
 template<>
 struct NullCollector<void> final {
     using result_type = void;
-    bool operator()() const noexcept { return true; }
+    bool operator()() const ENTT_NOEXCEPT { return true; }
 };
 
 
@@ -273,7 +274,7 @@ public:
      * @brief Number of listeners connected to the signal.
      * @return Number of listeners currently connected.
      */
-    size_type size() const noexcept {
+    size_type size() const ENTT_NOEXCEPT {
         return calls.size();
     }
 
@@ -281,7 +282,7 @@ public:
      * @brief Returns false if at least a listener is connected to the signal.
      * @return True if the signal has no listeners connected, false otherwise.
      */
-    bool empty() const noexcept {
+    bool empty() const ENTT_NOEXCEPT {
         return calls.empty();
     }
 
@@ -347,7 +348,7 @@ public:
      * @param other Signal with which to compare.
      * @return True if the two signals are identical, false otherwise.
      */
-    bool operator==(const SigH &other) const noexcept {
+    bool operator==(const SigH &other) const ENTT_NOEXCEPT {
         return std::equal(calls.cbegin(), calls.cend(), other.calls.cbegin(), other.calls.cend());
     }
 
@@ -369,7 +370,7 @@ private:
  * @return True if the two signals are different, false otherwise.
  */
 template<typename Ret, typename... Args>
-bool operator!=(const SigH<Ret(Args...)> &lhs, const SigH<Ret(Args...)> &rhs) noexcept {
+bool operator!=(const SigH<Ret(Args...)> &lhs, const SigH<Ret(Args...)> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 

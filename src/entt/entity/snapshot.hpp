@@ -9,6 +9,7 @@
 #include <cassert>
 #include <iterator>
 #include <type_traits>
+#include "../config/config.h"
 #include "entt_traits.hpp"
 #include "utility.hpp"
 
@@ -41,7 +42,7 @@ class Snapshot final {
     using follow_fn_type = Entity(*)(const Registry<Entity> &, Entity);
     using raw_fn_type = const Entity *(*)(const Registry<Entity> &, typename Registry<Entity>::component_type);
 
-    Snapshot(const Registry<Entity> &registry, Entity seed, std::size_t size, follow_fn_type follow, raw_fn_type raw) noexcept
+    Snapshot(const Registry<Entity> &registry, Entity seed, std::size_t size, follow_fn_type follow, raw_fn_type raw) ENTT_NOEXCEPT
         : registry{registry},
           seed{seed},
           size{size},
@@ -196,7 +197,7 @@ class SnapshotLoader final {
 
     using assure_fn_type = void(*)(Registry<Entity> &, Entity, bool);
 
-    SnapshotLoader(Registry<Entity> &registry, assure_fn_type assure_fn) noexcept
+    SnapshotLoader(Registry<Entity> &registry, assure_fn_type assure_fn) ENTT_NOEXCEPT
         : registry{registry},
           assure_fn{assure_fn}
     {
@@ -490,7 +491,7 @@ public:
      * @brief Constructs a loader that is bound to a given registry.
      * @param registry A valid reference to a registry.
      */
-    ContinuousLoader(Registry<entity_type> &registry) noexcept
+    ContinuousLoader(Registry<entity_type> &registry) ENTT_NOEXCEPT
         : registry{registry}
     {}
 

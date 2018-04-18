@@ -3,6 +3,7 @@
 
 
 #include <utility>
+#include "../config/config.h"
 
 
 namespace entt {
@@ -36,7 +37,7 @@ class Delegate<Ret(Args...)> final {
     using proto_type = Ret(*)(void *, Args...);
     using stub_type = std::pair<void *, proto_type>;
 
-    static Ret fallback(void *, Args...) noexcept { return {}; }
+    static Ret fallback(void *, Args...) ENTT_NOEXCEPT { return {}; }
 
     template<Ret(*Function)(Args...)>
     static Ret proto(void *, Args... args) {
@@ -50,7 +51,7 @@ class Delegate<Ret(Args...)> final {
 
 public:
     /*! @brief Default constructor. */
-    Delegate() noexcept
+    Delegate() ENTT_NOEXCEPT
         : stub{std::make_pair(nullptr, &fallback)}
     {}
 
@@ -59,7 +60,7 @@ public:
      * @tparam Function A valid free function pointer.
      */
     template<Ret(*Function)(Args...)>
-    void connect() noexcept {
+    void connect() ENTT_NOEXCEPT {
         stub = std::make_pair(nullptr, &proto<Function>);
     }
 
@@ -75,7 +76,7 @@ public:
      * @param instance A valid instance of type pointer to `Class`.
      */
     template<typename Class, Ret(Class::*Member)(Args...)>
-    void connect(Class *instance) noexcept {
+    void connect(Class *instance) ENTT_NOEXCEPT {
         stub = std::make_pair(instance, &proto<Class, Member>);
     }
 
@@ -84,7 +85,7 @@ public:
      *
      * After a reset, a delegate can be safely invoked with no effect.
      */
-    void reset() noexcept {
+    void reset() ENTT_NOEXCEPT {
         stub = std::make_pair(nullptr, &fallback);
     }
 
@@ -105,7 +106,7 @@ public:
      * @param other Delegate with which to compare.
      * @return True if the two delegates are identical, false otherwise.
      */
-    bool operator==(const Delegate<Ret(Args...)> &other) const noexcept {
+    bool operator==(const Delegate<Ret(Args...)> &other) const ENTT_NOEXCEPT {
         return stub.first == other.stub.first && stub.second == other.stub.second;
     }
 
@@ -126,7 +127,7 @@ private:
  * @return True if the two delegates are different, false otherwise.
  */
 template<typename Ret, typename... Args>
-bool operator!=(const Delegate<Ret(Args...)> &lhs, const Delegate<Ret(Args...)> &rhs) noexcept {
+bool operator!=(const Delegate<Ret(Args...)> &lhs, const Delegate<Ret(Args...)> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 

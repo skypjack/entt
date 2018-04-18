@@ -5,6 +5,7 @@
 #include <memory>
 #include <utility>
 #include <cassert>
+#include "../config/config.h"
 
 
 namespace entt {
@@ -31,20 +32,20 @@ class ResourceHandle final {
     /*! @brief Resource handles are friends of their caches. */
     friend class ResourceCache<Resource>;
 
-    ResourceHandle(std::shared_ptr<Resource> res) noexcept
+    ResourceHandle(std::shared_ptr<Resource> res) ENTT_NOEXCEPT
         : resource{std::move(res)}
     {}
 
 public:
     /*! @brief Default copy constructor. */
-    ResourceHandle(const ResourceHandle &) noexcept = default;
+    ResourceHandle(const ResourceHandle &) ENTT_NOEXCEPT = default;
     /*! @brief Default move constructor. */
-    ResourceHandle(ResourceHandle &&) noexcept = default;
+    ResourceHandle(ResourceHandle &&) ENTT_NOEXCEPT = default;
 
     /*! @brief Default copy assignment operator. @return This handle. */
-    ResourceHandle & operator=(const ResourceHandle &) noexcept = default;
+    ResourceHandle & operator=(const ResourceHandle &) ENTT_NOEXCEPT = default;
     /*! @brief Default move assignment operator. @return This handle. */
-    ResourceHandle & operator=(ResourceHandle &&) noexcept = default;
+    ResourceHandle & operator=(ResourceHandle &&) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Gets a reference to the managed resource.
@@ -56,7 +57,7 @@ public:
      *
      * @return A reference to the managed resource.
      */
-    const Resource & get() const noexcept {
+    const Resource & get() const ENTT_NOEXCEPT {
         assert(static_cast<bool>(resource));
         return *resource;
     }
@@ -69,7 +70,7 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * handle is empty.
      */
-    inline operator const Resource & () const noexcept { return get(); }
+    inline operator const Resource & () const ENTT_NOEXCEPT { return get(); }
 
     /**
      * @brief Dereferences a handle to obtain the managed resource.
@@ -81,7 +82,7 @@ public:
      *
      * @return A reference to the managed resource.
      */
-    inline const Resource & operator *() const noexcept { return get(); }
+    inline const Resource & operator *() const ENTT_NOEXCEPT { return get(); }
 
     /**
      * @brief Gets a pointer to the managed resource from a handle .
@@ -94,7 +95,7 @@ public:
      * @return A pointer to the managed resource or `nullptr` if the handle
      * contains no resource at all.
      */
-    inline const Resource * operator ->() const noexcept {
+    inline const Resource * operator ->() const ENTT_NOEXCEPT {
         assert(static_cast<bool>(resource));
         return resource.get();
     }

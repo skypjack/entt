@@ -11,6 +11,7 @@
 #include <cassert>
 #include <algorithm>
 #include <type_traits>
+#include "../config/config.h"
 #include "../core/family.hpp"
 #include "../signal/sigh.hpp"
 #include "entt_traits.hpp"
@@ -71,14 +72,14 @@ class Registry {
     };
 
     template<typename Component>
-    const SparseSet<Entity, Component> & pool() const noexcept {
+    const SparseSet<Entity, Component> & pool() const ENTT_NOEXCEPT {
         const auto ctype = component_family::type<Component>();
         assert(ctype < pools.size() && std::get<0>(pools[ctype]));
         return static_cast<SparseSet<Entity, Component> &>(*std::get<0>(pools[ctype]));
     }
 
     template<typename Component>
-    SparseSet<Entity, Component> & pool() noexcept {
+    SparseSet<Entity, Component> & pool() ENTT_NOEXCEPT {
         return const_cast<SparseSet<Entity, Component> &>(const_cast<const Registry *>(this)->pool<Component>());
     }
 
@@ -146,7 +147,7 @@ public:
      * @return Runtime numeric identifier of the given type of tag.
      */
     template<typename Tag>
-    tag_type type(tag_type_t) const noexcept {
+    tag_type type(tag_type_t) const ENTT_NOEXCEPT {
         return tag_family::type<Tag>();
     }
 
@@ -163,7 +164,7 @@ public:
      * @return Runtime numeric identifier of the given type of component.
      */
     template<typename Component>
-    component_type type() const noexcept {
+    component_type type() const ENTT_NOEXCEPT {
         return component_family::type<Component>();
     }
 
@@ -173,7 +174,7 @@ public:
      * @return Number of existing components of the given type.
      */
     template<typename Component>
-    size_type size() const noexcept {
+    size_type size() const ENTT_NOEXCEPT {
         const auto ctype = component_family::type<Component>();
         return ((ctype < pools.size()) && std::get<0>(pools[ctype])) ? std::get<0>(pools[ctype])->size() : size_type{};
     }
@@ -182,7 +183,7 @@ public:
      * @brief Returns the number of entities still in use.
      * @return Number of entities still in use.
      */
-    size_type size() const noexcept {
+    size_type size() const ENTT_NOEXCEPT {
         return entities.size() - available;
     }
 
@@ -217,7 +218,7 @@ public:
      * @brief Returns the number of entities ever created.
      * @return Number of entities ever created.
      */
-    size_type capacity() const noexcept {
+    size_type capacity() const ENTT_NOEXCEPT {
         return entities.size();
     }
 
@@ -228,7 +229,7 @@ public:
      * otherwise.
      */
     template<typename Component>
-    bool empty() const noexcept {
+    bool empty() const ENTT_NOEXCEPT {
         const auto ctype = component_family::type<Component>();
         return (!(ctype < pools.size()) || !std::get<0>(pools[ctype]) || std::get<0>(pools[ctype])->empty());
     }
@@ -237,7 +238,7 @@ public:
      * @brief Checks if there exists at least an entity still in use.
      * @return True if at least an entity is still in use, false otherwise.
      */
-    bool empty() const noexcept {
+    bool empty() const ENTT_NOEXCEPT {
         return entities.size() == available;
     }
 
@@ -246,7 +247,7 @@ public:
      * @param entity An entity identifier, either valid or not.
      * @return True if the identifier is valid, false otherwise.
      */
-    bool valid(entity_type entity) const noexcept {
+    bool valid(entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
         return (pos < entities.size() && entities[pos] == entity);
     }
@@ -268,7 +269,7 @@ public:
      * @param entity A valid entity identifier.
      * @return True if the identifier is valid, false otherwise.
      */
-    bool fast(entity_type entity) const noexcept {
+    bool fast(entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
         assert(pos < entities.size());
         return (entities[pos] == entity);
@@ -279,7 +280,7 @@ public:
      * @param entity An entity identifier, either valid or not.
      * @return Version stored along with the given entity identifier.
      */
-    version_type version(entity_type entity) const noexcept {
+    version_type version(entity_type entity) const ENTT_NOEXCEPT {
         return version_type((entity >> traits_type::entity_shift) & traits_type::version_mask);
     }
 
@@ -300,7 +301,7 @@ public:
      * @param entity A valid entity identifier.
      * @return Actual version for the given entity identifier.
      */
-    version_type current(entity_type entity) const noexcept {
+    version_type current(entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
         assert(pos < entities.size());
         return version_type((entities[pos] >> traits_type::entity_shift) & traits_type::version_mask);
@@ -323,7 +324,7 @@ public:
      *
      * @return A valid entity identifier.
      */
-    entity_type create() noexcept {
+    entity_type create() ENTT_NOEXCEPT {
         entity_type entity;
 
         if(available) {
@@ -491,7 +492,7 @@ public:
      * @return True if the tag already has an owner, false otherwise.
      */
     template<typename Tag>
-    bool has() const noexcept {
+    bool has() const ENTT_NOEXCEPT {
         const auto ttype = tag_family::type<Tag>();
         bool found = false;
 
@@ -517,7 +518,7 @@ public:
      * @return True if the entity has all the components, false otherwise.
      */
     template<typename... Component>
-    bool has(entity_type entity) const noexcept {
+    bool has(entity_type entity) const ENTT_NOEXCEPT {
         assert(valid(entity));
         using accumulator_type = bool[];
         bool all = true;
@@ -540,7 +541,7 @@ public:
      * @return A reference to the tag.
      */
     template<typename Tag>
-    const Tag & get() const noexcept {
+    const Tag & get() const ENTT_NOEXCEPT {
         assert(has<Tag>());
         return static_cast<Attaching<Tag> *>(std::get<0>(tags[tag_family::type<Tag>()]).get())->tag;
     }
@@ -558,7 +559,7 @@ public:
      * @return A reference to the tag.
      */
     template<typename Tag>
-    Tag & get() noexcept {
+    Tag & get() ENTT_NOEXCEPT {
         return const_cast<Tag &>(const_cast<const Registry *>(this)->get<Tag>());
     }
 
@@ -577,7 +578,7 @@ public:
      * @return A reference to the component owned by the entity.
      */
     template<typename Component>
-    const Component & get(entity_type entity) const noexcept {
+    const Component & get(entity_type entity) const ENTT_NOEXCEPT {
         assert(valid(entity));
         const auto ctype = component_family::type<Component>();
         assert((ctype < pools.size()) && std::get<0>(pools[ctype]));
@@ -599,7 +600,7 @@ public:
      * @return A reference to the component owned by the entity.
      */
     template<typename Component>
-    Component & get(entity_type entity) noexcept {
+    Component & get(entity_type entity) ENTT_NOEXCEPT {
         return const_cast<Component &>(const_cast<const Registry *>(this)->get<Component>(entity));
     }
 
@@ -619,7 +620,7 @@ public:
      */
     template<typename... Component>
     std::enable_if_t<(sizeof...(Component) > 1), std::tuple<const Component &...>>
-    get(entity_type entity) const noexcept {
+    get(entity_type entity) const ENTT_NOEXCEPT {
         return std::tuple<const Component &...>{get<Component>(entity)...};
     }
 
@@ -639,7 +640,7 @@ public:
      */
     template<typename... Component>
     std::enable_if_t<(sizeof...(Component) > 1), std::tuple<Component &...>>
-    get(entity_type entity) noexcept {
+    get(entity_type entity) ENTT_NOEXCEPT {
         return std::tuple<Component &...>{get<Component>(entity)...};
     }
 
@@ -730,7 +731,7 @@ public:
      * @return A valid entity identifier.
      */
     template<typename Tag>
-    entity_type attachee() const noexcept {
+    entity_type attachee() const ENTT_NOEXCEPT {
         assert(has<Tag>());
         return std::get<0>(tags[tag_family::type<Tag>()])->entity;
     }
@@ -790,7 +791,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Tag>
-    sink_type construction(tag_type_t) noexcept {
+    sink_type construction(tag_type_t) ENTT_NOEXCEPT {
         assure<Tag>(tag_type_t{});
         return std::get<1>(tags[tag_family::type<Tag>()]).sink();
     }
@@ -819,7 +820,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    sink_type construction() noexcept {
+    sink_type construction() ENTT_NOEXCEPT {
         assure<Component>();
         return std::get<1>(pools[component_family::type<Component>()]).sink();
     }
@@ -848,7 +849,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Tag>
-    sink_type destruction(tag_type_t) noexcept {
+    sink_type destruction(tag_type_t) ENTT_NOEXCEPT {
         assure<Tag>(tag_type_t{});
         return std::get<2>(tags[tag_family::type<Tag>()]).sink();
     }
@@ -877,7 +878,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    sink_type destruction() noexcept {
+    sink_type destruction() ENTT_NOEXCEPT {
         assure<Component>();
         return std::get<2>(pools[component_family::type<Component>()]).sink();
     }
@@ -1223,7 +1224,7 @@ public:
      * @return True if the view has already been prepared, false otherwise.
      */
     template<typename... Component>
-    bool contains() const noexcept {
+    bool contains() const ENTT_NOEXCEPT {
         static_assert(sizeof...(Component) > 1, "!");
         const auto htype = handler_family::type<Component...>();
         return (htype < handlers.size() && handlers[htype]);

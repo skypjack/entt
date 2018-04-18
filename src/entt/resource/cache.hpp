@@ -6,6 +6,7 @@
 #include <utility>
 #include <type_traits>
 #include <unordered_map>
+#include "../config/config.h"
 #include "../core/hashed_string.hpp"
 #include "handle.hpp"
 #include "loader.hpp"
@@ -38,20 +39,20 @@ public:
     ResourceCache() = default;
 
     /*! @brief Copying a cache isn't allowed. */
-    ResourceCache(const ResourceCache &) noexcept = delete;
+    ResourceCache(const ResourceCache &) ENTT_NOEXCEPT = delete;
     /*! @brief Default move constructor. */
-    ResourceCache(ResourceCache &&) noexcept = default;
+    ResourceCache(ResourceCache &&) ENTT_NOEXCEPT = default;
 
     /*! @brief Copying a cache isn't allowed. @return This cache. */
-    ResourceCache & operator=(const ResourceCache &) noexcept = delete;
+    ResourceCache & operator=(const ResourceCache &) ENTT_NOEXCEPT = delete;
     /*! @brief Default move assignment operator. @return This cache. */
-    ResourceCache & operator=(ResourceCache &&) noexcept = default;
+    ResourceCache & operator=(ResourceCache &&) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Number of resources managed by a cache.
      * @return Number of resources currently stored.
      */
-    size_type size() const noexcept {
+    size_type size() const ENTT_NOEXCEPT {
         return resources.size();
     }
 
@@ -59,7 +60,7 @@ public:
      * @brief Returns true if a cache contains no resources, false otherwise.
      * @return True if the cache contains no resources, false otherwise.
      */
-    bool empty() const noexcept {
+    bool empty() const ENTT_NOEXCEPT {
         return resources.empty();
     }
 
@@ -69,7 +70,7 @@ public:
      * Handles are not invalidated and the memory used by a resource isn't
      * freed as long as at least a handle keeps the resource itself alive.
      */
-    void clear() noexcept {
+    void clear() ENTT_NOEXCEPT {
         resources.clear();
     }
 
@@ -169,7 +170,7 @@ public:
      * @param id Unique resource identifier.
      * @return True if the cache contains the resource, false otherwise.
      */
-    bool contains(resource_type id) const noexcept {
+    bool contains(resource_type id) const ENTT_NOEXCEPT {
         return (resources.find(id) != resources.cend());
     }
 
@@ -181,7 +182,7 @@ public:
      *
      * @param id Unique resource identifier.
      */
-    void discard(resource_type id) noexcept {
+    void discard(resource_type id) ENTT_NOEXCEPT {
         auto it = resources.find(id);
 
         if(it != resources.end()) {

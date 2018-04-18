@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <utility>
+#include "../config/config.h"
 #include "registry.hpp"
 #include "utility.hpp"
 
@@ -111,7 +112,7 @@ struct Actor {
      * @return True if the actor owns the tag, false otherwise.
      */
     template<typename Tag>
-    bool has(tag_type_t) const noexcept {
+    bool has(tag_type_t) const ENTT_NOEXCEPT {
         return (reg.template has<Tag>() && (reg.template attachee<Tag>() == entt));
     }
 
@@ -121,7 +122,7 @@ struct Actor {
      * @return True if the actor has the component, false otherwise.
      */
     template<typename Component>
-    bool has() const noexcept {
+    bool has() const ENTT_NOEXCEPT {
         return reg.template has<Component>(entt);
     }
 
@@ -131,7 +132,7 @@ struct Actor {
      * @return A reference to the instance of the tag owned by the actor.
      */
     template<typename Tag>
-    const Tag & get(tag_type_t) const noexcept {
+    const Tag & get(tag_type_t) const ENTT_NOEXCEPT {
         assert(has<Tag>(tag_type_t{}));
         return reg.template get<Tag>();
     }
@@ -142,7 +143,7 @@ struct Actor {
      * @return A reference to the instance of the tag owned by the actor.
      */
     template<typename Tag>
-    Tag & get(tag_type_t) noexcept {
+    Tag & get(tag_type_t) ENTT_NOEXCEPT {
         return const_cast<Tag &>(const_cast<const Actor *>(this)->get<Tag>(tag_type_t{}));
     }
 
@@ -152,7 +153,7 @@ struct Actor {
      * @return A reference to the instance of the component owned by the actor.
      */
     template<typename Component>
-    const Component & get() const noexcept {
+    const Component & get() const ENTT_NOEXCEPT {
         return reg.template get<Component>(entt);
     }
 
@@ -162,7 +163,7 @@ struct Actor {
      * @return A reference to the instance of the component owned by the actor.
      */
     template<typename Component>
-    Component & get() noexcept {
+    Component & get() ENTT_NOEXCEPT {
         return const_cast<Component &>(const_cast<const Actor *>(this)->get<Component>());
     }
 
@@ -170,7 +171,7 @@ struct Actor {
      * @brief Returns a reference to the underlying registry.
      * @return A reference to the underlying registry.
      */
-    const registry_type & registry() const noexcept {
+    const registry_type & registry() const ENTT_NOEXCEPT {
         return reg;
     }
 
@@ -178,7 +179,7 @@ struct Actor {
      * @brief Returns a reference to the underlying registry.
      * @return A reference to the underlying registry.
      */
-    registry_type & registry() noexcept {
+    registry_type & registry() ENTT_NOEXCEPT {
         return const_cast<registry_type &>(const_cast<const Actor *>(this)->registry());
     }
 
@@ -186,7 +187,7 @@ struct Actor {
      * @brief Returns the entity associated with an actor.
      * @return The entity associated with the actor.
      */
-    entity_type entity() const noexcept {
+    entity_type entity() const ENTT_NOEXCEPT {
         return entt;
     }
 

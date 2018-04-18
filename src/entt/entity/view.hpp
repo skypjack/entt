@@ -8,6 +8,7 @@
 #include <utility>
 #include <algorithm>
 #include <type_traits>
+#include "../config/config.h"
 #include "entt_traits.hpp"
 #include "sparse_set.hpp"
 
@@ -76,7 +77,7 @@ class PersistentView final {
     using view_type = SparseSet<Entity>;
     using pattern_type = std::tuple<pool_type<Component> &...>;
 
-    PersistentView(view_type &view, pool_type<Component> &... pools) noexcept
+    PersistentView(view_type &view, pool_type<Component> &... pools) ENTT_NOEXCEPT
         : view{view}, pools{pools...}
     {}
 
@@ -92,7 +93,7 @@ public:
      * @brief Returns the number of entities that have the given components.
      * @return Number of entities that have the given components.
      */
-    size_type size() const noexcept {
+    size_type size() const ENTT_NOEXCEPT {
         return view.size();
     }
 
@@ -108,7 +109,7 @@ public:
      *
      * @return A pointer to the array of entities.
      */
-    const entity_type * data() const noexcept {
+    const entity_type * data() const ENTT_NOEXCEPT {
         return view.data();
     }
 
@@ -126,7 +127,7 @@ public:
      *
      * @return An iterator to the first entity that has the given components.
      */
-    iterator_type begin() const noexcept {
+    iterator_type begin() const ENTT_NOEXCEPT {
         return view.begin();
     }
 
@@ -145,7 +146,7 @@ public:
      * @return An iterator to the entity following the last entity that has the
      * given components.
      */
-    iterator_type end() const noexcept {
+    iterator_type end() const ENTT_NOEXCEPT {
         return view.end();
     }
 
@@ -154,7 +155,7 @@ public:
      * @param entity A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
-    bool contains(entity_type entity) const noexcept {
+    bool contains(entity_type entity) const ENTT_NOEXCEPT {
         return view.has(entity) && (view.data()[view.get(entity)] == entity);
     }
 
@@ -176,7 +177,7 @@ public:
      * @return The component assigned to the entity.
      */
     template<typename Comp>
-    const Comp & get(entity_type entity) const noexcept {
+    const Comp & get(entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
         return std::get<pool_type<Comp> &>(pools).get(entity);
     }
@@ -199,7 +200,7 @@ public:
      * @return The component assigned to the entity.
      */
     template<typename Comp>
-    Comp & get(entity_type entity) noexcept {
+    Comp & get(entity_type entity) ENTT_NOEXCEPT {
         return const_cast<Comp &>(const_cast<const PersistentView *>(this)->get<Comp>(entity));
     }
 
@@ -222,7 +223,7 @@ public:
      */
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<const Comp &...>>
-    get(entity_type entity) const noexcept {
+    get(entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
         return std::tuple<const Comp &...>{get<Comp>(entity)...};
     }
@@ -246,7 +247,7 @@ public:
      */
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<Comp &...>>
-    get(entity_type entity) noexcept {
+    get(entity_type entity) ENTT_NOEXCEPT {
         assert(contains(entity));
         return std::tuple<Comp &...>{get<Comp>(entity)...};
     }
@@ -383,7 +384,7 @@ class View final {
     class Iterator {
         using size_type = typename view_type::size_type;
 
-        inline bool valid() const noexcept {
+        inline bool valid() const ENTT_NOEXCEPT {
             const auto entity = *begin;
             const auto sz = size_type(entity & traits_type::entity_mask);
             auto pos = unchecked.size();
@@ -402,7 +403,7 @@ class View final {
         using reference = typename underlying_iterator_type::reference;
         using iterator_category = typename underlying_iterator_type::iterator_category;
 
-        Iterator(unchecked_type unchecked, size_type extent, underlying_iterator_type begin, underlying_iterator_type end) noexcept
+        Iterator(unchecked_type unchecked, size_type extent, underlying_iterator_type begin, underlying_iterator_type end) ENTT_NOEXCEPT
             : unchecked{unchecked},
               extent{extent},
               begin{begin},
@@ -413,32 +414,32 @@ class View final {
             }
         }
 
-        Iterator & operator++() noexcept {
+        Iterator & operator++() ENTT_NOEXCEPT {
             return (++begin != end && !valid()) ? ++(*this) : *this;
         }
 
-        Iterator operator++(int) noexcept {
+        Iterator operator++(int) ENTT_NOEXCEPT {
             Iterator orig = *this;
             return ++(*this), orig;
         }
 
-        Iterator & operator+=(difference_type value) noexcept {
+        Iterator & operator+=(difference_type value) ENTT_NOEXCEPT {
             return ((begin += value) != end && !valid()) ? ++(*this) : *this;
         }
 
-        Iterator operator+(difference_type value) noexcept {
+        Iterator operator+(difference_type value) ENTT_NOEXCEPT {
             return Iterator{unchecked, extent, begin+value, end};
         }
 
-        bool operator==(const Iterator &other) const noexcept {
+        bool operator==(const Iterator &other) const ENTT_NOEXCEPT {
             return other.begin == begin;
         }
 
-        bool operator!=(const Iterator &other) const noexcept {
+        bool operator!=(const Iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
-        value_type operator*() const noexcept {
+        value_type operator*() const ENTT_NOEXCEPT {
             return *begin;
         }
 
@@ -449,7 +450,7 @@ class View final {
         underlying_iterator_type end;
     };
 
-    View(pool_type<Component> &... pools) noexcept
+    View(pool_type<Component> &... pools) ENTT_NOEXCEPT
         : pools{pools...}, view{nullptr}, unchecked{}
     {
         reset();
@@ -467,7 +468,7 @@ public:
      * @brief Estimates the number of entities that have the given components.
      * @return Estimated number of entities that have the given components.
      */
-    size_type size() const noexcept {
+    size_type size() const ENTT_NOEXCEPT {
         return view->size();
     }
 
@@ -485,7 +486,7 @@ public:
      *
      * @return An iterator to the first entity that has the given components.
      */
-    iterator_type begin() const noexcept {
+    iterator_type begin() const ENTT_NOEXCEPT {
         const auto extent = std::min({ std::get<pool_type<Component> &>(pools).extent()... });
         return Iterator{unchecked, extent, view->begin(), view->end()};
     }
@@ -505,7 +506,7 @@ public:
      * @return An iterator to the entity following the last entity that has the
      * given components.
      */
-    iterator_type end() const noexcept {
+    iterator_type end() const ENTT_NOEXCEPT {
         const auto extent = std::min({ std::get<pool_type<Component> &>(pools).extent()... });
         return Iterator{unchecked, extent, view->end(), view->end()};
     }
@@ -515,7 +516,7 @@ public:
      * @param entity A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
-    bool contains(entity_type entity) const noexcept {
+    bool contains(entity_type entity) const ENTT_NOEXCEPT {
         const auto extent = std::min({ std::get<pool_type<Component> &>(pools).extent()... });
         const auto sz = size_type(entity & traits_type::entity_mask);
         auto pos = unchecked.size();
@@ -545,7 +546,7 @@ public:
      * @return The component assigned to the entity.
      */
     template<typename Comp>
-    const Comp & get(entity_type entity) const noexcept {
+    const Comp & get(entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
         return std::get<pool_type<Comp> &>(pools).get(entity);
     }
@@ -568,7 +569,7 @@ public:
      * @return The component assigned to the entity.
      */
     template<typename Comp>
-    Comp & get(entity_type entity) noexcept {
+    Comp & get(entity_type entity) ENTT_NOEXCEPT {
         return const_cast<Comp &>(const_cast<const View *>(this)->get<Comp>(entity));
     }
 
@@ -591,7 +592,7 @@ public:
      */
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<const Comp &...>>
-    get(entity_type entity) const noexcept {
+    get(entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
         return std::tuple<const Comp &...>{get<Comp>(entity)...};
     }
@@ -615,7 +616,7 @@ public:
      */
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<Comp &...>>
-    get(entity_type entity) noexcept {
+    get(entity_type entity) ENTT_NOEXCEPT {
         assert(contains(entity));
         return std::tuple<Comp &...>{get<Comp>(entity)...};
     }
@@ -760,7 +761,7 @@ class View<Entity, Component> final {
     using view_type = SparseSet<Entity>;
     using pool_type = SparseSet<Entity, Component>;
 
-    View(pool_type &pool) noexcept
+    View(pool_type &pool) ENTT_NOEXCEPT
         : pool{pool}
     {}
 
@@ -778,7 +779,7 @@ public:
      * @brief Returns the number of entities that have the given component.
      * @return Number of entities that have the given component.
      */
-    size_type size() const noexcept {
+    size_type size() const ENTT_NOEXCEPT {
         return pool.size();
     }
 
@@ -794,7 +795,7 @@ public:
      *
      * @return A pointer to the array of components.
      */
-    raw_type * raw() noexcept {
+    raw_type * raw() ENTT_NOEXCEPT {
         return pool.raw();
     }
 
@@ -810,7 +811,7 @@ public:
      *
      * @return A pointer to the array of components.
      */
-    const raw_type * raw() const noexcept {
+    const raw_type * raw() const ENTT_NOEXCEPT {
         return pool.raw();
     }
 
@@ -826,7 +827,7 @@ public:
      *
      * @return A pointer to the array of entities.
      */
-    const entity_type * data() const noexcept {
+    const entity_type * data() const ENTT_NOEXCEPT {
         return pool.data();
     }
 
@@ -844,7 +845,7 @@ public:
      *
      * @return An iterator to the first entity that has the given component.
      */
-    iterator_type begin() const noexcept {
+    iterator_type begin() const ENTT_NOEXCEPT {
         return pool.view_type::begin();
     }
 
@@ -863,7 +864,7 @@ public:
      * @return An iterator to the entity following the last entity that has the
      * given component.
      */
-    iterator_type end() const noexcept {
+    iterator_type end() const ENTT_NOEXCEPT {
         return pool.view_type::end();
     }
 
@@ -872,7 +873,7 @@ public:
      * @param entity A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
-    bool contains(entity_type entity) const noexcept {
+    bool contains(entity_type entity) const ENTT_NOEXCEPT {
         return pool.has(entity) && (pool.data()[pool.view_type::get(entity)] == entity);
     }
 
@@ -891,7 +892,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The component assigned to the entity.
      */
-    const Component & get(entity_type entity) const noexcept {
+    const Component & get(entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
         return pool.get(entity);
     }
@@ -911,7 +912,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The component assigned to the entity.
      */
-    Component & get(entity_type entity) noexcept {
+    Component & get(entity_type entity) ENTT_NOEXCEPT {
         return const_cast<Component &>(const_cast<const View *>(this)->get(entity));
     }
 
@@ -1012,7 +1013,7 @@ class RawView final {
     using view_type = SparseSet<Entity>;
     using pool_type = SparseSet<Entity, Component>;
 
-    RawView(pool_type &pool) noexcept
+    RawView(pool_type &pool) ENTT_NOEXCEPT
         : pool{pool}
     {}
 
@@ -1030,7 +1031,7 @@ public:
      * @brief Returns the number of instances of the given type.
      * @return Number of instances of the given component.
      */
-    size_type size() const noexcept {
+    size_type size() const ENTT_NOEXCEPT {
         return pool.size();
     }
 
@@ -1046,7 +1047,7 @@ public:
      *
      * @return A pointer to the array of components.
      */
-    raw_type * raw() noexcept {
+    raw_type * raw() ENTT_NOEXCEPT {
         return pool.raw();
     }
 
@@ -1062,7 +1063,7 @@ public:
      *
      * @return A pointer to the array of components.
      */
-    const raw_type * raw() const noexcept {
+    const raw_type * raw() const ENTT_NOEXCEPT {
         return pool.raw();
     }
 
@@ -1078,7 +1079,7 @@ public:
      *
      * @return A pointer to the array of entities.
      */
-    const entity_type * data() const noexcept {
+    const entity_type * data() const ENTT_NOEXCEPT {
         return pool.data();
     }
 
@@ -1094,7 +1095,7 @@ public:
      *
      * @return An iterator to the first instance of the given type.
      */
-    iterator_type begin() const noexcept {
+    iterator_type begin() const ENTT_NOEXCEPT {
         return pool.begin();
     }
 
@@ -1113,7 +1114,7 @@ public:
      * @return An iterator to the element following the last instance of the
      * given type.
      */
-    iterator_type end() const noexcept {
+    iterator_type end() const ENTT_NOEXCEPT {
         return pool.end();
     }
 
