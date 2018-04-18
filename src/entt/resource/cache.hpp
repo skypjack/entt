@@ -170,7 +170,7 @@ public:
      * @return True if the cache contains the resource, false otherwise.
      */
     bool contains(resource_type id) const noexcept {
-        return !(resources.find(id) == resources.cend());
+        return (resources.find(id) != resources.cend());
     }
 
     /**

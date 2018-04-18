@@ -103,7 +103,7 @@ class SparseSet<Entity> {
         std::size_t pos;
     };
 
-    static constexpr Entity in_use = (Entity{1} << traits_type::entity_shift);
+    static constexpr auto pending = ~typename traits_type::entity_type{};
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -239,7 +239,7 @@ public:
     bool has(entity_type entity) const noexcept {
         const auto pos = size_type(entity & traits_type::entity_mask);
         // the in-use control bit permits to avoid accessing the direct vector
-        return (pos < reverse.size()) && (reverse[pos] & in_use);
+        return (pos < reverse.size()) && (reverse[pos] != pending);
     }
 
     /**
@@ -263,7 +263,7 @@ public:
         const auto pos = size_type(entity & traits_type::entity_mask);
         assert(pos < reverse.size());
         // the in-use control bit permits to avoid accessing the direct vector
-        return (reverse[pos] & in_use);
+        return (reverse[pos] != pending);
     }
 
     /**
@@ -280,9 +280,7 @@ public:
      */
     pos_type get(entity_type entity) const noexcept {
         assert(has(entity));
-        const auto entt = entity & traits_type::entity_mask;
-        // we must get rid of the in-use bit for it's not part of the position
-        return reverse[entt] & traits_type::entity_mask;
+        return reverse[entity & traits_type::entity_mask];
     }
 
     /**
@@ -301,13 +299,12 @@ public:
         const auto pos = size_type(entity & traits_type::entity_mask);
 
         if(!(pos < reverse.size())) {
-            reverse.resize(pos+1, pos_type{});
+            const auto value = pending;
+            reverse.resize(pos+1, value);
         }
 
-        // we exploit the fact that pos_type is equal to entity_type and pos has
-        // traits_type::version_mask bits unused we can use to mark it as in-use
-        reverse[pos] = pos_type(direct.size()) | in_use;
-        direct.emplace_back(entity);
+        reverse[pos] = pos_type(direct.size());
+        direct.push_back(entity);
     }
 
     /**
@@ -323,14 +320,12 @@ public:
      */
     virtual void destroy(entity_type entity) {
         assert(has(entity));
-        const auto entt = entity & traits_type::entity_mask;
-        const auto back = direct.back() & traits_type::entity_mask;
-        // we must get rid of the in-use bit for it's not part of the position
-        const auto pos = reverse[entt] & traits_type::entity_mask;
-        reverse[back] = reverse[entt];
-        reverse[entt] = pos;
+        const auto back = direct.back();
+        auto &candidate = reverse[entity & traits_type::entity_mask];
         // swapping isn't required here, we are getting rid of the last element
-        direct[pos] = direct.back();
+        reverse[back & traits_type::entity_mask] = candidate;
+        direct[candidate] = back;
+        candidate = pending;
         direct.pop_back();
     }
 
@@ -352,10 +347,10 @@ public:
     void swap(pos_type lhs, pos_type rhs) noexcept {
         assert(lhs < direct.size());
         assert(rhs < direct.size());
-        const auto src = direct[lhs] & traits_type::entity_mask;
-        const auto dst = direct[rhs] & traits_type::entity_mask;
-        std::swap(reverse[src], reverse[dst]);
-        std::swap(direct[lhs], direct[rhs]);
+        auto &src = direct[lhs];
+        auto &dst = direct[rhs];
+        std::swap(reverse[src & traits_type::entity_mask], reverse[dst & traits_type::entity_mask]);
+        std::swap(src, dst);
     }
 
     /**

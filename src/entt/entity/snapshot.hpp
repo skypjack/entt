@@ -680,7 +680,7 @@ public:
      * @return True if `entity` is managed by the loader, false otherwise.
      */
     bool has(entity_type entity) {
-        return !(remloc.find(entity) == remloc.cend());
+        return (remloc.find(entity) != remloc.cend());
     }
 
     /**
