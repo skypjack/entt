@@ -204,7 +204,7 @@ Dell XPS 13 out of the mid 2014):
 | Benchmark | EntityX (compile-time) | EnTT |
 |-----------|-------------|-------------|
 | Create 1M entities | 0.0147s | **0.0046s** |
-| Destroy 1M entities | 0.0053s | **0.0048s** |
+| Destroy 1M entities | 0.0053s | **0.0049s** |
 | Standard view, 1M entities, one component | 0.0012s | **1.9e-07s** |
 | Standard view, 1M entities, two components | 0.0012s | **3.8e-07s** |
 | Standard view, 1M entities, two components<br/>Half of the entities have all the components | 0.0009s | **3.8e-07s** |
