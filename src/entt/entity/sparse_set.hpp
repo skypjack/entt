@@ -61,11 +61,11 @@ class SparseSet<Entity> {
     struct Iterator final {
         using difference_type = std::size_t;
         using value_type = Entity;
-        using pointer = value_type *;
+        using pointer = const value_type *;
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
 
-        Iterator(const std::vector<value_type> &direct, std::size_t pos)
+        Iterator(pointer direct, std::size_t pos)
             : direct{direct}, pos{pos}
         {}
 
@@ -100,7 +100,7 @@ class SparseSet<Entity> {
         }
 
     private:
-        const std::vector<value_type> &direct;
+        pointer direct;
         std::size_t pos;
     };
 
@@ -115,6 +115,8 @@ public:
     using size_type = std::size_t;
     /*! @brief Input iterator type. */
     using iterator_type = Iterator;
+    /*! @brief Constant input iterator type. */
+    using const_iterator_type = Iterator;
 
     /*! @brief Default constructor. */
     SparseSet() ENTT_NOEXCEPT = default;
@@ -211,8 +213,24 @@ public:
      *
      * @return An iterator to the first entity of the internal packed array.
      */
-    iterator_type begin() const ENTT_NOEXCEPT {
-        return Iterator{direct, direct.size()};
+    const_iterator_type cbegin() const ENTT_NOEXCEPT {
+        return const_iterator_type{direct.data(), direct.size()};
+    }
+
+    /**
+     * @brief Returns an iterator to the beginning.
+     *
+     * The returned iterator points to the first entity of the internal packed
+     * array. If the sparse set is empty, the returned iterator will be equal to
+     * `end()`.
+     *
+     * @note
+     * Input iterators stay true to the order imposed by a call to `respect`.
+     *
+     * @return An iterator to the first entity of the internal packed array.
+     */
+    inline iterator_type begin() ENTT_NOEXCEPT {
+        return cbegin();
     }
 
     /**
@@ -228,8 +246,25 @@ public:
      * @return An iterator to the element following the last entity of the
      * internal packed array.
      */
-    iterator_type end() const ENTT_NOEXCEPT {
-        return Iterator{direct, 0};
+    const_iterator_type cend() const ENTT_NOEXCEPT {
+        return const_iterator_type{direct.data(), 0};
+    }
+
+    /**
+     * @brief Returns an iterator to the end.
+     *
+     * The returned iterator points to the element following the last entity in
+     * the internal packed array. Attempting to dereference the returned
+     * iterator results in undefined behavior.
+     *
+     * @note
+     * Input iterators stay true to the order imposed by a call to `respect`.
+     *
+     * @return An iterator to the element following the last entity of the
+     * internal packed array.
+     */
+    inline iterator_type end() ENTT_NOEXCEPT {
+        return cend();
     }
 
     /**
@@ -374,8 +409,8 @@ public:
      * @param other The sparse sets that imposes the order of the entities.
      */
     void respect(const SparseSet<Entity> &other) ENTT_NOEXCEPT {
-        auto from = other.begin();
-        auto to = other.end();
+        auto from = other.cbegin();
+        auto to = other.cend();
 
         pos_type pos = direct.size() - 1;
 
@@ -432,14 +467,15 @@ template<typename Entity, typename Type>
 class SparseSet<Entity, Type>: public SparseSet<Entity> {
     using underlying_type = SparseSet<Entity>;
 
+    template<bool Const>
     struct Iterator final {
         using difference_type = std::size_t;
-        using value_type = Type;
+        using value_type = std::conditional_t<Const, const Type, Type>;
         using pointer = value_type *;
         using reference = value_type &;
         using iterator_category = std::input_iterator_tag;
 
-        Iterator(std::vector<value_type> &instances, std::size_t pos)
+        Iterator(pointer instances, std::size_t pos)
             : instances{instances}, pos{pos}
         {}
 
@@ -469,16 +505,16 @@ class SparseSet<Entity, Type>: public SparseSet<Entity> {
             return !(*this == other);
         }
 
-        reference operator*() ENTT_NOEXCEPT {
+        reference operator*() const ENTT_NOEXCEPT {
             return instances[pos-1];
         }
 
-        pointer operator->() ENTT_NOEXCEPT {
-            return &instances.data()[pos-1];
+        pointer operator->() const ENTT_NOEXCEPT {
+            return (instances+pos-1);
         }
 
     private:
-        std::vector<value_type> &instances;
+        pointer instances;
         std::size_t pos;
     };
 
@@ -492,7 +528,9 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = typename underlying_type::size_type;
     /*! @brief Input iterator type. */
-    using iterator_type = Iterator;
+    using iterator_type = Iterator<false>;
+    /*! @brief Constant input iterator type. */
+    using const_iterator_type = Iterator<true>;
 
     /*! @brief Default constructor. */
     SparseSet() ENTT_NOEXCEPT = default;
@@ -570,8 +608,42 @@ public:
      *
      * @return An iterator to the first instance of the given type.
      */
+    const_iterator_type cbegin() const ENTT_NOEXCEPT {
+        return const_iterator_type{instances.data(), instances.size()};
+    }
+
+    /**
+     * @brief Returns an iterator to the beginning.
+     *
+     * The returned iterator points to the first instance of the given type. If
+     * the sparse set is empty, the returned iterator will be equal to `end()`.
+     *
+     * @note
+     * Input iterators stay true to the order imposed by a call to either `sort`
+     * or `respect`.
+     *
+     * @return An iterator to the first instance of the given type.
+     */
     iterator_type begin() ENTT_NOEXCEPT {
-        return Iterator{instances, instances.size()};
+        return iterator_type{instances.data(), instances.size()};
+    }
+
+    /**
+     * @brief Returns an iterator to the end.
+     *
+     * The returned iterator points to the element following the last instance
+     * of the given type. Attempting to dereference the returned iterator
+     * results in undefined behavior.
+     *
+     * @note
+     * Input iterators stay true to the order imposed by a call to either `sort`
+     * or `respect`.
+     *
+     * @return An iterator to the element following the last instance of the
+     * given type.
+     */
+    const_iterator_type cend() const ENTT_NOEXCEPT {
+        return const_iterator_type{instances.data(), 0};
     }
 
     /**
@@ -589,7 +661,7 @@ public:
      * given type.
      */
     iterator_type end() ENTT_NOEXCEPT {
-        return Iterator{instances, 0};
+        return iterator_type{instances.data(), 0};
     }
 
     /**
@@ -772,8 +844,8 @@ public:
      * @param other The sparse sets that imposes the order of the entities.
      */
     void respect(const SparseSet<Entity> &other) ENTT_NOEXCEPT {
-        auto from = other.begin();
-        auto to = other.end();
+        auto from = other.cbegin();
+        auto to = other.cend();
 
         pos_type pos = underlying_type::size() - 1;
         const auto *local = underlying_type::data();

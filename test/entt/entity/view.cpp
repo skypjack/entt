@@ -4,9 +4,12 @@
 
 TEST(View, SingleComponent) {
     entt::DefaultRegistry registry;
+    auto view = registry.view<char>();
 
     const auto e0 = registry.create();
     const auto e1 = registry.create();
+
+    ASSERT_TRUE(view.empty());
 
     registry.assign<int>(e1);
     registry.assign<char>(e1);
@@ -14,10 +17,9 @@ TEST(View, SingleComponent) {
     ASSERT_NO_THROW(registry.view<char>().begin()++);
     ASSERT_NO_THROW(++registry.view<char>().begin());
 
-    auto view = registry.view<char>();
-
     ASSERT_NE(view.begin(), view.end());
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
+    ASSERT_FALSE(view.empty());
 
     registry.assign<char>(e0);
 
@@ -41,6 +43,7 @@ TEST(View, SingleComponent) {
     registry.remove<char>(e1);
 
     ASSERT_EQ(view.begin(), view.end());
+    ASSERT_TRUE(view.empty());
 }
 
 TEST(View, SingleComponentContains) {
@@ -106,12 +109,18 @@ TEST(View, SingleComponentEach) {
 
 TEST(View, MultipleComponent) {
     entt::DefaultRegistry registry;
+    auto view = registry.view<int, char>();
+
+    ASSERT_TRUE(view.empty());
 
     const auto e0 = registry.create();
     registry.assign<char>(e0);
 
     const auto e1 = registry.create();
     registry.assign<int>(e1);
+
+    ASSERT_FALSE(view.empty());
+
     registry.assign<char>(e1);
 
     auto it = registry.view<char>().begin();
@@ -122,8 +131,6 @@ TEST(View, MultipleComponent) {
 
     ASSERT_NO_THROW((registry.view<int, char>().begin()++));
     ASSERT_NO_THROW((++registry.view<int, char>().begin()));
-
-    auto view = registry.view<int, char>();
 
     ASSERT_NE(view.begin(), view.end());
     ASSERT_EQ(view.begin()+1, view.end());
@@ -145,6 +152,7 @@ TEST(View, MultipleComponent) {
     view.reset();
 
     ASSERT_EQ(view.begin(), view.end());
+    ASSERT_TRUE(view.empty());
 }
 
 TEST(View, MultipleComponentContains) {
@@ -213,6 +221,9 @@ TEST(View, MultipleComponentEach) {
 TEST(PersistentView, Prepare) {
     entt::DefaultRegistry registry;
     registry.prepare<int, char>();
+    auto view = registry.persistent<int, char>();
+
+    ASSERT_TRUE(view.empty());
 
     const auto e0 = registry.create();
     registry.assign<char>(e0);
@@ -221,10 +232,9 @@ TEST(PersistentView, Prepare) {
     registry.assign<int>(e1);
     registry.assign<char>(e1);
 
+    ASSERT_FALSE(view.empty());
     ASSERT_NO_THROW((registry.persistent<int, char>().begin()++));
     ASSERT_NO_THROW((++registry.persistent<int, char>().begin()));
-
-    auto view = registry.persistent<int, char>();
 
     ASSERT_NE(view.begin(), view.end());
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
@@ -254,10 +264,14 @@ TEST(PersistentView, Prepare) {
     registry.remove<char>(e1);
 
     ASSERT_EQ(view.begin(), view.end());
+    ASSERT_TRUE(view.empty());
 }
 
 TEST(PersistentView, NoPrepare) {
     entt::DefaultRegistry registry;
+    auto view = registry.persistent<int, char>();
+
+    ASSERT_TRUE(view.empty());
 
     const auto e0 = registry.create();
     registry.assign<char>(e0);
@@ -266,10 +280,9 @@ TEST(PersistentView, NoPrepare) {
     registry.assign<int>(e1);
     registry.assign<char>(e1);
 
+    ASSERT_FALSE(view.empty());
     ASSERT_NO_THROW((registry.persistent<int, char>().begin()++));
     ASSERT_NO_THROW((++registry.persistent<int, char>().begin()));
-
-    auto view = registry.persistent<int, char>();
 
     ASSERT_NE(view.begin(), view.end());
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
@@ -299,6 +312,7 @@ TEST(PersistentView, NoPrepare) {
     registry.remove<char>(e1);
 
     ASSERT_EQ(view.begin(), view.end());
+    ASSERT_TRUE(view.empty());
 }
 
 TEST(PersistentView, Contains) {
@@ -405,6 +419,9 @@ TEST(PersistentView, Sort) {
 
 TEST(RawView, Functionalities) {
     entt::DefaultRegistry registry;
+    auto view = registry.raw<char>();
+
+    ASSERT_TRUE(view.empty());
 
     const auto e0 = registry.create();
     const auto e1 = registry.create();
@@ -412,10 +429,9 @@ TEST(RawView, Functionalities) {
     registry.assign<int>(e1);
     registry.assign<char>(e1);
 
+    ASSERT_FALSE(view.empty());
     ASSERT_NO_THROW(registry.raw<char>().begin()++);
     ASSERT_NO_THROW(++registry.raw<char>().begin());
-
-    auto view = registry.raw<char>();
 
     ASSERT_NE(view.begin(), view.end());
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
@@ -450,6 +466,7 @@ TEST(RawView, Functionalities) {
     registry.remove<char>(e1);
 
     ASSERT_EQ(view.begin(), view.end());
+    ASSERT_TRUE(view.empty());
 }
 
 TEST(RawView, Empty) {
