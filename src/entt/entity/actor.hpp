@@ -64,8 +64,8 @@ struct Actor {
      * @return A reference to the newly created tag.
      */
     template<typename Tag, typename... Args>
-    Tag & assign(tag_type_t, Args &&... args) {
-        return (reg.template remove<Tag>(), reg.template assign<Tag>(tag_type_t{}, entt, std::forward<Args>(args)...));
+    Tag & assign(tag_t, Args &&... args) {
+        return (reg.template remove<Tag>(), reg.template assign<Tag>(tag_t{}, entt, std::forward<Args>(args)...));
     }
 
     /**
@@ -92,8 +92,8 @@ struct Actor {
      * @tparam Tag Type of the tag to remove.
      */
     template<typename Tag>
-    void remove(tag_type_t) {
-        assert(has<Tag>(tag_type_t{}));
+    void remove(tag_t) {
+        assert(has<Tag>(tag_t{}));
         reg.template remove<Tag>();
     }
 
@@ -112,7 +112,7 @@ struct Actor {
      * @return True if the actor owns the tag, false otherwise.
      */
     template<typename Tag>
-    bool has(tag_type_t) const ENTT_NOEXCEPT {
+    bool has(tag_t) const ENTT_NOEXCEPT {
         return (reg.template has<Tag>() && (reg.template attachee<Tag>() == entt));
     }
 
@@ -132,8 +132,8 @@ struct Actor {
      * @return A reference to the instance of the tag owned by the actor.
      */
     template<typename Tag>
-    const Tag & get(tag_type_t) const ENTT_NOEXCEPT {
-        assert(has<Tag>(tag_type_t{}));
+    const Tag & get(tag_t) const ENTT_NOEXCEPT {
+        assert(has<Tag>(tag_t{}));
         return reg.template get<Tag>();
     }
 
@@ -143,8 +143,8 @@ struct Actor {
      * @return A reference to the instance of the tag owned by the actor.
      */
     template<typename Tag>
-    Tag & get(tag_type_t) ENTT_NOEXCEPT {
-        return const_cast<Tag &>(const_cast<const Actor *>(this)->get<Tag>(tag_type_t{}));
+    Tag & get(tag_t) ENTT_NOEXCEPT {
+        return const_cast<Tag &>(const_cast<const Actor *>(this)->get<Tag>(tag_t{}));
     }
 
     /**

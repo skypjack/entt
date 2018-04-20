@@ -65,7 +65,7 @@ void dependency(Sink<void(Registry<Entity> &, Entity)> sink) {
  * components `AType` and `AnotherType`:
  * @code{.cpp}
  * entt::DefaultRegistry registry;
- * entt::dependency<AType, AnotherType>(entt::break_op_t{}, registry.construction<MyType>());
+ * entt::dependency<AType, AnotherType>(entt::break_t{}, registry.construction<MyType>());
  * @endcode
  *
  * @tparam Dependency Types of components used to create the dependency.
@@ -73,7 +73,7 @@ void dependency(Sink<void(Registry<Entity> &, Entity)> sink) {
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Entity>
-void dependency(break_op_t, Sink<void(Registry<Entity> &, Entity)> sink) {
+void dependency(break_t, Sink<void(Registry<Entity> &, Entity)> sink) {
     sink.template disconnect<dependency<Entity, Dependency...>>();
 }
 

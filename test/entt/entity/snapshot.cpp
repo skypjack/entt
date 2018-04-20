@@ -63,10 +63,10 @@ TEST(Snapshot, Dump) {
 
     const auto e3 = registry.create();
     registry.assign<char>(e3, '0');
-    registry.assign<float>(entt::tag_type_t{}, e3, .3f);
+    registry.assign<float>(entt::tag_t{}, e3, .3f);
 
     const auto e4 = registry.create();
-    registry.assign<AComponent>(entt::tag_type_t{}, e4);
+    registry.assign<AComponent>(entt::tag_t{}, e4);
 
     registry.destroy(e1);
     auto v1 = registry.current(e1);
@@ -152,10 +152,10 @@ TEST(Snapshot, Partial) {
 
     const auto e3 = registry.create();
     registry.assign<char>(e3, '0');
-    registry.assign<float>(entt::tag_type_t{}, e3, .3f);
+    registry.assign<float>(entt::tag_t{}, e3, .3f);
 
     const auto e4 = registry.create();
-    registry.assign<AComponent>(entt::tag_type_t{}, e4);
+    registry.assign<AComponent>(entt::tag_t{}, e4);
 
     registry.destroy(e1);
     auto v1 = registry.current(e1);
@@ -279,7 +279,7 @@ TEST(Snapshot, Continuous) {
         if(i % 2) {
             src.assign<WhatAComponent>(entity, entity);
         } else if(i == 2) {
-            src.assign<double>(entt::tag_type_t{}, entity, .3);
+            src.assign<double>(entt::tag_t{}, entity, .3);
         }
     }
 
@@ -511,7 +511,7 @@ TEST(Snapshot, SyncDataMembers) {
     auto parent = src.create();
     auto child = src.create();
 
-    src.assign<WhatAComponent>(entt::tag_type_t{}, child, parent).quux.push_back(parent);
+    src.assign<WhatAComponent>(entt::tag_t{}, child, parent).quux.push_back(parent);
     src.assign<WhatAComponent>(child, child).quux.push_back(child);
 
     src.snapshot().entities(output)

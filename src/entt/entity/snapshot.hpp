@@ -315,7 +315,7 @@ public:
     template<typename... Tag, typename Archive>
     SnapshotLoader & tag(Archive &archive) {
         using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (assign<Tag>(archive, tag_type_t{}), 0)... };
+        accumulator_type accumulator = { 0, (assign<Tag>(archive, tag_t{}), 0)... };
         (void)accumulator;
         return *this;
     }
@@ -464,7 +464,7 @@ class ContinuousLoader final {
 
         each(archive, [&archive, this](auto entity) {
             entity = restore(entity);
-            archive(registry.template assign<Tag>(tag_type_t{}, entity));
+            archive(registry.template assign<Tag>(tag_t{}, entity));
         });
     }
 
@@ -474,7 +474,7 @@ class ContinuousLoader final {
 
         each(archive, [&archive, member..., this](auto entity) {
             entity = restore(entity);
-            auto &tag = registry.template assign<Tag>(entt::tag_type_t{}, entity);
+            auto &tag = registry.template assign<Tag>(entt::tag_t{}, entity);
             archive(tag);
 
             using accumulator_type = int[];

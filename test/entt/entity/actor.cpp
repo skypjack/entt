@@ -40,21 +40,21 @@ TEST(Actor, Tag) {
     ASSERT_EQ(&registry, &actor.registry());
     ASSERT_EQ(&registry, &cactor.registry());
     ASSERT_FALSE(registry.has<ActorTag>());
-    ASSERT_FALSE(actor.has<ActorTag>(entt::tag_type_t{}));
+    ASSERT_FALSE(actor.has<ActorTag>(entt::tag_t{}));
 
-    const auto &tag = actor.assign<ActorTag>(entt::tag_type_t{});
+    const auto &tag = actor.assign<ActorTag>(entt::tag_t{});
 
-    ASSERT_EQ(&tag, &actor.get<ActorTag>(entt::tag_type_t{}));
-    ASSERT_EQ(&tag, &cactor.get<ActorTag>(entt::tag_type_t{}));
+    ASSERT_EQ(&tag, &actor.get<ActorTag>(entt::tag_t{}));
+    ASSERT_EQ(&tag, &cactor.get<ActorTag>(entt::tag_t{}));
     ASSERT_TRUE(registry.has<ActorTag>());
     ASSERT_FALSE(registry.empty());
-    ASSERT_TRUE(actor.has<ActorTag>(entt::tag_type_t{}));
+    ASSERT_TRUE(actor.has<ActorTag>(entt::tag_t{}));
 
-    actor.remove<ActorTag>(entt::tag_type_t{});
+    actor.remove<ActorTag>(entt::tag_t{});
 
     ASSERT_FALSE(registry.has<ActorTag>());
     ASSERT_FALSE(registry.empty());
-    ASSERT_FALSE(actor.has<ActorTag>(entt::tag_type_t{}));
+    ASSERT_FALSE(actor.has<ActorTag>(entt::tag_t{}));
 }
 
 TEST(Actor, EntityLifetime) {

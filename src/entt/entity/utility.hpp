@@ -11,7 +11,25 @@ namespace entt {
  * An empty class type used to disambiguate the overloads of some member
  * functions.
  */
-struct tag_type_t final {};
+struct tag_t final {};
+
+
+/**
+ * @brief Persistent view type.
+ *
+ * An empty class type used to disambiguate the overloads of some member
+ * functions.
+ */
+struct persistent_t final {};
+
+
+/**
+ * @brief Raw view type.
+ *
+ * An empty class type used to disambiguate the overloads of some member
+ * functions.
+ */
+struct raw_t final {};
 
 
 /**
@@ -20,7 +38,7 @@ struct tag_type_t final {};
  * An empty class type used to disambiguate the overloads of some member
  * functions.
  */
-struct break_op_t final {};
+struct break_t final {};
 
 
 }

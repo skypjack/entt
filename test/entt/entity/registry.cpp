@@ -48,11 +48,11 @@ struct Listener {
 TEST(DefaultRegistry, Types) {
     entt::DefaultRegistry registry;
 
-    ASSERT_EQ(registry.type<int>(entt::tag_type_t{}), registry.type<int>(entt::tag_type_t{}));
+    ASSERT_EQ(registry.type<int>(entt::tag_t{}), registry.type<int>(entt::tag_t{}));
     ASSERT_EQ(registry.type<int>(), registry.type<int>());
 
-    ASSERT_NE(registry.type<int>(entt::tag_type_t{}), registry.type<double>(entt::tag_type_t{}));
-    ASSERT_NE(registry.type<int>(), registry.type<double>(entt::tag_type_t{}));
+    ASSERT_NE(registry.type<int>(entt::tag_t{}), registry.type<double>(entt::tag_t{}));
+    ASSERT_NE(registry.type<int>(), registry.type<double>(entt::tag_t{}));
 }
 
 TEST(DefaultRegistry, Functionalities) {
@@ -287,7 +287,7 @@ TEST(DefaultRegistry, Orphans) {
     registry.create();
     registry.assign<int>(registry.create());
     registry.create();
-    registry.assign<double>(entt::tag_type_t{}, registry.create());
+    registry.assign<double>(entt::tag_t{}, registry.create());
 
     registry.orphans([&](auto) { ++tot; });
     ASSERT_EQ(tot, 2u);
@@ -341,14 +341,14 @@ TEST(DefaultRegistry, AttachSetRemoveTags) {
     ASSERT_FALSE(registry.has<int>());
 
     const auto entity = registry.create();
-    registry.assign<int>(entt::tag_type_t{}, entity, 42);
+    registry.assign<int>(entt::tag_t{}, entity, 42);
 
     ASSERT_TRUE(registry.has<int>());
     ASSERT_EQ(registry.get<int>(), 42);
     ASSERT_EQ(cregistry.get<int>(), 42);
     ASSERT_EQ(registry.attachee<int>(), entity);
 
-    registry.replace<int>(entt::tag_type_t{}, 3);
+    registry.replace<int>(entt::tag_t{}, 3);
 
     ASSERT_TRUE(registry.has<int>());
     ASSERT_EQ(registry.get<int>(), 3);
@@ -367,7 +367,7 @@ TEST(DefaultRegistry, AttachSetRemoveTags) {
 
     ASSERT_FALSE(registry.has<int>());
 
-    registry.assign<int>(entt::tag_type_t{}, entity, 42);
+    registry.assign<int>(entt::tag_t{}, entity, 42);
     registry.destroy(entity);
 
     ASSERT_FALSE(registry.has<int>());
@@ -401,7 +401,7 @@ TEST(DefaultRegistry, StandardViews) {
 
 TEST(DefaultRegistry, PersistentViews) {
     entt::DefaultRegistry registry;
-    auto view = registry.persistent<int, char>();
+    auto view = registry.view<int, char>(entt::persistent_t{});
 
     ASSERT_TRUE((registry.contains<int, char>()));
     ASSERT_FALSE((registry.contains<int, double>()));
@@ -433,7 +433,7 @@ TEST(DefaultRegistry, PersistentViews) {
 
 TEST(DefaultRegistry, RawViews) {
     entt::DefaultRegistry registry;
-    auto view = registry.raw<int>();
+    auto view = registry.view<int>(entt::raw_t{});
 
     const auto e0 = registry.create();
     registry.assign<int>(e0, 0);
@@ -463,7 +463,7 @@ TEST(DefaultRegistry, CleanStandardViewsAfterReset) {
 
 TEST(DefaultRegistry, CleanPersistentViewsAfterReset) {
     entt::DefaultRegistry registry;
-    auto view = registry.persistent<int, char>();
+    auto view = registry.view<int, char>(entt::persistent_t{});
 
     const auto entity = registry.create();
     registry.assign<int>(entity, 0);
@@ -478,7 +478,7 @@ TEST(DefaultRegistry, CleanPersistentViewsAfterReset) {
 
 TEST(DefaultRegistry, CleanRawViewsAfterReset) {
     entt::DefaultRegistry registry;
-    auto view = registry.raw<int>();
+    auto view = registry.view<int>(entt::raw_t{});
     registry.assign<int>(registry.create(), 0);
 
     ASSERT_EQ(view.size(), entt::DefaultRegistry::size_type{1});
@@ -491,7 +491,7 @@ TEST(DefaultRegistry, CleanRawViewsAfterReset) {
 TEST(DefaultRegistry, CleanTagsAfterReset) {
     entt::DefaultRegistry registry;
     const auto entity = registry.create();
-    registry.assign<int>(entt::tag_type_t{}, entity);
+    registry.assign<int>(entt::tag_t{}, entity);
 
     ASSERT_TRUE(registry.has<int>());
 
@@ -680,11 +680,11 @@ TEST(DefaultRegistry, TagSignals) {
     entt::DefaultRegistry registry;
     Listener listener;
 
-    registry.construction<int>(entt::tag_type_t{}).connect<Listener, &Listener::incrTag<int>>(&listener);
-    registry.destruction<int>(entt::tag_type_t{}).connect<Listener, &Listener::decrTag<int>>(&listener);
+    registry.construction<int>(entt::tag_t{}).connect<Listener, &Listener::incrTag<int>>(&listener);
+    registry.destruction<int>(entt::tag_t{}).connect<Listener, &Listener::decrTag<int>>(&listener);
 
     auto e0 = registry.create();
-    registry.assign<int>(entt::tag_type_t{}, e0);
+    registry.assign<int>(entt::tag_t{}, e0);
 
     ASSERT_EQ(listener.counter, 1);
     ASSERT_EQ(listener.last, e0);
@@ -696,18 +696,18 @@ TEST(DefaultRegistry, TagSignals) {
     ASSERT_EQ(listener.counter, 0);
     ASSERT_EQ(listener.last, e1);
 
-    registry.construction<int>(entt::tag_type_t{}).disconnect<Listener, &Listener::incrTag<int>>(&listener);
-    registry.destruction<int>(entt::tag_type_t{}).disconnect<Listener, &Listener::decrTag<int>>(&listener);
-    registry.assign<int>(entt::tag_type_t{}, e0);
+    registry.construction<int>(entt::tag_t{}).disconnect<Listener, &Listener::incrTag<int>>(&listener);
+    registry.destruction<int>(entt::tag_t{}).disconnect<Listener, &Listener::decrTag<int>>(&listener);
+    registry.assign<int>(entt::tag_t{}, e0);
     registry.remove<int>();
 
     ASSERT_EQ(listener.counter, 0);
     ASSERT_EQ(listener.last, e1);
 
-    registry.construction<int>(entt::tag_type_t{}).connect<Listener, &Listener::incrTag<int>>(&listener);
-    registry.destruction<int>(entt::tag_type_t{}).connect<Listener, &Listener::decrTag<int>>(&listener);
+    registry.construction<int>(entt::tag_t{}).connect<Listener, &Listener::incrTag<int>>(&listener);
+    registry.destruction<int>(entt::tag_t{}).connect<Listener, &Listener::decrTag<int>>(&listener);
 
-    registry.assign<int>(entt::tag_type_t{}, e0);
+    registry.assign<int>(entt::tag_t{}, e0);
     registry.destroy(e0);
 
     ASSERT_EQ(listener.counter, 0);

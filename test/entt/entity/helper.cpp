@@ -41,7 +41,7 @@ TEST(Dependency, Functionalities) {
     registry.remove<int>(entity);
     registry.remove<double>(entity);
     registry.remove<float>(entity);
-    entt::dependency<double, float>(entt::break_op_t{}, registry.construction<int>());
+    entt::dependency<double, float>(entt::break_t{}, registry.construction<int>());
     registry.assign<int>(entity);
 
     ASSERT_FALSE(registry.has<double>(entity));

@@ -99,7 +99,7 @@ class Registry {
     }
 
     template<typename Tag>
-    void assure(tag_type_t) {
+    void assure(tag_t) {
         const auto ttype = tag_family::type<Tag>();
 
         if(!(ttype < tags.size())) {
@@ -147,7 +147,7 @@ public:
      * @return Runtime numeric identifier of the given type of tag.
      */
     template<typename Tag>
-    tag_type type(tag_type_t) const ENTT_NOEXCEPT {
+    tag_type type(tag_t) const ENTT_NOEXCEPT {
         return tag_family::type<Tag>();
     }
 
@@ -411,10 +411,10 @@ public:
      * @return A reference to the newly created tag.
      */
     template<typename Tag, typename... Args>
-    Tag & assign(tag_type_t, entity_type entity, Args &&... args) {
+    Tag & assign(tag_t, entity_type entity, Args &&... args) {
         assert(valid(entity));
         assert(!has<Tag>());
-        assure<Tag>(tag_type_t{});
+        assure<Tag>(tag_t{});
         auto &tup = tags[tag_family::type<Tag>()];
         std::get<0>(tup).reset(new Attaching<Tag>{entity, Tag{std::forward<Args>(args)...}});
         std::get<1>(tup).publish(*this, entity);
@@ -663,7 +663,7 @@ public:
      * @return A reference to the tag.
      */
     template<typename Tag, typename... Args>
-    Tag & replace(tag_type_t, Args &&... args) {
+    Tag & replace(tag_t, Args &&... args) {
         return (get<Tag>() = Tag{std::forward<Args>(args)...});
     }
 
@@ -791,8 +791,8 @@ public:
      * @return A temporary sink object.
      */
     template<typename Tag>
-    sink_type construction(tag_type_t) ENTT_NOEXCEPT {
-        assure<Tag>(tag_type_t{});
+    sink_type construction(tag_t) ENTT_NOEXCEPT {
+        assure<Tag>(tag_t{});
         return std::get<1>(tags[tag_family::type<Tag>()]).sink();
     }
 
@@ -849,8 +849,8 @@ public:
      * @return A temporary sink object.
      */
     template<typename Tag>
-    sink_type destruction(tag_type_t) ENTT_NOEXCEPT {
-        assure<Tag>(tag_type_t{});
+    sink_type destruction(tag_t) ENTT_NOEXCEPT {
+        assure<Tag>(tag_t{});
         return std::get<2>(tags[tag_family::type<Tag>()]).sink();
     }
 
@@ -1269,7 +1269,7 @@ public:
      * @return A newly created persistent view.
      */
     template<typename... Component>
-    PersistentView<Entity, Component...> persistent() {
+    PersistentView<Entity, Component...> view(persistent_t) {
         prepare<Component...>();
         const auto htype = handler_family::type<Component...>();
         return PersistentView<Entity, Component...>{*handlers[htype], (assure<Component>(), pool<Component>())...};
@@ -1298,7 +1298,7 @@ public:
      * @return A newly created raw view.
      */
     template<typename Component>
-    RawView<Entity, Component> raw() {
+    RawView<Entity, Component> view(raw_t) {
         assure<Component>();
         return RawView<Entity, Component>{pool<Component>()};
     }

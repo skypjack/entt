@@ -539,7 +539,7 @@ data structures or more complex and movable data structures with a proper
 constructor.<br/>
 Actually, the same type can be used both as a tag and as a component and the
 registry will not complain about it. It is up to the users to properly manage
-their own types. In some cases, the `tag_type_t` must also be used in order to
+their own types. In some cases, the tag `tag_t` must also be used in order to
 disambiguate overloads of member functions.
 
 Attaching tags to entities and removing them is trivial:
@@ -549,10 +549,10 @@ auto player = registry.create();
 auto camera = registry.create();
 
 // attaches a default-initialized tag to an entity
-registry.assign<PlayingCharacter>(entt::tag_type_t{}, player);
+registry.assign<PlayingCharacter>(entt::tag_t{}, player);
 
 // attaches a tag to an entity and initializes it
-registry.assign<Camera>(entt::tag_type_t{}, camera, player);
+registry.assign<Camera>(entt::tag_t{}, camera, player);
 
 // removes tags from their owners
 registry.remove<PlayingCharacter>();
@@ -565,7 +565,7 @@ transferred to another entity using the `move` member function template:
 
 ```
 // replaces the content of the given tag
-Point &point = registry.replace<Point>(entt::tag_type_t{}, 1.f, 1.f);
+Point &point = registry.replace<Point>(entt::tag_t{}, 1.f, 1.f);
 
 // transfers the ownership of the tag to another entity
 entity_type prev = registry.move<Point>(next);
@@ -671,12 +671,12 @@ Signals for tags undergo exactly the same requirements of those introduced for
 components. Also the function type for a listener is the same and it's invoked
 with the same guarantees discussed above.
 
-To get the sinks for a tag just use `entt::tag_type_t` to disambiguate overloads
-of member functions as in the following example:
+To get the sinks for a tag just use tag `tag_t` to disambiguate overloads of
+member functions as in the following example:
 
 ```cpp
-registry.construction<MyTag>(entt::tag_type_t{}).connect<&MyFreeFunction>();
-registry.destruction<MyTag>(entt::tag_type_t{}).connect<MyClass, &MyClass::member>(&instance);
+registry.construction<MyTag>(entt::tag_t{}).connect<&MyFreeFunction>();
+registry.destruction<MyTag>(entt::tag_t{}).connect<MyClass, &MyClass::member>(&instance);
 ```
 
 Listeners for tags and components are managed separately and do not influence
@@ -1025,7 +1025,7 @@ be overriden.<br/>
 A dependency can easily be broken by means of the same function template:
 
 ```cpp
-entt::dependency<AType, AnotherType>(entt::break_op_t{}, registry.construction<MyType>());
+entt::dependency<AType, AnotherType>(entt::break_t{}, registry.construction<MyType>());
 ```
 
 ## View: to persist or not to persist?
@@ -1231,11 +1231,12 @@ tightly packed in memory for fast iterations.<br/>
 In general, persistent views don't stay true to the order of any set of
 components unless users explicitly sort them.
 
-Persistent views can be used only to iterate multiple components. Create them
-as it follows:
+Persistent views can be used only to iterate multiple components. To create this
+kind of views, the tag `persistent_t` must also be used in order to disambiguate
+overloads of the `view` member function:
 
 ```cpp
-auto view = registry.persistent<Position, Velocity>();
+auto view = registry.view<Position, Velocity>(entt::persistent_t{});
 ```
 
 There is no need to store views around for they are extremely cheap to
@@ -1266,7 +1267,7 @@ the details.
 To iterate a persistent view, either use it in range-for loop:
 
 ```cpp
-auto view = registry.persistent<Position, Velocity>();
+auto view = registry.view<Position, Velocity>(entt::persistent_t{});
 
 for(auto entity: view) {
     // a component at a time ...
@@ -1284,7 +1285,7 @@ Or rely on the `each` member function to iterate entities and get all their
 components at once:
 
 ```cpp
-registry.persistent<Position, Velocity>().each([](auto entity, auto &position, auto &velocity) {
+registry.view<Position, Velocity>(entt::persistent_t{}).each([](auto entity, auto &position, auto &velocity) {
     // ...
 });
 ```
@@ -1299,13 +1300,21 @@ mind that it works only with the components of the view itself.
 ### Raw View
 
 Raw views return all the components of a given type. This kind of views can
-access components directly and avoid extra indirections as if components were
+access components directly and avoid extra indirections like when components are
 accessed via an entity identifier.<br/>
 They offer a bunch of functionalities to get the number of instances they are
 going to return and a raw access to the entity list as well as to the component
 list.<br/>
 Refer to the [official documentation](https://skypjack.github.io/entt/) for all
 the details.
+
+Raw views can be used only to iterate components for a single type. To create
+this kind of views, the tag `raw_t` must also be used in order to disambiguate
+overloads of the `view` member function:
+
+```cpp
+auto view = registry.view<Renderable>(entt::raw_t{});
+```
 
 There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
@@ -1314,7 +1323,7 @@ fact, they return newly created and correctly initialized iterators whenever
 To iterate a raw view, use it in range-for loop:
 
 ```cpp
-auto view = registry.raw<Renderable>();
+auto view = registry.view<Renderable>(entt::raw_t{});
 
 for(auto &&component: raw) {
     // ...
