@@ -393,7 +393,7 @@ TEST(DefaultRegistry, AttachSetRemoveTags) {
     ASSERT_FALSE(registry.has<int>());
 }
 
-TEST(DefaultRegistry, StandardViews) {
+TEST(DefaultRegistry, StandardView) {
     entt::DefaultRegistry registry;
     auto mview = registry.view<int, char>();
     auto iview = registry.view<int>();
@@ -419,7 +419,7 @@ TEST(DefaultRegistry, StandardViews) {
     ASSERT_EQ(cnt, decltype(mview)::size_type{2});
 }
 
-TEST(DefaultRegistry, PersistentViews) {
+TEST(DefaultRegistry, PersistentView) {
     entt::DefaultRegistry registry;
     auto view = registry.view<int, char>(entt::persistent_t{});
 
@@ -451,7 +451,7 @@ TEST(DefaultRegistry, PersistentViews) {
     ASSERT_EQ(cnt, decltype(view)::size_type{2});
 }
 
-TEST(DefaultRegistry, RawViews) {
+TEST(DefaultRegistry, RawView) {
     entt::DefaultRegistry registry;
     auto view = registry.view<int>(entt::raw_t{});
 
@@ -469,7 +469,7 @@ TEST(DefaultRegistry, RawViews) {
     ASSERT_EQ(cnt, decltype(view)::size_type{2});
 }
 
-TEST(DefaultRegistry, CleanStandardViewsAfterReset) {
+TEST(DefaultRegistry, CleanStandardViewAfterReset) {
     entt::DefaultRegistry registry;
     auto view = registry.view<int>();
     registry.assign<int>(registry.create(), 0);
@@ -481,7 +481,7 @@ TEST(DefaultRegistry, CleanStandardViewsAfterReset) {
     ASSERT_EQ(view.size(), entt::DefaultRegistry::size_type{0});
 }
 
-TEST(DefaultRegistry, CleanPersistentViewsAfterReset) {
+TEST(DefaultRegistry, CleanPersistentViewAfterReset) {
     entt::DefaultRegistry registry;
     auto view = registry.view<int, char>(entt::persistent_t{});
 
@@ -496,7 +496,7 @@ TEST(DefaultRegistry, CleanPersistentViewsAfterReset) {
     ASSERT_EQ(view.size(), entt::DefaultRegistry::size_type{0});
 }
 
-TEST(DefaultRegistry, CleanRawViewsAfterReset) {
+TEST(DefaultRegistry, CleanRawViewAfterReset) {
     entt::DefaultRegistry registry;
     auto view = registry.view<int>(entt::raw_t{});
     registry.assign<int>(registry.create(), 0);

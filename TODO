@@ -7,6 +7,5 @@
 * does it worth it to add an optional functor to the member functions of snapshot so as to filter out instances and entities?
 * ease the assignment of tags as string (use a template class with a non-type template parameter behind the scene)
 * dictionary based dependency class (templates copied over) + prefabs (shared state/copy-on-write)
-* are const Registry::view/::persistent/::raw possible?
 * "singleton mode" for tags (see #66)
 * AOB
