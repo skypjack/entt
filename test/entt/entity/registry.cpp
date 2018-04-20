@@ -195,6 +195,26 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_TRUE(registry.empty<int>());
 }
 
+TEST(DefaultRegistry, RawData) {
+    entt::DefaultRegistry registry;
+    const entt::DefaultRegistry &cregistry = registry;
+    const auto entity = registry.create();
+
+    ASSERT_EQ(registry.raw<int>(), nullptr);
+    ASSERT_EQ(cregistry.raw<int>(), nullptr);
+    ASSERT_EQ(cregistry.data<int>(), nullptr);
+
+    registry.assign<int>(entity, 42);
+
+    ASSERT_NE(registry.raw<int>(), nullptr);
+    ASSERT_NE(cregistry.raw<int>(), nullptr);
+    ASSERT_NE(cregistry.data<int>(), nullptr);
+
+    ASSERT_EQ(*registry.raw<int>(), 42);
+    ASSERT_EQ(*cregistry.raw<int>(), 42);
+    ASSERT_EQ(*cregistry.data<int>(), entity);
+}
+
 TEST(DefaultRegistry, CreateDestroyCornerCase) {
     entt::DefaultRegistry registry;
 

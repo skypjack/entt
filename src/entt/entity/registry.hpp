@@ -72,9 +72,15 @@ class Registry {
     };
 
     template<typename Component>
-    const SparseSet<Entity, Component> & pool() const ENTT_NOEXCEPT {
+    bool managed() const ENTT_NOEXCEPT {
         const auto ctype = component_family::type<Component>();
-        assert(ctype < pools.size() && std::get<0>(pools[ctype]));
+        return ctype < pools.size() && std::get<0>(pools[ctype]);
+    }
+
+    template<typename Component>
+    const SparseSet<Entity, Component> & pool() const ENTT_NOEXCEPT {
+        assert(managed<Component>());
+        const auto ctype = component_family::type<Component>();
         return static_cast<SparseSet<Entity, Component> &>(*std::get<0>(pools[ctype]));
     }
 
@@ -175,8 +181,7 @@ public:
      */
     template<typename Component>
     size_type size() const ENTT_NOEXCEPT {
-        const auto ctype = component_family::type<Component>();
-        return ((ctype < pools.size()) && std::get<0>(pools[ctype])) ? std::get<0>(pools[ctype])->size() : size_type{};
+        return managed<Component>() ? pool<Component>().size() : size_type{};
     }
 
     /**
@@ -230,8 +235,7 @@ public:
      */
     template<typename Component>
     bool empty() const ENTT_NOEXCEPT {
-        const auto ctype = component_family::type<Component>();
-        return (!(ctype < pools.size()) || !std::get<0>(pools[ctype]) || std::get<0>(pools[ctype])->empty());
+        return !managed<Component>() || pool<Component>().empty();
     }
 
     /**
@@ -240,6 +244,63 @@ public:
      */
     bool empty() const ENTT_NOEXCEPT {
         return entities.size() == available;
+    }
+
+    /**
+     * @brief Direct access to the list of components of a given pool.
+     *
+     * The returned pointer is such that range
+     * `[raw<Component>(), raw<Component>() + size<Component>()]` is always a
+     * valid range, even if the container is empty.
+     *
+     * @note
+     * There are no guarantees on the order of the components. Use a view if you
+     * want to iterate entities and components in the expected order.
+     *
+     * @tparam Component Type of component in which one is interested.
+     * @return A pointer to the array of components of the given type.
+     */
+    template<typename Component>
+    const Component * raw() const ENTT_NOEXCEPT {
+        return managed<Component>() ? pool<Component>().raw() : nullptr;
+    }
+
+    /**
+     * @brief Direct access to the list of components of a given pool.
+     *
+     * The returned pointer is such that range
+     * `[raw<Component>(), raw<Component>() + size<Component>()]` is always a
+     * valid range, even if the container is empty.
+     *
+     * @note
+     * There are no guarantees on the order of the components. Use a view if you
+     * want to iterate entities and components in the expected order.
+     *
+     * @tparam Component Type of component in which one is interested.
+     * @return A pointer to the array of components of the given type.
+     */
+    template<typename Component>
+    Component * raw() ENTT_NOEXCEPT {
+        return const_cast<Component *>(const_cast<const Registry *>(this)->raw<Component>());
+    }
+
+    /**
+     * @brief Direct access to the list of entities of a given pool.
+     *
+     * The returned pointer is such that range
+     * `[data<Component>(), data<Component>() + size<Component>()]` is always a
+     * valid range, even if the container is empty.
+     *
+     * @note
+     * There are no guarantees on the order of the entities. Use a view if you
+     * want to iterate entities and components in the expected order.
+     *
+     * @tparam Component Type of component in which one is interested.
+     * @return A pointer to the array of entities.
+     */
+    template<typename Component>
+    const entity_type * data() const ENTT_NOEXCEPT {
+        return managed<Component>() ? pool<Component>().data() : nullptr;
     }
 
     /**
@@ -480,8 +541,8 @@ public:
     template<typename Component>
     void remove(entity_type entity) {
         assert(valid(entity));
+        assert(managed<Component>());
         const auto ctype = component_family::type<Component>();
-        assert(ctype < pools.size() && std::get<0>(pools[ctype]));
         std::get<2>(pools[ctype]).publish(*this, entity);
         pool<Component>().destroy(entity);
     }
@@ -522,9 +583,8 @@ public:
         assert(valid(entity));
         using accumulator_type = bool[];
         bool all = true;
-        auto test = [entity, this](auto ctype) { return (ctype < pools.size()) && std::get<0>(pools[ctype]) && std::get<0>(pools[ctype])->has(entity); };
-        accumulator_type accumulator = { all, (all = all && test(component_family::type<Component>()))... };
-        (void)test, (void)accumulator;
+        accumulator_type accumulator = { all, (all = all && managed<Component>() && pool<Component>().has(entity))... };
+        (void)accumulator;
         return all;
     }
 
@@ -580,9 +640,8 @@ public:
     template<typename Component>
     const Component & get(entity_type entity) const ENTT_NOEXCEPT {
         assert(valid(entity));
-        const auto ctype = component_family::type<Component>();
-        assert((ctype < pools.size()) && std::get<0>(pools[ctype]));
-        return static_cast<SparseSet<Entity, Component> &>(*std::get<0>(pools[ctype])).get(entity);
+        assert(managed<Component>());
+        return pool<Component>().get(entity);
     }
 
     /**
@@ -1315,7 +1374,6 @@ public:
      */
     Snapshot<Entity> snapshot() const {
         using follow_fn_type = entity_type(*)(const Registry &, entity_type);
-        using raw_fn_type = const entity_type *(*)(const Registry &, component_type);
         const entity_type seed = available ? (next | (entities[next] & ~traits_type::entity_mask)) : next;
 
         follow_fn_type follow = [](const Registry &registry, entity_type entity) -> entity_type {
@@ -1325,12 +1383,7 @@ public:
             return (next | (entities[next] & ~traits_type::entity_mask));
         };
 
-        raw_fn_type raw = [](const Registry &registry, component_type component) -> const entity_type * {
-            const auto &pools = registry.pools;
-            return (component < pools.size() && std::get<0>(pools[component])) ? std::get<0>(pools[component])->data() : nullptr;
-        };
-
-        return { *this, seed, available, follow, raw };
+        return { *this, seed, available, follow };
     }
 
     /**

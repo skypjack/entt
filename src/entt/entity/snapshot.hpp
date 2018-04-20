@@ -40,21 +40,18 @@ class Snapshot final {
     friend class Registry<Entity>;
 
     using follow_fn_type = Entity(*)(const Registry<Entity> &, Entity);
-    using raw_fn_type = const Entity *(*)(const Registry<Entity> &, typename Registry<Entity>::component_type);
 
-    Snapshot(const Registry<Entity> &registry, Entity seed, std::size_t size, follow_fn_type follow, raw_fn_type raw) ENTT_NOEXCEPT
+    Snapshot(const Registry<Entity> &registry, Entity seed, std::size_t size, follow_fn_type follow) ENTT_NOEXCEPT
         : registry{registry},
           seed{seed},
           size{size},
-          follow{follow},
-          raw{raw}
+          follow{follow}
     {}
 
     template<typename Component, typename Archive>
     void get(Archive &archive, const Registry<Entity> &registry) {
-        const auto component = registry.template type<Component>();
         const auto sz = registry.template size<Component>();
-        const auto *entities = raw(registry, component);
+        const auto *entities = registry.template data<Component>();
 
         archive(static_cast<Entity>(sz));
 
@@ -176,7 +173,6 @@ private:
     const Entity seed;
     const std::size_t size;
     follow_fn_type follow;
-    raw_fn_type raw;
 };
 
 
