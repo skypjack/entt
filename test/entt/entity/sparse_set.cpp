@@ -79,6 +79,15 @@ TEST(SparseSetNoType, DataBeginEnd) {
     ASSERT_EQ(*(begin++), 3u);
 
     ASSERT_EQ(begin, end);
+
+    auto cbegin = set.cbegin();
+    auto cend = set.cend();
+
+    ASSERT_NE(cbegin, cend);
+    ASSERT_EQ(cbegin+3, cend);
+    ASSERT_NE(cbegin, cend);
+    ASSERT_EQ(cbegin += 3, cend);
+    ASSERT_EQ(cbegin, cend);
 }
 
 TEST(SparseSetNoType, RespectDisjoint) {
@@ -324,6 +333,15 @@ TEST(SparseSetWithType, RawBeginEnd) {
     ASSERT_EQ(*(begin++), 6);
     ASSERT_EQ(*(begin++), 3);
     ASSERT_EQ(begin, end);
+
+    auto cbegin = set.cbegin();
+    auto cend = set.cend();
+
+    ASSERT_NE(cbegin, cend);
+    ASSERT_EQ(cbegin+3, cend);
+    ASSERT_NE(cbegin, cend);
+    ASSERT_EQ(cbegin += 3, cend);
+    ASSERT_EQ(cbegin, cend);
 }
 
 TEST(SparseSetWithType, SortOrdered) {

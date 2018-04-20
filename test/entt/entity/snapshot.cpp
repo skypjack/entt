@@ -267,9 +267,7 @@ TEST(Snapshot, Continuous) {
         src.create();
     }
 
-    src.each([&src](auto entity) {
-        src.destroy(entity);
-    });
+    src.reset();
 
     for(int i = 0; i < 5; ++i) {
         entity = src.create();
@@ -486,4 +484,55 @@ TEST(Snapshot, ContinuousMoreOnShrink) {
     loader.shrink();
 
     ASSERT_FALSE(dst.valid(entity));
+}
+
+TEST(Snapshot, SyncDataMembers) {
+    using entity_type = entt::DefaultRegistry::entity_type;
+
+    entt::DefaultRegistry src;
+    entt::DefaultRegistry dst;
+
+    entt::ContinuousLoader<entity_type> loader{dst};
+
+    using storage_type = std::tuple<
+        std::queue<entity_type>,
+        std::queue<WhatAComponent>
+    >;
+
+    storage_type storage;
+    OutputArchive<storage_type> output{storage};
+    InputArchive<storage_type> input{storage};
+
+    src.create();
+    src.create();
+
+    src.reset();
+
+    auto parent = src.create();
+    auto child = src.create();
+
+    src.assign<WhatAComponent>(entt::tag_type_t{}, child, parent).quux.push_back(parent);
+    src.assign<WhatAComponent>(child, child).quux.push_back(child);
+
+    src.snapshot().entities(output)
+            .component<WhatAComponent>(output)
+            .tag<WhatAComponent>(output);
+
+    loader.entities(input)
+            .component<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
+            .tag<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux);
+
+    ASSERT_FALSE(dst.valid(parent));
+    ASSERT_FALSE(dst.valid(child));
+
+    ASSERT_TRUE(dst.has<WhatAComponent>());
+    ASSERT_EQ(dst.attachee<WhatAComponent>(), loader.map(child));
+    ASSERT_EQ(dst.get<WhatAComponent>().bar, loader.map(parent));
+    ASSERT_EQ(dst.get<WhatAComponent>().quux[0], loader.map(parent));
+    ASSERT_TRUE(dst.has<WhatAComponent>(loader.map(child)));
+
+    const auto &component = dst.get<WhatAComponent>(loader.map(child));
+
+    ASSERT_EQ(component.bar, loader.map(child));
+    ASSERT_EQ(component.quux[0], loader.map(child));
 }

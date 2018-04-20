@@ -46,6 +46,37 @@ TEST(View, SingleComponent) {
     ASSERT_TRUE(view.empty());
 }
 
+TEST(View, SingleComponentBeginEnd) {
+    entt::DefaultRegistry registry;
+    auto view = registry.view<int>();
+
+    for(auto i = 0; i < 3; ++i) {
+        registry.assign<int>(registry.create());
+    }
+
+    auto begin = view.begin();
+    auto end = view.end();
+
+    ASSERT_NE(begin, end);
+    ASSERT_NE(++begin, end);
+    ASSERT_NE(begin++, end);
+    ASSERT_EQ(begin+1, end);
+    ASSERT_NE(begin, end);
+    ASSERT_EQ((begin += 1), end);
+    ASSERT_EQ(begin, end);
+
+    auto cbegin = view.cbegin();
+    auto cend = view.cend();
+
+    ASSERT_NE(cbegin, cend);
+    ASSERT_NE(++cbegin, cend);
+    ASSERT_NE(cbegin++, cend);
+    ASSERT_EQ(cbegin+1, cend);
+    ASSERT_NE(cbegin, cend);
+    ASSERT_EQ((cbegin += 1), cend);
+    ASSERT_EQ(cbegin, cend);
+}
+
 TEST(View, SingleComponentContains) {
     entt::DefaultRegistry registry;
 
@@ -86,13 +117,8 @@ TEST(View, SingleComponentEmpty) {
 TEST(View, SingleComponentEach) {
     entt::DefaultRegistry registry;
 
-    const auto e0 = registry.create();
-    registry.assign<int>(e0);
-    registry.assign<char>(e0);
-
-    const auto e1 = registry.create();
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
+    registry.assign<int>(registry.create());
+    registry.assign<int>(registry.create());
 
     auto view = registry.view<int>();
     const auto &cview = static_cast<const decltype(view) &>(view);
@@ -153,6 +179,39 @@ TEST(View, MultipleComponent) {
 
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_TRUE(view.empty());
+}
+
+TEST(View, MultipleComponentBeginEnd) {
+    entt::DefaultRegistry registry;
+    auto view = registry.view<int, char>();
+
+    for(auto i = 0; i < 3; ++i) {
+        const auto entity = registry.create();
+        registry.assign<int>(entity);
+        registry.assign<char>(entity);
+    }
+
+    auto begin = view.begin();
+    auto end = view.end();
+
+    ASSERT_NE(begin, end);
+    ASSERT_NE(++begin, end);
+    ASSERT_NE(begin++, end);
+    ASSERT_EQ(begin+1, end);
+    ASSERT_NE(begin, end);
+    ASSERT_EQ((begin += 1), end);
+    ASSERT_EQ(begin, end);
+
+    auto cbegin = view.cbegin();
+    auto cend = view.cend();
+
+    ASSERT_NE(cbegin, cend);
+    ASSERT_NE(++cbegin, cend);
+    ASSERT_NE(cbegin++, cend);
+    ASSERT_EQ(cbegin+1, cend);
+    ASSERT_NE(cbegin, cend);
+    ASSERT_EQ((cbegin += 1), cend);
+    ASSERT_EQ(cbegin, cend);
 }
 
 TEST(View, MultipleComponentContains) {
@@ -313,6 +372,39 @@ TEST(PersistentView, NoPrepare) {
 
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_TRUE(view.empty());
+}
+
+TEST(PersistentView, BeginEnd) {
+    entt::DefaultRegistry registry;
+    auto view = registry.persistent<int, char>();
+
+    for(auto i = 0; i < 3; ++i) {
+        const auto entity = registry.create();
+        registry.assign<int>(entity);
+        registry.assign<char>(entity);
+    }
+
+    auto begin = view.begin();
+    auto end = view.end();
+
+    ASSERT_NE(begin, end);
+    ASSERT_NE(++begin, end);
+    ASSERT_NE(begin++, end);
+    ASSERT_EQ(begin+1, end);
+    ASSERT_NE(begin, end);
+    ASSERT_EQ((begin += 1), end);
+    ASSERT_EQ(begin, end);
+
+    auto cbegin = view.cbegin();
+    auto cend = view.cend();
+
+    ASSERT_NE(cbegin, cend);
+    ASSERT_NE(++cbegin, cend);
+    ASSERT_NE(cbegin++, cend);
+    ASSERT_EQ(cbegin+1, cend);
+    ASSERT_NE(cbegin, cend);
+    ASSERT_EQ((cbegin += 1), cend);
+    ASSERT_EQ(cbegin, cend);
 }
 
 TEST(PersistentView, Contains) {
@@ -487,4 +579,23 @@ TEST(RawView, Empty) {
         (void)component;
         FAIL();
     }
+}
+
+TEST(RawView, Each) {
+    entt::DefaultRegistry registry;
+
+    registry.assign<int>(registry.create(), 1);
+    registry.assign<int>(registry.create(), 3);
+
+    auto view = registry.raw<int>();
+    const auto &cview = static_cast<const decltype(view) &>(view);
+    std::size_t cnt = 0;
+
+    view.each([&cnt](int &v) { cnt += (v % 2); });
+
+    ASSERT_EQ(cnt, std::size_t{2});
+
+    cview.each([&cnt](const int &v) { cnt -= (v % 2); });
+
+    ASSERT_EQ(cnt, std::size_t{0});
 }
