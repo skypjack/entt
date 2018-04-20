@@ -561,6 +561,37 @@ TEST(RawView, Functionalities) {
     ASSERT_TRUE(view.empty());
 }
 
+TEST(RawView, BeginEnd) {
+    entt::DefaultRegistry registry;
+    auto view = registry.raw<int>();
+
+    for(auto i = 0; i < 3; ++i) {
+        registry.assign<int>(registry.create());
+    }
+
+    auto begin = view.begin();
+    auto end = view.end();
+
+    ASSERT_NE(begin, end);
+    ASSERT_NE(++begin, end);
+    ASSERT_NE(begin++, end);
+    ASSERT_EQ(begin+1, end);
+    ASSERT_NE(begin, end);
+    ASSERT_EQ((begin += 1), end);
+    ASSERT_EQ(begin, end);
+
+    auto cbegin = view.cbegin();
+    auto cend = view.cend();
+
+    ASSERT_NE(cbegin, cend);
+    ASSERT_NE(++cbegin, cend);
+    ASSERT_NE(cbegin++, cend);
+    ASSERT_EQ(cbegin+1, cend);
+    ASSERT_NE(cbegin, cend);
+    ASSERT_EQ((cbegin += 1), cend);
+    ASSERT_EQ(cbegin, cend);
+}
+
 TEST(RawView, Empty) {
     entt::DefaultRegistry registry;
 
