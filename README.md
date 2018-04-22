@@ -51,6 +51,8 @@
    * [Delegate](#delegate)
    * [Event dispatcher](#event-dispatcher)
    * [Event emitter](#event-emitter)
+* [Packaging Tools](#packaging-tools)
+* [EnTT in Action](#entt-in-action)
 * [License](#license)
 * [Support](#support)
    * [Donation](#donation)
@@ -2430,6 +2432,38 @@ In general, the event emitter is a handy tool when the derived classes _wrap_
 asynchronous operations, because it introduces a _nice-to-have_ model based on
 events and listeners that kindly hides the complexity behind the scenes. However
 it is not limited to such uses.
+
+# Packaging Tools
+
+`EnTT` is available for some of the most known packaging tools. In particular:
+
+* [`vcpkg`](https://github.com/Microsoft/vcpkg/tree/master/ports/entt),
+  Microsoft VC++ Packaging Tool.
+
+Consider this list a work in progress and help me to make it longer.
+
+# EnTT in Action
+
+`EnTT` is widely used in private and commercial applications. I cannot even
+mention most of them because of some signatures I put on some documents time
+ago.<br/>
+Fortunately, there are also people who took the time to implement open source
+projects based on EnTT and did not hold back when it came to documenting them.
+
+Below an incomplete list of projects and articles:
+
+* [EnttPong](https://github.com/reworks/EnttPong) - Example game for `EnTT`
+  framework.
+* [ECS_SpaceBattle](https://github.com/vblanco20-1/ECS_SpaceBattle) - Huge space
+  battle using an ECS library for the logic. Built on UE4.
+* Code: [Experimenting with ECS in UE4](http://victor.madtriangles.com/code%20experiment/2018/03/25/post-ue4-ecs-battle.html)
+* [Implementing ECS architecture in UE4](https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1449913-implementing-ecs-architecture-in-ue4-giant-space-battle).
+  Giant space battle.
+* [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt).
+* ...
+
+If you know of other resources out there that are about `EnTT`, feel free to
+open an issue or a PR and I'll be glad to add them to the list.
 
 # Contributors
 
