@@ -808,6 +808,8 @@ public:
      * }
      * @endcode
      *
+     * Prefer this function anyway because it has slightly better performance.
+     *
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.<br/>
      * An assertion will abort the execution at runtime in debug mode in case of
@@ -821,9 +823,12 @@ public:
      */
     template<typename Component, typename... Args>
     Component & accommodate(entity_type entity, Args &&... args) {
-        return (has<Component>(entity)
-                ? replace<Component>(entity, std::forward<Args>(args)...)
-                : assign<Component>(entity, std::forward<Args>(args)...));
+        assure<Component>();
+        auto &cpool = pool<Component>();
+
+        return (cpool.has(entity)
+                ? cpool.get(entity) = Component{std::forward<Args>(args)...}
+                : cpool.construct(entity, std::forward<Args>(args)...));
     }
 
     /**

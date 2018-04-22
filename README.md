@@ -462,8 +462,8 @@ velocity.dx = 0.;
 velocity.dy = 0.;
 ```
 
-Note that `accommodate` is mostly syntactic sugar for the following `if`/`else`
-statement and nothing more:
+Note that `accommodate` is a slightly faster alternative for the following
+`if/else` statement and nothing more:
 
 ```cpp
 if(registry.has<Comp>(entity)) {
