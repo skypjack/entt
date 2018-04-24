@@ -2439,6 +2439,12 @@ it is not limited to such uses.
 
 * [`vcpkg`](https://github.com/Microsoft/vcpkg/tree/master/ports/entt),
   Microsoft VC++ Packaging Tool.
+* [`Homebrew`](https://github.com/skypjack/homebrew-entt), the missing package
+  manager for macOS.<br/>
+  Available as a homebrew formula. Just type the following to install it:
+  ```
+  brew install skypjack/entt/entt
+  ```
 
 Consider this list a work in progress and help me to make it longer.
 
