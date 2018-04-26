@@ -5,39 +5,19 @@
 namespace entt {
 
 
-/**
- * @brief Tag class type.
- *
- * An empty class type used to disambiguate the overloads of some member
- * functions.
- */
+/*! @brief Tag class type used to disambiguate overloads. */
 struct tag_t final {};
 
 
-/**
- * @brief Persistent view type.
- *
- * An empty class type used to disambiguate the overloads of some member
- * functions.
- */
+/*! @brief Persistent view type used to disambiguate overloads. */
 struct persistent_t final {};
 
 
-/**
- * @brief Raw view type.
- *
- * An empty class type used to disambiguate the overloads of some member
- * functions.
- */
+/*! @brief Raw view type used to disambiguate overloads. */
 struct raw_t final {};
 
 
-/**
- * @brief Break type.
- *
- * An empty class type used to disambiguate the overloads of some member
- * functions.
- */
+/*! @brief Break type used to disambiguate overloads. */
 struct break_t final {};
 
 

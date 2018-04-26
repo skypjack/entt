@@ -470,7 +470,7 @@ class ContinuousLoader final {
 
         each(archive, [&archive, member..., this](auto entity) {
             entity = restore(entity);
-            auto &tag = registry.template assign<Tag>(entt::tag_t{}, entity);
+            auto &tag = registry.template assign<Tag>(tag_t{}, entity);
             archive(tag);
 
             using accumulator_type = int[];

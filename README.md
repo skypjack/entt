@@ -1068,7 +1068,7 @@ All of them have pros and cons to take in consideration. In particular:
 
   * Once prepared, creating and destroying them isn't expensive at all because
     they don't have any type of initialization.
-  * They are the best tool for iterating entities for mmultiple components and
+  * They are the best tool for iterating entities for multiple components when
     most entities have them all.
 
   Cons:
@@ -1100,12 +1100,21 @@ All of them have pros and cons to take in consideration. In particular:
 To sum up and as a rule of thumb:
 
 * Use a raw view to iterate components only (no entities) for a given type.
-* Use a standard view to iterate entities for a single component.
-* Use a standard view to iterate entities for multiple components when a
-  significantly low number of entities have one of the components.
+* Use a standard view to iterate entities and components for a single type.
+* Use a standard view to iterate entities and components for multiple types when
+  the number of types is low. Standard views are really optimized and persistent
+  views won't add much in this case.
+* Use a standard view to iterate entities and components for multiple types when
+  a significantly low number of entities have one of the components.
 * Use a standard view in all those cases where a persistent view would give a
   boost to performance but the iteration isn't performed frequently.
-* Prepare and use a persistent view in all the other cases.
+* Prepare and use a persistent view when you want to iterate only entities for
+  multiple components.
+* Prepare and use a persistent view when you want to iterate entities for
+  multiple components and each component is assigned to a great number of
+  entities but the intersection between the sets of entities is small.
+* Prepare and use a persistent view in all the cases where a standard view
+  wouldn't fit well otherwise.
 
 To easily iterate entities and components, all the views offer the common
 `begin` and `end` member functions that allow users to use a view in a typical

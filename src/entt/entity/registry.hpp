@@ -44,14 +44,15 @@ class Registry {
 
     template<typename... Component>
     static void creating(Registry &registry, Entity entity) {
-        const auto ttype = handler_family::type<Component...>();
-        return registry.has<Component...>(entity) ? registry.handlers[ttype]->construct(entity) : void();
+        if(registry.has<Component...>(entity)) {
+            registry.handlers[handler_family::type<Component...>()]->construct(entity);
+        }
     }
 
     template<typename... Component>
     static void destroying(Registry &registry, Entity entity) {
-        auto &handler = registry.handlers[handler_family::type<Component...>()];
-        return handler->has(entity) ? handler->destroy(entity) : void();
+        auto &handler = *registry.handlers[handler_family::type<Component...>()];
+        return handler.has(entity) ? handler.destroy(entity) : void();
     }
 
     struct Attachee {
@@ -85,7 +86,7 @@ class Registry {
     }
 
     template<typename Component>
-    SparseSet<Entity, Component> & pool() ENTT_NOEXCEPT {
+    inline SparseSet<Entity, Component> & pool() ENTT_NOEXCEPT {
         return const_cast<SparseSet<Entity, Component> &>(const_cast<const Registry *>(this)->pool<Component>());
     }
 
@@ -153,7 +154,7 @@ public:
      * @return Runtime numeric identifier of the given type of tag.
      */
     template<typename Tag>
-    tag_type type(tag_t) const ENTT_NOEXCEPT {
+    static tag_type type(tag_t) ENTT_NOEXCEPT {
         return tag_family::type<Tag>();
     }
 
@@ -170,7 +171,7 @@ public:
      * @return Runtime numeric identifier of the given type of component.
      */
     template<typename Component>
-    component_type type() const ENTT_NOEXCEPT {
+    static component_type type() ENTT_NOEXCEPT {
         return component_family::type<Component>();
     }
 
@@ -280,7 +281,7 @@ public:
      * @return A pointer to the array of components of the given type.
      */
     template<typename Component>
-    Component * raw() ENTT_NOEXCEPT {
+    inline Component * raw() ENTT_NOEXCEPT {
         return const_cast<Component *>(const_cast<const Registry *>(this)->raw<Component>());
     }
 
@@ -619,7 +620,7 @@ public:
      * @return A reference to the tag.
      */
     template<typename Tag>
-    Tag & get() ENTT_NOEXCEPT {
+    inline Tag & get() ENTT_NOEXCEPT {
         return const_cast<Tag &>(const_cast<const Registry *>(this)->get<Tag>());
     }
 
@@ -659,7 +660,7 @@ public:
      * @return A reference to the component owned by the entity.
      */
     template<typename Component>
-    Component & get(entity_type entity) ENTT_NOEXCEPT {
+    inline Component & get(entity_type entity) ENTT_NOEXCEPT {
         return const_cast<Component &>(const_cast<const Registry *>(this)->get<Component>(entity));
     }
 

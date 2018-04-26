@@ -77,13 +77,11 @@ TEST(Benchmark, IterateCreateDeleteSingleComponent) {
             registry.assign<Position>(entity);
         }
 
-        view.each([&](auto entity, auto &position) {
-            (void)position;
-
+        for(auto entity: view) {
             if(rand() % 2 == 0) {
                 registry.destroy(entity);
             }
-        });
+        }
     }
 
     timer.elapsed();
@@ -99,9 +97,16 @@ TEST(Benchmark, IterateSingleComponent1M) {
         registry.assign<Position>(entity);
     }
 
-    Timer timer;
-    registry.view<Position>().each([](auto, auto &) {});
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto, const auto &) {});
+    test([](auto, auto &position) {
+        position.x = {};
+    });
 }
 
 TEST(Benchmark, IterateSingleComponentRaw1M) {
@@ -114,11 +119,16 @@ TEST(Benchmark, IterateSingleComponentRaw1M) {
         registry.assign<Position>(entity);
     }
 
-    Timer timer;
-    for(auto &&component: registry.view<Position>(entt::raw_t{})) {
-        (void)component;
-    }
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position>(entt::raw_t{}).each(func);
+        timer.elapsed();
+    };
+
+    test([](const auto &) {});
+    test([](auto &position) {
+        position.x = {};
+    });
 }
 
 TEST(Benchmark, IterateTwoComponents1M) {
@@ -132,9 +142,17 @@ TEST(Benchmark, IterateTwoComponents1M) {
         registry.assign<Velocity>(entity);
     }
 
-    Timer timer;
-    registry.view<Position, Velocity>().each([](auto, auto &...) {});
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position, Velocity>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto, const auto &...) {});
+    test([](auto, auto &position, auto &velocity) {
+        position.x = {};
+        velocity.x = {};
+    });
 }
 
 TEST(Benchmark, IterateTwoComponents1MHalf) {
@@ -151,9 +169,17 @@ TEST(Benchmark, IterateTwoComponents1MHalf) {
         }
     }
 
-    Timer timer;
-    registry.view<Position, Velocity>().each([](auto, auto &...) {});
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position, Velocity>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto, const auto &...) {});
+    test([](auto, auto &position, auto &velocity) {
+        position.x = {};
+        velocity.x = {};
+    });
 }
 
 TEST(Benchmark, IterateTwoComponents1MOne) {
@@ -170,9 +196,17 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
         }
     }
 
-    Timer timer;
-    registry.view<Position, Velocity>().each([](auto, auto &...) {});
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position, Velocity>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto, const auto &...) {});
+    test([](auto, auto &position, auto &velocity) {
+        position.x = {};
+        velocity.x = {};
+    });
 }
 
 TEST(Benchmark, IterateTwoComponentsPersistent1M) {
@@ -187,9 +221,17 @@ TEST(Benchmark, IterateTwoComponentsPersistent1M) {
         registry.assign<Velocity>(entity);
     }
 
-    Timer timer;
-    registry.view<Position, Velocity>(entt::persistent_t{}).each([](auto, auto &...) {});
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position, Velocity>(entt::persistent_t{}).each(func);
+        timer.elapsed();
+    };
+
+    test([](auto, const auto &...) {});
+    test([](auto, auto &position, auto &velocity) {
+        position.x = {};
+        velocity.x = {};
+    });
 }
 
 TEST(Benchmark, IterateFiveComponents1M) {
@@ -206,9 +248,20 @@ TEST(Benchmark, IterateFiveComponents1M) {
         registry.assign<Comp<3>>(entity);
     }
 
-    Timer timer;
-    registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>().each([](auto, auto &...) {});
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto, const auto &...) {});
+    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3) {
+        position.x = {};
+        velocity.x = {};
+        comp1.x = {};
+        comp2.x = {};
+        comp3.x = {};
+    });
 }
 
 TEST(Benchmark, IterateFiveComponents1MHalf) {
@@ -228,9 +281,20 @@ TEST(Benchmark, IterateFiveComponents1MHalf) {
         }
     }
 
-    Timer timer;
-    registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>().each([](auto, auto &...) {});
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto, const auto &...) {});
+    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3) {
+        position.x = {};
+        velocity.x = {};
+        comp1.x = {};
+        comp2.x = {};
+        comp3.x = {};
+    });
 }
 
 TEST(Benchmark, IterateFiveComponents1MOne) {
@@ -250,9 +314,20 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
         }
     }
 
-    Timer timer;
-    registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>().each([](auto, auto &...) {});
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto, const auto &...) {});
+    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3) {
+        position.x = {};
+        velocity.x = {};
+        comp1.x = {};
+        comp2.x = {};
+        comp3.x = {};
+    });
 }
 
 TEST(Benchmark, IterateFiveComponentsPersistent1M) {
@@ -270,9 +345,20 @@ TEST(Benchmark, IterateFiveComponentsPersistent1M) {
         registry.assign<Comp<3>>(entity);
     }
 
-    Timer timer;
-    registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>(entt::persistent_t{}).each([](auto, auto &...) {});
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>>(entt::persistent_t{}).each(func);
+        timer.elapsed();
+    };
+
+    test([](auto, const auto &...) {});
+    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3) {
+        position.x = {};
+        velocity.x = {};
+        comp1.x = {};
+        comp2.x = {};
+        comp3.x = {};
+    });
 }
 
 TEST(Benchmark, IterateTenComponents1M) {
@@ -294,9 +380,25 @@ TEST(Benchmark, IterateTenComponents1M) {
         registry.assign<Comp<8>>(entity);
     }
 
-    Timer timer;
-    registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>().each([](auto, auto &...) {});
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto, const auto &...) {});
+    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3, auto &comp4, auto &comp5, auto &comp6, auto &comp7, auto &comp8) {
+        position.x = {};
+        velocity.x = {};
+        comp1.x = {};
+        comp2.x = {};
+        comp3.x = {};
+        comp4.x = {};
+        comp5.x = {};
+        comp6.x = {};
+        comp7.x = {};
+        comp8.x = {};
+    });
 }
 
 TEST(Benchmark, IterateTenComponents1MHalf) {
@@ -321,9 +423,25 @@ TEST(Benchmark, IterateTenComponents1MHalf) {
         }
     }
 
-    Timer timer;
-    registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>().each([](auto, auto &...) {});
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto, auto &...) {});
+    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3, auto &comp4, auto &comp5, auto &comp6, auto &comp7, auto &comp8) {
+        position.x = {};
+        velocity.x = {};
+        comp1.x = {};
+        comp2.x = {};
+        comp3.x = {};
+        comp4.x = {};
+        comp5.x = {};
+        comp6.x = {};
+        comp7.x = {};
+        comp8.x = {};
+    });
 }
 
 TEST(Benchmark, IterateTenComponents1MOne) {
@@ -348,9 +466,25 @@ TEST(Benchmark, IterateTenComponents1MOne) {
         }
     }
 
-    Timer timer;
-    registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>().each([](auto, auto &...) {});
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](auto, const auto &...) {});
+    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3, auto &comp4, auto &comp5, auto &comp6, auto &comp7, auto &comp8) {
+        position.x = {};
+        velocity.x = {};
+        comp1.x = {};
+        comp2.x = {};
+        comp3.x = {};
+        comp4.x = {};
+        comp5.x = {};
+        comp6.x = {};
+        comp7.x = {};
+        comp8.x = {};
+    });
 }
 
 TEST(Benchmark, IterateTenComponentsPersistent1M) {
@@ -373,9 +507,25 @@ TEST(Benchmark, IterateTenComponentsPersistent1M) {
         registry.assign<Comp<8>>(entity);
     }
 
-    Timer timer;
-    registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>(entt::persistent_t{}).each([](auto, auto &...) {});
-    timer.elapsed();
+    auto test = [&registry](auto func) {
+        Timer timer;
+        registry.view<Position, Velocity, Comp<1>, Comp<2>, Comp<3>, Comp<4>, Comp<5>, Comp<6>, Comp<7>, Comp<8>>(entt::persistent_t{}).each(func);
+        timer.elapsed();
+    };
+
+    test([](auto, const auto &...) {});
+    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3, auto &comp4, auto &comp5, auto &comp6, auto &comp7, auto &comp8) {
+        position.x = {};
+        velocity.x = {};
+        comp1.x = {};
+        comp2.x = {};
+        comp3.x = {};
+        comp4.x = {};
+        comp5.x = {};
+        comp6.x = {};
+        comp7.x = {};
+        comp8.x = {};
+    });
 }
 
 TEST(Benchmark, SortSingle) {

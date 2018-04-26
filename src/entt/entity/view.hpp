@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
+#include "../core/ident.hpp"
 #include "entt_traits.hpp"
 #include "sparse_set.hpp"
 
@@ -247,7 +248,7 @@ public:
      * @return The component assigned to the entity.
      */
     template<typename Comp>
-    Comp & get(entity_type entity) ENTT_NOEXCEPT {
+    inline Comp & get(entity_type entity) ENTT_NOEXCEPT {
         return const_cast<Comp &>(const_cast<const PersistentView *>(this)->get<Comp>(entity));
     }
 
@@ -339,9 +340,9 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func func) {
-        std::for_each(view.begin(), view.end(), [&func, this](const auto entity) {
-            func(entity, std::get<pool_type<Component> &>(pools).get(entity)...);
+    inline void each(Func func) {
+        const_cast<const PersistentView *>(this)->each([&func](entity_type entity, const Component &... component) {
+            func(entity, const_cast<Component &>(component)...);
         });
     }
 
@@ -428,6 +429,28 @@ class View final {
     using pattern_type = std::tuple<pool_type<Component> &...>;
     using traits_type = entt_traits<Entity>;
 
+    template<typename...>
+    struct ComponentList {};
+
+    template<typename, typename, typename = ComponentList<>, typename = void>
+    struct SplitComponentListBy;
+
+    template<typename Comp, typename Next, typename... Other, typename... Types>
+    struct SplitComponentListBy<Comp, ComponentList<Next, Other...>, ComponentList<Types...>, std::enable_if_t<std::is_same<Comp, Next>::value>> {
+        using pre_type = ComponentList<Types...>;
+        using post_type = ComponentList<Other...>;
+    };
+
+    template<typename Comp, typename Next, typename... Other, typename... Types>
+    struct SplitComponentListBy<Comp, ComponentList<Next, Other...>, ComponentList<Types...>, std::enable_if_t<!std::is_same<Comp, Next>::value>>
+            : SplitComponentListBy<Comp, ComponentList<Other...>, ComponentList<Types..., Next>> {};
+
+    template<typename Comp>
+    using PreList = typename SplitComponentListBy<Comp, ComponentList<Component...>>::pre_type;
+
+    template<typename Comp>
+    using PostList = typename SplitComponentListBy<Comp, ComponentList<Component...>>::post_type;
+
     class Iterator {
         using size_type = typename view_type::size_type;
 
@@ -498,9 +521,30 @@ class View final {
     };
 
     View(pool_type<Component> &... pools) ENTT_NOEXCEPT
-        : pools{pools...}, view{nullptr}, unchecked{}
+        : pools{pools...}, view{nullptr}, unchecked{}, idx{}
     {
         reset();
+    }
+
+    template<typename Comp, typename... Pre, typename... Post, typename Func>
+    void each(Func func, ComponentList<Pre...>, ComponentList<Post...>) const {
+        const auto extent = std::min({ std::get<pool_type<Component> &>(pools).extent()... });
+        auto &pool = std::get<pool_type<Comp> &>(pools);
+
+        std::for_each(pool.view_type::cbegin(), pool.view_type::cend(), [&func, raw = pool.cbegin(), extent, this](const auto entity) mutable {
+            const auto sz = size_type(entity & traits_type::entity_mask);
+
+            if(sz < extent) {
+                auto pos = unchecked.size();
+
+                for(; pos && unchecked[pos-1]->fast(entity); --pos);
+
+                if(!pos) {
+                    // avoided indirections due to the sparse set for the pivot
+                    func(entity, std::get<pool_type<Pre> &>(pools).get(entity)..., *(raw)++, std::get<pool_type<Post> &>(pools).get(entity)...);
+                }
+            }
+        });
     }
 
 public:
@@ -663,7 +707,7 @@ public:
      * @return The component assigned to the entity.
      */
     template<typename Comp>
-    Comp & get(entity_type entity) ENTT_NOEXCEPT {
+    inline Comp & get(entity_type entity) ENTT_NOEXCEPT {
         return const_cast<Comp &>(const_cast<const View *>(this)->get<Comp>(entity));
     }
 
@@ -732,22 +776,11 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func func) const {
-        const auto extent = std::min({ std::get<pool_type<Component> &>(pools).extent()... });
-
-        std::for_each(view->cbegin(), view->cend(), [&func, extent, this](const auto entity) {
-            const auto sz = size_type(entity & traits_type::entity_mask);
-
-            if(sz < extent) {
-                auto pos = unchecked.size();
-
-                for(; pos && unchecked[pos-1]->fast(entity); --pos);
-
-                if(!pos) {
-                    func(entity, std::get<pool_type<Component> &>(pools).get(entity)...);
-                }
-            }
-        });
+    inline void each(Func func) const {
+        constexpr auto indexes = ident<Component...>;
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (indexes.template get<Component>() == idx ? (each<Component>(std::move(func), PreList<Component>{}, PostList<Component>{}), 0) : 0)... };
+        (void)accumulator;
     }
 
     /**
@@ -767,7 +800,7 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func func) {
+    inline void each(Func func) {
         const_cast<const View *>(this)->each([&func](entity_type entity, const Component &... component) {
             func(entity, const_cast<Component &>(component)...);
         });
@@ -786,18 +819,18 @@ public:
     void reset() {
         using accumulator_type = size_type[];
         size_type sz = std::max({ std::get<pool_type<Component> &>(pools).size()... }) + std::size_t{1};
-        size_type pos{};
+        size_type next{};
 
         auto probe = [this](auto sz, const auto &pool) {
             return pool.size() < sz ? (view = &pool, pool.size()) : sz;
         };
 
-        auto filter = [this](auto pos, const auto &pool) {
-            return (view != &pool) ? (unchecked[pos++] = &pool, pos) : pos;
+        auto filter = [this](auto next, const auto &pool) {
+            return (view == &pool) ? (idx = next) : (unchecked[next++] = &pool, next);
         };
 
         accumulator_type probing = { (sz = probe(sz, std::get<pool_type<Component> &>(pools)))... };
-        accumulator_type filtering = { (pos = filter(pos, std::get<pool_type<Component> &>(pools)))... };
+        accumulator_type filtering = { (next = filter(next, std::get<pool_type<Component> &>(pools)))... };
 
         (void)filtering;
         (void)probing;
@@ -807,6 +840,7 @@ private:
     const pattern_type pools;
     const view_type *view;
     unchecked_type unchecked;
+    size_type idx;
 };
 
 
@@ -915,7 +949,7 @@ public:
      *
      * @return A pointer to the array of components.
      */
-    raw_type * raw() ENTT_NOEXCEPT {
+    inline raw_type * raw() ENTT_NOEXCEPT {
         return const_cast<raw_type *>(const_cast<const View *>(this)->raw());
     }
 
@@ -1053,7 +1087,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The component assigned to the entity.
      */
-    Component & get(entity_type entity) ENTT_NOEXCEPT {
+    inline Component & get(entity_type entity) ENTT_NOEXCEPT {
         return const_cast<Component &>(const_cast<const View *>(this)->get(entity));
     }
 
@@ -1074,8 +1108,8 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        std::for_each(pool.view_type::cbegin(), pool.view_type::cend(), [&func, this](const auto entity) {
-            func(entity, pool.get(entity));
+        std::for_each(pool.view_type::cbegin(), pool.view_type::cend(), [&func, raw = pool.cbegin()](const auto entity) mutable {
+            func(entity, *(raw++));
         });
     }
 
@@ -1095,9 +1129,9 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func func) {
-        std::for_each(pool.view_type::begin(), pool.view_type::end(), [&func, this](const auto entity) {
-            func(entity, pool.get(entity));
+    inline void each(Func func) {
+        const_cast<const View *>(this)->each([&func](entity_type entity, const Component &component) {
+            func(entity, const_cast<Component &>(component));
         });
     }
 
@@ -1211,7 +1245,7 @@ public:
      *
      * @return A pointer to the array of components.
      */
-    raw_type * raw() ENTT_NOEXCEPT {
+    inline raw_type * raw() ENTT_NOEXCEPT {
         return const_cast<raw_type *>(const_cast<const RawView *>(this)->raw());
     }
 

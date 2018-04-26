@@ -692,7 +692,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The object associated to the entity.
      */
-    object_type & get(entity_type entity) ENTT_NOEXCEPT {
+    inline object_type & get(entity_type entity) ENTT_NOEXCEPT {
         return const_cast<object_type &>(const_cast<const SparseSet *>(this)->get(entity));
     }
 

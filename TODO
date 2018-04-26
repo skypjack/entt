@@ -5,7 +5,8 @@
 * define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
 * does it worth it to add an optional functor to the member functions of snapshot so as to filter out instances and entities?
+* allow for custom sort functions on registry/view sort (unlikely std::sort is the best function ever in game programming)
 * ease the assignment of tags as string (use a template class with a non-type template parameter behind the scene)
-* dictionary based dependency class (templates copied over) + prefabs (shared state/copy-on-write)
+* prototype entities, a really interesting feature (see #56)
 * "singleton mode" for tags (see #66)
 * AOB

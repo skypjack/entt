@@ -143,7 +143,7 @@ struct Actor {
      * @return A reference to the instance of the tag owned by the actor.
      */
     template<typename Tag>
-    Tag & get(tag_t) ENTT_NOEXCEPT {
+    inline Tag & get(tag_t) ENTT_NOEXCEPT {
         return const_cast<Tag &>(const_cast<const Actor *>(this)->get<Tag>(tag_t{}));
     }
 
@@ -163,7 +163,7 @@ struct Actor {
      * @return A reference to the instance of the component owned by the actor.
      */
     template<typename Component>
-    Component & get() ENTT_NOEXCEPT {
+    inline Component & get() ENTT_NOEXCEPT {
         return const_cast<Component &>(const_cast<const Actor *>(this)->get<Component>());
     }
 
@@ -179,7 +179,7 @@ struct Actor {
      * @brief Returns a reference to the underlying registry.
      * @return A reference to the underlying registry.
      */
-    registry_type & registry() ENTT_NOEXCEPT {
+    inline registry_type & registry() ENTT_NOEXCEPT {
         return const_cast<registry_type &>(const_cast<const Actor *>(this)->registry());
     }
 
