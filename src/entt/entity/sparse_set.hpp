@@ -11,6 +11,7 @@
 #include <cassert>
 #include <type_traits>
 #include "../config/config.h"
+#include "../core/algorithm.hpp"
 #include "entt_traits.hpp"
 
 
@@ -787,20 +788,36 @@ public:
      * bool(const Type &, const Type &)
      * @endcode
      *
+     * Moreover, the comparison function object shall induce a
+     * _strict weak ordering_ on the values.
+     *
+     * The sort function oject must offer a member function template
+     * `operator()` that accepts three arguments:
+     *
+     * * An iterator to the first element of the range to sort.
+     * * An iterator past the last element of the range to sort.
+     * * A comparison function to use to compare the elements.
+     *
+     * The comparison funtion object received by the sort function object hasn't
+     * necessarily the type of the one passed along with the other parameters to
+     * this member function.
+     *
      * @note
      * Attempting to iterate elements using a raw pointer returned by a call to
      * either `data` or `raw` gives no guarantees on the order, even though
      * `sort` has been invoked.
      *
      * @tparam Compare Type of comparison function object.
+     * @tparam Sort Type of sort function object.
      * @param compare A valid comparison function object.
+     * @param sort A valid sort function object.
      */
-    template<typename Compare>
-    void sort(Compare compare) {
+    template<typename Compare, typename Sort = StdSort>
+    void sort(Compare compare, Sort sort = Sort{}) {
         std::vector<pos_type> copy(instances.size());
         std::iota(copy.begin(), copy.end(), 0);
 
-        std::sort(copy.begin(), copy.end(), [this, compare = std::move(compare)](auto lhs, auto rhs) {
+        sort(copy.begin(), copy.end(), [this, compare = std::move(compare)](auto lhs, auto rhs) {
             return compare(const_cast<const object_type &>(instances[rhs]), const_cast<const object_type &>(instances[lhs]));
         });
 

@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
+#include "../core/algorithm.hpp"
 #include "../core/family.hpp"
 #include "../signal/sigh.hpp"
 #include "entt_traits.hpp"
@@ -967,14 +968,30 @@ public:
      * bool(const Component &, const Component &)
      * @endcode
      *
+     * Moreover, the comparison function object shall induce a
+     * _strict weak ordering_ on the values.
+     *
+     * The sort function oject must offer a member function template
+     * `operator()` that accepts three arguments:
+     *
+     * * An iterator to the first element of the range to sort.
+     * * An iterator past the last element of the range to sort.
+     * * A comparison function to use to compare the elements.
+     *
+     * The comparison funtion object received by the sort function object hasn't
+     * necessarily the type of the one passed along with the other parameters to
+     * this member function.
+     *
      * @tparam Component Type of components to sort.
      * @tparam Compare Type of comparison function object.
+     * @tparam Sort Type of sort function object.
      * @param compare A valid comparison function object.
+     * @param sort A valid sort function object.
      */
-    template<typename Component, typename Compare>
-    void sort(Compare compare) {
+    template<typename Component, typename Compare, typename Sort = StdSort>
+    void sort(Compare compare, Sort sort = Sort{}) {
         assure<Component>();
-        pool<Component>().sort(std::move(compare));
+        pool<Component>().sort(std::move(compare), std::move(sort));
     }
 
     /**

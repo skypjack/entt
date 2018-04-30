@@ -45,6 +45,7 @@ endif()
 
 # Test core
 
+ADD_ENTT_TEST(algorithm entt/core/algorithm.cpp)
 ADD_ENTT_TEST(family entt/core/family.cpp)
 ADD_ENTT_TEST(hashed_string entt/core/hashed_string.cpp)
 ADD_ENTT_TEST(ident entt/core/ident.cpp)

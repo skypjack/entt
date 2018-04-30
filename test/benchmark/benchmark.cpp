@@ -568,3 +568,63 @@ TEST(Benchmark, SortMulti) {
 
     timer.elapsed();
 }
+
+TEST(Benchmark, AlmostSortedStdSort) {
+    entt::DefaultRegistry registry;
+    entt::DefaultRegistry::entity_type entities[3];
+
+    std::cout << "Sort 150000 entities, almost sorted, std::sort" << std::endl;
+
+    for(std::uint64_t i = 0; i < 150000L; i++) {
+        const auto entity = registry.create();
+        registry.assign<Position>(entity, i, i);
+
+        if(!(i % 50000)) {
+            entities[i / 50000] = entity;
+        }
+    }
+
+    for(std::uint64_t i = 0; i < 3; ++i) {
+        registry.destroy(entities[i]);
+        const auto entity = registry.create();
+        registry.assign<Position>(entity, 50000 * i, 50000 * i);
+    }
+
+    Timer timer;
+
+    registry.sort<Position>([](const auto &lhs, const auto &rhs) {
+        return lhs.x > rhs.x && lhs.y > rhs.y;
+    });
+
+    timer.elapsed();
+}
+
+TEST(Benchmark, AlmostSortedInsertionSort) {
+    entt::DefaultRegistry registry;
+    entt::DefaultRegistry::entity_type entities[3];
+
+    std::cout << "Sort 150000 entities, almost sorted, insertion sort" << std::endl;
+
+    for(std::uint64_t i = 0; i < 150000L; i++) {
+        const auto entity = registry.create();
+        registry.assign<Position>(entity, i, i);
+
+        if(!(i % 50000)) {
+            entities[i / 50000] = entity;
+        }
+    }
+
+    for(std::uint64_t i = 0; i < 3; ++i) {
+        registry.destroy(entities[i]);
+        const auto entity = registry.create();
+        registry.assign<Position>(entity, 50000 * i, 50000 * i);
+    }
+
+    Timer timer;
+
+    registry.sort<Position>([](const auto &lhs, const auto &rhs) {
+        return lhs.x > rhs.x && lhs.y > rhs.y;
+    }, entt::InsertionSort{});
+
+    timer.elapsed();
+}

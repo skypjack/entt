@@ -1,3 +1,4 @@
+#include "core/algorithm.hpp"
 #include "core/family.hpp"
 #include "core/hashed_string.hpp"
 #include "core/ident.hpp"

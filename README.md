@@ -751,6 +751,13 @@ In fact, there are two functions that respond to slightly different needs:
   });
   ```
 
+  There exists also the possibility to use a custom sort function object, as
+  long as it adheres to the requirements described in the
+  [official documentation](https://skypjack.github.io/entt/).<br/>
+  This is possible mainly because users can get much more with a custom sort
+  function object if the pattern of usage is known. As an example, in case of an
+  almost sorted pool, quick sort could be much, much slower than insertion sort.
+
 * Components can be sorted according to the order imposed by another component:
 
   ```cpp
