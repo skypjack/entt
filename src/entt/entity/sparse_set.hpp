@@ -92,7 +92,7 @@ class SparseSet<Entity> {
             return other.pos == pos;
         }
 
-        bool operator!=(const Iterator &other) const ENTT_NOEXCEPT {
+        inline bool operator!=(const Iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
@@ -502,7 +502,7 @@ class SparseSet<Entity, Type>: public SparseSet<Entity> {
             return other.pos == pos;
         }
 
-        bool operator!=(const Iterator &other) const ENTT_NOEXCEPT {
+        inline bool operator!=(const Iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 

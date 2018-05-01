@@ -483,7 +483,7 @@ class View final {
             return other.begin == begin;
         }
 
-        bool operator!=(const Iterator &other) const ENTT_NOEXCEPT {
+        inline bool operator!=(const Iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 

@@ -206,7 +206,7 @@ Dell XPS 13 out of the mid 2014):
 | Benchmark | EntityX (compile-time) | EnTT |
 |-----------|-------------|-------------|
 | Create 1M entities | 0.0147s | **0.0046s** |
-| Destroy 1M entities | 0.0053s | **0.0049s** |
+| Destroy 1M entities | 0.0053s | **0.0045s** |
 | Standard view, 1M entities, one component | 0.0012s | **1.9e-07s** |
 | Standard view, 1M entities, two components | 0.0012s | **3.8e-07s** |
 | Standard view, 1M entities, two components<br/>Half of the entities have all the components | 0.0009s | **3.8e-07s** |
@@ -221,6 +221,8 @@ Dell XPS 13 out of the mid 2014):
 | Raw view, 1M entities | - | **2.2e-07s** |
 | Sort 150k entities, one component<br/>Arrays are in reverse order | - | **0.0036s** |
 | Sort 150k entities, enforce permutation<br/>Arrays are in reverse order | - | **0.0005s** |
+| Sort 150k entities, one component<br/>Arrays are almost sorted, std::sort | - | **0.0035s** |
+| Sort 150k entities, one component<br/>Arrays are almost sorted, insertion sort | - | **0.0007s** |
 
 Note: The default version of `EntityX` (`master` branch) wasn't added to the
 comparison because it's already much slower than its compile-time counterpart.
@@ -236,8 +238,9 @@ case for these benchmarks.<br/>
 This is why they are completely wrong and cannot be used to evaluate any of the
 entity-component systems.
 
-If you decide to use `EnTT`, choose it because of its API and its performance,
-not because there is a benchmark somewhere that makes it seem the fastest.
+If you decide to use `EnTT`, choose it because of its API, features and
+performance, not because there is a benchmark somewhere that makes it seem the
+fastest.
 
 Probably I'll try to get out of `EnTT` more features and even better performance
 in the future, mainly for fun.<br/>
@@ -748,6 +751,7 @@ In fact, there are two functions that respond to slightly different needs:
   ```cpp
   registry.sort<Renderable>([](const auto &lhs, const auto &rhs) {
       return lhs.z < rhs.z;
+
   });
   ```
 

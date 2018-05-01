@@ -6,8 +6,6 @@
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
 * does it worth it to add an optional functor to the member functions of snapshot so as to filter out instances and entities?
 * ease the assignment of tags as string (use a template class with a non-type template parameter behind the scene)
-* add a small comparison of benchmarks for the single component view somewhere, to give a grasp of the performance
-* add benchmarks for sorting in case of almost sorted array and insertion sort
 * prototype entities, a really interesting feature (see #56)
 * is registry/utility.hpp really required?
 * "singleton mode" for tags (see #66)
