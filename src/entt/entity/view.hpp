@@ -517,7 +517,7 @@ class View final {
         const auto extent = std::min({ std::get<pool_type<Component> &>(pools).extent()... });
         auto &pool = std::get<pool_type<Comp> &>(pools);
 
-        std::for_each(pool.view_type::cbegin(), pool.view_type::cend(), [&func, raw = pool.cbegin(), extent, this](const auto entity) mutable {
+        std::for_each(pool.view_type::cbegin(), pool.view_type::cend(), [func = std::move(func), raw = pool.cbegin(), extent, this](const auto entity) mutable {
             const auto sz = size_type(entity & traits_type::entity_mask);
 
             if(sz < extent) {

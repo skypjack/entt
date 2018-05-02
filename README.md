@@ -234,7 +234,10 @@ indeed).<br/>
 The proposed entity-component system is incredibly fast to iterate entities,
 this is a fact. The compiler can make a lot of optimizations because of how
 `EnTT` works, even more when components aren't used at all. This is exactly the
-case for these benchmarks.<br/>
+case for these benchmarks. On the other hand, `EnTT` is in the middle between a
+bit and much faster than the other solutions around if users also access the
+components and not just the entities, although it is not as fast as reported by
+these benchmarks.<br/>
 This is why they are completely wrong and cannot be used to evaluate any of the
 entity-component systems.
 
