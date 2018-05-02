@@ -364,6 +364,7 @@ TEST(DefaultRegistry, AttachSetRemoveTags) {
     registry.assign<int>(entt::tag_t{}, entity, 42);
 
     ASSERT_TRUE(registry.has<int>());
+    ASSERT_TRUE(registry.has<int>(entt::tag_t{}, entity));
     ASSERT_EQ(registry.get<int>(), 42);
     ASSERT_EQ(cregistry.get<int>(), 42);
     ASSERT_EQ(registry.attachee<int>(), entity);
@@ -371,6 +372,7 @@ TEST(DefaultRegistry, AttachSetRemoveTags) {
     registry.replace<int>(entt::tag_t{}, 3);
 
     ASSERT_TRUE(registry.has<int>());
+    ASSERT_TRUE(registry.has<int>(entt::tag_t{}, entity));
     ASSERT_EQ(registry.get<int>(), 3);
     ASSERT_EQ(cregistry.get<int>(), 3);
     ASSERT_EQ(registry.attachee<int>(), entity);
@@ -379,6 +381,8 @@ TEST(DefaultRegistry, AttachSetRemoveTags) {
     registry.move<int>(other);
 
     ASSERT_TRUE(registry.has<int>());
+    ASSERT_FALSE(registry.has<int>(entt::tag_t{}, entity));
+    ASSERT_TRUE(registry.has<int>(entt::tag_t{}, other));
     ASSERT_EQ(registry.get<int>(), 3);
     ASSERT_EQ(cregistry.get<int>(), 3);
     ASSERT_EQ(registry.attachee<int>(), other);
@@ -386,11 +390,15 @@ TEST(DefaultRegistry, AttachSetRemoveTags) {
     registry.remove<int>();
 
     ASSERT_FALSE(registry.has<int>());
+    ASSERT_FALSE(registry.has<int>(entt::tag_t{}, entity));
+    ASSERT_FALSE(registry.has<int>(entt::tag_t{}, other));
 
     registry.assign<int>(entt::tag_t{}, entity, 42);
     registry.destroy(entity);
 
     ASSERT_FALSE(registry.has<int>());
+    ASSERT_FALSE(registry.has<int>(entt::tag_t{}, entity));
+    ASSERT_FALSE(registry.has<int>(entt::tag_t{}, other));
 }
 
 TEST(DefaultRegistry, StandardView) {

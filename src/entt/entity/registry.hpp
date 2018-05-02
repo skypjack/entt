@@ -569,6 +569,24 @@ public:
     }
 
     /**
+     * @brief Checks if an entity owns the given tag.
+     *
+     * Syntactic sugar for the following snippet:
+     *
+     * @code{.cpp}
+     * has<Tag>() && attachee<Tag>() == entity
+     * @endcode
+     *
+     * @tparam Tag Type of tag for which to perform the check.
+     * @param entity A valid entity identifier.
+     * @return True if the entity owns the tag, false otherwise.
+     */
+    template<typename Tag>
+    bool has(tag_t, entity_type entity) const ENTT_NOEXCEPT {
+        return has<Tag>() && attachee<Tag>() == entity;
+    }
+
+    /**
      * @brief Checks if an entity has all the given components.
      *
      * @warning
