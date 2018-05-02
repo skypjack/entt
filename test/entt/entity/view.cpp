@@ -277,6 +277,31 @@ TEST(View, MultipleComponentEach) {
     ASSERT_EQ(cnt, std::size_t{0});
 }
 
+TEST(View, MultipleComponentEachWithHoles) {
+    entt::DefaultRegistry registry;
+
+    const auto e0 = registry.create();
+    const auto e1 = registry.create();
+    const auto e2 = registry.create();
+
+    registry.assign<char>(e0, '0');
+    registry.assign<char>(e1, '1');
+
+    registry.assign<int>(e0, 0);
+    registry.assign<int>(e2, 2);
+
+    auto view = registry.view<char, int>();
+
+    view.each([&](auto entity, const char &c, const int &i) {
+        if(entity == e0) {
+            ASSERT_EQ(c, '0');
+            ASSERT_EQ(i, 0);
+        } else {
+            FAIL();
+        }
+    });
+}
+
 TEST(PersistentView, Prepare) {
     entt::DefaultRegistry registry;
     registry.prepare<int, char>();

@@ -506,7 +506,7 @@ class View final {
 
     template<typename Comp, typename Other, typename It>
     inline std::enable_if_t<std::is_same<Comp, Other>::value, const Other &>
-    get(It &it, Entity) const { return *(it++); }
+    get(const It &it, Entity) const { return *it; }
 
     template<typename Comp, typename Other, typename It>
     inline std::enable_if_t<!std::is_same<Comp, Other>::value, const Other &>
@@ -530,6 +530,8 @@ class View final {
                     func(entity, this->get<Comp, Component>(raw, entity)...);
                 }
             }
+
+            ++raw;
         });
     }
 
