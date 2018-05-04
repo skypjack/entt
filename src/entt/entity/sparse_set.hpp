@@ -275,7 +275,7 @@ public:
      */
     bool has(entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
-        // the in-use control bit permits to avoid accessing the direct vector
+        // testing against pending permits to avoid accessing the direct vector
         return (pos < reverse.size()) && (reverse[pos] != pending);
     }
 
@@ -299,7 +299,7 @@ public:
     bool fast(entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
         assert(pos < reverse.size());
-        // the in-use control bit permits to avoid accessing the direct vector
+        // testing against pending permits to avoid accessing the direct vector
         return (reverse[pos] != pending);
     }
 

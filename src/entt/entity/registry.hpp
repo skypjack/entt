@@ -574,7 +574,7 @@ public:
      * Syntactic sugar for the following snippet:
      *
      * @code{.cpp}
-     * has<Tag>() && attachee<Tag>() == entity
+     * registry.has<Tag>() && registry.attachee<Tag>() == entity
      * @endcode
      *
      * @tparam Tag Type of tag for which to perform the check.
