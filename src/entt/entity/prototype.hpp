@@ -198,7 +198,7 @@ public:
     /**
      * @brief Assigns of replaces the given component
      *
-     * @tparam Comp Type of component to replace
+     * @tparam Component Type of component to replace
      * @tparam Args Types of arguments to use to construct the component
      * @param args Parameters to use to initialize the component
      * @return A refernce to the newly created component
