@@ -216,6 +216,11 @@ private:
   std::vector<std::unique_ptr<StorageBase>> comps;
 };
 
+/**
+ * @brief Default prototype
+ */
+using DefaultPrototype = Prototype<uint32_t>;
+
 }
 
 #endif
