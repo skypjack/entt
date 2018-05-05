@@ -32,21 +32,25 @@ public:
   Prototype(Prototype &&) = default;
   Prototype &operator=(Prototype &&) = default;
 
-  void operator()(registry_t &reg, const entity_t entity) const {
+  bool empty() const ENTT_NOEXCEPT {
+    return comps.empty();
+  }
+
+  void operator()(registry_t &reg, const entity_t entity) const ENTT_NOEXCEPT {
     for (const std::unique_ptr<ComponentBase> &component : comps) {
       if (component) {
         component->assign(reg, entity);
       }
     }
   }
-  entity_t operator()(registry_t &reg) const {
+  entity_t operator()(registry_t &reg) const ENTT_NOEXCEPT {
     const entity_t entity = reg.create();
     (*this)(reg, entity);
     return entity;
   }
 
   template <typename Comp>
-  size_t type() const {
+  size_t type() const ENTT_NOEXCEPT {
     return family_t::template type<Comp>();
   }
 
@@ -65,25 +69,25 @@ public:
   }
   
   template <typename Comp>
-  void remove() {
+  void remove() ENTT_NOEXCEPT {
     assert(has<Comp>());
     comps[type<Comp>()] = nullptr;
   }
   
   template <typename Comp>
-  bool has() const {
+  bool has() const ENTT_NOEXCEPT {
     const size_t index = type<Comp>();
     return index < comps.size() && comps[index] != nullptr;
   }
   
   template <typename Comp>
-  const Comp &get() const {
+  const Comp &get() const ENTT_NOEXCEPT {
     assert(has<Comp>());
     return static_cast<Component<Comp> *>(comps[type<Comp>()].get())->comp;
   }
   
   template <typename Comp>
-  Comp &get() {
+  Comp &get() ENTT_NOEXCEPT {
     assert(has<Comp>());
     return static_cast<Component<Comp> *>(comps[type<Comp>()].get())->comp;
   }
