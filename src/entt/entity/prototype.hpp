@@ -100,9 +100,10 @@ public:
    *
    * @tparam Comp Type of component to create
    * @tparam Args Types of arguments to use to construct the component.
+   * @param args Parameters to use to initialize the component.
    * @return A reference to the newly created component.
    */
-  template <typename Comp, typename ...Args>
+  template <typename Comp, typename... Args>
   Comp &assign(Args &&... args) {
     assert(!has<Comp>());
     auto component = std::make_unique<Component<Comp>>();
@@ -175,6 +176,40 @@ public:
   Comp &get() ENTT_NOEXCEPT {
     assert(has<Comp>());
     return static_cast<Component<Comp> *>(comps[type<Comp>()].get())->comp;
+  }
+  
+  /**
+   * @brief Replaces the given component
+   *
+   * @warning
+   * An assertion will abort the execution at runtime in debug mode in case
+   * the prototype doesn't own the given component
+   *
+   * @tparam Comp Type of component to replace
+   * @tparam Args Types of arguments to use to construct the component
+   * @param args Parameters to use to initialize the component
+   * @return A refernce to the newly created component
+   */
+  template <typename Comp, typename... Args>
+  Comp &replace(Args &&... args) ENTT_NOEXCEPT {
+    return (get<Comp>() = Comp{std::forward<Args>(args)...});
+  }
+  
+  /**
+   * @brief Assigns of replaces the given component
+   *
+   * @tparam Comp Type of component to replace
+   * @tparam Args Types of arguments to use to construct the component
+   * @param args Parameters to use to initialize the component
+   * @return A refernce to the newly created component
+   */
+  template <typename Comp, typename... Args>
+  Comp &accommodate(Args &&... args) ENTT_NOEXCEPT {
+    if (has<Comp>()) {
+      return replace<Comp>(std::forward<Args>(args)...);
+    } else {
+      return assign<Comp>(std::forward<Args>(args)...);
+    }
   }
   
 private:
