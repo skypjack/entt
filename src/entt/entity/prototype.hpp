@@ -26,20 +26,18 @@ public:
   using family_t = entt::Family<struct PrototypeFamily>;
 
 private:
-  class ComponentBase {
-  public:
-    virtual ~ComponentBase() = default;
+  struct StorageBase {
+    virtual ~StorageBase() = default;
     virtual void accommodate(registry_t &, entity_t) const ENTT_NOEXCEPT = 0;
   };
   
-  template <typename Comp>
-  class Component : public ComponentBase {
-  public:
+  template <typename Component>
+  struct Storage : StorageBase {
     void accommodate(registry_t &reg, const entity_t entity) const ENTT_NOEXCEPT override {
-      reg.template accommodate<Comp>(entity, comp);
+      reg.template accommodate<Component>(entity, comp);
     }
     
-    Comp comp;
+    Component comp;
   };
 
 public:
@@ -60,7 +58,7 @@ public:
    * @brief Accommodate copies of the components to the given entity
    */
   void operator()(registry_t &reg, const entity_t entity) const ENTT_NOEXCEPT {
-    for (const std::unique_ptr<ComponentBase> &component : comps) {
+    for (const std::unique_ptr<StorageBase> &component : comps) {
       if (component) {
         component->accommodate(reg, entity);
       }
@@ -83,12 +81,12 @@ public:
    * The component doesn't need to be assigned to the prototype for this
    * function to return a valid ID. The IDs are not synced with the registry.
    *
-   * @tparam Comp Type of component to query.
+   * @tparam Component Type of component to query.
    * @return Runtime numeric identifier of the given type of component
    */
-  template <typename Comp>
+  template <typename Component>
   size_t type() const ENTT_NOEXCEPT {
-    return family_t::template type<Comp>();
+    return family_t::template type<Component>();
   }
 
   /**
@@ -98,21 +96,21 @@ public:
    * An assertion will abort the execution at runtime in debug mode in case
    * the prototype already owns the given component
    *
-   * @tparam Comp Type of component to create
+   * @tparam Component Type of component to create
    * @tparam Args Types of arguments to use to construct the component.
    * @param args Parameters to use to initialize the component.
    * @return A reference to the newly created component.
    */
-  template <typename Comp, typename... Args>
-  Comp &assign(Args &&... args) {
-    assert(!has<Comp>());
-    auto component = std::make_unique<Component<Comp>>();
-    component->comp = Comp {std::forward<Args>(args)...};
-    const size_t index = type<Comp>();
+  template <typename Component, typename... Args>
+  Component &assign(Args &&... args) {
+    assert(!has<Component>());
+    auto component = std::make_unique<Storage<Component>>();
+    component->comp = Component {std::forward<Args>(args)...};
+    const size_t index = type<Component>();
     while (comps.size() <= index) {
       comps.emplace_back();
     }
-    Comp &comp = component->comp;
+    Component &comp = component->comp;
     comps[index] = std::move(component);
     return comp;
   }
@@ -124,25 +122,25 @@ public:
    * An assertion will abort the execution at runtime in debug mode in case
    * the prototype doesn't own the given component
    *
-   * @tparam Comp Type of component to remove
+   * @tparam Component Type of component to remove
    */
-  template <typename Comp>
+  template <typename Component>
   void remove() ENTT_NOEXCEPT {
-    assert(has<Comp>());
-    comps[type<Comp>()] = nullptr;
+    assert(has<Component>());
+    comps[type<Component>()] = nullptr;
   }
   
   /**
    * @brief Checks if the prototype has all the given components
    *
-   * @tparam Comp Components that the prototype must own
+   * @tparam Components Components that the prototype must own
    * @return True if the prototype owns all of the components, false otherwise.
    */
-  template <typename... Comp>
+  template <typename... Components>
   bool has() const ENTT_NOEXCEPT {
     bool all = true;
     [[maybe_unused]]
-    bool acc[] = {(all = all && type<Comp>() < comps.size() && comps[type<Comp>()] != nullptr)...};
+    bool acc[] = {(all = all && type<Components>() < comps.size() && comps[type<Components>()] != nullptr)...};
     return all;
   }
   
@@ -153,13 +151,13 @@ public:
    * An assertion will abort the execution at runtime in debug mode in case
    * the prototype doesn't own the given component
    *
-   * @tparam Comp Type of component to get
+   * @tparam Component Type of component to get
    * @return A reference to the component
    */
-  template <typename Comp>
-  const Comp &get() const ENTT_NOEXCEPT {
-    assert(has<Comp>());
-    return static_cast<Component<Comp> *>(comps[type<Comp>()].get())->comp;
+  template <typename Component>
+  const Component &get() const ENTT_NOEXCEPT {
+    assert(has<Component>());
+    return static_cast<Storage<Component> *>(comps[type<Component>()].get())->comp;
   }
   
   /**
@@ -169,13 +167,13 @@ public:
    * An assertion will abort the execution at runtime in debug mode in case
    * the prototype doesn't own the given component
    *
-   * @tparam Comp Type of component to get
+   * @tparam Component Type of component to get
    * @return A reference to the component
    */
-  template <typename Comp>
-  Comp &get() ENTT_NOEXCEPT {
-    assert(has<Comp>());
-    return static_cast<Component<Comp> *>(comps[type<Comp>()].get())->comp;
+  template <typename Component>
+  Component &get() ENTT_NOEXCEPT {
+    assert(has<Component>());
+    return static_cast<Storage<Component> *>(comps[type<Component>()].get())->comp;
   }
   
   /**
@@ -185,14 +183,14 @@ public:
    * An assertion will abort the execution at runtime in debug mode in case
    * the prototype doesn't own the given component
    *
-   * @tparam Comp Type of component to replace
+   * @tparam Component Type of component to replace
    * @tparam Args Types of arguments to use to construct the component
    * @param args Parameters to use to initialize the component
    * @return A refernce to the newly created component
    */
-  template <typename Comp, typename... Args>
-  Comp &replace(Args &&... args) ENTT_NOEXCEPT {
-    return (get<Comp>() = Comp{std::forward<Args>(args)...});
+  template <typename Component, typename... Args>
+  Component &replace(Args &&... args) ENTT_NOEXCEPT {
+    return (get<Component>() = Component{std::forward<Args>(args)...});
   }
   
   /**
@@ -203,17 +201,17 @@ public:
    * @param args Parameters to use to initialize the component
    * @return A refernce to the newly created component
    */
-  template <typename Comp, typename... Args>
-  Comp &accommodate(Args &&... args) ENTT_NOEXCEPT {
-    if (has<Comp>()) {
-      return replace<Comp>(std::forward<Args>(args)...);
+  template <typename Component, typename... Args>
+  Component &accommodate(Args &&... args) ENTT_NOEXCEPT {
+    if (has<Component>()) {
+      return replace<Component>(std::forward<Args>(args)...);
     } else {
-      return assign<Comp>(std::forward<Args>(args)...);
+      return assign<Component>(std::forward<Args>(args)...);
     }
   }
   
 private:
-  std::vector<std::unique_ptr<ComponentBase>> comps;
+  std::vector<std::unique_ptr<StorageBase>> comps;
 };
 
 }
