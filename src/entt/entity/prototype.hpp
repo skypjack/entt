@@ -51,7 +51,9 @@ public:
    * @return True if at least one component is assigned
    */
   bool empty() const ENTT_NOEXCEPT {
-    return comps.empty();
+    return std::all_of(comps.cbegin(), comps.cend(), [] (auto comp) {
+      return comp == nullptr;
+    });
   }
 
   /**
