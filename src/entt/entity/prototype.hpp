@@ -48,7 +48,7 @@ public:
     /**
      * @brief Checks if there exists at least one component assigned
      *
-     * @return True if at least one component is assigned
+     * @return True if no components are assigned
      */
     bool empty() const ENTT_NOEXCEPT {
         return std::all_of(comps.cbegin(), comps.cend(), [] (auto comp) {
