@@ -658,11 +658,17 @@ There are also some limitations on what a listener can and cannot do. In
 particular:
 
 * Connecting and disconnecting other functions from within the body of a
-  listener should be avoided. It can lead to undefined behavior.
+  listener should be avoided. It can lead to undefined behavior in some cases.
 * Assigning and removing components and tags from within the body of a listener
   that observes the destruction of instances of a given type should be avoided.
-  It can lead to undefined behavior. This type of listeners is intended to
-  provide users with an easy way to perform cleanup and nothing more.
+  It can lead to undefined behavior in some cases. This type of listeners is
+  intended to provide users with an easy way to perform cleanup and nothing
+  more.
+
+To a certain extent, these limitations do not apply. However, it is risky to try
+to force them and users should respect the limitations unless they know exactly
+what they are doing. Subtle bugs are the price to pay in case of errors
+otherwise.
 
 In general, events and therefore listeners must not be used as replacements for
 systems. They should not contain much logic and interactions with a registry

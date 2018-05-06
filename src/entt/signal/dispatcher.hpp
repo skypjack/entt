@@ -168,9 +168,13 @@ public:
      * to reduce at a minimum the time spent in the bodies of the listeners.
      */
     inline void update() {
-        std::for_each(wrappers.begin(), wrappers.end(), [](auto &&wrapper) {
-            return wrapper ? wrapper->publish() : void();
-        });
+        for(auto pos = wrappers.size(); pos; --pos) {
+            auto &wrapper = wrappers[pos-1];
+
+            if(wrapper) {
+                wrapper->publish();
+            }
+        }
     }
 
 private:

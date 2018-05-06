@@ -307,9 +307,10 @@ public:
      * @param args Arguments to use to invoke listeners.
      */
     void publish(Args... args) {
-        std::for_each(calls.begin(), calls.end(), [&args...](auto &&call) {
+        for(auto pos = calls.size(); pos; --pos) {
+            auto &call = calls[pos-1];
             call.second(call.first, args...);
-        });
+        }
     }
 
     /**

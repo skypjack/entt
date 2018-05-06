@@ -425,23 +425,27 @@ public:
     void destroy(entity_type entity) {
         assert(valid(entity));
 
-        std::for_each(pools.begin(), pools.end(), [entity, this](auto &&tup) {
+        for(auto pos = pools.size(); pos; --pos) {
+            auto &tup = pools[pos-1];
             auto &cpool = std::get<0>(tup);
 
             if(cpool && cpool->has(entity)) {
                 std::get<2>(tup).publish(*this, entity);
                 cpool->destroy(entity);
             }
-        });
+        };
 
-        std::for_each(tags.begin(), tags.end(), [entity, this](auto &&tup) {
+        for(auto pos = tags.size(); pos; --pos) {
+            auto &tup = tags[pos-1];
             auto &tag = std::get<0>(tup);
 
             if(tag && tag->entity == entity) {
                 std::get<2>(tup).publish(*this, entity);
                 tag.reset();
             }
-        });
+        };
+
+        assert(orphan(entity));
 
         const auto entt = entity & traits_type::entity_mask;
         const auto version = (((entity >> traits_type::entity_shift) + 1) & traits_type::version_mask) << traits_type::entity_shift;
