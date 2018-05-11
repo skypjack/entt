@@ -4,11 +4,9 @@
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
-* is it possible to allow multiple components for registry remove, reset, reserve, (maybe) managed, empty, get (tags), move and so on?
 * create dedicated flat map based on types implementation (sort of "type map") for types to use within the registry and so on...
 * does it worth it to add an optional functor to the member functions of snapshot so as to filter out instances and entities?
 * ease the assignment of tags as string (use a template class with a non-type template parameter behind the scene)
-* define a dedicated specialization for multi component view in case of two components
 * is it possible to reduce the storage used to manage empty components?
 * reintroduce meaningful copy/clone functionalities into the registry
 * is registry/utility.hpp really required?

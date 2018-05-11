@@ -102,17 +102,11 @@ public:
      * @brief Removes the given component from a prototype.
      * @tparam Component Type of component to remove.
      */
-    template<typename... Component>
+    template<typename Component>
     void unset() ENTT_NOEXCEPT {
-        auto erase = [this](const auto ctype) {
-            handlers.erase(std::remove_if(handlers.begin(), handlers.end(), [ctype](const auto &handler) {
-                return handler.type == ctype;
-            }), handlers.end());
-        };
-
-        using accumulator_type = int[];
-        accumulator_type accumulator = { (erase(registry_type::template type<Component>()), 0)... };
-        (void)accumulator;
+        handlers.erase(std::remove_if(handlers.begin(), handlers.end(), [](const auto &handler) {
+            return handler.type == registry_type::template type<Component>();
+        }), handlers.end());
     }
 
     /**
