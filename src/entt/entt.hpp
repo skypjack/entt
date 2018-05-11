@@ -5,6 +5,7 @@
 #include "entity/actor.hpp"
 #include "entity/entt_traits.hpp"
 #include "entity/helper.hpp"
+#include "entity/prototype.hpp"
 #include "entity/registry.hpp"
 #include "entity/snapshot.hpp"
 #include "entity/sparse_set.hpp"

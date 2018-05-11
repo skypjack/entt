@@ -26,6 +26,7 @@
          * [Continuous loader](#continuous-loader)
          * [Archives](#archives)
          * [One example to rule them all](#one-example-to-rule-them-all)
+      * [Prototype](#prototype)
       * [Helpers](#helpers)
          * [Dependency function](#dependency-function)
    * [View: to persist or not to persist?](#view-to-persist-or-not-to-persist)
@@ -679,7 +680,7 @@ destroyed.
 #### Who let the tags out?
 
 As an extension, signals are also provided with tags. Although they are not
-strictly required internally, it makes sense that an user expects signal support
+strictly required internally, it makes sense that a user expects signal support
 even when it comes to tags actually.<br/>
 Signals for tags undergo exactly the same requirements of those introduced for
 components. Also the function type for a listener is the same and it's invoked
@@ -829,7 +830,7 @@ The `component` member function is a function template the aim of which is to
 store aside components. The presence of a template parameter list is a
 consequence of a couple of design choices from the past and in the present:
 
-* First of all, there is no reason to force an user to serialize all the
+* First of all, there is no reason to force a user to serialize all the
   components at once and most of the times it isn't desiderable. As an example,
   in case the stuff for the HUD in a game is put into the registry for some
   reasons, its components can be freely discarded during a serialization step
@@ -1022,6 +1023,70 @@ the best way to do it. However, feel free to use it at your own risk.
 
 The basic idea is to store everything in a group of queues in memory, then bring
 everything back to the registry with different loaders.
+
+### Prototype
+
+A prototype defines a type of an application in terms of its parts. They can be
+used to assign components to entities of a registry at once.<br/>
+Roughly speaking, in most cases prototypes can be considered just as templates
+to use to initialize entities according to _concepts_. In fact, users can create
+how many prototypes they want, each one initialized differently from the others.
+
+The following is an example of use of a prototype:
+
+```cpp
+entt::DefaultPrototype prototype;
+
+prototype.set<Position>(100.f, 100.f);
+prototype.set<Velocity>(0.f, 0.f);
+
+// ...
+
+entt::DefaultRegistry registry;
+
+const auto entity = prototype(registry);
+```
+
+To assign and remove components from a prototype, it offers two dedicated member
+functions named `set` and `unset`. The `has` member function can be used to know
+if a given prototype contains one or more components and the `get` member
+function can be used to retrieve the components.
+
+Creating an entity from a prototype is straightforward:
+
+* To create a new entity from scratch and assign it a prototype, this is the way
+  to go:
+  ```cpp
+  const auto entity = prototype(registry);
+  ```
+  It is equivalent to the following invokation:
+  ```cpp
+  const auto entity = prototype.create(registry);
+  ```
+
+* In case we want to initialize an already existing entity, we can provide the
+  `operator()` directly with the entity identifier:
+  ```cpp
+  prototype(registry, entity);
+  ```
+  It is equivalent to the following invokation:
+  ```cpp
+  prototype.assign(registry, entity);
+  ```
+  Note that existing components aren't overwritten in this case. Only those
+  components that the entity doesn't own yet are copied over. All the other
+  components remain unchanged.
+
+* Finally, to assign or replace all the components for an entity, thus
+  overwriting existing ones:
+  ```cpp
+  prototype.accommodate(registry, entity);
+  ```
+
+Prototypes are a very useful tool that can save a lot of typing sometimes.
+Furthermore, the codebase may be easier to maintain, since updating a prototype
+is much less error prone than jumping around in the codebase to update all the
+snippets copied and pasted around to initialize entities and components.
 
 ### Helpers
 

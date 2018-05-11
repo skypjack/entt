@@ -1,226 +1,334 @@
 #ifndef ENTT_ENTITY_PROTOTYPE_HPP
 #define ENTT_ENTITY_PROTOTYPE_HPP
 
+
+#include <tuple>
+#include <memory>
+#include <vector>
+#include <utility>
+#include <cstddef>
+#include <algorithm>
 #include "registry.hpp"
+
 
 namespace entt {
 
+
 /**
- * @brief A prototype entity for creating new entities
+ * @brief Prototype container for _concepts_.
  *
- * Prototype provides a similar interface to the registry except that Prototype
- * stores a single entity. This entity is not apart of the registry so it is not
- * seen by views. The Prototype can be used to accommodate components to an
- * entity on the registry.
+ * A prototype is used to define a _concept_ in terms of components.<br/>
+ * Prototypes act as templates for those specific types of an application which
+ * users would otherwise define through a series of component assignments to
+ * entities. In other words, prototypes can be used to assign components to
+ * entities of a registry at once.
  *
- * Note that components stored in the Prototype must have copy constructors to
- * initialize an entity.
+ * @note
+ * Components used along with prototypes must be copy constructible.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
-template <typename Entity>
+template<typename Entity>
 class Prototype {
-public:
-    using entity_t = Entity;
-    using registry_t = entt::Registry<Entity>;
-    using family_t = entt::Family<struct PrototypeFamily>;
+    using component_type = typename Registry<Entity>::component_type;
+    using fn_type = void(*)(const void *, Registry<Entity> &, Entity);
+    using deleter_type = void(*)(void *);
+    using ptr_type = std::unique_ptr<void, deleter_type>;
 
-private:
-    struct StorageBase {
-        virtual ~StorageBase() = default;
-        virtual void accommodate(registry_t &, entity_t) const ENTT_NOEXCEPT = 0;
-    };
-    
-    template <typename Component>
-    struct Storage : StorageBase {
-        void accommodate(registry_t &reg, const entity_t entity) const ENTT_NOEXCEPT override {
-            reg.template accommodate<Component>(entity, comp);
-        }
-        
-        Component comp;
-    };
-
-public:
-    Prototype() = default;
-    Prototype(Prototype &&) = default;
-    Prototype &operator=(Prototype &&) = default;
-
-    /**
-     * @brief Checks if there exists at least one component assigned
-     *
-     * @return True if no components are assigned
-     */
-    bool empty() const ENTT_NOEXCEPT {
-        return std::all_of(comps.cbegin(), comps.cend(), [] (auto comp) {
-            return comp == nullptr;
-        });
+    template<typename Component>
+    static void accommodate(const void *component, Registry<Entity> &registry, Entity entity) {
+        const auto &ref = *static_cast<const Component *>(component);
+        registry.template accommodate<Component>(entity, ref);
     }
 
-    /**
-     * @brief Accommodate copies of the components to the given entity
-     */
-    void operator()(registry_t &reg, const entity_t entity) const ENTT_NOEXCEPT {
-        for (const std::unique_ptr<StorageBase> &component : comps) {
-            if (component) {
-                component->accommodate(reg, entity);
-            }
+    template<typename Component>
+    static void assign(const void *component, Registry<Entity> &registry, Entity entity) {
+        if(!registry.template has<Component>(entity)) {
+            const auto &ref = *static_cast<const Component *>(component);
+            registry.template assign<Component>(entity, ref);
         }
     }
-    /**
-     * @brief Create an new entity assign copies of the components to it
-     *
-     * @return Newly created entity
-     */
-    entity_t operator()(registry_t &reg) const ENTT_NOEXCEPT {
-        const entity_t entity = reg.create();
-        (*this)(reg, entity);
-        return entity;
-    }
+
+    struct Handler final {
+        Handler(ptr_type component, fn_type accommodate, fn_type assign, component_type type)
+            : component{std::move(component)},
+              accommodate{accommodate},
+              assign{assign},
+              type{type}
+        {}
+
+        ptr_type component{nullptr, +[](void *) {}};
+        fn_type accommodate{nullptr};
+        fn_type assign{nullptr};
+        component_type type;
+    };
+
+public:
+    /*! @brief Registry type. */
+    using registry_type = Registry<Entity>;
+    /*! @brief Underlying entity identifier. */
+    using entity_type = Entity;
+    /*! @brief Unsigned integer type. */
+    using size_type = std::size_t;
 
     /**
-     * @brief Returns the numeric identifier of a type of component at runtime
-     *
-     * The component doesn't need to be assigned to the prototype for this
-     * function to return a valid ID. The IDs are not synced with the registry.
-     *
-     * @tparam Component Type of component to query.
-     * @return Runtime numeric identifier of the given type of component
-     */
-    template <typename Component>
-    size_t type() const ENTT_NOEXCEPT {
-        return family_t::template type<Component>();
-    }
-
-    /**
-     * @brief Assigns the given component to the prototype
-     *
-     * @warning
-     * An assertion will abort the execution at runtime in debug mode in case
-     * the prototype already owns the given component
-     *
-     * @tparam Component Type of component to create
+     * @brief Assigns to or replaces the given component of a prototype.
+     * @tparam Component Type of component to assign or replace.
      * @tparam Args Types of arguments to use to construct the component.
      * @param args Parameters to use to initialize the component.
      * @return A reference to the newly created component.
      */
-    template <typename Component, typename... Args>
-    Component &assign(Args &&... args) {
-        assert(!has<Component>());
-        auto component = std::make_unique<Storage<Component>>();
-        component->comp = Component {std::forward<Args>(args)...};
-        const size_t index = type<Component>();
-        while (comps.size() <= index) {
-            comps.emplace_back();
+    template<typename Component, typename... Args>
+    Component & set(Args &&... args) {
+        const auto ctype = registry_type::template type<Component>();
+
+        auto it = std::find_if(handlers.begin(), handlers.end(), [ctype](const auto &handler) {
+            return handler.type == ctype;
+        });
+
+        const auto deleter = +[](void *component) { delete static_cast<Component *>(component); };
+        ptr_type component{new Component{std::forward<Args>(args)...}, deleter};
+
+        if(it == handlers.cend()) {
+            handlers.emplace_back(std::move(component), &Prototype::accommodate<Component>, &Prototype::assign<Component>, ctype);
+        } else {
+            it->component = std::move(component);
         }
-        Component &comp = component->comp;
-        comps[index] = std::move(component);
-        return comp;
+
+        return *static_cast<Component *>(component.get());
     }
-    
+
     /**
-     * @brief Removes the given component from the prototype
-     *
-     * @warning
-     * An assertion will abort the execution at runtime in debug mode in case
-     * the prototype doesn't own the given component
-     *
-     * @tparam Component Type of component to remove
+     * @brief Removes the given component from a prototype.
+     * @tparam Component Type of component to remove.
      */
-    template <typename Component>
-    void remove() ENTT_NOEXCEPT {
-        assert(has<Component>());
-        comps[type<Component>()] = nullptr;
+    template<typename... Component>
+    void unset() ENTT_NOEXCEPT {
+        handlers.erase(std::remove_if(handlers.begin(), handlers.end(), [](const auto &handler) {
+            using accumulator_type = bool[];
+            bool match = false;
+            accumulator_type accumulator = { (match = match || handler.type == registry_type::template type<Component>())... };
+            (void)accumulator;
+            return match;
+        }), handlers.end());
     }
-    
+
     /**
-     * @brief Checks if the prototype has all the given components
-     *
-     * @tparam Components Components that the prototype must own
-     * @return True if the prototype owns all of the components, false otherwise.
+     * @brief Checks if a prototype owns all the given components.
+     * @tparam Component Components for which to perform the check.
+     * @return True if the prototype owns all the components, false otherwise.
      */
-    template <typename... Components>
+    template<typename... Component>
     bool has() const ENTT_NOEXCEPT {
+        auto found = [this](const auto ctype) {
+            return std::find_if(handlers.cbegin(), handlers.cend(), [ctype](const auto &handler) {
+                return handler.type == ctype;
+            }) != handlers.cend();
+        };
+
+        using accumulator_type = bool[];
         bool all = true;
-        [[maybe_unused]]
-        bool acc[] = {(all = all && type<Components>() < comps.size() && comps[type<Components>()] != nullptr)...};
+        accumulator_type accumulator = { all, (all = all && found(registry_type::template type<Component>()))... };
+        (void)accumulator;
         return all;
     }
-    
+
     /**
-     * @brief Returns a const reference to the given component
+     * @brief Returns a reference to the given component.
      *
      * @warning
-     * An assertion will abort the execution at runtime in debug mode in case
-     * the prototype doesn't own the given component
+     * Attempting to get a component from a prototype that doesn't own it
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * prototype doesn't own an instance of the given component.
      *
-     * @tparam Component Type of component to get
-     * @return A reference to the component
+     * @tparam Component Type of component to get.
+     * @return A reference to the component owned by the prototype.
      */
-    template <typename Component>
-    const Component &get() const ENTT_NOEXCEPT {
+    template<typename Component>
+    const Component & get() const ENTT_NOEXCEPT {
         assert(has<Component>());
-        return static_cast<Storage<Component> *>(comps[type<Component>()].get())->comp;
+
+        auto it = std::find_if(handlers.cbegin(), handlers.cend(), [](const auto &handler) {
+            return handler.type == registry_type::template type<Component>();
+        });
+
+        return *static_cast<Component *>(it->component.get());
     }
-    
+
     /**
-     * @brief Returns a reference to the given component
+     * @brief Returns a reference to the given component.
      *
      * @warning
-     * An assertion will abort the execution at runtime in debug mode in case
-     * the prototype doesn't own the given component
+     * Attempting to get a component from a prototype that doesn't own it
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * prototype doesn't own an instance of the given component.
      *
-     * @tparam Component Type of component to get
-     * @return A reference to the component
+     * @tparam Component Type of component to get.
+     * @return A reference to the component owned by the prototype.
      */
-    template <typename Component>
-    Component &get() ENTT_NOEXCEPT {
-        assert(has<Component>());
-        return static_cast<Storage<Component> *>(comps[type<Component>()].get())->comp;
+    template<typename Component>
+    inline Component & get() ENTT_NOEXCEPT {
+        return const_cast<Component &>(const_cast<const Prototype *>(this)->get<Component>());
     }
-    
+
     /**
-     * @brief Replaces the given component
+     * @brief Returns a reference to the given components.
      *
      * @warning
-     * An assertion will abort the execution at runtime in debug mode in case
-     * the prototype doesn't own the given component
+     * Attempting to get components from a prototype that doesn't own them
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * prototype doesn't own instances of the given components.
      *
-     * @tparam Component Type of component to replace
-     * @tparam Args Types of arguments to use to construct the component
-     * @param args Parameters to use to initialize the component
-     * @return A refernce to the newly created component
+     * @tparam Component Type of components to get.
+     * @return References to the components owned by the prototype.
      */
-    template <typename Component, typename... Args>
-    Component &replace(Args &&... args) ENTT_NOEXCEPT {
-        return (get<Component>() = Component{std::forward<Args>(args)...});
+    template<typename... Component>
+    std::enable_if_t<(sizeof...(Component) > 1), std::tuple<const Component &...>>
+    get() const ENTT_NOEXCEPT {
+        return { get<Component>()... };
     }
-    
+
     /**
-     * @brief Assigns of replaces the given component
+     * @brief Returns a reference to the given components.
      *
-     * @tparam Component Type of component to replace
-     * @tparam Args Types of arguments to use to construct the component
-     * @param args Parameters to use to initialize the component
-     * @return A refernce to the newly created component
+     * @warning
+     * Attempting to get components from a prototype that doesn't own them
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * prototype doesn't own instances of the given components.
+     *
+     * @tparam Component Type of components to get.
+     * @return References to the components owned by the prototype.
      */
-    template <typename Component, typename... Args>
-    Component &accommodate(Args &&... args) ENTT_NOEXCEPT {
-        if (has<Component>()) {
-            return replace<Component>(std::forward<Args>(args)...);
-        } else {
-            return assign<Component>(std::forward<Args>(args)...);
-        }
+    template<typename... Component>
+    std::enable_if_t<(sizeof...(Component) > 1), std::tuple<Component &...>>
+    get() ENTT_NOEXCEPT {
+        return std::tuple<Component &...>{get<Component>()...};
     }
-    
+
+    /**
+     * @brief Creates a new entity using a given prototype.
+     *
+     * Utility shortcut, equivalent to the following snippet:
+     *
+     * @code{.cpp}
+     * const auto entity = registry.create();
+     * prototype(registry, entity);
+     * @endcode
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @param registry A valid reference to a registry.
+     * @return A valid entity identifier.
+     */
+    entity_type create(registry_type &registry) {
+        const auto entity = registry.create();
+        assign(registry, entity);
+        return entity;
+    }
+
+    /**
+     * @brief Assigns the components of a prototype to a given entity.
+     *
+     * Assigning a prototype to an entity won't overwrite existing components
+     * under any circumstances.<br/>
+     * In other words, only those components that the entity doesn't own yet are
+     * copied over. All the other components remain unchanged.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @param registry A valid reference to a registry.
+     * @param entity A valid entity identifier.
+     */
+    void assign(registry_type &registry, entity_type entity) {
+        std::for_each(handlers.begin(), handlers.end(), [&registry, entity, this](auto &&handler) {
+            handler.assign(handler.component.get(), registry, entity);
+        });
+    }
+
+    /**
+     * @brief Assigns or replaces the components of a prototype for an entity.
+     *
+     * Existing components are overwritten, if any. All the other components
+     * will be copied over to the target entity.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @param registry A valid reference to a registry.
+     * @param entity A valid entity identifier.
+     */
+    void accommodate(registry_type &registry, entity_type entity) {
+        std::for_each(handlers.begin(), handlers.end(), [&registry, entity, this](auto &&handler) {
+            handler.accommodate(handler.component.get(), registry, entity);
+        });
+    }
+
+    /**
+     * @brief Assigns the components of a prototype to an entity.
+     *
+     * Assigning a prototype to an entity won't overwrite existing components
+     * under any circumstances.<br/>
+     * In other words, only the components that the entity doesn't own yet are
+     * copied over. All the other components remain unchanged.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @param registry A valid reference to a registry.
+     * @param entity A valid entity identifier.
+     */
+    inline void operator()(registry_type &registry, entity_type entity) ENTT_NOEXCEPT {
+        assign(registry, entity);
+    }
+
+    /**
+     * @brief Creates a new entity using a given prototype.
+     *
+     * Utility shortcut, equivalent to the following snippet:
+     *
+     * @code{.cpp}
+     * const auto entity = registry.create();
+     * prototype(registry, entity);
+     * @endcode
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @param registry A valid reference to a registry.
+     * @return A valid entity identifier.
+     */
+    inline entity_type operator()(registry_type &registry) ENTT_NOEXCEPT {
+        return create(registry);
+    }
+
 private:
-    std::vector<std::unique_ptr<StorageBase>> comps;
+    std::vector<Handler> handlers;
 };
+
 
 /**
  * @brief Default prototype
  */
 using DefaultPrototype = Prototype<uint32_t>;
 
+
 }
 
-#endif
+
+#endif // ENTT_ENTITY_PROTOTYPE_HPP

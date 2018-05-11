@@ -54,6 +54,7 @@ ADD_ENTT_TEST(ident entt/core/ident.cpp)
 
 ADD_ENTT_TEST(actor entt/entity/actor.cpp)
 ADD_ENTT_TEST(helper entt/entity/helper.cpp)
+ADD_ENTT_TEST(prototype entt/entity/prototype.cpp)
 ADD_ENTT_TEST(registry entt/entity/registry.cpp)
 ADD_ENTT_TEST(snapshot entt/entity/snapshot.cpp)
 ADD_ENTT_TEST(sparse_set entt/entity/sparse_set.cpp)

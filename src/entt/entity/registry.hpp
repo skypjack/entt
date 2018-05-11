@@ -704,7 +704,7 @@ public:
     template<typename... Component>
     std::enable_if_t<(sizeof...(Component) > 1), std::tuple<const Component &...>>
     get(entity_type entity) const ENTT_NOEXCEPT {
-        return std::tuple<const Component &...>{get<Component>(entity)...};
+        return { get<Component>(entity)... };
     }
 
     /**
@@ -724,7 +724,7 @@ public:
     template<typename... Component>
     std::enable_if_t<(sizeof...(Component) > 1), std::tuple<Component &...>>
     get(entity_type entity) ENTT_NOEXCEPT {
-        return std::tuple<Component &...>{get<Component>(entity)...};
+        return { get<Component>(entity)... };
     }
 
     /**

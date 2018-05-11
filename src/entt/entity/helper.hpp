@@ -17,7 +17,7 @@ namespace entt {
  * components to an entity when a type has a dependency on some other types.
  *
  * This is a prototype function to use to create dependencies.<br/>
- * It isn't intended for direct use, even if nothing forbids using it freely.
+ * It isn't intended for direct use, although nothing forbids using it freely.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Component Types of components to assign to an entity if triggered.
