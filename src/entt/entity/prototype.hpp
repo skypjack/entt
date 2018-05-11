@@ -104,14 +104,15 @@ public:
      */
     template<typename... Component>
     void unset() ENTT_NOEXCEPT {
-        handlers.erase(std::remove_if(handlers.begin(), handlers.end(), [](const auto &handler) {
-            using accumulator_type = bool[];
-            bool match = false;
-            auto test = [&handler](bool match, component_type ctype) { return match || handler.type == ctype; };
-            accumulator_type accumulator = { (match = test(match, registry_type::template type<Component>()))... };
-            (void)accumulator;
-            return match;
-        }), handlers.end());
+        auto erase = [this](const auto ctype) {
+            handlers.erase(std::remove_if(handlers.begin(), handlers.end(), [ctype](const auto &handler) {
+                return handler.type == ctype;
+            }), handlers.end());
+        };
+
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (erase(registry_type::template type<Component>()), 0)... };
+        (void)accumulator;
     }
 
     /**
@@ -189,7 +190,7 @@ public:
     template<typename... Component>
     std::enable_if_t<(sizeof...(Component) > 1), std::tuple<const Component &...>>
     get() const ENTT_NOEXCEPT {
-        return { get<Component>()... };
+        return std::tuple<const Component &...>{get<Component>()...};
     }
 
     /**
