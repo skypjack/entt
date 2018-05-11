@@ -107,7 +107,8 @@ public:
         handlers.erase(std::remove_if(handlers.begin(), handlers.end(), [](const auto &handler) {
             using accumulator_type = bool[];
             bool match = false;
-            accumulator_type accumulator = { (match = match || handler.type == registry_type::template type<Component>())... };
+            auto test = [&handler](bool match, component_type ctype) { return match || handler.type == ctype; };
+            accumulator_type accumulator = { (match = test(match, registry_type::template type<Component>()))... };
             (void)accumulator;
             return match;
         }), handlers.end());
