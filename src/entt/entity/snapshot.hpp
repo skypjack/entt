@@ -99,7 +99,7 @@ public:
     template<typename Archive>
     Snapshot & entities(Archive &archive) {
         archive(static_cast<Entity>(registry.size()));
-        registry.each([&archive, this](auto entity) { archive(entity); });
+        registry.each([&archive](auto entity) { archive(entity); });
         return *this;
     }
 

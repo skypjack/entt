@@ -406,7 +406,7 @@ TEST(Snapshot, Continuous) {
             .orphans()
             .shrink();
 
-    dst.view<WhatAComponent>().each([&dst, &loader, entity](auto, auto &component) {
+    dst.view<WhatAComponent>().each([&dst](auto, auto &component) {
         ASSERT_FALSE(dst.valid(component.bar));
     });
 

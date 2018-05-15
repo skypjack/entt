@@ -605,8 +605,8 @@ public:
     template<typename... Component>
     bool has(entity_type entity) const ENTT_NOEXCEPT {
         assert(valid(entity));
-        using accumulator_type = bool[];
         bool all = true;
+        using accumulator_type = bool[];
         accumulator_type accumulator = { all, (all = all && managed<Component>() && pool<Component>().has(entity))... };
         (void)accumulator;
         return all;
@@ -1269,7 +1269,6 @@ public:
         }
 
         if(!handlers[htype]) {
-            using accumulator_type = int[];
             handlers[htype] = std::make_unique<SparseSet<entity_type>>();
             auto &handler = handlers[htype];
 
@@ -1283,6 +1282,7 @@ public:
                 std::get<2>(cpool).sink().template connect<&Registry::destroying<Component...>>();
             };
 
+            using accumulator_type = int[];
             accumulator_type accumulator = { (assure<Component>(), connect(component_family::type<Component>()), 0)... };
             (void)accumulator;
         }
@@ -1306,7 +1306,6 @@ public:
     template<typename... Component>
     void discard() {
         if(contains<Component...>()) {
-            using accumulator_type = int[];
             const auto htype = handler_family::type<Component...>();
 
             auto disconnect = [this](auto ctype) {
@@ -1316,6 +1315,7 @@ public:
             };
 
             // if a set exists, pools have already been created for it
+            using accumulator_type = int[];
             accumulator_type accumulator = { (disconnect(component_family::type<Component>()), 0)... };
             handlers[htype].reset();
             (void)accumulator;

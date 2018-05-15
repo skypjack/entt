@@ -122,8 +122,8 @@ public:
             }) != handlers.cend();
         };
 
-        using accumulator_type = bool[];
         bool all = true;
+        using accumulator_type = bool[];
         accumulator_type accumulator = { all, (all = all && found(registry_type::template type<Component>()))... };
         (void)accumulator;
         return all;
@@ -246,7 +246,7 @@ public:
      * @param entity A valid entity identifier.
      */
     void assign(registry_type &registry, entity_type entity) {
-        std::for_each(handlers.begin(), handlers.end(), [&registry, entity, this](auto &&handler) {
+        std::for_each(handlers.begin(), handlers.end(), [&registry, entity](auto &&handler) {
             handler.assign(handler.component.get(), registry, entity);
         });
     }
@@ -266,7 +266,7 @@ public:
      * @param entity A valid entity identifier.
      */
     void accommodate(registry_type &registry, entity_type entity) {
-        std::for_each(handlers.begin(), handlers.end(), [&registry, entity, this](auto &&handler) {
+        std::for_each(handlers.begin(), handlers.end(), [&registry, entity](auto &&handler) {
             handler.accommodate(handler.component.get(), registry, entity);
         });
     }
