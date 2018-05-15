@@ -17,7 +17,7 @@
    * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
       * [Single instance components](#single-instance-components)
       * [Observe changes](#observe-changes)
-         * [Who let the tags out?](#who-let-the-tags-out?)
+         * [Who let the tags out?](#who-let-the-tags-out)
       * [Runtime components](#runtime-components)
          * [A journey through a plugin](#a-journey-through-a-plugin)
       * [Sorting: is it possible?](#sorting-is-it-possible)
