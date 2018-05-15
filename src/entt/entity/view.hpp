@@ -155,6 +155,24 @@ public:
      *
      * @return An iterator to the first entity that has the given components.
      */
+    inline const_iterator_type begin() const ENTT_NOEXCEPT {
+        return cbegin();
+    }
+
+    /**
+     * @brief Returns an iterator to the first entity that has the given
+     * components.
+     *
+     * The returned iterator points to the first entity that has the given
+     * components. If the view is empty, the returned iterator will be equal to
+     * `end()`.
+     *
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the first entity that has the given components.
+     */
     iterator_type begin() ENTT_NOEXCEPT {
         return view.begin();
     }
@@ -176,6 +194,25 @@ public:
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
         return view.cend();
+    }
+
+    /**
+     * @brief Returns an iterator that is past the last entity that has the
+     * given components.
+     *
+     * The returned iterator points to the entity following the last entity that
+     * has the given components. Attempting to dereference the returned iterator
+     * results in undefined behavior.
+     *
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the entity following the last entity that has the
+     * given components.
+     */
+    inline const_iterator_type end() const ENTT_NOEXCEPT {
+        return cend();
     }
 
     /**
@@ -594,6 +631,24 @@ public:
      *
      * @return An iterator to the first entity that has the given components.
      */
+    inline const_iterator_type begin() const ENTT_NOEXCEPT {
+        return cbegin();
+    }
+
+    /**
+     * @brief Returns an iterator to the first entity that has the given
+     * components.
+     *
+     * The returned iterator points to the first entity that has the given
+     * components. If the view is empty, the returned iterator will be equal to
+     * `end()`.
+     *
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the first entity that has the given components.
+     */
     inline iterator_type begin() ENTT_NOEXCEPT {
         return cbegin();
     }
@@ -616,6 +671,25 @@ public:
     const_iterator_type cend() const ENTT_NOEXCEPT {
         const auto *view = candidate();
         return iterator_type{ unchecked(view), extent(), view->cend(), view->cend() };
+    }
+
+    /**
+     * @brief Returns an iterator that is past the last entity that has the
+     * given components.
+     *
+     * The returned iterator points to the entity following the last entity that
+     * has the given components. Attempting to dereference the returned iterator
+     * results in undefined behavior.
+     *
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the entity following the last entity that has the
+     * given components.
+     */
+    inline const_iterator_type end() const ENTT_NOEXCEPT {
+        return cend();
     }
 
     /**
@@ -966,6 +1040,24 @@ public:
      *
      * @return An iterator to the first entity that has the given component.
      */
+    inline const_iterator_type begin() const ENTT_NOEXCEPT {
+        return cbegin();
+    }
+
+    /**
+     * @brief Returns an iterator to the first entity that has the given
+     * component.
+     *
+     * The returned iterator points to the first entity that has the given
+     * component. If the view is empty, the returned iterator will be equal to
+     * `end()`.
+     *
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the first entity that has the given component.
+     */
     iterator_type begin() ENTT_NOEXCEPT {
         return pool.view_type::begin();
     }
@@ -987,6 +1079,25 @@ public:
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
         return pool.view_type::cend();
+    }
+
+    /**
+     * @brief Returns an iterator that is past the last entity that has the
+     * given component.
+     *
+     * The returned iterator points to the entity following the last entity that
+     * has the given component. Attempting to dereference the returned iterator
+     * results in undefined behavior.
+     *
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the entity following the last entity that has the
+     * given component.
+     */
+    inline const_iterator_type end() const ENTT_NOEXCEPT {
+        return cend();
     }
 
     /**
@@ -1258,6 +1369,22 @@ public:
      *
      * @return An iterator to the first instance of the given type.
      */
+    inline const_iterator_type begin() const ENTT_NOEXCEPT {
+        return cbegin();
+    }
+
+    /**
+     * @brief Returns an iterator to the first instance of the given type.
+     *
+     * The returned iterator points to the first instance of the given type. If
+     * the view is empty, the returned iterator will be equal to `end()`.
+     *
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the first instance of the given type.
+     */
     iterator_type begin() ENTT_NOEXCEPT {
         return pool.begin();
     }
@@ -1279,6 +1406,25 @@ public:
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
         return pool.cend();
+    }
+
+    /**
+     * @brief Returns an iterator that is past the last instance of the given
+     * type.
+     *
+     * The returned iterator points to the element following the last instance
+     * of the given type. Attempting to dereference the returned iterator
+     * results in undefined behavior.
+     *
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the element following the last instance of the
+     * given type.
+     */
+    inline const_iterator_type end() const ENTT_NOEXCEPT {
+        return cend();
     }
 
     /**

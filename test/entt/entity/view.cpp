@@ -49,32 +49,25 @@ TEST(View, SingleComponent) {
 TEST(View, SingleComponentBeginEnd) {
     entt::DefaultRegistry registry;
     auto view = registry.view<int>();
+    const auto &cview = view;
 
     for(auto i = 0; i < 3; ++i) {
         registry.assign<int>(registry.create());
     }
 
-    auto begin = view.begin();
-    auto end = view.end();
+    auto test = [](auto begin, auto end) {
+        ASSERT_NE(begin, end);
+        ASSERT_NE(++begin, end);
+        ASSERT_NE(begin++, end);
+        ASSERT_EQ(begin+1, end);
+        ASSERT_NE(begin, end);
+        ASSERT_EQ((begin += 1), end);
+        ASSERT_EQ(begin, end);
+    };
 
-    ASSERT_NE(begin, end);
-    ASSERT_NE(++begin, end);
-    ASSERT_NE(begin++, end);
-    ASSERT_EQ(begin+1, end);
-    ASSERT_NE(begin, end);
-    ASSERT_EQ((begin += 1), end);
-    ASSERT_EQ(begin, end);
-
-    auto cbegin = view.cbegin();
-    auto cend = view.cend();
-
-    ASSERT_NE(cbegin, cend);
-    ASSERT_NE(++cbegin, cend);
-    ASSERT_NE(cbegin++, cend);
-    ASSERT_EQ(cbegin+1, cend);
-    ASSERT_NE(cbegin, cend);
-    ASSERT_EQ((cbegin += 1), cend);
-    ASSERT_EQ(cbegin, cend);
+    test(view.begin(), view.end());
+    test(cview.begin(), cview.end());
+    test(view.cbegin(), view.cend());
 }
 
 TEST(View, SingleComponentContains) {
@@ -180,6 +173,7 @@ TEST(View, MultipleComponent) {
 TEST(View, MultipleComponentBeginEnd) {
     entt::DefaultRegistry registry;
     auto view = registry.view<int, char>();
+    const auto &cview = view;
 
     for(auto i = 0; i < 3; ++i) {
         const auto entity = registry.create();
@@ -187,27 +181,19 @@ TEST(View, MultipleComponentBeginEnd) {
         registry.assign<char>(entity);
     }
 
-    auto begin = view.begin();
-    auto end = view.end();
+    auto test = [](auto begin, auto end) {
+        ASSERT_NE(begin, end);
+        ASSERT_NE(++begin, end);
+        ASSERT_NE(begin++, end);
+        ASSERT_EQ(begin+1, end);
+        ASSERT_NE(begin, end);
+        ASSERT_EQ((begin += 1), end);
+        ASSERT_EQ(begin, end);
+    };
 
-    ASSERT_NE(begin, end);
-    ASSERT_NE(++begin, end);
-    ASSERT_NE(begin++, end);
-    ASSERT_EQ(begin+1, end);
-    ASSERT_NE(begin, end);
-    ASSERT_EQ((begin += 1), end);
-    ASSERT_EQ(begin, end);
-
-    auto cbegin = view.cbegin();
-    auto cend = view.cend();
-
-    ASSERT_NE(cbegin, cend);
-    ASSERT_NE(++cbegin, cend);
-    ASSERT_NE(cbegin++, cend);
-    ASSERT_EQ(cbegin+1, cend);
-    ASSERT_NE(cbegin, cend);
-    ASSERT_EQ((cbegin += 1), cend);
-    ASSERT_EQ(cbegin, cend);
+    test(cview.begin(), cview.end());
+    test(view.begin(), view.end());
+    test(view.cbegin(), view.cend());
 }
 
 TEST(View, MultipleComponentContains) {
@@ -398,6 +384,7 @@ TEST(PersistentView, NoPrepare) {
 TEST(PersistentView, BeginEnd) {
     entt::DefaultRegistry registry;
     auto view = registry.view<int, char>(entt::persistent_t{});
+    const auto &cview = view;
 
     for(auto i = 0; i < 3; ++i) {
         const auto entity = registry.create();
@@ -405,27 +392,19 @@ TEST(PersistentView, BeginEnd) {
         registry.assign<char>(entity);
     }
 
-    auto begin = view.begin();
-    auto end = view.end();
+    auto test = [](auto begin, auto end) {
+        ASSERT_NE(begin, end);
+        ASSERT_NE(++begin, end);
+        ASSERT_NE(begin++, end);
+        ASSERT_EQ(begin+1, end);
+        ASSERT_NE(begin, end);
+        ASSERT_EQ((begin += 1), end);
+        ASSERT_EQ(begin, end);
+    };
 
-    ASSERT_NE(begin, end);
-    ASSERT_NE(++begin, end);
-    ASSERT_NE(begin++, end);
-    ASSERT_EQ(begin+1, end);
-    ASSERT_NE(begin, end);
-    ASSERT_EQ((begin += 1), end);
-    ASSERT_EQ(begin, end);
-
-    auto cbegin = view.cbegin();
-    auto cend = view.cend();
-
-    ASSERT_NE(cbegin, cend);
-    ASSERT_NE(++cbegin, cend);
-    ASSERT_NE(cbegin++, cend);
-    ASSERT_EQ(cbegin+1, cend);
-    ASSERT_NE(cbegin, cend);
-    ASSERT_EQ((cbegin += 1), cend);
-    ASSERT_EQ(cbegin, cend);
+    test(cview.begin(), cview.end());
+    test(view.begin(), view.end());
+    test(view.cbegin(), view.cend());
 }
 
 TEST(PersistentView, Contains) {
@@ -585,32 +564,25 @@ TEST(RawView, Functionalities) {
 TEST(RawView, BeginEnd) {
     entt::DefaultRegistry registry;
     auto view = registry.view<int>(entt::raw_t{});
+    const auto &cview = view;
 
     for(auto i = 0; i < 3; ++i) {
         registry.assign<int>(registry.create());
     }
 
-    auto begin = view.begin();
-    auto end = view.end();
+    auto test = [](auto begin, auto end) {
+        ASSERT_NE(begin, end);
+        ASSERT_NE(++begin, end);
+        ASSERT_NE(begin++, end);
+        ASSERT_EQ(begin+1, end);
+        ASSERT_NE(begin, end);
+        ASSERT_EQ((begin += 1), end);
+        ASSERT_EQ(begin, end);
+    };
 
-    ASSERT_NE(begin, end);
-    ASSERT_NE(++begin, end);
-    ASSERT_NE(begin++, end);
-    ASSERT_EQ(begin+1, end);
-    ASSERT_NE(begin, end);
-    ASSERT_EQ((begin += 1), end);
-    ASSERT_EQ(begin, end);
-
-    auto cbegin = view.cbegin();
-    auto cend = view.cend();
-
-    ASSERT_NE(cbegin, cend);
-    ASSERT_NE(++cbegin, cend);
-    ASSERT_NE(cbegin++, cend);
-    ASSERT_EQ(cbegin+1, cend);
-    ASSERT_NE(cbegin, cend);
-    ASSERT_EQ((cbegin += 1), cend);
-    ASSERT_EQ(cbegin, cend);
+    test(cview.begin(), cview.end());
+    test(view.begin(), view.end());
+    test(view.cbegin(), view.cend());
 }
 
 TEST(RawView, Empty) {
