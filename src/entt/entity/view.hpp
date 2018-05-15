@@ -382,7 +382,7 @@ private:
  * reference to the smallest set of candidate entities in order to get a
  * performance boost when iterate.<br/>
  * Order of elements during iterations are highly dependent on the order of the
- * underlying data strctures. See SparseSet and its specializations for more
+ * underlying data structures. See SparseSet and its specializations for more
  * details.
  *
  * @b Important
