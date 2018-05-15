@@ -759,16 +759,20 @@ public:
     template<typename Func>
     void each(Func func) const {
         auto iterate = [&func, this](const auto &cpool) {
-            std::for_each(cpool.view_type::cbegin(), cpool.view_type::cend(), [&func, raw = cpool.cbegin(), unchecked = this->unchecked(&cpool), extent = this->extent(), this](const auto entity) mutable {
+            const auto other = unchecked(&cpool);
+            const auto ext = extent();
+            auto raw = cpool.cbegin();
+
+            for(const auto entity: static_cast<const view_type &>(cpool)) {
                 const auto sz = size_type(entity & traits_type::entity_mask);
 
-                if(sz < extent && std::all_of(unchecked.cbegin(), unchecked.cend(), [entity](const view_type *view) { return view->fast(entity); })) {
-                    // avoided indirections due to the sparse set for the pivot type
-                    func(entity, this->get<typename std::decay_t<decltype(cpool)>::object_type, Component>(raw, entity)...);
+                if(sz < ext && std::all_of(other.cbegin(), other.cend(), [entity](const view_type *view) { return view->fast(entity); })) {
+                    // avoided indirections due to the sparse set for the pivot type (see get for more details)
+                    func(entity, get<typename std::decay_t<decltype(cpool)>::object_type, Component>(raw, entity)...);
                 }
 
                 ++raw;
-            });
+            }
         };
 
         const auto *view = candidate();

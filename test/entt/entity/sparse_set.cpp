@@ -4,10 +4,12 @@
 
 TEST(SparseSetNoType, Functionalities) {
     entt::SparseSet<unsigned int> set;
+    const auto &cset = set;
 
     ASSERT_NO_THROW(set.reserve(42));
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(cset.begin(), cset.end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -18,6 +20,7 @@ TEST(SparseSetNoType, Functionalities) {
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
+    ASSERT_NE(cset.begin(), cset.end());
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_TRUE(set.has(42));
@@ -28,6 +31,7 @@ TEST(SparseSetNoType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(cset.begin(), cset.end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -40,6 +44,7 @@ TEST(SparseSetNoType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(cset.begin(), cset.end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -254,10 +259,12 @@ TEST(SparseSetNoType, RespectUnordered) {
 
 TEST(SparseSetWithType, Functionalities) {
     entt::SparseSet<unsigned int, int> set;
+    const auto &cset = set;
 
     ASSERT_NO_THROW(set.reserve(42));
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(cset.begin(), cset.end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -267,6 +274,7 @@ TEST(SparseSetWithType, Functionalities) {
     ASSERT_EQ(set.get(42), 3);
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
+    ASSERT_NE(cset.begin(), cset.end());
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_TRUE(set.has(42));
@@ -277,6 +285,7 @@ TEST(SparseSetWithType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(cset.begin(), cset.end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -289,6 +298,7 @@ TEST(SparseSetWithType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(cset.begin(), cset.end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));

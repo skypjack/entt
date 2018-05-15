@@ -230,6 +230,22 @@ public:
      *
      * @return An iterator to the first entity of the internal packed array.
      */
+    inline const_iterator_type begin() const ENTT_NOEXCEPT {
+        return cbegin();
+    }
+
+    /**
+     * @brief Returns an iterator to the beginning.
+     *
+     * The returned iterator points to the first entity of the internal packed
+     * array. If the sparse set is empty, the returned iterator will be equal to
+     * `end()`.
+     *
+     * @note
+     * Input iterators stay true to the order imposed by a call to `respect`.
+     *
+     * @return An iterator to the first entity of the internal packed array.
+     */
     inline iterator_type begin() ENTT_NOEXCEPT {
         return cbegin();
     }
@@ -249,6 +265,23 @@ public:
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
         return const_iterator_type{direct.data(), 0};
+    }
+
+    /**
+     * @brief Returns an iterator to the end.
+     *
+     * The returned iterator points to the element following the last entity in
+     * the internal packed array. Attempting to dereference the returned
+     * iterator results in undefined behavior.
+     *
+     * @note
+     * Input iterators stay true to the order imposed by a call to `respect`.
+     *
+     * @return An iterator to the element following the last entity of the
+     * internal packed array.
+     */
+    inline const_iterator_type end() const ENTT_NOEXCEPT {
+        return cend();
     }
 
     /**
@@ -625,6 +658,22 @@ public:
      *
      * @return An iterator to the first instance of the given type.
      */
+    inline const_iterator_type begin() const ENTT_NOEXCEPT {
+        return cbegin();
+    }
+
+    /**
+     * @brief Returns an iterator to the beginning.
+     *
+     * The returned iterator points to the first instance of the given type. If
+     * the sparse set is empty, the returned iterator will be equal to `end()`.
+     *
+     * @note
+     * Input iterators stay true to the order imposed by a call to either `sort`
+     * or `respect`.
+     *
+     * @return An iterator to the first instance of the given type.
+     */
     iterator_type begin() ENTT_NOEXCEPT {
         return iterator_type{instances.data(), instances.size()};
     }
@@ -645,6 +694,24 @@ public:
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
         return const_iterator_type{instances.data(), 0};
+    }
+
+    /**
+     * @brief Returns an iterator to the end.
+     *
+     * The returned iterator points to the element following the last instance
+     * of the given type. Attempting to dereference the returned iterator
+     * results in undefined behavior.
+     *
+     * @note
+     * Input iterators stay true to the order imposed by a call to either `sort`
+     * or `respect`.
+     *
+     * @return An iterator to the element following the last instance of the
+     * given type.
+     */
+    inline const_iterator_type end() const ENTT_NOEXCEPT {
+        return cend();
     }
 
     /**
