@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/ident.hpp"
 #include "entt_traits.hpp"
 #include "sparse_set.hpp"
 
@@ -432,16 +431,13 @@ class View final {
     class Iterator {
         using size_type = typename view_type::size_type;
 
-        inline bool valid() const ENTT_NOEXCEPT {
+        bool valid() const ENTT_NOEXCEPT {
             const auto entity = *begin;
             const auto sz = size_type(entity & traits_type::entity_mask);
-            auto pos = unchecked.size();
 
-            if(sz < extent) {
-                for(; pos && unchecked[pos-1]->fast(entity); --pos);
-            }
-
-            return !pos;
+            return sz < extent && std::all_of(unchecked.cbegin(), unchecked.cend(), [entity](const view_type *view) {
+                return view->fast(entity);
+            });
         }
 
     public:
@@ -499,41 +495,45 @@ class View final {
     };
 
     View(pool_type<Component> &... pools) ENTT_NOEXCEPT
-        : pools{pools...}, view{nullptr}, unchecked{}, idx{}
-    {
-        reset();
+        : pools{pools...}
+    {}
+
+    template<typename Comp>
+    const pool_type<Comp> & pool() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Comp> &>(pools);
     }
 
-    template<typename Comp, typename Other, typename It>
-    inline std::enable_if_t<std::is_same<Comp, Other>::value, const Other &>
-    get(const It &it, Entity) const { return *it; }
+    template<typename Comp>
+    inline pool_type<Comp> & pool() ENTT_NOEXCEPT {
+        return const_cast<pool_type<Comp> &>(const_cast<const View *>(this)->pool<Comp>());
+    }
 
-    template<typename Comp, typename Other, typename It>
-    inline std::enable_if_t<!std::is_same<Comp, Other>::value, const Other &>
-    get(const It &, Entity entity) const { return std::get<pool_type<Other> &>(pools).get(entity); }
-
-    template<typename Comp, typename Func>
-    void each(Func func) const {
-        const auto extent = std::min({ std::get<pool_type<Component> &>(pools).extent()... });
-        auto &pool = std::get<pool_type<Comp> &>(pools);
-
-        std::for_each(pool.view_type::cbegin(), pool.view_type::cend(), [func = std::move(func), raw = pool.cbegin(), extent, this](const auto entity) mutable {
-            const auto sz = size_type(entity & traits_type::entity_mask);
-
-            if(sz < extent) {
-                auto pos = unchecked.size();
-
-                for(; pos && unchecked[pos-1]->fast(entity); --pos);
-
-                if(!pos) {
-                    // avoided indirections due to the sparse set for the pivot (this-> required because of GCC 6)
-                    func(entity, this->get<Comp, Component>(raw, entity)...);
-                }
-            }
-
-            ++raw;
+    const view_type * candidate() const ENTT_NOEXCEPT {
+        return std::min({ static_cast<const view_type *>(&pool<Component>())... }, [](const auto *lhs, const auto *rhs) {
+            return lhs->size() < rhs->size();
         });
     }
+
+    unchecked_type unchecked(const view_type *view) const ENTT_NOEXCEPT {
+        unchecked_type other{};
+        std::size_t pos{};
+        using accumulator_type = const view_type *[];
+        accumulator_type accumulator = { (&pool<Component>() == view ? view : other[pos++] = &pool<Component>())... };
+        (void)accumulator;
+        return other;
+    }
+
+    typename view_type::size_type extent() const ENTT_NOEXCEPT {
+        return std::min({ pool<Component>().extent()... });
+    }
+
+    template<typename Comp, typename Other>
+    inline std::enable_if_t<std::is_same<Comp, Other>::value, const Other &>
+    get(const typename pool_type<Comp>::const_iterator_type &it, Entity) const ENTT_NOEXCEPT { return *it; }
+
+    template<typename Comp, typename Other>
+    inline std::enable_if_t<!std::is_same<Comp, Other>::value, const Other &>
+    get(const typename pool_type<Comp>::const_iterator_type &, Entity entity) const ENTT_NOEXCEPT { return pool<Other>().get(entity); }
 
 public:
     /*! @brief Input iterator type. */
@@ -550,7 +550,7 @@ public:
      * @return Estimated number of entities that have the given components.
      */
     size_type size() const ENTT_NOEXCEPT {
-        return view->size();
+        return std::min({ pool<Component>().size()... });
     }
 
     /**
@@ -558,7 +558,7 @@ public:
      * @return True if the view is definitely empty, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
-        return view->empty();
+        return std::max({ pool<Component>().empty()... });
     }
 
     /**
@@ -576,8 +576,8 @@ public:
      * @return An iterator to the first entity that has the given components.
      */
     const_iterator_type cbegin() const ENTT_NOEXCEPT {
-        const auto extent = std::min({ std::get<pool_type<Component> &>(pools).extent()... });
-        return iterator_type{ unchecked, extent, view->cbegin(), view->cend() };
+        const auto *view = candidate();
+        return iterator_type{ unchecked(view), extent(), view->cbegin(), view->cend() };
     }
 
     /**
@@ -614,8 +614,8 @@ public:
      * given components.
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
-        const auto extent = std::min({ std::get<pool_type<Component> &>(pools).extent()... });
-        return iterator_type{ unchecked, extent, view->cend(), view->cend() };
+        const auto *view = candidate();
+        return iterator_type{ unchecked(view), extent(), view->cend(), view->cend() };
     }
 
     /**
@@ -643,15 +643,8 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     bool contains(entity_type entity) const ENTT_NOEXCEPT {
-        const auto extent = std::min({ std::get<pool_type<Component> &>(pools).extent()... });
         const auto sz = size_type(entity & traits_type::entity_mask);
-        auto pos = unchecked.size();
-
-        if(sz < extent && view->has(entity) && (view->data()[view->get(entity)] == entity)) {
-            for(; pos && unchecked[pos-1]->fast(entity); --pos);
-        }
-
-        return !pos;
+        return sz < extent() && std::min({ (pool<Component>().has(entity) && (pool<Component>().data()[pool<Component>().view_type::get(entity)] == entity))... });
     }
 
     /**
@@ -674,7 +667,7 @@ public:
     template<typename Comp>
     const Comp & get(entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
-        return std::get<pool_type<Comp> &>(pools).get(entity);
+        return pool<Comp>().get(entity);
     }
 
     /**
@@ -764,10 +757,23 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    inline void each(Func func) const {
-        constexpr auto indexes = ident<Component...>;
+    void each(Func func) const {
+        auto iterate = [&func, this](const auto &cpool) {
+            std::for_each(cpool.view_type::cbegin(), cpool.view_type::cend(), [&func, raw = cpool.cbegin(), unchecked = this->unchecked(&cpool), extent = this->extent(), this](const auto entity) mutable {
+                const auto sz = size_type(entity & traits_type::entity_mask);
+
+                if(sz < extent && std::all_of(unchecked.cbegin(), unchecked.cend(), [entity](const view_type *view) { return view->fast(entity); })) {
+                    // avoided indirections due to the sparse set for the pivot type
+                    func(entity, this->get<typename std::decay_t<decltype(cpool)>::object_type, Component>(raw, entity)...);
+                }
+
+                ++raw;
+            });
+        };
+
+        const auto *view = candidate();
         using accumulator_type = int[];
-        accumulator_type accumulator = { (indexes.template get<Component>() == idx ? (each<Component>(std::move(func)), 0) : 0)... };
+        accumulator_type accumulator = { (&pool<Component>() == view ? (iterate(pool<Component>()), 0) : 0)... };
         (void)accumulator;
     }
 
@@ -794,41 +800,8 @@ public:
         });
     }
 
-    /**
-     * @brief Resets the view and reinitializes it.
-     *
-     * A multi component view keeps a reference to the smallest set of candidate
-     * entities to iterate. Resetting a view means querying the underlying data
-     * structures and reinitializing the view.<br/>
-     * Use it only if copies of views are stored around and there is a
-     * possibility that a component has become the best candidate in the
-     * meantime.
-     */
-    void reset() {
-        using accumulator_type = size_type[];
-        size_type sz = std::max({ std::get<pool_type<Component> &>(pools).size()... }) + std::size_t{1};
-        size_type next{};
-
-        auto probe = [this](auto sz, const auto &pool) {
-            return pool.size() < sz ? (view = &pool, pool.size()) : sz;
-        };
-
-        auto filter = [this](auto next, const auto &pool) {
-            return (view == &pool) ? (idx = next) : (unchecked[next++] = &pool, next);
-        };
-
-        accumulator_type probing = { (sz = probe(sz, std::get<pool_type<Component> &>(pools)))... };
-        accumulator_type filtering = { (next = filter(next, std::get<pool_type<Component> &>(pools)))... };
-
-        (void)filtering;
-        (void)probing;
-    }
-
 private:
     const pattern_type pools;
-    const view_type *view;
-    unchecked_type unchecked;
-    size_type idx;
 };
 
 

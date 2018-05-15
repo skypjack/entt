@@ -175,10 +175,6 @@ TEST(View, MultipleComponent) {
 
     registry.remove<char>(e0);
     registry.remove<char>(e1);
-    view.reset();
-
-    ASSERT_EQ(view.begin(), view.end());
-    ASSERT_TRUE(view.empty());
 }
 
 TEST(View, MultipleComponentBeginEnd) {

@@ -1276,9 +1276,9 @@ entities available for each component and pick up a reference to the smallest
 set of candidates in order to speed up iterations.<br/>
 They offer fewer functionalities than their companion views for single
 component. In particular, a multi component standard view exposes utility
-functions to reset its internal state (optimization purposes) and to get the
-estimated number of entities it is going to return. It's also possible to ask a
-view if it contains a given entity.<br/>
+functions to get the estimated number of entities it is going to return and to
+know whether it's empty or not. It's also possible to ask a view if it contains
+a given entity.<br/>
 Refer to the [official documentation](https://skypjack.github.io/entt/) for all
 the details.
 
