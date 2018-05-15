@@ -95,7 +95,7 @@ public:
             it->component = std::move(component);
         }
 
-        return *static_cast<Component *>(component.get());
+        return get<Component>();
     }
 
     /**

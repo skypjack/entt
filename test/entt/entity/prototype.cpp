@@ -10,8 +10,9 @@ TEST(Prototype, Functionalities) {
     ASSERT_FALSE((prototype.has<int, char>()));
     ASSERT_TRUE(registry.empty());
 
-    prototype.set<int>(3);
-    prototype.set<char>('c');
+    ASSERT_EQ(prototype.set<int>(2), 2);
+    ASSERT_EQ(prototype.set<int>(3), 3);
+    ASSERT_EQ(prototype.set<char>('c'), 'c');
 
     ASSERT_EQ(prototype.get<int>(), 3);
     ASSERT_EQ(cprototype.get<char>(), 'c');
