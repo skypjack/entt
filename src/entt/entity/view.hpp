@@ -508,7 +508,7 @@ class View final {
             return ((begin += value) != end && !valid()) ? ++(*this) : *this;
         }
 
-        Iterator operator+(difference_type value) ENTT_NOEXCEPT {
+        Iterator operator+(difference_type value) const ENTT_NOEXCEPT {
             return Iterator{unchecked, extent, begin+value, end};
         }
 

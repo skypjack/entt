@@ -84,7 +84,7 @@ class SparseSet<Entity> {
             return *this;
         }
 
-        Iterator operator+(difference_type value) ENTT_NOEXCEPT {
+        Iterator operator+(difference_type value) const ENTT_NOEXCEPT {
             return Iterator{direct, pos-value};
         }
 
@@ -527,7 +527,7 @@ class SparseSet<Entity, Type>: public SparseSet<Entity> {
             return *this;
         }
 
-        Iterator operator+(difference_type value) ENTT_NOEXCEPT {
+        Iterator operator+(difference_type value) const ENTT_NOEXCEPT {
             return Iterator{instances, pos-value};
         }
 
