@@ -104,8 +104,10 @@ TEST(Benchmark, IterateSingleComponent1M) {
     };
 
     test([](auto, const auto &) {});
-    test([](auto, auto &position) {
-        position.x = {};
+    test([](auto, auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
@@ -126,8 +128,10 @@ TEST(Benchmark, IterateSingleComponentRaw1M) {
     };
 
     test([](const auto &) {});
-    test([](auto &position) {
-        position.x = {};
+    test([](auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
@@ -149,9 +153,10 @@ TEST(Benchmark, IterateTwoComponents1M) {
     };
 
     test([](auto, const auto &...) {});
-    test([](auto, auto &position, auto &velocity) {
-        position.x = {};
-        velocity.x = {};
+    test([](auto, auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
@@ -176,9 +181,10 @@ TEST(Benchmark, IterateTwoComponents1MHalf) {
     };
 
     test([](auto, const auto &...) {});
-    test([](auto, auto &position, auto &velocity) {
-        position.x = {};
-        velocity.x = {};
+    test([](auto, auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
@@ -203,9 +209,10 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
     };
 
     test([](auto, const auto &...) {});
-    test([](auto, auto &position, auto &velocity) {
-        position.x = {};
-        velocity.x = {};
+    test([](auto, auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
@@ -228,9 +235,10 @@ TEST(Benchmark, IterateTwoComponentsPersistent1M) {
     };
 
     test([](auto, const auto &...) {});
-    test([](auto, auto &position, auto &velocity) {
-        position.x = {};
-        velocity.x = {};
+    test([](auto, auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
@@ -255,12 +263,10 @@ TEST(Benchmark, IterateFiveComponents1M) {
     };
 
     test([](auto, const auto &...) {});
-    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3) {
-        position.x = {};
-        velocity.x = {};
-        comp1.x = {};
-        comp2.x = {};
-        comp3.x = {};
+    test([](auto, auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
@@ -288,12 +294,10 @@ TEST(Benchmark, IterateFiveComponents1MHalf) {
     };
 
     test([](auto, const auto &...) {});
-    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3) {
-        position.x = {};
-        velocity.x = {};
-        comp1.x = {};
-        comp2.x = {};
-        comp3.x = {};
+    test([](auto, auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
@@ -321,12 +325,10 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
     };
 
     test([](auto, const auto &...) {});
-    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3) {
-        position.x = {};
-        velocity.x = {};
-        comp1.x = {};
-        comp2.x = {};
-        comp3.x = {};
+    test([](auto, auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
@@ -352,12 +354,10 @@ TEST(Benchmark, IterateFiveComponentsPersistent1M) {
     };
 
     test([](auto, const auto &...) {});
-    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3) {
-        position.x = {};
-        velocity.x = {};
-        comp1.x = {};
-        comp2.x = {};
-        comp3.x = {};
+    test([](auto, auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
@@ -387,17 +387,10 @@ TEST(Benchmark, IterateTenComponents1M) {
     };
 
     test([](auto, const auto &...) {});
-    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3, auto &comp4, auto &comp5, auto &comp6, auto &comp7, auto &comp8) {
-        position.x = {};
-        velocity.x = {};
-        comp1.x = {};
-        comp2.x = {};
-        comp3.x = {};
-        comp4.x = {};
-        comp5.x = {};
-        comp6.x = {};
-        comp7.x = {};
-        comp8.x = {};
+    test([](auto, auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
@@ -430,17 +423,10 @@ TEST(Benchmark, IterateTenComponents1MHalf) {
     };
 
     test([](auto, auto &...) {});
-    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3, auto &comp4, auto &comp5, auto &comp6, auto &comp7, auto &comp8) {
-        position.x = {};
-        velocity.x = {};
-        comp1.x = {};
-        comp2.x = {};
-        comp3.x = {};
-        comp4.x = {};
-        comp5.x = {};
-        comp6.x = {};
-        comp7.x = {};
-        comp8.x = {};
+    test([](auto, auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
@@ -473,17 +459,10 @@ TEST(Benchmark, IterateTenComponents1MOne) {
     };
 
     test([](auto, const auto &...) {});
-    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3, auto &comp4, auto &comp5, auto &comp6, auto &comp7, auto &comp8) {
-        position.x = {};
-        velocity.x = {};
-        comp1.x = {};
-        comp2.x = {};
-        comp3.x = {};
-        comp4.x = {};
-        comp5.x = {};
-        comp6.x = {};
-        comp7.x = {};
-        comp8.x = {};
+    test([](auto, auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
@@ -514,17 +493,10 @@ TEST(Benchmark, IterateTenComponentsPersistent1M) {
     };
 
     test([](auto, const auto &...) {});
-    test([](auto, auto &position, auto &velocity, auto &comp1, auto &comp2, auto &comp3, auto &comp4, auto &comp5, auto &comp6, auto &comp7, auto &comp8) {
-        position.x = {};
-        velocity.x = {};
-        comp1.x = {};
-        comp2.x = {};
-        comp3.x = {};
-        comp4.x = {};
-        comp5.x = {};
-        comp6.x = {};
-        comp7.x = {};
-        comp8.x = {};
+    test([](auto, auto &... comp) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (comp.x = {}, 0)... };
+        (void)accumulator;
     });
 }
 
