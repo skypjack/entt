@@ -459,6 +459,9 @@ class View final {
     template<typename Comp>
     using pool_type = SparseSet<Entity, Comp>;
 
+    template<typename Comp>
+    using component_iterator_type = typename pool_type<Comp>::const_iterator_type;
+
     using view_type = SparseSet<Entity>;
     using underlying_iterator_type = typename view_type::const_iterator_type;
     using unchecked_type = std::array<const view_type *, (sizeof...(Component) - 1)>;
@@ -566,11 +569,43 @@ class View final {
 
     template<typename Comp, typename Other>
     inline std::enable_if_t<std::is_same<Comp, Other>::value, const Other &>
-    get(const typename pool_type<Comp>::const_iterator_type &it, Entity) const ENTT_NOEXCEPT { return *it; }
+    get(const component_iterator_type<Comp> &it, Entity) const ENTT_NOEXCEPT { return *it; }
 
     template<typename Comp, typename Other>
     inline std::enable_if_t<!std::is_same<Comp, Other>::value, const Other &>
-    get(const typename pool_type<Comp>::const_iterator_type &, Entity entity) const ENTT_NOEXCEPT { return pool<Other>().get(entity); }
+    get(const component_iterator_type<Comp> &, Entity entity) const ENTT_NOEXCEPT { return pool<Other>().get(entity); }
+
+    template<typename Comp, typename Func, std::size_t... Indexes>
+    void each(const pool_type<Comp> &cpool, Func func, std::index_sequence<Indexes...>) const {
+        const auto other = unchecked(&cpool);
+        std::array<underlying_iterator_type, sizeof...(Component)> data{{cpool.view_type::cbegin(), std::get<Indexes>(other)->cbegin()...}};
+        auto raw = std::make_tuple(pool<Component>().cbegin()...);
+        const auto end = cpool.view_type::cend();
+        std::size_t pos{};
+
+        // we can directly use the raw iterators if pools are ordered
+        while(!pos && data[0] != end) {
+            for(pos = data.size() - 1; pos && *(data[pos]++) == *data[pos-1]; --pos);
+
+            if(!pos) {
+                func(*(data[0]++), *(std::get<component_iterator_type<Component>>(raw)++)...);
+            }
+        }
+
+        auto it = std::get<component_iterator_type<Comp>>(raw);
+        const auto ext = extent();
+
+        // fallback to visit what remains using indirections
+        for(; data[0] != end; ++data[0], ++it) {
+            const auto entity = *data[0];
+            const auto sz = size_type(entity & traits_type::entity_mask);
+
+            if(sz < ext && std::all_of(other.cbegin(), other.cend(), [entity](const view_type *view) { return view->fast(entity); })) {
+                // avoided at least the indirection due to the sparse set for the pivot type (see get for more details)
+                func(entity, get<Comp, Component>(it, entity)...);
+            }
+        }
+    }
 
 public:
     /*! @brief Input iterator type. */
@@ -832,26 +867,9 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        auto iterate = [&func, this](const auto &cpool) {
-            const auto other = unchecked(&cpool);
-            const auto ext = extent();
-            auto raw = cpool.cbegin();
-
-            for(const auto entity: static_cast<const view_type &>(cpool)) {
-                const auto sz = size_type(entity & traits_type::entity_mask);
-
-                if(sz < ext && std::all_of(other.cbegin(), other.cend(), [entity](const view_type *view) { return view->fast(entity); })) {
-                    // avoided indirections due to the sparse set for the pivot type (see get for more details)
-                    func(entity, get<typename std::decay_t<decltype(cpool)>::object_type, Component>(raw, entity)...);
-                }
-
-                ++raw;
-            }
-        };
-
         const auto *view = candidate();
         using accumulator_type = int[];
-        accumulator_type accumulator = { (&pool<Component>() == view ? (iterate(pool<Component>()), 0) : 0)... };
+        accumulator_type accumulator = { (&pool<Component>() == view ? (each(pool<Component>(), std::move(func), std::make_index_sequence<sizeof...(Component)-1>{}), 0) : 0)... };
         (void)accumulator;
     }
 
