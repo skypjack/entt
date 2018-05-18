@@ -274,8 +274,8 @@ TEST(View, MultipleComponentEachWithHoles) {
 
     auto view = registry.view<char, int>();
 
-    view.each([&](auto entity, const char &c, const int &i) {
-        if(entity == e0) {
+    view.each([e0](auto entity, const char &c, const int &i) {
+        if(e0 == entity) {
             ASSERT_EQ(c, '0');
             ASSERT_EQ(i, 0);
         } else {
