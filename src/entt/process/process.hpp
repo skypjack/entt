@@ -183,7 +183,7 @@ public:
      *
      * @param immediately Requests an immediate operation.
      */
-    void abort(bool immediately = false) ENTT_NOEXCEPT {
+    void abort(const bool immediately = false) ENTT_NOEXCEPT {
         if(alive()) {
             current = State::ABORTED;
 
@@ -230,7 +230,7 @@ public:
      * @param delta Elapsed time.
      * @param data Optional data.
      */
-    void tick(Delta delta, void *data = nullptr) {
+    void tick(const Delta delta, void *data = nullptr) {
         switch (current) {
         case State::UNINITIALIZED:
             tick(0, tag<State::UNINITIALIZED>{}, data);
@@ -327,7 +327,7 @@ struct ProcessAdaptor: Process<ProcessAdaptor<Func, Delta>, Delta>, private Func
      * @param delta Elapsed time.
      * @param data Optional data.
      */
-    void update(Delta delta, void *data) {
+    void update(const Delta delta, void *data) {
         Func::operator()(delta, data, [this]() { this->succeed(); }, [this]() { this->fail(); });
     }
 };

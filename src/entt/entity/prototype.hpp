@@ -31,18 +31,18 @@ namespace entt {
 template<typename Entity>
 class Prototype {
     using component_type = typename Registry<Entity>::component_type;
-    using fn_type = void(*)(const void *, Registry<Entity> &, Entity);
+    using fn_type = void(*)(Registry<Entity> &, const Entity, const void *);
     using deleter_type = void(*)(void *);
     using ptr_type = std::unique_ptr<void, deleter_type>;
 
     template<typename Component>
-    static void accommodate(const void *component, Registry<Entity> &registry, Entity entity) {
+    static void accommodate(Registry<Entity> &registry, const Entity entity, const void *component) {
         const auto &ref = *static_cast<const Component *>(component);
         registry.template accommodate<Component>(entity, ref);
     }
 
     template<typename Component>
-    static void assign(const void *component, Registry<Entity> &registry, Entity entity) {
+    static void assign(Registry<Entity> &registry, const Entity entity, const void *component) {
         if(!registry.template has<Component>(entity)) {
             const auto &ref = *static_cast<const Component *>(component);
             registry.template assign<Component>(entity, ref);
@@ -50,7 +50,7 @@ class Prototype {
     }
 
     struct Handler final {
-        Handler(ptr_type component, fn_type accommodate, fn_type assign, component_type type)
+        Handler(ptr_type component, const fn_type accommodate, const fn_type assign, const component_type type)
             : component{std::move(component)},
               accommodate{accommodate},
               assign{assign},
@@ -245,9 +245,9 @@ public:
      * @param registry A valid reference to a registry.
      * @param entity A valid entity identifier.
      */
-    void assign(registry_type &registry, entity_type entity) {
+    void assign(registry_type &registry, const entity_type entity) {
         std::for_each(handlers.begin(), handlers.end(), [&registry, entity](auto &&handler) {
-            handler.assign(handler.component.get(), registry, entity);
+            handler.assign(registry, entity, handler.component.get());
         });
     }
 
@@ -265,9 +265,9 @@ public:
      * @param registry A valid reference to a registry.
      * @param entity A valid entity identifier.
      */
-    void accommodate(registry_type &registry, entity_type entity) {
+    void accommodate(registry_type &registry, const entity_type entity) {
         std::for_each(handlers.begin(), handlers.end(), [&registry, entity](auto &&handler) {
-            handler.accommodate(handler.component.get(), registry, entity);
+            handler.accommodate(registry, entity, handler.component.get());
         });
     }
 
@@ -287,7 +287,7 @@ public:
      * @param registry A valid reference to a registry.
      * @param entity A valid entity identifier.
      */
-    inline void operator()(registry_type &registry, entity_type entity) ENTT_NOEXCEPT {
+    inline void operator()(registry_type &registry, const entity_type entity) ENTT_NOEXCEPT {
         assign(registry, entity);
     }
 

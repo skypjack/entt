@@ -271,7 +271,6 @@ TEST(SparseSetWithType, Functionalities) {
 
     set.construct(42, 3);
 
-    ASSERT_EQ(set.get(42), 3);
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
     ASSERT_NE(cset.begin(), cset.end());

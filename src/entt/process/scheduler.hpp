@@ -82,7 +82,7 @@ class Scheduler final {
     };
 
     template<typename Proc>
-    static bool update(ProcessHandler &handler, Delta delta, void *data) {
+    static bool update(ProcessHandler &handler, const Delta delta, void *data) {
         auto *process = static_cast<Proc *>(handler.instance.get());
         process->tick(delta, data);
 
@@ -101,7 +101,7 @@ class Scheduler final {
     }
 
     template<typename Proc>
-    static void abort(ProcessHandler &handler, bool immediately) {
+    static void abort(ProcessHandler &handler, const bool immediately) {
         static_cast<Proc *>(handler.instance.get())->abort(immediately);
     }
 
@@ -272,7 +272,7 @@ public:
      * @param delta Elapsed time.
      * @param data Optional data.
      */
-    void update(Delta delta, void *data = nullptr) {
+    void update(const Delta delta, void *data = nullptr) {
         bool clean = false;
 
         for(auto pos = handlers.size(); pos; --pos) {
@@ -298,7 +298,7 @@ public:
      *
      * @param immediately Requests an immediate operation.
      */
-    void abort(bool immediately = false) {
+    void abort(const bool immediately = false) {
         decltype(handlers) exec;
         exec.swap(handlers);
 

@@ -620,7 +620,7 @@ Because of how the registry works internally, it stores a couple of signal
 handlers for each pool in order to notify some of its data structures on the
 construction and destruction of components.<br/>
 These signal handlers are also exposed and made available to users. This is the
-basic brick to build fancy things like blueprints and reactive systems.
+basic brick to build fancy things like dependencies and reactive systems.
 
 To get a sink to be used to connect and disconnect listeners so as to be
 notified on the creation of a component, use the `construction` member function:

@@ -39,7 +39,7 @@ class Snapshot final {
     /*! @brief A registry is allowed to create snapshots. */
     friend class Registry<Entity>;
 
-    using follow_fn_type = Entity(*)(const Registry<Entity> &, Entity);
+    using follow_fn_type = Entity(*)(const Registry<Entity> &, const Entity);
 
     Snapshot(const Registry<Entity> &registry, Entity seed, std::size_t size, follow_fn_type follow) ENTT_NOEXCEPT
         : registry{registry},
@@ -99,7 +99,7 @@ public:
     template<typename Archive>
     Snapshot & entities(Archive &archive) {
         archive(static_cast<Entity>(registry.size()));
-        registry.each([&archive](auto entity) { archive(entity); });
+        registry.each([&archive](const auto entity) { archive(entity); });
         return *this;
     }
 
@@ -191,7 +191,7 @@ class SnapshotLoader final {
     /*! @brief A registry is allowed to create snapshot loaders. */
     friend class Registry<Entity>;
 
-    using assure_fn_type = void(*)(Registry<Entity> &, Entity, bool);
+    using assure_fn_type = void(*)(Registry<Entity> &, const Entity, const bool);
 
     SnapshotLoader(Registry<Entity> &registry, assure_fn_type assure_fn) ENTT_NOEXCEPT
         : registry{registry},
@@ -216,7 +216,7 @@ class SnapshotLoader final {
 
     template<typename Type, typename Archive, typename... Args>
     void assign(Archive &archive, Args... args) {
-        each(archive, [&archive, this, args...](auto entity) {
+        each(archive, [&archive, this, args...](const auto entity) {
             static constexpr auto destroyed = false;
             assure_fn(registry, entity, destroyed);
             archive(registry.template assign<Type>(args..., entity));
@@ -246,7 +246,7 @@ public:
      */
     template<typename Archive>
     SnapshotLoader & entities(Archive &archive) {
-        each(archive, [this](auto entity) {
+        each(archive, [this](const auto entity) {
             static constexpr auto destroyed = false;
             assure_fn(registry, entity, destroyed);
         });
@@ -266,7 +266,7 @@ public:
      */
     template<typename Archive>
     SnapshotLoader & destroyed(Archive &archive) {
-        each(archive, [this](auto entity) {
+        each(archive, [this](const auto entity) {
             static constexpr auto destroyed = true;
             assure_fn(registry, entity, destroyed);
         });
@@ -327,7 +327,7 @@ public:
      * @return A valid loader to continue restoring data.
      */
     SnapshotLoader & orphans() {
-        registry.orphans([this](auto entity) {
+        registry.orphans([this](const auto entity) {
             registry.destroy(entity);
         });
 
@@ -360,7 +360,7 @@ template<typename Entity>
 class ContinuousLoader final {
     using traits_type = entt_traits<Entity>;
 
-    Entity destroy(Entity entity) {
+    Entity destroy(const Entity entity) {
         const auto it = remloc.find(entity);
 
         if(it == remloc.cend()) {
@@ -372,7 +372,7 @@ class ContinuousLoader final {
         return remloc[entity].first;
     }
 
-    Entity restore(Entity entity) {
+    Entity restore(const Entity entity) {
         const auto it = remloc.find(entity);
 
         if(it == remloc.cend()) {
@@ -433,9 +433,9 @@ class ContinuousLoader final {
     void assign(Archive &archive) {
         reset<Component>();
 
-        each(archive, [&archive, this](auto entity) {
-            entity = restore(entity);
-            archive(registry.template accommodate<Component>(entity));
+        each(archive, [&archive, this](const auto entity) {
+            const auto local = restore(entity);
+            archive(registry.template accommodate<Component>(local));
         });
     }
 
@@ -443,9 +443,9 @@ class ContinuousLoader final {
     void assign(Archive &archive, Type Component::*... member) {
         reset<Component>();
 
-        each(archive, [&archive, member..., this](auto entity) {
-            entity = restore(entity);
-            auto &component = registry.template accommodate<Component>(entity);
+        each(archive, [&archive, member..., this](const auto entity) {
+            const auto local = restore(entity);
+            auto &component = registry.template accommodate<Component>(local);
             archive(component);
 
             using accumulator_type = int[];
@@ -458,9 +458,9 @@ class ContinuousLoader final {
     void attach(Archive &archive) {
         registry.template remove<Tag>();
 
-        each(archive, [&archive, this](auto entity) {
-            entity = restore(entity);
-            archive(registry.template assign<Tag>(tag_t{}, entity));
+        each(archive, [&archive, this](const auto entity) {
+            const auto local = restore(entity);
+            archive(registry.template assign<Tag>(tag_t{}, local));
         });
     }
 
@@ -468,9 +468,9 @@ class ContinuousLoader final {
     void attach(Archive &archive, Type Tag::*... member) {
         registry.template remove<Tag>();
 
-        each(archive, [&archive, member..., this](auto entity) {
-            entity = restore(entity);
-            auto &tag = registry.template assign<Tag>(tag_t{}, entity);
+        each(archive, [&archive, member..., this](const auto entity) {
+            const auto local = restore(entity);
+            auto &tag = registry.template assign<Tag>(tag_t{}, local);
             archive(tag);
 
             using accumulator_type = int[];
@@ -513,7 +513,7 @@ public:
      */
     template<typename Archive>
     ContinuousLoader & entities(Archive &archive) {
-        each(archive, [this](auto entity) { restore(entity); });
+        each(archive, [this](const auto entity) { restore(entity); });
         return *this;
     }
 
@@ -529,7 +529,7 @@ public:
      */
     template<typename Archive>
     ContinuousLoader & destroyed(Archive &archive) {
-        each(archive, [this](auto entity) { destroy(entity); });
+        each(archive, [this](const auto entity) { destroy(entity); });
         return *this;
     }
 
@@ -664,7 +664,7 @@ public:
      * @return A non-const reference to this loader.
      */
     ContinuousLoader & orphans() {
-        registry.orphans([this](auto entity) {
+        registry.orphans([this](const auto entity) {
             registry.destroy(entity);
         });
 

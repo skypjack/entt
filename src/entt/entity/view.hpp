@@ -239,7 +239,7 @@ public:
      * @param entity A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
-    bool contains(entity_type entity) const ENTT_NOEXCEPT {
+    bool contains(const entity_type entity) const ENTT_NOEXCEPT {
         return view.has(entity) && (view.data()[view.get(entity)] == entity);
     }
 
@@ -261,7 +261,7 @@ public:
      * @return The component assigned to the entity.
      */
     template<typename Comp>
-    const Comp & get(entity_type entity) const ENTT_NOEXCEPT {
+    const Comp & get(const entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
         return std::get<pool_type<Comp> &>(pools).get(entity);
     }
@@ -284,7 +284,7 @@ public:
      * @return The component assigned to the entity.
      */
     template<typename Comp>
-    inline Comp & get(entity_type entity) ENTT_NOEXCEPT {
+    inline Comp & get(const entity_type entity) ENTT_NOEXCEPT {
         return const_cast<Comp &>(const_cast<const PersistentView *>(this)->get<Comp>(entity));
     }
 
@@ -307,7 +307,7 @@ public:
      */
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<const Comp &...>>
-    get(entity_type entity) const ENTT_NOEXCEPT {
+    get(const entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
         return std::tuple<const Comp &...>{get<Comp>(entity)...};
     }
@@ -331,7 +331,7 @@ public:
      */
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<Comp &...>>
-    get(entity_type entity) ENTT_NOEXCEPT {
+    get(const entity_type entity) ENTT_NOEXCEPT {
         assert(contains(entity));
         return std::tuple<Comp &...>{get<Comp>(entity)...};
     }
@@ -346,7 +346,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(entity_type, const Component &...);
+     * void(const entity_type, const Component &...);
      * @endcode
      *
      * @tparam Func Type of the function object to invoke.
@@ -369,7 +369,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(entity_type, Component &...);
+     * void(const entity_type, Component &...);
      * @endcode
      *
      * @tparam Func Type of the function object to invoke.
@@ -377,7 +377,7 @@ public:
      */
     template<typename Func>
     inline void each(Func func) {
-        const_cast<const PersistentView *>(this)->each([&func](entity_type entity, const Component &... component) {
+        const_cast<const PersistentView *>(this)->each([&func](const entity_type entity, const Component &... component) {
             func(entity, const_cast<Component &>(component)...);
         });
     }
@@ -507,11 +507,11 @@ class View final {
             return ++(*this), orig;
         }
 
-        Iterator & operator+=(difference_type value) ENTT_NOEXCEPT {
+        Iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
             return ((begin += value) != end && !valid()) ? ++(*this) : *this;
         }
 
-        Iterator operator+(difference_type value) const ENTT_NOEXCEPT {
+        Iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
             return Iterator{unchecked, extent, begin+value, end};
         }
 
@@ -569,11 +569,11 @@ class View final {
 
     template<typename Comp, typename Other>
     inline std::enable_if_t<std::is_same<Comp, Other>::value, const Other &>
-    get(const component_iterator_type<Comp> &it, Entity) const ENTT_NOEXCEPT { return *it; }
+    get(const component_iterator_type<Comp> &it, const Entity) const ENTT_NOEXCEPT { return *it; }
 
     template<typename Comp, typename Other>
     inline std::enable_if_t<!std::is_same<Comp, Other>::value, const Other &>
-    get(const component_iterator_type<Comp> &, Entity entity) const ENTT_NOEXCEPT { return pool<Other>().get(entity); }
+    get(const component_iterator_type<Comp> &, const Entity entity) const ENTT_NOEXCEPT { return pool<Other>().get(entity); }
 
     template<typename Comp, typename Func, std::size_t... Indexes>
     void each(const pool_type<Comp> &cpool, Func func, std::index_sequence<Indexes...>) const {
@@ -751,7 +751,7 @@ public:
      * @param entity A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
-    bool contains(entity_type entity) const ENTT_NOEXCEPT {
+    bool contains(const entity_type entity) const ENTT_NOEXCEPT {
         const auto sz = size_type(entity & traits_type::entity_mask);
         return sz < extent() && std::min({ (pool<Component>().has(entity) && (pool<Component>().data()[pool<Component>().view_type::get(entity)] == entity))... });
     }
@@ -774,7 +774,7 @@ public:
      * @return The component assigned to the entity.
      */
     template<typename Comp>
-    const Comp & get(entity_type entity) const ENTT_NOEXCEPT {
+    const Comp & get(const entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
         return pool<Comp>().get(entity);
     }
@@ -797,7 +797,7 @@ public:
      * @return The component assigned to the entity.
      */
     template<typename Comp>
-    inline Comp & get(entity_type entity) ENTT_NOEXCEPT {
+    inline Comp & get(const entity_type entity) ENTT_NOEXCEPT {
         return const_cast<Comp &>(const_cast<const View *>(this)->get<Comp>(entity));
     }
 
@@ -820,7 +820,7 @@ public:
      */
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<const Comp &...>>
-    get(entity_type entity) const ENTT_NOEXCEPT {
+    get(const entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
         return std::tuple<const Comp &...>{get<Comp>(entity)...};
     }
@@ -844,7 +844,7 @@ public:
      */
     template<typename... Comp>
     std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<Comp &...>>
-    get(entity_type entity) ENTT_NOEXCEPT {
+    get(const entity_type entity) ENTT_NOEXCEPT {
         assert(contains(entity));
         return std::tuple<Comp &...>{get<Comp>(entity)...};
     }
@@ -859,7 +859,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(entity_type, const Component &...);
+     * void(const entity_type, const Component &...);
      * @endcode
      *
      * @tparam Func Type of the function object to invoke.
@@ -883,7 +883,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(entity_type, Component &...);
+     * void(const entity_type, Component &...);
      * @endcode
      *
      * @tparam Func Type of the function object to invoke.
@@ -891,7 +891,7 @@ public:
      */
     template<typename Func>
     inline void each(Func func) {
-        const_cast<const View *>(this)->each([&func](entity_type entity, const Component &... component) {
+        const_cast<const View *>(this)->each([&func](const entity_type entity, const Component &... component) {
             func(entity, const_cast<Component &>(component)...);
         });
     }
@@ -1142,7 +1142,7 @@ public:
      * @param entity A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
-    bool contains(entity_type entity) const ENTT_NOEXCEPT {
+    bool contains(const entity_type entity) const ENTT_NOEXCEPT {
         return pool.has(entity) && (pool.data()[pool.view_type::get(entity)] == entity);
     }
 
@@ -1161,7 +1161,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The component assigned to the entity.
      */
-    const Component & get(entity_type entity) const ENTT_NOEXCEPT {
+    const Component & get(const entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
         return pool.get(entity);
     }
@@ -1181,7 +1181,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The component assigned to the entity.
      */
-    inline Component & get(entity_type entity) ENTT_NOEXCEPT {
+    inline Component & get(const entity_type entity) ENTT_NOEXCEPT {
         return const_cast<Component &>(const_cast<const View *>(this)->get(entity));
     }
 
@@ -1194,7 +1194,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(entity_type, const Component &);
+     * void(const entity_type, const Component &);
      * @endcode
      *
      * @tparam Func Type of the function object to invoke.
@@ -1216,7 +1216,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(entity_type, Component &);
+     * void(const entity_type, Component &);
      * @endcode
      *
      * @tparam Func Type of the function object to invoke.
@@ -1224,7 +1224,7 @@ public:
      */
     template<typename Func>
     inline void each(Func func) {
-        const_cast<const View *>(this)->each([&func](entity_type entity, const Component &component) {
+        const_cast<const View *>(this)->each([&func](const entity_type entity, const Component &component) {
             func(entity, const_cast<Component &>(component));
         });
     }
