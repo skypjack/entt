@@ -381,8 +381,7 @@ with the registry nor with the entity-component system at all.
 The following sections will explain in short how to use the entity-component
 system, the core part of the whole framework.<br/>
 In fact, the framework is composed of many other classes in addition to those
-describe below. For more details, please refer to the
-[online documentation](https://skypjack.github.io/entt/).
+describe below. For more details, please refer to the inline documentation.
 
 ## The Registry, the Entity and the Component
 
@@ -397,16 +396,22 @@ Entities are represented by _entity identifiers_. An entity identifier is an
 opaque type that users should not inspect or modify in any way. It carries
 information about the entity itself and its version.
 
-A registry can be used both to construct and to destroy entities:
+A registry can be used both to construct and destroy entities, as well as to
+clone already existing entities:
 
 ```cpp
 // constructs a naked entity with no components and returns its identifier
 auto entity = registry.create();
 
+// clones an entity and assigns all its components by copy to the newly created one
+auto other = registry.clone(entity);
+
 // destroys an entity and all its components
 registry.destroy(entity);
 ```
 
+Be aware that cloning an entity can lead to unexpected results under certain
+conditions. Please refer to the inline documentation for more details.<br/>
 Once an entity is deleted, the registry can freely reuse it internally with a
 slightly different identifier. In particular, the version of an entity is
 increased each and every time it's destroyed.<br/>
@@ -766,8 +771,8 @@ In fact, there are two functions that respond to slightly different needs:
   ```
 
   There exists also the possibility to use a custom sort function object, as
-  long as it adheres to the requirements described in the
-  [official documentation](https://skypjack.github.io/entt/).<br/>
+  long as it adheres to the requirements described in the inline
+  documentation.<br/>
   This is possible mainly because users can get much more with a custom sort
   function object if the pattern of usage is known. As an example, in case of an
   almost sorted pool, quick sort could be much, much slower than insertion sort.
@@ -1205,8 +1210,7 @@ To easily iterate entities and components, all the views offer the common
 `begin` and `end` member functions that allow users to use a view in a typical
 range-for loop. Almost all the views offer also a *more functional* `each`
 member function that accepts a callback for convenience.<br/>
-Continue reading for more details or refer to the
-[official documentation](https://skypjack.github.io/entt/).
+Continue reading for more details or refer to the inline documentation.
 
 ### Standard View
 
@@ -1233,8 +1237,7 @@ underlying data structures directly and avoid superfluous checks.<br/>
 They offer a bunch of functionalities to get the number of entities they are
 going to return and a raw access to the entity list as well as to the component
 list. It's also possible to ask a view if it contains a given entity.<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
+Refer to the inline documentation for all the details.
 
 There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
@@ -1279,8 +1282,7 @@ component. In particular, a multi component standard view exposes utility
 functions to get the estimated number of entities it is going to return and to
 know whether it's empty or not. It's also possible to ask a view if it contains
 a given entity.<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
+Refer to the inline documentation for all the details.
 
 There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
@@ -1357,8 +1359,7 @@ entities it's going to return, a raw access to the entity list and the
 possibility to sort the underlying data structures according to the order of one
 of the components for which it has been constructed. It's also possible to ask a
 view if it contains a given entity.<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
+Refer to the inline documentation for all the details.
 
 To iterate a persistent view, either use it in range-for loop:
 
@@ -1401,8 +1402,7 @@ accessed via an entity identifier.<br/>
 They offer a bunch of functionalities to get the number of instances they are
 going to return and a raw access to the entity list as well as to the component
 list.<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
+Refer to the inline documentation for all the details.
 
 Raw views can be used only to iterate components for a single type. To create
 this kind of views, the tag `raw_t` must also be used in order to disambiguate

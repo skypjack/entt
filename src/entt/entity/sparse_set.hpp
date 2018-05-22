@@ -378,6 +378,28 @@ public:
     }
 
     /**
+     * @brief Assigns an entity to a sparse set by cloning another entity.
+     *
+     * @warning
+     * Attempting to clone an entity that doesn't belong to the sparse set or to
+     * assign an entity that already belongs to the sparse set results in
+     * undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set doesn't contain the entity to clone or if it already contains
+     * the given entity.
+     *
+     * @param entity A valid entity identifier.
+     * @param source A valid entity identifier from which to clone.
+     */
+    inline virtual void clone(const entity_type entity, const entity_type source) {
+        assert(has(source));
+        assert(!has(entity));
+        construct(entity);
+        // useful to suppress warnings when asserts are disabled
+        (void)source;
+    }
+
+    /**
      * @brief Removes an entity from a sparse set.
      *
      * @warning
@@ -818,6 +840,24 @@ public:
         underlying_type::construct(entity);
         instances.emplace_back(Type{std::forward<Args>(args)...});
         return instances.back();
+    }
+
+    /**
+     * @brief Assigns an entity to a sparse set by cloning another entity.
+     *
+     * @warning
+     * Attempting to clone an entity that doesn't belong to the sparse set or to
+     * assign an entity that already belongs to the sparse set results in
+     * undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set doesn't contain the entity to clone or if it already contains
+     * the given entity.
+     *
+     * @param entity A valid entity identifier.
+     * @param source A valid entity identifier from which to clone.
+     */
+    inline void clone(const entity_type entity, const entity_type source) override {
+        construct(entity, get(source));
     }
 
     /**

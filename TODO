@@ -8,7 +8,6 @@
 * create dedicated flat map based on types implementation (sort of "type map") for types to use within the registry and so on...
 * does it worth it to add an optional functor to the member functions of snapshot so as to filter out instances and entities?
 * ease the assignment of tags as string (use a template class with a non-type template parameter behind the scene)
-* reintroduce meaningful clone functionalities into the registry
 * improve CMake interface, see mail from Malte
 * is registry/utility.hpp really required?
 * "singleton mode" for tags (see #66)
