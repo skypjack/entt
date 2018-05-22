@@ -1479,7 +1479,7 @@ public:
             return (next | (entities[next] & ~traits_type::entity_mask));
         };
 
-        return { *this, seed, available, follow };
+        return { *this, seed, follow };
     }
 
     /**

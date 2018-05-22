@@ -44,7 +44,7 @@ class Delegate<Ret(Args...)> final {
         return (Function)(args...);
     }
 
-    template<typename Class, Ret(Class::*Member)(Args...)>
+    template<typename Class, Ret(Class:: *Member)(Args...)>
     static Ret proto(void *instance, Args... args) {
         return (static_cast<Class *>(instance)->*Member)(args...);
     }
@@ -75,7 +75,7 @@ public:
      * @tparam Member Member function to connect to the delegate.
      * @param instance A valid instance of type pointer to `Class`.
      */
-    template<typename Class, Ret(Class::*Member)(Args...)>
+    template<typename Class, Ret(Class:: *Member)(Args...)>
     void connect(Class *instance) ENTT_NOEXCEPT {
         stub = std::make_pair(instance, &proto<Class, Member>);
     }

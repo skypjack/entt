@@ -846,6 +846,21 @@ consequence of a couple of design choices from the past and in the present:
   internally and doesn't know at any time what types of components it contains.
   Therefore being explicit at the call point is mandatory.
 
+There exists also another version of the `component` member function that
+accepts a range of entities to serialize. This version is a bit slower than the
+other one, mainly because it iterates the range of entities more than once for
+internal purposes. However, it can be used to filter out those entities that
+shouldn't be serialized for some reasons.<br/>
+As an example:
+
+```cpp
+const auto view = registry.view<Serialize>();
+OutputArchive output;
+
+registry.snapshot()
+    .component<AComponent, AnotherComponent>(output, view.cbegin(), view.cend());
+```
+
 The `tag` member function is similar to the previous one, apart from the fact
 that it works with tags and not with components.<br/>
 Note also that both `component` and `tag` store items along with entities. It
@@ -921,10 +936,8 @@ InputArchive input;
 
 loader.entities(input)
     .destroyed(input)
-    .component<AComponent, AnotherComponent>(input)
-    .component<DirtyComponent>(input, &DirtyComponent::parent, &DirtyComponent::child)
-    .tag<MyTag>(input)
-    .tag<DirtyTag>(input, &DirtyTag::container)
+    .component<AComponent, AnotherComponent, DirtyComponent>(input, &DirtyComponent::parent, &DirtyComponent::child)
+    .tag<MyTag, DirtyTag>(input, &DirtyTag::container)
     .orphans()
     .shrink();
 ```
@@ -945,20 +958,7 @@ and the tags specified and assign them to the right entities.<br/>
 In case the component or the tag contains entities itself (either as data
 members of type `entity_type` or as containers of entities), the loader can
 update them automatically. To do that, it's enough to specify the data members
-to update as shown in the example. If the component or the tag was in the middle
-of the template parameter list during serialization, multiple commands are
-required during a restore:
-
-```cpp
-registry.snapshot().component<ASimpleComponent, AnotherSimpleComponent, AMoreComplexComponent, TheLastComponent>();
-
-// ...
-
-loader
-    .component<ASimpleComponent, AnotherSimpleComponent>(input)
-    .component<AMoreComplexComponent>(input, &AMoreComplexComponent::entity);
-    .component<TheLastComponent>(input);
-```
+to update as shown in the example.
 
 The `orphans` member function literally destroys those entities that have
 neither components nor tags after a restore. It has exactly the same purpose
@@ -972,7 +972,7 @@ snapshot, unless they know exactly what they are doing.
 
 Archives must publicly expose a predefined set of member functions. The API is
 straightforward and consists only of a group of function call operators that
-are invoked by the registry.
+are invoked by the snapshot class and the loaders.
 
 In particular:
 
@@ -983,13 +983,15 @@ In particular:
   void operator()(Entity);
   ```
 
-  Where `Entity` is the type of the entities used by the registry.<br/>
-  In addition, it must accept the types of both the components and the tags to
-  serialize. Therefore, given a type `T` (either a component or a tag), it must
-  contain a function call operator with the following signature:
+  Where `Entity` is the type of the entities used by the registry. Note that all
+  the member functions of the snapshot class make also an initial call to this
+  endpoint to save the _size_ of the set they are going to store.<br/>
+  In addition, an archive must accept a pair of entity and either component or
+  tag for each type to be serialized. Therefore, given a type `T`, the archive
+  must contain a function call operator with the following signature:
 
   ```cpp
-  void operator()(const T &);
+  void operator()(Entity, const T &);
   ```
 
   The output archive can freely decide how to serialize the data. The register
@@ -1004,17 +1006,19 @@ In particular:
 
   Where `Entity` is the type of the entities used by the registry. Each time the
   function is invoked, the archive must read the next element from the
-  underlying storage and copy it in the given variable.<br/>
-  In addition, it must accept the types of both the components and the tags to
-  restore. Therefore, given a type `T` (either a component or a tag), it must
-  contain a function call operator with the following signature:
+  underlying storage and copy it in the given variable. Note that all the member
+  functions of a loader class make also an initial call to this endpoint to read
+  the _size_ of the set they are going to load.<br/>
+  In addition, the archive must accept a pair of entity and either component or
+  tag for each type to be restored. Therefore, given a type `T`, the archive
+  must contain a function call operator with the following signature:
 
   ```cpp
-  void operator()(T &);
+  void operator()(Entity &, T &);
   ```
 
-  Every time such an operator is invoked, the archive must read the next element
-  from the underlying storage and copy it in the given variable.
+  Every time such an operator is invoked, the archive must read the next
+  elements from the underlying storage and copy them in the given variables.
 
 #### One example to rule them all
 

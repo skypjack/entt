@@ -10,9 +10,11 @@ struct OutputArchive {
         : storage{storage}
     {}
 
-    template<typename Value>
-    void operator()(const Value &value) {
-        std::get<std::queue<Value>>(storage).push(value);
+    template<typename... Value>
+    void operator()(const Value &... value) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (std::get<std::queue<Value>>(storage).push(value), 0)... };
+        (void)accumulator;
     }
 
 private:
@@ -25,11 +27,17 @@ struct InputArchive {
         : storage{storage}
     {}
 
-    template<typename Value>
-    void operator()(Value &value) {
-        auto &queue = std::get<std::queue<Value>>(storage);
-        value = queue.front();
-        queue.pop();
+    template<typename... Value>
+    void operator()(Value &... value) {
+        auto assign = [this](auto &value) {
+            auto &queue = std::get<std::queue<std::decay_t<decltype(value)>>>(storage);
+            value = queue.front();
+            queue.pop();
+        };
+
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (assign(value), 0)... };
+        (void)accumulator;
     }
 
 private:
@@ -240,6 +248,41 @@ TEST(Snapshot, Partial) {
     ASSERT_FALSE(registry.valid(e4));
 }
 
+TEST(Snapshot, Iterator) {
+    entt::DefaultRegistry registry;
+
+    for(auto i = 0; i < 50; ++i) {
+        const auto entity = registry.create();
+        registry.assign<AnotherComponent>(entity, i, i);
+
+        if(i % 2) {
+            registry.assign<AComponent>(entity);
+        }
+    }
+
+    using storage_type = std::tuple<
+        std::queue<entt::DefaultRegistry::entity_type>,
+        std::queue<AnotherComponent>
+    >;
+
+    storage_type storage;
+    OutputArchive<storage_type> output{storage};
+    InputArchive<storage_type> input{storage};
+
+    const auto view = registry.view<AComponent>();
+    const auto size = view.size();
+
+    registry.snapshot().component<AnotherComponent>(output, view.cbegin(), view.cend());
+    registry.reset();
+    registry.restore().component<AnotherComponent>(input);
+
+    ASSERT_EQ(registry.view<AnotherComponent>().size(), size);
+
+    registry.view<AnotherComponent>().each([](const auto entity, auto &&...) {
+        ASSERT_TRUE(entity % 2);
+    });
+}
+
 TEST(Snapshot, Continuous) {
     using entity_type = entt::DefaultRegistry::entity_type;
 
@@ -299,8 +342,7 @@ TEST(Snapshot, Continuous) {
 
     loader.entities(input)
             .destroyed(input)
-            .component<AComponent, AnotherComponent>(input)
-            .component<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
+            .component<AComponent, AnotherComponent, WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
             .tag<double>(input)
             .orphans();
 
@@ -340,13 +382,12 @@ TEST(Snapshot, Continuous) {
     src.snapshot()
             .entities(output)
             .destroyed(output)
-            .component<AComponent, AnotherComponent, WhatAComponent>(output)
+            .component<AComponent, WhatAComponent, AnotherComponent>(output)
             .tag<double>(output);
 
     loader.entities(input)
             .destroyed(input)
-            .component<AComponent, AnotherComponent>(input)
-            .component<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
+            .component<AComponent, WhatAComponent, AnotherComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
             .tag<double>(input)
             .orphans();
 
@@ -370,13 +411,12 @@ TEST(Snapshot, Continuous) {
     src.snapshot()
             .entities(output)
             .destroyed(output)
-            .component<AComponent, AnotherComponent, WhatAComponent>(output)
+            .component<WhatAComponent, AComponent, AnotherComponent>(output)
             .tag<double>(output);
 
     loader.entities(input)
             .destroyed(input)
-            .component<AComponent, AnotherComponent>(input)
-            .component<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
+            .component<WhatAComponent, AComponent, AnotherComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
             .tag<double>(input)
             .orphans();
 
@@ -400,8 +440,7 @@ TEST(Snapshot, Continuous) {
 
     loader.entities(input)
             .destroyed(input)
-            .component<AComponent, AnotherComponent>(input)
-            .component<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
+            .component<AComponent, AnotherComponent, WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
             .tag<double>(input)
             .orphans()
             .shrink();
@@ -424,13 +463,12 @@ TEST(Snapshot, Continuous) {
     src.snapshot()
             .entities(output)
             .destroyed(output)
-            .component<AComponent, AnotherComponent, WhatAComponent>(output)
+            .component<AComponent, WhatAComponent, AnotherComponent>(output)
             .tag<double>(output);
 
     loader.entities(input)
             .destroyed(input)
-            .component<AComponent, AnotherComponent>(input)
-            .component<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
+            .component<AComponent, WhatAComponent, AnotherComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
             .tag<double>(input)
             .orphans();
 
@@ -444,13 +482,12 @@ TEST(Snapshot, Continuous) {
     src.snapshot()
             .entities(output)
             .destroyed(output)
-            .component<AComponent, AnotherComponent, WhatAComponent>(output)
+            .component<WhatAComponent, AComponent, AnotherComponent>(output)
             .tag<double>(output);
 
     loader.entities(input)
             .destroyed(input)
-            .component<AComponent, AnotherComponent>(input)
-            .component<WhatAComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
+            .component<WhatAComponent, AComponent, AnotherComponent>(input, &WhatAComponent::bar, &WhatAComponent::quux)
             .tag<double>(input)
             .orphans();
 

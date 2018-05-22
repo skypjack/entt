@@ -140,7 +140,7 @@ class Sink<Ret(Args...)> final {
         return (Function)(args...);
     }
 
-    template<typename Class, Ret(Class::*Member)(Args... args)>
+    template<typename Class, Ret(Class:: *Member)(Args... args)>
     static Ret proto(void *instance, Args... args) {
         return (static_cast<Class *>(instance)->*Member)(args...);
     }
@@ -177,7 +177,7 @@ public:
      * @tparam Member Member function to connect to the signal.
      * @param instance A valid instance of type pointer to `Class`.
      */
-    template <typename Class, Ret(Class::*Member)(Args...) = &Class::receive>
+    template <typename Class, Ret(Class:: *Member)(Args...) = &Class::receive>
     void connect(Class *instance) {
         disconnect<Class, Member>(instance);
         calls.emplace_back(instance, &proto<Class, Member>);
@@ -199,7 +199,7 @@ public:
      * @tparam Member Member function to connect to the signal.
      * @param instance A valid instance of type pointer to `Class`.
      */
-    template<typename Class, Ret(Class::*Member)(Args...)>
+    template<typename Class, Ret(Class:: *Member)(Args...)>
     void disconnect(Class *instance) {
         call_type target{instance, &proto<Class, Member>};
         calls.erase(std::remove(calls.begin(), calls.end(), std::move(target)), calls.end());
