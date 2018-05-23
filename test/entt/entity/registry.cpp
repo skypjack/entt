@@ -719,6 +719,11 @@ TEST(DefaultRegistry, ComponentSignals) {
 
     ASSERT_EQ(listener.counter, 1);
     ASSERT_EQ(listener.last, e1);
+
+    e1 = registry.clone(e0);
+
+    ASSERT_EQ(listener.counter, 2);
+    ASSERT_EQ(listener.last, e1);
 }
 
 TEST(DefaultRegistry, TagSignals) {

@@ -440,10 +440,12 @@ public:
         const auto other = create();
 
         for(auto pos = pools.size(); pos; --pos) {
-            auto &cpool = std::get<0>(pools[pos-1]);
+            auto &tup = pools[pos-1];
+            auto &cpool = std::get<0>(tup);
 
             if(cpool && cpool->has(entity)) {
                 cpool->clone(other, entity);
+                std::get<1>(tup).publish(*this, other);
             }
         }
 
