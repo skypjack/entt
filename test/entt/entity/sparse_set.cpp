@@ -4,10 +4,12 @@
 
 TEST(SparseSetNoType, Functionalities) {
     entt::SparseSet<unsigned int> set;
+    const auto &cset = set;
 
     ASSERT_NO_THROW(set.reserve(42));
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(cset.begin(), cset.end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -18,6 +20,7 @@ TEST(SparseSetNoType, Functionalities) {
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
+    ASSERT_NE(cset.begin(), cset.end());
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_TRUE(set.has(42));
@@ -28,6 +31,7 @@ TEST(SparseSetNoType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(cset.begin(), cset.end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -40,6 +44,7 @@ TEST(SparseSetNoType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(cset.begin(), cset.end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -47,6 +52,23 @@ TEST(SparseSetNoType, Functionalities) {
     (void)entt::SparseSet<unsigned int>{std::move(set)};
     entt::SparseSet<unsigned int> other;
     other = std::move(set);
+}
+
+TEST(SparseSetNoType, Clone) {
+    entt::SparseSet<unsigned int> set;
+
+    ASSERT_FALSE(set.has(0));
+    ASSERT_FALSE(set.has(42));
+
+    set.construct(0);
+
+    ASSERT_TRUE(set.has(0));
+    ASSERT_FALSE(set.has(42));
+
+    set.clone(42, 0);
+
+    ASSERT_TRUE(set.has(0));
+    ASSERT_TRUE(set.has(42));
 }
 
 TEST(SparseSetNoType, DataBeginEnd) {
@@ -79,6 +101,15 @@ TEST(SparseSetNoType, DataBeginEnd) {
     ASSERT_EQ(*(begin++), 3u);
 
     ASSERT_EQ(begin, end);
+
+    auto cbegin = set.cbegin();
+    auto cend = set.cend();
+
+    ASSERT_NE(cbegin, cend);
+    ASSERT_EQ(cbegin+3, cend);
+    ASSERT_NE(cbegin, cend);
+    ASSERT_EQ(cbegin += 3, cend);
+    ASSERT_EQ(cbegin, cend);
 }
 
 TEST(SparseSetNoType, RespectDisjoint) {
@@ -245,19 +276,21 @@ TEST(SparseSetNoType, RespectUnordered) {
 
 TEST(SparseSetWithType, Functionalities) {
     entt::SparseSet<unsigned int, int> set;
+    const auto &cset = set;
 
     ASSERT_NO_THROW(set.reserve(42));
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(cset.begin(), cset.end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
 
     set.construct(42, 3);
 
-    ASSERT_EQ(set.get(42), 3);
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
+    ASSERT_NE(cset.begin(), cset.end());
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_TRUE(set.has(42));
@@ -268,6 +301,7 @@ TEST(SparseSetWithType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(cset.begin(), cset.end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -280,6 +314,7 @@ TEST(SparseSetWithType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
+    ASSERT_EQ(cset.begin(), cset.end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -287,6 +322,26 @@ TEST(SparseSetWithType, Functionalities) {
     (void)entt::SparseSet<unsigned int>{std::move(set)};
     entt::SparseSet<unsigned int> other;
     other = std::move(set);
+}
+
+TEST(SparseSetWithType, Clone) {
+    entt::SparseSet<unsigned int, int> set;
+
+    ASSERT_FALSE(set.has(0));
+    ASSERT_FALSE(set.has(42));
+
+    set.construct(0, 3);
+
+    ASSERT_TRUE(set.has(0));
+    ASSERT_FALSE(set.has(42));
+    ASSERT_EQ(set.get(0), 3);
+
+    set.clone(42, 0);
+
+    ASSERT_TRUE(set.has(0));
+    ASSERT_TRUE(set.has(42));
+    ASSERT_EQ(set.get(0), set.get(42));
+    ASSERT_EQ(set.get(42), 3);
 }
 
 TEST(SparseSetWithType, AggregatesMustWork) {
@@ -324,6 +379,15 @@ TEST(SparseSetWithType, RawBeginEnd) {
     ASSERT_EQ(*(begin++), 6);
     ASSERT_EQ(*(begin++), 3);
     ASSERT_EQ(begin, end);
+
+    auto cbegin = set.cbegin();
+    auto cend = set.cend();
+
+    ASSERT_NE(cbegin, cend);
+    ASSERT_EQ(cbegin+3, cend);
+    ASSERT_NE(cbegin, cend);
+    ASSERT_EQ(cbegin += 3, cend);
+    ASSERT_EQ(cbegin, cend);
 }
 
 TEST(SparseSetWithType, SortOrdered) {
@@ -453,8 +517,8 @@ TEST(SparseSetWithType, RespectDisjoint) {
     ASSERT_EQ(*(clhs.raw() + 1u), 6);
     ASSERT_EQ(*(clhs.raw() + 2u), 9);
 
-    auto begin = clhs.begin();
-    auto end = clhs.end();
+    auto begin = lhs.begin();
+    auto end = lhs.end();
 
     ASSERT_EQ(*(begin++), 9);
     ASSERT_EQ(*(begin++), 6);
@@ -483,8 +547,8 @@ TEST(SparseSetWithType, RespectOverlap) {
     ASSERT_EQ(*(clhs.raw() + 1u), 9);
     ASSERT_EQ(*(clhs.raw() + 2u), 6);
 
-    auto begin = clhs.begin();
-    auto end = clhs.end();
+    auto begin = lhs.begin();
+    auto end = lhs.end();
 
     ASSERT_EQ(*(begin++), 6);
     ASSERT_EQ(*(begin++), 9);
@@ -628,4 +692,34 @@ TEST(SparseSetWithType, RespectUnordered) {
     ASSERT_EQ(*(rhs.data() + 3u), 3u);
     ASSERT_EQ(*(rhs.data() + 4u), 4u);
     ASSERT_EQ(*(rhs.data() + 5u), 5u);
+}
+
+TEST(SparseSetWithType, ReferencesGuaranteed) {
+    struct InternalType { int value; };
+
+    entt::SparseSet<unsigned int, InternalType> set;
+
+    set.construct(0, 0);
+    set.construct(1, 1);
+
+    ASSERT_EQ(set.get(0).value, 0);
+    ASSERT_EQ(set.get(1).value, 1);
+
+    for(auto &&type: set) {
+        if(type.value) {
+            type.value = 42;
+        }
+    }
+
+    ASSERT_EQ(set.get(0).value, 0);
+    ASSERT_EQ(set.get(1).value, 42);
+
+    auto begin = set.begin();
+
+    while(begin != set.end()) {
+        (begin++)->value = 3;
+    }
+
+    ASSERT_EQ(set.get(0).value, 3);
+    ASSERT_EQ(set.get(1).value, 3);
 }

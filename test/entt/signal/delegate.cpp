@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 #include <entt/signal/delegate.hpp>
 
-int f(int i) {
+int delegateFunction(int i) {
     return i*i;
 }
 
-struct S {
-    int f(int i) {
+struct DelegateFunctor {
+    int operator()(int i) {
         return i+i;
     }
 };
@@ -14,13 +14,13 @@ struct S {
 TEST(Delegate, Functionalities) {
     entt::Delegate<int(int)> ffdel;
     entt::Delegate<int(int)> mfdel;
-    S test;
+    DelegateFunctor functor;
 
     ASSERT_EQ(ffdel(42), int{});
     ASSERT_EQ(mfdel(42), int{});
 
-    ffdel.connect<&f>();
-    mfdel.connect<S, &S::f>(&test);
+    ffdel.connect<&delegateFunction>();
+    mfdel.connect<DelegateFunctor, &DelegateFunctor::operator()>(&functor);
 
     ASSERT_EQ(ffdel(3), 9);
     ASSERT_EQ(mfdel(3), 6);
@@ -35,7 +35,7 @@ TEST(Delegate, Functionalities) {
 TEST(Delegate, Comparison) {
     entt::Delegate<int(int)> delegate;
     entt::Delegate<int(int)> def;
-    delegate.connect<&f>();
+    delegate.connect<&delegateFunction>();
 
     ASSERT_EQ(def, entt::Delegate<int(int)>{});
     ASSERT_NE(def, delegate);

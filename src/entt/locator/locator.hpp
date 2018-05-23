@@ -5,6 +5,7 @@
 #include <memory>
 #include <utility>
 #include <cassert>
+#include "../config/config.h"
 
 
 namespace entt {
@@ -35,7 +36,7 @@ struct ServiceLocator final {
      * @brief Tests if a valid service implementation is set.
      * @return True if the service is set, false otherwise.
      */
-    inline static bool empty() noexcept {
+    inline static bool empty() ENTT_NOEXCEPT {
         return !static_cast<bool>(service);
     }
 
@@ -49,7 +50,7 @@ struct ServiceLocator final {
      *
      * @return A reference to the service implementation currently set, if any.
      */
-    inline static std::weak_ptr<Service> get() noexcept {
+    inline static std::weak_ptr<Service> get() ENTT_NOEXCEPT {
         return service;
     }
 
@@ -67,7 +68,7 @@ struct ServiceLocator final {
      *
      * @return A reference to the service implementation currently set, if any.
      */
-    inline static Service & ref() noexcept {
+    inline static Service & ref() ENTT_NOEXCEPT {
         return *service;
     }
 

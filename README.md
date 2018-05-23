@@ -16,9 +16,19 @@
    * [Vademecum](#vademecum)
    * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
       * [Single instance components](#single-instance-components)
+      * [Observe changes](#observe-changes)
+         * [Who let the tags out?](#who-let-the-tags-out)
       * [Runtime components](#runtime-components)
          * [A journey through a plugin](#a-journey-through-a-plugin)
       * [Sorting: is it possible?](#sorting-is-it-possible)
+      * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
+         * [Snapshot loader](#snapshot-loader)
+         * [Continuous loader](#continuous-loader)
+         * [Archives](#archives)
+         * [One example to rule them all](#one-example-to-rule-them-all)
+      * [Prototype](#prototype)
+      * [Helpers](#helpers)
+         * [Dependency function](#dependency-function)
    * [View: to persist or not to persist?](#view-to-persist-or-not-to-persist)
       * [Standard View](#standard-view)
          * [Single component standard view](#single-component-standard-view)
@@ -39,12 +49,15 @@
    * [The resource, the loader and the cache](#the-resource-the-loader-and-the-cache)
 * [Crash Course: events, signals and everything in between](#crash-course-events-signals-and-everything-in-between)
    * [Signals](#signals)
-   * [Compile-time event bus](#compile-time-event-bus)
    * [Delegate](#delegate)
    * [Event dispatcher](#event-dispatcher)
    * [Event emitter](#event-emitter)
+* [Packaging Tools](#packaging-tools)
+* [EnTT in Action](#entt-in-action)
 * [License](#license)
 * [Support](#support)
+   * [Donation](#donation)
+   * [Hire me](#hire-me)
 
 # Introduction
 
@@ -96,7 +109,8 @@ Here is a brief list of what it offers today:
 * The smallest and most basic implementation of a service locator ever seen.
 * A cooperative scheduler for processes of any type.
 * All what is needed for resource management (cache, loaders, handles).
-* Signal handlers of any type, delegates and an event bus.
+* Delegates, signal handlers (with built-in support for collectors) and a tiny
+  event dispatcher.
 * A general purpose event emitter, that is a CRTP idiom based class template.
 * An event dispatcher for immediate and delayed events to integrate in loops.
 * ...
@@ -156,7 +170,8 @@ int main() {
     std::uint64_t dt = 16;
 
     for(auto i = 0; i < 10; ++i) {
-        auto entity = registry.create(Position{i * 1.f, i * 1.f});
+        auto entity = registry.create();
+        registry.assign<Position>(entity, i * 1.f, i * 1.f);
         if(i % 2 == 0) { registry.assign<Velocity>(entity, i * .1f, i * .1f); }
     }
 
@@ -191,8 +206,8 @@ Dell XPS 13 out of the mid 2014):
 
 | Benchmark | EntityX (compile-time) | EnTT |
 |-----------|-------------|-------------|
-| Create 1M entities | 0.0167s | **0.0046s** |
-| Destroy 1M entities | 0.0053s | **0.0039s** |
+| Create 1M entities | 0.0147s | **0.0046s** |
+| Destroy 1M entities | 0.0053s | **0.0045s** |
 | Standard view, 1M entities, one component | 0.0012s | **1.9e-07s** |
 | Standard view, 1M entities, two components | 0.0012s | **3.8e-07s** |
 | Standard view, 1M entities, two components<br/>Half of the entities have all the components | 0.0009s | **3.8e-07s** |
@@ -207,6 +222,8 @@ Dell XPS 13 out of the mid 2014):
 | Raw view, 1M entities | - | **2.2e-07s** |
 | Sort 150k entities, one component<br/>Arrays are in reverse order | - | **0.0036s** |
 | Sort 150k entities, enforce permutation<br/>Arrays are in reverse order | - | **0.0005s** |
+| Sort 150k entities, one component<br/>Arrays are almost sorted, std::sort | - | **0.0035s** |
+| Sort 150k entities, one component<br/>Arrays are almost sorted, insertion sort | - | **0.0007s** |
 
 Note: The default version of `EntityX` (`master` branch) wasn't added to the
 comparison because it's already much slower than its compile-time counterpart.
@@ -218,12 +235,16 @@ indeed).<br/>
 The proposed entity-component system is incredibly fast to iterate entities,
 this is a fact. The compiler can make a lot of optimizations because of how
 `EnTT` works, even more when components aren't used at all. This is exactly the
-case for these benchmarks.<br/>
+case for these benchmarks. On the other hand and if we consider real world
+cases, `EnTT` is in the middle between a bit and much faster than the other
+solutions around when users also access the components and not just the
+entities, although it is not as fast as reported by these benchmarks.<br/>
 This is why they are completely wrong and cannot be used to evaluate any of the
 entity-component systems.
 
-If you decide to use `EnTT`, choose it because of its API and its performance,
-not because there is a benchmark somewhere that makes it seem the fastest.
+If you decide to use `EnTT`, choose it because of its API, features and
+performance, not because there is a benchmark somewhere that makes it seem the
+fastest.
 
 Probably I'll try to get out of `EnTT` more features and even better performance
 in the future, mainly for fun.<br/>
@@ -360,8 +381,7 @@ with the registry nor with the entity-component system at all.
 The following sections will explain in short how to use the entity-component
 system, the core part of the whole framework.<br/>
 In fact, the framework is composed of many other classes in addition to those
-describe below. For more details, please refer to the
-[online documentation](https://skypjack.github.io/entt/).
+describe below. For more details, please refer to the inline documentation.
 
 ## The Registry, the Entity and the Component
 
@@ -376,19 +396,22 @@ Entities are represented by _entity identifiers_. An entity identifier is an
 opaque type that users should not inspect or modify in any way. It carries
 information about the entity itself and its version.
 
-A registry can be used both to construct and to destroy entities:
+A registry can be used both to construct and destroy entities, as well as to
+clone already existing entities:
 
 ```cpp
 // constructs a naked entity with no components and returns its identifier
 auto entity = registry.create();
 
-// constructs an entity and assigns it default-initialized components
-auto another = registry.create<Position, Velocity>();
+// clones an entity and assigns all its components by copy to the newly created one
+auto other = registry.clone(entity);
 
 // destroys an entity and all its components
 registry.destroy(entity);
 ```
 
+Be aware that cloning an entity can lead to unexpected results under certain
+conditions. Please refer to the inline documentation for more details.<br/>
 Once an entity is deleted, the registry can freely reuse it internally with a
 slightly different identifier. In particular, the version of an entity is
 increased each and every time it's destroyed.<br/>
@@ -454,7 +477,7 @@ velocity.dy = 0.;
 ```
 
 Note that `accommodate` is a slightly faster alternative for the following
-`if`/`else` statement and nothing more:
+`if/else` statement and nothing more:
 
 ```cpp
 if(registry.has<Comp>(entity)) {
@@ -530,7 +553,8 @@ data structures or more complex and movable data structures with a proper
 constructor.<br/>
 Actually, the same type can be used both as a tag and as a component and the
 registry will not complain about it. It is up to the users to properly manage
-their own types.
+their own types. In some cases, the tag `tag_t` must also be used in order to
+disambiguate overloads of member functions.
 
 Attaching tags to entities and removing them is trivial:
 
@@ -539,17 +563,29 @@ auto player = registry.create();
 auto camera = registry.create();
 
 // attaches a default-initialized tag to an entity
-registry.attach<PlayingCharacter>(player);
+registry.assign<PlayingCharacter>(entt::tag_t{}, player);
 
 // attaches a tag to an entity and initializes it
-registry.attach<Camera>(camera, player);
+registry.assign<Camera>(entt::tag_t{}, camera, player);
 
 // removes tags from their owners
 registry.remove<PlayingCharacter>();
 registry.remove<Camera>();
 ```
 
-If in doubt about whether or not a tag has already an owner, the `has` member
+In case a tag already has an owner, its content can be updated by means of the
+`replace` member function template and the ownership of the tag can be
+transferred to another entity using the `move` member function template:
+
+```
+// replaces the content of the given tag
+Point &point = registry.replace<Point>(entt::tag_t{}, 1.f, 1.f);
+
+// transfers the ownership of the tag to another entity
+entity_type prev = registry.move<Point>(next);
+```
+
+If in doubt about whether or not a tag already has an owner, the `has` member
 function template may be useful:
 
 ```cpp
@@ -582,6 +618,91 @@ auto player = registry.attachee<PlayingCharacter>();
 
 Note that iterating tags isn't possible for obvious reasons. Tags give direct
 access to single entities and nothing more.
+
+### Observe changes
+
+Because of how the registry works internally, it stores a couple of signal
+handlers for each pool in order to notify some of its data structures on the
+construction and destruction of components.<br/>
+These signal handlers are also exposed and made available to users. This is the
+basic brick to build fancy things like dependencies and reactive systems.
+
+To get a sink to be used to connect and disconnect listeners so as to be
+notified on the creation of a component, use the `construction` member function:
+
+```cpp
+// connects a free function
+registry.construction<Position>().connect<&MyFreeFunction>();
+
+// connects a member function
+registry.construction<Position>().connect<MyClass, &MyClass::member>(&instance);
+
+// disconnects a free function
+registry.construction<Position>().disconnect<&MyFreeFunction>();
+
+// disconnects a member function
+registry.construction<Position>().disconnect<MyClass, &MyClass::member>(&instance);
+```
+
+To be notified when components are destroyed, use the `destruction` member
+function instead.
+
+The function type of a listener is the same in both cases:
+
+```cpp
+void(Registry<Entity> &, Entity);
+```
+
+In other terms, a listener is provided with the registry that triggered the
+notification and the entity affected by the change. Note also that:
+
+* Listeners are invoked **after** components have been assigned to entities.
+* Listeners are invoked **before** components have been removed from entities.
+* The order of invocation of the listeners isn't guaranteed in any case.
+
+There are also some limitations on what a listener can and cannot do. In
+particular:
+
+* Connecting and disconnecting other functions from within the body of a
+  listener should be avoided. It can lead to undefined behavior in some cases.
+* Assigning and removing components and tags from within the body of a listener
+  that observes the destruction of instances of a given type should be avoided.
+  It can lead to undefined behavior in some cases. This type of listeners is
+  intended to provide users with an easy way to perform cleanup and nothing
+  more.
+
+To a certain extent, these limitations do not apply. However, it is risky to try
+to force them and users should respect the limitations unless they know exactly
+what they are doing. Subtle bugs are the price to pay in case of errors
+otherwise.
+
+In general, events and therefore listeners must not be used as replacements for
+systems. They should not contain much logic and interactions with a registry
+should be kept to a minimum, if possible. Note also that the greater the number
+of listeners, the greater the performance hit when components are created or
+destroyed.
+
+#### Who let the tags out?
+
+As an extension, signals are also provided with tags. Although they are not
+strictly required internally, it makes sense that a user expects signal support
+even when it comes to tags actually.<br/>
+Signals for tags undergo exactly the same requirements of those introduced for
+components. Also the function type for a listener is the same and it's invoked
+with the same guarantees discussed above.
+
+To get the sinks for a tag just use tag `tag_t` to disambiguate overloads of
+member functions as in the following example:
+
+```cpp
+registry.construction<MyTag>(entt::tag_t{}).connect<&MyFreeFunction>();
+registry.destruction<MyTag>(entt::tag_t{}).connect<MyClass, &MyClass::member>(&instance);
+```
+
+Listeners for tags and components are managed separately and do not influence
+each other in any case. Therefore, note that the greater the number of listeners
+for a type, the greater the performance hit when a tag of the given type is
+created or destroyed.
 
 ### Runtime components
 
@@ -645,8 +766,16 @@ In fact, there are two functions that respond to slightly different needs:
   ```cpp
   registry.sort<Renderable>([](const auto &lhs, const auto &rhs) {
       return lhs.z < rhs.z;
+
   });
   ```
+
+  There exists also the possibility to use a custom sort function object, as
+  long as it adheres to the requirements described in the inline
+  documentation.<br/>
+  This is possible mainly because users can get much more with a custom sort
+  function object if the pattern of usage is known. As an example, in case of an
+  almost sorted pool, quick sort could be much, much slower than insertion sort.
 
 * Components can be sorted according to the order imposed by another component:
 
@@ -656,6 +785,340 @@ In fact, there are two functions that respond to slightly different needs:
 
   In this case, instances of `Movement` are arranged in memory so that cache
   misses are minimized when the two components are iterated together.
+
+### Snapshot: complete vs continuous
+
+The `Registry` class offers basic support to serialization.<br/>
+It doesn't convert components and tags to bytes directly, there wasn't the need
+of another tool for serialization out there. Instead, it accepts an opaque
+object with a suitable interface (namely an _archive_) to serialize its internal
+data structures and restore them later. The way types and instances are
+converted to a bunch of bytes is completely in charge to the archive and thus to
+the users.
+
+The goal of the serialization part is to allow users to make both a dump of the
+entire registry or a narrower snapshot, that is to select only the components
+and the tags in which they are interested.<br/>
+Intuitively, the use cases are different. As an example, the first approach is
+suitable for local save/restore functionalities while the latter is suitable for
+creating client-server applications and for transferring somehow parts of the
+representation side to side.
+
+To take a snapshot of the registry, use the `snapshot` member function. It
+returns a temporary object properly initialized to _save_ the whole registry or
+parts of it.
+
+Example of use:
+
+```cpp
+OutputArchive output;
+
+registry.snapshot()
+    .entities(output)
+    .destroyed(output)
+    .component<AComponent, AnotherComponent>(output)
+    .tag<MyTag>(output);
+```
+
+It isn't necessary to invoke all these functions each and every time. What
+functions to use in which case mostly depends on the goal and there is not a
+golden rule to do that.
+
+The `entities` member function asks the registry to serialize all the entities
+that are still in use along with their versions. On the other side, the
+`destroyed` member function tells to the registry to serialize the entities that
+have been destroyed and are no longer in use.<br/>
+These two functions can be used to save and restore the whole set of entities
+with the versions they had during serialization.
+
+The `component` member function is a function template the aim of which is to
+store aside components. The presence of a template parameter list is a
+consequence of a couple of design choices from the past and in the present:
+
+* First of all, there is no reason to force a user to serialize all the
+  components at once and most of the times it isn't desiderable. As an example,
+  in case the stuff for the HUD in a game is put into the registry for some
+  reasons, its components can be freely discarded during a serialization step
+  because probably the software already knows how to reconstruct the HUD
+  correctly from scratch.
+
+* Furthermore, the registry makes heavy use of _type-erasure_ techniques
+  internally and doesn't know at any time what types of components it contains.
+  Therefore being explicit at the call point is mandatory.
+
+The `tag` member function is similar to the previous one, apart from the fact
+that it works with tags and not with components.<br/>
+Note also that both `component` and `tag` store items along with entities. It
+means that they work properly without a call to the `entities` member function.
+
+Once a snapshot is created, there exist mainly two _ways_ to load it: as a whole
+and in a kind of _continuous mode_.<br/>
+The following sections describe both loaders and archives in details.
+
+#### Snapshot loader
+
+A snapshot loader requires that the destination registry be empty and loads all
+the data at once while keeping intact the identifiers that the entities
+originally had.<br/>
+To do that, the registry offers a member function named `restore` that returns a
+temporary object properly initialized to _restore_ a snapshot.
+
+Example of use:
+
+```cpp
+InputArchive input;
+
+registry.restore()
+    .entities(input)
+    .destroyed(input)
+    .component<AComponent, AnotherComponent>(input)
+    .tag<MyTag>(input)
+    .orphans();
+```
+
+It isn't necessary to invoke all these functions each and every time. What
+functions to use in which case mostly depends on the goal and there is not a
+golden rule to do that. For obvious reasons, what is important is that the data
+are restored in exactly the same order in which they were serialized.
+
+The `entities` and `destroyed` member functions restore the sets of entities and
+the versions that the entities originally had at the source.
+
+The `component` member function restores all and only the components specified
+and assigns them to the right entities. Note that the template parameter list
+must be exactly the same used during the serialization. The same applies to the
+`tag` member function.
+
+The `orphans` member function literally destroys those entities that have
+neither components nor tags. It's usually useless if the snapshot is a full dump
+of the source. However, in case all the entities are serialized but only few
+components and tags are saved, it could happen that some of the entities have
+neither components nor tags once restored. The best users can do to deal with
+them is to destroy those entities and thus update their versions.
+
+#### Continuous loader
+
+A continuous loader is designed to load data from a source registry to a
+(possibly) non-empty destination. The loader can accommodate in a registry more
+than one snapshot in a sort of _continuous loading_ that updates the
+destination one step at a time.<br/>
+Identifiers that entities originally had are not transferred to the target.
+Instead, the loader maps remote identifiers to local ones while restoring a
+snapshot. Because of that, this kind of loader offers a way to update
+automatically identifiers that are part of components or tags (as an example, as
+data members or gathered in a container).<br/>
+Another difference with the snapshot loader is that the continuous loader does
+not need to work with the private data structures of a registry. Furthermore, it
+has an internal state that must persist over time. Therefore, there is no reason
+to create it by means of a registry, or to limit its lifetime to that of a
+temporary object.
+
+Example of use:
+
+```cpp
+entt::ContinuousLoader<entity_type> loader{registry};
+InputArchive input;
+
+loader.entities(input)
+    .destroyed(input)
+    .component<AComponent, AnotherComponent>(input)
+    .component<DirtyComponent>(input, &DirtyComponent::parent, &DirtyComponent::child)
+    .tag<MyTag>(input)
+    .tag<DirtyTag>(input, &DirtyTag::container)
+    .orphans()
+    .shrink();
+```
+
+It isn't necessary to invoke all these functions each and every time. What
+functions to use in which case mostly depends on the goal and there is not a
+golden rule to do that. For obvious reasons, what is important is that the data
+are restored in exactly the same order in which they were serialized.
+
+The `entities` and `destroyed` member functions restore groups of entities and
+map each entity to a local counterpart when required. In other terms, for each
+remote entity identifier not yet registered by the loader, the latter creates a
+local identifier so that it can keep the local entity in sync with the remote
+one.
+
+The `component` and `tag` member functions restore all and only the components
+and the tags specified and assign them to the right entities.<br/>
+In case the component or the tag contains entities itself (either as data
+members of type `entity_type` or as containers of entities), the loader can
+update them automatically. To do that, it's enough to specify the data members
+to update as shown in the example. If the component or the tag was in the middle
+of the template parameter list during serialization, multiple commands are
+required during a restore:
+
+```cpp
+registry.snapshot().component<ASimpleComponent, AnotherSimpleComponent, AMoreComplexComponent, TheLastComponent>();
+
+// ...
+
+loader
+    .component<ASimpleComponent, AnotherSimpleComponent>(input)
+    .component<AMoreComplexComponent>(input, &AMoreComplexComponent::entity);
+    .component<TheLastComponent>(input);
+```
+
+The `orphans` member function literally destroys those entities that have
+neither components nor tags after a restore. It has exactly the same purpose
+described in the previous section and works the same way.
+
+Finally, `shrink` helps to purge local entities that no longer have a remote
+conterpart. Users should invoke this member function after restoring each
+snapshot, unless they know exactly what they are doing.
+
+#### Archives
+
+Archives must publicly expose a predefined set of member functions. The API is
+straightforward and consists only of a group of function call operators that
+are invoked by the registry.
+
+In particular:
+
+* An output archive, the one used when creating a snapshot, must expose a
+  function call operator with the following signature to store entities:
+
+  ```cpp
+  void operator()(Entity);
+  ```
+
+  Where `Entity` is the type of the entities used by the registry.<br/>
+  In addition, it must accept the types of both the components and the tags to
+  serialize. Therefore, given a type `T` (either a component or a tag), it must
+  contain a function call operator with the following signature:
+
+  ```cpp
+  void operator()(const T &);
+  ```
+
+  The output archive can freely decide how to serialize the data. The register
+  is not affected at all by the decision.
+
+* An input archive, the one used when restoring a snapshot, must expose a
+  function call operator with the following signature to load entities:
+
+  ```cpp
+  void operator()(Entity &);
+  ```
+
+  Where `Entity` is the type of the entities used by the registry. Each time the
+  function is invoked, the archive must read the next element from the
+  underlying storage and copy it in the given variable.<br/>
+  In addition, it must accept the types of both the components and the tags to
+  restore. Therefore, given a type `T` (either a component or a tag), it must
+  contain a function call operator with the following signature:
+
+  ```cpp
+  void operator()(T &);
+  ```
+
+  Every time such an operator is invoked, the archive must read the next element
+  from the underlying storage and copy it in the given variable.
+
+#### One example to rule them all
+
+`EnTT` comes with some examples (actually some tests) that show how to integrate
+a well known library for serialization as an archive. It uses
+[`Cereal C++`](https://uscilab.github.io/cereal/) under the hood, mainly
+because I wanted to learn how it works at the time I was writing the code.
+
+The code is not production-ready and it isn't neither the only nor (probably)
+the best way to do it. However, feel free to use it at your own risk.
+
+The basic idea is to store everything in a group of queues in memory, then bring
+everything back to the registry with different loaders.
+
+### Prototype
+
+A prototype defines a type of an application in terms of its parts. They can be
+used to assign components to entities of a registry at once.<br/>
+Roughly speaking, in most cases prototypes can be considered just as templates
+to use to initialize entities according to _concepts_. In fact, users can create
+how many prototypes they want, each one initialized differently from the others.
+
+The following is an example of use of a prototype:
+
+```cpp
+entt::DefaultPrototype prototype;
+
+prototype.set<Position>(100.f, 100.f);
+prototype.set<Velocity>(0.f, 0.f);
+
+// ...
+
+entt::DefaultRegistry registry;
+
+const auto entity = prototype(registry);
+```
+
+To assign and remove components from a prototype, it offers two dedicated member
+functions named `set` and `unset`. The `has` member function can be used to know
+if a given prototype contains one or more components and the `get` member
+function can be used to retrieve the components.
+
+Creating an entity from a prototype is straightforward:
+
+* To create a new entity from scratch and assign it a prototype, this is the way
+  to go:
+  ```cpp
+  const auto entity = prototype(registry);
+  ```
+  It is equivalent to the following invokation:
+  ```cpp
+  const auto entity = prototype.create(registry);
+  ```
+
+* In case we want to initialize an already existing entity, we can provide the
+  `operator()` directly with the entity identifier:
+  ```cpp
+  prototype(registry, entity);
+  ```
+  It is equivalent to the following invokation:
+  ```cpp
+  prototype.assign(registry, entity);
+  ```
+  Note that existing components aren't overwritten in this case. Only those
+  components that the entity doesn't own yet are copied over. All the other
+  components remain unchanged.
+
+* Finally, to assign or replace all the components for an entity, thus
+  overwriting existing ones:
+  ```cpp
+  prototype.accommodate(registry, entity);
+  ```
+
+Prototypes are a very useful tool that can save a lot of typing sometimes.
+Furthermore, the codebase may be easier to maintain, since updating a prototype
+is much less error prone than jumping around in the codebase to update all the
+snippets copied and pasted around to initialize entities and components.
+
+### Helpers
+
+The so called _helpers_ are small classes and functions mainly designed to offer
+built-in support for the most basic functionalities.<br/>
+The list of helpers will grow longer as time passes and new ideas come out.
+
+#### Dependency function
+
+A _dependency function_ is a predefined listener, actually a function template
+to use to automatically assign components to an entity when a type has a
+dependency on some other types.<br/>
+The following adds components `AType` and `AnotherType` whenever `MyType` is
+assigned to an entity:
+
+```cpp
+entt::dependency<AType, AnotherType>(registry.construction<MyType>());
+```
+
+A component is assigned to an entity and thus default initialized only in case
+the entity itself hasn't it yet. It means that already existent components won't
+be overriden.<br/>
+A dependency can easily be broken by means of the same function template:
+
+```cpp
+entt::dependency<AType, AnotherType>(entt::break_t{}, registry.construction<MyType>());
+```
 
 ## View: to persist or not to persist?
 
@@ -675,6 +1138,7 @@ All of them have pros and cons to take in consideration. In particular:
 * Standard views:
 
   Pros:
+
   * They work out-of-the-box and don't require any dedicated data structure.
   * Creating and destroying them isn't expensive at all because they don't have
     any type of initialization.
@@ -684,18 +1148,21 @@ All of them have pros and cons to take in consideration. In particular:
   * They don't affect any other operations of the registry.
 
   Cons:
+
   * Their performance tend to degenerate when the number of components to
     iterate grows up and the most of the entities have all of them.
 
 * Persistent views:
 
   Pros:
+
   * Once prepared, creating and destroying them isn't expensive at all because
     they don't have any type of initialization.
-  * They are the best tool for iterating entities for mmultiple components and
+  * They are the best tool for iterating entities for multiple components when
     most entities have them all.
 
   Cons:
+
   * They have dedicated data structures and thus affect the memory usage to a
     minimal extent.
   * If not previously prepared, the first time they are used they go through an
@@ -707,6 +1174,7 @@ All of them have pros and cons to take in consideration. In particular:
 * Raw views:
 
   Pros:
+
   * They work out-of-the-box and don't require any dedicated data structure.
   * Creating and destroying them isn't expensive at all because they don't have
     any type of initialization.
@@ -715,24 +1183,34 @@ All of them have pros and cons to take in consideration. In particular:
   * They don't affect any other operations of the registry.
 
   Cons:
+
   * They can be used to iterate only one type of component at a time.
   * They don't return the entity to which a component belongs to the caller.
 
 To sum up and as a rule of thumb:
+
 * Use a raw view to iterate components only (no entities) for a given type.
-* Use a standard view to iterate entities for a single component.
-* Use a standard view to iterate entities for multiple components when a
-  significantly low number of entities have one of the components.
+* Use a standard view to iterate entities and components for a single type.
+* Use a standard view to iterate entities and components for multiple types when
+  the number of types is low. Standard views are really optimized and persistent
+  views won't add much in this case.
+* Use a standard view to iterate entities and components for multiple types when
+  a significantly low number of entities have one of the components.
 * Use a standard view in all those cases where a persistent view would give a
   boost to performance but the iteration isn't performed frequently.
-* Prepare and use a persistent view in all the other cases.
+* Prepare and use a persistent view when you want to iterate only entities for
+  multiple components.
+* Prepare and use a persistent view when you want to iterate entities for
+  multiple components and each component is assigned to a great number of
+  entities but the intersection between the sets of entities is small.
+* Prepare and use a persistent view in all the cases where a standard view
+  wouldn't fit well otherwise.
 
 To easily iterate entities and components, all the views offer the common
 `begin` and `end` member functions that allow users to use a view in a typical
 range-for loop. Almost all the views offer also a *more functional* `each`
 member function that accepts a callback for convenience.<br/>
-Continue reading for more details or refer to the
-[official documentation](https://skypjack.github.io/entt/).
+Continue reading for more details or refer to the inline documentation.
 
 ### Standard View
 
@@ -759,8 +1237,7 @@ underlying data structures directly and avoid superfluous checks.<br/>
 They offer a bunch of functionalities to get the number of entities they are
 going to return and a raw access to the entity list as well as to the component
 list. It's also possible to ask a view if it contains a given entity.<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
+Refer to the inline documentation for all the details.
 
 There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
@@ -802,11 +1279,10 @@ entities available for each component and pick up a reference to the smallest
 set of candidates in order to speed up iterations.<br/>
 They offer fewer functionalities than their companion views for single
 component. In particular, a multi component standard view exposes utility
-functions to reset its internal state (optimization purposes) and to get the
-estimated number of entities it is going to return. It's also possible to ask a
-view if it contains a given entity.<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
+functions to get the estimated number of entities it is going to return and to
+know whether it's empty or not. It's also possible to ask a view if it contains
+a given entity.<br/>
+Refer to the inline documentation for all the details.
 
 There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
@@ -853,11 +1329,12 @@ tightly packed in memory for fast iterations.<br/>
 In general, persistent views don't stay true to the order of any set of
 components unless users explicitly sort them.
 
-Persistent views can be used only to iterate multiple components. Create them
-as it follows:
+Persistent views can be used only to iterate multiple components. To create this
+kind of views, the tag `persistent_t` must also be used in order to disambiguate
+overloads of the `view` member function:
 
 ```cpp
-auto view = registry.persistent<Position, Velocity>();
+auto view = registry.view<Position, Velocity>(entt::persistent_t{});
 ```
 
 There is no need to store views around for they are extremely cheap to
@@ -882,13 +1359,12 @@ entities it's going to return, a raw access to the entity list and the
 possibility to sort the underlying data structures according to the order of one
 of the components for which it has been constructed. It's also possible to ask a
 view if it contains a given entity.<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
+Refer to the inline documentation for all the details.
 
 To iterate a persistent view, either use it in range-for loop:
 
 ```cpp
-auto view = registry.persistent<Position, Velocity>();
+auto view = registry.view<Position, Velocity>(entt::persistent_t{});
 
 for(auto entity: view) {
     // a component at a time ...
@@ -906,7 +1382,7 @@ Or rely on the `each` member function to iterate entities and get all their
 components at once:
 
 ```cpp
-registry.persistent<Position, Velocity>().each([](auto entity, auto &position, auto &velocity) {
+registry.view<Position, Velocity>(entt::persistent_t{}).each([](auto entity, auto &position, auto &velocity) {
     // ...
 });
 ```
@@ -921,13 +1397,20 @@ mind that it works only with the components of the view itself.
 ### Raw View
 
 Raw views return all the components of a given type. This kind of views can
-access components directly and avoid extra indirections as if components were
+access components directly and avoid extra indirections like when components are
 accessed via an entity identifier.<br/>
 They offer a bunch of functionalities to get the number of instances they are
 going to return and a raw access to the entity list as well as to the component
 list.<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
+Refer to the inline documentation for all the details.
+
+Raw views can be used only to iterate components for a single type. To create
+this kind of views, the tag `raw_t` must also be used in order to disambiguate
+overloads of the `view` member function:
+
+```cpp
+auto view = registry.view<Renderable>(entt::raw_t{});
+```
 
 There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
@@ -936,7 +1419,7 @@ fact, they return newly created and correctly initialized iterators whenever
 To iterate a raw view, use it in range-for loop:
 
 ```cpp
-auto view = registry.raw<Renderable>();
+auto view = registry.view<Renderable>(entt::raw_t{});
 
 for(auto &&component: raw) {
     // ...
@@ -1002,16 +1485,16 @@ not be used frequently to avoid the risk of a performance hit.
   construction of the pools for all their components and access them directly,
   thus avoiding all the checks.
 
-* Most of the _ECS_ available out there have an annoying limitation (at least
+* Most of the _ECS_ available out there have some annoying limitations (at least
   from my point of view): entities and components cannot be created and/or
   destroyed during iterations.<br/>
   `EnTT` partially solves the problem with a few limitations:
 
   * Creating entities and components is allowed during iterations.
-  * Deleting an entity or removing its components is allowed during
-    iterations if it's the one currently returned by a view. For all the
-    other entities, destroying them or removing their components isn't
-    allowed and it can result in undefined behavior.
+  * Deleting an entity or removing its components is allowed during iterations
+    if it's the one currently returned by a view. For all the other entities,
+    destroying them or removing their components isn't allowed and it can result
+    in undefined behavior.
 
   Iterators are invalidated and the behavior is undefined if an entity is
   modified or destroyed and it's not the one currently returned by the
@@ -1033,6 +1516,17 @@ not be used frequently to avoid the risk of a performance hit.
   As a trivial example, users can freely execute the rendering system and
   iterate the renderable entities while updating a physic component concurrently
   on a separate thread.
+
+* In general, the entire registry isn't thread safe as it is. Thread safety
+  isn't something that users should want out of the box for several reasons.
+  Just to mention one of them: performance.<br/>
+  This kind of entity-component systems can be used in single threaded
+  applications as well as along with async stuff. Moreover, typical thread based
+  models for ECS don't require a fully thread safe registry to work. Actually
+  one could reach the goal with the registry as it is while working with most of
+  the common models, after all.<br/>
+  Because of the few reasons mentioned above and many others not mentioned,
+  users are completely responsible for synchronization whether required.
 
 # Crash Course: core functionalities
 
@@ -1662,96 +2156,26 @@ offers a full set of classes to solve completely different problems.
 
 ## Signals
 
-There are two types of signal handlers in `EnTT`, internally called _managed_
-and _unmanaged_.<br/>
-They differ in the way they work around the tradeoff between performance, memory
-usage and safety. Managed listeners must be wrapped in an `std::shared_ptr` and
-the sink will take care of disconnecting them whenever they die. Unmanaged
-listeners can be any kind of objects and the client is in charge of connecting
-and disconnecting them from a sink to avoid crashes due to different lifetimes.
+Signal handlers work with naked pointers, function pointers and pointers to
+member functions. Listeners can be any kind of objects and the user is in charge
+of connecting and disconnecting them from a signal to avoid crashes due to
+different lifetimes. On the other side, performance shouldn't be affected that
+much by the presence of such a signal handler.<br/>
+A signal handler can be used as a private data member without exposing any
+_publish_ functionality to the clients of a class. The basic idea is to impose a
+clear separation between the signal itself and its _sink_ class, that is a tool
+to be used to connect and disconnect listeners on the fly.
 
-### Managed signal handler
-
-A managed signal handler works with weak pointers to classes and pointers to
-member functions as well as pointers to free functions. References are
-automatically removed when the instances to which they point are freed.<br/>
-In other terms, users can simply connect a listener and forget about it, thus
-getting rid of the burden of controlling its lifetime. The drawback is that
-listeners must be allocated on the dynamic storage and wrapped into an
-`std::shared_ptr`. Performance and memory management can suffer from this in
-real world softwares.
-
-To create an instance of this type of handler, the function type is all what is
-needed:
-
-```cpp
-entt::Signal<void(int, char)> signal;
-```
-
-From now on, free functions and member functions that respect the given
-signature can be easily connected to and disconnected from the signal:
-
-```cpp
-void foo(int, char) { /* ... */ }
-
-struct S {
-    void bar(int, char) { /* ... */ }
-};
-
-// ...
-
-auto instance = std::make_shared<S>();
-
-signal.connect<&foo>();
-signal.connect<S, &S::bar>(instance);
-
-// ...
-
-signal.disconnect<&foo>();
-
-// disconnect a specific member function of an instance ...
-signal.disconnect<S, &S::bar>(instance);
-
-// ... or an instance as a whole
-signal.disconnect(instance);
-```
-
-Once listeners are attached (or even if there are no listeners at all), events
-and data in general can be published through a signal by means of the `publish`
-member function:
-
-```cpp
-signal.publish(42, 'c');
-```
-
-This is more or less all what a managed signal handler has to offer.<br/>
-A bunch of other member functions are exposed actually. As an example, there is
-a method to use to know how many listeners a managed signal handler contains
-(`size`) or if it contains at least a listener (`empty`), to reset it to its
-initial state (`clear`) and even to swap two handlers (`swap`).<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
-
-### Unmanaged signal handler
-
-An unmanaged signal handler works with naked pointers to classes and pointers to
-member functions as well as pointers to free functions. Removing references when
-the instances to which they point are freed is in charge to the users.<br/>
-In other terms, users must explicitly disconnect a listener before to delete the
-class to which it belongs, thus taking care of the lifetime of each instance. On
-the other side, performance shouldn't be affected that much by the presence of
-such a signal handler.
-
-The API of an unmanaged signal handler is similar to the one of a managed signal
-handler.<br/>
-The most important difference is that it comes in two forms: with and without a
-collector. In case it is associated with a collector, all the values returned by
-the listeners can be literally _collected_ and used later by the caller.<br/>
+The API of a signal handler is straightforward. The most important thing is that
+it comes in two forms: with and without a collector. In case a signal is
+associated with a collector, all the values returned by the listeners can be
+literally _collected_ and used later by the caller. Otherwise it works just like
+a plain signal that emits events from time to time.<br/>
 
 **Note**: collectors are allowed only in case of function types whose the return
 type isn't `void` for obvious reasons.
 
-To create instances of this type of handler there exist mainly two ways:
+To create instances of signal handlers there exist mainly two ways:
 
 ```cpp
 // no collector type
@@ -1761,13 +2185,12 @@ entt::SigH<void(int, char)> signal;
 entt::SigH<void(int, char), MyCollector<bool>> collector;
 ```
 
-As expected, an unmanaged signal handler offers all the basic functionalities
-required to know how many listeners it contains (`size`) or if it contains at
-least a listener (`empty`), to reset it to its initial state (`clear`) and even
-to swap two handlers (`swap`).
+As expected, they offer all the basic functionalities required to know how many
+listeners they contain (`size`) or if they contain at least a listener (`empty`)
+and even to swap two signal handlers (`swap`).
 
 Besides them, there are member functions to use both to connect and disconnect
-listeners in all their forms:
+listeners in all their forms by means of a sink::
 
 ```cpp
 void foo(int, char) { /* ... */ }
@@ -1780,18 +2203,22 @@ struct S {
 
 S instance;
 
-signal.connect<&foo>();
-signal.connect<S, &S::bar>(&instance);
+signal.sink().connect<&foo>();
+signal.sink().connect<S, &S::bar>(&instance);
 
 // ...
 
-signal.disconnect<&foo>();
+// disconnects a free function
+signal.sink().disconnect<&foo>();
 
 // disconnect a specific member function of an instance ...
-signal.disconnect<S, &S::bar>(&instance);
+signal.sink().disconnect<S, &S::bar>(&instance);
 
 // ... or an instance as a whole
-signal.disconnect(&instance);
+signal.sink().disconnect(&instance);
+
+// discards all the listeners at once
+signal.sink().disconnect();
 ```
 
 Once listeners are attached (or even if there are no listeners at all), events
@@ -1822,8 +2249,8 @@ int g() { return 1; }
 
 entt::SigH<int(), MyCollector<int>> signal;
 
-signal.connect<&f>();
-signal.connect<&g>();
+signal.sink().connect<&f>();
+signal.sink().connect<&g>();
 
 MyCollector collector = signal.collect();
 
@@ -1836,89 +2263,6 @@ argument a type to which the return type of the listeners can be converted.
 Moreover, it has to return a boolean value that is false to stop collecting
 data, true otherwise. This way one can avoid calling all the listeners in case
 it isn't necessary.
-
-## Compile-time event bus
-
-A bus can be used to create a compile-time backbone for event management.<br/>
-The intended use is as a base class, which is the opposite of what the signals
-are meant for. Internally it uses either managed or unmanaged signal handlers,
-that is why there exist both a managed and an unmanaged event bus.
-
-The API of a bus is a kind of subset of the one of a signal. First of all, it
-requires that all the types of events are specified when the bus is declared:
-
-```cpp
-struct AnEvent { int value; };
-struct AnotherEvent {};
-
-// define a managed bus that works with std::shared_ptr/std::weak_ptr
-entt::ManagedBus<AnEvent, AnotherEvent> managed;
-
-// define an unmanaged bus that works with naked pointers
-entt::UnmanagedBus<AnEvent, AnotherEvent> unmanaged;
-```
-
-For the sake of brevity, below is described the interface of the sole unmanaged
-bus. The interface of the managed bus is almost the same but for the fact that
-it accepts smart pointers instead of naked pointers.
-
-In order to register an instance of a class to a bus, its type must expose one
-or more member functions named `receive` of which the return types are `void`
-and the argument lists are `const E &`, for each type of event `E`.<br/>
-The `reg` member function is the way to go to register such an instance:
-
-```cpp
-struct Listener
-{
-    void receive(const AnEvent &) { /* ... */ }
-    void receive(const AnotherEvent &) { /* ... */ }
-};
-
-// ...
-
-Listener listener;
-bus.reg(&listener);
-```
-
-To disconnect an instance of a class from a bus, use the `unreg` member
-function instead:
-
-```cpp
-bus.unreg(&listener);
-```
-
-Each function that respects the accepted signature is automatically registered
-and/or unregistered. Note that invoking `unreg` with an instance of a class that
-hasn't been previously registered is a perfectly valid operation.
-
-Free functions can be registered and unregistered as well by means of the
-dedicated member functions, namely `connect` and `disconnect`:
-
-```cpp
-void foo(const AnEvent &) { /* ... */ }
-void bar(const AnotherEvent &) { /* ... */ }
-
-// ...
-
-bus.connect<AnEvent, &foo>();
-bus.connect<AnotherEvent, &bar>();
-
-// ...
-
-bus.disconnect<AnEvent, &foo>();
-bus.disconnect<AnotherEvent, &bar>();
-```
-
-Whenever the need to send an event arises, it can be done through the `publish`
-member function:
-
-```cpp
-bus.publish<AnEvent>(42);
-bus.publish<AnotherEvent>();
-```
-
-Finally, there are another few functions to use to query the internal state of a
-bus like `empty` and `size` whose meaning is quite intuitive.
 
 ## Delegate
 
@@ -1978,26 +2322,13 @@ within the framework.
 The event dispatcher class is designed so as to be used in a loop. It allows
 users both to trigger immediate events or to queue events to be published all
 together once per tick.<br/>
-Internally it uses either managed or unmanaged signal handlers, that is why
-there exist both a managed and an unmanaged event dispatcher.
-
-This class shares part of its API with the one of the signals, but it doesn't
-require that all the types of events are specified when declared:
+This class shares part of its API with the one of the signal handler, but it
+doesn't require that all the types of events are specified when declared:
 
 ```cpp
-// define a managed dispatcher that works with std::shared_ptr/std::weak_ptr
-entt::Dispatcher<entt::Signal> managed{};
-
-// define an unmanaged dispatcher that works with naked pointers
-entt::Dispatcher<entt::SigH> unmanaged{};
+// define a general purpose dispatcher that works with naked pointers
+entt::Dispatcher dispatcher{};
 ```
-
-Actually there exist two aliases for the classes shown in the previous example:
-`entt::ManagedDispatcher` and `entt::UnmanagedDispatcher`.
-
-For the sake of brevity, below is described the interface of the sole unmanaged
-dispatcher. The interface of the managed dispatcher is almost the same but for
-the fact that it accepts smart pointers instead of naked pointers.
 
 In order to register an instance of a class to a dispatcher, its type must
 expose one or more member functions of which the return types are `void` and the
@@ -2005,7 +2336,8 @@ argument lists are `const E &`, for each type of event `E`.<br/>
 To ease the development, member functions that are named `receive` are
 automatically detected and have not to be explicitly specified when registered.
 In all the other cases, the name of the member function aimed to receive the
-event must be provided to the `connect` member function:
+event must be provided to the `connect` member function of the sink bound to the
+specific event:
 
 ```cpp
 struct AnEvent { int value; };
@@ -2020,16 +2352,16 @@ struct Listener
 // ...
 
 Listener listener;
-dispatcher.connect<AnEvent>(&listener);
-dispatcher.connect<AnotherEvent, Listener, &Listener::method>(&listener);
+dispatcher.sink<AnEvent>().connect(&listener);
+dispatcher.sink<AnotherEvent>().connect<Listener, &Listener::method>(&listener);
 ```
 
 The `disconnect` member function follows the same pattern and can be used to
 selectively remove listeners:
 
 ```cpp
-dispatcher.disconnect<AnEvent>(&listener);
-dispatcher.disconnect<AnotherEvent, Listener, &Listener::method>(&listener);
+dispatcher.sink<AnEvent>().disconnect(&listener);
+dispatcher.sink<AnotherEvent>().disconnect<Listener, &Listener::method>(&listener);
 ```
 
 The `trigger` member function serves the purpose of sending an immediate event
@@ -2061,6 +2393,10 @@ Events are stored aside until the `update` member function is invoked, then all
 the messages that are still pending are sent to the listeners at once:
 
 ```cpp
+// emits all the events of the given type at once
+dispatcher.update<MyEvent>();
+
+// emits all the events queued so far at once
 dispatcher.update();
 ```
 
@@ -2191,6 +2527,44 @@ asynchronous operations, because it introduces a _nice-to-have_ model based on
 events and listeners that kindly hides the complexity behind the scenes. However
 it is not limited to such uses.
 
+# Packaging Tools
+
+`EnTT` is available for some of the most known packaging tools. In particular:
+
+* [`vcpkg`](https://github.com/Microsoft/vcpkg/tree/master/ports/entt),
+  Microsoft VC++ Packaging Tool.
+* [`Homebrew`](https://github.com/skypjack/homebrew-entt), the missing package
+  manager for macOS.<br/>
+  Available as a homebrew formula. Just type the following to install it:
+  ```
+  brew install skypjack/entt/entt
+  ```
+
+Consider this list a work in progress and help me to make it longer.
+
+# EnTT in Action
+
+`EnTT` is widely used in private and commercial applications. I cannot even
+mention most of them because of some signatures I put on some documents time
+ago.<br/>
+Fortunately, there are also people who took the time to implement open source
+projects based on EnTT and did not hold back when it came to documenting them.
+
+Below an incomplete list of projects and articles:
+
+* [EnttPong](https://github.com/reworks/EnttPong) - Example game for `EnTT`
+  framework.
+* [ECS_SpaceBattle](https://github.com/vblanco20-1/ECS_SpaceBattle) - Huge space
+  battle using an ECS library for the logic. Built on UE4.
+* Code: [Experimenting with ECS in UE4](http://victor.madtriangles.com/code%20experiment/2018/03/25/post-ue4-ecs-battle.html)
+* [Implementing ECS architecture in UE4](https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1449913-implementing-ecs-architecture-in-ue4-giant-space-battle).
+  Giant space battle.
+* [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt).
+* ...
+
+If you know of other resources out there that are about `EnTT`, feel free to
+open an issue or a PR and I'll be glad to add them to the list.
+
 # Contributors
 
 If you want to contribute, please send patches as pull requests against the
@@ -2223,7 +2597,7 @@ just click [here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=
 ## Hire me
 
 If you start using `EnTT` and need help, if you want a new feature and want me
-to give it the highest priority, or for any other reason, I'm available for
-hiring.<br/>
+to give it the highest priority, if you have any other reason to contact me:
+do not hesitate. I'm available for hiring.<br/>
 Feel free to take a look at my [profile](https://github.com/skypjack) and
 contact me by mail.

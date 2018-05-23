@@ -1,49 +1,49 @@
 #include <gtest/gtest.h>
 #include <entt/locator/locator.hpp>
 
-struct A {};
+struct AService {};
 
-struct B {
+struct AnotherService {
     virtual void f(bool) = 0;
     bool check{false};
 };
 
-struct D: B {
-    D(int): B{} {}
+struct DerivedService: AnotherService {
+    DerivedService(int): AnotherService{} {}
     void f(bool b) override { check = b; }
 };
 
 TEST(ServiceLocator, Functionalities) {
     using entt::ServiceLocator;
 
-    ASSERT_TRUE(ServiceLocator<A>::empty());
-    ASSERT_TRUE(ServiceLocator<B>::empty());
+    ASSERT_TRUE(ServiceLocator<AService>::empty());
+    ASSERT_TRUE(ServiceLocator<AnotherService>::empty());
 
-    ServiceLocator<A>::set();
+    ServiceLocator<AService>::set();
 
-    ASSERT_FALSE(ServiceLocator<A>::empty());
-    ASSERT_TRUE(ServiceLocator<B>::empty());
+    ASSERT_FALSE(ServiceLocator<AService>::empty());
+    ASSERT_TRUE(ServiceLocator<AnotherService>::empty());
 
-    ServiceLocator<A>::reset();
+    ServiceLocator<AService>::reset();
 
-    ASSERT_TRUE(ServiceLocator<A>::empty());
-    ASSERT_TRUE(ServiceLocator<B>::empty());
+    ASSERT_TRUE(ServiceLocator<AService>::empty());
+    ASSERT_TRUE(ServiceLocator<AnotherService>::empty());
 
-    ServiceLocator<A>::set(std::make_shared<A>());
+    ServiceLocator<AService>::set(std::make_shared<AService>());
 
-    ASSERT_FALSE(ServiceLocator<A>::empty());
-    ASSERT_TRUE(ServiceLocator<B>::empty());
+    ASSERT_FALSE(ServiceLocator<AService>::empty());
+    ASSERT_TRUE(ServiceLocator<AnotherService>::empty());
 
-    ServiceLocator<B>::set<D>(42);
+    ServiceLocator<AnotherService>::set<DerivedService>(42);
 
-    ASSERT_FALSE(ServiceLocator<A>::empty());
-    ASSERT_FALSE(ServiceLocator<B>::empty());
+    ASSERT_FALSE(ServiceLocator<AService>::empty());
+    ASSERT_FALSE(ServiceLocator<AnotherService>::empty());
 
-    ServiceLocator<B>::get().lock()->f(!ServiceLocator<B>::get().lock()->check);
+    ServiceLocator<AnotherService>::get().lock()->f(!ServiceLocator<AnotherService>::get().lock()->check);
 
-    ASSERT_TRUE(ServiceLocator<B>::get().lock()->check);
+    ASSERT_TRUE(ServiceLocator<AnotherService>::get().lock()->check);
 
-    ServiceLocator<B>::ref().f(!ServiceLocator<B>::get().lock()->check);
+    ServiceLocator<AnotherService>::ref().f(!ServiceLocator<AnotherService>::get().lock()->check);
 
-    ASSERT_FALSE(ServiceLocator<B>::get().lock()->check);
+    ASSERT_FALSE(ServiceLocator<AnotherService>::get().lock()->check);
 }

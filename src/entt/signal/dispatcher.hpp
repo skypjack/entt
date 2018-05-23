@@ -6,8 +6,10 @@
 #include <memory>
 #include <utility>
 #include <cstdint>
+#include <algorithm>
+#include <type_traits>
+#include "../config/config.h"
 #include "../core/family.hpp"
-#include "signal.hpp"
 #include "sigh.hpp"
 
 
@@ -20,42 +22,40 @@ namespace entt {
  * A dispatcher can be used either to trigger an immediate event or to enqueue
  * events to be published all together once per tick.<br/>
  * Listeners are provided in the form of member functions. For each event of
- * type `Event`, listeners must have the following signature:
- * `void(const Event &)`. Member functions named `receive` are automatically
- * detected and registered or unregistered by the dispatcher.
+ * type `Event`, listeners must have the following function type:
+ * @code{.cpp}
+ * void(const Event &)
+ * @endcode
  *
- * @tparam Sig Type of the signal handler to use.
+ * Member functions named `receive` are automatically detected and registered or
+ * unregistered by the dispatcher. The type of the instances is `Class *` (a
+ * naked pointer). It means that users must guarantee that the lifetimes of the
+ * instances overcome the one of the dispatcher itself to avoid crashes.
  */
-template<template<typename...> class Sig>
 class Dispatcher final {
     using event_family = Family<struct InternalDispatcherEventFamily>;
 
     template<typename Class, typename Event>
-    using instance_type = typename Sig<void(const Event &)>::template instance_type<Class>;
+    using instance_type = typename SigH<void(const Event &)>::template instance_type<Class>;
 
     struct BaseSignalWrapper {
         virtual ~BaseSignalWrapper() = default;
-        virtual void publish(std::size_t) = 0;
+        virtual void publish() = 0;
     };
 
     template<typename Event>
     struct SignalWrapper final: BaseSignalWrapper {
-        void publish(std::size_t current) override {
-            for(const auto &event: events[current]) {
-                signal.publish(event);
-            }
+        using sink_type = typename SigH<void(const Event &)>::sink_type;
 
-            events[current].clear();
+        void publish() override {
+            const auto &curr = current++;
+            current %= std::extent<decltype(events)>::value;
+            std::for_each(events[curr].cbegin(), events[curr].cend(), [this](const auto &event) { signal.publish(event); });
+            events[curr].clear();
         }
 
-        template<typename Class, void(Class::*Member)(const Event &)>
-        inline void connect(instance_type<Class, Event> instance) noexcept {
-            signal.template connect<Class, Member>(std::move(instance));
-        }
-
-        template<typename Class, void(Class::*Member)(const Event &)>
-        inline void disconnect(instance_type<Class, Event> instance) noexcept {
-            signal.template disconnect<Class, Member>(std::move(instance));
+        inline sink_type sink() ENTT_NOEXCEPT {
+            return signal.sink();
         }
 
         template<typename... Args>
@@ -64,18 +64,15 @@ class Dispatcher final {
         }
 
         template<typename... Args>
-        inline void enqueue(std::size_t current, Args &&... args) {
+        inline void enqueue(Args &&... args) {
             events[current].push_back({ std::forward<Args>(args)... });
         }
 
     private:
-        Sig<void(const Event &)> signal{};
+        SigH<void(const Event &)> signal{};
         std::vector<Event> events[2];
+        int current{};
     };
-
-    inline static std::size_t buffer(bool mode) {
-        return mode ? 0 : 1;
-    }
 
     template<typename Event>
     SignalWrapper<Event> & wrapper() {
@@ -93,52 +90,30 @@ class Dispatcher final {
     }
 
 public:
-    /*! @brief Default constructor. */
-    Dispatcher() noexcept
-        : wrappers{}, mode{false}
-    {}
+    /*! @brief Type of sink for the given event. */
+    template<typename Event>
+    using sink_type = typename SignalWrapper<Event>::sink_type;
 
     /**
-     * @brief Registers a listener given in the form of a member function.
+     * @brief Returns a sink object for the given event.
      *
-     * A matching member function has the following signature:
-     * `void receive(const Event &)`. Member functions named `receive` are
-     * automatically detected and registered if available.
+     * A sink is an opaque object used to connect listeners to events.
      *
-     * @warning
-     * Connecting a listener during an update may lead to unexpected behavior.
-     * Register listeners before or after invoking the update if possible.
+     * The function type for a listener is:
+     * @code{.cpp}
+     * void(const Event &)
+     * @endcode
      *
-     * @tparam Event Type of event to which to connect the function.
-     * @tparam Class Type of class to which the member function belongs.
-     * @tparam Member Member function to connect to the signal.
-     * @param instance A valid instance of the right type.
+     * The order of invocation of the listeners isn't guaranteed.
+     *
+     * @sa SigH::Sink
+     *
+     * @tparam Event Type of event of which to get the sink.
+     * @return A temporary sink object.
      */
-    template<typename Event, typename Class, void(Class::*Member)(const Event &) = &Class::receive>
-    void connect(instance_type<Class, Event> instance) noexcept {
-        wrapper<Event>().template connect<Class, Member>(std::move(instance));
-    }
-
-    /**
-     * @brief Unregisters a listener given in the form of a member function.
-     *
-     * A matching member function has the following signature:
-     * `void receive(const Event &)`. Member functions named `receive` are
-     * automatically detected and unregistered if available.
-     *
-     * @warning
-     * Disconnecting a listener during an update may lead to unexpected
-     * behavior. Unregister listeners before or after invoking the update if
-     * possible.
-     *
-     * @tparam Event Type of event from which to disconnect the function.
-     * @tparam Class Type of class to which the member function belongs.
-     * @tparam Member Member function to connect to the signal.
-     * @param instance A valid instance of the right type.
-     */
-    template<typename Event, typename Class, void(Class::*Member)(const Event &) = &Class::receive>
-    void disconnect(instance_type<Class, Event> instance) noexcept {
-        wrapper<Event>().template disconnect<Class, Member>(std::move(instance));
+    template<typename Event>
+    inline sink_type<Event> sink() ENTT_NOEXCEPT {
+        return wrapper<Event>().sink();
     }
 
     /**
@@ -152,7 +127,7 @@ public:
      * @param args Arguments to use to construct the event.
      */
     template<typename Event, typename... Args>
-    void trigger(Args &&... args) {
+    inline void trigger(Args &&... args) {
         wrapper<Event>().trigger(std::forward<Args>(args)...);
     }
 
@@ -167,56 +142,44 @@ public:
      * @param args Arguments to use to construct the event.
      */
     template<typename Event, typename... Args>
-    void enqueue(Args &&... args) {
-        wrapper<Event>().enqueue(buffer(mode), std::forward<Args>(args)...);
+    inline void enqueue(Args &&... args) {
+        wrapper<Event>().enqueue(std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Delivers all the pending events of the given type.
+     *
+     * This method is blocking and it doesn't return until all the events are
+     * delivered to the registered listeners. It's responsibility of the users
+     * to reduce at a minimum the time spent in the bodies of the listeners.
+     *
+     * @tparam Event Type of events to send.
+     */
+    template<typename Event>
+    inline void update() {
+        wrapper<Event>().publish();
     }
 
     /**
      * @brief Delivers all the pending events.
      *
      * This method is blocking and it doesn't return until all the events are
-     * delivered to the registered listeners. It's responsability of the users
+     * delivered to the registered listeners. It's responsibility of the users
      * to reduce at a minimum the time spent in the bodies of the listeners.
      */
-    void update() {
-        const auto buf = buffer(mode);
-        mode = !mode;
-
+    inline void update() {
         for(auto pos = wrappers.size(); pos; --pos) {
             auto &wrapper = wrappers[pos-1];
 
             if(wrapper) {
-                wrapper->publish(buf);
+                wrapper->publish();
             }
         }
     }
 
 private:
     std::vector<std::unique_ptr<BaseSignalWrapper>> wrappers;
-    bool mode;
 };
-
-
-/**
- * @brief Managed dispatcher.
- *
- * A managed dispatcher uses the Signal class template as an underlying type.
- * The type of the instances is the one required by the signal handler:
- * `std::shared_ptr<Class>` (a shared pointer).
- */
-using ManagedDispatcher = Dispatcher<Signal>;
-
-
-/**
- * @brief Unmanaged dispatcher.
- *
- * An unmanaged dispatcher uses the SigH class template as an underlying type.
- * The type of the instances is the one required by the signal handler:
- * `Class *` (a naked pointer).<br/>
- * When it comes to work with this kind of dispatcher, users must guarantee that
- * the lifetimes of the instances overcome the one of the dispatcher itself.
- */
-using UnmanagedDispatcher = Dispatcher<SigH>;
 
 
 }
