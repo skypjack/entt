@@ -2575,9 +2575,10 @@ open an issue or a PR and I'll be glad to add them to the list.
 
 # Contributors
 
-If you want to contribute, please send patches as pull requests against the
-branch `master`.<br/>
-See the
+If you want to participate, please see the guidelines for
+[contributing](https://github.com/skypjack/entt/blob/master/CONTRIBUTING.md)
+before to create issues or pull requests.<br/>
+Take also a look at the
 [contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to
 know who has participated so far.
 
