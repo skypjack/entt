@@ -2556,14 +2556,18 @@ projects based on EnTT and did not hold back when it came to documenting them.
 
 Below an incomplete list of projects and articles:
 
-* [EnttPong](https://github.com/reworks/EnttPong) - Example game for `EnTT`
+* [EnttPong](https://github.com/reworks/EnttPong): example game for `EnTT`
   framework.
-* [ECS_SpaceBattle](https://github.com/vblanco20-1/ECS_SpaceBattle) - Huge space
-  battle using an ECS library for the logic. Built on UE4.
-* Code: [Experimenting with ECS in UE4](http://victor.madtriangles.com/code%20experiment/2018/03/25/post-ue4-ecs-battle.html)
-* [Implementing ECS architecture in UE4](https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1449913-implementing-ecs-architecture-in-ue4-giant-space-battle).
-  Giant space battle.
-* [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt).
+* [ECS_SpaceBattle](https://github.com/vblanco20-1/ECS_SpaceBattle): huge space
+  battle built on `UE4`.
+* [Experimenting with ECS in UE4](http://victor.madtriangles.com/code%20experiment/2018/03/25/post-ue4-ecs-battle.html):
+  interesting article about `UE4` and `EnTT`.
+* [Implementing ECS architecture in UE4](https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1449913-implementing-ecs-architecture-in-ue4-giant-space-battle):
+  giant space battle.
+* [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt): port of
+  [Match One](https://github.com/sschmid/Match-One) for `Entitas-CSharp`.
+* [Randballs](https://github.com/gale93/randballs): simple `SFML` and `EnTT`
+  playground.
 * ...
 
 If you know of other resources out there that are about `EnTT`, feel free to
