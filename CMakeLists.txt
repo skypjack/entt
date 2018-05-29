@@ -4,6 +4,8 @@
 
 cmake_minimum_required(VERSION 3.2)
 
+include(GNUInstallDirs)
+
 #
 # Building in-tree is not allowed (we take care of your craziness).
 #
@@ -36,44 +38,86 @@ message("*")
 # Compiler stuff
 #
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 if(NOT MSVC)
     include(CheckCXXSourceCompiles)
+    include(CMakePushCheckState)
+    
+    cmake_push_check_state()
 
-    set(OLD_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-
+    set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -stdlib=libc++")
+    
     check_cxx_source_compiles("
         #include<type_traits>
-        int main() { return std::is_same<int, int>::value ? 0 : 1; }
-    " HAS_LIBCPP)
+        int main() { return std::is_same<int, int>::value ? 0 : 1; }"
+    HAS_LIBCPP)
 
-    if(NOT HAS_LIBCPP)
-        set(CMAKE_CXX_FLAGS "${OLD_CMAKE_CXX_FLAGS}")
-    endif()
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DRELEASE")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -DDEBUG")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
-
-    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        # it seems that -O3 ruins the performance when using clang ...
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
-    else()
-        # ... on the other side, GCC is incredibly comfortable with it.
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-    endif()
+    cmake_pop_check_state()
+    # set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 endif()
 
 #
-# Include EnTT
+# Add EnTT target
 #
 
-include_directories(${entt_SOURCE_DIR}/src)
+#message(STATUS "Compile features: ${CMAKE_CXX_COMPILE_FEATURES}")
+
+add_library(EnTT INTERFACE)
+
+target_include_directories(EnTT INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<INSTALL_INTERFACE:include>
+)
+
+target_compile_definitions(EnTT
+  INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:DEBUG>
+  INTERFACE $<$<AND:$<CONFIG:Release>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:RELEASE>
+)
+
+target_compile_options(EnTT
+  INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-O0 -g>
+  INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:Clang>>:-O2>
+  INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU>>:-O3>
+  INTERFACE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -Wall>
+)
+
+if(HAS_LIBCPP)
+  target_compile_options(EnTT BEFORE
+    INTERFACE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-stdlib=libc++>
+  )
+endif()
+
+target_compile_features(EnTT
+  INTERFACE cxx_std_14
+)
+
+install(DIRECTORY src/
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(TARGETS EnTT EXPORT EnTTTargets
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(EXPORT EnTTTargets
+  FILE EnTTTargets.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/entt)
+
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(cmake/in/EnTTConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfig.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/entt
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO
+)
+
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfigVersion.cmake
+  VERSION ${TMXPARSER_VERSION}
+  COMPATIBILITY SameMajorVersion
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfig.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfigVersion.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/entt
+)
 
 #
 # Tests
@@ -105,10 +149,14 @@ endif()
 # Documentation
 #
 
-find_package(Doxygen 1.8)
+option(BUILD_DOCS "Enable building with documentation." OFF)
 
-if(DOXYGEN_FOUND)
+if(BUILD_DOCS)
+  find_package(Doxygen 1.8)
+
+  if(DOXYGEN_FOUND)
     add_subdirectory(docs)
+  endif()
 endif()
 
 #
