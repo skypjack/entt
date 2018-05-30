@@ -174,7 +174,7 @@ public:
         Connection(Connection &&) = default;
 
         /**
-         * @brief Default copy assignament operator.
+         * @brief Default copy assignment operator.
          * @return This connection.
          */
         Connection & operator=(const Connection &) = default;
@@ -201,7 +201,7 @@ public:
 
     /*! @brief Copying an emitter isn't allowed. @return This emitter. */
     Emitter & operator=(const Emitter &) = delete;
-    /*! @brief Default move assignament operator. @return This emitter. */
+    /*! @brief Default move assignment operator. @return This emitter. */
     Emitter & operator=(Emitter &&) = default;
 
     /**

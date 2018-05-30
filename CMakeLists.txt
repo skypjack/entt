@@ -120,7 +120,7 @@ add_custom_target(
     SOURCES
         appveyor.yml
         AUTHORS
-        CONTRIBUTING.md
+        CONTRIBUTING
         LICENSE
         README.md
         TODO

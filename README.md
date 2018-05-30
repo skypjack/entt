@@ -2589,7 +2589,7 @@ open an issue or a PR and I'll be glad to add them to the list.
 # Contributors
 
 If you want to participate, please see the guidelines for
-[contributing](https://github.com/skypjack/entt/blob/master/CONTRIBUTING.md)
+[contributing](https://github.com/skypjack/entt/blob/master/CONTRIBUTING)
 before to create issues or pull requests.<br/>
 Take also a look at the
 [contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to

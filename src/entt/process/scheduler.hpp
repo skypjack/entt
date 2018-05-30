@@ -140,7 +140,7 @@ public:
 
     /*! @brief Copying a scheduler isn't allowed. @return This scheduler. */
     Scheduler & operator=(const Scheduler &) = delete;
-    /*! @brief Default move assignament operator. @return This scheduler. */
+    /*! @brief Default move assignment operator. @return This scheduler. */
     Scheduler & operator=(Scheduler &&) = default;
 
     /**
