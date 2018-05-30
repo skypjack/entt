@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['abort',['abort',['../classentt_1_1Process.html#a3678846862a819a23361bca2982251d5',1,'entt::Process::abort()'],['../classentt_1_1Scheduler.html#acb2a74ce41dbb7c9109531b751f73cc4',1,'entt::Scheduler::abort()']]],
-  ['accommodate',['accommodate',['../classentt_1_1Registry.html#a05b872df10bc6ca6f1a11f74eb6f824a',1,'entt::Registry']]],
-  ['actor',['Actor',['../structentt_1_1Actor.html#aa55414e7e6ad064d9f72d391d3a0884b',1,'entt::Actor::Actor(Registry&lt; Entity &gt; &amp;reg)'],['../structentt_1_1Actor.html#a6d1037c1560e61445a34ba948d249b03',1,'entt::Actor::Actor(const Actor &amp;)=default'],['../structentt_1_1Actor.html#afd6eea6ee3fa37462bd0ce132a167e6c',1,'entt::Actor::Actor(Actor &amp;&amp;)=default']]],
-  ['alive',['alive',['../classentt_1_1Process.html#ab5c72a70dc7d5b7b5ac61f288cb11193',1,'entt::Process']]],
-  ['assign',['assign',['../classentt_1_1Registry.html#aa6b578d40a9305869e692167fc3dcddf',1,'entt::Registry']]],
-  ['attach',['attach',['../classentt_1_1Registry.html#ad6aba3339872b3dccc722debcdf4d65c',1,'entt::Registry::attach()'],['../classentt_1_1Scheduler.html#a1a836000f65e8e275119c0f77ec46674',1,'entt::Scheduler::attach(Args &amp;&amp;... args)'],['../classentt_1_1Scheduler.html#a5915b9783b278a6006d4857feefc0e3b',1,'entt::Scheduler::attach(Func &amp;&amp;func)']]],
-  ['attachee',['attachee',['../classentt_1_1Registry.html#a9300c3ef37bc0abb7ebc5dac7b2fc873',1,'entt::Registry']]]
+  ['abort',['abort',['../classentt_1_1Process.html#ae7a9c2acd493969267ce4a6d2e2884b8',1,'entt::Process::abort()'],['../classentt_1_1Scheduler.html#af2494e025703d03a87117d6e897c87db',1,'entt::Scheduler::abort()']]],
+  ['accommodate',['accommodate',['../classentt_1_1Prototype.html#a7e8f25e418fa8a4667dc474405dd60c4',1,'entt::Prototype::accommodate()'],['../classentt_1_1Registry.html#a6333a56f3a5a58882963a11bbbcf2ac2',1,'entt::Registry::accommodate()']]],
+  ['actor',['Actor',['../structentt_1_1Actor.html#a000a099327600af5eaf86990fe886260',1,'entt::Actor::Actor(Registry&lt; Entity &gt; &amp;reg)'],['../structentt_1_1Actor.html#a02fb1433a35bb6df68a79a8bdd80036c',1,'entt::Actor::Actor(const Actor &amp;)=default'],['../structentt_1_1Actor.html#a851508562e73c601be2965929b31c218',1,'entt::Actor::Actor(Actor &amp;&amp;)=default']]],
+  ['alive',['alive',['../classentt_1_1Process.html#ad18ce3558d2325d622fb2b8ab51c49d5',1,'entt::Process']]],
+  ['assign',['assign',['../structentt_1_1Actor.html#a0a161248d739e780833e534f7d1cf638',1,'entt::Actor::assign(tag_t, Args &amp;&amp;... args)'],['../structentt_1_1Actor.html#a7631fdb2de787c10b016a71905906147',1,'entt::Actor::assign(Args &amp;&amp;... args)'],['../classentt_1_1Prototype.html#a4a070e4f3316e8d2fc95dcb250a685e2',1,'entt::Prototype::assign()'],['../classentt_1_1Registry.html#a93b5717af287a2b97e0ef9695c51ed58',1,'entt::Registry::assign(tag_t, const entity_type entity, Args &amp;&amp;... args)'],['../classentt_1_1Registry.html#a01f87450271067dda6c87f0c7c9b80dd',1,'entt::Registry::assign(const entity_type entity, Args &amp;&amp;... args)']]],
+  ['attach',['attach',['../classentt_1_1Scheduler.html#a1a836000f65e8e275119c0f77ec46674',1,'entt::Scheduler::attach(Args &amp;&amp;... args)'],['../classentt_1_1Scheduler.html#a5915b9783b278a6006d4857feefc0e3b',1,'entt::Scheduler::attach(Func &amp;&amp;func)']]],
+  ['attachee',['attachee',['../classentt_1_1Registry.html#af157dcabe4fe027e2f9cd45f4958f3b9',1,'entt::Registry']]]
 ];

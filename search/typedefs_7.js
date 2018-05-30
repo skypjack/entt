@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['managedbus',['ManagedBus',['../namespaceentt.html#ab0f1cfc713909d1324ba76592e22bef5',1,'entt']]],
-  ['manageddispatcher',['ManagedDispatcher',['../namespaceentt.html#aa87d8c710e5a90c2a89d574d38f4b0b6',1,'entt']]]
+  ['object_5ftype',['object_type',['../classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#af7db79dfb4e031a63fa526d4f7d54915',1,'entt::SparseSet&lt; Entity, Type &gt;']]]
 ];

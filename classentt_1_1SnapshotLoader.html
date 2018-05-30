@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.5.0</span>
+   &#160;<span id="projectnumber">2.6.0</span>
    </div>
   </td>
  </tr>
@@ -79,25 +79,39 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a743161b8622d14003b4ed7c9aa719623"><td class="memTemplParams" colspan="2">template&lt;typename Archive &gt; </td></tr>
-<tr class="memitem:a743161b8622d14003b4ed7c9aa719623"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#a743161b8622d14003b4ed7c9aa719623">entities</a> (Archive &amp;archive) &amp;&amp;</td></tr>
-<tr class="memdesc:a743161b8622d14003b4ed7c9aa719623"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restores entities that were in use during serialization.  <a href="#a743161b8622d14003b4ed7c9aa719623">More...</a><br /></td></tr>
-<tr class="separator:a743161b8622d14003b4ed7c9aa719623"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa761f91d76e9469132d1bb5c64e2bd95"><td class="memTemplParams" colspan="2">template&lt;typename Archive &gt; </td></tr>
-<tr class="memitem:aa761f91d76e9469132d1bb5c64e2bd95"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#aa761f91d76e9469132d1bb5c64e2bd95">destroyed</a> (Archive &amp;archive) &amp;&amp;</td></tr>
-<tr class="memdesc:aa761f91d76e9469132d1bb5c64e2bd95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restores entities that were destroyed during serialization.  <a href="#aa761f91d76e9469132d1bb5c64e2bd95">More...</a><br /></td></tr>
-<tr class="separator:aa761f91d76e9469132d1bb5c64e2bd95"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a88481c82391a2e930545aa1f540e843e"><td class="memTemplParams" colspan="2">template&lt;typename... Component, typename Archive &gt; </td></tr>
-<tr class="memitem:a88481c82391a2e930545aa1f540e843e"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#a88481c82391a2e930545aa1f540e843e">component</a> (Archive &amp;archive) &amp;&amp;</td></tr>
-<tr class="memdesc:a88481c82391a2e930545aa1f540e843e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restores components and assigns them to the right entities.  <a href="#a88481c82391a2e930545aa1f540e843e">More...</a><br /></td></tr>
-<tr class="separator:a88481c82391a2e930545aa1f540e843e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7218fc0747446219914c67c9bcf55ade"><td class="memTemplParams" colspan="2">template&lt;typename... Tag, typename Archive &gt; </td></tr>
-<tr class="memitem:a7218fc0747446219914c67c9bcf55ade"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#a7218fc0747446219914c67c9bcf55ade">tag</a> (Archive &amp;archive) &amp;&amp;</td></tr>
-<tr class="memdesc:a7218fc0747446219914c67c9bcf55ade"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restores tags and assigns them to the right entities.  <a href="#a7218fc0747446219914c67c9bcf55ade">More...</a><br /></td></tr>
-<tr class="separator:a7218fc0747446219914c67c9bcf55ade"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae938a5d0e6cc778f436d6383ae9b4db1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#ae938a5d0e6cc778f436d6383ae9b4db1">orphans</a> () &amp;&amp;</td></tr>
-<tr class="memdesc:ae938a5d0e6cc778f436d6383ae9b4db1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys those entities that have neither components nor tags.  <a href="#ae938a5d0e6cc778f436d6383ae9b4db1">More...</a><br /></td></tr>
-<tr class="separator:ae938a5d0e6cc778f436d6383ae9b4db1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7cc32b25447bf6d13ac36a814e446f4c"><td class="memItemLeft" align="right" valign="top"><a id="a7cc32b25447bf6d13ac36a814e446f4c"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#a7cc32b25447bf6d13ac36a814e446f4c">SnapshotLoader</a> (const <a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> &amp;)=delete</td></tr>
+<tr class="memdesc:a7cc32b25447bf6d13ac36a814e446f4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copying a snapshot loader isn't allowed. <br /></td></tr>
+<tr class="separator:a7cc32b25447bf6d13ac36a814e446f4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad20cadc8bb3699629cb3ae54bf07b39a"><td class="memItemLeft" align="right" valign="top"><a id="ad20cadc8bb3699629cb3ae54bf07b39a"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#ad20cadc8bb3699629cb3ae54bf07b39a">SnapshotLoader</a> (<a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> &amp;&amp;)=default</td></tr>
+<tr class="memdesc:ad20cadc8bb3699629cb3ae54bf07b39a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move constructor. <br /></td></tr>
+<tr class="separator:ad20cadc8bb3699629cb3ae54bf07b39a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1f8a300b9c5ccf0598cd90ab0e0062f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#ad1f8a300b9c5ccf0598cd90ab0e0062f">operator=</a> (const <a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> &amp;)=delete</td></tr>
+<tr class="memdesc:ad1f8a300b9c5ccf0598cd90ab0e0062f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copying a snapshot loader isn't allowed.  <a href="#ad1f8a300b9c5ccf0598cd90ab0e0062f">More...</a><br /></td></tr>
+<tr class="separator:ad1f8a300b9c5ccf0598cd90ab0e0062f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69ed990a8a614e5a1cb90960c216784b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#a69ed990a8a614e5a1cb90960c216784b">operator=</a> (<a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> &amp;&amp;)=default</td></tr>
+<tr class="memdesc:a69ed990a8a614e5a1cb90960c216784b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move assignment operator.  <a href="#a69ed990a8a614e5a1cb90960c216784b">More...</a><br /></td></tr>
+<tr class="separator:a69ed990a8a614e5a1cb90960c216784b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0b795caeb563c2b2b96acb571df1bec"><td class="memTemplParams" colspan="2">template&lt;typename Archive &gt; </td></tr>
+<tr class="memitem:ae0b795caeb563c2b2b96acb571df1bec"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#ae0b795caeb563c2b2b96acb571df1bec">entities</a> (Archive &amp;archive)</td></tr>
+<tr class="memdesc:ae0b795caeb563c2b2b96acb571df1bec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restores entities that were in use during serialization.  <a href="#ae0b795caeb563c2b2b96acb571df1bec">More...</a><br /></td></tr>
+<tr class="separator:ae0b795caeb563c2b2b96acb571df1bec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f670aab4a988b292f2fa62c0efd3b5e"><td class="memTemplParams" colspan="2">template&lt;typename Archive &gt; </td></tr>
+<tr class="memitem:a5f670aab4a988b292f2fa62c0efd3b5e"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#a5f670aab4a988b292f2fa62c0efd3b5e">destroyed</a> (Archive &amp;archive)</td></tr>
+<tr class="memdesc:a5f670aab4a988b292f2fa62c0efd3b5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restores entities that were destroyed during serialization.  <a href="#a5f670aab4a988b292f2fa62c0efd3b5e">More...</a><br /></td></tr>
+<tr class="separator:a5f670aab4a988b292f2fa62c0efd3b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7323002a2314bd65fff27fea3c2c96e"><td class="memTemplParams" colspan="2">template&lt;typename... Component, typename Archive &gt; </td></tr>
+<tr class="memitem:ac7323002a2314bd65fff27fea3c2c96e"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#ac7323002a2314bd65fff27fea3c2c96e">component</a> (Archive &amp;archive)</td></tr>
+<tr class="memdesc:ac7323002a2314bd65fff27fea3c2c96e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restores components and assigns them to the right entities.  <a href="#ac7323002a2314bd65fff27fea3c2c96e">More...</a><br /></td></tr>
+<tr class="separator:ac7323002a2314bd65fff27fea3c2c96e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88dae592f38013a258046f8c2e5b0fbb"><td class="memTemplParams" colspan="2">template&lt;typename... Tag, typename Archive &gt; </td></tr>
+<tr class="memitem:a88dae592f38013a258046f8c2e5b0fbb"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#a88dae592f38013a258046f8c2e5b0fbb">tag</a> (Archive &amp;archive)</td></tr>
+<tr class="memdesc:a88dae592f38013a258046f8c2e5b0fbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restores tags and assigns them to the right entities.  <a href="#a88dae592f38013a258046f8c2e5b0fbb">More...</a><br /></td></tr>
+<tr class="separator:a88dae592f38013a258046f8c2e5b0fbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab31328a925c3b7c3fe6e32d9255ae03b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SnapshotLoader.html#ab31328a925c3b7c3fe6e32d9255ae03b">orphans</a> ()</td></tr>
+<tr class="memdesc:ab31328a925c3b7c3fe6e32d9255ae03b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys those entities that have neither components nor tags.  <a href="#ab31328a925c3b7c3fe6e32d9255ae03b">More...</a><br /></td></tr>
+<tr class="separator:ab31328a925c3b7c3fe6e32d9255ae03b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -120,10 +134,10 @@ class entt::SnapshotLoader&lt; Entity &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00188">188</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00261">261</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a88481c82391a2e930545aa1f540e843e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a88481c82391a2e930545aa1f540e843e">&#9670;&nbsp;</a></span>component()</h2>
+<a id="ac7323002a2314bd65fff27fea3c2c96e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7323002a2314bd65fff27fea3c2c96e">&#9670;&nbsp;</a></span>component()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -136,11 +150,11 @@ template&lt;typename... Component, typename Archive &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> <a class="el" href="classentt_1_1SnapshotLoader.html">entt::SnapshotLoader</a>&lt; Entity &gt;::component </td>
+          <td class="memname"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&amp; <a class="el" href="classentt_1_1SnapshotLoader.html">entt::SnapshotLoader</a>&lt; Entity &gt;::component </td>
           <td>(</td>
           <td class="paramtype">Archive &amp;&#160;</td>
           <td class="paramname"><em>archive</em></td><td>)</td>
-          <td> &amp;&amp;</td>
+          <td></td>
         </tr>
       </table>
   </td>
@@ -167,12 +181,12 @@ template&lt;typename... Component, typename Archive &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid loader to continue restoring data. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00294">294</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00361">361</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
 
 </div>
 </div>
-<a id="aa761f91d76e9469132d1bb5c64e2bd95"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa761f91d76e9469132d1bb5c64e2bd95">&#9670;&nbsp;</a></span>destroyed()</h2>
+<a id="a5f670aab4a988b292f2fa62c0efd3b5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f670aab4a988b292f2fa62c0efd3b5e">&#9670;&nbsp;</a></span>destroyed()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -185,11 +199,11 @@ template&lt;typename Archive &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> <a class="el" href="classentt_1_1SnapshotLoader.html">entt::SnapshotLoader</a>&lt; Entity &gt;::destroyed </td>
+          <td class="memname"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&amp; <a class="el" href="classentt_1_1SnapshotLoader.html">entt::SnapshotLoader</a>&lt; Entity &gt;::destroyed </td>
           <td>(</td>
           <td class="paramtype">Archive &amp;&#160;</td>
           <td class="paramname"><em>archive</em></td><td>)</td>
-          <td> &amp;&amp;</td>
+          <td></td>
         </tr>
       </table>
   </td>
@@ -215,12 +229,12 @@ template&lt;typename Archive &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid loader to continue restoring data. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00271">271</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00341">341</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a743161b8622d14003b4ed7c9aa719623"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a743161b8622d14003b4ed7c9aa719623">&#9670;&nbsp;</a></span>entities()</h2>
+<a id="ae0b795caeb563c2b2b96acb571df1bec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0b795caeb563c2b2b96acb571df1bec">&#9670;&nbsp;</a></span>entities()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -233,11 +247,11 @@ template&lt;typename Archive &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> <a class="el" href="classentt_1_1SnapshotLoader.html">entt::SnapshotLoader</a>&lt; Entity &gt;::entities </td>
+          <td class="memname"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&amp; <a class="el" href="classentt_1_1SnapshotLoader.html">entt::SnapshotLoader</a>&lt; Entity &gt;::entities </td>
           <td>(</td>
           <td class="paramtype">Archive &amp;&#160;</td>
           <td class="paramname"><em>archive</em></td><td>)</td>
-          <td> &amp;&amp;</td>
+          <td></td>
         </tr>
       </table>
   </td>
@@ -263,12 +277,12 @@ template&lt;typename Archive &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid loader to continue restoring data. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00251">251</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00324">324</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ae938a5d0e6cc778f436d6383ae9b4db1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae938a5d0e6cc778f436d6383ae9b4db1">&#9670;&nbsp;</a></span>orphans()</h2>
+<a id="ad1f8a300b9c5ccf0598cd90ab0e0062f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1f8a300b9c5ccf0598cd90ab0e0062f">&#9670;&nbsp;</a></span>operator=() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -279,10 +293,72 @@ template&lt;typename Entity &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> <a class="el" href="classentt_1_1SnapshotLoader.html">entt::SnapshotLoader</a>&lt; Entity &gt;::orphans </td>
+          <td class="memname"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&amp; <a class="el" href="classentt_1_1SnapshotLoader.html">entt::SnapshotLoader</a>&lt; Entity &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&lt; Entity &gt; &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copying a snapshot loader isn't allowed. </p>
+<dl class="section return"><dt>Returns</dt><dd>This loader. </dd></dl>
+
+</div>
+</div>
+<a id="a69ed990a8a614e5a1cb90960c216784b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69ed990a8a614e5a1cb90960c216784b">&#9670;&nbsp;</a></span>operator=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&amp; <a class="el" href="classentt_1_1SnapshotLoader.html">entt::SnapshotLoader</a>&lt; Entity &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&lt; Entity &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Default move assignment operator. </p>
+<dl class="section return"><dt>Returns</dt><dd>This loader. </dd></dl>
+
+</div>
+</div>
+<a id="ab31328a925c3b7c3fe6e32d9255ae03b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab31328a925c3b7c3fe6e32d9255ae03b">&#9670;&nbsp;</a></span>orphans()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&amp; <a class="el" href="classentt_1_1SnapshotLoader.html">entt::SnapshotLoader</a>&lt; Entity &gt;::orphans </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> &amp;&amp;</td>
+          <td></td>
         </tr>
       </table>
   </td>
@@ -297,12 +373,12 @@ template&lt;typename Entity &gt; </div>
  This functions helps to identify and destroy those entities.</p>
 <dl class="section return"><dt>Returns</dt><dd>A valid loader to continue restoring data. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00333">333</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00399">399</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a7218fc0747446219914c67c9bcf55ade"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7218fc0747446219914c67c9bcf55ade">&#9670;&nbsp;</a></span>tag()</h2>
+<a id="a88dae592f38013a258046f8c2e5b0fbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88dae592f38013a258046f8c2e5b0fbb">&#9670;&nbsp;</a></span>tag()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -315,11 +391,11 @@ template&lt;typename... Tag, typename Archive &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a> <a class="el" href="classentt_1_1SnapshotLoader.html">entt::SnapshotLoader</a>&lt; Entity &gt;::tag </td>
+          <td class="memname"><a class="el" href="classentt_1_1SnapshotLoader.html">SnapshotLoader</a>&amp; <a class="el" href="classentt_1_1SnapshotLoader.html">entt::SnapshotLoader</a>&lt; Entity &gt;::tag </td>
           <td>(</td>
           <td class="paramtype">Archive &amp;&#160;</td>
           <td class="paramname"><em>archive</em></td><td>)</td>
-          <td> &amp;&amp;</td>
+          <td></td>
         </tr>
       </table>
   </td>
@@ -346,7 +422,7 @@ template&lt;typename... Tag, typename Archive &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid loader to continue restoring data. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00315">315</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="snapshot_8hpp_source.html#l00382">382</a> of file <a class="el" href="snapshot_8hpp_source.html">snapshot.hpp</a>.</p>
 
 </div>
 </div>

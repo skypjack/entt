@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['tag',['tag',['../classentt_1_1Registry.html#a307aa3a1d24923f34d1e8a595c82649f',1,'entt::Registry::tag()'],['../classentt_1_1Snapshot.html#a3bb6e46e94b21266d26fdc643dc88d9a',1,'entt::Snapshot::tag()'],['../classentt_1_1SnapshotLoader.html#a7218fc0747446219914c67c9bcf55ade',1,'entt::SnapshotLoader::tag()'],['../classentt_1_1ContinuousLoader.html#a11f333456b6657ee26aadee8ea276c24',1,'entt::ContinuousLoader::tag(Archive &amp;archive)'],['../classentt_1_1ContinuousLoader.html#abb45d38d0d9187772b0326bdb0710e70',1,'entt::ContinuousLoader::tag(Archive &amp;archive, Type Tag::*... member)']]],
+  ['tag',['tag',['../classentt_1_1Snapshot.html#a974ac8ba41fb8bac536a115edea03dbe',1,'entt::Snapshot::tag(Archive &amp;archive)'],['../classentt_1_1Snapshot.html#a4b0f272d334d54fcd9e59318cee96a58',1,'entt::Snapshot::tag(Archive &amp;archive)'],['../classentt_1_1SnapshotLoader.html#a88dae592f38013a258046f8c2e5b0fbb',1,'entt::SnapshotLoader::tag()'],['../classentt_1_1ContinuousLoader.html#a8d50d3f90d95b370305561da67da6c3b',1,'entt::ContinuousLoader::tag()']]],
   ['temp',['temp',['../classentt_1_1ResourceCache.html#a00ad6d9478d2f6721f0a846b49adec07',1,'entt::ResourceCache']]],
-  ['tick',['tick',['../classentt_1_1Process.html#a6d2bd2fb6112a8df87d873102c20f462',1,'entt::Process']]],
-  ['trigger',['trigger',['../classentt_1_1Dispatcher.html#ab80c2891d90e8ac83531913416f9b398',1,'entt::Dispatcher']]],
-  ['type',['type',['../classentt_1_1Family.html#a1d54430410246e053bf7f18994db6848',1,'entt::Family']]]
+  ['tick',['tick',['../classentt_1_1Process.html#a9298c55069b27d4ffa005f4345be4d59',1,'entt::Process']]],
+  ['trigger',['trigger',['../classentt_1_1Dispatcher.html#a89d44e6fa992fba9ba927f4b1492f66f',1,'entt::Dispatcher']]],
+  ['type',['type',['../classentt_1_1Family.html#aa5ce983dfef17bf0df6a608308193f6d',1,'entt::Family::type()'],['../classentt_1_1Registry.html#a682552d500d7768b5d9d4e5f547cdfaf',1,'entt::Registry::type(tag_t) ENTT_NOEXCEPT'],['../classentt_1_1Registry.html#a484018ca7d1898708ea17a651eddc7e4',1,'entt::Registry::type() ENTT_NOEXCEPT']]]
 ];

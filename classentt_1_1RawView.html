@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.5.0</span>
+   &#160;<span id="projectnumber">2.6.0</span>
    </div>
   </td>
  </tr>
@@ -84,6 +84,10 @@ Public Types</h2></td></tr>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#ab34740dea79327742888e84ba5c14328">iterator_type</a> = typename pool_type::iterator_type</td></tr>
 <tr class="memdesc:ab34740dea79327742888e84ba5c14328"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input iterator type. <br /></td></tr>
 <tr class="separator:ab34740dea79327742888e84ba5c14328"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7"><td class="memItemLeft" align="right" valign="top"><a id="a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7">const_iterator_type</a> = typename pool_type::const_iterator_type</td></tr>
+<tr class="memdesc:a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant input iterator type. <br /></td></tr>
+<tr class="separator:a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a544ee87b4a856cfa5c49ea4581c85a35"><td class="memItemLeft" align="right" valign="top"><a id="a544ee87b4a856cfa5c49ea4581c85a35"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#a544ee87b4a856cfa5c49ea4581c85a35">entity_type</a> = typename pool_type::entity_type</td></tr>
 <tr class="memdesc:a544ee87b4a856cfa5c49ea4581c85a35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying entity identifier. <br /></td></tr>
@@ -99,24 +103,47 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a6cb64d519e0a9ced6d3425d74d8c2b3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1RawView.html#afc530c9c64688b522ac643fdb5a0bb6e">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#a6cb64d519e0a9ced6d3425d74d8c2b3f">size</a> () const noexcept</td></tr>
-<tr class="memdesc:a6cb64d519e0a9ced6d3425d74d8c2b3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of instances of the given type.  <a href="#a6cb64d519e0a9ced6d3425d74d8c2b3f">More...</a><br /></td></tr>
-<tr class="separator:a6cb64d519e0a9ced6d3425d74d8c2b3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab854771fb5c3890af4561ffa5c0e96cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1RawView.html#a6a6e2cd0387a63e153a18bd60a1283a3">raw_type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#ab854771fb5c3890af4561ffa5c0e96cd">raw</a> () noexcept</td></tr>
-<tr class="memdesc:ab854771fb5c3890af4561ffa5c0e96cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direct access to the list of components.  <a href="#ab854771fb5c3890af4561ffa5c0e96cd">More...</a><br /></td></tr>
-<tr class="separator:ab854771fb5c3890af4561ffa5c0e96cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a989e423fbdb43784deb07dfb860df66f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classentt_1_1RawView.html#a6a6e2cd0387a63e153a18bd60a1283a3">raw_type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#a989e423fbdb43784deb07dfb860df66f">raw</a> () const noexcept</td></tr>
-<tr class="memdesc:a989e423fbdb43784deb07dfb860df66f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direct access to the list of components.  <a href="#a989e423fbdb43784deb07dfb860df66f">More...</a><br /></td></tr>
-<tr class="separator:a989e423fbdb43784deb07dfb860df66f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cf35c3e7448199362fa451377f6c8c1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classentt_1_1RawView.html#a544ee87b4a856cfa5c49ea4581c85a35">entity_type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#a0cf35c3e7448199362fa451377f6c8c1">data</a> () const noexcept</td></tr>
-<tr class="memdesc:a0cf35c3e7448199362fa451377f6c8c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direct access to the list of entities.  <a href="#a0cf35c3e7448199362fa451377f6c8c1">More...</a><br /></td></tr>
-<tr class="separator:a0cf35c3e7448199362fa451377f6c8c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab69d33ca758be8bcce4327d471d502ab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1RawView.html#ab34740dea79327742888e84ba5c14328">iterator_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#ab69d33ca758be8bcce4327d471d502ab">begin</a> () const noexcept</td></tr>
-<tr class="memdesc:ab69d33ca758be8bcce4327d471d502ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the first instance of the given type.  <a href="#ab69d33ca758be8bcce4327d471d502ab">More...</a><br /></td></tr>
-<tr class="separator:ab69d33ca758be8bcce4327d471d502ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add91eefe659d9f50709ae0f1669f7cad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1RawView.html#ab34740dea79327742888e84ba5c14328">iterator_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#add91eefe659d9f50709ae0f1669f7cad">end</a> () const noexcept</td></tr>
-<tr class="memdesc:add91eefe659d9f50709ae0f1669f7cad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator that is past the last instance of the given type.  <a href="#add91eefe659d9f50709ae0f1669f7cad">More...</a><br /></td></tr>
-<tr class="separator:add91eefe659d9f50709ae0f1669f7cad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56cd44cbd4cf15fcaacdcfd9e2b0f710"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1RawView.html#afc530c9c64688b522ac643fdb5a0bb6e">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#a56cd44cbd4cf15fcaacdcfd9e2b0f710">size</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a56cd44cbd4cf15fcaacdcfd9e2b0f710"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of instances of the given type.  <a href="#a56cd44cbd4cf15fcaacdcfd9e2b0f710">More...</a><br /></td></tr>
+<tr class="separator:a56cd44cbd4cf15fcaacdcfd9e2b0f710"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf0001549a9555166c532405bd3b647d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#abf0001549a9555166c532405bd3b647d">empty</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:abf0001549a9555166c532405bd3b647d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the view is empty.  <a href="#abf0001549a9555166c532405bd3b647d">More...</a><br /></td></tr>
+<tr class="separator:abf0001549a9555166c532405bd3b647d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9909bbe3f734989b765324b8cd75332"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classentt_1_1RawView.html#a6a6e2cd0387a63e153a18bd60a1283a3">raw_type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#ae9909bbe3f734989b765324b8cd75332">raw</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:ae9909bbe3f734989b765324b8cd75332"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direct access to the list of components.  <a href="#ae9909bbe3f734989b765324b8cd75332">More...</a><br /></td></tr>
+<tr class="separator:ae9909bbe3f734989b765324b8cd75332"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cdb189f5b2bf17021cf5c53d10ec222"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1RawView.html#a6a6e2cd0387a63e153a18bd60a1283a3">raw_type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#a1cdb189f5b2bf17021cf5c53d10ec222">raw</a> () ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a1cdb189f5b2bf17021cf5c53d10ec222"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direct access to the list of components.  <a href="#a1cdb189f5b2bf17021cf5c53d10ec222">More...</a><br /></td></tr>
+<tr class="separator:a1cdb189f5b2bf17021cf5c53d10ec222"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27edc55b8d2d18f75118b3b1e68ff270"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classentt_1_1RawView.html#a544ee87b4a856cfa5c49ea4581c85a35">entity_type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#a27edc55b8d2d18f75118b3b1e68ff270">data</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a27edc55b8d2d18f75118b3b1e68ff270"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direct access to the list of entities.  <a href="#a27edc55b8d2d18f75118b3b1e68ff270">More...</a><br /></td></tr>
+<tr class="separator:a27edc55b8d2d18f75118b3b1e68ff270"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2550b7ceee635d59bac8eddce6523cf3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1RawView.html#a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7">const_iterator_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#a2550b7ceee635d59bac8eddce6523cf3">cbegin</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a2550b7ceee635d59bac8eddce6523cf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the first instance of the given type.  <a href="#a2550b7ceee635d59bac8eddce6523cf3">More...</a><br /></td></tr>
+<tr class="separator:a2550b7ceee635d59bac8eddce6523cf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a564cc60d60b8d80aefca967eea79031f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1RawView.html#a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7">const_iterator_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#a564cc60d60b8d80aefca967eea79031f">begin</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a564cc60d60b8d80aefca967eea79031f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the first instance of the given type.  <a href="#a564cc60d60b8d80aefca967eea79031f">More...</a><br /></td></tr>
+<tr class="separator:a564cc60d60b8d80aefca967eea79031f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a195eb860ca3f49f72fc08e4505431286"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1RawView.html#ab34740dea79327742888e84ba5c14328">iterator_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#a195eb860ca3f49f72fc08e4505431286">begin</a> () ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a195eb860ca3f49f72fc08e4505431286"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the first instance of the given type.  <a href="#a195eb860ca3f49f72fc08e4505431286">More...</a><br /></td></tr>
+<tr class="separator:a195eb860ca3f49f72fc08e4505431286"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aedfe14bbc1b65afecc549cc65354575f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1RawView.html#a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7">const_iterator_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#aedfe14bbc1b65afecc549cc65354575f">cend</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:aedfe14bbc1b65afecc549cc65354575f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator that is past the last instance of the given type.  <a href="#aedfe14bbc1b65afecc549cc65354575f">More...</a><br /></td></tr>
+<tr class="separator:aedfe14bbc1b65afecc549cc65354575f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7ad0559b9b4a440813e1752b0814bb4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1RawView.html#a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7">const_iterator_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#ad7ad0559b9b4a440813e1752b0814bb4">end</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:ad7ad0559b9b4a440813e1752b0814bb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator that is past the last instance of the given type.  <a href="#ad7ad0559b9b4a440813e1752b0814bb4">More...</a><br /></td></tr>
+<tr class="separator:ad7ad0559b9b4a440813e1752b0814bb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ebfe24e5a5e428b429f470755d0a1f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1RawView.html#ab34740dea79327742888e84ba5c14328">iterator_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#a8ebfe24e5a5e428b429f470755d0a1f7">end</a> () ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a8ebfe24e5a5e428b429f470755d0a1f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator that is past the last instance of the given type.  <a href="#a8ebfe24e5a5e428b429f470755d0a1f7">More...</a><br /></td></tr>
+<tr class="separator:a8ebfe24e5a5e428b429f470755d0a1f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f88d86e1ad74bb558df47e7507612b1"><td class="memTemplParams" colspan="2">template&lt;typename Func &gt; </td></tr>
+<tr class="memitem:a2f88d86e1ad74bb558df47e7507612b1"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#a2f88d86e1ad74bb558df47e7507612b1">each</a> (Func func) const</td></tr>
+<tr class="memdesc:a2f88d86e1ad74bb558df47e7507612b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates components and applies the given function object to them.  <a href="#a2f88d86e1ad74bb558df47e7507612b1">More...</a><br /></td></tr>
+<tr class="separator:a2f88d86e1ad74bb558df47e7507612b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad54a334bfbd407df75b93e428117d598"><td class="memTemplParams" colspan="2">template&lt;typename Func &gt; </td></tr>
+<tr class="memitem:ad54a334bfbd407df75b93e428117d598"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1RawView.html#ad54a334bfbd407df75b93e428117d598">each</a> (Func func)</td></tr>
+<tr class="memdesc:ad54a334bfbd407df75b93e428117d598"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates components and applies the given function object to them.  <a href="#ad54a334bfbd407df75b93e428117d598">More...</a><br /></td></tr>
+<tr class="separator:ad54a334bfbd407df75b93e428117d598"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -154,10 +181,44 @@ class entt::RawView&lt; Entity, Component &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01008">1008</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01276">1276</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="ab69d33ca758be8bcce4327d471d502ab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab69d33ca758be8bcce4327d471d502ab">&#9670;&nbsp;</a></span>begin()</h2>
+<a id="a564cc60d60b8d80aefca967eea79031f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a564cc60d60b8d80aefca967eea79031f">&#9670;&nbsp;</a></span>begin() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename Component &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1RawView.html#a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7">const_iterator_type</a> <a class="el" href="classentt_1_1RawView.html">entt::RawView</a>&lt; Entity, Component &gt;::begin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns an iterator to the first instance of the given type. </p>
+<p>The returned iterator points to the first instance of the given type. If the view is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1RawView.html#a8ebfe24e5a5e428b429f470755d0a1f7" title="Returns an iterator that is past the last instance of the given type. ">end()</a></code>.</p>
+<dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An iterator to the first instance of the given type. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01390">1390</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a195eb860ca3f49f72fc08e4505431286"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a195eb860ca3f49f72fc08e4505431286">&#9670;&nbsp;</a></span>begin() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -171,27 +232,95 @@ template&lt;typename Entity , typename Component &gt; </div>
           <td class="memname"><a class="el" href="classentt_1_1RawView.html#ab34740dea79327742888e84ba5c14328">iterator_type</a> <a class="el" href="classentt_1_1RawView.html">entt::RawView</a>&lt; Entity, Component &gt;::begin </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Returns an iterator to the first instance of the given type. </p>
-<p>The returned iterator points to the first instance of the given type. If the view is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1RawView.html#add91eefe659d9f50709ae0f1669f7cad" title="Returns an iterator that is past the last instance of the given type. ">end()</a></code>.</p>
+<p>The returned iterator points to the first instance of the given type. If the view is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1RawView.html#a8ebfe24e5a5e428b429f470755d0a1f7" title="Returns an iterator that is past the last instance of the given type. ">end()</a></code>.</p>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first instance of the given type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01097">1097</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01406">1406</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a0cf35c3e7448199362fa451377f6c8c1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0cf35c3e7448199362fa451377f6c8c1">&#9670;&nbsp;</a></span>data()</h2>
+<a id="a2550b7ceee635d59bac8eddce6523cf3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2550b7ceee635d59bac8eddce6523cf3">&#9670;&nbsp;</a></span>cbegin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename Component &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1RawView.html#a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7">const_iterator_type</a> <a class="el" href="classentt_1_1RawView.html">entt::RawView</a>&lt; Entity, Component &gt;::cbegin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns an iterator to the first instance of the given type. </p>
+<p>The returned iterator points to the first instance of the given type. If the view is empty, the returned iterator will be equal to <code><a class="el" href="classentt_1_1RawView.html#a8ebfe24e5a5e428b429f470755d0a1f7" title="Returns an iterator that is past the last instance of the given type. ">end()</a></code>.</p>
+<dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An iterator to the first instance of the given type. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01374">1374</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aedfe14bbc1b65afecc549cc65354575f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aedfe14bbc1b65afecc549cc65354575f">&#9670;&nbsp;</a></span>cend()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename Component &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1RawView.html#a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7">const_iterator_type</a> <a class="el" href="classentt_1_1RawView.html">entt::RawView</a>&lt; Entity, Component &gt;::cend </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns an iterator that is past the last instance of the given type. </p>
+<p>The returned iterator points to the element following the last instance of the given type. Attempting to dereference the returned iterator results in undefined behavior.</p>
+<dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last instance of the given type. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01425">1425</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a27edc55b8d2d18f75118b3b1e68ff270"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27edc55b8d2d18f75118b3b1e68ff270">&#9670;&nbsp;</a></span>data()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -210,22 +339,184 @@ template&lt;typename Entity , typename Component &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Direct access to the list of entities. </p>
-<p>The returned pointer is such that range <code>[<a class="el" href="classentt_1_1RawView.html#a0cf35c3e7448199362fa451377f6c8c1" title="Direct access to the list of entities. ">data()</a>, <a class="el" href="classentt_1_1RawView.html#a0cf35c3e7448199362fa451377f6c8c1" title="Direct access to the list of entities. ">data()</a> + <a class="el" href="classentt_1_1RawView.html#a6cb64d519e0a9ced6d3425d74d8c2b3f" title="Returns the number of instances of the given type. ">size()</a>]</code> is always a valid range, even if the container is empty.</p>
+<p>The returned pointer is such that range <code>[<a class="el" href="classentt_1_1RawView.html#a27edc55b8d2d18f75118b3b1e68ff270" title="Direct access to the list of entities. ">data()</a>, <a class="el" href="classentt_1_1RawView.html#a27edc55b8d2d18f75118b3b1e68ff270" title="Direct access to the list of entities. ">data()</a> + <a class="el" href="classentt_1_1RawView.html#a56cd44cbd4cf15fcaacdcfd9e2b0f710" title="Returns the number of instances of the given type. ">size()</a>]</code> is always a valid range, even if the container is empty.</p>
 <dl class="section note"><dt>Note</dt><dd>There are no guarantees on the order of the entities. Use <code>begin</code> and <code>end</code> if you want to iterate the view in the expected order.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the array of entities. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01081">1081</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01358">1358</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
-<a id="add91eefe659d9f50709ae0f1669f7cad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#add91eefe659d9f50709ae0f1669f7cad">&#9670;&nbsp;</a></span>end()</h2>
+<a id="a2f88d86e1ad74bb558df47e7507612b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f88d86e1ad74bb558df47e7507612b1">&#9670;&nbsp;</a></span>each() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename Component &gt; </div>
+<div class="memtemplate">
+template&lt;typename Func &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classentt_1_1RawView.html">entt::RawView</a>&lt; Entity, Component &gt;::each </td>
+          <td>(</td>
+          <td class="paramtype">Func&#160;</td>
+          <td class="paramname"><em>func</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Iterates components and applies the given function object to them. </p>
+<p>The function object is provided with a const reference to each component of the view.<br />
+ The signature of the function should be equivalent to the following:</p>
+<div class="fragment"><div class="line">void(<span class="keyword">const</span> Component &amp;);</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Func</td><td>Type of the function object to invoke. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">func</td><td>A valid function object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01482">1482</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ad54a334bfbd407df75b93e428117d598"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad54a334bfbd407df75b93e428117d598">&#9670;&nbsp;</a></span>each() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename Component &gt; </div>
+<div class="memtemplate">
+template&lt;typename Func &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classentt_1_1RawView.html">entt::RawView</a>&lt; Entity, Component &gt;::each </td>
+          <td>(</td>
+          <td class="paramtype">Func&#160;</td>
+          <td class="paramname"><em>func</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Iterates components and applies the given function object to them. </p>
+<p>The function object is provided with a const reference to each component of the view.<br />
+ The signature of the function should be equivalent to the following:</p>
+<div class="fragment"><div class="line">void(<span class="keyword">const</span> Component &amp;);</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Func</td><td>Type of the function object to invoke. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">func</td><td>A valid function object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01501">1501</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+
+</div>
+</div>
+<a id="abf0001549a9555166c532405bd3b647d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf0001549a9555166c532405bd3b647d">&#9670;&nbsp;</a></span>empty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename Component &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classentt_1_1RawView.html">entt::RawView</a>&lt; Entity, Component &gt;::empty </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks whether the view is empty. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if the view is empty, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01310">1310</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ad7ad0559b9b4a440813e1752b0814bb4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7ad0559b9b4a440813e1752b0814bb4">&#9670;&nbsp;</a></span>end() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename Component &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1RawView.html#a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7">const_iterator_type</a> <a class="el" href="classentt_1_1RawView.html">entt::RawView</a>&lt; Entity, Component &gt;::end </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns an iterator that is past the last instance of the given type. </p>
+<p>The returned iterator points to the element following the last instance of the given type. Attempting to dereference the returned iterator results in undefined behavior.</p>
+<dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last instance of the given type. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01444">1444</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a8ebfe24e5a5e428b429f470755d0a1f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ebfe24e5a5e428b429f470755d0a1f7">&#9670;&nbsp;</a></span>end() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -239,12 +530,12 @@ template&lt;typename Entity , typename Component &gt; </div>
           <td class="memname"><a class="el" href="classentt_1_1RawView.html#ab34740dea79327742888e84ba5c14328">iterator_type</a> <a class="el" href="classentt_1_1RawView.html">entt::RawView</a>&lt; Entity, Component &gt;::end </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -254,46 +545,12 @@ template&lt;typename Entity , typename Component &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last instance of the given type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01116">1116</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01463">1463</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ab854771fb5c3890af4561ffa5c0e96cd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab854771fb5c3890af4561ffa5c0e96cd">&#9670;&nbsp;</a></span>raw() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Entity , typename Component &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classentt_1_1RawView.html#a6a6e2cd0387a63e153a18bd60a1283a3">raw_type</a>* <a class="el" href="classentt_1_1RawView.html">entt::RawView</a>&lt; Entity, Component &gt;::raw </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Direct access to the list of components. </p>
-<p>The returned pointer is such that range <code>[<a class="el" href="classentt_1_1RawView.html#ab854771fb5c3890af4561ffa5c0e96cd" title="Direct access to the list of components. ">raw()</a>, <a class="el" href="classentt_1_1RawView.html#ab854771fb5c3890af4561ffa5c0e96cd" title="Direct access to the list of components. ">raw()</a> + <a class="el" href="classentt_1_1RawView.html#a6cb64d519e0a9ced6d3425d74d8c2b3f" title="Returns the number of instances of the given type. ">size()</a>]</code> is always a valid range, even if the container is empty.</p>
-<dl class="section note"><dt>Note</dt><dd>There are no guarantees on the order of the components. Use <code>begin</code> and <code>end</code> if you want to iterate the view in the expected order.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>A pointer to the array of components. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01049">1049</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a989e423fbdb43784deb07dfb860df66f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a989e423fbdb43784deb07dfb860df66f">&#9670;&nbsp;</a></span>raw() <span class="overload">[2/2]</span></h2>
+<a id="ae9909bbe3f734989b765324b8cd75332"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9909bbe3f734989b765324b8cd75332">&#9670;&nbsp;</a></span>raw() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -312,22 +569,56 @@ template&lt;typename Entity , typename Component &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
 <p>Direct access to the list of components. </p>
-<p>The returned pointer is such that range <code>[<a class="el" href="classentt_1_1RawView.html#ab854771fb5c3890af4561ffa5c0e96cd" title="Direct access to the list of components. ">raw()</a>, <a class="el" href="classentt_1_1RawView.html#ab854771fb5c3890af4561ffa5c0e96cd" title="Direct access to the list of components. ">raw()</a> + <a class="el" href="classentt_1_1RawView.html#a6cb64d519e0a9ced6d3425d74d8c2b3f" title="Returns the number of instances of the given type. ">size()</a>]</code> is always a valid range, even if the container is empty.</p>
+<p>The returned pointer is such that range <code>[<a class="el" href="classentt_1_1RawView.html#a1cdb189f5b2bf17021cf5c53d10ec222" title="Direct access to the list of components. ">raw()</a>, <a class="el" href="classentt_1_1RawView.html#a1cdb189f5b2bf17021cf5c53d10ec222" title="Direct access to the list of components. ">raw()</a> + <a class="el" href="classentt_1_1RawView.html#a56cd44cbd4cf15fcaacdcfd9e2b0f710" title="Returns the number of instances of the given type. ">size()</a>]</code> is always a valid range, even if the container is empty.</p>
 <dl class="section note"><dt>Note</dt><dd>There are no guarantees on the order of the components. Use <code>begin</code> and <code>end</code> if you want to iterate the view in the expected order.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the array of components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01065">1065</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01326">1326</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a6cb64d519e0a9ced6d3425d74d8c2b3f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6cb64d519e0a9ced6d3425d74d8c2b3f">&#9670;&nbsp;</a></span>size()</h2>
+<a id="a1cdb189f5b2bf17021cf5c53d10ec222"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1cdb189f5b2bf17021cf5c53d10ec222">&#9670;&nbsp;</a></span>raw() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity , typename Component &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1RawView.html#a6a6e2cd0387a63e153a18bd60a1283a3">raw_type</a>* <a class="el" href="classentt_1_1RawView.html">entt::RawView</a>&lt; Entity, Component &gt;::raw </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Direct access to the list of components. </p>
+<p>The returned pointer is such that range <code>[<a class="el" href="classentt_1_1RawView.html#a1cdb189f5b2bf17021cf5c53d10ec222" title="Direct access to the list of components. ">raw()</a>, <a class="el" href="classentt_1_1RawView.html#a1cdb189f5b2bf17021cf5c53d10ec222" title="Direct access to the list of components. ">raw()</a> + <a class="el" href="classentt_1_1RawView.html#a56cd44cbd4cf15fcaacdcfd9e2b0f710" title="Returns the number of instances of the given type. ">size()</a>]</code> is always a valid range, even if the container is empty.</p>
+<dl class="section note"><dt>Note</dt><dd>There are no guarantees on the order of the components. Use <code>begin</code> and <code>end</code> if you want to iterate the view in the expected order.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to the array of components. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01342">1342</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a56cd44cbd4cf15fcaacdcfd9e2b0f710"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a56cd44cbd4cf15fcaacdcfd9e2b0f710">&#9670;&nbsp;</a></span>size()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -346,7 +637,7 @@ template&lt;typename Entity , typename Component &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -354,7 +645,7 @@ template&lt;typename Entity , typename Component &gt; </div>
 <p>Returns the number of instances of the given type. </p>
 <dl class="section return"><dt>Returns</dt><dd>Number of instances of the given component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01033">1033</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l01302">1302</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>

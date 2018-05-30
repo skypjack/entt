@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.5.0</span>
+   &#160;<span id="projectnumber">2.6.0</span>
    </div>
   </td>
  </tr>
@@ -63,14 +63,31 @@ $(function() {
 
 <h3><a id="index_c"></a>- c -</h3><ul>
 <li>capacity()
-: <a class="el" href="classentt_1_1Registry.html#af51d1553722e555eb1557fc0c68f104a">entt::Registry&lt; Entity &gt;</a>
+: <a class="el" href="classentt_1_1Registry.html#aefe4ec26db45257de26da19147a9e3f3">entt::Registry&lt; Entity &gt;</a>
+</li>
+<li>cbegin()
+: <a class="el" href="classentt_1_1PersistentView.html#a5a6d810548ae9959047cc1a6249c5aff">entt::PersistentView&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1RawView.html#a2550b7ceee635d59bac8eddce6523cf3">entt::RawView&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a1ba1127cc520b39c2d147da99000866f">entt::SparseSet&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#af38e9a34f90809eae7b2d51882cc2302">entt::SparseSet&lt; Entity, Type &gt;</a>
+, <a class="el" href="classentt_1_1View.html#a2cefabdbdd85098f9ac789a47fcc930a">entt::View&lt; Entity, Component &gt;</a>
+</li>
+<li>cend()
+: <a class="el" href="classentt_1_1PersistentView.html#a8ae9798901deacb27827f23b9ab51fe2">entt::PersistentView&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1RawView.html#aedfe14bbc1b65afecc549cc65354575f">entt::RawView&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#aaec7e4e14421c38084ef57b13d40a15d">entt::SparseSet&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#ae5994b196eca429c708722ba4b720208">entt::SparseSet&lt; Entity, Type &gt;</a>
+, <a class="el" href="classentt_1_1View.html#ab57c0ac7a0bb1487f525757a07a6bd71">entt::View&lt; Entity, Component &gt;</a>
 </li>
 <li>clear()
-: <a class="el" href="classentt_1_1Emitter.html#a1ada75fa53cc433dd4d1aa5fcef32ecf">entt::Emitter&lt; Derived &gt;</a>
-, <a class="el" href="classentt_1_1ResourceCache.html#a2d179ddd5034e89bd60d69c7f8cf00d7">entt::ResourceCache&lt; Resource &gt;</a>
+: <a class="el" href="classentt_1_1Emitter.html#a4e722d57776f3185e39386e6f252c56b">entt::Emitter&lt; Derived &gt;</a>
+, <a class="el" href="classentt_1_1ResourceCache.html#a9ab70500ad42f8bd565ce1c379f472b4">entt::ResourceCache&lt; Resource &gt;</a>
 , <a class="el" href="classentt_1_1Scheduler.html#a2fd48cfd2ce32308f5e7bb8bafd5cda2">entt::Scheduler&lt; Delta &gt;</a>
-, <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#addb26bed0ae1287d7946d2a194118826">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
-, <a class="el" href="classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#adaa1914b3d748847cf693edb26da08b7">entt::Signal&lt; void(Args...)&gt;</a>
+</li>
+<li>clone()
+: <a class="el" href="classentt_1_1Registry.html#a9aacbda0a34aeaad85eb396603b050ad">entt::Registry&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a79ada4ed181ca00c360807c9280e8f9b">entt::SparseSet&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#abfd5a557a21a5d606a8466b026e73c9e">entt::SparseSet&lt; Entity, Type &gt;</a>
 </li>
 <li>collect()
 : <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#ab6258af321b48bc2e70e09c68155b9bc">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
@@ -79,43 +96,49 @@ $(function() {
 : <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#ad0e4e34e41daec83437b1c607855079a">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
 </li>
 <li>component()
-: <a class="el" href="classentt_1_1ContinuousLoader.html#aa5c5faedbdf6c05993d177e30d42f995">entt::ContinuousLoader&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1Registry.html#ab284cde58cbc42cf0e929edc857f5182">entt::Registry&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1Snapshot.html#a2bb0a44f9157384eaaf6ed652d09a7c0">entt::Snapshot&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1SnapshotLoader.html#a88481c82391a2e930545aa1f540e843e">entt::SnapshotLoader&lt; Entity &gt;</a>
+: <a class="el" href="classentt_1_1ContinuousLoader.html#a9c185ecae861f074afb1d2a14cf4f0f2">entt::ContinuousLoader&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1Snapshot.html#a7c272de52104f0d29186e9b00128fd03">entt::Snapshot&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1SnapshotLoader.html#ac7323002a2314bd65fff27fea3c2c96e">entt::SnapshotLoader&lt; Entity &gt;</a>
 </li>
 <li>component_type
 : <a class="el" href="classentt_1_1Registry.html#aefd07a0cdff88ebf1e35e531d58c3077">entt::Registry&lt; Entity &gt;</a>
 </li>
 <li>connect()
-: <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_01_4.html#af5b14be6bc080a3ed83fa2731d5d0e25">entt::Bus&lt; Sig, Event &gt;</a>
-, <a class="el" href="classentt_1_1Bus_3_01Sig_00_01Event_00_01Other_8_8_8_01_4.html#af1ae094ee06303e7ce521c1f95cb6e35">entt::Bus&lt; Sig, Event, Other... &gt;</a>
-, <a class="el" href="classentt_1_1Delegate_3_01Ret_07Args_8_8_8_08_4.html#a6c5cf47394e3f12aeae6e3aaf628e111">entt::Delegate&lt; Ret(Args...)&gt;</a>
-, <a class="el" href="classentt_1_1Dispatcher.html#ac1625cbf5503c1b705b2215b9bf018d4">entt::Dispatcher&lt; Sig &gt;</a>
-, <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aa08b7a84d99e44a10b4843e4d866c9b1">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
-, <a class="el" href="classentt_1_1Signal_3_01void_07Args_8_8_8_08_4.html#a7a241d0af449033f47e134b72e82a6c0">entt::Signal&lt; void(Args...)&gt;</a>
+: <a class="el" href="classentt_1_1Delegate_3_01Ret_07Args_8_8_8_08_4.html#a51d3c462c56349e09a1c7fe0d58859b7">entt::Delegate&lt; Ret(Args...)&gt;</a>
+, <a class="el" href="classentt_1_1Sink_3_01Ret_07Args_8_8_8_08_4.html#a53d91eccac3db8a7b64534f2b52d31bb">entt::Sink&lt; Ret(Args...)&gt;</a>
 </li>
 <li>Connection()
-: <a class="el" href="structentt_1_1Emitter_1_1Connection.html#a1ccd273683a9fb65a7a4d0c9bf7d0543">entt::Emitter&lt; Derived &gt;::Connection&lt; Event &gt;</a>
+: <a class="el" href="structentt_1_1Emitter_1_1Connection.html#a1091537202d401609a73f0ee3fcc9ea6">entt::Emitter&lt; Derived &gt;::Connection&lt; Event &gt;</a>
+</li>
+<li>const_iterator_type
+: <a class="el" href="classentt_1_1PersistentView.html#a260bd2740fb90caf984ce62c26bb887b">entt::PersistentView&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1RawView.html#a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7">entt::RawView&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#aba42055f0c8a43cae63d443a17f6a5e2">entt::SparseSet&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#a947d3fd0440167f469331a31b1d8d782">entt::SparseSet&lt; Entity, Type &gt;</a>
+, <a class="el" href="classentt_1_1View.html#a81b76e0389ffeb60195a3391c4c5ce3a">entt::View&lt; Entity, Component &gt;</a>
 </li>
 <li>construct()
-: <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#adb65da9a09f41dcf6ec433066a7891c3">entt::SparseSet&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#a63142a81c21687b8c98058fe29cd86b6">entt::SparseSet&lt; Entity, Type &gt;</a>
+: <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a47dad39fa63ac4be07dcd9234c8a57c7">entt::SparseSet&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#acf06fa56b6b0880d546dd3bc0ddc087f">entt::SparseSet&lt; Entity, Type &gt;</a>
+</li>
+<li>construction()
+: <a class="el" href="classentt_1_1Registry.html#a6f6b29268ba11a8526fa3f9d3bdb58e5">entt::Registry&lt; Entity &gt;</a>
 </li>
 <li>contains()
-: <a class="el" href="classentt_1_1PersistentView.html#ae171b0f71a46c7c56b386a0156885f32">entt::PersistentView&lt; Entity, Component &gt;</a>
-, <a class="el" href="classentt_1_1Registry.html#a7059c072d8002af2248439e5b01cac12">entt::Registry&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1ResourceCache.html#abc98a061dd5b9924101ed252bdb3f05b">entt::ResourceCache&lt; Resource &gt;</a>
-, <a class="el" href="classentt_1_1View.html#adf75d690b32cda94b729b1af758e7c19">entt::View&lt; Entity, Component &gt;</a>
+: <a class="el" href="classentt_1_1PersistentView.html#af98a61a6ac04e08b6b46e4163ad3d415">entt::PersistentView&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1Registry.html#a67a9d1a75fa1f8e29091f1127c0f3a70">entt::Registry&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1ResourceCache.html#aa133ec347db1ee8fab5d757b8b24a185">entt::ResourceCache&lt; Resource &gt;</a>
+, <a class="el" href="classentt_1_1View.html#abbc407e2fecdbcf97c129ade5db185e8">entt::View&lt; Entity, Component &gt;</a>
 </li>
 <li>ContinuousLoader()
-: <a class="el" href="classentt_1_1ContinuousLoader.html#a69f620047f7de6eb68eb49bf6842741f">entt::ContinuousLoader&lt; Entity &gt;</a>
+: <a class="el" href="classentt_1_1ContinuousLoader.html#a26ccd96f9ee4219ad7e3d1b8138ade37">entt::ContinuousLoader&lt; Entity &gt;</a>
 </li>
 <li>create()
-: <a class="el" href="classentt_1_1Registry.html#ae1d9f447dfda4794f8d364965eab6586">entt::Registry&lt; Entity &gt;</a>
+: <a class="el" href="classentt_1_1Prototype.html#a9aafbd9b428567729c87f146219c71aa">entt::Prototype&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1Registry.html#a10de276e8fc78fe205907c808ddb8d9a">entt::Registry&lt; Entity &gt;</a>
 </li>
 <li>current()
-: <a class="el" href="classentt_1_1Registry.html#a4e1a07f4170764925864b162277485b6">entt::Registry&lt; Entity &gt;</a>
+: <a class="el" href="classentt_1_1Registry.html#a9e79305f5a066bdc2b272181a08b17ac">entt::Registry&lt; Entity &gt;</a>
 </li>
 </ul>
 </div><!-- contents -->
