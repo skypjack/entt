@@ -104,7 +104,7 @@ Here is a brief list of what it offers today:
 * A constexpr utility for human readable resource identifiers.
 * An incredibly fast entity-component system based on sparse sets, with its own
   views and a _pay for what you use_ policy to adjust performance and memory
-  usage according to the users' requirements.
+  usage according to users' requirements.
 * Actor class for those who aren't confident with entity-component systems.
 * The smallest and most basic implementation of a service locator ever seen.
 * A cooperative scheduler for processes of any type.
@@ -374,8 +374,8 @@ and move assignable. They are list initialized by using the parameters provided
 to construct the component itself. No need to register components or their types
 neither with the registry nor with the entity-component system at all.<br/>
 Systems (the _S_ of an _ECS_) are just plain functions, functors, lambdas or
-whatever the users want. They can accept a `Registry` or a view of any type and
-use them the way they prefer. No need to register systems or their types neither
+whatever users want. They can accept a `Registry` or a view of any type and use
+them the way they prefer. No need to register systems or their types neither
 with the registry nor with the entity-component system at all.
 
 The following sections will explain in short how to use the entity-component
@@ -387,9 +387,9 @@ describe below. For more details, please refer to the inline documentation.
 
 A registry can store and manage entities, as well as create views to iterate the
 underlying data structures.<br/>
-`Registry` is a class template that lets the users decide what's the preferred
-type to represent an entity. Because `std::uint32_t` is large enough for almost
-all the cases, there exists also an alias named `DefaultRegistry` for
+`Registry` is a class template that lets users decide what's the preferred type
+to represent an entity. Because `std::uint32_t` is large enough for almost all
+the cases, there exists also an alias named `DefaultRegistry` for
 `Registry<std::uint32_t>`.
 
 Entities are represented by _entity identifiers_. An entity identifier is an
@@ -428,6 +428,19 @@ auto version = registry.version(entity);
 
 // gets the actual version for the given entity
 auto curr = registry.current(entity);
+```
+
+Finally, there is also a sort of _null identifier_ made available to users. It's
+treated as if it were a _null pointer_ that doesn't identify any entity. A
+registry will reject this identifier in all cases because it isn't considered
+valid.<br/>
+The rules that define a _null identifier_ are a bit tricky to explain. However,
+being `Entity` the type of the entities (for example, `std::uint32_t`), users
+can easily construct a _null identifier_ by flipping all the bits of the _zero_:
+
+```cpp
+using Entity = std::uint32_t;
+const auto null = ~Entity{};
 ```
 
 Components can be assigned to or removed from entities at any time with a few
@@ -552,8 +565,8 @@ Tags undergo the same requirements of components. They can be either plain old
 data structures or more complex and movable data structures with a proper
 constructor.<br/>
 Actually, the same type can be used both as a tag and as a component and the
-registry will not complain about it. It is up to the users to properly manage
-their own types. In some cases, the tag `tag_t` must also be used in order to
+registry will not complain about it. It is up to users to properly manage their
+own types. In some cases, the tag `tag_t` must also be used in order to
 disambiguate overloads of member functions.
 
 Attaching tags to entities and removing them is trivial:
@@ -794,7 +807,7 @@ of another tool for serialization out there. Instead, it accepts an opaque
 object with a suitable interface (namely an _archive_) to serialize its internal
 data structures and restore them later. The way types and instances are
 converted to a bunch of bytes is completely in charge to the archive and thus to
-the users.
+final users.
 
 The goal of the serialization part is to allow users to make both a dump of the
 entire registry or a narrower snapshot, that is to select only the components
@@ -2079,7 +2092,7 @@ In case the cache doesn't contain a resource for the given identifier, the
 function does nothing and returns immediately.
 
 So far, so good. Resources are finally loaded and stored within the cache.<br/>
-They are returned to the users in the form of handles. To get one of them:
+They are returned to users in the form of handles. To get one of them:
 
 ```cpp
 auto handle = cache.handle("my/identifier");
@@ -2117,8 +2130,8 @@ The resource can also be accessed directly using the arrow operator if required:
 auto value = handle->value;
 ```
 
-To test if a handle is still valid, the cast operator to `bool` allows the users
-to use it in a guard:
+To test if a handle is still valid, the cast operator to `bool` allows users to
+use it in a guard:
 
 ```cpp
 if(handle) {

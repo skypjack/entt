@@ -400,8 +400,9 @@ public:
             --available;
         } else {
             entity = entity_type(entities.size());
-            assert(entity < traits_type::entity_mask);
             entities.push_back(entity);
+            // traits_type::entity_mask is reserved to allow for null identifiers
+            assert(entity < traits_type::entity_mask);
         }
 
         return entity;
