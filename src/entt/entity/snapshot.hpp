@@ -48,7 +48,7 @@ class Snapshot final {
     {}
 
     template<typename Component, typename Archive, typename It>
-    void get(Archive &archive, std::size_t sz, It first, It last) {
+    void get(Archive &archive, std::size_t sz, It first, It last) const {
         archive(static_cast<Entity>(sz));
 
         while(first != last) {
@@ -61,7 +61,7 @@ class Snapshot final {
     }
 
     template<typename... Component, typename Archive, typename It, std::size_t... Indexes>
-    void component(Archive &archive, It first, It last, std::index_sequence<Indexes...>) {
+    void component(Archive &archive, It first, It last, std::index_sequence<Indexes...>) const {
         std::array<std::size_t, sizeof...(Indexes)> size{};
         auto begin = first;
 
@@ -99,7 +99,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename Archive>
-    Snapshot & entities(Archive &archive) {
+    const Snapshot & entities(Archive &archive) const {
         archive(static_cast<Entity>(registry.size()));
         registry.each([&archive](const auto entity) { archive(entity); });
         return *this;
@@ -116,7 +116,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename Archive>
-    Snapshot & destroyed(Archive &archive) {
+    const Snapshot & destroyed(Archive &archive) const {
         auto size = registry.capacity() - registry.size();
         archive(static_cast<Entity>(size));
         auto curr = seed;
@@ -141,7 +141,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename Component, typename Archive>
-    Snapshot & component(Archive &archive) {
+    const Snapshot & component(Archive &archive) const {
         const auto sz = registry.template size<Component>();
         const auto *entities = registry.template data<Component>();
 
@@ -167,8 +167,8 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename... Component, typename Archive>
-    std::enable_if_t<(sizeof...(Component) > 1), Snapshot &>
-    component(Archive &archive) {
+    std::enable_if_t<(sizeof...(Component) > 1), const Snapshot &>
+    component(Archive &archive) const {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (component<Component>(archive), 0)... };
         (void)accumulator;
@@ -190,7 +190,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename... Component, typename Archive, typename It>
-    Snapshot & component(Archive &archive, It first, It last) {
+    const Snapshot & component(Archive &archive, It first, It last) const {
         component<Component...>(archive, first, last, std::make_index_sequence<sizeof...(Component)>{});
         return *this;
     }
@@ -207,7 +207,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename Tag, typename Archive>
-    Snapshot & tag(Archive &archive) {
+    const Snapshot & tag(Archive &archive) const {
         const bool has = registry.template has<Tag>();
 
         // numerical length is forced for tags to facilitate loading
@@ -232,8 +232,8 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename... Tag, typename Archive>
-    std::enable_if_t<(sizeof...(Tag) > 1), Snapshot &>
-    tag(Archive &archive) {
+    std::enable_if_t<(sizeof...(Tag) > 1), const Snapshot &>
+    tag(Archive &archive) const {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (tag<Tag>(archive), 0)... };
         (void)accumulator;
@@ -273,7 +273,7 @@ class SnapshotLoader final {
     }
 
     template<typename Archive>
-    void assure(Archive &archive, bool destroyed) {
+    void assure(Archive &archive, bool destroyed) const {
         Entity length{};
         archive(length);
 
@@ -285,7 +285,7 @@ class SnapshotLoader final {
     }
 
     template<typename Type, typename Archive, typename... Args>
-    void assign(Archive &archive, Args... args) {
+    void assign(Archive &archive, Args... args) const {
         Entity length{};
         archive(length);
 
@@ -321,7 +321,7 @@ public:
      * @return A valid loader to continue restoring data.
      */
     template<typename Archive>
-    SnapshotLoader & entities(Archive &archive) {
+    const SnapshotLoader & entities(Archive &archive) const {
         static constexpr auto destroyed = false;
         assure(archive, destroyed);
         return *this;
@@ -338,7 +338,7 @@ public:
      * @return A valid loader to continue restoring data.
      */
     template<typename Archive>
-    SnapshotLoader & destroyed(Archive &archive) {
+    const SnapshotLoader & destroyed(Archive &archive) const {
         static constexpr auto destroyed = true;
         assure(archive, destroyed);
         return *this;
@@ -358,7 +358,7 @@ public:
      * @return A valid loader to continue restoring data.
      */
     template<typename... Component, typename Archive>
-    SnapshotLoader & component(Archive &archive) {
+    const SnapshotLoader & component(Archive &archive) const {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (assign<Component>(archive), 0)... };
         (void)accumulator;
@@ -379,7 +379,7 @@ public:
      * @return A valid loader to continue restoring data.
      */
     template<typename... Tag, typename Archive>
-    SnapshotLoader & tag(Archive &archive) {
+    const SnapshotLoader & tag(Archive &archive) const {
         using accumulator_type = int[];
         accumulator_type accumulator = { 0, (assign<Tag>(archive, tag_t{}), 0)... };
         (void)accumulator;
@@ -396,7 +396,7 @@ public:
      *
      * @return A valid loader to continue restoring data.
      */
-    SnapshotLoader & orphans() {
+    const SnapshotLoader & orphans() const {
         registry.orphans([this](const auto entity) {
             registry.destroy(entity);
         });
@@ -687,7 +687,7 @@ public:
      * @param entity An entity identifier.
      * @return True if `entity` is managed by the loader, false otherwise.
      */
-    bool has(entity_type entity) {
+    bool has(entity_type entity) const ENTT_NOEXCEPT {
         return (remloc.find(entity) != remloc.cend());
     }
 
@@ -703,9 +703,9 @@ public:
      * @param entity An entity identifier.
      * @return The identifier to which `entity` refers in the target registry.
      */
-    entity_type map(entity_type entity) {
+    entity_type map(entity_type entity) const ENTT_NOEXCEPT {
         assert(has(entity));
-        return remloc[entity].first;
+        return remloc.find(entity)->second.first;
     }
 
 private:

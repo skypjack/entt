@@ -2,9 +2,10 @@
 #define ENTT_CORE_IDENT_HPP
 
 
-#include<type_traits>
-#include<cstddef>
-#include<utility>
+#include <type_traits>
+#include <cstddef>
+#include <utility>
+#include "../config/config.h"
 
 
 namespace entt {
@@ -24,12 +25,12 @@ struct Identifier final: Identifier<Types>... {
     using identifier_type = std::size_t;
 
     template<std::size_t... Indexes>
-    constexpr Identifier(std::index_sequence<Indexes...>)
+    constexpr Identifier(std::index_sequence<Indexes...>) ENTT_NOEXCEPT
         : Identifier<Types>{std::index_sequence<Indexes>{}}...
     {}
 
     template<typename Type>
-    constexpr std::size_t get() const {
+    constexpr std::size_t get() const  ENTT_NOEXCEPT {
         return Identifier<std::decay_t<Type>>::get();
     }
 };
@@ -40,11 +41,11 @@ struct Identifier<Type> {
     using identifier_type = std::size_t;
 
     template<std::size_t Index>
-    constexpr Identifier(std::index_sequence<Index>)
+    constexpr Identifier(std::index_sequence<Index>) ENTT_NOEXCEPT
         : index{Index}
     {}
 
-    constexpr std::size_t get() const {
+    constexpr std::size_t get() const ENTT_NOEXCEPT {
         return index;
     }
 

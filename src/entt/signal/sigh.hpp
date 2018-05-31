@@ -31,7 +31,7 @@ struct Invoker<Ret(Args...), Collector> {
 
     virtual ~Invoker() = default;
 
-    bool invoke(Collector &collector, proto_type proto, void *instance, Args... args) {
+    bool invoke(Collector &collector, proto_type proto, void *instance, Args... args) const {
         return collector(proto(instance, args...));
     }
 };
@@ -44,7 +44,7 @@ struct Invoker<void(Args...), Collector> {
 
     virtual ~Invoker() = default;
 
-    bool invoke(Collector &, proto_type proto, void *instance, Args... args) {
+    bool invoke(Collector &, proto_type proto, void *instance, Args... args) const {
         return (proto(instance, args...), true);
     }
 };
@@ -306,7 +306,7 @@ public:
      *
      * @param args Arguments to use to invoke listeners.
      */
-    void publish(Args... args) {
+    void publish(Args... args) const {
         for(auto pos = calls.size(); pos; --pos) {
             auto &call = calls[pos-1];
             call.second(call.first, args...);
@@ -318,7 +318,7 @@ public:
      * @param args Arguments to use to invoke listeners.
      * @return An instance of the collector filled with collected data.
      */
-    collector_type collect(Args... args) {
+    collector_type collect(Args... args) const {
         collector_type collector;
 
         for(auto &&call: calls) {

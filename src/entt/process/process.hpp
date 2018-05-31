@@ -115,7 +115,7 @@ class Process {
     }
 
     template<State S, typename... Args>
-    void tick(char, tag<S>, Args &&...) {}
+    void tick(char, tag<S>, Args &&...) const ENTT_NOEXCEPT {}
 
 protected:
     /**

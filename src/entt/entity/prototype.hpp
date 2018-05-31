@@ -215,11 +215,6 @@ public:
      * prototype(registry, entity);
      * @endcode
      *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
-     *
      * @param registry A valid reference to a registry.
      * @return A valid entity identifier.
      */
@@ -301,11 +296,6 @@ public:
      * prototype(registry, entity);
      * @endcode
      *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
-     *
      * @param registry A valid reference to a registry.
      * @return A valid entity identifier.
      */
@@ -320,8 +310,12 @@ private:
 
 /**
  * @brief Default prototype
+ *
+ * The default prototype is the best choice for almost all the
+ * applications.<br/>
+ * Users should have a really good reason to choose something different.
  */
-using DefaultPrototype = Prototype<uint32_t>;
+using DefaultPrototype = Prototype<std::uint32_t>;
 
 
 }
