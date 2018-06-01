@@ -52,74 +52,71 @@ if(NOT MSVC)
     HAS_LIBCPP)
 
     cmake_pop_check_state()
-    # set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 endif()
 
 #
 # Add EnTT target
 #
 
-#message(STATUS "Compile features: ${CMAKE_CXX_COMPILE_FEATURES}")
-
 add_library(EnTT INTERFACE)
 
 target_include_directories(EnTT INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-  $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+    $<INSTALL_INTERFACE:include>
 )
 
 target_compile_definitions(EnTT
-  INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:DEBUG>
-  INTERFACE $<$<AND:$<CONFIG:Release>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:RELEASE>
+    INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:DEBUG>
+    INTERFACE $<$<AND:$<CONFIG:Release>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:RELEASE>
 )
 
 target_compile_options(EnTT
-  INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-O0 -g>
-  INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:Clang>>:-O2>
-  INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU>>:-O3>
-  INTERFACE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -Wall>
+    INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-O0 -g>
+    INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:Clang>>:-O2>
+    INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU>>:-O3>
+    INTERFACE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -Wall>
 )
 
 if(HAS_LIBCPP)
-  target_compile_options(EnTT BEFORE
-    INTERFACE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-stdlib=libc++>
-  )
+    target_compile_options(EnTT BEFORE
+        INTERFACE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-stdlib=libc++>
+    )
 endif()
 
 target_compile_features(EnTT
-  INTERFACE cxx_std_14
+    INTERFACE cxx_std_14
 )
 
 install(DIRECTORY src/
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} 
 )
 
 install(TARGETS EnTT EXPORT EnTTTargets
-  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(EXPORT EnTTTargets
-  FILE EnTTTargets.cmake
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/entt
+    FILE EnTTTargets.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/entt
 )
 
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(cmake/in/EnTTConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfig.cmake
-  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/entt
-  NO_CHECK_REQUIRED_COMPONENTS_MACRO
+    ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/entt
+    NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )
 
 write_basic_package_version_file(
-  ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfigVersion.cmake
-  VERSION ${TMXPARSER_VERSION}
-  COMPATIBILITY SameMajorVersion
+    ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfigVersion.cmake
+    VERSION ${TMXPARSER_VERSION}
+    COMPATIBILITY SameMajorVersion
 )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfig.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfigVersion.cmake
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/entt
+    ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/entt
 )
 
 #
@@ -155,11 +152,11 @@ endif()
 option(BUILD_DOCS "Enable building with documentation." OFF)
 
 if(BUILD_DOCS)
-  find_package(Doxygen 1.8)
+    find_package(Doxygen 1.8)
 
-  if(DOXYGEN_FOUND)
-    add_subdirectory(docs)
-  endif()
+    if(DOXYGEN_FOUND)
+        add_subdirectory(docs)
+    endif()
 endif()
 
 #
