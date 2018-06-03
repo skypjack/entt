@@ -3,11 +3,10 @@
 
 
 #include <tuple>
-#include <memory>
-#include <vector>
 #include <utility>
 #include <cstddef>
-#include <algorithm>
+#include <type_traits>
+#include <unordered_map>
 #include "registry.hpp"
 
 
@@ -24,43 +23,28 @@ namespace entt {
  * entities of a registry at once.
  *
  * @note
- * Components used along with prototypes must be copy constructible.
+ * Components used along with prototypes must be copy constructible. Prototypes
+ * wrap component types with custom types, so they do not interfere with other
+ * users of the registry they were built with.
+ *
+ * @warning
+ * Prototypes directly use their underlying registries to store entities and
+ * components for their purposes. Users must ensure that the lifetime of a
+ * registry and its contents exceed that of the prototypes that use it.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class Prototype {
+class Prototype final {
+    using fn_type = void(*)(const Prototype &, Registry<Entity> &, const Entity);
     using component_type = typename Registry<Entity>::component_type;
-    using fn_type = void(*)(Registry<Entity> &, const Entity, const void *);
-    using deleter_type = void(*)(void *);
-    using ptr_type = std::unique_ptr<void, deleter_type>;
 
     template<typename Component>
-    static void accommodate(Registry<Entity> &registry, const Entity entity, const void *component) {
-        const auto &ref = *static_cast<const Component *>(component);
-        registry.template accommodate<Component>(entity, ref);
-    }
+    struct Wrapper { Component component; };
 
-    template<typename Component>
-    static void assign(Registry<Entity> &registry, const Entity entity, const void *component) {
-        if(!registry.template has<Component>(entity)) {
-            const auto &ref = *static_cast<const Component *>(component);
-            registry.template assign<Component>(entity, ref);
-        }
-    }
-
-    struct Handler final {
-        Handler(ptr_type component, const fn_type accommodate, const fn_type assign, const component_type type)
-            : component{std::move(component)},
-              accommodate{accommodate},
-              assign{assign},
-              type{type}
-        {}
-
-        ptr_type component{nullptr, +[](void *) {}};
-        fn_type accommodate{nullptr};
-        fn_type assign{nullptr};
-        component_type type;
+    struct Handler {
+        fn_type accommodate;
+        fn_type assign;
     };
 
 public:
@@ -72,6 +56,22 @@ public:
     using size_type = std::size_t;
 
     /**
+     * @brief Constructs a prototype that is bound to a given registry.
+     * @param registry A valid reference to a registry.
+     */
+    Prototype(Registry<Entity> &registry)
+        : registry{registry},
+          entity{registry.create()}
+    {}
+
+    /**
+     * @brief Releases all its resources.
+     */
+    ~Prototype() {
+        registry.destroy(entity);
+    }
+
+    /**
      * @brief Assigns to or replaces the given component of a prototype.
      * @tparam Component Type of component to assign or replace.
      * @tparam Args Types of arguments to use to construct the component.
@@ -80,22 +80,21 @@ public:
      */
     template<typename Component, typename... Args>
     Component & set(Args &&... args) {
-        const auto ctype = registry_type::template type<Component>();
+        fn_type accommodate = [](const Prototype &prototype, Registry<Entity> &other, const Entity dst) {
+            const auto &wrapper = prototype.registry.template get<Wrapper<Component>>(prototype.entity);
+            other.template accommodate<Component>(dst, wrapper.component);
+        };
 
-        auto it = std::find_if(handlers.begin(), handlers.end(), [ctype](const auto &handler) {
-            return handler.type == ctype;
-        });
+        fn_type assign = [](const Prototype &prototype, Registry<Entity> &other, const Entity dst) {
+            if(!other.template has<Component>(dst)) {
+                const auto &wrapper = prototype.registry.template get<Wrapper<Component>>(prototype.entity);
+                other.template accommodate<Component>(dst, wrapper.component);
+            }
+        };
 
-        const auto deleter = +[](void *component) { delete static_cast<Component *>(component); };
-        ptr_type component{new Component{std::forward<Args>(args)...}, deleter};
-
-        if(it == handlers.cend()) {
-            handlers.emplace_back(std::move(component), &Prototype::accommodate<Component>, &Prototype::assign<Component>, ctype);
-        } else {
-            it->component = std::move(component);
-        }
-
-        return get<Component>();
+        handlers[registry.template type<Component>()] = Handler{accommodate, assign};
+        auto &wrapper = registry.template accommodate<Wrapper<Component>>(entity, Component{std::forward<Args>(args)...});
+        return wrapper.component;
     }
 
     /**
@@ -104,9 +103,8 @@ public:
      */
     template<typename Component>
     void unset() ENTT_NOEXCEPT {
-        handlers.erase(std::remove_if(handlers.begin(), handlers.end(), [](const auto &handler) {
-            return handler.type == registry_type::template type<Component>();
-        }), handlers.end());
+        registry.template reset<Wrapper<Component>>(entity);
+        handlers.erase(registry.template type<Component>());
     }
 
     /**
@@ -116,17 +114,7 @@ public:
      */
     template<typename... Component>
     bool has() const ENTT_NOEXCEPT {
-        auto found = [this](const auto ctype) {
-            return std::find_if(handlers.cbegin(), handlers.cend(), [ctype](const auto &handler) {
-                return handler.type == ctype;
-            }) != handlers.cend();
-        };
-
-        bool all = true;
-        using accumulator_type = bool[];
-        accumulator_type accumulator = { all, (all = all && found(registry_type::template type<Component>()))... };
-        (void)accumulator;
-        return all;
+        return registry.template has<Wrapper<Component>...>(entity);
     }
 
     /**
@@ -143,13 +131,7 @@ public:
      */
     template<typename Component>
     const Component & get() const ENTT_NOEXCEPT {
-        assert(has<Component>());
-
-        auto it = std::find_if(handlers.cbegin(), handlers.cend(), [](const auto &handler) {
-            return handler.type == registry_type::template type<Component>();
-        });
-
-        return *static_cast<Component *>(it->component.get());
+        return registry.template get<Wrapper<Component>>(entity).component;
     }
 
     /**
@@ -182,7 +164,7 @@ public:
      * @return References to the components owned by the prototype.
      */
     template<typename... Component>
-    std::enable_if_t<(sizeof...(Component) > 1), std::tuple<const Component &...>>
+    inline std::enable_if_t<(sizeof...(Component) > 1), std::tuple<const Component &...>>
     get() const ENTT_NOEXCEPT {
         return std::tuple<const Component &...>{get<Component>()...};
     }
@@ -200,7 +182,7 @@ public:
      * @return References to the components owned by the prototype.
      */
     template<typename... Component>
-    std::enable_if_t<(sizeof...(Component) > 1), std::tuple<Component &...>>
+    inline std::enable_if_t<(sizeof...(Component) > 1), std::tuple<Component &...>>
     get() ENTT_NOEXCEPT {
         return std::tuple<Component &...>{get<Component>()...};
     }
@@ -215,10 +197,38 @@ public:
      * prototype(registry, entity);
      * @endcode
      *
-     * @param registry A valid reference to a registry.
+     * @note
+     * The registry may or may not be different from the one already used by
+     * the prototype. There is also an overload that directly uses the
+     * underlying registry.
+     *
+     * @param other A valid reference to a registry.
      * @return A valid entity identifier.
      */
-    entity_type create(registry_type &registry) {
+    entity_type create(registry_type &other) const {
+        const auto entity = other.create();
+        assign(other, entity);
+        return entity;
+    }
+
+    /**
+     * @brief Creates a new entity using a given prototype.
+     *
+     * Utility shortcut, equivalent to the following snippet:
+     *
+     * @code{.cpp}
+     * const auto entity = registry.create();
+     * prototype(entity);
+     * @endcode
+     *
+     * @note
+     * This overload directly uses the underlying registry as a working space.
+     * Therefore, the components of the prototype and of the entity will share
+     * the same registry.
+     *
+     * @return A valid entity identifier.
+     */
+    entity_type create() const {
         const auto entity = registry.create();
         assign(registry, entity);
         return entity;
@@ -232,18 +242,49 @@ public:
      * In other words, only those components that the entity doesn't own yet are
      * copied over. All the other components remain unchanged.
      *
+     * @note
+     * The registry may or may not be different from the one already used by
+     * the prototype. There is also an overload that directly uses the
+     * underlying registry.
+     *
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.<br/>
      * An assertion will abort the execution at runtime in debug mode in case of
      * invalid entity.
      *
-     * @param registry A valid reference to a registry.
-     * @param entity A valid entity identifier.
+     * @param other A valid reference to a registry.
+     * @param dst A valid entity identifier.
      */
-    void assign(registry_type &registry, const entity_type entity) {
-        std::for_each(handlers.begin(), handlers.end(), [&registry, entity](auto &&handler) {
-            handler.assign(registry, entity, handler.component.get());
-        });
+    void assign(registry_type &other, const entity_type dst) const {
+        for(auto &handler: handlers) {
+            handler.second.assign(*this, other, dst);
+        }
+    }
+
+    /**
+     * @brief Assigns the components of a prototype to a given entity.
+     *
+     * Assigning a prototype to an entity won't overwrite existing components
+     * under any circumstances.<br/>
+     * In other words, only those components that the entity doesn't own yet are
+     * copied over. All the other components remain unchanged.
+     *
+     * @note
+     * This overload directly uses the underlying registry as a working space.
+     * Therefore, the components of the prototype and of the entity will share
+     * the same registry.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @param dst A valid entity identifier.
+     */
+    void assign(const entity_type dst) const {
+        for(auto &handler: handlers) {
+            handler.second.assign(*this, registry, dst);
+        }
     }
 
     /**
@@ -252,18 +293,47 @@ public:
      * Existing components are overwritten, if any. All the other components
      * will be copied over to the target entity.
      *
+     * @note
+     * The registry may or may not be different from the one already used by
+     * the prototype. There is also an overload that directly uses the
+     * underlying registry.
+     *
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.<br/>
      * An assertion will abort the execution at runtime in debug mode in case of
      * invalid entity.
      *
-     * @param registry A valid reference to a registry.
-     * @param entity A valid entity identifier.
+     * @param other A valid reference to a registry.
+     * @param dst A valid entity identifier.
      */
-    void accommodate(registry_type &registry, const entity_type entity) {
-        std::for_each(handlers.begin(), handlers.end(), [&registry, entity](auto &&handler) {
-            handler.accommodate(registry, entity, handler.component.get());
-        });
+    void accommodate(registry_type &other, const entity_type dst) const {
+        for(auto &handler: handlers) {
+            handler.second.accommodate(*this, other, dst);
+        }
+    }
+
+    /**
+     * @brief Assigns or replaces the components of a prototype for an entity.
+     *
+     * Existing components are overwritten, if any. All the other components
+     * will be copied over to the target entity.
+     *
+     * @note
+     * This overload directly uses the underlying registry as a working space.
+     * Therefore, the components of the prototype and of the entity will share
+     * the same registry.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @param dst A valid entity identifier.
+     */
+    void accommodate(const entity_type dst) const {
+        for(auto &handler: handlers) {
+            handler.second.accommodate(*this, registry, dst);
+        }
     }
 
     /**
@@ -274,16 +344,45 @@ public:
      * In other words, only the components that the entity doesn't own yet are
      * copied over. All the other components remain unchanged.
      *
+     * @note
+     * The registry may or may not be different from the one already used by
+     * the prototype. There is also an overload that directly uses the
+     * underlying registry.
+     *
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.<br/>
      * An assertion will abort the execution at runtime in debug mode in case of
      * invalid entity.
      *
-     * @param registry A valid reference to a registry.
-     * @param entity A valid entity identifier.
+     * @param other A valid reference to a registry.
+     * @param dst A valid entity identifier.
      */
-    inline void operator()(registry_type &registry, const entity_type entity) ENTT_NOEXCEPT {
-        assign(registry, entity);
+    inline void operator()(registry_type &other, const entity_type dst) const ENTT_NOEXCEPT {
+        assign(other, dst);
+    }
+
+    /**
+     * @brief Assigns the components of a prototype to an entity.
+     *
+     * Assigning a prototype to an entity won't overwrite existing components
+     * under any circumstances.<br/>
+     * In other words, only the components that the entity doesn't own yet are
+     * copied over. All the other components remain unchanged.
+     *
+     * @note
+     * This overload directly uses the underlying registry as a working space.
+     * Therefore, the components of the prototype and of the entity will share
+     * the same registry.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @param dst A valid entity identifier.
+     */
+    inline void operator()(const entity_type dst) const ENTT_NOEXCEPT {
+        assign(registry, dst);
     }
 
     /**
@@ -296,15 +395,43 @@ public:
      * prototype(registry, entity);
      * @endcode
      *
-     * @param registry A valid reference to a registry.
+     * @note
+     * The registry may or may not be different from the one already used by
+     * the prototype. There is also an overload that directly uses the
+     * underlying registry.
+     *
+     * @param other A valid reference to a registry.
      * @return A valid entity identifier.
      */
-    inline entity_type operator()(registry_type &registry) ENTT_NOEXCEPT {
+    inline entity_type operator()(registry_type &other) const ENTT_NOEXCEPT {
+        return create(other);
+    }
+
+    /**
+     * @brief Creates a new entity using a given prototype.
+     *
+     * Utility shortcut, equivalent to the following snippet:
+     *
+     * @code{.cpp}
+     * const auto entity = registry.create();
+     * prototype(entity);
+     * @endcode
+     *
+     * @note
+     * This overload directly uses the underlying registry as a working space.
+     * Therefore, the components of the prototype and of the entity will share
+     * the same registry.
+     *
+     * @return A valid entity identifier.
+     */
+    inline entity_type operator()() const ENTT_NOEXCEPT {
         return create(registry);
     }
 
 private:
-    std::vector<Handler> handlers;
+    std::unordered_map<component_type, Handler> handlers;
+    Registry<Entity> &registry;
+    entity_type entity;
 };
 
 

@@ -1057,16 +1057,15 @@ how many prototypes they want, each one initialized differently from the others.
 The following is an example of use of a prototype:
 
 ```cpp
-entt::DefaultPrototype prototype;
+entt::DefaultRegistry registry;
+entt::DefaultPrototype prototype{registry};
 
 prototype.set<Position>(100.f, 100.f);
 prototype.set<Velocity>(0.f, 0.f);
 
 // ...
 
-entt::DefaultRegistry registry;
-
-const auto entity = prototype(registry);
+const auto entity = prototype();
 ```
 
 To assign and remove components from a prototype, it offers two dedicated member
@@ -1079,21 +1078,21 @@ Creating an entity from a prototype is straightforward:
 * To create a new entity from scratch and assign it a prototype, this is the way
   to go:
   ```cpp
-  const auto entity = prototype(registry);
+  const auto entity = prototype();
   ```
   It is equivalent to the following invokation:
   ```cpp
-  const auto entity = prototype.create(registry);
+  const auto entity = prototype.create();
   ```
 
 * In case we want to initialize an already existing entity, we can provide the
   `operator()` directly with the entity identifier:
   ```cpp
-  prototype(registry, entity);
+  prototype(entity);
   ```
   It is equivalent to the following invokation:
   ```cpp
-  prototype.assign(registry, entity);
+  prototype.assign(entity);
   ```
   Note that existing components aren't overwritten in this case. Only those
   components that the entity doesn't own yet are copied over. All the other
@@ -1102,8 +1101,13 @@ Creating an entity from a prototype is straightforward:
 * Finally, to assign or replace all the components for an entity, thus
   overwriting existing ones:
   ```cpp
-  prototype.accommodate(registry, entity);
+  prototype.accommodate(entity);
   ```
+
+In the examples above, the prototype uses its underlying registry to create
+entities and components both for its purposes and when it's cloned. To use a
+different repository to clone a prototype, all the member functions accept also
+a reference to a valid registry as a first argument.
 
 Prototypes are a very useful tool that can save a lot of typing sometimes.
 Furthermore, the codebase may be easier to maintain, since updating a prototype
