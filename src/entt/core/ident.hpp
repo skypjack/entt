@@ -30,7 +30,7 @@ struct Identifier final: Identifier<Types>... {
     {}
 
     template<typename Type>
-    constexpr std::size_t get() const  ENTT_NOEXCEPT {
+    constexpr std::size_t get() const ENTT_NOEXCEPT {
         return Identifier<std::decay_t<Type>>::get();
     }
 };
