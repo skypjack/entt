@@ -9,6 +9,6 @@ var searchData=
   ['process',['Process',['../classentt_1_1Process.html',1,'entt']]],
   ['process_3c_20processadaptor_3c_20func_2c_20delta_20_3e_2c_20delta_20_3e',['Process&lt; ProcessAdaptor&lt; Func, Delta &gt;, Delta &gt;',['../classentt_1_1Process.html',1,'entt']]],
   ['processadaptor',['ProcessAdaptor',['../structentt_1_1ProcessAdaptor.html',1,'entt::ProcessAdaptor&lt; Func, Delta &gt;'],['../structentt_1_1ProcessAdaptor.html#a16a0964a81c537fe16b937696e47358b',1,'entt::ProcessAdaptor::ProcessAdaptor()']]],
-  ['prototype',['Prototype',['../classentt_1_1Prototype.html',1,'entt']]],
-  ['publish',['publish',['../classentt_1_1Emitter.html#ab5141fd9793f53ef83af47c8c8a74b0e',1,'entt::Emitter::publish()'],['../classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a09e4795c05a1ebac1c25a60e79d67507',1,'entt::SigH&lt; Ret(Args...), Collector &gt;::publish()']]]
+  ['prototype',['Prototype',['../classentt_1_1Prototype.html',1,'entt::Prototype&lt; Entity &gt;'],['../classentt_1_1Prototype.html#aa6033be234aad4d287d740c40db17fec',1,'entt::Prototype::Prototype()']]],
+  ['publish',['publish',['../classentt_1_1Emitter.html#ab5141fd9793f53ef83af47c8c8a74b0e',1,'entt::Emitter::publish()'],['../classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a5d3aaec10dba146d75672e3dc81a4274',1,'entt::SigH&lt; Ret(Args...), Collector &gt;::publish()']]]
 ];

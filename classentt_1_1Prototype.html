@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.6.0</span>
+   &#160;<span id="projectnumber">2.6.1</span>
    </div>
   </td>
  </tr>
@@ -69,7 +69,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classentt_1_1Prototype-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">entt::Prototype&lt; Entity &gt; Class Template Reference</div>  </div>
+<div class="title">entt::Prototype&lt; Entity &gt; Class Template Reference<span class="mlabels"><span class="mlabel">final</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -95,6 +95,13 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:aa6033be234aad4d287d740c40db17fec"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#aa6033be234aad4d287d740c40db17fec">Prototype</a> (<a class="el" href="classentt_1_1Registry.html">Registry</a>&lt; Entity &gt; &amp;registry)</td></tr>
+<tr class="memdesc:aa6033be234aad4d287d740c40db17fec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a prototype that is bound to a given registry.  <a href="#aa6033be234aad4d287d740c40db17fec">More...</a><br /></td></tr>
+<tr class="separator:aa6033be234aad4d287d740c40db17fec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb70104c3d32fcf22fbe37afa7602ed5"><td class="memItemLeft" align="right" valign="top"><a id="acb70104c3d32fcf22fbe37afa7602ed5"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#acb70104c3d32fcf22fbe37afa7602ed5">~Prototype</a> ()</td></tr>
+<tr class="memdesc:acb70104c3d32fcf22fbe37afa7602ed5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases all its resources. <br /></td></tr>
+<tr class="separator:acb70104c3d32fcf22fbe37afa7602ed5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf665ce59c8f43c4eff3ce77a21c5cfb"><td class="memTemplParams" colspan="2">template&lt;typename Component , typename... Args&gt; </td></tr>
 <tr class="memitem:abf665ce59c8f43c4eff3ce77a21c5cfb"><td class="memTemplItemLeft" align="right" valign="top">Component &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#abf665ce59c8f43c4eff3ce77a21c5cfb">set</a> (Args &amp;&amp;... args)</td></tr>
 <tr class="memdesc:abf665ce59c8f43c4eff3ce77a21c5cfb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns to or replaces the given component of a prototype.  <a href="#abf665ce59c8f43c4eff3ce77a21c5cfb">More...</a><br /></td></tr>
@@ -123,21 +130,36 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a35fcf29a4c01caa611cffa9f73cbe535"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if_t&lt;(sizeof...(Component) &gt; 1), std::tuple&lt; Component &amp;... &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#a35fcf29a4c01caa611cffa9f73cbe535">get</a> () ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:a35fcf29a4c01caa611cffa9f73cbe535"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the given components.  <a href="#a35fcf29a4c01caa611cffa9f73cbe535">More...</a><br /></td></tr>
 <tr class="separator:a35fcf29a4c01caa611cffa9f73cbe535"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9aafbd9b428567729c87f146219c71aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#a9aafbd9b428567729c87f146219c71aa">create</a> (<a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;registry)</td></tr>
-<tr class="memdesc:a9aafbd9b428567729c87f146219c71aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new entity using a given prototype.  <a href="#a9aafbd9b428567729c87f146219c71aa">More...</a><br /></td></tr>
-<tr class="separator:a9aafbd9b428567729c87f146219c71aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4a070e4f3316e8d2fc95dcb250a685e2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#a4a070e4f3316e8d2fc95dcb250a685e2">assign</a> (<a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;registry, const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a> entity)</td></tr>
-<tr class="memdesc:a4a070e4f3316e8d2fc95dcb250a685e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns the components of a prototype to a given entity.  <a href="#a4a070e4f3316e8d2fc95dcb250a685e2">More...</a><br /></td></tr>
-<tr class="separator:a4a070e4f3316e8d2fc95dcb250a685e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e8f25e418fa8a4667dc474405dd60c4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#a7e8f25e418fa8a4667dc474405dd60c4">accommodate</a> (<a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;registry, const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a> entity)</td></tr>
-<tr class="memdesc:a7e8f25e418fa8a4667dc474405dd60c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns or replaces the components of a prototype for an entity.  <a href="#a7e8f25e418fa8a4667dc474405dd60c4">More...</a><br /></td></tr>
-<tr class="separator:a7e8f25e418fa8a4667dc474405dd60c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1eff99583b394859d6ddd033e37b55b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#a1eff99583b394859d6ddd033e37b55b3">operator()</a> (<a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;registry, const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a> entity) ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:a1eff99583b394859d6ddd033e37b55b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns the components of a prototype to an entity.  <a href="#a1eff99583b394859d6ddd033e37b55b3">More...</a><br /></td></tr>
-<tr class="separator:a1eff99583b394859d6ddd033e37b55b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af68eda2cf40b877c8d880c6d38184e9d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#af68eda2cf40b877c8d880c6d38184e9d">operator()</a> (<a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;registry) ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:af68eda2cf40b877c8d880c6d38184e9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new entity using a given prototype.  <a href="#af68eda2cf40b877c8d880c6d38184e9d">More...</a><br /></td></tr>
-<tr class="separator:af68eda2cf40b877c8d880c6d38184e9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a434b43ae5f761093a0c9e74da0802523"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#a434b43ae5f761093a0c9e74da0802523">create</a> (<a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;other) const</td></tr>
+<tr class="memdesc:a434b43ae5f761093a0c9e74da0802523"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new entity using a given prototype.  <a href="#a434b43ae5f761093a0c9e74da0802523">More...</a><br /></td></tr>
+<tr class="separator:a434b43ae5f761093a0c9e74da0802523"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a659d7582d8fb52c5be59b0a319e2ec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#a5a659d7582d8fb52c5be59b0a319e2ec">create</a> () const</td></tr>
+<tr class="memdesc:a5a659d7582d8fb52c5be59b0a319e2ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new entity using a given prototype.  <a href="#a5a659d7582d8fb52c5be59b0a319e2ec">More...</a><br /></td></tr>
+<tr class="separator:a5a659d7582d8fb52c5be59b0a319e2ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a52cda550a678ee14272cff7b2fcf35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#a0a52cda550a678ee14272cff7b2fcf35">assign</a> (<a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;other, const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a> dst) const</td></tr>
+<tr class="memdesc:a0a52cda550a678ee14272cff7b2fcf35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns the components of a prototype to a given entity.  <a href="#a0a52cda550a678ee14272cff7b2fcf35">More...</a><br /></td></tr>
+<tr class="separator:a0a52cda550a678ee14272cff7b2fcf35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7bf733f40f1071d73d4f3245526c038"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#ab7bf733f40f1071d73d4f3245526c038">assign</a> (const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a> dst) const</td></tr>
+<tr class="memdesc:ab7bf733f40f1071d73d4f3245526c038"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns the components of a prototype to a given entity.  <a href="#ab7bf733f40f1071d73d4f3245526c038">More...</a><br /></td></tr>
+<tr class="separator:ab7bf733f40f1071d73d4f3245526c038"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adaec9cc16436af85ef938fc9686cd02d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#adaec9cc16436af85ef938fc9686cd02d">accommodate</a> (<a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;other, const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a> dst) const</td></tr>
+<tr class="memdesc:adaec9cc16436af85ef938fc9686cd02d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns or replaces the components of a prototype for an entity.  <a href="#adaec9cc16436af85ef938fc9686cd02d">More...</a><br /></td></tr>
+<tr class="separator:adaec9cc16436af85ef938fc9686cd02d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37299298c61bb06a75b697296e328477"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#a37299298c61bb06a75b697296e328477">accommodate</a> (const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a> dst) const</td></tr>
+<tr class="memdesc:a37299298c61bb06a75b697296e328477"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns or replaces the components of a prototype for an entity.  <a href="#a37299298c61bb06a75b697296e328477">More...</a><br /></td></tr>
+<tr class="separator:a37299298c61bb06a75b697296e328477"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7cb69aad2015e94f3a0a9ad42b82f1b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#ac7cb69aad2015e94f3a0a9ad42b82f1b">operator()</a> (<a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;other, const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a> dst) const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:ac7cb69aad2015e94f3a0a9ad42b82f1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns the components of a prototype to an entity.  <a href="#ac7cb69aad2015e94f3a0a9ad42b82f1b">More...</a><br /></td></tr>
+<tr class="separator:ac7cb69aad2015e94f3a0a9ad42b82f1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b0560c31432fb6591a772ce9a322728"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#a6b0560c31432fb6591a772ce9a322728">operator()</a> (const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a> dst) const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a6b0560c31432fb6591a772ce9a322728"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns the components of a prototype to an entity.  <a href="#a6b0560c31432fb6591a772ce9a322728">More...</a><br /></td></tr>
+<tr class="separator:a6b0560c31432fb6591a772ce9a322728"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c401ecc89b0c88ab15ed2dd7686b54e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#a7c401ecc89b0c88ab15ed2dd7686b54e">operator()</a> (<a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;other) const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a7c401ecc89b0c88ab15ed2dd7686b54e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new entity using a given prototype.  <a href="#a7c401ecc89b0c88ab15ed2dd7686b54e">More...</a><br /></td></tr>
+<tr class="separator:a7c401ecc89b0c88ab15ed2dd7686b54e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad39dd5c5449cc647a1402543ebe411fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Prototype.html#ad39dd5c5449cc647a1402543ebe411fe">operator()</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:ad39dd5c5449cc647a1402543ebe411fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new entity using a given prototype.  <a href="#ad39dd5c5449cc647a1402543ebe411fe">More...</a><br /></td></tr>
+<tr class="separator:ad39dd5c5449cc647a1402543ebe411fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Entity&gt;<br />
@@ -146,7 +168,8 @@ class entt::Prototype&lt; Entity &gt;</h3>
 <p><a class="el" href="classentt_1_1Prototype.html" title="Prototype container for concepts. ">Prototype</a> container for <em>concepts</em>. </p>
 <p>A prototype is used to define a <em>concept</em> in terms of components.<br />
  Prototypes act as templates for those specific types of an application which users would otherwise define through a series of component assignments to entities. In other words, prototypes can be used to assign components to entities of a registry at once.</p>
-<dl class="section note"><dt>Note</dt><dd>Components used along with prototypes must be copy constructible.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Components used along with prototypes must be copy constructible. Prototypes wrap component types with custom types, so they do not interfere with other users of the registry they were built with.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Prototypes directly use their underlying registries to store entities and components for their purposes. Users must ensure that the lifetime of a registry and its contents exceed that of the prototypes that use it.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Entity</td><td>A valid entity type (see <a class="el" href="structentt_1_1entt__traits.html" title="Entity traits. ">entt_traits</a> for more details). </td></tr>
@@ -154,10 +177,49 @@ class entt::Prototype&lt; Entity &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00032">32</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a7e8f25e418fa8a4667dc474405dd60c4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7e8f25e418fa8a4667dc474405dd60c4">&#9670;&nbsp;</a></span>accommodate()</h2>
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00039">39</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="aa6033be234aad4d287d740c40db17fec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6033be234aad4d287d740c40db17fec">&#9670;&nbsp;</a></span>Prototype()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1Prototype.html">entt::Prototype</a>&lt; Entity &gt;::<a class="el" href="classentt_1_1Prototype.html">Prototype</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classentt_1_1Registry.html">Registry</a>&lt; Entity &gt; &amp;&#160;</td>
+          <td class="paramname"><em>registry</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a prototype that is bound to a given registry. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">registry</td><td>A valid reference to a registry. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00063">63</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="adaec9cc16436af85ef938fc9686cd02d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adaec9cc16436af85ef938fc9686cd02d">&#9670;&nbsp;</a></span>accommodate() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -171,18 +233,18 @@ template&lt;typename Entity &gt; </div>
           <td class="memname">void <a class="el" href="classentt_1_1Prototype.html">entt::Prototype</a>&lt; Entity &gt;::accommodate </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;&#160;</td>
-          <td class="paramname"><em>registry</em>, </td>
+          <td class="paramname"><em>other</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a>&#160;</td>
-          <td class="paramname"><em>entity</em>&#160;</td>
+          <td class="paramname"><em>dst</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> const</td>
         </tr>
       </table>
   </td>
@@ -194,22 +256,65 @@ template&lt;typename Entity &gt; </div>
 
 <p>Assigns or replaces the components of a prototype for an entity. </p>
 <p>Existing components are overwritten, if any. All the other components will be copied over to the target entity.</p>
+<dl class="section note"><dt>Note</dt><dd>The registry may or may not be different from the one already used by the prototype. There is also an overload that directly uses the underlying registry.</dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br />
  An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">registry</td><td>A valid reference to a registry. </td></tr>
-    <tr><td class="paramname">entity</td><td>A valid entity identifier. </td></tr>
+    <tr><td class="paramname">other</td><td>A valid reference to a registry. </td></tr>
+    <tr><td class="paramname">dst</td><td>A valid entity identifier. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00268">268</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00310">310</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a4a070e4f3316e8d2fc95dcb250a685e2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4a070e4f3316e8d2fc95dcb250a685e2">&#9670;&nbsp;</a></span>assign()</h2>
+<a id="a37299298c61bb06a75b697296e328477"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37299298c61bb06a75b697296e328477">&#9670;&nbsp;</a></span>accommodate() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classentt_1_1Prototype.html">entt::Prototype</a>&lt; Entity &gt;::accommodate </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a>&#160;</td>
+          <td class="paramname"><em>dst</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assigns or replaces the components of a prototype for an entity. </p>
+<p>Existing components are overwritten, if any. All the other components will be copied over to the target entity.</p>
+<dl class="section note"><dt>Note</dt><dd>This overload directly uses the underlying registry as a working space. Therefore, the components of the prototype and of the entity will share the same registry.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br />
+ An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dst</td><td>A valid entity identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00334">334</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a0a52cda550a678ee14272cff7b2fcf35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a52cda550a678ee14272cff7b2fcf35">&#9670;&nbsp;</a></span>assign() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -223,18 +328,18 @@ template&lt;typename Entity &gt; </div>
           <td class="memname">void <a class="el" href="classentt_1_1Prototype.html">entt::Prototype</a>&lt; Entity &gt;::assign </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;&#160;</td>
-          <td class="paramname"><em>registry</em>, </td>
+          <td class="paramname"><em>other</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a>&#160;</td>
-          <td class="paramname"><em>entity</em>&#160;</td>
+          <td class="paramname"><em>dst</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> const</td>
         </tr>
       </table>
   </td>
@@ -247,22 +352,66 @@ template&lt;typename Entity &gt; </div>
 <p>Assigns the components of a prototype to a given entity. </p>
 <p>Assigning a prototype to an entity won't overwrite existing components under any circumstances.<br />
  In other words, only those components that the entity doesn't own yet are copied over. All the other components remain unchanged.</p>
+<dl class="section note"><dt>Note</dt><dd>The registry may or may not be different from the one already used by the prototype. There is also an overload that directly uses the underlying registry.</dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br />
  An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">registry</td><td>A valid reference to a registry. </td></tr>
-    <tr><td class="paramname">entity</td><td>A valid entity identifier. </td></tr>
+    <tr><td class="paramname">other</td><td>A valid reference to a registry. </td></tr>
+    <tr><td class="paramname">dst</td><td>A valid entity identifier. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00248">248</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00259">259</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a9aafbd9b428567729c87f146219c71aa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9aafbd9b428567729c87f146219c71aa">&#9670;&nbsp;</a></span>create()</h2>
+<a id="ab7bf733f40f1071d73d4f3245526c038"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7bf733f40f1071d73d4f3245526c038">&#9670;&nbsp;</a></span>assign() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classentt_1_1Prototype.html">entt::Prototype</a>&lt; Entity &gt;::assign </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a>&#160;</td>
+          <td class="paramname"><em>dst</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assigns the components of a prototype to a given entity. </p>
+<p>Assigning a prototype to an entity won't overwrite existing components under any circumstances.<br />
+ In other words, only those components that the entity doesn't own yet are copied over. All the other components remain unchanged.</p>
+<dl class="section note"><dt>Note</dt><dd>This overload directly uses the underlying registry as a working space. Therefore, the components of the prototype and of the entity will share the same registry.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br />
+ An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dst</td><td>A valid entity identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00285">285</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a434b43ae5f761093a0c9e74da0802523"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a434b43ae5f761093a0c9e74da0802523">&#9670;&nbsp;</a></span>create() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -276,8 +425,8 @@ template&lt;typename Entity &gt; </div>
           <td class="memname"><a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a> <a class="el" href="classentt_1_1Prototype.html">entt::Prototype</a>&lt; Entity &gt;::create </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;&#160;</td>
-          <td class="paramname"><em>registry</em></td><td>)</td>
-          <td></td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -289,17 +438,50 @@ template&lt;typename Entity &gt; </div>
 
 <p>Creates a new entity using a given prototype. </p>
 <p>Utility shortcut, equivalent to the following snippet:</p>
-<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> entity = registry.create();</div><div class="line">prototype(registry, entity);</div></div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
+<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> entity = registry.create();</div><div class="line">prototype(registry, entity);</div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The registry may or may not be different from the one already used by the prototype. There is also an overload that directly uses the underlying registry.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">registry</td><td>A valid reference to a registry. </td></tr>
+    <tr><td class="paramname">other</td><td>A valid reference to a registry. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00226">226</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00209">209</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a5a659d7582d8fb52c5be59b0a319e2ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a659d7582d8fb52c5be59b0a319e2ec">&#9670;&nbsp;</a></span>create() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a> <a class="el" href="classentt_1_1Prototype.html">entt::Prototype</a>&lt; Entity &gt;::create </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a new entity using a given prototype. </p>
+<p>Utility shortcut, equivalent to the following snippet:</p>
+<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> entity = registry.create();</div><div class="line">prototype(entity);</div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>This overload directly uses the underlying registry as a working space. Therefore, the components of the prototype and of the entity will share the same registry.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00232">232</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
 
 </div>
 </div>
@@ -341,7 +523,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the component owned by the prototype. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00145">145</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00134">134</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
 
 </div>
 </div>
@@ -383,7 +565,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the component owned by the prototype. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00168">168</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00151">151</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
 
 </div>
 </div>
@@ -425,7 +607,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>References to the components owned by the prototype. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00186">186</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00169">169</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
 
 </div>
 </div>
@@ -467,7 +649,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>References to the components owned by the prototype. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00204">204</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00187">187</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
 
 </div>
 </div>
@@ -507,12 +689,12 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the prototype owns all the components, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00118">118</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00117">117</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a1eff99583b394859d6ddd033e37b55b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1eff99583b394859d6ddd033e37b55b3">&#9670;&nbsp;</a></span>operator()() <span class="overload">[1/2]</span></h2>
+<a id="ac7cb69aad2015e94f3a0a9ad42b82f1b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7cb69aad2015e94f3a0a9ad42b82f1b">&#9670;&nbsp;</a></span>operator()() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -526,18 +708,18 @@ template&lt;typename Entity &gt; </div>
           <td class="memname">void <a class="el" href="classentt_1_1Prototype.html">entt::Prototype</a>&lt; Entity &gt;::operator() </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;&#160;</td>
-          <td class="paramname"><em>registry</em>, </td>
+          <td class="paramname"><em>other</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a>&#160;</td>
-          <td class="paramname"><em>entity</em>&#160;</td>
+          <td class="paramname"><em>dst</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> const</td>
         </tr>
       </table>
   </td>
@@ -550,22 +732,66 @@ template&lt;typename Entity &gt; </div>
 <p>Assigns the components of a prototype to an entity. </p>
 <p>Assigning a prototype to an entity won't overwrite existing components under any circumstances.<br />
  In other words, only the components that the entity doesn't own yet are copied over. All the other components remain unchanged.</p>
+<dl class="section note"><dt>Note</dt><dd>The registry may or may not be different from the one already used by the prototype. There is also an overload that directly uses the underlying registry.</dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br />
  An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">registry</td><td>A valid reference to a registry. </td></tr>
-    <tr><td class="paramname">entity</td><td>A valid entity identifier. </td></tr>
+    <tr><td class="paramname">other</td><td>A valid reference to a registry. </td></tr>
+    <tr><td class="paramname">dst</td><td>A valid entity identifier. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00290">290</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00361">361</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
 
 </div>
 </div>
-<a id="af68eda2cf40b877c8d880c6d38184e9d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af68eda2cf40b877c8d880c6d38184e9d">&#9670;&nbsp;</a></span>operator()() <span class="overload">[2/2]</span></h2>
+<a id="a6b0560c31432fb6591a772ce9a322728"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b0560c31432fb6591a772ce9a322728">&#9670;&nbsp;</a></span>operator()() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classentt_1_1Prototype.html">entt::Prototype</a>&lt; Entity &gt;::operator() </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a>&#160;</td>
+          <td class="paramname"><em>dst</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assigns the components of a prototype to an entity. </p>
+<p>Assigning a prototype to an entity won't overwrite existing components under any circumstances.<br />
+ In other words, only the components that the entity doesn't own yet are copied over. All the other components remain unchanged.</p>
+<dl class="section note"><dt>Note</dt><dd>This overload directly uses the underlying registry as a working space. Therefore, the components of the prototype and of the entity will share the same registry.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br />
+ An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dst</td><td>A valid entity identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00385">385</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a7c401ecc89b0c88ab15ed2dd7686b54e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c401ecc89b0c88ab15ed2dd7686b54e">&#9670;&nbsp;</a></span>operator()() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -579,8 +805,8 @@ template&lt;typename Entity &gt; </div>
           <td class="memname"><a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a> <a class="el" href="classentt_1_1Prototype.html">entt::Prototype</a>&lt; Entity &gt;::operator() </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">registry_type</a> &amp;&#160;</td>
-          <td class="paramname"><em>registry</em></td><td>)</td>
-          <td></td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -592,17 +818,50 @@ template&lt;typename Entity &gt; </div>
 
 <p>Creates a new entity using a given prototype. </p>
 <p>Utility shortcut, equivalent to the following snippet:</p>
-<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> entity = registry.create();</div><div class="line">prototype(registry, entity);</div></div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Attempting to use an invalid entity results in undefined behavior.<br />
- An assertion will abort the execution at runtime in debug mode in case of invalid entity.</dd></dl>
+<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> entity = registry.create();</div><div class="line">prototype(registry, entity);</div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The registry may or may not be different from the one already used by the prototype. There is also an overload that directly uses the underlying registry.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">registry</td><td>A valid reference to a registry. </td></tr>
+    <tr><td class="paramname">other</td><td>A valid reference to a registry. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00312">312</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00407">407</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ad39dd5c5449cc647a1402543ebe411fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad39dd5c5449cc647a1402543ebe411fe">&#9670;&nbsp;</a></span>operator()() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entity_type</a> <a class="el" href="classentt_1_1Prototype.html">entt::Prototype</a>&lt; Entity &gt;::operator() </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a new entity using a given prototype. </p>
+<p>Utility shortcut, equivalent to the following snippet:</p>
+<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keyword">auto</span> entity = registry.create();</div><div class="line">prototype(entity);</div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>This overload directly uses the underlying registry as a working space. Therefore, the components of the prototype and of the entity will share the same registry.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A valid entity identifier. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00428">428</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
 
 </div>
 </div>
@@ -650,7 +909,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00082">82</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="prototype_8hpp_source.html#l00083">83</a> of file <a class="el" href="prototype_8hpp_source.html">prototype.hpp</a>.</p>
 
 </div>
 </div>

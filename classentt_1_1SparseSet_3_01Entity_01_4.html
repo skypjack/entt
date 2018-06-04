@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">entt
-   &#160;<span id="projectnumber">2.6.0</span>
+   &#160;<span id="projectnumber">2.6.1</span>
    </div>
   </td>
  </tr>
@@ -178,9 +178,6 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a47dad39fa63ac4be07dcd9234c8a57c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a47dad39fa63ac4be07dcd9234c8a57c7">construct</a> (const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a> entity)</td></tr>
 <tr class="memdesc:a47dad39fa63ac4be07dcd9234c8a57c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns an entity to a sparse set.  <a href="#a47dad39fa63ac4be07dcd9234c8a57c7">More...</a><br /></td></tr>
 <tr class="separator:a47dad39fa63ac4be07dcd9234c8a57c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79ada4ed181ca00c360807c9280e8f9b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a79ada4ed181ca00c360807c9280e8f9b">clone</a> (const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a> entity, const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a> source)</td></tr>
-<tr class="memdesc:a79ada4ed181ca00c360807c9280e8f9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns an entity to a sparse set by cloning another entity.  <a href="#a79ada4ed181ca00c360807c9280e8f9b">More...</a><br /></td></tr>
-<tr class="separator:a79ada4ed181ca00c360807c9280e8f9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7bd15b00eb2ce0e52d3d957673b4dd97"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7bd15b00eb2ce0e52d3d957673b4dd97">destroy</a> (const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a> entity)</td></tr>
 <tr class="memdesc:a7bd15b00eb2ce0e52d3d957673b4dd97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes an entity from a sparse set.  <a href="#a7bd15b00eb2ce0e52d3d957673b4dd97">More...</a><br /></td></tr>
 <tr class="separator:a7bd15b00eb2ce0e52d3d957673b4dd97"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -352,59 +349,6 @@ template&lt;typename Entity &gt; </div>
 
 </div>
 </div>
-<a id="a79ada4ed181ca00c360807c9280e8f9b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a79ada4ed181ca00c360807c9280e8f9b">&#9670;&nbsp;</a></span>clone()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Entity &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void <a class="el" href="classentt_1_1SparseSet.html">entt::SparseSet</a>&lt; Entity &gt;::clone </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a>&#160;</td>
-          <td class="paramname"><em>entity</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a>&#160;</td>
-          <td class="paramname"><em>source</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assigns an entity to a sparse set by cloning another entity. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Attempting to clone an entity that doesn't belong to the sparse set or to assign an entity that already belongs to the sparse set results in undefined behavior.<br />
- An assertion will abort the execution at runtime in debug mode if the sparse set doesn't contain the entity to clone or if it already contains the given entity.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">entity</td><td>A valid entity identifier. </td></tr>
-    <tr><td class="paramname">source</td><td>A valid entity identifier from which to clone. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Reimplemented in <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#abfd5a557a21a5d606a8466b026e73c9e">entt::SparseSet&lt; Entity, Type &gt;</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00394">394</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
-
-</div>
-</div>
 <a id="a47dad39fa63ac4be07dcd9234c8a57c7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a47dad39fa63ac4be07dcd9234c8a57c7">&#9670;&nbsp;</a></span>construct()</h2>
 
@@ -517,7 +461,7 @@ template&lt;typename Entity &gt; </div>
 
 <p>Reimplemented in <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#ae763b848ccde63e554f5b3f04b9dcdea">entt::SparseSet&lt; Entity, Type &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00413">413</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00391">391</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -916,7 +860,7 @@ template&lt;typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00467">467</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00445">445</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -1001,7 +945,7 @@ template&lt;typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00439">439</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00417">417</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>

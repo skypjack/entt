@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['tag',['tag',['../classentt_1_1Snapshot.html#a974ac8ba41fb8bac536a115edea03dbe',1,'entt::Snapshot::tag(Archive &amp;archive)'],['../classentt_1_1Snapshot.html#a4b0f272d334d54fcd9e59318cee96a58',1,'entt::Snapshot::tag(Archive &amp;archive)'],['../classentt_1_1SnapshotLoader.html#a88dae592f38013a258046f8c2e5b0fbb',1,'entt::SnapshotLoader::tag()'],['../classentt_1_1ContinuousLoader.html#a8d50d3f90d95b370305561da67da6c3b',1,'entt::ContinuousLoader::tag()']]],
+  ['tag',['tag',['../classentt_1_1Snapshot.html#ac13d5fe79511e27f7b935e84c112e051',1,'entt::Snapshot::tag(Archive &amp;archive) const'],['../classentt_1_1Snapshot.html#a960471c2f13bc1c693a9c58396e63b93',1,'entt::Snapshot::tag(Archive &amp;archive) const'],['../classentt_1_1SnapshotLoader.html#afc4964c76a8fc7a8a1c6a435babc796f',1,'entt::SnapshotLoader::tag()'],['../classentt_1_1ContinuousLoader.html#a8d50d3f90d95b370305561da67da6c3b',1,'entt::ContinuousLoader::tag()']]],
   ['tag_5ft',['tag_t',['../structentt_1_1tag__t.html',1,'entt']]],
   ['tag_5ftype',['tag_type',['../classentt_1_1Registry.html#a357cfdc1b3c5abc7a36e8eddbd6ce5c7',1,'entt::Registry']]],
   ['temp',['temp',['../classentt_1_1ResourceCache.html#a00ad6d9478d2f6721f0a846b49adec07',1,'entt::ResourceCache']]],
