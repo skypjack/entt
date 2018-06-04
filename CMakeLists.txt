@@ -87,6 +87,16 @@ target_compile_features(EnTT
     INTERFACE cxx_std_14
 )
 
+#
+# Install EnTT
+#
+
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+  set(ENTT_INSTALL_CONFIGDIR cmake)
+else()
+  set(ENTT_INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/entt)
+endif()
+
 install(DIRECTORY src/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} 
 )
@@ -97,27 +107,29 @@ install(TARGETS EnTT EXPORT EnTTTargets
 
 install(EXPORT EnTTTargets
     FILE EnTTTargets.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/entt
+    DESTINATION ${ENTT_INSTALL_CONFIGDIR} 
 )
 
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(cmake/in/EnTTConfig.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfig.cmake
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/entt
+    INSTALL_DESTINATION ${ENTT_INSTALL_CONFIGDIR} 
     NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )
 
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfigVersion.cmake
-    VERSION ${TMXPARSER_VERSION}
+    VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMajorVersion
 )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfig.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfigVersion.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/entt
+    DESTINATION ${ENTT_INSTALL_CONFIGDIR}
 )
+
+export(PACKAGE EnTT)
 
 #
 # Tests
