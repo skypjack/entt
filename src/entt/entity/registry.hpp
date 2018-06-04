@@ -409,51 +409,6 @@ public:
     }
 
     /**
-     * @brief Clones an entity and returns the newly created one.
-     *
-     * There are two kinds of entity identifiers:
-     *
-     * * Newly created ones in case no entities have been previously destroyed.
-     * * Recycled ones with updated versions.
-     *
-     * Users should not care about the type of the returned entity identifier.
-     * In case entity identifers are stored around, the `valid` member
-     * function can be used to know if they are still valid or the entity has
-     * been destroyed and potentially recycled.
-     *
-     * @warning
-     * In case there are listeners that observe the construction of components
-     * and assign other components to the entity in their bodies, the result of
-     * invoking this function may not be as expected. In the worst case, it
-     * could lead to undefined behavior. An assertion will abort the execution
-     * at runtime in debug mode if a violation is detected.
-     *
-     * @warning
-     * Attempting to clone an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
-     *
-     * @param entity A valid entity identifier
-     * @return A valid entity identifier.
-     */
-    entity_type clone(const entity_type entity) ENTT_NOEXCEPT {
-        assert(valid(entity));
-        const auto other = create();
-
-        for(auto pos = pools.size(); pos; --pos) {
-            auto &tup = pools[pos-1];
-            auto &cpool = std::get<0>(tup);
-
-            if(cpool && cpool->has(entity)) {
-                cpool->clone(other, entity);
-                std::get<1>(tup).publish(*this, other);
-            }
-        }
-
-        return other;
-    }
-
-    /**
      * @brief Destroys an entity and lets the registry recycle the identifier.
      *
      * When an entity is destroyed, its version is updated and the identifier

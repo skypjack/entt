@@ -54,23 +54,6 @@ TEST(SparseSetNoType, Functionalities) {
     other = std::move(set);
 }
 
-TEST(SparseSetNoType, Clone) {
-    entt::SparseSet<unsigned int> set;
-
-    ASSERT_FALSE(set.has(0));
-    ASSERT_FALSE(set.has(42));
-
-    set.construct(0);
-
-    ASSERT_TRUE(set.has(0));
-    ASSERT_FALSE(set.has(42));
-
-    set.clone(42, 0);
-
-    ASSERT_TRUE(set.has(0));
-    ASSERT_TRUE(set.has(42));
-}
-
 TEST(SparseSetNoType, DataBeginEnd) {
     entt::SparseSet<unsigned int> set;
 
@@ -322,26 +305,6 @@ TEST(SparseSetWithType, Functionalities) {
     (void)entt::SparseSet<unsigned int>{std::move(set)};
     entt::SparseSet<unsigned int> other;
     other = std::move(set);
-}
-
-TEST(SparseSetWithType, Clone) {
-    entt::SparseSet<unsigned int, int> set;
-
-    ASSERT_FALSE(set.has(0));
-    ASSERT_FALSE(set.has(42));
-
-    set.construct(0, 3);
-
-    ASSERT_TRUE(set.has(0));
-    ASSERT_FALSE(set.has(42));
-    ASSERT_EQ(set.get(0), 3);
-
-    set.clone(42, 0);
-
-    ASSERT_TRUE(set.has(0));
-    ASSERT_TRUE(set.has(42));
-    ASSERT_EQ(set.get(0), set.get(42));
-    ASSERT_EQ(set.get(42), 3);
 }
 
 TEST(SparseSetWithType, AggregatesMustWork) {
@@ -722,4 +685,19 @@ TEST(SparseSetWithType, ReferencesGuaranteed) {
 
     ASSERT_EQ(set.get(0).value, 3);
     ASSERT_EQ(set.get(1).value, 3);
+}
+
+TEST(SparseSetWithType, MoveOnlyComponent) {
+    struct MoveOnlyComponent {
+        MoveOnlyComponent() = default;
+        ~MoveOnlyComponent() = default;
+        MoveOnlyComponent(const MoveOnlyComponent &) = delete;
+        MoveOnlyComponent(MoveOnlyComponent &&) = default;
+        MoveOnlyComponent & operator=(const MoveOnlyComponent &) = delete;
+        MoveOnlyComponent & operator=(MoveOnlyComponent &&) = default;
+    };
+
+    // it's purpose is to ensure that move only components are always accepted
+    entt::SparseSet<unsigned int, MoveOnlyComponent> set;
+    (void)set;
 }

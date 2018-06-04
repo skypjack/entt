@@ -396,25 +396,19 @@ Entities are represented by _entity identifiers_. An entity identifier is an
 opaque type that users should not inspect or modify in any way. It carries
 information about the entity itself and its version.
 
-A registry can be used both to construct and destroy entities, as well as to
-clone already existing entities:
+A registry can be used both to construct and destroy entities:
 
 ```cpp
 // constructs a naked entity with no components and returns its identifier
 auto entity = registry.create();
 
-// clones an entity and assigns all its components by copy to the newly created one
-auto other = registry.clone(entity);
-
 // destroys an entity and all its components
 registry.destroy(entity);
 ```
 
-Be aware that cloning an entity can lead to unexpected results under certain
-conditions. Please refer to the inline documentation for more details.<br/>
-Once an entity is deleted, the registry can freely reuse it internally with a
+When an entity is destroyed, the registry can freely reuse it internally with a
 slightly different identifier. In particular, the version of an entity is
-increased each and every time it's destroyed.<br/>
+increased each and every time it's discarded.<br/>
 In case entity identifiers are stored around, the registry offers all the
 functionalities required to test them and get out of the them all the
 information they carry:

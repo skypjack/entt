@@ -354,23 +354,6 @@ TEST(DefaultRegistry, CreateDestroyEntities) {
     ASSERT_EQ(registry.current(pre), registry.current(post));
 }
 
-TEST(DefaultRegistry, CloneEntities) {
-    entt::DefaultRegistry registry;
-
-    const auto entity = registry.create();
-    registry.assign<int>(entity, 42);
-    registry.assign<char>(entity, 'c');
-
-    const auto other = registry.clone(entity);
-
-    ASSERT_TRUE(registry.has<int>(other));
-    ASSERT_TRUE(registry.has<char>(other));
-    ASSERT_EQ(registry.get<int>(entity), registry.get<int>(other));
-    ASSERT_EQ(registry.get<char>(entity), registry.get<char>(other));
-    ASSERT_EQ(registry.get<int>(other), 42);
-    ASSERT_EQ(registry.get<char>(other), 'c');
-}
-
 TEST(DefaultRegistry, AttachSetRemoveTags) {
     entt::DefaultRegistry registry;
     const auto &cregistry = registry;
@@ -718,11 +701,6 @@ TEST(DefaultRegistry, ComponentSignals) {
     registry.destroy(e1);
 
     ASSERT_EQ(listener.counter, 1);
-    ASSERT_EQ(listener.last, e1);
-
-    e1 = registry.clone(e0);
-
-    ASSERT_EQ(listener.counter, 2);
     ASSERT_EQ(listener.last, e1);
 }
 
