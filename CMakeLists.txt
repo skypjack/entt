@@ -34,11 +34,14 @@ message("* ${PROJECT_NAME} v${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
 message("* Copyright (c) 2018 ${PROJECT_AUTHOR} <${PROJECT_AUTHOR_EMAIL}>")
 message("*")
 
+option(ENTT_COMPILE_OPTIONS "Use compile options from EnTT." ON)
+option(USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if availbale." ON)
+
 #
 # Compiler stuff
 #
 
-if(NOT MSVC)
+if(NOT MSVC AND USE_LIBCPP)
     include(CheckCXXSourceCompiles)
     include(CMakePushCheckState)
     
@@ -49,7 +52,11 @@ if(NOT MSVC)
     check_cxx_source_compiles("
         #include<type_traits>
         int main() { return std::is_same<int, int>::value ? 0 : 1; }"
-    HAS_LIBCPP)
+        HAS_LIBCPP)
+
+      if(USE_LIBCPP AND NOT HAS_LIBCPP)
+        message(WARNING "The option USE_LIBCPP is set (by default) but libc++ is not available. The flag will not be added to the target")
+    endif()
 
     cmake_pop_check_state()
 endif()
@@ -70,16 +77,17 @@ target_compile_definitions(EnTT
     INTERFACE $<$<AND:$<CONFIG:Release>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:RELEASE>
 )
 
-target_compile_options(EnTT
-    INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-O0 -g>
-    INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:Clang>>:-O2>
-    INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU>>:-O3>
-    INTERFACE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -Wall>
-)
+if(ENTT_COMPILE_OPTIONS)
+    target_compile_options(EnTT
+        INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-O0 -g>
+        INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:Clang>>:-O2>
+        INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU>>:-O3>
+    )
+endif()
 
-if(HAS_LIBCPP)
+if(USE_LIBCPP AND HAS_LIBCPP)
     target_compile_options(EnTT BEFORE
-        INTERFACE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-stdlib=libc++>
+        INTERFACE -stdlib=libc++
     )
 endif()
 
