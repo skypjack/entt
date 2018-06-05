@@ -181,6 +181,59 @@ TEST(Benchmark, ParallelIterateSingleComponentRaw1M) {
 	});
 }
 
+TEST(Benchmark, ParallelIterateSingleComponentHeavyInternalFunction) {
+	entt::DefaultRegistry registry;
+
+	std::cout << "Parallel iteration over 1000 entities, heavy internal function, one component, raw view" << std::endl;
+
+	for (std::uint64_t i = 100000; i < 101000L; i++) {
+		const auto entity = registry.create();
+		registry.assign<Position>(entity,i, i);
+	}
+
+	auto test = [&registry](auto func) {
+		std::cout << "Serial:";
+		Timer timer;
+		registry.view<Position>(entt::raw_t{}).each(func);
+		timer.elapsed();
+	};
+	auto par_test = [&registry](auto func) {
+		std::cout << "Parallel:";
+		Timer timer;
+		registry.view<Position>(entt::raw_t{}).par_each(func);
+		timer.elapsed();
+	};
+
+	//calculate if the number in Position.x is a prime as a "expensive" function
+	test([](Position & p) {
+		p.y = 0;
+		for (int i = 2; i <= p.x / 2; ++i)
+		{
+			if (p.x % i == 0)
+			{
+				p.y = 1;
+				return;
+			}
+		}	
+	});
+	par_test([](Position & p) {
+		p.y = 0;
+		for (int i = 2; i <= p.x / 2; ++i)
+		{
+			if (p.x % i == 0)
+			{
+				p.y = 1;
+				return;
+			}
+		}
+	});
+	test([](auto &... comp) {
+		using accumulator_type = int[];
+		accumulator_type accumulator = { (comp.x = {}, 0)... };
+		(void)accumulator;
+	});
+}
+
 TEST(Benchmark, IterateTwoComponents1M) {
     entt::DefaultRegistry registry;
 
