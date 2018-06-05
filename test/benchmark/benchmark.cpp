@@ -264,6 +264,31 @@ TEST(Benchmark, IterateTwoComponentsPersistent1M) {
         (void)accumulator;
     });
 }
+TEST(Benchmark, ParallelIterateTwoComponentsPersistent1M) {
+	entt::DefaultRegistry registry;
+	registry.prepare<Position, Velocity>();
+
+	std::cout << "Parallel Iteration over 1000000 entities, two components, persistent view" << std::endl;
+
+	for (std::uint64_t i = 0; i < 1000000L; i++) {
+		const auto entity = registry.create();
+		registry.assign<Position>(entity);
+		registry.assign<Velocity>(entity);
+	}
+
+	auto test = [&registry](auto func) {
+		Timer timer;
+		registry.view<Position, Velocity>(entt::persistent_t{}).par_each(func);
+		timer.elapsed();
+	};
+
+	test([](auto, const auto &...) {});
+	test([](auto, auto &... comp) {
+		using accumulator_type = int[];
+		accumulator_type accumulator = { (comp.x = {}, 0)... };
+		(void)accumulator;
+	});
+}
 
 TEST(Benchmark, IterateFiveComponents1M) {
     entt::DefaultRegistry registry;
