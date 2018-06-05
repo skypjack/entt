@@ -1232,6 +1232,20 @@ public:
         });
     }
 
+	template<typename Func>
+	void par_each(Func func) const {
+#ifdef ENTT_HAS_PARALLEL_VIEW
+		std::for_each(std::execution::par,pool.view_type::cbegin(), pool.view_type::cend(), [&func, raw = pool.cbegin()](const auto entity) mutable {
+			func(entity, *(raw++));
+		});
+#else
+		std::for_each(pool.view_type::cbegin(), pool.view_type::cend(), [&func, raw = pool.cbegin()](const auto entity) mutable {
+			func(entity, *(raw++));
+		});
+#endif
+		
+	}
+
     /**
      * @brief Iterates entities and components and applies the given function
      * object to them.
@@ -1252,7 +1266,13 @@ public:
         const_cast<const View *>(this)->each([&func](const entity_type entity, const Component &component) {
             func(entity, const_cast<Component &>(component));
         });
-    }
+    }	
+	template<typename Func>
+	inline void par_each(Func func) {
+		const_cast<const View *>(this)->par_each([&func](const entity_type entity, const Component &component) {
+			func(entity, const_cast<Component &>(component));
+		});
+	}
 
 private:
     pool_type &pool;
