@@ -134,6 +134,29 @@ TEST(Benchmark, IterateSingleComponentRaw1M) {
         (void)accumulator;
     });
 }
+TEST(Benchmark, ParallelIterateSingleComponentRaw1M) {
+	entt::DefaultRegistry registry;
+
+	std::cout << "Parallel iteration over 1000000 entities, one component, raw view" << std::endl;
+
+	for (std::uint64_t i = 0; i < 1000000L; i++) {
+		const auto entity = registry.create();
+		registry.assign<Position>(entity);
+	}
+
+	auto test = [&registry](auto func) {
+		Timer timer;
+		registry.view<Position>(entt::raw_t{}).par_each(func);
+		timer.elapsed();
+	};
+
+	test([](const auto &) {});
+	test([](auto &... comp) {
+		using accumulator_type = int[];
+		accumulator_type accumulator = { (comp.x = {}, 0)... };
+		(void)accumulator;
+	});
+}
 
 TEST(Benchmark, IterateTwoComponents1M) {
     entt::DefaultRegistry registry;

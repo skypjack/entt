@@ -12,6 +12,9 @@
 #include "entt_traits.hpp"
 #include "sparse_set.hpp"
 
+#ifdef ENTT_HAS_PARALLEL_VIEW
+#include <execution>
+#endif
 
 namespace entt {
 
@@ -1483,6 +1486,15 @@ public:
         std::for_each(pool.cbegin(), pool.cend(), func);
     }
 
+	template<typename Func>
+	void par_each(Func func) const {
+#ifdef ENTT_HAS_PARALLEL_VIEW
+		std::for_each(std::execution::par,pool.cbegin(), pool.cend(), func);
+#else
+		std::for_each(pool.cbegin(), pool.cend(), func);
+#endif
+	}
+
     /**
      * @brief Iterates components and applies the given function object to them.
      *
@@ -1501,6 +1513,17 @@ public:
     void each(Func func) {
         std::for_each(pool.begin(), pool.end(), func);
     }
+
+
+	template<typename Func>
+	void par_each(Func func) {
+#ifdef ENTT_HAS_PARALLEL_VIEW
+		std::for_each(std::execution::par,pool.begin(), pool.end(), func);
+#else
+		std::for_each(pool.begin(), pool.end(), func);
+#endif
+	}
+
 
 private:
     pool_type &pool;
