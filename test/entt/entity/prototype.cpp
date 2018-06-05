@@ -133,3 +133,21 @@ TEST(Prototype, RAII) {
 
     ASSERT_TRUE(registry.empty());
 }
+
+TEST(Prototype, MoveConstructionAssignment) {
+    entt::DefaultRegistry registry;
+
+    entt::DefaultPrototype prototype{registry};
+    prototype.set<int>(0);
+    auto other{std::move(prototype)};
+    const auto e0 = other();
+
+    ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{2});
+    ASSERT_TRUE(registry.has<int>(e0));
+
+    prototype = std::move(other);
+    const auto e1 = prototype();
+
+    ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{3});
+    ASSERT_TRUE(registry.has<int>(e1));
+}

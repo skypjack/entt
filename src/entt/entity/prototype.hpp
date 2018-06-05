@@ -48,6 +48,12 @@ class Prototype final {
         fn_type assign;
     };
 
+    void release() {
+        if(registry->valid(entity)) {
+            registry->destroy(entity);
+        }
+    }
+
 public:
     /*! @brief Registry type. */
     using registry_type = Registry<Entity>;
@@ -61,7 +67,7 @@ public:
      * @param registry A valid reference to a registry.
      */
     Prototype(Registry<Entity> &registry)
-        : registry{registry},
+        : registry{&registry},
           entity{registry.create()}
     {}
 
@@ -69,7 +75,51 @@ public:
      * @brief Releases all its resources.
      */
     ~Prototype() {
-        registry.destroy(entity);
+        release();
+    }
+
+    /*! @brief Copying a prototype isn't allowed. */
+    Prototype(const Prototype &) = delete;
+
+    /**
+     * @brief Move constructor.
+     *
+     * After prototype move construction, instances that have been moved from
+     * are placed in a valid but unspecified state. It's highly discouraged to
+     * continue using them.
+     *
+     * @param other The instance to move from.
+     */
+    Prototype(Prototype &&other)
+        : handlers{std::move(other.handlers)},
+          registry{other.registry},
+          entity{other.entity}
+    {
+        other.entity = ~entity_type{};
+    }
+
+    /*! @brief Copying a prototype isn't allowed. @return This Prototype. */
+    Prototype & operator=(const Prototype &) = delete;
+
+    /**
+     * @brief Move assignment operator.
+     *
+     * After prototype move assignment, instances that have been moved from are
+     * placed in a valid but unspecified state. It's highly discouraged to
+     * continue using them.
+     *
+     * @param other The instance to move from.
+     * @return This Prototype.
+     */
+    Prototype & operator=(Prototype &&other) {
+        if(this != &other) {
+            auto tmp{std::move(other)};
+            handlers.swap(tmp.handlers);
+            std::swap(registry, tmp.registry);
+            std::swap(entity, tmp.entity);
+        }
+
+        return *this;
     }
 
     /**
@@ -82,19 +132,19 @@ public:
     template<typename Component, typename... Args>
     Component & set(Args &&... args) {
         fn_type accommodate = [](const Prototype &prototype, Registry<Entity> &other, const Entity dst) {
-            const auto &wrapper = prototype.registry.template get<Wrapper<Component>>(prototype.entity);
+            const auto &wrapper = prototype.registry->template get<Wrapper<Component>>(prototype.entity);
             other.template accommodate<Component>(dst, wrapper.component);
         };
 
         fn_type assign = [](const Prototype &prototype, Registry<Entity> &other, const Entity dst) {
             if(!other.template has<Component>(dst)) {
-                const auto &wrapper = prototype.registry.template get<Wrapper<Component>>(prototype.entity);
+                const auto &wrapper = prototype.registry->template get<Wrapper<Component>>(prototype.entity);
                 other.template accommodate<Component>(dst, wrapper.component);
             }
         };
 
-        handlers[registry.template type<Component>()] = Handler{accommodate, assign};
-        auto &wrapper = registry.template accommodate<Wrapper<Component>>(entity, Component{std::forward<Args>(args)...});
+        handlers[registry->template type<Component>()] = Handler{accommodate, assign};
+        auto &wrapper = registry->template accommodate<Wrapper<Component>>(entity, Component{std::forward<Args>(args)...});
         return wrapper.component;
     }
 
@@ -104,8 +154,8 @@ public:
      */
     template<typename Component>
     void unset() ENTT_NOEXCEPT {
-        registry.template reset<Wrapper<Component>>(entity);
-        handlers.erase(registry.template type<Component>());
+        registry->template reset<Wrapper<Component>>(entity);
+        handlers.erase(registry->template type<Component>());
     }
 
     /**
@@ -115,7 +165,7 @@ public:
      */
     template<typename... Component>
     bool has() const ENTT_NOEXCEPT {
-        return registry.template has<Wrapper<Component>...>(entity);
+        return registry->template has<Wrapper<Component>...>(entity);
     }
 
     /**
@@ -132,7 +182,7 @@ public:
      */
     template<typename Component>
     const Component & get() const ENTT_NOEXCEPT {
-        return registry.template get<Wrapper<Component>>(entity).component;
+        return registry->template get<Wrapper<Component>>(entity).component;
     }
 
     /**
@@ -230,8 +280,8 @@ public:
      * @return A valid entity identifier.
      */
     entity_type create() const {
-        const auto entity = registry.create();
-        assign(registry, entity);
+        const auto entity = registry->create();
+        assign(*registry, entity);
         return entity;
     }
 
@@ -284,7 +334,7 @@ public:
      */
     void assign(const entity_type dst) const {
         for(auto &handler: handlers) {
-            handler.second.assign(*this, registry, dst);
+            handler.second.assign(*this, *registry, dst);
         }
     }
 
@@ -333,7 +383,7 @@ public:
      */
     void accommodate(const entity_type dst) const {
         for(auto &handler: handlers) {
-            handler.second.accommodate(*this, registry, dst);
+            handler.second.accommodate(*this, *registry, dst);
         }
     }
 
@@ -383,7 +433,7 @@ public:
      * @param dst A valid entity identifier.
      */
     inline void operator()(const entity_type dst) const ENTT_NOEXCEPT {
-        assign(registry, dst);
+        assign(*registry, dst);
     }
 
     /**
@@ -426,12 +476,12 @@ public:
      * @return A valid entity identifier.
      */
     inline entity_type operator()() const ENTT_NOEXCEPT {
-        return create(registry);
+        return create(*registry);
     }
 
 private:
     std::unordered_map<component_type, Handler> handlers;
-    Registry<Entity> &registry;
+    Registry<Entity> *registry;
     entity_type entity;
 };
 
