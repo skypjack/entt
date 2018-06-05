@@ -51,10 +51,10 @@ if(NOT MSVC AND USE_LIBCPP)
     
     check_cxx_source_compiles("
         #include<type_traits>
-        int main() { return std::is_same<int, int>::value ? 0 : 1; }"
-        HAS_LIBCPP)
+        int main() { return std::is_same<int, int>::value ? 0 : 1; }
+    " HAS_LIBCPP)
 
-      if(USE_LIBCPP AND NOT HAS_LIBCPP)
+    if(USE_LIBCPP AND NOT HAS_LIBCPP)
         message(WARNING "The option USE_LIBCPP is set (by default) but libc++ is not available. The flag will not be added to the target")
     endif()
 
@@ -100,9 +100,9 @@ target_compile_features(EnTT
 #
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-  set(ENTT_INSTALL_CONFIGDIR cmake)
+    set(ENTT_INSTALL_CONFIGDIR cmake)
 else()
-  set(ENTT_INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/entt)
+    set(ENTT_INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/entt)
 endif()
 
 install(DIRECTORY src/
