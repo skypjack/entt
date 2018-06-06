@@ -493,7 +493,7 @@ private:
  * applications.<br/>
  * Users should have a really good reason to choose something different.
  */
-using DefaultPrototype = Prototype<std::uint32_t>;
+using DefaultPrototype = Prototype<DefaultRegistry::entity_type>;
 
 
 }
