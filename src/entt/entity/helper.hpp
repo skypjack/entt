@@ -25,7 +25,7 @@ namespace entt {
  * @param entity A valid entity identifier.
  */
 template<typename Entity, typename... Component>
-void dependency(Registry<Entity> &registry, Entity entity) {
+void dependency(Registry<Entity> &registry, const Entity entity) {
     using accumulator_type = int[];
     accumulator_type accumulator = { ((registry.template has<Component>(entity) ? void() : (registry.template assign<Component>(entity), void())), 0)... };
     (void)accumulator;
@@ -50,7 +50,7 @@ void dependency(Registry<Entity> &registry, Entity entity) {
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Entity>
-void dependency(Sink<void(Registry<Entity> &, Entity)> sink) {
+void dependency(Sink<void(Registry<Entity> &, const Entity)> sink) {
     sink.template connect<dependency<Entity, Dependency...>>();
 }
 
@@ -73,7 +73,7 @@ void dependency(Sink<void(Registry<Entity> &, Entity)> sink) {
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Entity>
-void dependency(break_t, Sink<void(Registry<Entity> &, Entity)> sink) {
+void dependency(break_t, Sink<void(Registry<Entity> &, const Entity)> sink) {
     sink.template disconnect<dependency<Entity, Dependency...>>();
 }
 

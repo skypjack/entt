@@ -70,7 +70,7 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * handle is empty.
      */
-    inline operator const Resource & () const ENTT_NOEXCEPT { return get(); }
+    inline operator const Resource &() const ENTT_NOEXCEPT { return get(); }
 
     /**
      * @brief Dereferences a handle to obtain the managed resource.

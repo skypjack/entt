@@ -31,7 +31,7 @@ struct Invoker<Ret(Args...), Collector> {
 
     virtual ~Invoker() = default;
 
-    bool invoke(Collector &collector, proto_type proto, void *instance, Args... args) {
+    bool invoke(Collector &collector, proto_type proto, void *instance, Args... args) const {
         return collector(proto(instance, args...));
     }
 };
@@ -44,7 +44,7 @@ struct Invoker<void(Args...), Collector> {
 
     virtual ~Invoker() = default;
 
-    bool invoke(Collector &, proto_type proto, void *instance, Args... args) {
+    bool invoke(Collector &, proto_type proto, void *instance, Args... args) const {
         return (proto(instance, args...), true);
     }
 };
@@ -140,7 +140,7 @@ class Sink<Ret(Args...)> final {
         return (Function)(args...);
     }
 
-    template<typename Class, Ret(Class::*Member)(Args... args)>
+    template<typename Class, Ret(Class:: *Member)(Args... args)>
     static Ret proto(void *instance, Args... args) {
         return (static_cast<Class *>(instance)->*Member)(args...);
     }
@@ -177,7 +177,7 @@ public:
      * @tparam Member Member function to connect to the signal.
      * @param instance A valid instance of type pointer to `Class`.
      */
-    template <typename Class, Ret(Class::*Member)(Args...) = &Class::receive>
+    template <typename Class, Ret(Class:: *Member)(Args...) = &Class::receive>
     void connect(Class *instance) {
         disconnect<Class, Member>(instance);
         calls.emplace_back(instance, &proto<Class, Member>);
@@ -199,7 +199,7 @@ public:
      * @tparam Member Member function to connect to the signal.
      * @param instance A valid instance of type pointer to `Class`.
      */
-    template<typename Class, Ret(Class::*Member)(Args...)>
+    template<typename Class, Ret(Class:: *Member)(Args...)>
     void disconnect(Class *instance) {
         call_type target{instance, &proto<Class, Member>};
         calls.erase(std::remove(calls.begin(), calls.end(), std::move(target)), calls.end());
@@ -306,7 +306,7 @@ public:
      *
      * @param args Arguments to use to invoke listeners.
      */
-    void publish(Args... args) {
+    void publish(Args... args) const {
         for(auto pos = calls.size(); pos; --pos) {
             auto &call = calls[pos-1];
             call.second(call.first, args...);
@@ -318,7 +318,7 @@ public:
      * @param args Arguments to use to invoke listeners.
      * @return An instance of the collector filled with collected data.
      */
-    collector_type collect(Args... args) {
+    collector_type collect(Args... args) const {
         collector_type collector;
 
         for(auto &&call: calls) {

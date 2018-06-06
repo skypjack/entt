@@ -79,12 +79,12 @@ class SparseSet<Entity> {
             return ++(*this), orig;
         }
 
-        Iterator & operator+=(difference_type value) ENTT_NOEXCEPT {
+        Iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
             pos -= value;
             return *this;
         }
 
-        Iterator operator+(difference_type value) const ENTT_NOEXCEPT {
+        Iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
             return Iterator{direct, pos-value};
         }
 
@@ -143,7 +143,7 @@ public:
      *
      * @param cap Desired capacity.
      */
-    void reserve(size_type cap) {
+    void reserve(const size_type cap) {
         direct.reserve(cap);
     }
 
@@ -264,7 +264,7 @@ public:
      * internal packed array.
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
-        return const_iterator_type{direct.data(), 0};
+        return const_iterator_type{direct.data(), {}};
     }
 
     /**
@@ -306,7 +306,7 @@ public:
      * @param entity A valid entity identifier.
      * @return True if the sparse set contains the entity, false otherwise.
      */
-    bool has(entity_type entity) const ENTT_NOEXCEPT {
+    bool has(const entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
         // testing against pending permits to avoid accessing the direct vector
         return (pos < reverse.size()) && (reverse[pos] != pending);
@@ -329,7 +329,7 @@ public:
      * @param entity A valid entity identifier.
      * @return True if the sparse set contains the entity, false otherwise.
      */
-    bool fast(entity_type entity) const ENTT_NOEXCEPT {
+    bool fast(const entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
         assert(pos < reverse.size());
         // testing against pending permits to avoid accessing the direct vector
@@ -348,7 +348,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The position of the entity in the sparse set.
      */
-    pos_type get(entity_type entity) const ENTT_NOEXCEPT {
+    pos_type get(const entity_type entity) const ENTT_NOEXCEPT {
         assert(has(entity));
         return reverse[entity & traits_type::entity_mask];
     }
@@ -364,7 +364,7 @@ public:
      *
      * @param entity A valid entity identifier.
      */
-    void construct(entity_type entity) {
+    void construct(const entity_type entity) {
         assert(!has(entity));
         const auto pos = size_type(entity & traits_type::entity_mask);
 
@@ -388,7 +388,7 @@ public:
      *
      * @param entity A valid entity identifier.
      */
-    virtual void destroy(entity_type entity) {
+    virtual void destroy(const entity_type entity) {
         assert(has(entity));
         const auto back = direct.back();
         auto &candidate = reverse[entity & traits_type::entity_mask];
@@ -414,7 +414,7 @@ public:
      * @param lhs A valid position within the sparse set.
      * @param rhs A valid position within the sparse set.
      */
-    void swap(pos_type lhs, pos_type rhs) ENTT_NOEXCEPT {
+    void swap(const pos_type lhs, const pos_type rhs) ENTT_NOEXCEPT {
         assert(lhs < direct.size());
         assert(rhs < direct.size());
         auto &src = direct[lhs];
@@ -522,12 +522,12 @@ class SparseSet<Entity, Type>: public SparseSet<Entity> {
             return ++(*this), orig;
         }
 
-        Iterator & operator+=(difference_type value) ENTT_NOEXCEPT {
+        Iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
             pos -= value;
             return *this;
         }
 
-        Iterator operator+(difference_type value) const ENTT_NOEXCEPT {
+        Iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
             return Iterator{instances, pos-value};
         }
 
@@ -587,7 +587,7 @@ public:
      *
      * @param cap Desired capacity.
      */
-    void reserve(size_type cap) {
+    void reserve(const size_type cap) {
         underlying_type::reserve(cap);
         instances.reserve(cap);
     }
@@ -693,7 +693,7 @@ public:
      * given type.
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
-        return const_iterator_type{instances.data(), 0};
+        return const_iterator_type{instances.data(), {}};
     }
 
     /**
@@ -729,7 +729,7 @@ public:
      * given type.
      */
     iterator_type end() ENTT_NOEXCEPT {
-        return iterator_type{instances.data(), 0};
+        return iterator_type{instances.data(), {}};
     }
 
     /**
@@ -744,7 +744,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The object associated to the entity.
      */
-    const object_type & get(entity_type entity) const ENTT_NOEXCEPT {
+    const object_type & get(const entity_type entity) const ENTT_NOEXCEPT {
         return instances[underlying_type::get(entity)];
     }
 
@@ -760,7 +760,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The object associated to the entity.
      */
-    inline object_type & get(entity_type entity) ENTT_NOEXCEPT {
+    inline object_type & get(const entity_type entity) ENTT_NOEXCEPT {
         return const_cast<object_type &>(const_cast<const SparseSet *>(this)->get(entity));
     }
 
@@ -786,7 +786,7 @@ public:
      */
     template<typename... Args>
     std::enable_if_t<std::is_constructible<Type, Args...>::value, object_type &>
-    construct(entity_type entity, Args &&... args) {
+    construct(const entity_type entity, Args &&... args) {
         underlying_type::construct(entity);
         instances.emplace_back(std::forward<Args>(args)...);
         return instances.back();
@@ -814,7 +814,7 @@ public:
      */
     template<typename... Args>
     std::enable_if_t<!std::is_constructible<Type, Args...>::value, object_type &>
-    construct(entity_type entity, Args &&... args) {
+    construct(const entity_type entity, Args &&... args) {
         underlying_type::construct(entity);
         instances.emplace_back(Type{std::forward<Args>(args)...});
         return instances.back();
@@ -831,7 +831,7 @@ public:
      *
      * @param entity A valid entity identifier.
      */
-    void destroy(entity_type entity) override {
+    void destroy(const entity_type entity) override {
         // swapping isn't required here, we are getting rid of the last element
         // however, we must protect ourselves from self assignments (see #37)
         auto tmp = std::move(instances.back());
@@ -884,7 +884,7 @@ public:
         std::vector<pos_type> copy(instances.size());
         std::iota(copy.begin(), copy.end(), 0);
 
-        sort(copy.begin(), copy.end(), [this, compare = std::move(compare)](auto lhs, auto rhs) {
+        sort(copy.begin(), copy.end(), [this, compare = std::move(compare)](const auto lhs, const auto rhs) {
             return compare(const_cast<const object_type &>(instances[rhs]), const_cast<const object_type &>(instances[lhs]));
         });
 

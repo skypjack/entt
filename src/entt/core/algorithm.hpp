@@ -31,7 +31,7 @@ struct StdSort {
      * @param compare A valid comparison function object.
      */
     template<typename It, typename Compare = std::less<>>
-    void operator()(It first, It last, Compare compare = Compare{}) {
+    void operator()(It first, It last, Compare compare = Compare{}) const {
         std::sort(std::move(first), std::move(last), std::move(compare));
     }
 };
@@ -51,7 +51,7 @@ struct InsertionSort {
      * @param compare A valid comparison function object.
      */
     template<typename It, typename Compare = std::less<>>
-    void operator()(It first, It last, Compare compare = Compare{}) {
+    void operator()(It first, It last, Compare compare = Compare{}) const {
         auto it = first + 1;
 
         while(it != last) {

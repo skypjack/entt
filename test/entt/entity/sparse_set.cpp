@@ -271,7 +271,6 @@ TEST(SparseSetWithType, Functionalities) {
 
     set.construct(42, 3);
 
-    ASSERT_EQ(set.get(42), 3);
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
     ASSERT_NE(cset.begin(), cset.end());
@@ -686,4 +685,19 @@ TEST(SparseSetWithType, ReferencesGuaranteed) {
 
     ASSERT_EQ(set.get(0).value, 3);
     ASSERT_EQ(set.get(1).value, 3);
+}
+
+TEST(SparseSetWithType, MoveOnlyComponent) {
+    struct MoveOnlyComponent {
+        MoveOnlyComponent() = default;
+        ~MoveOnlyComponent() = default;
+        MoveOnlyComponent(const MoveOnlyComponent &) = delete;
+        MoveOnlyComponent(MoveOnlyComponent &&) = default;
+        MoveOnlyComponent & operator=(const MoveOnlyComponent &) = delete;
+        MoveOnlyComponent & operator=(MoveOnlyComponent &&) = default;
+    };
+
+    // it's purpose is to ensure that move only components are always accepted
+    entt::SparseSet<unsigned int, MoveOnlyComponent> set;
+    (void)set;
 }

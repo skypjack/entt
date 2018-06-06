@@ -18,7 +18,7 @@ endif()
 # Project configuration
 #
 
-project(entt VERSION 2.5.0)
+project(entt VERSION 2.6.1)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
@@ -188,6 +188,7 @@ add_custom_target(
     SOURCES
         appveyor.yml
         AUTHORS
+        CONTRIBUTING
         LICENSE
         README.md
         TODO

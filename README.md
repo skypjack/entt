@@ -104,7 +104,7 @@ Here is a brief list of what it offers today:
 * A constexpr utility for human readable resource identifiers.
 * An incredibly fast entity-component system based on sparse sets, with its own
   views and a _pay for what you use_ policy to adjust performance and memory
-  usage according to the users' requirements.
+  usage according to users' requirements.
 * Actor class for those who aren't confident with entity-component systems.
 * The smallest and most basic implementation of a service locator ever seen.
 * A cooperative scheduler for processes of any type.
@@ -375,30 +375,29 @@ and move assignable. They are list initialized by using the parameters provided
 to construct the component itself. No need to register components or their types
 neither with the registry nor with the entity-component system at all.<br/>
 Systems (the _S_ of an _ECS_) are just plain functions, functors, lambdas or
-whatever the users want. They can accept a `Registry` or a view of any type and
-use them the way they prefer. No need to register systems or their types neither
+whatever users want. They can accept a `Registry` or a view of any type and use
+them the way they prefer. No need to register systems or their types neither
 with the registry nor with the entity-component system at all.
 
 The following sections will explain in short how to use the entity-component
 system, the core part of the whole framework.<br/>
 In fact, the framework is composed of many other classes in addition to those
-describe below. For more details, please refer to the
-[online documentation](https://skypjack.github.io/entt/).
+describe below. For more details, please refer to the inline documentation.
 
 ## The Registry, the Entity and the Component
 
 A registry can store and manage entities, as well as create views to iterate the
 underlying data structures.<br/>
-`Registry` is a class template that lets the users decide what's the preferred
-type to represent an entity. Because `std::uint32_t` is large enough for almost
-all the cases, there exists also an alias named `DefaultRegistry` for
+`Registry` is a class template that lets users decide what's the preferred type
+to represent an entity. Because `std::uint32_t` is large enough for almost all
+the cases, there exists also an alias named `DefaultRegistry` for
 `Registry<std::uint32_t>`.
 
 Entities are represented by _entity identifiers_. An entity identifier is an
 opaque type that users should not inspect or modify in any way. It carries
 information about the entity itself and its version.
 
-A registry can be used both to construct and to destroy entities:
+A registry can be used both to construct and destroy entities:
 
 ```cpp
 // constructs a naked entity with no components and returns its identifier
@@ -408,9 +407,9 @@ auto entity = registry.create();
 registry.destroy(entity);
 ```
 
-Once an entity is deleted, the registry can freely reuse it internally with a
+When an entity is destroyed, the registry can freely reuse it internally with a
 slightly different identifier. In particular, the version of an entity is
-increased each and every time it's destroyed.<br/>
+increased each and every time it's discarded.<br/>
 In case entity identifiers are stored around, the registry offers all the
 functionalities required to test them and get out of the them all the
 information they carry:
@@ -424,6 +423,19 @@ auto version = registry.version(entity);
 
 // gets the actual version for the given entity
 auto curr = registry.current(entity);
+```
+
+Finally, there is also a sort of _null identifier_ made available to users. It's
+treated as if it were a _null pointer_ that doesn't identify any entity. A
+registry will reject this identifier in all cases because it isn't considered
+valid.<br/>
+The rules that define a _null identifier_ are a bit tricky to explain. However,
+being `Entity` the type of the entities (for example, `std::uint32_t`), users
+can easily construct a _null identifier_ by flipping all the bits of the _zero_:
+
+```cpp
+using Entity = std::uint32_t;
+const auto null = ~Entity{};
 ```
 
 Components can be assigned to or removed from entities at any time with a few
@@ -548,8 +560,8 @@ Tags undergo the same requirements of components. They can be either plain old
 data structures or more complex and movable data structures with a proper
 constructor.<br/>
 Actually, the same type can be used both as a tag and as a component and the
-registry will not complain about it. It is up to the users to properly manage
-their own types. In some cases, the tag `tag_t` must also be used in order to
+registry will not complain about it. It is up to users to properly manage their
+own types. In some cases, the tag `tag_t` must also be used in order to
 disambiguate overloads of member functions.
 
 Attaching tags to entities and removing them is trivial:
@@ -621,7 +633,7 @@ Because of how the registry works internally, it stores a couple of signal
 handlers for each pool in order to notify some of its data structures on the
 construction and destruction of components.<br/>
 These signal handlers are also exposed and made available to users. This is the
-basic brick to build fancy things like blueprints and reactive systems.
+basic brick to build fancy things like dependencies and reactive systems.
 
 To get a sink to be used to connect and disconnect listeners so as to be
 notified on the creation of a component, use the `construction` member function:
@@ -767,8 +779,8 @@ In fact, there are two functions that respond to slightly different needs:
   ```
 
   There exists also the possibility to use a custom sort function object, as
-  long as it adheres to the requirements described in the
-  [official documentation](https://skypjack.github.io/entt/).<br/>
+  long as it adheres to the requirements described in the inline
+  documentation.<br/>
   This is possible mainly because users can get much more with a custom sort
   function object if the pattern of usage is known. As an example, in case of an
   almost sorted pool, quick sort could be much, much slower than insertion sort.
@@ -790,7 +802,7 @@ of another tool for serialization out there. Instead, it accepts an opaque
 object with a suitable interface (namely an _archive_) to serialize its internal
 data structures and restore them later. The way types and instances are
 converted to a bunch of bytes is completely in charge to the archive and thus to
-the users.
+final users.
 
 The goal of the serialization part is to allow users to make both a dump of the
 entire registry or a narrower snapshot, that is to select only the components
@@ -841,6 +853,21 @@ consequence of a couple of design choices from the past and in the present:
 * Furthermore, the registry makes heavy use of _type-erasure_ techniques
   internally and doesn't know at any time what types of components it contains.
   Therefore being explicit at the call point is mandatory.
+
+There exists also another version of the `component` member function that
+accepts a range of entities to serialize. This version is a bit slower than the
+other one, mainly because it iterates the range of entities more than once for
+internal purposes. However, it can be used to filter out those entities that
+shouldn't be serialized for some reasons.<br/>
+As an example:
+
+```cpp
+const auto view = registry.view<Serialize>();
+OutputArchive output;
+
+registry.snapshot()
+    .component<AComponent, AnotherComponent>(output, view.cbegin(), view.cend());
+```
 
 The `tag` member function is similar to the previous one, apart from the fact
 that it works with tags and not with components.<br/>
@@ -917,10 +944,8 @@ InputArchive input;
 
 loader.entities(input)
     .destroyed(input)
-    .component<AComponent, AnotherComponent>(input)
-    .component<DirtyComponent>(input, &DirtyComponent::parent, &DirtyComponent::child)
-    .tag<MyTag>(input)
-    .tag<DirtyTag>(input, &DirtyTag::container)
+    .component<AComponent, AnotherComponent, DirtyComponent>(input, &DirtyComponent::parent, &DirtyComponent::child)
+    .tag<MyTag, DirtyTag>(input, &DirtyTag::container)
     .orphans()
     .shrink();
 ```
@@ -941,20 +966,7 @@ and the tags specified and assign them to the right entities.<br/>
 In case the component or the tag contains entities itself (either as data
 members of type `entity_type` or as containers of entities), the loader can
 update them automatically. To do that, it's enough to specify the data members
-to update as shown in the example. If the component or the tag was in the middle
-of the template parameter list during serialization, multiple commands are
-required during a restore:
-
-```cpp
-registry.snapshot().component<ASimpleComponent, AnotherSimpleComponent, AMoreComplexComponent, TheLastComponent>();
-
-// ...
-
-loader
-    .component<ASimpleComponent, AnotherSimpleComponent>(input)
-    .component<AMoreComplexComponent>(input, &AMoreComplexComponent::entity);
-    .component<TheLastComponent>(input);
-```
+to update as shown in the example.
 
 The `orphans` member function literally destroys those entities that have
 neither components nor tags after a restore. It has exactly the same purpose
@@ -968,7 +980,7 @@ snapshot, unless they know exactly what they are doing.
 
 Archives must publicly expose a predefined set of member functions. The API is
 straightforward and consists only of a group of function call operators that
-are invoked by the registry.
+are invoked by the snapshot class and the loaders.
 
 In particular:
 
@@ -979,13 +991,15 @@ In particular:
   void operator()(Entity);
   ```
 
-  Where `Entity` is the type of the entities used by the registry.<br/>
-  In addition, it must accept the types of both the components and the tags to
-  serialize. Therefore, given a type `T` (either a component or a tag), it must
-  contain a function call operator with the following signature:
+  Where `Entity` is the type of the entities used by the registry. Note that all
+  the member functions of the snapshot class make also an initial call to this
+  endpoint to save the _size_ of the set they are going to store.<br/>
+  In addition, an archive must accept a pair of entity and either component or
+  tag for each type to be serialized. Therefore, given a type `T`, the archive
+  must contain a function call operator with the following signature:
 
   ```cpp
-  void operator()(const T &);
+  void operator()(Entity, const T &);
   ```
 
   The output archive can freely decide how to serialize the data. The register
@@ -1000,17 +1014,19 @@ In particular:
 
   Where `Entity` is the type of the entities used by the registry. Each time the
   function is invoked, the archive must read the next element from the
-  underlying storage and copy it in the given variable.<br/>
-  In addition, it must accept the types of both the components and the tags to
-  restore. Therefore, given a type `T` (either a component or a tag), it must
-  contain a function call operator with the following signature:
+  underlying storage and copy it in the given variable. Note that all the member
+  functions of a loader class make also an initial call to this endpoint to read
+  the _size_ of the set they are going to load.<br/>
+  In addition, the archive must accept a pair of entity and either component or
+  tag for each type to be restored. Therefore, given a type `T`, the archive
+  must contain a function call operator with the following signature:
 
   ```cpp
-  void operator()(T &);
+  void operator()(Entity &, T &);
   ```
 
-  Every time such an operator is invoked, the archive must read the next element
-  from the underlying storage and copy it in the given variable.
+  Every time such an operator is invoked, the archive must read the next
+  elements from the underlying storage and copy them in the given variables.
 
 #### One example to rule them all
 
@@ -1036,16 +1052,15 @@ how many prototypes they want, each one initialized differently from the others.
 The following is an example of use of a prototype:
 
 ```cpp
-entt::DefaultPrototype prototype;
+entt::DefaultRegistry registry;
+entt::DefaultPrototype prototype{registry};
 
 prototype.set<Position>(100.f, 100.f);
 prototype.set<Velocity>(0.f, 0.f);
 
 // ...
 
-entt::DefaultRegistry registry;
-
-const auto entity = prototype(registry);
+const auto entity = prototype();
 ```
 
 To assign and remove components from a prototype, it offers two dedicated member
@@ -1058,21 +1073,21 @@ Creating an entity from a prototype is straightforward:
 * To create a new entity from scratch and assign it a prototype, this is the way
   to go:
   ```cpp
-  const auto entity = prototype(registry);
+  const auto entity = prototype();
   ```
   It is equivalent to the following invokation:
   ```cpp
-  const auto entity = prototype.create(registry);
+  const auto entity = prototype.create();
   ```
 
 * In case we want to initialize an already existing entity, we can provide the
   `operator()` directly with the entity identifier:
   ```cpp
-  prototype(registry, entity);
+  prototype(entity);
   ```
   It is equivalent to the following invokation:
   ```cpp
-  prototype.assign(registry, entity);
+  prototype.assign(entity);
   ```
   Note that existing components aren't overwritten in this case. Only those
   components that the entity doesn't own yet are copied over. All the other
@@ -1081,8 +1096,13 @@ Creating an entity from a prototype is straightforward:
 * Finally, to assign or replace all the components for an entity, thus
   overwriting existing ones:
   ```cpp
-  prototype.accommodate(registry, entity);
+  prototype.accommodate(entity);
   ```
+
+In the examples above, the prototype uses its underlying registry to create
+entities and components both for its purposes and when it's cloned. To use a
+different repository to clone a prototype, all the member functions accept also
+a reference to a valid registry as a first argument.
 
 Prototypes are a very useful tool that can save a lot of typing sometimes.
 Furthermore, the codebase may be easier to maintain, since updating a prototype
@@ -1206,8 +1226,7 @@ To easily iterate entities and components, all the views offer the common
 `begin` and `end` member functions that allow users to use a view in a typical
 range-for loop. Almost all the views offer also a *more functional* `each`
 member function that accepts a callback for convenience.<br/>
-Continue reading for more details or refer to the
-[official documentation](https://skypjack.github.io/entt/).
+Continue reading for more details or refer to the inline documentation.
 
 ### Standard View
 
@@ -1234,8 +1253,7 @@ underlying data structures directly and avoid superfluous checks.<br/>
 They offer a bunch of functionalities to get the number of entities they are
 going to return and a raw access to the entity list as well as to the component
 list. It's also possible to ask a view if it contains a given entity.<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
+Refer to the inline documentation for all the details.
 
 There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
@@ -1280,8 +1298,7 @@ component. In particular, a multi component standard view exposes utility
 functions to get the estimated number of entities it is going to return and to
 know whether it's empty or not. It's also possible to ask a view if it contains
 a given entity.<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
+Refer to the inline documentation for all the details.
 
 There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
@@ -1358,8 +1375,7 @@ entities it's going to return, a raw access to the entity list and the
 possibility to sort the underlying data structures according to the order of one
 of the components for which it has been constructed. It's also possible to ask a
 view if it contains a given entity.<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
+Refer to the inline documentation for all the details.
 
 To iterate a persistent view, either use it in range-for loop:
 
@@ -1402,8 +1418,7 @@ accessed via an entity identifier.<br/>
 They offer a bunch of functionalities to get the number of instances they are
 going to return and a raw access to the entity list as well as to the component
 list.<br/>
-Refer to the [official documentation](https://skypjack.github.io/entt/) for all
-the details.
+Refer to the inline documentation for all the details.
 
 Raw views can be used only to iterate components for a single type. To create
 this kind of views, the tag `raw_t` must also be used in order to disambiguate
@@ -2076,7 +2091,7 @@ In case the cache doesn't contain a resource for the given identifier, the
 function does nothing and returns immediately.
 
 So far, so good. Resources are finally loaded and stored within the cache.<br/>
-They are returned to the users in the form of handles. To get one of them:
+They are returned to users in the form of handles. To get one of them:
 
 ```cpp
 auto handle = cache.handle("my/identifier");
@@ -2114,8 +2129,8 @@ The resource can also be accessed directly using the arrow operator if required:
 auto value = handle->value;
 ```
 
-To test if a handle is still valid, the cast operator to `bool` allows the users
-to use it in a guard:
+To test if a handle is still valid, the cast operator to `bool` allows users to
+use it in a guard:
 
 ```cpp
 if(handle) {
@@ -2553,14 +2568,18 @@ projects based on EnTT and did not hold back when it came to documenting them.
 
 Below an incomplete list of projects and articles:
 
-* [EnttPong](https://github.com/reworks/EnttPong) - Example game for `EnTT`
+* [EnttPong](https://github.com/reworks/EnttPong): example game for `EnTT`
   framework.
-* [ECS_SpaceBattle](https://github.com/vblanco20-1/ECS_SpaceBattle) - Huge space
-  battle using an ECS library for the logic. Built on UE4.
-* Code: [Experimenting with ECS in UE4](http://victor.madtriangles.com/code%20experiment/2018/03/25/post-ue4-ecs-battle.html)
-* [Implementing ECS architecture in UE4](https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1449913-implementing-ecs-architecture-in-ue4-giant-space-battle).
-  Giant space battle.
-* [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt).
+* [ECS_SpaceBattle](https://github.com/vblanco20-1/ECS_SpaceBattle): huge space
+  battle built on `UE4`.
+* [Experimenting with ECS in UE4](http://victor.madtriangles.com/code%20experiment/2018/03/25/post-ue4-ecs-battle.html):
+  interesting article about `UE4` and `EnTT`.
+* [Implementing ECS architecture in UE4](https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1449913-implementing-ecs-architecture-in-ue4-giant-space-battle):
+  giant space battle.
+* [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt): port of
+  [Match One](https://github.com/sschmid/Match-One) for `Entitas-CSharp`.
+* [Randballs](https://github.com/gale93/randballs): simple `SFML` and `EnTT`
+  playground.
 * ...
 
 If you know of other resources out there that are about `EnTT`, feel free to
@@ -2568,9 +2587,10 @@ open an issue or a PR and I'll be glad to add them to the list.
 
 # Contributors
 
-If you want to contribute, please send patches as pull requests against the
-branch `master`.<br/>
-See the
+If you want to participate, please see the guidelines for
+[contributing](https://github.com/skypjack/entt/blob/master/CONTRIBUTING)
+before to create issues or pull requests.<br/>
+Take also a look at the
 [contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to
 know who has participated so far.
 

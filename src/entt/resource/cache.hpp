@@ -93,7 +93,7 @@ public:
      * @return True if the resource is ready to use, false otherwise.
      */
     template<typename Loader, typename... Args>
-    bool load(resource_type id, Args &&... args) {
+    bool load(const resource_type id, Args &&... args) {
         static_assert(std::is_base_of<ResourceLoader<Loader, Resource>, Loader>::value, "!");
 
         bool loaded = true;
@@ -126,7 +126,7 @@ public:
      * @return True if the resource is ready to use, false otherwise.
      */
     template<typename Loader, typename... Args>
-    bool reload(resource_type id, Args &&... args) {
+    bool reload(const resource_type id, Args &&... args) {
         return (discard(id), load<Loader>(id, std::forward<Args>(args)...));
     }
 
@@ -160,7 +160,7 @@ public:
      * @param id Unique resource identifier.
      * @return A handle for the given resource.
      */
-    ResourceHandle<Resource> handle(resource_type id) const {
+    ResourceHandle<Resource> handle(const resource_type id) const {
         auto it = resources.find(id);
         return { it == resources.end() ? nullptr : it->second };
     }
@@ -170,7 +170,7 @@ public:
      * @param id Unique resource identifier.
      * @return True if the cache contains the resource, false otherwise.
      */
-    bool contains(resource_type id) const ENTT_NOEXCEPT {
+    bool contains(const resource_type id) const ENTT_NOEXCEPT {
         return (resources.find(id) != resources.cend());
     }
 
@@ -182,7 +182,7 @@ public:
      *
      * @param id Unique resource identifier.
      */
-    void discard(resource_type id) ENTT_NOEXCEPT {
+    void discard(const resource_type id) ENTT_NOEXCEPT {
         auto it = resources.find(id);
 
         if(it != resources.end()) {

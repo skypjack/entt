@@ -128,8 +128,7 @@ TEST(Snapshot, Continuous) {
     cereal::JSONInputArchive input{storage};
     entt::ContinuousLoader<entt::DefaultRegistry::entity_type> loader{destination};
     loader.entities(input)
-            .component<Position>(input)
-            .component<Relationship>(input, &Relationship::parent)
+            .component<Position, Relationship>(input, &Relationship::parent)
             .component<Timer>(input);
 
     ASSERT_FALSE(destination.valid(e0));

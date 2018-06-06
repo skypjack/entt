@@ -167,7 +167,7 @@ public:
      * delivered to the registered listeners. It's responsibility of the users
      * to reduce at a minimum the time spent in the bodies of the listeners.
      */
-    inline void update() {
+    inline void update() const {
         for(auto pos = wrappers.size(); pos; --pos) {
             auto &wrapper = wrappers[pos-1];
 
