@@ -6,6 +6,7 @@
 TEST(SingleComponentView, Functionalities) {
     entt::DefaultRegistry registry;
     auto view = registry.view<char>();
+    const auto &cview = view;
 
     const auto e0 = registry.create();
     const auto e1 = registry.create();
@@ -19,6 +20,7 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_NO_THROW(++registry.view<char>().begin());
 
     ASSERT_NE(view.begin(), view.end());
+    ASSERT_NE(cview.begin(), cview.end());
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
     ASSERT_FALSE(view.empty());
 
@@ -107,6 +109,7 @@ TEST(SingleComponentView, Each) {
 TEST(MultipleComponentView, Functionalities) {
     entt::DefaultRegistry registry;
     auto view = registry.view<int, char>();
+    const auto &cview = view;
 
     ASSERT_TRUE(view.empty());
 
@@ -130,6 +133,7 @@ TEST(MultipleComponentView, Functionalities) {
     ASSERT_NO_THROW((++registry.view<int, char>().begin()));
 
     ASSERT_NE(view.begin(), view.end());
+    ASSERT_NE(cview.begin(), cview.end());
     ASSERT_EQ(view.size(), decltype(view.size()){1});
 
     registry.get<char>(e0) = '1';
@@ -285,6 +289,7 @@ TEST(PersistentView, Prepare) {
     entt::DefaultRegistry registry;
     registry.prepare<int, char>();
     auto view = registry.view<int, char>(entt::persistent_t{});
+    const auto &cview = view;
 
     ASSERT_TRUE(view.empty());
 
@@ -300,6 +305,7 @@ TEST(PersistentView, Prepare) {
     ASSERT_NO_THROW((++registry.view<int, char>(entt::persistent_t{}).begin()));
 
     ASSERT_NE(view.begin(), view.end());
+    ASSERT_NE(cview.begin(), cview.end());
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
 
     registry.assign<int>(e0);
@@ -485,6 +491,7 @@ TEST(PersistentView, Sort) {
 TEST(RawView, Functionalities) {
     entt::DefaultRegistry registry;
     auto view = registry.view<char>(entt::raw_t{});
+    const auto &cview = view;
 
     ASSERT_TRUE(view.empty());
 
@@ -499,6 +506,7 @@ TEST(RawView, Functionalities) {
     ASSERT_NO_THROW(++registry.view<char>(entt::raw_t{}).begin());
 
     ASSERT_NE(view.begin(), view.end());
+    ASSERT_NE(cview.begin(), cview.end());
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
 
     registry.assign<char>(e0);

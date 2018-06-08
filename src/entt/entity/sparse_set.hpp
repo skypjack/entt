@@ -81,12 +81,6 @@ class SparseSet<Entity> {
         Iterator(const Iterator &) ENTT_NOEXCEPT = default;
         Iterator & operator=(const Iterator &) ENTT_NOEXCEPT = default;
 
-        friend void swap(Iterator &lhs, Iterator &rhs) ENTT_NOEXCEPT {
-            using std::swap;
-            swap(lhs.direct, rhs.direct);
-            swap(lhs.pos, rhs.pos);
-        }
-
         Iterator & operator++() ENTT_NOEXCEPT {
             return --pos, *this;
         }
@@ -587,12 +581,6 @@ class SparseSet<Entity, Type>: public SparseSet<Entity> {
 
         Iterator(const Iterator &) ENTT_NOEXCEPT = default;
         Iterator & operator=(const Iterator &) ENTT_NOEXCEPT = default;
-
-        friend void swap(Iterator &lhs, Iterator &rhs) ENTT_NOEXCEPT {
-            using std::swap;
-            swap(lhs.instances, rhs.instances);
-            swap(lhs.pos, rhs.pos);
-        }
 
         Iterator & operator++() ENTT_NOEXCEPT {
             return --pos, *this;

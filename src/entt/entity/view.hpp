@@ -511,14 +511,6 @@ class View final {
         Iterator(const Iterator &) ENTT_NOEXCEPT = default;
         Iterator & operator=(const Iterator &) ENTT_NOEXCEPT = default;
 
-        friend void swap(Iterator &lhs, Iterator &rhs) ENTT_NOEXCEPT {
-            using std::swap;
-            swap(lhs.unchecked, rhs.unchecked);
-            swap(lhs.extent, rhs.extent);
-            swap(lhs.begin, rhs.begin);
-            swap(lhs.end, rhs.end);
-        }
-
         Iterator & operator++() ENTT_NOEXCEPT {
             return (++begin != end && !valid()) ? ++(*this) : *this;
         }
@@ -558,11 +550,6 @@ class View final {
     template<typename Comp>
     const pool_type<Comp> & pool() const ENTT_NOEXCEPT {
         return std::get<pool_type<Comp> &>(pools);
-    }
-
-    template<typename Comp>
-    inline pool_type<Comp> & pool() ENTT_NOEXCEPT {
-        return const_cast<pool_type<Comp> &>(const_cast<const View *>(this)->pool<Comp>());
     }
 
     const view_type * candidate() const ENTT_NOEXCEPT {
