@@ -120,10 +120,14 @@ install(EXPORT EnTTTargets
     DESTINATION ${ENTT_INSTALL_CONFIGDIR} 
 )
 
+# build tree package config file
+configure_file(cmake/in/EnTTBuildConfig.cmake.in EnTTConfig.cmake @ONLY)
+
 include(CMakePackageConfigHelpers)
 
+# install tree package config file
 configure_package_config_file(cmake/in/EnTTConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfig.cmake
+    ${ENTT_INSTALL_CONFIGDIR}/EnTTConfig.cmake
     INSTALL_DESTINATION ${ENTT_INSTALL_CONFIGDIR} 
     PATH_VARS CMAKE_INSTALL_INCLUDEDIR
     NO_CHECK_REQUIRED_COMPONENTS_MACRO
@@ -135,7 +139,7 @@ write_basic_package_version_file(
     COMPATIBILITY AnyNewerVersion
 )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfig.cmake
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${ENTT_INSTALL_CONFIGDIR}/EnTTConfig.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfigVersion.cmake
     DESTINATION ${ENTT_INSTALL_CONFIGDIR}
 )
