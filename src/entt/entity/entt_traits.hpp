@@ -32,6 +32,8 @@ struct entt_traits<std::uint16_t> {
     using entity_type = std::uint16_t;
     /*! @brief Underlying version type. */
     using version_type = std::uint8_t;
+    /*! @brief Difference type. */
+    using difference_type = std::int32_t;
 
     /*! @brief Mask to use to get the entity number out of an identifier. */
     static constexpr auto entity_mask = 0xFFF;
@@ -56,6 +58,8 @@ struct entt_traits<std::uint32_t> {
     using entity_type = std::uint32_t;
     /*! @brief Underlying version type. */
     using version_type = std::uint16_t;
+    /*! @brief Difference type. */
+    using difference_type = std::int64_t;
 
     /*! @brief Mask to use to get the entity number out of an identifier. */
     static constexpr auto entity_mask = 0xFFFFF;
@@ -71,8 +75,8 @@ struct entt_traits<std::uint32_t> {
  *
  * A 64 bits entity identifier guarantees:
  *
- * * 40 bits for the entity number (an indecently large number).
- * * 24 bit for the version (an indecently large number).
+ * * 32 bits for the entity number (an indecently large number).
+ * * 32 bit for the version (an indecently large number).
  */
 template<>
 struct entt_traits<std::uint64_t> {
@@ -80,13 +84,15 @@ struct entt_traits<std::uint64_t> {
     using entity_type = std::uint64_t;
     /*! @brief Underlying version type. */
     using version_type = std::uint32_t;
+    /*! @brief Difference type. */
+    using difference_type = std::int64_t;
 
     /*! @brief Mask to use to get the entity number out of an identifier. */
-    static constexpr auto entity_mask = 0xFFFFFFFFFF;
+    static constexpr auto entity_mask = 0xFFFFFFFF;
     /*! @brief Mask to use to get the version out of an identifier. */
-    static constexpr auto version_mask = 0xFFFFFF;
+    static constexpr auto version_mask = 0xFFFFFFFF;
     /*! @brief Extent of the entity number within an identifier. */
-    static constexpr auto entity_shift = 40;
+    static constexpr auto entity_shift = 32;
 };
 
 

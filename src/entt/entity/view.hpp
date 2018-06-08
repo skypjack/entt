@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_VIEW_HPP
 
 
+#include <iterator>
 #include <cassert>
 #include <array>
 #include <tuple>
@@ -469,7 +470,25 @@ class View final {
     using traits_type = entt_traits<Entity>;
 
     class Iterator {
+        friend class View<Entity, Component...>;
+
         using size_type = typename view_type::size_type;
+
+        Iterator(unchecked_type unchecked, underlying_iterator_type begin, underlying_iterator_type end) ENTT_NOEXCEPT
+            : unchecked{unchecked},
+              begin{begin},
+              end{end},
+              extent{min(std::make_index_sequence<unchecked.size()>{})}
+        {
+            if(begin != end && !valid()) {
+                ++(*this);
+            }
+        }
+
+        template<std::size_t... Indexes>
+        size_type min(std::index_sequence<Indexes...>) const ENTT_NOEXCEPT {
+            return std::min({ std::get<Indexes>(unchecked)->extent()... });
+        }
 
         bool valid() const ENTT_NOEXCEPT {
             const auto entity = *begin;
@@ -485,17 +504,19 @@ class View final {
         using value_type = typename underlying_iterator_type::value_type;
         using pointer = typename underlying_iterator_type::pointer;
         using reference = typename underlying_iterator_type::reference;
-        using iterator_category = typename underlying_iterator_type::iterator_category;
+        using iterator_category = std::forward_iterator_tag;
 
-        Iterator(unchecked_type unchecked, size_type extent, underlying_iterator_type begin, underlying_iterator_type end) ENTT_NOEXCEPT
-            : unchecked{unchecked},
-              extent{extent},
-              begin{begin},
-              end{end}
-        {
-            if(begin != end && !valid()) {
-                ++(*this);
-            }
+        Iterator() ENTT_NOEXCEPT = default;
+
+        Iterator(const Iterator &) ENTT_NOEXCEPT = default;
+        Iterator & operator=(const Iterator &) ENTT_NOEXCEPT = default;
+
+        friend void swap(Iterator &lhs, Iterator &rhs) ENTT_NOEXCEPT {
+            using std::swap;
+            swap(lhs.unchecked, rhs.unchecked);
+            swap(lhs.extent, rhs.extent);
+            swap(lhs.begin, rhs.begin);
+            swap(lhs.end, rhs.end);
         }
 
         Iterator & operator++() ENTT_NOEXCEPT {
@@ -507,14 +528,6 @@ class View final {
             return ++(*this), orig;
         }
 
-        Iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
-            return ((begin += value) != end && !valid()) ? ++(*this) : *this;
-        }
-
-        Iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
-            return Iterator{unchecked, extent, begin+value, end};
-        }
-
         bool operator==(const Iterator &other) const ENTT_NOEXCEPT {
             return other.begin == begin;
         }
@@ -523,15 +536,19 @@ class View final {
             return !(*this == other);
         }
 
-        value_type operator*() const ENTT_NOEXCEPT {
-            return *begin;
+        pointer operator->() const ENTT_NOEXCEPT {
+            return begin.operator->();
+        }
+
+        inline reference operator*() const ENTT_NOEXCEPT {
+            return *operator->();
         }
 
     private:
-        const unchecked_type unchecked;
-        const size_type extent;
+        unchecked_type unchecked;
         underlying_iterator_type begin;
         underlying_iterator_type end;
+        size_type extent;
     };
 
     View(pool_type<Component> &... pools) ENTT_NOEXCEPT
@@ -563,10 +580,6 @@ class View final {
         return other;
     }
 
-    typename view_type::size_type extent() const ENTT_NOEXCEPT {
-        return std::min({ pool<Component>().extent()... });
-    }
-
     template<typename Comp, typename Other>
     inline std::enable_if_t<std::is_same<Comp, Other>::value, const Other &>
     get(const component_iterator_type<Comp> &it, const Entity) const ENTT_NOEXCEPT { return *it; }
@@ -592,15 +605,15 @@ class View final {
             }
         }
 
+        const auto extent = std::min({ pool<Component>().extent()... });
         auto it = std::get<component_iterator_type<Comp>>(raw);
-        const auto ext = extent();
 
         // fallback to visit what remains using indirections
         for(; data[0] != end; ++data[0], ++it) {
             const auto entity = *data[0];
             const auto sz = size_type(entity & traits_type::entity_mask);
 
-            if(sz < ext && std::all_of(other.cbegin(), other.cend(), [entity](const view_type *view) { return view->fast(entity); })) {
+            if(sz < extent && std::all_of(other.cbegin(), other.cend(), [entity](const view_type *view) { return view->fast(entity); })) {
                 // avoided at least the indirection due to the sparse set for the pivot type (see get for more details)
                 func(entity, get<Comp, Component>(it, entity)...);
             }
@@ -649,7 +662,7 @@ public:
      */
     const_iterator_type cbegin() const ENTT_NOEXCEPT {
         const auto *view = candidate();
-        return iterator_type{ unchecked(view), extent(), view->cbegin(), view->cend() };
+        return iterator_type{ unchecked(view), view->cbegin(), view->cend() };
     }
 
     /**
@@ -705,7 +718,7 @@ public:
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
         const auto *view = candidate();
-        return iterator_type{ unchecked(view), extent(), view->cend(), view->cend() };
+        return iterator_type{ unchecked(view), view->cend(), view->cend() };
     }
 
     /**
@@ -753,7 +766,8 @@ public:
      */
     bool contains(const entity_type entity) const ENTT_NOEXCEPT {
         const auto sz = size_type(entity & traits_type::entity_mask);
-        return sz < extent() && std::min({ (pool<Component>().has(entity) && (pool<Component>().data()[pool<Component>().view_type::get(entity)] == entity))... });
+        const auto extent = std::min({ pool<Component>().extent()... });
+        return sz < extent && std::min({ (pool<Component>().has(entity) && (pool<Component>().data()[pool<Component>().view_type::get(entity)] == entity))... });
     }
 
     /**

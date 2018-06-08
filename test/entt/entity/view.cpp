@@ -1,8 +1,9 @@
+#include <utility>
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
 
-TEST(View, SingleComponent) {
+TEST(SingleComponentView, Functionalities) {
     entt::DefaultRegistry registry;
     auto view = registry.view<char>();
 
@@ -43,34 +44,11 @@ TEST(View, SingleComponent) {
     registry.remove<char>(e1);
 
     ASSERT_EQ(view.begin(), view.end());
+    ASSERT_EQ(view.cbegin(), view.cend());
     ASSERT_TRUE(view.empty());
 }
 
-TEST(View, SingleComponentBeginEnd) {
-    entt::DefaultRegistry registry;
-    auto view = registry.view<int>();
-    const auto &cview = view;
-
-    for(auto i = 0; i < 3; ++i) {
-        registry.assign<int>(registry.create());
-    }
-
-    auto test = [](auto begin, auto end) {
-        ASSERT_NE(begin, end);
-        ASSERT_NE(++begin, end);
-        ASSERT_NE(begin++, end);
-        ASSERT_EQ(begin+1, end);
-        ASSERT_NE(begin, end);
-        ASSERT_EQ((begin += 1), end);
-        ASSERT_EQ(begin, end);
-    };
-
-    test(view.begin(), view.end());
-    test(cview.begin(), cview.end());
-    test(view.cbegin(), view.cend());
-}
-
-TEST(View, SingleComponentContains) {
+TEST(SingleComponentView, Contains) {
     entt::DefaultRegistry registry;
 
     const auto e0 = registry.create();
@@ -87,7 +65,7 @@ TEST(View, SingleComponentContains) {
     ASSERT_TRUE(view.contains(e1));
 }
 
-TEST(View, SingleComponentEmpty) {
+TEST(SingleComponentView, Empty) {
     entt::DefaultRegistry registry;
 
     const auto e0 = registry.create();
@@ -107,7 +85,7 @@ TEST(View, SingleComponentEmpty) {
     }
 }
 
-TEST(View, SingleComponentEach) {
+TEST(SingleComponentView, Each) {
     entt::DefaultRegistry registry;
 
     registry.assign<int>(registry.create());
@@ -126,7 +104,7 @@ TEST(View, SingleComponentEach) {
     ASSERT_EQ(cnt, std::size_t{0});
 }
 
-TEST(View, MultipleComponent) {
+TEST(MultipleComponentView, Functionalities) {
     entt::DefaultRegistry registry;
     auto view = registry.view<int, char>();
 
@@ -152,7 +130,6 @@ TEST(View, MultipleComponent) {
     ASSERT_NO_THROW((++registry.view<int, char>().begin()));
 
     ASSERT_NE(view.begin(), view.end());
-    ASSERT_EQ(view.begin()+1, view.end());
     ASSERT_EQ(view.size(), decltype(view.size()){1});
 
     registry.get<char>(e0) = '1';
@@ -170,33 +147,53 @@ TEST(View, MultipleComponent) {
     registry.remove<char>(e1);
 }
 
-TEST(View, MultipleComponentBeginEnd) {
+TEST(MultipleComponentView, Iterator) {
+    using iterator_type = typename decltype(std::declval<entt::DefaultRegistry>().view<int, char>())::iterator_type;
+
     entt::DefaultRegistry registry;
-    auto view = registry.view<int, char>();
-    const auto &cview = view;
+    const auto entity = registry.create();
+    registry.assign<int>(entity);
+    registry.assign<char>(entity);
 
-    for(auto i = 0; i < 3; ++i) {
-        const auto entity = registry.create();
-        registry.assign<int>(entity);
-        registry.assign<char>(entity);
-    }
+    const auto view = registry.view<int, char>();
 
-    auto test = [](auto begin, auto end) {
-        ASSERT_NE(begin, end);
-        ASSERT_NE(++begin, end);
-        ASSERT_NE(begin++, end);
-        ASSERT_EQ(begin+1, end);
-        ASSERT_NE(begin, end);
-        ASSERT_EQ((begin += 1), end);
-        ASSERT_EQ(begin, end);
-    };
+    iterator_type end{view.begin()};
+    iterator_type begin{};
+    begin = view.end();
+    std::swap(begin, end);
 
-    test(cview.begin(), cview.end());
-    test(view.begin(), view.end());
-    test(view.cbegin(), view.cend());
+    ASSERT_EQ(begin, view.begin());
+    ASSERT_EQ(end, view.end());
+    ASSERT_NE(begin, end);
+
+    ASSERT_EQ(view.begin()++, view.begin());
+    ASSERT_EQ(++view.begin(), view.end());
 }
 
-TEST(View, MultipleComponentContains) {
+TEST(MultipleComponentView, ConstIterator) {
+    using iterator_type = typename decltype(std::declval<entt::DefaultRegistry>().view<int, char>())::const_iterator_type;
+
+    entt::DefaultRegistry registry;
+    const auto entity = registry.create();
+    registry.assign<int>(entity);
+    registry.assign<char>(entity);
+
+    const auto view = registry.view<int, char>();
+
+    iterator_type cend{view.cbegin()};
+    iterator_type cbegin{};
+    cbegin = view.cend();
+    std::swap(cbegin, cend);
+
+    ASSERT_EQ(cbegin, view.cbegin());
+    ASSERT_EQ(cend, view.cend());
+    ASSERT_NE(cbegin, cend);
+
+    ASSERT_EQ(view.cbegin()++, view.cbegin());
+    ASSERT_EQ(++view.cbegin(), view.cend());
+}
+
+TEST(MultipleComponentView, Contains) {
     entt::DefaultRegistry registry;
 
     const auto e0 = registry.create();
@@ -215,7 +212,7 @@ TEST(View, MultipleComponentContains) {
     ASSERT_TRUE(view.contains(e1));
 }
 
-TEST(View, MultipleComponentEmpty) {
+TEST(MultipleComponentView, Empty) {
     entt::DefaultRegistry registry;
 
     const auto e0 = registry.create();
@@ -235,7 +232,7 @@ TEST(View, MultipleComponentEmpty) {
     }
 }
 
-TEST(View, MultipleComponentEach) {
+TEST(MultipleComponentView, Each) {
     entt::DefaultRegistry registry;
 
     const auto e0 = registry.create();
@@ -259,7 +256,7 @@ TEST(View, MultipleComponentEach) {
     ASSERT_EQ(cnt, std::size_t{0});
 }
 
-TEST(View, MultipleComponentEachWithHoles) {
+TEST(MultipleComponentView, EachWithHoles) {
     entt::DefaultRegistry registry;
 
     const auto e0 = registry.create();
@@ -330,6 +327,7 @@ TEST(PersistentView, Prepare) {
     registry.remove<char>(e1);
 
     ASSERT_EQ(view.begin(), view.end());
+    ASSERT_EQ(view.cbegin(), view.cend());
     ASSERT_TRUE(view.empty());
 }
 
@@ -378,33 +376,8 @@ TEST(PersistentView, NoPrepare) {
     registry.remove<char>(e1);
 
     ASSERT_EQ(view.begin(), view.end());
+    ASSERT_EQ(view.cbegin(), view.cend());
     ASSERT_TRUE(view.empty());
-}
-
-TEST(PersistentView, BeginEnd) {
-    entt::DefaultRegistry registry;
-    auto view = registry.view<int, char>(entt::persistent_t{});
-    const auto &cview = view;
-
-    for(auto i = 0; i < 3; ++i) {
-        const auto entity = registry.create();
-        registry.assign<int>(entity);
-        registry.assign<char>(entity);
-    }
-
-    auto test = [](auto begin, auto end) {
-        ASSERT_NE(begin, end);
-        ASSERT_NE(++begin, end);
-        ASSERT_NE(begin++, end);
-        ASSERT_EQ(begin+1, end);
-        ASSERT_NE(begin, end);
-        ASSERT_EQ((begin += 1), end);
-        ASSERT_EQ(begin, end);
-    };
-
-    test(cview.begin(), cview.end());
-    test(view.begin(), view.end());
-    test(view.cbegin(), view.cend());
 }
 
 TEST(PersistentView, Contains) {
@@ -558,31 +531,8 @@ TEST(RawView, Functionalities) {
     registry.remove<char>(e1);
 
     ASSERT_EQ(view.begin(), view.end());
+    ASSERT_EQ(view.cbegin(), view.cend());
     ASSERT_TRUE(view.empty());
-}
-
-TEST(RawView, BeginEnd) {
-    entt::DefaultRegistry registry;
-    auto view = registry.view<int>(entt::raw_t{});
-    const auto &cview = view;
-
-    for(auto i = 0; i < 3; ++i) {
-        registry.assign<int>(registry.create());
-    }
-
-    auto test = [](auto begin, auto end) {
-        ASSERT_NE(begin, end);
-        ASSERT_NE(++begin, end);
-        ASSERT_NE(begin++, end);
-        ASSERT_EQ(begin+1, end);
-        ASSERT_NE(begin, end);
-        ASSERT_EQ((begin += 1), end);
-        ASSERT_EQ(begin, end);
-    };
-
-    test(cview.begin(), cview.end());
-    test(view.begin(), view.end());
-    test(view.cbegin(), view.cend());
 }
 
 TEST(RawView, Empty) {

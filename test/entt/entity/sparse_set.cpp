@@ -2,6 +2,10 @@
 #include <gtest/gtest.h>
 #include <entt/entity/sparse_set.hpp>
 
+struct Type {
+    int value;
+};
+
 TEST(SparseSetNoType, Functionalities) {
     entt::SparseSet<unsigned int> set;
     const auto &cset = set;
@@ -54,7 +58,97 @@ TEST(SparseSetNoType, Functionalities) {
     other = std::move(set);
 }
 
-TEST(SparseSetNoType, DataBeginEnd) {
+TEST(SparseSetNoType, Iterator) {
+    using iterator_type = typename entt::SparseSet<unsigned int>::iterator_type;
+
+    entt::SparseSet<unsigned int> set;
+    set.construct(3);
+
+    iterator_type end{set.begin()};
+    iterator_type begin{};
+    begin = set.end();
+    std::swap(begin, end);
+
+    ASSERT_EQ(begin, set.begin());
+    ASSERT_EQ(end, set.end());
+    ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin++, set.begin());
+    ASSERT_EQ(begin--, set.end());
+
+    ASSERT_EQ(begin+1, set.end());
+    ASSERT_EQ(end-1, set.begin());
+
+    ASSERT_EQ(++begin, set.end());
+    ASSERT_EQ(--begin, set.begin());
+
+    ASSERT_EQ(begin += 1, set.end());
+    ASSERT_EQ(begin -= 1, set.begin());
+
+    ASSERT_EQ(begin + (end - begin), set.end());
+    ASSERT_EQ(begin - (begin - end), set.end());
+
+    ASSERT_EQ(end - (end - begin), set.begin());
+    ASSERT_EQ(end + (begin - end), set.begin());
+
+    ASSERT_EQ(begin[0], *set.begin());
+
+    ASSERT_LT(begin, end);
+    ASSERT_LE(begin, set.begin());
+
+    ASSERT_GT(end, begin);
+    ASSERT_GE(end, set.end());
+
+    ASSERT_EQ(*begin, 3);
+    ASSERT_EQ(*begin.operator->(), 3);
+}
+
+TEST(SparseSetNoType, ConstIterator) {
+    using iterator_type = typename entt::SparseSet<unsigned int>::const_iterator_type;
+
+    entt::SparseSet<unsigned int> set;
+    set.construct(3);
+
+    iterator_type cend{set.cbegin()};
+    iterator_type cbegin{};
+    cbegin = set.cend();
+    std::swap(cbegin, cend);
+
+    ASSERT_EQ(cbegin, set.cbegin());
+    ASSERT_EQ(cend, set.cend());
+    ASSERT_NE(cbegin, cend);
+
+    ASSERT_EQ(cbegin++, set.cbegin());
+    ASSERT_EQ(cbegin--, set.cend());
+
+    ASSERT_EQ(cbegin+1, set.cend());
+    ASSERT_EQ(cend-1, set.cbegin());
+
+    ASSERT_EQ(++cbegin, set.cend());
+    ASSERT_EQ(--cbegin, set.cbegin());
+
+    ASSERT_EQ(cbegin += 1, set.cend());
+    ASSERT_EQ(cbegin -= 1, set.cbegin());
+
+    ASSERT_EQ(cbegin + (cend - cbegin), set.cend());
+    ASSERT_EQ(cbegin - (cbegin - cend), set.cend());
+
+    ASSERT_EQ(cend - (cend - cbegin), set.cbegin());
+    ASSERT_EQ(cend + (cbegin - cend), set.cbegin());
+
+    ASSERT_EQ(cbegin[0], *set.cbegin());
+
+    ASSERT_LT(cbegin, cend);
+    ASSERT_LE(cbegin, set.cbegin());
+
+    ASSERT_GT(cend, cbegin);
+    ASSERT_GE(cend, set.cend());
+
+    ASSERT_EQ(*cbegin, 3);
+    ASSERT_EQ(*cbegin.operator->(), 3);
+}
+
+TEST(SparseSetNoType, Data) {
     entt::SparseSet<unsigned int> set;
 
     set.construct(3);
@@ -68,31 +162,6 @@ TEST(SparseSetNoType, DataBeginEnd) {
     ASSERT_EQ(*(set.data() + 0u), 3u);
     ASSERT_EQ(*(set.data() + 1u), 12u);
     ASSERT_EQ(*(set.data() + 2u), 42u);
-
-    auto it = set.begin();
-
-    ASSERT_EQ(*it, 42u);
-    ASSERT_EQ(*(it+1), 12u);
-    ASSERT_EQ(*(it+2), 3u);
-    ASSERT_EQ(it += 3, set.end());
-
-    auto begin = set.begin();
-    auto end = set.end();
-
-    ASSERT_EQ(*(begin++), 42u);
-    ASSERT_EQ(*(begin++), 12u);
-    ASSERT_EQ(*(begin++), 3u);
-
-    ASSERT_EQ(begin, end);
-
-    auto cbegin = set.cbegin();
-    auto cend = set.cend();
-
-    ASSERT_NE(cbegin, cend);
-    ASSERT_EQ(cbegin+3, cend);
-    ASSERT_NE(cbegin, cend);
-    ASSERT_EQ(cbegin += 3, cend);
-    ASSERT_EQ(cbegin, cend);
 }
 
 TEST(SparseSetNoType, RespectDisjoint) {
@@ -320,7 +389,91 @@ TEST(SparseSetWithType, TypesFromStandardTemplateLibraryMustWork) {
     set.destroy(0);
 }
 
-TEST(SparseSetWithType, RawBeginEnd) {
+TEST(SparseSetWithType, Iterator) {
+    using iterator_type = typename entt::SparseSet<unsigned int, Type>::iterator_type;
+
+    entt::SparseSet<unsigned int, Type> set;
+    set.construct(3, 42);
+
+    iterator_type end{set.begin()};
+    iterator_type begin{};
+    begin = set.end();
+    std::swap(begin, end);
+
+    ASSERT_EQ(begin, set.begin());
+    ASSERT_EQ(end, set.end());
+    ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin++, set.begin());
+    ASSERT_EQ(begin--, set.end());
+
+    ASSERT_EQ(begin+1, set.end());
+    ASSERT_EQ(end-1, set.begin());
+
+    ASSERT_EQ(++begin, set.end());
+    ASSERT_EQ(--begin, set.begin());
+
+    ASSERT_EQ(begin += 1, set.end());
+    ASSERT_EQ(begin -= 1, set.begin());
+
+    ASSERT_EQ(begin + (end - begin), set.end());
+    ASSERT_EQ(begin - (begin - end), set.end());
+
+    ASSERT_EQ(end - (end - begin), set.begin());
+    ASSERT_EQ(end + (begin - end), set.begin());
+
+    ASSERT_EQ(begin[0].value, set.begin()->value);
+
+    ASSERT_LT(begin, end);
+    ASSERT_LE(begin, set.begin());
+
+    ASSERT_GT(end, begin);
+    ASSERT_GE(end, set.end());
+}
+
+TEST(SparseSetWithType, ConstIterator) {
+    using iterator_type = typename entt::SparseSet<unsigned int, Type>::const_iterator_type;
+
+    entt::SparseSet<unsigned int, Type> set;
+    set.construct(3, 42);
+
+    iterator_type cend{set.cbegin()};
+    iterator_type cbegin{};
+    cbegin = set.cend();
+    std::swap(cbegin, cend);
+
+    ASSERT_EQ(cbegin, set.cbegin());
+    ASSERT_EQ(cend, set.cend());
+    ASSERT_NE(cbegin, cend);
+
+    ASSERT_EQ(cbegin++, set.cbegin());
+    ASSERT_EQ(cbegin--, set.cend());
+
+    ASSERT_EQ(cbegin+1, set.cend());
+    ASSERT_EQ(cend-1, set.cbegin());
+
+    ASSERT_EQ(++cbegin, set.cend());
+    ASSERT_EQ(--cbegin, set.cbegin());
+
+    ASSERT_EQ(cbegin += 1, set.cend());
+    ASSERT_EQ(cbegin -= 1, set.cbegin());
+
+    ASSERT_EQ(cbegin + (cend - cbegin), set.cend());
+    ASSERT_EQ(cbegin - (cbegin - cend), set.cend());
+
+    ASSERT_EQ(cend - (cend - cbegin), set.cbegin());
+    ASSERT_EQ(cend + (cbegin - cend), set.cbegin());
+
+    ASSERT_EQ(cbegin[0].value, set.cbegin()->value);
+
+    ASSERT_LT(cbegin, cend);
+    ASSERT_LE(cbegin, set.cbegin());
+
+    ASSERT_GT(cend, cbegin);
+    ASSERT_GE(cend, set.cend());
+}
+
+TEST(SparseSetWithType, Raw) {
     entt::SparseSet<unsigned int, int> set;
 
     set.construct(3, 3);
@@ -334,23 +487,6 @@ TEST(SparseSetWithType, RawBeginEnd) {
     ASSERT_EQ(*(set.raw() + 0u), 3);
     ASSERT_EQ(*(set.raw() + 1u), 6);
     ASSERT_EQ(*(set.raw() + 2u), 9);
-
-    auto begin = set.begin();
-    auto end = set.end();
-
-    ASSERT_EQ(*(begin++), 9);
-    ASSERT_EQ(*(begin++), 6);
-    ASSERT_EQ(*(begin++), 3);
-    ASSERT_EQ(begin, end);
-
-    auto cbegin = set.cbegin();
-    auto cend = set.cend();
-
-    ASSERT_NE(cbegin, cend);
-    ASSERT_EQ(cbegin+3, cend);
-    ASSERT_NE(cbegin, cend);
-    ASSERT_EQ(cbegin += 3, cend);
-    ASSERT_EQ(cbegin, cend);
 }
 
 TEST(SparseSetWithType, SortOrdered) {

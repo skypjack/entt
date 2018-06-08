@@ -10,4 +10,7 @@
 * improve CMake interface, see mail from Malte
 * is registry/utility.hpp really required?
 * "singleton mode" for tags (see #66)
+* add a shortcut to destroy all the entities that have components X, Y, Z (view and registry?)
+* add operator[] to views if possible
+* C++17. That's all.
 * AOB
