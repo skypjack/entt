@@ -19,7 +19,7 @@ TEST(Prototype, SameRegistry) {
     ASSERT_EQ(std::get<0>(prototype.get<int, char>()), 3);
     ASSERT_EQ(std::get<1>(cprototype.get<int, char>()), 'c');
 
-    const auto e0 = prototype();
+    const auto e0 = prototype.create();
 
     ASSERT_TRUE((prototype.has<int, char>()));
     ASSERT_FALSE(registry.orphan(e0));
@@ -79,7 +79,7 @@ TEST(Prototype, OtherRegistry) {
     ASSERT_EQ(std::get<0>(prototype.get<int, char>()), 3);
     ASSERT_EQ(std::get<1>(cprototype.get<int, char>()), 'c');
 
-    const auto e0 = prototype(registry);
+    const auto e0 = prototype.create(registry);
 
     ASSERT_TRUE((prototype.has<int, char>()));
     ASSERT_FALSE(registry.orphan(e0));

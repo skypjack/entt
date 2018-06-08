@@ -279,10 +279,8 @@ public:
      *
      * @return A valid entity identifier.
      */
-    entity_type create() const {
-        const auto entity = registry->create();
-        assign(*registry, entity);
-        return entity;
+    inline entity_type create() const {
+        return create(*registry);
     }
 
     /**
@@ -332,10 +330,8 @@ public:
      *
      * @param dst A valid entity identifier.
      */
-    void assign(const entity_type dst) const {
-        for(auto &handler: handlers) {
-            handler.second.assign(*this, *registry, dst);
-        }
+    inline void assign(const entity_type dst) const {
+        assign(*registry, dst);
     }
 
     /**
@@ -381,10 +377,8 @@ public:
      *
      * @param dst A valid entity identifier.
      */
-    void accommodate(const entity_type dst) const {
-        for(auto &handler: handlers) {
-            handler.second.accommodate(*this, *registry, dst);
-        }
+    inline void accommodate(const entity_type dst) const {
+        accommodate(*registry, dst);
     }
 
     /**
