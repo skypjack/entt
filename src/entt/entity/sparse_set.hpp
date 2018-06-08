@@ -64,12 +64,14 @@ class SparseSet<Entity> {
         using value_type = Entity;
         using pointer = const value_type *;
         using reference = value_type;
-        using iterator_category = std::input_iterator_tag;
+        using iterator_category = std::forward_iterator_tag;
 
         Iterator(pointer direct, std::size_t pos)
             : direct{direct}, pos{pos}
         {}
-
+		Iterator()
+			: direct{ nullptr }, pos{ 0 }
+		{}
         Iterator & operator++() ENTT_NOEXCEPT {
             return --pos, *this;
         }
@@ -507,11 +509,14 @@ class SparseSet<Entity, Type>: public SparseSet<Entity> {
         using value_type = std::conditional_t<Const, const Type, Type>;
         using pointer = value_type *;
         using reference = value_type &;
-        using iterator_category = std::input_iterator_tag;
+        using iterator_category = std::forward_iterator_tag;
 
         Iterator(pointer instances, std::size_t pos)
             : instances{instances}, pos{pos}
         {}
+		Iterator()
+			: instances{ nullptr }, pos{ 0 }
+		{}
 
         Iterator & operator++() ENTT_NOEXCEPT {
             return --pos, *this;

@@ -110,6 +110,29 @@ TEST(Benchmark, IterateSingleComponent1M) {
         (void)accumulator;
     });
 }
+TEST(Benchmark, ParallelIterateSingleComponent1M) {
+	entt::DefaultRegistry registry;
+
+	std::cout << "Parallel iteration over 1000000 entities, one component" << std::endl;
+
+	for (std::uint64_t i = 0; i < 1000000L; i++) {
+		const auto entity = registry.create();
+		registry.assign<Position>(entity);
+	}
+
+	auto test = [&registry](auto func) {
+		Timer timer;
+		registry.view<Position>().par_each(func);
+		timer.elapsed();
+	};
+
+	test([](auto, const auto &) {});
+	test([](auto, auto &... comp) {
+		using accumulator_type = int[];
+		accumulator_type accumulator = { (comp.x = {}, 0)... };
+		(void)accumulator;
+	});
+}
 
 TEST(Benchmark, IterateSingleComponentRaw1M) {
     entt::DefaultRegistry registry;
@@ -133,6 +156,139 @@ TEST(Benchmark, IterateSingleComponentRaw1M) {
         accumulator_type accumulator = { (comp.x = {}, 0)... };
         (void)accumulator;
     });
+}
+TEST(Benchmark, ParallelIterateSingleComponentRaw1M) {
+	entt::DefaultRegistry registry;
+
+	std::cout << "Parallel iteration over 1000000 entities, one component, raw view" << std::endl;
+
+	for (std::uint64_t i = 0; i < 1000000L; i++) {
+		const auto entity = registry.create();
+		registry.assign<Position>(entity);
+	}
+
+	auto test = [&registry](auto func) {
+		Timer timer;
+		registry.view<Position>(entt::raw_t{}).par_each(func);
+		timer.elapsed();
+	};
+
+	test([](const auto &) {});
+	test([](auto &... comp) {
+		using accumulator_type = int[];
+		accumulator_type accumulator = { (comp.x = {}, 0)... };
+		(void)accumulator;
+	});
+}
+
+bool IsPrime(int n)
+{
+	for (int i = 2; i <= n / 2; ++i)
+	{
+		if (n % i == 0)
+		{
+			//p.y = 1;
+			return false;
+		}
+	}
+	return true;
+}
+TEST(Benchmark, ParallelIterateRawHeavyInternalFunction) {
+	entt::DefaultRegistry registry;
+
+	std::cout << "Parallel iteration over 1000 entities, heavy internal function, raw view" << std::endl;
+
+	for (std::uint64_t i = 100000; i < 101000L; i++) {
+		const auto entity = registry.create();
+		registry.assign<Position>(entity,i, i);
+	}
+
+	auto test = [&registry](auto func) {
+		std::cout << "Serial:";
+		Timer timer;
+		registry.view<Position>(entt::raw_t{}).each(func);
+		timer.elapsed();
+	};
+	auto par_test = [&registry](auto func) {
+		std::cout << "Parallel:";
+		Timer timer;
+		registry.view<Position>(entt::raw_t{}).par_each(func);
+		timer.elapsed();
+	};
+
+	//calculate if the number in Position.x is a prime as a "expensive" function
+	test([](Position & p) {
+		p.y = IsPrime(p.x) ? 1 : 0;
+		
+	});
+	par_test([](Position & p) {
+		p.y = IsPrime(p.x) ? 1 : 0;
+	});	
+}
+
+TEST(Benchmark, ParallelIterateSingleComponentHeavyInternalFunction) {
+	entt::DefaultRegistry registry;
+
+	std::cout << "Parallel iteration over 1000 entities, heavy internal function, one component, normal view" << std::endl;
+
+	for (std::uint64_t i = 100000; i < 101000L; i++) {
+		const auto entity = registry.create();
+		registry.assign<Position>(entity, i, i);
+	}
+
+	auto test = [&registry](auto func) {
+		std::cout << "Serial:";
+		Timer timer;
+		registry.view<Position>().each(func);
+		timer.elapsed();
+	};
+	auto par_test = [&registry](auto func) {
+		std::cout << "Parallel:";
+		Timer timer;
+		registry.view<Position>().par_each(func);
+		timer.elapsed();
+	};
+
+	//calculate if the number in Position.x is a prime as a "expensive" function
+	test([](auto & e,Position & p) {
+		p.y = IsPrime(p.x) ? 1 : 0;
+	});
+	par_test([](auto & e, Position & p) {
+		p.y = IsPrime(p.x) ? 1 : 0;
+	});	
+}
+
+TEST(Benchmark, ParallelIteratePersistentViewHeavyInternalFunction) {
+	entt::DefaultRegistry registry;
+
+	std::cout << "Parallel iteration over 1000 entities, heavy internal function, 2 component persistent view, normal view" << std::endl;
+
+	for (std::uint64_t i = 100000; i < 101000L; i++) {
+		const auto entity = registry.create();
+		registry.assign<Position>(entity, i, i);
+		registry.assign<Velocity>(entity, i, i);
+	}
+
+	auto test = [&registry](auto func) {
+		std::cout << "Serial:";
+		Timer timer;
+		registry.view<Position, Velocity>(entt::persistent_t{}).each(func);
+		timer.elapsed();
+	};
+	auto par_test = [&registry](auto func) {
+		std::cout << "Parallel:";
+		Timer timer;
+		registry.view<Position, Velocity>(entt::persistent_t{}).par_each(func);
+		timer.elapsed();
+	};
+
+	//calculate if the number in Position.x is a prime as a "expensive" function
+	test([](auto & e, Position & p, Velocity&v) {
+		p.y = IsPrime(p.x) ? 1 : 0;
+	});
+	par_test([](auto & e, Position & p, Velocity&v) {
+		p.y = IsPrime(p.x) ? 1 : 0;
+	});	
 }
 
 TEST(Benchmark, IterateTwoComponents1M) {
@@ -240,6 +396,31 @@ TEST(Benchmark, IterateTwoComponentsPersistent1M) {
         accumulator_type accumulator = { (comp.x = {}, 0)... };
         (void)accumulator;
     });
+}
+TEST(Benchmark, ParallelIterateTwoComponentsPersistent1M) {
+	entt::DefaultRegistry registry;
+	registry.prepare<Position, Velocity>();
+
+	std::cout << "Parallel Iteration over 1000000 entities, two components, persistent view" << std::endl;
+
+	for (std::uint64_t i = 0; i < 1000000L; i++) {
+		const auto entity = registry.create();
+		registry.assign<Position>(entity);
+		registry.assign<Velocity>(entity);
+	}
+
+	auto test = [&registry](auto func) {
+		Timer timer;
+		registry.view<Position, Velocity>(entt::persistent_t{}).par_each(func);
+		timer.elapsed();
+	};
+
+	test([](auto, const auto &...) {});
+	test([](auto, auto &... comp) {
+		using accumulator_type = int[];
+		accumulator_type accumulator = { (comp.x = {}, 0)... };
+		(void)accumulator;
+	});
 }
 
 TEST(Benchmark, IterateFiveComponents1M) {
@@ -599,4 +780,5 @@ TEST(Benchmark, AlmostSortedInsertionSort) {
     }, entt::InsertionSort{});
 
     timer.elapsed();
+	
 }
