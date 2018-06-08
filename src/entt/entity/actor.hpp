@@ -170,7 +170,7 @@ struct Actor {
      * @brief Returns a reference to the underlying registry.
      * @return A reference to the underlying registry.
      */
-    const registry_type & registry() const ENTT_NOEXCEPT {
+    inline const registry_type & registry() const ENTT_NOEXCEPT {
         return reg;
     }
 
@@ -186,7 +186,7 @@ struct Actor {
      * @brief Returns the entity associated with an actor.
      * @return The entity associated with the actor.
      */
-    entity_type entity() const ENTT_NOEXCEPT {
+    inline entity_type entity() const ENTT_NOEXCEPT {
         return entt;
     }
 

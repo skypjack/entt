@@ -47,8 +47,8 @@ struct entt_traits<std::uint16_t> {
  *
  * A 32 bits entity identifier guarantees:
  *
- * * 24 bits for the entity number (suitable for almost all the games).
- * * 8 bit for the version (resets in [0-255]).
+ * * 20 bits for the entity number (suitable for almost all the games).
+ * * 12 bit for the version (resets in [0-4095]).
  */
 template<>
 struct entt_traits<std::uint32_t> {
