@@ -83,14 +83,14 @@ class PersistentView final {
     {}
 
 public:
-    /*! @brief Input iterator type. */
-    using iterator_type = typename view_type::iterator_type;
-    /*! @brief Constant input iterator type. */
-    using const_iterator_type = typename view_type::const_iterator_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename view_type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = typename view_type::size_type;
+    /*! @brief Input iterator type. */
+    using iterator_type = typename view_type::iterator_type;
+    /*! @brief Constant input iterator type. */
+    using const_iterator_type = typename view_type::const_iterator_type;
 
     /**
      * @brief Returns the number of entities that have the given components.
@@ -233,6 +233,15 @@ public:
      */
     iterator_type end() ENTT_NOEXCEPT {
         return view.end();
+    }
+
+    /**
+     * @brief Returns a reference to the element at the given position.
+     * @param pos Position of the element to return.
+     * @return A reference to the requested element.
+     */
+    const entity_type & operator[](const size_type pos) const ENTT_NOEXCEPT {
+        return view[pos];
     }
 
     /**
@@ -608,14 +617,14 @@ class View final {
     }
 
 public:
-    /*! @brief Input iterator type. */
-    using iterator_type = Iterator;
-    /*! @brief Constant input iterator type. */
-    using const_iterator_type = Iterator;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename view_type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = typename view_type::size_type;
+    /*! @brief Input iterator type. */
+    using iterator_type = Iterator;
+    /*! @brief Constant input iterator type. */
+    using const_iterator_type = Iterator;
 
     /**
      * @brief Estimates the number of entities that have the given components.
@@ -952,16 +961,16 @@ class View<Entity, Component> final {
     {}
 
 public:
-    /*! @brief Input iterator type. */
-    using iterator_type = typename view_type::iterator_type;
-    /*! @brief Constant input iterator type. */
-    using const_iterator_type = typename view_type::const_iterator_type;
+    /*! @brief Type of component iterated by the view. */
+    using raw_type = typename pool_type::object_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename pool_type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = typename pool_type::size_type;
-    /*! @brief Type of component iterated by the view. */
-    using raw_type = typename pool_type::object_type;
+    /*! @brief Input iterator type. */
+    using iterator_type = typename view_type::iterator_type;
+    /*! @brief Constant input iterator type. */
+    using const_iterator_type = typename view_type::const_iterator_type;
 
     /**
      * @brief Returns the number of entities that have the given component.
@@ -1139,6 +1148,15 @@ public:
     }
 
     /**
+     * @brief Returns a reference to the element at the given position.
+     * @param pos Position of the element to return.
+     * @return A reference to the requested element.
+     */
+    const entity_type & operator[](const size_type pos) const ENTT_NOEXCEPT {
+        return pool.view_type::operator[](pos);
+    }
+
+    /**
      * @brief Checks if a view contains an entity.
      * @param entity A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
@@ -1285,16 +1303,16 @@ class RawView final {
     {}
 
 public:
-    /*! @brief Input iterator type. */
-    using iterator_type = typename pool_type::iterator_type;
-    /*! @brief Constant input iterator type. */
-    using const_iterator_type = typename pool_type::const_iterator_type;
+    /*! @brief Type of component iterated by the view. */
+    using raw_type = typename pool_type::object_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename pool_type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = typename pool_type::size_type;
-    /*! @brief Type of component iterated by the view. */
-    using raw_type = typename pool_type::object_type;
+    /*! @brief Input iterator type. */
+    using iterator_type = typename pool_type::iterator_type;
+    /*! @brief Constant input iterator type. */
+    using const_iterator_type = typename pool_type::const_iterator_type;
 
     /**
      * @brief Returns the number of instances of the given type.
@@ -1463,6 +1481,24 @@ public:
      */
     iterator_type end() ENTT_NOEXCEPT {
         return pool.end();
+    }
+
+    /**
+     * @brief Returns a reference to the element at the given position.
+     * @param pos Position of the element to return.
+     * @return A reference to the requested element.
+     */
+    const raw_type & operator[](const size_type pos) const ENTT_NOEXCEPT {
+        return pool[pos];
+    }
+
+    /**
+     * @brief Returns a reference to the element at the given position.
+     * @param pos Position of the element to return.
+     * @return A reference to the requested element.
+     */
+    inline raw_type & operator[](const size_type pos) ENTT_NOEXCEPT {
+        return const_cast<raw_type &>(const_cast<const RawView *>(this)->operator[](pos));
     }
 
     /**
