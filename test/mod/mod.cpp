@@ -135,7 +135,6 @@ duk_ret_t get<DuktapeRuntime>(duk_context *ctx, entt::DefaultRegistry &registry)
     duk_push_string(ctx, runtime.components[type].c_str());
     duk_json_decode(ctx, -1);
 
-
     return 1;
 }
 

@@ -11,6 +11,7 @@
 #include <vector>
 #include <list>
 #include "../config/config.h"
+#include "../core/family.hpp"
 
 
 namespace entt {
@@ -39,6 +40,8 @@ namespace entt {
  */
 template<typename Derived>
 class Emitter {
+    using handler_family = Family<struct InternalEmitterHandlerFamily>;
+
     struct BaseHandler {
         virtual ~BaseHandler() = default;
         virtual bool empty() const ENTT_NOEXCEPT = 0;
@@ -112,20 +115,9 @@ class Emitter {
         container_type onL{};
     };
 
-    static std::size_t next() ENTT_NOEXCEPT {
-        static std::size_t counter = 0;
-        return counter++;
-    }
-
-    template<typename>
-    static std::size_t type() ENTT_NOEXCEPT {
-        static std::size_t value = next();
-        return value;
-    }
-
     template<typename Event>
     Handler<Event> & handler() ENTT_NOEXCEPT {
-        const std::size_t family = type<Event>();
+        const std::size_t family = handler_family::type<Event>();
 
         if(!(family < handlers.size())) {
             handlers.resize(family+1);
@@ -174,7 +166,7 @@ public:
         Connection(Connection &&) = default;
 
         /**
-         * @brief Default copy assignament operator.
+         * @brief Default copy assignment operator.
          * @return This connection.
          */
         Connection & operator=(const Connection &) = default;
@@ -201,7 +193,7 @@ public:
 
     /*! @brief Copying an emitter isn't allowed. @return This emitter. */
     Emitter & operator=(const Emitter &) = delete;
-    /*! @brief Default move assignament operator. @return This emitter. */
+    /*! @brief Default move assignment operator. @return This emitter. */
     Emitter & operator=(Emitter &&) = default;
 
     /**
@@ -304,8 +296,9 @@ public:
      * results in undefined behavior.
      */
     void clear() ENTT_NOEXCEPT {
-        std::for_each(handlers.begin(), handlers.end(),
-                      [](auto &&handler) { if(handler) { handler->clear(); } });
+        std::for_each(handlers.begin(), handlers.end(), [](auto &&handler) {
+            return handler ? handler->clear() : void();
+        });
     }
 
     /**
@@ -315,7 +308,7 @@ public:
      */
     template<typename Event>
     bool empty() const ENTT_NOEXCEPT {
-        const std::size_t family = type<Event>();
+        const std::size_t family = handler_family::type<Event>();
 
         return (!(family < handlers.size()) ||
                 !handlers[family] ||
@@ -327,8 +320,9 @@ public:
      * @return True if there are no listeners registered, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
-        return std::all_of(handlers.cbegin(), handlers.cend(),
-                           [](auto &&handler) { return !handler || handler->empty(); });
+        return std::all_of(handlers.cbegin(), handlers.cend(), [](auto &&handler) {
+            return !handler || handler->empty();
+        });
     }
 
 private:

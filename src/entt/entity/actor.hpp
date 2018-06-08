@@ -6,7 +6,6 @@
 #include <utility>
 #include "../config/config.h"
 #include "registry.hpp"
-#include "utility.hpp"
 
 
 namespace entt {

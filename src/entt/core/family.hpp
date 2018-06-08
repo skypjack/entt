@@ -2,9 +2,9 @@
 #define ENTT_CORE_FAMILY_HPP
 
 
-#include<type_traits>
-#include<cstddef>
-#include<atomic>
+#include <type_traits>
+#include <cstddef>
+#include <atomic>
 #include "../config/config.h"
 
 
