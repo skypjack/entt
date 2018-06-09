@@ -1148,7 +1148,7 @@ public:
     void each(Func func) const {
         if(available) {
             for(auto pos = entities.size(); pos; --pos) {
-                const entity_type curr = pos - 1;
+                const entity_type curr = static_cast<entity_type>(pos - 1);
                 const auto entity = entities[curr];
                 const auto entt = entity & traits_type::entity_mask;
 
