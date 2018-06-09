@@ -26,7 +26,7 @@ if(BUILD_MOD)
     set(DUKTAPE_SRC_DIR ${DUKTAPE_DEPS_DIR}/src/src)
 
     set(MOD_TEST_SOURCE ${DUKTAPE_SRC_DIR}/duktape.c mod/mod.cpp)
-    ADD_ENTT_TEST(mod ${MOD_TEST_SOURCE})
+    ADD_ENTT_TEST(mod "${MOD_TEST_SOURCE}")
     target_include_directories(mod PRIVATE ${DUKTAPE_SRC_DIR})
 endif()
 
