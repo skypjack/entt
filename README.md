@@ -36,7 +36,8 @@
       * [Persistent View](#persistent-view)
       * [Raw View](#raw-view)
       * [Give me everything](#give-me-everything)
-   * [Side notes](#side-notes)
+   * [Iterations: what is allowed and what is not](#iterations-what-is-allowed-and-what-is-not)
+   * [Multithreading](#multithreading)
 * [Crash Course: core functionalities](#crash-course-core-functionalities)
    * [Compile-time identifiers](#compile-time-identifiers)
    * [Runtime identifiers](#runtime-identifiers)
@@ -1486,62 +1487,64 @@ In general, all these functions can result in poor performance.<br/>
 entity. For similar reasons, `orphans` can be even slower. Both functions should
 not be used frequently to avoid the risk of a performance hit.
 
-## Side notes
+## Iterations: what is allowed and what is not
 
-* Entity identifiers are numbers and nothing more. They are not classes and they
-  have no member functions at all. As already mentioned, do no try to inspect or
-  modify an entity descriptor in any way.
+Most of the _ECS_ available out there have some annoying limitations (at least
+from my point of view): entities and components cannot be created nor destroyed
+during iterations.<br/>
+`EnTT` partially solves the problem with a few limitations:
 
-* As shown in the examples above, the preferred way to get references to the
-  components while iterating a view is by using the view itself. It's a faster
-  alternative to the `get` member function template that is part of the API of
-  the `Registry`. This is because the registry must ensure that a pool for the
-  given component exists before to use it; on the other side, views force the
-  construction of the pools for all their components and access them directly,
-  thus avoiding all the checks.
+* Creating entities and components is allowed during iterations.
+* Deleting an entity or removing its components is allowed during iterations if
+  it's the one currently returned by the view. For all the other entities,
+  destroying them or removing their components isn't allowed and it can result
+  in undefined behavior.
 
-* Most of the _ECS_ available out there have some annoying limitations (at least
-  from my point of view): entities and components cannot be created and/or
-  destroyed during iterations.<br/>
-  `EnTT` partially solves the problem with a few limitations:
+Iterators are invalidated and the behavior is undefined if an entity is modified
+or destroyed and it's not the one currently returned by the view.<br/>
+To work around it, possible approaches are:
 
-  * Creating entities and components is allowed during iterations.
-  * Deleting an entity or removing its components is allowed during iterations
-    if it's the one currently returned by a view. For all the other entities,
-    destroying them or removing their components isn't allowed and it can result
-    in undefined behavior.
+* Store aside the entities and the components to be removed and perform the
+  operations at the end of the iteration.
+* Mark entities and components with a proper tag component that indicates they
+  must be purged, then perform a second iteration to clean them up one by one.
 
-  Iterators are invalidated and the behavior is undefined if an entity is
-  modified or destroyed and it's not the one currently returned by the
-  view.<br/>
-  To work around it, possible approaches are:
+A notable side effect of this feature is that the number of required allocations
+is further reduced in most of the cases.
 
-    * Store aside the entities and the components to be removed and perform the
-      operations at the end of the iteration.
-    * Mark entities and components with a proper tag component that indicates
-      they must be purged, then perform a second iteration to clean them up one
-      by one.
+## Multithreading
 
-* Views and thus their iterators aren't thread safe. Do no try to iterate a set
-  of components and modify the same set concurrently.<br/>
-  That being said, as long as a thread iterates the entities that have the
-  component `X` or assign and removes that component from a set of entities,
-  another thread can safely do the same with components `Y` and `Z` and
-  everything will work like a charm.<br/>
-  As a trivial example, users can freely execute the rendering system and
+In general, the entire registry isn't thread safe as it is. Thread safety isn't
+something that users should want out of the box for several reasons. Just to
+mention one of them: performance.<br/>
+Views and consequently the approach adopted by `EnTT` are the great exception to
+the rule. It's true that views and thus their iterators aren't thread safe by
+themselves. Because of this users shouldn't try to iterate a set of components
+and modify the same set concurrently. However:
+
+* As long as a thread iterates the entities that have the component `X` or
+  assign and removes that component from a set of entities, another thread can
+  safely do the same with components `Y` and `Z` and everything will work like a
+  charm. As a trivial example, users can freely execute the rendering system and
   iterate the renderable entities while updating a physic component concurrently
   on a separate thread.
 
-* In general, the entire registry isn't thread safe as it is. Thread safety
-  isn't something that users should want out of the box for several reasons.
-  Just to mention one of them: performance.<br/>
-  This kind of entity-component systems can be used in single threaded
-  applications as well as along with async stuff. Moreover, typical thread based
-  models for ECS don't require a fully thread safe registry to work. Actually
-  one could reach the goal with the registry as it is while working with most of
-  the common models, after all.<br/>
-  Because of the few reasons mentioned above and many others not mentioned,
-  users are completely responsible for synchronization whether required.
+* Similarly, a single set of components can be iterated by multiple threads as
+  long as the components are neither assigned nor removed in the meantime. In
+  other words, a hypothetical movement system can start multiple threads, each
+  of which will access the components that carry information about velocity and
+  position for its entities.
+
+This kind of entity-component systems can be used in single threaded
+applications as well as along with async stuff or multiple threads. Moreover,
+typical thread based models for _ECS_ don't require a fully thread safe registry
+to work. Actually, users can reach the goal with the registry as it is while
+working with most of the common models.
+
+Because of the few reasons mentioned above and many others not mentioned, users
+are completely responsible for synchronization whether required. On the other
+hand, they could get away with it without having to resort to particular
+expedients.
 
 # Crash Course: core functionalities
 
