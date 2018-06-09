@@ -9,6 +9,7 @@
 * ease the assignment of tags as string (use a template class with a non-type template parameter behind the scene)
 * "singleton mode" for tags (see #66)
 * add a shortcut to destroy all the entities that have components X, Y, Z (view and registry?)
-* make views copy/move constructible and copy/move assignable
+* write a few notes about multi threading in the README? (random access/forward iterators)
+* is it possible to use EASTL instead of the standard library?
 * C++17. That's all.
 * AOB
