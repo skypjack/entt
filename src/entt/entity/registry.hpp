@@ -387,7 +387,7 @@ public:
      *
      * @return A valid entity identifier.
      */
-    entity_type create() ENTT_NOEXCEPT {
+    entity_type create() {
         entity_type entity;
 
         if(available) {
@@ -888,7 +888,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Tag>
-    sink_type construction(tag_t) ENTT_NOEXCEPT {
+    sink_type construction(tag_t) {
         assure<Tag>(tag_t{});
         return std::get<1>(tags[tag_family::type<Tag>()]).sink();
     }
@@ -917,7 +917,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    sink_type construction() ENTT_NOEXCEPT {
+    sink_type construction() {
         assure<Component>();
         return std::get<1>(pools[component_family::type<Component>()]).sink();
     }
@@ -946,7 +946,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Tag>
-    sink_type destruction(tag_t) ENTT_NOEXCEPT {
+    sink_type destruction(tag_t) {
         assure<Tag>(tag_t{});
         return std::get<2>(tags[tag_family::type<Tag>()]).sink();
     }
@@ -975,7 +975,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    sink_type destruction() ENTT_NOEXCEPT {
+    sink_type destruction() {
         assure<Component>();
         return std::get<2>(pools[component_family::type<Component>()]).sink();
     }
