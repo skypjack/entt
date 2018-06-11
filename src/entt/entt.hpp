@@ -3,6 +3,7 @@
 #include "core/hashed_string.hpp"
 #include "core/ident.hpp"
 #include "entity/actor.hpp"
+#include "entity/entity.hpp"
 #include "entity/entt_traits.hpp"
 #include "entity/helper.hpp"
 #include "entity/prototype.hpp"

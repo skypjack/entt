@@ -53,6 +53,7 @@ ADD_ENTT_TEST(ident entt/core/ident.cpp)
 # Test entity
 
 ADD_ENTT_TEST(actor entt/entity/actor.cpp)
+ADD_ENTT_TEST(entity entt/entity/entity.cpp)
 ADD_ENTT_TEST(helper entt/entity/helper.cpp)
 ADD_ENTT_TEST(prototype entt/entity/prototype.cpp)
 ADD_ENTT_TEST(registry entt/entity/registry.cpp)

@@ -425,19 +425,6 @@ auto version = registry.version(entity);
 auto curr = registry.current(entity);
 ```
 
-Finally, there is also a sort of _null identifier_ made available to users. It's
-treated as if it were a _null pointer_ that doesn't identify any entity. A
-registry will reject this identifier in all cases because it isn't considered
-valid.<br/>
-The rules that define a _null identifier_ are a bit tricky to explain. However,
-being `Entity` the type of the entities (for example, `std::uint32_t`), users
-can easily construct a _null identifier_ by flipping all the bits of the _zero_:
-
-```cpp
-using Entity = std::uint32_t;
-const auto null = ~Entity{};
-```
-
 Components can be assigned to or removed from entities at any time with a few
 calls to member functions of the registry. As for the entities, the registry
 offers also a set of functionalities users can use to work with the components.
@@ -1134,6 +1121,34 @@ A dependency can easily be broken by means of the same function template:
 
 ```cpp
 entt::dependency<AType, AnotherType>(entt::break_t{}, registry.construction<MyType>());
+```
+
+### Null entity
+
+In `EnTT`, there exists a sort of _null entity_ made available to users that is
+accessible via the `entt::null` variable.<br/>
+The framework guarantees that the following expression always returns false:
+
+```cpp
+registry.valid(entt::null);
+```
+
+In other terms, a registry will reject the null entity in all cases because it
+isn't considered valid. It means that the null entity cannot own components or
+tags for obvious reasons.<br/>
+The type of the null entity is internal and should not be used for any purpose
+other than defining the null entity itself. However, there exist implicit
+conversions from the null entity to identifiers of any allowed type:
+
+```cpp
+typename entt::DefaultRegistry::entity_type null = entt::null;
+```
+
+Similarly, the null entity can be compared to any other identifier:
+
+```cpp
+const auto entity = registry.create();
+const bool null = (entity == entt::null);
 ```
 
 ## View: to persist or not to persist?
