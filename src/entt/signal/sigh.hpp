@@ -145,7 +145,7 @@ class Sink<Ret(Args...)> final {
         return (static_cast<Class *>(instance)->*Member)(args...);
     }
 
-    Sink(std::vector<call_type> &calls)
+    Sink(std::vector<call_type> &calls) ENTT_NOEXCEPT
         : calls{calls}
     {}
 
@@ -295,7 +295,7 @@ public:
      *
      * @return A temporary sink object.
      */
-    sink_type sink() {
+    sink_type sink() ENTT_NOEXCEPT {
         return { calls };
     }
 

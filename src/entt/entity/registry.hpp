@@ -57,7 +57,7 @@ class Registry {
     }
 
     struct Attachee {
-        Attachee(const Entity entity): entity{entity} {}
+        Attachee(const Entity entity) ENTT_NOEXCEPT: entity{entity} {}
         virtual ~Attachee() = default;
         Entity entity;
     };
@@ -842,7 +842,7 @@ public:
      * @return A valid entity identifier.
      */
     template<typename Tag>
-    entity_type move(const entity_type entity) {
+    entity_type move(const entity_type entity) ENTT_NOEXCEPT {
         assert(valid(entity));
         assert(has<Tag>());
         auto &tag = std::get<0>(tags[tag_family::type<Tag>()]);
@@ -929,7 +929,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Tag>
-    sink_type construction(tag_t) {
+    sink_type construction(tag_t) ENTT_NOEXCEPT {
         assure<Tag>(tag_t{});
         return std::get<1>(tags[tag_family::type<Tag>()]).sink();
     }
@@ -958,7 +958,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    sink_type construction() {
+    sink_type construction() ENTT_NOEXCEPT {
         assure<Component>();
         return std::get<1>(pools[component_family::type<Component>()]).sink();
     }
@@ -987,7 +987,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Tag>
-    sink_type destruction(tag_t) {
+    sink_type destruction(tag_t) ENTT_NOEXCEPT {
         assure<Tag>(tag_t{});
         return std::get<2>(tags[tag_family::type<Tag>()]).sink();
     }
@@ -1016,7 +1016,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    sink_type destruction() {
+    sink_type destruction() ENTT_NOEXCEPT {
         assure<Component>();
         return std::get<2>(pools[component_family::type<Component>()]).sink();
     }
@@ -1467,7 +1467,7 @@ public:
      *
      * @return A temporary object to use to take snasphosts.
      */
-    Snapshot<Entity> snapshot() const {
+    Snapshot<Entity> snapshot() const ENTT_NOEXCEPT {
         using follow_fn_type = entity_type(*)(const Registry &, const entity_type);
         const entity_type seed = available ? (next | (entities[next] & ~traits_type::entity_mask)) : next;
 
@@ -1496,7 +1496,7 @@ public:
      *
      * @return A temporary object to use to load snasphosts.
      */
-    SnapshotLoader<Entity> restore() {
+    SnapshotLoader<Entity> restore() ENTT_NOEXCEPT {
         using assure_fn_type = void(*)(Registry &, const entity_type, const bool);
 
         assure_fn_type assure = [](Registry &registry, const entity_type entity, const bool destroyed) {
