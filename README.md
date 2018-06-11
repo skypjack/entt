@@ -29,6 +29,7 @@
       * [Prototype](#prototype)
       * [Helpers](#helpers)
          * [Dependency function](#dependency-function)
+      * [Null entity](#null-entity)
    * [View: to persist or not to persist?](#view-to-persist-or-not-to-persist)
       * [Standard View](#standard-view)
          * [Single component standard view](#single-component-standard-view)
