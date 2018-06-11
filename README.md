@@ -2235,7 +2235,7 @@ listeners they contain (`size`) or if they contain at least a listener (`empty`)
 and even to swap two signal handlers (`swap`).
 
 Besides them, there are member functions to use both to connect and disconnect
-listeners in all their forms by means of a sink::
+listeners in all their forms by means of a sink:
 
 ```cpp
 void foo(int, char) { /* ... */ }
