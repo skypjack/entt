@@ -383,7 +383,7 @@ public:
      * function can be used to know if they are still valid or the entity has
      * been destroyed and potentially recycled.
      *
-     * The returned entity has no components assigned.
+     * The returned entity has no components nor tags assigned.
      *
      * @return A valid entity identifier.
      */
@@ -406,6 +406,25 @@ public:
         }
 
         return entity;
+    }
+
+    /**
+     * @brief Destroys the entity that owns the given tag, if any.
+     *
+     * Convenient shortcut to destroy an entity by means of a tag type.<br/>
+     * Syntactic sugar for the following snippet:
+     *
+     * @code{.cpp}
+     * if(registry.has<Tag>()) {
+     *     registry.destroy(registry.attachee<Tag>());
+     * }
+     * @endcode
+     *
+     * @tparam Tag Type of tag to use to search for the entity.
+     */
+    template<typename Tag>
+    void destroy(tag_t) {
+        return has<Tag>() ? destroy(attachee<Tag>()) : void();
     }
 
     /**
@@ -463,6 +482,28 @@ public:
         entities[entt] = node;
         next = entt;
         ++available;
+    }
+
+    /**
+     * @brief Destroys the entities that own he given components, if any.
+     *
+     * Convenient shortcut to destroy a set of entities at once.<br/>
+     * Syntactic sugar for the following snippet:
+     *
+     * @code{.cpp}
+     * for(const auto entity: registry.view<Component...>(Type{}...)) {
+     *     registry.destroy(entity);
+     * }
+     * @endcode
+     *
+     * @tparam Component Types of components to use to search for the entities.
+     * @tparam Type Type of view to use or empty to use a standard view.
+     */
+    template<typename... Component, typename... Type>
+    void destroy(Type...) {
+        for(const auto entity: view<Component...>(Type{}...)) {
+            destroy(entity);
+        }
     }
 
     /**

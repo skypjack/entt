@@ -741,3 +741,54 @@ TEST(DefaultRegistry, TagSignals) {
     ASSERT_EQ(listener.counter, 0);
     ASSERT_EQ(listener.last, e0);
 }
+
+TEST(DefaultRegistry, DestroyByTagAndComponents) {
+    entt::DefaultRegistry registry;
+
+    const auto e0 = registry.create();
+    const auto e1 = registry.create();
+    const auto e2 = registry.create();
+    const auto e3 = registry.create();
+
+    registry.assign<int>(e0);
+    registry.assign<char>(e0);
+    registry.assign<double>(e0);
+
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
+
+    registry.assign<int>(e2);
+
+    registry.assign<float>(entt::tag_t{}, e3);
+
+    ASSERT_TRUE(registry.valid(e0));
+    ASSERT_TRUE(registry.valid(e1));
+    ASSERT_TRUE(registry.valid(e2));
+    ASSERT_TRUE(registry.valid(e3));
+
+    registry.destroy<int, char, double>(entt::persistent_t{});
+
+    ASSERT_FALSE(registry.valid(e0));
+    ASSERT_TRUE(registry.valid(e1));
+    ASSERT_TRUE(registry.valid(e2));
+    ASSERT_TRUE(registry.valid(e3));
+
+    registry.destroy<int, char>();
+
+    ASSERT_FALSE(registry.valid(e0));
+    ASSERT_FALSE(registry.valid(e1));
+    ASSERT_TRUE(registry.valid(e2));
+    ASSERT_TRUE(registry.valid(e3));
+
+    registry.destroy<int>();
+
+    ASSERT_FALSE(registry.valid(e0));
+    ASSERT_FALSE(registry.valid(e1));
+    ASSERT_FALSE(registry.valid(e2));
+    ASSERT_TRUE(registry.valid(e3));
+
+    registry.destroy<int>(entt::tag_t{});
+    registry.destroy<char>(entt::tag_t{});
+    registry.destroy<double>(entt::tag_t{});
+    registry.destroy<float>(entt::tag_t{});
+}

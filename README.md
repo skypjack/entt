@@ -407,6 +407,17 @@ auto entity = registry.create();
 registry.destroy(entity);
 ```
 
+Entities can also be destroyed _by type_, that is by specifying the types of the
+tags or components that identify them:
+
+```cpp
+// destroys the entity that owns the given tag, if any
+registry.destroy<MyTag>(entt::tag_t{});
+
+// destroys the entities that own the given components, if any
+registry.destroy<AComponent, AnotherComponent>();
+```
+
 When an entity is destroyed, the registry can freely reuse it internally with a
 slightly different identifier. In particular, the version of an entity is
 increased each and every time it's discarded.<br/>

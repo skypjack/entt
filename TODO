@@ -7,8 +7,6 @@
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
 * create dedicated flat map based on types implementation (sort of "type map") for types to use within the registry and so on...
 * ease the assignment of tags as string (use a template class with a non-type template parameter behind the scene)
-* "singleton mode" for tags (see #66)
-* add a shortcut to destroy all the entities that have components X, Y, Z (view and registry?)
 * is it possible to use EASTL instead of the standard library?
 * C++17. That's all.
 * AOB
