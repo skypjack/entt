@@ -1528,7 +1528,8 @@ during iterations.<br/>
   in undefined behavior.
 
 Iterators are invalidated and the behavior is undefined if an entity is modified
-or destroyed and it's not the one currently returned by the view.<br/>
+or destroyed and it's not the one currently returned by the view nor a newly
+created one.<br/>
 To work around it, possible approaches are:
 
 * Store aside the entities and the components to be removed and perform the
