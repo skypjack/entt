@@ -1011,17 +1011,19 @@ public:
      *
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
+     * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
      * @param sort A valid sort function object.
+     * @param args Arguments to forward to the sort function object, if any.
      */
-    template<typename Compare, typename Sort = StdSort>
-    void sort(Compare compare, Sort sort = Sort{}) {
+    template<typename Compare, typename Sort = StdSort, typename... Args>
+    void sort(Compare compare, Sort sort = Sort{}, Args &&... args) {
         std::vector<size_type> copy(instances.size());
         std::iota(copy.begin(), copy.end(), 0);
 
         sort(copy.begin(), copy.end(), [this, compare = std::move(compare)](const auto lhs, const auto rhs) {
             return compare(const_cast<const object_type &>(instances[rhs]), const_cast<const object_type &>(instances[lhs]));
-        });
+        }, std::forward<Args>(args)...);
 
         for(size_type pos = 0, last = copy.size(); pos < last; ++pos) {
             auto curr = pos;

@@ -26,13 +26,15 @@ struct StdSort {
      *
      * @tparam It Type of random access iterator.
      * @tparam Compare Type of comparison function object.
+     * @tparam Args Types of arguments to forward to the sort function.
      * @param first An iterator to the first element of the range to sort.
      * @param last An iterator past the last element of the range to sort.
      * @param compare A valid comparison function object.
+     * @param args Arguments to forward to the sort function, if any.
      */
-    template<typename It, typename Compare = std::less<>>
-    void operator()(It first, It last, Compare compare = Compare{}) const {
-        std::sort(std::move(first), std::move(last), std::move(compare));
+    template<typename It, typename Compare = std::less<>, typename... Args>
+    void operator()(It first, It last, Compare compare = Compare{}, Args &&... args) const {
+        std::sort(std::forward<Args>(args)..., std::move(first), std::move(last), std::move(compare));
     }
 };
 

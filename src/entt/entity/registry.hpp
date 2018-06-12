@@ -1057,13 +1057,15 @@ public:
      * @tparam Component Type of components to sort.
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
+     * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
      * @param sort A valid sort function object.
+     * @param args Arguments to forward to the sort function object, if any.
      */
-    template<typename Component, typename Compare, typename Sort = StdSort>
-    void sort(Compare compare, Sort sort = Sort{}) {
+    template<typename Component, typename Compare, typename Sort = StdSort, typename... Args>
+    void sort(Compare compare, Sort sort = Sort{}, Args &&... args) {
         assure<Component>();
-        pool<Component>().sort(std::move(compare), std::move(sort));
+        pool<Component>().sort(std::move(compare), std::move(sort), std::forward<Args>(args)...);
     }
 
     /**
