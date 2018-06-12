@@ -2600,7 +2600,9 @@ Below an incomplete list of projects and articles:
 
 * [EnttPong](https://github.com/reworks/EnttPong): example game for `EnTT`
   framework.
-* [ECS_SpaceBattle](https://github.com/vblanco20-1/ECS_SpaceBattle): huge space
+* [Space Battle: Huge edition](http://victor.madtriangles.com/code%20experiment/2018/06/11/post-ecs-battle-huge.html):
+  huge space battle built entirely from scratch.
+* [Space Battle](https://github.com/vblanco20-1/ECS_SpaceBattle): huge space
   battle built on `UE4`.
 * [Experimenting with ECS in UE4](http://victor.madtriangles.com/code%20experiment/2018/03/25/post-ue4-ecs-battle.html):
   interesting article about `UE4` and `EnTT`.

@@ -447,7 +447,7 @@ public:
      * An assertion will abort the execution at runtime in debug mode in case of
      * invalid entity.
      *
-     * @param entity A valid entity identifier
+     * @param entity A valid entity identifier.
      */
     void destroy(const entity_type entity) {
         assert(valid(entity));
@@ -523,7 +523,7 @@ public:
      *
      * @tparam Tag Type of tag to create.
      * @tparam Args Types of arguments to use to construct the tag.
-     * @param entity A valid entity identifier
+     * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the tag.
      * @return A reference to the newly created tag.
      */

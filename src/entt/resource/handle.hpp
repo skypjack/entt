@@ -85,7 +85,7 @@ public:
     inline const Resource & operator *() const ENTT_NOEXCEPT { return get(); }
 
     /**
-     * @brief Gets a pointer to the managed resource from a handle .
+     * @brief Gets a pointer to the managed resource from a handle.
      *
      * @warning
      * The behavior is undefined if the handle doesn't contain a resource.<br/>
