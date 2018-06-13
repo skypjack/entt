@@ -4,8 +4,6 @@
 
 cmake_minimum_required(VERSION 3.2)
 
-include(GNUInstallDirs)
-
 #
 # Building in-tree is not allowed (we take care of your craziness).
 #
@@ -19,6 +17,8 @@ endif()
 #
 
 project(entt VERSION 2.6.1)
+
+include(GNUInstallDirs)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
@@ -44,18 +44,18 @@ option(USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if availbale." ON)
 if(NOT MSVC AND USE_LIBCPP)
     include(CheckCXXSourceCompiles)
     include(CMakePushCheckState)
-    
+
     cmake_push_check_state()
 
     set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -stdlib=libc++")
-    
+
     check_cxx_source_compiles("
         #include<type_traits>
         int main() { return std::is_same<int, int>::value ? 0 : 1; }
     " HAS_LIBCPP)
 
-    if(USE_LIBCPP AND NOT HAS_LIBCPP)
-        message(WARNING "The option USE_LIBCPP is set (by default) but libc++ is not available. The flag will not be added to the target")
+    if(NOT HAS_LIBCPP)
+        message(WARNING "The option USE_LIBCPP is set (by default) but libc++ is not available. The flag will not be added to the target.")
     endif()
 
     cmake_pop_check_state()
@@ -67,33 +67,34 @@ endif()
 
 add_library(EnTT INTERFACE)
 
-target_include_directories(EnTT INTERFACE
+target_include_directories(
+    EnTT INTERFACE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_compile_definitions(EnTT
+target_compile_definitions(
+    EnTT
     INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:DEBUG>
     INTERFACE $<$<AND:$<CONFIG:Release>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:RELEASE>
 )
 
 if(ENTT_COMPILE_OPTIONS)
-    target_compile_options(EnTT
+    target_compile_options(
+        EnTT
         INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-O0 -g>
+        # it seems that -O3 ruins the performance when using clang ...
         INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:Clang>>:-O2>
+        # ... on the other side, GCC is incredibly comfortable with it.
         INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU>>:-O3>
     )
 endif()
 
 if(USE_LIBCPP AND HAS_LIBCPP)
-    target_compile_options(EnTT BEFORE
-        INTERFACE -stdlib=libc++
-    )
+    target_compile_options(EnTT BEFORE INTERFACE -stdlib=libc++)
 endif()
 
-target_compile_features(EnTT
-    INTERFACE cxx_std_14
-)
+target_compile_features(EnTT INTERFACE cxx_std_14)
 
 #
 # Install EnTT
@@ -105,42 +106,47 @@ else()
     set(ENTT_INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/entt)
 endif()
 
-install(DIRECTORY src/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} 
-)
-
+install(DIRECTORY src/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(TARGETS EnTT EXPORT EnTTTargets)
 
-export(EXPORT EnTTTargets
-  FILE ${CMAKE_CURRENT_BINARY_DIR}/EnTTTargets.cmake
-)
+export(EXPORT EnTTTargets FILE ${entt_BINARY_DIR}/EnTTTargets.cmake)
 
-install(EXPORT EnTTTargets
+install(
+    EXPORT EnTTTargets
     FILE EnTTTargets.cmake
-    DESTINATION ${ENTT_INSTALL_CONFIGDIR} 
+    DESTINATION ${ENTT_INSTALL_CONFIGDIR}
 )
 
-# build tree package config file
+#
+# Build tree package config file
+#
+
 configure_file(cmake/in/EnTTBuildConfig.cmake.in EnTTConfig.cmake @ONLY)
 
 include(CMakePackageConfigHelpers)
 
-# install tree package config file
-configure_package_config_file(cmake/in/EnTTConfig.cmake.in
+#
+# Install tree package config file
+#
+
+configure_package_config_file(
+    cmake/in/EnTTConfig.cmake.in
     ${ENTT_INSTALL_CONFIGDIR}/EnTTConfig.cmake
-    INSTALL_DESTINATION ${ENTT_INSTALL_CONFIGDIR} 
+    INSTALL_DESTINATION ${ENTT_INSTALL_CONFIGDIR}
     PATH_VARS CMAKE_INSTALL_INCLUDEDIR
     NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )
 
 write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfigVersion.cmake
+    ${entt_BINARY_DIR}/EnTTConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${ENTT_INSTALL_CONFIGDIR}/EnTTConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/EnTTConfigVersion.cmake
+install(
+    FILES
+        ${entt_BINARY_DIR}/${ENTT_INSTALL_CONFIGDIR}/EnTTConfig.cmake
+        ${entt_BINARY_DIR}/EnTTConfigVersion.cmake
     DESTINATION ${ENTT_INSTALL_CONFIGDIR}
 )
 
