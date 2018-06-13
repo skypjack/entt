@@ -292,8 +292,8 @@ The documentation is based on [doxygen](http://www.stack.nl/~dimitri/doxygen/).
 To build it:
 
     $ cd build
-    $ cmake ..
-    $ make docs
+    $ cmake .. -DBUILD_DOCS=ON
+    $ make
 
 The API reference will be created in HTML format within the directory
 `build/docs/html`. To navigate it with your favorite browser:
@@ -307,7 +307,8 @@ for the latest version.
 ## Tests
 
 To compile and run the tests, `EnTT` requires *googletest*.<br/>
-`cmake` will download and compile the library before to compile anything else.
+`cmake` will download and compile the library before compiling anything else.
+In order to build without tests set CMake option `BUILD_TESTING=OFF`.
 
 To build the most basic set of tests:
 

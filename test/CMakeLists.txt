@@ -4,9 +4,30 @@
 
 add_library(odr OBJECT odr.cpp)
 
+set_target_properties(odr PROPERTIES CXX_EXTENSIONS OFF)
+
+target_include_directories(odr
+    PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
+target_compile_definitions(odr
+    PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_DEFINITIONS>
+)
+
+target_compile_options(odr
+    PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_OPTIONS>
+    PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -Wall>
+)
+
+target_compile_features(odr
+    PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_FEATURES>
+)
+
 macro(ADD_ENTT_TEST TEST_NAME TEST_SOURCE)
     add_executable(${TEST_NAME} $<TARGET_OBJECTS:odr> ${TEST_SOURCE})
-    target_link_libraries(${TEST_NAME} PRIVATE gtest_main Threads::Threads)
+    target_link_libraries(${TEST_NAME} PRIVATE EnTT gtest_main Threads::Threads)
+    set_target_properties(${TEST_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+    target_compile_options(${TEST_NAME} PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -Wall>)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 endmacro()
 
