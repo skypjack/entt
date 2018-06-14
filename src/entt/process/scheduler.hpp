@@ -43,9 +43,6 @@ namespace entt {
  */
 template<typename Delta>
 class Scheduler final {
-    template<typename T>
-    struct type_t { using type = T; };
-
     struct ProcessHandler final {
         using instance_type = std::unique_ptr<void, void(*)(void *)>;
         using update_type = bool(*)(ProcessHandler &, Delta, void *);
@@ -58,16 +55,15 @@ class Scheduler final {
         next_type next;
     };
 
-    template<typename Lambda>
-    struct Then final: Lambda {
-        Then(Lambda &&lambda, ProcessHandler *handler)
-            : Lambda{std::forward<Lambda>(lambda)}, handler{handler}
+    struct Then final {
+        Then(ProcessHandler *handler)
+            : handler{handler}
         {}
 
         template<typename Proc, typename... Args>
         decltype(auto) then(Args &&... args) && {
             static_assert(std::is_base_of<Process<Proc, Delta>, Proc>::value, "!");
-            handler = Lambda::operator()(handler, type_t<Proc>{}, std::forward<Args>(args)...);
+            handler = Scheduler::then<Proc>(handler, std::forward<Args>(args)...);
             return std::move(*this);
         }
 
@@ -110,20 +106,15 @@ class Scheduler final {
         delete static_cast<Proc *>(proc);
     }
 
-    auto then(ProcessHandler *handler) {
-        auto lambda = [](ProcessHandler *handler, auto next, auto... args) {
-            using Proc = typename decltype(next)::type;
+    template<typename Proc, typename... Args>
+    static auto then(ProcessHandler *handler, Args &&... args) {
+        if(handler) {
+            auto proc = typename ProcessHandler::instance_type{new Proc{std::forward<Args>(args)...}, &Scheduler::deleter<Proc>};
+            handler->next.reset(new ProcessHandler{std::move(proc), &Scheduler::update<Proc>, &Scheduler::abort<Proc>, nullptr});
+            handler = handler->next.get();
+        }
 
-            if(handler) {
-                auto proc = typename ProcessHandler::instance_type{new Proc{std::forward<decltype(args)>(args)...}, &Scheduler::deleter<Proc>};
-                handler->next.reset(new ProcessHandler{std::move(proc), &Scheduler::update<Proc>, &Scheduler::abort<Proc>, nullptr});
-                handler = handler->next.get();
-            }
-
-            return handler;
-        };
-
-        return Then<decltype(lambda)>{std::move(lambda), handler};
+        return handler;
     }
 
 public:
@@ -202,7 +193,7 @@ public:
         ProcessHandler handler{std::move(proc), &Scheduler::update<Proc>, &Scheduler::abort<Proc>, nullptr};
         handlers.push_back(std::move(handler));
 
-        return then(&handlers.back());
+        return Then{&handlers.back()};
     }
 
     /**
