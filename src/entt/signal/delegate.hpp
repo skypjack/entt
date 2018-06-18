@@ -110,6 +110,17 @@ public:
         return stub.first == other.stub.first && stub.second == other.stub.second;
     }
 
+    /**
+     * @brief Checks whether the delegate actually stores a function.
+     *
+     * An empty delegate is a default constructed one.
+     *
+     * @return True if this delegate is empty, false otherwise.
+     */
+    bool empty() const ENTT_NOEXCEPT {
+        return !stub.first && stub.second == &fallback;
+    }
+
 private:
     stub_type stub;
 };
