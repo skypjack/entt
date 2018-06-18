@@ -1890,7 +1890,7 @@ It has member functions to query its internal data structures, like `empty` or
 
 ```cpp
 // checks if there are processes still running
-bool empty = scheduler.empty();
+const auto empty = scheduler.empty();
 
 // gets the number of processes still running
 Scheduler<std::uint32_t>::size_type size = scheduler.size();
@@ -2038,10 +2038,10 @@ _organize_ it:
 
 ```cpp
 // gets the number of resources managed by a cache
-auto size = cache.size();
+const auto size = cache.size();
 
 // checks if a cache contains at least a valid resource
-auto empty = cache.empty();
+const auto empty = cache.empty();
 
 // clears a cache and discards its content
 cache.clear();
@@ -2353,6 +2353,12 @@ delegate.connect<MyStruct, &MyStruct::f>(&instance);
 
 It hasn't a `disconnect` counterpart. Instead, there exists a `reset` member
 function to clear it.<br/>
+The `empty` member function can be used to know if a delegate is empty:
+
+```cpp
+const auto empty = delegate.empty();
+```
+
 Finally, to invoke a delegate, the function call operator is the way to go as
 usual:
 

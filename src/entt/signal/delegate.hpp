@@ -37,8 +37,6 @@ class Delegate<Ret(Args...)> final {
     using proto_type = Ret(*)(void *, Args...);
     using stub_type = std::pair<void *, proto_type>;
 
-    static Ret fallback(void *, Args...) ENTT_NOEXCEPT { return {}; }
-
     template<Ret(*Function)(Args...)>
     static Ret proto(void *, Args... args) {
         return (Function)(args...);
@@ -52,8 +50,17 @@ class Delegate<Ret(Args...)> final {
 public:
     /*! @brief Default constructor. */
     Delegate() ENTT_NOEXCEPT
-        : stub{std::make_pair(nullptr, &fallback)}
+        : stub{std::make_pair(nullptr, proto_type{})}
     {}
+
+    /**
+     * @brief Checks whether a delegate actually stores a listener.
+     * @return True if the delegate is empty, false otherwise.
+     */
+    bool empty() const ENTT_NOEXCEPT {
+        // no need to test also stub.first
+        return !stub.second;
+    }
 
     /**
      * @brief Binds a free function to a delegate.
@@ -86,7 +93,7 @@ public:
      * After a reset, a delegate can be safely invoked with no effect.
      */
     void reset() ENTT_NOEXCEPT {
-        stub = std::make_pair(nullptr, &fallback);
+        stub = std::make_pair(nullptr, proto_type{});
     }
 
     /**
