@@ -37,7 +37,7 @@ class Delegate<Ret(Args...)> final {
     using proto_type = Ret(*)(void *, Args...);
     using stub_type = std::pair<void *, proto_type>;
 
-    static Ret fallback(void *, Args...) ENTT_NOEXCEPT { return {}; }
+    static Ret fallback(void *, Args...) ENTT_NOEXCEPT { return Ret(); }
 
     template<Ret(*Function)(Args...)>
     static Ret proto(void *, Args... args) {
