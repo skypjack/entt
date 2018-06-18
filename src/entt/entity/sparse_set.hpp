@@ -13,6 +13,7 @@
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
 #include "entt_traits.hpp"
+#include "entity.hpp"
 
 
 namespace entt {
@@ -160,8 +161,6 @@ class SparseSet<Entity> {
         pointer direct;
         index_type index;
     };
-
-    static constexpr auto pending = ~typename traits_type::entity_type{};
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -372,8 +371,8 @@ public:
      */
     bool has(const entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
-        // testing against pending permits to avoid accessing the direct vector
-        return (pos < reverse.size()) && (reverse[pos] != pending);
+        // testing against null permits to avoid accessing the direct vector
+        return (pos < reverse.size()) && (reverse[pos] != null);
     }
 
     /**
@@ -396,8 +395,8 @@ public:
     bool fast(const entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
         assert(pos < reverse.size());
-        // testing against pending permits to avoid accessing the direct vector
-        return (reverse[pos] != pending);
+        // testing against null permits to avoid accessing the direct vector
+        return (reverse[pos] != null);
     }
 
     /**
@@ -433,8 +432,8 @@ public:
         const auto pos = size_type(entity & traits_type::entity_mask);
 
         if(!(pos < reverse.size())) {
-            const auto value = pending;
-            reverse.resize(pos+1, value);
+            // null is safe in all cases for our purposes
+            reverse.resize(pos+1, null);
         }
 
         reverse[pos] = entity_type(direct.size());
@@ -459,7 +458,7 @@ public:
         // swapping isn't required here, we are getting rid of the last element
         reverse[back & traits_type::entity_mask] = candidate;
         direct[candidate] = back;
-        candidate = pending;
+        candidate = null;
         direct.pop_back();
     }
 
