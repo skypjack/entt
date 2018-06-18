@@ -6,7 +6,11 @@
 * define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
 * create dedicated flat map based on types implementation (sort of "type map") for types to use within the registry and so on...
-* ease the assignment of tags as string (use a template class with a non-type template parameter behind the scene)
+* ease the assignment of tags as string (type-less assign member function + user defined literal for hashed strings)
+* config system with atomic (something like Config<"foobar"_hs>::set(true) and Config<"foobar"_hs>::get<bool>())
+* user defined literal for hashed strings (add a config parameter to disable it and avoid pollution)
 * is it possible to use EASTL instead of the standard library?
+* registry-to-registry serializer for deep copies (see #100)
+* work stealing job system (see #100)
 * C++17. That's all.
 * AOB
