@@ -4,6 +4,7 @@
 struct AService {};
 
 struct AnotherService {
+    virtual ~AnotherService() = default;
     virtual void f(bool) = 0;
     bool check{false};
 };
