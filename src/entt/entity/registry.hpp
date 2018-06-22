@@ -1163,7 +1163,8 @@ public:
      */
     void reset() {
         each([this](const auto entity) {
-            destroy(entity);
+            // useless this-> used to suppress a warning with clang
+            this->destroy(entity);
         });
     }
 

@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <utility>
 #include <tuple>
-#include <algorithm>
 #include "../config/config.h"
 
 
@@ -75,7 +74,12 @@ class Identifier final {
     template<typename Type, std::size_t... Indexes>
     static constexpr std::size_t get(std::index_sequence<Indexes...>) ENTT_NOEXCEPT {
         static_assert(internal::IsPartOf<Type, Types...>::value, "!");
-        return std::max({ (std::is_same<Type, std::tuple_element_t<Indexes, tuple_type>>::value ? Indexes : std::size_t{})... });
+
+        std::size_t max{};
+        using accumulator_type = std::size_t[];
+        accumulator_type accumulator = { (max = std::is_same<Type, std::tuple_element_t<Indexes, tuple_type>>::value ? Indexes : max)... };
+        (void)accumulator;
+        return max;
     }
 
 public:
