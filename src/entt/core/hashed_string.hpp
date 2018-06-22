@@ -108,7 +108,7 @@ constexpr bool operator!=(const HashedString &lhs, const HashedString &rhs) ENTT
 }
 
 
-constexpr entt::HashedString operator"" ENTT_HS_SUFFIX(const char *str, const long unsigned int) ENTT_NOEXCEPT {
+constexpr entt::HashedString operator"" ENTT_HS_SUFFIX(const char *str, std::size_t) ENTT_NOEXCEPT {
     return entt::HashedString{str};
 }
 
