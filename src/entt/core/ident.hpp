@@ -5,6 +5,8 @@
 #include <type_traits>
 #include <cstddef>
 #include <utility>
+#include <tuple>
+#include <algorithm>
 #include "../config/config.h"
 
 
@@ -20,38 +22,14 @@ namespace internal {
  */
 
 
-template<typename... Types>
-struct Identifier final: Identifier<Types>... {
-    using identifier_type = std::size_t;
+template<typename...>
+struct IsPartOf;
 
-    template<std::size_t... Indexes>
-    constexpr Identifier(std::index_sequence<Indexes...>) ENTT_NOEXCEPT
-        : Identifier<Types>{std::index_sequence<Indexes>{}}...
-    {}
-
-    template<typename Type>
-    constexpr std::size_t get() const ENTT_NOEXCEPT {
-        return Identifier<std::decay_t<Type>>::get();
-    }
-};
-
+template<typename Type, typename Current, typename... Other>
+struct IsPartOf<Type, Current, Other...>: std::conditional_t<std::is_same<Type, Current>::value, std::true_type, IsPartOf<Type, Other...>> {};
 
 template<typename Type>
-struct Identifier<Type> {
-    using identifier_type = std::size_t;
-
-    template<std::size_t Index>
-    constexpr Identifier(std::index_sequence<Index>) ENTT_NOEXCEPT
-        : index{Index}
-    {}
-
-    constexpr std::size_t get() const ENTT_NOEXCEPT {
-        return index;
-    }
-
-private:
-    const std::size_t index;
-};
+struct IsPartOf<Type>: std::false_type {};
 
 
 /**
@@ -64,23 +42,23 @@ private:
 
 
 /**
- * @brief Types identifers.
+ * @brief Types identifiers.
  *
  * Variable template used to generate identifiers at compile-time for the given
- * types. Use the `constexpr` `get` member function to know what's the
- * identifier associated to the specific type.
+ * types. Use the `get` member function to know what's the identifier associated
+ * to the specific type.
  *
  * @note
  * Identifiers are constant expression and can be used in any context where such
  * an expression is required. As an example:
  * @code{.cpp}
- * constexpr auto identifiers = entt::ident<AType, AnotherType>;
+ * using ID = entt::Identifier<AType, AnotherType>;
  *
  * switch(aTypeIdentifier) {
- * case identifers.get<AType>():
+ * case ID::get<AType>():
  *     // ...
  *     break;
- * case identifers.get<AnotherType>():
+ * case ID::get<AnotherType>():
  *     // ...
  *     break;
  * default:
@@ -88,19 +66,32 @@ private:
  * }
  * @endcode
  *
- * @note
- * In case of single type list, `get` isn't a member function template:
- * @code{.cpp}
- * func(std::integral_constant<
- *     entt::ident<AType>::identifier_type,
- *     entt::ident<AType>::get()
- * >{});
- * @endcode
- *
  * @tparam Types List of types for which to generate identifiers.
  */
 template<typename... Types>
-constexpr auto ident = internal::Identifier<std::decay_t<Types>...>{std::make_index_sequence<sizeof...(Types)>{}};
+class Identifier final {
+    using tuple_type = std::tuple<std::decay_t<Types>...>;
+
+    template<typename Type, std::size_t... Indexes>
+    static constexpr std::size_t get(std::index_sequence<Indexes...>) ENTT_NOEXCEPT {
+        static_assert(internal::IsPartOf<Type, Types...>::value, "!");
+        return std::max({ (std::is_same<Type, std::tuple_element_t<Indexes, tuple_type>>::value ? Indexes : std::size_t{})... });
+    }
+
+public:
+    /*! @brief Unsigned integer type. */
+    using identifier_type = std::size_t;
+
+    /**
+     * @brief Returns the identifier associated with a given type.
+     * @tparam Type of which to return the identifier.
+     * @return The identifier associated with the given type.
+     */
+    template<typename Type>
+    static constexpr identifier_type get() ENTT_NOEXCEPT {
+        return get<std::decay_t<Type>>(std::make_index_sequence<sizeof...(Types)>{});
+    }
+};
 
 
 }

@@ -1591,21 +1591,21 @@ There are plenty of different solutions out there and I could have used one of
 them. However, I decided to spend my time to define a compact and versatile tool
 that fully embraces what the modern C++ has to offer.
 
-The _result of my efforts_ is the `ident` `constexpr` variable:
+The _result of my efforts_ is the `Identifier` class template:
 
 ```cpp
 #include <ident.hpp>
 
 // defines the identifiers for the given types
-constexpr auto identifiers = entt::ident<AType, AnotherType>;
+using ID = entt::Identifier<AType, AnotherType>;
 
 // ...
 
 switch(aTypeIdentifier) {
-case identifers.get<AType>():
+case ID::get<AType>():
     // ...
     break;
-case identifers.get<AnotherType>():
+case ID::get<AnotherType>():
     // ...
     break;
 default:
@@ -1613,9 +1613,9 @@ default:
 }
 ```
 
-This is all what the variable has to offer: a `get` member function that returns
-a numerical identifier for the given type. It can be used in any context where
-constant expressions are required.
+This is all what the class template has to offer: a static `get` member function
+that returns a numerical identifier for the given type. It can be used in any
+context where constant expressions are required.
 
 As long as the list remains unchanged, identifiers are also guaranteed to be the
 same for every run. In case they have been used in a production environment and
@@ -1625,7 +1625,7 @@ identifiers unchanged:
 ```cpp
 template<typename> struct IgnoreType {};
 
-constexpr auto identifiers = entt::ident<
+using ID = entt::Identifier<
     ATypeStillValid,
     IgnoreType<ATypeNoLongerValid>,
     AnotherTypeStillValid
