@@ -43,6 +43,7 @@
    * [Compile-time identifiers](#compile-time-identifiers)
    * [Runtime identifiers](#runtime-identifiers)
    * [Hashed strings](#hashed-strings)
+   * [Monostate](#monostate)
 * [Crash Course: service locator](#crash-course-service-locator)
 * [Crash Course: cooperative scheduler](#crash-course-cooperative-scheduler)
    * [The process](#the-process)
@@ -1696,6 +1697,29 @@ After all, human-readable resource identifiers aren't something strictly defined
 and over which users have not the control. Choosing a slightly different
 identifier is probably the best solution to make the conflict disappear in this
 case.
+
+## Monostate
+
+The monostate pattern is often presented as an alternative to a singleton based
+configuration system. This is exactly its purpose in `EnTT`. Moreover, this
+implementation is thread safe by design (hopefully).<br/>
+Keys are represented by hashed strings, values are basic types like `int`s or
+`bool`s. Values of different types can be associated to each key, even more than
+one at a time. Because of this, users must pay attention to use the same type
+both during an assignment and when they try to read back their data. Otherwise,
+they will probably incur in unexpected results.
+
+Example of use:
+
+```cpp
+entt::Monostate<entt::HashedString{"mykey"}>{} = true;
+entt::Monostate<"mykey"_hs>{} = 42;
+
+// ...
+
+const bool b = entt::Monostate<"mykey"_hs>{};
+const int i = entt::Monostate<entt::HashedString{"mykey"}>{};
+```
 
 # Crash Course: service locator
 

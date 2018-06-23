@@ -2,6 +2,7 @@
 #include "core/family.hpp"
 #include "core/hashed_string.hpp"
 #include "core/ident.hpp"
+#include "core/monostate.hpp"
 #include "entity/actor.hpp"
 #include "entity/entity.hpp"
 #include "entity/entt_traits.hpp"
