@@ -44,13 +44,13 @@ template<typename Delta>
 class Scheduler final {
     struct ProcessHandler final {
         using instance_type = std::unique_ptr<void, void(*)(void *)>;
-        using update_type = bool(*)(ProcessHandler &, Delta, void *);
-        using abort_type = void(*)(ProcessHandler &, bool);
+        using update_fn_type = bool(ProcessHandler &, Delta, void *);
+        using abort_fn_type = void(ProcessHandler &, bool);
         using next_type = std::unique_ptr<ProcessHandler>;
 
         instance_type instance;
-        update_type update;
-        abort_type abort;
+        update_fn_type *update;
+        abort_fn_type *abort;
         next_type next;
     };
 

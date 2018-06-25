@@ -26,12 +26,12 @@ struct Invoker;
 
 template<typename Ret, typename... Args, typename Collector>
 struct Invoker<Ret(Args...), Collector> {
-    using proto_type = Ret(*)(void *, Args...);
-    using call_type = std::pair<void *, proto_type>;
+    using proto_fn_type = Ret(void *, Args...);
+    using call_type = std::pair<void *, proto_fn_type *>;
 
     virtual ~Invoker() = default;
 
-    bool invoke(Collector &collector, proto_type proto, void *instance, Args... args) const {
+    bool invoke(Collector &collector, proto_fn_type *proto, void *instance, Args... args) const {
         return collector(proto(instance, args...));
     }
 };
@@ -39,12 +39,12 @@ struct Invoker<Ret(Args...), Collector> {
 
 template<typename... Args, typename Collector>
 struct Invoker<void(Args...), Collector> {
-    using proto_type = void(*)(void *, Args...);
-    using call_type = std::pair<void *, proto_type>;
+    using proto_fn_type = void(void *, Args...);
+    using call_type = std::pair<void *, proto_fn_type *>;
 
     virtual ~Invoker() = default;
 
-    bool invoke(Collector &, proto_type proto, void *instance, Args... args) const {
+    bool invoke(Collector &, proto_fn_type *proto, void *instance, Args... args) const {
         return (proto(instance, args...), true);
     }
 };
@@ -132,8 +132,8 @@ class Sink<Ret(Args...)> final {
     template<typename, typename>
     friend class SigH;
 
-    using proto_type = Ret(*)(void *, Args...);
-    using call_type = std::pair<void *, proto_type>;
+    using proto_fn_type = Ret(void *, Args...);
+    using call_type = std::pair<void *, proto_fn_type *>;
 
     template<Ret(*Function)(Args...)>
     static Ret proto(void *, Args... args) {

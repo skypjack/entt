@@ -1471,10 +1471,10 @@ public:
      * @return A temporary object to use to take snasphosts.
      */
     Snapshot<Entity> snapshot() const ENTT_NOEXCEPT {
-        using follow_fn_type = entity_type(*)(const Registry &, const entity_type);
+        using follow_fn_type = entity_type(const Registry &, const entity_type);
         const entity_type seed = available ? (next | (entities[next] & ~traits_type::entity_mask)) : next;
 
-        follow_fn_type follow = [](const Registry &registry, const entity_type entity) -> entity_type {
+        follow_fn_type *follow = [](const Registry &registry, const entity_type entity) -> entity_type {
             const auto &entities = registry.entities;
             const auto entt = entity & traits_type::entity_mask;
             const auto next = entities[entt] & traits_type::entity_mask;
@@ -1500,9 +1500,9 @@ public:
      * @return A temporary object to use to load snasphosts.
      */
     SnapshotLoader<Entity> restore() ENTT_NOEXCEPT {
-        using assure_fn_type = void(*)(Registry &, const entity_type, const bool);
+        using assure_fn_type = void(Registry &, const entity_type, const bool);
 
-        assure_fn_type assure = [](Registry &registry, const entity_type entity, const bool destroyed) {
+        assure_fn_type *assure = [](Registry &registry, const entity_type entity, const bool destroyed) {
             using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
             // explicit promotion to avoid warnings with std::uint16_t
             const auto entt = promotion_type{entity} & traits_type::entity_mask;

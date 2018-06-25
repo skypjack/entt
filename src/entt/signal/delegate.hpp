@@ -34,8 +34,8 @@ class Delegate;
  */
 template<typename Ret, typename... Args>
 class Delegate<Ret(Args...)> final {
-    using proto_type = Ret(*)(void *, Args...);
-    using stub_type = std::pair<void *, proto_type>;
+    using proto_fn_type = Ret(void *, Args...);
+    using stub_type = std::pair<void *, proto_fn_type *>;
 
     template<Ret(*Function)(Args...)>
     static Ret proto(void *, Args... args) {
@@ -50,7 +50,7 @@ class Delegate<Ret(Args...)> final {
 public:
     /*! @brief Default constructor. */
     Delegate() ENTT_NOEXCEPT
-        : stub{std::make_pair(nullptr, proto_type{})}
+        : stub{}
     {}
 
     /**
@@ -93,7 +93,7 @@ public:
      * After a reset, a delegate can be safely invoked with no effect.
      */
     void reset() ENTT_NOEXCEPT {
-        stub = std::make_pair(nullptr, proto_type{});
+        stub.second = nullptr;
     }
 
     /**

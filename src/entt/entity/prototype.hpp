@@ -37,15 +37,15 @@ namespace entt {
  */
 template<typename Entity>
 class Prototype final {
-    using fn_type = void(*)(const Prototype &, Registry<Entity> &, const Entity);
+    using basic_fn_type = void(const Prototype &, Registry<Entity> &, const Entity);
     using component_type = typename Registry<Entity>::component_type;
 
     template<typename Component>
     struct Wrapper { Component component; };
 
     struct Handler {
-        fn_type accommodate;
-        fn_type assign;
+        basic_fn_type *accommodate;
+        basic_fn_type *assign;
     };
 
     void release() {
@@ -131,12 +131,12 @@ public:
      */
     template<typename Component, typename... Args>
     Component & set(Args &&... args) {
-        fn_type accommodate = [](const Prototype &prototype, Registry<Entity> &other, const Entity dst) {
+        basic_fn_type *accommodate = [](const Prototype &prototype, Registry<Entity> &other, const Entity dst) {
             const auto &wrapper = prototype.registry->template get<Wrapper<Component>>(prototype.entity);
             other.template accommodate<Component>(dst, wrapper.component);
         };
 
-        fn_type assign = [](const Prototype &prototype, Registry<Entity> &other, const Entity dst) {
+        basic_fn_type *assign = [](const Prototype &prototype, Registry<Entity> &other, const Entity dst) {
             if(!other.template has<Component>(dst)) {
                 const auto &wrapper = prototype.registry->template get<Wrapper<Component>>(prototype.entity);
                 other.template accommodate<Component>(dst, wrapper.component);
