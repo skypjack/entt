@@ -235,34 +235,41 @@ public:
 
         duk_push_array(ctx);
 
-        dreg.registry.each([ctx, nargs, &pos, &dreg](auto entity) {
-            auto &registry = dreg.registry;
-            auto &func = dreg.func;
-            bool match = true;
+        std::vector<typename entt::DefaultRegistry::component_type> components;
+        std::vector<typename entt::DefaultRegistry::component_type> runtime;
 
-            for (duk_idx_t arg = 0; match && arg < nargs; arg++) {
-                auto type = duk_require_uint(ctx, arg);
+        for(duk_idx_t arg = 0; arg < nargs; arg++) {
+            auto type = duk_require_uint(ctx, arg);
 
-                if(type < udef) {
-                    assert(func.find(type) != func.cend());
-                    match = (registry.*func[type].test)(entity);
-                } else {
-                    const auto ctype = registry.type<DuktapeRuntime>();
-                    assert(func.find(ctype) != func.cend());
-                    match = (registry.*func[ctype].test)(entity);
-
-                    if(match) {
-                        auto &components = registry.get<DuktapeRuntime>(entity).components;
-                        match = (components.find(type) != components.cend());
-                    }
+            if(type < udef) {
+                components.push_back(type);
+            } else {
+                if(runtime.empty()) {
+                    components.push_back(dreg.registry.type<DuktapeRuntime>());
                 }
-            }
 
-            if(match) {
+                runtime.push_back(type);
+            }
+        }
+
+        auto view = dreg.registry.view(components.cbegin(), components.cend());
+
+        for(const auto entity: view) {
+            if(runtime.empty()) {
                 duk_push_uint(ctx, entity);
                 duk_put_prop_index(ctx, -2, pos++);
+            } else {
+                const auto &components = dreg.registry.get<DuktapeRuntime>(entity).components;
+                const auto match = std::all_of(runtime.cbegin(), runtime.cend(), [&components](const auto type) {
+                    return components.find(type) != components.cend();
+                });
+
+                if(match) {
+                    duk_push_uint(ctx, entity);
+                    duk_put_prop_index(ctx, -2, pos++);
+                }
             }
-        });
+        }
 
         return 1;
     }

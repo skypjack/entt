@@ -36,6 +36,7 @@
          * [Multi component standard view](#multi-component-standard-view)
       * [Persistent View](#persistent-view)
       * [Raw View](#raw-view)
+      * [Runtime View](#runtime-view)
       * [Give me everything](#give-me-everything)
    * [Iterations: what is allowed and what is not](#iterations-what-is-allowed-and-what-is-not)
    * [Multithreading](#multithreading)
@@ -211,18 +212,14 @@ Dell XPS 13 out of the mid 2014):
 |-----------|-------------|-------------|
 | Create 1M entities | 0.0147s | **0.0046s** |
 | Destroy 1M entities | 0.0053s | **0.0045s** |
-| Standard view, 1M entities, one component | 0.0012s | **1.9e-07s** |
-| Standard view, 1M entities, two components | 0.0012s | **3.8e-07s** |
-| Standard view, 1M entities, two components<br/>Half of the entities have all the components | 0.0009s | **3.8e-07s** |
-| Standard view, 1M entities, two components<br/>One of the entities has all the components | 0.0008s | **1.0e-06s** |
-| Persistent view, 1M entities, two components | 0.0012s | **2.8e-07s** |
-| Standard view, 1M entities, five components | 0.0010s | **7.0e-07s** |
-| Persistent view, 1M entities, five components | 0.0010s | **2.8e-07s** |
-| Standard view, 1M entities, ten components | 0.0011s | **1.2e-06s** |
-| Standard view, 1M entities, ten components<br/>Half of the entities have all the components | 0.0010s | **1.2e-06s** |
-| Standard view, 1M entities, ten components<br/>One of the entities has all the components | 0.0008s | **1.2e-06s** |
-| Persistent view, 1M entities, ten components | 0.0011s | **3.0e-07s** |
-| Raw view, 1M entities | - | **2.2e-07s** |
+| 1M entities, one component | 0.0012s | **1.9e-07s** |
+| 1M entities, two components | 0.0012s | **3.8e-07s** |
+| 1M entities, two components<br/>Half of the entities have all the components | 0.0009s | **3.8e-07s** |
+| 1M entities, two components<br/>One of the entities has all the components | 0.0008s | **1.0e-06s** |
+| 1M entities, five components | 0.0010s | **7.0e-07s** |
+| 1M entities, ten components | 0.0011s | **1.2e-06s** |
+| 1M entities, ten components<br/>Half of the entities have all the components | 0.0010s | **1.2e-06s** |
+| 1M entities, ten components<br/>One of the entities has all the components | 0.0008s | **1.2e-06s** |
 | Sort 150k entities, one component<br/>Arrays are in reverse order | - | **0.0036s** |
 | Sort 150k entities, enforce permutation<br/>Arrays are in reverse order | - | **0.0005s** |
 | Sort 150k entities, one component<br/>Arrays are almost sorted, std::sort | - | **0.0035s** |
@@ -715,9 +712,9 @@ created or destroyed.
 
 ### Runtime components
 
-Defining components at runtime is useful to support plugins and mods in general.
-However, it seems impossible with a tool designed around a bunch of templates.
-Indeed it's not that difficult.<br/>
+Defining components at runtime is useful to support plugin systems and mods in
+general. However, it seems impossible with a tool designed around a bunch of
+templates. Indeed it's not that difficult.<br/>
 Of course, some features cannot be easily exported into a runtime
 environment. As an example, sorting a group of components defined at runtime
 isn't for free if compared to most of the other operations. However, the basic
@@ -1175,9 +1172,9 @@ view can only iterate entities and their components, then read or update the
 data members of the latter.<br/>
 It is a subtle difference that can help designing a better software sometimes.
 
-There are mainly three kinds of views: standard (also known as `View`),
-persistent (also known as `PersistentView`) and raw (also known as
-`RawView`).<br/>
+There are mainly four kinds of views: standard (also known as `View`),
+persistent (also known as `PersistentView`), raw (also known as `RawView`) and
+runtime (also known as `RuntimeView`).<br/>
 All of them have pros and cons to take in consideration. In particular:
 
 * Standard views:
@@ -1232,6 +1229,21 @@ All of them have pros and cons to take in consideration. In particular:
   * They can be used to iterate only one type of component at a time.
   * They don't return the entity to which a component belongs to the caller.
 
+* Runtime views:
+
+  Pros:
+
+  * Their lists of components are defined at runtime and not at compile-time.
+  * Creating and destroying them isn't expensive at all because they don't have
+    any type of initialization.
+  * They are the best tool for things like plugin systems and mods in general.
+  * They don't affect any other operations of the registry.
+
+  Cons:
+
+  * Their performances are definitely lower than those of all the other views,
+    although they are still usable and sufficient for most of the purposes.
+
 To sum up and as a rule of thumb:
 
 * Use a raw view to iterate components only (no entities) for a given type.
@@ -1250,6 +1262,8 @@ To sum up and as a rule of thumb:
   entities but the intersection between the sets of entities is small.
 * Prepare and use a persistent view in all the cases where a standard view
   wouldn't fit well otherwise.
+* Finally, in case you don't know at compile-time what are the components to
+  use, choose a runtime view and set them during execution.
 
 To easily iterate entities and components, all the views offer the common
 `begin` and `end` member functions that allow users to use a view in a typical
@@ -1288,7 +1302,7 @@ There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
 fact, they return newly created and correctly initialized iterators whenever
 `begin` or `end` are invoked.<br/>
-To iterate a single component standard view, either use it in range-for loop:
+To iterate a single component standard view, either use it in a range-for loop:
 
 ```cpp
 auto view = registry.view<Renderable>();
@@ -1309,8 +1323,8 @@ registry.view<Renderable>().each([](auto entity, auto &renderable) {
 });
 ```
 
-Performance are more or less the same. The best approach depends mainly on
-whether all the components have to be accessed or not.
+The `each` member function is highly optimized. Unless users want to iterate
+only entities, using `each` should be the preferred approach.
 
 **Note**: prefer the `get` member function of a view instead of the `get` member
 function template of a registry during iterations, if possible. However, keep in
@@ -1333,7 +1347,7 @@ There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
 fact, they return newly created and correctly initialized iterators whenever
 `begin` or `end` are invoked.<br/>
-To iterate a multi component standard view, either use it in range-for loop:
+To iterate a multi component standard view, either use it in a range-for loop:
 
 ```cpp
 auto view = registry.view<Position, Velocity>();
@@ -1359,8 +1373,9 @@ registry.view<Position, Velocity>().each([](auto entity, auto &position, auto &v
 });
 ```
 
-Performance are more or less the same. The best approach depends mainly on
-whether all the components have to be accessed or not.
+The `each` member function is highly optimized. Unless users want to iterate
+only entities or get only some of the components, using `each` should be the
+preferred approach.
 
 **Note**: prefer the `get` member function of a view instead of the `get` member
 function template of a registry during iterations, if possible. However, keep in
@@ -1406,7 +1421,7 @@ of the components for which it has been constructed. It's also possible to ask a
 view if it contains a given entity.<br/>
 Refer to the inline documentation for all the details.
 
-To iterate a persistent view, either use it in range-for loop:
+To iterate a persistent view, either use it in a range-for loop:
 
 ```cpp
 auto view = registry.view<Position, Velocity>(entt::persistent_t{});
@@ -1461,7 +1476,7 @@ There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
 fact, they return newly created and correctly initialized iterators whenever
 `begin` or `end` are invoked.<br/>
-To iterate a raw view, use it in range-for loop:
+To iterate a raw view, use it in a range-for loop:
 
 ```cpp
 auto view = registry.view<Renderable>(entt::raw_t{});
@@ -1471,9 +1486,74 @@ for(auto &&component: raw) {
 }
 ```
 
-**Note**: raw views don't have the `each` nor the `get` member function for
-obvious reasons. The former would only return the components and therefore it
-would be redundant, the latter isn't required at all.
+Or rely on the `each` member function:
+
+```cpp
+registry.view<Renderable>(entt::raw_t{}).each([](auto &renderable) {
+    // ...
+});
+```
+
+Performance are exactly the same in both cases.
+
+**Note**: raw views don't have a `get` member function for obvious reasons.
+
+### Runtime View
+
+Runtime views iterate entities that have at least all the given components in
+their bags. During construction, these views look at the number of entities
+available for each component and pick up a reference to the smallest
+set of candidates in order to speed up iterations.<br/>
+They offer more or less the same functionalities of a multi component standard
+view. However, they don't expose a `get` member function and users should refer
+to the registry that generated the view to access components. In particular, a
+runtime view exposes utility functions to get the estimated number of entities
+it is going to return and to know whether it's empty or not. It's also possible
+to ask a view if it contains a given entity.<br/>
+Refer to the inline documentation for all the details.
+
+Runtime view are extremely cheap to construct and should not be stored around in
+any case. They should be used immediately after creation and then they should be
+thrown away. The reasons for this go far beyond the scope of this document.<br/>
+To iterate a runtime view, either use it in a range-for loop:
+
+```cpp
+using component_type = typename decltype(registry)::component_type;
+component_type types[] = { registry.type<Position>(), registry.type<Velocity>() };
+
+auto view = registry.view(std::cbegin(types), std::cend(types));
+
+for(auto entity: view) {
+    // a component at a time ...
+    Position &position = registry.get<Position>(entity);
+    Velocity &velocity = registry.get<Velocity>(entity);
+
+    // ... or multiple components at once
+    std::tuple<Position &, Velocity &> tup = view.get<Position, Velocity>(entity);
+
+    // ...
+}
+```
+
+Or rely on the `each` member function to iterate entities:
+
+```cpp
+using component_type = typename decltype(registry)::component_type;
+component_type types[] = { registry.type<Position>(), registry.type<Velocity>() };
+
+auto view = registry.view(std::cbegin(types), std::cend(types)).each([](auto entity) {
+    // ...
+});
+```
+
+Performance are exactly the same in both cases.
+
+**Note**: runtime views are meant for all those cases where users don't know at
+compile-time what components to use to iterate entities. This is particularly
+well suited to plugin systems and mods in general. Where possible, don't use
+runtime views, as their performance are slightly inferior to those of the other
+views.
+
 
 ### Give me everything
 
