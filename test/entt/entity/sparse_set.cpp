@@ -6,7 +6,9 @@ TEST(SparseSetNoType, Functionalities) {
     entt::SparseSet<std::uint64_t> set;
     const auto &cset = set;
 
-    ASSERT_NO_THROW(set.reserve(42));
+    set.reserve(42);
+
+    ASSERT_EQ(set.capacity(), 42);
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
     ASSERT_EQ(cset.begin(), cset.end());
@@ -339,7 +341,9 @@ TEST(SparseSetWithType, Functionalities) {
     entt::SparseSet<std::uint64_t, int> set;
     const auto &cset = set;
 
-    ASSERT_NO_THROW(set.reserve(42));
+    set.reserve(42);
+
+    ASSERT_EQ(set.capacity(), 42);
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
     ASSERT_EQ(cset.begin(), cset.end());

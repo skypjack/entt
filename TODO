@@ -9,7 +9,6 @@
 * ease the assignment of tags as string (type-less assign member function + user defined literal for hashed strings)
 * break snapshot <-> registry dependency (and get rid of utility.hpp)
 * family -> std::uint32_t (or some other fixed and known size type)
-* capacity extended to types of components
 * work stealing job system (see #100)
 * more on runtime stuff
 * C++17. That's all.

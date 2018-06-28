@@ -201,6 +201,15 @@ public:
     }
 
     /**
+     * @brief Returns the number of elements that a sparse set has currently
+     * allocated space for.
+     * @return Capacity of the sparse set.
+     */
+    size_type capacity() const ENTT_NOEXCEPT {
+        return direct.capacity();
+    }
+
+    /**
      * @brief Returns the extent of a sparse set.
      *
      * The extent of a sparse set is also the size of the internal sparse array.

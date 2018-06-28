@@ -195,7 +195,7 @@ public:
     }
 
     /**
-     * @brief Increases the capacity of the pool for a given component.
+     * @brief Increases the capacity of the pool for the given component.
      *
      * If the new capacity is greater than the current capacity, new storage is
      * allocated, otherwise the method does nothing.
@@ -222,17 +222,28 @@ public:
     }
 
     /**
-     * @brief Returns the number of entities ever created.
-     * @return Number of entities ever created.
+     * @brief Returns the capacity of the pool for the given component.
+     * @tparam Component Type of component in which one is interested.
+     * @return Capacity of the pool of the given component.
      */
+    template<typename Component>
     size_type capacity() const ENTT_NOEXCEPT {
-        return entities.size();
+        return managed<Component>() ? pool<Component>().capacity() : size_type{};
     }
 
     /**
-     * @brief Checks whether the pool for the given component is empty.
+     * @brief Returns the number of entities that a registry has currently
+     * allocated space for.
+     * @return Capacity of the registry.
+     */
+    size_type capacity() const ENTT_NOEXCEPT {
+        return entities.capacity();
+    }
+
+    /**
+     * @brief Checks whether the pool of the given component is empty.
      * @tparam Component Type of component in which one is interested.
-     * @return True if the pool for the given component is empty, false
+     * @return True if the pool of the given component is empty, false
      * otherwise.
      */
     template<typename Component>
@@ -1029,7 +1040,7 @@ public:
      * maximize the performance during iterations and users should not make any
      * assumption on the order.<br/>
      * This function can be used to impose an order to the elements in the pool
-     * for the given component. The order is kept valid until a component of the
+     * of the given component. The order is kept valid until a component of the
      * given type is assigned or removed from an entity.
      *
      * The comparison function object must return `true` if the first element
