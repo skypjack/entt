@@ -730,10 +730,10 @@ In `EnTT`, identifiers are easily accessible:
 entt::DefaultRegistry registry;
 
 // standard component identifier
-auto ctype = registry.component<Position>();
+auto ctype = registry.type<Position>();
 
 // single instance component identifier
-auto ttype = registry.tag<PlayingCharacter>();
+auto ttype = registry.type<PlayingCharacter>(entt::tag_t{});
 ```
 
 Once the identifiers are made available, almost everything becomes pretty
