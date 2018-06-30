@@ -64,6 +64,14 @@ if(BUILD_SNAPSHOT)
     target_include_directories(cereal PRIVATE ${CEREAL_SRC_DIR})
 endif()
 
+# Test library
+
+add_library(enttlibrary SHARED $<TARGET_OBJECTS:odr> library/library.cpp)
+set_target_properties(enttlibrary PROPERTIES CXX_VISIBILITY_PRESET hidden)
+target_link_libraries(enttlibrary PRIVATE EnTT)
+ADD_ENTT_TEST(libraryuser library/user.cpp)
+target_link_libraries(libraryuser PRIVATE enttlibrary)
+
 # Test core
 
 ADD_ENTT_TEST(algorithm entt/core/algorithm.cpp)

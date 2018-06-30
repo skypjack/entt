@@ -15,6 +15,9 @@
 
 namespace entt {
 
+#if ENTT_FORCE_EXPORT_FAMILY
+template class ENTT_EXPORT Family<struct InternalDispatcherEventFamily>;
+#endif
 
 /**
  * @brief Basic dispatcher implementation.

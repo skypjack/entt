@@ -25,6 +25,11 @@
 
 namespace entt {
 
+#if ENTT_FORCE_EXPORT_FAMILY
+template class ENTT_EXPORT Family<struct InternalRegistryTagFamily>;
+template class ENTT_EXPORT Family<struct InternalRegistryComponentFamily>;
+template class ENTT_EXPORT Family<struct InternalRegistryHandlerFamily>;
+#endif
 
 /**
  * @brief Fast and reliable entity-component system.

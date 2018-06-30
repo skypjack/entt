@@ -16,6 +16,9 @@
 
 namespace entt {
 
+#if ENTT_FORCE_EXPORT_FAMILY
+template class ENTT_EXPORT Family<struct InternalEmitterHandlerFamily>;
+#endif
 
 /**
  * @brief General purpose event emitter.
