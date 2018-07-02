@@ -1,2 +1,2 @@
-bash update_homebrew.bash $1
+bash scripts/update_homebrew.bash $1
 # vcpkg?
