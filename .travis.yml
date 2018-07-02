@@ -74,6 +74,6 @@ script:
 
 deploy:
   provider: script
-  script: bash scripts/update_packages.bash $TRAVIS_TAG
+  script: bash scripts/update_packages.sh $TRAVIS_TAG
   on:
     tags: true

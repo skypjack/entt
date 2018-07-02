@@ -52,7 +52,7 @@ rm "$FORMULA-e"
 echo "Gitting..."
 git add entt.rb
 git commit -m "Update to $VERSION"
-git push origin master
+#git push origin master
 
 # out of homebrew-entt dir
 cd ..
