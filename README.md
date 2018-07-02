@@ -2692,7 +2692,7 @@ it is not limited to such uses.
   Microsoft VC++ Packaging Tool.
 * [`Homebrew`](https://github.com/skypjack/homebrew-entt), the missing package
   manager for macOS.<br/>
-  Available as a homebrew formula. Just type the following to install it:
+  Install with this command:
   ```
   brew install skypjack/entt/entt
   ```

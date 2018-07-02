@@ -71,3 +71,9 @@ script:
 - mkdir -p build && cd build
 - cmake .. && make -j4
 - CTEST_OUTPUT_ON_FAILURE=1 make test
+
+deploy:
+  provider: script
+  script: bash scripts/update_packages.bash $TRAVIS_TAG
+  on:
+    tags: true
