@@ -1,1 +1,3 @@
-bash scripts/update_homebrew.sh $1
+#!/bin/bash
+
+scripts/update_homebrew.sh $1

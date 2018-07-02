@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # only argument should be the version to upgrade to
 if [ $# != 1 ]
 then
