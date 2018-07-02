@@ -1675,7 +1675,7 @@ class RuntimeView {
         : pools{std::move(others)}
     {
         const auto it = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
-            return !lhs || (rhs && (lhs->size() < rhs->size()));
+            return (!lhs && rhs) || (lhs && rhs && lhs->size() < rhs->size());
         });
 
         // brings the best candidate (if any) on front of the vector
