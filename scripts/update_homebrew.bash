@@ -13,6 +13,10 @@ echo "Updating homebrew package to $VERSION"
 
 echo "Cloning..."
 git clone https://github.com/skypjack/homebrew-entt.git
+if [ $? != 0 ]
+then
+  exit 1
+fi
 cd homebrew-entt
 
 # download the repo at the version
