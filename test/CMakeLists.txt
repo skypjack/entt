@@ -25,7 +25,7 @@ target_compile_features(odr
 
 macro(ADD_ENTT_TEST TEST_NAME TEST_SOURCE)
     add_executable(${TEST_NAME} $<TARGET_OBJECTS:odr> ${TEST_SOURCE})
-    target_link_libraries(${TEST_NAME} PRIVATE EnTT gtest_main Threads::Threads)
+    target_link_libraries(${TEST_NAME} PRIVATE EnTT GTest::Main Threads::Threads)
     set_target_properties(${TEST_NAME} PROPERTIES CXX_EXTENSIONS OFF)
     target_compile_options(${TEST_NAME} PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -Wall>)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
