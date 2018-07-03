@@ -2,7 +2,7 @@
 # EnTT
 #
 
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.7.2)
 
 #
 # Building in-tree is not allowed (we take care of your craziness).
