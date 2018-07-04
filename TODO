@@ -4,8 +4,10 @@
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
+* add to the prototype the possibility to submit components during creation to use to initialize the ones created by the prototype itself
 * create dedicated flat map based on types implementation (sort of "type map") for types to use within the registry and so on...
 * ease the assignment of tags as string (type-less assign member function + user defined literal for hashed strings)
+* move signals within sparse set and attacchee if possible, it would be less error-prone
 * family -> std::uint32_t (or some other fixed and known size type)
 * work stealing job system (see #100)
 * C++17. That's all.

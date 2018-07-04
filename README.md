@@ -1,4 +1,4 @@
-# EnTT Framework
+# EnTT
 
 [![Build Status](https://travis-ci.org/skypjack/entt.svg?branch=master)](https://travis-ci.org/skypjack/entt)
 [![Build status](https://ci.appveyor.com/api/projects/status/rvhaabjmghg715ck?svg=true)](https://ci.appveyor.com/project/skypjack/entt)
@@ -65,10 +65,10 @@
 
 # Introduction
 
-`EnTT` is a header-only, tiny and easy to use framework written in modern
-C++.<br/>
-It was originally designed entirely around an architectural pattern called _ECS_
-that is used mostly in game development. For further details:
+`EnTT` is a header-only, tiny and easy to use entity-component system (and much
+more) written in modern C++.<br/>
+The entity-component-system (also known as _ECS_) is an architectural pattern
+used mostly in game development. For further details:
 
 * [Entity Systems Wiki](http://entity-systems.wikidot.com/)
 * [Evolve Your Hierarchy](http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/)
@@ -77,35 +77,12 @@ that is used mostly in game development. For further details:
 A long time ago, the sole entity-component system was part of the project. After
 a while the codebase has grown and more and more classes have become part of the
 repository.<br/>
-That's why today it's called _the EnTT Framework_.
-
-Currently, `EnTT` is tested on Linux, Microsoft Windows and OS X. It has proven
-to work also on both Android and iOS.<br/>
-Most likely it will not be problematic on other systems as well, but has not
-been sufficiently tested so far.
-
-## The framework
-
-`EnTT` was written initially as a faster alternative to other well known and
-open source entity-component systems. Nowadays the `EnTT` framework is moving
-its first steps. Much more will come in the future and hopefully I'm going to
-work on it for a long time.<br/>
-Requests for feature, PR, suggestions ad feedback are highly appreciated.
-
-If you find you can help me and want to contribute to the `EnTT` framework with
-your experience or you do want to get part of the project for some other
-reasons, feel free to contact me directly (you can find the mail in the
-[profile](https://github.com/skypjack)).<br/>
-I can't promise that each and every contribution will be accepted, but I can
-assure that I'll do my best to take them all seriously.
-
-### State of the art
-
-Here is a brief list of what it offers today:
+Here is a brief, yet incomplete list of what it offers today:
 
 * Statically generated integer identifiers for types (assigned either at
   compile-time or at runtime).
 * A constexpr utility for human readable resource identifiers.
+* A minimal configuration system built on top of the monostate pattern.
 * An incredibly fast entity-component system based on sparse sets, with its own
   views and a _pay for what you use_ policy to adjust performance and memory
   usage according to users' requirements.
@@ -123,9 +100,12 @@ Here is a brief list of what it offers today:
 Consider it a work in progress. For more details and an updated list, please
 refer to the [online documentation](https://skypjack.github.io/entt/). It
 probably contains much more. Moreover, the whole API is fully documented in-code
-for those who are brave enough to read it.<br/>
-Continue reading to know how the different parts of the project work or follow
-the link above to take a look at the API reference.
+for those who are brave enough to read it.
+
+Currently, `EnTT` is tested on Linux, Microsoft Windows and OS X. It has proven
+to work also on both Android and iOS.<br/>
+Most likely it will not be problematic on other systems as well, but has not
+been sufficiently tested so far.
 
 ## Code Example
 
@@ -197,7 +177,7 @@ satisfying at all. The fastest and nothing more, fairly little indeed. When I
 realized it, I tried hard to keep intact the great performance of `EnTT` and to
 add all the features I wanted to see in *my own library* at the same time.
 
-Today `EnTT` is finally what I was looking for: still faster than its
+Nowadays, `EnTT` is finally what I was looking for: still faster than its
 _competitors_, lower memory usage in the average case, a really good API and an
 amazing set of features. And even more, of course.
 
@@ -265,8 +245,8 @@ documentation:
 
 ## Library
 
-`EnTT` is a header-only library. This means that including the `entt.hpp`
-header is enough to include the whole framework and use it. For those who are
+`EnTT` is a header-only library. This means that including the `entt.hpp` header
+is enough to include the library as a whole and use it. For those who are
 interested only in the entity-component system, consider to include the sole
 `entity/registry.hpp` header instead.<br/>
 It's a matter of adding the following line to the top of a file:
@@ -380,8 +360,8 @@ them the way they prefer. No need to register systems or their types neither
 with the registry nor with the entity-component system at all.
 
 The following sections will explain in short how to use the entity-component
-system, the core part of the whole framework.<br/>
-In fact, the framework is composed of many other classes in addition to those
+system, the core part of the whole library.<br/>
+In fact, the project is composed of many other classes in addition to those
 describe below. For more details, please refer to the inline documentation.
 
 ## The Registry, the Entity and the Component
@@ -1138,7 +1118,7 @@ entt::dependency<AType, AnotherType>(entt::break_t{}, registry.construction<MyTy
 
 In `EnTT`, there exists a sort of _null entity_ made available to users that is
 accessible via the `entt::null` variable.<br/>
-The framework guarantees that the following expression always returns false:
+The library guarantees that the following expression always returns false:
 
 ```cpp
 registry.valid(entt::null);
@@ -1658,11 +1638,10 @@ expedients.
 
 # Crash Course: core functionalities
 
-The `EnTT` framework comes with a bunch of core functionalities mostly used by
-the other parts of the library itself.<br/>
-Hardly users of the framework will include these features in their code, but
-it's worth describing what `EnTT` offers so as not to reinvent the wheel in case
-of need.
+`EnTT` comes with a bunch of core functionalities mostly used by the other parts
+of the library itself.<br/>
+Hardly users will include these features in their code, but it's worth
+describing what `EnTT` offers so as not to reinvent the wheel in case of need.
 
 ## Compile-time identifiers
 
@@ -1721,7 +1700,7 @@ Sometimes it's useful to be able to give unique identifiers to types at
 runtime.<br/>
 There are plenty of different solutions out there and I could have used one of
 them. In fact, I adapted the most common one to my requirements and used it
-extensively within the entire framework.
+extensively within the entire library.
 
 It's the `Family` class. Here is an example of use directly from the
 entity-component system:
@@ -1868,8 +1847,8 @@ Sometimes processes are a useful tool to work around the strict definition of a
 system and introduce logic in a different way, usually without resorting to the
 introduction of other components.
 
-The `EnTT` framework offers a minimal support to this paradigm by introducing a
-few classes that users can use to define and execute cooperative processes.
+`EnTT` offers a minimal support to this paradigm by introducing a few classes
+that users can use to define and execute cooperative processes.
 
 ## The process
 
@@ -2068,9 +2047,9 @@ requirements of the piece of software in which they are used.<br/>
 Examples are loading everything on start, loading on request, predictive
 loading, and so on.
 
-The `EnTT` framework doesn't pretend to offer a _one-fits-all_ solution for the
-different cases. Instead, it offers a minimal and perhaps trivial cache that can
-be useful most of the time during prototyping and sometimes even in a production
+`EnTT` doesn't pretend to offer a _one-fits-all_ solution for the different
+cases. Instead, it offers a minimal and perhaps trivial cache that can be useful
+most of the time during prototyping and sometimes even in a production
 environment.<br/>
 For those interested in the subject, the plan is to improve it considerably over
 time in terms of performance, memory usage and functionalities. Hoping to make
@@ -2302,8 +2281,8 @@ it solves a problem but may not adapt well to other requirements that may arise
 from time to time.
 
 In case that the flexibility and potential of an `std::function` are not
-required or where you are looking for something different, the `EnTT` framework
-offers a full set of classes to solve completely different problems.
+required or where you are looking for something different, `EnTT` offers a full
+set of classes to solve completely different problems.
 
 ## Signals
 
@@ -2472,7 +2451,7 @@ auto ret = delegate(42);
 
 Probably too much small and pretty poor of functionalities, but the delegate
 class can help in a lot of cases and it has shown that it is worth keeping it
-within the framework.
+within the library.
 
 ## Event dispatcher
 
@@ -2709,8 +2688,7 @@ projects based on EnTT and did not hold back when it came to documenting them.
 
 Below an incomplete list of projects and articles:
 
-* [EnttPong](https://github.com/reworks/EnttPong): example game for `EnTT`
-  framework.
+* [EnttPong](https://github.com/reworks/EnttPong): example game with `EnTT`.
 * [Space Battle: Huge edition](http://victor.madtriangles.com/code%20experiment/2018/06/11/post-ecs-battle-huge.html):
   huge space battle built entirely from scratch.
 * [Space Battle](https://github.com/vblanco20-1/ECS_SpaceBattle): huge space
@@ -2730,7 +2708,20 @@ open an issue or a PR and I'll be glad to add them to the list.
 
 # Contributors
 
-If you want to participate, please see the guidelines for
+`EnTT` was written initially as a faster alternative to other well known and
+open source entity-component systems. Nowadays this library is moving its first
+steps. Much more will come in the future and hopefully I'm going to work on it
+for a long time.<br/>
+Requests for features, PR, suggestions ad feedback are highly appreciated.
+
+If you find you can help me and want to contribute to the project with your
+experience or you do want to get part of the project for some other reasons,
+feel free to contact me directly (you can find the mail in the
+[profile](https://github.com/skypjack)).<br/>
+I can't promise that each and every contribution will be accepted, but I can
+assure that I'll do my best to take them all seriously.
+
+If you decide to participate, please see the guidelines for
 [contributing](https://github.com/skypjack/entt/blob/master/CONTRIBUTING)
 before to create issues or pull requests.<br/>
 Take also a look at the
@@ -2751,7 +2742,7 @@ Docs released under
 
 Developing and maintaining `EnTT` takes some time and lots of coffee. I'd like
 to add more and more functionalities in future and turn it in a full-featured
-framework.<br/>
+solution.<br/>
 If you want to support this project, you can offer me an espresso. I'm from
 Italy, we're used to turning the best coffee ever in code. If you find that
 it's not enough, feel free to support me the way you prefer.<br/>
