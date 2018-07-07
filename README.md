@@ -29,6 +29,7 @@
       * [Prototype](#prototype)
       * [Helpers](#helpers)
          * [Dependency function](#dependency-function)
+         * [Labels](#labels)
       * [Null entity](#null-entity)
    * [View: to persist or not to persist?](#view-to-persist-or-not-to-persist)
       * [Standard View](#standard-view)
@@ -1154,6 +1155,20 @@ A dependency can easily be broken by means of the same function template:
 entt::dependency<AType, AnotherType>(entt::break_t{}, registry.construction<MyType>());
 ```
 
+#### Labels
+
+There's nothing magical about the way labels can be assigned to entities while
+avoiding a performance hit at runtime. Nonetheless, the syntax can be annoying
+and that's why a more user-friendly shortcut is provided to do it.<br/>
+This shortcut is the alias template `entt::label`.
+
+If used in combination with hashed strings, it helps to use labels where types
+would be required otherwise. As an example:
+
+```cpp
+registry.assign<entt::label<"enemy"_hs>>(entity);
+```
+
 ### Null entity
 
 In `EnTT`, there exists a sort of _null entity_ made available to users that is
@@ -1782,6 +1797,13 @@ auto load(entt::HashedString::hash_type resource) {
 }
 
 auto resource = load(entt::HashedString{"gui/background"});
+```
+
+There is also a _user defined literal_ dedicated to hashed strings to make them
+more user-friendly:
+
+```cpp
+constexpr auto str = "text"_hs;
 ```
 
 ### Conflicts

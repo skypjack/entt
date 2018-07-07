@@ -2,6 +2,8 @@
 #define ENTT_ENTITY_HELPER_HPP
 
 
+#include <type_traits>
+#include "../core/hashed_string.hpp"
 #include "../signal/sigh.hpp"
 #include "registry.hpp"
 #include "utility.hpp"
@@ -76,6 +78,25 @@ template<typename... Dependency, typename Entity>
 void dependency(break_t, Sink<void(Registry<Entity> &, const Entity)> sink) {
     sink.template disconnect<dependency<Entity, Dependency...>>();
 }
+
+
+/**
+ * @brief Alias template to ease the assignment of labels to entities.
+ *
+ * If used in combination with hashed strings, it simplifies the assignment of
+ * labels to entities and the use of labels in general where a type would be
+ * required otherwise.<br/>
+ * As an example and where the user defined literal for hashed strings hasn't
+ * been changed:
+ * @code{.cpp}
+ * entt::DefaultRegistry registry;
+ * registry.assign<entt::label<"enemy"_hs>>(entity);
+ * @endcode
+ *
+ * @tparam Value The numeric representation of an instance of hashed string.
+ */
+template<typename HashedString::hash_type Value>
+using label = std::integral_constant<typename HashedString::hash_type, Value>;
 
 
 }
