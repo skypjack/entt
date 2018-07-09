@@ -590,26 +590,21 @@ class View final {
     template<typename Comp, typename Func, std::size_t... Indexes>
     void each(const pool_type<Comp> &cpool, Func func, std::index_sequence<Indexes...>) const {
         const auto other = unchecked(&cpool);
-        std::array<underlying_iterator_type, sizeof...(Component)> data{{cpool.view_type::cbegin(), std::get<Indexes>(other)->cbegin()...}};
+        std::array<underlying_iterator_type, sizeof...(Indexes)> data{{std::get<Indexes>(other)->cbegin()...}};
+        const auto extent = std::min({ pool<Component>().extent()... });
         auto raw = std::make_tuple(pool<Component>().cbegin()...);
         const auto end = cpool.view_type::cend();
-        std::size_t pos{};
+        auto begin = cpool.view_type::cbegin();
 
         // we can directly use the raw iterators if pools are ordered
-        while(!pos && data[0] != end) {
-            for(pos = data.size() - 1; pos && *(data[pos]++) == *data[pos-1]; --pos);
-
-            if(!pos) {
-                func(*(data[0]++), *(std::get<component_iterator_type<Component>>(raw)++)...);
-            }
+        while(begin != end && std::min({ (*(std::get<Indexes>(data)++) == *begin)... })) {
+            func(*(begin++), *(std::get<component_iterator_type<Component>>(raw)++)...);
         }
 
-        const auto extent = std::min({ pool<Component>().extent()... });
-        auto it = std::get<component_iterator_type<Comp>>(raw);
-
         // fallback to visit what remains using indirections
-        for(; data[0] != end; ++data[0], ++it) {
-            const auto entity = *data[0];
+        while(begin != end) {
+            const auto entity = *(begin++);
+            const auto it = std::get<component_iterator_type<Comp>>(raw)++;
             const auto sz = size_type(entity & traits_type::entity_mask);
 
             if(sz < extent && std::all_of(other.cbegin(), other.cend(), [entity](const view_type *view) { return view->fast(entity); })) {

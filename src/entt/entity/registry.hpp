@@ -44,10 +44,10 @@ class Registry {
     using signal_type = SigH<void(Registry &, const Entity)>;
     using traits_type = entt_traits<Entity>;
 
-    template<typename... Component>
+    template<typename handler_family::family_type(*Type)(), typename... Component>
     static void creating(Registry &registry, const Entity entity) {
         if(registry.has<Component...>(entity)) {
-            registry.handlers[handler_family::type<Component...>()]->construct(entity);
+            registry.handlers[Type()]->construct(entity);
         }
     }
 
@@ -73,6 +73,35 @@ class Registry {
 
         Tag tag;
     };
+
+    template<typename Comp, std::size_t Pivot, typename... Component, std::size_t... Indexes>
+    void connect(std::index_sequence<Indexes...>) {
+        auto &cpool = pools[component_family::type<Comp>()];
+        std::get<1>(cpool).sink().template connect<&Registry::creating<&handler_family::type<Component...>, std::tuple_element_t<(Indexes < Pivot ? Indexes : (Indexes+1)), std::tuple<Component...>>...>>();
+        std::get<2>(cpool).sink().template connect<&Registry::destroying<Component...>>();
+    }
+
+    template<typename... Component, std::size_t... Indexes>
+    void connect(std::index_sequence<Indexes...>) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { (assure<Component>(), connect<Component, Indexes, Component...>(std::make_index_sequence<sizeof...(Component)-1>{}), 0)... };
+        (void)accumulator;
+    }
+
+    template<typename Comp, std::size_t Pivot, typename... Component, std::size_t... Indexes>
+    void disconnect(std::index_sequence<Indexes...>) {
+        auto &cpool = pools[component_family::type<Comp>()];
+        std::get<1>(cpool).sink().template disconnect<&Registry::creating<&handler_family::type<Component...>, std::tuple_element_t<(Indexes < Pivot ? Indexes : (Indexes+1)), std::tuple<Component...>>...>>();
+        std::get<2>(cpool).sink().template disconnect<&Registry::destroying<Component...>>();
+    }
+
+    template<typename... Component, std::size_t... Indexes>
+    void disconnect(std::index_sequence<Indexes...>) {
+        using accumulator_type = int[];
+        // if a set exists, pools have already been created for it
+        accumulator_type accumulator = { (disconnect<Component, Indexes, Component...>(std::make_index_sequence<sizeof...(Component)-1>{}), 0)... };
+        (void)accumulator;
+    }
 
     template<typename Component>
     inline bool managed() const ENTT_NOEXCEPT {
@@ -1335,22 +1364,13 @@ public:
         }
 
         if(!handlers[htype]) {
+            connect<Component...>(std::make_index_sequence<sizeof...(Component)>{});
             handlers[htype] = std::make_unique<SparseSet<entity_type>>();
-            auto &handler = handlers[htype];
+            auto &handler = *handlers[htype];
 
             for(auto entity: view<Component...>()) {
-                handler->construct(entity);
+                handler.construct(entity);
             }
-
-            auto connect = [this](const auto ctype) {
-                auto &cpool = pools[ctype];
-                std::get<1>(cpool).sink().template connect<&Registry::creating<Component...>>();
-                std::get<2>(cpool).sink().template connect<&Registry::destroying<Component...>>();
-            };
-
-            using accumulator_type = int[];
-            accumulator_type accumulator = { (assure<Component>(), connect(component_family::type<Component>()), 0)... };
-            (void)accumulator;
         }
     }
 
@@ -1372,19 +1392,8 @@ public:
     template<typename... Component>
     void discard() {
         if(contains<Component...>()) {
-            const auto htype = handler_family::type<Component...>();
-
-            auto disconnect = [this](const auto ctype) {
-                auto &cpool = pools[ctype];
-                std::get<1>(cpool).sink().template disconnect<&Registry::creating<Component...>>();
-                std::get<2>(cpool).sink().template disconnect<&Registry::destroying<Component...>>();
-            };
-
-            // if a set exists, pools have already been created for it
-            using accumulator_type = int[];
-            accumulator_type accumulator = { (disconnect(component_family::type<Component>()), 0)... };
-            handlers[htype].reset();
-            (void)accumulator;
+            disconnect<Component...>(std::make_index_sequence<sizeof...(Component)>{});
+            handlers[handler_family::type<Component...>()].reset();
         }
     }
 
