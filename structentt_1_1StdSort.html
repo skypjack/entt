@@ -78,10 +78,10 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9a7a40458a3999618dd95d70de024331"><td class="memTemplParams" colspan="2">template&lt;typename It , typename Compare  = std::less&lt;&gt;&gt; </td></tr>
-<tr class="memitem:a9a7a40458a3999618dd95d70de024331"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1StdSort.html#a9a7a40458a3999618dd95d70de024331">operator()</a> (It first, It last, Compare compare=Compare{}) const</td></tr>
-<tr class="memdesc:a9a7a40458a3999618dd95d70de024331"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sorts the element in a range.  <a href="#a9a7a40458a3999618dd95d70de024331">More...</a><br /></td></tr>
-<tr class="separator:a9a7a40458a3999618dd95d70de024331"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3363910b5a138b20f96d8a967a7bbd8b"><td class="memTemplParams" colspan="2">template&lt;typename It , typename Compare  = std::less&lt;&gt;, typename... Args&gt; </td></tr>
+<tr class="memitem:a3363910b5a138b20f96d8a967a7bbd8b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1StdSort.html#a3363910b5a138b20f96d8a967a7bbd8b">operator()</a> (It first, It last, Compare compare=Compare{}, Args &amp;&amp;... args) const</td></tr>
+<tr class="memdesc:a3363910b5a138b20f96d8a967a7bbd8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sorts the element in a range.  <a href="#a3363910b5a138b20f96d8a967a7bbd8b">More...</a><br /></td></tr>
+<tr class="separator:a3363910b5a138b20f96d8a967a7bbd8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Function object to wrap <code>std::sort</code> in a class type. </p>
@@ -90,13 +90,13 @@ Public Member Functions</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="algorithm_8hpp_source.html#l00021">21</a> of file <a class="el" href="algorithm_8hpp_source.html">algorithm.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a9a7a40458a3999618dd95d70de024331"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9a7a40458a3999618dd95d70de024331">&#9670;&nbsp;</a></span>operator()()</h2>
+<a id="a3363910b5a138b20f96d8a967a7bbd8b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3363910b5a138b20f96d8a967a7bbd8b">&#9670;&nbsp;</a></span>operator()()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename It , typename Compare  = std::less&lt;&gt;&gt; </div>
+template&lt;typename It , typename Compare  = std::less&lt;&gt;, typename... Args&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -117,7 +117,13 @@ template&lt;typename It , typename Compare  = std::less&lt;&gt;&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Compare&#160;</td>
-          <td class="paramname"><em>compare</em> = <code>Compare{}</code>&#160;</td>
+          <td class="paramname"><em>compare</em> = <code>Compare{}</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Args &amp;&amp;...&#160;</td>
+          <td class="paramname"><em>args</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -138,6 +144,7 @@ template&lt;typename It , typename Compare  = std::less&lt;&gt;&gt; </div>
   <table class="tparams">
     <tr><td class="paramname">It</td><td>Type of random access iterator. </td></tr>
     <tr><td class="paramname">Compare</td><td>Type of comparison function object. </td></tr>
+    <tr><td class="paramname">Args</td><td>Types of arguments to forward to the sort function. </td></tr>
   </table>
   </dd>
 </dl>
@@ -146,11 +153,12 @@ template&lt;typename It , typename Compare  = std::less&lt;&gt;&gt; </div>
     <tr><td class="paramname">first</td><td>An iterator to the first element of the range to sort. </td></tr>
     <tr><td class="paramname">last</td><td>An iterator past the last element of the range to sort. </td></tr>
     <tr><td class="paramname">compare</td><td>A valid comparison function object. </td></tr>
+    <tr><td class="paramname">args</td><td>Arguments to forward to the sort function, if any. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="algorithm_8hpp_source.html#l00034">34</a> of file <a class="el" href="algorithm_8hpp_source.html">algorithm.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="algorithm_8hpp_source.html#l00036">36</a> of file <a class="el" href="algorithm_8hpp_source.html">algorithm.hpp</a>.</p>
 
 </div>
 </div>

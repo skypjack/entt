@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ident',['ident',['../namespaceentt.html#a02c0c4d37a2cdf573029814c1903de3c',1,'entt']]]
+  ['null',['null',['../namespaceentt.html#a588326af8f6f902a6c0b57d3f9fc6c17',1,'entt']]]
 ];

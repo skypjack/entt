@@ -81,14 +81,6 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a738fb04a466b1f858a1eb5d7bc8fd668"><td class="memItemLeft" align="right" valign="top"><a id="a738fb04a466b1f858a1eb5d7bc8fd668"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a738fb04a466b1f858a1eb5d7bc8fd668">iterator_type</a> = Iterator</td></tr>
-<tr class="memdesc:a738fb04a466b1f858a1eb5d7bc8fd668"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input iterator type. <br /></td></tr>
-<tr class="separator:a738fb04a466b1f858a1eb5d7bc8fd668"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81b76e0389ffeb60195a3391c4c5ce3a"><td class="memItemLeft" align="right" valign="top"><a id="a81b76e0389ffeb60195a3391c4c5ce3a"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a81b76e0389ffeb60195a3391c4c5ce3a">const_iterator_type</a> = Iterator</td></tr>
-<tr class="memdesc:a81b76e0389ffeb60195a3391c4c5ce3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant input iterator type. <br /></td></tr>
-<tr class="separator:a81b76e0389ffeb60195a3391c4c5ce3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61be0e712de89d1eb275e14bbc59174e"><td class="memItemLeft" align="right" valign="top"><a id="a61be0e712de89d1eb275e14bbc59174e"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entity_type</a> = typename <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">view_type::entity_type</a></td></tr>
 <tr class="memdesc:a61be0e712de89d1eb275e14bbc59174e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying entity identifier. <br /></td></tr>
@@ -97,6 +89,14 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#ab3f86ec55935bbbb00077bbe07f15c4b">size_type</a> = typename <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">view_type::size_type</a></td></tr>
 <tr class="memdesc:ab3f86ec55935bbbb00077bbe07f15c4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type. <br /></td></tr>
 <tr class="separator:ab3f86ec55935bbbb00077bbe07f15c4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a738fb04a466b1f858a1eb5d7bc8fd668"><td class="memItemLeft" align="right" valign="top"><a id="a738fb04a466b1f858a1eb5d7bc8fd668"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a738fb04a466b1f858a1eb5d7bc8fd668">iterator_type</a> = Iterator</td></tr>
+<tr class="memdesc:a738fb04a466b1f858a1eb5d7bc8fd668"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input iterator type. <br /></td></tr>
+<tr class="separator:a738fb04a466b1f858a1eb5d7bc8fd668"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81b76e0389ffeb60195a3391c4c5ce3a"><td class="memItemLeft" align="right" valign="top"><a id="a81b76e0389ffeb60195a3391c4c5ce3a"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1View.html#a81b76e0389ffeb60195a3391c4c5ce3a">const_iterator_type</a> = Iterator</td></tr>
+<tr class="memdesc:a81b76e0389ffeb60195a3391c4c5ce3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant input iterator type. <br /></td></tr>
+<tr class="separator:a81b76e0389ffeb60195a3391c4c5ce3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -179,7 +179,9 @@ class entt::View&lt; Entity, Component &gt;</h3>
 <dd>
 <a class="el" href="classentt_1_1PersistentView.html" title="Persistent view. ">PersistentView</a> </dd>
 <dd>
-<a class="el" href="classentt_1_1RawView.html" title="Raw view. ">RawView</a></dd></dl>
+<a class="el" href="classentt_1_1RawView.html" title="Raw view. ">RawView</a> </dd>
+<dd>
+<a class="el" href="classentt_1_1RuntimeView.html" title="Runtime view. ">RuntimeView</a></dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Entity</td><td>A valid entity type (see <a class="el" href="structentt_1_1entt__traits.html" title="Entity traits. ">entt_traits</a> for more details). </td></tr>
@@ -188,7 +190,7 @@ class entt::View&lt; Entity, Component &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00453">453</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00466">466</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a7c59406241bd142289a0d618a33f98d3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7c59406241bd142289a0d618a33f98d3">&#9670;&nbsp;</a></span>begin() <span class="overload">[1/2]</span></h2>
@@ -220,7 +222,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00669">669</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00681">681</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -254,7 +256,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00687">687</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00699">699</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -288,7 +290,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00650">650</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00662">662</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -322,7 +324,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the entity following the last entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00706">706</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00718">718</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -361,7 +363,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the view contains the given entity, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00754">754</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00766">766</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -409,7 +411,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00869">869</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00882">882</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -457,7 +459,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00893">893</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00906">906</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -489,7 +491,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <p>Checks if the view is definitely empty. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the view is definitely empty, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00632">632</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00644">644</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -523,7 +525,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the entity following the last entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00726">726</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00738">738</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -557,7 +559,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the entity following the last entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00745">745</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00757">757</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -607,7 +609,7 @@ template&lt;typename Comp &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The component assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00777">777</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00790">790</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -657,7 +659,7 @@ template&lt;typename Comp &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The component assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00800">800</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00813">813</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -707,7 +709,7 @@ template&lt;typename... Comp&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The components assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00823">823</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00836">836</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -757,7 +759,7 @@ template&lt;typename... Comp&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The components assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00847">847</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00860">860</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>
@@ -789,7 +791,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
 <p>Estimates the number of entities that have the given components. </p>
 <dl class="section return"><dt>Returns</dt><dd>Estimated number of entities that have the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00624">624</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="view_8hpp_source.html#l00636">636</a> of file <a class="el" href="view_8hpp_source.html">view.hpp</a>.</p>
 
 </div>
 </div>

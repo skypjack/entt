@@ -82,6 +82,9 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Delegate_3_01Ret_07Args_8_8_8_08_4.html#a57a011f4b42c3358ee5219f63997e00b">Delegate</a> () ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:a57a011f4b42c3358ee5219f63997e00b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
 <tr class="separator:a57a011f4b42c3358ee5219f63997e00b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab776848ee5ece9b92740d8a2ad0b84a8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1Delegate_3_01Ret_07Args_8_8_8_08_4.html#ab776848ee5ece9b92740d8a2ad0b84a8">empty</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:ab776848ee5ece9b92740d8a2ad0b84a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether a delegate actually stores a listener.  <a href="#ab776848ee5ece9b92740d8a2ad0b84a8">More...</a><br /></td></tr>
+<tr class="separator:ab776848ee5ece9b92740d8a2ad0b84a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51d3c462c56349e09a1c7fe0d58859b7"><td class="memTemplParams" colspan="2">template&lt;Ret(*)(Args...) Function&gt; </td></tr>
 <tr class="memitem:a51d3c462c56349e09a1c7fe0d58859b7"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1Delegate_3_01Ret_07Args_8_8_8_08_4.html#a51d3c462c56349e09a1c7fe0d58859b7">connect</a> () ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:a51d3c462c56349e09a1c7fe0d58859b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Binds a free function to a delegate.  <a href="#a51d3c462c56349e09a1c7fe0d58859b7">More...</a><br /></td></tr>
@@ -152,7 +155,7 @@ template&lt;Ret(*)(Args...) Function&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="delegate_8hpp_source.html#l00063">63</a> of file <a class="el" href="delegate_8hpp_source.html">delegate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delegate_8hpp_source.html#l00070">70</a> of file <a class="el" href="delegate_8hpp_source.html">delegate.hpp</a>.</p>
 
 </div>
 </div>
@@ -200,7 +203,39 @@ template&lt;typename Class , Ret(Class::*)(Args...) Member&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="delegate_8hpp_source.html#l00079">79</a> of file <a class="el" href="delegate_8hpp_source.html">delegate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delegate_8hpp_source.html#l00086">86</a> of file <a class="el" href="delegate_8hpp_source.html">delegate.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ab776848ee5ece9b92740d8a2ad0b84a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab776848ee5ece9b92740d8a2ad0b84a8">&#9670;&nbsp;</a></span>empty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Ret , typename... Args&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classentt_1_1Delegate.html">entt::Delegate</a>&lt; Ret(Args...)&gt;::empty </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks whether a delegate actually stores a listener. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if the delegate is empty, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="delegate_8hpp_source.html#l00060">60</a> of file <a class="el" href="delegate_8hpp_source.html">delegate.hpp</a>.</p>
 
 </div>
 </div>
@@ -239,7 +274,7 @@ template&lt;typename Ret , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The value returned by the underlying function. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="delegate_8hpp_source.html#l00097">97</a> of file <a class="el" href="delegate_8hpp_source.html">delegate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delegate_8hpp_source.html#l00104">104</a> of file <a class="el" href="delegate_8hpp_source.html">delegate.hpp</a>.</p>
 
 </div>
 </div>
@@ -279,7 +314,7 @@ template&lt;typename Ret , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the two delegates are identical, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="delegate_8hpp_source.html#l00109">109</a> of file <a class="el" href="delegate_8hpp_source.html">delegate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delegate_8hpp_source.html#l00116">116</a> of file <a class="el" href="delegate_8hpp_source.html">delegate.hpp</a>.</p>
 
 </div>
 </div>
@@ -311,7 +346,7 @@ template&lt;typename Ret , typename... Args&gt; </div>
 <p>Resets a delegate. </p>
 <p>After a reset, a delegate can be safely invoked with no effect. </p>
 
-<p class="definition">Definition at line <a class="el" href="delegate_8hpp_source.html#l00088">88</a> of file <a class="el" href="delegate_8hpp_source.html">delegate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delegate_8hpp_source.html#l00095">95</a> of file <a class="el" href="delegate_8hpp_source.html">delegate.hpp</a>.</p>
 
 </div>
 </div>

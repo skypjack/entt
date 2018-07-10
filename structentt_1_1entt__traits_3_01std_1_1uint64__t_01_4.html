@@ -87,19 +87,23 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="str
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#aeac4d9172940a9dec0682860ac176725">version_type</a> = std::uint32_t</td></tr>
 <tr class="memdesc:aeac4d9172940a9dec0682860ac176725"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying version type. <br /></td></tr>
 <tr class="separator:aeac4d9172940a9dec0682860ac176725"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afba2f77f80b0bf89a208f6876ab67271"><td class="memItemLeft" align="right" valign="top"><a id="afba2f77f80b0bf89a208f6876ab67271"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#afba2f77f80b0bf89a208f6876ab67271">difference_type</a> = std::int64_t</td></tr>
+<tr class="memdesc:afba2f77f80b0bf89a208f6876ab67271"><td class="mdescLeft">&#160;</td><td class="mdescRight">Difference type. <br /></td></tr>
+<tr class="separator:afba2f77f80b0bf89a208f6876ab67271"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
 <tr class="memitem:a4a9de15b5c7720c248a9cfee974a304f"><td class="memItemLeft" align="right" valign="top"><a id="a4a9de15b5c7720c248a9cfee974a304f"></a>
-static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#a4a9de15b5c7720c248a9cfee974a304f">entity_mask</a> = 0xFFFFFFFFFF</td></tr>
+static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#a4a9de15b5c7720c248a9cfee974a304f">entity_mask</a> = 0xFFFFFFFF</td></tr>
 <tr class="memdesc:a4a9de15b5c7720c248a9cfee974a304f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask to use to get the entity number out of an identifier. <br /></td></tr>
 <tr class="separator:a4a9de15b5c7720c248a9cfee974a304f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab242af30841712877cd2d4042840551b"><td class="memItemLeft" align="right" valign="top"><a id="ab242af30841712877cd2d4042840551b"></a>
-static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#ab242af30841712877cd2d4042840551b">version_mask</a> = 0xFFFFFF</td></tr>
+static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#ab242af30841712877cd2d4042840551b">version_mask</a> = 0xFFFFFFFF</td></tr>
 <tr class="memdesc:ab242af30841712877cd2d4042840551b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask to use to get the version out of an identifier. <br /></td></tr>
 <tr class="separator:ab242af30841712877cd2d4042840551b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abbf9ff9ddaf2cb92eec8bd08dcc7d5a7"><td class="memItemLeft" align="right" valign="top"><a id="abbf9ff9ddaf2cb92eec8bd08dcc7d5a7"></a>
-static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#abbf9ff9ddaf2cb92eec8bd08dcc7d5a7">entity_shift</a> = 40</td></tr>
+static constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#abbf9ff9ddaf2cb92eec8bd08dcc7d5a7">entity_shift</a> = 32</td></tr>
 <tr class="memdesc:abbf9ff9ddaf2cb92eec8bd08dcc7d5a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extent of the entity number within an identifier. <br /></td></tr>
 <tr class="separator:abbf9ff9ddaf2cb92eec8bd08dcc7d5a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -110,11 +114,11 @@ struct entt::entt_traits&lt; std::uint64_t &gt;</h3>
 <p>Entity traits for a 64 bits entity identifier. </p>
 <p>A 64 bits entity identifier guarantees:</p>
 <ul>
-<li>40 bits for the entity number (an indecently large number).</li>
-<li>24 bit for the version (an indecently large number). </li>
+<li>32 bits for the entity number (an indecently large number).</li>
+<li>32 bit for the version (an indecently large number). </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="entt__traits_8hpp_source.html#l00078">78</a> of file <a class="el" href="entt__traits_8hpp_source.html">entt_traits.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entt__traits_8hpp_source.html#l00082">82</a> of file <a class="el" href="entt__traits_8hpp_source.html">entt_traits.hpp</a>.</p>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li>src/entt/entity/<a class="el" href="entt__traits_8hpp_source.html">entt_traits.hpp</a></li>
 </ul>

@@ -92,10 +92,6 @@ Public Types</h2></td></tr>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a> = Entity</td></tr>
 <tr class="memdesc:a7d36e852257a965a9a0ed3fb636433e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Underlying entity identifier. <br /></td></tr>
 <tr class="separator:a7d36e852257a965a9a0ed3fb636433e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20c218a69cf339371251ffa5580d7aa0"><td class="memItemLeft" align="right" valign="top"><a id="a20c218a69cf339371251ffa5580d7aa0"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a20c218a69cf339371251ffa5580d7aa0">pos_type</a> = <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a></td></tr>
-<tr class="memdesc:a20c218a69cf339371251ffa5580d7aa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entity dependent position type. <br /></td></tr>
-<tr class="separator:a20c218a69cf339371251ffa5580d7aa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab81c48dcee7a1104ee82794613ee7ed2"><td class="memItemLeft" align="right" valign="top"><a id="ab81c48dcee7a1104ee82794613ee7ed2"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a> = std::size_t</td></tr>
 <tr class="memdesc:ab81c48dcee7a1104ee82794613ee7ed2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer type. <br /></td></tr>
@@ -136,6 +132,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a19fd8be1b2cad2a4ca01c88225b0a379"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a19fd8be1b2cad2a4ca01c88225b0a379">reserve</a> (const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a> cap)</td></tr>
 <tr class="memdesc:a19fd8be1b2cad2a4ca01c88225b0a379"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increases the capacity of a sparse set.  <a href="#a19fd8be1b2cad2a4ca01c88225b0a379">More...</a><br /></td></tr>
 <tr class="separator:a19fd8be1b2cad2a4ca01c88225b0a379"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affd4ddc4bc12517d84772a40b0d992d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#affd4ddc4bc12517d84772a40b0d992d5">capacity</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:affd4ddc4bc12517d84772a40b0d992d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of elements that a sparse set has currently allocated space for.  <a href="#affd4ddc4bc12517d84772a40b0d992d5">More...</a><br /></td></tr>
+<tr class="separator:affd4ddc4bc12517d84772a40b0d992d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab314d3642b6a5b90bbcb170ba83b7978"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab314d3642b6a5b90bbcb170ba83b7978">extent</a> () const ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:ab314d3642b6a5b90bbcb170ba83b7978"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the extent of a sparse set.  <a href="#ab314d3642b6a5b90bbcb170ba83b7978">More...</a><br /></td></tr>
 <tr class="separator:ab314d3642b6a5b90bbcb170ba83b7978"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -166,24 +165,27 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a14720d48f6d553a06813379ee6d7092f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a1ad77aed1e49af60b61044c996969b9a">iterator_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a14720d48f6d553a06813379ee6d7092f">end</a> () ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:a14720d48f6d553a06813379ee6d7092f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the end.  <a href="#a14720d48f6d553a06813379ee6d7092f">More...</a><br /></td></tr>
 <tr class="separator:a14720d48f6d553a06813379ee6d7092f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2de3b3dc887e30616c37dd1dbc3de46b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a2de3b3dc887e30616c37dd1dbc3de46b">operator[]</a> (const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a> pos) const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a2de3b3dc887e30616c37dd1dbc3de46b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the element at the given position.  <a href="#a2de3b3dc887e30616c37dd1dbc3de46b">More...</a><br /></td></tr>
+<tr class="separator:a2de3b3dc887e30616c37dd1dbc3de46b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a824d6f4789f0c03a7f18802d9dc46582"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a824d6f4789f0c03a7f18802d9dc46582">has</a> (const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a> entity) const ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:a824d6f4789f0c03a7f18802d9dc46582"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a sparse set contains an entity.  <a href="#a824d6f4789f0c03a7f18802d9dc46582">More...</a><br /></td></tr>
 <tr class="separator:a824d6f4789f0c03a7f18802d9dc46582"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa76df55ad01a2c5d4e407fc3a72ccd90"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#aa76df55ad01a2c5d4e407fc3a72ccd90">fast</a> (const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a> entity) const ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:aa76df55ad01a2c5d4e407fc3a72ccd90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a sparse set contains an entity (unsafe).  <a href="#aa76df55ad01a2c5d4e407fc3a72ccd90">More...</a><br /></td></tr>
 <tr class="separator:aa76df55ad01a2c5d4e407fc3a72ccd90"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15ae580507381985e2bf3e4098d71f6c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a20c218a69cf339371251ffa5580d7aa0">pos_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a15ae580507381985e2bf3e4098d71f6c">get</a> (const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a> entity) const ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:a15ae580507381985e2bf3e4098d71f6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the position of an entity in a sparse set.  <a href="#a15ae580507381985e2bf3e4098d71f6c">More...</a><br /></td></tr>
-<tr class="separator:a15ae580507381985e2bf3e4098d71f6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7893474e3b47da7c2568a0dc4ab4bcf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#aa7893474e3b47da7c2568a0dc4ab4bcf">get</a> (const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a> entity) const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:aa7893474e3b47da7c2568a0dc4ab4bcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the position of an entity in a sparse set.  <a href="#aa7893474e3b47da7c2568a0dc4ab4bcf">More...</a><br /></td></tr>
+<tr class="separator:aa7893474e3b47da7c2568a0dc4ab4bcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47dad39fa63ac4be07dcd9234c8a57c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a47dad39fa63ac4be07dcd9234c8a57c7">construct</a> (const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a> entity)</td></tr>
 <tr class="memdesc:a47dad39fa63ac4be07dcd9234c8a57c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns an entity to a sparse set.  <a href="#a47dad39fa63ac4be07dcd9234c8a57c7">More...</a><br /></td></tr>
 <tr class="separator:a47dad39fa63ac4be07dcd9234c8a57c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7bd15b00eb2ce0e52d3d957673b4dd97"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7bd15b00eb2ce0e52d3d957673b4dd97">destroy</a> (const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a> entity)</td></tr>
 <tr class="memdesc:a7bd15b00eb2ce0e52d3d957673b4dd97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes an entity from a sparse set.  <a href="#a7bd15b00eb2ce0e52d3d957673b4dd97">More...</a><br /></td></tr>
 <tr class="separator:a7bd15b00eb2ce0e52d3d957673b4dd97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a271e5e6736388ca8bf350187da2a0d8f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a271e5e6736388ca8bf350187da2a0d8f">swap</a> (const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a20c218a69cf339371251ffa5580d7aa0">pos_type</a> lhs, const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a20c218a69cf339371251ffa5580d7aa0">pos_type</a> rhs) ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:a271e5e6736388ca8bf350187da2a0d8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swaps the position of two entities in the internal packed array.  <a href="#a271e5e6736388ca8bf350187da2a0d8f">More...</a><br /></td></tr>
-<tr class="separator:a271e5e6736388ca8bf350187da2a0d8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace9db01fbfd9f1b8afa4a6f43d42390e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ace9db01fbfd9f1b8afa4a6f43d42390e">swap</a> (const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a> lhs, const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a> rhs) ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:ace9db01fbfd9f1b8afa4a6f43d42390e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swaps the position of two entities in the internal packed array.  <a href="#ace9db01fbfd9f1b8afa4a6f43d42390e">More...</a><br /></td></tr>
+<tr class="separator:ace9db01fbfd9f1b8afa4a6f43d42390e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17422401f952b58be5113ff88e302c0e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a17422401f952b58be5113ff88e302c0e">respect</a> (const <a class="el" href="classentt_1_1SparseSet.html">SparseSet</a>&lt; Entity &gt; &amp;other) ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:a17422401f952b58be5113ff88e302c0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sort entities according to their order in another sparse set.  <a href="#a17422401f952b58be5113ff88e302c0e">More...</a><br /></td></tr>
 <tr class="separator:a17422401f952b58be5113ff88e302c0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -211,7 +213,7 @@ Internal data structures arrange elements to maximize performance. Because of th
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00059">59</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00060">60</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="aebd9c479dc54907cf42a4423f34edeb2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aebd9c479dc54907cf42a4423f34edeb2">&#9670;&nbsp;</a></span>begin() <span class="overload">[1/2]</span></h2>
@@ -243,7 +245,7 @@ template&lt;typename Entity &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed by a call to <code>respect</code>.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity of the internal packed array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00233">233</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00296">296</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -277,7 +279,39 @@ template&lt;typename Entity &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed by a call to <code>respect</code>.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity of the internal packed array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00249">249</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00312">312</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+
+</div>
+</div>
+<a id="affd4ddc4bc12517d84772a40b0d992d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affd4ddc4bc12517d84772a40b0d992d5">&#9670;&nbsp;</a></span>capacity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a> <a class="el" href="classentt_1_1SparseSet.html">entt::SparseSet</a>&lt; Entity &gt;::capacity </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the number of elements that a sparse set has currently allocated space for. </p>
+<dl class="section return"><dt>Returns</dt><dd>Capacity of the sparse set. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00208">208</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -311,7 +345,7 @@ template&lt;typename Entity &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed by a call to <code>respect</code>.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity of the internal packed array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00217">217</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00279">279</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -345,7 +379,7 @@ template&lt;typename Entity &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed by a call to <code>respect</code>.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last entity of the internal packed array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00266">266</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00329">329</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -385,7 +419,7 @@ template&lt;typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00367">367</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00439">439</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -419,7 +453,7 @@ template&lt;typename Entity &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>There are no guarantees on the order, even though <code>respect</code> has been previously invoked. Internal data structures arrange elements to maximize performance. Accessing them directly gives a performance boost but less guarantees. Use <code>begin</code> and <code>end</code> if you want to iterate the sparse set in the expected order.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the internal packed array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00201">201</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00263">263</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -461,7 +495,7 @@ template&lt;typename Entity &gt; </div>
 
 <p>Reimplemented in <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#ae763b848ccde63e554f5b3f04b9dcdea">entt::SparseSet&lt; Entity, Type &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00391">391</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00463">463</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -493,7 +527,7 @@ template&lt;typename Entity &gt; </div>
 <p>Checks whether a sparse set is empty. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the sparse set is empty, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00182">182</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00244">244</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -527,7 +561,7 @@ template&lt;typename Entity &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed by a call to <code>respect</code>.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last entity of the internal packed array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00283">283</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00346">346</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -561,7 +595,7 @@ template&lt;typename Entity &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed by a call to <code>respect</code>.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the element following the last entity of the internal packed array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00300">300</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00363">363</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -594,7 +628,7 @@ template&lt;typename Entity &gt; </div>
 <p>The extent of a sparse set is also the size of the internal sparse array. There is no guarantee that the internal packed array has the same size. Usually the size of the internal sparse array is equal or greater than the one of the internal packed array.</p>
 <dl class="section return"><dt>Returns</dt><dd>Extent of the sparse set. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00160">160</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00222">222</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -637,12 +671,12 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the sparse set contains the entity, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00332">332</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00404">404</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a15ae580507381985e2bf3e4098d71f6c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a15ae580507381985e2bf3e4098d71f6c">&#9670;&nbsp;</a></span>get()</h2>
+<a id="aa7893474e3b47da7c2568a0dc4ab4bcf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7893474e3b47da7c2568a0dc4ab4bcf">&#9670;&nbsp;</a></span>get()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -653,7 +687,7 @@ template&lt;typename Entity &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a20c218a69cf339371251ffa5580d7aa0">pos_type</a> <a class="el" href="classentt_1_1SparseSet.html">entt::SparseSet</a>&lt; Entity &gt;::get </td>
+          <td class="memname"><a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a> <a class="el" href="classentt_1_1SparseSet.html">entt::SparseSet</a>&lt; Entity &gt;::get </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a>&#160;</td>
           <td class="paramname"><em>entity</em></td><td>)</td>
@@ -678,7 +712,7 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The position of the entity in the sparse set. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00351">351</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00423">423</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -717,7 +751,7 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the sparse set contains the entity, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00309">309</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00381">381</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -783,6 +817,45 @@ template&lt;typename Entity &gt; </div>
 
 </div>
 </div>
+<a id="a2de3b3dc887e30616c37dd1dbc3de46b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2de3b3dc887e30616c37dd1dbc3de46b">&#9670;&nbsp;</a></span>operator[]()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entity_type</a>&amp; <a class="el" href="classentt_1_1SparseSet.html">entt::SparseSet</a>&lt; Entity &gt;::operator[] </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a>&#160;</td>
+          <td class="paramname"><em>pos</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a reference to the element at the given position. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pos</td><td>Position of the element to return. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the requested element. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00372">372</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a19fd8be1b2cad2a4ca01c88225b0a379"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a19fd8be1b2cad2a4ca01c88225b0a379">&#9670;&nbsp;</a></span>reserve()</h2>
 
@@ -818,7 +891,7 @@ template&lt;typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00146">146</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00199">199</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -860,7 +933,7 @@ template&lt;typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00445">445</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00517">517</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -893,12 +966,12 @@ template&lt;typename Entity &gt; </div>
 <p>The number of elements is also the size of the internal packed array. There is no guarantee that the internal sparse array has the same size. Usually the size of the internal sparse array is equal or greater than the one of the internal packed array.</p>
 <dl class="section return"><dt>Returns</dt><dd>Number of elements. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00174">174</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00236">236</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a271e5e6736388ca8bf350187da2a0d8f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a271e5e6736388ca8bf350187da2a0d8f">&#9670;&nbsp;</a></span>swap()</h2>
+<a id="ace9db01fbfd9f1b8afa4a6f43d42390e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace9db01fbfd9f1b8afa4a6f43d42390e">&#9670;&nbsp;</a></span>swap()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -911,13 +984,13 @@ template&lt;typename Entity &gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classentt_1_1SparseSet.html">entt::SparseSet</a>&lt; Entity &gt;::swap </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a20c218a69cf339371251ffa5580d7aa0">pos_type</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a>&#160;</td>
           <td class="paramname"><em>lhs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a20c218a69cf339371251ffa5580d7aa0">pos_type</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">size_type</a>&#160;</td>
           <td class="paramname"><em>rhs</em>&#160;</td>
         </tr>
         <tr>
@@ -945,7 +1018,7 @@ template&lt;typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00417">417</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__set_8hpp_source.html#l00489">489</a> of file <a class="el" href="sparse__set_8hpp_source.html">sparse_set.hpp</a>.</p>
 
 </div>
 </div>
