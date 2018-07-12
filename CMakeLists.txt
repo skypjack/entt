@@ -16,7 +16,7 @@ endif()
 # Project configuration
 #
 
-project(entt VERSION 2.7.1)
+project(EnTT VERSION 2.7.1)
 
 include(GNUInstallDirs)
 
@@ -34,7 +34,7 @@ message("* ${PROJECT_NAME} v${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
 message("* Copyright (c) 2018 ${PROJECT_AUTHOR} <${PROJECT_AUTHOR_EMAIL}>")
 message("*")
 
-option(ENTT_COMPILE_OPTIONS "Use compile options from EnTT." ON)
+option(USE_COMPILE_OPTIONS "Use compile options from EnTT." ON)
 option(USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if availbale." ON)
 
 #
@@ -79,7 +79,7 @@ target_compile_definitions(
     INTERFACE $<$<AND:$<CONFIG:Release>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:RELEASE>
 )
 
-if(ENTT_COMPILE_OPTIONS)
+if(USE_COMPILE_OPTIONS)
     target_compile_options(
         EnTT
         INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-O0 -g>
@@ -101,20 +101,20 @@ target_compile_features(EnTT INTERFACE cxx_std_14)
 #
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-    set(ENTT_INSTALL_CONFIGDIR cmake)
+    set(CUSTOM_INSTALL_CONFIGDIR cmake)
 else()
-    set(ENTT_INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/entt)
+    set(CUSTOM_INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/entt)
 endif()
 
 install(DIRECTORY src/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(TARGETS EnTT EXPORT EnTTTargets)
 
-export(EXPORT EnTTTargets FILE ${entt_BINARY_DIR}/EnTTTargets.cmake)
+export(EXPORT EnTTTargets FILE ${EnTT_BINARY_DIR}/EnTTTargets.cmake)
 
 install(
     EXPORT EnTTTargets
     FILE EnTTTargets.cmake
-    DESTINATION ${ENTT_INSTALL_CONFIGDIR}
+    DESTINATION ${CUSTOM_INSTALL_CONFIGDIR}
 )
 
 #
@@ -131,23 +131,23 @@ include(CMakePackageConfigHelpers)
 
 configure_package_config_file(
     cmake/in/EnTTConfig.cmake.in
-    ${ENTT_INSTALL_CONFIGDIR}/EnTTConfig.cmake
-    INSTALL_DESTINATION ${ENTT_INSTALL_CONFIGDIR}
+    ${CUSTOM_INSTALL_CONFIGDIR}/EnTTConfig.cmake
+    INSTALL_DESTINATION ${CUSTOM_INSTALL_CONFIGDIR}
     PATH_VARS CMAKE_INSTALL_INCLUDEDIR
     NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )
 
 write_basic_package_version_file(
-    ${entt_BINARY_DIR}/EnTTConfigVersion.cmake
+    ${EnTT_BINARY_DIR}/EnTTConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
 install(
     FILES
-        ${entt_BINARY_DIR}/${ENTT_INSTALL_CONFIGDIR}/EnTTConfig.cmake
-        ${entt_BINARY_DIR}/EnTTConfigVersion.cmake
-    DESTINATION ${ENTT_INSTALL_CONFIGDIR}
+        ${EnTT_BINARY_DIR}/${CUSTOM_INSTALL_CONFIGDIR}/EnTTConfig.cmake
+        ${EnTT_BINARY_DIR}/EnTTConfigVersion.cmake
+    DESTINATION ${CUSTOM_INSTALL_CONFIGDIR}
 )
 
 export(PACKAGE EnTT)
@@ -168,8 +168,8 @@ if(BUILD_TESTING)
         find_package(GTest REQUIRED)
     else()
         # gtest, gtest_main, gmock and gmock_main targets are available from now on
-        set(GOOGLETEST_DEPS_DIR ${entt_SOURCE_DIR}/deps/googletest)
-        configure_file(${entt_SOURCE_DIR}/cmake/in/googletest.in ${GOOGLETEST_DEPS_DIR}/CMakeLists.txt)
+        set(GOOGLETEST_DEPS_DIR ${EnTT_SOURCE_DIR}/deps/googletest)
+        configure_file(${EnTT_SOURCE_DIR}/cmake/in/googletest.in ${GOOGLETEST_DEPS_DIR}/CMakeLists.txt)
         execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY ${GOOGLETEST_DEPS_DIR})
         execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${GOOGLETEST_DEPS_DIR})
         set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -208,9 +208,10 @@ add_custom_target(
     SOURCES
         appveyor.yml
         AUTHORS
-        CONTRIBUTING
         LICENSE
         README.md
         TODO
         .travis.yml
+        docs/CONTRIBUTING.md
+        docs/extra.dox
 )

@@ -1,5 +1,8 @@
-# EnTT
+![EnTT: Gaming meets modern C++](https://user-images.githubusercontent.com/1812216/42513718-ee6e98d0-8457-11e8-9baf-8d83f61a3097.png)
 
+<!--
+@cond TURN_OFF_DOXYGEN
+-->
 [![Build Status](https://travis-ci.org/skypjack/entt.svg?branch=master)](https://travis-ci.org/skypjack/entt)
 [![Build status](https://ci.appveyor.com/api/projects/status/rvhaabjmghg715ck?svg=true)](https://ci.appveyor.com/project/skypjack/entt)
 [![Coverage Status](https://coveralls.io/repos/github/skypjack/entt/badge.svg?branch=master)](https://coveralls.io/github/skypjack/entt?branch=master)
@@ -63,6 +66,9 @@
 * [Support](#support)
    * [Donation](#donation)
    * [Hire me](#hire-me)
+<!--
+@endcond TURN_OFF_DOXYGEN
+-->
 
 # Introduction
 
@@ -98,9 +104,7 @@ Here is a brief, yet incomplete list of what it offers today:
 * ...
 * Any other business.
 
-Consider it a work in progress. For more details and an updated list, please
-refer to the [online documentation](https://skypjack.github.io/entt/). It
-probably contains much more. Moreover, the whole API is fully documented in-code
+Consider it a work in progress. The whole API is also fully documented in-code
 for those who are brave enough to read it.
 
 Currently, `EnTT` is tested on Linux, Microsoft Windows and OS X. It has proven
@@ -320,8 +324,14 @@ The API reference will be created in HTML format within the directory
     $ cd build
     $ your_favorite_browser docs/html/index.html
 
+<!--
+@cond TURN_OFF_DOXYGEN
+-->
 The API reference is also available [online](https://skypjack.github.io/entt/)
 for the latest version.
+<!--
+@endcond TURN_OFF_DOXYGEN
+-->
 
 ## Tests
 
@@ -2768,6 +2778,9 @@ Below an incomplete list of projects and articles:
 If you know of other resources out there that are about `EnTT`, feel free to
 open an issue or a PR and I'll be glad to add them to the list.
 
+<!--
+@cond TURN_OFF_DOXYGEN
+-->
 # Contributors
 
 `EnTT` was written initially as a faster alternative to other well known and
@@ -2784,20 +2797,29 @@ I can't promise that each and every contribution will be accepted, but I can
 assure that I'll do my best to take them all seriously.
 
 If you decide to participate, please see the guidelines for
-[contributing](https://github.com/skypjack/entt/blob/master/CONTRIBUTING)
-before to create issues or pull requests.<br/>
+[contributing](docs/CONTRIBUTING.md) before to create issues or pull requests.<br/>
 Take also a look at the
 [contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to
 know who has participated so far.
+<!--
+@endcond TURN_OFF_DOXYGEN
+-->
 
 # License
 
-Code and documentation Copyright (c) 2018 Michele Caini.<br/>
+Code and documentation Copyright (c) 2017-2018 Michele Caini.<br/>
+Logo Copyright (c) 2018 Richard Caseres.
+
 Code released under
 [the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).
-Docs released under
-[Creative Commons](https://github.com/skypjack/entt/blob/master/docs/LICENSE).
+Documentation released under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).<br/>
+Logo released under
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
+<!--
+@cond TURN_OFF_DOXYGEN
+-->
 # Support
 
 ## Donation
@@ -2818,3 +2840,6 @@ to give it the highest priority, if you have any other reason to contact me:
 do not hesitate. I'm available for hiring.<br/>
 Feel free to take a look at my [profile](https://github.com/skypjack) and
 contact me by mail.
+<!--
+@endcond TURN_OFF_DOXYGEN
+-->
