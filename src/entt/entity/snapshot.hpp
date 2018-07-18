@@ -100,7 +100,7 @@ public:
      */
     template<typename Archive>
     const Snapshot & entities(Archive &archive) const {
-        archive(static_cast<Entity>(registry.size()));
+        archive(static_cast<Entity>(registry.alive()));
         registry.each([&archive](const auto entity) { archive(entity); });
         return *this;
     }
@@ -117,7 +117,7 @@ public:
      */
     template<typename Archive>
     const Snapshot & destroyed(Archive &archive) const {
-        auto size = registry.capacity() - registry.size();
+        auto size = registry.size() - registry.alive();
         archive(static_cast<Entity>(size));
         auto curr = seed;
 

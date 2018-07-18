@@ -217,10 +217,18 @@ public:
     }
 
     /**
+     * @brief Returns the number of entities created so far.
+     * @return Number of entities created so far.
+     */
+    size_type size() const ENTT_NOEXCEPT {
+        return entities.size();
+    }
+
+    /**
      * @brief Returns the number of entities still in use.
      * @return Number of entities still in use.
      */
-    size_type size() const ENTT_NOEXCEPT {
+    size_type alive() const ENTT_NOEXCEPT {
         return entities.size() - available;
     }
 

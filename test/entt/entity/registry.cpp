@@ -59,6 +59,7 @@ TEST(DefaultRegistry, Functionalities) {
     entt::DefaultRegistry registry;
 
     ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{0});
+    ASSERT_EQ(registry.alive(), entt::DefaultRegistry::size_type{0});
     ASSERT_NO_THROW(registry.reserve(42));
     ASSERT_NO_THROW(registry.reserve<int>(8));
     ASSERT_NO_THROW(registry.reserve<char>(8));
@@ -134,6 +135,7 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_EQ(static_cast<const entt::DefaultRegistry &>(registry).get<int>(e1), 1);
 
     ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{3});
+    ASSERT_EQ(registry.alive(), entt::DefaultRegistry::size_type{3});
     ASSERT_FALSE(registry.empty());
 
     ASSERT_EQ(registry.version(e2), entt::DefaultRegistry::version_type{0});
@@ -149,12 +151,14 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_FALSE(registry.valid(e2));
     ASSERT_FALSE(registry.fast(e2));
 
-    ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{2});
+    ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{3});
+    ASSERT_EQ(registry.alive(), entt::DefaultRegistry::size_type{2});
     ASSERT_FALSE(registry.empty());
 
     ASSERT_NO_THROW(registry.reset());
 
-    ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{0});
+    ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{3});
+    ASSERT_EQ(registry.alive(), entt::DefaultRegistry::size_type{0});
     ASSERT_TRUE(registry.empty());
 
     const auto e3 = registry.create();
