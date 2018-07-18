@@ -2760,6 +2760,8 @@ projects based on EnTT and did not hold back when it came to documenting them.
 
 Below an incomplete list of projects and articles:
 
+* [Face Smash](https://play.google.com/store/apps/details?id=com.gamee.facesmash):
+  the emojis dominate the world, destroy them all with your facial expressions.
 * [EnttPong](https://github.com/reworks/EnttPong): example game with `EnTT`.
 * [Space Battle: Huge edition](http://victor.madtriangles.com/code%20experiment/2018/06/11/post-ecs-battle-huge.html):
   huge space battle built entirely from scratch.
