@@ -6,8 +6,8 @@
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
 * create dedicated flat map based on types implementation (sort of "type map") for types to use within the registry and so on...
 * registry::create with a "hint" on the entity identifier to use, it should ease combining multiple registries
-* add a member function aside current and version to get the actual identifier without its version
 * can we do more for shared libraries? who knows... see #144
+* filtered views (has, hasn't and so on)
 * work stealing job system (see #100)
 * reflection system (maybe)
 * C++17. That's all.

@@ -198,6 +198,22 @@ TEST(DefaultRegistry, Functionalities) {
     ASSERT_TRUE(registry.empty<int>());
 }
 
+TEST(DefaultRegistry, Identifiers) {
+    entt::DefaultRegistry registry;
+    const auto pre = registry.create();
+
+    ASSERT_EQ(pre, registry.entity(pre));
+
+    registry.destroy(pre);
+    const auto post = registry.create();
+
+    ASSERT_NE(pre, post);
+    ASSERT_EQ(registry.entity(pre), registry.entity(post));
+    ASSERT_NE(registry.version(pre), registry.version(post));
+    ASSERT_NE(registry.version(pre), registry.current(pre));
+    ASSERT_EQ(registry.version(post), registry.current(post));
+}
+
 TEST(DefaultRegistry, RawData) {
     entt::DefaultRegistry registry;
     const entt::DefaultRegistry &cregistry = registry;

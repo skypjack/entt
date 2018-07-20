@@ -388,9 +388,18 @@ public:
     }
 
     /**
+     * @brief Returns the entity identifier without the version.
+     * @param entity An entity identifier, either valid or not.
+     * @return The entity identifier without the version.
+     */
+    entity_type entity(const entity_type entity) const ENTT_NOEXCEPT {
+        return entity & traits_type::entity_mask;
+    }
+
+    /**
      * @brief Returns the version stored along with an entity identifier.
      * @param entity An entity identifier, either valid or not.
-     * @return Version stored along with the given entity identifier.
+     * @return The version stored along with the given entity identifier.
      */
     version_type version(const entity_type entity) const ENTT_NOEXCEPT {
         return version_type((entity >> traits_type::entity_shift) & traits_type::version_mask);
@@ -442,7 +451,6 @@ public:
         if(available) {
             const auto entt = next;
             const auto version = entities[entt] & (~traits_type::entity_mask);
-
             entity = entt | version;
             next = entities[entt] & traits_type::entity_mask;
             entities[entt] = entity;
@@ -524,10 +532,10 @@ public:
         // just a way to protect users from listeners that attach components
         assert(orphan(entity));
 
+        // lengthens the implicit list of destroyed entities
         const auto entt = entity & traits_type::entity_mask;
         const auto version = (((entity >> traits_type::entity_shift) + 1) & traits_type::version_mask) << traits_type::entity_shift;
         const auto node = (available ? next : ((entt + 1) & traits_type::entity_mask)) | version;
-
         entities[entt] = node;
         next = entt;
         ++available;
