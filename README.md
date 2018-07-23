@@ -2761,6 +2761,7 @@ projects based on EnTT and did not hold back when it came to documenting them.
 
 Below an incomplete list of projects and articles:
 
+* [Minecraft](https://minecraft.net/en-us/attribution/): of course, **that** Minecraft, by Mojang (see the open source attributions page).
 * [Face Smash](https://play.google.com/store/apps/details?id=com.gamee.facesmash):
   the emojis dominate the world, destroy them all with your facial expressions.
 * [EnttPong](https://github.com/reworks/EnttPong): example game with `EnTT`.
