@@ -542,7 +542,7 @@ public:
     }
 
     /**
-     * @brief Destroys the entities that own he given components, if any.
+     * @brief Destroys the entities that own the given components, if any.
      *
      * Convenient shortcut to destroy a set of entities at once.<br/>
      * Syntactic sugar for the following snippet:
