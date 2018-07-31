@@ -9,7 +9,7 @@ TEST(Algorithm, StdSort) {
 
     sort(arr.begin(), arr.end());
 
-    for(auto i = 0; i < 4; ++i) {
+    for(typename decltype(arr)::size_type i = 0; i < (arr.size() - 1); ++i) {
         ASSERT_LT(arr[i], arr[i+1]);
     }
 }
@@ -20,7 +20,21 @@ TEST(Algorithm, InsertionSort) {
 
     sort(arr.begin(), arr.end());
 
-    for(auto i = 0; i < 4; ++i) {
+    for(typename decltype(arr)::size_type i = 0; i < (arr.size() - 1); ++i) {
+        ASSERT_LT(arr[i], arr[i+1]);
+    }
+}
+
+TEST(Algorithm, OneShotBubbleSort) {
+    std::array<int, 5> arr{{4, 1, 3, 2, 0}};
+    entt::OneShotBubbleSort sort;
+
+    sort(arr.begin(), arr.end());
+    sort(arr.begin(), arr.end());
+    sort(arr.begin(), arr.end());
+    sort(arr.begin(), arr.end());
+
+    for(typename decltype(arr)::size_type i = 0; i < (arr.size() - 1); ++i) {
         ASSERT_LT(arr[i], arr[i+1]);
     }
 }

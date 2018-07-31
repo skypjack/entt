@@ -20,7 +20,6 @@ TEST(Identifier, Uniqueness) {
     switch(ID::get<AnotherType>()) {
     case ID::get<AType>():
         FAIL();
-        break;
     case ID::get<AnotherType>():
         SUCCEED();
     }

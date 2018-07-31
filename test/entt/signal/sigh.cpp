@@ -142,7 +142,7 @@ TEST(SigH, Functions) {
     sigh.publish(v);
 
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ((entt::SigH<bool(int)>::size_type)1, sigh.size());
+    ASSERT_EQ(static_cast<entt::SigH<bool(int)>::size_type>(1), sigh.size());
     ASSERT_EQ(42, v);
 
     v = 0;
@@ -150,7 +150,7 @@ TEST(SigH, Functions) {
     sigh.publish(v);
 
     ASSERT_TRUE(sigh.empty());
-    ASSERT_EQ((entt::SigH<bool(int)>::size_type)0, sigh.size());
+    ASSERT_EQ(static_cast<entt::SigH<bool(int)>::size_type>(0), sigh.size());
     ASSERT_EQ(0, v);
 
     sigh.sink().connect<&SigHListener::f>();
@@ -166,25 +166,25 @@ TEST(SigH, Members) {
 
     ASSERT_TRUE(s.k);
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ((entt::SigH<bool(int)>::size_type)1, sigh.size());
+    ASSERT_EQ(static_cast<entt::SigH<bool(int)>::size_type>(1), sigh.size());
 
     sigh.sink().disconnect<SigHListener, &SigHListener::g>(ptr);
     sigh.publish(42);
 
     ASSERT_TRUE(s.k);
     ASSERT_TRUE(sigh.empty());
-    ASSERT_EQ((entt::SigH<bool(int)>::size_type)0, sigh.size());
+    ASSERT_EQ(static_cast<entt::SigH<bool(int)>::size_type>(0), sigh.size());
 
     sigh.sink().connect<SigHListener, &SigHListener::g>(ptr);
     sigh.sink().connect<SigHListener, &SigHListener::h>(ptr);
 
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ((entt::SigH<bool(int)>::size_type)2, sigh.size());
+    ASSERT_EQ(static_cast<entt::SigH<bool(int)>::size_type>(2), sigh.size());
 
     sigh.sink().disconnect(ptr);
 
     ASSERT_TRUE(sigh.empty());
-    ASSERT_EQ((entt::SigH<bool(int)>::size_type)0, sigh.size());
+    ASSERT_EQ(static_cast<entt::SigH<bool(int)>::size_type>(0), sigh.size());
 }
 
 TEST(SigH, Collector) {
@@ -205,7 +205,7 @@ TEST(SigH, Collector) {
 
     ASSERT_FALSE(sigh_all.empty());
     ASSERT_FALSE(collector_all.vec.empty());
-    ASSERT_EQ((std::vector<int>::size_type)2, collector_all.vec.size());
+    ASSERT_EQ(static_cast<std::vector<int>::size_type>(2), collector_all.vec.size());
     ASSERT_EQ(42, collector_all.vec[0]);
     ASSERT_EQ(42, collector_all.vec[1]);
 
@@ -217,6 +217,6 @@ TEST(SigH, Collector) {
 
     ASSERT_FALSE(sigh_first.empty());
     ASSERT_FALSE(collector_first.vec.empty());
-    ASSERT_EQ((std::vector<int>::size_type)1, collector_first.vec.size());
+    ASSERT_EQ(static_cast<std::vector<int>::size_type>(1), collector_first.vec.size());
     ASSERT_EQ(42, collector_first.vec[0]);
 }
