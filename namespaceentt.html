@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>entt: entt Namespace Reference</title>
+<title>EnTT: entt Namespace Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,8 +21,8 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">entt
-   &#160;<span id="projectnumber">2.7.1</span>
+   <div id="projectname">EnTT
+   &#160;<span id="projectnumber">2.7.2</span>
    </div>
   </td>
  </tr>
@@ -122,6 +122,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1Monostate.html">Monostate</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minimal implementation of the monostate pattern.  <a href="structentt_1_1Monostate.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1OneShotBubbleSort.html">OneShotBubbleSort</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function object for performing bubble sort (single iteration).  <a href="structentt_1_1OneShotBubbleSort.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1persistent__t.html">persistent_t</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Persistent view type used to disambiguate overloads.  <a href="structentt_1_1persistent__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -209,6 +212,10 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a0790fdd772249d8b22f1cf2d5e2403d4"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceentt.html#a0790fdd772249d8b22f1cf2d5e2403d4">DefaultActor</a> = <a class="el" href="structentt_1_1Actor.html">Actor</a>&lt; <a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">DefaultRegistry::entity_type</a> &gt;</td></tr>
 <tr class="memdesc:a0790fdd772249d8b22f1cf2d5e2403d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default actor class.  <a href="#a0790fdd772249d8b22f1cf2d5e2403d4">More...</a><br /></td></tr>
 <tr class="separator:a0790fdd772249d8b22f1cf2d5e2403d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8512c4b75207424bd97724a17cd1eeb0"><td class="memTemplParams" colspan="2">template&lt;typename HashedString::hash_type Value&gt; </td></tr>
+<tr class="memitem:a8512c4b75207424bd97724a17cd1eeb0"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceentt.html#a8512c4b75207424bd97724a17cd1eeb0">label</a> = std::integral_constant&lt; typename <a class="el" href="classentt_1_1HashedString.html#af511100177b5e0213bf5b0efb3f4f528">HashedString::hash_type</a>, Value &gt;</td></tr>
+<tr class="memdesc:a8512c4b75207424bd97724a17cd1eeb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alias template to ease the assignment of labels to entities.  <a href="#a8512c4b75207424bd97724a17cd1eeb0">More...</a><br /></td></tr>
+<tr class="separator:a8512c4b75207424bd97724a17cd1eeb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94d8a4552b7bd5a3543c2ffc6eaf878c"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceentt.html#a94d8a4552b7bd5a3543c2ffc6eaf878c">DefaultPrototype</a> = <a class="el" href="classentt_1_1Prototype.html">Prototype</a>&lt; <a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">DefaultRegistry::entity_type</a> &gt;</td></tr>
 <tr class="memdesc:a94d8a4552b7bd5a3543c2ffc6eaf878c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default prototype.  <a href="#a94d8a4552b7bd5a3543c2ffc6eaf878c">More...</a><br /></td></tr>
 <tr class="separator:a94d8a4552b7bd5a3543c2ffc6eaf878c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -307,7 +314,34 @@ Variables</h2></td></tr>
 <p>The default registry is the best choice for almost all the applications.<br />
  Users should have a really good reason to choose something different. </p>
 
-<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01598">1598</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8hpp_source.html#l01623">1623</a> of file <a class="el" href="registry_8hpp_source.html">registry.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a8512c4b75207424bd97724a17cd1eeb0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8512c4b75207424bd97724a17cd1eeb0">&#9670;&nbsp;</a></span>label</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename HashedString::hash_type Value&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespaceentt.html#a8512c4b75207424bd97724a17cd1eeb0">entt::label</a> = typedef std::integral_constant&lt;typename <a class="el" href="classentt_1_1HashedString.html#af511100177b5e0213bf5b0efb3f4f528">HashedString::hash_type</a>, Value&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Alias template to ease the assignment of labels to entities. </p>
+<p>If used in combination with hashed strings, it simplifies the assignment of labels to entities and the use of labels in general where a type would be required otherwise.<br />
+ As an example and where the user defined literal for hashed strings hasn't been changed: </p><div class="fragment"><div class="line"><a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a> registry;</div><div class="line">registry.<a class="code" href="classentt_1_1Registry.html#a93b5717af287a2b97e0ef9695c51ed58">assign</a>&lt;<a class="code" href="namespaceentt.html#a8512c4b75207424bd97724a17cd1eeb0">entt::label</a>&lt;<span class="stringliteral">&quot;enemy&quot;</span>_hs&gt;&gt;(entity);</div></div><!-- fragment --><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Value</td><td>The numeric representation of an instance of hashed string. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00099">99</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
 
 </div>
 </div>
@@ -359,7 +393,7 @@ template&lt;typename Entity , typename... Component&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00028">28</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00030">30</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
 
 </div>
 </div>
@@ -397,7 +431,7 @@ template&lt;typename... Dependency, typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00053">53</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00055">55</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
 
 </div>
 </div>
@@ -445,7 +479,7 @@ template&lt;typename... Dependency, typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00076">76</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00078">78</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
 
 </div>
 </div>
