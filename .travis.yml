@@ -77,3 +77,4 @@ deploy:
   script: scripts/update_packages.sh $TRAVIS_TAG
   on:
     tags: true
+    condition: “$TRAVIS_BRANCH” = “$TRAVIS_TAG”
