@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include "../config/config.h"
 #include "registry.hpp"
+#include "entity.hpp"
 
 
 namespace entt {
@@ -95,7 +96,7 @@ public:
           registry{other.registry},
           entity{other.entity}
     {
-        other.entity = ~entity_type{};
+        other.entity = entt::null;
     }
 
     /*! @brief Copying a prototype isn't allowed. @return This Prototype. */

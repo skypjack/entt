@@ -9,17 +9,13 @@
 namespace entt {
 
 
-namespace internal {
-
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
 
 
-template<typename Entity>
-static constexpr auto null = ~typename entt_traits<Entity>::entity_type{};
+namespace internal {
 
 
 struct Null {
@@ -27,7 +23,8 @@ struct Null {
 
     template<typename Entity>
     constexpr operator Entity() const ENTT_NOEXCEPT {
-        return null<Entity>;
+        using traits_type = entt_traits<Entity>;
+        return traits_type::entity_mask | (traits_type::version_mask << traits_type::entity_shift);
     }
 
     constexpr bool operator==(Null) const ENTT_NOEXCEPT {
@@ -40,12 +37,12 @@ struct Null {
 
     template<typename Entity>
     constexpr bool operator==(const Entity entity) const ENTT_NOEXCEPT {
-        return entity == null<Entity>;
+        return entity == static_cast<Entity>(*this);
     }
 
     template<typename Entity>
     constexpr bool operator!=(const Entity entity) const ENTT_NOEXCEPT {
-        return entity != null<Entity>;
+        return entity != static_cast<Entity>(*this);
     }
 };
 
@@ -62,13 +59,13 @@ constexpr bool operator!=(const Entity entity, Null null) ENTT_NOEXCEPT {
 }
 
 
+}
+
+
 /**
  * Internal details not to be documented.
  * @endcond TURN_OFF_DOXYGEN
  */
-
-
-}
 
 
 /**

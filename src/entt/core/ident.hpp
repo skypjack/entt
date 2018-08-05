@@ -12,13 +12,13 @@
 namespace entt {
 
 
-namespace internal {
-
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
+
+
+namespace internal {
 
 
 template<typename...>
@@ -31,13 +31,13 @@ template<typename Type>
 struct IsPartOf<Type>: std::false_type {};
 
 
+}
+
+
 /**
  * Internal details not to be documented.
  * @endcond TURN_OFF_DOXYGEN
  */
-
-
-}
 
 
 /**

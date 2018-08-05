@@ -11,13 +11,13 @@
 namespace entt {
 
 
-namespace internal {
-
-
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
+
+
+namespace internal {
 
 
 template<typename, typename>
@@ -78,13 +78,13 @@ template<typename Function>
 using DefaultCollectorType = typename DefaultCollector<Function>::collector_type;
 
 
+}
+
+
 /**
  * Internal details not to be documented.
  * @endcond TURN_OFF_DOXYGEN
  */
-
-
-}
 
 
 /**

@@ -36,9 +36,9 @@ struct entt_traits<std::uint16_t> {
     using difference_type = std::int32_t;
 
     /*! @brief Mask to use to get the entity number out of an identifier. */
-    static constexpr auto entity_mask = 0xFFF;
+    static constexpr std::uint16_t entity_mask = 0xFFF;
     /*! @brief Mask to use to get the version out of an identifier. */
-    static constexpr auto version_mask = 0xF;
+    static constexpr std::uint16_t version_mask = 0xF;
     /*! @brief Extent of the entity number within an identifier. */
     static constexpr auto entity_shift = 12;
 };
@@ -62,9 +62,9 @@ struct entt_traits<std::uint32_t> {
     using difference_type = std::int64_t;
 
     /*! @brief Mask to use to get the entity number out of an identifier. */
-    static constexpr auto entity_mask = 0xFFFFF;
+    static constexpr std::uint32_t entity_mask = 0xFFFFF;
     /*! @brief Mask to use to get the version out of an identifier. */
-    static constexpr auto version_mask = 0xFFF;
+    static constexpr std::uint32_t version_mask = 0xFFF;
     /*! @brief Extent of the entity number within an identifier. */
     static constexpr auto entity_shift = 20;
 };
@@ -88,9 +88,9 @@ struct entt_traits<std::uint64_t> {
     using difference_type = std::int64_t;
 
     /*! @brief Mask to use to get the entity number out of an identifier. */
-    static constexpr auto entity_mask = 0xFFFFFFFF;
+    static constexpr std::uint64_t entity_mask = 0xFFFFFFFF;
     /*! @brief Mask to use to get the version out of an identifier. */
-    static constexpr auto version_mask = 0xFFFFFFFF;
+    static constexpr std::uint64_t version_mask = 0xFFFFFFFF;
     /*! @brief Extent of the entity number within an identifier. */
     static constexpr auto entity_shift = 32;
 };

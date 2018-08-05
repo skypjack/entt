@@ -402,7 +402,7 @@ public:
      * @return The version stored along with the given entity identifier.
      */
     version_type version(const entity_type entity) const ENTT_NOEXCEPT {
-        return version_type((entity >> traits_type::entity_shift) & traits_type::version_mask);
+        return version_type(entity >> traits_type::entity_shift);
     }
 
     /**
@@ -425,7 +425,7 @@ public:
     version_type current(const entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
         assert(pos < entities.size());
-        return version_type((entities[pos] >> traits_type::entity_shift) & traits_type::version_mask);
+        return version_type(entities[pos] >> traits_type::entity_shift);
     }
 
     /**
@@ -450,9 +450,9 @@ public:
 
         if(available) {
             const auto entt = next;
-            const auto version = entities[entt] & (~traits_type::entity_mask);
-            entity = entt | version;
+            const auto version = entities[entt] & (traits_type::version_mask << traits_type::entity_shift);
             next = entities[entt] & traits_type::entity_mask;
+            entity = entt | version;
             entities[entt] = entity;
             --available;
         } else {
@@ -534,7 +534,7 @@ public:
 
         // lengthens the implicit list of destroyed entities
         const auto entt = entity & traits_type::entity_mask;
-        const auto version = (((entity >> traits_type::entity_shift) + 1) & traits_type::version_mask) << traits_type::entity_shift;
+        const auto version = ((entity >> traits_type::entity_shift) + 1) << traits_type::entity_shift;
         const auto node = (available ? next : ((entt + 1) & traits_type::entity_mask)) | version;
         entities[entt] = node;
         next = entt;
@@ -1550,13 +1550,13 @@ public:
      */
     Snapshot<Entity> snapshot() const ENTT_NOEXCEPT {
         using follow_fn_type = entity_type(const Registry &, const entity_type);
-        const entity_type seed = available ? (next | (entities[next] & ~traits_type::entity_mask)) : next;
+        const entity_type seed = available ? (next | (entities[next] & (traits_type::version_mask << traits_type::entity_shift))) : next;
 
         follow_fn_type *follow = [](const Registry &registry, const entity_type entity) -> entity_type {
             const auto &entities = registry.entities;
             const auto entt = entity & traits_type::entity_mask;
             const auto next = entities[entt] & traits_type::entity_mask;
-            return (next | (entities[next] & ~traits_type::entity_mask));
+            return (next | (entities[next] & (traits_type::version_mask << traits_type::entity_shift)));
         };
 
         return { *this, seed, follow };
@@ -1596,7 +1596,7 @@ public:
 
             if(destroyed) {
                 registry.destroy(entity);
-                const auto version = (entity & (~traits_type::entity_mask));
+                const auto version = entity & (traits_type::version_mask << traits_type::entity_shift);
                 entities[entt] = ((entities[entt] & traits_type::entity_mask) | version);
             }
         };
