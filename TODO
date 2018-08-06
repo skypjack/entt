@@ -6,6 +6,7 @@
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
 * create dedicated flat map based on types implementation (sort of "type map") for types to use within the registry and so on...
 * registry::create with a "hint" on the entity identifier to use, it should ease combining multiple registries
+* is it possible to iterate all the components assigned to an entity through a common base class?
 * optimize for empty components, it would be a mid improvement in terms of memory usage
 * add some lazy iterative sorters like "single bubble sort loop"
 * can we do more for shared libraries? who knows... see #144
