@@ -42,6 +42,11 @@ class Delegate<Ret(Args...)> final {
         return (Function)(args...);
     }
 
+    template<typename Class, Ret(Class:: *Member)(Args...) const>
+    static Ret proto(void *instance, Args... args) {
+        return (static_cast<const Class *>(instance)->*Member)(args...);
+    }
+
     template<typename Class, Ret(Class:: *Member)(Args...)>
     static Ret proto(void *instance, Args... args) {
         return (static_cast<Class *>(instance)->*Member)(args...);
@@ -69,6 +74,22 @@ public:
     template<Ret(*Function)(Args...)>
     void connect() ENTT_NOEXCEPT {
         stub = std::make_pair(nullptr, &proto<Function>);
+    }
+
+    /**
+     * @brief Connects a member function for a given instance to a delegate.
+     *
+     * The delegate isn't responsible for the connected object. Users must
+     * guarantee that the lifetime of the instance overcomes the one of the
+     * delegate.
+     *
+     * @tparam Class Type of class to which the member function belongs.
+     * @tparam Member Member function to connect to the delegate.
+     * @param instance A valid instance of type pointer to `Class`.
+     */
+    template<typename Class, Ret(Class:: *Member)(Args...) const>
+    void connect(Class *instance) ENTT_NOEXCEPT {
+        stub = std::make_pair(instance, &proto<Class, Member>);
     }
 
     /**

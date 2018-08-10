@@ -45,6 +45,14 @@ struct TestCollectFirst {
     }
 };
 
+struct ConstNonConstNoExcept {
+    void f() { ++cnt; }
+    void g() noexcept { ++cnt; }
+    void h() const { ++cnt; }
+    void i() const noexcept { ++cnt; }
+    mutable int cnt{0};
+};
+
 TEST(SigH, Lifetime) {
     using signal = entt::SigH<void(void)>;
 
@@ -219,4 +227,25 @@ TEST(SigH, Collector) {
     ASSERT_FALSE(collector_first.vec.empty());
     ASSERT_EQ(static_cast<std::vector<int>::size_type>(1), collector_first.vec.size());
     ASSERT_EQ(42, collector_first.vec[0]);
+}
+
+TEST(SigH, ConstNonConstNoExcept) {
+    entt::SigH<void()> sigh;
+    ConstNonConstNoExcept functor;
+
+    sigh.sink().connect<ConstNonConstNoExcept, &ConstNonConstNoExcept::f>(&functor);
+    sigh.sink().connect<ConstNonConstNoExcept, &ConstNonConstNoExcept::g>(&functor);
+    sigh.sink().connect<ConstNonConstNoExcept, &ConstNonConstNoExcept::h>(&functor);
+    sigh.sink().connect<ConstNonConstNoExcept, &ConstNonConstNoExcept::i>(&functor);
+    sigh.publish();
+
+    ASSERT_EQ(functor.cnt, 4);
+
+    sigh.sink().disconnect<ConstNonConstNoExcept, &ConstNonConstNoExcept::f>(&functor);
+    sigh.sink().disconnect<ConstNonConstNoExcept, &ConstNonConstNoExcept::g>(&functor);
+    sigh.sink().disconnect<ConstNonConstNoExcept, &ConstNonConstNoExcept::h>(&functor);
+    sigh.sink().disconnect<ConstNonConstNoExcept, &ConstNonConstNoExcept::i>(&functor);
+    sigh.publish();
+
+    ASSERT_EQ(functor.cnt, 4);
 }

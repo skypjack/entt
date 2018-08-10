@@ -11,6 +11,14 @@ struct DelegateFunctor {
     }
 };
 
+struct ConstNonConstNoExcept {
+    void f() { ++cnt; }
+    void g() noexcept { ++cnt; }
+    void h() const { ++cnt; }
+    void i() const noexcept { ++cnt; }
+    mutable int cnt{0};
+};
+
 TEST(Delegate, Functionalities) {
     entt::Delegate<int(int)> ffdel;
     entt::Delegate<int(int)> mfdel;
@@ -45,4 +53,23 @@ TEST(Delegate, Comparison) {
 
     ASSERT_TRUE(def == entt::Delegate<int(int)>{});
     ASSERT_TRUE (def != delegate);
+}
+
+TEST(Delegate, ConstNonConstNoExcept) {
+    entt::Delegate<void()> delegate;
+    ConstNonConstNoExcept functor;
+
+    delegate.connect<ConstNonConstNoExcept, &ConstNonConstNoExcept::f>(&functor);
+    delegate();
+
+    delegate.connect<ConstNonConstNoExcept, &ConstNonConstNoExcept::g>(&functor);
+    delegate();
+
+    delegate.connect<ConstNonConstNoExcept, &ConstNonConstNoExcept::h>(&functor);
+    delegate();
+
+    delegate.connect<ConstNonConstNoExcept, &ConstNonConstNoExcept::i>(&functor);
+    delegate();
+
+    ASSERT_EQ(functor.cnt, 4);
 }
