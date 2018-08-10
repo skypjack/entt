@@ -52,7 +52,7 @@ public:
      * @tparam N Number of characters of the identifier.
      * @param str Human-readable identifer.
      */
-    template <std::size_t N>
+    template<std::size_t N>
     constexpr HashedString(const char (&str)[N]) ENTT_NOEXCEPT
         : hash{helper(offset, str)}, str{str}
     {}

@@ -23,6 +23,7 @@ namespace internal {
 template<typename>
 struct sigh_traits;
 
+
 template<typename Ret, typename... Args>
 struct sigh_traits<Ret(Args...)> {
     using proto_fn_type = Ret(void *, Args...);
@@ -189,7 +190,7 @@ public:
      * @tparam Member Member function to connect to the signal.
      * @param instance A valid instance of type pointer to `Class`.
      */
-    template <typename Class, Ret(Class:: *Member)(Args...) const = &Class::receive>
+    template<typename Class, Ret(Class:: *Member)(Args...) const = &Class::receive>
     void connect(Class *instance) {
         disconnect<Class, Member>(instance);
         calls.emplace_back(instance, &proto<Class, Member>);
@@ -208,7 +209,7 @@ public:
      * @tparam Member Member function to connect to the signal.
      * @param instance A valid instance of type pointer to `Class`.
      */
-    template <typename Class, Ret(Class:: *Member)(Args...) = &Class::receive>
+    template<typename Class, Ret(Class:: *Member)(Args...) = &Class::receive>
     void connect(Class *instance) {
         disconnect<Class, Member>(instance);
         calls.emplace_back(instance, &proto<Class, Member>);
