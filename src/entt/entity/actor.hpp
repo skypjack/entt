@@ -6,6 +6,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "registry.hpp"
+#include "entity.hpp"
 
 
 namespace entt {
@@ -31,23 +32,54 @@ struct Actor {
      * @param reg An entity-component system properly initialized.
      */
     Actor(Registry<Entity> &reg)
-        : reg{reg}, entt{reg.create()}
+        : reg{&reg}, entt{reg.create()}
     {}
 
     /*! @brief Default destructor. */
     virtual ~Actor() {
-        reg.destroy(entt);
+        reg->destroy(entt);
     }
 
-    /*! @brief Default copy constructor. */
-    Actor(const Actor &) = default;
-    /*! @brief Default move constructor. */
-    Actor(Actor &&) = default;
+    /*! @brief Copying an actor isn't allowed. */
+    Actor(const Actor &) = delete;
+
+    /**
+     * @brief Move constructor.
+     *
+     * After actor move construction, instances that have been moved from are
+     * placed in a valid but unspecified state. It's highly discouraged to
+     * continue using them.
+     *
+     * @param other The instance to move from.
+     */
+    Actor(Actor &&other)
+        : reg{other.reg}, entt{other.entt}
+    {
+        other.entt = entt::null;
+    }
 
     /*! @brief Default copy assignment operator. @return This actor. */
-    Actor & operator=(const Actor &) = default;
-    /*! @brief Default move assignment operator. @return This actor. */
-    Actor & operator=(Actor &&) = default;
+    Actor & operator=(const Actor &) = delete;
+
+    /**
+     * @brief Move assignment operator.
+     *
+     * After actor move assignment, instances that have been moved from are
+     * placed in a valid but unspecified state. It's highly discouraged to
+     * continue using them.
+     *
+     * @param other The instance to move from.
+     * @return This actor.
+     */
+    Actor & operator=(Actor &&other) {
+        if(this != &other) {
+            auto tmp{std::move(other)};
+            std::swap(reg, tmp.reg);
+            std::swap(entt, tmp.entt);
+        }
+
+        return *this;
+    }
 
     /**
      * @brief Assigns the given tag to an actor.
@@ -64,7 +96,7 @@ struct Actor {
      */
     template<typename Tag, typename... Args>
     Tag & assign(tag_t, Args &&... args) {
-        return (reg.template remove<Tag>(), reg.template assign<Tag>(tag_t{}, entt, std::forward<Args>(args)...));
+        return (reg->template remove<Tag>(), reg->template assign<Tag>(tag_t{}, entt, std::forward<Args>(args)...));
     }
 
     /**
@@ -83,7 +115,7 @@ struct Actor {
      */
     template<typename Component, typename... Args>
     Component & assign(Args &&... args) {
-        return reg.template accommodate<Component>(entt, std::forward<Args>(args)...);
+        return reg->template accommodate<Component>(entt, std::forward<Args>(args)...);
     }
 
     /**
@@ -93,7 +125,7 @@ struct Actor {
     template<typename Tag>
     void remove(tag_t) {
         assert(has<Tag>(tag_t{}));
-        reg.template remove<Tag>();
+        reg->template remove<Tag>();
     }
 
     /**
@@ -102,7 +134,7 @@ struct Actor {
      */
     template<typename Component>
     void remove() {
-        reg.template remove<Component>(entt);
+        reg->template remove<Component>(entt);
     }
 
     /**
@@ -112,7 +144,7 @@ struct Actor {
      */
     template<typename Tag>
     bool has(tag_t) const ENTT_NOEXCEPT {
-        return (reg.template has<Tag>() && (reg.template attachee<Tag>() == entt));
+        return (reg->template has<Tag>() && (reg->template attachee<Tag>() == entt));
     }
 
     /**
@@ -122,7 +154,7 @@ struct Actor {
      */
     template<typename Component>
     bool has() const ENTT_NOEXCEPT {
-        return reg.template has<Component>(entt);
+        return reg->template has<Component>(entt);
     }
 
     /**
@@ -133,7 +165,7 @@ struct Actor {
     template<typename Tag>
     const Tag & get(tag_t) const ENTT_NOEXCEPT {
         assert(has<Tag>(tag_t{}));
-        return reg.template get<Tag>();
+        return reg->template get<Tag>();
     }
 
     /**
@@ -153,7 +185,7 @@ struct Actor {
      */
     template<typename Component>
     const Component & get() const ENTT_NOEXCEPT {
-        return reg.template get<Component>(entt);
+        return reg->template get<Component>(entt);
     }
 
     /**
@@ -171,7 +203,7 @@ struct Actor {
      * @return A reference to the underlying registry.
      */
     inline const registry_type & registry() const ENTT_NOEXCEPT {
-        return reg;
+        return *reg;
     }
 
     /**
@@ -191,7 +223,7 @@ struct Actor {
     }
 
 private:
-    registry_type &reg;
+    registry_type * reg;
     Entity entt;
 };
 

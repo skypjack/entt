@@ -158,7 +158,7 @@ class Sink<Ret(Args...)> final {
         return (static_cast<Class *>(instance)->*Member)(args...);
     }
 
-    Sink(std::vector<call_type> &calls) ENTT_NOEXCEPT
+    Sink(std::vector<call_type> *calls) ENTT_NOEXCEPT
         : calls{calls}
     {}
 
@@ -174,7 +174,7 @@ public:
     template<Ret(*Function)(Args...)>
     void connect() {
         disconnect<Function>();
-        calls.emplace_back(nullptr, &proto<Function>);
+        calls->emplace_back(nullptr, &proto<Function>);
     }
 
     /**
@@ -193,7 +193,7 @@ public:
     template<typename Class, Ret(Class:: *Member)(Args...) const = &Class::receive>
     void connect(Class *instance) {
         disconnect<Class, Member>(instance);
-        calls.emplace_back(instance, &proto<Class, Member>);
+        calls->emplace_back(instance, &proto<Class, Member>);
     }
 
     /**
@@ -212,7 +212,7 @@ public:
     template<typename Class, Ret(Class:: *Member)(Args...) = &Class::receive>
     void connect(Class *instance) {
         disconnect<Class, Member>(instance);
-        calls.emplace_back(instance, &proto<Class, Member>);
+        calls->emplace_back(instance, &proto<Class, Member>);
     }
 
     /**
@@ -222,7 +222,7 @@ public:
     template<Ret(*Function)(Args...)>
     void disconnect() {
         call_type target{nullptr, &proto<Function>};
-        calls.erase(std::remove(calls.begin(), calls.end(), std::move(target)), calls.end());
+        calls->erase(std::remove(calls->begin(), calls->end(), std::move(target)), calls->end());
     }
 
     /**
@@ -234,7 +234,7 @@ public:
     template<typename Class, Ret(Class:: *Member)(Args...) const>
     void disconnect(Class *instance) {
         call_type target{instance, &proto<Class, Member>};
-        calls.erase(std::remove(calls.begin(), calls.end(), std::move(target)), calls.end());
+        calls->erase(std::remove(calls->begin(), calls->end(), std::move(target)), calls->end());
     }
 
     /**
@@ -246,7 +246,7 @@ public:
     template<typename Class, Ret(Class:: *Member)(Args...)>
     void disconnect(Class *instance) {
         call_type target{instance, &proto<Class, Member>};
-        calls.erase(std::remove(calls.begin(), calls.end(), std::move(target)), calls.end());
+        calls->erase(std::remove(calls->begin(), calls->end(), std::move(target)), calls->end());
     }
 
     /**
@@ -257,18 +257,18 @@ public:
     template<typename Class>
     void disconnect(Class *instance) {
         auto func = [instance](const call_type &call) { return call.first == instance; };
-        calls.erase(std::remove_if(calls.begin(), calls.end(), std::move(func)), calls.end());
+        calls->erase(std::remove_if(calls->begin(), calls->end(), std::move(func)), calls->end());
     }
 
     /**
      * @brief Disconnects all the listeners from a signal.
      */
     void disconnect() {
-        calls.clear();
+        calls->clear();
     }
 
 private:
-    std::vector<call_type> &calls;
+    std::vector<call_type> *calls;
 };
 
 
@@ -340,7 +340,7 @@ public:
      * @return A temporary sink object.
      */
     sink_type sink() ENTT_NOEXCEPT {
-        return { calls };
+        return { &calls };
     }
 
     /**
