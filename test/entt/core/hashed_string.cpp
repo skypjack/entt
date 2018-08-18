@@ -25,6 +25,16 @@ TEST(HashedString, Functionalities) {
     ASSERT_NE(barHs, "foo"_hs);
 }
 
+TEST(HashedString, Empty) {
+    using hash_type = entt::HashedString::hash_type;
+
+    entt::HashedString hs{};
+
+    ASSERT_EQ(static_cast<hash_type>(hs), hash_type{});
+    ASSERT_EQ(static_cast<const char *>(hs), nullptr);
+}
+
+
 TEST(HashedString, Constexprness) {
     using hash_type = entt::HashedString::hash_type;
     // how would you test a constexpr otherwise?

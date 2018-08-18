@@ -79,6 +79,10 @@ SETUP_AND_ADD_TEST(view entt/entity/view.cpp)
 
 SETUP_AND_ADD_TEST(locator entt/locator/locator.cpp)
 
+# Test meta
+
+SETUP_AND_ADD_TEST(meta entt/meta/meta.cpp)
+
 # Test process
 
 SETUP_AND_ADD_TEST(process entt/process/process.cpp)

@@ -1,18 +1,24 @@
+* suggestion (Milerius): cache made with flat_map + object pools + new/delete overloads so as to get rid of shared pointers (+ cache coherency)
+# suggestion (Alan): add iterative sorter to the algorithms
 * custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
 * scene management (I prefer the concept of spaces, that is a kind of scene anyway)
 * review doc: separate it in multiple md/dox files, reduce the readme to a minimum and provide users with links to the online documentation on gh-pages
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
+* sort of low-level prefabs: prototypes with children prototypes and glue functions to adjust parent-child relationships on creation
 * create dedicated flat map based on types implementation (sort of "type map") for types to use within the registry and so on...
 * registry::create with a "hint" on the entity identifier to use, it should ease combining multiple registries
 * deep copy of a registry (or use the snapshot stuff to copy components and keep intact ids at least)
 * is it possible to iterate all the components assigned to an entity through a common base class?
 * optimize for empty components, it would be a mid improvement in terms of memory usage
-* add some lazy iterative sorters like "single bubble sort loop"
 * can we do more for shared libraries? who knows... see #144
 * work stealing job system (see #100)
+* remove final specifiers all around
 * make view copyable/moveable
-* reflection system (maybe)
 * C++17. That's all.
+* meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
+* meta: test for conflicts with hashed strings at runtime when using meta system
+* meta: allow reflection without "names"
+* meta: add destructor?
 * AOB

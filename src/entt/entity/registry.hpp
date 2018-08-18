@@ -1578,9 +1578,9 @@ public:
      * @return A temporary object to use to load snasphosts.
      */
     SnapshotLoader<Entity> restore() ENTT_NOEXCEPT {
-        using assure_fn_type = void(Registry &, const entity_type, const bool);
+        using force_fn_type = void(Registry &, const entity_type, const bool);
 
-        assure_fn_type *assure = [](Registry &registry, const entity_type entity, const bool destroyed) {
+        force_fn_type *force = [](Registry &registry, const entity_type entity, const bool destroyed) {
             using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
             // explicit promotion to avoid warnings with std::uint16_t
             const auto entt = promotion_type{entity} & traits_type::entity_mask;
@@ -1601,7 +1601,7 @@ public:
             }
         };
 
-        return { (*this = {}), assure };
+        return { (*this = {}), force };
     }
 
 private:

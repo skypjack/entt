@@ -14,6 +14,8 @@
 #include "entity/utility.hpp"
 #include "entity/view.hpp"
 #include "locator/locator.hpp"
+#include "meta/any.hpp"
+#include "meta/meta.hpp"
 #include "process/process.hpp"
 #include "process/scheduler.hpp"
 #include "resource/cache.hpp"

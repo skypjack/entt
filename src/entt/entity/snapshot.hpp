@@ -262,11 +262,11 @@ class SnapshotLoader final {
     /*! @brief A registry is allowed to create snapshot loaders. */
     friend class Registry<Entity>;
 
-    using assure_fn_type = void(Registry<Entity> &, const Entity, const bool);
+    using force_fn_type = void(Registry<Entity> &, const Entity, const bool);
 
-    SnapshotLoader(Registry<Entity> &registry, assure_fn_type *assure_fn) ENTT_NOEXCEPT
+    SnapshotLoader(Registry<Entity> &registry, force_fn_type *force) ENTT_NOEXCEPT
         : registry{registry},
-          assure_fn{assure_fn}
+          force{force}
     {
         // restore a snapshot as a whole requires a clean registry
         assert(!registry.capacity());
@@ -280,7 +280,7 @@ class SnapshotLoader final {
         while(length--) {
             Entity entity{};
             archive(entity);
-            assure_fn(registry, entity, destroyed);
+            force(registry, entity, destroyed);
         }
     }
 
@@ -294,7 +294,7 @@ class SnapshotLoader final {
             Type instance{};
             archive(entity, instance);
             static constexpr auto destroyed = false;
-            assure_fn(registry, entity, destroyed);
+            force(registry, entity, destroyed);
             registry.template assign<Type>(args..., entity, static_cast<const Type &>(instance));
         }
     }
@@ -406,7 +406,7 @@ public:
 
 private:
     Registry<Entity> &registry;
-    assure_fn_type *assure_fn;
+    force_fn_type *force;
 };
 
 
