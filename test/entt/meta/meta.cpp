@@ -8,39 +8,39 @@
 void print(unsigned int n, entt::MetaClass *meta) {
     std::cout << std::string(n, ' ') << "class: " << static_cast<const char *>(meta->name()) << std::endl;
 
-    for(auto &prop: meta->prop()) {
-        std::cout << std::string(n+2, ' ') << "prop: " << static_cast<const char *>(prop.key().value<entt::HashedString>()) << "/" << prop.value().value<int>() << std::endl;
-    }
+    meta->prop([n=n+2](auto *prop) {
+        std::cout << std::string(n, ' ') << "prop: " << static_cast<const char *>(prop->key().template value<entt::HashedString>()) << "/" << prop->value().template value<int>() << std::endl;
+    });
 
-    for(auto &data: meta->data()) {
-        std::cout << std::string(n, ' ') << "data: " << static_cast<const char *>(data.name()) << std::endl;
+    meta->data([n=n+2](auto *data) {
+        std::cout << std::string(n, ' ') << "data: " << static_cast<const char *>(data->name()) << std::endl;
 
-        for(auto &prop: data.prop()) {
-            std::cout << std::string(n+2, ' ') << "prop: " << static_cast<const char *>(prop.key().value<entt::HashedString>()) << "/" << prop.value().value<int>() << std::endl;
+        data->prop([n=n+2](auto *prop) {
+            std::cout << std::string(n, ' ') << "prop: " << static_cast<const char *>(prop->key().template value<entt::HashedString>()) << "/" << prop->value().template value<int>() << std::endl;
+        });
+
+        if(data->type()) {
+            print(n, data->type());
+        }
+    });
+
+    meta->func([n=n+2](auto *func) {
+        std::cout << std::string(n, ' ') << "func: " << static_cast<const char *>(func->name()) << std::endl;
+
+        func->prop([n=n+2](auto *prop) {
+            std::cout << std::string(n, ' ') << "prop: " << static_cast<const char *>(prop->key().template value<entt::HashedString>()) << "/" << prop->value().template value<int>() << std::endl;
+        });
+
+        if(func->ret()) {
+            print(n+2, func->ret());
         }
 
-        if(data.type()) {
-            print(n+2, data.type());
-        }
-    }
-
-    for(auto &func: meta->func()) {
-        std::cout << std::string(n, ' ') << "func: " << static_cast<const char *>(func.name()) << std::endl;
-
-        for(auto &prop: func.prop()) {
-            std::cout << std::string(n+2, ' ') << "prop: " << static_cast<const char *>(prop.key().value<entt::HashedString>()) << "/" << prop.value().value<int>() << std::endl;
-        }
-
-        if(func.ret()) {
-            print(n+2, func.ret());
-        }
-
-        for(unsigned int i = 0; i < func.size(); ++i) {
-            if(func.arg(i)) {
-                print(n+2, func.arg(i));
+        for(unsigned int i = 0; i < func->size(); ++i) {
+            if(func->arg(i)) {
+                print(n+2, func->arg(i));
             }
         }
-    }
+    });
 }
 
 
@@ -99,7 +99,7 @@ TEST(Meta, TODO) {
             .data<const int * const, &S::k>("k")
             .func<void(), &S::f>("f")
             .func<S *(int), &S::g>("g")
-            .func<const S *(int) const, &S::g>("g")
+            .func<const S *(int) const, &S::g>("cg")
             .func<int(int) const, &S::h>("h")
             .func<void(), &serialize>("serialize", entt::property(entt::HashedString{"3"}, 3))
             .func<int(char)>("lambda", [](const S &, auto) { std::cout << "lambda S" << std::endl; return -1; })
@@ -134,11 +134,11 @@ TEST(Meta, TODO) {
     ASSERT_EQ(sMeta->data("i")->get(&s).value<int>(), 3);
     ASSERT_EQ(sMeta->data("j")->get(&s).value<int>(), 42);
 
-    for(auto &data: sMeta->data()) {
-        if(!data.constant()) {
-            data.set(&s, 0);
+    sMeta->data([&s](auto *data) {
+        if(!data->constant()) {
+            data->set(&s, 0);
         }
-    }
+    });
 
     ASSERT_EQ(s.i, 0);
     ASSERT_EQ(s.j, 0);
@@ -151,6 +151,7 @@ TEST(Meta, TODO) {
     auto *s1DataMeta = s1Data->type();
     auto instance = s1DataMeta->ctor("int.int")->invoke(99, 100);
 
+    ASSERT_EQ(instance.type(), entt::Any::type<S>());
     ASSERT_TRUE(instance);
 
     tMeta->data("s1")->set(&t, instance);
