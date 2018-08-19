@@ -2777,6 +2777,8 @@ Below an incomplete list of projects and articles:
   [Match One](https://github.com/sschmid/Match-One) for `Entitas-CSharp`.
 * [Randballs](https://github.com/gale93/randballs): simple `SFML` and `EnTT`
   playground.
+* [Classic Tower Defence](https://indi-kernick.itch.io/classic-tower-defence): A tiny little tower defence game featuring a homemade font, just for you! Check out [the source](https://github.com/kerndog73/Classic-Tower-Defence) 
+* [The Machine](https://indi-kernick.itch.io/the-machine-web-version): A box pushing puzzler with logic gates and other cool stuff. It even has [a github repo!](https://github.com/Kerndog73/The-Machine)
 * ...
 
 If you know of other resources out there that are about `EnTT`, feel free to
