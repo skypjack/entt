@@ -201,11 +201,11 @@ inline Meta * meta(const Key &key, Node *node) ENTT_NOEXCEPT {
 
 
 template<typename Meta>
-class Range {
+class MetaRange {
     using node_type = typename internal::MetaNode<Meta>::type;
 
     class Iterator {
-        friend class Range<Meta>;
+        friend class MetaRange<Meta>;
 
         Iterator(node_type *node)
             : node{node}
@@ -257,7 +257,7 @@ public:
     using iterator_type = Iterator;
     using const_iterator_type = Iterator;
 
-    Range(node_type *node)
+    MetaRange(node_type *node)
         : node{node}
     {}
 
@@ -321,7 +321,7 @@ public:
     virtual size_type size() const ENTT_NOEXCEPT = 0;
     virtual MetaClass * arg(size_type) const ENTT_NOEXCEPT = 0;
 
-    virtual Range<MetaProp> prop() const ENTT_NOEXCEPT = 0;
+    virtual MetaRange<MetaProp> prop() const ENTT_NOEXCEPT = 0;
     virtual MetaProp * prop(const Any &) const ENTT_NOEXCEPT = 0;
 
     template<typename... Args>
@@ -338,7 +338,7 @@ struct MetaData {
     virtual bool constant() const ENTT_NOEXCEPT = 0;
     virtual Any get(const void *) const ENTT_NOEXCEPT = 0;
     virtual void set(void *, const Any &) = 0;
-    virtual Range<MetaProp> prop() const ENTT_NOEXCEPT = 0;
+    virtual MetaRange<MetaProp> prop() const ENTT_NOEXCEPT = 0;
     virtual MetaProp * prop(const Any &) const ENTT_NOEXCEPT = 0;
 };
 
@@ -370,7 +370,7 @@ public:
     virtual MetaClass * ret() const ENTT_NOEXCEPT = 0;
     virtual MetaClass * arg(size_type) const ENTT_NOEXCEPT = 0;
 
-    virtual Range<MetaProp> prop() const ENTT_NOEXCEPT = 0;
+    virtual MetaRange<MetaProp> prop() const ENTT_NOEXCEPT = 0;
     virtual MetaProp * prop(const Any &) const ENTT_NOEXCEPT = 0;
 
     template<typename... Args>
@@ -403,16 +403,16 @@ public:
     virtual const char * name() const ENTT_NOEXCEPT = 0;
     virtual void destroy(void *) = 0;
 
-    virtual Range<MetaProp> prop() const ENTT_NOEXCEPT = 0;
+    virtual MetaRange<MetaProp> prop() const ENTT_NOEXCEPT = 0;
     virtual MetaProp * prop(const Any &) const ENTT_NOEXCEPT = 0;
 
-    virtual Range<MetaCtor> ctor() const ENTT_NOEXCEPT = 0;
+    virtual MetaRange<MetaCtor> ctor() const ENTT_NOEXCEPT = 0;
     virtual MetaCtor * ctor(const char *str) const ENTT_NOEXCEPT = 0;
 
-    virtual Range<MetaData> data() const ENTT_NOEXCEPT = 0;
+    virtual MetaRange<MetaData> data() const ENTT_NOEXCEPT = 0;
     virtual MetaData * data(const char *str) const ENTT_NOEXCEPT = 0;
 
-    virtual Range<MetaFunc> func() const ENTT_NOEXCEPT = 0;
+    virtual MetaRange<MetaFunc> func() const ENTT_NOEXCEPT = 0;
     virtual MetaFunc * func(const char *str) const ENTT_NOEXCEPT = 0;
 
     template<typename... Args>
@@ -557,7 +557,7 @@ public:
         return index < sizeof...(Args) ? arg(index, std::make_index_sequence<sizeof...(Args)>{}) : nullptr;
     }
 
-    Range<MetaProp> prop() const ENTT_NOEXCEPT override {
+    MetaRange<MetaProp> prop() const ENTT_NOEXCEPT override {
         return {internal::MetaInfo<Class>::template Ctor<Args...>::ctor->prop};
     }
 
@@ -603,7 +603,7 @@ public:
         return set<std::is_const<Type>::value>(instance, any);
     }
 
-    Range<MetaProp> prop() const ENTT_NOEXCEPT override {
+    MetaRange<MetaProp> prop() const ENTT_NOEXCEPT override {
         return {internal::MetaInfo<Class>::template Member<Type, Member>::member->prop};
     }
 
@@ -620,10 +620,10 @@ class MetaFuncType: public MetaFunc {
     using func_type = FuncType<Type>;
 
     template<typename>
-    struct Invoker;
+    struct Invoke;
 
     template<typename Ret, typename... Args>
-    struct Invoker<Ret(Args...)> {
+    struct Invoke<Ret(Args...)> {
         template<std::size_t... Indexes>
         inline static Any invoke(void *instance, const Any *args, std::index_sequence<Indexes...> indexes) {
             return acceptable<Args...>(args, indexes)
@@ -639,7 +639,7 @@ class MetaFuncType: public MetaFunc {
     };
 
     template<typename... Args>
-    struct Invoker<void(Args...)> {
+    struct Invoke<void(Args...)> {
         template<std::size_t... Indexes>
         inline static Any invoke(void *instance, const Any *args, std::index_sequence<Indexes...> indexes) {
             if(acceptable<Args...>(args, indexes)) {
@@ -657,7 +657,7 @@ class MetaFuncType: public MetaFunc {
     };
 
     template<typename Ret, typename... Args>
-    struct Invoker<Ret(Args...) const> {
+    struct Invoke<Ret(Args...) const> {
         template<std::size_t... Indexes>
         inline static Any invoke(const void *instance, const Any *args, std::index_sequence<Indexes...> indexes) {
             return acceptable<Args...>(args, indexes)
@@ -667,7 +667,7 @@ class MetaFuncType: public MetaFunc {
     };
 
     template<typename... Args>
-    struct Invoker<void(Args...) const> {
+    struct Invoke<void(Args...) const> {
         template<std::size_t... Indexes>
         inline static Any invoke(const void *instance, const Any *args, std::index_sequence<Indexes...> indexes) {
             if(acceptable<Args...>(args, indexes)) {
@@ -684,11 +684,11 @@ class MetaFuncType: public MetaFunc {
     }
 
     Any run(const void *instance, const Any *args, std::size_t sz) const override {
-        return sz == func_type::size ? Invoker<Type>::invoke(instance, args, std::make_index_sequence<func_type::size>{}) : Any{};
+        return sz == func_type::size ? Invoke<Type>::invoke(instance, args, std::make_index_sequence<func_type::size>{}) : Any{};
     }
 
     Any run(void *instance, const Any *args, std::size_t sz) override {
-        return sz == func_type::size ? Invoker<Type>::invoke(instance, args, std::make_index_sequence<func_type::size>{}) : Any{};
+        return sz == func_type::size ? Invoke<Type>::invoke(instance, args, std::make_index_sequence<func_type::size>{}) : Any{};
     }
 
 public:
@@ -708,7 +708,7 @@ public:
         return index < func_type::size ? arg(index, std::make_index_sequence<func_type::size>{}) : nullptr;
     }
 
-    Range<MetaProp> prop() const ENTT_NOEXCEPT override {
+    MetaRange<MetaProp> prop() const ENTT_NOEXCEPT override {
         return {internal::MetaInfo<Class>::template Member<Type, Member>::member->prop};
     }
 
@@ -726,10 +726,10 @@ class MetaFreeFuncType: public MetaFunc {
     using func_type = FuncType<Type>;
 
     template<typename>
-    struct Invoker;
+    struct Invoke;
 
     template<typename Ret, typename... Args>
-    struct Invoker<Ret(Args...)> {
+    struct Invoke<Ret(Args...)> {
         template<std::size_t... Indexes>
         inline static Any invoke(const void *instance, const Any *args, std::index_sequence<Indexes...> indexes) {
             return acceptable<Args...>(args, indexes)
@@ -739,7 +739,7 @@ class MetaFreeFuncType: public MetaFunc {
     };
 
     template<typename... Args>
-    struct Invoker<void(Args...)> {
+    struct Invoke<void(Args...)> {
         template<std::size_t... Indexes>
         inline static Any invoke(const void *instance, const Any *args, std::index_sequence<Indexes...> indexes) {
             if(acceptable<Args...>(args, indexes)) {
@@ -756,11 +756,11 @@ class MetaFreeFuncType: public MetaFunc {
     }
 
     Any run(const void *instance, const Any *args, size_type sz) const override {
-        return sz == func_type::size ? Invoker<Type>::invoke(instance, args, std::make_index_sequence<func_type::size>{}) : Any{};
+        return sz == func_type::size ? Invoke<Type>::invoke(instance, args, std::make_index_sequence<func_type::size>{}) : Any{};
     }
 
     Any run(void *instance, const Any *args, size_type sz) override {
-        return sz == func_type::size ? Invoker<Type>::invoke(instance, args, std::make_index_sequence<func_type::size>{}) : Any{};
+        return sz == func_type::size ? Invoke<Type>::invoke(instance, args, std::make_index_sequence<func_type::size>{}) : Any{};
     }
 
 public:
@@ -780,7 +780,7 @@ public:
         return index < func_type::size ? arg(index, std::make_index_sequence<func_type::size>{}) : nullptr;
     }
 
-    Range<MetaProp> prop() const ENTT_NOEXCEPT override {
+    MetaRange<MetaProp> prop() const ENTT_NOEXCEPT override {
         return {internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func->prop};
     }
 
@@ -798,10 +798,10 @@ class MetaFunctorType: public MetaFunc, public Func {
     using func_type = FuncType<Type>;
 
     template<typename>
-    struct Invoker;
+    struct Invoke;
 
     template<typename Ret, typename... Args>
-    struct Invoker<Ret(Args...)> {
+    struct Invoke<Ret(Args...)> {
         template<typename Op, std::size_t... Indexes>
         inline static Any invoke(Op &&op, const void *instance, const Any *args, std::index_sequence<Indexes...> indexes) {
             return acceptable<Args...>(args, indexes)
@@ -811,7 +811,7 @@ class MetaFunctorType: public MetaFunc, public Func {
     };
 
     template<typename... Args>
-    struct Invoker<void(Args...)> {
+    struct Invoke<void(Args...)> {
         template<typename Op, std::size_t... Indexes>
         inline static Any invoke(Op &&op, const void *instance, const Any *args, std::index_sequence<Indexes...> indexes) {
             if(acceptable<Args...>(args, indexes)) {
@@ -828,11 +828,11 @@ class MetaFunctorType: public MetaFunc, public Func {
     }
 
     Any run(const void *instance, const Any *args, size_type sz) const override {
-        return sz == func_type::size ? Invoker<Type>::invoke(*this, instance, args, std::make_index_sequence<func_type::size>{}) : Any{};
+        return sz == func_type::size ? Invoke<Type>::invoke(*this, instance, args, std::make_index_sequence<func_type::size>{}) : Any{};
     }
 
     Any run(void *instance, const Any *args, size_type sz) override {
-        return sz == func_type::size ? Invoker<Type>::invoke(*this, instance, args, std::make_index_sequence<func_type::size>{}) : Any{};
+        return sz == func_type::size ? Invoke<Type>::invoke(*this, instance, args, std::make_index_sequence<func_type::size>{}) : Any{};
     }
 
 public:
@@ -856,7 +856,7 @@ public:
         return index < func_type::size ? arg(index, std::make_index_sequence<func_type::size>{}) : nullptr;
     }
 
-    Range<MetaProp> prop() const ENTT_NOEXCEPT override {
+    MetaRange<MetaProp> prop() const ENTT_NOEXCEPT override {
         return {internal::MetaInfo<Class>::template Functor<Func>::functor->prop};
     }
 
@@ -892,7 +892,7 @@ public:
         static_cast<Class *>(instance)->~Class();
     }
 
-    Range<MetaProp> prop() const ENTT_NOEXCEPT override {
+    MetaRange<MetaProp> prop() const ENTT_NOEXCEPT override {
         return {internal::MetaInfo<Class>::clazz->prop};
     }
 
@@ -900,7 +900,7 @@ public:
         return internal::meta<MetaProp>(key, internal::MetaInfo<Class>::clazz->prop);
     }
 
-    Range<MetaCtor> ctor() const ENTT_NOEXCEPT override {
+    MetaRange<MetaCtor> ctor() const ENTT_NOEXCEPT override {
         return {internal::MetaInfo<Class>::clazz->ctor};
     }
 
@@ -908,7 +908,7 @@ public:
         return internal::meta<MetaCtor>(HashedString{str}, internal::MetaInfo<Class>::clazz->ctor);
     }
 
-    Range<MetaData> data() const ENTT_NOEXCEPT override {
+    MetaRange<MetaData> data() const ENTT_NOEXCEPT override {
         return {internal::MetaInfo<Class>::clazz->data};
     }
 
@@ -916,7 +916,7 @@ public:
         return internal::meta<MetaData>(HashedString{str}, internal::MetaInfo<Class>::clazz->data);
     }
 
-    Range<MetaFunc> func() const ENTT_NOEXCEPT override {
+    MetaRange<MetaFunc> func() const ENTT_NOEXCEPT override {
         return {internal::MetaInfo<Class>::clazz->func};
     }
 
