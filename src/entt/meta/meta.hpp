@@ -310,13 +310,13 @@ public:
 
     template<typename... Args>
     inline bool accept() const {
-        std::array<Any::any_type, sizeof...(Args)> types{Any::type<Args>()...};
+        std::array<Any::any_type, sizeof...(Args)> types{{Any::type<Args>()...}};
         return accept(types.data(), sizeof...(Args));
     }
 
     template<typename... Args>
     inline Any invoke(Args &&... args) const {
-        const std::array<const Any, sizeof...(Args)> params{std::forward<Args>(args)...};
+        const std::array<const Any, sizeof...(Args)> params{{std::forward<Args>(args)...}};
         return execute(params.data(), params.size());
     }
 };
@@ -344,13 +344,13 @@ public:
 
     template<typename... Args>
     inline bool accept() const {
-        std::array<Any::any_type, sizeof...(Args)> types{Any::type<Args>()...};
+        std::array<Any::any_type, sizeof...(Args)> types{{Any::type<Args>()...}};
         return accept(types.data(), sizeof...(Args));
     }
 
     template<typename Instance, typename... Args>
     inline Any invoke(Instance *instance, Args &&... args) const {
-        const std::array<const Any, sizeof...(Args)> params{std::forward<Args>(args)...};
+        const std::array<const Any, sizeof...(Args)> params{{std::forward<Args>(args)...}};
         return execute(instance, params.data(), params.size());
     }
 };
@@ -471,7 +471,7 @@ class MetaCtorType final: public MetaCtor {
 
     template<std::size_t... Indexes>
     inline static MetaClass * arg(size_type index, std::index_sequence<Indexes...>) {
-        return std::array<MetaClass *, sizeof...(Indexes)>{meta<std::decay_t<Args>>()...}[index];
+        return std::array<MetaClass *, sizeof...(Indexes)>{{meta<std::decay_t<Args>>()...}}[index];
     }
 
     internal::MetaCtorNode * node() const ENTT_NOEXCEPT override {
@@ -573,7 +573,7 @@ class MetaFuncType final: public MetaFunc {
 
     template<std::size_t... Indexes>
     inline static MetaClass * arg(size_type index, std::index_sequence<Indexes...>) {
-        return std::array<MetaClass *, sizeof...(Indexes)>{meta<std::decay_t<std::tuple_element_t<Indexes, typename func_type::args_type>>>()...}[index];
+        return std::array<MetaClass *, sizeof...(Indexes)>{{meta<std::decay_t<std::tuple_element_t<Indexes, typename func_type::args_type>>>()...}}[index];
     }
 
     internal::MetaFuncNode * node() const ENTT_NOEXCEPT override {
@@ -638,7 +638,7 @@ class MetaFreeFuncType final: public MetaFunc {
 
     template<std::size_t... Indexes>
     inline static MetaClass * arg(size_type index, std::index_sequence<Indexes...>) {
-        return std::array<MetaClass *, sizeof...(Indexes)>{meta<std::decay_t<std::tuple_element_t<Indexes, typename func_type::args_type>>>()...}[index];
+        return std::array<MetaClass *, sizeof...(Indexes)>{{meta<std::decay_t<std::tuple_element_t<Indexes, typename func_type::args_type>>>()...}}[index];
     }
 
     internal::MetaFuncNode * node() const ENTT_NOEXCEPT override {
@@ -701,7 +701,7 @@ class MetaFunctorType final: public MetaFunc, public Func {
 
     template<std::size_t... Indexes>
     inline static MetaClass * arg(size_type index, std::index_sequence<Indexes...>) {
-        return std::array<MetaClass *, sizeof...(Indexes)>{meta<std::decay_t<std::tuple_element_t<Indexes, typename func_type::args_type>>>()...}[index];
+        return std::array<MetaClass *, sizeof...(Indexes)>{{meta<std::decay_t<std::tuple_element_t<Indexes, typename func_type::args_type>>>()...}}[index];
     }
 
     internal::MetaFuncNode * node() const ENTT_NOEXCEPT override {
