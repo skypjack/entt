@@ -17,9 +17,7 @@
 * remove final specifiers all around
 * make view copyable/moveable
 * C++17. That's all.
-* meta: get rid of accept functions
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
-* meta: test for conflicts with hashed strings at runtime when using meta system
 * meta: allow reflection without "names"
 * meta: add destructor?
 * AOB
