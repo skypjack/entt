@@ -12,12 +12,13 @@
 * deep copy of a registry (or use the snapshot stuff to copy components and keep intact ids at least)
 * is it possible to iterate all the components assigned to an entity through a common base class?
 * optimize for empty components, it would be a mid improvement in terms of memory usage
+* prototype should offer a way to retrieve its internal registry
 * can we do more for shared libraries? who knows... see #144
 * work stealing job system (see #100)
 * remove final specifiers all around
 * make view copyable/moveable
 * C++17. That's all.
+* meta: review const all around, they are mostly wrong :-D
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
-* meta: allow reflection without "names"
-* meta: add destructor?
+* review functions wrapper, remove extended type, remove func type, reduce, reduce, reduce...
 * AOB

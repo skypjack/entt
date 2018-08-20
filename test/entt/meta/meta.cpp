@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/meta.hpp>
-#include <entt/meta/any.hpp>
 #include <iostream>
 
 
@@ -79,21 +78,27 @@ struct A {
 };
 
 
+void destroy(A &a) {
+    std::cout << "destroy A: " << a.i << "/" << a.c << std::endl;
+    a.~A();
+}
+
+
 void serialize(const S &) {
     std::cout << "serializing S" << std::endl;
 }
 
 
-void serialize(const T &) {
+void serialize(T &) {
     std::cout << "serializing T" << std::endl;
 }
 
 
 TEST(Meta, TODO) {
     entt::reflect<S>("foo", entt::property(entt::HashedString{"x"}, 42), entt::property(entt::HashedString{"y"}, 100))
-            .ctor<>("def")
-            .ctor<int, int>("int.int")
-            .ctor<const S &>("const S &")
+            .ctor<>()
+            .ctor<int, int>()
+            .ctor<const S &>()
             .data<int, &S::i>("i")
             .data<int, &S::j>("j")
             .data<const int * const, &S::k>("k")
@@ -101,16 +106,14 @@ TEST(Meta, TODO) {
             .func<S *(int), &S::g>("g")
             .func<const S *(int) const, &S::g>("cg")
             .func<int(int) const, &S::h>("h")
-            .func<void(), &serialize>("serialize", entt::property(entt::HashedString{"3"}, 3))
-            .func<int(char)>("lambda", [](const S &, auto) { std::cout << "lambda S" << std::endl; return -1; })
+            .func<void(const S &), &serialize>("serialize", entt::property(entt::HashedString{"3"}, 3))
             ;
 
     entt::reflect<T>("bar")
             .data<S, &T::s1>("s1")
             .data<const S, &T::s2>("s2")
             .func<void(const S &), &T::f>("f")
-            .func<void(), &serialize>("serialize")
-            .func<int(char)>("lambda", [](const T &, auto) { std::cout << "lambda T" << std::endl; return -2; })
+            .func<void(T &), &serialize>("serialize")
             ;
 
     auto *sMeta = entt::meta<S>();
@@ -149,9 +152,9 @@ TEST(Meta, TODO) {
 
     auto *s1Data = tMeta->data("s1");
     auto *s1DataMeta = s1Data->type();
-    auto instance = s1DataMeta->ctor("int.int")->invoke(99, 100);
+    auto instance = s1DataMeta->ctor<int, int>()->invoke(99, 100);
 
-    ASSERT_EQ(instance.type(), entt::Any::type<S>());
+    ASSERT_EQ(instance.meta(), entt::meta<S>());
     ASSERT_TRUE(instance);
 
     tMeta->data("s1")->set(&t, instance);
@@ -162,24 +165,23 @@ TEST(Meta, TODO) {
 
     auto res = sMeta->func("h")->invoke(&s, 41);
 
-    ASSERT_EQ(res.type(), entt::Any::type<int>());
+    ASSERT_EQ(res.meta(), entt::meta<int>());
     ASSERT_EQ(res.value<int>(), 42);
 
-    sMeta->func("serialize")->invoke(&s);
-    tMeta->func("serialize")->invoke(static_cast<const void *>(&t));
+    sMeta->func("serialize")->invoke(static_cast<const void *>(&s));
+    tMeta->func("serialize")->invoke(&t);
 
     ASSERT_EQ(sMeta->func("serialize")->size(), 0);
     ASSERT_EQ(tMeta->func("serialize")->size(), 0);
 
-    ASSERT_EQ(sMeta->func("lambda")->invoke(&s, 'c').value<int>(), -1);
-    ASSERT_EQ(tMeta->func("lambda")->invoke(static_cast<const void *>(&t), 'c').value<int>(), -2);
-
-    entt::reflect<A>("A").ctor<int, char>("ic");
+    entt::reflect<A>("A").ctor<int, char>().dtor<&destroy>();
     auto any = entt::meta<A>()->construct(42, 'c');
-    const auto &a = any.value<A>();
 
-    ASSERT_EQ(a.i, 42);
-    ASSERT_EQ(a.c, 'c');
+    ASSERT_EQ(any.value<A>().i, 42);
+    ASSERT_EQ(any.value<A>().c, 'c');
+
+    entt::meta<A>()->dtor()->invoke(any);
+    entt::meta<A>()->destroy(entt::meta<A>()->construct(42, 'c'));
 
     print(0, entt::meta("A"));
 }

@@ -4,21 +4,23 @@
 
 #include <tuple>
 #include <array>
+#include <memory>
 #include <cassert>
 #include <cstddef>
 #include <utility>
 #include <iterator>
 #include <type_traits>
 #include "../core/hashed_string.hpp"
-#include "any.hpp"
 
 
 namespace entt {
 
 
+struct MetaAny;
 class MetaProp;
 class MetaCtor;
-struct MetaData;
+class MetaDtor;
+class MetaData;
 class MetaFunc;
 class MetaClass;
 
@@ -27,17 +29,22 @@ namespace internal {
 
 
 struct MetaPropNode final {
-    const Any key;
-    const Any value;
+    const MetaAny &key;
+    const MetaAny &value;
     MetaPropNode * const next;
     MetaProp * const meta;
 };
 
 
 struct MetaCtorNode final {
-    const HashedString key;
     MetaCtorNode * const next;
     MetaCtor * const meta;
+    MetaPropNode *prop{nullptr};
+};
+
+
+struct MetaDtorNode final {
+    MetaDtor * const meta;
     MetaPropNode *prop{nullptr};
 };
 
@@ -64,31 +71,9 @@ struct MetaClassNode final {
     MetaClass * const meta;
     MetaPropNode *prop{nullptr};
     MetaCtorNode *ctor{nullptr};
+    MetaDtorNode *dtor{nullptr};
     MetaDataNode *data{nullptr};
     MetaFuncNode *func{nullptr};
-};
-
-
-template<typename>
-struct FuncType;
-
-template<typename Ret, typename... Args>
-struct FuncType<Ret(Args...)> {
-    static constexpr auto size = sizeof...(Args);
-    using args_type = std::tuple<Args...>;
-    using return_type = Ret;
-};
-
-template<typename Ret, typename... Args>
-struct FuncType<Ret(Args...) const>: FuncType<Ret(Args...)> {};
-
-
-template<typename, typename>
-struct ExtendedFunc;
-
-template<typename Class, typename Ret, typename... Args>
-struct ExtendedFunc<Class, Ret(Args...)> {
-    using type = Ret(const Class &, Args...);
 };
 
 
@@ -119,6 +104,14 @@ struct MetaInfo<Class> final {
         static MetaPropNode *prop;
     };
 
+    template<void(*)(Class &)>
+    struct Dtor {
+        static MetaDtorNode *dtor;
+
+        template<std::size_t>
+        static MetaPropNode *prop;
+    };
+
     template<typename Type, Type Class:: *>
     struct Member {
         static std::conditional_t<std::is_member_function_pointer<Type Class:: *>::value, MetaFuncNode, MetaDataNode> *member;
@@ -127,17 +120,9 @@ struct MetaInfo<Class> final {
         static MetaPropNode *prop;
     };
 
-    template<typename Type, typename ExtendedFunc<Class, Type>::type *>
+    template<typename Type, Type *>
     struct FreeFunc {
         static MetaFuncNode *func;
-
-        template<std::size_t>
-        static MetaPropNode *prop;
-    };
-
-    template<typename Func>
-    struct Functor {
-        static MetaFuncNode * functor;
 
         template<std::size_t>
         static MetaPropNode *prop;
@@ -166,6 +151,17 @@ MetaPropNode * MetaInfo<Class>::Ctor<Args...>::prop = nullptr;
 
 
 template<typename Class>
+template<void(*Func)(Class &)>
+MetaDtorNode * MetaInfo<Class>::Dtor<Func>::dtor = nullptr;
+
+
+template<typename Class>
+template<void(*Func)(Class &)>
+template<std::size_t>
+MetaPropNode * MetaInfo<Class>::Dtor<Func>::prop = nullptr;
+
+
+template<typename Class>
 template<typename Type, Type Class:: *Member>
 std::conditional_t<std::is_member_function_pointer<Type Class:: *>::value, MetaFuncNode, MetaDataNode> *
 MetaInfo<Class>::Member<Type, Member>::member = nullptr;
@@ -178,62 +174,14 @@ MetaPropNode * MetaInfo<Class>::Member<Type, Member>::prop = nullptr;
 
 
 template<typename Class>
-template<typename Type, typename ExtendedFunc<Class, Type>::type *Func>
+template<typename Type, Type *Func>
 MetaFuncNode * MetaInfo<Class>::FreeFunc<Type, Func>::func = nullptr;
 
 
 template<typename Class>
-template<typename Type, typename ExtendedFunc<Class, Type>::type *Func>
+template<typename Type, Type *Func>
 template<std::size_t>
 MetaPropNode * MetaInfo<Class>::FreeFunc<Type, Func>::prop = nullptr;
-
-
-template<typename Class>
-template<typename Func>
-MetaFuncNode * MetaInfo<Class>::Functor<Func>::functor = nullptr;
-
-
-template<typename Class>
-template<typename Func>
-template<std::size_t>
-MetaPropNode * MetaInfo<Class>::Functor<Func>::prop = nullptr;
-
-
-template<typename... Args>
-struct Accept {
-    template<typename>
-    using ArgType = Any::any_type;
-
-    inline static bool types(ArgType<Args>... values) {
-        bool res = true;
-        using accumulator_type = bool[];
-        accumulator_type accumulator = { res, (res = res && values == Any::type<Args>())... };
-        (void)accumulator;
-        return res;
-    }
-
-    template<std::size_t... Indexes>
-    inline static bool types(Any::any_type * const values, std::index_sequence<Indexes...>) {
-        return types(*(values+Indexes)...);
-    }
-
-    inline static bool types(Any::any_type * const values) {
-        return types(values, std::make_index_sequence<sizeof...(Args)>{});
-    }
-
-    template<std::size_t... Indexes>
-    inline static bool types(const Any * const values, std::index_sequence<Indexes...>) {
-        return types((values+Indexes)->type()...);
-    }
-
-    inline static bool types(const Any * const values) {
-        return types(values, std::make_index_sequence<sizeof...(Args)>{});
-    }
-};
-
-
-template<typename... Args>
-struct Accept<std::tuple<Args...>>: Accept<Args...> {};
 
 
 template<typename Type>
@@ -243,7 +191,10 @@ meta() ENTT_NOEXCEPT { return nullptr; }
 
 template<typename Type>
 std::enable_if_t<std::is_class<Type>::value, MetaClass *>
-meta() ENTT_NOEXCEPT { return internal::MetaInfo<std::decay_t<Type>>::clazz->meta; }
+meta() ENTT_NOEXCEPT {
+    const auto *clazz = internal::MetaInfo<std::decay_t<Type>>::clazz;
+    return clazz ? clazz->meta : nullptr;
+}
 
 
 template<typename Meta, typename Key, typename Node>
@@ -252,34 +203,151 @@ inline Meta * meta(const Key &key, Node *node) ENTT_NOEXCEPT {
 }
 
 
-template<typename Node>
-struct MetaBase {
-    virtual ~MetaBase() = default;
-    virtual Node * node() const ENTT_NOEXCEPT = 0;
+template<typename Op, typename Node>
+inline void prop(Op op, Node *curr) ENTT_NOEXCEPT {
+    while(curr) {
+        op(curr->meta);
+        curr = curr->next;
+    }
+}
 
-    inline const char * name() const ENTT_NOEXCEPT {
-        return node()->key;
+
+struct Holder {
+    virtual ~Holder() = default;
+
+    virtual const MetaClass * meta() const ENTT_NOEXCEPT = 0;
+    virtual const void * data() const ENTT_NOEXCEPT = 0;
+    virtual bool operator==(const Holder &) const ENTT_NOEXCEPT = 0;
+
+    inline MetaClass * meta() ENTT_NOEXCEPT {
+        return const_cast<MetaClass *>(const_cast<const Holder *>(this)->meta());
     }
 
-    template<typename Op>
-    inline auto prop(Op op) const ENTT_NOEXCEPT
-    -> decltype(op(std::declval<MetaProp *>()), void())
-    {
-        auto *curr = node()->prop;
-
-        while(curr) {
-            op(curr->meta);
-            curr = curr->next;
-        }
-    }
-
-    inline MetaProp * prop(const Any &key) const ENTT_NOEXCEPT {
-        return internal::meta<MetaProp>(key, node()->prop);
+    inline void * data() ENTT_NOEXCEPT {
+        return const_cast<void *>(const_cast<const Holder *>(this)->data());
     }
 };
 
 
+template<typename Type>
+struct HolderType: public Holder {
+    template<typename Object>
+    static auto compare(int, const Object &lhs, const Object &rhs)
+    -> decltype(lhs == rhs, bool{})
+    {
+        return lhs == rhs;
+    }
+
+    template<typename Object>
+    static bool compare(char, const Object &, const Object &) {
+        return false;
+    }
+
+public:
+    template<typename... Args>
+    HolderType(Args &&... args)
+        : storage{}
+    {
+        new (&storage) Type{std::forward<Args>(args)...};
+    }
+
+    ~HolderType() {
+        reinterpret_cast<Type *>(&storage)->~Type();
+    }
+
+    MetaClass * meta() const ENTT_NOEXCEPT override {
+        return entt::internal::meta<Type>();
+    }
+
+    inline const void * data() const ENTT_NOEXCEPT override {
+        return &storage;
+    }
+
+    bool operator==(const Holder &other) const ENTT_NOEXCEPT {
+        return meta() == other.meta() && compare(0, *reinterpret_cast<const Type *>(&storage), *static_cast<const Type *>(other.data()));
+    }
+
+private:
+    typename std::aligned_storage_t<sizeof(Type), alignof(Type)> storage;
+};
+
+
 }
+
+
+struct MetaAny final {
+    MetaAny() ENTT_NOEXCEPT = default;
+
+    template<typename Type>
+    MetaAny(Type &&type)
+        : actual{std::make_unique<internal::HolderType<std::decay_t<Type>>>(std::forward<Type>(type))}
+    {}
+
+    MetaAny(const MetaAny &) = delete;
+    MetaAny(MetaAny &&) = default;
+
+    MetaAny & operator=(const MetaAny &other) = delete;
+    MetaAny & operator=(MetaAny &&) = default;
+
+    inline bool valid() const ENTT_NOEXCEPT {
+        return *this;
+    }
+
+    const MetaClass * meta() const ENTT_NOEXCEPT {
+        return actual ? actual->meta() : nullptr;
+    }
+
+    MetaClass * meta() ENTT_NOEXCEPT {
+        return const_cast<MetaClass *>(const_cast<const MetaAny *>(this)->meta());
+    }
+
+    template<typename Type>
+    inline const Type & value() const ENTT_NOEXCEPT {
+        return *static_cast<const Type *>(actual->data());
+    }
+
+    template<typename Type>
+    inline Type & value() ENTT_NOEXCEPT {
+        return const_cast<Type &>(const_cast<const MetaAny *>(this)->value<Type>());
+    }
+
+    template<typename Type>
+    inline const Type * data() const ENTT_NOEXCEPT {
+        return actual ? static_cast<const Type *>(actual->data()) : nullptr;
+    }
+
+    template<typename Type>
+    inline Type * data() ENTT_NOEXCEPT {
+        return const_cast<Type *>(const_cast<const MetaAny *>(this)->data<Type>());
+    }
+
+    inline const void * data() const ENTT_NOEXCEPT {
+        return *this;
+    }
+
+    inline void * data() ENTT_NOEXCEPT {
+        return const_cast<void *>(const_cast<const MetaAny *>(this)->data());
+    }
+
+    inline operator const void *() const ENTT_NOEXCEPT {
+        return actual ? actual->data() : nullptr;
+    }
+
+    inline operator void *() ENTT_NOEXCEPT {
+        return const_cast<void *>(const_cast<const MetaAny *>(this)->data());
+    }
+
+    inline explicit operator bool() const ENTT_NOEXCEPT {
+        return static_cast<bool>(actual);
+    }
+
+    inline bool operator==(const MetaAny &other) const ENTT_NOEXCEPT {
+        return actual == other.actual || (actual && other.actual && *actual == *other.actual);
+    }
+
+private:
+    std::unique_ptr<internal::Holder> actual;
+};
 
 
 class MetaProp {
@@ -288,75 +356,161 @@ class MetaProp {
 public:
     virtual ~MetaProp() ENTT_NOEXCEPT = default;
 
-    inline const Any & key() const ENTT_NOEXCEPT {
+    inline const MetaAny & key() const ENTT_NOEXCEPT {
         return node()->key;
     }
 
-    const Any & value() const ENTT_NOEXCEPT {
+    inline const MetaAny & value() const ENTT_NOEXCEPT {
         return node()->value;
     }
 };
 
 
-class MetaCtor: public internal::MetaBase<internal::MetaCtorNode> {
-    virtual bool accept(Any::any_type * const, std::size_t) const = 0;
-    virtual Any execute(const Any * const, std::size_t) const = 0;
+class MetaCtor {
+    virtual internal::MetaCtorNode * node() const ENTT_NOEXCEPT = 0;
+    virtual bool accept(const MetaClass ** const, std::size_t) const ENTT_NOEXCEPT = 0;
+    virtual MetaAny execute(const MetaAny * const, std::size_t) const = 0;
 
 public:
     using size_type = std::size_t;
 
+    virtual ~MetaCtor() = default;
     virtual size_type size() const ENTT_NOEXCEPT = 0;
     virtual MetaClass * arg(size_type) const ENTT_NOEXCEPT = 0;
 
     template<typename... Args>
-    inline bool accept() const {
-        std::array<Any::any_type, sizeof...(Args)> types{{Any::type<Args>()...}};
+    inline bool accept() const ENTT_NOEXCEPT {
+        std::array<const MetaClass *, sizeof...(Args)> types{{internal::meta<std::decay_t<Args>>()...}};
         return accept(types.data(), sizeof...(Args));
     }
 
     template<typename... Args>
-    inline Any invoke(Args &&... args) const {
-        const std::array<const Any, sizeof...(Args)> params{{std::forward<Args>(args)...}};
+    inline MetaAny invoke(Args &&... args) const {
+        const std::array<const MetaAny, sizeof...(Args)> params{{std::forward<Args>(args)...}};
         return execute(params.data(), params.size());
+    }
+
+    template<typename Op>
+    inline auto prop(Op op) const ENTT_NOEXCEPT
+    -> decltype(op(std::declval<MetaProp *>()), void())
+    {
+        return internal::prop(std::move(op), node()->prop);
+    }
+
+    inline MetaProp * prop(const MetaAny &key) const ENTT_NOEXCEPT {
+        return internal::meta<MetaProp>(key, node()->prop);
     }
 };
 
 
-struct MetaData: public internal::MetaBase<internal::MetaDataNode> {
+class MetaDtor {
+    virtual internal::MetaDtorNode * node() const ENTT_NOEXCEPT = 0;
+
+public:
+    virtual ~MetaDtor() = default;
+    virtual void invoke(void *) = 0;
+
+    template<typename Op>
+    inline auto prop(Op op) const ENTT_NOEXCEPT
+    -> decltype(op(std::declval<MetaProp *>()), void())
+    {
+        return internal::prop(std::move(op), node()->prop);
+    }
+
+    inline MetaProp * prop(const MetaAny &key) const ENTT_NOEXCEPT {
+        return internal::meta<MetaProp>(key, node()->prop);
+    }
+};
+
+class MetaData {
+    virtual internal::MetaDataNode * node() const ENTT_NOEXCEPT = 0;
+
+public:
+    virtual ~MetaData() = default;
     virtual MetaClass * type() const ENTT_NOEXCEPT = 0;
     virtual bool constant() const ENTT_NOEXCEPT = 0;
-    virtual Any get(const void *) const ENTT_NOEXCEPT = 0;
-    virtual void set(void *, const Any &) = 0;
+    virtual MetaAny get(const void *) const ENTT_NOEXCEPT = 0;
+    virtual void set(void *, const MetaAny &) = 0;
+
+    inline const char * name() const ENTT_NOEXCEPT {
+        return node()->key;
+    }
+
+    template<typename Type>
+    bool accept() const ENTT_NOEXCEPT {
+        return type() == internal::meta<Type>();
+    }
+
+    template<typename Op>
+    inline auto prop(Op op) const ENTT_NOEXCEPT
+    -> decltype(op(std::declval<MetaProp *>()), void())
+    {
+        return internal::prop(std::move(op), node()->prop);
+    }
+
+    inline MetaProp * prop(const MetaAny &key) const ENTT_NOEXCEPT {
+        return internal::meta<MetaProp>(key, node()->prop);
+    }
 };
 
 
-class MetaFunc: public internal::MetaBase<internal::MetaFuncNode> {
-    virtual bool accept(Any::any_type * const, std::size_t) const = 0;
-    virtual Any execute(const void *, const Any *, std::size_t) const = 0;
-    virtual Any execute(void *, const Any *, std::size_t) = 0;
+class MetaFunc {
+    virtual internal::MetaFuncNode * node() const ENTT_NOEXCEPT = 0;
+    virtual bool accept(const MetaClass ** const, std::size_t) const ENTT_NOEXCEPT = 0;
+    virtual MetaAny execute(const void *, const MetaAny *, std::size_t) const = 0;
+    virtual MetaAny execute(void *, const MetaAny *, std::size_t) = 0;
 
 public:
     using size_type = std::size_t;
 
+    virtual ~MetaFunc() = default;
     virtual size_type size() const ENTT_NOEXCEPT = 0;
     virtual MetaClass * ret() const ENTT_NOEXCEPT = 0;
     virtual MetaClass * arg(size_type) const ENTT_NOEXCEPT = 0;
 
+    inline const char * name() const ENTT_NOEXCEPT {
+        return node()->key;
+    }
+
+    template<typename Type>
+    inline bool ret() const ENTT_NOEXCEPT {
+        return ret() == internal::meta<std::decay_t<Type>>();
+    }
+
     template<typename... Args>
-    inline bool accept() const {
-        std::array<Any::any_type, sizeof...(Args)> types{{Any::type<Args>()...}};
+    inline bool accept() const ENTT_NOEXCEPT {
+        std::array<const MetaClass *, sizeof...(Args)> types{{internal::meta<std::decay_t<Args>>()...}};
         return accept(types.data(), sizeof...(Args));
     }
 
-    template<typename Instance, typename... Args>
-    inline Any invoke(Instance *instance, Args &&... args) const {
-        const std::array<const Any, sizeof...(Args)> params{{std::forward<Args>(args)...}};
+    template<typename... Args>
+    inline MetaAny invoke(const void *instance, Args &&... args) const {
+        const std::array<const MetaAny, sizeof...(Args)> params{{std::forward<Args>(args)...}};
         return execute(instance, params.data(), params.size());
+    }
+
+    template<typename... Args>
+    inline MetaAny invoke(void *instance, Args &&... args) {
+        const std::array<const MetaAny, sizeof...(Args)> params{{std::forward<Args>(args)...}};
+        return execute(instance, params.data(), params.size());
+    }
+
+    template<typename Op>
+    inline auto prop(Op op) const ENTT_NOEXCEPT
+    -> decltype(op(std::declval<MetaProp *>()), void())
+    {
+        return internal::prop(std::move(op), node()->prop);
+    }
+
+    inline MetaProp * prop(const MetaAny &key) const ENTT_NOEXCEPT {
+        return internal::meta<MetaProp>(key, node()->prop);
     }
 };
 
 
-class MetaClass: public internal::MetaBase<internal::MetaClassNode> {
+class MetaClass {
+    virtual internal::MetaClassNode * node() const ENTT_NOEXCEPT = 0;
+
     template<typename Node, typename Op>
     inline void all(Node *curr, Op op) const ENTT_NOEXCEPT {
         while(curr) {
@@ -368,10 +522,27 @@ class MetaClass: public internal::MetaBase<internal::MetaClassNode> {
 public:
     using size_type = std::size_t;
 
+    virtual ~MetaClass() = default;
     virtual void destroy(void *) = 0;
 
-    inline MetaCtor * ctor(const char *str) const ENTT_NOEXCEPT {
-        return internal::meta<MetaCtor>(str, node()->ctor);
+    inline const char * name() const ENTT_NOEXCEPT {
+        return node()->key;
+    }
+
+    template<typename... Args>
+    MetaCtor * ctor() const ENTT_NOEXCEPT {
+        auto *curr = node()->ctor;
+
+        while(curr && !curr->meta->accept<Args...>()) {
+            curr = curr->next;
+        }
+
+        assert(curr);
+        return curr->meta;
+    }
+
+    inline MetaDtor * dtor() const ENTT_NOEXCEPT {
+        return node()->dtor ? node()->dtor->meta : nullptr;
     }
 
     inline MetaData * data(const char *str) const ENTT_NOEXCEPT {
@@ -390,6 +561,13 @@ public:
     }
 
     template<typename Op>
+    inline auto dtor(Op op) const ENTT_NOEXCEPT
+    -> decltype(op(std::declval<MetaDtor *>()), void())
+    {
+        op(node()->dtor);
+    }
+
+    template<typename Op>
     inline auto data(Op op) const ENTT_NOEXCEPT
     -> decltype(op(std::declval<MetaData *>()), void())
     {
@@ -404,17 +582,19 @@ public:
     }
 
     template<typename... Args>
-    Any construct(Args &&... args) const {
-        auto *curr = node()->ctor;
-        Any any;
+    MetaAny construct(Args &&... args) const {
+        return ctor<Args...>()->invoke(std::forward<Args>(args)...);
+    }
 
-        while(curr && !curr->meta->accept<Args...>()) {
-            curr = curr->next;
-        }
+    template<typename Op>
+    inline auto prop(Op op) const ENTT_NOEXCEPT
+    -> decltype(op(std::declval<MetaProp *>()), void())
+    {
+        return internal::prop(std::move(op), node()->prop);
+    }
 
-        assert(curr);
-
-        return curr->meta->invoke(std::forward<Args>(args)...);
+    inline MetaProp * prop(const MetaAny &key) const ENTT_NOEXCEPT {
+        return internal::meta<MetaProp>(key, node()->prop);
     }
 };
 
@@ -422,10 +602,51 @@ public:
 namespace internal {
 
 
+template<typename... Args>
+struct Accept {
+    template<typename>
+    using ArgType = const MetaClass *;
+
+    static bool types(ArgType<Args>... values) {
+        bool res = true;
+        using accumulator_type = bool[];
+        accumulator_type accumulator = { res, (res = res && values == meta<Args>())... };
+        (void)accumulator;
+        return res;
+    }
+
+    template<std::size_t... Indexes>
+    inline static bool types(const MetaClass ** const values, std::index_sequence<Indexes...>) {
+        return types(*(values+Indexes)...);
+    }
+
+    inline static bool types(const MetaClass ** const values) {
+        return types(values, std::make_index_sequence<sizeof...(Args)>{});
+    }
+
+    template<std::size_t... Indexes>
+    inline static bool types(const MetaAny * const values, std::index_sequence<Indexes...>) {
+        return types((values+Indexes)->meta()...);
+    }
+
+    inline static bool types(const MetaAny * const values) {
+        return types(values, std::make_index_sequence<sizeof...(Args)>{});
+    }
+};
+
+
 template<std::size_t Index, typename Class, typename... Args>
 class MetaCtorPropType final: public MetaProp {
     internal::MetaPropNode * node() const ENTT_NOEXCEPT override {
         return internal::MetaInfo<Class>::template Ctor<Args...>::template prop<Index>;
+    }
+};
+
+
+template<std::size_t Index, typename Class, void(*Func)(Class &)>
+class MetaDtorPropType final: public MetaProp {
+    internal::MetaPropNode * node() const ENTT_NOEXCEPT override {
+        return internal::MetaInfo<Class>::template Dtor<Func>::template prop<Index>;
     }
 };
 
@@ -438,18 +659,10 @@ class MetaMemberPropType final: public MetaProp {
 };
 
 
-template<std::size_t Index, typename Class, typename Type, typename ExtendedFunc<Class, Type>::type *Func>
+template<std::size_t Index, typename Class, typename Type, Type *Func>
 class MetaFunctionPropType final: public MetaProp {
     internal::MetaPropNode * node() const ENTT_NOEXCEPT override {
         return internal::MetaInfo<Class>::template FreeFunc<Type, Func>::template prop<Index>;
-    }
-};
-
-
-template<std::size_t Index, typename Class, typename Type, typename Func>
-class MetaFunctorPropType final: public MetaProp {
-    internal::MetaPropNode * node() const ENTT_NOEXCEPT override {
-        return internal::MetaInfo<Class>::template Functor<Type, Func>::template prop<Index>;
     }
 };
 
@@ -465,8 +678,8 @@ class MetaClassPropType final: public MetaProp {
 template<typename Class, typename... Args>
 class MetaCtorType final: public MetaCtor {
     template<std::size_t... Indexes>
-    static auto ctor(const Any *args, std::index_sequence<Indexes...>) {
-        return Any{Class{(args+Indexes)->value<std::decay_t<Args>>()...}};
+    static auto ctor(const MetaAny *args, std::index_sequence<Indexes...>) {
+        return MetaAny{Class{(args+Indexes)->value<std::decay_t<Args>>()...}};
     }
 
     template<std::size_t... Indexes>
@@ -478,13 +691,13 @@ class MetaCtorType final: public MetaCtor {
         return internal::MetaInfo<Class>::template Ctor<Args...>::ctor;
     }
 
-    bool accept(Any::any_type * const types, std::size_t sz) const override {
+    bool accept(const MetaClass ** const types, std::size_t sz) const ENTT_NOEXCEPT override {
         return sz == sizeof...(Args) && Accept<std::decay_t<Args>...>::types(types);
     }
 
-    Any execute(const Any *args, std::size_t sz) const override {
+    MetaAny execute(const MetaAny *args, std::size_t sz) const override {
         return sz == sizeof...(Args) && Accept<std::decay_t<Args>...>::types(args)
-                  ? ctor(args, std::make_index_sequence<sizeof...(Args)>{}) : Any{};
+                  ? ctor(args, std::make_index_sequence<sizeof...(Args)>{}) : MetaAny{};
     }
 
 public:
@@ -498,20 +711,33 @@ public:
 };
 
 
+template<typename Class, void(*Func)(Class &)>
+class MetaDtorType: public MetaDtor {
+    internal::MetaDtorNode * node() const ENTT_NOEXCEPT override {
+        return internal::MetaInfo<Class>::template Dtor<Func>::dtor;
+    }
+
+public:
+    void invoke(void *instance) override {
+        (*Func)(*static_cast<Class *>(instance));
+    }
+};
+
+
 template<typename Class, typename Type, Type Class:: *Member>
 class MetaDataType final: public MetaData {
     static_assert(std::is_member_object_pointer<Type Class:: *>::value, "!");
 
     template<bool Const>
     inline static std::enable_if_t<!Const>
-    set(void *instance, const Any &any) {
-        assert(Any::type<Type>() == any.type());
+    set(void *instance, const MetaAny &any) {
+        assert(internal::meta<std::decay_t<Type>>() == any.meta());
         static_cast<Class *>(instance)->*Member = any.value<std::decay_t<Type>>();
     }
 
     template<bool Const>
     inline static std::enable_if_t<Const>
-    set(void *, const Any &) { assert(false); }
+    set(void *, const MetaAny &) { assert(false); }
 
     internal::MetaDataNode * node() const ENTT_NOEXCEPT override {
         return internal::MetaInfo<Class>::template Member<Type, Member>::member;
@@ -526,217 +752,170 @@ public:
         return std::is_const<Type>::value;
     }
 
-    Any get(const void *instance) const ENTT_NOEXCEPT override {
-        return Any{static_cast<const Class *>(instance)->*Member};
+    MetaAny get(const void *instance) const ENTT_NOEXCEPT override {
+        return MetaAny{static_cast<const Class *>(instance)->*Member};
     }
 
-    void set(void *instance, const Any &any) override {
+    void set(void *instance, const MetaAny &any) override {
         return set<std::is_const<Type>::value>(instance, any);
     }
 };
 
 
-template<typename Class, typename Type, Type Class:: *Member>
-class MetaFuncType final: public MetaFunc {
-    static_assert(std::is_member_function_pointer<Type Class:: *>::value, "!");
+template<typename Class, typename Type>
+class MetaFuncBaseType;
 
-    using func_type = FuncType<Type>;
 
-    template<typename>
-    struct Invoker;
-
-    template<typename... Args>
-    struct Invoker<std::tuple<Args...>> {
-        template<typename Ret, typename Instance, std::size_t... Indexes>
-        static auto invoke(int, Instance *instance, const Any *args, std::index_sequence<Indexes...>)
-        -> std::enable_if_t<std::is_void<Ret>::value, decltype((std::declval<std::conditional_t<std::is_const<Instance>::value, const Class, Class>>().*Member)(std::declval<Args>()...), Any{})>
-        {
-            auto *object = static_cast<std::conditional_t<std::is_const<Instance>::value, const Class, Class> *>(instance);
-            (object->*Member)((args+Indexes)->value<std::decay_t<Args>>()...);
-            return Any{};
-        }
-
-        template<typename Ret, typename Instance, std::size_t... Indexes>
-        static auto invoke(int, Instance *instance, const Any *args, std::index_sequence<Indexes...>)
-        -> std::enable_if_t<!std::is_void<Ret>::value, decltype((std::declval<std::conditional_t<std::is_const<Instance>::value, const Class, Class>>().*Member)(std::declval<Args>()...), Any{})>
-        {
-            auto *object = static_cast<std::conditional_t<std::is_const<Instance>::value, const Class, Class> *>(instance);
-            return Any{(object->*Member)((args+Indexes)->value<std::decay_t<Args>>()...)};
-        }
-
-        template<typename, typename Instance, std::size_t... Indexes>
-        static Any invoke(char, Instance *, const Any *, std::index_sequence<Indexes...>) {
-            assert(false);
-            return Any{};
-        }
-    };
-
-    template<std::size_t... Indexes>
-    inline static MetaClass * arg(size_type index, std::index_sequence<Indexes...>) {
-        return std::array<MetaClass *, sizeof...(Indexes)>{{meta<std::decay_t<std::tuple_element_t<Indexes, typename func_type::args_type>>>()...}}[index];
-    }
-
-    internal::MetaFuncNode * node() const ENTT_NOEXCEPT override {
-        return internal::MetaInfo<Class>::template Member<Type, Member>::member;
-    }
-
-    bool accept(Any::any_type * const types, std::size_t sz) const override {
-        return sz == func_type::size && Accept<typename func_type::args_type>::types(types);
-    }
-
-    Any execute(const void *instance, const Any *args, std::size_t sz) const override {
-        return sz == func_type::size && Accept<typename func_type::args_type>::types(args)
-                ? Invoker<typename func_type::args_type>::template invoke<typename func_type::return_type>(0, instance, args, std::make_index_sequence<func_type::size>{})
-                : Any{};
-    }
-
-    Any execute(void *instance, const Any *args, std::size_t sz) override {
-        return sz == func_type::size && Accept<typename func_type::args_type>::types(args)
-                ? Invoker<typename func_type::args_type>::template invoke<typename func_type::return_type>(0, instance, args, std::make_index_sequence<func_type::size>{})
-                : Any{};
+template<typename Class, typename Ret, typename... Args>
+class MetaFuncBaseType<Class, Ret(Args...)>: public MetaFunc {
+    bool accept(const MetaClass ** const types, std::size_t sz) const ENTT_NOEXCEPT override {
+        return sz == sizeof...(Args) && Accept<Args...>::types(types);
     }
 
 public:
     size_type size() const ENTT_NOEXCEPT override {
-        return func_type::size;
+        return sizeof...(Args);
     }
 
     MetaClass * ret() const ENTT_NOEXCEPT override {
-        return meta<typename func_type::return_type>();
+        return meta<std::decay_t<Ret>>();
     }
 
     MetaClass * arg(size_type index) const ENTT_NOEXCEPT override {
-        return index < func_type::size ? arg(index, std::make_index_sequence<func_type::size>{}) : nullptr;
+        return index < sizeof...(Args) ? std::array<MetaClass *, sizeof...(Args)>{{meta<std::decay_t<Args>>()...}}[index] : nullptr;
     }
 };
 
 
-template<typename Class, typename Type, typename ExtendedFunc<Class, Type>::type *Func>
-class MetaFreeFuncType final: public MetaFunc {
-    static_assert(std::is_function<Type>::value, "!");
+template<typename Class, typename Type, Type Class:: *>
+class MetaFuncType;
 
-    using func_type = FuncType<Type>;
 
-    template<typename>
-    struct Invoker;
-
-    template<typename... Args>
-    struct Invoker<std::tuple<Args...>> {
-        template<typename Ret, std::size_t... Indexes>
-        static std::enable_if_t<std::is_void<Ret>::value, Any>
-        invoke(const void *instance, const Any *args, std::index_sequence<Indexes...>) {
-            (*Func)(*static_cast<const Class *>(instance), (args+Indexes)->value<std::decay_t<Args>>()...);
-            return Any{};
-        }
-
-        template<typename Ret, std::size_t... Indexes>
-        static std::enable_if_t<!std::is_void<Ret>::value, Any>
-        invoke(const void *instance, const Any *args, std::index_sequence<Indexes...>) {
-            return Any{(*Func)(*static_cast<const Class *>(instance), (args+Indexes)->value<std::decay_t<Args>>()...)};
-        }
-    };
+template<typename Class, typename Ret, typename... Args, Ret(Class:: *Member)(Args...)>
+class MetaFuncType<Class, Ret(Args...), Member>: public MetaFuncBaseType<Class, Ret(Args...)> {
+    template<std::size_t... Indexes>
+    static auto invoke(int, Class *instance, const MetaAny *args, std::index_sequence<Indexes...>)
+    -> decltype(MetaAny{(instance->*Member)(std::declval<Args>()...)}, MetaAny{})
+    {
+        return MetaAny{(instance->*Member)((args+Indexes)->value<std::decay_t<Args>>()...)};
+    }
 
     template<std::size_t... Indexes>
-    inline static MetaClass * arg(size_type index, std::index_sequence<Indexes...>) {
-        return std::array<MetaClass *, sizeof...(Indexes)>{{meta<std::decay_t<std::tuple_element_t<Indexes, typename func_type::args_type>>>()...}}[index];
+    static MetaAny invoke(char, Class *instance, const MetaAny *args, std::index_sequence<Indexes...>) {
+        (instance->*Member)((args+Indexes)->value<std::decay_t<Args>>()...);
+        return MetaAny{};
     }
 
     internal::MetaFuncNode * node() const ENTT_NOEXCEPT override {
-        return internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func;
+        return internal::MetaInfo<Class>::template Member<Ret(Args...), Member>::member;
     }
 
-    bool accept(Any::any_type * const types, std::size_t sz) const override {
-        return sz == func_type::size && Accept<typename func_type::args_type>::types(types);
+    MetaAny execute(const void *, const MetaAny *, std::size_t) const override {
+        assert(false);
+        return MetaAny{};
     }
 
-    Any execute(const void *instance, const Any *args, size_type sz) const override {
-        return sz == func_type::size && Accept<typename func_type::args_type>::types(args)
-                ? Invoker<typename func_type::args_type>::template invoke<typename func_type::return_type>(instance, args, std::make_index_sequence<func_type::size>{})
-                : Any{};
-    }
-
-    Any execute(void *instance, const Any *args, size_type sz) override {
-        return execute(static_cast<const void *>(instance), args, sz);
-    }
-
-public:
-    size_type size() const ENTT_NOEXCEPT override {
-        return func_type::size;
-    }
-
-    MetaClass * ret() const ENTT_NOEXCEPT override {
-        return meta<typename func_type::return_type>();
-    }
-
-    MetaClass * arg(size_type index) const ENTT_NOEXCEPT override {
-        return index < func_type::size ? arg(index, std::make_index_sequence<func_type::size>{}) : nullptr;
+    MetaAny execute(void *instance, const MetaAny *args, std::size_t sz) override {
+        return sz == sizeof...(Args) && Accept<Args...>::types(args)
+                ? invoke(0, static_cast<Class *>(instance), args, std::make_index_sequence<sizeof...(Args)>{})
+                : MetaAny{};
     }
 };
 
 
-template<typename Class, typename Type, typename Func>
-class MetaFunctorType final: public MetaFunc, public Func {
-    static_assert(std::is_function<Type>::value, "!");
-
-    using func_type = FuncType<Type>;
-
-    template<typename>
-    struct Invoker;
-
-    template<typename... Args>
-    struct Invoker<std::tuple<Args...>> {
-        template<typename Ret, typename Op, std::size_t... Indexes>
-        static std::enable_if_t<std::is_void<Ret>::value, Any>
-        invoke(Op &op, const void *instance, const Any *args, std::index_sequence<Indexes...>) {
-            op(*static_cast<const Class *>(instance), (args+Indexes)->value<std::decay_t<Args>>()...);
-            return Any{};
-        }
-
-        template<typename Ret, typename Op, std::size_t... Indexes>
-        static std::enable_if_t<!std::is_void<Ret>::value, Any>
-        invoke(Op &op, const void *instance, const Any *args, std::index_sequence<Indexes...>) {
-            return Any{op(*static_cast<const Class *>(instance), (args+Indexes)->value<std::decay_t<Args>>()...)};
-        }
-    };
+template<typename Class, typename Ret, typename... Args, Ret(Class:: *Member)(Args...) const>
+class MetaFuncType<Class, Ret(Args...) const, Member>: public MetaFuncBaseType<Class, Ret(Args...)> {
+    template<std::size_t... Indexes>
+    static auto invoke(int, const Class *instance, const MetaAny *args, std::index_sequence<Indexes...>)
+    -> decltype(MetaAny{(instance->*Member)(std::declval<Args>()...)}, MetaAny{})
+    {
+        return MetaAny{(instance->*Member)((args+Indexes)->value<std::decay_t<Args>>()...)};
+    }
 
     template<std::size_t... Indexes>
-    inline static MetaClass * arg(size_type index, std::index_sequence<Indexes...>) {
-        return std::array<MetaClass *, sizeof...(Indexes)>{{meta<std::decay_t<std::tuple_element_t<Indexes, typename func_type::args_type>>>()...}}[index];
+    static MetaAny invoke(char, const Class *instance, const MetaAny *args, std::index_sequence<Indexes...>) {
+        (instance->*Member)((args+Indexes)->value<std::decay_t<Args>>()...);
+        return MetaAny{};
     }
 
     internal::MetaFuncNode * node() const ENTT_NOEXCEPT override {
-        return internal::MetaInfo<Class>::template Functor<Func>::functor;
+        return internal::MetaInfo<Class>::template Member<Ret(Args...) const, Member>::member;
     }
 
-    bool accept(Any::any_type * const types, std::size_t sz) const override {
-        return sz == func_type::size && Accept<typename func_type::args_type>::types(types);
+    MetaAny execute(const void *instance, const MetaAny *args, std::size_t sz) const override {
+        return sz == sizeof...(Args) && Accept<Args...>::types(args)
+                ? invoke(0, static_cast<const Class *>(instance), args, std::make_index_sequence<sizeof...(Args)>{})
+                : MetaAny{};
     }
 
-    Any execute(const void *instance, const Any *args, size_type sz) const override {
-        return sz == func_type::size && Accept<typename func_type::args_type>::types(args)
-                ? Invoker<typename func_type::args_type>::template invoke<typename func_type::return_type>(*this, instance, args, std::make_index_sequence<func_type::size>{})
-                : Any{};
-    }
-
-    Any execute(void *instance, const Any *args, size_type sz) override {
+    MetaAny execute(void *instance, const MetaAny *args, std::size_t sz) override {
         return execute(static_cast<const void *>(instance), args, sz);
     }
+};
 
+
+template<typename, typename Type, Type *>
+struct MetaFreeFuncType;
+
+
+template<typename Class, typename Instance, typename Ret, typename... Args, Ret(*Func)(Instance &, Args...)>
+struct MetaFreeFuncType<Class, Ret(Instance &, Args...), Func>: public MetaFunc {
+    template<std::size_t... Indexes>
+    static auto invoke(int, Instance *instance, const MetaAny *args, std::index_sequence<Indexes...>)
+    -> decltype(MetaAny{(*Func)(*instance, std::declval<Args>()...)}, MetaAny{})
+    {
+        return MetaAny{(*Func)(*instance, (args+Indexes)->value<std::decay_t<Args>>()...)};
+    }
+
+    template<std::size_t... Indexes>
+    static MetaAny invoke(char, Instance *instance, const MetaAny *args, std::index_sequence<Indexes...>) {
+        (*Func)(*instance, (args+Indexes)->value<std::decay_t<Args>>()...);
+        return MetaAny{};
+    }
+
+    internal::MetaFuncNode * node() const ENTT_NOEXCEPT override {
+        return internal::MetaInfo<Class>::template FreeFunc<Ret(Instance &, Args...), Func>::func;
+    }
+
+    bool accept(const MetaClass ** const types, std::size_t sz) const ENTT_NOEXCEPT override {
+        return sz == sizeof...(Args) && Accept<Args...>::types(types);
+    }
+
+    template<bool Const>
+    std::enable_if_t<Const, MetaAny>
+    execute(const void *instance, const MetaAny *args, size_type sz) const {
+        return sz == sizeof...(Args) && Accept<Args...>::types(args)
+                ? invoke(0, static_cast<const Class *>(instance), args, std::make_index_sequence<sizeof...(Args)>{})
+                : MetaAny{};
+    }
+
+    template<bool Const>
+    std::enable_if_t<!Const, MetaAny>
+    execute(const void *, const MetaAny *, size_type) const {
+        assert(false);
+        return MetaAny{};
+    }
+
+    MetaAny execute(const void *instance, const MetaAny *args, size_type sz) const override {
+        return execute<std::is_const<Instance>::value>(instance, args, sz);
+    }
+
+    MetaAny execute(void *instance, const MetaAny *args, size_type sz) override {
+        return sz == sizeof...(Args) && Accept<Args...>::types(args)
+                ? invoke(0, static_cast<Class *>(instance), args, std::make_index_sequence<sizeof...(Args)>{})
+                : MetaAny{};
+    }
 public:
-    MetaFunctorType(Func func)
-        : Func{std::move(func)}
-    {}
-
     size_type size() const ENTT_NOEXCEPT override {
-        return func_type::size;
+        return sizeof...(Args);
     }
 
     MetaClass * ret() const ENTT_NOEXCEPT override {
-        return meta<typename func_type::return_type>();
+        return meta<std::decay_t<Ret>>();
     }
 
     MetaClass * arg(size_type index) const ENTT_NOEXCEPT override {
-        return index < func_type::size ? arg(index, std::make_index_sequence<func_type::size>{}) : nullptr;
+        return index < sizeof...(Args) ? std::array<MetaClass *, sizeof...(Args)>{{meta<std::decay_t<Args>>()...}}[index] : nullptr;
     }
 };
 
@@ -749,7 +928,9 @@ class MetaClassType final: public MetaClass {
 
 public:
     void destroy(void *instance) override {
-        static_cast<Class *>(instance)->~Class();
+        return internal::MetaInfo<Class>::clazz->dtor
+                ? internal::MetaInfo<Class>::clazz->dtor->meta->invoke(instance)
+                : static_cast<Class *>(instance)->~Class();
     }
 };
 
@@ -767,9 +948,11 @@ template<typename Class>
 class MetaFactory final {
     template<std::size_t Index, typename Property>
     static void clazz(const Property &property) {
+        static const MetaAny key{property.first};
+        static const MetaAny value{property.second};
         static internal::MetaClassPropType<Index, Class> meta{};
-        static internal::MetaPropNode node{property.first, property.second, internal::MetaInfo<Class>::clazz->prop, &meta};
-        assert(!internal::meta<MetaProp>(property.first, internal::MetaInfo<Class>::clazz->prop));
+        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::clazz->prop, &meta};
+        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::clazz->prop));
         assert(!internal::MetaInfo<Class>::template prop<Index>);
         internal::MetaInfo<Class>::template prop<Index> = &node;
         internal::MetaInfo<Class>::clazz->prop = &node;
@@ -784,9 +967,11 @@ class MetaFactory final {
 
     template<std::size_t Index, typename... Args, typename Property>
     static void ctor(const Property &property) {
+        static const MetaAny key{property.first};
+        static const MetaAny value{property.second};
         static internal::MetaCtorPropType<Index, Class, Args...> meta{};
-        static internal::MetaPropNode node{property.first, property.second, internal::MetaInfo<Class>::template Ctor<Args...>::ctor->prop, &meta};
-        assert(!internal::meta<MetaProp>(property.first, internal::MetaInfo<Class>::template Ctor<Args...>::ctor->prop));
+        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::template Ctor<Args...>::ctor->prop, &meta};
+        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::template Ctor<Args...>::ctor->prop));
         assert(!internal::MetaInfo<Class>::template Ctor<Args...>::template prop<Index>);
         internal::MetaInfo<Class>::template Ctor<Args...>::template prop<Index> = &node;
         internal::MetaInfo<Class>::template Ctor<Args...>::ctor->prop = &node;
@@ -799,11 +984,32 @@ class MetaFactory final {
         (void)accumulator;
     }
 
+    template<std::size_t Index, void(*Func)(Class &), typename Property>
+    static void dtor(const Property &property) {
+        static const MetaAny key{property.first};
+        static const MetaAny value{property.second};
+        static internal::MetaDtorPropType<Index, Class, Func> meta{};
+        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::template Dtor<Func>::dtor->prop, &meta};
+        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::template Dtor<Func>::dtor->prop));
+        assert(!internal::MetaInfo<Class>::template Dtor<Func>::template prop<Index>);
+        internal::MetaInfo<Class>::template Dtor<Func>::template prop<Index> = &node;
+        internal::MetaInfo<Class>::template Dtor<Func>::dtor->prop = &node;
+    }
+
+    template<void(*Func)(Class &), std::size_t... Indexes, typename... Property>
+    static void dtor(std::index_sequence<Indexes...>, Property &&... property) {
+        using accumulator_type = int[];
+        accumulator_type accumulator = { 0, (dtor<Indexes, Func>(std::forward<Property>(property)), 0)... };
+        (void)accumulator;
+    }
+
     template<std::size_t Index, typename Type, Type Class:: *Member, typename Property>
     static void member(const Property &property) {
+        static const MetaAny key{property.first};
+        static const MetaAny value{property.second};
         static internal::MetaMemberPropType<Index, Class, Type, Member> meta{};
-        static internal::MetaPropNode node{property.first, property.second, internal::MetaInfo<Class>::template Member<Type, Member>::member->prop, &meta};
-        assert(!internal::meta<MetaProp>(property.first, internal::MetaInfo<Class>::template Member<Type, Member>::member->prop));
+        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::template Member<Type, Member>::member->prop, &meta};
+        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::template Member<Type, Member>::member->prop));
         assert((!internal::MetaInfo<Class>::template Member<Type, Member>::template prop<Index>));
         internal::MetaInfo<Class>::template Member<Type, Member>::template prop<Index> = &node;
         internal::MetaInfo<Class>::template member<Type, Member>->prop = &node;
@@ -816,37 +1022,22 @@ class MetaFactory final {
         (void)accumulator;
     }
 
-    template<std::size_t Index, typename Type, typename internal::ExtendedFunc<Class, Type>::type *Func, typename Property>
-    static void attached(const Property &property) {
+    template<std::size_t Index, typename Type, Type *Func, typename Property>
+    static void func(const Property &property) {
+        static const MetaAny key{property.first};
+        static const MetaAny value{property.second};
         static internal::MetaFunctionPropType<Index, Class, Type, Func> meta{};
-        static internal::MetaPropNode node{property.first, property.second, internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func->prop, &meta};
-        assert(!internal::meta<MetaProp>(property.first, internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func->prop));
+        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func->prop, &meta};
+        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func->prop));
         assert((!internal::MetaInfo<Class>::template FreeFunc<Type, Func>::template prop<Index>));
         internal::MetaInfo<Class>::template FreeFunc<Type, Func>::template prop<Index> = &node;
         internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func->prop = &node;
     }
 
-    template<typename Type, typename internal::ExtendedFunc<Class, Type>::type *Func, std::size_t... Indexes, typename... Property>
-    static void attached(std::index_sequence<Indexes...>, Property &&... property) {
+    template<typename Type, Type *Func, std::size_t... Indexes, typename... Property>
+    static void func(std::index_sequence<Indexes...>, Property &&... property) {
         using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (attached<Indexes, Type, Func>(std::forward<Property>(property)), 0)... };
-        (void)accumulator;
-    }
-
-    template<std::size_t Index, typename Type, typename Func, typename Property>
-    static void attached(const Property &property) {
-        static internal::MetaFunctorPropType<Index, Class, Type, Func> meta{};
-        static internal::MetaPropNode node{property.first, property.second, internal::MetaInfo<Class>::template Functor<Func>::functor->prop, &meta};
-        assert(!internal::meta<MetaProp>(property.first, internal::MetaInfo<Class>::template Functor<Func>::functor->prop));
-        assert((!internal::MetaInfo<Class>::template Functor<Type, Func>::template prop<Index>));
-        internal::MetaInfo<Class>::template Functor<Type, Func>::template prop<Index> = &node;
-        internal::MetaInfo<Class>::template Functor<Func>::functor->prop = &node;
-    }
-
-    template<typename Type, typename Func, std::size_t... Indexes, typename... Property>
-    static void attached(std::index_sequence<Indexes...>, Property &&... property) {
-        using accumulator_type = int[];
-        accumulator_type accumulator = { 0, (attached<Indexes, Type, Func>(std::forward<Property>(property)), 0)... };
+        accumulator_type accumulator = { 0, (func<Indexes, Type, Func>(std::forward<Property>(property)), 0)... };
         (void)accumulator;
     }
 
@@ -865,14 +1056,25 @@ public:
     }
 
     template<typename... Args, typename... Property>
-    static MetaFactory ctor(const char *str, Property &&... property) ENTT_NOEXCEPT {
+    static MetaFactory ctor(Property &&... property) ENTT_NOEXCEPT {
         static internal::MetaCtorType<Class, Args...> meta{};
-        static internal::MetaCtorNode node{HashedString{str}, internal::MetaInfo<Class>::clazz->ctor, &meta};
-        assert(!internal::meta<MetaCtor>(HashedString{str}, internal::MetaInfo<Class>::clazz->ctor));
+        static internal::MetaCtorNode node{internal::MetaInfo<Class>::clazz->ctor, &meta};
         assert(!internal::MetaInfo<Class>::template Ctor<Args...>::ctor);
         internal::MetaInfo<Class>::template Ctor<Args...>::ctor = &node;
         internal::MetaInfo<Class>::clazz->ctor = &node;
         ctor<Args...>(std::make_index_sequence<sizeof...(Property)>{}, std::forward<Property>(property)...);
+        return MetaFactory<Class>{};
+    }
+
+    template<void(*Func)(Class &), typename... Property>
+    static MetaFactory dtor(Property &&... property) ENTT_NOEXCEPT {
+        static internal::MetaDtorType<Class, Func> meta{};
+        static internal::MetaDtorNode node{&meta};
+        assert(!internal::MetaInfo<Class>::clazz->dtor);
+        assert(!internal::MetaInfo<Class>::template Dtor<Func>::dtor);
+        internal::MetaInfo<Class>::template Dtor<Func>::dtor = &node;
+        internal::MetaInfo<Class>::clazz->dtor = &node;
+        dtor<Func>(std::make_index_sequence<sizeof...(Property)>{}, std::forward<Property>(property)...);
         return MetaFactory<Class>{};
     }
 
@@ -900,7 +1102,7 @@ public:
         return MetaFactory<Class>{};
     }
 
-    template<typename Type, typename internal::ExtendedFunc<Class, Type>::type *Func, typename... Property>
+    template<typename Type, Type *Func, typename... Property>
     static MetaFactory func(const char *str, Property &&... property) ENTT_NOEXCEPT {
         static typename internal::MetaFreeFuncType<Class, Type, Func> meta{};
         static internal::MetaFuncNode node{HashedString{str}, internal::MetaInfo<Class>::clazz->func, &meta};
@@ -908,19 +1110,7 @@ public:
         assert((!internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func));
         internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func = &node;
         internal::MetaInfo<Class>::clazz->func = &node;
-        attached<Type, Func>(std::make_index_sequence<sizeof...(Property)>{}, std::forward<Property>(property)...);
-        return MetaFactory<Class>{};
-    }
-
-    template<typename Type, typename Func, typename... Property>
-    static MetaFactory func(const char *str, Func func, Property &&... property) ENTT_NOEXCEPT {
-        static typename internal::MetaFunctorType<Class, Type, Func> meta{std::move(func)};
-        static internal::MetaFuncNode node{HashedString{str}, internal::MetaInfo<Class>::clazz->func, &meta};
-        assert(!internal::meta<MetaFunc>(HashedString{str}, internal::MetaInfo<Class>::clazz->func));
-        assert((!internal::MetaInfo<Class>::template Functor<Func>::functor));
-        internal::MetaInfo<Class>::template Functor<Func>::functor = &node;
-        internal::MetaInfo<Class>::clazz->func = &node;
-        attached<Type, Func>(std::make_index_sequence<sizeof...(Property)>{}, std::forward<Property>(property)...);
+        func<Type, Func>(std::make_index_sequence<sizeof...(Property)>{}, std::forward<Property>(property)...);
         return MetaFactory<Class>{};
     }
 };
@@ -934,8 +1124,7 @@ inline MetaFactory<Class> reflect(const char *str, Property &&... property) ENTT
 
 template<typename Class>
 inline MetaClass * meta() ENTT_NOEXCEPT {
-    static_assert(std::is_class<Class>::value, "!");
-    return internal::MetaInfo<Class>::clazz ? internal::MetaInfo<Class>::clazz->meta : nullptr;
+    return internal::meta<Class>();
 }
 
 
