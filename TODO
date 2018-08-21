@@ -18,7 +18,5 @@
 * remove final specifiers all around
 * make view copyable/moveable
 * C++17. That's all.
-* meta: review const all around, they are mostly wrong :-D
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
-* review functions wrapper, remove extended type, remove func type, reduce, reduce, reduce...
 * AOB
