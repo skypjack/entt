@@ -263,7 +263,7 @@ public:
         return &storage;
     }
 
-    bool operator==(const Holder &other) const ENTT_NOEXCEPT {
+    bool operator==(const Holder &other) const ENTT_NOEXCEPT override {
         return meta() == other.meta() && compare(0, *reinterpret_cast<const Type *>(&storage), *static_cast<const Type *>(other.data()));
     }
 
@@ -701,11 +701,11 @@ class MetaCtorType final: public MetaCtor {
     }
 
 public:
-    size_type size() const ENTT_NOEXCEPT {
+    size_type size() const ENTT_NOEXCEPT override {
         return sizeof...(Args);
     }
 
-    MetaClass * arg(size_type index) const ENTT_NOEXCEPT {
+    MetaClass * arg(size_type index) const ENTT_NOEXCEPT override {
         return index < sizeof...(Args) ? arg(index, std::make_index_sequence<sizeof...(Args)>{}) : nullptr;
     }
 };
@@ -795,7 +795,7 @@ template<typename Class, typename Ret, typename... Args, Ret(Class:: *Member)(Ar
 class MetaFuncType<Class, Ret(Args...), Member>: public MetaFuncBaseType<Class, Ret(Args...)> {
     template<std::size_t... Indexes>
     static auto invoke(int, Class *instance, const MetaAny *args, std::index_sequence<Indexes...>)
-    -> decltype(MetaAny{(instance->*Member)(std::declval<Args>()...)}, MetaAny{})
+    -> decltype(MetaAny{(instance->*Member)((args+Indexes)->value<std::decay_t<Args>>()...)}, MetaAny{})
     {
         return MetaAny{(instance->*Member)((args+Indexes)->value<std::decay_t<Args>>()...)};
     }
@@ -862,7 +862,7 @@ template<typename Class, typename Instance, typename Ret, typename... Args, Ret(
 struct MetaFreeFuncType<Class, Ret(Instance &, Args...), Func>: public MetaFunc {
     template<std::size_t... Indexes>
     static auto invoke(int, Instance *instance, const MetaAny *args, std::index_sequence<Indexes...>)
-    -> decltype(MetaAny{(*Func)(*instance, std::declval<Args>()...)}, MetaAny{})
+    -> decltype(MetaAny{(*Func)(*instance, (args+Indexes)->value<std::decay_t<Args>>()...)}, MetaAny{})
     {
         return MetaAny{(*Func)(*instance, (args+Indexes)->value<std::decay_t<Args>>()...)};
     }
