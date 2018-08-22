@@ -20,3 +20,4 @@
 * C++17. That's all.
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
 * AOB
+* tag_t and the others, create constexpr var

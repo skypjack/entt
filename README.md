@@ -1154,16 +1154,16 @@ The following adds components `AType` and `AnotherType` whenever `MyType` is
 assigned to an entity:
 
 ```cpp
-entt::dependency<AType, AnotherType>(registry.construction<MyType>());
+entt::connnect<AType, AnotherType>(registry.construction<MyType>());
 ```
 
 A component is assigned to an entity and thus default initialized only in case
 the entity itself hasn't it yet. It means that already existent components won't
 be overriden.<br/>
-A dependency can easily be broken by means of the same function template:
+A dependency can easily be broken by means of the following function template:
 
 ```cpp
-entt::dependency<AType, AnotherType>(entt::break_t{}, registry.construction<MyType>());
+entt::disconnect<AType, AnotherType>(registry.construction<MyType>());
 ```
 
 #### Labels

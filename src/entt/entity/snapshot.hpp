@@ -119,11 +119,15 @@ public:
     const Snapshot & destroyed(Archive &archive) const {
         auto size = registry.size() - registry.alive();
         archive(static_cast<Entity>(size));
-        auto curr = seed;
 
-        for(; size; --size) {
+        if(size) {
+            auto curr = seed;
             archive(curr);
-            curr = follow(registry, curr);
+
+            for(--size; size; --size) {
+                curr = follow(registry, curr);
+                archive(curr);
+            }
         }
 
         return *this;
