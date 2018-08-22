@@ -827,7 +827,7 @@ template<typename Class, typename Ret, typename... Args, Ret(Class:: *Member)(Ar
 class MetaFuncType<Class, Ret(Args...) const, Member>: public MetaFuncBaseType<Class, Ret(Args...)> {
     template<std::size_t... Indexes>
     static auto invoke(int, const Class *instance, const MetaAny *args, std::index_sequence<Indexes...>)
-    -> decltype(MetaAny{(instance->*Member)(std::declval<Args>()...)}, MetaAny{})
+    -> decltype(MetaAny{(instance->*Member)((args+Indexes)->value<std::decay_t<Args>>()...)}, MetaAny{})
     {
         return MetaAny{(instance->*Member)((args+Indexes)->value<std::decay_t<Args>>()...)};
     }
