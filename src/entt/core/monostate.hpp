@@ -24,6 +24,9 @@ namespace entt {
  */
 template<HashedString::hash_type>
 struct Monostate {
+    /*! @brief Default constructor. Workaround for VS2015: fixes list initialization of this class. */
+    Monostate() {}
+
     /**
      * @brief Assigns a value of a specific type to a given key.
      * @tparam Type Type of the value to assign.
@@ -52,7 +55,7 @@ private:
 
 template<HashedString::hash_type ID>
 template<typename Type>
-std::atomic<Type> Monostate<ID>::value{};
+std::atomic<Type> Monostate<ID>::value = {}; // Workaround for VS2015: No list initialization
 
 
 }

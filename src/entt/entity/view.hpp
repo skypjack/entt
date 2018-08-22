@@ -486,13 +486,13 @@ class View final {
 
         using extent_type = typename view_type::size_type;
 
-        Iterator(unchecked_type unchecked, underlying_iterator_type begin, underlying_iterator_type end) ENTT_NOEXCEPT
+        Iterator(unchecked_type unchecked, underlying_iterator_type begin_iter, underlying_iterator_type end_iter) ENTT_NOEXCEPT
             : unchecked{unchecked},
-              begin{begin},
-              end{end},
+              begin_iter{begin_iter},
+              end_iter{end_iter},
               extent{min(std::make_index_sequence<unchecked.size()>{})}
         {
-            if(begin != end && !valid()) {
+            if(begin_iter != end_iter && !valid()) {
                 ++(*this);
             }
         }
@@ -503,7 +503,7 @@ class View final {
         }
 
         bool valid() const ENTT_NOEXCEPT {
-            const auto entity = *begin;
+            const auto entity = *begin_iter;
             const auto sz = size_type(entity & traits_type::entity_mask);
 
             return sz < extent && std::all_of(unchecked.cbegin(), unchecked.cend(), [entity](const view_type *view) {
@@ -524,7 +524,7 @@ class View final {
         Iterator & operator=(const Iterator &) ENTT_NOEXCEPT = default;
 
         Iterator & operator++() ENTT_NOEXCEPT {
-            return (++begin != end && !valid()) ? ++(*this) : *this;
+            return (++begin_iter != end_iter && !valid()) ? ++(*this) : *this;
         }
 
         Iterator operator++(int) ENTT_NOEXCEPT {
@@ -533,7 +533,7 @@ class View final {
         }
 
         bool operator==(const Iterator &other) const ENTT_NOEXCEPT {
-            return other.begin == begin;
+            return other.begin_iter == begin_iter;
         }
 
         inline bool operator!=(const Iterator &other) const ENTT_NOEXCEPT {
@@ -541,7 +541,7 @@ class View final {
         }
 
         pointer operator->() const ENTT_NOEXCEPT {
-            return begin.operator->();
+            return begin_iter.operator->();
         }
 
         inline reference operator*() const ENTT_NOEXCEPT {
@@ -550,8 +550,8 @@ class View final {
 
     private:
         unchecked_type unchecked;
-        underlying_iterator_type begin;
-        underlying_iterator_type end;
+        underlying_iterator_type begin_iter;
+        underlying_iterator_type end_iter;
         extent_type extent;
     };
 
@@ -1600,20 +1600,20 @@ class RuntimeView {
     class Iterator {
         friend class RuntimeView<Entity>;
 
-        Iterator(underlying_iterator_type begin, underlying_iterator_type end, const view_type * const *first, const view_type * const *last, extent_type extent) ENTT_NOEXCEPT
-            : begin{begin},
-              end{end},
+        Iterator(underlying_iterator_type begin_iter, underlying_iterator_type end_iter, const view_type * const *first, const view_type * const *last, extent_type extent) ENTT_NOEXCEPT
+            : begin_iter{begin_iter},
+              end_iter{end_iter},
               first{first},
               last{last},
               extent{extent}
         {
-            if(begin != end && !valid()) {
+            if(begin_iter != end_iter && !valid()) {
                 ++(*this);
             }
         }
 
         bool valid() const ENTT_NOEXCEPT {
-            const auto entity = *begin;
+            const auto entity = *begin_iter;
             const auto sz = size_type(entity & traits_type::entity_mask);
 
             return sz < extent && std::all_of(first, last, [entity](const auto *view) {
@@ -1634,7 +1634,7 @@ class RuntimeView {
         Iterator & operator=(const Iterator &) ENTT_NOEXCEPT = default;
 
         Iterator & operator++() ENTT_NOEXCEPT {
-            return (++begin != end && !valid()) ? ++(*this) : *this;
+            return (++begin_iter != end_iter && !valid()) ? ++(*this) : *this;
         }
 
         Iterator operator++(int) ENTT_NOEXCEPT {
@@ -1643,7 +1643,7 @@ class RuntimeView {
         }
 
         bool operator==(const Iterator &other) const ENTT_NOEXCEPT {
-            return other.begin == begin;
+            return other.begin_iter == begin_iter;
         }
 
         inline bool operator!=(const Iterator &other) const ENTT_NOEXCEPT {
@@ -1651,7 +1651,7 @@ class RuntimeView {
         }
 
         pointer operator->() const ENTT_NOEXCEPT {
-            return begin.operator->();
+            return begin_iter.operator->();
         }
 
         inline reference operator*() const ENTT_NOEXCEPT {
@@ -1659,8 +1659,8 @@ class RuntimeView {
         }
 
     private:
-        underlying_iterator_type begin;
-        underlying_iterator_type end;
+        underlying_iterator_type begin_iter;
+        underlying_iterator_type end_iter;
         const view_type * const *first;
         const view_type * const *last;
         extent_type extent;

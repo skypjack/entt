@@ -109,7 +109,9 @@ class Scheduler final {
     static auto then(ProcessHandler *handler, Args &&... args) {
         if(handler) {
             auto proc = typename ProcessHandler::instance_type{new Proc{std::forward<Args>(args)...}, &Scheduler::deleter<Proc>};
-            handler->next.reset(new ProcessHandler{std::move(proc), &Scheduler::update<Proc>, &Scheduler::abort<Proc>, nullptr});
+            auto updateProc = static_cast<bool(*)(ProcessHandler&, const Delta, void*)>(&Scheduler::update<Proc>);
+            auto abortProc = static_cast<void(*)(ProcessHandler&, const bool)>(&Scheduler::abort<Proc>);
+            handler->next.reset(new ProcessHandler{std::move(proc), updateProc, abortProc, nullptr});
             handler = handler->next.get();
         }
 

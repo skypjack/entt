@@ -44,7 +44,7 @@ public:
 
 
 template<typename... Types>
-std::atomic<std::size_t> Family<Types...>::identifier{};
+std::atomic<std::size_t> Family<Types...>::identifier = {0}; // Workaround for VS2015: No list initialization
 
 
 }

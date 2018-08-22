@@ -30,6 +30,18 @@ struct IsPartOf<Type, Current, Other...>: std::conditional_t<std::is_same<Type, 
 template<typename Type>
 struct IsPartOf<Type>: std::false_type {};
 
+template <class T, class Tuple>
+struct IndexOf;
+
+template <class T, class U, class... Types>
+struct IndexOf<T, std::tuple<U, Types...>> {
+    static const std::size_t value = 1 + IndexOf<T, std::tuple<Types...>>::value;
+};
+
+template <class T, class... Types>
+struct IndexOf<T, std::tuple<T, Types...>> {
+    static const std::size_t value = 0;
+};
 
 }
 
@@ -71,17 +83,6 @@ template<typename... Types>
 class Identifier final {
     using tuple_type = std::tuple<std::decay_t<Types>...>;
 
-    template<typename Type, std::size_t... Indexes>
-    static constexpr std::size_t get(std::index_sequence<Indexes...>) ENTT_NOEXCEPT {
-        static_assert(internal::IsPartOf<Type, Types...>::value, "!");
-
-        std::size_t max{};
-        using accumulator_type = std::size_t[];
-        accumulator_type accumulator = { (max = std::is_same<Type, std::tuple_element_t<Indexes, tuple_type>>::value ? Indexes : max)... };
-        (void)accumulator;
-        return max;
-    }
-
 public:
     /*! @brief Unsigned integer type. */
     using identifier_type = std::size_t;
@@ -93,7 +94,8 @@ public:
      */
     template<typename Type>
     static constexpr identifier_type get() ENTT_NOEXCEPT {
-        return get<std::decay_t<Type>>(std::make_index_sequence<sizeof...(Types)>{});
+        static_assert(internal::IsPartOf<std::decay_t<Type>, Types...>::value, "!");
+        return internal::IndexOf<std::decay_t<Type>, tuple_type>::value;
     }
 };
 

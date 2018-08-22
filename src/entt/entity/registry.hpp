@@ -25,6 +25,21 @@
 
 namespace entt {
 
+namespace internal {
+
+template<typename... Types>
+using TupleCat = decltype(std::tuple_cat(std::declval<Types>()...));
+
+template<typename Type, typename... Types>
+using RemoveTypeFromTuple = TupleCat<
+    typename std::conditional<
+        std::is_same<Type, Types>::value,
+        std::tuple<>,
+        std::tuple<Types>
+    >::type...
+>;
+
+}
 
 /**
  * @brief Fast and reliable entity-component system.
@@ -74,32 +89,32 @@ class Registry {
         Tag tag;
     };
 
-    template<typename Comp, std::size_t Pivot, typename... Component, std::size_t... Indexes>
+    template<typename Comp, typename... Component, std::size_t... Indexes>
     void connect(std::index_sequence<Indexes...>) {
         auto &cpool = pools[component_family::type<Comp>()];
-        std::get<1>(cpool).sink().template connect<&Registry::creating<&handler_family::type<Component...>, std::tuple_element_t<(Indexes < Pivot ? Indexes : (Indexes+1)), std::tuple<Component...>>...>>();
+        std::get<1>(cpool).sink().template connect<&Registry::creating<&handler_family::type<Component...>, std::tuple_element_t<Indexes, internal::RemoveTypeFromTuple<Comp, Component...>>...>>();
         std::get<2>(cpool).sink().template connect<&Registry::destroying<Component...>>();
     }
 
-    template<typename... Component, std::size_t... Indexes>
-    void connect(std::index_sequence<Indexes...>) {
+    template<typename... Component>
+    void connect() {
         using accumulator_type = int[];
-        accumulator_type accumulator = { (assure<Component>(), connect<Component, Indexes, Component...>(std::make_index_sequence<sizeof...(Component)-1>{}), 0)... };
+        accumulator_type accumulator = { (assure<Component>(), connect<Component, Component...>(std::make_index_sequence<sizeof...(Component)-1>{}), 0)... };
         (void)accumulator;
     }
 
-    template<typename Comp, std::size_t Pivot, typename... Component, std::size_t... Indexes>
+    template<typename Comp, typename... Component, std::size_t... Indexes>
     void disconnect(std::index_sequence<Indexes...>) {
         auto &cpool = pools[component_family::type<Comp>()];
-        std::get<1>(cpool).sink().template disconnect<&Registry::creating<&handler_family::type<Component...>, std::tuple_element_t<(Indexes < Pivot ? Indexes : (Indexes+1)), std::tuple<Component...>>...>>();
+        std::get<1>(cpool).sink().template disconnect<&Registry::creating<&handler_family::type<Component...>, std::tuple_element_t<Indexes, internal::RemoveTypeFromTuple<Comp, Component...>>...>>();
         std::get<2>(cpool).sink().template disconnect<&Registry::destroying<Component...>>();
     }
 
-    template<typename... Component, std::size_t... Indexes>
-    void disconnect(std::index_sequence<Indexes...>) {
+    template<typename... Component>
+    void disconnect() {
         using accumulator_type = int[];
         // if a set exists, pools have already been created for it
-        accumulator_type accumulator = { (disconnect<Component, Indexes, Component...>(std::make_index_sequence<sizeof...(Component)-1>{}), 0)... };
+        accumulator_type accumulator = { (disconnect<Component, Component...>(std::make_index_sequence<sizeof...(Component)-1>{}), 0)... };
         (void)accumulator;
     }
 
@@ -1380,7 +1395,7 @@ public:
         }
 
         if(!handlers[htype]) {
-            connect<Component...>(std::make_index_sequence<sizeof...(Component)>{});
+            connect<Component...>();
             handlers[htype] = std::make_unique<SparseSet<entity_type>>();
             auto &handler = *handlers[htype];
 
@@ -1408,7 +1423,7 @@ public:
     template<typename... Component>
     void discard() {
         if(contains<Component...>()) {
-            disconnect<Component...>(std::make_index_sequence<sizeof...(Component)>{});
+            disconnect<Component...>();
             handlers[handler_family::type<Component...>()].reset();
         }
     }

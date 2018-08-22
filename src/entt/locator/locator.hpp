@@ -107,7 +107,7 @@ private:
 
 
 template<typename Service>
-std::shared_ptr<Service> ServiceLocator<Service>::service{};
+std::shared_ptr<Service> ServiceLocator<Service>::service; // Workaround for VS2015: No list initialization.
 
 
 }
