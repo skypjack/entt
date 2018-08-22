@@ -16,3 +16,4 @@
 * reflection system (maybe)
 * C++17. That's all.
 * AOB
+* tag_t and the others, create constexpr var

@@ -6,7 +6,7 @@
 TEST(Helper, Dependency) {
     entt::DefaultRegistry registry;
     const auto entity = registry.create();
-    entt::dependency<double, float>(registry.construction<int>());
+    entt::connect<double, float>(registry.construction<int>());
 
     ASSERT_FALSE(registry.has<double>(entity));
     ASSERT_FALSE(registry.has<float>(entity));
@@ -42,7 +42,7 @@ TEST(Helper, Dependency) {
     registry.remove<int>(entity);
     registry.remove<double>(entity);
     registry.remove<float>(entity);
-    entt::dependency<double, float>(entt::break_t{}, registry.construction<int>());
+    entt::disconnect<double, float>(registry.construction<int>());
     registry.assign<int>(entity);
 
     ASSERT_FALSE(registry.has<double>(entity));

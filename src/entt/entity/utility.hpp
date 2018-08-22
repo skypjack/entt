@@ -17,10 +17,6 @@ struct persistent_t final {};
 struct raw_t final {};
 
 
-/*! @brief Break type used to disambiguate overloads. */
-struct break_t final {};
-
-
 }
 
 

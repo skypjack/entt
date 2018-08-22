@@ -44,7 +44,7 @@ void dependency(Registry<Entity> &registry, const Entity entity) {
  * assigned to an entity:
  * @code{.cpp}
  * entt::DefaultRegistry registry;
- * entt::dependency<AType, AnotherType>(registry.construction<MyType>());
+ * entt::connect<AType, AnotherType>(registry.construction<MyType>());
  * @endcode
  *
  * @tparam Dependency Types of components to assign to an entity if triggered.
@@ -52,7 +52,7 @@ void dependency(Registry<Entity> &registry, const Entity entity) {
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Entity>
-void dependency(Sink<void(Registry<Entity> &, const Entity)> sink) {
+inline void connect(Sink<void(Registry<Entity> &, const Entity)> sink) {
     sink.template connect<dependency<Entity, Dependency...>>();
 }
 
@@ -67,7 +67,7 @@ void dependency(Sink<void(Registry<Entity> &, const Entity)> sink) {
  * components `AType` and `AnotherType`:
  * @code{.cpp}
  * entt::DefaultRegistry registry;
- * entt::dependency<AType, AnotherType>(entt::break_t{}, registry.construction<MyType>());
+ * entt::disconnect<AType, AnotherType>(registry.construction<MyType>());
  * @endcode
  *
  * @tparam Dependency Types of components used to create the dependency.
@@ -75,7 +75,7 @@ void dependency(Sink<void(Registry<Entity> &, const Entity)> sink) {
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Entity>
-void dependency(break_t, Sink<void(Registry<Entity> &, const Entity)> sink) {
+inline void disconnect(Sink<void(Registry<Entity> &, const Entity)> sink) {
     sink.template disconnect<dependency<Entity, Dependency...>>();
 }
 
