@@ -11,11 +11,7 @@ namespace entt {
 
 
 struct MetaAny;
-class MetaProp;
-class MetaCtor;
-class MetaDtor;
-class MetaData;
-class MetaFunc;
+struct MetaProp;
 class MetaType;
 
 
@@ -31,14 +27,18 @@ struct MetaPropNode final {
 
 
 struct MetaCtorNode final {
+    using size_type = std::size_t;
     MetaCtorNode * const next;
-    MetaCtor * const meta;
+    std::size_t(* const size)() ENTT_NOEXCEPT;
+    MetaType *(* const arg)(size_type) ENTT_NOEXCEPT;
+    bool (* const accept)(const MetaType ** const) ENTT_NOEXCEPT;
+    MetaAny(* const invoke)(const MetaAny * const);
     MetaPropNode *prop{nullptr};
 };
 
 
 struct MetaDtorNode final {
-    MetaDtor * const meta;
+    void(* const invoke)(void *);
     MetaPropNode *prop{nullptr};
 };
 
@@ -46,15 +46,25 @@ struct MetaDtorNode final {
 struct MetaDataNode final {
     const HashedString key;
     MetaDataNode * const next;
-    MetaData * const meta;
+    MetaType *(* const type)() ENTT_NOEXCEPT;
+    bool(* const constant)() ENTT_NOEXCEPT;
+    MetaAny(* const get)(const void *) ENTT_NOEXCEPT;
+    void(* const set)(void *, const MetaAny &);
+    bool(* const accept)(const MetaType * const) ENTT_NOEXCEPT;
     MetaPropNode *prop{nullptr};
 };
 
 
 struct MetaFuncNode final {
+    using size_type = std::size_t;
     const HashedString key;
     MetaFuncNode * const next;
-    MetaFunc * const meta;
+    size_type(* const size)() ENTT_NOEXCEPT;
+    MetaType *(* const ret)() ENTT_NOEXCEPT;
+    MetaType *(* const arg)(size_type) ENTT_NOEXCEPT;
+    bool(* const accept)(const MetaType ** const) ENTT_NOEXCEPT;
+    MetaAny(* const cinvoke)(const void *, const MetaAny *);
+    MetaAny(* const invoke)(void *, const MetaAny *);
     MetaPropNode *prop{nullptr};
 };
 
