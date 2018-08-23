@@ -4,7 +4,7 @@
 #include <iostream>
 
 
-void print(unsigned int n, entt::MetaClass *meta) {
+void print(unsigned int n, entt::MetaType *meta) {
     std::cout << std::string(n, ' ') << "class: " << static_cast<const char *>(meta->name()) << std::endl;
 
     meta->prop([n=n+2](auto *prop) {

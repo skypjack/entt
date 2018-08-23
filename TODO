@@ -6,7 +6,6 @@
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
-* sort of low-level prefabs: prototypes with children prototypes and glue functions to adjust parent-child relationships on creation
 * create dedicated flat map based on types implementation (sort of "type map") for types to use within the registry and so on...
 * registry::create with a "hint" on the entity identifier to use, it should ease combining multiple registries
 * deep copy of a registry (or use the snapshot stuff to copy components and keep intact ids at least)
@@ -19,5 +18,6 @@
 * make view copyable/moveable
 * C++17. That's all.
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
+* comparision on Meta is broken, it doesn't work as expected when meta is missed (ie int, bool unregistered types, ...)
 * AOB
 * tag_t and the others, create constexpr var
