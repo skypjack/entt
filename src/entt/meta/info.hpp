@@ -33,13 +33,13 @@ struct MetaCtorNode final {
     MetaType *(* const arg)(size_type) ENTT_NOEXCEPT;
     bool (* const accept)(const MetaType ** const) ENTT_NOEXCEPT;
     MetaAny(* const invoke)(const MetaAny * const);
-    MetaPropNode *prop{nullptr};
+    MetaPropNode *(* const prop)() ENTT_NOEXCEPT;
 };
 
 
 struct MetaDtorNode final {
     void(* const invoke)(void *);
-    MetaPropNode *prop{nullptr};
+    MetaPropNode *(* const prop)();
 };
 
 
@@ -51,7 +51,7 @@ struct MetaDataNode final {
     MetaAny(* const get)(const void *) ENTT_NOEXCEPT;
     void(* const set)(void *, const MetaAny &);
     bool(* const accept)(const MetaType * const) ENTT_NOEXCEPT;
-    MetaPropNode *prop{nullptr};
+    MetaPropNode *(* const prop)();
 };
 
 
@@ -65,7 +65,7 @@ struct MetaFuncNode final {
     bool(* const accept)(const MetaType ** const) ENTT_NOEXCEPT;
     MetaAny(* const cinvoke)(const void *, const MetaAny *);
     MetaAny(* const invoke)(void *, const MetaAny *);
-    MetaPropNode *prop{nullptr};
+    MetaPropNode *(* const prop)();
 };
 
 
@@ -73,11 +73,11 @@ struct MetaTypeNode final {
     const HashedString key;
     MetaTypeNode * const next;
     MetaType * const meta;
-    MetaPropNode *prop{nullptr};
-    MetaCtorNode *ctor{nullptr};
-    MetaDtorNode *dtor{nullptr};
-    MetaDataNode *data{nullptr};
-    MetaFuncNode *func{nullptr};
+    MetaCtorNode *(* const ctor)();
+    MetaDtorNode *(* const dtor)();
+    MetaDataNode *(* const data)();
+    MetaFuncNode *(* const func)();
+    MetaPropNode *(* const prop)();
 };
 
 
@@ -95,38 +95,33 @@ template<typename Class>
 struct MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>> final {
     static MetaTypeNode *type;
 
-    template<std::size_t>
+    static MetaCtorNode *ctor;
+    static MetaDtorNode *dtor;
+    static MetaDataNode *data;
+    static MetaFuncNode *func;
     static MetaPropNode *prop;
 
     template<typename...>
     struct Ctor {
         static MetaCtorNode *ctor;
-
-        template<std::size_t>
         static MetaPropNode *prop;
     };
 
     template<void(*)(Class &)>
     struct Dtor {
         static MetaDtorNode *dtor;
-
-        template<std::size_t>
         static MetaPropNode *prop;
     };
 
     template<typename Type, Type Class:: *>
     struct Member {
         static std::conditional_t<std::is_member_function_pointer<Type Class:: *>::value, MetaFuncNode, MetaDataNode> *member;
-
-        template<std::size_t>
         static MetaPropNode *prop;
     };
 
     template<typename Type, Type *>
     struct FreeFunc {
         static MetaFuncNode *func;
-
-        template<std::size_t>
         static MetaPropNode *prop;
     };
 };
@@ -137,7 +132,22 @@ MetaTypeNode * MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::t
 
 
 template<typename Class>
-template<std::size_t>
+MetaCtorNode * MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::ctor = nullptr;
+
+
+template<typename Class>
+MetaDtorNode * MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::dtor = nullptr;
+
+
+template<typename Class>
+MetaDataNode * MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::data = nullptr;
+
+
+template<typename Class>
+MetaFuncNode * MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::func = nullptr;
+
+
+template<typename Class>
 MetaPropNode * MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::prop = nullptr;
 
 
@@ -148,7 +158,6 @@ MetaCtorNode * MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::C
 
 template<typename Class>
 template<typename... Args>
-template<std::size_t>
 MetaPropNode * MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::Ctor<Args...>::prop = nullptr;
 
 
@@ -159,7 +168,6 @@ MetaDtorNode * MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::D
 
 template<typename Class>
 template<void(*Func)(Class &)>
-template<std::size_t>
 MetaPropNode * MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::Dtor<Func>::prop = nullptr;
 
 
@@ -171,7 +179,6 @@ MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::Member<Type, Mem
 
 template<typename Class>
 template<typename Type, Type Class:: *Member>
-template<std::size_t>
 MetaPropNode * MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::Member<Type, Member>::prop = nullptr;
 
 
@@ -182,7 +189,6 @@ MetaFuncNode * MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::F
 
 template<typename Class>
 template<typename Type, Type *Func>
-template<std::size_t>
 MetaPropNode * MetaInfo<Class, std::enable_if_t<std::is_class<Class>::value>>::FreeFunc<Type, Func>::prop = nullptr;
 
 

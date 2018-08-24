@@ -227,11 +227,11 @@ struct MetaCtor {
     inline auto prop(Op op) const ENTT_NOEXCEPT
     -> decltype(op(std::declval<MetaProp *>()), void())
     {
-        return internal::prop(std::move(op), node->prop);
+        return internal::prop(std::move(op), node->prop());
     }
 
     inline MetaProp * prop(const MetaAny &key) const ENTT_NOEXCEPT {
-        return internal::meta<MetaProp>(key, node->prop);
+        return internal::meta<MetaProp>(key, node->prop());
     }
 
     explicit operator bool() const ENTT_NOEXCEPT {
@@ -256,11 +256,11 @@ struct MetaDtor {
     inline auto prop(Op op) const ENTT_NOEXCEPT
     -> decltype(op(std::declval<MetaProp *>()), void())
     {
-        return internal::prop(std::move(op), node->prop);
+        return internal::prop(std::move(op), node->prop());
     }
 
     inline MetaProp * prop(const MetaAny &key) const ENTT_NOEXCEPT {
-        return internal::meta<MetaProp>(key, node->prop);
+        return internal::meta<MetaProp>(key, node->prop());
     }
 
     explicit operator bool() const ENTT_NOEXCEPT {
@@ -309,11 +309,11 @@ struct MetaData {
     inline auto prop(Op op) const ENTT_NOEXCEPT
     -> decltype(op(std::declval<MetaProp *>()), void())
     {
-        return internal::prop(std::move(op), node->prop);
+        return internal::prop(std::move(op), node->prop());
     }
 
     inline MetaProp * prop(const MetaAny &key) const ENTT_NOEXCEPT {
-        return internal::meta<MetaProp>(key, node->prop);
+        return internal::meta<MetaProp>(key, node->prop());
     }
 
     explicit operator bool() const ENTT_NOEXCEPT {
@@ -375,11 +375,11 @@ struct MetaFunc {
     inline auto prop(Op op) const ENTT_NOEXCEPT
     -> decltype(op(std::declval<MetaProp *>()), void())
     {
-        return internal::prop(std::move(op), node->prop);
+        return internal::prop(std::move(op), node->prop());
     }
 
     inline MetaProp * prop(const MetaAny &key) const ENTT_NOEXCEPT {
-        return internal::meta<MetaProp>(key, node->prop);
+        return internal::meta<MetaProp>(key, node->prop());
     }
 
     explicit operator bool() const ENTT_NOEXCEPT {
@@ -394,14 +394,6 @@ private:
 class MetaType {
     virtual internal::MetaTypeNode * node() const ENTT_NOEXCEPT = 0;
 
-    template<typename Node, typename Op>
-    inline void all(Node *curr, Op op) const ENTT_NOEXCEPT {
-        while(curr) {
-            op(curr->meta);
-            curr = curr->next;
-        }
-    }
-
 public:
     using size_type = std::size_t;
 
@@ -415,7 +407,7 @@ public:
     template<typename... Args>
     MetaCtor ctor() const ENTT_NOEXCEPT {
         std::array<const MetaType *, sizeof...(Args)> types{{internal::meta<std::decay_t<Args>>()...}};
-        auto *curr = node()->ctor;
+        auto *curr = node()->ctor();
 
         while(curr && curr->size() != types.size() && !curr->accept(types.data())) {
             curr = curr->next;
@@ -426,17 +418,17 @@ public:
     }
 
     inline MetaDtor dtor() const ENTT_NOEXCEPT {
-        return MetaDtor{node()->dtor};
+        return MetaDtor{node()->dtor()};
     }
 
     inline MetaData data(const char *str) const ENTT_NOEXCEPT {
-        auto *curr = node()->data;
+        auto *curr = node()->data();
         for(; curr && curr->key != str; curr = curr->next);
         return MetaData{curr};
     }
 
     inline MetaFunc func(const char *str) const ENTT_NOEXCEPT {
-        auto *curr = node()->func;
+        auto *curr = node()->func();
         for(; curr && curr->key != str; curr = curr->next);
         return MetaFunc{curr};
     }
@@ -445,7 +437,7 @@ public:
     inline auto ctor(Op op) const ENTT_NOEXCEPT
     -> decltype(op(std::declval<MetaCtor>()), void())
     {
-        auto *curr = node()->ctor;
+        auto *curr = node()->ctor();
 
         while(curr) {
             op(MetaCtor{curr});
@@ -457,14 +449,14 @@ public:
     inline auto dtor(Op op) const ENTT_NOEXCEPT
     -> decltype(op(std::declval<MetaDtor>()), void())
     {
-        op(MetaDtor{node()->dtor});
+        op(MetaDtor{node()->dtor()});
     }
 
     template<typename Op>
     inline auto data(Op op) const ENTT_NOEXCEPT
     -> decltype(op(std::declval<MetaData>()), void())
     {
-        auto *curr = node()->data;
+        auto *curr = node()->data();
 
         while(curr) {
             op(MetaData{curr});
@@ -476,7 +468,7 @@ public:
     inline auto func(Op op) const ENTT_NOEXCEPT
     -> decltype(op(std::declval<MetaFunc>()), void())
     {
-        auto *curr = node()->func;
+        auto *curr = node()->func();
 
         while(curr) {
             op(MetaFunc{curr});
@@ -493,11 +485,11 @@ public:
     inline auto prop(Op op) const ENTT_NOEXCEPT
     -> decltype(op(std::declval<MetaProp *>()), void())
     {
-        return internal::prop(std::move(op), node()->prop);
+        return internal::prop(std::move(op), node()->prop());
     }
 
     inline MetaProp * prop(const MetaAny &key) const ENTT_NOEXCEPT {
-        return internal::meta<MetaProp>(key, node()->prop);
+        return internal::meta<MetaProp>(key, node()->prop());
     }
 };
 
@@ -508,7 +500,7 @@ namespace internal {
 template<std::size_t Index, typename Class, typename... Args>
 class MetaCtorPropImpl final: public MetaProp {
     internal::MetaPropNode * node() const ENTT_NOEXCEPT override {
-        return internal::MetaInfo<Class>::template Ctor<Args...>::template prop<Index>;
+        return internal::MetaInfo<Class>::template Ctor<Args...>::prop;
     }
 };
 
@@ -516,7 +508,7 @@ class MetaCtorPropImpl final: public MetaProp {
 template<std::size_t Index, typename Class, void(*Func)(Class &)>
 class MetaDtorPropImpl final: public MetaProp {
     internal::MetaPropNode * node() const ENTT_NOEXCEPT override {
-        return internal::MetaInfo<Class>::template Dtor<Func>::template prop<Index>;
+        return internal::MetaInfo<Class>::template Dtor<Func>::prop;
     }
 };
 
@@ -524,7 +516,7 @@ class MetaDtorPropImpl final: public MetaProp {
 template<std::size_t Index, typename Class, typename Type, Type Class:: *Member>
 class MetaMemberPropImpl final: public MetaProp {
     internal::MetaPropNode * node() const ENTT_NOEXCEPT override {
-        return internal::MetaInfo<Class>::template Member<Type, Member>::template prop<Index>;
+        return internal::MetaInfo<Class>::template Member<Type, Member>::prop;
     }
 };
 
@@ -532,7 +524,7 @@ class MetaMemberPropImpl final: public MetaProp {
 template<std::size_t Index, typename Class, typename Type, Type *Func>
 class MetaFunctionPropImpl final: public MetaProp {
     internal::MetaPropNode * node() const ENTT_NOEXCEPT override {
-        return internal::MetaInfo<Class>::template FreeFunc<Type, Func>::template prop<Index>;
+        return internal::MetaInfo<Class>::template FreeFunc<Type, Func>::prop;
     }
 };
 
@@ -540,7 +532,7 @@ class MetaFunctionPropImpl final: public MetaProp {
 template<std::size_t Index, typename Type>
 class MetaTypePropImpl final: public MetaProp {
     internal::MetaPropNode * node() const ENTT_NOEXCEPT override {
-        return internal::MetaInfo<Type>::template prop<Index>;
+        return internal::MetaInfo<Type>::prop;
     }
 };
 
@@ -553,8 +545,8 @@ class MetaTypeImpl final: public MetaType {
 
 public:
     void destroy(void *instance) override {
-        return internal::MetaInfo<Type>::type->dtor
-                ? internal::MetaInfo<Type>::type->dtor->invoke(instance)
+        return internal::MetaInfo<Type>::type->dtor()
+                ? internal::MetaInfo<Type>::type->dtor()->invoke(instance)
                 : static_cast<Type *>(instance)->~Type();
     }
 };
@@ -579,11 +571,9 @@ class MetaFactory final {
         static const MetaAny key{property.first};
         static const MetaAny value{property.second};
         static internal::MetaTypePropImpl<Index, Class> meta{};
-        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::type->prop, &meta};
-        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::type->prop));
-        assert(!internal::MetaInfo<Class>::template prop<Index>);
-        internal::MetaInfo<Class>::template prop<Index> = &node;
-        internal::MetaInfo<Class>::type->prop = &node;
+        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::prop, &meta};
+        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::prop));
+        internal::MetaInfo<Class>::prop = &node;
     }
 
     template<std::size_t... Indexes, typename... Property>
@@ -598,11 +588,9 @@ class MetaFactory final {
         static const MetaAny key{property.first};
         static const MetaAny value{property.second};
         static internal::MetaCtorPropImpl<Index, Class, Args...> meta{};
-        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::template Ctor<Args...>::ctor->prop, &meta};
-        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::template Ctor<Args...>::ctor->prop));
-        assert(!internal::MetaInfo<Class>::template Ctor<Args...>::template prop<Index>);
-        internal::MetaInfo<Class>::template Ctor<Args...>::template prop<Index> = &node;
-        internal::MetaInfo<Class>::template Ctor<Args...>::ctor->prop = &node;
+        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::template Ctor<Args...>::prop, &meta};
+        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::template Ctor<Args...>::prop));
+        internal::MetaInfo<Class>::template Ctor<Args...>::prop = &node;
     }
 
     template<typename... Args, std::size_t... Indexes, typename... Property>
@@ -617,11 +605,9 @@ class MetaFactory final {
         static const MetaAny key{property.first};
         static const MetaAny value{property.second};
         static internal::MetaDtorPropImpl<Index, Class, Func> meta{};
-        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::template Dtor<Func>::dtor->prop, &meta};
-        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::template Dtor<Func>::dtor->prop));
-        assert(!internal::MetaInfo<Class>::template Dtor<Func>::template prop<Index>);
-        internal::MetaInfo<Class>::template Dtor<Func>::template prop<Index> = &node;
-        internal::MetaInfo<Class>::template Dtor<Func>::dtor->prop = &node;
+        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::template Dtor<Func>::prop, &meta};
+        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::template Dtor<Func>::prop));
+        internal::MetaInfo<Class>::template Dtor<Func>::prop = &node;
     }
 
     template<void(*Func)(Class &), std::size_t... Indexes, typename... Property>
@@ -636,11 +622,9 @@ class MetaFactory final {
         static const MetaAny key{property.first};
         static const MetaAny value{property.second};
         static internal::MetaMemberPropImpl<Index, Class, Type, Member> meta{};
-        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::template Member<Type, Member>::member->prop, &meta};
-        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::template Member<Type, Member>::member->prop));
-        assert((!internal::MetaInfo<Class>::template Member<Type, Member>::template prop<Index>));
-        internal::MetaInfo<Class>::template Member<Type, Member>::template prop<Index> = &node;
-        internal::MetaInfo<Class>::template member<Type, Member>->prop = &node;
+        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::template Member<Type, Member>::prop, &meta};
+        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::template Member<Type, Member>::prop));
+        internal::MetaInfo<Class>::template Member<Type, Member>::prop = &node;
     }
 
     template<typename Type, Type Class:: *Member, std::size_t... Indexes, typename... Property>
@@ -655,11 +639,9 @@ class MetaFactory final {
         static const MetaAny key{property.first};
         static const MetaAny value{property.second};
         static internal::MetaFunctionPropImpl<Index, Class, Type, Func> meta{};
-        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func->prop, &meta};
-        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func->prop));
-        assert((!internal::MetaInfo<Class>::template FreeFunc<Type, Func>::template prop<Index>));
-        internal::MetaInfo<Class>::template FreeFunc<Type, Func>::template prop<Index> = &node;
-        internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func->prop = &node;
+        static internal::MetaPropNode node{key, value, internal::MetaInfo<Class>::template FreeFunc<Type, Func>::prop, &meta};
+        assert(!internal::meta<MetaProp>(key, internal::MetaInfo<Class>::template FreeFunc<Type, Func>::prop));
+        internal::MetaInfo<Class>::template FreeFunc<Type, Func>::prop = &node;
     }
 
     template<typename Type, Type *Func, std::size_t... Indexes, typename... Property>
@@ -870,7 +852,28 @@ public:
     static MetaFactory reflect(const char *str, Property &&... property) ENTT_NOEXCEPT {
         static_assert(std::is_class<Class>::value, "!");
         static internal::MetaTypeImpl<Class> meta;
-        static internal::MetaTypeNode node{HashedString{str}, internal::MetaInfo<MetaFooBar>::type, &meta};
+
+        static internal::MetaTypeNode node{
+            HashedString{str},
+            internal::MetaInfo<MetaFooBar>::type,
+            &meta,
+            +[]() {
+                return internal::MetaInfo<Class>::ctor;
+            },
+            +[]() {
+                return internal::MetaInfo<Class>::dtor;
+            },
+            +[]() {
+                return internal::MetaInfo<Class>::data;
+            },
+            +[]() {
+                return internal::MetaInfo<Class>::func;
+            },
+            +[]() {
+                return internal::MetaInfo<Class>::prop;
+            }
+        };
+
         assert(!internal::meta<MetaType>(HashedString{str}, internal::MetaInfo<MetaFooBar>::type));
         assert(!internal::MetaInfo<Class>::type);
         internal::MetaInfo<Class>::type = &node;
@@ -882,7 +885,7 @@ public:
     template<typename... Args, typename... Property>
     static MetaFactory ctor(Property &&... property) ENTT_NOEXCEPT {
         static internal::MetaCtorNode node{
-            internal::MetaInfo<Class>::type->ctor,
+            internal::MetaInfo<Class>::ctor,
             +[]() ENTT_NOEXCEPT {
                 return sizeof...(Args);
             },
@@ -895,12 +898,15 @@ public:
             },
             +[](const MetaAny * const any) {
                 return constructor<Args...>(any, std::make_index_sequence<sizeof...(Args)>{});
+            },
+            +[]() {
+                return internal::MetaInfo<Class>::template Ctor<Args...>::prop;
             }
         };
 
         assert(!internal::MetaInfo<Class>::template Ctor<Args...>::ctor);
         internal::MetaInfo<Class>::template Ctor<Args...>::ctor = &node;
-        internal::MetaInfo<Class>::type->ctor = &node;
+        internal::MetaInfo<Class>::ctor = &node;
         ctor<Args...>(std::make_index_sequence<sizeof...(Property)>{}, std::forward<Property>(property)...);
         return MetaFactory<Class>{};
     }
@@ -910,13 +916,16 @@ public:
         static internal::MetaDtorNode node{
             +[](void *instance) {
                 (*Func)(*static_cast<Class *>(instance));
+            },
+            +[]() {
+                return internal::MetaInfo<Class>::template Dtor<Func>::prop;
             }
         };
 
-        assert(!internal::MetaInfo<Class>::type->dtor);
+        assert(!internal::MetaInfo<Class>::dtor);
         assert(!internal::MetaInfo<Class>::template Dtor<Func>::dtor);
         internal::MetaInfo<Class>::template Dtor<Func>::dtor = &node;
-        internal::MetaInfo<Class>::type->dtor = &node;
+        internal::MetaInfo<Class>::dtor = &node;
         dtor<Func>(std::make_index_sequence<sizeof...(Property)>{}, std::forward<Property>(property)...);
         return MetaFactory<Class>{};
     }
@@ -925,7 +934,7 @@ public:
     static MetaFactory data(const char *str, Property &&... property) ENTT_NOEXCEPT {
         static internal::MetaDataNode node{
             HashedString{str},
-            internal::MetaInfo<Class>::type->data,
+            internal::MetaInfo<Class>::data,
             +[]() ENTT_NOEXCEPT {
                 return internal::meta<std::decay_t<Type>>();
             },
@@ -940,13 +949,16 @@ public:
             },
             +[](const MetaType * const type) ENTT_NOEXCEPT {
                 return type == internal::meta<std::decay_t<Type>>();
+            },
+            +[]() {
+                return internal::MetaInfo<Class>::template Member<Type, Member>::prop;
             }
         };
 
-        assert(!duplicate(HashedString{str}, internal::MetaInfo<Class>::type->data));
+        assert(!duplicate(HashedString{str}, internal::MetaInfo<Class>::data));
         assert((!internal::MetaInfo<Class>::template Member<Type, Member>::member));
         internal::MetaInfo<Class>::template Member<Type, Member>::member = &node;
-        internal::MetaInfo<Class>::type->data = &node;
+        internal::MetaInfo<Class>::data = &node;
         member<Type, Member>(std::make_index_sequence<sizeof...(Property)>{}, std::forward<Property>(property)...);
         return MetaFactory<Class>{};
     }
@@ -955,7 +967,7 @@ public:
     static MetaFactory func(const char *str, Property &&... property) ENTT_NOEXCEPT {
         static internal::MetaFuncNode node{
             HashedString{str},
-            internal::MetaInfo<Class>::type->func,
+            internal::MetaInfo<Class>::func,
             +[]() {
                 return MemberFuncHelper<Type, Member>::size();
             },
@@ -974,12 +986,15 @@ public:
             +[](void *instance, const MetaAny *any) {
                 return MemberFuncHelper<Type, Member>::invoke(instance, any);
             },
+            +[]() {
+                return internal::MetaInfo<Class>::template Member<Type, Member>::prop;
+            }
         };
 
-        assert(!duplicate(HashedString{str}, internal::MetaInfo<Class>::type->func));
+        assert(!duplicate(HashedString{str}, internal::MetaInfo<Class>::func));
         assert((!internal::MetaInfo<Class>::template Member<Type, Member>::member));
         internal::MetaInfo<Class>::template Member<Type, Member>::member = &node;
-        internal::MetaInfo<Class>::type->func = &node;
+        internal::MetaInfo<Class>::func = &node;
         member<Type, Member>(std::make_index_sequence<sizeof...(Property)>{}, std::forward<Property>(property)...);
         return MetaFactory<Class>{};
     }
@@ -988,7 +1003,7 @@ public:
     static MetaFactory func(const char *str, Property &&... property) ENTT_NOEXCEPT {
         static internal::MetaFuncNode node{
             HashedString{str},
-            internal::MetaInfo<Class>::type->func,
+            internal::MetaInfo<Class>::func,
             +[]() {
                 return FreeFuncHelper<Type, Func>::size();
             },
@@ -1007,12 +1022,15 @@ public:
             +[](void *instance, const MetaAny *any) {
                 return FreeFuncHelper<Type, Func>::invoke(instance, any);
             },
+            +[]() {
+                return internal::MetaInfo<Class>::template FreeFunc<Type, Func>::prop;
+            }
         };
 
-        assert(!duplicate(HashedString{str}, internal::MetaInfo<Class>::type->func));
+        assert(!duplicate(HashedString{str}, internal::MetaInfo<Class>::func));
         assert((!internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func));
         internal::MetaInfo<Class>::template FreeFunc<Type, Func>::func = &node;
-        internal::MetaInfo<Class>::type->func = &node;
+        internal::MetaInfo<Class>::func = &node;
         func<Type, Func>(std::make_index_sequence<sizeof...(Property)>{}, std::forward<Property>(property)...);
         return MetaFactory<Class>{};
     }

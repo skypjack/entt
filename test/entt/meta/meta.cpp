@@ -113,7 +113,7 @@ TEST(Meta, TODO) {
             .data<S, &T::s1>("s1")
             .data<const S, &T::s2>("s2")
             .func<void(const S &), &T::f>("f")
-            //.func<void(T &), &serialize>("serialize")
+            .func<void(T &), &serialize>("serialize")
             ;
 
     auto *sMeta = entt::meta<S>();
@@ -168,20 +168,20 @@ TEST(Meta, TODO) {
     ASSERT_EQ(res.meta(), entt::meta<int>());
     ASSERT_EQ(res.value<int>(), 42);
 
-    //sMeta->func("serialize").invoke(static_cast<const void *>(&s));
-    //tMeta->func("serialize").invoke(&t);
-    //
-    //ASSERT_EQ(sMeta->func("serialize").size(), 0);
-    //ASSERT_EQ(tMeta->func("serialize").size(), 0);
-    //
-    //entt::reflect<A>("A").ctor<int, char>().dtor<&destroy>();
-    //auto any = entt::meta<A>()->construct(42, 'c');
-    //
-    //ASSERT_EQ(any.value<A>().i, 42);
-    //ASSERT_EQ(any.value<A>().c, 'c');
-    //
-    //entt::meta<A>()->dtor().invoke(any);
-    //entt::meta<A>()->destroy(entt::meta<A>()->construct(42, 'c'));
-    //
-    //print(0, entt::meta("A"));
+    sMeta->func("serialize").invoke(static_cast<const void *>(&s));
+    tMeta->func("serialize").invoke(&t);
+
+    ASSERT_EQ(sMeta->func("serialize").size(), 0);
+    ASSERT_EQ(tMeta->func("serialize").size(), 0);
+
+    entt::reflect<A>("A").ctor<int, char>().dtor<&destroy>();
+    auto any = entt::meta<A>()->construct(42, 'c');
+
+    ASSERT_EQ(any.value<A>().i, 42);
+    ASSERT_EQ(any.value<A>().c, 'c');
+
+    entt::meta<A>()->dtor().invoke(any);
+    entt::meta<A>()->destroy(entt::meta<A>()->construct(42, 'c'));
+
+    print(0, entt::meta("A"));
 }
