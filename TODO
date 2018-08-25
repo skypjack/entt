@@ -18,6 +18,5 @@
 * make view copyable/moveable
 * C++17. That's all.
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
-* comparision on Meta is broken, it doesn't work as expected when meta is missed (ie int, bool unregistered types, ...)
-* AOB
 * tag_t and the others, create constexpr var
+* AOB

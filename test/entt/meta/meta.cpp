@@ -117,6 +117,10 @@ TEST(Meta, TODO) {
             .func<void(T &), &serialize>("serialize")
             ;
 
+    ASSERT_NE(entt::MetaSystem::meta<S>(), nullptr);
+    ASSERT_NE(entt::MetaSystem::meta<T>(), nullptr);
+    ASSERT_NE(entt::MetaSystem::meta<int>(), nullptr);
+
 //    auto *sMeta = entt::meta<S>();
 //    auto *tMeta = entt::meta("bar");
 //

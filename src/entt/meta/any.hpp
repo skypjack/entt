@@ -54,7 +54,7 @@ public:
     }
 
     MetaTypeNode * meta() const ENTT_NOEXCEPT override {
-        return internal::MetaInfo<Type>::type;
+        return MetaTypeNode::type<Type>;
     }
 
     inline const void * data() const ENTT_NOEXCEPT override {
