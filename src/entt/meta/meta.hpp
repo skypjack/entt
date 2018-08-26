@@ -9,20 +9,10 @@
 #include <algorithm>
 #include <type_traits>
 #include "../core/hashed_string.hpp"
-#include "any.hpp"
 #include "info.hpp"
 
 
 namespace entt {
-
-
-/**
- * TODO
- * - drop meta info
- * - add a layer that abstracts from nodes and make nodes private
- * - props aren't unique if one can define multiple times something (ctor, dtor, etc)
- * - next non-const?
- */
 
 
 template<typename Key, typename Value>
@@ -37,19 +27,21 @@ class MetaSystem final {
         return node ? node->name == name || duplicate(name, node->next) : false;
     }
 
-    inline static bool duplicate(const MetaAny &key, const MetaPropNode *node) ENTT_NOEXCEPT {
+    inline static bool duplicate(const MetaAny &key, const internal::MetaPropNode *node) ENTT_NOEXCEPT {
         return node ? node->key() == key || duplicate(key, node->next) : false;
     }
 
     template<typename...>
-    static MetaPropNode * properties() {
+    static internal::MetaPropNode * properties() {
         return nullptr;
     }
 
     template<typename... Dispatch, typename Property, typename... Other>
-    static MetaPropNode * properties(const Property &property, const Other &... other) {
+    static internal::MetaPropNode * properties(const Property &property, const Other &... other) {
+        static internal::MetaPropImpl<Dispatch..., Property, Other...> impl;
         static const Property prop{property};
-        static MetaPropNode node{
+        static internal::MetaPropNode node{
+            &impl,
             properties<Dispatch...>(other...),
             +[]() ENTT_NOEXCEPT {
                 return MetaAny{prop.first};
@@ -60,6 +52,8 @@ class MetaSystem final {
         };
 
         assert(!duplicate(MetaAny{prop.first}, node.next));
+        assert((!internal::MetaInfo::prop<Dispatch..., Property, Other...>));
+        internal::MetaInfo::prop<Dispatch..., Property, Other...> = &node;
         return &node;
     }
 
@@ -93,21 +87,21 @@ class MetaSystem final {
             using return_type = Ret;
             static constexpr auto size = sizeof...(Args);
 
-            static auto arg(typename MetaFuncNode::size_type index) ENTT_NOEXCEPT {
-                return std::array<MetaTypeNode *, sizeof...(Args)>{{meta<Args>()...}}[index];
+            static auto arg(typename internal::MetaFuncNode::size_type index) ENTT_NOEXCEPT {
+                return std::array<internal::MetaTypeNode *, sizeof...(Args)>{{meta<Args>()...}}[index];
             }
 
-            static auto accept(const MetaTypeNode ** const types) ENTT_NOEXCEPT {
-                std::array<MetaTypeNode *, sizeof...(Args)> args{{meta<Args>()...}};
+            static auto accept(const internal::MetaTypeNode ** const types) ENTT_NOEXCEPT {
+                std::array<internal::MetaTypeNode *, sizeof...(Args)> args{{meta<Args>()...}};
                 return std::equal(args.cbegin(), args.cend(), types);
             }
         };
 
         template<typename Type, Type Class:: *>
-        struct MemberFuncHelper;
+        class MemberFuncHelper;
 
         template<typename Ret, typename... Args, Ret(Class:: *Member)(Args...)>
-        struct MemberFuncHelper<Ret(Args...), Member>: CommonFuncHelper<Ret(Args...)> {
+        class MemberFuncHelper<Ret(Args...), Member>: public CommonFuncHelper<Ret(Args...)> {
             template<std::size_t... Indexes>
             static auto invoke(int, void *instance, const MetaAny *any, std::index_sequence<Indexes...>)
             -> decltype(MetaAny{(static_cast<Class *>(instance)->*Member)((any+Indexes)->get<std::decay_t<Args>>()...)}, MetaAny{})
@@ -127,6 +121,7 @@ class MetaSystem final {
                 return MetaAny{};
             }
 
+        public:
             static auto invoke(void *instance, const MetaAny *any) {
                 return invoke(0, instance, any, std::make_index_sequence<sizeof...(Args)>{});
             }
@@ -137,7 +132,7 @@ class MetaSystem final {
         };
 
         template<typename Ret, typename... Args, Ret(Class:: *Member)(Args...) const>
-        struct MemberFuncHelper<Ret(Args...) const, Member>: CommonFuncHelper<Ret(Args...)> {
+        class MemberFuncHelper<Ret(Args...) const, Member>: public CommonFuncHelper<Ret(Args...)> {
             template<std::size_t... Indexes>
             static auto invoke(int, const void *instance, const MetaAny *any, std::index_sequence<Indexes...>)
             -> decltype(MetaAny{(static_cast<const Class *>(instance)->*Member)((any+Indexes)->get<std::decay_t<Args>>()...)}, MetaAny{})
@@ -151,6 +146,7 @@ class MetaSystem final {
                 return MetaAny{};
             }
 
+        public:
             static auto invoke(void *instance, const MetaAny *any) {
                 return invoke(0, instance, any, std::make_index_sequence<sizeof...(Args)>{});
             }
@@ -161,10 +157,10 @@ class MetaSystem final {
         };
 
         template<typename Type, Type *>
-        struct FreeFuncHelper;
+        class FreeFuncHelper;
 
         template<typename Ret, typename... Args, Ret(*Func)(Class &, Args...)>
-        struct FreeFuncHelper<Ret(Class &, Args...), Func>: CommonFuncHelper<Ret(Args...)> {
+        class FreeFuncHelper<Ret(Class &, Args...), Func>: public CommonFuncHelper<Ret(Args...)> {
             template<std::size_t... Indexes>
             static auto invoke(int, void *instance, const MetaAny *any, std::index_sequence<Indexes...>)
             -> decltype(MetaAny{(*Func)(*static_cast<Class *>(instance), (any+Indexes)->get<std::decay_t<Args>>()...)}, MetaAny{})
@@ -184,6 +180,7 @@ class MetaSystem final {
                 return MetaAny{};
             }
 
+        public:
             static auto invoke(void *instance, const MetaAny *any) {
                 return invoke(0, instance, any, std::make_index_sequence<sizeof...(Args)>{});
             }
@@ -194,7 +191,7 @@ class MetaSystem final {
         };
 
         template<typename Ret, typename... Args, Ret(*Func)(const Class &, Args...)>
-        struct FreeFuncHelper<Ret(const Class &, Args...), Func>: CommonFuncHelper<Ret(Args...)> {
+        class FreeFuncHelper<Ret(const Class &, Args...), Func>: public CommonFuncHelper<Ret(Args...)> {
             template<std::size_t... Indexes>
             static auto invoke(int, const void *instance, const MetaAny *any, std::index_sequence<Indexes...>)
             -> decltype(MetaAny{(*Func)(*static_cast<const Class *>(instance), (any+Indexes)->get<std::decay_t<Args>>()...)}, MetaAny{})
@@ -208,6 +205,7 @@ class MetaSystem final {
                 return MetaAny{};
             }
 
+        public:
             static auto invoke(void *instance, const MetaAny *any) {
                 return invoke(0, instance, any, std::make_index_sequence<sizeof...(Args)>{});
             }
@@ -220,16 +218,17 @@ class MetaSystem final {
     public:
         template<typename... Args, typename... Property>
         static auto ctor(Property &&... property) ENTT_NOEXCEPT {
-            static bool watchdog = true;
-            static MetaCtorNode node{
-                MetaTypeNode::type<Class>->ctor,
+            static internal::MetaCtorImpl<Class, Args...> impl;
+            static internal::MetaCtorNode node{
+                &impl,
+                internal::MetaInfo::type<Class>->ctor,
                 properties<Class, Args...>(std::forward<Property>(property)...),
                 sizeof...(Args),
-                +[](typename MetaCtorNode::size_type index) ENTT_NOEXCEPT {
-                    return std::array<MetaTypeNode *, sizeof...(Args)>{{meta<Args>()...}}[index];
+                +[](typename internal::MetaCtorNode::size_type index) ENTT_NOEXCEPT {
+                    return std::array<internal::MetaTypeNode *, sizeof...(Args)>{{meta<Args>()...}}[index];
                 },
-                +[](const MetaTypeNode ** const types) ENTT_NOEXCEPT {
-                    std::array<MetaTypeNode *, sizeof...(Args)> args{{meta<Args>()...}};
+                +[](const internal::MetaTypeNode ** const types) ENTT_NOEXCEPT {
+                    std::array<internal::MetaTypeNode *, sizeof...(Args)> args{{meta<Args>()...}};
                     return std::equal(args.cbegin(), args.cend(), types);
                 },
                 +[](const MetaAny * const any) {
@@ -237,35 +236,37 @@ class MetaSystem final {
                 }
             };
 
-            assert(watchdog);
-            watchdog = !watchdog;
-            MetaTypeNode::type<Class>->ctor = &node;
+            assert((!internal::MetaInfo::ctor<Class, Args...>));
+            internal::MetaInfo::ctor<Class, Args...> = &node;
+            internal::MetaInfo::type<Class>->ctor = &node;
             return MetaFactory<Class>{};
         }
 
         template<void(*Func)(Class &), typename... Property>
         static auto dtor(Property &&... property) ENTT_NOEXCEPT {
-            static bool watchdog = true;
-            static MetaDtorNode node{
+            static internal::MetaDtorImpl<Class, std::integral_constant<void(*)(Class &), Func>> impl;
+            static internal::MetaDtorNode node{
+                &impl,
                 properties<Class, std::integral_constant<void(*)(Class &), Func>>(std::forward<Property>(property)...),
                 +[](void *instance) {
                     (*Func)(*static_cast<Class *>(instance));
                 }
             };
 
-            assert(watchdog);
-            watchdog = !watchdog;
-            assert(!MetaTypeNode::type<Class>->dtor);
-            MetaTypeNode::type<Class>->dtor = &node;
+            assert(!internal::MetaInfo::type<Class>->dtor);
+            assert((!internal::MetaInfo::dtor<Class, std::integral_constant<void(*)(Class &), Func>>));
+            internal::MetaInfo::dtor<Class, std::integral_constant<void(*)(Class &), Func>> = &node;
+            internal::MetaInfo::type<Class>->dtor = &node;
             return MetaFactory<Class>{};
         }
 
         template<typename Type, Type Class:: *Member, typename... Property>
         static auto data(const char *str, Property &&... property) ENTT_NOEXCEPT {
-            static bool watchdog = true;
-            static MetaDataNode node{
+            static internal::MetaDataImpl<Class, std::integral_constant<Type Class:: *, Member>> impl;
+            static internal::MetaDataNode node{
+                &impl,
                 HashedString{str},
-                MetaTypeNode::type<Class>->data,
+                internal::MetaInfo::type<Class>->data,
                 properties<Class, std::integral_constant<Type Class:: *, Member>>(std::forward<Property>(property)...),
                 std::is_const<Type>::value,
                 &meta<Type>,
@@ -273,24 +274,25 @@ class MetaSystem final {
                 +[](const void *instance) ENTT_NOEXCEPT {
                     return MetaAny{static_cast<const Class *>(instance)->*Member};
                 },
-                +[](const MetaTypeNode * const other) ENTT_NOEXCEPT {
+                +[](const internal::MetaTypeNode * const other) ENTT_NOEXCEPT {
                     return other == meta<Type>();
                 }
             };
 
-            assert(watchdog);
-            watchdog = !watchdog;
-            assert(!duplicate(HashedString{str}, MetaTypeNode::type<Class>->data));
-            MetaTypeNode::type<Class>->data = &node;
+            assert(!duplicate(HashedString{str}, internal::MetaInfo::type<Class>->data));
+            assert((!internal::MetaInfo::data<Class, std::integral_constant<Type Class:: *, Member>>));
+            internal::MetaInfo::data<Class, std::integral_constant<Type Class:: *, Member>> = &node;
+            internal::MetaInfo::type<Class>->data = &node;
             return MetaFactory<Class>{};
         }
 
         template<typename Type, Type Class:: *Member, typename... Property>
         static auto func(const char *str, Property &&... property) ENTT_NOEXCEPT {
-            static bool watchdog = true;
-            static MetaFuncNode node{
+            static internal::MetaFuncImpl<Class, std::integral_constant<Type Class:: *, Member>> impl;
+            static internal::MetaFuncNode node{
+                &impl,
                 HashedString{str},
-                MetaTypeNode::type<Class>->func,
+                internal::MetaInfo::type<Class>->func,
                 properties<Class, std::integral_constant<Type Class:: *, Member>>(std::forward<Property>(property)...),
                 MemberFuncHelper<Type, Member>::size,
                 &meta<typename MemberFuncHelper<Type, Member>::return_type>,
@@ -300,19 +302,20 @@ class MetaSystem final {
                 &MemberFuncHelper<Type, Member>::invoke
             };
 
-            assert(watchdog);
-            watchdog = !watchdog;
-            assert(!duplicate(HashedString{str}, MetaTypeNode::type<Class>->func));
-            MetaTypeNode::type<Class>->func = &node;
+            assert(!duplicate(HashedString{str}, internal::MetaInfo::type<Class>->func));
+            assert((!internal::MetaInfo::func<Class, std::integral_constant<Type Class:: *, Member>>));
+            internal::MetaInfo::func<Class, std::integral_constant<Type Class:: *, Member>> = &node;
+            internal::MetaInfo::type<Class>->func = &node;
             return MetaFactory<Class>{};
         }
 
         template<typename Type, Type *Func, typename... Property>
         static auto func(const char *str, Property &&... property) ENTT_NOEXCEPT {
-            static bool watchdog = true;
-            static MetaFuncNode node{
+            static internal::MetaFuncImpl<Class, std::integral_constant<Type *, Func>> impl;
+            static internal::MetaFuncNode node{
+                &impl,
                 HashedString{str},
-                MetaTypeNode::type<Class>->func,
+                internal::MetaInfo::type<Class>->func,
                 properties<Class, std::integral_constant<Type *, Func>>(std::forward<Property>(property)...),
                 FreeFuncHelper<Type, Func>::size,
                 &meta<typename FreeFuncHelper<Type, Func>::return_type>,
@@ -322,33 +325,28 @@ class MetaSystem final {
                 &FreeFuncHelper<Type, Func>::invoke
             };
 
-            assert(watchdog);
-            watchdog = !watchdog;
-            assert(!duplicate(HashedString{str}, MetaTypeNode::type<Class>->func));
-            MetaTypeNode::type<Class>->func = &node;
+            assert(!duplicate(HashedString{str}, internal::MetaInfo::type<Class>->func));
+            assert((!internal::MetaInfo::func<Class, std::integral_constant<Type *, Func>>));
+            internal::MetaInfo::func<Class, std::integral_constant<Type *, Func>> = &node;
+            internal::MetaInfo::type<Class>->func = &node;
             return MetaFactory<Class>{};
         }
     };
 
     template<typename Type, typename... Property>
-    static MetaFactory<Type> reflect(HashedString hs, Property &&... property) ENTT_NOEXCEPT {
-        static bool watchdog = true;
-        static MetaTypeNode node{
-            hs,
-            MetaTypeNode::type<>,
-            properties<Type>(std::forward<Property>(property)...),
-            nullptr,
-            nullptr,
-            nullptr,
-            nullptr
+    static MetaFactory<Type> reflect(HashedString name, Property &&... property) ENTT_NOEXCEPT {
+        static internal::MetaTypeImpl<Type> impl;
+        static internal::MetaTypeNode node{
+            &impl,
+            name,
+            internal::MetaInfo::type<>,
+            properties<Type>(std::forward<Property>(property)...)
         };
 
-        assert(watchdog);
-        watchdog = !watchdog;
-        assert(!duplicate(hs, MetaTypeNode::type<>));
-        assert(!MetaTypeNode::type<Type>);
-        MetaTypeNode::type<Type> = &node;
-        MetaTypeNode::type<> = &node;
+        assert(!duplicate(name, internal::MetaInfo::type<>));
+        assert(!internal::MetaInfo::type<Type>);
+        internal::MetaInfo::type<Type> = &node;
+        internal::MetaInfo::type<> = &node;
         return MetaFactory<Type>{};
     }
 
@@ -362,12 +360,8 @@ public:
     }
 
     template<typename Type>
-    static MetaTypeNode * meta() ENTT_NOEXCEPT {
-        if(!MetaTypeNode::type<std::decay_t<Type>>) {
-            reflect<std::decay_t<Type>>(HashedString{});
-        }
-
-        return MetaTypeNode::type<std::decay_t<Type>>;
+    static internal::MetaTypeNode * meta() ENTT_NOEXCEPT {
+        return internal::MetaInfo::resolve<Type>();
     }
 };
 
