@@ -2,8 +2,20 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
-#include <iostream>
 
+template<typename Type, Type Value>
+bool equal(const Type &value) {
+    return value == Value;
+}
+
+TEST(Meta, Fundamental) {
+    // entt::Meta::reflect<int>("Integer")
+    //         .func<bool(const int &), &equal<int, 0>>("equal");
+}
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>OLD
+
+#include <iostream>
 
 void print(unsigned int n, entt::MetaType *meta) {
     std::cout << std::string(n, ' ') << "class: " << meta->name() << std::endl;
