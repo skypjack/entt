@@ -9,8 +9,8 @@ bool equal(const Type &value) {
 }
 
 TEST(Meta, Fundamental) {
-    // entt::Meta::reflect<int>("Integer")
-    //         .func<bool(const int &), &equal<int, 0>>("equal");
+    entt::Meta::reflect<char>("Char")
+            .ext<bool(const char &), &equal<char, 'c'>>("equal");
 }
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>OLD
@@ -119,19 +119,19 @@ TEST(Meta, TODO) {
             .func<S *(int), &S::g>("g")
             .func<const S *(int) const, &S::g>("cg")
             .func<int(int) const, &S::h>("h")
-            .func<void(const S &), &serialize>("serialize", entt::property(entt::HashedString{"3"}, 3))
+            .ext<void(const S &), &serialize>("serialize", entt::property(entt::HashedString{"3"}, 3))
             ;
 
     entt::Meta::reflect<T>("bar")
             .data<S, &T::s1>("s1")
             .data<const S, &T::s2>("s2")
             .func<void(const S &), &T::f>("f")
-            .func<void(T &), &serialize>("serialize")
+            .ext<void(T &), &serialize>("serialize")
             ;
 
     ASSERT_NE(entt::Meta::resolve<S>(), nullptr);
     ASSERT_NE(entt::Meta::resolve<T>(), nullptr);
-    ASSERT_NE(entt::Meta::resolve<int>(), nullptr);
+    ASSERT_EQ(entt::Meta::resolve<int>(), nullptr);
 
     auto *sMeta = entt::Meta::resolve<S>();
     auto *tMeta = entt::Meta::resolve("bar");
