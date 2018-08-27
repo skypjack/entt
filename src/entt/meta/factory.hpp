@@ -224,10 +224,12 @@ class Meta final {
     public:
         template<typename... Args, typename... Property>
         static auto ctor(Property &&... property) ENTT_NOEXCEPT {
+            auto *type = internal::MetaInfo::type<Class>;
+
             static internal::MetaCtorImpl<Class, Args...> impl;
             static internal::MetaCtorNode node{
                 &impl,
-                internal::MetaInfo::type<Class>->ctor,
+                type->ctor,
                 properties<Class, Args...>(std::forward<Property>(property)...),
                 sizeof...(Args),
                 [](typename internal::MetaCtorNode::size_type index) ENTT_NOEXCEPT {
@@ -244,7 +246,7 @@ class Meta final {
 
             assert((!internal::MetaInfo::ctor<Class, Args...>));
             internal::MetaInfo::ctor<Class, Args...> = &node;
-            internal::MetaInfo::type<Class>->ctor = &node;
+            type->ctor = &node;
             return MetaFactory<Class>{};
         }
 
