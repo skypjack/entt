@@ -226,22 +226,26 @@ class Meta final {
         static auto ctor(Property &&... property) ENTT_NOEXCEPT {
             auto *type = internal::MetaInfo::type<Class>;
 
+            internal::MetaTypeNode *(* const arg)(typename internal::MetaCtorNode::size_type) ENTT_NOEXCEPT = [](typename internal::MetaCtorNode::size_type index) ENTT_NOEXCEPT {
+                return std::array<internal::MetaTypeNode *, sizeof...(Args)>{{internal::MetaInfo::resolve<Args>()...}}[index];
+            };
+
+            bool(* const accept)(const internal::MetaTypeNode ** const) ENTT_NOEXCEPT = [](const internal::MetaTypeNode ** const types) ENTT_NOEXCEPT {
+                std::array<internal::MetaTypeNode *, sizeof...(Args)> args{{internal::MetaInfo::resolve<Args>()...}};
+                return std::equal(args.cbegin(), args.cend(), types);
+            };
+
+            MetaAny(* const invoke)(const MetaAny * const) = [](const MetaAny * const any) {
+                return constructor<Args...>(any, std::make_index_sequence<sizeof...(Args)>{});
+            };
+
             static internal::MetaCtorImpl<Class, Args...> impl;
             static internal::MetaCtorNode node{
                 &impl,
                 type->ctor,
                 properties<Class, Args...>(std::forward<Property>(property)...),
                 sizeof...(Args),
-                [](typename internal::MetaCtorNode::size_type index) ENTT_NOEXCEPT {
-                    return std::array<internal::MetaTypeNode *, sizeof...(Args)>{{internal::MetaInfo::resolve<Args>()...}}[index];
-                },
-                [](const internal::MetaTypeNode ** const types) ENTT_NOEXCEPT {
-                    std::array<internal::MetaTypeNode *, sizeof...(Args)> args{{internal::MetaInfo::resolve<Args>()...}};
-                    return std::equal(args.cbegin(), args.cend(), types);
-                },
-                [](const MetaAny * const any) {
-                    return constructor<Args...>(any, std::make_index_sequence<sizeof...(Args)>{});
-                }
+                arg, accept, invoke
             };
 
             assert((!internal::MetaInfo::ctor<Class, Args...>));
