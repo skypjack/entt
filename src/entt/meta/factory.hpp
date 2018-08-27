@@ -185,10 +185,10 @@ class Meta final {
         static internal::MetaPropNode node{
             &impl,
             properties<Dispatch...>(other...),
-            +[]() ENTT_NOEXCEPT -> const MetaAny & {
+            []() ENTT_NOEXCEPT -> const MetaAny & {
                 return key;
             },
-            +[]() ENTT_NOEXCEPT -> const MetaAny & {
+            []() ENTT_NOEXCEPT -> const MetaAny & {
                 return value;
             }
         };
@@ -200,9 +200,7 @@ class Meta final {
     }
 
     template<typename, typename = void>
-    struct MetaFactory final {
-
-    };
+    struct MetaFactory final {};
 
     template<typename Class>
     class MetaFactory<Class, std::enable_if_t<std::is_class<Class>::value>> {
@@ -232,16 +230,16 @@ class Meta final {
                 internal::MetaInfo::type<Class>->ctor,
                 properties<Class, Args...>(std::forward<Property>(property)...),
                 sizeof...(Args),
-                static_cast<internal::MetaTypeNode *(*)(typename internal::MetaCtorNode::size_type) ENTT_NOEXCEPT>([](typename internal::MetaCtorNode::size_type index) ENTT_NOEXCEPT {
+                [](typename internal::MetaCtorNode::size_type index) ENTT_NOEXCEPT {
                     return std::array<internal::MetaTypeNode *, sizeof...(Args)>{{internal::MetaInfo::resolve<Args>()...}}[index];
-                }),
-                static_cast<bool(*)(const internal::MetaTypeNode ** const) ENTT_NOEXCEPT>([](const internal::MetaTypeNode ** const types) ENTT_NOEXCEPT {
+                },
+                [](const internal::MetaTypeNode ** const types) ENTT_NOEXCEPT {
                     std::array<internal::MetaTypeNode *, sizeof...(Args)> args{{internal::MetaInfo::resolve<Args>()...}};
                     return std::equal(args.cbegin(), args.cend(), types);
-                }),
-                static_cast<MetaAny(*)(const MetaAny * const)>([](const MetaAny * const any) {
+                },
+                [](const MetaAny * const any) {
                     return constructor<Args...>(any, std::make_index_sequence<sizeof...(Args)>{});
-                })
+                }
             };
 
             assert((!internal::MetaInfo::ctor<Class, Args...>));
@@ -256,7 +254,7 @@ class Meta final {
             static internal::MetaDtorNode node{
                 &impl,
                 properties<Class, std::integral_constant<void(*)(Class &), Func>>(std::forward<Property>(property)...),
-                +[](void *instance) {
+                [](void *instance) {
                     (*Func)(*static_cast<Class *>(instance));
                 }
             };
@@ -279,10 +277,10 @@ class Meta final {
                 std::is_const<Type>::value,
                 &internal::MetaInfo::resolve<Type>,
                 &setter<std::is_const<Type>::value, Type, Member>,
-                +[](const void *instance) ENTT_NOEXCEPT {
+                [](const void *instance) ENTT_NOEXCEPT {
                     return MetaAny{static_cast<const Class *>(instance)->*Member};
                 },
-                +[](const internal::MetaTypeNode * const other) ENTT_NOEXCEPT {
+                [](const internal::MetaTypeNode * const other) ENTT_NOEXCEPT {
                     return other == internal::MetaInfo::resolve<Type>();
                 }
             };
