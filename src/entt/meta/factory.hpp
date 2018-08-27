@@ -226,28 +226,24 @@ class Meta final {
     public:
         template<typename... Args, typename... Property>
         static auto ctor(Property &&... property) ENTT_NOEXCEPT {
-            auto *arg = +[](typename internal::MetaCtorNode::size_type index) ENTT_NOEXCEPT {
-                return std::array<internal::MetaTypeNode *, sizeof...(Args)>{{internal::MetaInfo::resolve<Args>()...}}[index];
-            };
-
-            auto *accept = +[](const internal::MetaTypeNode ** const types) ENTT_NOEXCEPT {
-                std::array<internal::MetaTypeNode *, sizeof...(Args)> args{{internal::MetaInfo::resolve<Args>()...}};
-                return std::equal(args.cbegin(), args.cend(), types);
-            };
-
-            auto *invoke = +[](const MetaAny * const any) {
-                return constructor<Args...>(any, std::make_index_sequence<sizeof...(Args)>{});
-            };
+            auto *foobar = internal::MetaInfo::type<Class>->ctor;
 
             static internal::MetaCtorImpl<Class, Args...> impl;
             static internal::MetaCtorNode node{
                 &impl,
-                internal::MetaInfo::type<Class>->ctor,
+                foobar,
                 properties<Class, Args...>(std::forward<Property>(property)...),
                 sizeof...(Args),
-                arg,
-                accept,
-                invoke
+                +[](typename internal::MetaCtorNode::size_type index) ENTT_NOEXCEPT {
+                    return std::array<internal::MetaTypeNode *, sizeof...(Args)>{{internal::MetaInfo::resolve<Args>()...}}[index];
+                },
+                +[](const internal::MetaTypeNode ** const types) ENTT_NOEXCEPT {
+                    std::array<internal::MetaTypeNode *, sizeof...(Args)> args{{internal::MetaInfo::resolve<Args>()...}};
+                    return std::equal(args.cbegin(), args.cend(), types);
+                },
+                +[](const MetaAny * const any) {
+                    return constructor<Args...>(any, std::make_index_sequence<sizeof...(Args)>{});
+                }
             };
 
             assert((!internal::MetaInfo::ctor<Class, Args...>));
