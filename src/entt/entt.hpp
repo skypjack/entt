@@ -4,6 +4,7 @@
 #include "core/ident.hpp"
 #include "core/monostate.hpp"
 #include "entity/actor.hpp"
+#include "entity/attachee.hpp"
 #include "entity/entity.hpp"
 #include "entity/entt_traits.hpp"
 #include "entity/helper.hpp"

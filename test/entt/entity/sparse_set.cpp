@@ -400,8 +400,8 @@ TEST(SparseSetWithType, Functionalities) {
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
 
-    (void)entt::SparseSet<std::uint64_t>{std::move(set)};
-    entt::SparseSet<std::uint64_t> other;
+    (void)entt::SparseSet<std::uint64_t, int>{std::move(set)};
+    entt::SparseSet<std::uint64_t, int> other;
     other = std::move(set);
 }
 

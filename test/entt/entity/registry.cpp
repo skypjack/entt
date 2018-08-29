@@ -376,8 +376,10 @@ TEST(DefaultRegistry, CreateDestroyEntities) {
 TEST(DefaultRegistry, AttachSetRemoveTags) {
     entt::DefaultRegistry registry;
     const auto &cregistry = registry;
+    const typename decltype(registry)::entity_type null = entt::null;
 
     ASSERT_FALSE(registry.has<int>());
+    ASSERT_EQ(registry.attachee<int>(), null);
 
     const auto entity = registry.create();
     registry.assign<int>(entt::tag_t{}, entity, 42);
@@ -411,6 +413,7 @@ TEST(DefaultRegistry, AttachSetRemoveTags) {
     ASSERT_FALSE(registry.has<int>());
     ASSERT_FALSE(registry.has<int>(entt::tag_t{}, entity));
     ASSERT_FALSE(registry.has<int>(entt::tag_t{}, other));
+    ASSERT_EQ(registry.attachee<int>(), null);
 
     registry.assign<int>(entt::tag_t{}, entity, 42);
     registry.destroy(entity);
@@ -810,4 +813,15 @@ TEST(DefaultRegistry, DestroyByTagAndComponents) {
     registry.destroy<char>(entt::tag_t{});
     registry.destroy<double>(entt::tag_t{});
     registry.destroy<float>(entt::tag_t{});
+}
+
+TEST(DefaultRegistry, SignalsOnAccommodate) {
+    entt::DefaultRegistry registry;
+    const auto entity = registry.create();
+
+    registry.prepare<int, char>();
+    registry.assign<int>(entity);
+    registry.accommodate<char>(entity);
+
+    ASSERT_FALSE((registry.view<int, char>(entt::persistent_t{}).empty()));
 }

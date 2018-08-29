@@ -140,7 +140,7 @@ public:
         basic_fn_type *assign = [](const Prototype &prototype, Registry<Entity> &other, const Entity dst) {
             if(!other.template has<Component>(dst)) {
                 const auto &wrapper = prototype.registry->template get<Wrapper<Component>>(prototype.entity);
-                other.template accommodate<Component>(dst, wrapper.component);
+                other.template assign<Component>(dst, wrapper.component);
             }
         };
 
