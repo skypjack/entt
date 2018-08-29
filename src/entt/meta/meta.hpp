@@ -615,7 +615,7 @@ MetaTypeNode * MetaInfo::resolve() ENTT_NOEXCEPT {
             {},
             MetaInfo::type<>,
             nullptr,
-            []() -> MetaType * {
+            []() ENTT_NOEXCEPT -> MetaType * {
                 return nullptr;
             }
         };
