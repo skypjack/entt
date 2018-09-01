@@ -122,7 +122,7 @@ class SparseSet<Entity> {
         }
 
         reference operator[](const difference_type value) const ENTT_NOEXCEPT {
-            return (*direct)[index-value-1];
+            return (*direct)[static_cast<size_type>(index-value-1)];
         }
 
         bool operator==(const Iterator &other) const ENTT_NOEXCEPT {
@@ -150,7 +150,7 @@ class SparseSet<Entity> {
         }
 
         pointer operator->() const ENTT_NOEXCEPT {
-            return &(*direct)[index-1];
+            return &(*direct)[static_cast<size_type>(index-1)];
         }
 
         inline reference operator*() const ENTT_NOEXCEPT {
@@ -422,7 +422,7 @@ public:
      */
     size_type get(const entity_type entity) const ENTT_NOEXCEPT {
         assert(has(entity));
-        return reverse[entity & traits_type::entity_mask];
+        return static_cast<size_type>(reverse[static_cast<size_type>(entity & traits_type::entity_mask)]);
     }
 
     /**
@@ -466,7 +466,7 @@ public:
         auto &candidate = reverse[entity & traits_type::entity_mask];
         // swapping isn't required here, we are getting rid of the last element
         reverse[back & traits_type::entity_mask] = candidate;
-        direct[candidate] = back;
+        direct[static_cast<size_type>(candidate)] = back;
         candidate = null;
         direct.pop_back();
     }
@@ -637,7 +637,7 @@ class SparseSet<Entity, Type>: public SparseSet<Entity> {
         }
 
         reference operator[](const difference_type value) const ENTT_NOEXCEPT {
-            return (*instances)[index-value-1];
+            return (*instances)[static_cast<size_type>(index-value-1)];
         }
 
         bool operator==(const Iterator &other) const ENTT_NOEXCEPT {
@@ -665,7 +665,7 @@ class SparseSet<Entity, Type>: public SparseSet<Entity> {
         }
 
         pointer operator->() const ENTT_NOEXCEPT {
-            return &(*instances)[index-1];
+            return &(*instances)[static_cast<size_type>(index-1)];
         }
 
         inline reference operator*() const ENTT_NOEXCEPT {
