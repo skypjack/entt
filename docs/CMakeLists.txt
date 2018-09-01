@@ -20,3 +20,17 @@ install(
     DIRECTORY ${DOXY_OUTPUT_DIRECTORY}/html
     DESTINATION share/${PROJECT_NAME}-${PROJECT_VERSION}/
 )
+
+add_custom_target(
+    docs_aob
+    SOURCES
+        CONTRIBUTING.md
+        core.md
+        entity.md
+        locator.md
+        process.md
+        resource.md
+        shared.md
+        signal.md
+        extra.dox
+)

@@ -218,6 +218,4 @@ add_custom_target(
         README.md
         TODO
         .travis.yml
-        docs/CONTRIBUTING.md
-        docs/extra.dox
 )
