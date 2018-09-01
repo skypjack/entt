@@ -122,7 +122,8 @@ class SparseSet<Entity> {
         }
 
         reference operator[](const difference_type value) const ENTT_NOEXCEPT {
-            return (*direct)[index-value-1];
+            const auto pos = size_type(index-value-1);
+            return (*direct)[pos];
         }
 
         bool operator==(const Iterator &other) const ENTT_NOEXCEPT {
@@ -150,7 +151,8 @@ class SparseSet<Entity> {
         }
 
         pointer operator->() const ENTT_NOEXCEPT {
-            return &(*direct)[index-1];
+            const auto pos = size_type(index-1);
+            return &(*direct)[pos];
         }
 
         inline reference operator*() const ENTT_NOEXCEPT {
@@ -422,7 +424,8 @@ public:
      */
     size_type get(const entity_type entity) const ENTT_NOEXCEPT {
         assert(has(entity));
-        return reverse[entity & traits_type::entity_mask];
+        const auto pos = size_type(entity & traits_type::entity_mask);
+        return size_type(reverse[pos]);
     }
 
     /**
@@ -463,10 +466,10 @@ public:
     virtual void destroy(const entity_type entity) {
         assert(has(entity));
         const auto back = direct.back();
-        auto &candidate = reverse[entity & traits_type::entity_mask];
+        auto &candidate = reverse[size_type(entity & traits_type::entity_mask)];
         // swapping isn't required here, we are getting rid of the last element
         reverse[back & traits_type::entity_mask] = candidate;
-        direct[candidate] = back;
+        direct[size_type(candidate)] = back;
         candidate = null;
         direct.pop_back();
     }
@@ -637,7 +640,8 @@ class SparseSet<Entity, Type>: public SparseSet<Entity> {
         }
 
         reference operator[](const difference_type value) const ENTT_NOEXCEPT {
-            return (*instances)[index-value-1];
+            const auto pos = size_type(index-value-1);
+            return (*instances)[pos];
         }
 
         bool operator==(const Iterator &other) const ENTT_NOEXCEPT {
@@ -665,7 +669,8 @@ class SparseSet<Entity, Type>: public SparseSet<Entity> {
         }
 
         pointer operator->() const ENTT_NOEXCEPT {
-            return &(*instances)[index-1];
+            const auto pos = size_type(index-1);
+            return &(*instances)[pos];
         }
 
         inline reference operator*() const ENTT_NOEXCEPT {
