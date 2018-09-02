@@ -15,3 +15,4 @@
 * AOB
 * lower case names (?)
 * tag_t and the others, create constexpr var
+* use delegate within sink, it reduces the boilerplate in C++14, it shrinks the API of sink in C++17

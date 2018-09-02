@@ -4,7 +4,7 @@
 @cond TURN_OFF_DOXYGEN
 -->
 [![GitHub version](https://badge.fury.io/gh/skypjack%2Fentt.svg)](http://badge.fury.io/gh/skypjack%2Fentt)
-[![Loc](https://tokei.rs/b1/github/skypjack/entt)](https://github.com/skypjack/entt)
+[![LoC](https://tokei.rs/b1/github/skypjack/entt)](https://github.com/skypjack/entt)
 [![Build Status](https://travis-ci.org/skypjack/entt.svg?branch=master)](https://travis-ci.org/skypjack/entt)
 [![Build status](https://ci.appveyor.com/api/projects/status/rvhaabjmghg715ck?svg=true)](https://ci.appveyor.com/project/skypjack/entt)
 [![Coverage Status](https://coveralls.io/repos/github/skypjack/entt/badge.svg?branch=master)](https://coveralls.io/github/skypjack/entt?branch=master)
