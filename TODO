@@ -13,5 +13,5 @@
 * reflection system (maybe)
 * C++17. That's all.
 * AOB
+* lower case names (?)
 * tag_t and the others, create constexpr var
-* namespace scope separation (entt::ecs, entt::signal, and so on)
