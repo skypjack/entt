@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['hashedstring',['HashedString',['../classentt_1_1HashedString.html',1,'entt']]]
+  ['identifier',['Identifier',['../classentt_1_1Identifier.html',1,'entt']]],
+  ['insertionsort',['InsertionSort',['../structentt_1_1InsertionSort.html',1,'entt']]]
 ];

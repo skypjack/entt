@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['monostate',['Monostate',['../structentt_1_1Monostate.html',1,'entt']]]
+  ['oneshotbubblesort',['OneShotBubbleSort',['../structentt_1_1OneShotBubbleSort.html',1,'entt']]]
 ];
