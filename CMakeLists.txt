@@ -16,7 +16,7 @@ endif()
 # Project configuration
 #
 
-project(EnTT VERSION 2.7.3)
+project(EnTT VERSION 3.0.0)
 
 include(GNUInstallDirs)
 
@@ -100,7 +100,7 @@ if(HAS_LIBCPP)
     target_compile_options(EnTT BEFORE INTERFACE -stdlib=libc++)
 endif()
 
-target_compile_features(EnTT INTERFACE cxx_std_14)
+target_compile_features(EnTT INTERFACE cxx_std_17)
 
 #
 # Install EnTT

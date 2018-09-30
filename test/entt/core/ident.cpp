@@ -2,31 +2,31 @@
 #include <gtest/gtest.h>
 #include <entt/core/ident.hpp>
 
-struct AType {};
-struct AnotherType {};
+struct a_type {};
+struct another_type {};
 
 TEST(Identifier, Uniqueness) {
-    using ID = entt::Identifier<AType, AnotherType>;
-    constexpr AType anInstance;
-    constexpr AnotherType anotherInstance;
+    using id = entt::identifier<a_type, another_type>;
+    constexpr a_type an_instance;
+    constexpr another_type another_instance;
 
-    ASSERT_NE(ID::get<AType>(), ID::get<AnotherType>());
-    ASSERT_EQ(ID::get<AType>(), ID::get<decltype(anInstance)>());
-    ASSERT_NE(ID::get<AType>(), ID::get<decltype(anotherInstance)>());
-    ASSERT_EQ(ID::get<AType>(), ID::get<AType>());
-    ASSERT_EQ(ID::get<AnotherType>(), ID::get<AnotherType>());
+    ASSERT_NE(id::type<a_type>, id::type<another_type>);
+    ASSERT_EQ(id::type<a_type>, id::type<decltype(an_instance)>);
+    ASSERT_NE(id::type<a_type>, id::type<decltype(another_instance)>);
+    ASSERT_EQ(id::type<a_type>, id::type<a_type>);
+    ASSERT_EQ(id::type<another_type>, id::type<another_type>);
 
     // test uses in constant expressions
-    switch(ID::get<AnotherType>()) {
-    case ID::get<AType>():
+    switch(id::type<another_type>) {
+    case id::type<a_type>:
         FAIL();
-    case ID::get<AnotherType>():
+    case id::type<another_type>:
         SUCCEED();
     }
 }
 
 TEST(Identifier, SingleType) {
-    using ID = entt::Identifier<AType>;
-    std::integral_constant<ID::identifier_type, ID::get<AType>()> ic;
+    using id = entt::identifier<a_type>;
+    std::integral_constant<id::identifier_type, id::type<a_type>> ic;
     (void)ic;
 }

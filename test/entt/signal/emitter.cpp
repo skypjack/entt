@@ -1,117 +1,117 @@
 #include <gtest/gtest.h>
 #include <entt/signal/emitter.hpp>
 
-struct TestEmitter: entt::Emitter<TestEmitter> {};
+struct test_emitter: entt::emitter<test_emitter> {};
 
-struct FooEvent { int i; char c; };
-struct BarEvent {};
+struct foo_event { int i; char c; };
+struct bar_event {};
 
 TEST(Emitter, Clear) {
-    TestEmitter emitter;
+    test_emitter emitter;
 
     ASSERT_TRUE(emitter.empty());
 
-    emitter.on<FooEvent>([](const auto &, const auto &){});
+    emitter.on<foo_event>([](const auto &, const auto &){});
 
     ASSERT_FALSE(emitter.empty());
-    ASSERT_FALSE(emitter.empty<FooEvent>());
-    ASSERT_TRUE(emitter.empty<BarEvent>());
+    ASSERT_FALSE(emitter.empty<foo_event>());
+    ASSERT_TRUE(emitter.empty<bar_event>());
 
-    emitter.clear<BarEvent>();
+    emitter.clear<bar_event>();
 
     ASSERT_FALSE(emitter.empty());
-    ASSERT_FALSE(emitter.empty<FooEvent>());
-    ASSERT_TRUE(emitter.empty<BarEvent>());
+    ASSERT_FALSE(emitter.empty<foo_event>());
+    ASSERT_TRUE(emitter.empty<bar_event>());
 
-    emitter.clear<FooEvent>();
+    emitter.clear<foo_event>();
 
     ASSERT_TRUE(emitter.empty());
-    ASSERT_TRUE(emitter.empty<FooEvent>());
-    ASSERT_TRUE(emitter.empty<BarEvent>());
+    ASSERT_TRUE(emitter.empty<foo_event>());
+    ASSERT_TRUE(emitter.empty<bar_event>());
 
-    emitter.on<FooEvent>([](const auto &, const auto &){});
-    emitter.on<BarEvent>([](const auto &, const auto &){});
+    emitter.on<foo_event>([](const auto &, const auto &){});
+    emitter.on<bar_event>([](const auto &, const auto &){});
 
     ASSERT_FALSE(emitter.empty());
-    ASSERT_FALSE(emitter.empty<FooEvent>());
-    ASSERT_FALSE(emitter.empty<BarEvent>());
+    ASSERT_FALSE(emitter.empty<foo_event>());
+    ASSERT_FALSE(emitter.empty<bar_event>());
 
     emitter.clear();
 
     ASSERT_TRUE(emitter.empty());
-    ASSERT_TRUE(emitter.empty<FooEvent>());
-    ASSERT_TRUE(emitter.empty<BarEvent>());
+    ASSERT_TRUE(emitter.empty<foo_event>());
+    ASSERT_TRUE(emitter.empty<bar_event>());
 }
 
 TEST(Emitter, ClearPublishing) {
-    TestEmitter emitter;
+    test_emitter emitter;
     bool invoked = false;
 
     ASSERT_TRUE(emitter.empty());
 
-    emitter.on<BarEvent>([&invoked](const auto &, auto &em){
+    emitter.on<bar_event>([&invoked](const auto &, auto &em){
         invoked = true;
         em.clear();
     });
 
-    emitter.publish<BarEvent>();
+    emitter.publish<bar_event>();
 
     ASSERT_TRUE(emitter.empty());
     ASSERT_TRUE(invoked);
 }
 
 TEST(Emitter, On) {
-    TestEmitter emitter;
+    test_emitter emitter;
 
-    emitter.on<FooEvent>([](const auto &, const auto &){});
-
-    ASSERT_FALSE(emitter.empty());
-    ASSERT_FALSE(emitter.empty<FooEvent>());
-
-    emitter.publish<FooEvent>(0, 'c');
+    emitter.on<foo_event>([](const auto &, const auto &){});
 
     ASSERT_FALSE(emitter.empty());
-    ASSERT_FALSE(emitter.empty<FooEvent>());
+    ASSERT_FALSE(emitter.empty<foo_event>());
+
+    emitter.publish<foo_event>(0, 'c');
+
+    ASSERT_FALSE(emitter.empty());
+    ASSERT_FALSE(emitter.empty<foo_event>());
 }
 
 TEST(Emitter, Once) {
-    TestEmitter emitter;
+    test_emitter emitter;
 
-    emitter.once<BarEvent>([](const auto &, const auto &){});
+    emitter.once<bar_event>([](const auto &, const auto &){});
 
     ASSERT_FALSE(emitter.empty());
-    ASSERT_FALSE(emitter.empty<BarEvent>());
+    ASSERT_FALSE(emitter.empty<bar_event>());
 
-    emitter.publish<BarEvent>();
+    emitter.publish<bar_event>();
 
     ASSERT_TRUE(emitter.empty());
-    ASSERT_TRUE(emitter.empty<BarEvent>());
+    ASSERT_TRUE(emitter.empty<bar_event>());
 }
 
 TEST(Emitter, OnceAndErase) {
-    TestEmitter emitter;
+    test_emitter emitter;
 
-    auto conn = emitter.once<FooEvent>([](const auto &, const auto &){});
+    auto conn = emitter.once<foo_event>([](const auto &, const auto &){});
 
     ASSERT_FALSE(emitter.empty());
-    ASSERT_FALSE(emitter.empty<FooEvent>());
+    ASSERT_FALSE(emitter.empty<foo_event>());
 
     emitter.erase(conn);
 
     ASSERT_TRUE(emitter.empty());
-    ASSERT_TRUE(emitter.empty<FooEvent>());
+    ASSERT_TRUE(emitter.empty<foo_event>());
 }
 
 TEST(Emitter, OnAndErase) {
-    TestEmitter emitter;
+    test_emitter emitter;
 
-    auto conn = emitter.on<BarEvent>([](const auto &, const auto &){});
+    auto conn = emitter.on<bar_event>([](const auto &, const auto &){});
 
     ASSERT_FALSE(emitter.empty());
-    ASSERT_FALSE(emitter.empty<BarEvent>());
+    ASSERT_FALSE(emitter.empty<bar_event>());
 
     emitter.erase(conn);
 
     ASSERT_TRUE(emitter.empty());
-    ASSERT_TRUE(emitter.empty<BarEvent>());
+    ASSERT_TRUE(emitter.empty<bar_event>());
 }

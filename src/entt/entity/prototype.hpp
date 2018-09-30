@@ -37,27 +37,32 @@ namespace entt {
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class Prototype final {
-    using basic_fn_type = void(const Prototype &, Registry<Entity> &, const Entity);
-    using component_type = typename Registry<Entity>::component_type;
+class prototype final {
+    using basic_fn_type = void(const prototype &, registry<Entity> &, const Entity);
+    using component_type = typename registry<Entity>::component_type;
 
     template<typename Component>
-    struct Wrapper { Component component; };
+    struct component_wrapper { Component component; };
 
-    struct Handler {
+    struct component_handler {
         basic_fn_type *accommodate;
         basic_fn_type *assign;
     };
 
+    template<typename Component>
+    inline const Component & component() const ENTT_NOEXCEPT {
+        return reg->template get<component_wrapper<Component>>(entity).component;
+    }
+
     void release() {
-        if(registry->valid(entity)) {
-            registry->destroy(entity);
+        if(reg->valid(entity)) {
+            reg->destroy(entity);
         }
     }
 
 public:
     /*! @brief Registry type. */
-    using registry_type = Registry<Entity>;
+    using registry_type = registry<Entity>;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
@@ -65,22 +70,22 @@ public:
 
     /**
      * @brief Constructs a prototype that is bound to a given registry.
-     * @param registry A valid reference to a registry.
+     * @param reg A valid reference to a registry.
      */
-    Prototype(Registry<Entity> &registry)
-        : registry{&registry},
-          entity{registry.create()}
+    prototype(registry<Entity> &reg)
+        : reg{&reg},
+          entity{reg.create()}
     {}
 
     /**
      * @brief Releases all its resources.
      */
-    ~Prototype() {
+    ~prototype() {
         release();
     }
 
     /*! @brief Copying a prototype isn't allowed. */
-    Prototype(const Prototype &) = delete;
+    prototype(const prototype &) = delete;
 
     /**
      * @brief Move constructor.
@@ -91,16 +96,16 @@ public:
      *
      * @param other The instance to move from.
      */
-    Prototype(Prototype &&other)
+    prototype(prototype &&other)
         : handlers{std::move(other.handlers)},
-          registry{other.registry},
+          reg{other.reg},
           entity{other.entity}
     {
-        other.entity = entt::null;
+        other.entity = null;
     }
 
-    /*! @brief Copying a prototype isn't allowed. @return This Prototype. */
-    Prototype & operator=(const Prototype &) = delete;
+    /*! @brief Copying a prototype isn't allowed. @return This prototype. */
+    prototype & operator=(const prototype &) = delete;
 
     /**
      * @brief Move assignment operator.
@@ -110,13 +115,13 @@ public:
      * continue using them.
      *
      * @param other The instance to move from.
-     * @return This Prototype.
+     * @return This prototype.
      */
-    Prototype & operator=(Prototype &&other) {
+    prototype & operator=(prototype &&other) {
         if(this != &other) {
             auto tmp{std::move(other)};
             handlers.swap(tmp.handlers);
-            std::swap(registry, tmp.registry);
+            std::swap(reg, tmp.reg);
             std::swap(entity, tmp.entity);
         }
 
@@ -132,20 +137,20 @@ public:
      */
     template<typename Component, typename... Args>
     Component & set(Args &&... args) {
-        basic_fn_type *accommodate = [](const Prototype &prototype, Registry<Entity> &other, const Entity dst) {
-            const auto &wrapper = prototype.registry->template get<Wrapper<Component>>(prototype.entity);
+        basic_fn_type *accommodate = [](const prototype &prototype, registry<Entity> &other, const Entity dst) {
+            const auto &wrapper = prototype.reg->template get<component_wrapper<Component>>(prototype.entity);
             other.template accommodate<Component>(dst, wrapper.component);
         };
 
-        basic_fn_type *assign = [](const Prototype &prototype, Registry<Entity> &other, const Entity dst) {
+        basic_fn_type *assign = [](const prototype &prototype, registry<Entity> &other, const Entity dst) {
             if(!other.template has<Component>(dst)) {
-                const auto &wrapper = prototype.registry->template get<Wrapper<Component>>(prototype.entity);
+                const auto &wrapper = prototype.reg->template get<component_wrapper<Component>>(prototype.entity);
                 other.template assign<Component>(dst, wrapper.component);
             }
         };
 
-        handlers[registry->template type<Component>()] = Handler{accommodate, assign};
-        auto &wrapper = registry->template accommodate<Wrapper<Component>>(entity, Component{std::forward<Args>(args)...});
+        handlers[reg->template type<Component>()] = component_handler{accommodate, assign};
+        auto &wrapper = reg->template accommodate<component_wrapper<Component>>(entity, Component{std::forward<Args>(args)...});
         return wrapper.component;
     }
 
@@ -155,8 +160,8 @@ public:
      */
     template<typename Component>
     void unset() ENTT_NOEXCEPT {
-        registry->template reset<Wrapper<Component>>(entity);
-        handlers.erase(registry->template type<Component>());
+        reg->template reset<component_wrapper<Component>>(entity);
+        handlers.erase(reg->template type<Component>());
     }
 
     /**
@@ -166,11 +171,11 @@ public:
      */
     template<typename... Component>
     bool has() const ENTT_NOEXCEPT {
-        return registry->template has<Wrapper<Component>...>(entity);
+        return reg->template has<component_wrapper<Component>...>(entity);
     }
 
     /**
-     * @brief Returns a reference to the given component.
+     * @brief Returns references to the given components.
      *
      * @warning
      * Attempting to get a component from a prototype that doesn't own it
@@ -178,16 +183,20 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * prototype doesn't own an instance of the given component.
      *
-     * @tparam Component Type of component to get.
-     * @return A reference to the component owned by the prototype.
+     * @tparam Component Types of components to get.
+     * @return References to the components owned by the prototype.
      */
-    template<typename Component>
-    const Component & get() const ENTT_NOEXCEPT {
-        return registry->template get<Wrapper<Component>>(entity).component;
+    template<typename... Component>
+    decltype(auto) get() const ENTT_NOEXCEPT {
+        if constexpr(sizeof...(Component) == 1) {
+            return component<Component...>();
+        } else {
+            return std::tuple<const Component &...>{get<Component>()...};
+        }
     }
 
     /**
-     * @brief Returns a reference to the given component.
+     * @brief Returns references to the given components.
      *
      * @warning
      * Attempting to get a component from a prototype that doesn't own it
@@ -195,48 +204,16 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * prototype doesn't own an instance of the given component.
      *
-     * @tparam Component Type of component to get.
-     * @return A reference to the component owned by the prototype.
-     */
-    template<typename Component>
-    inline Component & get() ENTT_NOEXCEPT {
-        return const_cast<Component &>(const_cast<const Prototype *>(this)->get<Component>());
-    }
-
-    /**
-     * @brief Returns a reference to the given components.
-     *
-     * @warning
-     * Attempting to get components from a prototype that doesn't own them
-     * results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * prototype doesn't own instances of the given components.
-     *
-     * @tparam Component Type of components to get.
+     * @tparam Component Types of components to get.
      * @return References to the components owned by the prototype.
      */
     template<typename... Component>
-    inline std::enable_if_t<(sizeof...(Component) > 1), std::tuple<const Component &...>>
-    get() const ENTT_NOEXCEPT {
-        return std::tuple<const Component &...>{get<Component>()...};
-    }
-
-    /**
-     * @brief Returns a reference to the given components.
-     *
-     * @warning
-     * Attempting to get components from a prototype that doesn't own them
-     * results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * prototype doesn't own instances of the given components.
-     *
-     * @tparam Component Type of components to get.
-     * @return References to the components owned by the prototype.
-     */
-    template<typename... Component>
-    inline std::enable_if_t<(sizeof...(Component) > 1), std::tuple<Component &...>>
-    get() ENTT_NOEXCEPT {
-        return std::tuple<Component &...>{get<Component>()...};
+    inline decltype(auto) get() ENTT_NOEXCEPT {
+        if constexpr(sizeof...(Component) == 1) {
+            return (const_cast<Component &>(std::as_const(*this).template get<Component>()), ...);
+        } else {
+            return std::tuple<Component &...>{get<Component>()...};
+        }
     }
 
     /**
@@ -281,7 +258,7 @@ public:
      * @return A valid entity identifier.
      */
     inline entity_type create() const {
-        return create(*registry);
+        return create(*reg);
     }
 
     /**
@@ -332,7 +309,7 @@ public:
      * @param dst A valid entity identifier.
      */
     inline void assign(const entity_type dst) const {
-        assign(*registry, dst);
+        assign(*reg, dst);
     }
 
     /**
@@ -379,7 +356,7 @@ public:
      * @param dst A valid entity identifier.
      */
     inline void accommodate(const entity_type dst) const {
-        accommodate(*registry, dst);
+        accommodate(*reg, dst);
     }
 
     /**
@@ -428,7 +405,7 @@ public:
      * @param dst A valid entity identifier.
      */
     inline void operator()(const entity_type dst) const ENTT_NOEXCEPT {
-        assign(*registry, dst);
+        assign(*reg, dst);
     }
 
     /**
@@ -471,24 +448,14 @@ public:
      * @return A valid entity identifier.
      */
     inline entity_type operator()() const ENTT_NOEXCEPT {
-        return create(*registry);
+        return create(*reg);
     }
 
 private:
-    std::unordered_map<component_type, Handler> handlers;
-    Registry<Entity> *registry;
+    std::unordered_map<component_type, component_handler> handlers;
+    registry<Entity> *reg;
     entity_type entity;
 };
-
-
-/**
- * @brief Default prototype
- *
- * The default prototype is the best choice for almost all the
- * applications.<br/>
- * Users should have a really good reason to choose something different.
- */
-using DefaultPrototype = Prototype<DefaultRegistry::entity_type>;
 
 
 }

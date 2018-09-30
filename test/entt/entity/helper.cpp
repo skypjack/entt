@@ -4,7 +4,7 @@
 #include <entt/entity/registry.hpp>
 
 TEST(Helper, Dependency) {
-    entt::DefaultRegistry registry;
+    entt::registry<> registry;
     const auto entity = registry.create();
     entt::connect<double, float>(registry.construction<int>());
 
@@ -50,7 +50,7 @@ TEST(Helper, Dependency) {
 }
 
 TEST(Helper, Label) {
-    entt::DefaultRegistry registry;
+    entt::registry<> registry;
     const auto entity = registry.create();
     registry.assign<entt::label<"foobar"_hs>>(entity);
     registry.assign<int>(entity, 42);

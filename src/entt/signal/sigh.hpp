@@ -5,7 +5,10 @@
 #include <algorithm>
 #include <utility>
 #include <vector>
+#include <functional>
+#include <type_traits>
 #include "../config/config.h"
+#include "delegate.hpp"
 
 
 namespace entt {
@@ -20,71 +23,56 @@ namespace entt {
 namespace internal {
 
 
-template<typename>
-struct sigh_traits;
-
-
-template<typename Ret, typename... Args>
-struct sigh_traits<Ret(Args...)> {
-    using proto_fn_type = Ret(void *, Args...);
-    using call_type = std::pair<void *, proto_fn_type *>;
-};
-
-
 template<typename, typename>
-struct Invoker;
+struct invoker;
 
 
 template<typename Ret, typename... Args, typename Collector>
-struct Invoker<Ret(Args...), Collector> {
-    using proto_fn_type = typename sigh_traits<Ret(Args...)>::proto_fn_type;
+struct invoker<Ret(Args...), Collector> {
+    virtual ~invoker() = default;
 
-    virtual ~Invoker() = default;
-
-    bool invoke(Collector &collector, proto_fn_type *proto, void *instance, Args... args) const {
-        return collector(proto(instance, args...));
+    bool invoke(Collector &collector, const delegate<Ret(Args...)> &delegate, Args... args) const {
+        return collector(delegate(args...));
     }
 };
 
 
 template<typename... Args, typename Collector>
-struct Invoker<void(Args...), Collector> {
-    using proto_fn_type = typename sigh_traits<void(Args...)>::proto_fn_type;
+struct invoker<void(Args...), Collector> {
+    virtual ~invoker() = default;
 
-    virtual ~Invoker() = default;
-
-    bool invoke(Collector &, proto_fn_type *proto, void *instance, Args... args) const {
-        return (proto(instance, args...), true);
+    bool invoke(Collector &, const delegate<void(Args...)> &delegate, Args... args) const {
+        return (delegate(args...), true);
     }
 };
 
 
 template<typename Ret>
-struct NullCollector final {
+struct null_collector final {
     using result_type = Ret;
     bool operator()(result_type) const ENTT_NOEXCEPT { return true; }
 };
 
 
 template<>
-struct NullCollector<void> final {
+struct null_collector<void> final {
     using result_type = void;
     bool operator()() const ENTT_NOEXCEPT { return true; }
 };
 
 
 template<typename>
-struct DefaultCollector;
+struct default_collector;
 
 
 template<typename Ret, typename... Args>
-struct DefaultCollector<Ret(Args...)> final {
-    using collector_type = NullCollector<Ret>;
+struct default_collector<Ret(Args...)> final {
+    using collector_type = null_collector<Ret>;
 };
 
 
 template<typename Function>
-using DefaultCollectorType = typename DefaultCollector<Function>::collector_type;
+using default_collector_type = typename default_collector<Function>::collector_type;
 
 
 }
@@ -105,7 +93,7 @@ using DefaultCollectorType = typename DefaultCollector<Function>::collector_type
  * @tparam Function A valid function type.
  */
 template<typename Function>
-class Sink;
+class sink;
 
 
 /**
@@ -117,8 +105,8 @@ class Sink;
  * @tparam Function A valid function type.
  * @tparam Collector Type of collector to use, if any.
  */
-template<typename Function, typename Collector = internal::DefaultCollectorType<Function>>
-class SigH;
+template<typename Function, typename Collector = internal::default_collector_type<Function>>
+struct sigh;
 
 
 /**
@@ -128,37 +116,20 @@ class SigH;
  * The function type for a listener is the one of the signal to which it
  * belongs.
  *
- * The clear separation between a signal and a sink permits to store the
- * former as private data member without exposing the publish functionality
- * to the users of a class.
+ * The clear separation between a signal and a sink permits to store the former
+ * as private data member without exposing the publish functionality to the
+ * users of a class.
  *
  * @tparam Ret Return type of a function type.
  * @tparam Args Types of arguments of a function type.
  */
 template<typename Ret, typename... Args>
-class Sink<Ret(Args...)> final {
+class sink<Ret(Args...)> final {
     /*! @brief A signal is allowed to create sinks. */
     template<typename, typename>
-    friend class SigH;
+    friend struct sigh;
 
-    using call_type = typename internal::sigh_traits<Ret(Args...)>::call_type;
-
-    template<Ret(*Function)(Args...)>
-    static Ret proto(void *, Args... args) {
-        return (Function)(args...);
-    }
-
-    template<typename Class, Ret(Class:: *Member)(Args... args) const>
-    static Ret proto(void *instance, Args... args) {
-        return (static_cast<const Class *>(instance)->*Member)(args...);
-    }
-
-    template<typename Class, Ret(Class:: *Member)(Args... args)>
-    static Ret proto(void *instance, Args... args) {
-        return (static_cast<Class *>(instance)->*Member)(args...);
-    }
-
-    Sink(std::vector<call_type> *calls) ENTT_NOEXCEPT
+    sink(std::vector<delegate<Ret(Args...)>> *calls) ENTT_NOEXCEPT
         : calls{calls}
     {}
 
@@ -166,15 +137,17 @@ public:
     /**
      * @brief Connects a free function to a signal.
      *
-     * The signal handler performs checks to avoid multiple connections for
-     * free functions.
+     * The signal handler performs checks to avoid multiple connections for free
+     * functions.
      *
      * @tparam Function A valid free function pointer.
      */
-    template<Ret(*Function)(Args...)>
+    template<auto Function>
     void connect() {
         disconnect<Function>();
-        calls->emplace_back(nullptr, &proto<Function>);
+        delegate<Ret(Args...)> delegate{};
+        delegate.template connect<Function>();
+        calls->emplace_back(std::move(delegate));
     }
 
     /**
@@ -182,71 +155,60 @@ public:
      *
      * The signal isn't responsible for the connected object. Users must
      * guarantee that the lifetime of the instance overcomes the one of the
-     * signal. On the other side, the signal handler performs checks to
-     * avoid multiple connections for the same member function of a given
-     * instance.
+     * signal. On the other side, the signal handler performs checks to avoid
+     * multiple connections for the same member function of a given instance.
      *
-     * @tparam Class Type of class to which the member function belongs.
      * @tparam Member Member function to connect to the signal.
+     * @tparam Class Type of class to which the member function belongs.
      * @param instance A valid instance of type pointer to `Class`.
      */
-    template<typename Class, Ret(Class:: *Member)(Args...) const = &Class::receive>
+    template<auto Member, typename Class>
     void connect(Class *instance) {
-        disconnect<Class, Member>(instance);
-        calls->emplace_back(instance, &proto<Class, Member>);
+        disconnect<Member>(instance);
+        delegate<Ret(Args...)> delegate{};
+        delegate.template connect<Member>(instance);
+        calls->emplace_back(std::move(delegate));
     }
 
     /**
-     * @brief Connects a member function for a given instance to a signal.
+     * @brief Connects the `receive` member function for a given instance to a
+     * signal.
      *
      * The signal isn't responsible for the connected object. Users must
      * guarantee that the lifetime of the instance overcomes the one of the
-     * signal. On the other side, the signal handler performs checks to
-     * avoid multiple connections for the same member function of a given
-     * instance.
+     * signal. On the other side, the signal handler performs checks to avoid
+     * multiple connections for the same member function of a given instance.
      *
      * @tparam Class Type of class to which the member function belongs.
-     * @tparam Member Member function to connect to the signal.
      * @param instance A valid instance of type pointer to `Class`.
      */
-    template<typename Class, Ret(Class:: *Member)(Args...) = &Class::receive>
-    void connect(Class *instance) {
-        disconnect<Class, Member>(instance);
-        calls->emplace_back(instance, &proto<Class, Member>);
+    template<typename Class>
+    inline void connect(Class *instance) {
+        connect<&Class::receive>(instance);
     }
 
     /**
      * @brief Disconnects a free function from a signal.
      * @tparam Function A valid free function pointer.
      */
-    template<Ret(*Function)(Args...)>
+    template<auto Function>
     void disconnect() {
-        call_type target{nullptr, &proto<Function>};
-        calls->erase(std::remove(calls->begin(), calls->end(), std::move(target)), calls->end());
+        delegate<Ret(Args...)> delegate{};
+        delegate.template connect<Function>();
+        calls->erase(std::remove(calls->begin(), calls->end(), std::move(delegate)), calls->end());
     }
 
     /**
      * @brief Disconnects the given member function from a signal.
-     * @tparam Class Type of class to which the member function belongs.
      * @tparam Member Member function to connect to the signal.
+     * @tparam Class Type of class to which the member function belongs.
      * @param instance A valid instance of type pointer to `Class`.
      */
-    template<typename Class, Ret(Class:: *Member)(Args...) const>
+    template<auto Member, typename Class>
     void disconnect(Class *instance) {
-        call_type target{instance, &proto<Class, Member>};
-        calls->erase(std::remove(calls->begin(), calls->end(), std::move(target)), calls->end());
-    }
-
-    /**
-     * @brief Disconnects the given member function from a signal.
-     * @tparam Class Type of class to which the member function belongs.
-     * @tparam Member Member function to connect to the signal.
-     * @param instance A valid instance of type pointer to `Class`.
-     */
-    template<typename Class, Ret(Class:: *Member)(Args...)>
-    void disconnect(Class *instance) {
-        call_type target{instance, &proto<Class, Member>};
-        calls->erase(std::remove(calls->begin(), calls->end(), std::move(target)), calls->end());
+        delegate<Ret(Args...)> delegate{};
+        delegate.template connect<Member>(instance);
+        calls->erase(std::remove(calls->begin(), calls->end(), std::move(delegate)), calls->end());
     }
 
     /**
@@ -256,7 +218,7 @@ public:
      */
     template<typename Class>
     void disconnect(Class *instance) {
-        auto func = [instance](const call_type &call) { return call.first == instance; };
+        auto func = [instance](const auto &delegate) { return delegate.instance() == instance; };
         calls->erase(std::remove_if(calls->begin(), calls->end(), std::move(func)), calls->end());
     }
 
@@ -268,7 +230,7 @@ public:
     }
 
 private:
-    std::vector<call_type> *calls;
+    std::vector<delegate<Ret(Args...)>> *calls;
 };
 
 
@@ -296,16 +258,13 @@ private:
  * @tparam Collector Type of collector to use, if any.
  */
 template<typename Ret, typename... Args, typename Collector>
-class SigH<Ret(Args...), Collector> final: private internal::Invoker<Ret(Args...), Collector> {
-    using call_type = typename internal::sigh_traits<Ret(Args...)>::call_type;
-
-public:
+struct sigh<Ret(Args...), Collector> final: private internal::invoker<Ret(Args...), Collector> {
     /*! @brief Unsigned integer type. */
-    using size_type = typename std::vector<call_type>::size_type;
+    using size_type = typename std::vector<delegate<Ret(Args...)>>::size_type;
     /*! @brief Collector type. */
     using collector_type = Collector;
     /*! @brief Sink type. */
-    using sink_type = Sink<Ret(Args...)>;
+    using sink_type = entt::sink<Ret(Args...)>;
 
     /**
      * @brief Instance type when it comes to connecting member functions.
@@ -353,7 +312,7 @@ public:
     void publish(Args... args) const {
         for(auto pos = calls.size(); pos; --pos) {
             auto &call = calls[pos-1];
-            call.second(call.first, args...);
+            call(args...);
         }
     }
 
@@ -366,7 +325,7 @@ public:
         collector_type collector;
 
         for(auto &&call: calls) {
-            if(!this->invoke(collector, call.second, call.first, args...)) {
+            if(!this->invoke(collector, call, args...)) {
                 break;
             }
         }
@@ -379,7 +338,7 @@ public:
      * @param lhs A valid signal object.
      * @param rhs A valid signal object.
      */
-    friend void swap(SigH &lhs, SigH &rhs) {
+    friend void swap(sigh &lhs, sigh &rhs) {
         using std::swap;
         swap(lhs.calls, rhs.calls);
     }
@@ -393,20 +352,20 @@ public:
      * @param other Signal with which to compare.
      * @return True if the two signals are identical, false otherwise.
      */
-    bool operator==(const SigH &other) const ENTT_NOEXCEPT {
+    bool operator==(const sigh &other) const ENTT_NOEXCEPT {
         return std::equal(calls.cbegin(), calls.cend(), other.calls.cbegin(), other.calls.cend());
     }
 
 private:
-    std::vector<call_type> calls;
+    std::vector<delegate<Ret(Args...)>> calls;
 };
 
 
 /**
  * @brief Checks if the contents of the two signals are different.
  *
- * Two signals are identical if they have the same size and the same
- * listeners registered exactly in the same order.
+ * Two signals are identical if they have the same size and the same listeners
+ * registered exactly in the same order.
  *
  * @tparam Ret Return type of a function type.
  * @tparam Args Types of arguments of a function type.
@@ -415,7 +374,7 @@ private:
  * @return True if the two signals are different, false otherwise.
  */
 template<typename Ret, typename... Args>
-bool operator!=(const SigH<Ret(Args...)> &lhs, const SigH<Ret(Args...)> &rhs) ENTT_NOEXCEPT {
+bool operator!=(const sigh<Ret(Args...)> &lhs, const sigh<Ret(Args...)> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 

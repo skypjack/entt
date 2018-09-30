@@ -3,7 +3,7 @@
 #include <entt/entity/sparse_set.hpp>
 
 TEST(SparseSetNoType, Functionalities) {
-    entt::SparseSet<std::uint64_t> set;
+    entt::sparse_set<std::uint64_t> set;
     const auto &cset = set;
 
     set.reserve(42);
@@ -51,28 +51,28 @@ TEST(SparseSetNoType, Functionalities) {
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
 
-    (void)entt::SparseSet<std::uint64_t>{std::move(set)};
-    entt::SparseSet<std::uint64_t> other;
+    (void)entt::sparse_set<std::uint64_t>{std::move(set)};
+    entt::sparse_set<std::uint64_t> other;
     other = std::move(set);
 }
 
 TEST(SparseSetNoType, ElementAccess) {
-    entt::SparseSet<std::uint64_t> set;
+    entt::sparse_set<std::uint64_t> set;
     const auto &cset = set;
 
     set.construct(42);
     set.construct(3);
 
-    for(typename entt::SparseSet<std::uint64_t>::size_type i{}; i < set.size(); ++i) {
+    for(typename entt::sparse_set<std::uint64_t>::size_type i{}; i < set.size(); ++i) {
         ASSERT_EQ(set[i], i ? 42 : 3);
         ASSERT_EQ(cset[i], i ? 42 : 3);
     }
 }
 
 TEST(SparseSetNoType, Iterator) {
-    using iterator_type = typename entt::SparseSet<std::uint64_t>::iterator_type;
+    using iterator_type = typename entt::sparse_set<std::uint64_t>::iterator_type;
 
-    entt::SparseSet<std::uint64_t> set;
+    entt::sparse_set<std::uint64_t> set;
     set.construct(3);
 
     iterator_type end{set.begin()};
@@ -115,9 +115,9 @@ TEST(SparseSetNoType, Iterator) {
 }
 
 TEST(SparseSetNoType, ConstIterator) {
-    using iterator_type = typename entt::SparseSet<std::uint64_t>::const_iterator_type;
+    using iterator_type = typename entt::sparse_set<std::uint64_t>::const_iterator_type;
 
-    entt::SparseSet<std::uint64_t> set;
+    entt::sparse_set<std::uint64_t> set;
     set.construct(3);
 
     iterator_type cend{set.cbegin()};
@@ -160,7 +160,7 @@ TEST(SparseSetNoType, ConstIterator) {
 }
 
 TEST(SparseSetNoType, Data) {
-    entt::SparseSet<std::uint64_t> set;
+    entt::sparse_set<std::uint64_t> set;
 
     set.construct(3);
     set.construct(12);
@@ -176,8 +176,8 @@ TEST(SparseSetNoType, Data) {
 }
 
 TEST(SparseSetNoType, RespectDisjoint) {
-    entt::SparseSet<std::uint64_t> lhs;
-    entt::SparseSet<std::uint64_t> rhs;
+    entt::sparse_set<std::uint64_t> lhs;
+    entt::sparse_set<std::uint64_t> rhs;
     const auto &clhs = lhs;
 
     lhs.construct(3);
@@ -196,8 +196,8 @@ TEST(SparseSetNoType, RespectDisjoint) {
 }
 
 TEST(SparseSetNoType, RespectOverlap) {
-    entt::SparseSet<std::uint64_t> lhs;
-    entt::SparseSet<std::uint64_t> rhs;
+    entt::sparse_set<std::uint64_t> lhs;
+    entt::sparse_set<std::uint64_t> rhs;
     const auto &clhs = lhs;
 
     lhs.construct(3);
@@ -218,8 +218,8 @@ TEST(SparseSetNoType, RespectOverlap) {
 }
 
 TEST(SparseSetNoType, RespectOrdered) {
-    entt::SparseSet<std::uint64_t> lhs;
-    entt::SparseSet<std::uint64_t> rhs;
+    entt::sparse_set<std::uint64_t> lhs;
+    entt::sparse_set<std::uint64_t> rhs;
 
     lhs.construct(1);
     lhs.construct(2);
@@ -258,8 +258,8 @@ TEST(SparseSetNoType, RespectOrdered) {
 }
 
 TEST(SparseSetNoType, RespectReverse) {
-    entt::SparseSet<std::uint64_t> lhs;
-    entt::SparseSet<std::uint64_t> rhs;
+    entt::sparse_set<std::uint64_t> lhs;
+    entt::sparse_set<std::uint64_t> rhs;
 
     lhs.construct(1);
     lhs.construct(2);
@@ -298,8 +298,8 @@ TEST(SparseSetNoType, RespectReverse) {
 }
 
 TEST(SparseSetNoType, RespectUnordered) {
-    entt::SparseSet<std::uint64_t> lhs;
-    entt::SparseSet<std::uint64_t> rhs;
+    entt::sparse_set<std::uint64_t> lhs;
+    entt::sparse_set<std::uint64_t> rhs;
 
     lhs.construct(1);
     lhs.construct(2);
@@ -338,15 +338,15 @@ TEST(SparseSetNoType, RespectUnordered) {
 }
 
 TEST(SparseSetNoType, CanModifyDuringIteration) {
-    entt::SparseSet<std::uint64_t> set;
+    entt::sparse_set<std::uint64_t> set;
     set.construct(0);
 
-    ASSERT_EQ(set.capacity(), entt::SparseSet<std::uint64_t>::size_type{1});
+    ASSERT_EQ(set.capacity(), entt::sparse_set<std::uint64_t>::size_type{1});
 
     const auto it = set.cbegin();
-    set.reserve(entt::SparseSet<std::uint64_t>::size_type{2});
+    set.reserve(entt::sparse_set<std::uint64_t>::size_type{2});
 
-    ASSERT_EQ(set.capacity(), entt::SparseSet<std::uint64_t>::size_type{2});
+    ASSERT_EQ(set.capacity(), entt::sparse_set<std::uint64_t>::size_type{2});
 
     // this should crash with asan enabled if we break the constraint
     const auto entity = *it;
@@ -354,7 +354,7 @@ TEST(SparseSetNoType, CanModifyDuringIteration) {
 }
 
 TEST(SparseSetWithType, Functionalities) {
-    entt::SparseSet<std::uint64_t, int> set;
+    entt::sparse_set<std::uint64_t, int> set;
     const auto &cset = set;
 
     set.reserve(42);
@@ -400,43 +400,43 @@ TEST(SparseSetWithType, Functionalities) {
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
 
-    (void)entt::SparseSet<std::uint64_t, int>{std::move(set)};
-    entt::SparseSet<std::uint64_t, int> other;
+    (void)entt::sparse_set<std::uint64_t, int>{std::move(set)};
+    entt::sparse_set<std::uint64_t, int> other;
     other = std::move(set);
 }
 
 TEST(SparseSetWithType, ElementAccess) {
-    entt::SparseSet<std::uint64_t, int> set;
+    entt::sparse_set<std::uint64_t, int> set;
     const auto &cset = set;
 
     set.construct(42, 1);
     set.construct(3, 0);
 
-    for(typename entt::SparseSet<std::uint64_t, int>::size_type i{}; i < set.size(); ++i) {
+    for(typename entt::sparse_set<std::uint64_t, int>::size_type i{}; i < set.size(); ++i) {
         ASSERT_EQ(set[i], i);
         ASSERT_EQ(cset[i], i);
     }
 }
 
 TEST(SparseSetWithType, AggregatesMustWork) {
-    struct AggregateType { int value; };
+    struct aggregate_type { int value; };
     // the goal of this test is to enforce the requirements for aggregate types
-    entt::SparseSet<std::uint64_t, AggregateType>{}.construct(0, 42);
+    entt::sparse_set<std::uint64_t, aggregate_type>{}.construct(0, 42);
 }
 
 TEST(SparseSetWithType, TypesFromStandardTemplateLibraryMustWork) {
     // see #37 - this test shouldn't crash, that's all
-    entt::SparseSet<std::uint64_t, std::unordered_set<int>> set;
+    entt::sparse_set<std::uint64_t, std::unordered_set<int>> set;
     set.construct(0).insert(42);
     set.destroy(0);
 }
 
 TEST(SparseSetWithType, Iterator) {
-    struct InternalType { int value; };
+    struct internal_type { int value; };
 
-    using iterator_type = typename entt::SparseSet<std::uint64_t, InternalType>::iterator_type;
+    using iterator_type = typename entt::sparse_set<std::uint64_t, internal_type>::iterator_type;
 
-    entt::SparseSet<std::uint64_t, InternalType> set;
+    entt::sparse_set<std::uint64_t, internal_type> set;
     set.construct(3, 42);
 
     iterator_type end{set.begin()};
@@ -476,11 +476,11 @@ TEST(SparseSetWithType, Iterator) {
 }
 
 TEST(SparseSetWithType, ConstIterator) {
-    struct InternalType { int value; };
+    struct internal_type { int value; };
 
-    using iterator_type = typename entt::SparseSet<std::uint64_t, InternalType>::const_iterator_type;
+    using iterator_type = typename entt::sparse_set<std::uint64_t, internal_type>::const_iterator_type;
 
-    entt::SparseSet<std::uint64_t, InternalType> set;
+    entt::sparse_set<std::uint64_t, internal_type> set;
     set.construct(3, 42);
 
     iterator_type cend{set.cbegin()};
@@ -520,7 +520,7 @@ TEST(SparseSetWithType, ConstIterator) {
 }
 
 TEST(SparseSetWithType, Raw) {
-    entt::SparseSet<std::uint64_t, int> set;
+    entt::sparse_set<std::uint64_t, int> set;
 
     set.construct(3, 3);
     set.construct(12, 6);
@@ -536,7 +536,7 @@ TEST(SparseSetWithType, Raw) {
 }
 
 TEST(SparseSetWithType, SortOrdered) {
-    entt::SparseSet<std::uint64_t, int> set;
+    entt::sparse_set<std::uint64_t, int> set;
 
     set.construct(12, 12);
     set.construct(42, 9);
@@ -572,7 +572,7 @@ TEST(SparseSetWithType, SortOrdered) {
 }
 
 TEST(SparseSetWithType, SortReverse) {
-    entt::SparseSet<std::uint64_t, int> set;
+    entt::sparse_set<std::uint64_t, int> set;
 
     set.construct(12, 1);
     set.construct(42, 3);
@@ -608,7 +608,7 @@ TEST(SparseSetWithType, SortReverse) {
 }
 
 TEST(SparseSetWithType, SortUnordered) {
-    entt::SparseSet<std::uint64_t, int> set;
+    entt::sparse_set<std::uint64_t, int> set;
 
     set.construct(12, 6);
     set.construct(42, 3);
@@ -644,8 +644,8 @@ TEST(SparseSetWithType, SortUnordered) {
 }
 
 TEST(SparseSetWithType, RespectDisjoint) {
-    entt::SparseSet<std::uint64_t, int> lhs;
-    entt::SparseSet<std::uint64_t, int> rhs;
+    entt::sparse_set<std::uint64_t, int> lhs;
+    entt::sparse_set<std::uint64_t, int> rhs;
     const auto &clhs = lhs;
 
     lhs.construct(3, 3);
@@ -672,8 +672,8 @@ TEST(SparseSetWithType, RespectDisjoint) {
 }
 
 TEST(SparseSetWithType, RespectOverlap) {
-    entt::SparseSet<std::uint64_t, int> lhs;
-    entt::SparseSet<std::uint64_t, int> rhs;
+    entt::sparse_set<std::uint64_t, int> lhs;
+    entt::sparse_set<std::uint64_t, int> rhs;
     const auto &clhs = lhs;
 
     lhs.construct(3, 3);
@@ -702,8 +702,8 @@ TEST(SparseSetWithType, RespectOverlap) {
 }
 
 TEST(SparseSetWithType, RespectOrdered) {
-    entt::SparseSet<std::uint64_t, int> lhs;
-    entt::SparseSet<std::uint64_t, int> rhs;
+    entt::sparse_set<std::uint64_t, int> lhs;
+    entt::sparse_set<std::uint64_t, int> rhs;
 
     lhs.construct(1, 0);
     lhs.construct(2, 0);
@@ -748,8 +748,8 @@ TEST(SparseSetWithType, RespectOrdered) {
 }
 
 TEST(SparseSetWithType, RespectReverse) {
-    entt::SparseSet<std::uint64_t, int> lhs;
-    entt::SparseSet<std::uint64_t, int> rhs;
+    entt::sparse_set<std::uint64_t, int> lhs;
+    entt::sparse_set<std::uint64_t, int> rhs;
 
     lhs.construct(1, 0);
     lhs.construct(2, 0);
@@ -794,8 +794,8 @@ TEST(SparseSetWithType, RespectReverse) {
 }
 
 TEST(SparseSetWithType, RespectUnordered) {
-    entt::SparseSet<std::uint64_t, int> lhs;
-    entt::SparseSet<std::uint64_t, int> rhs;
+    entt::sparse_set<std::uint64_t, int> lhs;
+    entt::sparse_set<std::uint64_t, int> rhs;
 
     lhs.construct(1, 0);
     lhs.construct(2, 0);
@@ -840,15 +840,15 @@ TEST(SparseSetWithType, RespectUnordered) {
 }
 
 TEST(SparseSetWithType, CanModifyDuringIteration) {
-    entt::SparseSet<std::uint64_t, int> set;
+    entt::sparse_set<std::uint64_t, int> set;
     set.construct(0, 42);
 
-    ASSERT_EQ(set.capacity(), entt::SparseSet<std::uint64_t>::size_type{1});
+    ASSERT_EQ(set.capacity(), entt::sparse_set<std::uint64_t>::size_type{1});
 
     const auto it = set.cbegin();
-    set.reserve(entt::SparseSet<std::uint64_t>::size_type{2});
+    set.reserve(entt::sparse_set<std::uint64_t>::size_type{2});
 
-    ASSERT_EQ(set.capacity(), entt::SparseSet<std::uint64_t>::size_type{2});
+    ASSERT_EQ(set.capacity(), entt::sparse_set<std::uint64_t>::size_type{2});
 
     // this should crash with asan enabled if we break the constraint
     const auto entity = *it;
@@ -856,9 +856,9 @@ TEST(SparseSetWithType, CanModifyDuringIteration) {
 }
 
 TEST(SparseSetWithType, ReferencesGuaranteed) {
-    struct InternalType { int value; };
+    struct internal_type { int value; };
 
-    entt::SparseSet<std::uint64_t, InternalType> set;
+    entt::sparse_set<std::uint64_t, internal_type> set;
 
     set.construct(0, 0);
     set.construct(1, 1);
@@ -886,16 +886,16 @@ TEST(SparseSetWithType, ReferencesGuaranteed) {
 }
 
 TEST(SparseSetWithType, MoveOnlyComponent) {
-    struct MoveOnlyComponent {
-        MoveOnlyComponent() = default;
-        ~MoveOnlyComponent() = default;
-        MoveOnlyComponent(const MoveOnlyComponent &) = delete;
-        MoveOnlyComponent(MoveOnlyComponent &&) = default;
-        MoveOnlyComponent & operator=(const MoveOnlyComponent &) = delete;
-        MoveOnlyComponent & operator=(MoveOnlyComponent &&) = default;
+    struct move_only_component {
+        move_only_component() = default;
+        ~move_only_component() = default;
+        move_only_component(const move_only_component &) = delete;
+        move_only_component(move_only_component &&) = default;
+        move_only_component & operator=(const move_only_component &) = delete;
+        move_only_component & operator=(move_only_component &&) = default;
     };
 
     // it's purpose is to ensure that move only components are always accepted
-    entt::SparseSet<std::uint64_t, MoveOnlyComponent> set;
+    entt::sparse_set<std::uint64_t, move_only_component> set;
     (void)set;
 }

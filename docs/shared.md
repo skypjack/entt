@@ -4,23 +4,22 @@ To make sure that an application and a shared library that use both `EnTT` can
 interact correctly when symbols are hidden by default, there are some tricks to
 follow.<br/>
 In particular and in order to avoid undefined behaviors, all the instantiation
-of the `Family` class template shall be made explicit along with the system-wide
+of the `family` class template shall be made explicit along with the system-wide
 specifier to use to export them.
 
 At the time I'm writing this document, the classes that use internally the above
-mentioned class template are `Dispatcher`, `Emitter` and `Registry`. Therefore
-and as an example, if you use the `Registry` class template in your shared
+mentioned class template are `dispatcher`, `emitter` and `registry`. Therefore
+and as an example, if you use the `registry` class template in your shared
 library and want to set symbols visibility to _hidden_ by default, the following
 lines are required to allow it to function properly with a client that also uses
-the `Registry` somehow:
+the `registry` somehow:
 
 * On GNU/Linux:
 
   ```cpp
   namespace entt {
-      template class __attribute__((visibility("default"))) Family<struct InternalRegistryTagFamily>;
-      template class __attribute__((visibility("default"))) Family<struct InternalRegistryComponentFamily>;
-      template class __attribute__((visibility("default"))) Family<struct InternalRegistryHandlerFamily>;
+      template class __attribute__((visibility("default"))) family<struct internal_registry_component_family>;
+      template class __attribute__((visibility("default"))) family<struct internal_registry_handler_family>;
   }
   ```
 
@@ -28,9 +27,8 @@ the `Registry` somehow:
 
   ```cpp
   namespace entt {
-      template class __declspec(dllexport) Family<struct InternalRegistryTagFamily>;
-      template class __declspec(dllexport) Family<struct InternalRegistryComponentFamily>;
-      template class __declspec(dllexport) Family<struct InternalRegistryHandlerFamily>;
+      template class __declspec(dllexport) family<struct internal_registry_component_family>;
+      template class __declspec(dllexport) family<struct internal_registry_handler_family>;
   }
   ```
 

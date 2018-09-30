@@ -3,8 +3,8 @@
 #include <entt/entity/registry.hpp>
 
 TEST(Prototype, SameRegistry) {
-    entt::DefaultRegistry registry;
-    entt::DefaultPrototype prototype{registry};
+    entt::registry<> registry;
+    entt::prototype prototype{registry};
     const auto &cprototype = prototype;
 
     ASSERT_FALSE(registry.empty());
@@ -62,9 +62,9 @@ TEST(Prototype, SameRegistry) {
 }
 
 TEST(Prototype, OtherRegistry) {
-    entt::DefaultRegistry registry;
-    entt::DefaultRegistry repository;
-    entt::DefaultPrototype prototype{repository};
+    entt::registry<> registry;
+    entt::registry<> repository;
+    entt::prototype prototype{repository};
     const auto &cprototype = prototype;
 
     ASSERT_TRUE(registry.empty());
@@ -122,10 +122,10 @@ TEST(Prototype, OtherRegistry) {
 }
 
 TEST(Prototype, RAII) {
-    entt::DefaultRegistry registry;
+    entt::registry<> registry;
 
     {
-        entt::DefaultPrototype prototype{registry};
+        entt::prototype prototype{registry};
         prototype.set<int>(0);
 
         ASSERT_FALSE(registry.empty());
@@ -135,19 +135,19 @@ TEST(Prototype, RAII) {
 }
 
 TEST(Prototype, MoveConstructionAssignment) {
-    entt::DefaultRegistry registry;
+    entt::registry<> registry;
 
-    entt::DefaultPrototype prototype{registry};
+    entt::prototype prototype{registry};
     prototype.set<int>(0);
     auto other{std::move(prototype)};
     const auto e0 = other();
 
-    ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{2});
+    ASSERT_EQ(registry.size(), entt::registry<>::size_type{2});
     ASSERT_TRUE(registry.has<int>(e0));
 
     prototype = std::move(other);
     const auto e1 = prototype();
 
-    ASSERT_EQ(registry.size(), entt::DefaultRegistry::size_type{3});
+    ASSERT_EQ(registry.size(), entt::registry<>::size_type{3});
     ASSERT_TRUE(registry.has<int>(e1));
 }

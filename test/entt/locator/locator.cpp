@@ -1,50 +1,48 @@
 #include <gtest/gtest.h>
 #include <entt/locator/locator.hpp>
 
-struct AService {};
+struct a_service {};
 
-struct AnotherService {
-    virtual ~AnotherService() = default;
+struct another_service {
+    virtual ~another_service() = default;
     virtual void f(bool) = 0;
     bool check{false};
 };
 
-struct DerivedService: AnotherService {
-    DerivedService(int): AnotherService{} {}
+struct derived_service: another_service {
+    derived_service(int): another_service{} {}
     void f(bool b) override { check = b; }
 };
 
 TEST(ServiceLocator, Functionalities) {
-    using entt::ServiceLocator;
+    ASSERT_TRUE(entt::service_locator<a_service>::empty());
+    ASSERT_TRUE(entt::service_locator<another_service>::empty());
 
-    ASSERT_TRUE(ServiceLocator<AService>::empty());
-    ASSERT_TRUE(ServiceLocator<AnotherService>::empty());
+    entt::service_locator<a_service>::set();
 
-    ServiceLocator<AService>::set();
+    ASSERT_FALSE(entt::service_locator<a_service>::empty());
+    ASSERT_TRUE(entt::service_locator<another_service>::empty());
 
-    ASSERT_FALSE(ServiceLocator<AService>::empty());
-    ASSERT_TRUE(ServiceLocator<AnotherService>::empty());
+    entt::service_locator<a_service>::reset();
 
-    ServiceLocator<AService>::reset();
+    ASSERT_TRUE(entt::service_locator<a_service>::empty());
+    ASSERT_TRUE(entt::service_locator<another_service>::empty());
 
-    ASSERT_TRUE(ServiceLocator<AService>::empty());
-    ASSERT_TRUE(ServiceLocator<AnotherService>::empty());
+    entt::service_locator<a_service>::set(std::make_shared<a_service>());
 
-    ServiceLocator<AService>::set(std::make_shared<AService>());
+    ASSERT_FALSE(entt::service_locator<a_service>::empty());
+    ASSERT_TRUE(entt::service_locator<another_service>::empty());
 
-    ASSERT_FALSE(ServiceLocator<AService>::empty());
-    ASSERT_TRUE(ServiceLocator<AnotherService>::empty());
+    entt::service_locator<another_service>::set<derived_service>(42);
 
-    ServiceLocator<AnotherService>::set<DerivedService>(42);
+    ASSERT_FALSE(entt::service_locator<a_service>::empty());
+    ASSERT_FALSE(entt::service_locator<another_service>::empty());
 
-    ASSERT_FALSE(ServiceLocator<AService>::empty());
-    ASSERT_FALSE(ServiceLocator<AnotherService>::empty());
+    entt::service_locator<another_service>::get().lock()->f(!entt::service_locator<another_service>::get().lock()->check);
 
-    ServiceLocator<AnotherService>::get().lock()->f(!ServiceLocator<AnotherService>::get().lock()->check);
+    ASSERT_TRUE(entt::service_locator<another_service>::get().lock()->check);
 
-    ASSERT_TRUE(ServiceLocator<AnotherService>::get().lock()->check);
+    entt::service_locator<another_service>::ref().f(!entt::service_locator<another_service>::get().lock()->check);
 
-    ServiceLocator<AnotherService>::ref().f(!ServiceLocator<AnotherService>::get().lock()->check);
-
-    ASSERT_FALSE(ServiceLocator<AnotherService>::get().lock()->check);
+    ASSERT_FALSE(entt::service_locator<another_service>::get().lock()->check);
 }

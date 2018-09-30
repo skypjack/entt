@@ -3,18 +3,18 @@
 #include <entt/core/monostate.hpp>
 
 TEST(Monostate, Functionalities) {
-    const bool bPre = entt::Monostate<entt::HashedString{"foobar"}>{};
-    const int iPre = entt::Monostate<"foobar"_hs>{};
+    const bool b_pre = entt::monostate<entt::hashed_string{"foobar"}>{};
+    const int i_pre = entt::monostate<"foobar"_hs>{};
 
-    ASSERT_FALSE(bPre);
-    ASSERT_EQ(iPre, int{});
+    ASSERT_FALSE(b_pre);
+    ASSERT_EQ(i_pre, int{});
 
-    entt::Monostate<"foobar"_hs>{} = true;
-    entt::Monostate<"foobar"_hs>{} = 42;
+    entt::monostate<"foobar"_hs>{} = true;
+    entt::monostate<"foobar"_hs>{} = 42;
 
-    const bool &bPost = entt::Monostate<"foobar"_hs>{};
-    const int &iPost = entt::Monostate<entt::HashedString{"foobar"}>{};
+    const bool &b_post = entt::monostate<"foobar"_hs>{};
+    const int &i_post = entt::monostate<entt::hashed_string{"foobar"}>{};
 
-    ASSERT_TRUE(bPost);
-    ASSERT_EQ(iPost, 42);
+    ASSERT_TRUE(b_post);
+    ASSERT_EQ(i_post, 42);
 }

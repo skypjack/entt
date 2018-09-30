@@ -4,54 +4,54 @@
 #include <cereal/archives/json.hpp>
 #include <entt/entity/registry.hpp>
 
-struct Position {
+struct position {
     float x;
     float y;
 };
 
-struct Timer {
+struct timer {
     int duration;
     int elapsed{0};
 };
 
-struct Relationship {
-    entt::DefaultRegistry::entity_type parent;
+struct relationship {
+    entt::registry<>::entity_type parent;
 };
 
 template<typename Archive>
-void serialize(Archive &archive, Position &position) {
+void serialize(Archive &archive, position &position) {
   archive(position.x, position.y);
 }
 
 template<typename Archive>
-void serialize(Archive &archive, Timer &timer) {
+void serialize(Archive &archive, timer &timer) {
   archive(timer.duration);
 }
 
 template<typename Archive>
-void serialize(Archive &archive, Relationship &relationship) {
+void serialize(Archive &archive, relationship &relationship) {
   archive(relationship.parent);
 }
 
 TEST(Snapshot, Full) {
     std::stringstream storage;
 
-    entt::DefaultRegistry source;
-    entt::DefaultRegistry destination;
+    entt::registry<> source;
+    entt::registry<> destination;
 
     auto e0 = source.create();
-    source.assign<Position>(e0, 16.f, 16.f);
+    source.assign<position>(e0, 16.f, 16.f);
 
     source.destroy(source.create());
 
     auto e1 = source.create();
-    source.assign<Position>(e1, .8f, .0f);
-    source.assign<Relationship>(e1, e0);
+    source.assign<position>(e1, .8f, .0f);
+    source.assign<relationship>(e1, e0);
 
     auto e2 = source.create();
 
     auto e3 = source.create();
-    source.assign<Timer>(e3, 1000, 100);
+    source.assign<timer>(e3, 1000, 100);
 
     source.destroy(e2);
     auto v2 = source.current(e2);
@@ -60,41 +60,41 @@ TEST(Snapshot, Full) {
         // output finishes flushing its contents when it goes out of scope
         cereal::JSONOutputArchive output{storage};
         source.snapshot().entities(output).destroyed(output)
-                .component<Position, Timer, Relationship>(output);
+                .component<position, timer, relationship>(output);
     }
 
     cereal::JSONInputArchive input{storage};
-    destination.restore().entities(input).destroyed(input)
-            .component<Position, Timer, Relationship>(input);
+    destination.loader().entities(input).destroyed(input)
+            .component<position, timer, relationship>(input);
 
     ASSERT_TRUE(destination.valid(e0));
-    ASSERT_TRUE(destination.has<Position>(e0));
-    ASSERT_EQ(destination.get<Position>(e0).x, 16.f);
-    ASSERT_EQ(destination.get<Position>(e0).y, 16.f);
+    ASSERT_TRUE(destination.has<position>(e0));
+    ASSERT_EQ(destination.get<position>(e0).x, 16.f);
+    ASSERT_EQ(destination.get<position>(e0).y, 16.f);
 
     ASSERT_TRUE(destination.valid(e1));
-    ASSERT_TRUE(destination.has<Position>(e1));
-    ASSERT_EQ(destination.get<Position>(e1).x, .8f);
-    ASSERT_EQ(destination.get<Position>(e1).y, .0f);
-    ASSERT_TRUE(destination.has<Relationship>(e1));
-    ASSERT_EQ(destination.get<Relationship>(e1).parent, e0);
+    ASSERT_TRUE(destination.has<position>(e1));
+    ASSERT_EQ(destination.get<position>(e1).x, .8f);
+    ASSERT_EQ(destination.get<position>(e1).y, .0f);
+    ASSERT_TRUE(destination.has<relationship>(e1));
+    ASSERT_EQ(destination.get<relationship>(e1).parent, e0);
 
     ASSERT_FALSE(destination.valid(e2));
     ASSERT_EQ(destination.current(e2), v2);
 
     ASSERT_TRUE(destination.valid(e3));
-    ASSERT_TRUE(destination.has<Timer>(e3));
-    ASSERT_EQ(destination.get<Timer>(e3).duration, 1000);
-    ASSERT_EQ(destination.get<Timer>(e3).elapsed, 0);
+    ASSERT_TRUE(destination.has<timer>(e3));
+    ASSERT_EQ(destination.get<timer>(e3).duration, 1000);
+    ASSERT_EQ(destination.get<timer>(e3).elapsed, 0);
 }
 
 TEST(Snapshot, Continuous) {
     std::stringstream storage;
 
-    entt::DefaultRegistry source;
-    entt::DefaultRegistry destination;
+    entt::registry<> source;
+    entt::registry<> destination;
 
-    std::vector<entt::DefaultRegistry::entity_type> entities;
+    std::vector<entt::registry<>::entity_type> entities;
     for(auto i = 0; i < 10; ++i) {
         entities.push_back(source.create());
     }
@@ -104,32 +104,32 @@ TEST(Snapshot, Continuous) {
     }
 
     auto e0 = source.create();
-    source.assign<Position>(e0, 0.f, 0.f);
-    source.assign<Relationship>(e0, e0);
+    source.assign<position>(e0, 0.f, 0.f);
+    source.assign<relationship>(e0, e0);
 
     auto e1 = source.create();
-    source.assign<Position>(e1, 1.f, 1.f);
-    source.assign<Relationship>(e1, e0);
+    source.assign<position>(e1, 1.f, 1.f);
+    source.assign<relationship>(e1, e0);
 
     auto e2 = source.create();
-    source.assign<Position>(e2, .2f, .2f);
-    source.assign<Relationship>(e2, e0);
+    source.assign<position>(e2, .2f, .2f);
+    source.assign<relationship>(e2, e0);
 
     auto e3 = source.create();
-    source.assign<Timer>(e3, 1000, 1000);
-    source.assign<Relationship>(e3, e2);
+    source.assign<timer>(e3, 1000, 1000);
+    source.assign<relationship>(e3, e2);
 
     {
         // output finishes flushing its contents when it goes out of scope
         cereal::JSONOutputArchive output{storage};
-        source.snapshot().entities(output).component<Position, Relationship, Timer>(output);
+        source.snapshot().entities(output).component<position, relationship, timer>(output);
     }
 
     cereal::JSONInputArchive input{storage};
-    entt::ContinuousLoader<entt::DefaultRegistry::entity_type> loader{destination};
+    entt::continuous_loader<entt::registry<>::entity_type> loader{destination};
     loader.entities(input)
-            .component<Position, Relationship>(input, &Relationship::parent)
-            .component<Timer>(input);
+            .component<position, relationship>(input, &relationship::parent)
+            .component<timer>(input);
 
     ASSERT_FALSE(destination.valid(e0));
     ASSERT_TRUE(loader.has(e0));
@@ -137,11 +137,11 @@ TEST(Snapshot, Continuous) {
     auto l0 = loader.map(e0);
 
     ASSERT_TRUE(destination.valid(l0));
-    ASSERT_TRUE(destination.has<Position>(l0));
-    ASSERT_EQ(destination.get<Position>(l0).x, 0.f);
-    ASSERT_EQ(destination.get<Position>(l0).y, 0.f);
-    ASSERT_TRUE(destination.has<Relationship>(l0));
-    ASSERT_EQ(destination.get<Relationship>(l0).parent, l0);
+    ASSERT_TRUE(destination.has<position>(l0));
+    ASSERT_EQ(destination.get<position>(l0).x, 0.f);
+    ASSERT_EQ(destination.get<position>(l0).y, 0.f);
+    ASSERT_TRUE(destination.has<relationship>(l0));
+    ASSERT_EQ(destination.get<relationship>(l0).parent, l0);
 
     ASSERT_FALSE(destination.valid(e1));
     ASSERT_TRUE(loader.has(e1));
@@ -149,11 +149,11 @@ TEST(Snapshot, Continuous) {
     auto l1 = loader.map(e1);
 
     ASSERT_TRUE(destination.valid(l1));
-    ASSERT_TRUE(destination.has<Position>(l1));
-    ASSERT_EQ(destination.get<Position>(l1).x, 1.f);
-    ASSERT_EQ(destination.get<Position>(l1).y, 1.f);
-    ASSERT_TRUE(destination.has<Relationship>(l1));
-    ASSERT_EQ(destination.get<Relationship>(l1).parent, l0);
+    ASSERT_TRUE(destination.has<position>(l1));
+    ASSERT_EQ(destination.get<position>(l1).x, 1.f);
+    ASSERT_EQ(destination.get<position>(l1).y, 1.f);
+    ASSERT_TRUE(destination.has<relationship>(l1));
+    ASSERT_EQ(destination.get<relationship>(l1).parent, l0);
 
     ASSERT_FALSE(destination.valid(e2));
     ASSERT_TRUE(loader.has(e2));
@@ -161,11 +161,11 @@ TEST(Snapshot, Continuous) {
     auto l2 = loader.map(e2);
 
     ASSERT_TRUE(destination.valid(l2));
-    ASSERT_TRUE(destination.has<Position>(l2));
-    ASSERT_EQ(destination.get<Position>(l2).x, .2f);
-    ASSERT_EQ(destination.get<Position>(l2).y, .2f);
-    ASSERT_TRUE(destination.has<Relationship>(l2));
-    ASSERT_EQ(destination.get<Relationship>(l2).parent, l0);
+    ASSERT_TRUE(destination.has<position>(l2));
+    ASSERT_EQ(destination.get<position>(l2).x, .2f);
+    ASSERT_EQ(destination.get<position>(l2).y, .2f);
+    ASSERT_TRUE(destination.has<relationship>(l2));
+    ASSERT_EQ(destination.get<relationship>(l2).parent, l0);
 
     ASSERT_FALSE(destination.valid(e3));
     ASSERT_TRUE(loader.has(e3));
@@ -173,9 +173,9 @@ TEST(Snapshot, Continuous) {
     auto l3 = loader.map(e3);
 
     ASSERT_TRUE(destination.valid(l3));
-    ASSERT_TRUE(destination.has<Timer>(l3));
-    ASSERT_EQ(destination.get<Timer>(l3).duration, 1000);
-    ASSERT_EQ(destination.get<Timer>(l3).elapsed, 0);
-    ASSERT_TRUE(destination.has<Relationship>(l3));
-    ASSERT_EQ(destination.get<Relationship>(l3).parent, l2);
+    ASSERT_TRUE(destination.has<timer>(l3));
+    ASSERT_EQ(destination.get<timer>(l3).duration, 1000);
+    ASSERT_EQ(destination.get<timer>(l3).elapsed, 0);
+    ASSERT_TRUE(destination.has<relationship>(l3));
+    ASSERT_EQ(destination.get<relationship>(l3).parent, l2);
 }

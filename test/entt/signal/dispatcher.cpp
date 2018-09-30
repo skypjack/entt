@@ -2,39 +2,39 @@
 #include <gtest/gtest.h>
 #include <entt/signal/dispatcher.hpp>
 
-struct AnEvent {};
-struct AnotherEvent {};
+struct an_event {};
+struct another_event {};
 
-struct Receiver {
-    void receive(const AnEvent &) { ++cnt; }
+struct receiver {
+    void receive(const an_event &) { ++cnt; }
     void reset() { cnt = 0; }
     int cnt{0};
 };
 
 TEST(Dispatcher, Functionalities) {
-    entt::Dispatcher dispatcher;
-    Receiver receiver;
+    entt::dispatcher dispatcher;
+    receiver receiver;
 
-    dispatcher.template sink<AnEvent>().connect(&receiver);
-    dispatcher.template trigger<AnEvent>();
-    dispatcher.template enqueue<AnEvent>();
-    dispatcher.template enqueue<AnotherEvent>();
-    dispatcher.update<AnotherEvent>();
+    dispatcher.template sink<an_event>().connect(&receiver);
+    dispatcher.template trigger<an_event>();
+    dispatcher.template enqueue<an_event>();
+    dispatcher.template enqueue<another_event>();
+    dispatcher.update<another_event>();
 
     ASSERT_EQ(receiver.cnt, 1);
 
-    dispatcher.update<AnEvent>();
-    dispatcher.template trigger<AnEvent>();
+    dispatcher.update<an_event>();
+    dispatcher.template trigger<an_event>();
 
     ASSERT_EQ(receiver.cnt, 3);
 
     receiver.reset();
 
-    dispatcher.template sink<AnEvent>().disconnect(&receiver);
-    dispatcher.template trigger<AnEvent>();
-    dispatcher.template enqueue<AnEvent>();
+    dispatcher.template sink<an_event>().disconnect(&receiver);
+    dispatcher.template trigger<an_event>();
+    dispatcher.template enqueue<an_event>();
     dispatcher.update();
-    dispatcher.template trigger<AnEvent>();
+    dispatcher.template trigger<an_event>();
 
     ASSERT_EQ(receiver.cnt, 0);
 }

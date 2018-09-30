@@ -4,6 +4,7 @@
 
 #include <iterator>
 #include <cassert>
+#include <cstddef>
 #include <array>
 #include <tuple>
 #include <vector>
@@ -22,7 +23,7 @@ namespace entt {
  * @brief Forward declaration of the registry class.
  */
 template<typename>
-class Registry;
+class registry;
 
 
 /**
@@ -47,7 +48,7 @@ class Registry;
  * behavior.
  *
  * @note
- * Views share references to the underlying data structures with the Registry
+ * Views share references to the underlying data structures with the registry
  * that generated them. Therefore any change to the entities and to the
  * components made by means of the registry are immediately reflected by
  * views.<br/>
@@ -59,28 +60,28 @@ class Registry;
  * Lifetime of a view must overcome the one of the registry that generated it.
  * In any other case, attempting to use a view results in undefined behavior.
  *
- * @sa View
- * @sa View<Entity, Component>
- * @sa RawView
- * @sa RuntimeView
+ * @sa view
+ * @sa view<Entity, Component>
+ * @sa raw_view
+ * @sa runtime_view
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Component Types of components iterated by the view.
  */
 template<typename Entity, typename... Component>
-class PersistentView final {
-    static_assert(sizeof...(Component) > 1, "!");
+class persistent_view final {
+    static_assert(sizeof...(Component) > 1);
 
     /*! @brief A registry is allowed to create views. */
-    friend class Registry<Entity>;
+    friend class registry<Entity>;
 
     template<typename Comp>
-    using pool_type = SparseSet<Entity, Comp>;
+    using pool_type = sparse_set<Entity, Comp>;
 
-    using view_type = SparseSet<Entity>;
-    using pattern_type = std::tuple<pool_type<Component> &...>;
+    using view_type = sparse_set<Entity>;
+    using pattern_type = std::tuple<pool_type<Component> *...>;
 
-    PersistentView(view_type &view, pool_type<Component> &... pools) ENTT_NOEXCEPT
+    persistent_view(view_type *view, pool_type<Component> *... pools) ENTT_NOEXCEPT
         : view{view}, pools{pools...}
     {}
 
@@ -94,12 +95,22 @@ public:
     /*! @brief Constant input iterator type. */
     using const_iterator_type = typename view_type::const_iterator_type;
 
+    /*! @brief Default copy constructor. */
+    persistent_view(const persistent_view &) = default;
+    /*! @brief Default move constructor. */
+    persistent_view(persistent_view &&) = default;
+
+    /*! @brief Default copy assignment operator. @return This view. */
+    persistent_view & operator=(const persistent_view &) = default;
+    /*! @brief Default move assignment operator. @return This view. */
+    persistent_view & operator=(persistent_view &&) = default;
+
     /**
      * @brief Returns the number of entities that have the given components.
      * @return Number of entities that have the given components.
      */
     size_type size() const ENTT_NOEXCEPT {
-        return view.size();
+        return view->size();
     }
 
     /**
@@ -107,7 +118,7 @@ public:
      * @return True if the view is empty, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
-        return view.empty();
+        return view->empty();
     }
 
     /**
@@ -123,7 +134,7 @@ public:
      * @return A pointer to the array of entities.
      */
     const entity_type * data() const ENTT_NOEXCEPT {
-        return view.data();
+        return view->data();
     }
 
     /**
@@ -141,7 +152,7 @@ public:
      * @return An iterator to the first entity that has the given components.
      */
     const_iterator_type cbegin() const ENTT_NOEXCEPT {
-        return view.cbegin();
+        return view->cbegin();
     }
 
     /**
@@ -177,7 +188,7 @@ public:
      * @return An iterator to the first entity that has the given components.
      */
     iterator_type begin() ENTT_NOEXCEPT {
-        return view.begin();
+        return view->begin();
     }
 
     /**
@@ -196,7 +207,7 @@ public:
      * given components.
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
-        return view.cend();
+        return view->cend();
     }
 
     /**
@@ -234,7 +245,7 @@ public:
      * given components.
      */
     iterator_type end() ENTT_NOEXCEPT {
-        return view.end();
+        return view->end();
     }
 
     /**
@@ -243,7 +254,7 @@ public:
      * @return A reference to the requested element.
      */
     const entity_type & operator[](const size_type pos) const ENTT_NOEXCEPT {
-        return view[pos];
+        return (*view)[pos];
     }
 
     /**
@@ -252,13 +263,13 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     bool contains(const entity_type entity) const ENTT_NOEXCEPT {
-        return view.has(entity) && (view.data()[view.get(entity)] == entity);
+        return view->has(entity) && (view->data()[view->get(entity)] == entity);
     }
 
     /**
-     * @brief Returns the component assigned to the given entity.
+     * @brief Returns the components assigned to the given entity.
      *
-     * Prefer this function instead of `Registry::get` during iterations. It has
+     * Prefer this function instead of `registry::get` during iterations. It has
      * far better performance than its companion function.
      *
      * @warning
@@ -268,20 +279,26 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * view doesn't contain the given entity.
      *
-     * @tparam Comp Type of component to get.
+     * @tparam Comp Types of components to get.
      * @param entity A valid entity identifier.
-     * @return The component assigned to the entity.
+     * @return The components assigned to the entity.
      */
-    template<typename Comp>
-    const Comp & get(const entity_type entity) const ENTT_NOEXCEPT {
+    template<typename... Comp>
+    std::conditional_t<sizeof...(Comp) == 1, std::tuple_element_t<0, std::tuple<const Comp &...>>, std::tuple<const Comp &...>>
+    get([[maybe_unused]] const entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
-        return std::get<pool_type<Comp> &>(pools).get(entity);
+
+        if constexpr(sizeof...(Comp) == 1) {
+            return (std::get<pool_type<Comp> *>(pools)->get(entity), ...);
+        } else {
+            return std::tuple<const Comp &...>{get<Comp>(entity)...};
+        }
     }
 
     /**
-     * @brief Returns the component assigned to the given entity.
+     * @brief Returns the components assigned to the given entity.
      *
-     * Prefer this function instead of `Registry::get` during iterations. It has
+     * Prefer this function instead of `registry::get` during iterations. It has
      * far better performance than its companion function.
      *
      * @warning
@@ -291,61 +308,18 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * view doesn't contain the given entity.
      *
-     * @tparam Comp Type of component to get.
-     * @param entity A valid entity identifier.
-     * @return The component assigned to the entity.
-     */
-    template<typename Comp>
-    inline Comp & get(const entity_type entity) ENTT_NOEXCEPT {
-        return const_cast<Comp &>(const_cast<const PersistentView *>(this)->get<Comp>(entity));
-    }
-
-    /**
-     * @brief Returns the components assigned to the given entity.
-     *
-     * Prefer this function instead of `Registry::get` during iterations. It has
-     * far better performance than its companion function.
-     *
-     * @warning
-     * Attempting to use invalid component types results in a compilation error.
-     * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * view doesn't contain the given entity.
-     *
-     * @tparam Comp Types of the components to get.
+     * @tparam Comp Types of components to get.
      * @param entity A valid entity identifier.
      * @return The components assigned to the entity.
      */
     template<typename... Comp>
-    inline std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<const Comp &...>>
-    get(const entity_type entity) const ENTT_NOEXCEPT {
-        assert(contains(entity));
-        return std::tuple<const Comp &...>{get<Comp>(entity)...};
-    }
-
-    /**
-     * @brief Returns the components assigned to the given entity.
-     *
-     * Prefer this function instead of `Registry::get` during iterations. It has
-     * far better performance than its companion function.
-     *
-     * @warning
-     * Attempting to use invalid component types results in a compilation error.
-     * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * view doesn't contain the given entity.
-     *
-     * @tparam Comp Types of the components to get.
-     * @param entity A valid entity identifier.
-     * @return The components assigned to the entity.
-     */
-    template<typename... Comp>
-    inline std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<Comp &...>>
-    get(const entity_type entity) ENTT_NOEXCEPT {
-        assert(contains(entity));
-        return std::tuple<Comp &...>{get<Comp>(entity)...};
+    inline std::conditional_t<sizeof...(Comp) == 1, std::tuple_element_t<0, std::tuple<Comp &...>>, std::tuple<Comp &...>>
+    get([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
+        if constexpr(sizeof...(Comp) == 1) {
+            return (const_cast<Comp &>(std::as_const(*this).template get<Comp>(entity)), ...);
+        } else {
+            return std::tuple<Comp &...>{get<Comp>(entity)...};
+        }
     }
 
     /**
@@ -366,8 +340,8 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        std::for_each(view.cbegin(), view.cend(), [&func, this](const auto entity) {
-            func(entity, std::get<pool_type<Component> &>(pools).get(entity)...);
+        std::for_each(view->cbegin(), view->cend(), [&func, this](const auto entity) {
+            func(entity, std::get<pool_type<Component> *>(pools)->get(entity)...);
         });
     }
 
@@ -389,7 +363,7 @@ public:
      */
     template<typename Func>
     inline void each(Func func) {
-        const_cast<const PersistentView *>(this)->each([&func](const entity_type entity, const Component &... component) {
+        std::as_const(*this).each([&func](const entity_type entity, const Component &... component) {
             func(entity, const_cast<Component &>(component)...);
         });
     }
@@ -397,7 +371,7 @@ public:
     /**
      * @brief Sort the shared pool of entities according to the given component.
      *
-     * Persistent views of the same type share with the Registry a pool of
+     * Persistent views of the same type share with the registry a pool of
      * entities with its own order that doesn't depend on the order of any pool
      * of components. Users can order the underlying data structure so that it
      * respects the order of the pool of the given component.
@@ -412,11 +386,11 @@ public:
      */
     template<typename Comp>
     void sort() {
-        view.respect(std::get<pool_type<Comp> &>(pools));
+        view->respect(*std::get<pool_type<Comp> *>(pools));
     }
 
 private:
-    view_type &view;
+    view_type *view;
     const pattern_type pools;
 };
 
@@ -430,7 +404,7 @@ private:
  * reference to the smallest set of candidate entities in order to get a
  * performance boost when iterate.<br/>
  * Order of elements during iterations are highly dependent on the order of the
- * underlying data structures. See SparseSet and its specializations for more
+ * underlying data structures. See sparse_set and its specializations for more
  * details.
  *
  * @b Important
@@ -446,7 +420,7 @@ private:
  * behavior.
  *
  * @note
- * Views share references to the underlying data structures with the Registry
+ * Views share references to the underlying data structures with the registry
  * that generated them. Therefore any change to the entities and to the
  * components made by means of the registry are immediately reflected by views.
  *
@@ -454,39 +428,39 @@ private:
  * Lifetime of a view must overcome the one of the registry that generated it.
  * In any other case, attempting to use a view results in undefined behavior.
  *
- * @sa View<Entity, Component>
- * @sa PersistentView
- * @sa RawView
- * @sa RuntimeView
+ * @sa view<Entity, Component>
+ * @sa persistent_view
+ * @sa raw_view
+ * @sa runtime_view
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Component Types of components iterated by the view.
  */
 template<typename Entity, typename... Component>
-class View final {
-    static_assert(sizeof...(Component) > 1, "!");
+class view final {
+    static_assert(sizeof...(Component) > 1);
 
     /*! @brief A registry is allowed to create views. */
-    friend class Registry<Entity>;
+    friend class registry<Entity>;
 
     template<typename Comp>
-    using pool_type = SparseSet<Entity, Comp>;
+    using pool_type = sparse_set<Entity, Comp>;
 
     template<typename Comp>
     using component_iterator_type = typename pool_type<Comp>::const_iterator_type;
 
-    using view_type = SparseSet<Entity>;
+    using view_type = sparse_set<Entity>;
     using underlying_iterator_type = typename view_type::const_iterator_type;
     using unchecked_type = std::array<const view_type *, (sizeof...(Component) - 1)>;
-    using pattern_type = std::tuple<pool_type<Component> &...>;
+    using pattern_type = std::tuple<pool_type<Component> *...>;
     using traits_type = entt_traits<Entity>;
 
-    class Iterator {
-        friend class View<Entity, Component...>;
+    class iterator {
+        friend class view<Entity, Component...>;
 
         using extent_type = typename view_type::size_type;
 
-        Iterator(unchecked_type unchecked, underlying_iterator_type begin, underlying_iterator_type end) ENTT_NOEXCEPT
+        iterator(unchecked_type unchecked, underlying_iterator_type begin, underlying_iterator_type end) ENTT_NOEXCEPT
             : unchecked{unchecked},
               begin{begin},
               end{end},
@@ -518,25 +492,25 @@ class View final {
         using reference = typename underlying_iterator_type::reference;
         using iterator_category = std::forward_iterator_tag;
 
-        Iterator() ENTT_NOEXCEPT = default;
+        iterator() ENTT_NOEXCEPT = default;
 
-        Iterator(const Iterator &) ENTT_NOEXCEPT = default;
-        Iterator & operator=(const Iterator &) ENTT_NOEXCEPT = default;
+        iterator(const iterator &) ENTT_NOEXCEPT = default;
+        iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
 
-        Iterator & operator++() ENTT_NOEXCEPT {
+        iterator & operator++() ENTT_NOEXCEPT {
             return (++begin != end && !valid()) ? ++(*this) : *this;
         }
 
-        Iterator operator++(int) ENTT_NOEXCEPT {
-            Iterator orig = *this;
+        iterator operator++(int) ENTT_NOEXCEPT {
+            iterator orig = *this;
             return ++(*this), orig;
         }
 
-        bool operator==(const Iterator &other) const ENTT_NOEXCEPT {
+        bool operator==(const iterator &other) const ENTT_NOEXCEPT {
             return other.begin == begin;
         }
 
-        inline bool operator!=(const Iterator &other) const ENTT_NOEXCEPT {
+        inline bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
@@ -555,17 +529,17 @@ class View final {
         extent_type extent;
     };
 
-    View(pool_type<Component> &... pools) ENTT_NOEXCEPT
+    view(pool_type<Component> *... pools) ENTT_NOEXCEPT
         : pools{pools...}
     {}
 
     template<typename Comp>
-    const pool_type<Comp> & pool() const ENTT_NOEXCEPT {
-        return std::get<pool_type<Comp> &>(pools);
+    const pool_type<Comp> * pool() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Comp> *>(pools);
     }
 
     const view_type * candidate() const ENTT_NOEXCEPT {
-        return std::min({ static_cast<const view_type *>(&pool<Component>())... }, [](const auto *lhs, const auto *rhs) {
+        return std::min({ static_cast<const view_type *>(pool<Component>())... }, [](const auto *lhs, const auto *rhs) {
             return lhs->size() < rhs->size();
         });
     }
@@ -573,31 +547,30 @@ class View final {
     unchecked_type unchecked(const view_type *view) const ENTT_NOEXCEPT {
         unchecked_type other{};
         std::size_t pos{};
-        using accumulator_type = const view_type *[];
-        accumulator_type accumulator = { (&pool<Component>() == view ? view : other[pos++] = &pool<Component>())... };
-        (void)accumulator;
+        ((pool<Component>() == view ? nullptr : (other[pos++] = pool<Component>())), ...);
         return other;
     }
 
     template<typename Comp, typename Other>
-    inline std::enable_if_t<std::is_same<Comp, Other>::value, const Other &>
-    get(const component_iterator_type<Comp> &it, const Entity) const ENTT_NOEXCEPT { return *it; }
-
-    template<typename Comp, typename Other>
-    inline std::enable_if_t<!std::is_same<Comp, Other>::value, const Other &>
-    get(const component_iterator_type<Comp> &, const Entity entity) const ENTT_NOEXCEPT { return pool<Other>().get(entity); }
+    inline const Other & get([[maybe_unused]] const component_iterator_type<Comp> &it, [[maybe_unused]] const Entity entity) const ENTT_NOEXCEPT {
+        if constexpr(std::is_same_v<Comp, Other>) {
+            return *it;
+        } else {
+            return pool<Other>()->get(entity);
+        }
+    }
 
     template<typename Comp, typename Func, std::size_t... Indexes>
-    void each(const pool_type<Comp> &cpool, Func func, std::index_sequence<Indexes...>) const {
-        const auto other = unchecked(&cpool);
+    void each(const pool_type<Comp> *cpool, Func func, std::index_sequence<Indexes...>) const {
+        const auto other = unchecked(cpool);
         std::array<underlying_iterator_type, sizeof...(Indexes)> data{{std::get<Indexes>(other)->cbegin()...}};
-        const auto extent = std::min({ pool<Component>().extent()... });
-        auto raw = std::make_tuple(pool<Component>().cbegin()...);
-        const auto end = cpool.view_type::cend();
-        auto begin = cpool.view_type::cbegin();
+        const auto extent = std::min({ pool<Component>()->extent()... });
+        auto raw = std::make_tuple(pool<Component>()->cbegin()...);
+        const auto end = cpool->view_type::cend();
+        auto begin = cpool->view_type::cbegin();
 
         // we can directly use the raw iterators if pools are ordered
-        while(begin != end && std::min({ (*(std::get<Indexes>(data)++) == *begin)... })) {
+        while(((begin != end) && ... && (*begin == *(std::get<Indexes>(data)++)))) {
             func(*(begin++), *(std::get<component_iterator_type<Component>>(raw)++)...);
         }
 
@@ -607,7 +580,7 @@ class View final {
             const auto it = std::get<component_iterator_type<Comp>>(raw)++;
             const auto sz = size_type(entity & traits_type::entity_mask);
 
-            if(sz < extent && std::all_of(other.cbegin(), other.cend(), [entity](const view_type *view) { return view->fast(entity); })) {
+            if(((sz < extent) && ... && std::get<Indexes>(other)->fast(entity))) {
                 // avoided at least the indirection due to the sparse set for the pivot type (see get for more details)
                 func(entity, get<Comp, Component>(it, entity)...);
             }
@@ -620,16 +593,26 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = typename view_type::size_type;
     /*! @brief Input iterator type. */
-    using iterator_type = Iterator;
+    using iterator_type = iterator;
     /*! @brief Constant input iterator type. */
-    using const_iterator_type = Iterator;
+    using const_iterator_type = iterator;
+
+    /*! @brief Default copy constructor. */
+    view(const view &) = default;
+    /*! @brief Default move constructor. */
+    view(view &&) = default;
+
+    /*! @brief Default copy assignment operator. @return This view. */
+    view & operator=(const view &) = default;
+    /*! @brief Default move assignment operator. @return This view. */
+    view & operator=(view &&) = default;
 
     /**
      * @brief Estimates the number of entities that have the given components.
      * @return Estimated number of entities that have the given components.
      */
     size_type size() const ENTT_NOEXCEPT {
-        return std::min({ pool<Component>().size()... });
+        return std::min({ pool<Component>()->size()... });
     }
 
     /**
@@ -637,7 +620,7 @@ public:
      * @return True if the view is definitely empty, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
-        return std::max({ pool<Component>().empty()... });
+        return (pool<Component>()->empty() || ...);
     }
 
     /**
@@ -760,14 +743,14 @@ public:
      */
     bool contains(const entity_type entity) const ENTT_NOEXCEPT {
         const auto sz = size_type(entity & traits_type::entity_mask);
-        const auto extent = std::min({ pool<Component>().extent()... });
-        return sz < extent && std::min({ (pool<Component>().has(entity) && (pool<Component>().data()[pool<Component>().view_type::get(entity)] == entity))... });
+        const auto extent = std::min({ pool<Component>()->extent()... });
+        return ((sz < extent) && ... && (pool<Component>()->has(entity) && (pool<Component>()->data()[pool<Component>()->view_type::get(entity)] == entity)));
     }
 
     /**
-     * @brief Returns the component assigned to the given entity.
+     * @brief Returns the components assigned to the given entity.
      *
-     * Prefer this function instead of `Registry::get` during iterations. It has
+     * Prefer this function instead of `registry::get` during iterations. It has
      * far better performance than its companion function.
      *
      * @warning
@@ -777,20 +760,26 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * view doesn't contain the given entity.
      *
-     * @tparam Comp Type of component to get.
+     * @tparam Comp Types of components to get.
      * @param entity A valid entity identifier.
-     * @return The component assigned to the entity.
+     * @return The components assigned to the entity.
      */
-    template<typename Comp>
-    const Comp & get(const entity_type entity) const ENTT_NOEXCEPT {
+    template<typename... Comp>
+    std::conditional_t<sizeof...(Comp) == 1, std::tuple_element_t<0, std::tuple<const Comp &...>>, std::tuple<const Comp &...>>
+    get([[maybe_unused]] const entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
-        return pool<Comp>().get(entity);
+
+        if constexpr(sizeof...(Comp) == 1) {
+            return (pool<Comp>()->get(entity), ...);
+        } else {
+            return std::tuple<const Comp &...>{get<Comp>(entity)...};
+        }
     }
 
     /**
-     * @brief Returns the component assigned to the given entity.
+     * @brief Returns the components assigned to the given entity.
      *
-     * Prefer this function instead of `Registry::get` during iterations. It has
+     * Prefer this function instead of `registry::get` during iterations. It has
      * far better performance than its companion function.
      *
      * @warning
@@ -800,61 +789,18 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * view doesn't contain the given entity.
      *
-     * @tparam Comp Type of component to get.
-     * @param entity A valid entity identifier.
-     * @return The component assigned to the entity.
-     */
-    template<typename Comp>
-    inline Comp & get(const entity_type entity) ENTT_NOEXCEPT {
-        return const_cast<Comp &>(const_cast<const View *>(this)->get<Comp>(entity));
-    }
-
-    /**
-     * @brief Returns the components assigned to the given entity.
-     *
-     * Prefer this function instead of `Registry::get` during iterations. It has
-     * far better performance than its companion function.
-     *
-     * @warning
-     * Attempting to use invalid component types results in a compilation error.
-     * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * view doesn't contain the given entity.
-     *
-     * @tparam Comp Types of the components to get.
+     * @tparam Comp Types of components to get.
      * @param entity A valid entity identifier.
      * @return The components assigned to the entity.
      */
     template<typename... Comp>
-    inline std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<const Comp &...>>
-    get(const entity_type entity) const ENTT_NOEXCEPT {
-        assert(contains(entity));
-        return std::tuple<const Comp &...>{get<Comp>(entity)...};
-    }
-
-    /**
-     * @brief Returns the components assigned to the given entity.
-     *
-     * Prefer this function instead of `Registry::get` during iterations. It has
-     * far better performance than its companion function.
-     *
-     * @warning
-     * Attempting to use invalid component types results in a compilation error.
-     * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * view doesn't contain the given entity.
-     *
-     * @tparam Comp Types of the components to get.
-     * @param entity A valid entity identifier.
-     * @return The components assigned to the entity.
-     */
-    template<typename... Comp>
-    inline std::enable_if_t<(sizeof...(Comp) > 1), std::tuple<Comp &...>>
-    get(const entity_type entity) ENTT_NOEXCEPT {
-        assert(contains(entity));
-        return std::tuple<Comp &...>{get<Comp>(entity)...};
+    inline std::conditional_t<sizeof...(Comp) == 1, std::tuple_element_t<0, std::tuple<Comp &...>>, std::tuple<Comp &...>>
+    get([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
+        if constexpr(sizeof...(Comp) == 1) {
+            return (const_cast<Comp &>(std::as_const(*this).template get<Comp>(entity)), ...);
+        } else {
+            return std::tuple<Comp &...>{get<Comp>(entity)...};
+        }
     }
 
     /**
@@ -876,9 +822,7 @@ public:
     template<typename Func>
     void each(Func func) const {
         const auto *view = candidate();
-        using accumulator_type = int[];
-        accumulator_type accumulator = { (&pool<Component>() == view ? (each(pool<Component>(), std::move(func), std::make_index_sequence<sizeof...(Component)-1>{}), 0) : 0)... };
-        (void)accumulator;
+        ((pool<Component>() == view ? each(pool<Component>(), std::move(func), std::make_index_sequence<sizeof...(Component)-1>{}) : void()), ...);
     }
 
     /**
@@ -899,7 +843,7 @@ public:
      */
     template<typename Func>
     inline void each(Func func) {
-        const_cast<const View *>(this)->each([&func](const entity_type entity, const Component &... component) {
+        std::as_const(*this).each([&func](const entity_type entity, const Component &... component) {
             func(entity, const_cast<Component &>(component)...);
         });
     }
@@ -916,7 +860,7 @@ private:
  * performance. This kind of views can access the underlying data structure
  * directly and avoid superfluous checks.<br/>
  * Order of elements during iterations are highly dependent on the order of the
- * underlying data structure. See SparseSet and its specializations for more
+ * underlying data structure. See sparse_set and its specializations for more
  * details.
  *
  * @b Important
@@ -931,7 +875,7 @@ private:
  * invalidates all the iterators and using them results in undefined behavior.
  *
  * @note
- * Views share a reference to the underlying data structure with the Registry
+ * Views share a reference to the underlying data structure with the registry
  * that generated them. Therefore any change to the entities and to the
  * components made by means of the registry are immediately reflected by views.
  *
@@ -939,23 +883,23 @@ private:
  * Lifetime of a view must overcome the one of the registry that generated it.
  * In any other case, attempting to use a view results in undefined behavior.
  *
- * @sa View
- * @sa PersistentView
- * @sa RawView
- * @sa RuntimeView
+ * @sa view
+ * @sa persistent_view
+ * @sa raw_view
+ * @sa runtime_view
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Component Type of component iterated by the view.
  */
 template<typename Entity, typename Component>
-class View<Entity, Component> final {
+class view<Entity, Component> final {
     /*! @brief A registry is allowed to create views. */
-    friend class Registry<Entity>;
+    friend class registry<Entity>;
 
-    using view_type = SparseSet<Entity>;
-    using pool_type = SparseSet<Entity, Component>;
+    using view_type = sparse_set<Entity>;
+    using pool_type = sparse_set<Entity, Component>;
 
-    View(pool_type &pool) ENTT_NOEXCEPT
+    view(pool_type *pool) ENTT_NOEXCEPT
         : pool{pool}
     {}
 
@@ -971,12 +915,22 @@ public:
     /*! @brief Constant input iterator type. */
     using const_iterator_type = typename view_type::const_iterator_type;
 
+    /*! @brief Default copy constructor. */
+    view(const view &) = default;
+    /*! @brief Default move constructor. */
+    view(view &&) = default;
+
+    /*! @brief Default copy assignment operator. @return This view. */
+    view & operator=(const view &) = default;
+    /*! @brief Default move assignment operator. @return This view. */
+    view & operator=(view &&) = default;
+
     /**
      * @brief Returns the number of entities that have the given component.
      * @return Number of entities that have the given component.
      */
     size_type size() const ENTT_NOEXCEPT {
-        return pool.size();
+        return pool->size();
     }
 
     /**
@@ -984,7 +938,7 @@ public:
      * @return True if the view is empty, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
-        return pool.empty();
+        return pool->empty();
     }
 
     /**
@@ -1000,7 +954,7 @@ public:
      * @return A pointer to the array of components.
      */
     const raw_type * raw() const ENTT_NOEXCEPT {
-        return pool.raw();
+        return pool->raw();
     }
 
     /**
@@ -1016,7 +970,7 @@ public:
      * @return A pointer to the array of components.
      */
     inline raw_type * raw() ENTT_NOEXCEPT {
-        return const_cast<raw_type *>(const_cast<const View *>(this)->raw());
+        return const_cast<raw_type *>(std::as_const(*this).raw());
     }
 
     /**
@@ -1032,7 +986,7 @@ public:
      * @return A pointer to the array of entities.
      */
     const entity_type * data() const ENTT_NOEXCEPT {
-        return pool.data();
+        return pool->data();
     }
 
     /**
@@ -1050,7 +1004,7 @@ public:
      * @return An iterator to the first entity that has the given component.
      */
     const_iterator_type cbegin() const ENTT_NOEXCEPT {
-        return pool.view_type::cbegin();
+        return pool->view_type::cbegin();
     }
 
     /**
@@ -1086,7 +1040,7 @@ public:
      * @return An iterator to the first entity that has the given component.
      */
     iterator_type begin() ENTT_NOEXCEPT {
-        return pool.view_type::begin();
+        return pool->view_type::begin();
     }
 
     /**
@@ -1105,7 +1059,7 @@ public:
      * given component.
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
-        return pool.view_type::cend();
+        return pool->view_type::cend();
     }
 
     /**
@@ -1143,7 +1097,7 @@ public:
      * given component.
      */
     iterator_type end() ENTT_NOEXCEPT {
-        return pool.view_type::end();
+        return pool->view_type::end();
     }
 
     /**
@@ -1152,7 +1106,7 @@ public:
      * @return A reference to the requested element.
      */
     const entity_type & operator[](const size_type pos) const ENTT_NOEXCEPT {
-        return pool.view_type::operator[](pos);
+        return pool->view_type::operator[](pos);
     }
 
     /**
@@ -1161,13 +1115,13 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     bool contains(const entity_type entity) const ENTT_NOEXCEPT {
-        return pool.has(entity) && (pool.data()[pool.view_type::get(entity)] == entity);
+        return pool->has(entity) && (pool->data()[pool->view_type::get(entity)] == entity);
     }
 
     /**
      * @brief Returns the component assigned to the given entity.
      *
-     * Prefer this function instead of `Registry::get` during iterations. It has
+     * Prefer this function instead of `registry::get` during iterations. It has
      * far better performance than its companion function.
      *
      * @warning
@@ -1181,13 +1135,13 @@ public:
      */
     const Component & get(const entity_type entity) const ENTT_NOEXCEPT {
         assert(contains(entity));
-        return pool.get(entity);
+        return pool->get(entity);
     }
 
     /**
      * @brief Returns the component assigned to the given entity.
      *
-     * Prefer this function instead of `Registry::get` during iterations. It has
+     * Prefer this function instead of `registry::get` during iterations. It has
      * far better performance than its companion function.
      *
      * @warning
@@ -1200,7 +1154,7 @@ public:
      * @return The component assigned to the entity.
      */
     inline Component & get(const entity_type entity) ENTT_NOEXCEPT {
-        return const_cast<Component &>(const_cast<const View *>(this)->get(entity));
+        return const_cast<Component &>(std::as_const(*this).get(entity));
     }
 
     /**
@@ -1220,7 +1174,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        std::for_each(pool.view_type::cbegin(), pool.view_type::cend(), [&func, raw = pool.cbegin()](const auto entity) mutable {
+        std::for_each(pool->view_type::cbegin(), pool->view_type::cend(), [&func, raw = pool->cbegin()](const auto entity) mutable {
             func(entity, *(raw++));
         });
     }
@@ -1242,13 +1196,13 @@ public:
      */
     template<typename Func>
     inline void each(Func func) {
-        const_cast<const View *>(this)->each([&func](const entity_type entity, const Component &component) {
+        std::as_const(*this).each([&func](const entity_type entity, const Component &component) {
             func(entity, const_cast<Component &>(component));
         });
     }
 
 private:
-    pool_type &pool;
+    pool_type *pool;
 };
 
 
@@ -1260,7 +1214,7 @@ private:
  * Whenever knowing the entity to which a component belongs isn't required, this
  * should be the preferred tool.<br/>
  * Order of elements during iterations are highly dependent on the order of the
- * underlying data structure. See SparseSet and its specializations for more
+ * underlying data structure. See sparse_set and its specializations for more
  * details.
  *
  * @b Important
@@ -1275,7 +1229,7 @@ private:
  * invalidates all the iterators and using them results in undefined behavior.
  *
  * @note
- * Views share a reference to the underlying data structure with the Registry
+ * Views share a reference to the underlying data structure with the registry
  * that generated them. Therefore any change to the entities and to the
  * components made by means of the registry are immediately reflected by views.
  *
@@ -1283,22 +1237,22 @@ private:
  * Lifetime of a view must overcome the one of the registry that generated it.
  * In any other case, attempting to use a view results in undefined behavior.
  *
- * @sa View
- * @sa View<Entity, Component>
- * @sa PersistentView
- * @sa RuntimeView
+ * @sa view
+ * @sa view<Entity, Component>
+ * @sa persistent_view
+ * @sa runtime_view
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Component Type of component iterated by the view.
  */
 template<typename Entity, typename Component>
-class RawView final {
+class raw_view final {
     /*! @brief A registry is allowed to create views. */
-    friend class Registry<Entity>;
+    friend class registry<Entity>;
 
-    using pool_type = SparseSet<Entity, Component>;
+    using pool_type = sparse_set<Entity, Component>;
 
-    RawView(pool_type &pool) ENTT_NOEXCEPT
+    raw_view(pool_type *pool) ENTT_NOEXCEPT
         : pool{pool}
     {}
 
@@ -1314,12 +1268,22 @@ public:
     /*! @brief Constant input iterator type. */
     using const_iterator_type = typename pool_type::const_iterator_type;
 
+    /*! @brief Default copy constructor. */
+    raw_view(const raw_view &) = default;
+    /*! @brief Default move constructor. */
+    raw_view(raw_view &&) = default;
+
+    /*! @brief Default copy assignment operator. @return This view. */
+    raw_view & operator=(const raw_view &) = default;
+    /*! @brief Default move assignment operator. @return This view. */
+    raw_view & operator=(raw_view &&) = default;
+
     /**
      * @brief Returns the number of instances of the given type.
      * @return Number of instances of the given component.
      */
     size_type size() const ENTT_NOEXCEPT {
-        return pool.size();
+        return pool->size();
     }
 
     /**
@@ -1327,7 +1291,7 @@ public:
      * @return True if the view is empty, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
-        return pool.empty();
+        return pool->empty();
     }
 
     /**
@@ -1343,7 +1307,7 @@ public:
      * @return A pointer to the array of components.
      */
     const raw_type * raw() const ENTT_NOEXCEPT {
-        return pool.raw();
+        return pool->raw();
     }
 
     /**
@@ -1359,7 +1323,7 @@ public:
      * @return A pointer to the array of components.
      */
     inline raw_type * raw() ENTT_NOEXCEPT {
-        return const_cast<raw_type *>(const_cast<const RawView *>(this)->raw());
+        return const_cast<raw_type *>(std::as_const(*this).raw());
     }
 
     /**
@@ -1375,7 +1339,7 @@ public:
      * @return A pointer to the array of entities.
      */
     const entity_type * data() const ENTT_NOEXCEPT {
-        return pool.data();
+        return pool->data();
     }
 
     /**
@@ -1391,7 +1355,7 @@ public:
      * @return An iterator to the first instance of the given type.
      */
     const_iterator_type cbegin() const ENTT_NOEXCEPT {
-        return pool.cbegin();
+        return pool->cbegin();
     }
 
     /**
@@ -1423,7 +1387,7 @@ public:
      * @return An iterator to the first instance of the given type.
      */
     iterator_type begin() ENTT_NOEXCEPT {
-        return pool.begin();
+        return pool->begin();
     }
 
     /**
@@ -1442,7 +1406,7 @@ public:
      * given type.
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
-        return pool.cend();
+        return pool->cend();
     }
 
     /**
@@ -1480,7 +1444,7 @@ public:
      * given type.
      */
     iterator_type end() ENTT_NOEXCEPT {
-        return pool.end();
+        return pool->end();
     }
 
     /**
@@ -1489,7 +1453,7 @@ public:
      * @return A reference to the requested element.
      */
     const raw_type & operator[](const size_type pos) const ENTT_NOEXCEPT {
-        return pool[pos];
+        return (*pool)[pos];
     }
 
     /**
@@ -1498,7 +1462,7 @@ public:
      * @return A reference to the requested element.
      */
     inline raw_type & operator[](const size_type pos) ENTT_NOEXCEPT {
-        return const_cast<raw_type &>(const_cast<const RawView *>(this)->operator[](pos));
+        return const_cast<raw_type &>(std::as_const(*this).operator[](pos));
     }
 
     /**
@@ -1517,7 +1481,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        std::for_each(pool.cbegin(), pool.cend(), func);
+        std::for_each(pool->cbegin(), pool->cend(), func);
     }
 
     /**
@@ -1536,11 +1500,11 @@ public:
      */
     template<typename Func>
     void each(Func func) {
-        std::for_each(pool.begin(), pool.end(), func);
+        std::for_each(pool->begin(), pool->end(), func);
     }
 
 private:
-    pool_type &pool;
+    pool_type *pool;
 };
 
 
@@ -1553,7 +1517,7 @@ private:
  * the smallest set of candidate entities in order to get a performance boost
  * when iterate.<br/>
  * Order of elements during iterations are highly dependent on the order of the
- * underlying data structures. See SparseSet and its specializations for more
+ * underlying data structures. See sparse_set and its specializations for more
  * details.
  *
  * @b Important
@@ -1569,7 +1533,7 @@ private:
  * behavior.
  *
  * @note
- * Views share references to the underlying data structures with the Registry
+ * Views share references to the underlying data structures with the registry
  * that generated them. Therefore any change to the entities and to the
  * components made by means of the registry are immediately reflected by views,
  * unless a pool wasn't missing when the view was built (in this case, the view
@@ -1579,28 +1543,28 @@ private:
  * Lifetime of a view must overcome the one of the registry that generated it.
  * In any other case, attempting to use a view results in undefined behavior.
  *
- * @sa View
- * @sa View<Entity, Component>
- * @sa PersistentView
- * @sa RawView
+ * @sa view
+ * @sa view<Entity, Component>
+ * @sa persistent_view
+ * @sa raw_view
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class RuntimeView {
+class runtime_view {
     /*! @brief A registry is allowed to create views. */
-    friend class Registry<Entity>;
+    friend class registry<Entity>;
 
-    using view_type = SparseSet<Entity>;
+    using view_type = sparse_set<Entity>;
     using underlying_iterator_type = typename view_type::const_iterator_type;
     using pattern_type = std::vector<const view_type *>;
     using extent_type = typename view_type::size_type;
     using traits_type = entt_traits<Entity>;
 
-    class Iterator {
-        friend class RuntimeView<Entity>;
+    class iterator {
+        friend class runtime_view<Entity>;
 
-        Iterator(underlying_iterator_type begin, underlying_iterator_type end, const view_type * const *first, const view_type * const *last, extent_type extent) ENTT_NOEXCEPT
+        iterator(underlying_iterator_type begin, underlying_iterator_type end, const view_type * const *first, const view_type * const *last, extent_type extent) ENTT_NOEXCEPT
             : begin{begin},
               end{end},
               first{first},
@@ -1628,25 +1592,25 @@ class RuntimeView {
         using reference = typename underlying_iterator_type::reference;
         using iterator_category = std::forward_iterator_tag;
 
-        Iterator() ENTT_NOEXCEPT = default;
+        iterator() ENTT_NOEXCEPT = default;
 
-        Iterator(const Iterator &) ENTT_NOEXCEPT = default;
-        Iterator & operator=(const Iterator &) ENTT_NOEXCEPT = default;
+        iterator(const iterator &) ENTT_NOEXCEPT = default;
+        iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
 
-        Iterator & operator++() ENTT_NOEXCEPT {
+        iterator & operator++() ENTT_NOEXCEPT {
             return (++begin != end && !valid()) ? ++(*this) : *this;
         }
 
-        Iterator operator++(int) ENTT_NOEXCEPT {
-            Iterator orig = *this;
+        iterator operator++(int) ENTT_NOEXCEPT {
+            iterator orig = *this;
             return ++(*this), orig;
         }
 
-        bool operator==(const Iterator &other) const ENTT_NOEXCEPT {
+        bool operator==(const iterator &other) const ENTT_NOEXCEPT {
             return other.begin == begin;
         }
 
-        inline bool operator!=(const Iterator &other) const ENTT_NOEXCEPT {
+        inline bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
@@ -1666,7 +1630,7 @@ class RuntimeView {
         extent_type extent;
     };
 
-    RuntimeView(pattern_type others) ENTT_NOEXCEPT
+    runtime_view(pattern_type others) ENTT_NOEXCEPT
         : pools{std::move(others)}
     {
         const auto it = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
@@ -1701,9 +1665,19 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = typename view_type::size_type;
     /*! @brief Input iterator type. */
-    using iterator_type = Iterator;
+    using iterator_type = iterator;
     /*! @brief Constant input iterator type. */
-    using const_iterator_type = Iterator;
+    using const_iterator_type = iterator;
+
+    /*! @brief Default copy constructor. */
+    runtime_view(const runtime_view &) = default;
+    /*! @brief Default move constructor. */
+    runtime_view(runtime_view &&) = default;
+
+    /*! @brief Default copy assignment operator. @return This view. */
+    runtime_view & operator=(const runtime_view &) = default;
+    /*! @brief Default move assignment operator. @return This view. */
+    runtime_view & operator=(runtime_view &&) = default;
 
     /**
      * @brief Estimates the number of entities that have the given components.

@@ -38,29 +38,29 @@ whatever. There are no limits.<br/>
 As a minimal example:
 
 ```cpp
-struct MyResource { const int value; };
+struct my_resource { const int value; };
 ```
 
 A _loader_ is a class the aim of which is to load a specific resource. It has to
 inherit directly from the dedicated base class as in the following example:
 
 ```cpp
-struct MyLoader final: entt::ResourceLoader<MyLoader, MyResource> {
+struct my_loader final: entt::resource_loader<my_loader, my_resource> {
     // ...
 };
 ```
 
-Where `MyResource` is the type of resources it creates.<br/>
+Where `my_resource` is the type of resources it creates.<br/>
 A resource loader must also expose a public const member function named `load`
 that accepts a variable number of arguments and returns a shared pointer to a
 resource.<br/>
 As an example:
 
 ```cpp
-struct MyLoader: entt::ResourceLoader<MyLoader, MyResource> {
-    std::shared_ptr<MyResource> load(int value) const {
+struct my_loader: entt::resource_loader<my_loader, my_resource> {
+    std::shared_ptr<my_resource> load(int value) const {
         // ...
-        return std::shared_ptr<MyResource>(new MyResource{ value });
+        return std::shared_ptr<my_resource>(new my_resource{ value });
     }
 };
 ```
@@ -76,11 +76,11 @@ Finally, a cache is a specialization of a class template tailored to a specific
 resource:
 
 ```cpp
-using MyResourceCache = entt::ResourceCache<MyResource>;
+using my_resource_cache = entt::resource_cache<my_resource>;
 
 // ...
 
-MyResourceCache cache{};
+my_resource_cache cache{};
 ```
 
 The idea is to create different caches for different types of resources and to
@@ -109,19 +109,19 @@ Before to explore this part of the interface, it makes sense to mention how
 resources are identified. The type of the identifiers to use is defined as:
 
 ```cpp
-entt::ResourceCache<Resource>::resource_type
+entt::resource_cache<resource>::resource_type
 ```
 
-Where `resource_type` is an alias for `entt::HashedString`. Therefore, resource
+Where `resource_type` is an alias for `entt::hashed_string`. Therefore, resource
 identifiers are created explicitly as in the following example:
 
 ```cpp
-constexpr auto identifier = entt::ResourceCache<Resource>::resource_type{"my/resource/identifier"};
+constexpr auto identifier = entt::resource_cache<resource>::resource_type{"my/resource/identifier"};
 // this is equivalent to the following
-constexpr auto hs = entt::HashedString{"my/resource/identifier"};
+constexpr auto hs = entt::hashed_string{"my/resource/identifier"};
 ```
 
-The class `HashedString` is described in a dedicated section, so I won't do in
+The class `hashed_string` is described in a dedicated section, so I won't do in
 details here.
 
 Resources are loaded and thus stored in a cache through the `load` member
@@ -130,10 +130,10 @@ identifier and the parameters used to construct the resource as arguments:
 
 ```cpp
 // uses the identifier declared above
-cache.load<MyLoader>(identifier, 0);
+cache.load<my_loader>(identifier, 0);
 
 // uses a const char * directly as an identifier
-cache.load<MyLoader>("another/identifier", 42);
+cache.load<my_loader>("another/identifier", 42);
 ```
 
 The return value can be used to know if the resource has been loaded correctly.
@@ -141,7 +141,7 @@ In case the loader returns an invalid pointer or the resource already exists in
 the cache, a false value is returned:
 
 ```cpp
-if(!cache.load<MyLoader>("another/identifier", 42)) {
+if(!cache.load<my_loader>("another/identifier", 42)) {
     // ...
 }
 ```
@@ -159,7 +159,7 @@ There exists also a member function to use to force a reload of an already
 existing resource if needed:
 
 ```cpp
-auto result = cache.reload<MyLoader>("another/identifier", 42);
+auto result = cache.reload<my_loader>("another/identifier", 42);
 ```
 
 As above, the function returns true in case of success, false otherwise. The
@@ -170,7 +170,7 @@ snippet:
 
 ```cpp
 cache.discard(identifier);
-cache.load<MyLoader>(identifier, 42);
+cache.load<my_loader>(identifier, 42);
 ```
 
 Where the `discard` member function is used to get rid of a resource if loaded.
@@ -233,7 +233,7 @@ return a boolean value. Instead, it returns a (possibly invalid) handle for the
 resource:
 
 ```cpp
-auto handle = cache.temp<MyLoader>("another/identifier", 42);
+auto handle = cache.temp<my_loader>("another/identifier", 42);
 ```
 
 Do not forget to test the handle for validity. Otherwise, getting the reference

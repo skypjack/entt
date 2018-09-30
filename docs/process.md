@@ -24,7 +24,7 @@ that users can use to define and execute cooperative processes.
 
 # The process
 
-A typical process must inherit from the `Process` class template that stays true
+A typical process must inherit from the `process` class template that stays true
 to the CRTP idiom. Moreover, derived classes must specify what's the intended
 type for elapsed times.
 
@@ -70,7 +70,7 @@ life cycle of a process from a derived class.
 Here is a minimal example for the sake of curiosity:
 
 ```cpp
-struct MyProcess: entt::Process<MyProcess, std::uint32_t> {
+struct my_process: entt::process<my_process, std::uint32_t> {
     using delta_type = std::uint32_t;
 
     void update(delta_type delta, void *) {
@@ -137,7 +137,7 @@ Using a scheduler is straightforward. To create it, users must provide only the
 type for the elapsed times and no arguments at all:
 
 ```cpp
-Scheduler<std::uint32_t> scheduler;
+entt::scheduler<std::uint32_t> scheduler;
 ```
 
 It has member functions to query its internal data structures, like `empty` or
@@ -148,7 +148,7 @@ It has member functions to query its internal data structures, like `empty` or
 const auto empty = scheduler.empty();
 
 // gets the number of processes still running
-Scheduler<std::uint32_t>::size_type size = scheduler.size();
+entt::scheduler<std::uint32_t>::size_type size = scheduler.size();
 
 // resets the scheduler to its initial state and discards all the processes
 scheduler.clear();
@@ -156,12 +156,12 @@ scheduler.clear();
 
 To attach a process to a scheduler there are mainly two ways:
 
-* If the process inherits from the `Process` class template, it's enough to
+* If the process inherits from the `process` class template, it's enough to
   indicate its type and submit all the parameters required to construct it to
   the `attach` member function:
 
   ```cpp
-  scheduler.attach<MyProcess>("foobar");
+  scheduler.attach<my_process>("foobar");
   ```
 
 * Otherwise, in case of a lambda or a functor, it's enough to provide an
@@ -185,7 +185,7 @@ scheduler.attach([](auto delta, void *, auto succeed, auto fail) {
     // ...
 })
 // appends a child in the form of a process class
-.then<MyProcess>();
+.then<my_process>();
 ```
 
 To update a scheduler and thus all its processes, the `update` member function

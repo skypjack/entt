@@ -32,13 +32,13 @@ initialize it. As an example:
 
 ```cpp
 // the service has no base type, a locator is used to treat it as a kind of singleton
-entt::ServiceLocator<MyService>::set(params...);
+entt::service_locator<my_service>::set(params...);
 
 // sets up an opaque service
-entt::ServiceLocator<AudioInterface>::set<AudioImplementation>(params...);
+entt::service_locator<audio_interface>::set<audio_implementation>(params...);
 
 // resets (destroys) the service
-entt::ServiceLocator<AudioInterface>::reset();
+entt::service_locator<audio_interface>::reset();
 ```
 
 The locator can also be queried to know if an active service is currently set
@@ -46,30 +46,30 @@ and to retrieve it if necessary (either as a pointer or as a reference):
 
 ```cpp
 // no service currently set
-auto empty = entt::ServiceLocator<AudioInterface>::empty();
+auto empty = entt::service_locator<audio_interface>::empty();
 
 // gets a (possibly empty) shared pointer to the service ...
-std::shared_ptr<AudioInterface> ptr = entt::ServiceLocator<AudioInterface>::get();
+std::shared_ptr<audio_interface> ptr = entt::service_locator<audio_interface>::get();
 
 // ... or a reference, but it's undefined behaviour if the service isn't set yet
-AudioInterface &ref = entt::ServiceLocator<AudioInterface>::ref();
+audio_interface &ref = entt::service_locator<audio_interface>::ref();
 ```
 
 A common use is to wrap the different locators in a container class, creating
 aliases for the various services:
 
 ```cpp
-struct Locator {
-    using Camera = entt::ServiceLocator<CameraInterface>;
-    using Audio = entt::ServiceLocator<AudioInterface>;
+struct locator {
+    using camera = entt::service_locator<camera_interface>;
+    using audio = entt::service_locator<audio_interface>;
     // ...
 };
 
 // ...
 
 void init() {
-    Locator::Camera::set<CameraNull>();
-    Locator::Audio::set<AudioImplementation>(params...);
+    locator::camera::set<camera_null>();
+    locator::audio::set<audio_implementation>(params...);
     // ...
 }
 ```

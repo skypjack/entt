@@ -30,21 +30,21 @@ There are plenty of different solutions out there and I could have used one of
 them. However, I decided to spend my time to define a compact and versatile tool
 that fully embraces what the modern C++ has to offer.
 
-The _result of my efforts_ is the `Identifier` class template:
+The _result of my efforts_ is the `identifier` class template:
 
 ```cpp
 #include <ident.hpp>
 
 // defines the identifiers for the given types
-using ID = entt::Identifier<AType, AnotherType>;
+using id = entt::identifier<a_type, another_type>;
 
 // ...
 
-switch(aTypeIdentifier) {
-case ID::get<AType>():
+switch(a_type_identifier) {
+case id::type<a_type>:
     // ...
     break;
-case ID::get<AnotherType>():
+case id::type<another_type>:
     // ...
     break;
 default:
@@ -52,8 +52,8 @@ default:
 }
 ```
 
-This is all what the class template has to offer: a static `get` member function
-that returns a numerical identifier for the given type. It can be used in any
+This is all what the class template has to offer: a `type` inline variable that
+contains a numerical identifier for the given type. It can be used in any
 context where constant expressions are required.
 
 As long as the list remains unchanged, identifiers are also guaranteed to be the
@@ -62,12 +62,12 @@ a type has to be removed, one can just use a placeholder to left the other
 identifiers unchanged:
 
 ```cpp
-template<typename> struct IgnoreType {};
+template<typename> struct ignore_type {};
 
-using ID = entt::Identifier<
-    ATypeStillValid,
-    IgnoreType<ATypeNoLongerValid>,
-    AnotherTypeStillValid
+using id = entt::identifier<
+    a_type_still_valid,
+    ignore_type<a_type_no_longer_valid>,
+    another_type_still_valid
 >;
 ```
 
@@ -81,21 +81,21 @@ There are plenty of different solutions out there and I could have used one of
 them. In fact, I adapted the most common one to my requirements and used it
 extensively within the entire library.
 
-It's the `Family` class. Here is an example of use directly from the
+It's the `family` class. Here is an example of use directly from the
 entity-component system:
 
 ```cpp
-using component_family = entt::Family<struct InternalRegistryComponentFamily>;
+using component_family = entt::family<struct internal_registry_component_family>;
 
 // ...
 
 template<typename Component>
 component_type component() const noexcept {
-    return component_family::type<Component>();
+    return component_family::type<Component>;
 }
 ```
 
-This is all what a _family_ has to offer: a `type` member function that returns
+This is all what a _family_ has to offer: a `type` inline variable that contains
 a numerical identifier for the given type.
 
 Please, note that identifiers aren't guaranteed to be the same for every run.
@@ -116,11 +116,11 @@ used carefully.
 Example of use:
 
 ```cpp
-auto load(entt::HashedString::hash_type resource) {
+auto load(entt::hashed_string::hash_type resource) {
     // uses the numeric representation of the resource to load and return it
 }
 
-auto resource = load(entt::HashedString{"gui/background"});
+auto resource = load(entt::hashed_string{"gui/background"});
 ```
 
 There is also a _user defined literal_ dedicated to hashed strings to make them
@@ -157,11 +157,11 @@ they will probably incur in unexpected results.
 Example of use:
 
 ```cpp
-entt::Monostate<entt::HashedString{"mykey"}>{} = true;
-entt::Monostate<"mykey"_hs>{} = 42;
+entt::monostate<entt::hashed_string{"mykey"}>{} = true;
+entt::monostate<"mykey"_hs>{} = 42;
 
 // ...
 
-const bool b = entt::Monostate<"mykey"_hs>{};
-const int i = entt::Monostate<entt::HashedString{"mykey"}>{};
+const bool b = entt::monostate<"mykey"_hs>{};
+const int i = entt::monostate<entt::hashed_string{"mykey"}>{};
 ```

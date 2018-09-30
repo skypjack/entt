@@ -5,7 +5,7 @@
 TEST(Algorithm, StdSort) {
     // well, I'm pretty sure it works, it's std::sort!!
     std::array<int, 5> arr{{4, 1, 3, 2, 0}};
-    entt::StdSort sort;
+    entt::std_sort sort;
 
     sort(arr.begin(), arr.end());
 
@@ -16,7 +16,7 @@ TEST(Algorithm, StdSort) {
 
 TEST(Algorithm, InsertionSort) {
     std::array<int, 5> arr{{4, 1, 3, 2, 0}};
-    entt::InsertionSort sort;
+    entt::insertion_sort sort;
 
     sort(arr.begin(), arr.end());
 
@@ -27,7 +27,7 @@ TEST(Algorithm, InsertionSort) {
 
 TEST(Algorithm, OneShotBubbleSort) {
     std::array<int, 5> arr{{4, 1, 3, 2, 0}};
-    entt::OneShotBubbleSort sort;
+    entt::one_shot_bubble_sort sort;
 
     sort(arr.begin(), arr.end());
     sort(arr.begin(), arr.end());

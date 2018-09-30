@@ -9,35 +9,17 @@ matrix:
     addons:
       apt:
         sources: ['ubuntu-toolchain-r-test']
-        packages: ['g++-6']
-    env: COMPILER=g++-6
-  - os: linux
-    compiler: gcc
-    addons:
-      apt:
-        sources: ['ubuntu-toolchain-r-test']
         packages: ['g++-7']
     env: COMPILER=g++-7
   - os: linux
     compiler: clang
     addons:
       apt:
-        sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-4.0']
-        packages: ['clang-4.0', 'libstdc++-4.9-dev']
-    env: COMPILER=clang++-4.0
-  - os: linux
-    compiler: clang
-    addons:
-      apt:
-        sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-5.0']
-        packages: ['clang-5.0', 'libstdc++-4.9-dev']
-    env: COMPILER=clang++-5.0
+        sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-6.0']
+        packages: ['clang-6.0', 'g++-7']
+    env: COMPILER=clang++-6.0
   - os: osx
-    osx_image: xcode8.3
-    compiler: clang
-    env: COMPILER=clang++
-  - os: osx
-    osx_image: xcode9.4
+    osx_image: xcode10
     compiler: clang
     env: COMPILER=clang++
   - os: linux

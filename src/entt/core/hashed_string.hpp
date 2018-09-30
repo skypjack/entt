@@ -19,10 +19,10 @@ namespace entt {
  * Because of that, a hashed string can also be used in constant expressions if
  * required.
  */
-class HashedString final {
-    struct ConstCharWrapper final {
+class hashed_string final {
+    struct const_wrapper final {
         // non-explicit constructor on purpose
-        constexpr ConstCharWrapper(const char *str) ENTT_NOEXCEPT: str{str} {}
+        constexpr const_wrapper(const char *str) ENTT_NOEXCEPT: str{str} {}
         const char *str;
     };
 
@@ -46,14 +46,14 @@ public:
      * characters.<br/>
      * Example of use:
      * @code{.cpp}
-     * HashedString sh{"my.png"};
+     * hashed_string hs{"my.png"};
      * @endcode
      *
      * @tparam N Number of characters of the identifier.
      * @param str Human-readable identifer.
      */
     template<std::size_t N>
-    constexpr HashedString(const char (&str)[N]) ENTT_NOEXCEPT
+    constexpr hashed_string(const char (&str)[N]) ENTT_NOEXCEPT
         : hash{helper(offset, str)}, str{str}
     {}
 
@@ -63,9 +63,25 @@ public:
      *
      * @param wrapper Helps achieving the purpose by relying on overloading.
      */
-    explicit constexpr HashedString(ConstCharWrapper wrapper) ENTT_NOEXCEPT
+    explicit constexpr hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
         : hash{helper(offset, wrapper.str)}, str{wrapper.str}
     {}
+
+    /**
+     * @brief Returns the human-readable representation of a hashed string.
+     * @return The string used to initialize the instance.
+     */
+    constexpr const char * data() const ENTT_NOEXCEPT {
+        return str;
+    }
+
+    /**
+     * @brief Returns the numeric representation of a hashed string.
+     * @return The numeric representation of the instance.
+     */
+    constexpr hash_type value() const ENTT_NOEXCEPT {
+        return hash;
+    }
 
     /**
      * @brief Returns the human-readable representation of a hashed string.
@@ -84,7 +100,7 @@ public:
      * @param other Hashed string with which to compare.
      * @return True if the two hashed strings are identical, false otherwise.
      */
-    constexpr bool operator==(const HashedString &other) const ENTT_NOEXCEPT {
+    constexpr bool operator==(const hashed_string &other) const ENTT_NOEXCEPT {
         return hash == other.hash;
     }
 
@@ -100,7 +116,7 @@ private:
  * @param rhs A valid hashed string.
  * @return True if the two hashed strings are identical, false otherwise.
  */
-constexpr bool operator!=(const HashedString &lhs, const HashedString &rhs) ENTT_NOEXCEPT {
+constexpr bool operator!=(const hashed_string &lhs, const hashed_string &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
@@ -113,8 +129,8 @@ constexpr bool operator!=(const HashedString &lhs, const HashedString &rhs) ENTT
  * @param str The literal without its suffix.
  * @return A properly initialized hashed string.
  */
-constexpr entt::HashedString operator"" ENTT_HS_SUFFIX(const char *str, std::size_t) ENTT_NOEXCEPT {
-    return entt::HashedString{str};
+constexpr entt::hashed_string operator"" ENTT_HS_SUFFIX(const char *str, std::size_t) ENTT_NOEXCEPT {
+    return entt::hashed_string{str};
 }
 
 

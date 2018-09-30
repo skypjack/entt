@@ -67,7 +67,6 @@ SETUP_AND_ADD_TEST(monostate entt/core/monostate.cpp)
 # Test entity
 
 SETUP_AND_ADD_TEST(actor entt/entity/actor.cpp)
-SETUP_AND_ADD_TEST(attachee entt/entity/attachee.cpp)
 SETUP_AND_ADD_TEST(entity entt/entity/entity.cpp)
 SETUP_AND_ADD_TEST(helper entt/entity/helper.cpp)
 SETUP_AND_ADD_TEST(prototype entt/entity/prototype.cpp)

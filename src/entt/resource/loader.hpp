@@ -9,7 +9,7 @@ namespace entt {
 
 
 template<typename Resource>
-class ResourceCache;
+class resource_cache;
 
 
 /**
@@ -22,12 +22,12 @@ class ResourceCache;
  * As an example:
  *
  * @code{.cpp}
- * struct MyResource {};
+ * struct my_resource {};
  *
- * struct MyLoader: entt::ResourceLoader<MyLoader, MyResource> {
- *     std::shared_ptr<MyResource> load(int) const {
+ * struct my_loader: entt::resource_loader<my_loader, my_resource> {
+ *     std::shared_ptr<my_resource> load(int) const {
  *         // use the integer value somehow
- *         return std::make_shared<MyResource>();
+ *         return std::make_shared<my_resource>();
  *     }
  * };
  * @endcode
@@ -45,9 +45,9 @@ class ResourceCache;
  * @tparam Resource Type of resource for which to use the loader.
  */
 template<typename Loader, typename Resource>
-class ResourceLoader {
+class resource_loader {
     /*! @brief Resource loaders are friends of their caches. */
-    friend class ResourceCache<Resource>;
+    friend class resource_cache<Resource>;
 
     template<typename... Args>
     std::shared_ptr<Resource> get(Args &&... args) const {

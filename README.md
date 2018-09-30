@@ -86,50 +86,50 @@ been sufficiently tested so far.
 #include <entt/entt.hpp>
 #include <cstdint>
 
-struct Position {
+struct position {
     float x;
     float y;
 };
 
-struct Velocity {
+struct velocity {
     float dx;
     float dy;
 };
 
-void update(entt::DefaultRegistry &registry) {
-    auto view = registry.view<Position, Velocity>();
+void update(entt::registry &registry) {
+    auto view = registry.view<position, velocity>();
 
     for(auto entity: view) {
         // gets only the components that are going to be used ...
 
-        auto &velocity = view.get<Velocity>(entity);
+        auto &vel = view.get<velocity>(entity);
 
-        velocity.dx = 0.;
-        velocity.dy = 0.;
+        vel.dx = 0.;
+        vel.dy = 0.;
 
         // ...
     }
 }
 
-void update(std::uint64_t dt, entt::DefaultRegistry &registry) {
-    registry.view<Position, Velocity>().each([dt](auto entity, auto &position, auto &velocity) {
+void update(std::uint64_t dt, entt::registry &registry) {
+    registry.view<position, velocity>().each([dt](const auto, auto &pos, auto &vel) {
         // gets all the components of the view at once ...
 
-        position.x += velocity.dx * dt;
-        position.y += velocity.dy * dt;
+        pos.x += vel.dx * dt;
+        pos.y += vel.dy * dt;
 
         // ...
     });
 }
 
 int main() {
-    entt::DefaultRegistry registry;
+    entt::registry registry;
     std::uint64_t dt = 16;
 
     for(auto i = 0; i < 10; ++i) {
         auto entity = registry.create();
-        registry.assign<Position>(entity, i * 1.f, i * 1.f);
-        if(i % 2 == 0) { registry.assign<Velocity>(entity, i * .1f, i * .1f); }
+        registry.assign<position>(entity, i * 1.f, i * 1.f);
+        if(i % 2 == 0) { registry.assign<velocity>(entity, i * .1f, i * .1f); }
     }
 
     update(dt, registry);
@@ -209,12 +209,14 @@ open an issue to discuss your idea.
 ## Requirements
 
 To be able to use `EnTT`, users must provide a full-featured compiler that
-supports at least C++14.<br/>
+supports at least C++17.<br/>
 The requirements below are mandatory to compile the tests and to extract the
 documentation:
 
 * CMake version 3.2 or later.
 * Doxygen version 1.8 or later.
+
+If you are looking for a C++14 version of `EnTT`, check out the git tag `cpp14`.
 
 ## Library
 
@@ -351,7 +353,8 @@ I can't promise that each and every contribution will be accepted, but I can
 assure that I'll do my best to take them all seriously.
 
 If you decide to participate, please see the guidelines for
-[contributing](docs/CONTRIBUTING.md) before to create issues or pull requests.<br/>
+[contributing](docs/CONTRIBUTING.md) before to create issues or pull
+requests.<br/>
 Take also a look at the
 [contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to
 know who has participated so far.

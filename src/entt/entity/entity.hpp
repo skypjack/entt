@@ -18,20 +18,20 @@ namespace entt {
 namespace internal {
 
 
-struct Null {
-    explicit constexpr Null() = default;
+struct null {
+    explicit constexpr null() = default;
 
     template<typename Entity>
     constexpr operator Entity() const ENTT_NOEXCEPT {
-        using traits_type = entt::entt_traits<Entity>;
+        using traits_type = entt_traits<Entity>;
         return traits_type::entity_mask | (traits_type::version_mask << traits_type::entity_shift);
     }
 
-    constexpr bool operator==(Null) const ENTT_NOEXCEPT {
+    constexpr bool operator==(null) const ENTT_NOEXCEPT {
         return true;
     }
 
-    constexpr bool operator!=(Null) const ENTT_NOEXCEPT {
+    constexpr bool operator!=(null) const ENTT_NOEXCEPT {
         return false;
     }
 
@@ -48,14 +48,14 @@ struct Null {
 
 
 template<typename Entity>
-constexpr bool operator==(const Entity entity, Null null) ENTT_NOEXCEPT {
-    return null == entity;
+constexpr bool operator==(const Entity entity, null other) ENTT_NOEXCEPT {
+    return other == entity;
 }
 
 
 template<typename Entity>
-constexpr bool operator!=(const Entity entity, Null null) ENTT_NOEXCEPT {
-    return null != entity;
+constexpr bool operator!=(const Entity entity, null other) ENTT_NOEXCEPT {
+    return other != entity;
 }
 
 
@@ -75,7 +75,7 @@ constexpr bool operator!=(const Entity entity, Null null) ENTT_NOEXCEPT {
  * any allowed type. Similarly, there exist comparision operators between the
  * null entity and any other entity identifier.
  */
-constexpr auto null = internal::Null{};
+constexpr auto null = internal::null{};
 
 
 }

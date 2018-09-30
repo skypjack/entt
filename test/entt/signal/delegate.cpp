@@ -1,17 +1,17 @@
 #include <gtest/gtest.h>
 #include <entt/signal/delegate.hpp>
 
-int delegateFunction(int i) {
+int delegate_function(const int &i) {
     return i*i;
 }
 
-struct DelegateFunctor {
+struct delegate_functor {
     int operator()(int i) {
         return i+i;
     }
 };
 
-struct ConstNonConstNoExcept {
+struct const_nonconst_noexcept {
     void f() { ++cnt; }
     void g() noexcept { ++cnt; }
     void h() const { ++cnt; }
@@ -20,15 +20,16 @@ struct ConstNonConstNoExcept {
 };
 
 TEST(Delegate, Functionalities) {
-    entt::Delegate<int(int)> ffdel;
-    entt::Delegate<int(int)> mfdel;
-    DelegateFunctor functor;
+    entt::delegate<int(int)> ffdel;
+    entt::delegate<int(int)> mfdel;
+    delegate_functor functor;
 
     ASSERT_TRUE(ffdel.empty());
     ASSERT_TRUE(mfdel.empty());
+    ASSERT_EQ(ffdel, mfdel);
 
-    ffdel.connect<&delegateFunction>();
-    mfdel.connect<DelegateFunctor, &DelegateFunctor::operator()>(&functor);
+    ffdel.connect<&delegate_function>();
+    mfdel.connect<&delegate_functor::operator()>(&functor);
 
     ASSERT_FALSE(ffdel.empty());
     ASSERT_FALSE(mfdel.empty());
@@ -37,39 +38,52 @@ TEST(Delegate, Functionalities) {
     ASSERT_EQ(mfdel(3), 6);
 
     ffdel.reset();
-    mfdel.reset();
 
     ASSERT_TRUE(ffdel.empty());
-    ASSERT_TRUE(mfdel.empty());
+    ASSERT_FALSE(mfdel.empty());
+
+    ASSERT_EQ(ffdel, entt::delegate<int(int)>{});
+    ASSERT_NE(ffdel, mfdel);
 }
 
 TEST(Delegate, Comparison) {
-    entt::Delegate<int(int)> delegate;
-    entt::Delegate<int(int)> def;
-    delegate.connect<&delegateFunction>();
+    entt::delegate<int(int)> delegate;
+    entt::delegate<int(int)> def;
+    delegate.connect<&delegate_function>();
 
-    ASSERT_EQ(def, entt::Delegate<int(int)>{});
+    ASSERT_EQ(def, entt::delegate<int(int)>{});
     ASSERT_NE(def, delegate);
 
-    ASSERT_TRUE(def == entt::Delegate<int(int)>{});
+    ASSERT_TRUE(def == entt::delegate<int(int)>{});
     ASSERT_TRUE (def != delegate);
 }
 
 TEST(Delegate, ConstNonConstNoExcept) {
-    entt::Delegate<void()> delegate;
-    ConstNonConstNoExcept functor;
+    entt::delegate<void()> delegate;
+    const_nonconst_noexcept functor;
 
-    delegate.connect<ConstNonConstNoExcept, &ConstNonConstNoExcept::f>(&functor);
+    delegate.connect<&const_nonconst_noexcept::f>(&functor);
     delegate();
 
-    delegate.connect<ConstNonConstNoExcept, &ConstNonConstNoExcept::g>(&functor);
+    delegate.connect<&const_nonconst_noexcept::g>(&functor);
     delegate();
 
-    delegate.connect<ConstNonConstNoExcept, &ConstNonConstNoExcept::h>(&functor);
+    delegate.connect<&const_nonconst_noexcept::h>(&functor);
     delegate();
 
-    delegate.connect<ConstNonConstNoExcept, &ConstNonConstNoExcept::i>(&functor);
+    delegate.connect<&const_nonconst_noexcept::i>(&functor);
     delegate();
 
     ASSERT_EQ(functor.cnt, 4);
+}
+
+TEST(Delegate, Constructors) {
+    delegate_functor functor;
+    entt::delegate<int(int)> empty{};
+    entt::delegate<int(int)> func{entt::connect_arg<&delegate_function>};
+    entt::delegate<int(int)> member{entt::connect_arg<&delegate_functor::operator()>, &functor};
+
+    ASSERT_TRUE(empty.empty());
+    ASSERT_FALSE(func.empty());
+    ASSERT_FALSE(member.empty());
 }

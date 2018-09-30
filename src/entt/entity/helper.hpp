@@ -6,7 +6,6 @@
 #include "../core/hashed_string.hpp"
 #include "../signal/sigh.hpp"
 #include "registry.hpp"
-#include "utility.hpp"
 
 
 namespace entt {
@@ -27,10 +26,8 @@ namespace entt {
  * @param entity A valid entity identifier.
  */
 template<typename Entity, typename... Component>
-void dependency(Registry<Entity> &registry, const Entity entity) {
-    using accumulator_type = int[];
-    accumulator_type accumulator = { ((registry.template has<Component>(entity) ? void() : (registry.template assign<Component>(entity), void())), 0)... };
-    (void)accumulator;
+void dependency(registry<Entity> &registry, const Entity entity) {
+    ((registry.template has<Component>(entity) ? void() : (registry.template assign<Component>(entity), void())), ...);
 }
 
 
@@ -40,11 +37,11 @@ void dependency(Registry<Entity> &registry, const Entity entity) {
  * A _dependency function_ is a built-in listener to use to automatically assign
  * components to an entity when a type has a dependency on some other types.
  *
- * The following adds components `AType` and `AnotherType` whenever `MyType` is
- * assigned to an entity:
+ * The following adds components `a_type` and `another_type` whenever `my_type`
+ * is assigned to an entity:
  * @code{.cpp}
- * entt::DefaultRegistry registry;
- * entt::connect<AType, AnotherType>(registry.construction<MyType>());
+ * entt::registry registry;
+ * entt::connect<a_type, another_type>(registry.construction<my_type>());
  * @endcode
  *
  * @tparam Dependency Types of components to assign to an entity if triggered.
@@ -52,7 +49,7 @@ void dependency(Registry<Entity> &registry, const Entity entity) {
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Entity>
-inline void connect(Sink<void(Registry<Entity> &, const Entity)> sink) {
+inline void connect(sink<void(registry<Entity> &, const Entity)> sink) {
     sink.template connect<dependency<Entity, Dependency...>>();
 }
 
@@ -63,11 +60,11 @@ inline void connect(Sink<void(Registry<Entity> &, const Entity)> sink) {
  * A _dependency function_ is a built-in listener to use to automatically assign
  * components to an entity when a type has a dependency on some other types.
  *
- * The following breaks the dependency between the component `MyType` and the
- * components `AType` and `AnotherType`:
+ * The following breaks the dependency between the component `my_type` and the
+ * components `a_type` and `another_type`:
  * @code{.cpp}
- * entt::DefaultRegistry registry;
- * entt::disconnect<AType, AnotherType>(registry.construction<MyType>());
+ * entt::registry registry;
+ * entt::disconnect<a_type, another_type>(registry.construction<my_type>());
  * @endcode
  *
  * @tparam Dependency Types of components used to create the dependency.
@@ -75,7 +72,7 @@ inline void connect(Sink<void(Registry<Entity> &, const Entity)> sink) {
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Entity>
-inline void disconnect(Sink<void(Registry<Entity> &, const Entity)> sink) {
+inline void disconnect(sink<void(registry<Entity> &, const Entity)> sink) {
     sink.template disconnect<dependency<Entity, Dependency...>>();
 }
 
@@ -89,14 +86,14 @@ inline void disconnect(Sink<void(Registry<Entity> &, const Entity)> sink) {
  * As an example and where the user defined literal for hashed strings hasn't
  * been changed:
  * @code{.cpp}
- * entt::DefaultRegistry registry;
+ * entt::registry registry;
  * registry.assign<entt::label<"enemy"_hs>>(entity);
  * @endcode
  *
  * @tparam Value The numeric representation of an instance of hashed string.
  */
-template<typename HashedString::hash_type Value>
-using label = std::integral_constant<typename HashedString::hash_type, Value>;
+template<typename hashed_string::hash_type Value>
+using label = std::integral_constant<typename hashed_string::hash_type, Value>;
 
 
 }
