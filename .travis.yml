@@ -51,7 +51,7 @@ install:
 
 script:
 - mkdir -p build && cd build
-- cmake .. && make -j4
+- cmake -DCMAKE_BUILD_TYPE=Release .. && make -j4
 - CTEST_OUTPUT_ON_FAILURE=1 make test
 
 deploy:

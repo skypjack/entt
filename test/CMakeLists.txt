@@ -63,6 +63,7 @@ SETUP_AND_ADD_TEST(family entt/core/family.cpp)
 SETUP_AND_ADD_TEST(hashed_string entt/core/hashed_string.cpp)
 SETUP_AND_ADD_TEST(ident entt/core/ident.cpp)
 SETUP_AND_ADD_TEST(monostate entt/core/monostate.cpp)
+SETUP_AND_ADD_TEST(utility entt/core/utility.cpp)
 
 # Test entity
 
@@ -78,6 +79,10 @@ SETUP_AND_ADD_TEST(view entt/entity/view.cpp)
 # Test locator
 
 SETUP_AND_ADD_TEST(locator entt/locator/locator.cpp)
+
+# Test meta
+
+SETUP_AND_ADD_TEST(meta entt/meta/meta.cpp)
 
 # Test process
 

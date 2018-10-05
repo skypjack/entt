@@ -976,7 +976,7 @@ public:
      * comparison function should be equivalent to the following:
      *
      * @code{.cpp}
-     * bool(const Type &, const Type &)
+     * bool(const Type &, const Type &);
      * @endcode
      *
      * Moreover, the comparison function object shall induce a

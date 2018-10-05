@@ -30,13 +30,18 @@ class hashed_string final {
     static constexpr std::uint64_t prime = 1099511628211ull;
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    static constexpr std::uint64_t helper(std::uint64_t partial, const char *str) ENTT_NOEXCEPT {
+    inline static constexpr std::uint64_t helper(std::uint64_t partial, const char *str) ENTT_NOEXCEPT {
         return str[0] == 0 ? partial : helper((partial^str[0])*prime, str+1);
     }
 
 public:
     /*! @brief Unsigned integer type. */
     using hash_type = std::uint64_t;
+
+    /*! @brief Constructs an empty hashed string. */
+    constexpr hashed_string() ENTT_NOEXCEPT
+        : hash{}, str{nullptr}
+    {}
 
     /**
      * @brief Constructs a hashed string from an array of const chars.

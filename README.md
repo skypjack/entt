@@ -52,23 +52,25 @@ a while the codebase has grown and more and more classes have become part of the
 repository.<br/>
 Here is a brief, yet incomplete list of what it offers today:
 
-* Statically generated integer identifiers for types (assigned either at
-  compile-time or at runtime).
-* A constexpr utility for human readable resource identifiers.
-* A minimal configuration system built on top of the monostate pattern.
-* An incredibly fast entity-component system based on sparse sets, with its own
-  views and a _pay for what you use_ policy to adjust performance and memory
+* Statically generated integer **identifiers for types** (assigned either at
+  **compile-time** or at **runtime**).
+* A **constexpr utility** for **human readable resource identifiers**.
+* A minimal **configuration system** built on top of the **monostate pattern**.
+* **An incredibly fast entity-component system** based on sparse sets, with its
+  own views and a _pay for what you use_ policy to adjust performance and memory
   usage according to users' requirements.
-* A lot of facilities built on top of the entity-component system to help
-  developers and avoid reinventing the wheel (ie dependencies, snapshot, actor
-  class for those who aren't confident with the architecture and so on).
-* The smallest and most basic implementation of a service locator ever seen.
-* A cooperative scheduler for processes of any type.
-* All what is needed for resource management (cache, loaders, handles).
-* Delegates, signal handlers (with built-in support for collectors) and a tiny
-  event dispatcher.
-* A general purpose event emitter, that is a CRTP idiom based class template.
-* An event dispatcher for immediate and delayed events to integrate in loops.
+* A lot of **facilities built on top of the entity-component system** to help
+  developers and avoid reinventing the wheel (ie **dependencies**, **snapshot**,
+  **actor class** for those who aren't confident with the architecture and so
+  on).
+* The smallest and most basic implementation of a **service locator** ever seen.
+* A built-in, non-intrusive and macro-free **runtime reflection system**.
+* A **cooperative scheduler** for processes of any type.
+* All what is needed for **resource management** (cache, loaders, handles).
+* **Delegates**, **signal handlers** (with built-in support for collectors) and
+  a tiny **event dispatcher** for immediate and delayed events to integrate in
+  loops.
+* A general purpose **event emitter** as a CRTP idiom based class template.
 * ...
 * Any other business.
 
@@ -257,10 +259,10 @@ The API reference will be created in HTML format within the directory
 <!--
 @cond TURN_OFF_DOXYGEN
 -->
-The API reference is also available [online](https://skypjack.github.io/entt/)
-for the latest version.<br/>
-There exists also a [wiki](https://github.com/skypjack/entt/wiki) dedicated to
-the project where users can find all related documentation pages.
+It's also available [online](https://skypjack.github.io/entt/) for the latest
+version.<br/>
+Finally, there exists a [wiki](https://github.com/skypjack/entt/wiki) dedicated
+to the project where users can find all related documentation pages.
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->

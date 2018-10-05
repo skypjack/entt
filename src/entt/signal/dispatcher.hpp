@@ -98,7 +98,7 @@ public:
      *
      * The function type for a listener is:
      * @code{.cpp}
-     * void(const Event &)
+     * void(const Event &);
      * @endcode
      *
      * The order of invocation of the listeners isn't guaranteed.

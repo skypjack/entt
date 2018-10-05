@@ -12,5 +12,4 @@
 #endif // ENTT_HS_SUFFIX
 
 
-
 #endif // ENTT_CONFIG_CONFIG_H

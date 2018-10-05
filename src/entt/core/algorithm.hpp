@@ -72,39 +72,6 @@ struct insertion_sort final {
 };
 
 
-/*! @brief Function object for performing bubble sort (single iteration). */
-struct one_shot_bubble_sort final {
-    /**
-     * @brief Tries to sort the elements in a range.
-     *
-     * Performs a single iteration to sort the elements in a range using the
-     * given binary comparison function. The range may not be completely sorted
-     * after running this function.
-     *
-     * @tparam It Type of random access iterator.
-     * @tparam Compare Type of comparison function object.
-     * @param first An iterator to the first element of the range to sort.
-     * @param last An iterator past the last element of the range to sort.
-     * @param compare A valid comparison function object.
-     */
-    template<typename It, typename Compare = std::less<>>
-    void operator()(It first, It last, Compare compare = Compare{}) const {
-        if(first != last) {
-            auto it = first++;
-
-            while(first != last) {
-                if(compare(*first, *it)) {
-                    using std::swap;
-                    std::swap(*first, *it);
-                }
-
-                it = first++;
-            }
-        }
-    }
-};
-
-
 }
 
 

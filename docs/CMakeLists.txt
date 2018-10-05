@@ -28,6 +28,7 @@ add_custom_target(
         core.md
         entity.md
         locator.md
+        meta.md
         process.md
         resource.md
         shared.md

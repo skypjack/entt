@@ -101,7 +101,8 @@ public:
     }
 
     /**
-     * @brief Returns true if the handle contains a resource, false otherwise.
+     * @brief Returns true if a handle contains a resource, false otherwise.
+     * @return True if the handle contains a resource, false otherwise.
      */
     explicit operator bool() const { return static_cast<bool>(resource); }
 
