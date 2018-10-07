@@ -1,5 +1,5 @@
-* suggestion/request: cache made with flat_map + object pools + new/delete overloads so as to get rid of shared pointers (+ cache coherency)
-# suggestion/request: add iterative sorter to the algorithms
+* long term feature: shared_ptr less locator
+* long term feature: shared_ptr-less resource cache
 * custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
 * scene management (I prefer the concept of spaces, that is a kind of scene anyway)
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it

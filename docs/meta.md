@@ -207,7 +207,7 @@ The meta objects that compose a meta type are accessed in the following ways:
 * _Meta constructors_. They are accessed by types of arguments:
 
   ```cpp
-  auto *ctor = entt::resolve<my_type>().ctor<int, char>();
+  auto *ctor = entt::resolve<my_type>()->ctor<int, char>();
   ```
 
   The returned type is `meta_ctor *` and may be null if there is no constructor
@@ -220,7 +220,7 @@ The meta objects that compose a meta type are accessed in the following ways:
 * _Meta destructor_. It's returned by a dedicated function:
 
   ```cpp
-  auto *dtor = entt::resolve<my_type>().dtor();
+  auto *dtor = entt::resolve<my_type>()->dtor();
   ```
 
   The returned type is `meta_dtor *` and may be null if there is no custom
@@ -231,7 +231,7 @@ The meta objects that compose a meta type are accessed in the following ways:
 * _Meta data_. They are accessed by name:
 
   ```cpp
-  auto *data = entt::resolve<my_type>().data("member");
+  auto *data = entt::resolve<my_type>()->data("member");
   ```
 
   The returned type is `meta_data *` and may be null if there is no meta data
@@ -243,7 +243,7 @@ The meta objects that compose a meta type are accessed in the following ways:
 * _Meta functions_. They are accessed by name:
 
   ```cpp
-  auto *func = entt::resolve<my_type>().func("member");
+  auto *func = entt::resolve<my_type>()->func("member");
   ```
 
   The returned type is `meta_func *` and may be null if there is no meta
@@ -258,7 +258,7 @@ The meta objects that compose a meta type are accessed in the following ways:
 * _Meta bases_. They are accessed through the name of the base types:
 
   ```cpp
-  auto *base = entt::resolve<derived_type>().base("base");
+  auto *base = entt::resolve<derived_type>()->base("base");
   ```
 
   The returned type is `meta_base *` and may be null if there is no meta base
@@ -270,7 +270,7 @@ The meta objects that compose a meta type are accessed in the following ways:
 * _Meta conversion functions_. They are accessed by type:
 
   ```cpp
-  auto *conv = entt::resolve<double>().conv<int>();
+  auto *conv = entt::resolve<double>()->conv<int>();
   ```
 
   The returned type is `meta_conv *` and may be null if there is no meta
@@ -285,7 +285,7 @@ iterated through an overload that accepts a callback through which to return
 them. As an example:
 
 ```cpp
-entt::resolve<my_type>().data([](auto *data) {
+entt::resolve<my_type>()->data([](auto *data) {
     // ...
 });
 ```
@@ -326,12 +326,12 @@ named `prop` to iterate them at once and to search a specific property by key:
 
 ```cpp
 // iterate all the properties of a meta type
-entt::resolve<my_type>().prop([](auto *prop) {
+entt::resolve<my_type>()->prop([](auto *prop) {
     // ...
 });
 
 // search for a given property by name
-auto *prop = entt::resolve<my_type>().prop("tooltip"_hs);
+auto *prop = entt::resolve<my_type>()->prop("tooltip"_hs);
 ```
 
 Meta properties are objects having a fairly poor interface, all in all. They
