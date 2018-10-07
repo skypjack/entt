@@ -20,4 +20,4 @@
 * signals on entity creation/destruction
 * flexible views with "composable" filters
 * do not set BUILD_TESTING to ON by default anymore
-* add https://github.com/Kerndog73/EnTT-Pacman to entt in action
+* create a dedicated .md for EnTT in Action list and create two sections: articles and games
