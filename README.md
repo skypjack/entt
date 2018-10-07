@@ -71,8 +71,7 @@ Here is a brief, yet incomplete list of what it offers today:
   a tiny **event dispatcher** for immediate and delayed events to integrate in
   loops.
 * A general purpose **event emitter** as a CRTP idiom based class template.
-* ...
-* Any other business.
+* And **much more**! Check out the [**wiki**](https://github.com/skypjack/entt/wiki).
 
 Consider it a work in progress. The whole API is also fully documented in-code
 for those who are brave enough to read it.
@@ -312,6 +311,8 @@ Below an incomplete list of projects and articles:
 * [Face Smash](https://play.google.com/store/apps/details?id=com.gamee.facesmash):
   the emojis dominate the world, destroy them all with your facial expressions.
 * [shiva](https://github.com/Milerius/shiva): modern C++ Engine with modularity.
+* [EnTT Pacman](https://github.com/Kerndog73/EnTT-Pacman): an example of how to
+  make Pacman with EnTT.
 * [Classic Tower Defence](https://github.com/kerndog73/Classic-Tower-Defence):
   a tiny little tower defence game featuring a homemade font.
   [Check it out](https://indi-kernick.itch.io/classic-tower-defence).
