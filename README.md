@@ -71,7 +71,8 @@ Here is a brief, yet incomplete list of what it offers today:
   a tiny **event dispatcher** for immediate and delayed events to integrate in
   loops.
 * A general purpose **event emitter** as a CRTP idiom based class template.
-* And **much more**! Check out the [**wiki**](https://github.com/skypjack/entt/wiki).
+* And **much more**! Check out the
+  [**wiki**](https://github.com/skypjack/entt/wiki).
 
 Consider it a work in progress. The whole API is also fully documented in-code
 for those who are brave enough to read it.
