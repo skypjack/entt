@@ -37,14 +37,99 @@ class meta_type;
 namespace internal {
 
 
-struct meta_prop_node;
-struct meta_base_node;
-struct meta_conv_node;
-struct meta_ctor_node;
-struct meta_dtor_node;
-struct meta_data_node;
-struct meta_func_node;
 struct meta_type_node;
+
+
+struct meta_prop_node final {
+    meta_prop_node * const next;
+    meta_any(* const key)();
+    meta_any(* const value)();
+};
+
+
+struct meta_base_node final {
+    meta_base_node * const next;
+    meta_type_node * const parent;
+    meta_type_node *(* const type)();
+    void *(* const cast)(void *);
+};
+
+
+struct meta_conv_node final {
+    meta_conv_node * const next;
+    meta_type_node * const parent;
+    meta_type_node *(* const type)();
+    meta_any(* const conv)(void *);
+};
+
+
+struct meta_ctor_node final {
+    using size_type = std::size_t;
+    meta_ctor_node * const next;
+    meta_type_node * const parent;
+    meta_prop_node * const prop;
+    const size_type size;
+    meta_type_node *(* const arg)(size_type);
+    meta_any(* const invoke)(meta_any * const);
+};
+
+
+struct meta_dtor_node final {
+    meta_type_node * const parent;
+    bool(* const invoke)(meta_handle);
+};
+
+
+struct meta_data_node final {
+    const hashed_string name;
+    meta_data_node * const next;
+    meta_type_node * const parent;
+    meta_prop_node * const prop;
+    const bool is_const;
+    const bool is_static;
+    meta_type_node *(* const type)();
+    bool(* const set)(meta_handle, meta_any &);
+    meta_any(* const get)(meta_handle);
+};
+
+
+struct meta_func_node final {
+    using size_type = std::size_t;
+    const hashed_string name;
+    meta_func_node * const next;
+    meta_type_node * const parent;
+    meta_prop_node * const prop;
+    const size_type size;
+    const bool is_const;
+    const bool is_static;
+    meta_type_node *(* const ret)();
+    meta_type_node *(* const arg)(size_type);
+    meta_any(* const invoke)(meta_handle, meta_any *);
+};
+
+
+struct meta_type_node final {
+    const hashed_string name;
+    meta_type_node * const next;
+    meta_prop_node * const prop;
+    const bool is_void;
+    const bool is_enum;
+    const bool is_class;
+    const bool is_pointer;
+    const bool is_function_pointer;
+    const bool is_member_object_pointer;
+    const bool is_member_function_pointer;
+    const bool is_member_pointer;
+    const bool is_arithmetic;
+    const bool is_compound;
+    bool(* const destroy)(meta_handle);
+    meta_base_node *base;
+    meta_conv_node *conv;
+    meta_ctor_node *ctor;
+    meta_dtor_node *dtor;
+    meta_data_node *data;
+    meta_func_node *func;
+};
 
 
 template<typename...>
@@ -121,106 +206,6 @@ template<typename... Type>
 struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> {};
 
 
-struct meta_prop_node final {
-    meta_prop_node * const next;
-    meta_any(* const key)();
-    meta_any(* const value)();
-    meta_prop *(* const meta)();
-};
-
-
-struct meta_base_node final {
-    meta_base_node * const next;
-    meta_type_node * const parent;
-    meta_type_node *(* const type)();
-    void *(* const cast)(void *);
-    meta_base *(* const meta)();
-};
-
-
-struct meta_conv_node final {
-    meta_conv_node * const next;
-    meta_type_node * const parent;
-    meta_type_node *(* const type)();
-    meta_any(* const conv)(void *);
-    meta_conv *(* const meta)();
-};
-
-
-struct meta_ctor_node final {
-    using size_type = std::size_t;
-    meta_ctor_node * const next;
-    meta_type_node * const parent;
-    meta_prop_node * const prop;
-    const size_type size;
-    meta_type_node *(* const arg)(size_type);
-    meta_any(* const invoke)(meta_any * const);
-    meta_ctor *(* const meta)();
-};
-
-
-struct meta_dtor_node final {
-    meta_type_node * const parent;
-    bool(* const invoke)(meta_handle);
-    meta_dtor *(* const meta)();
-};
-
-
-struct meta_data_node final {
-    const hashed_string name;
-    meta_data_node * const next;
-    meta_type_node * const parent;
-    meta_prop_node * const prop;
-    const bool is_const;
-    const bool is_static;
-    meta_type_node *(* const type)();
-    bool(* const set)(meta_handle, meta_any &);
-    meta_any(* const get)(meta_handle);
-    meta_data *(* const meta)();
-};
-
-
-struct meta_func_node final {
-    using size_type = std::size_t;
-    const hashed_string name;
-    meta_func_node * const next;
-    meta_type_node * const parent;
-    meta_prop_node * const prop;
-    const size_type size;
-    const bool is_const;
-    const bool is_static;
-    meta_type_node *(* const ret)();
-    meta_type_node *(* const arg)(size_type);
-    meta_any(* const invoke)(meta_handle, meta_any *);
-    meta_func *(* const meta)();
-};
-
-
-struct meta_type_node final {
-    const hashed_string name;
-    meta_type_node * const next;
-    meta_prop_node * const prop;
-    const bool is_void;
-    const bool is_enum;
-    const bool is_class;
-    const bool is_pointer;
-    const bool is_function_pointer;
-    const bool is_member_object_pointer;
-    const bool is_member_function_pointer;
-    const bool is_member_pointer;
-    const bool is_arithmetic;
-    const bool is_compound;
-    bool(* const destroy)(meta_handle);
-    meta_type *(* const meta)();
-    meta_base_node *base;
-    meta_conv_node *conv;
-    meta_ctor_node *ctor;
-    meta_dtor_node *dtor;
-    meta_data_node *data;
-    meta_func_node *func;
-};
-
-
 template<typename Op, typename Node>
 void iterate(Op op, const Node *curr) ENTT_NOEXCEPT {
     while(curr) {
@@ -250,7 +235,7 @@ auto find_if(Op op, const Node *curr) ENTT_NOEXCEPT {
         curr = curr->next;
     }
 
-    return curr ? curr->meta() : nullptr;
+    return curr;
 }
 
 
@@ -298,6 +283,38 @@ inline bool can_cast_or_convert(const meta_type_node *from, const meta_type_node
     return (from == to) || find_if<Member>([to](auto *node) {
         return node->type() == to;
     }, from);
+}
+
+
+template<typename... Args, std::size_t... Indexes>
+inline auto ctor(std::index_sequence<Indexes...>, const meta_type_node *node) ENTT_NOEXCEPT {
+    return internal::find_if([](auto *node) {
+        return node->size == sizeof...(Args) &&
+                (([](auto *from, auto *to) {
+                    return internal::can_cast_or_convert<&internal::meta_type_node::base>(from, to)
+                            || internal::can_cast_or_convert<&internal::meta_type_node::conv>(from, to);
+                }(internal::meta_info<Args>::resolve(), node->arg(Indexes))) && ...);
+    }, node->ctor);
+}
+
+
+template<typename>
+struct factory_traits;
+
+
+template<> struct factory_traits<meta_prop_node> { using type = meta_prop; };
+template<> struct factory_traits<meta_base_node> { using type = meta_base; };
+template<> struct factory_traits<meta_conv_node> { using type = meta_conv; };
+template<> struct factory_traits<meta_ctor_node> { using type = meta_ctor; };
+template<> struct factory_traits<meta_dtor_node> { using type = meta_dtor; };
+template<> struct factory_traits<meta_data_node> { using type = meta_data; };
+template<> struct factory_traits<meta_func_node> { using type = meta_func; };
+template<> struct factory_traits<meta_type_node> { using type = meta_type; };
+
+
+template<typename Node>
+inline typename factory_traits<Node>::type factory(const Node *node) ENTT_NOEXCEPT {
+    return node;
 }
 
 
@@ -384,8 +401,9 @@ public:
             };
 
             destroy = [](storage_type &storage) {
-                auto *instance = reinterpret_cast<actual_type *>(&storage);
-                internal::meta_info<Type>::resolve()->meta()->destroy(*instance);
+                auto *node = internal::meta_info<Type>::resolve();
+                meta_handle handle = *reinterpret_cast<actual_type *>(&storage);
+                node->dtor ? node->dtor->invoke(handle) : node->destroy(handle);
             };
         } else {
             using chunk_type = std::aligned_storage_t<sizeof(actual_type), alignof(actual_type)>;
@@ -400,8 +418,10 @@ public:
             };
 
             destroy = [](storage_type &storage) {
+                auto *node = internal::meta_info<Type>::resolve();
                 auto *chunk = *reinterpret_cast<chunk_type **>(&storage);
-                internal::meta_info<Type>::resolve()->meta()->destroy(*reinterpret_cast<actual_type *>(chunk));
+                meta_handle handle = *reinterpret_cast<actual_type *>(chunk);
+                node->dtor ? node->dtor->invoke(handle) : node->destroy(handle);
                 delete chunk;
             };
         }
@@ -459,9 +479,7 @@ public:
      * @brief Returns the meta type of the underlying object.
      * @return The meta type of the underlying object, if any.
      */
-    inline meta_type * type() const ENTT_NOEXCEPT {
-        return node ? node->meta() : nullptr;
-    }
+    inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
      * @brief Returns an opaque pointer to the contained instance.
@@ -559,7 +577,7 @@ public:
             }, node);
 
             if(conv) {
-                any = conv->convert(instance);
+                any = conv->conv(instance);
             }
         }
 
@@ -697,9 +715,7 @@ public:
      * @brief Returns the meta type of the underlying object.
      * @return The meta type of the underlying object, if any.
      */
-    inline meta_type * type() const ENTT_NOEXCEPT {
-        return node ? node->meta() : nullptr;
-    }
+    inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
      * @brief Tries to cast an instance to a given type.
@@ -788,10 +804,9 @@ inline bool operator!=(const meta_any &lhs, const meta_any &rhs) ENTT_NOEXCEPT {
  */
 class meta_prop final {
     /*! @brief A factory is allowed to create meta objects. */
-    template<typename>
-    friend class meta_factory;
+    friend meta_prop internal::factory<internal::meta_prop_node>(const internal::meta_prop_node *) ENTT_NOEXCEPT;
 
-    meta_prop(internal::meta_prop_node * node) ENTT_NOEXCEPT
+    inline meta_prop(const internal::meta_prop_node *node) ENTT_NOEXCEPT
         : node{node}
     {}
 
@@ -812,9 +827,38 @@ public:
         return node->value();
     }
 
+    /**
+     * @brief Returns true if a meta object is valid, false otherwise.
+     * @return True if the meta object is valid, false otherwise.
+     */
+    inline explicit operator bool() const ENTT_NOEXCEPT {
+        return node;
+    }
+
+    /**
+     * @brief Checks if two meta objects refer to the same node.
+     * @param other The meta object with which to compare.
+     * @return True if the two meta objects refer to the same node, false
+     * otherwise.
+     */
+    inline bool operator==(const meta_prop &other) const ENTT_NOEXCEPT {
+        return node == other.node;
+    }
+
 private:
-    internal::meta_prop_node *node;
+    const internal::meta_prop_node *node;
 };
+
+
+/**
+ * @brief Checks if two meta objects refer to the same node.
+ * @param lhs A meta object, either valid or not.
+ * @param rhs A meta object, either valid or not.
+ * @return True if the two meta objects refer to the same node, false otherwise.
+ */
+inline bool operator!=(const meta_prop &lhs, const meta_prop &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
 
 
 /**
@@ -825,10 +869,9 @@ private:
  */
 class meta_base final {
     /*! @brief A factory is allowed to create meta objects. */
-    template<typename>
-    friend class meta_factory;
+    friend meta_base internal::factory<internal::meta_base_node>(const internal::meta_base_node *) ENTT_NOEXCEPT;
 
-    meta_base(internal::meta_base_node * node) ENTT_NOEXCEPT
+    inline meta_base(const internal::meta_base_node *node) ENTT_NOEXCEPT
         : node{node}
     {}
 
@@ -837,17 +880,13 @@ public:
      * @brief Returns the meta type to which a meta base belongs.
      * @return The meta type to which the meta base belongs.
      */
-    inline meta_type * parent() const ENTT_NOEXCEPT {
-        return node->parent->meta();
-    }
+    inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
      * @brief Returns the meta type of a given meta base.
      * @return The meta type of the meta base.
      */
-    inline meta_type * type() const ENTT_NOEXCEPT {
-        return node->type()->meta();
-    }
+    inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
      * @brief Casts an instance from a parent type to a base type.
@@ -858,9 +897,38 @@ public:
         return node->cast(instance);
     }
 
+    /**
+     * @brief Returns true if a meta object is valid, false otherwise.
+     * @return True if the meta object is valid, false otherwise.
+     */
+    inline explicit operator bool() const ENTT_NOEXCEPT {
+        return node;
+    }
+
+    /**
+     * @brief Checks if two meta objects refer to the same node.
+     * @param other The meta object with which to compare.
+     * @return True if the two meta objects refer to the same node, false
+     * otherwise.
+     */
+    inline bool operator==(const meta_base &other) const ENTT_NOEXCEPT {
+        return node == other.node;
+    }
+
 private:
-    internal::meta_base_node *node;
+    const internal::meta_base_node *node;
 };
+
+
+/**
+ * @brief Checks if two meta objects refer to the same node.
+ * @param lhs A meta object, either valid or not.
+ * @param rhs A meta object, either valid or not.
+ * @return True if the two meta objects refer to the same node, false otherwise.
+ */
+inline bool operator!=(const meta_base &lhs, const meta_base &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
 
 
 /**
@@ -871,10 +939,9 @@ private:
  */
 class meta_conv final {
     /*! @brief A factory is allowed to create meta objects. */
-    template<typename>
-    friend class meta_factory;
+    friend meta_conv internal::factory<internal::meta_conv_node>(const internal::meta_conv_node *) ENTT_NOEXCEPT;
 
-    meta_conv(internal::meta_conv_node * node) ENTT_NOEXCEPT
+    inline meta_conv(const internal::meta_conv_node *node) ENTT_NOEXCEPT
         : node{node}
     {}
 
@@ -883,17 +950,13 @@ public:
      * @brief Returns the meta type to which a meta conversion function belongs.
      * @return The meta type to which the meta conversion function belongs.
      */
-    inline meta_type * parent() const ENTT_NOEXCEPT {
-        return node->parent->meta();
-    }
+    inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
      * @brief Returns the meta type of a given meta conversion function.
      * @return The meta type of the meta conversion function.
      */
-    inline meta_type * type() const ENTT_NOEXCEPT {
-        return node->type()->meta();
-    }
+    inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
      * @brief Converts an instance to a given type.
@@ -904,9 +967,38 @@ public:
         return node->conv(instance);
     }
 
+    /**
+     * @brief Returns true if a meta object is valid, false otherwise.
+     * @return True if the meta object is valid, false otherwise.
+     */
+    inline explicit operator bool() const ENTT_NOEXCEPT {
+        return node;
+    }
+
+    /**
+     * @brief Checks if two meta objects refer to the same node.
+     * @param other The meta object with which to compare.
+     * @return True if the two meta objects refer to the same node, false
+     * otherwise.
+     */
+    inline bool operator==(const meta_conv &other) const ENTT_NOEXCEPT {
+        return node == other.node;
+    }
+
 private:
-    internal::meta_conv_node *node;
+    const internal::meta_conv_node *node;
 };
+
+
+/**
+ * @brief Checks if two meta objects refer to the same node.
+ * @param lhs A meta object, either valid or not.
+ * @param rhs A meta object, either valid or not.
+ * @return True if the two meta objects refer to the same node, false otherwise.
+ */
+inline bool operator!=(const meta_conv &lhs, const meta_conv &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
 
 
 /**
@@ -917,10 +1009,9 @@ private:
  */
 class meta_ctor final {
     /*! @brief A factory is allowed to create meta objects. */
-    template<typename>
-    friend class meta_factory;
+    friend meta_ctor internal::factory<internal::meta_ctor_node>(const internal::meta_ctor_node *) ENTT_NOEXCEPT;
 
-    meta_ctor(internal::meta_ctor_node * node) ENTT_NOEXCEPT
+    inline meta_ctor(const internal::meta_ctor_node *node) ENTT_NOEXCEPT
         : node{node}
     {}
 
@@ -932,9 +1023,7 @@ public:
      * @brief Returns the meta type to which a meta constructor belongs.
      * @return The meta type to which the meta constructor belongs.
      */
-    inline meta_type * parent() const ENTT_NOEXCEPT {
-        return node->parent->meta();
-    }
+    inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
      * @brief Returns the number of arguments accepted by a meta constructor.
@@ -949,9 +1038,7 @@ public:
      * @param index The index of the argument of which to return the meta type.
      * @return The meta type of the i-th argument of a meta constructor, if any.
      */
-    inline meta_type * arg(size_type index) const ENTT_NOEXCEPT {
-        return index < size() ? node->arg(index)->meta() : nullptr;
-    }
+    inline meta_type arg(size_type index) const ENTT_NOEXCEPT;
 
     /**
      * @brief Creates an instance of the underlying type, if possible.
@@ -982,10 +1069,10 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    inline std::enable_if_t<std::is_invocable_v<Op, meta_prop *>, void>
+    inline std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
         internal::iterate([op = std::move(op)](auto *node) {
-            op(node->meta());
+            op(internal::factory(node));
         }, node->prop);
     }
 
@@ -996,16 +1083,45 @@ public:
      * @return The property associated with the given key, if any.
      */
     template<typename Key>
-    inline std::enable_if_t<!std::is_invocable_v<Key, meta_prop *>, meta_prop *>
+    inline std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        return internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *curr) {
+        return internal::factory(internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *curr) {
             return curr->key() == key;
-        }, node->prop);
+        }, node->prop));
+    }
+
+    /**
+     * @brief Returns true if a meta object is valid, false otherwise.
+     * @return True if the meta object is valid, false otherwise.
+     */
+    inline explicit operator bool() const ENTT_NOEXCEPT {
+        return node;
+    }
+
+    /**
+     * @brief Checks if two meta objects refer to the same node.
+     * @param other The meta object with which to compare.
+     * @return True if the two meta objects refer to the same node, false
+     * otherwise.
+     */
+    inline bool operator==(const meta_ctor &other) const ENTT_NOEXCEPT {
+        return node == other.node;
     }
 
 private:
-    internal::meta_ctor_node *node;
+    const internal::meta_ctor_node *node;
 };
+
+
+/**
+ * @brief Checks if two meta objects refer to the same node.
+ * @param lhs A meta object, either valid or not.
+ * @param rhs A meta object, either valid or not.
+ * @return True if the two meta objects refer to the same node, false otherwise.
+ */
+inline bool operator!=(const meta_ctor &lhs, const meta_ctor &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
 
 
 /**
@@ -1016,10 +1132,9 @@ private:
  */
 class meta_dtor final {
     /*! @brief A factory is allowed to create meta objects. */
-    template<typename>
-    friend class meta_factory;
+    friend meta_dtor internal::factory<internal::meta_dtor_node>(const internal::meta_dtor_node *) ENTT_NOEXCEPT;
 
-    meta_dtor(internal::meta_dtor_node * node) ENTT_NOEXCEPT
+    inline meta_dtor(const internal::meta_dtor_node *node) ENTT_NOEXCEPT
         : node{node}
     {}
 
@@ -1028,9 +1143,7 @@ public:
      * @brief Returns the meta type to which a meta destructor belongs.
      * @return The meta type to which the meta destructor belongs.
      */
-    inline meta_type * parent() const ENTT_NOEXCEPT {
-        return node->parent->meta();
-    }
+    inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
      * @brief Destroys an instance of the underlying type.
@@ -1046,9 +1159,38 @@ public:
         return node->invoke(handle);
     }
 
+    /**
+     * @brief Returns true if a meta object is valid, false otherwise.
+     * @return True if the meta object is valid, false otherwise.
+     */
+    inline explicit operator bool() const ENTT_NOEXCEPT {
+        return node;
+    }
+
+    /**
+     * @brief Checks if two meta objects refer to the same node.
+     * @param other The meta object with which to compare.
+     * @return True if the two meta objects refer to the same node, false
+     * otherwise.
+     */
+    inline bool operator==(const meta_dtor &other) const ENTT_NOEXCEPT {
+        return node == other.node;
+    }
+
 private:
-    internal::meta_dtor_node *node;
+    const internal::meta_dtor_node *node;
 };
+
+
+/**
+ * @brief Checks if two meta objects refer to the same node.
+ * @param lhs A meta object, either valid or not.
+ * @param rhs A meta object, either valid or not.
+ * @return True if the two meta objects refer to the same node, false otherwise.
+ */
+inline bool operator!=(const meta_dtor &lhs, const meta_dtor &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
 
 
 /**
@@ -1059,10 +1201,9 @@ private:
  */
 class meta_data final {
     /*! @brief A factory is allowed to create meta objects. */
-    template<typename>
-    friend class meta_factory;
+    friend meta_data internal::factory<internal::meta_data_node>(const internal::meta_data_node *) ENTT_NOEXCEPT;
 
-    meta_data(internal::meta_data_node * node) ENTT_NOEXCEPT
+    inline meta_data(const internal::meta_data_node *node) ENTT_NOEXCEPT
         : node{node}
     {}
 
@@ -1079,9 +1220,7 @@ public:
      * @brief Returns the meta type to which a meta data belongs.
      * @return The meta type to which the meta data belongs.
      */
-    inline meta_type * parent() const ENTT_NOEXCEPT {
-        return node->parent->meta();
-    }
+    inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
      * @brief Indicates whether a given meta data is constant or not.
@@ -1107,9 +1246,7 @@ public:
      * @brief Returns the meta type of a given meta data.
      * @return The meta type of the meta data.
      */
-    inline meta_type * type() const ENTT_NOEXCEPT {
-        return node->type()->meta();
-    }
+    inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
      * @brief Sets the value of the variable enclosed by a given meta type.
@@ -1151,10 +1288,10 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    inline std::enable_if_t<std::is_invocable_v<Op, meta_prop *>, void>
+    inline std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
         internal::iterate([op = std::move(op)](auto *node) {
-            op(node->meta());
+            op(internal::factory(node));
         }, node->prop);
     }
 
@@ -1165,16 +1302,45 @@ public:
      * @return The property associated with the given key, if any.
      */
     template<typename Key>
-    inline std::enable_if_t<!std::is_invocable_v<Key, meta_prop *>, meta_prop *>
+    inline std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        return internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *curr) {
+        return internal::factory(internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *curr) {
             return curr->key() == key;
-        }, node->prop);
+        }, node->prop));
+    }
+
+    /**
+     * @brief Returns true if a meta object is valid, false otherwise.
+     * @return True if the meta object is valid, false otherwise.
+     */
+    inline explicit operator bool() const ENTT_NOEXCEPT {
+        return node;
+    }
+
+    /**
+     * @brief Checks if two meta objects refer to the same node.
+     * @param other The meta object with which to compare.
+     * @return True if the two meta objects refer to the same node, false
+     * otherwise.
+     */
+    inline bool operator==(const meta_data &other) const ENTT_NOEXCEPT {
+        return node == other.node;
     }
 
 private:
-    internal::meta_data_node *node;
+    const internal::meta_data_node *node;
 };
+
+
+/**
+ * @brief Checks if two meta objects refer to the same node.
+ * @param lhs A meta object, either valid or not.
+ * @param rhs A meta object, either valid or not.
+ * @return True if the two meta objects refer to the same node, false otherwise.
+ */
+inline bool operator!=(const meta_data &lhs, const meta_data &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
 
 
 /**
@@ -1185,10 +1351,9 @@ private:
  */
 class meta_func final {
     /*! @brief A factory is allowed to create meta objects. */
-    template<typename>
-    friend class meta_factory;
+    friend meta_func internal::factory<internal::meta_func_node>(const internal::meta_func_node *) ENTT_NOEXCEPT;
 
-    meta_func(internal::meta_func_node * node) ENTT_NOEXCEPT
+    inline meta_func(const internal::meta_func_node *node) ENTT_NOEXCEPT
         : node{node}
     {}
 
@@ -1208,9 +1373,7 @@ public:
      * @brief Returns the meta type to which a meta function belongs.
      * @return The meta type to which the meta function belongs.
      */
-    inline meta_type * parent() const ENTT_NOEXCEPT {
-        return node->parent->meta();
-    }
+    inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
      * @brief Returns the number of arguments accepted by a meta function.
@@ -1244,18 +1407,14 @@ public:
      * @brief Returns the meta type of the return type of a meta function.
      * @return The meta type of the return type of the meta function.
      */
-    inline meta_type * ret() const ENTT_NOEXCEPT {
-        return node->ret()->meta();
-    }
+    inline meta_type ret() const ENTT_NOEXCEPT;
 
     /**
      * @brief Returns the meta type of the i-th argument of a meta function.
      * @param index The index of the argument of which to return the meta type.
      * @return The meta type of the i-th argument of a meta function, if any.
      */
-    inline meta_type * arg(size_type index) const ENTT_NOEXCEPT {
-        return index < size() ? node->arg(index)->meta() : nullptr;
-    }
+    inline meta_type arg(size_type index) const ENTT_NOEXCEPT;
 
     /**
      * @brief Invokes the underlying function, if possible.
@@ -1290,10 +1449,10 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    inline std::enable_if_t<std::is_invocable_v<Op, meta_prop *>, void>
+    inline std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
         internal::iterate([op = std::move(op)](auto *node) {
-            op(node->meta());
+            op(internal::factory(node));
         }, node->prop);
     }
 
@@ -1304,16 +1463,45 @@ public:
      * @return The property associated with the given key, if any.
      */
     template<typename Key>
-    inline std::enable_if_t<!std::is_invocable_v<Key, meta_prop *>, meta_prop *>
+    inline std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        return internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *curr) {
+        return internal::factory(internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *curr) {
             return curr->key() == key;
-        }, node->prop);
+        }, node->prop));
+    }
+
+    /**
+     * @brief Returns true if a meta object is valid, false otherwise.
+     * @return True if the meta object is valid, false otherwise.
+     */
+    inline explicit operator bool() const ENTT_NOEXCEPT {
+        return node;
+    }
+
+    /**
+     * @brief Checks if two meta objects refer to the same node.
+     * @param other The meta object with which to compare.
+     * @return True if the two meta objects refer to the same node, false
+     * otherwise.
+     */
+    inline bool operator==(const meta_func &other) const ENTT_NOEXCEPT {
+        return node == other.node;
     }
 
 private:
-    internal::meta_func_node *node;
+    const internal::meta_func_node *node;
 };
+
+
+/**
+ * @brief Checks if two meta objects refer to the same node.
+ * @param lhs A meta object, either valid or not.
+ * @param rhs A meta object, either valid or not.
+ * @return True if the two meta objects refer to the same node, false otherwise.
+ */
+inline bool operator!=(const meta_func &lhs, const meta_func &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
 
 
 /**
@@ -1324,27 +1512,11 @@ private:
  */
 class meta_type final {
     /*! @brief A factory is allowed to create meta objects. */
-    template<typename>
-    friend class meta_factory;
+    friend meta_type internal::factory<internal::meta_type_node>(const internal::meta_type_node *) ENTT_NOEXCEPT;
 
-    /*! @brief A meta node is allowed to create meta objects. */
-    template<typename...>
-    friend struct internal::meta_node;
-
-    meta_type(internal::meta_type_node * node) ENTT_NOEXCEPT
+    inline meta_type(const internal::meta_type_node *node) ENTT_NOEXCEPT
         : node{node}
     {}
-
-    template<typename... Args, std::size_t... Indexes>
-    inline auto ctor(std::index_sequence<Indexes...>) const ENTT_NOEXCEPT {
-        return internal::find_if([](auto *node) {
-            return node->size == sizeof...(Args) &&
-                    (([](auto *from, auto *to) {
-                        return internal::can_cast_or_convert<&internal::meta_type_node::base>(from, to)
-                                || internal::can_cast_or_convert<&internal::meta_type_node::conv>(from, to);
-                    }(internal::meta_info<Args>::resolve(), node->arg(Indexes))) && ...);
-        }, node->ctor);
-    }
 
 public:
     /**
@@ -1457,7 +1629,7 @@ public:
     template<typename Op>
     inline void base(Op op) const ENTT_NOEXCEPT {
         internal::iterate<&internal::meta_type_node::base>([op = std::move(op)](auto *node) {
-            op(node->meta());
+            op(internal::factory(node));
         }, node);
     }
 
@@ -1469,10 +1641,10 @@ public:
      * @param str The name to use to search for a meta base.
      * @return The meta base associated with the given name, if any.
      */
-    inline meta_base * base(const char *str) const ENTT_NOEXCEPT {
-        return internal::find_if<&internal::meta_type_node::base>([name = hashed_string{str}](auto *node) {
+    inline meta_base base(const char *str) const ENTT_NOEXCEPT {
+        return internal::factory(internal::find_if<&internal::meta_type_node::base>([name = hashed_string{str}](auto *node) {
             return node->type()->name == name;
-        }, node);
+        }, node));
     }
 
     /**
@@ -1487,7 +1659,7 @@ public:
     template<typename Op>
     inline void conv(Op op) const ENTT_NOEXCEPT {
         internal::iterate<&internal::meta_type_node::conv>([op = std::move(op)](auto *node) {
-            op(node->meta());
+            op(internal::factory(node));
         }, node);
     }
 
@@ -1502,10 +1674,10 @@ public:
      * any.
      */
     template<typename Type>
-    inline meta_conv * conv() const ENTT_NOEXCEPT {
-        return internal::find_if<&internal::meta_type_node::conv>([type = internal::meta_info<Type>::resolve()](auto *node) {
+    inline meta_conv conv() const ENTT_NOEXCEPT {
+        return internal::factory(internal::find_if<&internal::meta_type_node::conv>([type = internal::meta_info<Type>::resolve()](auto *node) {
             return node->type() == type;
-        }, node);
+        }, node));
     }
 
     /**
@@ -1516,7 +1688,7 @@ public:
     template<typename Op>
     inline void ctor(Op op) const ENTT_NOEXCEPT {
         internal::iterate([op = std::move(op)](auto *node) {
-            op(node->meta());
+            op(internal::factory(node));
         }, node->ctor);
     }
 
@@ -1526,16 +1698,16 @@ public:
      * @return The requested meta constructor, if any.
      */
     template<typename... Args>
-    inline meta_ctor * ctor() const ENTT_NOEXCEPT {
-        return ctor<Args...>(std::make_index_sequence<sizeof...(Args)>{});
+    inline meta_ctor ctor() const ENTT_NOEXCEPT {
+        return internal::factory(internal::ctor<Args...>(std::make_index_sequence<sizeof...(Args)>{}, node));
     }
 
     /**
      * @brief Returns the meta destructor associated with a given type.
      * @return The meta destructor associated with the given type, if any.
      */
-    inline meta_dtor * dtor() const ENTT_NOEXCEPT {
-        return node->dtor ? node->dtor->meta() : nullptr;
+    inline meta_dtor dtor() const ENTT_NOEXCEPT {
+        return internal::factory(node->dtor);
     }
 
     /**
@@ -1550,7 +1722,7 @@ public:
     template<typename Op>
     inline void data(Op op) const ENTT_NOEXCEPT {
         internal::iterate<&internal::meta_type_node::data>([op = std::move(op)](auto *node) {
-            op(node->meta());
+            op(internal::factory(node));
         }, node);
     }
 
@@ -1564,10 +1736,10 @@ public:
      * @param str The name to use to search for a meta data.
      * @return The meta data associated with the given name, if any.
      */
-    inline meta_data * data(const char *str) const ENTT_NOEXCEPT {
-        return internal::find_if<&internal::meta_type_node::data>([name = hashed_string{str}](auto *node) {
+    inline meta_data data(const char *str) const ENTT_NOEXCEPT {
+        return internal::factory(internal::find_if<&internal::meta_type_node::data>([name = hashed_string{str}](auto *node) {
             return node->name == name;
-        }, node);
+        }, node));
     }
 
     /**
@@ -1583,7 +1755,7 @@ public:
     template<typename Op>
     inline void func(Op op) const ENTT_NOEXCEPT {
         internal::iterate<&internal::meta_type_node::func>([op = std::move(op)](auto *node) {
-            op(node->meta());
+            op(internal::factory(node));
         }, node);
     }
 
@@ -1597,10 +1769,10 @@ public:
      * @param str The name to use to search for a meta function.
      * @return The meta function associated with the given name, if any.
      */
-    inline meta_func * func(const char *str) const ENTT_NOEXCEPT {
-        return internal::find_if<&internal::meta_type_node::func>([name = hashed_string{str}](auto *node) {
+    inline meta_func func(const char *str) const ENTT_NOEXCEPT {
+        return internal::factory(internal::find_if<&internal::meta_type_node::func>([name = hashed_string{str}](auto *node) {
             return node->name == name;
-        }, node);
+        }, node));
     }
 
     /**
@@ -1650,10 +1822,10 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    inline std::enable_if_t<std::is_invocable_v<Op, meta_prop *>, void>
+    inline std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
         internal::iterate<&internal::meta_type_node::prop>([op = std::move(op)](auto *node) {
-            op(node->meta());
+            op(internal::factory(node));
         }, node);
     }
 
@@ -1669,16 +1841,115 @@ public:
      * @return The property associated with the given key, if any.
      */
     template<typename Key>
-    inline std::enable_if_t<!std::is_invocable_v<Key, meta_prop *>, meta_prop *>
+    inline std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        return internal::find_if<&internal::meta_type_node::prop>([key = meta_any{std::forward<Key>(key)}](auto *curr) {
+        return internal::factory(internal::find_if<&internal::meta_type_node::prop>([key = meta_any{std::forward<Key>(key)}](auto *curr) {
             return curr->key() == key;
-        }, node);
+        }, node));
+    }
+
+    /**
+     * @brief Returns true if a meta object is valid, false otherwise.
+     * @return True if the meta object is valid, false otherwise.
+     */
+    inline explicit operator bool() const ENTT_NOEXCEPT {
+        return node;
+    }
+
+    /**
+     * @brief Checks if two meta objects refer to the same node.
+     * @param other The meta object with which to compare.
+     * @return True if the two meta objects refer to the same node, false
+     * otherwise.
+     */
+    inline bool operator==(const meta_type &other) const ENTT_NOEXCEPT {
+        return node == other.node;
     }
 
 private:
-    internal::meta_type_node *node;
+    const internal::meta_type_node *node;
 };
+
+
+/**
+ * @brief Checks if two meta objects refer to the same node.
+ * @param lhs A meta object, either valid or not.
+ * @param rhs A meta object, either valid or not.
+ * @return True if the two meta objects refer to the same node, false otherwise.
+ */
+inline bool operator!=(const meta_type &lhs, const meta_type &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
+
+inline meta_type meta_any::type() const ENTT_NOEXCEPT {
+    return internal::factory(node);
+}
+
+
+inline meta_type meta_handle::type() const ENTT_NOEXCEPT {
+    return internal::factory(node);
+}
+
+
+inline meta_type meta_base::parent() const ENTT_NOEXCEPT {
+    return internal::factory(node->parent);
+}
+
+
+inline meta_type meta_base::type() const ENTT_NOEXCEPT {
+    return internal::factory(node->type());
+}
+
+
+inline meta_type meta_conv::parent() const ENTT_NOEXCEPT {
+    return internal::factory(node->parent);
+}
+
+
+inline meta_type meta_conv::type() const ENTT_NOEXCEPT {
+    return internal::factory(node->type());
+}
+
+
+inline meta_type meta_ctor::parent() const ENTT_NOEXCEPT {
+    return internal::factory(node->parent);
+}
+
+
+inline meta_type meta_ctor::arg(size_type index) const ENTT_NOEXCEPT {
+    return internal::factory(index < size() ? node->arg(index) : nullptr);
+}
+
+
+inline meta_type meta_dtor::parent() const ENTT_NOEXCEPT {
+    return internal::factory(node->parent);
+}
+
+
+inline meta_type meta_data::parent() const ENTT_NOEXCEPT {
+    return internal::factory(node->parent);
+}
+
+
+inline meta_type meta_data::type() const ENTT_NOEXCEPT {
+    return internal::factory(node->type());
+}
+
+
+inline meta_type meta_func::parent() const ENTT_NOEXCEPT {
+    return internal::factory(node->parent);
+}
+
+
+inline meta_type meta_func::ret() const ENTT_NOEXCEPT {
+    return internal::factory(node->ret());
+}
+
+
+inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
+    return internal::factory(index < size() ? node->arg(index) : nullptr);
+}
 
 
 /**
@@ -1704,7 +1975,7 @@ struct meta_function_helper<Ret(Args...)> {
 
     static constexpr auto size = sizeof...(Args);
 
-    inline static auto arg(typename meta_func_node::size_type index) {
+    inline static auto arg(typename internal::meta_func_node::size_type index) {
         return std::array<meta_type_node *, sizeof...(Args)>{{meta_info<Args>::resolve()...}}[index];
     }
 };
@@ -1742,7 +2013,7 @@ inline bool destroy([[maybe_unused]] meta_handle handle) {
     if constexpr(std::is_void_v<Type>) {
         return false;
     } else {
-        return handle.type() == meta_info<Type>::resolve()->meta()
+        return handle.type() == internal::factory(meta_info<Type>::resolve())
                 ? (static_cast<Type *>(handle.data())->~Type(), true)
                 : false;
     }
@@ -1865,11 +2136,7 @@ meta_type_node * meta_node<Type>::resolve() ENTT_NOEXCEPT {
             std::is_member_pointer_v<Type>,
             std::is_arithmetic_v<Type>,
             std::is_compound_v<Type>,
-            &destroy<Type>,
-            []() {
-                static meta_type meta{&node};
-                return &meta;
-            }
+            &destroy<Type>
         };
 
         type = &node;

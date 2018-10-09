@@ -74,10 +74,6 @@ class meta_factory {
             },
             []() -> meta_any {
                 return std::get<1>(prop);
-            },
-            []() {
-                static meta_prop meta{&node};
-                return &meta;
             }
         };
 
@@ -101,11 +97,7 @@ class meta_factory {
             std::is_member_pointer_v<Type>,
             std::is_arithmetic_v<Type>,
             std::is_compound_v<Type>,
-            &internal::destroy<Type>,
-            []() {
-                static meta_type meta{&node};
-                return &meta;
-            }
+            &internal::destroy<Type>
         };
 
         assert(!duplicate(name, node.next));
@@ -138,10 +130,6 @@ public:
             &internal::meta_info<Base>::resolve,
             [](void *instance) -> void * {
                 return static_cast<Base *>(static_cast<Type *>(instance));
-            },
-            []() {
-                static meta_base meta{&node};
-                return &meta;
             }
         };
 
@@ -172,10 +160,6 @@ public:
             &internal::meta_info<To>::resolve,
             [](void *instance) -> meta_any {
                 return static_cast<std::decay_t<To>>(*static_cast<Type *>(instance));
-            },
-            []() {
-                static meta_conv meta{&node};
-                return &meta;
             }
         };
 
@@ -214,10 +198,6 @@ public:
             &helper_type::arg,
             [](meta_any * const any) {
                 return internal::invoke<Type, Func>(nullptr, any, std::make_index_sequence<helper_type::size>{});
-            },
-            []() {
-                static meta_ctor meta{&node};
-                return &meta;
             }
         };
 
@@ -253,10 +233,6 @@ public:
             &helper_type::arg,
             [](meta_any * const any) {
                 return internal::construct<Type, Args...>(any, std::make_index_sequence<helper_type::size>{});
-            },
-            []() {
-                static meta_ctor meta{&node};
-                return &meta;
             }
         };
 
@@ -291,13 +267,9 @@ public:
         static internal::meta_dtor_node node{
             type,
             [](meta_handle handle) {
-                return handle.type() == internal::meta_info<Type>::resolve()->meta()
+                return handle.type() == internal::factory(internal::meta_info<Type>::resolve())
                         ? ((*Func)(*static_cast<Type *>(handle.data())), true)
                         : false;
-            },
-            []() {
-                static meta_dtor meta{&node};
-                return &meta;
             }
         };
 
@@ -336,11 +308,7 @@ public:
             !std::is_member_object_pointer_v<decltype(Data)>,
             &internal::meta_info<data_type<Data>>::resolve,
             &internal::setter<std::is_const_v<data_type<Data>>, Type, Data>,
-            &internal::getter<Type, Data>,
-            []() {
-                static meta_data meta{&node};
-                return &meta;
-            }
+            &internal::getter<Type, Data>
         };
 
         assert(!duplicate(hashed_string{str}, node.next));
@@ -381,10 +349,6 @@ public:
             &func_type<Func>::arg,
             [](meta_handle handle, meta_any *any) {
                 return internal::invoke<Type, Func>(handle, any, std::make_index_sequence<func_type<Func>::size>{});
-            },
-            []() {
-                static meta_func meta{&node};
-                return &meta;
             }
         };
 
@@ -444,8 +408,8 @@ inline meta_factory<Type> reflect() ENTT_NOEXCEPT {
  * @return The meta type associated with the given type, if any.
  */
 template<typename Type>
-inline meta_type * resolve() ENTT_NOEXCEPT {
-    return internal::meta_info<Type>::resolve()->meta();
+inline meta_type resolve() ENTT_NOEXCEPT {
+    return internal::factory(internal::meta_info<Type>::resolve());
 }
 
 
@@ -454,10 +418,10 @@ inline meta_type * resolve() ENTT_NOEXCEPT {
  * @param str The name to use to search for a meta type.
  * @return The meta type associated with the given name, if any.
  */
-inline meta_type * resolve(const char *str) ENTT_NOEXCEPT {
-    return internal::find_if([name = hashed_string{str}](auto *node) {
+inline meta_type resolve(const char *str) ENTT_NOEXCEPT {
+    return internal::factory(internal::find_if([name = hashed_string{str}](auto *node) {
         return node->name == name;
-    }, internal::meta_info<>::type);
+    }, internal::meta_info<>::type));
 }
 
 
@@ -469,7 +433,7 @@ inline meta_type * resolve(const char *str) ENTT_NOEXCEPT {
 template<typename Op>
 void resolve(Op op) ENTT_NOEXCEPT {
     internal::iterate([op = std::move(op)](auto *node) {
-        op(node->meta());
+        op(internal::factory(node));
     }, internal::meta_info<>::type);
 }
 
