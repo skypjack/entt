@@ -402,8 +402,8 @@ public:
 
             destroy = [](storage_type &storage) {
                 auto *node = internal::meta_info<Type>::resolve();
-                meta_handle handle = *reinterpret_cast<actual_type *>(&storage);
-                node->dtor ? node->dtor->invoke(handle) : node->destroy(handle);
+                auto *instance = reinterpret_cast<actual_type *>(&storage);
+                node->dtor ? node->dtor->invoke(*instance) : node->destroy(*instance);
             };
         } else {
             using chunk_type = std::aligned_storage_t<sizeof(actual_type), alignof(actual_type)>;
@@ -420,8 +420,8 @@ public:
             destroy = [](storage_type &storage) {
                 auto *node = internal::meta_info<Type>::resolve();
                 auto *chunk = *reinterpret_cast<chunk_type **>(&storage);
-                meta_handle handle = *reinterpret_cast<actual_type *>(chunk);
-                node->dtor ? node->dtor->invoke(handle) : node->destroy(handle);
+                auto *instance = reinterpret_cast<actual_type *>(chunk);
+                node->dtor ? node->dtor->invoke(*instance) : node->destroy(*instance);
                 delete chunk;
             };
         }
