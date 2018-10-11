@@ -106,6 +106,12 @@ struct Meta: public ::testing::Test {
 
         entt::reflect<char>("char", std::make_pair(properties::prop_int, 42));
 
+        entt::reflect<properties>()
+                .data<properties::prop_bool>("prop_bool")
+                .data<properties::prop_int>("prop_int");
+
+        entt::reflect<unsigned int>().data<0u>("min").data<100u>("max");
+
         entt::reflect<base_type>("base");
 
         entt::reflect<derived_type>("derived", std::make_pair(properties::prop_int, 99))
@@ -1322,4 +1328,30 @@ TEST_F(Meta, AbstractClass) {
     type.func("g").invoke(instance, 3);
 
     ASSERT_EQ(instance.i, -3);
+}
+
+TEST_F(Meta, EnumAndNamedConstants) {
+    auto type = entt::resolve<properties>();
+
+    ASSERT_TRUE(type.data("prop_bool"));
+    ASSERT_TRUE(type.data("prop_int"));
+
+    ASSERT_EQ(type.data("prop_bool").type(), type);
+    ASSERT_EQ(type.data("prop_int").type(), type);
+
+    ASSERT_EQ(type.data("prop_bool").get({}).cast<properties>(), properties::prop_bool);
+    ASSERT_EQ(type.data("prop_int").get({}).cast<properties>(), properties::prop_int);
+}
+
+TEST_F(Meta, ArithmeticTypeAndNamedConstants) {
+    auto type = entt::resolve<unsigned int>();
+
+    ASSERT_TRUE(type.data("min"));
+    ASSERT_TRUE(type.data("max"));
+
+    ASSERT_EQ(type.data("min").type(), type);
+    ASSERT_EQ(type.data("max").type(), type);
+
+    ASSERT_EQ(type.data("min").get({}).cast<unsigned int>(), 0u);
+    ASSERT_EQ(type.data("max").get({}).cast<unsigned int>(), 100u);
 }

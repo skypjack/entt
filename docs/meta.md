@@ -9,6 +9,7 @@
 * [Reflection in a nutshell](#reflection-in-a-nutshell)
 * [Any as in any type](#any-as-in-any-type)
 * [Enjoy the runtime](#enjoy-the-runtime)
+* [Named constants and enums](#named-constants-and-enums)
 * [Properties and meta objects](#properties-and-meta-objects)
 <!--
 @endcond TURN_OFF_DOXYGEN
@@ -69,10 +70,10 @@ It can be used to extend the reflected type and add the following:
   entt::reflect<my_type>("reflected").dtor<&destroy>();
   ```
 
-* _Data members_. Both real data members of the underlying type and static or
-  global variables can be attached to a meta type. From a client's point of
-  view, all the variables associated with the reflected type will appear as if
-  they were part of the type.<br/>
+* _Data members_. Both real data members of the underlying type and static and
+  global variables, as well as constants of any kind, can be attached to a meta
+  type. From a client's point of view, all the variables associated with the
+  reflected type will appear as if they were part of the type itself.<br/>
   Use the `data` member function for this purpose:
 
   ```cpp
@@ -89,7 +90,7 @@ It can be used to extend the reflected type and add the following:
 * _Member functions_. Both real member functions of the underlying type and free
   functions can be attached to a meta type. From a client's point of view, all
   the functions associated with the reflected type will appear as if they were
-  part of the type.<br/>
+  part of the type itself.<br/>
   Use the `func` member function for this purpose:
 
   ```cpp
@@ -316,6 +317,44 @@ plethora of functions in addition to those listed whose purposes and uses go
 unfortunately beyond the scope of this document.<br/>
 I invite anyone interested in the subject to look at the code, experiment and
 read the official documentation to get the best out of this powerful tool.
+
+# Named constants and enums
+
+A special mention should be made for constant values and enums. It wouldn't be
+necessary, but it will help distracted readers.
+
+As mentioned, the `data` member function can be used to reflect constants of any
+type among the other things.<br/>
+This allows users to create meta types for enums that will work exactly like any
+other meta type built from a class. Similarly, arithmetic types can be enriched
+with constants of special meaning where required.<br/>
+Personally, I find it very useful not to export what is the difference between
+enums and classes in C++ directly in the space of the reflected types.
+
+All the values thus exported will appear to users as if they were constant data
+members of the reflected types.
+
+Exporting constant values or elements from an enum is as simple as ever:
+
+```cpp
+entt::reflect<my_enum>()
+        .data<my_enum::a_value>("a_value")
+        .data<my_enum::another_value>("another_value");
+
+entt::reflect<int>().data<2048>("max_int");
+```
+
+It goes without saying that accessing them is trivial as well. It's a matter of
+doing the following, as with any other data member of a meta type:
+
+```cpp
+auto value = entt::resolve<my_enum>().data("a_value").get({}).cast<my_enum>();
+auto max = entt::resolve<int>().data("max_int").get({}).cast<int>();
+```
+
+As a side note, remember that all this happens behind the scenes without any
+allocation because of the small object optimization performed by the meta any
+class.
 
 # Properties and meta objects
 

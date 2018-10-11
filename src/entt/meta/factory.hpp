@@ -40,7 +40,7 @@ class meta_factory {
     actual_type();
 
     template<auto Data>
-    static std::enable_if_t<!std::is_member_object_pointer_v<decltype(Data)>, decltype(*Data)>
+    static std::enable_if_t<std::is_pointer_v<decltype(Data)>, decltype(*Data)>
     actual_type();
 
     template<auto Data>
@@ -284,10 +284,10 @@ public:
     /**
      * @brief Assigns a meta data to a meta type.
      *
-     * Both data members and static or global variables can be assigned to a
-     * meta type.<br/>
+     * Both data members and static and global variables, as well as constants
+     * of any kind, can be assigned to a meta type.<br/>
      * From a client's point of view, all the variables associated with the
-     * reflected object will appear as if they were part of the type.
+     * reflected object will appear as if they were part of the type itself.
      *
      * @tparam Data The actual variable to attach to the meta type.
      * @tparam Property Types of properties to assign to the meta data.
@@ -299,22 +299,41 @@ public:
     meta_factory & data(const char *str, Property &&... property) ENTT_NOEXCEPT {
         auto * const type = internal::meta_info<Type>::resolve();
 
-        static internal::meta_data_node node{
-            hashed_string{str},
-            type->data,
-            type,
-            properties<std::integral_constant<decltype(Data), Data>>(std::forward<Property>(property)...),
-            std::is_const_v<data_type<Data>>,
-            !std::is_member_object_pointer_v<decltype(Data)>,
-            &internal::meta_info<data_type<Data>>::resolve,
-            &internal::setter<std::is_const_v<data_type<Data>>, Type, Data>,
-            &internal::getter<Type, Data>
-        };
+        if constexpr(std::is_same_v<Type, decltype(Data)>) {
+            static internal::meta_data_node node{
+                hashed_string{str},
+                type->data,
+                type,
+                properties<std::integral_constant<Type, Data>>(std::forward<Property>(property)...),
+                true,
+                true,
+                &internal::meta_info<Type>::resolve,
+                [](meta_handle, meta_any &) { return false; },
+                [](meta_handle) -> meta_any { return Data; }
+            };
 
-        assert(!duplicate(hashed_string{str}, node.next));
-        assert((!internal::meta_info<Type>::template data<Data>));
-        internal::meta_info<Type>::template data<Data> = &node;
-        type->data = &node;
+            assert(!duplicate(hashed_string{str}, node.next));
+            assert((!internal::meta_info<Type>::template data<Data>));
+            internal::meta_info<Type>::template data<Data> = &node;
+            type->data = &node;
+        } else {
+            static internal::meta_data_node node{
+                hashed_string{str},
+                type->data,
+                type,
+                properties<std::integral_constant<decltype(Data), Data>>(std::forward<Property>(property)...),
+                std::is_const_v<data_type<Data>>,
+                !std::is_member_object_pointer_v<decltype(Data)>,
+                &internal::meta_info<data_type<Data>>::resolve,
+                &internal::setter<std::is_const_v<data_type<Data>>, Type, Data>,
+                &internal::getter<Type, Data>
+            };
+
+            assert(!duplicate(hashed_string{str}, node.next));
+            assert((!internal::meta_info<Type>::template data<Data>));
+            internal::meta_info<Type>::template data<Data> = &node;
+            type->data = &node;
+        }
 
         return *this;
     }
@@ -325,7 +344,7 @@ public:
      * Both member functions and free functions can be assigned to a meta
      * type.<br/>
      * From a client's point of view, all the functions associated with the
-     * reflected object will appear as if they were part of the type.
+     * reflected object will appear as if they were part of the type itself.
      *
      * @tparam Func The actual function to attach to the meta type.
      * @tparam Property Types of properties to assign to the meta function.
