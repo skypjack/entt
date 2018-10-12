@@ -539,6 +539,7 @@ TEST_F(Meta, MetaProp) {
     auto prop = entt::resolve<char>().prop(properties::prop_int);
 
     ASSERT_TRUE(prop);
+    ASSERT_NE(prop, entt::meta_prop{});
     ASSERT_EQ(prop.key(), properties::prop_int);
     ASSERT_EQ(prop.value(), 42);
 }
@@ -548,6 +549,7 @@ TEST_F(Meta, MetaBase) {
     derived_type derived{};
 
     ASSERT_TRUE(base);
+    ASSERT_NE(base, entt::meta_base{});
     ASSERT_EQ(base.parent(), entt::resolve("derived"));
     ASSERT_EQ(base.type(), entt::resolve<base_type>());
     ASSERT_EQ(base.cast(&derived), static_cast<base_type *>(&derived));
@@ -558,6 +560,7 @@ TEST_F(Meta, MetaConv) {
     double value = 3.;
 
     ASSERT_TRUE(conv);
+    ASSERT_NE(conv, entt::meta_conv{});
     ASSERT_EQ(conv.parent(), entt::resolve<double>());
     ASSERT_EQ(conv.type(), entt::resolve<int>());
 
@@ -572,6 +575,7 @@ TEST_F(Meta, MetaCtor) {
     auto ctor = entt::resolve<derived_type>().ctor<const base_type &, int, char>();
 
     ASSERT_TRUE(ctor);
+    ASSERT_NE(ctor, entt::meta_ctor{});
     ASSERT_EQ(ctor.parent(), entt::resolve("derived"));
     ASSERT_EQ(ctor.size(), entt::meta_ctor::size_type{3});
     ASSERT_EQ(ctor.arg(entt::meta_ctor::size_type{0}), entt::resolve<base_type>());
@@ -692,6 +696,7 @@ TEST_F(Meta, MetaDtor) {
     empty_type empty{};
 
     ASSERT_TRUE(dtor);
+    ASSERT_NE(dtor, entt::meta_dtor{});
     ASSERT_EQ(dtor.parent(), entt::resolve("empty"));
     ASSERT_EQ(empty_type::counter, 0);
     ASSERT_TRUE(dtor.invoke(empty));
@@ -717,6 +722,7 @@ TEST_F(Meta, MetaData) {
     data_type instance{};
 
     ASSERT_TRUE(data);
+    ASSERT_NE(data, entt::meta_data{});
     ASSERT_EQ(data.parent(), entt::resolve("data"));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_STREQ(data.name(), "i");
@@ -878,6 +884,7 @@ TEST_F(Meta, MetaFunc) {
     func_type instance{};
 
     ASSERT_TRUE(func);
+    ASSERT_NE(func, entt::meta_func{});
     ASSERT_EQ(func.parent(), entt::resolve("func"));
     ASSERT_STREQ(func.name(), "f2");
     ASSERT_EQ(func.size(), entt::meta_func::size_type{2});
@@ -1079,6 +1086,7 @@ TEST_F(Meta, MetaType) {
     auto type = entt::resolve<derived_type>();
 
     ASSERT_TRUE(type);
+    ASSERT_NE(type, entt::meta_type{});
     ASSERT_STREQ(type.name(), "derived");
 
     type.prop([](auto prop) {
@@ -1339,6 +1347,9 @@ TEST_F(Meta, EnumAndNamedConstants) {
     ASSERT_EQ(type.data("prop_bool").type(), type);
     ASSERT_EQ(type.data("prop_int").type(), type);
 
+    ASSERT_FALSE(type.data("prop_bool").set({}, properties::prop_int));
+    ASSERT_FALSE(type.data("prop_int").set({}, properties::prop_bool));
+
     ASSERT_EQ(type.data("prop_bool").get({}).cast<properties>(), properties::prop_bool);
     ASSERT_EQ(type.data("prop_int").get({}).cast<properties>(), properties::prop_int);
 }
@@ -1351,6 +1362,9 @@ TEST_F(Meta, ArithmeticTypeAndNamedConstants) {
 
     ASSERT_EQ(type.data("min").type(), type);
     ASSERT_EQ(type.data("max").type(), type);
+
+    ASSERT_FALSE(type.data("min").set({}, 100u));
+    ASSERT_FALSE(type.data("max").set({}, 0u));
 
     ASSERT_EQ(type.data("min").get({}).cast<unsigned int>(), 0u);
     ASSERT_EQ(type.data("max").get({}).cast<unsigned int>(), 100u);
