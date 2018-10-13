@@ -142,72 +142,34 @@ struct meta_type_node final {
 
 template<typename...>
 struct meta_node {
-    static meta_type_node *type;
+    inline static meta_type_node *type = nullptr;
 };
-
-
-template<typename... Type>
-meta_type_node * meta_node<Type...>::type = nullptr;
 
 
 template<typename Type>
 struct meta_node<Type> {
-    static meta_type_node *type;
+    inline static meta_type_node *type = nullptr;
 
     template<typename>
-    static meta_base_node *base;
+    inline static meta_base_node *base = nullptr;
 
     template<typename>
-    static meta_conv_node *conv;
+    inline static meta_conv_node *conv = nullptr;
 
     template<typename>
-    static meta_ctor_node *ctor;
+    inline static meta_ctor_node *ctor = nullptr;
 
     template<auto>
-    static meta_dtor_node *dtor;
+    inline static meta_dtor_node *dtor = nullptr;
 
     template<auto>
-    static meta_data_node *data;
+    inline static meta_data_node *data = nullptr;
 
     template<auto>
-    static meta_func_node *func;
+    inline static meta_func_node *func = nullptr;
 
-    static meta_type_node * resolve() ENTT_NOEXCEPT;
+    inline static meta_type_node * resolve() ENTT_NOEXCEPT;
 };
-
-
-template<typename Type>
-meta_type_node * meta_node<Type>::type = nullptr;
-
-
-template<typename Type>
-template<typename>
-meta_base_node * meta_node<Type>::base = nullptr;
-
-
-template<typename Type>
-template<typename>
-meta_conv_node * meta_node<Type>::conv = nullptr;
-
-
-template<typename Type>
-template<typename>
-meta_ctor_node * meta_node<Type>::ctor = nullptr;
-
-
-template<typename Type>
-template<auto>
-meta_dtor_node * meta_node<Type>::dtor = nullptr;
-
-
-template<typename Type>
-template<auto>
-meta_data_node * meta_node<Type>::data = nullptr;
-
-
-template<typename Type>
-template<auto>
-meta_func_node * meta_node<Type>::func = nullptr;
 
 
 template<typename... Type>
