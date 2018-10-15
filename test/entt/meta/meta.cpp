@@ -35,6 +35,11 @@ struct fat_type: empty_type {
     }
 };
 
+union union_type {
+    int i;
+    double d;
+};
+
 bool operator!=(const fat_type &lhs, const fat_type &rhs) {
     return !(lhs == rhs);
 }
@@ -1106,15 +1111,21 @@ TEST_F(Meta, MetaType) {
 
 TEST_F(Meta, MetaTypeTraits) {
     ASSERT_TRUE(entt::resolve<void>().is_void());
+    ASSERT_TRUE(entt::resolve<bool>().is_integral());
+    ASSERT_TRUE(entt::resolve<double>().is_floating_point());
     ASSERT_TRUE(entt::resolve<properties>().is_enum());
+    ASSERT_TRUE(entt::resolve<union_type>().is_union());
     ASSERT_TRUE(entt::resolve<derived_type>().is_class());
     ASSERT_TRUE(entt::resolve<int *>().is_pointer());
-    ASSERT_TRUE(entt::resolve<decltype(&empty_type::destroy)>().is_function_pointer());
+    ASSERT_TRUE(entt::resolve<decltype(empty_type::destroy)>().is_function());
     ASSERT_TRUE(entt::resolve<decltype(&data_type::i)>().is_member_object_pointer());
     ASSERT_TRUE(entt::resolve<decltype(&func_type::g)>().is_member_function_pointer());
-    ASSERT_TRUE(entt::resolve<decltype(&data_type::j)>().is_member_pointer());
-    ASSERT_TRUE(entt::resolve<bool>().is_arithmetic());
-    ASSERT_TRUE(entt::resolve<properties>().is_compound());
+}
+
+TEST_F(Meta, MetaTypeRemovePointer) {
+    ASSERT_EQ(entt::resolve<void *>().remove_pointer(), entt::resolve<void>());
+    ASSERT_EQ(entt::resolve<int(*)(char, double)>().remove_pointer(), entt::resolve<int(char, double)>());
+    ASSERT_EQ(entt::resolve<int>().remove_pointer(), entt::resolve<int>());
 }
 
 TEST_F(Meta, MetaTypeBase) {

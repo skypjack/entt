@@ -33,7 +33,7 @@ meta_factory<Type> reflect(const char *str, Property &&... property) ENTT_NOEXCE
  */
 template<typename Type>
 class meta_factory {
-    static_assert((std::is_scalar_v<Type> || std::is_class_v<Type>) && !std::is_const_v<Type>);
+    static_assert(std::is_object_v<Type> && !(std::is_const_v<Type> || std::is_volatile_v<Type>));
 
     template<auto Data>
     static std::enable_if_t<std::is_member_object_pointer_v<decltype(Data)>, decltype(std::declval<Type>().*Data)>
@@ -91,15 +91,18 @@ class meta_factory {
             internal::meta_info<>::type,
             properties<Type>(std::forward<Property>(property)...),
             std::is_void_v<Type>,
+            std::is_integral_v<Type>,
+            std::is_floating_point_v<Type>,
             std::is_enum_v<Type>,
+            std::is_union_v<Type>,
             std::is_class_v<Type>,
             std::is_pointer_v<Type>,
-            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
+            std::is_function_v<Type>,
             std::is_member_object_pointer_v<Type>,
             std::is_member_function_pointer_v<Type>,
-            std::is_member_pointer_v<Type>,
-            std::is_arithmetic_v<Type>,
-            std::is_compound_v<Type>,
+            []() -> meta_type {
+                return internal::meta_info<std::remove_pointer_t<Type>>::resolve();
+            },
             &internal::destroy<Type>,
             []() -> meta_type {
                 return &node;
