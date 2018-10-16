@@ -22,8 +22,8 @@ How to do it mostly depends on the type of contribution:
   If you are unable to find an open issue addressing the problem, feel free to
   [open a new one](https://github.com/skypjack/entt/issues/new). **Please**, do
   not forget to carefully describe how to reproduce the problem, then add all
-  the informaion about the system on which you are experiencing it and point out
-  the version of `EnTT` you are using (tag or commit).
+  the information about the system on which you are experiencing it and point
+  out the version of `EnTT` you are using (tag or commit).
 
 * If you found a bug and you wrote a patch to fix it, open a new
   [pull request](https://github.com/skypjack/entt/pulls) with your code.
