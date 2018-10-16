@@ -113,7 +113,7 @@ It can be used to extend the reflected type and add the following:
   entt::reflect<derived_type>("derived").base<base_type>();
   ```
 
-  From now on, wherever a `my_base_type` is required, an instance of `my_type`
+  From now on, wherever a `base_type` is required, an instance of `derived_type`
   will also be accepted.
 
 * _Conversion functions_. Actual types can be converted, this is a fact. Just
