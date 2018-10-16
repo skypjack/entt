@@ -23,7 +23,7 @@ looked for a third-party library that met my needs on the subject, but I always
 came across some details that I didn't like: macros, being intrusive, too many
 allocations. In one word: unsatisfactory.<br/>
 I finally decided to write a built-in, non-intrusive and macro-free runtime
-reflection system for `EnTT. Maybe I didn't do better than others or maybe yes,
+reflection system for `EnTT`. Maybe I didn't do better than others or maybe yes,
 time will tell me, but at least I can model this tool around the library to
 which it belongs and not vice versa.
 
