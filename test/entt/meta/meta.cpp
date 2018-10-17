@@ -1123,9 +1123,9 @@ TEST_F(Meta, MetaTypeTraits) {
 }
 
 TEST_F(Meta, MetaTypeRemovePointer) {
-    ASSERT_EQ(entt::resolve<derived_type *>().remove_pointer(), entt::resolve<derived_type>());
+    ASSERT_EQ(entt::resolve<void *>().remove_pointer(), entt::resolve<void>());
     ASSERT_EQ(entt::resolve<int(*)(char, double)>().remove_pointer(), entt::resolve<int(char, double)>());
-    ASSERT_EQ(entt::resolve<int>().remove_pointer(), entt::resolve<int>());
+    ASSERT_EQ(entt::resolve<derived_type>().remove_pointer(), entt::resolve<derived_type>());
 }
 
 TEST_F(Meta, MetaTypeBase) {
