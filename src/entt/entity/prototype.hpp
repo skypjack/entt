@@ -451,6 +451,22 @@ public:
         return create(*reg);
     }
 
+    /**
+     * @brief Returns a reference to the underlying registry.
+     * @return A reference to the underlying registry.
+     */
+    inline const registry_type & backend() const ENTT_NOEXCEPT {
+        return *reg;
+    }
+
+    /**
+     * @brief Returns a reference to the underlying registry.
+     * @return A reference to the underlying registry.
+     */
+    inline registry_type & backend() ENTT_NOEXCEPT {
+        return const_cast<registry_type &>(std::as_const(*this).backend());
+    }
+
 private:
     std::unordered_map<component_type, component_handler> handlers;
     registry<Entity> *reg;

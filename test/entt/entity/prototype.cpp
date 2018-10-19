@@ -7,6 +7,8 @@ TEST(Prototype, SameRegistry) {
     entt::prototype prototype{registry};
     const auto &cprototype = prototype;
 
+    ASSERT_EQ(&registry, &prototype.backend());
+    ASSERT_EQ(&registry, &cprototype.backend());
     ASSERT_FALSE(registry.empty());
     ASSERT_FALSE((prototype.has<int, char>()));
 
