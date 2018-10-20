@@ -162,7 +162,7 @@ export(PACKAGE EnTT)
 # Tests
 #
 
-option(BUILD_TESTING "Enable testing with ctest." ON)
+option(BUILD_TESTING "Enable testing with ctest." OFF)
 
 if(BUILD_TESTING)
     set(THREADS_PREFER_PTHREAD_FLAG ON)

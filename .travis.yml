@@ -51,8 +51,8 @@ install:
 
 script:
 - mkdir -p build && cd build
-- cmake -DCMAKE_BUILD_TYPE=Release .. && make -j4
-- CTEST_OUTPUT_ON_FAILURE=1 make test
+- cmake -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release .. && make -j4
+- CTEST_OUTPUT_ON_FAILURE=1 ctest -j4
 
 deploy:
   provider: script

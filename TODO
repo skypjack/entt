@@ -19,5 +19,4 @@
 * add a note about multithreading support to the README file
 * signals on entity creation/destruction
 * flexible views with "composable" filters
-* do not set BUILD_TESTING to ON by default anymore
 * create a dedicated .md for EnTT in Action list and create two sections: articles and games
