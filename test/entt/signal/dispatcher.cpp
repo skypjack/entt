@@ -30,11 +30,14 @@ TEST(Dispatcher, Functionalities) {
 
     receiver.reset();
 
+    an_event event{};
+    const an_event &cevent = event;
+
     dispatcher.template sink<an_event>().disconnect(&receiver);
-    dispatcher.template trigger<an_event>();
-    dispatcher.template enqueue<an_event>();
+    dispatcher.template trigger(an_event{});
+    dispatcher.template enqueue(event);
     dispatcher.update();
-    dispatcher.template trigger<an_event>();
+    dispatcher.template trigger(cevent);
 
     ASSERT_EQ(receiver.cnt, 0);
 }

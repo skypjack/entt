@@ -129,18 +129,46 @@ public:
     }
 
     /**
+     * @brief Triggers an immediate event of the given type.
+     *
+     * All the listeners registered for the given type are immediately notified.
+     * The event is discarded after the execution.
+     *
+     * @tparam Event Type of event to trigger.
+     * @param event An instance of the given type of event.
+     */
+    template<typename Event>
+    inline void trigger(Event &&event) {
+        wrapper<std::decay_t<Event>>().trigger(std::forward<Event>(event));
+    }
+
+    /**
      * @brief Enqueues an event of the given type.
      *
      * An event of the given type is queued. No listener is invoked. Use the
      * `update` member function to notify listeners when ready.
      *
-     * @tparam Event Type of event to trigger.
+     * @tparam Event Type of event to enqueue.
      * @tparam Args Types of arguments to use to construct the event.
      * @param args Arguments to use to construct the event.
      */
     template<typename Event, typename... Args>
     inline void enqueue(Args &&... args) {
         wrapper<Event>().enqueue(std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Enqueues an event of the given type.
+     *
+     * An event of the given type is queued. No listener is invoked. Use the
+     * `update` member function to notify listeners when ready.
+     *
+     * @tparam Event Type of event to enqueue.
+     * @param event An instance of the given type of event.
+     */
+    template<typename Event>
+    inline void enqueue(Event &&event) {
+        wrapper<std::decay_t<Event>>().enqueue(std::forward<Event>(event));
     }
 
     /**
