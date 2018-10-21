@@ -167,8 +167,8 @@ the delegate will _contain_, that is the signature of the free function or the
 member function one wants to assign to it.
 
 Attempting to use an empty delegate by invoking its function call operator
-results in undefined behavior, most likely a crash actually. Before to use a
-delegate, it must be initialized.<br/>
+results in undefined behavior or most likely a crash. Before to use a delegate,
+it must be initialized.<br/>
 There exist two functions to do that, both named `connect`:
 
 ```cpp
@@ -188,10 +188,13 @@ delegate.connect<&my_struct::f>(&instance);
 
 It hasn't a `disconnect` counterpart. Instead, there exists a `reset` member
 function to clear it.<br/>
-The `empty` member function can be used to know if a delegate is empty:
+To know if a delegate is empty, it can be used explicitly in every conditional
+statement:
 
 ```cpp
-const auto empty = delegate.empty();
+if(delegate) {
+    // ...
+}
 ```
 
 Finally, to invoke a delegate, the function call operator is the way to go as

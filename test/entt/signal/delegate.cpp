@@ -24,23 +24,23 @@ TEST(Delegate, Functionalities) {
     entt::delegate<int(int)> mfdel;
     delegate_functor functor;
 
-    ASSERT_TRUE(ffdel.empty());
-    ASSERT_TRUE(mfdel.empty());
+    ASSERT_FALSE(ffdel);
+    ASSERT_FALSE(mfdel);
     ASSERT_EQ(ffdel, mfdel);
 
     ffdel.connect<&delegate_function>();
     mfdel.connect<&delegate_functor::operator()>(&functor);
 
-    ASSERT_FALSE(ffdel.empty());
-    ASSERT_FALSE(mfdel.empty());
+    ASSERT_TRUE(ffdel);
+    ASSERT_TRUE(mfdel);
 
     ASSERT_EQ(ffdel(3), 9);
     ASSERT_EQ(mfdel(3), 6);
 
     ffdel.reset();
 
-    ASSERT_TRUE(ffdel.empty());
-    ASSERT_FALSE(mfdel.empty());
+    ASSERT_FALSE(ffdel);
+    ASSERT_TRUE(mfdel);
 
     ASSERT_EQ(ffdel, entt::delegate<int(int)>{});
     ASSERT_NE(ffdel, mfdel);
@@ -83,7 +83,7 @@ TEST(Delegate, Constructors) {
     entt::delegate<int(int)> func{entt::connect_arg<&delegate_function>};
     entt::delegate<int(int)> member{entt::connect_arg<&delegate_functor::operator()>, &functor};
 
-    ASSERT_TRUE(empty.empty());
-    ASSERT_FALSE(func.empty());
-    ASSERT_FALSE(member.empty());
+    ASSERT_FALSE(empty);
+    ASSERT_TRUE(func);
+    ASSERT_TRUE(member);
 }

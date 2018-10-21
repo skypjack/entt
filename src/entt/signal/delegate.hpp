@@ -90,15 +90,6 @@ public:
     }
 
     /**
-     * @brief Checks whether a delegate actually stores a listener.
-     * @return True if the delegate is empty, false otherwise.
-     */
-    bool empty() const ENTT_NOEXCEPT {
-        // no need to test also stub.first
-        return !stub.second;
-    }
-
-    /**
      * @brief Binds a free function to a delegate.
      * @tparam Function A valid free function pointer.
      */
@@ -158,6 +149,15 @@ public:
      */
     Ret operator()(Args... args) const {
         return stub.second(stub.first, args...);
+    }
+
+    /**
+     * @brief Checks whether a delegate actually stores a listener.
+     * @return False if the delegate is empty, true otherwise.
+     */
+    explicit operator bool() const ENTT_NOEXCEPT {
+        // no need to test also stub.first
+        return stub.second;
     }
 
     /**
