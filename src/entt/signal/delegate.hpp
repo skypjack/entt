@@ -11,6 +11,40 @@
 namespace entt {
 
 
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename Ret, typename... Args>
+auto to_function_pointer(Ret(*)(Args...)) -> Ret(*)(Args...);
+
+
+template<typename Class, typename Ret, typename... Args>
+auto to_function_pointer(Ret(Class:: *)(Args...)) -> Ret(*)(Args...);
+
+
+template<typename Class, typename Ret, typename... Args>
+auto to_function_pointer(Ret(Class:: *)(Args...) const) -> Ret(*)(Args...);
+
+
+template<auto Func>
+using function_type = std::remove_pointer_t<decltype(to_function_pointer(Func))>;
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond TURN_OFF_DOXYGEN
+ */
+
+
 /*! @brief Used to wrap a function or a member function of a specified type. */
 template<auto>
 struct connect_arg_t {};
@@ -60,6 +94,9 @@ class delegate<Ret(Args...)> final {
     }
 
 public:
+    /*! @brief Function type of the delegate. */
+    using function_type = Ret(Args...);
+
     /*! @brief Default constructor. */
     delegate() ENTT_NOEXCEPT
         : stub{}
@@ -192,6 +229,32 @@ template<typename Ret, typename... Args>
 bool operator!=(const delegate<Ret(Args...)> &lhs, const delegate<Ret(Args...)> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
+
+
+/**
+ * @brief Deduction guideline.
+ *
+ * It allows to deduce the function type of the delegate directly from the
+ * function provided to the constructor.
+ *
+ * @tparam Function A valid free function pointer.
+ */
+template<auto Function>
+delegate(connect_arg_t<Function>) ENTT_NOEXCEPT -> delegate<internal::function_type<Function>>;
+
+
+/**
+
+ * @brief Deduction guideline.
+ *
+ * It allows to deduce the function type of the delegate directly from the
+ * member function provided to the constructor.
+ *
+ * @tparam Member Member function to connect to the delegate.
+ * @tparam Class Type of class to which the member function belongs.
+ */
+template<auto Member, typename Class>
+delegate(connect_arg_t<Member>, Class *) ENTT_NOEXCEPT -> delegate<internal::function_type<Member>>;
 
 
 }

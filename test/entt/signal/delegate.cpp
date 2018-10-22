@@ -87,3 +87,25 @@ TEST(Delegate, Constructors) {
     ASSERT_TRUE(func);
     ASSERT_TRUE(member);
 }
+
+TEST(Delegate, DeducedGuidelines) {
+    const_nonconst_noexcept functor;
+
+    entt::delegate func_deduced{entt::connect_arg<&delegate_function>};
+    entt::delegate member_f_deduced{entt::connect_arg<&const_nonconst_noexcept::f>, &functor};
+    entt::delegate member_g_deduced{entt::connect_arg<&const_nonconst_noexcept::g>, &functor};
+    entt::delegate member_h_deduced{entt::connect_arg<&const_nonconst_noexcept::h>, &functor};
+    entt::delegate member_i_deduced{entt::connect_arg<&const_nonconst_noexcept::i>, &functor};
+
+    static_assert(std::is_same_v<typename decltype(func_deduced)::function_type, int(const int &)>);
+    static_assert(std::is_same_v<typename decltype(member_f_deduced)::function_type, void()>);
+    static_assert(std::is_same_v<typename decltype(member_g_deduced)::function_type, void()>);
+    static_assert(std::is_same_v<typename decltype(member_h_deduced)::function_type, void()>);
+    static_assert(std::is_same_v<typename decltype(member_i_deduced)::function_type, void()>);
+
+    ASSERT_TRUE(func_deduced);
+    ASSERT_TRUE(member_f_deduced);
+    ASSERT_TRUE(member_g_deduced);
+    ASSERT_TRUE(member_h_deduced);
+    ASSERT_TRUE(member_i_deduced);
+}
