@@ -1507,7 +1507,7 @@ class meta_type final {
     template<typename> friend class meta_factory;
 
     /*! @brief A meta node is allowed to create meta objects. */
-    template<typename Type> friend internal::meta_type_node * internal::meta_node<Type>::resolve() ENTT_NOEXCEPT;
+    template<typename...> friend struct internal::meta_node;
 
     inline meta_type(const internal::meta_type_node *node) ENTT_NOEXCEPT
         : node{node}
