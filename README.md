@@ -298,50 +298,24 @@ Note that benchmarks are not part of this set.
 
 Consider this list a work in progress and help me to make it longer.
 
+<!--
+@cond TURN_OFF_DOXYGEN
+-->
 # EnTT in Action
 
 `EnTT` is widely used in private and commercial applications. I cannot even
 mention most of them because of some signatures I put on some documents time
-ago.<br/>
-Fortunately, there are also people who took the time to implement open source
-projects based on EnTT and did not hold back when it came to documenting them.
+ago. Fortunately, there are also people who took the time to implement open
+source projects based on `EnTT` and did not hold back when it came to
+documenting them.
 
-Below an incomplete list of projects and articles:
-
-* [Minecraft](https://minecraft.net/en-us/attribution/): of course, **that**
-  Minecraft, by Mojang (see the open source attributions page).
-* [Face Smash](https://play.google.com/store/apps/details?id=com.gamee.facesmash):
-  the emojis dominate the world, destroy them all with your facial expressions.
-* [shiva](https://github.com/Milerius/shiva): modern C++ Engine with modularity.
-* [EnTT Pacman](https://github.com/Kerndog73/EnTT-Pacman): an example of how to
-  make Pacman with EnTT.
-* [Classic Tower Defence](https://github.com/kerndog73/Classic-Tower-Defence):
-  a tiny little tower defence game featuring a homemade font.
-  [Check it out](https://indi-kernick.itch.io/classic-tower-defence).
-* [The Machine](https://github.com/Kerndog73/The-Machine): a box pushing puzzler
-  with logic gates and other cool stuff.
-  [Check it out](https://indi-kernick.itch.io/the-machine-web-version).
-* [EnttPong](https://github.com/reworks/EnttPong): example game with `EnTT`.
-* [Space Battle: Huge edition](http://victor.madtriangles.com/code%20experiment/2018/06/11/post-ecs-battle-huge.html):
-  huge space battle built entirely from scratch.
-* [Space Battle](https://github.com/vblanco20-1/ECS_SpaceBattle): huge space
-  battle built on `UE4`.
-* [Experimenting with ECS in UE4](http://victor.madtriangles.com/code%20experiment/2018/03/25/post-ue4-ecs-battle.html):
-  interesting article about `UE4` and `EnTT`.
-* [Implementing ECS architecture in UE4](https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1449913-implementing-ecs-architecture-in-ue4-giant-space-battle):
-  giant space battle.
-* [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt): port of
-  [Match One](https://github.com/sschmid/Match-One) for `Entitas-CSharp`.
-* [Randballs](https://github.com/gale93/randballs): simple `SFML` and `EnTT`
-  playground.
-* ...
+[Here](https://github.com/skypjack/entt/wiki/EnTT-in-Action) you can find and
+incomplete list of games, applications and articles that can be used as a
+reference.
 
 If you know of other resources out there that are about `EnTT`, feel free to
 open an issue or a PR and I'll be glad to add them to the list.
 
-<!--
-@cond TURN_OFF_DOXYGEN
--->
 # Contributors
 
 `EnTT` was written initially as a faster alternative to other well known and

@@ -1,3 +1,4 @@
+* long term feature: templated generic vm
 * long term feature: shared_ptr less locator
 * long term feature: shared_ptr less resource cache
 * custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
@@ -19,4 +20,4 @@
 * add a note about multithreading support to the README file
 * signals on entity creation/destruction
 * flexible views with "composable" filters
-* create a dedicated .md for EnTT in Action list and create two sections: articles and games
+* sigh/sink: disconnect doesn't really require the Class type, void * is enough

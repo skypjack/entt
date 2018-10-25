@@ -27,6 +27,7 @@ add_custom_target(
         CONTRIBUTING.md
         core.md
         entity.md
+        links.md
         locator.md
         meta.md
         process.md
