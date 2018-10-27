@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <memory>
+#include <cassert>
 #include <utility>
 #include <algorithm>
 #include <type_traits>
@@ -57,12 +58,16 @@ class scheduler final {
     struct continuation final {
         continuation(process_handler *handler)
             : handler{handler}
-        {}
+        {
+            assert(handler);
+        }
 
         template<typename Proc, typename... Args>
         continuation then(Args &&... args) {
             static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>);
-            handler = scheduler::then<Proc>(handler, std::forward<Args>(args)...);
+            auto proc = typename process_handler::instance_type{new Proc{std::forward<Args>(args)...}, &scheduler::deleter<Proc>};
+            handler->next.reset(new process_handler{std::move(proc), &scheduler::update<Proc>, &scheduler::abort<Proc>, nullptr});
+            handler = handler->next.get();
             return *this;
         }
 
@@ -102,17 +107,6 @@ class scheduler final {
     template<typename Proc>
     static void deleter(void *proc) {
         delete static_cast<Proc *>(proc);
-    }
-
-    template<typename Proc, typename... Args>
-    static auto then(process_handler *handler, Args &&... args) {
-        if(handler) {
-            auto proc = typename process_handler::instance_type{new Proc{std::forward<Args>(args)...}, &scheduler::deleter<Proc>};
-            handler->next.reset(new process_handler{std::move(proc), &scheduler::update<Proc>, &scheduler::abort<Proc>, nullptr});
-            handler = handler->next.get();
-        }
-
-        return handler;
     }
 
 public:
@@ -186,11 +180,9 @@ public:
     template<typename Proc, typename... Args>
     auto attach(Args &&... args) {
         static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>);
-
         auto proc = typename process_handler::instance_type{new Proc{std::forward<Args>(args)...}, &scheduler::deleter<Proc>};
         process_handler handler{std::move(proc), &scheduler::update<Proc>, &scheduler::abort<Proc>, nullptr};
         handlers.push_back(std::move(handler));
-
         return continuation{&handlers.back()};
     }
 
