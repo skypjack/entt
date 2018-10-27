@@ -683,7 +683,7 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
     };
 
 public:
-    /*! @brief Type of the objects associated to the entities. */
+    /*! @brief Type of the objects associated with the entities. */
     using object_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename underlying_type::entity_type;
@@ -881,7 +881,7 @@ public:
     }
 
     /**
-     * @brief Returns the object associated to an entity.
+     * @brief Returns the object associated with an entity.
      *
      * @warning
      * Attempting to use an entity that doesn't belong to the sparse set results
@@ -890,14 +890,14 @@ public:
      * sparse set doesn't contain the given entity.
      *
      * @param entity A valid entity identifier.
-     * @return The object associated to the entity.
+     * @return The object associated with the entity.
      */
     const object_type & get(const entity_type entity) const ENTT_NOEXCEPT {
         return instances[underlying_type::get(entity)];
     }
 
     /**
-     * @brief Returns the object associated to an entity.
+     * @brief Returns the object associated with an entity.
      *
      * @warning
      * Attempting to use an entity that doesn't belong to the sparse set results
@@ -906,10 +906,28 @@ public:
      * sparse set doesn't contain the given entity.
      *
      * @param entity A valid entity identifier.
-     * @return The object associated to the entity.
+     * @return The object associated with the entity.
      */
     inline object_type & get(const entity_type entity) ENTT_NOEXCEPT {
         return const_cast<object_type &>(std::as_const(*this).get(entity));
+    }
+
+    /**
+     * @brief Returns a pointer to the object associated with an entity, if any.
+     * @param entity A valid entity identifier.
+     * @return The object associated with the entity, if any.
+     */
+    const object_type * get_if(const entity_type entity) const ENTT_NOEXCEPT {
+        return underlying_type::has(entity) ? (instances.data() + underlying_type::get(entity)) : nullptr;
+    }
+
+    /**
+     * @brief Returns a pointer to the object associated with an entity, if any.
+     * @param entity A valid entity identifier.
+     * @return The object associated with the entity, if any.
+     */
+    inline object_type * get_if(const entity_type entity) ENTT_NOEXCEPT {
+        return const_cast<object_type *>(std::as_const(*this).get_if(entity));
     }
 
     /**
@@ -929,7 +947,7 @@ public:
      * @tparam Args Types of arguments to use to construct the object.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to construct an object for the entity.
-     * @return The object associated to the entity.
+     * @return The object associated with the entity.
      */
     template<typename... Args>
     object_type & construct(const entity_type entity, Args &&... args) {

@@ -21,6 +21,14 @@ TEST(Prototype, SameRegistry) {
     ASSERT_EQ(std::get<0>(prototype.get<int, char>()), 3);
     ASSERT_EQ(std::get<1>(cprototype.get<int, char>()), 'c');
 
+    ASSERT_NE(prototype.get_if<int>(), nullptr);
+    ASSERT_NE(prototype.get_if<char>(), nullptr);
+    ASSERT_EQ(prototype.get_if<double>(), nullptr);
+    ASSERT_EQ(*prototype.get_if<int>(), 3);
+    ASSERT_EQ(*cprototype.get_if<char>(), 'c');
+    ASSERT_EQ(*std::get<0>(prototype.get_if<int, char, double>()), 3);
+    ASSERT_EQ(*std::get<1>(cprototype.get_if<int, char, double>()), 'c');
+
     const auto e0 = prototype.create();
 
     ASSERT_TRUE((prototype.has<int, char>()));

@@ -625,6 +625,50 @@ public:
     }
 
     /**
+     * @brief Returns pointers to the given components for an entity.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @tparam Component Types of components to get.
+     * @param entity A valid entity identifier.
+     * @return Pointers to the components owned by the entity.
+     */
+    template<typename... Component>
+    auto get_if([[maybe_unused]] const entity_type entity) const ENTT_NOEXCEPT {
+        assert(valid(entity));
+
+        if constexpr(sizeof...(Component) == 1) {
+            return managed<Component...>() ? pool<Component...>().get_if(entity) : nullptr;
+        } else {
+            return std::tuple<const Component *...>{get_if<Component>(entity)...};
+        }
+    }
+
+    /**
+     * @brief Returns pointers to the given components for an entity.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @tparam Component Types of components to get.
+     * @param entity A valid entity identifier.
+     * @return Pointers to the components owned by the entity.
+     */
+    template<typename... Component>
+    inline auto get_if([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
+        if constexpr(sizeof...(Component) == 1) {
+            return (const_cast<Component *>(std::as_const(*this).template get_if<Component>(entity)), ...);
+        } else {
+            return std::tuple<Component *...>{get_if<Component>(entity)...};
+        }
+    }
+
+    /**
      * @brief Replaces the given component for an entity.
      *
      * A new instance of the given component is created and initialized with the

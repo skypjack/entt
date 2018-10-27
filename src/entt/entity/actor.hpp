@@ -120,23 +120,43 @@ struct actor {
     }
 
     /**
-     * @brief Returns a reference to the given component for an actor.
-     * @tparam Component Type of the component to get.
-     * @return A reference to the instance of the component owned by the actor.
+     * @brief Returns references to the given components for an actor.
+     * @tparam Component Types of components to get.
+     * @return References to the components owned by the actor.
      */
-    template<typename Component>
-    const Component & get() const ENTT_NOEXCEPT {
-        return reg->template get<Component>(entt);
+    template<typename... Component>
+    decltype(auto) get() const ENTT_NOEXCEPT {
+        return reg->template get<Component...>(entt);
     }
 
     /**
-     * @brief Returns a reference to the given component for an actor.
-     * @tparam Component Type of the component to get.
-     * @return A reference to the instance of the component owned by the actor.
+     * @brief Returns references to the given components for an actor.
+     * @tparam Component Types of components to get.
+     * @return References to the components owned by the actor.
      */
-    template<typename Component>
-    inline Component & get() ENTT_NOEXCEPT {
-        return const_cast<Component &>(std::as_const(*this).template get<Component>());
+    template<typename... Component>
+    decltype(auto) get() ENTT_NOEXCEPT {
+        return reg->template get<Component...>(entt);
+    }
+
+    /**
+     * @brief Returns pointers to the given components for an actor.
+     * @tparam Component Types of components to get.
+     * @return Pointers to the components owned by the actor.
+     */
+    template<typename... Component>
+    auto get_if() const ENTT_NOEXCEPT {
+        return reg->template get_if<Component...>(entt);
+    }
+
+    /**
+     * @brief Returns pointers to the given components for an actor.
+     * @tparam Component Types of components to get.
+     * @return Pointers to the components owned by the actor.
+     */
+    template<typename... Component>
+    auto get_if() ENTT_NOEXCEPT {
+        return reg->template get_if<Component...>(entt);
     }
 
     /**
