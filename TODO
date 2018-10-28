@@ -19,4 +19,3 @@
 * add a note about multithreading support to the README file
 * signals on entity creation/destruction
 * flexible views with "composable" filters
-* sigh/sink: disconnect doesn't really require the Class type, void * is enough

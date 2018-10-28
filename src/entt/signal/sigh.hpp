@@ -213,11 +213,9 @@ public:
 
     /**
      * @brief Removes all existing connections for the given instance.
-     * @tparam Class Type of class to which the member function belongs.
-     * @param instance A valid instance of type pointer to `Class`.
+     * @param instance An instance to be disconnected from the signal.
      */
-    template<typename Class>
-    void disconnect(Class *instance) {
+    void disconnect(const void *instance) {
         auto func = [instance](const auto &delegate) { return delegate.instance() == instance; };
         calls->erase(std::remove_if(calls->begin(), calls->end(), std::move(func)), calls->end());
     }
