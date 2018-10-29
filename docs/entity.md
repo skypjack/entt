@@ -272,7 +272,9 @@ auto &[pos, vel] = registry.get<position, velocity>(entity);
 ```
 
 The `get` member function template gives direct access to the component of an
-entity stored in the underlying data structures of the registry.
+entity stored in the underlying data structures of the registry. There exists
+also an alternative member function named `get_if` that returns a pointer to the
+component owned by an entity if any, a null pointer otherwise.
 
 ## Observe changes
 

@@ -18,4 +18,3 @@
 * signals on entity creation/destruction
 * flexible views with "composable" filters
 * review persistent views and avoid indirection to get components
-* registry::create(it_from, it_end) to create N instances at once
