@@ -35,6 +35,7 @@
   * [Give me everything](#give-me-everything)
 * [Iterations: what is allowed and what is not](#iterations-what-is-allowed-and-what-is-not)
 * [Multithreading](#multithreading)
+  * [Views and Iterators](#views-and-iterators)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -1280,3 +1281,18 @@ Because of the few reasons mentioned above and many others not mentioned, users
 are completely responsible for synchronization whether required. On the other
 hand, they could get away with it without having to resort to particular
 expedients.
+
+## Views and Iterators
+
+A special mention is needed for the iterators returned by the views. Most of the
+time they meet the requirements of **random access iterators**, in all cases
+they meet at least the requirements of **forward iterators**.<br/>
+In other terms, they are suitable for use with the **parallel algorithms** of
+the standard library. If it's not clear, this is a great thing.
+
+As an example, this kind of iterators can be used in combination with
+`std::for_each` and `std::execution::par` to parallelize the visit and therefore
+the update of the components returned by a view, as long as the constraints
+previously discussed are respected.<br/>
+This can increase the throughput considerably, even without resorting to who
+knows what artifacts that are difficult to maintain over time.

@@ -6,7 +6,6 @@
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
-* registry::create with a "hint" on the entity identifier to use, it should ease combining multiple registries
 * optimize for empty components, it would be a mid improvement in terms of memory usage (see std::is_empty)
 * deep copy of a registry (or use the snapshot stuff to copy components and keep intact ids at least)
 * is it possible to iterate all the components assigned to an entity through a common base class?
@@ -16,6 +15,7 @@
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
 * meta: move-to-head optimization when searching by name on parts (data, func, etc)
 * hashed string: add implicit check on construction for uniqueness (optional)
-* add a note about multithreading support to the README file
 * signals on entity creation/destruction
 * flexible views with "composable" filters
+* review persistent views and avoid indirection to get components
+* registry::create(it_from, it_end) to create N instances at once
