@@ -182,8 +182,7 @@ public:
         static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>);
         auto proc = typename process_handler::instance_type{new Proc{std::forward<Args>(args)...}, &scheduler::deleter<Proc>};
         process_handler handler{std::move(proc), &scheduler::update<Proc>, &scheduler::abort<Proc>, nullptr};
-        handlers.push_back(std::move(handler));
-        return continuation{&handlers.back()};
+        return continuation{&handlers.emplace_back(std::move(handler))};
     }
 
     /**
