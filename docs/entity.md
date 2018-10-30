@@ -134,6 +134,9 @@ auto entity = registry.create();
 registry.destroy(entity);
 ```
 
+There exists another overload of the `create` member function that accepts two
+iterators, that is a range to assign. It can be used to create multiple entities
+at once.<br/>
 Entities can also be destroyed _by type_, that is by specifying the types of the
 components that identify them:
 

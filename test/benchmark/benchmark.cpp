@@ -45,6 +45,17 @@ TEST(Benchmark, Construct) {
     timer.elapsed();
 }
 
+TEST(Benchmark, ConstructMany) {
+    entt::registry<> registry;
+    std::vector<entt::registry<>::entity_type> entities(1000000);
+
+    std::cout << "Constructing 1000000 entities at once" << std::endl;
+
+    timer timer;
+    registry.create(entities.begin(), entities.end());
+    timer.elapsed();
+}
+
 TEST(Benchmark, Destroy) {
     entt::registry<> registry;
 

@@ -435,13 +435,50 @@ public:
             entities[entt] = entity;
             --available;
         } else {
-            entity = entity_type(entities.size());
-            entities.push_back(entity);
+            entity = entities.emplace_back(entity_type(entities.size()));
             // traits_type::entity_mask is reserved to allow for null identifiers
             assert(entity < traits_type::entity_mask);
         }
 
         return entity;
+    }
+
+    /**
+     * @brief Assigns each element in a range an entity.
+     *
+     * There are two kinds of entity identifiers:
+     *
+     * * Newly created ones in case no entities have been previously destroyed.
+     * * Recycled ones with updated versions.
+     *
+     * Users should not care about the type of the returned entity identifier.
+     * In case entity identifers are stored around, the `valid` member
+     * function can be used to know if they are still valid or the entity has
+     * been destroyed and potentially recycled.
+     *
+     * The generated entities have no components assigned.
+     *
+     * @tparam It Type of forward iterator.
+     * @param first An iterator to the first element of the range to generate.
+     * @param last An iterator past the last element of the range to generate.
+     */
+    template<typename It>
+    void create(It first, It last) {
+        const auto length = size_type(last - first);
+        const auto sz = std::min(available, length);
+
+        available -= sz;
+
+        std::generate_n(first, sz, [this]() {
+            const auto entt = next;
+            const auto version = entities[entt] & (traits_type::version_mask << traits_type::entity_shift);
+            next = entities[entt] & traits_type::entity_mask;
+            return (entities[entt] = entt | version);
+        });
+
+        std::generate_n((first + sz), (length - sz), [this]() {
+            return entities.emplace_back(entity_type(entities.size()));
+        });
     }
 
     /**

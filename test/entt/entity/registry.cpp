@@ -1,6 +1,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <functional>
+#include <iterator>
 #include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/entity/entt_traits.hpp>
@@ -703,4 +704,31 @@ TEST(Registry, SignalsOnAccommodate) {
     registry.accommodate<char>(entity);
 
     ASSERT_FALSE((registry.persistent_view<int, char>().empty()));
+}
+
+TEST(Registry, CreateManyEntitiesAtOnce) {
+    entt::registry<> registry;
+    entt::registry<>::entity_type entities[3];
+
+    const auto entity = registry.create();
+    registry.destroy(registry.create());
+    registry.destroy(entity);
+    registry.destroy(registry.create());
+
+    registry.create(std::begin(entities), std::end(entities));
+
+    ASSERT_TRUE(registry.valid(entities[0]));
+    ASSERT_TRUE(registry.valid(entities[1]));
+    ASSERT_TRUE(registry.valid(entities[2]));
+
+    ASSERT_EQ(registry.entity(entities[0]), entt::registry<>::entity_type{0});
+    ASSERT_EQ(registry.version(entities[0]), entt::registry<>::version_type{2});
+
+    ASSERT_EQ(registry.entity(entities[1]), entt::registry<>::entity_type{1});
+    ASSERT_EQ(registry.version(entities[1]), entt::registry<>::version_type{1});
+
+    ASSERT_EQ(registry.entity(entities[2]), entt::registry<>::entity_type{2});
+    ASSERT_EQ(registry.version(entities[2]), entt::registry<>::version_type{0});
+
+    // TODO
 }
