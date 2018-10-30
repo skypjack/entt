@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <utility>
+#include <type_traits>
 #include "../config/config.h"
 #include "registry.hpp"
 #include "entity.hpp"
@@ -126,7 +127,7 @@ struct actor {
      */
     template<typename... Component>
     decltype(auto) get() const ENTT_NOEXCEPT {
-        return reg->template get<Component...>(entt);
+        return std::as_const(*reg).template get<Component...>(entt);
     }
 
     /**
@@ -146,7 +147,7 @@ struct actor {
      */
     template<typename... Component>
     auto get_if() const ENTT_NOEXCEPT {
-        return reg->template get_if<Component...>(entt);
+        return std::as_const(*reg).template get_if<Component...>(entt);
     }
 
     /**

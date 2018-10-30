@@ -184,8 +184,7 @@ public:
     template<typename... Component>
     decltype(auto) get() const ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 1) {
-            const auto &component = reg->template get<component_wrapper<Component...>>(entity).component;
-            return component;
+            return (std::as_const(*reg).template get<component_wrapper<Component...>>(entity).component);
         } else {
             return std::tuple<const Component &...>{get<Component>()...};
         }
