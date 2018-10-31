@@ -85,7 +85,11 @@ It can be used to extend the reflected type and add the following:
 
   This function requires as an argument the name to give to the meta data once
   created. Users can then access meta data at runtime by searching for them by
-  name.
+  name.<br/>
+  Data members can be set also by means of a couple of functions, namely a
+  setter and a getter. Setters and getters can be either free functions, member
+  functions or mixed ones, as long as they respect the required signatures.<br/>
+  Refer to the inline documentation for all the details.
 
 * _Member functions_. Both real member functions of the underlying type and free
   functions can be attached to a meta type. From a client's point of view, all

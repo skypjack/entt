@@ -80,6 +80,16 @@ struct func_type {
     inline static int value = 0;
 };
 
+struct setter_getter_type {
+    int value{};
+
+    int setter(int value) { return this->value = value; }
+    int getter() { return value; }
+
+    static int static_setter(setter_getter_type &type, int value) { return type.value = value; }
+    static int static_getter(const setter_getter_type &type) { return type.value; }
+};
+
 struct not_comparable_type {
     bool operator==(const not_comparable_type &) const = delete;
 };
@@ -145,6 +155,11 @@ struct Meta: public ::testing::Test {
                 .func<&func_type::g>("g", std::make_pair(properties::prop_bool, false))
                 .func<&func_type::h>("h", std::make_pair(properties::prop_bool, false))
                 .func<&func_type::k>("k", std::make_pair(properties::prop_bool, false));
+
+        entt::reflect<setter_getter_type>("setter_getter")
+                .data<&setter_getter_type::static_setter, &setter_getter_type::static_getter>("x")
+                .data<&setter_getter_type::setter, &setter_getter_type::getter>("y")
+                .data<&setter_getter_type::static_setter, &setter_getter_type::getter>("z");
 
         entt::reflect<an_abstract_type>("an_abstract_type", std::make_pair(properties::prop_bool, false))
                 .data<&an_abstract_type::i>("i")
@@ -882,6 +897,54 @@ TEST_F(Meta, MetaDataSetConvert) {
     ASSERT_EQ(instance.i, 0);
     ASSERT_TRUE(data.set(instance, 3.));
     ASSERT_EQ(instance.i, 3);
+}
+
+TEST_F(Meta, MetaDataSetterGetterAsFreeFunctions) {
+    auto data = entt::resolve<setter_getter_type>().data("x");
+    setter_getter_type instance{};
+
+    ASSERT_TRUE(data);
+    ASSERT_NE(data, entt::meta_data{});
+    ASSERT_EQ(data.parent(), entt::resolve("setter_getter"));
+    ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_STREQ(data.name(), "x");
+    ASSERT_FALSE(data.is_const());
+    ASSERT_FALSE(data.is_static());
+    ASSERT_EQ(data.get(instance).cast<int>(), 0);
+    ASSERT_TRUE(data.set(instance, 42));
+    ASSERT_EQ(data.get(instance).cast<int>(), 42);
+}
+
+TEST_F(Meta, MetaDataSetterGetterAsMemberFunctions) {
+    auto data = entt::resolve<setter_getter_type>().data("y");
+    setter_getter_type instance{};
+
+    ASSERT_TRUE(data);
+    ASSERT_NE(data, entt::meta_data{});
+    ASSERT_EQ(data.parent(), entt::resolve("setter_getter"));
+    ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_STREQ(data.name(), "y");
+    ASSERT_FALSE(data.is_const());
+    ASSERT_FALSE(data.is_static());
+    ASSERT_EQ(data.get(instance).cast<int>(), 0);
+    ASSERT_TRUE(data.set(instance, 42));
+    ASSERT_EQ(data.get(instance).cast<int>(), 42);
+}
+
+TEST_F(Meta, MetaDataSetterGetterMixed) {
+    auto data = entt::resolve<setter_getter_type>().data("z");
+    setter_getter_type instance{};
+
+    ASSERT_TRUE(data);
+    ASSERT_NE(data, entt::meta_data{});
+    ASSERT_EQ(data.parent(), entt::resolve("setter_getter"));
+    ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_STREQ(data.name(), "z");
+    ASSERT_FALSE(data.is_const());
+    ASSERT_FALSE(data.is_static());
+    ASSERT_EQ(data.get(instance).cast<int>(), 0);
+    ASSERT_TRUE(data.set(instance, 42));
+    ASSERT_EQ(data.get(instance).cast<int>(), 42);
 }
 
 TEST_F(Meta, MetaFunc) {

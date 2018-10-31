@@ -281,8 +281,8 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto *Func>
-    std::enable_if_t<std::is_invocable_v<decltype(Func), Type &>, meta_factory &>
-    dtor() ENTT_NOEXCEPT {
+    meta_factory & dtor() ENTT_NOEXCEPT {
+        static_assert(std::is_invocable_v<decltype(Func), Type &>);
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_dtor_node node{
@@ -364,6 +364,55 @@ public:
             internal::meta_info<Type>::template data<Data> = &node;
             type->data = &node;
         }
+
+        return *this;
+    }
+
+    /**
+     * @brief Assigns a meta data to a meta type by means of its setter and
+     * getter.
+     *
+     * Setters and getters can be either free functions, member functions or a
+     * mix of them.<br/>
+     * In case of free functions, setters and getters must accept an instance of
+     * the parent type as their first argument. A setter has then an extra
+     * argument of a type convertible to that of the parameter to set.<br/>
+     * In case of member functions, getters have no arguments at all, while
+     * setters has an argument of a type convertible to that of the parameter to
+     * set.
+     *
+     * @tparam Setter The actual function to use as a setter.
+     * @tparam Getter The actual function to use as a getter.
+     * @tparam Property Types of properties to assign to the meta data.
+     * @param str The name to assign to the meta data.
+     * @param property Properties to assign to the meta data.
+     * @return A meta factory for the parent type.
+     */
+    template<auto Setter, auto Getter, typename... Property>
+    meta_factory & data(const char *str, Property &&... property) ENTT_NOEXCEPT {
+        using data_type = std::invoke_result_t<decltype(Getter), Type &>;
+        static_assert(std::is_invocable_v<decltype(Setter), Type &, data_type>);
+        auto * const type = internal::meta_info<Type>::resolve();
+
+        static internal::meta_data_node node{
+            hashed_string{str},
+            type->data,
+            type,
+            properties<std::tuple<decltype(Setter), decltype(Getter)>>(std::forward<Property>(property)...),
+            false,
+            false,
+            &internal::meta_info<data_type>::resolve,
+            &internal::setter<false, Type, Setter>,
+            &internal::getter<Type, Getter>,
+            []() -> meta_data {
+                return &node;
+            }
+        };
+
+        assert(!duplicate(hashed_string{str}, node.next));
+        assert((!internal::meta_info<Type>::template data<Setter, Getter>));
+        internal::meta_info<Type>::template data<Setter, Getter> = &node;
+        type->data = &node;
 
         return *this;
     }
