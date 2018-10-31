@@ -15,16 +15,16 @@ TEST(Dispatcher, Functionalities) {
     entt::dispatcher dispatcher;
     receiver receiver;
 
-    dispatcher.template sink<an_event>().connect(&receiver);
-    dispatcher.template trigger<an_event>();
-    dispatcher.template enqueue<an_event>();
-    dispatcher.template enqueue<another_event>();
+    dispatcher.sink<an_event>().connect(&receiver);
+    dispatcher.trigger<an_event>();
+    dispatcher.enqueue<an_event>();
+    dispatcher.enqueue<another_event>();
     dispatcher.update<another_event>();
 
     ASSERT_EQ(receiver.cnt, 1);
 
     dispatcher.update<an_event>();
-    dispatcher.template trigger<an_event>();
+    dispatcher.trigger<an_event>();
 
     ASSERT_EQ(receiver.cnt, 3);
 
@@ -33,11 +33,11 @@ TEST(Dispatcher, Functionalities) {
     an_event event{};
     const an_event &cevent = event;
 
-    dispatcher.template sink<an_event>().disconnect(&receiver);
-    dispatcher.template trigger(an_event{});
-    dispatcher.template enqueue(event);
+    dispatcher.sink<an_event>().disconnect(&receiver);
+    dispatcher.trigger(an_event{});
+    dispatcher.enqueue(event);
     dispatcher.update();
-    dispatcher.template trigger(cevent);
+    dispatcher.trigger(cevent);
 
     ASSERT_EQ(receiver.cnt, 0);
 }
