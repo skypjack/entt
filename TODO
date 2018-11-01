@@ -17,4 +17,5 @@
 * hashed string: add implicit check on construction for uniqueness (optional)
 * signals on entity creation/destruction
 * flexible views with "composable" filters like negative queries: find entites that have components A, B, but not C.
+* destroy overload that accepts a couple of iterators (see create)
 * review persistent views and avoid indirection to get components
