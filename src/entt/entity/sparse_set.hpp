@@ -367,11 +367,11 @@ public:
     }
 
     /**
-     * @brief Returns a reference to the element at the given position.
+     * @brief Returns the identifier that occupies the given position.
      * @param pos Position of the element to return.
-     * @return A reference to the requested element.
+     * @return The identifier that occupies the given position.
      */
-    inline const entity_type & operator[](const size_type pos) const ENTT_NOEXCEPT {
+    inline entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
         return cbegin()[pos];
     }
 

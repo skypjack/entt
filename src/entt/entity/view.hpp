@@ -249,11 +249,11 @@ public:
     }
 
     /**
-     * @brief Returns a reference to the element at the given position.
+     * @brief Returns the identifier that occupies the given position.
      * @param pos Position of the element to return.
-     * @return A reference to the requested element.
+     * @return The identifier that occupies the given position.
      */
-    const entity_type & operator[](const size_type pos) const ENTT_NOEXCEPT {
+    entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
         return (*view)[pos];
     }
 
@@ -1101,11 +1101,11 @@ public:
     }
 
     /**
-     * @brief Returns a reference to the element at the given position.
+     * @brief Returns the identifier that occupies the given position.
      * @param pos Position of the element to return.
-     * @return A reference to the requested element.
+     * @return The identifier that occupies the given position.
      */
-    const entity_type & operator[](const size_type pos) const ENTT_NOEXCEPT {
+    entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
         return pool->view_type::operator[](pos);
     }
 
