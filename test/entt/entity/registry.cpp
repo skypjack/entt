@@ -393,18 +393,6 @@ TEST(Registry, StandardView) {
 
 TEST(Registry, PersistentView) {
     entt::registry<> registry;
-    auto view = registry.persistent_view<int, char>();
-
-    ASSERT_TRUE((registry.has_persistent_view<int, char>()));
-    ASSERT_FALSE((registry.has_persistent_view<int, double>()));
-
-    registry.prepare_persistent_view<int, double>();
-
-    ASSERT_TRUE((registry.has_persistent_view<int, double>()));
-
-    registry.discard_persistent_view<int, double>();
-
-    ASSERT_FALSE((registry.has_persistent_view<int, double>()));
 
     const auto e0 = registry.create();
     registry.assign<int>(e0, 0);
@@ -417,6 +405,7 @@ TEST(Registry, PersistentView) {
     registry.assign<int>(e2, 0);
     registry.assign<char>(e2, 'c');
 
+    auto view = registry.persistent_view<int, char>();
     decltype(view)::size_type cnt{0};
     view.each([&cnt](auto...) { ++cnt; });
 
@@ -698,12 +687,12 @@ TEST(Registry, DestroyByComponents) {
 TEST(Registry, SignalsOnAccommodate) {
     entt::registry<> registry;
     const auto entity = registry.create();
+    const auto view = registry.persistent_view<int, char>();
 
-    registry.prepare_persistent_view<int, char>();
     registry.assign<int>(entity);
     registry.accommodate<char>(entity);
 
-    ASSERT_FALSE((registry.persistent_view<int, char>().empty()));
+    ASSERT_FALSE((view.empty()));
 }
 
 TEST(Registry, CreateManyEntitiesAtOnce) {

@@ -56,19 +56,6 @@ TEST(SparseSetNoType, Functionalities) {
     other = std::move(set);
 }
 
-TEST(SparseSetNoType, ElementAccess) {
-    entt::sparse_set<std::uint64_t> set;
-    const auto &cset = set;
-
-    set.construct(42);
-    set.construct(3);
-
-    for(typename entt::sparse_set<std::uint64_t>::size_type i{}; i < set.size(); ++i) {
-        ASSERT_EQ(set[i], i ? 42 : 3);
-        ASSERT_EQ(cset[i], i ? 42 : 3);
-    }
-}
-
 TEST(SparseSetNoType, Iterator) {
     using iterator_type = typename entt::sparse_set<std::uint64_t>::iterator_type;
 
@@ -405,20 +392,7 @@ TEST(SparseSetWithType, Functionalities) {
     other = std::move(set);
 }
 
-TEST(SparseSetWithType, ElementAccess) {
-    entt::sparse_set<std::uint64_t, int> set;
-    const auto &cset = set;
-
-    set.construct(42, 1);
-    set.construct(3, 0);
-
-    for(typename entt::sparse_set<std::uint64_t, int>::size_type i{}; i < set.size(); ++i) {
-        ASSERT_EQ(set[i], i);
-        ASSERT_EQ(cset[i], i);
-    }
-}
-
-TEST(SparseSetWithType, AggregatesMustWork) {
+    TEST(SparseSetWithType, AggregatesMustWork) {
     struct aggregate_type { int value; };
     // the goal of this test is to enforce the requirements for aggregate types
     entt::sparse_set<std::uint64_t, aggregate_type>{}.construct(0, 42);

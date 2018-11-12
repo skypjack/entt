@@ -79,11 +79,43 @@ class persistent_view final {
     using pool_type = sparse_set<Entity, Comp>;
 
     using view_type = sparse_set<Entity>;
+    using persistent_type = sparse_set<Entity, std::array<typename view_type::size_type, sizeof...(Component)>>;
     using pattern_type = std::tuple<pool_type<Component> *...>;
 
-    persistent_view(view_type *view, pool_type<Component> *... pools) ENTT_NOEXCEPT
-        : view{view}, pools{pools...}
+    persistent_view(persistent_type *handler, pool_type<Component> *... pools) ENTT_NOEXCEPT
+        : handler{handler},
+          pools{pools...}
     {}
+
+    template<typename Comp>
+    const pool_type<Comp> * pool() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Comp> *>(pools);
+    }
+
+    const view_type * candidate() const ENTT_NOEXCEPT {
+        return std::min({ static_cast<const view_type *>(pool<Component>())... }, [](const auto *lhs, const auto *rhs) {
+            return lhs->size() < rhs->size();
+        });
+    }
+
+    template<typename Func, std::size_t... Indexes>
+    void each(Func func, std::index_sequence<Indexes...>) const {
+        if(handler->empty()) {
+            const auto *view = candidate();
+
+            std::for_each(view->cbegin(), view->cend(), [func = std::move(func), this](const auto entity) {
+                if((pool<Component>()->has(entity) && ...)) {
+                    const auto &indexes = handler->construct(entity, pool<Component>()->sparse_set<Entity>::get(entity)...);
+                    func(entity, pool<Component>()->raw()[indexes[Indexes]]...);
+                }
+            });
+        } else {
+            std::for_each(handler->view_type::cbegin(), handler->view_type::cend(), [&func, raw = handler->cbegin(), this](const auto entity) mutable {
+                func(entity, pool<Component>()->raw()[(*raw)[Indexes]]...);
+                ++raw;
+            });
+        }
+    }
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -110,7 +142,7 @@ public:
      * @return Number of entities that have the given components.
      */
     size_type size() const ENTT_NOEXCEPT {
-        return view->size();
+        return handler->size();
     }
 
     /**
@@ -118,7 +150,7 @@ public:
      * @return True if the view is empty, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
-        return view->empty();
+        return handler->empty();
     }
 
     /**
@@ -134,7 +166,7 @@ public:
      * @return A pointer to the array of entities.
      */
     const entity_type * data() const ENTT_NOEXCEPT {
-        return view->data();
+        return handler->data();
     }
 
     /**
@@ -152,7 +184,7 @@ public:
      * @return An iterator to the first entity that has the given components.
      */
     const_iterator_type cbegin() const ENTT_NOEXCEPT {
-        return view->cbegin();
+        return handler->view_type::cbegin();
     }
 
     /**
@@ -188,7 +220,7 @@ public:
      * @return An iterator to the first entity that has the given components.
      */
     iterator_type begin() ENTT_NOEXCEPT {
-        return view->begin();
+        return handler->view_type::begin();
     }
 
     /**
@@ -207,7 +239,7 @@ public:
      * given components.
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
-        return view->cend();
+        return handler->view_type::cend();
     }
 
     /**
@@ -245,7 +277,7 @@ public:
      * given components.
      */
     iterator_type end() ENTT_NOEXCEPT {
-        return view->end();
+        return handler->view_type::end();
     }
 
     /**
@@ -254,7 +286,7 @@ public:
      * @return The identifier that occupies the given position.
      */
     entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
-        return (*view)[pos];
+        return handler->view_type::cbegin()[pos];
     }
 
     /**
@@ -263,7 +295,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     bool contains(const entity_type entity) const ENTT_NOEXCEPT {
-        return view->has(entity) && (view->data()[view->get(entity)] == entity);
+        return handler->has(entity) && (handler->view_type::data()[handler->view_type::get(entity)] == entity);
     }
 
     /**
@@ -289,7 +321,7 @@ public:
         assert(contains(entity));
 
         if constexpr(sizeof...(Comp) == 1) {
-            return (std::get<pool_type<Comp> *>(pools)->get(entity), ...);
+            return (pool<Comp>()->get(entity), ...);
         } else {
             return std::tuple<const Comp &...>{get<Comp>(entity)...};
         }
@@ -339,10 +371,8 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func func) const {
-        std::for_each(view->cbegin(), view->cend(), [&func, this](const auto entity) {
-            func(entity, std::get<pool_type<Component> *>(pools)->get(entity)...);
-        });
+    inline void each(Func func) const {
+        each(std::move(func), std::make_index_sequence<sizeof...(Component)>{});
     }
 
     /**
@@ -363,9 +393,36 @@ public:
      */
     template<typename Func>
     inline void each(Func func) {
-        std::as_const(*this).each([&func](const entity_type entity, const Component &... component) {
+        each([&func](const entity_type entity, const Component &... component) {
             func(entity, const_cast<Component &>(component)...);
-        });
+        }, std::make_index_sequence<sizeof...(Component)>{});
+    }
+
+    /**
+     * @brief Initializes the internal data structures used by persistent views.
+     *
+     * Persistent views are an incredibly fast tool used to iterate a packed
+     * array of entities all of which have specific components.<br/>
+     * The initialization of a persistent view is also a pretty cheap operation,
+     * but for the first time they are created. That's mainly because of the
+     * internal data structures of the registry that are dedicated to this kind
+     * of views and that don't exist yet the very first time they are
+     * requested.
+     *
+     * Consider using consistently the `each` member function instead of this
+     * one if in doubt. Initializing the view during an iteration allows to
+     * considerably reduce the cost of this operation.
+     */
+    void initialize() {
+        if(empty()) {
+            const auto *view = candidate();
+
+            std::for_each(view->cbegin(), view->cend(), [this](const auto entity) {
+                if((pool<Component>()->has(entity) && ...)) {
+                    handler->construct(entity, pool<Component>()->sparse_set<Entity>::get(entity)...);
+                }
+            });
+        }
     }
 
     /**
@@ -386,11 +443,11 @@ public:
      */
     template<typename Comp>
     void sort() {
-        view->respect(*std::get<pool_type<Comp> *>(pools));
+        handler->respect(*pool<Comp>());
     }
 
 private:
-    view_type *view;
+    persistent_type *handler;
     const pattern_type pools;
 };
 
@@ -1106,7 +1163,7 @@ public:
      * @return The identifier that occupies the given position.
      */
     entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
-        return pool->view_type::operator[](pos);
+        return pool->view_type::cbegin()[pos];
     }
 
     /**
@@ -1453,7 +1510,7 @@ public:
      * @return A reference to the requested element.
      */
     const raw_type & operator[](const size_type pos) const ENTT_NOEXCEPT {
-        return (*pool)[pos];
+        return pool->cbegin()[pos];
     }
 
     /**

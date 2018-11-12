@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_REGISTRY_HPP
 
 
+#include <array>
 #include <tuple>
 #include <vector>
 #include <memory>
@@ -44,6 +45,9 @@ class registry {
     using signal_type = sigh<void(registry &, const Entity)>;
     using traits_type = entt_traits<Entity>;
 
+    template<std::size_t N>
+    using handler_type = sparse_set<Entity, std::array<typename sparse_set<Entity>::size_type, N>>;
+
     template<typename Component>
     struct component_pool: sparse_set<Entity, Component> {
         component_pool(registry *reg) ENTT_NOEXCEPT
@@ -76,17 +80,27 @@ class registry {
         registry *reg;
     };
 
-    template<auto *Type, typename... Component>
+    template<auto Has, typename... Component>
     static void creating(registry &reg, const Entity entity) {
-        if(reg.has<Component...>(entity)) {
-            reg.handlers[*Type]->construct(entity);
+        if((reg.*Has)(entity)) {
+            auto *handler = static_cast<handler_type<sizeof...(Component)> *>(reg.handlers[handler_family::type<Component...>].get());
+            handler->construct(entity, reg.pool<Component>().sparse_set<Entity>::get(entity)...);
         }
     }
 
-    template<typename... Component>
+    template<typename Comp, std::size_t Index, typename... Component>
     static void destroying(registry &reg, const Entity entity) {
-        auto &handler = *reg.handlers[handler_family::type<Component...>];
-        return handler.has(entity) ? handler.destroy(entity) : void();
+        auto *handler = static_cast<handler_type<sizeof...(Component)> *>(reg.handlers[handler_family::type<Component...>].get());
+        const sparse_set<Entity> &cpool = reg.pool<Comp>();
+        const auto last = *cpool.cbegin();
+
+        if(handler->has(last)) {
+            handler->get(last)[Index] = cpool.get(entity);
+        }
+
+        if(handler->has(entity)) {
+            handler->destroy(entity);
+        }
     }
 
     template<typename Component>
@@ -108,8 +122,8 @@ class registry {
 
     template<typename Comp, std::size_t Index, typename... Component, std::size_t... Indexes>
     void connect(std::index_sequence<Indexes...>) {
-        pool<Comp>().construction().template connect<&registry::creating<&handler_family::type<Component...>, std::tuple_element_t<(Indexes < Index ? Indexes : (Indexes+1)), std::tuple<Component...>>...>>();
-        pool<Comp>().destruction().template connect<&registry::destroying<Component...>>();
+        pool<Comp>().construction().template connect<&registry::creating<&registry::has<std::tuple_element_t<(Indexes < Index ? Indexes : (Indexes+1)), std::tuple<Component...>>...>, Component...>>();
+        pool<Comp>().destruction().template connect<&registry::destroying<Comp, Index, Component...>>();
     }
 
     template<typename... Component, std::size_t... Indexes>
@@ -120,8 +134,8 @@ class registry {
 
     template<typename Comp, std::size_t Index, typename... Component, std::size_t... Indexes>
     void disconnect(std::index_sequence<Indexes...>) {
-        pool<Comp>().construction().template disconnect<&registry::creating<&handler_family::type<Component...>, std::tuple_element_t<(Indexes < Index ? Indexes : (Indexes+1)), std::tuple<Component...>>...>>();
-        pool<Comp>().destruction().template disconnect<&registry::destroying<Component...>>();
+        pool<Comp>().construction().template disconnect<&registry::creating<&registry::has<std::tuple_element_t<(Indexes < Index ? Indexes : (Indexes+1)), std::tuple<Component...>>...>, Component...>>();
+        pool<Comp>().destruction().template disconnect<&registry::destroying<Comp, Index, Component...>>();
     }
 
     template<typename... Component, std::size_t... Indexes>
@@ -869,6 +883,10 @@ public:
     void sort(Compare compare, Sort sort = Sort{}, Args &&... args) {
         assure<Component>();
         pool<Component>().sort(std::move(compare), std::move(sort), std::forward<Args>(args)...);
+
+        std::for_each(handlers.begin(), handlers.end(), [](auto &handler) {
+            return handler ? handler->reset() : void();
+        });
     }
 
     /**
@@ -906,6 +924,10 @@ public:
         assure<To>();
         assure<From>();
         pool<To>().respect(pool<From>());
+
+        std::for_each(handlers.begin(), handlers.end(), [](auto &handler) {
+            return handler ? handler->reset() : void();
+        });
     }
 
     /**
@@ -1091,77 +1113,6 @@ public:
     }
 
     /**
-     * @brief Prepares the internal data structures used by persistent views.
-     *
-     * Persistent views are an incredibly fast tool used to iterate a packed
-     * array of entities all of which have specific components.<br/>
-     * The initialization of a persistent view is also a pretty cheap operation,
-     * but for the first time they are created. That's mainly because of the
-     * internal data structures of the registry that are dedicated to this kind
-     * of views and that don't exist yet the very first time they are
-     * requested.<br/>
-     * To avoid costly operations, internal data structures for persistent views
-     * can be prepared with this function. Just use the same set of components
-     * that would have been used otherwise to construct the view.
-     *
-     * @tparam Component Types of components used to prepare the view.
-     */
-    template<typename... Component>
-    void prepare_persistent_view() {
-        static_assert(sizeof...(Component) > 1);
-        const auto htype = handler_family::type<Component...>;
-
-        if(!(htype < handlers.size())) {
-            handlers.resize(htype + 1);
-        }
-
-        if(!handlers[htype]) {
-            connect<Component...>(std::make_index_sequence<sizeof...(Component)>{});
-            handlers[htype] = std::make_unique<sparse_set<entity_type>>();
-            auto &handler = *handlers[htype];
-
-            for(auto entity: view<Component...>()) {
-                handler.construct(entity);
-            }
-        }
-    }
-
-    /**
-     * @brief Discards all the data structures used for a given persitent view.
-     *
-     * Persistent views occupy memory, no matter if they are in use or not.<br/>
-     * This function can be used to discard all the internal data structures
-     * dedicated to a specific persistent view, with the goal of reducing the
-     * memory pressure.
-     *
-     * @warning
-     * Attempting to use a persistent view created before calling this function
-     * results in undefined behavior. No assertion available in this case,
-     * neither in debug mode nor in release mode.
-     *
-     * @tparam Component Types of components of the persistent view.
-     */
-    template<typename... Component>
-    void discard_persistent_view() {
-        if(has_persistent_view<Component...>()) {
-            disconnect<Component...>(std::make_index_sequence<sizeof...(Component)>{});
-            handlers[handler_family::type<Component...>].reset();
-        }
-    }
-
-    /**
-     * @brief Checks if a persistent view has already been prepared.
-     * @tparam Component Types of components of the persistent view.
-     * @return True if the view has already been prepared, false otherwise.
-     */
-    template<typename... Component>
-    bool has_persistent_view() const ENTT_NOEXCEPT {
-        static_assert(sizeof...(Component) > 1);
-        const auto htype = handler_family::type<Component...>;
-        return (htype < handlers.size() && handlers[htype]);
-    }
-
-    /**
      * @brief Returns a persistent view for the given components.
      *
      * This kind of views are created on the fly and share with the registry its
@@ -1202,9 +1153,25 @@ public:
      */
     template<typename... Component>
     entt::persistent_view<Entity, Component...> persistent_view() {
-        prepare_persistent_view<Component...>();
-        (assure<Component>(), ...);
-        return { handlers[handler_family::type<Component...>].get(), &pool<Component>()... };
+        static_assert(sizeof...(Component) > 1);
+        const auto htype = handler_family::type<Component...>;
+
+        if(!(htype < handlers.size() && handlers[htype])) {
+            if(!(htype < handlers.size())) {
+                handlers.resize(htype + 1);
+            }
+
+            if(!handlers[htype]) {
+                (assure<Component>(), ...);
+                connect<Component...>(std::make_index_sequence<sizeof...(Component)>{});
+                handlers[htype] = std::make_unique<handler_type<sizeof...(Component)>>();
+            }
+        }
+
+        return {
+            static_cast<handler_type<sizeof...(Component)> *>(handlers[htype].get()),
+            &pool<Component>()...
+        };
     }
 
     /**

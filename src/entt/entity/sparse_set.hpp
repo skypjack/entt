@@ -367,15 +367,6 @@ public:
     }
 
     /**
-     * @brief Returns the identifier that occupies the given position.
-     * @param pos Position of the element to return.
-     * @return The identifier that occupies the given position.
-     */
-    inline entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
-        return cbegin()[pos];
-    }
-
-    /**
      * @brief Checks if a sparse set contains an entity.
      * @param entity A valid entity identifier.
      * @return True if the sparse set contains the entity, false otherwise.
@@ -860,24 +851,6 @@ public:
      */
     iterator_type end() ENTT_NOEXCEPT {
         return iterator_type{&instances, {}};
-    }
-
-    /**
-     * @brief Returns a reference to the element at the given position.
-     * @param pos Position of the element to return.
-     * @return A reference to the requested element.
-     */
-    inline const object_type & operator[](const size_type pos) const ENTT_NOEXCEPT {
-        return cbegin()[pos];
-    }
-
-    /**
-     * @brief Returns a reference to the element at the given position.
-     * @param pos Position of the element to return.
-     * @return A reference to the requested element.
-     */
-    inline object_type & operator[](const size_type pos) ENTT_NOEXCEPT {
-        return const_cast<object_type &>(std::as_const(*this).operator[](pos));
     }
 
     /**

@@ -820,9 +820,9 @@ All of them have pros and cons to take in consideration. In particular:
   * They work out-of-the-box and don't require any dedicated data structure.
   * Creating and destroying them isn't expensive at all because they don't have
     any type of initialization.
-  * They are the best tool for iterating entities for a single component.
-  * They are the best tool for iterating entities for multiple components when
-    one of the components is assigned to a significantly low number of entities.
+  * They are the best tool for iterating a single component.
+  * They are the best tool for iterating multiple components when one of them is
+    assigned to a significantly low number of entities.
   * They don't affect any other operations of the registry.
 
   Cons:
@@ -834,20 +834,22 @@ All of them have pros and cons to take in consideration. In particular:
 
   Pros:
 
-  * Once prepared, creating and destroying them isn't expensive at all because
-    they don't have any type of initialization.
-  * They are the best tool for iterating entities for multiple components when
-    most entities have them all.
+  * Creating and destroying them isn't expensive at all because they don't have
+    any type of initialization.
+  * They are the best tool for iterating multiple components when most entities
+    have them all.
 
   Cons:
 
   * They have dedicated data structures and thus affect the memory usage to a
     minimal extent.
-  * If not previously prepared, the first time they are used they go through an
-    initialization step that could take a while.
+  * If not previously initialized, the first time they are used they go through
+    an initialization step that is slightly more expensive.
   * They affect to a minimum the creation and destruction of entities and
     components. In other terms: the more persistent views there will be, the
     less performing will be creating and destroying entities and components.
+  * They don't perform well if the `sort` member function of a registry is
+    invoked frequently (but this shouldn't be the case in general).
 
 * Raw views:
 
@@ -885,19 +887,16 @@ To sum up and as a rule of thumb:
 * Use a raw view to iterate components only (no entities) for a given type.
 * Use a standard view to iterate entities and components for a single type.
 * Use a standard view to iterate entities and components for multiple types when
-  the number of types is low. Standard views are really optimized and persistent
+  a significantly low number of entities have one of the components, persistent
   views won't add much in this case.
-* Use a standard view to iterate entities and components for multiple types when
-  a significantly low number of entities have one of the components.
 * Use a standard view in all those cases where a persistent view would give a
-  boost to performance but the iteration isn't performed frequently.
-* Prepare and use a persistent view when you want to iterate only entities for
-  multiple components.
-* Prepare and use a persistent view when you want to iterate entities for
-  multiple components and each component is assigned to a great number of
-  entities but the intersection between the sets of entities is small.
-* Prepare and use a persistent view in all the cases where a standard view
-  wouldn't fit well otherwise.
+  boost to performance but the iteration isn't performed frequently or isn't on
+  a critical path.
+* Use a persistent view when you want to iterate multiple components and each
+  component is assigned to a great number of entities but the intersection
+  between the sets of entities is small.
+* Use a persistent view in all the cases where a standard view wouldn't fit well
+  otherwise.
 * Finally, in case you don't know at compile-time what are the components to
   use, choose a runtime view and set them during execution.
 
@@ -1025,7 +1024,7 @@ tightly packed in memory for fast iterations.<br/>
 In general, persistent views don't stay true to the order of any set of
 components unless users explicitly sort them.
 
-Persistent views can be used only to iterate multiple components:
+Persistent views can be used only to iterate multiple components at once:
 
 ```cpp
 auto view = registry.persistent_view<position, velocity>();
@@ -1034,19 +1033,7 @@ auto view = registry.persistent_view<position, velocity>();
 There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
 fact, they return newly created and correctly initialized iterators whenever
-`begin` or `end` are invoked.<br/>
-That being said, persistent views perform an initialization step the very first
-time they are constructed and this could be quite costly. To avoid it, consider
-asking to the registry to _prepare_ them when no entities have been created yet:
-
-```cpp
-registry.prepare_persistent_view<position, velocity>();
-```
-
-If the registry is empty, preparation is extremely fast. Moreover the
-`prepare_persistent_view` member function template is idempotent. Feel free to
-invoke it even more than once: if the view has been already prepared before, the
-function returns immediately and does nothing.
+`begin` or `end` are invoked.
 
 A persistent view offers a bunch of functionalities to get the number of
 entities it's going to return, a raw access to the entity list and the
@@ -1054,6 +1041,18 @@ possibility to sort the underlying data structures according to the order of one
 of the components for which it has been constructed. It's also possible to ask a
 view if it contains a given entity.<br/>
 Refer to the inline documentation for all the details.
+
+The underlying data structure of a persistent view is initialized through a
+slightly slower iteration the first time the `each` member function is invoked
+or by means of an explicit call to the `initialize` member function. An
+uninitialized persistent view is empty and has a size of zero.<br/>
+Once initialized, these data structures are kept up-to-date automatically,
+unless users invoke the sort functionalities made available by the registry. The
+reasons behind this limit go beyond the purposes of the document. However, keep
+in mind that all the data structures otherwise supporting persistent views are
+discarded in this case and they must be reinitialized somehow.<br/>
+For reasons of clarity, sorting a persistent view has no side effects and the
+view won't need to be reinitialized in this case.
 
 To iterate a persistent view, either use it in a range-for loop:
 
@@ -1081,8 +1080,8 @@ registry.persistent_view<position, velocity>().each([](auto entity, auto &pos, a
 });
 ```
 
-Performance are more or less the same. The best approach depends mainly on
-whether all the components have to be accessed or not.
+The `each` member function is highly optimized. Unless users want to iterate
+only entities, using `each` should be the preferred approach.
 
 **Note**: prefer the `get` member function of a view instead of the `get` member
 function template of a registry during iterations, if possible. However, keep in
