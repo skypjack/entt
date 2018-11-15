@@ -85,7 +85,7 @@ class meta_factory {
     }
 
     template<typename... Property>
-    meta_factory<Type> type(hashed_string name, Property &&... property) ENTT_NOEXCEPT {
+    meta_factory type(hashed_string name, Property &&... property) ENTT_NOEXCEPT {
         static internal::meta_type_node node{
             name,
             internal::meta_info<>::type,
@@ -129,7 +129,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename Base>
-    meta_factory & base() ENTT_NOEXCEPT {
+    meta_factory base() ENTT_NOEXCEPT {
         static_assert(std::is_base_of_v<Base, Type>);
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -162,7 +162,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename To>
-    meta_factory & conv() ENTT_NOEXCEPT {
+    meta_factory conv() ENTT_NOEXCEPT {
         static_assert(std::is_convertible_v<Type, std::decay_t<To>>);
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -200,7 +200,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Func, typename... Property>
-    meta_factory & ctor(Property &&... property) ENTT_NOEXCEPT {
+    meta_factory ctor(Property &&... property) ENTT_NOEXCEPT {
         using helper_type = internal::meta_function_helper<std::integral_constant<decltype(Func), Func>>;
         static_assert(std::is_same_v<typename helper_type::return_type, Type>);
         auto * const type = internal::meta_info<Type>::resolve();
@@ -239,7 +239,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename... Args, typename... Property>
-    meta_factory & ctor(Property &&... property) ENTT_NOEXCEPT {
+    meta_factory ctor(Property &&... property) ENTT_NOEXCEPT {
         using helper_type = internal::meta_function_helper<Type(Args...)>;
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -281,7 +281,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto *Func>
-    meta_factory & dtor() ENTT_NOEXCEPT {
+    meta_factory dtor() ENTT_NOEXCEPT {
         static_assert(std::is_invocable_v<decltype(Func), Type &>);
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -320,7 +320,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Data, typename... Property>
-    meta_factory & data(const char *str, Property &&... property) ENTT_NOEXCEPT {
+    meta_factory data(const char *str, Property &&... property) ENTT_NOEXCEPT {
         auto * const type = internal::meta_info<Type>::resolve();
 
         if constexpr(std::is_same_v<Type, decltype(Data)>) {
@@ -389,7 +389,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Setter, auto Getter, typename... Property>
-    meta_factory & data(const char *str, Property &&... property) ENTT_NOEXCEPT {
+    meta_factory data(const char *str, Property &&... property) ENTT_NOEXCEPT {
         using data_type = std::invoke_result_t<decltype(Getter), Type &>;
         static_assert(std::is_invocable_v<decltype(Setter), Type &, data_type>);
         auto * const type = internal::meta_info<Type>::resolve();
@@ -432,7 +432,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Func, typename... Property>
-    meta_factory & func(const char *str, Property &&... property) ENTT_NOEXCEPT {
+    meta_factory func(const char *str, Property &&... property) ENTT_NOEXCEPT {
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_func_node node{
