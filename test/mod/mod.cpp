@@ -27,7 +27,7 @@ duk_ret_t set(duk_context *ctx, entt::registry<> &registry) {
     if constexpr(std::is_same_v<Comp, position>) {
         const auto x = duk_require_number(ctx, 2);
         const auto y = duk_require_number(ctx, 3);
-        registry.accommodate<position>(entity, x, y);
+        registry.assign_or_replace<position>(entity, x, y);
     } else if constexpr(std::is_same_v<Comp, duktape_runtime>) {
         const auto type = duk_require_uint(ctx, 1);
 
@@ -41,7 +41,7 @@ duk_ret_t set(duk_context *ctx, entt::registry<> &registry) {
 
         duk_pop(ctx);
     } else {
-        registry.accommodate<Comp>(entity);
+        registry.assign_or_replace<Comp>(entity);
     }
 
     return 0;

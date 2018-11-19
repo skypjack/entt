@@ -771,7 +771,7 @@ public:
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    Component & accommodate(const entity_type entity, Args &&... args) {
+    Component & assign_or_replace(const entity_type entity, Args &&... args) {
         assure<Component>();
         auto &cpool = pool<Component>();
 

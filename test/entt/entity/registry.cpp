@@ -96,8 +96,8 @@ TEST(Registry, Functionalities) {
 
     const auto e2 = registry.create();
 
-    registry.accommodate<int>(e2, registry.get<int>(e0));
-    registry.accommodate<char>(e2, registry.get<char>(e0));
+    registry.assign_or_replace<int>(e2, registry.get<int>(e0));
+    registry.assign_or_replace<char>(e2, registry.get<char>(e0));
 
     ASSERT_TRUE(registry.has<int>(e2));
     ASSERT_TRUE(registry.has<char>(e2));
@@ -123,8 +123,8 @@ TEST(Registry, Functionalities) {
     ASSERT_NO_THROW(registry.replace<int>(e0, 0));
     ASSERT_EQ(registry.get<int>(e0), 0);
 
-    ASSERT_NO_THROW(registry.accommodate<int>(e0, 1));
-    ASSERT_NO_THROW(registry.accommodate<int>(e1, 1));
+    ASSERT_NO_THROW(registry.assign_or_replace<int>(e0, 1));
+    ASSERT_NO_THROW(registry.assign_or_replace<int>(e1, 1));
     ASSERT_EQ(static_cast<const entt::registry<> &>(registry).get<int>(e0), 1);
     ASSERT_EQ(static_cast<const entt::registry<> &>(registry).get<int>(e1), 1);
 
@@ -690,7 +690,7 @@ TEST(Registry, SignalsOnAccommodate) {
     const auto view = registry.persistent_view<int, char>();
 
     registry.assign<int>(entity);
-    registry.accommodate<char>(entity);
+    registry.assign_or_replace<char>(entity);
 
     ASSERT_FALSE((view.empty()));
 }

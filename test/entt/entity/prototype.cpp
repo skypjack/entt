@@ -66,7 +66,7 @@ TEST(Prototype, SameRegistry) {
     ASSERT_EQ(registry.get<char>(e0), '*');
 
     registry.get<char>(e1) = '*';
-    prototype.accommodate(e1);
+    prototype.assign_or_replace(e1);
 
     ASSERT_EQ(registry.get<char>(e1), 'c');
 }
@@ -126,7 +126,7 @@ TEST(Prototype, OtherRegistry) {
     ASSERT_EQ(registry.get<char>(e0), '*');
 
     registry.get<char>(e1) = '*';
-    prototype.accommodate(registry, e1);
+    prototype.assign_or_replace(registry, e1);
 
     ASSERT_EQ(registry.get<char>(e1), 'c');
 }

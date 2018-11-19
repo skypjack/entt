@@ -98,7 +98,7 @@ struct actor {
      */
     template<typename Component, typename... Args>
     Component & assign(Args &&... args) {
-        return reg->template accommodate<Component>(entt, std::forward<Args>(args)...);
+        return reg->template assign_or_replace<Component>(entt, std::forward<Args>(args)...);
     }
 
     /**

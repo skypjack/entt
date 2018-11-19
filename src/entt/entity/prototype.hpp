@@ -45,7 +45,7 @@ class prototype final {
     struct component_wrapper { Component component; };
 
     struct component_handler {
-        basic_fn_type *accommodate;
+        basic_fn_type *assign_or_replace;
         basic_fn_type *assign;
     };
 
@@ -132,9 +132,9 @@ public:
      */
     template<typename Component, typename... Args>
     Component & set(Args &&... args) {
-        basic_fn_type *accommodate = [](const prototype &prototype, registry<Entity> &other, const Entity dst) {
+        basic_fn_type *assign_or_replace = [](const prototype &prototype, registry<Entity> &other, const Entity dst) {
             const auto &wrapper = prototype.reg->template get<component_wrapper<Component>>(prototype.entity);
-            other.template accommodate<Component>(dst, wrapper.component);
+            other.template assign_or_replace<Component>(dst, wrapper.component);
         };
 
         basic_fn_type *assign = [](const prototype &prototype, registry<Entity> &other, const Entity dst) {
@@ -144,8 +144,8 @@ public:
             }
         };
 
-        handlers[reg->template type<Component>()] = component_handler{accommodate, assign};
-        auto &wrapper = reg->template accommodate<component_wrapper<Component>>(entity, Component{std::forward<Args>(args)...});
+        handlers[reg->template type<Component>()] = component_handler{assign_or_replace, assign};
+        auto &wrapper = reg->template assign_or_replace<component_wrapper<Component>>(entity, Component{std::forward<Args>(args)...});
         return wrapper.component;
     }
 
@@ -355,9 +355,9 @@ public:
      * @param other A valid reference to a registry.
      * @param dst A valid entity identifier.
      */
-    void accommodate(registry_type &other, const entity_type dst) const {
+    void assign_or_replace(registry_type &other, const entity_type dst) const {
         for(auto &handler: handlers) {
-            handler.second.accommodate(*this, other, dst);
+            handler.second.assign_or_replace(*this, other, dst);
         }
     }
 
@@ -379,8 +379,8 @@ public:
      *
      * @param dst A valid entity identifier.
      */
-    inline void accommodate(const entity_type dst) const {
-        accommodate(*reg, dst);
+    inline void assign_or_replace(const entity_type dst) const {
+        assign_or_replace(*reg, dst);
     }
 
     /**

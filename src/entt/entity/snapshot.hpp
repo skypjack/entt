@@ -500,7 +500,7 @@ public:
     template<typename... Component, typename Archive, typename... Type, typename... Member>
     continuous_loader & component(Archive &archive, Member Type:: *... member) {
         auto apply = [this](const auto entity, const auto &component) {
-            reg.template accommodate<std::decay_t<decltype(component)>>(entity, component);
+            reg.template assign_or_replace<std::decay_t<decltype(component)>>(entity, component);
         };
 
         (reset<Component>(), ...);

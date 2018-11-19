@@ -195,21 +195,21 @@ vel.dy = 0.;
 ```
 
 In case users want to assign a component to an entity, but it's unknown whether
-the entity already has it or not, `accommodate` does the work in a single call
-(there is a performance penalty to pay for this mainly due to the fact that it
-has to check if the entity already has the given component or not):
+the entity already has it or not, `assign_or_replace` does the work in a single
+call (there is a performance penalty to pay for this mainly due to the fact that
+it has to check if the entity already has the given component or not):
 
 ```cpp
-registry.accommodate<position>(entity, 0., 0.);
+registry.assign_or_replace<position>(entity, 0., 0.);
 
 // ...
 
-auto &velocity = registry.accommodate<velocity>(entity);
+auto &velocity = registry.assign_or_replace<velocity>(entity);
 vel.dx = 0.;
 vel.dy = 0.;
 ```
 
-Note that `accommodate` is a slightly faster alternative for the following
+Note that `assign_or_replace` is a slightly faster alternative for the following
 `if/else` statement and nothing more:
 
 ```cpp
@@ -716,7 +716,7 @@ Creating an entity from a prototype is straightforward:
 * Finally, to assign or replace all the components for an entity, thus
   overwriting existing ones:
   ```cpp
-  prototype.accommodate(entity);
+  prototype.assign_or_replace(entity);
   ```
 
 In the examples above, the prototype uses its underlying registry to create
