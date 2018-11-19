@@ -21,13 +21,13 @@ TEST(Prototype, SameRegistry) {
     ASSERT_EQ(std::get<0>(prototype.get<int, char>()), 3);
     ASSERT_EQ(std::get<1>(cprototype.get<int, char>()), 'c');
 
-    ASSERT_NE(prototype.get_if<int>(), nullptr);
-    ASSERT_NE(prototype.get_if<char>(), nullptr);
-    ASSERT_EQ(prototype.get_if<double>(), nullptr);
-    ASSERT_EQ(*prototype.get_if<int>(), 3);
-    ASSERT_EQ(*cprototype.get_if<char>(), 'c');
-    ASSERT_EQ(*std::get<0>(prototype.get_if<int, char, double>()), 3);
-    ASSERT_EQ(*std::get<1>(cprototype.get_if<int, char, double>()), 'c');
+    ASSERT_NE(prototype.try_get<int>(), nullptr);
+    ASSERT_NE(prototype.try_get<char>(), nullptr);
+    ASSERT_EQ(prototype.try_get<double>(), nullptr);
+    ASSERT_EQ(*prototype.try_get<int>(), 3);
+    ASSERT_EQ(*cprototype.try_get<char>(), 'c');
+    ASSERT_EQ(*std::get<0>(prototype.try_get<int, char, double>()), 3);
+    ASSERT_EQ(*std::get<1>(cprototype.try_get<int, char, double>()), 'c');
 
     const auto e0 = prototype.create();
 

@@ -146,8 +146,8 @@ struct actor {
      * @return Pointers to the components owned by the actor.
      */
     template<typename... Component>
-    auto get_if() const ENTT_NOEXCEPT {
-        return std::as_const(*reg).template get_if<Component...>(entt);
+    auto try_get() const ENTT_NOEXCEPT {
+        return std::as_const(*reg).template try_get<Component...>(entt);
     }
 
     /**
@@ -156,8 +156,8 @@ struct actor {
      * @return Pointers to the components owned by the actor.
      */
     template<typename... Component>
-    auto get_if() ENTT_NOEXCEPT {
-        return reg->template get_if<Component...>(entt);
+    auto try_get() ENTT_NOEXCEPT {
+        return reg->template try_get<Component...>(entt);
     }
 
     /**

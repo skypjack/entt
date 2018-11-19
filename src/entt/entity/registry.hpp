@@ -688,13 +688,13 @@ public:
      * @return Pointers to the components owned by the entity.
      */
     template<typename... Component>
-    auto get_if([[maybe_unused]] const entity_type entity) const ENTT_NOEXCEPT {
+    auto try_get([[maybe_unused]] const entity_type entity) const ENTT_NOEXCEPT {
         assert(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return managed<Component...>() ? pool<Component...>().get_if(entity) : nullptr;
+            return managed<Component...>() ? pool<Component...>().try_get(entity) : nullptr;
         } else {
-            return std::tuple<const Component *...>{get_if<Component>(entity)...};
+            return std::tuple<const Component *...>{try_get<Component>(entity)...};
         }
     }
 
@@ -711,11 +711,11 @@ public:
      * @return Pointers to the components owned by the entity.
      */
     template<typename... Component>
-    inline auto get_if([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
+    inline auto try_get([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 1) {
-            return (const_cast<Component *>(std::as_const(*this).template get_if<Component>(entity)), ...);
+            return (const_cast<Component *>(std::as_const(*this).template try_get<Component>(entity)), ...);
         } else {
-            return std::tuple<Component *...>{get_if<Component>(entity)...};
+            return std::tuple<Component *...>{try_get<Component>(entity)...};
         }
     }
 

@@ -890,7 +890,7 @@ public:
      * @param entity A valid entity identifier.
      * @return The object associated with the entity, if any.
      */
-    const object_type * get_if(const entity_type entity) const ENTT_NOEXCEPT {
+    const object_type * try_get(const entity_type entity) const ENTT_NOEXCEPT {
         return underlying_type::has(entity) ? (instances.data() + underlying_type::get(entity)) : nullptr;
     }
 
@@ -899,8 +899,8 @@ public:
      * @param entity A valid entity identifier.
      * @return The object associated with the entity, if any.
      */
-    inline object_type * get_if(const entity_type entity) ENTT_NOEXCEPT {
-        return const_cast<object_type *>(std::as_const(*this).get_if(entity));
+    inline object_type * try_get(const entity_type entity) ENTT_NOEXCEPT {
+        return const_cast<object_type *>(std::as_const(*this).try_get(entity));
     }
 
     /**

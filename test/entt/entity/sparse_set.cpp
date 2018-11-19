@@ -364,6 +364,8 @@ TEST(SparseSetWithType, Functionalities) {
     ASSERT_TRUE(set.has(42));
     ASSERT_TRUE(set.fast(42));
     ASSERT_EQ(set.get(42), 3);
+    ASSERT_EQ(*set.try_get(42), 3);
+    ASSERT_EQ(set.try_get(99), nullptr);
 
     set.destroy(42);
 
@@ -377,6 +379,8 @@ TEST(SparseSetWithType, Functionalities) {
     set.construct(42, 12);
 
     ASSERT_EQ(set.get(42), 12);
+    ASSERT_EQ(*set.try_get(42), 12);
+    ASSERT_EQ(set.try_get(99), nullptr);
 
     set.reset();
 
@@ -392,7 +396,7 @@ TEST(SparseSetWithType, Functionalities) {
     other = std::move(set);
 }
 
-    TEST(SparseSetWithType, AggregatesMustWork) {
+TEST(SparseSetWithType, AggregatesMustWork) {
     struct aggregate_type { int value; };
     // the goal of this test is to enforce the requirements for aggregate types
     entt::sparse_set<std::uint64_t, aggregate_type>{}.construct(0, 42);

@@ -75,12 +75,12 @@ TEST(Registry, Functionalities) {
     ASSERT_FALSE((registry.has<int, char>(e0)));
     ASSERT_TRUE((registry.has<int, char>(e1)));
 
-    ASSERT_EQ(registry.get_if<int>(e0), nullptr);
-    ASSERT_NE(registry.get_if<int>(e1), nullptr);
-    ASSERT_EQ(registry.get_if<char>(e0), nullptr);
-    ASSERT_NE(registry.get_if<char>(e1), nullptr);
-    ASSERT_EQ(registry.get_if<double>(e0), nullptr);
-    ASSERT_EQ(registry.get_if<double>(e1), nullptr);
+    ASSERT_EQ(registry.try_get<int>(e0), nullptr);
+    ASSERT_NE(registry.try_get<int>(e1), nullptr);
+    ASSERT_EQ(registry.try_get<char>(e0), nullptr);
+    ASSERT_NE(registry.try_get<char>(e1), nullptr);
+    ASSERT_EQ(registry.try_get<double>(e0), nullptr);
+    ASSERT_EQ(registry.try_get<double>(e1), nullptr);
 
     ASSERT_EQ(registry.assign<int>(e0, 42), 42);
     ASSERT_EQ(registry.assign<char>(e0, 'c'), 'c');
@@ -104,16 +104,16 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.get<int>(e0), 42);
     ASSERT_EQ(registry.get<char>(e0), 'c');
 
-    ASSERT_NE(registry.get_if<int>(e0), nullptr);
-    ASSERT_NE(registry.get_if<char>(e0), nullptr);
-    ASSERT_EQ(registry.get_if<double>(e0), nullptr);
-    ASSERT_EQ(*registry.get_if<int>(e0), 42);
-    ASSERT_EQ(*registry.get_if<char>(e0), 'c');
+    ASSERT_NE(registry.try_get<int>(e0), nullptr);
+    ASSERT_NE(registry.try_get<char>(e0), nullptr);
+    ASSERT_EQ(registry.try_get<double>(e0), nullptr);
+    ASSERT_EQ(*registry.try_get<int>(e0), 42);
+    ASSERT_EQ(*registry.try_get<char>(e0), 'c');
 
     ASSERT_EQ(std::get<0>(registry.get<int, char>(e0)), 42);
-    ASSERT_EQ(*std::get<0>(registry.get_if<int, char, double>(e0)), 42);
+    ASSERT_EQ(*std::get<0>(registry.try_get<int, char, double>(e0)), 42);
     ASSERT_EQ(std::get<1>(static_cast<const entt::registry<> &>(registry).get<int, char>(e0)), 'c');
-    ASSERT_EQ(*std::get<1>(static_cast<const entt::registry<> &>(registry).get_if<int, char, double>(e0)), 'c');
+    ASSERT_EQ(*std::get<1>(static_cast<const entt::registry<> &>(registry).try_get<int, char, double>(e0)), 'c');
 
     ASSERT_EQ(registry.get<int>(e0), registry.get<int>(e2));
     ASSERT_EQ(registry.get<char>(e0), registry.get<char>(e2));

@@ -21,12 +21,12 @@ TEST(Actor, Component) {
     ASSERT_EQ(&cchar, &cactor.get<char>());
     ASSERT_EQ(&cint, &std::get<0>(actor.get<int, char>()));
     ASSERT_EQ(&cchar, &std::get<1>(actor.get<int, char>()));
-    ASSERT_EQ(&cint, std::get<0>(actor.get_if<int, char, double>()));
-    ASSERT_EQ(&cchar, std::get<1>(actor.get_if<int, char, double>()));
-    ASSERT_EQ(nullptr, std::get<2>(actor.get_if<int, char, double>()));
-    ASSERT_EQ(nullptr, actor.get_if<double>());
-    ASSERT_EQ(&cchar, actor.get_if<char>());
-    ASSERT_EQ(&cint, actor.get_if<int>());
+    ASSERT_EQ(&cint, std::get<0>(actor.try_get<int, char, double>()));
+    ASSERT_EQ(&cchar, std::get<1>(actor.try_get<int, char, double>()));
+    ASSERT_EQ(nullptr, std::get<2>(actor.try_get<int, char, double>()));
+    ASSERT_EQ(nullptr, actor.try_get<double>());
+    ASSERT_EQ(&cchar, actor.try_get<char>());
+    ASSERT_EQ(&cint, actor.try_get<int>());
 
     ASSERT_FALSE(registry.empty<int>());
     ASSERT_FALSE(registry.empty());

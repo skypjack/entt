@@ -217,12 +217,12 @@ public:
      * @return Pointers to the components owned by the prototype.
      */
     template<typename... Component>
-    auto get_if() const ENTT_NOEXCEPT {
+    auto try_get() const ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 1) {
-            const auto *wrapper = reg->template get_if<component_wrapper<Component...>>(entity);
+            const auto *wrapper = reg->template try_get<component_wrapper<Component...>>(entity);
             return wrapper ? &wrapper->component : nullptr;
         } else {
-            return std::tuple<const Component *...>{get_if<Component>()...};
+            return std::tuple<const Component *...>{try_get<Component>()...};
         }
     }
 
@@ -232,11 +232,11 @@ public:
      * @return Pointers to the components owned by the prototype.
      */
     template<typename... Component>
-    inline auto get_if() ENTT_NOEXCEPT {
+    inline auto try_get() ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 1) {
-            return (const_cast<Component *>(std::as_const(*this).template get_if<Component>()), ...);
+            return (const_cast<Component *>(std::as_const(*this).template try_get<Component>()), ...);
         } else {
-            return std::tuple<Component *...>{get_if<Component>()...};
+            return std::tuple<Component *...>{try_get<Component>()...};
         }
     }
 
