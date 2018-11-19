@@ -157,13 +157,17 @@ TEST(Registry, Functionalities) {
 
     const auto e3 = registry.create();
 
-    registry.assign<int>(e3);
-    registry.assign<char>(e3);
+    ASSERT_EQ(registry.get<int>(e3, 3), 3);
+    ASSERT_EQ(registry.get<char>(e3, 'c'), 'c');
 
     ASSERT_EQ(registry.size<int>(), entt::registry<>::size_type{1});
     ASSERT_EQ(registry.size<char>(), entt::registry<>::size_type{1});
     ASSERT_FALSE(registry.empty<int>());
     ASSERT_FALSE(registry.empty<char>());
+    ASSERT_TRUE(registry.has<int>(e3));
+    ASSERT_TRUE(registry.has<char>(e3));
+    ASSERT_EQ(registry.get<int>(e3), 3);
+    ASSERT_EQ(registry.get<char>(e3), 'c');
 
     ASSERT_NO_THROW(registry.reset<int>());
 

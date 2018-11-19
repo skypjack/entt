@@ -676,6 +676,38 @@ public:
     }
 
     /**
+     * @brief Returns a reference to the given component for an entity.
+     *
+     * In case the entity doesn't own the component, the value provided will be
+     * used to construct it.<br/>
+     * Equivalent to the following snippet (pseudocode):
+     *
+     * @code{.cpp}
+     * auto &component = registry.has<Component>(entity) ? registry.get<Component>(entity) : registry.assign<Component>(entity, value);
+     * @endcode
+     *
+     * Prefer this function anyway because it has slightly better performance.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @tparam Component Type of component to get.
+     * @param entity A valid entity identifier.
+     * @param component Instance to use to construct the component.
+     * @return Reference to the component owned by the entity.
+     */
+    template<typename Component>
+    Component & get(const entity_type entity, Component &&component) ENTT_NOEXCEPT {
+        assert(valid(entity));
+        assure<Component>();
+        auto &cpool = pool<Component>();
+        auto *comp = cpool.try_get(entity);
+        return comp ? *comp : cpool.construct(entity, std::forward<Component>(component));
+    }
+
+    /**
      * @brief Returns pointers to the given components for an entity.
      *
      * @warning
