@@ -25,13 +25,14 @@
     * [Dependency function](#dependency-function)
     * [Labels](#labels)
   * [Null entity](#null-entity)
-* [View: to persist or not to persist?](#view-to-persist-or-not-to-persist)
+* [Views: pay for what you use](#views-pay-for-what-you-use)
   * [Standard View](#standard-view)
     * [Single component standard view](#single-component-standard-view)
     * [Multi component standard view](#multi-component-standard-view)
   * [Persistent View](#persistent-view)
   * [Raw View](#raw-view)
   * [Runtime View](#runtime-view)
+  * [Types: const, non-const and all in between](#types-const-non-const-and-all-in-between)
   * [Give me everything](#give-me-everything)
 * [Iterations: what is allowed and what is not](#iterations-what-is-allowed-and-what-is-not)
 * [Multithreading](#multithreading)
@@ -798,7 +799,7 @@ const auto entity = registry.create();
 const bool null = (entity == entt::null);
 ```
 
-# View: to persist or not to persist?
+# Views: pay for what you use
 
 First of all, it is worth answering an obvious question: why views?<br/>
 Roughly speaking, they are a good tool to enforce single responsibility. A
@@ -1185,6 +1186,60 @@ well suited to plugin systems and mods in general. Where possible, don't use
 runtime views, as their performance are slightly inferior to those of the other
 views.
 
+# Types: const, non-const and all in between
+
+The `registry` class offers two overloads for most of the member functions used
+to construct views: a const one and a non-const one. The former accepts both
+const and non-const types as template parameters, the latter accepts only const
+types instead.<br/>
+It means that views can be constructed also from a const registry and they
+require to propagate the constness of the registry to the types used to
+construct the views themselves:
+
+```cpp
+entt::view<const position, const velocity> view = std::as_const(registry).view<const position, const velocity>();
+```
+
+Consider the following definition for a non-const view instead:
+
+```cpp
+entt::view<position, const velocity> view = registry.view<position, const velocity>();
+```
+
+In the example above, `view` can be used to access either read-only or writable
+`position` components while `velocity` components are read-only in all
+cases.<br/>
+In other terms, these statements are all valid:
+
+```cpp
+position &pos = view.get<position>(entity);
+const position &cpos = view.get<const position>(entity);
+const velocity &cpos = view.get<const velocity>(entity);
+std::tuple<position &, const velocity &> tup = view.get<position, const velocity>(entity);
+std::tuple<const position &, const velocity &> ctup = view.get<const position, const velocity>(entity);
+```
+
+It's not possible to get non-const references to `velocity` components from the
+same view instead and these will result in compilation errors:
+
+```cpp
+velocity &cpos = view.get<velocity>(entity);
+std::tuple<position &, velocity &> tup = view.get<position, velocity>(entity);
+std::tuple<const position &, velocity &> ctup = view.get<const position, velocity>(entity);
+```
+
+Similarly, the `each` member functions will propagate constness to the type of
+the components returned during iterations:
+
+```cpp
+view.each([](const auto entity, position &pos, const velocity &vel) {
+    // ...
+});
+```
+
+Obviously, a caller can still refer to the `position` components through a const
+reference because of the rules of the language that fortunately already allow
+it.
 
 ## Give me everything
 

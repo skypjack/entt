@@ -186,7 +186,7 @@ public:
         if constexpr(sizeof...(Component) == 1) {
             return (std::as_const(*reg).template get<component_wrapper<Component...>>(entity).component);
         } else {
-            return std::tuple<const Component &...>{get<Component>()...};
+            return std::tuple<std::add_const_t<Component> &...>{get<Component>()...};
         }
     }
 
@@ -222,7 +222,7 @@ public:
             const auto *wrapper = reg->template try_get<component_wrapper<Component...>>(entity);
             return wrapper ? &wrapper->component : nullptr;
         } else {
-            return std::tuple<const Component *...>{try_get<Component>()...};
+            return std::tuple<std::add_const_t<Component> *...>{try_get<Component>()...};
         }
     }
 

@@ -225,7 +225,7 @@ TEST(Snapshot, Iterator) {
     const auto view = registry.view<a_component>();
     const auto size = view.size();
 
-    registry.snapshot().component<another_component>(output, view.cbegin(), view.cend());
+    registry.snapshot().component<another_component>(output, view.begin(), view.end());
     registry.reset();
     registry.loader().component<another_component>(input);
 

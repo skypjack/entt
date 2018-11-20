@@ -110,42 +110,37 @@ class registry {
     }
 
     template<typename Component>
-    inline const component_pool<Component> & pool() const ENTT_NOEXCEPT {
+    inline auto & pool() const ENTT_NOEXCEPT {
         assert(managed<Component>());
-        return static_cast<const component_pool<Component> &>(*pools[component_family::type<Component>]);
-    }
-
-    template<typename Component>
-    inline component_pool<Component> & pool() ENTT_NOEXCEPT {
-        return const_cast<component_pool<Component> &>(std::as_const(*this).template pool<Component>());
+        return static_cast<component_pool<std::decay_t<Component>> &>(*pools[component_family::type<Component>]);
     }
 
     template<typename Comp, std::size_t Index, typename... Component, std::size_t... Indexes>
-    void connect(std::index_sequence<Indexes...>) {
+    void connect(std::index_sequence<Indexes...>) const {
         pool<Comp>().construction().template connect<&registry::creating<&registry::has<std::tuple_element_t<(Indexes < Index ? Indexes : (Indexes+1)), std::tuple<Component...>>...>, Component...>>();
         pool<Comp>().destruction().template connect<&registry::destroying<Comp, Index, Component...>>();
     }
 
     template<typename... Component, std::size_t... Indexes>
-    void connect(std::index_sequence<Indexes...>) {
+    void connect(std::index_sequence<Indexes...>) const {
         (assure<Component>(), ...);
         (connect<Component, Indexes, Component...>(std::make_index_sequence<sizeof...(Component)-1>{}), ...);
     }
 
     template<typename Comp, std::size_t Index, typename... Component, std::size_t... Indexes>
-    void disconnect(std::index_sequence<Indexes...>) {
+    void disconnect(std::index_sequence<Indexes...>) const {
         pool<Comp>().construction().template disconnect<&registry::creating<&registry::has<std::tuple_element_t<(Indexes < Index ? Indexes : (Indexes+1)), std::tuple<Component...>>...>, Component...>>();
         pool<Comp>().destruction().template disconnect<&registry::destroying<Comp, Index, Component...>>();
     }
 
     template<typename... Component, std::size_t... Indexes>
-    void disconnect(std::index_sequence<Indexes...>) {
+    void disconnect(std::index_sequence<Indexes...>) const {
         // if a set exists, pools have already been created for it
         (disconnect<Component, Indexes, Component...>(std::make_index_sequence<sizeof...(Component)-1>{}), ...);
     }
 
     template<typename Component>
-    void assure() {
+    void assure() const {
         const auto ctype = component_family::type<Component>;
 
         if(!(ctype < pools.size())) {
@@ -153,7 +148,7 @@ class registry {
         }
 
         if(!pools[ctype]) {
-            pools[ctype] = std::make_unique<component_pool<Component>>(this);
+            pools[ctype] = std::make_unique<component_pool<std::decay_t<Component>>>(const_cast<registry *>(this));
         }
     }
 
@@ -305,7 +300,7 @@ public:
      * @return A pointer to the array of components of the given type.
      */
     template<typename Component>
-    const Component * raw() const ENTT_NOEXCEPT {
+    std::add_const_t<Component> * raw() const ENTT_NOEXCEPT {
         return managed<Component>() ? pool<Component>().raw() : nullptr;
     }
 
@@ -478,6 +473,7 @@ public:
      */
     template<typename It>
     void create(It first, It last) {
+        static_assert(std::is_convertible_v<entity_type, typename std::iterator_traits<It>::value_type>);
         const auto length = size_type(last - first);
         const auto sz = std::min(available, length);
 
@@ -646,9 +642,9 @@ public:
         assert((managed<Component>() && ...));
 
         if constexpr(sizeof...(Component) == 1) {
-            return pool<Component...>().get(entity);
+            return std::as_const(pool<Component...>()).get(entity);
         } else {
-            return std::tuple<const Component &...>{get<Component>(entity)...};
+            return std::tuple<std::add_const_t<Component> &...>{get<Component>(entity)...};
         }
     }
 
@@ -724,9 +720,9 @@ public:
         assert(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return managed<Component...>() ? pool<Component...>().try_get(entity) : nullptr;
+            return managed<Component...>() ? std::as_const(pool<Component...>()).try_get(entity) : nullptr;
         } else {
-            return std::tuple<const Component *...>{try_get<Component>(entity)...};
+            return std::tuple<std::add_const_t<Component> *...>{try_get<Component>(entity)...};
         }
     }
 
@@ -773,7 +769,7 @@ public:
      */
     template<typename Component, typename... Args>
     Component & replace(const entity_type entity, Args &&... args) {
-        return (get<Component>(entity) = Component{std::forward<Args>(args)...});
+        return (pool<Component>().get(entity) = std::decay_t<Component>{std::forward<Args>(args)...});
     }
 
     /**
@@ -808,7 +804,7 @@ public:
         auto &cpool = pool<Component>();
 
         return cpool.has(entity)
-                ? cpool.get(entity) = Component{std::forward<Args>(args)...}
+                ? cpool.get(entity) = std::decay_t<Component>{std::forward<Args>(args)...}
                 : cpool.construct(entity, std::forward<Args>(args)...);
     }
 
@@ -1042,6 +1038,8 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
+        static_assert(std::is_invocable_v<Func, entity_type>);
+
         if(available) {
             for(auto pos = entities.size(); pos; --pos) {
                 const auto curr = entity_type(pos - 1);
@@ -1097,6 +1095,8 @@ public:
      */
     template<typename Func>
     void orphans(Func func) const {
+        static_assert(std::is_invocable_v<Func, entity_type>);
+
         each([func = std::move(func), this](const auto entity) {
             if(orphan(entity)) {
                 func(entity);
@@ -1145,6 +1145,46 @@ public:
     }
 
     /**
+     * @brief Returns a standard view for the given components.
+     *
+     * This kind of views are created on the fly and share with the registry its
+     * internal data structures.<br/>
+     * Feel free to discard a view after the use. Creating and destroying a view
+     * is an incredibly cheap operation because they do not require any type of
+     * initialization.<br/>
+     * As a rule of thumb, storing a view should never be an option.
+     *
+     * Standard views do their best to iterate the smallest set of candidate
+     * entities. In particular:
+     *
+     * * Single component views are incredibly fast and iterate a packed array
+     *   of entities, all of which has the given component.
+     * * Multi component views look at the number of entities available for each
+     *   component and pick up a reference to the smallest set of candidates to
+     *   test for the given components.
+     *
+     * @note
+     * Multi component views are pretty fast. However their performance tend to
+     * degenerate when the number of components to iterate grows up and the most
+     * of the entities have all the given components.<br/>
+     * To get a performance boost, consider using a persistent_view instead.
+     *
+     * @sa view
+     * @sa view<Entity, Component>
+     * @sa persistent_view
+     * @sa raw_view
+     * @sa runtime_view
+     *
+     * @tparam Component Type of components used to construct the view.
+     * @return A newly created standard view.
+     */
+    template<typename... Component>
+    inline entt::view<Entity, Component...> view() const {
+        static_assert(std::conjunction_v<std::is_const<Component>...>);
+        return const_cast<registry *>(this)->view<Component...>();
+    }
+
+    /**
      * @brief Returns a persistent view for the given components.
      *
      * This kind of views are created on the fly and share with the registry its
@@ -1188,22 +1228,65 @@ public:
         static_assert(sizeof...(Component) > 1);
         const auto htype = handler_family::type<Component...>;
 
-        if(!(htype < handlers.size() && handlers[htype])) {
-            if(!(htype < handlers.size())) {
-                handlers.resize(htype + 1);
-            }
+        if(!(htype < handlers.size())) {
+            handlers.resize(htype + 1);
+        }
 
-            if(!handlers[htype]) {
-                (assure<Component>(), ...);
-                connect<Component...>(std::make_index_sequence<sizeof...(Component)>{});
-                handlers[htype] = std::make_unique<handler_type<sizeof...(Component)>>();
-            }
+        if(!handlers[htype]) {
+            (assure<Component>(), ...);
+            connect<Component...>(std::make_index_sequence<sizeof...(Component)>{});
+            handlers[htype] = std::make_unique<handler_type<sizeof...(Component)>>();
         }
 
         return {
-            static_cast<handler_type<sizeof...(Component)> *>(handlers[htype].get()),
+            static_cast<handler_type<sizeof...(Component)> *>(handlers[handler_family::type<Component...>].get()),
             &pool<Component>()...
         };
+    }
+
+    /**
+     * @brief Returns a persistent view for the given components.
+     *
+     * This kind of views are created on the fly and share with the registry its
+     * internal data structures.<br/>
+     * Feel free to discard a view after the use. Creating and destroying a view
+     * is an incredibly cheap operation because they do not require any type of
+     * initialization.<br/>
+     * As a rule of thumb, storing a view should never be an option.
+     *
+     * Persistent views are the right choice to iterate entities when the number
+     * of components grows up and the most of the entities have all the given
+     * components.<br/>
+     * However they have also drawbacks:
+     *
+     * * Each kind of persistent view requires a dedicated data structure that
+     *   is allocated within the registry and it increases memory pressure.
+     * * Internal data structures used to construct persistent views must be
+     *   kept updated and it affects slightly construction and destruction of
+     *   entities and components.
+     *
+     * That being said, persistent views are an incredibly powerful tool if used
+     * with care and offer a boost of performance undoubtedly.
+     *
+     * @note
+     * Consider to use the `prepare` member function to initialize the internal
+     * data structures used by persistent views when the registry is still
+     * empty. Initialization could be a costly operation otherwise and it will
+     * be performed the very first time each view is created.
+     *
+     * @sa view
+     * @sa view<Entity, Component>
+     * @sa persistent_view
+     * @sa raw_view
+     * @sa runtime_view
+     *
+     * @tparam Component Types of components used to construct the view.
+     * @return A newly created persistent view.
+     */
+    template<typename... Component>
+    inline entt::persistent_view<Entity, Component...> persistent_view() const {
+        static_assert(std::conjunction_v<std::is_const<Component>...>);
+        return const_cast<registry *>(this)->persistent_view<Component...>();
     }
 
     /**
@@ -1236,6 +1319,35 @@ public:
     }
 
     /**
+     * @brief Returns a raw view for the given component.
+     *
+     * This kind of views are created on the fly and share with the registry its
+     * internal data structures.<br/>
+     * Feel free to discard a view after the use. Creating and destroying a view
+     * is an incredibly cheap operation because they do not require any type of
+     * initialization.<br/>
+     * As a rule of thumb, storing a view should never be an option.
+     *
+     * Raw views are incredibly fast and must be considered the best tool to
+     * iterate components whenever knowing the entities to which they belong
+     * isn't required.
+     *
+     * @sa view
+     * @sa view<Entity, Component>
+     * @sa persistent_view
+     * @sa raw_view
+     * @sa runtime_view
+     *
+     * @tparam Component Type of component used to construct the view.
+     * @return A newly created raw view.
+     */
+    template<typename Component>
+    inline entt::raw_view<Entity, Component> raw_view() const {
+        static_assert(std::is_const_v<Component>);
+        return const_cast<registry *>(this)->raw_view<Component>();
+    }
+
+    /**
      * @brief Returns a runtime view for the given components.
      *
      * This kind of views are created on the fly and share with the registry its
@@ -1262,7 +1374,7 @@ public:
      * @return A newly created runtime view.
      */
     template<typename It>
-    entt::runtime_view<Entity> runtime_view(It first, It last) {
+    entt::runtime_view<Entity> runtime_view(It first, It last) const {
         static_assert(std::is_convertible_v<typename std::iterator_traits<It>::value_type, component_type>);
         std::vector<const sparse_set<Entity> *> set(last - first);
 
@@ -1340,8 +1452,8 @@ public:
     }
 
 private:
-    std::vector<std::unique_ptr<sparse_set<Entity>>> handlers;
-    std::vector<std::unique_ptr<sparse_set<Entity>>> pools;
+    mutable std::vector<std::unique_ptr<sparse_set<Entity>>> handlers;
+    mutable std::vector<std::unique_ptr<sparse_set<Entity>>> pools;
     std::vector<entity_type> entities;
     size_type available{};
     entity_type next{};
