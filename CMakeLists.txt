@@ -140,7 +140,6 @@ configure_package_config_file(
     ${CUSTOM_INSTALL_CONFIGDIR}/EnTTConfig.cmake
     INSTALL_DESTINATION ${CUSTOM_INSTALL_CONFIGDIR}
     PATH_VARS CMAKE_INSTALL_INCLUDEDIR
-    NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )
 
 write_basic_package_version_file(
