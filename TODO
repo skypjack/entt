@@ -17,9 +17,8 @@
 * meta: move-to-head optimization when searching by name on parts (data, func, etc)
 * hashed string: add implicit check on construction for uniqueness (optional)
 * signals on entity creation/destruction
-* flexible views with "composable" filters like negative queries: find entites that have components A, B, but not C.
 * destroy overload that accepts a couple of iterators (see create)
-* filtered groups of entities to support comple queries like all of, one of, none of (sparse set + listeners)
-* "negative" queries with sort of exclude<Comp> as template parameter for persistent views
 * allow for built-in parallel each if possible
 * add on-the-fly sort functionality (is it possible?)
+* introduce support for const instances * in delegate/sigh if possible
+* add support for composable filters

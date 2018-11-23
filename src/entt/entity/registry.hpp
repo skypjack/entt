@@ -42,7 +42,8 @@ template<typename Entity = std::uint32_t>
 class registry {
     using component_family = family<struct internal_registry_component_family>;
     using handler_family = family<struct internal_registry_handler_family>;
-    using signal_type = sigh<void(registry &, const Entity)>;
+    using component_signal_type = sigh<void(registry &, const Entity)>;
+    using pool_signal_type = sigh<void(const typename component_family::family_type)>;
     using traits_type = entt_traits<Entity>;
 
     template<std::size_t N>
@@ -66,17 +67,17 @@ class registry {
             sparse_set<Entity, Component>::destroy(entity);
         }
 
-        typename signal_type::sink_type construction() ENTT_NOEXCEPT {
+        typename component_signal_type::sink_type construction() ENTT_NOEXCEPT {
             return ctor.sink();
         }
 
-        typename signal_type::sink_type destruction() ENTT_NOEXCEPT {
+        typename component_signal_type::sink_type destruction() ENTT_NOEXCEPT {
             return dtor.sink();
         }
 
     private:
-        signal_type ctor;
-        signal_type dtor;
+        component_signal_type ctor;
+        component_signal_type dtor;
         registry *reg;
     };
 
@@ -84,7 +85,7 @@ class registry {
     static void creating(registry &reg, const Entity entity) {
         if((reg.*Has)(entity)) {
             auto *handler = static_cast<handler_type<sizeof...(Component)> *>(reg.handlers[handler_family::type<Component...>].get());
-            handler->construct(entity, reg.pool<Component>().sparse_set<Entity>::get(entity)...);
+            handler->construct(entity, reg.pools[component_family::type<Component>]->get(entity)...);
         }
     }
 
@@ -110,37 +111,51 @@ class registry {
     }
 
     template<typename Component>
-    inline auto & pool() const ENTT_NOEXCEPT {
+    inline const auto & pool() const ENTT_NOEXCEPT {
         assert(managed<Component>());
         return static_cast<component_pool<std::decay_t<Component>> &>(*pools[component_family::type<Component>]);
     }
 
+    template<typename Component>
+    inline auto & pool() ENTT_NOEXCEPT {
+        return const_cast<component_pool<std::decay_t<Component>> &>(std::as_const(*this).template pool<Component>());
+    }
+
     template<typename Comp, std::size_t Index, typename... Component, std::size_t... Indexes>
-    void connect(std::index_sequence<Indexes...>) const {
+    void connect(std::index_sequence<Indexes...>) {
         pool<Comp>().construction().template connect<&registry::creating<&registry::has<std::tuple_element_t<(Indexes < Index ? Indexes : (Indexes+1)), std::tuple<Component...>>...>, Component...>>();
         pool<Comp>().destruction().template connect<&registry::destroying<Comp, Index, Component...>>();
     }
 
     template<typename... Component, std::size_t... Indexes>
-    void connect(std::index_sequence<Indexes...>) const {
+    void connect(std::index_sequence<Indexes...>) {
         (assure<Component>(), ...);
         (connect<Component, Indexes, Component...>(std::make_index_sequence<sizeof...(Component)-1>{}), ...);
     }
 
-    template<typename Comp, std::size_t Index, typename... Component, std::size_t... Indexes>
-    void disconnect(std::index_sequence<Indexes...>) const {
-        pool<Comp>().construction().template disconnect<&registry::creating<&registry::has<std::tuple_element_t<(Indexes < Index ? Indexes : (Indexes+1)), std::tuple<Component...>>...>, Component...>>();
-        pool<Comp>().destruction().template disconnect<&registry::destroying<Comp, Index, Component...>>();
+    template<typename... Component, std::size_t... Indexes>
+    void rebuild(const typename component_family::family_type ctype, std::index_sequence<Indexes...>) {
+        auto index = sizeof...(Indexes);
+        ((index = (component_family::type<Component> == ctype) ? Indexes : index), ...);
+
+        if(index != sizeof...(Indexes)) {
+            auto *handler = static_cast<handler_type<sizeof...(Component)> *>(handlers[handler_family::type<Component...>].get());
+            auto cbegin = handler->sparse_set<Entity>::cbegin();
+            const auto &cpool = *pools[ctype];
+
+            for(auto &&indexes: *handler) {
+                indexes[index] = cpool.get(*(cbegin++));
+            }
+        }
     }
 
-    template<typename... Component, std::size_t... Indexes>
-    void disconnect(std::index_sequence<Indexes...>) const {
-        // if a set exists, pools have already been created for it
-        (disconnect<Component, Indexes, Component...>(std::make_index_sequence<sizeof...(Component)-1>{}), ...);
+    template<typename... Component>
+    void refresh(const typename component_family::family_type ctype) {
+        rebuild<Component...>(ctype, std::make_index_sequence<sizeof...(Component)>{});
     }
 
     template<typename Component>
-    void assure() const {
+    void assure() {
         const auto ctype = component_family::type<Component>;
 
         if(!(ctype < pools.size())) {
@@ -162,7 +177,7 @@ public:
     /*! @brief Unsigned integer type. */
     using component_type = typename component_family::family_type;
     /*! @brief Type of sink for the given component. */
-    using sink_type = typename signal_type::sink_type;
+    using sink_type = typename component_signal_type::sink_type;
 
     /*! @brief Default constructor. */
     registry() ENTT_NOEXCEPT = default;
@@ -642,7 +657,7 @@ public:
         assert((managed<Component>() && ...));
 
         if constexpr(sizeof...(Component) == 1) {
-            return std::as_const(pool<Component...>()).get(entity);
+            return pool<Component...>().get(entity);
         } else {
             return std::tuple<std::add_const_t<Component> &...>{get<Component>(entity)...};
         }
@@ -720,7 +735,7 @@ public:
         assert(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return managed<Component...>() ? std::as_const(pool<Component...>()).try_get(entity) : nullptr;
+            return managed<Component...>() ? pool<Component...>().try_get(entity) : nullptr;
         } else {
             return std::tuple<std::add_const_t<Component> *...>{try_get<Component>(entity)...};
         }
@@ -911,10 +926,7 @@ public:
     void sort(Compare compare, Sort sort = Sort{}, Args &&... args) {
         assure<Component>();
         pool<Component>().sort(std::move(compare), std::move(sort), std::forward<Args>(args)...);
-
-        std::for_each(handlers.begin(), handlers.end(), [](auto &handler) {
-            return handler ? handler->reset() : void();
-        });
+        invalidate.publish(component_family::type<Component>);
     }
 
     /**
@@ -952,10 +964,7 @@ public:
         assure<To>();
         assure<From>();
         pool<To>().respect(pool<From>());
-
-        std::for_each(handlers.begin(), handlers.end(), [](auto &handler) {
-            return handler ? handler->reset() : void();
-        });
+        invalidate.publish(component_family::type<To>);
     }
 
     /**
@@ -1191,7 +1200,10 @@ public:
      * internal data structures.<br/>
      * Feel free to discard a view after the use. Creating and destroying a view
      * is an incredibly cheap operation because they do not require any type of
-     * initialization.<br/>
+     * initialization, but for the first time they are used. That's mainly
+     * because of the internal data structures of the registry that are
+     * dedicated to this kind of views and that don't exist yet the very first
+     * time they are requested.<br/>
      * As a rule of thumb, storing a view should never be an option.
      *
      * Persistent views are the right choice to iterate entities when the number
@@ -1203,7 +1215,7 @@ public:
      *   is allocated within the registry and it increases memory pressure.
      * * Internal data structures used to construct persistent views must be
      *   kept updated and it affects slightly construction and destruction of
-     *   entities and components.
+     *   entities and components, as well as sort functionalities.
      *
      * That being said, persistent views are an incredibly powerful tool if used
      * with care and offer a boost of performance undoubtedly.
@@ -1235,11 +1247,18 @@ public:
         if(!handlers[htype]) {
             (assure<Component>(), ...);
             connect<Component...>(std::make_index_sequence<sizeof...(Component)>{});
+            invalidate.sink().template connect<&registry::refresh<Component...>>(this);
+
             handlers[htype] = std::make_unique<handler_type<sizeof...(Component)>>();
+            auto *handler = static_cast<handler_type<sizeof...(Component)> *>(handlers[htype].get());
+
+            for(const auto entity: view<Component...>()) {
+                handler->construct(entity, pools[component_family::type<Component>]->get(entity)...);
+            }
         }
 
         return {
-            static_cast<handler_type<sizeof...(Component)> *>(handlers[handler_family::type<Component...>].get()),
+            static_cast<handler_type<sizeof...(Component)> *>(handlers[htype].get()),
             &pool<Component>()...
         };
     }
@@ -1251,7 +1270,10 @@ public:
      * internal data structures.<br/>
      * Feel free to discard a view after the use. Creating and destroying a view
      * is an incredibly cheap operation because they do not require any type of
-     * initialization.<br/>
+     * initialization, but for the first time they are used. That's mainly
+     * because of the internal data structures of the registry that are
+     * dedicated to this kind of views and that don't exist yet the very first
+     * time they are requested.<br/>
      * As a rule of thumb, storing a view should never be an option.
      *
      * Persistent views are the right choice to iterate entities when the number
@@ -1263,7 +1285,7 @@ public:
      *   is allocated within the registry and it increases memory pressure.
      * * Internal data structures used to construct persistent views must be
      *   kept updated and it affects slightly construction and destruction of
-     *   entities and components.
+     *   entities and components, as well as sort functionalities.
      *
      * That being said, persistent views are an incredibly powerful tool if used
      * with care and offer a boost of performance undoubtedly.
@@ -1452,11 +1474,12 @@ public:
     }
 
 private:
-    mutable std::vector<std::unique_ptr<sparse_set<Entity>>> handlers;
-    mutable std::vector<std::unique_ptr<sparse_set<Entity>>> pools;
+    std::vector<std::unique_ptr<sparse_set<Entity>>> handlers;
+    std::vector<std::unique_ptr<sparse_set<Entity>>> pools;
     std::vector<entity_type> entities;
     size_type available{};
     entity_type next{};
+    pool_signal_type invalidate;
 };
 
 

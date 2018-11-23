@@ -50,7 +50,7 @@ class registry;
  * @note
  * Views share references to the underlying data structures with the registry
  * that generated them. Therefore any change to the entities and to the
- * components made by means of the registry are immediately reflected by
+ * components made by means of the registry are immediately reflected by all the
  * views.<br/>
  * Moreover, sorting a persistent view affects all the other views of the same
  * type (it means that users don't have to call `sort` on each view to sort all
@@ -102,22 +102,10 @@ class persistent_view final {
 
     template<typename Func, std::size_t... Indexes>
     void each(Func func, std::index_sequence<Indexes...>) const {
-        if(handler->empty()) {
-            const auto *view = candidate();
-
-            std::for_each(view->cbegin(), view->cend(), [func = std::move(func), this](const auto entity) {
-                if((pool<Component>()->has(entity) && ...)) {
-                    const auto &indexes = handler->construct(entity, pool<Component>()->sparse_set<Entity>::get(entity)...);
-                    func(entity, pool<Component>()->raw()[indexes[Indexes]]...);
-                }
-            });
-        } else {
-            std::for_each(handler->view_type::cbegin(), handler->view_type::cend(), [func = std::move(func), raw = handler->cbegin(), this](const auto entity) mutable {
-                std::array<typename view_type::size_type, sizeof...(Indexes)> indexes{(*raw)[Indexes]...};
-                func(entity, pool<Component>()->raw()[std::get<Indexes>(indexes)]...);
-                ++raw;
-            });
-        }
+        std::for_each(handler->view_type::cbegin(), handler->view_type::cend(), [func = std::move(func), raw = handler->cbegin(), this](const auto entity) mutable {
+            func(entity, pool<Component>()->raw()[(*raw)[Indexes]]...);
+            ++raw;
+        });
     }
 
 public:
@@ -274,33 +262,6 @@ public:
     template<typename Func>
     inline void each(Func func) const {
         each(std::move(func), std::make_index_sequence<sizeof...(Component)>{});
-    }
-
-    /**
-     * @brief Initializes the internal data structures used by persistent views.
-     *
-     * Persistent views are an incredibly fast tool used to iterate a packed
-     * array of entities all of which have specific components.<br/>
-     * The initialization of a persistent view is also a pretty cheap operation,
-     * but for the first time they are created. That's mainly because of the
-     * internal data structures of the registry that are dedicated to this kind
-     * of views and that don't exist yet the very first time they are
-     * requested.
-     *
-     * Consider using consistently the `each` member function instead of this
-     * one if in doubt. Initializing the view during an iteration allows to
-     * considerably reduce the cost of this operation.
-     */
-    void initialize() const {
-        if(empty()) {
-            const auto *view = candidate();
-
-            std::for_each(view->cbegin(), view->cend(), [this](const auto entity) {
-                if((pool<Component>()->has(entity) && ...)) {
-                    handler->construct(entity, pool<Component>()->sparse_set<Entity>::get(entity)...);
-                }
-            });
-        }
     }
 
     /**

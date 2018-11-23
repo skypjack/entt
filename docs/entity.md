@@ -835,8 +835,8 @@ All of them have pros and cons to take in consideration. In particular:
 
   Pros:
 
-  * Creating and destroying them isn't expensive at all because they don't have
-    any type of initialization.
+  * Once prepared, creating and destroying them isn't expensive at all because
+    they don't have any type of initialization.
   * They are the best tool for iterating multiple components when most entities
     have them all.
 
@@ -847,10 +847,9 @@ All of them have pros and cons to take in consideration. In particular:
   * If not previously initialized, the first time they are used they go through
     an initialization step that is slightly more expensive.
   * They affect to a minimum the creation and destruction of entities and
-    components. In other terms: the more persistent views there will be, the
-    less performing will be creating and destroying entities and components.
-  * They don't perform well if the `sort` member function of a registry is
-    invoked frequently (but this shouldn't be the case in general).
+    components, as well as the sort functionalities. In other terms: the more
+    persistent views there will be, the less performing will be creating and
+    destroying entities and components or sorting a pool.
 
 * Raw views:
 
@@ -1034,7 +1033,11 @@ auto view = registry.persistent_view<position, velocity>();
 There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
 fact, they return newly created and correctly initialized iterators whenever
-`begin` or `end` are invoked.
+`begin` or `end` are invoked.<br/>
+That being said, persistent views perform an initialization step the very first
+time they are constructed and this could be quite costly. To avoid it, consider
+creating them when no components have been assigned yet. If the registry is
+empty, preparation is extremely fast.
 
 A persistent view offers a bunch of functionalities to get the number of
 entities it's going to return, a raw access to the entity list and the
@@ -1042,18 +1045,6 @@ possibility to sort the underlying data structures according to the order of one
 of the components for which it has been constructed. It's also possible to ask a
 view if it contains a given entity.<br/>
 Refer to the inline documentation for all the details.
-
-The underlying data structure of a persistent view is initialized through a
-slightly slower iteration the first time the `each` member function is invoked
-or by means of an explicit call to the `initialize` member function. An
-uninitialized persistent view is empty and has a size of zero.<br/>
-Once initialized, these data structures are kept up-to-date automatically,
-unless users invoke the sort functionalities made available by the registry. The
-reasons behind this limit go beyond the purposes of the document. However, keep
-in mind that all the data structures otherwise supporting persistent views are
-discarded in this case and they must be reinitialized somehow.<br/>
-For reasons of clarity, sorting a persistent view has no side effects and the
-view won't need to be reinitialized in this case.
 
 To iterate a persistent view, either use it in a range-for loop:
 

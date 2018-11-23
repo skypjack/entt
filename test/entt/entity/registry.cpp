@@ -722,6 +722,57 @@ TEST(Registry, CreateManyEntitiesAtOnce) {
 
     ASSERT_EQ(registry.entity(entities[2]), entt::registry<>::entity_type{2});
     ASSERT_EQ(registry.version(entities[2]), entt::registry<>::version_type{0});
+}
 
-    // TODO
+TEST(Registry, PersistentViewInterleaved) {
+    entt::registry<> registry;
+    typename entt::registry<>::entity_type entity = entt::null;
+
+    entity = registry.create();
+    registry.assign<int>(entity);
+    registry.assign<char>(entity);
+
+    const auto view = registry.persistent_view<int, char>();
+
+    entity = registry.create();
+    registry.assign<int>(entity);
+    registry.assign<char>(entity);
+
+    decltype(view)::size_type cnt{0};
+    view.each([&cnt](auto...) { ++cnt; });
+
+    ASSERT_EQ(cnt, decltype(view)::size_type{2});
+}
+
+TEST(Registry, PersistentViewSortInterleaved) {
+    entt::registry<> registry;
+    const auto view = registry.persistent_view<int, char>();
+
+    auto e0 = registry.create();
+    registry.assign<int>(e0, 0);
+    registry.assign<char>(e0, '0');
+
+    auto e1 = registry.create();
+    registry.assign<int>(e1, 1);
+    registry.assign<char>(e1, '1');
+
+    registry.sort<int>([](auto lhs, auto rhs) { return lhs > rhs; });
+    registry.sort<char>([](auto lhs, auto rhs) { return lhs < rhs; });
+
+    auto e2 = registry.create();
+    registry.assign<int>(e2, 2);
+    registry.assign<char>(e2, '2');
+
+    view.each([e0, e1, e2](const auto entity, const auto &i, const auto &c) {
+        if(entity == e0) {
+            ASSERT_EQ(i, 0);
+            ASSERT_EQ(c, '0');
+        } else if(entity == e1) {
+            ASSERT_EQ(i, 1);
+            ASSERT_EQ(c, '1');
+        } else if(entity == e2) {
+            ASSERT_EQ(i, 2);
+            ASSERT_EQ(c, '2');
+        }
+    });
 }

@@ -260,8 +260,6 @@ TEST(Benchmark, IterateTwoComponentsPersistent1M) {
         timer.elapsed();
     };
 
-    registry.persistent_view<position, velocity>().initialize();
-
     test([](auto, const auto &...) {});
     test([](auto, auto &... comp) {
         ((comp.x = {}), ...);
@@ -458,8 +456,6 @@ TEST(Benchmark, IterateFiveComponentsPersistent1M) {
         registry.persistent_view<position, velocity, comp<1>, comp<2>, comp<3>>().each(func);
         timer.elapsed();
     };
-
-    registry.persistent_view<position, velocity, comp<1>, comp<2>, comp<3>>().initialize();
 
     test([](auto, const auto &...) {});
     test([](auto, auto &... comp) {
@@ -713,8 +709,6 @@ TEST(Benchmark, IterateTenComponentsPersistent1M) {
         registry.persistent_view<position, velocity, comp<1>, comp<2>, comp<3>, comp<4>, comp<5>, comp<6>, comp<7>, comp<8>>().each(func);
         timer.elapsed();
     };
-
-    registry.persistent_view<position, velocity, comp<1>, comp<2>, comp<3>, comp<4>, comp<5>, comp<6>, comp<7>, comp<8>>().initialize();
 
     test([](auto, const auto &...) {});
     test([](auto, auto &... comp) {
