@@ -81,9 +81,9 @@ class registry {
         registry *reg;
     };
 
-    template<auto Has, typename... Component>
+    template<typename... Component>
     static void creating(registry &reg, const Entity entity) {
-        if((reg.*Has)(entity)) {
+        if((reg.pool<Component>().has(entity) && ...)) {
             auto *handler = static_cast<handler_type<sizeof...(Component)> *>(reg.handlers[handler_family::type<Component...>].get());
             handler->construct(entity, reg.pools[component_family::type<Component>]->get(entity)...);
         }
@@ -121,16 +121,10 @@ class registry {
         return const_cast<component_pool<std::decay_t<Component>> &>(std::as_const(*this).template pool<Component>());
     }
 
-    template<typename Comp, std::size_t Index, typename... Component, std::size_t... Indexes>
-    void connect(std::index_sequence<Indexes...>) {
-        pool<Comp>().construction().template connect<&registry::creating<&registry::has<std::tuple_element_t<(Indexes < Index ? Indexes : (Indexes+1)), std::tuple<Component...>>...>, Component...>>();
-        pool<Comp>().destruction().template connect<&registry::destroying<Comp, Index, Component...>>();
-    }
-
     template<typename... Component, std::size_t... Indexes>
     void connect(std::index_sequence<Indexes...>) {
-        (assure<Component>(), ...);
-        (connect<Component, Indexes, Component...>(std::make_index_sequence<sizeof...(Component)-1>{}), ...);
+        (pool<Component>().construction().template connect<&registry::creating<Component...>>(), ...);
+        (pool<Component>().destruction().template connect<&registry::destroying<Component, Indexes, Component...>>(), ...);
     }
 
     template<typename... Component, std::size_t... Indexes>
