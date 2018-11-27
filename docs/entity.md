@@ -1152,7 +1152,7 @@ for(auto entity: view) {
     auto &velocity = registry.get<velocity>(entity);
 
     // ... or multiple components at once
-    auto &[pos, vel] = view.get<position, velocity>(entity);
+    auto &[pos, vel] = registry.get<position, velocity>(entity);
 
     // ...
 }
