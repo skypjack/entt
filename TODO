@@ -20,5 +20,4 @@
 * destroy overload that accepts a couple of iterators (see create)
 * allow for built-in parallel each if possible
 * add on-the-fly sort functionality (is it possible?)
-* introduce support for const instances * in delegate/sigh if possible
 * add support for composable filters

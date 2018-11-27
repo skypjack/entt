@@ -9,6 +9,10 @@ struct delegate_functor {
     int operator()(int i) {
         return i+i;
     }
+
+    int identity(int i) const {
+        return i;
+    }
 };
 
 struct const_nonconst_noexcept {
@@ -43,7 +47,17 @@ TEST(Delegate, Functionalities) {
     ASSERT_TRUE(mfdel);
 
     ASSERT_EQ(ffdel, entt::delegate<int(int)>{});
+    ASSERT_NE(mfdel, entt::delegate<int(int)>{});
     ASSERT_NE(ffdel, mfdel);
+
+    mfdel.reset();
+
+    ASSERT_FALSE(ffdel);
+    ASSERT_FALSE(mfdel);
+
+    ASSERT_EQ(ffdel, entt::delegate<int(int)>{});
+    ASSERT_EQ(mfdel, entt::delegate<int(int)>{});
+    ASSERT_EQ(ffdel, mfdel);
 }
 
 TEST(Delegate, Comparison) {
@@ -108,4 +122,21 @@ TEST(Delegate, DeducedGuidelines) {
     ASSERT_TRUE(member_g_deduced);
     ASSERT_TRUE(member_h_deduced);
     ASSERT_TRUE(member_i_deduced);
+}
+
+TEST(Delegate, ConstInstance) {
+    entt::delegate<int(int)> delegate;
+    const delegate_functor functor;
+
+    ASSERT_FALSE(delegate);
+
+    delegate.connect<&delegate_functor::identity>(&functor);
+
+    ASSERT_TRUE(delegate);
+    ASSERT_EQ(delegate(3), 3);
+
+    delegate.reset();
+
+    ASSERT_FALSE(delegate);
+    ASSERT_EQ(delegate, entt::delegate<int(int)>{});
 }

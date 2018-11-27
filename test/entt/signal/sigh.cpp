@@ -232,20 +232,23 @@ TEST(SigH, Collector) {
 TEST(SigH, ConstNonConstNoExcept) {
     entt::sigh<void()> sigh;
     const_nonconst_noexcept functor;
+    const const_nonconst_noexcept cfunctor;
 
     sigh.sink().connect<&const_nonconst_noexcept::f>(&functor);
     sigh.sink().connect<&const_nonconst_noexcept::g>(&functor);
-    sigh.sink().connect<&const_nonconst_noexcept::h>(&functor);
-    sigh.sink().connect<&const_nonconst_noexcept::i>(&functor);
+    sigh.sink().connect<&const_nonconst_noexcept::h>(&cfunctor);
+    sigh.sink().connect<&const_nonconst_noexcept::i>(&cfunctor);
     sigh.publish();
 
-    ASSERT_EQ(functor.cnt, 4);
+    ASSERT_EQ(functor.cnt, 2);
+    ASSERT_EQ(cfunctor.cnt, 2);
 
     sigh.sink().disconnect<&const_nonconst_noexcept::f>(&functor);
     sigh.sink().disconnect<&const_nonconst_noexcept::g>(&functor);
-    sigh.sink().disconnect<&const_nonconst_noexcept::h>(&functor);
-    sigh.sink().disconnect<&const_nonconst_noexcept::i>(&functor);
+    sigh.sink().disconnect<&const_nonconst_noexcept::h>(&cfunctor);
+    sigh.sink().disconnect<&const_nonconst_noexcept::i>(&cfunctor);
     sigh.publish();
 
-    ASSERT_EQ(functor.cnt, 4);
+    ASSERT_EQ(functor.cnt, 2);
+    ASSERT_EQ(cfunctor.cnt, 2);
 }

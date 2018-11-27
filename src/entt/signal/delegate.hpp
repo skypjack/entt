@@ -80,17 +80,21 @@ class delegate;
  */
 template<typename Ret, typename... Args>
 class delegate<Ret(Args...)> final {
-    using proto_fn_type = Ret(void *, Args...);
-    using stub_type = std::pair<void *, proto_fn_type *>;
+    using proto_fn_type = Ret(const void *, Args...);
+    using stub_type = std::pair<const void *, proto_fn_type *>;
 
     template<auto Function>
-    static Ret proto(void *, Args... args) {
+    static Ret proto(const void *, Args... args) {
         return std::invoke(Function, args...);
     }
 
-    template<typename Class, auto Member>
-    static Ret proto(void *instance, Args... args) {
-        return std::invoke(Member, static_cast<Class *>(instance), args...);
+    template<bool Const, typename Class, auto Member>
+    static Ret proto(const void *instance, Args... args) {
+        if constexpr(Const) {
+            return std::invoke(Member, static_cast<const Class *>(instance), args...);
+        } else {
+            return std::invoke(Member, const_cast<Class *>(static_cast<const Class *>(instance)), args...);
+        }
     }
 
 public:
@@ -150,7 +154,7 @@ public:
     template<auto Member, typename Class>
     void connect(Class *instance) ENTT_NOEXCEPT {
         static_assert(std::is_invocable_r_v<Ret, decltype(Member), Class, Args...>);
-        stub = std::make_pair(instance, &proto<Class, Member>);
+        stub = std::make_pair(instance, &proto<std::is_const_v<Class>, std::remove_const_t<Class>, Member>);
     }
 
     /**
@@ -159,7 +163,7 @@ public:
      * After a reset, a delegate can be safely invoked with no effect.
      */
     void reset() ENTT_NOEXCEPT {
-        stub.second = nullptr;
+        stub = std::make_pair(nullptr, nullptr);
     }
 
     /**
