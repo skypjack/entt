@@ -102,7 +102,7 @@ class persistent_view final {
 
     template<typename Func, std::size_t... Indexes>
     void each(Func func, std::index_sequence<Indexes...>) const {
-        std::for_each(handler->view_type::cbegin(), handler->view_type::cend(), [func = std::move(func), raw = handler->cbegin(), this](const auto entity) mutable {
+        std::for_each(handler->view_type::begin(), handler->view_type::end(), [func = std::move(func), raw = handler->cbegin(), this](const auto entity) mutable {
             func(entity, pool<Component>()->raw()[(*raw)[Indexes]]...);
             ++raw;
         });
@@ -114,7 +114,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = typename view_type::size_type;
     /*! @brief Input iterator type. */
-    using iterator_type = typename view_type::const_iterator_type;
+    using iterator_type = typename view_type::iterator_type;
 
     /*! @brief Default copy constructor. */
     persistent_view(const persistent_view &) = default;
@@ -173,7 +173,7 @@ public:
      * @return An iterator to the first entity that has the given components.
      */
     iterator_type begin() const ENTT_NOEXCEPT {
-        return handler->view_type::cbegin();
+        return handler->view_type::begin();
     }
 
     /**
@@ -192,7 +192,7 @@ public:
      * given components.
      */
     iterator_type end() const ENTT_NOEXCEPT {
-        return handler->view_type::cend();
+        return handler->view_type::end();
     }
 
     /**
@@ -201,7 +201,7 @@ public:
      * @return The identifier that occupies the given position.
      */
     entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
-        return handler->view_type::cbegin()[pos];
+        return handler->view_type::begin()[pos];
     }
 
     /**
@@ -346,7 +346,7 @@ class view final {
     using component_iterator_type = decltype(std::declval<pool_type<Comp>>().begin());
 
     using view_type = sparse_set<Entity>;
-    using underlying_iterator_type = typename view_type::const_iterator_type;
+    using underlying_iterator_type = typename view_type::iterator_type;
     using unchecked_type = std::array<const view_type *, (sizeof...(Component) - 1)>;
     using pattern_type = std::tuple<pool_type<Component> *...>;
     using traits_type = entt_traits<Entity>;
@@ -461,11 +461,11 @@ class view final {
     template<typename Comp, typename Func, std::size_t... Indexes>
     void each(pool_type<Comp> *cpool, Func func, std::index_sequence<Indexes...>) const {
         const auto other = unchecked(cpool);
-        std::array<underlying_iterator_type, sizeof...(Indexes)> data{{std::get<Indexes>(other)->cbegin()...}};
+        std::array<underlying_iterator_type, sizeof...(Indexes)> data{{std::get<Indexes>(other)->begin()...}};
         const auto extent = std::min({ pool<Component>()->extent()... });
         auto raw = std::make_tuple(pool<Component>()->begin()...);
-        const auto end = cpool->view_type::cend();
-        auto begin = cpool->view_type::cbegin();
+        const auto end = cpool->view_type::end();
+        auto begin = cpool->view_type::begin();
 
         // we can directly use the raw iterators if pools are ordered
         while(((begin != end) && ... && (*begin == *(std::get<Indexes>(data)++)))) {
@@ -535,7 +535,7 @@ public:
      */
     iterator_type begin() const ENTT_NOEXCEPT {
         const auto *view = candidate();
-        return iterator_type{unchecked(view), view->cbegin(), view->cend()};
+        return iterator_type{unchecked(view), view->begin(), view->end()};
     }
 
     /**
@@ -555,7 +555,7 @@ public:
      */
     iterator_type end() const ENTT_NOEXCEPT {
         const auto *view = candidate();
-        return iterator_type{unchecked(view), view->cend(), view->cend()};
+        return iterator_type{unchecked(view), view->end(), view->end()};
     }
 
     /**
@@ -684,7 +684,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = typename pool_type::size_type;
     /*! @brief Input iterator type. */
-    using iterator_type = typename view_type::const_iterator_type;
+    using iterator_type = typename view_type::iterator_type;
 
     /*! @brief Default copy constructor. */
     view(const view &) = default;
@@ -759,7 +759,7 @@ public:
      * @return An iterator to the first entity that has the given component.
      */
     iterator_type begin() const ENTT_NOEXCEPT {
-        return pool->view_type::cbegin();
+        return pool->view_type::begin();
     }
 
     /**
@@ -778,7 +778,7 @@ public:
      * given component.
      */
     iterator_type end() const ENTT_NOEXCEPT {
-        return pool->view_type::cend();
+        return pool->view_type::end();
     }
 
     /**
@@ -787,7 +787,7 @@ public:
      * @return The identifier that occupies the given position.
      */
     entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
-        return pool->view_type::cbegin()[pos];
+        return pool->view_type::begin()[pos];
     }
 
     /**
@@ -836,7 +836,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        std::for_each(pool->view_type::cbegin(), pool->view_type::cend(), [func = std::move(func), raw = pool->begin()](const auto entity) mutable {
+        std::for_each(pool->view_type::begin(), pool->view_type::end(), [func = std::move(func), raw = pool->begin()](const auto entity) mutable {
             func(entity, *(raw++));
         });
     }
@@ -1080,7 +1080,7 @@ class runtime_view {
     friend class registry<Entity>;
 
     using view_type = sparse_set<Entity>;
-    using underlying_iterator_type = typename view_type::const_iterator_type;
+    using underlying_iterator_type = typename view_type::iterator_type;
     using pattern_type = std::vector<const view_type *>;
     using extent_type = typename view_type::size_type;
     using traits_type = entt_traits<Entity>;
@@ -1237,7 +1237,7 @@ public:
         if(valid()) {
             const auto &pool = *pools.front();
             const auto * const *data = pools.data();
-            it = { pool.cbegin(), pool.cend(), data + 1, data + pools.size(), min() };
+            it = { pool.begin(), pool.end(), data + 1, data + pools.size(), min() };
         }
 
         return it;
@@ -1263,7 +1263,7 @@ public:
 
         if(valid()) {
             const auto &pool = *pools.front();
-            it = { pool.cend(), pool.cend(), nullptr, nullptr, min() };
+            it = { pool.end(), pool.end(), nullptr, nullptr, min() };
         }
 
         return it;

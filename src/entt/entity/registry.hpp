@@ -93,7 +93,7 @@ class registry {
     static void destroying(registry &reg, const Entity entity) {
         auto *handler = static_cast<handler_type<sizeof...(Component)> *>(reg.handlers[handler_family::type<Component...>].get());
         const sparse_set<Entity> &cpool = reg.pool<Comp>();
-        const auto last = *cpool.cbegin();
+        const auto last = *cpool.begin();
 
         if(handler->has(last)) {
             handler->get(last)[Index] = cpool.get(entity);
@@ -134,11 +134,11 @@ class registry {
 
         if(index != sizeof...(Indexes)) {
             auto *handler = static_cast<handler_type<sizeof...(Component)> *>(handlers[handler_family::type<Component...>].get());
-            auto cbegin = handler->sparse_set<Entity>::cbegin();
+            auto begin = handler->sparse_set<Entity>::begin();
             const auto &cpool = *pools[ctype];
 
             for(auto &&indexes: *handler) {
-                indexes[index] = cpool.get(*(cbegin++));
+                indexes[index] = cpool.get(*(begin++));
             }
         }
     }

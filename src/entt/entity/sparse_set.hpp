@@ -171,8 +171,6 @@ public:
     using size_type = std::size_t;
     /*! @brief Input iterator type. */
     using iterator_type = iterator;
-    /*! @brief Constant input iterator type. */
-    using const_iterator_type = iterator;
 
     /*! @brief Default constructor. */
     sparse_set() ENTT_NOEXCEPT = default;
@@ -278,41 +276,9 @@ public:
      *
      * @return An iterator to the first entity of the internal packed array.
      */
-    const_iterator_type cbegin() const ENTT_NOEXCEPT {
+    iterator_type begin() const ENTT_NOEXCEPT {
         const typename traits_type::difference_type pos = direct.size();
-        return const_iterator_type{&direct, pos};
-    }
-
-    /**
-     * @brief Returns an iterator to the beginning.
-     *
-     * The returned iterator points to the first entity of the internal packed
-     * array. If the sparse set is empty, the returned iterator will be equal to
-     * `end()`.
-     *
-     * @note
-     * Input iterators stay true to the order imposed by a call to `respect`.
-     *
-     * @return An iterator to the first entity of the internal packed array.
-     */
-    inline const_iterator_type begin() const ENTT_NOEXCEPT {
-        return cbegin();
-    }
-
-    /**
-     * @brief Returns an iterator to the beginning.
-     *
-     * The returned iterator points to the first entity of the internal packed
-     * array. If the sparse set is empty, the returned iterator will be equal to
-     * `end()`.
-     *
-     * @note
-     * Input iterators stay true to the order imposed by a call to `respect`.
-     *
-     * @return An iterator to the first entity of the internal packed array.
-     */
-    inline iterator_type begin() ENTT_NOEXCEPT {
-        return cbegin();
+        return iterator_type{&direct, pos};
     }
 
     /**
@@ -328,42 +294,8 @@ public:
      * @return An iterator to the element following the last entity of the
      * internal packed array.
      */
-    const_iterator_type cend() const ENTT_NOEXCEPT {
-        return const_iterator_type{&direct, {}};
-    }
-
-    /**
-     * @brief Returns an iterator to the end.
-     *
-     * The returned iterator points to the element following the last entity in
-     * the internal packed array. Attempting to dereference the returned
-     * iterator results in undefined behavior.
-     *
-     * @note
-     * Input iterators stay true to the order imposed by a call to `respect`.
-     *
-     * @return An iterator to the element following the last entity of the
-     * internal packed array.
-     */
-    inline const_iterator_type end() const ENTT_NOEXCEPT {
-        return cend();
-    }
-
-    /**
-     * @brief Returns an iterator to the end.
-     *
-     * The returned iterator points to the element following the last entity in
-     * the internal packed array. Attempting to dereference the returned
-     * iterator results in undefined behavior.
-     *
-     * @note
-     * Input iterators stay true to the order imposed by a call to `respect`.
-     *
-     * @return An iterator to the element following the last entity of the
-     * internal packed array.
-     */
-    inline iterator_type end() ENTT_NOEXCEPT {
-        return cend();
+    iterator_type end() const ENTT_NOEXCEPT {
+        return iterator_type{&direct, {}};
     }
 
     /**
@@ -509,8 +441,8 @@ public:
      * @param other The sparse sets that imposes the order of the entities.
      */
     void respect(const sparse_set &other) ENTT_NOEXCEPT {
-        auto from = other.cbegin();
-        auto to = other.cend();
+        const auto to = other.end();
+        auto from = other.begin();
 
         size_type pos = direct.size() - 1;
 
@@ -1045,8 +977,8 @@ public:
      * @param other The sparse sets that imposes the order of the entities.
      */
     void respect(const sparse_set<Entity> &other) ENTT_NOEXCEPT {
-        auto from = other.cbegin();
-        auto to = other.cend();
+        const auto to = other.end();
+        auto from = other.begin();
 
         size_type pos = underlying_type::size() - 1;
         const auto *local = underlying_type::data();

@@ -101,51 +101,6 @@ TEST(SparseSetNoType, Iterator) {
     ASSERT_EQ(*begin.operator->(), 3);
 }
 
-TEST(SparseSetNoType, ConstIterator) {
-    using iterator_type = typename entt::sparse_set<std::uint64_t>::const_iterator_type;
-
-    entt::sparse_set<std::uint64_t> set;
-    set.construct(3);
-
-    iterator_type cend{set.cbegin()};
-    iterator_type cbegin{};
-    cbegin = set.cend();
-    std::swap(cbegin, cend);
-
-    ASSERT_EQ(cbegin, set.cbegin());
-    ASSERT_EQ(cend, set.cend());
-    ASSERT_NE(cbegin, cend);
-
-    ASSERT_EQ(cbegin++, set.cbegin());
-    ASSERT_EQ(cbegin--, set.cend());
-
-    ASSERT_EQ(cbegin+1, set.cend());
-    ASSERT_EQ(cend-1, set.cbegin());
-
-    ASSERT_EQ(++cbegin, set.cend());
-    ASSERT_EQ(--cbegin, set.cbegin());
-
-    ASSERT_EQ(cbegin += 1, set.cend());
-    ASSERT_EQ(cbegin -= 1, set.cbegin());
-
-    ASSERT_EQ(cbegin + (cend - cbegin), set.cend());
-    ASSERT_EQ(cbegin - (cbegin - cend), set.cend());
-
-    ASSERT_EQ(cend - (cend - cbegin), set.cbegin());
-    ASSERT_EQ(cend + (cbegin - cend), set.cbegin());
-
-    ASSERT_EQ(cbegin[0], *set.cbegin());
-
-    ASSERT_LT(cbegin, cend);
-    ASSERT_LE(cbegin, set.cbegin());
-
-    ASSERT_GT(cend, cbegin);
-    ASSERT_GE(cend, set.cend());
-
-    ASSERT_EQ(*cbegin, 3);
-    ASSERT_EQ(*cbegin.operator->(), 3);
-}
-
 TEST(SparseSetNoType, Data) {
     entt::sparse_set<std::uint64_t> set;
 
@@ -330,7 +285,7 @@ TEST(SparseSetNoType, CanModifyDuringIteration) {
 
     ASSERT_EQ(set.capacity(), entt::sparse_set<std::uint64_t>::size_type{1});
 
-    const auto it = set.cbegin();
+    const auto it = set.begin();
     set.reserve(entt::sparse_set<std::uint64_t>::size_type{2});
 
     ASSERT_EQ(set.capacity(), entt::sparse_set<std::uint64_t>::size_type{2});
