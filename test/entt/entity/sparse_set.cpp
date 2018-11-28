@@ -101,6 +101,26 @@ TEST(SparseSetNoType, Iterator) {
     ASSERT_EQ(*begin.operator->(), 3);
 }
 
+TEST(SparseSetNoType, Find) {
+    entt::sparse_set<std::uint64_t> set;
+    set.construct(3);
+    set.construct(42);
+    set.construct(99);
+
+    ASSERT_NE(set.find(3), set.end());
+    ASSERT_NE(set.find(42), set.end());
+    ASSERT_NE(set.find(99), set.end());
+    ASSERT_EQ(set.find(0), set.end());
+
+    auto it = set.find(99);
+
+    ASSERT_EQ(*it, 99);
+    ASSERT_EQ(*(++it), 42);
+    ASSERT_EQ(*(++it), 3);
+    ASSERT_EQ(++it, set.end());
+    ASSERT_EQ(++set.find(3), set.end());
+}
+
 TEST(SparseSetNoType, Data) {
     entt::sparse_set<std::uint64_t> set;
 

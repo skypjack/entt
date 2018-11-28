@@ -196,6 +196,16 @@ public:
     }
 
     /**
+     * @brief Finds an entity.
+     * @param entity A valid entity identifier.
+     * @return An iterator to the given entity if it's found, past the end
+     * iterator otherwise.
+     */
+    iterator_type find(const entity_type entity) const ENTT_NOEXCEPT {
+        return handler->view_type::find(entity);
+    }
+
+    /**
      * @brief Returns the identifier that occupies the given position.
      * @param pos Position of the element to return.
      * @return The identifier that occupies the given position.
@@ -559,6 +569,18 @@ public:
     }
 
     /**
+     * @brief Finds an entity.
+     * @param entity A valid entity identifier.
+     * @return An iterator to the given entity if it's found, past the end
+     * iterator otherwise.
+     */
+    iterator_type find(const entity_type entity) const ENTT_NOEXCEPT {
+        const auto *view = candidate();
+        iterator_type it{unchecked(view), view->find(entity), view->end()};
+        return (it != end() && *it == entity) ? it : end();
+    }
+
+    /**
      * @brief Checks if a view contains an entity.
      * @param entity A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
@@ -779,6 +801,16 @@ public:
      */
     iterator_type end() const ENTT_NOEXCEPT {
         return pool->view_type::end();
+    }
+
+    /**
+     * @brief Finds an entity.
+     * @param entity A valid entity identifier.
+     * @return An iterator to the given entity if it's found, past the end
+     * iterator otherwise.
+     */
+    iterator_type find(const entity_type entity) const ENTT_NOEXCEPT {
+        return pool->view_type::find(entity);
     }
 
     /**

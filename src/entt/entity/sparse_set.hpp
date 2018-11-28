@@ -299,6 +299,16 @@ public:
     }
 
     /**
+     * @brief Finds an entity.
+     * @param entity A valid entity identifier.
+     * @return An iterator to the given entity if it's found, past the end
+     * iterator otherwise.
+     */
+    iterator_type find(const entity_type entity) const ENTT_NOEXCEPT {
+        return has(entity) ? --(end() - get(entity)) : end();
+    }
+
+    /**
      * @brief Checks if a sparse set contains an entity.
      * @param entity A valid entity identifier.
      * @return True if the sparse set contains the entity, false otherwise.

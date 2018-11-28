@@ -215,6 +215,42 @@ TEST(PersistentView, ConstNonConstAndAllInBetween) {
     });
 }
 
+TEST(PersistentView, Find) {
+    entt::registry<> registry;
+    auto view = registry.persistent_view<int, const char>();
+
+    const auto e0 = registry.create();
+    registry.assign<int>(e0);
+    registry.assign<char>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
+
+    const auto e2 = registry.create();
+    registry.assign<int>(e2);
+    registry.assign<char>(e2);
+
+    const auto e3 = registry.create();
+    registry.assign<int>(e3);
+    registry.assign<char>(e3);
+
+    registry.remove<int>(e1);
+
+    ASSERT_NE(view.find(e0), view.end());
+    ASSERT_EQ(view.find(e1), view.end());
+    ASSERT_NE(view.find(e2), view.end());
+    ASSERT_NE(view.find(e3), view.end());
+
+    auto it = view.find(e2);
+
+    ASSERT_EQ(*it, e2);
+    ASSERT_EQ(*(++it), e3);
+    ASSERT_EQ(*(++it), e0);
+    ASSERT_EQ(++it, view.end());
+    ASSERT_EQ(++view.find(e0), view.end());
+}
+
 TEST(SingleComponentView, Functionalities) {
     entt::registry<> registry;
     auto view = registry.view<char>();
@@ -353,6 +389,38 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     cview.each([](auto, auto &&i) {
         ASSERT_TRUE((std::is_same_v<decltype(i), const int &>));
     });
+}
+
+TEST(SingleComponentView, Find) {
+    entt::registry<> registry;
+    auto view = registry.view<int>();
+
+    const auto e0 = registry.create();
+    registry.assign<int>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+
+    const auto e2 = registry.create();
+    registry.assign<int>(e2);
+
+    const auto e3 = registry.create();
+    registry.assign<int>(e3);
+
+    registry.remove<int>(e1);
+
+    ASSERT_NE(view.find(e0), view.end());
+    ASSERT_EQ(view.find(e1), view.end());
+    ASSERT_NE(view.find(e2), view.end());
+    ASSERT_NE(view.find(e3), view.end());
+
+    auto it = view.find(e2);
+
+    ASSERT_EQ(*it, e2);
+    ASSERT_EQ(*(++it), e3);
+    ASSERT_EQ(*(++it), e0);
+    ASSERT_EQ(++it, view.end());
+    ASSERT_EQ(++view.find(e0), view.end());
 }
 
 TEST(MultipleComponentView, Functionalities) {
@@ -519,6 +587,42 @@ TEST(MultipleComponentView, ConstNonConstAndAllInBetween) {
         ASSERT_TRUE((std::is_same_v<decltype(i), int &>));
         ASSERT_TRUE((std::is_same_v<decltype(c), const char &>));
     });
+}
+
+TEST(MultipleComponentView, Find) {
+    entt::registry<> registry;
+    auto view = registry.view<int, const char>();
+
+    const auto e0 = registry.create();
+    registry.assign<int>(e0);
+    registry.assign<char>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
+
+    const auto e2 = registry.create();
+    registry.assign<int>(e2);
+    registry.assign<char>(e2);
+
+    const auto e3 = registry.create();
+    registry.assign<int>(e3);
+    registry.assign<char>(e3);
+
+    registry.remove<int>(e1);
+
+    ASSERT_NE(view.find(e0), view.end());
+    ASSERT_EQ(view.find(e1), view.end());
+    ASSERT_NE(view.find(e2), view.end());
+    ASSERT_NE(view.find(e3), view.end());
+
+    auto it = view.find(e2);
+
+    ASSERT_EQ(*it, e2);
+    ASSERT_EQ(*(++it), e3);
+    ASSERT_EQ(*(++it), e0);
+    ASSERT_EQ(++it, view.end());
+    ASSERT_EQ(++view.find(e0), view.end());
 }
 
 TEST(RawView, Functionalities) {
