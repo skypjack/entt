@@ -1,1 +1,5 @@
 *.user
+conan/test_package/build
+
+# IDEs
+.idea
