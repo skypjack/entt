@@ -12,6 +12,81 @@ namespace entt {
 
 
 /**
+ * @brief Converts a registry to a view.
+ * @tparam Const Constness of the accepted registry.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
+template<bool Const, typename Entity>
+struct as_view final {
+    /*! @brief Type of registry to convert. */
+    using registry_type = std::conditional_t<Const, const entt::registry<Entity>, entt::registry<Entity>>;
+
+    /**
+     * @brief Constructs a converter for a given registry.
+     * @param reg A valid reference to a registry.
+     */
+    as_view(registry_type &reg) ENTT_NOEXCEPT: reg{reg} {}
+
+    /**
+     * @brief Conversion function from a registry to a view.
+     * @tparam Component Type of components used to construct the view.
+     * @return A newly created standard view.
+     */
+    template<typename... Component>
+    inline operator entt::view<Entity, Component...>() const {
+        return reg.template view<Component...>();
+    }
+
+    /**
+     * @brief Conversion function from a registry to a persistent view.
+     * @tparam Component Types of components used to construct the view.
+     * @return A newly created persistent view.
+     */
+    template<typename... Component>
+    inline operator entt::persistent_view<Entity, Component...>() const {
+        return reg.template persistent_view<Component...>();
+    }
+
+    /**
+     * @brief Conversion function from a registry to a raw view.
+     * @tparam Component Type of component used to construct the view.
+     * @return A newly created raw view.
+     */
+    template<typename Component>
+    inline operator entt::raw_view<Entity, Component>() const {
+        return reg.template raw_view<Component>();
+    }
+
+private:
+    registry_type &reg;
+};
+
+
+/**
+ * @brief Deduction guideline.
+ *
+ * It allows to deduce the constness of a registry directly from the instance
+ * provided to the constructor.
+ *
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
+template<typename Entity>
+as_view(registry<Entity> &) ENTT_NOEXCEPT -> as_view<false, Entity>;
+
+
+/**
+ * @brief Deduction guideline.
+ *
+ * It allows to deduce the constness of a registry directly from the instance
+ * provided to the constructor.
+ *
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
+template<typename Entity>
+as_view(const registry<Entity> &) ENTT_NOEXCEPT -> as_view<true, Entity>;
+
+
+/**
  * @brief Dependency function prototype.
  *
  * A _dependency function_ is a built-in listener to use to automatically assign

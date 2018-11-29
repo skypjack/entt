@@ -3,6 +3,22 @@
 #include <entt/entity/helper.hpp>
 #include <entt/entity/registry.hpp>
 
+TEST(Helper, AsView) {
+    using entity_type = typename entt::registry<>::entity_type;
+
+    entt::registry<> registry;
+    const entt::registry<> cregistry;
+
+    ([](entt::view<entity_type, int, char>) {})(entt::as_view{registry});
+    ([](entt::view<entity_type, const double>) {})(entt::as_view{cregistry});
+
+    ([](entt::persistent_view<entity_type, int, char>) {})(entt::as_view{registry});
+    ([](entt::persistent_view<entity_type, const double, const float>) {})(entt::as_view{cregistry});
+
+    ([](entt::raw_view<entity_type, int>) {})(entt::as_view{registry});
+    ([](entt::raw_view<entity_type, const double>) {})(entt::as_view{cregistry});
+}
+
 TEST(Helper, Dependency) {
     entt::registry<> registry;
     const auto entity = registry.create();
