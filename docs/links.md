@@ -27,7 +27,11 @@ a reference:
   * [Randballs](https://github.com/gale93/randballs): simple `SFML` and `EnTT`
     playground.
 
-* Engines:
+* Engines/Frameworks:
+  * [starlight](https://github.com/DomRe/starlight): game programming framework
+    using `Allegro`, `Lua` and modern C++.
+  * [Apparently](https://github.com/JosiahWI/qub3d-libdeps)
+    [Qub3d](https://qub3d.org/): because blocks should be open source.
   * [shiva](https://github.com/Milerius/shiva): modern C++ engine with
     modularity.
 
