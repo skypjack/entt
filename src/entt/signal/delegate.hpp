@@ -2,7 +2,6 @@
 #define ENTT_SIGNAL_DELEGATE_HPP
 
 
-#include <utility>
 #include <functional>
 #include <type_traits>
 #include "../config/config.h"
@@ -81,21 +80,6 @@ class delegate;
 template<typename Ret, typename... Args>
 class delegate<Ret(Args...)> final {
     using proto_fn_type = Ret(const void *, Args...);
-    using stub_type = std::pair<const void *, proto_fn_type *>;
-
-    template<auto Function>
-    static Ret proto(const void *, Args... args) {
-        return std::invoke(Function, args...);
-    }
-
-    template<bool Const, typename Class, auto Member>
-    static Ret proto(const void *instance, Args... args) {
-        if constexpr(Const) {
-            return std::invoke(Member, static_cast<const Class *>(instance), args...);
-        } else {
-            return std::invoke(Member, const_cast<Class *>(static_cast<const Class *>(instance)), args...);
-        }
-    }
 
 public:
     /*! @brief Function type of the delegate. */
@@ -103,7 +87,7 @@ public:
 
     /*! @brief Default constructor. */
     delegate() ENTT_NOEXCEPT
-        : stub{}
+        : fn{nullptr}, ref{nullptr}
     {}
 
     /**
@@ -112,7 +96,7 @@ public:
      */
     template<auto Function>
     delegate(connect_arg_t<Function>) ENTT_NOEXCEPT
-        : stub{}
+        : delegate{}
     {
         connect<Function>();
     }
@@ -125,7 +109,7 @@ public:
      */
     template<auto Member, typename Class>
     delegate(connect_arg_t<Member>, Class *instance) ENTT_NOEXCEPT
-        : stub{}
+        : delegate{}
     {
         connect<Member>(instance);
     }
@@ -137,7 +121,11 @@ public:
     template<auto Function>
     void connect() ENTT_NOEXCEPT {
         static_assert(std::is_invocable_r_v<Ret, decltype(Function), Args...>);
-        stub = std::make_pair(nullptr, &proto<Function>);
+        ref = nullptr;
+
+        fn = [](const void *, Args... args) -> Ret {
+            return std::invoke(Function, args...);
+        };
     }
 
     /**
@@ -154,7 +142,15 @@ public:
     template<auto Member, typename Class>
     void connect(Class *instance) ENTT_NOEXCEPT {
         static_assert(std::is_invocable_r_v<Ret, decltype(Member), Class, Args...>);
-        stub = std::make_pair(instance, &proto<std::is_const_v<Class>, std::remove_const_t<Class>, Member>);
+        ref = instance;
+
+        fn = [](const void *instance, Args... args) -> Ret {
+            if constexpr(std::is_const_v<Class>) {
+                return std::invoke(Member, static_cast<Class *>(instance), args...);
+            } else {
+                return std::invoke(Member, static_cast<Class *>(const_cast<void *>(instance)), args...);
+            }
+        };
     }
 
     /**
@@ -163,7 +159,8 @@ public:
      * After a reset, a delegate can be safely invoked with no effect.
      */
     void reset() ENTT_NOEXCEPT {
-        stub = std::make_pair(nullptr, nullptr);
+        ref = nullptr;
+        fn = nullptr;
     }
 
     /**
@@ -171,7 +168,7 @@ public:
      * @return An opaque pointer to the instance bound to the delegate, if any.
      */
     const void * instance() const ENTT_NOEXCEPT {
-        return stub.first;
+        return ref;
     }
 
     /**
@@ -189,7 +186,7 @@ public:
      * @return The value returned by the underlying function.
      */
     Ret operator()(Args... args) const {
-        return stub.second(stub.first, args...);
+        return fn(ref, args...);
     }
 
     /**
@@ -197,8 +194,8 @@ public:
      * @return False if the delegate is empty, true otherwise.
      */
     explicit operator bool() const ENTT_NOEXCEPT {
-        // no need to test also stub.first
-        return stub.second;
+        // no need to test also data
+        return fn;
     }
 
     /**
@@ -210,11 +207,12 @@ public:
      * @return True if the two delegates are identical, false otherwise.
      */
     bool operator==(const delegate<Ret(Args...)> &other) const ENTT_NOEXCEPT {
-        return stub.first == other.stub.first && stub.second == other.stub.second;
+        return ref == other.ref && fn == other.fn;
     }
 
 private:
-    stub_type stub{};
+    proto_fn_type *fn;
+    const void *ref;
 };
 
 
