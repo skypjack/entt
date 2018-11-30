@@ -24,52 +24,93 @@ struct const_nonconst_noexcept {
 };
 
 TEST(Delegate, Functionalities) {
-    entt::delegate<int(int)> ffdel;
-    entt::delegate<int(int)> mfdel;
+    entt::delegate<int(int)> ff_del;
+    entt::delegate<int(int)> mf_del;
     delegate_functor functor;
 
-    ASSERT_FALSE(ffdel);
-    ASSERT_FALSE(mfdel);
-    ASSERT_EQ(ffdel, mfdel);
+    ASSERT_FALSE(ff_del);
+    ASSERT_FALSE(mf_del);
+    ASSERT_EQ(ff_del, mf_del);
 
-    ffdel.connect<&delegate_function>();
-    mfdel.connect<&delegate_functor::operator()>(&functor);
+    ff_del.connect<&delegate_function>();
+    mf_del.connect<&delegate_functor::operator()>(&functor);
 
-    ASSERT_TRUE(ffdel);
-    ASSERT_TRUE(mfdel);
+    ASSERT_TRUE(ff_del);
+    ASSERT_TRUE(mf_del);
 
-    ASSERT_EQ(ffdel(3), 9);
-    ASSERT_EQ(mfdel(3), 6);
+    ASSERT_EQ(ff_del(3), 9);
+    ASSERT_EQ(mf_del(3), 6);
 
-    ffdel.reset();
+    ff_del.reset();
 
-    ASSERT_FALSE(ffdel);
-    ASSERT_TRUE(mfdel);
+    ASSERT_FALSE(ff_del);
+    ASSERT_TRUE(mf_del);
 
-    ASSERT_EQ(ffdel, entt::delegate<int(int)>{});
-    ASSERT_NE(mfdel, entt::delegate<int(int)>{});
-    ASSERT_NE(ffdel, mfdel);
+    ASSERT_EQ(ff_del, entt::delegate<int(int)>{});
+    ASSERT_NE(mf_del, entt::delegate<int(int)>{});
+    ASSERT_NE(ff_del, mf_del);
 
-    mfdel.reset();
+    mf_del.reset();
 
-    ASSERT_FALSE(ffdel);
-    ASSERT_FALSE(mfdel);
+    ASSERT_FALSE(ff_del);
+    ASSERT_FALSE(mf_del);
 
-    ASSERT_EQ(ffdel, entt::delegate<int(int)>{});
-    ASSERT_EQ(mfdel, entt::delegate<int(int)>{});
-    ASSERT_EQ(ffdel, mfdel);
+    ASSERT_EQ(ff_del, entt::delegate<int(int)>{});
+    ASSERT_EQ(mf_del, entt::delegate<int(int)>{});
+    ASSERT_EQ(ff_del, mf_del);
 }
 
 TEST(Delegate, Comparison) {
-    entt::delegate<int(int)> delegate;
-    entt::delegate<int(int)> def;
-    delegate.connect<&delegate_function>();
+    entt::delegate<int(int)> lhs;
+    entt::delegate<int(int)> rhs;
+    delegate_functor functor;
 
-    ASSERT_EQ(def, entt::delegate<int(int)>{});
-    ASSERT_NE(def, delegate);
+    ASSERT_EQ(lhs, entt::delegate<int(int)>{});
+    ASSERT_FALSE(lhs != rhs);
+    ASSERT_TRUE(lhs == rhs);
+    ASSERT_EQ(lhs, rhs);
 
-    ASSERT_TRUE(def == entt::delegate<int(int)>{});
-    ASSERT_TRUE (def != delegate);
+    lhs.connect<&delegate_function>();
+
+    ASSERT_EQ(lhs, entt::delegate<int(int)>{entt::connect_arg<&delegate_function>});
+    ASSERT_TRUE(lhs != rhs);
+    ASSERT_FALSE(lhs == rhs);
+    ASSERT_NE(lhs, rhs);
+
+    rhs.connect<&delegate_function>();
+
+    ASSERT_EQ(lhs, entt::delegate<int(int)>{entt::connect_arg<&delegate_function>});
+    ASSERT_FALSE(lhs != rhs);
+    ASSERT_TRUE(lhs == rhs);
+    ASSERT_EQ(lhs, rhs);
+
+    lhs.connect<&delegate_functor::operator()>(&functor);
+
+    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&delegate_functor::operator()>, &functor}));
+    ASSERT_TRUE(lhs != rhs);
+    ASSERT_FALSE(lhs == rhs);
+    ASSERT_NE(lhs, rhs);
+
+    rhs.connect<&delegate_functor::operator()>(&functor);
+
+    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&delegate_functor::operator()>, &functor}));
+    ASSERT_FALSE(lhs != rhs);
+    ASSERT_TRUE(lhs == rhs);
+    ASSERT_EQ(lhs, rhs);
+
+    lhs.reset();
+
+    ASSERT_EQ(lhs, (entt::delegate<int(int)>{}));
+    ASSERT_TRUE(lhs != rhs);
+    ASSERT_FALSE(lhs == rhs);
+    ASSERT_NE(lhs, rhs);
+
+    rhs.reset();
+
+    ASSERT_EQ(lhs, (entt::delegate<int(int)>{}));
+    ASSERT_FALSE(lhs != rhs);
+    ASSERT_TRUE(lhs == rhs);
+    ASSERT_EQ(lhs, rhs);
 }
 
 TEST(Delegate, ConstNonConstNoExcept) {
