@@ -309,7 +309,7 @@ ago. Fortunately, there are also people who took the time to implement open
 source projects based on `EnTT` and did not hold back when it came to
 documenting them.
 
-[Here](https://github.com/skypjack/entt/wiki/EnTT-in-Action) you can find and
+[Here](https://github.com/skypjack/entt/wiki/EnTT-in-Action) you can find an
 incomplete list of games, applications and articles that can be used as a
 reference.
 
