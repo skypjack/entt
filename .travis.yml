@@ -2,6 +2,38 @@ language: cpp
 dist: trusty
 sudo: false
 
+env:
+  global:
+    - CONAN_USERNAME="skypjack"
+    - CONAN_PACKAGE_NAME="entt"
+    - CONAN_HEADER_ONLY="True"
+    - NON_CONAN_DEPLOYMENT="True"
+
+conan-buildsteps: &conan-buildsteps
+  before_install:
+    # use this step if you desire to manipulate CONAN variables programmatically
+    - NON_CONAN_DEPLOYMENT="False"
+  install:
+    - chmod +x ./conan/ci/install.sh
+    - ./conan/ci/install.sh
+  script:
+    - chmod +x ./conan/ci/build.sh
+    - ./conan/ci/build.sh
+  # the following are dummies to overwrite default build steps
+  before_script:
+    - true
+  after_success:
+    - true
+  if: tag IS present
+conan-linux: &conan-linux
+  os: linux
+  sudo: required
+  language: python
+  python: "3.6"
+  services:
+    - docker
+  <<: *conan-buildsteps
+
 matrix:
   include:
   - os: linux
@@ -35,6 +67,9 @@ matrix:
       - pip install --user cpp-coveralls
     after_success:
       - coveralls --gcov gcov-7 --gcov-options '\-lp' --root ${TRAVIS_BUILD_DIR} --build-root ${TRAVIS_BUILD_DIR}/build --extension cpp --extension hpp --exclude deps --include src
+  # Conan testing and uploading
+  - <<: *conan-linux
+    env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8
 
 notifications:
   email:
@@ -59,4 +94,4 @@ deploy:
   script: scripts/update_packages.sh $TRAVIS_TAG
   on:
     tags: true
-    condition: “$TRAVIS_BRANCH” = “$TRAVIS_TAG”
+    condition: “$NON_CONAN_DEPLOYMENT = “True”

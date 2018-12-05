@@ -287,14 +287,16 @@ Note that benchmarks are not part of this set.
 
 `EnTT` is available for some of the most known packaging tools. In particular:
 
-* [`vcpkg`](https://github.com/Microsoft/vcpkg/tree/master/ports/entt),
-  Microsoft VC++ Packaging Tool.
+* [`Conan`](https://bintray.com/skypjack/conan/entt%3Askypjack/_latestVersion),
+  the C/C++ Package Manager for Developers.
 * [`Homebrew`](https://github.com/skypjack/homebrew-entt), the missing package
   manager for macOS.<br/>
   Available as a homebrew formula. Just type the following to install it:
   ```
   brew install skypjack/entt/entt
   ```
+* [`vcpkg`](https://github.com/Microsoft/vcpkg/tree/master/ports/entt),
+  Microsoft VC++ Packaging Tool.
 
 Consider this list a work in progress and help me to make it longer.
 
