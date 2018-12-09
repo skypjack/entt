@@ -68,6 +68,8 @@ endif()
 
 add_library(EnTT INTERFACE)
 
+configure_file(${EnTT_SOURCE_DIR}/cmake/in/version.h.in ${EnTT_SOURCE_DIR}/src/entt/config/version.h @ONLY)
+
 target_include_directories(
     EnTT INTERFACE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
