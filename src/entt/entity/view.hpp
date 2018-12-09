@@ -70,7 +70,7 @@ class registry;
  */
 template<typename Entity, typename... Component>
 class persistent_view final {
-    static_assert(sizeof...(Component) > 1);
+    static_assert(sizeof...(Component));
 
     /*! @brief A registry is allowed to create views. */
     friend class registry<Entity>;

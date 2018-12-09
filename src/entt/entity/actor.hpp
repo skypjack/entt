@@ -32,7 +32,7 @@ struct actor {
      * @brief Constructs an actor by using the given registry.
      * @param reg An entity-component system properly initialized.
      */
-    actor(registry<Entity> &reg)
+    actor(registry_type &reg)
         : reg{&reg}, entt{reg.create()}
     {}
 

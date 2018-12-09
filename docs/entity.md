@@ -839,6 +839,8 @@ All of them have pros and cons to take in consideration. In particular:
     they don't have any type of initialization.
   * They are the best tool for iterating multiple components when most entities
     have them all.
+  * They are also the only type of views that supports filters without incurring
+    in a loss of performance during iterations.
 
   Cons:
 
@@ -895,8 +897,9 @@ To sum up and as a rule of thumb:
 * Use a persistent view when you want to iterate multiple components and each
   component is assigned to a great number of entities but the intersection
   between the sets of entities is small.
-* Use a persistent view in all the cases where a standard view wouldn't fit well
-  otherwise.
+* Use a persistent view when you want to set more complex filters that would
+  translate otherwise in a bunch of `if`s within a loop.
+* Use a persistent view in all the cases where a standard view doesn't fit well.
 * Finally, in case you don't know at compile-time what are the components to
   use, choose a runtime view and set them during execution.
 
@@ -1019,16 +1022,29 @@ mind that it works only with the components of the view itself.
 ## Persistent View
 
 A persistent view returns all the entities and only the entities that have at
-least the given components. Moreover, it's guaranteed that the entity list is
-tightly packed in memory for fast iterations.<br/>
+least the given components and respect the given filters. Moreover, it's
+guaranteed that the entity list is tightly packed in memory for fast
+iterations.<br/>
 In general, persistent views don't stay true to the order of any set of
 components unless users explicitly sort them.
 
-Persistent views can be used only to iterate multiple components at once:
+Persistent views are used mainly to iterate multiple components at once:
 
 ```cpp
 auto view = registry.persistent_view<position, velocity>();
 ```
+
+Moreover, filters can be applied to a persistent view to some extents:
+
+```cpp
+auto view = registry.persistent_view<position, velocity>(entt::type_list<renderable>);
+```
+
+In this case, the view will return all the entities that have both components
+`position` and `velocity` but don't have component `renderable`.<br/>
+Exclusive filters (ie the entities that have either `position` or `velocity`)
+aren't supported for performance reasons. Similarly, a filter cannot be applied
+to a persistent view with an empty template parameters list.
 
 There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In
@@ -1180,7 +1196,7 @@ views.
 # Types: const, non-const and all in between
 
 The `registry` class offers two overloads for most of the member functions used
-to construct views: a const one and a non-const one. The former accepts both
+to construct views: a const version and a non-const one. The former accepts both
 const and non-const types as template parameters, the latter accepts only const
 types instead.<br/>
 It means that views can be constructed also from a const registry and they

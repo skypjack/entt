@@ -7,12 +7,10 @@
 * define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
 * runner proposal: https://en.wikipedia.org/wiki/Fork%E2%80%93join_model https://slide-rs.github.io/specs/03_dispatcher.html
-* optimize for empty components, it would be a mid improvement in terms of memory usage (see std::is_empty)
 * deep copy of a registry (or use the snapshot stuff to copy components and keep intact ids at least)
 * is it possible to iterate all the components assigned to an entity through a common base class?
 * can we do more for shared libraries? who knows... see #144
 * work stealing job system (see #100)
-* composable looper so as to pack erased systems, compose runners at different rates and run them at once in the loop
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
 * meta: move-to-head optimization when searching by name on parts (data, func, etc)
 * hashed string: add implicit check on construction for uniqueness (optional)
@@ -22,4 +20,7 @@
 * add on-the-fly sort functionality (is it possible?)
 * write/show how to work with missing components using and-strategies
 * write/show how to create an archetype based model on top of EnTT
-* mention hunter and conan in the readme file, section packaging tools
+* mention hunter in the readme file, section packaging tools
+* monostate: make constraint trivially copyable due to atomic optional
+* monostate: use template variable to avoid {}
+* travis + windows is now available, try it

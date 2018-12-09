@@ -1,5 +1,6 @@
 #include <utility>
 #include <iterator>
+#include <algorithm>
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
@@ -249,6 +250,71 @@ TEST(PersistentView, Find) {
     ASSERT_EQ(*(++it), e0);
     ASSERT_EQ(++it, view.end());
     ASSERT_EQ(++view.find(e0), view.end());
+}
+
+TEST(PersistentView, SingleComponent) {
+    entt::registry<> registry;
+    const auto view = registry.persistent_view<const int>();
+
+    registry.assign<int>(registry.create());
+
+    const auto entity = registry.create();
+    registry.assign<int>(entity);
+
+    registry.assign<int>(registry.create());
+
+    registry.destroy(entity);
+    registry.assign<int>(registry.create());
+
+    ASSERT_TRUE(std::equal(view.begin(), view.end(), registry.view<int>().begin()));
+}
+
+TEST(PersistentView, ExcludedComponents) {
+    entt::registry<> registry;
+
+    const auto e0 = registry.create();
+    registry.assign<int>(e0, 0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1, 1);
+    registry.assign<char>(e1);
+
+    const auto view = registry.persistent_view<int>(entt::type_list<char>{});
+
+    const auto e2 = registry.create();
+    registry.assign<int>(e2, 2);
+
+    const auto e3 = registry.create();
+    registry.assign<int>(e3, 3);
+    registry.assign<char>(e3);
+
+    for(const auto entity: view) {
+        if(entity == e0) {
+            ASSERT_EQ(view.get<int>(e0), 0);
+        } else if(entity == e2) {
+            ASSERT_EQ(view.get<int>(e2), 2);
+        } else {
+            FAIL();
+        }
+    }
+
+    registry.assign<char>(e0);
+    registry.assign<char>(e2);
+
+    ASSERT_TRUE(view.empty());
+
+    registry.remove<char>(e1);
+    registry.remove<char>(e3);
+
+    for(const auto entity: view) {
+        if(entity == e1) {
+            ASSERT_EQ(view.get<int>(e1), 1);
+        } else if(entity == e3) {
+            ASSERT_EQ(view.get<int>(e3), 3);
+        } else {
+            FAIL();
+        }
+    }
 }
 
 TEST(SingleComponentView, Functionalities) {
