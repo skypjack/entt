@@ -24,3 +24,10 @@ TEST(Algorithm, InsertionSort) {
         ASSERT_LT(arr[i], arr[i+1]);
     }
 }
+
+TEST(Algorithm, InsertionSortEmptyContainer) {
+    std::vector<int> vec{};
+    entt::insertion_sort sort;
+    // this should crash with asan enabled if we break the constraint
+    sort(vec.begin(), vec.end());
+}
