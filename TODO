@@ -18,9 +18,12 @@
 * destroy overload that accepts a couple of iterators (see create)
 * allow for built-in parallel each if possible
 * add on-the-fly sort functionality (is it possible?)
-* write/show how to work with missing components using and-strategies
 * write/show how to create an archetype based model on top of EnTT
 * mention hunter in the readme file, section packaging tools
 * monostate: make constraint trivially copyable due to atomic optional
 * monostate: use template variable to avoid {}
 * travis + windows is now available, try it
+* hashed string: static (constexpr) member function to_value for direct hashing
+* entity: simplify get functions so as to generate less symbols for multiple components
+* events on replace, so that one can track updated components? indagate impact
+* add merge functionality for type list

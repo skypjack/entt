@@ -848,7 +848,7 @@ TEST(SparseSetWithType, MoveOnlyComponent) {
         move_only_component & operator=(move_only_component &&) = default;
     };
 
-    // it's purpose is to ensure that move only components are always accepted
+    // the purpose is to ensure that move only components are always accepted
     entt::sparse_set<std::uint64_t, move_only_component> set;
     (void)set;
 }

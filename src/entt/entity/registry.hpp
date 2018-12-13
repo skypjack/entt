@@ -178,19 +178,6 @@ public:
     /*! @brief Type of sink for the given component. */
     using sink_type = typename component_signal_type::sink_type;
 
-    /*! @brief Default constructor. */
-    registry() ENTT_NOEXCEPT = default;
-
-    /*! @brief Copying a registry isn't allowed. */
-    registry(const registry &) = delete;
-    /*! @brief Default move constructor. */
-    registry(registry &&) = default;
-
-    /*! @brief Copying a registry isn't allowed. @return This registry. */
-    registry & operator=(const registry &) = delete;
-    /*! @brief Default move assignment operator. @return This registry. */
-    registry & operator=(registry &&) = default;
-
     /**
      * @brief Returns the numeric identifier of a type of component at runtime.
      *
@@ -207,6 +194,19 @@ public:
     static component_type type() ENTT_NOEXCEPT {
         return component_family::type<Component>;
     }
+
+    /*! @brief Default constructor. */
+    registry() ENTT_NOEXCEPT = default;
+
+    /*! @brief Copying a registry isn't allowed. */
+    registry(const registry &) = delete;
+    /*! @brief Default move constructor. */
+    registry(registry &&) = default;
+
+    /*! @brief Copying a registry isn't allowed. @return This registry. */
+    registry & operator=(const registry &) = delete;
+    /*! @brief Default move assignment operator. @return This registry. */
+    registry & operator=(registry &&) = default;
 
     /**
      * @brief Returns the number of existing components of the given type.
@@ -1402,6 +1402,43 @@ public:
         });
 
         return { std::move(set) };
+    }
+
+    /**
+     * @brief Clones the given components and all the entity identifiers.
+     *
+     * The components must be copiable for obvious reasons. The entities
+     * maintain their versions once copied.
+     *
+     * @note
+     * There isn't an efficient way to know if all the entities are assigned at
+     * least one component once copied. Therefore, there may be orphans. It is
+     * up to the caller to clean up the registry if necessary.
+     *
+     * @warning
+     * This function requires that the registry be empty. In case it isn't, all
+     * the data will be automatically deleted beforehand.
+     *
+     * @tparam Component Types of components to clone.
+     * @param reg A valid reference to a source registry.
+     */
+    template<typename... Component>
+    void clone(const registry &reg) {
+        *this = {};
+
+        (assure<Component>(), ...);
+        (reserve<Component>(reg.size<Component>()), ...);
+
+        (std::copy(reg.raw<Component>(), reg.raw<Component>() + reg.size<Component>(), pool<Component>().raw()), ...);
+        // double lambda function used to work around a bug of gcc7
+        (std::for_each(reg.data<Component>(), reg.data<Component>() + reg.size<Component>(), ([](auto *cpool) {
+            return [cpool](const auto entity) { cpool->construct(entity); };
+        })(pools[component_family::type<Component>].get())), ...);
+
+        next = reg.next;
+        available = reg.available;
+        entities.resize(reg.entities.size());
+        std::copy(reg.entities.cbegin(), reg.entities.cend(), entities.begin());
     }
 
     /**

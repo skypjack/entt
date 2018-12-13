@@ -748,18 +748,18 @@ TEST(Registry, PersistentViewSortInterleaved) {
     entt::registry<> registry;
     const auto view = registry.persistent_view<int, char>();
 
-    auto e0 = registry.create();
+    const auto e0 = registry.create();
     registry.assign<int>(e0, 0);
     registry.assign<char>(e0, '0');
 
-    auto e1 = registry.create();
+    const auto e1 = registry.create();
     registry.assign<int>(e1, 1);
     registry.assign<char>(e1, '1');
 
     registry.sort<int>([](auto lhs, auto rhs) { return lhs > rhs; });
     registry.sort<char>([](auto lhs, auto rhs) { return lhs < rhs; });
 
-    auto e2 = registry.create();
+    const auto e2 = registry.create();
     registry.assign<int>(e2, 2);
     registry.assign<char>(e2, '2');
 
@@ -775,4 +775,44 @@ TEST(Registry, PersistentViewSortInterleaved) {
             ASSERT_EQ(c, '2');
         }
     });
+}
+
+TEST(Registry, Clone) {
+    entt::registry<> registry;
+    entt::registry<> other;
+
+    const auto entity = other.create();
+    other.assign<int>(entity, 42);
+    other.assign<char>(entity, 'c');
+
+    registry.destroy(registry.create());
+
+    const auto e0 = registry.create();
+    registry.assign<int>(e0, 0);
+    registry.assign<double>(e0, 0.0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1, 1);
+    registry.assign<char>(e1, '1');
+    registry.assign<double>(e1, 1.1);
+
+    const auto e2 = registry.create();
+    registry.assign<int>(e2, 2);
+    registry.assign<char>(e2, '2');
+
+    registry.destroy(e1);
+    other.clone<int, char>(registry);
+
+    ASSERT_FALSE(other.valid(entity));
+    ASSERT_TRUE(other.valid(e0));
+    ASSERT_FALSE(other.valid(e1));
+    ASSERT_TRUE(other.valid(e2));
+
+    ASSERT_TRUE((other.has<int>(e0)));
+    ASSERT_FALSE((other.has<double>(e0)));
+    ASSERT_TRUE((other.has<int, char>(e2)));
+
+    ASSERT_EQ(other.get<int>(e0), 0);
+    ASSERT_EQ(other.get<int>(e2), 2);
+    ASSERT_EQ(other.get<char>(e2), '2');
 }

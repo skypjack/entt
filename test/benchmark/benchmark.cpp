@@ -245,6 +245,7 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
 
 TEST(Benchmark, IterateTwoComponentsPersistent1M) {
     entt::registry<> registry;
+    registry.persistent_view<position, velocity>();
 
     std::cout << "Iterating over 1000000 entities, two components, persistent view" << std::endl;
 
@@ -439,6 +440,7 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
 
 TEST(Benchmark, IterateFiveComponentsPersistent1M) {
     entt::registry<> registry;
+    registry.persistent_view<position, velocity, comp<1>, comp<2>, comp<3>>();
 
     std::cout << "Iterating over 1000000 entities, five components, persistent view" << std::endl;
 
@@ -687,6 +689,7 @@ TEST(Benchmark, IterateTenComponents1MOne) {
 
 TEST(Benchmark, IterateTenComponentsPersistent1M) {
     entt::registry<> registry;
+    registry.persistent_view<position, velocity, comp<1>, comp<2>, comp<3>, comp<4>, comp<5>, comp<6>, comp<7>, comp<8>>();
 
     std::cout << "Iterating over 1000000 entities, ten components, persistent view" << std::endl;
 
