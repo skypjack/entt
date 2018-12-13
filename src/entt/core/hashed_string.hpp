@@ -94,10 +94,7 @@ public:
      */
     constexpr operator const char *() const ENTT_NOEXCEPT { return str; }
 
-    /**
-     * @brief Returns the numeric representation of a hashed string.
-     * @return The numeric representation of the instance.
-     */
+    /*! @copydoc value */
     constexpr operator hash_type() const ENTT_NOEXCEPT { return hash; }
 
     /**

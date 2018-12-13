@@ -130,11 +130,7 @@ struct actor {
         return std::as_const(*reg).template get<Component...>(entt);
     }
 
-    /**
-     * @brief Returns references to the given components for an actor.
-     * @tparam Component Types of components to get.
-     * @return References to the components owned by the actor.
-     */
+    /*! @copydoc get */
     template<typename... Component>
     decltype(auto) get() ENTT_NOEXCEPT {
         return reg->template get<Component...>(entt);
@@ -150,11 +146,7 @@ struct actor {
         return std::as_const(*reg).template try_get<Component...>(entt);
     }
 
-    /**
-     * @brief Returns pointers to the given components for an actor.
-     * @tparam Component Types of components to get.
-     * @return Pointers to the components owned by the actor.
-     */
+    /*! @copydoc try_get */
     template<typename... Component>
     auto try_get() ENTT_NOEXCEPT {
         return reg->template try_get<Component...>(entt);
@@ -168,10 +160,7 @@ struct actor {
         return *reg;
     }
 
-    /**
-     * @brief Returns a reference to the underlying registry.
-     * @return A reference to the underlying registry.
-     */
+    /*! @copydoc backend */
     inline registry_type & backend() ENTT_NOEXCEPT {
         return const_cast<registry_type &>(std::as_const(*this).backend());
     }

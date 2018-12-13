@@ -74,14 +74,7 @@ template<typename Entity>
 as_view(registry<Entity> &) ENTT_NOEXCEPT -> as_view<false, Entity>;
 
 
-/**
- * @brief Deduction guideline.
- *
- * It allows to deduce the constness of a registry directly from the instance
- * provided to the constructor.
- *
- * @tparam Entity A valid entity type (see entt_traits for more details).
- */
+/*! @copydoc as_view */
 template<typename Entity>
 as_view(const registry<Entity> &) ENTT_NOEXCEPT -> as_view<true, Entity>;
 

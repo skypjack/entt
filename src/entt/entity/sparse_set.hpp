@@ -672,21 +672,7 @@ public:
         return instances.data();
     }
 
-    /**
-     * @brief Direct access to the array of objects.
-     *
-     * The returned pointer is such that range `[raw(), raw() + size()]` is
-     * always a valid range, even if the container is empty.
-     *
-     * @note
-     * There are no guarantees on the order, even though either `sort` or
-     * `respect` has been previously invoked. Internal data structures arrange
-     * elements to maximize performance. Accessing them directly gives a
-     * performance boost but less guarantees. Use `begin` and `end` if you want
-     * to iterate the sparse set in the expected order.
-     *
-     * @return A pointer to the array of objects.
-     */
+    /*! @copydoc raw */
     object_type * raw() ENTT_NOEXCEPT {
         return instances.data();
     }
@@ -708,34 +694,12 @@ public:
         return const_iterator_type{&instances, pos};
     }
 
-    /**
-     * @brief Returns an iterator to the beginning.
-     *
-     * The returned iterator points to the first instance of the given type. If
-     * the sparse set is empty, the returned iterator will be equal to `end()`.
-     *
-     * @note
-     * Input iterators stay true to the order imposed by a call to either `sort`
-     * or `respect`.
-     *
-     * @return An iterator to the first instance of the given type.
-     */
+    /*! @copydoc cbegin */
     inline const_iterator_type begin() const ENTT_NOEXCEPT {
         return cbegin();
     }
 
-    /**
-     * @brief Returns an iterator to the beginning.
-     *
-     * The returned iterator points to the first instance of the given type. If
-     * the sparse set is empty, the returned iterator will be equal to `end()`.
-     *
-     * @note
-     * Input iterators stay true to the order imposed by a call to either `sort`
-     * or `respect`.
-     *
-     * @return An iterator to the first instance of the given type.
-     */
+    /*! @copydoc begin */
     iterator_type begin() ENTT_NOEXCEPT {
         const typename traits_type::difference_type pos = instances.size();
         return iterator_type{&instances, pos};
@@ -759,38 +723,12 @@ public:
         return const_iterator_type{&instances, {}};
     }
 
-    /**
-     * @brief Returns an iterator to the end.
-     *
-     * The returned iterator points to the element following the last instance
-     * of the given type. Attempting to dereference the returned iterator
-     * results in undefined behavior.
-     *
-     * @note
-     * Input iterators stay true to the order imposed by a call to either `sort`
-     * or `respect`.
-     *
-     * @return An iterator to the element following the last instance of the
-     * given type.
-     */
+    /*! @copydoc cend */
     inline const_iterator_type end() const ENTT_NOEXCEPT {
         return cend();
     }
 
-    /**
-     * @brief Returns an iterator to the end.
-     *
-     * The returned iterator points to the element following the last instance
-     * of the given type. Attempting to dereference the returned iterator
-     * results in undefined behavior.
-     *
-     * @note
-     * Input iterators stay true to the order imposed by a call to either `sort`
-     * or `respect`.
-     *
-     * @return An iterator to the element following the last instance of the
-     * given type.
-     */
+    /*! @copydoc end */
     iterator_type end() ENTT_NOEXCEPT {
         return iterator_type{&instances, {}};
     }
@@ -811,18 +749,7 @@ public:
         return instances[underlying_type::get(entity)];
     }
 
-    /**
-     * @brief Returns the object associated with an entity.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the sparse set results
-     * in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * sparse set doesn't contain the given entity.
-     *
-     * @param entity A valid entity identifier.
-     * @return The object associated with the entity.
-     */
+    /*! @copydoc get */
     inline object_type & get(const entity_type entity) ENTT_NOEXCEPT {
         return const_cast<object_type &>(std::as_const(*this).get(entity));
     }
@@ -836,11 +763,7 @@ public:
         return underlying_type::has(entity) ? (instances.data() + underlying_type::get(entity)) : nullptr;
     }
 
-    /**
-     * @brief Returns a pointer to the object associated with an entity, if any.
-     * @param entity A valid entity identifier.
-     * @return The object associated with the entity, if any.
-     */
+    /*! @copydoc try_get */
     inline object_type * try_get(const entity_type entity) ENTT_NOEXCEPT {
         return const_cast<object_type *>(std::as_const(*this).try_get(entity));
     }
@@ -1010,9 +933,7 @@ public:
         }
     }
 
-    /**
-     * @brief Resets a sparse set.
-     */
+    /*! @brief Resets a sparse set. */
     void reset() override {
         underlying_type::reset();
         instances.clear();

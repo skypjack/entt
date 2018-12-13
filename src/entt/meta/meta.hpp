@@ -440,10 +440,7 @@ public:
         return instance;
     }
 
-    /**
-     * @brief Returns an opaque pointer to the contained instance.
-     * @return An opaque pointer the contained instance, if any.
-     */
+    /*! @copydoc data */
     inline void * data() ENTT_NOEXCEPT {
         return const_cast<void *>(std::as_const(*this).data());
     }
@@ -479,20 +476,7 @@ public:
         return *internal::try_cast<Type>(node, instance);
     }
 
-    /**
-     * @brief Tries to cast an instance to a given type.
-     *
-     * The type of the instance must be such that the cast is possible.
-     *
-     * @warning
-     * Attempting to perform a cast that isn't viable results in undefined
-     * behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case
-     * the cast is not feasible.
-     *
-     * @tparam Type Type to which to cast the instance.
-     * @return A reference to the contained instance.
-     */
+    /*! @copydoc cast */
     template<typename Type>
     inline Type & cast() ENTT_NOEXCEPT {
         return const_cast<Type &>(std::as_const(*this).cast<Type>());
@@ -687,20 +671,7 @@ public:
         return internal::try_cast<Type>(node, instance);
     }
 
-    /**
-     * @brief Tries to cast an instance to a given type.
-     *
-     * The type of the instance must be such that the conversion is possible.
-     *
-     * @warning
-     * Attempting to perform a conversion that isn't viable results in undefined
-     * behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case
-     * the conversion is not feasible.
-     *
-     * @tparam Type Type to which to cast the instance.
-     * @return A pointer to the contained instance.
-     */
+    /*! @copydoc try_cast */
     template<typename Type>
     inline Type * try_cast() ENTT_NOEXCEPT {
         return const_cast<Type *>(std::as_const(*this).try_cast<Type>());
@@ -714,10 +685,7 @@ public:
         return instance;
     }
 
-    /**
-     * @brief Returns an opaque pointer to the contained instance.
-     * @return An opaque pointer the contained instance, if any.
-     */
+    /*! @copydoc data */
     inline void * data() ENTT_NOEXCEPT {
         return const_cast<void *>(std::as_const(*this).data());
     }

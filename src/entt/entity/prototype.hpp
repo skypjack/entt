@@ -190,18 +190,7 @@ public:
         }
     }
 
-    /**
-     * @brief Returns references to the given components.
-     *
-     * @warning
-     * Attempting to get a component from a prototype that doesn't own it
-     * results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * prototype doesn't own an instance of the given component.
-     *
-     * @tparam Component Types of components to get.
-     * @return References to the components owned by the prototype.
-     */
+    /*! @copydoc get */
     template<typename... Component>
     inline decltype(auto) get() ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 1) {
@@ -226,11 +215,7 @@ public:
         }
     }
 
-    /**
-     * @brief Returns pointers to the given components.
-     * @tparam Component Types of components to get.
-     * @return Pointers to the components owned by the prototype.
-     */
+    /*! @copydoc try_get */
     template<typename... Component>
     inline auto try_get() ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 1) {
@@ -483,10 +468,7 @@ public:
         return *reg;
     }
 
-    /**
-     * @brief Returns a reference to the underlying registry.
-     * @return A reference to the underlying registry.
-     */
+    /*! @copydoc backend */
     inline registry_type & backend() ENTT_NOEXCEPT {
         return const_cast<registry_type &>(std::as_const(*this).backend());
     }

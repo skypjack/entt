@@ -318,20 +318,7 @@ public:
         return managed<Component>() ? pool<Component>().raw() : nullptr;
     }
 
-    /**
-     * @brief Direct access to the list of components of a given pool.
-     *
-     * The returned pointer is such that range
-     * `[raw<Component>(), raw<Component>() + size<Component>()]` is always a
-     * valid range, even if the container is empty.
-     *
-     * @note
-     * There are no guarantees on the order of the components. Use a view if you
-     * want to iterate entities and components in the expected order.
-     *
-     * @tparam Component Type of component in which one is interested.
-     * @return A pointer to the array of components of the given type.
-     */
+    /*! @copydoc raw */
     template<typename Component>
     inline Component * raw() ENTT_NOEXCEPT {
         return const_cast<Component *>(std::as_const(*this).template raw<Component>());
@@ -662,20 +649,7 @@ public:
         }
     }
 
-    /**
-     * @brief Returns references to the given components for an entity.
-     *
-     * @warning
-     * Attempting to use an invalid entity or to get a component from an entity
-     * that doesn't own it results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity or if the entity doesn't own an instance of the given
-     * component.
-     *
-     * @tparam Component Types of components to get.
-     * @param entity A valid entity identifier.
-     * @return References to the components owned by the entity.
-     */
+    /*! @copydoc get */
     template<typename... Component>
     inline decltype(auto) get([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 1) {
@@ -740,18 +714,7 @@ public:
         }
     }
 
-    /**
-     * @brief Returns pointers to the given components for an entity.
-     *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
-     *
-     * @tparam Component Types of components to get.
-     * @param entity A valid entity identifier.
-     * @return Pointers to the components owned by the entity.
-     */
+    /*! @copydoc try_get */
     template<typename... Component>
     inline auto try_get([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 1) {
@@ -1152,40 +1115,7 @@ public:
         return { &pool<Component>()... };
     }
 
-    /**
-     * @brief Returns a standard view for the given components.
-     *
-     * This kind of views are created on the fly and share with the registry its
-     * internal data structures.<br/>
-     * Feel free to discard a view after the use. Creating and destroying a view
-     * is an incredibly cheap operation because they do not require any type of
-     * initialization.<br/>
-     * As a rule of thumb, storing a view should never be an option.
-     *
-     * Standard views do their best to iterate the smallest set of candidate
-     * entities. In particular:
-     *
-     * * Single component views are incredibly fast and iterate a packed array
-     *   of entities, all of which has the given component.
-     * * Multi component views look at the number of entities available for each
-     *   component and pick up a reference to the smallest set of candidates to
-     *   test for the given components.
-     *
-     * @note
-     * Multi component views are pretty fast. However their performance tend to
-     * degenerate when the number of components to iterate grows up and the most
-     * of the entities have all the given components.<br/>
-     * To get a performance boost, consider using a persistent_view instead.
-     *
-     * @sa view
-     * @sa view<Entity, Component>
-     * @sa persistent_view
-     * @sa raw_view
-     * @sa runtime_view
-     *
-     * @tparam Component Type of components used to construct the view.
-     * @return A newly created standard view.
-     */
+    /*! @copydoc view */
     template<typename... Component>
     inline entt::view<Entity, Component...> view() const {
         static_assert(std::conjunction_v<std::is_const<Component>...>);
@@ -1264,44 +1194,7 @@ public:
         };
     }
 
-    /**
-     * @brief Returns a persistent view for the given components.
-     *
-     * This kind of views are created on the fly and share with the registry its
-     * internal data structures.<br/>
-     * Feel free to discard a view after the use. Creating and destroying a view
-     * is an incredibly cheap operation because they do not require any type of
-     * initialization, but for the first time they are used. That's mainly
-     * because of the internal data structures of the registry that are
-     * dedicated to this kind of views and that don't exist yet the very first
-     * time they are requested.<br/>
-     * As a rule of thumb, storing a view should never be an option.
-     *
-     * Persistent views are the right choice to iterate entities when the number
-     * of components grows up and the most of the entities have all the given
-     * components. They are also the only type of views that supports filters
-     * without incurring in a loss of performance during iterations.<br/>
-     * However, persistent views have also drawbacks:
-     *
-     * * Each kind of persistent view requires a dedicated data structure that
-     *   is allocated within the registry and it increases memory pressure.
-     * * Internal data structures used to construct persistent views must be
-     *   kept updated and it affects slightly construction and destruction of
-     *   entities and components, as well as sort functionalities.
-     *
-     * That being said, persistent views are an incredibly powerful tool if used
-     * with care and offer a boost of performance undoubtedly.
-     *
-     * @sa view
-     * @sa view<Entity, Component>
-     * @sa persistent_view
-     * @sa raw_view
-     * @sa runtime_view
-     *
-     * @tparam Component Types of components used to construct the view.
-     * @tparam Exclude Types of components used to filter the view.
-     * @return A newly created persistent view.
-     */
+    /*! @copydoc persistent_view */
     template<typename... Component, typename... Exclude>
     inline entt::persistent_view<Entity, Component...> persistent_view(type_list<Exclude...> = type_list<>{}) const {
         static_assert(std::conjunction_v<std::is_const<Component>...>);
@@ -1337,29 +1230,7 @@ public:
         return { &pool<Component>() };
     }
 
-    /**
-     * @brief Returns a raw view for the given component.
-     *
-     * This kind of views are created on the fly and share with the registry its
-     * internal data structures.<br/>
-     * Feel free to discard a view after the use. Creating and destroying a view
-     * is an incredibly cheap operation because they do not require any type of
-     * initialization.<br/>
-     * As a rule of thumb, storing a view should never be an option.
-     *
-     * Raw views are incredibly fast and must be considered the best tool to
-     * iterate components whenever knowing the entities to which they belong
-     * isn't required.
-     *
-     * @sa view
-     * @sa view<Entity, Component>
-     * @sa persistent_view
-     * @sa raw_view
-     * @sa runtime_view
-     *
-     * @tparam Component Type of component used to construct the view.
-     * @return A newly created raw view.
-     */
+    /*! @copydoc raw_view */
     template<typename Component>
     inline entt::raw_view<Entity, Component> raw_view() const {
         static_assert(std::is_const_v<Component>);

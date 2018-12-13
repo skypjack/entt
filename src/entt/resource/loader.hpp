@@ -49,6 +49,12 @@ class resource_loader {
     /*! @brief Resource loaders are friends of their caches. */
     friend class resource_cache<Resource>;
 
+    /**
+     * @brief Loads the resource and returns it.
+     * @tparam Args Types of arguments for the loader.
+     * @param args Arguments for the loader.
+     * @return The resource just loaded or an empty pointer in case of errors.
+     */
     template<typename... Args>
     std::shared_ptr<Resource> get(Args &&... args) const {
         return static_cast<const Loader *>(this)->load(std::forward<Args>(args)...);
