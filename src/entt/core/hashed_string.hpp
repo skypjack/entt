@@ -38,6 +38,35 @@ public:
     /*! @brief Unsigned integer type. */
     using hash_type = std::uint64_t;
 
+    /**
+     * @brief Returns directly the numeric representation of a string.
+     *
+     * Forcing template resolution avoids implicit conversions. An
+     * human-readable identifier can be anything but a plain, old bunch of
+     * characters.<br/>
+     * Example of use:
+     * @code{.cpp}
+     * const auto value = hashed_string::to_value("my.png");
+     * @endcode
+     *
+     * @tparam N Number of characters of the identifier.
+     * @param str Human-readable identifer.
+     * @return The numeric representation of the string.
+     */
+    template<std::size_t N>
+    inline static constexpr hash_type to_value(const char (&str)[N]) ENTT_NOEXCEPT {
+        return helper(offset, str);
+    }
+
+    /**
+     * @brief Returns directly the numeric representation of a string.
+     * @param wrapper Helps achieving the purpose by relying on overloading.
+     * @return The numeric representation of the string.
+     */
+    inline static hash_type to_value(const_wrapper wrapper) ENTT_NOEXCEPT {
+        return helper(offset, wrapper.str);
+    }
+
     /*! @brief Constructs an empty hashed string. */
     constexpr hashed_string() ENTT_NOEXCEPT
         : hash{}, str{nullptr}

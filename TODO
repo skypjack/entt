@@ -23,7 +23,5 @@
 * monostate: make constraint trivially copyable due to atomic optional
 * monostate: use template variable to avoid {}
 * travis + windows is now available, try it
-* hashed string: static (constexpr) member function to_value for direct hashing
-* entity: simplify get functions so as to generate less symbols for multiple components
 * events on replace, so that one can track updated components? indagate impact
 * allow to bind values to delegate on connect with free functions (sbo + check size on costruction to guarantee a zero allocation abstraction)

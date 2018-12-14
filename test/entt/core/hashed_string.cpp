@@ -44,3 +44,13 @@ TEST(HashedString, Constexprness) {
     (void)std::integral_constant<hash_type, "quux"_hs>{};
     ASSERT_TRUE(true);
 }
+
+TEST(HashedString, ToValue) {
+    using hash_type = entt::hashed_string::hash_type;
+
+    const char *foobar = "foobar";
+
+    ASSERT_EQ(entt::hashed_string::to_value(foobar), 0x85944171f73967e8);
+    // how would you test a constexpr otherwise?
+    (void)std::integral_constant<hash_type, entt::hashed_string::to_value("quux")>{};
+}
