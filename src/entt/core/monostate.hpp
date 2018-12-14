@@ -49,6 +49,14 @@ private:
 };
 
 
+/**
+ * @brief Helper variable template.
+ * @tparam Value Value used to differentiate between different variables.
+ */
+template<hashed_string::hash_type Value>
+inline monostate<Value> monostate_v = {};
+
+
 }
 
 
