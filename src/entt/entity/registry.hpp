@@ -1161,7 +1161,7 @@ public:
      * @return A newly created persistent view.
      */
     template<typename... Component, typename... Exclude>
-    entt::persistent_view<Entity, Component...> persistent_view(type_list<Exclude...> = type_list<>{}) {
+    entt::persistent_view<Entity, Component...> persistent_view(type_list<Exclude...> = {}) {
         static_assert(sizeof...(Component));
         using handler_type = handler_pool<type_list<Component...>, type_list<Exclude...>>;
         const auto htype = handler_family::type<Component...>;
@@ -1196,7 +1196,7 @@ public:
 
     /*! @copydoc persistent_view */
     template<typename... Component, typename... Exclude>
-    inline entt::persistent_view<Entity, Component...> persistent_view(type_list<Exclude...> = type_list<>{}) const {
+    inline entt::persistent_view<Entity, Component...> persistent_view(type_list<Exclude...> = {}) const {
         static_assert(std::conjunction_v<std::is_const<Component>...>);
         return const_cast<registry *>(this)->persistent_view<Component...>(type_list<Exclude...>{});
     }
@@ -1294,7 +1294,7 @@ public:
      * @param reg A valid reference to a source registry.
      */
     template<typename... Component>
-    void clone(const registry &reg) {
+    void clone(const registry &reg, type_list<Component...> = {}) {
         *this = {};
 
         (assure<Component>(), ...);

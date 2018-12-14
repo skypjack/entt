@@ -127,13 +127,11 @@ class duktape_registry {
 
     struct func_map {
         using func_type = duk_ret_t(*)(duk_context *, entt::registry<> &);
-        using test_type = bool(entt::registry<>:: *)(entt::registry<>::entity_type) const;
 
         func_type set;
         func_type unset;
         func_type has;
         func_type get;
-        test_type test;
     };
 
     template<typename... Comp>
@@ -142,8 +140,7 @@ class duktape_registry {
                 &::set<Comp>,
                 &::unset<Comp>,
                 &::has<Comp>,
-                &::get<Comp>,
-                &entt::registry<>::has<Comp>
+                &::get<Comp>
         }), ...);
     }
 

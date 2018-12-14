@@ -63,6 +63,7 @@ SETUP_AND_ADD_TEST(family entt/core/family.cpp)
 SETUP_AND_ADD_TEST(hashed_string entt/core/hashed_string.cpp)
 SETUP_AND_ADD_TEST(ident entt/core/ident.cpp)
 SETUP_AND_ADD_TEST(monostate entt/core/monostate.cpp)
+SETUP_AND_ADD_TEST(type_traits entt/core/type_traits.cpp)
 SETUP_AND_ADD_TEST(utility entt/core/utility.cpp)
 
 # Test entity
