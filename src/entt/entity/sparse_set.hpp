@@ -7,6 +7,7 @@
 #include <numeric>
 #include <utility>
 #include <vector>
+#include <memory>
 #include <cstddef>
 #include <cassert>
 #include <type_traits>
@@ -80,7 +81,10 @@ class sparse_set<Entity> {
         iterator() ENTT_NOEXCEPT = default;
 
         iterator(const iterator &) ENTT_NOEXCEPT = default;
+        iterator(iterator &&) ENTT_NOEXCEPT = default;
+
         iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
+        iterator & operator=(iterator &&) ENTT_NOEXCEPT = default;
 
         iterator & operator++() ENTT_NOEXCEPT {
             return --index, *this;
@@ -172,21 +176,8 @@ public:
     /*! @brief Input iterator type. */
     using iterator_type = iterator;
 
-    /*! @brief Default constructor. */
-    sparse_set() ENTT_NOEXCEPT = default;
-
     /*! @brief Default destructor. */
     virtual ~sparse_set() ENTT_NOEXCEPT = default;
-
-    /*! @brief Copying a sparse set isn't allowed. */
-    sparse_set(const sparse_set &) = delete;
-    /*! @brief Default move constructor. */
-    sparse_set(sparse_set &&) = default;
-
-    /*! @brief Copying a sparse set isn't allowed. @return This sparse set. */
-    sparse_set & operator=(const sparse_set &) = delete;
-    /*! @brief Default move assignment operator. @return This sparse set. */
-    sparse_set & operator=(sparse_set &&) = default;
 
     /**
      * @brief Increases the capacity of a sparse set.
@@ -477,6 +468,23 @@ public:
         direct.clear();
     }
 
+    /**
+     * @brief Clones and returns a sparse set.
+     *
+     * The basic implementation of a sparse set is always copyable. Therefore,
+     * the returned instance is always valid.
+     *
+     * @return A fresh copy of the given sparse set.
+     */
+    virtual std::unique_ptr<sparse_set> clone() const {
+        auto other = std::make_unique<sparse_set>();
+        other->reverse.resize(reverse.size());
+        other->direct.resize(direct.size());
+        std::copy(reverse.cbegin(), reverse.cend(), other->reverse.begin());
+        std::copy(direct.cbegin(), direct.cend(), other->direct.begin());
+        return other;
+    }
+
 private:
     std::vector<entity_type> reverse;
     std::vector<entity_type> direct;
@@ -531,7 +539,10 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
         iterator() ENTT_NOEXCEPT = default;
 
         iterator(const iterator &) ENTT_NOEXCEPT = default;
+        iterator(iterator &&) ENTT_NOEXCEPT = default;
+
         iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
+        iterator & operator=(iterator &&) ENTT_NOEXCEPT = default;
 
         iterator & operator++() ENTT_NOEXCEPT {
             return --index, *this;
@@ -626,19 +637,6 @@ public:
     using iterator_type = iterator<false>;
     /*! @brief Constant input iterator type. */
     using const_iterator_type = iterator<true>;
-
-    /*! @brief Default constructor. */
-    sparse_set() ENTT_NOEXCEPT = default;
-
-    /*! @brief Copying a sparse set isn't allowed. */
-    sparse_set(const sparse_set &) = delete;
-    /*! @brief Default move constructor. */
-    sparse_set(sparse_set &&) = default;
-
-    /*! @brief Copying a sparse set isn't allowed. @return This sparse set. */
-    sparse_set & operator=(const sparse_set &) = delete;
-    /*! @brief Default move assignment operator. @return This sparse set. */
-    sparse_set & operator=(sparse_set &&) = default;
 
     /**
      * @brief Increases the capacity of a sparse set.
@@ -937,6 +935,24 @@ public:
     void reset() override {
         underlying_type::reset();
         instances.clear();
+    }
+
+    /**
+     * @brief Clones and returns a sparse set if possible.
+     *
+     * The extended implementation of a sparse set is copyable only if its
+     * object type is copyable. Because of that, this member functions isn't
+     * guaranteed to return always a valid pointer.
+     *
+     * @return A fresh copy of the given sparse set if its object type is
+     * copyable, an empty unique pointer otherwise.
+     */
+    std::unique_ptr<sparse_set<Entity>> clone() const override {
+        if constexpr(std::is_copy_constructible_v<Type>) {
+            return std::make_unique<sparse_set>(*this);
+        } else {
+            return nullptr;
+        }
     }
 
 private:

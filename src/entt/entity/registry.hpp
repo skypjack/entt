@@ -53,6 +53,15 @@ class registry {
             : reg{reg}
         {}
 
+        component_pool(const component_pool &other)
+            : sparse_set<Entity, Component>{other}, ctor{}, dtor{}, reg{other.reg}
+        {}
+
+        component_pool & operator=(const component_pool &other) {
+            sparse_set<Entity, Component>::operator=(other);
+            reg = other.reg;
+        }
+
         template<typename... Args>
         Component & construct(const Entity entity, Args &&... args) {
             auto &component = sparse_set<Entity, Component>::construct(entity, std::forward<Args>(args)...);
@@ -63,6 +72,14 @@ class registry {
         void destroy(const Entity entity) override {
             dtor.publish(*reg, entity);
             sparse_set<Entity, Component>::destroy(entity);
+        }
+
+        std::unique_ptr<sparse_set<Entity>> clone() const override {
+            if constexpr(std::is_copy_constructible_v<Component>) {
+                return std::make_unique<component_pool>(*this);
+            } else {
+                return nullptr;
+            }
         }
 
         typename component_signal_type::sink_type construction() ENTT_NOEXCEPT {
@@ -1279,37 +1296,51 @@ public:
      * @brief Clones the given components and all the entity identifiers.
      *
      * The components must be copiable for obvious reasons. The entities
-     * maintain their versions once copied.
+     * maintain their versions once copied.<br/>
+     * If no components are provided, the registry will try to clone all the
+     * existing pools.
+     *
+     * @warning
+     * Attempting to clone components that aren't copyable can result in
+     * unexpected behaviors.<br/>
+     * A static assertion will abort the compilation when one or more components
+     * are provided at the call site. Otherwise, an assertion will abort the
+     * execution at runtime in debug mode in case one or more pools cannot be
+     * cloned.
      *
      * @note
      * There isn't an efficient way to know if all the entities are assigned at
      * least one component once copied. Therefore, there may be orphans. It is
      * up to the caller to clean up the registry if necessary.
      *
-     * @warning
-     * This function requires that the registry be empty. In case it isn't, all
-     * the data will be automatically deleted beforehand.
-     *
      * @tparam Component Types of components to clone.
-     * @param reg A valid reference to a source registry.
+     * @return A fresh copy of the registry.
      */
     template<typename... Component>
-    void clone(const registry &reg, type_list<Component...> = {}) {
-        *this = {};
+    registry clone() const {
+        registry other;
+        other.pools.resize(pools.size());
 
-        (assure<Component>(), ...);
-        (reserve<Component>(reg.size<Component>()), ...);
+        if(sizeof...(Component)) {
+            static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
+            ((other.pools[component_family::type<Component>] = managed<Component>() ? pool<Component>().clone() : nullptr), ...);
+        } else {
+            for(auto pos = pools.size(); pos; --pos) {
+                auto &cpool = pools[pos-1];
 
-        (std::copy(reg.raw<Component>(), reg.raw<Component>() + reg.size<Component>(), pool<Component>().raw()), ...);
-        // double lambda function used to work around a bug of gcc7
-        (std::for_each(reg.data<Component>(), reg.data<Component>() + reg.size<Component>(), ([](auto *cpool) {
-            return [cpool](const auto entity) { cpool->construct(entity); };
-        })(pools[component_family::type<Component>].get())), ...);
+                if(cpool) {
+                    other.pools[pos-1] = cpool->clone();
+                    assert(other.pools[pos-1]);
+                }
+            };
+        }
 
-        next = reg.next;
-        available = reg.available;
-        entities.resize(reg.entities.size());
-        std::copy(reg.entities.cbegin(), reg.entities.cend(), entities.begin());
+        other.next = next;
+        other.available = available;
+        other.entities.resize(entities.size());
+        std::copy(entities.cbegin(), entities.cend(), other.entities.begin());
+
+        return other;
     }
 
     /**

@@ -2,6 +2,7 @@
 #include <unordered_set>
 #include <functional>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/entity/entt_traits.hpp>
@@ -781,10 +782,6 @@ TEST(Registry, Clone) {
     entt::registry<> registry;
     entt::registry<> other;
 
-    const auto entity = other.create();
-    other.assign<int>(entity, 42);
-    other.assign<char>(entity, 'c');
-
     registry.destroy(registry.create());
 
     const auto e0 = registry.create();
@@ -801,9 +798,12 @@ TEST(Registry, Clone) {
     registry.assign<char>(e2, '2');
 
     registry.destroy(e1);
-    other.clone<int, char>(registry);
 
-    ASSERT_FALSE(other.valid(entity));
+    other = registry.clone<int, char>();
+
+    ASSERT_EQ(other.size(), registry.size());
+    ASSERT_EQ(other.alive(), registry.alive());
+
     ASSERT_TRUE(other.valid(e0));
     ASSERT_FALSE(other.valid(e1));
     ASSERT_TRUE(other.valid(e2));
@@ -815,4 +815,53 @@ TEST(Registry, Clone) {
     ASSERT_EQ(other.get<int>(e0), 0);
     ASSERT_EQ(other.get<int>(e2), 2);
     ASSERT_EQ(other.get<char>(e2), '2');
+
+    other = registry.clone();
+
+    ASSERT_EQ(other.size(), registry.size());
+    ASSERT_EQ(other.alive(), registry.alive());
+
+    ASSERT_TRUE(other.valid(e0));
+    ASSERT_FALSE(other.valid(e1));
+    ASSERT_TRUE(other.valid(e2));
+
+    ASSERT_TRUE((other.has<int, double>(e0)));
+    ASSERT_TRUE((other.has<int, char>(e2)));
+
+    ASSERT_EQ(other.get<int>(e0), 0);
+    ASSERT_EQ(other.get<double>(e0), 0.);
+    ASSERT_EQ(other.get<int>(e2), 2);
+    ASSERT_EQ(other.get<char>(e2), '2');
+
+    other = registry.clone<char>();
+
+    ASSERT_EQ(other.size(), registry.size());
+    ASSERT_EQ(other.alive(), registry.alive());
+
+    ASSERT_TRUE(other.valid(e0));
+    ASSERT_FALSE(other.valid(e1));
+    ASSERT_TRUE(other.valid(e2));
+
+    ASSERT_FALSE((other.has<int>(e0)));
+    ASSERT_FALSE((other.has<double>(e0)));
+    ASSERT_FALSE((other.has<int>(e2)));
+    ASSERT_TRUE((other.has<char>(e2)));
+
+    ASSERT_TRUE(other.orphan(e0));
+    ASSERT_EQ(other.get<char>(e2), '2');
+
+    const auto entity = registry.create();
+    listener listener;
+
+    ASSERT_NE(e1, entity);
+    ASSERT_EQ(registry.entity(e1), registry.entity(entity));
+
+    registry.construction<char>().connect<&listener::incr<char>>(&listener);
+    registry.destruction<char>().connect<&listener::decr<char>>(&listener);
+    registry.assign<char>(entity, 'e');
+    registry.assign<char>(e0, '0');
+    registry.remove<char>(e0);
+
+    ASSERT_EQ(listener.counter, 1);
+    ASSERT_EQ(listener.last, e0);
 }

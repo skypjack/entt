@@ -1,3 +1,4 @@
+#include <memory>
 #include <unordered_set>
 #include <gtest/gtest.h>
 #include <entt/entity/sparse_set.hpp>
@@ -839,16 +840,7 @@ TEST(SparseSetWithType, ReferencesGuaranteed) {
 }
 
 TEST(SparseSetWithType, MoveOnlyComponent) {
-    struct move_only_component {
-        move_only_component() = default;
-        ~move_only_component() = default;
-        move_only_component(const move_only_component &) = delete;
-        move_only_component(move_only_component &&) = default;
-        move_only_component & operator=(const move_only_component &) = delete;
-        move_only_component & operator=(move_only_component &&) = default;
-    };
-
     // the purpose is to ensure that move only components are always accepted
-    entt::sparse_set<std::uint64_t, move_only_component> set;
+    entt::sparse_set<std::uint64_t, std::unique_ptr<int>> set;
     (void)set;
 }
