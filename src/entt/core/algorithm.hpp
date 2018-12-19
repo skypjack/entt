@@ -58,16 +58,14 @@ struct insertion_sort final {
             auto it = first + 1;
 
             while(it != last) {
-                auto value = *it;
-                auto pre = it;
+                auto pre = it++;
+                auto value = *pre;
 
-                while(pre != first && compare(value, *(pre-1))) {
-                    *pre = *(pre-1);
-                    --pre;
+                while(pre-- != first && compare(value, *pre)) {
+                    *(pre+1) = *pre;
                 }
 
-                *pre = value;
-                ++it;
+                *(pre+1) = value;
             }
         }
     }
