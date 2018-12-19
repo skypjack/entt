@@ -7,7 +7,6 @@
 * define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
 * runner proposal: https://en.wikipedia.org/wiki/Fork%E2%80%93join_model https://slide-rs.github.io/specs/03_dispatcher.html
-* deep copy of a registry (or use the snapshot stuff to copy components and keep intact ids at least)
 * is it possible to iterate all the components assigned to an entity through a common base class?
 * can we do more for shared libraries? who knows... see #144
 * work stealing job system (see #100)
@@ -23,4 +22,3 @@
 * monostate: make constraint trivially copyable due to atomic optional
 * travis + windows is now available, try it
 * events on replace, so that one can track updated components? indagate impact
-* allow to bind values to delegate on connect with free functions (sbo + check size on costruction to guarantee a zero allocation abstraction)

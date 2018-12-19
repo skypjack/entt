@@ -5,6 +5,10 @@ int delegate_function(const int &i) {
     return i*i;
 }
 
+int curried_function(int i, int j) {
+    return i+j;
+}
+
 struct delegate_functor {
     int operator()(int i) {
         return i+i;
@@ -64,6 +68,7 @@ TEST(Delegate, Comparison) {
     entt::delegate<int(int)> lhs;
     entt::delegate<int(int)> rhs;
     delegate_functor functor;
+    delegate_functor other;
 
     ASSERT_EQ(lhs, entt::delegate<int(int)>{});
     ASSERT_FALSE(lhs != rhs);
@@ -97,6 +102,13 @@ TEST(Delegate, Comparison) {
     ASSERT_FALSE(lhs != rhs);
     ASSERT_TRUE(lhs == rhs);
     ASSERT_EQ(lhs, rhs);
+
+    lhs.connect<&delegate_functor::operator()>(&other);
+
+    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&delegate_functor::operator()>, &other}));
+    ASSERT_TRUE(lhs != rhs);
+    ASSERT_FALSE(lhs == rhs);
+    ASSERT_NE(lhs, rhs);
 
     lhs.reset();
 
@@ -180,4 +192,12 @@ TEST(Delegate, ConstInstance) {
 
     ASSERT_FALSE(delegate);
     ASSERT_EQ(delegate, entt::delegate<int(int)>{});
+}
+
+TEST(Delegate, CurriedFunction) {
+    entt::delegate<int(int)> delegate;
+    delegate.connect<&curried_function>(3);
+
+    ASSERT_TRUE(delegate);
+    ASSERT_EQ(delegate(1), 4);
 }

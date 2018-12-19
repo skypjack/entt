@@ -1034,7 +1034,7 @@ Persistent views are used mainly to iterate multiple components at once:
 auto view = registry.persistent_view<position, velocity>();
 ```
 
-Moreover, filters can be applied to a persistent view to some extents:
+Filtering entities by components is also supported:
 
 ```cpp
 auto view = registry.persistent_view<position, velocity>(entt::type_list<renderable>);
@@ -1043,8 +1043,8 @@ auto view = registry.persistent_view<position, velocity>(entt::type_list<rendera
 In this case, the view will return all the entities that have both components
 `position` and `velocity` but don't have component `renderable`.<br/>
 Exclusive filters (ie the entities that have either `position` or `velocity`)
-aren't supported for performance reasons. Similarly, a filter cannot be applied
-to a persistent view with an empty template parameters list.
+aren't directly supported for performance reasons. Similarly, a filter cannot be
+applied to a persistent view with an empty template parameters list.
 
 There is no need to store views around for they are extremely cheap to
 construct, even though they can be copied without problems and reused freely. In

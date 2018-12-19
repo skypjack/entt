@@ -8,6 +8,7 @@
 * [Introduction](#introduction)
 * [Signals](#signals)
 * [Delegate](#delegate)
+  * [Currying and free functions](#currying-and-free-functions)
 * [Event dispatcher](#event-dispatcher)
 * [Event emitter](#event-emitter)
 <!--
@@ -212,6 +213,39 @@ fine.
 Probably too much small and pretty poor of functionalities, but the delegate
 class can help in a lot of cases and it has shown that it is worth keeping it
 within the library.
+
+## Currying and free functions
+
+The delegate class comes with a rather obscure feature to be considered as an
+_advanced mode_, that is its limited support for curried free functions.
+
+Consider the following definition:
+
+```cpp
+entt::delegate<void(int)> delegate{};
+```
+
+As shown previously, it accepts functions having type `void(int)`. However, we
+can do something more in this case, because of how the delegate class is
+implemented internally (that is something that goes beyond the purposes of this
+document).<br/>
+In particular, the delegate accepts also functions having type `void(T, int)`,
+as long as `sizeof(T)` is lower than or equal to `sizeof(void *)`. The first
+parameter is stored directly by the delegate class and passed to the connected
+function when needed.
+
+In other terms, this works as well with the above definition:
+
+```cpp
+void g(char c, int i) { /* ... */ }
+
+delegate.connect<&g>('c');
+delegate(42);
+```
+
+In this case, the function `g` is invoked with parameters `'c'` and `42`.
+However, the function type of the delegate is still `void(int)`, mainly because
+this is also the signature of its function call operator.
 
 # Event dispatcher
 
