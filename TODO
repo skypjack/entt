@@ -13,12 +13,12 @@
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
 * meta: move-to-head optimization when searching by name on parts (data, func, etc)
 * hashed string: add implicit check on construction for uniqueness (optional)
-* signals on entity creation/destruction
 * destroy overload that accepts a couple of iterators (see create)
 * allow for built-in parallel each if possible
 * add on-the-fly sort functionality (is it possible?)
 * write/show how to create an archetype based model on top of EnTT
 * mention hunter in the readme file, section packaging tools
-* monostate: make constraint trivially copyable due to atomic optional
 * travis + windows is now available, try it
 * events on replace, so that one can track updated components? indagate impact
+* add entt::exclude as alias of entt::type_list
+* add sparse_set::swap and registry::swap

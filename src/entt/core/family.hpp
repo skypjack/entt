@@ -4,7 +4,6 @@
 
 #include <type_traits>
 #include <cstddef>
-#include <atomic>
 #include "../config/config.h"
 
 
@@ -20,10 +19,10 @@ namespace entt {
  */
 template<typename...>
 class family {
-    inline static std::atomic<std::size_t> identifier;
+    inline static maybe_atomic_type<std::size_t> identifier;
 
     template<typename...>
-    inline static const auto inner = identifier.fetch_add(1);
+    inline static const auto inner = identifier++;
 
 public:
     /*! @brief Unsigned integer type. */

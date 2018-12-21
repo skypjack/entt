@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <utility>
 #include <type_traits>
+#include "../config/config.h"
 #include "../core/hashed_string.hpp"
 
 

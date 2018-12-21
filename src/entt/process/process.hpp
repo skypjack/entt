@@ -2,8 +2,8 @@
 #define ENTT_PROCESS_PROCESS_HPP
 
 
-#include <type_traits>
 #include <utility>
+#include <type_traits>
 #include "../config/config.h"
 
 
