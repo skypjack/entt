@@ -20,5 +20,4 @@
 * mention hunter in the readme file, section packaging tools
 * travis + windows is now available, try it
 * events on replace, so that one can track updated components? indagate impact
-* add entt::exclude as alias of entt::type_list
 * add sparse_set::swap and registry::swap

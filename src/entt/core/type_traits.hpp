@@ -34,6 +34,14 @@ constexpr auto type_list_cat(type_list<Type...>, type_list<Other...>, List...) {
 }
 
 
+/**
+ * @brief Alias template for type lists.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+using exclude = type_list<Type...>;
+
+
 }
 
 

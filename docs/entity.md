@@ -1037,7 +1037,7 @@ auto view = registry.persistent_view<position, velocity>();
 Filtering entities by components is also supported:
 
 ```cpp
-auto view = registry.persistent_view<position, velocity>(entt::type_list<renderable>);
+auto view = registry.persistent_view<position, velocity>(entt::exclude<renderable>);
 ```
 
 In this case, the view will return all the entities that have both components
