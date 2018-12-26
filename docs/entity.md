@@ -1340,7 +1340,7 @@ Nonetheless, the iterators returned by the `begin` and `end` member functions
 are still valid and can be used safely. Similarly, raw views can still be built
 for this type of components if required.<br/>
 More in general, all the features offered by the library aren't affected, but
-for the raw member function that is no longer available instead.
+for the `raw` member function that is no longer available instead.
 
 # Multithreading
 
