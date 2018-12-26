@@ -400,6 +400,17 @@ TEST(SparseSetWithType, Functionalities) {
     other = std::move(set);
 }
 
+TEST(SparseSetWithType, FunctionalitiesEmptyType) {
+    struct empty_type {};
+    entt::sparse_set<std::uint64_t, empty_type> set;
+    const auto &cset = set;
+
+    ASSERT_EQ(&set.construct(42), &set.construct(99));
+    ASSERT_EQ(&set.get(42), set.try_get(42));
+    ASSERT_EQ(&set.get(42), &set.get(99));
+    ASSERT_EQ(cset.try_get(42), cset.try_get(99));
+}
+
 TEST(SparseSetWithType, AggregatesMustWork) {
     struct aggregate_type { int value; };
     // the goal of this test is to enforce the requirements for aggregate types
@@ -501,20 +512,128 @@ TEST(SparseSetWithType, ConstIterator) {
     ASSERT_GE(cend, set.cend());
 }
 
+TEST(SparseSetWithType, IteratorEmptyType) {
+    struct empty_type {};
+    using iterator_type = typename entt::sparse_set<std::uint64_t, empty_type>::iterator_type;
+    entt::sparse_set<std::uint64_t, empty_type> set;
+    set.construct(3);
+
+    iterator_type end{set.begin()};
+    iterator_type begin{};
+    begin = set.end();
+    std::swap(begin, end);
+
+    ASSERT_EQ(begin, set.begin());
+    ASSERT_EQ(end, set.end());
+    ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin++, set.begin());
+    ASSERT_EQ(begin--, set.end());
+
+    ASSERT_EQ(begin+1, set.end());
+    ASSERT_EQ(end-1, set.begin());
+
+    ASSERT_EQ(++begin, set.end());
+    ASSERT_EQ(--begin, set.begin());
+
+    ASSERT_EQ(begin += 1, set.end());
+    ASSERT_EQ(begin -= 1, set.begin());
+
+    ASSERT_EQ(begin + (end - begin), set.end());
+    ASSERT_EQ(begin - (begin - end), set.end());
+
+    ASSERT_EQ(end - (end - begin), set.begin());
+    ASSERT_EQ(end + (begin - end), set.begin());
+
+    ASSERT_EQ(&begin[0], set.begin().operator->());
+
+    ASSERT_LT(begin, end);
+    ASSERT_LE(begin, set.begin());
+
+    ASSERT_GT(end, begin);
+    ASSERT_GE(end, set.end());
+
+    set.construct(33);
+
+    ASSERT_EQ(&*begin, &*(begin+1));
+    ASSERT_EQ(&begin[0], &begin[1]);
+    ASSERT_EQ(begin.operator->(), (end-1).operator->());
+}
+
+TEST(SparseSetWithType, ConstIteratorEmptyType) {
+    struct empty_type {};
+    using iterator_type = typename entt::sparse_set<std::uint64_t, empty_type>::const_iterator_type;
+    entt::sparse_set<std::uint64_t, empty_type> set;
+    set.construct(3);
+
+    iterator_type cend{set.cbegin()};
+    iterator_type cbegin{};
+    cbegin = set.cend();
+    std::swap(cbegin, cend);
+
+    ASSERT_EQ(cbegin, set.cbegin());
+    ASSERT_EQ(cend, set.cend());
+    ASSERT_NE(cbegin, cend);
+
+    ASSERT_EQ(cbegin++, set.cbegin());
+    ASSERT_EQ(cbegin--, set.cend());
+
+    ASSERT_EQ(cbegin+1, set.cend());
+    ASSERT_EQ(cend-1, set.cbegin());
+
+    ASSERT_EQ(++cbegin, set.cend());
+    ASSERT_EQ(--cbegin, set.cbegin());
+
+    ASSERT_EQ(cbegin += 1, set.cend());
+    ASSERT_EQ(cbegin -= 1, set.cbegin());
+
+    ASSERT_EQ(cbegin + (cend - cbegin), set.cend());
+    ASSERT_EQ(cbegin - (cbegin - cend), set.cend());
+
+    ASSERT_EQ(cend - (cend - cbegin), set.cbegin());
+    ASSERT_EQ(cend + (cbegin - cend), set.cbegin());
+
+    ASSERT_EQ(&cbegin[0], set.cbegin().operator->());
+
+    ASSERT_LT(cbegin, cend);
+    ASSERT_LE(cbegin, set.cbegin());
+
+    ASSERT_GT(cend, cbegin);
+    ASSERT_GE(cend, set.cend());
+
+    set.construct(33);
+
+    ASSERT_EQ(&*cbegin, &*(cbegin+1));
+    ASSERT_EQ(&cbegin[0], &cbegin[1]);
+    ASSERT_EQ(cbegin.operator->(), (cend-1).operator->());
+}
+
 TEST(SparseSetWithType, Raw) {
     entt::sparse_set<std::uint64_t, int> set;
+    const auto &cset = set;
 
     set.construct(3, 3);
     set.construct(12, 6);
     set.construct(42, 9);
 
     ASSERT_EQ(set.get(3), 3);
-    ASSERT_EQ(set.get(12), 6);
+    ASSERT_EQ(cset.get(12), 6);
     ASSERT_EQ(set.get(42), 9);
 
     ASSERT_EQ(*(set.raw() + 0u), 3);
-    ASSERT_EQ(*(set.raw() + 1u), 6);
+    ASSERT_EQ(*(cset.raw() + 1u), 6);
     ASSERT_EQ(*(set.raw() + 2u), 9);
+}
+
+TEST(SparseSetWithType, RawEmptyType) {
+    struct empty_type {};
+    entt::sparse_set<std::uint64_t, empty_type> set;
+    const auto &cset = set;
+
+    set.construct(3);
+
+    ASSERT_EQ(set.raw(), nullptr);
+    ASSERT_EQ(cset.raw(), nullptr);
 }
 
 TEST(SparseSetWithType, SortOrdered) {
@@ -819,6 +938,29 @@ TEST(SparseSetWithType, RespectUnordered) {
     ASSERT_EQ(*(rhs.data() + 3u), 3u);
     ASSERT_EQ(*(rhs.data() + 4u), 4u);
     ASSERT_EQ(*(rhs.data() + 5u), 5u);
+}
+
+TEST(SparseSetWithType, RespectOverlapEmptyType) {
+    struct empty_type {};
+    entt::sparse_set<std::uint64_t, empty_type> lhs;
+    entt::sparse_set<std::uint64_t, empty_type> rhs;
+    const auto &clhs = lhs;
+
+    lhs.construct(3);
+    lhs.construct(12);
+    lhs.construct(42);
+
+    rhs.construct(12);
+
+    ASSERT_EQ(lhs.sparse_set<std::uint64_t>::get(3), 0u);
+    ASSERT_EQ(lhs.sparse_set<std::uint64_t>::get(12), 1u);
+    ASSERT_EQ(lhs.sparse_set<std::uint64_t>::get(42), 2u);
+
+    lhs.respect(rhs);
+
+    ASSERT_EQ(clhs.sparse_set<std::uint64_t>::get(3), 0u);
+    ASSERT_EQ(clhs.sparse_set<std::uint64_t>::get(12), 2u);
+    ASSERT_EQ(clhs.sparse_set<std::uint64_t>::get(42), 1u);
 }
 
 TEST(SparseSetWithType, CanModifyDuringIteration) {

@@ -518,7 +518,7 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
     using underlying_type = sparse_set<Entity>;
     using traits_type = entt_traits<Entity>;
 
-    template<bool Const>
+    template<bool Const, bool = std::is_empty_v<Type>>
     class iterator final {
         friend class sparse_set<Entity, Type>;
 
@@ -626,6 +626,112 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
         index_type index;
     };
 
+    template<bool Const>
+    class iterator<Const, true> final {
+        friend class sparse_set<Entity, Type>;
+
+        using instance_type = std::conditional_t<Const, const Type, Type>;
+        using index_type = typename traits_type::difference_type;
+
+        iterator(instance_type *instance, index_type index) ENTT_NOEXCEPT
+            : instance{instance}, index{index}
+        {}
+
+    public:
+        using difference_type = index_type;
+        using value_type = std::conditional_t<Const, const Type, Type>;
+        using pointer = value_type *;
+        using reference = value_type &;
+        using iterator_category = std::random_access_iterator_tag;
+
+        iterator() ENTT_NOEXCEPT = default;
+
+        iterator(const iterator &) ENTT_NOEXCEPT = default;
+        iterator(iterator &&) ENTT_NOEXCEPT = default;
+
+        iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
+        iterator & operator=(iterator &&) ENTT_NOEXCEPT = default;
+
+        iterator & operator++() ENTT_NOEXCEPT {
+            return --index, *this;
+        }
+
+        iterator operator++(int) ENTT_NOEXCEPT {
+            iterator orig = *this;
+            return ++(*this), orig;
+        }
+
+        iterator & operator--() ENTT_NOEXCEPT {
+            return ++index, *this;
+        }
+
+        iterator operator--(int) ENTT_NOEXCEPT {
+            iterator orig = *this;
+            return --(*this), orig;
+        }
+
+        iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
+            index -= value;
+            return *this;
+        }
+
+        iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+            return iterator{instance, index-value};
+        }
+
+        inline iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
+            return (*this += -value);
+        }
+
+        inline iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+            return (*this + -value);
+        }
+
+        difference_type operator-(const iterator &other) const ENTT_NOEXCEPT {
+            return other.index - index;
+        }
+
+        reference operator[](const difference_type) const ENTT_NOEXCEPT {
+            return *instance;
+        }
+
+        bool operator==(const iterator &other) const ENTT_NOEXCEPT {
+            return other.index == index;
+        }
+
+        inline bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
+            return !(*this == other);
+        }
+
+        bool operator<(const iterator &other) const ENTT_NOEXCEPT {
+            return index > other.index;
+        }
+
+        bool operator>(const iterator &other) const ENTT_NOEXCEPT {
+            return index < other.index;
+        }
+
+        inline bool operator<=(const iterator &other) const ENTT_NOEXCEPT {
+            return !(*this > other);
+        }
+
+        inline bool operator>=(const iterator &other) const ENTT_NOEXCEPT {
+            return !(*this < other);
+        }
+
+        pointer operator->() const ENTT_NOEXCEPT {
+            return instance;
+        }
+
+        inline reference operator*() const ENTT_NOEXCEPT {
+            return *operator->();
+        }
+
+    private:
+        instance_type *instance;
+        index_type index;
+    };
+
 public:
     /*! @brief Type of the objects associated with the entities. */
     using object_type = Type;
@@ -646,9 +752,12 @@ public:
      *
      * @param cap Desired capacity.
      */
-    void reserve(const size_type cap) {
+    void reserve([[maybe_unused]] const size_type cap) {
         underlying_type::reserve(cap);
-        instances.reserve(cap);
+
+        if constexpr(!std::is_empty_v<object_type>) {
+            instances.reserve(cap);
+        }
     }
 
     /**
@@ -664,15 +773,23 @@ public:
      * performance boost but less guarantees. Use `begin` and `end` if you want
      * to iterate the sparse set in the expected order.
      *
+     * @warning
+     * Empty components aren't explicitly instantiated. Therefore, this function
+     * always returns `nullptr` for them.
+     *
      * @return A pointer to the array of objects.
      */
     const object_type * raw() const ENTT_NOEXCEPT {
-        return instances.data();
+        if constexpr(std::is_empty_v<object_type>) {
+            return nullptr;
+        } else {
+            return instances.data();
+        }
     }
 
     /*! @copydoc raw */
     object_type * raw() ENTT_NOEXCEPT {
-        return instances.data();
+        return const_cast<object_type *>(std::as_const(*this).raw());
     }
 
     /**
@@ -688,7 +805,7 @@ public:
      * @return An iterator to the first instance of the given type.
      */
     const_iterator_type cbegin() const ENTT_NOEXCEPT {
-        const typename traits_type::difference_type pos = instances.size();
+        const typename traits_type::difference_type pos = underlying_type::size();
         return const_iterator_type{&instances, pos};
     }
 
@@ -699,7 +816,7 @@ public:
 
     /*! @copydoc begin */
     iterator_type begin() ENTT_NOEXCEPT {
-        const typename traits_type::difference_type pos = instances.size();
+        const typename traits_type::difference_type pos = underlying_type::size();
         return iterator_type{&instances, pos};
     }
 
@@ -743,8 +860,13 @@ public:
      * @param entity A valid entity identifier.
      * @return The object associated with the entity.
      */
-    const object_type & get(const entity_type entity) const ENTT_NOEXCEPT {
-        return instances[underlying_type::get(entity)];
+    const object_type & get([[maybe_unused]] const entity_type entity) const ENTT_NOEXCEPT {
+        if constexpr(std::is_empty_v<object_type>) {
+            assert(underlying_type::has(entity));
+            return instances;
+        } else {
+            return instances[underlying_type::get(entity)];
+        }
     }
 
     /*! @copydoc get */
@@ -758,7 +880,11 @@ public:
      * @return The object associated with the entity, if any.
      */
     const object_type * try_get(const entity_type entity) const ENTT_NOEXCEPT {
-        return underlying_type::has(entity) ? (instances.data() + underlying_type::get(entity)) : nullptr;
+        if constexpr(std::is_empty_v<object_type>) {
+            return underlying_type::has(entity) ? &instances : nullptr;
+        } else {
+            return underlying_type::has(entity) ? (instances.data() + underlying_type::get(entity)) : nullptr;
+        }
     }
 
     /*! @copydoc try_get */
@@ -786,16 +912,20 @@ public:
      * @return The object associated with the entity.
      */
     template<typename... Args>
-    object_type & construct(const entity_type entity, Args &&... args) {
+    object_type & construct([[maybe_unused]] const entity_type entity, [[maybe_unused]] Args &&... args) {
         underlying_type::construct(entity);
 
-        if constexpr(std::is_aggregate_v<Type>) {
-            instances.emplace_back(Type{std::forward<Args>(args)...});
+        if constexpr(std::is_empty_v<object_type>) {
+            return instances;
         } else {
-            instances.emplace_back(std::forward<Args>(args)...);
-        }
+            if constexpr(std::is_aggregate_v<object_type>) {
+                instances.emplace_back(Type{std::forward<Args>(args)...});
+            } else {
+                instances.emplace_back(std::forward<Args>(args)...);
+            }
 
-        return instances.back();
+            return instances.back();
+        }
     }
 
     /**
@@ -810,11 +940,14 @@ public:
      * @param entity A valid entity identifier.
      */
     void destroy(const entity_type entity) override {
-        // swapping isn't required here, we are getting rid of the last element
-        // however, we must protect ourselves from self assignments (see #37)
-        auto tmp = std::move(instances.back());
-        instances[underlying_type::get(entity)] = std::move(tmp);
-        instances.pop_back();
+        if constexpr(!std::is_empty_v<object_type>) {
+            // swapping isn't required here, we are getting rid of the last element
+            // however, we must protect ourselves from self assignments (see #37)
+            auto tmp = std::move(instances.back());
+            instances[underlying_type::get(entity)] = std::move(tmp);
+            instances.pop_back();
+        }
+
         underlying_type::destroy(entity);
     }
 
@@ -852,6 +985,10 @@ public:
      * either `data` or `raw` gives no guarantees on the order, even though
      * `sort` has been invoked.
      *
+     * @warning
+     * Empty components aren't explicitly instantiated. Therefore, this function
+     * isn't available for them.
+     *
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
@@ -860,7 +997,9 @@ public:
      * @param args Arguments to forward to the sort function object, if any.
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
-    void sort(Compare compare, Sort sort = Sort{}, Args &&... args) {
+    void sort([[maybe_unused]] Compare compare, [[maybe_unused]] Sort sort = Sort{}, [[maybe_unused]] Args &&... args) {
+        static_assert(!std::is_empty_v<object_type>);
+
         std::vector<size_type> copy(instances.size());
         std::iota(copy.begin(), copy.end(), 0);
 
@@ -908,33 +1047,40 @@ public:
      * @param other The sparse sets that imposes the order of the entities.
      */
     void respect(const sparse_set<Entity> &other) ENTT_NOEXCEPT {
-        const auto to = other.end();
-        auto from = other.begin();
+        if constexpr(std::is_empty_v<object_type>) {
+            underlying_type::respect(other);
+        } else {
+            const auto to = other.end();
+            auto from = other.begin();
 
-        size_type pos = underlying_type::size() - 1;
-        const auto *local = underlying_type::data();
+            size_type pos = underlying_type::size() - 1;
+            const auto *local = underlying_type::data();
 
-        while(pos && from != to) {
-            const auto curr = *from;
+            while(pos && from != to) {
+                const auto curr = *from;
 
-            if(underlying_type::has(curr)) {
-                if(curr != *(local + pos)) {
-                    auto candidate = underlying_type::get(curr);
-                    std::swap(instances[pos], instances[candidate]);
-                    underlying_type::swap(pos, candidate);
+                if(underlying_type::has(curr)) {
+                    if(curr != *(local + pos)) {
+                        auto candidate = underlying_type::get(curr);
+                        std::swap(instances[pos], instances[candidate]);
+                        underlying_type::swap(pos, candidate);
+                    }
+
+                    --pos;
                 }
 
-                --pos;
+                ++from;
             }
-
-            ++from;
         }
     }
 
     /*! @brief Resets a sparse set. */
     void reset() override {
         underlying_type::reset();
-        instances.clear();
+
+        if constexpr(!std::is_empty_v<object_type>) {
+            instances.clear();
+        }
     }
 
     /**
@@ -948,7 +1094,7 @@ public:
      * copyable, an empty unique pointer otherwise.
      */
     std::unique_ptr<sparse_set<Entity>> clone() const override {
-        if constexpr(std::is_copy_constructible_v<Type>) {
+        if constexpr(std::is_copy_constructible_v<object_type>) {
             return std::make_unique<sparse_set>(*this);
         } else {
             return nullptr;
@@ -956,7 +1102,7 @@ public:
     }
 
 private:
-    std::vector<object_type> instances;
+    std::conditional_t<std::is_empty_v<object_type>, object_type, std::vector<object_type>> instances;
 };
 
 

@@ -100,10 +100,20 @@ class persistent_view final {
         });
     }
 
+    template<typename Comp>
+    inline decltype(auto) get([[maybe_unused]] typename persistent_type::object_type::value_type index, [[maybe_unused]] const Entity entity) const {
+        if constexpr(std::is_empty_v<Comp>) {
+            // raw returns nullptr for empty components
+            return pool<Comp>()->get(entity);
+        } else {
+            return pool<Comp>()->raw()[index];
+        }
+    }
+
     template<typename Func, std::size_t... Indexes>
     void each(Func func, std::index_sequence<Indexes...>) const {
         std::for_each(handler->view_type::begin(), handler->view_type::end(), [func = std::move(func), raw = handler->cbegin(), this](const auto entity) mutable {
-            func(entity, pool<Component>()->raw()[(*raw)[Indexes]]...);
+            func(entity, get<Component>((*raw)[Indexes], entity)...);
             ++raw;
         });
     }
@@ -744,6 +754,10 @@ public:
      * There are no guarantees on the order of the components. Use `begin` and
      * `end` if you want to iterate the view in the expected order.
      *
+     * @warning
+     * Empty components aren't explicitly instantiated. Therefore, this function
+     * always returns `nullptr` for them.
+     *
      * @return A pointer to the array of components.
      */
     raw_type * raw() const ENTT_NOEXCEPT {
@@ -973,6 +987,10 @@ public:
      * @note
      * There are no guarantees on the order of the components. Use `begin` and
      * `end` if you want to iterate the view in the expected order.
+     *
+     * @warning
+     * Empty components aren't explicitly instantiated. Therefore, this function
+     * always returns `nullptr` for them.
      *
      * @return A pointer to the array of components.
      */

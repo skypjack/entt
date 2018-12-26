@@ -317,6 +317,29 @@ TEST(PersistentView, ExcludedComponents) {
     }
 }
 
+TEST(PersistentView, EmptyAndNonEmptyTypes) {
+    struct empty_type {};
+    entt::registry<> registry;
+    const auto view = registry.persistent_view<int, empty_type>();
+
+    const auto e0 = registry.create();
+    registry.assign<empty_type>(e0);
+    registry.assign<int>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<empty_type>(e1);
+    registry.assign<int>(e1);
+
+    registry.assign<int>(registry.create());
+
+    for(const auto entity: view) {
+        ASSERT_TRUE(entity == e0 || entity == e1);
+    }
+
+    ASSERT_EQ(view.size(), typename decltype(view)::size_type{2});
+    ASSERT_EQ(&view.get<empty_type>(e0), &view.get<empty_type>(e1));
+}
+
 TEST(SingleComponentView, Functionalities) {
     entt::registry<> registry;
     auto view = registry.view<char>();

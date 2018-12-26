@@ -35,6 +35,7 @@
   * [Types: const, non-const and all in between](#types-const-non-const-and-all-in-between)
   * [Give me everything](#give-me-everything)
 * [Iterations: what is allowed and what is not](#iterations-what-is-allowed-and-what-is-not)
+* [Empty type optimization](#empty-type-optimization)
 * [Multithreading](#multithreading)
   * [Views and Iterators](#views-and-iterators)
 <!--
@@ -1313,6 +1314,33 @@ To work around it, possible approaches are:
 
 A notable side effect of this feature is that the number of required allocations
 is further reduced in most of the cases.
+
+# Empty type optimization
+
+An empty type `T` is such that `std::is_empty_v<T>` returns true. They are also
+the same types for which _empty base optimization_ (EBO) is possibile.<br/>
+`EnTT` handles these types in a special way, optimizing both in terms of
+performance and memory usage. However, this also has drawbacks that are worth
+mentioning.
+
+When an empty type is detected, a pool is created in such a way that one and
+only one instance of the given type is created. All the entities will refer to
+it. Since the type is, in fact, empty, this is safe and there is no risk that a
+modification of its data members will affect other instances.<br/>
+Iterations are faster because only the entities to which the type is assigned
+are considered. Similarly, less memory is used, since there exists always only
+one instance of the component itself, no matter how many entities it is
+assigned.
+
+The drawback is that the `raw` member function will no longer be able to return
+a valid pointer to the list of components in the pool. This is because there is
+no list of components at all. Therefore, `raw` will always return `nullptr` for
+this type of components.<br/>
+Nonetheless, the iterators returned by the `begin` and `end` member functions
+are still valid and can be used safely. Similarly, raw views can still be built
+for this type of components if required.<br/>
+More in general, all the features offered by the library aren't affected, but
+for the raw member function that is no longer available instead.
 
 # Multithreading
 

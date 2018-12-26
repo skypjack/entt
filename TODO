@@ -17,7 +17,9 @@
 * allow for built-in parallel each if possible
 * add on-the-fly sort functionality (is it possible?)
 * write/show how to create an archetype based model on top of EnTT
+* write/show how to create prefabs on top of EnTT (that's easy!!)
 * mention hunter in the readme file, section packaging tools
 * travis + windows is now available, try it
 * events on replace, so that one can track updated components? indagate impact
-* add sparse_set::swap and registry::swap
+* optimize for empty component - maybe it's possible with a raw-less view that uses fake iterators (with correct size (correct size, same component)
+* tags revenge: if it's possible, reintroduce them but without a link to entities (see #169 for more details)

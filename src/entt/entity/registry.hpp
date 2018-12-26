@@ -327,6 +327,10 @@ public:
      * There are no guarantees on the order of the components. Use a view if you
      * want to iterate entities and components in the expected order.
      *
+     * @warning
+     * Empty components aren't explicitly instantiated. Therefore, this function
+     * always returns `nullptr` for them.
+     *
      * @tparam Component Type of component in which one is interested.
      * @return A pointer to the array of components of the given type.
      */
