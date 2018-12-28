@@ -5,7 +5,6 @@
 #include <vector>
 #include <memory>
 #include <utility>
-#include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/family.hpp"
@@ -22,13 +21,17 @@ namespace entt {
  * events to be published all together once per tick.<br/>
  * Listeners are provided in the form of member functions. For each event of
  * type `Event`, listeners are such that they can be invoked with an argument of
- * type `const Event &`, no matter what the return type is.
+ * type `const Event &` plus an extra list of arguments to forward with the
+ * event itself, no matter what the return type is.
  *
  * Member functions named `receive` are automatically detected and registered or
  * unregistered by the dispatcher. The type of the instances is `Class *` (a
  * naked pointer). It means that users must guarantee that the lifetimes of the
  * instances overcome the one of the dispatcher itself to avoid crashes.
+ *
+ * @tparam Args Types of arguments to forward along with an event.
  */
+template<typename... Args>
 class dispatcher final {
     using event_family = family<struct internal_dispatcher_event_family>;
 
@@ -37,36 +40,38 @@ class dispatcher final {
 
     struct base_wrapper {
         virtual ~base_wrapper() = default;
-        virtual void publish() = 0;
+        virtual void publish(Args...) = 0;
     };
 
     template<typename Event>
     struct signal_wrapper final: base_wrapper {
-        using sink_type = typename sigh<void(const Event &)>::sink_type;
+        using signal_type = sigh<void(const Event &, Args...)>;
+        using sink_type = typename signal_type::sink_type;
 
-        void publish() override {
-            const auto &curr = current++;
-            current %= std::extent<decltype(events)>::value;
-            std::for_each(events[curr].cbegin(), events[curr].cend(), [this](const auto &event) { signal.publish(event); });
-            events[curr].clear();
+        void publish(Args... args) override {
+            for(const auto &event: events[current]) {
+                signal.publish(event, args...);
+            }
+
+            events[current].clear();
+            current = (current + 1) % std::extent<decltype(events)>::value;
         }
 
         inline sink_type sink() ENTT_NOEXCEPT {
             return signal.sink();
         }
 
-        template<typename... Args>
-        inline void trigger(Args &&... args) {
-            signal.publish({ std::forward<Args>(args)... });
+        inline void trigger(const Event &event, Args... args) {
+            signal.publish(event, args...);
         }
 
-        template<typename... Args>
-        inline void enqueue(Args &&... args) {
-            events[current].push_back({ std::forward<Args>(args)... });
+        template<typename... Params>
+        inline void enqueue(Params &&... params) {
+            events[current].emplace_back(std::forward<Params>(params)...);
         }
 
     private:
-        sigh<void(const Event &)> signal{};
+        signal_type signal{};
         std::vector<Event> events[2];
         int current{};
     };
@@ -120,12 +125,12 @@ public:
      * The event is discarded after the execution.
      *
      * @tparam Event Type of event to trigger.
-     * @tparam Args Types of arguments to use to construct the event.
-     * @param args Arguments to use to construct the event.
+     * @param event An instance of the given type of event.
+     * @param args Arguments to forward along with the event.
      */
-    template<typename Event, typename... Args>
-    inline void trigger(Args &&... args) {
-        wrapper<Event>().trigger(std::forward<Args>(args)...);
+    template<typename Event>
+    inline void trigger(Event &&event, Args... args) {
+        wrapper<std::decay_t<Event>>().trigger(std::forward<Event>(event), args...);
     }
 
     /**
@@ -135,11 +140,11 @@ public:
      * The event is discarded after the execution.
      *
      * @tparam Event Type of event to trigger.
-     * @param event An instance of the given type of event.
+     * @param args Arguments to forward along with the event.
      */
     template<typename Event>
-    inline void trigger(Event &&event) {
-        wrapper<std::decay_t<Event>>().trigger(std::forward<Event>(event));
+    inline void trigger(Args... args) {
+        wrapper<std::decay_t<Event>>().trigger(Event{}, args...);
     }
 
     /**
@@ -149,12 +154,12 @@ public:
      * `update` member function to notify listeners when ready.
      *
      * @tparam Event Type of event to enqueue.
-     * @tparam Args Types of arguments to use to construct the event.
-     * @param args Arguments to use to construct the event.
+     * @tparam Params Types of arguments to use to construct the event.
+     * @param params Arguments to use to construct the event.
      */
-    template<typename Event, typename... Args>
-    inline void enqueue(Args &&... args) {
-        wrapper<Event>().enqueue(std::forward<Args>(args)...);
+    template<typename Event, typename... Params>
+    inline void enqueue(Params &&... params) {
+        wrapper<Event>().enqueue(std::forward<Params>(params)...);
     }
 
     /**
@@ -179,10 +184,11 @@ public:
      * to reduce at a minimum the time spent in the bodies of the listeners.
      *
      * @tparam Event Type of events to send.
+     * @param args Arguments to forward along with the event.
      */
     template<typename Event>
-    inline void update() {
-        wrapper<Event>().publish();
+    inline void update(Args... args) {
+        wrapper<Event>().publish(args...);
     }
 
     /**
@@ -191,13 +197,15 @@ public:
      * This method is blocking and it doesn't return until all the events are
      * delivered to the registered listeners. It's responsibility of the users
      * to reduce at a minimum the time spent in the bodies of the listeners.
+     *
+     * @param args Arguments to forward along with the event.
      */
-    inline void update() const {
+    inline void update(Args... args) const {
         for(auto pos = wrappers.size(); pos; --pos) {
             auto &wrapper = wrappers[pos-1];
 
             if(wrapper) {
-                wrapper->publish();
+                wrapper->publish(args...);
             }
         }
     }

@@ -6,27 +6,27 @@ struct an_event {};
 struct another_event {};
 
 struct receiver {
-    void receive(const an_event &) { ++cnt; }
+    void receive(const an_event &, int value) { cnt += value; }
     void reset() { cnt = 0; }
     int cnt{0};
 };
 
 TEST(Dispatcher, Functionalities) {
-    entt::dispatcher dispatcher;
+    entt::dispatcher<int> dispatcher;
     receiver receiver;
 
     dispatcher.sink<an_event>().connect(&receiver);
-    dispatcher.trigger<an_event>();
+    dispatcher.trigger<an_event>(1);
     dispatcher.enqueue<an_event>();
     dispatcher.enqueue<another_event>();
-    dispatcher.update<another_event>();
+    dispatcher.update<another_event>(1);
 
     ASSERT_EQ(receiver.cnt, 1);
 
-    dispatcher.update<an_event>();
-    dispatcher.trigger<an_event>();
+    dispatcher.update<an_event>(2);
+    dispatcher.trigger<an_event>(1);
 
-    ASSERT_EQ(receiver.cnt, 3);
+    ASSERT_EQ(receiver.cnt, 4);
 
     receiver.reset();
 
@@ -34,10 +34,10 @@ TEST(Dispatcher, Functionalities) {
     const an_event &cevent = event;
 
     dispatcher.sink<an_event>().disconnect(&receiver);
-    dispatcher.trigger(an_event{});
+    dispatcher.trigger(an_event{}, 1);
     dispatcher.enqueue(event);
-    dispatcher.update();
-    dispatcher.trigger(cevent);
+    dispatcher.update(1);
+    dispatcher.trigger(cevent, 1);
 
     ASSERT_EQ(receiver.cnt, 0);
 }

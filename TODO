@@ -8,7 +8,6 @@
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
 * runner proposal: https://en.wikipedia.org/wiki/Fork%E2%80%93join_model https://slide-rs.github.io/specs/03_dispatcher.html
 * is it possible to iterate all the components assigned to an entity through a common base class?
-* can we do more for shared libraries? who knows... see #144
 * work stealing job system (see #100)
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
 * meta: move-to-head optimization when searching by name on parts (data, func, etc)
@@ -16,10 +15,17 @@
 * destroy overload that accepts a couple of iterators (see create)
 * allow for built-in parallel each if possible
 * add on-the-fly sort functionality (is it possible?)
-* write/show how to create an archetype based model on top of EnTT
 * write/show how to create prefabs on top of EnTT (that's easy!!)
 * mention hunter in the readme file, section packaging tools
 * travis + windows is now available, try it
 * events on replace, so that one can track updated components? indagate impact
-* optimize for empty component - maybe it's possible with a raw-less view that uses fake iterators (with correct size (correct size, same component)
 * tags revenge: if it's possible, reintroduce them but without a link to entities (see #169 for more details)
+
+Required test:
+* can we do more for shared libraries? who knows... see #144
+* type_info::hash_code can be used in place of family when it comes to working with dlls
+
+Ready to go:
+* stealing archetype-like model on top of EnTT (design completed, wip dev)
+* write/show how to create an archetype based model on top of EnTT
+* do not include it in EnTT, it breaks the pay-for-what-you-use principle all the ways
