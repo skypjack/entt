@@ -140,12 +140,12 @@ public:
      * When used to connect a member function, the delegate isn't responsible
      * for the connected object. Users must guarantee that the lifetime of the
      * instance overcomes the one of the delegate.<br/>
-     * When used to connect a curried free function, the linked value must be at
-     * least copyable and such that its size is lower than or equal to the one
-     * of a `void *`. It means that all primitive types are accepted as well as
-     * pointers. Moreover, the signature of the free function must be such that
-     * the value is the first argument before the ones used to define the
-     * delegate itself.
+     * When used to connect a curried free function, the linked value must be
+     * both trivially copyable and trivially destructible, other than such that
+     * its size is lower than or equal to the one of a `void *`. It means that
+     * all the primitive types are accepted as well as pointers. Moreover, the
+     * signature of the free function must be such that the value is the first
+     * argument before the ones used to define the delegate itself.
      *
      * @tparam Candidate Member function or curried free function to connect to
      * the delegate.
@@ -157,6 +157,8 @@ public:
     template<auto Candidate, typename Type>
     void connect(Type value_or_instance) ENTT_NOEXCEPT {
         static_assert(sizeof(Type) <= sizeof(void *));
+        static_assert(std::is_trivially_copyable_v<Type>);
+        static_assert(std::is_trivially_destructible_v<Type>);
         static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), Type, Args...>);
         new (&storage) Type{value_or_instance};
 
