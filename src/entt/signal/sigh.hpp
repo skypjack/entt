@@ -351,7 +351,7 @@ struct sigh<Ret(Args...), Collector> final: private internal::invoker<Ret(Args..
      * @return True if the two signals are identical, false otherwise.
      */
     bool operator==(const sigh &other) const ENTT_NOEXCEPT {
-        return std::equal(calls.cbegin(), calls.cend(), other.calls.cbegin(), other.calls.cend());
+        return calls == other.calls;
     }
 
 private:

@@ -10,7 +10,8 @@ struct sigh_listener {
     bool h(const int &) { return k; }
 
     void i() {}
-    void l() {}
+    // useless definition just because msvc does weird things if both are empty
+    void l() { k = k ? true : false; }
 
     bool k{false};
 };
@@ -19,7 +20,7 @@ template<typename Ret>
 struct test_collect_all {
     std::vector<Ret> vec{};
     static int f() { return 42; }
-    static int g() { return 42; }
+    static int g() { return 3; }
     bool operator()(Ret r) noexcept {
         vec.push_back(r);
         return true;
@@ -215,7 +216,7 @@ TEST(SigH, Collector) {
     ASSERT_FALSE(collector_all.vec.empty());
     ASSERT_EQ(static_cast<std::vector<int>::size_type>(2), collector_all.vec.size());
     ASSERT_EQ(42, collector_all.vec[0]);
-    ASSERT_EQ(42, collector_all.vec[1]);
+    ASSERT_EQ(3, collector_all.vec[1]);
 
     entt::sigh<int(), test_collect_first<int>> sigh_first;
 

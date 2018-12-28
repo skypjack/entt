@@ -225,8 +225,8 @@ public:
      * @return True if the two delegates are identical, false otherwise.
      */
     bool operator==(const delegate<Ret(Args...)> &other) const ENTT_NOEXCEPT {
-        const char *lhs = reinterpret_cast<const char *>(&storage);
-        const char *rhs = reinterpret_cast<const char *>(&other.storage);
+        auto *lhs = reinterpret_cast<const unsigned char *>(&storage);
+        auto *rhs = reinterpret_cast<const unsigned char *>(&other.storage);
         return fn == other.fn && std::equal(lhs, lhs + sizeof(storage_type), rhs);
     }
 
