@@ -15,7 +15,6 @@
 * hashed string: add implicit check on construction for uniqueness (optional)
 * destroy overload that accepts a couple of iterators (see create)
 * allow for built-in parallel each if possible
-* add on-the-fly sort functionality (is it possible?)
 * write/show how to create prefabs on top of EnTT (that's easy!!)
 * mention hunter in the readme file, section packaging tools
 * travis + windows is now available, try it
@@ -23,6 +22,7 @@
 * tags revenge: if it's possible, reintroduce them but without a link to entities (see #169 for more details)
 
 Ready to go:
-* stealing archetype-like model on top of EnTT (design completed, wip dev)
-* write/show how to create an archetype based model on top of EnTT
-* note: do not include it in EnTT, it breaks the pay-for-what-you-use principle all the ways
+==> req: ref to value with curried functions
+* add on-the-fly sort functionality (is it possible?)
+* (even more) optimized standard views are possible!
+* induce-respect policy
