@@ -22,7 +22,6 @@
 * tags revenge: if it's possible, reintroduce them but without a link to entities (see #169 for more details)
 
 Ready to go:
-==> req: ref to value with curried functions
-* add on-the-fly sort functionality (is it possible?)
 * (even more) optimized standard views are possible!
-* induce-respect policy
+* add on-the-fly sort functionality
+* introduce induce-respect policy

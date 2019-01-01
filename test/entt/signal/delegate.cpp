@@ -5,8 +5,13 @@ int delegate_function(const int &i) {
     return i*i;
 }
 
-int curried_function(int i, int j) {
+int curried_function_by_value(int i, int j) {
     return i+j;
+}
+
+int curried_function_by_ref(int &value) {
+    value *= 2;
+    return value;
 }
 
 struct delegate_functor {
@@ -194,10 +199,19 @@ TEST(Delegate, ConstInstance) {
     ASSERT_EQ(delegate, entt::delegate<int(int)>{});
 }
 
-TEST(Delegate, CurriedFunction) {
+TEST(Delegate, CurriedFunctionByValue) {
     entt::delegate<int(int)> delegate;
-    delegate.connect<&curried_function>(3);
+    delegate.connect<&curried_function_by_value>(3);
 
     ASSERT_TRUE(delegate);
     ASSERT_EQ(delegate(1), 4);
+}
+
+TEST(Delegate, CurriedFunctionByRef) {
+    entt::delegate<int()> delegate;
+    delegate.connect<&curried_function_by_ref>(2);
+
+    ASSERT_TRUE(delegate);
+    ASSERT_EQ(delegate(), 4);
+    ASSERT_EQ(delegate(), 8);
 }

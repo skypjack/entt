@@ -229,10 +229,10 @@ As shown previously, it accepts functions having type `void(int)`. However, we
 can do something more in this case, because of how the delegate class is
 implemented internally (that is something that goes beyond the purposes of this
 document).<br/>
-In particular, the delegate accepts also functions having type `void(T, int)`,
-as long as `sizeof(T)` is lower than or equal to `sizeof(void *)`. The first
-parameter is stored directly by the delegate class and passed to the connected
-function when needed.
+In particular, the delegate accepts also functions having type equivalent to
+`void(T &, int)`, as long as `sizeof(T)` is lower than or equal to
+`sizeof(void *)`. The first parameter is stored directly by the delegate class
+and passed to the connected function when needed.
 
 In other terms, this works as well with the above definition:
 
@@ -245,7 +245,11 @@ delegate(42);
 
 In this case, the function `g` is invoked with parameters `'c'` and `42`.
 However, the function type of the delegate is still `void(int)`, mainly because
-this is also the signature of its function call operator.
+this is also the signature of its function call operator.<br/>
+When the curried function gets the linked parameter by reference, it can modify
+it and the new value will be stored in place of the previous one. It's highly
+discouraged to accept the parameter by reference, unless you know exactly what
+you're doing. Prefer accepting it by value if possible.
 
 # Event dispatcher
 

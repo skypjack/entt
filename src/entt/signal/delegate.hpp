@@ -159,11 +159,11 @@ public:
         static_assert(sizeof(Type) <= sizeof(void *));
         static_assert(std::is_trivially_copyable_v<Type>);
         static_assert(std::is_trivially_destructible_v<Type>);
-        static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), Type, Args...>);
+        static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), Type &, Args...>);
         new (&storage) Type{value_or_instance};
 
         fn = [](storage_type &storage, Args... args) -> Ret {
-            Type value_or_instance = *reinterpret_cast<Type *>(&storage);
+            Type &value_or_instance = *reinterpret_cast<Type *>(&storage);
             return std::invoke(Candidate, value_or_instance, args...);
         };
     }
