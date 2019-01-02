@@ -345,8 +345,8 @@ know who has participated so far.
 
 # License
 
-Code and documentation Copyright (c) 2017-2018 Michele Caini.<br/>
-Logo Copyright (c) 2018 Richard Caseres.
+Code and documentation Copyright (c) 2017-2019 Michele Caini.<br/>
+Logo Copyright (c) 2018-2019 Richard Caseres.
 
 Code released under
 [the MIT license](https://github.com/skypjack/entt/blob/master/LICENSE).
