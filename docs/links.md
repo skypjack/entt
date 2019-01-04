@@ -48,6 +48,9 @@ a reference:
 * Any Other Business:
   * [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt): port of
     [Match One](https://github.com/sschmid/Match-One) for `Entitas-CSharp`.
+  * GitHub contains also
+    [many other examples](https://github.com/search?o=desc&q=%22skypjack%2Fentt%22&s=indexed&type=Code)
+    of use of `EnTT` from which to take inspiration if interested.
 
 If you know of other resources out there that are about `EnTT`, feel free to
 open an issue or a PR and I'll be glad to add them to this page.
