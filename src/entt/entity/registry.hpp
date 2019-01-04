@@ -1124,7 +1124,6 @@ public:
      * @sa view
      * @sa view<Entity, Component>
      * @sa persistent_view
-     * @sa raw_view
      * @sa runtime_view
      *
      * @tparam Component Type of components used to construct the view.
@@ -1174,7 +1173,6 @@ public:
      * @sa view
      * @sa view<Entity, Component>
      * @sa persistent_view
-     * @sa raw_view
      * @sa runtime_view
      *
      * @tparam Component Types of components used to construct the view.
@@ -1223,42 +1221,6 @@ public:
     }
 
     /**
-     * @brief Returns a raw view for the given component.
-     *
-     * This kind of views are created on the fly and share with the registry its
-     * internal data structures.<br/>
-     * Feel free to discard a view after the use. Creating and destroying a view
-     * is an incredibly cheap operation because they do not require any type of
-     * initialization.<br/>
-     * As a rule of thumb, storing a view should never be an option.
-     *
-     * Raw views are incredibly fast and must be considered the best tool to
-     * iterate components whenever knowing the entities to which they belong
-     * isn't required.
-     *
-     * @sa view
-     * @sa view<Entity, Component>
-     * @sa persistent_view
-     * @sa raw_view
-     * @sa runtime_view
-     *
-     * @tparam Component Type of component used to construct the view.
-     * @return A newly created raw view.
-     */
-    template<typename Component>
-    entt::raw_view<Entity, Component> raw_view() {
-        assure<Component>();
-        return { &pool<Component>() };
-    }
-
-    /*! @copydoc raw_view */
-    template<typename Component>
-    inline entt::raw_view<Entity, Component> raw_view() const {
-        static_assert(std::is_const_v<Component>);
-        return const_cast<registry *>(this)->raw_view<Component>();
-    }
-
-    /**
      * @brief Returns a runtime view for the given components.
      *
      * This kind of views are created on the fly and share with the registry its
@@ -1276,7 +1238,6 @@ public:
      * @sa view
      * @sa view<Entity, Component>
      * @sa persistent_view
-     * @sa raw_view
      * @sa runtime_view
      *
      * @tparam It Type of forward iterator.

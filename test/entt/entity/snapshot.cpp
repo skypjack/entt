@@ -231,7 +231,7 @@ TEST(Snapshot, Iterator) {
 
     ASSERT_EQ(registry.view<another_component>().size(), size);
 
-    registry.view<another_component>().each([](const auto entity, auto &&...) {
+    registry.view<another_component>().each([](const auto entity, const auto &) {
         ASSERT_TRUE(entity % 2);
     });
 }

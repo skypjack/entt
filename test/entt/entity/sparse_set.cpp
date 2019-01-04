@@ -632,8 +632,8 @@ TEST(SparseSetWithType, RawEmptyType) {
 
     set.construct(3);
 
-    ASSERT_EQ(set.raw(), nullptr);
-    ASSERT_EQ(cset.raw(), nullptr);
+    ASSERT_EQ(set.raw(), cset.raw());
+    ASSERT_EQ(set.try_get(3), set.raw());
 }
 
 TEST(SparseSetWithType, SortOrdered) {

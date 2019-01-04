@@ -62,7 +62,6 @@ class registry;
  *
  * @sa view
  * @sa view<Entity, Component>
- * @sa raw_view
  * @sa runtime_view
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -101,10 +100,9 @@ class persistent_view final {
     }
 
     template<typename Comp>
-    inline decltype(auto) get([[maybe_unused]] typename persistent_type::object_type::value_type index, [[maybe_unused]] const Entity entity) const {
+    inline decltype(auto) instance([[maybe_unused]] typename persistent_type::object_type::value_type index) const {
         if constexpr(std::is_empty_v<Comp>) {
-            // raw returns nullptr for empty components
-            return pool<Comp>()->get(entity);
+            return *pool<Comp>()->raw();
         } else {
             return pool<Comp>()->raw()[index];
         }
@@ -112,10 +110,17 @@ class persistent_view final {
 
     template<typename Func, std::size_t... Indexes>
     void each(Func func, std::index_sequence<Indexes...>) const {
-        std::for_each(handler->view_type::begin(), handler->view_type::end(), [func = std::move(func), raw = handler->cbegin(), this](const auto entity) mutable {
-            func(entity, get<Component>((*raw)[Indexes], entity)...);
-            ++raw;
-        });
+        if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>...>) {
+            std::for_each(handler->cbegin(), handler->cend(), [func = std::move(func), this](const auto &indexes) mutable {
+                // we can safely use the first entity each and every time, b
+                func(instance<Component>(indexes[Indexes])...);
+            });
+        } else {
+            std::for_each(handler->view_type::begin(), handler->view_type::end(), [func = std::move(func), raw = handler->cbegin(), this](const auto entity) mutable {
+                func(entity, instance<Component>((*raw)[Indexes])...);
+                ++raw;
+            });
+        }
     }
 
 public:
@@ -268,12 +273,14 @@ public:
      * object to them.
      *
      * The function object is invoked for each entity. It is provided with the
-     * entity itself and a set of const references to all the components of the
-     * view.<br/>
-     * The signature of the function should be equivalent to the following:
+     * entity itself and a set of references to all its components. The
+     * _constness_ of the components is as requested.<br/>
+     * The signature of the function must be equivalent to one of the following
+     * forms:
      *
      * @code{.cpp}
      * void(const entity_type, Component &...);
+     * void(Component &...);
      * @endcode
      *
      * @tparam Func Type of the function object to invoke.
@@ -346,7 +353,6 @@ private:
  *
  * @sa view<Entity, Component>
  * @sa persistent_view
- * @sa raw_view
  * @sa runtime_view
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -488,8 +494,14 @@ class view final {
         auto begin = cpool->view_type::begin();
 
         // we can directly use the raw iterators if pools are ordered
-        while(((begin != end) && ... && (*begin == *(std::get<Indexes>(data)++)))) {
-            func(*(begin++), *(std::get<component_iterator_type<Component>>(raw)++)...);
+        if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>...>) {
+            for(; ((begin != end) && ... && (*begin == *(std::get<Indexes>(data)++))); ++begin) {
+                func(*(std::get<component_iterator_type<Component>>(raw)++)...);
+            }
+        } else {
+            while(((begin != end) && ... && (*begin == *(std::get<Indexes>(data)++)))) {
+                func(*(begin++), *(std::get<component_iterator_type<Component>>(raw)++)...);
+            }
         }
 
         // fallback to visit what remains using indirections
@@ -500,7 +512,11 @@ class view final {
 
             if(((sz < extent) && ... && std::get<Indexes>(other)->fast(entity))) {
                 // avoided at least the indirection due to the sparse set for the pivot type (see get for more details)
-                func(entity, get<Comp, Component>(it, entity)...);
+                if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>...>) {
+                    func(get<Comp, Component>(it, entity)...);
+                } else {
+                    func(entity, get<Comp, Component>(it, entity)...);
+                }
             }
         }
     }
@@ -636,12 +652,14 @@ public:
      * object to them.
      *
      * The function object is invoked for each entity. It is provided with the
-     * entity itself and a set of const references to all the components of the
-     * view.<br/>
-     * The signature of the function should be equivalent to the following:
+     * entity itself and a set of references to all its components. The
+     * _constness_ of the components is as requested.<br/>
+     * The signature of the function must be equivalent to one of the following
+     * forms:
      *
      * @code{.cpp}
      * void(const entity_type, Component &...);
+     * void(Component &...);
      * @endcode
      *
      * @tparam Func Type of the function object to invoke.
@@ -690,7 +708,6 @@ private:
  *
  * @sa view
  * @sa persistent_view
- * @sa raw_view
  * @sa runtime_view
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -870,202 +887,13 @@ public:
      * object to them.
      *
      * The function object is invoked for each entity. It is provided with the
-     * entity itself and a const reference to the component of the view.<br/>
-     * The signature of the function should be equivalent to the following:
+     * entity itself and a reference to its component. The _constness_ of the
+     * component is as requested.<br/>
+     * The signature of the function must be equivalent to one of the following
+     * forms:
      *
      * @code{.cpp}
-     * void(const entity_type, const Component &);
-     * @endcode
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void each(Func func) const {
-        std::for_each(pool->view_type::begin(), pool->view_type::end(), [func = std::move(func), raw = pool->begin()](const auto entity) mutable {
-            func(entity, *(raw++));
-        });
-    }
-
-private:
-    pool_type *pool;
-};
-
-
-/**
- * @brief Raw view.
- *
- * Raw views are meant to easily iterate components without having to resort to
- * using any other member function, so as to further increase the performance.
- * Whenever knowing the entity to which a component belongs isn't required, this
- * should be the preferred tool.<br/>
- * Order of elements during iterations are highly dependent on the order of the
- * underlying data structure. See sparse_set and its specializations for more
- * details.
- *
- * @b Important
- *
- * Iterators aren't invalidated if:
- *
- * * New instances of the given component are created and assigned to entities.
- * * The entity to which the component belongs is modified (as an example, the
- *   given component is destroyed).
- *
- * In all the other cases, modifying the pool of the given component in any way
- * invalidates all the iterators and using them results in undefined behavior.
- *
- * @note
- * Views share a reference to the underlying data structure with the registry
- * that generated them. Therefore any change to the entities and to the
- * components made by means of the registry are immediately reflected by views.
- *
- * @warning
- * Lifetime of a view must overcome the one of the registry that generated it.
- * In any other case, attempting to use a view results in undefined behavior.
- *
- * @sa view
- * @sa view<Entity, Component>
- * @sa persistent_view
- * @sa runtime_view
- *
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Component Type of component iterated by the view.
- */
-template<typename Entity, typename Component>
-class raw_view final {
-    /*! @brief A registry is allowed to create views. */
-    friend class registry<Entity>;
-
-    using pool_type = std::conditional_t<std::is_const_v<Component>, const sparse_set<Entity, std::remove_const_t<Component>>, sparse_set<Entity, Component>>;
-
-    raw_view(pool_type *pool) ENTT_NOEXCEPT
-        : pool{pool}
-    {}
-
-public:
-    /*! @brief Type of component iterated by the view. */
-    using raw_type = std::remove_reference_t<decltype(std::declval<pool_type>().get(0))>;
-    /*! @brief Underlying entity identifier. */
-    using entity_type = typename pool_type::entity_type;
-    /*! @brief Unsigned integer type. */
-    using size_type = typename pool_type::size_type;
-    /*! @brief Input iterator type. */
-    using iterator_type = decltype(std::declval<pool_type>().begin());
-
-    /*! @brief Default copy constructor. */
-    raw_view(const raw_view &) = default;
-    /*! @brief Default move constructor. */
-    raw_view(raw_view &&) = default;
-
-    /*! @brief Default copy assignment operator. @return This view. */
-    raw_view & operator=(const raw_view &) = default;
-    /*! @brief Default move assignment operator. @return This view. */
-    raw_view & operator=(raw_view &&) = default;
-
-    /**
-     * @brief Returns the number of instances of the given type.
-     * @return Number of instances of the given component.
-     */
-    size_type size() const ENTT_NOEXCEPT {
-        return pool->size();
-    }
-
-    /**
-     * @brief Checks whether the view is empty.
-     * @return True if the view is empty, false otherwise.
-     */
-    bool empty() const ENTT_NOEXCEPT {
-        return pool->empty();
-    }
-
-    /**
-     * @brief Direct access to the list of components.
-     *
-     * The returned pointer is such that range `[raw(), raw() + size()]` is
-     * always a valid range, even if the container is empty.
-     *
-     * @note
-     * There are no guarantees on the order of the components. Use `begin` and
-     * `end` if you want to iterate the view in the expected order.
-     *
-     * @warning
-     * Empty components aren't explicitly instantiated. Therefore, this function
-     * always returns `nullptr` for them.
-     *
-     * @return A pointer to the array of components.
-     */
-    raw_type * raw() const ENTT_NOEXCEPT {
-        return pool->raw();
-    }
-
-    /**
-     * @brief Direct access to the list of entities.
-     *
-     * The returned pointer is such that range `[data(), data() + size()]` is
-     * always a valid range, even if the container is empty.
-     *
-     * @note
-     * There are no guarantees on the order of the entities. Use `begin` and
-     * `end` if you want to iterate the view in the expected order.
-     *
-     * @return A pointer to the array of entities.
-     */
-    const entity_type * data() const ENTT_NOEXCEPT {
-        return pool->data();
-    }
-
-    /**
-     * @brief Returns an iterator to the first instance of the given type.
-     *
-     * The returned iterator points to the first instance of the given type. If
-     * the view is empty, the returned iterator will be equal to `end()`.
-     *
-     * @note
-     * Input iterators stay true to the order imposed to the underlying data
-     * structures.
-     *
-     * @return An iterator to the first instance of the given type.
-     */
-    iterator_type begin() const ENTT_NOEXCEPT {
-        return pool->begin();
-    }
-
-    /**
-     * @brief Returns an iterator that is past the last instance of the given
-     * type.
-     *
-     * The returned iterator points to the element following the last instance
-     * of the given type. Attempting to dereference the returned iterator
-     * results in undefined behavior.
-     *
-     * @note
-     * Input iterators stay true to the order imposed to the underlying data
-     * structures.
-     *
-     * @return An iterator to the element following the last instance of the
-     * given type.
-     */
-    iterator_type end() const ENTT_NOEXCEPT {
-        return pool->end();
-    }
-
-    /**
-     * @brief Returns a reference to the element at the given position.
-     * @param pos Position of the element to return.
-     * @return A reference to the requested element.
-     */
-    raw_type & operator[](const size_type pos) const ENTT_NOEXCEPT {
-        return pool->begin()[pos];
-    }
-
-    /**
-     * @brief Iterates components and applies the given function object to them.
-     *
-     * The function object is provided with a reference to each component of the
-     * view.<br/>
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
+     * void(const entity_type, Component &);
      * void(Component &);
      * @endcode
      *
@@ -1074,7 +902,13 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        std::for_each(pool->begin(), pool->end(), std::move(func));
+        if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>>) {
+            std::for_each(pool->begin(), pool->end(), std::move(func));
+        } else {
+            std::for_each(pool->view_type::begin(), pool->view_type::end(), [func = std::move(func), raw = pool->begin()](const auto entity) mutable {
+                func(entity, *(raw++));
+            });
+        }
     }
 
 private:
@@ -1120,7 +954,6 @@ private:
  * @sa view
  * @sa view<Entity, Component>
  * @sa persistent_view
- * @sa raw_view
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */

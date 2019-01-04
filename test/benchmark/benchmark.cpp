@@ -115,29 +115,7 @@ TEST(Benchmark, IterateSingleComponent1M) {
         timer.elapsed();
     };
 
-    test([](auto, const auto &) {});
-    test([](auto, auto &... comp) {
-        ((comp.x = {}), ...);
-    });
-}
-
-TEST(Benchmark, IterateSingleComponentRaw1M) {
-    entt::registry<> registry;
-
-    std::cout << "Iterating over 1000000 entities, one component, raw view" << std::endl;
-
-    for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.assign<position>(entity);
-    }
-
-    auto test = [&registry](auto func) {
-        timer timer;
-        registry.raw_view<position>().each(func);
-        timer.elapsed();
-    };
-
-    test([](const auto &) {});
+    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -185,8 +163,8 @@ TEST(Benchmark, IterateTwoComponents1M) {
         timer.elapsed();
     };
 
-    test([](auto, const auto &...) {});
-    test([](auto, auto &... comp) {
+    test([](const auto &...) {});
+    test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -211,8 +189,8 @@ TEST(Benchmark, IterateTwoComponents1MHalf) {
         timer.elapsed();
     };
 
-    test([](auto, const auto &...) {});
-    test([](auto, auto &... comp) {
+    test([](const auto &...) {});
+    test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -237,8 +215,8 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
         timer.elapsed();
     };
 
-    test([](auto, const auto &...) {});
-    test([](auto, auto &... comp) {
+    test([](const auto &...) {});
+    test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -261,8 +239,8 @@ TEST(Benchmark, IterateTwoComponentsPersistent1M) {
         timer.elapsed();
     };
 
-    test([](auto, const auto &...) {});
-    test([](auto, auto &... comp) {
+    test([](const auto &...) {});
+    test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -374,8 +352,8 @@ TEST(Benchmark, IterateFiveComponents1M) {
         timer.elapsed();
     };
 
-    test([](auto, const auto &...) {});
-    test([](auto, auto &... comp) {
+    test([](const auto &...) {});
+    test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -403,8 +381,8 @@ TEST(Benchmark, IterateFiveComponents1MHalf) {
         timer.elapsed();
     };
 
-    test([](auto, const auto &...) {});
-    test([](auto, auto &... comp) {
+    test([](const auto &...) {});
+    test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -432,8 +410,8 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
         timer.elapsed();
     };
 
-    test([](auto, const auto &...) {});
-    test([](auto, auto &... comp) {
+    test([](const auto &...) {});
+    test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -459,8 +437,8 @@ TEST(Benchmark, IterateFiveComponentsPersistent1M) {
         timer.elapsed();
     };
 
-    test([](auto, const auto &...) {});
-    test([](auto, auto &... comp) {
+    test([](const auto &...) {});
+    test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -613,8 +591,8 @@ TEST(Benchmark, IterateTenComponents1M) {
         timer.elapsed();
     };
 
-    test([](auto, const auto &...) {});
-    test([](auto, auto &... comp) {
+    test([](const auto &...) {});
+    test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -647,8 +625,8 @@ TEST(Benchmark, IterateTenComponents1MHalf) {
         timer.elapsed();
     };
 
-    test([](auto, auto &...) {});
-    test([](auto, auto &... comp) {
+    test([](auto &...) {});
+    test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -681,8 +659,8 @@ TEST(Benchmark, IterateTenComponents1MOne) {
         timer.elapsed();
     };
 
-    test([](auto, const auto &...) {});
-    test([](auto, auto &... comp) {
+    test([](const auto &...) {});
+    test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
 }
@@ -713,8 +691,8 @@ TEST(Benchmark, IterateTenComponentsPersistent1M) {
         timer.elapsed();
     };
 
-    test([](auto, const auto &...) {});
-    test([](auto, auto &... comp) {
+    test([](const auto &...) {});
+    test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
 }

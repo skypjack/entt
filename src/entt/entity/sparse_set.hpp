@@ -774,14 +774,15 @@ public:
      * to iterate the sparse set in the expected order.
      *
      * @warning
-     * Empty components aren't explicitly instantiated. Therefore, this function
-     * always returns `nullptr` for them.
+     * Empty components aren't explicitly instantiated. Only one instance of the
+     * given type is created. Therefore, this function always returns a pointer
+     * to that instance.
      *
      * @return A pointer to the array of objects.
      */
     const object_type * raw() const ENTT_NOEXCEPT {
         if constexpr(std::is_empty_v<object_type>) {
-            return nullptr;
+            return &instances;
         } else {
             return instances.data();
         }

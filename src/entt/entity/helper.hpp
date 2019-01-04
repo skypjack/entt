@@ -47,16 +47,6 @@ struct as_view final {
         return reg.template persistent_view<Component...>();
     }
 
-    /**
-     * @brief Conversion function from a registry to a raw view.
-     * @tparam Component Type of component used to construct the view.
-     * @return A newly created raw view.
-     */
-    template<typename Component>
-    inline operator entt::raw_view<Entity, Component>() const {
-        return reg.template raw_view<Component>();
-    }
-
 private:
     registry_type &reg;
 };

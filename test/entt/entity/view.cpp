@@ -131,10 +131,12 @@ TEST(PersistentView, Each) {
     std::size_t cnt = 0;
 
     view.each([&cnt](auto, int &, char &) { ++cnt; });
+    view.each([&cnt](int &, char &) { ++cnt; });
 
-    ASSERT_EQ(cnt, std::size_t{2});
+    ASSERT_EQ(cnt, std::size_t{4});
 
     cview.each([&cnt](auto, const int &, const char &) { --cnt; });
+    cview.each([&cnt](const int &, const char &) { --cnt; });
 
     ASSERT_EQ(cnt, std::size_t{0});
 }
@@ -336,6 +338,10 @@ TEST(PersistentView, EmptyAndNonEmptyTypes) {
         ASSERT_TRUE(entity == e0 || entity == e1);
     }
 
+    view.each([e0, e1](const auto entity, const int &, const empty_type &) {
+        ASSERT_TRUE(entity == e0 || entity == e1);
+    });
+
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{2});
     ASSERT_EQ(&view.get<empty_type>(e0), &view.get<empty_type>(e1));
 }
@@ -450,10 +456,12 @@ TEST(SingleComponentView, Each) {
     std::size_t cnt = 0;
 
     view.each([&cnt](auto, int &) { ++cnt; });
+    view.each([&cnt](int &) { ++cnt; });
 
-    ASSERT_EQ(cnt, std::size_t{2});
+    ASSERT_EQ(cnt, std::size_t{4});
 
     cview.each([&cnt](auto, const int &) { --cnt; });
+    cview.each([&cnt](const int &) { --cnt; });
 
     ASSERT_EQ(cnt, std::size_t{0});
 }
@@ -629,10 +637,12 @@ TEST(MultipleComponentView, Each) {
     std::size_t cnt = 0;
 
     view.each([&cnt](auto, int &, char &) { ++cnt; });
+    view.each([&cnt](int &, char &) { ++cnt; });
 
-    ASSERT_EQ(cnt, std::size_t{2});
+    ASSERT_EQ(cnt, std::size_t{4});
 
     cview.each([&cnt](auto, const int &, const char &) { --cnt; });
+    cview.each([&cnt](const int &, const char &) { --cnt; });
 
     ASSERT_EQ(cnt, std::size_t{0});
 }
@@ -712,146 +722,6 @@ TEST(MultipleComponentView, Find) {
     ASSERT_EQ(*(++it), e0);
     ASSERT_EQ(++it, view.end());
     ASSERT_EQ(++view.find(e0), view.end());
-}
-
-TEST(RawView, Functionalities) {
-    entt::registry<> registry;
-    auto view = registry.raw_view<char>();
-    auto cview = std::as_const(registry).raw_view<const char>();
-
-    ASSERT_TRUE(view.empty());
-
-    const auto e0 = registry.create();
-    const auto e1 = registry.create();
-
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
-
-    ASSERT_FALSE(view.empty());
-    ASSERT_NO_THROW(view.begin()++);
-    ASSERT_NO_THROW(++cview.begin());
-
-    ASSERT_NE(view.begin(), view.end());
-    ASSERT_NE(cview.begin(), cview.end());
-    ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
-
-    registry.assign<char>(e0);
-
-    ASSERT_EQ(view.size(), typename decltype(view)::size_type{2});
-
-    registry.get<char>(e0) = '1';
-    registry.get<char>(e1) = '2';
-
-    for(auto &&component: view) {
-        ASSERT_TRUE(component == '1' || component == '2');
-    }
-
-    ASSERT_EQ(*(view.data() + 0), e1);
-    ASSERT_EQ(*(view.data() + 1), e0);
-
-    ASSERT_EQ(*(view.raw() + 0), '2');
-    ASSERT_EQ(*(cview.raw() + 1), '1');
-
-    for(auto &&component: view) {
-        // verifies that iterators return references to components
-        component = '0';
-    }
-
-    for(auto &&component: cview) {
-        ASSERT_TRUE(component == '0');
-    }
-
-    registry.remove<char>(e0);
-    registry.remove<char>(e1);
-
-    ASSERT_EQ(view.begin(), view.end());
-    ASSERT_TRUE(view.empty());
-}
-
-TEST(RawView, ElementAccess) {
-    entt::registry<> registry;
-    auto view = registry.raw_view<int>();
-    auto cview = std::as_const(registry).raw_view<const int>();
-
-    const auto e0 = registry.create();
-    registry.assign<int>(e0, 42);
-
-    const auto e1 = registry.create();
-    registry.assign<int>(e1, 3);
-
-    for(typename decltype(view)::size_type i{}; i < view.size(); ++i) {
-        ASSERT_EQ(view[i], i ? 42 : 3);
-        ASSERT_EQ(cview[i], i ? 42 : 3);
-    }
-}
-
-TEST(RawView, Empty) {
-    entt::registry<> registry;
-
-    const auto e0 = registry.create();
-    registry.assign<char>(e0);
-    registry.assign<double>(e0);
-
-    const auto e1 = registry.create();
-    registry.assign<char>(e1);
-
-    auto view = registry.raw_view<int>();
-
-    ASSERT_EQ(view.size(), entt::registry<>::size_type{0});
-
-    for(auto &&component: view) {
-        (void)component;
-        FAIL();
-    }
-}
-
-TEST(RawView, Each) {
-    entt::registry<> registry;
-
-    registry.assign<int>(registry.create(), 1);
-    registry.assign<int>(registry.create(), 3);
-
-    auto view = registry.raw_view<int>();
-    auto cview = std::as_const(registry).raw_view<const int>();
-    std::size_t cnt = 0;
-
-    view.each([&cnt](int &v) { cnt += (v % 2); });
-
-    ASSERT_EQ(cnt, std::size_t{2});
-
-    cview.each([&cnt](const int &v) { cnt -= (v % 2); });
-
-    ASSERT_EQ(cnt, std::size_t{0});
-}
-
-TEST(RawView, ConstNonConstAndAllInBetween) {
-    entt::registry<> registry;
-    auto view = registry.raw_view<int>();
-    auto cview = registry.raw_view<const int>();
-
-    ASSERT_TRUE((std::is_same_v<typename decltype(view)::raw_type, int>));
-    ASSERT_TRUE((std::is_same_v<typename decltype(cview)::raw_type, const int>));
-
-    ASSERT_TRUE((std::is_same_v<decltype(view[0]), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(view.raw()), int *>));
-    ASSERT_TRUE((std::is_same_v<decltype(cview[0]), const int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(cview.raw()), const int *>));
-
-    view.each([](auto &&i) {
-        ASSERT_TRUE((std::is_same_v<decltype(i), int &>));
-    });
-
-    cview.each([](auto &&i) {
-        ASSERT_TRUE((std::is_same_v<decltype(i), const int &>));
-    });
-
-    for(auto &&i: view) {
-        ASSERT_TRUE((std::is_same_v<decltype(i), int &>));
-    }
-
-    for(auto &&i: cview) {
-        ASSERT_TRUE((std::is_same_v<decltype(i), const int &>));
-    }
 }
 
 TEST(RuntimeView, Functionalities) {

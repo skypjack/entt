@@ -417,24 +417,6 @@ TEST(Registry, PersistentView) {
     ASSERT_EQ(cnt, decltype(view)::size_type{2});
 }
 
-TEST(Registry, RawView) {
-    entt::registry<> registry;
-    auto view = registry.raw_view<int>();
-
-    const auto e0 = registry.create();
-    registry.assign<int>(e0, 0);
-    registry.assign<char>(e0, 'c');
-
-    const auto e1 = registry.create();
-    registry.assign<int>(e1, 0);
-    registry.assign<char>(e1, 'c');
-
-    decltype(view)::size_type cnt{0};
-    view.each([&cnt](auto &...) { ++cnt; });
-
-    ASSERT_EQ(cnt, decltype(view)::size_type{2});
-}
-
 TEST(Registry, CleanStandardViewAfterReset) {
     entt::registry<> registry;
     auto view = registry.view<int>();
@@ -454,18 +436,6 @@ TEST(Registry, CleanPersistentViewAfterReset) {
     const auto entity = registry.create();
     registry.assign<int>(entity, 0);
     registry.assign<char>(entity, 'c');
-
-    ASSERT_EQ(view.size(), entt::registry<>::size_type{1});
-
-    registry.reset();
-
-    ASSERT_EQ(view.size(), entt::registry<>::size_type{0});
-}
-
-TEST(Registry, CleanRawViewAfterReset) {
-    entt::registry<> registry;
-    auto view = registry.raw_view<int>();
-    registry.assign<int>(registry.create(), 0);
 
     ASSERT_EQ(view.size(), entt::registry<>::size_type{1});
 

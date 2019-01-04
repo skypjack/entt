@@ -30,7 +30,6 @@
     * [Single component standard view](#single-component-standard-view)
     * [Multi component standard view](#multi-component-standard-view)
   * [Persistent View](#persistent-view)
-  * [Raw View](#raw-view)
   * [Runtime View](#runtime-view)
   * [Types: const, non-const and all in between](#types-const-non-const-and-all-in-between)
   * [Give me everything](#give-me-everything)
@@ -810,9 +809,9 @@ view can only iterate entities and their components, then read or update the
 data members of the latter.<br/>
 It is a subtle difference that can help designing a better software sometimes.
 
-There are mainly four kinds of views: standard (also known as `view`),
-persistent (also known as `persistent_view`), raw (also known as `raw_view`) and
-runtime (also known as `runtime_view`).<br/>
+There are mainly three kinds of views: standard (also known as `view`),
+persistent (also known as `persistent_view`), and runtime (also known as
+`runtime_view`).<br/>
 All of them have pros and cons to take in consideration. In particular:
 
 * Standard views:
@@ -854,22 +853,6 @@ All of them have pros and cons to take in consideration. In particular:
     persistent views there will be, the less performing will be creating and
     destroying entities and components or sorting a pool.
 
-* Raw views:
-
-  Pros:
-
-  * They work out-of-the-box and don't require any dedicated data structure.
-  * Creating and destroying them isn't expensive at all because they don't have
-    any type of initialization.
-  * They are the best tool for iterating components when it is not necessary to
-    know which entities they belong to.
-  * They don't affect any other operations of the registry.
-
-  Cons:
-
-  * They can be used to iterate only one type of component at a time.
-  * They don't return the entity to which a component belongs to the caller.
-
 * Runtime views:
 
   Pros:
@@ -887,7 +870,6 @@ All of them have pros and cons to take in consideration. In particular:
 
 To sum up and as a rule of thumb:
 
-* Use a raw view to iterate components only (no entities) for a given type.
 * Use a standard view to iterate entities and components for a single type.
 * Use a standard view to iterate entities and components for multiple types when
   a significantly low number of entities have one of the components, persistent
@@ -1096,48 +1078,6 @@ only entities, using `each` should be the preferred approach.
 function template of a registry during iterations, if possible. However, keep in
 mind that it works only with the components of the view itself.
 
-## Raw View
-
-Raw views return all the components of a given type. This kind of views can
-access components directly and avoid extra indirections like when components are
-accessed via an entity identifier.<br/>
-They offer a bunch of functionalities to get the number of instances they are
-going to return and a raw access to the entity list as well as to the component
-list.<br/>
-Refer to the inline documentation for all the details.
-
-Raw views can be used only to iterate components for a single type:
-
-```cpp
-auto view = registry.raw_view<renderable>();
-```
-
-There is no need to store views around for they are extremely cheap to
-construct, even though they can be copied without problems and reused freely. In
-fact, they return newly created and correctly initialized iterators whenever
-`begin` or `end` are invoked.<br/>
-To iterate a raw view, use it in a range-for loop:
-
-```cpp
-auto view = registry.raw_view<renderable>();
-
-for(auto &&component: raw) {
-    // ...
-}
-```
-
-Or rely on the `each` member function:
-
-```cpp
-registry.raw_view<renderable>().each([](auto &renderable) {
-    // ...
-});
-```
-
-Performance are exactly the same in both cases.
-
-**Note**: raw views don't have a `get` member function for obvious reasons.
-
 ## Runtime View
 
 Runtime views iterate entities that have at least all the given components in
@@ -1334,13 +1274,11 @@ assigned.
 
 The drawback is that the `raw` member function will no longer be able to return
 a valid pointer to the list of components in the pool. This is because there is
-no list of components at all. Therefore, `raw` will always return `nullptr` for
-this type of components.<br/>
+no list of components at all. Only one instance of the given type exists in this
+case. Therefore, `raw` will always return a pointer to that instance.<br/>
 Nonetheless, the iterators returned by the `begin` and `end` member functions
-are still valid and can be used safely. Similarly, raw views can still be built
-for this type of components if required.<br/>
-More in general, all the features offered by the library aren't affected, but
-for the `raw` member function that is no longer available instead.
+are still valid and can be used safely. More in general, all the features
+offered by the library aren't affected, but for the `raw` member function.
 
 # Multithreading
 

@@ -23,11 +23,11 @@ namespace entt {
  * The emitter class template follows the CRTP idiom. To create a custom emitter
  * type, derived classes must inherit directly from the base class as:
  *
- * ```cpp
+ * @code{.cpp}
  * struct my_emitter: emitter<my_emitter> {
  *     // ...
  * }
- * ```
+ * @endcode
  *
  * Handlers for the type of events are created internally on the fly. It's not
  * required to specify in advance the full list of accepted types.<br/>
