@@ -33,7 +33,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = typename container_type::size_type;
     /*! @brief Type of resources managed by a cache. */
-    using resource_type = hashed_string;
+    using resource_type = typename hashed_string::hash_type;
 
     /*! @brief Default constructor. */
     resource_cache() = default;
