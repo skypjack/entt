@@ -37,6 +37,8 @@ class resource_handle final {
     {}
 
 public:
+    /*! @brief Default constructor. */
+    resource_handle() ENTT_NOEXCEPT = default;
     /*! @brief Default copy constructor. */
     resource_handle(const resource_handle &) ENTT_NOEXCEPT = default;
     /*! @brief Default move constructor. */
@@ -95,7 +97,7 @@ public:
      * @return A pointer to the managed resource or `nullptr` if the handle
      * contains no resource at all.
      */
-    inline const Resource * operator ->() const ENTT_NOEXCEPT {
+    inline const Resource * operator->() const ENTT_NOEXCEPT {
         assert(static_cast<bool>(resource));
         return resource.get();
     }
