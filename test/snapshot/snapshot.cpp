@@ -16,6 +16,9 @@ struct timer {
 
 struct relationship {
     entt::registry<>::entity_type parent;
+    // null member should not be changed
+    // during continuous loading.
+    entt::registry<>::entity_type null_parent{entt::null};
 };
 
 template<typename Archive>
@@ -128,7 +131,7 @@ TEST(Snapshot, Continuous) {
     cereal::JSONInputArchive input{storage};
     entt::continuous_loader<entt::registry<>::entity_type> loader{destination};
     loader.entities(input)
-            .component<position, relationship>(input, &relationship::parent)
+            .component<position, relationship>(input, &relationship::parent, &relationship::null_parent)
             .component<timer>(input);
 
     ASSERT_FALSE(destination.valid(e0));
@@ -142,6 +145,7 @@ TEST(Snapshot, Continuous) {
     ASSERT_EQ(destination.get<position>(l0).y, 0.f);
     ASSERT_TRUE(destination.has<relationship>(l0));
     ASSERT_EQ(destination.get<relationship>(l0).parent, l0);
+    ASSERT_EQ(destination.get<relationship>(l0).null_parent, entt::null);
 
     ASSERT_FALSE(destination.valid(e1));
     ASSERT_TRUE(loader.has(e1));
@@ -154,6 +158,7 @@ TEST(Snapshot, Continuous) {
     ASSERT_EQ(destination.get<position>(l1).y, 1.f);
     ASSERT_TRUE(destination.has<relationship>(l1));
     ASSERT_EQ(destination.get<relationship>(l1).parent, l0);
+    ASSERT_EQ(destination.get<relationship>(l1).null_parent, entt::null);
 
     ASSERT_FALSE(destination.valid(e2));
     ASSERT_TRUE(loader.has(e2));
@@ -166,6 +171,7 @@ TEST(Snapshot, Continuous) {
     ASSERT_EQ(destination.get<position>(l2).y, .2f);
     ASSERT_TRUE(destination.has<relationship>(l2));
     ASSERT_EQ(destination.get<relationship>(l2).parent, l0);
+    ASSERT_EQ(destination.get<relationship>(l2).null_parent, entt::null);
 
     ASSERT_FALSE(destination.valid(e3));
     ASSERT_TRUE(loader.has(e3));
@@ -178,4 +184,5 @@ TEST(Snapshot, Continuous) {
     ASSERT_EQ(destination.get<timer>(l3).elapsed, 0);
     ASSERT_TRUE(destination.has<relationship>(l3));
     ASSERT_EQ(destination.get<relationship>(l3).parent, l2);
+    ASSERT_EQ(destination.get<relationship>(l3).null_parent, entt::null);
 }

@@ -573,11 +573,14 @@ public:
      * undefined behavior.<br/>
      * An assertion will abort the execution at runtime in debug mode if the
      * loader doesn't knows about the entity.
+     * If the entity is null ent, then it wil return null. This allows for
+     * null members to not be mapped during deserialization.
      *
      * @param entity An entity identifier.
      * @return The identifier to which `entity` refers in the target registry.
      */
     entity_type map(entity_type entity) const ENTT_NOEXCEPT {
+        if (entity == null) return null;
         assert(has(entity));
         return remloc.find(entity)->second.first;
     }
