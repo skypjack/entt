@@ -3,6 +3,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/entity.hpp>
 
 template<typename Storage>
 struct output_archive {
@@ -427,7 +428,7 @@ TEST(Snapshot, Continuous) {
     ASSERT_EQ(dst.size<a_component>(), a_component_cnt);
 }
 
-TEST(Snapshot, ContinuousMoreOnShrink) {
+TEST(Snapshot, MoreOnShrink) {
     using entity_type = entt::registry<>::entity_type;
 
     entt::registry<> src;
@@ -480,14 +481,19 @@ TEST(Snapshot, SyncDataMembers) {
     auto parent = src.create();
     auto child = src.create();
 
+    src.assign<what_a_component>(parent, entt::null);
     src.assign<what_a_component>(child, parent).quux.push_back(child);
+
     src.snapshot().entities(output).component<what_a_component>(output);
     loader.entities(input).component<what_a_component>(input, &what_a_component::bar, &what_a_component::quux);
 
     ASSERT_FALSE(dst.valid(parent));
     ASSERT_FALSE(dst.valid(child));
 
+    ASSERT_TRUE(dst.has<what_a_component>(loader.map(parent)));
     ASSERT_TRUE(dst.has<what_a_component>(loader.map(child)));
+
+    ASSERT_EQ(dst.get<what_a_component>(loader.map(parent)).bar, static_cast<entity_type>(entt::null));
 
     const auto &component = dst.get<what_a_component>(loader.map(child));
 

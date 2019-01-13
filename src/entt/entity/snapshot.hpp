@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include "../config/config.h"
 #include "entt_traits.hpp"
+#include "entity.hpp"
 
 
 namespace entt {
@@ -567,19 +568,18 @@ public:
 
     /**
      * @brief Returns the identifier to which an entity refers.
-     *
-     * @warning
-     * Attempting to use an entity that isn't managed by the loader results in
-     * undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * loader doesn't knows about the entity.
-     *
      * @param entity An entity identifier.
-     * @return The identifier to which `entity` refers in the target registry.
+     * @return The local identifier if any, the null entity otherwise.
      */
     entity_type map(entity_type entity) const ENTT_NOEXCEPT {
-        assert(has(entity));
-        return remloc.find(entity)->second.first;
+        const auto it = remloc.find(entity);
+        entity_type other = null;
+
+        if(it != remloc.cend()) {
+            other = it->second.first;
+        }
+
+        return other;
     }
 
 private:

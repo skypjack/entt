@@ -20,8 +20,8 @@
 * travis + windows is now available, try it
 * events on replace, so that one can track updated components? indagate impact
 * tags revenge: if it's possible, reintroduce them but without a link to entities (see #169 for more details)
+* optimize reset (and some others?), direct call on pool in case of no listeners
+* provide create with a pack of default constructible components to assign
 
 Ready to go:
-* (even more) optimized standard views are possible!
-* add on-the-fly sort functionality
-* introduce induce-respect policy
+* policy based views
