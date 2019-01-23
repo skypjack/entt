@@ -15,7 +15,7 @@ TEST(Dispatcher, Functionalities) {
     entt::dispatcher<int> dispatcher;
     receiver receiver;
 
-    dispatcher.sink<an_event>().connect(&receiver);
+    dispatcher.sink<an_event>().connect<&receiver::receive>(&receiver);
     dispatcher.trigger<an_event>(1);
     dispatcher.enqueue<an_event>();
     dispatcher.enqueue<another_event>();
@@ -33,7 +33,7 @@ TEST(Dispatcher, Functionalities) {
     an_event event{};
     const an_event &cevent = event;
 
-    dispatcher.sink<an_event>().disconnect(&receiver);
+    dispatcher.sink<an_event>().disconnect<&receiver::receive>(&receiver);
     dispatcher.trigger(an_event{}, 1);
     dispatcher.enqueue(event);
     dispatcher.update(1);

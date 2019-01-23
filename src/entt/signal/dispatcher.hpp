@@ -24,15 +24,14 @@ namespace entt {
  * type `const Event &` plus an extra list of arguments to forward with the
  * event itself, no matter what the return type is.
  *
- * Member functions named `receive` are automatically detected and registered or
- * unregistered by the dispatcher. The type of the instances is `Class *` (a
- * naked pointer). It means that users must guarantee that the lifetimes of the
- * instances overcome the one of the dispatcher itself to avoid crashes.
+ * The type of the instances is `Class *` (a naked pointer). It means that users
+ * must guarantee that the lifetimes of the instances overcome the one of the
+ * dispatcher itself to avoid crashes.
  *
  * @tparam Args Types of arguments to forward along with an event.
  */
 template<typename... Args>
-class dispatcher final {
+class dispatcher {
     using event_family = family<struct internal_dispatcher_event_family>;
 
     template<typename Class, typename Event>
@@ -44,7 +43,7 @@ class dispatcher final {
     };
 
     template<typename Event>
-    struct signal_wrapper final: base_wrapper {
+    struct signal_wrapper: base_wrapper {
         using signal_type = sigh<void(const Event &, Args...)>;
         using sink_type = typename signal_type::sink_type;
 

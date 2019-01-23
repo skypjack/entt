@@ -69,54 +69,6 @@ TEST(SigH, Lifetime) {
     ASSERT_NO_THROW(delete new signal{});
 }
 
-TEST(SigH, Comparison) {
-    entt::sigh<void()> sig1;
-    entt::sigh<void()> sig2;
-
-    sigh_listener s1;
-    sigh_listener s2;
-
-    sig1.sink().connect<&sigh_listener::i>(&s1);
-    sig2.sink().connect<&sigh_listener::i>(&s2);
-
-    ASSERT_FALSE(sig1 == sig2);
-    ASSERT_TRUE(sig1 != sig2);
-
-    sig1.sink().disconnect<&sigh_listener::i>(&s1);
-    sig2.sink().disconnect<&sigh_listener::i>(&s2);
-
-    sig1.sink().connect<&sigh_listener::i>(&s1);
-    sig2.sink().connect<&sigh_listener::l>(&s1);
-
-    ASSERT_FALSE(sig1 == sig2);
-    ASSERT_TRUE(sig1 != sig2);
-
-    sig1.sink().disconnect<&sigh_listener::i>(&s1);
-    sig2.sink().disconnect<&sigh_listener::l>(&s1);
-
-    ASSERT_TRUE(sig1 == sig2);
-    ASSERT_FALSE(sig1 != sig2);
-
-    sig1.sink().connect<&sigh_listener::i>(&s1);
-    sig1.sink().connect<&sigh_listener::l>(&s1);
-    sig2.sink().connect<&sigh_listener::i>(&s1);
-    sig2.sink().connect<&sigh_listener::l>(&s1);
-
-    ASSERT_TRUE(sig1 == sig2);
-
-    sig1.sink().disconnect<&sigh_listener::i>(&s1);
-    sig1.sink().disconnect<&sigh_listener::l>(&s1);
-    sig2.sink().disconnect<&sigh_listener::i>(&s1);
-    sig2.sink().disconnect<&sigh_listener::l>(&s1);
-
-    sig1.sink().connect<&sigh_listener::i>(&s1);
-    sig1.sink().connect<&sigh_listener::l>(&s1);
-    sig2.sink().connect<&sigh_listener::l>(&s1);
-    sig2.sink().connect<&sigh_listener::i>(&s1);
-
-    ASSERT_FALSE(sig1 == sig2);
-}
-
 TEST(SigH, Clear) {
     entt::sigh<void(int &)> sigh;
     sigh.sink().connect<&sigh_listener::f>();
@@ -160,7 +112,7 @@ TEST(SigH, Functions) {
 
     ASSERT_TRUE(sigh.empty());
     ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(0), sigh.size());
-    ASSERT_EQ(0, v);
+    ASSERT_EQ(v, 0);
 
     sigh.sink().connect<&sigh_listener::f>();
 }
@@ -190,7 +142,8 @@ TEST(SigH, Members) {
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(2), sigh.size());
 
-    sigh.sink().disconnect(ptr);
+    sigh.sink().disconnect<&sigh_listener::g>(ptr);
+    sigh.sink().disconnect<&sigh_listener::h>(ptr);
 
     ASSERT_TRUE(sigh.empty());
     ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(0), sigh.size());

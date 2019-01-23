@@ -48,14 +48,14 @@ struct invoker<void(Args...), Collector> {
 
 
 template<typename Ret>
-struct null_collector final {
+struct null_collector {
     using result_type = Ret;
     bool operator()(result_type) const ENTT_NOEXCEPT { return true; }
 };
 
 
 template<>
-struct null_collector<void> final {
+struct null_collector<void> {
     using result_type = void;
     bool operator()() const ENTT_NOEXCEPT { return true; }
 };
@@ -66,7 +66,7 @@ struct default_collector;
 
 
 template<typename Ret, typename... Args>
-struct default_collector<Ret(Args...)> final {
+struct default_collector<Ret(Args...)> {
     using collector_type = null_collector<Ret>;
 };
 
@@ -124,7 +124,7 @@ struct sigh;
  * @tparam Args Types of arguments of a function type.
  */
 template<typename Ret, typename... Args>
-class sink<Ret(Args...)> final {
+class sink<Ret(Args...)> {
     /*! @brief A signal is allowed to create sinks. */
     template<typename, typename>
     friend struct sigh;
@@ -151,40 +151,39 @@ public:
     }
 
     /**
-     * @brief Connects a member function for a given instance to a signal.
+     * @brief Connects a member function for a given instance or a curried free
+     * function to a signal.
      *
-     * The signal isn't responsible for the connected object. Users must
-     * guarantee that the lifetime of the instance overcomes the one of the
-     * signal. On the other side, the signal handler performs checks to avoid
-     * multiple connections for the same member function of a given instance.
+     * When used to connect a member function, the signal isn't responsible for
+     * the connected object. Users must guarantee that the lifetime of the
+     * instance overcomes the one of the delegate. On the other side, the signal
+     * handler performs checks to avoid multiple connections for the same member
+     * function of a given instance.<br/>
+     * When used to connect a curried free function, the linked value must be
+     * both trivially copyable and trivially destructible, other than such that
+     * its size is lower than or equal to the one of a `void *`. It means that
+     * all the primitive types are accepted as well as pointers. Moreover, the
+     * signature of the free function must be such that the value is the first
+     * argument before the ones used to define the delegate itself.
      *
-     * @tparam Member Member function to connect to the signal.
-     * @tparam Class Type of class to which the member function belongs.
-     * @param instance A valid instance of type pointer to `Class`.
+     * @tparam Candidate Member function or curried free function to connect to
+     * the signal.
+     * @tparam Type Type of class to which the member function belongs or type
+     * of value used for currying.
+     * @param value_or_instance A valid pointer to an instance of class type or
+     * the value to use for currying.
      */
-    template<auto Member, typename Class>
-    void connect(Class *instance) {
-        disconnect<Member>(instance);
-        delegate<Ret(Args...)> delegate{};
-        delegate.template connect<Member>(instance);
-        calls->emplace_back(std::move(delegate));
-    }
+    template<auto Candidate, typename Type>
+    void connect(Type value_or_instance) {
+        if constexpr(std::is_class_v<std::remove_pointer_t<Type>>) {
+            disconnect<Candidate>(value_or_instance);
+        } else {
+            disconnect<Candidate>();
+        }
 
-    /**
-     * @brief Connects the `receive` member function for a given instance to a
-     * signal.
-     *
-     * The signal isn't responsible for the connected object. Users must
-     * guarantee that the lifetime of the instance overcomes the one of the
-     * signal. On the other side, the signal handler performs checks to avoid
-     * multiple connections for the same member function of a given instance.
-     *
-     * @tparam Class Type of class to which the member function belongs.
-     * @param instance A valid instance of type pointer to `Class`.
-     */
-    template<typename Class>
-    inline void connect(Class *instance) {
-        connect<&Class::receive>(instance);
+        delegate<Ret(Args...)> delegate{};
+        delegate.template connect<Candidate>(value_or_instance);
+        calls->emplace_back(std::move(delegate));
     }
 
     /**
@@ -208,16 +207,9 @@ public:
     void disconnect(Class *instance) {
         delegate<Ret(Args...)> delegate{};
         delegate.template connect<Member>(instance);
-        calls->erase(std::remove(calls->begin(), calls->end(), std::move(delegate)), calls->end());
-    }
-
-    /**
-     * @brief Removes all existing connections for the given instance.
-     * @param instance An instance to be disconnected from the signal.
-     */
-    void disconnect(const void *instance) {
-        auto func = [instance](const auto &delegate) { return delegate.instance() == instance; };
-        calls->erase(std::remove_if(calls->begin(), calls->end(), std::move(func)), calls->end());
+        calls->erase(std::remove_if(calls->begin(), calls->end(), [&delegate](const auto &other) {
+            return other == delegate && other.instance() == delegate.instance();
+        }), calls->end());
     }
 
     /**
@@ -256,7 +248,7 @@ private:
  * @tparam Collector Type of collector to use, if any.
  */
 template<typename Ret, typename... Args, typename Collector>
-struct sigh<Ret(Args...), Collector> final: private internal::invoker<Ret(Args...), Collector> {
+struct sigh<Ret(Args...), Collector>: private internal::invoker<Ret(Args...), Collector> {
     /*! @brief Unsigned integer type. */
     using size_type = typename std::vector<delegate<Ret(Args...)>>::size_type;
     /*! @brief Collector type. */
@@ -341,40 +333,9 @@ struct sigh<Ret(Args...), Collector> final: private internal::invoker<Ret(Args..
         swap(lhs.calls, rhs.calls);
     }
 
-    /**
-     * @brief Checks if the contents of the two signals are identical.
-     *
-     * Two signals are identical if they have the same size and the same
-     * listeners registered exactly in the same order.
-     *
-     * @param other Signal with which to compare.
-     * @return True if the two signals are identical, false otherwise.
-     */
-    bool operator==(const sigh &other) const ENTT_NOEXCEPT {
-        return calls == other.calls;
-    }
-
 private:
     std::vector<delegate<Ret(Args...)>> calls;
 };
-
-
-/**
- * @brief Checks if the contents of the two signals are different.
- *
- * Two signals are identical if they have the same size and the same listeners
- * registered exactly in the same order.
- *
- * @tparam Ret Return type of a function type.
- * @tparam Args Types of arguments of a function type.
- * @param lhs A valid signal object.
- * @param rhs A valid signal object.
- * @return True if the two signals are different, false otherwise.
- */
-template<typename Ret, typename... Args>
-bool operator!=(const sigh<Ret(Args...)> &lhs, const sigh<Ret(Args...)> &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
 
 
 }

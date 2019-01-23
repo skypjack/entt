@@ -49,7 +49,7 @@ class emitter {
     };
 
     template<typename Event>
-    struct event_handler final: base_handler {
+    struct event_handler: base_handler {
         using listener_type = std::function<void(const Event &, Derived &)>;
         using element_type = std::pair<bool, listener_type>;
         using container_type = std::list<element_type>;
@@ -145,7 +145,7 @@ public:
      * @tparam Event Type of event for which the connection is created.
      */
     template<typename Event>
-    struct connection final: private event_handler<Event>::connection_type {
+    struct connection: private event_handler<Event>::connection_type {
         /** @brief Event emitters are friend classes of connections. */
         friend class emitter;
 

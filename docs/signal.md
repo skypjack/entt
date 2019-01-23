@@ -90,11 +90,8 @@ signal.sink().connect<&listener::bar>(&instance);
 // disconnects a free function
 signal.sink().disconnect<&foo>();
 
-// disconnect a specific member function of an instance ...
+// disconnect a member function of an instance
 signal.sink().disconnect<&listener::bar>(&instance);
-
-// ... or an instance as a whole
-signal.sink().disconnect(&instance);
 
 // discards all the listeners at once
 signal.sink().disconnect();
@@ -187,10 +184,22 @@ my_struct instance;
 delegate.connect<&my_struct::f>(&instance);
 ```
 
-It hasn't a `disconnect` counterpart. Instead, there exists a `reset` member
-function to clear it.<br/>
-To know if a delegate is empty, it can be used explicitly in every conditional
-statement:
+The delegate class accepts also data members if required. In this case, the
+function type of the delegate is such that the parameter list is empty and the
+value of the data member is at least convertible to the return type.<br/>
+Finally, it can work with invokable objects in general (lambdas or functors), as
+long as they are trivially destructible and their sizes fit the one of `void *`.
+As an example, a lambda that captures a pointer or an integer value can be used
+with a delegate:
+
+```cpp
+delegate.connect([value = int_var](int i) { return value * i; });
+```
+
+Aside `connect`, a `disconnect` counterpart isn't provided. Instead, there
+exists a `reset` member function to use to clear a delegate.<br/>
+To know if it's empty instead, the delegate can be used explicitly in every
+conditional statement:
 
 ```cpp
 if(delegate) {
@@ -268,11 +277,8 @@ In order to register an instance of a class to a dispatcher, its type must
 expose one or more member functions the arguments of which are such that
 `const E &` can be converted to them for each type of event `E`, no matter what
 the return value is.<br/>
-To ease the development, member functions that are named `receive` are
-automatically detected and have not to be explicitly specified when registered.
-In all the other cases, the name of the member function aimed to receive the
-event must be provided to the `connect` member function of the sink bound to the
-specific event:
+The name of the member function aimed to receive the event must be provided to
+the `connect` member function of the sink in charge for the specific event:
 
 ```cpp
 struct an_event { int value; };
@@ -287,7 +293,7 @@ struct listener
 // ...
 
 listener listener;
-dispatcher.sink<an_event>().connect(&listener);
+dispatcher.sink<an_event>().connect<&listener::receive>(&listener);
 dispatcher.sink<another_event>().connect<&listener::method>(&listener);
 ```
 
@@ -295,7 +301,7 @@ The `disconnect` member function follows the same pattern and can be used to
 selectively remove listeners:
 
 ```cpp
-dispatcher.sink<an_event>().disconnect(&listener);
+dispatcher.sink<an_event>().disconnect<&listener::receive>(&listener);
 dispatcher.sink<another_event>().disconnect<&listener::method>(&listener);
 ```
 
