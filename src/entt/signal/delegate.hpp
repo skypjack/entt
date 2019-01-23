@@ -46,7 +46,7 @@ auto to_function_pointer(Ret(Class:: *)(Args...) const, Class *) -> Ret(*)(Args.
  */
 
 
-/*! @brief Used to wrap a function or a member function of a specified type. */
+/*! @brief Used to wrap a function or a member of a specified type. */
 template<auto>
 struct connect_arg_t {};
 
@@ -67,14 +67,14 @@ class delegate;
 
 
 /**
- * @brief Utility class to use to send around functions and member functions.
+ * @brief Utility class to use to send around functions and members.
  *
- * Unmanaged delegate for function pointers and member functions. Users of this
- * class are in charge of disconnecting instances before deleting them.
+ * Unmanaged delegate for function pointers and members. Users of this class are
+ * in charge of disconnecting instances before deleting them.
  *
  * A delegate can be used as general purpose invoker with no memory overhead for
- * free functions and member functions provided along with an instance on which
- * to invoke them. It comes also with limited support for curried functions.
+ * free functions and members provided along with an instance on which to invoke
+ * them. It comes also with limited support for curried functions.
  *
  * @tparam Ret Return type of a function type.
  * @tparam Args Types of arguments of a function type.
@@ -107,12 +107,12 @@ public:
     }
 
     /**
-     * @brief Constructs a delegate and connects a member function for a given
-     * instance or a curried free function to it.
-     * @tparam Candidate Member function or curried free function to connect to
-     * the delegate.
-     * @tparam Type Type of class to which the member function belongs or type
-     * of value used for currying.
+     * @brief Constructs a delegate and connects a member for a given instance
+     * or a curried free function to it.
+     * @tparam Candidate Member or curried free function to connect to the
+     * delegate.
+     * @tparam Type Type of class to which the member belongs or type of value
+     * used for currying.
      * @param value_or_instance A valid pointer to an instance of class type or
      * the value to use for currying.
      */
@@ -150,12 +150,12 @@ public:
     }
 
     /**
-     * @brief Connects a member function for a given instance or a curried free
-     * function to a delegate.
+     * @brief Connects a member for a given instance or a curried free function
+     * to a delegate.
      *
-     * When used to connect a member function, the delegate isn't responsible
-     * for the connected object. Users must guarantee that the lifetime of the
-     * instance overcomes the one of the delegate.<br/>
+     * When used to connect a member, the delegate isn't responsible for the
+     * connected object. Users must guarantee that the lifetime of the instance
+     * overcomes the one of the delegate.<br/>
      * When used to connect a curried free function, the linked value must be
      * both trivially copyable and trivially destructible, other than such that
      * its size is lower than or equal to the one of a `void *`. It means that
@@ -163,10 +163,10 @@ public:
      * signature of the free function must be such that the value is the first
      * argument before the ones used to define the delegate itself.
      *
-     * @tparam Candidate Member function or curried free function to connect to
-     * the delegate.
-     * @tparam Type Type of class to which the member function belongs or type
-     * of value used for currying.
+     * @tparam Candidate Member or curried free function to connect to the
+     * delegate.
+     * @tparam Type Type of class to which the member belongs or type of value
+     * used for currying.
      * @param value_or_instance A valid pointer to an instance of class type or
      * the value to use for currying.
      */
@@ -218,7 +218,7 @@ public:
      *
      * @warning
      * Attempting to use an instance returned by a delegate that doesn't contain
-     * a pointer to a member function results in undefined behavior.
+     * a pointer to a member results in undefined behavior.
      *
      * @return An opaque pointer to the instance linked to the delegate, if any.
      */
@@ -257,9 +257,8 @@ public:
     /**
      * @brief Checks if the connected functions differ.
      *
-     * In case of member functions, the instances connected to the delegate
-     * are not verified by this operator. Use the instance member function
-     * instead.
+     * In case of members, the instances connected to the delegate are not
+     * verified by this operator. Use the `instance` member function instead.
      *
      * @param other Delegate with which to compare.
      * @return False if the connected functions differ, true otherwise.
@@ -277,8 +276,8 @@ private:
 /**
  * @brief Checks if the connected functions differ.
  *
- * In case of member functions, the instances connected to the delegate are not
- * verified by this operator. Use the `instance` member function instead.
+ * In case of members, the instances connected to the delegate are not verified
+ * by this operator. Use the `instance` member function instead.
  *
  * @tparam Ret Return type of a function type.
  * @tparam Args Types of arguments of a function type.
@@ -309,12 +308,11 @@ delegate(connect_arg_t<Function>) ENTT_NOEXCEPT
  * @brief Deduction guideline.
  *
  * It allows to deduce the function type of the delegate directly from a member
- * function or a curried free function provided to the constructor.
+ * or a curried free function provided to the constructor.
  *
- * @tparam Candidate Member function or curried free function to connect to
- * the delegate.
- * @tparam Type Type of class to which the member function belongs or type
- * of value used for currying.
+ * @tparam Candidate Member or curried free function to connect to the delegate.
+ * @tparam Type Type of class to which the member belongs or type of value used
+ * for currying.
  */
 template<auto Candidate, typename Type>
 delegate(connect_arg_t<Candidate>, Type) ENTT_NOEXCEPT

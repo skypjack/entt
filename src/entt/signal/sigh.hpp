@@ -176,6 +176,7 @@ public:
     template<auto Candidate, typename Type>
     void connect(Type value_or_instance) {
         if constexpr(std::is_class_v<std::remove_pointer_t<Type>>) {
+            static_assert(std::is_member_function_pointer_v<decltype(Candidate)>);
             disconnect<Candidate>(value_or_instance);
         } else {
             disconnect<Candidate>();
@@ -205,6 +206,7 @@ public:
      */
     template<auto Member, typename Class>
     void disconnect(Class *instance) {
+        static_assert(std::is_member_function_pointer_v<decltype(Member)>);
         delegate<Ret(Args...)> delegate{};
         delegate.template connect<Member>(instance);
         calls->erase(std::remove_if(calls->begin(), calls->end(), [&delegate](const auto &other) {
