@@ -39,8 +39,9 @@
 # Introduction
 
 `EnTT` is a header-only, tiny and easy to use entity-component system (and much
-more) written in modern C++ and even
-[used by Mojang in Minecraft](https://minecraft.net/en-us/attribution/).<br/>
+more) written in modern C++. Among others, it's also used in
+[Minecraft by Mojang](https://minecraft.net/en-us/attribution/) and
+[The Forge by Confetti](https://github.com/ConfettiFX/The-Forge).<br/>
 The entity-component-system (also known as _ECS_) is an architectural pattern
 used mostly in game development. For further details:
 

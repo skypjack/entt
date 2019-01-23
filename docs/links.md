@@ -28,6 +28,8 @@ a reference:
     playground.
 
 * Engines/Frameworks:
+  * [The Forge](https://github.com/ConfettiFX/The-Forge): cross-platform
+    rendering framework by Confetti.
   * [starlight](https://github.com/DomRe/starlight): game programming framework
     using `Allegro`, `Lua` and modern C++.
   * [Apparently](https://github.com/JosiahWI/qub3d-libdeps)

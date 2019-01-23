@@ -2,7 +2,6 @@
 * long term feature: shared_ptr less locator
 * long term feature: shared_ptr less resource cache
 * custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
-* scene management (I prefer the concept of spaces, that is a kind of scene anyway)
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
@@ -15,13 +14,19 @@
 * hashed string: add implicit check on construction for uniqueness (optional)
 * destroy overload that accepts a couple of iterators (see create)
 * allow for built-in parallel each if possible
-* write/show how to create prefabs on top of EnTT (that's easy!!)
 * mention hunter in the readme file, section packaging tools
 * travis + windows is now available, try it
 * events on replace, so that one can track updated components? indagate impact
 * tags revenge: if it's possible, reintroduce them but without a link to entities (see #169 for more details)
-* optimize reset (and some others?), direct call on pool in case of no listeners
+* empty components model allows for shared components and prefabs unity-like
 * provide create with a pack of default constructible components to assign
+* allow to replace std:: with custom implementations
 
 Ready to go:
 * policy based views
+* preferred approach (hints):
+  - registry.policy(induce<A, B>::split<C>).view<A, B, C>()
+  - registry.policy(induce<A, B>::split<C>).view<A, B>(exclude<C>())
+  - registry.policy(induce<A, B>::split<C>).view<A, B>()
+* update documentation: view, query, policy
+* update tests: view, query, policy
