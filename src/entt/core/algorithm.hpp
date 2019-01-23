@@ -18,7 +18,7 @@ namespace entt {
  * This class fills the gap by wrapping some flavors of `std::sort` in a
  * function object.
  */
-struct std_sort final {
+struct std_sort {
     /**
      * @brief Sorts the elements in a range.
      *
@@ -40,7 +40,7 @@ struct std_sort final {
 
 
 /*! @brief Function object for performing insertion sort. */
-struct insertion_sort final {
+struct insertion_sort {
     /**
      * @brief Sorts the elements in a range.
      *

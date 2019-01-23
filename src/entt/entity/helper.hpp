@@ -17,7 +17,7 @@ namespace entt {
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<bool Const, typename Entity>
-struct as_view final {
+struct as_view {
     /*! @brief Type of registry to convert. */
     using registry_type = std::conditional_t<Const, const entt::registry<Entity>, entt::registry<Entity>>;
 

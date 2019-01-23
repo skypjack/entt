@@ -35,7 +35,7 @@ class registry;
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class snapshot final {
+class snapshot {
     /*! @brief A registry is allowed to create snapshots. */
     friend class registry<Entity>;
 
@@ -197,7 +197,7 @@ private:
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class snapshot_loader final {
+class snapshot_loader {
     /*! @brief A registry is allowed to create snapshot loaders. */
     friend class registry<Entity>;
 
@@ -343,7 +343,7 @@ private:
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class continuous_loader final {
+class continuous_loader {
     using traits_type = entt_traits<Entity>;
 
     void destroy(Entity entity) {

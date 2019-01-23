@@ -19,8 +19,8 @@ namespace entt {
  * Because of that, a hashed string can also be used in constant expressions if
  * required.
  */
-class hashed_string final {
-    struct const_wrapper final {
+class hashed_string {
+    struct const_wrapper {
         // non-explicit constructor on purpose
         constexpr const_wrapper(const char *str) ENTT_NOEXCEPT: str{str} {}
         const char *str;

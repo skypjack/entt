@@ -41,7 +41,7 @@ namespace internal {
 struct meta_type_node;
 
 
-struct meta_prop_node final {
+struct meta_prop_node {
     meta_prop_node * const next;
     meta_any(* const key)();
     meta_any(* const value)();
@@ -49,7 +49,7 @@ struct meta_prop_node final {
 };
 
 
-struct meta_base_node final {
+struct meta_base_node {
     meta_base_node * const next;
     meta_type_node * const parent;
     meta_type_node *(* const type)();
@@ -58,7 +58,7 @@ struct meta_base_node final {
 };
 
 
-struct meta_conv_node final {
+struct meta_conv_node {
     meta_conv_node * const next;
     meta_type_node * const parent;
     meta_type_node *(* const type)();
@@ -67,7 +67,7 @@ struct meta_conv_node final {
 };
 
 
-struct meta_ctor_node final {
+struct meta_ctor_node {
     using size_type = std::size_t;
     meta_ctor_node * const next;
     meta_type_node * const parent;
@@ -79,14 +79,14 @@ struct meta_ctor_node final {
 };
 
 
-struct meta_dtor_node final {
+struct meta_dtor_node {
     meta_type_node * const parent;
     bool(* const invoke)(meta_handle);
     meta_dtor(* const meta)();
 };
 
 
-struct meta_data_node final {
+struct meta_data_node {
     const hashed_string name;
     meta_data_node * const next;
     meta_type_node * const parent;
@@ -100,7 +100,7 @@ struct meta_data_node final {
 };
 
 
-struct meta_func_node final {
+struct meta_func_node {
     using size_type = std::size_t;
     const hashed_string name;
     meta_func_node * const next;
@@ -116,7 +116,7 @@ struct meta_func_node final {
 };
 
 
-struct meta_type_node final {
+struct meta_type_node {
     const hashed_string name;
     meta_type_node * const next;
     meta_prop_node * const prop;
@@ -291,7 +291,7 @@ inline auto ctor(std::index_sequence<Indexes...>, const meta_type_node *node) EN
  * of pointers. This will greatly improve the use of the cache, thus increasing
  * the overall performance.
  */
-class meta_any final {
+class meta_any {
     /*! @brief A meta handle is allowed to _inherit_ from a meta any. */
     friend class meta_handle;
 
@@ -603,7 +603,7 @@ private:
  * responsible for ensuring that the target object remains alive for the entire
  * interval of use of the handle.
  */
-class meta_handle final {
+class meta_handle {
     meta_handle(int, meta_any &any) ENTT_NOEXCEPT
         : node{any.node},
           instance{any.instance}
@@ -722,7 +722,7 @@ inline bool operator!=(const meta_any &lhs, const meta_any &rhs) ENTT_NOEXCEPT {
  * A meta property is an opaque container for a key/value pair.<br/>
  * Properties are associated with any other meta object to enrich it.
  */
-class meta_prop final {
+class meta_prop {
     /*! @brief A meta factory is allowed to create meta objects. */
     template<typename> friend class meta_factory;
 
@@ -792,7 +792,7 @@ inline bool operator!=(const meta_prop &lhs, const meta_prop &rhs) ENTT_NOEXCEPT
  * A meta base is an opaque container for a base class to be used to walk
  * through hierarchies.
  */
-class meta_base final {
+class meta_base {
     /*! @brief A meta factory is allowed to create meta objects. */
     template<typename> friend class meta_factory;
 
@@ -867,7 +867,7 @@ inline bool operator!=(const meta_base &lhs, const meta_base &rhs) ENTT_NOEXCEPT
  * A meta conversion function is an opaque container for a conversion function
  * to be used to convert a given instance to another type.
  */
-class meta_conv final {
+class meta_conv {
     /*! @brief A meta factory is allowed to create meta objects. */
     template<typename> friend class meta_factory;
 
@@ -942,7 +942,7 @@ inline bool operator!=(const meta_conv &lhs, const meta_conv &rhs) ENTT_NOEXCEPT
  * A meta constructor is an opaque container for a function to be used to
  * construct instances of a given type.
  */
-class meta_ctor final {
+class meta_ctor {
     /*! @brief A meta factory is allowed to create meta objects. */
     template<typename> friend class meta_factory;
 
@@ -1072,7 +1072,7 @@ inline bool operator!=(const meta_ctor &lhs, const meta_ctor &rhs) ENTT_NOEXCEPT
  * A meta destructor is an opaque container for a function to be used to
  * destroy instances of a given type.
  */
-class meta_dtor final {
+class meta_dtor {
     /*! @brief A meta factory is allowed to create meta objects. */
     template<typename> friend class meta_factory;
 
@@ -1146,7 +1146,7 @@ inline bool operator!=(const meta_dtor &lhs, const meta_dtor &rhs) ENTT_NOEXCEPT
  * A meta data is an opaque container for a data member associated with a given
  * type.
  */
-class meta_data final {
+class meta_data {
     /*! @brief A meta factory is allowed to create meta objects. */
     template<typename> friend class meta_factory;
 
@@ -1303,7 +1303,7 @@ inline bool operator!=(const meta_data &lhs, const meta_data &rhs) ENTT_NOEXCEPT
  * A meta function is an opaque container for a member function associated with
  * a given type.
  */
-class meta_func final {
+class meta_func {
     /*! @brief A meta factory is allowed to create meta objects. */
     template<typename> friend class meta_factory;
 
@@ -1471,7 +1471,7 @@ inline bool operator!=(const meta_func &lhs, const meta_func &rhs) ENTT_NOEXCEPT
  * A meta type is the starting point for accessing a reflected type, thus being
  * able to work through it on real objects.
  */
-class meta_type final {
+class meta_type {
     /*! @brief A meta factory is allowed to create meta objects. */
     template<typename> friend class meta_factory;
 

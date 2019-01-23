@@ -42,8 +42,8 @@ namespace entt {
  * @tparam Delta Type to use to provide elapsed time.
  */
 template<typename Delta>
-class scheduler final {
-    struct process_handler final {
+class scheduler {
+    struct process_handler {
         using instance_type = std::unique_ptr<void, void(*)(void *)>;
         using update_fn_type = bool(process_handler &, Delta, void *);
         using abort_fn_type = void(process_handler &, bool);
@@ -55,7 +55,7 @@ class scheduler final {
         next_type next;
     };
 
-    struct continuation final {
+    struct continuation {
         continuation(process_handler *handler)
             : handler{handler}
         {

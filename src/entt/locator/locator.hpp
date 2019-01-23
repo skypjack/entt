@@ -23,7 +23,7 @@ namespace entt {
  * @tparam Service Type of service managed by the locator.
  */
 template<typename Service>
-struct service_locator final {
+struct service_locator {
     /*! @brief Type of service offered. */
     using service_type = Service;
 

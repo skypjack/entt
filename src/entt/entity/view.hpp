@@ -68,7 +68,7 @@ class registry;
  * @tparam Component Types of components iterated by the view.
  */
 template<typename Entity, typename... Component>
-class persistent_view final {
+class persistent_view {
     static_assert(sizeof...(Component));
 
     /*! @brief A registry is allowed to create views. */
@@ -359,7 +359,7 @@ private:
  * @tparam Component Types of components iterated by the view.
  */
 template<typename Entity, typename... Component>
-class view final {
+class view {
     static_assert(sizeof...(Component) > 1);
 
     /*! @brief A registry is allowed to create views. */
@@ -714,7 +714,7 @@ private:
  * @tparam Component Type of component iterated by the view.
  */
 template<typename Entity, typename Component>
-class view<Entity, Component> final {
+class view<Entity, Component> {
     /*! @brief A registry is allowed to create views. */
     friend class registry<Entity>;
 

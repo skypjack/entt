@@ -28,7 +28,7 @@ class resource_cache;
  * @tparam Resource Type of resource managed by a handle.
  */
 template<typename Resource>
-class resource_handle final {
+class resource_handle {
     /*! @brief Resource handles are friends of their caches. */
     friend class resource_cache<Resource>;
 

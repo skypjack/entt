@@ -40,7 +40,7 @@ namespace entt {
  * @tparam Types List of types for which to generate identifiers.
  */
 template<typename... Types>
-class identifier final {
+class identifier {
     using tuple_type = std::tuple<std::decay_t<Types>...>;
 
     template<typename Type, std::size_t... Indexes>

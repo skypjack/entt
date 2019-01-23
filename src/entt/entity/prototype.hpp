@@ -37,7 +37,7 @@ namespace entt {
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class prototype final {
+class prototype {
     using basic_fn_type = void(const prototype &, registry<Entity> &, const Entity);
     using component_type = typename registry<Entity>::component_type;
 

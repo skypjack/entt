@@ -61,7 +61,7 @@ template<typename Entity>
 class sparse_set<Entity> {
     using traits_type = entt_traits<Entity>;
 
-    class iterator final {
+    class iterator {
         friend class sparse_set<Entity>;
 
         using direct_type = const std::vector<Entity>;
@@ -519,7 +519,7 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
     using traits_type = entt_traits<Entity>;
 
     template<bool Const, bool = std::is_empty_v<Type>>
-    class iterator final {
+    class iterator {
         friend class sparse_set<Entity, Type>;
 
         using instance_type = std::conditional_t<Const, const std::vector<Type>, std::vector<Type>>;
@@ -627,7 +627,7 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
     };
 
     template<bool Const>
-    class iterator<Const, true> final {
+    class iterator<Const, true> {
         friend class sparse_set<Entity, Type>;
 
         using instance_type = std::conditional_t<Const, const Type, Type>;
