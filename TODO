@@ -21,12 +21,10 @@
 * empty components model allows for shared components and prefabs unity-like
 * provide create with a pack of default constructible components to assign
 * allow to replace std:: with custom implementations
+* allow lambdas on sigh/dispatcher (mixed approach with sinks that accept also delegates?)
 
 Ready to go:
 * policy based views
-* preferred approach (hints):
-  - registry.policy(induce<A, B>::split<C>).view<A, B, C>()
-  - registry.policy(induce<A, B>::split<C>).view<A, B>(exclude<C>())
-  - registry.policy(induce<A, B>::split<C>).view<A, B>()
-* update documentation: view, query, policy
-* update tests: view, query, policy
+* preferred approach (hints): registry.view<A, B, C>(exclude<D>, policy<A, B>)?
+* previous model used for persistent views as default view, query as old fashioned views
+* is it enough to store a view as <direct set, length>?

@@ -138,17 +138,16 @@ assert(collector.vec[0] == 0);
 assert(collector.vec[1] == 1);
 ```
 
-As shown above, a collector must expose a function operator that accepts as an
-argument a type to which the return type of the listeners can be converted.
-Moreover, it has to return a boolean value that is false to stop collecting
-data, true otherwise. This way one can avoid calling all the listeners in case
-it isn't necessary.
+A collector must expose a function operator that accepts as an argument a type
+to which the return type of the listeners can be converted. Moreover, it has to
+return a boolean value that is false to stop collecting data, true otherwise.
+This way one can avoid calling all the listeners in case it isn't necessary.
 
 # Delegate
 
 A delegate can be used as general purpose invoker with no memory overhead for
-free functions and member functions provided along with an instance on which
-to invoke them.<br/>
+free functions, members provided along with an instance on which to invoke them,
+lambdas and functors in general.<br/>
 It does not claim to be a drop-in replacement for an `std::function`, so do not
 expect to use it whenever an `std::function` fits well. However, it can be used
 to send opaque delegates around to be used to invoke functions as needed.
@@ -167,7 +166,8 @@ member function one wants to assign to it.
 Attempting to use an empty delegate by invoking its function call operator
 results in undefined behavior or most likely a crash. Before to use a delegate,
 it must be initialized.<br/>
-There exist two functions to do that, both named `connect`:
+There exists a bunch of overloads of the `connect` member function to do that.
+As an example of use:
 
 ```cpp
 int f(int i) { return i; }
@@ -187,13 +187,21 @@ delegate.connect<&my_struct::f>(&instance);
 The delegate class accepts also data members if required. In this case, the
 function type of the delegate is such that the parameter list is empty and the
 value of the data member is at least convertible to the return type.<br/>
-Finally, it can work with invokable objects in general (lambdas or functors), as
-long as they are trivially destructible and their sizes fit the one of `void *`.
-As an example, a lambda that captures a pointer or an integer value can be used
-with a delegate:
+Moreover, it can work with invokable objects in general (lambdas or functors),
+as long as they are trivially destructible and the size fits the one of
+`void *`. As an example, a lambda that captures a pointer or an integer value
+can be used with a delegate:
 
 ```cpp
 delegate.connect([value = int_var](int i) { return value * i; });
+```
+
+To create and initialize a delegate at once, there are also some specialized
+constructors. Because of the rules of the language, the listener is provided by
+means of the `entt::connect_arg` class template:
+
+```cpp
+entt::delegate<int(int)> func{entt::connect_arg<&f>};
 ```
 
 Aside `connect`, a `disconnect` counterpart isn't provided. Instead, there
@@ -255,10 +263,10 @@ delegate(42);
 In this case, the function `g` is invoked with parameters `'c'` and `42`.
 However, the function type of the delegate is still `void(int)`, mainly because
 this is also the signature of its function call operator.<br/>
-When the curried function gets the linked parameter by reference, it can modify
-it and the new value will be stored in place of the previous one. It's highly
-discouraged to accept the parameter by reference, unless you know exactly what
-you're doing. Prefer accepting it by value if possible.
+When the curried function receives the linked parameter by reference, it can
+modify it and the new value will be stored in place of the previous one. It's
+highly discouraged to accept the parameter by reference, unless you know exactly
+what you're doing. Prefer accepting it by value if possible.
 
 # Event dispatcher
 
