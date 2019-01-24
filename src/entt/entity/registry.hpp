@@ -102,14 +102,14 @@ class registry {
     template<typename... Component, typename... Exclude>
     struct handler_pool<type_list<Component...>, type_list<Exclude...>>: sparse_set<Entity, std::array<typename sparse_set<Entity>::size_type, sizeof...(Component)>> {
         void candidate(registry &reg, const Entity entity) {
-            if((reg.pool<Component>().has(entity) && ...) && !(reg.pool<Exclude>().has(entity) || ...)) {
+            if((reg.assure<Component>().has(entity) && ...) && !(reg.assure<Exclude>().has(entity) || ...)) {
                 handler_pool::construct(entity, reg.pools[component_family::type<Component>]->get(entity)...);
             }
         }
 
         template<typename Comp, std::size_t Index>
         void check(registry &reg, const Entity entity) {
-            const sparse_set<Entity> &cpool = reg.pool<Comp>();
+            const sparse_set<Entity> &cpool = reg.assure<Comp>();
             const auto last = *cpool.begin();
 
             if(handler_pool::has(last)) {
@@ -147,31 +147,14 @@ class registry {
     template<typename... Component, typename... Exclude, std::size_t... Indexes>
     void connect(handler_pool<type_list<Component...>, type_list<Exclude...>> *handler, std::index_sequence<Indexes...>) {
         using handler_type = handler_pool<type_list<Component...>, type_list<Exclude...>>;
-        (pool<Component>().construction().template connect<&handler_type::candidate>(handler), ...);
-        (pool<Exclude>().construction().template connect<&handler_type::discard>(handler), ...);
-        (pool<Component>().destruction().template connect<&handler_type::template check<Component, Indexes>>(handler), ...);
-        (pool<Exclude>().destruction().template connect<&handler_type::candidate>(handler), ...);
+        (assure<Component>().construction().template connect<&handler_type::candidate>(handler), ...);
+        (assure<Exclude>().construction().template connect<&handler_type::discard>(handler), ...);
+        (assure<Component>().destruction().template connect<&handler_type::template check<Component, Indexes>>(handler), ...);
+        (assure<Exclude>().destruction().template connect<&handler_type::candidate>(handler), ...);
     }
 
     template<typename Component>
-    inline bool managed() const ENTT_NOEXCEPT {
-        const auto ctype = component_family::type<Component>;
-        return ctype < pools.size() && pools[ctype];
-    }
-
-    template<typename Component>
-    inline const auto & pool() const ENTT_NOEXCEPT {
-        assert(managed<Component>());
-        return static_cast<component_pool<std::decay_t<Component>> &>(*pools[component_family::type<Component>]);
-    }
-
-    template<typename Component>
-    inline auto & pool() ENTT_NOEXCEPT {
-        return const_cast<component_pool<std::decay_t<Component>> &>(std::as_const(*this).template pool<Component>());
-    }
-
-    template<typename Component>
-    void assure() {
+    auto & assure() const {
         const auto ctype = component_family::type<Component>;
 
         if(!(ctype < pools.size())) {
@@ -181,6 +164,8 @@ class registry {
         if(!pools[ctype]) {
             pools[ctype] = std::make_unique<component_pool<std::decay_t<Component>>>(const_cast<registry *>(this));
         }
+
+        return static_cast<component_pool<std::decay_t<Component>> &>(*pools[ctype]);
     }
 
 public:
@@ -232,7 +217,7 @@ public:
      */
     template<typename Component>
     size_type size() const ENTT_NOEXCEPT {
-        return managed<Component>() ? pool<Component>().size() : size_type{};
+        return assure<Component>().size();
     }
 
     /**
@@ -262,8 +247,7 @@ public:
      */
     template<typename Component>
     void reserve(const size_type cap) {
-        assure<Component>();
-        pool<Component>().reserve(cap);
+        assure<Component>().reserve(cap);
     }
 
     /**
@@ -285,7 +269,7 @@ public:
      */
     template<typename Component>
     size_type capacity() const ENTT_NOEXCEPT {
-        return managed<Component>() ? pool<Component>().capacity() : size_type{};
+        return assure<Component>().capacity();
     }
 
     /**
@@ -305,7 +289,7 @@ public:
      */
     template<typename Component>
     bool empty() const ENTT_NOEXCEPT {
-        return !managed<Component>() || pool<Component>().empty();
+        return assure<Component>().empty();
     }
 
     /**
@@ -336,7 +320,7 @@ public:
      */
     template<typename Component>
     std::add_const_t<Component> * raw() const ENTT_NOEXCEPT {
-        return managed<Component>() ? pool<Component>().raw() : nullptr;
+        return assure<Component>().raw();
     }
 
     /*! @copydoc raw */
@@ -361,7 +345,7 @@ public:
      */
     template<typename Component>
     const entity_type * data() const ENTT_NOEXCEPT {
-        return managed<Component>() ? pool<Component>().data() : nullptr;
+        return assure<Component>().data();
     }
 
     /**
@@ -602,8 +586,7 @@ public:
     template<typename Component, typename... Args>
     Component & assign(const entity_type entity, Args &&... args) {
         assert(valid(entity));
-        assure<Component>();
-        return pool<Component>().construct(entity, std::forward<Args>(args)...);
+        return assure<Component>().construct(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -622,8 +605,7 @@ public:
     template<typename Component>
     void remove(const entity_type entity) {
         assert(valid(entity));
-        assert(managed<Component>());
-        pool<Component>().destroy(entity);
+        assure<Component>().destroy(entity);
     }
 
     /**
@@ -641,7 +623,7 @@ public:
     template<typename... Component>
     bool has(const entity_type entity) const ENTT_NOEXCEPT {
         assert(valid(entity));
-        return ((managed<Component>() && pool<Component>().has(entity)) && ...);
+        return (assure<Component>().has(entity) && ...);
     }
 
     /**
@@ -661,10 +643,9 @@ public:
     template<typename... Component>
     decltype(auto) get([[maybe_unused]] const entity_type entity) const ENTT_NOEXCEPT {
         assert(valid(entity));
-        assert((managed<Component>() && ...));
 
         if constexpr(sizeof...(Component) == 1) {
-            return pool<Component...>().get(entity);
+            return assure<Component...>().get(entity);
         } else {
             return std::tuple<std::add_const_t<Component> &...>{get<Component>(entity)...};
         }
@@ -706,8 +687,7 @@ public:
     template<typename Component>
     Component & get(const entity_type entity, Component &&component) ENTT_NOEXCEPT {
         assert(valid(entity));
-        assure<Component>();
-        auto &cpool = pool<Component>();
+        auto &cpool = assure<Component>();
         auto *comp = cpool.try_get(entity);
         return comp ? *comp : cpool.construct(entity, std::forward<Component>(component));
     }
@@ -729,7 +709,7 @@ public:
         assert(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return managed<Component...>() ? pool<Component...>().try_get(entity) : nullptr;
+            return assure<Component...>().try_get(entity);
         } else {
             return std::tuple<std::add_const_t<Component> *...>{try_get<Component>(entity)...};
         }
@@ -767,7 +747,7 @@ public:
      */
     template<typename Component, typename... Args>
     Component & replace(const entity_type entity, Args &&... args) {
-        return (pool<Component>().get(entity) = std::decay_t<Component>{std::forward<Args>(args)...});
+        return (assure<Component>().get(entity) = std::decay_t<Component>{std::forward<Args>(args)...});
     }
 
     /**
@@ -798,8 +778,7 @@ public:
      */
     template<typename Component, typename... Args>
     Component & assign_or_replace(const entity_type entity, Args &&... args) {
-        assure<Component>();
-        auto &cpool = pool<Component>();
+        auto &cpool = assure<Component>();
 
         return cpool.has(entity)
                 ? cpool.get(entity) = std::decay_t<Component>{std::forward<Args>(args)...}
@@ -831,8 +810,7 @@ public:
      */
     template<typename Component>
     sink_type construction() ENTT_NOEXCEPT {
-        assure<Component>();
-        return pool<Component>().construction();
+        return assure<Component>().construction();
     }
 
     /**
@@ -860,8 +838,7 @@ public:
      */
     template<typename Component>
     sink_type destruction() ENTT_NOEXCEPT {
-        assure<Component>();
-        return pool<Component>().destruction();
+        return assure<Component>().destruction();
     }
 
     /**
@@ -907,8 +884,7 @@ public:
      */
     template<typename Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort sort = Sort{}, Args &&... args) {
-        assure<Component>();
-        pool<Component>().sort(std::move(compare), std::move(sort), std::forward<Args>(args)...);
+        assure<Component>().sort(std::move(compare), std::move(sort), std::forward<Args>(args)...);
         invalidate.publish(*this, component_family::type<Component>);
     }
 
@@ -944,9 +920,7 @@ public:
      */
     template<typename To, typename From>
     void sort() {
-        assure<To>();
-        assure<From>();
-        pool<To>().respect(pool<From>());
+        assure<To>().respect(assure<From>());
         invalidate.publish(*this, component_family::type<To>);
     }
 
@@ -967,8 +941,7 @@ public:
     template<typename Component>
     void reset(const entity_type entity) {
         assert(valid(entity));
-        assure<Component>();
-        auto &cpool = pool<Component>();
+        auto &cpool = assure<Component>();
 
         if(cpool.has(entity)) {
             cpool.destroy(entity);
@@ -985,10 +958,9 @@ public:
      */
     template<typename Component>
     void reset() {
-        assure<Component>();
-        auto &cpool = pool<Component>();
+        sparse_set<Entity> &cpool = assure<Component>();
 
-        for(const auto entity: static_cast<sparse_set<Entity> &>(cpool)) {
+        for(const auto entity: cpool) {
             cpool.destroy(entity);
         }
     }
@@ -1131,8 +1103,7 @@ public:
      */
     template<typename... Component>
     entt::view<Entity, Component...> view() {
-        (assure<Component>(), ...);
-        return { &pool<Component>()... };
+        return { &assure<Component>()... };
     }
 
     /*! @copydoc view */
@@ -1190,16 +1161,13 @@ public:
         }
 
         if(!handlers[htype]) {
-            (assure<Component>(), ...);
-            (assure<Exclude>(), ...);
-
             auto handler = std::make_unique<handler_type>();
 
             connect(handler.get(), std::make_index_sequence<sizeof...(Component)>{});
             invalidate.sink().template connect<&handler_type::rebuild>(handler.get());
 
             for(const auto entity: view<Component...>()) {
-                if(!(pool<Exclude>().has(entity) || ...)) {
+                if(!(assure<Exclude>().has(entity) || ...)) {
                     handler->construct(entity, pools[component_family::type<Component>]->get(entity)...);
                 }
             }
@@ -1209,7 +1177,7 @@ public:
 
         return {
             static_cast<handler_type *>(handlers[htype].get()),
-            &pool<Component>()...
+            &assure<Component>()...
         };
     }
 
@@ -1288,7 +1256,7 @@ public:
 
         if(sizeof...(Component)) {
             static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
-            ((other.pools[component_family::type<Component>] = managed<Component>() ? pool<Component>().clone() : nullptr), ...);
+            ((other.pools[component_family::type<Component>] = assure<Component>().clone()), ...);
         } else {
             for(auto pos = pools.size(); pos; --pos) {
                 auto &cpool = pools[pos-1];
@@ -1376,7 +1344,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<sparse_set<Entity>>> handlers;
-    std::vector<std::unique_ptr<sparse_set<Entity>>> pools;
+    mutable std::vector<std::unique_ptr<sparse_set<Entity>>> pools;
     std::vector<entity_type> entities;
     size_type available{};
     entity_type next{};
