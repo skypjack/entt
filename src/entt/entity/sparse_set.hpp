@@ -914,9 +914,9 @@ public:
      */
     template<typename... Args>
     object_type & construct([[maybe_unused]] const entity_type entity, [[maybe_unused]] Args &&... args) {
-        underlying_type::construct(entity);
 
         if constexpr(std::is_empty_v<object_type>) {
+            underlying_type::construct(entity);
             return instances;
         } else {
             if constexpr(std::is_aggregate_v<object_type>) {
@@ -924,7 +924,8 @@ public:
             } else {
                 instances.emplace_back(std::forward<Args>(args)...);
             }
-
+            // construct entity after component in case component constructor throws
+            underlying_type::construct(entity);
             return instances.back();
         }
     }
