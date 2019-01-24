@@ -191,7 +191,7 @@ public:
      */
     template<typename Invokable>
     void connect(Invokable invokable) ENTT_NOEXCEPT {
-        static_assert(sizeof(Invokable) < sizeof(void *));
+        static_assert(sizeof(Invokable) <= sizeof(void *));
         static_assert(std::is_class_v<Invokable>);
         static_assert(std::is_trivially_destructible_v<Invokable>);
         static_assert(std::is_invocable_r_v<Ret, Invokable, Args...>);

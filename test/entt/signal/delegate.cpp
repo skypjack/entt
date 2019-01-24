@@ -85,9 +85,10 @@ TEST(Delegate, LambdaAndFunctor) {
     entt::delegate<int(int)> non_capturing_delegate;
     entt::delegate<int(int)> capturing_delegate;
     entt::delegate<int(int)> functor_delegate;
+    const int value = 5;
 
     non_capturing_delegate.connect([](int v) { return v*v; });
-    capturing_delegate.connect([value = 5](int v) { return v*value; });
+    capturing_delegate.connect([val = &value](int v) { return v * *val; });
     functor_delegate.connect(delegate_functor{});
 
     ASSERT_EQ(non_capturing_delegate(3), 9);
