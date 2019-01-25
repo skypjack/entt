@@ -151,39 +151,23 @@ public:
     }
 
     /**
-     * @brief Connects a member function for a given instance or a curried free
-     * function to a signal.
+     * @brief Connects a member function to a signal.
      *
-     * When used to connect a member function, the signal isn't responsible for
-     * the connected object. Users must guarantee that the lifetime of the
-     * instance overcomes the one of the delegate. On the other side, the signal
-     * handler performs checks to avoid multiple connections for the same member
-     * function of a given instance.<br/>
-     * When used to connect a curried free function, the linked value must be
-     * both trivially copyable and trivially destructible, other than such that
-     * its size is lower than or equal to the one of a `void *`. It means that
-     * all the primitive types are accepted as well as pointers. Moreover, the
-     * signature of the free function must be such that the value is the first
-     * argument before the ones used to define the delegate itself.
+     * The signal isn't responsible for the connected object. Users must
+     * guarantee that the lifetime of the instance overcomes the one of the
+     * delegate. On the other side, the signal handler performs checks to avoid
+     * multiple connections for the same member function of a given instance.
      *
-     * @tparam Candidate Member function or curried free function to connect to
-     * the signal.
-     * @tparam Type Type of class to which the member function belongs or type
-     * of value used for currying.
-     * @param value_or_instance A valid pointer to an instance of class type or
-     * the value to use for currying.
+     * @tparam Member Member function to connect to the signal.
+     * @tparam Class Type of class to which the member function belongs.
+     * @param instance A valid instance of type pointer to `Class`.
      */
-    template<auto Candidate, typename Type>
-    void connect(Type value_or_instance) {
-        if constexpr(std::is_class_v<std::remove_pointer_t<Type>>) {
-            static_assert(std::is_member_function_pointer_v<decltype(Candidate)>);
-            disconnect<Candidate>(value_or_instance);
-        } else {
-            disconnect<Candidate>();
-        }
-
+    template<auto Member, typename Class>
+    void connect(Class *instance) {
+        static_assert(std::is_member_function_pointer_v<decltype(Member)>);
+        disconnect<Member>(instance);
         delegate<Ret(Args...)> delegate{};
-        delegate.template connect<Candidate>(value_or_instance);
+        delegate.template connect<Member>(instance);
         calls->emplace_back(std::move(delegate));
     }
 
@@ -200,7 +184,7 @@ public:
 
     /**
      * @brief Disconnects the given member function from a signal.
-     * @tparam Member Member function to connect to the signal.
+     * @tparam Member Member function to disconnect from the signal.
      * @tparam Class Type of class to which the member function belongs.
      * @param instance A valid instance of type pointer to `Class`.
      */

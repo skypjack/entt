@@ -21,7 +21,7 @@
 * empty components model allows for shared components and prefabs unity-like
 * provide create with a pack of default constructible components to assign
 * allow to replace std:: with custom implementations
-* allow lambdas on sigh/dispatcher (mixed approach with sinks that accept also delegates?)
+* allow curried function and lambdas on sigh/dispatcher (mixed approach with sinks that accept also delegates?)
 
 Ready to go:
 * policy based views
