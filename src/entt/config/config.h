@@ -15,10 +15,10 @@
 #ifndef ENTT_NO_ATOMIC
 #include <atomic>
 template<typename Type>
-using maybe_atomic_type = std::atomic<Type>;
+using maybe_atomic_t = std::atomic<Type>;
 #else
 template<typename Type>
-using maybe_atomic_type = Type;
+using maybe_atomic_t = Type;
 #endif // ENTT_USE_ATOMIC
 
 
