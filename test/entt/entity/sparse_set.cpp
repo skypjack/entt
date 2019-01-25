@@ -1,7 +1,7 @@
 #include <memory>
+#include <exception>
 #include <algorithm>
 #include <unordered_set>
-#include <exception>
 #include <gtest/gtest.h>
 #include <entt/entity/sparse_set.hpp>
 
