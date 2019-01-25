@@ -1056,23 +1056,22 @@ TEST(SparseSetWithType, CloneMoveOnlyComponent) {
     ASSERT_EQ(set.clone(), nullptr);
 }
 
-TEST(SparseSetWithType, ConstructorExceptionDoesNotAddToSet)
-{
-    class ThrowingComponent {
-    public:
-        class ConstructorException : public std::exception {};
-        ThrowingComponent() { throw ConstructorException{}; }
+TEST(SparseSetWithType, ConstructorExceptionDoesNotAddToSet) {
+    struct throwing_component {
+        struct constructor_exception: std::exception {};
+        
+        throwing_component() { throw constructor_exception{}; }
 
-        // necessary to avoid the short-circuit construct() logic for 0-size objects
+        // necessary to avoid the short-circuit construct() logic for empty objects
         int data;
     };
 
-    entt::sparse_set<std::uint64_t, ThrowingComponent> set;
+    entt::sparse_set<std::uint64_t, throwing_component> set;
 
     try {
         set.construct(0);
-        FAIL() << "Expected ConstructorException to be thrown";
-    } catch (const ThrowingComponent::ConstructorException& e) {
-        ASSERT_FALSE(set.has(0));
+        FAIL() << "Expected constructor_exception to be thrown";
+    } catch (const throwing_component::constructor_exception &) {
+        ASSERT_TRUE(set.empty());
     }
 }
