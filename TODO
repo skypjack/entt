@@ -22,6 +22,7 @@
 * provide create with a pack of default constructible components to assign
 * allow to replace std:: with custom implementations
 * allow curried function and lambdas on sigh/dispatcher (mixed approach with sinks that accept also delegates?)
+* allow user to use also uint32 for hashed strings type if possible
 
 Ready to go:
 * policy based views
