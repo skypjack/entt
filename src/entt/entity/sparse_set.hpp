@@ -164,7 +164,7 @@ class sparse_set<Entity> {
         }
 
     private:
-        direct_type *direct;st
+        direct_type *direct;
         index_type index;
     };
 
