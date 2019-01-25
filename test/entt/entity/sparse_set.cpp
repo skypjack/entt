@@ -1,4 +1,5 @@
 #include <memory>
+#include <exception>
 #include <algorithm>
 #include <unordered_set>
 #include <gtest/gtest.h>
@@ -1053,4 +1054,24 @@ TEST(SparseSetWithType, CloneMoveOnlyComponent) {
     // the purpose is to ensure that move only components are not cloned
     entt::sparse_set<std::uint64_t, std::unique_ptr<int>> set;
     ASSERT_EQ(set.clone(), nullptr);
+}
+
+TEST(SparseSetWithType, ConstructorExceptionDoesNotAddToSet) {
+    struct throwing_component {
+        struct constructor_exception: std::exception {};
+        
+        throwing_component() { throw constructor_exception{}; }
+
+        // necessary to avoid the short-circuit construct() logic for empty objects
+        int data;
+    };
+
+    entt::sparse_set<std::uint64_t, throwing_component> set;
+
+    try {
+        set.construct(0);
+        FAIL() << "Expected constructor_exception to be thrown";
+    } catch (const throwing_component::constructor_exception &) {
+        ASSERT_TRUE(set.empty());
+    }
 }
