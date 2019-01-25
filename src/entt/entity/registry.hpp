@@ -930,10 +930,15 @@ public:
     template<typename Component>
     void reset() {
         sparse_set<Entity> &cpool = assure<Component>();
+        auto &sigh = sighs[component_family::type<Component>].second;
 
-        for(const auto entity: cpool) {
-            sighs[component_family::type<Component>].second.publish(*this, entity);
-            cpool.destroy(entity);
+        if(sigh.empty()) {
+            cpool.reset();
+        } else {
+            for(const auto entity: cpool) {
+                sigh.publish(*this, entity);
+                cpool.destroy(entity);
+            }
         }
     }
 
