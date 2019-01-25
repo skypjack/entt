@@ -207,7 +207,7 @@ class snapshot_loader {
         : reg{reg},
           force{force}
     {
-        // restore a snapshot as a whole requires a clean registry
+        // to restore a snapshot as a whole requires a clean registry
         assert(!reg.capacity());
     }
 
