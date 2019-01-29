@@ -43,65 +43,23 @@ template<typename Entity = std::uint32_t>
 class registry {
     using component_family = family<struct internal_registry_component_family>;
     using handler_family = family<struct internal_registry_handler_family>;
-    using component_signal_type = sigh<void(registry &, const Entity)>;
-    using pool_signal_type = sigh<void(registry &, const typename component_family::family_type)>;
+    using signal_type = sigh<void(registry &, const Entity)>;
     using traits_type = entt_traits<Entity>;
 
-    template<typename, typename>
-    struct handler_pool;
-
-    template<typename... Component, typename... Exclude>
-    struct handler_pool<type_list<Component...>, type_list<Exclude...>>: sparse_set<Entity, std::array<typename sparse_set<Entity>::size_type, sizeof...(Component)>> {
-        void candidate(registry &reg, const Entity entity) {
-            if((reg.assure<Component>().has(entity) && ...) && !(reg.assure<Exclude>().has(entity) || ...)) {
-                handler_pool::construct(entity, reg.pools[component_family::type<Component>]->get(entity)...);
-            }
+    template<typename Type, auto Has, auto Any>
+    static void construct_if(registry &reg, const Entity entity) {
+        if((reg.*Has)(entity) && !(reg.*Any)(entity)) {
+            reg.handlers[handler_family::type<Type>]->construct(entity);
         }
+    }
 
-        template<typename Comp, std::size_t Index>
-        void check(registry &reg, const Entity entity) {
-            const sparse_set<Entity> &cpool = reg.assure<Comp>();
-            const auto last = *cpool.begin();
+    template<typename Type>
+    static void destroy_if(registry &reg, const Entity entity) {
+        auto &handler = reg.handlers[handler_family::type<Type>];
 
-            if(handler_pool::has(last)) {
-                handler_pool::get(last)[Index] = cpool.get(entity);
-            }
-
-            if(handler_pool::has(entity)) {
-                handler_pool::destroy(entity);
-            }
+        if(handler->has(entity)) {
+            handler->destroy(entity);
         }
-
-        void discard(registry &, const Entity entity) {
-            if(handler_pool::has(entity)) {
-                handler_pool::destroy(entity);
-            }
-        }
-
-        void rebuild(registry &reg, const typename component_family::family_type ctype) {
-            auto index = sizeof...(Component);
-            decltype(index) cnt{};
-
-            ((index = (component_family::type<Component> == ctype) ? cnt++ : (static_cast<void>(++cnt), index)), ...);
-
-            if(index != sizeof...(Component)) {
-                auto begin = sparse_set<Entity>::begin();
-                const auto &cpool = *reg.pools[ctype];
-
-                for(auto &&indexes: *this) {
-                    indexes[index] = cpool.get(*(begin++));
-                }
-            }
-        }
-    };
-
-    template<typename... Component, typename... Exclude, std::size_t... Indexes>
-    void connect(handler_pool<type_list<Component...>, type_list<Exclude...>> *handler, std::index_sequence<Indexes...>) {
-        using handler_type = handler_pool<type_list<Component...>, type_list<Exclude...>>;
-        (sighs[component_family::type<Component>].first.sink().template connect<&handler_type::candidate>(handler), ...);
-        (sighs[component_family::type<Exclude>].first.sink().template connect<&handler_type::discard>(handler), ...);
-        (sighs[component_family::type<Component>].second.sink().template connect<&handler_type::template check<Component, Indexes>>(handler), ...);
-        (sighs[component_family::type<Exclude>].second.sink().template connect<&handler_type::candidate>(handler), ...);
     }
 
     template<typename Component>
@@ -120,6 +78,12 @@ class registry {
         return static_cast<sparse_set<Entity, std::decay_t<Component>> &>(*pools[ctype]);
     }
 
+    template<typename... Component>
+    bool any_of(const Entity entity) const ENTT_NOEXCEPT {
+        assert(valid(entity));
+        return (assure<Component>().has(entity) || ...);
+    }
+
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = typename traits_type::entity_type;
@@ -130,7 +94,7 @@ public:
     /*! @brief Unsigned integer type. */
     using component_type = typename component_family::family_type;
     /*! @brief Type of sink for the given component. */
-    using sink_type = typename component_signal_type::sink_type;
+    using sink_type = typename signal_type::sink_type;
 
     /**
      * @brief Returns the numeric identifier of a type of component at runtime.
@@ -855,7 +819,6 @@ public:
     template<typename Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort sort = Sort{}, Args &&... args) {
         assure<Component>().sort(std::move(compare), std::move(sort), std::forward<Args>(args)...);
-        invalidate.publish(*this, component_family::type<Component>);
     }
 
     /**
@@ -891,7 +854,6 @@ public:
     template<typename To, typename From>
     void sort() {
         assure<To>().respect(assure<From>());
-        invalidate.publish(*this, component_family::type<To>);
     }
 
     /**
@@ -1129,9 +1091,8 @@ public:
      */
     template<typename... Component, typename... Exclude>
     entt::persistent_view<Entity, Component...> persistent_view(type_list<Exclude...> = {}) {
-        static_assert(sizeof...(Component));
-        using handler_type = handler_pool<type_list<Component...>, type_list<Exclude...>>;
-        const auto htype = handler_family::type<Component...>;
+        using handler_type = type_list<Component..., type_list<Exclude...>>;
+        const auto htype = handler_family::type<handler_type>;
 
         if(!(htype < handlers.size())) {
             handlers.resize(htype + 1);
@@ -1141,24 +1102,22 @@ public:
             (assure<Component>(), ...);
             (assure<Exclude>(), ...);
 
-            auto handler = std::make_unique<handler_type>();
+            handlers[htype] = std::make_unique<sparse_set<entity_type>>();
+            auto *direct = handlers[htype].get();
 
-            connect(handler.get(), std::make_index_sequence<sizeof...(Component)>{});
-            invalidate.sink().template connect<&handler_type::rebuild>(handler.get());
+            ((sighs[component_family::type<Component>].first.sink().template connect<&construct_if<handler_type, &registry::has<Component...>, &registry::any_of<Exclude...>>>()), ...);
+            ((sighs[component_family::type<Exclude>].second.sink().template connect<&construct_if<handler_type, &registry::has<Component...>, &registry::any_of<Exclude...>>>()), ...);
+            ((sighs[component_family::type<Exclude>].first.sink().template connect<&registry::destroy_if<handler_type>>()), ...);
+            ((sighs[component_family::type<Component>].second.sink().template connect<&registry::destroy_if<handler_type>>()), ...);
 
             for(const auto entity: view<Component...>()) {
-                if(!(assure<Exclude>().has(entity) || ...)) {
-                    handler->construct(entity, pools[component_family::type<Component>]->get(entity)...);
+                if(!any_of<Exclude...>(entity)) {
+                    direct->construct(entity);
                 }
             }
-
-            handlers[htype] = std::move(handler);
         }
 
-        return {
-            static_cast<handler_type *>(handlers[htype].get()),
-            &assure<Component>()...
-        };
+        return { handlers[htype].get(), &assure<Component>()... };
     }
 
     /*! @copydoc persistent_view */
@@ -1325,11 +1284,10 @@ public:
 private:
     std::vector<std::unique_ptr<sparse_set<Entity>>> handlers;
     mutable std::vector<std::unique_ptr<sparse_set<Entity>>> pools;
-    mutable std::vector<std::pair<component_signal_type, component_signal_type>> sighs;
+    mutable std::vector<std::pair<signal_type, signal_type>> sighs;
     std::vector<entity_type> entities;
     size_type available{};
     entity_type next{};
-    pool_signal_type invalidate;
 };
 
 

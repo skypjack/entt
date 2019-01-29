@@ -77,42 +77,11 @@ class persistent_view {
     template<typename Comp>
     using pool_type = std::conditional_t<std::is_const_v<Comp>, const sparse_set<Entity, std::remove_const_t<Comp>>, sparse_set<Entity, Comp>>;
 
-    using persistent_type = sparse_set<Entity, std::array<typename sparse_set<Entity>::size_type, sizeof...(Component)>>;
-
     // we could use pool_type<Component> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    persistent_view(persistent_type *handler, sparse_set<Entity, std::remove_const_t<Component>> *... pools) ENTT_NOEXCEPT
+    persistent_view(sparse_set<Entity> *handler, sparse_set<Entity, std::remove_const_t<Component>> *... pools) ENTT_NOEXCEPT
         : handler{handler},
           pools{pools...}
     {}
-
-    const sparse_set<Entity> * candidate() const ENTT_NOEXCEPT {
-        return std::min({ static_cast<const sparse_set<Entity> *>(std::get<pool_type<Component> *>(pools))... }, [](const auto *lhs, const auto *rhs) {
-            return lhs->size() < rhs->size();
-        });
-    }
-
-    template<typename Comp>
-    inline decltype(auto) instance([[maybe_unused]] typename persistent_type::object_type::value_type index) const {
-        if constexpr(std::is_empty_v<Comp>) {
-            return *std::get<pool_type<Comp> *>(pools)->raw();
-        } else {
-            return std::get<pool_type<Comp> *>(pools)->raw()[index];
-        }
-    }
-
-    template<typename Func, std::size_t... Indexes>
-    void each(Func func, std::index_sequence<Indexes...>) const {
-        if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>...>) {
-            std::for_each(handler->cbegin(), handler->cend(), [func = std::move(func), this](const auto &indexes) mutable {
-                func(instance<Component>(indexes[Indexes])...);
-            });
-        } else {
-            std::for_each(handler->sparse_set<Entity>::begin(), handler->sparse_set<Entity>::end(), [func = std::move(func), raw = handler->cbegin(), this](const auto entity) mutable {
-                func(entity, instance<Component>((*raw)[Indexes])...);
-                ++raw;
-            });
-        }
-    }
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -179,7 +148,7 @@ public:
      * @return An iterator to the first entity that has the given components.
      */
     iterator_type begin() const ENTT_NOEXCEPT {
-        return handler->sparse_set<Entity>::begin();
+        return handler->begin();
     }
 
     /**
@@ -198,7 +167,7 @@ public:
      * given components.
      */
     iterator_type end() const ENTT_NOEXCEPT {
-        return handler->sparse_set<Entity>::end();
+        return handler->end();
     }
 
     /**
@@ -280,7 +249,15 @@ public:
      */
     template<typename Func>
     inline void each(Func func) const {
-        each(std::move(func), std::make_index_sequence<sizeof...(Component)>{});
+        if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>...>) {
+            std::for_each(handler->begin(), handler->end(), [func = std::move(func), this](const auto entity) mutable {
+                func(std::get<pool_type<Component> *>(pools)->get(entity)...);
+            });
+        } else {
+            std::for_each(handler->begin(), handler->end(), [func = std::move(func), this](const auto entity) mutable {
+                func(entity, std::get<pool_type<Component> *>(pools)->get(entity)...);
+            });
+        }
     }
 
     /**
@@ -305,7 +282,7 @@ public:
     }
 
 private:
-    persistent_type *handler;
+    sparse_set<entity_type> *handler;
     const std::tuple<pool_type<Component> *...> pools;
 };
 
