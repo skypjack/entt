@@ -208,7 +208,8 @@ public:
      * iterator otherwise.
      */
     iterator_type find(const entity_type entity) const ENTT_NOEXCEPT {
-        return handler->find(entity);
+        const auto it = handler->find(entity);
+        return it != end() && *it == entity ? it : end();
     }
 
     /**
@@ -217,7 +218,7 @@ public:
      * @return The identifier that occupies the given position.
      */
     entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
-        return handler->sparse_set<Entity>::begin()[pos];
+        return begin()[pos];
     }
 
     /**
@@ -226,7 +227,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     bool contains(const entity_type entity) const ENTT_NOEXCEPT {
-        return handler->has(entity) && (handler->data()[handler->sparse_set<Entity>::get(entity)] == entity);
+        return find(entity) != end();
     }
 
     /**
@@ -595,9 +596,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     bool contains(const entity_type entity) const ENTT_NOEXCEPT {
-        const auto sz = size_type(entity & traits_type::entity_mask);
-        const auto extent = std::min({ std::get<pool_type<Component> *>(pools)->extent()... });
-        return ((sz < extent) && ... && (std::get<pool_type<Component> *>(pools)->has(entity) && (std::get<pool_type<Component> *>(pools)->data()[std::get<pool_type<Component> *>(pools)->sparse_set<Entity>::get(entity)] == entity)));
+        return find(entity) != end();
     }
 
     /**
@@ -823,7 +822,8 @@ public:
      * iterator otherwise.
      */
     iterator_type find(const entity_type entity) const ENTT_NOEXCEPT {
-        return pool->find(entity);
+        const auto it = pool->find(entity);
+        return it != end() && *it == entity ? it : end();
     }
 
     /**
@@ -832,7 +832,7 @@ public:
      * @return The identifier that occupies the given position.
      */
     entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
-        return pool->sparse_set<Entity>::begin()[pos];
+        return begin()[pos];
     }
 
     /**
@@ -841,7 +841,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     bool contains(const entity_type entity) const ENTT_NOEXCEPT {
-        return pool->has(entity) && (pool->data()[pool->sparse_set<Entity>::get(entity)] == entity);
+        return find(entity) != end();
     }
 
     /**

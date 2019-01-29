@@ -252,6 +252,15 @@ TEST(PersistentView, Find) {
     ASSERT_EQ(*(++it), e0);
     ASSERT_EQ(++it, view.end());
     ASSERT_EQ(++view.find(e0), view.end());
+
+    const auto e4 = registry.create();
+    registry.destroy(e4);
+    const auto e5 = registry.create();
+    registry.assign<int>(e5);
+    registry.assign<char>(e5);
+
+    ASSERT_NE(view.find(e5), view.end());
+    ASSERT_EQ(view.find(e4), view.end());
 }
 
 TEST(PersistentView, SingleComponent) {
@@ -518,6 +527,14 @@ TEST(SingleComponentView, Find) {
     ASSERT_EQ(*(++it), e0);
     ASSERT_EQ(++it, view.end());
     ASSERT_EQ(++view.find(e0), view.end());
+
+    const auto e4 = registry.create();
+    registry.destroy(e4);
+    const auto e5 = registry.create();
+    registry.assign<int>(e5);
+
+    ASSERT_NE(view.find(e5), view.end());
+    ASSERT_EQ(view.find(e4), view.end());
 }
 
 TEST(MultipleComponentView, Functionalities) {
@@ -722,6 +739,15 @@ TEST(MultipleComponentView, Find) {
     ASSERT_EQ(*(++it), e0);
     ASSERT_EQ(++it, view.end());
     ASSERT_EQ(++view.find(e0), view.end());
+
+    const auto e4 = registry.create();
+    registry.destroy(e4);
+    const auto e5 = registry.create();
+    registry.assign<int>(e5);
+    registry.assign<char>(e5);
+
+    ASSERT_NE(view.find(e5), view.end());
+    ASSERT_EQ(view.find(e4), view.end());
 }
 
 TEST(RuntimeView, Functionalities) {
