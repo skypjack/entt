@@ -290,7 +290,7 @@ TEST(PersistentView, ExcludedComponents) {
     registry.assign<int>(e1, 1);
     registry.assign<char>(e1);
 
-    const auto view = registry.persistent_view<int>(entt::exclude<char>{});
+    const auto view = registry.persistent_view<int>(entt::exclude<char>);
 
     const auto e2 = registry.create();
     registry.assign<int>(e2, 2);
