@@ -477,12 +477,7 @@ public:
      * @return A fresh copy of the given sparse set.
      */
     virtual std::unique_ptr<sparse_set> clone() const {
-        auto other = std::make_unique<sparse_set>();
-        other->reverse.resize(reverse.size());
-        other->direct.resize(direct.size());
-        std::copy(reverse.cbegin(), reverse.cend(), other->reverse.begin());
-        std::copy(direct.cbegin(), direct.cend(), other->direct.begin());
-        return other;
+        return std::make_unique<sparse_set>(*this);
     }
 
 private:
