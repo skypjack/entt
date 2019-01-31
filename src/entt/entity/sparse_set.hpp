@@ -752,7 +752,7 @@ public:
      *
      * @param cap Desired capacity.
      */
-    void reserve([[maybe_unused]] const size_type cap) {
+    void reserve(const size_type cap) {
         underlying_type::reserve(cap);
 
         if constexpr(!std::is_empty_v<object_type>) {
@@ -913,7 +913,7 @@ public:
      * @return The object associated with the entity.
      */
     template<typename... Args>
-    object_type & construct([[maybe_unused]] const entity_type entity, [[maybe_unused]] Args &&... args) {
+    object_type & construct(const entity_type entity, [[maybe_unused]] Args &&... args) {
         if constexpr(std::is_empty_v<object_type>) {
             underlying_type::construct(entity);
             return instances;
@@ -999,7 +999,7 @@ public:
      * @param args Arguments to forward to the sort function object, if any.
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
-    void sort([[maybe_unused]] Compare compare, [[maybe_unused]] Sort sort = Sort{}, [[maybe_unused]] Args &&... args) {
+    void sort(Compare compare, Sort sort = Sort{}, Args &&... args) {
         static_assert(!std::is_empty_v<object_type>);
 
         std::vector<size_type> copy(instances.size());
