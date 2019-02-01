@@ -312,14 +312,50 @@ class meta_any {
         return &lhs == &rhs;
     }
 
+    template<typename Type>
+    static bool compare(const void *lhs, const void *rhs) {
+        return compare(0, *static_cast<const Type *>(lhs), *static_cast<const Type *>(rhs));
+    }
+
+    template<typename Type>
+    static void * copy_storage(storage_type &storage, const void *instance) {
+        return new (&storage) Type{*static_cast<const Type *>(instance)};
+    }
+
+    template<typename Type>
+    static void * copy_object(storage_type &storage, const void *instance) {
+        using chunk_type = std::aligned_storage_t<sizeof(Type), alignof(Type)>;
+        auto *chunk = new chunk_type;
+        new (&storage) chunk_type *{chunk};
+        return new (chunk) Type{*static_cast<const Type *>(instance)};
+    }
+
+    template<typename Type>
+    static void destroy_storage(storage_type &storage) {
+        auto *node = internal::meta_info<Type>::resolve();
+        auto *instance = reinterpret_cast<Type *>(&storage);
+        node->dtor ? node->dtor->invoke(*instance) : node->destroy(*instance);
+    }
+
+    template<typename Type>
+    static void destroy_object(storage_type &storage) {
+        using chunk_type = std::aligned_storage_t<sizeof(Type), alignof(Type)>;
+        auto *node = internal::meta_info<Type>::resolve();
+        auto *chunk = *reinterpret_cast<chunk_type **>(&storage);
+        auto *instance = reinterpret_cast<Type *>(chunk);
+        node->dtor ? node->dtor->invoke(*instance) : node->destroy(*instance);
+        delete chunk;
+    }
+
 public:
     /*! @brief Default constructor. */
     meta_any() ENTT_NOEXCEPT
         : storage{},
           instance{nullptr},
-          destroy{nullptr},
           node{nullptr},
-          comparator{nullptr}
+          destroy_fn{nullptr},
+          compare_fn{nullptr},
+          copy_fn{nullptr}
     {}
 
     /**
@@ -340,42 +376,23 @@ public:
         using actual_type = std::decay_t<Type>;
         node = internal::meta_info<Type>::resolve();
 
-        comparator = [](const void *lhs, const void *rhs) {
-            return compare(0, *static_cast<const actual_type *>(lhs), *static_cast<const actual_type *>(rhs));
-        };
+        compare_fn = &compare<actual_type>;
 
         if constexpr(sizeof(actual_type) <= sizeof(void *)) {
             new (&storage) actual_type{std::forward<Type>(type)};
             instance = &storage;
 
-            copy = [](storage_type &storage, const void *instance) -> void * {
-                return new (&storage) actual_type{*static_cast<const actual_type *>(instance)};
-            };
-
-            destroy = [](storage_type &storage) {
-                auto *node = internal::meta_info<Type>::resolve();
-                auto *instance = reinterpret_cast<actual_type *>(&storage);
-                node->dtor ? node->dtor->invoke(*instance) : node->destroy(*instance);
-            };
+            destroy_fn = &destroy_storage<actual_type>;
+            copy_fn = &copy_storage<actual_type>;
         } else {
             using chunk_type = std::aligned_storage_t<sizeof(actual_type), alignof(actual_type)>;
+
             auto *chunk = new chunk_type;
             instance = new (chunk) actual_type{std::forward<Type>(type)};
             new (&storage) chunk_type *{chunk};
 
-            copy = [](storage_type &storage, const void *instance) -> void * {
-                auto *chunk = new chunk_type;
-                new (&storage) chunk_type *{chunk};
-                return new (chunk) actual_type{*static_cast<const actual_type *>(instance)};
-            };
-
-            destroy = [](storage_type &storage) {
-                auto *node = internal::meta_info<Type>::resolve();
-                auto *chunk = *reinterpret_cast<chunk_type **>(&storage);
-                auto *instance = reinterpret_cast<actual_type *>(chunk);
-                node->dtor ? node->dtor->invoke(*instance) : node->destroy(*instance);
-                delete chunk;
-            };
+            destroy_fn = &destroy_object<actual_type>;
+            copy_fn = &copy_object<actual_type>;
         }
     }
 
@@ -387,11 +404,11 @@ public:
         : meta_any{}
     {
         if(other) {
-            instance = other.copy(storage, other.instance);
-            destroy = other.destroy;
+            instance = other.copy_fn(storage, other.instance);
             node = other.node;
-            comparator = other.comparator;
-            copy = other.copy;
+            destroy_fn = other.destroy_fn;
+            compare_fn = other.compare_fn;
+            copy_fn = other.copy_fn;
         }
     }
 
@@ -412,8 +429,8 @@ public:
 
     /*! @brief Frees the internal storage, whatever it means. */
     ~meta_any() {
-        if(destroy) {
-            destroy(storage);
+        if(destroy_fn) {
+            destroy_fn(storage);
         }
     }
 
@@ -546,7 +563,7 @@ public:
      * @return False if the container is empty, true otherwise.
      */
     inline explicit operator bool() const ENTT_NOEXCEPT {
-        return destroy;
+        return destroy_fn;
     }
 
     /**
@@ -556,7 +573,7 @@ public:
      * otherwise.
      */
     inline bool operator==(const meta_any &other) const ENTT_NOEXCEPT {
-        return (!instance && !other.instance) || (instance && other.instance && node == other.node && comparator(instance, other.instance));
+        return (!instance && !other.instance) || (instance && other.instance && node == other.node && compare_fn(instance, other.instance));
     }
 
     /**
@@ -569,10 +586,10 @@ public:
 
         std::swap(lhs.storage, rhs.storage);
         std::swap(lhs.instance, rhs.instance);
-        std::swap(lhs.destroy, rhs.destroy);
+        std::swap(lhs.destroy_fn, rhs.destroy_fn);
         std::swap(lhs.node, rhs.node);
-        std::swap(lhs.comparator, rhs.comparator);
-        std::swap(lhs.copy, rhs.copy);
+        std::swap(lhs.compare_fn, rhs.compare_fn);
+        std::swap(lhs.copy_fn, rhs.copy_fn);
 
         if(lhs.instance == &rhs.storage) {
             lhs.instance = &lhs.storage;
@@ -586,10 +603,10 @@ public:
 private:
     storage_type storage;
     void *instance;
-    destroy_fn_type destroy;
     internal::meta_type_node *node;
-    compare_fn_type comparator;
-    copy_fn_type copy;
+    destroy_fn_type destroy_fn;
+    compare_fn_type compare_fn;
+    copy_fn_type copy_fn;
 };
 
 
