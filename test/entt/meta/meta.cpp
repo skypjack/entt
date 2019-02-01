@@ -367,15 +367,13 @@ TEST_F(Meta, MetaAnyNoSBOMoveAssignment) {
 
 TEST_F(Meta, MetaAnySBODestruction) {
     ASSERT_EQ(empty_type::counter, 0);
-    entt::meta_any any{empty_type{}};
-    any = {};
+    { entt::meta_any any{empty_type{}}; }
     ASSERT_EQ(empty_type::counter, 1);
 }
 
 TEST_F(Meta, MetaAnyNoSBODestruction) {
     ASSERT_EQ(fat_type::counter, 0);
-    entt::meta_any any{fat_type{}};
-    any = {};
+    { entt::meta_any any{fat_type{}}; }
     ASSERT_EQ(fat_type::counter, 1);
 }
 
@@ -414,6 +412,37 @@ TEST_F(Meta, MetaAnySBOWithNoSBOSwap) {
     ASSERT_TRUE(rhs.can_cast<fat_type>());
     ASSERT_EQ(rhs.cast<fat_type>().foo, &value);
     ASSERT_EQ(rhs.cast<fat_type>().bar, &value);
+}
+
+TEST_F(Meta, MetaAnySBOWithEmptySwap) {
+    entt::meta_any lhs{'c'};
+    entt::meta_any rhs{};
+
+    std::swap(lhs, rhs);
+
+    ASSERT_FALSE(lhs);
+    ASSERT_TRUE(rhs.can_cast<char>());
+    ASSERT_EQ(rhs.cast<char>(), 'c');
+
+    std::swap(lhs, rhs);
+
+    ASSERT_FALSE(rhs);
+    ASSERT_TRUE(lhs.can_cast<char>());
+    ASSERT_EQ(lhs.cast<char>(), 'c');
+}
+
+TEST_F(Meta, MetaAnyNoSBOWithEmptySwap) {
+    int i;
+    entt::meta_any lhs{fat_type{&i}};
+    entt::meta_any rhs{};
+
+    std::swap(lhs, rhs);
+
+    ASSERT_EQ(rhs.cast<fat_type>().bar, &i);
+
+    std::swap(lhs, rhs);
+
+    ASSERT_EQ(lhs.cast<fat_type>().bar, &i);
 }
 
 TEST_F(Meta, MetaAnyComparable) {
@@ -1283,13 +1312,11 @@ TEST_F(Meta, MetaTypeConstructMetaAnyArgs) {
     ASSERT_EQ(any.cast<derived_type>().c, 'c');
 }
 
-
 TEST_F(Meta, MetaTypeConstructInvalidArgs) {
     auto type = entt::resolve<derived_type>();
     auto any = type.construct(entt::meta_any{base_type{}}, entt::meta_any{'c'}, entt::meta_any{42});
     ASSERT_FALSE(any);
 }
-
 
 TEST_F(Meta, MetaTypeConstructCastAndConvert) {
     auto type = entt::resolve<derived_type>();
@@ -1300,7 +1327,6 @@ TEST_F(Meta, MetaTypeConstructCastAndConvert) {
     ASSERT_EQ(any.cast<derived_type>().i, 42);
     ASSERT_EQ(any.cast<derived_type>().c, 'c');
 }
-
 
 TEST_F(Meta, MetaTypeDestroyDtor) {
     auto type = entt::resolve<empty_type>();

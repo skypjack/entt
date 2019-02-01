@@ -379,9 +379,7 @@ public:
         compare_fn = &compare<actual_type>;
 
         if constexpr(sizeof(actual_type) <= sizeof(void *)) {
-            new (&storage) actual_type{std::forward<Type>(type)};
-            instance = &storage;
-
+            instance = new (&storage) actual_type{std::forward<Type>(type)};
             destroy_fn = &destroy_storage<actual_type>;
             copy_fn = &copy_storage<actual_type>;
         } else {
@@ -440,7 +438,7 @@ public:
      * @return This meta any object.
      */
     meta_any & operator=(meta_any other) {
-        swap(*this, other);
+        swap(other, *this);
         return *this;
     }
 
@@ -550,7 +548,7 @@ public:
             auto any = std::as_const(*this).convert<Type>();
 
             if(any) {
-                std::swap(*this, any);
+                std::swap(any, *this);
                 valid = true;
             }
         }
@@ -584,20 +582,28 @@ public:
     friend void swap(meta_any &lhs, meta_any &rhs) {
         using std::swap;
 
-        std::swap(lhs.storage, rhs.storage);
-        std::swap(lhs.instance, rhs.instance);
-        std::swap(lhs.destroy_fn, rhs.destroy_fn);
+        if(lhs && rhs) {
+            storage_type buffer;
+            void *tmp = lhs.copy_fn(buffer, lhs.instance);
+            lhs.destroy_fn(lhs.storage);
+            lhs.instance = rhs.copy_fn(lhs.storage, rhs.instance);
+            rhs.destroy_fn(rhs.storage);
+            rhs.instance = lhs.copy_fn(rhs.storage, tmp);
+            lhs.destroy_fn(buffer);
+        } else if(lhs) {
+            rhs.instance = lhs.copy_fn(rhs.storage, lhs.instance);
+            lhs.destroy_fn(lhs.storage);
+            lhs.instance = nullptr;
+        } else if(rhs) {
+            lhs.instance = rhs.copy_fn(lhs.storage, rhs.instance);
+            rhs.destroy_fn(rhs.storage);
+            rhs.instance = nullptr;
+        }
+
         std::swap(lhs.node, rhs.node);
+        std::swap(lhs.destroy_fn, rhs.destroy_fn);
         std::swap(lhs.compare_fn, rhs.compare_fn);
         std::swap(lhs.copy_fn, rhs.copy_fn);
-
-        if(lhs.instance == &rhs.storage) {
-            lhs.instance = &lhs.storage;
-        }
-
-        if(rhs.instance == &lhs.storage) {
-            rhs.instance = &rhs.storage;
-        }
     }
 
 private:
