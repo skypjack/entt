@@ -25,18 +25,19 @@
     * [Dependency function](#dependency-function)
     * [Labels](#labels)
   * [Null entity](#null-entity)
-* [Views: pay for what you use](#views-pay-for-what-you-use)
-  * [Standard View](#standard-view)
-    * [Single component standard view](#single-component-standard-view)
-    * [Multi component standard view](#multi-component-standard-view)
-  * [Persistent View](#persistent-view)
-  * [Runtime View](#runtime-view)
+* [Views and Groups](#views-and-groups)
+  * [Views](#views)
+  * [Runtime views](#runtime-views)
+  * [Groups](#groups)
+    * [Full-owning groups](#full-owning-groups)
+    * [Partial-owning groups](#partial-owning-groups)
+    * [Non-owning groups](#non-owning-groups)
   * [Types: const, non-const and all in between](#types-const-non-const-and-all-in-between)
   * [Give me everything](#give-me-everything)
-* [Iterations: what is allowed and what is not](#iterations-what-is-allowed-and-what-is-not)
+  * [What is allowed and what is not](#what-is-allowed-and-what-is-not)
 * [Empty type optimization](#empty-type-optimization)
 * [Multithreading](#multithreading)
-  * [Views and Iterators](#views-and-iterators)
+  * [Iterators](#iterators)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -73,10 +74,13 @@ what they want.
 
 When it comes to using an entity-component system, the tradeoff is usually
 between performance and memory usage. The faster it is, the more memory it uses.
-However, slightly worse performance along non-critical paths are the right price
-to pay to reduce memory usage and I've always wondered why this kind of tools do
-not leave me the choice.<br/>
-`EnTT` follows a completely different approach. It squeezes the best from the
+Even worse, some approaches tend to heavily affect other functionalities like
+the construction and destruction of components to favor iterations, even when it
+isn't strictly required. In fact, slightly worse performance along non-critical
+paths are the right price to pay to reduce memory usage and have overall better
+perfomance sometimes and I've always wondered why this kind of tools do not
+leave me the choice.<br/>
+`EnTT` follows a completely different approach. It gets the best out from the
 basic data structures and gives users the possibility to pay more for higher
 performance where needed.<br/>
 The disadvantage of this approach is that users need to know the systems they
@@ -88,7 +92,7 @@ many others besides me.
 
 # Vademecum
 
-The registry to store, the views to iterate. That's all.
+The registry to store, the views and the groups to iterate. That's all.
 
 An entity (the _E_ of an _ECS_) is an opaque identifier that users should just
 use as-is and store around if needed. Do not try to inspect an entity
@@ -104,9 +108,9 @@ and move assignable. They are list initialized by using the parameters provided
 to construct the component itself. No need to register components or their types
 neither with the registry nor with the entity-component system at all.<br/>
 Systems (the _S_ of an _ECS_) are just plain functions, functors, lambdas or
-whatever users want. They can accept a `registry` or a view of any type and use
-them the way they prefer. No need to register systems or their types neither
-with the registry nor with the entity-component system at all.
+whatever users want. They can accept a `registry`, a view or a group of any type
+and use them the way they prefer. No need to register systems or their types
+neither with the registry nor with the entity-component system at all.
 
 The following sections will explain in short how to use the entity-component
 system, the core part of the whole library.<br/>
@@ -115,8 +119,8 @@ describe below. For more details, please refer to the inline documentation.
 
 # The Registry, the Entity and the Component
 
-A registry can store and manage entities, as well as create views to iterate the
-underlying data structures.<br/>
+A registry can store and manage entities, as well as create views and groups to
+iterate the underlying data structures.<br/>
 The class template `registry` lets users decide what's the preferred type to
 represent an entity. Because `std::uint32_t` is large enough for almost all the
 cases, `registry` is also an _alias_ for `registry<std::uint32_t>`.
@@ -799,176 +803,88 @@ const auto entity = registry.create();
 const bool null = (entity == entt::null);
 ```
 
-# Views: pay for what you use
+# Views and Groups
 
-First of all, it is worth answering an obvious question: why views?<br/>
-Roughly speaking, they are a good tool to enforce single responsibility. A
-system that has access to a registry can create and destroy entities, as well as
-assign and remove components. On the other side, a system that has access to a
-view can only iterate entities and their components, then read or update the
+First of all, it is worth answering an obvious question: why views and
+groups?<br/>
+Briefly, they are a good tool to enforce single responsibility. A system that
+has access to a registry can create and destroy entities, as well as assign and
+remove components. On the other side, a system that has access to a view or a
+group can only iterate entities and their components, then read or update the
 data members of the latter.<br/>
 It is a subtle difference that can help designing a better software sometimes.
 
-There are mainly three kinds of views: standard (also known as `view`),
-persistent (also known as `persistent_view`), and runtime (also known as
-`runtime_view`).<br/>
-All of them have pros and cons to take in consideration. In particular:
+More in details, views are a non-intrusive tool to access entities and
+components without affecting other functionalities or increasing the memory
+consumption. On the other side, groups are an intrusive tool that allows to
+reach higher performance along critical paths but has also a price to pay for
+that.
 
-* Standard views:
+There are mainly two kinds of views: _compile-time_ (also known as `view`) and
+runtime (also known as `runtime_view`).<br/>
+The former require that users indicate at compile-time what are the components
+involved and can make several optimizations because of that. The latter can be
+constructed at runtime instead and are a bit slower to iterate entities and
+components.<br/>
+In both cases, creating and destroying a view isn't expensive at all because
+views don't have any type of initialization. Moreover, views don't affect any
+other functionality of the registry and keep memory usage at a minimum.
 
-  Pros:
+Groups come in three different flavors: _full-owning groups_, _partial-owning
+groups_ and _non-owning groups_. The main difference between them is in terms of
+performance.<br/>
+Groups can literally _own_ one or more types of components. It means that they
+will be allowed to rearrange pools so as to speed up iterations. Roughly
+speaking: the more components a group owns, the faster it is to iterate them.
+On the other side, a given component can belong only to one group, so users have
+to define groups carefully to get the best out of them.
 
-  * They work out-of-the-box and don't require any dedicated data structure.
-  * Creating and destroying them isn't expensive at all because they don't have
-    any type of initialization.
-  * They are the best tool for iterating a single component.
-  * They are the best tool for iterating multiple components when one of them is
-    assigned to a significantly low number of entities.
-  * They don't affect any other operations of the registry.
-
-  Cons:
-
-  * Their performance tend to degenerate when the number of components to
-    iterate grows up and the most of the entities have all of them.
-
-* Persistent views:
-
-  Pros:
-
-  * Once prepared, creating and destroying them isn't expensive at all because
-    they don't have any type of initialization.
-  * They are the best tool for iterating multiple components when most entities
-    have them all.
-  * They are also the only type of views that supports filters without incurring
-    in a loss of performance during iterations.
-
-  Cons:
-
-  * They have dedicated data structures and thus affect the memory usage to a
-    minimal extent.
-  * If not previously initialized, the first time they are used they go through
-    an initialization step that is slightly more expensive.
-  * They affect to a minimum the creation and destruction of entities and
-    components, as well as the sort functionalities. In other terms: the more
-    persistent views there will be, the less performing will be creating and
-    destroying entities and components or sorting a pool.
-
-* Runtime views:
-
-  Pros:
-
-  * Their lists of components are defined at runtime and not at compile-time.
-  * Creating and destroying them isn't expensive at all because they don't have
-    any type of initialization.
-  * They are the best tool for things like plugin systems and mods in general.
-  * They don't affect any other operations of the registry.
-
-  Cons:
-
-  * Their performances are definitely lower than those of all the other views,
-    although they are still usable and sufficient for most of the purposes.
-
-To sum up and as a rule of thumb:
-
-* Use a standard view to iterate entities and components for a single type.
-* Use a standard view to iterate entities and components for multiple types when
-  a significantly low number of entities have one of the components, persistent
-  views won't add much in this case.
-* Use a standard view in all those cases where a persistent view would give a
-  boost to performance but the iteration isn't performed frequently or isn't on
-  a critical path.
-* Use a persistent view when you want to iterate multiple components and each
-  component is assigned to a great number of entities but the intersection
-  between the sets of entities is small.
-* Use a persistent view when you want to set more complex filters that would
-  translate otherwise in a bunch of `if`s within a loop.
-* Use a persistent view in all the cases where a standard view doesn't fit well.
-* Finally, in case you don't know at compile-time what are the components to
-  use, choose a runtime view and set them during execution.
-
-To easily iterate entities and components, all the views offer the common
-`begin` and `end` member functions that allow users to use a view in a typical
-range-for loop. Almost all the views offer also a *more functional* `each`
-member function that accepts a callback for convenience.<br/>
 Continue reading for more details or refer to the inline documentation.
 
-## Standard View
+## Views
 
-A standard view behaves differently if it's constructed for a single component
-or if it has been requested to iterate multiple components. Even the API is
-different in the two cases.<br/>
-All that they share is the way they are created by means of a registry:
+A view behaves differently if it's constructed for a single component or if it
+has been created to iterate multiple components. Even the API is slightly
+different in the two cases.
 
-```cpp
-// single component standard view
-auto single = registry.view<position>();
-
-// multi component standard view
-auto multi = registry.view<position, velocity>();
-```
-
-For all that remains, it's worth discussing them separately.<br/>
-
-### Single component standard view
-
-Single component standard views are specialized in order to give a boost in
-terms of performance in all the situation. This kind of views can access the
-underlying data structures directly and avoid superfluous checks.<br/>
-They offer a bunch of functionalities to get the number of entities they are
-going to return and a raw access to the entity list as well as to the component
-list. It's also possible to ask a view if it contains a given entity.<br/>
+Single component views are specialized in order to give a boost in terms of
+performance in all the situations. This kind of views can access the underlying
+data structures directly and avoid superfluous checks. There is nothing as fast
+as a single component view. In fact, they walk through a packed array of
+components and return them one at a time.<br/>
+Single component views offer a bunch of functionalities to get the number of
+entities they are going to return and a raw access to the entity list as well as
+to the component list. It's also possible to ask a view if it contains a
+given entity.<br/>
 Refer to the inline documentation for all the details.
 
-There is no need to store views around for they are extremely cheap to
-construct, even though they can be copied without problems and reused freely. In
-fact, they return newly created and correctly initialized iterators whenever
-`begin` or `end` are invoked.<br/>
-To iterate a single component standard view, either use it in a range-for loop:
-
-```cpp
-auto view = registry.view<renderable>();
-
-for(auto entity: view) {
-    renderable &renderable = view.get(entity);
-
-    // ...
-}
-```
-
-Or rely on the `each` member function to iterate entities and get all their
-components at once:
-
-```cpp
-registry.view<renderable>().each([](auto entity, auto &renderable) {
-    // ...
-});
-```
-
-The `each` member function is highly optimized. Unless users want to iterate
-only entities, using `each` should be the preferred approach.
-
-**Note**: prefer the `get` member function of a view instead of the `get` member
-function template of a registry during iterations, if possible. However, keep in
-mind that it works only with the components of the view itself.
-
-### Multi component standard view
-
-Multi component standard views iterate entities that have at least all the given
+Multi component views iterate entities that have at least all the given
 components in their bags. During construction, these views look at the number of
 entities available for each component and pick up a reference to the smallest
 set of candidates in order to speed up iterations.<br/>
 They offer fewer functionalities than their companion views for single
-component. In particular, a multi component standard view exposes utility
-functions to get the estimated number of entities it is going to return and to
-know whether it's empty or not. It's also possible to ask a view if it contains
-a given entity.<br/>
+component. In particular, a multi component view exposes utility functions to
+get the estimated number of entities it is going to return and to know whether
+it's empty or not. It's also possible to ask a view if it contains a given
+entity.<br/>
 Refer to the inline documentation for all the details.
 
 There is no need to store views around for they are extremely cheap to
-construct, even though they can be copied without problems and reused freely. In
-fact, they return newly created and correctly initialized iterators whenever
-`begin` or `end` are invoked.<br/>
-To iterate a multi component standard view, either use it in a range-for loop:
+construct, even though they can be copied without problems and reused freely.
+Views also return newly created and correctly initialized iterators whenever
+`begin` or `end` are invoked.
+
+Views share the way they are created by means of a registry:
+
+```cpp
+// single component view
+auto single = registry.view<position>();
+
+// multi component view
+auto multi = registry.view<position, velocity>();
+```
+
+To iterate a view, either use it in a range-for loop:
 
 ```cpp
 auto view = registry.view<position, velocity>();
@@ -995,101 +911,26 @@ registry.view<position, velocity>().each([](auto entity, auto &pos, auto &vel) {
 ```
 
 The `each` member function is highly optimized. Unless users want to iterate
-only entities or get only some of the components, using `each` should be the
-preferred approach.
+only entities or get only some of the components, this should be the preferred
+approach. Note that the entity can also be excluded from the parameter list if
+not required, but this won't improve performance for multi component views.
 
 **Note**: prefer the `get` member function of a view instead of the `get` member
 function template of a registry during iterations, if possible. However, keep in
 mind that it works only with the components of the view itself.
 
-## Persistent View
-
-A persistent view returns all the entities and only the entities that have at
-least the given components and respect the given filters. Moreover, it's
-guaranteed that the entity list is tightly packed in memory for fast
-iterations.<br/>
-In general, persistent views don't stay true to the order of any set of
-components unless users explicitly sort them.
-
-Persistent views are used mainly to iterate multiple components at once:
-
-```cpp
-auto view = registry.persistent_view<position, velocity>();
-```
-
-Filtering entities by components is also supported:
-
-```cpp
-auto view = registry.persistent_view<position, velocity>(entt::exclude<renderable>);
-```
-
-In this case, the view will return all the entities that have both components
-`position` and `velocity` but don't have component `renderable`.<br/>
-Exclusive filters (ie the entities that have either `position` or `velocity`)
-aren't directly supported for performance reasons. Similarly, a filter cannot be
-applied to a persistent view with an empty template parameters list.
-
-There is no need to store views around for they are extremely cheap to
-construct, even though they can be copied without problems and reused freely. In
-fact, they return newly created and correctly initialized iterators whenever
-`begin` or `end` are invoked.<br/>
-That being said, persistent views perform an initialization step the very first
-time they are constructed and this could be quite costly. To avoid it, consider
-creating them when no components have been assigned yet. If the registry is
-empty, preparation is extremely fast.
-
-A persistent view offers a bunch of functionalities to get the number of
-entities it's going to return, a raw access to the entity list and the
-possibility to sort the underlying data structures according to the order of one
-of the components for which it has been constructed. It's also possible to ask a
-view if it contains a given entity.<br/>
-Refer to the inline documentation for all the details.
-
-To iterate a persistent view, either use it in a range-for loop:
-
-```cpp
-auto view = registry.persistent_view<position, velocity>();
-
-for(auto entity: view) {
-    // a component at a time ...
-    auto &position = view.get<position>(entity);
-    auto &velocity = view.get<velocity>(entity);
-
-    // ... or multiple components at once
-    auto &[pos, vel] = view.get<position, velocity>(entity);
-
-    // ...
-}
-```
-
-Or rely on the `each` member function to iterate entities and get all their
-components at once:
-
-```cpp
-registry.persistent_view<position, velocity>().each([](auto entity, auto &pos, auto &vel) {
-    // ...
-});
-```
-
-The `each` member function is highly optimized. Unless users want to iterate
-only entities, using `each` should be the preferred approach.
-
-**Note**: prefer the `get` member function of a view instead of the `get` member
-function template of a registry during iterations, if possible. However, keep in
-mind that it works only with the components of the view itself.
-
-## Runtime View
+## Runtime views
 
 Runtime views iterate entities that have at least all the given components in
 their bags. During construction, these views look at the number of entities
 available for each component and pick up a reference to the smallest
 set of candidates in order to speed up iterations.<br/>
-They offer more or less the same functionalities of a multi component standard
-view. However, they don't expose a `get` member function and users should refer
-to the registry that generated the view to access components. In particular, a
-runtime view exposes utility functions to get the estimated number of entities
-it is going to return and to know whether it's empty or not. It's also possible
-to ask a view if it contains a given entity.<br/>
+They offer more or less the same functionalities of a multi component view.
+However, they don't expose a `get` member function and users should refer to the
+registry that generated the view to access components. In particular, a runtime
+view exposes utility functions to get the estimated number of entities it is
+going to return and to know whether it's empty or not. It's also possible to ask
+a runtime view if it contains a given entity.<br/>
 Refer to the inline documentation for all the details.
 
 Runtime view are extremely cheap to construct and should not be stored around in
@@ -1134,15 +975,172 @@ well suited to plugin systems and mods in general. Where possible, don't use
 runtime views, as their performance are slightly inferior to those of the other
 views.
 
+## Groups
+
+Groups are meant to iterate multiple components at once and offer a faster
+alternative to views. Roughly speaking, they just play in another league when
+compared to views.<br/>
+Groups overcome the performance of the other tools available but require to get
+the ownership of components and this sets some constraints on pools. On the
+other side, groups aren't an automatism that increases memory consumption,
+affects functionalities and tries to optimize iterations for all the possible
+combinations of components. Users can decide when to pay for groups and to what
+extent.<br/>
+The most interesting aspect of groups is that they fit _usage patterns_. Other
+solutions around usually try to optimize everything, because it is known that
+somewhere within the _everything_ there are also our usage patterns. However
+this has a cost that isn't negligible, both in terms of performance and memory
+usage. Ironically, users pay the price also for things they don't want and this
+isn't something I like much. Even worse, you cannot easily disable such a
+behavior. Groups work differently instead and are designed to optimize only the
+real use cases when users find they need to.<br/>
+Another nice-to-have feature of groups is that they have no impact on memory
+consumption, put aside full non-owning groups that are pretty rare and should be
+avoided as long as possible.
+
+All groups affect to an extent the creation and destruction of their components.
+This is due to the fact that they must _observe_ changes in the pools of
+interest and arrange data _correctly_ when needed for the types they own.<br/>
+That being said, the way groups operate is beyond the scope of this document.
+However, it's unlikely that users will be able to appreciate the impact of
+groups on other functionalities of the registry.
+
+Groups offer a bunch of functionalities to get the number of entities they are
+going to return and a raw access to the entity list as well as to the component
+list for owned components. It's also possible to ask a group if it contains a
+given entity.<br/>
+Refer to the inline documentation for all the details.
+
+There is no need to store groups around for they are extremely cheap to
+construct, even though they can be copied without problems and reused freely.
+A group performs an initialization step the very first time it's requested and
+this could be quite costly. To avoid it, consider creating the group when no
+components have been assigned yet. If the registry is empty, preparation is
+extremely fast. Groups also return newly created and correctly initialized
+iterators whenever `begin` or `end` are invoked.
+
+To iterate groups, either use them in a range-for loop:
+
+```cpp
+auto group = registry.group<position>(entt::get<velocity>);
+
+for(auto entity: group) {
+    // a component at a time ...
+    auto &position = group.get<position>(entity);
+    auto &velocity = group.get<velocity>(entity);
+
+    // ... or multiple components at once
+    auto &[pos, vel] = group.get<position, velocity>(entity);
+
+    // ...
+}
+```
+
+Or rely on the `each` member function to iterate entities and get all their
+components at once:
+
+```cpp
+registry.registry.group<position>(entt::get<velocity>).each([](auto entity, auto &pos, auto &vel) {
+    // ...
+});
+```
+
+The `each` member function is highly optimized. Unless users want to iterate
+only entities, this should be the preferred approach. Note that the entity can
+also be excluded from the parameter list if not required and it can improve even
+further the performance during iterations.
+
+**Note**: prefer the `get` member function of a group instead of the `get`
+member function template of a registry during iterations, if possible. However,
+keep in mind that it works only with the components of the group itself.
+
+Let's go a bit deeper into the different types of groups made available by this
+library to know how they are constructed and what are the differences between
+them.
+
+### Full-owning groups
+
+A full-owning group is the fastest tool an user can expect to use to iterate
+multiple components at once. It iterates all the components directly, no
+indirection required. This type of groups performs more or less as if users are
+accessing sequentially a bunch of packed arrays of components all sorted
+identically.
+
+A full-owning group is created as:
+
+```cpp
+auto group = registry.group<position, velocity>();
+```
+
+Filtering entities by components is also supported:
+
+```cpp
+auto group = registry.group<position, velocity>(entt::exclude<renderable>);
+```
+
+Once created, the group gets the ownership of all the components specified in
+the template parameter list and arranges their pools so as to iterate all of
+them as fast as possible.<br/>
+Sorting owned components is no longer allowed once the group has been created.
+
+### Partial-owning groups
+
+A partial-owning group works similarly to a full-owning group for the components
+it owns, but relies on indirection to get components owned by other groups. This
+isn't as fast as a full-owning group, but it's already much faster than views
+when there are only one or two free components to retrieve (the most common
+cases likely). In the worst case, it's not slower than views anyway.
+
+A partial-owning group is created as:
+
+```cpp
+auto group = registry.group<position>(entt::get<velocity>);
+```
+
+Filtering entities by components is also supported:
+
+```cpp
+auto group = registry.group<position>(entt::get<velocity>, entt::exclude<renderable>);
+```
+
+Once created, the group gets the ownership of all the components specified in
+the template parameter list and arranges their pools so as to iterate all of
+them as fast as possible. The ownership of the types provided via `entt::get`
+doesn't pass to the group instead.<br/>
+Sorting owned components is no longer allowed once the group has been created.
+
+### Non-owning groups
+
+Non-owning groups are usually fast enough, for sure faster than views and well
+suited for most of the cases. However, they require custom data structures to
+work properly and they increase memory consumption. As a rule of thumb, users
+should avoid using non-owning groups, if possible.
+
+A non-owning group is created as:
+
+```cpp
+auto group = registry.group<>(entt::get<position, velocity>);
+```
+
+Filtering entities by components is also supported:
+
+```cpp
+auto group = registry.group<>(entt::get<position, velocity>, entt::exclude<renderable>);
+```
+
+The group doesn't receive the ownership of any type of component in this case.
+This has a positive implication, that is, the fact that non-owning groups can be
+sorted by means of the `sort` member function, if required.
+
 # Types: const, non-const and all in between
 
-The `registry` class offers two overloads for most of the member functions used
-to construct views: a const version and a non-const one. The former accepts both
-const and non-const types as template parameters, the latter accepts only const
-types instead.<br/>
-It means that views can be constructed also from a const registry and they
-require to propagate the constness of the registry to the types used to
-construct the views themselves:
+The `registry` class offers two overloads when it comes to constructing views
+and groups: a const version and a non-const one. The former accepts both const
+and non-const types as template parameters, the latter accepts only const types
+instead.<br/>
+It means that views and groups can be constructed also from a const registry and
+they propagate the constness of the registry to the types involved. As an
+example:
 
 ```cpp
 entt::view<const position, const velocity> view = std::as_const(registry).view<const position, const velocity>();
@@ -1189,10 +1187,12 @@ Obviously, a caller can still refer to the `position` components through a const
 reference because of the rules of the language that fortunately already allow
 it.
 
+The same concepts apply to groups as well.
+
 ## Give me everything
 
-Views are narrow windows on the entire list of entities. They work by filtering
-entities according to their components.<br/>
+Views and groups are narrow windows on the entire list of entities. They work by
+filtering entities according to their components.<br/>
 In some cases there may be the need to iterate all the entities still in use
 regardless of their components. The registry offers a specific member function
 to do that:
@@ -1205,9 +1205,9 @@ registry.each([](auto entity) {
 
 It returns to the caller all the entities that are still in use by means of the
 given function.<br/>
-As a rule of thumb, consider using a view if the goal is to iterate entities
-that have a determinate set of components. A view is usually much faster than
-combining this function with a bunch of custom tests.<br/>
+As a rule of thumb, consider using a view or a group if the goal is to iterate
+entities that have a determinate set of components. These tools are usually much
+faster than combining this function with a bunch of custom tests.<br/>
 In all the other cases, this is the way to go.
 
 There exists also another member function to use to retrieve orphans. An orphan
@@ -1229,7 +1229,7 @@ In general, all these functions can result in poor performance.<br/>
 entity. For similar reasons, `orphans` can be even slower. Both functions should
 not be used frequently to avoid the risk of a performance hit.
 
-# Iterations: what is allowed and what is not
+## What is allowed and what is not
 
 Most of the _ECS_ available out there have some annoying limitations (at least
 from my point of view): entities and components cannot be created nor destroyed
@@ -1237,13 +1237,12 @@ during iterations.<br/>
 `EnTT` partially solves the problem with a few limitations:
 
 * Creating entities and components is allowed during iterations.
-* Deleting an entity or removing its components is allowed during iterations if
-  it's the one currently returned by the view. For all the other entities,
-  destroying them or removing their components isn't allowed and it can result
-  in undefined behavior.
+* Deleting the current entity or removing its components is allowed during
+  iterations. For all the other entities, destroying them or removing their
+  components isn't allowed and can result in undefined behavior.
 
 Iterators are invalidated and the behavior is undefined if an entity is modified
-or destroyed and it's not the one currently returned by the view nor a newly
+or destroyed and it's not the one currently returned by the iterator nor a newly
 created one.<br/>
 To work around it, possible approaches are:
 
@@ -1285,10 +1284,10 @@ offered by the library aren't affected, but for the `raw` member function.
 In general, the entire registry isn't thread safe as it is. Thread safety isn't
 something that users should want out of the box for several reasons. Just to
 mention one of them: performance.<br/>
-Views and consequently the approach adopted by `EnTT` are the great exception to
-the rule. It's true that views and thus their iterators aren't thread safe by
-themselves. Because of this users shouldn't try to iterate a set of components
-and modify the same set concurrently. However:
+Views, groups and consequently the approach adopted by `EnTT` are the great
+exception to the rule. It's true that views, groups and iterators in general
+aren't thread safe by themselves. Because of this users shouldn't try to iterate
+a set of components and modify the same set concurrently. However:
 
 * As long as a thread iterates the entities that have the component `X` or
   assign and removes that component from a set of entities, another thread can
@@ -1314,17 +1313,18 @@ are completely responsible for synchronization whether required. On the other
 hand, they could get away with it without having to resort to particular
 expedients.
 
-## Views and Iterators
+## Iterators
 
-A special mention is needed for the iterators returned by the views. Most of the
-time they meet the requirements of **random access iterators**, in all cases
-they meet at least the requirements of **forward iterators**.<br/>
+A special mention is needed for the iterators returned by the views and the
+groups. Most of the time they meet the requirements of **random access
+iterators**, in all cases they meet at least the requirements of **forward
+iterators**.<br/>
 In other terms, they are suitable for use with the **parallel algorithms** of
 the standard library. If it's not clear, this is a great thing.
 
 As an example, this kind of iterators can be used in combination with
 `std::for_each` and `std::execution::par` to parallelize the visit and therefore
-the update of the components returned by a view, as long as the constraints
-previously discussed are respected.<br/>
+the update of the components returned by a view or a group, as long as the
+constraints previously discussed are respected.<br/>
 This can increase the throughput considerably, even without resorting to who
 knows what artifacts that are difficult to maintain over time.

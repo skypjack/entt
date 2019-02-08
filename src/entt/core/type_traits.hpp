@@ -34,14 +34,6 @@ constexpr auto type_list_cat(type_list<Type...>, type_list<Other...>, List...) {
 }
 
 
-/**
- * @brief Variable template for exclusion lists.
- * @tparam Type List of types.
- */
-template<typename... Type>
-constexpr type_list<Type...> exclude{};
-
-
 }
 
 

@@ -187,7 +187,7 @@ public:
      *
      * @param cap Desired capacity.
      */
-    void reserve(const size_type cap) {
+    virtual void reserve(const size_type cap) {
         direct.reserve(cap);
     }
 
@@ -441,7 +441,7 @@ public:
      *
      * @param other The sparse sets that imposes the order of the entities.
      */
-    void respect(const sparse_set &other) ENTT_NOEXCEPT {
+    virtual void respect(const sparse_set &other) ENTT_NOEXCEPT {
         const auto to = other.end();
         auto from = other.begin();
 
@@ -747,7 +747,7 @@ public:
      *
      * @param cap Desired capacity.
      */
-    void reserve(const size_type cap) {
+    void reserve(const size_type cap) override {
         underlying_type::reserve(cap);
 
         if constexpr(!std::is_empty_v<object_type>) {
@@ -1043,7 +1043,7 @@ public:
      *
      * @param other The sparse sets that imposes the order of the entities.
      */
-    void respect(const sparse_set<Entity> &other) ENTT_NOEXCEPT {
+    void respect(const sparse_set<Entity> &other) ENTT_NOEXCEPT override {
         if constexpr(std::is_empty_v<object_type>) {
             underlying_type::respect(other);
         } else {

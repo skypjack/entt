@@ -23,9 +23,8 @@
 * allow to replace std:: with custom implementations
 * allow curried function and lambdas on sigh/dispatcher (mixed approach with sinks that accept also delegates?)
 * allow user to use also uint32 for hashed strings type if possible
-
-Ready to go:
-* policy based views
-* preferred approach (hints): registry.view<A, B, C>(exclude<D>, policy<A, B>)?
-* previous model used for persistent views as default view, query as old fashioned views
-* is it enough to store a view as <direct set, length>?
+* allow to sort groups (::respect can already work with begin/end instead of a whole sparse set)
+* views' iterators should return a tuple entity+components, not only entities
+* delegate/sigh "benign" UB: memcpy to work around the fact that types don't pop in existence when the storage is copied (even if all the compilers allow it)
+  see https://stackoverflow.com/questions/54512451/about-aligned-storage-and-trivially-copyable-destructible-types/54518339?noredirect=1
+  see https://stackoverflow.com/questions/54531009/copy-trivially-copyable-types-using-temporary-storage-areas-is-it-allowed

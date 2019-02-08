@@ -8,6 +8,7 @@
 #include "entity/actor.hpp"
 #include "entity/entity.hpp"
 #include "entity/entt_traits.hpp"
+#include "entity/group.hpp"
 #include "entity/helper.hpp"
 #include "entity/prototype.hpp"
 #include "entity/registry.hpp"

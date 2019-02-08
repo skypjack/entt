@@ -70,6 +70,7 @@ SETUP_AND_ADD_TEST(utility entt/core/utility.cpp)
 
 SETUP_AND_ADD_TEST(actor entt/entity/actor.cpp)
 SETUP_AND_ADD_TEST(entity entt/entity/entity.cpp)
+SETUP_AND_ADD_TEST(group entt/entity/group.cpp)
 SETUP_AND_ADD_TEST(helper entt/entity/helper.cpp)
 SETUP_AND_ADD_TEST(prototype entt/entity/prototype.cpp)
 SETUP_AND_ADD_TEST(registry entt/entity/registry.cpp)

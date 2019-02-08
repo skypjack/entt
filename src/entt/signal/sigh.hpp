@@ -135,6 +135,14 @@ class sink<Ret(Args...)> {
 
 public:
     /**
+     * @brief Returns false if at least a listener is connected to the sink.
+     * @return True if the sink has no listeners connected, false otherwise.
+     */
+    bool empty() const ENTT_NOEXCEPT {
+        return calls->empty();
+    }
+
+    /**
      * @brief Connects a free function to a signal.
      *
      * The signal handler performs checks to avoid multiple connections for free

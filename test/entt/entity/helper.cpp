@@ -10,10 +10,19 @@ TEST(Helper, AsView) {
     const entt::registry<> cregistry;
 
     ([](entt::view<entity_type, int, char>) {})(entt::as_view{registry});
+    ([](entt::view<entity_type, const int, char>) {})(entt::as_view{registry});
     ([](entt::view<entity_type, const double>) {})(entt::as_view{cregistry});
+}
 
-    ([](entt::persistent_view<entity_type, int, char>) {})(entt::as_view{registry});
-    ([](entt::persistent_view<entity_type, const double, const float>) {})(entt::as_view{cregistry});
+TEST(Helper, AsGroup) {
+    using entity_type = typename entt::registry<>::entity_type;
+
+    entt::registry<> registry;
+    const entt::registry<> cregistry;
+
+    ([](entt::group<entity_type, entt::get_t<>, double, float>) {})(entt::as_group{registry});
+    ([](entt::group<entity_type, entt::get_t<>, const double, float>) {})(entt::as_group{registry});
+    ([](entt::group<entity_type, entt::get_t<>, const double, const float>) {})(entt::as_group{cregistry});
 }
 
 TEST(Helper, Dependency) {
