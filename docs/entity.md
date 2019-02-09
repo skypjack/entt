@@ -1040,7 +1040,7 @@ Or rely on the `each` member function to iterate entities and get all their
 components at once:
 
 ```cpp
-registry.registry.group<position>(entt::get<velocity>).each([](auto entity, auto &pos, auto &vel) {
+registry.group<position>(entt::get<velocity>).each([](auto entity, auto &pos, auto &vel) {
     // ...
 });
 ```
