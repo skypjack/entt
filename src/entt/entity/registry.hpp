@@ -85,7 +85,7 @@ class registry {
     template<auto Has, auto Accept, typename... Owned>
     static void induce_if(registry &reg, const Entity entity) {
         if((reg.*Has)(entity) && (reg.*Accept)(entity)) {
-            const auto curr = reg.descriptors[handler_family::type<Owned...>]->last++;
+            const auto curr = reg.groups[group_family::type<Owned...>]->last++;
             (std::swap(reg.pool<Owned>().get(entity), reg.pool<Owned>().raw()[curr]), ...);
             (reg.pool<Owned>().swap(reg.pools[reg.type<Owned>()]->get(entity), curr), ...);
         }
@@ -94,10 +94,10 @@ class registry {
     template<typename... Owned>
     static void discard_if(registry &reg, const Entity entity) {
         const auto ctype = type<std::tuple_element_t<0, std::tuple<Owned...>>>();
-        const auto dtype = handler_family::type<Owned...>;
+        const auto gtype = group_family::type<Owned...>;
 
-        if(reg.pools[ctype]->has(entity) && reg.pools[ctype]->get(entity) < reg.descriptors[dtype]->last) {
-            const auto curr = --reg.descriptors[dtype]->last;
+        if(reg.pools[ctype]->has(entity) && reg.pools[ctype]->get(entity) < reg.groups[gtype]->last) {
+            const auto curr = --reg.groups[gtype]->last;
             (std::swap(reg.pool<Owned>().get(entity), reg.pool<Owned>().raw()[curr]), ...);
             (reg.pool<Owned>().swap(reg.pools[reg.type<Owned>()]->get(entity), curr), ...);
         }
@@ -1148,7 +1148,7 @@ public:
      */
     template<typename Component>
     bool owned() const ENTT_NOEXCEPT {
-        return std::any_of(descriptors.cbegin(), descriptors.cend(), [](const auto &descriptor) {
+        return std::any_of(groups.cbegin(), groups.cend(), [](const auto &descriptor) {
             return descriptor && descriptor->contains(type<Component>());
         });
     }
@@ -1215,15 +1215,15 @@ public:
 
             return { handlers[htype].get(), &pool<Get>()... };
         } else {
-            const auto dtype = handler_family::type<Owned...>;
+            const auto gtype = group_family::type<Owned...>;
 
-            if(!(dtype < descriptors.size())) {
-                descriptors.resize(dtype + 1);
+            if(!(gtype < groups.size())) {
+                groups.resize(gtype + 1);
             }
 
-            if(!descriptors[dtype]) {
+            if(!groups[gtype]) {
                 assert((!owned<Owned>() && ...));
-                descriptors[dtype] = std::make_unique<descriptor<Owned...>>();
+                groups[gtype] = std::make_unique<descriptor<Owned...>>();
 
                 (sighs[type<Owned>()].construction.sink().template connect<&induce_if<&registry::has<Owned..., Get...>, &registry::accept<0, Exclude...>, Owned...>>(), ...);
                 (sighs[type<Get>()].construction.sink().template connect<&induce_if<&registry::has<Owned..., Get...>, &registry::accept<0, Exclude...>, Owned...>>(), ...);
@@ -1243,7 +1243,7 @@ public:
                 });
             }
 
-            return { &descriptors[dtype]->last, &pool<Owned>()..., &pool<Get>()... };
+            return { &groups[gtype]->last, &pool<Owned>()..., &pool<Get>()... };
         }
     }
 
@@ -1422,8 +1422,8 @@ public:
     }
 
 private:
+    std::vector<std::unique_ptr<basic_descriptor>> groups;
     std::vector<std::unique_ptr<sparse_set<Entity>>> handlers;
-    std::vector<std::unique_ptr<basic_descriptor>> descriptors;
     mutable std::vector<std::unique_ptr<sparse_set<Entity>>> pools;
     mutable std::vector<signals> sighs;
     std::vector<entity_type> entities;
