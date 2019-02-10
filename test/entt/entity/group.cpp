@@ -373,6 +373,14 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
     entt::registry<> registry;
     auto group = registry.group<>(entt::get<int, const char>);
 
+    ASSERT_EQ(group.size(), decltype(group.size()){0});
+
+    const auto entity = registry.create();
+    registry.assign<int>(entity, 0);
+    registry.assign<char>(entity, 'c');
+
+    ASSERT_EQ(group.size(), decltype(group.size()){1});
+
     ASSERT_TRUE((std::is_same_v<decltype(group.get<int>(0)), int &>));
     ASSERT_TRUE((std::is_same_v<decltype(group.get<const int>(0)), const int &>));
     ASSERT_TRUE((std::is_same_v<decltype(group.get<const char>(0)), const char &>));
@@ -388,6 +396,16 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
 TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     entt::registry<> registry;
     auto group = registry.group<int, const char>(entt::get<double, const float>);
+
+    ASSERT_EQ(group.size(), decltype(group.size()){0});
+
+    const auto entity = registry.create();
+    registry.assign<int>(entity, 0);
+    registry.assign<char>(entity, 'c');
+    registry.assign<double>(entity, 0.);
+    registry.assign<float>(entity, 0.f);
+
+    ASSERT_EQ(group.size(), decltype(group.size()){1});
 
     ASSERT_TRUE((std::is_same_v<decltype(group.get<int>(0)), int &>));
     ASSERT_TRUE((std::is_same_v<decltype(group.get<const int>(0)), const int &>));

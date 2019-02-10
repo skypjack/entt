@@ -130,6 +130,14 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     auto view = registry.view<int>();
     auto cview = registry.view<const int>();
 
+    ASSERT_EQ(view.size(), decltype(view.size()){0});
+    ASSERT_EQ(cview.size(), decltype(cview.size()){0});
+
+    registry.assign<int>(registry.create(), 0);
+
+    ASSERT_EQ(view.size(), decltype(view.size()){1});
+    ASSERT_EQ(cview.size(), decltype(cview.size()){1});
+
     ASSERT_TRUE((std::is_same_v<typename decltype(view)::raw_type, int>));
     ASSERT_TRUE((std::is_same_v<typename decltype(cview)::raw_type, const int>));
 
@@ -342,6 +350,14 @@ TEST(MultipleComponentView, EachWithHoles) {
 TEST(MultipleComponentView, ConstNonConstAndAllInBetween) {
     entt::registry<> registry;
     auto view = registry.view<int, const char>();
+
+    ASSERT_EQ(view.size(), decltype(view.size()){0});
+
+    const auto entity = registry.create();
+    registry.assign<int>(entity, 0);
+    registry.assign<char>(entity, 'c');
+
+    ASSERT_EQ(view.size(), decltype(view.size()){1});
 
     ASSERT_TRUE((std::is_same_v<decltype(view.get<int>(0)), int &>));
     ASSERT_TRUE((std::is_same_v<decltype(view.get<const int>(0)), const int &>));
