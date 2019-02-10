@@ -73,10 +73,12 @@ TEST(SigH, Clear) {
     entt::sigh<void(int &)> sigh;
     sigh.sink().connect<&sigh_listener::f>();
 
+    ASSERT_FALSE(sigh.sink().empty());
     ASSERT_FALSE(sigh.empty());
 
     sigh.sink().disconnect();
 
+    ASSERT_TRUE(sigh.sink().empty());
     ASSERT_TRUE(sigh.empty());
 }
 
@@ -86,10 +88,16 @@ TEST(SigH, Swap) {
 
     sigh1.sink().connect<&sigh_listener::f>();
 
+    ASSERT_FALSE(sigh1.sink().empty());
+    ASSERT_TRUE(sigh2.sink().empty());
+
     ASSERT_FALSE(sigh1.empty());
     ASSERT_TRUE(sigh2.empty());
 
     std::swap(sigh1, sigh2);
+
+    ASSERT_TRUE(sigh1.sink().empty());
+    ASSERT_FALSE(sigh2.sink().empty());
 
     ASSERT_TRUE(sigh1.empty());
     ASSERT_FALSE(sigh2.empty());
