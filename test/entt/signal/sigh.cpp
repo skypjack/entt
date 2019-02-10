@@ -30,7 +30,7 @@ struct test_collect_all {
 template<>
 struct test_collect_all<void> {
     std::vector<int> vec{};
-    static void h() {}
+    static void h(const void *) {}
     bool operator()() noexcept {
         return true;
     }
@@ -39,7 +39,7 @@ struct test_collect_all<void> {
 template<typename Ret>
 struct test_collect_first {
     std::vector<Ret> vec{};
-    static int f() { return 42; }
+    static int f(const void *) { return 42; }
     bool operator()(Ret r) noexcept {
         vec.push_back(r);
         return false;
@@ -151,8 +151,9 @@ TEST(SigH, Members) {
 
 TEST(SigH, Collector) {
     entt::sigh<void(), test_collect_all<void>> sigh_void;
+    const void *fake_instance = nullptr;
 
-    sigh_void.sink().connect<&test_collect_all<void>::h>();
+    sigh_void.sink().connect<&test_collect_all<void>::h>(fake_instance);
     auto collector_void = sigh_void.collect();
 
     ASSERT_FALSE(sigh_void.empty());
@@ -173,8 +174,8 @@ TEST(SigH, Collector) {
 
     entt::sigh<int(), test_collect_first<int>> sigh_first;
 
-    sigh_first.sink().connect<&test_collect_first<int>::f>();
-    sigh_first.sink().connect<&test_collect_first<int>::f>();
+    sigh_first.sink().connect<&test_collect_first<int>::f>(fake_instance);
+    sigh_first.sink().connect<&test_collect_first<int>::f>(fake_instance);
     auto collector_first = sigh_first.collect();
 
     ASSERT_FALSE(sigh_first.empty());

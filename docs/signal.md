@@ -6,9 +6,8 @@
 # Table of Contents
 
 * [Introduction](#introduction)
-* [Signals](#signals)
 * [Delegate](#delegate)
-  * [Currying and free functions](#currying-and-free-functions)
+* [Signals](#signals)
 * [Event dispatcher](#event-dispatcher)
 * [Event emitter](#event-emitter)
 <!--
@@ -32,6 +31,102 @@ from time to time.
 In case that the flexibility and potential of an `std::function` are not
 required or where you are looking for something different, `EnTT` offers a full
 set of classes to solve completely different problems.
+
+# Delegate
+
+A delegate can be used as a general purpose invoker with no memory overhead for
+free functions and members provided along with an instance on which to invoke
+them.<br/>
+It does not claim to be a drop-in replacement for an `std::function`, so do not
+expect to use it whenever an `std::function` fits well. However, it can be used
+to send opaque delegates around to be used to invoke functions as needed.
+
+The interface is trivial. It offers a default constructor to create empty
+delegates:
+
+```cpp
+entt::delegate<int(int)> delegate{};
+```
+
+All what is needed to create an instance is to specify the type of the function
+the delegate will _contain_, that is the signature of the free function or the
+member function one wants to assign to it.
+
+Attempting to use an empty delegate by invoking its function call operator
+results in undefined behavior or most likely a crash. Before to use a delegate,
+it must be initialized.<br/>
+There exists a bunch of overloads of the `connect` member function to do that.
+As an example of use:
+
+```cpp
+int f(int i) { return i; }
+
+struct my_struct {
+    int f(const int &i) { return i }
+};
+
+// bind a free function to the delegate
+delegate.connect<&f>();
+
+// bind a member function to the delegate
+my_struct instance;
+delegate.connect<&my_struct::f>(&instance);
+```
+
+The delegate class accepts also data members, if needed. In this case, the
+function type of the delegate is such that the parameter list is empty and the
+value of the data member is at least convertible to the return type.<br/>
+Functions having type equivalent to `void(T *, args...)` are accepted as well.
+In this case, `T *` is considered a payload and the function will receive it
+back every time it's invoked. In other terms, this works just fine with the
+above definition:
+
+```cpp
+void g(const char *c, int i) { /* ... */ }
+const char c = 'c';
+
+delegate.connect<&g>(&c);
+delegate(42);
+```
+
+The function `g` will be invoked with a pointer to `c` and `42`. However, the
+function type of the delegate is still `void(int)`, mainly because this is also
+the signature of its function call operator.
+
+To create and initialize a delegate at once, there are also some specialized
+constructors. Because of the rules of the language, the listener is provided by
+means of the `entt::connect_arg` variable template:
+
+```cpp
+entt::delegate<int(int)> func{entt::connect_arg<&f>};
+```
+
+Aside `connect`, a `disconnect` counterpart isn't provided. Instead, there
+exists a `reset` member function to use to clear a delegate.<br/>
+To know if a delegate is empty, it can be used explicitly in every conditional
+statement:
+
+```cpp
+if(delegate) {
+    // ...
+}
+```
+
+Finally, to invoke a delegate, the function call operator is the way to go as
+usual:
+
+```cpp
+auto ret = delegate(42);
+```
+
+As shown above, listeners do not have to strictly follow the signature of the
+delegate. As long as a listener can be invoked with the given arguments to yield
+a result that is convertible to the given result type, everything works just
+fine.
+
+Probably too much small and pretty poor of functionalities, but the delegate
+class can help in a lot of cases and it has shown that it is worth keeping it
+within the library.
 
 # Signals
 
@@ -142,131 +237,6 @@ A collector must expose a function operator that accepts as an argument a type
 to which the return type of the listeners can be converted. Moreover, it has to
 return a boolean value that is false to stop collecting data, true otherwise.
 This way one can avoid calling all the listeners in case it isn't necessary.
-
-# Delegate
-
-A delegate can be used as general purpose invoker with no memory overhead for
-free functions, members provided along with an instance on which to invoke them,
-lambdas and functors in general.<br/>
-It does not claim to be a drop-in replacement for an `std::function`, so do not
-expect to use it whenever an `std::function` fits well. However, it can be used
-to send opaque delegates around to be used to invoke functions as needed.
-
-The interface is trivial. It offers a default constructor to create empty
-delegates:
-
-```cpp
-entt::delegate<int(int)> delegate{};
-```
-
-All what is needed to create an instance is to specify the type of the function
-the delegate will _contain_, that is the signature of the free function or the
-member function one wants to assign to it.
-
-Attempting to use an empty delegate by invoking its function call operator
-results in undefined behavior or most likely a crash. Before to use a delegate,
-it must be initialized.<br/>
-There exists a bunch of overloads of the `connect` member function to do that.
-As an example of use:
-
-```cpp
-int f(int i) { return i; }
-
-struct my_struct {
-    int f(const int &i) { return i }
-};
-
-// bind a free function to the delegate
-delegate.connect<&f>();
-
-// bind a member function to the delegate
-my_struct instance;
-delegate.connect<&my_struct::f>(&instance);
-```
-
-The delegate class accepts also data members if required. In this case, the
-function type of the delegate is such that the parameter list is empty and the
-value of the data member is at least convertible to the return type.<br/>
-Moreover, it can work with invokable objects in general (lambdas or functors),
-as long as they are trivially destructible and the size fits the one of
-`void *`. As an example, a lambda that captures a pointer or an integer value
-can be used with a delegate:
-
-```cpp
-delegate.connect([value = int_var](int i) { return value * i; });
-```
-
-To create and initialize a delegate at once, there are also some specialized
-constructors. Because of the rules of the language, the listener is provided by
-means of the `entt::connect_arg` class template:
-
-```cpp
-entt::delegate<int(int)> func{entt::connect_arg<&f>};
-```
-
-Aside `connect`, a `disconnect` counterpart isn't provided. Instead, there
-exists a `reset` member function to use to clear a delegate.<br/>
-To know if it's empty instead, the delegate can be used explicitly in every
-conditional statement:
-
-```cpp
-if(delegate) {
-    // ...
-}
-```
-
-Finally, to invoke a delegate, the function call operator is the way to go as
-usual:
-
-```cpp
-auto ret = delegate(42);
-```
-
-As shown above, listeners do not have to strictly follow the signature of the
-delegate. As long as a listener can be invoked with the given arguments to yield
-a result that is convertible to the given result type, everything works just
-fine.
-
-Probably too much small and pretty poor of functionalities, but the delegate
-class can help in a lot of cases and it has shown that it is worth keeping it
-within the library.
-
-## Currying and free functions
-
-The delegate class comes with a rather obscure feature to be considered as an
-_advanced mode_, that is its limited support for curried free functions.
-
-Consider the following definition:
-
-```cpp
-entt::delegate<void(int)> delegate{};
-```
-
-As shown previously, it accepts functions having type `void(int)`. However, we
-can do something more in this case, because of how the delegate class is
-implemented internally (that is something that goes beyond the purposes of this
-document).<br/>
-In particular, the delegate accepts also functions having type equivalent to
-`void(T &, int)`, as long as `sizeof(T)` is lower than or equal to
-`sizeof(void *)`. The first parameter is stored directly by the delegate class
-and passed to the connected function when needed.
-
-In other terms, this works as well with the above definition:
-
-```cpp
-void g(char c, int i) { /* ... */ }
-
-delegate.connect<&g>('c');
-delegate(42);
-```
-
-In this case, the function `g` is invoked with parameters `'c'` and `42`.
-However, the function type of the delegate is still `void(int)`, mainly because
-this is also the signature of its function call operator.<br/>
-When the curried function receives the linked parameter by reference, it can
-modify it and the new value will be stored in place of the previous one. It's
-highly discouraged to accept the parameter by reference, unless you know exactly
-what you're doing. Prefer accepting it by value if possible.
 
 # Event dispatcher
 

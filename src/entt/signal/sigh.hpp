@@ -129,6 +129,9 @@ class sink<Ret(Args...)> {
     template<typename, typename>
     friend struct sigh;
 
+    template<typename Type>
+    Type * payload_type(Ret(*)(Type *, Args...));
+
     sink(std::vector<delegate<Ret(Args...)>> *calls) ENTT_NOEXCEPT
         : calls{calls}
     {}
@@ -159,23 +162,31 @@ public:
     }
 
     /**
-     * @brief Connects a member function to a signal.
+     * @brief Connects a member function or a free function with payload to a
+     * signal.
      *
-     * The signal isn't responsible for the connected object. Users must
-     * guarantee that the lifetime of the instance overcomes the one of the
-     * delegate. On the other side, the signal handler performs checks to avoid
-     * multiple connections for the same member function of a given instance.
+     * The signal isn't responsible for the connected object or the payload.
+     * Users must always guarantee that the lifetime of the instance overcomes
+     * the one  of the delegate. On the other side, the signal handler performs
+     * checks to avoid multiple connections for the same function.<br/>
+     * When used to connect a free function with payload, its signature must be
+     * such that the instance is the first argument before the ones used to
+     * define the delegate itself.
      *
-     * @tparam Member Member function to connect to the signal.
-     * @tparam Class Type of class to which the member function belongs.
-     * @param instance A valid instance of type pointer to `Class`.
+     * @tparam Candidate Member or free function to connect to the delegate.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid pointer that fits the purpose.
      */
-    template<auto Member, typename Class>
-    void connect(Class *instance) {
-        static_assert(std::is_member_function_pointer_v<decltype(Member)>);
-        disconnect<Member>(instance);
+    template<auto Candidate, typename Type>
+    void connect(Type *value_or_instance) {
+        if constexpr(std::is_member_function_pointer_v<decltype(Candidate)>) {
+            disconnect<Candidate>(value_or_instance);
+        } else {
+            disconnect<Candidate>();
+        }
+
         delegate<Ret(Args...)> delegate{};
-        delegate.template connect<Member>(instance);
+        delegate.template connect<Candidate>(value_or_instance);
         calls->emplace_back(std::move(delegate));
     }
 
@@ -186,12 +197,19 @@ public:
     template<auto Function>
     void disconnect() {
         delegate<Ret(Args...)> delegate{};
-        delegate.template connect<Function>();
+
+        if constexpr(std::is_invocable_r_v<Ret, decltype(Function), Args...>) {
+            delegate.template connect<Function>();
+        } else {
+            decltype(payload_type(Function)) payload = nullptr;
+            delegate.template connect<Function>(payload);
+        }
+
         calls->erase(std::remove(calls->begin(), calls->end(), std::move(delegate)), calls->end());
     }
 
     /**
-     * @brief Disconnects the given member function from a signal.
+     * @brief Disconnects a given member function from a signal.
      * @tparam Member Member function to disconnect from the signal.
      * @tparam Class Type of class to which the member function belongs.
      * @param instance A valid instance of type pointer to `Class`.
