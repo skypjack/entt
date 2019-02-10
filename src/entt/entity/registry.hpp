@@ -59,7 +59,6 @@ constexpr exclude_t<Type...> exclude{};
 template<typename Entity = std::uint32_t>
 class registry {
     using component_family = family<struct internal_registry_component_family>;
-    using handler_family = family<struct internal_registry_handler_family>;
     using group_family = family<struct internal_registry_group_family>;
     using signal_type = sigh<void(registry &, const Entity)>;
     using traits_type = entt_traits<Entity>;
@@ -71,53 +70,61 @@ class registry {
 
     struct basic_descriptor {
         virtual ~basic_descriptor() = default;
-        virtual bool contains(typename component_family::family_type) = 0;
-        typename sparse_set<Entity>::size_type last;
+        virtual bool owns(typename component_family::family_type) = 0;
     };
 
-    template<typename... Owned>
-    struct descriptor: basic_descriptor {
-        bool contains(typename component_family::family_type ctype) override {
+    template<typename...>
+    struct descriptor;
+
+    template<typename... Owned, typename... Get, typename... Exclude>
+    struct descriptor<exclude_t<Exclude...>, get_t<Get...>, Owned...>: basic_descriptor {
+        typename sparse_set<Entity>::size_type data;
+
+        template<auto Accepted>
+        void induce_if(registry &reg, const Entity entity) {
+            if(reg.has<Owned..., Get...>(entity) && (0 + ... + reg.has<Exclude>(entity)) == Accepted) {
+                const auto curr = data++;
+                (std::swap(reg.pool<Owned>().get(entity), reg.pool<Owned>().raw()[curr]), ...);
+                (reg.pool<Owned>().swap(reg.pools[reg.type<Owned>()]->get(entity), curr), ...);
+            }
+        }
+
+        void discard_if(registry &reg, const Entity entity) {
+            const auto ctype = type<std::tuple_element_t<0, std::tuple<Owned...>>>();
+
+            if(reg.pools[ctype]->has(entity) && reg.pools[ctype]->get(entity) < data) {
+                const auto curr = --data;
+                (std::swap(reg.pool<Owned>().get(entity), reg.pool<Owned>().raw()[curr]), ...);
+                (reg.pool<Owned>().swap(reg.pools[reg.type<Owned>()]->get(entity), curr), ...);
+            }
+        }
+
+        bool owns(typename component_family::family_type ctype) override {
             return ((ctype == type<Owned>()) || ...);
         }
     };
 
-    template<auto Has, auto Accept, typename... Owned>
-    static void induce_if(registry &reg, const Entity entity) {
-        if((reg.*Has)(entity) && (reg.*Accept)(entity)) {
-            const auto curr = reg.groups[group_family::type<Owned...>]->last++;
-            (std::swap(reg.pool<Owned>().get(entity), reg.pool<Owned>().raw()[curr]), ...);
-            (reg.pool<Owned>().swap(reg.pools[reg.type<Owned>()]->get(entity), curr), ...);
+    template<typename... Get, typename... Exclude>
+    struct descriptor<exclude_t<Exclude...>, get_t<Get...>>: basic_descriptor {
+        sparse_set<Entity> data;
+
+        template<auto Accepted>
+        void construct_if(registry &reg, const Entity entity) {
+            if(reg.has<Get...>(entity) && (0 + ... + reg.has<Exclude>(entity)) == Accepted) {
+                data.construct(entity);
+            }
         }
-    }
 
-    template<typename... Owned>
-    static void discard_if(registry &reg, const Entity entity) {
-        const auto ctype = type<std::tuple_element_t<0, std::tuple<Owned...>>>();
-        const auto gtype = group_family::type<Owned...>;
-
-        if(reg.pools[ctype]->has(entity) && reg.pools[ctype]->get(entity) < reg.groups[gtype]->last) {
-            const auto curr = --reg.groups[gtype]->last;
-            (std::swap(reg.pool<Owned>().get(entity), reg.pool<Owned>().raw()[curr]), ...);
-            (reg.pool<Owned>().swap(reg.pools[reg.type<Owned>()]->get(entity), curr), ...);
+        void destroy_if(registry &, const Entity entity) {
+            if(data.has(entity)) {
+                data.destroy(entity);
+            }
         }
-    }
 
-    template<auto Has, auto Accept, typename Type>
-    static void construct_if(registry &reg, const Entity entity) {
-        if((reg.*Has)(entity) && (reg.*Accept)(entity)) {
-            reg.handlers[handler_family::type<Type>]->construct(entity);
+        bool owns(typename component_family::family_type) override {
+            return false;
         }
-    }
-
-    template<typename Type>
-    static void destroy_if(registry &reg, const Entity entity) {
-        auto &handler = reg.handlers[handler_family::type<Type>];
-
-        if(handler->has(entity)) {
-            handler->destroy(entity);
-        }
-    }
+    };
 
     template<typename Component>
     inline const auto & pool() const ENTT_NOEXCEPT {
@@ -147,13 +154,6 @@ class registry {
     template<typename Component>
     inline auto & assure() {
         return const_cast<sparse_set<Entity, std::decay_t<Component>> &>(std::as_const(*this).template assure<Component>());
-    }
-
-    template<auto Auth, typename... Component>
-    bool accept(const Entity entity) const ENTT_NOEXCEPT {
-        assert(valid(entity));
-        // internal function, pools are guaranteed to exist
-        return (0 + ... + pool<Component>().has(entity)) == Auth;
     }
 
 public:
@@ -1148,8 +1148,8 @@ public:
      */
     template<typename Component>
     bool owned() const ENTT_NOEXCEPT {
-        return std::any_of(groups.cbegin(), groups.cend(), [](const auto &descriptor) {
-            return descriptor && descriptor->contains(type<Component>());
+        return std::any_of(groups.cbegin(), groups.cend(), [](const auto &curr) {
+            return curr && curr->owns(type<Component>());
         });
     }
 
@@ -1185,66 +1185,52 @@ public:
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1);
         static_assert(sizeof...(Owned) + sizeof...(Get));
 
+        using descriptor_type = descriptor<exclude_t<std::decay_t<Exclude>...>, get_t<std::decay_t<Get>...>, std::decay_t<Owned>...>;
+        const auto gtype = group_family::type<exclude_t<std::decay_t<Exclude>...>, get_t<std::decay_t<Get>...>, std::decay_t<Owned>...>;
+
         (assure<Owned>(), ...);
         (assure<Get>(), ...);
         (assure<Exclude>(), ...);
 
-        if constexpr(sizeof...(Owned) == 0) {
-            using handler_type = type_list<Get..., type_list<Exclude...>>;
-            const auto htype = handler_family::type<handler_type>;
+        if(!(gtype < groups.size())) {
+            groups.resize(gtype + 1);
+        }
 
-            if(!(htype < handlers.size())) {
-                handlers.resize(htype + 1);
-            }
+        if(!groups[gtype]) {
+            assert((!owned<Owned>() && ...));
+            groups[gtype] = std::make_unique<descriptor_type>();
+            auto *curr = static_cast<descriptor_type *>(groups[gtype].get());
 
-            if(!handlers[htype]) {
-                handlers[htype] = std::make_unique<sparse_set<entity_type>>();
-                auto *direct = handlers[htype].get();
-
-                ((sighs[type<Get>()].destruction.sink().template connect<&registry::destroy_if<handler_type>>()), ...);
-                ((sighs[type<Get>()].construction.sink().template connect<&construct_if<&registry::has<Get...>, &registry::accept<0, Exclude...>, handler_type>>()), ...);
-                ((sighs[type<Exclude>()].destruction.sink().template connect<&construct_if<&registry::has<Get...>, &registry::accept<1, Exclude...>, handler_type>>()), ...);
-                ((sighs[type<Exclude>()].construction.sink().template connect<&registry::destroy_if<handler_type>>()), ...);
+            if constexpr(sizeof...(Owned) == 0) {
+                ((sighs[type<Get>()].destruction.sink().template connect<&descriptor_type::destroy_if>(curr)), ...);
+                ((sighs[type<Get>()].construction.sink().template connect<&descriptor_type::template construct_if<0>>(curr)), ...);
+                ((sighs[type<Exclude>()].destruction.sink().template connect<&descriptor_type::template construct_if<1>>(curr)), ...);
+                ((sighs[type<Exclude>()].construction.sink().template connect<&descriptor_type::destroy_if>(curr)), ...);
 
                 for(const auto entity: view<Get...>()) {
-                    if(accept<0, Exclude...>(entity)) {
-                        direct->construct(entity);
-                    }
+                    curr->template construct_if<0>(*this, entity);
                 }
-            }
+            } else {
+                (sighs[type<Owned>()].construction.sink().template connect<&descriptor_type::template induce_if<0>>(curr), ...);
+                (sighs[type<Get>()].construction.sink().template connect<&descriptor_type::template induce_if<0>>(curr), ...);
 
-            return { handlers[htype].get(), &pool<Get>()... };
-        } else {
-            const auto gtype = group_family::type<Owned...>;
+                (sighs[type<Owned>()].destruction.sink().template connect<&descriptor_type::discard_if>(curr), ...);
+                (sighs[type<Get>()].destruction.sink().template connect<&descriptor_type::discard_if>(curr), ...);
 
-            if(!(gtype < groups.size())) {
-                groups.resize(gtype + 1);
-            }
-
-            if(!groups[gtype]) {
-                assert((!owned<Owned>() && ...));
-                groups[gtype] = std::make_unique<descriptor<Owned...>>();
-
-                (sighs[type<Owned>()].construction.sink().template connect<&induce_if<&registry::has<Owned..., Get...>, &registry::accept<0, Exclude...>, Owned...>>(), ...);
-                (sighs[type<Get>()].construction.sink().template connect<&induce_if<&registry::has<Owned..., Get...>, &registry::accept<0, Exclude...>, Owned...>>(), ...);
-
-                (sighs[type<Owned>()].destruction.sink().template connect<&discard_if<Owned...>>(), ...);
-                (sighs[type<Get>()].destruction.sink().template connect<&discard_if<Owned...>>(), ...);
-
-                (sighs[type<Exclude>()].destruction.sink().template connect<&induce_if<&registry::has<Owned..., Get...>, &registry::accept<1, Exclude...>, Owned...>>(), ...);
-                (sighs[type<Exclude>()].construction.sink().template connect<&discard_if<Owned...>>(), ...);
+                (sighs[type<Exclude>()].destruction.sink().template connect<&descriptor_type::template induce_if<1>>(curr), ...);
+                (sighs[type<Exclude>()].construction.sink().template connect<&descriptor_type::discard_if>(curr), ...);
 
                 const auto *cpool = std::min({ pools[type<Owned>()].get()... }, [](const auto *lhs, const auto *rhs) {
                     return lhs->size() < rhs->size();
                 });
 
-                std::for_each(cpool->data(), cpool->data() + cpool->size(), [this](const auto entity) {
-                    induce_if<&registry::has<Owned..., Get...>, &registry::accept<0, Exclude...>, Owned...>(*this, entity);
+                std::for_each(cpool->data(), cpool->data() + cpool->size(), [curr, this](const auto entity) {
+                    curr->template induce_if<0>(*this, entity);
                 });
             }
-
-            return { &groups[gtype]->last, &pool<Owned>()..., &pool<Get>()... };
         }
+
+        return { &static_cast<descriptor_type &>(*groups[gtype]).data, &pool<Owned>()..., &pool<Get>()... };
     }
 
     /*! @copydoc group */
@@ -1423,7 +1409,6 @@ public:
 
 private:
     std::vector<std::unique_ptr<basic_descriptor>> groups;
-    std::vector<std::unique_ptr<sparse_set<Entity>>> handlers;
     mutable std::vector<std::unique_ptr<sparse_set<Entity>>> pools;
     mutable std::vector<signals> sighs;
     std::vector<entity_type> entities;

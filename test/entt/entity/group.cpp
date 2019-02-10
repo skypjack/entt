@@ -222,7 +222,7 @@ TEST(OwningGroup, Empty) {
         FAIL();
     }
 
-    for(auto entity: registry.group<char, int>(entt::get<double, float>)) {
+    for(auto entity: registry.group<double, float>(entt::get<char, int>)) {
         (void)entity;
         FAIL();
     }
