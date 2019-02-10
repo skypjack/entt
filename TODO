@@ -6,7 +6,6 @@
 * define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
 * runner proposal: https://en.wikipedia.org/wiki/Fork%E2%80%93join_model https://slide-rs.github.io/specs/03_dispatcher.html
-* is it possible to iterate all the components assigned to an entity through a common base class?
 * work stealing job system (see #100)
 * can we do more for shared libraries? who knows... see #144
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
@@ -14,7 +13,6 @@
 * hashed string: add implicit check on construction for uniqueness (optional)
 * destroy overload that accepts a couple of iterators (see create)
 * allow for built-in parallel each if possible
-* mention hunter in the readme file, section packaging tools
 * travis + windows is now available, try it
 * events on replace, so that one can track updated components? indagate impact
 * tags revenge: if it's possible, reintroduce them but without a link to entities (see #169 for more details)
@@ -23,9 +21,3 @@
 * allow to replace std:: with custom implementations
 * allow user to use also uint32 for hashed strings type if possible
 * allow to sort groups (::respect can already work with begin/end instead of a whole sparse set)
-...
-* delegate/sigh "benign" UB: memcpy to work around the fact that types don't pop in existence when the storage is copied (even if all the compilers allow it)
-  see https://stackoverflow.com/questions/54512451/about-aligned-storage-and-trivially-copyable-destructible-types/54518339?noredirect=1
-  see https://stackoverflow.com/questions/54531009/copy-trivially-copyable-types-using-temporary-storage-areas-is-it-allowed
-* allow curried function and lambdas on sigh/dispatcher (mixed approach with sinks that accept also delegates?)
-* remove group/handler family, use "extended signals" and track the pointer instead (required to fully support shared libraries)
