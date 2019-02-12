@@ -947,6 +947,26 @@ public:
     }
 
     /**
+     * @brief Swaps two pools of components of same structure.
+     *
+     * Useful for when having write/read component types of the same structure
+     * and wanting to switch the read/write component as part of a double-buffer pattern.
+     * See http://gameprogrammingpatterns.com/double-buffer.html
+     * While double-buffering is often used for graphics writing/reading, it can also be useful
+     * for multi-threading game logic itself.
+     *
+     * @tparam C1 Type of first component to swap.
+     * @tparam C2 Type of second component to swap.
+     */
+    template<typename C1, typename C2>
+    void swap() {
+        const auto ctype1 = component_family::type<C1>;
+        const auto ctype2 = component_family::type<C2>;
+        pools[ctype1].swap(pools[ctype2]);
+    }
+
+
+    /**
      * @brief Resets the given component for an entity.
      *
      * If the entity has an instance of the component, this function removes the
