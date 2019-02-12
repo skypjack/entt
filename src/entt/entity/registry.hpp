@@ -679,7 +679,7 @@ public:
     template<typename Component>
     Component & get(const entity_type entity, Component &&component) ENTT_NOEXCEPT {
         assert(valid(entity));
-        auto &cpool = pool<Component>();
+        auto &cpool = assure<Component>();
         auto *comp = cpool.try_get(entity);
 
         if(!comp) {

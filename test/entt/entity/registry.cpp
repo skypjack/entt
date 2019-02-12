@@ -1108,3 +1108,12 @@ TEST(Registry, Clone) {
     ASSERT_EQ(listener.counter, 1);
     ASSERT_EQ(listener.last, e0);
 }
+
+TEST(Registry, GetOrAssign) {
+    entt::registry<> registry;
+    const auto entity = registry.create();
+    const auto value = registry.get<int>(entity, 3);
+    ASSERT_TRUE(registry.has<int>(entity));
+    ASSERT_EQ(registry.get<int>(entity), value);
+    ASSERT_EQ(registry.get<int>(entity), 3);
+}
