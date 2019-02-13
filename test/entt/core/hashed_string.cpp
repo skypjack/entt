@@ -21,8 +21,8 @@ TEST(HashedString, Functionalities) {
 
     entt::hashed_string hs{"foobar"};
 
-    ASSERT_EQ(static_cast<hash_type>(hs), 0x85944171f73967e8);
-    ASSERT_EQ(hs.value(), 0x85944171f73967e8);
+    ASSERT_EQ(static_cast<hash_type>(hs), 0xbf9cf968);
+    ASSERT_EQ(hs.value(), 0xbf9cf968);
 
     ASSERT_EQ(foo_hs, "foo"_hs);
     ASSERT_NE(bar_hs, "foo"_hs);
@@ -50,7 +50,7 @@ TEST(HashedString, ToValue) {
 
     const char *foobar = "foobar";
 
-    ASSERT_EQ(entt::hashed_string::to_value(foobar), 0x85944171f73967e8);
+    ASSERT_EQ(entt::hashed_string::to_value(foobar), 0xbf9cf968);
     // how would you test a constexpr otherwise?
     (void)std::integral_constant<hash_type, entt::hashed_string::to_value("quux")>{};
 }

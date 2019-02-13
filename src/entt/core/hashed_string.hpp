@@ -11,7 +11,43 @@ namespace entt {
 
 
 /**
- * @brief Zero overhead resource identifier.
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+template<typename>
+struct fnv1a_traits;
+
+
+template<>
+struct fnv1a_traits<std::uint32_t> {
+    static constexpr std::uint32_t offset = 2166136261;
+    static constexpr std::uint32_t prime = 16777619;
+};
+
+
+template<>
+struct fnv1a_traits<std::uint64_t> {
+    static constexpr std::uint64_t offset = 14695981039346656037ull;
+    static constexpr std::uint64_t prime = 1099511628211ull;
+};
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond TURN_OFF_DOXYGEN
+ */
+
+
+/**
+ * @brief Zero overhead unique identifier.
  *
  * A hashed string is a compile-time tool that allows users to use
  * human-readable identifers in the codebase while using their numeric
@@ -20,23 +56,22 @@ namespace entt {
  * required.
  */
 class hashed_string {
+    using traits_type = internal::fnv1a_traits<ENTT_HASH_TYPE>;
+
     struct const_wrapper {
         // non-explicit constructor on purpose
         constexpr const_wrapper(const char *str) ENTT_NOEXCEPT: str{str} {}
         const char *str;
     };
 
-    static constexpr std::uint64_t offset = 14695981039346656037ull;
-    static constexpr std::uint64_t prime = 1099511628211ull;
-
     // Fowler–Noll–Vo hash function v. 1a - the good
-    inline static constexpr std::uint64_t helper(std::uint64_t partial, const char *str) ENTT_NOEXCEPT {
-        return str[0] == 0 ? partial : helper((partial^str[0])*prime, str+1);
+    inline static constexpr ENTT_HASH_TYPE helper(ENTT_HASH_TYPE partial, const char *str) ENTT_NOEXCEPT {
+        return str[0] == 0 ? partial : helper((partial^str[0])*traits_type::prime, str+1);
     }
 
 public:
     /*! @brief Unsigned integer type. */
-    using hash_type = std::uint64_t;
+    using hash_type = ENTT_HASH_TYPE;
 
     /**
      * @brief Returns directly the numeric representation of a string.
@@ -55,7 +90,7 @@ public:
      */
     template<std::size_t N>
     inline static constexpr hash_type to_value(const char (&str)[N]) ENTT_NOEXCEPT {
-        return helper(offset, str);
+        return helper(traits_type::offset, str);
     }
 
     /**
@@ -64,7 +99,7 @@ public:
      * @return The numeric representation of the string.
      */
     inline static hash_type to_value(const_wrapper wrapper) ENTT_NOEXCEPT {
-        return helper(offset, wrapper.str);
+        return helper(traits_type::offset, wrapper.str);
     }
 
     /*! @brief Constructs an empty hashed string. */
@@ -88,7 +123,7 @@ public:
      */
     template<std::size_t N>
     constexpr hashed_string(const char (&str)[N]) ENTT_NOEXCEPT
-        : hash{helper(offset, str)}, str{str}
+        : hash{helper(traits_type::offset, str)}, str{str}
     {}
 
     /**
@@ -98,7 +133,7 @@ public:
      * @param wrapper Helps achieving the purpose by relying on overloading.
      */
     explicit constexpr hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
-        : hash{helper(offset, wrapper.str)}, str{wrapper.str}
+        : hash{helper(traits_type::offset, wrapper.str)}, str{wrapper.str}
     {}
 
     /**

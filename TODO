@@ -19,5 +19,4 @@
 * empty components model allows for shared components and prefabs unity-like
 * provide create with a pack of default constructible components to assign
 * allow to replace std:: with custom implementations
-* allow user to use also uint32 for hashed strings type if possible
 * allow to sort groups (::respect can already work with begin/end instead of a whole sparse set)
