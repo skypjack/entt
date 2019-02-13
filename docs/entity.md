@@ -1242,12 +1242,13 @@ during iterations.<br/>
   components isn't allowed and can result in undefined behavior.
 
 In these cases, iterators aren't invalidated. To be clear, it doesn't mean that
-also references will continue to be valid. Consider the following example:
+also references will continue to be valid.<br/>
+Consider the following example:
 
 ```cpp
 registry.view<position>([&](auto entity, auto &pos) {
     registry.assign<position>(registry.create(), 0., 0.);
-    position.x = 0.; // warning: dangling pointer
+    pos.x = 0.; // warning: dangling pointer
 });
 ```
 
