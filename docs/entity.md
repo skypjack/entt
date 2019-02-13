@@ -1178,7 +1178,7 @@ Similarly, the `each` member functions will propagate constness to the type of
 the components returned during iterations:
 
 ```cpp
-view.each([](const auto entity, position &pos, const velocity &vel) {
+view.each([](auto entity, position &pos, const velocity &vel) {
     // ...
 });
 ```
@@ -1241,9 +1241,24 @@ during iterations.<br/>
   iterations. For all the other entities, destroying them or removing their
   components isn't allowed and can result in undefined behavior.
 
-Iterators are invalidated and the behavior is undefined if an entity is modified
-or destroyed and it's not the one currently returned by the iterator nor a newly
-created one.<br/>
+In these cases, iterators aren't invalidated. To be clear, it doesn't mean that
+also references will continue to be valid. Consider the following example:
+
+```cpp
+registry.view<position>([&](auto entity, auto &pos) {
+    registry.assign<position>(registry.create(), 0., 0.);
+    position.x = 0.; // warning: dangling pointer
+});
+```
+
+The `each` member function won't break (because iterators aren't invalidated)
+but there are no guarantees on references. Use a common range-for loop and get
+components directly from the view or move the creation of components at the end
+of the function to avoid dangling pointers.
+
+Iterators are invalidated instead and the behavior is undefined if an entity is
+modified or destroyed and it's not the one currently returned by the iterator
+nor a newly created one.<br/>
 To work around it, possible approaches are:
 
 * Store aside the entities and the components to be removed and perform the
