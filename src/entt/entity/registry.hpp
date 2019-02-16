@@ -1319,7 +1319,7 @@ public:
         other.pools.resize(pools.size());
         other.sighs.resize(pools.size());
 
-        if(sizeof...(Component)) {
+        if constexpr(sizeof...(Component)) {
             static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
             ((other.pools[type<Component>()] = assure<Component>().clone()), ...);
             assert((other.pools[type<Component>()] && ...));
