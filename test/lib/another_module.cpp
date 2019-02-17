@@ -10,6 +10,11 @@
 #endif
 #endif
 
+ENTT_SHARED_TYPE(int);
+ENTT_SHARED_TYPE(char);
+ENTT_SHARED_TYPE(double);
+ENTT_SHARED_TYPE(float);
+
 LIB_EXPORT typename entt::registry<>::component_type another_module_int_type() {
     entt::registry<> registry;
 

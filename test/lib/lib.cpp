@@ -6,6 +6,9 @@ extern typename entt::registry<>::component_type a_module_char_type();
 extern typename entt::registry<>::component_type another_module_int_type();
 extern typename entt::registry<>::component_type another_module_char_type();
 
+ENTT_SHARED_TYPE(int);
+ENTT_SHARED_TYPE(char);
+
 TEST(Lib, Shared) {
     entt::registry<> registry;
 

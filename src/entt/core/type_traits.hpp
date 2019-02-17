@@ -44,13 +44,54 @@ struct shared_traits;
 
 
 /**
+ * @brief Specialization used to get rid of constness.
+ * @tparam Type Shared type.
+ */
+template<typename Type>
+struct shared_traits<const Type>
+        : shared_traits<Type>
+{};
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is
+ * shared. In all other cases, `value` is false.
+ */
+template<typename, typename = std::void_t<>>
+struct is_shared: std::false_type {};
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is
+ * shared. In all other cases, `value` is false.
+ * @tparam Type Potentially shared type.
+ */
+template<typename Type>
+struct is_shared<Type, std::void_t<typename shared_traits<std::decay_t<Type>>::type>>: std::true_type {};
+
+
+/**
+ * @brief Helper variable template.
+ *
+ * True if a given type is shared, false otherwise.
+ *
+ * @tparam Type Potentially shared type.
+ */
+template<class Type>
+constexpr auto is_shared_v = is_shared<Type>::value;
+
+
+}
+
+
+/**
  * @brief Makes an already existing type a shared type.
  * @param type Type to make shareable.
  */
 #define ENTT_SHARED_TYPE(type)\
     template<>\
-    struct shared_traits<type>\
-        : std::integral_constant<typename hashed_string::hash_type, hashed_string::to_value(#type)>\
+    struct entt::shared_traits<type>\
+        : std::integral_constant<typename entt::hashed_string::hash_type, entt::hashed_string::to_value(#type)>\
     {}
 
 
@@ -72,37 +113,6 @@ struct shared_traits;
     class clazz;\
     ENTT_SHARED_TYPE(clazz)\
     class clazz
-
-
-/**
- * @brief Provides the member constant `value` to true if a given type is
- * shared. In all other cases, `value` is false.
- */
-template<typename>
-struct is_shared: std::false_type {};
-
-
-/**
- * @brief Provides the member constant `value` to true if a given type is
- * shared. In all other cases, `value` is false.
- * @tparam Type Potentially shared type.
- */
-template<typename Type>
-struct is_shared<shared_traits<Type>>: std::true_type {};
-
-
-/**
- * @brief Helper variable template.
- *
- * True if a given type is shared, false otherwise.
- *
- * @tparam Type Potentially shared type.
- */
-template<class Type>
-constexpr auto is_shared_v = is_shared<Type>::value;
-
-
-}
 
 
 #endif // ENTT_CORE_TYPE_TRAITS_HPP
