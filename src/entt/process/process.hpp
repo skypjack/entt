@@ -83,9 +83,6 @@ class process {
     template<state value>
     using state_value_t = std::integral_constant<state, value>;
 
-    template<state value>
-    inline static state_value_t<value> state_value{};
-
     template<typename Target = Derived>
     auto tick(int, state_value_t<state::UNINITIALIZED>, void *data)
     -> decltype(std::declval<Target>().init(data)) {

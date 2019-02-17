@@ -56,7 +56,7 @@ struct fnv1a_traits<std::uint64_t> {
  * required.
  */
 class hashed_string {
-    using traits_type = internal::fnv1a_traits<ENTT_HASH_TYPE>;
+    using traits_type = internal::fnv1a_traits<ENTT_ID_TYPE>;
 
     struct const_wrapper {
         // non-explicit constructor on purpose
@@ -65,13 +65,13 @@ class hashed_string {
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    inline static constexpr ENTT_HASH_TYPE helper(ENTT_HASH_TYPE partial, const char *str) ENTT_NOEXCEPT {
+    inline static constexpr ENTT_ID_TYPE helper(ENTT_ID_TYPE partial, const char *str) ENTT_NOEXCEPT {
         return str[0] == 0 ? partial : helper((partial^str[0])*traits_type::prime, str+1);
     }
 
 public:
     /*! @brief Unsigned integer type. */
-    using hash_type = ENTT_HASH_TYPE;
+    using hash_type = ENTT_ID_TYPE;
 
     /**
      * @brief Returns directly the numeric representation of a string.

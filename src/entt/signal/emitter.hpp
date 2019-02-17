@@ -6,7 +6,6 @@
 #include <functional>
 #include <algorithm>
 #include <utility>
-#include <cstddef>
 #include <memory>
 #include <vector>
 #include <list>
@@ -117,7 +116,7 @@ class emitter {
 
     template<typename Event>
     event_handler<Event> & handler() ENTT_NOEXCEPT {
-        const std::size_t family = handler_family::type<Event>;
+        const auto family = handler_family::type<Event>;
 
         if(!(family < handlers.size())) {
             handlers.resize(family+1);
@@ -291,7 +290,7 @@ public:
      */
     template<typename Event>
     bool empty() const ENTT_NOEXCEPT {
-        const std::size_t family = handler_family::type<Event>;
+        const auto family = handler_family::type<Event>;
 
         return (!(family < handlers.size()) ||
                 !handlers[family] ||

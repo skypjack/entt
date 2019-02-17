@@ -54,7 +54,7 @@ struct connect_arg_t {};
 
 /*! @brief Constant of type connect_arg_t used to disambiguate calls. */
 template<auto Func>
-inline static connect_arg_t<Func> connect_arg{};
+constexpr connect_arg_t<Func> connect_arg{};
 
 
 /**

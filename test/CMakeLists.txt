@@ -5,12 +5,16 @@
 include_directories($<TARGET_PROPERTY:EnTT,INTERFACE_INCLUDE_DIRECTORIES>)
 add_compile_options($<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_OPTIONS>)
 
+macro(SETUP_LIBRARY_TARGET LIB_TARGET)
+    set_target_properties(${LIB_TARGET} PROPERTIES CXX_EXTENSIONS OFF)
+    target_compile_definitions(${LIB_TARGET} PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_DEFINITIONS>)
+    target_compile_features(${LIB_TARGET} PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_FEATURES>)
+    target_compile_options(${LIB_TARGET} PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -Wall>)
+    target_compile_options(${LIB_TARGET} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/EHsc>)
+endmacro()
+
 add_library(odr OBJECT odr.cpp)
-set_target_properties(odr PROPERTIES CXX_EXTENSIONS OFF)
-target_compile_definitions(odr PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_DEFINITIONS>)
-target_compile_features(odr PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_FEATURES>)
-target_compile_options(odr PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -Wall>)
-target_compile_options(odr PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/EHsc>)
+SETUP_LIBRARY_TARGET(odr)
 
 macro(SETUP_AND_ADD_TEST TEST_NAME TEST_SOURCE)
     add_executable(${TEST_NAME} $<TARGET_OBJECTS:odr> ${TEST_SOURCE})
@@ -27,6 +31,26 @@ endmacro()
 
 if(BUILD_BENCHMARK)
     SETUP_AND_ADD_TEST(benchmark benchmark/benchmark.cpp)
+endif()
+
+# Test lib
+
+if(BUILD_LIB)
+    add_library(a_module_shared SHARED lib/a_module.cpp)
+    add_library(a_module_static STATIC lib/a_module.cpp)
+    add_library(another_module_shared SHARED lib/another_module.cpp)
+    add_library(another_module_static STATIC lib/another_module.cpp)
+
+    SETUP_LIBRARY_TARGET(a_module_shared)
+    SETUP_LIBRARY_TARGET(a_module_static)
+    SETUP_LIBRARY_TARGET(another_module_shared)
+    SETUP_LIBRARY_TARGET(another_module_static)
+
+    SETUP_AND_ADD_TEST(lib_shared lib/lib.cpp)
+    target_link_libraries(lib_shared PRIVATE a_module_shared another_module_shared)
+
+    SETUP_AND_ADD_TEST(lib_static lib/lib.cpp)
+    target_link_libraries(lib_static PRIVATE a_module_static another_module_static)
 endif()
 
 # Test mod

@@ -22,9 +22,9 @@ using maybe_atomic_t = Type;
 #endif // ENTT_USE_ATOMIC
 
 
-#ifndef ENTT_HASH_TYPE
+#ifndef ENTT_ID_TYPE
 #include <cstdint>
-#define ENTT_HASH_TYPE std::uint32_t
+#define ENTT_ID_TYPE std::uint32_t
 #endif
 
 

@@ -7,7 +7,6 @@
 * define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
 * runner proposal: https://en.wikipedia.org/wiki/Fork%E2%80%93join_model https://slide-rs.github.io/specs/03_dispatcher.html
 * work stealing job system (see #100)
-* can we do more for shared libraries? who knows... see #144
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
 * meta: move-to-head optimization when searching by name on parts (data, func, etc)
 * hashed string: add implicit check on construction for uniqueness (optional)
@@ -20,3 +19,14 @@
 * provide create with a pack of default constructible components to assign
 * allow to replace std:: with custom implementations
 * allow to sort groups (::respect can already work with begin/end instead of a whole sparse set)
+<<<<<<< HEAD
+=======
+
+==> can we do more for shared libraries? who knows... see #144
+- use stable component identifiers independent from families and hashed strings
+* to be updated: runtime view (also in doc, no longer missing pools)
+* to be updated: dispatcher
+* to be updated: registry
+* to be updated: emitter
+* to be updated: doc
+>>>>>>> experimental

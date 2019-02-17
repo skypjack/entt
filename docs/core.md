@@ -103,7 +103,7 @@ Indeed it mostly depends on the flow of execution.
 
 # Hashed strings
 
-A hashed string is a zero overhead resource identifier. Users can use
+A hashed string is a zero overhead unique identifier. Users can use
 human-readable identifiers in the codebase while using their numeric
 counterparts at runtime, thus without affecting performance.<br/>
 The class has an implicit `constexpr` constructor that chews a bunch of
@@ -138,7 +138,7 @@ possible. This is a fact.<br/>
 There is no silver bullet to solve the problem of conflicts when dealing with
 hashing functions. In this case, the best solution seemed to be to give up.
 That's all.<br/>
-After all, human-readable resource identifiers aren't something strictly defined
+After all, human-readable unique identifiers aren't something strictly defined
 and over which users have not the control. Choosing a slightly different
 identifier is probably the best solution to make the conflict disappear in this
 case.
