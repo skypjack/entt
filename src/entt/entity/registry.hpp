@@ -1319,11 +1319,7 @@ public:
         other.pools.resize(pools.size());
         other.sighs.resize(pools.size());
 
-        if constexpr(sizeof...(Component)) {
-            static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
-            ((other.pools[type<Component>()] = assure<Component>().clone()), ...);
-            assert((other.pools[type<Component>()] && ...));
-        } else {
+        if constexpr(sizeof...(Component) == 0) {
             for(auto pos = pools.size(); pos; --pos) {
                 auto &cpool = pools[pos-1];
 
@@ -1332,6 +1328,10 @@ public:
                     assert(other.pools[pos-1]);
                 }
             };
+        } else {
+            static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
+            ((other.pools[type<Component>()] = assure<Component>().clone()), ...);
+            assert((other.pools[type<Component>()] && ...));
         }
 
         other.next = next;
