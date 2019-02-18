@@ -54,6 +54,14 @@ struct shared_traits<const Type>
 
 
 /**
+ * @brief Helper type.
+ * @tparam Type Potentially shared type.
+ */
+template<typename Type>
+using shared_traits_t = typename shared_traits<Type>::type;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * shared. In all other cases, `value` is false.
  */
@@ -67,7 +75,7 @@ struct is_shared: std::false_type {};
  * @tparam Type Potentially shared type.
  */
 template<typename Type>
-struct is_shared<Type, std::void_t<typename shared_traits<std::decay_t<Type>>::type>>: std::true_type {};
+struct is_shared<Type, std::void_t<shared_traits_t<std::decay_t<Type>>>>: std::true_type {};
 
 
 /**
