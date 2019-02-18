@@ -79,31 +79,40 @@ class registry {
     template<typename...>
     struct descriptor;
 
-    template<typename... Owned, typename... Get, typename... Exclude>
-    struct descriptor<exclude_t<Exclude...>, get_t<Get...>, Owned...>: basic_descriptor {
+    template<typename Ref, typename... Owned, typename... Get, typename... Exclude>
+    struct descriptor<exclude_t<Exclude...>, get_t<Get...>, Ref, Owned...>: basic_descriptor {
         typename sparse_set<Entity>::size_type data;
 
         template<auto Accepted>
         void induce_if(registry &reg, const Entity entity) {
-            if(reg.has<Owned..., Get...>(entity) && (0 + ... + reg.has<Exclude>(entity)) == Accepted) {
-                const auto curr = data++;
-                (std::swap(reg.pool<Owned>().get(entity), reg.pool<Owned>().raw()[curr]), ...);
-                (reg.pool<Owned>().swap(reg.pool<Owned>().sparse_set<Entity>::get(entity), curr), ...);
+            if(reg.has<Ref, Owned..., Get...>(entity) && (0 + ... + reg.has<Exclude>(entity)) == Accepted) {
+                auto upd = [entity, curr = data++](auto &&cpool) {
+                    std::swap(cpool.get(entity), cpool.raw()[curr]);
+                    cpool.swap(cpool.sparse_set<Entity>::get(entity), curr);
+                };
+
+                upd(reg.pool<Ref>());
+                (upd(reg.pool<Owned>()), ...);
+
             }
         }
 
         void discard_if(registry &reg, const Entity entity) {
-            auto &cpool = reg.pool<std::tuple_element_t<0, std::tuple<Owned...>>>();
+            auto &cpool = reg.pool<Ref>();
 
             if(cpool.has(entity) && cpool.sparse_set<Entity>::get(entity) < data) {
-                const auto curr = --data;
-                (std::swap(reg.pool<Owned>().get(entity), reg.pool<Owned>().raw()[curr]), ...);
-                (reg.pool<Owned>().swap(reg.pool<Owned>().sparse_set<Entity>::get(entity), curr), ...);
+                auto upd = [entity, curr = --data](auto &&cpool) {
+                    std::swap(cpool.get(entity), cpool.raw()[curr]);
+                    cpool.swap(cpool.sparse_set<Entity>::get(entity), curr);
+                };
+
+                upd(cpool);
+                (upd(reg.pool<Owned>()), ...);
             }
         }
 
         bool owns(typename component_family::family_type ctype) override {
-            return ((ctype == type<Owned>()) || ...);
+            return ((ctype == type<Ref>()) || ... || (ctype == type<Owned>()));
         }
     };
 
@@ -129,7 +138,7 @@ class registry {
         }
     };
 
-    inline auto handler(typename component_family::family_type ctype) const ENTT_NOEXCEPT {
+    inline auto get_pool_data(typename component_family::family_type ctype) const ENTT_NOEXCEPT {
         return std::find_if(pools.begin(), pools.end(), [ctype](const auto &pdata) {
             return pdata.pool && pdata.runtime_type == ctype;
         });
@@ -138,7 +147,7 @@ class registry {
     template<typename Component>
     inline const auto & pool() const ENTT_NOEXCEPT {
         if constexpr(is_shared_v<Component>) {
-            const auto it = handler(type<Component>());
+            const auto it = get_pool_data(type<Component>());
             assert(it != pools.cend() && it->pool);
             return static_cast<const sparse_set<Entity, std::decay_t<Component>> &>(it->pool);
         } else {
@@ -159,7 +168,7 @@ class registry {
         pool_data *pdata = nullptr;
 
         if constexpr(is_shared_v<Component>) {
-            const auto it = handler(type<Component>());
+            const auto it = get_pool_data(type<Component>());
             pdata = (it == pools.cend() ? &pools.emplace_back() : &(*it));
         } else {
             if(!(ctype < pools.size())) {
@@ -611,7 +620,7 @@ public:
     Component & assign(const entity_type entity, Args &&... args) {
         assert(valid(entity));
         auto &component = assure<Component>().construct(entity, std::forward<Args>(args)...);
-        handler(type<Component>())->construction.publish(*this, entity);
+        get_pool_data(type<Component>())->construction.publish(*this, entity);
         return component;
     }
 
@@ -631,7 +640,7 @@ public:
     template<typename Component>
     void remove(const entity_type entity) {
         assert(valid(entity));
-        handler(type<Component>())->destruction.publish(*this, entity);
+        get_pool_data(type<Component>())->destruction.publish(*this, entity);
         pool<Component>().destroy(entity);
     }
 
@@ -719,7 +728,7 @@ public:
 
         if(!comp) {
             comp = &cpool.construct(entity, std::forward<Component>(component));
-            handler(type<Component>())->construction.publish(*this, entity);
+            get_pool_data(type<Component>())->construction.publish(*this, entity);
         }
 
         return *comp;
@@ -818,7 +827,7 @@ public:
             *comp = std::decay_t<Component>{std::forward<Args>(args)...};
         } else {
             comp = &cpool.construct(entity, std::forward<Args>(args)...);
-            handler(type<Component>())->construction.publish(*this, entity);
+            get_pool_data(type<Component>())->construction.publish(*this, entity);
         }
 
         return *comp;
@@ -850,7 +859,7 @@ public:
     template<typename Component>
     sink_type construction() ENTT_NOEXCEPT {
         assure<Component>();
-        return handler(type<Component>())->construction.sink();
+        return get_pool_data(type<Component>())->construction.sink();
     }
 
     /**
@@ -879,7 +888,7 @@ public:
     template<typename Component>
     sink_type destruction() ENTT_NOEXCEPT {
         assure<Component>();
-        return handler(type<Component>())->destruction.sink();
+        return get_pool_data(type<Component>())->destruction.sink();
     }
 
     /**
@@ -1001,7 +1010,7 @@ public:
         auto &cpool = assure<Component>();
 
         if(cpool.has(entity)) {
-            handler(type<Component>())->destruction.publish(*this, entity);
+            get_pool_data(type<Component>())->destruction.publish(*this, entity);
             cpool.destroy(entity);
         }
     }
@@ -1017,7 +1026,7 @@ public:
     template<typename Component>
     void reset() {
         auto &cpool = assure<Component>();
-        auto &sigh = handler(type<Component>())->destruction;
+        auto &sigh = get_pool_data(type<Component>())->destruction;
 
         if(sigh.empty()) {
             // no group set, otherwise the signal wouldn't be empty
@@ -1235,15 +1244,15 @@ public:
             assert((!owned<Owned>() && ...));
             groups[gtype] = std::make_unique<descriptor_type>();
             auto *curr = static_cast<descriptor_type *>(groups[gtype].get());
-            decltype(handler({})) it;
+            decltype(get_pool_data({})) it;
 
             if constexpr(sizeof...(Owned) == 0) {
-                ((it = handler(type<Get>()),
+                ((it = get_pool_data(type<Get>()),
                         it->destruction.sink().template connect<&descriptor_type::destroy_if>(curr),
                         it->construction.sink().template connect<&descriptor_type::template construct_if<0>>(curr)),
                         ...);
 
-                ((it = handler(type<Exclude>()),
+                ((it = get_pool_data(type<Exclude>()),
                         it->destruction.sink().template connect<&descriptor_type::template construct_if<1>>(curr),
                         it->construction.sink().template connect<&descriptor_type::destroy_if>(curr)), ...);
 
@@ -1251,15 +1260,15 @@ public:
                     curr->template construct_if<0>(*this, entity);
                 }
             } else {
-                ((it = handler(type<Get>()),
+                ((it = get_pool_data(type<Get>()),
                         it->construction.sink().template connect<&descriptor_type::template induce_if<0>>(curr),
                         it->destruction.sink().template connect<&descriptor_type::discard_if>(curr)), ...);
 
-                ((it = handler(type<Exclude>()),
+                ((it = get_pool_data(type<Exclude>()),
                         it->destruction.sink().template connect<&descriptor_type::template induce_if<1>>(curr),
                         it->construction.sink().template connect<&descriptor_type::discard_if>(curr)), ...);
 
-                auto owned = {((it = handler(type<Owned>()),
+                auto owned = {((it = get_pool_data(type<Owned>()),
                         it->construction.sink().template connect<&descriptor_type::template induce_if<0>>(curr),
                         it->destruction.sink().template connect<&descriptor_type::discard_if>(curr), it->pool.get()), ...)};
 
@@ -1321,7 +1330,7 @@ public:
         std::vector<const sparse_set<Entity> *> set(last - first);
 
         std::transform(first, last, set.begin(), [this](const component_type ctype) {
-            auto pdata = handler(ctype);
+            auto pdata = get_pool_data(ctype);
             return pdata != pools.cend() && pdata->pool ? pdata->pool.get() : nullptr;
         });
 
