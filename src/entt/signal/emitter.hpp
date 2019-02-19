@@ -159,23 +159,6 @@ public:
         connection(typename event_handler<Event>::connection_type conn)
             : event_handler<Event>::connection_type{std::move(conn)}
         {}
-
-        /*! @brief Default copy constructor. */
-        connection(const connection &) = default;
-        /*! @brief Default move constructor. */
-        connection(connection &&) = default;
-
-        /**
-         * @brief Default copy assignment operator.
-         * @return This connection.
-         */
-        connection & operator=(const connection &) = default;
-
-        /**
-         * @brief Default move assignment operator.
-         * @return This connection.
-         */
-        connection & operator=(connection &&) = default;
     };
 
     /*! @brief Default constructor. */

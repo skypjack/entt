@@ -658,18 +658,6 @@ public:
     /*! @brief Default destructor. */
     ~meta_handle() ENTT_NOEXCEPT = default;
 
-    /*! @brief Default copy constructor. */
-    meta_handle(const meta_handle &) ENTT_NOEXCEPT = default;
-
-    /*! @brief Default move constructor. */
-    meta_handle(meta_handle &&) ENTT_NOEXCEPT = default;
-
-    /*! @brief Default copy assignment operator. @return This handle. */
-    meta_handle & operator=(const meta_handle &) ENTT_NOEXCEPT = default;
-
-    /*! @brief Default move assignment operator. @return This handle. */
-    meta_handle & operator=(meta_handle &&) ENTT_NOEXCEPT = default;
-
     /**
      * @brief Returns the meta type of the underlying object.
      * @return The meta type of the underlying object, if any.

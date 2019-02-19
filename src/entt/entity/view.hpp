@@ -118,9 +118,6 @@ class view {
 
         iterator() ENTT_NOEXCEPT = default;
 
-        iterator(const iterator &) ENTT_NOEXCEPT = default;
-        iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
-
         iterator & operator++() ENTT_NOEXCEPT {
             return (++begin != end && !valid()) ? ++(*this) : *this;
         }
@@ -224,16 +221,6 @@ public:
     using size_type = typename sparse_set<Entity>::size_type;
     /*! @brief Input iterator type. */
     using iterator_type = iterator;
-
-    /*! @brief Default copy constructor. */
-    view(const view &) = default;
-    /*! @brief Default move constructor. */
-    view(view &&) = default;
-
-    /*! @brief Default copy assignment operator. @return This view. */
-    view & operator=(const view &) = default;
-    /*! @brief Default move assignment operator. @return This view. */
-    view & operator=(view &&) = default;
 
     /**
      * @brief Estimates the number of entities that have the given components.
@@ -423,16 +410,6 @@ public:
     using size_type = typename pool_type::size_type;
     /*! @brief Input iterator type. */
     using iterator_type = typename sparse_set<Entity>::iterator_type;
-
-    /*! @brief Default copy constructor. */
-    view(const view &) = default;
-    /*! @brief Default move constructor. */
-    view(view &&) = default;
-
-    /*! @brief Default copy assignment operator. @return This view. */
-    view & operator=(const view &) = default;
-    /*! @brief Default move assignment operator. @return This view. */
-    view & operator=(view &&) = default;
 
     /**
      * @brief Returns the number of entities that have the given component.
@@ -685,9 +662,6 @@ class runtime_view {
 
         iterator() ENTT_NOEXCEPT = default;
 
-        iterator(const iterator &) ENTT_NOEXCEPT = default;
-        iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
-
         iterator & operator++() ENTT_NOEXCEPT {
             return (++begin != end && !valid()) ? ++(*this) : *this;
         }
@@ -757,16 +731,6 @@ public:
     using size_type = typename sparse_set<Entity>::size_type;
     /*! @brief Input iterator type. */
     using iterator_type = iterator;
-
-    /*! @brief Default copy constructor. */
-    runtime_view(const runtime_view &) = default;
-    /*! @brief Default move constructor. */
-    runtime_view(runtime_view &&) = default;
-
-    /*! @brief Default copy assignment operator. @return This view. */
-    runtime_view & operator=(const runtime_view &) = default;
-    /*! @brief Default move assignment operator. @return This view. */
-    runtime_view & operator=(runtime_view &&) = default;
 
     /**
      * @brief Estimates the number of entities that have the given components.

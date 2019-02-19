@@ -80,12 +80,6 @@ class sparse_set<Entity> {
 
         iterator() ENTT_NOEXCEPT = default;
 
-        iterator(const iterator &) ENTT_NOEXCEPT = default;
-        iterator(iterator &&) ENTT_NOEXCEPT = default;
-
-        iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
-        iterator & operator=(iterator &&) ENTT_NOEXCEPT = default;
-
         iterator & operator++() ENTT_NOEXCEPT {
             return --index, *this;
         }
@@ -533,12 +527,6 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
 
         iterator() ENTT_NOEXCEPT = default;
 
-        iterator(const iterator &) ENTT_NOEXCEPT = default;
-        iterator(iterator &&) ENTT_NOEXCEPT = default;
-
-        iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
-        iterator & operator=(iterator &&) ENTT_NOEXCEPT = default;
-
         iterator & operator++() ENTT_NOEXCEPT {
             return --index, *this;
         }
@@ -640,12 +628,6 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
         using iterator_category = std::random_access_iterator_tag;
 
         iterator() ENTT_NOEXCEPT = default;
-
-        iterator(const iterator &) ENTT_NOEXCEPT = default;
-        iterator(iterator &&) ENTT_NOEXCEPT = default;
-
-        iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
-        iterator & operator=(iterator &&) ENTT_NOEXCEPT = default;
 
         iterator & operator++() ENTT_NOEXCEPT {
             return --index, *this;

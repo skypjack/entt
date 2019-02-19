@@ -19,8 +19,6 @@ namespace internal {
 
 
 struct null {
-    explicit constexpr null() = default;
-
     template<typename Entity>
     constexpr operator Entity() const ENTT_NOEXCEPT {
         using traits_type = entt_traits<Entity>;

@@ -109,16 +109,6 @@ public:
     /*! @brief Input iterator type. */
     using iterator_type = typename sparse_set<Entity>::iterator_type;
 
-    /*! @brief Default copy constructor. */
-    group(const group &) = default;
-    /*! @brief Default move constructor. */
-    group(group &&) = default;
-
-    /*! @brief Default copy assignment operator. @return This group. */
-    group & operator=(const group &) = default;
-    /*! @brief Default move assignment operator. @return This group. */
-    group & operator=(group &&) = default;
-
     /**
      * @brief Returns the number of entities that have the given components.
      * @return Number of entities that have the given components.
@@ -373,16 +363,6 @@ public:
     using size_type = typename sparse_set<Entity>::size_type;
     /*! @brief Input iterator type. */
     using iterator_type = typename sparse_set<Entity>::iterator_type;
-
-    /*! @brief Default copy constructor. */
-    group(const group &) = default;
-    /*! @brief Default move constructor. */
-    group(group &&) = default;
-
-    /*! @brief Default copy assignment operator. @return This group. */
-    group & operator=(const group &) = default;
-    /*! @brief Default move assignment operator. @return This group. */
-    group & operator=(group &&) = default;
 
     /**
      * @brief Returns the number of entities that have the given components.
