@@ -19,14 +19,11 @@
 * provide create with a pack of default constructible components to assign
 * allow to replace std:: with custom implementations
 * allow to sort groups (::respect can already work with begin/end instead of a whole sparse set)
-<<<<<<< HEAD
-=======
+* README file: add section with contacts (gitter and the others)
+* cleanup - see https://github.com/skypjack/entt/commit/ad5cedc08c83e8cbcc8aaeac9634d44624ffe35a#commitcomment-32380903
 
 ==> can we do more for shared libraries? who knows... see #144
-- use stable component identifiers independent from families and hashed strings
-* to be updated: runtime view (also in doc, no longer missing pools)
 * to be updated: dispatcher
 * to be updated: registry
 * to be updated: emitter
 * to be updated: doc
->>>>>>> experimental

@@ -100,7 +100,7 @@ constexpr auto is_shared_v = is_shared<Type>::value;
     template<>\
     struct entt::shared_traits<type>\
         : std::integral_constant<typename entt::hashed_string::hash_type, entt::hashed_string::to_value(#type)>\
-    {}
+    {};
 
 
 /**

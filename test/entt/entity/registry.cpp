@@ -508,10 +508,10 @@ TEST(Registry, PartialOwningGroupInitOnFirstUse) {
     registry.assign<char>(e0, 'c');
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1, 0);
+    registry.assign<int>(e1, 1);
 
     const auto e2 = registry.create();
-    registry.assign<int>(e2, 0);
+    registry.assign<int>(e2, 2);
     registry.assign<char>(e2, 'c');
 
     ASSERT_FALSE(registry.owned<int>());

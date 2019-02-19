@@ -351,7 +351,7 @@ class group<Entity, get_t<Get...>, Owned...> {
     using component_iterator_type = decltype(std::declval<pool_type<Component>>().begin());
 
     // we could use pool_type<Type> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    group(typename sparse_set<Entity>::size_type *length, sparse_set<Entity, std::remove_const_t<Owned>> *... owned, sparse_set<Entity, std::remove_const_t<Get>> *... others) ENTT_NOEXCEPT
+    group(const typename registry<Entity>::size_type *length, sparse_set<Entity, std::remove_const_t<Owned>> *... owned, sparse_set<Entity, std::remove_const_t<Get>> *... others) ENTT_NOEXCEPT
         : length{length},
           pools{owned..., others...}
     {}
@@ -555,7 +555,7 @@ public:
     }
 
 private:
-    const size_type *length;
+    const typename registry<Entity>::size_type *length;
     const std::tuple<pool_type<Owned> *..., pool_type<Get> *...> pools;
 };
 
