@@ -76,8 +76,8 @@ class registry {
         }
 
         void destroy_if(registry &, const Entity entity) {
-            if(has(entity)) {
-                destroy(entity);
+            if(this->has(entity)) {
+                this->destroy(entity);
             }
         }
     };
