@@ -106,21 +106,59 @@ constexpr auto is_shared_v = is_shared<Type>::value;
 /**
  * @brief Defines a type as shareable (to use for structs).
  * @param clazz Name of the type to make shareable.
+ * @param body Body of the type to make shareable.
  */
-#define ENTT_SHARED_STRUCT(clazz)\
+#define ENTT_SHARED_STRUCT_ONLY(clazz, body)\
     struct clazz;\
     ENTT_SHARED_TYPE(clazz)\
-    struct clazz
+    struct clazz body;
+
+
+/**
+ * @brief Defines a type as shareable (to use for structs).
+ * @param ns Namespace where to define the type to make shareable.
+ * @param clazz Name of the type to make shareable.
+ * @param body Body of the type to make shareable.
+ */
+#define ENTT_SHARED_STRUCT_WITH_NAMESPACE(ns, clazz, body)\
+    namespace ns { struct clazz; }\
+    ENTT_SHARED_TYPE(ns::clazz)\
+    namespace ns { struct clazz body; }
+
+
+/*! @brief Utility function to simulate macro overloading. */
+#define ENTT_SHARED_STRUCT_OVERLOAD(_1, _2, _3, FUNC, ...) FUNC
+/*! @brief Defines a type as shareable (to use for structs). */
+#define ENTT_SHARED_STRUCT(...) ENTT_SHARED_STRUCT_OVERLOAD(__VA_ARGS__, ENTT_SHARED_STRUCT_WITH_NAMESPACE, ENTT_SHARED_STRUCT_ONLY)(__VA_ARGS__)
 
 
 /**
  * @brief Defines a type as shareable (to use for classes).
  * @param clazz Name of the type to make shareable.
+ * @param body Body of the type to make shareable.
  */
-#define ENTT_SHARED_CLASS(clazz)\
+#define ENTT_SHARED_CLASS_ONLY(clazz, body)\
     class clazz;\
     ENTT_SHARED_TYPE(clazz)\
-    class clazz
+    class clazz body;
+
+
+/**
+ * @brief Defines a type as shareable (to use for classes).
+ * @param ns Namespace where to define the type to make shareable.
+ * @param clazz Name of the type to make shareable.
+ * @param body Body of the type to make shareable.
+ */
+#define ENTT_SHARED_CLASS_WITH_NAMESPACE(ns, clazz, body)\
+    namespace ns { class clazz; }\
+    ENTT_SHARED_TYPE(ns::clazz)\
+    namespace ns { class clazz body; }
+
+
+/*! @brief Utility function to simulate macro overloading. */
+#define ENTT_SHARED_CLASS_MACRO(_1, _2, _3, FUNC, ...) FUNC
+/*! @brief Defines a type as shareable (to use for classes). */
+#define ENTT_SHARED_CLASS(...) ENTT_SHARED_CLASS_MACRO(__VA_ARGS__, ENTT_SHARED_CLASS_WITH_NAMESPACE, ENTT_SHARED_CLASS_ONLY)(__VA_ARGS__)
 
 
 #endif // ENTT_CORE_TYPE_TRAITS_HPP
