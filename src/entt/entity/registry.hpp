@@ -960,9 +960,11 @@ public:
      */
     template<typename C1, typename C2>
     void swap() {
-        const auto ctype1 = component_family::type<C1>;
-        const auto ctype2 = component_family::type<C2>;
-        pools[ctype1].swap(pools[ctype2]);
+        // const auto ctype1 = component_family::type<C1>;
+        // const auto ctype2 = component_family::type<C2>;
+        // pools[ctype1].swap(pools[ctype2]);
+        // pools[ctype1]->swap2(pools[ctype2].get());
+        pool<C1>().swap2(pool<C2>());
     }
 
 

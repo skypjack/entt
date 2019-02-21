@@ -783,6 +783,17 @@ public:
         }
     }
 
+    template<typename C>
+    void swap2(sparse_set<Entity, C>& other) ENTT_NOEXCEPT {
+        // if constexpr(std::is_empty_v<object_type>) {
+        //     // return &instances;
+        // } else {
+            // return instances.data();
+        auto& a = other.instances;
+        instances.swap(reinterpret_cast<std::vector<Type>&>(a));
+        // }
+    }
+
     /*! @copydoc raw */
     object_type * raw() ENTT_NOEXCEPT {
         return const_cast<object_type *>(std::as_const(*this).raw());
@@ -1098,7 +1109,7 @@ public:
         }
     }
 
-private:
+public:
     std::conditional_t<std::is_empty_v<object_type>, object_type, std::vector<object_type>> instances;
 };
 
