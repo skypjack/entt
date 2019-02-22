@@ -8,6 +8,8 @@
 #include <entt/entity/entt_traits.hpp>
 #include <entt/entity/registry.hpp>
 
+ENTT_SHARED_TYPE(int)
+
 struct listener {
     template<typename Component>
     void incr(entt::registry<> &registry, entt::registry<>::entity_type entity) {
