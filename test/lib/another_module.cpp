@@ -1,4 +1,5 @@
 #include <entt/entity/registry.hpp>
+#include "component.h"
 
 #ifndef LIB_EXPORT
 #if defined _WIN32 || defined __CYGWIN__
@@ -37,4 +38,10 @@ LIB_EXPORT typename entt::registry<>::component_type another_module_char_type() 
     (void)registry.type<double>();
 
     return registry.type<char>();
+}
+
+LIB_EXPORT void assign_velocity(int vel, entt::registry<> &registry) {
+    for(auto entity: registry.view<position>()) {
+        registry.assign<velocity>(entity, vel, vel);
+    }
 }

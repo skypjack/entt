@@ -1,4 +1,5 @@
 #include <entt/entity/registry.hpp>
+#include "component.h"
 
 #ifndef LIB_EXPORT
 #if defined _WIN32 || defined __CYGWIN__
@@ -31,4 +32,11 @@ LIB_EXPORT typename entt::registry<>::component_type a_module_char_type() {
     (void)registry.type<float>();
 
     return registry.type<char>();
+}
+
+LIB_EXPORT void update_position(int delta, entt::registry<> &registry) {
+    registry.view<position, velocity>().each([delta](auto &pos, auto &vel) {
+        pos.x += delta * vel.dx;
+        pos.y += delta * vel.dy;
+    });
 }
