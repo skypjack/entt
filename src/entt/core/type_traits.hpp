@@ -93,6 +93,16 @@ constexpr auto is_shared_v = is_shared<Type>::value;
 
 
 /**
+ * @brief Utility macro to deal with an issue of MSVC.
+ *
+ * See _msvc-doesnt-expand-va-args-correctly_ on SO for all the details.
+ *
+ * @param args Argument to expand.
+ */
+#define EXPAND(args) args
+
+
+/**
  * @brief Makes an already existing type a shared type.
  * @param type Type to make shareable.
  */
@@ -109,9 +119,8 @@ constexpr auto is_shared_v = is_shared<Type>::value;
  * @param body Body of the type to make shareable.
  */
 #define ENTT_SHARED_STRUCT_ONLY(clazz, body)\
-    struct clazz;\
-    ENTT_SHARED_TYPE(clazz)\
-    struct clazz body;
+    struct clazz body;\
+    ENTT_SHARED_TYPE(clazz)
 
 
 /**
@@ -121,16 +130,14 @@ constexpr auto is_shared_v = is_shared<Type>::value;
  * @param body Body of the type to make shareable.
  */
 #define ENTT_SHARED_STRUCT_WITH_NAMESPACE(ns, clazz, body)\
-    namespace ns { struct clazz; }\
-    ENTT_SHARED_TYPE(ns::clazz)\
-    namespace ns { struct clazz body; }
+    namespace ns { struct clazz body; }\
+    ENTT_SHARED_TYPE(ns::clazz)
 
 
 /*! @brief Utility function to simulate macro overloading. */
 #define ENTT_SHARED_STRUCT_OVERLOAD(_1, _2, _3, FUNC, ...) FUNC
 /*! @brief Defines a type as shareable (to use for structs). */
-#define ENTT_SHARED_STRUCT(...) ENTT_SHARED_STRUCT_OVERLOAD(__VA_ARGS__, ENTT_SHARED_STRUCT_WITH_NAMESPACE, ENTT_SHARED_STRUCT_ONLY, 0)(__VA_ARGS__)
-// 0 is used to suppress warning: ISO C++11 requires at least one argument for the "..." in a variadic macro
+#define ENTT_SHARED_STRUCT(...) EXPAND(ENTT_SHARED_STRUCT_OVERLOAD(__VA_ARGS__, ENTT_SHARED_STRUCT_WITH_NAMESPACE, ENTT_SHARED_STRUCT_ONLY,)(__VA_ARGS__))
 
 
 /**
@@ -139,9 +146,8 @@ constexpr auto is_shared_v = is_shared<Type>::value;
  * @param body Body of the type to make shareable.
  */
 #define ENTT_SHARED_CLASS_ONLY(clazz, body)\
-    class clazz;\
-    ENTT_SHARED_TYPE(clazz)\
-    class clazz body;
+    class clazz body;\
+    ENTT_SHARED_TYPE(clazz)
 
 
 /**
@@ -151,16 +157,14 @@ constexpr auto is_shared_v = is_shared<Type>::value;
  * @param body Body of the type to make shareable.
  */
 #define ENTT_SHARED_CLASS_WITH_NAMESPACE(ns, clazz, body)\
-    namespace ns { class clazz; }\
-    ENTT_SHARED_TYPE(ns::clazz)\
-    namespace ns { class clazz body; }
+    namespace ns { class clazz body; }\
+    ENTT_SHARED_TYPE(ns::clazz)
 
 
 /*! @brief Utility function to simulate macro overloading. */
 #define ENTT_SHARED_CLASS_MACRO(_1, _2, _3, FUNC, ...) FUNC
 /*! @brief Defines a type as shareable (to use for classes). */
-#define ENTT_SHARED_CLASS(...) ENTT_SHARED_CLASS_MACRO(__VA_ARGS__, ENTT_SHARED_CLASS_WITH_NAMESPACE, ENTT_SHARED_CLASS_ONLY, 0)(__VA_ARGS__)
-// 0 is used to suppress warning: ISO C++11 requires at least one argument for the "..." in a variadic macro
+#define ENTT_SHARED_CLASS(...) EXPAND(ENTT_SHARED_CLASS_MACRO(__VA_ARGS__, ENTT_SHARED_CLASS_WITH_NAMESPACE, ENTT_SHARED_CLASS_ONLY,)(__VA_ARGS__))
 
 
 #endif // ENTT_CORE_TYPE_TRAITS_HPP
