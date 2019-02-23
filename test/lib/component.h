@@ -1,11 +1,14 @@
 #include <entt/core/type_traits.hpp>
 
-ENTT_SHARED_STRUCT(position, {
+struct position {
     int x;
     int y;
-})
+};
 
-ENTT_SHARED_STRUCT(velocity, {
+struct velocity {
     int dx;
     int dy;
-})
+};
+
+ENTT_SHARED_TYPE(position)
+ENTT_SHARED_TYPE(velocity)
