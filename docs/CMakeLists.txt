@@ -27,12 +27,12 @@ add_custom_target(
         CONTRIBUTING.md
         core.md
         entity.md
+        lib.md
         links.md
         locator.md
         meta.md
         process.md
         resource.md
-        shared.md
         signal.md
         extra.dox
 )
