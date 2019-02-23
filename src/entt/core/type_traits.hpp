@@ -99,7 +99,7 @@ constexpr auto is_shared_v = is_shared<Type>::value;
  *
  * @param args Argument to expand.
  */
-#define EXPAND(args) args
+#define ENTT_EXPAND(args) args
 
 
 /**
@@ -137,7 +137,7 @@ constexpr auto is_shared_v = is_shared<Type>::value;
 /*! @brief Utility function to simulate macro overloading. */
 #define ENTT_SHARED_STRUCT_OVERLOAD(_1, _2, _3, FUNC, ...) FUNC
 /*! @brief Defines a type as shareable (to use for structs). */
-#define ENTT_SHARED_STRUCT(...) EXPAND(ENTT_SHARED_STRUCT_OVERLOAD(__VA_ARGS__, ENTT_SHARED_STRUCT_WITH_NAMESPACE, ENTT_SHARED_STRUCT_ONLY,)(__VA_ARGS__))
+#define ENTT_SHARED_STRUCT(...) ENTT_EXPAND(ENTT_SHARED_STRUCT_OVERLOAD(__VA_ARGS__, ENTT_SHARED_STRUCT_WITH_NAMESPACE, ENTT_SHARED_STRUCT_ONLY,)(__VA_ARGS__))
 
 
 /**
@@ -164,7 +164,7 @@ constexpr auto is_shared_v = is_shared<Type>::value;
 /*! @brief Utility function to simulate macro overloading. */
 #define ENTT_SHARED_CLASS_MACRO(_1, _2, _3, FUNC, ...) FUNC
 /*! @brief Defines a type as shareable (to use for classes). */
-#define ENTT_SHARED_CLASS(...) EXPAND(ENTT_SHARED_CLASS_MACRO(__VA_ARGS__, ENTT_SHARED_CLASS_WITH_NAMESPACE, ENTT_SHARED_CLASS_ONLY,)(__VA_ARGS__))
+#define ENTT_SHARED_CLASS(...) ENTT_EXPAND(ENTT_SHARED_CLASS_MACRO(__VA_ARGS__, ENTT_SHARED_CLASS_WITH_NAMESPACE, ENTT_SHARED_CLASS_ONLY,)(__VA_ARGS__))
 
 
 #endif // ENTT_CORE_TYPE_TRAITS_HPP
