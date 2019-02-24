@@ -159,9 +159,9 @@ as they are not strictly necessary.
 
 I'm still working hard to make everything work across boundaries.<br/>
 The classes affected by the problem were `registry`, `dispatcher` and `emitter`.
-Currently, only the `registry` class fully support _shared types_. Using
-`dispatcher` and `emitter` across boundaries isn't allowed yet and can result in
-unexpected behavior on Windows in general and on GNU/Linux when default
-visibility is set to _hidden_.
+Currently, only `registry` and `dispatcher` fully support _shared types_. Using
+`emitter` across boundaries isn't allowed yet and can result in unexpected
+behavior on Windows in general and on GNU/Linux when default visibility is set
+to _hidden_.
 
 Stay tuned for future updates.

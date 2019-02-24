@@ -8,6 +8,7 @@
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/family.hpp"
+#include "../core/type_traits.hpp"
 #include "sigh.hpp"
 
 
@@ -75,19 +76,51 @@ class dispatcher {
         int current{};
     };
 
+    struct wrapper_data {
+        std::unique_ptr<base_wrapper> wrapper;
+        ENTT_ID_TYPE runtime_type;
+    };
+
+    template<typename Event>
+    static auto type() ENTT_NOEXCEPT {
+        if constexpr(is_shared_v<Event>) {
+            return shared_traits<Event>::value;
+        } else {
+            return event_family::type<Event>;
+        }
+    }
+
     template<typename Event>
     signal_wrapper<Event> & wrapper() {
-        const auto type = event_family::type<Event>;
+        const auto wtype = type<Event>();
+        wrapper_data *wdata = nullptr;
 
-        if(!(type < wrappers.size())) {
-            wrappers.resize(type + 1);
+        if constexpr(is_shared_v<Event>) {
+            const auto it = std::find_if(wrappers.begin(), wrappers.end(), [wtype](const auto &wdata) {
+                return wdata.wrapper && wdata.runtime_type == wtype;
+            });
+
+            wdata = (it == wrappers.cend() ? &wrappers.emplace_back() : &(*it));
+        } else {
+            if(!(wtype < wrappers.size())) {
+                wrappers.resize(wtype+1);
+            }
+
+            wdata = &wrappers[wtype];
+
+            if(wdata->wrapper && wdata->runtime_type != wtype) {
+                wrappers.emplace_back();
+                std::swap(wrappers[wtype], wrappers.back());
+                wdata = &wrappers[wtype];
+            }
         }
 
-        if(!wrappers[type]) {
-            wrappers[type] = std::make_unique<signal_wrapper<Event>>();
+        if(!wdata->wrapper) {
+            wdata->wrapper = std::make_unique<signal_wrapper<Event>>();
+            wdata->runtime_type = wtype;
         }
 
-        return static_cast<signal_wrapper<Event> &>(*wrappers[type]);
+        return static_cast<signal_wrapper<Event> &>(*wdata->wrapper);
     }
 
 public:
@@ -201,16 +234,16 @@ public:
      */
     inline void update(Args... args) const {
         for(auto pos = wrappers.size(); pos; --pos) {
-            auto &wrapper = wrappers[pos-1];
+            auto &wdata = wrappers[pos-1];
 
-            if(wrapper) {
-                wrapper->publish(args...);
+            if(wdata.wrapper) {
+                wdata.wrapper->publish(args...);
             }
         }
     }
 
 private:
-    std::vector<std::unique_ptr<base_wrapper>> wrappers;
+    std::vector<wrapper_data> wrappers;
 };
 
 
