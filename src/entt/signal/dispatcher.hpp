@@ -91,7 +91,7 @@ class dispatcher {
     }
 
     template<typename Event>
-    signal_wrapper<Event> & wrapper() {
+    signal_wrapper<Event> & assure() {
         const auto wtype = type<Event>();
         wrapper_data *wdata = nullptr;
 
@@ -147,7 +147,7 @@ public:
      */
     template<typename Event>
     inline sink_type<Event> sink() ENTT_NOEXCEPT {
-        return wrapper<Event>().sink();
+        return assure<Event>().sink();
     }
 
     /**
@@ -162,7 +162,7 @@ public:
      */
     template<typename Event>
     inline void trigger(Event &&event, Args... args) {
-        wrapper<std::decay_t<Event>>().trigger(std::forward<Event>(event), args...);
+        assure<std::decay_t<Event>>().trigger(std::forward<Event>(event), args...);
     }
 
     /**
@@ -176,7 +176,7 @@ public:
      */
     template<typename Event>
     inline void trigger(Args... args) {
-        wrapper<std::decay_t<Event>>().trigger(Event{}, args...);
+        assure<std::decay_t<Event>>().trigger(Event{}, args...);
     }
 
     /**
@@ -191,7 +191,7 @@ public:
      */
     template<typename Event, typename... Params>
     inline void enqueue(Params &&... params) {
-        wrapper<Event>().enqueue(std::forward<Params>(params)...);
+        assure<Event>().enqueue(std::forward<Params>(params)...);
     }
 
     /**
@@ -205,7 +205,7 @@ public:
      */
     template<typename Event>
     inline void enqueue(Event &&event) {
-        wrapper<std::decay_t<Event>>().enqueue(std::forward<Event>(event));
+        assure<std::decay_t<Event>>().enqueue(std::forward<Event>(event));
     }
 
     /**
@@ -220,7 +220,7 @@ public:
      */
     template<typename Event>
     inline void update(Args... args) {
-        wrapper<Event>().publish(args...);
+        assure<Event>().publish(args...);
     }
 
     /**

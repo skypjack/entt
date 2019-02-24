@@ -11,7 +11,6 @@
 * [Macros, macros everywhere](#macros-macros-everywhere)
   * [Conflicts](#conflict)
 * [Allocations: the dark side of the force](#allocations-the-dark-side-of-the-force)
-* [Note](#note)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -126,7 +125,7 @@ hashing strings during compilation. Therefore, conflicts are rare but still
 possible. In case of conflicts, everything simply will get broken at runtime and
 the strangest things will probably take place.<br/>
 Unfortunately, there is no safe way to prevent it. If this happens, it will be
-enough to give a different name to one of the conflicting types to solve the
+enough to give a different value to one of the conflicting types to solve the
 problem. To do this, users can either assign a different name to the class or
 directly define a specialization for the `shared_traits` class template.
 
@@ -154,14 +153,3 @@ enough).
 Maybe one day some dedicated methods will be added that do nothing but create a
 pool for a given type. Until now it has been preferred to keep the API cleaner
 as they are not strictly necessary.
-
-# Note
-
-I'm still working hard to make everything work across boundaries.<br/>
-The classes affected by the problem were `registry`, `dispatcher` and `emitter`.
-Currently, only `registry` and `dispatcher` fully support _shared types_. Using
-`emitter` across boundaries isn't allowed yet and can result in unexpected
-behavior on Windows in general and on GNU/Linux when default visibility is set
-to _hidden_.
-
-Stay tuned for future updates.
