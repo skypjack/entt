@@ -10,6 +10,7 @@
   * [Do not mix types](#do-not-mix-types)
 * [Macros, macros everywhere](#macros-macros-everywhere)
   * [Conflicts](#conflict)
+* [Allocations: the dark side of the force](#allocations-the-dark-side-of-the-force)
 * [Note](#note)
 <!--
 @endcond TURN_OFF_DOXYGEN
@@ -127,7 +128,32 @@ the strangest things will probably take place.<br/>
 Unfortunately, there is no safe way to prevent it. If this happens, it will be
 enough to give a different name to one of the conflicting types to solve the
 problem. To do this, users can either assign a different name to the class or
-define directly a specialization for the `shared_traits` class template.
+directly define a specialization for the `shared_traits` class template.
+
+# Allocations: the dark side of the force
+
+As long as `EnTT` won't support custom allocators, another problem with
+allocations will remain alive instead. This is in fact easily solved, or at
+least it is if one knows it.
+
+To allow users to add types dynamically, the library makes extensive use of type
+erasure techniques and dynamic allocations for pools (whether they are for
+components, events or anything else). The problem occurs when, for example, a
+registry is created on one side of a boundary and a pool is dynamically created
+on the other side. In the best case, everything will crash at the exit, while at
+worst it will do so at runtime.<br/>
+To avoid problems, the pools must be generated from the same side of the
+boundary where the object that owns them is also created. As an example, when
+the registry is created in the main executable and used across boundaries for a
+given type of component, the pool for that type must be created before passing
+around the registry itself. To do this is fortunately quite easy, since it is
+sufficient to invoke any of the methods that involve the given type (continuing
+the example with the registry, a call to `reserve` or `size` is more than
+enough).
+
+Maybe one day some dedicated methods will be added that do nothing but create a
+pool for a given type. Until now it has been preferred to keep the API cleaner
+as they are not strictly necessary.
 
 # Note
 
