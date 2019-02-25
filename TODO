@@ -12,7 +12,6 @@
 * hashed string: add implicit check on construction for uniqueness (optional)
 * destroy overload that accepts a couple of iterators (see create)
 * allow for built-in parallel each if possible
-* travis + windows is now available, try it
 * events on replace, so that one can track updated components? indagate impact
 * tags revenge: if it's possible, reintroduce them but without a link to entities (see #169 for more details)
 * empty components model allows for shared components and prefabs unity-like

@@ -547,7 +547,7 @@ public:
             auto &pdata = pools[pos-1];
 
             if(pdata.pool && pdata.pool->has(entity)) {
-                pools[pos-1].destruction.publish(*this, entity);
+                pdata.destruction.publish(*this, entity);
                 pdata.pool->destroy(entity);
             }
         };
