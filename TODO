@@ -19,5 +19,4 @@
 * provide create with a pack of default constructible components to assign
 * allow to replace std:: with custom implementations
 * allow to sort groups (::respect can already work with begin/end instead of a whole sparse set)
-* README file: add section with contacts (gitter and the others)
 * cleanup - see https://github.com/skypjack/entt/commit/ad5cedc08c83e8cbcc8aaeac9634d44624ffe35a#commitcomment-32380903
