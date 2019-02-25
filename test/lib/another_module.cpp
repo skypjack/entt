@@ -1,5 +1,7 @@
 #include <entt/entity/registry.hpp>
-#include "component.h"
+#include <entt/signal/dispatcher.hpp>
+#include <entt/signal/emitter.hpp>
+#include "types.h"
 
 #ifndef LIB_EXPORT
 #if defined _WIN32 || defined __CYGWIN__
@@ -44,4 +46,12 @@ LIB_EXPORT void assign_velocity(int vel, entt::registry<> &registry) {
     for(auto entity: registry.view<position>()) {
         registry.assign<velocity>(entity, vel, vel);
     }
+}
+
+LIB_EXPORT void trigger_an_event(int payload, entt::dispatcher<> &dispatcher) {
+    dispatcher.trigger(an_event{payload});
+}
+
+LIB_EXPORT void emit_an_event(int payload, test_emitter &emitter) {
+    emitter.publish<an_event>(payload);
 }

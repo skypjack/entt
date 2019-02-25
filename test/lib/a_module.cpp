@@ -1,5 +1,7 @@
 #include <entt/entity/registry.hpp>
-#include "component.h"
+#include <entt/signal/dispatcher.hpp>
+#include <entt/signal/emitter.hpp>
+#include "types.h"
 
 #ifndef LIB_EXPORT
 #if defined _WIN32 || defined __CYGWIN__
@@ -39,4 +41,12 @@ LIB_EXPORT void update_position(int delta, entt::registry<> &registry) {
         pos.x += delta * vel.dx;
         pos.y += delta * vel.dy;
     });
+}
+
+LIB_EXPORT void trigger_another_event(entt::dispatcher<> &dispatcher) {
+    dispatcher.trigger<another_event>();
+}
+
+LIB_EXPORT void emit_another_event(test_emitter &emitter) {
+    emitter.publish<another_event>();
 }
