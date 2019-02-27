@@ -9,7 +9,7 @@
 * [Shared types and traits class](#shared-types-and-traits-class)
   * [Do not mix types](#do-not-mix-types)
 * [Macros, macros everywhere](#macros-macros-everywhere)
-  * [Conflicts](#conflict)
+  * [Conflicts](#conflicts)
 * [Allocations: the dark side of the force](#allocations-the-dark-side-of-the-force)
 <!--
 @endcond TURN_OFF_DOXYGEN
