@@ -5,10 +5,9 @@
 TEST(Prototype, SameRegistry) {
     entt::registry<> registry;
     entt::prototype prototype{registry};
-    const auto &cprototype = prototype;
 
     ASSERT_EQ(&registry, &prototype.backend());
-    ASSERT_EQ(&registry, &cprototype.backend());
+    ASSERT_EQ(&registry, &std::as_const(prototype).backend());
     ASSERT_FALSE(registry.empty());
     ASSERT_FALSE((prototype.has<int, char>()));
 
@@ -17,17 +16,17 @@ TEST(Prototype, SameRegistry) {
     ASSERT_EQ(prototype.set<char>('c'), 'c');
 
     ASSERT_EQ(prototype.get<int>(), 3);
-    ASSERT_EQ(cprototype.get<char>(), 'c');
+    ASSERT_EQ(std::as_const(prototype).get<char>(), 'c');
     ASSERT_EQ(std::get<0>(prototype.get<int, char>()), 3);
-    ASSERT_EQ(std::get<1>(cprototype.get<int, char>()), 'c');
+    ASSERT_EQ(std::get<1>(std::as_const(prototype).get<int, char>()), 'c');
 
     ASSERT_NE(prototype.try_get<int>(), nullptr);
     ASSERT_NE(prototype.try_get<char>(), nullptr);
     ASSERT_EQ(prototype.try_get<double>(), nullptr);
     ASSERT_EQ(*prototype.try_get<int>(), 3);
-    ASSERT_EQ(*cprototype.try_get<char>(), 'c');
+    ASSERT_EQ(*std::as_const(prototype).try_get<char>(), 'c');
     ASSERT_EQ(*std::get<0>(prototype.try_get<int, char, double>()), 3);
-    ASSERT_EQ(*std::get<1>(cprototype.try_get<int, char, double>()), 'c');
+    ASSERT_EQ(*std::get<1>(std::as_const(prototype).try_get<int, char, double>()), 'c');
 
     const auto e0 = prototype.create();
 
@@ -75,7 +74,6 @@ TEST(Prototype, OtherRegistry) {
     entt::registry<> registry;
     entt::registry<> repository;
     entt::prototype prototype{repository};
-    const auto &cprototype = prototype;
 
     ASSERT_TRUE(registry.empty());
     ASSERT_FALSE((prototype.has<int, char>()));
@@ -85,9 +83,9 @@ TEST(Prototype, OtherRegistry) {
     ASSERT_EQ(prototype.set<char>('c'), 'c');
 
     ASSERT_EQ(prototype.get<int>(), 3);
-    ASSERT_EQ(cprototype.get<char>(), 'c');
+    ASSERT_EQ(std::as_const(prototype).get<char>(), 'c');
     ASSERT_EQ(std::get<0>(prototype.get<int, char>()), 3);
-    ASSERT_EQ(std::get<1>(cprototype.get<int, char>()), 'c');
+    ASSERT_EQ(std::get<1>(std::as_const(prototype).get<int, char>()), 'c');
 
     const auto e0 = prototype.create(registry);
 

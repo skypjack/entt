@@ -217,22 +217,21 @@ TEST(Registry, Identifiers) {
 
 TEST(Registry, RawData) {
     entt::registry<> registry;
-    const entt::registry<> &cregistry = registry;
     const auto entity = registry.create();
 
     ASSERT_EQ(registry.raw<int>(), nullptr);
-    ASSERT_EQ(cregistry.raw<int>(), nullptr);
-    ASSERT_EQ(cregistry.data<int>(), nullptr);
+    ASSERT_EQ(std::as_const(registry).raw<int>(), nullptr);
+    ASSERT_EQ(std::as_const(registry).data<int>(), nullptr);
 
     registry.assign<int>(entity, 42);
 
     ASSERT_NE(registry.raw<int>(), nullptr);
-    ASSERT_NE(cregistry.raw<int>(), nullptr);
-    ASSERT_NE(cregistry.data<int>(), nullptr);
+    ASSERT_NE(std::as_const(registry).raw<int>(), nullptr);
+    ASSERT_NE(std::as_const(registry).data<int>(), nullptr);
 
     ASSERT_EQ(*registry.raw<int>(), 42);
-    ASSERT_EQ(*cregistry.raw<int>(), 42);
-    ASSERT_EQ(*cregistry.data<int>(), entity);
+    ASSERT_EQ(*std::as_const(registry).raw<int>(), 42);
+    ASSERT_EQ(*std::as_const(registry).data<int>(), entity);
 }
 
 TEST(Registry, CreateDestroyCornerCase) {

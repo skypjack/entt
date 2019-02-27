@@ -6,10 +6,9 @@
 TEST(Actor, Component) {
     entt::registry<> registry;
     entt::actor actor{registry};
-    const auto &cactor = actor;
 
     ASSERT_EQ(&registry, &actor.backend());
-    ASSERT_EQ(&registry, &cactor.backend());
+    ASSERT_EQ(&registry, &std::as_const(actor).backend());
     ASSERT_TRUE(registry.empty<int>());
     ASSERT_FALSE(registry.empty());
     ASSERT_FALSE(actor.has<int>());
@@ -18,7 +17,7 @@ TEST(Actor, Component) {
     const auto &cchar = actor.assign<char>();
 
     ASSERT_EQ(&cint, &actor.get<int>());
-    ASSERT_EQ(&cchar, &cactor.get<char>());
+    ASSERT_EQ(&cchar, &std::as_const(actor).get<char>());
     ASSERT_EQ(&cint, &std::get<0>(actor.get<int, char>()));
     ASSERT_EQ(&cchar, &std::get<1>(actor.get<int, char>()));
     ASSERT_EQ(&cint, std::get<0>(actor.try_get<int, char, double>()));

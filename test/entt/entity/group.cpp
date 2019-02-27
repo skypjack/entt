@@ -666,9 +666,8 @@ TEST(OwningGroup, EmptyAndNonEmptyTypes) {
 
 TEST(NonOwningGroup, TrackEntitiesOnComponentDestruction) {
     entt::registry<> registry;
-    const entt::registry<> &cregistry = registry;
     const auto group = registry.group<>(entt::get<int>, entt::exclude<char>);
-    const auto cgroup = cregistry.group<>(entt::get<const int>, entt::exclude<char>);
+    const auto cgroup = std::as_const(registry).group<>(entt::get<const int>, entt::exclude<char>);
 
     const auto entity = registry.create();
     registry.assign<int>(entity);
@@ -685,9 +684,8 @@ TEST(NonOwningGroup, TrackEntitiesOnComponentDestruction) {
 
 TEST(OwningGroup, TrackEntitiesOnComponentDestruction) {
     entt::registry<> registry;
-    const entt::registry<> &cregistry = registry;
     const auto group = registry.group<int>(entt::exclude<char>);
-    const auto cgroup = cregistry.group<const int>(entt::exclude<char>);
+    const auto cgroup = std::as_const(registry).group<const int>(entt::exclude<char>);
 
     const auto entity = registry.create();
     registry.assign<int>(entity);

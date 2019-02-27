@@ -111,7 +111,6 @@ TEST(SingleComponentView, Each) {
     registry.assign<int>(registry.create());
 
     auto view = registry.view<int>();
-    const auto &cview = static_cast<const decltype(view) &>(view);
     std::size_t cnt = 0;
 
     view.each([&cnt](auto, int &) { ++cnt; });
@@ -119,8 +118,8 @@ TEST(SingleComponentView, Each) {
 
     ASSERT_EQ(cnt, std::size_t{4});
 
-    cview.each([&cnt](auto, const int &) { --cnt; });
-    cview.each([&cnt](const int &) { --cnt; });
+    std::as_const(view).each([&cnt](auto, const int &) { --cnt; });
+    std::as_const(view).each([&cnt](const int &) { --cnt; });
 
     ASSERT_EQ(cnt, std::size_t{0});
 }
@@ -128,7 +127,7 @@ TEST(SingleComponentView, Each) {
 TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     entt::registry<> registry;
     auto view = registry.view<int>();
-    auto cview = registry.view<const int>();
+    auto cview = std::as_const(registry).view<const int>();
 
     ASSERT_EQ(view.size(), decltype(view.size()){0});
     ASSERT_EQ(cview.size(), decltype(cview.size()){0});
