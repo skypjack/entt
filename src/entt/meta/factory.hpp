@@ -325,11 +325,13 @@ public:
         auto * const type = internal::meta_info<Type>::resolve();
 
         if constexpr(std::is_same_v<Type, decltype(Data)>) {
+            using owner_type = std::integral_constant<Type, Data>;
+
             static internal::meta_data_node node{
                 hashed_string{str},
                 type->data,
                 type,
-                properties<std::integral_constant<Type, Data>>(std::forward<Property>(property)...),
+                properties<owner_type>(std::forward<Property>(property)...),
                 true,
                 true,
                 &internal::meta_info<Type>::resolve,
@@ -345,11 +347,13 @@ public:
             internal::meta_info<Type>::template data<Data> = &node;
             type->data = &node;
         } else {
+            using owner_type = std::integral_constant<decltype(Data), Data>;
+
             static internal::meta_data_node node{
                 hashed_string{str},
                 type->data,
                 type,
-                properties<std::integral_constant<decltype(Data), Data>>(std::forward<Property>(property)...),
+                properties<owner_type>(std::forward<Property>(property)...),
                 std::is_const_v<data_type<Data>>,
                 !std::is_member_object_pointer_v<decltype(Data)>,
                 &internal::meta_info<data_type<Data>>::resolve,
@@ -391,6 +395,7 @@ public:
      */
     template<auto Setter, auto Getter, typename... Property>
     meta_factory data(const char *str, Property &&... property) ENTT_NOEXCEPT {
+        using owner_type = std::tuple<std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>;
         using data_type = std::invoke_result_t<decltype(Getter), Type &>;
         static_assert(std::is_invocable_v<decltype(Setter), Type &, data_type>);
         auto * const type = internal::meta_info<Type>::resolve();
@@ -399,7 +404,7 @@ public:
             hashed_string{str},
             type->data,
             type,
-            properties<std::tuple<decltype(Setter), decltype(Getter)>>(std::forward<Property>(property)...),
+            properties<owner_type>(std::forward<Property>(property)...),
             false,
             false,
             &internal::meta_info<data_type>::resolve,
@@ -434,13 +439,14 @@ public:
      */
     template<auto Func, typename... Property>
     meta_factory func(const char *str, Property &&... property) ENTT_NOEXCEPT {
+        using owner_type = std::integral_constant<decltype(Func), Func>;
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_func_node node{
             hashed_string{str},
             type->func,
             type,
-            properties<std::integral_constant<decltype(Func), Func>>(std::forward<Property>(property)...),
+            properties<owner_type>(std::forward<Property>(property)...),
             func_type<Func>::size,
             func_type<Func>::is_const,
             func_type<Func>::is_static,
