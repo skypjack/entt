@@ -874,19 +874,28 @@ TEST(Registry, DestroyByComponents) {
     ASSERT_TRUE(registry.valid(e1));
     ASSERT_TRUE(registry.valid(e2));
 
-    registry.destroy<int, char, double>();
+    {
+        const auto view = registry.view<int, char, double>();
+        registry.destroy(view.begin(), view.end());
+    }
 
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_TRUE(registry.valid(e1));
     ASSERT_TRUE(registry.valid(e2));
 
-    registry.destroy<int, char>();
+    {
+        const auto view = registry.view<int, char>();
+        registry.destroy(view.begin(), view.end());
+    }
 
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
     ASSERT_TRUE(registry.valid(e2));
 
-    registry.destroy<int>();
+    {
+        const auto view = registry.view<int>();
+        registry.destroy(view.begin(), view.end());
+    }
 
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));

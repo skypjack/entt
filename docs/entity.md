@@ -139,15 +139,14 @@ auto entity = registry.create();
 registry.destroy(entity);
 ```
 
-There exists another overload of the `create` member function that accepts two
-iterators, that is a range to assign. It can be used to create multiple entities
-at once.<br/>
-Entities can also be destroyed _by type_, that is by specifying the types of the
-components that identify them:
+There exist also overloads of the `create` and `destroy` member functions that
+accept two iterators, that is a range to assign or to destroy. It can be used to
+create or destroy multiple entities at once:
 
 ```cpp
-// destroys the entities that own the given components, if any
-registry.destroy<a_component, another_component>();
+// destroys all the entities in a range
+auto view = registry.view<a_component, another_component>();
+registry.destroy(view.begin(), view.end());
 ```
 
 When an entity is destroyed, the registry can freely reuse it internally with a

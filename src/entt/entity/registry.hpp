@@ -561,24 +561,16 @@ public:
     }
 
     /**
-     * @brief Destroys the entities that own the given components, if any.
-     *
-     * Convenient shortcut to destroy a set of entities at once.<br/>
-     * Syntactic sugar for the following snippet:
-     *
-     * @code{.cpp}
-     * for(const auto entity: registry.view<Component...>()) {
-     *     registry.destroy(entity);
-     * }
-     * @endcode
-     *
-     * @tparam Component Types of components to use to search for the entities.
+     * @brief Destroys all the entities in a range.
+     * @tparam It Type of forward iterator.
+     * @param first An iterator to the first element of the range to generate.
+     * @param last An iterator past the last element of the range to generate.
      */
-    template<typename... Component>
-    void destroy() {
-        for(const auto entity: view<Component...>()) {
+    template<typename It>
+    void destroy(It first, It last) {
+        std::for_each(first, last, [this](const auto entity) {
             destroy(entity);
-        }
+        });
     }
 
     /**
