@@ -22,16 +22,12 @@ namespace entt {
  * events to be published all together once per tick.<br/>
  * Listeners are provided in the form of member functions. For each event of
  * type `Event`, listeners are such that they can be invoked with an argument of
- * type `const Event &` plus an extra list of arguments to forward with the
- * event itself, no matter what the return type is.
+ * type `const Event &`, no matter what the return type is.
  *
  * The type of the instances is `Class *` (a naked pointer). It means that users
  * must guarantee that the lifetimes of the instances overcome the one of the
  * dispatcher itself to avoid crashes.
- *
- * @tparam Args Types of arguments to forward along with an event.
  */
-template<typename... Args>
 class dispatcher {
     using event_family = family<struct internal_dispatcher_event_family>;
 
@@ -40,34 +36,35 @@ class dispatcher {
 
     struct base_wrapper {
         virtual ~base_wrapper() = default;
-        virtual void publish(Args...) = 0;
+        virtual void publish() = 0;
     };
 
     template<typename Event>
     struct signal_wrapper: base_wrapper {
-        using signal_type = sigh<void(const Event &, Args...)>;
+        using signal_type = sigh<void(const Event &)>;
         using sink_type = typename signal_type::sink_type;
 
-        void publish(Args... args) override {
+        void publish() override {
             for(const auto &event: events[current]) {
-                signal.publish(event, args...);
+                signal.publish(event);
             }
 
-            events[current].clear();
-            current = (current + 1) % std::extent<decltype(events)>::value;
+            events[current++].clear();
+            current %= std::extent<decltype(events)>::value;
         }
 
         inline sink_type sink() ENTT_NOEXCEPT {
             return signal.sink();
         }
 
-        inline void trigger(const Event &event, Args... args) {
-            signal.publish(event, args...);
+        template<typename... Args>
+        inline void trigger(Args &&... args) {
+            signal.publish({ std::forward<Args>(args)... });
         }
 
-        template<typename... Params>
-        inline void enqueue(Params &&... params) {
-            events[current].emplace_back(std::forward<Params>(params)...);
+        template<typename... Args>
+        inline void enqueue(Args &&... args) {
+            events[current].emplace_back(std::forward<Args>(args)...);
         }
 
     private:
@@ -157,12 +154,12 @@ public:
      * The event is discarded after the execution.
      *
      * @tparam Event Type of event to trigger.
-     * @param event An instance of the given type of event.
-     * @param args Arguments to forward along with the event.
+     * @tparam Args Types of arguments to use to construct the event.
+     * @param args Arguments to use to construct the event.
      */
-    template<typename Event>
-    inline void trigger(Event &&event, Args... args) {
-        assure<std::decay_t<Event>>().trigger(std::forward<Event>(event), args...);
+    template<typename Event, typename... Args>
+    inline void trigger(Args &&... args) {
+        assure<Event>().trigger(std::forward<Args>(args)...);
     }
 
     /**
@@ -172,11 +169,11 @@ public:
      * The event is discarded after the execution.
      *
      * @tparam Event Type of event to trigger.
-     * @param args Arguments to forward along with the event.
+     * @param event An instance of the given type of event.
      */
     template<typename Event>
-    inline void trigger(Args... args) {
-        assure<std::decay_t<Event>>().trigger(Event{}, args...);
+    inline void trigger(Event &&event) {
+        assure<std::decay_t<Event>>().trigger(std::forward<Event>(event));
     }
 
     /**
@@ -186,12 +183,12 @@ public:
      * `update` member function to notify listeners when ready.
      *
      * @tparam Event Type of event to enqueue.
-     * @tparam Params Types of arguments to use to construct the event.
-     * @param params Arguments to use to construct the event.
+     * @tparam Args Types of arguments to use to construct the event.
+     * @param args Arguments to use to construct the event.
      */
-    template<typename Event, typename... Params>
-    inline void enqueue(Params &&... params) {
-        assure<Event>().enqueue(std::forward<Params>(params)...);
+    template<typename Event, typename... Args>
+    inline void enqueue(Args &&... args) {
+        assure<Event>().enqueue(std::forward<Args>(args)...);
     }
 
     /**
@@ -216,11 +213,10 @@ public:
      * to reduce at a minimum the time spent in the bodies of the listeners.
      *
      * @tparam Event Type of events to send.
-     * @param args Arguments to forward along with the event.
      */
     template<typename Event>
-    inline void update(Args... args) {
-        assure<Event>().publish(args...);
+    inline void update() {
+        assure<Event>().publish();
     }
 
     /**
@@ -229,15 +225,13 @@ public:
      * This method is blocking and it doesn't return until all the events are
      * delivered to the registered listeners. It's responsibility of the users
      * to reduce at a minimum the time spent in the bodies of the listeners.
-     *
-     * @param args Arguments to forward along with the event.
      */
-    inline void update(Args... args) const {
+    inline void update() const {
         for(auto pos = wrappers.size(); pos; --pos) {
             auto &wdata = wrappers[pos-1];
 
             if(wdata.wrapper) {
-                wdata.wrapper->publish(args...);
+                wdata.wrapper->publish();
             }
         }
     }

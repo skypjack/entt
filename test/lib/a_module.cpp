@@ -43,7 +43,7 @@ LIB_EXPORT void update_position(int delta, entt::registry<> &registry) {
     });
 }
 
-LIB_EXPORT void trigger_another_event(entt::dispatcher<> &dispatcher) {
+LIB_EXPORT void trigger_another_event(entt::dispatcher &dispatcher) {
     dispatcher.trigger<another_event>();
 }
 

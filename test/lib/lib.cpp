@@ -12,8 +12,8 @@ extern typename entt::registry<>::component_type another_module_char_type();
 extern void update_position(int delta, entt::registry<> &);
 extern void assign_velocity(int, entt::registry<> &);
 
-extern void trigger_an_event(int, entt::dispatcher<> &);
-extern void trigger_another_event(entt::dispatcher<> &);
+extern void trigger_an_event(int, entt::dispatcher &);
+extern void trigger_another_event(entt::dispatcher &);
 
 struct listener {
     void on_an_event(an_event event) { value = event.payload; }
@@ -64,7 +64,7 @@ TEST(Lib, Registry) {
 }
 
 TEST(Lib, Dispatcher) {
-    entt::dispatcher<> dispatcher;
+    entt::dispatcher dispatcher;
     listener listener;
 
     dispatcher.sink<an_event>().connect<&listener::on_an_event>(&listener);

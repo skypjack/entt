@@ -48,8 +48,8 @@ LIB_EXPORT void assign_velocity(int vel, entt::registry<> &registry) {
     }
 }
 
-LIB_EXPORT void trigger_an_event(int payload, entt::dispatcher<> &dispatcher) {
-    dispatcher.trigger(an_event{payload});
+LIB_EXPORT void trigger_an_event(int payload, entt::dispatcher &dispatcher) {
+    dispatcher.trigger<an_event>(payload);
 }
 
 LIB_EXPORT void emit_an_event(int payload, test_emitter &emitter) {
