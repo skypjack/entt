@@ -710,7 +710,7 @@ public:
     template<typename Component>
     Component & get(const entity_type entity, Component &&component) ENTT_NOEXCEPT {
         assert(valid(entity));
-        auto [pdata, cpool] = assure<Component>();
+        auto [pdata, cpool] = assure<std::remove_reference_t<Component>>();
         auto *comp = cpool->try_get(entity);
 
         if(!comp) {
