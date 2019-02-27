@@ -74,13 +74,9 @@ class snapshot {
     }
 
 public:
-    /*! @brief Copying a snapshot isn't allowed. */
-    snapshot(const snapshot &) = delete;
     /*! @brief Default move constructor. */
     snapshot(snapshot &&) = default;
 
-    /*! @brief Copying a snapshot isn't allowed. @return This snapshot. */
-    snapshot & operator=(const snapshot &) = delete;
     /*! @brief Default move assignment operator. @return This snapshot. */
     snapshot & operator=(snapshot &&) = default;
 
@@ -239,13 +235,9 @@ class snapshot_loader {
     }
 
 public:
-    /*! @brief Copying a snapshot loader isn't allowed. */
-    snapshot_loader(const snapshot_loader &) = delete;
     /*! @brief Default move constructor. */
     snapshot_loader(snapshot_loader &&) = default;
 
-    /*! @brief Copying a snapshot loader isn't allowed. @return This loader. */
-    snapshot_loader & operator=(const snapshot_loader &) = delete;
     /*! @brief Default move assignment operator. @return This loader. */
     snapshot_loader & operator=(snapshot_loader &&) = default;
 
@@ -437,13 +429,9 @@ public:
         : reg{reg}
     {}
 
-    /*! @brief Copying a snapshot loader isn't allowed. */
-    continuous_loader(const continuous_loader &) = delete;
     /*! @brief Default move constructor. */
     continuous_loader(continuous_loader &&) = default;
 
-    /*! @brief Copying a snapshot loader isn't allowed. @return This loader. */
-    continuous_loader & operator=(const continuous_loader &) = delete;
     /*! @brief Default move assignment operator. @return This loader. */
     continuous_loader & operator=(continuous_loader &&) = default;
 

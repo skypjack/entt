@@ -201,13 +201,9 @@ public:
     /*! @brief Default constructor. */
     registry() ENTT_NOEXCEPT = default;
 
-    /*! @brief Copying a registry isn't allowed. */
-    registry(const registry &) = delete;
     /*! @brief Default move constructor. */
     registry(registry &&) = default;
 
-    /*! @brief Copying a registry isn't allowed. @return This registry. */
-    registry & operator=(const registry &) = delete;
     /*! @brief Default move assignment operator. @return This registry. */
     registry & operator=(registry &&) = default;
 

@@ -79,9 +79,6 @@ public:
         release();
     }
 
-    /*! @brief Copying a prototype isn't allowed. */
-    prototype(const prototype &) = delete;
-
     /**
      * @brief Move constructor.
      *
@@ -98,9 +95,6 @@ public:
     {
         other.entity = null;
     }
-
-    /*! @brief Copying a prototype isn't allowed. @return This prototype. */
-    prototype & operator=(const prototype &) = delete;
 
     /**
      * @brief Move assignment operator.

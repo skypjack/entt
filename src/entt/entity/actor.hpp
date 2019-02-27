@@ -41,9 +41,6 @@ struct actor {
         reg->destroy(entt);
     }
 
-    /*! @brief Copying an actor isn't allowed. */
-    actor(const actor &) = delete;
-
     /**
      * @brief Move constructor.
      *
@@ -58,9 +55,6 @@ struct actor {
     {
         other.entt = null;
     }
-
-    /*! @brief Default copy assignment operator. @return This actor. */
-    actor & operator=(const actor &) = delete;
 
     /**
      * @brief Move assignment operator.

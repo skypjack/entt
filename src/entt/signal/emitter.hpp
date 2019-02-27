@@ -201,13 +201,9 @@ public:
         static_assert(std::is_base_of_v<emitter<Derived>, Derived>);
     }
 
-    /*! @brief Copying an emitter isn't allowed. */
-    emitter(const emitter &) = delete;
     /*! @brief Default move constructor. */
     emitter(emitter &&) = default;
 
-    /*! @brief Copying an emitter isn't allowed. @return This emitter. */
-    emitter & operator=(const emitter &) = delete;
     /*! @brief Default move assignment operator. @return This emitter. */
     emitter & operator=(emitter &&) = default;
 

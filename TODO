@@ -3,16 +3,25 @@
 * long term feature: shared_ptr less resource cache
 * custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
-* define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
-* define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
 * runner proposal: https://en.wikipedia.org/wiki/Fork%E2%80%93join_model https://slide-rs.github.io/specs/03_dispatcher.html
 * work stealing job system (see #100)
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
 * hashed string: add implicit check on construction for uniqueness (optional)
 * allow for built-in parallel each if possible
-* events on replace, so that one can track updated components? indagate impact
 * tags revenge: if it's possible, reintroduce them but without a link to entities (see #169 for more details)
 * empty components model allows for shared components and prefabs unity-like
 * allow to replace std:: with custom implementations
 * allow to sort groups (::respect can already work with begin/end instead of a whole sparse set)
 * cleanup - see https://github.com/skypjack/entt/commit/ad5cedc08c83e8cbcc8aaeac9634d44624ffe35a#commitcomment-32380903
+
+TODO
+* add and burst add with components (sort of registry.create<A, B>(first, last) and registry.create<A, B>())
+
+TODO
+* update doc dispatcher (it's outdated) or rollback changes to add extra parameters (is that really useful at the end of the day?)
+
+TODO
+* events on replace, so that one can track updated components? indagate impact
+* define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
+* define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
+==> from Tommaso on discord view<Health, Transform>().where<Health>([](h) {h > 5}).where<Transform>([](t) {t.inside(aabb)});
