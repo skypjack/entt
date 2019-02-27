@@ -281,12 +281,12 @@ to the project where users can find all related documentation pages.
 
 To compile and run the tests, `EnTT` requires *googletest*.<br/>
 `cmake` will download and compile the library before compiling anything else.
-In order to build without tests set CMake option `BUILD_TESTING=OFF`.
+In order to build the tests, set the CMake option `BUILD_TESTING` to `ON`.
 
 To build the most basic set of tests:
 
 * `$ cd build`
-* `$ cmake ..`
+* `$ cmake -DBUILD_TESTING=ON ..`
 * `$ make`
 * `$ make test`
 
