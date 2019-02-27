@@ -87,7 +87,7 @@ class group;
  */
 template<typename Entity, typename... Get>
 class group<Entity, get_t<Get...>> {
-    static_assert(sizeof...(Get));
+    static_assert(sizeof...(Get) > 0);
 
     /*! @brief A registry is allowed to create groups. */
     friend class registry<Entity>;
@@ -339,7 +339,7 @@ private:
  */
 template<typename Entity, typename... Get, typename... Owned>
 class group<Entity, get_t<Get...>, Owned...> {
-    static_assert(sizeof...(Get) + sizeof...(Owned));
+    static_assert(sizeof...(Get) + sizeof...(Owned) > 0);
 
     /*! @brief A registry is allowed to create groups. */
     friend class registry<Entity>;
@@ -541,11 +541,11 @@ public:
 
         while(std::get<0>(raw) != cend) {
             if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Owned>..., std::add_lvalue_reference_t<Get>...>) {
-                if constexpr(sizeof...(Get)) {
+                if constexpr(sizeof...(Get) == 0) {
+                    func(*(std::get<component_iterator_type<Owned>>(raw)++)...);
+                } else {
                     const auto entity = *(data++);
                     func(*(std::get<component_iterator_type<Owned>>(raw)++)..., std::get<pool_type<Get> *>(pools)->get(entity)...);
-                } else {
-                    func(*(std::get<component_iterator_type<Owned>>(raw)++)...);
                 }
             } else {
                 const auto entity = *(data++);

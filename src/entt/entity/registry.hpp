@@ -1211,7 +1211,7 @@ public:
     template<typename... Owned, typename... Get, typename... Exclude>
     entt::group<Entity, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1);
-        static_assert(sizeof...(Owned) + sizeof...(Get));
+        static_assert(sizeof...(Owned) + sizeof...(Get) > 0);
 
         if constexpr(sizeof...(Owned) == 0) {
             auto it = std::find_if(outer_groups.begin(), outer_groups.end(), [](auto &&gdata) {
