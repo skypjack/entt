@@ -11,13 +11,13 @@
 [![Gitter chat](https://badges.gitter.im/skypjack/entt.png)](https://gitter.im/skypjack/entt)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=W2HF9FESD5LJY&lc=IT&item_name=Michele%20Caini&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
 
-Do you want to keep up with changes or do you have a question that doesn't
-require you to open an issue?<br/>
-Join the [gitter channel](https://gitter.im/skypjack/entt) and meet other users
-like you. The more we are, the better it is for everyone.
+Do you want to **keep up with changes** or do you have a **question** that
+doesn't require you to open an issue?<br/>
+Join the [gitter channel](https://gitter.im/skypjack/entt) and **meet other
+users** like you. **The more** we are, **the better** it is for everyone.
 
-If you use `EnTT` and you want to say thanks or support the project, please
-consider becoming a patron:
+If you use `EnTT` and you want to **say thanks** or **support** the project,
+please **consider becoming a patron**:
 
 [![Patreon](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/bePatron?c=1772573)
 
