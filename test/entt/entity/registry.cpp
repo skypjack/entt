@@ -1127,3 +1127,19 @@ TEST(Registry, GetOrAssign) {
     ASSERT_EQ(registry.get<int>(entity), value);
     ASSERT_EQ(registry.get<int>(entity), 3);
 }
+
+TEST(Registry, Constness) {
+    entt::registry<> registry;
+
+    ASSERT_TRUE((std::is_same_v<decltype(registry.get<int>({})), int &>));
+    ASSERT_TRUE((std::is_same_v<decltype(registry.get<int, char>({})), std::tuple<int &, char &>>));
+
+    ASSERT_TRUE((std::is_same_v<decltype(registry.try_get<int>({})), int *>));
+    ASSERT_TRUE((std::is_same_v<decltype(registry.try_get<int, char>({})), std::tuple<int *, char *>>));
+
+    ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).get<int>({})), const int &>));
+    ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).get<int, char>({})), std::tuple<const int &, const char &>>));
+
+    ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).try_get<int>({})), const int *>));
+    ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).try_get<int, char>({})), std::tuple<const int *, const char *>>));
+}

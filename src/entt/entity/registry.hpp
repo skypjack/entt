@@ -660,7 +660,7 @@ public:
         assert(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return (std::get<1>(pool<Component>())->get(entity), ...);
+            return (std::as_const(*std::get<1>(pool<Component>())).get(entity), ...);
         } else {
             return std::tuple<std::add_const_t<Component> &...>{get<Component>(entity)...};
         }
@@ -730,7 +730,7 @@ public:
         assert(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return (std::get<1>(assure<Component>())->try_get(entity), ...);
+            return (std::as_const(*std::get<1>(assure<Component>())).try_get(entity), ...);
         } else {
             return std::tuple<std::add_const_t<Component> *...>{try_get<Component>(entity)...};
         }
