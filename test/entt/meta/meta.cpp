@@ -86,6 +86,9 @@ struct setter_getter_type {
     int setter(int value) { return this->value = value; }
     int getter() { return value; }
 
+    int setter_with_ref(const int &value) { return this->value = value; }
+    const int & getter_with_ref() { return value; }
+
     static int static_setter(setter_getter_type &type, int value) { return type.value = value; }
     static int static_getter(const setter_getter_type &type) { return type.value; }
 };
@@ -159,7 +162,8 @@ struct Meta: public ::testing::Test {
         entt::reflect<setter_getter_type>("setter_getter")
                 .data<&setter_getter_type::static_setter, &setter_getter_type::static_getter>("x")
                 .data<&setter_getter_type::setter, &setter_getter_type::getter>("y")
-                .data<&setter_getter_type::static_setter, &setter_getter_type::getter>("z");
+                .data<&setter_getter_type::static_setter, &setter_getter_type::getter>("z")
+                .data<&setter_getter_type::setter_with_ref, &setter_getter_type::getter_with_ref>("w");
 
         entt::reflect<an_abstract_type>("an_abstract_type", std::make_pair(properties::prop_bool, false))
                 .data<&an_abstract_type::i>("i")
@@ -953,6 +957,22 @@ TEST_F(Meta, MetaDataSetterGetterAsMemberFunctions) {
     ASSERT_EQ(data.parent(), entt::resolve("setter_getter"));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_STREQ(data.name(), "y");
+    ASSERT_FALSE(data.is_const());
+    ASSERT_FALSE(data.is_static());
+    ASSERT_EQ(data.get(instance).cast<int>(), 0);
+    ASSERT_TRUE(data.set(instance, 42));
+    ASSERT_EQ(data.get(instance).cast<int>(), 42);
+}
+
+TEST_F(Meta, MetaDataSetterGetterWithRefAsMemberFunctions) {
+    auto data = entt::resolve<setter_getter_type>().data("w");
+    setter_getter_type instance{};
+
+    ASSERT_TRUE(data);
+    ASSERT_NE(data, entt::meta_data{});
+    ASSERT_EQ(data.parent(), entt::resolve("setter_getter"));
+    ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_STREQ(data.name(), "w");
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
