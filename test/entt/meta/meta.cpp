@@ -13,7 +13,7 @@ enum class properties {
 struct empty_type {
     virtual ~empty_type() = default;
 
-    static void destroy(empty_type &instance) {
+    static void destroy(empty_type *) {
         ++counter;
     }
 
@@ -89,8 +89,8 @@ struct setter_getter_type {
     int setter_with_ref(const int &value) { return this->value = value; }
     const int & getter_with_ref() { return value; }
 
-    static int static_setter(setter_getter_type &type, int value) { return type.value = value; }
-    static int static_getter(const setter_getter_type &type) { return type.value; }
+    static int static_setter(setter_getter_type *type, int value) { return type->value = value; }
+    static int static_getter(const setter_getter_type *type) { return type->value; }
 };
 
 struct not_comparable_type {

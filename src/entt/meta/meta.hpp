@@ -656,9 +656,6 @@ public:
         : meta_handle{0, std::forward<Type>(instance)}
     {}
 
-    /*! @brief Default destructor. */
-    ~meta_handle() ENTT_NOEXCEPT = default;
-
     /**
      * @brief Returns the meta type of the underlying object.
      * @return The meta type of the underlying object, if any.
@@ -2042,17 +2039,12 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any &any)
     } else if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>> || std::is_member_function_pointer_v<decltype(Data)>) {
         using helper_type = meta_function_helper<std::integral_constant<decltype(Data), Data>>;
         using data_type = std::decay_t<std::tuple_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>>;
+        static_assert(std::is_invocable_v<decltype(Data), Type *, data_type>);
         accepted = any.can_cast<data_type>() || any.convert<data_type>();
         auto *clazz = handle.try_cast<Type>();
 
         if(accepted && clazz) {
-            if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>>) {
-                static_assert(std::is_invocable_v<decltype(Data), Type &, data_type>);
-                Data(*clazz, any.cast<data_type>());
-            } else if constexpr(std::is_member_function_pointer_v<decltype(Data)>) {
-                static_assert(std::is_invocable_v<decltype(Data), Type *, data_type>);
-                (clazz->*Data)(any.cast<data_type>());
-            }
+            std::invoke(Data, clazz, any.cast<data_type>());
         }
     } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
         using data_type = std::decay_t<decltype(std::declval<Type>().*Data)>;
@@ -2061,7 +2053,7 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any &any)
         auto *clazz = handle.try_cast<Type>();
 
         if(accepted && clazz) {
-            clazz->*Data = any.cast<data_type>();
+            std::invoke(Data, clazz) = any.cast<data_type>();
         }
     } else {
         static_assert(std::is_pointer_v<decltype(Data)>);
@@ -2080,16 +2072,9 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any &any)
 template<typename Type, auto Data>
 inline meta_any getter([[maybe_unused]] meta_handle handle) {
     if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>> || std::is_member_pointer_v<decltype(Data)>) {
-        static_assert(std::is_invocable_v<decltype(Data), Type &>);
+        static_assert(std::is_invocable_v<decltype(Data), Type *>);
         auto *clazz = handle.try_cast<Type>();
-
-        if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>>) {
-            return clazz ? meta_any{Data(*clazz)} : meta_any{};
-        } else if constexpr(std::is_member_function_pointer_v<decltype(Data)>) {
-            return clazz ? meta_any{(clazz->*Data)()} : meta_any{};
-        } else /* if constexpr(std::is_member_object_pointer_v<decltype(Data)>) */ {
-            return clazz ? meta_any{clazz->*Data} : meta_any{};
-        }
+        return clazz ? std::invoke(Data, clazz) : meta_any{};
     } else {
         static_assert(std::is_pointer_v<decltype(Data)>);
         return meta_any{*Data};
@@ -2107,9 +2092,9 @@ invoke(const meta_handle &, meta_any *args, std::index_sequence<Indexes...>) {
             || (args+Indexes)->convert<typename helper_type::template arg_type<Indexes>>()) && ...))
     {
         if constexpr(std::is_void_v<typename helper_type::return_type>) {
-            (*Func)((args+Indexes)->cast<typename helper_type::template arg_type<Indexes>>()...);
+            std::invoke(Func, (args+Indexes)->cast<typename helper_type::template arg_type<Indexes>>()...);
         } else {
-            any = meta_any{(*Func)((args+Indexes)->cast<typename helper_type::template arg_type<Indexes>>()...)};
+            any = meta_any{std::invoke(Func, (args+Indexes)->cast<typename helper_type::template arg_type<Indexes>>()...)};
         }
     }
 
@@ -2129,9 +2114,9 @@ invoke(meta_handle &handle, meta_any *args, std::index_sequence<Indexes...>) {
                   || (args+Indexes)->convert<typename helper_type::template arg_type<Indexes>>()) && ...))
     {
         if constexpr(std::is_void_v<typename helper_type::return_type>) {
-            (clazz->*Member)((args+Indexes)->cast<typename helper_type::template arg_type<Indexes>>()...);
+            std::invoke(Member, clazz, (args+Indexes)->cast<typename helper_type::template arg_type<Indexes>>()...);
         } else {
-            any = meta_any{(clazz->*Member)((args+Indexes)->cast<typename helper_type::template arg_type<Indexes>>()...)};
+            any = meta_any{std::invoke(Member, clazz, (args+Indexes)->cast<typename helper_type::template arg_type<Indexes>>()...)};
         }
     }
 

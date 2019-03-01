@@ -272,7 +272,7 @@ public:
      * The signature of the function should identical to the following:
      *
      * @code{.cpp}
-     * void(Type &);
+     * void(Type *);
      * @endcode
      *
      * From a client's point of view, nothing changes if the destructor of a
@@ -283,14 +283,14 @@ public:
      */
     template<auto *Func>
     meta_factory dtor() ENTT_NOEXCEPT {
-        static_assert(std::is_invocable_v<decltype(Func), Type &>);
+        static_assert(std::is_invocable_v<decltype(Func), Type *>);
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_dtor_node node{
             type,
             [](meta_handle handle) {
                 return handle.type() == internal::meta_info<Type>::resolve()->meta()
-                        ? ((*Func)(*static_cast<Type *>(handle.data())), true)
+                        ? ((*Func)(static_cast<Type *>(handle.data())), true)
                         : false;
             },
             []() -> meta_dtor {
@@ -379,9 +379,10 @@ public:
      *
      * Setters and getters can be either free functions, member functions or a
      * mix of them.<br/>
-     * In case of free functions, setters and getters must accept an instance of
-     * the parent type as their first argument. A setter has then an extra
-     * argument of a type convertible to that of the parameter to set.<br/>
+     * In case of free functions, setters and getters must accept a pointer to
+     * an instance of the parent type as their first argument. A setter has then
+     * an extra argument of a type convertible to that of the parameter to
+     * set.<br/>
      * In case of member functions, getters have no arguments at all, while
      * setters has an argument of a type convertible to that of the parameter to
      * set.
@@ -396,8 +397,8 @@ public:
     template<auto Setter, auto Getter, typename... Property>
     meta_factory data(const char *str, Property &&... property) ENTT_NOEXCEPT {
         using owner_type = std::tuple<std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>;
-        using data_type = std::invoke_result_t<decltype(Getter), Type &>;
-        static_assert(std::is_invocable_v<decltype(Setter), Type &, data_type>);
+        using data_type = std::invoke_result_t<decltype(Getter), Type *>;
+        static_assert(std::is_invocable_v<decltype(Setter), Type *, data_type>);
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_data_node node{
