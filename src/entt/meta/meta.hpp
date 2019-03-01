@@ -9,6 +9,7 @@
 #include <cassert>
 #include <cstddef>
 #include <utility>
+#include <functional>
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/hashed_string.hpp"
@@ -2046,8 +2047,10 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any &any)
 
         if(accepted && clazz) {
             if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>>) {
+                static_assert(std::is_invocable_v<decltype(Data), Type &, data_type>);
                 Data(*clazz, any.cast<data_type>());
             } else if constexpr(std::is_member_function_pointer_v<decltype(Data)>) {
+                static_assert(std::is_invocable_v<decltype(Data), Type *, data_type>);
                 (clazz->*Data)(any.cast<data_type>());
             }
         }
