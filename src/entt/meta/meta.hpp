@@ -2035,37 +2035,39 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any &any)
     bool accepted = false;
 
     if constexpr(Const) {
-        return false;
-    } else if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>> || std::is_member_function_pointer_v<decltype(Data)>) {
-        using helper_type = meta_function_helper<std::integral_constant<decltype(Data), Data>>;
-        using data_type = std::decay_t<std::tuple_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>>;
-        static_assert(std::is_invocable_v<decltype(Data), Type *, data_type>);
-        accepted = any.can_cast<data_type>() || any.convert<data_type>();
-        auto *clazz = handle.try_cast<Type>();
-
-        if(accepted && clazz) {
-            std::invoke(Data, clazz, any.cast<data_type>());
-        }
-    } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
-        using data_type = std::decay_t<decltype(std::declval<Type>().*Data)>;
-        static_assert(std::is_invocable_v<decltype(Data), Type>);
-        accepted = any.can_cast<data_type>() || any.convert<data_type>();
-        auto *clazz = handle.try_cast<Type>();
-
-        if(accepted && clazz) {
-            std::invoke(Data, clazz) = any.cast<data_type>();
-        }
+        return accepted;
     } else {
-        static_assert(std::is_pointer_v<decltype(Data)>);
-        using data_type = std::decay_t<decltype(*Data)>;
-        accepted = any.can_cast<data_type>() || any.convert<data_type>();
+        if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>> || std::is_member_function_pointer_v<decltype(Data)>) {
+            using helper_type = meta_function_helper<std::integral_constant<decltype(Data), Data>>;
+            using data_type = std::decay_t<std::tuple_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>>;
+            static_assert(std::is_invocable_v<decltype(Data), Type *, data_type>);
+            accepted = any.can_cast<data_type>() || any.convert<data_type>();
+            auto *clazz = handle.try_cast<Type>();
 
-        if(accepted) {
-            *Data = any.cast<data_type>();
+            if(accepted && clazz) {
+                std::invoke(Data, clazz, any.cast<data_type>());
+            }
+        } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
+            using data_type = std::decay_t<decltype(std::declval<Type>().*Data)>;
+            static_assert(std::is_invocable_v<decltype(Data), Type>);
+            accepted = any.can_cast<data_type>() || any.convert<data_type>();
+            auto *clazz = handle.try_cast<Type>();
+
+            if(accepted && clazz) {
+                std::invoke(Data, clazz) = any.cast<data_type>();
+            }
+        } else {
+            static_assert(std::is_pointer_v<decltype(Data)>);
+            using data_type = std::decay_t<decltype(*Data)>;
+            accepted = any.can_cast<data_type>() || any.convert<data_type>();
+
+            if(accepted) {
+                *Data = any.cast<data_type>();
+            }
         }
-    }
 
-    return accepted;
+        return accepted;
+    }
 }
 
 
