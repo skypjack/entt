@@ -497,7 +497,7 @@ public:
     template<typename It>
     void create(It first, It last) {
         static_assert(std::is_convertible_v<entity_type, typename std::iterator_traits<It>::value_type>);
-        const auto length = size_type(last - first);
+        const auto length = size_type(std::distance(first, last));
         const auto sz = std::min(available, length);
 
         available -= sz;
@@ -1335,7 +1335,7 @@ public:
     template<typename It>
     entt::runtime_view<Entity> runtime_view(It first, It last) const {
         static_assert(std::is_convertible_v<typename std::iterator_traits<It>::value_type, component_type>);
-        std::vector<const sparse_set<Entity> *> set(last - first);
+        std::vector<const sparse_set<Entity> *> set(std::distance(first, last));
 
         std::transform(first, last, set.begin(), [this](const component_type ctype) {
             auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &pdata) {
