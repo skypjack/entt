@@ -11,14 +11,14 @@
 * tags revenge: if it's possible, reintroduce them but without a link to entities (see #169 for more details)
 * empty components model allows for shared components and prefabs unity-like
 * allow to replace std:: with custom implementations
-* allow to sort groups (::respect can already work with begin/end instead of a whole sparse set)
 * cleanup - see https://github.com/skypjack/entt/commit/ad5cedc08c83e8cbcc8aaeac9634d44624ffe35a#commitcomment-32380903
-
-TODO
-* add and burst add with components (sort of registry.create<A, B>(first, last) and registry.create<A, B>())
-
-TODO
+* allow to sort groups (::respect can already work with begin/end instead of a whole sparse set)
+  -it would ease by far the group trick for hierarchies that requires otherwise more boilerplate
+* allow some features by component type (eg registry.assign(entity, component);
+  - it could be possible for eg default constructible types by storing aside (pool data) erased functions
+  - does it worth it?
+* add and bulk add with components (sort of registry.create<A, B>(first, last) and registry.create<A, B>())
 * events on replace, so that one can track updated components? indagate impact
-* define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
-* define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
-==> from Tommaso on discord view<Health, Transform>().where<Health>([](h) {h > 5}).where<Transform>([](t) {t.inside(aabb)});
+  - define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
+  - define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
+  - from Tommaso on discord view<Health, Transform>().where<Health>([](h) {h > 5}).where<Transform>([](t) {t.inside(aabb)});
