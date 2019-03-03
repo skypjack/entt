@@ -5,7 +5,6 @@
 #include <cassert>
 #include <tuple>
 #include <utility>
-#include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
@@ -257,15 +256,13 @@ public:
      */
     template<typename Func>
     inline void each(Func func) const {
-        if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Get>...>) {
-            std::for_each(handler->begin(), handler->end(), [func = std::move(func), this](const auto entity) mutable {
+        for(const auto entity: *handler) {
+            if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Get>...>) {
                 func(std::get<pool_type<Get> *>(pools)->get(entity)...);
-            });
-        } else {
-            std::for_each(handler->begin(), handler->end(), [func = std::move(func), this](const auto entity) mutable {
+            } else {
                 func(entity, std::get<pool_type<Get> *>(pools)->get(entity)...);
-            });
-        }
+            }
+        };
     }
 
     /**
@@ -537,9 +534,8 @@ public:
     inline void each(Func func) const {
         auto raw = std::make_tuple((std::get<pool_type<Owned> *>(pools)->end() - *length)...);
         [[maybe_unused]] auto data = std::get<0>(pools)->sparse_set<entity_type>::end() - *length;
-        const auto cend = std::get<0>(pools)->end();
 
-        while(std::get<0>(raw) != cend) {
+        for(auto next = *length; next; --next) {
             if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Owned>..., std::add_lvalue_reference_t<Get>...>) {
                 if constexpr(sizeof...(Get) == 0) {
                     func(*(std::get<component_iterator_type<Owned>>(raw)++)...);

@@ -380,6 +380,252 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
     });
 }
 
+TEST(Benchmark, IterateThreeComponents1M) {
+    entt::registry<> registry;
+
+    std::cout << "Iterating over 1000000 entities, three components" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.assign<position>(entity);
+        registry.assign<velocity>(entity);
+        registry.assign<comp<0>>(entity);
+    }
+
+    auto test = [&registry](auto func) {
+        timer timer;
+        registry.view<position, velocity, comp<0>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](const auto &...) {});
+    test([](auto &... comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
+TEST(Benchmark, IterateThreeComponents1MHalf) {
+    entt::registry<> registry;
+
+    std::cout << "Iterating over 1000000 entities, three components, half of the entities have all the components" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.assign<velocity>(entity);
+        registry.assign<comp<0>>(entity);
+
+        if(i % 2) {
+            registry.assign<position>(entity);
+        }
+    }
+
+    auto test = [&registry](auto func) {
+        timer timer;
+        registry.view<position, velocity, comp<0>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](const auto &...) {});
+    test([](auto &... comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
+TEST(Benchmark, IterateThreeComponents1MOne) {
+    entt::registry<> registry;
+
+    std::cout << "Iterating over 1000000 entities, three components, only one entity has all the components" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.assign<velocity>(entity);
+        registry.assign<comp<0>>(entity);
+
+        if(i == 5000000L) {
+            registry.assign<position>(entity);
+        }
+    }
+
+    auto test = [&registry](auto func) {
+        timer timer;
+        registry.view<position, velocity, comp<0>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](const auto &...) {});
+    test([](auto &... comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
+TEST(Benchmark, IterateThreeComponentsNonOwningGroup1M) {
+    entt::registry<> registry;
+    registry.group<>(entt::get<position, velocity>);
+
+    std::cout << "Iterating over 1000000 entities, three components, non owning group" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.assign<position>(entity);
+        registry.assign<velocity>(entity);
+        registry.assign<comp<0>>(entity);
+    }
+
+    auto test = [&registry](auto func) {
+        timer timer;
+        registry.group<>(entt::get<position, velocity, comp<0>>).each(func);
+        timer.elapsed();
+    };
+
+    test([](const auto &...) {});
+    test([](auto &... comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
+TEST(Benchmark, IterateThreeComponentsFullOwningGroup1M) {
+    entt::registry<> registry;
+    registry.group<position, velocity, comp<0>>();
+
+    std::cout << "Iterating over 1000000 entities, three components, full owning group" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.assign<position>(entity);
+        registry.assign<velocity>(entity);
+        registry.assign<comp<0>>(entity);
+    }
+
+    auto test = [&registry](auto func) {
+        timer timer;
+        registry.group<position, velocity, comp<0>>().each(func);
+        timer.elapsed();
+    };
+
+    test([](const auto &...) {});
+    test([](auto &... comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
+TEST(Benchmark, IterateThreeComponentsPartialOwningGroup1M) {
+    entt::registry<> registry;
+    registry.group<position, velocity>(entt::get<comp<0>>);
+
+    std::cout << "Iterating over 1000000 entities, three components, partial owning group" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.assign<position>(entity);
+        registry.assign<velocity>(entity);
+        registry.assign<comp<0>>(entity);
+    }
+
+    auto test = [&registry](auto func) {
+        timer timer;
+        registry.group<position, velocity>(entt::get<comp<0>>).each(func);
+        timer.elapsed();
+    };
+
+    test([](const auto &...) {});
+    test([](auto &... comp) {
+        ((comp.x = {}), ...);
+    });
+}
+
+TEST(Benchmark, IterateThreeComponentsRuntime1M) {
+    entt::registry<> registry;
+
+    std::cout << "Iterating over 1000000 entities, three components, runtime view" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.assign<position>(entity);
+        registry.assign<velocity>(entity);
+        registry.assign<comp<0>>(entity);
+    }
+
+    auto test = [&registry](auto func) {
+        using component_type = typename entt::registry<>::component_type;
+        component_type types[] = { registry.type<position>(), registry.type<velocity>(), registry.type<comp<0>>() };
+
+        timer timer;
+        registry.runtime_view(std::begin(types), std::end(types)).each(func);
+        timer.elapsed();
+    };
+
+    test([](auto) {});
+    test([&registry](auto entity) {
+        registry.get<position>(entity).x = {};
+        registry.get<velocity>(entity).x = {};
+        registry.get<comp<0>>(entity).x = {};
+    });
+}
+
+TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
+    entt::registry<> registry;
+
+    std::cout << "Iterating over 1000000 entities, three components, half of the entities have all the components, runtime view" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.assign<velocity>(entity);
+        registry.assign<comp<0>>(entity);
+
+        if(i % 2) {
+            registry.assign<position>(entity);
+        }
+    }
+
+    auto test = [&registry](auto func) {
+        using component_type = typename entt::registry<>::component_type;
+        component_type types[] = { registry.type<position>(), registry.type<velocity>(), registry.type<comp<0>>() };
+
+        timer timer;
+        registry.runtime_view(std::begin(types), std::end(types)).each(func);
+        timer.elapsed();
+    };
+
+    test([](auto) {});
+    test([&registry](auto entity) {
+        registry.get<position>(entity).x = {};
+        registry.get<velocity>(entity).x = {};
+        registry.get<comp<0>>(entity).x = {};
+    });
+}
+
+TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
+    entt::registry<> registry;
+
+    std::cout << "Iterating over 1000000 entities, three components, only one entity has all the components, runtime view" << std::endl;
+
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.assign<velocity>(entity);
+        registry.assign<comp<0>>(entity);
+
+        if(i == 5000000L) {
+            registry.assign<position>(entity);
+        }
+    }
+
+    auto test = [&registry](auto func) {
+        using component_type = typename entt::registry<>::component_type;
+        component_type types[] = { registry.type<position>(), registry.type<velocity>(), registry.type<comp<0>>() };
+
+        timer timer;
+        registry.runtime_view(std::begin(types), std::end(types)).each(func);
+        timer.elapsed();
+    };
+
+    test([](auto) {});
+    test([&registry](auto entity) {
+        registry.get<position>(entity).x = {};
+        registry.get<velocity>(entity).x = {};
+        registry.get<comp<0>>(entity).x = {};
+    });
+}
+
 TEST(Benchmark, IterateFiveComponents1M) {
     entt::registry<> registry;
 
