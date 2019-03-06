@@ -1,9 +1,12 @@
 #include <memory>
+#include <iterator>
 #include <exception>
 #include <algorithm>
 #include <unordered_set>
 #include <gtest/gtest.h>
 #include <entt/entity/sparse_set.hpp>
+
+struct empty_type {};
 
 TEST(SparseSetNoType, Functionalities) {
     entt::sparse_set<std::uint64_t> set;
@@ -56,6 +59,32 @@ TEST(SparseSetNoType, Functionalities) {
     (void)entt::sparse_set<std::uint64_t>{std::move(set)};
     entt::sparse_set<std::uint64_t> other;
     other = std::move(set);
+}
+
+TEST(SparseSetNoType, ConstructMany) {
+    entt::sparse_set<std::uint64_t> set;
+    entt::sparse_set<std::uint64_t>::entity_type entities[2];
+
+    entities[0] = 3;
+    entities[1] = 42;
+
+    set.construct(12);
+    set.construct(std::begin(entities), std::end(entities), 43);
+    set.construct(24);
+
+    ASSERT_TRUE(set.has(entities[0]));
+    ASSERT_TRUE(set.has(entities[1]));
+    ASSERT_FALSE(set.has(0));
+    ASSERT_FALSE(set.has(9));
+    ASSERT_TRUE(set.has(12));
+    ASSERT_TRUE(set.has(24));
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(set.size(), 4u);
+    ASSERT_EQ(set.get(12), 0u);
+    ASSERT_EQ(set.get(entities[0]), 1u);
+    ASSERT_EQ(set.get(entities[1]), 2u);
+    ASSERT_EQ(set.get(24), 3u);
 }
 
 TEST(SparseSetNoType, Iterator) {
@@ -397,14 +426,73 @@ TEST(SparseSetWithType, Functionalities) {
     other = std::move(set);
 }
 
-TEST(SparseSetWithType, FunctionalitiesEmptyType) {
-    struct empty_type {};
+TEST(SparseSetWithType, EmptyType) {
     entt::sparse_set<std::uint64_t, empty_type> set;
 
     ASSERT_EQ(&set.construct(42), &set.construct(99));
     ASSERT_EQ(&set.get(42), set.try_get(42));
     ASSERT_EQ(&set.get(42), &set.get(99));
     ASSERT_EQ(std::as_const(set).try_get(42), std::as_const(set).try_get(99));
+}
+
+TEST(SparseSetWithType, ConstructMany) {
+    entt::sparse_set<std::uint64_t, int> set;
+    entt::sparse_set<std::uint64_t>::entity_type entities[2];
+
+    entities[0] = 3;
+    entities[1] = 42;
+
+    set.reserve(4);
+    set.construct(12, 21);
+    auto *component = set.construct(std::begin(entities), std::end(entities), 43);
+    set.construct(24, 42);
+
+    ASSERT_TRUE(set.has(entities[0]));
+    ASSERT_TRUE(set.has(entities[1]));
+    ASSERT_FALSE(set.has(0));
+    ASSERT_FALSE(set.has(9));
+    ASSERT_TRUE(set.has(12));
+    ASSERT_TRUE(set.has(24));
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(set.size(), 4u);
+    ASSERT_EQ(set.get(12), 21);
+    ASSERT_EQ(set.get(entities[0]), 0);
+    ASSERT_EQ(set.get(entities[1]), 0);
+    ASSERT_EQ(set.get(24), 42);
+
+    component[0] = 1;
+    component[1] = 2;
+
+    ASSERT_EQ(set.get(entities[0]), 1);
+    ASSERT_EQ(set.get(entities[1]), 2);
+}
+
+TEST(SparseSetWithType, ConstructManyEmptyType) {
+    entt::sparse_set<std::uint64_t, empty_type> set;
+    entt::sparse_set<std::uint64_t>::entity_type entities[2];
+
+    entities[0] = 3;
+    entities[1] = 42;
+
+    set.reserve(4);
+    set.construct(12);
+    auto *component = set.construct(std::begin(entities), std::end(entities), 43);
+    set.construct(24);
+
+    ASSERT_TRUE(set.has(entities[0]));
+    ASSERT_TRUE(set.has(entities[1]));
+    ASSERT_FALSE(set.has(0));
+    ASSERT_FALSE(set.has(9));
+    ASSERT_TRUE(set.has(12));
+    ASSERT_TRUE(set.has(24));
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(set.size(), 4u);
+    ASSERT_EQ(&set.get(entities[0]), &set.get(entities[1]));
+    ASSERT_EQ(&set.get(entities[0]), &set.get(12));
+    ASSERT_EQ(&set.get(entities[0]), &set.get(24));
+    ASSERT_EQ(&set.get(entities[0]), component);
 }
 
 TEST(SparseSetWithType, AggregatesMustWork) {
@@ -509,7 +597,6 @@ TEST(SparseSetWithType, ConstIterator) {
 }
 
 TEST(SparseSetWithType, IteratorEmptyType) {
-    struct empty_type {};
     using iterator_type = typename entt::sparse_set<std::uint64_t, empty_type>::iterator_type;
     entt::sparse_set<std::uint64_t, empty_type> set;
     set.construct(3);
@@ -557,7 +644,6 @@ TEST(SparseSetWithType, IteratorEmptyType) {
 }
 
 TEST(SparseSetWithType, ConstIteratorEmptyType) {
-    struct empty_type {};
     using iterator_type = typename entt::sparse_set<std::uint64_t, empty_type>::const_iterator_type;
     entt::sparse_set<std::uint64_t, empty_type> set;
     set.construct(3);
@@ -621,7 +707,6 @@ TEST(SparseSetWithType, Raw) {
 }
 
 TEST(SparseSetWithType, RawEmptyType) {
-    struct empty_type {};
     entt::sparse_set<std::uint64_t, empty_type> set;
 
     set.construct(3);
@@ -933,7 +1018,6 @@ TEST(SparseSetWithType, RespectUnordered) {
 }
 
 TEST(SparseSetWithType, RespectOverlapEmptyType) {
-    struct empty_type {};
     entt::sparse_set<std::uint64_t, empty_type> lhs;
     entt::sparse_set<std::uint64_t, empty_type> rhs;
 
@@ -1050,7 +1134,7 @@ TEST(SparseSetWithType, ConstructorExceptionDoesNotAddToSet) {
     struct throwing_component {
         struct constructor_exception: std::exception {};
 
-        throwing_component() { throw constructor_exception{}; }
+        [[noreturn]] throwing_component() { throw constructor_exception{}; }
 
         // necessary to avoid the short-circuit construct() logic for empty objects
         int data;

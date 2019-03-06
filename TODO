@@ -17,7 +17,6 @@
 * allow some features by component type (eg registry.assign(entity, component);
   - it could be possible for eg default constructible types by storing aside (pool data) erased functions
   - does it worth it?
-* add and bulk add with components (sort of registry.create<A, B>(first, last) and registry.create<A, B>())
 * events on replace, so that one can track updated components? indagate impact
   - define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
   - define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)

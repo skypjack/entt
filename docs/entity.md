@@ -6,9 +6,10 @@
 # Table of Contents
 
 * [Introduction](#introduction)
-* [Design choices](#design-choices)
+* [Design decisions](#design-decisions)
   * [A bitset-free entity-component system](#a-bitset-free-entity-component-system)
   * [Pay per use](#pay-per-use)
+  * [All or nothing](#all-or-nothing)
 * [Vademecum](#vademecum)
 * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
   * [Observe changes](#observe-changes)
@@ -49,7 +50,7 @@ more) written in modern C++.<br/>
 The entity-component-system (also known as _ECS_) is an architectural pattern
 used mostly in game development.
 
-# Design choices
+# Design decisions
 
 ## A bitset-free entity-component system
 
@@ -90,6 +91,22 @@ performance along critical paths is high.
 So far, this choice has proven to be a good one and I really hope it can be for
 many others besides me.
 
+## All or nothing
+
+`EnTT` is such that at every moment a pair `(T *, size)` is available to
+directly access all the instances of a given component type `T`.<br/>
+This was a guideline and a design decision that influenced many choices, for
+better and for worse. I cannot say whether it will be useful or not to the
+reader, but it's worth to mention it, because it's of the corner stones of this
+library.
+
+Many of the tools described below, from the registry to the views and up to the
+groups give the possibility to get this information and have been designed
+around this need, which was and remains one of my main requirements during the
+development.<br/>
+The rest is experimentation and the desire to invent something new, hoping to
+have succeeded.
+
 # Vademecum
 
 The registry to store, the views and the groups to iterate. That's all.
@@ -129,7 +146,7 @@ Entities are represented by _entity identifiers_. An entity identifier is an
 opaque type that users should not inspect or modify in any way. It carries
 information about the entity itself and its version.
 
-A registry can be used both to construct and destroy entities:
+A registry can be used both to construct and to destroy entities:
 
 ```cpp
 // constructs a naked entity with no components and returns its identifier
@@ -139,15 +156,20 @@ auto entity = registry.create();
 registry.destroy(entity);
 ```
 
-There exist also overloads of the `create` and `destroy` member functions that
-accept two iterators, that is a range to assign or to destroy. It can be used to
-create or destroy multiple entities at once:
+There exists also an overload of the `create` and `destroy` member functions
+that accepts two iterators, that is a range to assign or to destroy. It can be
+used to create or destroy multiple entities at once:
 
 ```cpp
 // destroys all the entities in a range
 auto view = registry.view<a_component, another_component>();
 registry.destroy(view.begin(), view.end());
 ```
+
+In both cases, the `create` member function accepts also a list of default
+constructible types of components to assign to the entities before to return.
+It's a faster alternative to the creation and subsequent assignment of
+components in separate steps.
 
 When an entity is destroyed, the registry can freely reuse it internally with a
 slightly different identifier. In particular, the version of an entity is

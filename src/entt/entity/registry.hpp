@@ -63,6 +63,9 @@ class registry {
     using signal_type = sigh<void(registry &, const Entity)>;
     using traits_type = entt_traits<Entity>;
 
+    template<typename Component>
+    using pool_type = sparse_set<Entity, std::decay_t<Component>>;
+
     template<typename, typename>
     struct non_owning_group;
 
@@ -136,6 +139,16 @@ class registry {
         std::size_t extent;
     };
 
+    void release(const Entity entity) {
+        // lengthens the implicit list of destroyed entities
+        const auto entt = entity & traits_type::entity_mask;
+        const auto version = ((entity >> traits_type::entity_shift) + 1) << traits_type::entity_shift;
+        const auto node = (available ? next : ((entt + 1) & traits_type::entity_mask)) | version;
+        entities[entt] = node;
+        next = entt;
+        ++available;
+    }
+
     template<typename Component>
     inline auto pool() const ENTT_NOEXCEPT {
         const auto ctype = type<Component>();
@@ -146,10 +159,10 @@ class registry {
             });
 
             assert(it != pools.cend() && it->pool);
-            return std::make_tuple(&*it, static_cast<sparse_set<Entity, std::decay_t<Component>> *>(it->pool.get()));
+            return std::make_tuple(&*it, static_cast<pool_type<Component> *>(it->pool.get()));
         } else {
             assert(ctype < pools.size() && pools[ctype].pool && pools[ctype].runtime_type == ctype);
-            return std::make_tuple(&pools[ctype], static_cast<sparse_set<Entity, std::decay_t<Component>> *>(pools[ctype].pool.get()));
+            return std::make_tuple(&pools[ctype], static_cast<pool_type<Component> *>(pools[ctype].pool.get()));
         }
     }
 
@@ -179,11 +192,11 @@ class registry {
         }
 
         if(!pdata->pool) {
-            pdata->pool = std::make_unique<sparse_set<Entity, std::decay_t<Component>>>();
+            pdata->pool = std::make_unique<pool_type<Component>>();
             pdata->runtime_type = ctype;
         }
 
-        return std::make_tuple(pdata, static_cast<sparse_set<Entity, std::decay_t<Component>> *>(pdata->pool.get()));
+        return std::make_tuple(pdata, static_cast<pool_type<Component> *>(pdata->pool.get()));
     }
 
 public:
@@ -328,7 +341,7 @@ public:
      * There are no guarantees on the order of the components. Use a view if you
      * want to iterate entities and components in the expected order.
      *
-     * @warning
+     * @note
      * Empty components aren't explicitly instantiated. Therefore, this function
      * always returns `nullptr` for them.
      *
@@ -452,11 +465,18 @@ public:
      * function can be used to know if they are still valid or the entity has
      * been destroyed and potentially recycled.
      *
-     * The returned entity has no components assigned.
+     * The returned entity has assigned the given components, if any. The
+     * components must be at least default constructible. A compilation error
+     * will occur otherwhise.
      *
-     * @return A valid entity identifier.
+     * @tparam Component Types of components to assign to the entity.
+     * @return A valid entity identifier if the component list is empty, a tuple
+     * containing the entity identifier and the references to the components
+     * just created otherwise.
      */
-    entity_type create() {
+    template<typename... Component>
+    std::conditional_t<sizeof...(Component) == 0, entity_type, std::tuple<entity_type, Component &...>>
+    create() {
         entity_type entity;
 
         if(available) {
@@ -472,7 +492,11 @@ public:
             assert(entity < traits_type::entity_mask);
         }
 
-        return entity;
+        if constexpr(sizeof...(Component) == 0) {
+            return entity;
+        } else {
+            return { entity, assign<Component>(entity)... };
+        }
     }
 
     /**
@@ -488,30 +512,64 @@ public:
      * function can be used to know if they are still valid or the entity has
      * been destroyed and potentially recycled.
      *
-     * The generated entities have no components assigned.
+     * The entities so generated have assigned the given components, if any. The
+     * components must be at least default constructible. A compilation error
+     * will occur otherwhise.
      *
+     * @tparam Component Types of components to assign to the entity.
      * @tparam It Type of forward iterator.
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
+     * @return No return value if the component list is empty, a tuple
+     * containing the pointers to the arrays of components just created and
+     * sorted the same of the entities otherwise.
      */
-    template<typename It>
-    void create(It first, It last) {
+    template<typename... Component, typename It>
+    std::conditional_t<sizeof...(Component) == 0, void, std::tuple<Component *...>>
+    create(It first, It last) {
         static_assert(std::is_convertible_v<entity_type, typename std::iterator_traits<It>::value_type>);
         const auto length = size_type(std::distance(first, last));
         const auto sz = std::min(available, length);
+        [[maybe_unused]] entity_type candidate{};
 
         available -= sz;
 
-        std::generate_n(first, sz, [this]() {
+        const auto tail = std::generate_n(first, sz, [&candidate, this]() mutable {
+            if constexpr(sizeof...(Component) > 0) {
+                candidate = std::max(candidate, next);
+            } else {
+                // suppress warnings
+                (void)candidate;
+            }
+
             const auto entt = next;
             const auto version = entities[entt] & (traits_type::version_mask << traits_type::entity_shift);
             next = entities[entt] & traits_type::entity_mask;
             return (entities[entt] = entt | version);
         });
 
-        std::generate_n((first + sz), (length - sz), [this]() {
+        std::generate(tail, last, [this]() {
             return entities.emplace_back(entity_type(entities.size()));
         });
+
+        if constexpr(sizeof...(Component) > 0) {
+            const auto hint = size_type(std::max(candidate, *(last-1)))+1;
+
+            auto generator = [first, last, hint, this](auto &&adata) {
+                auto *comp = std::get<1>(adata)->construct(first, last, hint);
+                auto *pdata = std::get<0>(adata);
+
+                if(!pdata->construction.empty()) {
+                    std::for_each(first, last, [pdata, this](const auto entity) {
+                        pdata->construction.publish(*this, entity);
+                    });
+                }
+
+                return comp;
+            };
+
+            return { generator(assure<Component>())... };
+        }
     }
 
     /**
@@ -550,14 +608,7 @@ public:
 
         // just a way to protect users from listeners that attach components
         assert(orphan(entity));
-
-        // lengthens the implicit list of destroyed entities
-        const auto entt = entity & traits_type::entity_mask;
-        const auto version = ((entity >> traits_type::entity_shift) + 1) << traits_type::entity_shift;
-        const auto node = (available ? next : ((entt + 1) & traits_type::entity_mask)) | version;
-        entities[entt] = node;
-        next = entt;
-        ++available;
+        release(entity);
     }
 
     /**
@@ -568,8 +619,26 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
+        assert(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
+
+        for(auto pos = pools.size(); pos; --pos) {
+            auto &pdata = pools[pos-1];
+
+            if(pdata.pool) {
+                std::for_each(first, last, [&pdata, this](const auto entity) {
+                    if(pdata.pool->has(entity)) {
+                        pdata.destruction.publish(*this, entity);
+                        pdata.pool->destroy(entity);
+                    }
+                });
+            }
+        };
+
+        // just a way to protect users from listeners that attach components
+        assert(std::all_of(first, last, [this](const auto entity) { return orphan(entity); }));
+
         std::for_each(first, last, [this](const auto entity) {
-            destroy(entity);
+            release(entity);
         });
     }
 
@@ -1433,7 +1502,7 @@ public:
      * more instances of this class in sync, as an example in a client-server
      * architecture.
      *
-     * @warning
+     * @note
      * The loader returned by this function requires that the registry be empty.
      * In case it isn't, all the data will be automatically deleted before to
      * return.

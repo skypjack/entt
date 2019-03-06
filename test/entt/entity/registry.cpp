@@ -938,6 +938,81 @@ TEST(Registry, CreateManyEntitiesAtOnce) {
     ASSERT_EQ(registry.version(entities[2]), entt::registry<>::version_type{0});
 }
 
+TEST(Registry, CreateAnEntityWithComponents) {
+    entt::registry<> registry;
+    const auto &[entity, ivalue, cvalue] = registry.create<int, char>();
+
+    ASSERT_FALSE(registry.empty<int>());
+    ASSERT_FALSE(registry.empty<char>());
+
+    ASSERT_EQ(registry.size<int>(), entt::registry<>::size_type{1});
+    ASSERT_EQ(registry.size<int>(), entt::registry<>::size_type{1});
+
+    ASSERT_TRUE((registry.has<int, char>(entity)));
+
+    ivalue = 42;
+    cvalue = 'c';
+
+    ASSERT_EQ(registry.get<int>(entity), 42);
+    ASSERT_EQ(registry.get<char>(entity), 'c');
+}
+
+TEST(Registry, CreateManyEntitiesWithComponentsAtOnce) {
+    entt::registry<> registry;
+    entt::registry<>::entity_type entities[3];
+
+    const auto entity = registry.create();
+    registry.destroy(registry.create());
+    registry.destroy(entity);
+    registry.destroy(registry.create());
+
+    const auto [iptr, cptr] = registry.create<int, char>(std::begin(entities), std::end(entities));
+
+    ASSERT_FALSE(registry.empty<int>());
+    ASSERT_FALSE(registry.empty<char>());
+
+    ASSERT_EQ(registry.size<int>(), entt::registry<>::size_type{3});
+    ASSERT_EQ(registry.size<int>(), entt::registry<>::size_type{3});
+
+    ASSERT_TRUE(registry.valid(entities[0]));
+    ASSERT_TRUE(registry.valid(entities[1]));
+    ASSERT_TRUE(registry.valid(entities[2]));
+
+    ASSERT_EQ(registry.entity(entities[0]), entt::registry<>::entity_type{0});
+    ASSERT_EQ(registry.version(entities[0]), entt::registry<>::version_type{2});
+
+    ASSERT_EQ(registry.entity(entities[1]), entt::registry<>::entity_type{1});
+    ASSERT_EQ(registry.version(entities[1]), entt::registry<>::version_type{1});
+
+    ASSERT_EQ(registry.entity(entities[2]), entt::registry<>::entity_type{2});
+    ASSERT_EQ(registry.version(entities[2]), entt::registry<>::version_type{0});
+
+    ASSERT_TRUE((registry.has<int, char>(entities[0])));
+    ASSERT_TRUE((registry.has<int, char>(entities[1])));
+    ASSERT_TRUE((registry.has<int, char>(entities[2])));
+
+    for(auto i = 0; i < 3; ++i) {
+        iptr[i] = i;
+        cptr[i] = char('a'+i);
+    }
+
+    for(auto i = 0; i < 3; ++i) {
+        ASSERT_EQ(registry.get<int>(entities[i]), i);
+        ASSERT_EQ(registry.get<char>(entities[i]), char('a'+i));
+    }
+}
+
+TEST(Registry, CreateManyEntitiesWithComponentsAtOnceWithListener) {
+    entt::registry<> registry;
+    entt::registry<>::entity_type entities[3];
+    listener listener;
+
+    registry.construction<int>().connect<&listener::incr<int>>(&listener);
+    registry.create<int, char>(std::begin(entities), std::end(entities));
+
+    ASSERT_EQ(listener.counter, 3);
+}
+
 TEST(Registry, NonOwningGroupInterleaved) {
     entt::registry<> registry;
     typename entt::registry<>::entity_type entity = entt::null;

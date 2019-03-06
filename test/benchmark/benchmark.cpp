@@ -56,6 +56,35 @@ TEST(Benchmark, ConstructMany) {
     timer.elapsed();
 }
 
+TEST(Benchmark, ConstructManyAndAssignComponents) {
+    entt::registry<> registry;
+    std::vector<entt::registry<>::entity_type> entities(1000000);
+
+    std::cout << "Constructing 1000000 entities at once and assign components" << std::endl;
+
+    timer timer;
+
+    registry.create(entities.begin(), entities.end());
+
+    for(const auto entity: entities) {
+        registry.assign<position>(entity);
+        registry.assign<velocity>(entity);
+    }
+
+    timer.elapsed();
+}
+
+TEST(Benchmark, ConstructManyWithComponents) {
+    entt::registry<> registry;
+    std::vector<entt::registry<>::entity_type> entities(1000000);
+
+    std::cout << "Constructing 1000000 entities at once with components" << std::endl;
+
+    timer timer;
+    registry.create<position, velocity>(entities.begin(), entities.end());
+    timer.elapsed();
+}
+
 TEST(Benchmark, Destroy) {
     entt::registry<> registry;
 
