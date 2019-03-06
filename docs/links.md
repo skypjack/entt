@@ -26,6 +26,8 @@ a reference:
     Pong with `EnTT`.
   * [Randballs](https://github.com/gale93/randballs): simple `SFML` and `EnTT`
     playground.
+  * [EnTT Tower Defense](https://github.com/Daivuk/tddod): a data oriented tower
+    defense example.
 
 * Engines/Frameworks:
   * [The Forge](https://github.com/ConfettiFX/The-Forge): cross-platform
