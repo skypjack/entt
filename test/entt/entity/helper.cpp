@@ -2,6 +2,7 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/entity/helper.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/core/type_traits.hpp>
 
 TEST(Helper, AsView) {
     using entity_type = typename entt::registry<>::entity_type;
@@ -69,6 +70,18 @@ TEST(Helper, Dependency) {
 
     ASSERT_FALSE(registry.has<double>(entity));
     ASSERT_FALSE(registry.has<float>(entity));
+}
+
+TEST(Dependency, MultipleListenersOnTheSameType) {
+    entt::registry<> registry;
+    entt::connect<double>(registry.construction<int>());
+    entt::connect<char>(registry.construction<int>());
+
+    const auto entity = registry.create();
+    registry.assign<int>(entity);
+
+    ASSERT_TRUE(registry.has<double>(entity));
+    ASSERT_TRUE(registry.has<char>(entity));
 }
 
 TEST(Helper, Label) {
