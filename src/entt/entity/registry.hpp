@@ -84,7 +84,7 @@ class registry {
             return component;
         }
 
-        void destroy(Entity entity) {
+        void destroy(Entity entity) override {
             destruction.publish(*owner, entity);
             sparse_set<Entity, Component>::destroy(entity);
         }
