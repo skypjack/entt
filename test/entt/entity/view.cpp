@@ -321,6 +321,32 @@ TEST(MultipleComponentView, Each) {
     ASSERT_EQ(cnt, std::size_t{0});
 }
 
+TEST(MultipleComponentView, EachWithType) {
+    entt::registry<> registry;
+
+    for(auto i = 0; i < 3; ++i) {
+        const auto entity = registry.create();
+        registry.assign<int>(entity, i);
+        registry.assign<char>(entity);
+    }
+
+    // makes char a better candidate during iterations
+    const auto entity = registry.create();
+    registry.assign<int>(entity, 99);
+
+    registry.view<int, char>().each<int>([value = 2](const auto curr, const auto) mutable {
+        ASSERT_EQ(curr, value--);
+    });
+
+    registry.sort<int>([](const auto lhs, const auto rhs) {
+        return lhs < rhs;
+    });
+
+    registry.view<int, char>().each<int>([value = 0](const auto curr, const auto) mutable {
+        ASSERT_EQ(curr, value++);
+    });
+}
+
 TEST(MultipleComponentView, EachWithHoles) {
     entt::registry<> registry;
 
