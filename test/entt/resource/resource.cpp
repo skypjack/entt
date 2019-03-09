@@ -1,3 +1,4 @@
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/resource/cache.hpp>
 
@@ -15,7 +16,7 @@ struct broken_loader: entt::resource_loader<broken_loader, resource> {
     }
 };
 
-TEST(ResourceCache, Functionalities) {
+TEST(Resource, Functionalities) {
     entt::resource_cache<resource> cache;
 
     constexpr auto hs1 = entt::hashed_string{"res1"};
@@ -82,4 +83,10 @@ TEST(ResourceCache, Functionalities) {
 
     ASSERT_TRUE(cache.temp<loader>(42));
     ASSERT_TRUE(cache.empty());
+
+    ASSERT_FALSE(entt::resource_handle<resource>{});
+    ASSERT_TRUE(std::is_copy_constructible_v<entt::resource_handle<resource>>);
+    ASSERT_TRUE(std::is_move_constructible_v<entt::resource_handle<resource>>);
+    ASSERT_TRUE(std::is_copy_assignable_v<entt::resource_handle<resource>>);
+    ASSERT_TRUE(std::is_move_assignable_v<entt::resource_handle<resource>>);
 }

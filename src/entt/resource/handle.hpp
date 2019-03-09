@@ -37,6 +37,9 @@ class resource_handle {
     {}
 
 public:
+    /*! @brief Default constructor. */
+    resource_handle() ENTT_NOEXCEPT = default;
+
     /**
      * @brief Gets a reference to the managed resource.
      *
