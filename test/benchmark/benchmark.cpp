@@ -489,7 +489,7 @@ TEST(Benchmark, IterateThreeComponents1MOne) {
 
 TEST(Benchmark, IterateThreeComponentsNonOwningGroup1M) {
     entt::registry<> registry;
-    registry.group<>(entt::get<position, velocity>);
+    registry.group<>(entt::get<position, velocity, comp<0>>);
 
     std::cout << "Iterating over 1000000 entities, three components, non owning group" << std::endl;
 
