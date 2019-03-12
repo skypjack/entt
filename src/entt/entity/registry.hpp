@@ -793,7 +793,7 @@ public:
      * @return Reference to the component owned by the entity.
      */
     template<typename Component>
-    Component & get(const entity_type entity, Component &&component) ENTT_NOEXCEPT {
+    Component & get_or_create(const entity_type entity, Component &&component) ENTT_NOEXCEPT {
         assert(valid(entity));
         auto *cpool = assure<std::remove_reference_t<Component>>();
         auto *comp = cpool->try_get(entity);
