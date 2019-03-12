@@ -652,7 +652,7 @@ public:
             auto &pdata = pools[pos-1];
 
             if(pdata.pool) {
-                std::for_each(first, last, [&pdata, this](const auto entity) {
+                std::for_each(first, last, [&pdata](const auto entity) {
                     if(pdata.pool->has(entity)) {
                         pdata.pool->destroy(entity);
                     }
