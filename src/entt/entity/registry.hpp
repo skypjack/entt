@@ -772,7 +772,7 @@ public:
     /**
      * @brief Returns a reference to the given component for an entity.
      *
-     * In case the entity doesn't own the component, the value provided will be
+     * In case the entity doesn't own the component, the parameters provided are
      * used to construct it.<br/>
      * Equivalent to the following snippet (pseudocode):
      *
