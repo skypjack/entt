@@ -10,6 +10,7 @@
 #include "../config/config.h"
 #include "registry.hpp"
 #include "entity.hpp"
+#include "fwd.hpp"
 
 
 namespace entt {
@@ -37,9 +38,9 @@ namespace entt {
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class prototype {
-    using basic_fn_type = void(const prototype &, registry<Entity> &, const Entity);
-    using component_type = typename registry<Entity>::component_type;
+class basic_prototype {
+    using basic_fn_type = void(const basic_prototype &, basic_registry<Entity> &, const Entity);
+    using component_type = typename basic_registry<Entity>::component_type;
 
     template<typename Component>
     struct component_wrapper { Component component; };
@@ -57,7 +58,7 @@ class prototype {
 
 public:
     /*! @brief Registry type. */
-    using registry_type = registry<Entity>;
+    using registry_type = basic_registry<Entity>;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
@@ -67,7 +68,7 @@ public:
      * @brief Constructs a prototype that is bound to a given registry.
      * @param reg A valid reference to a registry.
      */
-    prototype(registry<Entity> &reg)
+    basic_prototype(registry_type &reg)
         : reg{&reg},
           entity{reg.create()}
     {}
@@ -75,7 +76,7 @@ public:
     /**
      * @brief Releases all its resources.
      */
-    ~prototype() {
+    ~basic_prototype() {
         release();
     }
 
@@ -88,7 +89,7 @@ public:
      *
      * @param other The instance to move from.
      */
-    prototype(prototype &&other)
+    basic_prototype(basic_prototype &&other)
         : handlers{std::move(other.handlers)},
           reg{other.reg},
           entity{other.entity}
@@ -106,7 +107,7 @@ public:
      * @param other The instance to move from.
      * @return This prototype.
      */
-    prototype & operator=(prototype &&other) {
+    basic_prototype & operator=(basic_prototype &&other) {
         if(this != &other) {
             auto tmp{std::move(other)};
             handlers.swap(tmp.handlers);
@@ -126,12 +127,12 @@ public:
      */
     template<typename Component, typename... Args>
     Component & set(Args &&... args) {
-        basic_fn_type *assign_or_replace = [](const prototype &prototype, registry<Entity> &other, const Entity dst) {
+        basic_fn_type *assign_or_replace = [](const basic_prototype &prototype, registry_type &other, const Entity dst) {
             const auto &wrapper = prototype.reg->template get<component_wrapper<Component>>(prototype.entity);
             other.template assign_or_replace<Component>(dst, wrapper.component);
         };
 
-        basic_fn_type *assign = [](const prototype &prototype, registry<Entity> &other, const Entity dst) {
+        basic_fn_type *assign = [](const basic_prototype &prototype, registry_type &other, const Entity dst) {
             if(!other.template has<Component>(dst)) {
                 const auto &wrapper = prototype.reg->template get<component_wrapper<Component>>(prototype.entity);
                 other.template assign<Component>(dst, wrapper.component);
@@ -469,7 +470,7 @@ public:
 
 private:
     std::unordered_map<component_type, component_handler> handlers;
-    registry<Entity> *reg;
+    registry_type *reg;
     entity_type entity;
 };
 

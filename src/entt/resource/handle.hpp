@@ -6,13 +6,10 @@
 #include <utility>
 #include <cassert>
 #include "../config/config.h"
+#include "fwd.hpp"
 
 
 namespace entt {
-
-
-template<typename Resource>
-class resource_cache;
 
 
 /**

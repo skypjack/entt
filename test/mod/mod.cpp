@@ -21,7 +21,7 @@ struct duktape_runtime {
 };
 
 template<typename Comp>
-duk_ret_t set(duk_context *ctx, entt::registry<> &registry) {
+duk_ret_t set(duk_context *ctx, entt::registry &registry) {
     const auto entity = duk_require_uint(ctx, 0);
 
     if constexpr(std::is_same_v<Comp, position>) {
@@ -48,7 +48,7 @@ duk_ret_t set(duk_context *ctx, entt::registry<> &registry) {
 }
 
 template<typename Comp>
-duk_ret_t unset(duk_context *ctx, entt::registry<> &registry) {
+duk_ret_t unset(duk_context *ctx, entt::registry &registry) {
     const auto entity = duk_require_uint(ctx, 0);
 
     if constexpr(std::is_same_v<Comp, duktape_runtime>) {
@@ -69,7 +69,7 @@ duk_ret_t unset(duk_context *ctx, entt::registry<> &registry) {
 }
 
 template<typename Comp>
-duk_ret_t has(duk_context *ctx, entt::registry<> &registry) {
+duk_ret_t has(duk_context *ctx, entt::registry &registry) {
     const auto entity = duk_require_uint(ctx, 0);
 
     if constexpr(std::is_same_v<Comp, duktape_runtime>) {
@@ -90,7 +90,7 @@ duk_ret_t has(duk_context *ctx, entt::registry<> &registry) {
 }
 
 template<typename Comp>
-duk_ret_t get(duk_context *ctx, entt::registry<> &registry) {
+duk_ret_t get(duk_context *ctx, entt::registry &registry) {
     [[maybe_unused]] const auto entity = duk_require_uint(ctx, 0);
 
     if constexpr(std::is_same_v<Comp, position>) {
@@ -123,10 +123,10 @@ duk_ret_t get(duk_context *ctx, entt::registry<> &registry) {
 
 class duktape_registry {
     // I'm pretty sure I won't have more than 99 components in the example
-    static constexpr entt::registry<>::component_type udef = 100;
+    static constexpr entt::registry::component_type udef = 100;
 
     struct func_map {
-        using func_type = duk_ret_t(*)(duk_context *, entt::registry<> &);
+        using func_type = duk_ret_t(*)(duk_context *, entt::registry &);
 
         func_type set;
         func_type unset;
@@ -172,7 +172,7 @@ class duktape_registry {
     }
 
 public:
-    duktape_registry(entt::registry<> &registry)
+    duktape_registry(entt::registry &registry)
         : registry{registry}
     {
         reg<position, renderable, duktape_runtime>();
@@ -213,8 +213,8 @@ public:
 
         duk_push_array(ctx);
 
-        std::vector<typename entt::registry<>::component_type> components;
-        std::vector<typename entt::registry<>::component_type> runtime;
+        std::vector<typename entt::registry::component_type> components;
+        std::vector<typename entt::registry::component_type> runtime;
 
         for(duk_idx_t arg = 0; arg < nargs; arg++) {
             auto type = duk_require_uint(ctx, arg);
@@ -254,7 +254,7 @@ public:
 
 private:
     std::map<duk_uint_t, func_map> func;
-    entt::registry<> &registry;
+    entt::registry &registry;
 };
 
 const duk_function_list_entry js_duktape_registry_methods[] = {
@@ -268,7 +268,7 @@ const duk_function_list_entry js_duktape_registry_methods[] = {
     { nullptr, nullptr, 0 }
 };
 
-void export_types(duk_context *ctx, entt::registry<> &registry) {
+void export_types(duk_context *ctx, entt::registry &registry) {
     auto export_type = [](auto *ctx, auto &registry, auto idx, auto type, const auto *name) {
         duk_push_string(ctx, name);
         duk_push_uint(ctx, registry.template type<typename decltype(type)::type>());
@@ -295,7 +295,7 @@ void export_duktape_registry(duk_context *ctx, duktape_registry &dreg) {
 }
 
 TEST(Mod, Duktape) {
-    entt::registry<> registry;
+    entt::registry registry;
     duktape_registry dreg{registry};
     duk_context *ctx = duk_create_heap_default();
 

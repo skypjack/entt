@@ -4,13 +4,13 @@
 #include <gtest/gtest.h>
 #include "types.h"
 
-extern typename entt::registry<>::component_type a_module_int_type();
-extern typename entt::registry<>::component_type a_module_char_type();
-extern typename entt::registry<>::component_type another_module_int_type();
-extern typename entt::registry<>::component_type another_module_char_type();
+extern typename entt::registry::component_type a_module_int_type();
+extern typename entt::registry::component_type a_module_char_type();
+extern typename entt::registry::component_type another_module_int_type();
+extern typename entt::registry::component_type another_module_char_type();
 
-extern void update_position(int delta, entt::registry<> &);
-extern void assign_velocity(int, entt::registry<> &);
+extern void update_position(int delta, entt::registry &);
+extern void assign_velocity(int, entt::registry &);
 
 extern void trigger_an_event(int, entt::dispatcher &);
 extern void trigger_another_event(entt::dispatcher &);
@@ -26,7 +26,7 @@ ENTT_SHARED_TYPE(int)
 ENTT_SHARED_TYPE(char)
 
 TEST(Lib, Types) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     ASSERT_EQ(registry.type<int>(), registry.type<const int>());
     ASSERT_EQ(registry.type<char>(), registry.type<const char>());
@@ -43,7 +43,7 @@ TEST(Lib, Types) {
 }
 
 TEST(Lib, Registry) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     for(auto i = 0; i < 3; ++i) {
         const auto entity = registry.create();
@@ -52,8 +52,8 @@ TEST(Lib, Registry) {
 
     assign_velocity(2, registry);
 
-    ASSERT_EQ(registry.size<position>(), entt::registry<>::size_type{3});
-    ASSERT_EQ(registry.size<velocity>(), entt::registry<>::size_type{3});
+    ASSERT_EQ(registry.size<position>(), entt::registry::size_type{3});
+    ASSERT_EQ(registry.size<velocity>(), entt::registry::size_type{3});
 
     update_position(1, registry);
 

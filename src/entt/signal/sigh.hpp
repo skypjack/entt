@@ -9,6 +9,7 @@
 #include <type_traits>
 #include "../config/config.h"
 #include "delegate.hpp"
+#include "fwd.hpp"
 
 
 namespace entt {

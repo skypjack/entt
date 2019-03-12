@@ -28,4 +28,10 @@ using maybe_atomic_t = Type;
 #endif
 
 
+#ifndef ENTT_ENTITY_TYPE
+#include <cstdint>
+#define ENTT_ENTITY_TYPE std::uint32_t
+#endif
+
+
 #endif // ENTT_CONFIG_CONFIG_H

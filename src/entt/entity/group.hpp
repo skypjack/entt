@@ -9,16 +9,10 @@
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
 #include "sparse_set.hpp"
+#include "fwd.hpp"
 
 
 namespace entt {
-
-
-/**
- * @brief Forward declaration of the registry class.
- */
-template<typename>
-class registry;
 
 
 /**
@@ -44,7 +38,7 @@ constexpr get_t<Type...> get{};
  * compile-time error, but for a few reasonable cases.
  */
 template<typename...>
-class group;
+class basic_group;
 
 
 /**
@@ -82,20 +76,20 @@ class group;
  * In any other case, attempting to use a group results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Get Types of components iterated by the group.
+ * @tparam Get Types of components observed by the group.
  */
 template<typename Entity, typename... Get>
-class group<Entity, get_t<Get...>> {
+class basic_group<Entity, get_t<Get...>> {
     static_assert(sizeof...(Get) > 0);
 
     /*! @brief A registry is allowed to create groups. */
-    friend class registry<Entity>;
+    friend class basic_registry<Entity>;
 
     template<typename Component>
     using pool_type = std::conditional_t<std::is_const_v<Component>, const sparse_set<Entity, std::remove_const_t<Component>>, sparse_set<Entity, Component>>;
 
     // we could use pool_type<Get> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    group(sparse_set<Entity> *handler, sparse_set<Entity, std::remove_const_t<Get>> *... pools) ENTT_NOEXCEPT
+    basic_group(sparse_set<Entity> *handler, sparse_set<Entity, std::remove_const_t<Get>> *... pools) ENTT_NOEXCEPT
         : handler{handler},
           pools{pools...}
     {}
@@ -335,11 +329,11 @@ private:
  * @tparam Owned Types of components owned by the group.
  */
 template<typename Entity, typename... Get, typename... Owned>
-class group<Entity, get_t<Get...>, Owned...> {
+class basic_group<Entity, get_t<Get...>, Owned...> {
     static_assert(sizeof...(Get) + sizeof...(Owned) > 0);
 
     /*! @brief A registry is allowed to create groups. */
-    friend class registry<Entity>;
+    friend class basic_registry<Entity>;
 
     template<typename Component>
     using pool_type = std::conditional_t<std::is_const_v<Component>, const sparse_set<Entity, std::remove_const_t<Component>>, sparse_set<Entity, Component>>;
@@ -348,7 +342,7 @@ class group<Entity, get_t<Get...>, Owned...> {
     using component_iterator_type = decltype(std::declval<pool_type<Component>>().begin());
 
     // we could use pool_type<Type> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    group(const typename registry<Entity>::size_type *length, sparse_set<Entity, std::remove_const_t<Owned>> *... owned, sparse_set<Entity, std::remove_const_t<Get>> *... others) ENTT_NOEXCEPT
+    basic_group(const typename basic_registry<Entity>::size_type *length, sparse_set<Entity, std::remove_const_t<Owned>> *... owned, sparse_set<Entity, std::remove_const_t<Get>> *... others) ENTT_NOEXCEPT
         : length{length},
           pools{owned..., others...}
     {}
@@ -551,7 +545,7 @@ public:
     }
 
 private:
-    const typename registry<Entity>::size_type *length;
+    const typename basic_registry<Entity>::size_type *length;
     const std::tuple<pool_type<Owned> *..., pool_type<Get> *...> pools;
 };
 

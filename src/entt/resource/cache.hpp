@@ -10,6 +10,7 @@
 #include "../core/hashed_string.hpp"
 #include "handle.hpp"
 #include "loader.hpp"
+#include "fwd.hpp"
 
 
 namespace entt {

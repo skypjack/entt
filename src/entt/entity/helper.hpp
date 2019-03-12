@@ -19,7 +19,7 @@ namespace entt {
 template<bool Const, typename Entity>
 struct as_view {
     /*! @brief Type of registry to convert. */
-    using registry_type = std::conditional_t<Const, const entt::registry<Entity>, entt::registry<Entity>>;
+    using registry_type = std::conditional_t<Const, const entt::basic_registry<Entity>, entt::basic_registry<Entity>>;
 
     /**
      * @brief Constructs a converter for a given registry.
@@ -33,7 +33,7 @@ struct as_view {
      * @return A newly created view.
      */
     template<typename... Component>
-    inline operator entt::view<Entity, Component...>() const {
+    inline operator entt::basic_view<Entity, Component...>() const {
         return reg.template view<Component...>();
     }
 
@@ -51,12 +51,12 @@ private:
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-as_view(registry<Entity> &) ENTT_NOEXCEPT -> as_view<false, Entity>;
+as_view(basic_registry<Entity> &) ENTT_NOEXCEPT -> as_view<false, Entity>;
 
 
 /*! @copydoc as_view */
 template<typename Entity>
-as_view(const registry<Entity> &) ENTT_NOEXCEPT -> as_view<true, Entity>;
+as_view(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_view<true, Entity>;
 
 
 /**
@@ -67,7 +67,7 @@ as_view(const registry<Entity> &) ENTT_NOEXCEPT -> as_view<true, Entity>;
 template<bool Const, typename Entity>
 struct as_group {
     /*! @brief Type of registry to convert. */
-    using registry_type = std::conditional_t<Const, const entt::registry<Entity>, entt::registry<Entity>>;
+    using registry_type = std::conditional_t<Const, const entt::basic_registry<Entity>, entt::basic_registry<Entity>>;
 
     /**
      * @brief Constructs a converter for a given registry.
@@ -86,7 +86,7 @@ struct as_group {
      * @return A newly created group.
      */
     template<typename... Owned>
-    inline operator entt::group<Entity, get_t<>, Owned...>() const {
+    inline operator entt::basic_group<Entity, get_t<>, Owned...>() const {
         return reg.template group<Owned...>();
     }
 
@@ -104,12 +104,12 @@ private:
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-as_group(registry<Entity> &) ENTT_NOEXCEPT -> as_group<false, Entity>;
+as_group(basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<false, Entity>;
 
 
 /*! @copydoc as_group */
 template<typename Entity>
-as_group(const registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>;
+as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>;
 
 
 /**
@@ -127,7 +127,7 @@ as_group(const registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>;
  * @param entity A valid entity identifier.
  */
 template<typename Entity, typename... Component>
-void dependency(registry<Entity> &registry, const Entity entity) {
+void dependency(basic_registry<Entity> &registry, const Entity entity) {
     ((registry.template has<Component>(entity) ? void() : (registry.template assign<Component>(entity), void())), ...);
 }
 
@@ -150,7 +150,7 @@ void dependency(registry<Entity> &registry, const Entity entity) {
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Entity>
-inline void connect(sink<void(registry<Entity> &, const Entity)> sink) {
+inline void connect(sink<void(basic_registry<Entity> &, const Entity)> sink) {
     sink.template connect<dependency<Entity, Dependency...>>();
 }
 
@@ -173,7 +173,7 @@ inline void connect(sink<void(registry<Entity> &, const Entity)> sink) {
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Entity>
-inline void disconnect(sink<void(registry<Entity> &, const Entity)> sink) {
+inline void disconnect(sink<void(basic_registry<Entity> &, const Entity)> sink) {
     sink.template disconnect<dependency<Entity, Dependency...>>();
 }
 

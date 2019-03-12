@@ -3,13 +3,10 @@
 
 
 #include <memory>
+#include "fwd.hpp"
 
 
 namespace entt {
-
-
-template<typename Resource>
-class resource_cache;
 
 
 /**

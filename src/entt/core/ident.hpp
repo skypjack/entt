@@ -2,9 +2,9 @@
 #define ENTT_CORE_IDENT_HPP
 
 
-#include <type_traits>
-#include <utility>
 #include <tuple>
+#include <utility>
+#include <type_traits>
 #include "../config/config.h"
 
 

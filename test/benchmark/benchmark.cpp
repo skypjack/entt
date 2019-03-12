@@ -32,7 +32,7 @@ private:
 };
 
 TEST(Benchmark, Construct) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Constructing 1000000 entities" << std::endl;
 
@@ -46,8 +46,8 @@ TEST(Benchmark, Construct) {
 }
 
 TEST(Benchmark, ConstructMany) {
-    entt::registry<> registry;
-    std::vector<entt::registry<>::entity_type> entities(1000000);
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
 
     std::cout << "Constructing 1000000 entities at once" << std::endl;
 
@@ -57,8 +57,8 @@ TEST(Benchmark, ConstructMany) {
 }
 
 TEST(Benchmark, ConstructManyAndAssignComponents) {
-    entt::registry<> registry;
-    std::vector<entt::registry<>::entity_type> entities(1000000);
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
 
     std::cout << "Constructing 1000000 entities at once and assign components" << std::endl;
 
@@ -75,8 +75,8 @@ TEST(Benchmark, ConstructManyAndAssignComponents) {
 }
 
 TEST(Benchmark, ConstructManyWithComponents) {
-    entt::registry<> registry;
-    std::vector<entt::registry<>::entity_type> entities(1000000);
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
 
     std::cout << "Constructing 1000000 entities at once with components" << std::endl;
 
@@ -86,7 +86,7 @@ TEST(Benchmark, ConstructManyWithComponents) {
 }
 
 TEST(Benchmark, Destroy) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Destroying 1000000 entities" << std::endl;
 
@@ -104,7 +104,7 @@ TEST(Benchmark, Destroy) {
 }
 
 TEST(Benchmark, IterateCreateDeleteSingleComponent) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Looping 10000 times creating and deleting a random number of entities" << std::endl;
 
@@ -129,7 +129,7 @@ TEST(Benchmark, IterateCreateDeleteSingleComponent) {
 }
 
 TEST(Benchmark, IterateSingleComponent1M) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, one component" << std::endl;
 
@@ -151,7 +151,7 @@ TEST(Benchmark, IterateSingleComponent1M) {
 }
 
 TEST(Benchmark, IterateSingleComponentRuntime1M) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, one component, runtime view" << std::endl;
 
@@ -161,7 +161,7 @@ TEST(Benchmark, IterateSingleComponentRuntime1M) {
      }
 
     auto test = [&registry](auto func) {
-        using component_type = typename entt::registry<>::component_type;
+        using component_type = typename entt::registry::component_type;
         component_type types[] = { registry.type<position>() };
 
         timer timer;
@@ -176,7 +176,7 @@ TEST(Benchmark, IterateSingleComponentRuntime1M) {
 }
 
 TEST(Benchmark, IterateTwoComponents1M) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, two components" << std::endl;
 
@@ -199,7 +199,7 @@ TEST(Benchmark, IterateTwoComponents1M) {
 }
 
 TEST(Benchmark, IterateTwoComponents1MHalf) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, two components, half of the entities have all the components" << std::endl;
 
@@ -225,7 +225,7 @@ TEST(Benchmark, IterateTwoComponents1MHalf) {
 }
 
 TEST(Benchmark, IterateTwoComponents1MOne) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, two components, only one entity has all the components" << std::endl;
 
@@ -251,7 +251,7 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
 }
 
 TEST(Benchmark, IterateTwoComponentsNonOwningGroup1M) {
-    entt::registry<> registry;
+    entt::registry registry;
     registry.group<>(entt::get<position, velocity>);
 
     std::cout << "Iterating over 1000000 entities, two components, non owning group" << std::endl;
@@ -275,7 +275,7 @@ TEST(Benchmark, IterateTwoComponentsNonOwningGroup1M) {
 }
 
 TEST(Benchmark, IterateTwoComponentsFullOwningGroup1M) {
-    entt::registry<> registry;
+    entt::registry registry;
     registry.group<position, velocity>();
 
     std::cout << "Iterating over 1000000 entities, two components, full owning group" << std::endl;
@@ -299,7 +299,7 @@ TEST(Benchmark, IterateTwoComponentsFullOwningGroup1M) {
 }
 
 TEST(Benchmark, IterateTwoComponentsPartialOwningGroup1M) {
-    entt::registry<> registry;
+    entt::registry registry;
     registry.group<position>(entt::get<velocity>);
 
     std::cout << "Iterating over 1000000 entities, two components, partial owning group" << std::endl;
@@ -323,7 +323,7 @@ TEST(Benchmark, IterateTwoComponentsPartialOwningGroup1M) {
 }
 
 TEST(Benchmark, IterateTwoComponentsRuntime1M) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, two components, runtime view" << std::endl;
 
@@ -334,7 +334,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1M) {
     }
 
     auto test = [&registry](auto func) {
-        using component_type = typename entt::registry<>::component_type;
+        using component_type = typename entt::registry::component_type;
         component_type types[] = { registry.type<position>(), registry.type<velocity>() };
 
         timer timer;
@@ -350,7 +350,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1M) {
 }
 
 TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, two components, half of the entities have all the components, runtime view" << std::endl;
 
@@ -364,7 +364,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
     }
 
     auto test = [&registry](auto func) {
-        using component_type = typename entt::registry<>::component_type;
+        using component_type = typename entt::registry::component_type;
         component_type types[] = { registry.type<position>(), registry.type<velocity>() };
 
         timer timer;
@@ -380,7 +380,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
 }
 
 TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, two components, only one entity has all the components, runtime view" << std::endl;
 
@@ -394,7 +394,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
     }
 
     auto test = [&registry](auto func) {
-        using component_type = typename entt::registry<>::component_type;
+        using component_type = typename entt::registry::component_type;
         component_type types[] = { registry.type<position>(), registry.type<velocity>() };
 
         timer timer;
@@ -410,7 +410,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
 }
 
 TEST(Benchmark, IterateThreeComponents1M) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, three components" << std::endl;
 
@@ -434,7 +434,7 @@ TEST(Benchmark, IterateThreeComponents1M) {
 }
 
 TEST(Benchmark, IterateThreeComponents1MHalf) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, three components, half of the entities have all the components" << std::endl;
 
@@ -461,7 +461,7 @@ TEST(Benchmark, IterateThreeComponents1MHalf) {
 }
 
 TEST(Benchmark, IterateThreeComponents1MOne) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, three components, only one entity has all the components" << std::endl;
 
@@ -488,7 +488,7 @@ TEST(Benchmark, IterateThreeComponents1MOne) {
 }
 
 TEST(Benchmark, IterateThreeComponentsNonOwningGroup1M) {
-    entt::registry<> registry;
+    entt::registry registry;
     registry.group<>(entt::get<position, velocity, comp<0>>);
 
     std::cout << "Iterating over 1000000 entities, three components, non owning group" << std::endl;
@@ -513,7 +513,7 @@ TEST(Benchmark, IterateThreeComponentsNonOwningGroup1M) {
 }
 
 TEST(Benchmark, IterateThreeComponentsFullOwningGroup1M) {
-    entt::registry<> registry;
+    entt::registry registry;
     registry.group<position, velocity, comp<0>>();
 
     std::cout << "Iterating over 1000000 entities, three components, full owning group" << std::endl;
@@ -538,7 +538,7 @@ TEST(Benchmark, IterateThreeComponentsFullOwningGroup1M) {
 }
 
 TEST(Benchmark, IterateThreeComponentsPartialOwningGroup1M) {
-    entt::registry<> registry;
+    entt::registry registry;
     registry.group<position, velocity>(entt::get<comp<0>>);
 
     std::cout << "Iterating over 1000000 entities, three components, partial owning group" << std::endl;
@@ -563,7 +563,7 @@ TEST(Benchmark, IterateThreeComponentsPartialOwningGroup1M) {
 }
 
 TEST(Benchmark, IterateThreeComponentsRuntime1M) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, three components, runtime view" << std::endl;
 
@@ -575,7 +575,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1M) {
     }
 
     auto test = [&registry](auto func) {
-        using component_type = typename entt::registry<>::component_type;
+        using component_type = typename entt::registry::component_type;
         component_type types[] = { registry.type<position>(), registry.type<velocity>(), registry.type<comp<0>>() };
 
         timer timer;
@@ -592,7 +592,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1M) {
 }
 
 TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, three components, half of the entities have all the components, runtime view" << std::endl;
 
@@ -607,7 +607,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
     }
 
     auto test = [&registry](auto func) {
-        using component_type = typename entt::registry<>::component_type;
+        using component_type = typename entt::registry::component_type;
         component_type types[] = { registry.type<position>(), registry.type<velocity>(), registry.type<comp<0>>() };
 
         timer timer;
@@ -624,7 +624,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
 }
 
 TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, three components, only one entity has all the components, runtime view" << std::endl;
 
@@ -639,7 +639,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
     }
 
     auto test = [&registry](auto func) {
-        using component_type = typename entt::registry<>::component_type;
+        using component_type = typename entt::registry::component_type;
         component_type types[] = { registry.type<position>(), registry.type<velocity>(), registry.type<comp<0>>() };
 
         timer timer;
@@ -656,7 +656,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
 }
 
 TEST(Benchmark, IterateFiveComponents1M) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, five components" << std::endl;
 
@@ -682,7 +682,7 @@ TEST(Benchmark, IterateFiveComponents1M) {
 }
 
 TEST(Benchmark, IterateFiveComponents1MHalf) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, five components, half of the entities have all the components" << std::endl;
 
@@ -711,7 +711,7 @@ TEST(Benchmark, IterateFiveComponents1MHalf) {
 }
 
 TEST(Benchmark, IterateFiveComponents1MOne) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, five components, only one entity has all the components" << std::endl;
 
@@ -740,7 +740,7 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
 }
 
 TEST(Benchmark, IterateFiveComponentsNonOwningGroup1M) {
-    entt::registry<> registry;
+    entt::registry registry;
     registry.group<>(entt::get<position, velocity, comp<0>, comp<1>, comp<2>>);
 
     std::cout << "Iterating over 1000000 entities, five components, non owning group" << std::endl;
@@ -767,7 +767,7 @@ TEST(Benchmark, IterateFiveComponentsNonOwningGroup1M) {
 }
 
 TEST(Benchmark, IterateFiveComponentsFullOwningGroup1M) {
-    entt::registry<> registry;
+    entt::registry registry;
     registry.group<position, velocity, comp<0>, comp<1>, comp<2>>();
 
     std::cout << "Iterating over 1000000 entities, five components, full owning group" << std::endl;
@@ -794,7 +794,7 @@ TEST(Benchmark, IterateFiveComponentsFullOwningGroup1M) {
 }
 
 TEST(Benchmark, IterateFiveComponentsPartialFourOfFiveOwningGroup1M) {
-    entt::registry<> registry;
+    entt::registry registry;
     registry.group<position, velocity, comp<0>, comp<1>>(entt::get<comp<2>>);
 
     std::cout << "Iterating over 1000000 entities, five components, partial (4 of 5) owning group" << std::endl;
@@ -821,7 +821,7 @@ TEST(Benchmark, IterateFiveComponentsPartialFourOfFiveOwningGroup1M) {
 }
 
 TEST(Benchmark, IterateFiveComponentsPartialThreeOfFiveOwningGroup1M) {
-    entt::registry<> registry;
+    entt::registry registry;
     registry.group<position, velocity, comp<0>>(entt::get<comp<1>, comp<2>>);
 
     std::cout << "Iterating over 1000000 entities, five components, partial (3 of 5) owning group" << std::endl;
@@ -848,7 +848,7 @@ TEST(Benchmark, IterateFiveComponentsPartialThreeOfFiveOwningGroup1M) {
 }
 
 TEST(Benchmark, IterateFiveComponentsRuntime1M) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, five components, runtime view" << std::endl;
 
@@ -862,7 +862,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1M) {
     }
 
     auto test = [&registry](auto func) {
-        using component_type = typename entt::registry<>::component_type;
+        using component_type = typename entt::registry::component_type;
         component_type types[] = {
             registry.type<position>(),
             registry.type<velocity>(),
@@ -887,7 +887,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1M) {
 }
 
 TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, five components, half of the entities have all the components, runtime view" << std::endl;
 
@@ -904,7 +904,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
     }
 
     auto test = [&registry](auto func) {
-        using component_type = typename entt::registry<>::component_type;
+        using component_type = typename entt::registry::component_type;
         component_type types[] = {
             registry.type<position>(),
             registry.type<velocity>(),
@@ -929,7 +929,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
 }
 
 TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Iterating over 1000000 entities, five components, only one entity has all the components, runtime view" << std::endl;
 
@@ -946,7 +946,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
     }
 
     auto test = [&registry](auto func) {
-        using component_type = typename entt::registry<>::component_type;
+        using component_type = typename entt::registry::component_type;
         component_type types[] = {
             registry.type<position>(),
             registry.type<velocity>(),
@@ -971,7 +971,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
 }
 
 TEST(Benchmark, IteratePathological) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Pathological case" << std::endl;
 
@@ -1011,7 +1011,7 @@ TEST(Benchmark, IteratePathological) {
 }
 
 TEST(Benchmark, IteratePathologicalNonOwningGroup) {
-    entt::registry<> registry;
+    entt::registry registry;
     registry.group<>(entt::get<position, velocity, comp<0>>);
 
     std::cout << "Pathological case" << std::endl;
@@ -1052,7 +1052,7 @@ TEST(Benchmark, IteratePathologicalNonOwningGroup) {
 }
 
 TEST(Benchmark, IteratePathologicalFullOwningGroup) {
-    entt::registry<> registry;
+    entt::registry registry;
     registry.group<position, velocity, comp<0>>();
 
     std::cout << "Pathological case" << std::endl;
@@ -1093,7 +1093,7 @@ TEST(Benchmark, IteratePathologicalFullOwningGroup) {
 }
 
 TEST(Benchmark, IteratePathologicalPartialOwningGroup) {
-    entt::registry<> registry;
+    entt::registry registry;
     registry.group<position, velocity>(entt::get<comp<0>>);
 
     std::cout << "Pathological case" << std::endl;
@@ -1134,7 +1134,7 @@ TEST(Benchmark, IteratePathologicalPartialOwningGroup) {
 }
 
 TEST(Benchmark, SortSingle) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Sort 150000 entities, one component" << std::endl;
 
@@ -1153,7 +1153,7 @@ TEST(Benchmark, SortSingle) {
 }
 
 TEST(Benchmark, SortMulti) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     std::cout << "Sort 150000 entities, two components" << std::endl;
 
@@ -1175,8 +1175,8 @@ TEST(Benchmark, SortMulti) {
 }
 
 TEST(Benchmark, AlmostSortedStdSort) {
-    entt::registry<> registry;
-    entt::registry<>::entity_type entities[3];
+    entt::registry registry;
+    entt::entity entities[3];
 
     std::cout << "Sort 150000 entities, almost sorted, std::sort" << std::endl;
 
@@ -1205,8 +1205,8 @@ TEST(Benchmark, AlmostSortedStdSort) {
 }
 
 TEST(Benchmark, AlmostSortedInsertionSort) {
-    entt::registry<> registry;
-    entt::registry<>::entity_type entities[3];
+    entt::registry registry;
+    entt::entity entities[3];
 
     std::cout << "Sort 150000 entities, almost sorted, insertion sort" << std::endl;
 

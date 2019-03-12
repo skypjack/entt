@@ -4,7 +4,7 @@
 #include <entt/entity/registry.hpp>
 
 TEST(Actor, Component) {
-    entt::registry<> registry;
+    entt::registry registry;
     entt::actor actor{registry};
 
     ASSERT_EQ(&registry, &actor.backend());
@@ -41,7 +41,7 @@ TEST(Actor, Component) {
 }
 
 TEST(Actor, EntityLifetime) {
-    entt::registry<> registry;
+    entt::registry registry;
     auto *actor = new entt::actor{registry};
     actor->assign<int>();
 

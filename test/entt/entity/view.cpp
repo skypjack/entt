@@ -6,7 +6,7 @@
 #include <entt/entity/view.hpp>
 
 TEST(SingleComponentView, Functionalities) {
-    entt::registry<> registry;
+    entt::registry registry;
     auto view = registry.view<char>();
     auto cview = std::as_const(registry).view<const char>();
 
@@ -51,7 +51,7 @@ TEST(SingleComponentView, Functionalities) {
 }
 
 TEST(SingleComponentView, ElementAccess) {
-    entt::registry<> registry;
+    entt::registry registry;
     auto view = registry.view<int>();
     auto cview = std::as_const(registry).view<const int>();
 
@@ -68,7 +68,7 @@ TEST(SingleComponentView, ElementAccess) {
 }
 
 TEST(SingleComponentView, Contains) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     const auto e0 = registry.create();
     registry.assign<int>(e0);
@@ -85,7 +85,7 @@ TEST(SingleComponentView, Contains) {
 }
 
 TEST(SingleComponentView, Empty) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     const auto e0 = registry.create();
     registry.assign<char>(e0);
@@ -96,7 +96,7 @@ TEST(SingleComponentView, Empty) {
 
     auto view = registry.view<int>();
 
-    ASSERT_EQ(view.size(), entt::registry<>::size_type{0});
+    ASSERT_EQ(view.size(), entt::registry::size_type{0});
 
     for(auto entity: view) {
         (void)entity;
@@ -105,7 +105,7 @@ TEST(SingleComponentView, Empty) {
 }
 
 TEST(SingleComponentView, Each) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     registry.assign<int>(registry.create());
     registry.assign<int>(registry.create());
@@ -125,7 +125,7 @@ TEST(SingleComponentView, Each) {
 }
 
 TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
-    entt::registry<> registry;
+    entt::registry registry;
     auto view = registry.view<int>();
     auto cview = std::as_const(registry).view<const int>();
 
@@ -155,7 +155,7 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
 }
 
 TEST(SingleComponentView, Find) {
-    entt::registry<> registry;
+    entt::registry registry;
     auto view = registry.view<int>();
 
     const auto e0 = registry.create();
@@ -195,7 +195,7 @@ TEST(SingleComponentView, Find) {
 }
 
 TEST(MultipleComponentView, Functionalities) {
-    entt::registry<> registry;
+    entt::registry registry;
     auto view = registry.view<int, char>();
     auto cview = std::as_const(registry).view<const int, const char>();
 
@@ -235,7 +235,7 @@ TEST(MultipleComponentView, Functionalities) {
 }
 
 TEST(MultipleComponentView, Iterator) {
-    entt::registry<> registry;
+    entt::registry registry;
     const auto entity = registry.create();
     registry.assign<int>(entity);
     registry.assign<char>(entity);
@@ -257,7 +257,7 @@ TEST(MultipleComponentView, Iterator) {
 }
 
 TEST(MultipleComponentView, Contains) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     const auto e0 = registry.create();
     registry.assign<int>(e0);
@@ -276,7 +276,7 @@ TEST(MultipleComponentView, Contains) {
 }
 
 TEST(MultipleComponentView, Empty) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     const auto e0 = registry.create();
     registry.assign<double>(e0);
@@ -296,7 +296,7 @@ TEST(MultipleComponentView, Empty) {
 }
 
 TEST(MultipleComponentView, Each) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     const auto e0 = registry.create();
     registry.assign<int>(e0);
@@ -322,7 +322,7 @@ TEST(MultipleComponentView, Each) {
 }
 
 TEST(MultipleComponentView, EachWithType) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     for(auto i = 0; i < 3; ++i) {
         const auto entity = registry.create();
@@ -348,7 +348,7 @@ TEST(MultipleComponentView, EachWithType) {
 }
 
 TEST(MultipleComponentView, EachWithHoles) {
-    entt::registry<> registry;
+    entt::registry registry;
 
     const auto e0 = registry.create();
     const auto e1 = registry.create();
@@ -373,7 +373,7 @@ TEST(MultipleComponentView, EachWithHoles) {
 }
 
 TEST(MultipleComponentView, ConstNonConstAndAllInBetween) {
-    entt::registry<> registry;
+    entt::registry registry;
     auto view = registry.view<int, const char>();
 
     ASSERT_EQ(view.size(), decltype(view.size()){0});
@@ -397,7 +397,7 @@ TEST(MultipleComponentView, ConstNonConstAndAllInBetween) {
 }
 
 TEST(MultipleComponentView, Find) {
-    entt::registry<> registry;
+    entt::registry registry;
     auto view = registry.view<int, const char>();
 
     const auto e0 = registry.create();
@@ -442,7 +442,7 @@ TEST(MultipleComponentView, Find) {
 }
 
 TEST(RuntimeView, Functionalities) {
-    entt::registry<> registry;
+    entt::registry registry;
     using component_type = typename decltype(registry)::component_type;
 
     // forces the creation of the pools
@@ -486,7 +486,7 @@ TEST(RuntimeView, Functionalities) {
 }
 
 TEST(RuntimeView, Iterator) {
-    entt::registry<> registry;
+    entt::registry registry;
     using component_type = typename decltype(registry)::component_type;
 
     const auto entity = registry.create();
@@ -511,7 +511,7 @@ TEST(RuntimeView, Iterator) {
 }
 
 TEST(RuntimeView, Contains) {
-    entt::registry<> registry;
+    entt::registry registry;
     using component_type = typename decltype(registry)::component_type;
 
     const auto e0 = registry.create();
@@ -532,7 +532,7 @@ TEST(RuntimeView, Contains) {
 }
 
 TEST(RuntimeView, Empty) {
-    entt::registry<> registry;
+    entt::registry registry;
     using component_type = typename decltype(registry)::component_type;
 
     const auto e0 = registry.create();
@@ -554,7 +554,7 @@ TEST(RuntimeView, Empty) {
 }
 
 TEST(RuntimeView, Each) {
-    entt::registry<> registry;
+    entt::registry registry;
     using component_type = typename decltype(registry)::component_type;
 
     const auto e0 = registry.create();
@@ -575,7 +575,7 @@ TEST(RuntimeView, Each) {
 }
 
 TEST(RuntimeView, EachWithHoles) {
-    entt::registry<> registry;
+    entt::registry registry;
     using component_type = typename decltype(registry)::component_type;
 
     const auto e0 = registry.create();
@@ -597,7 +597,7 @@ TEST(RuntimeView, EachWithHoles) {
 }
 
 TEST(RuntimeView, MissingPool) {
-    entt::registry<> registry;
+    entt::registry registry;
     using component_type = typename decltype(registry)::component_type;
 
     const auto e0 = registry.create();
@@ -624,7 +624,7 @@ TEST(RuntimeView, MissingPool) {
 }
 
 TEST(RuntimeView, EmptyRange) {
-    entt::registry<> registry;
+    entt::registry registry;
     using component_type = typename decltype(registry)::component_type;
 
     const auto e0 = registry.create();
