@@ -389,7 +389,7 @@ public:
      * @param hint Hint value to avoid searching for the largest entity.
      */
     template<typename It>
-    void construct(It first, It last, size_type hint) {
+    void batch(It first, It last, size_type hint) {
         if(hint > reverse.size()) {
             // null is safe in all cases for our purposes
             reverse.resize(hint, null);
@@ -971,16 +971,16 @@ public:
      * same of the entities.
      */
     template<typename It>
-    object_type * construct(It first, It last, const size_type hint) {
+    object_type * batch(It first, It last, const size_type hint) {
         if constexpr(std::is_empty_v<object_type>) {
-            underlying_type::construct(first, last, hint);
+            underlying_type::batch(first, last, hint);
             return &instances;
         } else {
             static_assert(std::is_default_constructible_v<object_type>);
             const auto offset = instances.size();
             instances.insert(instances.end(), last-first, {});
             // entity goes after component in case constructor throws
-            underlying_type::construct(first, last, hint);
+            underlying_type::batch(first, last, hint);
             return instances.data() + offset;
         }
     }

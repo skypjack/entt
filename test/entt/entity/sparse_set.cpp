@@ -61,7 +61,7 @@ TEST(SparseSetNoType, Functionalities) {
     other = std::move(set);
 }
 
-TEST(SparseSetNoType, ConstructMany) {
+TEST(SparseSetNoType, BatchAdd) {
     entt::sparse_set<std::uint64_t> set;
     entt::sparse_set<std::uint64_t>::entity_type entities[2];
 
@@ -69,7 +69,7 @@ TEST(SparseSetNoType, ConstructMany) {
     entities[1] = 42;
 
     set.construct(12);
-    set.construct(std::begin(entities), std::end(entities), 43);
+    set.batch(std::begin(entities), std::end(entities), 43);
     set.construct(24);
 
     ASSERT_TRUE(set.has(entities[0]));
@@ -435,7 +435,7 @@ TEST(SparseSetWithType, EmptyType) {
     ASSERT_EQ(std::as_const(set).try_get(42), std::as_const(set).try_get(99));
 }
 
-TEST(SparseSetWithType, ConstructMany) {
+TEST(SparseSetWithType, BatchAdd) {
     entt::sparse_set<std::uint64_t, int> set;
     entt::sparse_set<std::uint64_t>::entity_type entities[2];
 
@@ -444,7 +444,7 @@ TEST(SparseSetWithType, ConstructMany) {
 
     set.reserve(4);
     set.construct(12, 21);
-    auto *component = set.construct(std::begin(entities), std::end(entities), 43);
+    auto *component = set.batch(std::begin(entities), std::end(entities), 43);
     set.construct(24, 42);
 
     ASSERT_TRUE(set.has(entities[0]));
@@ -468,7 +468,7 @@ TEST(SparseSetWithType, ConstructMany) {
     ASSERT_EQ(set.get(entities[1]), 2);
 }
 
-TEST(SparseSetWithType, ConstructManyEmptyType) {
+TEST(SparseSetWithType, BatchAddEmptyType) {
     entt::sparse_set<std::uint64_t, empty_type> set;
     entt::sparse_set<std::uint64_t>::entity_type entities[2];
 
@@ -477,7 +477,7 @@ TEST(SparseSetWithType, ConstructManyEmptyType) {
 
     set.reserve(4);
     set.construct(12);
-    auto *component = set.construct(std::begin(entities), std::end(entities), 43);
+    auto *component = set.batch(std::begin(entities), std::end(entities), 43);
     set.construct(24);
 
     ASSERT_TRUE(set.has(entities[0]));

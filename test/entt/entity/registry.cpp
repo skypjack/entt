@@ -3,6 +3,7 @@
 #include <functional>
 #include <iterator>
 #include <memory>
+#include <cstdint>
 #include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/entity/entt_traits.hpp>
@@ -1215,4 +1216,14 @@ TEST(Registry, Constness) {
 
     ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).try_get<int>({})), const int *>));
     ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).try_get<int, char>({})), std::tuple<const int *, const char *>>));
+}
+
+TEST(Registry, BatchCreateAmbiguousCall) {
+    struct ambiguous { std::uint32_t foo; std::uint64_t bar; };
+    entt::registry registry;
+    const auto entity = registry.create();
+    std::uint32_t foo = 32u;
+    std::uint64_t bar = 64u;
+    // this should work, no other tests required
+    registry.assign<ambiguous>(entity, foo, bar);
 }
