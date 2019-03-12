@@ -792,12 +792,12 @@ public:
      * @param component Instance to use to construct the component.
      * @return Reference to the component owned by the entity.
      */
-    template<typename Component>
-    Component & get_or_create(const entity_type entity, Component &&component) ENTT_NOEXCEPT {
+    template<typename Component, typename... Args>
+    Component & get_or_create(const entity_type entity, Args &&... args) ENTT_NOEXCEPT {
         assert(valid(entity));
         auto *cpool = assure<std::remove_reference_t<Component>>();
         auto *comp = cpool->try_get(entity);
-        return comp ? *comp : cpool->construct(entity, std::forward<Component>(component));
+        return comp ? *comp : cpool->construct(entity, std::forward<Args>(args)...);
     }
 
     /**
