@@ -160,8 +160,8 @@ TEST(Registry, Functionalities) {
 
     const auto e3 = registry.create();
 
-    ASSERT_EQ(registry.get<int>(e3, 3), 3);
-    ASSERT_EQ(registry.get<char>(e3, 'c'), 'c');
+    ASSERT_EQ(registry.get_or_assign<int>(e3, 3), 3);
+    ASSERT_EQ(registry.get_or_assign<char>(e3, 'c'), 'c');
 
     ASSERT_EQ(registry.size<int>(), entt::registry<>::size_type{1});
     ASSERT_EQ(registry.size<char>(), entt::registry<>::size_type{1});
@@ -1197,7 +1197,7 @@ TEST(Registry, Clone) {
 TEST(Registry, GetOrAssign) {
     entt::registry<> registry;
     const auto entity = registry.create();
-    const auto value = registry.get<int>(entity, 3);
+    const auto value = registry.get_or_assign<int>(entity, 3);
     ASSERT_TRUE(registry.has<int>(entity));
     ASSERT_EQ(registry.get<int>(entity), value);
     ASSERT_EQ(registry.get<int>(entity), 3);
