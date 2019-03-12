@@ -796,7 +796,7 @@ public:
     template<typename Component, typename... Args>
     Component & get_or_assign(const entity_type entity, Args &&... args) ENTT_NOEXCEPT {
         assert(valid(entity));
-        auto *cpool = assure<std::remove_reference_t<Component>>();
+        auto *cpool = assure<Component>();
         auto *comp = cpool->try_get(entity);
         return comp ? *comp : cpool->construct(entity, std::forward<Args>(args)...);
     }
