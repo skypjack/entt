@@ -16,6 +16,10 @@ class basic_registry;
 template<typename, typename...>
 class basic_view;
 
+/*! @brief Forward declaration of the runtime view class. */
+template<typename>
+class basic_runtime_view;
+
 /*! @brief Forward declaration of the group class. */
 template<typename...>
 class basic_group;
@@ -67,6 +71,9 @@ using continuous_loader = basic_continuous_loader<entity>;
  */
 template<typename... Types>
 using view = basic_view<entity, Types...>;
+
+/*! @brief Alias declaration for the most common use case. */
+using runtime_view = basic_runtime_view<entity>;
 
 /**
  * @brief Alias declaration for the most common use case.
