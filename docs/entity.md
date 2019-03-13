@@ -24,7 +24,7 @@
   * [Prototype](#prototype)
   * [Helpers](#helpers)
     * [Dependency function](#dependency-function)
-    * [Labels](#labels)
+    * [Tags](#tags)
   * [Null entity](#null-entity)
 * [Views and Groups](#views-and-groups)
   * [Views](#views)
@@ -782,18 +782,18 @@ A dependency can easily be broken by means of the following function template:
 entt::disconnect<a_type, another_type>(registry.construction<my_type>());
 ```
 
-### Labels
+### Tags
 
-There's nothing magical about the way labels can be assigned to entities while
+There's nothing magical about the way tags can be assigned to entities while
 avoiding a performance hit at runtime. Nonetheless, the syntax can be annoying
 and that's why a more user-friendly shortcut is provided to do it.<br/>
-This shortcut is the alias template `entt::label`.
+This shortcut is the alias template `entt::tag`.
 
-If used in combination with hashed strings, it helps to use labels where types
+If used in combination with hashed strings, it helps to use tags where types
 would be required otherwise. As an example:
 
 ```cpp
-registry.assign<entt::label<"enemy"_hs>>(entity);
+registry.assign<entt::tag<"enemy"_hs>>(entity);
 ```
 
 ## Null entity

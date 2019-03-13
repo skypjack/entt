@@ -3,6 +3,7 @@
 
 
 #include <type_traits>
+#include "../config/config.h"
 #include "../core/hashed_string.hpp"
 #include "../signal/sigh.hpp"
 #include "registry.hpp"
@@ -179,22 +180,26 @@ inline void disconnect(sink<void(basic_registry<Entity> &, const Entity)> sink) 
 
 
 /**
- * @brief Alias template to ease the assignment of labels to entities.
+ * @brief Alias template to ease the assignment of tags to entities.
  *
  * If used in combination with hashed strings, it simplifies the assignment of
- * labels to entities and the use of labels in general where a type would be
+ * tags to entities and the use of tags in general where a type would be
  * required otherwise.<br/>
  * As an example and where the user defined literal for hashed strings hasn't
  * been changed:
  * @code{.cpp}
  * entt::registry registry;
- * registry.assign<entt::label<"enemy"_hs>>(entity);
+ * registry.assign<entt::tag<"enemy"_hs>>(entity);
  * @endcode
+ *
+ * @note
+ * Tags are empty components and therefore candidates for the empty component
+ * optimization.
  *
  * @tparam Value The numeric representation of an instance of hashed string.
  */
 template<typename hashed_string::hash_type Value>
-using label = std::integral_constant<typename hashed_string::hash_type, Value>;
+using tag = std::integral_constant<typename hashed_string::hash_type, Value>;
 
 
 }

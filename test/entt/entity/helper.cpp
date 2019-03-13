@@ -80,24 +80,24 @@ TEST(Dependency, MultipleListenersOnTheSameType) {
     ASSERT_TRUE(registry.has<char>(entity));
 }
 
-TEST(Helper, Label) {
+TEST(Helper, Tag) {
     entt::registry registry;
     const auto entity = registry.create();
-    registry.assign<entt::label<"foobar"_hs>>(entity);
+    registry.assign<entt::tag<"foobar"_hs>>(entity);
     registry.assign<int>(entity, 42);
     int counter{};
 
-    ASSERT_FALSE(registry.has<entt::label<"barfoo"_hs>>(entity));
-    ASSERT_TRUE(registry.has<entt::label<"foobar"_hs>>(entity));
+    ASSERT_FALSE(registry.has<entt::tag<"barfoo"_hs>>(entity));
+    ASSERT_TRUE(registry.has<entt::tag<"foobar"_hs>>(entity));
 
-    for(auto entity: registry.view<int, entt::label<"foobar"_hs>>()) {
+    for(auto entity: registry.view<int, entt::tag<"foobar"_hs>>()) {
         (void)entity;
         ++counter;
     }
 
     ASSERT_NE(counter, 0);
 
-    for(auto entity: registry.view<entt::label<"foobar"_hs>>()) {
+    for(auto entity: registry.view<entt::tag<"foobar"_hs>>()) {
         (void)entity;
         --counter;
     }
