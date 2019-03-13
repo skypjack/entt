@@ -40,6 +40,8 @@ a reference:
     modularity.
 
 * Articles
+  * Some posts on my personal [blog](https://skypjack.github.io/) are obviously
+    also about `EnTT`, for those who want to know **more** on this project.
   * [Space Battle: Huge edition](http://victor.madtriangles.com/code%20experiment/2018/06/11/post-ecs-battle-huge.html):
     huge space battle built entirely from scratch.
   * [Space Battle](https://github.com/vblanco20-1/ECS_SpaceBattle): huge space
