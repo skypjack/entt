@@ -39,6 +39,10 @@ a reference:
   * [shiva](https://github.com/Milerius/shiva): modern C++ engine with
     modularity.
 
+* Emulators:
+  * [NovusCore](https://github.com/novuscore/NovusCore): A modern take on World
+    of Warcraft emulation.
+
 * Articles
   * Some posts on my personal [blog](https://skypjack.github.io/) are obviously
     also about `EnTT`, for those who want to know **more** on this project.
