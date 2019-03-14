@@ -152,7 +152,7 @@ class basic_registry {
     };
 
     struct owning_group_data {
-        using match_fn_type = bool(ENTT_ID_TYPE);
+        using match_fn_type = typename bool(ENTT_ID_TYPE);
         std::unique_ptr<boxed_owned> data;
         match_fn_type *exclude;
         match_fn_type *get;
@@ -161,7 +161,7 @@ class basic_registry {
     };
 
     struct non_owning_group_data {
-        using match_fn_type = bool(ENTT_ID_TYPE);
+        using match_fn_type = typename bool(ENTT_ID_TYPE);
         std::unique_ptr<sparse_set<Entity>> data;
         match_fn_type *exclude;
         match_fn_type *get;
