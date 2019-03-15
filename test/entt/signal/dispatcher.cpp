@@ -7,7 +7,7 @@ struct an_event {};
 struct another_event {};
 struct one_more_event {};
 
-ENTT_SHARED_TYPE(an_event)
+ENTT_NAMED_TYPE(an_event)
 
 struct receiver {
     void receive(const an_event &) { ++cnt; }

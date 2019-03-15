@@ -5,18 +5,18 @@ struct test_emitter
         : entt::emitter<test_emitter>
 {};
 
-ENTT_SHARED_STRUCT(position, {
+ENTT_NAMED_STRUCT(position, {
     int x;
     int y;
 })
 
-ENTT_SHARED_STRUCT(velocity, {
+ENTT_NAMED_STRUCT(velocity, {
     int dx;
     int dy;
 })
 
-ENTT_SHARED_STRUCT(an_event, {
+ENTT_NAMED_STRUCT(an_event, {
     int payload;
 })
 
-ENTT_SHARED_STRUCT(another_event, {})
+ENTT_NAMED_STRUCT(another_event, {})

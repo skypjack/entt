@@ -182,7 +182,7 @@ class basic_registry {
     inline const auto * pool() const ENTT_NOEXCEPT {
         const auto ctype = type<Component>();
 
-        if constexpr(is_shared_v<Component>) {
+        if constexpr(is_named_type_v<Component>) {
             const auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &pdata) {
                 return pdata.pool && pdata.runtime_type == ctype;
             });
@@ -207,7 +207,7 @@ class basic_registry {
         const auto ctype = type<Component>();
         pool_data *pdata = nullptr;
 
-        if constexpr(is_shared_v<Component>) {
+        if constexpr(is_named_type_v<Component>) {
             const auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &pdata) {
                 return pdata.pool && pdata.runtime_type == ctype;
             });
@@ -270,8 +270,8 @@ public:
      */
     template<typename Component>
     static component_type type() ENTT_NOEXCEPT {
-        if constexpr(is_shared_v<Component>) {
-            return shared_traits<Component>::value;
+        if constexpr(is_named_type_v<Component>) {
+            return named_type_traits<Component>::value;
         } else {
             return component_family::type<Component>;
         }

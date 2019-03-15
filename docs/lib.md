@@ -6,7 +6,7 @@
 # Table of Contents
 
 * [Introduction](#introduction)
-* [Shared types and traits class](#shared-types-and-traits-class)
+* [Named types and traits class](#named-types-and-traits-class)
   * [Do not mix types](#do-not-mix-types)
 * [Macros, macros everywhere](#macros-macros-everywhere)
   * [Conflicts](#conflicts)
@@ -27,13 +27,13 @@ The reasons for that are beyond the purposes of this document. However, the good
 news is that `EnTT` also offers now a way to overcome this limit and to push
 things across boundaries without problems when needed.
 
-# Shared types and traits class
+# Named types and traits class
 
 To allow a type to work properly across boundaries when used by a class that
 requires to assign unique identifiers to types, users must specialize a class
 template to literally give a compile-time name to the type itself.<br/>
-The name of the class template is `shared_traits` and the specialization must be
-such that it exposes a static constexpr data member named `value` having type
+The name of the class template is `name_type_traits` and the specialization must
+be such that it exposes a static constexpr data member named `value` having type
 either `ENTT_ID_TYPE` or `entt::hashed_string::hash_type`. Its value is the user
 defined unique identifier assigned to the specific type.<br/>
 Identifiers are not to be sequentially generated in this case.
@@ -44,7 +44,7 @@ As an example:
 struct my_type { /* ... */ };
 
 template<>
-struct entt::shared_traits<my_type> {
+struct entt::named_type_traits<my_type> {
     static constexpr auto value = "my_type"_hs;
 };
 ```
@@ -58,17 +58,17 @@ way around was in fact forcing users to inherit all their classes from a common
 base. Something to avoid, at least from my point of view.<br/>
 However, despite the fact that it's not intrusive, it would be great if it was
 also easier to use and a bit less error-prone. This is why a bunch of macros
-exist to ease defining shared types.
+exist to ease defining named types.
 
 ## Do not mix types
 
 Someone might think that this trick is valid only for the types to push across
 boundaries. This isn't how things work. In fact, the problem is more complex
 than that.<br/>
-As a rule of thumb, users should never mix shared and non-shared types. Whenever
-a type is made shareable, all the types should be made shareable. As an example,
-consider the `registry` class template. In case it is pushed across boundaries,
-all the types of components should be shareable to avoid subtle bugs.
+As a rule of thumb, users should never mix named and non-named types. Whenever
+a type is given a name, all the types must be given a name. As an example,
+consider the `registry` class template: in case it is pushed across boundaries,
+all the types of components should be assigned a name to avoid subtle bugs.
 
 Indeed, this constraint can be relaxed in many cases. However, it is difficult
 to define a general rule to follow that is not the most stringent, unless users
@@ -77,44 +77,44 @@ details on the topic.
 
 # Macros, macros everywhere
 
-The library comes with a set of predefined macros to use to declare shared types
+The library comes with a set of predefined macros to use to declare named types
 or export already existing ones. In particular:
 
-* `ENTT_SHARED_TYPE` can be used to make shareable already existing types. This
-  macro must be used in the global namespace even when types to make shareable
-  are not.
+* `ENTT_NAMED_TYPE` can be used to assign a name to already existing types. This
+  macro must be used in the global namespace even when the types to be named are
+  not.
 
   ```cpp
-  ENTT_SHARED_TYPE(my_type)
-  ENTT_SHARED_TYPE(ns::another_type)
+  ENTT_NAMED_TYPE(my_type)
+  ENTT_NAMED_TYPE(ns::another_type)
   ```
 
-* `ENTT_SHARED_STRUCT` can be used to define and export a struct at the same
+* `ENTT_NAMED_STRUCT` can be used to define and export a struct at the same
   time. It accepts also an optional namespace in which to define the given type.
   This macro must be used in the global namespace.
 
   ```cpp
-  ENTT_SHARED_STRUCT(my_type, { /* struct definition */})
-  ENTT_SHARED_STRUCT(ns, another_type, { /* struct definition */})
+  ENTT_NAMED_STRUCT(my_type, { /* struct definition */})
+  ENTT_NAMED_STRUCT(ns, another_type, { /* struct definition */})
   ```
 
-* `ENTT_SHARED_CLASS` can be used to define and export a class at the same
+* `ENTT_NAMED_CLASS` can be used to define and export a class at the same
   time. It accepts also an optional namespace in which to define the given type.
   This macro must be used in the global namespace.
 
   ```cpp
-  ENTT_SHARED_CLASS(my_type, { /* class definition */})
-  ENTT_SHARED_CLASS(ns, another_type, { /* class definition */})
+  ENTT_NAMED_CLASS(my_type, { /* class definition */})
+  ENTT_NAMED_CLASS(ns, another_type, { /* class definition */})
   ```
 
 Nested namespaces are supported out of the box as well in all cases. As an
 example:
 
 ```cpp
-ENTT_SHARED_STRUCT(nested::ns, my_type, { /* struct definition */})
+ENTT_NAMED_STRUCT(nested::ns, my_type, { /* struct definition */})
 ```
 
-These macros can be used to avoid specializing the `shared_traits` class
+These macros can be used to avoid specializing the `named_type_traits` class
 template. In all cases, the name of the class is used also as a seed to generate
 the compile-time unique identifier.
 
@@ -127,7 +127,7 @@ the strangest things will probably take place.<br/>
 Unfortunately, there is no safe way to prevent it. If this happens, it will be
 enough to give a different value to one of the conflicting types to solve the
 problem. To do this, users can either assign a different name to the class or
-directly define a specialization for the `shared_traits` class template.
+directly define a specialization for the `named_type_traits` class template.
 
 # Allocations: the dark side of the force
 

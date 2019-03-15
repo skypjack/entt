@@ -122,8 +122,8 @@ class emitter {
 
     template<typename Event>
     static auto type() ENTT_NOEXCEPT {
-        if constexpr(is_shared_v<Event>) {
-            return shared_traits<Event>::value;
+        if constexpr(is_named_type_v<Event>) {
+            return named_type_traits<Event>::value;
         } else {
             return handler_family::type<Event>;
         }
@@ -134,7 +134,7 @@ class emitter {
         const auto htype = type<Event>();
         handler_data *hdata = nullptr;
 
-        if constexpr(is_shared_v<Event>) {
+        if constexpr(is_named_type_v<Event>) {
             const auto it = std::find_if(handlers.begin(), handlers.end(), [htype](const auto &hdata) {
                 return hdata.handler && hdata.runtime_type == htype;
             });

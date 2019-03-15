@@ -17,3 +17,4 @@
   - define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
   - from Tommaso on discord view<Health, Transform>().where<Health>([](h) {h > 5}).where<Transform>([](t) {t.inside(aabb)});
 * remove runtime views, welcome reflection and what about snapshot?
+* add size+raw on multi comp views and groups, size retuns the actual size of the underlying pool and not that of the view/group

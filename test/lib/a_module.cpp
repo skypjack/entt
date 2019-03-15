@@ -13,10 +13,10 @@
 #endif
 #endif
 
-ENTT_SHARED_TYPE(int)
-ENTT_SHARED_TYPE(char)
-ENTT_SHARED_TYPE(double)
-ENTT_SHARED_TYPE(float)
+ENTT_NAMED_TYPE(int)
+ENTT_NAMED_TYPE(char)
+ENTT_NAMED_TYPE(double)
+ENTT_NAMED_TYPE(float)
 
 LIB_EXPORT typename entt::registry::component_type a_module_int_type() {
     entt::registry registry;

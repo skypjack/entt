@@ -8,7 +8,7 @@ struct foo_event { int i; char c; };
 struct bar_event {};
 struct quux_event {};
 
-ENTT_SHARED_TYPE(foo_event)
+ENTT_NAMED_TYPE(foo_event)
 
 TEST(Emitter, Clear) {
     test_emitter emitter;

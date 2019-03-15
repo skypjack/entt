@@ -22,8 +22,8 @@ struct listener {
     int value;
 };
 
-ENTT_SHARED_TYPE(int)
-ENTT_SHARED_TYPE(char)
+ENTT_NAMED_TYPE(int)
+ENTT_NAMED_TYPE(char)
 
 TEST(Lib, Types) {
     entt::registry registry;
