@@ -240,8 +240,8 @@ const Type * try_cast(const meta_type_node *node, void *instance) ENTT_NOEXCEPT 
     if(node == type) {
         ret = instance;
     } else {
-        const auto *base = find_if<&meta_type_node::base>([type](auto *node) {
-            return node->type() == type;
+        const auto *base = find_if<&meta_type_node::base>([type](auto *_node) {
+            return _node->type() == type;
         }, node);
 
         ret = base ? base->cast(instance) : nullptr;
@@ -253,20 +253,20 @@ const Type * try_cast(const meta_type_node *node, void *instance) ENTT_NOEXCEPT 
 
 template<auto Member>
 inline bool can_cast_or_convert(const meta_type_node *from, const meta_type_node *to) ENTT_NOEXCEPT {
-    return (from == to) || find_if<Member>([to](auto *node) {
-        return node->type() == to;
+    return (from == to) || find_if<Member>([to](auto *_node) {
+        return _node->type() == to;
     }, from);
 }
 
 
 template<typename... Args, std::size_t... Indexes>
 inline auto ctor(std::index_sequence<Indexes...>, const meta_type_node *node) ENTT_NOEXCEPT {
-    return internal::find_if([](auto *node) {
-        return node->size == sizeof...(Args) &&
+    return internal::find_if([](auto *_node) {
+        return _node->size == sizeof...(Args) &&
                 (([](auto *from, auto *to) {
                     return internal::can_cast_or_convert<&internal::meta_type_node::base>(from, to)
                             || internal::can_cast_or_convert<&internal::meta_type_node::conv>(from, to);
-                }(internal::meta_info<Args>::resolve(), node->arg(Indexes))) && ...);
+                }(internal::meta_info<Args>::resolve(), _node->arg(Indexes))) && ...);
     }, node->ctor);
 }
 
@@ -1034,8 +1034,8 @@ public:
     template<typename Key>
     inline std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *curr) {
-            return curr->key() == key;
+        const auto *curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *_curr) {
+            return _curr->key() == key;
         }, node->prop);
 
         return curr ? curr->meta() : meta_prop{};
@@ -1265,8 +1265,8 @@ public:
     template<typename Key>
     inline std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *curr) {
-            return curr->key() == key;
+        const auto *curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *_curr) {
+            return _curr->key() == key;
         }, node->prop);
 
         return curr ? curr->meta() : meta_prop{};
@@ -1419,8 +1419,8 @@ public:
     template<typename Op>
     inline std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
-        internal::iterate([op = std::move(op)](auto *node) {
-            op(node->meta());
+        internal::iterate([op = std::move(op)](auto *_node) {
+            op(_node->meta());
         }, node->prop);
     }
 
@@ -1433,8 +1433,8 @@ public:
     template<typename Key>
     inline std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *curr) {
-            return curr->key() == key;
+        const auto *curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *_curr) {
+            return _curr->key() == key;
         }, node->prop);
 
         return curr ? curr->meta() : meta_prop{};
@@ -1612,8 +1612,8 @@ public:
      */
     template<typename Op>
     inline void base(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::base>([op = std::move(op)](auto *node) {
-            op(node->meta());
+        internal::iterate<&internal::meta_type_node::base>([op = std::move(op)](auto *_node) {
+            op(_node->meta());
         }, node);
     }
 
@@ -1626,8 +1626,8 @@ public:
      * @return The meta base associated with the given name, if any.
      */
     inline meta_base base(const char *str) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if<&internal::meta_type_node::base>([name = hashed_string{str}](auto *node) {
-            return node->type()->name == name;
+        const auto *curr = internal::find_if<&internal::meta_type_node::base>([name = hashed_string{str}](auto *_node) {
+            return _node->type()->name == name;
         }, node);
 
         return curr ? curr->meta() : meta_base{};
@@ -1644,8 +1644,8 @@ public:
      */
     template<typename Op>
     inline void conv(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::conv>([op = std::move(op)](auto *node) {
-            op(node->meta());
+        internal::iterate<&internal::meta_type_node::conv>([op = std::move(op)](auto *_node) {
+            op(_node->meta());
         }, node);
     }
 
@@ -1661,8 +1661,8 @@ public:
      */
     template<typename Type>
     inline meta_conv conv() const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if<&internal::meta_type_node::conv>([type = internal::meta_info<Type>::resolve()](auto *node) {
-            return node->type() == type;
+        const auto *curr = internal::find_if<&internal::meta_type_node::conv>([type = internal::meta_info<Type>::resolve()](auto *_node) {
+            return _node->type() == type;
         }, node);
 
         return curr ? curr->meta() : meta_conv{};
@@ -1675,8 +1675,8 @@ public:
      */
     template<typename Op>
     inline void ctor(Op op) const ENTT_NOEXCEPT {
-        internal::iterate([op = std::move(op)](auto *node) {
-            op(node->meta());
+        internal::iterate([op = std::move(op)](auto *_node) {
+            op(_node->meta());
         }, node->ctor);
     }
 
@@ -1710,8 +1710,8 @@ public:
      */
     template<typename Op>
     inline void data(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::data>([op = std::move(op)](auto *node) {
-            op(node->meta());
+        internal::iterate<&internal::meta_type_node::data>([op = std::move(op)](auto *_node) {
+            op(_node->meta());
         }, node);
     }
 
@@ -1726,8 +1726,8 @@ public:
      * @return The meta data associated with the given name, if any.
      */
     inline meta_data data(const char *str) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if<&internal::meta_type_node::data>([name = hashed_string{str}](auto *node) {
-            return node->name == name;
+        const auto *curr = internal::find_if<&internal::meta_type_node::data>([name = hashed_string{str}](auto *_node) {
+            return _node->name == name;
         }, node);
 
         return curr ? curr->meta() : meta_data{};
@@ -1745,8 +1745,8 @@ public:
      */
     template<typename Op>
     inline void func(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::func>([op = std::move(op)](auto *node) {
-            op(node->meta());
+        internal::iterate<&internal::meta_type_node::func>([op = std::move(op)](auto *_node) {
+            op(_node->meta());
         }, node);
     }
 
@@ -1761,8 +1761,8 @@ public:
      * @return The meta function associated with the given name, if any.
      */
     inline meta_func func(const char *str) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if<&internal::meta_type_node::func>([name = hashed_string{str}](auto *node) {
-            return node->name == name;
+        const auto *curr = internal::find_if<&internal::meta_type_node::func>([name = hashed_string{str}](auto *_node) {
+            return _node->name == name;
         }, node);
 
         return curr ? curr->meta() : meta_func{};
@@ -1784,8 +1784,8 @@ public:
         std::array<meta_any, sizeof...(Args)> arguments{{std::forward<Args>(args)...}};
         meta_any any{};
 
-        internal::iterate<&internal::meta_type_node::ctor>([data = arguments.data(), &any](auto *node) -> bool {
-            any = node->invoke(data);
+        internal::iterate<&internal::meta_type_node::ctor>([data = arguments.data(), &any](auto *_node) -> bool {
+            any = _node->invoke(data);
             return static_cast<bool>(any);
         }, node);
 
@@ -1817,8 +1817,8 @@ public:
     template<typename Op>
     inline std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::prop>([op = std::move(op)](auto *node) {
-            op(node->meta());
+        internal::iterate<&internal::meta_type_node::prop>([op = std::move(op)](auto *_node) {
+            op(_node->meta());
         }, node);
     }
 
@@ -1836,8 +1836,8 @@ public:
     template<typename Key>
     inline std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if<&internal::meta_type_node::prop>([key = meta_any{std::forward<Key>(key)}](auto *curr) {
-            return curr->key() == key;
+        const auto *curr = internal::find_if<&internal::meta_type_node::prop>([key = meta_any{std::forward<Key>(key)}](auto *_curr) {
+            return _curr->key() == key;
         }, node);
 
         return curr ? curr->meta() : meta_prop{};

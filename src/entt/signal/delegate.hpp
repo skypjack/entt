@@ -154,16 +154,16 @@ public:
         data = value_or_instance;
 
         fn = [](const void *data, Args... args) -> Ret {
-            Type *value_or_instance = nullptr;
+            Type *_value_or_instance = nullptr;
 
             if constexpr(std::is_const_v<Type>) {
-                value_or_instance = static_cast<Type *>(data);
+                _value_or_instance = static_cast<Type *>(data);
             } else {
-                value_or_instance = static_cast<Type *>(const_cast<void *>(data));
+                _value_or_instance = static_cast<Type *>(const_cast<void *>(data));
             }
 
             // this allows void(...) to eat return values and avoid errors
-            return Ret(std::invoke(Candidate, value_or_instance, args...));
+            return Ret(std::invoke(Candidate, _value_or_instance, args...));
         };
     }
 

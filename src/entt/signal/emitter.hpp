@@ -135,8 +135,8 @@ class emitter {
         handler_data *hdata = nullptr;
 
         if constexpr(is_shared_v<Event>) {
-            const auto it = std::find_if(handlers.begin(), handlers.end(), [htype](const auto &hdata) {
-                return hdata.handler && hdata.runtime_type == htype;
+            const auto it = std::find_if(handlers.begin(), handlers.end(), [htype](const auto &_hdata) {
+                return _hdata.handler && _hdata.runtime_type == htype;
             });
 
             hdata = (it == handlers.cend() ? &handlers.emplace_back() : &(*it));

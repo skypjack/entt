@@ -183,8 +183,8 @@ class basic_registry {
         const auto ctype = type<Component>();
 
         if constexpr(is_shared_v<Component>) {
-            const auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &pdata) {
-                return pdata.pool && pdata.runtime_type == ctype;
+            const auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &_pdata) {
+                return _pdata.pool && _pdata.runtime_type == ctype;
             });
 
             return (it != pools.cend() && it->pool)
@@ -208,8 +208,8 @@ class basic_registry {
         pool_data *pdata = nullptr;
 
         if constexpr(is_shared_v<Component>) {
-            const auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &pdata) {
-                return pdata.pool && pdata.runtime_type == ctype;
+            const auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &_pdata) {
+                return _pdata.pool && _pdata.runtime_type == ctype;
             });
 
             pdata = (it == pools.cend() ? &pools.emplace_back() : &(*it));
@@ -1073,7 +1073,7 @@ public:
         // const auto ctype2 = component_family::type<C2>;
         // pools[ctype1].swap(pools[ctype2]);
         // pools[ctype1]->swap2(pools[ctype2].get());
-        pool<C1>().swap2(pool<C2>());
+        pool<C1>()->swap2(pool<C2>());
     }
 
 
