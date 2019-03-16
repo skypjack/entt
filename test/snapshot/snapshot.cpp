@@ -15,7 +15,7 @@ struct timer {
 };
 
 struct relationship {
-    entt::registry<>::entity_type parent;
+    entt::entity parent;
 };
 
 template<typename Archive>
@@ -36,8 +36,8 @@ void serialize(Archive &archive, relationship &relationship) {
 TEST(Snapshot, Full) {
     std::stringstream storage;
 
-    entt::registry<> source;
-    entt::registry<> destination;
+    entt::registry source;
+    entt::registry destination;
 
     auto e0 = source.create();
     source.assign<position>(e0, 16.f, 16.f);
@@ -91,10 +91,10 @@ TEST(Snapshot, Full) {
 TEST(Snapshot, Continuous) {
     std::stringstream storage;
 
-    entt::registry<> source;
-    entt::registry<> destination;
+    entt::registry source;
+    entt::registry destination;
 
-    std::vector<entt::registry<>::entity_type> entities;
+    std::vector<entt::entity> entities;
     for(auto i = 0; i < 10; ++i) {
         entities.push_back(source.create());
     }
@@ -126,7 +126,7 @@ TEST(Snapshot, Continuous) {
     }
 
     cereal::JSONInputArchive input{storage};
-    entt::continuous_loader<entt::registry<>::entity_type> loader{destination};
+    entt::continuous_loader loader{destination};
     loader.entities(input)
             .component<position, relationship>(input, &relationship::parent)
             .component<timer>(input);

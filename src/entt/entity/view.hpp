@@ -14,16 +14,10 @@
 #include "../core/type_traits.hpp"
 #include "entt_traits.hpp"
 #include "sparse_set.hpp"
+#include "fwd.hpp"
 
 
 namespace entt {
-
-
-/**
- * @brief Forward declaration of the registry class.
- */
-template<typename>
-class registry;
 
 
 /**
@@ -63,11 +57,11 @@ class registry;
  * @tparam Component Types of components iterated by the view.
  */
 template<typename Entity, typename... Component>
-class view {
+class basic_view {
     static_assert(sizeof...(Component) > 1);
 
     /*! @brief A registry is allowed to create views. */
-    friend class registry<Entity>;
+    friend class basic_registry<Entity>;
 
     template<typename Comp>
     using pool_type = std::conditional_t<std::is_const_v<Comp>, const sparse_set<Entity, std::remove_const_t<Comp>>, sparse_set<Entity, Comp>>;
@@ -80,7 +74,7 @@ class view {
     using traits_type = entt_traits<Entity>;
 
     class iterator {
-        friend class view<Entity, Component...>;
+        friend class basic_view<Entity, Component...>;
 
         using extent_type = typename sparse_set<Entity>::size_type;
 
@@ -118,9 +112,6 @@ class view {
 
         iterator() ENTT_NOEXCEPT = default;
 
-        iterator(const iterator &) ENTT_NOEXCEPT = default;
-        iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
-
         iterator & operator++() ENTT_NOEXCEPT {
             return (++begin != end && !valid()) ? ++(*this) : *this;
         }
@@ -154,7 +145,7 @@ class view {
     };
 
     // we could use pool_type<Component> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    view(sparse_set<Entity, std::remove_const_t<Component>> *... pools) ENTT_NOEXCEPT
+    basic_view(sparse_set<Entity, std::remove_const_t<Component>> *... pools) ENTT_NOEXCEPT
         : pools{pools...}
     {}
 
@@ -224,16 +215,6 @@ public:
     using size_type = typename sparse_set<Entity>::size_type;
     /*! @brief Input iterator type. */
     using iterator_type = iterator;
-
-    /*! @brief Default copy constructor. */
-    view(const view &) = default;
-    /*! @brief Default move constructor. */
-    view(view &&) = default;
-
-    /*! @brief Default copy assignment operator. @return This view. */
-    view & operator=(const view &) = default;
-    /*! @brief Default move assignment operator. @return This view. */
-    view & operator=(view &&) = default;
 
     /**
      * @brief Estimates the number of entities that have the given components.
@@ -365,6 +346,35 @@ public:
         ((std::get<pool_type<Component> *>(pools) == view ? each<Component>(std::get<pool_type<Component> *>(pools), std::move(func), std::make_index_sequence<sizeof...(Component)-1>{}) : void()), ...);
     }
 
+    /**
+     * @brief Iterates entities and components and applies the given function
+     * object to them.
+     *
+     * The function object is invoked for each entity. It is provided with the
+     * entity itself and a set of references to all its components. The
+     * _constness_ of the components is as requested.<br/>
+     * The signature of the function must be equivalent to one of the following
+     * forms:
+     *
+     * @code{.cpp}
+     * void(const entity_type, Component &...);
+     * void(Component &...);
+     * @endcode
+     *
+     * The pool of the suggested component is used to drive iterations. The
+     * returned entities will therefore respect the order of the pool associated
+     * with that type.<br/>
+     * It is no longer guaranteed that the performance is the best possible, but
+     * there will be greater control over the order of iteration.
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Comp, typename Func>
+    void each(Func func) const {
+        each<Comp>(std::get<pool_type<Comp> *>(pools), std::move(func), std::make_index_sequence<sizeof...(Component)-1>{});
+    }
+
 private:
     const std::tuple<pool_type<Component> *...> pools;
 };
@@ -404,13 +414,13 @@ private:
  * @tparam Component Type of component iterated by the view.
  */
 template<typename Entity, typename Component>
-class view<Entity, Component> {
+class basic_view<Entity, Component> {
     /*! @brief A registry is allowed to create views. */
-    friend class registry<Entity>;
+    friend class basic_registry<Entity>;
 
     using pool_type = std::conditional_t<std::is_const_v<Component>, const sparse_set<Entity, std::remove_const_t<Component>>, sparse_set<Entity, Component>>;
 
-    view(pool_type *pool) ENTT_NOEXCEPT
+    basic_view(pool_type *pool) ENTT_NOEXCEPT
         : pool{pool}
     {}
 
@@ -423,16 +433,6 @@ public:
     using size_type = typename pool_type::size_type;
     /*! @brief Input iterator type. */
     using iterator_type = typename sparse_set<Entity>::iterator_type;
-
-    /*! @brief Default copy constructor. */
-    view(const view &) = default;
-    /*! @brief Default move constructor. */
-    view(view &&) = default;
-
-    /*! @brief Default copy assignment operator. @return This view. */
-    view & operator=(const view &) = default;
-    /*! @brief Default move assignment operator. @return This view. */
-    view & operator=(view &&) = default;
 
     /**
      * @brief Returns the number of entities that have the given component.
@@ -644,16 +644,16 @@ private:
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class runtime_view {
+class basic_runtime_view {
     /*! @brief A registry is allowed to create views. */
-    friend class registry<Entity>;
+    friend class basic_registry<Entity>;
 
     using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
     using extent_type = typename sparse_set<Entity>::size_type;
     using traits_type = entt_traits<Entity>;
 
     class iterator {
-        friend class runtime_view<Entity>;
+        friend class basic_runtime_view<Entity>;
 
         iterator(underlying_iterator_type begin, underlying_iterator_type end, const sparse_set<Entity> * const *first, const sparse_set<Entity> * const *last, extent_type extent) ENTT_NOEXCEPT
             : begin{begin},
@@ -684,9 +684,6 @@ class runtime_view {
         using iterator_category = std::forward_iterator_tag;
 
         iterator() ENTT_NOEXCEPT = default;
-
-        iterator(const iterator &) ENTT_NOEXCEPT = default;
-        iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
 
         iterator & operator++() ENTT_NOEXCEPT {
             return (++begin != end && !valid()) ? ++(*this) : *this;
@@ -721,7 +718,7 @@ class runtime_view {
         extent_type extent;
     };
 
-    runtime_view(std::vector<const sparse_set<Entity> *> others) ENTT_NOEXCEPT
+    basic_runtime_view(std::vector<const sparse_set<Entity> *> others) ENTT_NOEXCEPT
         : pools{std::move(others)}
     {
         const auto it = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
@@ -757,16 +754,6 @@ public:
     using size_type = typename sparse_set<Entity>::size_type;
     /*! @brief Input iterator type. */
     using iterator_type = iterator;
-
-    /*! @brief Default copy constructor. */
-    runtime_view(const runtime_view &) = default;
-    /*! @brief Default move constructor. */
-    runtime_view(runtime_view &&) = default;
-
-    /*! @brief Default copy assignment operator. @return This view. */
-    runtime_view & operator=(const runtime_view &) = default;
-    /*! @brief Default move assignment operator. @return This view. */
-    runtime_view & operator=(runtime_view &&) = default;
 
     /**
      * @brief Estimates the number of entities that have the given components.

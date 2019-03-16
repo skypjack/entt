@@ -116,13 +116,9 @@ public:
     /*! @brief Default constructor. */
     scheduler() ENTT_NOEXCEPT = default;
 
-    /*! @brief Copying a scheduler isn't allowed. */
-    scheduler(const scheduler &) = delete;
     /*! @brief Default move constructor. */
     scheduler(scheduler &&) = default;
 
-    /*! @brief Copying a scheduler isn't allowed. @return This scheduler. */
-    scheduler & operator=(const scheduler &) = delete;
     /*! @brief Default move assignment operator. @return This scheduler. */
     scheduler & operator=(scheduler &&) = default;
 

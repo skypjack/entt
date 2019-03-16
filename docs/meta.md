@@ -63,7 +63,7 @@ It can be used to extend the reflected type and add the following:
 
 * _Destructors_. Free functions can be set as destructors of reflected types.
   The purpose is to give users the ability to free up resources that require
-  special treatment  before an object is actually destroyed.<br/>
+  special treatment before an object is actually destroyed.<br/>
   Use the `dtor` member function for this purpose:
 
   ```cpp

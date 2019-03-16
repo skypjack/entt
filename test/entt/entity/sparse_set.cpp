@@ -1,20 +1,22 @@
 #include <memory>
+#include <iterator>
 #include <exception>
 #include <algorithm>
 #include <unordered_set>
 #include <gtest/gtest.h>
 #include <entt/entity/sparse_set.hpp>
 
+struct empty_type {};
+
 TEST(SparseSetNoType, Functionalities) {
     entt::sparse_set<std::uint64_t> set;
-    const auto &cset = set;
 
     set.reserve(42);
 
     ASSERT_EQ(set.capacity(), 42);
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
-    ASSERT_EQ(cset.begin(), cset.end());
+    ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -25,7 +27,7 @@ TEST(SparseSetNoType, Functionalities) {
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
-    ASSERT_NE(cset.begin(), cset.end());
+    ASSERT_NE(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_TRUE(set.has(42));
@@ -36,7 +38,7 @@ TEST(SparseSetNoType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
-    ASSERT_EQ(cset.begin(), cset.end());
+    ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -49,7 +51,7 @@ TEST(SparseSetNoType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
-    ASSERT_EQ(cset.begin(), cset.end());
+    ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -57,6 +59,32 @@ TEST(SparseSetNoType, Functionalities) {
     (void)entt::sparse_set<std::uint64_t>{std::move(set)};
     entt::sparse_set<std::uint64_t> other;
     other = std::move(set);
+}
+
+TEST(SparseSetNoType, BatchAdd) {
+    entt::sparse_set<std::uint64_t> set;
+    entt::sparse_set<std::uint64_t>::entity_type entities[2];
+
+    entities[0] = 3;
+    entities[1] = 42;
+
+    set.construct(12);
+    set.batch(std::begin(entities), std::end(entities), 43);
+    set.construct(24);
+
+    ASSERT_TRUE(set.has(entities[0]));
+    ASSERT_TRUE(set.has(entities[1]));
+    ASSERT_FALSE(set.has(0));
+    ASSERT_FALSE(set.has(9));
+    ASSERT_TRUE(set.has(12));
+    ASSERT_TRUE(set.has(24));
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(set.size(), 4u);
+    ASSERT_EQ(set.get(12), 0u);
+    ASSERT_EQ(set.get(entities[0]), 1u);
+    ASSERT_EQ(set.get(entities[1]), 2u);
+    ASSERT_EQ(set.get(24), 3u);
 }
 
 TEST(SparseSetNoType, Iterator) {
@@ -143,7 +171,6 @@ TEST(SparseSetNoType, Data) {
 TEST(SparseSetNoType, RespectDisjoint) {
     entt::sparse_set<std::uint64_t> lhs;
     entt::sparse_set<std::uint64_t> rhs;
-    const auto &clhs = lhs;
 
     lhs.construct(3);
     lhs.construct(12);
@@ -155,15 +182,14 @@ TEST(SparseSetNoType, RespectDisjoint) {
 
     lhs.respect(rhs);
 
-    ASSERT_EQ(clhs.get(3), 0u);
-    ASSERT_EQ(clhs.get(12), 1u);
-    ASSERT_EQ(clhs.get(42), 2u);
+    ASSERT_EQ(std::as_const(lhs).get(3), 0u);
+    ASSERT_EQ(std::as_const(lhs).get(12), 1u);
+    ASSERT_EQ(std::as_const(lhs).get(42), 2u);
 }
 
 TEST(SparseSetNoType, RespectOverlap) {
     entt::sparse_set<std::uint64_t> lhs;
     entt::sparse_set<std::uint64_t> rhs;
-    const auto &clhs = lhs;
 
     lhs.construct(3);
     lhs.construct(12);
@@ -177,9 +203,9 @@ TEST(SparseSetNoType, RespectOverlap) {
 
     lhs.respect(rhs);
 
-    ASSERT_EQ(clhs.get(3), 0u);
-    ASSERT_EQ(clhs.get(12), 2u);
-    ASSERT_EQ(clhs.get(42), 1u);
+    ASSERT_EQ(std::as_const(lhs).get(3), 0u);
+    ASSERT_EQ(std::as_const(lhs).get(12), 2u);
+    ASSERT_EQ(std::as_const(lhs).get(42), 1u);
 }
 
 TEST(SparseSetNoType, RespectOrdered) {
@@ -347,14 +373,13 @@ TEST(SparseSetNoType, Clone) {
 
 TEST(SparseSetWithType, Functionalities) {
     entt::sparse_set<std::uint64_t, int> set;
-    const auto &cset = set;
 
     set.reserve(42);
 
     ASSERT_EQ(set.capacity(), 42);
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
-    ASSERT_EQ(cset.begin(), cset.end());
+    ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -363,7 +388,7 @@ TEST(SparseSetWithType, Functionalities) {
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
-    ASSERT_NE(cset.begin(), cset.end());
+    ASSERT_NE(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_TRUE(set.has(42));
@@ -376,7 +401,7 @@ TEST(SparseSetWithType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
-    ASSERT_EQ(cset.begin(), cset.end());
+    ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -391,7 +416,7 @@ TEST(SparseSetWithType, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
-    ASSERT_EQ(cset.begin(), cset.end());
+    ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_FALSE(set.has(42));
@@ -401,15 +426,73 @@ TEST(SparseSetWithType, Functionalities) {
     other = std::move(set);
 }
 
-TEST(SparseSetWithType, FunctionalitiesEmptyType) {
-    struct empty_type {};
+TEST(SparseSetWithType, EmptyType) {
     entt::sparse_set<std::uint64_t, empty_type> set;
-    const auto &cset = set;
 
     ASSERT_EQ(&set.construct(42), &set.construct(99));
     ASSERT_EQ(&set.get(42), set.try_get(42));
     ASSERT_EQ(&set.get(42), &set.get(99));
-    ASSERT_EQ(cset.try_get(42), cset.try_get(99));
+    ASSERT_EQ(std::as_const(set).try_get(42), std::as_const(set).try_get(99));
+}
+
+TEST(SparseSetWithType, BatchAdd) {
+    entt::sparse_set<std::uint64_t, int> set;
+    entt::sparse_set<std::uint64_t>::entity_type entities[2];
+
+    entities[0] = 3;
+    entities[1] = 42;
+
+    set.reserve(4);
+    set.construct(12, 21);
+    auto *component = set.batch(std::begin(entities), std::end(entities), 43);
+    set.construct(24, 42);
+
+    ASSERT_TRUE(set.has(entities[0]));
+    ASSERT_TRUE(set.has(entities[1]));
+    ASSERT_FALSE(set.has(0));
+    ASSERT_FALSE(set.has(9));
+    ASSERT_TRUE(set.has(12));
+    ASSERT_TRUE(set.has(24));
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(set.size(), 4u);
+    ASSERT_EQ(set.get(12), 21);
+    ASSERT_EQ(set.get(entities[0]), 0);
+    ASSERT_EQ(set.get(entities[1]), 0);
+    ASSERT_EQ(set.get(24), 42);
+
+    component[0] = 1;
+    component[1] = 2;
+
+    ASSERT_EQ(set.get(entities[0]), 1);
+    ASSERT_EQ(set.get(entities[1]), 2);
+}
+
+TEST(SparseSetWithType, BatchAddEmptyType) {
+    entt::sparse_set<std::uint64_t, empty_type> set;
+    entt::sparse_set<std::uint64_t>::entity_type entities[2];
+
+    entities[0] = 3;
+    entities[1] = 42;
+
+    set.reserve(4);
+    set.construct(12);
+    auto *component = set.batch(std::begin(entities), std::end(entities), 43);
+    set.construct(24);
+
+    ASSERT_TRUE(set.has(entities[0]));
+    ASSERT_TRUE(set.has(entities[1]));
+    ASSERT_FALSE(set.has(0));
+    ASSERT_FALSE(set.has(9));
+    ASSERT_TRUE(set.has(12));
+    ASSERT_TRUE(set.has(24));
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(set.size(), 4u);
+    ASSERT_EQ(&set.get(entities[0]), &set.get(entities[1]));
+    ASSERT_EQ(&set.get(entities[0]), &set.get(12));
+    ASSERT_EQ(&set.get(entities[0]), &set.get(24));
+    ASSERT_EQ(&set.get(entities[0]), component);
 }
 
 TEST(SparseSetWithType, AggregatesMustWork) {
@@ -514,7 +597,6 @@ TEST(SparseSetWithType, ConstIterator) {
 }
 
 TEST(SparseSetWithType, IteratorEmptyType) {
-    struct empty_type {};
     using iterator_type = typename entt::sparse_set<std::uint64_t, empty_type>::iterator_type;
     entt::sparse_set<std::uint64_t, empty_type> set;
     set.construct(3);
@@ -562,7 +644,6 @@ TEST(SparseSetWithType, IteratorEmptyType) {
 }
 
 TEST(SparseSetWithType, ConstIteratorEmptyType) {
-    struct empty_type {};
     using iterator_type = typename entt::sparse_set<std::uint64_t, empty_type>::const_iterator_type;
     entt::sparse_set<std::uint64_t, empty_type> set;
     set.construct(3);
@@ -611,29 +692,26 @@ TEST(SparseSetWithType, ConstIteratorEmptyType) {
 
 TEST(SparseSetWithType, Raw) {
     entt::sparse_set<std::uint64_t, int> set;
-    const auto &cset = set;
 
     set.construct(3, 3);
     set.construct(12, 6);
     set.construct(42, 9);
 
     ASSERT_EQ(set.get(3), 3);
-    ASSERT_EQ(cset.get(12), 6);
+    ASSERT_EQ(std::as_const(set).get(12), 6);
     ASSERT_EQ(set.get(42), 9);
 
     ASSERT_EQ(*(set.raw() + 0u), 3);
-    ASSERT_EQ(*(cset.raw() + 1u), 6);
+    ASSERT_EQ(*(std::as_const(set).raw() + 1u), 6);
     ASSERT_EQ(*(set.raw() + 2u), 9);
 }
 
 TEST(SparseSetWithType, RawEmptyType) {
-    struct empty_type {};
     entt::sparse_set<std::uint64_t, empty_type> set;
-    const auto &cset = set;
 
     set.construct(3);
 
-    ASSERT_EQ(set.raw(), cset.raw());
+    ASSERT_EQ(set.raw(), std::as_const(set).raw());
     ASSERT_EQ(set.try_get(3), set.raw());
 }
 
@@ -748,21 +826,20 @@ TEST(SparseSetWithType, SortUnordered) {
 TEST(SparseSetWithType, RespectDisjoint) {
     entt::sparse_set<std::uint64_t, int> lhs;
     entt::sparse_set<std::uint64_t, int> rhs;
-    const auto &clhs = lhs;
 
     lhs.construct(3, 3);
     lhs.construct(12, 6);
     lhs.construct(42, 9);
 
-    ASSERT_EQ(clhs.get(3), 3);
-    ASSERT_EQ(clhs.get(12), 6);
-    ASSERT_EQ(clhs.get(42), 9);
+    ASSERT_EQ(std::as_const(lhs).get(3), 3);
+    ASSERT_EQ(std::as_const(lhs).get(12), 6);
+    ASSERT_EQ(std::as_const(lhs).get(42), 9);
 
     lhs.respect(rhs);
 
-    ASSERT_EQ(*(clhs.raw() + 0u), 3);
-    ASSERT_EQ(*(clhs.raw() + 1u), 6);
-    ASSERT_EQ(*(clhs.raw() + 2u), 9);
+    ASSERT_EQ(*(std::as_const(lhs).raw() + 0u), 3);
+    ASSERT_EQ(*(std::as_const(lhs).raw() + 1u), 6);
+    ASSERT_EQ(*(std::as_const(lhs).raw() + 2u), 9);
 
     auto begin = lhs.begin();
     auto end = lhs.end();
@@ -776,23 +853,22 @@ TEST(SparseSetWithType, RespectDisjoint) {
 TEST(SparseSetWithType, RespectOverlap) {
     entt::sparse_set<std::uint64_t, int> lhs;
     entt::sparse_set<std::uint64_t, int> rhs;
-    const auto &clhs = lhs;
 
     lhs.construct(3, 3);
     lhs.construct(12, 6);
     lhs.construct(42, 9);
     rhs.construct(12, 6);
 
-    ASSERT_EQ(clhs.get(3), 3);
-    ASSERT_EQ(clhs.get(12), 6);
-    ASSERT_EQ(clhs.get(42), 9);
+    ASSERT_EQ(std::as_const(lhs).get(3), 3);
+    ASSERT_EQ(std::as_const(lhs).get(12), 6);
+    ASSERT_EQ(std::as_const(lhs).get(42), 9);
     ASSERT_EQ(rhs.get(12), 6);
 
     lhs.respect(rhs);
 
-    ASSERT_EQ(*(clhs.raw() + 0u), 3);
-    ASSERT_EQ(*(clhs.raw() + 1u), 9);
-    ASSERT_EQ(*(clhs.raw() + 2u), 6);
+    ASSERT_EQ(*(std::as_const(lhs).raw() + 0u), 3);
+    ASSERT_EQ(*(std::as_const(lhs).raw() + 1u), 9);
+    ASSERT_EQ(*(std::as_const(lhs).raw() + 2u), 6);
 
     auto begin = lhs.begin();
     auto end = lhs.end();
@@ -942,10 +1018,8 @@ TEST(SparseSetWithType, RespectUnordered) {
 }
 
 TEST(SparseSetWithType, RespectOverlapEmptyType) {
-    struct empty_type {};
     entt::sparse_set<std::uint64_t, empty_type> lhs;
     entt::sparse_set<std::uint64_t, empty_type> rhs;
-    const auto &clhs = lhs;
 
     lhs.construct(3);
     lhs.construct(12);
@@ -959,9 +1033,9 @@ TEST(SparseSetWithType, RespectOverlapEmptyType) {
 
     lhs.respect(rhs);
 
-    ASSERT_EQ(clhs.sparse_set<std::uint64_t>::get(3), 0u);
-    ASSERT_EQ(clhs.sparse_set<std::uint64_t>::get(12), 2u);
-    ASSERT_EQ(clhs.sparse_set<std::uint64_t>::get(42), 1u);
+    ASSERT_EQ(std::as_const(lhs).sparse_set<std::uint64_t>::get(3), 0u);
+    ASSERT_EQ(std::as_const(lhs).sparse_set<std::uint64_t>::get(12), 2u);
+    ASSERT_EQ(std::as_const(lhs).sparse_set<std::uint64_t>::get(42), 1u);
 }
 
 TEST(SparseSetWithType, CanModifyDuringIteration) {
@@ -1059,8 +1133,8 @@ TEST(SparseSetWithType, CloneMoveOnlyComponent) {
 TEST(SparseSetWithType, ConstructorExceptionDoesNotAddToSet) {
     struct throwing_component {
         struct constructor_exception: std::exception {};
-        
-        throwing_component() { throw constructor_exception{}; }
+
+        [[noreturn]] throwing_component() { throw constructor_exception{}; }
 
         // necessary to avoid the short-circuit construct() logic for empty objects
         int data;

@@ -14,7 +14,7 @@ configuration:
 
 before_build:
   - cd %BUILD_DIR%
-  - cmake .. -DBUILD_TESTING=ON -DCMAKE_CXX_FLAGS=/W1 -G"Visual Studio 15 2017"
+  - cmake .. -DBUILD_TESTING=ON -DBUILD_LIB=ON -DCMAKE_CXX_FLAGS=/W1 -G"Visual Studio 15 2017"
 
 after_build:
   - ctest -C Release -j4

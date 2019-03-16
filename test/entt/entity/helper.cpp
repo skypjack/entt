@@ -2,31 +2,28 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/entity/helper.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/core/type_traits.hpp>
 
 TEST(Helper, AsView) {
-    using entity_type = typename entt::registry<>::entity_type;
+    entt::registry registry;
+    const entt::registry cregistry;
 
-    entt::registry<> registry;
-    const entt::registry<> cregistry;
-
-    ([](entt::view<entity_type, int, char>) {})(entt::as_view{registry});
-    ([](entt::view<entity_type, const int, char>) {})(entt::as_view{registry});
-    ([](entt::view<entity_type, const double>) {})(entt::as_view{cregistry});
+    ([](entt::view<int, char>) {})(entt::as_view{registry});
+    ([](entt::view<const int, char>) {})(entt::as_view{registry});
+    ([](entt::view<const double>) {})(entt::as_view{cregistry});
 }
 
 TEST(Helper, AsGroup) {
-    using entity_type = typename entt::registry<>::entity_type;
+    entt::registry registry;
+    const entt::registry cregistry;
 
-    entt::registry<> registry;
-    const entt::registry<> cregistry;
-
-    ([](entt::group<entity_type, entt::get_t<>, double, float>) {})(entt::as_group{registry});
-    ([](entt::group<entity_type, entt::get_t<>, const double, float>) {})(entt::as_group{registry});
-    ([](entt::group<entity_type, entt::get_t<>, const double, const float>) {})(entt::as_group{cregistry});
+    ([](entt::group<entt::get_t<>, double, float>) {})(entt::as_group{registry});
+    ([](entt::group<entt::get_t<>, const double, float>) {})(entt::as_group{registry});
+    ([](entt::group<entt::get_t<>, const double, const float>) {})(entt::as_group{cregistry});
 }
 
 TEST(Helper, Dependency) {
-    entt::registry<> registry;
+    entt::registry registry;
     const auto entity = registry.create();
     entt::connect<double, float>(registry.construction<int>());
 
@@ -71,24 +68,36 @@ TEST(Helper, Dependency) {
     ASSERT_FALSE(registry.has<float>(entity));
 }
 
-TEST(Helper, Label) {
-    entt::registry<> registry;
+TEST(Dependency, MultipleListenersOnTheSameType) {
+    entt::registry registry;
+    entt::connect<double>(registry.construction<int>());
+    entt::connect<char>(registry.construction<int>());
+
     const auto entity = registry.create();
-    registry.assign<entt::label<"foobar"_hs>>(entity);
+    registry.assign<int>(entity);
+
+    ASSERT_TRUE(registry.has<double>(entity));
+    ASSERT_TRUE(registry.has<char>(entity));
+}
+
+TEST(Helper, Tag) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    registry.assign<entt::tag<"foobar"_hs>>(entity);
     registry.assign<int>(entity, 42);
     int counter{};
 
-    ASSERT_FALSE(registry.has<entt::label<"barfoo"_hs>>(entity));
-    ASSERT_TRUE(registry.has<entt::label<"foobar"_hs>>(entity));
+    ASSERT_FALSE(registry.has<entt::tag<"barfoo"_hs>>(entity));
+    ASSERT_TRUE(registry.has<entt::tag<"foobar"_hs>>(entity));
 
-    for(auto entity: registry.view<int, entt::label<"foobar"_hs>>()) {
+    for(auto entity: registry.view<int, entt::tag<"foobar"_hs>>()) {
         (void)entity;
         ++counter;
     }
 
     ASSERT_NE(counter, 0);
 
-    for(auto entity: registry.view<entt::label<"foobar"_hs>>()) {
+    for(auto entity: registry.view<entt::tag<"foobar"_hs>>()) {
         (void)entity;
         --counter;
     }

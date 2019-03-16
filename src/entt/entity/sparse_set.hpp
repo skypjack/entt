@@ -80,12 +80,6 @@ class sparse_set<Entity> {
 
         iterator() ENTT_NOEXCEPT = default;
 
-        iterator(const iterator &) ENTT_NOEXCEPT = default;
-        iterator(iterator &&) ENTT_NOEXCEPT = default;
-
-        iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
-        iterator & operator=(iterator &&) ENTT_NOEXCEPT = default;
-
         iterator & operator++() ENTT_NOEXCEPT {
             return --index, *this;
         }
@@ -377,6 +371,41 @@ public:
     }
 
     /**
+     * @brief Assigns one or more entities to a sparse set.
+     *
+     * This function requires to use a hint value for performance purposes.<br/>
+     * Its value indicates the size necessary to accommodate the largest entity
+     * if used as an index of a hypothetical array.
+     *
+     * @warning
+     * Attempting to assign an entity that already belongs to the sparse set
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set already contains the given entity.
+     *
+     * @tparam It Type of forward iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     * @param hint Hint value to avoid searching for the largest entity.
+     */
+    template<typename It>
+    void batch(It first, It last, size_type hint) {
+        if(hint > reverse.size()) {
+            // null is safe in all cases for our purposes
+            reverse.resize(hint, null);
+        }
+
+        std::for_each(first, last, [next = entity_type(direct.size()), this](const auto entity) mutable {
+            assert(!has(entity));
+            const auto pos = size_type(entity & traits_type::entity_mask);
+            assert(pos < reverse.size());
+            reverse[pos] = next++;
+        });
+
+        direct.insert(direct.end(), first, last);
+    }
+
+    /**
      * @brief Removes an entity from a sparse set.
      *
      * @warning
@@ -533,12 +562,6 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
 
         iterator() ENTT_NOEXCEPT = default;
 
-        iterator(const iterator &) ENTT_NOEXCEPT = default;
-        iterator(iterator &&) ENTT_NOEXCEPT = default;
-
-        iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
-        iterator & operator=(iterator &&) ENTT_NOEXCEPT = default;
-
         iterator & operator++() ENTT_NOEXCEPT {
             return --index, *this;
         }
@@ -640,12 +663,6 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
         using iterator_category = std::random_access_iterator_tag;
 
         iterator() ENTT_NOEXCEPT = default;
-
-        iterator(const iterator &) ENTT_NOEXCEPT = default;
-        iterator(iterator &&) ENTT_NOEXCEPT = default;
-
-        iterator & operator=(const iterator &) ENTT_NOEXCEPT = default;
-        iterator & operator=(iterator &&) ENTT_NOEXCEPT = default;
 
         iterator & operator++() ENTT_NOEXCEPT {
             return --index, *this;
@@ -768,7 +785,7 @@ public:
      * performance boost but less guarantees. Use `begin` and `end` if you want
      * to iterate the sparse set in the expected order.
      *
-     * @warning
+     * @note
      * Empty components aren't explicitly instantiated. Only one instance of the
      * given type is created. Therefore, this function always returns a pointer
      * to that instance.
@@ -902,7 +919,6 @@ public:
     /**
      * @brief Assigns an entity to a sparse set and constructs its object.
      *
-     * @note
      * This version accept both types that can be constructed in place directly
      * and types like aggregates that do not work well with a placement new as
      * performed usually under the hood during an _emplace back_.
@@ -933,6 +949,50 @@ public:
             // entity goes after component in case constructor throws
             underlying_type::construct(entity);
             return instances.back();
+        }
+    }
+
+    /**
+     * @brief Assigns one or more entities to a sparse set and constructs their
+     * objects.
+     *
+     * This function requires to use a hint value for performance purposes.<br/>
+     * Its value indicates the size necessary to accommodate the largest entity
+     * if used as an index of a hypothetical array.
+     *
+     * @note
+     * The object type must be at least default constructible.
+     *
+     * @note
+     * Empty components aren't explicitly instantiated. Only one instance of the
+     * given type is created. Therefore, this function always returns a pointer
+     * to that instance.
+     *
+     * @warning
+     * Attempting to assign an entity that already belongs to the sparse set
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set already contains the given entity.
+     *
+     * @tparam It Type of forward iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     * @param hint Hint value to avoid searching for the largest entity.
+     * @return A pointer to the array of instances just created and sorted the
+     * same of the entities.
+     */
+    template<typename It>
+    object_type * batch(It first, It last, const size_type hint) {
+        if constexpr(std::is_empty_v<object_type>) {
+            underlying_type::batch(first, last, hint);
+            return &instances;
+        } else {
+            static_assert(std::is_default_constructible_v<object_type>);
+            const auto offset = instances.size();
+            instances.insert(instances.end(), last-first, {});
+            // entity goes after component in case constructor throws
+            underlying_type::batch(first, last, hint);
+            return instances.data() + offset;
         }
     }
 
@@ -989,13 +1049,13 @@ public:
      * this member function.
      *
      * @note
+     * Empty components aren't explicitly instantiated. Therefore, this function
+     * isn't available for them.
+     *
+     * @note
      * Attempting to iterate elements using a raw pointer returned by a call to
      * either `data` or `raw` gives no guarantees on the order, even though
      * `sort` has been invoked.
-     *
-     * @warning
-     * Empty components aren't explicitly instantiated. Therefore, this function
-     * isn't available for them.
      *
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.

@@ -6,13 +6,10 @@
 #include <utility>
 #include <cassert>
 #include "../config/config.h"
+#include "fwd.hpp"
 
 
 namespace entt {
-
-
-template<typename Resource>
-class resource_cache;
 
 
 /**
@@ -39,15 +36,6 @@ class resource_handle {
 public:
     /*! @brief Default constructor. */
     resource_handle() ENTT_NOEXCEPT = default;
-    /*! @brief Default copy constructor. */
-    resource_handle(const resource_handle &) ENTT_NOEXCEPT = default;
-    /*! @brief Default move constructor. */
-    resource_handle(resource_handle &&) ENTT_NOEXCEPT = default;
-
-    /*! @brief Default copy assignment operator. @return This handle. */
-    resource_handle & operator=(const resource_handle &) ENTT_NOEXCEPT = default;
-    /*! @brief Default move assignment operator. @return This handle. */
-    resource_handle & operator=(resource_handle &&) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Gets a reference to the managed resource.

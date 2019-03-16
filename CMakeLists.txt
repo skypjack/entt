@@ -187,6 +187,7 @@ if(BUILD_TESTING)
     endif()
 
     option(BUILD_BENCHMARK "Build benchmark." OFF)
+    option(BUILD_LIB "Build lib example." OFF)
     option(BUILD_MOD "Build mod example." OFF)
     option(BUILD_SNAPSHOT "Build snapshot example." OFF)
 

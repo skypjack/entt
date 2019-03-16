@@ -10,6 +10,7 @@
 #include "../core/hashed_string.hpp"
 #include "handle.hpp"
 #include "loader.hpp"
+#include "fwd.hpp"
 
 
 namespace entt {
@@ -38,13 +39,9 @@ public:
     /*! @brief Default constructor. */
     resource_cache() = default;
 
-    /*! @brief Copying a cache isn't allowed. */
-    resource_cache(const resource_cache &) ENTT_NOEXCEPT = delete;
     /*! @brief Default move constructor. */
     resource_cache(resource_cache &&) ENTT_NOEXCEPT = default;
 
-    /*! @brief Copying a cache isn't allowed. @return This cache. */
-    resource_cache & operator=(const resource_cache &) ENTT_NOEXCEPT = delete;
     /*! @brief Default move assignment operator. @return This cache. */
     resource_cache & operator=(resource_cache &&) ENTT_NOEXCEPT = default;
 

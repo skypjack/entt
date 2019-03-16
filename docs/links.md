@@ -26,6 +26,8 @@ a reference:
     Pong with `EnTT`.
   * [Randballs](https://github.com/gale93/randballs): simple `SFML` and `EnTT`
     playground.
+  * [EnTT Tower Defense](https://github.com/Daivuk/tddod): a data oriented tower
+    defense example.
 
 * Engines/Frameworks:
   * [The Forge](https://github.com/ConfettiFX/The-Forge): cross-platform
@@ -37,7 +39,14 @@ a reference:
   * [shiva](https://github.com/Milerius/shiva): modern C++ engine with
     modularity.
 
+* Emulators:
+  * [NovusCore](https://github.com/novuscore/NovusCore): A modern take on World
+    of Warcraft emulation.
+
 * Articles
+  * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
+    [blog](https://skypjack.github.io/) are about `EnTT`, for those who want to
+    know **more** on this project.
   * [Space Battle: Huge edition](http://victor.madtriangles.com/code%20experiment/2018/06/11/post-ecs-battle-huge.html):
     huge space battle built entirely from scratch.
   * [Space Battle](https://github.com/vblanco20-1/ECS_SpaceBattle): huge space

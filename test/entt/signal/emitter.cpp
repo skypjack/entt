@@ -1,15 +1,20 @@
 #include <gtest/gtest.h>
+#include <entt/entity/entt_traits.hpp>
 #include <entt/signal/emitter.hpp>
 
 struct test_emitter: entt::emitter<test_emitter> {};
 
 struct foo_event { int i; char c; };
 struct bar_event {};
+struct quux_event {};
+
+ENTT_SHARED_TYPE(foo_event)
 
 TEST(Emitter, Clear) {
     test_emitter emitter;
 
     ASSERT_TRUE(emitter.empty());
+    ASSERT_TRUE(emitter.empty<quux_event>());
 
     emitter.on<foo_event>([](const auto &, const auto &){});
 
