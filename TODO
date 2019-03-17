@@ -19,5 +19,4 @@
 * empty components model allows for shared components and prefabs unity-like
   - each with entity return the shared component multiple times, one per entity that refers to it
   - each components only return actual component, so shared components are returned only once
-* doc: when types of components that belong to groups are iterated out of their group, can we still add instances without problems? document it if needed
 * add a sort of "fast each" for when users know they are not to add/remove components, it can use directly raw access and improve even further performance

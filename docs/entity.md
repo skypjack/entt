@@ -36,6 +36,7 @@
   * [Types: const, non-const and all in between](#types-const-non-const-and-all-in-between)
   * [Give me everything](#give-me-everything)
   * [What is allowed and what is not](#what-is-allowed-and-what-is-not)
+    * [More performance, more constraints](#more-performance-more-constraints)
 * [Empty type optimization](#empty-type-optimization)
 * [Multithreading](#multithreading)
   * [Iterators](#iterators)
@@ -1252,12 +1253,12 @@ not be used frequently to avoid the risk of a performance hit.
 
 ## What is allowed and what is not
 
-Most of the _ECS_ available out there have some annoying limitations (at least
-from my point of view): entities and components cannot be created nor destroyed
-during iterations.<br/>
+Most of the _ECS_ available out there don't allow to create and destroy entities
+and components during iterations.<br/>
 `EnTT` partially solves the problem with a few limitations:
 
-* Creating entities and components is allowed during iterations.
+* Creating entities and components is allowed during iterations in almost all
+  cases.
 * Deleting the current entity or removing its components is allowed during
   iterations. For all the other entities, destroying them or removing their
   components isn't allowed and can result in undefined behavior.
@@ -1290,6 +1291,30 @@ To work around it, possible approaches are:
 
 A notable side effect of this feature is that the number of required allocations
 is further reduced in most of the cases.
+
+### More performance, more constraints
+
+Groups are a (much) faster alternative to views. However, the higher the
+performance, the greater the constraints on what is allowed and what is
+not.<br/>
+In particular, groups add in some cases a limitation on the creation of
+components during iterations. It happens in quite particular cases. Given the
+nature and the scope of the groups, it isn't something in which it will happen
+to come across probably, but it's good to know it anyway.
+
+First of all, it must be said that creating components while iterating a group
+isn't a problem at all and can be done freely as it happens with the views. The
+same applies to the destruction of components and entities, for which the rules
+mentioned above apply.
+
+The additional limitation applies instead when a given component that is owned
+by a group is iterated outside of it. In this case, adding components that are
+part of the group itself can invalidate the iterators. There are no further
+limitations to the destruction of components and entities.<br/>
+This happens because groups own the pools of their components and organize the
+data internally to maximize performance. Because of that, full consistency for
+owned components is guaranteed only when they are iterated as part of their
+groups.
 
 # Empty type optimization
 
