@@ -103,6 +103,16 @@ public:
     using iterator_type = typename sparse_set<Entity>::iterator_type;
 
     /**
+     * @brief Returns the number of existing components of the given type.
+     * @tparam Component Type of component of which to return the size.
+     * @return Number of existing components of the given type.
+     */
+    template<typename Component>
+    size_type size() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Component> *>(pools)->size();
+    }
+
+    /**
      * @brief Returns the number of entities that have the given components.
      * @return Number of entities that have the given components.
      */
@@ -111,11 +121,65 @@ public:
     }
 
     /**
+     * @brief Checks whether the pool of a given component is empty.
+     * @tparam Component Type of component in which one is interested.
+     * @return True if the pool of the given component is empty, false
+     * otherwise.
+     */
+    template<typename Component>
+    bool empty() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Component> *>(pools)->empty();
+    }
+
+    /**
      * @brief Checks whether the group is empty.
      * @return True if the group is empty, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
         return handler->empty();
+    }
+
+    /**
+     * @brief Direct access to the list of components of a given pool.
+     *
+     * The returned pointer is such that range
+     * `[raw<Component>(), raw<Component>() + size<Component>()]` is always a
+     * valid range, even if the container is empty.
+     *
+     * @note
+     * There are no guarantees on the order of the components. Use `begin` and
+     * `end` if you want to iterate the group in the expected order.
+     *
+     * @warning
+     * Empty components aren't explicitly instantiated. Only one instance of the
+     * given type is created. Therefore, this function always returns a pointer
+     * to that instance.
+     *
+     * @tparam Component Type of component in which one is interested.
+     * @return A pointer to the array of components.
+     */
+    template<typename Component>
+    Component * raw() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Component> *>(pools)->raw();
+    }
+
+    /**
+     * @brief Direct access to the list of entities of a given pool.
+     *
+     * The returned pointer is such that range
+     * `[data<Component>(), data<Component>() + size<Component>()]` is always a
+     * valid range, even if the container is empty.
+     *
+     * @note
+     * There are no guarantees on the order of the entities. Use `begin` and
+     * `end` if you want to iterate the group in the expected order.
+     *
+     * @tparam Component Type of component in which one is interested.
+     * @return A pointer to the array of entities.
+     */
+    template<typename Component>
+    const entity_type * data() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Component> *>(pools)->data();
     }
 
     /**
@@ -223,7 +287,6 @@ public:
         assert(contains(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            static_assert(std::disjunction_v<std::is_same<Component..., Get>..., std::is_same<std::remove_const_t<Component>..., Get>...>);
             return (std::get<pool_type<Component> *>(pools)->get(entity), ...);
         } else {
             return std::tuple<Component &...>{get<Component>(entity)...};
@@ -356,11 +419,32 @@ public:
     using iterator_type = typename sparse_set<Entity>::iterator_type;
 
     /**
+     * @brief Returns the number of existing components of the given type.
+     * @tparam Component Type of component of which to return the size.
+     * @return Number of existing components of the given type.
+     */
+    template<typename Component>
+    size_type size() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Component> *>(pools)->size();
+    }
+
+    /**
      * @brief Returns the number of entities that have the given components.
      * @return Number of entities that have the given components.
      */
     size_type size() const ENTT_NOEXCEPT {
         return *length;
+    }
+
+    /**
+     * @brief Checks whether the pool of a given component is empty.
+     * @tparam Component Type of component in which one is interested.
+     * @return True if the pool of the given component is empty, false
+     * otherwise.
+     */
+    template<typename Component>
+    bool empty() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Component> *>(pools)->empty();
     }
 
     /**
@@ -372,25 +456,52 @@ public:
     }
 
     /**
-     * @brief Direct access to the list of components of an owned type.
+     * @brief Direct access to the list of components of a given pool.
      *
-     * The returned pointer is such that range `[raw(), raw() + size()]` is
-     * always a valid range, even if the container is empty.
+     * The returned pointer is such that range
+     * `[raw<Component>(), raw<Component>() + size<Component>()]` is always a
+     * valid range, even if the container is empty.<br/>
+     * Moreover, in case the group owns the given component, the range
+     * `[raw<Component>(), raw<Component>() + size()]` is such that it contains
+     * the instances that are part of the group itself.
      *
      * @note
-     * There are no guarantees on the order of the components. Use `each` if you
-     * want to iterate the group in the expected order.
+     * There are no guarantees on the order of the components. Use `begin` and
+     * `end` if you want to iterate the group in the expected order.
      *
      * @warning
-     * Empty components aren't explicitly instantiated. Therefore, this function
-     * always returns `nullptr` for them.
+     * Empty components aren't explicitly instantiated. Only one instance of the
+     * given type is created. Therefore, this function always returns a pointer
+     * to that instance.
      *
+     * @tparam Component Type of component in which one is interested.
      * @return A pointer to the array of components.
      */
     template<typename Component>
     Component * raw() const ENTT_NOEXCEPT {
-        static_assert(std::disjunction_v<std::is_same<Component, Owned>..., std::is_same<std::remove_const_t<Component>, Owned>...>);
         return std::get<pool_type<Component> *>(pools)->raw();
+    }
+
+    /**
+     * @brief Direct access to the list of entities of a given pool.
+     *
+     * The returned pointer is such that range
+     * `[data<Component>(), data<Component>() + size<Component>()]` is always a
+     * valid range, even if the container is empty.<br/>
+     * Moreover, in case the group owns the given component, the range
+     * `[data<Component>(), data<Component>() + size()]` is such that it
+     * contains the entities that are part of the group itself.
+     *
+     * @note
+     * There are no guarantees on the order of the entities. Use `begin` and
+     * `end` if you want to iterate the group in the expected order.
+     *
+     * @tparam Component Type of component in which one is interested.
+     * @return A pointer to the array of entities.
+     */
+    template<typename Component>
+    const entity_type * data() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Component> *>(pools)->data();
     }
 
     /**
@@ -401,7 +512,7 @@ public:
      *
      * @note
      * There are no guarantees on the order of the entities. Use `begin` and
-     * `end` if you want to iterate the view in the expected order.
+     * `end` if you want to iterate the group in the expected order.
      *
      * @return A pointer to the array of entities.
      */
@@ -498,8 +609,6 @@ public:
         assert(contains(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            static_assert(std::disjunction_v<std::is_same<Component..., Owned>..., std::is_same<std::remove_const_t<Component>..., Owned>...,
-                          std::is_same<Component..., Get>..., std::is_same<std::remove_const_t<Component>..., Get>...>);
             return (std::get<pool_type<Component> *>(pools)->get(entity), ...);
         } else {
             return std::tuple<Component &...>{get<Component>(entity)...};

@@ -8,7 +8,6 @@
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
 * allow for built-in parallel each if possible
 * tags revenge: if it's possible, reintroduce them but without a link to entities (see #169 for more details)
-* empty components model allows for shared components and prefabs unity-like
 * allow to replace std:: with custom implementations
 * allow to sort groups (::respect can already work with begin/end instead of a whole sparse set)
   -it would ease by far the group trick for hierarchies that requires otherwise more boilerplate
@@ -17,4 +16,8 @@
   - define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
   - from Tommaso on discord view<Health, Transform>().where<Health>([](h) {h > 5}).where<Transform>([](t) {t.inside(aabb)});
 * remove runtime views, welcome reflection and what about snapshot?
-* add size+raw on multi comp views and groups, size retuns the actual size of the underlying pool and not that of the view/group
+* empty components model allows for shared components and prefabs unity-like
+  - each with entity return the shared component multiple times, one per entity that refers to it
+  - each components only return actual component, so shared components are returned only once
+* doc: when types of components that belong to groups are iterated out of their group, can we still add instances without problems? document it if needed
+* add a sort of "fast each" for when users know they are not to add/remove components, it can use directly raw access and improve even further performance

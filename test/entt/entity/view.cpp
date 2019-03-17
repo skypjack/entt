@@ -41,7 +41,7 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_EQ(*(view.data() + 1), e0);
 
     ASSERT_EQ(*(view.raw() + 0), '2');
-    ASSERT_EQ(*(static_cast<const decltype(view) &>(view).raw() + 1), '1');
+    ASSERT_EQ(*(cview.raw() + 1), '1');
 
     registry.remove<char>(e0);
     registry.remove<char>(e1);
@@ -200,6 +200,8 @@ TEST(MultipleComponentView, Functionalities) {
     auto cview = std::as_const(registry).view<const int, const char>();
 
     ASSERT_TRUE(view.empty());
+    ASSERT_TRUE(view.empty<int>());
+    ASSERT_TRUE(cview.empty<const char>());
 
     const auto e0 = registry.create();
     registry.assign<char>(e0);
@@ -208,6 +210,8 @@ TEST(MultipleComponentView, Functionalities) {
     registry.assign<int>(e1);
 
     ASSERT_FALSE(view.empty());
+    ASSERT_FALSE(view.empty<int>());
+    ASSERT_FALSE(cview.empty<const char>());
 
     registry.assign<char>(e1);
 
@@ -222,6 +226,8 @@ TEST(MultipleComponentView, Functionalities) {
     ASSERT_NE(view.begin(), view.end());
     ASSERT_NE(cview.begin(), cview.end());
     ASSERT_EQ(view.size(), decltype(view.size()){1});
+    ASSERT_EQ(view.size<int>(), decltype(view.size()){1});
+    ASSERT_EQ(cview.size<const char>(), decltype(view.size()){2});
 
     registry.get<char>(e0) = '1';
     registry.get<char>(e1) = '2';
@@ -232,6 +238,14 @@ TEST(MultipleComponentView, Functionalities) {
         ASSERT_EQ(std::get<1>(view.get<int, char>(entity)), '2');
         ASSERT_EQ(cview.get<const char>(entity), '2');
     }
+
+    ASSERT_EQ(*(view.data<int>() + 0), e1);
+    ASSERT_EQ(*(view.data<char>() + 0), e0);
+    ASSERT_EQ(*(cview.data<const char>() + 1), e1);
+
+    ASSERT_EQ(*(view.raw<int>() + 0), 42);
+    ASSERT_EQ(*(view.raw<char>() + 0), '1');
+    ASSERT_EQ(*(cview.raw<const char>() + 1), '2');
 }
 
 TEST(MultipleComponentView, Iterator) {
@@ -389,6 +403,8 @@ TEST(MultipleComponentView, ConstNonConstAndAllInBetween) {
     ASSERT_TRUE((std::is_same_v<decltype(view.get<const char>(0)), const char &>));
     ASSERT_TRUE((std::is_same_v<decltype(view.get<int, const char>(0)), std::tuple<int &, const char &>>));
     ASSERT_TRUE((std::is_same_v<decltype(view.get<const int, const char>(0)), std::tuple<const int &, const char &>>));
+    ASSERT_TRUE((std::is_same_v<decltype(view.raw<const char>()), const char *>));
+    ASSERT_TRUE((std::is_same_v<decltype(view.raw<int>()), int *>));
 
     view.each([](auto, auto &&i, auto &&c) {
         ASSERT_TRUE((std::is_same_v<decltype(i), int &>));

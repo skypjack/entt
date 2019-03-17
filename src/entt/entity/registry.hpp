@@ -382,8 +382,9 @@ public:
      * want to iterate entities and components in the expected order.
      *
      * @note
-     * Empty components aren't explicitly instantiated. Therefore, this function
-     * always returns `nullptr` for them.
+     * Empty components aren't explicitly instantiated. Only one instance of the
+     * given type is created. Therefore, this function always returns a pointer
+     * to that instance.
      *
      * @tparam Component Type of component in which one is interested.
      * @return A pointer to the array of components of the given type.

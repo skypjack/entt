@@ -217,6 +217,16 @@ public:
     using iterator_type = iterator;
 
     /**
+     * @brief Returns the number of existing components of the given type.
+     * @tparam Comp Type of component of which to return the size.
+     * @return Number of existing components of the given type.
+     */
+    template<typename Comp>
+    size_type size() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Comp> *>(pools)->size();
+    }
+
+    /**
      * @brief Estimates the number of entities that have the given components.
      * @return Estimated number of entities that have the given components.
      */
@@ -225,11 +235,65 @@ public:
     }
 
     /**
+     * @brief Checks whether the pool of a given component is empty.
+     * @tparam Comp Type of component in which one is interested.
+     * @return True if the pool of the given component is empty, false
+     * otherwise.
+     */
+    template<typename Comp>
+    bool empty() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Comp> *>(pools)->empty();
+    }
+
+    /**
      * @brief Checks if the view is definitely empty.
      * @return True if the view is definitely empty, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
         return (std::get<pool_type<Component> *>(pools)->empty() || ...);
+    }
+
+    /**
+     * @brief Direct access to the list of components of a given pool.
+     *
+     * The returned pointer is such that range
+     * `[raw<Comp>(), raw<Comp>() + size<Comp>()]` is always a valid range, even
+     * if the container is empty.
+     *
+     * @note
+     * There are no guarantees on the order of the components. Use `begin` and
+     * `end` if you want to iterate the view in the expected order.
+     *
+     * @warning
+     * Empty components aren't explicitly instantiated. Only one instance of the
+     * given type is created. Therefore, this function always returns a pointer
+     * to that instance.
+     *
+     * @tparam Comp Type of component in which one is interested.
+     * @return A pointer to the array of components.
+     */
+    template<typename Comp>
+    Comp * raw() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Comp> *>(pools)->raw();
+    }
+
+    /**
+     * @brief Direct access to the list of entities of a given pool.
+     *
+     * The returned pointer is such that range
+     * `[data<Comp>(), data<Comp>() + size<Comp>()]` is always a valid range,
+     * even if the container is empty.
+     *
+     * @note
+     * There are no guarantees on the order of the entities. Use `begin` and
+     * `end` if you want to iterate the view in the expected order.
+     *
+     * @tparam Comp Type of component in which one is interested.
+     * @return A pointer to the array of entities.
+     */
+    template<typename Comp>
+    const entity_type * data() const ENTT_NOEXCEPT {
+        return std::get<pool_type<Comp> *>(pools)->data();
     }
 
     /**
@@ -315,7 +379,6 @@ public:
         assert(contains(entity));
 
         if constexpr(sizeof...(Comp) == 1) {
-            static_assert(std::disjunction_v<std::is_same<Comp..., Component>..., std::is_same<std::remove_const_t<Comp>..., Component>...>);
             return (std::get<pool_type<Comp> *>(pools)->get(entity), ...);
         } else {
             return std::tuple<Comp &...>{get<Comp>(entity)...};
@@ -461,8 +524,9 @@ public:
      * `end` if you want to iterate the view in the expected order.
      *
      * @warning
-     * Empty components aren't explicitly instantiated. Therefore, this function
-     * always returns `nullptr` for them.
+     * Empty components aren't explicitly instantiated. Only one instance of the
+     * given type is created. Therefore, this function always returns a pointer
+     * to that instance.
      *
      * @return A pointer to the array of components.
      */
