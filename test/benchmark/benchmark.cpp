@@ -990,7 +990,7 @@ TEST(Benchmark, IteratePathological) {
             if(i % 17) { registry.destroy(entity); }
         });
 
-        for(std::uint64_t i = 0; i < 50000L; i++) {
+        for(std::uint64_t j = 0; j < 50000L; j++) {
             const auto entity = registry.create();
             registry.assign<position>(entity);
             registry.assign<velocity>(entity);
@@ -1031,7 +1031,7 @@ TEST(Benchmark, IteratePathologicalNonOwningGroup) {
             if(i % 17) { registry.destroy(entity); }
         });
 
-        for(std::uint64_t i = 0; i < 50000L; i++) {
+        for(std::uint64_t j = 0; j < 50000L; j++) {
             const auto entity = registry.create();
             registry.assign<position>(entity);
             registry.assign<velocity>(entity);
@@ -1072,7 +1072,7 @@ TEST(Benchmark, IteratePathologicalFullOwningGroup) {
             if(i % 17) { registry.destroy(entity); }
         });
 
-        for(std::uint64_t i = 0; i < 50000L; i++) {
+        for(std::uint64_t j = 0; j < 50000L; j++) {
             const auto entity = registry.create();
             registry.assign<position>(entity);
             registry.assign<velocity>(entity);
@@ -1113,7 +1113,7 @@ TEST(Benchmark, IteratePathologicalPartialOwningGroup) {
             if(i % 17) { registry.destroy(entity); }
         });
 
-        for(std::uint64_t i = 0; i < 50000L; i++) {
+        for(std::uint64_t j = 0; j < 50000L; j++) {
             const auto entity = registry.create();
             registry.assign<position>(entity);
             registry.assign<velocity>(entity);

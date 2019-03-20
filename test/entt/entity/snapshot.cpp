@@ -7,8 +7,8 @@
 
 template<typename Storage>
 struct output_archive {
-    output_archive(Storage &storage)
-        : storage{storage}
+    output_archive(Storage &instance)
+        : storage{instance}
     {}
 
     template<typename... Value>
@@ -22,15 +22,15 @@ private:
 
 template<typename Storage>
 struct input_archive {
-    input_archive(Storage &storage)
-        : storage{storage}
+    input_archive(Storage &instance)
+        : storage{instance}
     {}
 
     template<typename... Value>
     void operator()(Value &... value) {
-        auto assign = [this](auto &value) {
-            auto &queue = std::get<std::queue<std::decay_t<decltype(value)>>>(storage);
-            value = queue.front();
+        auto assign = [this](auto &val) {
+            auto &queue = std::get<std::queue<std::decay_t<decltype(val)>>>(storage);
+            val = queue.front();
             queue.pop();
         };
 
@@ -298,8 +298,8 @@ TEST(Snapshot, Continuous) {
     decltype(dst.size()) another_component_cnt{};
     decltype(dst.size()) what_a_component_cnt{};
 
-    dst.each([&dst, &a_component_cnt](auto entity) {
-        ASSERT_TRUE(dst.has<a_component>(entity));
+    dst.each([&dst, &a_component_cnt](auto entt) {
+        ASSERT_TRUE(dst.has<a_component>(entt));
         ++a_component_cnt;
     });
 
@@ -308,11 +308,11 @@ TEST(Snapshot, Continuous) {
         ++another_component_cnt;
     });
 
-    dst.view<what_a_component>().each([&dst, &what_a_component_cnt](auto entity, const auto &component) {
-        ASSERT_EQ(entity, component.bar);
+    dst.view<what_a_component>().each([&dst, &what_a_component_cnt](auto entt, const auto &component) {
+        ASSERT_EQ(entt, component.bar);
 
-        for(auto entity: component.quux) {
-            ASSERT_TRUE(dst.valid(entity));
+        for(auto child: component.quux) {
+            ASSERT_TRUE(dst.valid(child));
         }
 
         ++what_a_component_cnt;
@@ -365,8 +365,8 @@ TEST(Snapshot, Continuous) {
     });
 
     entities.clear();
-    for(auto entity: src.view<a_component>()) {
-        entities.push_back(entity);
+    for(auto entt: src.view<a_component>()) {
+        entities.push_back(entt);
     }
 
     src.destroy(entity);

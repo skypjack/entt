@@ -66,11 +66,11 @@ public:
 
     /**
      * @brief Constructs a prototype that is bound to a given registry.
-     * @param reg A valid reference to a registry.
+     * @param ref A valid reference to a registry.
      */
-    basic_prototype(registry_type &reg)
-        : reg{&reg},
-          entity{reg.create()}
+    basic_prototype(registry_type &ref)
+        : reg{&ref},
+          entity{ref.create()}
     {}
 
     /**
@@ -127,19 +127,21 @@ public:
      */
     template<typename Component, typename... Args>
     Component & set(Args &&... args) {
-        basic_fn_type *assign_or_replace = [](const basic_prototype &prototype, registry_type &other, const Entity dst) {
-            const auto &wrapper = prototype.reg->template get<component_wrapper<Component>>(prototype.entity);
+        component_handler handler;
+
+        handler.assign_or_replace = [](const basic_prototype &proto, registry_type &other, const Entity dst) {
+            const auto &wrapper = proto.reg->template get<component_wrapper<Component>>(proto.entity);
             other.template assign_or_replace<Component>(dst, wrapper.component);
         };
 
-        basic_fn_type *assign = [](const basic_prototype &prototype, registry_type &other, const Entity dst) {
+        handler.assign = [](const basic_prototype &proto, registry_type &other, const Entity dst) {
             if(!other.template has<Component>(dst)) {
-                const auto &wrapper = prototype.reg->template get<component_wrapper<Component>>(prototype.entity);
+                const auto &wrapper = proto.reg->template get<component_wrapper<Component>>(proto.entity);
                 other.template assign<Component>(dst, wrapper.component);
             }
         };
 
-        handlers[reg->template type<Component>()] = component_handler{assign_or_replace, assign};
+        handlers[reg->template type<Component>()] = handler;
         auto &wrapper = reg->template assign_or_replace<component_wrapper<Component>>(entity, Component{std::forward<Args>(args)...});
         return wrapper.component;
     }
@@ -239,9 +241,9 @@ public:
      * @return A valid entity identifier.
      */
     entity_type create(registry_type &other) const {
-        const auto entity = other.create();
-        assign(other, entity);
-        return entity;
+        const auto entt = other.create();
+        assign(other, entt);
+        return entt;
     }
 
     /**

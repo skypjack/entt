@@ -133,8 +133,8 @@ class sink<Ret(Args...)> {
     template<typename Type>
     Type * payload_type(Ret(*)(Type *, Args...));
 
-    sink(std::vector<delegate<Ret(Args...)>> *calls) ENTT_NOEXCEPT
-        : calls{calls}
+    sink(std::vector<delegate<Ret(Args...)>> *ref) ENTT_NOEXCEPT
+        : calls{ref}
     {}
 
 public:

@@ -31,10 +31,10 @@ struct basic_actor {
 
     /**
      * @brief Constructs an actor by using the given registry.
-     * @param reg An entity-component system properly initialized.
+     * @param ref An entity-component system properly initialized.
      */
-    basic_actor(registry_type &reg)
-        : reg{&reg}, entt{reg.create()}
+    basic_actor(registry_type &ref)
+        : reg{&ref}, entt{ref.create()}
     {}
 
     /*! @brief Default destructor. */

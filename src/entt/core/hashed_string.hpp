@@ -59,13 +59,13 @@ class hashed_string {
 
     struct const_wrapper {
         // non-explicit constructor on purpose
-        constexpr const_wrapper(const char *str) ENTT_NOEXCEPT: str{str} {}
+        constexpr const_wrapper(const char *curr) ENTT_NOEXCEPT: str{curr} {}
         const char *str;
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    inline static constexpr ENTT_ID_TYPE helper(ENTT_ID_TYPE partial, const char *str) ENTT_NOEXCEPT {
-        return str[0] == 0 ? partial : helper((partial^str[0])*traits_type::prime, str+1);
+    inline static constexpr ENTT_ID_TYPE helper(ENTT_ID_TYPE partial, const char *curr) ENTT_NOEXCEPT {
+        return curr[0] == 0 ? partial : helper((partial^curr[0])*traits_type::prime, curr+1);
     }
 
 public:
@@ -118,11 +118,11 @@ public:
      * @endcode
      *
      * @tparam N Number of characters of the identifier.
-     * @param str Human-readable identifer.
+     * @param curr Human-readable identifer.
      */
     template<std::size_t N>
-    constexpr hashed_string(const char (&str)[N]) ENTT_NOEXCEPT
-        : hash{helper(traits_type::offset, str)}, str{str}
+    constexpr hashed_string(const char (&curr)[N]) ENTT_NOEXCEPT
+        : hash{helper(traits_type::offset, curr)}, str{curr}
     {}
 
     /**

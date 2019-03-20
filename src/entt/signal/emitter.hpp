@@ -135,8 +135,8 @@ class emitter {
         handler_data *hdata = nullptr;
 
         if constexpr(is_named_type_v<Event>) {
-            const auto it = std::find_if(handlers.begin(), handlers.end(), [htype](const auto &hdata) {
-                return hdata.handler && hdata.runtime_type == htype;
+            const auto it = std::find_if(handlers.begin(), handlers.end(), [htype](const auto &candidate) {
+                return candidate.handler && candidate.runtime_type == htype;
             });
 
             hdata = (it == handlers.cend() ? &handlers.emplace_back() : &(*it));
@@ -240,12 +240,12 @@ public:
      * instances for later uses.
      *
      * @tparam Event Type of event to which to connect the listener.
-     * @param listener The listener to register.
+     * @param instance The listener to register.
      * @return Connection object that can be used to disconnect the listener.
      */
     template<typename Event>
-    connection<Event> on(listener<Event> listener) {
-        return assure<Event>()->on(std::move(listener));
+    connection<Event> on(listener<Event> instance) {
+        return assure<Event>()->on(std::move(instance));
     }
 
     /**
@@ -265,12 +265,12 @@ public:
      * instances for later uses.
      *
      * @tparam Event Type of event to which to connect the listener.
-     * @param listener The listener to register.
+     * @param instance The listener to register.
      * @return Connection object that can be used to disconnect the listener.
      */
     template<typename Event>
-    connection<Event> once(listener<Event> listener) {
-        return assure<Event>()->once(std::move(listener));
+    connection<Event> once(listener<Event> instance) {
+        return assure<Event>()->once(std::move(instance));
     }
 
     /**

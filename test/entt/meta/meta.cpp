@@ -50,7 +50,10 @@ struct base_type {
 
 struct derived_type: base_type {
     derived_type() = default;
-    derived_type(const base_type &, int i, char c): i{i}, c{c} {}
+
+    derived_type(const base_type &, int value, char character)
+        : i{value}, c{character}
+    {}
 
     const int i{};
     const char c{};
@@ -83,10 +86,10 @@ struct func_type {
 struct setter_getter_type {
     int value{};
 
-    int setter(int value) { return this->value = value; }
+    int setter(int val) { return value = val; }
     int getter() { return value; }
 
-    int setter_with_ref(const int &value) { return this->value = value; }
+    int setter_with_ref(const int &val) { return value = val; }
     const int & getter_with_ref() { return value; }
 
     static int static_setter(setter_getter_type *type, int value) { return type->value = value; }

@@ -56,8 +56,8 @@ class scheduler {
     };
 
     struct continuation {
-        continuation(process_handler *handler)
-            : handler{handler}
+        continuation(process_handler *ref)
+            : handler{ref}
         {
             assert(handler);
         }

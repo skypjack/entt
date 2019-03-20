@@ -397,8 +397,8 @@ public:
     template<auto Setter, auto Getter, typename... Property>
     meta_factory data(const char *str, Property &&... property) ENTT_NOEXCEPT {
         using owner_type = std::tuple<std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>;
-        using data_type = std::invoke_result_t<decltype(Getter), Type *>;
-        static_assert(std::is_invocable_v<decltype(Setter), Type *, data_type>);
+        using underlying_type = std::invoke_result_t<decltype(Getter), Type *>;
+        static_assert(std::is_invocable_v<decltype(Setter), Type *, underlying_type>);
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_data_node node{
@@ -408,7 +408,7 @@ public:
             properties<owner_type>(std::forward<Property>(property)...),
             false,
             false,
-            &internal::meta_info<data_type>::resolve,
+            &internal::meta_info<underlying_type>::resolve,
             &internal::setter<false, Type, Setter>,
             &internal::getter<Type, Getter>,
             []() -> meta_data {

@@ -89,9 +89,9 @@ class basic_group<Entity, get_t<Get...>> {
     using pool_type = std::conditional_t<std::is_const_v<Component>, const sparse_set<Entity, std::remove_const_t<Component>>, sparse_set<Entity, Component>>;
 
     // we could use pool_type<Get> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    basic_group(sparse_set<Entity> *handler, sparse_set<Entity, std::remove_const_t<Get>> *... pools) ENTT_NOEXCEPT
-        : handler{handler},
-          pools{pools...}
+    basic_group(sparse_set<Entity> *ref, sparse_set<Entity, std::remove_const_t<Get>> *... get) ENTT_NOEXCEPT
+        : handler{ref},
+          pools{get...}
     {}
 
 public:
@@ -237,13 +237,13 @@ public:
 
     /**
      * @brief Finds an entity.
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator_type find(const entity_type entity) const ENTT_NOEXCEPT {
-        const auto it = handler->find(entity);
-        return it != end() && *it == entity ? it : end();
+    iterator_type find(const entity_type entt) const ENTT_NOEXCEPT {
+        const auto it = handler->find(entt);
+        return it != end() && *it == entt ? it : end();
     }
 
     /**
@@ -257,11 +257,11 @@ public:
 
     /**
      * @brief Checks if a group contains an entity.
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      * @return True if the group contains the given entity, false otherwise.
      */
-    bool contains(const entity_type entity) const ENTT_NOEXCEPT {
-        return find(entity) != end();
+    bool contains(const entity_type entt) const ENTT_NOEXCEPT {
+        return find(entt) != end();
     }
 
     /**
@@ -278,18 +278,18 @@ public:
      * group doesn't contain the given entity.
      *
      * @tparam Component Types of components to get.
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      * @return The components assigned to the entity.
      */
     template<typename... Component>
     std::conditional_t<sizeof...(Component) == 1, std::tuple_element_t<0, std::tuple<Component &...>>, std::tuple<Component &...>>
-    get([[maybe_unused]] const entity_type entity) const ENTT_NOEXCEPT {
-        assert(contains(entity));
+    get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
+        assert(contains(entt));
 
         if constexpr(sizeof...(Component) == 1) {
-            return (std::get<pool_type<Component> *>(pools)->get(entity), ...);
+            return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple<Component &...>{get<Component>(entity)...};
+            return std::tuple<Component &...>{get<Component>(entt)...};
         }
     }
 
@@ -313,11 +313,11 @@ public:
      */
     template<typename Func>
     inline void each(Func func) const {
-        for(const auto entity: *handler) {
+        for(const auto entt: *handler) {
             if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Get>...>) {
-                func(std::get<pool_type<Get> *>(pools)->get(entity)...);
+                func(std::get<pool_type<Get> *>(pools)->get(entt)...);
             } else {
-                func(entity, std::get<pool_type<Get> *>(pools)->get(entity)...);
+                func(entt, std::get<pool_type<Get> *>(pools)->get(entt)...);
             }
         };
     }
@@ -405,9 +405,9 @@ class basic_group<Entity, get_t<Get...>, Owned...> {
     using component_iterator_type = decltype(std::declval<pool_type<Component>>().begin());
 
     // we could use pool_type<Type> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    basic_group(const typename basic_registry<Entity>::size_type *length, sparse_set<Entity, std::remove_const_t<Owned>> *... owned, sparse_set<Entity, std::remove_const_t<Get>> *... others) ENTT_NOEXCEPT
-        : length{length},
-          pools{owned..., others...}
+    basic_group(const typename basic_registry<Entity>::size_type *sz, sparse_set<Entity, std::remove_const_t<Owned>> *... owned, sparse_set<Entity, std::remove_const_t<Get>> *... get) ENTT_NOEXCEPT
+        : length{sz},
+          pools{owned..., get...}
     {}
 
 public:
@@ -559,13 +559,13 @@ public:
 
     /**
      * @brief Finds an entity.
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator_type find(const entity_type entity) const ENTT_NOEXCEPT {
-        const auto it = std::get<0>(pools)->find(entity);
-        return it != end() && it >= begin() && *it == entity ? it : end();
+    iterator_type find(const entity_type entt) const ENTT_NOEXCEPT {
+        const auto it = std::get<0>(pools)->find(entt);
+        return it != end() && it >= begin() && *it == entt ? it : end();
     }
 
     /**
@@ -579,11 +579,11 @@ public:
 
     /**
      * @brief Checks if a group contains an entity.
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      * @return True if the group contains the given entity, false otherwise.
      */
-    bool contains(const entity_type entity) const ENTT_NOEXCEPT {
-        return find(entity) != end();
+    bool contains(const entity_type entt) const ENTT_NOEXCEPT {
+        return find(entt) != end();
     }
 
     /**
@@ -600,18 +600,18 @@ public:
      * group doesn't contain the given entity.
      *
      * @tparam Component Types of components to get.
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      * @return The components assigned to the entity.
      */
     template<typename... Component>
     std::conditional_t<sizeof...(Component) == 1, std::tuple_element_t<0, std::tuple<Component &...>>, std::tuple<Component &...>>
-    get([[maybe_unused]] const entity_type entity) const ENTT_NOEXCEPT {
-        assert(contains(entity));
+    get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
+        assert(contains(entt));
 
         if constexpr(sizeof...(Component) == 1) {
-            return (std::get<pool_type<Component> *>(pools)->get(entity), ...);
+            return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple<Component &...>{get<Component>(entity)...};
+            return std::tuple<Component &...>{get<Component>(entt)...};
         }
     }
 
@@ -643,12 +643,12 @@ public:
                 if constexpr(sizeof...(Get) == 0) {
                     func(*(std::get<component_iterator_type<Owned>>(raw)++)...);
                 } else {
-                    const auto entity = *(data++);
-                    func(*(std::get<component_iterator_type<Owned>>(raw)++)..., std::get<pool_type<Get> *>(pools)->get(entity)...);
+                    const auto entt = *(data++);
+                    func(*(std::get<component_iterator_type<Owned>>(raw)++)..., std::get<pool_type<Get> *>(pools)->get(entt)...);
                 }
             } else {
-                const auto entity = *(data++);
-                func(entity, *(std::get<component_iterator_type<Owned>>(raw)++)..., std::get<pool_type<Get> *>(pools)->get(entity)...);
+                const auto entt = *(data++);
+                func(entt, *(std::get<component_iterator_type<Owned>>(raw)++)..., std::get<pool_type<Get> *>(pools)->get(entt)...);
             }
         }
     }

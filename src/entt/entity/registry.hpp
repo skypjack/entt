@@ -65,9 +65,9 @@ class basic_registry {
     template<typename Component>
     struct pool_wrapper: sparse_set<Entity, Component> {
         template<typename... Args>
-        Component & construct(Entity entity, Args &&... args) {
-            auto &component = sparse_set<Entity, Component>::construct(entity, std::forward<Args>(args)...);
-            construction.publish(*owner, entity);
+        Component & construct(Entity entt, Args &&... args) {
+            auto &component = sparse_set<Entity, Component>::construct(entt, std::forward<Args>(args)...);
+            construction.publish(*owner, entt);
             return component;
         }
 
@@ -76,17 +76,17 @@ class basic_registry {
             auto *component = sparse_set<Entity, Component>::batch(first, last, hint);
 
             if(!construction.empty()) {
-                std::for_each(first, last, [this](const auto entity) {
-                    construction.publish(*owner, entity);
+                std::for_each(first, last, [this](const auto entt) {
+                    construction.publish(*owner, entt);
                 });
             }
 
             return component;
         }
 
-        void destroy(Entity entity) override {
-            destruction.publish(*owner, entity);
-            sparse_set<Entity, Component>::destroy(entity);
+        void destroy(Entity entt) override {
+            destruction.publish(*owner, entt);
+            sparse_set<Entity, Component>::destroy(entt);
         }
 
         signal_type construction;
@@ -103,15 +103,15 @@ class basic_registry {
     template<typename... Get, typename... Exclude>
     struct non_owning_group<type_list<Exclude...>, type_list<Get...>>: sparse_set<Entity> {
         template<auto Accepted>
-        void construct_if(basic_registry &reg, const Entity entity) {
-            if(reg.has<Get...>(entity) && (0 + ... + reg.has<Exclude>(entity)) == Accepted) {
-                this->construct(entity);
+        void construct_if(basic_registry &reg, const Entity entt) {
+            if(reg.has<Get...>(entt) && (0 + ... + reg.has<Exclude>(entt)) == Accepted) {
+                this->construct(entt);
             }
         }
 
-        void destroy_if(basic_registry &, const Entity entity) {
-            if(this->has(entity)) {
-                this->destroy(entity);
+        void destroy_if(basic_registry &, const Entity entt) {
+            if(this->has(entt)) {
+                this->destroy(entt);
             }
         }
     };
@@ -126,22 +126,22 @@ class basic_registry {
     template<typename... Owned, typename... Get, typename... Exclude>
     struct owning_group<type_list<Exclude...>, type_list<Get...>, Owned...>: boxed_owned {
         template<auto Accepted>
-        void induce_if(basic_registry &reg, const Entity entity) {
-            if(reg.has<Owned..., Get...>(entity) && (0 + ... + reg.has<Exclude>(entity)) == Accepted) {
+        void induce_if(basic_registry &reg, const Entity entt) {
+            if(reg.has<Owned..., Get...>(entt) && (0 + ... + reg.has<Exclude>(entt)) == Accepted) {
                 const auto curr = this->owned++;
                 const auto cpools = std::make_tuple(reg.pool<Owned>()...);
-                (std::swap(std::get<pool_type<Owned> *>(cpools)->get(entity), std::get<pool_type<Owned> *>(cpools)->raw()[curr]), ...);
-                (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entity), curr), ...);
+                (std::swap(std::get<pool_type<Owned> *>(cpools)->get(entt), std::get<pool_type<Owned> *>(cpools)->raw()[curr]), ...);
+                (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entt), curr), ...);
             }
         }
 
-        void discard_if(basic_registry &reg, const Entity entity) {
+        void discard_if(basic_registry &reg, const Entity entt) {
             const auto cpools = std::make_tuple(reg.pool<Owned>()...);
 
-            if(std::get<0>(cpools)->has(entity) && std::get<0>(cpools)->sparse_set<Entity>::get(entity) < this->owned) {
+            if(std::get<0>(cpools)->has(entt) && std::get<0>(cpools)->sparse_set<Entity>::get(entt) < this->owned) {
                 const auto curr = --this->owned;
-                (std::swap(std::get<pool_type<Owned> *>(cpools)->get(entity), std::get<pool_type<Owned> *>(cpools)->raw()[curr]), ...);
-                (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entity), curr), ...);
+                (std::swap(std::get<pool_type<Owned> *>(cpools)->get(entt), std::get<pool_type<Owned> *>(cpools)->raw()[curr]), ...);
+                (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entt), curr), ...);
             }
         }
     };
@@ -183,8 +183,8 @@ class basic_registry {
         const auto ctype = type<Component>();
 
         if constexpr(is_named_type_v<Component>) {
-            const auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &pdata) {
-                return pdata.pool && pdata.runtime_type == ctype;
+            const auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &candidate) {
+                return candidate.pool && candidate.runtime_type == ctype;
             });
 
             return (it != pools.cend() && it->pool)
@@ -208,8 +208,8 @@ class basic_registry {
         pool_data *pdata = nullptr;
 
         if constexpr(is_named_type_v<Component>) {
-            const auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &pdata) {
-                return pdata.pool && pdata.runtime_type == ctype;
+            const auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &candidate) {
+                return candidate.pool && candidate.runtime_type == ctype;
             });
 
             pdata = (it == pools.cend() ? &pools.emplace_back() : &(*it));
@@ -1499,10 +1499,10 @@ public:
         const entity_type seed = available ? (next | (entities[next] & (traits_type::version_mask << traits_type::entity_shift))) : next;
 
         follow_fn_type *follow = [](const basic_registry &reg, const entity_type entity) -> entity_type {
-            const auto &entities = reg.entities;
+            const auto &others = reg.entities;
             const auto entt = entity & traits_type::entity_mask;
-            const auto next = entities[entt] & traits_type::entity_mask;
-            return (next | (entities[next] & (traits_type::version_mask << traits_type::entity_shift)));
+            const auto curr = others[entt] & traits_type::entity_mask;
+            return (curr | (others[curr] & (traits_type::version_mask << traits_type::entity_shift)));
         };
 
         return { *this, seed, follow };
@@ -1524,30 +1524,30 @@ public:
      * @return A temporary object to use to load snasphosts.
      */
     basic_snapshot_loader<Entity> loader() ENTT_NOEXCEPT {
-        using assure_fn_type = void(basic_registry &, const entity_type, const bool);
+        using force_fn_type = void(basic_registry &, const entity_type, const bool);
 
-        assure_fn_type *assure = [](basic_registry &registry, const entity_type entity, const bool destroyed) {
+        force_fn_type *force = [](basic_registry &reg, const entity_type entity, const bool destroyed) {
             using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
             // explicit promotion to avoid warnings with std::uint16_t
             const auto entt = promotion_type{entity} & traits_type::entity_mask;
-            auto &entities = registry.entities;
+            auto &others = reg.entities;
 
-            if(!(entt < entities.size())) {
-                auto curr = entities.size();
-                entities.resize(entt + 1);
-                std::iota(entities.data() + curr, entities.data() + entt, entity_type(curr));
+            if(!(entt < others.size())) {
+                auto curr = others.size();
+                others.resize(entt + 1);
+                std::iota(others.data() + curr, others.data() + entt, entity_type(curr));
             }
 
-            entities[entt] = entity;
+            others[entt] = entity;
 
             if(destroyed) {
-                registry.destroy(entity);
+                reg.destroy(entity);
                 const auto version = entity & (traits_type::version_mask << traits_type::entity_shift);
-                entities[entt] = ((entities[entt] & traits_type::entity_mask) | version);
+                others[entt] = ((others[entt] & traits_type::entity_mask) | version);
             }
         };
 
-        return { (*this = {}), assure };
+        return { (*this = {}), force };
     }
 
 private:

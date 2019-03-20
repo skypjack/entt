@@ -4,8 +4,8 @@
 #include <entt/process/process.hpp>
 
 struct foo_process: entt::process<foo_process, int> {
-    foo_process(std::function<void()> on_update, std::function<void()> on_aborted)
-        : on_update{on_update}, on_aborted{on_aborted}
+    foo_process(std::function<void()> upd, std::function<void()> abort)
+        : on_update{upd}, on_aborted{abort}
     {}
 
     void update(delta_type, void *) { on_update(); }

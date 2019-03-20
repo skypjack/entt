@@ -172,8 +172,8 @@ class duktape_registry {
     }
 
 public:
-    duktape_registry(entt::registry &registry)
-        : registry{registry}
+    duktape_registry(entt::registry &ref)
+        : registry{ref}
     {
         reg<position, renderable, duktape_runtime>();
     }
@@ -237,9 +237,9 @@ public:
                 duk_push_uint(ctx, entity);
                 duk_put_prop_index(ctx, -2, pos++);
             } else {
-                const auto &components = dreg.registry.get<duktape_runtime>(entity).components;
-                const auto match = std::all_of(runtime.cbegin(), runtime.cend(), [&components](const auto type) {
-                    return components.find(type) != components.cend();
+                const auto &others = dreg.registry.get<duktape_runtime>(entity).components;
+                const auto match = std::all_of(runtime.cbegin(), runtime.cend(), [&others](const auto type) {
+                    return others.find(type) != others.cend();
                 });
 
                 if(match) {
@@ -268,19 +268,19 @@ const duk_function_list_entry js_duktape_registry_methods[] = {
     { nullptr, nullptr, 0 }
 };
 
-void export_types(duk_context *ctx, entt::registry &registry) {
-    auto export_type = [](auto *ctx, auto &registry, auto idx, auto type, const auto *name) {
+void export_types(duk_context *context, entt::registry &registry) {
+    auto export_type = [](auto *ctx, auto &reg, auto idx, auto type, const auto *name) {
         duk_push_string(ctx, name);
-        duk_push_uint(ctx, registry.template type<typename decltype(type)::type>());
+        duk_push_uint(ctx, reg.template type<typename decltype(type)::type>());
         duk_def_prop(ctx, idx, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE);
     };
 
-    auto idx = duk_push_object(ctx);
+    auto idx = duk_push_object(context);
 
-    export_type(ctx, registry, idx, tag<position>{}, "position");
-    export_type(ctx, registry, idx, tag<renderable>{}, "renderable");
+    export_type(context, registry, idx, tag<position>{}, "position");
+    export_type(context, registry, idx, tag<renderable>{}, "renderable");
 
-    duk_put_global_string(ctx, "Types");
+    duk_put_global_string(context, "Types");
 }
 
 void export_duktape_registry(duk_context *ctx, duktape_registry &dreg) {

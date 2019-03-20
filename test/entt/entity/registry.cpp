@@ -752,7 +752,7 @@ TEST(Registry, MergeTwoRegistries) {
 
     std::unordered_map<entt::entity, entt::entity> ref;
 
-    auto merge = [&ref](const auto &view, auto &dst) {
+    auto merge = [&ref, &dst](const auto &view) {
         view.each([&](auto entity, const auto &component) {
             if(ref.find(entity) == ref.cend()) {
                 const auto other = dst.create();
@@ -790,10 +790,10 @@ TEST(Registry, MergeTwoRegistries) {
     eq(dst.view<int, float, double>().begin(), dst.view<int, float, double>().end());
     eq(dst.view<char, float, int>().begin(), dst.view<char, float, int>().end());
 
-    merge(src.view<int>(), dst);
-    merge(src.view<char>(), dst);
-    merge(src.view<double>(), dst);
-    merge(src.view<float>(), dst);
+    merge(src.view<int>());
+    merge(src.view<char>());
+    merge(src.view<double>());
+    merge(src.view<float>());
 
     ne(dst.view<int, float, double>().begin(), dst.view<int, float, double>().end());
     ne(dst.view<char, float, int>().begin(), dst.view<char, float, int>().end());

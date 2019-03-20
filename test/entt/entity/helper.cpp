@@ -90,15 +90,15 @@ TEST(Helper, Tag) {
     ASSERT_FALSE(registry.has<entt::tag<"barfoo"_hs>>(entity));
     ASSERT_TRUE(registry.has<entt::tag<"foobar"_hs>>(entity));
 
-    for(auto entity: registry.view<int, entt::tag<"foobar"_hs>>()) {
-        (void)entity;
+    for(auto entt: registry.view<int, entt::tag<"foobar"_hs>>()) {
+        (void)entt;
         ++counter;
     }
 
     ASSERT_NE(counter, 0);
 
-    for(auto entity: registry.view<entt::tag<"foobar"_hs>>()) {
-        (void)entity;
+    for(auto entt: registry.view<entt::tag<"foobar"_hs>>()) {
+        (void)entt;
         --counter;
     }
 

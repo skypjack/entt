@@ -67,8 +67,8 @@ class sparse_set<Entity> {
         using direct_type = const std::vector<Entity>;
         using index_type = typename traits_type::difference_type;
 
-        iterator(direct_type *direct, index_type index) ENTT_NOEXCEPT
-            : direct{direct}, index{index}
+        iterator(direct_type *ref, index_type idx) ENTT_NOEXCEPT
+            : direct{ref}, index{idx}
         {}
 
     public:
@@ -285,21 +285,21 @@ public:
 
     /**
      * @brief Finds an entity.
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator_type find(const entity_type entity) const ENTT_NOEXCEPT {
-        return has(entity) ? --(end() - get(entity)) : end();
+    iterator_type find(const entity_type entt) const ENTT_NOEXCEPT {
+        return has(entt) ? --(end() - get(entt)) : end();
     }
 
     /**
      * @brief Checks if a sparse set contains an entity.
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      * @return True if the sparse set contains the entity, false otherwise.
      */
-    bool has(const entity_type entity) const ENTT_NOEXCEPT {
-        const auto pos = size_type(entity & traits_type::entity_mask);
+    bool has(const entity_type entt) const ENTT_NOEXCEPT {
+        const auto pos = size_type(entt & traits_type::entity_mask);
         // testing against null permits to avoid accessing the direct vector
         return (pos < reverse.size()) && (reverse[pos] != null);
     }
@@ -318,11 +318,11 @@ public:
      * An assertion will abort the execution at runtime in debug mode in case of
      * bounds violation.
      *
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      * @return True if the sparse set contains the entity, false otherwise.
      */
-    bool fast(const entity_type entity) const ENTT_NOEXCEPT {
-        const auto pos = size_type(entity & traits_type::entity_mask);
+    bool fast(const entity_type entt) const ENTT_NOEXCEPT {
+        const auto pos = size_type(entt & traits_type::entity_mask);
         assert(pos < reverse.size());
         // testing against null permits to avoid accessing the direct vector
         return (reverse[pos] != null);
@@ -337,12 +337,12 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * sparse set doesn't contain the given entity.
      *
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      * @return The position of the entity in the sparse set.
      */
-    size_type get(const entity_type entity) const ENTT_NOEXCEPT {
-        assert(has(entity));
-        const auto pos = size_type(entity & traits_type::entity_mask);
+    size_type get(const entity_type entt) const ENTT_NOEXCEPT {
+        assert(has(entt));
+        const auto pos = size_type(entt & traits_type::entity_mask);
         return size_type(reverse[pos]);
     }
 
@@ -355,11 +355,11 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * sparse set already contains the given entity.
      *
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      */
-    void construct(const entity_type entity) {
-        assert(!has(entity));
-        const auto pos = size_type(entity & traits_type::entity_mask);
+    void construct(const entity_type entt) {
+        assert(!has(entt));
+        const auto pos = size_type(entt & traits_type::entity_mask);
 
         if(!(pos < reverse.size())) {
             // null is safe in all cases for our purposes
@@ -367,7 +367,7 @@ public:
         }
 
         reverse[pos] = entity_type(direct.size());
-        direct.push_back(entity);
+        direct.push_back(entt);
     }
 
     /**
@@ -395,9 +395,9 @@ public:
             reverse.resize(hint, null);
         }
 
-        std::for_each(first, last, [next = entity_type(direct.size()), this](const auto entity) mutable {
-            assert(!has(entity));
-            const auto pos = size_type(entity & traits_type::entity_mask);
+        std::for_each(first, last, [next = entity_type(direct.size()), this](const auto entt) mutable {
+            assert(!has(entt));
+            const auto pos = size_type(entt & traits_type::entity_mask);
             assert(pos < reverse.size());
             reverse[pos] = next++;
         });
@@ -414,12 +414,12 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * sparse set doesn't contain the given entity.
      *
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      */
-    virtual void destroy(const entity_type entity) {
-        assert(has(entity));
+    virtual void destroy(const entity_type entt) {
+        assert(has(entt));
         const auto back = direct.back();
-        auto &candidate = reverse[size_type(entity & traits_type::entity_mask)];
+        auto &candidate = reverse[size_type(entt & traits_type::entity_mask)];
         // swapping isn't required here, we are getting rid of the last element
         reverse[back & traits_type::entity_mask] = candidate;
         direct[size_type(candidate)] = back;
@@ -549,8 +549,8 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
         using instance_type = std::conditional_t<Const, const std::vector<Type>, std::vector<Type>>;
         using index_type = typename traits_type::difference_type;
 
-        iterator(instance_type *instances, index_type index) ENTT_NOEXCEPT
-            : instances{instances}, index{index}
+        iterator(instance_type *ref, index_type idx) ENTT_NOEXCEPT
+            : instances{ref}, index{idx}
         {}
 
     public:
@@ -651,8 +651,8 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
         using instance_type = std::conditional_t<Const, const Type, Type>;
         using index_type = typename traits_type::difference_type;
 
-        iterator(instance_type *instance, index_type index) ENTT_NOEXCEPT
-            : instance{instance}, index{index}
+        iterator(instance_type *ref, index_type idx) ENTT_NOEXCEPT
+            : instance{ref}, index{idx}
         {}
 
     public:
@@ -870,39 +870,39 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * sparse set doesn't contain the given entity.
      *
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      * @return The object associated with the entity.
      */
-    const object_type & get([[maybe_unused]] const entity_type entity) const ENTT_NOEXCEPT {
+    const object_type & get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
         if constexpr(std::is_empty_v<object_type>) {
-            assert(underlying_type::has(entity));
+            assert(underlying_type::has(entt));
             return instances;
         } else {
-            return instances[underlying_type::get(entity)];
+            return instances[underlying_type::get(entt)];
         }
     }
 
     /*! @copydoc get */
-    inline object_type & get(const entity_type entity) ENTT_NOEXCEPT {
-        return const_cast<object_type &>(std::as_const(*this).get(entity));
+    inline object_type & get(const entity_type entt) ENTT_NOEXCEPT {
+        return const_cast<object_type &>(std::as_const(*this).get(entt));
     }
 
     /**
      * @brief Returns a pointer to the object associated with an entity, if any.
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      * @return The object associated with the entity, if any.
      */
-    const object_type * try_get(const entity_type entity) const ENTT_NOEXCEPT {
+    const object_type * try_get(const entity_type entt) const ENTT_NOEXCEPT {
         if constexpr(std::is_empty_v<object_type>) {
-            return underlying_type::has(entity) ? &instances : nullptr;
+            return underlying_type::has(entt) ? &instances : nullptr;
         } else {
-            return underlying_type::has(entity) ? (instances.data() + underlying_type::get(entity)) : nullptr;
+            return underlying_type::has(entt) ? (instances.data() + underlying_type::get(entt)) : nullptr;
         }
     }
 
     /*! @copydoc try_get */
-    inline object_type * try_get(const entity_type entity) ENTT_NOEXCEPT {
-        return const_cast<object_type *>(std::as_const(*this).try_get(entity));
+    inline object_type * try_get(const entity_type entt) ENTT_NOEXCEPT {
+        return const_cast<object_type *>(std::as_const(*this).try_get(entt));
     }
 
     /**
@@ -919,14 +919,14 @@ public:
      * sparse set already contains the given entity.
      *
      * @tparam Args Types of arguments to use to construct the object.
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      * @param args Parameters to use to construct an object for the entity.
      * @return The object associated with the entity.
      */
     template<typename... Args>
-    object_type & construct(const entity_type entity, [[maybe_unused]] Args &&... args) {
+    object_type & construct(const entity_type entt, [[maybe_unused]] Args &&... args) {
         if constexpr(std::is_empty_v<object_type>) {
-            underlying_type::construct(entity);
+            underlying_type::construct(entt);
             return instances;
         } else {
             if constexpr(std::is_aggregate_v<object_type>) {
@@ -936,7 +936,7 @@ public:
             }
 
             // entity goes after component in case constructor throws
-            underlying_type::construct(entity);
+            underlying_type::construct(entt);
             return instances.back();
         }
     }
@@ -994,18 +994,18 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * sparse set doesn't contain the given entity.
      *
-     * @param entity A valid entity identifier.
+     * @param entt A valid entity identifier.
      */
-    void destroy(const entity_type entity) override {
+    void destroy(const entity_type entt) override {
         if constexpr(!std::is_empty_v<object_type>) {
             // swapping isn't required here, we are getting rid of the last element
             // however, we must protect ourselves from self assignments (see #37)
             auto tmp = std::move(instances.back());
-            instances[underlying_type::get(entity)] = std::move(tmp);
+            instances[underlying_type::get(entt)] = std::move(tmp);
             instances.pop_back();
         }
 
-        underlying_type::destroy(entity);
+        underlying_type::destroy(entt);
     }
 
     /**

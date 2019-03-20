@@ -24,9 +24,9 @@ struct as_view {
 
     /**
      * @brief Constructs a converter for a given registry.
-     * @param reg A valid reference to a registry.
+     * @param source A valid reference to a registry.
      */
-    as_view(registry_type &reg) ENTT_NOEXCEPT: reg{reg} {}
+    as_view(registry_type &source) ENTT_NOEXCEPT: reg{source} {}
 
     /**
      * @brief Conversion function from a registry to a view.
@@ -72,9 +72,9 @@ struct as_group {
 
     /**
      * @brief Constructs a converter for a given registry.
-     * @param reg A valid reference to a registry.
+     * @param source A valid reference to a registry.
      */
-    as_group(registry_type &reg) ENTT_NOEXCEPT: reg{reg} {}
+    as_group(registry_type &source) ENTT_NOEXCEPT: reg{source} {}
 
     /**
      * @brief Conversion function from a registry to a group.
@@ -124,12 +124,12 @@ as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Component Types of components to assign to an entity if triggered.
- * @param registry A valid reference to a registry.
- * @param entity A valid entity identifier.
+ * @param reg A valid reference to a registry.
+ * @param entt A valid entity identifier.
  */
 template<typename Entity, typename... Component>
-void dependency(basic_registry<Entity> &registry, const Entity entity) {
-    ((registry.template has<Component>(entity) ? void() : (registry.template assign<Component>(entity), void())), ...);
+void dependency(basic_registry<Entity> &reg, const Entity entt) {
+    ((reg.template has<Component>(entt) ? void() : (reg.template assign<Component>(entt), void())), ...);
 }
 
 

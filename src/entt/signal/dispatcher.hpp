@@ -93,8 +93,8 @@ class dispatcher {
         wrapper_data *wdata = nullptr;
 
         if constexpr(is_named_type_v<Event>) {
-            const auto it = std::find_if(wrappers.begin(), wrappers.end(), [wtype](const auto &wdata) {
-                return wdata.wrapper && wdata.runtime_type == wtype;
+            const auto it = std::find_if(wrappers.begin(), wrappers.end(), [wtype](const auto &candidate) {
+                return candidate.wrapper && candidate.runtime_type == wtype;
             });
 
             wdata = (it == wrappers.cend() ? &wrappers.emplace_back() : &(*it));
