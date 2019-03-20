@@ -11,6 +11,15 @@
 [![Gitter chat](https://badges.gitter.im/skypjack/entt.png)](https://gitter.im/skypjack/entt)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/skypjack)
 
+**EnTT** is a header-only, tiny and easy to use **entity-component system** (and
+much more) written in **modern C++**.<br/>
+Among others, it's also used in
+[**Minecraft** by Mojang](https://minecraft.net/en-us/attribution/) and
+[**The Forge** by Confetti](https://github.com/ConfettiFX/The-Forge). Read on to
+find out what it can offer you.
+
+---
+
 Do you want to **keep up with changes** or do you have a **question** that
 doesn't require you to open an issue?<br/>
 Join the [gitter channel](https://gitter.im/skypjack/entt) and **meet other
@@ -46,10 +55,6 @@ please **consider becoming a patron**:
 
 # Introduction
 
-`EnTT` is a header-only, tiny and easy to use entity-component system (and much
-more) written in modern C++. Among others, it's also used in
-[Minecraft by Mojang](https://minecraft.net/en-us/attribution/) and
-[The Forge by Confetti](https://github.com/ConfettiFX/The-Forge).<br/>
 The entity-component-system (also known as _ECS_) is an architectural pattern
 used mostly in game development. For further details:
 
