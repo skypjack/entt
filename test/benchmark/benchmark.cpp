@@ -103,31 +103,6 @@ TEST(Benchmark, Destroy) {
     timer.elapsed();
 }
 
-TEST(Benchmark, IterateCreateDeleteSingleComponent) {
-    entt::registry registry;
-
-    std::cout << "Looping 10000 times creating and deleting a random number of entities" << std::endl;
-
-    timer timer;
-
-    auto view = registry.view<position>();
-
-    for(int i = 0; i < 10000; i++) {
-        for(int j = 0; j < 10000; j++) {
-            const auto entity = registry.create();
-            registry.assign<position>(entity);
-        }
-
-        for(auto entity: view) {
-            if(rand() % 2 == 0) {
-                registry.destroy(entity);
-            }
-        }
-    }
-
-    timer.elapsed();
-}
-
 TEST(Benchmark, IterateSingleComponent1M) {
     entt::registry registry;
 
