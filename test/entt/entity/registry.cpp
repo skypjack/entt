@@ -35,22 +35,24 @@ struct listener {
 TEST(Registry, Context) {
     entt::registry registry;
 
-    const auto &ivalue = registry.set<int>(0);
-    const auto &cvalue = registry.set<char>('c');
-    const auto &dvalue = registry.set<double>(1.);
+    registry.set<char>('c');
+    registry.set<int>(0);
+    registry.set<double>(1.);
     registry.set<int>(42);
 
-    ASSERT_EQ(ivalue, 42);
-    ASSERT_EQ(ivalue, registry.ctx<int>());
-    ASSERT_EQ(registry.ctx<int>(), std::as_const(registry).ctx<int>());
-
-    ASSERT_EQ(cvalue, 'c');
-    ASSERT_EQ(cvalue, registry.ctx<char>());
+    ASSERT_EQ(*registry.ctx<char>(), 'c');
+    ASSERT_NE(registry.ctx<char>(), nullptr);
     ASSERT_EQ(registry.ctx<char>(), std::as_const(registry).ctx<char>());
 
-    ASSERT_EQ(dvalue, 1.);
-    ASSERT_EQ(dvalue, registry.ctx<double>());
+    ASSERT_EQ(*registry.ctx<int>(), 42);
+    ASSERT_NE(registry.ctx<int>(), nullptr);
+    ASSERT_EQ(registry.ctx<int>(), std::as_const(registry).ctx<int>());
+
+    ASSERT_EQ(*registry.ctx<double>(), 1.);
+    ASSERT_NE(registry.ctx<double>(), nullptr);
     ASSERT_EQ(registry.ctx<double>(), std::as_const(registry).ctx<double>());
+
+    ASSERT_EQ(registry.ctx<float>(), nullptr);
 }
 
 TEST(Registry, Types) {

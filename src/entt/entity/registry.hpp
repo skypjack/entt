@@ -1605,7 +1605,8 @@ public:
                 std::swap(vars[ctype], vars.back());
                 wrapper = vars[ctype].get();
             } else if(!wrapper) {
-                wrapper = vars.emplace_back(std::make_unique<type_wrapper<Type>>()).get();
+                vars[ctype] = std::make_unique<type_wrapper<Type>>();
+                wrapper = vars[ctype].get();
             }
         }
 
@@ -1617,19 +1618,13 @@ public:
     }
 
     /**
-     * @brief Returns a reference to an object in the context of the registry.
-     *
-     * @warning
-     * Attempting to get an object that doesn't exist in the context of the
-     * registry results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * object isn't part of the context of the registry.
-     *
+     * @brief Returns a pointer to an object in the context of the registry.
      * @tparam Type Type of object to get.
-     * @return A reference to the object.
+     * @return A pointer to the object if it exists in the context of the
+     * registry, a null pointer otherwise.
      */
     template<typename Type>
-    const Type & ctx() const ENTT_NOEXCEPT {
+    const Type * ctx() const ENTT_NOEXCEPT {
         const auto ctype = runtime_type<Type, context_family>();
 
         if constexpr(is_named_type_v<Type>) {
@@ -1637,18 +1632,17 @@ public:
                 return candidate && candidate->runtime_type == ctype;
             });
 
-            assert(it != vars.cend());
-            return static_cast<const type_wrapper<Type> *>(it->get())->value;
+            return (it == vars.cend()) ? nullptr : &static_cast<const type_wrapper<Type> &>(**it).value;
         } else {
-            assert(ctype < vars.size() && vars[ctype] && vars[ctype]->runtime_type == ctype);
-            return static_cast<const type_wrapper<Type> *>(vars[ctype].get())->value;
+            const bool valid = ctype < vars.size() && vars[ctype] && vars[ctype]->runtime_type == ctype;
+            return valid ? &static_cast<const type_wrapper<Type> &>(*vars[ctype]).value : nullptr;
         }
     }
 
     /*! @copydoc ctx */
     template<typename Type>
-    Type & ctx() ENTT_NOEXCEPT {
-        return const_cast<Type &>(std::as_const(*this).template ctx<Type>());
+    Type * ctx() ENTT_NOEXCEPT {
+        return const_cast<Type *>(std::as_const(*this).template ctx<Type>());
     }
 
 private:

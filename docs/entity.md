@@ -838,15 +838,16 @@ newly created instance later on:
 // creates a new context variable initialized with the given values
 registry.set<my_type>(42, 'c');
 
-// gets a context variable associated with a registry
-auto &var = registry.ctx<my_type>();
+if(auto *var = registry.ctx<my_type>(); var) {
+    // uses the context variable associated with a registry, if any
+}
 ```
 
 The type of a context variable must be such that it's default constructible and
 can be moved. The `set` member function either creates a new instance of the
 context variable or overwrites an already existing one if any. The `ctx` member
-function requires that the context variable exist to work properly and doesn't
-create it silently under the hood.
+function returns a pointer to the context variable if it exists, otherwise it
+returns a null pointer. This fits well with the `if` statement with initializer.
 
 # Views and Groups
 
