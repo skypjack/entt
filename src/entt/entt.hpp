@@ -12,6 +12,7 @@
 #include "entity/helper.hpp"
 #include "entity/prototype.hpp"
 #include "entity/registry.hpp"
+#include "entity/runtime_view.hpp"
 #include "entity/snapshot.hpp"
 #include "entity/sparse_set.hpp"
 #include "entity/view.hpp"
