@@ -82,7 +82,7 @@ class basic_runtime_view {
             const auto sz = size_type(entt & traits_type::entity_mask);
 
             return sz < extent && std::all_of(from, to, [entt](const auto *view) {
-                return view->fast(entt);
+                return view->unsafe_has(entt);
             });
         }
 

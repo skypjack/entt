@@ -98,7 +98,7 @@ class basic_view {
             const auto sz = size_type(entt& traits_type::entity_mask);
 
             return sz < extent && std::all_of(unchecked.cbegin(), unchecked.cend(), [entt](const sparse_set<Entity> *view) {
-                return view->fast(entt);
+                return view->unsafe_has(entt);
             });
         }
 
@@ -196,7 +196,7 @@ class basic_view {
             const auto it = std::get<component_iterator_type<Comp>>(raw)++;
             const auto sz = size_type(entt & traits_type::entity_mask);
 
-            if(((sz < extent) && ... && std::get<Indexes>(other)->fast(entt))) {
+            if(((sz < extent) && ... && std::get<Indexes>(other)->unsafe_has(entt))) {
                 // avoided at least the indirection due to the sparse set for the pivot type (see get for more details)
                 if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>...>) {
                     func(get<Comp, Component>(it, entt)...);

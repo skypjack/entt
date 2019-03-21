@@ -313,15 +313,15 @@ public:
      * you are doing. Prefer the `has` member function instead.
      *
      * @warning
-     * Attempting to use an entity that doesn't belong to the sparse set can
-     * result in undefined behavior.<br/>
+     * Attempting to use an entity that doesn't belong to the sparse set results
+     * in undefined behavior.<br/>
      * An assertion will abort the execution at runtime in debug mode in case of
      * bounds violation.
      *
      * @param entt A valid entity identifier.
      * @return True if the sparse set contains the entity, false otherwise.
      */
-    bool fast(const entity_type entt) const ENTT_NOEXCEPT {
+    bool unsafe_has(const entity_type entt) const ENTT_NOEXCEPT {
         const auto pos = size_type(entt & traits_type::entity_mask);
         assert(pos < reverse.size());
         // testing against null permits to avoid accessing the direct vector
@@ -803,6 +803,44 @@ public:
     /*! @copydoc raw */
     object_type * raw() ENTT_NOEXCEPT {
         return const_cast<object_type *>(std::as_const(*this).raw());
+    }
+
+    /**
+     * @brief Returns the entity to which a given component is assigned.
+     * @param instance A valid reference to an object.
+     * @return A valid entity identifier if the instance belongs to the sparse
+     * set, the null entity otherwise.
+     */
+    inline entity_type entity(const object_type &instance) {
+        const auto address = std::addressof(instance);
+        const bool valid = !(instances.data() > address) && (address < (instances.data() + instances.size()));
+        return valid ? sparse_set<entity_type>::data()[address - instances.data()] : null;
+    }
+
+    /**
+     * @brief Returns the entity to which a given component is assigned
+     * (unsafe).
+     *
+     * Alternative version of `entity`. It accesses the underlying data
+     * structures without bounds checking and thus it's both unsafe and risky to
+     * use.<br/>
+     * You should not invoke directly this function unless you know exactly what
+     * you are doing. Prefer the `entity` member function instead.
+     *
+     * @warning
+     * Attempting to use an instance that doesn't belong to the sparse set
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * bounds violation.
+     *
+     * @param instance An object that belongs to the sparse set.
+     * @return A valid entity identifier.
+     */
+    inline entity_type unsafe_entity(const object_type &instance) {
+        const auto address = std::addressof(instance);
+        assert(!(instances.data() > address));
+        assert(address < (instances.data() + instances.size()));
+        return sparse_set<entity_type>::data()[address - instances.data()];
     }
 
     /**

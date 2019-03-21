@@ -31,7 +31,7 @@ TEST(SparseSetNoType, Functionalities) {
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_TRUE(set.has(42));
-    ASSERT_TRUE(set.fast(42));
+    ASSERT_TRUE(set.unsafe_has(42));
     ASSERT_EQ(set.get(42), 0u);
 
     set.destroy(42);
@@ -392,7 +392,7 @@ TEST(SparseSetWithType, Functionalities) {
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
     ASSERT_TRUE(set.has(42));
-    ASSERT_TRUE(set.fast(42));
+    ASSERT_TRUE(set.unsafe_has(42));
     ASSERT_EQ(set.get(42), 3);
     ASSERT_EQ(*set.try_get(42), 3);
     ASSERT_EQ(set.try_get(99), nullptr);
@@ -424,6 +424,43 @@ TEST(SparseSetWithType, Functionalities) {
     (void)entt::sparse_set<std::uint64_t, int>{std::move(set)};
     entt::sparse_set<std::uint64_t, int> other;
     other = std::move(set);
+}
+
+TEST(SparseSetWithType, EntityFromComponent) {
+    entt::sparse_set<std::uint64_t, int> set;
+    typename entt::sparse_set<std::uint64_t, int>::entity_type invalid = entt::null;
+
+    set.reserve(3);
+
+    const auto &first = set.construct(42, 3);
+    const auto &second = set.construct(3, 9);
+    const auto &third = set.construct(99, 7);
+
+    ASSERT_NE(set.entity(first), invalid);
+    ASSERT_EQ(set.get(set.entity(first)), first);
+    ASSERT_EQ(&set.get(set.entity(first)), &first);
+
+    ASSERT_NE(set.unsafe_entity(first), invalid);
+    ASSERT_EQ(set.get(set.unsafe_entity(first)), first);
+    ASSERT_EQ(&set.get(set.unsafe_entity(first)), &first);
+
+    ASSERT_NE(set.entity(second), invalid);
+    ASSERT_EQ(set.get(set.entity(second)), second);
+    ASSERT_EQ(&set.get(set.entity(second)), &second);
+
+    ASSERT_NE(set.unsafe_entity(second), invalid);
+    ASSERT_EQ(set.get(set.unsafe_entity(second)), second);
+    ASSERT_EQ(&set.get(set.unsafe_entity(second)), &second);
+
+    ASSERT_NE(set.entity(third), invalid);
+    ASSERT_EQ(set.get(set.entity(third)), third);
+    ASSERT_EQ(&set.get(set.entity(third)), &third);
+
+    ASSERT_NE(set.unsafe_entity(third), invalid);
+    ASSERT_EQ(set.get(set.unsafe_entity(third)), third);
+    ASSERT_EQ(&set.get(set.unsafe_entity(third)), &third);
+
+    ASSERT_EQ(set.entity(0), invalid);
 }
 
 TEST(SparseSetWithType, EmptyType) {

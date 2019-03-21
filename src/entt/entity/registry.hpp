@@ -449,7 +449,7 @@ public:
     }
 
     /**
-     * @brief Checks if an entity identifier refers to a valid entity.
+     * @brief Checks if an entity identifier refers to a valid entity (unsafe).
      *
      * Alternative version of `valid`. It accesses the internal data structures
      * without bounds checking and thus it's both unsafe and risky to use.<br/>
@@ -465,7 +465,7 @@ public:
      * @param entity A valid entity identifier.
      * @return True if the identifier is valid, false otherwise.
      */
-    bool fast(const entity_type entity) const ENTT_NOEXCEPT {
+    bool unsafe_valid(const entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
         assert(pos < entities.size());
         return (entities[pos] == entity);
@@ -1466,8 +1466,8 @@ public:
      * listeners of interest to the new registry and to set up groups.
      *
      * @warning
-     * Attempting to clone components that aren't copyable can result in
-     * unexpected behaviors.<br/>
+     * Attempting to clone components that aren't copyable results in unexpected
+     * behaviors.<br/>
      * A static assertion will abort the compilation when the components
      * provided aren't copy constructible. Otherwise, an assertion will abort
      * the execution at runtime in debug mode in case one or more pools cannot
