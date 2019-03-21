@@ -7,7 +7,6 @@
 * work stealing job system (see #100)
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
 * allow for built-in parallel each if possible
-* tags revenge: if it's possible, reintroduce them but without a link to entities (see #169 for more details)
 * allow to replace std:: with custom implementations
 * allow to sort groups (::respect can already work with begin/end instead of a whole sparse set)
   -it would ease by far the group trick for hierarchies that requires otherwise more boilerplate
@@ -20,3 +19,5 @@
   - each with entity return the shared component multiple times, one per entity that refers to it
   - each components only return actual component, so shared components are returned only once
 * add a sort of "fast each" for when users know they are not to add/remove components, it can use directly raw access and improve even further performance
+* types defined at runtime that refer to the same compile-time type (but to different pools) are possible, the library is almost there
+* view/group iterators that return entities and components? I'd still like to have it :-)

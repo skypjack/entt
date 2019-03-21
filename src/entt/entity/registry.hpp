@@ -58,6 +58,7 @@ constexpr exclude_t<Type...> exclude{};
  */
 template<typename Entity>
 class basic_registry {
+    using context_family = family<struct internal_registry_context_family>;
     using component_family = family<struct internal_registry_component_family>;
     using signal_type = sigh<void(basic_registry &, const Entity)>;
     using traits_type = entt_traits<Entity>;
@@ -168,6 +169,25 @@ class basic_registry {
         std::size_t extent;
     };
 
+    struct ctx_wrapper {
+        virtual ~ctx_wrapper() = default;
+        ENTT_ID_TYPE runtime_type;
+    };
+
+    template<typename Type>
+    struct type_wrapper: ctx_wrapper {
+        Type value;
+    };
+
+    template<typename Type, typename Family>
+    static ENTT_ID_TYPE runtime_type() ENTT_NOEXCEPT {
+        if constexpr(is_named_type_v<Type>) {
+            return named_type_traits<Type>::value;
+        } else {
+            return Family::template type<Type>;
+        }
+    }
+
     void release(const Entity entity) {
         // lengthens the implicit list of destroyed entities
         const auto entt = entity & traits_type::entity_mask;
@@ -269,12 +289,8 @@ public:
      * @return Runtime numeric identifier of the given type of component.
      */
     template<typename Component>
-    static component_type type() ENTT_NOEXCEPT {
-        if constexpr(is_named_type_v<Component>) {
-            return named_type_traits<Component>::value;
-        } else {
-            return component_family::type<Component>;
-        }
+    inline static component_type type() ENTT_NOEXCEPT {
+        return runtime_type<Component, component_family>();
     }
 
     /**
@@ -1550,10 +1566,95 @@ public:
         return { (*this = {}), force };
     }
 
+    /**
+     * @brief Binds an object to the context of the registry.
+     *
+     * If the value already exists it is overwritten, otherwise a new instance
+     * of the given type is created and initialized with the arguments provided.
+     *
+     * @tparam Type Type of object to set.
+     * @tparam Args Types of arguments to use to construct the object.
+     * @param args Parameters to use to initialize the value.
+     * @return A reference to the newly created object.
+     */
+    template<typename Type, typename... Args>
+    Type & set(Args &&... args) {
+        const auto ctype = runtime_type<Type, context_family>();
+        ctx_wrapper *wrapper = nullptr;
+
+        if constexpr(is_named_type_v<Type>) {
+            const auto it = std::find_if(vars.begin(), vars.end(), [ctype](const auto &candidate) {
+                return candidate && candidate->runtime_type == ctype;
+            });
+
+            if(it == vars.cend()) {
+                wrapper = vars.emplace_back(std::make_unique<type_wrapper<Type>>()).get();
+            } else {
+                wrapper = it->get();
+            }
+        } else {
+            if(!(ctype < vars.size())) {
+                vars.resize(ctype+1);
+            }
+
+            wrapper = vars[ctype].get();
+
+            if(wrapper && wrapper->runtime_type != ctype) {
+                vars.emplace_back(std::make_unique<type_wrapper<Type>>());
+                std::swap(vars[ctype], vars.back());
+                wrapper = vars[ctype].get();
+            } else if(!wrapper) {
+                wrapper = vars.emplace_back(std::make_unique<type_wrapper<Type>>()).get();
+            }
+        }
+
+        auto &value = static_cast<type_wrapper<Type> *>(wrapper)->value;
+        value = Type{std::forward<Args>(args)...};
+        wrapper->runtime_type = ctype;
+
+        return value;
+    }
+
+    /**
+     * @brief Returns a reference to an object in the context of the registry.
+     *
+     * @warning
+     * Attempting to get an object that doesn't exist in the context of the
+     * registry results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * object isn't part of the context of the registry.
+     *
+     * @tparam Type Type of object to get.
+     * @return A reference to the object.
+     */
+    template<typename Type>
+    const Type & ctx() const ENTT_NOEXCEPT {
+        const auto ctype = runtime_type<Type, context_family>();
+
+        if constexpr(is_named_type_v<Type>) {
+            const auto it = std::find_if(vars.begin(), vars.end(), [ctype](const auto &candidate) {
+                return candidate && candidate->runtime_type == ctype;
+            });
+
+            assert(it != vars.cend());
+            return static_cast<const type_wrapper<Type> *>(it->get())->value;
+        } else {
+            assert(ctype < vars.size() && vars[ctype] && vars[ctype]->runtime_type == ctype);
+            return static_cast<const type_wrapper<Type> *>(vars[ctype].get())->value;
+        }
+    }
+
+    /*! @copydoc ctx */
+    template<typename Type>
+    Type & ctx() ENTT_NOEXCEPT {
+        return const_cast<Type &>(std::as_const(*this).template ctx<Type>());
+    }
+
 private:
     std::vector<pool_data> pools;
     std::vector<owning_group_data> inner_groups;
     std::vector<non_owning_group_data> outer_groups;
+    std::vector<std::unique_ptr<ctx_wrapper>> vars;
     std::vector<entity_type> entities;
     size_type available{};
     entity_type next{};

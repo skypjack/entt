@@ -26,6 +26,7 @@
     * [Dependency function](#dependency-function)
     * [Tags](#tags)
   * [Null entity](#null-entity)
+  * [Context variables](#context-variables)
 * [Views and Groups](#views-and-groups)
   * [Views](#views)
   * [Runtime views](#runtime-views)
@@ -824,6 +825,28 @@ Similarly, the null entity can be compared to any other identifier:
 const auto entity = registry.create();
 const bool null = (entity == entt::null);
 ```
+
+## Context variables
+
+It is often convenient to assign context variables to a registry, so as to make
+it the only source of truth of an application.<br/>
+This is possible through two member functions named `set` and `ctx`. The former
+is used to create a context variable from a given type, the latter to get the
+newly created instance later on:
+
+```cpp
+// creates a new context variable initialized with the given values
+registry.set<my_type>(42, 'c');
+
+// gets a context variable associated with a registry
+auto &var = registry.ctx<my_type>();
+```
+
+The type of a context variable must be such that it's default constructible and
+can be moved. The `set` member function either creates a new instance of the
+context variable or overwrites an already existing one if any. The `ctx` member
+function requires that the context variable exist to work properly and doesn't
+create it silently under the hood.
 
 # Views and Groups
 
