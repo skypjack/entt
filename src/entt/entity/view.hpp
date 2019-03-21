@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/type_traits.hpp"
 #include "entt_traits.hpp"
 #include "sparse_set.hpp"
 #include "fwd.hpp"
@@ -66,7 +65,7 @@ class basic_view {
     using pool_type = std::conditional_t<std::is_const_v<Comp>, const sparse_set<Entity, std::remove_const_t<Comp>>, sparse_set<Entity, Comp>>;
 
     template<typename Comp>
-    using component_iterator_type = decltype(std::declval<pool_type<Comp>>().begin());
+    using component_type = std::remove_reference_t<decltype(std::declval<pool_type<Comp>>().get(0))>;
 
     using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
     using unchecked_type = std::array<const sparse_set<Entity> *, (sizeof...(Component) - 1)>;
@@ -161,50 +160,23 @@ class basic_view {
         return other;
     }
 
-    template<typename Comp, typename Other>
-    inline Other & get([[maybe_unused]] component_iterator_type<Comp> it, [[maybe_unused]] const Entity entt) const ENTT_NOEXCEPT {
-        if constexpr(std::is_same_v<Comp, Other>) {
-            return *it;
-        } else {
-            return std::get<pool_type<Other> *>(pools)->get(entt);
-        }
-    }
+    template<typename Comp, typename... Other, typename Func>
+    void each(std::tuple<Comp *, Other *...> pack, Func func) const {
+        const auto end = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::end();
+        auto begin = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::begin();
+        auto raw = std::get<pool_type<Comp> *>(pools)->begin();
 
-    template<typename Comp, typename Func, auto... Indexes>
-    void each(pool_type<Comp> *cpool, Func func, std::index_sequence<Indexes...>) const {
-        const auto other = unchecked(cpool);
-        std::array<underlying_iterator_type, sizeof...(Indexes)> data{{std::get<Indexes>(other)->begin()...}};
-        const auto extent = std::min({ std::get<pool_type<Component> *>(pools)->extent()... });
-        auto raw = std::make_tuple(std::get<pool_type<Component> *>(pools)->begin()...);
-        const auto end = cpool->sparse_set<Entity>::end();
-        auto begin = cpool->sparse_set<Entity>::begin();
+        std::for_each(begin, end, [&pack, &func, &raw, this](const auto entity) {
+            std::get<component_type<Comp> *>(pack) = &*raw++;
 
-        // we can directly use the raw iterators if pools are ordered
-        if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>...>) {
-            for(; ((begin != end) && ... && (*begin == *(std::get<Indexes>(data)++))); ++begin) {
-                func(*(std::get<component_iterator_type<Component>>(raw)++)...);
-            }
-        } else {
-            while(((begin != end) && ... && (*begin == *(std::get<Indexes>(data)++)))) {
-                func(*(begin++), *(std::get<component_iterator_type<Component>>(raw)++)...);
-            }
-        }
-
-        // fallback to visit what remains using indirections
-        while(begin != end) {
-            const auto entt = *(begin++);
-            const auto it = std::get<component_iterator_type<Comp>>(raw)++;
-            const auto sz = size_type(entt & traits_type::entity_mask);
-
-            if(((sz < extent) && ... && std::get<Indexes>(other)->unsafe_has(entt))) {
-                // avoided at least the indirection due to the sparse set for the pivot type (see get for more details)
+            if(((std::get<component_type<Other> *>(pack) = std::get<pool_type<Other> *>(pools)->try_get(entity)) && ...)) {
                 if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>...>) {
-                    func(get<Comp, Component>(it, entt)...);
+                    func(*std::get<component_type<Component> *>(pack)...);
                 } else {
-                    func(entt, get<Comp, Component>(it, entt)...);
+                    func(entity, *std::get<component_type<Component> *>(pack)...);
                 }
             }
-        }
+        });
     }
 
 public:
@@ -403,9 +375,9 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func func) const {
+    inline void each(Func func) const {
         const auto *view = candidate();
-        ((std::get<pool_type<Component> *>(pools) == view ? each<Component>(std::get<pool_type<Component> *>(pools), std::move(func), std::make_index_sequence<sizeof...(Component)-1>{}) : void()), ...);
+        ((std::get<pool_type<Component> *>(pools) == view ? each<Component>(std::move(func)) : void()), ...);
     }
 
     /**
@@ -423,7 +395,7 @@ public:
      * void(Component &...);
      * @endcode
      *
-     * The pool of the suggested component is used to drive iterations. The
+     * The pool of the suggested component is used to lead the iterations. The
      * returned entities will therefore respect the order of the pool associated
      * with that type.<br/>
      * It is no longer guaranteed that the performance is the best possible, but
@@ -433,8 +405,8 @@ public:
      * @param func A valid function object.
      */
     template<typename Comp, typename Func>
-    void each(Func func) const {
-        each<Comp>(std::get<pool_type<Comp> *>(pools), std::move(func), std::make_index_sequence<sizeof...(Component)-1>{});
+    inline void each(Func func) const {
+        each(std::tuple_cat(std::tuple<Comp *>{}, std::conditional_t<std::is_same_v<Comp *, Component *>, std::tuple<>, std::tuple<Component *>>{}...), std::move(func));
     }
 
 private:
@@ -658,7 +630,7 @@ public:
         if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>>) {
             std::for_each(pool->begin(), pool->end(), std::move(func));
         } else {
-            std::for_each(pool->sparse_set<Entity>::begin(), pool->sparse_set<Entity>::end(), [func = std::move(func), raw = pool->begin()](const auto entt) mutable {
+            std::for_each(pool->sparse_set<Entity>::begin(), pool->sparse_set<Entity>::end(), [&func, raw = pool->begin()](const auto entt) mutable {
                 func(entt, *(raw++));
             });
         }

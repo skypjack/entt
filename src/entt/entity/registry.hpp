@@ -1217,7 +1217,7 @@ public:
     void orphans(Func func) const {
         static_assert(std::is_invocable_v<Func, entity_type>);
 
-        each([func = std::move(func), this](const auto entity) {
+        each([&func, this](const auto entity) {
             if(orphan(entity)) {
                 func(entity);
             }
