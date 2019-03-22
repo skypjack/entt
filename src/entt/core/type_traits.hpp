@@ -2,7 +2,6 @@
 #define ENTT_CORE_TYPE_TRAITS_HPP
 
 
-#include <tuple>
 #include <type_traits>
 #include "../core/hashed_string.hpp"
 
@@ -12,7 +11,7 @@ namespace entt {
 
 /*! @brief A class to use to push around lists of types, nothing more. */
 template<typename... Type>
-using type_list = std::tuple<Type *...>;
+struct type_list {};
 
 
 /*! @brief Traits class used mainly to push things across boundaries. */
