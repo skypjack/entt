@@ -43,11 +43,11 @@ void pathological(Func func) {
     }
 
     for(auto i = 0; i < 10; ++i) {
-        registry.each([i = 0, &registry](const auto entity) mutable {
-            if(i % 7) { registry.remove<position>(entity); }
-            if(i % 11) { registry.remove<velocity>(entity); }
-            if(i % 13) { registry.remove<comp<0>>(entity); }
-            if(i % 17) { registry.destroy(entity); }
+        registry.each([i, &registry](const auto entity) mutable {
+            if(!(i % 7)) { registry.remove<position>(entity); }
+            if(!(i % 11)) { registry.remove<velocity>(entity); }
+            if(!(i % 13)) { registry.remove<comp<0>>(entity); }
+            if(!(i % 17)) { registry.destroy(entity); }
         });
 
         for(std::uint64_t j = 0; j < 50000L; j++) {
@@ -161,10 +161,10 @@ TEST(Benchmark, IterateSingleComponentRuntime1M) {
 
     std::cout << "Iterating over 1000000 entities, one component, runtime view" << std::endl;
 
-     for(std::uint64_t i = 0; i < 1000000L; i++) {
-         const auto entity = registry.create();
-         registry.assign<position>(entity);
-     }
+    for(std::uint64_t i = 0; i < 1000000L; i++) {
+        const auto entity = registry.create();
+        registry.assign<position>(entity);
+    }
 
     auto test = [&registry](auto func) {
         using component_type = typename entt::registry::component_type;
