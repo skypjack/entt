@@ -58,7 +58,6 @@ void pathological(Func func) {
         }
     }
 
-    func(registry, [](const auto &...) {});
     func(registry, [](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -152,7 +151,6 @@ TEST(Benchmark, IterateSingleComponent1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -177,7 +175,6 @@ TEST(Benchmark, IterateSingleComponentRuntime1M) {
         timer.elapsed();
     };
 
-    test([](auto) {});
     test([&registry](auto entity) {
         registry.get<position>(entity).x = {};
     });
@@ -200,35 +197,6 @@ TEST(Benchmark, IterateTwoComponents1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
-    test([](auto &... comp) {
-        ((comp.x = {}), ...);
-    });
-}
-
-TEST(Benchmark, IterateTwoComponentsRangeBasedFor1M) {
-    entt::registry registry;
-
-    std::cout << "Iterating over 1000000 entities, two components (range-based for)" << std::endl;
-
-    for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.assign<position>(entity);
-        registry.assign<velocity>(entity);
-    }
-
-    auto test = [&registry](auto func) {
-        auto view = registry.view<position, velocity>();
-        timer timer;
-
-        for(const auto entity: registry.view<position, velocity>()) {
-            func(view.get<position>(entity), view.get<velocity>(entity));
-        }
-
-        timer.elapsed();
-    };
-
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -254,7 +222,6 @@ TEST(Benchmark, IterateTwoComponents1MHalf) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -280,7 +247,6 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -304,7 +270,6 @@ TEST(Benchmark, IterateTwoComponentsNonOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -328,7 +293,6 @@ TEST(Benchmark, IterateTwoComponentsFullOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -352,7 +316,6 @@ TEST(Benchmark, IterateTwoComponentsPartialOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -378,7 +341,6 @@ TEST(Benchmark, IterateTwoComponentsRuntime1M) {
         timer.elapsed();
     };
 
-    test([](auto) {});
     test([&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
@@ -408,7 +370,6 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
         timer.elapsed();
     };
 
-    test([](auto) {});
     test([&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
@@ -438,7 +399,6 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
         timer.elapsed();
     };
 
-    test([](auto) {});
     test([&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
@@ -463,36 +423,6 @@ TEST(Benchmark, IterateThreeComponents1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
-    test([](auto &... comp) {
-        ((comp.x = {}), ...);
-    });
-}
-
-TEST(Benchmark, IterateThreeComponentsRangeBasedFor1M) {
-    entt::registry registry;
-
-    std::cout << "Iterating over 1000000 entities, three components (range-based for)" << std::endl;
-
-    for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.assign<position>(entity);
-        registry.assign<velocity>(entity);
-        registry.assign<comp<0>>(entity);
-    }
-
-    auto test = [&registry](auto func) {
-        auto view = registry.view<position, velocity, comp<0>>();
-        timer timer;
-
-        for(const auto entity: view) {
-            func(view.get<position>(entity), view.get<velocity>(entity), view.get<comp<0>>(entity));
-        }
-
-        timer.elapsed();
-    };
-
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -519,7 +449,6 @@ TEST(Benchmark, IterateThreeComponents1MHalf) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -546,7 +475,6 @@ TEST(Benchmark, IterateThreeComponents1MOne) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -571,7 +499,6 @@ TEST(Benchmark, IterateThreeComponentsNonOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -596,7 +523,6 @@ TEST(Benchmark, IterateThreeComponentsFullOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -621,7 +547,6 @@ TEST(Benchmark, IterateThreeComponentsPartialOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -648,7 +573,6 @@ TEST(Benchmark, IterateThreeComponentsRuntime1M) {
         timer.elapsed();
     };
 
-    test([](auto) {});
     test([&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
@@ -680,7 +604,6 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
         timer.elapsed();
     };
 
-    test([](auto) {});
     test([&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
@@ -712,7 +635,6 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
         timer.elapsed();
     };
 
-    test([](auto) {});
     test([&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
@@ -740,42 +662,6 @@ TEST(Benchmark, IterateFiveComponents1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
-    test([](auto &... comp) {
-        ((comp.x = {}), ...);
-    });
-}
-
-TEST(Benchmark, IterateFiveComponentsRangeBasedFor1M) {
-    entt::registry registry;
-
-    std::cout << "Iterating over 1000000 entities, five components (range-based for)" << std::endl;
-
-    for(std::uint64_t i = 0; i < 1000000L; i++) {
-        const auto entity = registry.create();
-        registry.assign<position>(entity);
-        registry.assign<velocity>(entity);
-        registry.assign<comp<0>>(entity);
-        registry.assign<comp<1>>(entity);
-        registry.assign<comp<2>>(entity);
-    }
-
-    auto test = [&registry](auto func) {
-        auto view = registry.view<position, velocity, comp<0>, comp<1>, comp<2>>();
-        timer timer;
-
-        for(const auto entity: view) {
-            func(view.get<position>(entity),
-                 view.get<velocity>(entity),
-                 view.get<comp<0>>(entity),
-                 view.get<comp<1>>(entity),
-                 view.get<comp<2>>(entity));
-        }
-
-        timer.elapsed();
-    };
-
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -804,7 +690,6 @@ TEST(Benchmark, IterateFiveComponents1MHalf) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -833,7 +718,6 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -860,7 +744,6 @@ TEST(Benchmark, IterateFiveComponentsNonOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -887,7 +770,6 @@ TEST(Benchmark, IterateFiveComponentsFullOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -914,7 +796,6 @@ TEST(Benchmark, IterateFiveComponentsPartialFourOfFiveOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -941,7 +822,6 @@ TEST(Benchmark, IterateFiveComponentsPartialThreeOfFiveOwningGroup1M) {
         timer.elapsed();
     };
 
-    test([](const auto &...) {});
     test([](auto &... comp) {
         ((comp.x = {}), ...);
     });
@@ -976,7 +856,6 @@ TEST(Benchmark, IterateFiveComponentsRuntime1M) {
         timer.elapsed();
     };
 
-    test([](auto) {});
     test([&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
@@ -1018,7 +897,6 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
         timer.elapsed();
     };
 
-    test([](auto) {});
     test([&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
@@ -1060,7 +938,6 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
         timer.elapsed();
     };
 
-    test([](auto) {});
     test([&registry](auto entity) {
         registry.get<position>(entity).x = {};
         registry.get<velocity>(entity).x = {};
@@ -1076,23 +953,6 @@ TEST(Benchmark, IteratePathological) {
     pathological([](auto &registry, auto func) {
         timer timer;
         registry.template view<position, velocity, comp<0>>().each(func);
-        timer.elapsed();
-    });
-}
-
-TEST(Benchmark, IteratePathologicalRangeBasedFor) {
-    std::cout << "Pathological case (range-based for)" << std::endl;
-
-    pathological([](auto &registry, auto func) {
-        auto view = registry.template view<position, velocity, comp<0>>();
-        timer timer;
-
-        for(const auto entity: view) {
-            func(view.template get<position>(entity),
-                 view.template get<velocity>(entity),
-                 view.template get<comp<0>>(entity));
-        }
-
         timer.elapsed();
     });
 }
