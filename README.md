@@ -113,7 +113,7 @@ struct velocity {
     float dy;
 };
 
-void update(entt::registry<> &registry) {
+void update(entt::registry &registry) {
     auto view = registry.view<position, velocity>();
 
     for(auto entity: view) {
@@ -128,8 +128,8 @@ void update(entt::registry<> &registry) {
     }
 }
 
-void update(std::uint64_t dt, entt::registry<> &registry) {
-    registry.view<position, velocity>().each([dt](const auto, auto &pos, auto &vel) {
+void update(std::uint64_t dt, entt::registry &registry) {
+    registry.view<position, velocity>().each([dt](auto &pos, auto &vel) {
         // gets all the components of the view at once ...
 
         pos.x += vel.dx * dt;
