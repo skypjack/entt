@@ -35,10 +35,28 @@ struct listener {
 TEST(Registry, Context) {
     entt::registry registry;
 
+    ASSERT_EQ(registry.ctx<char>(), nullptr);
+    ASSERT_EQ(registry.ctx<int>(), nullptr);
+    ASSERT_EQ(registry.ctx<double>(), nullptr);
+
+    registry.set<char>();
+    registry.set<int>();
+    registry.set<double>();
+
+    ASSERT_NE(registry.ctx<char>(), nullptr);
+    ASSERT_NE(registry.ctx<int>(), nullptr);
+    ASSERT_NE(registry.ctx<double>(), nullptr);
+
+    registry.unset<int>();
+    registry.unset<double>();
+
+    ASSERT_NE(registry.ctx<char>(), nullptr);
+    ASSERT_EQ(registry.ctx<int>(), nullptr);
+    ASSERT_EQ(registry.ctx<double>(), nullptr);
+
     registry.set<char>('c');
-    registry.set<int>(0);
-    registry.set<double>(1.);
     registry.set<int>(42);
+    registry.set<double>(1.);
 
     ASSERT_EQ(*registry.ctx<char>(), 'c');
     ASSERT_NE(registry.ctx<char>(), nullptr);

@@ -1618,6 +1618,27 @@ public:
     }
 
     /**
+     * @brief Unsets a context variable if it exists.
+     * @tparam Type Type of object to set.
+     */
+    template<typename Type>
+    void unset() {
+        const auto ctype = runtime_type<Type, context_family>();
+
+        if constexpr(is_named_type_v<Type>) {
+            for(auto &&wrapper: vars) {
+                if(wrapper && wrapper->runtime_type == ctype) {
+                    wrapper.reset();
+                }
+            }
+        } else {
+            if(ctype < vars.size()) {
+                vars[ctype].reset();
+            }
+        }
+    }
+
+    /**
      * @brief Returns a pointer to an object in the context of the registry.
      * @tparam Type Type of object to get.
      * @return A pointer to the object if it exists in the context of the

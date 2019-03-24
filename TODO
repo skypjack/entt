@@ -22,4 +22,3 @@
 * add take functionality, eg registry.take(entity, other); where it takes the entity and all its components from registry and move them to other
 * add entity function to views/groups (component -> owner, see sparse sets)
 * what about paged pools? vector of fixed-size blocks
-* add unset for context variables

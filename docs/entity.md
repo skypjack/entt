@@ -829,10 +829,12 @@ const bool null = (entity == entt::null);
 ## Context variables
 
 It is often convenient to assign context variables to a registry, so as to make
-it the only source of truth of an application.<br/>
-This is possible through two member functions named `set` and `ctx`. The former
-is used to create a context variable from a given type, the latter to get the
-newly created instance later on:
+it the only _source of truth_ of an application.<br/>
+This is possible by means of a member function named `set` to use to create a
+context variable from a given type. Later on, `get` can be used to retrieve the
+newly created instance and `unset` is there to literally reset it if needed.
+
+Example of use:
 
 ```cpp
 // creates a new context variable initialized with the given values
@@ -841,6 +843,9 @@ registry.set<my_type>(42, 'c');
 if(auto *var = registry.ctx<my_type>(); var) {
     // uses the context variable associated with a registry, if any
 }
+
+// unsets the context variable
+registry.unset<my_type>();
 ```
 
 The type of a context variable must be such that it's default constructible and
