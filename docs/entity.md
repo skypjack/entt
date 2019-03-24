@@ -99,8 +99,8 @@ many others besides me.
 directly access all the instances of a given component type `T`.<br/>
 This was a guideline and a design decision that influenced many choices, for
 better and for worse. I cannot say whether it will be useful or not to the
-reader, but it's worth to mention it, because it's of the corner stones of this
-library.
+reader, but it's worth to mention it, because it's one of the corner stones of
+this library.
 
 Many of the tools described below, from the registry to the views and up to the
 groups give the possibility to get this information and have been designed
