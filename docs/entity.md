@@ -831,7 +831,7 @@ const bool null = (entity == entt::null);
 It is often convenient to assign context variables to a registry, so as to make
 it the only _source of truth_ of an application.<br/>
 This is possible by means of a member function named `set` to use to create a
-context variable from a given type. Later on, `get` can be used to retrieve the
+context variable from a given type. Later on, `ctx` can be used to retrieve the
 newly created instance and `unset` is there to literally reset it if needed.
 
 Example of use:
