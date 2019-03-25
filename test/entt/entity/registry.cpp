@@ -55,8 +55,9 @@ TEST(Registry, Context) {
     ASSERT_EQ(registry.try_ctx<double>(), nullptr);
 
     registry.set<char>('c');
-    registry.set<int>(42);
+    registry.set<int>(0);
     registry.set<double>(1.);
+    registry.set<int>(42);
 
     ASSERT_EQ(registry.ctx<char>(), 'c');
     ASSERT_NE(registry.try_ctx<char>(), nullptr);
