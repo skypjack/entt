@@ -1645,7 +1645,7 @@ public:
      * registry, a null pointer otherwise.
      */
     template<typename Type>
-    const Type * ctx() const ENTT_NOEXCEPT {
+    const Type * try_ctx() const ENTT_NOEXCEPT {
         const auto ctype = runtime_type<Type, context_family>();
 
         if constexpr(is_named_type_v<Type>) {
@@ -1660,10 +1660,35 @@ public:
         }
     }
 
+    /*! @copydoc try_ctx */
+    template<typename Type>
+    inline Type * try_ctx() ENTT_NOEXCEPT {
+        return const_cast<Type *>(std::as_const(*this).template try_ctx<Type>());
+    }
+
+    /**
+     * @brief Returns a reference to an object in the context of the registry.
+     *
+     * @warning
+     * Attempting to get a context variable that doesn't exist results in
+     * undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid requests.
+     *
+     * @tparam Type Type of object to get.
+     * @return A valid reference to the object in the context of the registry.
+     */
+    template<typename Type>
+    const Type & ctx() const ENTT_NOEXCEPT {
+        const auto *instance = try_ctx<Type>();
+        assert(instance);
+        return *instance;
+    }
+
     /*! @copydoc ctx */
     template<typename Type>
-    Type * ctx() ENTT_NOEXCEPT {
-        return const_cast<Type *>(std::as_const(*this).template ctx<Type>());
+    inline Type & ctx() ENTT_NOEXCEPT {
+        return const_cast<Type &>(std::as_const(*this).template ctx<Type>());
     }
 
 private:

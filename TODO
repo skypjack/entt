@@ -20,5 +20,5 @@
   - each components only return actual component, so shared components are returned only once
 * types defined at runtime that refer to the same compile-time type (but to different pools) are possible, the library is almost there
 * add take functionality, eg registry.take(entity, other); where it takes the entity and all its components from registry and move them to other
+* what about paged pools? vector of fixed-size blocks (ease shared components, multi-ownership, etc).
 * add entity function to views/groups (component -> owner, see sparse sets)
-* what about paged pools? vector of fixed-size blocks

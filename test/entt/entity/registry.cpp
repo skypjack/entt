@@ -35,42 +35,45 @@ struct listener {
 TEST(Registry, Context) {
     entt::registry registry;
 
-    ASSERT_EQ(registry.ctx<char>(), nullptr);
-    ASSERT_EQ(registry.ctx<int>(), nullptr);
-    ASSERT_EQ(registry.ctx<double>(), nullptr);
+    ASSERT_EQ(registry.try_ctx<char>(), nullptr);
+    ASSERT_EQ(registry.try_ctx<int>(), nullptr);
+    ASSERT_EQ(registry.try_ctx<double>(), nullptr);
 
     registry.set<char>();
     registry.set<int>();
     registry.set<double>();
 
-    ASSERT_NE(registry.ctx<char>(), nullptr);
-    ASSERT_NE(registry.ctx<int>(), nullptr);
-    ASSERT_NE(registry.ctx<double>(), nullptr);
+    ASSERT_NE(registry.try_ctx<char>(), nullptr);
+    ASSERT_NE(registry.try_ctx<int>(), nullptr);
+    ASSERT_NE(registry.try_ctx<double>(), nullptr);
 
     registry.unset<int>();
     registry.unset<double>();
 
-    ASSERT_NE(registry.ctx<char>(), nullptr);
-    ASSERT_EQ(registry.ctx<int>(), nullptr);
-    ASSERT_EQ(registry.ctx<double>(), nullptr);
+    ASSERT_NE(registry.try_ctx<char>(), nullptr);
+    ASSERT_EQ(registry.try_ctx<int>(), nullptr);
+    ASSERT_EQ(registry.try_ctx<double>(), nullptr);
 
     registry.set<char>('c');
     registry.set<int>(42);
     registry.set<double>(1.);
 
-    ASSERT_EQ(*registry.ctx<char>(), 'c');
-    ASSERT_NE(registry.ctx<char>(), nullptr);
+    ASSERT_EQ(registry.ctx<char>(), 'c');
+    ASSERT_NE(registry.try_ctx<char>(), nullptr);
+    ASSERT_EQ(registry.try_ctx<char>(), &registry.ctx<char>());
     ASSERT_EQ(registry.ctx<char>(), std::as_const(registry).ctx<char>());
 
-    ASSERT_EQ(*registry.ctx<int>(), 42);
-    ASSERT_NE(registry.ctx<int>(), nullptr);
+    ASSERT_EQ(registry.ctx<int>(), 42);
+    ASSERT_NE(registry.try_ctx<int>(), nullptr);
+    ASSERT_EQ(registry.try_ctx<int>(), &registry.ctx<int>());
     ASSERT_EQ(registry.ctx<int>(), std::as_const(registry).ctx<int>());
 
-    ASSERT_EQ(*registry.ctx<double>(), 1.);
-    ASSERT_NE(registry.ctx<double>(), nullptr);
+    ASSERT_EQ(registry.ctx<double>(), 1.);
+    ASSERT_NE(registry.try_ctx<double>(), nullptr);
+    ASSERT_EQ(registry.try_ctx<double>(), &registry.ctx<double>());
     ASSERT_EQ(registry.ctx<double>(), std::as_const(registry).ctx<double>());
 
-    ASSERT_EQ(registry.ctx<float>(), nullptr);
+    ASSERT_EQ(registry.try_ctx<float>(), nullptr);
 }
 
 TEST(Registry, Types) {

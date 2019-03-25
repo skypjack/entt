@@ -831,8 +831,9 @@ const bool null = (entity == entt::null);
 It is often convenient to assign context variables to a registry, so as to make
 it the only _source of truth_ of an application.<br/>
 This is possible by means of a member function named `set` to use to create a
-context variable from a given type. Later on, `ctx` can be used to retrieve the
-newly created instance and `unset` is there to literally reset it if needed.
+context variable from a given type. Later on, either `ctx` or `try_ctx` can be
+used to retrieve the newly created instance and `unset` is there to literally
+reset it if needed.
 
 Example of use:
 
@@ -840,7 +841,11 @@ Example of use:
 // creates a new context variable initialized with the given values
 registry.set<my_type>(42, 'c');
 
-if(auto *var = registry.ctx<my_type>(); var) {
+// gets the context variable
+const auto &var = registry.ctx<my_type>();
+
+// if in doubts, probe the registry to avoid assertions in case of errors
+if(auto *ptr = registry.try_ctx<my_type>(); var) {
     // uses the context variable associated with a registry, if any
 }
 
@@ -850,9 +855,10 @@ registry.unset<my_type>();
 
 The type of a context variable must be such that it's default constructible and
 can be moved. The `set` member function either creates a new instance of the
-context variable or overwrites an already existing one if any. The `ctx` member
-function returns a pointer to the context variable if it exists, otherwise it
-returns a null pointer. This fits well with the `if` statement with initializer.
+context variable or overwrites an already existing one if any. The `try_ctx`
+member function returns a pointer to the context variable if it exists,
+otherwise it returns a null pointer. This fits well with the `if` statement with
+initializer.
 
 # Views and Groups
 
