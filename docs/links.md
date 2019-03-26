@@ -43,7 +43,7 @@ a reference:
   * [NovusCore](https://github.com/novuscore/NovusCore): A modern take on World
     of Warcraft emulation.
 
-* Articles
+* Articles and blog posts
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
     [blog](https://skypjack.github.io/) are about `EnTT`, for those who want to
     know **more** on this project.
@@ -55,6 +55,8 @@ a reference:
     interesting article about `UE4` and `EnTT`.
   * [Implementing ECS architecture in UE4](https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1449913-implementing-ecs-architecture-in-ue4-giant-space-battle):
     giant space battle.
+  * [Conan Adventures (SFML and EnTT in C++)](https://leinnan.github.io/blog/conan-adventuressfml-and-entt-in-c.html):
+    create projects in modern C++ using `SFML`, `EnTT`, `Conan` and `CMake`.
 
 * Any Other Business:
   * [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt): port of
