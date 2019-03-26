@@ -30,14 +30,6 @@ struct named_type_traits<const Type>
 
 
 /**
- * @brief Helper type.
- * @tparam Type Potentially named type.
- */
-template<typename Type>
-using named_type_traits_t = typename named_type_traits<Type>::type;
-
-
-/**
  * @brief Provides the member constant `value` to true if a given type has a
  * name. In all other cases, `value` is false.
  */
@@ -51,7 +43,7 @@ struct is_named_type: std::false_type {};
  * @tparam Type Potentially named type.
  */
 template<typename Type>
-struct is_named_type<Type, std::void_t<named_type_traits_t<std::decay_t<Type>>>>: std::true_type {};
+struct is_named_type<Type, std::enable_if_t<std::is_same_v<decltype(named_type_traits<std::decay_t<Type>>::value), ENTT_ID_TYPE>>> {};
 
 
 /**
@@ -86,7 +78,9 @@ constexpr auto is_named_type_v = is_named_type<Type>::value;
     template<>\
     struct entt::named_type_traits<type>\
         : std::integral_constant<typename entt::hashed_string::hash_type, entt::hashed_string::to_value(#type)>\
-    {};
+    {\
+        static_assert(std::is_same_v<std::decay_t<type>, type>);\
+    };
 
 
 /**
