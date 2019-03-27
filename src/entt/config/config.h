@@ -39,4 +39,9 @@ using maybe_atomic_t = Type;
 #endif // ENTT_ENTITY_TYPE
 
 
+#ifndef ENTT_PAGE_SIZE
+#define ENTT_PAGE_SIZE 32768
+#endif
+
+
 #endif // ENTT_CONFIG_CONFIG_H

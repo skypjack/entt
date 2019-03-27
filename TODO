@@ -21,8 +21,7 @@
 * types defined at runtime that refer to the same compile-time type (but to different pools) are possible, the library is almost there
 * add take functionality, eg registry.take(entity, other); where it takes the entity and all its components from registry and move them to other
 * add entity function to views/groups (component -> owner, see sparse sets)
-
-* what about paged pools? vector of fixed-size blocks (ease shared components, multi-ownership, etc).
-  - still separate the three arrays, work with page size, not number of components, arrays don't have to have the same number of pages
-  - opaque input iterator that returns a proxy object (tuple of entity+references) and each can hide the underlying details about paging
-  - it can avoid [] most of the times, that annoying thing current it does and I dislike so much :-)
+* add opaque input iterators to views and groups that return tuples <entity, T &...> (proxy), multi-pass guaranteed
+* add fast lane for raw iterations, extend mt doc to describe allowed add/remove with pre-allocations on fast lanes
+* review sparse set to allow extrem customization (mix pack in the spec, base is position only)
+* paged reverse to reduce memory usage
