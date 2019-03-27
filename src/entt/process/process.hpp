@@ -30,12 +30,13 @@ namespace entt {
  *   update.
  *
  * * @code{.cpp}
- *   void init(void *);
+ *   void init();
  *   @endcode
  *
- *   It's invoked at the first tick, immediately before an update. The `void *`
- *   parameter is an opaque pointer to user data (if any) forwarded directly to
- *   the process during an update.
+ *   It's invoked when the process joins the running queue of a scheduler. This
+ *   happens as soon as it's attached to the scheduler if the process is a top
+ *   level one, otherwise when it replaces its parent if the process is a
+ *   continuation.
  *
  * * @code{.cpp}
  *   void succeeded();
@@ -84,9 +85,9 @@ class process {
     using state_value_t = std::integral_constant<state, value>;
 
     template<typename Target = Derived>
-    auto tick(int, state_value_t<state::UNINITIALIZED>, void *data)
-    -> decltype(std::declval<Target>().init(data)) {
-        static_cast<Target *>(this)->init(data);
+    auto tick(int, state_value_t<state::UNINITIALIZED>)
+    -> decltype(std::declval<Target>().init()) {
+        static_cast<Target *>(this)->init();
     }
 
     template<typename Target = Derived>
@@ -232,11 +233,12 @@ public:
     void tick(const Delta delta, void *data = nullptr) {
         switch (current) {
         case state::UNINITIALIZED:
-            tick(0, state_value_t<state::UNINITIALIZED>{}, data);
+            tick(0, state_value_t<state::UNINITIALIZED>{});
             current = state::RUNNING;
-            [[fallthrough]];
+            break;
         case state::RUNNING:
             tick(0, state_value_t<state::RUNNING>{}, delta, data);
+            break;
         default:
             // suppress warnings
             break;

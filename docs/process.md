@@ -40,11 +40,12 @@ class wants to _override_ the default behavior):
   least define it to work properly. The `void *` parameter is an opaque pointer
   to user data (if any) forwarded directly to the process during an update.
 
-* `void init(void *);`
+* `void init();`
 
-  It's invoked at the first tick, immediately before an update. The `void *`
-  parameter is an opaque pointer to user data (if any) forwarded directly to the
-  process during an update.
+  It's invoked when the process joins the running queue of a scheduler. This
+  happens as soon as it's attached to the scheduler if the process is a top
+  level one, otherwise when it replaces its parent if the process is a
+  continuation.
 
 * `void succeeded();`
 
@@ -74,7 +75,7 @@ struct my_process: entt::process<my_process, std::uint32_t> {
     using delta_type = std::uint32_t;
 
     void update(delta_type delta, void *) {
-        remaining = delta > remaining ? delta_type{] : (remaining - delta);
+        remaining -= std::min(remaining, delta);
 
         // ...
 
@@ -83,12 +84,8 @@ struct my_process: entt::process<my_process, std::uint32_t> {
         }
     }
 
-    void init(void *data) {
-        remaining = *static_cast<delta_type *>(data);
-    }
-
 private:
-    delta_type remaining;
+    delta_type remaining{1000u};
 };
 ```
 
@@ -127,11 +124,11 @@ cycles.
 
 Each process is invoked once per tick. If it terminates, it's removed
 automatically from the scheduler and it's never invoked again. Otherwise it's
-a good candidate to run once more the next tick.<br/>
-A process can also have a child. In this case, the process is replaced with
-its child when it terminates if it returns with success. In case of errors,
-both the process and its child are discarded. This way, it's easy to create
-chain of processes to run sequentially.
+a good candidate to run one more time the next tick.<br/>
+A process can also have a child. In this case, the parent process is replaced
+with its child when it terminates and only if it returns with success. In case
+of errors, both the parent process and its child are discarded. This way, it's
+easy to create chain of processes to run sequentially.
 
 Using a scheduler is straightforward. To create it, users must provide only the
 type for the elapsed times and no arguments at all:
@@ -188,8 +185,8 @@ scheduler.attach([](auto delta, void *, auto succeed, auto fail) {
 .then<my_process>();
 ```
 
-To update a scheduler and thus all its processes, the `update` member function
-is the way to go:
+To update a scheduler and therefore all its processes, the `update` member
+function is the way to go:
 
 ```cpp
 // updates all the processes, no user data are provided

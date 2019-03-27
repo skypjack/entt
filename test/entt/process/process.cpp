@@ -10,7 +10,7 @@ struct fake_process: entt::process<fake_process, int> {
     void pause() noexcept { process_type::pause(); }
     void unpause() noexcept { process_type::unpause(); }
 
-    void init(void *) { init_invoked = true; }
+    void init() { init_invoked = true; }
     void succeeded() { succeeded_invoked = true; }
     void failed() { failed_invoked = true; }
     void aborted() { aborted_invoked = true; }
@@ -70,6 +70,7 @@ TEST(Process, Succeeded) {
     fake_process process;
 
     process.tick(0);
+    process.tick(0);
     process.succeed();
     process.tick(0);
 
@@ -87,6 +88,7 @@ TEST(Process, Succeeded) {
 TEST(Process, Fail) {
     fake_process process;
 
+    process.tick(0);
     process.tick(0);
     process.fail();
     process.tick(0);
@@ -106,6 +108,7 @@ TEST(Process, Data) {
     fake_process process;
     int value = 0;
 
+    process.tick(0);
     process.tick(0, &value);
     process.succeed();
     process.tick(0, &value);
@@ -134,7 +137,7 @@ TEST(Process, AbortNextTick) {
     ASSERT_FALSE(process.paused());
 
     ASSERT_TRUE(process.init_invoked);
-    ASSERT_TRUE(process.update_invoked);
+    ASSERT_FALSE(process.update_invoked);
     ASSERT_FALSE(process.succeeded_invoked);
     ASSERT_FALSE(process.failed_invoked);
     ASSERT_TRUE(process.aborted_invoked);
@@ -151,7 +154,7 @@ TEST(Process, AbortImmediately) {
     ASSERT_FALSE(process.paused());
 
     ASSERT_TRUE(process.init_invoked);
-    ASSERT_TRUE(process.update_invoked);
+    ASSERT_FALSE(process.update_invoked);
     ASSERT_FALSE(process.succeeded_invoked);
     ASSERT_FALSE(process.failed_invoked);
     ASSERT_TRUE(process.aborted_invoked);
@@ -167,6 +170,7 @@ TEST(ProcessAdaptor, Resolved) {
 
     auto process = entt::process_adaptor<decltype(lambda), std::uint64_t>{lambda};
 
+    process.tick(0);
     process.tick(0);
 
     ASSERT_TRUE(process.dead());
@@ -184,6 +188,7 @@ TEST(ProcessAdaptor, Rejected) {
     auto process = entt::process_adaptor<decltype(lambda), std::uint64_t>{lambda};
 
     process.tick(0);
+    process.tick(0);
 
     ASSERT_TRUE(process.rejected());
     ASSERT_TRUE(updated);
@@ -199,6 +204,7 @@ TEST(ProcessAdaptor, Data) {
 
     auto process = entt::process_adaptor<decltype(lambda), std::uint64_t>{lambda};
 
+    process.tick(0);
     process.tick(0, &value);
 
     ASSERT_TRUE(process.dead());
