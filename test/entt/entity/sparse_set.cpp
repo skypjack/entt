@@ -2,8 +2,10 @@
 #include <iterator>
 #include <exception>
 #include <algorithm>
+#include <type_traits>
 #include <unordered_set>
 #include <gtest/gtest.h>
+#include <entt/core/type_traits.hpp>
 #include <entt/entity/sparse_set.hpp>
 
 struct empty_type {};
@@ -45,20 +47,56 @@ TEST(SparseSetNoType, Functionalities) {
 
     set.construct(42);
 
+    ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.get(42), 0u);
 
-    set.reset();
+    ASSERT_TRUE(std::is_move_constructible_v<decltype(set)>);
+    ASSERT_TRUE(std::is_move_assignable_v<decltype(set)>);
+
+    entt::sparse_set<std::uint64_t> cpy{set};
+    set = cpy;
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_FALSE(cpy.empty());
+    ASSERT_EQ(set.get(42), 0u);
+    ASSERT_EQ(cpy.get(42), 0u);
+
+    entt::sparse_set<std::uint64_t> other{std::move(set)};
+
+    set = std::move(other);
+    other = std::move(set);
 
     ASSERT_TRUE(set.empty());
-    ASSERT_EQ(set.size(), 0u);
-    ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
-    ASSERT_EQ(set.begin(), set.end());
-    ASSERT_FALSE(set.has(0));
-    ASSERT_FALSE(set.has(42));
+    ASSERT_FALSE(other.empty());
+    ASSERT_EQ(other.get(42), 0u);
 
-    (void)entt::sparse_set<std::uint64_t>{std::move(set)};
-    entt::sparse_set<std::uint64_t> other;
-    other = std::move(set);
+    other.reset();
+
+    ASSERT_TRUE(other.empty());
+    ASSERT_EQ(other.size(), 0u);
+    ASSERT_EQ(std::as_const(other).begin(), std::as_const(other).end());
+    ASSERT_EQ(other.begin(), other.end());
+    ASSERT_FALSE(other.has(0));
+    ASSERT_FALSE(other.has(42));
+}
+
+TEST(SparseSetNoType, Pagination) {
+    entt::sparse_set<std::uint64_t> set;
+    constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(std::uint64_t);
+
+    ASSERT_EQ(set.extent(), 0u);
+
+    set.construct(entt_per_page-1);
+
+    ASSERT_EQ(set.extent(), entt_per_page);
+    ASSERT_TRUE(set.has(entt_per_page-1));
+
+    set.construct(entt_per_page);
+
+    ASSERT_EQ(set.extent(), 2 * entt_per_page);
+    ASSERT_TRUE(set.has(entt_per_page-1));
+    ASSERT_TRUE(set.has(entt_per_page));
+    ASSERT_FALSE(set.has(entt_per_page+1));
 }
 
 TEST(SparseSetNoType, BatchAdd) {
@@ -69,7 +107,7 @@ TEST(SparseSetNoType, BatchAdd) {
     entities[1] = 42;
 
     set.construct(12);
-    set.batch(std::begin(entities), std::end(entities), 43);
+    set.batch(std::begin(entities), std::end(entities));
     set.construct(24);
 
     ASSERT_TRUE(set.has(entities[0]));
@@ -481,7 +519,7 @@ TEST(SparseSetWithType, BatchAdd) {
 
     set.reserve(4);
     set.construct(12, 21);
-    auto *component = set.batch(std::begin(entities), std::end(entities), 43);
+    auto *component = set.batch(std::begin(entities), std::end(entities));
     set.construct(24, 42);
 
     ASSERT_TRUE(set.has(entities[0]));
@@ -514,7 +552,7 @@ TEST(SparseSetWithType, BatchAddEmptyType) {
 
     set.reserve(4);
     set.construct(12);
-    auto *component = set.batch(std::begin(entities), std::end(entities), 43);
+    auto *component = set.batch(std::begin(entities), std::end(entities));
     set.construct(24);
 
     ASSERT_TRUE(set.has(entities[0]));

@@ -65,19 +65,6 @@ template<class Type>
 constexpr auto is_named_type_v = is_named_type<Type>::value;
 
 
-/**
- * @brief Helper variable template.
- *
- * `ENTT_PAGE_SIZE` if it's a power of two, a compilation error otherwise.
- */
-constexpr auto page_size_v = []() constexpr {
-    constexpr auto size = ENTT_PAGE_SIZE;
-    // compile-time assertion if page size isn't a power of two
-    static_assert(size && ((size & (size - 1)) == 0));
-    return size;
-}();
-
-
 }
 
 

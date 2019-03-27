@@ -74,8 +74,8 @@ class basic_registry {
         }
 
         template<typename It>
-        Component * batch(It first, It last, typename sparse_set<Entity>::size_type hint) {
-            auto *component = sparse_set<Entity, Component>::batch(first, last, hint);
+        Component * batch(It first, It last) {
+            auto *component = sparse_set<Entity, Component>::batch(first, last);
 
             if(!construction.empty()) {
                 std::for_each(first, last, [this](const auto entt) {
@@ -613,8 +613,7 @@ public:
         });
 
         if constexpr(sizeof...(Component) > 0) {
-            const auto hint = size_type(std::max(candidate, *(last-1)))+1;
-            return { assure<Component>()->batch(first, last, hint)... };
+            return { assure<Component>()->batch(first, last)... };
         }
     }
 

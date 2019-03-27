@@ -61,6 +61,9 @@ template<typename Entity>
 class sparse_set<Entity> {
     using traits_type = entt_traits<Entity>;
 
+    static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0));
+    static constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(typename entt_traits<Entity>::entity_type);
+
     class iterator {
         friend class sparse_set<Entity>;
 
@@ -162,6 +165,23 @@ class sparse_set<Entity> {
         index_type index;
     };
 
+    void assure(std::size_t page) {
+        if(!(page < reverse.size())) {
+            reverse.resize(page+1);
+        }
+
+        if(!reverse[page]) {
+            reverse[page] = std::make_unique<entity_type[]>(entt_per_page);
+            // null is safe in all cases for our purposes
+            std::fill_n(reverse[page].get(), entt_per_page, null);
+        }
+    }
+
+    auto index(Entity entt) const ENTT_NOEXCEPT {
+        const auto identifier = entt & traits_type::entity_mask;
+        return std::make_pair(size_type(identifier / entt_per_page), size_type(identifier & (entt_per_page - 1)));
+    }
+
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -170,8 +190,47 @@ public:
     /*! @brief Input iterator type. */
     using iterator_type = iterator;
 
+    /*! @brief Default constructor. */
+    sparse_set() = default;
+
+    /**
+     * @brief Copy constructor.
+     * @param other The instance to copy from.
+     */
+    sparse_set(const sparse_set &other)
+        : reverse(),
+          direct{other.direct}
+    {
+        for(size_type i = {}, last = other.reverse.size(); i < last; ++i) {
+            if(other.reverse[i]) {
+                assure(i);
+                std::copy_n(other.reverse[i].get(), entt_per_page, reverse[i].get());
+            }
+        }
+    }
+
+    /*! @brief Default move constructor. */
+    sparse_set(sparse_set &&) = default;
+
     /*! @brief Default destructor. */
     virtual ~sparse_set() ENTT_NOEXCEPT = default;
+
+    /*! @brief Default move assignment operator. @return This sparse set. */
+    sparse_set & operator=(sparse_set &&) = default;
+
+    /**
+     * @brief Copy assignment operator.
+     * @param other The instance to copy from.
+     * @return This sparse set.
+     */
+    sparse_set & operator=(const sparse_set &other) {
+        if(&other != this) {
+            auto tmp{other};
+            *this = std::move(tmp);
+        }
+
+        return *this;
+    }
 
     /**
      * @brief Increases the capacity of a sparse set.
@@ -205,7 +264,7 @@ public:
      * @return Extent of the sparse set.
      */
     size_type extent() const ENTT_NOEXCEPT {
-        return reverse.size();
+        return reverse.size() * entt_per_page;
     }
 
     /**
@@ -299,9 +358,9 @@ public:
      * @return True if the sparse set contains the entity, false otherwise.
      */
     bool has(const entity_type entt) const ENTT_NOEXCEPT {
-        const auto pos = size_type(entt & traits_type::entity_mask);
+        auto [page, offset] = index(entt);
         // testing against null permits to avoid accessing the direct vector
-        return (pos < reverse.size()) && (reverse[pos] != null);
+        return (page < reverse.size() && reverse[page] && reverse[page][offset] != null);
     }
 
     /**
@@ -322,10 +381,10 @@ public:
      * @return True if the sparse set contains the entity, false otherwise.
      */
     bool unsafe_has(const entity_type entt) const ENTT_NOEXCEPT {
-        const auto pos = size_type(entt & traits_type::entity_mask);
-        assert(pos < reverse.size());
+        auto [page, offset] = index(entt);
+        assert(page < reverse.size());
         // testing against null permits to avoid accessing the direct vector
-        return (reverse[pos] != null);
+        return (reverse[page] && reverse[page][offset] != null);
     }
 
     /**
@@ -342,8 +401,8 @@ public:
      */
     size_type get(const entity_type entt) const ENTT_NOEXCEPT {
         assert(has(entt));
-        const auto pos = size_type(entt & traits_type::entity_mask);
-        return size_type(reverse[pos]);
+        auto [page, offset] = index(entt);
+        return size_type(reverse[page][offset]);
     }
 
     /**
@@ -359,23 +418,14 @@ public:
      */
     void construct(const entity_type entt) {
         assert(!has(entt));
-        const auto pos = size_type(entt & traits_type::entity_mask);
-
-        if(!(pos < reverse.size())) {
-            // null is safe in all cases for our purposes
-            reverse.resize(pos+1, null);
-        }
-
-        reverse[pos] = entity_type(direct.size());
+        auto [page, offset] = index(entt);
+        assure(page);
+        reverse[page][offset] = entity_type(direct.size());
         direct.push_back(entt);
     }
 
     /**
      * @brief Assigns one or more entities to a sparse set.
-     *
-     * This function requires to use a hint value for performance purposes.<br/>
-     * Its value indicates the size necessary to accommodate the largest entity
-     * if used as an index of a hypothetical array.
      *
      * @warning
      * Attempting to assign an entity that already belongs to the sparse set
@@ -386,20 +436,14 @@ public:
      * @tparam It Type of forward iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param hint Hint value to avoid searching for the largest entity.
      */
     template<typename It>
-    void batch(It first, It last, size_type hint) {
-        if(hint > reverse.size()) {
-            // null is safe in all cases for our purposes
-            reverse.resize(hint, null);
-        }
-
+    void batch(It first, It last) {
         std::for_each(first, last, [next = entity_type(direct.size()), this](const auto entt) mutable {
             assert(!has(entt));
-            const auto pos = size_type(entt & traits_type::entity_mask);
-            assert(pos < reverse.size());
-            reverse[pos] = next++;
+            auto [page, offset] = index(entt);
+            assure(page);
+            reverse[page][offset] = next++;
         });
 
         direct.insert(direct.end(), first, last);
@@ -418,12 +462,11 @@ public:
      */
     virtual void destroy(const entity_type entt) {
         assert(has(entt));
-        const auto back = direct.back();
-        auto &candidate = reverse[size_type(entt & traits_type::entity_mask)];
-        // swapping isn't required here, we are getting rid of the last element
-        reverse[back & traits_type::entity_mask] = candidate;
-        direct[size_type(candidate)] = back;
-        candidate = null;
+        auto [from_page, from_offset] = index(entt);
+        auto [to_page, to_offset] = index(direct.back());
+        std::swap(direct[size_type(reverse[from_page][from_offset])], direct.back());
+        std::swap(reverse[from_page][from_offset], reverse[to_page][to_offset]);
+        reverse[from_page][from_offset] = null;
         direct.pop_back();
     }
 
@@ -445,10 +488,10 @@ public:
     void swap(const size_type lhs, const size_type rhs) ENTT_NOEXCEPT {
         assert(lhs < direct.size());
         assert(rhs < direct.size());
-        auto &src = direct[lhs];
-        auto &dst = direct[rhs];
-        std::swap(reverse[src & traits_type::entity_mask], reverse[dst & traits_type::entity_mask]);
-        std::swap(src, dst);
+        auto [src_page, src_offset] = index(direct[lhs]);
+        auto [dst_page, dst_offset] = index(direct[rhs]);
+        std::swap(reverse[src_page][src_offset], reverse[dst_page][dst_offset]);
+        std::swap(direct[lhs], direct[rhs]);
     }
 
     /**
@@ -510,7 +553,7 @@ public:
     }
 
 private:
-    std::vector<entity_type> reverse;
+    std::vector<std::unique_ptr<entity_type[]>> reverse;
     std::vector<entity_type> direct;
 };
 
@@ -983,11 +1026,6 @@ public:
      * @brief Assigns one or more entities to a sparse set and constructs their
      * objects.
      *
-     * This function requires to use a hint value for performance purposes.<br/>
-     * Its value indicates the size necessary to accommodate the largest entity
-     * if used as an index of a hypothetical array.
-     *
-     * @note
      * The object type must be at least default constructible.
      *
      * @note
@@ -1004,22 +1042,21 @@ public:
      * @tparam It Type of forward iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param hint Hint value to avoid searching for the largest entity.
      * @return A pointer to the array of instances just created and sorted the
      * same of the entities.
      */
     template<typename It>
-    object_type * batch(It first, It last, const size_type hint) {
+    object_type * batch(It first, It last) {
         if constexpr(std::is_empty_v<object_type>) {
-            underlying_type::batch(first, last, hint);
+            underlying_type::batch(first, last);
             return &instances;
         } else {
             static_assert(std::is_default_constructible_v<object_type>);
-            const auto offset = instances.size();
+            const auto skip = instances.size();
             instances.insert(instances.end(), last-first, {});
             // entity goes after component in case constructor throws
-            underlying_type::batch(first, last, hint);
-            return instances.data() + offset;
+            underlying_type::batch(first, last);
+            return instances.data() + skip;
         }
     }
 
@@ -1036,10 +1073,7 @@ public:
      */
     void destroy(const entity_type entt) override {
         if constexpr(!std::is_empty_v<object_type>) {
-            // swapping isn't required here, we are getting rid of the last element
-            // however, we must protect ourselves from self assignments (see #37)
-            auto tmp = std::move(instances.back());
-            instances[underlying_type::get(entt)] = std::move(tmp);
+            std::swap(instances[underlying_type::get(entt)], instances.back());
             instances.pop_back();
         }
 
