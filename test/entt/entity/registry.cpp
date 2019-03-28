@@ -188,11 +188,8 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.current(e2), entt::registry::version_type{1});
 
     ASSERT_TRUE(registry.valid(e0));
-    ASSERT_TRUE(registry.unsafe_valid(e0));
     ASSERT_TRUE(registry.valid(e1));
-    ASSERT_TRUE(registry.unsafe_valid(e1));
     ASSERT_FALSE(registry.valid(e2));
-    ASSERT_FALSE(registry.unsafe_valid(e2));
 
     ASSERT_EQ(registry.size(), entt::registry::size_type{3});
     ASSERT_EQ(registry.alive(), entt::registry::size_type{2});

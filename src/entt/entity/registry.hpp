@@ -449,29 +449,6 @@ public:
     }
 
     /**
-     * @brief Checks if an entity identifier refers to a valid entity (unsafe).
-     *
-     * Alternative version of `valid`. It accesses the internal data structures
-     * without bounds checking and thus it's both unsafe and risky to use.<br/>
-     * You should not invoke directly this function unless you know exactly what
-     * you are doing. Prefer the `valid` member function instead.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the registry can
-     * result in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * bounds violation.
-     *
-     * @param entity A valid entity identifier.
-     * @return True if the identifier is valid, false otherwise.
-     */
-    bool unsafe_valid(const entity_type entity) const ENTT_NOEXCEPT {
-        const auto pos = size_type(entity & traits_type::entity_mask);
-        assert(pos < entities.size());
-        return (entities[pos] == entity);
-    }
-
-    /**
      * @brief Returns the entity identifier without the version.
      * @param entity An entity identifier, either valid or not.
      * @return The entity identifier without the version.

@@ -97,7 +97,7 @@ class basic_view {
             const auto sz = size_type(entt& traits_type::entity_mask);
 
             return sz < extent && std::all_of(unchecked.cbegin(), unchecked.cend(), [entt](const sparse_set<Entity> *view) {
-                return view->unsafe_has(entt);
+                return view->has(entt);
             });
         }
 
