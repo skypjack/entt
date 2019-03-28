@@ -6,7 +6,6 @@
 #include <array>
 #include <memory>
 #include <cstring>
-#include <cassert>
 #include <cstddef>
 #include <utility>
 #include <functional>
@@ -489,7 +488,7 @@ public:
      */
     template<typename Type>
     inline const Type & cast() const ENTT_NOEXCEPT {
-        assert(can_cast<Type>());
+        ENTT_ASSERT(can_cast<Type>());
         return *internal::try_cast<Type>(node, instance);
     }
 

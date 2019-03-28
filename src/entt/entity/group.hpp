@@ -2,7 +2,6 @@
 #define ENTT_ENTITY_GROUP_HPP
 
 
-#include <cassert>
 #include <tuple>
 #include <utility>
 #include <type_traits>
@@ -284,7 +283,7 @@ public:
     template<typename... Component>
     std::conditional_t<sizeof...(Component) == 1, std::tuple_element_t<0, std::tuple<Component &...>>, std::tuple<Component &...>>
     get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
-        assert(contains(entt));
+        ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Component) == 1) {
             return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
@@ -606,7 +605,7 @@ public:
     template<typename... Component>
     std::conditional_t<sizeof...(Component) == 1, std::tuple_element_t<0, std::tuple<Component &...>>, std::tuple<Component &...>>
     get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
-        assert(contains(entt));
+        ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Component) == 1) {
             return (std::get<pool_type<Component> *>(pools)->get(entt), ...);

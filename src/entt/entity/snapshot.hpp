@@ -5,7 +5,6 @@
 #include <array>
 #include <cstddef>
 #include <utility>
-#include <cassert>
 #include <iterator>
 #include <type_traits>
 #include <unordered_map>
@@ -198,7 +197,7 @@ class basic_snapshot_loader {
           force{fn}
     {
         // to restore a snapshot as a whole requires a clean registry
-        assert(!reg.capacity());
+        ENTT_ASSERT(!reg.capacity());
     }
 
     template<typename Archive>

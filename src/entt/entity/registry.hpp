@@ -7,7 +7,6 @@
 #include <memory>
 #include <utility>
 #include <cstddef>
-#include <cassert>
 #include <numeric>
 #include <iterator>
 #include <algorithm>
@@ -485,7 +484,7 @@ public:
      */
     version_type current(const entity_type entity) const ENTT_NOEXCEPT {
         const auto pos = size_type(entity & traits_type::entity_mask);
-        assert(pos < entities.size());
+        ENTT_ASSERT(pos < entities.size());
         return version_type(entities[pos] >> traits_type::entity_shift);
     }
 
@@ -526,7 +525,7 @@ public:
         } else {
             entity = entities.emplace_back(entity_type(entities.size()));
             // traits_type::entity_mask is reserved to allow for null identifiers
-            assert(entity < traits_type::entity_mask);
+            ENTT_ASSERT(entity < traits_type::entity_mask);
         }
 
         if constexpr(sizeof...(Component) == 0) {
@@ -617,7 +616,7 @@ public:
      * @param entity A valid entity identifier.
      */
     void destroy(const entity_type entity) {
-        assert(valid(entity));
+        ENTT_ASSERT(valid(entity));
 
         for(auto pos = pools.size(); pos; --pos) {
             auto &pdata = pools[pos-1];
@@ -628,7 +627,7 @@ public:
         };
 
         // just a way to protect users from listeners that attach components
-        assert(orphan(entity));
+        ENTT_ASSERT(orphan(entity));
         release(entity);
     }
 
@@ -640,7 +639,7 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
-        assert(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
 
         for(auto pos = pools.size(); pos; --pos) {
             auto &pdata = pools[pos-1];
@@ -655,7 +654,7 @@ public:
         };
 
         // just a way to protect users from listeners that attach components
-        assert(std::all_of(first, last, [this](const auto entity) { return orphan(entity); }));
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return orphan(entity); }));
 
         std::for_each(first, last, [this](const auto entity) {
             release(entity);
@@ -684,7 +683,7 @@ public:
      */
     template<typename Component, typename... Args>
     Component & assign(const entity_type entity, Args &&... args) {
-        assert(valid(entity));
+        ENTT_ASSERT(valid(entity));
         return assure<Component>()->construct(entity, std::forward<Args>(args)...);
     }
 
@@ -703,7 +702,7 @@ public:
      */
     template<typename Component>
     void remove(const entity_type entity) {
-        assert(valid(entity));
+        ENTT_ASSERT(valid(entity));
         pool<Component>()->destroy(entity);
     }
 
@@ -721,7 +720,7 @@ public:
      */
     template<typename... Component>
     bool has(const entity_type entity) const ENTT_NOEXCEPT {
-        assert(valid(entity));
+        ENTT_ASSERT(valid(entity));
         [[maybe_unused]] const auto cpools = std::make_tuple(pool<Component>()...);
         return ((std::get<const pool_type<Component> *>(cpools)
                  ? std::get<const pool_type<Component> *>(cpools)->has(entity)
@@ -744,7 +743,7 @@ public:
      */
     template<typename... Component>
     decltype(auto) get([[maybe_unused]] const entity_type entity) const ENTT_NOEXCEPT {
-        assert(valid(entity));
+        ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
             return (pool<Component>()->get(entity), ...);
@@ -789,7 +788,7 @@ public:
      */
     template<typename Component, typename... Args>
     Component & get_or_assign(const entity_type entity, Args &&... args) ENTT_NOEXCEPT {
-        assert(valid(entity));
+        ENTT_ASSERT(valid(entity));
         auto *cpool = assure<Component>();
         auto *comp = cpool->try_get(entity);
         return comp ? *comp : cpool->construct(entity, std::forward<Args>(args)...);
@@ -809,7 +808,7 @@ public:
      */
     template<typename... Component>
     auto try_get([[maybe_unused]] const entity_type entity) const ENTT_NOEXCEPT {
-        assert(valid(entity));
+        ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
             const auto cpools = std::make_tuple(pool<Component>()...);
@@ -1002,7 +1001,7 @@ public:
      */
     template<typename Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort sort = Sort{}, Args &&... args) {
-        assert(!owned<Component>());
+        ENTT_ASSERT(!owned<Component>());
         assure<Component>()->sort(std::move(compare), std::move(sort), std::forward<Args>(args)...);
     }
 
@@ -1045,7 +1044,7 @@ public:
      */
     template<typename To, typename From>
     void sort() {
-        assert(!owned<To>());
+        ENTT_ASSERT(!owned<To>());
         assure<To>()->respect(*assure<From>());
     }
 
@@ -1065,7 +1064,7 @@ public:
      */
     template<typename Component>
     void reset(const entity_type entity) {
-        assert(valid(entity));
+        ENTT_ASSERT(valid(entity));
         auto *cpool = assure<Component>();
 
         if(cpool->has(entity)) {
@@ -1162,7 +1161,7 @@ public:
      * @return True if the entity is an orphan, false otherwise.
      */
     bool orphan(const entity_type entity) const {
-        assert(valid(entity));
+        ENTT_ASSERT(valid(entity));
         bool orphan = true;
 
         for(std::size_t i = {}; i < pools.size() && orphan; ++i) {
@@ -1331,7 +1330,7 @@ public:
             });
 
             if(it == inner_groups.cend()) {
-                assert(!(owned<Owned>() || ...));
+                ENTT_ASSERT(!(owned<Owned>() || ...));
                 using group_type = owning_group<type_list<std::decay_t<Exclude>...>, type_list<std::decay_t<Get>...>, std::decay_t<Owned>...>;
                 auto &gdata = inner_groups.emplace_back();
 
@@ -1466,7 +1465,7 @@ public:
                 auto &curr = other.pools[pos-1];
                 curr.pool = pdata.pool->clone();
                 curr.runtime_type = pdata.runtime_type;
-                assert(curr.pool);
+                ENTT_ASSERT(curr.pool);
             }
         }
 
@@ -1657,7 +1656,7 @@ public:
     template<typename Type>
     const Type & ctx() const ENTT_NOEXCEPT {
         const auto *instance = try_ctx<Type>();
-        assert(instance);
+        ENTT_ASSERT(instance);
         return *instance;
     }
 

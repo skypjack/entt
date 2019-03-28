@@ -4,7 +4,6 @@
 
 #include <vector>
 #include <memory>
-#include <cassert>
 #include <utility>
 #include <algorithm>
 #include <type_traits>
@@ -59,7 +58,7 @@ class scheduler {
         continuation(process_handler *ref)
             : handler{ref}
         {
-            assert(handler);
+            ENTT_ASSERT(handler);
         }
 
         template<typename Proc, typename... Args>

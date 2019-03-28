@@ -12,19 +12,14 @@
 #endif // ENTT_HS_SUFFIX
 
 
-#ifndef ENTT_TAG_SUFFIX
-#define ENTT_TAG_SUFFIX _tag
-#endif // ENTT_TAG_SUFFIX
-
-
 #ifndef ENTT_NO_ATOMIC
 #include <atomic>
 template<typename Type>
 using maybe_atomic_t = std::atomic<Type>;
-#else // ENTT_USE_ATOMIC
+#else // ENTT_NO_ATOMIC
 template<typename Type>
 using maybe_atomic_t = Type;
-#endif // ENTT_USE_ATOMIC
+#endif // ENTT_NO_ATOMIC
 
 
 #ifndef ENTT_ID_TYPE
@@ -33,15 +28,17 @@ using maybe_atomic_t = Type;
 #endif // ENTT_ID_TYPE
 
 
-#ifndef ENTT_ENTITY_TYPE
-#include <cstdint>
-#define ENTT_ENTITY_TYPE std::uint32_t
-#endif // ENTT_ENTITY_TYPE
-
-
 #ifndef ENTT_PAGE_SIZE
 #define ENTT_PAGE_SIZE 32768
 #endif
+
+
+#ifndef ENTT_DISABLE_ASSERT
+#include <cassert>
+#define ENTT_ASSERT(condition) assert(condition)
+#else // ENTT_DISABLE_ASSERT
+#define ENTT_ASSERT(...) ((void)0)
+#endif // ENTT_DISABLE_ASSERT
 
 
 #endif // ENTT_CONFIG_CONFIG_H

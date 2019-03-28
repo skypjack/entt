@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_FWD_HPP
 
 
+#include <cstdint>
 #include "../config/config.h"
 
 
@@ -44,7 +45,7 @@ template<typename>
 class basic_continuous_loader;
 
 /*! @brief Alias declaration for the most common use case. */
-using entity = ENTT_ENTITY_TYPE;
+using entity = std::uint32_t;
 
 /*! @brief Alias declaration for the most common use case. */
 using registry = basic_registry<entity>;

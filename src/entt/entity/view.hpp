@@ -3,7 +3,6 @@
 
 
 #include <iterator>
-#include <cassert>
 #include <array>
 #include <tuple>
 #include <utility>
@@ -347,7 +346,7 @@ public:
     template<typename... Comp>
     std::conditional_t<sizeof...(Comp) == 1, std::tuple_element_t<0, std::tuple<Comp &...>>, std::tuple<Comp &...>>
     get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
-        assert(contains(entt));
+        ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Comp) == 1) {
             return (std::get<pool_type<Comp> *>(pools)->get(entt), ...);
@@ -603,7 +602,7 @@ public:
      * @return The component assigned to the entity.
      */
     raw_type & get(const entity_type entt) const ENTT_NOEXCEPT {
-        assert(contains(entt));
+        ENTT_ASSERT(contains(entt));
         return pool->get(entt);
     }
 

@@ -2,7 +2,6 @@
 #define ENTT_SIGNAL_DELEGATE_HPP
 
 
-#include <cassert>
 #include <cstring>
 #include <algorithm>
 #include <functional>
@@ -200,7 +199,7 @@ public:
      * @return The value returned by the underlying function.
      */
     Ret operator()(Args... args) const {
-        assert(fn);
+        ENTT_ASSERT(fn);
         return fn(data, args...);
     }
 

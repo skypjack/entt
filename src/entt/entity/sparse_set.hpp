@@ -9,7 +9,6 @@
 #include <vector>
 #include <memory>
 #include <cstddef>
-#include <cassert>
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
@@ -376,7 +375,7 @@ public:
      * @return The position of the entity in the sparse set.
      */
     size_type get(const entity_type entt) const ENTT_NOEXCEPT {
-        assert(has(entt));
+        ENTT_ASSERT(has(entt));
         auto [page, offset] = index(entt);
         return size_type(reverse[page][offset]);
     }
@@ -393,7 +392,7 @@ public:
      * @param entt A valid entity identifier.
      */
     void construct(const entity_type entt) {
-        assert(!has(entt));
+        ENTT_ASSERT(!has(entt));
         auto [page, offset] = index(entt);
         assure(page);
         reverse[page][offset] = entity_type(direct.size());
@@ -416,7 +415,7 @@ public:
     template<typename It>
     void batch(It first, It last) {
         std::for_each(first, last, [next = entity_type(direct.size()), this](const auto entt) mutable {
-            assert(!has(entt));
+            ENTT_ASSERT(!has(entt));
             auto [page, offset] = index(entt);
             assure(page);
             reverse[page][offset] = next++;
@@ -437,7 +436,7 @@ public:
      * @param entt A valid entity identifier.
      */
     virtual void destroy(const entity_type entt) {
-        assert(has(entt));
+        ENTT_ASSERT(has(entt));
         auto [from_page, from_offset] = index(entt);
         auto [to_page, to_offset] = index(direct.back());
         std::swap(direct[size_type(reverse[from_page][from_offset])], direct.back());
@@ -462,8 +461,8 @@ public:
      * @param rhs A valid position within the sparse set.
      */
     void swap(const size_type lhs, const size_type rhs) ENTT_NOEXCEPT {
-        assert(lhs < direct.size());
-        assert(rhs < direct.size());
+        ENTT_ASSERT(lhs < direct.size());
+        ENTT_ASSERT(rhs < direct.size());
         auto [src_page, src_offset] = index(direct[lhs]);
         auto [dst_page, dst_offset] = index(direct[rhs]);
         std::swap(reverse[src_page][src_offset], reverse[dst_page][dst_offset]);
@@ -906,7 +905,7 @@ public:
      */
     const object_type & get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
         if constexpr(std::is_empty_v<object_type>) {
-            assert(underlying_type::has(entt));
+            ENTT_ASSERT(underlying_type::has(entt));
             return instances;
         } else {
             return instances[underlying_type::get(entt)];

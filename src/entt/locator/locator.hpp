@@ -4,7 +4,6 @@
 
 #include <memory>
 #include <utility>
-#include <cassert>
 #include "../config/config.h"
 
 
@@ -88,7 +87,7 @@ struct service_locator {
      * @param ptr Service to use to replace the current one.
      */
     inline static void set(std::shared_ptr<Service> ptr) {
-        assert(static_cast<bool>(ptr));
+        ENTT_ASSERT(static_cast<bool>(ptr));
         service = std::move(ptr);
     }
 
