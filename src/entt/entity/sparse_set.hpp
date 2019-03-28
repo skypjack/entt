@@ -178,7 +178,9 @@ class sparse_set<Entity> {
 
     auto index(Entity entt) const ENTT_NOEXCEPT {
         const auto identifier = entt & traits_type::entity_mask;
-        return std::make_pair(size_type(identifier / entt_per_page), size_type(identifier & (entt_per_page - 1)));
+        const auto page = size_type(identifier / entt_per_page);
+        const auto offset = size_type(identifier & (entt_per_page - 1));
+        return std::make_pair(page, offset);
     }
 
 public:
