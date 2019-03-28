@@ -348,7 +348,7 @@ I can't promise that each and every contribution will be accepted, but I can
 assure that I'll do my best to take them all seriously.
 
 If you decide to participate, please see the guidelines for
-[contributing](docs/CONTRIBUTING.md) before to create issues or pull
+[contributing](docs/md/CONTRIBUTING.md) before to create issues or pull
 requests.<br/>
 Take also a look at the
 [contributors list](https://github.com/skypjack/entt/blob/master/AUTHORS) to

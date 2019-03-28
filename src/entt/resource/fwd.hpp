@@ -8,15 +8,15 @@
 namespace entt {
 
 
-/*! @brief Forward declaration of the resource cache class. */
+/*! @class resource_cache */
 template<typename>
 class resource_cache;
 
-/*! @brief Forward declaration of the resource handle class. */
+/*! @class resource_handle */
 template<typename>
 class resource_handle;
 
-/*! @brief Forward declaration of the resource loader class. */
+/*! @class resource_loader */
 template<typename, typename>
 class resource_loader;
 

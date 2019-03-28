@@ -8,15 +8,15 @@
 namespace entt {
 
 
-/*! @brief Forward declaration of the delegate class. */
+/*! @class delegate */
 template<typename>
 class delegate;
 
-/*! @brief Forward declaration of the sink class. */
+/*! @class sink */
 template<typename>
 class sink;
 
-/*! @brief Forward declaration of the sigh class. */
+/*! @class sigh */
 template<typename, typename>
 struct sigh;
 

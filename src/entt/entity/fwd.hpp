@@ -7,40 +7,39 @@
 
 namespace entt {
 
-
-/*! @brief Forward declaration of the registry class. */
+/*! @class basic_registry */
 template <typename>
 class basic_registry;
 
-/*! @brief Forward declaration of the view class. */
+/*! @class basic_view */
 template<typename, typename...>
 class basic_view;
 
-/*! @brief Forward declaration of the runtime view class. */
+/*! @class basic_runtime_view */
 template<typename>
 class basic_runtime_view;
 
-/*! @brief Forward declaration of the group class. */
+/*! @class basic_group */
 template<typename...>
 class basic_group;
 
-/*! @brief Forward declaration of the actor class. */
+/*! @class basic_actor */
 template <typename>
 struct basic_actor;
 
-/*! @brief Forward declaration of the prototype class. */
+/*! @class basic_prototype */
 template<typename>
 class basic_prototype;
 
-/*! @brief Forward declaration of the snapshot class. */
+/*! @class basic_snapshot */
 template<typename>
 class basic_snapshot;
 
-/*! @brief Forward declaration of the snapshot loader class. */
+/*! @class basic_snapshot_loader */
 template<typename>
 class basic_snapshot_loader;
 
-/*! @brief Forward declaration of the continuous loader class. */
+/*! @class basic_continuous_loader */
 template<typename>
 class basic_continuous_loader;
 

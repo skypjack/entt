@@ -780,7 +780,9 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = @DOXY_SOURCE_DIRECTORY@ @DOXY_DOCS_DIRECTORY@ @PROJECT_SOURCE_DIR@/README.md
+INPUT                  = @DOXY_SOURCE_DIRECTORY@ \
+			 @DOXY_DOCS_DIRECTORY@ \
+			 @PROJECT_SOURCE_DIR@/README.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -805,9 +807,7 @@ INPUT_ENCODING         = UTF-8
 # *.m, *.markdown, *.md, *.mm, *.dox, *.py, *.pyw, *.f90, *.f95, *.f03, *.f08,
 # *.f, *.for, *.tcl, *.vhd, *.vhdl, *.ucf and *.qsf.
 
-FILE_PATTERNS          = *.cpp \
-                         *.c++ \
-                         *.h \
+FILE_PATTERNS          = *.h \
                          *.hpp \
                          *.md \
                          *.dox
