@@ -27,6 +27,7 @@ add_custom_target(
         md/CONTRIBUTING.md
         md/core.md
         md/entity.md
+        md/faq.md
         md/lib.md
         md/links.md
         md/locator.md
