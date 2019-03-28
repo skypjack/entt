@@ -258,7 +258,7 @@ the include paths.
 
 ## Documentation
 
-The documentation is based on [doxygen](http://www.stack.nl/~dimitri/doxygen/).
+The documentation is based on [doxygen](http://www.doxygen.nl/).
 To build it:
 
     $ cd build
