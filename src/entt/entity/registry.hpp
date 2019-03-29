@@ -367,6 +367,15 @@ public:
     }
 
     /**
+     * @brief Requests the removal of unused capacity for a given component.
+     * @tparam Component Type of component for which to reclaim unused capacity.
+     */
+    template<typename Component>
+    void shrink_to_fit() {
+        assure<Component>()->shrink_to_fit();
+    }
+
+    /**
      * @brief Checks whether the pool of a given component is empty.
      * @tparam Component Type of component in which one is interested.
      * @return True if the pool of the given component is empty, false
@@ -376,15 +385,6 @@ public:
     bool empty() const ENTT_NOEXCEPT {
         const auto *cpool = pool<Component>();
         return cpool ? cpool->empty() : true;
-    }
-
-    /**
-     * @brief Requests the removal of unused capacity for a given component.
-     * @tparam Component Type of component for which to reclaim unused capacity.
-     */
-    template<typename Component>
-    void shrink_to_fit() {
-        assure<Component>()->shrink_to_fit();
     }
 
     /**
@@ -1548,7 +1548,11 @@ public:
             }
         };
 
-        return { (*this = {}), force };
+        reset();
+        entities.clear();
+        available = {};
+
+        return { *this, force };
     }
 
     /**

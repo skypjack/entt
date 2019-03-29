@@ -197,7 +197,7 @@ class basic_snapshot_loader {
           force{fn}
     {
         // to restore a snapshot as a whole requires a clean registry
-        ENTT_ASSERT(!reg.capacity());
+        ENTT_ASSERT(reg.empty());
     }
 
     template<typename Archive>
