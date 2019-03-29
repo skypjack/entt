@@ -83,7 +83,7 @@ TEST(SparseSetNoType, Pagination) {
     entt::sparse_set<std::uint64_t> set;
     constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(std::uint64_t);
 
-    ASSERT_EQ(set.extent(), 0u);
+    ASSERT_EQ(set.extent(), 0);
 
     set.construct(entt_per_page-1);
 
@@ -96,6 +96,23 @@ TEST(SparseSetNoType, Pagination) {
     ASSERT_TRUE(set.has(entt_per_page-1));
     ASSERT_TRUE(set.has(entt_per_page));
     ASSERT_FALSE(set.has(entt_per_page+1));
+
+    set.destroy(entt_per_page-1);
+
+    ASSERT_EQ(set.extent(), 2 * entt_per_page);
+    ASSERT_FALSE(set.has(entt_per_page-1));
+    ASSERT_TRUE(set.has(entt_per_page));
+
+    set.shrink_to_fit();
+    set.destroy(entt_per_page);
+
+    ASSERT_EQ(set.extent(), 2 * entt_per_page);
+    ASSERT_FALSE(set.has(entt_per_page-1));
+    ASSERT_FALSE(set.has(entt_per_page));
+
+    set.shrink_to_fit();
+
+    ASSERT_EQ(set.extent(), 0);
 }
 
 TEST(SparseSetNoType, BatchAdd) {
@@ -419,33 +436,33 @@ TEST(SparseSetWithType, Functionalities) {
     ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
-    ASSERT_FALSE(set.has(42));
+    ASSERT_FALSE(set.has(41));
 
-    set.construct(42, 3);
+    set.construct(41, 3);
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
     ASSERT_NE(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
-    ASSERT_TRUE(set.has(42));
-    ASSERT_EQ(set.get(42), 3);
-    ASSERT_EQ(*set.try_get(42), 3);
+    ASSERT_TRUE(set.has(41));
+    ASSERT_EQ(set.get(41), 3);
+    ASSERT_EQ(*set.try_get(41), 3);
     ASSERT_EQ(set.try_get(99), nullptr);
 
-    set.destroy(42);
+    set.destroy(41);
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
     ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
-    ASSERT_FALSE(set.has(42));
+    ASSERT_FALSE(set.has(41));
 
-    set.construct(42, 12);
+    set.construct(41, 12);
 
-    ASSERT_EQ(set.get(42), 12);
-    ASSERT_EQ(*set.try_get(42), 12);
+    ASSERT_EQ(set.get(41), 12);
+    ASSERT_EQ(*set.try_get(41), 12);
     ASSERT_EQ(set.try_get(99), nullptr);
 
     set.reset();
@@ -455,7 +472,13 @@ TEST(SparseSetWithType, Functionalities) {
     ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
     ASSERT_FALSE(set.has(0));
-    ASSERT_FALSE(set.has(42));
+    ASSERT_FALSE(set.has(41));
+
+    ASSERT_EQ(set.capacity(), 42);
+
+    set.shrink_to_fit();
+
+    ASSERT_EQ(set.capacity(), 0);
 
     (void)entt::sparse_set<std::uint64_t, int>{std::move(set)};
     entt::sparse_set<std::uint64_t, int> other;

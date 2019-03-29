@@ -379,6 +379,15 @@ public:
     }
 
     /**
+     * @brief Requests the removal of unused capacity for a given component.
+     * @tparam Component Type of component for which to reclaim unused capacity.
+     */
+    template<typename Component>
+    void shrink_to_fit() {
+        assure<Component>()->shrink_to_fit();
+    }
+
+    /**
      * @brief Checks if there exists at least an entity still in use.
      * @return True if at least an entity is still in use, false otherwise.
      */

@@ -240,6 +240,15 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.size<int>(), entt::registry::size_type{0});
     ASSERT_EQ(registry.size<char>(), entt::registry::size_type{0});
     ASSERT_TRUE(registry.empty<int>());
+
+    ASSERT_EQ(registry.capacity<int>(), entt::registry::size_type{8});
+    ASSERT_EQ(registry.capacity<char>(), entt::registry::size_type{8});
+
+    registry.shrink_to_fit<int>();
+    registry.shrink_to_fit<char>();
+
+    ASSERT_EQ(registry.capacity<int>(), entt::registry::size_type{});
+    ASSERT_EQ(registry.capacity<char>(), entt::registry::size_type{});
 }
 
 TEST(Registry, Identifiers) {
