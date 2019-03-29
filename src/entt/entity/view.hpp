@@ -400,6 +400,7 @@ public:
      * It is no longer guaranteed that the performance is the best possible, but
      * there will be greater control over the order of iteration.
      *
+     * @tparam Comp Type of component to use to enforce the iteration order.
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
      */

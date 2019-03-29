@@ -1048,7 +1048,7 @@ solutions around usually try to optimize everything, because it is known that
 somewhere within the _everything_ there are also our usage patterns. However
 this has a cost that isn't negligible, both in terms of performance and memory
 usage. Ironically, users pay the price also for things they don't want and this
-isn't something I like much. Even worse, you cannot easily disable such a
+isn't something I like much. Even worse, one cannot easily disable such a
 behavior. Groups work differently instead and are designed to optimize only the
 real use cases when users find they need to.<br/>
 Another nice-to-have feature of groups is that they have no impact on memory
@@ -1332,7 +1332,7 @@ is further reduced in most of the cases.
 Groups are a (much) faster alternative to views. However, the higher the
 performance, the greater the constraints on what is allowed and what is
 not.<br/>
-In particular, groups add in some cases a limitation on the creation of
+In particular, groups add in some rare cases a limitation on the creation of
 components during iterations. It happens in quite particular cases. Given the
 nature and the scope of the groups, it isn't something in which it will happen
 to come across probably, but it's good to know it anyway.
@@ -1342,14 +1342,31 @@ isn't a problem at all and can be done freely as it happens with the views. The
 same applies to the destruction of components and entities, for which the rules
 mentioned above apply.
 
-The additional limitation applies instead when a given component that is owned
+The additional limitation pops out instead when a given component that is owned
 by a group is iterated outside of it. In this case, adding components that are
-part of the group itself can invalidate the iterators. There are no further
+part of the group itself may invalidate the iterators. There are no further
 limitations to the destruction of components and entities.<br/>
+Fortunately, this isn't always true. In fact, it almost never is and this
+happens only under certain conditions. In particular:
+
+* Iterating a type of component that is part of a group with a single component
+  view and adding to an entity all the components required to get it into the
+  group may invalidate the iterators.
+
+* Iterating a type of component that is part of a group with a multi component
+  view and adding to an entity all the components required to get it into the
+  group can invalidate the iterators, unless users specify another type of
+  component to use to induce the order of iteration of the view (in this case,
+  the former is treated as a free type and isn't affected by the limitation).
+
+In other words, the limitation doesn't exist as long as a type is treated as a
+free type (as an example with multi component views and partial- or non-owning
+groups) or iterated with its own group, but it can occur if the type is used as
+a main type to rule on an iteration.<br/>
 This happens because groups own the pools of their components and organize the
 data internally to maximize performance. Because of that, full consistency for
 owned components is guaranteed only when they are iterated as part of their
-groups.
+groups or as free types with multi component views and groups in general.
 
 # Empty type optimization
 
@@ -1413,11 +1430,10 @@ expedients.
 ## Iterators
 
 A special mention is needed for the iterators returned by the views and the
-groups. Most of the time they meet the requirements of **random access
-iterators**, in all cases they meet at least the requirements of **forward
-iterators**.<br/>
-In other terms, they are suitable for use with the **parallel algorithms** of
-the standard library. If it's not clear, this is a great thing.
+groups. Most of the time they meet the requirements of random access iterators,
+in all cases they meet at least the requirements of forward iterators.<br/>
+In other terms, they are suitable for use with the parallel algorithms of the
+standard library. If it's not clear, this is a great thing.
 
 As an example, this kind of iterators can be used in combination with
 `std::for_each` and `std::execution::par` to parallelize the visit and therefore
