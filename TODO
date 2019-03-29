@@ -26,3 +26,5 @@
 * verify why registry::snapshot does a *this = {} instead of a safer reset that would trigger signals
 * review sparse set to allow customization (mix pack in the spec, base is position only)
   - non-owning groups can iterate pages and skip empty ones, this should mitigate the lack of the packed array
+* review 64 bit id: user defined area + dedicated member on the registry to set it
+* improve pagination: use a support integer to count elements and remove pages when empty
