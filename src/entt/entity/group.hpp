@@ -41,12 +41,12 @@ class basic_group;
 
 
 /**
- * @brief Detached group.
+ * @brief Non-owning group.
  *
- * A detached group returns all the entities and only the entities that have at
- * least the given components. Moreover, it's guaranteed that the entity list is
- * tightly packed in memory for fast iterations.<br/>
- * In general, detached groups don't stay true to the order of any set of
+ * A non-owning group returns all the entities and only the entities that have
+ * at least the given components. Moreover, it's guaranteed that the entity list
+ * is tightly packed in memory for fast iterations.<br/>
+ * In general, non-owning groups don't stay true to the order of any set of
  * components unless users explicitly sort them.
  *
  * @b Important
@@ -66,9 +66,9 @@ class basic_group;
  * that generated them. Therefore any change to the entities and to the
  * components made by means of the registry are immediately reflected by all the
  * groups.<br/>
- * Moreover, sorting a detached group affects all the other groups of the same
- * type (it means that users don't have to call `sort` on each group to sort all
- * of them because they share the set of entities).
+ * Moreover, sorting a non-owning group affects all the instance of the same
+ * group (it means that users don't have to call `sort` on each instance to sort
+ * all of them because they share the set of entities).
  *
  * @warning
  * Lifetime of a group must overcome the one of the registry that generated it.
@@ -117,6 +117,20 @@ public:
      */
     size_type size() const ENTT_NOEXCEPT {
         return handler->size();
+    }
+
+    /**
+     * @brief Returns the number of elements that a group has currently
+     * allocated space for.
+     * @return Capacity of the group.
+     */
+    size_type capacity() const ENTT_NOEXCEPT {
+        return handler->capacity();
+    }
+
+    /*! @brief Requests the removal of unused capacity. */
+    void shrink_to_fit() {
+        handler->shrink_to_fit();
     }
 
     /**
@@ -324,7 +338,7 @@ public:
     /**
      * @brief Sort the shared pool of entities according to the given component.
      *
-     * Detached groups of the same type share with the registry a pool of
+     * Non-owning groups of the same type share with the registry a pool of
      * entities with  its own order that doesn't depend on the order of any pool
      * of components. Users can order the underlying data structure so that it
      * respects the order of the pool of the given component.
@@ -333,7 +347,7 @@ public:
      * The shared pool of entities and thus its order is affected by the changes
      * to each and every pool that it tracks. Therefore changes to those pools
      * can quickly ruin the order imposed to the pool of entities shared between
-     * the detached groups.
+     * the non-owning groups.
      *
      * @tparam Component Type of component to use to impose the order.
      */

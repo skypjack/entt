@@ -71,6 +71,12 @@ TEST(NonOwningGroup, Functionalities) {
     ASSERT_EQ(group.begin(), group.end());
     ASSERT_EQ(cgroup.begin(), cgroup.end());
     ASSERT_TRUE(group.empty());
+
+    ASSERT_TRUE(group.capacity());
+
+    group.shrink_to_fit();
+
+    ASSERT_FALSE(group.capacity());
 }
 
 TEST(NonOwningGroup, ElementAccess) {
