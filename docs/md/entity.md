@@ -311,9 +311,10 @@ the component owned by an entity if any, a null pointer otherwise.
 
 Because of how the registry works internally, it stores a couple of signal
 handlers for each pool in order to notify some of its data structures on the
-construction and destruction of components.<br/>
-These signal handlers are also exposed and made available to users. This is the
-basic brick to build fancy things like dependencies and reactive systems.
+construction and destruction of components. Moreover, it offers also a signal
+handler to listen for changes on components.<br/>
+These signal handlers are also exposed and made available to users. These are
+the basic bricks to build fancy things like dependencies and reactive systems.
 
 To get a sink to be used to connect and disconnect listeners so as to be
 notified on the creation of a component, use the `construction` member function:
@@ -332,10 +333,12 @@ registry.construction<position>().disconnect<&my_free_function>();
 registry.construction<position>().disconnect<&my_class::member>(&instance);
 ```
 
+The `substitution` member function returns instead a sink object to which to
+connect listeners that are triggered when components are explicitly replaced.
 To be notified when components are destroyed, use the `destruction` member
 function instead.
 
-The function type of a listener is the same in both cases and should be
+The function type of a listener is the same in all cases and should be
 equivalent to:
 
 ```cpp
@@ -346,6 +349,7 @@ In other terms, a listener is provided with the registry that triggered the
 notification and the entity affected by the change. Note also that:
 
 * Listeners are invoked **after** components have been assigned to entities.
+* Listeners are invoked **after** components have been replaced for entities.
 * Listeners are invoked **before** components have been removed from entities.
 * The order of invocation of the listeners isn't guaranteed in any case.
 
@@ -354,13 +358,15 @@ particular:
 
 * Connecting and disconnecting other functions from within the body of a
   listener should be avoided. It can lead to undefined behavior in some cases.
+* Replacing components from within the body of a listener that observes changes
+  on entities should be avoided. Intuitively, it could trigger an infinite loop.
 * Assigning and removing components from within the body of a listener that
   observes the destruction of instances of a given type should be avoided. It
   can lead to undefined behavior in some cases. This type of listeners is
   intended to provide users with an easy way to perform cleanup and nothing
   more.
 
-To a certain extent, these limitations do not apply. However, it is risky to try
+To a certain extent, these limitations don't apply. However, it's risky to try
 to force them and users should respect the limitations unless they know exactly
 what they are doing. Subtle bugs are the price to pay in case of errors
 otherwise.

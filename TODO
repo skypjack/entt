@@ -10,10 +10,6 @@
 * allow to replace std:: with custom implementations
 * allow to sort groups (::respect can already work with begin/end instead of a whole sparse set)
   -it would ease by far the group trick for hierarchies that requires otherwise more boilerplate
-* events on replace, so that one can track updated components? indagate impact
-  - define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
-  - define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
-  - from Tommaso on discord view<Health, Transform>().where<Health>([](h) {h > 5}).where<Transform>([](t) {t.inside(aabb)});
 * remove runtime views, welcome reflection and what about snapshot?
 * empty components model allows for shared components and prefabs unity-like
   - each with entity return the shared component multiple times, one per entity that refers to it
@@ -26,3 +22,8 @@
 * review sparse set to allow customization (mix pack in the spec, base is position only)
   - non-owning groups can iterate pages and skip empty ones, this should mitigate the lack of the packed array
 * review 64 bit id: user defined area + dedicated member on the registry to set it
+* events on replace, so that one can track updated components? indagate impact
+  - construction, destruction, substitution -> assigned, removed, replaced
+  - define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
+  - define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
+  - from Tommaso on discord view<Health, Transform>().where<Health>([](h) {h > 5}).where<Transform>([](t) {t.inside(aabb)});

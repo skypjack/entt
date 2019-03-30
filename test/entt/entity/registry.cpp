@@ -856,6 +856,7 @@ TEST(Registry, Signals) {
 
     registry.construction<int>().connect<&listener::incr<int>>(&listener);
     registry.destruction<int>().connect<&listener::decr<int>>(&listener);
+    registry.substitution<int>().connect<&listener::incr<int>>(&listener);
 
     auto e0 = registry.create();
     auto e1 = registry.create();
@@ -902,6 +903,22 @@ TEST(Registry, Signals) {
 
     ASSERT_EQ(listener.counter, 1);
     ASSERT_EQ(listener.last, e1);
+
+    registry.remove<int>(e0);
+    registry.assign_or_replace<int>(e0);
+
+    ASSERT_EQ(listener.counter, 1);
+    ASSERT_EQ(listener.last, e0);
+
+    registry.assign_or_replace<int>(e0);
+
+    ASSERT_EQ(listener.counter, 2);
+    ASSERT_EQ(listener.last, e0);
+
+    registry.replace<int>(e0);
+
+    ASSERT_EQ(listener.counter, 3);
+    ASSERT_EQ(listener.last, e0);
 }
 
 TEST(Registry, DestroyByComponents) {
@@ -950,17 +967,6 @@ TEST(Registry, DestroyByComponents) {
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
     ASSERT_FALSE(registry.valid(e2));
-}
-
-TEST(Registry, SignalsOnAccommodate) {
-    entt::registry registry;
-    const auto entity = registry.create();
-    const auto group = registry.group<>(entt::get<int, char>);
-
-    registry.assign<int>(entity);
-    registry.assign_or_replace<char>(entity);
-
-    ASSERT_FALSE((group.empty()));
 }
 
 TEST(Registry, CreateManyEntitiesAtOnce) {

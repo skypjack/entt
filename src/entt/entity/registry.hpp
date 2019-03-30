@@ -90,8 +90,17 @@ class basic_registry {
             sparse_set<Entity, Component>::destroy(entt);
         }
 
+        template<typename... Args>
+        Component & replace(const Entity entt, Args &&... args) {
+            auto &component = sparse_set<Entity, Component>::get(entt);
+            component = std::decay_t<Component>{std::forward<Args>(args)...};
+            substitution.publish(*owner, entt);
+            return component;
+        }
+
         signal_type construction;
         signal_type destruction;
+        signal_type substitution;
         basic_registry *owner;
     };
 
@@ -861,7 +870,7 @@ public:
      */
     template<typename Component, typename... Args>
     Component & replace(const entity_type entity, Args &&... args) {
-        return (pool<Component>()->get(entity) = std::decay_t<Component>{std::forward<Args>(args)...});
+        return assure<Component>()->replace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -893,15 +902,10 @@ public:
     template<typename Component, typename... Args>
     Component & assign_or_replace(const entity_type entity, Args &&... args) {
         auto *cpool = assure<Component>();
-        auto *comp = cpool->try_get(entity);
 
-        if(comp) {
-            *comp = std::decay_t<Component>{std::forward<Args>(args)...};
-        } else {
-            comp = &cpool->construct(entity, std::forward<Args>(args)...);
-        }
-
-        return *comp;
+        return cpool->has(entity)
+                ? cpool->replace(entity, std::forward<Args>(args)...)
+                : cpool->construct(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -958,6 +962,33 @@ public:
     template<typename Component>
     sink_type destruction() ENTT_NOEXCEPT {
         return assure<Component>()->destruction.sink();
+    }
+
+    /**
+     * @brief Returns a sink object for the given component.
+     *
+     * A sink is an opaque object used to connect listeners to components.<br/>
+     * The sink returned by this function can be used to receive notifications
+     * whenever an instance of the given component is explicitly replaced.
+     *
+     * The function type for a listener is equivalent to:
+     * @code{.cpp}
+     * void(registry<Entity> &, Entity);
+     * @endcode
+     *
+     * Listeners are invoked **after** the component has been replaced. The
+     * order of invocation of the listeners isn't guaranteed.<br/>
+     * Note also that the greater the number of listeners, the greater the
+     * performance hit when a component is replaced.
+     *
+     * @sa sink
+     *
+     * @tparam Component Type of component of which to get the sink.
+     * @return A temporary sink object.
+     */
+    template<typename Component>
+    sink_type substitution() ENTT_NOEXCEPT {
+        return assure<Component>()->substitution.sink();
     }
 
     /**
