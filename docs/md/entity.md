@@ -317,25 +317,25 @@ These signal handlers are also exposed and made available to users. These are
 the basic bricks to build fancy things like dependencies and reactive systems.
 
 To get a sink to be used to connect and disconnect listeners so as to be
-notified on the creation of a component, use the `construction` member function:
+notified on the creation of a component, use the `on_assign` member function:
 
 ```cpp
 // connects a free function
-registry.construction<position>().connect<&my_free_function>();
+registry.on_assign<position>().connect<&my_free_function>();
 
 // connects a member function
-registry.construction<position>().connect<&my_class::member>(&instance);
+registry.on_assign<position>().connect<&my_class::member>(&instance);
 
 // disconnects a free function
-registry.construction<position>().disconnect<&my_free_function>();
+registry.on_assign<position>().disconnect<&my_free_function>();
 
 // disconnects a member function
-registry.construction<position>().disconnect<&my_class::member>(&instance);
+registry.on_assign<position>().disconnect<&my_class::member>(&instance);
 ```
 
-The `substitution` member function returns instead a sink object to which to
+The `on_replace` member function returns instead a sink object to which to
 connect listeners that are triggered when components are explicitly replaced.
-To be notified when components are destroyed, use the `destruction` member
+To be notified when components are destroyed, use the `on_remove` member
 function instead.
 
 The function type of a listener is the same in all cases and should be
@@ -778,7 +778,7 @@ The following adds components `a_type` and `another_type` whenever `my_type` is
 assigned to an entity:
 
 ```cpp
-entt::connnect<a_type, another_type>(registry.construction<my_type>());
+entt::connnect<a_type, another_type>(registry.on_assign<my_type>());
 ```
 
 A component is assigned to an entity and thus default initialized only in case
@@ -787,7 +787,7 @@ be overriden.<br/>
 A dependency can easily be broken by means of the following function template:
 
 ```cpp
-entt::disconnect<a_type, another_type>(registry.construction<my_type>());
+entt::disconnect<a_type, another_type>(registry.on_assign<my_type>());
 ```
 
 ### Tags

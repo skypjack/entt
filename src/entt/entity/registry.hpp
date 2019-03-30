@@ -68,7 +68,7 @@ class basic_registry {
         template<typename... Args>
         Component & construct(Entity entt, Args &&... args) {
             auto &component = sparse_set<Entity, Component>::construct(entt, std::forward<Args>(args)...);
-            construction.publish(*owner, entt);
+            on_assign.publish(*owner, entt);
             return component;
         }
 
@@ -76,9 +76,9 @@ class basic_registry {
         Component * batch(It first, It last) {
             auto *component = sparse_set<Entity, Component>::batch(first, last);
 
-            if(!construction.empty()) {
+            if(!on_assign.empty()) {
                 std::for_each(first, last, [this](const auto entt) {
-                    construction.publish(*owner, entt);
+                    on_assign.publish(*owner, entt);
                 });
             }
 
@@ -86,7 +86,7 @@ class basic_registry {
         }
 
         void destroy(Entity entt) override {
-            destruction.publish(*owner, entt);
+            on_destroy.publish(*owner, entt);
             sparse_set<Entity, Component>::destroy(entt);
         }
 
@@ -94,13 +94,13 @@ class basic_registry {
         Component & replace(const Entity entt, Args &&... args) {
             auto &component = sparse_set<Entity, Component>::get(entt);
             component = std::decay_t<Component>{std::forward<Args>(args)...};
-            substitution.publish(*owner, entt);
+            on_replace.publish(*owner, entt);
             return component;
         }
 
-        signal_type construction;
-        signal_type destruction;
-        signal_type substitution;
+        signal_type on_assign;
+        signal_type on_destroy;
+        signal_type on_replace;
         basic_registry *owner;
     };
 
@@ -932,8 +932,8 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    sink_type construction() ENTT_NOEXCEPT {
-        return assure<Component>()->construction.sink();
+    sink_type on_assign() ENTT_NOEXCEPT {
+        return assure<Component>()->on_assign.sink();
     }
 
     /**
@@ -960,8 +960,8 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    sink_type destruction() ENTT_NOEXCEPT {
-        return assure<Component>()->destruction.sink();
+    sink_type on_remove() ENTT_NOEXCEPT {
+        return assure<Component>()->on_destroy.sink();
     }
 
     /**
@@ -987,8 +987,8 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    sink_type substitution() ENTT_NOEXCEPT {
-        return assure<Component>()->substitution.sink();
+    sink_type on_replace() ENTT_NOEXCEPT {
+        return assure<Component>()->on_replace.sink();
     }
 
     /**
@@ -1124,7 +1124,7 @@ public:
     void reset() {
         auto *cpool = assure<Component>();
 
-        if(cpool->destruction.empty()) {
+        if(cpool->on_destroy.empty()) {
             // no group set, otherwise the signal wouldn't be empty
             cpool->reset();
         } else {
@@ -1345,11 +1345,11 @@ public:
                 auto *curr = static_cast<group_type *>(gdata.data.get());
                 const auto cpools = std::make_tuple(assure<Get>()..., assure<Exclude>()...);
 
-                (std::get<pool_type<Get> *>(cpools)->destruction.sink().template connect<&group_type::destroy_if>(curr), ...);
-                (std::get<pool_type<Get> *>(cpools)->construction.sink().template connect<&group_type::template construct_if<0>>(curr), ...);
+                (std::get<pool_type<Get> *>(cpools)->on_destroy.sink().template connect<&group_type::destroy_if>(curr), ...);
+                (std::get<pool_type<Get> *>(cpools)->on_assign.sink().template connect<&group_type::template construct_if<0>>(curr), ...);
 
-                (std::get<pool_type<Exclude> *>(cpools)->destruction.sink().template connect<&group_type::template construct_if<1>>(curr), ...);
-                (std::get<pool_type<Exclude> *>(cpools)->construction.sink().template connect<&group_type::destroy_if>(curr), ...);
+                (std::get<pool_type<Exclude> *>(cpools)->on_destroy.sink().template connect<&group_type::template construct_if<1>>(curr), ...);
+                (std::get<pool_type<Exclude> *>(cpools)->on_assign.sink().template connect<&group_type::destroy_if>(curr), ...);
 
                 for(const auto entity: view<Get...>()) {
                     if(!(has<Exclude>(entity) || ...)) {
@@ -1383,14 +1383,14 @@ public:
                 auto *curr = static_cast<group_type *>(gdata.data.get());
                 const auto cpools = std::make_tuple(assure<Owned>()..., assure<Get>()..., assure<Exclude>()...);
 
-                (std::get<pool_type<Owned> *>(cpools)->construction.sink().template connect<&group_type::template induce_if<0>>(curr), ...);
-                (std::get<pool_type<Owned> *>(cpools)->destruction.sink().template connect<&group_type::discard_if>(curr), ...);
+                (std::get<pool_type<Owned> *>(cpools)->on_assign.sink().template connect<&group_type::template induce_if<0>>(curr), ...);
+                (std::get<pool_type<Owned> *>(cpools)->on_destroy.sink().template connect<&group_type::discard_if>(curr), ...);
 
-                (std::get<pool_type<Get> *>(cpools)->construction.sink().template connect<&group_type::template induce_if<0>>(curr), ...);
-                (std::get<pool_type<Get> *>(cpools)->destruction.sink().template connect<&group_type::discard_if>(curr), ...);
+                (std::get<pool_type<Get> *>(cpools)->on_assign.sink().template connect<&group_type::template induce_if<0>>(curr), ...);
+                (std::get<pool_type<Get> *>(cpools)->on_destroy.sink().template connect<&group_type::discard_if>(curr), ...);
 
-                (std::get<pool_type<Exclude> *>(cpools)->destruction.sink().template connect<&group_type::template induce_if<1>>(curr), ...);
-                (std::get<pool_type<Exclude> *>(cpools)->construction.sink().template connect<&group_type::discard_if>(curr), ...);
+                (std::get<pool_type<Exclude> *>(cpools)->on_destroy.sink().template connect<&group_type::template induce_if<1>>(curr), ...);
+                (std::get<pool_type<Exclude> *>(cpools)->on_assign.sink().template connect<&group_type::discard_if>(curr), ...);
 
                 const auto *cpool = std::min({ static_cast<sparse_set<entity_type> *>(std::get<pool_type<Owned> *>(cpools))... }, [](const auto *lhs, const auto *rhs) {
                     return lhs->size() < rhs->size();

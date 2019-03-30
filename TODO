@@ -23,7 +23,6 @@
   - non-owning groups can iterate pages and skip empty ones, this should mitigate the lack of the packed array
 * review 64 bit id: user defined area + dedicated member on the registry to set it
 * events on replace, so that one can track updated components? indagate impact
-  - construction, destruction, substitution -> assigned, removed, replaced
   - define basic reactive systems (track entities to which component is attached, track entities from which component is removed, and so on)
   - define systems as composable mixins (initializazion, reactive, update, whatever) with flexible auto-detected arguments (registry, views, etc)
   - from Tommaso on discord view<Health, Transform>().where<Health>([](h) {h > 5}).where<Transform>([](t) {t.inside(aabb)});
