@@ -83,24 +83,31 @@ public:
      * If the identifier is already present in the cache, this function does
      * nothing and the arguments are simply discarded.
      *
+     * @warning
+     * If the resource cannot be loaded correctly, the returned handle will be
+     * invalid and any use of it will result in undefined behavior.
+     *
      * @tparam Loader Type of loader to use to load the resource if required.
      * @tparam Args Types of arguments to use to load the resource if required.
      * @param id Unique resource identifier.
      * @param args Arguments to use to load the resource if required.
-     * @return True if the resource is ready to use, false otherwise.
+     * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    bool load(const resource_type id, Args &&... args) {
+    resource_handle<Resource> load(const resource_type id, Args &&... args) {
         static_assert(std::is_base_of_v<resource_loader<Loader, Resource>, Loader>);
+        resource_handle<Resource> handle{};
 
-        bool loaded = true;
-
-        if(resources.find(id) == resources.cend()) {
-            std::shared_ptr<Resource> resource = Loader{}.get(std::forward<Args>(args)...);
-            loaded = (static_cast<bool>(resource) ? (resources[id] = std::move(resource), loaded) : false);
+        if(auto it = resources.find(id); it == resources.cend()) {
+            if(auto resource = Loader{}.get(std::forward<Args>(args)...); resource) {
+                resources[id] = resource;
+                handle = std::move(resource);
+            }
+        } else {
+            handle = it->second;
         }
 
-        return loaded;
+        return handle;
     }
 
     /**
@@ -116,14 +123,18 @@ public:
      * Arguments are forwarded directly to the loader in order to construct
      * properly the requested resource.
      *
+     * @warning
+     * If the resource cannot be loaded correctly, the returned handle will be
+     * invalid and any use of it will result in undefined behavior.
+     *
      * @tparam Loader Type of loader to use to load the resource.
      * @tparam Args Types of arguments to use to load the resource.
      * @param id Unique resource identifier.
      * @param args Arguments to use to load the resource.
-     * @return True if the resource is ready to use, false otherwise.
+     * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    bool reload(const resource_type id, Args &&... args) {
+    resource_handle<Resource> reload(const resource_type id, Args &&... args) {
         return (discard(id), load<Loader>(id, std::forward<Args>(args)...));
     }
 
@@ -180,9 +191,7 @@ public:
      * @param id Unique resource identifier.
      */
     void discard(const resource_type id) ENTT_NOEXCEPT {
-        auto it = resources.find(id);
-
-        if(it != resources.end()) {
+        if(auto it = resources.find(id); it != resources.end()) {
             resources.erase(it);
         }
     }

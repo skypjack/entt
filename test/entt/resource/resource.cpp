@@ -44,6 +44,7 @@ TEST(Resource, Functionalities) {
     ASSERT_FALSE(cache.contains(hs2));
     ASSERT_EQ((*cache.handle(hs1)).value, 42);
 
+    ASSERT_TRUE(cache.load<loader>(hs1, 42));
     ASSERT_TRUE(cache.load<loader>(hs2, 42));
 
     ASSERT_NE(cache.size(), entt::resource_cache<resource>::size_type{});
