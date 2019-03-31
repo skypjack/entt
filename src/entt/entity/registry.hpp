@@ -635,9 +635,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         for(auto pos = pools.size(); pos; --pos) {
-            auto &pdata = pools[pos-1];
-
-            if(pdata.pool && pdata.pool->has(entity)) {
+            if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->has(entity)) {
                 pdata.pool->destroy(entity);
             }
         };
@@ -658,9 +656,7 @@ public:
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
 
         for(auto pos = pools.size(); pos; --pos) {
-            auto &pdata = pools[pos-1];
-
-            if(pdata.pool) {
+            if(auto &pdata = pools[pos-1]; pdata.pool) {
                 std::for_each(first, last, [&pdata](const auto entity) {
                     if(pdata.pool->has(entity)) {
                         pdata.pool->destroy(entity);
@@ -1103,9 +1099,8 @@ public:
     template<typename Component>
     void reset(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
-        auto *cpool = assure<Component>();
 
-        if(cpool->has(entity)) {
+        if(auto *cpool = assure<Component>(); cpool->has(entity)) {
             cpool->destroy(entity);
         }
     }
@@ -1120,9 +1115,7 @@ public:
      */
     template<typename Component>
     void reset() {
-        auto *cpool = assure<Component>();
-
-        if(cpool->on_destroy.empty()) {
+        if(auto *cpool = assure<Component>(); cpool->on_destroy.empty()) {
             // no group set, otherwise the signal wouldn't be empty
             cpool->reset();
         } else {
@@ -1497,9 +1490,7 @@ public:
         other.pools.resize(pools.size());
 
         for(auto pos = pools.size(); pos; --pos) {
-            auto &pdata = pools[pos-1];
-
-            if(pdata.pool && (!sizeof...(Component) || ... || (pdata.runtime_type == type<Component>()))) {
+            if(auto &pdata = pools[pos-1]; pdata.pool && (!sizeof...(Component) || ... || (pdata.runtime_type == type<Component>()))) {
                 auto &curr = other.pools[pos-1];
                 curr.pool = pdata.pool->clone();
                 curr.runtime_type = pdata.runtime_type;
