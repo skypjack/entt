@@ -112,11 +112,12 @@ resources are identified. The type of the identifiers to use is defined as:
 entt::resource_cache<resource>::resource_type
 ```
 
-Where `resource_type` is an alias for `entt::hashed_string`. Therefore, resource
-identifiers are created explicitly as in the following example:
+Where `resource_type` is an alias for `entt::hashed_string::hash_type`.
+Therefore, resource identifiers are created explicitly as in the following
+example:
 
 ```cpp
-constexpr auto identifier = entt::resource_cache<resource>::resource_type{"my/resource/identifier"};
+constexpr auto identifier = entt::resource_cache<resource>::resource_type{"my/resource/identifier"_hs};
 // this is equivalent to the following
 constexpr auto hs = entt::hashed_string{"my/resource/identifier"};
 ```
@@ -133,7 +134,7 @@ identifier and the parameters used to construct the resource as arguments:
 cache.load<my_loader>(identifier, 0);
 
 // uses a const char * directly as an identifier
-cache.load<my_loader>("another/identifier", 42);
+cache.load<my_loader>("another/identifier"_hs, 42);
 ```
 
 The return value can be used to know if the resource has been loaded correctly.
@@ -141,7 +142,7 @@ In case the loader returns an invalid pointer or the resource already exists in
 the cache, a false value is returned:
 
 ```cpp
-if(!cache.load<my_loader>("another/identifier", 42)) {
+if(!cache.load<my_loader>("another/identifier"_hs, 42)) {
     // ...
 }
 ```
@@ -152,14 +153,14 @@ use the `contains` member function to know if a cache already contains a
 specific resource:
 
 ```cpp
-auto exists = cache.contains("my/identifier");
+auto exists = cache.contains("my/identifier"_hs);
 ```
 
 There exists also a member function to use to force a reload of an already
 existing resource if needed:
 
 ```cpp
-auto result = cache.reload<my_loader>("another/identifier", 42);
+auto result = cache.reload<my_loader>("another/identifier"_hs, 42);
 ```
 
 As above, the function returns true in case of success, false otherwise. The
@@ -181,7 +182,7 @@ So far, so good. Resources are finally loaded and stored within the cache.<br/>
 They are returned to users in the form of handles. To get one of them:
 
 ```cpp
-auto handle = cache.handle("my/identifier");
+auto handle = cache.handle("my/identifier"_hs);
 ```
 
 The idea behind a handle is the same of the flyweight pattern. In other terms,
@@ -229,11 +230,11 @@ Finally, in case there is the need to load a resource and thus to get a handle
 without storing the resource itself in the cache, users can rely on the `temp`
 member function template.<br/>
 The declaration is similar to the one of `load` but for the fact that it doesn't
-return a boolean value. Instead, it returns a (possibly invalid) handle for the
-resource:
+require a resource identifier and it doesn't return a boolean value. Instead,
+it returns a (possibly invalid) handle for the resource:
 
 ```cpp
-auto handle = cache.temp<my_loader>("another/identifier", 42);
+auto handle = cache.temp<my_loader>(42);
 ```
 
 Do not forget to test the handle for validity. Otherwise, getting the reference
