@@ -162,19 +162,17 @@ class basic_registry {
     };
 
     struct owning_group_data {
-        using match_fn_type = bool(ENTT_ID_TYPE);
         std::unique_ptr<boxed_owned> data;
-        match_fn_type *exclude;
-        match_fn_type *get;
-        match_fn_type *owned;
+        bool(* exclude)(ENTT_ID_TYPE);
+        bool(* get)(ENTT_ID_TYPE);
+        bool(* owned)(ENTT_ID_TYPE);
         std::size_t extent;
     };
 
     struct non_owning_group_data {
-        using match_fn_type = bool(ENTT_ID_TYPE);
         std::unique_ptr<sparse_set<Entity>> data;
-        match_fn_type *exclude;
-        match_fn_type *get;
+        bool(* exclude)(ENTT_ID_TYPE);
+        bool(* get)(ENTT_ID_TYPE);
         std::size_t extent;
     };
 
