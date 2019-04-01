@@ -170,7 +170,7 @@ public:
     }
 
 private:
-    const hash_type hash;
+    hash_type hash;
     const char *str;
 };
 
