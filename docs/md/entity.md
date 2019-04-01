@@ -851,8 +851,8 @@ registry.set<my_type>(42, 'c');
 const auto &var = registry.ctx<my_type>();
 
 // if in doubts, probe the registry to avoid assertions in case of errors
-if(auto *ptr = registry.try_ctx<my_type>(); var) {
-    // uses the context variable associated with a registry, if any
+if(auto *ptr = registry.try_ctx<my_type>(); ptr) {
+    // uses the context variable associated with the registry, if any
 }
 
 // unsets the context variable
