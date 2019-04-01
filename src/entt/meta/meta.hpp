@@ -42,7 +42,7 @@ struct meta_type_node;
 
 
 struct meta_prop_node {
-    meta_prop_node * const next;
+    meta_prop_node * next;
     meta_any(* const key)();
     meta_any(* const value)();
     meta_prop(* const meta)();
@@ -50,8 +50,9 @@ struct meta_prop_node {
 
 
 struct meta_base_node {
-    meta_base_node * const next;
+    meta_base_node ** const underlying;
     meta_type_node * const parent;
+    meta_base_node * next;
     meta_type_node *(* const type)();
     void *(* const cast)(void *);
     meta_base(* const meta)();
@@ -59,8 +60,9 @@ struct meta_base_node {
 
 
 struct meta_conv_node {
-    meta_conv_node * const next;
+    meta_conv_node ** const underlying;
     meta_type_node * const parent;
+    meta_conv_node * next;
     meta_type_node *(* const type)();
     meta_any(* const conv)(void *);
     meta_conv(* const meta)();
@@ -69,9 +71,10 @@ struct meta_conv_node {
 
 struct meta_ctor_node {
     using size_type = std::size_t;
-    meta_ctor_node * const next;
+    meta_ctor_node ** const underlying;
     meta_type_node * const parent;
-    meta_prop_node * const prop;
+    meta_ctor_node * next;
+    meta_prop_node * prop;
     const size_type size;
     meta_type_node *(* const arg)(size_type);
     meta_any(* const invoke)(meta_any * const);
@@ -80,6 +83,7 @@ struct meta_ctor_node {
 
 
 struct meta_dtor_node {
+    meta_dtor_node ** const underlying;
     meta_type_node * const parent;
     bool(* const invoke)(meta_handle);
     meta_dtor(* const meta)();
@@ -87,10 +91,11 @@ struct meta_dtor_node {
 
 
 struct meta_data_node {
-    const hashed_string name;
-    meta_data_node * const next;
+    meta_data_node ** const underlying;
+    hashed_string name;
     meta_type_node * const parent;
-    meta_prop_node * const prop;
+    meta_data_node * next;
+    meta_prop_node * prop;
     const bool is_const;
     const bool is_static;
     meta_type_node *(* const type)();
@@ -102,10 +107,11 @@ struct meta_data_node {
 
 struct meta_func_node {
     using size_type = std::size_t;
-    const hashed_string name;
-    meta_func_node * const next;
+    meta_func_node ** const underlying;
+    hashed_string name;
     meta_type_node * const parent;
-    meta_prop_node * const prop;
+    meta_func_node * next;
+    meta_prop_node * prop;
     const size_type size;
     const bool is_const;
     const bool is_static;
@@ -117,9 +123,9 @@ struct meta_func_node {
 
 
 struct meta_type_node {
-    const hashed_string name;
-    meta_type_node * const next;
-    meta_prop_node * const prop;
+    hashed_string name;
+    meta_type_node * next;
+    meta_prop_node * prop;
     const bool is_void;
     const bool is_integral;
     const bool is_floating_point;
@@ -2016,8 +2022,8 @@ inline bool destroy([[maybe_unused]] meta_handle handle) {
 
 template<typename Type, typename... Args, std::size_t... Indexes>
 inline meta_any construct(meta_any * const args, std::index_sequence<Indexes...>) {
-    std::array<bool, sizeof...(Args)> can_cast{{(args+Indexes)->can_cast<std::decay_t<Args>>()...}};
-    std::array<bool, sizeof...(Args)> can_convert{{(std::get<Indexes>(can_cast) ? false : (args+Indexes)->can_convert<std::decay_t<Args>>())...}};
+    [[maybe_unused]] std::array<bool, sizeof...(Args)> can_cast{{(args+Indexes)->can_cast<std::decay_t<Args>>()...}};
+    [[maybe_unused]] std::array<bool, sizeof...(Args)> can_convert{{(std::get<Indexes>(can_cast) ? false : (args+Indexes)->can_convert<std::decay_t<Args>>())...}};
     meta_any any{};
 
     if(((std::get<Indexes>(can_cast) || std::get<Indexes>(can_convert)) && ...)) {

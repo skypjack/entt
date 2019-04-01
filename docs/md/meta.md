@@ -11,6 +11,7 @@
 * [Enjoy the runtime](#enjoy-the-runtime)
 * [Named constants and enums](#named-constants-and-enums)
 * [Properties and meta objects](#properties-and-meta-objects)
+* [Unregister types](#unregister-types)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -391,3 +392,23 @@ auto prop = entt::resolve<my_type>().prop("tooltip"_hs);
 Meta properties are objects having a fairly poor interface, all in all. They
 only provide the `key` and the `value` member functions to be used to retrieve
 the key and the value contained in the form of meta any objects, respectively.
+
+# Unregister types
+
+A type registered with the reflection system can also be unregistered. This
+means unregistering all its data members, member functions, conversion functions
+and so on. However, the base classes won't be unregistered, since they don't
+necessarily depend on it. Similarly, implicitly generated types (as an example,
+the meta types implicitly generated for function parameters when needed) won't
+be unregistered.
+
+To unregister a type, users can use the `unregister` function from the global
+namespace:
+
+```cpp
+entt::unregister<my_type>();
+```
+
+This function returns a boolean value that is true if the type is actually
+registered with the reflection system, false otherwise.<br/>
+The type can be re-registered later with a completely different name and form.

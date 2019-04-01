@@ -183,6 +183,17 @@ struct Meta: public ::testing::Test {
                 .func<&concrete_type::f>("f");
     }
 
+    static void SetUpAfterUnregistration() {
+        entt::reflect<double>().conv<float>();
+
+        entt::reflect<derived_type>("my_type", std::make_pair(properties::prop_bool, false))
+                .ctor<>();
+
+        entt::reflect<another_abstract_type>("your_type")
+                .data<&another_abstract_type::j>("a_data_member")
+                .func<&another_abstract_type::h>("a_member_function");
+    }
+
     void SetUp() override {
         empty_type::counter = 0;
         func_type::value = 0;
@@ -651,7 +662,7 @@ TEST_F(Meta, MetaCtor) {
     ctor.prop([](auto prop) {
         ASSERT_TRUE(prop);
         ASSERT_EQ(prop.key(), properties::prop_bool);
-        ASSERT_EQ(prop.value(), false);
+        ASSERT_FALSE(prop.value().template cast<bool>());
     });
 
     ASSERT_FALSE(ctor.prop(properties::prop_int));
@@ -660,7 +671,7 @@ TEST_F(Meta, MetaCtor) {
 
     ASSERT_TRUE(prop);
     ASSERT_EQ(prop.key(), properties::prop_bool);
-    ASSERT_EQ(prop.value(), false);
+    ASSERT_FALSE(prop.value().template cast<bool>());
 }
 
 TEST_F(Meta, MetaCtorFunc) {
@@ -1491,4 +1502,58 @@ TEST_F(Meta, ArithmeticTypeAndNamedConstants) {
 
     ASSERT_EQ(type.data("min").get({}).cast<unsigned int>(), 0u);
     ASSERT_EQ(type.data("max").get({}).cast<unsigned int>(), 100u);
+}
+
+TEST_F(Meta, Unregister) {
+    entt::unregister<double>();
+    entt::unregister<char>();
+    entt::unregister<properties>();
+    entt::unregister<unsigned int>();
+    entt::unregister<base_type>();
+    entt::unregister<derived_type>();
+    entt::unregister<empty_type>();
+    entt::unregister<fat_type>();
+    entt::unregister<data_type>();
+    entt::unregister<func_type>();
+    entt::unregister<setter_getter_type>();
+    entt::unregister<an_abstract_type>();
+    entt::unregister<another_abstract_type>();
+    entt::unregister<concrete_type>();
+
+    ASSERT_FALSE(entt::resolve("char"));
+    ASSERT_FALSE(entt::resolve("base"));
+    ASSERT_FALSE(entt::resolve("derived"));
+    ASSERT_FALSE(entt::resolve("empty"));
+    ASSERT_FALSE(entt::resolve("fat"));
+    ASSERT_FALSE(entt::resolve("data"));
+    ASSERT_FALSE(entt::resolve("func"));
+    ASSERT_FALSE(entt::resolve("setter_getter"));
+    ASSERT_FALSE(entt::resolve("an_abstract_type"));
+    ASSERT_FALSE(entt::resolve("another_abstract_type"));
+    ASSERT_FALSE(entt::resolve("concrete"));
+
+    Meta::SetUpAfterUnregistration();
+    entt::meta_any any{42.};
+
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(any.can_convert<int>());
+    ASSERT_TRUE(any.can_convert<float>());
+
+    ASSERT_FALSE(entt::resolve("derived"));
+    ASSERT_TRUE(entt::resolve("my_type"));
+
+    entt::resolve<derived_type>().prop([](auto prop) {
+        ASSERT_TRUE(prop);
+        ASSERT_EQ(prop.key(), properties::prop_bool);
+        ASSERT_FALSE(prop.value().template cast<bool>());
+    });
+
+    ASSERT_FALSE((entt::resolve<derived_type>().ctor<const base_type &, int, char>()));
+    ASSERT_TRUE((entt::resolve<derived_type>().ctor<>()));
+
+    ASSERT_TRUE(entt::resolve("your_type").data("a_data_member"));
+    ASSERT_FALSE(entt::resolve("your_type").data("another_data_member"));
+
+    ASSERT_TRUE(entt::resolve("your_type").func("a_member_function"));
+    ASSERT_FALSE(entt::resolve("your_type").func("another_member_function"));
 }

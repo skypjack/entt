@@ -21,6 +21,10 @@ template<typename Type, typename... Property>
 meta_factory<Type> reflect(const char *str, Property &&... property) ENTT_NOEXCEPT;
 
 
+template<typename Type>
+bool unregister() ENTT_NOEXCEPT;
+
+
 /**
  * @brief A meta factory to be used for reflection purposes.
  *
@@ -65,10 +69,10 @@ class meta_factory {
 
     template<typename Owner, typename Property, typename... Other>
     internal::meta_prop_node * properties(Property &&property, Other &&... other) {
-        static auto prop{std::move(property)};
+        static std::decay_t<Property> prop{};
 
         static internal::meta_prop_node node{
-            properties<Owner>(std::forward<Other>(other)...),
+            nullptr,
             []() -> meta_any {
                 return std::get<0>(prop);
             },
@@ -80,6 +84,8 @@ class meta_factory {
             }
         };
 
+        prop = std::forward<Property>(property);
+        node.next = properties<Owner>(std::forward<Other>(other)...);
         ENTT_ASSERT(!duplicate(meta_any{std::get<0>(prop)}, node.next));
         return &node;
     }
@@ -87,9 +93,9 @@ class meta_factory {
     template<typename... Property>
     meta_factory type(hashed_string name, Property &&... property) ENTT_NOEXCEPT {
         static internal::meta_type_node node{
-            name,
-            internal::meta_info<>::type,
-            properties<Type>(std::forward<Property>(property)...),
+            {},
+            nullptr,
+            nullptr,
             std::is_void_v<Type>,
             std::is_integral_v<Type>,
             std::is_floating_point_v<Type>,
@@ -109,6 +115,9 @@ class meta_factory {
             }
         };
 
+        node.name = name;
+        node.next = internal::meta_info<>::type;
+        node.prop = properties<Type>(std::forward<Property>(property)...);
         ENTT_ASSERT(!duplicate(name, node.next));
         ENTT_ASSERT(!internal::meta_info<Type>::type);
         internal::meta_info<Type>::type = &node;
@@ -117,9 +126,83 @@ class meta_factory {
         return *this;
     }
 
+    void unregister_prop(internal::meta_prop_node **prop) {
+        while(*prop) {
+            auto *node = *prop;
+            *prop = node->next;
+            node->next = nullptr;
+        }
+    }
+
+    void unregister_dtor() {
+        if(auto node = internal::meta_info<Type>::type->dtor; node) {
+            internal::meta_info<Type>::type->dtor = nullptr;
+            *node->underlying = nullptr;
+        }
+    }
+
+    template<auto Member>
+    auto unregister_all(int) -> decltype((internal::meta_info<Type>::type->*Member)->prop, void()) {
+        while(internal::meta_info<Type>::type->*Member) {
+            auto node = internal::meta_info<Type>::type->*Member;
+            internal::meta_info<Type>::type->*Member = node->next;
+            unregister_prop(&node->prop);
+            node->next = nullptr;
+            *node->underlying = nullptr;
+        }
+    }
+
+    template<auto Member>
+    void unregister_all(char) {
+        while(internal::meta_info<Type>::type->*Member) {
+            auto node = internal::meta_info<Type>::type->*Member;
+            internal::meta_info<Type>::type->*Member = node->next;
+            node->next = nullptr;
+            *node->underlying = nullptr;
+        }
+    }
+
+    bool unregister() ENTT_NOEXCEPT {
+        const auto registered = internal::meta_info<Type>::type;
+
+        if(registered) {
+            if(auto *curr = internal::meta_info<>::type; curr == internal::meta_info<Type>::type) {
+                internal::meta_info<>::type = internal::meta_info<Type>::type->next;
+            } else {
+                while(curr && curr->next != internal::meta_info<Type>::type) {
+                    curr = curr->next;
+                }
+
+                if(curr) {
+                    curr->next = internal::meta_info<Type>::type->next;
+                }
+            }
+
+            unregister_prop(&internal::meta_info<Type>::type->prop);
+            unregister_all<&internal::meta_type_node::base>(0);
+            unregister_all<&internal::meta_type_node::conv>(0);
+            unregister_all<&internal::meta_type_node::ctor>(0);
+            unregister_all<&internal::meta_type_node::data>(0);
+            unregister_all<&internal::meta_type_node::func>(0);
+            unregister_dtor();
+
+            internal::meta_info<Type>::type->name = {};
+            internal::meta_info<Type>::type->next = nullptr;
+            internal::meta_info<Type>::type = nullptr;
+        }
+
+        return registered;
+    }
+
     meta_factory() ENTT_NOEXCEPT = default;
 
 public:
+    template<typename Other, typename... Property>
+    friend meta_factory<Other> reflect(const char *str, Property &&... property) ENTT_NOEXCEPT;
+
+    template<typename Other>
+    friend bool unregister() ENTT_NOEXCEPT;
+
     /**
      * @brief Assigns a meta base to a meta type.
      *
@@ -134,8 +217,9 @@ public:
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_base_node node{
-            type->base,
+            &internal::meta_info<Type>::template base<Base>,
             type,
+            nullptr,
             &internal::meta_info<Base>::resolve,
             [](void *instance) -> void * {
                 return static_cast<Base *>(static_cast<Type *>(instance));
@@ -145,6 +229,7 @@ public:
             }
         };
 
+        node.next = type->base;
         ENTT_ASSERT((!internal::meta_info<Type>::template base<Base>));
         internal::meta_info<Type>::template base<Base> = &node;
         type->base = &node;
@@ -167,8 +252,9 @@ public:
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_conv_node node{
-            type->conv,
+            &internal::meta_info<Type>::template conv<To>,
             type,
+            nullptr,
             &internal::meta_info<To>::resolve,
             [](void *instance) -> meta_any {
                 return static_cast<std::decay_t<To>>(*static_cast<Type *>(instance));
@@ -178,6 +264,7 @@ public:
             }
         };
 
+        node.next = type->conv;
         ENTT_ASSERT((!internal::meta_info<Type>::template conv<To>));
         internal::meta_info<Type>::template conv<To> = &node;
         type->conv = &node;
@@ -206,9 +293,10 @@ public:
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_ctor_node node{
-            type->ctor,
+            &internal::meta_info<Type>::template ctor<typename helper_type::args_type>,
             type,
-            properties<typename helper_type::args_type>(std::forward<Property>(property)...),
+            nullptr,
+            nullptr,
             helper_type::size,
             &helper_type::arg,
             [](meta_any * const any) {
@@ -219,6 +307,8 @@ public:
             }
         };
 
+        node.next = type->ctor;
+        node.prop = properties<typename helper_type::args_type>(std::forward<Property>(property)...);
         ENTT_ASSERT((!internal::meta_info<Type>::template ctor<typename helper_type::args_type>));
         internal::meta_info<Type>::template ctor<typename helper_type::args_type> = &node;
         type->ctor = &node;
@@ -244,9 +334,10 @@ public:
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_ctor_node node{
-            type->ctor,
+            &internal::meta_info<Type>::template ctor<typename helper_type::args_type>,
             type,
-            properties<typename helper_type::args_type>(std::forward<Property>(property)...),
+            nullptr,
+            nullptr,
             helper_type::size,
             &helper_type::arg,
             [](meta_any * const any) {
@@ -257,6 +348,8 @@ public:
             }
         };
 
+        node.next = type->ctor;
+        node.prop = properties<typename helper_type::args_type>(std::forward<Property>(property)...);
         ENTT_ASSERT((!internal::meta_info<Type>::template ctor<typename helper_type::args_type>));
         internal::meta_info<Type>::template ctor<typename helper_type::args_type> = &node;
         type->ctor = &node;
@@ -286,6 +379,7 @@ public:
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_dtor_node node{
+            &internal::meta_info<Type>::template dtor<Func>,
             type,
             [](meta_handle handle) {
                 return handle.type() == internal::meta_info<Type>::resolve()->meta()
@@ -322,15 +416,15 @@ public:
     template<auto Data, typename... Property>
     meta_factory data(const char *str, Property &&... property) ENTT_NOEXCEPT {
         auto * const type = internal::meta_info<Type>::resolve();
+        internal::meta_data_node *curr = nullptr;
 
         if constexpr(std::is_same_v<Type, decltype(Data)>) {
-            using owner_type = std::integral_constant<Type, Data>;
-
             static internal::meta_data_node node{
-                hashed_string{str},
-                type->data,
+                &internal::meta_info<Type>::template data<Data>,
+                {},
                 type,
-                properties<owner_type>(std::forward<Property>(property)...),
+                nullptr,
+                nullptr,
                 true,
                 true,
                 &internal::meta_info<Type>::resolve,
@@ -341,18 +435,15 @@ public:
                 }
             };
 
-            ENTT_ASSERT(!duplicate(hashed_string{str}, node.next));
-            ENTT_ASSERT((!internal::meta_info<Type>::template data<Data>));
-            internal::meta_info<Type>::template data<Data> = &node;
-            type->data = &node;
+            node.prop = properties<std::integral_constant<Type, Data>>(std::forward<Property>(property)...);
+            curr = &node;
         } else {
-            using owner_type = std::integral_constant<decltype(Data), Data>;
-
             static internal::meta_data_node node{
-                hashed_string{str},
-                type->data,
+                &internal::meta_info<Type>::template data<Data>,
+                {},
                 type,
-                properties<owner_type>(std::forward<Property>(property)...),
+                nullptr,
+                nullptr,
                 std::is_const_v<data_type<Data>>,
                 !std::is_member_object_pointer_v<decltype(Data)>,
                 &internal::meta_info<data_type<Data>>::resolve,
@@ -363,11 +454,16 @@ public:
                 }
             };
 
-            ENTT_ASSERT(!duplicate(hashed_string{str}, node.next));
-            ENTT_ASSERT((!internal::meta_info<Type>::template data<Data>));
-            internal::meta_info<Type>::template data<Data> = &node;
-            type->data = &node;
+            node.prop = properties<std::integral_constant<decltype(Data), Data>>(std::forward<Property>(property)...);
+            curr = &node;
         }
+
+        curr->name = hashed_string{str};
+        curr->next = type->data;
+        ENTT_ASSERT(!duplicate(hashed_string{str}, curr->next));
+        ENTT_ASSERT((!internal::meta_info<Type>::template data<Data>));
+        internal::meta_info<Type>::template data<Data> = curr;
+        type->data = curr;
 
         return *this;
     }
@@ -401,10 +497,11 @@ public:
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_data_node node{
-            hashed_string{str},
-            type->data,
+            &internal::meta_info<Type>::template data<Setter, Getter>,
+            {},
             type,
-            properties<owner_type>(std::forward<Property>(property)...),
+            nullptr,
+            nullptr,
             false,
             false,
             &internal::meta_info<underlying_type>::resolve,
@@ -415,6 +512,9 @@ public:
             }
         };
 
+        node.name = hashed_string{str};
+        node.next = type->data;
+        node.prop = properties<owner_type>(std::forward<Property>(property)...);
         ENTT_ASSERT(!duplicate(hashed_string{str}, node.next));
         ENTT_ASSERT((!internal::meta_info<Type>::template data<Setter, Getter>));
         internal::meta_info<Type>::template data<Setter, Getter> = &node;
@@ -443,10 +543,11 @@ public:
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_func_node node{
-            hashed_string{str},
-            type->func,
+            &internal::meta_info<Type>::template func<Func>,
+            {},
             type,
-            properties<owner_type>(std::forward<Property>(property)...),
+            nullptr,
+            nullptr,
             func_type<Func>::size,
             func_type<Func>::is_const,
             func_type<Func>::is_static,
@@ -460,6 +561,9 @@ public:
             }
         };
 
+        node.name = hashed_string{str};
+        node.next = type->func;
+        node.prop = properties<owner_type>(std::forward<Property>(property)...);
         ENTT_ASSERT(!duplicate(hashed_string{str}, node.next));
         ENTT_ASSERT((!internal::meta_info<Type>::template func<Func>));
         internal::meta_info<Type>::template func<Func> = &node;
@@ -467,9 +571,6 @@ public:
 
         return *this;
     }
-
-    template<typename Other, typename... Property>
-    friend meta_factory<Other> reflect(const char *str, Property &&... property) ENTT_NOEXCEPT;
 };
 
 
@@ -507,6 +608,24 @@ inline meta_factory<Type> reflect(const char *str, Property &&... property) ENTT
 template<typename Type>
 inline meta_factory<Type> reflect() ENTT_NOEXCEPT {
     return meta_factory<Type>{};
+}
+
+
+/**
+ * @brief Basic function to unregister a type.
+ *
+ * This function unregisters a type and all its data members, member functions
+ * and properties, as well as its constructors, destructors and conversion
+ * functions if any.<br/>
+ * Base classes aren't unregistered but the link between the two types is
+ * removed.
+ *
+ * @tparam Type Type to unregister.
+ * @return True if the type to unregister exists, false otherwise.
+ */
+template<typename Type>
+inline bool unregister() ENTT_NOEXCEPT {
+    return meta_factory<Type>().unregister();
 }
 
 
