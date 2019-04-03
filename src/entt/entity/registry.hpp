@@ -66,7 +66,7 @@ class basic_registry {
     template<typename Component>
     struct pool_wrapper: sparse_set<Entity, Component> {
         template<typename... Args>
-        Component & construct(Entity entt, Args &&... args) {
+        Component & construct(const Entity entt, Args &&... args) {
             auto &component = sparse_set<Entity, Component>::construct(entt, std::forward<Args>(args)...);
             construction.publish(*owner, entt);
             return component;
@@ -85,9 +85,18 @@ class basic_registry {
             return component;
         }
 
-        void destroy(Entity entt) override {
+        void destroy(const Entity entt) override {
             destruction.publish(*owner, entt);
             sparse_set<Entity, Component>::destroy(entt);
+        }
+
+        template<typename... Args>
+        Component & replace(const Entity entt, Args &&... args) {
+            destruction.publish(*owner, entt);
+            auto &component = sparse_set<Entity, Component>::get(entt);
+            component = Component{std::forward<Args>(args)...};
+            construction.publish(*owner, entt);
+            return component;
         }
 
         signal_type construction;
@@ -855,7 +864,7 @@ public:
      */
     template<typename Component, typename... Args>
     Component & replace(const entity_type entity, Args &&... args) {
-        return pool<Component>()->get(entity) = Component{std::forward<Args>(args)...};
+        return pool<Component>()->replace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -887,10 +896,9 @@ public:
     template<typename Component, typename... Args>
     Component & assign_or_replace(const entity_type entity, Args &&... args) {
         auto *cpool = assure<Component>();
-        auto *component = cpool->try_get(entity);
 
-        return component
-                ? (*component = Component{std::forward<Args>(args)...})
+        return cpool->has(entity)
+                ? cpool->replace(entity, std::forward<Args>(args)...)
                 : cpool->construct(entity, std::forward<Args>(args)...);
     }
 

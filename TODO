@@ -23,9 +23,4 @@
   - non-owning groups can iterate pages and skip empty ones, this should mitigate the lack of the packed array
 * review 64 bit id: user defined area + dedicated member on the registry to set it
 * add NIO to the EnTT in Action list (link to my CV/LinkedIN)
-
 * reactive systems
-  - add exclusion lists to views (part of signature in this case)
-  - add entt::opt for optional components both to views and groups
-  - add try_get both to views and groups (for optional components)
-  - setup support for reactive systems, something like: registry.reactive(entt:get<A...>, entt::opt<B...>, entt::exclude<C...>)

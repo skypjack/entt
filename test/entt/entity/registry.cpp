@@ -909,9 +909,22 @@ TEST(Registry, Signals) {
     ASSERT_EQ(listener.counter, 1);
     ASSERT_EQ(listener.last, e0);
 
+    registry.destruction<int>().disconnect<&listener::decr<int>>(&listener);
+    registry.assign_or_replace<int>(e0);
+
+    ASSERT_EQ(listener.counter, 2);
+    ASSERT_EQ(listener.last, e0);
+
+    registry.construction<int>().disconnect<&listener::incr<int>>(&listener);
+    registry.destruction<int>().connect<&listener::decr<int>>(&listener);
     registry.assign_or_replace<int>(e0);
 
     ASSERT_EQ(listener.counter, 1);
+    ASSERT_EQ(listener.last, e0);
+
+    registry.replace<int>(e0);
+
+    ASSERT_EQ(listener.counter, 0);
     ASSERT_EQ(listener.last, e0);
 }
 
