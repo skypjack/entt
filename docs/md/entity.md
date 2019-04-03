@@ -118,8 +118,9 @@ use as-is and store around if needed. Do not try to inspect an entity
 identifier, its format can change in future and a registry offers all the
 functionalities to query them out-of-the-box. The underlying type of an entity
 (either `std::uint16_t`, `std::uint32_t` or `std::uint64_t`) can be specified
-when defining a registry (actually `registry` is nothing more than an _alias_
-for `registry<std::uint32_t>`).<br/>
+when defining a registry (actually `entt::registry` is nothing more than an
+alias for `entt::basic_registry<entt::entity>` and `entt::entity` is an alias
+for `std::uint32_t`).<br/>
 Components (the _C_ of an _ECS_) should be plain old data structures or more
 complex and movable data structures with a proper constructor. Actually, the
 sole requirement of a component type is that it must be both move constructible
@@ -127,9 +128,9 @@ and move assignable. They are list initialized by using the parameters provided
 to construct the component itself. No need to register components or their types
 neither with the registry nor with the entity-component system at all.<br/>
 Systems (the _S_ of an _ECS_) are just plain functions, functors, lambdas or
-whatever users want. They can accept a `registry`, a view or a group of any type
-and use them the way they prefer. No need to register systems or their types
-neither with the registry nor with the entity-component system at all.
+whatever users want. They can accept an `entt::registry`, a view or a group of
+any type and use them the way they prefer. No need to register systems or their
+types neither with the registry nor with the entity-component system at all.
 
 The following sections will explain in short how to use the entity-component
 system, the core part of the whole library.<br/>
@@ -140,9 +141,10 @@ describe below. For more details, please refer to the inline documentation.
 
 A registry can store and manage entities, as well as create views and groups to
 iterate the underlying data structures.<br/>
-The class template `registry` lets users decide what's the preferred type to
-represent an entity. Because `std::uint32_t` is large enough for almost all the
-cases, `registry` is also an _alias_ for `registry<std::uint32_t>`.
+The class template `basic_registry` lets users decide what's the preferred type
+to represent an entity. Because `std::uint32_t` is large enough for almost all
+the cases, there exists also the alias `entt::entity` for it, as well as the
+alias `entt::registry` for `entt::basic_registry<entt::entity>`.
 
 Entities are represented by _entity identifiers_. An entity identifier is an
 opaque type that users should not inspect or modify in any way. It carries
@@ -342,7 +344,11 @@ The function type of a listener is the same in all cases and should be
 equivalent to:
 
 ```cpp
-void(registry<Entity> &, Entity);
+// when the default entity and the default registry are used
+void(registry &, entt::entity);
+
+// when a different specialization of the registry is used
+void(basic_registry<Entity> &, Entity);
 ```
 
 In other terms, a listener is provided with the registry that triggered the
