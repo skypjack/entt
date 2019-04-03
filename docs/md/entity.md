@@ -313,34 +313,31 @@ the component owned by an entity if any, a null pointer otherwise.
 
 Because of how the registry works internally, it stores a couple of signal
 handlers for each pool in order to notify some of its data structures on the
-construction and destruction of components. Moreover, it offers also a signal
-handler to listen for changes on components.<br/>
+construction and destruction of components.<br/>
 These signal handlers are also exposed and made available to users. These are
 the basic bricks to build fancy things like dependencies and reactive systems.
 
 To get a sink to be used to connect and disconnect listeners so as to be
-notified on the creation of a component, use the `on_assign` member function:
+notified on the creation of a component, use the `construction` member function:
 
 ```cpp
 // connects a free function
-registry.on_assign<position>().connect<&my_free_function>();
+registry.construction<position>().connect<&my_free_function>();
 
 // connects a member function
-registry.on_assign<position>().connect<&my_class::member>(&instance);
+registry.construction<position>().connect<&my_class::member>(&instance);
 
 // disconnects a free function
-registry.on_assign<position>().disconnect<&my_free_function>();
+registry.construction<position>().disconnect<&my_free_function>();
 
 // disconnects a member function
-registry.on_assign<position>().disconnect<&my_class::member>(&instance);
+registry.construction<position>().disconnect<&my_class::member>(&instance);
 ```
 
-The `on_replace` member function returns instead a sink object to which to
-connect listeners that are triggered when components are explicitly replaced.
-To be notified when components are destroyed, use the `on_remove` member
+To be notified when components are destroyed, use the `destruction` member
 function instead.
 
-The function type of a listener is the same in all cases and should be
+The function type of a listener is the same in both the cases and should be
 equivalent to:
 
 ```cpp
@@ -355,7 +352,6 @@ In other terms, a listener is provided with the registry that triggered the
 notification and the entity affected by the change. Note also that:
 
 * Listeners are invoked **after** components have been assigned to entities.
-* Listeners are invoked **after** components have been replaced for entities.
 * Listeners are invoked **before** components have been removed from entities.
 * The order of invocation of the listeners isn't guaranteed in any case.
 
@@ -364,8 +360,6 @@ particular:
 
 * Connecting and disconnecting other functions from within the body of a
   listener should be avoided. It can lead to undefined behavior in some cases.
-* Replacing components from within the body of a listener that observes changes
-  on entities should be avoided. Intuitively, it could trigger an infinite loop.
 * Assigning and removing components from within the body of a listener that
   observes the destruction of instances of a given type should be avoided. It
   can lead to undefined behavior in some cases. This type of listeners is
@@ -784,7 +778,7 @@ The following adds components `a_type` and `another_type` whenever `my_type` is
 assigned to an entity:
 
 ```cpp
-entt::connnect<a_type, another_type>(registry.on_assign<my_type>());
+entt::connnect<a_type, another_type>(registry.construction<my_type>());
 ```
 
 A component is assigned to an entity and thus default initialized only in case
@@ -793,7 +787,7 @@ be overriden.<br/>
 A dependency can easily be broken by means of the following function template:
 
 ```cpp
-entt::disconnect<a_type, another_type>(registry.on_assign<my_type>());
+entt::disconnect<a_type, another_type>(registry.construction<my_type>());
 ```
 
 ### Tags

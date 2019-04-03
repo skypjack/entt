@@ -854,9 +854,8 @@ TEST(Registry, Signals) {
     entt::registry registry;
     listener listener;
 
-    registry.on_assign<int>().connect<&listener::incr<int>>(&listener);
-    registry.on_remove<int>().connect<&listener::decr<int>>(&listener);
-    registry.on_replace<int>().connect<&listener::incr<int>>(&listener);
+    registry.construction<int>().connect<&listener::incr<int>>(&listener);
+    registry.destruction<int>().connect<&listener::decr<int>>(&listener);
 
     auto e0 = registry.create();
     auto e1 = registry.create();
@@ -872,20 +871,20 @@ TEST(Registry, Signals) {
     ASSERT_EQ(listener.counter, 1);
     ASSERT_EQ(listener.last, e0);
 
-    registry.on_remove<int>().disconnect<&listener::decr<int>>(&listener);
+    registry.destruction<int>().disconnect<&listener::decr<int>>(&listener);
     registry.remove<int>(e1);
 
     ASSERT_EQ(listener.counter, 1);
     ASSERT_EQ(listener.last, e0);
 
-    registry.on_assign<int>().disconnect<&listener::incr<int>>(&listener);
+    registry.construction<int>().disconnect<&listener::incr<int>>(&listener);
     registry.assign<int>(e1);
 
     ASSERT_EQ(listener.counter, 1);
     ASSERT_EQ(listener.last, e0);
 
-    registry.on_assign<int>().connect<&listener::incr<int>>(&listener);
-    registry.on_remove<int>().connect<&listener::decr<int>>(&listener);
+    registry.construction<int>().connect<&listener::incr<int>>(&listener);
+    registry.destruction<int>().connect<&listener::decr<int>>(&listener);
     registry.assign<int>(e0);
     registry.reset<int>(e1);
 
@@ -912,12 +911,7 @@ TEST(Registry, Signals) {
 
     registry.assign_or_replace<int>(e0);
 
-    ASSERT_EQ(listener.counter, 2);
-    ASSERT_EQ(listener.last, e0);
-
-    registry.replace<int>(e0);
-
-    ASSERT_EQ(listener.counter, 3);
+    ASSERT_EQ(listener.counter, 1);
     ASSERT_EQ(listener.last, e0);
 }
 
@@ -1063,7 +1057,7 @@ TEST(Registry, CreateManyEntitiesWithComponentsAtOnceWithListener) {
     entt::entity entities[3];
     listener listener;
 
-    registry.on_assign<int>().connect<&listener::incr<int>>(&listener);
+    registry.construction<int>().connect<&listener::incr<int>>(&listener);
     registry.create<int, char>(std::begin(entities), std::end(entities));
 
     ASSERT_EQ(listener.counter, 3);
@@ -1240,8 +1234,8 @@ TEST(Registry, Clone) {
     ASSERT_NE(e1, entity);
     ASSERT_EQ(registry.entity(e1), registry.entity(entity));
 
-    registry.on_assign<char>().connect<&listener::incr<char>>(&listener);
-    registry.on_remove<char>().connect<&listener::decr<char>>(&listener);
+    registry.construction<char>().connect<&listener::incr<char>>(&listener);
+    registry.destruction<char>().connect<&listener::decr<char>>(&listener);
     registry.assign<char>(entity, 'e');
     registry.assign<char>(e0, '0');
     registry.remove<char>(e0);
