@@ -142,7 +142,7 @@ class basic_view {
     };
 
     // we could use pool_type<Component> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    basic_view(sparse_set<Entity, std::remove_const_t<Component>> *... ref) ENTT_NOEXCEPT
+    basic_view(pool_type<Component> *... ref) ENTT_NOEXCEPT
         : pools{ref...}
     {}
 
