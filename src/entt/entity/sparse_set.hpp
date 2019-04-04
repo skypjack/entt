@@ -188,7 +188,7 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Input iterator type. */
+    /*! @brief Random access iterator type. */
     using iterator_type = iterator;
 
     /*! @brief Default constructor. */
@@ -791,9 +791,9 @@ public:
     using entity_type = typename underlying_type::entity_type;
     /*! @brief Unsigned integer type. */
     using size_type = typename underlying_type::size_type;
-    /*! @brief Input iterator type. */
+    /*! @brief Random access iterator type. */
     using iterator_type = iterator<false>;
-    /*! @brief Constant input iterator type. */
+    /*! @brief Constant random access iterator type. */
     using const_iterator_type = iterator<true>;
 
     /**
