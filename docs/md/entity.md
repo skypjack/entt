@@ -1160,8 +1160,11 @@ auto group = registry.group<position, velocity>(entt::exclude<renderable>);
 
 Once created, the group gets the ownership of all the components specified in
 the template parameter list and arranges their pools so as to iterate all of
-them as fast as possible.<br/>
+them as fast as possible.
+
 Sorting owned components is no longer allowed once the group has been created.
+However, full-owning groups can be sorted by means of the `sort` member
+function, if required.
 
 ### Partial-owning groups
 
@@ -1186,8 +1189,11 @@ auto group = registry.group<position>(entt::get<velocity>, entt::exclude<rendera
 Once created, the group gets the ownership of all the components specified in
 the template parameter list and arranges their pools so as to iterate all of
 them as fast as possible. The ownership of the types provided via `entt::get`
-doesn't pass to the group instead.<br/>
+doesn't pass to the group instead.
+
 Sorting owned components is no longer allowed once the group has been created.
+However, partial-owning groups can be sorted by means of the `sort` member
+function, if required.
 
 ### Non-owning groups
 
@@ -1208,9 +1214,13 @@ Filtering entities by components is also supported:
 auto group = registry.group<>(entt::get<position, velocity>, entt::exclude<renderable>);
 ```
 
-The group doesn't receive the ownership of any type of component in this case.
-This has a positive implication, that is, the fact that non-owning groups can be
-sorted by means of the `sort` member function, if required.
+The group doesn't receive the ownership of any type of component in this
+case. This type of groups is therefore the least performing in general, but also
+the only one that can be used in any situation to improve a performance where
+necessary.
+
+Non-owning groups can be sorted by means of the `sort` member function, if
+required.
 
 # Types: const, non-const and all in between
 

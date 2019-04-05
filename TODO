@@ -8,8 +8,6 @@
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
 * allow for built-in parallel each if possible
 * allow to replace std:: with custom implementations
-* allow to sort groups (::respect can already work with begin/end instead of a whole sparse set)
-  -it would ease by far the group trick for hierarchies that requires otherwise more boilerplate
 * remove runtime views, welcome reflection and what about snapshot?
 * empty components model allows for shared components and prefabs unity-like
   - each with entity return the shared component multiple times, one per entity that refers to it

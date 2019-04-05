@@ -5,6 +5,9 @@
 #include <entt/entity/registry.hpp>
 #include <entt/entity/group.hpp>
 
+struct empty_type {};
+struct boxed_int { int value; };
+
 TEST(NonOwningGroup, Functionalities) {
     entt::registry registry;
     auto group = registry.group<>(entt::get<int, char>);
@@ -346,7 +349,6 @@ TEST(NonOwningGroup, ExcludedComponents) {
 }
 
 TEST(NonOwningGroup, EmptyAndNonEmptyTypes) {
-    struct empty_type {};
     entt::registry registry;
     const auto group = registry.group<>(entt::get<int, empty_type>);
 
@@ -547,6 +549,155 @@ TEST(OwningGroup, Each) {
     ASSERT_EQ(cnt, std::size_t{0});
 }
 
+TEST(OwningGroup, SortOrdered) {
+    entt::registry registry;
+    auto group = registry.group<boxed_int, char>();
+
+    entt::entity entities[5] = {
+        registry.create(),
+        registry.create(),
+        registry.create(),
+        registry.create(),
+        registry.create()
+    };
+
+    registry.assign<boxed_int>(entities[0], 12);
+    registry.assign<char>(entities[0], 'a');
+
+    registry.assign<boxed_int>(entities[1], 9);
+    registry.assign<char>(entities[1], 'b');
+
+    registry.assign<boxed_int>(entities[2], 6);
+    registry.assign<char>(entities[2], 'c');
+
+    registry.assign<boxed_int>(entities[3], 1);
+    registry.assign<boxed_int>(entities[4], 2);
+
+    group.sort([&group](const auto lhs, const auto rhs) {
+        return group.get<boxed_int>(lhs).value < group.get<boxed_int>(rhs).value;
+    });
+
+    ASSERT_EQ(*(group.data() + 0u), entities[0]);
+    ASSERT_EQ(*(group.data() + 1u), entities[1]);
+    ASSERT_EQ(*(group.data() + 2u), entities[2]);
+    ASSERT_EQ(*(group.data() + 3u), entities[3]);
+    ASSERT_EQ(*(group.data() + 4u), entities[4]);
+
+    ASSERT_EQ((group.raw<boxed_int>() + 0u)->value, 12);
+    ASSERT_EQ((group.raw<boxed_int>() + 1u)->value, 9);
+    ASSERT_EQ((group.raw<boxed_int>() + 2u)->value, 6);
+    ASSERT_EQ((group.raw<boxed_int>() + 3u)->value, 1);
+    ASSERT_EQ((group.raw<boxed_int>() + 4u)->value, 2);
+
+    ASSERT_EQ(*(group.raw<char>() + 0u), 'a');
+    ASSERT_EQ(*(group.raw<char>() + 1u), 'b');
+    ASSERT_EQ(*(group.raw<char>() + 2u), 'c');
+}
+
+TEST(OwningGroup, SortReverse) {
+    entt::registry registry;
+    auto group = registry.group<boxed_int, char>();
+
+    entt::entity entities[5] = {
+        registry.create(),
+        registry.create(),
+        registry.create(),
+        registry.create(),
+        registry.create()
+    };
+
+    registry.assign<boxed_int>(entities[0], 6);
+    registry.assign<char>(entities[0], 'a');
+
+    registry.assign<boxed_int>(entities[1], 9);
+    registry.assign<char>(entities[1], 'b');
+
+    registry.assign<boxed_int>(entities[2], 12);
+    registry.assign<char>(entities[2], 'c');
+
+    registry.assign<boxed_int>(entities[3], 1);
+    registry.assign<boxed_int>(entities[4], 2);
+
+    group.sort([&group](const auto lhs, const auto rhs) {
+        return group.get<boxed_int>(lhs).value < group.get<boxed_int>(rhs).value;
+    });
+
+    ASSERT_EQ(*(group.data() + 0u), entities[2]);
+    ASSERT_EQ(*(group.data() + 1u), entities[1]);
+    ASSERT_EQ(*(group.data() + 2u), entities[0]);
+    ASSERT_EQ(*(group.data() + 3u), entities[3]);
+    ASSERT_EQ(*(group.data() + 4u), entities[4]);
+
+    ASSERT_EQ((group.raw<boxed_int>() + 0u)->value, 12);
+    ASSERT_EQ((group.raw<boxed_int>() + 1u)->value, 9);
+    ASSERT_EQ((group.raw<boxed_int>() + 2u)->value, 6);
+    ASSERT_EQ((group.raw<boxed_int>() + 3u)->value, 1);
+    ASSERT_EQ((group.raw<boxed_int>() + 4u)->value, 2);
+
+    ASSERT_EQ(*(group.raw<char>() + 0u), 'c');
+    ASSERT_EQ(*(group.raw<char>() + 1u), 'b');
+    ASSERT_EQ(*(group.raw<char>() + 2u), 'a');
+}
+
+TEST(OwningGroup, SortUnordered) {
+    entt::registry registry;
+    auto group = registry.group<boxed_int, char>();
+
+    entt::entity entities[7] = {
+        registry.create(),
+        registry.create(),
+        registry.create(),
+        registry.create(),
+        registry.create(),
+        registry.create(),
+        registry.create()
+    };
+
+    registry.assign<boxed_int>(entities[0], 6);
+    registry.assign<char>(entities[0], 'a');
+
+    registry.assign<boxed_int>(entities[1], 3);
+    registry.assign<char>(entities[1], 'b');
+
+    registry.assign<boxed_int>(entities[2], 1);
+    registry.assign<char>(entities[2], 'c');
+
+    registry.assign<boxed_int>(entities[3], 9);
+    registry.assign<char>(entities[3], 'd');
+
+    registry.assign<boxed_int>(entities[4], 12);
+    registry.assign<char>(entities[4], 'e');
+
+    registry.assign<boxed_int>(entities[5], 4);
+    registry.assign<boxed_int>(entities[6], 5);
+
+    group.sort([&group](const auto lhs, const auto rhs) {
+        return group.get<boxed_int>(lhs).value < group.get<boxed_int>(rhs).value;
+    });
+
+    ASSERT_EQ(*(group.data() + 0u), entities[4]);
+    ASSERT_EQ(*(group.data() + 1u), entities[3]);
+    ASSERT_EQ(*(group.data() + 2u), entities[0]);
+    ASSERT_EQ(*(group.data() + 3u), entities[1]);
+    ASSERT_EQ(*(group.data() + 4u), entities[2]);
+    ASSERT_EQ(*(group.data() + 5u), entities[5]);
+    ASSERT_EQ(*(group.data() + 6u), entities[6]);
+
+    ASSERT_EQ((group.raw<boxed_int>() + 0u)->value, 12);
+    ASSERT_EQ((group.raw<boxed_int>() + 1u)->value, 9);
+    ASSERT_EQ((group.raw<boxed_int>() + 2u)->value, 6);
+    ASSERT_EQ((group.raw<boxed_int>() + 3u)->value, 3);
+    ASSERT_EQ((group.raw<boxed_int>() + 4u)->value, 1);
+    ASSERT_EQ((group.raw<boxed_int>() + 5u)->value, 4);
+    ASSERT_EQ((group.raw<boxed_int>() + 6u)->value, 5);
+
+    ASSERT_EQ(*(group.raw<char>() + 0u), 'e');
+    ASSERT_EQ(*(group.raw<char>() + 1u), 'd');
+    ASSERT_EQ(*(group.raw<char>() + 2u), 'a');
+    ASSERT_EQ(*(group.raw<char>() + 3u), 'b');
+    ASSERT_EQ(*(group.raw<char>() + 4u), 'c');
+}
+
 TEST(OwningGroup, IndexRebuiltOnDestroy) {
     entt::registry registry;
     auto group = registry.group<int>(entt::get<unsigned int>);
@@ -704,7 +855,6 @@ TEST(OwningGroup, ExcludedComponents) {
 }
 
 TEST(OwningGroup, EmptyAndNonEmptyTypes) {
-    struct empty_type {};
     entt::registry registry;
     const auto group = registry.group<empty_type>(entt::get<int>);
 
