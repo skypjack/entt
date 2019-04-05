@@ -10,6 +10,7 @@
   * [A bitset-free entity-component system](#a-bitset-free-entity-component-system)
   * [Pay per use](#pay-per-use)
   * [All or nothing](#all-or-nothing)
+  * [Stateless systems](#stateless-systems)
 * [Vademecum](#vademecum)
 * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
   * [Observe changes](#observe-changes)
@@ -108,6 +109,18 @@ around this need, which was and remains one of my main requirements during the
 development.<br/>
 The rest is experimentation and the desire to invent something new, hoping to
 have succeeded.
+
+## Stateless systems
+
+`EnTT` is designed so that it can work with _stateless systems_. In other words,
+all systems can be free functions and there is no need to define them as classes
+(although nothing prevents users from doing so).<br/>
+This is possible because the main class with which the users will work provides
+all what is needed to act as the sole _source of truth_ of an application.
+
+To be honest, this point became part of the design principles at a later date,
+but has also become one of the cornerstones of the library to date, as stateless
+systems are widely used and appreciated in general.
 
 # Vademecum
 
@@ -439,9 +452,8 @@ In fact, there are two functions that respond to slightly different needs:
   Or by accessing their entities:
 
   ```cpp
-  registry.sort<renderable>([](const entt::entity &lhs, const entt::entity &rhs) {
-      return lhs.z < rhs.z;
-
+  registry.sort<renderable>([&registry](const entt::entity lhs, const entt::entity rhs) {
+      return registry.entity(lhs) < registry.entity(rhs);
   });
   ```
 
