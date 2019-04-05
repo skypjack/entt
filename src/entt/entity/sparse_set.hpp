@@ -1075,9 +1075,10 @@ public:
      *
      * The comparison function object must return `true` if the first element
      * is _less_ than the second one, `false` otherwise. The signature of the
-     * comparison function should be equivalent to the following:
+     * comparison function should be equivalent to one of the following:
      *
      * @code{.cpp}
+     * bool(const Entity, const Entity);
      * bool(const Type &, const Type &);
      * @endcode
      *
@@ -1096,8 +1097,8 @@ public:
      * this member function.
      *
      * @note
-     * Empty components aren't explicitly instantiated. Therefore, this function
-     * isn't available for them.
+     * Empty components aren't explicitly instantiated. Therefore, the
+     * comparison function must necessarily accept entity identifiers.
      *
      * @note
      * Attempting to iterate elements using a raw pointer returned by a call to
@@ -1108,19 +1109,25 @@ public:
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
-     * @param sort A valid sort function object.
+     * @param algo A valid sort function object.
      * @param args Arguments to forward to the sort function object, if any.
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
-    void sort(Compare compare, Sort sort = Sort{}, Args &&... args) {
-        static_assert(!std::is_empty_v<object_type>);
-
+    inline void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
         std::vector<size_type> copy(instances.size());
         std::iota(copy.begin(), copy.end(), 0);
 
-        sort(copy.begin(), copy.end(), [this, compare = std::move(compare)](const auto lhs, const auto rhs) {
-            return compare(std::as_const(instances[rhs]), std::as_const(instances[lhs]));
-        }, std::forward<Args>(args)...);
+        if constexpr(std::is_invocable_v<Compare, const object_type &, const object_type &>) {
+            static_assert(!std::is_empty_v<object_type>);
+
+            algo(copy.rbegin(), copy.rend(), [this, compare = std::move(compare)](const auto lhs, const auto rhs) {
+                return compare(std::as_const(instances[lhs]), std::as_const(instances[rhs]));
+            }, std::forward<Args>(args)...);
+        } else {
+            algo(copy.rbegin(), copy.rend(), [this, compare = std::move(compare), entities = underlying_type::data()](const auto lhs, const auto rhs) {
+                return compare(entities[lhs], entities[rhs]);
+            }, std::forward<Args>(args)...);
+        }
 
         for(size_type pos = 0, last = copy.size(); pos < last; ++pos) {
             auto curr = pos;
@@ -1129,7 +1136,11 @@ public:
             while(curr != next) {
                 const auto lhs = copy[curr];
                 const auto rhs = copy[next];
-                std::swap(instances[lhs], instances[rhs]);
+
+                if constexpr(!std::is_empty_v<object_type>) {
+                    std::swap(instances[lhs], instances[rhs]);
+                }
+
                 underlying_type::swap(lhs, rhs);
                 copy[curr] = curr;
                 curr = next;

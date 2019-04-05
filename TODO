@@ -16,11 +16,11 @@
   - each components only return actual component, so shared components are returned only once
 * types defined at runtime that refer to the same compile-time type (but to different pools) are possible, the library is almost there
 * add take functionality, eg registry.take(entity, other); where it takes the entity and all its components from registry and move them to other
-* add entity function to views/groups (component -> owner, see sparse sets)
 * add opaque input iterators to views and groups that return tuples <entity, T &...> (proxy), multi-pass guaranteed
 * add fast lane for raw iterations, extend mt doc to describe allowed add/remove with pre-allocations on fast lanes
 * review sparse set to allow customization (mix pack in the spec, base is position only)
   - non-owning groups can iterate pages and skip empty ones, this should mitigate the lack of the packed array
 * review 64 bit id: user defined area + dedicated member on the registry to set it
 * add NIO to the EnTT in Action list (link to my CV/LinkedIN)
+* remove entity function from sparse sets (no longer required)
 * reactive systems

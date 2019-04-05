@@ -338,14 +338,10 @@ To be notified when components are destroyed, use the `destruction` member
 function instead.
 
 The function type of a listener is the same in both the cases and should be
-equivalent to:
+equivalent to the following:
 
 ```cpp
-// when the default entity and the default registry are used
 void(registry &, entt::entity);
-
-// when a different specialization of the registry is used
-void(basic_registry<Entity> &, Entity);
 ```
 
 In other terms, a listener is provided with the registry that triggered the
@@ -431,10 +427,19 @@ It goes without saying that sorting entities and components is possible with
 `EnTT`.<br/>
 In fact, there are two functions that respond to slightly different needs:
 
-* Components can be sorted directly:
+* Components can be sorted either directly:
 
   ```cpp
   registry.sort<renderable>([](const auto &lhs, const auto &rhs) {
+      return lhs.z < rhs.z;
+
+  });
+  ```
+
+  Or by accessing their entities:
+
+  ```cpp
+  registry.sort<renderable>([](const entt::entity &lhs, const entt::entity &rhs) {
       return lhs.z < rhs.z;
 
   });
@@ -444,7 +449,7 @@ In fact, there are two functions that respond to slightly different needs:
   long as it adheres to the requirements described in the inline
   documentation.<br/>
   This is possible mainly because users can get much more with a custom sort
-  function object if the pattern of usage is known. As an example, in case of an
+  function object if the usage pattern is known. As an example, in case of an
   almost sorted pool, quick sort could be much, much slower than insertion sort.
 
 * Components can be sorted according to the order imposed by another component:
@@ -594,7 +599,7 @@ temporary object.
 Example of use:
 
 ```cpp
-entt::continuous_loader<entity_type> loader{registry};
+entt::continuous_loader<entt::entity> loader{registry};
 input_archive input;
 
 loader.entities(input)
@@ -618,7 +623,7 @@ one.
 The `component` member function restores all and only the components specified
 and assigns them to the right entities.<br/>
 In case the component contains entities itself (either as data members of type
-`entity_type` or as containers of entities), the loader can update them
+`entt::entity` or as containers of entities), the loader can update them
 automatically. To do that, it's enough to specify the data members to update as
 shown in the example.
 
@@ -642,18 +647,18 @@ In particular:
   function call operator with the following signature to store entities:
 
   ```cpp
-  void operator()(Entity);
+  void operator()(entt::entity);
   ```
 
-  Where `Entity` is the type of the entities used by the registry. Note that all
-  the member functions of the snapshot class make also an initial call to this
-  endpoint to save the _size_ of the set they are going to store.<br/>
+  Where `entt::entity` is the type of the entities used by the registry. Note
+  that all the member functions of the snapshot class make also an initial call
+  to this endpoint to save the _size_ of the set they are going to store.<br/>
   In addition, an archive must accept a pair of entity and component for each
   type to be serialized. Therefore, given a type `T`, the archive must contain a
   function call operator with the following signature:
 
   ```cpp
-  void operator()(Entity, const T &);
+  void operator()(entt::entity, const T &);
   ```
 
   The output archive can freely decide how to serialize the data. The register
@@ -663,11 +668,11 @@ In particular:
   function call operator with the following signature to load entities:
 
   ```cpp
-  void operator()(Entity &);
+  void operator()(entt::entity &);
   ```
 
-  Where `Entity` is the type of the entities used by the registry. Each time the
-  function is invoked, the archive must read the next element from the
+  Where `entt::entity` is the type of the entities used by the registry. Each
+  time the function is invoked, the archive must read the next element from the
   underlying storage and copy it in the given variable. Note that all the member
   functions of a loader class make also an initial call to this endpoint to read
   the _size_ of the set they are going to load.<br/>
@@ -676,7 +681,7 @@ In particular:
   function call operator with the following signature:
 
   ```cpp
-  void operator()(Entity &, T &);
+  void operator()(entt::entity &, T &);
   ```
 
   Every time such an operator is invoked, the archive must read the next
@@ -822,7 +827,7 @@ other than defining the null entity itself. However, there exist implicit
 conversions from the null entity to identifiers of any allowed type:
 
 ```cpp
-typename entt::registry::entity_type null = entt::null;
+entt::entity null = entt::null;
 ```
 
 Similarly, the null entity can be compared to any other identifier:
@@ -1309,7 +1314,7 @@ also references will continue to be valid.<br/>
 Consider the following example:
 
 ```cpp
-registry.view<position>([&](auto entity, auto &pos) {
+registry.view<position>([&](const auto entity, auto &pos) {
     registry.assign<position>(registry.create(), 0., 0.);
     pos.x = 0.; // warning: dangling pointer
 });

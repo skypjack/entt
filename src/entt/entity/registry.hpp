@@ -1003,13 +1003,13 @@ public:
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
-     * @param sort A valid sort function object.
+     * @param algo A valid sort function object.
      * @param args Arguments to forward to the sort function object, if any.
      */
     template<typename Component, typename Compare, typename Sort = std_sort, typename... Args>
-    void sort(Compare compare, Sort sort = Sort{}, Args &&... args) {
+    void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
         ENTT_ASSERT(!owned<Component>());
-        assure<Component>()->sort(std::move(compare), std::move(sort), std::forward<Args>(args)...);
+        assure<Component>()->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 
     /**

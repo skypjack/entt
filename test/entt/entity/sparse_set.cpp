@@ -9,6 +9,7 @@
 #include <entt/entity/sparse_set.hpp>
 
 struct empty_type {};
+struct boxed_int { int value; };
 
 TEST(SparseSetNoType, Functionalities) {
     entt::sparse_set<std::uint64_t> set;
@@ -800,110 +801,110 @@ TEST(SparseSetWithType, RawEmptyType) {
 }
 
 TEST(SparseSetWithType, SortOrdered) {
-    entt::sparse_set<std::uint64_t, int> set;
+    entt::sparse_set<std::uint64_t, boxed_int> set;
 
-    set.construct(12, 12);
-    set.construct(42, 9);
-    set.construct(7, 6);
-    set.construct(3, 3);
-    set.construct(9, 1);
+    set.construct(12, boxed_int{12});
+    set.construct(42, boxed_int{9});
+    set.construct(7, boxed_int{6});
+    set.construct(3, boxed_int{3});
+    set.construct(9, boxed_int{1});
 
-    ASSERT_EQ(set.get(12), 12);
-    ASSERT_EQ(set.get(42), 9);
-    ASSERT_EQ(set.get(7), 6);
-    ASSERT_EQ(set.get(3), 3);
-    ASSERT_EQ(set.get(9), 1);
+    ASSERT_EQ(set.get(12).value, 12);
+    ASSERT_EQ(set.get(42).value, 9);
+    ASSERT_EQ(set.get(7).value, 6);
+    ASSERT_EQ(set.get(3).value, 3);
+    ASSERT_EQ(set.get(9).value, 1);
 
     set.sort([](auto lhs, auto rhs) {
-        return lhs < rhs;
+        return lhs.value < rhs.value;
     });
 
-    ASSERT_EQ(*(set.raw() + 0u), 12);
-    ASSERT_EQ(*(set.raw() + 1u), 9);
-    ASSERT_EQ(*(set.raw() + 2u), 6);
-    ASSERT_EQ(*(set.raw() + 3u), 3);
-    ASSERT_EQ(*(set.raw() + 4u), 1);
+    ASSERT_EQ((set.raw() + 0u)->value, 12);
+    ASSERT_EQ((set.raw() + 1u)->value, 9);
+    ASSERT_EQ((set.raw() + 2u)->value, 6);
+    ASSERT_EQ((set.raw() + 3u)->value, 3);
+    ASSERT_EQ((set.raw() + 4u)->value, 1);
 
     auto begin = set.begin();
     auto end = set.end();
 
-    ASSERT_EQ(*(begin++), 1);
-    ASSERT_EQ(*(begin++), 3);
-    ASSERT_EQ(*(begin++), 6);
-    ASSERT_EQ(*(begin++), 9);
-    ASSERT_EQ(*(begin++), 12);
+    ASSERT_EQ((begin++)->value, 1);
+    ASSERT_EQ((begin++)->value, 3);
+    ASSERT_EQ((begin++)->value, 6);
+    ASSERT_EQ((begin++)->value, 9);
+    ASSERT_EQ((begin++)->value, 12);
     ASSERT_EQ(begin, end);
 }
 
 TEST(SparseSetWithType, SortReverse) {
-    entt::sparse_set<std::uint64_t, int> set;
+    entt::sparse_set<std::uint64_t, boxed_int> set;
 
-    set.construct(12, 1);
-    set.construct(42, 3);
-    set.construct(7, 6);
-    set.construct(3, 9);
-    set.construct(9, 12);
+    set.construct(12, boxed_int{1});
+    set.construct(42, boxed_int{3});
+    set.construct(7, boxed_int{6});
+    set.construct(3, boxed_int{9});
+    set.construct(9, boxed_int{12});
 
-    ASSERT_EQ(set.get(12), 1);
-    ASSERT_EQ(set.get(42), 3);
-    ASSERT_EQ(set.get(7), 6);
-    ASSERT_EQ(set.get(3), 9);
-    ASSERT_EQ(set.get(9), 12);
+    ASSERT_EQ(set.get(12).value, 1);
+    ASSERT_EQ(set.get(42).value, 3);
+    ASSERT_EQ(set.get(7).value, 6);
+    ASSERT_EQ(set.get(3).value, 9);
+    ASSERT_EQ(set.get(9).value, 12);
 
-    set.sort([](auto lhs, auto rhs) {
-        return lhs < rhs;
+    set.sort([&set](std::uint64_t lhs, std::uint64_t rhs) {
+        return set.get(lhs).value < set.get(rhs).value;
     });
 
-    ASSERT_EQ(*(set.raw() + 0u), 12);
-    ASSERT_EQ(*(set.raw() + 1u), 9);
-    ASSERT_EQ(*(set.raw() + 2u), 6);
-    ASSERT_EQ(*(set.raw() + 3u), 3);
-    ASSERT_EQ(*(set.raw() + 4u), 1);
+    ASSERT_EQ((set.raw() + 0u)->value, 12);
+    ASSERT_EQ((set.raw() + 1u)->value, 9);
+    ASSERT_EQ((set.raw() + 2u)->value, 6);
+    ASSERT_EQ((set.raw() + 3u)->value, 3);
+    ASSERT_EQ((set.raw() + 4u)->value, 1);
 
     auto begin = set.begin();
     auto end = set.end();
 
-    ASSERT_EQ(*(begin++), 1);
-    ASSERT_EQ(*(begin++), 3);
-    ASSERT_EQ(*(begin++), 6);
-    ASSERT_EQ(*(begin++), 9);
-    ASSERT_EQ(*(begin++), 12);
+    ASSERT_EQ((begin++)->value, 1);
+    ASSERT_EQ((begin++)->value, 3);
+    ASSERT_EQ((begin++)->value, 6);
+    ASSERT_EQ((begin++)->value, 9);
+    ASSERT_EQ((begin++)->value, 12);
     ASSERT_EQ(begin, end);
 }
 
 TEST(SparseSetWithType, SortUnordered) {
-    entt::sparse_set<std::uint64_t, int> set;
+    entt::sparse_set<std::uint64_t, boxed_int> set;
 
-    set.construct(12, 6);
-    set.construct(42, 3);
-    set.construct(7, 1);
-    set.construct(3, 9);
-    set.construct(9, 12);
+    set.construct(12, boxed_int{6});
+    set.construct(42, boxed_int{3});
+    set.construct(7, boxed_int{1});
+    set.construct(3, boxed_int{9});
+    set.construct(9, boxed_int{12});
 
-    ASSERT_EQ(set.get(12), 6);
-    ASSERT_EQ(set.get(42), 3);
-    ASSERT_EQ(set.get(7), 1);
-    ASSERT_EQ(set.get(3), 9);
-    ASSERT_EQ(set.get(9), 12);
+    ASSERT_EQ(set.get(12).value, 6);
+    ASSERT_EQ(set.get(42).value, 3);
+    ASSERT_EQ(set.get(7).value, 1);
+    ASSERT_EQ(set.get(3).value, 9);
+    ASSERT_EQ(set.get(9).value, 12);
 
     set.sort([](auto lhs, auto rhs) {
-        return lhs < rhs;
+        return lhs.value < rhs.value;
     });
 
-    ASSERT_EQ(*(set.raw() + 0u), 12);
-    ASSERT_EQ(*(set.raw() + 1u), 9);
-    ASSERT_EQ(*(set.raw() + 2u), 6);
-    ASSERT_EQ(*(set.raw() + 3u), 3);
-    ASSERT_EQ(*(set.raw() + 4u), 1);
+    ASSERT_EQ((set.raw() + 0u)->value, 12);
+    ASSERT_EQ((set.raw() + 1u)->value, 9);
+    ASSERT_EQ((set.raw() + 2u)->value, 6);
+    ASSERT_EQ((set.raw() + 3u)->value, 3);
+    ASSERT_EQ((set.raw() + 4u)->value, 1);
 
     auto begin = set.begin();
     auto end = set.end();
 
-    ASSERT_EQ(*(begin++), 1);
-    ASSERT_EQ(*(begin++), 3);
-    ASSERT_EQ(*(begin++), 6);
-    ASSERT_EQ(*(begin++), 9);
-    ASSERT_EQ(*(begin++), 12);
+    ASSERT_EQ((begin++)->value, 1);
+    ASSERT_EQ((begin++)->value, 3);
+    ASSERT_EQ((begin++)->value, 6);
+    ASSERT_EQ((begin++)->value, 9);
+    ASSERT_EQ((begin++)->value, 12);
     ASSERT_EQ(begin, end);
 }
 
