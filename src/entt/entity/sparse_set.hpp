@@ -1092,9 +1092,9 @@ public:
      * * An iterator past the last element of the range to sort.
      * * A comparison function to use to compare the elements.
      *
-     * The comparison funtion object received by the sort function object hasn't
-     * necessarily the type of the one passed along with the other parameters to
-     * this member function.
+     * The comparison function object received by the sort function object
+     * hasn't necessarily the type of the one passed along with the other
+     * parameters to this member function.
      *
      * @note
      * Empty components aren't explicitly instantiated. Therefore, the
