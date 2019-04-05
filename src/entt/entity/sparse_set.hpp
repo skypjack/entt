@@ -1113,7 +1113,7 @@ public:
      * @param args Arguments to forward to the sort function object, if any.
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
-    inline void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
+    void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
         std::vector<size_type> copy(instances.size());
         std::iota(copy.begin(), copy.end(), 0);
 
@@ -1124,8 +1124,8 @@ public:
                 return compare(std::as_const(instances[lhs]), std::as_const(instances[rhs]));
             }, std::forward<Args>(args)...);
         } else {
-            algo(copy.rbegin(), copy.rend(), [this, compare = std::move(compare), entities = underlying_type::data()](const auto lhs, const auto rhs) {
-                return compare(entities[lhs], entities[rhs]);
+            algo(copy.rbegin(), copy.rend(), [this, compare = std::move(compare), data = underlying_type::data()](const auto lhs, const auto rhs) {
+                return compare(data[lhs], data[rhs]);
             }, std::forward<Args>(args)...);
         }
 
