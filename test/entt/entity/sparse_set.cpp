@@ -10,6 +10,28 @@
 
 struct empty_type {};
 
+
+struct A { int a; };
+struct B : A {
+    using instance_type = A;
+};
+
+TEST(SparseSetSwapping, Basic) {
+
+    static_assert(std::is_class<B::instance_type>::value);
+    static_assert(has_type_instance_type<B>::value);
+    static_assert(!has_type_instance_type<A>::value);
+
+    static_assert(std::is_same<get_type_instance_type<B>::type, A>::value);
+    static_assert(std::is_same<std::decay<B>::type, B>::value);
+
+    entt::sparse_set<std::uint64_t, A> aset;
+    entt::sparse_set<std::uint64_t, B> bset;
+
+    aset.swap_instances(bset);
+
+}
+
 TEST(SparseSetNoType, Functionalities) {
     entt::sparse_set<std::uint64_t> set;
 

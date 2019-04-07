@@ -15,6 +15,40 @@
 #include "entt_traits.hpp"
 #include "entity.hpp"
 
+// https://stackoverflow.com/questions/11813940/possible-to-use-type-traits-sfinae-to-find-if-a-class-defines-a-member-type
+template<typename ...>
+struct void_type
+{
+     using type = void;
+};
+
+template<typename ...T>
+using void_t = typename void_type<T...>::type;
+
+#define HAS_TYPE(NAME) \
+template<typename, typename = void> \
+struct has_type_##NAME: std::false_type \
+{}; \
+template<typename T> \
+struct has_type_##NAME<T, void_t<typename T::NAME>>: std::true_type \
+{} \
+
+HAS_TYPE(instance_type);
+
+#define GET_TYPE(NAME) \
+template<typename, typename = void> \
+struct get_type_##NAME \
+{   \
+  using type = std::false_type;  \
+}; \
+template<typename T> \
+struct get_type_##NAME<T, void_t<typename T::NAME>> \
+{   \
+  using type = typename T::NAME;  \
+} \
+
+GET_TYPE(instance_type);
+
 
 namespace entt {
 
@@ -1216,8 +1250,31 @@ public:
         }
     }
 
-private:
-    std::conditional_t<std::is_empty_v<object_type>, object_type, std::vector<object_type>> instances;
+    template<typename OtherComponent>
+    void swap_instances(OtherComponent& other) {
+        // make instances public cause I'm lazy...
+        instances.swap(other.instances);
+    }
+
+
+public:
+    // if object type is empty, then just have instance of the empty type.
+    std::conditional_t<
+        std::is_empty_v<object_type>,
+        object_type,
+        std::vector<
+            // object_type
+            std::conditional_t<
+                // if the object type has "instance_type" member type alias,
+                // then use the member type alias instead of the object_type
+                // to theoretically allow for ability to swap to work?
+                has_type_instance_type<object_type>::value,
+                // typename object_type::instance_type,
+                typename get_type_instance_type<object_type>::type,
+                object_type
+            >
+        >
+    > instances;
 };
 
 
