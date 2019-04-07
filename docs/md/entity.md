@@ -350,15 +350,30 @@ registry.construction<position>().disconnect<&my_class::member>(&instance);
 To be notified when components are destroyed, use the `destruction` member
 function instead.
 
-The function type of a listener is the same in both the cases and should be
-equivalent to the following:
+The function type of a listener for the construction signal should be equivalent
+to the following:
+
+```cpp
+void(registry &, Component &, entt::entity);
+```
+
+Where `Component` is intuitively the type of component of interest. In other
+words, a listener is provided with the registry that triggered the notification
+and the entity affected by the change, in addition to the newly created
+instance.<br/>
+The function type of a listener for the destruction signal is the same, except
+for the `Component` parameter:
 
 ```cpp
 void(registry &, entt::entity);
 ```
 
-In other terms, a listener is provided with the registry that triggered the
-notification and the entity affected by the change. Note also that:
+This is mainly due to performance reasons. While the component is made available
+after the construction, it is not when destroyed. Because of that, there is no
+reason to get it from the underlying storage unless the user requires so. In
+this case, the registry is made available for the purpose.
+
+Note also that:
 
 * Listeners are invoked **after** components have been assigned to entities.
 * Listeners are invoked **before** components have been removed from entities.

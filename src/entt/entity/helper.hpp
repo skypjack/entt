@@ -123,13 +123,14 @@ as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>
  * It isn't intended for direct use, although nothing forbids using it freely.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Component Types of components to assign to an entity if triggered.
+ * @tparam Component Type of component that triggers the dependency handler.
+ * @tparam Dependency Types of components to assign to an entity if triggered.
  * @param reg A valid reference to a registry.
  * @param entt A valid entity identifier.
  */
-template<typename Entity, typename... Component>
-void dependency(basic_registry<Entity> &reg, const Entity entt) {
-    ((reg.template has<Component>(entt) ? void() : (reg.template assign<Component>(entt), void())), ...);
+template<typename Entity, typename Component, typename... Dependency>
+void dependency(basic_registry<Entity> &reg, const Component &, const Entity entt) {
+    ((reg.template has<Dependency>(entt) ? void() : (reg.template assign<Dependency>(entt), void())), ...);
 }
 
 
@@ -147,12 +148,13 @@ void dependency(basic_registry<Entity> &reg, const Entity entt) {
  * @endcode
  *
  * @tparam Dependency Types of components to assign to an entity if triggered.
+ * @tparam Component Type of component that triggers the dependency handler.
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @param sink A sink object properly initialized.
  */
-template<typename... Dependency, typename Entity>
-inline void connect(sink<void(basic_registry<Entity> &, const Entity)> sink) {
-    sink.template connect<dependency<Entity, Dependency...>>();
+template<typename... Dependency, typename Component, typename Entity>
+inline void connect(sink<void(basic_registry<Entity> &, Component &, const Entity)> sink) {
+    sink.template connect<dependency<Entity, Component, Dependency...>>();
 }
 
 
@@ -170,12 +172,13 @@ inline void connect(sink<void(basic_registry<Entity> &, const Entity)> sink) {
  * @endcode
  *
  * @tparam Dependency Types of components used to create the dependency.
+ * @tparam Component Type of component that triggers the dependency handler.
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @param sink A sink object properly initialized.
  */
-template<typename... Dependency, typename Entity>
-inline void disconnect(sink<void(basic_registry<Entity> &, const Entity)> sink) {
-    sink.template disconnect<dependency<Entity, Dependency...>>();
+template<typename... Dependency, typename Component, typename Entity>
+inline void disconnect(sink<void(basic_registry<Entity> &, Component &, const Entity)> sink) {
+    sink.template disconnect<dependency<Entity, Component, Dependency...>>();
 }
 
 

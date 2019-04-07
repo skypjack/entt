@@ -13,7 +13,7 @@ ENTT_NAMED_TYPE(int)
 
 struct listener {
     template<typename Component>
-    void incr(entt::registry &registry, entt::entity entity) {
+    void incr(entt::registry &registry, const Component &, entt::entity entity) {
         ASSERT_TRUE(registry.valid(entity));
         ASSERT_TRUE(registry.has<Component>(entity));
         last = entity;
