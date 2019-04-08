@@ -67,7 +67,7 @@ class basic_registry {
         template<typename... Args>
         Component & construct(const Entity entt, Args &&... args) {
             auto &component = sparse_set<Entity, Component>::construct(entt, std::forward<Args>(args)...);
-            construction.publish(*owner, component, entt);
+            construction.publish(*owner, entt, component);
             return component;
         }
 
@@ -77,7 +77,7 @@ class basic_registry {
 
             if(!construction.empty()) {
                 std::for_each(first, last, [component, this](const auto entt) mutable {
-                    construction.publish(*owner, *(component++), entt);
+                    construction.publish(*owner, entt, *(component++));
                 });
             }
 
@@ -94,11 +94,11 @@ class basic_registry {
             destruction.publish(*owner, entt);
             auto &component = sparse_set<Entity, Component>::get(entt);
             component = Component{std::forward<Args>(args)...};
-            construction.publish(*owner, component, entt);
+            construction.publish(*owner, entt, component);
             return component;
         }
 
-        sigh<void(basic_registry &, Component &, const Entity)> construction;
+        sigh<void(basic_registry &, const Entity, Component &)> construction;
         sigh<void(basic_registry &, const Entity)> destruction;
         basic_registry *owner;
     };
@@ -112,7 +112,7 @@ class basic_registry {
     template<typename... Get, typename... Exclude>
     struct non_owning_group<type_list<Exclude...>, type_list<Get...>>: sparse_set<Entity> {
         template<typename Component, typename... Args>
-        void maybe_valid_if(basic_registry &reg, const Args &..., const Entity entt) {
+        void maybe_valid_if(basic_registry &reg, const Entity entt, const Args &...) {
             if constexpr(std::disjunction_v<std::is_same<Get, Component>...>) {
                 if(((std::is_same_v<Component, Get> || reg.pool<Get>()->has(entt)) && ...) && !(reg.pool<Exclude>()->has(entt) || ...)) {
                     this->construct(entt);
@@ -126,8 +126,8 @@ class basic_registry {
             }
         }
 
-        template<typename... Component>
-        void destroy_if(basic_registry &, const Component &..., const Entity entt) {
+        template<typename... Args>
+        void destroy_if(basic_registry &, const Entity entt, const Args &...) {
             if(this->has(entt)) {
                 this->destroy(entt);
             }
@@ -144,7 +144,7 @@ class basic_registry {
     template<typename... Owned, typename... Get, typename... Exclude>
     struct owning_group<type_list<Exclude...>, type_list<Get...>, Owned...>: boxed_owned {
         template<typename Component, typename... Args>
-        void maybe_valid_if(basic_registry &reg, const Args &..., const Entity entt) {
+        void maybe_valid_if(basic_registry &reg, const Entity entt, const Args &...) {
             const auto cpools = std::make_tuple(reg.pool<Owned>()...);
 
             auto construct = [&cpools, entt, this]() {
@@ -172,8 +172,8 @@ class basic_registry {
             }
         }
 
-        template<typename... Component>
-        void discard_if(basic_registry &reg, const Component &..., const Entity entt) {
+        template<typename... Args>
+        void discard_if(basic_registry &reg, const Entity entt, const Args &...) {
             const auto cpools = std::make_tuple(reg.pool<Owned>()...);
 
             if(std::get<0>(cpools)->has(entt) && std::get<0>(cpools)->sparse_set<Entity>::get(entt) < this->owned) {
@@ -399,7 +399,7 @@ public:
 
     /*! @brief Construction sink type for the given component. */
     template<typename Component>
-    using construction_sink_type = typename sigh<void(basic_registry &, Component &, const Entity)>::sink_type;
+    using construction_sink_type = typename sigh<void(basic_registry &, const Entity, Component &)>::sink_type;
 
     /*! @brief Default constructor. */
     basic_registry() ENTT_NOEXCEPT = default;
@@ -1038,7 +1038,7 @@ public:
      *
      * The function type for a listener is equivalent to:
      * @code{.cpp}
-     * void(registry<Entity> &, Component &, Entity);
+     * void(registry<Entity> &, Entity, Component &);
      * @endcode
      *
      * Listeners are invoked **after** the component has been assigned to the

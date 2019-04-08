@@ -354,7 +354,7 @@ The function type of a listener for the construction signal should be equivalent
 to the following:
 
 ```cpp
-void(registry &, Component &, entt::entity);
+void(registry &, entt::entity, Component &);
 ```
 
 Where `Component` is intuitively the type of component of interest. In other
@@ -369,8 +369,8 @@ void(registry &, entt::entity);
 ```
 
 This is mainly due to performance reasons. While the component is made available
-after the construction, it is not when destroyed. Because of that, there is no
-reason to get it from the underlying storage unless the user requires so. In
+after the construction, it is not when destroyed. Because of that, there are no
+reasons to get it from the underlying storage unless the user requires so. In
 this case, the registry is made available for the purpose.
 
 Note also that:

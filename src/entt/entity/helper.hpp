@@ -129,7 +129,7 @@ as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>
  * @param entt A valid entity identifier.
  */
 template<typename Entity, typename Component, typename... Dependency>
-void dependency(basic_registry<Entity> &reg, const Component &, const Entity entt) {
+void dependency(basic_registry<Entity> &reg, const Entity entt, const Component &) {
     ((reg.template has<Dependency>(entt) ? void() : (reg.template assign<Dependency>(entt), void())), ...);
 }
 
@@ -153,7 +153,7 @@ void dependency(basic_registry<Entity> &reg, const Component &, const Entity ent
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Component, typename Entity>
-inline void connect(sink<void(basic_registry<Entity> &, Component &, const Entity)> sink) {
+inline void connect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sink) {
     sink.template connect<dependency<Entity, Component, Dependency...>>();
 }
 
@@ -177,7 +177,7 @@ inline void connect(sink<void(basic_registry<Entity> &, Component &, const Entit
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Component, typename Entity>
-inline void disconnect(sink<void(basic_registry<Entity> &, Component &, const Entity)> sink) {
+inline void disconnect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sink) {
     sink.template disconnect<dependency<Entity, Component, Dependency...>>();
 }
 
