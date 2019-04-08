@@ -12,7 +12,7 @@ public:
     using value_type = Value;
     using tag_type = Tag;
 
-    template <typename... Args>
+    template <typename... Args, typename = decltype(Value{std::declval<Args>()...})>
     constexpr explicit alias(Args &&... args) noexcept(noexcept(Value{std::forward<Args>(args)...}))
         : v{std::forward<Args>(args)...} {}
 
@@ -22,6 +22,16 @@ public:
     template <typename OtherTag>
     constexpr explicit alias(alias<Value, OtherTag> &&other) noexcept(noexcept(Value{std::move(*other)}))
         : v{std::move(*other)} {}
+
+    template <typename OtherValue, typename = decltype(Value{std::declval<OtherValue>()})>
+    constexpr alias(OtherValue &&other) noexcept(noexcept(Value{std::forward<OtherValue>(other)}))
+        : v{std::forward<OtherValue>(other)} {}
+
+    template <typename OtherValue, typename = decltype(std::declval<Value &>() = std::declval<OtherValue>())>
+    constexpr alias &operator=(OtherValue &&other) noexcept(noexcept(v = std::forward<OtherValue>(other))) {
+        v = std::forward<OtherValue>(other);
+        return *this;
+    }
 
     constexpr Value &operator*() & noexcept {
         return v;
