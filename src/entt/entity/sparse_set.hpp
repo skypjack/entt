@@ -1124,7 +1124,7 @@ public:
                 return compare(std::as_const(instances[lhs]), std::as_const(instances[rhs]));
             }, std::forward<Args>(args)...);
         } else {
-            algo(copy.rbegin(), copy.rend(), [this, compare = std::move(compare), data = underlying_type::data()](const auto lhs, const auto rhs) {
+            algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), data = underlying_type::data()](const auto lhs, const auto rhs) {
                 return compare(data[lhs], data[rhs]);
             }, std::forward<Args>(args)...);
         }

@@ -712,7 +712,7 @@ public:
         std::vector<size_type> copy(*length);
         std::iota(copy.begin(), copy.end(), 0);
 
-        algo(copy.rbegin(), copy.rend(), [this, compare = std::move(compare), data = data()](const auto lhs, const auto rhs) {
+        algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), data = data()](const auto lhs, const auto rhs) {
             return compare(data[lhs], data[rhs]);
         }, std::forward<Args>(args)...);
 
