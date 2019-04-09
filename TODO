@@ -19,6 +19,5 @@
 * review sparse set to allow customization (mix pack in the spec, base is position only)
   - non-owning groups can iterate pages and skip empty ones, this should mitigate the lack of the packed array
 * review 64 bit id: user defined area + dedicated member on the registry to set it
-* add NIO to the EnTT in Action list (link to my CV/LinkedIN)
 * remove entity function from sparse sets (no longer required)
 * reactive systems

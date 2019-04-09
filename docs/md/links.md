@@ -59,6 +59,9 @@ a reference:
     create projects in modern C++ using `SFML`, `EnTT`, `Conan` and `CMake`.
 
 * Any Other Business:
+  * [Apparently](https://www.linkedin.com/in/skypjack/)
+    [NIO](https://www.nio.io/): there was a collaboration to make changes to
+    `EnTT`, at the time used for internal projects.
   * [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt): port of
     [Match One](https://github.com/sschmid/Match-One) for `Entitas-CSharp`.
   * GitHub contains also
