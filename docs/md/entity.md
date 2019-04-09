@@ -141,9 +141,9 @@ and move assignable. They are list initialized by using the parameters provided
 to construct the component itself. No need to register components or their types
 neither with the registry nor with the entity-component system at all.<br/>
 Systems (the _S_ of an _ECS_) are just plain functions, functors, lambdas or
-whatever users want. They can accept an `entt::registry`, a view or a group of
-any type and use them the way they prefer. No need to register systems or their
-types neither with the registry nor with the entity-component system at all.
+whatever users want. They can accept a registry, a view or a group of any type
+and use them the way they prefer. No need to register systems or their types
+neither with the registry nor with the entity-component system at all.
 
 The following sections will explain in short how to use the entity-component
 system, the core part of the whole library.<br/>
@@ -356,7 +356,7 @@ The function type of a listener for the construction signal should be equivalent
 to the following:
 
 ```cpp
-void(registry &, entt::entity, Component &);
+void(entt::registry &, entt::entity, Component &);
 ```
 
 Where `Component` is intuitively the type of component of interest. In other
@@ -368,7 +368,7 @@ signature of which is the same of that of the construction signal. The one of
 the destruction signal is also similar, except for the `Component` parameter:
 
 ```cpp
-void(registry &, entt::entity);
+void(entt::registry &, entt::entity);
 ```
 
 This is mainly due to performance reasons. While the component is made available
