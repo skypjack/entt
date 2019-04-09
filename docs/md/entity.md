@@ -348,7 +348,8 @@ registry.construction<position>().disconnect<&my_class::member>(&instance);
 ```
 
 To be notified when components are destroyed, use the `destruction` member
-function instead.
+function instead. Finally, the `update` member function will return a sink to
+which to connect listeners to observe changes on components.
 
 The function type of a listener for the construction signal should be equivalent
 to the following:
@@ -361,8 +362,9 @@ Where `Component` is intuitively the type of component of interest. In other
 words, a listener is provided with the registry that triggered the notification
 and the entity affected by the change, in addition to the newly created
 instance.<br/>
-The function type of a listener for the destruction signal is the same, except
-for the `Component` parameter:
+The function type of a listener to be notified about changes is the same of that
+of the construction signal. The one the destruction signal is also similar,
+except for the `Component` parameter:
 
 ```cpp
 void(registry &, entt::entity);
@@ -375,8 +377,13 @@ this case, the registry is made available for the purpose.
 
 Note also that:
 
-* Listeners are invoked **after** components have been assigned to entities.
-* Listeners are invoked **before** components have been removed from entities.
+* Listeners for the construction signal are invoked **after** components have
+  been assigned to entities.
+* Listeners designed to observe changes are invoked **before** components have
+  been replaced and therefore before newly created instances have been assigned
+  to entities.
+* Listeners for the destruction signal are invoked **before** components have
+  been removed from entities.
 * The order of invocation of the listeners isn't guaranteed in any case.
 
 There are also some limitations on what a listener can and cannot do. In

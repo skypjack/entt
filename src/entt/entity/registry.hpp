@@ -91,14 +91,15 @@ class basic_registry {
 
         template<typename... Args>
         Component & replace(const Entity entt, Args &&... args) {
-            destruction.publish(*owner, entt);
-            auto &component = sparse_set<Entity, Component>::get(entt);
-            component = Component{std::forward<Args>(args)...};
-            construction.publish(*owner, entt, component);
-            return component;
+            Component component{std::forward<Args>(args)...};
+            update.publish(*owner, entt, component);
+            auto &other = sparse_set<Entity, Component>::get(entt);
+            std::swap(other, component);
+            return other;
         }
 
         sigh<void(basic_registry &, const Entity, Component &)> construction;
+        sigh<void(basic_registry &, const Entity, Component &)> update;
         sigh<void(basic_registry &, const Entity)> destruction;
         basic_registry *owner;
     };
@@ -394,12 +395,6 @@ public:
     using size_type = typename sparse_set<Entity>::size_type;
     /*! @brief Unsigned integer type. */
     using component_type = ENTT_ID_TYPE;
-    /*! @brief Destruction sink type. */
-    using destruction_sink_type = typename sigh<void(basic_registry &, const Entity)>::sink_type;
-
-    /*! @brief Construction sink type for the given component. */
-    template<typename Component>
-    using construction_sink_type = typename sigh<void(basic_registry &, const Entity, Component &)>::sink_type;
 
     /*! @brief Default constructor. */
     basic_registry() ENTT_NOEXCEPT = default;
@@ -1052,8 +1047,35 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    construction_sink_type<Component> construction() ENTT_NOEXCEPT {
+    auto construction() ENTT_NOEXCEPT {
         return assure<Component>()->construction.sink();
+    }
+
+    /**
+     * @brief Returns a sink object for the given component.
+     *
+     * A sink is an opaque object used to connect listeners to components.<br/>
+     * The sink returned by this function can be used to receive notifications
+     * whenever an instance of the given component is updated.
+     *
+     * The function type for a listener is equivalent to:
+     * @code{.cpp}
+     * void(registry<Entity> &, Entity, Component &);
+     * @endcode
+     *
+     * Listeners are invoked **before** the component has been replaced. The
+     * order of invocation of the listeners isn't guaranteed.<br/>
+     * Note also that the greater the number of listeners, the greater the
+     * performance hit when a new component is created.
+     *
+     * @sa sink
+     *
+     * @tparam Component Type of component of which to get the sink.
+     * @return A temporary sink object.
+     */
+    template<typename Component>
+    auto update() ENTT_NOEXCEPT {
+        return assure<Component>()->update.sink();
     }
 
     /**
@@ -1080,7 +1102,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    destruction_sink_type destruction() ENTT_NOEXCEPT {
+    auto destruction() ENTT_NOEXCEPT {
         return assure<Component>()->destruction.sink();
     }
 
