@@ -324,32 +324,33 @@ the component owned by an entity if any, a null pointer otherwise.
 
 ## Observe changes
 
-Because of how the registry works internally, it stores a couple of signal
+Because of how the registry works internally, it stores a bunch of signal
 handlers for each pool in order to notify some of its data structures on the
-construction and destruction of components.<br/>
+construction and destruction of components or when an instance of a component is
+explicitly replaced by the user.<br/>
 These signal handlers are also exposed and made available to users. These are
 the basic bricks to build fancy things like dependencies and reactive systems.
 
 To get a sink to be used to connect and disconnect listeners so as to be
-notified on the creation of a component, use the `construction` member function:
+notified on the creation of a component, use the `on_construct` member function:
 
 ```cpp
 // connects a free function
-registry.construction<position>().connect<&my_free_function>();
+registry.on_construct<position>().connect<&my_free_function>();
 
 // connects a member function
-registry.construction<position>().connect<&my_class::member>(&instance);
+registry.on_construct<position>().connect<&my_class::member>(&instance);
 
 // disconnects a free function
-registry.construction<position>().disconnect<&my_free_function>();
+registry.on_construct<position>().disconnect<&my_free_function>();
 
 // disconnects a member function
-registry.construction<position>().disconnect<&my_class::member>(&instance);
+registry.on_construct<position>().disconnect<&my_class::member>(&instance);
 ```
 
-To be notified when components are destroyed, use the `destruction` member
-function instead. Finally, the `update` member function will return a sink to
-which to connect listeners to observe changes on components.
+To be notified when components are destroyed, use the `on_destroy` member
+function instead. Finally, the `on_replace` member function will return a sink
+to which to connect listeners to observe changes on components.
 
 The function type of a listener for the construction signal should be equivalent
 to the following:
@@ -362,9 +363,9 @@ Where `Component` is intuitively the type of component of interest. In other
 words, a listener is provided with the registry that triggered the notification
 and the entity affected by the change, in addition to the newly created
 instance.<br/>
-The function type of a listener to be notified about changes is the same of that
-of the construction signal. The one the destruction signal is also similar,
-except for the `Component` parameter:
+The sink returned by the `on_replace` member function accepts listeners the
+signature of which is the same of that of the construction signal. The one of
+the destruction signal is also similar, except for the `Component` parameter:
 
 ```cpp
 void(registry &, entt::entity);
@@ -817,7 +818,7 @@ The following adds components `a_type` and `another_type` whenever `my_type` is
 assigned to an entity:
 
 ```cpp
-entt::connnect<a_type, another_type>(registry.construction<my_type>());
+entt::connnect<a_type, another_type>(registry.on_construct<my_type>());
 ```
 
 A component is assigned to an entity and thus default initialized only in case
@@ -826,7 +827,7 @@ be overriden.<br/>
 A dependency can easily be broken by means of the following function template:
 
 ```cpp
-entt::disconnect<a_type, another_type>(registry.construction<my_type>());
+entt::disconnect<a_type, another_type>(registry.on_construct<my_type>());
 ```
 
 ### Tags

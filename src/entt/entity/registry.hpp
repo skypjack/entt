@@ -67,7 +67,7 @@ class basic_registry {
         template<typename... Args>
         Component & construct(const Entity entt, Args &&... args) {
             auto &component = sparse_set<Entity, Component>::construct(entt, std::forward<Args>(args)...);
-            construction.publish(*owner, entt, component);
+            on_construct.publish(*owner, entt, component);
             return component;
         }
 
@@ -75,9 +75,9 @@ class basic_registry {
         Component * batch(It first, It last) {
             auto *component = sparse_set<Entity, Component>::batch(first, last);
 
-            if(!construction.empty()) {
+            if(!on_construct.empty()) {
                 std::for_each(first, last, [component, this](const auto entt) mutable {
-                    construction.publish(*owner, entt, *(component++));
+                    on_construct.publish(*owner, entt, *(component++));
                 });
             }
 
@@ -85,22 +85,22 @@ class basic_registry {
         }
 
         void destroy(const Entity entt) override {
-            destruction.publish(*owner, entt);
+            on_destroy.publish(*owner, entt);
             sparse_set<Entity, Component>::destroy(entt);
         }
 
         template<typename... Args>
         Component & replace(const Entity entt, Args &&... args) {
             Component component{std::forward<Args>(args)...};
-            update.publish(*owner, entt, component);
+            on_replace.publish(*owner, entt, component);
             auto &other = sparse_set<Entity, Component>::get(entt);
             std::swap(other, component);
             return other;
         }
 
-        sigh<void(basic_registry &, const Entity, Component &)> construction;
-        sigh<void(basic_registry &, const Entity, Component &)> update;
-        sigh<void(basic_registry &, const Entity)> destruction;
+        sigh<void(basic_registry &, const Entity, Component &)> on_construct;
+        sigh<void(basic_registry &, const Entity, Component &)> on_replace;
+        sigh<void(basic_registry &, const Entity)> on_destroy;
         basic_registry *owner;
     };
 
@@ -316,11 +316,11 @@ class basic_registry {
                 auto *curr = static_cast<group_type *>(gdata.data.get());
                 const auto cpools = std::make_tuple(assure<Get>()..., assure<Exclude>()...);
 
-                (std::get<pool_type<Get> *>(cpools)->destruction.sink().template connect<&group_type::template destroy_if<>>(curr), ...);
-                (std::get<pool_type<Get> *>(cpools)->construction.sink().template connect<&group_type::template maybe_valid_if<Get, Get>>(curr), ...);
+                (std::get<pool_type<Get> *>(cpools)->on_destroy.sink().template connect<&group_type::template destroy_if<>>(curr), ...);
+                (std::get<pool_type<Get> *>(cpools)->on_construct.sink().template connect<&group_type::template maybe_valid_if<Get, Get>>(curr), ...);
 
-                (std::get<pool_type<Exclude> *>(cpools)->destruction.sink().template connect<&group_type::template maybe_valid_if<Exclude>>(curr), ...);
-                (std::get<pool_type<Exclude> *>(cpools)->construction.sink().template connect<&group_type::template destroy_if<Exclude>>(curr), ...);
+                (std::get<pool_type<Exclude> *>(cpools)->on_destroy.sink().template connect<&group_type::template maybe_valid_if<Exclude>>(curr), ...);
+                (std::get<pool_type<Exclude> *>(cpools)->on_construct.sink().template connect<&group_type::template destroy_if<Exclude>>(curr), ...);
 
                 for(const auto entity: view<Get...>()) {
                     if(!(has<Exclude>(entity) || ...)) {
@@ -354,14 +354,14 @@ class basic_registry {
                 auto *curr = static_cast<group_type *>(gdata.data.get());
                 const auto cpools = std::make_tuple(assure<Owned>()..., assure<Get>()..., assure<Exclude>()...);
 
-                (std::get<pool_type<Owned> *>(cpools)->construction.sink().template connect<&group_type::template maybe_valid_if<Owned, Owned>>(curr), ...);
-                (std::get<pool_type<Owned> *>(cpools)->destruction.sink().template connect<&group_type::template discard_if<>>(curr), ...);
+                (std::get<pool_type<Owned> *>(cpools)->on_construct.sink().template connect<&group_type::template maybe_valid_if<Owned, Owned>>(curr), ...);
+                (std::get<pool_type<Owned> *>(cpools)->on_destroy.sink().template connect<&group_type::template discard_if<>>(curr), ...);
 
-                (std::get<pool_type<Get> *>(cpools)->construction.sink().template connect<&group_type::template maybe_valid_if<Get, Get>>(curr), ...);
-                (std::get<pool_type<Get> *>(cpools)->destruction.sink().template connect<&group_type::template discard_if<>>(curr), ...);
+                (std::get<pool_type<Get> *>(cpools)->on_construct.sink().template connect<&group_type::template maybe_valid_if<Get, Get>>(curr), ...);
+                (std::get<pool_type<Get> *>(cpools)->on_destroy.sink().template connect<&group_type::template discard_if<>>(curr), ...);
 
-                (std::get<pool_type<Exclude> *>(cpools)->destruction.sink().template connect<&group_type::template maybe_valid_if<Exclude>>(curr), ...);
-                (std::get<pool_type<Exclude> *>(cpools)->construction.sink().template connect<&group_type::template discard_if<Exclude>>(curr), ...);
+                (std::get<pool_type<Exclude> *>(cpools)->on_destroy.sink().template connect<&group_type::template maybe_valid_if<Exclude>>(curr), ...);
+                (std::get<pool_type<Exclude> *>(cpools)->on_construct.sink().template connect<&group_type::template discard_if<Exclude>>(curr), ...);
 
                 const auto *cpool = std::min({ static_cast<sparse_set<entity_type> *>(std::get<pool_type<Owned> *>(cpools))... }, [](const auto *lhs, const auto *rhs) {
                     return lhs->size() < rhs->size();
@@ -1047,8 +1047,8 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    auto construction() ENTT_NOEXCEPT {
-        return assure<Component>()->construction.sink();
+    auto on_construct() ENTT_NOEXCEPT {
+        return assure<Component>()->on_construct.sink();
     }
 
     /**
@@ -1056,7 +1056,7 @@ public:
      *
      * A sink is an opaque object used to connect listeners to components.<br/>
      * The sink returned by this function can be used to receive notifications
-     * whenever an instance of the given component is updated.
+     * whenever an instance of the given component is explicitly replaced.
      *
      * The function type for a listener is equivalent to:
      * @code{.cpp}
@@ -1074,8 +1074,8 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    auto update() ENTT_NOEXCEPT {
-        return assure<Component>()->update.sink();
+    auto on_replace() ENTT_NOEXCEPT {
+        return assure<Component>()->on_replace.sink();
     }
 
     /**
@@ -1102,8 +1102,8 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
-    auto destruction() ENTT_NOEXCEPT {
-        return assure<Component>()->destruction.sink();
+    auto on_destroy() ENTT_NOEXCEPT {
+        return assure<Component>()->on_destroy.sink();
     }
 
     /**
@@ -1236,7 +1236,7 @@ public:
      */
     template<typename Component>
     void reset() {
-        if(auto *cpool = assure<Component>(); cpool->destruction.empty()) {
+        if(auto *cpool = assure<Component>(); cpool->on_destroy.empty()) {
             // no group set, otherwise the signal wouldn't be empty
             cpool->reset();
         } else {
