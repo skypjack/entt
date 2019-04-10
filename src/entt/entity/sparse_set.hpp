@@ -861,18 +861,6 @@ public:
     }
 
     /**
-     * @brief Returns the entity to which a given component is assigned.
-     * @param instance A valid reference to an object.
-     * @return A valid entity identifier if the instance belongs to the sparse
-     * set, the null entity otherwise.
-     */
-    inline entity_type entity(const object_type &instance) {
-        const auto address = std::addressof(instance);
-        const bool valid = !(instances.data() > address) && (address < (instances.data() + instances.size()));
-        return valid ? sparse_set<entity_type>::data()[address - instances.data()] : null;
-    }
-
-    /**
      * @brief Returns an iterator to the beginning.
      *
      * The returned iterator points to the first instance of the given type. If

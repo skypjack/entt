@@ -486,31 +486,6 @@ TEST(SparseSetWithType, Functionalities) {
     other = std::move(set);
 }
 
-TEST(SparseSetWithType, EntityFromComponent) {
-    entt::sparse_set<std::uint64_t, int> set;
-    typename entt::sparse_set<std::uint64_t, int>::entity_type invalid = entt::null;
-
-    set.reserve(3);
-
-    const auto &first = set.construct(42, 3);
-    const auto &second = set.construct(3, 9);
-    const auto &third = set.construct(99, 7);
-
-    ASSERT_NE(set.entity(first), invalid);
-    ASSERT_EQ(set.get(set.entity(first)), first);
-    ASSERT_EQ(&set.get(set.entity(first)), &first);
-
-    ASSERT_NE(set.entity(second), invalid);
-    ASSERT_EQ(set.get(set.entity(second)), second);
-    ASSERT_EQ(&set.get(set.entity(second)), &second);
-
-    ASSERT_NE(set.entity(third), invalid);
-    ASSERT_EQ(set.get(set.entity(third)), third);
-    ASSERT_EQ(&set.get(set.entity(third)), &third);
-
-    ASSERT_EQ(set.entity(0), invalid);
-}
-
 TEST(SparseSetWithType, EmptyType) {
     entt::sparse_set<std::uint64_t, empty_type> set;
 
