@@ -293,7 +293,7 @@ class basic_registry {
     }
 
     template<typename... Owned, typename... Get, typename... Exclude>
-    auto * assure(get_t<Get...>, exclude_t<Exclude...> = {}) {
+    auto * assure(get_t<Get...>, exclude_t<Exclude...>) {
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1);
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0);
 
