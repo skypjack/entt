@@ -18,6 +18,9 @@ struct relationship {
     entt::entity parent;
 };
 
+struct empty_tag {
+};
+
 template<typename Archive>
 void serialize(Archive &archive, position &position) {
   archive(position.x, position.y);
@@ -31,6 +34,10 @@ void serialize(Archive &archive, timer &timer) {
 template<typename Archive>
 void serialize(Archive &archive, relationship &relationship) {
   archive(relationship.parent);
+}
+
+template<typename Archive>
+void serialize(Archive &archive, empty_tag &tag) {
 }
 
 TEST(Snapshot, Full) {
@@ -52,6 +59,7 @@ TEST(Snapshot, Full) {
 
     auto e3 = source.create();
     source.assign<timer>(e3, 1000, 100);
+    source.assign<empty_tag>(e3);
 
     source.destroy(e2);
     auto v2 = source.current(e2);
@@ -60,12 +68,12 @@ TEST(Snapshot, Full) {
         // output finishes flushing its contents when it goes out of scope
         cereal::JSONOutputArchive output{storage};
         source.snapshot().entities(output).destroyed(output)
-                .component<position, timer, relationship>(output);
+                .component<position, timer, relationship, empty_tag>(output);
     }
 
     cereal::JSONInputArchive input{storage};
     destination.loader().entities(input).destroyed(input)
-            .component<position, timer, relationship>(input);
+            .component<position, timer, relationship, empty_tag>(input);
 
     ASSERT_TRUE(destination.valid(e0));
     ASSERT_TRUE(destination.has<position>(e0));
@@ -84,6 +92,7 @@ TEST(Snapshot, Full) {
 
     ASSERT_TRUE(destination.valid(e3));
     ASSERT_TRUE(destination.has<timer>(e3));
+    ASSERT_TRUE(destination.has<empty_tag>(e3));
     ASSERT_EQ(destination.get<timer>(e3).duration, 1000);
     ASSERT_EQ(destination.get<timer>(e3).elapsed, 0);
 }
@@ -118,18 +127,19 @@ TEST(Snapshot, Continuous) {
     auto e3 = source.create();
     source.assign<timer>(e3, 1000, 1000);
     source.assign<relationship>(e3, e2);
+    source.assign<empty_tag>(e3);
 
     {
         // output finishes flushing its contents when it goes out of scope
         cereal::JSONOutputArchive output{storage};
-        source.snapshot().entities(output).component<position, relationship, timer>(output);
+        source.snapshot().entities(output).component<position, relationship, timer, empty_tag>(output);
     }
 
     cereal::JSONInputArchive input{storage};
     entt::continuous_loader loader{destination};
     loader.entities(input)
             .component<position, relationship>(input, &relationship::parent)
-            .component<timer>(input);
+            .component<timer, empty_tag>(input);
 
     ASSERT_FALSE(destination.valid(e0));
     ASSERT_TRUE(loader.has(e0));
@@ -178,4 +188,5 @@ TEST(Snapshot, Continuous) {
     ASSERT_EQ(destination.get<timer>(l3).elapsed, 0);
     ASSERT_TRUE(destination.has<relationship>(l3));
     ASSERT_EQ(destination.get<relationship>(l3).parent, l2);
+    ASSERT_TRUE(destination.has<empty_tag>(l3));
 }

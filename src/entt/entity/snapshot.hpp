@@ -48,7 +48,13 @@ class basic_snapshot {
             const auto entt = *(first++);
 
             if(reg.template has<Component>(entt)) {
-                archive(entt, reg.template get<Component>(entt));
+                // if component is empty, then no need to archive the component.
+                // this eliminates the need for serialize functions of empty components.
+                if constexpr(!std::is_empty_v<Component>) {
+                    archive(entt, reg.template get<Component>(entt));
+                } else {
+                    archive(entt);
+                }
             }
         }
     }
@@ -139,7 +145,13 @@ public:
 
             for(std::remove_const_t<decltype(sz)> i{}; i < sz; ++i) {
                 const auto entt = entities[i];
-                archive(entt, reg.template get<Component...>(entt));
+                // if component is empty, then no need to archive the component.
+                // this eliminates the need for serialize functions of empty components.
+                if constexpr(!std::is_empty_v<Component...>) {
+                    archive(entt, reg.template get<Component...>(entt));
+                } else {
+                    archive(entt);
+                }
             };
         } else {
             (component<Component>(archive), ...);
@@ -220,7 +232,13 @@ class basic_snapshot_loader {
         while(length--) {
             Entity entt{};
             Type instance{};
-            archive(entt, instance);
+            // if component is empty, then no need to archive the component.
+            // this eliminates the need for serialize functions of empty components.
+            if constexpr(!std::is_empty_v<Type>) {
+                archive(entt, instance);
+            } else {
+                archive(entt);
+            }
             static constexpr auto destroyed = false;
             force(reg, entt, destroyed);
             reg.template assign<Type>(args..., entt, std::as_const(instance));
@@ -403,7 +421,13 @@ class basic_continuous_loader {
         while(length--) {
             Entity entt{};
             Other instance{};
-            archive(entt, instance);
+            // if component is empty, then no need to archive the component.
+            // this eliminates the need for serialize functions of empty components.
+            if constexpr(!std::is_empty_v<Other>) {
+                archive(entt, instance);
+            } else {
+                archive(entt);
+            }
             restore(entt);
             (update(instance, member), ...);
             func(map(entt), instance);
