@@ -12,19 +12,19 @@
 #include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/algorithm.hpp"
 #include "../core/family.hpp"
+#include "../core/algorithm.hpp"
 #include "../core/hashed_string.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/sigh.hpp"
-#include "entt_traits.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
-#include "group.hpp"
 #include "runtime_view.hpp"
-#include "snapshot.hpp"
 #include "sparse_set.hpp"
+#include "snapshot.hpp"
+#include "entity.hpp"
+#include "group.hpp"
 #include "view.hpp"
+#include "pool.hpp"
+#include "fwd.hpp"
 
 
 namespace entt {

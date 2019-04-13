@@ -6,8 +6,8 @@
 #include <cstdint>
 #include <type_traits>
 #include <gtest/gtest.h>
-#include <entt/entity/entt_traits.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/entity.hpp>
 
 ENTT_NAMED_TYPE(int)
 

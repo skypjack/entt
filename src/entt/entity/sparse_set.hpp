@@ -12,7 +12,6 @@
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
-#include "entt_traits.hpp"
 #include "entity.hpp"
 
 

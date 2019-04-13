@@ -1,6 +1,6 @@
-#include <memory>
+#include <type_traits>
 #include <gtest/gtest.h>
-#include <entt/entity/entt_traits.hpp>
+#include <entt/core/type_traits.hpp>
 #include <entt/signal/dispatcher.hpp>
 
 struct an_event {};

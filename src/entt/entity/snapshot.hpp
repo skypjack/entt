@@ -9,7 +9,6 @@
 #include <type_traits>
 #include <unordered_map>
 #include "../config/config.h"
-#include "entt_traits.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
