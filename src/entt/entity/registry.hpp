@@ -191,18 +191,16 @@ class basic_registry {
     };
 
     struct owning_group_data {
+        const std::size_t extent[3];
         std::unique_ptr<boxed_owned> data;
-        bool(* exclude)(ENTT_ID_TYPE);
-        bool(* get)(ENTT_ID_TYPE);
-        bool(* owned)(ENTT_ID_TYPE);
-        std::size_t extent;
+        bool(* const is_same)(const ENTT_ID_TYPE *);
+        bool(* const owned)(ENTT_ID_TYPE);
     };
 
     struct non_owning_group_data {
+        const std::size_t extent[2];
         std::unique_ptr<sparse_set<Entity>> data;
-        bool(* exclude)(ENTT_ID_TYPE);
-        bool(* get)(ENTT_ID_TYPE);
-        std::size_t extent;
+        bool(* const is_same)(const ENTT_ID_TYPE *);
     };
 
     struct ctx_wrapper {
@@ -297,21 +295,25 @@ class basic_registry {
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1);
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0);
 
+        const std::size_t extent[] = { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) };
+        const ENTT_ID_TYPE types[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
+
         if constexpr(sizeof...(Owned) == 0) {
-            auto it = std::find_if(outer_groups.begin(), outer_groups.end(), [](auto &&gdata) {
-                return gdata.extent == sizeof...(Get) + sizeof...(Exclude)
-                        && (gdata.exclude(type<Exclude>()) && ...)
-                        && (gdata.get(type<Get>()) && ...);
+            auto it = std::find_if(outer_groups.begin(), outer_groups.end(), [&extent, &types](auto &&gdata) {
+                return std::equal(std::begin(extent), std::end(extent), gdata.extent) && gdata.is_same(types);
             });
 
             if(it == outer_groups.cend()) {
                 using group_type = non_owning_group<type_list<Exclude...>, type_list<Get...>>;
-                auto &gdata = outer_groups.emplace_back();
 
-                gdata.data = std::make_unique<group_type>();
-                gdata.exclude = +[](component_type ctype) { return ((ctype == type<Exclude>()) || ...); };
-                gdata.get = +[](component_type ctype) { return ((ctype == type<Get>()) || ...); };
-                gdata.extent = sizeof...(Get) + sizeof...(Exclude);
+                non_owning_group_data gdata{
+                    { sizeof...(Get), sizeof...(Exclude) },
+                    std::make_unique<group_type>(),
+                    +[](const ENTT_ID_TYPE *other) {
+                        const std::size_t types[] = { type<Get>()..., type<Exclude>()... };
+                        return std::equal(std::begin(types), std::end(types), other);
+                    }
+                };
 
                 auto *curr = static_cast<group_type *>(gdata.data.get());
                 const auto cpools = std::make_tuple(assure<Get>()..., assure<Exclude>()...);
@@ -328,28 +330,31 @@ class basic_registry {
                     }
                 }
 
+                outer_groups.push_back(std::move(gdata));
                 it = std::prev(outer_groups.end());
             }
 
             return it->data.get();
         } else {
-            auto it = std::find_if(inner_groups.begin(), inner_groups.end(), [](auto &&gdata) {
-                return gdata.extent == sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude)
-                        && (gdata.exclude(type<Exclude>()) && ...)
-                        && (gdata.get(type<Get>()) && ...)
-                        && (gdata.owned(type<Owned>()) && ...);
+            auto it = std::find_if(inner_groups.begin(), inner_groups.end(), [&extent, &types](auto &&gdata) {
+                return std::equal(std::begin(extent), std::end(extent), gdata.extent) && gdata.is_same(types);
             });
 
             if(it == inner_groups.cend()) {
                 ENTT_ASSERT(!(owned<Owned>() || ...));
                 using group_type = owning_group<type_list<Exclude...>, type_list<Get...>, Owned...>;
-                auto &gdata = inner_groups.emplace_back();
 
-                gdata.data = std::make_unique<group_type>();
-                gdata.exclude = +[](component_type ctype) { return ((ctype == type<Exclude>()) || ...); };
-                gdata.get = +[](component_type ctype) { return ((ctype == type<Get>()) || ...); };
-                gdata.owned = +[](component_type ctype) { return ((ctype == type<Owned>()) || ...); };
-                gdata.extent = sizeof...(Get) + sizeof...(Exclude) + sizeof...(Owned);
+                owning_group_data gdata{
+                    { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) },
+                    std::make_unique<group_type>(),
+                    +[](const ENTT_ID_TYPE *other) {
+                        const std::size_t types[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
+                        return std::equal(std::begin(types), std::end(types), other);
+                    },
+                    +[](ENTT_ID_TYPE ctype) {
+                        return ((ctype == type<Owned>()) || ...);
+                    }
+                };
 
                 auto *curr = static_cast<group_type *>(gdata.data.get());
                 const auto cpools = std::make_tuple(assure<Owned>()..., assure<Get>()..., assure<Exclude>()...);
@@ -379,6 +384,7 @@ class basic_registry {
                     }
                 });
 
+                inner_groups.push_back(std::move(gdata));
                 it = std::prev(inner_groups.end());
             }
 
