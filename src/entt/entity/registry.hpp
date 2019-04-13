@@ -23,7 +23,6 @@
 #include "entity.hpp"
 #include "group.hpp"
 #include "view.hpp"
-#include "pool.hpp"
 #include "fwd.hpp"
 
 
