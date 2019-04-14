@@ -47,7 +47,11 @@ class basic_snapshot {
             const auto entt = *(first++);
 
             if(reg.template has<Component>(entt)) {
-                archive(entt, reg.template get<Component>(entt));
+                if constexpr(std::is_empty_v<Component>) {
+                    archive(entt);
+                } else {
+                    archive(entt, reg.template get<Component>(entt));
+                }
             }
         }
     }
@@ -138,7 +142,12 @@ public:
 
             for(std::remove_const_t<decltype(sz)> i{}; i < sz; ++i) {
                 const auto entt = entities[i];
-                archive(entt, reg.template get<Component...>(entt));
+
+                if constexpr(std::is_empty_v<Component...>) {
+                    archive(entt);
+                } else {
+                    archive(entt, reg.template get<Component...>(entt));
+                }
             };
         } else {
             (component<Component>(archive), ...);
@@ -219,7 +228,13 @@ class basic_snapshot_loader {
         while(length--) {
             Entity entt{};
             Type instance{};
-            archive(entt, instance);
+
+            if constexpr(std::is_empty_v<Type>) {
+                archive(entt);
+            } else {
+                archive(entt, instance);
+            }
+
             static constexpr auto destroyed = false;
             force(reg, entt, destroyed);
             reg.template assign<Type>(args..., entt, std::as_const(instance));
@@ -402,7 +417,13 @@ class basic_continuous_loader {
         while(length--) {
             Entity entt{};
             Other instance{};
-            archive(entt, instance);
+
+            if constexpr(std::is_empty_v<Other>) {
+                archive(entt);
+            } else {
+                archive(entt, instance);
+            }
+
             restore(entt);
             (update(instance, member), ...);
             func(map(entt), instance);
