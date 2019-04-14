@@ -420,6 +420,15 @@ class basic_group<Entity, get_t<Get...>, Owned...> {
     template<typename Component>
     using component_iterator_type = decltype(std::declval<pool_type<Component>>().begin());
 
+    template<typename Component>
+    const Component & from_index(const typename sparse_set<Entity>::size_type index) {
+        if constexpr(std::disjunction_v<std::is_same<Component, Owned>...>) {
+            return std::get<pool_type<Component> *>(pools)->raw()[index];
+        } else {
+            return std::get<pool_type<Component> *>(pools)->get(data()[index]);
+        }
+    }
+
     // we could use pool_type<Type> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
     basic_group(const typename basic_registry<Entity>::size_type *sz, sparse_set<Entity, std::remove_const_t<Owned>> *... owned, sparse_set<Entity, std::remove_const_t<Get>> *... get) ENTT_NOEXCEPT
         : length{sz},
@@ -725,19 +734,7 @@ public:
             }, std::forward<Args>(args)...);
         } else {
             algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), this](const auto lhs, const auto rhs) {
-                return compare([lhs, this](auto *cpool) -> decltype(auto) {
-                    if constexpr(std::disjunction_v<std::is_same<typename std::remove_pointer_t<decltype(cpool)>::object_type, Owned>...>) {
-                        return cpool->raw()[lhs];
-                    } else {
-                        return cpool->get(data()[lhs]);
-                    }
-                }(std::get<pool_type<Component> *>(pools))..., [rhs, this](auto *cpool) -> decltype(auto) {
-                    if constexpr(std::disjunction_v<std::is_same<typename std::remove_pointer_t<decltype(cpool)>::object_type, Owned>...>) {
-                        return cpool->raw()[rhs];
-                    } else {
-                        return cpool->get(data()[rhs]);
-                    }
-                }(std::get<pool_type<Component> *>(pools))...);
+                return compare(from_index<Component>(lhs)..., from_index<Component>(rhs)...);
             }, std::forward<Args>(args)...);
         }
 
