@@ -1186,8 +1186,10 @@ the template parameter list and arranges their pools so as to iterate all of
 them as fast as possible.
 
 Sorting owned components is no longer allowed once the group has been created.
-However, full-owning groups can be sorted by means of the `sort` member
-function, if required.
+However, full-owning groups can be sorted by means of their `sort` member
+functions, if required. Sorting a full-owning group affects all the instance of
+the same group (it means that users don't have to call `sort` on each instance
+to sort all of them because they share the underlying data structure).
 
 ### Partial-owning groups
 
@@ -1215,8 +1217,10 @@ them as fast as possible. The ownership of the types provided via `entt::get`
 doesn't pass to the group instead.
 
 Sorting owned components is no longer allowed once the group has been created.
-However, partial-owning groups can be sorted by means of the `sort` member
-function, if required.
+However, partial-owning groups can be sorted by means of their `sort` member
+functions, if required. Sorting a partial-owning group affects all the instance
+of the same group (it means that users don't have to call `sort` on each
+instance to sort all of them because they share the underlying data structure).
 
 ### Non-owning groups
 
@@ -1242,8 +1246,10 @@ case. This type of groups is therefore the least performing in general, but also
 the only one that can be used in any situation to improve a performance where
 necessary.
 
-Non-owning groups can be sorted by means of the `sort` member function, if
-required.
+Non-owning groups can be sorted by means of their `sort` member functions, if
+required. Sorting a non-owning group affects all the instance of the same group
+(it means that users don't have to call `sort` on each instance to sort all of
+them because they share the set of entities).
 
 # Types: const, non-const and all in between
 

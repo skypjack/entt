@@ -641,7 +641,7 @@ TEST(OwningGroup, SortReverse) {
 
 TEST(OwningGroup, SortUnordered) {
     entt::registry registry;
-    auto group = registry.group<boxed_int, char>();
+    auto group = registry.group<boxed_int>(entt::get<char>);
 
     entt::entity entities[7] = {
         registry.create(),
@@ -671,8 +671,8 @@ TEST(OwningGroup, SortUnordered) {
     registry.assign<boxed_int>(entities[5], 4);
     registry.assign<boxed_int>(entities[6], 5);
 
-    group.sort([&group](const auto lhs, const auto rhs) {
-        return group.get<boxed_int>(lhs).value < group.get<boxed_int>(rhs).value;
+    group.sort([](const auto &lhs, const auto &rhs) {
+        return lhs.value < rhs.value;
     });
 
     ASSERT_EQ(*(group.data() + 0u), entities[4]);
@@ -691,11 +691,11 @@ TEST(OwningGroup, SortUnordered) {
     ASSERT_EQ((group.raw<boxed_int>() + 5u)->value, 4);
     ASSERT_EQ((group.raw<boxed_int>() + 6u)->value, 5);
 
-    ASSERT_EQ(*(group.raw<char>() + 0u), 'e');
-    ASSERT_EQ(*(group.raw<char>() + 1u), 'd');
-    ASSERT_EQ(*(group.raw<char>() + 2u), 'a');
-    ASSERT_EQ(*(group.raw<char>() + 3u), 'b');
-    ASSERT_EQ(*(group.raw<char>() + 4u), 'c');
+    ASSERT_EQ(*(group.raw<char>() + 0u), 'a');
+    ASSERT_EQ(*(group.raw<char>() + 1u), 'b');
+    ASSERT_EQ(*(group.raw<char>() + 2u), 'c');
+    ASSERT_EQ(*(group.raw<char>() + 3u), 'd');
+    ASSERT_EQ(*(group.raw<char>() + 4u), 'e');
 }
 
 TEST(OwningGroup, IndexRebuiltOnDestroy) {

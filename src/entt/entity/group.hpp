@@ -395,6 +395,9 @@ private:
  * that generated them. Therefore any change to the entities and to the
  * components made by means of the registry are immediately reflected by all the
  * groups.
+ * Moreover, sorting an owning group affects all the instance of the same group
+ * (it means that users don't have to call `sort` on each instance to sort all
+ * of them because they share the underlying data structure).
  *
  * @warning
  * Lifetime of a group must overcome the one of the registry that generated it.
@@ -675,9 +678,10 @@ public:
      *
      * The comparison function object must return `true` if the first element
      * is _less_ than the second one, `false` otherwise. The signature of the
-     * comparison function should be equivalent to the following:
+     * comparison function should be equivalent to one of the following:
      *
      * @code{.cpp}
+     * bool(const Owned &..., const Owned &...);
      * bool(const Entity, const Entity);
      * @endcode
      *
@@ -712,9 +716,15 @@ public:
         std::vector<size_type> copy(*length);
         std::iota(copy.begin(), copy.end(), 0);
 
-        algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), data = data()](const auto lhs, const auto rhs) {
-            return compare(data[lhs], data[rhs]);
-        }, std::forward<Args>(args)...);
+        if constexpr(std::is_invocable_v<Compare, const Owned &..., const Owned &...>) {
+            algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), raw = std::make_tuple(std::get<pool_type<Owned> *>(pools)->raw()...)](const auto lhs, const auto rhs) {
+                return compare(std::as_const(std::get<Owned *>(raw)[lhs])..., std::as_const(std::get<Owned *>(raw)[rhs])...);
+            }, std::forward<Args>(args)...);
+        } else {
+            algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), data = data()](const auto lhs, const auto rhs) {
+                return compare(data[lhs], data[rhs]);
+            }, std::forward<Args>(args)...);
+        }
 
         for(size_type pos = 0, last = copy.size(); pos < last; ++pos) {
             auto curr = pos;
