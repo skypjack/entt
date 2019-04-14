@@ -681,10 +681,12 @@ public:
      * comparison function should be equivalent to one of the following:
      *
      * @code{.cpp}
-     * bool(const Owned &..., const Owned &...);
+     * bool(const Component &..., const Component &...);
      * bool(const Entity, const Entity);
      * @endcode
      *
+     * Where `Component` are either owned types or not but still such that they
+     * are iterated by the group.<br/>
      * Moreover, the comparison function object shall induce a
      * _strict weak ordering_ on the values.
      *
@@ -704,6 +706,7 @@ public:
      * either `data` or `raw` gives no guarantees on the order, even though
      * `sort` has been invoked.
      *
+     * @tparam Component Optional types of components to compare.
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
@@ -711,18 +714,30 @@ public:
      * @param algo A valid sort function object.
      * @param args Arguments to forward to the sort function object, if any.
      */
-    template<typename Compare, typename Sort = std_sort, typename... Args>
+    template<typename... Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
         std::vector<size_type> copy(*length);
         std::iota(copy.begin(), copy.end(), 0);
 
-        if constexpr(std::is_invocable_v<Compare, const Owned &..., const Owned &...>) {
-            algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), raw = std::make_tuple(std::get<pool_type<Owned> *>(pools)->raw()...)](const auto lhs, const auto rhs) {
-                return compare(std::as_const(std::get<Owned *>(raw)[lhs])..., std::as_const(std::get<Owned *>(raw)[rhs])...);
-            }, std::forward<Args>(args)...);
-        } else {
+        if constexpr(sizeof...(Component) == 0) {
             algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), data = data()](const auto lhs, const auto rhs) {
                 return compare(data[lhs], data[rhs]);
+            }, std::forward<Args>(args)...);
+        } else {
+            algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), this](const auto lhs, const auto rhs) {
+                return compare([lhs, this](auto *cpool) -> decltype(auto) {
+                    if constexpr(std::disjunction_v<std::is_same<typename std::remove_pointer_t<decltype(cpool)>::object_type, Owned>...>) {
+                        return cpool->raw()[lhs];
+                    } else {
+                        return cpool->get(data()[lhs]);
+                    }
+                }(std::get<pool_type<Component> *>(pools))..., [rhs, this](auto *cpool) -> decltype(auto) {
+                    if constexpr(std::disjunction_v<std::is_same<typename std::remove_pointer_t<decltype(cpool)>::object_type, Owned>...>) {
+                        return cpool->raw()[rhs];
+                    } else {
+                        return cpool->get(data()[rhs]);
+                    }
+                }(std::get<pool_type<Component> *>(pools))...);
             }, std::forward<Args>(args)...);
         }
 
