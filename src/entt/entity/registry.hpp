@@ -294,10 +294,10 @@ class basic_registry {
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1);
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0);
 
-        const std::size_t extent[] = { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) };
-        const ENTT_ID_TYPE types[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
-
         if constexpr(sizeof...(Owned) == 0) {
+            const std::size_t extent[] = { sizeof...(Get), sizeof...(Exclude) };
+            const ENTT_ID_TYPE types[] = { type<Get>()..., type<Exclude>()... };
+
             auto it = std::find_if(outer_groups.begin(), outer_groups.end(), [&extent, &types](auto &&gdata) {
                 return std::equal(std::begin(extent), std::end(extent), gdata.extent) && gdata.is_same(types);
             });
@@ -335,6 +335,9 @@ class basic_registry {
 
             return it->data.get();
         } else {
+            const std::size_t extent[] = { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) };
+            const ENTT_ID_TYPE types[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
+
             auto it = std::find_if(inner_groups.begin(), inner_groups.end(), [&extent, &types](auto &&gdata) {
                 return std::equal(std::begin(extent), std::end(extent), gdata.extent) && gdata.is_same(types);
             });
