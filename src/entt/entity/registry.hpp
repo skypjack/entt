@@ -1127,9 +1127,10 @@ public:
      *
      * The comparison function object must return `true` if the first element
      * is _less_ than the second one, `false` otherwise. The signature of the
-     * comparison function should be equivalent to the following:
+     * comparison function should be equivalent to one of the following:
      *
      * @code{.cpp}
+     * bool(const Entity, const Entity);
      * bool(const Component &, const Component &);
      * @endcode
      *
