@@ -309,8 +309,8 @@ class basic_registry {
                     { sizeof...(Get), sizeof...(Exclude) },
                     std::make_unique<group_type>(),
                     +[](const ENTT_ID_TYPE *other) {
-                        const std::size_t types[] = { type<Get>()..., type<Exclude>()... };
-                        return std::equal(std::begin(types), std::end(types), other);
+                        const std::size_t ctypes[] = { type<Get>()..., type<Exclude>()... };
+                        return std::equal(std::begin(ctypes), std::end(ctypes), other);
                     }
                 };
 
@@ -350,8 +350,8 @@ class basic_registry {
                     { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) },
                     std::make_unique<group_type>(),
                     +[](const ENTT_ID_TYPE *other) {
-                        const std::size_t types[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
-                        return std::equal(std::begin(types), std::end(types), other);
+                        const std::size_t ctypes[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
+                        return std::equal(std::begin(ctypes), std::end(ctypes), other);
                     },
                     +[](ENTT_ID_TYPE ctype) {
                         return ((ctype == type<Owned>()) || ...);
