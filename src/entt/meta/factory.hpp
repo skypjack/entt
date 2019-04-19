@@ -39,20 +39,6 @@ template<typename Type>
 class meta_factory {
     static_assert(std::is_object_v<Type> && !(std::is_const_v<Type> || std::is_volatile_v<Type>));
 
-    template<auto Data>
-    static std::enable_if_t<std::is_member_object_pointer_v<decltype(Data)>, decltype(std::declval<Type>().*Data)>
-    actual_type();
-
-    template<auto Data>
-    static std::enable_if_t<std::is_pointer_v<decltype(Data)>, decltype(*Data)>
-    actual_type();
-
-    template<auto Data>
-    using data_type = std::remove_reference_t<decltype(meta_factory::actual_type<Data>())>;
-
-    template<auto Func>
-    using func_type = internal::meta_function_helper<std::integral_constant<decltype(Func), Func>>;
-
     template<typename Node>
     inline bool duplicate(const hashed_string &name, const Node *node) ENTT_NOEXCEPT {
         return node ? node->name == name || duplicate(name, node->next) : false;
@@ -69,7 +55,7 @@ class meta_factory {
 
     template<typename Owner, typename Property, typename... Other>
     internal::meta_prop_node * properties(Property &&property, Other &&... other) {
-        static std::decay_t<Property> prop{};
+        static std::remove_cv_t<std::remove_reference_t<Property>> prop{};
 
         static internal::meta_prop_node node{
             nullptr,
@@ -99,6 +85,7 @@ class meta_factory {
             std::is_void_v<Type>,
             std::is_integral_v<Type>,
             std::is_floating_point_v<Type>,
+            std::is_array_v<Type>,
             std::is_enum_v<Type>,
             std::is_union_v<Type>,
             std::is_class_v<Type>,
@@ -106,6 +93,7 @@ class meta_factory {
             std::is_function_v<Type>,
             std::is_member_object_pointer_v<Type>,
             std::is_member_function_pointer_v<Type>,
+            std::extent_v<Type>,
             []() -> meta_type {
                 return internal::meta_info<std::remove_pointer_t<Type>>::resolve();
             },
@@ -248,7 +236,7 @@ public:
      */
     template<typename To>
     meta_factory conv() ENTT_NOEXCEPT {
-        static_assert(std::is_convertible_v<Type, std::decay_t<To>>);
+        static_assert(std::is_convertible_v<Type, To>);
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_conv_node node{
@@ -257,7 +245,7 @@ public:
             nullptr,
             &internal::meta_info<To>::resolve,
             [](void *instance) -> meta_any {
-                return static_cast<std::decay_t<To>>(*static_cast<Type *>(instance));
+                return static_cast<To>(*static_cast<Type *>(instance));
             },
             []() -> meta_conv {
                 return &node;
@@ -428,8 +416,8 @@ public:
                 true,
                 true,
                 &internal::meta_info<Type>::resolve,
-                [](meta_handle, meta_any &) { return false; },
-                [](meta_handle) -> meta_any { return Data; },
+                [](meta_handle, meta_any, meta_any) { return false; },
+                [](meta_handle, meta_any) -> meta_any { return Data; },
                 []() -> meta_data {
                     return &node;
                 }
@@ -437,17 +425,41 @@ public:
 
             node.prop = properties<std::integral_constant<Type, Data>>(std::forward<Property>(property)...);
             curr = &node;
-        } else {
+        } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
+            using data_type = std::remove_reference_t<decltype(std::declval<Type>().*Data)>;
+
             static internal::meta_data_node node{
                 &internal::meta_info<Type>::template data<Data>,
                 {},
                 type,
                 nullptr,
                 nullptr,
-                std::is_const_v<data_type<Data>>,
+                std::is_const_v<data_type>,
                 !std::is_member_object_pointer_v<decltype(Data)>,
-                &internal::meta_info<data_type<Data>>::resolve,
-                &internal::setter<std::is_const_v<data_type<Data>>, Type, Data>,
+                &internal::meta_info<data_type>::resolve,
+                &internal::setter<std::is_const_v<data_type>, Type, Data>,
+                &internal::getter<Type, Data>,
+                []() -> meta_data {
+                    return &node;
+                }
+            };
+
+            node.prop = properties<std::integral_constant<decltype(Data), Data>>(std::forward<Property>(property)...);
+            curr = &node;
+        } else {
+            static_assert(std::is_pointer_v<decltype(Data)>);
+            using data_type = std::remove_pointer_t<decltype(Data)>;
+
+            static internal::meta_data_node node{
+                &internal::meta_info<Type>::template data<Data>,
+                {},
+                type,
+                nullptr,
+                nullptr,
+                std::is_const_v<data_type>,
+                !std::is_member_object_pointer_v<decltype(Data)>,
+                &internal::meta_info<data_type>::resolve,
+                &internal::setter<std::is_const_v<data_type>, Type, Data>,
                 &internal::getter<Type, Data>,
                 []() -> meta_data {
                     return &node;
@@ -540,6 +552,7 @@ public:
     template<auto Func, typename... Property>
     meta_factory func(const char *str, Property &&... property) ENTT_NOEXCEPT {
         using owner_type = std::integral_constant<decltype(Func), Func>;
+        using func_type = internal::meta_function_helper<std::integral_constant<decltype(Func), Func>>;
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_func_node node{
@@ -548,13 +561,13 @@ public:
             type,
             nullptr,
             nullptr,
-            func_type<Func>::size,
-            func_type<Func>::is_const,
-            func_type<Func>::is_static,
-            &internal::meta_info<typename func_type<Func>::return_type>::resolve,
-            &func_type<Func>::arg,
+            func_type::size,
+            func_type::is_const,
+            func_type::is_static,
+            &internal::meta_info<typename func_type::return_type>::resolve,
+            &func_type::arg,
             [](meta_handle handle, meta_any *any) {
-                return internal::invoke<Type, Func>(handle, any, std::make_index_sequence<func_type<Func>::size>{});
+                return internal::invoke<Type, Func>(handle, any, std::make_index_sequence<func_type::size>{});
             },
             []() -> meta_func {
                 return &node;

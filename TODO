@@ -19,4 +19,7 @@
 * review sparse set to allow customization (mix pack in the spec, base is position only)
   - non-owning groups can iterate pages and skip empty ones, this should mitigate the lack of the packed array
 * review 64 bit id: user defined area + dedicated member on the registry to set it
+* early out in views using bitmasks with bloom filter like access based on modulus
+  - standard each, use bitmask to speed up the whole thing and avoid accessing the pools to test for the page
+  - iterator based each with a couple of iterators passed from outside (use bitmask + has)
 * reactive systems

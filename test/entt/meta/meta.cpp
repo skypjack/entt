@@ -71,6 +71,11 @@ struct data_type {
     empty_type empty{};
 };
 
+struct array_type {
+    static inline int global[3];
+    int local[3];
+};
+
 struct func_type {
     int f(const base_type &, int a, int b) { return f(a, b); }
     int f(int a, int b) { value = a; return b*b; }
@@ -153,6 +158,10 @@ struct Meta: public ::testing::Test {
                 .data<&data_type::h>("h", std::make_pair(properties::prop_int, 2))
                 .data<&data_type::k>("k", std::make_pair(properties::prop_int, 3))
                 .data<&data_type::empty>("empty");
+
+        entt::reflect<array_type>("array")
+                .data<&array_type::global>("global")
+                .data<&array_type::local>("local");
 
         entt::reflect<func_type>("func")
                 .func<entt::overload<int(const base_type &, int, int)>(&func_type::f)>("f3")
@@ -1008,6 +1017,65 @@ TEST_F(Meta, MetaDataSetterGetterMixed) {
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
     ASSERT_TRUE(data.set(instance, 42));
     ASSERT_EQ(data.get(instance).cast<int>(), 42);
+}
+
+TEST_F(Meta, MetaDataArrayStatic) {
+    auto data = entt::resolve<array_type>().data("global");
+
+    array_type::global[0] = 3;
+    array_type::global[1] = 5;
+    array_type::global[2] = 7;
+
+    ASSERT_TRUE(data);
+    ASSERT_NE(data, entt::meta_data{});
+    ASSERT_EQ(data.parent(), entt::resolve("array"));
+    ASSERT_EQ(data.type(), entt::resolve<int[3]>());
+    ASSERT_STREQ(data.name(), "global");
+    ASSERT_FALSE(data.is_const());
+    ASSERT_TRUE(data.is_static());
+    ASSERT_TRUE(data.type().is_array());
+    ASSERT_EQ(data.type().extent(), 3);
+    ASSERT_EQ(data.get(nullptr, 0).cast<int>(), 3);
+    ASSERT_EQ(data.get(nullptr, 1).cast<int>(), 5);
+    ASSERT_EQ(data.get(nullptr, 2).cast<int>(), 7);
+    ASSERT_FALSE(data.set(nullptr, 0, 'c'));
+    ASSERT_EQ(data.get(nullptr, 0).cast<int>(), 3);
+    ASSERT_TRUE(data.set(nullptr, 0, data.get(nullptr, 0).cast<int>()+2));
+    ASSERT_TRUE(data.set(nullptr, 1, data.get(nullptr, 1).cast<int>()+2));
+    ASSERT_TRUE(data.set(nullptr, 2, data.get(nullptr, 2).cast<int>()+2));
+    ASSERT_EQ(data.get(nullptr, 0).cast<int>(), 5);
+    ASSERT_EQ(data.get(nullptr, 1).cast<int>(), 7);
+    ASSERT_EQ(data.get(nullptr, 2).cast<int>(), 9);
+}
+
+TEST_F(Meta, MetaDataArray) {
+    auto data = entt::resolve<array_type>().data("local");
+    array_type instance;
+
+    instance.local[0] = 3;
+    instance.local[1] = 5;
+    instance.local[2] = 7;
+
+    ASSERT_TRUE(data);
+    ASSERT_NE(data, entt::meta_data{});
+    ASSERT_EQ(data.parent(), entt::resolve("array"));
+    ASSERT_EQ(data.type(), entt::resolve<int[3]>());
+    ASSERT_STREQ(data.name(), "local");
+    ASSERT_FALSE(data.is_const());
+    ASSERT_FALSE(data.is_static());
+    ASSERT_TRUE(data.type().is_array());
+    ASSERT_EQ(data.type().extent(), 3);
+    ASSERT_EQ(data.get(instance, 0).cast<int>(), 3);
+    ASSERT_EQ(data.get(instance, 1).cast<int>(), 5);
+    ASSERT_EQ(data.get(instance, 2).cast<int>(), 7);
+    ASSERT_FALSE(data.set(instance, 0, 'c'));
+    ASSERT_EQ(data.get(instance, 0).cast<int>(), 3);
+    ASSERT_TRUE(data.set(instance, 0, data.get(instance, 0).cast<int>()+2));
+    ASSERT_TRUE(data.set(instance, 1, data.get(instance, 1).cast<int>()+2));
+    ASSERT_TRUE(data.set(instance, 2, data.get(instance, 2).cast<int>()+2));
+    ASSERT_EQ(data.get(instance, 0).cast<int>(), 5);
+    ASSERT_EQ(data.get(instance, 1).cast<int>(), 7);
+    ASSERT_EQ(data.get(instance, 2).cast<int>(), 9);
 }
 
 TEST_F(Meta, MetaFunc) {

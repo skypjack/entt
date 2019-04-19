@@ -99,8 +99,8 @@ struct meta_data_node {
     const bool is_const;
     const bool is_static;
     meta_type_node *(* const type)();
-    bool(* const set)(meta_handle, meta_any &);
-    meta_any(* const get)(meta_handle);
+    bool(* const set)(meta_handle, meta_any, meta_any);
+    meta_any(* const get)(meta_handle, meta_any);
     meta_data(* const meta)();
 };
 
@@ -123,12 +123,14 @@ struct meta_func_node {
 
 
 struct meta_type_node {
+    using size_type = std::size_t;
     hashed_string name;
     meta_type_node * next;
     meta_prop_node * prop;
     const bool is_void;
     const bool is_integral;
     const bool is_floating_point;
+    const bool is_array;
     const bool is_enum;
     const bool is_union;
     const bool is_class;
@@ -136,6 +138,7 @@ struct meta_type_node {
     const bool is_function;
     const bool is_member_object_pointer;
     const bool is_member_function_pointer;
+    const size_type extent;
     meta_type(* const remove_pointer)();
     bool(* const destroy)(meta_handle);
     meta_type(* const meta)();
@@ -377,9 +380,9 @@ public:
      * @tparam Type Type of object to use to initialize the container.
      * @param type An instance of an object to use to initialize the container.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>>>
     meta_any(Type &&type) {
-        using actual_type = std::decay_t<Type>;
+        using actual_type = std::remove_cv_t<std::remove_reference_t<Type>>;
         node = internal::meta_info<Type>::resolve();
 
         compare_fn = &compare<actual_type>;
@@ -656,7 +659,7 @@ public:
      * @tparam Type Type of object to use to initialize the handle.
      * @param obj A reference to an object to use to initialize the handle.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_handle>>>
     meta_handle(Type &&obj) ENTT_NOEXCEPT
         : meta_handle{0, std::forward<Type>(obj)}
     {}
@@ -1230,22 +1233,56 @@ public:
      */
     template<typename Type>
     inline bool set(meta_handle handle, Type &&value) const {
-        meta_any any{std::forward<Type>(value)};
-        return node->set(handle, any);
+        return node->set(handle, meta_any{}, std::forward<Type>(value));
+    }
+
+    /**
+     * @brief Sets the i-th element of an array enclosed by a given meta type.
+     *
+     * It must be possible to cast the instance to the parent type of the meta
+     * data. Otherwise, invoking the setter results in an undefined
+     * behavior.<br/>
+     * The type of the value must coincide exactly with that of the array type
+     * enclosed by the meta data. Otherwise, invoking the setter does nothing.
+     *
+     * @tparam Type Type of value to assign.
+     * @param handle An opaque pointer to an instance of the underlying type.
+     * @param index Position of the underlying element to set.
+     * @param value Parameter to use to set the underlying element.
+     * @return True in case of success, false otherwise.
+     */
+    template<typename Type>
+    inline bool set(meta_handle handle, std::size_t index, Type &&value) const {
+        assert(index < node->type()->extent);
+        return node->set(handle, index, std::forward<Type>(value));
     }
 
     /**
      * @brief Gets the value of the variable enclosed by a given meta type.
      *
      * It must be possible to cast the instance to the parent type of the meta
-     * function. Otherwise, invoking the getter results in an undefined
-     * behavior.
+     * data. Otherwise, invoking the getter results in an undefined behavior.
      *
      * @param handle An opaque pointer to an instance of the underlying type.
      * @return A meta any containing the value of the underlying variable.
      */
     inline meta_any get(meta_handle handle) const ENTT_NOEXCEPT {
-        return node->get(handle);
+        return node->get(handle, meta_any{});
+    }
+
+    /**
+     * @brief Gets the i-th element of an array enclosed by a given meta type.
+     *
+     * It must be possible to cast the instance to the parent type of the meta
+     * data. Otherwise, invoking the getter results in an undefined behavior.
+     *
+     * @param handle An opaque pointer to an instance of the underlying type.
+     * @param index Position of the underlying element to get.
+     * @return A meta any containing the value of the underlying element.
+     */
+    inline meta_any get(meta_handle handle, std::size_t index) const ENTT_NOEXCEPT {
+        assert(index < node->type()->extent);
+        return node->get(handle, index);
     }
 
     /**
@@ -1497,6 +1534,9 @@ class meta_type {
     {}
 
 public:
+    /*! @brief Unsigned integer type. */
+    using size_type = typename internal::meta_type_node::size_type;
+
     /*! @brief Default constructor. */
     inline meta_type() ENTT_NOEXCEPT
         : node{nullptr}
@@ -1535,6 +1575,15 @@ public:
      */
     inline bool is_floating_point() const ENTT_NOEXCEPT {
         return node->is_floating_point;
+    }
+
+    /**
+     * @brief Indicates whether a given meta type refers to an array type or
+     * not.
+     * @return True if the underlying type is an array type, false otherwise.
+     */
+    inline bool is_array() const ENTT_NOEXCEPT {
+        return node->is_array;
     }
 
     /**
@@ -1596,6 +1645,16 @@ public:
      */
     inline bool is_member_function_pointer() const ENTT_NOEXCEPT {
         return node->is_member_function_pointer;
+    }
+
+    /**
+     * @brief If a given meta type refers to an array type, provides the number
+     * of elements of the array.
+     * @return The number of elements of the array if the underlying type is an
+     * array type, 0 otherwise.
+     */
+    inline size_type extent() const ENTT_NOEXCEPT {
+        return node->extent;
     }
 
     /**
@@ -2010,25 +2069,29 @@ struct meta_function_helper<std::integral_constant<decltype(Func), Func>>: declt
 
 template<typename Type>
 inline bool destroy([[maybe_unused]] meta_handle handle) {
-    if constexpr(std::is_object_v<Type>) {
-        return handle.type() == meta_info<Type>::resolve()->meta()
-                ? (static_cast<Type *>(handle.data())->~Type(), true)
-                : false;
-    } else {
-        return false;
+    bool accepted = false;
+
+    if constexpr(std::is_object_v<Type> && !std::is_array_v<Type>) {
+        accepted = (handle.type() == meta_info<Type>::resolve()->meta());
+
+        if(accepted) {
+            static_cast<Type *>(handle.data())->~Type();
+        }
     }
+
+    return accepted;
 }
 
 
 template<typename Type, typename... Args, std::size_t... Indexes>
 inline meta_any construct(meta_any * const args, std::index_sequence<Indexes...>) {
-    [[maybe_unused]] std::array<bool, sizeof...(Args)> can_cast{{(args+Indexes)->can_cast<std::decay_t<Args>>()...}};
-    [[maybe_unused]] std::array<bool, sizeof...(Args)> can_convert{{(std::get<Indexes>(can_cast) ? false : (args+Indexes)->can_convert<std::decay_t<Args>>())...}};
+    [[maybe_unused]] std::array<bool, sizeof...(Args)> can_cast{{(args+Indexes)->can_cast<std::remove_cv_t<std::remove_reference_t<Args>>>()...}};
+    [[maybe_unused]] std::array<bool, sizeof...(Args)> can_convert{{(std::get<Indexes>(can_cast) ? false : (args+Indexes)->can_convert<std::remove_cv_t<std::remove_reference_t<Args>>>())...}};
     meta_any any{};
 
     if(((std::get<Indexes>(can_cast) || std::get<Indexes>(can_convert)) && ...)) {
-        ((std::get<Indexes>(can_convert) ? void((args+Indexes)->convert<std::decay_t<Args>>()) : void()), ...);
-        any = Type{(args+Indexes)->cast<std::decay_t<Args>>()...};
+        ((std::get<Indexes>(can_convert) ? void((args+Indexes)->convert<std::remove_cv_t<std::remove_reference_t<Args>>>()) : void()), ...);
+        any = Type{(args+Indexes)->cast<std::remove_cv_t<std::remove_reference_t<Args>>>()...};
     }
 
     return any;
@@ -2036,55 +2099,88 @@ inline meta_any construct(meta_any * const args, std::index_sequence<Indexes...>
 
 
 template<bool Const, typename Type, auto Data>
-bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any &any) {
+bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index, [[maybe_unused]] meta_any value) {
     bool accepted = false;
 
-    if constexpr(Const) {
-        return accepted;
-    } else {
+    if constexpr(!Const) {
         if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>> || std::is_member_function_pointer_v<decltype(Data)>) {
             using helper_type = meta_function_helper<std::integral_constant<decltype(Data), Data>>;
             using data_type = std::decay_t<std::tuple_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>>;
             static_assert(std::is_invocable_v<decltype(Data), Type *, data_type>);
-            accepted = any.can_cast<data_type>() || any.convert<data_type>();
+            accepted = value.can_cast<data_type>() || value.convert<data_type>();
             auto *clazz = handle.try_cast<Type>();
 
             if(accepted && clazz) {
-                std::invoke(Data, clazz, any.cast<data_type>());
+                std::invoke(Data, clazz, value.cast<data_type>());
             }
         } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
-            using data_type = std::decay_t<decltype(std::declval<Type>().*Data)>;
+            using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
             static_assert(std::is_invocable_v<decltype(Data), Type>);
-            accepted = any.can_cast<data_type>() || any.convert<data_type>();
             auto *clazz = handle.try_cast<Type>();
 
-            if(accepted && clazz) {
-                std::invoke(Data, clazz) = any.cast<data_type>();
+            if constexpr(std::is_array_v<data_type>) {
+                using underlying_type = std::remove_extent_t<data_type>;
+                accepted = index.can_cast<std::size_t>() && (value.can_cast<underlying_type>() || value.convert<underlying_type>());
+
+                if(accepted && clazz) {
+                    std::invoke(Data, clazz)[index.cast<std::size_t>()] = value.cast<underlying_type>();
+                }
+            } else {
+                accepted = value.can_cast<data_type>() || value.convert<data_type>();
+
+                if(accepted && clazz) {
+                    std::invoke(Data, clazz) = value.cast<data_type>();
+                }
             }
         } else {
             static_assert(std::is_pointer_v<decltype(Data)>);
-            using data_type = std::decay_t<decltype(*Data)>;
-            accepted = any.can_cast<data_type>() || any.convert<data_type>();
+            using data_type = std::remove_cv_t<std::remove_reference_t<decltype(*Data)>>;
 
-            if(accepted) {
-                *Data = any.cast<data_type>();
+            if constexpr(std::is_array_v<data_type>) {
+                using underlying_type = std::remove_extent_t<data_type>;
+                accepted = index.can_cast<std::size_t>() && (value.can_cast<underlying_type>() || value.convert<underlying_type>());
+
+                if(accepted) {
+                    (*Data)[index.cast<std::size_t>()] = value.cast<underlying_type>();
+                }
+            } else {
+                accepted = value.can_cast<data_type>() || value.convert<data_type>();
+
+                if(accepted) {
+                    *Data = value.cast<data_type>();
+                }
             }
         }
-
-        return accepted;
     }
+
+    return accepted;
 }
 
 
 template<typename Type, auto Data>
-inline meta_any getter([[maybe_unused]] meta_handle handle) {
-    if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>> || std::is_member_pointer_v<decltype(Data)>) {
-        static_assert(std::is_invocable_v<decltype(Data), Type *>);
+inline meta_any getter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index) {
+    if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>> || std::is_member_function_pointer_v<decltype(Data)>) {
+       static_assert(std::is_invocable_v<decltype(Data), Type *>);
         auto *clazz = handle.try_cast<Type>();
         return clazz ? std::invoke(Data, clazz) : meta_any{};
+    } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
+        using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
+        static_assert(std::is_invocable_v<decltype(Data), Type *>);
+        auto *clazz = handle.try_cast<Type>();
+
+        if constexpr(std::is_array_v<data_type>) {
+            return (clazz && index.can_cast<std::size_t>()) ? std::invoke(Data, clazz)[index.cast<std::size_t>()] : meta_any{};
+        } else {
+            return clazz ? std::invoke(Data, clazz) : meta_any{};
+        }
     } else {
         static_assert(std::is_pointer_v<decltype(Data)>);
-        return meta_any{*Data};
+
+        if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
+            return index.can_cast<std::size_t>() ? (*Data)[index.cast<std::size_t>()] : meta_any{};
+        } else {
+            return *Data;
+        }
     }
 }
 
@@ -2141,6 +2237,7 @@ meta_type_node * meta_node<Type>::resolve() ENTT_NOEXCEPT {
             std::is_void_v<Type>,
             std::is_integral_v<Type>,
             std::is_floating_point_v<Type>,
+            std::is_array_v<Type>,
             std::is_enum_v<Type>,
             std::is_union_v<Type>,
             std::is_class_v<Type>,
@@ -2148,6 +2245,7 @@ meta_type_node * meta_node<Type>::resolve() ENTT_NOEXCEPT {
             std::is_function_v<Type>,
             std::is_member_object_pointer_v<Type>,
             std::is_member_function_pointer_v<Type>,
+            std::extent_v<Type>,
             []() -> meta_type {
                 return internal::meta_info<std::remove_pointer_t<Type>>::resolve();
             },
