@@ -130,7 +130,9 @@ class meta_factory {
     }
 
     template<auto Member>
-    auto unregister_all(int) -> decltype((internal::meta_info<Type>::type->*Member)->prop, void()) {
+    auto unregister_all(int)
+    -> decltype((internal::meta_info<Type>::type->*Member)->prop, void())
+    {
         while(internal::meta_info<Type>::type->*Member) {
             auto node = internal::meta_info<Type>::type->*Member;
             internal::meta_info<Type>::type->*Member = node->next;
