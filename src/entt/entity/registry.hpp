@@ -51,7 +51,7 @@ constexpr exclude_t<Type...> exclude{};
  * The registry is the core class of the entity-component framework.<br/>
  * It stores entities and arranges pools of components on a per request basis.
  * By means of a registry, users can manage entities and components and thus
- * create views to iterate them.
+ * create views or groups to iterate them.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
@@ -417,9 +417,8 @@ public:
      * @brief Returns the numeric identifier of a component.
      *
      * The given component doesn't need to be necessarily in use.<br/>
-     * Do not use this functionality to provide numeric identifiers to types at
-     * runtime, because they aren't guaranteed to be stable between different
-     * runs.
+     * Do not use this functionality to generate numeric identifiers for types
+     * at runtime. They aren't guaranteed to be stable between different runs.
      *
      * @tparam Component Type of component to query.
      * @return Runtime numeric identifier of the given type of component.
@@ -538,7 +537,6 @@ public:
      * `[raw<Component>(), raw<Component>() + size<Component>()]` is always a
      * valid range, even if the container is empty.
      *
-     * @note
      * There are no guarantees on the order of the components. Use a view if you
      * want to iterate entities and components in the expected order.
      *
@@ -569,7 +567,6 @@ public:
      * `[data<Component>(), data<Component>() + size<Component>()]` is always a
      * valid range, even if the container is empty.
      *
-     * @note
      * There are no guarantees on the order of the entities. Use a view if you
      * want to iterate entities and components in the expected order.
      *
@@ -614,7 +611,7 @@ public:
      * @brief Returns the actual version for an entity identifier.
      *
      * In case entity identifers are stored around, this function can be used to
-     * know if they are still valid or the entity has been destroyed and
+     * know if they are still valid or if the entity has been destroyed and
      * potentially recycled.
      *
      * @warning
@@ -683,19 +680,7 @@ public:
     /**
      * @brief Assigns each element in a range an entity.
      *
-     * There are two kinds of entity identifiers:
-     *
-     * * Newly created ones in case no entities have been previously destroyed.
-     * * Recycled ones with updated versions.
-     *
-     * Users should not care about the type of the returned entity identifier.
-     * In case entity identifers are stored around, the `valid` member
-     * function can be used to know if they are still valid or the entity has
-     * been destroyed and potentially recycled.
-     *
-     * The entities so generated have assigned the given components, if any. The
-     * components must be at least default constructible. A compilation error
-     * will occur otherwhise.
+     * @sa create
      *
      * @tparam Component Types of components to assign to the entity.
      * @tparam It Type of forward iterator.
@@ -911,7 +896,7 @@ public:
      * Equivalent to the following snippet (pseudocode):
      *
      * @code{.cpp}
-     * auto &component = registry.has<Component>(entity) ? registry.get<Component>(entity) : registry.assign<Component>(entity, value);
+     * auto &component = registry.has<Component>(entity) ? registry.get<Component>(entity) : registry.assign<Component>(entity, args...);
      * @endcode
      *
      * Prefer this function anyway because it has slightly better performance.
@@ -1002,11 +987,7 @@ public:
      * Equivalent to the following snippet (pseudocode):
      *
      * @code{.cpp}
-     * if(registry.has<Component>(entity)) {
-     *     registry.replace<Component>(entity, args...);
-     * } else {
-     *     registry.assign<Component>(entity, args...);
-     * }
+     * auto &component = registry.has<Component>(entity) ? registry.replace<Component>(entity, args...) : registry.assign<Component>(entity, args...);
      * @endcode
      *
      * Prefer this function anyway because it has slightly better performance.
@@ -1040,14 +1021,13 @@ public:
      * an entity.
      *
      * The function type for a listener is equivalent to:
+     *
      * @code{.cpp}
      * void(registry<Entity> &, Entity, Component &);
      * @endcode
      *
      * Listeners are invoked **after** the component has been assigned to the
-     * entity. The order of invocation of the listeners isn't guaranteed.<br/>
-     * Note also that the greater the number of listeners, the greater the
-     * performance hit when a new component is created.
+     * entity. The order of invocation of the listeners isn't guaranteed.
      *
      * @sa sink
      *
@@ -1067,14 +1047,13 @@ public:
      * whenever an instance of the given component is explicitly replaced.
      *
      * The function type for a listener is equivalent to:
+     *
      * @code{.cpp}
      * void(registry<Entity> &, Entity, Component &);
      * @endcode
      *
      * Listeners are invoked **before** the component has been replaced. The
-     * order of invocation of the listeners isn't guaranteed.<br/>
-     * Note also that the greater the number of listeners, the greater the
-     * performance hit when a new component is created.
+     * order of invocation of the listeners isn't guaranteed.
      *
      * @sa sink
      *
@@ -1095,14 +1074,13 @@ public:
      * thus destroyed.
      *
      * The function type for a listener is equivalent to:
+     *
      * @code{.cpp}
      * void(registry<Entity> &, Entity);
      * @endcode
      *
      * Listeners are invoked **before** the component has been removed from the
-     * entity. The order of invocation of the listeners isn't guaranteed.<br/>
-     * Note also that the greater the number of listeners, the greater the
-     * performance hit when a component is destroyed.
+     * entity. The order of invocation of the listeners isn't guaranteed.
      *
      * @sa sink
      *
@@ -1149,9 +1127,7 @@ public:
      * this member function.
      *
      * @warning
-     * Pools of components that are owned by a group cannot be sorted anymore.
-     * The group takes the ownership of the pools and arrange components so as
-     * to iterate them as fast as possible.<br/>
+     * Pools of components that are owned by a group cannot be sorted.<br/>
      * An assertion will abort the execution at runtime in debug mode in case
      * the pool is owned by a group.
      *
@@ -1197,9 +1173,7 @@ public:
      * Any subsequent change to `B` won't affect the order in `A`.
      *
      * @warning
-     * Pools of components that are owned by a group cannot be sorted anymore.
-     * The group takes the ownership of the pools and arrange components so as
-     * to iterate them as fast as possible.<br/>
+     * Pools of components that are owned by a group cannot be sorted.<br/>
      * An assertion will abort the execution at runtime in debug mode in case
      * the pool is owned by a group.
      *
@@ -1279,15 +1253,12 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const entity_type);
+     * void(const Entity);
      * @endcode
      *
-     * This function is fairly slow and should not be used frequently.<br/>
-     * Consider using a view if the goal is to iterate entities that have a
-     * determinate set of components. A view is usually faster than combining
-     * this function with a bunch of custom tests.<br/>
-     * On the other side, this function can be used to iterate all the entities
-     * that are in use, regardless of their components.
+     * This function is fairly slow and should not be used frequently. However,
+     * it's useful for iterating all the entities still in use, regardless of
+     * their components.
      *
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
@@ -1314,12 +1285,9 @@ public:
     }
 
     /**
-     * @brief Checks if an entity is an orphan.
-     *
-     * An orphan is an entity that has no components assigned.
-     *
+     * @brief Checks if an entity has components assigned.
      * @param entity A valid entity identifier.
-     * @return True if the entity is an orphan, false otherwise.
+     * @return True if the entity has no components assigned, false otherwise.
      */
     bool orphan(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
@@ -1341,7 +1309,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const entity_type);
+     * void(const Entity);
      * @endcode
      *
      * This function can be very slow and should not be used frequently.
