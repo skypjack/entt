@@ -52,7 +52,7 @@ if(NOT MSVC AND USE_LIBCPP)
 
     check_cxx_source_compiles("
         #include<type_traits>
-        int main() { return std::is_same<int, int>::value ? 0 : 1; }
+        int main() { return std::is_same_v<int, int> ? 0 : 1; }
     " HAS_LIBCPP)
 
     if(NOT HAS_LIBCPP)
