@@ -597,7 +597,7 @@ public:
      * @param entity An entity identifier, either valid or not.
      * @return The entity identifier without the version.
      */
-    entity_type entity(const entity_type entity) const ENTT_NOEXCEPT {
+    static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
         return entity & traits_type::entity_mask;
     }
 
@@ -606,7 +606,7 @@ public:
      * @param entity An entity identifier, either valid or not.
      * @return The version stored along with the given entity identifier.
      */
-    version_type version(const entity_type entity) const ENTT_NOEXCEPT {
+    static version_type version(const entity_type entity) ENTT_NOEXCEPT {
         return version_type(entity >> traits_type::entity_shift);
     }
 

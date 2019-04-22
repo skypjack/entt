@@ -192,8 +192,8 @@ When an entity is destroyed, the registry can freely reuse it internally with a
 slightly different identifier. In particular, the version of an entity is
 increased each and every time it's discarded.<br/>
 In case entity identifiers are stored around, the registry offers all the
-functionalities required to test them and get out of the them all the
-information they carry:
+functionalities required to test them and to get out of them the information
+they carry:
 
 ```cpp
 // returns true if the entity is still valid, false otherwise
@@ -475,8 +475,8 @@ In fact, there are two functions that respond to slightly different needs:
   Or by accessing their entities:
 
   ```cpp
-  registry.sort<renderable>([&registry](const entt::entity lhs, const entt::entity rhs) {
-      return registry.entity(lhs) < registry.entity(rhs);
+  registry.sort<renderable>([](const entt::entity lhs, const entt::entity rhs) {
+      return entt::registry::entity(lhs) < entt::registry::entity(rhs);
   });
   ```
 

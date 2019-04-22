@@ -261,8 +261,8 @@ TEST(Registry, Identifiers) {
     const auto post = registry.create();
 
     ASSERT_NE(pre, post);
-    ASSERT_EQ(registry.entity(pre), registry.entity(post));
-    ASSERT_NE(registry.version(pre), registry.version(post));
+    ASSERT_EQ(entt::registry::entity(pre), entt::registry::entity(post));
+    ASSERT_NE(entt::registry::version(pre), entt::registry::version(post));
     ASSERT_NE(registry.version(pre), registry.current(pre));
     ASSERT_EQ(registry.version(post), registry.current(post));
 }
