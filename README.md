@@ -68,18 +68,17 @@ repository.<br/>
 Here is a brief, yet incomplete list of what it offers today:
 
 * Statically generated integer **identifiers for types** (assigned either at
-  **compile-time** or at **runtime**).
-* A **constexpr utility** for **human readable resource identifiers**.
-* A minimal **configuration system** built on top of the **monostate pattern**.
-* **An incredibly fast entity-component system** based on sparse sets, with its
+  compile-time or at runtime).
+* A constexpr utility for **human readable resource identifiers**.
+* A minimal **configuration system** built on top of the monostate pattern.
+* An incredibly fast **entity-component system** based on sparse sets, with its
   own _pay for what you use_ policy to adjust performance and memory usage
   according to users' requirements.
 * Views and groups to iterate entities and components and allow different access
   patterns, from **perfect SoA** to fully random.
-* A lot of **facilities built on top of the entity-component system** to help
-  developers and avoid reinventing the wheel (ie **dependencies**, **snapshot**,
-  **actor class** for those who aren't confident with the architecture and so
-  on).
+* A lot of **facilities** built on top of the entity-component system to help
+  the users and avoid reinventing the wheel (dependencies, snapshot, actor class
+  for those who aren't confident with the architecture and so on).
 * The smallest and most basic implementation of a **service locator** ever seen.
 * A built-in, non-intrusive and macro-free **runtime reflection system**.
 * A **cooperative scheduler** for processes of any type.
