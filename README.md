@@ -72,8 +72,10 @@ Here is a brief, yet incomplete list of what it offers today:
 * A **constexpr utility** for **human readable resource identifiers**.
 * A minimal **configuration system** built on top of the **monostate pattern**.
 * **An incredibly fast entity-component system** based on sparse sets, with its
-  own views and a _pay for what you use_ policy to adjust performance and memory
-  usage according to users' requirements.
+  own _pay for what you use_ policy to adjust performance and memory usage
+  according to users' requirements.
+* Views and groups to iterate entities and components and allow different access
+  patterns, from **perfect SoA** to fully random.
 * A lot of **facilities built on top of the entity-component system** to help
   developers and avoid reinventing the wheel (ie **dependencies**, **snapshot**,
   **actor class** for those who aren't confident with the architecture and so
