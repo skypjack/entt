@@ -191,14 +191,9 @@ class basic_registry {
         bool(* const is_same)(const ENTT_ID_TYPE *);
     };
 
-    struct ctx_wrapper {
-        virtual ~ctx_wrapper() = default;
+    struct ctx_variable {
+        std::unique_ptr<void, void(*)(void *)> value;
         ENTT_ID_TYPE runtime_type;
-    };
-
-    template<typename Type>
-    struct type_wrapper: ctx_wrapper {
-        Type value;
     };
 
     template<typename Type, typename Family>
@@ -1491,7 +1486,7 @@ public:
             return (curr | (others[curr] & (traits_type::version_mask << traits_type::entity_shift)));
         };
 
-        return { *this, seed, follow };
+        return { this, seed, follow };
     }
 
     /**
@@ -1537,7 +1532,7 @@ public:
         entities.clear();
         available = {};
 
-        return { *this, force };
+        return { this, force };
     }
 
     /**
@@ -1554,35 +1549,22 @@ public:
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
         const auto ctype = runtime_type<Type, context_family>();
-        ctx_wrapper *wrapper = nullptr;
+        auto it = std::find_if(vars.begin(), vars.end(), [ctype](const auto &candidate) {
+            return candidate.runtime_type == ctype;
+        });
 
-        if constexpr(is_named_type_v<Type>) {
-            const auto it = std::find_if(vars.begin()+skip_family_vars, vars.end(), [ctype](const auto &candidate) {
-                return candidate->runtime_type == ctype;
+        if(it == vars.cend()) {
+            vars.push_back({
+                decltype(ctx_variable::value){new Type{std::forward<Args>(args)...}, +[](void *ptr) { delete static_cast<Type *>(ptr); }},
+                ctype
             });
 
-            wrapper = (it == vars.cend()) ? vars.emplace_back(std::make_unique<type_wrapper<Type>>()).get() : it->get();
+            it = std::prev(vars.end());
         } else {
-            if(!(ctype < skip_family_vars)) {
-                vars.reserve(vars.size()+ctype-skip_family_vars+1);
-
-                while(!(ctype < skip_family_vars)) {
-                    vars.emplace(vars.begin()+(skip_family_vars++), nullptr);
-                }
-            }
-
-            if(!vars[ctype]) {
-                vars[ctype] = std::make_unique<type_wrapper<Type>>();
-            }
-
-            wrapper = vars[ctype].get();
+            it->value.reset(new Type{std::forward<Args>(args)...});
         }
 
-        auto &value = static_cast<type_wrapper<Type> *>(wrapper)->value;
-        value = Type{std::forward<Args>(args)...};
-        wrapper->runtime_type = ctype;
-
-        return value;
+        return *static_cast<Type *>(it->value.get());
     }
 
     /**
@@ -1591,17 +1573,9 @@ public:
      */
     template<typename Type>
     void unset() {
-        const auto ctype = runtime_type<Type, context_family>();
-
-        if constexpr(is_named_type_v<Type>) {
-            vars.erase(std::remove_if(vars.begin()+skip_family_vars, vars.end(), [ctype](auto &wrapper) {
-                return wrapper->runtime_type == ctype;
-            }), vars.end());
-        } else {
-            if(ctype < skip_family_vars) {
-                vars[ctype].reset();
-            }
-        }
+        vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &var) {
+            return var.runtime_type == runtime_type<Type, context_family>();
+        }), vars.end());
     }
 
     /**
@@ -1612,18 +1586,11 @@ public:
      */
     template<typename Type>
     const Type * try_ctx() const ENTT_NOEXCEPT {
-        const auto ctype = runtime_type<Type, context_family>();
+        const auto it = std::find_if(vars.begin(), vars.end(), [](const auto &var) {
+            return var.runtime_type == runtime_type<Type, context_family>();
+        });
 
-        if constexpr(is_named_type_v<Type>) {
-            const auto it = std::find_if(vars.begin()+skip_family_vars, vars.end(), [ctype](const auto &candidate) {
-                return candidate->runtime_type == ctype;
-            });
-
-            return (it == vars.cend()) ? nullptr : &static_cast<const type_wrapper<Type> &>(**it).value;
-        } else {
-            const bool valid = ctype < skip_family_vars && vars[ctype];
-            return valid ? &static_cast<const type_wrapper<Type> &>(*vars[ctype]).value : nullptr;
-        }
+        return (it == vars.cend()) ? nullptr : static_cast<const Type *>(it->value.get());
     }
 
     /*! @copydoc try_ctx */
@@ -1658,11 +1625,10 @@ public:
     }
 
 private:
-    std::vector<pool_data> pools;
     std::size_t skip_family_pools{};
+    std::vector<pool_data> pools;
     std::vector<group_data> groups;
-    std::vector<std::unique_ptr<ctx_wrapper>> vars;
-    std::size_t skip_family_vars{};
+    std::vector<ctx_variable> vars;
     std::vector<entity_type> entities;
     size_type available{};
     entity_type next{};
