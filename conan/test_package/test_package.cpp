@@ -1,6 +1,5 @@
 #include <entt/entt.hpp>
 #include <cstdint>
-#include <cstdlib>
 
 struct position {
     float x;
@@ -12,7 +11,7 @@ struct velocity {
     float dy;
 };
 
-void update(entt::registry<> &registry) {
+void update(entt::registry &registry) {
     auto view = registry.view<position, velocity>();
 
     for(auto entity: view) {
@@ -27,8 +26,8 @@ void update(entt::registry<> &registry) {
     }
 }
 
-void update(std::uint64_t dt, entt::registry<> &registry) {
-    registry.view<position, velocity>().each([dt](const auto, auto &pos, auto &vel) {
+void update(std::uint64_t dt, entt::registry &registry) {
+    registry.view<position, velocity>().each([dt](auto &pos, auto &vel) {
         // gets all the components of the view at once ...
 
         pos.x += vel.dx * dt;
@@ -39,7 +38,7 @@ void update(std::uint64_t dt, entt::registry<> &registry) {
 }
 
 int main() {
-    entt::registry<> registry;
+    entt::registry registry;
     std::uint64_t dt = 16;
 
     for(auto i = 0; i < 10; ++i) {
@@ -50,6 +49,8 @@ int main() {
 
     update(dt, registry);
     update(registry);
+
+    // ...
 
     return EXIT_SUCCESS;
 }
