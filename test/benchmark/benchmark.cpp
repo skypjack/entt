@@ -236,7 +236,7 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
         const auto entity = registry.create();
         registry.assign<velocity>(entity);
 
-        if(i == 5000000L) {
+        if(i == 500000L) {
             registry.assign<position>(entity);
         }
     }
@@ -385,7 +385,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
         const auto entity = registry.create();
         registry.assign<velocity>(entity);
 
-        if(i == 5000000L) {
+        if(i == 500000L) {
             registry.assign<position>(entity);
         }
     }
@@ -464,7 +464,7 @@ TEST(Benchmark, IterateThreeComponents1MOne) {
         registry.assign<velocity>(entity);
         registry.assign<comp<0>>(entity);
 
-        if(i == 5000000L) {
+        if(i == 500000L) {
             registry.assign<position>(entity);
         }
     }
@@ -621,7 +621,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
         registry.assign<velocity>(entity);
         registry.assign<comp<0>>(entity);
 
-        if(i == 5000000L) {
+        if(i == 500000L) {
             registry.assign<position>(entity);
         }
     }
@@ -707,7 +707,7 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
         registry.assign<comp<1>>(entity);
         registry.assign<comp<2>>(entity);
 
-        if(i == 5000000L) {
+        if(i == 500000L) {
             registry.assign<position>(entity);
         }
     }
@@ -918,7 +918,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
         registry.assign<comp<1>>(entity);
         registry.assign<comp<2>>(entity);
 
-        if(i == 5000000L) {
+        if(i == 500000L) {
             registry.assign<position>(entity);
         }
     }
