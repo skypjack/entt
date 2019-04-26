@@ -7,6 +7,7 @@
 
 struct empty_type {};
 struct boxed_int { int value; };
+struct ignore {};
 
 TEST(NonOwningGroup, Functionalities) {
     entt::registry registry;
@@ -342,6 +343,63 @@ TEST(NonOwningGroup, ExcludedComponents) {
             ASSERT_EQ(group.get<int>(e1), 1);
         } else if(entity == e3) {
             ASSERT_EQ(group.get<int>(e3), 3);
+        } else {
+            FAIL();
+        }
+    }
+}
+
+TEST(NonOwningGroup, ExcludedComponents2) {
+    // validate that more than 1 component can be excluded
+    entt::registry registry;
+
+    const auto e0 = registry.create();
+    registry.assign<int>(e0, 0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1, 1);
+    registry.assign<char>(e1);
+    registry.assign<ignore>(e1);
+
+    const auto group = registry.group<>(entt::get<int>, entt::exclude<char, ignore>);
+
+    const auto e2 = registry.create();
+    registry.assign<int>(e2, 2);
+
+    const auto e3 = registry.create();
+    registry.assign<int>(e3, 3);
+    registry.assign<char>(e3);
+
+    const auto e4 = registry.create();
+    registry.assign<int>(e4, 4);
+    registry.assign<ignore>(e4);
+
+    for(const auto entity: group) {
+        if(entity == e0) {
+            ASSERT_EQ(group.get<int>(e0), 0);
+        } else if(entity == e2) {
+            ASSERT_EQ(group.get<int>(e2), 2);
+        } else {
+            FAIL();
+        }
+    }
+
+    registry.assign<char>(e0);
+    registry.assign<char>(e2);
+
+    ASSERT_TRUE(group.empty());
+
+    registry.remove<char>(e1);
+    registry.remove<char>(e3);
+    registry.remove<ignore>(e4);
+
+    for(const auto entity: group) {
+        if(entity == e1) {
+            ASSERT_EQ(group.get<int>(e1), 1);
+        } else if(entity == e3) {
+            ASSERT_EQ(group.get<int>(e3), 3);
+        } else if(entity == e4) {
+            ASSERT_EQ(group.get<int>(e4), 4);
         } else {
             FAIL();
         }
