@@ -8,7 +8,6 @@
 #include <unordered_map>
 #include "../config/config.h"
 #include "../core/hashed_string.hpp"
-#include "handle.hpp"
 #include "loader.hpp"
 #include "fwd.hpp"
 
@@ -94,9 +93,9 @@ public:
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    resource_handle<Resource> load(const resource_type id, Args &&... args) {
+    std::shared_ptr<Resource> load(const resource_type id, Args &&... args) {
         static_assert(std::is_base_of_v<resource_loader<Loader, Resource>, Loader>);
-        resource_handle<Resource> handle{};
+        std::shared_ptr<Resource> handle;
 
         if(auto it = resources.find(id); it == resources.cend()) {
             if(auto resource = Loader{}.get(std::forward<Args>(args)...); resource) {
@@ -134,8 +133,9 @@ public:
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    resource_handle<Resource> reload(const resource_type id, Args &&... args) {
-        return (discard(id), load<Loader>(id, std::forward<Args>(args)...));
+    std::shared_ptr<Resource> reload(const resource_type id, Args &&... args) {
+        discard(id);
+        return load<Loader>(id, std::forward<Args>(args)...);
     }
 
     /**
@@ -151,8 +151,8 @@ public:
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    resource_handle<Resource> temp(Args &&... args) const {
-        return { Loader{}.get(std::forward<Args>(args)...) };
+    std::shared_ptr<Resource> temp(Args &&... args) const {
+        return Loader{}.get(std::forward<Args>(args)...);
     }
 
     /**
@@ -163,14 +163,12 @@ public:
      * cache contains the resource itself. Otherwise the returned handle is
      * uninitialized and accessing it results in undefined behavior.
      *
-     * @sa resource_handle
-     *
      * @param id Unique resource identifier.
      * @return A handle for the given resource.
      */
-    resource_handle<Resource> handle(const resource_type id) const {
+   std::shared_ptr<Resource> handle(const resource_type id) const {
         auto it = resources.find(id);
-        return { it == resources.end() ? nullptr : it->second };
+        return it == resources.end() ? nullptr : it->second;
     }
 
     /**

@@ -12,9 +12,6 @@ namespace entt {
 template<typename>
 class resource_cache;
 
-/*! @class resource_handle */
-template<typename>
-class resource_handle;
 
 /*! @class resource_loader */
 template<typename, typename>
