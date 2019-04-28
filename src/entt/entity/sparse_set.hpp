@@ -109,11 +109,11 @@ class sparse_set<Entity> {
         }
 
         iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
-            return (*this += -value);
+            return *this += -value;
         }
 
         iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
-            return (*this + -value);
+            return *this + -value;
         }
 
         difference_type operator-(const iterator &other) const ENTT_NOEXCEPT {
@@ -377,7 +377,7 @@ public:
     bool has(const entity_type entt) const ENTT_NOEXCEPT {
         auto [page, offset] = index(entt);
         // testing against null permits to avoid accessing the direct vector
-        return (page < reverse.size() && reverse[page].second && reverse[page].first[offset] != null);
+        return page < reverse.size() && reverse[page].second && reverse[page].first[offset] != null;
     }
 
     /**
@@ -629,11 +629,11 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
         }
 
         iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
-            return (*this += -value);
+            return *this += -value;
         }
 
         iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
-            return (*this + -value);
+            return *this + -value;
         }
 
         difference_type operator-(const iterator &other) const ENTT_NOEXCEPT {
@@ -731,11 +731,11 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
         }
 
         iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
-            return (*this += -value);
+            return *this += -value;
         }
 
         iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
-            return (*this + -value);
+            return *this + -value;
         }
 
         difference_type operator-(const iterator &other) const ENTT_NOEXCEPT {
