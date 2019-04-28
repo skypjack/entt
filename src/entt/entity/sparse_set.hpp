@@ -459,8 +459,8 @@ public:
         ENTT_ASSERT(has(entt));
         auto [from_page, from_offset] = index(entt);
         auto [to_page, to_offset] = index(direct.back());
-        std::swap(direct[size_type(reverse[from_page].first[from_offset])], direct.back());
-        std::swap(reverse[from_page].first[from_offset], reverse[to_page].first[to_offset]);
+        direct[size_type(reverse[from_page].first[from_offset])] = direct.back();
+        reverse[to_page].first[to_offset] = reverse[from_page].first[from_offset];
         reverse[from_page].first[from_offset] = null;
         reverse[from_page].second--;
         direct.pop_back();
