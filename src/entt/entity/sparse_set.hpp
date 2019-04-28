@@ -68,7 +68,7 @@ class sparse_set<Entity> {
         using direct_type = const std::vector<Entity>;
         using index_type = typename traits_type::difference_type;
 
-        iterator(direct_type *ref, index_type idx) ENTT_NOEXCEPT
+        iterator(direct_type *ref, const index_type idx) ENTT_NOEXCEPT
             : direct{ref}, index{idx}
         {}
 
@@ -163,7 +163,7 @@ class sparse_set<Entity> {
         index_type index;
     };
 
-    void assure(std::size_t page) {
+    void assure(const std::size_t page) {
         if(!(page < reverse.size())) {
             reverse.resize(page+1);
         }
@@ -175,7 +175,7 @@ class sparse_set<Entity> {
         }
     }
 
-    auto index(Entity entt) const ENTT_NOEXCEPT {
+    auto index(const Entity entt) const ENTT_NOEXCEPT {
         const auto identifier = entt & traits_type::entity_mask;
         const auto page = size_type(identifier / entt_per_page);
         const auto offset = size_type(identifier & (entt_per_page - 1));
@@ -588,7 +588,7 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
         using instance_type = std::conditional_t<Const, const std::vector<Type>, std::vector<Type>>;
         using index_type = typename traits_type::difference_type;
 
-        iterator(instance_type *ref, index_type idx) ENTT_NOEXCEPT
+        iterator(instance_type *ref, const index_type idx) ENTT_NOEXCEPT
             : instances{ref}, index{idx}
         {}
 
@@ -690,7 +690,7 @@ class sparse_set<Entity, Type>: public sparse_set<Entity> {
         using instance_type = std::conditional_t<Const, const Type, Type>;
         using index_type = typename traits_type::difference_type;
 
-        iterator(instance_type *ref, index_type idx) ENTT_NOEXCEPT
+        iterator(instance_type *ref, const index_type idx) ENTT_NOEXCEPT
             : instance{ref}, index{idx}
         {}
 
