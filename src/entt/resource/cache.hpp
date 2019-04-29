@@ -40,10 +40,10 @@ public:
     resource_cache() = default;
 
     /*! @brief Default move constructor. */
-    resource_cache(resource_cache &&) ENTT_NOEXCEPT = default;
+    resource_cache(resource_cache &&) = default;
 
     /*! @brief Default move assignment operator. @return This cache. */
-    resource_cache & operator=(resource_cache &&) ENTT_NOEXCEPT = default;
+    resource_cache & operator=(resource_cache &&) = default;
 
     /**
      * @brief Number of resources managed by a cache.
