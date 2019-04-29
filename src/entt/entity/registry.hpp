@@ -98,9 +98,7 @@ class basic_registry {
         Component & replace(const Entity entt, Args &&... args) {
             Component component{std::forward<Args>(args)...};
             on_replace.publish(*owner, entt, component);
-            auto &other = sparse_set<Entity, Component>::get(entt);
-            std::swap(other, component);
-            return other;
+            return (sparse_set<Entity, Component>::get(entt) = std::move(component));
         }
     };
 
