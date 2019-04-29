@@ -13,8 +13,8 @@
 
 **EnTT** is a header-only, tiny and easy to use **entity-component system** (and
 much more) written in **modern C++**.<br/>
-Among others, it's also used in
-[**Minecraft** by Mojang](https://minecraft.net/en-us/attribution/) and
+[Among others](https://github.com/skypjack/entt/wiki/EnTT-in-Action), it's also
+used in [**Minecraft** by Mojang](https://minecraft.net/en-us/attribution/) and
 [**The Forge** by Confetti](https://github.com/ConfettiFX/The-Forge). Read on to
 find out what it can offer you.
 

@@ -7,9 +7,13 @@ source projects based on `EnTT` and did not hold back when it came to
 documenting them.
 
 Below an incomplete list of games, applications and articles that can be used as
-a reference:
+a reference. Where I put the word _apparently_ means that the use of `EnTT` is
+documented but the authors didn't make explicit announcements or contacted me
+directly.
 
-* Games
+I hope this list can grow much more in the future:
+
+* Games:
   * [Minecraft](https://minecraft.net/en-us/attribution/): of course, **that**
     Minecraft, by Mojang (see the open source attributions page).
   * [Face Smash](https://play.google.com/store/apps/details?id=com.gamee.facesmash):
@@ -28,10 +32,19 @@ a reference:
     playground.
   * [EnTT Tower Defense](https://github.com/Daivuk/tddod): a data oriented tower
     defense example.
+  * [EnTT Breakout](https://github.com/vblanco20-1/entt-breakout): simple
+    example of a breakout game, using `SDL` and `EnTT`.
 
 * Engines/Frameworks:
   * [The Forge](https://github.com/ConfettiFX/The-Forge): cross-platform
     rendering framework by Confetti.
+  * [Apparently](https://github.com/Esri/entt) [Esri](https://github.com/Esri):
+    authors of [`ArcGis`](https://www.esri.com/en-us/arcgis/products/), the
+    world's most powerful mapping and analytics software.
+  * [Apparently](https://teamwisp.github.io/credits/)
+    [Wisp](https://teamwisp.github.io/product/): an advanced real-time ray
+    tracing renderer build for the demands of video game artists by
+    [Team Wisp](https://teamwisp.github.io/).
   * [starlight](https://github.com/DomRe/starlight): game programming framework
     using `Allegro`, `Lua` and modern C++.
   * [Apparently](https://github.com/JosiahWI/qub3d-libdeps)
