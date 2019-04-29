@@ -216,9 +216,6 @@ public:
     /*! @brief Default destructor. */
     virtual ~sparse_set() ENTT_NOEXCEPT = default;
 
-    /*! @brief Default move assignment operator. @return This sparse set. */
-    sparse_set & operator=(sparse_set &&) = default;
-
     /**
      * @brief Copy assignment operator.
      * @param other The instance to copy from.
@@ -232,6 +229,9 @@ public:
 
         return *this;
     }
+
+    /*! @brief Default move assignment operator. @return This sparse set. */
+    sparse_set & operator=(sparse_set &&) = default;
 
     /**
      * @brief Increases the capacity of a sparse set.
@@ -534,18 +534,6 @@ public:
     virtual void reset() {
         reverse.clear();
         direct.clear();
-    }
-
-    /**
-     * @brief Clones and returns a sparse set.
-     *
-     * The basic implementation of a sparse set is always copyable. Therefore,
-     * the returned instance is always valid.
-     *
-     * @return A fresh copy of the given sparse set.
-     */
-    virtual std::unique_ptr<sparse_set> clone() const {
-        return std::make_unique<sparse_set>(*this);
     }
 
 private:
@@ -1193,24 +1181,6 @@ public:
 
         if constexpr(!std::is_empty_v<object_type>) {
             instances.clear();
-        }
-    }
-
-    /**
-     * @brief Clones and returns a sparse set if possible.
-     *
-     * The extended implementation of a sparse set is copyable only if its
-     * object type is copyable. Because of that, this member functions isn't
-     * guaranteed to return always a valid pointer.
-     *
-     * @return A fresh copy of the given sparse set if its object type is
-     * copyable, an empty unique pointer otherwise.
-     */
-    std::unique_ptr<sparse_set<Entity>> clone() const override {
-        if constexpr(std::is_copy_constructible_v<object_type>) {
-            return std::make_unique<sparse_set>(*this);
-        } else {
-            return nullptr;
         }
     }
 

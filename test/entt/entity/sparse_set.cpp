@@ -399,33 +399,6 @@ TEST(SparseSetNoType, CanModifyDuringIteration) {
     (void)entity;
 }
 
-TEST(SparseSetNoType, Clone) {
-    entt::sparse_set<std::uint64_t> set;
-
-    set.construct(0);
-    set.construct(42);
-    set.construct(3);
-    set.destroy(0);
-    set.construct(0);
-
-    auto other = set.clone();
-
-    ASSERT_FALSE(other->empty());
-
-    ASSERT_TRUE(other->has(0));
-    ASSERT_TRUE(other->has(42));
-    ASSERT_TRUE(other->has(3));
-
-    ASSERT_EQ(set.get(0), other->get(0));
-    ASSERT_EQ(set.get(42), other->get(42));
-    ASSERT_EQ(set.get(3), other->get(3));
-
-    ASSERT_EQ(set.size(), other->size());
-    ASSERT_EQ(set.extent(), other->extent());
-    ASSERT_TRUE(std::equal(set.data(), set.data() + set.size(), other->data()));
-    ASSERT_TRUE(std::equal(set.begin(), set.end(), other->begin()));
-}
-
 TEST(SparseSetWithType, Functionalities) {
     entt::sparse_set<std::uint64_t, int> set;
 
@@ -1148,46 +1121,6 @@ TEST(SparseSetWithType, MoveOnlyComponent) {
     // the purpose is to ensure that move only components are always accepted
     entt::sparse_set<std::uint64_t, std::unique_ptr<int>> set;
     (void)set;
-}
-
-TEST(SparseSetWithType, Clone) {
-    entt::sparse_set<std::uint64_t, int> set;
-
-    set.construct(0, 2);
-    set.construct(42, 43);
-    set.construct(3, 4);
-    set.destroy(0);
-    set.construct(0, 1);
-
-    auto base = set.clone();
-    auto &other = static_cast<decltype(set) &>(*base);
-
-    ASSERT_FALSE(other.empty());
-
-    ASSERT_TRUE(other.has(0));
-    ASSERT_TRUE(other.has(42));
-    ASSERT_TRUE(other.has(3));
-
-    ASSERT_EQ(set.get(0), other.get(0));
-    ASSERT_EQ(set.get(42), other.get(42));
-    ASSERT_EQ(set.get(3), other.get(3));
-
-    ASSERT_NE(set.try_get(0), other.try_get(0));
-    ASSERT_NE(set.try_get(42), other.try_get(42));
-    ASSERT_NE(set.try_get(3), other.try_get(3));
-    ASSERT_EQ(set.try_get(99), other.try_get(99));
-
-    ASSERT_EQ(set.size(), other.size());
-    ASSERT_EQ(set.extent(), other.extent());
-    ASSERT_TRUE(std::equal(set.raw(), set.raw() + set.size(), other.raw()));
-    ASSERT_TRUE(std::equal(set.cbegin(), set.cend(), other.cbegin()));
-    ASSERT_TRUE(std::equal(set.begin(), set.end(), other.begin()));
-}
-
-TEST(SparseSetWithType, CloneMoveOnlyComponent) {
-    // the purpose is to ensure that move only components are not cloned
-    entt::sparse_set<std::uint64_t, std::unique_ptr<int>> set;
-    ASSERT_EQ(set.clone(), nullptr);
 }
 
 TEST(SparseSetWithType, ConstructorExceptionDoesNotAddToSet) {
