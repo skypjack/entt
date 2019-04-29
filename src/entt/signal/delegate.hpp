@@ -250,7 +250,7 @@ bool operator!=(const delegate<Ret(Args...)> &lhs, const delegate<Ret(Args...)> 
 
 
 /**
- * @brief Deduction guideline.
+ * @brief Deduction guide.
  *
  * It allows to deduce the function type of the delegate directly from a
  * function provided to the constructor.
@@ -263,7 +263,7 @@ delegate(connect_arg_t<Function>) ENTT_NOEXCEPT
 
 
 /**
- * @brief Deduction guideline.
+ * @brief Deduction guide.
  *
  * It allows to deduce the function type of the delegate directly from a member
  * or a free function with payload provided to the constructor.

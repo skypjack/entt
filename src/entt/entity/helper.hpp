@@ -44,7 +44,7 @@ private:
 
 
 /**
- * @brief Deduction guideline.
+ * @brief Deduction guide.
  *
  * It allows to deduce the constness of a registry directly from the instance
  * provided to the constructor.
@@ -97,7 +97,7 @@ private:
 
 
 /**
- * @brief Deduction guideline.
+ * @brief Deduction guide.
  *
  * It allows to deduce the constness of a registry directly from the instance
  * provided to the constructor.
