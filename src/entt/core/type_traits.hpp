@@ -26,7 +26,9 @@ inline constexpr auto is_unique<T, Rest...> = std::bool_constant<
 things for composing group inclusion and exlusion lists.*/
 template<typename... T1, typename... T2, template <typename...> class T>
 auto concat_types(T<T1...>, T<T2...>) {
-    static_assert(is_unique<T1..., T2...>);
+    // i can't think of an instance where we'd want non-unique type list... so
+    // let's assume unique enforcement...
+    static_assert(is_unique<T1..., T2...>, "type lists need to be unique within entt api");
     return T<T1..., T2...>{};
 }
 
