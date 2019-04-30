@@ -82,6 +82,51 @@ TEST(NonOwningGroup, Functionalities) {
     ASSERT_FALSE(group.capacity());
 }
 
+
+TEST(NonOwningGroup, ConcatGetLists) {
+    // validate that get type lists can be concatenated together to form a group.
+    const auto string_types = entt::get<char, std::string>;
+    const auto numeric_types = entt::get<int, float>;
+    const auto all_types = entt::concat_types(string_types, numeric_types);
+
+    entt::registry registry;
+    auto string_group = registry.group<>(string_types);
+    auto numeric_group = registry.group<>(numeric_types);
+    auto all_group = registry.group<>(all_types);
+
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
+    registry.assign<std::string>(e1);
+    registry.assign<float>(e1);
+    ASSERT_EQ(string_group.size(), all_group.size());
+    ASSERT_EQ(numeric_group.size(), all_group.size());
+}
+
+TEST(NonOwningGroup, ConcatExcludeLists) {
+    // validate that exclusionary type lists can be concatenated together to form a group.
+    const auto string_types = entt::exclude<char>;
+    const auto numeric_types = entt::exclude<int, float>;
+    const auto exclude_all = entt::concat_types(string_types, numeric_types);
+
+    entt::registry registry;
+    // groups are smart enough to differentiate that is exclusionary group
+    // list.
+    auto all_group = registry.group<std::string>(exclude_all);
+
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
+    registry.assign<std::string>(e1);
+    registry.assign<float>(e1);
+    const auto e2 = registry.create();
+    registry.assign<std::string>(e2);
+    ASSERT_EQ(all_group.size(), 1);
+}
+
+
 TEST(NonOwningGroup, ElementAccess) {
     entt::registry registry;
     auto group = registry.group<>(entt::get<int, char>);

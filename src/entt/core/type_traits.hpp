@@ -13,6 +13,12 @@ namespace entt {
 template<typename... Type>
 struct type_list {};
 
+/*! @brief A class to use to concat type lists. This is useful among other
+things for composing group inclusion and exlusion lists.*/
+template<typename... T1, typename... T2, template <typename...> class T>
+auto concat_types(T<T1...>, T<T2...>) {
+    return T<T1..., T2...>{};
+}
 
 /*! @brief Traits class used mainly to push things across boundaries. */
 template<typename>
