@@ -11,10 +11,11 @@
 [![Gitter chat](https://badges.gitter.im/skypjack/entt.png)](https://gitter.im/skypjack/entt)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/skypjack)
 
-**EnTT** is a header-only, tiny and easy to use **entity-component system** (and
-much more) written in **modern C++**.<br/>
-[Among others](https://github.com/skypjack/entt/wiki/EnTT-in-Action), it's also
-used in [**Minecraft** by Mojang](https://minecraft.net/en-us/attribution/) and
+`EnTT` is a header-only, tiny and easy to use library for game programming and
+much more written in **modern C++**, mainly known for its particular
+**entity-component-system (ECS)** model.<br/>
+[Among others](https://github.com/skypjack/entt/wiki/EnTT-in-Action), it's used
+in [**Minecraft** by Mojang](https://minecraft.net/en-us/attribution/) and
 [**The Forge** by Confetti](https://github.com/ConfettiFX/The-Forge). Read on to
 find out what it can offer you.
 
@@ -23,7 +24,7 @@ find out what it can offer you.
 Do you want to **keep up with changes** or do you have a **question** that
 doesn't require you to open an issue?<br/>
 Join the [gitter channel](https://gitter.im/skypjack/entt) and **meet other
-users** like you. **The more** we are, **the better** it is for everyone.
+users** like you. **The more** we are, **the better** for everyone.
 
 If you use `EnTT` and you want to **say thanks** or **support** the project,
 please **consider becoming a patron**:
@@ -62,27 +63,26 @@ used mostly in game development. For further details:
 * [Evolve Your Hierarchy](http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/)
 * [ECS on Wikipedia](https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system)
 
-A long time ago, the sole entity-component system was part of the project. After
-a while the codebase has grown and more and more classes have become part of the
-repository.<br/>
+This project started off as a pure entity-component system. Over time the
+codebase has grown as more and more classes and functionalities were added.<br/>
 Here is a brief, yet incomplete list of what it offers today:
 
 * Statically generated integer **identifiers for types** (assigned either at
   compile-time or at runtime).
-* A constexpr utility for **human readable resource identifiers**.
-* A minimal **configuration system** built on top of the monostate pattern.
+* A `constexpr` utility for **human readable resource identifiers**.
+* A minimal **configuration system** built using the monostate pattern.
 * An incredibly fast **entity-component system** based on sparse sets, with its
   own _pay for what you use_ policy to adjust performance and memory usage
-  according to users' requirements.
+  according to the users' requirements.
 * Views and groups to iterate entities and components and allow different access
   patterns, from **perfect SoA** to fully random.
-* A lot of **facilities** built on top of the entity-component system to help
+* A lot of **facilities** built on top of the entity-component system to support
   the users and avoid reinventing the wheel (dependencies, snapshot, actor class
   for those who aren't confident with the architecture and so on).
 * The smallest and most basic implementation of a **service locator** ever seen.
 * A built-in, non-intrusive and macro-free **runtime reflection system**.
 * A **cooperative scheduler** for processes of any type.
-* All what is needed for **resource management** (cache, loaders, handles).
+* All that is needed for **resource management** (cache, loaders, handles).
 * **Delegates**, **signal handlers** (with built-in support for collectors) and
   a tiny **event dispatcher** for immediate and delayed events to integrate in
   loops.
@@ -90,13 +90,13 @@ Here is a brief, yet incomplete list of what it offers today:
 * And **much more**! Check out the
   [**wiki**](https://github.com/skypjack/entt/wiki).
 
-Consider it a work in progress. The whole API is also fully documented in-code
-for those who are brave enough to read it.
+Consider this list a work in progress as well as the project. The whole API is
+fully documented in-code for those who are brave enough to read it.
 
-Currently, `EnTT` is tested on Linux, Microsoft Windows and OS X. It has proven
+Currently, `EnTT` is tested on Linux, Microsoft Windows and OSX. It has proven
 to work also on both Android and iOS.<br/>
-Most likely it will not be problematic on other systems as well, but has not
-been sufficiently tested so far.
+Most likely it won't be problematic on other systems as well, but it hasn't been
+sufficiently tested so far.
 
 ## Code Example
 
@@ -159,11 +159,10 @@ int main() {
 
 ## Motivation
 
-I started working on `EnTT` because of the wrong reason: my goal was to design
-an entity-component system that beated another well known open source solution
-in terms of performance and used (possibly) less memory in the average
-case.<br/>
-In the end, I did it, but it wasn't much satisfying. Actually it wasn't
+I started developing `EnTT` for the _wrong_ reason: my goal was to design an
+entity-component system to beat another well known open source solution both in
+terms of performance and possibly memory usage.<br/>
+In the end, I did it, but it wasn't very satisfying. Actually it wasn't
 satisfying at all. The fastest and nothing more, fairly little indeed. When I
 realized it, I tried hard to keep intact the great performance of `EnTT` and to
 add all the features I wanted to see in *my own library* at the same time.
@@ -174,10 +173,10 @@ amazing set of features. And even more, of course.
 
 ## Performance
 
-As it stands right now, `EnTT` is just fast enough for my requirements if
+As it stands right now, `EnTT` is just fast enough for my requirements when
 compared to my first choice (it was already amazingly fast actually).<br/>
 Below is a comparison between the two (both of them compiled with GCC 7.3.0 on a
-Dell XPS 13 out of the mid 2014):
+Dell XPS 13 from mid 2014):
 
 | Benchmark | EntityX (compile-time) | EnTT |
 |-----------|-------------|-------------|
@@ -199,27 +198,27 @@ Dell XPS 13 out of the mid 2014):
 Note: The default version of `EntityX` (`master` branch) wasn't added to the
 comparison because it's already much slower than its compile-time counterpart.
 
-Pretty interesting, aren't them? In fact, these benchmarks are the same used by
-`EntityX` to show _how fast it is_. To be honest, they aren't so good and these
-results shouldn't be taken much seriously (they are completely unrealistic
-indeed).<br/>
+Pretty interesting results, aren't them? In fact, these benchmarks are the ones
+used by `EntityX` to show _how fast it is_. To be honest, they aren't so good
+and these results shouldn't be taken too seriously (indeed they are completely
+unrealistic).<br/>
 The proposed entity-component system is incredibly fast to iterate entities,
 this is a fact. The compiler can make a lot of optimizations because of how
 `EnTT` works, even more when components aren't used at all. This is exactly the
-case for these benchmarks. On the other hand and if we consider real world
-cases, `EnTT` is in the middle between a bit and much faster than the other
-solutions around when users also access the components and not just the
-entities, although it is not as fast as reported by these benchmarks.<br/>
+case for these benchmarks. On the other hand, if we consider real world cases,
+`EnTT` is somewhere between a bit and much faster than the other solutions
+around when users also access the components and not just the entities, although
+it isn't as fast as reported by these benchmarks.<br/>
 This is why they are completely wrong and cannot be used to evaluate any of the
-entity-component systems.
+entity-component-system libraries out there.
 
-If you decide to use `EnTT`, choose it because of its API, features and
-performance, not because there is a benchmark somewhere that makes it seem the
-fastest.
+The choice to use `EnTT` should be based on its carefully designed API, its
+set of features and the general performance, not because some single benchmark
+shows it to be the fastest tool available.
 
-Probably I'll try to get out of `EnTT` more features and even better performance
-in the future, mainly for fun.<br/>
-If you want to contribute and/or have any suggestion, feel free to make a PR or
+In the future I'll likely try to get even better performance while still adding
+new features, mainly for fun.<br/>
+If you want to contribute and/or have suggestions, feel free to make a PR or
 open an issue to discuss your idea.
 
 # Build Instructions
