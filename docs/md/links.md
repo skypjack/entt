@@ -38,9 +38,6 @@ I hope this list can grow much more in the future:
 * Engines/Frameworks:
   * [The Forge](https://github.com/ConfettiFX/The-Forge): cross-platform
     rendering framework by Confetti.
-  * [Apparently](https://github.com/Esri/entt) [Esri](https://github.com/Esri):
-    authors of [`ArcGis`](https://www.esri.com/en-us/arcgis/products/), the
-    world's most powerful mapping and analytics software.
   * [Apparently](https://teamwisp.github.io/credits/)
     [Wisp](https://teamwisp.github.io/product/): an advanced real-time ray
     tracing renderer build for the demands of video game artists by
@@ -72,6 +69,9 @@ I hope this list can grow much more in the future:
     create projects in modern C++ using `SFML`, `EnTT`, `Conan` and `CMake`.
 
 * Any Other Business:
+  * [Apparently](https://github.com/Esri/entt) [Esri](https://github.com/Esri):
+    authors of [`ArcGis`](https://www.esri.com/en-us/arcgis/products/), the
+    world's most powerful mapping and analytics software.
   * [Apparently](https://www.linkedin.com/in/skypjack/)
     [NIO](https://www.nio.io/): there was a collaboration to make changes to
     `EnTT`, at the time used for internal projects.
