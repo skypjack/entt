@@ -109,10 +109,12 @@ TEST(NonOwningGroup, ConcatExcludeLists) {
     const auto string_types = entt::exclude<char>;
     const auto numeric_types = entt::exclude<int, float>;
     const auto exclude_all = entt::concat_types(string_types, numeric_types);
+    // invalid list concat
+    // this code below shouldn't compile...
+    // const auto invalid = entt::concat_types(numeric_types, numeric_types);
 
     entt::registry registry;
-    // groups are smart enough to differentiate that is exclusionary group
-    // list.
+    // groups are smart enough to differentiate that is exclusionary group list.
     auto all_group = registry.group<std::string>(exclude_all);
 
 

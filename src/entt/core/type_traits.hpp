@@ -13,10 +13,20 @@ namespace entt {
 template<typename... Type>
 struct type_list {};
 
+/* Recursive static method for confirming all types are unique */
+template <typename...>
+inline constexpr auto is_unique = std::true_type{};
+
+template <typename T, typename... Rest>
+inline constexpr auto is_unique<T, Rest...> = std::bool_constant<
+    (!std::is_same_v<T, Rest> && ...) && is_unique<Rest...>
+>{};
+
 /*! @brief A class to use to concat type lists. This is useful among other
 things for composing group inclusion and exlusion lists.*/
 template<typename... T1, typename... T2, template <typename...> class T>
 auto concat_types(T<T1...>, T<T2...>) {
+    static_assert(is_unique<T1..., T2...>);
     return T<T1..., T2...>{};
 }
 
