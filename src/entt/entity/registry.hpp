@@ -116,7 +116,7 @@ class basic_registry {
                     this->construct(entt);
                 }
             } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
-                if((reg.pool<Get>()->has(entt) && ...) && !((!std::is_same_v<Exclude, Component> && reg.pool<Exclude>()->has(entt)) || ...)) {
+                if((reg.pool<Get>()->has(entt) && ...) && ((std::is_same_v<Exclude, Component> || !reg.pool<Exclude>()->has(entt)) && ...)) {
                     this->construct(entt);
                 }
             }
@@ -154,7 +154,7 @@ class basic_registry {
             } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
                 if((std::get<pool_type<Owned> *>(cpools)->has(entt) && ...)
                         && (reg.pool<Get>()->has(entt) && ...)
-                        && !((!std::is_same_v<Exclude, Component> && reg.pool<Exclude>()->has(entt)) || ...))
+                        && ((std::is_same_v<Exclude, Component> || !reg.pool<Exclude>()->has(entt)) && ...))
                 {
                     construct();
                 }

@@ -816,14 +816,14 @@ TEST(OwningGroup, ExcludedComponents) {
     registry.assign<int>(e1, 1);
     registry.assign<char>(e1);
 
-    const auto group = registry.group<int>(entt::exclude<char>);
+    const auto group = registry.group<int>(entt::exclude<char, double>);
 
     const auto e2 = registry.create();
     registry.assign<int>(e2, 2);
 
     const auto e3 = registry.create();
     registry.assign<int>(e3, 3);
-    registry.assign<char>(e3);
+    registry.assign<double>(e3);
 
     for(const auto entity: group) {
         if(entity == e0) {
@@ -836,12 +836,12 @@ TEST(OwningGroup, ExcludedComponents) {
     }
 
     registry.assign<char>(e0);
-    registry.assign<char>(e2);
+    registry.assign<double>(e2);
 
     ASSERT_TRUE(group.empty());
 
     registry.remove<char>(e1);
-    registry.remove<char>(e3);
+    registry.remove<double>(e3);
 
     for(const auto entity: group) {
         if(entity == e1) {
