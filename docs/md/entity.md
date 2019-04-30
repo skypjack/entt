@@ -1018,6 +1018,31 @@ only entities or get only some of the components, this should be the preferred
 approach. Note that the entity can also be excluded from the parameter list if
 not required, but this won't improve performance for multi component views.
 
+As a side note, when using a single component view, the most common error is to
+invoke `get` with the type of the component as a template parameter. This is
+probably due to the fact that it's required for multi component views:
+
+```cpp
+auto view = registry.view<position, const velocity>();
+
+for(auto entity: view) {
+    const auto &vel = view.get<const velocity>(entity);
+    // ...
+}
+```
+
+However, in case of a single component view, `get` doesn't accept a template
+parameter, since it's implicitly defined by the view itself:
+
+```cpp
+auto view = registry.view<const renderable>();
+
+for(auto entity: view) {
+    const auto &renderable = view.get(entity);
+    // ...
+}
+```
+
 **Note**: prefer the `get` member function of a view instead of the `get` member
 function template of a registry during iterations, if possible. However, keep in
 mind that it works only with the components of the view itself.
