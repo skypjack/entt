@@ -1,0 +1,8 @@
+{
+	"project": "entt",
+	"target": "single_include/entt/entt.hpp",
+	"sources": [
+		"src/entt/entt.hpp"
+	],
+	"include_paths": ["src"]
+}
