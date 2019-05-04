@@ -63,6 +63,8 @@ class basic_registry {
 
     template<typename Component>
     struct pool_handler: sparse_set<Entity, Component> {
+        using underlying_type = sparse_set<Entity, Component>;
+
         sigh<void(basic_registry &, const Entity, Component &)> on_construct;
         sigh<void(basic_registry &, const Entity, Component &)> on_replace;
         sigh<void(basic_registry &, const Entity)> on_destroy;
@@ -259,8 +261,9 @@ class basic_registry {
 
             pdata->clone = +[](const sparse_set<Entity> &cpool) -> std::unique_ptr<sparse_set<Entity>> {
                 if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
-                    std::unique_ptr<sparse_set<Entity, std::decay_t<Component>>> ptr = std::make_unique<pool_type<Component>>();
-                    *ptr = static_cast<const sparse_set<Entity, std::decay_t<Component>> &>(cpool);
+                    using underlying_type = typename pool_type<Component>::underlying_type;
+                    std::unique_ptr<underlying_type> ptr = std::make_unique<pool_type<Component>>();
+                    *ptr = static_cast<const underlying_type &>(cpool);
                     return std::move(ptr);
                 } else {
                     ENTT_ASSERT(false);
