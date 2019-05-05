@@ -63,15 +63,19 @@ class basic_registry {
 
     template<typename Component>
     struct pool_handler: sparse_set<Entity, Component> {
-        using underlying_type = sparse_set<Entity, Component>;
-
         sigh<void(basic_registry &, const Entity, Component &)> on_construct;
         sigh<void(basic_registry &, const Entity, Component &)> on_replace;
         sigh<void(basic_registry &, const Entity)> on_destroy;
         void *group{};
 
+        pool_handler() ENTT_NOEXCEPT = default;
+
+        pool_handler(const sparse_set<Entity, Component> &other)
+            : sparse_set<Entity, Component>{other}
+        {}
+
         template<typename... Args>
-        Component & construct(basic_registry &registry, const Entity entt, Args &&... args) {
+        Component & assign(basic_registry &registry, const Entity entt, Args &&... args) {
             auto &component = sparse_set<Entity, Component>::construct(entt, std::forward<Args>(args)...);
             on_construct.publish(registry, entt, component);
             return component;
@@ -90,7 +94,7 @@ class basic_registry {
             return component;
         }
 
-        void destroy(basic_registry &registry, const Entity entt) {
+        void remove(basic_registry &registry, const Entity entt) {
             on_destroy.publish(registry, entt);
             sparse_set<Entity, Component>::destroy(entt);
         }
@@ -178,7 +182,7 @@ class basic_registry {
     struct pool_data {
         std::unique_ptr<sparse_set<Entity>> pool;
         std::unique_ptr<sparse_set<Entity>> (* clone)(const sparse_set<Entity> &);
-        void (* destroy)(basic_registry &, const Entity);
+        void (* remove)(basic_registry &, const Entity);
         ENTT_ID_TYPE runtime_type;
     };
 
@@ -259,20 +263,17 @@ class basic_registry {
             pdata->runtime_type = ctype;
             pdata->pool = std::make_unique<pool_type<Component>>();
 
-            pdata->clone = +[](const sparse_set<Entity> &cpool) -> std::unique_ptr<sparse_set<Entity>> {
+            pdata->clone = +[](const sparse_set<Entity> &other) -> std::unique_ptr<sparse_set<Entity>> {
                 if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
-                    using underlying_type = typename pool_type<Component>::underlying_type;
-                    std::unique_ptr<underlying_type> ptr = std::make_unique<pool_type<Component>>();
-                    *ptr = static_cast<const underlying_type &>(cpool);
-                    return std::move(ptr);
+                    return std::make_unique<pool_type<Component>>(static_cast<const pool_type<Component> &>(other));
                 } else {
                     ENTT_ASSERT(false);
                     return nullptr;
                 }
             };
 
-            pdata->destroy = [](basic_registry &registry, const Entity entt) {
-                registry.pool<Component>()->destroy(registry, entt);
+            pdata->remove = [](basic_registry &registry, const Entity entt) {
+                registry.pool<Component>()->remove(registry, entt);
             };
         }
 
@@ -635,7 +636,7 @@ public:
 
         for(auto pos = pools.size(); pos; --pos) {
             if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->has(entity)) {
-                pdata.destroy(*this, entity);
+                pdata.remove(*this, entity);
             }
         };
 
@@ -658,7 +659,7 @@ public:
             if(auto &pdata = pools[pos-1]; pdata.pool) {
                 std::for_each(first, last, [&pdata, this](const auto entity) {
                     if(pdata.pool->has(entity)) {
-                        pdata.destroy(*this, entity);
+                        pdata.remove(*this, entity);
                     }
                 });
             }
@@ -695,7 +696,7 @@ public:
     template<typename Component, typename... Args>
     Component & assign(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
-        return assure<Component>()->construct(*this, entity, std::forward<Args>(args)...);
+        return assure<Component>()->assign(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -714,7 +715,7 @@ public:
     template<typename Component>
     void remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
-        pool<Component>()->destroy(*this, entity);
+        pool<Component>()->remove(*this, entity);
     }
 
     /**
@@ -800,7 +801,7 @@ public:
         ENTT_ASSERT(valid(entity));
         auto *cpool = assure<Component>();
         auto *comp = cpool->try_get(entity);
-        return comp ? *comp : cpool->construct(*this, entity, std::forward<Args>(args)...);
+        return comp ? *comp : cpool->assign(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -887,7 +888,7 @@ public:
     template<typename Component, typename... Args>
     Component & assign_or_replace(const entity_type entity, Args &&... args) {
         auto *cpool = assure<Component>();
-        return cpool->has(entity) ? cpool->replace(*this, entity, std::forward<Args>(args)...) : cpool->construct(*this, entity, std::forward<Args>(args)...);
+        return cpool->has(entity) ? cpool->replace(*this, entity, std::forward<Args>(args)...) : cpool->assign(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -1083,7 +1084,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if(auto *cpool = assure<Component>(); cpool->has(entity)) {
-            cpool->destroy(*this, entity);
+            cpool->remove(*this, entity);
         }
     }
 
@@ -1102,7 +1103,7 @@ public:
             cpool->reset();
         } else {
             for(const auto entity: static_cast<const sparse_set<entity_type> &>(*cpool)) {
-                cpool->destroy(*this, entity);
+                cpool->remove(*this, entity);
             }
         }
     }
@@ -1307,7 +1308,7 @@ public:
 
             groups.push_back(group_data{
                 { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) },
-                decltype(group_data::group){new handler_type, +[](void *gptr) { delete static_cast<handler_type *>(gptr); }},
+                decltype(group_data::group){new handler_type{}, +[](void *gptr) { delete static_cast<handler_type *>(gptr); }},
                 +[](const ENTT_ID_TYPE *other) {
                     const std::size_t ctypes[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
                     return std::equal(std::begin(ctypes), std::end(ctypes), other);

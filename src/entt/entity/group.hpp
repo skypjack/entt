@@ -734,7 +734,8 @@ public:
             }, std::forward<Args>(args)...);
         } else {
             algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), this](const auto lhs, const auto rhs) {
-                return compare(from_index<Component>(lhs)..., from_index<Component>(rhs)...);
+                // useless this-> used to suppress a warning with clang
+                return compare(this->from_index<Component>(lhs)..., this->from_index<Component>(rhs)...);
             }, std::forward<Args>(args)...);
         }
 

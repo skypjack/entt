@@ -1292,3 +1292,10 @@ TEST(Registry, BatchCreateAmbiguousCall) {
     // this should work, no other tests required
     registry.assign<ambiguous>(entity, foo, bar);
 }
+
+TEST(Registry, MoveOnlyComponent) {
+    // the purpose is to ensure that move only components are always accepted
+    entt::registry registry;
+    const auto entity = registry.create();
+    registry.assign<std::unique_ptr<int>>(entity);
+}
