@@ -28,6 +28,14 @@ TEST(HashedString, Functionalities) {
     ASSERT_NE(bar_hs, "foo"_hs);
 }
 
+TEST(HashedString, StringView) {
+
+    const char *bar = "bar";
+    auto bar_hs = entt::hashed_string{bar};
+    std::string_view sview = bar;
+    ASSERT_EQ(bar_hs.value(), entt::hashed_string::to_value(sview));
+}
+
 TEST(HashedString, Empty) {
     using hash_type = entt::hashed_string::hash_type;
 
