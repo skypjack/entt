@@ -1,3 +1,5 @@
+#include <string>
+#include <string_view>
 #include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
@@ -53,4 +55,10 @@ TEST(HashedString, ToValue) {
     ASSERT_EQ(entt::hashed_string::to_value(foobar), 0xbf9cf968);
     // how would you test a constexpr otherwise?
     (void)std::integral_constant<hash_type, entt::hashed_string::to_value("quux")>{};
+}
+
+TEST(HashedString, StringView) {
+    std::string str{"__foobar__"};
+    std::string_view view{str.data()+2, 6};
+    ASSERT_EQ(entt::hashed_string::to_value(view.data(), view.size()), 0xbf9cf968);
 }

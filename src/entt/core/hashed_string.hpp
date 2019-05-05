@@ -101,9 +101,21 @@ public:
         return helper(traits_type::offset, wrapper.str);
     }
 
+    /**
+     * @brief Returns directly the numeric representation of a string view.
+     * @param str Human-readable identifer.
+     * @param size Length of the string to hash.
+     * @return The numeric representation of the string.
+     */
+    inline static hash_type to_value(const char *str, std::size_t size) ENTT_NOEXCEPT {
+        ENTT_ID_TYPE partial{traits_type::offset};
+        while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
+        return partial;
+    }
+
     /*! @brief Constructs an empty hashed string. */
     constexpr hashed_string() ENTT_NOEXCEPT
-        : hash{}, str{nullptr}
+        : str{nullptr}, hash{}
     {}
 
     /**
@@ -122,17 +134,16 @@ public:
      */
     template<std::size_t N>
     constexpr hashed_string(const char (&curr)[N]) ENTT_NOEXCEPT
-        : hash{helper(traits_type::offset, curr)}, str{curr}
+        : str{curr}, hash{helper(traits_type::offset, curr)}
     {}
 
     /**
      * @brief Explicit constructor on purpose to avoid constructing a hashed
      * string directly from a `const char *`.
-     *
      * @param wrapper Helps achieving the purpose by relying on overloading.
      */
     explicit constexpr hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
-        : hash{helper(traits_type::offset, wrapper.str)}, str{wrapper.str}
+        : str{wrapper.str}, hash{helper(traits_type::offset, wrapper.str)}
     {}
 
     /**
@@ -170,8 +181,8 @@ public:
     }
 
 private:
-    hash_type hash;
     const char *str;
+    hash_type hash;
 };
 
 
