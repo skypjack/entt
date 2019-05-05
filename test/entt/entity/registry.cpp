@@ -1258,6 +1258,20 @@ TEST(Registry, Clone) {
     ASSERT_EQ(other.get<char>(e2), '2');
 }
 
+TEST(Registry, CloneMoveOnlyComponent) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.assign<std::unique_ptr<int>>(entity);
+    registry.assign<char>(entity);
+
+    auto other = registry.clone();
+
+    ASSERT_TRUE(other.valid(entity));
+    ASSERT_TRUE(other.has<char>(entity));
+    ASSERT_FALSE(other.has<std::unique_ptr<int>>(entity));
+}
+
 TEST(Registry, GetOrAssign) {
     entt::registry registry;
     const auto entity = registry.create();

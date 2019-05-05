@@ -267,7 +267,6 @@ class basic_registry {
                 if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
                     return std::make_unique<pool_type<Component>>(static_cast<const pool_type<Component> &>(other));
                 } else {
-                    ENTT_ASSERT(false);
                     return nullptr;
                 }
             };
@@ -1456,7 +1455,7 @@ public:
                 curr.clone = pdata.clone;
                 curr.pool = curr.clone(*pdata.pool);
                 curr.runtime_type = pdata.runtime_type;
-                ENTT_ASSERT(curr.pool);
+                ENTT_ASSERT(sizeof...(Component) == 0 || curr.pool);
             }
         }
 
