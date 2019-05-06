@@ -63,9 +63,6 @@ class basic_view {
     template<typename Comp>
     using pool_type = std::conditional_t<std::is_const_v<Comp>, const sparse_set<Entity, std::remove_const_t<Comp>>, sparse_set<Entity, Comp>>;
 
-    template<typename Comp>
-    using component_type = std::remove_reference_t<decltype(std::declval<pool_type<Comp>>().get(0))>;
-
     using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
     using unchecked_type = std::array<const sparse_set<Entity> *, (sizeof...(Component) - 1)>;
     using traits_type = entt_traits<Entity>;
@@ -166,13 +163,13 @@ class basic_view {
         auto raw = std::get<pool_type<Comp> *>(pools)->begin();
 
         std::for_each(begin, end, [&pack, &func, &raw, this](const auto entity) {
-            std::get<component_type<Comp> *>(pack) = &*raw++;
+            std::get<Comp *>(pack) = &*raw++;
 
-            if(((std::get<component_type<Other> *>(pack) = std::get<pool_type<Other> *>(pools)->try_get(entity)) && ...)) {
+            if(((std::get<Other *>(pack) = std::get<pool_type<Other> *>(pools)->try_get(entity)) && ...)) {
                 if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>...>) {
-                    func(*std::get<component_type<Component> *>(pack)...);
+                    func(*std::get<Component *>(pack)...);
                 } else {
-                    func(entity, *std::get<component_type<Component> *>(pack)...);
+                    func(entity, *std::get<Component *>(pack)...);
                 }
             }
         });
