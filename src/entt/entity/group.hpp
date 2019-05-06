@@ -8,6 +8,7 @@
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
 #include "sparse_set.hpp"
+#include "storage.hpp"
 #include "fwd.hpp"
 
 
@@ -85,10 +86,10 @@ class basic_group<Entity, get_t<Get...>> {
     friend class basic_registry<Entity>;
 
     template<typename Component>
-    using pool_type = std::conditional_t<std::is_const_v<Component>, const sparse_set<Entity, std::remove_const_t<Component>>, sparse_set<Entity, Component>>;
+    using pool_type = std::conditional_t<std::is_const_v<Component>, const storage<Entity, std::remove_const_t<Component>>, storage<Entity, Component>>;
 
     // we could use pool_type<Get> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    basic_group(sparse_set<Entity> *ref, sparse_set<Entity, std::remove_const_t<Get>> *... get) ENTT_NOEXCEPT
+    basic_group(sparse_set<Entity> *ref, storage<Entity, std::remove_const_t<Get>> *... get) ENTT_NOEXCEPT
         : handler{ref},
           pools{get...}
     {}
@@ -415,7 +416,7 @@ class basic_group<Entity, get_t<Get...>, Owned...> {
     friend class basic_registry<Entity>;
 
     template<typename Component>
-    using pool_type = std::conditional_t<std::is_const_v<Component>, const sparse_set<Entity, std::remove_const_t<Component>>, sparse_set<Entity, Component>>;
+    using pool_type = std::conditional_t<std::is_const_v<Component>, const storage<Entity, std::remove_const_t<Component>>, storage<Entity, Component>>;
 
     template<typename Component>
     using component_iterator_type = decltype(std::declval<pool_type<Component>>().begin());
@@ -430,7 +431,7 @@ class basic_group<Entity, get_t<Get...>, Owned...> {
     }
 
     // we could use pool_type<Type> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    basic_group(const typename basic_registry<Entity>::size_type *sz, sparse_set<Entity, std::remove_const_t<Owned>> *... owned, sparse_set<Entity, std::remove_const_t<Get>> *... get) ENTT_NOEXCEPT
+    basic_group(const typename basic_registry<Entity>::size_type *sz, storage<Entity, std::remove_const_t<Owned>> *... owned, storage<Entity, std::remove_const_t<Get>> *... get) ENTT_NOEXCEPT
         : length{sz},
           pools{owned..., get...}
     {}

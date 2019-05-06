@@ -14,6 +14,7 @@
 #include "entity/runtime_view.hpp"
 #include "entity/snapshot.hpp"
 #include "entity/sparse_set.hpp"
+#include "entity/storage.hpp"
 #include "entity/view.hpp"
 #include "locator/locator.hpp"
 #include "meta/factory.hpp"

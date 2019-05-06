@@ -10,6 +10,7 @@
 #include <type_traits>
 #include "../config/config.h"
 #include "sparse_set.hpp"
+#include "storage.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -61,7 +62,7 @@ class basic_view {
     friend class basic_registry<Entity>;
 
     template<typename Comp>
-    using pool_type = std::conditional_t<std::is_const_v<Comp>, const sparse_set<Entity, std::remove_const_t<Comp>>, sparse_set<Entity, Comp>>;
+    using pool_type = std::conditional_t<std::is_const_v<Comp>, const storage<Entity, std::remove_const_t<Comp>>, storage<Entity, Comp>>;
 
     using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
     using unchecked_type = std::array<const sparse_set<Entity> *, (sizeof...(Component) - 1)>;
@@ -139,7 +140,7 @@ class basic_view {
     };
 
     // we could use pool_type<Component> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    basic_view(sparse_set<Entity, std::remove_const_t<Component>> *... ref) ENTT_NOEXCEPT
+    basic_view(storage<Entity, std::remove_const_t<Component>> *... ref) ENTT_NOEXCEPT
         : pools{ref...}
     {}
 
@@ -449,7 +450,7 @@ class basic_view<Entity, Component> {
     /*! @brief A registry is allowed to create views. */
     friend class basic_registry<Entity>;
 
-    using pool_type = std::conditional_t<std::is_const_v<Component>, const sparse_set<Entity, std::remove_const_t<Component>>, sparse_set<Entity, Component>>;
+    using pool_type = std::conditional_t<std::is_const_v<Component>, const storage<Entity, std::remove_const_t<Component>>, storage<Entity, Component>>;
 
     basic_view(pool_type *ref) ENTT_NOEXCEPT
         : pool{ref}

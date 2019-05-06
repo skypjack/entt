@@ -20,6 +20,7 @@
 #include "runtime_view.hpp"
 #include "sparse_set.hpp"
 #include "snapshot.hpp"
+#include "storage.hpp"
 #include "entity.hpp"
 #include "group.hpp"
 #include "view.hpp"
@@ -62,7 +63,7 @@ class basic_registry {
     using traits_type = entt_traits<Entity>;
 
     template<typename Component>
-    struct pool_handler: sparse_set<Entity, Component> {
+    struct pool_handler: storage<Entity, Component> {
         sigh<void(basic_registry &, const Entity, Component &)> on_construct;
         sigh<void(basic_registry &, const Entity, Component &)> on_replace;
         sigh<void(basic_registry &, const Entity)> on_destroy;
@@ -70,20 +71,20 @@ class basic_registry {
 
         pool_handler() ENTT_NOEXCEPT = default;
 
-        pool_handler(const sparse_set<Entity, Component> &other)
-            : sparse_set<Entity, Component>{other}
+        pool_handler(const storage<Entity, Component> &other)
+            : storage<Entity, Component>{other}
         {}
 
         template<typename... Args>
         Component & assign(basic_registry &registry, const Entity entt, Args &&... args) {
-            auto &component = sparse_set<Entity, Component>::construct(entt, std::forward<Args>(args)...);
+            auto &component = storage<Entity, Component>::construct(entt, std::forward<Args>(args)...);
             on_construct.publish(registry, entt, component);
             return component;
         }
 
         template<typename It>
         Component * batch(basic_registry &registry, It first, It last) {
-            auto *component = sparse_set<Entity, Component>::batch(first, last);
+            auto *component = storage<Entity, Component>::batch(first, last);
 
             if(!on_construct.empty()) {
                 std::for_each(first, last, [&registry, component, this](const auto entt) mutable {
@@ -96,14 +97,14 @@ class basic_registry {
 
         void remove(basic_registry &registry, const Entity entt) {
             on_destroy.publish(registry, entt);
-            sparse_set<Entity, Component>::destroy(entt);
+            storage<Entity, Component>::destroy(entt);
         }
 
         template<typename... Args>
         Component & replace(basic_registry &registry, const Entity entt, Args &&... args) {
             Component component{std::forward<Args>(args)...};
             on_replace.publish(registry, entt, component);
-            return (sparse_set<Entity, Component>::get(entt) = std::move(component));
+            return (storage<Entity, Component>::get(entt) = std::move(component));
         }
     };
 

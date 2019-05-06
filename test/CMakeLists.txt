@@ -101,6 +101,7 @@ SETUP_AND_ADD_TEST(registry entt/entity/registry.cpp)
 SETUP_AND_ADD_TEST(runtime_view entt/entity/runtime_view.cpp)
 SETUP_AND_ADD_TEST(snapshot entt/entity/snapshot.cpp)
 SETUP_AND_ADD_TEST(sparse_set entt/entity/sparse_set.cpp)
+SETUP_AND_ADD_TEST(storage entt/entity/storage.cpp)
 SETUP_AND_ADD_TEST(view entt/entity/view.cpp)
 
 # Test locator
