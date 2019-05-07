@@ -272,7 +272,7 @@ class basic_registry {
                 }
             };
 
-            pdata->remove = [](basic_registry &registry, const Entity entt) {
+            pdata->remove = +[](basic_registry &registry, const Entity entt) {
                 registry.pool<Component>()->remove(registry, entt);
             };
         }
