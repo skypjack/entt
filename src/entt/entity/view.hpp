@@ -64,6 +64,9 @@ class basic_view {
     template<typename Comp>
     using pool_type = std::conditional_t<std::is_const_v<Comp>, const storage<Entity, std::remove_const_t<Comp>>, storage<Entity, Comp>>;
 
+    template<typename Comp>
+    using component_iterator_type = decltype(std::declval<pool_type<Comp>>().begin());
+
     using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
     using unchecked_type = std::array<const sparse_set<Entity> *, (sizeof...(Component) - 1)>;
     using traits_type = entt_traits<Entity>;
@@ -158,30 +161,18 @@ class basic_view {
     }
 
     template<typename Comp, typename... Other, typename Func>
-    void each(std::tuple<Other *...> pack, Func func) const {
+    void each(std::tuple<component_iterator_type<Comp>, Other *...> pack, Func func) const {
         const auto end = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::end();
         auto begin = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::begin();
 
         std::for_each(begin, end, [&pack, &func, raw = std::get<pool_type<Comp> *>(pools)->begin(), this](const auto entity) mutable {
-            auto curr = raw++;
+            std::get<component_iterator_type<Comp>>(pack) = raw++;
 
             if(((std::get<Other *>(pack) = std::get<pool_type<Other> *>(pools)->try_get(entity)) && ...)) {
                 if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>...>) {
-                    func([&pack, &curr]() -> decltype(auto) {
-                        if constexpr(std::is_same_v<Comp, Component>) {
-                            return *curr;
-                        } else {
-                            return *std::get<Component *>(pack);
-                        }
-                    }()...);
+                    func(*std::get<std::conditional_t<std::is_same_v<Comp, Component>, component_iterator_type<Component>, Component *>>(pack)...);
                 } else {
-                    func(entity, [&pack, &curr]() -> decltype(auto) {
-                        if constexpr(std::is_same_v<Comp, Component>) {
-                            return *curr;
-                        } else {
-                            return *std::get<Component *>(pack);
-                        }
-                    }()...);
+                    func(entity, *std::get<std::conditional_t<std::is_same_v<Comp, Component>, component_iterator_type<Component>, Component *>>(pack)...);
                 }
             }
         });
@@ -415,7 +406,7 @@ public:
      */
     template<typename Comp, typename Func>
     inline void each(Func func) const {
-        each<Comp>(std::tuple_cat(std::conditional_t<std::is_same_v<Comp *, Component *>, std::tuple<>, std::tuple<Component *>>{}...), std::move(func));
+        each<Comp>(std::tuple_cat(std::tuple<component_iterator_type<Comp>>{}, std::conditional_t<std::is_same_v<Comp *, Component *>, std::tuple<>, std::tuple<Component *>>{}...), std::move(func));
     }
 
 private:
