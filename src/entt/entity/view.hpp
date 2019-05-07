@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
+#include "../core/type_traits.hpp"
 #include "sparse_set.hpp"
 #include "storage.hpp"
 #include "entity.hpp"
@@ -161,11 +162,12 @@ class basic_view {
     }
 
     template<typename Comp, typename... Other, typename Func>
-    void each(std::tuple<component_iterator_type<Comp>, Other *...> pack, Func func) const {
+    void each(type_list<Other...>, Func func) const {
         const auto end = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::end();
         auto begin = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::begin();
 
-        std::for_each(begin, end, [&pack, &func, raw = std::get<pool_type<Comp> *>(pools)->begin(), this](const auto entity) mutable {
+        std::for_each(begin, end, [&func, raw = std::get<pool_type<Comp> *>(pools)->begin(), this](const auto entity) mutable {
+            std::tuple<component_iterator_type<Comp>, Other *...> pack;
             std::get<component_iterator_type<Comp>>(pack) = raw++;
 
             if(((std::get<Other *>(pack) = std::get<pool_type<Other> *>(pools)->try_get(entity)) && ...)) {
@@ -406,7 +408,7 @@ public:
      */
     template<typename Comp, typename Func>
     inline void each(Func func) const {
-        each<Comp>(std::tuple_cat(std::tuple<component_iterator_type<Comp>>{}, std::conditional_t<std::is_same_v<Comp *, Component *>, std::tuple<>, std::tuple<Component *>>{}...), std::move(func));
+        each<Comp>(type_list_cat_t<std::conditional_t<std::is_same_v<Comp, Component>, type_list<>, type_list<Component>>...>{}, std::move(func));
     }
 
 private:
