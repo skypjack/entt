@@ -158,19 +158,30 @@ class basic_view {
     }
 
     template<typename Comp, typename... Other, typename Func>
-    void each(std::tuple<Comp *, Other *...> pack, Func func) const {
+    void each(std::tuple<Other *...> pack, Func func) const {
         const auto end = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::end();
         auto begin = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::begin();
-        auto raw = std::get<pool_type<Comp> *>(pools)->begin();
 
-        std::for_each(begin, end, [&pack, &func, &raw, this](const auto entity) {
-            std::get<Comp *>(pack) = &*raw++;
+        std::for_each(begin, end, [&pack, &func, raw = std::get<pool_type<Comp> *>(pools)->begin(), this](const auto entity) mutable {
+            auto curr = raw++;
 
             if(((std::get<Other *>(pack) = std::get<pool_type<Other> *>(pools)->try_get(entity)) && ...)) {
                 if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>...>) {
-                    func(*std::get<Component *>(pack)...);
+                    func([&pack, &curr]() -> decltype(auto) {
+                        if constexpr(std::is_same_v<Comp, Component>) {
+                            return *curr;
+                        } else {
+                            return *std::get<Component *>(pack);
+                        }
+                    }()...);
                 } else {
-                    func(entity, *std::get<Component *>(pack)...);
+                    func(entity, [&pack, &curr]() -> decltype(auto) {
+                        if constexpr(std::is_same_v<Comp, Component>) {
+                            return *curr;
+                        } else {
+                            return *std::get<Component *>(pack);
+                        }
+                    }()...);
                 }
             }
         });
@@ -404,7 +415,7 @@ public:
      */
     template<typename Comp, typename Func>
     inline void each(Func func) const {
-        each(std::tuple_cat(std::tuple<Comp *>{}, std::conditional_t<std::is_same_v<Comp *, Component *>, std::tuple<>, std::tuple<Component *>>{}...), std::move(func));
+        each<Comp>(std::tuple_cat(std::conditional_t<std::is_same_v<Comp *, Component *>, std::tuple<>, std::tuple<Component *>>{}...), std::move(func));
     }
 
 private:
