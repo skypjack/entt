@@ -366,12 +366,11 @@ TEST(NonOwningGroup, EmptyAndNonEmptyTypes) {
         ASSERT_TRUE(entity == e0 || entity == e1);
     }
 
-    group.each([e0, e1](const auto entity, const int &, const empty_type &) {
+    group.each([e0, e1](const auto entity, const int &, empty_type) {
         ASSERT_TRUE(entity == e0 || entity == e1);
     });
 
     ASSERT_EQ(group.size(), typename decltype(group)::size_type{2});
-    ASSERT_EQ(&group.get<empty_type>(e0), &group.get<empty_type>(e1));
 }
 
 TEST(NonOwningGroup, TrackEntitiesOnComponentDestruction) {
@@ -872,12 +871,11 @@ TEST(OwningGroup, EmptyAndNonEmptyTypes) {
         ASSERT_TRUE(entity == e0 || entity == e1);
     }
 
-    group.each([e0, e1](const auto entity, const empty_type &, const int &) {
+    group.each([e0, e1](const auto entity, empty_type, const int &) {
         ASSERT_TRUE(entity == e0 || entity == e1);
     });
 
     ASSERT_EQ(group.size(), typename decltype(group)::size_type{2});
-    ASSERT_EQ(&group.get<empty_type>(e0), &group.get<empty_type>(e1));
 }
 
 TEST(OwningGroup, TrackEntitiesOnComponentDestruction) {

@@ -368,7 +368,7 @@ TEST(Mod, Duktape) {
     ASSERT_EQ(registry.view<position>().size(), 3u);
     ASSERT_EQ(registry.view<renderable>().size(), 2u);
 
-    registry.view<duktape_runtime>().each([](auto, const duktape_runtime &runtime) {
+    registry.view<duktape_runtime>().each([](const duktape_runtime &runtime) {
         ASSERT_EQ(runtime.components.size(), 2u);
     });
 
@@ -387,7 +387,7 @@ TEST(Mod, Duktape) {
     ASSERT_EQ(registry.view<position>().size(), 3u);
     ASSERT_EQ(registry.view<renderable>().size(), 2u);
 
-    registry.view<position, renderable, duktape_runtime>().each([](auto, const position &position, const auto &...) {
+    registry.view<position, renderable, duktape_runtime>().each([](const position &position, auto &&...) {
         ASSERT_EQ(position.x, -100.);
         ASSERT_EQ(position.y, -100.);
     });

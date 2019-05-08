@@ -226,18 +226,19 @@ class basic_snapshot_loader {
         archive(length);
 
         while(length--) {
+            static constexpr auto destroyed = false;
             Entity entt{};
-            Type instance{};
 
             if constexpr(std::is_empty_v<Type>) {
                 archive(entt);
+                force(*reg, entt, destroyed);
+                reg->template assign<Type>(args..., entt);
             } else {
+                Type instance{};
                 archive(entt, instance);
+                force(*reg, entt, destroyed);
+                reg->template assign<Type>(args..., entt, std::as_const(instance));
             }
-
-            static constexpr auto destroyed = false;
-            force(*reg, entt, destroyed);
-            reg->template assign<Type>(args..., entt, std::as_const(instance));
         }
     }
 
@@ -405,24 +406,25 @@ class basic_continuous_loader {
         }
     }
 
-    template<typename Other, typename Archive, typename Func, typename... Type, typename... Member>
-    void assign(Archive &archive, Func func, Member Type:: *... member) {
+    template<typename Other, typename Archive, typename... Type, typename... Member>
+    void assign(Archive &archive, [[maybe_unused]] Member Type:: *... member) {
         Entity length{};
         archive(length);
 
         while(length--) {
             Entity entt{};
-            Other instance{};
 
             if constexpr(std::is_empty_v<Other>) {
                 archive(entt);
+                restore(entt);
+                reg->template assign_or_replace<Other>(map(entt));
             } else {
+                Other instance{};
                 archive(entt, instance);
+                (update(instance, member), ...);
+                restore(entt);
+                reg->template assign_or_replace<Other>(map(entt), std::as_const(instance));
             }
-
-            restore(entt);
-            (update(instance, member), ...);
-            func(map(entt), instance);
         }
     }
 
@@ -497,12 +499,8 @@ public:
      */
     template<typename... Component, typename Archive, typename... Type, typename... Member>
     basic_continuous_loader & component(Archive &archive, Member Type:: *... member) {
-        auto apply = [this](const auto entt, const auto &component) {
-            reg->template assign_or_replace<std::decay_t<decltype(component)>>(entt, component);
-        };
-
         (reset<Component>(), ...);
-        (assign<Component>(archive, apply, member...), ...);
+        (assign<Component>(archive, member...), ...);
         return *this;
     }
 

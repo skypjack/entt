@@ -61,9 +61,9 @@ class sparse_set {
 
     public:
         using difference_type = index_type;
-        using value_type = const Entity;
-        using pointer = value_type *;
-        using reference = value_type &;
+        using value_type = Entity;
+        using pointer = const value_type *;
+        using reference = const value_type &;
         using iterator_category = std::random_access_iterator_tag;
 
         iterator() ENTT_NOEXCEPT = default;

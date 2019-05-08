@@ -76,10 +76,17 @@ class basic_registry {
         {}
 
         template<typename... Args>
-        Component & assign(basic_registry &registry, const Entity entt, Args &&... args) {
-            auto &component = storage<Entity, Component>::construct(entt, std::forward<Args>(args)...);
-            on_construct.publish(registry, entt, component);
-            return component;
+        decltype(auto) assign(basic_registry &registry, const Entity entt, Args &&... args) {
+            if constexpr(std::is_empty_v<Component>) {
+                Component component{std::forward<Args>(args)...};
+                storage<Entity, Component>::construct(entt);
+                on_construct.publish(registry, entt, component);
+                return std::move(component);
+            } else {
+                auto &component = storage<Entity, Component>::construct(entt, std::forward<Args>(args)...);
+                on_construct.publish(registry, entt, component);
+                return component;
+            }
         }
 
         template<typename It>
@@ -87,9 +94,15 @@ class basic_registry {
             auto *component = storage<Entity, Component>::batch(first, last);
 
             if(!on_construct.empty()) {
-                std::for_each(first, last, [&registry, component, this](const auto entt) mutable {
-                    on_construct.publish(registry, entt, *(component++));
-                });
+                if constexpr(std::is_empty_v<Component>) {
+                    std::for_each(first, last, [&registry, component = Component{}, this](const auto entt) {
+                        on_construct.publish(registry, entt, component);
+                    });
+                } else {
+                    std::for_each(first, last, [&registry, component, this](const auto entt) mutable {
+                        on_construct.publish(registry, entt, *(component++));
+                    });
+                }
             }
 
             return component;
@@ -101,10 +114,15 @@ class basic_registry {
         }
 
         template<typename... Args>
-        Component & replace(basic_registry &registry, const Entity entt, Args &&... args) {
+        decltype(auto) replace(basic_registry &registry, const Entity entt, [[maybe_unused]] Args &&... args) {
             Component component{std::forward<Args>(args)...};
             on_replace.publish(registry, entt, component);
-            return (storage<Entity, Component>::get(entt) = std::move(component));
+
+            if constexpr(std::is_empty_v<Component>) {
+                return std::move(component);
+            } else {
+                return (storage<Entity, Component>::get(entt) = std::move(component));
+            }
         }
     };
 
@@ -145,25 +163,21 @@ class basic_registry {
         void maybe_valid_if(basic_registry &reg, const Entity entt, const Args &...) {
             const auto cpools = std::make_tuple(reg.pool<Owned>()...);
 
-            auto construct = [&cpools, entt, this]() {
-                const auto pos = this->owned++;
-                (std::swap(std::get<pool_type<Owned> *>(cpools)->get(entt), std::get<pool_type<Owned> *>(cpools)->raw()[pos]), ...);
-                (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entt), pos), ...);
-            };
-
             if constexpr(std::disjunction_v<std::is_same<Owned, Component>..., std::is_same<Get, Component>...>) {
                 if(((std::is_same_v<Component, Owned> || std::get<pool_type<Owned> *>(cpools)->has(entt)) && ...)
                         && ((std::is_same_v<Component, Get> || reg.pool<Get>()->has(entt)) && ...)
                         && !(reg.pool<Exclude>()->has(entt) || ...))
                 {
-                    construct();
+                    const auto pos = this->owned++;
+                    (reg.swap<Owned>(0, std::get<pool_type<Owned> *>(cpools), entt, pos), ...);
                 }
             } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
                 if((std::get<pool_type<Owned> *>(cpools)->has(entt) && ...)
                         && (reg.pool<Get>()->has(entt) && ...)
                         && ((std::is_same_v<Exclude, Component> || !reg.pool<Exclude>()->has(entt)) && ...))
                 {
-                    construct();
+                    const auto pos = this->owned++;
+                    (reg.swap<Owned>(0, std::get<pool_type<Owned> *>(cpools), entt, pos), ...);
                 }
             }
         }
@@ -174,8 +188,7 @@ class basic_registry {
 
             if(std::get<0>(cpools)->has(entt) && std::get<0>(cpools)->sparse_set<Entity>::get(entt) < this->owned) {
                 const auto pos = --this->owned;
-                (std::swap(std::get<pool_type<Owned> *>(cpools)->get(entt), std::get<pool_type<Owned> *>(cpools)->raw()[pos]), ...);
-                (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entt), pos), ...);
+                (reg.swap<Owned>(0, std::get<pool_type<Owned> *>(cpools), entt, pos), ...);
             }
         }
     };
@@ -215,6 +228,18 @@ class basic_registry {
         entities[entt] = node;
         next = entt;
         ++available;
+    }
+
+    template<typename Component>
+    inline auto swap(int, pool_type<Component> *cpool, const Entity entt, const std::size_t pos)
+    -> decltype(std::swap(cpool->get(entt), cpool->get(cpool->data()[pos])), void()) {
+        std::swap(cpool->get(entt), cpool->get(cpool->data()[pos]));
+        cpool->swap(cpool->sparse_set<Entity>::get(entt), pos);
+    }
+
+    template<typename Component>
+    inline void swap(char, pool_type<Component> *cpool, const Entity entt, const std::size_t pos) {
+        cpool->swap(cpool->sparse_set<Entity>::get(entt), pos);
     }
 
     template<typename Component>
@@ -694,7 +719,7 @@ public:
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    Component & assign(const entity_type entity, Args &&... args) {
+    decltype(auto) assign(const entity_type entity, [[maybe_unused]] Args &&... args) {
         ENTT_ASSERT(valid(entity));
         return assure<Component>()->assign(*this, entity, std::forward<Args>(args)...);
     }
@@ -797,7 +822,7 @@ public:
      * @return Reference to the component owned by the entity.
      */
     template<typename Component, typename... Args>
-    Component & get_or_assign(const entity_type entity, Args &&... args) ENTT_NOEXCEPT {
+    decltype(auto) get_or_assign(const entity_type entity, Args &&... args) ENTT_NOEXCEPT {
         ENTT_ASSERT(valid(entity));
         auto *cpool = assure<Component>();
         auto *comp = cpool->try_get(entity);
@@ -859,7 +884,7 @@ public:
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    Component & replace(const entity_type entity, Args &&... args) {
+    decltype(auto) replace(const entity_type entity, Args &&... args) {
         return pool<Component>()->replace(*this, entity, std::forward<Args>(args)...);
     }
 
@@ -886,7 +911,7 @@ public:
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    Component & assign_or_replace(const entity_type entity, Args &&... args) {
+    decltype(auto) assign_or_replace(const entity_type entity, Args &&... args) {
         auto *cpool = assure<Component>();
         return cpool->has(entity) ? cpool->replace(*this, entity, std::forward<Args>(args)...) : cpool->assign(*this, entity, std::forward<Args>(args)...);
     }
@@ -1290,6 +1315,7 @@ public:
     inline entt::basic_group<Entity, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0);
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1);
+
         using handler_type = group_handler<type_list<Exclude...>, type_list<Get...>, Owned...>;
 
         const std::size_t extent[] = { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) };
@@ -1336,7 +1362,7 @@ public:
             });
 
             // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-            std::for_each(cpool->data(), cpool->data() + cpool->size(), [curr, &cpools](const auto entity) {
+            std::for_each(cpool->data(), cpool->data() + cpool->size(), [curr, &cpools, this](const auto entity) {
                 if((std::get<pool_type<Owned> *>(cpools)->has(entity) && ...)
                         && (std::get<pool_type<Get> *>(cpools)->has(entity) && ...)
                         && !(std::get<pool_type<Exclude> *>(cpools)->has(entity) || ...))
@@ -1345,8 +1371,7 @@ public:
                         curr->construct(entity);
                     } else {
                         const auto pos = curr->owned++;
-                        (std::swap(std::get<pool_type<Owned> *>(cpools)->get(entity), std::get<pool_type<Owned> *>(cpools)->raw()[pos]), ...);
-                        (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entity), pos), ...);
+                        (swap<Owned>(0, std::get<pool_type<Owned> *>(cpools), entity, pos), ...);
                     }
                 }
             });

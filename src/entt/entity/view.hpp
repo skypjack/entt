@@ -161,20 +161,28 @@ class basic_view {
         return other;
     }
 
+    template<typename Comp, typename Other>
+    inline decltype(auto) get([[maybe_unused]] component_iterator_type<Comp> it, [[maybe_unused]] pool_type<Other> *cpool, [[maybe_unused]] const Entity entt) const ENTT_NOEXCEPT {
+        if constexpr(std::is_same_v<Comp, Other>) {
+            return *it;
+        } else {
+            return cpool->get(entt);
+        }
+    }
+
     template<typename Comp, typename... Other, typename Func>
     void each(type_list<Other...>, Func func) const {
         const auto end = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::end();
         auto begin = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::begin();
 
-        std::for_each(begin, end, [&func, raw = std::get<pool_type<Comp> *>(pools)->begin(), this](const auto entity) mutable {
-            std::tuple<component_iterator_type<Comp>, Other *...> pack;
-            std::get<component_iterator_type<Comp>>(pack) = raw++;
+        std::for_each(begin, end, [raw = std::get<pool_type<Comp> *>(pools)->begin(), &func, this](const auto entity) mutable {
+            auto curr = raw++;
 
-            if(((std::get<Other *>(pack) = std::get<pool_type<Other> *>(pools)->try_get(entity)) && ...)) {
+            if((std::get<pool_type<Other> *>(pools)->has(entity) && ...)) {
                 if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>...>) {
-                    func(*std::get<std::conditional_t<std::is_same_v<Comp, Component>, component_iterator_type<Component>, Component *>>(pack)...);
+                    func(get<Comp, Component>(curr, std::get<pool_type<Component> *>(pools), entity)...);
                 } else {
-                    func(entity, *std::get<std::conditional_t<std::is_same_v<Comp, Component>, component_iterator_type<Component>, Component *>>(pack)...);
+                    func(entity, get<Comp, Component>(curr, std::get<pool_type<Component> *>(pools), entity)...);
                 }
             }
         });

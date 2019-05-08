@@ -222,8 +222,7 @@ auto find_if(Op op, const Node *curr) ENTT_NOEXCEPT {
 
 template<auto Member, typename Op>
 auto find_if(Op op, const meta_type_node *node) ENTT_NOEXCEPT
--> decltype(find_if(op, node->*Member))
-{
+-> decltype(find_if(op, node->*Member)) {
     decltype(find_if(op, node->*Member)) ret = nullptr;
 
     if(node) {
@@ -311,8 +310,7 @@ class meta_any {
 
     template<typename Type>
     inline static auto compare(int, const Type &lhs, const Type &rhs)
-    -> decltype(lhs == rhs, bool{})
-    {
+    -> decltype(lhs == rhs, bool{}) {
         return lhs == rhs;
     }
 

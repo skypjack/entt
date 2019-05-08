@@ -19,7 +19,7 @@ struct throwing_component {
     int data;
 };
 
-TEST(SparseSetWithType, Functionalities) {
+TEST(Storage, Functionalities) {
     entt::storage<std::uint64_t, int> set;
 
     set.reserve(42);
@@ -79,16 +79,23 @@ TEST(SparseSetWithType, Functionalities) {
     other = std::move(set);
 }
 
-TEST(SparseSetWithType, EmptyType) {
+TEST(Storage, EmptyType) {
     entt::storage<std::uint64_t, empty_type> set;
 
-    ASSERT_EQ(&set.construct(42), &set.construct(99));
-    ASSERT_EQ(&set.get(42), set.try_get(42));
-    ASSERT_EQ(&set.get(42), &set.get(99));
+    set.construct(42);
+    set.construct(99);
+
+    ASSERT_TRUE(set.has(42));
+    ASSERT_TRUE(set.has(99));
+    ASSERT_EQ(set.try_get(42), nullptr);
     ASSERT_EQ(std::as_const(set).try_get(42), std::as_const(set).try_get(99));
+
+    auto &&component = set.get(42);
+
+    ASSERT_TRUE((std::is_same_v<decltype(component), empty_type &&>));
 }
 
-TEST(SparseSetWithType, BatchAdd) {
+TEST(Storage, BatchAdd) {
     entt::storage<std::uint64_t, int> set;
     entt::storage<std::uint64_t, int>::entity_type entities[2];
 
@@ -121,7 +128,7 @@ TEST(SparseSetWithType, BatchAdd) {
     ASSERT_EQ(set.get(entities[1]), 2);
 }
 
-TEST(SparseSetWithType, BatchAddEmptyType) {
+TEST(Storage, BatchAddEmptyType) {
     entt::storage<std::uint64_t, empty_type> set;
     entt::storage<std::uint64_t, empty_type>::entity_type entities[2];
 
@@ -130,7 +137,7 @@ TEST(SparseSetWithType, BatchAddEmptyType) {
 
     set.reserve(4);
     set.construct(12);
-    auto *component = set.batch(std::begin(entities), std::end(entities));
+    set.batch(std::begin(entities), std::end(entities));
     set.construct(24);
 
     ASSERT_TRUE(set.has(entities[0]));
@@ -142,26 +149,26 @@ TEST(SparseSetWithType, BatchAddEmptyType) {
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 4u);
-    ASSERT_EQ(&set.get(entities[0]), &set.get(entities[1]));
-    ASSERT_EQ(&set.get(entities[0]), &set.get(12));
-    ASSERT_EQ(&set.get(entities[0]), &set.get(24));
-    ASSERT_EQ(&set.get(entities[0]), component);
+
+    auto &&component = set.get(entities[0]);
+
+    ASSERT_TRUE((std::is_same_v<decltype(component), empty_type &&>));
 }
 
-TEST(SparseSetWithType, AggregatesMustWork) {
+TEST(Storage, AggregatesMustWork) {
     struct aggregate_type { int value; };
     // the goal of this test is to enforce the requirements for aggregate types
     entt::storage<std::uint64_t, aggregate_type>{}.construct(0, 42);
 }
 
-TEST(SparseSetWithType, TypesFromStandardTemplateLibraryMustWork) {
+TEST(Storage, TypesFromStandardTemplateLibraryMustWork) {
     // see #37 - this test shouldn't crash, that's all
     entt::storage<std::uint64_t, std::unordered_set<int>> set;
     set.construct(0).insert(42);
     set.destroy(0);
 }
 
-TEST(SparseSetWithType, Iterator) {
+TEST(Storage, Iterator) {
     using iterator_type = typename entt::storage<std::uint64_t, boxed_int>::iterator_type;
 
     entt::storage<std::uint64_t, boxed_int> set;
@@ -203,7 +210,7 @@ TEST(SparseSetWithType, Iterator) {
     ASSERT_GE(end, set.end());
 }
 
-TEST(SparseSetWithType, ConstIterator) {
+TEST(Storage, ConstIterator) {
     using iterator_type = typename entt::storage<std::uint64_t, boxed_int>::const_iterator_type;
 
     entt::storage<std::uint64_t, boxed_int> set;
@@ -245,7 +252,7 @@ TEST(SparseSetWithType, ConstIterator) {
     ASSERT_GE(cend, set.cend());
 }
 
-TEST(SparseSetWithType, IteratorEmptyType) {
+TEST(Storage, IteratorEmptyType) {
     using iterator_type = typename entt::storage<std::uint64_t, empty_type>::iterator_type;
     entt::storage<std::uint64_t, empty_type> set;
     set.construct(3);
@@ -277,7 +284,7 @@ TEST(SparseSetWithType, IteratorEmptyType) {
     ASSERT_EQ(end - (end - begin), set.begin());
     ASSERT_EQ(end + (begin - end), set.begin());
 
-    ASSERT_EQ(&begin[0], set.begin().operator->());
+    ASSERT_EQ(set.begin().operator->(), nullptr);
 
     ASSERT_LT(begin, end);
     ASSERT_LE(begin, set.begin());
@@ -286,60 +293,12 @@ TEST(SparseSetWithType, IteratorEmptyType) {
     ASSERT_GE(end, set.end());
 
     set.construct(33);
+    auto &&component = *begin;
 
-    ASSERT_EQ(&*begin, &*(begin+1));
-    ASSERT_EQ(&begin[0], &begin[1]);
-    ASSERT_EQ(begin.operator->(), (end-1).operator->());
+    ASSERT_TRUE((std::is_same_v<decltype(component), empty_type &&>));
 }
 
-TEST(SparseSetWithType, ConstIteratorEmptyType) {
-    using iterator_type = typename entt::storage<std::uint64_t, empty_type>::const_iterator_type;
-    entt::storage<std::uint64_t, empty_type> set;
-    set.construct(3);
-
-    iterator_type cend{set.cbegin()};
-    iterator_type cbegin{};
-    cbegin = set.cend();
-    std::swap(cbegin, cend);
-
-    ASSERT_EQ(cbegin, set.cbegin());
-    ASSERT_EQ(cend, set.cend());
-    ASSERT_NE(cbegin, cend);
-
-    ASSERT_EQ(cbegin++, set.cbegin());
-    ASSERT_EQ(cbegin--, set.cend());
-
-    ASSERT_EQ(cbegin+1, set.cend());
-    ASSERT_EQ(cend-1, set.cbegin());
-
-    ASSERT_EQ(++cbegin, set.cend());
-    ASSERT_EQ(--cbegin, set.cbegin());
-
-    ASSERT_EQ(cbegin += 1, set.cend());
-    ASSERT_EQ(cbegin -= 1, set.cbegin());
-
-    ASSERT_EQ(cbegin + (cend - cbegin), set.cend());
-    ASSERT_EQ(cbegin - (cbegin - cend), set.cend());
-
-    ASSERT_EQ(cend - (cend - cbegin), set.cbegin());
-    ASSERT_EQ(cend + (cbegin - cend), set.cbegin());
-
-    ASSERT_EQ(&cbegin[0], set.cbegin().operator->());
-
-    ASSERT_LT(cbegin, cend);
-    ASSERT_LE(cbegin, set.cbegin());
-
-    ASSERT_GT(cend, cbegin);
-    ASSERT_GE(cend, set.cend());
-
-    set.construct(33);
-
-    ASSERT_EQ(&*cbegin, &*(cbegin+1));
-    ASSERT_EQ(&cbegin[0], &cbegin[1]);
-    ASSERT_EQ(cbegin.operator->(), (cend-1).operator->());
-}
-
-TEST(SparseSetWithType, Raw) {
+TEST(Storage, Raw) {
     entt::storage<std::uint64_t, int> set;
 
     set.construct(3, 3);
@@ -355,7 +314,7 @@ TEST(SparseSetWithType, Raw) {
     ASSERT_EQ(*(set.raw() + 2u), 9);
 }
 
-TEST(SparseSetWithType, RawEmptyType) {
+TEST(Storage, RawEmptyType) {
     entt::storage<std::uint64_t, empty_type> set;
 
     set.construct(3);
@@ -364,7 +323,7 @@ TEST(SparseSetWithType, RawEmptyType) {
     ASSERT_EQ(set.try_get(3), set.raw());
 }
 
-TEST(SparseSetWithType, SortOrdered) {
+TEST(Storage, SortOrdered) {
     entt::storage<std::uint64_t, boxed_int> set;
 
     set.construct(12, boxed_int{12});
@@ -400,7 +359,7 @@ TEST(SparseSetWithType, SortOrdered) {
     ASSERT_EQ(begin, end);
 }
 
-TEST(SparseSetWithType, SortReverse) {
+TEST(Storage, SortReverse) {
     entt::storage<std::uint64_t, boxed_int> set;
 
     set.construct(12, boxed_int{1});
@@ -436,7 +395,7 @@ TEST(SparseSetWithType, SortReverse) {
     ASSERT_EQ(begin, end);
 }
 
-TEST(SparseSetWithType, SortUnordered) {
+TEST(Storage, SortUnordered) {
     entt::storage<std::uint64_t, boxed_int> set;
 
     set.construct(12, boxed_int{6});
@@ -472,7 +431,7 @@ TEST(SparseSetWithType, SortUnordered) {
     ASSERT_EQ(begin, end);
 }
 
-TEST(SparseSetWithType, RespectDisjoint) {
+TEST(Storage, RespectDisjoint) {
     entt::storage<std::uint64_t, int> lhs;
     entt::storage<std::uint64_t, int> rhs;
 
@@ -499,7 +458,7 @@ TEST(SparseSetWithType, RespectDisjoint) {
     ASSERT_EQ(begin, end);
 }
 
-TEST(SparseSetWithType, RespectOverlap) {
+TEST(Storage, RespectOverlap) {
     entt::storage<std::uint64_t, int> lhs;
     entt::storage<std::uint64_t, int> rhs;
 
@@ -528,7 +487,7 @@ TEST(SparseSetWithType, RespectOverlap) {
     ASSERT_EQ(begin, end);
 }
 
-TEST(SparseSetWithType, RespectOrdered) {
+TEST(Storage, RespectOrdered) {
     entt::storage<std::uint64_t, int> lhs;
     entt::storage<std::uint64_t, int> rhs;
 
@@ -574,7 +533,7 @@ TEST(SparseSetWithType, RespectOrdered) {
     ASSERT_EQ(*(rhs.data() + 5u), 5u);
 }
 
-TEST(SparseSetWithType, RespectReverse) {
+TEST(Storage, RespectReverse) {
     entt::storage<std::uint64_t, int> lhs;
     entt::storage<std::uint64_t, int> rhs;
 
@@ -620,7 +579,7 @@ TEST(SparseSetWithType, RespectReverse) {
     ASSERT_EQ(*(rhs.data() + 5u), 5u);
 }
 
-TEST(SparseSetWithType, RespectUnordered) {
+TEST(Storage, RespectUnordered) {
     entt::storage<std::uint64_t, int> lhs;
     entt::storage<std::uint64_t, int> rhs;
 
@@ -666,7 +625,7 @@ TEST(SparseSetWithType, RespectUnordered) {
     ASSERT_EQ(*(rhs.data() + 5u), 5u);
 }
 
-TEST(SparseSetWithType, RespectOverlapEmptyType) {
+TEST(Storage, RespectOverlapEmptyType) {
     entt::storage<std::uint64_t, empty_type> lhs;
     entt::storage<std::uint64_t, empty_type> rhs;
 
@@ -687,7 +646,7 @@ TEST(SparseSetWithType, RespectOverlapEmptyType) {
     ASSERT_EQ(std::as_const(lhs).sparse_set<std::uint64_t>::get(42), 1u);
 }
 
-TEST(SparseSetWithType, CanModifyDuringIteration) {
+TEST(Storage, CanModifyDuringIteration) {
     entt::storage<std::uint64_t, int> set;
     set.construct(0, 42);
 
@@ -703,7 +662,7 @@ TEST(SparseSetWithType, CanModifyDuringIteration) {
     (void)entity;
 }
 
-TEST(SparseSetWithType, ReferencesGuaranteed) {
+TEST(Storage, ReferencesGuaranteed) {
     entt::storage<std::uint64_t, boxed_int> set;
 
     set.construct(0, 0);
@@ -731,13 +690,13 @@ TEST(SparseSetWithType, ReferencesGuaranteed) {
     ASSERT_EQ(set.get(1).value, 3);
 }
 
-TEST(SparseSetWithType, MoveOnlyComponent) {
+TEST(Storage, MoveOnlyComponent) {
     // the purpose is to ensure that move only components are always accepted
     entt::storage<std::uint64_t, std::unique_ptr<int>> set;
     (void)set;
 }
 
-TEST(SparseSetWithType, ConstructorExceptionDoesNotAddToSet) {
+TEST(Storage, ConstructorExceptionDoesNotAddToSet) {
     entt::storage<std::uint64_t, throwing_component> set;
 
     try {

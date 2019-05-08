@@ -248,7 +248,6 @@ TEST(Snapshot, Continuous) {
 
     using storage_type = std::tuple<
         std::queue<entt::entity>,
-        std::queue<a_component>,
         std::queue<another_component>,
         std::queue<what_a_component>,
         std::queue<double>
@@ -432,10 +431,7 @@ TEST(Snapshot, MoreOnShrink) {
 
     entt::continuous_loader loader{dst};
 
-    using storage_type = std::tuple<
-        std::queue<entt::entity>,
-        std::queue<a_component>
-    >;
+    using storage_type = std::tuple<std::queue<entt::entity>>;
 
     storage_type storage;
     output_archive<storage_type> output{storage};
