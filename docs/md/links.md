@@ -14,8 +14,9 @@ directly.
 I hope this list can grow much more in the future:
 
 * Games:
-  * [Minecraft](https://minecraft.net/en-us/attribution/): of course, **that**
-    Minecraft, by Mojang (see the open source attributions page).
+  * [Minecraft](https://minecraft.net/en-us/attribution/) by
+    [Mojang](https://mojang.com/): of course, **that** Minecraft, see the
+    open source attributions page for more details.
   * [Face Smash](https://play.google.com/store/apps/details?id=com.gamee.facesmash):
     a game to play with your face.
   * [EnTT Pacman](https://github.com/Kerndog73/EnTT-Pacman): an example of how
@@ -36,12 +37,13 @@ I hope this list can grow much more in the future:
     example of a breakout game, using `SDL` and `EnTT`.
 
 * Engines/Frameworks:
-  * [The Forge](https://github.com/ConfettiFX/The-Forge): cross-platform
-    rendering framework by Confetti.
+  * [The Forge](https://github.com/ConfettiFX/The-Forge) by
+    [Confett](http://www.confettispecialfx.com/): a cross-platform rendering
+    framework.
   * [Apparently](https://teamwisp.github.io/credits/)
-    [Wisp](https://teamwisp.github.io/product/): an advanced real-time ray
-    tracing renderer build for the demands of video game artists by
-    [Team Wisp](https://teamwisp.github.io/).
+    [Wisp](https://teamwisp.github.io/product/) by
+    [Team Wisp](https://teamwisp.github.io/): an advanced real-time ray tracing
+    renderer built for the demands of video game artists.
   * [starlight](https://github.com/DomRe/starlight): game programming framework
     using `Allegro`, `Lua` and modern C++.
   * [Apparently](https://github.com/JosiahWI/qub3d-libdeps)
@@ -69,12 +71,18 @@ I hope this list can grow much more in the future:
     create projects in modern C++ using `SFML`, `EnTT`, `Conan` and `CMake`.
 
 * Any Other Business:
-  * [Apparently](https://github.com/Esri/entt) [Esri](https://github.com/Esri):
-    authors of [`ArcGis`](https://www.esri.com/en-us/arcgis/products/), the
-    world's most powerful mapping and analytics software.
+  * The [ArcGIS Runtime SDKs](https://developers.arcgis.com/arcgis-runtime/)
+    by [Esri](https://www.esri.com/): they use `EnTT` for the internal ECS and
+    the cross platform C++ rendering engine. The SDKs are utilized by a lot of
+    enterprise custom apps, as well as by Esri for its own public applications
+    such as
+    [Explorer](https://play.google.com/store/apps/details?id=com.esri.explorer),
+    [Collector](https://play.google.com/store/apps/details?id=com.esri.arcgis.collector)
+    and
+    [Navigator](https://play.google.com/store/apps/details?id=com.esri.navigator).
   * [Apparently](https://www.linkedin.com/in/skypjack/)
-    [NIO](https://www.nio.io/): there was a collaboration to make changes to
-    `EnTT`, at the time used for internal projects.
+    [NIO](https://www.nio.io/): there was a collaboration to make some changes
+    to `EnTT`, at the time used for internal projects.
   * [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt): port of
     [Match One](https://github.com/sschmid/Match-One) for `Entitas-CSharp`.
   * GitHub contains also

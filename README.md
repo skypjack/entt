@@ -12,22 +12,23 @@
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/skypjack)
 
 `EnTT` is a header-only, tiny and easy to use library for game programming and
-much more written in **modern C++**, mainly known for its particular
+much more written in **modern C++**, mainly known for its innovative
 **entity-component-system (ECS)** model.<br/>
 [Among others](https://github.com/skypjack/entt/wiki/EnTT-in-Action), it's used
-in [**Minecraft** by Mojang](https://minecraft.net/en-us/attribution/) and
-[**The Forge** by Confetti](https://github.com/ConfettiFX/The-Forge). Read on to
-find out what it can offer you.
+in [**Minecraft**](https://minecraft.net/en-us/attribution/) by Mojang, the
+[**ArcGIS Runtime SDKs**](https://developers.arcgis.com/arcgis-runtime/) by Esri
+and [**The Forge**](https://github.com/ConfettiFX/The-Forge) by Confetti. Read
+on to find out what it can offer you.
 
 ---
 
 Do you want to **keep up with changes** or do you have a **question** that
 doesn't require you to open an issue?<br/>
-Join the [gitter channel](https://gitter.im/skypjack/entt) and **meet other
-users** like you. **The more** we are, **the better** for everyone.
+Join the [gitter channel](https://gitter.im/skypjack/entt) and meet other users
+like you. The more we are, the better for everyone.
 
-If you use `EnTT` and you want to **say thanks** or **support** the project,
-please **consider becoming a patron**:
+If you use `EnTT` and you want to say thanks or support the project, please
+**consider becoming a patron**:
 
 [![Patreon](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/bePatron?c=1772573)
 
