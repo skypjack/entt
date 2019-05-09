@@ -1371,7 +1371,8 @@ public:
                         curr->construct(entity);
                     } else {
                         const auto pos = curr->owned++;
-                        (swap<Owned>(0, std::get<pool_type<Owned> *>(cpools), entity, pos), ...);
+                        // useless this-> used to suppress a warning with gcc and clang
+                        (this->swap<Owned>(0, std::get<pool_type<Owned> *>(cpools), entity, pos), ...);
                     }
                 }
             });
