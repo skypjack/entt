@@ -233,7 +233,7 @@ class basic_registry {
     template<typename Component>
     inline auto swap(int, pool_type<Component> *cpool, const Entity entt, const std::size_t pos)
     -> decltype(std::swap(cpool->get(entt), cpool->get(cpool->data()[pos])), void()) {
-        std::swap(cpool->get(entt), cpool->get(cpool->data()[pos]));
+        std::swap(cpool->get(entt), cpool->raw()[pos]);
         cpool->swap(cpool->sparse_set<Entity>::get(entt), pos);
     }
 
