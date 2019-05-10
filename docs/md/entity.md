@@ -1460,25 +1460,21 @@ groups or as free types with multi component views and groups in general.
 An empty type `T` is such that `std::is_empty_v<T>` returns true. They are also
 the same types for which _empty base optimization_ (EBO) is possibile.<br/>
 `EnTT` handles these types in a special way, optimizing both in terms of
-performance and memory usage. However, this also has drawbacks that are worth
+performance and memory usage. However, this also has consequences that are worth
 mentioning.
 
-When an empty type is detected, a pool is created in such a way that one and
-only one instance of the given type is created. All the entities will refer to
-it. Since the type is, in fact, empty, this is safe and there is no risk that a
-modification of its data members will affect other instances.<br/>
-Iterations are faster because only the entities to which the type is assigned
-are considered. Similarly, less memory is used, since there exists always only
-one instance of the component itself, no matter how many entities it is
-assigned.
+When an empty type is detected, it's not instantiated in any case. Therefore,
+only the entities to which it's assigned are made availble. All the iterators as
+well as the `get` member functions of registries, views and groups will return
+temporary objects. Similarly, some functions such as `try_get` or the raw access
+to the list of components aren't available for this kind of types.<br/>
+On the other hand, iterations are faster because only the entities to which the
+type is assigned are considered. Moreover, less memory is used, since there
+doesn't exist any instance of the component, no matter how many entities it is
+assigned to.
 
-The drawback is that the `raw` member function will no longer be able to return
-a valid pointer to the list of components in the pool. This is because there is
-no list of components at all. Only one instance of the given type exists in this
-case. Therefore, `raw` will always return a pointer to that instance.<br/>
-Nonetheless, the iterators returned by the `begin` and `end` member functions
-are still valid and can be used safely. More in general, all the features
-offered by the library aren't affected, but for the `raw` member function.
+More in general, none of the features offered by the library is affected, but
+for the ones that require to return actual instances.
 
 # Multithreading
 

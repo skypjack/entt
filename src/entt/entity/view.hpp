@@ -179,7 +179,7 @@ class basic_view {
             auto curr = raw++;
 
             if((std::get<pool_type<Other> *>(pools)->has(entity) && ...)) {
-                if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>...>) {
+                if constexpr(std::is_invocable_v<Func, decltype(get<Component>({}))...>) {
                     func(get<Comp, Component>(curr, std::get<pool_type<Component> *>(pools), entity)...);
                 } else {
                     func(entity, get<Comp, Component>(curr, std::get<pool_type<Component> *>(pools), entity)...);
@@ -243,11 +243,6 @@ public:
      * @note
      * There are no guarantees on the order of the components. Use `begin` and
      * `end` if you want to iterate the view in the expected order.
-     *
-     * @warning
-     * Empty components aren't explicitly instantiated. Only one instance of the
-     * given type is created. Therefore, this function always returns a pointer
-     * to that instance.
      *
      * @tparam Comp Type of component in which one is interested.
      * @return A pointer to the array of components.
@@ -354,14 +349,13 @@ public:
      * @return The components assigned to the entity.
      */
     template<typename... Comp>
-    std::conditional_t<sizeof...(Comp) == 1, std::tuple_element_t<0, std::tuple<Comp &...>>, std::tuple<Comp &...>>
-    get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
+    decltype(auto) get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Comp) == 1) {
             return (std::get<pool_type<Comp> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple<Comp &...>{get<Comp>(entt)...};
+            return std::tuple<decltype(get<Comp>(entt))...>{get<Comp>(entt)...};
         }
     }
 
@@ -379,6 +373,11 @@ public:
      * void(const entity_type, Component &...);
      * void(Component &...);
      * @endcode
+     *
+     * @note
+     * Empty types aren't explicitly instantiated. Therefore, temporary objects
+     * are returned during iterations. They can be caught only by copy or with
+     * const references.
      *
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
@@ -410,13 +409,19 @@ public:
      * It is no longer guaranteed that the performance is the best possible, but
      * there will be greater control over the order of iteration.
      *
+     * @note
+     * Empty types aren't explicitly instantiated. Therefore, temporary objects
+     * are returned during iterations. They can be caught only by copy or with
+     * const references.
+     *
      * @tparam Comp Type of component to use to enforce the iteration order.
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Comp, typename Func>
     inline void each(Func func) const {
-        each<Comp>(type_list_cat_t<std::conditional_t<std::is_same_v<Comp, Component>, type_list<>, type_list<Component>>...>{}, std::move(func));
+        using other_type = type_list_cat_t<std::conditional_t<std::is_same_v<Comp, Component>, type_list<>, type_list<Component>>...>;
+        each<Comp>(other_type{}, std::move(func));
     }
 
 private:
@@ -470,7 +475,7 @@ class basic_view<Entity, Component> {
 
 public:
     /*! @brief Type of component iterated by the view. */
-    using raw_type = std::remove_reference_t<decltype(std::declval<pool_type>().get(0))>;
+    using raw_type = Component;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename pool_type::entity_type;
     /*! @brief Unsigned integer type. */
@@ -503,11 +508,6 @@ public:
      * @note
      * There are no guarantees on the order of the components. Use `begin` and
      * `end` if you want to iterate the view in the expected order.
-     *
-     * @warning
-     * Empty components aren't explicitly instantiated. Only one instance of the
-     * given type is created. Therefore, this function always returns a pointer
-     * to that instance.
      *
      * @return A pointer to the array of components.
      */
@@ -612,7 +612,7 @@ public:
      * @param entt A valid entity identifier.
      * @return The component assigned to the entity.
      */
-    raw_type & get(const entity_type entt) const ENTT_NOEXCEPT {
+    decltype(auto) get(const entity_type entt) const ENTT_NOEXCEPT {
         ENTT_ASSERT(contains(entt));
         return pool->get(entt);
     }
@@ -632,12 +632,17 @@ public:
      * void(Component &);
      * @endcode
      *
+     * @note
+     * Empty types aren't explicitly instantiated. Therefore, temporary objects
+     * are returned during iterations. They can be caught only by copy or with
+     * const references.
+     *
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>>) {
+        if constexpr(std::is_invocable_v<Func, decltype(get({}))>) {
             std::for_each(pool->begin(), pool->end(), std::move(func));
         } else {
             std::for_each(pool->sparse_set<Entity>::begin(), pool->sparse_set<Entity>::end(), [&func, raw = pool->begin()](const auto entt) mutable {

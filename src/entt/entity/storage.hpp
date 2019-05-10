@@ -621,19 +621,6 @@ public:
     using iterator_type = iterator;
 
     /**
-     * @brief Direct access to the array of objects.
-     *
-     * @note
-     * Empty types aren't explicitly instantiated. Therefore, this function
-     * always returns a null pointer.
-     *
-     * @return A pointer to the array of objects.
-     */
-    const object_type * raw() const ENTT_NOEXCEPT {
-        return nullptr;
-    }
-
-    /**
      * @brief Returns an iterator to the beginning.
      *
      * The returned iterator points to the first instance of the given type. If
@@ -697,21 +684,6 @@ public:
     object_type get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
         ENTT_ASSERT(underlying_type::has(entt));
         return {};
-    }
-
-    /**
-     * @brief Returns a pointer to the object associated with an entity, if any.
-     *
-     * @note
-     * Empty types aren't explicitly instantiated. Therefore, this function
-     * always returns a null pointer.
-     *
-     * @param entt A valid entity identifier.
-     * @return The object associated with the entity, if any.
-     */
-    const object_type * try_get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
-        ENTT_ASSERT(underlying_type::has(entt));
-        return nullptr;
     }
 };
 

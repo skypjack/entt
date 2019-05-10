@@ -92,7 +92,7 @@ struct basic_actor {
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    Component & assign(Args &&... args) {
+    decltype(auto) assign(Args &&... args) {
         return reg->template assign_or_replace<Component>(entt, std::forward<Args>(args)...);
     }
 

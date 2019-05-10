@@ -398,10 +398,8 @@ TEST(MultipleComponentView, ConstNonConstAndAllInBetween) {
     ASSERT_EQ(view.size(), decltype(view.size()){1});
 
     ASSERT_TRUE((std::is_same_v<decltype(view.get<int>(0)), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(view.get<const int>(0)), const int &>));
     ASSERT_TRUE((std::is_same_v<decltype(view.get<const char>(0)), const char &>));
     ASSERT_TRUE((std::is_same_v<decltype(view.get<int, const char>(0)), std::tuple<int &, const char &>>));
-    ASSERT_TRUE((std::is_same_v<decltype(view.get<const int, const char>(0)), std::tuple<const int &, const char &>>));
     ASSERT_TRUE((std::is_same_v<decltype(view.raw<const char>()), const char *>));
     ASSERT_TRUE((std::is_same_v<decltype(view.raw<int>()), int *>));
 

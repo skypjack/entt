@@ -87,8 +87,6 @@ TEST(Storage, EmptyType) {
 
     ASSERT_TRUE(set.has(42));
     ASSERT_TRUE(set.has(99));
-    ASSERT_EQ(set.try_get(42), nullptr);
-    ASSERT_EQ(std::as_const(set).try_get(42), std::as_const(set).try_get(99));
 
     auto &&component = set.get(42);
 
@@ -312,15 +310,6 @@ TEST(Storage, Raw) {
     ASSERT_EQ(*(set.raw() + 0u), 3);
     ASSERT_EQ(*(std::as_const(set).raw() + 1u), 6);
     ASSERT_EQ(*(set.raw() + 2u), 9);
-}
-
-TEST(Storage, RawEmptyType) {
-    entt::storage<std::uint64_t, empty_type> set;
-
-    set.construct(3);
-
-    ASSERT_EQ(set.raw(), std::as_const(set).raw());
-    ASSERT_EQ(set.try_get(3), set.raw());
 }
 
 TEST(Storage, SortOrdered) {

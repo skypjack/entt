@@ -1002,7 +1002,7 @@ TEST(Registry, CreateManyEntitiesAtOnce) {
 
 TEST(Registry, CreateAnEntityWithComponents) {
     entt::registry registry;
-    const auto &[entity, ivalue, cvalue] = registry.create<int, char>();
+    auto &&[entity, ivalue, cvalue] = registry.create<int, char>();
 
     ASSERT_FALSE(registry.empty<int>());
     ASSERT_FALSE(registry.empty<char>());

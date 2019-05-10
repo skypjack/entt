@@ -164,11 +164,6 @@ public:
      * There are no guarantees on the order of the components. Use `begin` and
      * `end` if you want to iterate the group in the expected order.
      *
-     * @warning
-     * Empty components aren't explicitly instantiated. Only one instance of the
-     * given type is created. Therefore, this function always returns a pointer
-     * to that instance.
-     *
      * @tparam Component Type of component in which one is interested.
      * @return A pointer to the array of components.
      */
@@ -296,14 +291,13 @@ public:
      * @return The components assigned to the entity.
      */
     template<typename... Component>
-    std::conditional_t<sizeof...(Component) == 1, std::tuple_element_t<0, std::tuple<Component &...>>, std::tuple<Component &...>>
-    get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
+    decltype(auto) get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Component) == 1) {
             return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple<Component &...>{get<Component>(entt)...};
+            return std::tuple<decltype(get<Component>(entt))...>{get<Component>(entt)...};
         }
     }
 
@@ -322,13 +316,18 @@ public:
      * void(Get &...);
      * @endcode
      *
+     * @note
+     * Empty types aren't explicitly instantiated. Therefore, temporary objects
+     * are returned during iterations. They can be caught only by copy or with
+     * const references.
+     *
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
     inline void each(Func func) const {
         for(const auto entt: *handler) {
-            if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Get>...>) {
+            if constexpr(std::is_invocable_v<Func, decltype(get<Get>({}))...>) {
                 func(std::get<pool_type<Get> *>(pools)->get(entt)...);
             } else {
                 func(entt, std::get<pool_type<Get> *>(pools)->get(entt)...);
@@ -422,12 +421,28 @@ class basic_group<Entity, get_t<Get...>, Owned...> {
     using component_iterator_type = decltype(std::declval<pool_type<Component>>().begin());
 
     template<typename Component>
-    const Component & from_index(const typename sparse_set<Entity>::size_type index) {
+    decltype(auto) from_index(const typename sparse_set<Entity>::size_type index) {
         if constexpr(std::disjunction_v<std::is_same<Component, Owned>...>) {
-            return std::get<pool_type<Component> *>(pools)->raw()[index];
+            if constexpr(std::is_empty_v<Component>) {
+                return std::get<pool_type<Component> *>(pools).get();
+            } else {
+                return std::as_const(*std::get<pool_type<Component> *>(pools)).raw()[index];
+            }
         } else {
-            return std::get<pool_type<Component> *>(pools)->get(data()[index]);
+            return std::as_const(*std::get<pool_type<Component> *>(pools)).get(data()[index]);
         }
+    }
+
+    template<typename Component>
+    inline auto swap(int, pool_type<Component> *cpool, const std::size_t lhs, const std::size_t rhs)
+    -> decltype(cpool->raw(), void()) {
+        std::swap(cpool->raw()[lhs], cpool->raw()[rhs]);
+        cpool->swap(lhs, rhs);
+    }
+
+    template<typename Component>
+    inline void swap(char, pool_type<Component> *cpool, const std::size_t lhs, const std::size_t rhs) {
+        cpool->swap(lhs, rhs);
     }
 
     // we could use pool_type<Type> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
@@ -494,11 +509,6 @@ public:
      * @note
      * There are no guarantees on the order of the components. Use `begin` and
      * `end` if you want to iterate the group in the expected order.
-     *
-     * @warning
-     * Empty components aren't explicitly instantiated. Only one instance of the
-     * given type is created. Therefore, this function always returns a pointer
-     * to that instance.
      *
      * @tparam Component Type of component in which one is interested.
      * @return A pointer to the array of components.
@@ -630,14 +640,13 @@ public:
      * @return The components assigned to the entity.
      */
     template<typename... Component>
-    std::conditional_t<sizeof...(Component) == 1, std::tuple_element_t<0, std::tuple<Component &...>>, std::tuple<Component &...>>
-    get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
+    decltype(auto) get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Component) == 1) {
             return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple<Component &...>{get<Component>(entt)...};
+            return std::tuple<decltype(get<Component>(entt))...>{get<Component>(entt)...};
         }
     }
 
@@ -656,6 +665,11 @@ public:
      * void(Owned &..., Get &...);
      * @endcode
      *
+     * @note
+     * Empty types aren't explicitly instantiated. Therefore, temporary objects
+     * are returned during iterations. They can be caught only by copy or with
+     * const references.
+     *
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
      */
@@ -665,7 +679,7 @@ public:
         [[maybe_unused]] auto data = std::get<0>(pools)->sparse_set<entity_type>::end() - *length;
 
         for(auto next = *length; next; --next) {
-            if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Owned>..., std::add_lvalue_reference_t<Get>...>) {
+            if constexpr(std::is_invocable_v<Func, decltype(get<Owned>({}))..., decltype(get<Get>({}))...>) {
                 if constexpr(sizeof...(Get) == 0) {
                     func(*(std::get<component_iterator_type<Owned>>(raw)++)...);
                 } else {
@@ -747,8 +761,7 @@ public:
             while(curr != next) {
                 const auto lhs = copy[curr];
                 const auto rhs = copy[next];
-                (std::swap(std::get<pool_type<Owned> *>(pools)->raw()[lhs], std::get<pool_type<Owned> *>(pools)->raw()[rhs]), ...);
-                (std::get<pool_type<Owned> *>(pools)->swap(lhs, rhs), ...);
+                (swap<Owned>(0, std::get<pool_type<Owned> *>(pools), lhs, rhs), ...);
                 copy[curr] = curr;
                 curr = next;
                 next = copy[curr];

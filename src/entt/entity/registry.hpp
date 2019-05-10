@@ -564,8 +564,7 @@ public:
      * just created otherwise.
      */
     template<typename... Component>
-    std::conditional_t<sizeof...(Component) == 0, entity_type, std::tuple<entity_type, Component &...>>
-    create() {
+    decltype(auto) create() {
         entity_type entity;
 
         if(available) {
@@ -584,7 +583,7 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             return entity;
         } else {
-            return { entity, assign<Component>(entity)... };
+            return std::tuple<entity_type, decltype(assign<Component>(entity))...>{entity, assign<Component>(entity)...};
         }
     }
 
@@ -602,8 +601,7 @@ public:
      * sorted the same of the entities otherwise.
      */
     template<typename... Component, typename It>
-    std::conditional_t<sizeof...(Component) == 0, void, std::tuple<Component *...>>
-    create(It first, It last) {
+    auto create(It first, It last) {
         static_assert(std::is_convertible_v<entity_type, typename std::iterator_traits<It>::value_type>);
         const auto length = size_type(std::distance(first, last));
         const auto sz = std::min(available, length);
@@ -630,7 +628,7 @@ public:
         });
 
         if constexpr(sizeof...(Component) > 0) {
-            return { assure<Component>()->batch(*this, first, last)... };
+            return std::make_tuple(assure<Component>()->batch(*this, first, last)...);
         }
     }
 
@@ -783,17 +781,19 @@ public:
         if constexpr(sizeof...(Component) == 1) {
             return (pool<Component>()->get(entity), ...);
         } else {
-            return std::tuple<std::add_const_t<Component> &...>{get<Component>(entity)...};
+            return std::tuple<decltype(get<Component>(entity))...>{get<Component>(entity)...};
         }
     }
 
     /*! @copydoc get */
     template<typename... Component>
     inline decltype(auto) get([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
+        ENTT_ASSERT(valid(entity));
+
         if constexpr(sizeof...(Component) == 1) {
-            return (const_cast<Component &>(std::as_const(*this).template get<Component>(entity)), ...);
+            return (pool<Component>()->get(entity), ...);
         } else {
-            return std::tuple<Component &...>{get<Component>(entity)...};
+            return std::tuple<decltype(get<Component>(entity))...>{get<Component>(entity)...};
         }
     }
 
@@ -825,8 +825,7 @@ public:
     decltype(auto) get_or_assign(const entity_type entity, Args &&... args) ENTT_NOEXCEPT {
         ENTT_ASSERT(valid(entity));
         auto *cpool = assure<Component>();
-        auto *comp = cpool->try_get(entity);
-        return comp ? *comp : cpool->assign(*this, entity, std::forward<Args>(args)...);
+        return cpool->has(entity) ? cpool->get(entity) : cpool->assign(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
