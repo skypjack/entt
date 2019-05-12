@@ -521,10 +521,6 @@ public:
     /**
      * @brief Returns the actual version for an entity identifier.
      *
-     * In case entity identifers are stored around, this function can be used to
-     * know if they are still valid or if the entity has been destroyed and
-     * potentially recycled.
-     *
      * @warning
      * Attempting to use an entity that doesn't belong to the registry results
      * in undefined behavior. An entity belongs to the registry even if it has
@@ -884,6 +880,7 @@ public:
      */
     template<typename Component, typename... Args>
     decltype(auto) replace(const entity_type entity, Args &&... args) {
+        ENTT_ASSERT(valid(entity));
         return pool<Component>()->replace(*this, entity, std::forward<Args>(args)...);
     }
 
@@ -911,6 +908,7 @@ public:
      */
     template<typename Component, typename... Args>
     decltype(auto) assign_or_replace(const entity_type entity, Args &&... args) {
+        ENTT_ASSERT(valid(entity));
         auto *cpool = assure<Component>();
         return cpool->has(entity) ? cpool->replace(*this, entity, std::forward<Args>(args)...) : cpool->assign(*this, entity, std::forward<Args>(args)...);
     }
