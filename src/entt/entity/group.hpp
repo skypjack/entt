@@ -422,12 +422,10 @@ class basic_group<Entity, get_t<Get...>, Owned...> {
 
     template<typename Component>
     decltype(auto) from_index(const typename sparse_set<Entity>::size_type index) {
+        static_assert(!std::is_empty_v<Component>);
+
         if constexpr(std::disjunction_v<std::is_same<Component, Owned>...>) {
-            if constexpr(std::is_empty_v<Component>) {
-                return std::get<pool_type<Component> *>(pools).get();
-            } else {
-                return std::as_const(*std::get<pool_type<Component> *>(pools)).raw()[index];
-            }
+            return std::as_const(*std::get<pool_type<Component> *>(pools)).raw()[index];
         } else {
             return std::as_const(*std::get<pool_type<Component> *>(pools)).get(data()[index]);
         }

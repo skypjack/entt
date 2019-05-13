@@ -91,14 +91,20 @@ class basic_registry {
 
         template<typename It>
         Component * batch(basic_registry &registry, It first, It last) {
-            auto *component = storage<Entity, Component>::batch(first, last);
+            Component *component = nullptr;
 
-            if(!on_construct.empty()) {
-                if constexpr(std::is_empty_v<Component>) {
-                    std::for_each(first, last, [&registry, component = Component{}, this](const auto entt) {
+            if constexpr(std::is_empty_v<Component>) {
+                storage<Entity, Component>::batch(first, last);
+
+                if(!on_construct.empty()) {
+                    std::for_each(first, last, [&registry, component = Component{}, this](const auto entt) mutable {
                         on_construct.publish(registry, entt, component);
                     });
-                } else {
+                }
+            } else {
+                component = storage<Entity, Component>::batch(first, last);
+
+                if(!on_construct.empty()) {
                     std::for_each(first, last, [&registry, component, this](const auto entt) mutable {
                         on_construct.publish(registry, entt, *(component++));
                     });
