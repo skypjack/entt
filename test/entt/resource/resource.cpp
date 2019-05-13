@@ -16,11 +16,21 @@ struct broken_loader: entt::resource_loader<broken_loader, resource> {
     }
 };
 
+struct resource_mutable { int value; };
+
+struct mutable_loader: entt::resource_loader<mutable_loader, resource_mutable> {
+	std::shared_ptr<resource_mutable> load(int value) const {
+		return std::shared_ptr<resource_mutable>(new resource_mutable{ value });
+	}
+};
+
 TEST(Resource, Functionalities) {
     entt::resource_cache<resource> cache;
+	entt::resource_cache<resource_mutable> cache_mutable;
 
     constexpr auto hs1 = entt::hashed_string{"res1"};
     constexpr auto hs2 = entt::hashed_string{"res2"};
+	constexpr auto hs3 = entt::hashed_string{"res_mutable"};
 
     ASSERT_EQ(cache.size(), entt::resource_cache<resource>::size_type{});
     ASSERT_TRUE(cache.empty());
@@ -62,6 +72,13 @@ TEST(Resource, Functionalities) {
 
     ASSERT_TRUE(cache.load<loader>(hs1, 42));
     ASSERT_NO_THROW(cache.clear());
+
+	ASSERT_TRUE(cache_mutable.load<mutable_loader>(hs3, 42));
+	ASSERT_EQ(cache_mutable.handle(hs3)->value, 42);
+	auto handle_mutable = cache_mutable.handle(hs3);
+	handle_mutable->value = 5;
+	ASSERT_EQ(cache_mutable.handle(hs3)->value, 5);
+    ASSERT_NO_THROW(cache_mutable.clear());
 
     ASSERT_EQ(cache.size(), entt::resource_cache<resource>::size_type{});
     ASSERT_TRUE(cache.empty());
