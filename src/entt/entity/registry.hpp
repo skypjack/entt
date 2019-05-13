@@ -232,7 +232,7 @@ class basic_registry {
 
     template<typename Component>
     inline auto swap(int, pool_type<Component> *cpool, const Entity entt, const std::size_t pos)
-    -> decltype(std::swap(cpool->get(entt), cpool->get(cpool->data()[pos])), void()) {
+    -> decltype(std::swap(cpool->get(entt), cpool->raw()[pos]), void()) {
         std::swap(cpool->get(entt), cpool->raw()[pos]);
         cpool->swap(cpool->sparse_set<Entity>::get(entt), pos);
     }
@@ -1366,10 +1366,11 @@ public:
                 {
                     if constexpr(sizeof...(Owned) == 0) {
                         curr->construct(entity);
+                        // suppress warnings
+                        (void)this;
                     } else {
                         const auto pos = curr->owned++;
-                        // useless this-> used to suppress a warning with gcc and clang
-                        (this->swap<Owned>(0, std::get<pool_type<Owned> *>(cpools), entity, pos), ...);
+                        (swap<Owned>(0, std::get<pool_type<Owned> *>(cpools), entity, pos), ...);
                     }
                 }
             });
