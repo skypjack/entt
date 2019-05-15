@@ -936,6 +936,11 @@ public:
      * Listeners are invoked **after** the component has been assigned to the
      * entity. The order of invocation of the listeners isn't guaranteed.
      *
+     * @note
+     * Empty types aren't explicitly instantiated. Therefore, temporary objects
+     * are returned through signals. They can be caught only by copy or with
+     * const references.
+     *
      * @sa sink
      *
      * @tparam Component Type of component of which to get the sink.
@@ -961,6 +966,11 @@ public:
      *
      * Listeners are invoked **before** the component has been replaced. The
      * order of invocation of the listeners isn't guaranteed.
+     *
+     * @note
+     * Empty types aren't explicitly instantiated. Therefore, temporary objects
+     * are returned through signals. They can be caught only by copy or with
+     * const references.
      *
      * @sa sink
      *
@@ -988,6 +998,11 @@ public:
      *
      * Listeners are invoked **before** the component has been removed from the
      * entity. The order of invocation of the listeners isn't guaranteed.
+     *
+     * @note
+     * Empty types aren't explicitly instantiated. Therefore, temporary objects
+     * are returned through signals. They can be caught only by copy or with
+     * const references.
      *
      * @sa sink
      *
