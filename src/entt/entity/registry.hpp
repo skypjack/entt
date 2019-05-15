@@ -64,8 +64,8 @@ class basic_registry {
 
     template<typename Component>
     struct pool_handler: storage<Entity, Component> {
-        sigh<void(basic_registry &, const Entity, Component &)> on_construct;
-        sigh<void(basic_registry &, const Entity, Component &)> on_replace;
+        sigh<void(basic_registry &, const Entity, std::conditional_t<std::is_empty_v<Component>, const Component &, Component &>)> on_construct;
+        sigh<void(basic_registry &, const Entity, std::conditional_t<std::is_empty_v<Component>, const Component &, Component &>)> on_replace;
         sigh<void(basic_registry &, const Entity)> on_destroy;
         void *group{};
 
@@ -78,10 +78,9 @@ class basic_registry {
         template<typename... Args>
         decltype(auto) assign(basic_registry &registry, const Entity entt, Args &&... args) {
             if constexpr(std::is_empty_v<Component>) {
-                Component component{std::forward<Args>(args)...};
                 storage<Entity, Component>::construct(entt);
-                on_construct.publish(registry, entt, component);
-                return std::move(component);
+                on_construct.publish(registry, entt, Component{});
+                return Component{std::forward<Args>(args)...};
             } else {
                 auto &component = storage<Entity, Component>::construct(entt, std::forward<Args>(args)...);
                 on_construct.publish(registry, entt, component);
@@ -120,13 +119,13 @@ class basic_registry {
         }
 
         template<typename... Args>
-        decltype(auto) replace(basic_registry &registry, const Entity entt, [[maybe_unused]] Args &&... args) {
-            Component component{std::forward<Args>(args)...};
-            on_replace.publish(registry, entt, component);
-
+        decltype(auto) replace(basic_registry &registry, const Entity entt, Args &&... args) {
             if constexpr(std::is_empty_v<Component>) {
-                return std::move(component);
+                on_replace.publish(registry, entt, Component{});
+                return Component{std::forward<Args>(args)...};
             } else {
+                Component component{std::forward<Args>(args)...};
+                on_replace.publish(registry, entt, component);
                 return (storage<Entity, Component>::get(entt) = std::move(component));
             }
         }

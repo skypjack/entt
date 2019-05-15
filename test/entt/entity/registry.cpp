@@ -1043,6 +1043,8 @@ TEST(Registry, CreateManyEntitiesAtOnce) {
 TEST(Registry, CreateAnEntityWithComponents) {
     entt::registry registry;
     auto &&[entity, ivalue, cvalue, evalue] = registry.create<int, char, empty_type>();
+    // suppress warnings
+    (void)evalue;
 
     ASSERT_FALSE(registry.empty<int>());
     ASSERT_FALSE(registry.empty<char>());
