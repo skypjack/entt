@@ -1464,14 +1464,19 @@ performance and memory usage. However, this also has consequences that are worth
 mentioning.
 
 When an empty type is detected, it's not instantiated in any case. Therefore,
-only the entities to which it's assigned are made availble. All the iterators as
-well as the `get` member functions of registries, views and groups will return
-temporary objects. Similarly, some functions such as `try_get` or the raw access
-to the list of components aren't available for this kind of types.<br/>
+only the entities to which it's assigned are made available. All the iterators
+as well as the `get` member functions of the registry, the views and the groups
+will return temporary objects. Similarly, some functions such as `try_get` or
+the raw access to the list of components aren't available for this kind of
+types.<br/>
 On the other hand, iterations are faster because only the entities to which the
 type is assigned are considered. Moreover, less memory is used, since there
 doesn't exist any instance of the component, no matter how many entities it is
 assigned to.
+
+For similar reasons, wherever a function type of a listener accepts a component,
+it cannot be caught by a non-const reference. Capture it by copy or by const
+reference instead.
 
 More in general, none of the features offered by the library is affected, but
 for the ones that require to return actual instances.
