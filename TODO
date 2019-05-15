@@ -22,6 +22,7 @@
 * early out in views using bitmasks with bloom filter like access based on modulus
   - standard each, use bitmask to speed up the whole thing and avoid accessing the pools to test for the page
   - iterator based each with a couple of iterators passed from outside (use bitmask + has)
+* stable component handle that isn't affected by reallocations
 * multi component registry::remove and some others?
 * move CONTRIBUTING.md within doc (for GitHub)
 * reactive systems

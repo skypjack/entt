@@ -67,6 +67,7 @@ TEST(Snapshot, Dump) {
     registry.assign<int>(e2, 3);
 
     const auto e3 = registry.create();
+    registry.assign<a_component>(e3);
     registry.assign<char>(e3, '0');
 
     registry.destroy(e1);
@@ -77,6 +78,7 @@ TEST(Snapshot, Dump) {
         std::queue<int>,
         std::queue<char>,
         std::queue<double>,
+        std::queue<a_component>,
         std::queue<another_component>
     >;
 
@@ -87,7 +89,7 @@ TEST(Snapshot, Dump) {
     registry.snapshot()
             .entities(output)
             .destroyed(output)
-            .component<int, char, another_component, double>(output);
+            .component<int, char, double, a_component, another_component>(output);
 
     registry.reset();
 
@@ -99,7 +101,7 @@ TEST(Snapshot, Dump) {
     registry.loader()
             .entities(input)
             .destroyed(input)
-            .component<int, char, another_component, double>(input)
+            .component<int, char, double, a_component, another_component>(input)
             .orphans();
 
     ASSERT_TRUE(registry.valid(e0));
@@ -117,6 +119,7 @@ TEST(Snapshot, Dump) {
     ASSERT_EQ(registry.current(e1), v1);
     ASSERT_EQ(registry.get<int>(e2), 3);
     ASSERT_EQ(registry.get<char>(e3), '0');
+    ASSERT_TRUE(registry.has<a_component>(e3));
 
     ASSERT_TRUE(registry.empty<another_component>());
 }
