@@ -1251,7 +1251,7 @@ public:
      */
     template<typename Type>
     inline bool set(meta_handle handle, std::size_t index, Type &&value) const {
-        assert(index < node->type()->extent);
+        ENTT_ASSERT(index < node->type()->extent);
         return node->set(handle, index, std::forward<Type>(value));
     }
 
@@ -1279,7 +1279,7 @@ public:
      * @return A meta any containing the value of the underlying element.
      */
     inline meta_any get(meta_handle handle, std::size_t index) const ENTT_NOEXCEPT {
-        assert(index < node->type()->extent);
+        ENTT_ASSERT(index < node->type()->extent);
         return node->get(handle, index);
     }
 

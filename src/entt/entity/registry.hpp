@@ -121,7 +121,7 @@ class basic_registry {
         template<typename... Args>
         decltype(auto) replace(basic_registry &registry, const Entity entt, Args &&... args) {
             if constexpr(std::is_empty_v<Component>) {
-                assert((storage<Entity, Component>::has(entt)));
+                ENTT_ASSERT((storage<Entity, Component>::has(entt)));
                 on_replace.publish(registry, entt, Component{});
                 return Component{std::forward<Args>(args)...};
             } else {
