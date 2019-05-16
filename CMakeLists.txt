@@ -16,7 +16,7 @@ endif()
 # Project configuration
 #
 
-project(EnTT VERSION 3.0.0)
+project(EnTT VERSION 3.1.0)
 
 include(GNUInstallDirs)
 
