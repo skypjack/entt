@@ -420,6 +420,12 @@ class basic_group<Entity, get_t<Get...>, Owned...> {
     template<typename Component>
     using component_iterator_type = decltype(std::declval<pool_type<Component>>().begin());
 
+    // we could use pool_type<Type> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
+    basic_group(const typename basic_registry<Entity>::size_type *sz, storage<Entity, std::remove_const_t<Owned>> *... owned, storage<Entity, std::remove_const_t<Get>> *... get) ENTT_NOEXCEPT
+        : length{sz},
+          pools{owned..., get...}
+    {}
+
     template<typename Component>
     decltype(auto) from_index(const typename sparse_set<Entity>::size_type index) {
         static_assert(!std::is_empty_v<Component>);
@@ -432,22 +438,17 @@ class basic_group<Entity, get_t<Get...>, Owned...> {
     }
 
     template<typename Component>
-    inline auto swap(int, pool_type<Component> *cpool, const std::size_t lhs, const std::size_t rhs)
-    -> decltype(cpool->raw(), void()) {
+    inline auto swap(int, const std::size_t lhs, const std::size_t rhs)
+    -> decltype(std::declval<pool_type<Component>>().raw(), void()) {
+        auto *cpool = std::get<pool_type<Component> *>(pools);
         std::swap(cpool->raw()[lhs], cpool->raw()[rhs]);
         cpool->swap(lhs, rhs);
     }
 
     template<typename Component>
-    inline void swap(char, pool_type<Component> *cpool, const std::size_t lhs, const std::size_t rhs) {
-        cpool->swap(lhs, rhs);
+    inline void swap(char, const std::size_t lhs, const std::size_t rhs) {
+        std::get<pool_type<Component> *>(pools)->swap(lhs, rhs);
     }
-
-    // we could use pool_type<Type> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    basic_group(const typename basic_registry<Entity>::size_type *sz, storage<Entity, std::remove_const_t<Owned>> *... owned, storage<Entity, std::remove_const_t<Get>> *... get) ENTT_NOEXCEPT
-        : length{sz},
-          pools{owned..., get...}
-    {}
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -759,7 +760,7 @@ public:
             while(curr != next) {
                 const auto lhs = copy[curr];
                 const auto rhs = copy[next];
-                (swap<Owned>(0, std::get<pool_type<Owned> *>(pools), lhs, rhs), ...);
+                (swap<Owned>(0, lhs, rhs), ...);
                 copy[curr] = curr;
                 curr = next;
                 next = copy[curr];
