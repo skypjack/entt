@@ -1,3 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classentt_1_1ResourceHandle.html" title="Shared resource handle. " alt="" coords="5,5,155,47"/>
+<area shape="rect" id="node1" href="$classentt_1_1sparse__set.html" title="Basic sparse set implementation. " alt="" coords="5,111,180,138"/>
+<area shape="rect" id="node2" href="$classentt_1_1basic__storage.html" title="entt::basic_storage\l\&lt; Entity, Component \&gt;" alt="" coords="242,5,397,47"/>
+<area shape="rect" id="node4" href="$classentt_1_1basic__storage.html" title="entt::basic_storage\l\&lt; Entity, Type \&gt;" alt="" coords="253,71,386,112"/>
+<area shape="rect" id="node5" href="$classentt_1_1basic__storage.html" title="Basic storage implementation. " alt="" coords="228,136,411,177"/>
+<area shape="rect" id="node7" href="$classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01std_1_1is__empty__v_3_01Type_01_4_01_4_01_4.html" title="Basic storage implementation. " alt="" coords="241,201,397,272"/>
+<area shape="rect" id="node3" href="$structentt_1_1storage.html" title="entt::storage\&lt; Entity,\l Component \&gt;" alt="" coords="459,5,604,47"/>
+<area shape="rect" id="node6" href="$structentt_1_1storage.html" title="Basic storage implementation. " alt="" coords="459,136,604,177"/>
 </map>

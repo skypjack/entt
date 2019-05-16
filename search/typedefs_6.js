@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['label',['label',['../namespaceentt.html#a8512c4b75207424bd97724a17cd1eeb0',1,'entt']]],
-  ['listener',['Listener',['../classentt_1_1Emitter.html#a1a5bb5d6a7626aec285cc73bfc1e80ef',1,'entt::Emitter']]]
+  ['hash_5ftype',['hash_type',['../classentt_1_1hashed__string.html#a71cb1793c1193bd6c89c42a00179793f',1,'entt::hashed_string']]]
 ];

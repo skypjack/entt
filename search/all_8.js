@@ -1,8 +1,27 @@
 var searchData=
 [
-  ['identifier',['Identifier',['../classentt_1_1Identifier.html',1,'entt']]],
-  ['identifier_5ftype',['identifier_type',['../classentt_1_1Identifier.html#a80c4fd9773928949e788790fac671169',1,'entt::Identifier']]],
-  ['insertionsort',['InsertionSort',['../structentt_1_1InsertionSort.html',1,'entt']]],
-  ['instance_5ftype',['instance_type',['../classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aad306ac41adf5562740f5528bed80014',1,'entt::SigH&lt; Ret(Args...), Collector &gt;']]],
-  ['iterator_5ftype',['iterator_type',['../classentt_1_1SparseSet_3_01Entity_01_4.html#a1ad77aed1e49af60b61044c996969b9a',1,'entt::SparseSet&lt; Entity &gt;::iterator_type()'],['../classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#a7ff4726f5e0ae6698cb8e3f039289b52',1,'entt::SparseSet&lt; Entity, Type &gt;::iterator_type()'],['../classentt_1_1PersistentView.html#ae563ed31a62fd9f33f93767f0ecdfff5',1,'entt::PersistentView::iterator_type()'],['../classentt_1_1View.html#a738fb04a466b1f858a1eb5d7bc8fd668',1,'entt::View::iterator_type()'],['../classentt_1_1View_3_01Entity_00_01Component_01_4.html#a791a1288db896fda8e77acad396aa513',1,'entt::View&lt; Entity, Component &gt;::iterator_type()'],['../classentt_1_1RawView.html#ab34740dea79327742888e84ba5c14328',1,'entt::RawView::iterator_type()'],['../classentt_1_1RuntimeView.html#a59c6645fb86e079986d04887aa7c74e1',1,'entt::RuntimeView::iterator_type()']]]
+  ['identifier',['identifier',['../classentt_1_1identifier.html',1,'entt']]],
+  ['identifier_5ftype',['identifier_type',['../classentt_1_1identifier.html#ae35c46f5811183291dd25294e7d82f92',1,'entt::identifier']]],
+  ['insertion_5fsort',['insertion_sort',['../structentt_1_1insertion__sort.html',1,'entt']]],
+  ['instance',['instance',['../classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a3e0495b7612d458cbc59dc4b657d586f',1,'entt::delegate&lt; Ret(Args...)&gt;']]],
+  ['instance_5ftype',['instance_type',['../structentt_1_1sigh_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#adfd38e6a8d026f9418d60c207edcd295',1,'entt::sigh&lt; Ret(Args...), Collector &gt;']]],
+  ['invoke',['invoke',['../classentt_1_1meta__ctor.html#a2402980d8233e20480e0732df86f4d11',1,'entt::meta_ctor::invoke()'],['../classentt_1_1meta__dtor.html#a0b61f83fcfee615d8a27d9ff31c3deed',1,'entt::meta_dtor::invoke()'],['../classentt_1_1meta__func.html#a6145a3e14b99154a5caec4ad66a85c88',1,'entt::meta_func::invoke()']]],
+  ['is_5farray',['is_array',['../classentt_1_1meta__type.html#a708c42df22be9647eca05a8c9701a7b2',1,'entt::meta_type']]],
+  ['is_5fclass',['is_class',['../classentt_1_1meta__type.html#a9d1e5e6cd4c097143a3055b8e56a8641',1,'entt::meta_type']]],
+  ['is_5fconst',['is_const',['../classentt_1_1meta__data.html#a04acd97d1fe059a1dd3daaf508e10558',1,'entt::meta_data::is_const()'],['../classentt_1_1meta__func.html#a93c1f9ba3252788f9ac470f6ad6e3fb9',1,'entt::meta_func::is_const()']]],
+  ['is_5fenum',['is_enum',['../classentt_1_1meta__type.html#ab2d4f56d08063128d0b4bc5cb4b1b0c9',1,'entt::meta_type']]],
+  ['is_5ffloating_5fpoint',['is_floating_point',['../classentt_1_1meta__type.html#acb95ab1d8952b3595b0d820cee1aa79d',1,'entt::meta_type']]],
+  ['is_5ffunction',['is_function',['../classentt_1_1meta__type.html#a34f470bbee1fbc3a640d156c0e37c553',1,'entt::meta_type']]],
+  ['is_5fintegral',['is_integral',['../classentt_1_1meta__type.html#a222c4b6ae628f9ed6f90cd3573f788c8',1,'entt::meta_type']]],
+  ['is_5fmember_5ffunction_5fpointer',['is_member_function_pointer',['../classentt_1_1meta__type.html#a184083298b97b476f02509fd5379bdbb',1,'entt::meta_type']]],
+  ['is_5fmember_5fobject_5fpointer',['is_member_object_pointer',['../classentt_1_1meta__type.html#a486ce6d737b37675403f3e719a2a51a2',1,'entt::meta_type']]],
+  ['is_5fnamed_5ftype',['is_named_type',['../structentt_1_1is__named__type.html',1,'entt']]],
+  ['is_5fnamed_5ftype_3c_20type_2c_20std_3a_3avoid_5ft_3c_20named_5ftype_5ftraits_5ft_3c_20std_3a_3adecay_5ft_3c_20type_20_3e_20_3e_20_3e_20_3e',['is_named_type&lt; Type, std::void_t&lt; named_type_traits_t&lt; std::decay_t&lt; Type &gt; &gt; &gt; &gt;',['../structentt_1_1is__named__type_3_01Type_00_01std_1_1void__t_3_01named__type__traits__t_3_01std_1_268fa5a871b2de95e24d77c0786df19e.html',1,'entt']]],
+  ['is_5fnamed_5ftype_5fv',['is_named_type_v',['../namespaceentt.html#ab127297f5449d5c90bcef166a12c4358',1,'entt']]],
+  ['is_5fpointer',['is_pointer',['../classentt_1_1meta__type.html#a8eec2742984f892febcbc48a6192bdfd',1,'entt::meta_type']]],
+  ['is_5fstatic',['is_static',['../classentt_1_1meta__data.html#a94ae645e41c37e0da30a0353d391b9ad',1,'entt::meta_data::is_static()'],['../classentt_1_1meta__func.html#a8faf171039dc72ea51d94acc2c2ea249',1,'entt::meta_func::is_static()']]],
+  ['is_5funion',['is_union',['../classentt_1_1meta__type.html#ad3503617450b2814e53362206bb6fecd',1,'entt::meta_type']]],
+  ['is_5fvoid',['is_void',['../classentt_1_1meta__type.html#a4a8aea6060bd82daf287bb6c63c1955a',1,'entt::meta_type']]],
+  ['iterator_5ftype',['iterator_type',['../classentt_1_1basic__group_3_01Entity_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#aad8c6789036e02b7c4f2823255e7f16e',1,'entt::basic_group&lt; Entity, get_t&lt; Get... &gt; &gt;::iterator_type()'],['../classentt_1_1basic__group_3_01Entity_00_01get__t_3_01Get_8_8_8_01_4_00_01Owned_8_8_8_01_4.html#aafbded588937b50f5ce4ee6d79a559e6',1,'entt::basic_group&lt; Entity, get_t&lt; Get... &gt;, Owned... &gt;::iterator_type()'],['../classentt_1_1basic__runtime__view.html#afbaa87a1aa3eacd54ec3a5462faa10da',1,'entt::basic_runtime_view::iterator_type()'],['../classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469',1,'entt::sparse_set::iterator_type()'],['../classentt_1_1basic__storage.html#a9a1c32a0adebc8c3dc279064742c858f',1,'entt::basic_storage::iterator_type()'],['../classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01std_1_1is__empty__v_3_01Type_01_4_01_4_01_4.html#a2136db82a122b336298bd909c07c629b',1,'entt::basic_storage&lt; Entity, Type, std::enable_if_t&lt; std::is_empty_v&lt; Type &gt; &gt; &gt;::iterator_type()'],['../classentt_1_1basic__view.html#adad369b0a841ef254549668348fed0c5',1,'entt::basic_view::iterator_type()'],['../classentt_1_1basic__view_3_01Entity_00_01Component_01_4.html#a11420baf6cdbf1a97f3861784bd5fac2',1,'entt::basic_view&lt; Entity, Component &gt;::iterator_type()']]],
+  ['meta_5fnode',['meta_node',['../classentt_1_1meta__type.html#a98457ea639e19ea648d32776ac80cd44',1,'entt::meta_type']]]
 ];

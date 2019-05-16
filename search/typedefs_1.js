@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['defaultactor',['DefaultActor',['../namespaceentt.html#a0790fdd772249d8b22f1cf2d5e2403d4',1,'entt']]],
-  ['defaultprototype',['DefaultPrototype',['../namespaceentt.html#a94d8a4552b7bd5a3543c2ffc6eaf878c',1,'entt']]],
-  ['defaultregistry',['DefaultRegistry',['../namespaceentt.html#aa56ef01a9c62f21d68dd60f005296b23',1,'entt']]],
-  ['delta_5ftype',['delta_type',['../classentt_1_1Process.html#aaa304f69a0344fffd3a53daa922284ad',1,'entt::Process']]],
-  ['difference_5ftype',['difference_type',['../structentt_1_1entt__traits_3_01std_1_1uint16__t_01_4.html#ac16a602de26d43d316b497cb11b7c6b2',1,'entt::entt_traits&lt; std::uint16_t &gt;::difference_type()'],['../structentt_1_1entt__traits_3_01std_1_1uint32__t_01_4.html#a9809b457e16f4a071a91530b23c930d6',1,'entt::entt_traits&lt; std::uint32_t &gt;::difference_type()'],['../structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#afba2f77f80b0bf89a208f6876ab67271',1,'entt::entt_traits&lt; std::uint64_t &gt;::difference_type()']]]
+  ['collector_5ftype',['collector_type',['../structentt_1_1sigh_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aa1ed972f1fffb437a3b3c115fabe0532',1,'entt::sigh&lt; Ret(Args...), Collector &gt;']]],
+  ['component_5ftype',['component_type',['../classentt_1_1basic__registry.html#ace85f74fac787b967100f4186860f226',1,'entt::basic_registry']]],
+  ['const_5fiterator_5ftype',['const_iterator_type',['../classentt_1_1basic__storage.html#aaa02d4db8defee92683bbc47b3eaa869',1,'entt::basic_storage']]],
+  ['continuous_5floader',['continuous_loader',['../namespaceentt.html#a37b5b489846f6f2a5d143db2b4aea5d0',1,'entt']]]
 ];

@@ -1,10 +1,6 @@
 var searchData=
 [
-  ['raw_5ft',['raw_t',['../structentt_1_1raw__t.html',1,'entt']]],
-  ['rawview',['RawView',['../classentt_1_1RawView.html',1,'entt']]],
-  ['registry',['Registry',['../classentt_1_1Registry.html',1,'entt']]],
-  ['resourcecache',['ResourceCache',['../classentt_1_1ResourceCache.html',1,'entt']]],
-  ['resourcehandle',['ResourceHandle',['../classentt_1_1ResourceHandle.html',1,'entt']]],
-  ['resourceloader',['ResourceLoader',['../classentt_1_1ResourceLoader.html',1,'entt']]],
-  ['runtimeview',['RuntimeView',['../classentt_1_1RuntimeView.html',1,'entt']]]
+  ['named_5ftype_5ftraits',['named_type_traits',['../structentt_1_1named__type__traits.html',1,'entt']]],
+  ['named_5ftype_5ftraits_3c_20const_20type_20_3e',['named_type_traits&lt; const Type &gt;',['../structentt_1_1named__type__traits_3_01const_01Type_01_4.html',1,'entt']]],
+  ['named_5ftype_5ftraits_3c_20type_20_3e',['named_type_traits&lt; Type &gt;',['../structentt_1_1named__type__traits.html',1,'entt']]]
 ];

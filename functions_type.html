@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">2.7.3</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -63,25 +63,20 @@ $(function() {
 
 <h3><a id="index_c"></a>- c -</h3><ul>
 <li>collector_type
-: <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#ad0e4e34e41daec83437b1c607855079a">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+: <a class="el" href="structentt_1_1sigh_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aa1ed972f1fffb437a3b3c115fabe0532">entt::sigh&lt; Ret(Args...), Collector &gt;</a>
 </li>
 <li>component_type
-: <a class="el" href="classentt_1_1Registry.html#aefd07a0cdff88ebf1e35e531d58c3077">entt::Registry&lt; Entity &gt;</a>
+: <a class="el" href="classentt_1_1basic__registry.html#ace85f74fac787b967100f4186860f226">entt::basic_registry&lt; Entity &gt;</a>
 </li>
 <li>const_iterator_type
-: <a class="el" href="classentt_1_1PersistentView.html#a260bd2740fb90caf984ce62c26bb887b">entt::PersistentView&lt; Entity, Component &gt;</a>
-, <a class="el" href="classentt_1_1RawView.html#a5fa9cd28fb18ccfe01fd0eb3ea6e3dc7">entt::RawView&lt; Entity, Component &gt;</a>
-, <a class="el" href="classentt_1_1RuntimeView.html#acf976983924a5e0194a19a9b98fdc249">entt::RuntimeView&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#aba42055f0c8a43cae63d443a17f6a5e2">entt::SparseSet&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#a947d3fd0440167f469331a31b1d8d782">entt::SparseSet&lt; Entity, Type &gt;</a>
-, <a class="el" href="classentt_1_1View.html#a81b76e0389ffeb60195a3391c4c5ce3a">entt::View&lt; Entity, Component &gt;</a>
+: <a class="el" href="classentt_1_1basic__storage.html#aaa02d4db8defee92683bbc47b3eaa869">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_d"></a>- d -</h3><ul>
 <li>delta_type
-: <a class="el" href="classentt_1_1Process.html#aaa304f69a0344fffd3a53daa922284ad">entt::Process&lt; Derived, Delta &gt;</a>
+: <a class="el" href="classentt_1_1process.html#a625b574ea6d83e3a4933acc3d0279295">entt::process&lt; Derived, Delta &gt;</a>
 </li>
 <li>difference_type
 : <a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint16__t_01_4.html#ac16a602de26d43d316b497cb11b7c6b2">entt::entt_traits&lt; std::uint16_t &gt;</a>
@@ -93,125 +88,135 @@ $(function() {
 
 <h3><a id="index_e"></a>- e -</h3><ul>
 <li>entity_type
-: <a class="el" href="structentt_1_1Actor.html#a809cbe96d54fe86b470246a34e873a4e">entt::Actor&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1Attachee_3_01Entity_01_4.html#ab29a9628056147ed6eec373a1d0e6b32">entt::Attachee&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1Attachee_3_01Entity_00_01Type_01_4.html#ae2bc6eb2a7828941bab842f3dd4d4247">entt::Attachee&lt; Entity, Type &gt;</a>
-, <a class="el" href="classentt_1_1ContinuousLoader.html#ae2ddecfaeb16ddbf340b6ca643036c6f">entt::ContinuousLoader&lt; Entity &gt;</a>
+: <a class="el" href="structentt_1_1basic__actor.html#a2c2e10f12014f5269be0b9ab055acfca">entt::basic_actor&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__continuous__loader.html#a90a0d33147978cb3c142408487428277">entt::basic_continuous_loader&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#a6e655df47eca24e9f0885f1114eac566">entt::basic_group&lt; Entity, get_t&lt; Get... &gt; &gt;</a>
+, <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01get__t_3_01Get_8_8_8_01_4_00_01Owned_8_8_8_01_4.html#a364afe2787baf1f17fe4a8af294356b2">entt::basic_group&lt; Entity, get_t&lt; Get... &gt;, Owned... &gt;</a>
+, <a class="el" href="classentt_1_1basic__prototype.html#a0a8606dc36496d42f6188acdad4906f3">entt::basic_prototype&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__registry.html#a86f7d4defe404257da3be0e94cc3b6fd">entt::basic_registry&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__runtime__view.html#a8347b5b209e9dd8962c7b98c3314bae6">entt::basic_runtime_view&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage.html#ab2520abd2591d114866414f275cbdaa7">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01std_1_1is__empty__v_3_01Type_01_4_01_4_01_4.html#adcf45b53722e877c6c8b92e87ecc7824">entt::basic_storage&lt; Entity, Type, std::enable_if_t&lt; std::is_empty_v&lt; Type &gt; &gt; &gt;</a>
+, <a class="el" href="classentt_1_1basic__view.html#a4d733f92580b2623300174292e47c7cf">entt::basic_view&lt; Entity, Component &gt;</a>
 , <a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint16__t_01_4.html#a86e202c8932f341626b29c194bd47489">entt::entt_traits&lt; std::uint16_t &gt;</a>
 , <a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint32__t_01_4.html#aecde3ac9bfc28e7f0f880a74ee2c5d8f">entt::entt_traits&lt; std::uint32_t &gt;</a>
 , <a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#a304eb4dc4a1487cf2966d902214f7185">entt::entt_traits&lt; std::uint64_t &gt;</a>
-, <a class="el" href="classentt_1_1PersistentView.html#a5195c9d1dede0fe6c40bea576398022b">entt::PersistentView&lt; Entity, Component &gt;</a>
-, <a class="el" href="classentt_1_1Prototype.html#ab4542df6834170b6f0d96828d094269d">entt::Prototype&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1RawView.html#a544ee87b4a856cfa5c49ea4581c85a35">entt::RawView&lt; Entity, Component &gt;</a>
-, <a class="el" href="classentt_1_1Registry.html#ad434a1920dd2c6a9a31ab482e2f29038">entt::Registry&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1RuntimeView.html#ad5b5d664d388179dc164814e6268a774">entt::RuntimeView&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a7d36e852257a965a9a0ed3fb636433e2">entt::SparseSet&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#afe382e2d5c8769fb3d924e1a357cf9b0">entt::SparseSet&lt; Entity, Type &gt;</a>
-, <a class="el" href="classentt_1_1View.html#a61be0e712de89d1eb275e14bbc59174e">entt::View&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entt::sparse_set&lt; Entity &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_f"></a>- f -</h3><ul>
 <li>family_type
-: <a class="el" href="classentt_1_1Family.html#a263330fe09b437d3d91b8769f6a9fc77">entt::Family&lt;... &gt;</a>
+: <a class="el" href="classentt_1_1family.html#a86a662c9342935bcf145b70bf36191cb">entt::family&lt;... &gt;</a>
+</li>
+<li>function_type
+: <a class="el" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a235927a00f56e4b56dbfdc4e6cf5ddb4">entt::delegate&lt; Ret(Args...)&gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_h"></a>- h -</h3><ul>
 <li>hash_type
-: <a class="el" href="classentt_1_1HashedString.html#af511100177b5e0213bf5b0efb3f4f528">entt::HashedString</a>
+: <a class="el" href="classentt_1_1hashed__string.html#a71cb1793c1193bd6c89c42a00179793f">entt::hashed_string</a>
 </li>
 </ul>
 
 
 <h3><a id="index_i"></a>- i -</h3><ul>
 <li>identifier_type
-: <a class="el" href="classentt_1_1Identifier.html#a80c4fd9773928949e788790fac671169">entt::Identifier&lt; Types &gt;</a>
+: <a class="el" href="classentt_1_1identifier.html#ae35c46f5811183291dd25294e7d82f92">entt::identifier&lt; Types &gt;</a>
 </li>
 <li>instance_type
-: <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#aad306ac41adf5562740f5528bed80014">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+: <a class="el" href="structentt_1_1sigh_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#adfd38e6a8d026f9418d60c207edcd295">entt::sigh&lt; Ret(Args...), Collector &gt;</a>
 </li>
 <li>iterator_type
-: <a class="el" href="classentt_1_1PersistentView.html#ae563ed31a62fd9f33f93767f0ecdfff5">entt::PersistentView&lt; Entity, Component &gt;</a>
-, <a class="el" href="classentt_1_1RawView.html#ab34740dea79327742888e84ba5c14328">entt::RawView&lt; Entity, Component &gt;</a>
-, <a class="el" href="classentt_1_1RuntimeView.html#a59c6645fb86e079986d04887aa7c74e1">entt::RuntimeView&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#a1ad77aed1e49af60b61044c996969b9a">entt::SparseSet&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#a7ff4726f5e0ae6698cb8e3f039289b52">entt::SparseSet&lt; Entity, Type &gt;</a>
-, <a class="el" href="classentt_1_1View.html#a738fb04a466b1f858a1eb5d7bc8fd668">entt::View&lt; Entity, Component &gt;</a>
+: <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#aad8c6789036e02b7c4f2823255e7f16e">entt::basic_group&lt; Entity, get_t&lt; Get... &gt; &gt;</a>
+, <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01get__t_3_01Get_8_8_8_01_4_00_01Owned_8_8_8_01_4.html#aafbded588937b50f5ce4ee6d79a559e6">entt::basic_group&lt; Entity, get_t&lt; Get... &gt;, Owned... &gt;</a>
+, <a class="el" href="classentt_1_1basic__runtime__view.html#afbaa87a1aa3eacd54ec3a5462faa10da">entt::basic_runtime_view&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage.html#a9a1c32a0adebc8c3dc279064742c858f">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01std_1_1is__empty__v_3_01Type_01_4_01_4_01_4.html#a2136db82a122b336298bd909c07c629b">entt::basic_storage&lt; Entity, Type, std::enable_if_t&lt; std::is_empty_v&lt; Type &gt; &gt; &gt;</a>
+, <a class="el" href="classentt_1_1basic__view.html#adad369b0a841ef254549668348fed0c5">entt::basic_view&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">entt::sparse_set&lt; Entity &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_l"></a>- l -</h3><ul>
-<li>Listener
-: <a class="el" href="classentt_1_1Emitter.html#a1a5bb5d6a7626aec285cc73bfc1e80ef">entt::Emitter&lt; Derived &gt;</a>
+<li>listener
+: <a class="el" href="classentt_1_1emitter.html#a460311b6b4adfabe69b9d964c8d0b579">entt::emitter&lt; Derived &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_o"></a>- o -</h3><ul>
 <li>object_type
-: <a class="el" href="classentt_1_1Attachee_3_01Entity_00_01Type_01_4.html#a081468359310ab5cf3807d044ba4a8d6">entt::Attachee&lt; Entity, Type &gt;</a>
-, <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#af7db79dfb4e031a63fa526d4f7d54915">entt::SparseSet&lt; Entity, Type &gt;</a>
+: <a class="el" href="classentt_1_1basic__storage.html#aa4e4358d25212b71d9629e470b845c53">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01std_1_1is__empty__v_3_01Type_01_4_01_4_01_4.html#af67063212a566afa51deede112b70d2a">entt::basic_storage&lt; Entity, Type, std::enable_if_t&lt; std::is_empty_v&lt; Type &gt; &gt; &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_r"></a>- r -</h3><ul>
 <li>raw_type
-: <a class="el" href="classentt_1_1RawView.html#a6a6e2cd0387a63e153a18bd60a1283a3">entt::RawView&lt; Entity, Component &gt;</a>
-, <a class="el" href="classentt_1_1View_3_01Entity_00_01Component_01_4.html#a8bdfb1fbdd4340131be9c70bf02671b5">entt::View&lt; Entity, Component &gt;</a>
+: <a class="el" href="classentt_1_1basic__view_3_01Entity_00_01Component_01_4.html#a07488b51f1575b2e5740f3d5f21e0524">entt::basic_view&lt; Entity, Component &gt;</a>
 </li>
 <li>registry_type
-: <a class="el" href="structentt_1_1Actor.html#a59ce601affb52396d2cacdc3ffd14928">entt::Actor&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1Prototype.html#a8e4a91009c1cbb0bfaadf4e95178eaec">entt::Prototype&lt; Entity &gt;</a>
+: <a class="el" href="structentt_1_1as__group.html#a7ede36514bf64187bc93d3d295fe0123">entt::as_group&lt; Const, Entity &gt;</a>
+, <a class="el" href="structentt_1_1as__view.html#a458942b049c7ef96d45600337d57a70b">entt::as_view&lt; Const, Entity &gt;</a>
+, <a class="el" href="structentt_1_1basic__actor.html#a4577b087e2fe3e76dbd4516ae9064c6a">entt::basic_actor&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__prototype.html#aa7b03fff67dee5898849c971bc341962">entt::basic_prototype&lt; Entity &gt;</a>
 </li>
 <li>resource_type
-: <a class="el" href="classentt_1_1ResourceCache.html#a4936da93a62827d8c5fc04ac444e5456">entt::ResourceCache&lt; Resource &gt;</a>
+: <a class="el" href="classentt_1_1resource__cache.html#a178e741d1df5b41b0d27f814b6d061a7">entt::resource_cache&lt; Resource &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_s"></a>- s -</h3><ul>
 <li>service_type
-: <a class="el" href="structentt_1_1ServiceLocator.html#a0631b136adf579365fb444bc5e8f1416">entt::ServiceLocator&lt; Service &gt;</a>
+: <a class="el" href="structentt_1_1service__locator.html#af34a883e56f32a98d7b8a5db87bdf504">entt::service_locator&lt; Service &gt;</a>
 </li>
 <li>sink_type
-: <a class="el" href="classentt_1_1Dispatcher.html#a3b34b8591cdd82022dba3c542054fe68">entt::Dispatcher</a>
-, <a class="el" href="classentt_1_1Registry.html#ada8da3c42b6f37209255eef008581b0b">entt::Registry&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#afe3b68f9dc0a2bfe92081c256d0108b7">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
+: <a class="el" href="classentt_1_1dispatcher.html#a9ab3b084146a292b2dd2411cea452273">entt::dispatcher</a>
+, <a class="el" href="structentt_1_1sigh_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#adcfc3a58cb6421c41637461e9ac97812">entt::sigh&lt; Ret(Args...), Collector &gt;</a>
 </li>
 <li>size_type
-: <a class="el" href="classentt_1_1PersistentView.html#ac2e81caacece38b84f46c4430cd8cf4e">entt::PersistentView&lt; Entity, Component &gt;</a>
-, <a class="el" href="classentt_1_1Prototype.html#a2a593566474356ad2a03fea9b122de93">entt::Prototype&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1RawView.html#afc530c9c64688b522ac643fdb5a0bb6e">entt::RawView&lt; Entity, Component &gt;</a>
-, <a class="el" href="classentt_1_1Registry.html#a741ffda6e06838c5593ba97adc7658e2">entt::Registry&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1ResourceCache.html#a439daf6009e24ae40b1d7689c60ead48">entt::ResourceCache&lt; Resource &gt;</a>
-, <a class="el" href="classentt_1_1RuntimeView.html#a64ed96d1933ffff0e76f96a0cb38428e">entt::RuntimeView&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1Scheduler.html#a2d76dbf324cf960ac8f2fc6d87d40eba">entt::Scheduler&lt; Delta &gt;</a>
-, <a class="el" href="classentt_1_1SigH_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#a7635c4c773fee73faf6eddda2d4abb87">entt::SigH&lt; Ret(Args...), Collector &gt;</a>
-, <a class="el" href="classentt_1_1SparseSet_3_01Entity_01_4.html#ab81c48dcee7a1104ee82794613ee7ed2">entt::SparseSet&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1SparseSet_3_01Entity_00_01Type_01_4.html#a27a88e2bb0822de41131741d9ffcded5">entt::SparseSet&lt; Entity, Type &gt;</a>
-, <a class="el" href="classentt_1_1View.html#ab3f86ec55935bbbb00077bbe07f15c4b">entt::View&lt; Entity, Component &gt;</a>
+: <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#aeeca37a280faff7a53129a9b712ee523">entt::basic_group&lt; Entity, get_t&lt; Get... &gt; &gt;</a>
+, <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01get__t_3_01Get_8_8_8_01_4_00_01Owned_8_8_8_01_4.html#a515301bf580587caac4bdfdf8d178623">entt::basic_group&lt; Entity, get_t&lt; Get... &gt;, Owned... &gt;</a>
+, <a class="el" href="classentt_1_1basic__prototype.html#a01d3afe0260e80974f24c1d36b5fbccc">entt::basic_prototype&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__registry.html#a19addadd1c414778261e7c1ed67eee76">entt::basic_registry&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__runtime__view.html#af8fef2e30d39eaa7ce736539a55c2a1a">entt::basic_runtime_view&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage.html#ab820e508dfbc4442bc9a114cf49efde7">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01std_1_1is__empty__v_3_01Type_01_4_01_4_01_4.html#a9c0a52b283bc9b0ac2b7bf72cc76f996">entt::basic_storage&lt; Entity, Type, std::enable_if_t&lt; std::is_empty_v&lt; Type &gt; &gt; &gt;</a>
+, <a class="el" href="classentt_1_1basic__view.html#a8f3ec253d7fc6da42e9eb0e5c8f6a655">entt::basic_view&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1meta__ctor.html#a7a267e333222dab22e7a965137538f18">entt::meta_ctor</a>
+, <a class="el" href="classentt_1_1meta__func.html#a422ec572c7c56d3cb46d09704be64f65">entt::meta_func</a>
+, <a class="el" href="classentt_1_1meta__type.html#a7362687fc89444507cded22f57be3ff0">entt::meta_type</a>
+, <a class="el" href="classentt_1_1resource__cache.html#abfb6bd59f656ca6139602bbc7bb4c24a">entt::resource_cache&lt; Resource &gt;</a>
+, <a class="el" href="classentt_1_1scheduler.html#a7b08d5871918b39049c29e4daa62271f">entt::scheduler&lt; Delta &gt;</a>
+, <a class="el" href="structentt_1_1sigh_3_01Ret_07Args_8_8_8_08_00_01Collector_01_4.html#accb002f3088f2a3b5b5ff1fdd24fd353">entt::sigh&lt; Ret(Args...), Collector &gt;</a>
+, <a class="el" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">entt::sparse_set&lt; Entity &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_t"></a>- t -</h3><ul>
-<li>tag_type
-: <a class="el" href="classentt_1_1Registry.html#a357cfdc1b3c5abc7a36e8eddbd6ce5c7">entt::Registry&lt; Entity &gt;</a>
+<li>type
+: <a class="el" href="structentt_1_1type__list__cat_3_01type__list_3_01Type_8_8_8_01_4_01_4.html#a0c40287fad9d80f0532d80bf48f219ed">entt::type_list_cat&lt; type_list&lt; Type... &gt; &gt;</a>
+, <a class="el" href="structentt_1_1type__list__cat_3_01type__list_3_01Type_8_8_8_01_4_00_01type__list_3_01Other_8_8_8_01_4_00_01List_8_8_8_01_4.html#ae17db475954ad06eba24fd1eedba5f8b">entt::type_list_cat&lt; type_list&lt; Type... &gt;, type_list&lt; Other... &gt;, List... &gt;</a>
+, <a class="el" href="structentt_1_1type__list__unique_3_01type__list_3_01Type_00_01Other_8_8_8_01_4_01_4.html#a378823486aa4e4f288b1d73b2703c485">entt::type_list_unique&lt; type_list&lt; Type, Other... &gt; &gt;</a>
+, <a class="el" href="structentt_1_1type__list__unique_3_01type__list_3_4_01_4.html#a48245981f9818ca2601b9815cbfa5b79">entt::type_list_unique&lt; type_list&lt;&gt; &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_v"></a>- v -</h3><ul>
 <li>version_type
-: <a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint16__t_01_4.html#ab37d10c3be3d59159a63c0bd1e9e2924">entt::entt_traits&lt; std::uint16_t &gt;</a>
+: <a class="el" href="classentt_1_1basic__registry.html#aae2197c81e29459bbe3fa7984656a2b6">entt::basic_registry&lt; Entity &gt;</a>
+, <a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint16__t_01_4.html#ab37d10c3be3d59159a63c0bd1e9e2924">entt::entt_traits&lt; std::uint16_t &gt;</a>
 , <a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint32__t_01_4.html#aee59dc7455ea0be015e699c3e46a22d1">entt::entt_traits&lt; std::uint32_t &gt;</a>
 , <a class="el" href="structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#aeac4d9172940a9dec0682860ac176725">entt::entt_traits&lt; std::uint64_t &gt;</a>
-, <a class="el" href="classentt_1_1Registry.html#a82c8996277034df5e72b5f30a70ebb2d">entt::Registry&lt; Entity &gt;</a>
 </li>
 </ul>
 </div><!-- contents -->

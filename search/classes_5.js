@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['hashedstring',['HashedString',['../classentt_1_1HashedString.html',1,'entt']]]
+  ['family',['family',['../classentt_1_1family.html',1,'entt']]]
 ];

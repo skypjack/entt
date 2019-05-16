@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['monostate',['Monostate',['../structentt_1_1Monostate.html',1,'entt']]]
+  ['hashed_5fstring',['hashed_string',['../classentt_1_1hashed__string.html',1,'entt']]]
 ];

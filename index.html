@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">2.7.3</span>
+   &#160;<span id="projectnumber">3.0.0</span>
    </div>
   </td>
  </tr>
@@ -66,46 +66,45 @@ $(function() {
 <div class="textblock"><div class="image">
 <img src="https://user-images.githubusercontent.com/1812216/42513718-ee6e98d0-8457-11e8-9baf-8d83f61a3097.png" alt="EnTT: Gaming meets modern C++"/>
 </div>
-<h1><a class="anchor" id="autotoc_md59"></a>
+<h1><a class="anchor" id="autotoc_md83"></a>
 Introduction</h1>
-<p><code>EnTT</code> is a header-only, tiny and easy to use entity-component system (and much more) written in modern C++ and even <a href="https://minecraft.net/en-us/attribution/">used by Mojang in Minecraft</a>.<br />
- The entity-component-system (also known as <em>ECS</em>) is an architectural pattern used mostly in game development. For further details:</p>
+<p>The entity-component-system (also known as <em>ECS</em>) is an architectural pattern used mostly in game development. For further details:</p>
 <ul>
 <li><a href="http://entity-systems.wikidot.com/">Entity Systems Wiki</a></li>
 <li><a href="http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/">Evolve Your Hierarchy</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system">ECS on Wikipedia</a></li>
 </ul>
-<p>A long time ago, the sole entity-component system was part of the project. After a while the codebase has grown and more and more classes have become part of the repository.<br />
+<p>This project started off as a pure entity-component system. Over time the codebase has grown as more and more classes and functionalities were added.<br />
  Here is a brief, yet incomplete list of what it offers today:</p>
 <ul>
-<li>Statically generated integer identifiers for types (assigned either at compile-time or at runtime).</li>
-<li>A constexpr utility for human readable resource identifiers.</li>
-<li>A minimal configuration system built on top of the monostate pattern.</li>
-<li>An incredibly fast entity-component system based on sparse sets, with its own views and a <em>pay for what you use</em> policy to adjust performance and memory usage according to users' requirements.</li>
-<li>A lot of facilities built on top of the entity-component system to help developers and avoid reinventing the wheel (ie dependencies, snapshot, actor class for those who aren't confident with the architecture and so on).</li>
-<li>The smallest and most basic implementation of a service locator ever seen.</li>
-<li>A cooperative scheduler for processes of any type.</li>
-<li>All what is needed for resource management (cache, loaders, handles).</li>
-<li>Delegates, signal handlers (with built-in support for collectors) and a tiny event dispatcher.</li>
-<li>A general purpose event emitter, that is a CRTP idiom based class template.</li>
-<li>An event dispatcher for immediate and delayed events to integrate in loops.</li>
-<li>...</li>
-<li>Any other business.</li>
+<li>Statically generated integer <b>identifiers for types</b> (assigned either at compile-time or at runtime).</li>
+<li>A <code>constexpr</code> utility for <b>human readable resource identifiers</b>.</li>
+<li>A minimal <b>configuration system</b> built using the monostate pattern.</li>
+<li>An incredibly fast <b>entity-component system</b> based on sparse sets, with its own <em>pay for what you use</em> policy to adjust performance and memory usage according to the users' requirements.</li>
+<li>Views and groups to iterate entities and components and allow different access patterns, from <b>perfect SoA</b> to fully random.</li>
+<li>A lot of <b>facilities</b> built on top of the entity-component system to support the users and avoid reinventing the wheel (dependencies, snapshot, actor class for those who aren't confident with the architecture and so on).</li>
+<li>The smallest and most basic implementation of a <b>service locator</b> ever seen.</li>
+<li>A built-in, non-intrusive and macro-free <b>runtime reflection system</b>.</li>
+<li>A <b>cooperative scheduler</b> for processes of any type.</li>
+<li>All that is needed for <b>resource management</b> (cache, loaders, handles).</li>
+<li><b>Delegates</b>, <b>signal handlers</b> (with built-in support for collectors) and a tiny <b>event dispatcher</b> for immediate and delayed events to integrate in loops.</li>
+<li>A general purpose <b>event emitter</b> as a CRTP idiom based class template.</li>
+<li>And <b>much more</b>! Check out the <a href="https://github.com/skypjack/entt/wiki"><b>wiki</b></a>.</li>
 </ul>
-<p>Consider it a work in progress. The whole API is also fully documented in-code for those who are brave enough to read it.</p>
-<p>Currently, <code>EnTT</code> is tested on Linux, Microsoft Windows and OS X. It has proven to work also on both Android and iOS.<br />
- Most likely it will not be problematic on other systems as well, but has not been sufficiently tested so far.</p>
-<h2><a class="anchor" id="autotoc_md60"></a>
+<p>Consider this list a work in progress as well as the project. The whole API is fully documented in-code for those who are brave enough to read it.</p>
+<p>Currently, <code>EnTT</code> is tested on Linux, Microsoft Windows and OSX. It has proven to work also on both Android and iOS.<br />
+ Most likely it won't be problematic on other systems as well, but it hasn't been sufficiently tested so far.</p>
+<h2><a class="anchor" id="autotoc_md84"></a>
 Code Example</h2>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entt.hpp&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;cstdint&gt;</span></div><div class="line"></div><div class="line"><span class="keyword">struct </span>Position {</div><div class="line">    <span class="keywordtype">float</span> x;</div><div class="line">    <span class="keywordtype">float</span> y;</div><div class="line">};</div><div class="line"></div><div class="line"><span class="keyword">struct </span>Velocity {</div><div class="line">    <span class="keywordtype">float</span> dx;</div><div class="line">    <span class="keywordtype">float</span> dy;</div><div class="line">};</div><div class="line"></div><div class="line"><span class="keywordtype">void</span> update(<a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a> &amp;registry) {</div><div class="line">    <span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Position, Velocity&gt;();</div><div class="line"></div><div class="line">    <span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">        <span class="comment">// gets only the components that are going to be used ...</span></div><div class="line"></div><div class="line">        <span class="keyword">auto</span> &amp;velocity = view.get&lt;Velocity&gt;(entity);</div><div class="line"></div><div class="line">        velocity.dx = 0.;</div><div class="line">        velocity.dy = 0.;</div><div class="line"></div><div class="line">        <span class="comment">// ...</span></div><div class="line">    }</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">void</span> update(std::uint64_t dt, <a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a> &amp;registry) {</div><div class="line">    registry.<a class="code" href="classentt_1_1Registry.html#aed83d4c8f80ae647ee73f2a8440fa09d">view</a>&lt;Position, Velocity&gt;().each([dt](<span class="keyword">auto</span> entity, <span class="keyword">auto</span> &amp;position, <span class="keyword">auto</span> &amp;velocity) {</div><div class="line">        <span class="comment">// gets all the components of the view at once ...</span></div><div class="line"></div><div class="line">        position.x += velocity.dx * dt;</div><div class="line">        position.y += velocity.dy * dt;</div><div class="line"></div><div class="line">        <span class="comment">// ...</span></div><div class="line">    });</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> main() {</div><div class="line">    <a class="code" href="classentt_1_1Registry.html">entt::DefaultRegistry</a> registry;</div><div class="line">    std::uint64_t dt = 16;</div><div class="line"></div><div class="line">    <span class="keywordflow">for</span>(<span class="keyword">auto</span> i = 0; i &lt; 10; ++i) {</div><div class="line">        <span class="keyword">auto</span> entity = registry.<a class="code" href="classentt_1_1Registry.html#a433ac3fc8ea49347f691dd4ad1ccb58b">create</a>();</div><div class="line">        registry.<a class="code" href="classentt_1_1Registry.html#a93b5717af287a2b97e0ef9695c51ed58">assign</a>&lt;Position&gt;(entity, i * 1.f, i * 1.f);</div><div class="line">        <span class="keywordflow">if</span>(i % 2 == 0) { registry.<a class="code" href="classentt_1_1Registry.html#a93b5717af287a2b97e0ef9695c51ed58">assign</a>&lt;Velocity&gt;(entity, i * .1f, i * .1f); }</div><div class="line">    }</div><div class="line"></div><div class="line">    update(dt, registry);</div><div class="line">    update(registry);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><h2><a class="anchor" id="autotoc_md61"></a>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entt.hpp&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;cstdint&gt;</span></div><div class="line"></div><div class="line"><span class="keyword">struct </span>position {</div><div class="line">    <span class="keywordtype">float</span> x;</div><div class="line">    <span class="keywordtype">float</span> y;</div><div class="line">};</div><div class="line"></div><div class="line"><span class="keyword">struct </span>velocity {</div><div class="line">    <span class="keywordtype">float</span> dx;</div><div class="line">    <span class="keywordtype">float</span> dy;</div><div class="line">};</div><div class="line"></div><div class="line"><span class="keywordtype">void</span> update(<a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;registry) {</div><div class="line">    <span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1basic__registry.html#ab2ea1df9f827924f2ecba67921bf4845">view</a>&lt;position, velocity&gt;();</div><div class="line"></div><div class="line">    <span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">        <span class="comment">// gets only the components that are going to be used ...</span></div><div class="line"></div><div class="line">        <span class="keyword">auto</span> &amp;vel = view.get&lt;velocity&gt;(entity);</div><div class="line"></div><div class="line">        vel.dx = 0.;</div><div class="line">        vel.dy = 0.;</div><div class="line"></div><div class="line">        <span class="comment">// ...</span></div><div class="line">    }</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">void</span> update(std::uint64_t dt, <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;registry) {</div><div class="line">    registry.<a class="code" href="classentt_1_1basic__registry.html#ab2ea1df9f827924f2ecba67921bf4845">view</a>&lt;position, velocity&gt;().each([dt](<span class="keyword">auto</span> &amp;pos, <span class="keyword">auto</span> &amp;vel) {</div><div class="line">        <span class="comment">// gets all the components of the view at once ...</span></div><div class="line"></div><div class="line">        pos.x += vel.dx * dt;</div><div class="line">        pos.y += vel.dy * dt;</div><div class="line"></div><div class="line">        <span class="comment">// ...</span></div><div class="line">    });</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> main() {</div><div class="line">    <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> registry;</div><div class="line">    std::uint64_t dt = 16;</div><div class="line"></div><div class="line">    <span class="keywordflow">for</span>(<span class="keyword">auto</span> i = 0; i &lt; 10; ++i) {</div><div class="line">        <span class="keyword">auto</span> entity = registry.<a class="code" href="classentt_1_1basic__registry.html#a1bb5d5d0c5af3bd98de3d902406ff372">create</a>();</div><div class="line">        registry.<a class="code" href="classentt_1_1basic__registry.html#a3deb5b8f14eb1414c92e6ccb2065ce0e">assign</a>&lt;position&gt;(entity, i * 1.f, i * 1.f);</div><div class="line">        <span class="keywordflow">if</span>(i % 2 == 0) { registry.<a class="code" href="classentt_1_1basic__registry.html#a3deb5b8f14eb1414c92e6ccb2065ce0e">assign</a>&lt;velocity&gt;(entity, i * .1f, i * .1f); }</div><div class="line">    }</div><div class="line"></div><div class="line">    update(dt, registry);</div><div class="line">    update(registry);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><h2><a class="anchor" id="autotoc_md85"></a>
 Motivation</h2>
-<p>I started working on <code>EnTT</code> because of the wrong reason: my goal was to design an entity-component system that beated another well known open source solution in terms of performance and used (possibly) less memory in the average case.<br />
- In the end, I did it, but it wasn't much satisfying. Actually it wasn't satisfying at all. The fastest and nothing more, fairly little indeed. When I realized it, I tried hard to keep intact the great performance of <code>EnTT</code> and to add all the features I wanted to see in <em>my own library</em> at the same time.</p>
+<p>I started developing <code>EnTT</code> for the <em>wrong</em> reason: my goal was to design an entity-component system to beat another well known open source solution both in terms of performance and possibly memory usage.<br />
+ In the end, I did it, but it wasn't very satisfying. Actually it wasn't satisfying at all. The fastest and nothing more, fairly little indeed. When I realized it, I tried hard to keep intact the great performance of <code>EnTT</code> and to add all the features I wanted to see in <em>my own library</em> at the same time.</p>
 <p>Nowadays, <code>EnTT</code> is finally what I was looking for: still faster than its <em>competitors</em>, lower memory usage in the average case, a really good API and an amazing set of features. And even more, of course.</p>
-<h2><a class="anchor" id="autotoc_md62"></a>
+<h2><a class="anchor" id="autotoc_md86"></a>
 Performance</h2>
-<p>As it stands right now, <code>EnTT</code> is just fast enough for my requirements if compared to my first choice (it was already amazingly fast actually).<br />
- Below is a comparison between the two (both of them compiled with GCC 7.3.0 on a Dell XPS 13 out of the mid 2014):</p>
+<p>As it stands right now, <code>EnTT</code> is just fast enough for my requirements when compared to my first choice (it was already amazingly fast actually).<br />
+ Below is a comparison between the two (both of them compiled with GCC 7.3.0 on a Dell XPS 13 from mid 2014):</p>
 <table class="doxtable">
 <tr>
 <th>Benchmark </th><th>EntityX (compile-time) </th><th>EnTT  </th></tr>
@@ -147,81 +146,62 @@ Arrays are almost sorted, std::sort </td><td>- </td><td><b>0.0035s</b> </td></tr
 Arrays are almost sorted, insertion sort </td><td>- </td><td><b>0.0007s</b> </td></tr>
 </table>
 <p>Note: The default version of <code>EntityX</code> (<code>master</code> branch) wasn't added to the comparison because it's already much slower than its compile-time counterpart.</p>
-<p>Pretty interesting, aren't them? In fact, these benchmarks are the same used by <code>EntityX</code> to show <em>how fast it is</em>. To be honest, they aren't so good and these results shouldn't be taken much seriously (they are completely unrealistic indeed).<br />
- The proposed entity-component system is incredibly fast to iterate entities, this is a fact. The compiler can make a lot of optimizations because of how <code>EnTT</code> works, even more when components aren't used at all. This is exactly the case for these benchmarks. On the other hand and if we consider real world cases, <code>EnTT</code> is in the middle between a bit and much faster than the other solutions around when users also access the components and not just the entities, although it is not as fast as reported by these benchmarks.<br />
- This is why they are completely wrong and cannot be used to evaluate any of the entity-component systems.</p>
-<p>If you decide to use <code>EnTT</code>, choose it because of its API, features and performance, not because there is a benchmark somewhere that makes it seem the fastest.</p>
-<p>Probably I'll try to get out of <code>EnTT</code> more features and even better performance in the future, mainly for fun.<br />
- If you want to contribute and/or have any suggestion, feel free to make a PR or open an issue to discuss your idea.</p>
-<h1><a class="anchor" id="autotoc_md63"></a>
+<p>Pretty interesting results, aren't them? In fact, these benchmarks are the ones used by <code>EntityX</code> to show <em>how fast it is</em>. To be honest, they aren't so good and these results shouldn't be taken too seriously (indeed they are completely unrealistic).<br />
+ The proposed entity-component system is incredibly fast to iterate entities, this is a fact. The compiler can make a lot of optimizations because of how <code>EnTT</code> works, even more when components aren't used at all. This is exactly the case for these benchmarks. On the other hand, if we consider real world cases, <code>EnTT</code> is somewhere between a bit and much faster than the other solutions around when users also access the components and not just the entities, although it isn't as fast as reported by these benchmarks.<br />
+ This is why they are completely wrong and cannot be used to evaluate any of the entity-component-system libraries out there.</p>
+<p>The choice to use <code>EnTT</code> should be based on its carefully designed API, its set of features and the general performance, not because some single benchmark shows it to be the fastest tool available.</p>
+<p>In the future I'll likely try to get even better performance while still adding new features, mainly for fun.<br />
+ If you want to contribute and/or have suggestions, feel free to make a PR or open an issue to discuss your idea.</p>
+<h1><a class="anchor" id="autotoc_md87"></a>
 Build Instructions</h1>
-<h2><a class="anchor" id="autotoc_md64"></a>
+<h2><a class="anchor" id="autotoc_md88"></a>
 Requirements</h2>
-<p>To be able to use <code>EnTT</code>, users must provide a full-featured compiler that supports at least C++14.<br />
+<p>To be able to use <code>EnTT</code>, users must provide a full-featured compiler that supports at least C++17.<br />
  The requirements below are mandatory to compile the tests and to extract the documentation:</p>
 <ul>
 <li>CMake version 3.2 or later.</li>
 <li>Doxygen version 1.8 or later.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md65"></a>
+<p>If you are looking for a C++14 version of <code>EnTT</code>, check out the git tag <code>cpp14</code>.</p>
+<h2><a class="anchor" id="autotoc_md89"></a>
 Library</h2>
 <p><code>EnTT</code> is a header-only library. This means that including the <code><a class="el" href="entt_8hpp_source.html">entt.hpp</a></code> header is enough to include the library as a whole and use it. For those who are interested only in the entity-component system, consider to include the sole <code><a class="el" href="registry_8hpp_source.html">entity/registry.hpp</a></code> header instead.<br />
  It's a matter of adding the following line to the top of a file:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entt.hpp&gt;</span></div></div><!-- fragment --><p>Use the line below to include only the entity-component system instead:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entity/registry.hpp&gt;</span></div></div><!-- fragment --><p>Then pass the proper <code>-I</code> argument to the compiler to add the <code>src</code> directory to the include paths.</p>
-<h2><a class="anchor" id="autotoc_md66"></a>
+<h2><a class="anchor" id="autotoc_md90"></a>
 Documentation</h2>
-<p>The documentation is based on <a href="http://www.stack.nl/~dimitri/doxygen/">doxygen</a>. To build it: </p><pre class="fragment">$ cd build
+<p>The documentation is based on <a href="http://www.doxygen.nl/">doxygen</a>. To build it: </p><pre class="fragment">$ cd build
 $ cmake .. -DBUILD_DOCS=ON
 $ make
 </pre><p>The API reference will be created in HTML format within the directory <code>build/docs/html</code>. To navigate it with your favorite browser: </p><pre class="fragment">$ cd build
 $ your_favorite_browser docs/html/index.html
-</pre><h2><a class="anchor" id="autotoc_md67"></a>
+</pre><h2><a class="anchor" id="autotoc_md91"></a>
 Tests</h2>
 <p>To compile and run the tests, <code>EnTT</code> requires <em>googletest</em>.<br />
- <code>cmake</code> will download and compile the library before compiling anything else. In order to build without tests set CMake option <code>BUILD_TESTING=OFF</code>.</p>
+ <code>cmake</code> will download and compile the library before compiling anything else. In order to build the tests, set the CMake option <code>BUILD_TESTING</code> to <code>ON</code>.</p>
 <p>To build the most basic set of tests:</p>
 <ul>
 <li><code>$ cd build</code></li>
-<li><code>$ cmake ..</code></li>
+<li><code>$ cmake -DBUILD_TESTING=ON ..</code></li>
 <li><code>$ make</code></li>
 <li><code>$ make test</code></li>
 </ul>
 <p>Note that benchmarks are not part of this set.</p>
-<h1><a class="anchor" id="autotoc_md68"></a>
+<h1><a class="anchor" id="autotoc_md92"></a>
 Packaging Tools</h1>
 <p><code>EnTT</code> is available for some of the most known packaging tools. In particular:</p>
 <ul>
-<li><a href="https://github.com/Microsoft/vcpkg/tree/master/ports/entt"><code>vcpkg</code></a>, Microsoft VC++ Packaging Tool.</li>
+<li><a href="https://bintray.com/skypjack/conan/entt%3Askypjack/_latestVersion"><code>Conan</code></a>, the C/C++ Package Manager for Developers.</li>
 <li><a href="https://github.com/skypjack/homebrew-entt"><code>Homebrew</code></a>, the missing package manager for macOS.<br />
  Available as a homebrew formula. Just type the following to install it: <div class="fragment"><div class="line">brew install skypjack/entt/entt</div></div><!-- fragment --></li>
+<li><a href="https://github.com/Microsoft/vcpkg/tree/master/ports/entt"><code>vcpkg</code></a>, Microsoft VC++ Packaging Tool.</li>
 </ul>
 <p>Consider this list a work in progress and help me to make it longer.</p>
-<h1><a class="anchor" id="autotoc_md69"></a>
-EnTT in Action</h1>
-<p><code>EnTT</code> is widely used in private and commercial applications. I cannot even mention most of them because of some signatures I put on some documents time ago.<br />
- Fortunately, there are also people who took the time to implement open source projects based on EnTT and did not hold back when it came to documenting them.</p>
-<p>Below an incomplete list of projects and articles:</p>
-<ul>
-<li><a href="https://minecraft.net/en-us/attribution/">Minecraft</a>: of course, <b>that</b> Minecraft, by Mojang (see the open source attributions page).</li>
-<li><a href="https://play.google.com/store/apps/details?id=com.gamee.facesmash">Face Smash</a>: the emojis dominate the world, destroy them all with your facial expressions.</li>
-<li><a href="https://github.com/Milerius/shiva">shiva</a>: modern C++ Engine with modularity.</li>
-<li><a href="https://github.com/kerndog73/Classic-Tower-Defence">Classic Tower Defence</a>: a tiny little tower defence game featuring a homemade font. <a href="https://indi-kernick.itch.io/classic-tower-defence">Check it out</a>.</li>
-<li><a href="https://github.com/Kerndog73/The-Machine">The Machine</a>: a box pushing puzzler with logic gates and other cool stuff. <a href="https://indi-kernick.itch.io/the-machine-web-version">Check it out</a>.</li>
-<li><a href="https://github.com/reworks/EnttPong">EnttPong</a>: example game with <code>EnTT</code>.</li>
-<li><a href="http://victor.madtriangles.com/code%20experiment/2018/06/11/post-ecs-battle-huge.html">Space Battle: Huge edition</a>: huge space battle built entirely from scratch.</li>
-<li><a href="https://github.com/vblanco20-1/ECS_SpaceBattle">Space Battle</a>: huge space battle built on <code>UE4</code>.</li>
-<li><a href="http://victor.madtriangles.com/code%20experiment/2018/03/25/post-ue4-ecs-battle.html">Experimenting with ECS in UE4</a>: interesting article about <code>UE4</code> and <code>EnTT</code>.</li>
-<li><a href="https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1449913-implementing-ecs-architecture-in-ue4-giant-space-battle">Implementing ECS architecture in UE4</a>: giant space battle.</li>
-<li><a href="https://github.com/mhaemmerle/MatchOneEntt">MatchOneEntt</a>: port of <a href="https://github.com/sschmid/Match-One">Match One</a> for <code>Entitas-CSharp</code>.</li>
-<li><a href="https://github.com/gale93/randballs">Randballs</a>: simple <code>SFML</code> and <code>EnTT</code> playground.</li>
-<li>...</li>
-</ul>
-<p>If you know of other resources out there that are about <code>EnTT</code>, feel free to open an issue or a PR and I'll be glad to add them to the list.</p>
-<h1><a class="anchor" id="autotoc_md70"></a>
+<h1><a class="anchor" id="autotoc_md93"></a>
 License</h1>
-<p>Code and documentation Copyright (c) 2017-2018 Michele Caini.<br />
- Logo Copyright (c) 2018 Richard Caseres.</p>
+<p>Code and documentation Copyright (c) 2017-2019 Michele Caini.<br />
+ Logo Copyright (c) 2018-2019 Richard Caseres.</p>
 <p>Code released under <a href="https://github.com/skypjack/entt/blob/master/LICENSE">the MIT license</a>. Documentation released under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.<br />
  Logo released under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. </p>
 </div></div><!-- contents -->
