@@ -30,7 +30,7 @@ using maybe_atomic_t = Type;
 
 #ifndef ENTT_PAGE_SIZE
 #define ENTT_PAGE_SIZE 32768
-#endif
+#endif // ENTT_PAGE_SIZE
 
 
 #ifndef ENTT_DISABLE_ASSERT
