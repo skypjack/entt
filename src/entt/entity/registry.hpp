@@ -64,8 +64,10 @@ class basic_registry {
 
     template<typename Component>
     struct pool_handler: storage<Entity, Component> {
-        sigh<void(basic_registry &, const Entity, std::conditional_t<std::is_empty_v<Component>, const Component &, Component &>)> on_construct;
-        sigh<void(basic_registry &, const Entity, std::conditional_t<std::is_empty_v<Component>, const Component &, Component &>)> on_replace;
+        using reference_type = std::conditional_t<std::is_empty_v<Component>, const Component &, Component &>;
+
+        sigh<void(basic_registry &, const Entity, reference_type)> on_construct;
+        sigh<void(basic_registry &, const Entity, reference_type)> on_replace;
         sigh<void(basic_registry &, const Entity)> on_destroy;
         void *group{};
 
@@ -96,8 +98,8 @@ class basic_registry {
                 storage<Entity, Component>::batch(first, last);
 
                 if(!on_construct.empty()) {
-                    std::for_each(first, last, [&registry, component = Component{}, this](const auto entt) mutable {
-                        on_construct.publish(registry, entt, component);
+                    std::for_each(first, last, [&registry, this](const auto entt) {
+                        on_construct.publish(registry, entt, Component{});
                     });
                 }
             } else {
