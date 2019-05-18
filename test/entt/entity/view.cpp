@@ -1,6 +1,7 @@
 #include <utility>
 #include <type_traits>
 #include <gtest/gtest.h>
+#include <entt/entity/helper.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/view.hpp>
 
@@ -96,11 +97,7 @@ TEST(SingleComponentView, Empty) {
     auto view = registry.view<int>();
 
     ASSERT_EQ(view.size(), entt::registry::size_type{0});
-
-    for(auto entity: view) {
-        (void)entity;
-        FAIL();
-    }
+    ASSERT_EQ(view.begin(), view.end());
 }
 
 TEST(SingleComponentView, Each) {
@@ -191,6 +188,30 @@ TEST(SingleComponentView, Find) {
 
     ASSERT_NE(view.find(e5), view.end());
     ASSERT_EQ(view.find(e4), view.end());
+}
+
+TEST(SingleComponentView, Less) {
+    entt::registry registry;
+    const auto entity = std::get<0>(registry.create<int, entt::tag<"empty"_hs>>());
+    registry.create<char>();
+
+    registry.view<entt::tag<"empty"_hs>>().less([entity](const auto entt) {
+        ASSERT_EQ(entity, entt);
+    });
+
+    registry.view<entt::tag<"empty"_hs>>().less([check = true]() mutable {
+        ASSERT_TRUE(check);
+        check = false;
+    });
+
+    registry.view<int>().less([entity](const auto entt, int) {
+        ASSERT_EQ(entity, entt);
+    });
+
+    registry.view<int>().less([check = true](int) mutable {
+        ASSERT_TRUE(check);
+        check = false;
+    });
 }
 
 TEST(MultipleComponentView, Functionalities) {
@@ -302,10 +323,8 @@ TEST(MultipleComponentView, Empty) {
 
     auto view = registry.view<char, int, float>();
 
-    for(auto entity: view) {
-        (void)entity;
-        FAIL();
-    }
+    ASSERT_EQ(view.size(), entt::registry::size_type{1});
+    ASSERT_EQ(view.begin(), view.end());
 }
 
 TEST(MultipleComponentView, Each) {
@@ -452,4 +471,36 @@ TEST(MultipleComponentView, Find) {
 
     ASSERT_NE(view.find(e5), view.end());
     ASSERT_EQ(view.find(e4), view.end());
+}
+
+TEST(MultiComponentView, Less) {
+    entt::registry registry;
+    const auto entity = std::get<0>(registry.create<int, char, double, entt::tag<"empty"_hs>>());
+    registry.create<int, char>();
+
+    registry.view<int, char, entt::tag<"empty"_hs>>().less([entity](const auto entt, int, char) {
+        ASSERT_EQ(entity, entt);
+    });
+
+    registry.view<int, entt::tag<"empty"_hs>, char>().less([check = true](int, char) mutable {
+        ASSERT_TRUE(check);
+        check = false;
+    });
+
+    registry.view<entt::tag<"empty"_hs>, int, char>().less([entity](const auto entt, int, char) {
+        ASSERT_EQ(entity, entt);
+    });
+
+    registry.view<entt::tag<"empty"_hs>, int, char>().less<entt::tag<"empty"_hs>>([entity](const auto entt, int, char) {
+        ASSERT_EQ(entity, entt);
+    });
+
+    registry.view<int, entt::tag<"empty"_hs>, char>().less<entt::tag<"empty"_hs>>([check = true](int, char) mutable {
+        ASSERT_TRUE(check);
+        check = false;
+    });
+
+    registry.view<int, char, double>().less([entity](const auto entt, int, char, double) {
+        ASSERT_EQ(entity, entt);
+    });
 }

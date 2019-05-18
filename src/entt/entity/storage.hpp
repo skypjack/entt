@@ -434,7 +434,7 @@ public:
             }, std::forward<Args>(args)...);
         }
 
-        for(size_type pos = 0, last = copy.size(); pos < last; ++pos) {
+        for(size_type pos{}, last = copy.size(); pos < last; ++pos) {
             auto curr = pos;
             auto next = copy[curr];
 

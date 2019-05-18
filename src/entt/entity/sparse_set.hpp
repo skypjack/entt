@@ -188,11 +188,11 @@ public:
         : reverse{},
           direct{other.direct}
     {
-        for(size_type i = {}, last = other.reverse.size(); i < last; ++i) {
-            if(other.reverse[i].first) {
-                assure(i);
-                std::copy_n(other.reverse[i].first.get(), entt_per_page, reverse[i].first.get());
-                reverse[i].second = other.reverse[i].second;
+        for(size_type pos{}, last = other.reverse.size(); pos < last; ++pos) {
+            if(other.reverse[pos].first) {
+                assure(pos);
+                std::copy_n(other.reverse[pos].first.get(), entt_per_page, reverse[pos].first.get());
+                reverse[pos].second = other.reverse[pos].second;
             }
         }
     }

@@ -2,6 +2,7 @@
 #include <iterator>
 #include <algorithm>
 #include <gtest/gtest.h>
+#include <entt/entity/helper.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/group.hpp>
 
@@ -10,8 +11,8 @@ struct boxed_int { int value; };
 
 TEST(NonOwningGroup, Functionalities) {
     entt::registry registry;
-    auto group = registry.group<>(entt::get<int, char>);
-    auto cgroup = std::as_const(registry).group<>(entt::get<const int, const char>);
+    auto group = registry.group(entt::get<int, char>);
+    auto cgroup = std::as_const(registry).group(entt::get<const int, const char>);
 
     ASSERT_TRUE(group.empty());
     ASSERT_TRUE(group.empty<int>());
@@ -84,8 +85,8 @@ TEST(NonOwningGroup, Functionalities) {
 
 TEST(NonOwningGroup, ElementAccess) {
     entt::registry registry;
-    auto group = registry.group<>(entt::get<int, char>);
-    auto cgroup = std::as_const(registry).group<>(entt::get<const int, const char>);
+    auto group = registry.group(entt::get<int, char>);
+    auto cgroup = std::as_const(registry).group(entt::get<const int, const char>);
 
     const auto e0 = registry.create();
     registry.assign<int>(e0);
@@ -103,7 +104,7 @@ TEST(NonOwningGroup, ElementAccess) {
 
 TEST(NonOwningGroup, Contains) {
     entt::registry registry;
-    auto group = registry.group<>(entt::get<int, char>);
+    auto group = registry.group(entt::get<int, char>);
 
     const auto e0 = registry.create();
     registry.assign<int>(e0);
@@ -131,12 +132,12 @@ TEST(NonOwningGroup, Empty) {
     registry.assign<char>(e1);
     registry.assign<float>(e1);
 
-    for(auto entity: registry.group<>(entt::get<char, int, float>)) {
+    for(auto entity: registry.group(entt::get<char, int, float>)) {
         (void)entity;
         FAIL();
     }
 
-    for(auto entity: registry.group<>(entt::get<double, char, int, float>)) {
+    for(auto entity: registry.group(entt::get<double, char, int, float>)) {
         (void)entity;
         FAIL();
     }
@@ -144,7 +145,7 @@ TEST(NonOwningGroup, Empty) {
 
 TEST(NonOwningGroup, Each) {
     entt::registry registry;
-    auto group = registry.group<>(entt::get<int, char>);
+    auto group = registry.group(entt::get<int, char>);
 
     const auto e0 = registry.create();
     registry.assign<int>(e0);
@@ -154,7 +155,7 @@ TEST(NonOwningGroup, Each) {
     registry.assign<int>(e1);
     registry.assign<char>(e1);
 
-    auto cgroup = std::as_const(registry).group<>(entt::get<const int, const char>);
+    auto cgroup = std::as_const(registry).group(entt::get<const int, const char>);
     std::size_t cnt = 0;
 
     group.each([&cnt](auto, int &, char &) { ++cnt; });
@@ -170,7 +171,7 @@ TEST(NonOwningGroup, Each) {
 
 TEST(NonOwningGroup, Sort) {
     entt::registry registry;
-    auto group = registry.group<>(entt::get<const int, unsigned int>);
+    auto group = registry.group(entt::get<const int, unsigned int>);
 
     const auto e0 = registry.create();
     const auto e1 = registry.create();
@@ -203,7 +204,7 @@ TEST(NonOwningGroup, Sort) {
 
 TEST(NonOwningGroup, IndexRebuiltOnDestroy) {
     entt::registry registry;
-    auto group = registry.group<>(entt::get<int, unsigned int>);
+    auto group = registry.group(entt::get<int, unsigned int>);
 
     const auto e0 = registry.create();
     const auto e1 = registry.create();
@@ -231,7 +232,7 @@ TEST(NonOwningGroup, IndexRebuiltOnDestroy) {
 
 TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
     entt::registry registry;
-    auto group = registry.group<>(entt::get<int, const char>);
+    auto group = registry.group(entt::get<int, const char>);
 
     ASSERT_EQ(group.size(), decltype(group.size()){0});
 
@@ -255,7 +256,7 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
 
 TEST(NonOwningGroup, Find) {
     entt::registry registry;
-    auto group = registry.group<>(entt::get<int, const char>);
+    auto group = registry.group(entt::get<int, const char>);
 
     const auto e0 = registry.create();
     registry.assign<int>(e0);
@@ -308,7 +309,7 @@ TEST(NonOwningGroup, ExcludedComponents) {
     registry.assign<int>(e1, 1);
     registry.assign<char>(e1);
 
-    const auto group = registry.group<>(entt::get<int>, entt::exclude<char>);
+    const auto group = registry.group(entt::get<int>, entt::exclude<char>);
 
     const auto e2 = registry.create();
     registry.assign<int>(e2, 2);
@@ -348,7 +349,7 @@ TEST(NonOwningGroup, ExcludedComponents) {
 
 TEST(NonOwningGroup, EmptyAndNonEmptyTypes) {
     entt::registry registry;
-    const auto group = registry.group<>(entt::get<int, empty_type>);
+    const auto group = registry.group(entt::get<int, empty_type>);
 
     const auto e0 = registry.create();
     registry.assign<empty_type>(e0);
@@ -373,8 +374,8 @@ TEST(NonOwningGroup, EmptyAndNonEmptyTypes) {
 
 TEST(NonOwningGroup, TrackEntitiesOnComponentDestruction) {
     entt::registry registry;
-    const auto group = registry.group<>(entt::get<int>, entt::exclude<char>);
-    const auto cgroup = std::as_const(registry).group<>(entt::get<const int>, entt::exclude<char>);
+    const auto group = registry.group(entt::get<int>, entt::exclude<char>);
+    const auto cgroup = std::as_const(registry).group(entt::get<const int>, entt::exclude<char>);
 
     const auto entity = registry.create();
     registry.assign<int>(entity);
@@ -387,6 +388,29 @@ TEST(NonOwningGroup, TrackEntitiesOnComponentDestruction) {
 
     ASSERT_FALSE(group.empty());
     ASSERT_FALSE(cgroup.empty());
+}
+
+TEST(NonOwningGroup, Less) {
+    entt::registry registry;
+    const auto entity = std::get<0>(registry.create<int, entt::tag<"empty"_hs>>());
+    registry.create<char>();
+
+    registry.group(entt::get<int, char, entt::tag<"empty"_hs>>).less([entity](const auto entt, int, char) {
+        ASSERT_EQ(entity, entt);
+    });
+
+    registry.group(entt::get<int, entt::tag<"empty"_hs>, char>).less([check = true](int, char) mutable {
+        ASSERT_TRUE(check);
+        check = false;
+    });
+
+    registry.group(entt::get<entt::tag<"empty"_hs>, int, char>).less([entity](const auto entt, int, char) {
+        ASSERT_EQ(entity, entt);
+    });
+
+    registry.group(entt::get<int, char, double>).less([entity](const auto entt, int, char, double) {
+        ASSERT_EQ(entity, entt);
+    });
 }
 
 TEST(OwningGroup, Functionalities) {
@@ -889,4 +913,27 @@ TEST(OwningGroup, TrackEntitiesOnComponentDestruction) {
 
     ASSERT_FALSE(group.empty());
     ASSERT_FALSE(cgroup.empty());
+}
+
+TEST(OwningGroup, Less) {
+    entt::registry registry;
+    const auto entity = std::get<0>(registry.create<int, entt::tag<"empty"_hs>>());
+    registry.create<char>();
+
+    registry.group<int>(entt::get<char, entt::tag<"empty"_hs>>).less([entity](const auto entt, int, char) {
+        ASSERT_EQ(entity, entt);
+    });
+
+    registry.group<char>(entt::get<entt::tag<"empty"_hs>, int>).less([check = true](int, char) mutable {
+        ASSERT_TRUE(check);
+        check = false;
+    });
+
+    registry.group<entt::tag<"empty"_hs>>(entt::get<int, char>).less([entity](const auto entt, int, char) {
+        ASSERT_EQ(entity, entt);
+    });
+
+    registry.group<double>(entt::get<int, char>).less([entity](const auto entt, int, char, double) {
+        ASSERT_EQ(entity, entt);
+    });
 }

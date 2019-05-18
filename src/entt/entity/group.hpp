@@ -94,6 +94,17 @@ class basic_group<Entity, get_t<Get...>> {
           pools{get...}
     {}
 
+    template<typename Func, typename... Weak>
+    inline void traverse(Func func, type_list<Weak...>) const {
+        for(const auto entt: *handler) {
+            if constexpr(std::is_invocable_v<Func, decltype(get<Weak>({}))...>) {
+                func(std::get<pool_type<Weak> *>(pools)->get(entt)...);
+            } else {
+                func(entt, std::get<pool_type<Weak> *>(pools)->get(entt)...);
+            }
+        };
+    }
+
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = typename sparse_set<Entity>::entity_type;
@@ -326,13 +337,33 @@ public:
      */
     template<typename Func>
     inline void each(Func func) const {
-        for(const auto entt: *handler) {
-            if constexpr(std::is_invocable_v<Func, decltype(get<Get>({}))...>) {
-                func(std::get<pool_type<Get> *>(pools)->get(entt)...);
-            } else {
-                func(entt, std::get<pool_type<Get> *>(pools)->get(entt)...);
-            }
-        };
+        traverse(std::move(func), type_list<Get...>{});
+    }
+
+    /**
+     * @brief Iterates entities and components and applies the given function
+     * object to them.
+     *
+     * The function object is invoked for each entity. It is provided with the
+     * entity itself and a set of references to non-empty components. The
+     * _constness_ of the components is as requested.<br/>
+     * The signature of the function must be equivalent to one of the following
+     * forms:
+     *
+     * @code{.cpp}
+     * void(const entity_type, Type &...);
+     * void(Type &...);
+     * @endcode
+     *
+     * @sa each
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    inline void less(Func func) const {
+        using non_empty_get = type_list_cat_t<std::conditional_t<std::is_empty_v<Get>, type_list<>, type_list<Get>>...>;
+        traverse(std::move(func), non_empty_get{});
     }
 
     /**
@@ -448,6 +479,26 @@ class basic_group<Entity, get_t<Get...>, Owned...> {
     template<typename Component>
     inline void swap(char, const std::size_t lhs, const std::size_t rhs) {
         std::get<pool_type<Component> *>(pools)->swap(lhs, rhs);
+    }
+
+    template<typename Func, typename... Strong, typename... Weak>
+    inline void traverse(Func func, type_list<Strong...>, type_list<Weak...>) const {
+        auto raw = std::make_tuple((std::get<pool_type<Strong> *>(pools)->end() - *length)...);
+        [[maybe_unused]] auto data = std::get<0>(pools)->sparse_set<entity_type>::end() - *length;
+
+        for(auto next = *length; next; --next) {
+            if constexpr(std::is_invocable_v<Func, decltype(get<Strong>({}))..., decltype(get<Weak>({}))...>) {
+                if constexpr(sizeof...(Weak) == 0) {
+                    func(*(std::get<component_iterator_type<Strong>>(raw)++)...);
+                } else {
+                    const auto entt = *(data++);
+                    func(*(std::get<component_iterator_type<Strong>>(raw)++)..., std::get<pool_type<Weak> *>(pools)->get(entt)...);
+                }
+            } else {
+                const auto entt = *(data++);
+                func(entt, *(std::get<component_iterator_type<Strong>>(raw)++)..., std::get<pool_type<Weak> *>(pools)->get(entt)...);
+            }
+        }
     }
 
 public:
@@ -674,22 +725,34 @@ public:
      */
     template<typename Func>
     inline void each(Func func) const {
-        auto raw = std::make_tuple((std::get<pool_type<Owned> *>(pools)->end() - *length)...);
-        [[maybe_unused]] auto data = std::get<0>(pools)->sparse_set<entity_type>::end() - *length;
+        traverse(std::move(func), type_list<Owned...>{}, type_list<Get...>{});
+    }
 
-        for(auto next = *length; next; --next) {
-            if constexpr(std::is_invocable_v<Func, decltype(get<Owned>({}))..., decltype(get<Get>({}))...>) {
-                if constexpr(sizeof...(Get) == 0) {
-                    func(*(std::get<component_iterator_type<Owned>>(raw)++)...);
-                } else {
-                    const auto entt = *(data++);
-                    func(*(std::get<component_iterator_type<Owned>>(raw)++)..., std::get<pool_type<Get> *>(pools)->get(entt)...);
-                }
-            } else {
-                const auto entt = *(data++);
-                func(entt, *(std::get<component_iterator_type<Owned>>(raw)++)..., std::get<pool_type<Get> *>(pools)->get(entt)...);
-            }
-        }
+    /**
+     * @brief Iterates entities and components and applies the given function
+     * object to them.
+     *
+     * The function object is invoked for each entity. It is provided with the
+     * entity itself and a set of references to non-empty components. The
+     * _constness_ of the components is as requested.<br/>
+     * The signature of the function must be equivalent to one of the following
+     * forms:
+     *
+     * @code{.cpp}
+     * void(const entity_type, Type &...);
+     * void(Type &...);
+     * @endcode
+     *
+     * @sa each
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    inline void less(Func func) const {
+        using non_empty_owned = type_list_cat_t<std::conditional_t<std::is_empty_v<Owned>, type_list<>, type_list<Owned>>...>;
+        using non_empty_get = type_list_cat_t<std::conditional_t<std::is_empty_v<Get>, type_list<>, type_list<Get>>...>;
+        traverse(std::move(func), non_empty_owned{}, non_empty_get{});
     }
 
     /**
@@ -753,7 +816,7 @@ public:
             }, std::forward<Args>(args)...);
         }
 
-        for(size_type pos = 0, last = copy.size(); pos < last; ++pos) {
+        for(size_type pos{}, last = copy.size(); pos < last; ++pos) {
             auto curr = pos;
             auto next = copy[curr];
 

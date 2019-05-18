@@ -140,8 +140,8 @@ public:
 
             archive(static_cast<Entity>(sz));
 
-            for(std::remove_const_t<decltype(sz)> i{}; i < sz; ++i) {
-                const auto entt = entities[i];
+            for(std::remove_const_t<decltype(sz)> pos{}; pos < sz; ++pos) {
+                const auto entt = entities[pos];
 
                 if constexpr(std::is_empty_v<Component...>) {
                     archive(entt);

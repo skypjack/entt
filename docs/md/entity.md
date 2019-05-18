@@ -1016,7 +1016,10 @@ registry.view<position, velocity>().each([](auto entity, auto &pos, auto &vel) {
 The `each` member function is highly optimized. Unless users want to iterate
 only entities or get only some of the components, this should be the preferred
 approach. Note that the entity can also be excluded from the parameter list if
-not required, but this won't improve performance for multi component views.
+not required, but this won't improve performance for multi component views.<br/>
+There exists also an alternative version of `each` named `less` that works
+exactly as its counterpart but for the fact that it doesn't return empty
+components to the caller.
 
 As a side note, when using a single component view, the most common error is to
 invoke `get` with the type of the component as a template parameter. This is

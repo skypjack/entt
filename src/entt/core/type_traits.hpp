@@ -25,6 +25,14 @@ template<typename...>
 struct type_list_cat;
 
 
+/*! @brief Concatenates multiple type lists. */
+template<>
+struct type_list_cat<> {
+    /*! @brief A type list composed by the types of all the type lists. */
+    using type = type_list<>;
+};
+
+
 /**
  * @brief Concatenates multiple type lists.
  * @tparam Type Types provided by the first type list.

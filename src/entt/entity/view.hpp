@@ -170,22 +170,34 @@ class basic_view {
         }
     }
 
-    template<typename Comp, typename... Other, typename Func>
-    void each(type_list<Other...>, Func func) const {
+    template<typename Comp, typename Func, typename... Other, typename... Type>
+    void traverse(Func func, type_list<Other...>, type_list<Type...>) const {
         const auto end = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::end();
         auto begin = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::begin();
 
-        std::for_each(begin, end, [raw = std::get<pool_type<Comp> *>(pools)->begin(), &func, this](const auto entity) mutable {
-            auto curr = raw++;
+        if constexpr(std::disjunction_v<std::is_same<Comp, Type>...>) {
+            std::for_each(begin, end, [raw = std::get<pool_type<Comp> *>(pools)->begin(), &func, this](const auto entity) mutable {
+                auto curr = raw++;
 
-            if((std::get<pool_type<Other> *>(pools)->has(entity) && ...)) {
-                if constexpr(std::is_invocable_v<Func, decltype(get<Component>({}))...>) {
-                    func(get<Comp, Component>(curr, std::get<pool_type<Component> *>(pools), entity)...);
-                } else {
-                    func(entity, get<Comp, Component>(curr, std::get<pool_type<Component> *>(pools), entity)...);
+                if((std::get<pool_type<Other> *>(pools)->has(entity) && ...)) {
+                    if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
+                        func(get<Comp, Type>(curr, std::get<pool_type<Type> *>(pools), entity)...);
+                    } else {
+                        func(entity, get<Comp, Type>(curr, std::get<pool_type<Type> *>(pools), entity)...);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            std::for_each(begin, end, [&func, this](const auto entity) mutable {
+                if((std::get<pool_type<Other> *>(pools)->has(entity) && ...)) {
+                    if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
+                        func(std::get<pool_type<Type> *>(pools)->get(entity)...);
+                    } else {
+                        func(entity, std::get<pool_type<Type> *>(pools)->get(entity)...);
+                    }
+                }
+            });
+        }
     }
 
 public:
@@ -421,7 +433,67 @@ public:
     template<typename Comp, typename Func>
     inline void each(Func func) const {
         using other_type = type_list_cat_t<std::conditional_t<std::is_same_v<Comp, Component>, type_list<>, type_list<Component>>...>;
-        each<Comp>(other_type{}, std::move(func));
+        traverse<Comp>(std::move(func), other_type{}, type_list<Component...>{});
+    }
+
+    /**
+     * @brief Iterates entities and components and applies the given function
+     * object to them.
+     *
+     * The function object is invoked for each entity. It is provided with the
+     * entity itself and a set of references to non-empty components. The
+     * _constness_ of the components is as requested.<br/>
+     * The signature of the function must be equivalent to one of the following
+     * forms:
+     *
+     * @code{.cpp}
+     * void(const entity_type, Type &...);
+     * void(Type &...);
+     * @endcode
+     *
+     * @sa each
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    inline void less(Func func) const {
+        const auto *view = candidate();
+        ((std::get<pool_type<Component> *>(pools) == view ? less<Component>(std::move(func)) : void()), ...);
+    }
+
+    /**
+     * @brief Iterates entities and components and applies the given function
+     * object to them.
+     *
+     * The function object is invoked for each entity. It is provided with the
+     * entity itself and a set of references to non-empty components. The
+     * _constness_ of the components is as requested.<br/>
+     * The signature of the function must be equivalent to one of the following
+     * forms:
+     *
+     * @code{.cpp}
+     * void(const entity_type, Type &...);
+     * void(Type &...);
+     * @endcode
+     *
+     * The pool of the suggested component is used to lead the iterations. The
+     * returned entities will therefore respect the order of the pool associated
+     * with that type.<br/>
+     * It is no longer guaranteed that the performance is the best possible, but
+     * there will be greater control over the order of iteration.
+     *
+     * @sa each
+     *
+     * @tparam Comp Type of component to use to enforce the iteration order.
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Comp, typename Func>
+    inline void less(Func func) const {
+        using other_type = type_list_cat_t<std::conditional_t<std::is_same_v<Comp, Component>, type_list<>, type_list<Component>>...>;
+        using non_empty_type = type_list_cat_t<std::conditional_t<std::is_empty_v<Component>, type_list<>, type_list<Component>>...>;
+        traverse<Comp>(std::move(func), other_type{}, non_empty_type{});
     }
 
 private:
@@ -641,13 +713,56 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    void each(Func func) const {
+    inline void each(Func func) const {
         if constexpr(std::is_invocable_v<Func, decltype(get({}))>) {
             std::for_each(pool->begin(), pool->end(), std::move(func));
         } else {
             std::for_each(pool->sparse_set<Entity>::begin(), pool->sparse_set<Entity>::end(), [&func, raw = pool->begin()](const auto entt) mutable {
                 func(entt, *(raw++));
             });
+        }
+    }
+
+    /**
+     * @brief Iterates entities and components and applies the given function
+     * object to them.
+     *
+     * The function object is invoked for each entity. It is provided with the
+     * entity itself and a reference to its component if it's a non-empty one.
+     * The _constness_ of the component is as requested.<br/>
+     * The signature of the function must be equivalent to one of the following
+     * forms in case the component isn't an empty one:
+     *
+     * @code{.cpp}
+     * void(const entity_type, Component &);
+     * void(Component &);
+     * @endcode
+     *
+     * In case the component is an empty one instead, the following forms are
+     * accepted:
+     *
+     * @code{.cpp}
+     * void(const entity_type);
+     * void();
+     * @endcode
+     *
+     * @sa each
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    inline void less(Func func) const {
+        if constexpr(std::is_empty_v<Component>) {
+            if constexpr(std::is_invocable_v<Func>) {
+                for(auto pos = pool->size(); pos; --pos) {
+                    func();
+                }
+            } else {
+                std::for_each(pool->sparse_set<Entity>::begin(), pool->sparse_set<Entity>::end(), std::move(func));
+            }
+        } else {
+            each(std::move(func));
         }
     }
 

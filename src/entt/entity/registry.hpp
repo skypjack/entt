@@ -1213,8 +1213,8 @@ public:
         ENTT_ASSERT(valid(entity));
         bool orphan = true;
 
-        for(std::size_t i = {}, last = pools.size(); i < last && orphan; ++i) {
-            const auto &pdata = pools[i];
+        for(std::size_t pos{}, last = pools.size(); pos < last && orphan; ++pos) {
+            const auto &pdata = pools[pos];
             orphan = !(pdata.pool && pdata.pool->has(entity));
         }
 
