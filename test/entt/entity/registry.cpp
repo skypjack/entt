@@ -43,7 +43,7 @@ TEST(Registry, Context) {
 
     registry.set<char>();
     registry.set<int>();
-    registry.set<double>();
+    registry.ctx_or_set<double>();
 
     ASSERT_NE(registry.try_ctx<char>(), nullptr);
     ASSERT_NE(registry.try_ctx<int>(), nullptr);
@@ -61,7 +61,7 @@ TEST(Registry, Context) {
     registry.set<double>(1.);
     registry.set<int>(42);
 
-    ASSERT_EQ(registry.ctx<char>(), 'c');
+    ASSERT_EQ(registry.ctx_or_set<char>('a'), 'c');
     ASSERT_NE(registry.try_ctx<char>(), nullptr);
     ASSERT_EQ(registry.try_ctx<char>(), &registry.ctx<char>());
     ASSERT_EQ(registry.ctx<char>(), std::as_const(registry).ctx<char>());

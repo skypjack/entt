@@ -1634,6 +1634,23 @@ public:
     }
 
     /**
+     * @brief Binds an object to the context of the registry.
+     *
+     * In case the context doesn't contain the given object, the parameters
+     * provided are used to construct it.
+     *
+     * @tparam Type Type of object to set.
+     * @tparam Args Types of arguments to use to construct the object.
+     * @param args Parameters to use to initialize the object.
+     * @return Reference to the object.
+     */
+    template<typename Type, typename... Args>
+    Type & ctx_or_set(Args &&... args) {
+        auto *type = try_ctx<Type>();
+        return type ? *type : set<Type>(std::forward<Args>(args)...);
+    }
+
+    /**
      * @brief Returns a pointer to an object in the context of the registry.
      * @tparam Type Type of object to get.
      * @return A pointer to the object if it exists in the context of the
