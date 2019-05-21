@@ -32,6 +32,9 @@ If you use `EnTT` and you want to say thanks or support the project, please
 
 [![Patreon](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/bePatron?c=1772573)
 
+[Many thanks](https://skypjack.github.io/patreon/) to those who supported me and
+still support me today.
+
 # Table of Contents
 
 * [Introduction](#introduction)
