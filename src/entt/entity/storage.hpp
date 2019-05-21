@@ -376,6 +376,25 @@ public:
     }
 
     /**
+     * @brief Swaps entities and objects in the internal packed arrays.
+     *
+     * @warning
+     * Attempting to swap entities that don't belong to the sparse set results
+     * in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * sparse set doesn't contain the given entities.
+     *
+     * @param lhs A valid position within the sparse set.
+     * @param rhs A valid position within the sparse set.
+     */
+    void swap(const size_type lhs, const size_type rhs) ENTT_NOEXCEPT {
+        ENTT_ASSERT(lhs < instances.size());
+        ENTT_ASSERT(rhs < instances.size());
+        std::swap(instances[lhs], instances[rhs]);
+        underlying_type::swap(lhs, rhs);
+    }
+
+    /**
      * @brief Sort instances according to the given comparison function.
      *
      * Sort the elements so that iterating the storage with a couple of

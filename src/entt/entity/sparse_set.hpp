@@ -454,7 +454,7 @@ public:
     }
 
     /**
-     * @brief Swaps the position of two entities in the internal packed array.
+     * @brief Swaps two entities in the internal packed array.
      *
      * For what it's worth, this function affects both the internal sparse array
      * and the internal packed array. Users should not care of that anyway.

@@ -177,7 +177,7 @@ class basic_registry {
                         && !(reg.pool<Exclude>()->has(entt) || ...))
                 {
                     const auto pos = this->owned++;
-                    (reg.swap<Owned>(0, std::get<pool_type<Owned> *>(cpools), entt, pos), ...);
+                    (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entt), pos), ...);
                 }
             } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
                 if((std::get<pool_type<Owned> *>(cpools)->has(entt) && ...)
@@ -185,7 +185,7 @@ class basic_registry {
                         && ((std::is_same_v<Exclude, Component> || !reg.pool<Exclude>()->has(entt)) && ...))
                 {
                     const auto pos = this->owned++;
-                    (reg.swap<Owned>(0, std::get<pool_type<Owned> *>(cpools), entt, pos), ...);
+                    (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entt), pos), ...);
                 }
             }
         }
@@ -196,7 +196,7 @@ class basic_registry {
 
             if(std::get<0>(cpools)->has(entt) && std::get<0>(cpools)->sparse_set<Entity>::get(entt) < this->owned) {
                 const auto pos = --this->owned;
-                (reg.swap<Owned>(0, std::get<pool_type<Owned> *>(cpools), entt, pos), ...);
+                (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entt), pos), ...);
             }
         }
     };
@@ -236,18 +236,6 @@ class basic_registry {
         entities[entt] = node;
         next = entt;
         ++available;
-    }
-
-    template<typename Component>
-    inline auto swap(int, pool_type<Component> *cpool, const Entity entt, const std::size_t pos)
-    -> decltype(std::swap(cpool->get(entt), cpool->raw()[pos]), void()) {
-        std::swap(cpool->get(entt), cpool->raw()[pos]);
-        cpool->swap(cpool->sparse_set<Entity>::get(entt), pos);
-    }
-
-    template<typename Component>
-    inline void swap(char, pool_type<Component> *cpool, const Entity entt, const std::size_t pos) {
-        cpool->swap(cpool->sparse_set<Entity>::get(entt), pos);
     }
 
     template<typename Component>
@@ -1382,19 +1370,17 @@ public:
             });
 
             // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-            std::for_each(cpool->data(), cpool->data() + cpool->size(), [curr, &cpools, this](const auto entity) {
+            std::for_each(cpool->data(), cpool->data() + cpool->size(), [curr, &cpools](const auto entity) {
                 if((std::get<pool_type<Owned> *>(cpools)->has(entity) && ...)
                         && (std::get<pool_type<Get> *>(cpools)->has(entity) && ...)
                         && !(std::get<pool_type<Exclude> *>(cpools)->has(entity) || ...))
                 {
                     if constexpr(sizeof...(Owned) == 0) {
                         curr->construct(entity);
-                        // suppress warnings
-                        (void)this;
                     } else {
                         const auto pos = curr->owned++;
                         // useless this-> used to suppress a warning with clang
-                        (this->swap<Owned>(0, std::get<pool_type<Owned> *>(cpools), entity, pos), ...);
+                        (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entity), pos), ...);
                     }
                 }
             });

@@ -457,30 +457,6 @@ class basic_group<Entity, get_t<Get...>, Owned...> {
           pools{owned..., get...}
     {}
 
-    template<typename Component>
-    decltype(auto) from_index(const typename sparse_set<Entity>::size_type index) {
-        static_assert(!std::is_empty_v<Component>);
-
-        if constexpr(std::disjunction_v<std::is_same<Component, Owned>...>) {
-            return std::as_const(*std::get<pool_type<Component> *>(pools)).raw()[index];
-        } else {
-            return std::as_const(*std::get<pool_type<Component> *>(pools)).get(data()[index]);
-        }
-    }
-
-    template<typename Component>
-    inline auto swap(int, const std::size_t lhs, const std::size_t rhs)
-    -> decltype(std::declval<pool_type<Component>>().raw(), void()) {
-        auto *cpool = std::get<pool_type<Component> *>(pools);
-        std::swap(cpool->raw()[lhs], cpool->raw()[rhs]);
-        cpool->swap(lhs, rhs);
-    }
-
-    template<typename Component>
-    inline void swap(char, const std::size_t lhs, const std::size_t rhs) {
-        std::get<pool_type<Component> *>(pools)->swap(lhs, rhs);
-    }
-
     template<typename Func, typename... Strong, typename... Weak>
     inline void traverse(Func func, type_list<Strong...>, type_list<Weak...>) const {
         auto raw = std::make_tuple((std::get<pool_type<Strong> *>(pools)->end() - *length)...);
@@ -812,7 +788,7 @@ public:
         } else {
             algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), this](const auto lhs, const auto rhs) {
                 // useless this-> used to suppress a warning with clang
-                return compare(this->from_index<Component>(lhs)..., this->from_index<Component>(rhs)...);
+                return compare(this->get<Component>(lhs)..., this->get<Component>(rhs)...);
             }, std::forward<Args>(args)...);
         }
 
@@ -823,7 +799,7 @@ public:
             while(curr != next) {
                 const auto lhs = copy[curr];
                 const auto rhs = copy[next];
-                (swap<Owned>(0, lhs, rhs), ...);
+                (std::get<pool_type<Owned> *>(pools)->swap(lhs, rhs), ...);
                 copy[curr] = curr;
                 curr = next;
                 next = copy[curr];
