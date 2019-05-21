@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <entt/resource/cache.hpp>
 
-struct resource { const int value; };
+struct resource { int value; };
 
 struct loader: entt::resource_loader<loader, resource> {
     std::shared_ptr<resource> load(int value) const {
@@ -90,4 +90,20 @@ TEST(Resource, Functionalities) {
     ASSERT_TRUE(std::is_move_constructible_v<entt::resource_handle<resource>>);
     ASSERT_TRUE(std::is_copy_assignable_v<entt::resource_handle<resource>>);
     ASSERT_TRUE(std::is_move_assignable_v<entt::resource_handle<resource>>);
+}
+
+TEST(Resource, MutableHandle) {
+    entt::resource_cache<resource> cache;
+
+    constexpr auto hs = entt::hashed_string{"res"};
+    auto handle = cache.load<loader>(hs, 0);
+
+    ASSERT_TRUE(handle);
+
+    ++handle.get().value;
+    ++static_cast<resource &>(handle).value;
+    ++(*handle).value;
+    ++handle->value;
+
+    ASSERT_EQ(cache.handle(hs)->value, 4);
 }

@@ -51,30 +51,25 @@ public:
         return *resource;
     }
 
-    /**
-     * @brief Casts a handle and gets a reference to the managed resource.
-     *
-     * @warning
-     * The behavior is undefined if the handle doesn't contain a resource.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * handle is empty.
-     */
-    inline operator const Resource &() const ENTT_NOEXCEPT { return get(); }
+    /*! @copydoc get */
+    Resource & get() ENTT_NOEXCEPT {
+        return const_cast<Resource &>(std::as_const(*this).get());
+    }
 
-    /**
-     * @brief Dereferences a handle to obtain the managed resource.
-     *
-     * @warning
-     * The behavior is undefined if the handle doesn't contain a resource.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * handle is empty.
-     *
-     * @return A reference to the managed resource.
-     */
+    /*! @copydoc get */
+    inline operator const Resource & () const ENTT_NOEXCEPT { return get(); }
+
+    /*! @copydoc get */
+    inline operator Resource & () ENTT_NOEXCEPT { return get(); }
+
+    /*! @copydoc get */
     inline const Resource & operator *() const ENTT_NOEXCEPT { return get(); }
 
+    /*! @copydoc get */
+    inline Resource & operator *() ENTT_NOEXCEPT { return get(); }
+
     /**
-     * @brief Gets a pointer to the managed resource from a handle.
+     * @brief Gets a pointer to the managed resource.
      *
      * @warning
      * The behavior is undefined if the handle doesn't contain a resource.<br/>
@@ -87,6 +82,11 @@ public:
     inline const Resource * operator->() const ENTT_NOEXCEPT {
         ENTT_ASSERT(static_cast<bool>(resource));
         return resource.get();
+    }
+
+    /*! @copydoc operator-> */
+    inline Resource * operator->() ENTT_NOEXCEPT {
+        return const_cast<Resource *>(std::as_const(*this).operator->());
     }
 
     /**
