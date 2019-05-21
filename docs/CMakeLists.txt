@@ -24,7 +24,7 @@ install(
 add_custom_target(
     docs_aob
     SOURCES
-        md/CONTRIBUTING.md
+        dox/extra.dox
         md/core.md
         md/entity.md
         md/faq.md
@@ -35,5 +35,4 @@ add_custom_target(
         md/process.md
         md/resource.md
         md/signal.md
-        dox/extra.dox
 )
