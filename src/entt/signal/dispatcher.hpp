@@ -53,17 +53,17 @@ class dispatcher {
             current %= std::extent<decltype(events)>::value;
         }
 
-        inline sink_type sink() ENTT_NOEXCEPT {
+        sink_type sink() ENTT_NOEXCEPT {
             return signal.sink();
         }
 
         template<typename... Args>
-        inline void trigger(Args &&... args) {
+        void trigger(Args &&... args) {
             signal.publish({ std::forward<Args>(args)... });
         }
 
         template<typename... Args>
-        inline void enqueue(Args &&... args) {
+        void enqueue(Args &&... args) {
             events[current].emplace_back(std::forward<Args>(args)...);
         }
 
@@ -143,7 +143,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Event>
-    inline sink_type<Event> sink() ENTT_NOEXCEPT {
+    sink_type<Event> sink() ENTT_NOEXCEPT {
         return assure<Event>().sink();
     }
 
@@ -158,7 +158,7 @@ public:
      * @param args Arguments to use to construct the event.
      */
     template<typename Event, typename... Args>
-    inline void trigger(Args &&... args) {
+    void trigger(Args &&... args) {
         assure<Event>().trigger(std::forward<Args>(args)...);
     }
 
@@ -172,7 +172,7 @@ public:
      * @param event An instance of the given type of event.
      */
     template<typename Event>
-    inline void trigger(Event &&event) {
+    void trigger(Event &&event) {
         assure<std::decay_t<Event>>().trigger(std::forward<Event>(event));
     }
 
@@ -187,7 +187,7 @@ public:
      * @param args Arguments to use to construct the event.
      */
     template<typename Event, typename... Args>
-    inline void enqueue(Args &&... args) {
+    void enqueue(Args &&... args) {
         assure<Event>().enqueue(std::forward<Args>(args)...);
     }
 
@@ -201,7 +201,7 @@ public:
      * @param event An instance of the given type of event.
      */
     template<typename Event>
-    inline void enqueue(Event &&event) {
+    void enqueue(Event &&event) {
         assure<std::decay_t<Event>>().enqueue(std::forward<Event>(event));
     }
 
@@ -215,7 +215,7 @@ public:
      * @tparam Event Type of events to send.
      */
     template<typename Event>
-    inline void update() {
+    void update() {
         assure<Event>().publish();
     }
 
@@ -226,7 +226,7 @@ public:
      * delivered to the registered listeners. It's responsibility of the users
      * to reduce at a minimum the time spent in the bodies of the listeners.
      */
-    inline void update() const {
+    void update() const {
         for(auto pos = wrappers.size(); pos; --pos) {
             auto &wdata = wrappers[pos-1];
 

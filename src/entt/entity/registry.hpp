@@ -239,7 +239,7 @@ class basic_registry {
     }
 
     template<typename Component>
-    inline const auto * pool() const ENTT_NOEXCEPT {
+    const auto * pool() const ENTT_NOEXCEPT {
         const auto ctype = type<Component>();
 
         if constexpr(is_named_type_v<Component>) {
@@ -254,7 +254,7 @@ class basic_registry {
     }
 
     template<typename Component>
-    inline auto * pool() ENTT_NOEXCEPT {
+    auto * pool() ENTT_NOEXCEPT {
         return const_cast<pool_type<Component> *>(std::as_const(*this).template pool<Component>());
     }
 
@@ -331,7 +331,7 @@ public:
      * @return Runtime numeric identifier of the given type of component.
      */
     template<typename Component>
-    inline static component_type type() ENTT_NOEXCEPT {
+    static component_type type() ENTT_NOEXCEPT {
         return runtime_type<Component, component_family>();
     }
 
@@ -463,7 +463,7 @@ public:
 
     /*! @copydoc raw */
     template<typename Component>
-    inline Component * raw() ENTT_NOEXCEPT {
+    Component * raw() ENTT_NOEXCEPT {
         return const_cast<Component *>(std::as_const(*this).template raw<Component>());
     }
 
@@ -779,7 +779,7 @@ public:
 
     /*! @copydoc get */
     template<typename... Component>
-    inline decltype(auto) get([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
+    decltype(auto) get([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
@@ -846,7 +846,7 @@ public:
 
     /*! @copydoc try_get */
     template<typename... Component>
-    inline auto try_get([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
+    auto try_get([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 1) {
             return (const_cast<Component *>(std::as_const(*this).template try_get<Component>(entity)), ...);
         } else {
@@ -1276,7 +1276,7 @@ public:
 
     /*! @copydoc view */
     template<typename... Component>
-    inline entt::basic_view<Entity, Component...> view() const {
+    entt::basic_view<Entity, Component...> view() const {
         static_assert(std::conjunction_v<std::is_const<Component>...>);
         return const_cast<basic_registry *>(this)->view<Component...>();
     }
@@ -1320,7 +1320,7 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    inline entt::basic_group<Entity, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) {
+    entt::basic_group<Entity, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0);
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1);
 
@@ -1395,20 +1395,20 @@ public:
 
     /*! @copydoc group */
     template<typename... Owned, typename... Get, typename... Exclude>
-    inline entt::basic_group<Entity, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) const {
+    entt::basic_group<Entity, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) const {
         static_assert(std::conjunction_v<std::is_const<Owned>..., std::is_const<Get>...>);
         return const_cast<basic_registry *>(this)->group<Owned...>(entt::get<Get...>, exclude<Exclude...>);
     }
 
     /*! @copydoc group */
     template<typename... Owned, typename... Exclude>
-    inline entt::basic_group<Entity, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) {
+    entt::basic_group<Entity, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) {
         return group<Owned...>(entt::get<>, exclude<Exclude...>);
     }
 
     /*! @copydoc group */
     template<typename... Owned, typename... Exclude>
-    inline entt::basic_group<Entity, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) const {
+    entt::basic_group<Entity, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) const {
         static_assert(std::conjunction_v<std::is_const<Owned>...>);
         return const_cast<basic_registry *>(this)->group<Owned...>(exclude<Exclude...>);
     }
@@ -1653,7 +1653,7 @@ public:
 
     /*! @copydoc try_ctx */
     template<typename Type>
-    inline Type * try_ctx() ENTT_NOEXCEPT {
+    Type * try_ctx() ENTT_NOEXCEPT {
         return const_cast<Type *>(std::as_const(*this).template try_ctx<Type>());
     }
 
@@ -1678,7 +1678,7 @@ public:
 
     /*! @copydoc ctx */
     template<typename Type>
-    inline Type & ctx() ENTT_NOEXCEPT {
+    Type & ctx() ENTT_NOEXCEPT {
         return const_cast<Type &>(std::as_const(*this).template ctx<Type>());
     }
 

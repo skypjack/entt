@@ -40,11 +40,11 @@ class meta_factory {
     static_assert(std::is_object_v<Type> && !(std::is_const_v<Type> || std::is_volatile_v<Type>));
 
     template<typename Node>
-    inline bool duplicate(const hashed_string &name, const Node *node) ENTT_NOEXCEPT {
+    bool duplicate(const hashed_string &name, const Node *node) ENTT_NOEXCEPT {
         return node ? node->name == name || duplicate(name, node->next) : false;
     }
 
-    inline bool duplicate(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
+    bool duplicate(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
         return node ? node->key() == key || duplicate(key, node->next) : false;
     }
 
@@ -603,7 +603,7 @@ public:
  * @return A meta factory for the given type.
  */
 template<typename Type, typename... Property>
-inline meta_factory<Type> reflect(const char *str, Property &&... property) ENTT_NOEXCEPT {
+meta_factory<Type> reflect(const char *str, Property &&... property) ENTT_NOEXCEPT {
     return meta_factory<Type>{}.type(hashed_string{str}, std::forward<Property>(property)...);
 }
 
@@ -620,7 +620,7 @@ inline meta_factory<Type> reflect(const char *str, Property &&... property) ENTT
  * @return A meta factory for the given type.
  */
 template<typename Type>
-inline meta_factory<Type> reflect() ENTT_NOEXCEPT {
+meta_factory<Type> reflect() ENTT_NOEXCEPT {
     return meta_factory<Type>{};
 }
 
@@ -638,7 +638,7 @@ inline meta_factory<Type> reflect() ENTT_NOEXCEPT {
  * @return True if the type to unregister exists, false otherwise.
  */
 template<typename Type>
-inline bool unregister() ENTT_NOEXCEPT {
+bool unregister() ENTT_NOEXCEPT {
     return meta_factory<Type>().unregister();
 }
 
@@ -649,7 +649,7 @@ inline bool unregister() ENTT_NOEXCEPT {
  * @return The meta type associated with the given type, if any.
  */
 template<typename Type>
-inline meta_type resolve() ENTT_NOEXCEPT {
+meta_type resolve() ENTT_NOEXCEPT {
     return internal::meta_info<Type>::resolve()->meta();
 }
 

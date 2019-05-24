@@ -189,7 +189,7 @@ public:
 
     /*! @copydoc get */
     template<typename... Component>
-    inline decltype(auto) get() ENTT_NOEXCEPT {
+    decltype(auto) get() ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 1) {
             return (const_cast<Component &>(std::as_const(*this).template get<Component>()), ...);
         } else {
@@ -214,7 +214,7 @@ public:
 
     /*! @copydoc try_get */
     template<typename... Component>
-    inline auto try_get() ENTT_NOEXCEPT {
+    auto try_get() ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 1) {
             return (const_cast<Component *>(std::as_const(*this).template try_get<Component>()), ...);
         } else {
@@ -263,7 +263,7 @@ public:
      *
      * @return A valid entity identifier.
      */
-    inline entity_type create() const {
+    entity_type create() const {
         return create(*reg);
     }
 
@@ -314,7 +314,7 @@ public:
      *
      * @param dst A valid entity identifier.
      */
-    inline void assign(const entity_type dst) const {
+    void assign(const entity_type dst) const {
         assign(*reg, dst);
     }
 
@@ -361,7 +361,7 @@ public:
      *
      * @param dst A valid entity identifier.
      */
-    inline void assign_or_replace(const entity_type dst) const {
+    void assign_or_replace(const entity_type dst) const {
         assign_or_replace(*reg, dst);
     }
 
@@ -386,7 +386,7 @@ public:
      * @param other A valid reference to a registry.
      * @param dst A valid entity identifier.
      */
-    inline void operator()(registry_type &other, const entity_type dst) const ENTT_NOEXCEPT {
+    void operator()(registry_type &other, const entity_type dst) const ENTT_NOEXCEPT {
         assign(other, dst);
     }
 
@@ -410,7 +410,7 @@ public:
      *
      * @param dst A valid entity identifier.
      */
-    inline void operator()(const entity_type dst) const ENTT_NOEXCEPT {
+    void operator()(const entity_type dst) const ENTT_NOEXCEPT {
         assign(*reg, dst);
     }
 
@@ -432,7 +432,7 @@ public:
      * @param other A valid reference to a registry.
      * @return A valid entity identifier.
      */
-    inline entity_type operator()(registry_type &other) const ENTT_NOEXCEPT {
+    entity_type operator()(registry_type &other) const ENTT_NOEXCEPT {
         return create(other);
     }
 
@@ -453,7 +453,7 @@ public:
      *
      * @return A valid entity identifier.
      */
-    inline entity_type operator()() const ENTT_NOEXCEPT {
+    entity_type operator()() const ENTT_NOEXCEPT {
         return create(*reg);
     }
 
@@ -461,12 +461,12 @@ public:
      * @brief Returns a reference to the underlying registry.
      * @return A reference to the underlying registry.
      */
-    inline const registry_type & backend() const ENTT_NOEXCEPT {
+    const registry_type & backend() const ENTT_NOEXCEPT {
         return *reg;
     }
 
     /*! @copydoc backend */
-    inline registry_type & backend() ENTT_NOEXCEPT {
+    registry_type & backend() ENTT_NOEXCEPT {
         return const_cast<registry_type &>(std::as_const(*this).backend());
     }
 

@@ -108,7 +108,7 @@ class basic_runtime_view {
             return other.begin == begin;
         }
 
-        inline bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
@@ -116,7 +116,7 @@ class basic_runtime_view {
             return begin.operator->();
         }
 
-        inline reference operator*() const ENTT_NOEXCEPT {
+        reference operator*() const ENTT_NOEXCEPT {
             return *operator->();
         }
 
@@ -153,7 +153,7 @@ class basic_runtime_view {
         return extent;
     }
 
-    inline bool valid() const ENTT_NOEXCEPT {
+    bool valid() const ENTT_NOEXCEPT {
         return !pools.empty() && pools.front();
     }
 

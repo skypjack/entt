@@ -35,7 +35,7 @@ struct service_locator {
      * @brief Tests if a valid service implementation is set.
      * @return True if the service is set, false otherwise.
      */
-    inline static bool empty() ENTT_NOEXCEPT {
+    static bool empty() ENTT_NOEXCEPT {
         return !static_cast<bool>(service);
     }
 
@@ -49,7 +49,7 @@ struct service_locator {
      *
      * @return A reference to the service implementation currently set, if any.
      */
-    inline static std::weak_ptr<Service> get() ENTT_NOEXCEPT {
+    static std::weak_ptr<Service> get() ENTT_NOEXCEPT {
         return service;
     }
 
@@ -67,7 +67,7 @@ struct service_locator {
      *
      * @return A reference to the service implementation currently set, if any.
      */
-    inline static Service & ref() ENTT_NOEXCEPT {
+    static Service & ref() ENTT_NOEXCEPT {
         return *service;
     }
 
@@ -78,7 +78,7 @@ struct service_locator {
      * @param args Parameters to use to construct the service.
      */
     template<typename Impl = Service, typename... Args>
-    inline static void set(Args &&... args) {
+    static void set(Args &&... args) {
         service = std::make_shared<Impl>(std::forward<Args>(args)...);
     }
 
@@ -86,7 +86,7 @@ struct service_locator {
      * @brief Sets or replaces a service.
      * @param ptr Service to use to replace the current one.
      */
-    inline static void set(std::shared_ptr<Service> ptr) {
+    static void set(std::shared_ptr<Service> ptr) {
         ENTT_ASSERT(static_cast<bool>(ptr));
         service = std::move(ptr);
     }
@@ -96,7 +96,7 @@ struct service_locator {
      *
      * The service is no longer valid after a reset.
      */
-    inline static void reset() {
+    static void reset() {
         service.reset();
     }
 

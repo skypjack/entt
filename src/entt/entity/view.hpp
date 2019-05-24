@@ -124,7 +124,7 @@ class basic_view {
             return other.begin == begin;
         }
 
-        inline bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
@@ -132,7 +132,7 @@ class basic_view {
             return begin.operator->();
         }
 
-        inline reference operator*() const ENTT_NOEXCEPT {
+        reference operator*() const ENTT_NOEXCEPT {
             return *operator->();
         }
 
@@ -162,7 +162,7 @@ class basic_view {
     }
 
     template<typename Comp, typename Other>
-    inline decltype(auto) get([[maybe_unused]] component_iterator_type<Comp> it, [[maybe_unused]] pool_type<Other> *cpool, [[maybe_unused]] const Entity entt) const ENTT_NOEXCEPT {
+    decltype(auto) get([[maybe_unused]] component_iterator_type<Comp> it, [[maybe_unused]] pool_type<Other> *cpool, [[maybe_unused]] const Entity entt) const ENTT_NOEXCEPT {
         if constexpr(std::is_same_v<Comp, Other>) {
             return *it;
         } else {
@@ -395,7 +395,7 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    inline void each(Func func) const {
+    void each(Func func) const {
         const auto *view = candidate();
         ((std::get<pool_type<Component> *>(pools) == view ? each<Component>(std::move(func)) : void()), ...);
     }
@@ -431,7 +431,7 @@ public:
      * @param func A valid function object.
      */
     template<typename Comp, typename Func>
-    inline void each(Func func) const {
+    void each(Func func) const {
         using other_type = type_list_cat_t<std::conditional_t<std::is_same_v<Comp, Component>, type_list<>, type_list<Component>>...>;
         traverse<Comp>(std::move(func), other_type{}, type_list<Component...>{});
     }
@@ -457,7 +457,7 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    inline void less(Func func) const {
+    void less(Func func) const {
         const auto *view = candidate();
         ((std::get<pool_type<Component> *>(pools) == view ? less<Component>(std::move(func)) : void()), ...);
     }
@@ -490,7 +490,7 @@ public:
      * @param func A valid function object.
      */
     template<typename Comp, typename Func>
-    inline void less(Func func) const {
+    void less(Func func) const {
         using other_type = type_list_cat_t<std::conditional_t<std::is_same_v<Comp, Component>, type_list<>, type_list<Component>>...>;
         using non_empty_type = type_list_cat_t<std::conditional_t<std::is_empty_v<Component>, type_list<>, type_list<Component>>...>;
         traverse<Comp>(std::move(func), other_type{}, non_empty_type{});
@@ -713,7 +713,7 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    inline void each(Func func) const {
+    void each(Func func) const {
         if constexpr(std::is_invocable_v<Func, decltype(get({}))>) {
             std::for_each(pool->begin(), pool->end(), std::move(func));
         } else {
@@ -752,7 +752,7 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    inline void less(Func func) const {
+    void less(Func func) const {
         if constexpr(std::is_empty_v<Component>) {
             if constexpr(std::is_invocable_v<Func>) {
                 for(auto pos = pool->size(); pos; --pos) {

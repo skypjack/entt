@@ -151,12 +151,12 @@ struct basic_actor {
      * @brief Returns a reference to the underlying registry.
      * @return A reference to the underlying registry.
      */
-    inline const registry_type & backend() const ENTT_NOEXCEPT {
+    const registry_type & backend() const ENTT_NOEXCEPT {
         return *reg;
     }
 
     /*! @copydoc backend */
-    inline registry_type & backend() ENTT_NOEXCEPT {
+    registry_type & backend() ENTT_NOEXCEPT {
         return const_cast<registry_type &>(std::as_const(*this).backend());
     }
 
@@ -164,7 +164,7 @@ struct basic_actor {
      * @brief Returns the entity associated with an actor.
      * @return The entity associated with the actor.
      */
-    inline entity_type entity() const ENTT_NOEXCEPT {
+    entity_type entity() const ENTT_NOEXCEPT {
         return entt;
     }
 

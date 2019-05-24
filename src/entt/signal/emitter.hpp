@@ -73,11 +73,11 @@ class emitter {
             }
         }
 
-        inline connection_type once(listener_type listener) {
+        connection_type once(listener_type listener) {
             return once_list.emplace(once_list.cend(), false, std::move(listener));
         }
 
-        inline connection_type on(listener_type listener) {
+        connection_type on(listener_type listener) {
             return on_list.emplace(on_list.cend(), false, std::move(listener));
         }
 

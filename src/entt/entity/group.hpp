@@ -95,7 +95,7 @@ class basic_group<Entity, get_t<Get...>> {
     {}
 
     template<typename Func, typename... Weak>
-    inline void traverse(Func func, type_list<Weak...>) const {
+    void traverse(Func func, type_list<Weak...>) const {
         for(const auto entt: *handler) {
             if constexpr(std::is_invocable_v<Func, decltype(get<Weak>({}))...>) {
                 func(std::get<pool_type<Weak> *>(pools)->get(entt)...);
@@ -336,7 +336,7 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    inline void each(Func func) const {
+    void each(Func func) const {
         traverse(std::move(func), type_list<Get...>{});
     }
 
@@ -361,7 +361,7 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    inline void less(Func func) const {
+    void less(Func func) const {
         using non_empty_get = type_list_cat_t<std::conditional_t<std::is_empty_v<Get>, type_list<>, type_list<Get>>...>;
         traverse(std::move(func), non_empty_get{});
     }
@@ -458,7 +458,7 @@ class basic_group<Entity, get_t<Get...>, Owned...> {
     {}
 
     template<typename Func, typename... Strong, typename... Weak>
-    inline void traverse(Func func, type_list<Strong...>, type_list<Weak...>) const {
+    void traverse(Func func, type_list<Strong...>, type_list<Weak...>) const {
         auto raw = std::make_tuple((std::get<pool_type<Strong> *>(pools)->end() - *length)...);
         [[maybe_unused]] auto data = std::get<0>(pools)->sparse_set<entity_type>::end() - *length;
 
@@ -700,7 +700,7 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    inline void each(Func func) const {
+    void each(Func func) const {
         traverse(std::move(func), type_list<Owned...>{}, type_list<Get...>{});
     }
 
@@ -725,7 +725,7 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
-    inline void less(Func func) const {
+    void less(Func func) const {
         using non_empty_owned = type_list_cat_t<std::conditional_t<std::is_empty_v<Owned>, type_list<>, type_list<Owned>>...>;
         using non_empty_get = type_list_cat_t<std::conditional_t<std::is_empty_v<Get>, type_list<>, type_list<Get>>...>;
         traverse(std::move(func), non_empty_owned{}, non_empty_get{});
