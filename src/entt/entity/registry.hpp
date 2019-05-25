@@ -14,7 +14,6 @@
 #include "../config/config.h"
 #include "../core/family.hpp"
 #include "../core/algorithm.hpp"
-#include "../core/hashed_string.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/sigh.hpp"
 #include "runtime_view.hpp"
