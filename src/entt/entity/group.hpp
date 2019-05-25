@@ -459,7 +459,7 @@ class basic_group<Entity, get_t<Get...>, Owned...> {
 
     template<typename Func, typename... Strong, typename... Weak>
     void traverse(Func func, type_list<Strong...>, type_list<Weak...>) const {
-        auto raw = std::make_tuple((std::get<pool_type<Strong> *>(pools)->end() - *length)...);
+        [[maybe_unused]] auto raw = std::make_tuple((std::get<pool_type<Strong> *>(pools)->end() - *length)...);
         [[maybe_unused]] auto data = std::get<0>(pools)->sparse_set<entity_type>::end() - *length;
 
         for(auto next = *length; next; --next) {
