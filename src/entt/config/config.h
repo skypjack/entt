@@ -12,6 +12,11 @@
 #endif // ENTT_HS_SUFFIX
 
 
+#ifndef ENTT_HWS_SUFFIX
+#define ENTT_HWS_SUFFIX _hws
+#endif // ENTT_HWS_SUFFIX
+
+
 #ifndef ENTT_NO_ATOMIC
 #include <atomic>
 #define ENTT_MAYBE_ATOMIC(Type) std::atomic<Type>

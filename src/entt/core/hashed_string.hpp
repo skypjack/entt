@@ -53,18 +53,21 @@ struct fnv1a_traits<std::uint64_t> {
  * counterparts at runtime.<br/>
  * Because of that, a hashed string can also be used in constant expressions if
  * required.
+ *
+ * @tparam Char Character type.
  */
-class hashed_string {
+template<typename Char>
+class basic_hashed_string {
     using traits_type = internal::fnv1a_traits<ENTT_ID_TYPE>;
 
     struct const_wrapper {
         // non-explicit constructor on purpose
-        constexpr const_wrapper(const char *curr) ENTT_NOEXCEPT: str{curr} {}
-        const char *str;
+        constexpr const_wrapper(const Char *curr) ENTT_NOEXCEPT: str{curr} {}
+        const Char *str;
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    static constexpr ENTT_ID_TYPE helper(ENTT_ID_TYPE partial, const char *curr) ENTT_NOEXCEPT {
+    static constexpr ENTT_ID_TYPE helper(ENTT_ID_TYPE partial, const Char *curr) ENTT_NOEXCEPT {
         return curr[0] == 0 ? partial : helper((partial^curr[0])*traits_type::prime, curr+1);
     }
 
@@ -80,7 +83,7 @@ public:
      * characters.<br/>
      * Example of use:
      * @code{.cpp}
-     * const auto value = hashed_string::to_value("my.png");
+     * const auto value = basic_hashed_string<char>::to_value("my.png");
      * @endcode
      *
      * @tparam N Number of characters of the identifier.
@@ -88,7 +91,7 @@ public:
      * @return The numeric representation of the string.
      */
     template<std::size_t N>
-    static constexpr hash_type to_value(const char (&str)[N]) ENTT_NOEXCEPT {
+    static constexpr hash_type to_value(const Char (&str)[N]) ENTT_NOEXCEPT {
         return helper(traits_type::offset, str);
     }
 
@@ -107,42 +110,42 @@ public:
      * @param size Length of the string to hash.
      * @return The numeric representation of the string.
      */
-    static hash_type to_value(const char *str, std::size_t size) ENTT_NOEXCEPT {
+    static hash_type to_value(const Char *str, std::size_t size) ENTT_NOEXCEPT {
         ENTT_ID_TYPE partial{traits_type::offset};
         while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
         return partial;
     }
 
     /*! @brief Constructs an empty hashed string. */
-    constexpr hashed_string() ENTT_NOEXCEPT
+    constexpr basic_hashed_string() ENTT_NOEXCEPT
         : str{nullptr}, hash{}
     {}
 
     /**
-     * @brief Constructs a hashed string from an array of const chars.
+     * @brief Constructs a hashed string from an array of const characters.
      *
      * Forcing template resolution avoids implicit conversions. An
      * human-readable identifier can be anything but a plain, old bunch of
      * characters.<br/>
      * Example of use:
      * @code{.cpp}
-     * hashed_string hs{"my.png"};
+     * basic_hashed_string<char> hs{"my.png"};
      * @endcode
      *
      * @tparam N Number of characters of the identifier.
      * @param curr Human-readable identifer.
      */
     template<std::size_t N>
-    constexpr hashed_string(const char (&curr)[N]) ENTT_NOEXCEPT
+    constexpr basic_hashed_string(const Char (&curr)[N]) ENTT_NOEXCEPT
         : str{curr}, hash{helper(traits_type::offset, curr)}
     {}
 
     /**
      * @brief Explicit constructor on purpose to avoid constructing a hashed
-     * string directly from a `const char *`.
+     * string directly from a `const Char *`.
      * @param wrapper Helps achieving the purpose by relying on overloading.
      */
-    explicit constexpr hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
+    explicit constexpr basic_hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
         : str{wrapper.str}, hash{helper(traits_type::offset, wrapper.str)}
     {}
 
@@ -150,7 +153,7 @@ public:
      * @brief Returns the human-readable representation of a hashed string.
      * @return The string used to initialize the instance.
      */
-    constexpr const char * data() const ENTT_NOEXCEPT {
+    constexpr const Char * data() const ENTT_NOEXCEPT {
         return str;
     }
 
@@ -166,7 +169,7 @@ public:
      * @brief Returns the human-readable representation of a hashed string.
      * @return The string used to initialize the instance.
      */
-    constexpr operator const char *() const ENTT_NOEXCEPT { return str; }
+    constexpr operator const Char *() const ENTT_NOEXCEPT { return str; }
 
     /*! @copydoc value */
     constexpr operator hash_type() const ENTT_NOEXCEPT { return hash; }
@@ -176,25 +179,35 @@ public:
      * @param other Hashed string with which to compare.
      * @return True if the two hashed strings are identical, false otherwise.
      */
-    constexpr bool operator==(const hashed_string &other) const ENTT_NOEXCEPT {
+    constexpr bool operator==(const basic_hashed_string &other) const ENTT_NOEXCEPT {
         return hash == other.hash;
     }
 
 private:
-    const char *str;
+    const Char *str;
     hash_type hash;
 };
 
 
 /**
  * @brief Compares two hashed strings.
+ * @tparam Char Character type.
  * @param lhs A valid hashed string.
  * @param rhs A valid hashed string.
  * @return True if the two hashed strings are identical, false otherwise.
  */
-constexpr bool operator!=(const hashed_string &lhs, const hashed_string &rhs) ENTT_NOEXCEPT {
+template<typename Char>
+constexpr bool operator!=(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
+
+
+/*! @brief Aliases for common character types. */
+using hashed_string = basic_hashed_string<char>;
+
+
+/*! @brief Aliases for common character types. */
+using hashed_wstring = basic_hashed_string<wchar_t>;
 
 
 }
@@ -207,6 +220,16 @@ constexpr bool operator!=(const hashed_string &lhs, const hashed_string &rhs) EN
  */
 constexpr entt::hashed_string operator"" ENTT_HS_SUFFIX(const char *str, std::size_t) ENTT_NOEXCEPT {
     return entt::hashed_string{str};
+}
+
+
+/**
+ * @brief User defined literal for hashed wstrings.
+ * @param str The literal without its suffix.
+ * @return A properly initialized hashed wstring.
+ */
+constexpr entt::hashed_wstring operator"" ENTT_HWS_SUFFIX(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
+    return entt::hashed_wstring{str};
 }
 
 

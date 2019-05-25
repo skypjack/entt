@@ -62,3 +62,62 @@ TEST(HashedString, StringView) {
     std::string_view view{str.data()+2, 6};
     ASSERT_EQ(entt::hashed_string::to_value(view.data(), view.size()), 0xbf9cf968);
 }
+
+TEST(HashedWString, Functionalities) {
+    using hash_type = entt::hashed_wstring::hash_type;
+
+    const wchar_t *bar = L"bar";
+
+    auto foo_hws = entt::hashed_wstring{L"foo"};
+    auto bar_hws = entt::hashed_wstring{bar};
+
+    ASSERT_NE(static_cast<hash_type>(foo_hws), static_cast<hash_type>(bar_hws));
+    ASSERT_STREQ(static_cast<const wchar_t *>(foo_hws), L"foo");
+    ASSERT_STREQ(static_cast<const wchar_t *>(bar_hws), bar);
+    ASSERT_STREQ(foo_hws.data(), L"foo");
+    ASSERT_STREQ(bar_hws.data(), bar);
+
+    ASSERT_EQ(foo_hws, foo_hws);
+    ASSERT_NE(foo_hws, bar_hws);
+
+    entt::hashed_wstring hws{L"foobar"};
+
+    ASSERT_EQ(static_cast<hash_type>(hws), 0xbf9cf968);
+    ASSERT_EQ(hws.value(), 0xbf9cf968);
+
+    ASSERT_EQ(foo_hws, L"foo"_hws);
+    ASSERT_NE(bar_hws, L"foo"_hws);
+}
+
+TEST(HashedWString, Empty) {
+    using hash_type = entt::hashed_wstring::hash_type;
+
+    entt::hashed_wstring hws{};
+
+    ASSERT_EQ(static_cast<hash_type>(hws), hash_type{});
+    ASSERT_EQ(static_cast<const wchar_t *>(hws), nullptr);
+}
+
+TEST(HashedWString, Constexprness) {
+    using hash_type = entt::hashed_wstring::hash_type;
+    // how would you test a constexpr otherwise?
+    (void)std::integral_constant<hash_type, entt::hashed_wstring{L"quux"}>{};
+    (void)std::integral_constant<hash_type, L"quux"_hws>{};
+    ASSERT_TRUE(true);
+}
+
+TEST(HashedWString, ToValue) {
+    using hash_type = entt::hashed_wstring::hash_type;
+
+    const wchar_t *foobar = L"foobar";
+
+    ASSERT_EQ(entt::hashed_wstring::to_value(foobar), 0xbf9cf968);
+    // how would you test a constexpr otherwise?
+    (void)std::integral_constant<hash_type, entt::hashed_wstring::to_value(L"quux")>{};
+}
+
+TEST(HashedWString, StringView) {
+    std::wstring str{L"__foobar__"};
+    std::wstring_view view{str.data()+2, 6};
+    ASSERT_EQ(entt::hashed_wstring::to_value(view.data(), view.size()), 0xbf9cf968);
+}
