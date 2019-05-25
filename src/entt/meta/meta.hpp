@@ -1179,7 +1179,7 @@ public:
      * @brief Returns the name assigned to a given meta data.
      * @return The name assigned to the meta data.
      */
-    inline const char * name() const ENTT_NOEXCEPT {
+    inline const hs_char_t * name() const ENTT_NOEXCEPT {
         return node->name;
     }
 
@@ -1373,7 +1373,7 @@ public:
      * @brief Returns the name assigned to a given meta function.
      * @return The name assigned to the meta function.
      */
-    inline const char * name() const ENTT_NOEXCEPT {
+    inline const hs_char_t * name() const ENTT_NOEXCEPT {
         return node->name;
     }
 
@@ -1544,7 +1544,7 @@ public:
      * @brief Returns the name assigned to a given meta type.
      * @return The name assigned to the meta type.
      */
-    inline const char * name() const ENTT_NOEXCEPT {
+    inline const hs_char_t * name() const ENTT_NOEXCEPT {
         return node->name;
     }
 
@@ -1687,7 +1687,7 @@ public:
      * @param str The name to use to search for a meta base.
      * @return The meta base associated with the given name, if any.
      */
-    inline meta_base base(const char *str) const ENTT_NOEXCEPT {
+    inline meta_base base(const hs_char_t *str) const ENTT_NOEXCEPT {
         const auto *curr = internal::find_if<&internal::meta_type_node::base>([name = hashed_string{str}](auto *candidate) {
             return candidate->type()->name == name;
         }, node);
@@ -1787,7 +1787,7 @@ public:
      * @param str The name to use to search for a meta data.
      * @return The meta data associated with the given name, if any.
      */
-    inline meta_data data(const char *str) const ENTT_NOEXCEPT {
+    inline meta_data data(const hs_char_t *str) const ENTT_NOEXCEPT {
         const auto *curr = internal::find_if<&internal::meta_type_node::data>([name = hashed_string{str}](auto *candidate) {
             return candidate->name == name;
         }, node);
@@ -1822,7 +1822,7 @@ public:
      * @param str The name to use to search for a meta function.
      * @return The meta function associated with the given name, if any.
      */
-    inline meta_func func(const char *str) const ENTT_NOEXCEPT {
+    inline meta_func func(const hs_char_t *str) const ENTT_NOEXCEPT {
         const auto *curr = internal::find_if<&internal::meta_type_node::func>([name = hashed_string{str}](auto *candidate) {
             return candidate->name == name;
         }, node);

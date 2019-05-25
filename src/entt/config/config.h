@@ -11,6 +11,11 @@
 #define ENTT_HS_SUFFIX _hs
 #endif // ENTT_HS_SUFFIX
 
+#ifdef ENTT_HS_WIDE
+using hs_char_t = wchar_t;
+#else
+using hs_char_t = char;
+#endif // ENTT_HS_WIDE
 
 #ifndef ENTT_NO_ATOMIC
 #include <atomic>

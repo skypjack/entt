@@ -659,7 +659,7 @@ inline meta_type resolve() ENTT_NOEXCEPT {
  * @param str The name to use to search for a meta type.
  * @return The meta type associated with the given name, if any.
  */
-inline meta_type resolve(const char *str) ENTT_NOEXCEPT {
+inline meta_type resolve(const hs_char_t *str) ENTT_NOEXCEPT {
     const auto *curr = internal::find_if([name = hashed_string{str}](auto *node) {
         return node->name == name;
     }, internal::meta_info<>::type);

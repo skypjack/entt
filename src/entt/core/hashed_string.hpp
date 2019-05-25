@@ -59,12 +59,12 @@ class hashed_string {
 
     struct const_wrapper {
         // non-explicit constructor on purpose
-        constexpr const_wrapper(const char *curr) ENTT_NOEXCEPT: str{curr} {}
-        const char *str;
+        constexpr const_wrapper(const hs_char_t *curr) ENTT_NOEXCEPT: str{curr} {}
+        const hs_char_t *str;
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    inline static constexpr ENTT_ID_TYPE helper(ENTT_ID_TYPE partial, const char *curr) ENTT_NOEXCEPT {
+    inline static constexpr ENTT_ID_TYPE helper(ENTT_ID_TYPE partial, const hs_char_t *curr) ENTT_NOEXCEPT {
         return curr[0] == 0 ? partial : helper((partial^curr[0])*traits_type::prime, curr+1);
     }
 
@@ -77,18 +77,18 @@ public:
      *
      * Forcing template resolution avoids implicit conversions. An
      * human-readable identifier can be anything but a plain, old bunch of
-     * characters.<br/>
+     * hs_char_tacters.<br/>
      * Example of use:
      * @code{.cpp}
      * const auto value = hashed_string::to_value("my.png");
      * @endcode
      *
-     * @tparam N Number of characters of the identifier.
+     * @tparam N Number of hs_char_tacters of the identifier.
      * @param str Human-readable identifer.
      * @return The numeric representation of the string.
      */
     template<std::size_t N>
-    inline static constexpr hash_type to_value(const char (&str)[N]) ENTT_NOEXCEPT {
+    inline static constexpr hash_type to_value(const hs_char_t (&str)[N]) ENTT_NOEXCEPT {
         return helper(traits_type::offset, str);
     }
 
@@ -107,7 +107,7 @@ public:
      * @param size Length of the string to hash.
      * @return The numeric representation of the string.
      */
-    inline static hash_type to_value(const char *str, std::size_t size) ENTT_NOEXCEPT {
+    inline static hash_type to_value(const hs_char_t *str, std::size_t size) ENTT_NOEXCEPT {
         ENTT_ID_TYPE partial{traits_type::offset};
         while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
         return partial;
@@ -119,27 +119,27 @@ public:
     {}
 
     /**
-     * @brief Constructs a hashed string from an array of const chars.
+     * @brief Constructs a hashed string from an array of const hs_char_ts.
      *
      * Forcing template resolution avoids implicit conversions. An
      * human-readable identifier can be anything but a plain, old bunch of
-     * characters.<br/>
+     * hs_char_tacters.<br/>
      * Example of use:
      * @code{.cpp}
      * hashed_string hs{"my.png"};
      * @endcode
      *
-     * @tparam N Number of characters of the identifier.
+     * @tparam N Number of hs_char_tacters of the identifier.
      * @param curr Human-readable identifer.
      */
     template<std::size_t N>
-    constexpr hashed_string(const char (&curr)[N]) ENTT_NOEXCEPT
+    constexpr hashed_string(const hs_char_t (&curr)[N]) ENTT_NOEXCEPT
         : str{curr}, hash{helper(traits_type::offset, curr)}
     {}
 
     /**
      * @brief Explicit constructor on purpose to avoid constructing a hashed
-     * string directly from a `const char *`.
+     * string directly from a `const hs_char_t *`.
      * @param wrapper Helps achieving the purpose by relying on overloading.
      */
     explicit constexpr hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
@@ -150,7 +150,7 @@ public:
      * @brief Returns the human-readable representation of a hashed string.
      * @return The string used to initialize the instance.
      */
-    constexpr const char * data() const ENTT_NOEXCEPT {
+    constexpr const hs_char_t * data() const ENTT_NOEXCEPT {
         return str;
     }
 
@@ -166,7 +166,7 @@ public:
      * @brief Returns the human-readable representation of a hashed string.
      * @return The string used to initialize the instance.
      */
-    constexpr operator const char *() const ENTT_NOEXCEPT { return str; }
+    constexpr operator const hs_char_t *() const ENTT_NOEXCEPT { return str; }
 
     /*! @copydoc value */
     constexpr operator hash_type() const ENTT_NOEXCEPT { return hash; }
@@ -181,7 +181,7 @@ public:
     }
 
 private:
-    const char *str;
+    const hs_char_t *str;
     hash_type hash;
 };
 
@@ -205,7 +205,7 @@ constexpr bool operator!=(const hashed_string &lhs, const hashed_string &rhs) EN
  * @param str The literal without its suffix.
  * @return A properly initialized hashed string.
  */
-constexpr entt::hashed_string operator"" ENTT_HS_SUFFIX(const char *str, std::size_t) ENTT_NOEXCEPT {
+constexpr entt::hashed_string operator"" ENTT_HS_SUFFIX(const hs_char_t *str, std::size_t) ENTT_NOEXCEPT {
     return entt::hashed_string{str};
 }
 
