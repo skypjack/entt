@@ -14,11 +14,9 @@
 
 #ifndef ENTT_NO_ATOMIC
 #include <atomic>
-template<typename Type>
-using maybe_atomic_t = std::atomic<Type>;
+#define ENTT_MAYBE_ATOMIC(Type) std::atomic<Type>
 #else // ENTT_NO_ATOMIC
-template<typename Type>
-using maybe_atomic_t = Type;
+#define ENTT_MAYBE_ATOMIC(Type) Type
 #endif // ENTT_NO_ATOMIC
 
 

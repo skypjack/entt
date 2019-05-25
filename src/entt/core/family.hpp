@@ -18,7 +18,7 @@ namespace entt {
  */
 template<typename...>
 class family {
-    inline static maybe_atomic_t<ENTT_ID_TYPE> identifier;
+    inline static ENTT_MAYBE_ATOMIC(ENTT_ID_TYPE) identifier;
 
     template<typename...>
     inline static const auto inner = identifier++;

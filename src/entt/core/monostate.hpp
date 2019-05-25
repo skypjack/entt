@@ -45,7 +45,7 @@ struct monostate {
 
 private:
     template<typename Type>
-    inline static maybe_atomic_t<Type> value{};
+    inline static ENTT_MAYBE_ATOMIC(Type) value{};
 };
 
 
