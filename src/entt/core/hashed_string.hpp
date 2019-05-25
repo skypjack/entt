@@ -64,7 +64,7 @@ class hashed_string {
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    inline static constexpr ENTT_ID_TYPE helper(ENTT_ID_TYPE partial, const char *curr) ENTT_NOEXCEPT {
+    static constexpr ENTT_ID_TYPE helper(ENTT_ID_TYPE partial, const char *curr) ENTT_NOEXCEPT {
         return curr[0] == 0 ? partial : helper((partial^curr[0])*traits_type::prime, curr+1);
     }
 
@@ -88,7 +88,7 @@ public:
      * @return The numeric representation of the string.
      */
     template<std::size_t N>
-    inline static constexpr hash_type to_value(const char (&str)[N]) ENTT_NOEXCEPT {
+    static constexpr hash_type to_value(const char (&str)[N]) ENTT_NOEXCEPT {
         return helper(traits_type::offset, str);
     }
 
@@ -97,7 +97,7 @@ public:
      * @param wrapper Helps achieving the purpose by relying on overloading.
      * @return The numeric representation of the string.
      */
-    inline static hash_type to_value(const_wrapper wrapper) ENTT_NOEXCEPT {
+    static hash_type to_value(const_wrapper wrapper) ENTT_NOEXCEPT {
         return helper(traits_type::offset, wrapper.str);
     }
 
@@ -107,7 +107,7 @@ public:
      * @param size Length of the string to hash.
      * @return The numeric representation of the string.
      */
-    inline static hash_type to_value(const char *str, std::size_t size) ENTT_NOEXCEPT {
+    static hash_type to_value(const char *str, std::size_t size) ENTT_NOEXCEPT {
         ENTT_ID_TYPE partial{traits_type::offset};
         while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
         return partial;

@@ -98,11 +98,11 @@ class basic_storage: public sparse_set<Entity> {
             return iterator{instances, index-value};
         }
 
-        inline iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
+        iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
             return (*this += -value);
         }
 
-        inline iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+        iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
             return (*this + -value);
         }
 
@@ -119,7 +119,7 @@ class basic_storage: public sparse_set<Entity> {
             return other.index == index;
         }
 
-        inline bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
@@ -131,11 +131,11 @@ class basic_storage: public sparse_set<Entity> {
             return index < other.index;
         }
 
-        inline bool operator<=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator<=(const iterator &other) const ENTT_NOEXCEPT {
             return !(*this > other);
         }
 
-        inline bool operator>=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator>=(const iterator &other) const ENTT_NOEXCEPT {
             return !(*this < other);
         }
 
@@ -144,7 +144,7 @@ class basic_storage: public sparse_set<Entity> {
             return &(*instances)[pos];
         }
 
-        inline reference operator*() const ENTT_NOEXCEPT {
+        reference operator*() const ENTT_NOEXCEPT {
             return *operator->();
         }
 
@@ -226,7 +226,7 @@ public:
     }
 
     /*! @copydoc cbegin */
-    inline const_iterator_type begin() const ENTT_NOEXCEPT {
+    const_iterator_type begin() const ENTT_NOEXCEPT {
         return cbegin();
     }
 
@@ -255,7 +255,7 @@ public:
     }
 
     /*! @copydoc cend */
-    inline const_iterator_type end() const ENTT_NOEXCEPT {
+    const_iterator_type end() const ENTT_NOEXCEPT {
         return cend();
     }
 
@@ -281,7 +281,7 @@ public:
     }
 
     /*! @copydoc get */
-    inline object_type & get(const entity_type entt) ENTT_NOEXCEPT {
+    object_type & get(const entity_type entt) ENTT_NOEXCEPT {
         return const_cast<object_type &>(std::as_const(*this).get(entt));
     }
 
@@ -295,7 +295,7 @@ public:
     }
 
     /*! @copydoc try_get */
-    inline object_type * try_get(const entity_type entt) ENTT_NOEXCEPT {
+    object_type * try_get(const entity_type entt) ENTT_NOEXCEPT {
         return const_cast<object_type *>(std::as_const(*this).try_get(entt));
     }
 
@@ -577,11 +577,11 @@ class basic_storage<Entity, Type, std::enable_if_t<std::is_empty_v<Type>>>: publ
             return iterator{index-value};
         }
 
-        inline iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
+        iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
             return (*this += -value);
         }
 
-        inline iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+        iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
             return (*this + -value);
         }
 
@@ -597,7 +597,7 @@ class basic_storage<Entity, Type, std::enable_if_t<std::is_empty_v<Type>>>: publ
             return other.index == index;
         }
 
-        inline bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
@@ -609,11 +609,11 @@ class basic_storage<Entity, Type, std::enable_if_t<std::is_empty_v<Type>>>: publ
             return index < other.index;
         }
 
-        inline bool operator<=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator<=(const iterator &other) const ENTT_NOEXCEPT {
             return !(*this > other);
         }
 
-        inline bool operator>=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator>=(const iterator &other) const ENTT_NOEXCEPT {
             return !(*this < other);
         }
 
@@ -621,7 +621,7 @@ class basic_storage<Entity, Type, std::enable_if_t<std::is_empty_v<Type>>>: publ
             return nullptr;
         }
 
-        inline reference operator*() const ENTT_NOEXCEPT {
+        reference operator*() const ENTT_NOEXCEPT {
             return {};
         }
 
@@ -657,7 +657,7 @@ public:
     }
 
     /*! @copydoc cbegin */
-    inline iterator_type begin() const ENTT_NOEXCEPT {
+    iterator_type begin() const ENTT_NOEXCEPT {
         return cbegin();
     }
 
@@ -680,7 +680,7 @@ public:
     }
 
     /*! @copydoc cend */
-    inline iterator_type end() const ENTT_NOEXCEPT {
+    iterator_type end() const ENTT_NOEXCEPT {
         return cend();
     }
 

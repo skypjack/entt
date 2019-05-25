@@ -34,7 +34,7 @@ struct as_view {
      * @return A newly created view.
      */
     template<typename... Component>
-    inline operator entt::basic_view<Entity, Component...>() const {
+    operator entt::basic_view<Entity, Component...>() const {
         return reg.template view<Component...>();
     }
 
@@ -87,7 +87,7 @@ struct as_group {
      * @return A newly created group.
      */
     template<typename... Owned>
-    inline operator entt::basic_group<Entity, get_t<>, Owned...>() const {
+    operator entt::basic_group<Entity, get_t<>, Owned...>() const {
         return reg.template group<Owned...>();
     }
 
@@ -153,7 +153,7 @@ void dependency(basic_registry<Entity> &reg, const Entity entt, const Component 
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Component, typename Entity>
-inline void connect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sink) {
+void connect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sink) {
     sink.template connect<dependency<Entity, Component, Dependency...>>();
 }
 
@@ -177,7 +177,7 @@ inline void connect(sink<void(basic_registry<Entity> &, const Entity, Component 
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Component, typename Entity>
-inline void disconnect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sink) {
+void disconnect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sink) {
     sink.template disconnect<dependency<Entity, Component, Dependency...>>();
 }
 

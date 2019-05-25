@@ -40,11 +40,11 @@ class meta_factory {
     static_assert(std::is_object_v<Type> && !(std::is_const_v<Type> || std::is_volatile_v<Type>));
 
     template<typename Node>
-    inline bool duplicate(const hashed_string &name, const Node *node) ENTT_NOEXCEPT {
+    bool duplicate(const hashed_string &name, const Node *node) ENTT_NOEXCEPT {
         return node ? node->name == name || duplicate(name, node->next) : false;
     }
 
-    inline bool duplicate(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
+    bool duplicate(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
         return node ? node->key() == key || duplicate(key, node->next) : false;
     }
 
@@ -674,7 +674,7 @@ inline meta_type resolve(const char *str) ENTT_NOEXCEPT {
  * @param op A valid function object.
  */
 template<typename Op>
-void resolve(Op op) ENTT_NOEXCEPT {
+inline void resolve(Op op) ENTT_NOEXCEPT {
     internal::iterate([op = std::move(op)](auto *node) {
         op(node->meta());
     }, internal::meta_info<>::type);

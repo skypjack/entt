@@ -57,16 +57,16 @@ public:
     }
 
     /*! @copydoc get */
-    inline operator const Resource & () const ENTT_NOEXCEPT { return get(); }
+    operator const Resource & () const ENTT_NOEXCEPT { return get(); }
 
     /*! @copydoc get */
-    inline operator Resource & () ENTT_NOEXCEPT { return get(); }
+    operator Resource & () ENTT_NOEXCEPT { return get(); }
 
     /*! @copydoc get */
-    inline const Resource & operator *() const ENTT_NOEXCEPT { return get(); }
+    const Resource & operator *() const ENTT_NOEXCEPT { return get(); }
 
     /*! @copydoc get */
-    inline Resource & operator *() ENTT_NOEXCEPT { return get(); }
+    Resource & operator *() ENTT_NOEXCEPT { return get(); }
 
     /**
      * @brief Gets a pointer to the managed resource.
@@ -79,13 +79,13 @@ public:
      * @return A pointer to the managed resource or `nullptr` if the handle
      * contains no resource at all.
      */
-    inline const Resource * operator->() const ENTT_NOEXCEPT {
+    const Resource * operator->() const ENTT_NOEXCEPT {
         ENTT_ASSERT(static_cast<bool>(resource));
         return resource.get();
     }
 
     /*! @copydoc operator-> */
-    inline Resource * operator->() ENTT_NOEXCEPT {
+    Resource * operator->() ENTT_NOEXCEPT {
         return const_cast<Resource *>(std::as_const(*this).operator->());
     }
 
