@@ -155,10 +155,10 @@ class sparse_set {
             reverse.resize(page+1);
         }
 
-        if(!reverse[page].first) {
-            reverse[page].first = std::make_unique<entity_type[]>(entt_per_page);
+        if(!reverse[page]) {
+            reverse[page] = std::make_unique<entity_type[]>(entt_per_page);
             // null is safe in all cases for our purposes
-            std::fill_n(reverse[page].first.get(), entt_per_page, null);
+            std::fill_n(reverse[page].get(), entt_per_page, null);
         }
     }
 
@@ -189,10 +189,9 @@ public:
           direct{other.direct}
     {
         for(size_type pos{}, last = other.reverse.size(); pos < last; ++pos) {
-            if(other.reverse[pos].first) {
+            if(other.reverse[pos]) {
                 assure(pos);
-                std::copy_n(other.reverse[pos].first.get(), entt_per_page, reverse[pos].first.get());
-                reverse[pos].second = other.reverse[pos].second;
+                std::copy_n(other.reverse[pos].get(), entt_per_page, reverse[pos].get());
             }
         }
     }
@@ -243,14 +242,9 @@ public:
 
     /*! @brief Requests the removal of unused capacity. */
     virtual void shrink_to_fit() {
-        while(!reverse.empty() && !reverse.back().second) {
-            reverse.pop_back();
-        }
-
-        for(auto &&data: reverse) {
-            if(!data.second) {
-                data.first.reset();
-            }
+        // conservative approach
+        if(direct.empty()) {
+            reverse.clear();
         }
 
         reverse.shrink_to_fit();
@@ -364,7 +358,7 @@ public:
     bool has(const entity_type entt) const ENTT_NOEXCEPT {
         auto [page, offset] = index(entt);
         // testing against null permits to avoid accessing the direct vector
-        return (page < reverse.size() && reverse[page].second && reverse[page].first[offset] != null);
+        return (page < reverse.size() && reverse[page] && reverse[page][offset] != null);
     }
 
     /**
@@ -382,7 +376,7 @@ public:
     size_type get(const entity_type entt) const ENTT_NOEXCEPT {
         ENTT_ASSERT(has(entt));
         auto [page, offset] = index(entt);
-        return size_type(reverse[page].first[offset]);
+        return size_type(reverse[page][offset]);
     }
 
     /**
@@ -400,8 +394,7 @@ public:
         ENTT_ASSERT(!has(entt));
         auto [page, offset] = index(entt);
         assure(page);
-        reverse[page].first[offset] = entity_type(direct.size());
-        reverse[page].second++;
+        reverse[page][offset] = entity_type(direct.size());
         direct.push_back(entt);
     }
 
@@ -424,8 +417,7 @@ public:
             ENTT_ASSERT(!has(entt));
             auto [page, offset] = index(entt);
             assure(page);
-            reverse[page].first[offset] = next++;
-            reverse[page].second++;
+            reverse[page][offset] = next++;
         });
 
         direct.insert(direct.end(), first, last);
@@ -446,10 +438,9 @@ public:
         ENTT_ASSERT(has(entt));
         auto [from_page, from_offset] = index(entt);
         auto [to_page, to_offset] = index(direct.back());
-        direct[size_type(reverse[from_page].first[from_offset])] = direct.back();
-        reverse[to_page].first[to_offset] = reverse[from_page].first[from_offset];
-        reverse[from_page].first[from_offset] = null;
-        reverse[from_page].second--;
+        direct[size_type(reverse[from_page][from_offset])] = direct.back();
+        reverse[to_page][to_offset] = reverse[from_page][from_offset];
+        reverse[from_page][from_offset] = null;
         direct.pop_back();
     }
 
@@ -473,7 +464,7 @@ public:
         ENTT_ASSERT(rhs < direct.size());
         auto [src_page, src_offset] = index(direct[lhs]);
         auto [dst_page, dst_offset] = index(direct[rhs]);
-        std::swap(reverse[src_page].first[src_offset], reverse[dst_page].first[dst_offset]);
+        std::swap(reverse[src_page][src_offset], reverse[dst_page][dst_offset]);
         std::swap(direct[lhs], direct[rhs]);
     }
 
@@ -524,7 +515,7 @@ public:
     }
 
 private:
-    std::vector<std::pair<std::unique_ptr<entity_type[]>, size_type>> reverse;
+    std::vector<std::unique_ptr<entity_type[]>> reverse;
     std::vector<entity_type> direct;
 };
 
