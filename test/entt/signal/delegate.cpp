@@ -172,7 +172,7 @@ TEST(Delegate, ConstNonConstNoExcept) {
     ASSERT_EQ(functor.cnt, 4);
 }
 
-TEST(Delegate, DeducedGuidelines) {
+TEST(Delegate, DeducedGuide) {
     const_nonconst_noexcept functor;
     const int value = 0;
 
