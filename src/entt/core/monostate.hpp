@@ -4,7 +4,6 @@
 
 #include <cassert>
 #include "../config/config.h"
-#include "hashed_string.hpp"
 
 
 namespace entt {
@@ -21,7 +20,7 @@ namespace entt {
  * both during an assignment and when they try to read back their data.
  * Otherwise, they can incur in unexpected results.
  */
-template<hashed_string::hash_type>
+template<ENTT_ID_TYPE>
 struct monostate {
     /**
      * @brief Assigns a value of a specific type to a given key.
@@ -53,7 +52,7 @@ private:
  * @brief Helper variable template.
  * @tparam Value Value used to differentiate between different variables.
  */
-template<hashed_string::hash_type Value>
+template<ENTT_ID_TYPE Value>
 inline monostate<Value> monostate_v = {};
 
 

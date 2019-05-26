@@ -11,7 +11,6 @@
 #include <functional>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/hashed_string.hpp"
 
 
 namespace entt {
@@ -92,7 +91,7 @@ struct meta_dtor_node {
 
 struct meta_data_node {
     meta_data_node ** const underlying;
-    hashed_string name;
+    ENTT_ID_TYPE identifier;
     meta_type_node * const parent;
     meta_data_node * next;
     meta_prop_node * prop;
@@ -108,7 +107,7 @@ struct meta_data_node {
 struct meta_func_node {
     using size_type = std::size_t;
     meta_func_node ** const underlying;
-    hashed_string name;
+    ENTT_ID_TYPE identifier;
     meta_type_node * const parent;
     meta_func_node * next;
     meta_prop_node * prop;
@@ -124,7 +123,7 @@ struct meta_func_node {
 
 struct meta_type_node {
     using size_type = std::size_t;
-    hashed_string name;
+    ENTT_ID_TYPE identifier;
     meta_type_node * next;
     meta_prop_node * prop;
     const bool is_void;
@@ -1176,11 +1175,11 @@ public:
     {}
 
     /**
-     * @brief Returns the name assigned to a given meta data.
-     * @return The name assigned to the meta data.
+     * @brief Returns the identifier assigned to a given meta data.
+     * @return The identifier assigned to the meta data.
      */
-    const char * name() const ENTT_NOEXCEPT {
-        return node->name;
+    ENTT_ID_TYPE identifier() const ENTT_NOEXCEPT {
+        return node->identifier;
     }
 
     /**
@@ -1370,11 +1369,11 @@ public:
     {}
 
     /**
-     * @brief Returns the name assigned to a given meta function.
-     * @return The name assigned to the meta function.
+     * @brief Returns the identifier assigned to a given meta function.
+     * @return The identifier assigned to the meta function.
      */
-    const char * name() const ENTT_NOEXCEPT {
-        return node->name;
+    ENTT_ID_TYPE identifier() const ENTT_NOEXCEPT {
+        return node->identifier;
     }
 
     /**
@@ -1541,11 +1540,11 @@ public:
     {}
 
     /**
-     * @brief Returns the name assigned to a given meta type.
-     * @return The name assigned to the meta type.
+     * @brief Returns the identifier assigned to a given meta type.
+     * @return The identifier assigned to the meta type.
      */
-    const char * name() const ENTT_NOEXCEPT {
-        return node->name;
+    ENTT_ID_TYPE identifier() const ENTT_NOEXCEPT {
+        return node->identifier;
     }
 
     /**
@@ -1673,23 +1672,24 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    void base(Op op) const ENTT_NOEXCEPT {
+    std::enable_if_t<std::is_invocable_v<Op, meta_base>, void>
+    base(Op op) const ENTT_NOEXCEPT {
         internal::iterate<&internal::meta_type_node::base>([op = std::move(op)](auto *curr) {
             op(curr->meta());
         }, node);
     }
 
     /**
-     * @brief Returns the meta base associated with a given name.
+     * @brief Returns the meta base associated with a given identifier.
      *
      * Searches recursively among **all** the base classes of the given type.
      *
-     * @param str The name to use to search for a meta base.
-     * @return The meta base associated with the given name, if any.
+     * @param identifier Unique identifier.
+     * @return The meta base associated with the given identifier, if any.
      */
-    meta_base base(const char *str) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if<&internal::meta_type_node::base>([name = hashed_string{str}](auto *candidate) {
-            return candidate->type()->name == name;
+    meta_base base(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
+        const auto *curr = internal::find_if<&internal::meta_type_node::base>([identifier](auto *candidate) {
+            return candidate->type()->identifier == identifier;
         }, node);
 
         return curr ? curr->meta() : meta_base{};
@@ -1771,25 +1771,26 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    void data(Op op) const ENTT_NOEXCEPT {
+    std::enable_if_t<std::is_invocable_v<Op, meta_data>, void>
+    data(Op op) const ENTT_NOEXCEPT {
         internal::iterate<&internal::meta_type_node::data>([op = std::move(op)](auto *curr) {
             op(curr->meta());
         }, node);
     }
 
     /**
-     * @brief Returns the meta data associated with a given name.
+     * @brief Returns the meta data associated with a given identifier.
      *
      * Searches recursively among **all** the meta data of the given type. This
      * means that the meta data of the base classes will also be inspected, if
      * any.
      *
-     * @param str The name to use to search for a meta data.
-     * @return The meta data associated with the given name, if any.
+     * @param identifier Unique identifier.
+     * @return The meta data associated with the given identifier, if any.
      */
-    meta_data data(const char *str) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if<&internal::meta_type_node::data>([name = hashed_string{str}](auto *candidate) {
-            return candidate->name == name;
+    meta_data data(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
+        const auto *curr = internal::find_if<&internal::meta_type_node::data>([identifier](auto *candidate) {
+            return candidate->identifier == identifier;
         }, node);
 
         return curr ? curr->meta() : meta_data{};
@@ -1806,25 +1807,26 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    void func(Op op) const ENTT_NOEXCEPT {
+    std::enable_if_t<std::is_invocable_v<Op, meta_func>, void>
+    func(Op op) const ENTT_NOEXCEPT {
         internal::iterate<&internal::meta_type_node::func>([op = std::move(op)](auto *curr) {
             op(curr->meta());
         }, node);
     }
 
     /**
-     * @brief Returns the meta function associated with a given name.
+     * @brief Returns the meta function associated with a given identifier.
      *
      * Searches recursively among **all** the meta functions of the given type.
      * This means that the meta functions of the base classes will also be
      * inspected, if any.
      *
-     * @param str The name to use to search for a meta function.
-     * @return The meta function associated with the given name, if any.
+     * @param identifier Unique identifier.
+     * @return The meta function associated with the given identifier, if any.
      */
-    meta_func func(const char *str) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if<&internal::meta_type_node::func>([name = hashed_string{str}](auto *candidate) {
-            return candidate->name == name;
+    meta_func func(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
+        const auto *curr = internal::find_if<&internal::meta_type_node::func>([identifier](auto *candidate) {
+            return candidate->identifier == identifier;
         }, node);
 
         return curr ? curr->meta() : meta_func{};

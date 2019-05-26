@@ -121,3 +121,8 @@ TEST(HashedWString, StringView) {
     std::wstring_view view{str.data()+2, 6};
     ASSERT_EQ(entt::hashed_wstring::to_value(view.data(), view.size()), 0xbf9cf968);
 }
+
+TEST(BasicHashedString, DeductionGuide) {
+    static_assert(std::is_same_v<decltype(entt::basic_hashed_string{"foo"}), entt::hashed_string>);
+    static_assert(std::is_same_v<decltype(entt::basic_hashed_string{L"foo"}), entt::hashed_wstring>);
+}

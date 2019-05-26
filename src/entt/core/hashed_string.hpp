@@ -72,6 +72,8 @@ class basic_hashed_string {
     }
 
 public:
+    /*! @brief Character type. */
+    using value_type = Char;
     /*! @brief Unsigned integer type. */
     using hash_type = ENTT_ID_TYPE;
 
@@ -91,7 +93,7 @@ public:
      * @return The numeric representation of the string.
      */
     template<std::size_t N>
-    static constexpr hash_type to_value(const Char (&str)[N]) ENTT_NOEXCEPT {
+    static constexpr hash_type to_value(const value_type (&str)[N]) ENTT_NOEXCEPT {
         return helper(traits_type::offset, str);
     }
 
@@ -110,7 +112,7 @@ public:
      * @param size Length of the string to hash.
      * @return The numeric representation of the string.
      */
-    static hash_type to_value(const Char *str, std::size_t size) ENTT_NOEXCEPT {
+    static hash_type to_value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
         ENTT_ID_TYPE partial{traits_type::offset};
         while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
         return partial;
@@ -136,13 +138,13 @@ public:
      * @param curr Human-readable identifer.
      */
     template<std::size_t N>
-    constexpr basic_hashed_string(const Char (&curr)[N]) ENTT_NOEXCEPT
+    constexpr basic_hashed_string(const value_type (&curr)[N]) ENTT_NOEXCEPT
         : str{curr}, hash{helper(traits_type::offset, curr)}
     {}
 
     /**
      * @brief Explicit constructor on purpose to avoid constructing a hashed
-     * string directly from a `const Char *`.
+     * string directly from a `const value_type *`.
      * @param wrapper Helps achieving the purpose by relying on overloading.
      */
     explicit constexpr basic_hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
@@ -153,7 +155,7 @@ public:
      * @brief Returns the human-readable representation of a hashed string.
      * @return The string used to initialize the instance.
      */
-    constexpr const Char * data() const ENTT_NOEXCEPT {
+    constexpr const value_type * data() const ENTT_NOEXCEPT {
         return str;
     }
 
@@ -169,7 +171,7 @@ public:
      * @brief Returns the human-readable representation of a hashed string.
      * @return The string used to initialize the instance.
      */
-    constexpr operator const Char *() const ENTT_NOEXCEPT { return str; }
+    constexpr operator const value_type *() const ENTT_NOEXCEPT { return str; }
 
     /*! @copydoc value */
     constexpr operator hash_type() const ENTT_NOEXCEPT { return hash; }
@@ -184,9 +186,24 @@ public:
     }
 
 private:
-    const Char *str;
+    const value_type *str;
     hash_type hash;
 };
+
+
+/**
+ * @brief Deduction guide.
+ *
+ * It allows to deduce the character type of the hashed string directly from a
+ * human-readable identifer provided to the constructor.
+ *
+ * @tparam Char Character type.
+ * @tparam N Number of characters of the identifier.
+ * @param str Human-readable identifer.
+ */
+template<typename Char, std::size_t N>
+basic_hashed_string(const Char (&str)[N]) ENTT_NOEXCEPT
+-> basic_hashed_string<Char>;
 
 
 /**

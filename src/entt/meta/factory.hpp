@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/hashed_string.hpp"
 #include "meta.hpp"
 
 
@@ -18,7 +17,7 @@ class meta_factory;
 
 
 template<typename Type, typename... Property>
-meta_factory<Type> reflect(const char *str, Property &&... property) ENTT_NOEXCEPT;
+meta_factory<Type> reflect(const ENTT_ID_TYPE identifier, Property &&... property) ENTT_NOEXCEPT;
 
 
 template<typename Type>
@@ -40,8 +39,8 @@ class meta_factory {
     static_assert(std::is_object_v<Type> && !(std::is_const_v<Type> || std::is_volatile_v<Type>));
 
     template<typename Node>
-    bool duplicate(const hashed_string &name, const Node *node) ENTT_NOEXCEPT {
-        return node ? node->name == name || duplicate(name, node->next) : false;
+    bool duplicate(const ENTT_ID_TYPE identifier, const Node *node) ENTT_NOEXCEPT {
+        return node ? node->identifier == identifier || duplicate(identifier, node->next) : false;
     }
 
     bool duplicate(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
@@ -77,7 +76,7 @@ class meta_factory {
     }
 
     template<typename... Property>
-    meta_factory type(hashed_string name, Property &&... property) ENTT_NOEXCEPT {
+    meta_factory type(const ENTT_ID_TYPE identifier, Property &&... property) ENTT_NOEXCEPT {
         static internal::meta_type_node node{
             {},
             nullptr,
@@ -103,10 +102,10 @@ class meta_factory {
             }
         };
 
-        node.name = name;
+        node.identifier = identifier;
         node.next = internal::meta_info<>::type;
         node.prop = properties<Type>(std::forward<Property>(property)...);
-        ENTT_ASSERT(!duplicate(name, node.next));
+        ENTT_ASSERT(!duplicate(identifier, node.next));
         ENTT_ASSERT(!internal::meta_info<Type>::type);
         internal::meta_info<Type>::type = &node;
         internal::meta_info<>::type = &node;
@@ -175,7 +174,7 @@ class meta_factory {
             unregister_all<&internal::meta_type_node::func>(0);
             unregister_dtor();
 
-            internal::meta_info<Type>::type->name = {};
+            internal::meta_info<Type>::type->identifier = {};
             internal::meta_info<Type>::type->next = nullptr;
             internal::meta_info<Type>::type = nullptr;
         }
@@ -187,7 +186,7 @@ class meta_factory {
 
 public:
     template<typename Other, typename... Property>
-    friend meta_factory<Other> reflect(const char *str, Property &&... property) ENTT_NOEXCEPT;
+    friend meta_factory<Other> reflect(const ENTT_ID_TYPE identifier, Property &&... property) ENTT_NOEXCEPT;
 
     template<typename Other>
     friend bool unregister() ENTT_NOEXCEPT;
@@ -398,12 +397,12 @@ public:
      *
      * @tparam Data The actual variable to attach to the meta type.
      * @tparam Property Types of properties to assign to the meta data.
-     * @param str The name to assign to the meta data.
+     * @param identifier Unique identifier.
      * @param property Properties to assign to the meta data.
      * @return A meta factory for the parent type.
      */
     template<auto Data, typename... Property>
-    meta_factory data(const char *str, Property &&... property) ENTT_NOEXCEPT {
+    meta_factory data(const ENTT_ID_TYPE identifier, Property &&... property) ENTT_NOEXCEPT {
         auto * const type = internal::meta_info<Type>::resolve();
         internal::meta_data_node *curr = nullptr;
 
@@ -471,9 +470,9 @@ public:
             curr = &node;
         }
 
-        curr->name = hashed_string{str};
+        curr->identifier = identifier;
         curr->next = type->data;
-        ENTT_ASSERT(!duplicate(hashed_string{str}, curr->next));
+        ENTT_ASSERT(!duplicate(identifier, curr->next));
         ENTT_ASSERT((!internal::meta_info<Type>::template data<Data>));
         internal::meta_info<Type>::template data<Data> = curr;
         type->data = curr;
@@ -498,12 +497,12 @@ public:
      * @tparam Setter The actual function to use as a setter.
      * @tparam Getter The actual function to use as a getter.
      * @tparam Property Types of properties to assign to the meta data.
-     * @param str The name to assign to the meta data.
+     * @param identifier Unique identifier.
      * @param property Properties to assign to the meta data.
      * @return A meta factory for the parent type.
      */
     template<auto Setter, auto Getter, typename... Property>
-    meta_factory data(const char *str, Property &&... property) ENTT_NOEXCEPT {
+    meta_factory data(const ENTT_ID_TYPE identifier, Property &&... property) ENTT_NOEXCEPT {
         using owner_type = std::tuple<std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>;
         using underlying_type = std::invoke_result_t<decltype(Getter), Type *>;
         static_assert(std::is_invocable_v<decltype(Setter), Type *, underlying_type>);
@@ -525,10 +524,10 @@ public:
             }
         };
 
-        node.name = hashed_string{str};
+        node.identifier = identifier;
         node.next = type->data;
         node.prop = properties<owner_type>(std::forward<Property>(property)...);
-        ENTT_ASSERT(!duplicate(hashed_string{str}, node.next));
+        ENTT_ASSERT(!duplicate(identifier, node.next));
         ENTT_ASSERT((!internal::meta_info<Type>::template data<Setter, Getter>));
         internal::meta_info<Type>::template data<Setter, Getter> = &node;
         type->data = &node;
@@ -546,12 +545,12 @@ public:
      *
      * @tparam Func The actual function to attach to the meta type.
      * @tparam Property Types of properties to assign to the meta function.
-     * @param str The name to assign to the meta function.
+     * @param identifier Unique identifier.
      * @param property Properties to assign to the meta function.
      * @return A meta factory for the parent type.
      */
     template<auto Func, typename... Property>
-    meta_factory func(const char *str, Property &&... property) ENTT_NOEXCEPT {
+    meta_factory func(const ENTT_ID_TYPE identifier, Property &&... property) ENTT_NOEXCEPT {
         using owner_type = std::integral_constant<decltype(Func), Func>;
         using func_type = internal::meta_function_helper<std::integral_constant<decltype(Func), Func>>;
         auto * const type = internal::meta_info<Type>::resolve();
@@ -575,10 +574,10 @@ public:
             }
         };
 
-        node.name = hashed_string{str};
+        node.identifier = identifier;
         node.next = type->func;
         node.prop = properties<owner_type>(std::forward<Property>(property)...);
-        ENTT_ASSERT(!duplicate(hashed_string{str}, node.next));
+        ENTT_ASSERT(!duplicate(identifier, node.next));
         ENTT_ASSERT((!internal::meta_info<Type>::template func<Func>));
         internal::meta_info<Type>::template func<Func> = &node;
         type->func = &node;
@@ -598,13 +597,13 @@ public:
  *
  * @tparam Type Type to reflect.
  * @tparam Property Types of properties to assign to the reflected type.
- * @param str The name to assign to the reflected type.
+ * @param identifier Unique identifier.
  * @param property Properties to assign to the reflected type.
  * @return A meta factory for the given type.
  */
 template<typename Type, typename... Property>
-inline meta_factory<Type> reflect(const char *str, Property &&... property) ENTT_NOEXCEPT {
-    return meta_factory<Type>{}.type(hashed_string{str}, std::forward<Property>(property)...);
+inline meta_factory<Type> reflect(const ENTT_ID_TYPE identifier, Property &&... property) ENTT_NOEXCEPT {
+    return meta_factory<Type>{}.type(identifier, std::forward<Property>(property)...);
 }
 
 
@@ -655,13 +654,13 @@ inline meta_type resolve() ENTT_NOEXCEPT {
 
 
 /**
- * @brief Returns the meta type associated with a given name.
- * @param str The name to use to search for a meta type.
- * @return The meta type associated with the given name, if any.
+ * @brief Returns the meta type associated with a given identifier.
+ * @param identifier Unique identifier.
+ * @return The meta type associated with the given identifier, if any.
  */
-inline meta_type resolve(const char *str) ENTT_NOEXCEPT {
-    const auto *curr = internal::find_if([name = hashed_string{str}](auto *node) {
-        return node->name == name;
+inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
+    const auto *curr = internal::find_if([identifier](auto *node) {
+        return node->identifier == identifier;
     }, internal::meta_info<>::type);
 
     return curr ? curr->meta() : meta_type{};
@@ -674,7 +673,8 @@ inline meta_type resolve(const char *str) ENTT_NOEXCEPT {
  * @param op A valid function object.
  */
 template<typename Op>
-inline void resolve(Op op) ENTT_NOEXCEPT {
+inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
+resolve(Op op) ENTT_NOEXCEPT {
     internal::iterate([op = std::move(op)](auto *node) {
         op(node->meta());
     }, internal::meta_info<>::type);

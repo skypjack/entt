@@ -7,7 +7,6 @@
 #include <type_traits>
 #include <unordered_map>
 #include "../config/config.h"
-#include "../core/hashed_string.hpp"
 #include "handle.hpp"
 #include "loader.hpp"
 #include "fwd.hpp"
@@ -28,13 +27,13 @@ namespace entt {
  */
 template<typename Resource>
 class resource_cache {
-    using container_type = std::unordered_map<hashed_string::hash_type, std::shared_ptr<Resource>>;
+    using container_type = std::unordered_map<ENTT_ID_TYPE, std::shared_ptr<Resource>>;
 
 public:
     /*! @brief Unsigned integer type. */
     using size_type = typename container_type::size_type;
     /*! @brief Type of resources managed by a cache. */
-    using resource_type = typename hashed_string::hash_type;
+    using resource_type = ENTT_ID_TYPE;
 
     /*! @brief Default constructor. */
     resource_cache() = default;

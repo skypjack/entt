@@ -3,6 +3,7 @@
 
 
 #include <type_traits>
+#include "../config/config.h"
 #include "../core/hashed_string.hpp"
 
 
@@ -173,7 +174,7 @@ constexpr auto is_named_type_v = is_named_type<Type>::value;
 #define ENTT_NAMED_TYPE(type)\
     template<>\
     struct entt::named_type_traits<type>\
-        : std::integral_constant<typename entt::hashed_string::hash_type, entt::hashed_string::to_value(#type)>\
+        : std::integral_constant<ENTT_ID_TYPE, entt::basic_hashed_string{#type}>\
     {\
         static_assert(std::is_same_v<std::decay_t<type>, type>);\
     };

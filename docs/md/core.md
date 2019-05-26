@@ -9,6 +9,7 @@
 * [Compile-time identifiers](#compile-time-identifiers)
 * [Runtime identifiers](#runtime-identifiers)
 * [Hashed strings](#hashed-strings)
+  * [Wide characters](wide-characters)
   * [Conflicts](#conflicts)
 * [Monostate](#monostate)
 <!--
@@ -129,6 +130,22 @@ more user-friendly:
 ```cpp
 constexpr auto str = "text"_hs;
 ```
+
+## Wide characters
+
+The hashed string has a design that is close to that of an `std::basic_string`.
+It means that `hashed_string` is nothing more than an alias for
+`basic_hashed_string<char>`. For those who want to use the C++ type for wide
+character representation, there exists also the alias `hashed_wstring` for
+`basic_hashed_string<wchar_t>`.<br/>
+In this case, the user defined literal to use to create hashed strings on the
+fly is `_hws`:
+
+```cpp
+constexpr auto str = "text"_hws;
+```
+
+Note that the hash type of the `hashed_wstring` is the same of its counterpart.
 
 ## Conflicts
 

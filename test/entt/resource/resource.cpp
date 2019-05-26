@@ -1,5 +1,6 @@
 #include <type_traits>
 #include <gtest/gtest.h>
+#include <entt/core/hashed_string.hpp>
 #include <entt/resource/cache.hpp>
 
 struct resource { int value; };

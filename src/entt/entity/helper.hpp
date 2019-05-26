@@ -4,7 +4,6 @@
 
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/hashed_string.hpp"
 #include "../signal/sigh.hpp"
 #include "registry.hpp"
 
@@ -201,8 +200,8 @@ void disconnect(sink<void(basic_registry<Entity> &, const Entity, Component &)> 
  *
  * @tparam Value The numeric representation of an instance of hashed string.
  */
-template<typename hashed_string::hash_type Value>
-using tag = std::integral_constant<typename hashed_string::hash_type, Value>;
+template<ENTT_ID_TYPE Value>
+using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
 
 
 }
