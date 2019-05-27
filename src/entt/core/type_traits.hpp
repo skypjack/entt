@@ -169,12 +169,25 @@ constexpr auto is_named_type_v = is_named_type<Type>::value;
 
 /**
  * @brief Makes an already existing type a named type.
+ *
+ * The current definition contains a workaround for Clang 6 because it fails to
+ * deduce correctly the type to use to specialize the class template.<br/>
+ * With a compiler that fully supports C++17 and works fine with deduction
+ * guides, the following should be fine instead:
+ *
+ * @code{.cpp}
+ * std::integral_constant<ENTT_ID_TYPE, entt::basic_hashed_string{#type}>
+ * @endcode
+ *
+ * In order to support even sligthly older compilers, I prefer to stick to the
+ * implementation below.
+ *
  * @param type Type to assign a name to.
  */
 #define ENTT_NAMED_TYPE(type)\
     template<>\
     struct entt::named_type_traits<type>\
-        : std::integral_constant<ENTT_ID_TYPE, entt::basic_hashed_string{#type}>\
+        : std::integral_constant<ENTT_ID_TYPE, entt::basic_hashed_string<std::remove_cv_t<std::remove_pointer_t<std::decay_t<decltype(#type)>>>>{#type}>\
     {\
         static_assert(std::is_same_v<std::decay_t<type>, type>);\
     };
