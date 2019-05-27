@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_ENTITY_HPP
 
 
+#include <cstdint>
 #include "../config/config.h"
 
 
