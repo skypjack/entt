@@ -77,17 +77,13 @@ struct as_group {
 
     /**
      * @brief Conversion function from a registry to a group.
-     *
-     * @note
-     * Unfortunately, only full owning groups are supported because of an issue
-     * with msvc that doesn't manage to correctly deduce types.
-     *
+     * @tparam Get Types of components observed by the group.
      * @tparam Owned Types of components owned by the group.
      * @return A newly created group.
      */
-    template<typename... Owned>
-    operator entt::basic_group<Entity, get_t<>, Owned...>() const {
-        return reg.template group<Owned...>();
+    template<typename Get, typename... Owned>
+    operator entt::basic_group<Entity, Get, Owned...>() const {
+        return reg.template group<Owned...>(Get{});
     }
 
 private:

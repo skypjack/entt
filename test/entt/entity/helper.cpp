@@ -20,6 +20,10 @@ TEST(Helper, AsGroup) {
     ([](entt::group<entt::get_t<>, double, float>) {})(entt::as_group{registry});
     ([](entt::group<entt::get_t<>, const double, float>) {})(entt::as_group{registry});
     ([](entt::group<entt::get_t<>, const double, const float>) {})(entt::as_group{cregistry});
+
+    ([](entt::group<entt::get_t<int>, char>) {})(entt::as_group{registry});
+    ([](entt::group<entt::get_t<const int>, char>) {})(entt::as_group{registry});
+    ([](entt::group<entt::get_t<const int>, const char>) {})(entt::as_group{cregistry});
 }
 
 TEST(Helper, Dependency) {
