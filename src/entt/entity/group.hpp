@@ -16,6 +16,22 @@ namespace entt {
 
 
 /**
+ * @brief Alias for exclusion lists.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+struct exclude_t: type_list<Type...> {};
+
+
+/**
+ * @brief Variable template for exclusion lists.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+constexpr exclude_t<Type...> exclude{};
+
+
+/**
  * @brief Alias for lists of observed components.
  * @tparam Type List of types.
  */
@@ -76,10 +92,11 @@ class basic_group;
  * In any other case, attempting to use a group results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Exclude Types of components used to filter the group.
  * @tparam Get Types of components observed by the group.
  */
-template<typename Entity, typename... Get>
-class basic_group<Entity, get_t<Get...>> {
+template<typename Entity, typename... Exclude, typename... Get>
+class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
     static_assert(sizeof...(Get) > 0);
 
     /*! @brief A registry is allowed to create groups. */
@@ -435,11 +452,12 @@ private:
  * In any other case, attempting to use a group results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Exclude Types of components used to filter the group.
  * @tparam Get Types of components observed by the group.
  * @tparam Owned Types of components owned by the group.
  */
-template<typename Entity, typename... Get, typename... Owned>
-class basic_group<Entity, get_t<Get...>, Owned...> {
+template<typename Entity, typename... Exclude, typename... Get, typename... Owned>
+class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
     static_assert(sizeof...(Get) + sizeof...(Owned) > 0);
 
     /*! @brief A registry is allowed to create groups. */

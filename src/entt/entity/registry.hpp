@@ -30,22 +30,6 @@ namespace entt {
 
 
 /**
- * @brief Alias for exclusion lists.
- * @tparam Type List of types.
- */
-template<typename... Type>
-struct exclude_t: type_list<Type...> {};
-
-
-/**
- * @brief Variable template for exclusion lists.
- * @tparam Type List of types.
- */
-template<typename... Type>
-constexpr exclude_t<Type...> exclude{};
-
-
-/**
  * @brief Fast and reliable entity-component system.
  *
  * The registry is the core class of the entity-component framework.<br/>
@@ -1319,7 +1303,7 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    entt::basic_group<Entity, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) {
+    entt::basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0);
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1);
 
@@ -1394,20 +1378,20 @@ public:
 
     /*! @copydoc group */
     template<typename... Owned, typename... Get, typename... Exclude>
-    entt::basic_group<Entity, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) const {
+    entt::basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) const {
         static_assert(std::conjunction_v<std::is_const<Owned>..., std::is_const<Get>...>);
         return const_cast<basic_registry *>(this)->group<Owned...>(entt::get<Get...>, exclude<Exclude...>);
     }
 
     /*! @copydoc group */
     template<typename... Owned, typename... Exclude>
-    entt::basic_group<Entity, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) {
+    entt::basic_group<Entity, exclude_t<Exclude...>, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) {
         return group<Owned...>(entt::get<>, exclude<Exclude...>);
     }
 
     /*! @copydoc group */
     template<typename... Owned, typename... Exclude>
-    entt::basic_group<Entity, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) const {
+    entt::basic_group<Entity, exclude_t<Exclude...>, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) const {
         static_assert(std::conjunction_v<std::is_const<Owned>...>);
         return const_cast<basic_registry *>(this)->group<Owned...>(exclude<Exclude...>);
     }

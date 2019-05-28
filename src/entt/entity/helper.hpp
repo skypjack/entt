@@ -77,13 +77,14 @@ struct as_group {
 
     /**
      * @brief Conversion function from a registry to a group.
+     * @tparam Exclude Types of components used to filter the group.
      * @tparam Get Types of components observed by the group.
      * @tparam Owned Types of components owned by the group.
      * @return A newly created group.
      */
-    template<typename Get, typename... Owned>
-    operator entt::basic_group<Entity, Get, Owned...>() const {
-        return reg.template group<Owned...>(Get{});
+    template<typename Exclude, typename Get, typename... Owned>
+    operator entt::basic_group<Entity, Exclude, Get, Owned...>() const {
+        return reg.template group<Owned...>(Get{}, Exclude{});
     }
 
 private:

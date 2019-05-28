@@ -17,13 +17,10 @@ TEST(Helper, AsGroup) {
     entt::registry registry;
     const entt::registry cregistry;
 
-    ([](entt::group<entt::get_t<>, double, float>) {})(entt::as_group{registry});
-    ([](entt::group<entt::get_t<>, const double, float>) {})(entt::as_group{registry});
-    ([](entt::group<entt::get_t<>, const double, const float>) {})(entt::as_group{cregistry});
-
-    ([](entt::group<entt::get_t<int>, char>) {})(entt::as_group{registry});
-    ([](entt::group<entt::get_t<const int>, char>) {})(entt::as_group{registry});
-    ([](entt::group<entt::get_t<const int>, const char>) {})(entt::as_group{cregistry});
+    ([](entt::group<entt::exclude_t<int>, entt::get_t<char>, double>) {})(entt::as_group{registry});
+    ([](entt::group<entt::exclude_t<const int>, entt::get_t<char>, double>) {})(entt::as_group{registry});
+    ([](entt::group<entt::exclude_t<const int>, entt::get_t<const char>, double>) {})(entt::as_group{registry});
+    ([](entt::group<entt::exclude_t<const int>, entt::get_t<const char>, const double>) {})(entt::as_group{registry});
 }
 
 TEST(Helper, Dependency) {
