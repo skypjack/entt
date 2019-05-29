@@ -15,6 +15,7 @@
 #include "../core/family.hpp"
 #include "../core/algorithm.hpp"
 #include "../core/type_traits.hpp"
+#include "../signal/delegate.hpp"
 #include "../signal/sigh.hpp"
 #include "runtime_view.hpp"
 #include "sparse_set.hpp"
@@ -125,14 +126,19 @@ class basic_registry {
 
     template<typename... Exclude, typename... Get>
     struct group_handler<type_list<Exclude...>, type_list<Get...>>: sparse_set<Entity> {
+        std::tuple<pool_type<Get> *..., pool_type<Exclude> *...> cpools{};
+
         template<typename Component, typename... Args>
-        void maybe_valid_if(basic_registry &reg, const Entity entt, const Args &...) {
+        void maybe_valid_if(basic_registry &, const Entity entt, const Args &...) {
             if constexpr(std::disjunction_v<std::is_same<Get, Component>...>) {
-                if(((std::is_same_v<Component, Get> || reg.pool<Get>()->has(entt)) && ...) && !(reg.pool<Exclude>()->has(entt) || ...)) {
+                if(((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
+                        && !(std::get<pool_type<Exclude> *>(cpools)->has(entt) || ...))
+                {
                     this->construct(entt);
                 }
             } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
-                if((reg.pool<Get>()->has(entt) && ...) && ((std::is_same_v<Exclude, Component> || !reg.pool<Exclude>()->has(entt)) && ...)) {
+                if((std::get<pool_type<Get> *>(cpools)->has(entt) && ...)
+                        && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...)) {
                     this->construct(entt);
                 }
             }
@@ -148,24 +154,23 @@ class basic_registry {
 
     template<typename... Exclude, typename... Get, typename... Owned>
     struct group_handler<type_list<Exclude...>, type_list<Get...>, Owned...>: sparse_set<Entity> {
+        std::tuple<pool_type<Owned> *..., pool_type<Get> *..., pool_type<Exclude> *...> cpools{};
         std::size_t owned{};
 
         template<typename Component, typename... Args>
-        void maybe_valid_if(basic_registry &reg, const Entity entt, const Args &...) {
-            const auto cpools = std::make_tuple(reg.pool<Owned>()...);
-
+        void maybe_valid_if(basic_registry &, const Entity entt, const Args &...) {
             if constexpr(std::disjunction_v<std::is_same<Owned, Component>..., std::is_same<Get, Component>...>) {
                 if(((std::is_same_v<Component, Owned> || std::get<pool_type<Owned> *>(cpools)->has(entt)) && ...)
-                        && ((std::is_same_v<Component, Get> || reg.pool<Get>()->has(entt)) && ...)
-                        && !(reg.pool<Exclude>()->has(entt) || ...))
+                        && ((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
+                        && !(std::get<pool_type<Exclude> *>(cpools)->has(entt) || ...))
                 {
                     const auto pos = this->owned++;
                     (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entt), pos), ...);
                 }
             } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
                 if((std::get<pool_type<Owned> *>(cpools)->has(entt) && ...)
-                        && (reg.pool<Get>()->has(entt) && ...)
-                        && ((std::is_same_v<Exclude, Component> || !reg.pool<Exclude>()->has(entt)) && ...))
+                        && (std::get<pool_type<Get> *>(cpools)->has(entt) && ...)
+                        && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...))
                 {
                     const auto pos = this->owned++;
                     (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entt), pos), ...);
@@ -174,9 +179,7 @@ class basic_registry {
         }
 
         template<typename... Args>
-        void discard_if(basic_registry &reg, const Entity entt, const Args &...) {
-            const auto cpools = std::make_tuple(reg.pool<Owned>()...);
-
+        void discard_if(basic_registry &, const Entity entt, const Args &...) {
             if(std::get<0>(cpools)->has(entt) && std::get<0>(cpools)->sparse_set<Entity>::get(entt) < this->owned) {
                 const auto pos = --this->owned;
                 (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entt), pos), ...);
@@ -187,7 +190,7 @@ class basic_registry {
     struct pool_data {
         std::unique_ptr<sparse_set<Entity>> pool;
         std::unique_ptr<sparse_set<Entity>> (* clone)(const sparse_set<Entity> &);
-        void (* remove)(basic_registry &, const Entity);
+        delegate<void(basic_registry &, const Entity)> remove;
         ENTT_ID_TYPE runtime_type;
     };
 
@@ -267,6 +270,7 @@ class basic_registry {
         if(!pdata->pool) {
             pdata->runtime_type = ctype;
             pdata->pool = std::make_unique<pool_type<Component>>();
+            pdata->remove.template connect<&pool_type<Component>::remove>(static_cast<pool_type<Component> *>(pdata->pool.get()));
 
             pdata->clone = +[](const sparse_set<Entity> &other) -> std::unique_ptr<sparse_set<Entity>> {
                 if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
@@ -274,10 +278,6 @@ class basic_registry {
                 } else {
                     return nullptr;
                 }
-            };
-
-            pdata->remove = +[](basic_registry &registry, const Entity entt) {
-                registry.pool<Component>()->remove(registry, entt);
             };
         }
 
@@ -1321,8 +1321,6 @@ public:
         }
 
         if(!curr) {
-            ENTT_ASSERT(!(owned<Owned>() || ...));
-
             groups.push_back(group_data{
                 { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) },
                 decltype(group_data::group){new handler_type{}, +[](void *gptr) { delete static_cast<handler_type *>(gptr); }},
@@ -1332,47 +1330,52 @@ public:
                 }
             });
 
-            const auto cpools = std::make_tuple(assure<Owned>()..., assure<Get>()..., assure<Exclude>()...);
             curr = static_cast<handler_type *>(groups.back().group.get());
 
-            ((std::get<pool_type<Owned> *>(cpools)->group = curr), ...);
-            (std::get<pool_type<Owned> *>(cpools)->on_construct.sink().template connect<&handler_type::template maybe_valid_if<Owned, Owned>>(curr), ...);
-            (std::get<pool_type<Owned> *>(cpools)->on_destroy.sink().template connect<&handler_type::template discard_if<>>(curr), ...);
+            ((std::get<pool_type<Owned> *>(curr->cpools) = assure<Owned>()), ...);
+            ((std::get<pool_type<Get> *>(curr->cpools) = assure<Get>()), ...);
+            ((std::get<pool_type<Exclude> *>(curr->cpools) = assure<Exclude>()), ...);
 
-            (std::get<pool_type<Get> *>(cpools)->on_construct.sink().template connect<&handler_type::template maybe_valid_if<Get, Get>>(curr), ...);
-            (std::get<pool_type<Get> *>(cpools)->on_destroy.sink().template connect<&handler_type::template discard_if<>>(curr), ...);
+            ENTT_ASSERT((!std::get<pool_type<Owned> *>(curr->cpools)->group && ...));
 
-            (std::get<pool_type<Exclude> *>(cpools)->on_destroy.sink().template connect<&handler_type::template maybe_valid_if<Exclude>>(curr), ...);
-            (std::get<pool_type<Exclude> *>(cpools)->on_construct.sink().template connect<&handler_type::template discard_if<Exclude>>(curr), ...);
+            ((std::get<pool_type<Owned> *>(curr->cpools)->group = curr), ...);
+            (std::get<pool_type<Owned> *>(curr->cpools)->on_construct.sink().template connect<&handler_type::template maybe_valid_if<Owned, Owned>>(curr), ...);
+            (std::get<pool_type<Owned> *>(curr->cpools)->on_destroy.sink().template connect<&handler_type::template discard_if<>>(curr), ...);
+
+            (std::get<pool_type<Get> *>(curr->cpools)->on_construct.sink().template connect<&handler_type::template maybe_valid_if<Get, Get>>(curr), ...);
+            (std::get<pool_type<Get> *>(curr->cpools)->on_destroy.sink().template connect<&handler_type::template discard_if<>>(curr), ...);
+
+            (std::get<pool_type<Exclude> *>(curr->cpools)->on_destroy.sink().template connect<&handler_type::template maybe_valid_if<Exclude>>(curr), ...);
+            (std::get<pool_type<Exclude> *>(curr->cpools)->on_construct.sink().template connect<&handler_type::template discard_if<Exclude>>(curr), ...);
 
             const auto *cpool = std::min({
-                static_cast<sparse_set<Entity> *>(std::get<pool_type<Owned> *>(cpools))...,
-                static_cast<sparse_set<Entity> *>(std::get<pool_type<Get> *>(cpools))...
+                static_cast<sparse_set<Entity> *>(std::get<pool_type<Owned> *>(curr->cpools))...,
+                static_cast<sparse_set<Entity> *>(std::get<pool_type<Get> *>(curr->cpools))...
             }, [](const auto *lhs, const auto *rhs) {
                 return lhs->size() < rhs->size();
             });
 
             // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-            std::for_each(cpool->data(), cpool->data() + cpool->size(), [curr, &cpools](const auto entity) {
-                if((std::get<pool_type<Owned> *>(cpools)->has(entity) && ...)
-                        && (std::get<pool_type<Get> *>(cpools)->has(entity) && ...)
-                        && !(std::get<pool_type<Exclude> *>(cpools)->has(entity) || ...))
+            std::for_each(cpool->data(), cpool->data() + cpool->size(), [curr](const auto entity) {
+                if((std::get<pool_type<Owned> *>(curr->cpools)->has(entity) && ...)
+                        && (std::get<pool_type<Get> *>(curr->cpools)->has(entity) && ...)
+                        && !(std::get<pool_type<Exclude> *>(curr->cpools)->has(entity) || ...))
                 {
                     if constexpr(sizeof...(Owned) == 0) {
                         curr->construct(entity);
                     } else {
                         const auto pos = curr->owned++;
                         // useless this-> used to suppress a warning with clang
-                        (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entity), pos), ...);
+                        (std::get<pool_type<Owned> *>(curr->cpools)->swap(std::get<pool_type<Owned> *>(curr->cpools)->sparse_set<Entity>::get(entity), pos), ...);
                     }
                 }
             });
         }
 
         if constexpr(sizeof...(Owned) == 0) {
-            return { static_cast<sparse_set<Entity> *>(curr), pool<Get>()... };
+            return { static_cast<sparse_set<Entity> *>(curr), std::get<pool_type<Get> *>(curr->cpools)... };
         } else {
-            return { &curr->owned, pool<Owned>()... , pool<Get>()... };
+            return { &curr->owned, std::get<pool_type<Owned> *>(curr->cpools)... , std::get<pool_type<Get> *>(curr->cpools)... };
         }
     }
 
