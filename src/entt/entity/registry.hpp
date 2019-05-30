@@ -129,7 +129,7 @@ class basic_registry {
         std::tuple<pool_type<Get> *..., pool_type<Exclude> *...> cpools{};
 
         template<typename Component, typename... Args>
-        void maybe_valid_if(basic_registry &, const Entity entt, const Args &...) {
+        void maybe_valid_if(const basic_registry &, const Entity entt, const Args &...) {
             if constexpr(std::disjunction_v<std::is_same<Get, Component>...>) {
                 if(((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
                         && !(std::get<pool_type<Exclude> *>(cpools)->has(entt) || ...))
@@ -145,7 +145,7 @@ class basic_registry {
         }
 
         template<typename... Args>
-        void discard_if(basic_registry &, const Entity entt, const Args &...) {
+        void discard_if(const basic_registry &, const Entity entt, const Args &...) {
             if(this->has(entt)) {
                 this->destroy(entt);
             }
@@ -158,7 +158,7 @@ class basic_registry {
         std::size_t owned{};
 
         template<typename Component, typename... Args>
-        void maybe_valid_if(basic_registry &, const Entity entt, const Args &...) {
+        void maybe_valid_if(const basic_registry &, const Entity entt, const Args &...) {
             if constexpr(std::disjunction_v<std::is_same<Owned, Component>..., std::is_same<Get, Component>...>) {
                 if(((std::is_same_v<Component, Owned> || std::get<pool_type<Owned> *>(cpools)->has(entt)) && ...)
                         && ((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
@@ -179,7 +179,7 @@ class basic_registry {
         }
 
         template<typename... Args>
-        void discard_if(basic_registry &, const Entity entt, const Args &...) {
+        void discard_if(const basic_registry &, const Entity entt, const Args &...) {
             if(std::get<0>(cpools)->has(entt) && std::get<0>(cpools)->sparse_set<Entity>::get(entt) < this->owned) {
                 const auto pos = --this->owned;
                 (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entt), pos), ...);
