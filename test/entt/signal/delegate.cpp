@@ -277,3 +277,18 @@ TEST(Delegate, VoidVsNonVoidReturnType) {
     ASSERT_TRUE(member);
     ASSERT_TRUE(cmember);
 }
+
+TEST(Delegate, TheLessTheBetter) {
+    delegate_functor functor;
+    entt::delegate<int(int, char)> delegate;
+
+    // int delegate_function(const int &);
+    delegate.connect<&delegate_function>();
+
+    ASSERT_EQ(delegate(3, 'c'), 9);
+
+    // int delegate_functor::operator()(int);
+    delegate.connect<&delegate_functor::operator()>(&functor);
+
+    ASSERT_EQ(delegate(3, 'c'), 6);
+}

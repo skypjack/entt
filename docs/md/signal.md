@@ -38,8 +38,9 @@ A delegate can be used as a general purpose invoker with no memory overhead for
 free functions and members provided along with an instance on which to invoke
 them.<br/>
 It does not claim to be a drop-in replacement for an `std::function`, so do not
-expect to use it whenever an `std::function` fits well. However, it can be used
-to send opaque delegates around to be used to invoke functions as needed.
+expect to use it whenever an `std::function` fits well. That said, it's most
+likely even a better fit than an `std::function` in a lot of cases, so expect to
+use it quite a lot anyway.
 
 The interface is trivial. It offers a default constructor to create empty
 delegates:
@@ -50,7 +51,7 @@ entt::delegate<int(int)> delegate{};
 
 All what is needed to create an instance is to specify the type of the function
 the delegate will _contain_, that is the signature of the free function or the
-member function one wants to assign to it.
+member one wants to assign to it.
 
 Attempting to use an empty delegate by invoking its function call operator
 results in undefined behavior or most likely a crash. Before to use a delegate,
@@ -75,7 +76,8 @@ delegate.connect<&my_struct::f>(&instance);
 
 The delegate class accepts also data members, if needed. In this case, the
 function type of the delegate is such that the parameter list is empty and the
-value of the data member is at least convertible to the return type.<br/>
+value of the data member is at least convertible to the return type.
+
 Functions having type equivalent to `void(T *, args...)` are accepted as well.
 In this case, `T *` is considered a payload and the function will receive it
 back every time it's invoked. In other terms, this works just fine with the
@@ -90,10 +92,25 @@ delegate(42);
 ```
 
 The function `g` will be invoked with a pointer to `c` and `42`. However, the
-function type of the delegate is still `void(int)`, mainly because this is also
-the signature of its function call operator.
+function type of the delegate is still `void(int)`. This is also the signature
+of its function call operator.
 
-To create and initialize a delegate at once, there are also some specialized
+Another interesting aspect of the delegate class is that it accepts also
+functions with a list of parameters that is shorter than that of the function
+type used to specialize the delegate itself.<br/>
+This is a nice-to-have feature in a lot of cases. The following code is
+therefore perfectly valid:
+
+```cpp
+void g() { /* ... */ }
+delegate.connect<&g>();
+delegate(42);
+```
+
+Where the function type of the delegate is `void(int)` as above. It goes without
+saying that the extra arguments are silently discarded internally.
+
+To create and initialize a delegate at once, there are a few specialized
 constructors. Because of the rules of the language, the listener is provided by
 means of the `entt::connect_arg` variable template:
 
@@ -113,26 +130,22 @@ if(delegate) {
 ```
 
 Finally, to invoke a delegate, the function call operator is the way to go as
-usual:
+already shown in the examples above:
 
 ```cpp
 auto ret = delegate(42);
 ```
 
-As shown above, listeners do not have to strictly follow the signature of the
+In all cases, the listeners don't have to strictly follow the signature of the
 delegate. As long as a listener can be invoked with the given arguments to yield
 a result that is convertible to the given result type, everything works just
 fine.
 
-Probably too much small and pretty poor of functionalities, but the delegate
-class can help in a lot of cases and it has shown that it is worth keeping it
-within the library.
-
 # Signals
 
 Signal handlers work with naked pointers, function pointers and pointers to
-member functions. Listeners can be any kind of objects and users are in charge
-of connecting and disconnecting them from a signal to avoid crashes due to
+member. Listeners can be any kind of objects and users are in charge of
+connecting and disconnecting them from a signal to avoid crashes due to
 different lifetimes. On the other side, performance shouldn't be affected that
 much by the presence of such a signal handler.<br/>
 A signal handler can be used as a private data member without exposing any
@@ -192,7 +205,7 @@ signal.sink().disconnect<&listener::bar>(&instance);
 signal.sink().disconnect();
 ```
 
-As shown above, listeners do not have to strictly follow the signature of the
+As shown above, the listeners don't have to strictly follow the signature of the
 signal. As long as a listener can be invoked with the given arguments to yield a
 result that is convertible to the given result type, everything works just fine.
 

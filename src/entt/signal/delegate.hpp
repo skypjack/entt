@@ -2,7 +2,9 @@
 #define ENTT_SIGNAL_DELEGATE_HPP
 
 
+#include <tuple>
 #include <cstring>
+#include <utility>
 #include <algorithm>
 #include <functional>
 #include <type_traits>
@@ -39,6 +41,20 @@ auto to_function_pointer(Ret(Class:: *)(Args...) const, const Class *) -> Ret(*)
 
 template<typename Class, typename Type>
 auto to_function_pointer(Type Class:: *, const Class *) -> Type(*)();
+
+
+template<typename>
+struct function_extent;
+
+
+template<typename Ret, typename... Args>
+struct function_extent<Ret(*)(Args...)> {
+    static constexpr auto value = sizeof...(Args);
+};
+
+
+template<typename Func>
+constexpr auto function_extent_v = function_extent<Func>::value;
 
 
 }
@@ -85,7 +101,37 @@ class delegate;
  */
 template<typename Ret, typename... Args>
 class delegate<Ret(Args...)> {
-    using proto_fn_type = Ret(const void *, Args...);
+    using proto_fn_type = Ret(const void *, std::tuple<Args...>);
+
+    template<auto Function, std::size_t... Index>
+    void connect(std::index_sequence<Index...>) ENTT_NOEXCEPT {
+        data = nullptr;
+
+        fn = +[](const void *, std::tuple<Args...> args) -> Ret {
+            static_assert(std::is_invocable_r_v<Ret, decltype(Function), std::tuple_element_t<Index, std::tuple<Args...>>...>);
+            // Ret(...) allows void(...) to eat return values and avoid errors
+            return Ret(std::invoke(Function, std::get<Index>(args)...));
+        };
+    }
+
+    template<auto Candidate, typename Type, std::size_t... Index>
+    void connect(Type *value_or_instance, std::index_sequence<Index...>) ENTT_NOEXCEPT {
+        data = value_or_instance;
+
+        fn = +[](const void *payload, std::tuple<Args...> args) -> Ret {
+            Type *curr = nullptr;
+
+            if constexpr(std::is_const_v<Type>) {
+                curr = static_cast<Type *>(payload);
+            } else {
+                curr = static_cast<Type *>(const_cast<void *>(payload));
+            }
+
+            static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), Type *, std::tuple_element_t<Index, std::tuple<Args...>>...>);
+            // Ret(...) allows void(...) to eat return values and avoid errors
+            return Ret(std::invoke(Candidate, curr, std::get<Index>(args)...));
+        };
+    }
 
 public:
     /*! @brief Function type of the delegate. */
@@ -127,13 +173,8 @@ public:
      */
     template<auto Function>
     void connect() ENTT_NOEXCEPT {
-        static_assert(std::is_invocable_r_v<Ret, decltype(Function), Args...>);
-        data = nullptr;
-
-        fn = [](const void *, Args... args) -> Ret {
-            // this allows void(...) to eat return values and avoid errors
-            return Ret(std::invoke(Function, args...));
-        };
+        constexpr auto extent = internal::function_extent_v<decltype(internal::to_function_pointer(std::declval<decltype(Function)>()))>;
+        connect<Function>(std::make_index_sequence<extent>{});
     }
 
     /**
@@ -153,21 +194,8 @@ public:
      */
     template<auto Candidate, typename Type>
     void connect(Type *value_or_instance) ENTT_NOEXCEPT {
-        static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), Type *, Args...>);
-        data = value_or_instance;
-
-        fn = [](const void *payload, Args... args) -> Ret {
-            Type *curr = nullptr;
-
-            if constexpr(std::is_const_v<Type>) {
-                curr = static_cast<Type *>(payload);
-            } else {
-                curr = static_cast<Type *>(const_cast<void *>(payload));
-            }
-
-            // this allows void(...) to eat return values and avoid errors
-            return Ret(std::invoke(Candidate, curr, args...));
-        };
+        constexpr auto extent = internal::function_extent_v<decltype(internal::to_function_pointer(std::declval<decltype(Candidate)>(), std::declval<Type *>()))>;
+        connect<Candidate>(value_or_instance, std::make_index_sequence<extent>{});
     }
 
     /**
@@ -204,7 +232,7 @@ public:
      */
     Ret operator()(Args... args) const {
         ENTT_ASSERT(fn);
-        return fn(data, args...);
+        return fn(data, std::forward_as_tuple(args...));
     }
 
     /**
