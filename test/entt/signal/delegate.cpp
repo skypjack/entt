@@ -27,6 +27,8 @@ struct const_nonconst_noexcept {
     void g() noexcept { ++cnt; }
     void h() const { ++cnt; }
     void i() const noexcept { ++cnt; }
+    int u{};
+    const int v{};
     mutable int cnt{0};
 };
 
@@ -172,30 +174,48 @@ TEST(Delegate, ConstNonConstNoExcept) {
     ASSERT_EQ(functor.cnt, 4);
 }
 
-TEST(Delegate, DeducedGuide) {
+TEST(Delegate, DeductionGuide) {
     const_nonconst_noexcept functor;
-    const int value = 0;
+    int value = 0;
 
-    entt::delegate func_deduced{entt::connect_arg<&delegate_function>};
-    entt::delegate curried_func_deduced{entt::connect_arg<&curried_function>, &value};
-    entt::delegate member_f_deduced{entt::connect_arg<&const_nonconst_noexcept::f>, &functor};
-    entt::delegate member_g_deduced{entt::connect_arg<&const_nonconst_noexcept::g>, &functor};
-    entt::delegate member_h_deduced{entt::connect_arg<&const_nonconst_noexcept::h>, &functor};
-    entt::delegate member_i_deduced{entt::connect_arg<&const_nonconst_noexcept::i>, &functor};
+    entt::delegate func{entt::connect_arg<&delegate_function>};
+    entt::delegate curried_func{entt::connect_arg<&curried_function>, &value};
+    entt::delegate curried_func_const{entt::connect_arg<&curried_function>, &std::as_const(value)};
+    entt::delegate member_func_f{entt::connect_arg<&const_nonconst_noexcept::f>, &functor};
+    entt::delegate member_func_g{entt::connect_arg<&const_nonconst_noexcept::g>, &functor};
+    entt::delegate member_func_h{entt::connect_arg<&const_nonconst_noexcept::h>, &functor};
+    entt::delegate member_func_h_const{entt::connect_arg<&const_nonconst_noexcept::h>, &std::as_const(functor)};
+    entt::delegate member_func_i{entt::connect_arg<&const_nonconst_noexcept::i>, &functor};
+    entt::delegate member_func_i_const{entt::connect_arg<&const_nonconst_noexcept::i>, &std::as_const(functor)};
+    entt::delegate data_member_u{entt::connect_arg<&const_nonconst_noexcept::u>, &functor};
+    entt::delegate data_member_v{entt::connect_arg<&const_nonconst_noexcept::v>, &functor};
+    entt::delegate data_member_v_const{entt::connect_arg<&const_nonconst_noexcept::v>, &std::as_const(functor)};
 
-    static_assert(std::is_same_v<typename decltype(func_deduced)::function_type, int(const int &)>);
-    static_assert(std::is_same_v<typename decltype(curried_func_deduced)::function_type, int(int)>);
-    static_assert(std::is_same_v<typename decltype(member_f_deduced)::function_type, void()>);
-    static_assert(std::is_same_v<typename decltype(member_g_deduced)::function_type, void()>);
-    static_assert(std::is_same_v<typename decltype(member_h_deduced)::function_type, void()>);
-    static_assert(std::is_same_v<typename decltype(member_i_deduced)::function_type, void()>);
+    static_assert(std::is_same_v<typename decltype(func)::function_type, int(const int &)>);
+    static_assert(std::is_same_v<typename decltype(curried_func)::function_type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(curried_func_const)::function_type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(member_func_f)::function_type, void()>);
+    static_assert(std::is_same_v<typename decltype(member_func_g)::function_type, void()>);
+    static_assert(std::is_same_v<typename decltype(member_func_h)::function_type, void()>);
+    static_assert(std::is_same_v<typename decltype(member_func_h_const)::function_type, void()>);
+    static_assert(std::is_same_v<typename decltype(member_func_i)::function_type, void()>);
+    static_assert(std::is_same_v<typename decltype(member_func_i_const)::function_type, void()>);
+    static_assert(std::is_same_v<typename decltype(data_member_u)::function_type, int()>);
+    static_assert(std::is_same_v<typename decltype(data_member_v)::function_type, const int()>);
+    static_assert(std::is_same_v<typename decltype(data_member_v_const)::function_type, const int()>);
 
-    ASSERT_TRUE(func_deduced);
-    ASSERT_TRUE(curried_func_deduced);
-    ASSERT_TRUE(member_f_deduced);
-    ASSERT_TRUE(member_g_deduced);
-    ASSERT_TRUE(member_h_deduced);
-    ASSERT_TRUE(member_i_deduced);
+    ASSERT_TRUE(func);
+    ASSERT_TRUE(curried_func);
+    ASSERT_TRUE(curried_func_const);
+    ASSERT_TRUE(member_func_f);
+    ASSERT_TRUE(member_func_g);
+    ASSERT_TRUE(member_func_h);
+    ASSERT_TRUE(member_func_h_const);
+    ASSERT_TRUE(member_func_i);
+    ASSERT_TRUE(member_func_i_const);
+    ASSERT_TRUE(data_member_u);
+    ASSERT_TRUE(data_member_v);
+    ASSERT_TRUE(data_member_v_const);
 }
 
 TEST(Delegate, ConstInstance) {
