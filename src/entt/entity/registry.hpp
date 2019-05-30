@@ -128,8 +128,8 @@ class basic_registry {
     struct group_handler<type_list<Exclude...>, type_list<Get...>>: sparse_set<Entity> {
         std::tuple<pool_type<Get> *..., pool_type<Exclude> *...> cpools{};
 
-        template<typename Component, typename... Args>
-        void maybe_valid_if(const basic_registry &, const Entity entt, const Args &...) {
+        template<typename Component>
+        void maybe_valid_if(const basic_registry &, const Entity entt) {
             if constexpr(std::disjunction_v<std::is_same<Get, Component>...>) {
                 if(((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
                         && !(std::get<pool_type<Exclude> *>(cpools)->has(entt) || ...))
@@ -144,8 +144,7 @@ class basic_registry {
             }
         }
 
-        template<typename... Args>
-        void discard_if(const basic_registry &, const Entity entt, const Args &...) {
+        void discard_if(const basic_registry &, const Entity entt) {
             if(this->has(entt)) {
                 this->destroy(entt);
             }
@@ -157,8 +156,8 @@ class basic_registry {
         std::tuple<pool_type<Owned> *..., pool_type<Get> *..., pool_type<Exclude> *...> cpools{};
         std::size_t owned{};
 
-        template<typename Component, typename... Args>
-        void maybe_valid_if(const basic_registry &, const Entity entt, const Args &...) {
+        template<typename Component>
+        void maybe_valid_if(const basic_registry &, const Entity entt) {
             if constexpr(std::disjunction_v<std::is_same<Owned, Component>..., std::is_same<Get, Component>...>) {
                 if(((std::is_same_v<Component, Owned> || std::get<pool_type<Owned> *>(cpools)->has(entt)) && ...)
                         && ((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
@@ -178,8 +177,7 @@ class basic_registry {
             }
         }
 
-        template<typename... Args>
-        void discard_if(const basic_registry &, const Entity entt, const Args &...) {
+        void discard_if(const basic_registry &, const Entity entt) {
             if(std::get<0>(cpools)->has(entt) && std::get<0>(cpools)->sparse_set<Entity>::get(entt) < this->owned) {
                 const auto pos = --this->owned;
                 (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entt), pos), ...);
@@ -1339,14 +1337,14 @@ public:
             ENTT_ASSERT((!std::get<pool_type<Owned> *>(curr->cpools)->group && ...));
 
             ((std::get<pool_type<Owned> *>(curr->cpools)->group = curr), ...);
-            (std::get<pool_type<Owned> *>(curr->cpools)->on_construct.sink().template connect<&handler_type::template maybe_valid_if<Owned, Owned>>(curr), ...);
-            (std::get<pool_type<Owned> *>(curr->cpools)->on_destroy.sink().template connect<&handler_type::template discard_if<>>(curr), ...);
+            (std::get<pool_type<Owned> *>(curr->cpools)->on_construct.sink().template connect<&handler_type::template maybe_valid_if<Owned>>(curr), ...);
+            (std::get<pool_type<Owned> *>(curr->cpools)->on_destroy.sink().template connect<&handler_type::discard_if>(curr), ...);
 
-            (std::get<pool_type<Get> *>(curr->cpools)->on_construct.sink().template connect<&handler_type::template maybe_valid_if<Get, Get>>(curr), ...);
-            (std::get<pool_type<Get> *>(curr->cpools)->on_destroy.sink().template connect<&handler_type::template discard_if<>>(curr), ...);
+            (std::get<pool_type<Get> *>(curr->cpools)->on_construct.sink().template connect<&handler_type::template maybe_valid_if<Get>>(curr), ...);
+            (std::get<pool_type<Get> *>(curr->cpools)->on_destroy.sink().template connect<&handler_type::discard_if>(curr), ...);
 
             (std::get<pool_type<Exclude> *>(curr->cpools)->on_destroy.sink().template connect<&handler_type::template maybe_valid_if<Exclude>>(curr), ...);
-            (std::get<pool_type<Exclude> *>(curr->cpools)->on_construct.sink().template connect<&handler_type::template discard_if<Exclude>>(curr), ...);
+            (std::get<pool_type<Exclude> *>(curr->cpools)->on_construct.sink().template connect<&handler_type::discard_if>(curr), ...);
 
             const auto *cpool = std::min({
                 static_cast<sparse_set<Entity> *>(std::get<pool_type<Owned> *>(curr->cpools))...,
