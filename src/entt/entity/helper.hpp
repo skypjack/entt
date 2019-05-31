@@ -119,13 +119,12 @@ as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>
  * It isn't intended for direct use, although nothing forbids using it freely.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Component Type of component that triggers the dependency handler.
  * @tparam Dependency Types of components to assign to an entity if triggered.
  * @param reg A valid reference to a registry.
  * @param entt A valid entity identifier.
  */
-template<typename Entity, typename Component, typename... Dependency>
-void dependency(basic_registry<Entity> &reg, const Entity entt, const Component &) {
+template<typename Entity, typename... Dependency>
+void dependency(basic_registry<Entity> &reg, const Entity entt) {
     ((reg.template has<Dependency>(entt) ? void() : (reg.template assign<Dependency>(entt), void())), ...);
 }
 
@@ -150,7 +149,7 @@ void dependency(basic_registry<Entity> &reg, const Entity entt, const Component 
  */
 template<typename... Dependency, typename Component, typename Entity>
 void connect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sink) {
-    sink.template connect<dependency<Entity, Component, Dependency...>>();
+    sink.template connect<dependency<Entity, Dependency...>>();
 }
 
 
@@ -174,7 +173,7 @@ void connect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sin
  */
 template<typename... Dependency, typename Component, typename Entity>
 void disconnect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sink) {
-    sink.template disconnect<dependency<Entity, Component, Dependency...>>();
+    sink.template disconnect<dependency<Entity, Dependency...>>();
 }
 
 
