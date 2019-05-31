@@ -209,8 +209,8 @@ public:
     }
 
     /**
-     * @brief Returns the instance linked to a delegate, if any.
-     * @return An opaque pointer to the instance linked to the delegate, if any.
+     * @brief Returns the instance or the payload linked to a delegate, if any.
+     * @return An opaque pointer to the underlying data.
      */
     const void * instance() const ENTT_NOEXCEPT {
         return data;
