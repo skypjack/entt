@@ -214,6 +214,17 @@ public:
     }
 
     /**
+     * @brief Disconnects member functions or free functions based on an
+     * instance or specific payload.
+     * @param value_or_instance A valid pointer that fits the purpose.
+     */
+    void disconnect(const void *value_or_instance) {
+        calls->erase(std::remove_if(calls->begin(), calls->end(), [value_or_instance](const auto &delegate) {
+            return value_or_instance == delegate.instance();
+        }), calls->end());
+    }
+
+    /**
      * @brief Disconnects all the listeners from a signal.
      */
     void disconnect() {

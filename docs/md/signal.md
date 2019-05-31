@@ -201,6 +201,9 @@ signal.sink().disconnect<&foo>();
 // disconnect a member function of an instance
 signal.sink().disconnect<&listener::bar>(&instance);
 
+// disconnect all the member functions of an instance, if any
+signal.sink().disconnect(&instance);
+
 // discards all the listeners at once
 signal.sink().disconnect();
 ```
@@ -289,11 +292,11 @@ dispatcher.sink<another_event>().connect<&listener::method>(&listener);
 ```
 
 The `disconnect` member function follows the same pattern and can be used to
-selectively remove listeners:
+remove one listener at a time or all of them at once:
 
 ```cpp
 dispatcher.sink<an_event>().disconnect<&listener::receive>(&listener);
-dispatcher.sink<another_event>().disconnect<&listener::method>(&listener);
+dispatcher.sink<another_event>().disconnect(&listener);
 ```
 
 The `trigger` member function serves the purpose of sending an immediate event

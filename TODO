@@ -5,6 +5,7 @@
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * runner proposal: https://en.wikipedia.org/wiki/Fork%E2%80%93join_model https://slide-rs.github.io/specs/03_dispatcher.html
 * work stealing job system (see #100)
+  - mt scheduler based on const awareness for types
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
 * allow for built-in parallel each if possible
 * allow to replace std:: with custom implementations

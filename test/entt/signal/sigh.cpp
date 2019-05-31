@@ -111,7 +111,7 @@ TEST(SigH, Functions) {
     sigh.publish(v);
 
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(1), sigh.size());
+    ASSERT_EQ(static_cast<entt::sigh<void(int &)>::size_type>(1), sigh.size());
     ASSERT_EQ(42, v);
 
     v = 0;
@@ -119,42 +119,47 @@ TEST(SigH, Functions) {
     sigh.publish(v);
 
     ASSERT_TRUE(sigh.empty());
-    ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(0), sigh.size());
+    ASSERT_EQ(static_cast<entt::sigh<void(int &)>::size_type>(0), sigh.size());
     ASSERT_EQ(v, 0);
 
     sigh.sink().connect<&sigh_listener::f>();
-}
+
+    ASSERT_FALSE(sigh.empty());
+    ASSERT_EQ(static_cast<entt::sigh<void(int &)>::size_type>(1), sigh.size());
+
+    sigh.sink().disconnect(nullptr);
+
+    ASSERT_TRUE(sigh.empty());
+    ASSERT_EQ(static_cast<entt::sigh<void(int &)>::size_type>(0), sigh.size());}
 
 TEST(SigH, Members) {
-    sigh_listener s;
-    sigh_listener *ptr = &s;
+    sigh_listener l1, l2;
     entt::sigh<bool(int)> sigh;
 
-    sigh.sink().connect<&sigh_listener::g>(ptr);
+    sigh.sink().connect<&sigh_listener::g>(&l1);
     sigh.publish(42);
 
-    ASSERT_TRUE(s.k);
+    ASSERT_TRUE(l1.k);
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(1), sigh.size());
 
-    sigh.sink().disconnect<&sigh_listener::g>(ptr);
+    sigh.sink().disconnect<&sigh_listener::g>(&l1);
     sigh.publish(42);
 
-    ASSERT_TRUE(s.k);
+    ASSERT_TRUE(l1.k);
     ASSERT_TRUE(sigh.empty());
     ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(0), sigh.size());
 
-    sigh.sink().connect<&sigh_listener::g>(ptr);
-    sigh.sink().connect<&sigh_listener::h>(ptr);
+    sigh.sink().connect<&sigh_listener::g>(&l1);
+    sigh.sink().connect<&sigh_listener::h>(&l2);
 
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(2), sigh.size());
 
-    sigh.sink().disconnect<&sigh_listener::g>(ptr);
-    sigh.sink().disconnect<&sigh_listener::h>(ptr);
+    sigh.sink().disconnect(&l1);
 
-    ASSERT_TRUE(sigh.empty());
-    ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(0), sigh.size());
+    ASSERT_FALSE(sigh.empty());
+    ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(1), sigh.size());
 }
 
 TEST(SigH, Collector) {
