@@ -174,18 +174,13 @@ public:
      * such that the instance is the first argument before the ones used to
      * define the delegate itself.
      *
-     * @tparam Candidate Member or free function to connect to the delegate.
+     * @tparam Candidate Member or free function to connect to the signal.
      * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid pointer that fits the purpose.
      */
     template<auto Candidate, typename Type>
     void connect(Type *value_or_instance) {
-        if constexpr(std::is_member_function_pointer_v<decltype(Candidate)>) {
-            disconnect<Candidate>(value_or_instance);
-        } else {
-            disconnect<Candidate>();
-        }
-
+        disconnect<Candidate>(value_or_instance);
         delegate<Ret(Args...)> delegate{};
         delegate.template connect<Candidate>(value_or_instance);
         calls->emplace_back(std::move(delegate));
@@ -198,29 +193,22 @@ public:
     template<auto Function>
     void disconnect() {
         delegate<Ret(Args...)> delegate{};
-
-        if constexpr(std::is_invocable_r_v<Ret, decltype(Function), Args...>) {
-            delegate.template connect<Function>();
-        } else {
-            decltype(payload_type(Function)) payload = nullptr;
-            delegate.template connect<Function>(payload);
-        }
-
+        delegate.template connect<Function>();
         calls->erase(std::remove(calls->begin(), calls->end(), std::move(delegate)), calls->end());
     }
 
     /**
-     * @brief Disconnects a given member function from a signal.
-     * @tparam Member Member function to disconnect from the signal.
-     * @tparam Class Type of class to which the member function belongs.
-     * @param instance A valid instance of type pointer to `Class`.
+     * @brief Disconnects a member function or a free function with payload from
+     * a signal.
+     * @tparam Candidate Member or free function to disconnect from the signal.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid pointer that fits the purpose.
      */
-    template<auto Member, typename Class>
-    void disconnect(Class *instance) {
-        static_assert(std::is_member_function_pointer_v<decltype(Member)>);
+    template<auto Candidate, typename Type>
+    void disconnect(Type *value_or_instance) {
         delegate<Ret(Args...)> delegate{};
-        delegate.template connect<Member>(instance);
-        calls->erase(std::remove_if(calls->begin(), calls->end(), [&delegate](const auto &other) {
+        delegate.template connect<Candidate>(value_or_instance);
+        calls->erase(std::remove_if(calls->begin(), calls->end(), [delegate](const auto &other) {
             return other == delegate && other.instance() == delegate.instance();
         }), calls->end());
     }
