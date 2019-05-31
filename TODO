@@ -22,4 +22,5 @@
   - iterator based each with a couple of iterators passed from outside (use bitmask + has)
 * stable component handle that isn't affected by reallocations
 * multi component registry::remove and some others?
+* built-in support for dual (or N-) buffering
 * reactive systems
