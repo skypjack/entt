@@ -818,7 +818,7 @@ The following adds components `a_type` and `another_type` whenever `my_type` is
 assigned to an entity:
 
 ```cpp
-entt::connnect<a_type, another_type>(registry.on_construct<my_type>());
+entt::connect<a_type, another_type>(registry.on_construct<my_type>());
 ```
 
 A component is assigned to an entity and thus default initialized only in case
