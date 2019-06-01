@@ -1848,8 +1848,11 @@ public:
         std::array<meta_any, sizeof...(Args)> arguments{{std::forward<Args>(args)...}};
         meta_any any{};
 
-        internal::iterate<&internal::meta_type_node::ctor>([data = arguments.data(), &any](auto *curr) -> bool {
-            any = curr->invoke(data);
+        internal::find_if<&internal::meta_type_node::ctor>([data = arguments.data(), &any](auto *curr) -> bool {
+            if(curr->size == sizeof...(args)) {
+                any = curr->invoke(data);
+            }
+
             return static_cast<bool>(any);
         }, node);
 

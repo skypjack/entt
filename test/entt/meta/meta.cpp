@@ -1420,6 +1420,12 @@ TEST_F(Meta, MetaTypeConstructInvalidArgs) {
     ASSERT_FALSE(any);
 }
 
+TEST_F(Meta, MetaTypeLessArgs) {
+    auto type = entt::resolve<derived_type>();
+    auto any = type.construct(base_type{});
+    ASSERT_FALSE(any);
+}
+
 TEST_F(Meta, MetaTypeConstructCastAndConvert) {
     auto type = entt::resolve<derived_type>();
     auto any = type.construct(entt::meta_any{derived_type{}}, entt::meta_any{42.}, entt::meta_any{'c'});
