@@ -280,7 +280,7 @@ TEST_F(Meta, MetaAnySBOCopyConstruction) {
 
 TEST_F(Meta, MetaAnySBOCopyAssignment) {
     entt::meta_any any{42};
-    entt::meta_any other{};
+    entt::meta_any other{3};
 
     other = any;
 
@@ -310,7 +310,7 @@ TEST_F(Meta, MetaAnySBOMoveConstruction) {
 
 TEST_F(Meta, MetaAnySBOMoveAssignment) {
     entt::meta_any any{42};
-    entt::meta_any other{};
+    entt::meta_any other{3};
 
     other = std::move(any);
 
@@ -344,7 +344,7 @@ TEST_F(Meta, MetaAnyNoSBOCopyAssignment) {
     int value = 42;
     fat_type instance{&value};
     entt::meta_any any{instance};
-    entt::meta_any other{};
+    entt::meta_any other{3};
 
     other = any;
 
@@ -378,7 +378,7 @@ TEST_F(Meta, MetaAnyNoSBOMoveAssignment) {
     int value = 42;
     fat_type instance{&value};
     entt::meta_any any{instance};
-    entt::meta_any other{};
+    entt::meta_any other{3};
 
     other = std::move(any);
 
