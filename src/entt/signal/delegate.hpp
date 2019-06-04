@@ -107,7 +107,7 @@ class delegate<Ret(Args...)> {
     void connect(std::index_sequence<Index...>) ENTT_NOEXCEPT {
         data = nullptr;
 
-        fn = +[](const void *, std::tuple<Args...> args) -> Ret {
+        fn = [](const void *, std::tuple<Args...> args) -> Ret {
             static_assert(std::is_invocable_r_v<Ret, decltype(Function), std::tuple_element_t<Index, std::tuple<Args...>>...>);
             // Ret(...) allows void(...) to eat return values and avoid errors
             return Ret(std::invoke(Function, std::get<Index>(args)...));
@@ -118,7 +118,7 @@ class delegate<Ret(Args...)> {
     void connect(Type *value_or_instance, std::index_sequence<Index...>) ENTT_NOEXCEPT {
         data = value_or_instance;
 
-        fn = +[](const void *payload, std::tuple<Args...> args) -> Ret {
+        fn = [](const void *payload, std::tuple<Args...> args) -> Ret {
             Type *curr = nullptr;
 
             if constexpr(std::is_const_v<Type>) {

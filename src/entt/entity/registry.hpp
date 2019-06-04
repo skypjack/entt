@@ -270,7 +270,7 @@ class basic_registry {
             pdata->pool = std::make_unique<pool_type<Component>>();
             pdata->remove.template connect<&pool_type<Component>::remove>(static_cast<pool_type<Component> *>(pdata->pool.get()));
 
-            pdata->clone = +[](const sparse_set<Entity> &other) -> std::unique_ptr<sparse_set<Entity>> {
+            pdata->clone = [](const sparse_set<Entity> &other) -> std::unique_ptr<sparse_set<Entity>> {
                 if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
                     return std::make_unique<pool_type<Component>>(static_cast<const pool_type<Component> &>(other));
                 } else {
@@ -1321,8 +1321,8 @@ public:
         if(!curr) {
             groups.push_back(group_data{
                 { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) },
-                decltype(group_data::group){new handler_type{}, +[](void *gptr) { delete static_cast<handler_type *>(gptr); }},
-                +[](const ENTT_ID_TYPE *other) {
+                decltype(group_data::group){new handler_type{}, [](void *gptr) { delete static_cast<handler_type *>(gptr); }},
+                [](const ENTT_ID_TYPE *other) {
                     const std::size_t ctypes[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
                     return std::equal(std::begin(ctypes), std::end(ctypes), other);
                 }
@@ -1580,7 +1580,7 @@ public:
 
         if(it == vars.cend()) {
             vars.push_back({
-                decltype(ctx_variable::value){new Type{std::forward<Args>(args)...}, +[](void *ptr) { delete static_cast<Type *>(ptr); }},
+                decltype(ctx_variable::value){new Type{std::forward<Args>(args)...}, [](void *ptr) { delete static_cast<Type *>(ptr); }},
                 ctype
             });
 
