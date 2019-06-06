@@ -1579,20 +1579,22 @@ TEST_F(Meta, ArithmeticTypeAndNamedConstants) {
 }
 
 TEST_F(Meta, Unregister) {
-    entt::unregister<double>();
-    entt::unregister<char>();
-    entt::unregister<properties>();
-    entt::unregister<unsigned int>();
-    entt::unregister<base_type>();
-    entt::unregister<derived_type>();
-    entt::unregister<empty_type>();
-    entt::unregister<fat_type>();
-    entt::unregister<data_type>();
-    entt::unregister<func_type>();
-    entt::unregister<setter_getter_type>();
-    entt::unregister<an_abstract_type>();
-    entt::unregister<another_abstract_type>();
-    entt::unregister<concrete_type>();
+    ASSERT_FALSE(entt::unregister<float>());
+    ASSERT_TRUE(entt::unregister<double>());
+    ASSERT_TRUE(entt::unregister<char>());
+    ASSERT_TRUE(entt::unregister<properties>());
+    ASSERT_TRUE(entt::unregister<unsigned int>());
+    ASSERT_TRUE(entt::unregister<base_type>());
+    ASSERT_TRUE(entt::unregister<derived_type>());
+    ASSERT_TRUE(entt::unregister<empty_type>());
+    ASSERT_TRUE(entt::unregister<fat_type>());
+    ASSERT_TRUE(entt::unregister<data_type>());
+    ASSERT_TRUE(entt::unregister<func_type>());
+    ASSERT_TRUE(entt::unregister<setter_getter_type>());
+    ASSERT_TRUE(entt::unregister<an_abstract_type>());
+    ASSERT_TRUE(entt::unregister<another_abstract_type>());
+    ASSERT_TRUE(entt::unregister<concrete_type>());
+    ASSERT_FALSE(entt::unregister<double>());
 
     ASSERT_FALSE(entt::resolve("char"_hs));
     ASSERT_FALSE(entt::resolve("base"_hs));
