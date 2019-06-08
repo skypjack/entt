@@ -21,6 +21,7 @@ I hope this list can grow much more in the future:
     a game to play with your face.
   * [EnTT Pacman](https://github.com/Kerndog73/EnTT-Pacman): an example of how
     to make Pacman with `EnTT`.
+  * [Wacman](https://github.com/carlfindahl/wacman): a pacman clone with OpenGL.
   * [Classic Tower Defence](https://github.com/kerndog73/Classic-Tower-Defence):
     a tiny little tower defence game featuring a homemade font.
     [Check it out](https://indi-kernick.itch.io/classic-tower-defence).
