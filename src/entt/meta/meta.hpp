@@ -365,6 +365,45 @@ public:
     {}
 
     /**
+     * @brief Constructs a meta any by directly initializing the new object.
+     *
+     * This class uses a technique called small buffer optimization (SBO) to
+     * completely eliminate the need to allocate memory, where possible.<br/>
+     * From the user's point of view, nothing will change, but the elimination
+     * of allocations will reduce the jumps in memory and therefore will avoid
+     * chasing of pointers. This will greatly improve the use of the cache, thus
+     * increasing the overall performance.
+     *
+     * @tparam Type Type of object to use to initialize the container.
+     * @tparam Args Types of arguments to use to construct the new instance.
+     * @param args Parameters to use to construct the instance.
+     */
+    template<typename Type, typename... Args>
+    meta_any(std::in_place_type_t<Type>, Args &&... args) {
+        using actual_type = std::remove_cv_t<std::remove_reference_t<Type>>;
+        constexpr auto sbo_allowed = sizeof(actual_type) <= sizeof(void *);
+        node = internal::meta_info<Type>::resolve();
+
+        compare_fn = &compare<actual_type>;
+
+        if constexpr(sbo_allowed) {
+            instance = new (&storage) actual_type{std::forward<Args>(args)...};
+            destroy_fn = &destroy_storage<actual_type>;
+            copy_fn = &copy_storage<actual_type>;
+        } else {
+            using chunk_type = std::aligned_storage_t<sizeof(actual_type), alignof(actual_type)>;
+
+            auto chunk = std::make_unique<chunk_type>();
+            instance = new (chunk.get()) actual_type{std::forward<Args>(args)...};
+            new (&storage) chunk_type *{chunk.get()};
+            chunk.release();
+
+            destroy_fn = &destroy_object<actual_type>;
+            copy_fn = &copy_object<actual_type>;
+        }
+    }
+
+    /**
      * @brief Constructs a meta any from a given value.
      *
      * This class uses a technique called small buffer optimization (SBO) to
@@ -378,27 +417,9 @@ public:
      * @param type An instance of an object to use to initialize the container.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>>>
-    meta_any(Type &&type) {
-        using actual_type = std::remove_cv_t<std::remove_reference_t<Type>>;
-        node = internal::meta_info<Type>::resolve();
-
-        compare_fn = &compare<actual_type>;
-
-        if constexpr(sizeof(actual_type) <= sizeof(void *)) {
-            instance = new (&storage) actual_type{std::forward<Type>(type)};
-            destroy_fn = &destroy_storage<actual_type>;
-            copy_fn = &copy_storage<actual_type>;
-        } else {
-            using chunk_type = std::aligned_storage_t<sizeof(actual_type), alignof(actual_type)>;
-
-            auto *chunk = new chunk_type;
-            instance = new (chunk) actual_type{std::forward<Type>(type)};
-            new (&storage) chunk_type *{chunk};
-
-            destroy_fn = &destroy_object<actual_type>;
-            copy_fn = &copy_object<actual_type>;
-        }
-    }
+    meta_any(Type &&type)
+        : meta_any{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(type)}
+    {}
 
     /**
      * @brief Copy constructor.
@@ -560,6 +581,19 @@ public:
         }
 
         return valid;
+    }
+
+    /**
+     * @brief Replaces the contained object by initializing a new instance
+     * directly.
+     * @tparam Type Type of object to use to initialize the container.
+     * @tparam Args Types of arguments to use to construct the new instance.
+     * @param args Parameters to use to construct the instance.
+     */
+    template<typename Type, typename... Args>
+    void emplace(Args&& ... args) {
+        [[maybe_unused]] meta_any other{std::move(*this)};
+        *this = meta_any{std::in_place_type_t<Type>{}, std::forward<Args>(args)...};
     }
 
     /**
