@@ -24,6 +24,10 @@ class basic_runtime_view;
 template<typename...>
 class basic_group;
 
+/*! @class basic_observer */
+template<typename>
+class basic_observer;
+
 /*! @class basic_actor */
 template <typename>
 struct basic_actor;
@@ -49,6 +53,9 @@ using entity = std::uint32_t;
 
 /*! @brief Alias declaration for the most common use case. */
 using registry = basic_registry<entity>;
+
+/*! @brief Alias declaration for the most common use case. */
+using observer = basic_observer<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using actor = basic_actor<entity>;

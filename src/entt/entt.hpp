@@ -9,6 +9,7 @@
 #include "entity/entity.hpp"
 #include "entity/group.hpp"
 #include "entity/helper.hpp"
+#include "entity/observer.hpp"
 #include "entity/prototype.hpp"
 #include "entity/registry.hpp"
 #include "entity/runtime_view.hpp"

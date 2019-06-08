@@ -38,6 +38,7 @@ namespace entt {
  * * New instances of the given components are created and assigned to entities.
  * * The entity currently pointed is modified (as an example, if one of the
  *   given components is removed from the entity to which the iterator points).
+ * * The entity currently pointed is destroyed.
  *
  * In all the other cases, modifying the pools of the given components in any
  * way invalidates all the iterators and using them results in undefined
@@ -518,6 +519,7 @@ private:
  * * New instances of the given component are created and assigned to entities.
  * * The entity currently pointed is modified (as an example, the given
  *   component is removed from the entity to which the iterator points).
+ * * The entity currently pointed is destroyed.
  *
  * In all the other cases, modifying the pool of the given component in any way
  * invalidates all the iterators and using them results in undefined behavior.

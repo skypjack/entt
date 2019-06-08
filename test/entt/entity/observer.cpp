@@ -1,0 +1,169 @@
+#include <gtest/gtest.h>
+#include <entt/entity/observer.hpp>
+#include <entt/entity/registry.hpp>
+
+TEST(Observer, Functionalities) {
+    entt::registry registry;
+    entt::observer observer{registry, entt::collector.group<int>()};
+
+    ASSERT_EQ(observer.size(), entt::observer::size_type{});
+    ASSERT_TRUE(observer.empty());
+    ASSERT_EQ(observer.data(), nullptr);
+    ASSERT_EQ(observer.begin(), observer.end());
+
+    const auto entity = std::get<0>(registry.create<int>());
+
+    ASSERT_EQ(observer.size(), entt::observer::size_type{1});
+    ASSERT_FALSE(observer.empty());
+    ASSERT_NE(observer.data(), nullptr);
+    ASSERT_EQ(*observer.data(), entity);
+    ASSERT_NE(observer.begin(), observer.end());
+    ASSERT_EQ(++observer.begin(), observer.end());
+    ASSERT_EQ(*observer.begin(), entity);
+
+    observer.clear();
+
+    ASSERT_EQ(observer.size(), entt::observer::size_type{});
+    ASSERT_TRUE(observer.empty());
+
+    observer.disconnect();
+    registry.remove<int>(entity);
+    registry.assign<int>(entity);
+
+    ASSERT_EQ(observer.size(), entt::observer::size_type{});
+    ASSERT_TRUE(observer.empty());
+}
+
+TEST(Observer, AllOf) {
+    constexpr auto collector =  entt::collector
+            .group<int, char>(entt::exclude<float>)
+            .group<int, double>();
+
+    entt::registry registry;
+    entt::observer observer{registry, collector};
+    const auto entity = registry.create();
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign<int>(entity);
+    registry.assign<char>(entity);
+
+    ASSERT_EQ(observer.size(), entt::observer::size_type{1});
+    ASSERT_FALSE(observer.empty());
+    ASSERT_EQ(*observer.data(), entity);
+
+    registry.assign<double>(entity);
+
+    ASSERT_FALSE(observer.empty());
+
+    registry.remove<int>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign<float>(entity);
+    registry.assign<int>(entity);
+
+    ASSERT_FALSE(observer.empty());
+
+    registry.remove<double>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign<double>(entity);
+    observer.clear();
+
+    ASSERT_TRUE(observer.empty());
+
+    observer.disconnect();
+    registry.assign_or_replace<int>(entity);
+    registry.assign_or_replace<char>(entity);
+    registry.reset<float>(entity);
+
+    ASSERT_TRUE(observer.empty());
+}
+
+TEST(Observer, Observe) {
+    entt::registry registry;
+    entt::observer observer{registry, entt::collector.replace<int, char>()};
+    const auto entity = registry.create();
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign<int>(entity);
+    registry.assign<char>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign_or_replace<int>(entity);
+
+    ASSERT_EQ(observer.size(), entt::observer::size_type{1});
+    ASSERT_FALSE(observer.empty());
+    ASSERT_EQ(*observer.data(), entity);
+
+    observer.clear();
+    registry.replace<char>(entity);
+
+    ASSERT_FALSE(observer.empty());
+
+    observer.clear();
+
+    ASSERT_TRUE(observer.empty());
+
+    observer.disconnect();
+    registry.assign_or_replace<int>(entity);
+    registry.assign_or_replace<char>(entity);
+
+    ASSERT_TRUE(observer.empty());
+}
+
+TEST(Observer, AllOfObserve) {
+    entt::registry registry;
+    entt::observer observer{};
+    const auto entity = registry.create();
+
+    observer.connect(registry, entt::collector.group<int>().replace<char>());
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign<int>(entity);
+    registry.assign<char>(entity);
+    registry.replace<char>(entity);
+    registry.remove<int>(entity);
+
+    ASSERT_EQ(observer.size(), entt::observer::size_type{1});
+    ASSERT_FALSE(observer.empty());
+    ASSERT_EQ(*observer.data(), entity);
+
+    registry.remove<char>(entity);
+    registry.assign<char>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.replace<char>(entity);
+    observer.clear();
+
+    ASSERT_TRUE(observer.empty());
+
+    observer.disconnect();
+    registry.assign_or_replace<int>(entity);
+    registry.assign_or_replace<char>(entity);
+
+    ASSERT_TRUE(observer.empty());
+}
+
+
+TEST(Observer, CrossRulesCornerCase) {
+    entt::registry registry;
+    entt::observer observer{registry, entt::collector.group<int>().group<char>()};
+    const auto entity = registry.create();
+
+    registry.assign<int>(entity);
+    observer.clear();
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign<char>(entity);
+    registry.remove<int>(entity);
+
+    ASSERT_FALSE(observer.empty());
+}

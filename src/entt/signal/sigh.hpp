@@ -224,9 +224,7 @@ public:
         }), calls->end());
     }
 
-    /**
-     * @brief Disconnects all the listeners from a signal.
-     */
+    /*! @brief Disconnects all the listeners from a signal. */
     void disconnect() {
         calls->clear();
     }
