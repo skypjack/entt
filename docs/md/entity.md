@@ -14,6 +14,7 @@
 * [Vademecum](#vademecum)
 * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
   * [Observe changes](#observe-changes)
+    * [They call me Reactive System](#they-call-me-reactive-system)
   * [Runtime components](#runtime-components)
     * [A journey through a plugin](#a-journey-through-a-plugin)
   * [Sorting: is it possible?](#sorting-is-it-possible)
@@ -57,8 +58,9 @@ used mostly in game development.
 
 ## A bitset-free entity-component system
 
-`EnTT` is a _bitset-free_ entity-component system that doesn't require users to
-specify the component set at compile-time.<br/>
+`EnTT` offers a _bitset-free_ entity-component system that doesn't require users
+to specify the set of components neither at compile-time nor at runtime before
+being able to use the library itself.<br/>
 This is why users can instantiate the core class simply like:
 
 ```cpp
@@ -70,6 +72,10 @@ In place of its more annoying and error-prone counterpart:
 ```cpp
 entt::registry<comp_0, comp_1, ..., comp_n> registry;
 ```
+
+Furthermore, there is no need to indicate to the library in any way that a type
+of component exists and will be used sooner or later. When the time comes, users
+can just use it and that's all.
 
 ## Pay per use
 
@@ -408,6 +414,90 @@ systems. They should not contain much logic and interactions with a registry
 should be kept to a minimum, if possible. Note also that the greater the number
 of listeners, the greater the performance hit when components are created or
 destroyed.
+
+### They call me Reactive System
+
+As mentioned above, signals are the basic tools to construct reactive systems,
+even if they are not enough on their own.<br/>
+`EnTT` tries to take another step in that direction with the `observer` class
+template.
+
+In order to explain what reactive systems are, this is a slightly revised quote
+from the documentation of the library that first introduced this tool,
+[Entitas](https://github.com/sschmid/Entitas-CSharp):
+
+>Imagine you have 100 fighting units on the battlefield but only 10 of them
+>changed their positions. Instead of using a normal system and updating all 100
+>entities depending on the position, you can use a reactive system which will
+>only update the 10 changed units. So efficient.
+
+In `EnTT`, this means to iterating over a reduced set of entities and components
+with respect to what would otherwise be returned from a view or group.<br/>
+On these words, however, the similarities with the proposal of Entitas also end.
+The rules of language and the design of the library obviously impose and allow
+different things.
+
+An `observer` is initialized with an instance of a registry and a set of rules
+that describe what are the entities to intercept. As an example:
+
+```cpp
+entt::observer observer{registry, entt::collector.replace<sprite>()};
+```
+
+The class also default constructible if required and it can be reconfigured at
+any time by means of the `connect` member function. Moreover, instances can be
+disconnected from the underlying registries through the `disconnect` member
+function.<br/>
+The `observer` offers also some member functions to query its internal state and
+to know if it's empty or how many entities it contains. Moreover, it can return
+a raw pointer to the list of entities it contains.<br/>
+However, the most important features of this class are that:
+
+* It's iterable and therefore users can easily walk through the list of entities
+  by means of a range-for loop.
+* It's clearable and therefore users can consume the entities and literally
+  reset the observer after each iteration.
+
+These aspects make the observer an incredibly powerful tool to know at any time
+what are the entities that have started to respect the given rules since the
+last time one asked:
+
+```cpp
+for(const auto entity: observer) {
+    // ...
+}
+
+observer.clear();
+```
+
+The `collector` is an utility to use to generate a list of `matcher`s (the
+actual rules) to use with an `observer`.<br/>
+There are two types of `matcher`s:
+
+* Observing matcher: an observer will return at least all the living entities
+  for which one or more of the given components have been explicitly replaced
+  and not yet destroyed.
+
+  ```cpp
+  collector.replace<sprite>();
+  ```
+
+* Grouping matcher: an observer will return at least all the living entities
+  that would have entered the given group if it existed and that would have
+  not yet left it.
+
+  ```cpp
+  collector.group<position, velocity>(entt::exclude<destroyed>);
+  ```
+
+  A grouping matcher supports also exclusion lists as well as single components.
+
+Roughly speaking, an observing matcher intercepts the entities for which the
+given components are replaced (as in `registry::replace`) while a grouping
+matcher tracks the entities that have assigned the given components since the
+last time one asked.<br/>
+Note that, for a grouping matcher, if an entity already has all the components
+except one and the missing type is assigned to it, it is intercepted.
 
 ## Runtime components
 
@@ -766,29 +856,37 @@ Creating an entity from a prototype is straightforward:
 
 * To create a new entity from scratch and assign it a prototype, this is the way
   to go:
+
   ```cpp
   const auto entity = prototype();
   ```
+
   It is equivalent to the following invokation:
+
   ```cpp
   const auto entity = prototype.create();
   ```
 
-* In case we want to initialize an already existing entity, we can provide the
-  `operator()` directly with the entity identifier:
+* To initialize an already existing entity, users can provide the `operator()`
+  directly with the entity identifier:
+
   ```cpp
   prototype(entity);
   ```
+
   It is equivalent to the following invokation:
+
   ```cpp
   prototype.assign(entity);
   ```
+
   Note that existing components aren't overwritten in this case. Only those
   components that the entity doesn't own yet are copied over. All the other
   components remain unchanged.
 
 * Finally, to assign or replace all the components for an entity, thus
   overwriting existing ones:
+
   ```cpp
   prototype.assign_or_replace(entity);
   ```

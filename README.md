@@ -71,25 +71,24 @@ This project started off as a pure entity-component system. Over time the
 codebase has grown as more and more classes and functionalities were added.<br/>
 Here is a brief, yet incomplete list of what it offers today:
 
-* Statically generated integer **identifiers for types** (assigned either at
+* Statically generated integer **identifiers** for types (assigned either at
   compile-time or at runtime).
-* A `constexpr` utility for **human readable resource identifiers**.
+* A `constexpr` utility for human readable **resource names**.
 * A minimal **configuration system** built using the monostate pattern.
 * An incredibly fast **entity-component system** based on sparse sets, with its
   own _pay for what you use_ policy to adjust performance and memory usage
   according to the users' requirements.
 * Views and groups to iterate entities and components and allow different access
   patterns, from **perfect SoA** to fully random.
-* A lot of **facilities** built on top of the entity-component system to support
-  the users and avoid reinventing the wheel (dependencies, snapshot, actor class
-  for those who aren't confident with the architecture and so on).
+* A lot of **facilities** built on top of the entity-component system to help
+  the users and avoid reinventing the wheel (dependencies, snapshot, actor
+  class, support for **reactive systems** and so on).
 * The smallest and most basic implementation of a **service locator** ever seen.
-* A built-in, non-intrusive and macro-free **runtime reflection system**.
+* A built-in, non-intrusive and macro-free runtime **reflection system**.
 * A **cooperative scheduler** for processes of any type.
 * All that is needed for **resource management** (cache, loaders, handles).
-* **Delegates**, **signal handlers** (with built-in support for collectors) and
-  a tiny **event dispatcher** for immediate and delayed events to integrate in
-  loops.
+* Delegates, **signal handlers** (with built-in support for collectors) and a
+  tiny event dispatcher for immediate and delayed events to integrate in loops.
 * A general purpose **event emitter** as a CRTP idiom based class template.
 * And **much more**! Check out the
   [**wiki**](https://github.com/skypjack/entt/wiki).

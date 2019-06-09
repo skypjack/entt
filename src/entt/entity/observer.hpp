@@ -267,7 +267,7 @@ public:
      */
     template<typename... Matcher>
     void connect(basic_registry<entity_type> &reg, basic_collector<Matcher...>) {
-        release ? release(*target, *this) : void();
+        disconnect();
         connect<Matcher...>(reg, std::make_index_sequence<sizeof...(Matcher)>{});
         target = &reg;
         view.reset();

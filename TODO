@@ -24,4 +24,3 @@
 * stable component handle that isn't affected by reallocations
 * multi component registry::remove and some others?
 * built-in support for dual (or N-) buffering
-* reactive systems
