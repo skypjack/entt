@@ -370,7 +370,8 @@ public:
      * @param entt A valid entity identifier.
      */
     void destroy(const entity_type entt) override {
-        std::swap(instances[underlying_type::get(entt)], instances.back());
+        auto other = std::move(instances.back());
+        instances[underlying_type::get(entt)] = std::move(other);
         instances.pop_back();
         underlying_type::destroy(entt);
     }
