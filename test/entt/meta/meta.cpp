@@ -1,3 +1,4 @@
+#include <utility>
 #include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
@@ -422,6 +423,28 @@ TEST_F(Meta, MetaAnyNoSBOMoveAssignment) {
     ASSERT_EQ(std::as_const(other).cast<fat_type>(), instance);
     ASSERT_EQ(other, entt::meta_any{instance});
     ASSERT_NE(other, fat_type{});
+}
+
+TEST_F(Meta, MetaAnySBOMoveInvalidate) {
+    entt::meta_any any{42};
+    entt::meta_any other{std::move(any)};
+    entt::meta_any valid = std::move(other);
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(other);
+    ASSERT_TRUE(valid);
+}
+
+TEST_F(Meta, MetaAnyNoSBOMoveInvalidate) {
+    int value = 42;
+    fat_type instance{&value};
+    entt::meta_any any{instance};
+    entt::meta_any other{std::move(any)};
+    entt::meta_any valid = std::move(other);
+
+    ASSERT_FALSE(any);
+    ASSERT_FALSE(other);
+    ASSERT_TRUE(valid);
 }
 
 TEST_F(Meta, MetaAnySBODestruction) {

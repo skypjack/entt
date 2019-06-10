@@ -44,7 +44,7 @@ struct meta_prop_node {
     meta_prop_node * next;
     meta_any(* const key)();
     meta_any(* const value)();
-    meta_prop(* const meta)();
+    meta_prop(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -52,9 +52,9 @@ struct meta_base_node {
     meta_base_node ** const underlying;
     meta_type_node * const parent;
     meta_base_node * next;
-    meta_type_node *(* const type)();
-    void *(* const cast)(void *);
-    meta_base(* const meta)();
+    meta_type_node *(* const type)() ENTT_NOEXCEPT;
+    void *(* const cast)(void *) ENTT_NOEXCEPT;
+    meta_base(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -62,9 +62,9 @@ struct meta_conv_node {
     meta_conv_node ** const underlying;
     meta_type_node * const parent;
     meta_conv_node * next;
-    meta_type_node *(* const type)();
+    meta_type_node *(* const type)() ENTT_NOEXCEPT;
     meta_any(* const conv)(void *);
-    meta_conv(* const meta)();
+    meta_conv(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -75,9 +75,9 @@ struct meta_ctor_node {
     meta_ctor_node * next;
     meta_prop_node * prop;
     const size_type size;
-    meta_type_node *(* const arg)(size_type);
+    meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_any * const);
-    meta_ctor(* const meta)();
+    meta_ctor(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -85,7 +85,7 @@ struct meta_dtor_node {
     meta_dtor_node ** const underlying;
     meta_type_node * const parent;
     bool(* const invoke)(meta_handle);
-    meta_dtor(* const meta)();
+    meta_dtor(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -97,10 +97,10 @@ struct meta_data_node {
     meta_prop_node * prop;
     const bool is_const;
     const bool is_static;
-    meta_type_node *(* const type)();
+    meta_type_node *(* const type)() ENTT_NOEXCEPT;
     bool(* const set)(meta_handle, meta_any, meta_any);
     meta_any(* const get)(meta_handle, meta_any);
-    meta_data(* const meta)();
+    meta_data(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -114,10 +114,10 @@ struct meta_func_node {
     const size_type size;
     const bool is_const;
     const bool is_static;
-    meta_type_node *(* const ret)();
-    meta_type_node *(* const arg)(size_type);
+    meta_type_node *(* const ret)() ENTT_NOEXCEPT;
+    meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_handle, meta_any *);
-    meta_func(* const meta)();
+    meta_func(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -138,9 +138,9 @@ struct meta_type_node {
     const bool is_member_object_pointer;
     const bool is_member_function_pointer;
     const size_type extent;
-    meta_type(* const remove_pointer)();
+    meta_type(* const remove_pointer)() ENTT_NOEXCEPT;
     bool(* const destroy)(meta_handle);
-    meta_type(* const meta)();
+    meta_type(* const meta)() ENTT_NOEXCEPT;
     meta_base_node *base{nullptr};
     meta_conv_node *conv{nullptr};
     meta_ctor_node *ctor{nullptr};
@@ -303,23 +303,24 @@ class meta_any {
     friend class meta_handle;
 
     using storage_type = std::aligned_storage_t<sizeof(void *), alignof(void *)>;
-    using compare_fn_type = bool(*)(const void *, const void *);
-    using copy_fn_type = void *(*)(storage_type &, const void *);
-    using destroy_fn_type = void(*)(storage_type &);
+    using compare_fn_type = bool(const void *, const void *) ENTT_NOEXCEPT;
+    using copy_fn_type = void *(storage_type &, const void *);
+    using destroy_fn_type = void(storage_type &);
+    using steal_fn_type = void *(storage_type &, storage_type &, destroy_fn_type *, void *)  ENTT_NOEXCEPT;
 
     template<typename Type>
-    static auto compare(int, const Type &lhs, const Type &rhs)
+    static auto compare(int, const Type &lhs, const Type &rhs) ENTT_NOEXCEPT
     -> decltype(lhs == rhs, bool{}) {
         return lhs == rhs;
     }
 
     template<typename Type>
-    static bool compare(char, const Type &lhs, const Type &rhs) {
+    static bool compare(char, const Type &lhs, const Type &rhs) ENTT_NOEXCEPT {
         return &lhs == &rhs;
     }
 
     template<typename Type>
-    static bool compare(const void *lhs, const void *rhs) {
+    static bool compare(const void *lhs, const void *rhs) ENTT_NOEXCEPT {
         return compare(0, *static_cast<const Type *>(lhs), *static_cast<const Type *>(rhs));
     }
 
@@ -331,9 +332,27 @@ class meta_any {
     template<typename Type>
     static void * copy_object(storage_type &storage, const void *instance) {
         using chunk_type = std::aligned_storage_t<sizeof(Type), alignof(Type)>;
-        auto *chunk = new chunk_type;
-        new (&storage) chunk_type *{chunk};
-        return new (chunk) Type{*static_cast<const Type *>(instance)};
+        auto chunk = std::make_unique<chunk_type>();
+        new (&storage) chunk_type *{chunk.get()};
+        auto *other = new (chunk.get()) Type{*static_cast<const Type *>(instance)};
+        chunk.release();
+        return other;
+    }
+
+    template<typename Type>
+    static void * steal_storage(storage_type &to, storage_type &from, destroy_fn_type *destroy_fn, void *) noexcept {
+        void *instance = new (&to) Type{std::move(*reinterpret_cast<Type *>(&from))};
+        destroy_fn(from);
+        return instance;
+    }
+
+    template<typename Type>
+    static void * steal_object(storage_type &to, storage_type &from, destroy_fn_type *, void *instance) noexcept {
+        using chunk_type = std::aligned_storage_t<sizeof(Type), alignof(Type)>;
+        auto *chunk = *reinterpret_cast<chunk_type **>(&from);
+        new (&to) chunk_type *{chunk};
+        chunk->~chunk_type();
+        return instance;
     }
 
     template<typename Type>
@@ -361,7 +380,8 @@ public:
           node{nullptr},
           destroy_fn{nullptr},
           compare_fn{nullptr},
-          copy_fn{nullptr}
+          copy_fn{nullptr},
+          steal_fn{nullptr}
     {}
 
     /**
@@ -381,15 +401,18 @@ public:
     template<typename Type, typename... Args>
     meta_any(std::in_place_type_t<Type>, Args &&... args) {
         using actual_type = std::remove_cv_t<std::remove_reference_t<Type>>;
-        constexpr auto sbo_allowed = sizeof(actual_type) <= sizeof(void *);
         node = internal::meta_info<Type>::resolve();
 
         compare_fn = &compare<actual_type>;
+
+        constexpr auto sbo_allowed = sizeof(actual_type) <= sizeof(void *)
+                && std::is_nothrow_move_constructible_v<actual_type>;
 
         if constexpr(sbo_allowed) {
             instance = new (&storage) actual_type{std::forward<Args>(args)...};
             destroy_fn = &destroy_storage<actual_type>;
             copy_fn = &copy_storage<actual_type>;
+            steal_fn = &steal_storage<actual_type>;
         } else {
             using chunk_type = std::aligned_storage_t<sizeof(actual_type), alignof(actual_type)>;
 
@@ -400,6 +423,7 @@ public:
 
             destroy_fn = &destroy_object<actual_type>;
             copy_fn = &copy_object<actual_type>;
+            steal_fn = &steal_object<actual_type>;
         }
     }
 
@@ -434,6 +458,7 @@ public:
             destroy_fn = other.destroy_fn;
             compare_fn = other.compare_fn;
             copy_fn = other.copy_fn;
+            steal_fn = other.steal_fn;
         }
     }
 
@@ -543,7 +568,7 @@ public:
      * one otherwise.
      */
     template<typename Type>
-    meta_any convert() const ENTT_NOEXCEPT {
+    meta_any convert() const {
         const auto *type = internal::meta_info<Type>::resolve();
         meta_any any{};
 
@@ -568,7 +593,7 @@ public:
      * @return True if the conversion is possible, false otherwise.
      */
     template<typename Type>
-    bool convert() ENTT_NOEXCEPT {
+    bool convert() {
         bool valid = (node == internal::meta_info<Type>::resolve());
 
         if(!valid) {
@@ -601,7 +626,7 @@ public:
      * @return False if the container is empty, true otherwise.
      */
     explicit operator bool() const ENTT_NOEXCEPT {
-        return destroy_fn;
+        return instance;
     }
 
     /**
@@ -619,24 +644,19 @@ public:
      * @param lhs A valid meta any object.
      * @param rhs A valid meta any object.
      */
-    friend void swap(meta_any &lhs, meta_any &rhs) {
+    friend void swap(meta_any &lhs, meta_any &rhs) ENTT_NOEXCEPT {
         using std::swap;
 
         if(lhs && rhs) {
             storage_type buffer;
-            void *tmp = lhs.copy_fn(buffer, lhs.instance);
-            lhs.destroy_fn(lhs.storage);
-            lhs.instance = rhs.copy_fn(lhs.storage, rhs.instance);
-            rhs.destroy_fn(rhs.storage);
-            rhs.instance = lhs.copy_fn(rhs.storage, tmp);
-            lhs.destroy_fn(buffer);
+            void *instance = lhs.steal_fn(buffer, lhs.storage, lhs.destroy_fn, lhs.instance);
+            lhs.instance = rhs.steal_fn(lhs.storage, rhs.storage, rhs.destroy_fn, rhs.instance);
+            rhs.instance = lhs.steal_fn(rhs.storage, buffer, lhs.destroy_fn, instance);
         } else if(lhs) {
-            rhs.instance = lhs.copy_fn(rhs.storage, lhs.instance);
-            lhs.destroy_fn(lhs.storage);
+            rhs.instance = lhs.steal_fn(rhs.storage, lhs.storage, lhs.destroy_fn, lhs.instance);
             lhs.instance = nullptr;
         } else if(rhs) {
-            lhs.instance = rhs.copy_fn(lhs.storage, rhs.instance);
-            rhs.destroy_fn(rhs.storage);
+            lhs.instance = rhs.steal_fn(lhs.storage, rhs.storage, rhs.destroy_fn, rhs.instance);
             rhs.instance = nullptr;
         }
 
@@ -644,15 +664,17 @@ public:
         std::swap(lhs.destroy_fn, rhs.destroy_fn);
         std::swap(lhs.compare_fn, rhs.compare_fn);
         std::swap(lhs.copy_fn, rhs.copy_fn);
+        std::swap(lhs.steal_fn, rhs.steal_fn);
     }
 
 private:
     storage_type storage;
     void *instance;
     internal::meta_type_node *node;
-    destroy_fn_type destroy_fn;
-    compare_fn_type compare_fn;
-    copy_fn_type copy_fn;
+    destroy_fn_type *destroy_fn;
+    compare_fn_type *compare_fn;
+    copy_fn_type *copy_fn;
+    steal_fn_type *steal_fn;
 };
 
 
@@ -2071,7 +2093,7 @@ struct meta_function_helper<Ret(Args...)> {
 
     static constexpr auto size = sizeof...(Args);
 
-    static auto arg(typename internal::meta_func_node::size_type index) {
+    static auto arg(typename internal::meta_func_node::size_type index) ENTT_NOEXCEPT {
         return std::array<meta_type_node *, sizeof...(Args)>{{meta_info<Args>::resolve()...}}[index];
     }
 };
@@ -2283,11 +2305,11 @@ inline meta_type_node * meta_node<Type>::resolve() ENTT_NOEXCEPT {
             std::is_member_object_pointer_v<Type>,
             std::is_member_function_pointer_v<Type>,
             std::extent_v<Type>,
-            []() -> meta_type {
+            []() ENTT_NOEXCEPT -> meta_type {
                 return internal::meta_info<std::remove_pointer_t<Type>>::resolve();
             },
             &destroy<Type>,
-            []() -> meta_type {
+            []() ENTT_NOEXCEPT -> meta_type {
                 return &node;
             }
         };

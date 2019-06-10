@@ -64,7 +64,7 @@ class meta_factory {
             []() -> meta_any {
                 return std::get<1>(prop);
             },
-            []() -> meta_prop {
+            []() ENTT_NOEXCEPT -> meta_prop {
                 return &node;
             }
         };
@@ -93,11 +93,11 @@ class meta_factory {
             std::is_member_object_pointer_v<Type>,
             std::is_member_function_pointer_v<Type>,
             std::extent_v<Type>,
-            []() -> meta_type {
+            []() ENTT_NOEXCEPT -> meta_type {
                 return internal::meta_info<std::remove_pointer_t<Type>>::resolve();
             },
             &internal::destroy<Type>,
-            []() -> meta_type {
+            []() ENTT_NOEXCEPT -> meta_type {
                 return &node;
             }
         };
@@ -209,10 +209,10 @@ public:
             type,
             nullptr,
             &internal::meta_info<Base>::resolve,
-            [](void *instance) -> void * {
+            [](void *instance) ENTT_NOEXCEPT -> void * {
                 return static_cast<Base *>(static_cast<Type *>(instance));
             },
-            []() -> meta_base {
+            []() ENTT_NOEXCEPT -> meta_base {
                 return &node;
             }
         };
@@ -247,7 +247,7 @@ public:
             [](void *instance) -> meta_any {
                 return static_cast<To>(*static_cast<Type *>(instance));
             },
-            []() -> meta_conv {
+            []() ENTT_NOEXCEPT -> meta_conv {
                 return &node;
             }
         };
@@ -290,7 +290,7 @@ public:
             [](meta_any * const any) {
                 return internal::invoke<Type, Func>(nullptr, any, std::make_index_sequence<helper_type::size>{});
             },
-            []() -> meta_ctor {
+            []() ENTT_NOEXCEPT -> meta_ctor {
                 return &node;
             }
         };
@@ -331,7 +331,7 @@ public:
             [](meta_any * const any) {
                 return internal::construct<Type, Args...>(any, std::make_index_sequence<helper_type::size>{});
             },
-            []() -> meta_ctor {
+            []() ENTT_NOEXCEPT -> meta_ctor {
                 return &node;
             }
         };
@@ -374,7 +374,7 @@ public:
                         ? ((*Func)(static_cast<Type *>(handle.data())), true)
                         : false;
             },
-            []() -> meta_dtor {
+            []() ENTT_NOEXCEPT -> meta_dtor {
                 return &node;
             }
         };
@@ -418,7 +418,7 @@ public:
                 &internal::meta_info<Type>::resolve,
                 [](meta_handle, meta_any, meta_any) { return false; },
                 [](meta_handle, meta_any) -> meta_any { return Data; },
-                []() -> meta_data {
+                []() ENTT_NOEXCEPT -> meta_data {
                     return &node;
                 }
             };
@@ -439,7 +439,7 @@ public:
                 &internal::meta_info<data_type>::resolve,
                 &internal::setter<std::is_const_v<data_type>, Type, Data>,
                 &internal::getter<Type, Data>,
-                []() -> meta_data {
+                []() ENTT_NOEXCEPT -> meta_data {
                     return &node;
                 }
             };
@@ -461,7 +461,7 @@ public:
                 &internal::meta_info<data_type>::resolve,
                 &internal::setter<std::is_const_v<data_type>, Type, Data>,
                 &internal::getter<Type, Data>,
-                []() -> meta_data {
+                []() ENTT_NOEXCEPT -> meta_data {
                     return &node;
                 }
             };
@@ -519,7 +519,7 @@ public:
             &internal::meta_info<underlying_type>::resolve,
             &internal::setter<false, Type, Setter>,
             &internal::getter<Type, Getter>,
-            []() -> meta_data {
+            []() ENTT_NOEXCEPT -> meta_data {
                 return &node;
             }
         };
@@ -569,7 +569,7 @@ public:
             [](meta_handle handle, meta_any *any) {
                 return internal::invoke<Type, Func>(handle, any, std::make_index_sequence<func_type::size>{});
             },
-            []() -> meta_func {
+            []() ENTT_NOEXCEPT -> meta_func {
                 return &node;
             }
         };
