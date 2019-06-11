@@ -6,6 +6,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <utility>
+#include <algorithm>
+#include <type_traits>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
 #include "registry.hpp"
@@ -17,46 +19,19 @@
 namespace entt {
 
 
+/*! @brief Grouping matcher. */
+template<typename...>
+struct matcher {};
+
+
 /**
- * @brief Matcher.
+ * @brief Collector.
  *
  * Primary template isn't defined on purpose. All the specializations give a
  * compile-time error, but for a few reasonable cases.
  */
 template<typename...>
-struct matcher;
-
-
-/**
- * @brief Observing matcher.
- *
- * An observing matcher contains a type for which changes should be
- * detected.<br/>
- * Because of the rules of the language, not all changes can be easily detected.
- * In order to avoid nasty solutions that could affect performance to an extent,
- * the matcher listens only to the `on_replace` signals emitted by a registry
- * and is therefore triggered whenever an instance of the given component is
- * explicitly replaced.
- *
- * @tparam AnyOf Type of component for which changes should be detected.
- */
-template<typename AnyOf>
-struct matcher<AnyOf> {};
-
-
-/**
- * @brief Grouping matcher.
- *
- * A grouping matcher describes the group to track in terms of accepted and
- * excluded types.<br/>
- * This kind of matcher is triggered whenever an entity _enters_ the desired
- * group because of the components it is assigned.
- *
- * @tparam AllOf Types of components tracked by the matcher.
- * @tparam NoneOf Types of components used to filter out entities.
- */
-template<typename... AllOf, typename... NoneOf>
-struct matcher<type_list<AllOf...>, type_list<NoneOf...>> {};
+struct basic_collector;
 
 
 /**
@@ -66,12 +41,9 @@ struct matcher<type_list<AllOf...>, type_list<NoneOf...>> {};
  * entities.<br/>
  * Its main purpose is to generate a descriptor that allows an observer to know
  * how to connect to a registry.
- *
- * @tparam AnyOf Types of components for which changes should be detected.
- * @tparam Matcher Types of grouping matchers.
  */
-template<typename... Matcher>
-struct basic_collector {
+template<>
+struct basic_collector<> {
     /**
      * @brief Adds a grouping matcher to the collector.
      * @tparam AllOf Types of components tracked by the matcher.
@@ -80,17 +52,60 @@ struct basic_collector {
      */
     template<typename... AllOf, typename... NoneOf>
     static constexpr auto group(exclude_t<NoneOf...> = {}) ENTT_NOEXCEPT {
-        return basic_collector<Matcher..., matcher<type_list<AllOf...>, type_list<NoneOf...>>>{};
+        return basic_collector<matcher<matcher<type_list<>, type_list<>>, type_list<NoneOf...>, type_list<AllOf...>>>{};
     }
 
     /**
-     * @brief Adds one or more observing matchers to the collector.
-     * @tparam AnyOf Types of components for which changes should be detected.
+     * @brief Adds an observing matcher to the collector.
+     * @tparam AnyOf Type of component for which changes should be detected.
      * @return The updated collector.
      */
-    template<typename... AnyOf>
+    template<typename AnyOf>
     static constexpr auto replace() ENTT_NOEXCEPT {
-        return basic_collector<Matcher..., matcher<AnyOf>...>{};
+        return basic_collector<matcher<matcher<type_list<>, type_list<>>, AnyOf>>{};
+    }
+};
+
+/**
+ * @brief Collector.
+ * @copydetails basic_collector<>
+ * @tparam AnyOf Types of components for which changes should be detected.
+ * @tparam Matcher Types of grouping matchers.
+ */
+template<typename... Reject, typename... Require, typename... Rule, typename... Other>
+struct basic_collector<matcher<matcher<type_list<Reject...>, type_list<Require...>>, Rule...>, Other...> {
+    /**
+     * @brief Adds a grouping matcher to the collector.
+     * @tparam AllOf Types of components tracked by the matcher.
+     * @tparam NoneOf Types of components used to filter out entities.
+     * @return The updated collector.
+     */
+    template<typename... AllOf, typename... NoneOf>
+    static constexpr auto group(exclude_t<NoneOf...> = {}) ENTT_NOEXCEPT {
+        using first = matcher<matcher<type_list<Reject...>, type_list<Require...>>, Rule...>;
+        return basic_collector<first, Other..., matcher<matcher<type_list<>, type_list<>>, type_list<NoneOf...>, type_list<AllOf...>>>{};
+    }
+
+    /**
+     * @brief Adds an observing matcher to the collector.
+     * @tparam AnyOf Type of component for which changes should be detected.
+     * @return The updated collector.
+     */
+    template<typename AnyOf>
+    static constexpr auto replace() ENTT_NOEXCEPT {
+        using first = matcher<matcher<type_list<Reject...>, type_list<Require...>>, Rule...>;
+        return basic_collector<first, Other..., matcher<matcher<type_list<>, type_list<>>, AnyOf>>{};
+    }
+
+    /**
+     * @brief Updates the filter of the last added matcher.
+     * @tparam AllOf Types of components required by the matcher.
+     * @tparam NoneOf Types of components used to filter out entities.
+     * @return The updated collector.
+     */
+    template<typename... AllOf, typename... NoneOf>
+    static constexpr auto when(exclude_t<NoneOf...> = {}) ENTT_NOEXCEPT {
+        return basic_collector<matcher<matcher<type_list<Reject..., NoneOf...>, type_list<Require..., AllOf...>>, Rule...>, Other...>{};
     }
 };
 
@@ -119,6 +134,13 @@ constexpr basic_collector<> collector{};
  *
  * If an entity respects the requirements of multiple matchers, it will be
  * returned once and only once by the observer in any case.
+ *
+ * Matchers support also filtering by means of a _when_ clause that accepts both
+ * a list of types and an exclusion list.<br/>
+ * Whenever a matcher finds that an entity matches its requirements, the
+ * condition of the filter is verified before to register the entity itself.
+ * Moreover, a registered entity isn't returned by the observer if the condition
+ * set by the filter is broken in the meantime.
  *
  * @b Important
  *
@@ -149,10 +171,12 @@ class basic_observer {
     template<std::size_t Index, typename>
     struct matcher_handler;
 
-    template<std::size_t Index, typename AnyOf>
-    struct matcher_handler<Index, matcher<AnyOf>> {
-        static void maybe_valid_if(basic_observer *obs, const basic_registry<Entity> &, const Entity entt) {
-            (obs->view.has(entt) ? obs->view.get(entt) : obs->view.construct(entt)) |= (1 << Index);
+    template<std::size_t Index, typename... Reject, typename... Require, typename AnyOf>
+    struct matcher_handler<Index, matcher<matcher<type_list<Reject...>, type_list<Require...>>, AnyOf>> {
+        static void maybe_valid_if(basic_observer *obs, const basic_registry<Entity> &reg, const Entity entt) {
+            if(reg.template has<Require...>(entt) && !(reg.template has<Reject>(entt) || ...)) {
+                (obs->view.has(entt) ? obs->view.get(entt) : obs->view.construct(entt)) |= (1 << Index);
+            }
         }
 
         static void discard_if(basic_observer *obs, const basic_registry<Entity> &, const Entity entt) {
@@ -162,20 +186,26 @@ class basic_observer {
         }
 
         static void disconnect(basic_registry<Entity> &reg, const basic_observer &obs) {
-            (reg.template on_replace<AnyOf>().disconnect(&obs));
-            (reg.template on_destroy<AnyOf>().disconnect(&obs));
+            reg.template on_replace<AnyOf>().disconnect(&obs);
+            reg.template on_destroy<AnyOf>().disconnect(&obs);
+            (reg.template on_destroy<Require>().disconnect(&obs), ...);
+            (reg.template on_construct<Reject>().disconnect(&obs), ...);
         }
 
         static void connect(basic_observer &obs, basic_registry<Entity> &reg) {
             reg.template on_replace<AnyOf>().template connect<&maybe_valid_if>(&obs);
             reg.template on_destroy<AnyOf>().template connect<&discard_if>(&obs);
+            (reg.template on_destroy<Require>().template connect<&discard_if>(&obs), ...);
+            (reg.template on_construct<Reject>().template connect<&discard_if>(&obs), ...);
         }
     };
 
-    template<std::size_t Index, typename... AllOf, typename... NoneOf>
-    struct matcher_handler<Index, matcher<type_list<AllOf...>, type_list<NoneOf...>>> {
+    template<std::size_t Index, typename... Reject, typename... Require, typename... NoneOf, typename... AllOf>
+    struct matcher_handler<Index, matcher<matcher<type_list<Reject...>, type_list<Require...>>, type_list<NoneOf...>, type_list<AllOf...>>> {
         static void maybe_valid_if(basic_observer *obs, const basic_registry<Entity> &reg, const Entity entt) {
-            if(reg.template has<AllOf...>(entt) && !(reg.template has<NoneOf>(entt) || ...)) {
+            if(reg.template has<AllOf...>(entt) && !(reg.template has<NoneOf>(entt) || ...)
+                    && reg.template has<Require...>(entt) && !(reg.template has<Reject>(entt) || ...))
+            {
                 (obs->view.has(entt) ? obs->view.get(entt) : obs->view.construct(entt)) |= (1 << Index);
             }
         }
@@ -191,6 +221,8 @@ class basic_observer {
             ((reg.template on_destroy<AllOf>().disconnect(&obs)), ...);
             ((reg.template on_construct<NoneOf>().disconnect(&obs)), ...);
             ((reg.template on_destroy<NoneOf>().disconnect(&obs)), ...);
+            (reg.template on_destroy<Require>().disconnect(&obs), ...);
+            (reg.template on_construct<Reject>().disconnect(&obs), ...);
         }
 
         static void connect(basic_observer &obs, basic_registry<Entity> &reg) {
@@ -198,6 +230,8 @@ class basic_observer {
             (reg.template on_destroy<NoneOf>().template connect<&maybe_valid_if>(&obs), ...);
             (reg.template on_destroy<AllOf>().template connect<&discard_if>(&obs), ...);
             (reg.template on_construct<NoneOf>().template connect<&discard_if>(&obs), ...);
+            (reg.template on_destroy<Require>().template connect<&discard_if>(&obs), ...);
+            (reg.template on_construct<Reject>().template connect<&discard_if>(&obs), ...);
         }
     };
 
@@ -341,7 +375,47 @@ public:
 
     /*! @brief Resets the underlying container. */
     void clear() {
-        return view.reset();
+        view.reset();
+    }
+
+    /**
+     * @brief Iterates entities and applies the given function object to them,
+     * then clears the observer.
+     *
+     * The function object is invoked for each entity.<br/>
+     * The signature of the function must be equivalent to the following form:
+     *
+     * @code{.cpp}
+     * void(const entity_type);
+     * @endcode
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void each(Func func) const {
+        static_assert(std::is_invocable_v<Func, entity_type>);
+        std::for_each(begin(), end(), std::move(func));
+    }
+
+    /**
+     * @brief Iterates entities and applies the given function object to them,
+     * then clears the observer.
+     *
+     * The function object is invoked for each entity.<br/>
+     * The signature of the function must be equivalent to the following form:
+     *
+     * @code{.cpp}
+     * void(const entity_type);
+     * @endcode
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void each(Func func) {
+        std::as_const(*this).each(std::move(func));
+        clear();
     }
 
 private:

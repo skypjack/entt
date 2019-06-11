@@ -432,10 +432,10 @@ from the documentation of the library that first introduced this tool,
 >only update the 10 changed units. So efficient.
 
 In `EnTT`, this means to iterating over a reduced set of entities and components
-with respect to what would otherwise be returned from a view or group.<br/>
-On these words, however, the similarities with the proposal of Entitas also end.
-The rules of language and the design of the library obviously impose and allow
-different things.
+with respect to what would otherwise be returned from a view or a group.<br/>
+On these words, however, the similarities with the proposal of `Entitas` also
+end. The rules of language and the design of the library obviously impose and
+allow different things.
 
 An `observer` is initialized with an instance of a registry and a set of rules
 that describe what are the entities to intercept. As an example:
@@ -444,23 +444,24 @@ that describe what are the entities to intercept. As an example:
 entt::observer observer{registry, entt::collector.replace<sprite>()};
 ```
 
-The class also default constructible if required and it can be reconfigured at
-any time by means of the `connect` member function. Moreover, instances can be
+The class is default constructible if required and it can be reconfigured at any
+time by means of the `connect` member function. Moreover, instances can be
 disconnected from the underlying registries through the `disconnect` member
 function.<br/>
 The `observer` offers also some member functions to query its internal state and
 to know if it's empty or how many entities it contains. Moreover, it can return
-a raw pointer to the list of entities it contains.<br/>
+a raw pointer to the list of entities it contains.
+
 However, the most important features of this class are that:
 
 * It's iterable and therefore users can easily walk through the list of entities
-  by means of a range-for loop.
+  by means of a range-for loop or the `each` member function.
 * It's clearable and therefore users can consume the entities and literally
   reset the observer after each iteration.
 
 These aspects make the observer an incredibly powerful tool to know at any time
-what are the entities that have started to respect the given rules since the
-last time one asked:
+what are the entities that matched the given rules since the last time one
+asked:
 
 ```cpp
 for(const auto entity: observer) {
@@ -470,8 +471,20 @@ for(const auto entity: observer) {
 observer.clear();
 ```
 
-The `collector` is an utility to use to generate a list of `matcher`s (the
-actual rules) to use with an `observer`.<br/>
+Note that the snippet above is equivalent to the following:
+
+```cpp
+observer.each([](const auto entity) {
+    // ...
+});
+```
+
+At least as long as the `observer` isn't const. This means that the non-const
+overload of `each` does also reset the underlying data structure before to
+return to the caller, while the const overload does not for obvious reasons.
+
+The `collector` is an utility aimed to generate a list of `matcher`s (the actual
+rules) to use with an `observer` instead.<br/>
 There are two types of `matcher`s:
 
 * Observing matcher: an observer will return at least all the living entities
@@ -479,7 +492,7 @@ There are two types of `matcher`s:
   and not yet destroyed.
 
   ```cpp
-  collector.replace<sprite>();
+  entt::collector.replace<sprite>();
   ```
 
 * Grouping matcher: an observer will return at least all the living entities
@@ -487,7 +500,7 @@ There are two types of `matcher`s:
   not yet left it.
 
   ```cpp
-  collector.group<position, velocity>(entt::exclude<destroyed>);
+  entt::collector.group<position, velocity>(entt::exclude<destroyed>);
   ```
 
   A grouping matcher supports also exclusion lists as well as single components.
@@ -498,6 +511,25 @@ matcher tracks the entities that have assigned the given components since the
 last time one asked.<br/>
 Note that, for a grouping matcher, if an entity already has all the components
 except one and the missing type is assigned to it, it is intercepted.
+
+In addition, a matcher can be filtered with a `when` clause:
+
+```cpp
+entt::collector.replace<sprite>().when<position>(entt::exclude<velocity>);
+```
+
+This clause introduces a way to intercept entities if and only if they are
+already part of a hypothetical group. If they are not, they aren't returned by
+the observer, no matter if they matched the given rule.<br/>
+In the example above, whenever the component `sprite` of an entity is replaced,
+the observer probes the entity itself to verify that it has at least `position`
+and has not `velocity` before to store it aside. If one of the two conditions of
+the filter isn't respected, the entity is discared, no matter what.
+
+A `when` clause accepts a theoretically unlimited number of types as well as
+multiple elements in the exclusion list. Moreover, every matcher can have it's
+own clause and multiple clauses for the same matcher are combined in a single
+one.
 
 ## Runtime components
 
