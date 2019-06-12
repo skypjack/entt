@@ -68,7 +68,7 @@ public:
      * @brief Constructs a prototype that is bound to a given registry.
      * @param ref A valid reference to a registry.
      */
-    basic_prototype(registry_type &ref)
+    explicit basic_prototype(registry_type &ref)
         : reg{&ref},
           entity{ref.create()}
     {}

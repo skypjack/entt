@@ -22,5 +22,6 @@
   - standard each, use bitmask to speed up the whole thing and avoid accessing the pools to test for the page
   - iterator based each with a couple of iterators passed from outside (use bitmask + has)
 * stable component handle that isn't affected by reallocations
+* default constructor + init/re-init function to actor
 * multi component registry::remove and some others?
 * built-in support for dual (or N-) buffering

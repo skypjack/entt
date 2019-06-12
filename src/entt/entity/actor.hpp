@@ -33,13 +33,15 @@ struct basic_actor {
      * @brief Constructs an actor by using the given registry.
      * @param ref An entity-component system properly initialized.
      */
-    basic_actor(registry_type &ref)
+    explicit basic_actor(registry_type &ref)
         : reg{&ref}, entt{ref.create()}
     {}
 
     /*! @brief Default destructor. */
     virtual ~basic_actor() {
-        reg->destroy(entt);
+        if(*this) {
+            reg->destroy(entt);
+        }
     }
 
     /**
@@ -166,6 +168,14 @@ struct basic_actor {
      */
     entity_type entity() const ENTT_NOEXCEPT {
         return entt;
+    }
+
+    /**
+     * @brief Checks if an actor refers to a valid entity or not.
+     * @return True if the actor refers to a valid entity, false otherwise.
+     */
+    explicit operator bool() const ENTT_NOEXCEPT {
+        return reg && reg->valid(entt);
     }
 
 private:

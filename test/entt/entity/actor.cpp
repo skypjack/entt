@@ -42,6 +42,19 @@ TEST(Actor, Component) {
 
 TEST(Actor, EntityLifetime) {
     entt::registry registry;
+    entt::actor actor{registry};
+    actor.assign<int>();
+
+    ASSERT_TRUE(actor);
+    ASSERT_TRUE(actor);
+
+    registry.destroy(actor.entity());
+
+    ASSERT_FALSE(actor);
+}
+
+TEST(Actor, ActorLifetime) {
+    entt::registry registry;
     auto *actor = new entt::actor{registry};
     actor->assign<int>();
 
