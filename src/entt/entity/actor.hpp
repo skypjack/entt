@@ -29,6 +29,10 @@ struct basic_actor {
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
 
+    basic_actor() ENTT_NOEXCEPT
+        : reg{nullptr}, entt{entt::null}
+    {}
+
     /**
      * @brief Constructs an actor by using the given registry.
      * @param ref An entity-component system properly initialized.
