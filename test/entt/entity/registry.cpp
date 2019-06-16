@@ -988,15 +988,6 @@ TEST(Registry, DestroyByComponents) {
     ASSERT_TRUE(registry.valid(e2));
 
     {
-        const auto view = registry.view<int, char, double>();
-        registry.destroy(view.begin(), view.end());
-    }
-
-    ASSERT_FALSE(registry.valid(e0));
-    ASSERT_TRUE(registry.valid(e1));
-    ASSERT_TRUE(registry.valid(e2));
-
-    {
         const auto view = registry.view<int, char>();
         registry.destroy(view.begin(), view.end());
     }

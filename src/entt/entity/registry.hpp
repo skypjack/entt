@@ -643,30 +643,14 @@ public:
 
     /**
      * @brief Destroys all the entities in a range.
-     * @tparam It Type of forward iterator.
+     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
      */
     template<typename It>
     void destroy(It first, It last) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-
-        for(auto pos = pools.size(); pos; --pos) {
-            if(auto &pdata = pools[pos-1]; pdata.pool) {
-                std::for_each(first, last, [&pdata, this](const auto entity) {
-                    if(pdata.pool->has(entity)) {
-                        pdata.remove(*this, entity);
-                    }
-                });
-            }
-        };
-
-        // just a way to protect users from listeners that attach components
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return orphan(entity); }));
-
-        std::for_each(first, last, [this](const auto entity) {
-            release(entity);
-        });
+        // useless this-> used to suppress a warning with clang
+        std::for_each(first, last, [this](const auto entity) { this->destroy(entity); });
     }
 
     /**
@@ -1412,7 +1396,7 @@ public:
      * components.<br/>
      * This is particularly well suited to plugin systems and mods in general.
      *
-     * @tparam It Type of forward iterator.
+     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of components.
      * @param last An iterator past the last element of the range of components.
      * @return A newly created runtime view.
