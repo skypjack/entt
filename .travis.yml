@@ -86,8 +86,8 @@ install:
 
 script:
 - mkdir -p build && cd build
-- cmake -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release .. && make -j4
-- CTEST_OUTPUT_ON_FAILURE=1 ctest -j4
+- cmake -DBUILD_TESTING=ON -DBUILD_LIB=ON .. && make -j4
+- CTEST_OUTPUT_ON_FAILURE=1 ctest --timeout 5 -C Debug -j4
 
 deploy:
   provider: script

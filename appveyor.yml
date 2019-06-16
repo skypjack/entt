@@ -5,19 +5,20 @@ image: Visual Studio 2017
 
 environment:
   BUILD_DIR: "%APPVEYOR_BUILD_FOLDER%\\build"
+  CTEST_OUTPUT_ON_FAILURE: 1
 
 platform:
   - Win32
 
 configuration:
-  - Release
+  - Debug
 
 before_build:
   - cd %BUILD_DIR%
   - cmake .. -DBUILD_TESTING=ON -DBUILD_LIB=ON -DCMAKE_CXX_FLAGS=/W1 -G"Visual Studio 15 2017"
 
 after_build:
-  - ctest -C Release -j4
+  - ctest --timeout 5 -C Debug -j4
 
 build:
   parallel: true
