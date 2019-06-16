@@ -61,11 +61,11 @@ struct insertion_sort {
                 auto pre = it++;
                 auto value = *pre;
 
-                while(pre-- != first && compare(value, *pre)) {
-                    *(pre+1) = *pre;
+                for(; pre != first && compare(value, *(pre-1)); --pre) {
+                    *pre = *(pre-1);
                 }
 
-                *(pre+1) = value;
+                *pre = value;
             }
         }
     }
