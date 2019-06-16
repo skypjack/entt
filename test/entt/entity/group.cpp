@@ -933,7 +933,7 @@ TEST(OwningGroup, Less) {
         ASSERT_EQ(entity, entt);
     });
 
-    registry.group<double>(entt::get<int, char>).less([entity](const auto entt, int, char, double) {
+    registry.group<double>(entt::get<int, char>).less([entity](const auto entt, double, int, char) {
         ASSERT_EQ(entity, entt);
     });
 }
