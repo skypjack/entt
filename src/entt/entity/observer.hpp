@@ -104,7 +104,7 @@ struct basic_collector<matcher<matcher<type_list<Reject...>, type_list<Require..
      * @return The updated collector.
      */
     template<typename... AllOf, typename... NoneOf>
-    static constexpr auto when(exclude_t<NoneOf...> = {}) ENTT_NOEXCEPT {
+    static constexpr auto where(exclude_t<NoneOf...> = {}) ENTT_NOEXCEPT {
         return basic_collector<matcher<matcher<type_list<Reject..., NoneOf...>, type_list<Require..., AllOf...>>, Rule...>, Other...>{};
     }
 };
@@ -135,8 +135,8 @@ constexpr basic_collector<> collector{};
  * If an entity respects the requirements of multiple matchers, it will be
  * returned once and only once by the observer in any case.
  *
- * Matchers support also filtering by means of a _when_ clause that accepts both
- * a list of types and an exclusion list.<br/>
+ * Matchers support also filtering by means of a _where_ clause that accepts
+ * both a list of types and an exclusion list.<br/>
  * Whenever a matcher finds that an entity matches its requirements, the
  * condition of the filter is verified before to register the entity itself.
  * Moreover, a registered entity isn't returned by the observer if the condition

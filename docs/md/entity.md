@@ -512,10 +512,10 @@ last time one asked.<br/>
 Note that, for a grouping matcher, if an entity already has all the components
 except one and the missing type is assigned to it, it is intercepted.
 
-In addition, a matcher can be filtered with a `when` clause:
+In addition, a matcher can be filtered with a `where` clause:
 
 ```cpp
-entt::collector.replace<sprite>().when<position>(entt::exclude<velocity>);
+entt::collector.replace<sprite>().where<position>(entt::exclude<velocity>);
 ```
 
 This clause introduces a way to intercept entities if and only if they are
@@ -526,7 +526,7 @@ the observer probes the entity itself to verify that it has at least `position`
 and has not `velocity` before to store it aside. If one of the two conditions of
 the filter isn't respected, the entity is discared, no matter what.
 
-A `when` clause accepts a theoretically unlimited number of types as well as
+A `where` clause accepts a theoretically unlimited number of types as well as
 multiple elements in the exclusion list. Moreover, every matcher can have it's
 own clause and multiple clauses for the same matcher are combined in a single
 one.

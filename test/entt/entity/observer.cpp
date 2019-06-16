@@ -86,7 +86,7 @@ TEST(Observer, AllOf) {
 
 TEST(Observer, AllOfFiltered) {
     constexpr auto collector =  entt::collector
-            .group<int>().when<char>(entt::exclude<double>);
+            .group<int>().where<char>(entt::exclude<double>);
 
     entt::registry registry;
     entt::observer observer{registry, collector};
@@ -160,7 +160,7 @@ TEST(Observer, Observe) {
 
 TEST(Observer, ObserveFiltered) {
     constexpr auto collector =  entt::collector
-            .replace<int>().when<char>(entt::exclude<double>);
+            .replace<int>().where<char>(entt::exclude<double>);
 
     entt::registry registry;
     entt::observer observer{registry, collector};
