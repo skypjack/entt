@@ -168,40 +168,44 @@ class basic_observer {
     using traits_type = entt_traits<Entity>;
     using payload_type = std::uint32_t;
 
-    template<std::size_t Index, typename>
+    template<typename>
     struct matcher_handler;
 
-    template<std::size_t Index, typename... Reject, typename... Require, typename AnyOf>
-    struct matcher_handler<Index, matcher<matcher<type_list<Reject...>, type_list<Require...>>, AnyOf>> {
+    template<typename... Reject, typename... Require, typename AnyOf>
+    struct matcher_handler<matcher<matcher<type_list<Reject...>, type_list<Require...>>, AnyOf>> {
+        template<std::size_t Index>
         static void maybe_valid_if(basic_observer *obs, const basic_registry<Entity> &reg, const Entity entt) {
             if(reg.template has<Require...>(entt) && !(reg.template has<Reject>(entt) || ...)) {
                 (obs->view.has(entt) ? obs->view.get(entt) : obs->view.construct(entt)) |= (1 << Index);
             }
         }
 
+        template<std::size_t Index>
         static void discard_if(basic_observer *obs, const basic_registry<Entity> &, const Entity entt) {
             if(auto *value = obs->view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
                 obs->view.destroy(entt);
             }
         }
 
-        static void disconnect(basic_registry<Entity> &reg, const basic_observer &obs) {
-            reg.template on_replace<AnyOf>().disconnect(&obs);
-            reg.template on_destroy<AnyOf>().disconnect(&obs);
-            (reg.template on_destroy<Require>().disconnect(&obs), ...);
-            (reg.template on_construct<Reject>().disconnect(&obs), ...);
+        template<std::size_t Index>
+        static void connect(basic_observer &obs, basic_registry<Entity> &reg) {
+            (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(&obs), ...);
+            (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(&obs), ...);
+            reg.template on_replace<AnyOf>().template connect<&maybe_valid_if<Index>>(&obs);
+            reg.template on_destroy<AnyOf>().template connect<&discard_if<Index>>(&obs);
         }
 
-        static void connect(basic_observer &obs, basic_registry<Entity> &reg) {
-            reg.template on_replace<AnyOf>().template connect<&maybe_valid_if>(&obs);
-            reg.template on_destroy<AnyOf>().template connect<&discard_if>(&obs);
-            (reg.template on_destroy<Require>().template connect<&discard_if>(&obs), ...);
-            (reg.template on_construct<Reject>().template connect<&discard_if>(&obs), ...);
+        static void disconnect(basic_observer &obs, basic_registry<Entity> &reg) {
+            (reg.template on_destroy<Require>().disconnect(&obs), ...);
+            (reg.template on_construct<Reject>().disconnect(&obs), ...);
+            reg.template on_replace<AnyOf>().disconnect(&obs);
+            reg.template on_destroy<AnyOf>().disconnect(&obs);
         }
     };
 
-    template<std::size_t Index, typename... Reject, typename... Require, typename... NoneOf, typename... AllOf>
-    struct matcher_handler<Index, matcher<matcher<type_list<Reject...>, type_list<Require...>>, type_list<NoneOf...>, type_list<AllOf...>>> {
+    template<typename... Reject, typename... Require, typename... NoneOf, typename... AllOf>
+    struct matcher_handler<matcher<matcher<type_list<Reject...>, type_list<Require...>>, type_list<NoneOf...>, type_list<AllOf...>>> {
+        template<std::size_t Index>
         static void maybe_valid_if(basic_observer *obs, const basic_registry<Entity> &reg, const Entity entt) {
             if(reg.template has<AllOf...>(entt) && !(reg.template has<NoneOf>(entt) || ...)
                     && reg.template has<Require...>(entt) && !(reg.template has<Reject>(entt) || ...))
@@ -210,41 +214,43 @@ class basic_observer {
             }
         }
 
+        template<std::size_t Index>
         static void discard_if(basic_observer *obs, const basic_registry<Entity> &, const Entity entt) {
             if(auto *value = obs->view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
                 obs->view.destroy(entt);
             }
         }
 
-        static void disconnect(basic_registry<Entity> &reg, const basic_observer &obs) {
-            ((reg.template on_construct<AllOf>().disconnect(&obs)), ...);
-            ((reg.template on_destroy<AllOf>().disconnect(&obs)), ...);
-            ((reg.template on_construct<NoneOf>().disconnect(&obs)), ...);
-            ((reg.template on_destroy<NoneOf>().disconnect(&obs)), ...);
-            (reg.template on_destroy<Require>().disconnect(&obs), ...);
-            (reg.template on_construct<Reject>().disconnect(&obs), ...);
+        template<std::size_t Index>
+        static void connect(basic_observer &obs, basic_registry<Entity> &reg) {
+            (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(&obs), ...);
+            (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(&obs), ...);
+            (reg.template on_construct<AllOf>().template connect<&maybe_valid_if<Index>>(&obs), ...);
+            (reg.template on_destroy<NoneOf>().template connect<&maybe_valid_if<Index>>(&obs), ...);
+            (reg.template on_destroy<AllOf>().template connect<&discard_if<Index>>(&obs), ...);
+            (reg.template on_construct<NoneOf>().template connect<&discard_if<Index>>(&obs), ...);
         }
 
-        static void connect(basic_observer &obs, basic_registry<Entity> &reg) {
-            (reg.template on_construct<AllOf>().template connect<&maybe_valid_if>(&obs), ...);
-            (reg.template on_destroy<NoneOf>().template connect<&maybe_valid_if>(&obs), ...);
-            (reg.template on_destroy<AllOf>().template connect<&discard_if>(&obs), ...);
-            (reg.template on_construct<NoneOf>().template connect<&discard_if>(&obs), ...);
-            (reg.template on_destroy<Require>().template connect<&discard_if>(&obs), ...);
-            (reg.template on_construct<Reject>().template connect<&discard_if>(&obs), ...);
+        static void disconnect(basic_observer &obs, basic_registry<Entity> &reg) {
+            (reg.template on_destroy<Require>().disconnect(&obs), ...);
+            (reg.template on_construct<Reject>().disconnect(&obs), ...);
+            (reg.template on_construct<AllOf>().disconnect(&obs), ...);
+            (reg.template on_destroy<NoneOf>().disconnect(&obs), ...);
+            (reg.template on_destroy<AllOf>().disconnect(&obs), ...);
+            (reg.template on_construct<NoneOf>().disconnect(&obs), ...);
         }
     };
 
-    template<auto... Disconnect>
-    static void disconnect(basic_registry<Entity> &reg, const basic_observer &obs) {
-        (Disconnect(reg, obs), ...);
+    template<typename... Matcher>
+    static void disconnect(basic_observer &obs, basic_registry<Entity> &reg) {
+        (matcher_handler<Matcher>::disconnect(obs, reg), ...);
     }
 
     template<typename... Matcher, std::size_t... Index>
     void connect(basic_registry<Entity> &reg, std::index_sequence<Index...>) {
         static_assert(sizeof...(Matcher) < std::numeric_limits<payload_type>::digits);
-        release = &basic_observer::disconnect<&matcher_handler<Index, Matcher>::disconnect...>;
-        (matcher_handler<Index, Matcher>::connect(*this, reg), ...);
+        (matcher_handler<Matcher>::template connect<Index>(*this, reg), ...);
+        release = &basic_observer::disconnect<Matcher...>;
     }
 
 public:
@@ -266,18 +272,6 @@ public:
     basic_observer(basic_observer &&) = delete;
 
     /**
-     * @brief Default copy assignment operator, deleted on purpose.
-     * @return This observer.
-     */
-    basic_observer & operator=(const basic_observer &) = delete;
-
-    /**
-     * @brief Default move assignment operator, deleted on purpose.
-     * @return This observer.
-     */
-    basic_observer & operator=(basic_observer &&) = delete;
-
-    /**
      * @brief Creates an observer and connects it to a given registry.
      * @tparam Matcher Types of matchers to use to initialize the observer.
      * @param reg A valid reference to a registry.
@@ -295,6 +289,18 @@ public:
     ~basic_observer() = default;
 
     /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This observer.
+     */
+    basic_observer & operator=(const basic_observer &) = delete;
+
+    /**
+     * @brief Default move assignment operator, deleted on purpose.
+     * @return This observer.
+     */
+    basic_observer & operator=(basic_observer &&) = delete;
+
+    /**
      * @brief Connects an observer to a given registry.
      * @tparam Matcher Types of matchers to use to initialize the observer.
      * @param reg A valid reference to a registry.
@@ -310,7 +316,7 @@ public:
     /*! @brief Disconnects an observer from the registry it keeps track of. */
     void disconnect() {
         if(release) {
-            release(*target, *this);
+            release(*this, *target);
             release = nullptr;
         }
     }
@@ -420,7 +426,7 @@ public:
 
 private:
     basic_registry<entity_type> *target;
-    void(* release)(basic_registry<Entity> &, const basic_observer &);
+    void(* release)(basic_observer &, basic_registry<Entity> &);
     storage<entity_type, payload_type> view;
 };
 

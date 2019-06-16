@@ -122,6 +122,12 @@ TEST(Observer, AllOfFiltered) {
     registry.remove<double>(entity);
 
     ASSERT_TRUE(observer.empty());
+
+    observer.disconnect();
+    registry.remove<int>(entity);
+    registry.assign<int>(entity);
+
+    ASSERT_TRUE(observer.empty());
 }
 
 TEST(Observer, Observe) {
@@ -193,6 +199,11 @@ TEST(Observer, ObserveFiltered) {
     ASSERT_TRUE(observer.empty());
 
     registry.remove<double>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    observer.disconnect();
+    registry.replace<int>(entity);
 
     ASSERT_TRUE(observer.empty());
 }
