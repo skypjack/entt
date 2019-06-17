@@ -54,18 +54,16 @@ struct insertion_sort {
      */
     template<typename It, typename Compare = std::less<>>
     void operator()(It first, It last, Compare compare = Compare{}) const {
-        if(first != last) {
-            auto it = first + 1;
+        if(first < last) {
+            for(auto it = first+1; it < last; ++it) {
+                auto value = std::move(*it);
+                auto pre = it;
 
-            while(it != last) {
-                auto pre = it++;
-                auto value = *pre;
-
-                for(; pre != first && compare(value, *(pre-1)); --pre) {
-                    *pre = *(pre-1);
+                for(; pre > first && compare(value, *(pre-1)); --pre) {
+                    *pre = std::move(*(pre-1));
                 }
 
-                *pre = value;
+                *pre = std::move(value);
             }
         }
     }
