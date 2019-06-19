@@ -30,8 +30,6 @@ struct invoker;
 
 template<typename Ret, typename... Args, typename Collector>
 struct invoker<Ret(Args...), Collector> {
-    virtual ~invoker() = default;
-
     bool invoke(Collector &collector, const delegate<Ret(Args...)> &delegate, Args... args) const {
         return collector(delegate(args...));
     }
@@ -40,8 +38,6 @@ struct invoker<Ret(Args...), Collector> {
 
 template<typename... Args, typename Collector>
 struct invoker<void(Args...), Collector> {
-    virtual ~invoker() = default;
-
     bool invoke(Collector &, const delegate<void(Args...)> &delegate, Args... args) const {
         return (delegate(args...), true);
     }
@@ -129,9 +125,6 @@ class sink<Ret(Args...)> {
     /*! @brief A signal is allowed to create sinks. */
     template<typename, typename>
     friend struct sigh;
-
-    template<typename Type>
-    Type * payload_type(Ret(*)(Type *, Args...));
 
     sink(std::vector<delegate<Ret(Args...)>> *ref) ENTT_NOEXCEPT
         : calls{ref}
