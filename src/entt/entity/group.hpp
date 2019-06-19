@@ -806,9 +806,9 @@ public:
                 return compare(data[lhs], data[rhs]);
             }, std::forward<Args>(args)...);
         } else {
-            algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), this](const auto lhs, const auto rhs) {
+            algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), data = data(), this](const auto lhs, const auto rhs) {
                 // useless this-> used to suppress a warning with clang
-                return compare(this->get<Component>(lhs)..., this->get<Component>(rhs)...);
+                return compare(this->get<Component>(data[lhs])..., this->get<Component>(data[rhs])...);
             }, std::forward<Args>(args)...);
         }
 
