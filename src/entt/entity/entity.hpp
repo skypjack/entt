@@ -3,6 +3,7 @@
 
 
 #include <cstdint>
+#include <type_traits>
 #include "../config/config.h"
 
 
@@ -109,8 +110,8 @@ namespace internal {
 struct null {
     template<typename Entity>
     constexpr operator Entity() const ENTT_NOEXCEPT {
-        using traits_type = entt_traits<Entity>;
-        return traits_type::entity_mask | (traits_type::version_mask << traits_type::entity_shift);
+        using traits_type = entt_traits<std::underlying_type_t<Entity>>;
+        return Entity{traits_type::entity_mask | (traits_type::version_mask << traits_type::entity_shift)};
     }
 
     constexpr bool operator==(null) const ENTT_NOEXCEPT {
@@ -162,6 +163,20 @@ constexpr bool operator!=(const Entity entity, null other) ENTT_NOEXCEPT {
  * null entity and any other entity identifier.
  */
 constexpr auto null = internal::null{};
+
+
+/**
+ * @brief Defines an enum class to use for entity identifiers and a dedicate
+ * `to_integer` function to convert the identifiers to their underlying type.
+ * @param clazz The name to use for the enum class.
+ * @param type The underlying type for the enum class.
+ */
+#define ENTT_ENTITY_TYPE(clazz, type)\
+    enum class clazz: type {};\
+    constexpr auto to_integer(const clazz entt) ENTT_NOEXCEPT {\
+        using traits_type = entt_traits<std::underlying_type_t<clazz>>;\
+        return typename traits_type::entity_type(entt);\
+    }
 
 
 }

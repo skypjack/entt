@@ -7,6 +7,7 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include <type_traits>
 #include "../config/config.h"
 #include "sparse_set.hpp"
 #include "entity.hpp"
@@ -61,7 +62,7 @@ class basic_runtime_view {
 
     using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
     using extent_type = typename sparse_set<Entity>::size_type;
-    using traits_type = entt_traits<Entity>;
+    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     class iterator {
         friend class basic_runtime_view<Entity>;
@@ -80,7 +81,7 @@ class basic_runtime_view {
 
         bool valid() const ENTT_NOEXCEPT {
             const auto entt = *begin;
-            const auto sz = size_type(entt & traits_type::entity_mask);
+            const auto sz = size_type(to_integer(entt) & traits_type::entity_mask);
 
             return sz < extent && std::all_of(from, to, [entt](const auto *view) {
                 return view->has(entt);

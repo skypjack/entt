@@ -1,6 +1,7 @@
 #include <tuple>
 #include <queue>
 #include <vector>
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/entity.hpp>
@@ -54,6 +55,8 @@ struct what_a_component {
 };
 
 TEST(Snapshot, Dump) {
+    using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
+
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -74,6 +77,7 @@ TEST(Snapshot, Dump) {
     auto v1 = registry.current(e1);
 
     using storage_type = std::tuple<
+        std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
         std::queue<int>,
         std::queue<char>,
@@ -125,6 +129,8 @@ TEST(Snapshot, Dump) {
 }
 
 TEST(Snapshot, Partial) {
+    using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
+
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -144,6 +150,7 @@ TEST(Snapshot, Partial) {
     auto v1 = registry.current(e1);
 
     using storage_type = std::tuple<
+        std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
         std::queue<int>,
         std::queue<char>,
@@ -206,6 +213,8 @@ TEST(Snapshot, Partial) {
 }
 
 TEST(Snapshot, Iterator) {
+    using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
+
     entt::registry registry;
 
     for(auto i = 0; i < 50; ++i) {
@@ -218,6 +227,7 @@ TEST(Snapshot, Iterator) {
     }
 
     using storage_type = std::tuple<
+        std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
         std::queue<another_component>
     >;
@@ -236,11 +246,13 @@ TEST(Snapshot, Iterator) {
     ASSERT_EQ(registry.view<another_component>().size(), size);
 
     registry.view<another_component>().each([](const auto entity, const auto &) {
-        ASSERT_TRUE(entity % 2);
+        ASSERT_TRUE(entt::to_integer(entity) % 2);
     });
 }
 
 TEST(Snapshot, Continuous) {
+    using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
+
     entt::registry src;
     entt::registry dst;
 
@@ -250,6 +262,7 @@ TEST(Snapshot, Continuous) {
     entt::entity entity;
 
     using storage_type = std::tuple<
+        std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
         std::queue<another_component>,
         std::queue<what_a_component>,
@@ -429,12 +442,17 @@ TEST(Snapshot, Continuous) {
 }
 
 TEST(Snapshot, MoreOnShrink) {
+    using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
+
     entt::registry src;
     entt::registry dst;
 
     entt::continuous_loader loader{dst};
 
-    using storage_type = std::tuple<std::queue<entt::entity>>;
+    using storage_type = std::tuple<
+        std::queue<typename traits_type::entity_type>,
+        std::queue<entt::entity>
+    >;
 
     storage_type storage;
     output_archive<storage_type> output{storage};
@@ -452,12 +470,15 @@ TEST(Snapshot, MoreOnShrink) {
 }
 
 TEST(Snapshot, SyncDataMembers) {
+    using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
+
     entt::registry src;
     entt::registry dst;
 
     entt::continuous_loader loader{dst};
 
     using storage_type = std::tuple<
+        std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
         std::queue<what_a_component>
     >;

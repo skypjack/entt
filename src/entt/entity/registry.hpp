@@ -7,7 +7,6 @@
 #include <memory>
 #include <utility>
 #include <cstddef>
-#include <numeric>
 #include <iterator>
 #include <algorithm>
 #include <type_traits>
@@ -44,7 +43,7 @@ template<typename Entity>
 class basic_registry {
     using context_family = family<struct internal_registry_context_family>;
     using component_family = family<struct internal_registry_component_family>;
-    using traits_type = entt_traits<Entity>;
+    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     template<typename Component>
     struct pool_handler: storage<Entity, Component> {
@@ -214,11 +213,11 @@ class basic_registry {
 
     void release(const Entity entity) {
         // lengthens the implicit list of destroyed entities
-        const auto entt = entity & traits_type::entity_mask;
-        const auto version = ((entity >> traits_type::entity_shift) + 1) << traits_type::entity_shift;
-        const auto node = (available ? next : ((entt + 1) & traits_type::entity_mask)) | version;
-        entities[entt] = node;
-        next = entt;
+        const auto entt = to_integer(entity) & traits_type::entity_mask;
+        const auto version = ((to_integer(entity) >> traits_type::entity_shift) + 1) << traits_type::entity_shift;
+        const auto node = (available ? to_integer(next) : ((entt + 1) & traits_type::entity_mask)) | version;
+        entities[entt] = Entity{node};
+        next = Entity{entt};
         ++available;
     }
 
@@ -284,7 +283,7 @@ class basic_registry {
 
 public:
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename traits_type::entity_type;
+    using entity_type = Entity;
     /*! @brief Underlying version type. */
     using version_type = typename traits_type::version_type;
     /*! @brief Unsigned integer type. */
@@ -473,7 +472,7 @@ public:
      * @return True if the identifier is valid, false otherwise.
      */
     bool valid(const entity_type entity) const ENTT_NOEXCEPT {
-        const auto pos = size_type(entity & traits_type::entity_mask);
+        const auto pos = size_type(to_integer(entity) & traits_type::entity_mask);
         return (pos < entities.size() && entities[pos] == entity);
     }
 
@@ -483,7 +482,7 @@ public:
      * @return The entity identifier without the version.
      */
     static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
-        return entity & traits_type::entity_mask;
+        return entity_type{to_integer(entity) & traits_type::entity_mask};
     }
 
     /**
@@ -492,7 +491,7 @@ public:
      * @return The version stored along with the given entity identifier.
      */
     static version_type version(const entity_type entity) ENTT_NOEXCEPT {
-        return version_type(entity >> traits_type::entity_shift);
+        return version_type(to_integer(entity) >> traits_type::entity_shift);
     }
 
     /**
@@ -509,9 +508,9 @@ public:
      * @return Actual version for the given entity identifier.
      */
     version_type current(const entity_type entity) const ENTT_NOEXCEPT {
-        const auto pos = size_type(entity & traits_type::entity_mask);
+        const auto pos = size_type(to_integer(entity) & traits_type::entity_mask);
         ENTT_ASSERT(pos < entities.size());
-        return version_type(entities[pos] >> traits_type::entity_shift);
+        return version_type(to_integer(entities[pos]) >> traits_type::entity_shift);
     }
 
     /**
@@ -541,16 +540,16 @@ public:
         entity_type entity;
 
         if(available) {
-            const auto entt = next;
-            const auto version = entities[entt] & (traits_type::version_mask << traits_type::entity_shift);
-            next = entities[entt] & traits_type::entity_mask;
-            entity = entt | version;
+            const auto entt = to_integer(next);
+            const auto version = to_integer(entities[entt]) & (traits_type::version_mask << traits_type::entity_shift);
+            next = entity_type{to_integer(entities[entt]) & traits_type::entity_mask};
+            entity = entity_type{entt | version};
             entities[entt] = entity;
             --available;
         } else {
             entity = entities.emplace_back(entity_type(entities.size()));
             // traits_type::entity_mask is reserved to allow for null identifiers
-            ENTT_ASSERT(entity < traits_type::entity_mask);
+            ENTT_ASSERT(to_integer(entity) < traits_type::entity_mask);
         }
 
         if constexpr(sizeof...(Component) == 0) {
@@ -584,16 +583,16 @@ public:
 
         const auto tail = std::generate_n(first, sz, [&candidate, this]() mutable {
             if constexpr(sizeof...(Component) > 0) {
-                candidate = std::max(candidate, next);
+                candidate = entity_type{std::max(candidate, next)};
             } else {
                 // suppress warnings
                 (void)candidate;
             }
 
-            const auto entt = next;
-            const auto version = entities[entt] & (traits_type::version_mask << traits_type::entity_shift);
-            next = entities[entt] & traits_type::entity_mask;
-            return (entities[entt] = entt | version);
+            const auto entt = to_integer(next);
+            const auto version = to_integer(entities[entt]) & (traits_type::version_mask << traits_type::entity_shift);
+            next = entity_type{to_integer(entities[entt]) & traits_type::entity_mask};
+            return (entities[entt] = entity_type{entt | version});
         });
 
         std::generate(tail, last, [this]() {
@@ -1145,8 +1144,8 @@ public:
         if(available) {
             for(auto pos = entities.size(); pos; --pos) {
                 const auto curr = entity_type(pos - 1);
-                const auto entity = entities[curr];
-                const auto entt = entity & traits_type::entity_mask;
+                const auto entity = entities[to_integer(curr)];
+                const auto entt = entity_type{to_integer(entity) & traits_type::entity_mask};
 
                 if(curr == entt) {
                     func(entity);
@@ -1486,13 +1485,17 @@ public:
      */
     entt::basic_snapshot<Entity> snapshot() const ENTT_NOEXCEPT {
         using follow_fn_type = entity_type(const basic_registry &, const entity_type);
-        const entity_type seed = available ? (next | (entities[next] & (traits_type::version_mask << traits_type::entity_shift))) : next;
+
+        const auto head = to_integer(next);
+        const entity_type seed = available
+                ? entity_type{head | (to_integer(entities[head]) & (traits_type::version_mask << traits_type::entity_shift))}
+                : next;
 
         follow_fn_type *follow = [](const basic_registry &reg, const entity_type entity) -> entity_type {
             const auto &others = reg.entities;
-            const auto entt = entity & traits_type::entity_mask;
-            const auto curr = others[entt] & traits_type::entity_mask;
-            return (curr | (others[curr] & (traits_type::version_mask << traits_type::entity_shift)));
+            const auto entt = to_integer(entity) & traits_type::entity_mask;
+            const auto curr = to_integer(others[entt]) & traits_type::entity_mask;
+            return entity_type{curr | (to_integer(others[curr]) & (traits_type::version_mask << traits_type::entity_shift))};
         };
 
         return { this, seed, follow };
@@ -1517,23 +1520,24 @@ public:
         using force_fn_type = void(basic_registry &, const entity_type, const bool);
 
         force_fn_type *force = [](basic_registry &reg, const entity_type entity, const bool destroyed) {
-            using promotion_type = std::conditional_t<sizeof(size_type) >= sizeof(entity_type), size_type, entity_type>;
-            // explicit promotion to avoid warnings with std::uint16_t
-            const auto entt = promotion_type{entity} & traits_type::entity_mask;
+            const auto entt = to_integer(entity) & traits_type::entity_mask;
             auto &others = reg.entities;
 
             if(!(entt < others.size())) {
                 auto curr = others.size();
                 others.resize(entt + 1);
-                std::iota(others.data() + curr, others.data() + entt, entity_type(curr));
+
+                std::generate(others.data() + curr, others.data() + entt, [curr]() mutable {
+                    return entity_type(curr++);
+                });
             }
 
             others[entt] = entity;
 
             if(destroyed) {
                 reg.destroy(entity);
-                const auto version = entity & (traits_type::version_mask << traits_type::entity_shift);
-                others[entt] = ((others[entt] & traits_type::entity_mask) | version);
+                const auto version = to_integer(entity) & (traits_type::version_mask << traits_type::entity_shift);
+                others[entt] = entity_type{(to_integer(others[entt]) & traits_type::entity_mask) | version};
             }
         };
 

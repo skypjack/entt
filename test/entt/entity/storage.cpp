@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <gtest/gtest.h>
 #include <entt/entity/storage.hpp>
+#include <entt/entity/fwd.hpp>
 
 struct empty_type {};
 struct boxed_int { int value; };
@@ -20,7 +21,7 @@ struct throwing_component {
 };
 
 TEST(Storage, Functionalities) {
-    entt::storage<std::uint64_t, int> set;
+    entt::storage<entt::entity, int> set;
 
     set.reserve(42);
 
@@ -29,35 +30,35 @@ TEST(Storage, Functionalities) {
     ASSERT_EQ(set.size(), 0u);
     ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
-    ASSERT_FALSE(set.has(0));
-    ASSERT_FALSE(set.has(41));
+    ASSERT_FALSE(set.has(entt::entity{0}));
+    ASSERT_FALSE(set.has(entt::entity{41}));
 
-    set.construct(41, 3);
+    set.construct(entt::entity{41}, 3);
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
     ASSERT_NE(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_NE(set.begin(), set.end());
-    ASSERT_FALSE(set.has(0));
-    ASSERT_TRUE(set.has(41));
-    ASSERT_EQ(set.get(41), 3);
-    ASSERT_EQ(*set.try_get(41), 3);
-    ASSERT_EQ(set.try_get(99), nullptr);
+    ASSERT_FALSE(set.has(entt::entity{0}));
+    ASSERT_TRUE(set.has(entt::entity{41}));
+    ASSERT_EQ(set.get(entt::entity{41}), 3);
+    ASSERT_EQ(*set.try_get(entt::entity{41}), 3);
+    ASSERT_EQ(set.try_get(entt::entity{99}), nullptr);
 
-    set.destroy(41);
+    set.destroy(entt::entity{41});
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
     ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
-    ASSERT_FALSE(set.has(0));
-    ASSERT_FALSE(set.has(41));
+    ASSERT_FALSE(set.has(entt::entity{0}));
+    ASSERT_FALSE(set.has(entt::entity{41}));
 
-    set.construct(41, 12);
+    set.construct(entt::entity{41}, 12);
 
-    ASSERT_EQ(set.get(41), 12);
-    ASSERT_EQ(*set.try_get(41), 12);
-    ASSERT_EQ(set.try_get(99), nullptr);
+    ASSERT_EQ(set.get(entt::entity{41}), 12);
+    ASSERT_EQ(*set.try_get(entt::entity{41}), 12);
+    ASSERT_EQ(set.try_get(entt::entity{99}), nullptr);
 
     set.reset();
 
@@ -65,8 +66,8 @@ TEST(Storage, Functionalities) {
     ASSERT_EQ(set.size(), 0u);
     ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
     ASSERT_EQ(set.begin(), set.end());
-    ASSERT_FALSE(set.has(0));
-    ASSERT_FALSE(set.has(41));
+    ASSERT_FALSE(set.has(entt::entity{0}));
+    ASSERT_FALSE(set.has(entt::entity{41}));
 
     ASSERT_EQ(set.capacity(), 42);
 
@@ -74,50 +75,50 @@ TEST(Storage, Functionalities) {
 
     ASSERT_EQ(set.capacity(), 0);
 
-    (void)entt::storage<std::uint64_t, int>{std::move(set)};
-    entt::storage<std::uint64_t, int> other;
+    (void)entt::storage<entt::entity, int>{std::move(set)};
+    entt::storage<entt::entity, int> other;
     other = std::move(set);
 }
 
 TEST(Storage, EmptyType) {
-    entt::storage<std::uint64_t, empty_type> set;
+    entt::storage<entt::entity, empty_type> set;
 
-    set.construct(42);
-    set.construct(99);
+    set.construct(entt::entity{42});
+    set.construct(entt::entity{99});
 
-    ASSERT_TRUE(set.has(42));
-    ASSERT_TRUE(set.has(99));
+    ASSERT_TRUE(set.has(entt::entity{42}));
+    ASSERT_TRUE(set.has(entt::entity{99}));
 
-    auto &&component = set.get(42);
+    auto &&component = set.get(entt::entity{42});
 
     ASSERT_TRUE((std::is_same_v<decltype(component), empty_type &&>));
 }
 
 TEST(Storage, BatchAdd) {
-    entt::storage<std::uint64_t, int> set;
-    entt::storage<std::uint64_t, int>::entity_type entities[2];
+    entt::storage<entt::entity, int> set;
+    entt::storage<entt::entity, int>::entity_type entities[2];
 
-    entities[0] = 3;
-    entities[1] = 42;
+    entities[0] = entt::entity{3};
+    entities[1] = entt::entity{42};
 
     set.reserve(4);
-    set.construct(12, 21);
+    set.construct(entt::entity{12}, 21);
     auto *component = set.batch(std::begin(entities), std::end(entities));
-    set.construct(24, 42);
+    set.construct(entt::entity{24}, 42);
 
     ASSERT_TRUE(set.has(entities[0]));
     ASSERT_TRUE(set.has(entities[1]));
-    ASSERT_FALSE(set.has(0));
-    ASSERT_FALSE(set.has(9));
-    ASSERT_TRUE(set.has(12));
-    ASSERT_TRUE(set.has(24));
+    ASSERT_FALSE(set.has(entt::entity{0}));
+    ASSERT_FALSE(set.has(entt::entity{9}));
+    ASSERT_TRUE(set.has(entt::entity{12}));
+    ASSERT_TRUE(set.has(entt::entity{24}));
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 4u);
-    ASSERT_EQ(set.get(12), 21);
+    ASSERT_EQ(set.get(entt::entity{12}), 21);
     ASSERT_EQ(set.get(entities[0]), 0);
     ASSERT_EQ(set.get(entities[1]), 0);
-    ASSERT_EQ(set.get(24), 42);
+    ASSERT_EQ(set.get(entt::entity{24}), 42);
 
     component[0] = 1;
     component[1] = 2;
@@ -127,23 +128,23 @@ TEST(Storage, BatchAdd) {
 }
 
 TEST(Storage, BatchAddEmptyType) {
-    entt::storage<std::uint64_t, empty_type> set;
-    entt::storage<std::uint64_t, empty_type>::entity_type entities[2];
+    entt::storage<entt::entity, empty_type> set;
+    entt::storage<entt::entity, empty_type>::entity_type entities[2];
 
-    entities[0] = 3;
-    entities[1] = 42;
+    entities[0] = entt::entity{3};
+    entities[1] = entt::entity{42};
 
     set.reserve(4);
-    set.construct(12);
+    set.construct(entt::entity{12});
     set.batch(std::begin(entities), std::end(entities));
-    set.construct(24);
+    set.construct(entt::entity{24});
 
     ASSERT_TRUE(set.has(entities[0]));
     ASSERT_TRUE(set.has(entities[1]));
-    ASSERT_FALSE(set.has(0));
-    ASSERT_FALSE(set.has(9));
-    ASSERT_TRUE(set.has(12));
-    ASSERT_TRUE(set.has(24));
+    ASSERT_FALSE(set.has(entt::entity{0}));
+    ASSERT_FALSE(set.has(entt::entity{9}));
+    ASSERT_TRUE(set.has(entt::entity{12}));
+    ASSERT_TRUE(set.has(entt::entity{24}));
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 4u);
@@ -156,21 +157,21 @@ TEST(Storage, BatchAddEmptyType) {
 TEST(Storage, AggregatesMustWork) {
     struct aggregate_type { int value; };
     // the goal of this test is to enforce the requirements for aggregate types
-    entt::storage<std::uint64_t, aggregate_type>{}.construct(0, 42);
+    entt::storage<entt::entity, aggregate_type>{}.construct(entt::entity{0}, 42);
 }
 
 TEST(Storage, TypesFromStandardTemplateLibraryMustWork) {
     // see #37 - this test shouldn't crash, that's all
-    entt::storage<std::uint64_t, std::unordered_set<int>> set;
-    set.construct(0).insert(42);
-    set.destroy(0);
+    entt::storage<entt::entity, std::unordered_set<int>> set;
+    set.construct(entt::entity{0}).insert(42);
+    set.destroy(entt::entity{0});
 }
 
 TEST(Storage, Iterator) {
-    using iterator_type = typename entt::storage<std::uint64_t, boxed_int>::iterator_type;
+    using iterator_type = typename entt::storage<entt::entity, boxed_int>::iterator_type;
 
-    entt::storage<std::uint64_t, boxed_int> set;
-    set.construct(3, 42);
+    entt::storage<entt::entity, boxed_int> set;
+    set.construct(entt::entity{3}, 42);
 
     iterator_type end{set.begin()};
     iterator_type begin{};
@@ -209,10 +210,10 @@ TEST(Storage, Iterator) {
 }
 
 TEST(Storage, ConstIterator) {
-    using iterator_type = typename entt::storage<std::uint64_t, boxed_int>::const_iterator_type;
+    using iterator_type = typename entt::storage<entt::entity, boxed_int>::const_iterator_type;
 
-    entt::storage<std::uint64_t, boxed_int> set;
-    set.construct(3, 42);
+    entt::storage<entt::entity, boxed_int> set;
+    set.construct(entt::entity{3}, 42);
 
     iterator_type cend{set.cbegin()};
     iterator_type cbegin{};
@@ -251,9 +252,9 @@ TEST(Storage, ConstIterator) {
 }
 
 TEST(Storage, IteratorEmptyType) {
-    using iterator_type = typename entt::storage<std::uint64_t, empty_type>::iterator_type;
-    entt::storage<std::uint64_t, empty_type> set;
-    set.construct(3);
+    using iterator_type = typename entt::storage<entt::entity, empty_type>::iterator_type;
+    entt::storage<entt::entity, empty_type> set;
+    set.construct(entt::entity{3});
 
     iterator_type end{set.begin()};
     iterator_type begin{};
@@ -290,22 +291,22 @@ TEST(Storage, IteratorEmptyType) {
     ASSERT_GT(end, begin);
     ASSERT_GE(end, set.end());
 
-    set.construct(33);
+    set.construct(entt::entity{33});
     auto &&component = *begin;
 
     ASSERT_TRUE((std::is_same_v<decltype(component), empty_type &&>));
 }
 
 TEST(Storage, Raw) {
-    entt::storage<std::uint64_t, int> set;
+    entt::storage<entt::entity, int> set;
 
-    set.construct(3, 3);
-    set.construct(12, 6);
-    set.construct(42, 9);
+    set.construct(entt::entity{3}, 3);
+    set.construct(entt::entity{12}, 6);
+    set.construct(entt::entity{42}, 9);
 
-    ASSERT_EQ(set.get(3), 3);
-    ASSERT_EQ(std::as_const(set).get(12), 6);
-    ASSERT_EQ(set.get(42), 9);
+    ASSERT_EQ(set.get(entt::entity{3}), 3);
+    ASSERT_EQ(std::as_const(set).get(entt::entity{12}), 6);
+    ASSERT_EQ(set.get(entt::entity{42}), 9);
 
     ASSERT_EQ(*(set.raw() + 0u), 3);
     ASSERT_EQ(*(std::as_const(set).raw() + 1u), 6);
@@ -313,19 +314,19 @@ TEST(Storage, Raw) {
 }
 
 TEST(Storage, SortOrdered) {
-    entt::storage<std::uint64_t, boxed_int> set;
+    entt::storage<entt::entity, boxed_int> set;
 
-    set.construct(12, boxed_int{12});
-    set.construct(42, boxed_int{9});
-    set.construct(7, boxed_int{6});
-    set.construct(3, boxed_int{3});
-    set.construct(9, boxed_int{1});
+    set.construct(entt::entity{12}, boxed_int{12});
+    set.construct(entt::entity{42}, boxed_int{9});
+    set.construct(entt::entity{7}, boxed_int{6});
+    set.construct(entt::entity{3}, boxed_int{3});
+    set.construct(entt::entity{9}, boxed_int{1});
 
-    ASSERT_EQ(set.get(12).value, 12);
-    ASSERT_EQ(set.get(42).value, 9);
-    ASSERT_EQ(set.get(7).value, 6);
-    ASSERT_EQ(set.get(3).value, 3);
-    ASSERT_EQ(set.get(9).value, 1);
+    ASSERT_EQ(set.get(entt::entity{12}).value, 12);
+    ASSERT_EQ(set.get(entt::entity{42}).value, 9);
+    ASSERT_EQ(set.get(entt::entity{7}).value, 6);
+    ASSERT_EQ(set.get(entt::entity{3}).value, 3);
+    ASSERT_EQ(set.get(entt::entity{9}).value, 1);
 
     set.sort([](auto lhs, auto rhs) {
         return lhs.value < rhs.value;
@@ -349,21 +350,21 @@ TEST(Storage, SortOrdered) {
 }
 
 TEST(Storage, SortReverse) {
-    entt::storage<std::uint64_t, boxed_int> set;
+    entt::storage<entt::entity, boxed_int> set;
 
-    set.construct(12, boxed_int{1});
-    set.construct(42, boxed_int{3});
-    set.construct(7, boxed_int{6});
-    set.construct(3, boxed_int{9});
-    set.construct(9, boxed_int{12});
+    set.construct(entt::entity{12}, boxed_int{1});
+    set.construct(entt::entity{42}, boxed_int{3});
+    set.construct(entt::entity{7}, boxed_int{6});
+    set.construct(entt::entity{3}, boxed_int{9});
+    set.construct(entt::entity{9}, boxed_int{12});
 
-    ASSERT_EQ(set.get(12).value, 1);
-    ASSERT_EQ(set.get(42).value, 3);
-    ASSERT_EQ(set.get(7).value, 6);
-    ASSERT_EQ(set.get(3).value, 9);
-    ASSERT_EQ(set.get(9).value, 12);
+    ASSERT_EQ(set.get(entt::entity{12}).value, 1);
+    ASSERT_EQ(set.get(entt::entity{42}).value, 3);
+    ASSERT_EQ(set.get(entt::entity{7}).value, 6);
+    ASSERT_EQ(set.get(entt::entity{3}).value, 9);
+    ASSERT_EQ(set.get(entt::entity{9}).value, 12);
 
-    set.sort([&set](std::uint64_t lhs, std::uint64_t rhs) {
+    set.sort([&set](entt::entity lhs, entt::entity rhs) {
         return set.get(lhs).value < set.get(rhs).value;
     });
 
@@ -385,19 +386,19 @@ TEST(Storage, SortReverse) {
 }
 
 TEST(Storage, SortUnordered) {
-    entt::storage<std::uint64_t, boxed_int> set;
+    entt::storage<entt::entity, boxed_int> set;
 
-    set.construct(12, boxed_int{6});
-    set.construct(42, boxed_int{3});
-    set.construct(7, boxed_int{1});
-    set.construct(3, boxed_int{9});
-    set.construct(9, boxed_int{12});
+    set.construct(entt::entity{12}, boxed_int{6});
+    set.construct(entt::entity{42}, boxed_int{3});
+    set.construct(entt::entity{7}, boxed_int{1});
+    set.construct(entt::entity{3}, boxed_int{9});
+    set.construct(entt::entity{9}, boxed_int{12});
 
-    ASSERT_EQ(set.get(12).value, 6);
-    ASSERT_EQ(set.get(42).value, 3);
-    ASSERT_EQ(set.get(7).value, 1);
-    ASSERT_EQ(set.get(3).value, 9);
-    ASSERT_EQ(set.get(9).value, 12);
+    ASSERT_EQ(set.get(entt::entity{12}).value, 6);
+    ASSERT_EQ(set.get(entt::entity{42}).value, 3);
+    ASSERT_EQ(set.get(entt::entity{7}).value, 1);
+    ASSERT_EQ(set.get(entt::entity{3}).value, 9);
+    ASSERT_EQ(set.get(entt::entity{9}).value, 12);
 
     set.sort([](auto lhs, auto rhs) {
         return lhs.value < rhs.value;
@@ -421,16 +422,16 @@ TEST(Storage, SortUnordered) {
 }
 
 TEST(Storage, RespectDisjoint) {
-    entt::storage<std::uint64_t, int> lhs;
-    entt::storage<std::uint64_t, int> rhs;
+    entt::storage<entt::entity, int> lhs;
+    entt::storage<entt::entity, int> rhs;
 
-    lhs.construct(3, 3);
-    lhs.construct(12, 6);
-    lhs.construct(42, 9);
+    lhs.construct(entt::entity{3}, 3);
+    lhs.construct(entt::entity{12}, 6);
+    lhs.construct(entt::entity{42}, 9);
 
-    ASSERT_EQ(std::as_const(lhs).get(3), 3);
-    ASSERT_EQ(std::as_const(lhs).get(12), 6);
-    ASSERT_EQ(std::as_const(lhs).get(42), 9);
+    ASSERT_EQ(std::as_const(lhs).get(entt::entity{3}), 3);
+    ASSERT_EQ(std::as_const(lhs).get(entt::entity{12}), 6);
+    ASSERT_EQ(std::as_const(lhs).get(entt::entity{42}), 9);
 
     lhs.respect(rhs);
 
@@ -448,18 +449,18 @@ TEST(Storage, RespectDisjoint) {
 }
 
 TEST(Storage, RespectOverlap) {
-    entt::storage<std::uint64_t, int> lhs;
-    entt::storage<std::uint64_t, int> rhs;
+    entt::storage<entt::entity, int> lhs;
+    entt::storage<entt::entity, int> rhs;
 
-    lhs.construct(3, 3);
-    lhs.construct(12, 6);
-    lhs.construct(42, 9);
-    rhs.construct(12, 6);
+    lhs.construct(entt::entity{3}, 3);
+    lhs.construct(entt::entity{12}, 6);
+    lhs.construct(entt::entity{42}, 9);
+    rhs.construct(entt::entity{12}, 6);
 
-    ASSERT_EQ(std::as_const(lhs).get(3), 3);
-    ASSERT_EQ(std::as_const(lhs).get(12), 6);
-    ASSERT_EQ(std::as_const(lhs).get(42), 9);
-    ASSERT_EQ(rhs.get(12), 6);
+    ASSERT_EQ(std::as_const(lhs).get(entt::entity{3}), 3);
+    ASSERT_EQ(std::as_const(lhs).get(entt::entity{12}), 6);
+    ASSERT_EQ(std::as_const(lhs).get(entt::entity{42}), 9);
+    ASSERT_EQ(rhs.get(entt::entity{12}), 6);
 
     lhs.respect(rhs);
 
@@ -477,174 +478,174 @@ TEST(Storage, RespectOverlap) {
 }
 
 TEST(Storage, RespectOrdered) {
-    entt::storage<std::uint64_t, int> lhs;
-    entt::storage<std::uint64_t, int> rhs;
+    entt::storage<entt::entity, int> lhs;
+    entt::storage<entt::entity, int> rhs;
 
-    lhs.construct(1, 0);
-    lhs.construct(2, 0);
-    lhs.construct(3, 0);
-    lhs.construct(4, 0);
-    lhs.construct(5, 0);
+    lhs.construct(entt::entity{1}, 0);
+    lhs.construct(entt::entity{2}, 0);
+    lhs.construct(entt::entity{3}, 0);
+    lhs.construct(entt::entity{4}, 0);
+    lhs.construct(entt::entity{5}, 0);
 
-    ASSERT_EQ(lhs.get(1), 0);
-    ASSERT_EQ(lhs.get(2), 0);
-    ASSERT_EQ(lhs.get(3), 0);
-    ASSERT_EQ(lhs.get(4), 0);
-    ASSERT_EQ(lhs.get(5), 0);
+    ASSERT_EQ(lhs.get(entt::entity{1}), 0);
+    ASSERT_EQ(lhs.get(entt::entity{2}), 0);
+    ASSERT_EQ(lhs.get(entt::entity{3}), 0);
+    ASSERT_EQ(lhs.get(entt::entity{4}), 0);
+    ASSERT_EQ(lhs.get(entt::entity{5}), 0);
 
-    rhs.construct(6, 0);
-    rhs.construct(1, 0);
-    rhs.construct(2, 0);
-    rhs.construct(3, 0);
-    rhs.construct(4, 0);
-    rhs.construct(5, 0);
+    rhs.construct(entt::entity{6}, 0);
+    rhs.construct(entt::entity{1}, 0);
+    rhs.construct(entt::entity{2}, 0);
+    rhs.construct(entt::entity{3}, 0);
+    rhs.construct(entt::entity{4}, 0);
+    rhs.construct(entt::entity{5}, 0);
 
-    ASSERT_EQ(rhs.get(6), 0);
-    ASSERT_EQ(rhs.get(1), 0);
-    ASSERT_EQ(rhs.get(2), 0);
-    ASSERT_EQ(rhs.get(3), 0);
-    ASSERT_EQ(rhs.get(4), 0);
-    ASSERT_EQ(rhs.get(5), 0);
+    ASSERT_EQ(rhs.get(entt::entity{6}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{1}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{2}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{3}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{4}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{5}), 0);
 
     rhs.respect(lhs);
 
-    ASSERT_EQ(*(lhs.data() + 0u), 1u);
-    ASSERT_EQ(*(lhs.data() + 1u), 2u);
-    ASSERT_EQ(*(lhs.data() + 2u), 3u);
-    ASSERT_EQ(*(lhs.data() + 3u), 4u);
-    ASSERT_EQ(*(lhs.data() + 4u), 5u);
+    ASSERT_EQ(*(lhs.data() + 0u), entt::entity{1});
+    ASSERT_EQ(*(lhs.data() + 1u), entt::entity{2});
+    ASSERT_EQ(*(lhs.data() + 2u), entt::entity{3});
+    ASSERT_EQ(*(lhs.data() + 3u), entt::entity{4});
+    ASSERT_EQ(*(lhs.data() + 4u), entt::entity{5});
 
-    ASSERT_EQ(*(rhs.data() + 0u), 6u);
-    ASSERT_EQ(*(rhs.data() + 1u), 1u);
-    ASSERT_EQ(*(rhs.data() + 2u), 2u);
-    ASSERT_EQ(*(rhs.data() + 3u), 3u);
-    ASSERT_EQ(*(rhs.data() + 4u), 4u);
-    ASSERT_EQ(*(rhs.data() + 5u), 5u);
+    ASSERT_EQ(*(rhs.data() + 0u), entt::entity{6});
+    ASSERT_EQ(*(rhs.data() + 1u), entt::entity{1});
+    ASSERT_EQ(*(rhs.data() + 2u), entt::entity{2});
+    ASSERT_EQ(*(rhs.data() + 3u), entt::entity{3});
+    ASSERT_EQ(*(rhs.data() + 4u), entt::entity{4});
+    ASSERT_EQ(*(rhs.data() + 5u), entt::entity{5});
 }
 
 TEST(Storage, RespectReverse) {
-    entt::storage<std::uint64_t, int> lhs;
-    entt::storage<std::uint64_t, int> rhs;
+    entt::storage<entt::entity, int> lhs;
+    entt::storage<entt::entity, int> rhs;
 
-    lhs.construct(1, 0);
-    lhs.construct(2, 0);
-    lhs.construct(3, 0);
-    lhs.construct(4, 0);
-    lhs.construct(5, 0);
+    lhs.construct(entt::entity{1}, 0);
+    lhs.construct(entt::entity{2}, 0);
+    lhs.construct(entt::entity{3}, 0);
+    lhs.construct(entt::entity{4}, 0);
+    lhs.construct(entt::entity{5}, 0);
 
-    ASSERT_EQ(lhs.get(1), 0);
-    ASSERT_EQ(lhs.get(2), 0);
-    ASSERT_EQ(lhs.get(3), 0);
-    ASSERT_EQ(lhs.get(4), 0);
-    ASSERT_EQ(lhs.get(5), 0);
+    ASSERT_EQ(lhs.get(entt::entity{1}), 0);
+    ASSERT_EQ(lhs.get(entt::entity{2}), 0);
+    ASSERT_EQ(lhs.get(entt::entity{3}), 0);
+    ASSERT_EQ(lhs.get(entt::entity{4}), 0);
+    ASSERT_EQ(lhs.get(entt::entity{5}), 0);
 
-    rhs.construct(5, 0);
-    rhs.construct(4, 0);
-    rhs.construct(3, 0);
-    rhs.construct(2, 0);
-    rhs.construct(1, 0);
-    rhs.construct(6, 0);
+    rhs.construct(entt::entity{5}, 0);
+    rhs.construct(entt::entity{4}, 0);
+    rhs.construct(entt::entity{3}, 0);
+    rhs.construct(entt::entity{2}, 0);
+    rhs.construct(entt::entity{1}, 0);
+    rhs.construct(entt::entity{6}, 0);
 
-    ASSERT_EQ(rhs.get(5), 0);
-    ASSERT_EQ(rhs.get(4), 0);
-    ASSERT_EQ(rhs.get(3), 0);
-    ASSERT_EQ(rhs.get(2), 0);
-    ASSERT_EQ(rhs.get(1), 0);
-    ASSERT_EQ(rhs.get(6), 0);
+    ASSERT_EQ(rhs.get(entt::entity{5}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{4}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{3}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{2}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{1}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{6}), 0);
 
     rhs.respect(lhs);
 
-    ASSERT_EQ(*(lhs.data() + 0u), 1u);
-    ASSERT_EQ(*(lhs.data() + 1u), 2u);
-    ASSERT_EQ(*(lhs.data() + 2u), 3u);
-    ASSERT_EQ(*(lhs.data() + 3u), 4u);
-    ASSERT_EQ(*(lhs.data() + 4u), 5u);
+    ASSERT_EQ(*(lhs.data() + 0u), entt::entity{1});
+    ASSERT_EQ(*(lhs.data() + 1u), entt::entity{2});
+    ASSERT_EQ(*(lhs.data() + 2u), entt::entity{3});
+    ASSERT_EQ(*(lhs.data() + 3u), entt::entity{4});
+    ASSERT_EQ(*(lhs.data() + 4u), entt::entity{5});
 
-    ASSERT_EQ(*(rhs.data() + 0u), 6u);
-    ASSERT_EQ(*(rhs.data() + 1u), 1u);
-    ASSERT_EQ(*(rhs.data() + 2u), 2u);
-    ASSERT_EQ(*(rhs.data() + 3u), 3u);
-    ASSERT_EQ(*(rhs.data() + 4u), 4u);
-    ASSERT_EQ(*(rhs.data() + 5u), 5u);
+    ASSERT_EQ(*(rhs.data() + 0u), entt::entity{6});
+    ASSERT_EQ(*(rhs.data() + 1u), entt::entity{1});
+    ASSERT_EQ(*(rhs.data() + 2u), entt::entity{2});
+    ASSERT_EQ(*(rhs.data() + 3u), entt::entity{3});
+    ASSERT_EQ(*(rhs.data() + 4u), entt::entity{4});
+    ASSERT_EQ(*(rhs.data() + 5u), entt::entity{5});
 }
 
 TEST(Storage, RespectUnordered) {
-    entt::storage<std::uint64_t, int> lhs;
-    entt::storage<std::uint64_t, int> rhs;
+    entt::storage<entt::entity, int> lhs;
+    entt::storage<entt::entity, int> rhs;
 
-    lhs.construct(1, 0);
-    lhs.construct(2, 0);
-    lhs.construct(3, 0);
-    lhs.construct(4, 0);
-    lhs.construct(5, 0);
+    lhs.construct(entt::entity{1}, 0);
+    lhs.construct(entt::entity{2}, 0);
+    lhs.construct(entt::entity{3}, 0);
+    lhs.construct(entt::entity{4}, 0);
+    lhs.construct(entt::entity{5}, 0);
 
-    ASSERT_EQ(lhs.get(1), 0);
-    ASSERT_EQ(lhs.get(2), 0);
-    ASSERT_EQ(lhs.get(3), 0);
-    ASSERT_EQ(lhs.get(4), 0);
-    ASSERT_EQ(lhs.get(5), 0);
+    ASSERT_EQ(lhs.get(entt::entity{1}), 0);
+    ASSERT_EQ(lhs.get(entt::entity{2}), 0);
+    ASSERT_EQ(lhs.get(entt::entity{3}), 0);
+    ASSERT_EQ(lhs.get(entt::entity{4}), 0);
+    ASSERT_EQ(lhs.get(entt::entity{5}), 0);
 
-    rhs.construct(3, 0);
-    rhs.construct(2, 0);
-    rhs.construct(6, 0);
-    rhs.construct(1, 0);
-    rhs.construct(4, 0);
-    rhs.construct(5, 0);
+    rhs.construct(entt::entity{3}, 0);
+    rhs.construct(entt::entity{2}, 0);
+    rhs.construct(entt::entity{6}, 0);
+    rhs.construct(entt::entity{1}, 0);
+    rhs.construct(entt::entity{4}, 0);
+    rhs.construct(entt::entity{5}, 0);
 
-    ASSERT_EQ(rhs.get(3), 0);
-    ASSERT_EQ(rhs.get(2), 0);
-    ASSERT_EQ(rhs.get(6), 0);
-    ASSERT_EQ(rhs.get(1), 0);
-    ASSERT_EQ(rhs.get(4), 0);
-    ASSERT_EQ(rhs.get(5), 0);
+    ASSERT_EQ(rhs.get(entt::entity{3}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{2}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{6}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{1}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{4}), 0);
+    ASSERT_EQ(rhs.get(entt::entity{5}), 0);
 
     rhs.respect(lhs);
 
-    ASSERT_EQ(*(lhs.data() + 0u), 1u);
-    ASSERT_EQ(*(lhs.data() + 1u), 2u);
-    ASSERT_EQ(*(lhs.data() + 2u), 3u);
-    ASSERT_EQ(*(lhs.data() + 3u), 4u);
-    ASSERT_EQ(*(lhs.data() + 4u), 5u);
+    ASSERT_EQ(*(lhs.data() + 0u), entt::entity{1});
+    ASSERT_EQ(*(lhs.data() + 1u), entt::entity{2});
+    ASSERT_EQ(*(lhs.data() + 2u), entt::entity{3});
+    ASSERT_EQ(*(lhs.data() + 3u), entt::entity{4});
+    ASSERT_EQ(*(lhs.data() + 4u), entt::entity{5});
 
-    ASSERT_EQ(*(rhs.data() + 0u), 6u);
-    ASSERT_EQ(*(rhs.data() + 1u), 1u);
-    ASSERT_EQ(*(rhs.data() + 2u), 2u);
-    ASSERT_EQ(*(rhs.data() + 3u), 3u);
-    ASSERT_EQ(*(rhs.data() + 4u), 4u);
-    ASSERT_EQ(*(rhs.data() + 5u), 5u);
+    ASSERT_EQ(*(rhs.data() + 0u), entt::entity{6});
+    ASSERT_EQ(*(rhs.data() + 1u), entt::entity{1});
+    ASSERT_EQ(*(rhs.data() + 2u), entt::entity{2});
+    ASSERT_EQ(*(rhs.data() + 3u), entt::entity{3});
+    ASSERT_EQ(*(rhs.data() + 4u), entt::entity{4});
+    ASSERT_EQ(*(rhs.data() + 5u), entt::entity{5});
 }
 
 TEST(Storage, RespectOverlapEmptyType) {
-    entt::storage<std::uint64_t, empty_type> lhs;
-    entt::storage<std::uint64_t, empty_type> rhs;
+    entt::storage<entt::entity, empty_type> lhs;
+    entt::storage<entt::entity, empty_type> rhs;
 
-    lhs.construct(3);
-    lhs.construct(12);
-    lhs.construct(42);
+    lhs.construct(entt::entity{3});
+    lhs.construct(entt::entity{12});
+    lhs.construct(entt::entity{42});
 
-    rhs.construct(12);
+    rhs.construct(entt::entity{12});
 
-    ASSERT_EQ(lhs.sparse_set<std::uint64_t>::get(3), 0u);
-    ASSERT_EQ(lhs.sparse_set<std::uint64_t>::get(12), 1u);
-    ASSERT_EQ(lhs.sparse_set<std::uint64_t>::get(42), 2u);
+    ASSERT_EQ(lhs.sparse_set<entt::entity>::get(entt::entity{3}), 0u);
+    ASSERT_EQ(lhs.sparse_set<entt::entity>::get(entt::entity{12}), 1u);
+    ASSERT_EQ(lhs.sparse_set<entt::entity>::get(entt::entity{42}), 2u);
 
     lhs.respect(rhs);
 
-    ASSERT_EQ(std::as_const(lhs).sparse_set<std::uint64_t>::get(3), 0u);
-    ASSERT_EQ(std::as_const(lhs).sparse_set<std::uint64_t>::get(12), 2u);
-    ASSERT_EQ(std::as_const(lhs).sparse_set<std::uint64_t>::get(42), 1u);
+    ASSERT_EQ(std::as_const(lhs).sparse_set<entt::entity>::get(entt::entity{3}), 0u);
+    ASSERT_EQ(std::as_const(lhs).sparse_set<entt::entity>::get(entt::entity{12}), 2u);
+    ASSERT_EQ(std::as_const(lhs).sparse_set<entt::entity>::get(entt::entity{42}), 1u);
 }
 
 TEST(Storage, CanModifyDuringIteration) {
-    entt::storage<std::uint64_t, int> set;
-    set.construct(0, 42);
+    entt::storage<entt::entity, int> set;
+    set.construct(entt::entity{0}, 42);
 
-    ASSERT_EQ(set.capacity(), (entt::storage<std::uint64_t, int>::size_type{1}));
+    ASSERT_EQ(set.capacity(), (entt::storage<entt::entity, int>::size_type{1}));
 
     const auto it = set.cbegin();
-    set.reserve(entt::storage<std::uint64_t, int>::size_type{2});
+    set.reserve(entt::storage<entt::entity, int>::size_type{2});
 
-    ASSERT_EQ(set.capacity(), (entt::storage<std::uint64_t, int>::size_type{2}));
+    ASSERT_EQ(set.capacity(), (entt::storage<entt::entity, int>::size_type{2}));
 
     // this should crash with asan enabled if we break the constraint
     const auto entity = *it;
@@ -652,13 +653,13 @@ TEST(Storage, CanModifyDuringIteration) {
 }
 
 TEST(Storage, ReferencesGuaranteed) {
-    entt::storage<std::uint64_t, boxed_int> set;
+    entt::storage<entt::entity, boxed_int> set;
 
-    set.construct(0, 0);
-    set.construct(1, 1);
+    set.construct(entt::entity{0}, 0);
+    set.construct(entt::entity{1}, 1);
 
-    ASSERT_EQ(set.get(0).value, 0);
-    ASSERT_EQ(set.get(1).value, 1);
+    ASSERT_EQ(set.get(entt::entity{0}).value, 0);
+    ASSERT_EQ(set.get(entt::entity{1}).value, 1);
 
     for(auto &&type: set) {
         if(type.value) {
@@ -666,8 +667,8 @@ TEST(Storage, ReferencesGuaranteed) {
         }
     }
 
-    ASSERT_EQ(set.get(0).value, 0);
-    ASSERT_EQ(set.get(1).value, 42);
+    ASSERT_EQ(set.get(entt::entity{0}).value, 0);
+    ASSERT_EQ(set.get(entt::entity{1}).value, 42);
 
     auto begin = set.begin();
 
@@ -675,21 +676,21 @@ TEST(Storage, ReferencesGuaranteed) {
         (begin++)->value = 3;
     }
 
-    ASSERT_EQ(set.get(0).value, 3);
-    ASSERT_EQ(set.get(1).value, 3);
+    ASSERT_EQ(set.get(entt::entity{0}).value, 3);
+    ASSERT_EQ(set.get(entt::entity{1}).value, 3);
 }
 
 TEST(Storage, MoveOnlyComponent) {
     // the purpose is to ensure that move only components are always accepted
-    entt::storage<std::uint64_t, std::unique_ptr<int>> set;
+    entt::storage<entt::entity, std::unique_ptr<int>> set;
     (void)set;
 }
 
 TEST(Storage, ConstructorExceptionDoesNotAddToSet) {
-    entt::storage<std::uint64_t, throwing_component> set;
+    entt::storage<entt::entity, throwing_component> set;
 
     try {
-        set.construct(0);
+        set.construct(entt::entity{0});
         FAIL() << "Expected constructor_exception to be thrown";
     } catch (const throwing_component::constructor_exception &) {
         ASSERT_TRUE(set.empty());

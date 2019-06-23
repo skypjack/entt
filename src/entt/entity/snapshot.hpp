@@ -32,6 +32,7 @@ class basic_snapshot {
     friend class basic_registry<Entity>;
 
     using follow_fn_type = Entity(const basic_registry<Entity> &, const Entity);
+    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     basic_snapshot(const basic_registry<Entity> *source, Entity init, follow_fn_type *fn) ENTT_NOEXCEPT
         : reg{source},
@@ -41,7 +42,7 @@ class basic_snapshot {
 
     template<typename Component, typename Archive, typename It>
     void get(Archive &archive, std::size_t sz, It first, It last) const {
-        archive(static_cast<Entity>(sz));
+        archive(typename traits_type::entity_type(sz));
 
         while(first != last) {
             const auto entt = *(first++);
@@ -88,7 +89,7 @@ public:
      */
     template<typename Archive>
     const basic_snapshot & entities(Archive &archive) const {
-        archive(static_cast<Entity>(reg->alive()));
+        archive(typename traits_type::entity_type(reg->alive()));
         reg->each([&archive](const auto entt) { archive(entt); });
         return *this;
     }
@@ -106,7 +107,7 @@ public:
     template<typename Archive>
     const basic_snapshot & destroyed(Archive &archive) const {
         auto size = reg->size() - reg->alive();
-        archive(static_cast<Entity>(size));
+        archive(typename traits_type::entity_type(size));
 
         if(size) {
             auto curr = seed;
@@ -138,7 +139,7 @@ public:
             const auto sz = reg->template size<Component...>();
             const auto *entities = reg->template data<Component...>();
 
-            archive(static_cast<Entity>(sz));
+            archive(typename traits_type::entity_type(sz));
 
             for(std::remove_const_t<decltype(sz)> pos{}; pos < sz; ++pos) {
                 const auto entt = entities[pos];
@@ -199,6 +200,7 @@ class basic_snapshot_loader {
     friend class basic_registry<Entity>;
 
     using force_fn_type = void(basic_registry<Entity> &, const Entity, const bool);
+    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     basic_snapshot_loader(basic_registry<Entity> *source, force_fn_type *fn) ENTT_NOEXCEPT
         : reg{source},
@@ -210,7 +212,7 @@ class basic_snapshot_loader {
 
     template<typename Archive>
     void assure(Archive &archive, bool destroyed) const {
-        Entity length{};
+        typename traits_type::entity_type length{};
         archive(length);
 
         while(length--) {
@@ -222,7 +224,7 @@ class basic_snapshot_loader {
 
     template<typename Type, typename Archive, typename... Args>
     void assign(Archive &archive, Args... args) const {
-        Entity length{};
+        typename traits_type::entity_type length{};
         archive(length);
 
         while(length--) {
@@ -344,7 +346,7 @@ private:
  */
 template<typename Entity>
 class basic_continuous_loader {
-    using traits_type = entt_traits<Entity>;
+    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     void destroy(Entity entt) {
         const auto it = remloc.find(entt);
@@ -385,7 +387,7 @@ class basic_continuous_loader {
 
     template<typename Archive>
     void assure(Archive &archive, void(basic_continuous_loader:: *member)(Entity)) {
-        Entity length{};
+        typename traits_type::entity_type length{};
         archive(length);
 
         while(length--) {
@@ -408,7 +410,7 @@ class basic_continuous_loader {
 
     template<typename Other, typename Archive, typename... Type, typename... Member>
     void assign(Archive &archive, [[maybe_unused]] Member Type:: *... member) {
-        Entity length{};
+        typename traits_type::entity_type length{};
         archive(length);
 
         while(length--) {
@@ -578,8 +580,8 @@ public:
     }
 
 private:
-    std::unordered_map<Entity, std::pair<Entity, bool>> remloc;
-    basic_registry<Entity> *reg;
+    std::unordered_map<entity_type, std::pair<entity_type, bool>> remloc;
+    basic_registry<entity_type> *reg;
 };
 
 

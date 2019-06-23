@@ -8,8 +8,10 @@
 #include <vector>
 #include <memory>
 #include <cstddef>
+#include <type_traits>
 #include "../config/config.h"
 #include "entity.hpp"
+#include "fwd.hpp"
 
 
 namespace entt {
@@ -44,7 +46,7 @@ namespace entt {
  */
 template<typename Entity>
 class sparse_set {
-    using traits_type = entt_traits<Entity>;
+    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0));
     static constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(typename traits_type::entity_type);
@@ -163,7 +165,7 @@ class sparse_set {
     }
 
     auto index(const Entity entt) const ENTT_NOEXCEPT {
-        const auto identifier = entt & traits_type::entity_mask;
+        const auto identifier = to_integer(entt) & traits_type::entity_mask;
         const auto page = size_type(identifier / entt_per_page);
         const auto offset = size_type(identifier & (entt_per_page - 1));
         return std::make_pair(page, offset);
@@ -413,11 +415,11 @@ public:
      */
     template<typename It>
     void batch(It first, It last) {
-        std::for_each(first, last, [next = entity_type(direct.size()), this](const auto entt) mutable {
+        std::for_each(first, last, [next = direct.size(), this](const auto entt) mutable {
             ENTT_ASSERT(!has(entt));
             auto [page, offset] = index(entt);
             assure(page);
-            reverse[page][offset] = next++;
+            reverse[page][offset] = entity_type(next++);
         });
 
         direct.insert(direct.end(), first, last);
@@ -438,7 +440,7 @@ public:
         ENTT_ASSERT(has(entt));
         auto [from_page, from_offset] = index(entt);
         auto [to_page, to_offset] = index(direct.back());
-        direct[size_type(reverse[from_page][from_offset])] = direct.back();
+        direct[size_type(reverse[from_page][from_offset])] = entity_type(direct.back());
         reverse[to_page][to_offset] = reverse[from_page][from_offset];
         reverse[from_page][from_offset] = null;
         direct.pop_back();

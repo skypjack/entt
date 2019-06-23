@@ -242,9 +242,9 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
 
     ASSERT_EQ(group.size(), decltype(group.size()){1});
 
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<int>(0)), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<const char>(0)), const char &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<int, const char>(0)), std::tuple<int &, const char &>>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<int>(entt::entity{0})), int &>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<const char>(entt::entity{0})), const char &>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<int, const char>(entt::entity{0})), std::tuple<int &, const char &>>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<const char>()), const char *>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<int>()), int *>));
 
@@ -761,11 +761,11 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
 
     ASSERT_EQ(group.size(), decltype(group.size()){1});
 
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<int>(0)), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<const char>(0)), const char &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<double>(0)), double &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<const float>(0)), const float &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<int, const char, double, const float>(0)), std::tuple<int &, const char &, double &, const float &>>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<int>(entt::entity{0})), int &>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<const char>(entt::entity{0})), const char &>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<double>(entt::entity{0})), double &>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<const float>(entt::entity{0})), const float &>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<int, const char, double, const float>(entt::entity{0})), std::tuple<int &, const char &, double &, const float &>>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<const float>()), const float *>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<double>()), double *>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<const char>()), const char *>));

@@ -136,9 +136,9 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     ASSERT_TRUE((std::is_same_v<typename decltype(view)::raw_type, int>));
     ASSERT_TRUE((std::is_same_v<typename decltype(cview)::raw_type, const int>));
 
-    ASSERT_TRUE((std::is_same_v<decltype(view.get(0)), int &>));
+    ASSERT_TRUE((std::is_same_v<decltype(view.get(entt::entity{0})), int &>));
     ASSERT_TRUE((std::is_same_v<decltype(view.raw()), int *>));
-    ASSERT_TRUE((std::is_same_v<decltype(cview.get(0)), const int &>));
+    ASSERT_TRUE((std::is_same_v<decltype(cview.get(entt::entity{0})), const int &>));
     ASSERT_TRUE((std::is_same_v<decltype(cview.raw()), const int *>));
 
     view.each([](auto, auto &&i) {
@@ -416,9 +416,9 @@ TEST(MultipleComponentView, ConstNonConstAndAllInBetween) {
 
     ASSERT_EQ(view.size(), decltype(view.size()){1});
 
-    ASSERT_TRUE((std::is_same_v<decltype(view.get<int>(0)), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(view.get<const char>(0)), const char &>));
-    ASSERT_TRUE((std::is_same_v<decltype(view.get<int, const char>(0)), std::tuple<int &, const char &>>));
+    ASSERT_TRUE((std::is_same_v<decltype(view.get<int>(entt::entity{0})), int &>));
+    ASSERT_TRUE((std::is_same_v<decltype(view.get<const char>(entt::entity{0})), const char &>));
+    ASSERT_TRUE((std::is_same_v<decltype(view.get<int, const char>(entt::entity{0})), std::tuple<int &, const char &>>));
     ASSERT_TRUE((std::is_same_v<decltype(view.raw<const char>()), const char *>));
     ASSERT_TRUE((std::is_same_v<decltype(view.raw<int>()), int *>));
 

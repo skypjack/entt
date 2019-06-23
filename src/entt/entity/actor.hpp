@@ -184,7 +184,7 @@ struct basic_actor {
 
 private:
     registry_type *reg;
-    Entity entt;
+    entity_type entt;
 };
 
 

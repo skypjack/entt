@@ -311,7 +311,7 @@ TEST(Registry, VersionOverflow) {
 
     ASSERT_EQ(registry.version(entity), entt::registry::version_type{});
 
-    for(auto i = entt::entt_traits<entt::entity>::version_mask; i; --i) {
+    for(auto i = entt::entt_traits<std::underlying_type_t<entt::entity>>::version_mask; i; --i) {
         ASSERT_NE(registry.current(entity), registry.version(entity));
         registry.destroy(registry.create());
     }

@@ -71,7 +71,7 @@ class basic_view {
 
     using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
     using unchecked_type = std::array<const sparse_set<Entity> *, (sizeof...(Component) - 1)>;
-    using traits_type = entt_traits<Entity>;
+    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     class iterator {
         friend class basic_view<Entity, Component...>;
@@ -96,7 +96,7 @@ class basic_view {
 
         bool valid() const ENTT_NOEXCEPT {
             const auto entt = *begin;
-            const auto sz = size_type(entt& traits_type::entity_mask);
+            const auto sz = size_type(to_integer(entt) & traits_type::entity_mask);
 
             return sz < extent && std::all_of(unchecked.cbegin(), unchecked.cend(), [entt](const sparse_set<Entity> *view) {
                 return view->has(entt);

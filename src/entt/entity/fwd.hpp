@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include "../config/config.h"
+#include "entity.hpp"
 
 
 namespace entt {
@@ -49,7 +50,7 @@ template<typename>
 class basic_continuous_loader;
 
 /*! @brief Alias declaration for the most common use case. */
-using entity = std::uint32_t;
+ENTT_ENTITY_TYPE(entity, std::uint32_t)
 
 /*! @brief Alias declaration for the most common use case. */
 using registry = basic_registry<entity>;

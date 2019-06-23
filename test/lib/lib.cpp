@@ -1,7 +1,8 @@
+#include <gtest/gtest.h>
+#include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
 #include <entt/signal/emitter.hpp>
-#include <gtest/gtest.h>
 #include "types.h"
 
 extern typename entt::registry::component_type a_module_int_type();
@@ -58,8 +59,8 @@ TEST(Lib, Registry) {
     update_position(1, registry);
 
     registry.view<position>().each([](auto entity, auto &position) {
-        ASSERT_EQ(position.x, entity + 2);
-        ASSERT_EQ(position.y, entity + 3);
+        ASSERT_EQ(position.x, entt::to_integer(entity) + 2);
+        ASSERT_EQ(position.y, entt::to_integer(entity) + 3);
     });
 }
 

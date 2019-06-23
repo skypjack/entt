@@ -165,7 +165,6 @@ constexpr basic_collector<> collector{};
  */
 template<typename Entity>
 class basic_observer {
-    using traits_type = entt_traits<Entity>;
     using payload_type = std::uint32_t;
 
     template<typename>
@@ -257,7 +256,7 @@ class basic_observer {
 
 public:
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename traits_type::entity_type;
+    using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = typename sparse_set<Entity>::size_type;
     /*! @brief Input iterator type. */
@@ -428,7 +427,7 @@ public:
 
 private:
     basic_registry<entity_type> *target;
-    void(* release)(basic_observer &, basic_registry<Entity> &);
+    void(* release)(basic_observer &, basic_registry<entity_type> &);
     storage<entity_type, payload_type> view;
 };
 

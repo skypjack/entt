@@ -137,9 +137,9 @@ use as-is and store around if needed. Do not try to inspect an entity
 identifier, its format can change in future and a registry offers all the
 functionalities to query them out-of-the-box. The underlying type of an entity
 (either `std::uint16_t`, `std::uint32_t` or `std::uint64_t`) can be specified
-when defining a registry (actually `entt::registry` is nothing more than an
-alias for `entt::basic_registry<entt::entity>` and `entt::entity` is an alias
-for `std::uint32_t`).<br/>
+when defining a registry. In fact, an `entt::registry` is nothing more than an
+alias for `entt::basic_registry<entt::entity>` and `entt::entity` is a distinct
+type that implements the concept of _entity identifier_.<br/>
 Components (the _C_ of an _ECS_) should be plain old data structures or more
 complex and movable data structures with a proper constructor. Actually, the
 sole requirement of a component type is that it must be both move constructible
@@ -162,12 +162,14 @@ A registry can store and manage entities, as well as create views and groups to
 iterate the underlying data structures.<br/>
 The class template `basic_registry` lets users decide what's the preferred type
 to represent an entity. Because `std::uint32_t` is large enough for almost all
-the cases, there exists also the alias `entt::entity` for it, as well as the
+the cases, there exists also the type `entt::entity` for it, as well as the
 alias `entt::registry` for `entt::basic_registry<entt::entity>`.
 
 Entities are represented by _entity identifiers_. An entity identifier is an
 opaque type that users should not inspect or modify in any way. It carries
-information about the entity itself and its version.
+information about the entity itself and its version.<br/>
+User defined identifiers can be introduced by means of the `ENTT_ENTITY_TYPE`
+macro if needed.
 
 A registry can be used both to construct and to destroy entities:
 
