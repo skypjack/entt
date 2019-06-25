@@ -24,26 +24,6 @@ namespace entt {
 namespace internal {
 
 
-template<typename, typename>
-struct invoker;
-
-
-template<typename Ret, typename... Args, typename Collector>
-struct invoker<Ret(Args...), Collector> {
-    bool invoke(Collector &collector, const delegate<Ret(Args...)> &delegate, Args... args) const {
-        return collector(delegate(args...));
-    }
-};
-
-
-template<typename... Args, typename Collector>
-struct invoker<void(Args...), Collector> {
-    bool invoke(Collector &, const delegate<void(Args...)> &delegate, Args... args) const {
-        return (delegate(args...), true);
-    }
-};
-
-
 template<typename Ret>
 struct null_collector {
     using result_type = Ret;
@@ -251,7 +231,7 @@ private:
  * @tparam Collector Type of collector to use, if any.
  */
 template<typename Ret, typename... Args, typename Collector>
-struct sigh<Ret(Args...), Collector>: private internal::invoker<Ret(Args...), Collector> {
+struct sigh<Ret(Args...), Collector> {
     /*! @brief Unsigned integer type. */
     using size_type = typename std::vector<delegate<Ret(Args...)>>::size_type;
     /*! @brief Collector type. */
@@ -318,8 +298,16 @@ struct sigh<Ret(Args...), Collector>: private internal::invoker<Ret(Args...), Co
         collector_type collector;
 
         for(auto &&call: calls) {
-            if(!this->invoke(collector, call, args...)) {
-                break;
+            if constexpr(std::is_void_v<Ret>) {
+                call(args...);
+
+                if(!collector()) {
+                    break;
+                }
+            } else {
+                if(!collector(call(args...))) {
+                    break;
+                }
             }
         }
 
