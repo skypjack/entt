@@ -17,7 +17,7 @@ template<typename>
 class sink;
 
 /*! @class sigh */
-template<typename, typename>
+template<typename>
 struct sigh;
 
 

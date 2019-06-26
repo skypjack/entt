@@ -11,39 +11,9 @@ struct sigh_listener {
 
     void i() {}
     // useless definition just because msvc does weird things if both are empty
-    void l() { k = k ? true : false; }
+    void l() { k = k*k; }
 
     bool k{false};
-};
-
-template<typename Ret>
-struct test_collect_all {
-    std::vector<Ret> vec{};
-    static int f() { return 42; }
-    static int g() { return 3; }
-    bool operator()(Ret r) noexcept {
-        vec.push_back(r);
-        return true;
-    }
-};
-
-template<>
-struct test_collect_all<void> {
-    std::vector<int> vec{};
-    static void h(const void *) {}
-    bool operator()() noexcept {
-        return true;
-    }
-};
-
-template<typename Ret>
-struct test_collect_first {
-    std::vector<Ret> vec{};
-    static int f(const void *) { return 42; }
-    bool operator()(Ret r) noexcept {
-        vec.push_back(r);
-        return false;
-    }
 };
 
 struct const_nonconst_noexcept {
@@ -163,38 +133,53 @@ TEST(SigH, Members) {
 }
 
 TEST(SigH, Collector) {
-    entt::sigh<void(), test_collect_all<void>> sigh_void;
-    const void *fake_instance = nullptr;
+    sigh_listener listener;
+    entt::sigh<bool(int)> sigh;
+    int cnt = 0;
 
-    sigh_void.sink().connect<&test_collect_all<void>::h>(fake_instance);
-    auto collector_void = sigh_void.collect();
+    sigh.sink().connect<&sigh_listener::g>(&listener);
+    sigh.sink().connect<&sigh_listener::h>(&listener);
 
-    ASSERT_FALSE(sigh_void.empty());
-    ASSERT_TRUE(collector_void.vec.empty());
+    listener.k = true;
+    sigh.collect([&listener, &cnt](bool value) {
+        ASSERT_TRUE(value);
+        listener.k = true;
+        ++cnt;
+    }, 42);
 
-    entt::sigh<int(), test_collect_all<int>> sigh_all;
+    ASSERT_FALSE(sigh.empty());
+    ASSERT_EQ(cnt, 2);
 
-    sigh_all.sink().connect<&test_collect_all<int>::f>();
-    sigh_all.sink().connect<&test_collect_all<int>::f>();
-    sigh_all.sink().connect<&test_collect_all<int>::g>();
-    auto collector_all = sigh_all.collect();
+    cnt = 0;
+    sigh.collect([&cnt](bool value) {
+        // gtest and its macro hell are sometimes really annoying...
+        [](auto v) { ASSERT_TRUE(v); }(value);
+        ++cnt;
+        return true;
+    }, 42);
 
-    ASSERT_FALSE(sigh_all.empty());
-    ASSERT_FALSE(collector_all.vec.empty());
-    ASSERT_EQ(static_cast<std::vector<int>::size_type>(2), collector_all.vec.size());
-    ASSERT_EQ(42, collector_all.vec[0]);
-    ASSERT_EQ(3, collector_all.vec[1]);
+    ASSERT_EQ(cnt, 1);
+}
 
-    entt::sigh<int(), test_collect_first<int>> sigh_first;
+TEST(SigH, CollectorVoid) {
+    sigh_listener listener;
+    entt::sigh<void(int)> sigh;
+    int cnt = 0;
 
-    sigh_first.sink().connect<&test_collect_first<int>::f>(fake_instance);
-    sigh_first.sink().connect<&test_collect_first<int>::f>(fake_instance);
-    auto collector_first = sigh_first.collect();
+    sigh.sink().connect<&sigh_listener::g>(&listener);
+    sigh.sink().connect<&sigh_listener::h>(&listener);
+    sigh.collect([&cnt]() { ++cnt; }, 42);
 
-    ASSERT_FALSE(sigh_first.empty());
-    ASSERT_FALSE(collector_first.vec.empty());
-    ASSERT_EQ(static_cast<std::vector<int>::size_type>(1), collector_first.vec.size());
-    ASSERT_EQ(42, collector_first.vec[0]);
+    ASSERT_FALSE(sigh.empty());
+    ASSERT_EQ(cnt, 2);
+
+    cnt = 0;
+    sigh.collect([&cnt]() {
+        ++cnt;
+        return true;
+    }, 42);
+
+    ASSERT_EQ(cnt, 1);
 }
 
 TEST(SigH, ConstNonConstNoExcept) {

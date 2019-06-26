@@ -16,49 +16,16 @@ namespace entt {
 
 
 /**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
+ * @brief Unmanaged signal handler declaration.
+ *
+ * Primary template isn't defined on purpose. All the specializations give a
+ * compile-time error unless the template parameter is a function type.
+ *
+ * @tparam Function A valid function type.
+ * @tparam Collector Type of collector to use, if any.
  */
-
-
-namespace internal {
-
-
-template<typename Ret>
-struct null_collector {
-    using result_type = Ret;
-    bool operator()(result_type) const ENTT_NOEXCEPT { return true; }
-};
-
-
-template<>
-struct null_collector<void> {
-    using result_type = void;
-    bool operator()() const ENTT_NOEXCEPT { return true; }
-};
-
-
-template<typename>
-struct default_collector;
-
-
-template<typename Ret, typename... Args>
-struct default_collector<Ret(Args...)> {
-    using collector_type = null_collector<Ret>;
-};
-
-
 template<typename Function>
-using default_collector_type = typename default_collector<Function>::collector_type;
-
-
-}
-
-
-/**
- * Internal details not to be documented.
- * @endcond TURN_OFF_DOXYGEN
- */
+struct sigh;
 
 
 /**
@@ -71,19 +38,6 @@ using default_collector_type = typename default_collector<Function>::collector_t
  */
 template<typename Function>
 class sink;
-
-
-/**
- * @brief Unmanaged signal handler declaration.
- *
- * Primary template isn't defined on purpose. All the specializations give a
- * compile-time error unless the template parameter is a function type.
- *
- * @tparam Function A valid function type.
- * @tparam Collector Type of collector to use, if any.
- */
-template<typename Function, typename Collector = internal::default_collector_type<Function>>
-struct sigh;
 
 
 /**
@@ -103,7 +57,7 @@ struct sigh;
 template<typename Ret, typename... Args>
 class sink<Ret(Args...)> {
     /*! @brief A signal is allowed to create sinks. */
-    template<typename, typename>
+    template<typename>
     friend struct sigh;
 
     sink(std::vector<delegate<Ret(Args...)>> *ref) ENTT_NOEXCEPT
@@ -216,26 +170,16 @@ private:
  *
  * This class serves mainly two purposes:
  *
- * * Creating signals used later to notify a bunch of listeners.
+ * * Creating signals to use later to notify a bunch of listeners.
  * * Collecting results from a set of functions like in a voting system.
- *
- * The default collector does nothing. To properly collect data, define and use
- * a class that has a call operator the signature of which is `bool(Param)` and:
- *
- * * `Param` is a type to which `Ret` can be converted.
- * * The return type is true if the handler must stop collecting data, false
- * otherwise.
  *
  * @tparam Ret Return type of a function type.
  * @tparam Args Types of arguments of a function type.
- * @tparam Collector Type of collector to use, if any.
  */
-template<typename Ret, typename... Args, typename Collector>
-struct sigh<Ret(Args...), Collector> {
+template<typename Ret, typename... Args>
+struct sigh<Ret(Args...)> {
     /*! @brief Unsigned integer type. */
     using size_type = typename std::vector<delegate<Ret(Args...)>>::size_type;
-    /*! @brief Collector type. */
-    using collector_type = Collector;
     /*! @brief Sink type. */
     using sink_type = entt::sink<Ret(Args...)>;
 
@@ -284,34 +228,45 @@ struct sigh<Ret(Args...), Collector> {
      */
     void publish(Args... args) const {
         for(auto pos = calls.size(); pos; --pos) {
-            auto &call = calls[pos-1];
-            call(args...);
+            calls[pos-1](args...);
         }
     }
 
     /**
      * @brief Collects return values from the listeners.
+     *
+     * The collector must expose a call operator with the following properties:
+     *
+     * * The return type is either `void` or such that it's convertible to
+     *   `bool`. In the second case, a true value will stop the iteration.
+     * * The list of parameters is empty if `Ret` is `void`, otherwise it
+     *   contains a single element such that `Ret` is convertible to it.
+     *
+     * @tparam Func Type of collector to use, if any.
+     * @param func A valid function object.
      * @param args Arguments to use to invoke listeners.
-     * @return An instance of the collector filled with collected data.
      */
-    collector_type collect(Args... args) const {
-        collector_type collector;
+    template<typename Func>
+    void collect(Func func, Args... args) const {
+        bool stop = false;
 
-        for(auto &&call: calls) {
+        for(auto pos = calls.size(); pos && !stop; --pos) {
             if constexpr(std::is_void_v<Ret>) {
-                call(args...);
-
-                if(!collector()) {
-                    break;
+                if constexpr(std::is_invocable_r_v<bool, Func>) {
+                    calls[pos-1](args...);
+                    stop = func();
+                } else {
+                    calls[pos-1](args...);
+                    func();
                 }
             } else {
-                if(!collector(call(args...))) {
-                    break;
+                if constexpr(std::is_invocable_r_v<bool, Func, Ret>) {
+                    stop = func(calls[pos-1](args...));
+                } else {
+                    func(calls[pos-1](args...));
                 }
             }
         }
-
-        return collector;
     }
 
     /**
