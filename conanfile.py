@@ -19,5 +19,9 @@ class EnttConan(ConanFile):
         self.copy(pattern="LICENSE", dst="licenses")
         self.copy(pattern="*", dst="include", src="src", keep_path=True)
 
+    def package_info(self):
+        if not self.in_local_cache:
+            self.cpp_info.includedirs = ["src"]
+
     def package_id(self):
         self.info.header_only()
