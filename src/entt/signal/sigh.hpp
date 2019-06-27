@@ -22,7 +22,6 @@ namespace entt {
  * compile-time error unless the template parameter is a function type.
  *
  * @tparam Function A valid function type.
- * @tparam Collector Type of collector to use, if any.
  */
 template<typename Function>
 struct sigh;
