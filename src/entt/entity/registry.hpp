@@ -151,7 +151,7 @@ class basic_registry {
     };
 
     template<typename... Exclude, typename... Get, typename... Owned>
-    struct group_handler<type_list<Exclude...>, type_list<Get...>, Owned...>: sparse_set<Entity> {
+    struct group_handler<type_list<Exclude...>, type_list<Get...>, Owned...> {
         std::tuple<pool_type<Owned> *..., pool_type<Get> *..., pool_type<Exclude> *...> cpools{};
         std::size_t owned{};
 
