@@ -47,11 +47,6 @@ class basic_registry {
 
     template<typename Component>
     struct pool_handler: storage<Entity, Component> {
-        using reference_type = std::conditional_t<std::is_empty_v<Component>, const Component &, Component &>;
-
-        sigh<void(basic_registry &, const Entity, reference_type)> on_construct;
-        sigh<void(basic_registry &, const Entity, reference_type)> on_replace;
-        sigh<void(basic_registry &, const Entity)> on_destroy;
         void *group{};
 
         pool_handler() ENTT_NOEXCEPT = default;
@@ -60,15 +55,27 @@ class basic_registry {
             : storage<Entity, Component>{other}
         {}
 
+        auto on_construct() ENTT_NOEXCEPT {
+            return sink{construction};
+        }
+
+        auto on_replace() ENTT_NOEXCEPT {
+            return sink{update};
+        }
+
+        auto on_destroy() ENTT_NOEXCEPT {
+            return sink{destruction};
+        }
+
         template<typename... Args>
         decltype(auto) assign(basic_registry &registry, const Entity entt, Args &&... args) {
             if constexpr(std::is_empty_v<Component>) {
                 storage<Entity, Component>::construct(entt);
-                on_construct.publish(registry, entt, Component{});
+                construction.publish(registry, entt, Component{});
                 return Component{std::forward<Args>(args)...};
             } else {
                 auto &component = storage<Entity, Component>::construct(entt, std::forward<Args>(args)...);
-                on_construct.publish(registry, entt, component);
+                construction.publish(registry, entt, component);
                 return component;
             }
         }
@@ -80,17 +87,17 @@ class basic_registry {
             if constexpr(std::is_empty_v<Component>) {
                 storage<Entity, Component>::batch(first, last);
 
-                if(!on_construct.empty()) {
+                if(!construction.empty()) {
                     std::for_each(first, last, [&registry, this](const auto entt) {
-                        on_construct.publish(registry, entt, Component{});
+                        construction.publish(registry, entt, Component{});
                     });
                 }
             } else {
                 component = storage<Entity, Component>::batch(first, last);
 
-                if(!on_construct.empty()) {
+                if(!construction.empty()) {
                     std::for_each(first, last, [&registry, component, this](const auto entt) mutable {
-                        on_construct.publish(registry, entt, *(component++));
+                        construction.publish(registry, entt, *(component++));
                     });
                 }
             }
@@ -99,7 +106,7 @@ class basic_registry {
         }
 
         void remove(basic_registry &registry, const Entity entt) {
-            on_destroy.publish(registry, entt);
+            destruction.publish(registry, entt);
             storage<Entity, Component>::destroy(entt);
         }
 
@@ -107,14 +114,20 @@ class basic_registry {
         decltype(auto) replace(basic_registry &registry, const Entity entt, Args &&... args) {
             if constexpr(std::is_empty_v<Component>) {
                 ENTT_ASSERT((storage<Entity, Component>::has(entt)));
-                on_replace.publish(registry, entt, Component{});
+                update.publish(registry, entt, Component{});
                 return Component{std::forward<Args>(args)...};
             } else {
                 Component component{std::forward<Args>(args)...};
-                on_replace.publish(registry, entt, component);
+                update.publish(registry, entt, component);
                 return (storage<Entity, Component>::get(entt) = std::move(component));
             }
         }
+
+    private:
+        using reference_type = std::conditional_t<std::is_empty_v<Component>, const Component &, Component &>;
+        sigh<void(basic_registry &, const Entity, reference_type)> construction{};
+        sigh<void(basic_registry &, const Entity, reference_type)> update{};
+        sigh<void(basic_registry &, const Entity)> destruction{};
     };
 
     template<typename Component>
@@ -902,7 +915,7 @@ public:
      */
     template<typename Component>
     auto on_construct() ENTT_NOEXCEPT {
-        return assure<Component>()->on_construct.sink();
+        return assure<Component>()->on_construct();
     }
 
     /**
@@ -933,7 +946,7 @@ public:
      */
     template<typename Component>
     auto on_replace() ENTT_NOEXCEPT {
-        return assure<Component>()->on_replace.sink();
+        return assure<Component>()->on_replace();
     }
 
     /**
@@ -965,7 +978,7 @@ public:
      */
     template<typename Component>
     auto on_destroy() ENTT_NOEXCEPT {
-        return assure<Component>()->on_destroy.sink();
+        return assure<Component>()->on_destroy();
     }
 
     /**
@@ -1095,7 +1108,7 @@ public:
      */
     template<typename Component>
     void reset() {
-        if(auto *cpool = assure<Component>(); cpool->on_destroy.empty()) {
+        if(auto *cpool = assure<Component>(); cpool->on_destroy().empty()) {
             // no group set, otherwise the signal wouldn't be empty
             cpool->reset();
         } else {
@@ -1320,14 +1333,14 @@ public:
             ENTT_ASSERT((!std::get<pool_type<Owned> *>(curr->cpools)->group && ...));
 
             ((std::get<pool_type<Owned> *>(curr->cpools)->group = curr), ...);
-            (std::get<pool_type<Owned> *>(curr->cpools)->on_construct.sink().template connect<&handler_type::template maybe_valid_if<Owned>>(curr), ...);
-            (std::get<pool_type<Owned> *>(curr->cpools)->on_destroy.sink().template connect<&handler_type::discard_if>(curr), ...);
+            (std::get<pool_type<Owned> *>(curr->cpools)->on_construct().template connect<&handler_type::template maybe_valid_if<Owned>>(curr), ...);
+            (std::get<pool_type<Owned> *>(curr->cpools)->on_destroy().template connect<&handler_type::discard_if>(curr), ...);
 
-            (std::get<pool_type<Get> *>(curr->cpools)->on_construct.sink().template connect<&handler_type::template maybe_valid_if<Get>>(curr), ...);
-            (std::get<pool_type<Get> *>(curr->cpools)->on_destroy.sink().template connect<&handler_type::discard_if>(curr), ...);
+            (std::get<pool_type<Get> *>(curr->cpools)->on_construct().template connect<&handler_type::template maybe_valid_if<Get>>(curr), ...);
+            (std::get<pool_type<Get> *>(curr->cpools)->on_destroy().template connect<&handler_type::discard_if>(curr), ...);
 
-            (std::get<pool_type<Exclude> *>(curr->cpools)->on_destroy.sink().template connect<&handler_type::template maybe_valid_if<Exclude>>(curr), ...);
-            (std::get<pool_type<Exclude> *>(curr->cpools)->on_construct.sink().template connect<&handler_type::discard_if>(curr), ...);
+            (std::get<pool_type<Exclude> *>(curr->cpools)->on_destroy().template connect<&handler_type::template maybe_valid_if<Exclude>>(curr), ...);
+            (std::get<pool_type<Exclude> *>(curr->cpools)->on_construct().template connect<&handler_type::discard_if>(curr), ...);
 
             const auto *cpool = std::min({
                 static_cast<sparse_set<Entity> *>(std::get<pool_type<Owned> *>(curr->cpools))...,

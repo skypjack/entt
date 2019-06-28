@@ -16,6 +16,18 @@ namespace entt {
 
 
 /**
+ * @brief Sink implementation.
+ *
+ * Primary template isn't defined on purpose. All the specializations give a
+ * compile-time error unless the template parameter is a function type.
+ *
+ * @tparam Function A valid function type.
+ */
+template<typename Function>
+struct sink;
+
+
+/**
  * @brief Unmanaged signal handler declaration.
  *
  * Primary template isn't defined on purpose. All the specializations give a
@@ -24,140 +36,7 @@ namespace entt {
  * @tparam Function A valid function type.
  */
 template<typename Function>
-struct sigh;
-
-
-/**
- * @brief Sink implementation.
- *
- * Primary template isn't defined on purpose. All the specializations give a
- * compile-time error unless the template parameter is a function type.
- *
- * @tparam Function A valid function type.
- */
-template<typename Function>
-class sink;
-
-
-/**
- * @brief Sink implementation.
- *
- * A sink is an opaque object used to connect listeners to signals.<br/>
- * The function type for a listener is the one of the signal to which it
- * belongs.
- *
- * The clear separation between a signal and a sink permits to store the former
- * as private data member without exposing the publish functionality to the
- * users of a class.
- *
- * @tparam Ret Return type of a function type.
- * @tparam Args Types of arguments of a function type.
- */
-template<typename Ret, typename... Args>
-class sink<Ret(Args...)> {
-    /*! @brief A signal is allowed to create sinks. */
-    template<typename>
-    friend struct sigh;
-
-    sink(std::vector<delegate<Ret(Args...)>> *ref) ENTT_NOEXCEPT
-        : calls{ref}
-    {}
-
-public:
-    /**
-     * @brief Returns false if at least a listener is connected to the sink.
-     * @return True if the sink has no listeners connected, false otherwise.
-     */
-    bool empty() const ENTT_NOEXCEPT {
-        return calls->empty();
-    }
-
-    /**
-     * @brief Connects a free function to a signal.
-     *
-     * The signal handler performs checks to avoid multiple connections for free
-     * functions.
-     *
-     * @tparam Function A valid free function pointer.
-     */
-    template<auto Function>
-    void connect() {
-        disconnect<Function>();
-        delegate<Ret(Args...)> delegate{};
-        delegate.template connect<Function>();
-        calls->emplace_back(std::move(delegate));
-    }
-
-    /**
-     * @brief Connects a member function or a free function with payload to a
-     * signal.
-     *
-     * The signal isn't responsible for the connected object or the payload.
-     * Users must always guarantee that the lifetime of the instance overcomes
-     * the one  of the delegate. On the other side, the signal handler performs
-     * checks to avoid multiple connections for the same function.<br/>
-     * When used to connect a free function with payload, its signature must be
-     * such that the instance is the first argument before the ones used to
-     * define the delegate itself.
-     *
-     * @tparam Candidate Member or free function to connect to the signal.
-     * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid pointer that fits the purpose.
-     */
-    template<auto Candidate, typename Type>
-    void connect(Type *value_or_instance) {
-        disconnect<Candidate>(value_or_instance);
-        delegate<Ret(Args...)> delegate{};
-        delegate.template connect<Candidate>(value_or_instance);
-        calls->emplace_back(std::move(delegate));
-    }
-
-    /**
-     * @brief Disconnects a free function from a signal.
-     * @tparam Function A valid free function pointer.
-     */
-    template<auto Function>
-    void disconnect() {
-        delegate<Ret(Args...)> delegate{};
-        delegate.template connect<Function>();
-        calls->erase(std::remove(calls->begin(), calls->end(), std::move(delegate)), calls->end());
-    }
-
-    /**
-     * @brief Disconnects a member function or a free function with payload from
-     * a signal.
-     * @tparam Candidate Member or free function to disconnect from the signal.
-     * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid pointer that fits the purpose.
-     */
-    template<auto Candidate, typename Type>
-    void disconnect(Type *value_or_instance) {
-        delegate<Ret(Args...)> delegate{};
-        delegate.template connect<Candidate>(value_or_instance);
-        calls->erase(std::remove_if(calls->begin(), calls->end(), [delegate](const auto &other) {
-            return other == delegate && other.instance() == delegate.instance();
-        }), calls->end());
-    }
-
-    /**
-     * @brief Disconnects member functions or free functions based on an
-     * instance or specific payload.
-     * @param value_or_instance A valid pointer that fits the purpose.
-     */
-    void disconnect(const void *value_or_instance) {
-        calls->erase(std::remove_if(calls->begin(), calls->end(), [value_or_instance](const auto &delegate) {
-            return value_or_instance == delegate.instance();
-        }), calls->end());
-    }
-
-    /*! @brief Disconnects all the listeners from a signal. */
-    void disconnect() {
-        calls->clear();
-    }
-
-private:
-    std::vector<delegate<Ret(Args...)>> *calls;
-};
+class sigh;
 
 
 /**
@@ -176,7 +55,11 @@ private:
  * @tparam Args Types of arguments of a function type.
  */
 template<typename Ret, typename... Args>
-struct sigh<Ret(Args...)> {
+class sigh<Ret(Args...)> {
+    /*! @brief A sink is allowed to modify a signal. */
+    friend struct sink<Ret(Args...)>;
+
+public:
     /*! @brief Unsigned integer type. */
     using size_type = typename std::vector<delegate<Ret(Args...)>>::size_type;
     /*! @brief Sink type. */
@@ -203,19 +86,6 @@ struct sigh<Ret(Args...)> {
      */
     bool empty() const ENTT_NOEXCEPT {
         return calls.empty();
-    }
-
-    /**
-     * @brief Returns a sink object for the given signal.
-     *
-     * A sink is an opaque object used to connect listeners to signals.<br/>
-     * The function type for a listener is the one of the signal to which it
-     * belongs. The order of invocation of the listeners isn't guaranteed.
-     *
-     * @return A temporary sink object.
-     */
-    sink_type sink() ENTT_NOEXCEPT {
-        return { &calls };
     }
 
     /**
@@ -281,6 +151,142 @@ struct sigh<Ret(Args...)> {
 private:
     std::vector<delegate<Ret(Args...)>> calls;
 };
+
+
+/**
+ * @brief Sink implementation.
+ *
+ * A sink is an opaque object used to connect listeners to signals.<br/>
+ * The function type for a listener is the one of the signal to which it
+ * belongs.
+ *
+ * The clear separation between a signal and a sink permits to store the former
+ * as private data member without exposing the publish functionality to the
+ * users of a class.
+ *
+ * @tparam Ret Return type of a function type.
+ * @tparam Args Types of arguments of a function type.
+ */
+template<typename Ret, typename... Args>
+struct sink<Ret(Args...)> {
+    /**
+     * @brief Constructs a sink that is allowed to modify a given signal.
+     * @param ref A valid reference to a signal object.
+     */
+    sink(sigh<Ret(Args...)> &ref) ENTT_NOEXCEPT
+        : parent{&ref}
+    {}
+
+    /**
+     * @brief Returns false if at least a listener is connected to the sink.
+     * @return True if the sink has no listeners connected, false otherwise.
+     */
+    bool empty() const ENTT_NOEXCEPT {
+        return parent->calls.empty();
+    }
+
+    /**
+     * @brief Connects a free function to a signal.
+     *
+     * The signal handler performs checks to avoid multiple connections for free
+     * functions.
+     *
+     * @tparam Function A valid free function pointer.
+     */
+    template<auto Function>
+    void connect() {
+        disconnect<Function>();
+        delegate<Ret(Args...)> delegate{};
+        delegate.template connect<Function>();
+        parent->calls.emplace_back(std::move(delegate));
+    }
+
+    /**
+     * @brief Connects a member function or a free function with payload to a
+     * signal.
+     *
+     * The signal isn't responsible for the connected object or the payload.
+     * Users must always guarantee that the lifetime of the instance overcomes
+     * the one  of the delegate. On the other side, the signal handler performs
+     * checks to avoid multiple connections for the same function.<br/>
+     * When used to connect a free function with payload, its signature must be
+     * such that the instance is the first argument before the ones used to
+     * define the delegate itself.
+     *
+     * @tparam Candidate Member or free function to connect to the signal.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid pointer that fits the purpose.
+     */
+    template<auto Candidate, typename Type>
+    void connect(Type *value_or_instance) {
+        disconnect<Candidate>(value_or_instance);
+        delegate<Ret(Args...)> delegate{};
+        delegate.template connect<Candidate>(value_or_instance);
+        parent->calls.emplace_back(std::move(delegate));
+    }
+
+    /**
+     * @brief Disconnects a free function from a signal.
+     * @tparam Function A valid free function pointer.
+     */
+    template<auto Function>
+    void disconnect() {
+        auto &calls = parent->calls;
+        delegate<Ret(Args...)> delegate{};
+        delegate.template connect<Function>();
+        calls.erase(std::remove(calls.begin(), calls.end(), std::move(delegate)), calls.end());
+    }
+
+    /**
+     * @brief Disconnects a member function or a free function with payload from
+     * a signal.
+     * @tparam Candidate Member or free function to disconnect from the signal.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid pointer that fits the purpose.
+     */
+    template<auto Candidate, typename Type>
+    void disconnect(Type *value_or_instance) {
+        auto &calls = parent->calls;
+        delegate<Ret(Args...)> delegate{};
+        delegate.template connect<Candidate>(value_or_instance);
+        calls.erase(std::remove_if(calls.begin(), calls.end(), [delegate](const auto &other) {
+            return other == delegate && other.instance() == delegate.instance();
+        }), calls.end());
+    }
+
+    /**
+     * @brief Disconnects member functions or free functions based on an
+     * instance or specific payload.
+     * @param value_or_instance A valid pointer that fits the purpose.
+     */
+    void disconnect(const void *value_or_instance) {
+        auto &calls = parent->calls;
+        calls.erase(std::remove_if(calls.begin(), calls.end(), [value_or_instance](const auto &delegate) {
+            return value_or_instance == delegate.instance();
+        }), calls.end());
+    }
+
+    /*! @brief Disconnects all the listeners from a signal. */
+    void disconnect() {
+        parent->calls.clear();
+    }
+
+private:
+    sigh<Ret(Args...)> *parent;
+};
+
+
+/**
+ * @brief Deduction guide.
+ *
+ * It allows to deduce the function type of a sink directly from the signal it
+ * refers to.
+ *
+ * @tparam Ret Return type of a function type.
+ * @tparam Args Types of arguments of a function type.
+ */
+template<typename Ret, typename... Args>
+sink(sigh<Ret(Args...)> &) ENTT_NOEXCEPT -> sink<Ret(Args...)>;
 
 
 }

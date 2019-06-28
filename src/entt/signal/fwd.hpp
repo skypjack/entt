@@ -14,11 +14,11 @@ class delegate;
 
 /*! @class sink */
 template<typename>
-class sink;
+struct sink;
 
 /*! @class sigh */
 template<typename>
-struct sigh;
+class sigh;
 
 
 }

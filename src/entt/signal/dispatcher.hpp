@@ -54,7 +54,7 @@ class dispatcher {
         }
 
         sink_type sink() ENTT_NOEXCEPT {
-            return signal.sink();
+            return entt::sink{signal};
         }
 
         template<typename... Args>
