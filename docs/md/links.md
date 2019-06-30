@@ -38,9 +38,6 @@ I hope this list can grow much more in the future:
     example of a breakout game, using `SDL` and `EnTT`.
 
 * Engines/Frameworks:
-  * [The Forge](https://github.com/ConfettiFX/The-Forge) by
-    [Confett](http://www.confettispecialfx.com/): a cross-platform rendering
-    framework.
   * [Apparently](https://teamwisp.github.io/credits/)
     [Wisp](https://teamwisp.github.io/product/) by
     [Team Wisp](https://teamwisp.github.io/): an advanced real-time ray tracing

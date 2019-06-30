@@ -15,10 +15,9 @@
 much more written in **modern C++**, mainly known for its innovative
 **entity-component-system (ECS)** model.<br/>
 [Among others](https://github.com/skypjack/entt/wiki/EnTT-in-Action), it's used
-in [**Minecraft**](https://minecraft.net/en-us/attribution/) by Mojang, the
-[**ArcGIS Runtime SDKs**](https://developers.arcgis.com/arcgis-runtime/) by Esri
-and [**The Forge**](https://github.com/ConfettiFX/The-Forge) by Confetti. Read
-on to find out what it can offer you.
+in [**Minecraft**](https://minecraft.net/en-us/attribution/) by Mojang and the
+[**ArcGIS Runtime SDKs**](https://developers.arcgis.com/arcgis-runtime/) by
+Esri. Open an issue or submit a PR if you don't see your project in the list!
 
 ---
 
@@ -26,6 +25,13 @@ Do you want to **keep up with changes** or do you have a **question** that
 doesn't require you to open an issue?<br/>
 Join the [gitter channel](https://gitter.im/skypjack/entt) and meet other users
 like you. The more we are, the better for everyone.
+
+Wondering why your **debug build** is so slow on Windows or how to represent a
+**hierarchy** with components?<br/>
+Check out the
+[FAQ](https://github.com/skypjack/entt/wiki/Frequently-Asked-Questions) and the
+[wiki](https://github.com/skypjack/entt/wiki) if you have these or other doubts,
+your answers may already be there.
 
 If you use `EnTT` and you want to say thanks or support the project, please
 **consider becoming a patron**:
