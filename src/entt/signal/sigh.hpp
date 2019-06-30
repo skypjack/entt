@@ -332,9 +332,7 @@ struct sink<Ret(Args...)> {
         auto &calls = parent->calls;
         delegate<Ret(Args...)> delegate{};
         delegate.template connect<Candidate>(value_or_instance);
-        calls.erase(std::remove_if(calls.begin(), calls.end(), [delegate](const auto &other) {
-            return other == delegate && other.instance() == delegate.instance();
-        }), calls.end());
+        calls.erase(std::remove(calls.begin(), calls.end(), std::move(delegate)), calls.end());
     }
 
     /**

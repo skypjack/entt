@@ -27,6 +27,4 @@
 
 TODO
 * registry::sort and registry::respect also for types that are part of a group (untracked items only)
-* remove collector from sigh and use it as a template parameter of sigh::collect
-* sink<F> receives and stores aside a ref to a sigh<F> (public constructor)
 * introduce connection<F> and scoped_connection<F>

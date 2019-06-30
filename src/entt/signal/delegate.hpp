@@ -245,16 +245,12 @@ public:
     }
 
     /**
-     * @brief Checks if the connected functions differ.
-     *
-     * Instances connected to delegates are ignored by this operator. Use the
-     * `instance` member function instead.
-     *
+     * @brief Compares the contents of two delegates.
      * @param other Delegate with which to compare.
-     * @return False if the connected functions differ, true otherwise.
+     * @return False if the two contents differ, true otherwise.
      */
     bool operator==(const delegate<Ret(Args...)> &other) const ENTT_NOEXCEPT {
-        return fn == other.fn;
+        return fn == other.fn && data == other.data;
     }
 
 private:
@@ -264,16 +260,12 @@ private:
 
 
 /**
- * @brief Checks if the connected functions differ.
- *
- * Instances connected to delegates are ignored by this operator. Use the
- * `instance` member function instead.
- *
+ * @brief Compares the contents of two delegates.
  * @tparam Ret Return type of a function type.
  * @tparam Args Types of arguments of a function type.
  * @param lhs A valid delegate object.
  * @param rhs A valid delegate object.
- * @return True if the connected functions differ, false otherwise.
+ * @return True if the two contents differ, false otherwise.
  */
 template<typename Ret, typename... Args>
 bool operator!=(const delegate<Ret(Args...)> &lhs, const delegate<Ret(Args...)> &rhs) ENTT_NOEXCEPT {
