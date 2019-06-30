@@ -8,6 +8,7 @@
 * [Introduction](#introduction)
 * [FAQ](#faq)
   * [Why is my debug build on Windows so slow?](#why-is-my-debug-build-on-windows-so-slow)
+  * [How can I represent hierarchies with my components?](#how-can-i-represent-hierarchies-with-my-components)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -53,3 +54,35 @@ the performance in some cases.
 With these changes, debug performance should increase enough for most cases. If
 you want something more, you can can also switch to an optimization level `O0`
 or preferably `O1`.
+
+## How can I represent hierarchies with my components?
+
+This is one of the first questions that anyone makes when starting to work with
+the entity-component-system architectural pattern.<br/>
+There are several approaches to the problem and what’s the best one depends
+mainly on the real problem one is facing. In all cases, how to do it doesn't
+strictly depend on the library in use, but the latter can certainly allow or
+not different techniques depending on how the data are laid out.
+
+I tried to describe some of the techniques that fit well with the model of
+`EnTT`. [Here](https://skypjack.github.io/2019-06-25-ecs-baf-part-4/) is the
+first post of a series that tries to explore the problem. More will probably
+come in future.
+
+Long story short, you can always define a tree where the nodes expose implicit
+lists of children by means of the following type:
+
+```cpp
+struct relationship {
+    std::size_t children{};
+    entt::entity first{entt::null};
+    entt::entity prev{entt::null};
+    entt::entity next{entt::null};
+    entt::entity parent{entt::null};
+    // ... other data members ...
+};
+```
+
+The sort functionalities of `EnTT`, the groups and all the other features of the
+library can help then to get the best in terms of data locality and therefore
+performance from this component.
