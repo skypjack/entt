@@ -190,6 +190,45 @@ TEST(SigH, CollectorVoid) {
     ASSERT_EQ(cnt, 1);
 }
 
+TEST(SigH, Connection) {
+    entt::sigh<void(int &)> sigh;
+    entt::sink sink{sigh};
+    int v = 0;
+
+    auto conn = sink.connect<&sigh_listener::f>();
+    sigh.publish(v);
+
+    ASSERT_FALSE(sigh.empty());
+    ASSERT_EQ(42, v);
+
+    v = 0;
+    conn.release();
+    sigh.publish(v);
+
+    ASSERT_TRUE(sigh.empty());
+    ASSERT_EQ(0, v);
+}
+
+TEST(SigH, ScopedConnection) {
+    entt::sigh<void(int &)> sigh;
+    entt::sink sink{sigh};
+    int v = 0;
+
+    {
+        entt::scoped_connection conn = sink.connect<&sigh_listener::f>();
+        sigh.publish(v);
+
+        ASSERT_FALSE(sigh.empty());
+        ASSERT_EQ(42, v);
+    }
+
+    v = 0;
+    sigh.publish(v);
+
+    ASSERT_TRUE(sigh.empty());
+    ASSERT_EQ(0, v);
+}
+
 TEST(SigH, ConstNonConstNoExcept) {
     entt::sigh<void()> sigh;
     entt::sink sink{sigh};

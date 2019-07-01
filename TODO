@@ -27,4 +27,4 @@
 
 TODO
 * registry::sort and registry::respect also for types that are part of a group (untracked items only)
-* introduce connection<F> and scoped_connection<F>
+* update documentation for delegate and sigh

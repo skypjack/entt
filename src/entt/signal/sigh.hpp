@@ -24,7 +24,7 @@ namespace entt {
  * @tparam Function A valid function type.
  */
 template<typename Function>
-struct sink;
+class sink;
 
 
 /**
@@ -57,7 +57,7 @@ class sigh;
 template<typename Ret, typename... Args>
 class sigh<Ret(Args...)> {
     /*! @brief A sink is allowed to modify a signal. */
-    friend struct sink<Ret(Args...)>;
+    friend class sink<Ret(Args...)>;
 
 public:
     /*! @brief Unsigned integer type. */
@@ -163,18 +163,31 @@ private:
 class connection {
     /*! @brief A sink is allowed to create connection objects. */
     template<typename>
-    friend struct sink;
+    friend class sink;
+
+    connection(delegate<void(void *)> fn, void *ref)
+        : disconnect{fn}, signal{ref}
+    {}
 
 public:
+    /*! @brief Default copy constructor. */
+    connection(const connection &) = default;
+    /*! @brief Default move constructor. */
+    connection(connection &&) = default;
+
+    /*! @brief Default copy assignment operator. @return This connection. */
+    connection & operator=(const connection &) = default;
+    /*! @brief Default move assignment operator. @return This connection. */
+    connection & operator=(connection &&) = default;
+
     /*! @brief Breaks the connection. */
     void release() {
-        disconnect(parent, value_or_instance);
+        disconnect(signal);
     }
 
 private:
-    void(* disconnect)(void *, const void *){};
-    const void *value_or_instance{};
-    void *parent{};
+    delegate<void(void *)> disconnect;
+    void *signal{};
 };
 
 
@@ -218,16 +231,26 @@ struct scoped_connection: private connection {
  * @tparam Args Types of arguments of a function type.
  */
 template<typename Ret, typename... Args>
-struct sink<Ret(Args...)> {
-    /*! @brief Signal type. */
+class sink<Ret(Args...)> {
     using signal_type = sigh<Ret(Args...)>;
 
+    template<auto Candidate, typename Type>
+    static void release(Type *value_or_instance, void *signal) {
+        sink{*static_cast<signal_type *>(signal)}.disconnect<Candidate>(value_or_instance);
+    }
+
+    template<auto Function>
+    static void release(void *signal) {
+        sink{*static_cast<signal_type *>(signal)}.disconnect<Function>();
+    }
+
+public:
     /**
      * @brief Constructs a sink that is allowed to modify a given signal.
      * @param ref A valid reference to a signal object.
      */
     sink(sigh<Ret(Args...)> &ref) ENTT_NOEXCEPT
-        : parent{&ref}
+        : signal{&ref}
     {}
 
     /**
@@ -235,7 +258,7 @@ struct sink<Ret(Args...)> {
      * @return True if the sink has no listeners connected, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
-        return parent->calls.empty();
+        return signal->calls.empty();
     }
 
     /**
@@ -250,19 +273,8 @@ struct sink<Ret(Args...)> {
     template<auto Function>
     connection connect() {
         disconnect<Function>();
-
-        delegate<Ret(Args...)> delegate{};
-        delegate.template connect<Function>();
-        parent->calls.emplace_back(std::move(delegate));
-
-        connection conn;
-        conn.parent = parent;
-        conn.value_or_instance = nullptr;
-        conn.disconnect = [](void *parent, const void *) {
-            sink{*static_cast<signal_type *>(parent)}.disconnect<Function>();
-        };
-
-        return conn;
+        signal->calls.emplace_back(delegate<Ret(Args...)>{connect_arg<Function>});
+        return { delegate<void(void *)>{connect_arg<&release<Function>>}, signal };
     }
 
     /**
@@ -285,27 +297,8 @@ struct sink<Ret(Args...)> {
     template<auto Candidate, typename Type>
     connection connect(Type *value_or_instance) {
         disconnect<Candidate>(value_or_instance);
-
-        delegate<Ret(Args...)> delegate{};
-        delegate.template connect<Candidate>(value_or_instance);
-        parent->calls.emplace_back(std::move(delegate));
-
-        connection conn;
-        conn.parent = parent;
-        conn.value_or_instance = value_or_instance;
-        conn.disconnect = [](void *parent, const void *value_or_instance) {
-            Type *curr = nullptr;
-
-            if constexpr(std::is_const_v<Type>) {
-                curr = static_cast<Type *>(value_or_instance);
-            } else {
-                curr = static_cast<Type *>(const_cast<void *>(value_or_instance));
-            }
-
-            sink{*static_cast<signal_type *>(parent)}.disconnect<Candidate>(curr);
-        };
-
-        return conn;
+        signal->calls.emplace_back(delegate<Ret(Args...)>{connect_arg<Candidate>, value_or_instance});
+        return { delegate<void(void *)>{connect_arg<&release<Candidate, Type>>, value_or_instance}, signal };
     }
 
     /**
@@ -314,7 +307,7 @@ struct sink<Ret(Args...)> {
      */
     template<auto Function>
     void disconnect() {
-        auto &calls = parent->calls;
+        auto &calls = signal->calls;
         delegate<Ret(Args...)> delegate{};
         delegate.template connect<Function>();
         calls.erase(std::remove(calls.begin(), calls.end(), std::move(delegate)), calls.end());
@@ -329,7 +322,7 @@ struct sink<Ret(Args...)> {
      */
     template<auto Candidate, typename Type>
     void disconnect(Type *value_or_instance) {
-        auto &calls = parent->calls;
+        auto &calls = signal->calls;
         delegate<Ret(Args...)> delegate{};
         delegate.template connect<Candidate>(value_or_instance);
         calls.erase(std::remove(calls.begin(), calls.end(), std::move(delegate)), calls.end());
@@ -341,7 +334,7 @@ struct sink<Ret(Args...)> {
      * @param value_or_instance A valid pointer that fits the purpose.
      */
     void disconnect(const void *value_or_instance) {
-        auto &calls = parent->calls;
+        auto &calls = signal->calls;
         calls.erase(std::remove_if(calls.begin(), calls.end(), [value_or_instance](const auto &delegate) {
             return value_or_instance == delegate.instance();
         }), calls.end());
@@ -349,11 +342,11 @@ struct sink<Ret(Args...)> {
 
     /*! @brief Disconnects all the listeners from a signal. */
     void disconnect() {
-        parent->calls.clear();
+        signal->calls.clear();
     }
 
 private:
-    signal_type *parent;
+    signal_type *signal;
 };
 
 
