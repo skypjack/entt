@@ -11,7 +11,7 @@ struct sigh_listener {
 
     void i() {}
     // useless definition just because msvc does weird things if both are empty
-    void l() { k = k*k; }
+    void l() { k = k && k; }
 
     bool k{false};
 };
