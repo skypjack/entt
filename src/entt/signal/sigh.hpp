@@ -273,8 +273,10 @@ public:
     template<auto Function>
     connection connect() {
         disconnect<Function>();
+        delegate<void(void *)> conn{};
+        conn.template connect<&release<Function>>();
         signal->calls.emplace_back(delegate<Ret(Args...)>{connect_arg<Function>});
-        return { delegate<void(void *)>{connect_arg<&release<Function>>}, signal };
+        return { std::move(conn), signal };
     }
 
     /**
@@ -297,8 +299,10 @@ public:
     template<auto Candidate, typename Type>
     connection connect(Type *value_or_instance) {
         disconnect<Candidate>(value_or_instance);
+        delegate<void(void *)> conn{};
+        conn.template connect<&sink::release<Candidate, Type>>(value_or_instance);
         signal->calls.emplace_back(delegate<Ret(Args...)>{connect_arg<Candidate>, value_or_instance});
-        return { delegate<void(void *)>{connect_arg<&release<Candidate, Type>>, value_or_instance}, signal };
+        return { std::move(conn), signal };
     }
 
     /**
