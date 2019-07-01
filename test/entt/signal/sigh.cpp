@@ -210,23 +210,24 @@ TEST(SigH, Connection) {
 }
 
 TEST(SigH, ScopedConnection) {
-    entt::sigh<void(int &)> sigh;
+    sigh_listener listener;
+    entt::sigh<void(int)> sigh;
     entt::sink sink{sigh};
-    int v = 0;
 
     {
-        entt::scoped_connection conn = sink.connect<&sigh_listener::f>();
-        sigh.publish(v);
+        ASSERT_FALSE(listener.k);
+
+        entt::scoped_connection conn = sink.connect<&sigh_listener::g>(&listener);
+        sigh.publish(42);
 
         ASSERT_FALSE(sigh.empty());
-        ASSERT_EQ(42, v);
+        ASSERT_TRUE(listener.k);
     }
 
-    v = 0;
-    sigh.publish(v);
+    sigh.publish(42);
 
     ASSERT_TRUE(sigh.empty());
-    ASSERT_EQ(0, v);
+    ASSERT_TRUE(listener.k);
 }
 
 TEST(SigH, ConstNonConstNoExcept) {
