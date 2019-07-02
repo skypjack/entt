@@ -32,6 +32,23 @@ struct const_nonconst_noexcept {
     mutable int cnt{0};
 };
 
+struct move_only_type {
+    move_only_type(move_only_type &&) = default;
+    move_only_type &operator=(move_only_type &&) = default;
+
+    int i;
+};
+
+move_only_type move_only_identity(move_only_type o) {
+    return o;
+}
+
+struct move_only_identity_functor {
+    move_only_type operator()(move_only_type o) {
+        return o;
+    }
+};
+
 TEST(Delegate, Functionalities) {
     entt::delegate<int(int)> ff_del;
     entt::delegate<int(int)> mf_del;
@@ -291,4 +308,22 @@ TEST(Delegate, TheLessTheBetter) {
     delegate.connect<&delegate_functor::operator()>(&functor);
 
     ASSERT_EQ(delegate(3, 'c'), 6);
+}
+
+TEST(Delegate, MoveOnly) {
+    move_only_identity_functor functor;
+    entt::delegate<move_only_type(move_only_type)> delegate;
+    delegate.connect<&move_only_identity>();
+
+    ASSERT_EQ(delegate(move_only_type{1}).i, 1);
+    ASSERT_EQ(delegate({2}).i, 2);
+    move_only_type o = delegate({3});
+    ASSERT_EQ(o.i, 3);
+
+    delegate.connect<&move_only_identity_functor::operator()>(&functor);
+
+    ASSERT_EQ(delegate(move_only_type{4}).i, 4);
+    ASSERT_EQ(delegate({5}).i, 5);
+    o = delegate({6});
+    ASSERT_EQ(o.i, 6);
 }
