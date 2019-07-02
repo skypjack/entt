@@ -1,3 +1,4 @@
+#include <memory>
 #include <gtest/gtest.h>
 #include <entt/signal/delegate.hpp>
 
@@ -7,6 +8,14 @@ int delegate_function(const int &i) {
 
 int curried_function(const int *i, int j) {
     return *i+j;
+}
+
+int non_const_reference(int &i) {
+    return i *= i;
+}
+
+int move_only_type(std::unique_ptr<int> ptr) {
+    return *ptr;
 }
 
 struct delegate_functor {
@@ -233,6 +242,24 @@ TEST(Delegate, ConstInstance) {
 
     ASSERT_FALSE(delegate);
     ASSERT_EQ(delegate, entt::delegate<int(int)>{});
+}
+
+TEST(Delegate, NonConstReference) {
+    entt::delegate<int(int &)> delegate;
+    delegate.connect<&non_const_reference>();
+    int value = 3;
+
+    ASSERT_EQ(delegate(value), value);
+    ASSERT_EQ(value, 9);
+}
+
+TEST(Delegate, MoveOnlyType) {
+    entt::delegate<int(std::unique_ptr<int>)> delegate;
+    auto ptr = std::make_unique<int>(3);
+    delegate.connect<&move_only_type>();
+
+    ASSERT_EQ(delegate(std::move(ptr)), 3);
+    ASSERT_FALSE(ptr);
 }
 
 TEST(Delegate, CurriedFunction) {

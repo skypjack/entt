@@ -101,16 +101,16 @@ class delegate;
  */
 template<typename Ret, typename... Args>
 class delegate<Ret(Args...)> {
-    using proto_fn_type = Ret(const void *, std::tuple<Args...>);
+    using proto_fn_type = Ret(const void *, std::tuple<Args &&...>);
 
     template<auto Function, std::size_t... Index>
     void connect(std::index_sequence<Index...>) ENTT_NOEXCEPT {
         data = nullptr;
 
-        fn = [](const void *, std::tuple<Args...> args) -> Ret {
+        fn = [](const void *, std::tuple<Args &&...> args) -> Ret {
+            // Ret(...) makes void(...) eat the return values to avoid errors
             static_assert(std::is_invocable_r_v<Ret, decltype(Function), std::tuple_element_t<Index, std::tuple<Args...>>...>);
-            // Ret(...) allows void(...) to eat return values and avoid errors
-            return Ret(std::invoke(Function, std::get<Index>(args)...));
+            return Ret(std::invoke(Function, std::forward<std::tuple_element_t<Index, std::tuple<Args...>>>(std::get<Index>(args))...));
         };
     }
 
@@ -118,7 +118,7 @@ class delegate<Ret(Args...)> {
     void connect(Type *value_or_instance, std::index_sequence<Index...>) ENTT_NOEXCEPT {
         data = value_or_instance;
 
-        fn = [](const void *payload, std::tuple<Args...> args) -> Ret {
+        fn = [](const void *payload, std::tuple<Args &&...> args) -> Ret {
             Type *curr = nullptr;
 
             if constexpr(std::is_const_v<Type>) {
@@ -127,9 +127,9 @@ class delegate<Ret(Args...)> {
                 curr = static_cast<Type *>(const_cast<void *>(payload));
             }
 
+            // Ret(...) makes void(...) eat the return values to avoid errors
             static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), Type *, std::tuple_element_t<Index, std::tuple<Args...>>...>);
-            // Ret(...) allows void(...) to eat return values and avoid errors
-            return Ret(std::invoke(Candidate, curr, std::get<Index>(args)...));
+            return Ret(std::invoke(Candidate, curr, std::forward<std::tuple_element_t<Index, std::tuple<Args...>>>(std::get<Index>(args))...));
         };
     }
 
@@ -232,7 +232,7 @@ public:
      */
     Ret operator()(Args... args) const {
         ENTT_ASSERT(fn);
-        return fn(data, std::forward_as_tuple(args...));
+        return fn(data, std::forward_as_tuple(std::forward<Args>(args)...));
     }
 
     /**
