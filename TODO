@@ -28,4 +28,3 @@
 
 TODO
 * registry::sort and registry::respect also for types that are part of a group (untracked items only)
-* update documentation for delegate and sigh

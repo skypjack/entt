@@ -417,6 +417,12 @@ should be kept to a minimum, if possible. Note also that the greater the number
 of listeners, the greater the performance hit when components are created or
 destroyed.
 
+Please, refer to the documentation of the signal class to know all the features
+it offers.<br/>
+There are many useful but less known functionalities that aren't described here,
+such as the connection objects or the possibility to attach listeners with a
+list of parameters that is shorter than that of the signal itself.
+
 ### They call me Reactive System
 
 As mentioned above, signals are the basic tools to construct reactive systems,
