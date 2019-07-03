@@ -228,6 +228,34 @@ To collect data, the `collect` member function should be used instead. Below is
 a minimal example to show how to use it:
 
 ```cpp
+int f() { return 0; }
+int g() { return 1; }
+
+// ...
+
+entt::sigh<int()> signal;
+entt::sink sink{signal};
+
+sink.connect<&f>();
+sink.connect<&g>();
+
+std::vector<int> vec{};
+signal.collect([&vec](int value) { vec.push_back(value); });
+
+assert(vec[0] == 0);
+assert(vec[1] == 1);
+```
+
+A collector must expose a function operator that accepts as an argument a type
+to which the return type of the listeners can be converted. Moreover, it can
+optionally return a boolean value that is true to stop collecting data, false
+otherwise. This way one can avoid calling all the listeners in case it isn't
+necessary.<br/>
+Functors can also be used in place of a lambda. Since the collector is copied
+when invoking the `collect` member function, `std::ref` is the way to go in this
+case:
+
+```cpp
 struct my_collector {
     std::vector<int> vec{};
 
@@ -237,29 +265,11 @@ struct my_collector {
     }
 };
 
-int f() { return 0; }
-int g() { return 1; }
-
 // ...
 
-entt::sigh<int(), my_collector<int>> signal;
-entt::sink sink{sigh};
-
-sink.connect<&f>();
-sink.connect<&g>();
-
-std::vector<int> vec{};
-my_collector collector = signal.collect([&vec](int value) { vec.push_back(value); });
-
-assert(collector.vec[0] == 0);
-assert(collector.vec[1] == 1);
+my_collector collector;
+signal.collect(std::ref(collector));
 ```
-
-A collector must expose a function operator that accepts as an argument a type
-to which the return type of the listeners can be converted. Moreover, it can
-optionally return a boolean value that is true to stop collecting data, false
-otherwise. This way one can avoid calling all the listeners in case it isn't
-necessary.
 
 # Event dispatcher
 
