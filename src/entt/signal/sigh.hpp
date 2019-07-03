@@ -138,16 +138,6 @@ public:
         }
     }
 
-    /**
-     * @brief Swaps listeners between the two signals.
-     * @param lhs A valid signal object.
-     * @param rhs A valid signal object.
-     */
-    friend void swap(sigh &lhs, sigh &rhs) {
-        using std::swap;
-        swap(lhs.calls, rhs.calls);
-    }
-
 private:
     std::vector<delegate<Ret(Args...)>> calls;
 };

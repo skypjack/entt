@@ -645,8 +645,6 @@ public:
      * @param rhs A valid meta any object.
      */
     friend void swap(meta_any &lhs, meta_any &rhs) ENTT_NOEXCEPT {
-        using std::swap;
-
         if(lhs && rhs) {
             storage_type buffer;
             void *instance = lhs.steal_fn(buffer, lhs.storage, lhs.destroy_fn, lhs.instance);
