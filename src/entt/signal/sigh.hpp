@@ -160,19 +160,55 @@ class connection {
     {}
 
 public:
+    /*! Default constructor. */
+    connection() = default;
+
     /*! @brief Default copy constructor. */
     connection(const connection &) = default;
-    /*! @brief Default move constructor. */
-    connection(connection &&) = default;
+
+    /**
+     * @brief Default move constructor.
+     * @param other The instance to move from.
+     */
+    connection(connection &&other)
+        : connection{}
+    {
+        std::swap(disconnect, other.disconnect);
+        std::swap(signal, other.signal);
+    }
 
     /*! @brief Default copy assignment operator. @return This connection. */
     connection & operator=(const connection &) = default;
-    /*! @brief Default move assignment operator. @return This connection. */
-    connection & operator=(connection &&) = default;
+
+    /**
+     * @brief Default move assignment operator.
+     * @param other The instance to move from.
+     * @return This connection.
+     */
+    connection & operator=(connection &&other) {
+        if(this != &other) {
+            auto tmp{std::move(other)};
+            disconnect = tmp.disconnect;
+            signal = tmp.signal;
+        }
+
+        return *this;
+    }
+
+    /**
+     * @brief Checks whether a connection is properly initialized.
+     * @return True if the connection is properly initialized, false otherwise.
+     */
+    explicit operator bool() const ENTT_NOEXCEPT {
+        return static_cast<bool>(disconnect);
+    }
 
     /*! @brief Breaks the connection. */
     void release() {
-        disconnect(signal);
+        if(disconnect) {
+            disconnect(signal);
+            disconnect.reset();
+        }
     }
 
 private:
@@ -191,6 +227,9 @@ private:
  * when it goes out of scope.
  */
 struct scoped_connection: private connection {
+    /*! Default constructor. */
+    scoped_connection() = default;
+
     /**
      * @brief Constructs a scoped connection from a basic connection.
      * @param conn A valid connection object.
@@ -199,10 +238,51 @@ struct scoped_connection: private connection {
         : connection{conn}
     {}
 
+    /*! @brief Default copy constructor, deleted on purpose. */
+    scoped_connection(const scoped_connection &) = delete;
+
+    /*! @brief Default move constructor. */
+    scoped_connection(scoped_connection &&) = default;
+
     /*! @brief Automatically breaks the link on destruction. */
     ~scoped_connection() {
         connection::release();
     }
+
+    /**
+     * @brief Default copy assignment operator, deleted on purpose.
+     * @return This scoped connection.
+     */
+    scoped_connection & operator=(const scoped_connection &) = delete;
+
+    /**
+     * @brief Default move assignment operator.
+     * @return This scoped connection.
+     */
+    scoped_connection & operator=(scoped_connection &&) = default;
+
+    /**
+     * @brief Copies a connection.
+     * @param other The connection object to copy.
+     * @return This scoped connection.
+     */
+    scoped_connection & operator=(const connection &other) {
+        static_cast<connection &>(*this) = other;
+        return *this;
+    }
+
+    /**
+     * @brief Moves a connection.
+     * @param other The connection object to move.
+     * @return This scoped connection.
+     */
+    scoped_connection & operator=(connection &&other) {
+        static_cast<connection &>(*this) = std::move(other);
+        return *this;
+    }
+
+    using connection::operator bool;
+    using connection::release;
 };
 
 

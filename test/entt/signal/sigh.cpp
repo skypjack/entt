@@ -199,6 +199,7 @@ TEST(SigH, Connection) {
     sigh.publish(v);
 
     ASSERT_FALSE(sigh.empty());
+    ASSERT_TRUE(conn);
     ASSERT_EQ(42, v);
 
     v = 0;
@@ -206,6 +207,7 @@ TEST(SigH, Connection) {
     sigh.publish(v);
 
     ASSERT_TRUE(sigh.empty());
+    ASSERT_FALSE(conn);
     ASSERT_EQ(0, v);
 }
 
@@ -222,8 +224,42 @@ TEST(SigH, ScopedConnection) {
 
         ASSERT_FALSE(sigh.empty());
         ASSERT_TRUE(listener.k);
+        ASSERT_TRUE(conn);
     }
 
+    sigh.publish(42);
+
+    ASSERT_TRUE(sigh.empty());
+    ASSERT_TRUE(listener.k);
+}
+
+TEST(SigH, ScopedConnectionConstructorsAndOperators) {
+    sigh_listener listener;
+    entt::sigh<void(int)> sigh;
+    entt::sink sink{sigh};
+    entt::scoped_connection conn;
+
+    {
+        ASSERT_FALSE(listener.k);
+        ASSERT_FALSE(conn);
+
+        auto basic = sink.connect<&sigh_listener::g>(&listener);
+        entt::scoped_connection inner = std::move(basic);
+        sigh.publish(42);
+
+        ASSERT_FALSE(sigh.empty());
+        ASSERT_TRUE(listener.k);
+        ASSERT_TRUE(inner);
+
+        conn = std::move(inner);
+
+        ASSERT_FALSE(inner);
+        ASSERT_TRUE(conn);
+    }
+
+    ASSERT_TRUE(conn);
+
+    conn.release();
     sigh.publish(42);
 
     ASSERT_TRUE(sigh.empty());
