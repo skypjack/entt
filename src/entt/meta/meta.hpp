@@ -303,73 +303,109 @@ class meta_any {
     friend class meta_handle;
 
     using storage_type = std::aligned_storage_t<sizeof(void *), alignof(void *)>;
-    using compare_fn_type = bool(const void *, const void *) ENTT_NOEXCEPT;
+    using compare_fn_type = bool(const void *, const void *);
     using copy_fn_type = void *(storage_type &, const void *);
     using destroy_fn_type = void(storage_type &);
-    using steal_fn_type = void *(storage_type &, storage_type &, destroy_fn_type *, void *)  ENTT_NOEXCEPT;
+    using steal_fn_type = void *(storage_type &, storage_type &, destroy_fn_type *, void *) ENTT_NOEXCEPT;
+
+    template<typename Type, typename = std::void_t<>>
+    struct type_traits {
+        using chunk_type = std::aligned_storage_t<sizeof(Type), alignof(Type)>;
+
+        template<typename... Args>
+        static void * instance(storage_type &storage, Args &&... args) {
+            auto chunk = std::make_unique<chunk_type>();
+            auto *instance = new (chunk.get()) Type{std::forward<Args>(args)...};
+            new (&storage) chunk_type *{chunk.get()};
+            chunk.release();
+            return instance;
+        }
+
+        static void destroy(storage_type &storage) {
+            auto *node = internal::meta_info<Type>::resolve();
+            auto *chunk = *reinterpret_cast<chunk_type **>(&storage);
+            auto *instance = reinterpret_cast<Type *>(chunk);
+            node->dtor ? node->dtor->invoke(*instance) : node->destroy(*instance);
+            delete chunk;
+        }
+
+        static void * copy(storage_type &storage, const void *instance) {
+            auto chunk = std::make_unique<chunk_type>();
+            new (&storage) chunk_type *{chunk.get()};
+            auto *other = new (chunk.get()) Type{*static_cast<const Type *>(instance)};
+            chunk.release();
+            return other;
+        }
+
+        static void * steal(storage_type &to, storage_type &from, destroy_fn_type *, void *instance) ENTT_NOEXCEPT {
+            auto *chunk = *reinterpret_cast<chunk_type **>(&from);
+            new (&to) chunk_type *{chunk};
+            chunk->~chunk_type();
+            return instance;
+        }
+
+        static bool compare(const void *lhs, const void *rhs) {
+            return meta_any::compare(0, *static_cast<const Type *>(lhs), *static_cast<const Type *>(rhs));
+        }
+    };
 
     template<typename Type>
-    static auto compare(int, const Type &lhs, const Type &rhs) ENTT_NOEXCEPT
-    -> decltype(lhs == rhs, bool{}) {
+    struct type_traits<Type, std::enable_if_t<std::is_void_v<Type>>> {
+        static void * instance(storage_type &) {
+            return nullptr;
+        }
+
+        static void destroy(storage_type &) {}
+
+        static void * copy(storage_type &, const void *) {
+            return nullptr;
+        }
+
+        static void * steal(storage_type &, storage_type &, destroy_fn_type *, void *) ENTT_NOEXCEPT {
+            return nullptr;
+        }
+
+        static bool compare(const void *, const void *) {
+            return true;
+        }
+    };
+
+    template<typename Type>
+    struct type_traits<Type, std::enable_if_t<sizeof(Type) <= sizeof(void *) && std::is_nothrow_move_constructible_v<Type>>> {
+        template<typename... Args>
+        static void * instance(storage_type &storage, Args &&... args) {
+            return new (&storage) Type{std::forward<Args>(args)...};
+        }
+
+        static void destroy(storage_type &storage) {
+            auto *node = internal::meta_info<Type>::resolve();
+            auto *instance = reinterpret_cast<Type *>(&storage);
+            node->dtor ? node->dtor->invoke(*instance) : node->destroy(*instance);
+        }
+
+        static void * copy(storage_type &storage, const void *instance) {
+            return new (&storage) Type{*static_cast<const Type *>(instance)};
+        }
+
+        static void * steal(storage_type &to, storage_type &from, destroy_fn_type *destroy_fn, void *) ENTT_NOEXCEPT {
+            void *instance = new (&to) Type{std::move(*reinterpret_cast<Type *>(&from))};
+            destroy_fn(from);
+            return instance;
+        }
+
+        static bool compare(const void *lhs, const void *rhs) {
+            return meta_any::compare(0, *static_cast<const Type *>(lhs), *static_cast<const Type *>(rhs));
+        }
+    };
+
+    template<typename Type>
+    static auto compare(int, const Type &lhs, const Type &rhs) -> decltype(lhs == rhs, bool{}) {
         return lhs == rhs;
     }
 
     template<typename Type>
-    static bool compare(char, const Type &lhs, const Type &rhs) ENTT_NOEXCEPT {
+    static bool compare(char, const Type &lhs, const Type &rhs) {
         return &lhs == &rhs;
-    }
-
-    template<typename Type>
-    static bool compare(const void *lhs, const void *rhs) ENTT_NOEXCEPT {
-        return compare(0, *static_cast<const Type *>(lhs), *static_cast<const Type *>(rhs));
-    }
-
-    template<typename Type>
-    static void * copy_storage(storage_type &storage, const void *instance) {
-        return new (&storage) Type{*static_cast<const Type *>(instance)};
-    }
-
-    template<typename Type>
-    static void * copy_object(storage_type &storage, const void *instance) {
-        using chunk_type = std::aligned_storage_t<sizeof(Type), alignof(Type)>;
-        auto chunk = std::make_unique<chunk_type>();
-        new (&storage) chunk_type *{chunk.get()};
-        auto *other = new (chunk.get()) Type{*static_cast<const Type *>(instance)};
-        chunk.release();
-        return other;
-    }
-
-    template<typename Type>
-    static void * steal_storage(storage_type &to, storage_type &from, destroy_fn_type *destroy_fn, void *) noexcept {
-        void *instance = new (&to) Type{std::move(*reinterpret_cast<Type *>(&from))};
-        destroy_fn(from);
-        return instance;
-    }
-
-    template<typename Type>
-    static void * steal_object(storage_type &to, storage_type &from, destroy_fn_type *, void *instance) noexcept {
-        using chunk_type = std::aligned_storage_t<sizeof(Type), alignof(Type)>;
-        auto *chunk = *reinterpret_cast<chunk_type **>(&from);
-        new (&to) chunk_type *{chunk};
-        chunk->~chunk_type();
-        return instance;
-    }
-
-    template<typename Type>
-    static void destroy_storage(storage_type &storage) {
-        auto *node = internal::meta_info<Type>::resolve();
-        auto *instance = reinterpret_cast<Type *>(&storage);
-        node->dtor ? node->dtor->invoke(*instance) : node->destroy(*instance);
-    }
-
-    template<typename Type>
-    static void destroy_object(storage_type &storage) {
-        using chunk_type = std::aligned_storage_t<sizeof(Type), alignof(Type)>;
-        auto *node = internal::meta_info<Type>::resolve();
-        auto *chunk = *reinterpret_cast<chunk_type **>(&storage);
-        auto *instance = reinterpret_cast<Type *>(chunk);
-        node->dtor ? node->dtor->invoke(*instance) : node->destroy(*instance);
-        delete chunk;
     }
 
 public:
@@ -401,30 +437,14 @@ public:
     template<typename Type, typename... Args>
     meta_any(std::in_place_type_t<Type>, Args &&... args) {
         using actual_type = std::remove_cv_t<std::remove_reference_t<Type>>;
+        using traits_type = type_traits<actual_type>;
+
         node = internal::meta_info<Type>::resolve();
-
-        compare_fn = &compare<actual_type>;
-
-        constexpr auto sbo_allowed = sizeof(actual_type) <= sizeof(void *)
-                && std::is_nothrow_move_constructible_v<actual_type>;
-
-        if constexpr(sbo_allowed) {
-            instance = new (&storage) actual_type{std::forward<Args>(args)...};
-            destroy_fn = &destroy_storage<actual_type>;
-            copy_fn = &copy_storage<actual_type>;
-            steal_fn = &steal_storage<actual_type>;
-        } else {
-            using chunk_type = std::aligned_storage_t<sizeof(actual_type), alignof(actual_type)>;
-
-            auto chunk = std::make_unique<chunk_type>();
-            instance = new (chunk.get()) actual_type{std::forward<Args>(args)...};
-            new (&storage) chunk_type *{chunk.get()};
-            chunk.release();
-
-            destroy_fn = &destroy_object<actual_type>;
-            copy_fn = &copy_object<actual_type>;
-            steal_fn = &steal_object<actual_type>;
-        }
+        instance = traits_type::instance(storage, std::forward<Args>(args)...);
+        destroy_fn = &traits_type::destroy;
+        copy_fn = &traits_type::copy;
+        steal_fn = &traits_type::steal;
+        compare_fn = &traits_type::compare;
     }
 
     /**
@@ -622,7 +642,7 @@ public:
      * @return False if the container is empty, true otherwise.
      */
     explicit operator bool() const ENTT_NOEXCEPT {
-        return instance;
+        return destroy_fn;
     }
 
     /**
@@ -632,7 +652,7 @@ public:
      * otherwise.
      */
     bool operator==(const meta_any &other) const ENTT_NOEXCEPT {
-        return (!instance && !other.instance) || (instance && other.instance && node == other.node && compare_fn(instance, other.instance));
+        return (!compare_fn && !other.compare_fn) || (compare_fn && other.compare_fn && node == other.node && compare_fn(instance, other.instance));
     }
 
     /**
