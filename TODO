@@ -28,3 +28,4 @@
 
 TODO
 * registry::sort and registry::respect also for types that are part of a group (untracked items only)
+* review group::sort, rely on storage::sort and storage::respect

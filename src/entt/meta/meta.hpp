@@ -569,10 +569,9 @@ public:
      */
     template<typename Type>
     meta_any convert() const {
-        const auto *type = internal::meta_info<Type>::resolve();
         meta_any any{};
 
-        if(node == type) {
+        if(const auto *type = internal::meta_info<Type>::resolve(); node == type) {
             any = *static_cast<const Type *>(instance);
         } else {
             const auto *conv = internal::find_if<&internal::meta_type_node::conv>([type](auto *other) {
@@ -597,10 +596,8 @@ public:
         bool valid = (node == internal::meta_info<Type>::resolve());
 
         if(!valid) {
-            auto any = std::as_const(*this).convert<Type>();
-
-            if(any) {
-                std::swap(any, *this);
+            if(auto any = std::as_const(*this).convert<Type>(); any) {
+                swap(any, *this);
                 valid = true;
             }
         }
@@ -617,7 +614,6 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args&& ... args) {
-        [[maybe_unused]] meta_any other{std::move(*this)};
         *this = meta_any{std::in_place_type_t<Type>{}, std::forward<Args>(args)...};
     }
 
