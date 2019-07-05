@@ -243,12 +243,25 @@ TEST(SigH, ScopedConnectionConstructorsAndOperators) {
         ASSERT_FALSE(listener.k);
         ASSERT_FALSE(conn);
 
-        auto basic = sink.connect<&sigh_listener::g>(&listener);
-        entt::scoped_connection inner = std::move(basic);
+        entt::scoped_connection inner{};
+        inner = sink.connect<&sigh_listener::g>(&listener);
         sigh.publish(42);
 
         ASSERT_FALSE(sigh.empty());
         ASSERT_TRUE(listener.k);
+        ASSERT_TRUE(inner);
+
+        inner.release();
+
+        ASSERT_TRUE(sigh.empty());
+        ASSERT_FALSE(inner);
+
+        auto basic = sink.connect<&sigh_listener::g>(&listener);
+        inner = std::as_const(basic);
+        sigh.publish(42);
+
+        ASSERT_FALSE(sigh.empty());
+        ASSERT_FALSE(listener.k);
         ASSERT_TRUE(inner);
 
         conn = std::move(inner);
@@ -263,7 +276,7 @@ TEST(SigH, ScopedConnectionConstructorsAndOperators) {
     sigh.publish(42);
 
     ASSERT_TRUE(sigh.empty());
-    ASSERT_TRUE(listener.k);
+    ASSERT_FALSE(listener.k);
 }
 
 TEST(SigH, ConstNonConstNoExcept) {
