@@ -2269,6 +2269,7 @@ invoke(const meta_handle &, meta_any *args, std::index_sequence<Indexes...>) {
     {
         if constexpr(std::is_void_v<typename helper_type::return_type>) {
             std::invoke(Func, (args+Indexes)->cast<typename helper_type::template arg_type<Indexes>>()...);
+            any.emplace<void>();
         } else {
             any = meta_any{std::invoke(Func, (args+Indexes)->cast<typename helper_type::template arg_type<Indexes>>()...)};
         }
@@ -2291,6 +2292,7 @@ invoke(meta_handle &handle, meta_any *args, std::index_sequence<Indexes...>) {
     {
         if constexpr(std::is_void_v<typename helper_type::return_type>) {
             std::invoke(Member, clazz, (args+Indexes)->cast<typename helper_type::template arg_type<Indexes>>()...);
+            any.emplace<void>();
         } else {
             any = meta_any{std::invoke(Member, clazz, (args+Indexes)->cast<typename helper_type::template arg_type<Indexes>>()...)};
         }

@@ -1373,7 +1373,8 @@ TEST_F(Meta, MetaFuncRetVoid) {
 
     auto any = func.invoke(instance, 5);
 
-    ASSERT_FALSE(any);
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(any.can_cast<void>());
     ASSERT_EQ(func_type::value, 25);
 
     func.prop([](auto prop) {
@@ -1442,7 +1443,8 @@ TEST_F(Meta, MetaFuncStaticRetVoid) {
 
     auto any = func.invoke({}, 42);
 
-    ASSERT_FALSE(any);
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(any.can_cast<void>());
     ASSERT_EQ(func_type::value, 42);
 
     func.prop([](auto *prop) {
