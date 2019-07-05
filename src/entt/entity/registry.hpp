@@ -200,7 +200,7 @@ class basic_registry {
     struct pool_data {
         std::unique_ptr<sparse_set<Entity>> pool;
         std::unique_ptr<sparse_set<Entity>> (* clone)(const sparse_set<Entity> &);
-        delegate<void(basic_registry &, const Entity)> remove;
+        void (* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
         ENTT_ID_TYPE runtime_type;
     };
 
@@ -280,7 +280,10 @@ class basic_registry {
         if(!pdata->pool) {
             pdata->runtime_type = ctype;
             pdata->pool = std::make_unique<pool_type<Component>>();
-            pdata->remove.template connect<&pool_type<Component>::remove>(static_cast<pool_type<Component> *>(pdata->pool.get()));
+
+            pdata->remove = [](sparse_set<Entity> &other, basic_registry &registry, const Entity entt) {
+                static_cast<pool_type<Component> &>(other).remove(registry, entt);
+            };
 
             pdata->clone = [](const sparse_set<Entity> &other) -> std::unique_ptr<sparse_set<Entity>> {
                 if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
@@ -644,7 +647,7 @@ public:
 
         for(auto pos = pools.size(); pos; --pos) {
             if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->has(entity)) {
-                pdata.remove(*this, entity);
+                pdata.remove(*pdata.pool, *this, entity);
             }
         };
 
@@ -1468,7 +1471,8 @@ public:
             if(auto &pdata = pools[pos-1]; pdata.pool && (!sizeof...(Component) || ... || (pdata.runtime_type == type<Component>()))) {
                 auto &curr = other.pools[pos-1];
                 curr.clone = pdata.clone;
-                curr.pool = curr.clone(*pdata.pool);
+                curr.remove = pdata.remove;
+                curr.pool = pdata.clone(*pdata.pool);
                 curr.runtime_type = pdata.runtime_type;
                 ENTT_ASSERT(sizeof...(Component) == 0 || curr.pool);
             }

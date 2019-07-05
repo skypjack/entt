@@ -1303,6 +1303,9 @@ TEST(Registry, Clone) {
 
     ASSERT_TRUE(other.orphan(e0));
     ASSERT_EQ(other.get<char>(e2), '2');
+
+    // the remove erased function must be available after cloning
+    other.reset();
 }
 
 TEST(Registry, CloneMoveOnlyComponent) {
