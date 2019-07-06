@@ -289,7 +289,6 @@ The meta objects that compose a meta type are accessed in the following ways:
   function object can be used to invoke the underlying function and then get the
   return value in the form of meta any object.
 
-
 * _Meta bases_. They are accessed through the _name_ of the base types:
 
   ```cpp
