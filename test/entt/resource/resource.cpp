@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/resource/cache.hpp>
-#include <entt/config/config.h>
 
 struct resource { int value; };
 
@@ -63,7 +62,7 @@ TEST(Resource, Functionalities) {
     ASSERT_TRUE(cache.contains(hs2));
     ASSERT_EQ((*cache.handle(hs1)).value, 43);
     ASSERT_EQ(cache.handle(hs2)->value, 43);
-    cache.each([&](ENTT_ID_TYPE id) {
+    cache.each([&cache](entt::resource_cache<resource>::resource_type id) {
         ASSERT_TRUE(cache.contains(id));
     });
 

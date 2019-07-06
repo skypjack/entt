@@ -206,7 +206,7 @@ public:
     template <typename Func> 
     void each(Func func) {
         for (const auto& pair : resources) {
-            if constexpr (std::is_invocable_v<Func, ENTT_ID_TYPE>) {
+            if constexpr (std::is_invocable_v<Func, resource_type>) {
                 func(pair.first);
             }
             else if constexpr (std::is_invocable_v<Func, resource_handle<Resource>>) {
