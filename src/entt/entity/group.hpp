@@ -817,9 +817,7 @@ public:
             auto next = copy[curr];
 
             while(curr != next) {
-                const auto lhs = copy[curr];
-                const auto rhs = copy[next];
-                (std::get<pool_type<Owned> *>(pools)->swap(lhs, rhs), ...);
+                (std::get<pool_type<Owned> *>(pools)->swap(copy[curr], copy[next]), ...);
                 copy[curr] = curr;
                 curr = next;
                 next = copy[curr];

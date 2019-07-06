@@ -459,10 +459,7 @@ public:
             auto next = copy[curr];
 
             while(curr != next) {
-                const auto lhs = copy[curr];
-                const auto rhs = copy[next];
-                std::swap(instances[lhs], instances[rhs]);
-                underlying_type::swap(lhs, rhs);
+                swap(copy[curr], copy[next]);
                 copy[curr] = curr;
                 curr = next;
                 next = copy[curr];
@@ -504,9 +501,7 @@ public:
 
             if(underlying_type::has(curr)) {
                 if(curr != *(local + pos)) {
-                    auto candidate = underlying_type::get(curr);
-                    std::swap(instances[pos], instances[candidate]);
-                    underlying_type::swap(pos, candidate);
+                    swap(pos, underlying_type::get(curr));
                 }
 
                 --pos;
