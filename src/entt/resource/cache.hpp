@@ -195,6 +195,29 @@ public:
         }
     }
 
+    /**
+     * @brief Iterates all resources.
+     *
+     * The function object is invoked for each resource.<br/>
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template <typename Func> 
+    void each(Func func) {
+        for (const auto& pair : resources) {
+            if constexpr (std::is_invocable_v<Func, ENTT_ID_TYPE>) {
+                func(pair.first);
+            }
+            else if constexpr (std::is_invocable_v<Func, resource_handle<Resource>>) {
+                func(resource_handle{ pair.second });
+            }
+            else {
+                func(pair.first, resource_handle{ pair.second });
+            }
+        }
+    }
+
 private:
     container_type resources;
 };
