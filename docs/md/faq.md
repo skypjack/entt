@@ -9,6 +9,7 @@
 * [FAQ](#faq)
   * [Why is my debug build on Windows so slow?](#why-is-my-debug-build-on-windows-so-slow)
   * [How can I represent hierarchies with my components?](#how-can-i-represent-hierarchies-with-my-components)
+  * [Custom entity identifiers: yay or nay?](#custom-entity-identifiers-yay-or-nay)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -86,3 +87,27 @@ struct relationship {
 The sort functionalities of `EnTT`, the groups and all the other features of the
 library can help then to get the best in terms of data locality and therefore
 performance from this component.
+
+## Custom entity identifiers: yay or nay?
+
+Custom entity identifiers are definitely a good idea in two cases at least:
+
+* If `std::uint32_t` isn't large enough as an underlying type.
+* If you want to avoid conflicts when using multiple registries.
+
+These identifiers are nothing more than enum classes with some salt.<br/>
+To simplify the creation of new identifiers, `EnTT` provides the macro
+`ENTT_ENTITY_TYPE` that accepts two arguments:
+
+* The name you want to give to the new identifier (watch out for namespaces).
+* The underlying type to use (either `std::uint16_t`, `std::uint32_t`
+  or `std::uint64_t`).
+
+In fact, this is the definition of `entt::entity`:
+
+```cpp
+ENTT_ENTITY_TYPE(entity, std::uint32_t)
+```
+
+The use of this macro is highly recommended, so as not to run into problems if
+the requirements for the identifiers should change in the future.
