@@ -475,7 +475,7 @@ public:
      *
      * Entities that are part of both the sparse sets are ordered internally
      * according to the order they have in `other`. All the other entities goes
-     * to the end of the list and there are no guarantess on their order.<br/>
+     * to the end of the list and there are no guarantees on their order.<br/>
      * In other terms, this function can be used to impose the same order on two
      * sets by using one of them as a master and the other one as a slave.
      *
