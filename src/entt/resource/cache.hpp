@@ -195,6 +195,41 @@ public:
         }
     }
 
+    /**
+     * @brief Iterates all resources.
+     *
+     * The function object is invoked for each element. It is provided with
+     * either the resource identifier, the resource handle or both of them.<br/>
+     * The signature of the function must be equivalent to one of the following
+     * forms:
+     *
+     * @code{.cpp}
+     * void(const resource_type);
+     * void(resource_handle<Resource>);
+     * void(const resource_type, resource_handle<Resource>);
+     * @endcode
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template <typename Func>
+    void each(Func func) const {
+        auto begin = resources.begin();
+        auto end = resources.end();
+
+        while(begin != end) {
+            auto curr = begin++;
+
+            if constexpr(std::is_invocable_v<Func, resource_type>) {
+                func(curr->first);
+            } else if constexpr(std::is_invocable_v<Func, resource_handle<Resource>>) {
+                func(resource_handle{ curr->second });
+            } else {
+                func(curr->first, resource_handle{ curr->second });
+            }
+        }
+    }
+
 private:
     container_type resources;
 };

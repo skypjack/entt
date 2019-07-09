@@ -108,3 +108,29 @@ TEST(Resource, MutableHandle) {
 
     ASSERT_EQ(cache.handle(hs)->value, 4);
 }
+
+TEST(Resource, Each) {
+    entt::resource_cache<resource> cache;
+    cache.load<loader>("resource"_hs, 0);
+
+    cache.each([](entt::resource_handle<resource> res) {
+        ++res->value;
+    });
+
+    ASSERT_FALSE(cache.empty());
+    ASSERT_EQ(cache.handle("resource"_hs)->value, 1);
+
+    cache.each([](auto id, auto res) {
+        ASSERT_EQ(id, "resource"_hs);
+        ++res->value;
+    });
+
+    ASSERT_FALSE(cache.empty());
+    ASSERT_EQ(cache.handle("resource"_hs)->value, 2);
+
+    cache.each([&cache](entt::resource_cache<resource>::resource_type id) {
+        cache.discard(id);
+    });
+
+    ASSERT_TRUE(cache.empty());
+}
