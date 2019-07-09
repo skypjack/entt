@@ -388,7 +388,7 @@ public:
      * @param lhs A valid position within the sparse set.
      * @param rhs A valid position within the sparse set.
      */
-    void swap(const size_type lhs, const size_type rhs) ENTT_NOEXCEPT {
+    void swap(const size_type lhs, const size_type rhs) ENTT_NOEXCEPT override {
         ENTT_ASSERT(lhs < instances.size());
         ENTT_ASSERT(rhs < instances.size());
         std::swap(instances[lhs], instances[rhs]);
@@ -396,11 +396,11 @@ public:
     }
 
     /**
-     * @brief Sort instances according to the given comparison function.
+     * @brief Sort elements according to the given comparison function.
      *
-     * Sort the elements so that iterating the storage with a couple of
-     * iterators returns them in the expected order. See `begin` and `end` for
-     * more details.
+     * Sort the elements so that iterating the range with a couple of iterators
+     * returns them in the expected order. See `begin` and `end` for more
+     * details.
      *
      * The comparison function object must return `true` if the first element
      * is _less_ than the second one, `false` otherwise. The signature of the
@@ -433,14 +433,18 @@ public:
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
+     * @param first An iterator to the first element of the range to sort.
+     * @param last An iterator past the last element of the range to sort.
      * @param compare A valid comparison function object.
      * @param algo A valid sort function object.
      * @param args Arguments to forward to the sort function object, if any.
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
-    void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
-        std::vector<size_type> copy(instances.size());
-        std::iota(copy.begin(), copy.end(), 0);
+    void sort(iterator_type first, iterator_type last, Compare compare, Sort algo = Sort{}, Args &&... args) {
+        ENTT_ASSERT(!(first > last));
+
+        std::vector<size_type> copy(last - first);
+        std::iota(copy.begin(), copy.end(), std::distance(last, end()));
 
         if constexpr(std::is_invocable_v<Compare, const object_type &, const object_type &>) {
             static_assert(!std::is_empty_v<object_type>);
@@ -450,11 +454,11 @@ public:
             }, std::forward<Args>(args)...);
         } else {
             algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), data = underlying_type::data()](const auto lhs, const auto rhs) {
-                return compare(data[lhs], data[rhs]);
+                return compare(std::as_const(data[lhs]), std::as_const(data[rhs]));
             }, std::forward<Args>(args)...);
         }
 
-        for(size_type pos{}, last = copy.size(); pos < last; ++pos) {
+        for(size_type pos{}, length = copy.size(); pos < length; ++pos) {
             auto curr = pos;
             auto next = copy[curr];
 
@@ -464,50 +468,6 @@ public:
                 curr = next;
                 next = copy[curr];
             }
-        }
-    }
-
-    /**
-     * @brief Sort instances according to the order of the entities in another
-     * sparse set.
-     *
-     * Entities that are part of both the storage are ordered internally
-     * according to the order they have in `other`. All the other entities goes
-     * to the end of the list and there are no guarantees on their order.
-     * Instances are sorted according to the entities to which they belong.<br/>
-     * In other terms, this function can be used to impose the same order on two
-     * sets by using one of them as a master and the other one as a slave.
-     *
-     * Iterating the storage with a couple of iterators returns elements in the
-     * expected order after a call to `respect`. See `begin` and `end` for more
-     * details.
-     *
-     * @note
-     * Attempting to iterate elements using a raw pointer returned by a call to
-     * either `data` or `raw` gives no guarantees on the order, even though
-     * `respect` has been invoked.
-     *
-     * @param other The sparse sets that imposes the order of the entities.
-     */
-    void respect(const sparse_set<Entity> &other) ENTT_NOEXCEPT override {
-        const auto to = other.end();
-        auto from = other.begin();
-
-        size_type pos = underlying_type::size() - 1;
-        const auto *local = underlying_type::data();
-
-        while(pos && from != to) {
-            const auto curr = *from;
-
-            if(underlying_type::has(curr)) {
-                if(curr != *(local + pos)) {
-                    swap(pos, underlying_type::get(curr));
-                }
-
-                --pos;
-            }
-
-            ++from;
         }
     }
 

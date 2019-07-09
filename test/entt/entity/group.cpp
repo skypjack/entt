@@ -594,7 +594,7 @@ TEST(OwningGroup, SortOrdered) {
     registry.assign<boxed_int>(entities[3], 1);
     registry.assign<boxed_int>(entities[4], 2);
 
-    group.sort([&group](const auto lhs, const auto rhs) {
+    group.sort([&group](const entt::entity lhs, const entt::entity rhs) {
         return group.get<boxed_int>(lhs).value < group.get<boxed_int>(rhs).value;
     });
 

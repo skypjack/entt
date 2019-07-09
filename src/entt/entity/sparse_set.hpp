@@ -461,7 +461,7 @@ public:
      * @param lhs A valid position within the sparse set.
      * @param rhs A valid position within the sparse set.
      */
-    void swap(const size_type lhs, const size_type rhs) ENTT_NOEXCEPT {
+    virtual void swap(const size_type lhs, const size_type rhs) ENTT_NOEXCEPT {
         ENTT_ASSERT(lhs < direct.size());
         ENTT_ASSERT(rhs < direct.size());
         auto [src_page, src_offset] = index(direct[lhs]);
@@ -489,7 +489,7 @@ public:
      *
      * @param other The sparse sets that imposes the order of the entities.
      */
-    virtual void respect(const sparse_set &other) ENTT_NOEXCEPT {
+    void respect(const sparse_set &other) ENTT_NOEXCEPT {
         const auto to = other.end();
         auto from = other.begin();
 

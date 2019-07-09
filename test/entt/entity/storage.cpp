@@ -328,7 +328,7 @@ TEST(Storage, SortOrdered) {
     ASSERT_EQ(set.get(entt::entity{3}).value, 3);
     ASSERT_EQ(set.get(entt::entity{9}).value, 1);
 
-    set.sort([](auto lhs, auto rhs) {
+    set.sort(set.begin(), set.end(), [](auto lhs, auto rhs) {
         return lhs.value < rhs.value;
     });
 
@@ -364,7 +364,7 @@ TEST(Storage, SortReverse) {
     ASSERT_EQ(set.get(entt::entity{3}).value, 9);
     ASSERT_EQ(set.get(entt::entity{9}).value, 12);
 
-    set.sort([&set](entt::entity lhs, entt::entity rhs) {
+    set.sort(set.begin(), set.end(), [&set](entt::entity lhs, entt::entity rhs) {
         return set.get(lhs).value < set.get(rhs).value;
     });
 
@@ -400,7 +400,7 @@ TEST(Storage, SortUnordered) {
     ASSERT_EQ(set.get(entt::entity{3}).value, 9);
     ASSERT_EQ(set.get(entt::entity{9}).value, 12);
 
-    set.sort([](auto lhs, auto rhs) {
+    set.sort(set.begin(), set.end(), [](auto lhs, auto rhs) {
         return lhs.value < rhs.value;
     });
 
