@@ -63,7 +63,7 @@ struct meta_conv_node {
     meta_type_node * const parent;
     meta_conv_node * next;
     meta_type_node *(* const type)() ENTT_NOEXCEPT;
-    meta_any(* const conv)(void *);
+    meta_any(* const conv)(const void *);
     meta_conv(* const meta)() ENTT_NOEXCEPT;
 };
 
@@ -982,7 +982,7 @@ public:
      * @param instance The instance to convert.
      * @return An opaque pointer to the instance to convert.
      */
-    meta_any convert(void *instance) const ENTT_NOEXCEPT {
+    meta_any convert(const void *instance) const ENTT_NOEXCEPT {
         return node->conv(instance);
     }
 

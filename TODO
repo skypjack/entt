@@ -17,14 +17,10 @@
 * add take functionality, eg registry.take(entity, other); where it takes the entity and all its components from registry and move them to other
 * add opaque input iterators to views and groups that return tuples <entity, T &...> (proxy), multi-pass guaranteed
 * add fast lane for raw iterations, extend mt doc to describe allowed add/remove with pre-allocations on fast lanes
-* review 64 bit id: user defined area + dedicated member on the registry to set it
-* early out in views using bitmasks with bloom filter like access based on modulus
-  - standard each, use bitmask to speed up the whole thing and avoid accessing the pools to test for the page
-  - iterator based each with a couple of iterators passed from outside (use bitmask + has)
-* stable component handle that isn't affected by reallocations
 * multi component registry::remove and some others?
 * can I use opaque connection also for the emitter?
 * built-in support for dual (or N-) buffering
+* meta: opaque references and pointers
 
 TODO
 * registry::sort also for types that are part of a group (untracked items only)

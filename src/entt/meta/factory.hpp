@@ -244,8 +244,8 @@ public:
             type,
             nullptr,
             &internal::meta_info<To>::resolve,
-            [](void *instance) -> meta_any {
-                return static_cast<To>(*static_cast<Type *>(instance));
+            [](const void *instance) -> meta_any {
+                return static_cast<To>(*static_cast<const Type *>(instance));
             },
             []() ENTT_NOEXCEPT -> meta_conv {
                 return &node;
@@ -261,11 +261,49 @@ public:
     }
 
     /**
+     * @brief Assigns a meta conversion function to a meta type.
+     *
+     * Conversion functions can be either free functions or member
+     * functions.<br/>
+     * In case of free functions, they must accept a reference to an instance of
+     * the parent type as an argument. Otherwise, they must accept no arguments
+     * at all.
+     *
+     * @tparam Candidate The actual function to use for the conversion.
+     * @return A meta factory for the parent type.
+     */
+    template<auto Candidate>
+    meta_factory conv() ENTT_NOEXCEPT {
+        using conv_type = std::invoke_result_t<decltype(Candidate), Type &>;
+        auto * const type = internal::meta_info<Type>::resolve();
+
+        static internal::meta_conv_node node{
+            &internal::meta_info<Type>::template conv<conv_type>,
+            type,
+            nullptr,
+            &internal::meta_info<conv_type>::resolve,
+            [](const void *instance) -> meta_any {
+                return std::invoke(Candidate, *static_cast<const Type *>(instance));
+            },
+            []() ENTT_NOEXCEPT -> meta_conv {
+                return &node;
+            }
+        };
+
+        node.next = type->conv;
+        ENTT_ASSERT((!internal::meta_info<Type>::template conv<conv_type>));
+        internal::meta_info<Type>::template conv<conv_type> = &node;
+        type->conv = &node;
+
+        return *this;
+    }
+
+    /**
      * @brief Assigns a meta constructor to a meta type.
      *
-     * Free functions can be assigned to meta types in the role of
-     * constructors. All that is required is that they return an instance of the
-     * underlying type.<br/>
+     * Free functions can be assigned to meta types in the role of constructors.
+     * All that is required is that they return an instance of the underlying
+     * type.<br/>
      * From a client's point of view, nothing changes if a constructor of a meta
      * type is a built-in one or a free function.
      *

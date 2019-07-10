@@ -56,6 +56,9 @@ struct derived_type: base_type {
         : i{value}, c{character}
     {}
 
+    int f() const { return i; }
+    static char g(const derived_type &type) { return type.c; }
+
     const int i{};
     const char c{};
 };
@@ -144,7 +147,9 @@ struct Meta: public ::testing::Test {
         entt::reflect<derived_type>("derived"_hs, std::make_pair(properties::prop_int, 99))
                 .base<base_type>()
                 .ctor<const base_type &, int, char>(std::make_pair(properties::prop_bool, false))
-                .ctor<&derived_factory>(std::make_pair(properties::prop_int, 42));
+                .ctor<&derived_factory>(std::make_pair(properties::prop_int, 42))
+                .conv<&derived_type::f>()
+                .conv<&derived_type::g>();
 
         entt::reflect<empty_type>("empty"_hs)
                 .dtor<&empty_type::destroy>();
@@ -847,6 +852,38 @@ TEST_F(Meta, MetaConv) {
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
     ASSERT_EQ(any.cast<int>(), 3);
+}
+
+TEST_F(Meta, MetaConvAsFreeFunctions) {
+    auto conv = entt::resolve<derived_type>().conv<int>();
+    derived_type derived{derived_type{}, 42, 'c'};
+
+    ASSERT_TRUE(conv);
+    ASSERT_NE(conv, entt::meta_conv{});
+    ASSERT_EQ(conv.parent(), entt::resolve<derived_type>());
+    ASSERT_EQ(conv.type(), entt::resolve<int>());
+
+    auto any = conv.convert(&derived);
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<int>());
+    ASSERT_EQ(any.cast<int>(), 42);
+}
+
+TEST_F(Meta, MetaConvAsMemberFunctions) {
+    auto conv = entt::resolve<derived_type>().conv<char>();
+    derived_type derived{derived_type{}, 42, 'c'};
+
+    ASSERT_TRUE(conv);
+    ASSERT_NE(conv, entt::meta_conv{});
+    ASSERT_EQ(conv.parent(), entt::resolve<derived_type>());
+    ASSERT_EQ(conv.type(), entt::resolve<char>());
+
+    auto any = conv.convert(&derived);
+
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<char>());
+    ASSERT_EQ(any.cast<char>(), 'c');
 }
 
 TEST_F(Meta, MetaCtor) {
