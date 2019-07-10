@@ -265,9 +265,9 @@ public:
      *
      * Conversion functions can be either free functions or member
      * functions.<br/>
-     * In case of free functions, they must accept a reference to an instance of
-     * the parent type as an argument. Otherwise, they must accept no arguments
-     * at all.
+     * In case of free functions, they must accept a const reference to an
+     * instance of the parent type as an argument. In case of member functions,
+     * they should have no arguments at all.
      *
      * @tparam Candidate The actual function to use for the conversion.
      * @return A meta factory for the parent type.
