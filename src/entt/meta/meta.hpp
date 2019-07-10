@@ -2179,12 +2179,12 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index
         if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>> || std::is_member_function_pointer_v<decltype(Data)>) {
             using helper_type = meta_function_helper<std::integral_constant<decltype(Data), Data>>;
             using data_type = std::decay_t<std::tuple_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>>;
-            static_assert(std::is_invocable_v<decltype(Data), Type *, data_type>);
+            static_assert(std::is_invocable_v<decltype(Data), Type &, data_type>);
             accepted = value.can_cast<data_type>() || value.convert<data_type>();
             auto *clazz = handle.try_cast<Type>();
 
             if(accepted && clazz) {
-                std::invoke(Data, clazz, value.cast<data_type>());
+                std::invoke(Data, *clazz, value.cast<data_type>());
             }
         } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
@@ -2233,9 +2233,9 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index
 template<typename Type, auto Data>
 meta_any getter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index) {
     if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>> || std::is_member_function_pointer_v<decltype(Data)>) {
-       static_assert(std::is_invocable_v<decltype(Data), Type *>);
+       static_assert(std::is_invocable_v<decltype(Data), Type &>);
         auto *clazz = handle.try_cast<Type>();
-        return clazz ? std::invoke(Data, clazz) : meta_any{};
+        return clazz ? std::invoke(Data, *clazz) : meta_any{};
     } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
         using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
         static_assert(std::is_invocable_v<decltype(Data), Type *>);

@@ -486,7 +486,7 @@ public:
      *
      * Setters and getters can be either free functions, member functions or a
      * mix of them.<br/>
-     * In case of free functions, setters and getters must accept a pointer to
+     * In case of free functions, setters and getters must accept a reference to
      * an instance of the parent type as their first argument. A setter has then
      * an extra argument of a type convertible to that of the parameter to
      * set.<br/>
@@ -504,8 +504,8 @@ public:
     template<auto Setter, auto Getter, typename... Property>
     meta_factory data(const ENTT_ID_TYPE identifier, Property &&... property) ENTT_NOEXCEPT {
         using owner_type = std::tuple<std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>;
-        using underlying_type = std::invoke_result_t<decltype(Getter), Type *>;
-        static_assert(std::is_invocable_v<decltype(Setter), Type *, underlying_type>);
+        using underlying_type = std::invoke_result_t<decltype(Getter), Type &>;
+        static_assert(std::is_invocable_v<decltype(Setter), Type &, underlying_type>);
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_data_node node{

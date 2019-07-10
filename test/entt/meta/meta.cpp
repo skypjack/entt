@@ -98,8 +98,8 @@ struct setter_getter_type {
     int setter_with_ref(const int &val) { return value = val; }
     const int & getter_with_ref() { return value; }
 
-    static int static_setter(setter_getter_type *type, int value) { return type->value = value; }
-    static int static_getter(const setter_getter_type *type) { return type->value; }
+    static int static_setter(setter_getter_type &type, int value) { return type.value = value; }
+    static int static_getter(const setter_getter_type &type) { return type.value; }
 };
 
 struct not_comparable_type {
