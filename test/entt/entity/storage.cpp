@@ -421,6 +421,72 @@ TEST(Storage, SortUnordered) {
     ASSERT_EQ(begin, end);
 }
 
+TEST(Storage, SortRange) {
+    entt::storage<entt::entity, boxed_int> set;
+
+    set.construct(entt::entity{12}, boxed_int{6});
+    set.construct(entt::entity{42}, boxed_int{3});
+    set.construct(entt::entity{7}, boxed_int{1});
+    set.construct(entt::entity{3}, boxed_int{9});
+    set.construct(entt::entity{9}, boxed_int{12});
+
+    ASSERT_EQ(set.get(entt::entity{12}).value, 6);
+    ASSERT_EQ(set.get(entt::entity{42}).value, 3);
+    ASSERT_EQ(set.get(entt::entity{7}).value, 1);
+    ASSERT_EQ(set.get(entt::entity{3}).value, 9);
+    ASSERT_EQ(set.get(entt::entity{9}).value, 12);
+
+    set.sort(set.end(), set.end(), [](auto lhs, auto rhs) {
+        return lhs.value < rhs.value;
+    });
+
+    ASSERT_EQ(set.get(entt::entity{12}).value, 6);
+    ASSERT_EQ(set.get(entt::entity{42}).value, 3);
+    ASSERT_EQ(set.get(entt::entity{7}).value, 1);
+    ASSERT_EQ(set.get(entt::entity{3}).value, 9);
+    ASSERT_EQ(set.get(entt::entity{9}).value, 12);
+
+    set.sort(set.begin(), set.begin(), [](auto lhs, auto rhs) {
+        return lhs.value < rhs.value;
+    });
+
+    ASSERT_EQ(set.get(entt::entity{12}).value, 6);
+    ASSERT_EQ(set.get(entt::entity{42}).value, 3);
+    ASSERT_EQ(set.get(entt::entity{7}).value, 1);
+    ASSERT_EQ(set.get(entt::entity{3}).value, 9);
+    ASSERT_EQ(set.get(entt::entity{9}).value, 12);
+
+    set.sort(set.begin()+2, set.begin()+3, [](auto lhs, auto rhs) {
+        return lhs.value < rhs.value;
+    });
+
+    ASSERT_EQ(set.get(entt::entity{12}).value, 6);
+    ASSERT_EQ(set.get(entt::entity{42}).value, 3);
+    ASSERT_EQ(set.get(entt::entity{7}).value, 1);
+    ASSERT_EQ(set.get(entt::entity{3}).value, 9);
+    ASSERT_EQ(set.get(entt::entity{9}).value, 12);
+
+    set.sort(++set.begin(), --set.end(), [](auto lhs, auto rhs) {
+        return lhs.value < rhs.value;
+    });
+
+    ASSERT_EQ((set.raw() + 0u)->value, 6);
+    ASSERT_EQ((set.raw() + 1u)->value, 9);
+    ASSERT_EQ((set.raw() + 2u)->value, 3);
+    ASSERT_EQ((set.raw() + 3u)->value, 1);
+    ASSERT_EQ((set.raw() + 4u)->value, 12);
+
+    auto begin = set.begin();
+    auto end = set.end();
+
+    ASSERT_EQ((begin++)->value, 12);
+    ASSERT_EQ((begin++)->value, 1);
+    ASSERT_EQ((begin++)->value, 3);
+    ASSERT_EQ((begin++)->value, 9);
+    ASSERT_EQ((begin++)->value, 6);
+    ASSERT_EQ(begin, end);
+}
+
 TEST(Storage, RespectDisjoint) {
     entt::storage<entt::entity, int> lhs;
     entt::storage<entt::entity, int> rhs;

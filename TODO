@@ -25,5 +25,4 @@
 TODO
 * registry::sort also for types that are part of a group (untracked items only)
 * add sort by type to the non-owning group
-* add test for range sort to storage
 * custom (decoupled) pools ==> double buffering, shared components, multi-model

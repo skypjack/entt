@@ -444,17 +444,18 @@ public:
         ENTT_ASSERT(!(first > last));
 
         std::vector<size_type> copy(last - first);
-        std::iota(copy.begin(), copy.end(), std::distance(last, end()));
+        const auto offset = std::distance(last, end());
+        std::iota(copy.begin(), copy.end(), size_type{});
 
         if constexpr(std::is_invocable_v<Compare, const object_type &, const object_type &>) {
             static_assert(!std::is_empty_v<object_type>);
 
-            algo(copy.rbegin(), copy.rend(), [this, compare = std::move(compare)](const auto lhs, const auto rhs) {
-                return compare(std::as_const(instances[lhs]), std::as_const(instances[rhs]));
+            algo(copy.rbegin(), copy.rend(), [this, offset, compare = std::move(compare)](const auto lhs, const auto rhs) {
+                return compare(std::as_const(instances[lhs+offset]), std::as_const(instances[rhs+offset]));
             }, std::forward<Args>(args)...);
         } else {
-            algo(copy.rbegin(), copy.rend(), [compare = std::move(compare), data = underlying_type::data()](const auto lhs, const auto rhs) {
-                return compare(std::as_const(data[lhs]), std::as_const(data[rhs]));
+            algo(copy.rbegin(), copy.rend(), [offset, compare = std::move(compare), data = underlying_type::data()](const auto lhs, const auto rhs) {
+                return compare(std::as_const(data[lhs+offset]), std::as_const(data[rhs+offset]));
             }, std::forward<Args>(args)...);
         }
 
@@ -463,7 +464,7 @@ public:
             auto next = copy[curr];
 
             while(curr != next) {
-                swap(copy[curr], copy[next]);
+                swap(copy[curr]+offset, copy[next]+offset);
                 copy[curr] = curr;
                 curr = next;
                 next = copy[curr];
