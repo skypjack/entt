@@ -23,6 +23,7 @@
 * meta: opaque references and pointers
 
 TODO
-* registry::sort also for types that are part of a group (untracked items only)
 * add sort by type to the non-owning group
 * custom (decoupled) pools ==> double buffering, shared components, multi-model
+* registry.each<T...>(first, last) by iterators, entities/components guaranteed
+* non-owning groups shouldn't store entities, but positions => optimized each

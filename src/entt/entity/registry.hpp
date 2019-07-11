@@ -45,9 +45,13 @@ class basic_registry {
     using component_family = family<struct internal_registry_component_family>;
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
+    struct group_type {
+        std::size_t owned{};
+    };
+
     template<typename Component>
     struct pool_handler: storage<Entity, Component> {
-        void *group{};
+        group_type *group{};
 
         pool_handler() ENTT_NOEXCEPT = default;
 
@@ -164,9 +168,8 @@ class basic_registry {
     };
 
     template<typename... Exclude, typename... Get, typename... Owned>
-    struct group_handler<type_list<Exclude...>, type_list<Get...>, Owned...> {
+    struct group_handler<type_list<Exclude...>, type_list<Get...>, Owned...>: group_type {
         std::tuple<pool_type<Owned> *..., pool_type<Get> *..., pool_type<Exclude> *...> cpools{};
-        std::size_t owned{};
 
         template<typename Component>
         void maybe_valid_if(const basic_registry &, const Entity entt) {
@@ -1019,9 +1022,10 @@ public:
      * this member function.
      *
      * @warning
-     * Pools of components that are owned by a group cannot be sorted.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case
-     * the pool is owned by a group.
+     * Pools of components owned by a group are only partially sorted.<br/>
+     * In other words, only the elements that aren't part of the group are
+     * sorted by this function. Use the `sort` member function of a group to
+     * sort the other half of the pool.
      *
      * @tparam Component Type of components to sort.
      * @tparam Compare Type of comparison function object.
@@ -1033,9 +1037,12 @@ public:
      */
     template<typename Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
-        ENTT_ASSERT(!owned<Component>());
-        auto *cpool = assure<Component>();
-        cpool->sort(cpool->begin(), cpool->end(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+        if(auto *cpool = assure<Component>(); cpool->group) {
+            const auto last = cpool->end() - cpool->group->owned;
+            cpool->sort(cpool->begin(), last, std::move(compare), std::move(algo), std::forward<Args>(args)...);
+        } else {
+            cpool->sort(cpool->begin(), cpool->end(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+        }
     }
 
     /**
@@ -1066,7 +1073,7 @@ public:
      * Any subsequent change to `B` won't affect the order in `A`.
      *
      * @warning
-     * Pools of components that are owned by a group cannot be sorted.<br/>
+     * Pools of components owned by a group cannot be sorted this way.<br/>
      * An assertion will abort the execution at runtime in debug mode in case
      * the pool is owned by a group.
      *

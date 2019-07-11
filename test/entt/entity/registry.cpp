@@ -784,6 +784,75 @@ TEST(Registry, SortMulti) {
     }
 }
 
+TEST(Registry, SortOwned) {
+    entt::registry registry;
+    registry.group<int>(entt::get<char>);
+
+    for(auto i = 0; i < 5; ++i) {
+        const auto entity = registry.create();
+        registry.assign<int>(entity, i);
+
+        if(i < 2) {
+            registry.assign<char>(entity);
+        }
+    }
+
+    ASSERT_TRUE((registry.has<int, char>(*(registry.data<int>()+0))));
+    ASSERT_TRUE((registry.has<int, char>(*(registry.data<int>()+1))));
+
+    ASSERT_EQ(*(registry.raw<int>()+0), 0);
+    ASSERT_EQ(*(registry.raw<int>()+1), 1);
+    ASSERT_EQ(*(registry.raw<int>()+2), 2);
+    ASSERT_EQ(*(registry.raw<int>()+3), 3);
+    ASSERT_EQ(*(registry.raw<int>()+4), 4);
+
+    registry.sort<int>([](const int lhs, const int rhs) {
+        return lhs < rhs;
+    });
+
+    ASSERT_EQ(*(registry.raw<int>()+0), 0);
+    ASSERT_EQ(*(registry.raw<int>()+1), 1);
+    ASSERT_EQ(*(registry.raw<int>()+2), 4);
+    ASSERT_EQ(*(registry.raw<int>()+3), 3);
+    ASSERT_EQ(*(registry.raw<int>()+4), 2);
+
+    registry.reset<char>();
+    registry.sort<int>([](const int lhs, const int rhs) {
+        return lhs < rhs;
+    });
+
+    ASSERT_EQ(*(registry.raw<int>()+0), 4);
+    ASSERT_EQ(*(registry.raw<int>()+1), 3);
+    ASSERT_EQ(*(registry.raw<int>()+2), 2);
+    ASSERT_EQ(*(registry.raw<int>()+3), 1);
+    ASSERT_EQ(*(registry.raw<int>()+4), 0);
+
+    registry.each([&registry](const auto entity) {
+        registry.assign<char>(entity);
+    });
+
+    registry.sort<int>([](const int lhs, const int rhs) {
+        return lhs > rhs;
+    });
+
+    ASSERT_EQ(*(registry.raw<int>()+0), 4);
+    ASSERT_EQ(*(registry.raw<int>()+1), 3);
+    ASSERT_EQ(*(registry.raw<int>()+2), 2);
+    ASSERT_EQ(*(registry.raw<int>()+3), 1);
+    ASSERT_EQ(*(registry.raw<int>()+4), 0);
+
+    registry.reset<char>();
+    registry.sort<int>([](const int lhs, const int rhs) {
+        return lhs > rhs;
+    });
+
+    ASSERT_EQ(*(registry.raw<int>()+0), 0);
+    ASSERT_EQ(*(registry.raw<int>()+1), 1);
+    ASSERT_EQ(*(registry.raw<int>()+2), 2);
+    ASSERT_EQ(*(registry.raw<int>()+3), 3);
+    ASSERT_EQ(*(registry.raw<int>()+4), 4);
+}
+
 TEST(Registry, ComponentsWithTypesFromStandardTemplateLibrary) {
     // see #37 - the test shouldn't crash, that's all
     entt::registry registry;

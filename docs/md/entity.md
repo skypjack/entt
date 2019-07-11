@@ -1373,9 +1373,11 @@ them as fast as possible.
 
 Sorting owned components is no longer allowed once the group has been created.
 However, full-owning groups can be sorted by means of their `sort` member
-functions, if required. Sorting a full-owning group affects all the instance of
+functions, if required. Sorting a full-owning group affects all the instances of
 the same group (it means that users don't have to call `sort` on each instance
-to sort all of them because they share the underlying data structure).
+to sort all of them because they share the underlying data structure).<br/>
+The elements that aren't part of the group can still be sorted separately for
+each pool using the `sort` member function of the registry.
 
 ### Partial-owning groups
 
@@ -1404,9 +1406,13 @@ doesn't pass to the group instead.
 
 Sorting owned components is no longer allowed once the group has been created.
 However, partial-owning groups can be sorted by means of their `sort` member
-functions, if required. Sorting a partial-owning group affects all the instance
+functions, if required. Sorting a partial-owning group affects all the instances
 of the same group (it means that users don't have to call `sort` on each
-instance to sort all of them because they share the underlying data structure).
+instance to sort all of them because they share the underlying data
+structure).<br/>
+Regarding the owned types, the elements that aren't part of the group can still
+be sorted separately for each pool using the `sort` member function of the
+registry.
 
 ### Non-owning groups
 

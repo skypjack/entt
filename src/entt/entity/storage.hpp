@@ -451,7 +451,7 @@ public:
             static_assert(!std::is_empty_v<object_type>);
 
             algo(copy.rbegin(), copy.rend(), [this, offset, compare = std::move(compare)](const auto lhs, const auto rhs) {
-                return compare(std::as_const(instances[lhs+offset]), std::as_const(instances[rhs+offset]));
+                return compare(std::as_const(instances[lhs + offset]), std::as_const(instances[rhs + offset]));
             }, std::forward<Args>(args)...);
         } else {
             algo(copy.rbegin(), copy.rend(), [offset, compare = std::move(compare), data = underlying_type::data()](const auto lhs, const auto rhs) {
@@ -464,7 +464,7 @@ public:
             auto next = copy[curr];
 
             while(curr != next) {
-                swap(copy[curr]+offset, copy[next]+offset);
+                swap(copy[curr] + offset, copy[next] + offset);
                 copy[curr] = curr;
                 curr = next;
                 next = copy[curr];
