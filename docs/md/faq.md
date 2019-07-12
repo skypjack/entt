@@ -10,6 +10,7 @@
   * [Why is my debug build on Windows so slow?](#why-is-my-debug-build-on-windows-so-slow)
   * [How can I represent hierarchies with my components?](#how-can-i-represent-hierarchies-with-my-components)
   * [Custom entity identifiers: yay or nay?](#custom-entity-identifiers-yay-or-nay)
+  * [Warning C4307: integral constant overflow](#warning-C4307-integral-constant-overflow)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -111,3 +112,33 @@ ENTT_ENTITY_TYPE(entity, std::uint32_t)
 
 The use of this macro is highly recommended, so as not to run into problems if
 the requirements for the identifiers should change in the future.
+
+## Warning C4307: integral constant overflow
+
+According to [this](https://github.com/skypjack/entt/issues/121) issue, using a
+hashed string under VS could generate a warning.<br/>
+First of all, I want to reassure you: it's expected and harmless. However, it
+can be annoying.
+
+To suppress it and if you don't want to suppress all the other warnings as well,
+here is a workaround in the form of a macro:
+
+```cpp
+#if defined(_MSC_VER)
+    #define HS(x)\
+        __pragma(warning(push))\
+        __pragma(warning(disable:4307))\
+        entt::hashed_string{#x}\
+        __pragma(warning(pop))
+#else
+    #define HS(x) entt::hashed_string{#x}
+#endif
+```
+
+With an example of use included:
+
+```cpp
+constexpr auto identifier = HS("my/resource/identifier");
+```
+
+Thanks to [huwpascoe](https://github.com/huwpascoe) for the courtesy.
