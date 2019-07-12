@@ -443,32 +443,17 @@ public:
     void sort(iterator_type first, iterator_type last, Compare compare, Sort algo = Sort{}, Args &&... args) {
         ENTT_ASSERT(!(first > last));
 
-        std::vector<size_type> copy(last - first);
-        const auto offset = std::distance(last, end());
-        std::iota(copy.begin(), copy.end(), size_type{});
+        const auto from = underlying_type::begin() + std::distance(begin(), first);
+        const auto to = from + std::distance(first, last);
 
         if constexpr(std::is_invocable_v<Compare, const object_type &, const object_type &>) {
             static_assert(!std::is_empty_v<object_type>);
 
-            algo(copy.rbegin(), copy.rend(), [this, offset, compare = std::move(compare)](const auto lhs, const auto rhs) {
-                return compare(std::as_const(instances[lhs + offset]), std::as_const(instances[rhs + offset]));
-            }, std::forward<Args>(args)...);
+            underlying_type::sort(from, to, [this, compare = std::move(compare)](const auto lhs, const auto rhs) {
+                return compare(std::as_const(instances[underlying_type::get(lhs)]), std::as_const(instances[underlying_type::get(rhs)]));
+            }, std::move(algo), std::forward<Args>(args)...);
         } else {
-            algo(copy.rbegin(), copy.rend(), [offset, compare = std::move(compare), data = underlying_type::data()](const auto lhs, const auto rhs) {
-                return compare(std::as_const(data[lhs+offset]), std::as_const(data[rhs+offset]));
-            }, std::forward<Args>(args)...);
-        }
-
-        for(size_type pos{}, length = copy.size(); pos < length; ++pos) {
-            auto curr = pos;
-            auto next = copy[curr];
-
-            while(curr != next) {
-                swap(copy[curr] + offset, copy[next] + offset);
-                copy[curr] = curr;
-                curr = next;
-                next = copy[curr];
-            }
+            underlying_type::sort(from, to, std::move(compare), std::move(algo), std::forward<Args>(args)...);
         }
     }
 

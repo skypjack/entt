@@ -177,7 +177,7 @@ class basic_view {
         auto begin = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::begin();
 
         if constexpr(std::disjunction_v<std::is_same<Comp, Type>...>) {
-            std::for_each(begin, end, [raw = std::get<pool_type<Comp> *>(pools)->begin(), &func, this](const auto entity) mutable {
+            std::for_each(begin, end, [this, raw = std::get<pool_type<Comp> *>(pools)->begin(), &func](const auto entity) mutable {
                 auto curr = raw++;
 
                 if((std::get<pool_type<Other> *>(pools)->has(entity) && ...)) {
@@ -189,7 +189,7 @@ class basic_view {
                 }
             });
         } else {
-            std::for_each(begin, end, [&func, this](const auto entity) mutable {
+            std::for_each(begin, end, [this, &func](const auto entity) mutable {
                 if((std::get<pool_type<Other> *>(pools)->has(entity) && ...)) {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
                         func(std::get<pool_type<Type> *>(pools)->get(entity)...);

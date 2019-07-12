@@ -8,8 +8,10 @@
 #include <vector>
 #include <memory>
 #include <cstddef>
+#include <numeric>
 #include <type_traits>
 #include "../config/config.h"
+#include "../core/algorithm.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -415,7 +417,7 @@ public:
      */
     template<typename It>
     void batch(It first, It last) {
-        std::for_each(first, last, [next = direct.size(), this](const auto entt) mutable {
+        std::for_each(first, last, [this, next = direct.size()](const auto entt) mutable {
             ENTT_ASSERT(!has(entt));
             auto [page, offset] = index(entt);
             assure(page);
@@ -468,6 +470,74 @@ public:
         auto [dst_page, dst_offset] = index(direct[rhs]);
         std::swap(reverse[src_page][src_offset], reverse[dst_page][dst_offset]);
         std::swap(direct[lhs], direct[rhs]);
+    }
+
+    /**
+     * @brief Sort elements according to the given comparison function.
+     *
+     * Sort the elements so that iterating the range with a couple of iterators
+     * returns them in the expected order. See `begin` and `end` for more
+     * details.
+     *
+     * The comparison function object must return `true` if the first element
+     * is _less_ than the second one, `false` otherwise. The signature of the
+     * comparison function should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * bool(const Entity, const Entity);
+     * @endcode
+     *
+     * Moreover, the comparison function object shall induce a
+     * _strict weak ordering_ on the values.
+     *
+     * The sort function oject must offer a member function template
+     * `operator()` that accepts three arguments:
+     *
+     * * An iterator to the first element of the range to sort.
+     * * An iterator past the last element of the range to sort.
+     * * A comparison function to use to compare the elements.
+     *
+     * The comparison function object received by the sort function object
+     * hasn't necessarily the type of the one passed along with the other
+     * parameters to this member function.
+     *
+     * @note
+     * Attempting to iterate elements using a raw pointer returned by a call to
+     * either `data` or `raw` gives no guarantees on the order, even though
+     * `sort` has been invoked.
+     *
+     * @tparam Compare Type of comparison function object.
+     * @tparam Sort Type of sort function object.
+     * @tparam Args Types of arguments to forward to the sort function object.
+     * @param first An iterator to the first element of the range to sort.
+     * @param last An iterator past the last element of the range to sort.
+     * @param compare A valid comparison function object.
+     * @param algo A valid sort function object.
+     * @param args Arguments to forward to the sort function object, if any.
+     */
+    template<typename Compare, typename Sort = std_sort, typename... Args>
+    void sort(iterator_type first, iterator_type last, Compare compare, Sort algo = Sort{}, Args &&... args) {
+        ENTT_ASSERT(!(first > last));
+
+        std::vector<size_type> copy(last - first);
+        const auto offset = std::distance(last, end());
+        std::iota(copy.begin(), copy.end(), size_type{});
+
+        algo(copy.rbegin(), copy.rend(), [this, offset, compare = std::move(compare)](const auto lhs, const auto rhs) {
+            return compare(std::as_const(direct[lhs+offset]), std::as_const(direct[rhs+offset]));
+        }, std::forward<Args>(args)...);
+
+        for(size_type pos{}, length = copy.size(); pos < length; ++pos) {
+            auto curr = pos;
+            auto next = copy[curr];
+
+            while(curr != next) {
+                swap(copy[curr] + offset, copy[next] + offset);
+                copy[curr] = curr;
+                curr = next;
+                next = copy[curr];
+            }
+        }
     }
 
     /**

@@ -1,6 +1,7 @@
 #include <utility>
 #include <iterator>
 #include <algorithm>
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/entity/helper.hpp>
 #include <entt/entity/registry.hpp>
@@ -132,15 +133,8 @@ TEST(NonOwningGroup, Empty) {
     registry.assign<char>(e1);
     registry.assign<float>(e1);
 
-    for(auto entity: registry.group(entt::get<char, int, float>)) {
-        (void)entity;
-        FAIL();
-    }
-
-    for(auto entity: registry.group(entt::get<double, char, int, float>)) {
-        (void)entity;
-        FAIL();
-    }
+    ASSERT_TRUE(registry.group(entt::get<char, int, float>).empty());
+    ASSERT_TRUE(registry.group(entt::get<double, char, int, float>).empty());
 }
 
 TEST(NonOwningGroup, Each) {
@@ -170,6 +164,59 @@ TEST(NonOwningGroup, Each) {
 }
 
 TEST(NonOwningGroup, Sort) {
+    entt::registry registry;
+    auto group = registry.group(entt::get<const int, unsigned int>);
+
+    const auto e0 = registry.create();
+    const auto e1 = registry.create();
+    const auto e2 = registry.create();
+
+    registry.assign<unsigned int>(e0, 0u);
+    registry.assign<unsigned int>(e1, 1u);
+    registry.assign<unsigned int>(e2, 2u);
+
+    registry.assign<int>(e0, 0);
+    registry.assign<int>(e1, 1);
+    registry.assign<int>(e2, 2);
+
+    ASSERT_EQ(*(group.raw<unsigned int>() + 0u), 0u);
+    ASSERT_EQ(*(group.raw<unsigned int>() + 1u), 1u);
+    ASSERT_EQ(*(group.raw<unsigned int>() + 2u), 2u);
+
+    ASSERT_EQ(*(group.raw<const int>() + 0u), 0);
+    ASSERT_EQ(*(group.raw<const int>() + 1u), 1);
+    ASSERT_EQ(*(group.raw<const int>() + 2u), 2);
+
+    ASSERT_EQ(*(group.data() + 0u), e0);
+    ASSERT_EQ(*(group.data() + 1u), e1);
+    ASSERT_EQ(*(group.data() + 2u), e2);
+
+    group.sort([](const entt::entity lhs, const entt::entity rhs) {
+        return std::underlying_type_t<entt::entity>(lhs) < std::underlying_type_t<entt::entity>(rhs);
+    });
+
+    ASSERT_EQ(*(group.raw<unsigned int>() + 0u), 0u);
+    ASSERT_EQ(*(group.raw<unsigned int>() + 1u), 1u);
+    ASSERT_EQ(*(group.raw<unsigned int>() + 2u), 2u);
+
+    ASSERT_EQ(*(group.raw<const int>() + 0u), 0);
+    ASSERT_EQ(*(group.raw<const int>() + 1u), 1);
+    ASSERT_EQ(*(group.raw<const int>() + 2u), 2);
+
+    ASSERT_EQ(*(group.data() + 0u), e2);
+    ASSERT_EQ(*(group.data() + 1u), e1);
+    ASSERT_EQ(*(group.data() + 2u), e0);
+
+    group.sort<const int>([](const int lhs, const int rhs) {
+        return lhs > rhs;
+    });
+
+    ASSERT_EQ(*(group.data() + 0u), e0);
+    ASSERT_EQ(*(group.data() + 1u), e1);
+    ASSERT_EQ(*(group.data() + 2u), e2);
+}
+
+TEST(NonOwningGroup, SortAsAPool) {
     entt::registry registry;
     auto group = registry.group(entt::get<const int, unsigned int>);
 
@@ -533,15 +580,8 @@ TEST(OwningGroup, Empty) {
     registry.assign<char>(e1);
     registry.assign<float>(e1);
 
-    for(auto entity: registry.group<char, int>(entt::get<float>)) {
-        (void)entity;
-        FAIL();
-    }
-
-    for(auto entity: registry.group<double, float>(entt::get<char, int>)) {
-        (void)entity;
-        FAIL();
-    }
+    ASSERT_TRUE((registry.group<char, int>(entt::get<float>).empty()));
+    ASSERT_TRUE((registry.group<double, float>(entt::get<char, int>).empty()));
 }
 
 TEST(OwningGroup, Each) {

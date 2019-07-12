@@ -221,6 +221,180 @@ TEST(SparseSet, Data) {
     ASSERT_EQ(*(set.data() + 2u), entt::entity{42});
 }
 
+TEST(SparseSet, SortOrdered) {
+    entt::sparse_set<entt::entity> set;
+
+    set.construct(entt::entity{42});
+    set.construct(entt::entity{12});
+    set.construct(entt::entity{9});
+    set.construct(entt::entity{7});
+    set.construct(entt::entity{3});
+
+    ASSERT_EQ(*(set.data() + 0u), entt::entity{42});
+    ASSERT_EQ(*(set.data() + 1u), entt::entity{12});
+    ASSERT_EQ(*(set.data() + 2u), entt::entity{9});
+    ASSERT_EQ(*(set.data() + 3u), entt::entity{7});
+    ASSERT_EQ(*(set.data() + 4u), entt::entity{3});
+
+    set.sort(set.begin(), set.end(), [](const auto lhs, const auto rhs) {
+        return std::underlying_type_t<entt::entity>(lhs) < std::underlying_type_t<entt::entity>(rhs);
+    });
+
+    ASSERT_EQ(*(set.data() + 0u), entt::entity{42});
+    ASSERT_EQ(*(set.data() + 1u), entt::entity{12});
+    ASSERT_EQ(*(set.data() + 2u), entt::entity{9});
+    ASSERT_EQ(*(set.data() + 3u), entt::entity{7});
+    ASSERT_EQ(*(set.data() + 4u), entt::entity{3});
+
+    auto begin = set.begin();
+    auto end = set.end();
+
+    ASSERT_EQ(*(begin++), entt::entity{3});
+    ASSERT_EQ(*(begin++), entt::entity{7});
+    ASSERT_EQ(*(begin++), entt::entity{9});
+    ASSERT_EQ(*(begin++), entt::entity{12});
+    ASSERT_EQ(*(begin++), entt::entity{42});
+    ASSERT_EQ(begin, end);
+}
+
+TEST(SparseSet, SortReverse) {
+    entt::sparse_set<entt::entity> set;
+
+    set.construct(entt::entity{3});
+    set.construct(entt::entity{7});
+    set.construct(entt::entity{9});
+    set.construct(entt::entity{12});
+    set.construct(entt::entity{42});
+
+    ASSERT_EQ(*(set.data() + 0u), entt::entity{3});
+    ASSERT_EQ(*(set.data() + 1u), entt::entity{7});
+    ASSERT_EQ(*(set.data() + 2u), entt::entity{9});
+    ASSERT_EQ(*(set.data() + 3u), entt::entity{12});
+    ASSERT_EQ(*(set.data() + 4u), entt::entity{42});
+
+    set.sort(set.begin(), set.end(), [](const auto lhs, const auto rhs) {
+        return std::underlying_type_t<entt::entity>(lhs) < std::underlying_type_t<entt::entity>(rhs);
+    });
+
+    ASSERT_EQ(*(set.data() + 0u), entt::entity{42});
+    ASSERT_EQ(*(set.data() + 1u), entt::entity{12});
+    ASSERT_EQ(*(set.data() + 2u), entt::entity{9});
+    ASSERT_EQ(*(set.data() + 3u), entt::entity{7});
+    ASSERT_EQ(*(set.data() + 4u), entt::entity{3});
+
+    auto begin = set.begin();
+    auto end = set.end();
+
+    ASSERT_EQ(*(begin++), entt::entity{3});
+    ASSERT_EQ(*(begin++), entt::entity{7});
+    ASSERT_EQ(*(begin++), entt::entity{9});
+    ASSERT_EQ(*(begin++), entt::entity{12});
+    ASSERT_EQ(*(begin++), entt::entity{42});
+    ASSERT_EQ(begin, end);
+}
+
+TEST(SparseSet, SortUnordered) {
+    entt::sparse_set<entt::entity> set;
+
+    set.construct(entt::entity{9});
+    set.construct(entt::entity{7});
+    set.construct(entt::entity{3});
+    set.construct(entt::entity{12});
+    set.construct(entt::entity{42});
+
+    ASSERT_EQ(*(set.data() + 0u), entt::entity{9});
+    ASSERT_EQ(*(set.data() + 1u), entt::entity{7});
+    ASSERT_EQ(*(set.data() + 2u), entt::entity{3});
+    ASSERT_EQ(*(set.data() + 3u), entt::entity{12});
+    ASSERT_EQ(*(set.data() + 4u), entt::entity{42});
+
+    set.sort(set.begin(), set.end(), [](const auto lhs, const auto rhs) {
+        return std::underlying_type_t<entt::entity>(lhs) < std::underlying_type_t<entt::entity>(rhs);
+    });
+
+    ASSERT_EQ(*(set.data() + 0u), entt::entity{42});
+    ASSERT_EQ(*(set.data() + 1u), entt::entity{12});
+    ASSERT_EQ(*(set.data() + 2u), entt::entity{9});
+    ASSERT_EQ(*(set.data() + 3u), entt::entity{7});
+    ASSERT_EQ(*(set.data() + 4u), entt::entity{3});
+
+    auto begin = set.begin();
+    auto end = set.end();
+
+    ASSERT_EQ(*(begin++), entt::entity{3});
+    ASSERT_EQ(*(begin++), entt::entity{7});
+    ASSERT_EQ(*(begin++), entt::entity{9});
+    ASSERT_EQ(*(begin++), entt::entity{12});
+    ASSERT_EQ(*(begin++), entt::entity{42});
+    ASSERT_EQ(begin, end);
+}
+
+TEST(SparseSet, SortRange) {
+    entt::sparse_set<entt::entity> set;
+
+    set.construct(entt::entity{9});
+    set.construct(entt::entity{7});
+    set.construct(entt::entity{3});
+    set.construct(entt::entity{12});
+    set.construct(entt::entity{42});
+
+    ASSERT_EQ(*(set.data() + 0u), entt::entity{9});
+    ASSERT_EQ(*(set.data() + 1u), entt::entity{7});
+    ASSERT_EQ(*(set.data() + 2u), entt::entity{3});
+    ASSERT_EQ(*(set.data() + 3u), entt::entity{12});
+    ASSERT_EQ(*(set.data() + 4u), entt::entity{42});
+
+    set.sort(set.end(), set.end(), [](const auto lhs, const auto rhs) {
+        return std::underlying_type_t<entt::entity>(lhs) < std::underlying_type_t<entt::entity>(rhs);
+    });
+
+    ASSERT_EQ(*(set.data() + 0u), entt::entity{9});
+    ASSERT_EQ(*(set.data() + 1u), entt::entity{7});
+    ASSERT_EQ(*(set.data() + 2u), entt::entity{3});
+    ASSERT_EQ(*(set.data() + 3u), entt::entity{12});
+    ASSERT_EQ(*(set.data() + 4u), entt::entity{42});
+
+    set.sort(set.begin(), set.begin(), [](const auto lhs, const auto rhs) {
+        return std::underlying_type_t<entt::entity>(lhs) < std::underlying_type_t<entt::entity>(rhs);
+    });
+
+    ASSERT_EQ(*(set.data() + 0u), entt::entity{9});
+    ASSERT_EQ(*(set.data() + 1u), entt::entity{7});
+    ASSERT_EQ(*(set.data() + 2u), entt::entity{3});
+    ASSERT_EQ(*(set.data() + 3u), entt::entity{12});
+    ASSERT_EQ(*(set.data() + 4u), entt::entity{42});
+
+    set.sort(set.begin()+2, set.begin()+3, [](const auto lhs, const auto rhs) {
+        return std::underlying_type_t<entt::entity>(lhs) < std::underlying_type_t<entt::entity>(rhs);
+    });
+
+    ASSERT_EQ(*(set.data() + 0u), entt::entity{9});
+    ASSERT_EQ(*(set.data() + 1u), entt::entity{7});
+    ASSERT_EQ(*(set.data() + 2u), entt::entity{3});
+    ASSERT_EQ(*(set.data() + 3u), entt::entity{12});
+    ASSERT_EQ(*(set.data() + 4u), entt::entity{42});
+
+    set.sort(++set.begin(), --set.end(), [](const auto lhs, const auto rhs) {
+        return std::underlying_type_t<entt::entity>(lhs) < std::underlying_type_t<entt::entity>(rhs);
+    });
+
+    ASSERT_EQ(*(set.data() + 0u), entt::entity{9});
+    ASSERT_EQ(*(set.data() + 1u), entt::entity{12});
+    ASSERT_EQ(*(set.data() + 2u), entt::entity{7});
+    ASSERT_EQ(*(set.data() + 3u), entt::entity{3});
+    ASSERT_EQ(*(set.data() + 4u), entt::entity{42});
+
+    auto begin = set.begin();
+    auto end = set.end();
+
+    ASSERT_EQ(*(begin++), entt::entity{42});
+    ASSERT_EQ(*(begin++), entt::entity{3});
+    ASSERT_EQ(*(begin++), entt::entity{7});
+    ASSERT_EQ(*(begin++), entt::entity{12});
+    ASSERT_EQ(*(begin++), entt::entity{9});
+    ASSERT_EQ(begin, end);
+}
+
 TEST(SparseSet, RespectDisjoint) {
     entt::sparse_set<entt::entity> lhs;
     entt::sparse_set<entt::entity> rhs;

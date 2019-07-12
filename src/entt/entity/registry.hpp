@@ -92,7 +92,7 @@ class basic_registry {
                 storage<Entity, Component>::batch(first, last);
 
                 if(!construction.empty()) {
-                    std::for_each(first, last, [&registry, this](const auto entt) {
+                    std::for_each(first, last, [this, &registry](const auto entt) {
                         construction.publish(registry, entt, Component{});
                     });
                 }
@@ -100,7 +100,7 @@ class basic_registry {
                 component = storage<Entity, Component>::batch(first, last);
 
                 if(!construction.empty()) {
-                    std::for_each(first, last, [&registry, component, this](const auto entt) mutable {
+                    std::for_each(first, last, [this, &registry, component](const auto entt) mutable {
                         construction.publish(registry, entt, *(component++));
                     });
                 }
@@ -600,7 +600,7 @@ public:
 
         available -= sz;
 
-        const auto tail = std::generate_n(first, sz, [&candidate, this]() mutable {
+        const auto tail = std::generate_n(first, sz, [this, &candidate]() mutable {
             if constexpr(sizeof...(Component) > 0) {
                 candidate = entity_type{std::max(candidate, next)};
             } else {
@@ -1219,7 +1219,7 @@ public:
     void orphans(Func func) const {
         static_assert(std::is_invocable_v<Func, entity_type>);
 
-        each([&func, this](const auto entity) {
+        each([this, &func](const auto entity) {
             if(orphan(entity)) {
                 func(entity);
             }

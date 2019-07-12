@@ -385,6 +385,64 @@ public:
     }
 
     /**
+     * @brief Sort a group according to the given comparison function.
+     *
+     * Sort the group so that iterating it with a couple of iterators returns
+     * entities and components in the expected order. See `begin` and `end` for
+     * more details.
+     *
+     * The comparison function object must return `true` if the first element
+     * is _less_ than the second one, `false` otherwise. The signature of the
+     * comparison function should be equivalent to one of the following:
+     *
+     * @code{.cpp}
+     * bool(std::tuple<Component &...>, std::tuple<Component &...>);
+     * bool(const Component &..., const Component &...);
+     * bool(const Entity, const Entity);
+     * @endcode
+     *
+     * Where `Component` are such that they are iterated by the group.<br/>
+     * Moreover, the comparison function object shall induce a
+     * _strict weak ordering_ on the values.
+     *
+     * The sort function oject must offer a member function template
+     * `operator()` that accepts three arguments:
+     *
+     * * An iterator to the first element of the range to sort.
+     * * An iterator past the last element of the range to sort.
+     * * A comparison function to use to compare the elements.
+     *
+     * The comparison function object received by the sort function object
+     * hasn't necessarily the type of the one passed along with the other
+     * parameters to this member function.
+     *
+     * @note
+     * Attempting to iterate elements using a raw pointer returned by a call to
+     * either `data` or `raw` gives no guarantees on the order, even though
+     * `sort` has been invoked.
+     *
+     * @tparam Component Optional types of components to compare.
+     * @tparam Compare Type of comparison function object.
+     * @tparam Sort Type of sort function object.
+     * @tparam Args Types of arguments to forward to the sort function object.
+     * @param compare A valid comparison function object.
+     * @param algo A valid sort function object.
+     * @param args Arguments to forward to the sort function object, if any.
+     */
+    template<typename... Component, typename Compare, typename Sort = std_sort, typename... Args>
+    void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
+        if constexpr(sizeof...(Component) == 0) {
+            static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>);
+            handler->sort(handler->begin(), handler->end(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+        } else {
+            handler->sort(handler->begin(), handler->end(), [this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
+                // useless this-> used to suppress a warning with clang
+                return compare(this->get<Component...>(lhs), this->get<Component...>(rhs));
+            }, std::move(algo), std::forward<Args>(args)...);
+        }
+    }
+
+    /**
      * @brief Sort the shared pool of entities according to the given component.
      *
      * Non-owning groups of the same type share with the registry a pool of
@@ -763,7 +821,8 @@ public:
      * comparison function should be equivalent to one of the following:
      *
      * @code{.cpp}
-     * bool(const Component &..., const Component &...);
+     * bool(std::tuple<Component &...>, std::tuple<Component &...>);
+     * bool(const Component &, const Component &);
      * bool(const Entity, const Entity);
      * @endcode
      *
@@ -804,9 +863,9 @@ public:
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>);
             cpool->sort(cpool->end()-*length, cpool->end(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else {
-            cpool->sort(cpool->end()-*length, cpool->end(), [compare = std::move(compare), this](const entity_type lhs, const entity_type rhs) {
+            cpool->sort(cpool->end()-*length, cpool->end(), [this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
                 // useless this-> used to suppress a warning with clang
-                return compare(this->get<Component>(lhs)..., this->get<Component>(rhs)...);
+                return compare(this->get<Component...>(lhs), this->get<Component...>(rhs));
             }, std::move(algo), std::forward<Args>(args)...);
         }
 
