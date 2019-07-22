@@ -11,6 +11,7 @@
   * [How can I represent hierarchies with my components?](#how-can-i-represent-hierarchies-with-my-components)
   * [Custom entity identifiers: yay or nay?](#custom-entity-identifiers-yay-or-nay)
   * [Warning C4307: integral constant overflow](#warning-C4307-integral-constant-overflow)
+  * [Warning C4003: the min, the max and the macro](#warning-C4003-the-min-the-max-and-the-macro)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -142,3 +143,21 @@ constexpr auto identifier = HS("my/resource/identifier");
 ```
 
 Thanks to [huwpascoe](https://github.com/huwpascoe) for the courtesy.
+
+## Warning C4003: the min, the max and the macro
+
+On Windows, a header file defines two macros `min` and `max` which may result in
+conflicts with their counterparts in the standard library and therefore in
+errors during compilation.
+
+It's a pretty big problem but fortunately it's not a problem of `EnTT` and there
+is a fairly simple solution to it.<br/>
+It consists in defining the `NOMINMAX` macro before to include any other header
+so as to get rid of the extra definitions:
+
+```cpp
+#define NOMINMAX
+```
+
+Please refer to [this](https://github.com/skypjack/entt/issues/96) issue for
+more details.
