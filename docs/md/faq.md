@@ -126,13 +126,13 @@ here is a workaround in the form of a macro:
 
 ```cpp
 #if defined(_MSC_VER)
-    #define HS(x)\
+    #define HS(str)\
         __pragma(warning(push))\
         __pragma(warning(disable:4307))\
-        entt::hashed_string{#x}\
+        entt::hashed_string{str}\
         __pragma(warning(pop))
 #else
-    #define HS(x) entt::hashed_string{#x}
+    #define HS(str) entt::hashed_string{str}
 #endif
 ```
 
