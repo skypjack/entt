@@ -21,7 +21,7 @@
 * multi component registry::remove and some others?
 * can I use opaque connection also for the emitter?
 * built-in support for dual (or N-) buffering
-* meta: opaque references and pointers
 
 TODO
 * custom (decoupled) pools ==> double buffering, shared components, multi-model
+* use direct access (pool-like) also for context variables

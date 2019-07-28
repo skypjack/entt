@@ -195,13 +195,21 @@ entt::meta_any any{0};
 entt::meta_any empty{};
 ```
 
-It can be constructed or assigned by copy and move and it takes the burden of
-destroying the contained object when required.<br/>
+It takes the burden of destroying the contained instance when required.<br/>
+Moreover, it can be used as an opaque container for unmanaged objects if needed:
+
+```cpp
+int value;
+entt::meta_any any{std::in_place, value};
+```
+
+In this case, the contained instance is never destroyed and users must ensure
+that the lifetime of the object exceeds that of the container.
+
 A meta any object has a `type` member function that returns the meta type of the
-contained value, if any. The member functions `can_cast` and `can_convert` are
-used to know if the underlying object has a given type as a base or if it can be
-converted implicitly to it. Similarly, `cast` and `convert` do what they promise
-and return the expected value.
+contained value, if any. The member functions `try_cast`, `cast` and `convert`
+are used to know if the underlying object has a given type as a base or if it
+can be converted implicitly to it.
 
 ## Enjoy the runtime
 
