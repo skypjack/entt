@@ -241,7 +241,7 @@ resolve([](auto type) {
 
 In all cases, the returned value is an instance of `meta_type`. This type of
 objects offer an API to know the _runtime identifier_ of the type, to iterate
-all themeta objects associated with them and even to build or destroy instances
+all the meta objects associated with them and even to build or destroy instances
 of the underlying type.<br/>
 Refer to the inline documentation for all the details.
 
