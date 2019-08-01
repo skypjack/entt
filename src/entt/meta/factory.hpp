@@ -742,7 +742,7 @@ public:
     template<auto Func, typename... Property>
     meta_factory func(const ENTT_ID_TYPE identifier, Property &&... property) ENTT_NOEXCEPT {
         using owner_type = std::integral_constant<decltype(Func), Func>;
-        using func_type = internal::meta_function_helper<std::integral_constant<decltype(Func), Func>>;
+        using helper_type = internal::meta_function_helper<std::integral_constant<decltype(Func), Func>>;
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_func_node node{
@@ -751,13 +751,13 @@ public:
             type,
             nullptr,
             nullptr,
-            func_type::size,
-            func_type::is_const,
-            func_type::is_static,
-            &internal::meta_info<typename func_type::return_type>::resolve,
-            &func_type::arg,
+            helper_type::size,
+            helper_type::is_const,
+            helper_type::is_static,
+            &internal::meta_info<typename helper_type::return_type>::resolve,
+            &helper_type::arg,
             [](meta_handle handle, meta_any *any) {
-                return internal::invoke<Type, Func>(handle, any, std::make_index_sequence<func_type::size>{});
+                return internal::invoke<Type, Func>(handle, any, std::make_index_sequence<helper_type::size>{});
             },
             []() ENTT_NOEXCEPT -> meta_func {
                 return &node;
