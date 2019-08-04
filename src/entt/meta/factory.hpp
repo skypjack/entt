@@ -266,10 +266,10 @@ class meta_factory {
         static internal::meta_prop_node node{
             nullptr,
             []() -> meta_any {
-                return std::get<0>(prop);
+                return std::as_const(std::get<0>(prop));
             },
             []() -> meta_any {
-                return std::get<1>(prop);
+                return std::as_const(std::get<1>(prop));
             },
             []() ENTT_NOEXCEPT -> meta_prop {
                 return &node;
