@@ -105,17 +105,18 @@ class delegate<Ret(Args...)> {
 
     template<auto Function, std::size_t... Index>
     void connect(std::index_sequence<Index...>) ENTT_NOEXCEPT {
+        static_assert(std::is_invocable_r_v<Ret, decltype(Function), std::tuple_element_t<Index, std::tuple<Args...>>...>);
         data = nullptr;
 
         fn = [](const void *, std::tuple<Args &&...> args) -> Ret {
             // Ret(...) makes void(...) eat the return values to avoid errors
-            static_assert(std::is_invocable_r_v<Ret, decltype(Function), std::tuple_element_t<Index, std::tuple<Args...>>...>);
             return Ret(std::invoke(Function, std::forward<std::tuple_element_t<Index, std::tuple<Args...>>>(std::get<Index>(args))...));
         };
     }
 
     template<auto Candidate, typename Type, std::size_t... Index>
     void connect(Type *value_or_instance, std::index_sequence<Index...>) ENTT_NOEXCEPT {
+        static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), Type *, std::tuple_element_t<Index, std::tuple<Args...>>...>);
         data = value_or_instance;
 
         fn = [](const void *payload, std::tuple<Args &&...> args) -> Ret {
@@ -128,7 +129,6 @@ class delegate<Ret(Args...)> {
             }
 
             // Ret(...) makes void(...) eat the return values to avoid errors
-            static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), Type *, std::tuple_element_t<Index, std::tuple<Args...>>...>);
             return Ret(std::invoke(Candidate, curr, std::forward<std::tuple_element_t<Index, std::tuple<Args...>>>(std::get<Index>(args))...));
         };
     }
