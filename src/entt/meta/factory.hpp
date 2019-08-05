@@ -537,18 +537,18 @@ public:
      * The signature of the function should identical to the following:
      *
      * @code{.cpp}
-     * void(Type *);
+     * void(Type &);
      * @endcode
      *
-     * From a client's point of view, nothing changes if the destructor of a
-     * meta type is the default one or a custom one.
+     * The purpose is to give users the ability to free up resources that
+     * require special treatment before an object is actually destroyed.
      *
      * @tparam Func The actual function to use as a destructor.
      * @return A meta factory for the parent type.
      */
-    template<auto *Func>
+    template<auto Func>
     meta_factory dtor() ENTT_NOEXCEPT {
-        static_assert(std::is_invocable_v<decltype(Func), Type *>);
+        static_assert(std::is_invocable_v<decltype(Func), Type &>);
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_dtor_node node{
@@ -556,7 +556,7 @@ public:
             type,
             [](meta_handle handle) {
                 return handle.type() == internal::meta_info<Type>::resolve()->meta()
-                        ? ((*Func)(handle.data<Type>()), true)
+                        ? (std::invoke(Func, *handle.data<Type>()), true)
                         : false;
             },
             []() ENTT_NOEXCEPT -> meta_dtor {

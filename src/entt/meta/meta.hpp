@@ -137,7 +137,6 @@ struct meta_type_node {
     const bool is_member_function_pointer;
     const size_type extent;
     meta_type(* const remove_pointer)() ENTT_NOEXCEPT;
-    bool(* const destroy)(meta_handle);
     meta_type(* const meta)() ENTT_NOEXCEPT;
     meta_base_node *base{nullptr};
     meta_conv_node *conv{nullptr};
@@ -303,8 +302,8 @@ class meta_any {
     using storage_type = std::aligned_storage_t<sizeof(void *), alignof(void *)>;
     using compare_fn_type = bool(const void *, const void *);
     using copy_fn_type = void *(storage_type &, const void *);
-    using destroy_fn_type = void(storage_type &);
-    using steal_fn_type = void *(storage_type &, storage_type &, destroy_fn_type *) ENTT_NOEXCEPT;
+    using destroy_fn_type = void(void *);
+    using steal_fn_type = void *(storage_type &, void *, destroy_fn_type *) ENTT_NOEXCEPT;
 
     template<typename Type, typename = std::void_t<>>
     struct type_traits {
@@ -315,11 +314,12 @@ class meta_any {
             return instance.release();
         }
 
-        static void destroy(storage_type &storage) {
+        static void destroy(void *instance) {
             auto *node = internal::meta_info<Type>::resolve();
-            auto *instance = *reinterpret_cast<Type **>(&storage);
-            node->dtor ? node->dtor->invoke(*instance) : node->destroy(*instance);
-            delete instance;
+            auto *actual = static_cast<Type *>(instance);
+            [[maybe_unused]] const bool destroyed = node->meta().destroy(*actual);
+            ENTT_ASSERT(destroyed);
+            delete actual;
         }
 
         static void * copy(storage_type &storage, const void *other) {
@@ -328,8 +328,8 @@ class meta_any {
             return instance.release();
         }
 
-        static void * steal(storage_type &to, storage_type &from, destroy_fn_type *) ENTT_NOEXCEPT {
-            auto *instance = *reinterpret_cast<Type **>(&from);
+        static void * steal(storage_type &to, void *from, destroy_fn_type *) ENTT_NOEXCEPT {
+            auto *instance = static_cast<Type *>(from);
             new (&to) Type *{instance};
             return instance;
         }
@@ -342,19 +342,20 @@ class meta_any {
             return new (&storage) Type{std::forward<Args>(args)...};
         }
 
-        static void destroy(storage_type &storage) {
+        static void destroy(void *instance) {
             auto *node = internal::meta_info<Type>::resolve();
-            auto *instance = reinterpret_cast<Type *>(&storage);
-            node->dtor ? node->dtor->invoke(*instance) : node->destroy(*instance);
-            instance->~Type();
+            auto *actual = static_cast<Type *>(instance);
+            [[maybe_unused]] const bool destroyed = node->meta().destroy(*actual);
+            ENTT_ASSERT(destroyed);
+            actual->~Type();
         }
 
         static void * copy(storage_type &storage, const void *instance) {
             return new (&storage) Type{*static_cast<const Type *>(instance)};
         }
 
-        static void * steal(storage_type &to, storage_type &from, destroy_fn_type *destroy_fn) ENTT_NOEXCEPT {
-            void *instance = new (&to) Type{std::move(*reinterpret_cast<Type *>(&from))};
+        static void * steal(storage_type &to, void *from, destroy_fn_type *destroy_fn) ENTT_NOEXCEPT {
+            void *instance = new (&to) Type{std::move(*static_cast<Type *>(from))};
             destroy_fn(from);
             return instance;
         }
@@ -468,7 +469,7 @@ public:
     /*! @brief Frees the internal storage, whatever it means. */
     ~meta_any() {
         if(destroy_fn) {
-            destroy_fn(storage);
+            destroy_fn(instance);
         }
     }
 
@@ -554,8 +555,9 @@ public:
      */
     template<typename Type>
     const Type & cast() const ENTT_NOEXCEPT {
-        ENTT_ASSERT(try_cast<Type>());
-        return *try_cast<Type>();
+        auto *actual = try_cast<Type>();
+        ENTT_ASSERT(actual);
+        return *actual;
     }
 
     /*! @copydoc cast */
@@ -646,15 +648,15 @@ public:
     friend void swap(meta_any &lhs, meta_any &rhs) ENTT_NOEXCEPT {
         if(lhs.steal_fn && rhs.steal_fn) {
             storage_type buffer;
-            lhs.steal_fn(buffer, lhs.storage, lhs.destroy_fn);
-            lhs.instance = rhs.steal_fn(lhs.storage, rhs.storage, rhs.destroy_fn);
-            rhs.instance = lhs.steal_fn(rhs.storage, buffer, lhs.destroy_fn);
+            auto *temp = lhs.steal_fn(buffer, lhs.instance, lhs.destroy_fn);
+            lhs.instance = rhs.steal_fn(lhs.storage, rhs.instance, rhs.destroy_fn);
+            rhs.instance = lhs.steal_fn(rhs.storage, temp, lhs.destroy_fn);
         } else if(lhs.steal_fn) {
-            lhs.instance = rhs.instance;
-            rhs.instance = lhs.steal_fn(rhs.storage, lhs.storage, lhs.destroy_fn);
+            lhs.instance = lhs.steal_fn(rhs.storage, lhs.instance, lhs.destroy_fn);
+            std::swap(rhs.instance, lhs.instance);
         } else if(rhs.steal_fn) {
-            rhs.instance = lhs.instance;
-            lhs.instance = rhs.steal_fn(lhs.storage, rhs.storage, rhs.destroy_fn);
+            rhs.instance = rhs.steal_fn(lhs.storage, rhs.instance, rhs.destroy_fn);
+            std::swap(rhs.instance, lhs.instance);
         } else {
             std::swap(lhs.instance, rhs.instance);
         }
@@ -1904,13 +1906,16 @@ public:
      * @brief Destroys an instance of the underlying type.
      *
      * It must be possible to cast the instance to the underlying type.
-     * Otherwise, invoking the meta destructor results in an undefined behavior.
+     * Otherwise, invoking the meta destructor results in an undefined
+     * behavior.<br/>
+     * If no destructor has been set, this function returns true without doing
+     * anything.
      *
      * @param handle An opaque pointer to an instance of the underlying type.
      * @return True in case of success, false otherwise.
      */
     bool destroy(meta_handle handle) const {
-        return node->dtor ? node->dtor->invoke(handle) : node->destroy(handle);
+        return (handle.type() == node->meta()) && (!node->dtor || node->dtor->invoke(handle));
     }
 
     /**
@@ -2085,18 +2090,6 @@ inline meta_type_node * meta_node<Type>::resolve() ENTT_NOEXCEPT {
             std::extent_v<Type>,
             []() ENTT_NOEXCEPT -> meta_type {
                 return internal::meta_info<std::remove_pointer_t<Type>>::resolve();
-            },
-            []([[maybe_unused]] meta_handle handle) {
-                bool accepted = false;
-
-                if constexpr(std::is_object_v<Type> && !std::is_array_v<Type>) {
-                    if((handle.type() == meta_info<Type>::resolve()->meta())) {
-                        handle.data<Type>()->~Type();
-                        accepted = true;
-                    }
-                }
-
-                return accepted;
             },
             []() ENTT_NOEXCEPT -> meta_type {
                 return &node;

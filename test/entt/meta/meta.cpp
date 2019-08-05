@@ -14,7 +14,7 @@ enum class properties {
 struct empty_type {
     virtual ~empty_type() = default;
 
-    static void destroy(empty_type *) {
+    static void destroy(empty_type &) {
         ++counter;
     }
 

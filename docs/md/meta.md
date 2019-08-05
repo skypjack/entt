@@ -100,6 +100,9 @@ It can be used to extend the reflected type and add the following:
   entt::reflect<my_type>("reflected"_hs).dtor<&destroy>();
   ```
 
+  A function should neither delete nor explicitly invoke the destructor of a
+  given instance.
+
 * _Data members_. Both real data members of the underlying type and static and
   global variables, as well as constants of any kind, can be attached to a meta
   type. From a client's point of view, all the variables associated with the
@@ -350,8 +353,10 @@ arguments and searches for a match. It returns a `meta_any` object that may or
 may not be initialized, depending on whether a suitable constructor has been
 found or not. On the other side, the `destroy` member function accepts instances
 of `meta_any` as well as actual objects by reference and invokes the registered
-destructor if any or a default one.<br/>
-Be aware that the result of a call to `destroy` may not be what is expected.
+destructor if any.<br/>
+Be aware that the result of a call to `destroy` may not be what is expected. The
+purpose is to give users the ability to free up resources that require special
+treatment and **not** to actually destroy instances.
 
 Meta types and meta objects in general contain much more than what is said: a
 plethora of functions in addition to those listed whose purposes and uses go
