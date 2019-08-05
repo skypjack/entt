@@ -181,17 +181,15 @@ meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_
     using helper_type = meta_function_helper_t<decltype(Candidate)>;
     meta_any any{};
 
-    [[maybe_unused]] const auto direct = std::make_tuple([args](const auto index) {
-        using arg_type = std::tuple_element_t<index.value, typename helper_type::args_type>;
-        auto *any = args + index.value;
-        auto *instance = any->template try_cast<arg_type>();
+    [[maybe_unused]] const auto direct = std::make_tuple([](meta_any *any, auto *instance) {
+        using arg_type = std::remove_reference_t<decltype(*instance)>;
 
-        if(!instance && any->template convert<arg_type>()) {
-            instance = any->template try_cast<arg_type>();
+        if(!instance && any->convert<arg_type>()) {
+            instance = any->try_cast<arg_type>();
         }
 
         return instance;
-    }(std::integral_constant<std::size_t, Indexes>{})...);
+    }(args+Indexes, (args+Indexes)->try_cast<std::tuple_element_t<Indexes, typename helper_type::args_type>>())...);
 
     if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Candidate)>>) {
         if((std::get<Indexes>(direct) && ...)) {
