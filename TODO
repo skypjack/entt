@@ -29,3 +29,5 @@ TODO
   - cloning all/part of the components are both required and a target entity on which to stomp your stuff could help
   - clone is just clone, creating new entity. But yeah, both "clone-all", and "clone-components"
   - for "apply", again both All and Components, and maybe an enum of what kind of apply "dont overwrite, overwrite, add-only"
+* meta: copy on aliasing should make an actual copy of the value, not of the pointer (steal has a similar problem)
+* meta: almost always aliasing method
