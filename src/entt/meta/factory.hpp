@@ -9,6 +9,7 @@
 #include <functional>
 #include <type_traits>
 #include "../config/config.h"
+#include "policy.hpp"
 #include "meta.hpp"
 
 
@@ -146,12 +147,23 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index
 }
 
 
-template<typename Type, auto Data>
+template<typename Type, auto Data, typename Policy>
 meta_any getter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index) {
+    auto dispatch = []([[maybe_unused]] auto &&value) {
+        if constexpr(std::is_same_v<Policy, as_void_t>) {
+            return meta_any{std::in_place_type<void>};
+        } else if constexpr(std::is_same_v<Policy, as_alias_t>) {
+            return meta_any{as_alias, std::forward<decltype(value)>(value)};
+        } else {
+            static_assert(std::is_same_v<Policy, as_is_t>);
+            return meta_any{std::forward<decltype(value)>(value)};
+        }
+    };
+
     if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>> || std::is_member_function_pointer_v<decltype(Data)>) {
         static_assert(std::is_invocable_v<decltype(Data), Type &>);
         auto *clazz = handle.data<Type>();
-        return clazz ? std::invoke(Data, *clazz) : meta_any{};
+        return clazz ? dispatch(std::invoke(Data, *clazz)) : meta_any{};
     } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
         using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
         static_assert(std::is_invocable_v<decltype(Data), Type *>);
@@ -159,27 +171,38 @@ meta_any getter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any i
 
         if constexpr(std::is_array_v<data_type>) {
             auto *idx = index.try_cast<std::size_t>();
-            return (clazz && idx) ? std::invoke(Data, clazz)[*idx] : meta_any{};
+            return (clazz && idx) ? dispatch(std::invoke(Data, clazz)[*idx]) : meta_any{};
         } else {
-            return clazz ? std::invoke(Data, clazz) : meta_any{};
+            return clazz ? dispatch(std::invoke(Data, clazz)) : meta_any{};
         }
     } else {
         static_assert(std::is_pointer_v<decltype(Data)>);
 
         if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
             auto *idx = index.try_cast<std::size_t>();
-            return idx ? (*Data)[*idx] : meta_any{};
+            return idx ? dispatch((*Data)[*idx]) : meta_any{};
         } else {
-            return *Data;
+            return dispatch(*Data);
         }
     }
 }
 
 
-template<typename Type, auto Candidate, std::size_t... Indexes>
+template<typename Type, auto Candidate, typename Policy, std::size_t... Indexes>
 meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_sequence<Indexes...>) {
     using helper_type = meta_function_helper_t<decltype(Candidate)>;
-    meta_any any{};
+
+    auto dispatch = [](auto *... args) {
+        if constexpr(std::is_void_v<typename helper_type::return_type> || std::is_same_v<Policy, as_void_t>) {
+            std::invoke(Candidate, *args...);
+            return meta_any{std::in_place_type<void>};
+        } else if constexpr(std::is_same_v<Policy, as_alias_t>) {
+            return meta_any{as_alias, std::invoke(Candidate, *args...)};
+        } else {
+            static_assert(std::is_same_v<Policy, as_is_t>);
+            return meta_any{std::invoke(Candidate, *args...)};
+        }
+    };
 
     [[maybe_unused]] const auto direct = std::make_tuple([](meta_any *any, auto *instance) {
         using arg_type = std::remove_reference_t<decltype(*instance)>;
@@ -192,28 +215,11 @@ meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_
     }(args+Indexes, (args+Indexes)->try_cast<std::tuple_element_t<Indexes, typename helper_type::args_type>>())...);
 
     if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Candidate)>>) {
-        if((std::get<Indexes>(direct) && ...)) {
-            if constexpr(std::is_void_v<typename helper_type::return_type>) {
-                std::invoke(Candidate, *std::get<Indexes>(direct)...);
-                any.emplace<void>();
-            } else {
-                any = std::invoke(Candidate, *std::get<Indexes>(direct)...);
-            }
-        }
+        return (std::get<Indexes>(direct) && ...) ? dispatch(std::get<Indexes>(direct)...) : meta_any{};
     } else {
         auto *clazz = handle.data<Type>();
-
-        if(clazz && (std::get<Indexes>(direct) && ...)) {
-            if constexpr(std::is_void_v<typename helper_type::return_type>) {
-                std::invoke(Candidate, clazz, *std::get<Indexes>(direct)...);
-                any.emplace<void>();
-            } else {
-                any = std::invoke(Candidate, clazz, *std::get<Indexes>(direct)...);
-            }
-        }
+        return (clazz && (std::get<Indexes>(direct) && ...)) ? dispatch(clazz, std::get<Indexes>(direct)...) : meta_any{};
     }
-
-    return any;
 }
 
 
@@ -455,11 +461,12 @@ public:
      * type is a built-in one or a free function.
      *
      * @tparam Func The actual function to use as a constructor.
+     * @tparam Policy Optional policy (no policy set by default).
      * @tparam Property Types of properties to assign to the meta data.
      * @param property Properties to assign to the meta data.
      * @return A meta factory for the parent type.
      */
-    template<auto Func, typename... Property>
+    template<auto Func, typename Policy = as_is_t, typename... Property>
     meta_factory ctor(Property &&... property) ENTT_NOEXCEPT {
         using helper_type = internal::meta_function_helper_t<decltype(Func)>;
         static_assert(std::is_same_v<typename helper_type::return_type, Type>);
@@ -473,7 +480,7 @@ public:
             helper_type::size,
             &helper_type::arg,
             [](meta_any * const any) {
-                return internal::invoke<Type, Func>({}, any, std::make_index_sequence<helper_type::size>{});
+                return internal::invoke<Type, Func, Policy>({}, any, std::make_index_sequence<helper_type::size>{});
             },
             []() ENTT_NOEXCEPT -> meta_ctor {
                 return &node;
@@ -581,17 +588,20 @@ public:
      * reflected object will appear as if they were part of the type itself.
      *
      * @tparam Data The actual variable to attach to the meta type.
+     * @tparam Policy Optional policy (no policy set by default).
      * @tparam Property Types of properties to assign to the meta data.
      * @param identifier Unique identifier.
      * @param property Properties to assign to the meta data.
      * @return A meta factory for the parent type.
      */
-    template<auto Data, typename... Property>
+    template<auto Data, typename Policy = as_is_t, typename... Property>
     meta_factory data(const ENTT_ID_TYPE identifier, Property &&... property) ENTT_NOEXCEPT {
         auto * const type = internal::meta_info<Type>::resolve();
         internal::meta_data_node *curr = nullptr;
 
         if constexpr(std::is_same_v<Type, decltype(Data)>) {
+            static_assert(std::is_same_v<Policy, as_is_t>);
+
             static internal::meta_data_node node{
                 &internal::meta_info<Type>::template data<Data>,
                 {},
@@ -623,7 +633,7 @@ public:
                 !std::is_member_object_pointer_v<decltype(Data)>,
                 &internal::meta_info<data_type>::resolve,
                 &internal::setter<std::is_const_v<data_type>, Type, Data>,
-                &internal::getter<Type, Data>,
+                &internal::getter<Type, Data, Policy>,
                 []() ENTT_NOEXCEPT -> meta_data {
                     return &node;
                 }
@@ -645,7 +655,7 @@ public:
                 !std::is_member_object_pointer_v<decltype(Data)>,
                 &internal::meta_info<data_type>::resolve,
                 &internal::setter<std::is_const_v<data_type>, Type, Data>,
-                &internal::getter<Type, Data>,
+                &internal::getter<Type, Data, Policy>,
                 []() ENTT_NOEXCEPT -> meta_data {
                     return &node;
                 }
@@ -681,12 +691,13 @@ public:
      *
      * @tparam Setter The actual function to use as a setter.
      * @tparam Getter The actual function to use as a getter.
+     * @tparam Policy Optional policy (no policy set by default).
      * @tparam Property Types of properties to assign to the meta data.
      * @param identifier Unique identifier.
      * @param property Properties to assign to the meta data.
      * @return A meta factory for the parent type.
      */
-    template<auto Setter, auto Getter, typename... Property>
+    template<auto Setter, auto Getter, typename Policy = as_is_t, typename... Property>
     meta_factory data(const ENTT_ID_TYPE identifier, Property &&... property) ENTT_NOEXCEPT {
         using owner_type = std::tuple<std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>;
         using underlying_type = std::invoke_result_t<decltype(Getter), Type &>;
@@ -703,7 +714,7 @@ public:
             false,
             &internal::meta_info<underlying_type>::resolve,
             &internal::setter<false, Type, Setter>,
-            &internal::getter<Type, Getter>,
+            &internal::getter<Type, Getter, Policy>,
             []() ENTT_NOEXCEPT -> meta_data {
                 return &node;
             }
@@ -729,12 +740,13 @@ public:
      * reflected object will appear as if they were part of the type itself.
      *
      * @tparam Candidate The actual function to attach to the meta type.
+     * @tparam Policy Optional policy (no policy set by default).
      * @tparam Property Types of properties to assign to the meta function.
      * @param identifier Unique identifier.
      * @param property Properties to assign to the meta function.
      * @return A meta factory for the parent type.
      */
-    template<auto Candidate, typename... Property>
+    template<auto Candidate, typename Policy = as_is_t, typename... Property>
     meta_factory func(const ENTT_ID_TYPE identifier, Property &&... property) ENTT_NOEXCEPT {
         using owner_type = std::integral_constant<decltype(Candidate), Candidate>;
         using helper_type = internal::meta_function_helper_t<decltype(Candidate)>;
@@ -749,10 +761,10 @@ public:
             helper_type::size,
             helper_type::is_const,
             !std::is_member_function_pointer_v<decltype(Candidate)>,
-            &internal::meta_info<typename helper_type::return_type>::resolve,
+            &internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename helper_type::return_type>>::resolve,
             &helper_type::arg,
             [](meta_handle handle, meta_any *any) {
-                return internal::invoke<Type, Candidate>(handle, any, std::make_index_sequence<helper_type::size>{});
+                return internal::invoke<Type, Candidate, Policy>(handle, any, std::make_index_sequence<helper_type::size>{});
             },
             []() ENTT_NOEXCEPT -> meta_func {
                 return &node;

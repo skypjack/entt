@@ -21,6 +21,7 @@
 #include "locator/locator.hpp"
 #include "meta/factory.hpp"
 #include "meta/meta.hpp"
+#include "meta/policy.hpp"
 #include "process/process.hpp"
 #include "process/scheduler.hpp"
 #include "resource/cache.hpp"

@@ -9,6 +9,7 @@
 #include <utility>
 #include <type_traits>
 #include "../config/config.h"
+#include "policy.hpp"
 
 
 namespace entt {
@@ -415,7 +416,7 @@ public:
      * @param type An instance of an object to use to initialize the container.
      */
     template<typename Type>
-    explicit meta_any(std::in_place_t, Type &type)
+    explicit meta_any(as_alias_t, Type &type)
         : meta_any{}
     {
         node = internal::meta_info<Type>::resolve();
