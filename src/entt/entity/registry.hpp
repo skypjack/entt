@@ -20,6 +20,7 @@
 #include "sparse_set.hpp"
 #include "snapshot.hpp"
 #include "storage.hpp"
+#include "utility.hpp"
 #include "entity.hpp"
 #include "group.hpp"
 #include "view.hpp"
@@ -141,7 +142,7 @@ class basic_registry {
     struct group_handler;
 
     template<typename... Exclude, typename... Get>
-    struct group_handler<type_list<Exclude...>, type_list<Get...>>: sparse_set<Entity> {
+    struct group_handler<exclude_t<Exclude...>, get_t<Get...>>: sparse_set<Entity> {
         std::tuple<pool_type<Get> *..., pool_type<Exclude> *...> cpools{};
 
         template<typename Component>
@@ -168,7 +169,7 @@ class basic_registry {
     };
 
     template<typename... Exclude, typename... Get, typename... Owned>
-    struct group_handler<type_list<Exclude...>, type_list<Get...>, Owned...>: group_type {
+    struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...>: group_type {
         std::tuple<pool_type<Owned> *..., pool_type<Get> *..., pool_type<Exclude> *...> cpools{};
 
         template<typename Component>
@@ -1312,7 +1313,7 @@ public:
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0);
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1);
 
-        using handler_type = group_handler<type_list<Exclude...>, type_list<Get...>, Owned...>;
+        using handler_type = group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...>;
 
         const std::size_t extent[] = { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) };
         const ENTT_ID_TYPE types[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
