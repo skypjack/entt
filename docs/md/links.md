@@ -36,6 +36,10 @@ I hope this list can grow much more in the future:
     defense example.
   * [EnTT Breakout](https://github.com/vblanco20-1/entt-breakout): simple
     example of a breakout game, using `SDL` and `EnTT`.
+  * [Arcade puzzle game with EnTT](https://github.com/MasonRG/ArcadePuzzleGame):
+    arcade puzzle game made in C++ using the `SDL2` and `EnTT` libraries.
+  * [Snake with EnTT](https://github.com/MasonRG/SnakeGame): simple snake game
+    made in C++ with the `SDL2` and `EnTT` libraries.
 
 * Engines/Frameworks:
   * [Apparently](https://teamwisp.github.io/credits/)
