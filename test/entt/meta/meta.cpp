@@ -73,6 +73,7 @@ struct data_type {
     inline static int h{2};
     inline static const int k{3};
     empty_type empty{};
+    int v{0};
 };
 
 struct array_type {
@@ -88,6 +89,9 @@ struct func_type {
 
     static int h(int v) { return v; }
     static void k(int v) { value = v; }
+
+    int v(int v) const { return (value = v); }
+    int & a() const { return value; }
 
     inline static int value = 0;
 };
@@ -159,11 +163,12 @@ struct Meta: public ::testing::Test {
                 .dtor<&fat_type::destroy>();
 
         entt::reflect<data_type>("data"_hs)
-                .data<&data_type::i>("i"_hs, std::make_pair(properties::prop_int, 0))
+                .data<&data_type::i, entt::as_alias_t>("i"_hs, std::make_pair(properties::prop_int, 0))
                 .data<&data_type::j>("j"_hs, std::make_pair(properties::prop_int, 1))
                 .data<&data_type::h>("h"_hs, std::make_pair(properties::prop_int, 2))
                 .data<&data_type::k>("k"_hs, std::make_pair(properties::prop_int, 3))
-                .data<&data_type::empty>("empty"_hs);
+                .data<&data_type::empty>("empty"_hs)
+                .data<&data_type::v, entt::as_void_t>("v"_hs);
 
         entt::reflect<array_type>("array"_hs)
                 .data<&array_type::global>("global"_hs)
@@ -175,7 +180,9 @@ struct Meta: public ::testing::Test {
                 .func<entt::overload<int(int) const>(&func_type::f)>("f1"_hs, std::make_pair(properties::prop_bool, false))
                 .func<&func_type::g>("g"_hs, std::make_pair(properties::prop_bool, false))
                 .func<&func_type::h>("h"_hs, std::make_pair(properties::prop_bool, false))
-                .func<&func_type::k>("k"_hs, std::make_pair(properties::prop_bool, false));
+                .func<&func_type::k>("k"_hs, std::make_pair(properties::prop_bool, false))
+                .func<&func_type::v, entt::as_void_t>("v"_hs)
+                .func<&func_type::a, entt::as_alias_t>("a"_hs);
 
         entt::reflect<setter_getter_type>("setter_getter"_hs)
                 .data<&setter_getter_type::static_setter, &setter_getter_type::static_getter>("x"_hs)
@@ -285,7 +292,7 @@ TEST_F(Meta, MetaAnySBOInPlaceTypeConstruction) {
     ASSERT_NE(entt::meta_any{3}, any);
 }
 
-TEST_F(Meta, MetaAnySBOInPlaceConstruction) {
+TEST_F(Meta, MetaAnySBOAsAliasConstruction) {
     int value = 3;
     int other = 42;
     entt::meta_any any{entt::as_alias, value};
@@ -392,7 +399,7 @@ TEST_F(Meta, MetaAnyNoSBOInPlaceTypeConstruction) {
     ASSERT_NE(entt::meta_any{fat_type{}}, any);
 }
 
-TEST_F(Meta, MetaAnyNoSBOInPlaceConstruction) {
+TEST_F(Meta, MetaAnyNoSBOAsAliasConstruction) {
     int value = 3;
     fat_type instance{&value};
     entt::meta_any any{entt::as_alias, instance};
@@ -1377,6 +1384,29 @@ TEST_F(Meta, MetaDataArray) {
     ASSERT_EQ(data.get(instance, 2).cast<int>(), 9);
 }
 
+TEST_F(Meta, MetaDataAsVoid) {
+    auto data = entt::resolve<data_type>().data("v"_hs);
+    data_type instance{};
+
+    ASSERT_TRUE(data.set(instance, 42));
+    ASSERT_EQ(instance.v, 42);
+    ASSERT_EQ(data.get(instance), entt::meta_any{std::in_place_type<void>});
+}
+
+TEST_F(Meta, MetaDataAsAlias) {
+    data_type instance{};
+    auto h_data = entt::resolve<data_type>().data("h"_hs);
+    auto i_data = entt::resolve<data_type>().data("i"_hs);
+
+    h_data.get(instance).cast<int>() = 3;
+    i_data.get(instance).cast<int>() = 3;
+
+    ASSERT_EQ(h_data.type(), entt::resolve<int>());
+    ASSERT_EQ(i_data.type(), entt::resolve<int>());
+    ASSERT_NE(instance.h, 3);
+    ASSERT_EQ(instance.i, 3);
+}
+
 TEST_F(Meta, MetaFunc) {
     auto func = entt::resolve<func_type>().func("f2"_hs);
     func_type instance{};
@@ -1588,6 +1618,24 @@ TEST_F(Meta, MetaFuncCastAndConvert) {
     ASSERT_EQ(any.cast<int>(), 9);
 }
 
+TEST_F(Meta, MetaFuncAsVoid) {
+    auto func = entt::resolve<func_type>().func("v"_hs);
+    func_type instance{};
+
+    ASSERT_EQ(func.invoke(instance, 42), entt::meta_any{std::in_place_type<void>});
+    ASSERT_EQ(func.ret(), entt::resolve<void>());
+    ASSERT_EQ(instance.value, 42);
+}
+
+TEST_F(Meta, MetaFuncAsAlias) {
+    func_type instance{};
+    auto func = entt::resolve<func_type>().func("a"_hs);
+    func.invoke(instance).cast<int>() = 3;
+
+    ASSERT_EQ(func.ret(), entt::resolve<int>());
+    ASSERT_EQ(instance.value, 3);
+}
+
 TEST_F(Meta, MetaType) {
     auto type = entt::resolve<derived_type>();
 
@@ -1685,7 +1733,7 @@ TEST_F(Meta, MetaTypeData) {
         ++counter;
     });
 
-    ASSERT_EQ(counter, 5);
+    ASSERT_EQ(counter, 6);
     ASSERT_TRUE(type.data("i"_hs));
 }
 
@@ -1697,7 +1745,7 @@ TEST_F(Meta, MetaTypeFunc) {
         ++counter;
     });
 
-    ASSERT_EQ(counter, 6);
+    ASSERT_EQ(counter, 8);
     ASSERT_TRUE(type.func("f1"_hs));
 }
 
