@@ -21,7 +21,8 @@ class family {
     inline static ENTT_MAYBE_ATOMIC(ENTT_ID_TYPE) identifier;
 
     template<typename...>
-    inline static const auto inner = identifier++;
+    // clang (since version 9) started to complain if auto is used instead of ENTT_ID_TYPE
+    inline static const ENTT_ID_TYPE inner = identifier++;
 
 public:
     /*! @brief Unsigned integer type. */
@@ -29,7 +30,7 @@ public:
 
     /*! @brief Statically generated unique identifier for the given type. */
     template<typename... Type>
-    // at the time I'm writing, clang crashes during compilation if auto is used in place of family_type here
+    // at the time I'm writing, clang crashes during compilation if auto is used instead of family_type
     inline static const family_type type = inner<std::decay_t<Type>...>;
 };
 
