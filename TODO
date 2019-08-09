@@ -18,7 +18,6 @@
 * add fast lane for raw iterations, extend mt doc to describe allowed add/remove with pre-allocations on fast lanes
 * registry.each<T...>(first, last) by iterators, entities/components guaranteed
 * multi component registry::remove and some others?
-* can I use opaque connection also for the emitter?
 * built-in support for dual (or N-) buffering
 
 TODO
@@ -29,5 +28,3 @@ TODO
   - cloning all/part of the components are both required and a target entity on which to stomp your stuff could help
   - clone is just clone, creating new entity. But yeah, both "clone-all", and "clone-components"
   - for "apply", again both All and Components, and maybe an enum of what kind of apply "dont overwrite, overwrite, add-only"
-* test meta policies
-* doc meta policies
