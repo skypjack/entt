@@ -10,6 +10,7 @@
 * [Reflection in a nutshell](#reflection-in-a-nutshell)
   * [Any as in any type](#any-as-in-any-type)
   * [Enjoy the runtime](#enjoy-the-runtime)
+  * [Policies: the more, the less](#policies-the-more-the-less)
   * [Named constants and enums](#named-constants-and-enums)
   * [Properties and meta objects](#properties-and-meta-objects)
   * [Unregister types](#unregister-types)
@@ -364,6 +365,61 @@ unfortunately beyond the scope of this document.<br/>
 I invite anyone interested in the subject to look at the code, experiment and
 read the official documentation to get the best out of this powerful tool.
 
+## Policies: the more, the less
+
+Policies are a kind of compile-time directives that can be used when recording
+reflection information.<br/>
+Their purpose is to require slightly different behavior than the default in some
+specific cases. For example, when reading a given data member, its value is
+returned wrapped in a `meta_any` object which, by default, makes a copy of it.
+For large objects or if the caller wants to access the original instance, this
+behavior isn't desirable. Policies are there to offer a solution to this and
+other problems.
+
+There are a few alternatives available at the moment:
+
+* The _as-is_ policy, associated with the type `entt::as_is_t`.<br/>
+  This is the default policy. In general, it should never be used explicitly,
+  since it's implicitly selected if no other policy is specified.<br/>
+  In this case, the return values of the functions as well as the properties
+  exposed as data members are always returned by copy in a dedicated wrapper and
+  therefore associated with their original meta types.
+
+* The _as-void_ policy, associated with the type `entt::as_void_t`.<br/>
+  Its purpose is to discard the return value of a meta object, whatever it is,
+  thus making it appear as if its type were `void`.<br/>
+  If the use with functions is obvious, it must be said that it's also possible
+  to use this policy with constructors and data members. In the first case, the
+  constructor will be invoked but the returned wrapper will actually be empty.
+  In the second case, instead, the property will not be accessible for
+  reading.
+
+  As an example of use:
+
+  ```cpp
+  entt::reflect<my_type>("reflected"_hs)
+      .func<&my_type::member_function, entt::as_void_t>("member"_hs);
+  ```
+
+* The _as-alias_ policy, associated with the type `entt::as_alias_t`<br/>
+  It allows to build wrappers that act as aliases for the objects used to
+  initialize them. Modifying the object contained in the wrapper for which the
+  _aliasing_ was requested will make it possible to directly modify the instance
+  used to initialize the wrapper itself.<br/>
+  This policy works with constructors (for example, when objects are taken from
+  an external container rather than created on demand), data members and
+  functions in general (as long as their return types are lvalue references).
+
+  As an example of use:
+
+  ```cpp
+  entt::reflect<my_type>("reflected"_hs)
+      .data<&my_type::data_member, entt::as_alias_t>("member"_hs);
+  ```
+
+Some uses are rather trivial, but it's useful to note that there are some less
+obvious corner cases that can in turn be solved with the use of policies.
+
 ## Named constants and enums
 
 A special mention should be made for constant values and enums. It wouldn't be
@@ -404,9 +460,9 @@ class.
 
 ## Properties and meta objects
 
-Sometimes (ie when it comes to creating an editor) it might be useful to be able
-to attach properties to the meta objects created. Fortunately, this is possible
-for most of them.<br/>
+Sometimes (for example, when it comes to creating an editor) it might be useful
+to be able to attach properties to the meta objects created. Fortunately, this
+is possible for most of them.<br/>
 To attach a property to a meta object, no matter what as long as it supports
 properties, it is sufficient to provide an object at the time of construction
 such that `std::get<0>` and `std::get<1>` are valid for it. In other terms, the
