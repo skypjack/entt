@@ -67,12 +67,19 @@ derived_type derived_factory(const base_type &, int value) {
     return {derived_type{}, value, 'c'};
 }
 
+enum class options {
+    optionA,
+    optionB,
+    optionC
+};
+
 struct data_type {
     int i{0};
     const int j{1};
     inline static int h{2};
     inline static const int k{3};
     empty_type empty{};
+    options option{options::optionA};
 };
 
 struct array_type {
@@ -158,12 +165,18 @@ struct Meta: public ::testing::Test {
                 .base<empty_type>()
                 .dtor<&fat_type::destroy>();
 
+        entt::reflect<options>("options"_hs)
+            .data<options::optionA>("optionA"_hs)
+            .data<options::optionB>("optionB"_hs)
+            .data<options::optionC>("optionC"_hs);
+
         entt::reflect<data_type>("data"_hs)
                 .data<&data_type::i>("i"_hs, std::make_pair(properties::prop_int, 0))
                 .data<&data_type::j>("j"_hs, std::make_pair(properties::prop_int, 1))
                 .data<&data_type::h>("h"_hs, std::make_pair(properties::prop_int, 2))
                 .data<&data_type::k>("k"_hs, std::make_pair(properties::prop_int, 3))
-                .data<&data_type::empty>("empty"_hs);
+                .data<&data_type::empty>("empty"_hs)
+                .data<&data_type::option>("option"_hs);
 
         entt::reflect<array_type>("array"_hs)
                 .data<&array_type::global>("global"_hs)
@@ -1090,6 +1103,33 @@ TEST_F(Meta, MetaDtorMetaAnyInvalidArg) {
     ASSERT_FALSE(entt::resolve<empty_type>().dtor().invoke(instance));
 }
 
+TEST_F(Meta, MetaDataOptions) {
+    auto data = entt::resolve<data_type>().data("option"_hs);
+    ASSERT_TRUE(data);
+    data_type instance{};
+    instance.option = options::optionB;
+
+    ASSERT_EQ(data.get(instance), options::optionB);
+    ASSERT_TRUE(data.set(instance, options::optionC));
+    ASSERT_EQ(data.get(instance), options::optionC);
+
+    // set value using the enum member type options.
+    auto next = data.type().data("optionA"_hs);
+    ASSERT_TRUE(next);
+    ASSERT_TRUE(data.set(instance, next.get({})));
+    ASSERT_EQ(data.get(instance), options::optionA);
+    ASSERT_EQ(instance.option, options::optionA);
+}
+
+
+TEST_F(Meta, MeataOptionsValue) {
+    options value = options::optionA;
+    auto any = entt::meta_any(value);
+    ASSERT_EQ(any.type(), entt::resolve<options>());
+    // ok so how do we update the meta handle
+    // with enum value (without expliclity using enum type casting)
+    ASSERT_EQ(value, options::optionC);
+}
 
 TEST_F(Meta, MetaData) {
     auto data = entt::resolve<data_type>().data("i"_hs);
@@ -1685,7 +1725,7 @@ TEST_F(Meta, MetaTypeData) {
         ++counter;
     });
 
-    ASSERT_EQ(counter, 5);
+    ASSERT_EQ(counter, 6);
     ASSERT_TRUE(type.data("i"_hs));
 }
 
