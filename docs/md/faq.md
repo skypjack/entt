@@ -99,7 +99,7 @@ Custom entity identifiers are definitely a good idea in two cases at least:
 
 These identifiers are nothing more than enum classes with some salt.<br/>
 To simplify the creation of new identifiers, `EnTT` provides the macro
-`ENTT_ENTITY_TYPE` that accepts two arguments:
+`ENTT_OPAQUE_TYPE` that accepts two arguments:
 
 * The name you want to give to the new identifier (watch out for namespaces).
 * The underlying type to use (either `std::uint16_t`, `std::uint32_t`
@@ -108,7 +108,7 @@ To simplify the creation of new identifiers, `EnTT` provides the macro
 In fact, this is the definition of `entt::entity`:
 
 ```cpp
-ENTT_ENTITY_TYPE(entity, std::uint32_t)
+ENTT_OPAQUE_TYPE(entity, std::uint32_t)
 ```
 
 The use of this macro is highly recommended, so as not to run into problems if

@@ -169,10 +169,10 @@ alias `entt::registry` for `entt::basic_registry<entt::entity>`.
 Entities are represented by _entity identifiers_. An entity identifier is an
 opaque type that users should not inspect or modify in any way. It carries
 information about the entity itself and its version.<br/>
-User defined identifiers can be introduced by means of the `ENTT_ENTITY_TYPE`
+User defined identifiers can be introduced by means of the `ENTT_OPAQUE_TYPE`
 macro if needed.
 
-A registry can be used both to construct and to destroy entities:
+A registry is used both to construct and to destroy entities:
 
 ```cpp
 // constructs a naked entity with no components and returns its identifier
