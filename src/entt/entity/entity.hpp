@@ -156,7 +156,7 @@ constexpr bool operator!=(const Entity entity, null other) ENTT_NOEXCEPT {
 
 
 /**
- * @brief Null entity.
+ * @brief Compile-time constant for null entities.
  *
  * There exist implicit conversions from this variable to entity identifiers of
  * any allowed type. Similarly, there exist comparision operators between the
