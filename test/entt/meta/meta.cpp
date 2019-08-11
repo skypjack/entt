@@ -6,9 +6,19 @@
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 
+template<typename Type>
+void set(Type &prop, Type value) {
+    prop = value;
+}
+
+template<typename Type>
+Type get(Type &prop) {
+    return prop;
+}
+
 enum class properties {
     prop_int,
-    prop_bool
+    prop_bool,
 };
 
 struct empty_type {
@@ -138,11 +148,13 @@ struct Meta: public ::testing::Test {
     static void SetUpTestCase() {
         entt::reflect<double>().conv<int>();
 
-        entt::reflect<char>("char"_hs, std::make_pair(properties::prop_int, 42));
+        entt::reflect<char>("char"_hs, std::make_pair(properties::prop_int, 42))
+                .data<&set<char>, &get<char>>("value"_hs);
 
         entt::reflect<properties>()
                 .data<properties::prop_bool>("prop_bool"_hs)
-                .data<properties::prop_int>("prop_int"_hs);
+                .data<properties::prop_int>("prop_int"_hs)
+                .data<&set<properties>, &get<properties>>("value"_hs);
 
         entt::reflect<unsigned int>().data<0u>("min"_hs).data<100u>("max"_hs);
 
@@ -1936,6 +1948,22 @@ TEST_F(Meta, ArithmeticTypeAndNamedConstants) {
 
     ASSERT_EQ(type.data("min"_hs).get({}).cast<unsigned int>(), 0u);
     ASSERT_EQ(type.data("max"_hs).get({}).cast<unsigned int>(), 100u);
+}
+
+TEST_F(Meta, Variables) {
+    auto p_data = entt::resolve<properties>().data("value"_hs);
+    auto c_data = entt::resolve("char"_hs).data("value"_hs);
+
+    properties prop{properties::prop_int};
+    char c = 'c';
+
+    p_data.set(prop, properties::prop_bool);
+    c_data.set(c, 'x');
+
+    ASSERT_EQ(p_data.get(prop).cast<properties>(), properties::prop_bool);
+    ASSERT_EQ(c_data.get(c).cast<char>(), 'x');
+    ASSERT_EQ(prop, properties::prop_bool);
+    ASSERT_EQ(c, 'x');
 }
 
 TEST_F(Meta, Unregister) {
