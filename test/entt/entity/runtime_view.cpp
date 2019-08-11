@@ -5,13 +5,12 @@
 
 TEST(RuntimeView, Functionalities) {
     entt::registry registry;
-    using component_type = typename decltype(registry)::component_type;
 
     // forces the creation of the pools
     registry.reserve<int>(0);
     registry.reserve<char>(0);
 
-    component_type types[] = { registry.type<int>(), registry.type<char>() };
+    entt::component types[] = { registry.type<int>(), registry.type<char>() };
     auto view = registry.runtime_view(std::begin(types), std::end(types));
 
     ASSERT_TRUE(view.empty());
@@ -49,13 +48,12 @@ TEST(RuntimeView, Functionalities) {
 
 TEST(RuntimeView, Iterator) {
     entt::registry registry;
-    using component_type = typename decltype(registry)::component_type;
 
     const auto entity = registry.create();
     registry.assign<int>(entity);
     registry.assign<char>(entity);
 
-    component_type types[] = { registry.type<int>(), registry.type<char>() };
+    entt::component types[] = { registry.type<int>(), registry.type<char>() };
     auto view = registry.runtime_view(std::begin(types), std::end(types));
     using iterator_type = typename decltype(view)::iterator_type;
 
@@ -74,7 +72,6 @@ TEST(RuntimeView, Iterator) {
 
 TEST(RuntimeView, Contains) {
     entt::registry registry;
-    using component_type = typename decltype(registry)::component_type;
 
     const auto e0 = registry.create();
     registry.assign<int>(e0);
@@ -86,7 +83,7 @@ TEST(RuntimeView, Contains) {
 
     registry.destroy(e0);
 
-    component_type types[] = { registry.type<int>(), registry.type<char>() };
+    entt::component types[] = { registry.type<int>(), registry.type<char>() };
     auto view = registry.runtime_view(std::begin(types), std::end(types));
 
     ASSERT_FALSE(view.contains(e0));
@@ -95,7 +92,6 @@ TEST(RuntimeView, Contains) {
 
 TEST(RuntimeView, Empty) {
     entt::registry registry;
-    using component_type = typename decltype(registry)::component_type;
 
     const auto e0 = registry.create();
     registry.assign<double>(e0);
@@ -106,7 +102,7 @@ TEST(RuntimeView, Empty) {
     registry.assign<char>(e1);
     registry.assign<float>(e1);
 
-    component_type types[] = { registry.type<char>(), registry.type<int>(), registry.type<float>() };
+    entt::component types[] = { registry.type<char>(), registry.type<int>(), registry.type<float>() };
     auto view = registry.runtime_view(std::begin(types), std::end(types));
 
     for(auto entity: view) {
@@ -117,7 +113,6 @@ TEST(RuntimeView, Empty) {
 
 TEST(RuntimeView, Each) {
     entt::registry registry;
-    using component_type = typename decltype(registry)::component_type;
 
     const auto e0 = registry.create();
     registry.assign<int>(e0);
@@ -127,7 +122,7 @@ TEST(RuntimeView, Each) {
     registry.assign<int>(e1);
     registry.assign<char>(e1);
 
-    component_type types[] = { registry.type<int>(), registry.type<char>() };
+    entt::component types[] = { registry.type<int>(), registry.type<char>() };
     auto view = registry.runtime_view(std::begin(types), std::end(types));
     std::size_t cnt = 0;
 
@@ -138,7 +133,6 @@ TEST(RuntimeView, Each) {
 
 TEST(RuntimeView, EachWithHoles) {
     entt::registry registry;
-    using component_type = typename decltype(registry)::component_type;
 
     const auto e0 = registry.create();
     const auto e1 = registry.create();
@@ -150,7 +144,7 @@ TEST(RuntimeView, EachWithHoles) {
     registry.assign<int>(e0, 0);
     registry.assign<int>(e2, 2);
 
-    component_type types[] = { registry.type<int>(), registry.type<char>() };
+    entt::component types[] = { registry.type<int>(), registry.type<char>() };
     auto view = registry.runtime_view(std::begin(types), std::end(types));
 
     view.each([e0](auto entity) {
@@ -160,12 +154,11 @@ TEST(RuntimeView, EachWithHoles) {
 
 TEST(RuntimeView, MissingPool) {
     entt::registry registry;
-    using component_type = typename decltype(registry)::component_type;
 
     const auto e0 = registry.create();
     registry.assign<int>(e0);
 
-    component_type types[] = { registry.type<int>(), registry.type<char>() };
+    entt::component types[] = { registry.type<int>(), registry.type<char>() };
     auto view = registry.runtime_view(std::begin(types), std::end(types));
 
     ASSERT_TRUE(view.empty());
@@ -187,12 +180,11 @@ TEST(RuntimeView, MissingPool) {
 
 TEST(RuntimeView, EmptyRange) {
     entt::registry registry;
-    using component_type = typename decltype(registry)::component_type;
 
     const auto e0 = registry.create();
     registry.assign<int>(e0);
 
-    const component_type *ptr = nullptr;
+    const entt::component *ptr = nullptr;
     auto view = registry.runtime_view(ptr, ptr);
 
     ASSERT_TRUE(view.empty());

@@ -154,6 +154,19 @@ template<class Type>
 constexpr auto is_named_type_v = is_named_type<Type>::value;
 
 
+/**
+ * @brief Defines an enum class to use for opaque identifiers and a dedicate
+ * `to_integer` function to convert the identifiers to their underlying type.
+ * @param clazz The name to use for the enum class.
+ * @param type The underlying type for the enum class.
+ */
+#define ENTT_OPAQUE_TYPE(clazz, type)\
+    enum class clazz: type {};\
+    constexpr auto to_integer(const clazz id) ENTT_NOEXCEPT {\
+        return std::underlying_type_t<clazz>(id);\
+    }
+
+
 }
 
 

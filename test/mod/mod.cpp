@@ -123,7 +123,7 @@ duk_ret_t get(duk_context *ctx, entt::registry &registry) {
 
 class duktape_registry {
     // I'm pretty sure I won't have more than 99 components in the example
-    static constexpr entt::registry::component_type udef = 100;
+    static constexpr ENTT_ID_TYPE udef = 100;
 
     struct func_map {
         using func_type = duk_ret_t(*)(duk_context *, entt::registry &);
@@ -136,7 +136,7 @@ class duktape_registry {
 
     template<typename... Comp>
     void reg() {
-        ((func[registry.type<Comp>()] = {
+        ((func[to_integer(registry.type<Comp>())] = {
                 &::set<Comp>,
                 &::unset<Comp>,
                 &::has<Comp>,
@@ -163,7 +163,7 @@ class duktape_registry {
         auto type = duk_require_uint(ctx, 1);
 
         if(type >= udef) {
-            type = registry.type<duktape_runtime>();
+            type = to_integer(registry.type<duktape_runtime>());
         }
 
         assert(func.find(type) != func.cend());
@@ -214,20 +214,20 @@ public:
 
         duk_push_array(ctx);
 
-        std::vector<typename entt::registry::component_type> components;
-        std::vector<typename entt::registry::component_type> runtime;
+        std::vector<entt::component> components;
+        std::vector<entt::component> runtime;
 
         for(duk_idx_t arg = 0; arg < nargs; arg++) {
             auto type = duk_require_uint(ctx, arg);
 
             if(type < udef) {
-                components.push_back(type);
+                components.push_back(entt::component{type});
             } else {
                 if(runtime.empty()) {
                     components.push_back(dreg.registry.type<duktape_runtime>());
                 }
 
-                runtime.push_back(type);
+                runtime.push_back(entt::component{type});
             }
         }
 
@@ -240,7 +240,7 @@ public:
             } else {
                 const auto &others = dreg.registry.get<duktape_runtime>(entity).components;
                 const auto match = std::all_of(runtime.cbegin(), runtime.cend(), [&others](const auto type) {
-                    return others.find(type) != others.cend();
+                    return others.find(to_integer(type)) != others.cend();
                 });
 
                 if(match) {
@@ -272,7 +272,7 @@ const duk_function_list_entry js_duktape_registry_methods[] = {
 void export_types(duk_context *context, entt::registry &registry) {
     auto export_type = [](auto *ctx, auto &reg, auto idx, auto type, const auto *name) {
         duk_push_string(ctx, name);
-        duk_push_uint(ctx, reg.template type<typename decltype(type)::type>());
+        duk_push_uint(ctx, to_integer(reg.template type<typename decltype(type)::type>()));
         duk_def_prop(ctx, idx, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE);
     };
 

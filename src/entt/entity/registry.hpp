@@ -211,7 +211,7 @@ class basic_registry {
     struct group_data {
         const std::size_t extent[3];
         std::unique_ptr<void, void(*)(void *)> group;
-        bool(* const is_same)(const ENTT_ID_TYPE *);
+        bool(* const is_same)(const component *);
     };
 
     struct ctx_variable {
@@ -240,7 +240,7 @@ class basic_registry {
 
     template<typename Component>
     const auto * pool() const ENTT_NOEXCEPT {
-        const auto ctype = type<Component>();
+        const auto ctype = to_integer(type<Component>());
 
         if constexpr(is_named_type_v<Component>) {
             const auto it = std::find_if(pools.begin()+skip_family_pools, pools.end(), [ctype](const auto &candidate) {
@@ -260,7 +260,7 @@ class basic_registry {
 
     template<typename Component>
     auto * assure() {
-        const auto ctype = type<Component>();
+        const auto ctype = to_integer(type<Component>());
         pool_data *pdata = nullptr;
 
         if constexpr(is_named_type_v<Component>) {
@@ -308,8 +308,6 @@ public:
     using version_type = typename traits_type::version_type;
     /*! @brief Unsigned integer type. */
     using size_type = typename sparse_set<Entity>::size_type;
-    /*! @brief Unsigned integer type. */
-    using component_type = ENTT_ID_TYPE;
 
     /*! @brief Default constructor. */
     basic_registry() ENTT_NOEXCEPT = default;
@@ -331,8 +329,8 @@ public:
      * @return Runtime numeric identifier of the given type of component.
      */
     template<typename Component>
-    static component_type type() ENTT_NOEXCEPT {
-        return runtime_type<Component, component_family>();
+    static component type() ENTT_NOEXCEPT {
+        return component{runtime_type<Component, component_family>()};
     }
 
     /**
@@ -1316,7 +1314,7 @@ public:
         using handler_type = group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...>;
 
         const std::size_t extent[] = { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) };
-        const ENTT_ID_TYPE types[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
+        const component types[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
         handler_type *curr = nullptr;
 
         if(auto it = std::find_if(groups.begin(), groups.end(), [&extent, &types](auto &&gdata) {
@@ -1330,8 +1328,8 @@ public:
             groups.push_back(group_data{
                 { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) },
                 decltype(group_data::group){new handler_type{}, [](void *gptr) { delete static_cast<handler_type *>(gptr); }},
-                [](const ENTT_ID_TYPE *other) {
-                    const std::size_t ctypes[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
+                [](const component *other) {
+                    const component ctypes[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
                     return std::equal(std::begin(ctypes), std::end(ctypes), other);
                 }
             });
@@ -1427,11 +1425,11 @@ public:
      */
     template<typename It>
     entt::basic_runtime_view<Entity> runtime_view(It first, It last) const {
-        static_assert(std::is_convertible_v<typename std::iterator_traits<It>::value_type, component_type>);
+        static_assert(std::is_same_v<typename std::iterator_traits<It>::value_type, component>);
         std::vector<const sparse_set<Entity> *> set(std::distance(first, last));
 
-        std::transform(first, last, set.begin(), [this](const component_type ctype) {
-            auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &pdata) {
+        std::transform(first, last, set.begin(), [this](const component ctype) {
+            auto it = std::find_if(pools.begin(), pools.end(), [ctype = to_integer(ctype)](const auto &pdata) {
                 return pdata.pool && pdata.runtime_type == ctype;
             });
 
@@ -1477,7 +1475,7 @@ public:
         other.pools.resize(pools.size());
 
         for(auto pos = pools.size(); pos; --pos) {
-            if(auto &pdata = pools[pos-1]; pdata.pool && (!sizeof...(Component) || ... || (pdata.runtime_type == type<Component>()))) {
+            if(auto &pdata = pools[pos-1]; pdata.pool && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))) {
                 auto &curr = other.pools[pos-1];
                 curr.clone = pdata.clone;
                 curr.remove = pdata.remove;

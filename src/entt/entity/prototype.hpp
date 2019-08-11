@@ -40,7 +40,6 @@ namespace entt {
 template<typename Entity>
 class basic_prototype {
     using basic_fn_type = void(const basic_prototype &, basic_registry<Entity> &, const Entity);
-    using component_type = typename basic_registry<Entity>::component_type;
 
     template<typename Component>
     struct component_wrapper { Component component; };
@@ -471,7 +470,7 @@ public:
     }
 
 private:
-    std::unordered_map<component_type, component_handler> handlers;
+    std::unordered_map<component, component_handler> handlers;
     registry_type *reg;
     entity_type entity;
 };

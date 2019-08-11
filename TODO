@@ -10,9 +10,6 @@
 * allow for built-in parallel each if possible
 * allow to replace std:: with custom implementations
 * remove runtime views, welcome reflection and what about snapshot?
-* empty components model allows for shared components and prefabs unity-like
-  - each with entity return the shared component multiple times, one per entity that refers to it
-  - each components only return actual component, so shared components are returned only once
 * types defined at runtime that refer to the same compile-time type (but to different pools) are possible, the library is almost there
 * add opaque input iterators to views and groups that return tuples <entity, T &...> (proxy), multi-pass guaranteed
 * add fast lane for raw iterations, extend mt doc to describe allowed add/remove with pre-allocations on fast lanes

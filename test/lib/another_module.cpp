@@ -18,7 +18,7 @@ ENTT_NAMED_TYPE(char)
 ENTT_NAMED_TYPE(double)
 ENTT_NAMED_TYPE(float)
 
-LIB_EXPORT typename entt::registry::component_type another_module_int_type() {
+LIB_EXPORT typename entt::component another_module_int_type() {
     entt::registry registry;
 
     (void)registry.type<char>();
@@ -30,7 +30,7 @@ LIB_EXPORT typename entt::registry::component_type another_module_int_type() {
     return registry.type<int>();
 }
 
-LIB_EXPORT typename entt::registry::component_type another_module_char_type() {
+LIB_EXPORT typename entt::component another_module_char_type() {
     entt::registry registry;
 
     (void)registry.type<int>();

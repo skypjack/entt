@@ -5,10 +5,10 @@
 #include <entt/signal/emitter.hpp>
 #include "types.h"
 
-extern typename entt::registry::component_type a_module_int_type();
-extern typename entt::registry::component_type a_module_char_type();
-extern typename entt::registry::component_type another_module_int_type();
-extern typename entt::registry::component_type another_module_char_type();
+extern typename entt::component a_module_int_type();
+extern typename entt::component a_module_char_type();
+extern typename entt::component another_module_int_type();
+extern typename entt::component another_module_char_type();
 
 extern void update_position(int delta, entt::registry &);
 extern void assign_velocity(int, entt::registry &);
