@@ -203,8 +203,8 @@ class basic_registry {
 
     struct pool_data {
         std::unique_ptr<sparse_set<Entity>> pool;
-        std::unique_ptr<sparse_set<Entity>>(* clone)(const sparse_set<Entity> &);
         void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
+        std::unique_ptr<sparse_set<Entity>>(* clone)(const sparse_set<Entity> &);
         ENTT_ID_TYPE runtime_type;
     };
 
@@ -289,7 +289,7 @@ class basic_registry {
                 static_cast<pool_type<Component> &>(other).remove(registry, entt);
             };
 
-            pdata->clone = [](const sparse_set<Entity> &other) -> std::unique_ptr<sparse_set<Entity>> {
+            pdata->clone = []([[maybe_unused]] const sparse_set<Entity> &other) -> std::unique_ptr<sparse_set<Entity>> {
                 if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
                     return std::make_unique<pool_type<Component>>(static_cast<const pool_type<Component> &>(other));
                 } else {
@@ -1442,10 +1442,10 @@ public:
     /**
      * @brief Clones the given components and all the entity identifiers.
      *
-     * The components must be copiable for obvious reasons. The entities
+     * The components must be copyable for obvious reasons. The entities
      * maintain their versions once copied.<br/>
      * If no components are provided, the registry will try to clone all the
-     * existing pools.
+     * existing pools. The ones for non-copyable types won't be cloned.
      *
      * This feature supports exclusion lists. The excluded types have higher
      * priority than those indicated for cloning. An excluded type will never be
@@ -1485,11 +1485,11 @@ public:
                     && !((pdata.runtime_type == to_integer(type<Exclude>())) || ...))
             {
                 auto &curr = other.pools[pos-1];
-                curr.clone = pdata.clone;
                 curr.remove = pdata.remove;
+                curr.clone = pdata.clone;
                 curr.pool = pdata.clone(*pdata.pool);
                 curr.runtime_type = pdata.runtime_type;
-                ENTT_ASSERT(sizeof...(Component) == 0 || curr.pool);
+                ENTT_ASSERT(!sizeof...(Component) || curr.pool);
             }
         }
 
