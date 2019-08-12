@@ -18,7 +18,7 @@ Type get(Type &prop) {
 
 enum class properties {
     prop_int,
-    prop_bool,
+    prop_bool
 };
 
 struct empty_type {
