@@ -31,3 +31,17 @@ TEST(Algorithm, InsertionSortEmptyContainer) {
     // this should crash with asan enabled if we break the constraint
     sort(vec.begin(), vec.end());
 }
+
+TEST(Algorithm, RadixSort)
+{
+    std::array<uint32_t, 5> arr{{4, 1, 3, 2, 0}};
+    entt::radix_sort<8, 32> sort;
+
+    sort(arr.begin(), arr.end(), [](const auto &v) {
+        return v;
+    });
+
+    for(typename decltype(arr)::size_type i = 0; i < (arr.size() - 1); ++i) {
+        ASSERT_LT(arr[i], arr[i+1]);
+    }
+}
