@@ -1377,6 +1377,32 @@ TEST(Registry, Clone) {
     other.reset();
 }
 
+TEST(Registry, CloneExclude) {
+    entt::registry registry;
+    entt::registry other;
+
+    const auto entity = registry.create();
+    registry.assign<int>(entity);
+    registry.assign<char>(entity);
+
+    other = registry.clone<int, char>(entt::exclude<char>);
+
+    ASSERT_TRUE(other.has(entity));
+    ASSERT_TRUE(other.has<int>(entity));
+    ASSERT_FALSE(other.has<char>(entity));
+
+    other = registry.clone(entt::exclude<int>);
+
+    ASSERT_TRUE(other.has(entity));
+    ASSERT_FALSE(other.has<int>(entity));
+    ASSERT_TRUE(other.has<char>(entity));
+
+    other = registry.clone(entt::exclude<int, char>);
+
+    ASSERT_TRUE(other.has(entity));
+    ASSERT_TRUE(other.orphan(entity));
+}
+
 TEST(Registry, CloneMoveOnlyComponent) {
     entt::registry registry;
     const auto entity = registry.create();

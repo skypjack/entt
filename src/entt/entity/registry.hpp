@@ -1447,6 +1447,10 @@ public:
      * If no components are provided, the registry will try to clone all the
      * existing pools.
      *
+     * This feature supports exclusion lists. The excluded types have higher
+     * priority than those indicated for cloning. An excluded type will never be
+     * cloned.
+     *
      * @note
      * There isn't an efficient way to know if all the entities are assigned at
      * least one component once copied. Therefore, there may be orphans. It is
@@ -1465,17 +1469,21 @@ public:
      * be cloned.
      *
      * @tparam Component Types of components to clone.
+     * @tparam Exclude Types of components not to be cloned.
      * @return A fresh copy of the registry.
      */
-    template<typename... Component>
-    basic_registry clone() const {
+    template<typename... Component, typename... Exclude>
+    basic_registry clone(exclude_t<Exclude...> = {}) const {
         static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
         basic_registry other;
 
         other.pools.resize(pools.size());
 
         for(auto pos = pools.size(); pos; --pos) {
-            if(auto &pdata = pools[pos-1]; pdata.pool && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))) {
+            if(auto &pdata = pools[pos-1]; pdata.pool
+                    && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))
+                    && !((pdata.runtime_type == to_integer(type<Exclude>())) || ...))
+            {
                 auto &curr = other.pools[pos-1];
                 curr.clone = pdata.clone;
                 curr.remove = pdata.remove;
