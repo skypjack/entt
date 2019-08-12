@@ -203,8 +203,8 @@ class basic_registry {
 
     struct pool_data {
         std::unique_ptr<sparse_set<Entity>> pool;
-        std::unique_ptr<sparse_set<Entity>> (* clone)(const sparse_set<Entity> &);
-        void (* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
+        std::unique_ptr<sparse_set<Entity>>(* clone)(const sparse_set<Entity> &);
+        void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
         ENTT_ID_TYPE runtime_type;
     };
 
