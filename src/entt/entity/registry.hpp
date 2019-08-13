@@ -205,6 +205,7 @@ class basic_registry {
         std::unique_ptr<sparse_set<Entity>> pool;
         void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
         std::unique_ptr<sparse_set<Entity>>(* clone)(const sparse_set<Entity> &);
+        void(* accommodate)(const sparse_set<Entity> &, const Entity, registry &, const Entity);
         ENTT_ID_TYPE runtime_type;
     };
 
@@ -239,7 +240,7 @@ class basic_registry {
     }
 
     template<typename Component>
-    const auto * pool() const ENTT_NOEXCEPT {
+    const pool_type<Component> * pool() const ENTT_NOEXCEPT {
         const auto ctype = to_integer(type<Component>());
 
         if constexpr(is_named_type_v<Component>) {
@@ -254,12 +255,12 @@ class basic_registry {
     }
 
     template<typename Component>
-    auto * pool() ENTT_NOEXCEPT {
+    pool_type<Component> * pool() ENTT_NOEXCEPT {
         return const_cast<pool_type<Component> *>(std::as_const(*this).template pool<Component>());
     }
 
     template<typename Component>
-    auto * assure() {
+    pool_type<Component> * assure() {
         const auto ctype = to_integer(type<Component>());
         pool_data *pdata = nullptr;
 
@@ -285,17 +286,22 @@ class basic_registry {
             pdata->runtime_type = ctype;
             pdata->pool = std::make_unique<pool_type<Component>>();
 
-            pdata->remove = [](sparse_set<Entity> &other, basic_registry &registry, const Entity entt) {
-                static_cast<pool_type<Component> &>(other).remove(registry, entt);
+            pdata->remove = [](sparse_set<Entity> &cpool, basic_registry &registry, const Entity entt) {
+                static_cast<pool_type<Component> &>(cpool).remove(registry, entt);
             };
 
-            pdata->clone = []([[maybe_unused]] const sparse_set<Entity> &other) -> std::unique_ptr<sparse_set<Entity>> {
-                if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
-                    return std::make_unique<pool_type<Component>>(static_cast<const pool_type<Component> &>(other));
-                } else {
-                    return nullptr;
-                }
-            };
+            if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
+                pdata->clone = [](const sparse_set<Entity> &cpool) -> std::unique_ptr<sparse_set<Entity>> {
+                    return std::make_unique<pool_type<Component>>(static_cast<const pool_type<Component> &>(cpool));
+                };
+
+                pdata->accommodate = [](const sparse_set<Entity> &cpool, const Entity from, registry &other, const Entity to) {
+                    other.assign_or_replace<Component>(to, static_cast<const pool_type<Component> &>(cpool).get(from));
+                };
+            } else {
+                pdata->clone = nullptr;
+                pdata->accommodate = nullptr;
+            }
         }
 
         return static_cast<pool_type<Component> *>(pdata->pool.get());
@@ -319,14 +325,14 @@ public:
     basic_registry & operator=(basic_registry &&) = default;
 
     /**
-     * @brief Returns the numeric identifier of a component.
+     * @brief Returns the opaque identifier of a component.
      *
      * The given component doesn't need to be necessarily in use.<br/>
      * Do not use this functionality to generate numeric identifiers for types
      * at runtime. They aren't guaranteed to be stable between different runs.
      *
      * @tparam Component Type of component to query.
-     * @return Runtime numeric identifier of the given type of component.
+     * @return Runtime the opaque identifier of the given type of component.
      */
     template<typename Component>
     static component type() ENTT_NOEXCEPT {
@@ -1440,7 +1446,7 @@ public:
     }
 
     /**
-     * @brief Clones the given components and all the entity identifiers.
+     * @brief Returns a full or partial copy of a registry.
      *
      * The components must be copyable for obvious reasons. The entities
      * maintain their versions once copied.<br/>
@@ -1480,16 +1486,19 @@ public:
         other.pools.resize(pools.size());
 
         for(auto pos = pools.size(); pos; --pos) {
-            if(auto &pdata = pools[pos-1]; pdata.pool
+            const auto &pdata = pools[pos-1];
+            ENTT_ASSERT(!sizeof...(Component) || !pdata.pool || pdata.clone);
+
+            if(pdata.pool && pdata.clone
                     && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))
                     && !((pdata.runtime_type == to_integer(type<Exclude>())) || ...))
             {
                 auto &curr = other.pools[pos-1];
                 curr.remove = pdata.remove;
                 curr.clone = pdata.clone;
-                curr.pool = pdata.clone(*pdata.pool);
+                curr.accommodate = pdata.accommodate;
+                curr.pool = pdata.clone ? pdata.clone(*pdata.pool) : nullptr;
                 curr.runtime_type = pdata.runtime_type;
-                ENTT_ASSERT(!sizeof...(Component) || curr.pool);
             }
         }
 
@@ -1503,6 +1512,56 @@ public:
         }), other.pools.end());
 
         return other;
+    }
+
+    /**
+     * @brief Makes a full or partial copy of an entity.
+     *
+     * The components must be copyable for obvious reasons. The entities
+     * must be both valid.<br/>
+     * If no components are provided, the registry will try to copy all the
+     * existing types. The non-copyable ones will be ignored.
+     *
+     * This feature supports exclusion lists. The excluded types have higher
+     * priority than those indicated for copying. An excluded type will never be
+     * copied.
+     *
+     * @warning
+     * Attempting to copy components that aren't copyable results in unexpected
+     * behaviors.<br/>
+     * A static assertion will abort the compilation when the components
+     * provided aren't copy constructible. Otherwise, an assertion will abort
+     * the execution at runtime in debug mode in case one or more types cannot
+     * be copied.
+     *
+     * @warning
+     * Attempting to use invalid entities results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entities.
+     *
+     * @tparam Component Types of components to copy.
+     * @tparam Exclude Types of components not to be copied.
+     * @param from A valid entity identifier to be copied.
+     * @param other The registry that owns the target entity.
+     * @param to A valid entity identifier to copy to.
+     */
+    template<typename... Component, typename... Exclude>
+    void clone(const Entity from, registry &other, const Entity to, exclude_t<Exclude...> = {}) {
+        static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
+        ENTT_ASSERT(valid(from) && other.valid(to));
+
+        for(auto pos = pools.size(); pos; --pos) {
+            const auto &pdata = pools[pos-1];
+            ENTT_ASSERT(!sizeof...(Component) || !pdata.pool || pdata->accommodate);
+
+            if(pdata.pool && pdata.accommodate
+                    && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))
+                    && !((pdata.runtime_type == to_integer(type<Exclude>())) || ...)
+                    && pdata.pool->has(from))
+            {
+                pdata.accommodate(*pdata.pool, from, other, to);
+            }
+        }
     }
 
     /**

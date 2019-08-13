@@ -16,6 +16,7 @@
 * registry.each<T...>(first, last) by iterators, entities/components guaranteed
 * multi component registry::remove and some others?
 * built-in support for dual (or N-) buffering
+* allow to "merge" registries easily
 
 TODO
 * custom (decoupled) pools ==> double buffering, shared components, multi-model
@@ -25,3 +26,4 @@ TODO
   - cloning all/part of the components are both required and a target entity on which to stomp your stuff could help
   - clone is just clone, creating new entity. But yeah, both "clone-all", and "clone-components"
   - for "apply", again both All and Components, and maybe an enum of what kind of apply "dont overwrite, overwrite, add-only"
+  - deprecate prototype
