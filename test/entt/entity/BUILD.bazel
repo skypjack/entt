@@ -1,0 +1,121 @@
+load("//bazel:copts.bzl", "entt_copts")
+
+cc_test(
+    name = "actor",
+    copts = entt_copts,
+    srcs = ["actor.cpp"],
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "entity",
+    copts = entt_copts,
+    srcs = ["entity.cpp"],
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "group",
+    copts = entt_copts,
+    srcs = ["group.cpp"],
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "helper",
+    copts = entt_copts,
+    srcs = ["helper.cpp"],
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "observer",
+    copts = entt_copts,
+    srcs = ["observer.cpp"],
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",  
+    ],
+)
+
+cc_test(
+    name = "prototype",
+    copts = entt_copts,
+    srcs = ["prototype.cpp"],
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "registry",
+    copts = entt_copts,
+    srcs = ["registry.cpp"],
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "runtime_view",
+    copts = entt_copts,
+    srcs = ["runtime_view.cpp"],
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "snapshot",
+    copts = entt_copts,
+    srcs = ["snapshot.cpp"],
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",  
+    ],
+)
+
+cc_test(
+    name = "sparse_set",
+    copts = entt_copts,
+    srcs = ["sparse_set.cpp"],
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "storage",
+    copts = entt_copts,
+    srcs = ["storage.cpp"],
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "view",
+    copts = entt_copts,
+    srcs = ["view.cpp"],
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

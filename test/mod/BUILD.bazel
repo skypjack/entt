@@ -1,0 +1,12 @@
+load("//bazel:copts.bzl", "entt_copts")
+
+cc_test(
+    name = "mod",
+    srcs = ["mod.cpp"],
+    copts = entt_copts,
+    deps = [
+        "//:entt",
+        "@org_duktape//:duktape",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

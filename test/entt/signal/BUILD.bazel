@@ -1,0 +1,41 @@
+load("//bazel:copts.bzl", "entt_copts")
+
+cc_test(
+    name = "delegate",
+    srcs = ["delegate.cpp"],
+    copts = entt_copts,
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "dispatcher",
+    srcs = ["dispatcher.cpp"],
+    copts = entt_copts,
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "emitter",
+    srcs = ["emitter.cpp"],
+    copts = entt_copts,
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "sigh",
+    srcs = ["sigh.cpp"],
+    copts = entt_copts,
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

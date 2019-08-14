@@ -1,0 +1,11 @@
+load("//bazel:copts.bzl", "entt_copts")
+
+cc_test(
+    name = "resource",
+    srcs = ["resource.cpp"],
+    copts = entt_copts,
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
