@@ -41,7 +41,7 @@ I hope this list can grow much more in the future:
   * [Snake with EnTT](https://github.com/MasonRG/SnakeGame): simple snake game
     made in C++ with the `SDL2` and `EnTT` libraries.
 
-* Engines/Frameworks:
+* Engines and the like:
   * [Apparently](https://teamwisp.github.io/credits/)
     [Wisp](https://teamwisp.github.io/product/) by
     [Team Wisp](https://teamwisp.github.io/): an advanced real-time ray tracing
@@ -52,10 +52,12 @@ I hope this list can grow much more in the future:
     [Qub3d](https://qub3d.org/): because blocks should be open source.
   * [shiva](https://github.com/Milerius/shiva): modern C++ engine with
     modularity.
-
-* Emulators:
   * [NovusCore](https://github.com/novuscore/NovusCore): A modern take on World
     of Warcraft emulation.
+  * [ImGui/EnTT editor](https://github.com/Green-Sky/imgui_entt_entity_editor):
+    A drop-in, single-file entity editor for `EnTT` that uses `ImGui` as
+    graphical backend (with
+    [demo code](https://github.com/Green-Sky/imgui_entt_entity_editor_demo)).
 
 * Articles and blog posts
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
