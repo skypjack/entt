@@ -18,12 +18,12 @@
   * [Runtime components](#runtime-components)
     * [A journey through a plugin](#a-journey-through-a-plugin)
   * [Sorting: is it possible?](#sorting-is-it-possible)
+  * [Multiple registries to the rescue](#multiple-registries-to-the-rescue)
   * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
     * [Snapshot loader](#snapshot-loader)
     * [Continuous loader](#continuous-loader)
     * [Archives](#archives)
     * [One example to rule them all](#one-example-to-rule-them-all)
-  * [Prototype](#prototype)
   * [The actor class](#the-actor-class)
   * [Helpers](#helpers)
     * [Dependency function](#dependency-function)
@@ -627,6 +627,56 @@ In fact, there are two functions that respond to slightly different needs:
   In this case, instances of `movement` are arranged in memory so that cache
   misses are minimized when the two components are iterated together.
 
+As a side note, when groups are involved, the sorting functions are applied
+separately to the elements that are part of the group and to those that are not,
+effectively generating two partitions, both of which can be ordered
+independently of each other.
+
+## Multiple registries to the rescue
+
+The use of multiple registries is quite common. Examples of use are the
+separation of the UI from the simulation or the loading of different scenes in
+the background, possibly on a separate thread, without having to keep track of
+which entity belongs to which scene.<br/>
+In fact, with `EnTT` this is even a recommended practice, as the registry is
+nothing more than a container and different optimizations can be applied to
+different containers.
+
+Once there are multiple registries available, however, a method is needed to
+transfer information from one container to another and this results in the
+`stomp` member function of the `registry` class.<br/>
+This function allows to take an entity from a registry and copy it over another
+entity in another registry (or even in place, actually making a local copy).
+
+It opens definitely the doors to a lot of interesting features. Below is a
+brief, yet incomplete list of some of them:
+
+* Prototypes or templates for high level _concepts_ to use to spawn new entities
+  when needed or to _apply_ a given set of components to an existing
+  entity.<br/>
+  Put aside the fact that having the prototypes separated from the simulation is
+  useful in many cases, they make also the codebase easier to maintain, since
+  updating a template is much less error prone than jumping in the code to
+  update all the snippets copied and pasted around to initialize entities and
+  components.
+
+* Literally _move_ entities from one registry to another (that is a copy
+  followed by a destroy), which can be useful for solving problems such as the
+  migration of entities between different scenes without loss of information.
+
+* Even prefabs, shared instances without explicit owner and copy-on-write
+  policies among other things are easily achievable in this way and with the
+  _right_ types in use for the components.
+
+* Remove entities that are distant or not visible so as to reduce the processing
+  time, moving them to a _cold_ registry from which they can be easily resumed
+  at any time.
+
+And so on. There are many things that become possible by combining multiple
+containers but none is really useful without the right means to move entities
+and components between registries.<br/>
+Therefore, this seemed a good reason to implement such a feature.
+
 ## Snapshot: complete vs continuous
 
 The `registry` class offers basic support to serialization.<br/>
@@ -865,82 +915,6 @@ the best way to do it. However, feel free to use it at your own risk.
 
 The basic idea is to store everything in a group of queues in memory, then bring
 everything back to the registry with different loaders.
-
-## Prototype
-
-A prototype defines a type of an application in terms of its parts. They can be
-used to assign components to entities of a registry at once.<br/>
-Roughly speaking, in most cases prototypes can be considered just as templates
-to use to initialize entities according to _concepts_. In fact, users can create
-how many prototypes they want, each one initialized differently from the others.
-
-The following is an example of use of a prototype:
-
-```cpp
-entt::registry registry;
-entt::prototype prototype{registry};
-
-prototype.set<position>(100.f, 100.f);
-prototype.set<velocity>(0.f, 0.f);
-
-// ...
-
-const auto entity = prototype();
-```
-
-To assign and remove components from a prototype, it offers two dedicated member
-functions named `set` and `unset`. The `has` member function can be used to know
-if a given prototype contains one or more components and the `get` member
-function can be used to retrieve the components.
-
-Creating an entity from a prototype is straightforward:
-
-* To create a new entity from scratch and assign it a prototype, this is the way
-  to go:
-
-  ```cpp
-  const auto entity = prototype();
-  ```
-
-  It is equivalent to the following invokation:
-
-  ```cpp
-  const auto entity = prototype.create();
-  ```
-
-* To initialize an already existing entity, users can provide the `operator()`
-  directly with the entity identifier:
-
-  ```cpp
-  prototype(entity);
-  ```
-
-  It is equivalent to the following invokation:
-
-  ```cpp
-  prototype.assign(entity);
-  ```
-
-  Note that existing components aren't overwritten in this case. Only those
-  components that the entity doesn't own yet are copied over. All the other
-  components remain unchanged.
-
-* Finally, to assign or replace all the components for an entity, thus
-  overwriting existing ones:
-
-  ```cpp
-  prototype.assign_or_replace(entity);
-  ```
-
-In the examples above, the prototype uses its underlying registry to create
-entities and components both for its purposes and when it's cloned. To use a
-different repository to clone a prototype, all the member functions accept also
-a reference to a valid registry as a first argument.
-
-Prototypes are a very useful tool that can save a lot of typing sometimes.
-Furthermore, the codebase may be easier to maintain, since updating a prototype
-is much less error prone than jumping around in the codebase to update all the
-snippets copied and pasted around to initialize entities and components.
 
 ## The actor class
 

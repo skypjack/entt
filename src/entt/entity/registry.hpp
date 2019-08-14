@@ -205,7 +205,7 @@ class basic_registry {
         std::unique_ptr<sparse_set<Entity>> pool;
         void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
         std::unique_ptr<sparse_set<Entity>>(* clone)(const sparse_set<Entity> &);
-        void(* accommodate)(const sparse_set<Entity> &, const Entity, registry &, const Entity);
+        void(* stomp)(const sparse_set<Entity> &, const Entity, registry &, const Entity);
         ENTT_ID_TYPE runtime_type;
     };
 
@@ -295,12 +295,12 @@ class basic_registry {
                     return std::make_unique<pool_type<Component>>(static_cast<const pool_type<Component> &>(cpool));
                 };
 
-                pdata->accommodate = [](const sparse_set<Entity> &cpool, const Entity from, registry &other, const Entity to) {
+                pdata->stomp = [](const sparse_set<Entity> &cpool, const Entity from, registry &other, const Entity to) {
                     other.assign_or_replace<Component>(to, static_cast<const pool_type<Component> &>(cpool).get(from));
                 };
             } else {
                 pdata->clone = nullptr;
-                pdata->accommodate = nullptr;
+                pdata->stomp = nullptr;
             }
         }
 
@@ -1496,7 +1496,7 @@ public:
                 auto &curr = other.pools[pos-1];
                 curr.remove = pdata.remove;
                 curr.clone = pdata.clone;
-                curr.accommodate = pdata.accommodate;
+                curr.stomp = pdata.stomp;
                 curr.pool = pdata.clone ? pdata.clone(*pdata.pool) : nullptr;
                 curr.runtime_type = pdata.runtime_type;
             }
@@ -1546,20 +1546,20 @@ public:
      * @param to A valid entity identifier to copy to.
      */
     template<typename... Component, typename... Exclude>
-    void clone(const Entity from, registry &other, const Entity to, exclude_t<Exclude...> = {}) {
+    void stomp(const Entity from, registry &other, const Entity to, exclude_t<Exclude...> = {}) {
         static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
         ENTT_ASSERT(valid(from) && other.valid(to));
 
         for(auto pos = pools.size(); pos; --pos) {
             const auto &pdata = pools[pos-1];
-            ENTT_ASSERT(!sizeof...(Component) || !pdata.pool || pdata->accommodate);
+            ENTT_ASSERT(!sizeof...(Component) || !pdata.pool || pdata->stomp);
 
-            if(pdata.pool && pdata.accommodate
+            if(pdata.pool && pdata.stomp
                     && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))
                     && !((pdata.runtime_type == to_integer(type<Exclude>())) || ...)
                     && pdata.pool->has(from))
             {
-                pdata.accommodate(*pdata.pool, from, other, to);
+                pdata.stomp(*pdata.pool, from, other, to);
             }
         }
     }
