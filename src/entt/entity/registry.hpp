@@ -1552,7 +1552,7 @@ public:
 
         for(auto pos = pools.size(); pos; --pos) {
             const auto &pdata = pools[pos-1];
-            ENTT_ASSERT(!sizeof...(Component) || !pdata.pool || pdata->stomp);
+            ENTT_ASSERT(!sizeof...(Component) || !pdata.pool || pdata.stomp);
 
             if(pdata.pool && pdata.stomp
                     && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))

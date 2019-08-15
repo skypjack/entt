@@ -26,8 +26,3 @@ TODO
 * make meta work across boundaries
   - inline variables are fine here, only the head represents a problem
   - we should always resolve by looking into the list of types when working across boundaries, no direct resolve
-* add take functionality, eg registry.take(entity, other); where it takes the entity and all its components from registry and move them to other
-* add merge functionality, eg you have entity with A-B, and "apply" a clone from an entity with B-C. B gets replaced, C gets added, and A stays
-  - cloning all/part of the components are both required and a target entity on which to stomp your stuff could help
-  - clone is just clone, creating new entity. But yeah, both "clone-all", and "clone-components"
-  - for "apply", again both All and Components, and maybe an enum of what kind of apply "dont overwrite, overwrite, add-only"

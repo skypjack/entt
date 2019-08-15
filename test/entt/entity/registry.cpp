@@ -1307,7 +1307,7 @@ TEST(Registry, Clone) {
 
     ASSERT_EQ((other.group<int, char>().size()), entt::registry::size_type{0});
 
-    other = registry.clone<int, char>();
+    other = registry.clone<int, char, float>();
 
     ASSERT_EQ((other.group<int, char>().size()), entt::registry::size_type{1});
     ASSERT_EQ(other.size(), registry.size());
@@ -1415,6 +1415,72 @@ TEST(Registry, CloneMoveOnlyComponent) {
     ASSERT_TRUE(other.valid(entity));
     ASSERT_TRUE(other.has<char>(entity));
     ASSERT_FALSE(other.has<std::unique_ptr<int>>(entity));
+}
+
+TEST(Registry, Stomp) {
+    entt::registry registry;
+
+    const auto entity = registry.create();
+    registry.assign<int>(entity, 3);
+    registry.assign<char>(entity, 'c');
+
+    auto other = registry.create();
+    registry.stomp<int, char, double>(entity, registry, other);
+
+    ASSERT_TRUE(registry.has<int>(other));
+    ASSERT_TRUE(registry.has<char>(other));
+    ASSERT_EQ(registry.get<int>(other), 3);
+    ASSERT_EQ(registry.get<char>(other), 'c');
+
+    registry.replace<int>(entity, 42);
+    registry.replace<char>(entity, 'a');
+    registry.stomp<int>(entity, registry, other);
+
+    ASSERT_EQ(registry.get<int>(other), 42);
+    ASSERT_EQ(registry.get<char>(other), 'c');
+}
+
+TEST(Registry, StompExclude) {
+    entt::registry registry;
+
+    const auto entity = registry.create();
+    registry.assign<int>(entity, 3);
+    registry.assign<char>(entity, 'c');
+
+    const auto other = registry.create();
+    registry.stomp<int, char>(entity, registry, other, entt::exclude<char>);
+
+    ASSERT_TRUE(registry.has<int>(other));
+    ASSERT_FALSE(registry.has<char>(other));
+    ASSERT_EQ(registry.get<int>(other), 3);
+
+    registry.replace<int>(entity, 42);
+    registry.stomp(entity, registry, other, entt::exclude<int>);
+
+    ASSERT_TRUE(registry.has<int>(other));
+    ASSERT_TRUE(registry.has<char>(other));
+    ASSERT_EQ(registry.get<int>(other), 3);
+    ASSERT_EQ(registry.get<char>(other), 'c');
+
+    registry.remove<int>(other);
+    registry.remove<char>(other);
+    registry.stomp(entity, registry, other, entt::exclude<int, char>);
+
+    ASSERT_TRUE(registry.orphan(other));
+}
+
+TEST(Registry, StompMoveOnlyComponent) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.assign<std::unique_ptr<int>>(entity);
+    registry.assign<char>(entity);
+
+    const auto other = registry.create();
+    registry.stomp(entity, registry, other);
+
+    ASSERT_TRUE(registry.has<char>(other));
+    ASSERT_FALSE(registry.has<std::unique_ptr<int>>(other));
 }
 
 TEST(Registry, GetOrAssign) {
