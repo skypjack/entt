@@ -233,7 +233,7 @@ class basic_registry {
         // lengthens the implicit list of destroyed entities
         const auto entt = to_integer(entity) & traits_type::entity_mask;
         const auto version = ((to_integer(entity) >> traits_type::entity_shift) + 1) << traits_type::entity_shift;
-        const auto node = (available ? to_integer(next) : ((entt + 1) & traits_type::entity_mask)) | version;
+        const auto node = to_integer(next) | version;
         entities[entt] = Entity{node};
         next = Entity{entt};
         ++available;
@@ -1747,12 +1747,12 @@ public:
 
 private:
     std::size_t skip_family_pools{};
-    std::vector<pool_data> pools;
-    std::vector<group_data> groups;
-    std::vector<ctx_variable> vars;
-    std::vector<entity_type> entities;
+    std::vector<pool_data> pools{};
+    std::vector<group_data> groups{};
+    std::vector<ctx_variable> vars{};
+    std::vector<entity_type> entities{};
     size_type available{};
-    entity_type next{};
+    entity_type next{null};
 };
 
 

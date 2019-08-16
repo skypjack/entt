@@ -110,8 +110,7 @@ namespace internal {
 struct null {
     template<typename Entity>
     constexpr operator Entity() const ENTT_NOEXCEPT {
-        using traits_type = entt_traits<std::underlying_type_t<Entity>>;
-        return Entity{traits_type::entity_mask | (traits_type::version_mask << traits_type::entity_shift)};
+        return Entity{entt_traits<std::underlying_type_t<Entity>>::entity_mask};
     }
 
     constexpr bool operator==(null) const ENTT_NOEXCEPT {
