@@ -13,6 +13,7 @@ TEST(Traits, Null) {
     registry.assign<int>(entity, 42);
 
     ASSERT_TRUE(entt::entity{traits_type::entity_mask} == entt::null);
+    ASSERT_TRUE(entt::entity{~typename traits_type::entity_type{}} == entt::null);
 
     ASSERT_TRUE(entt::null == entt::null);
     ASSERT_FALSE(entt::null != entt::null);

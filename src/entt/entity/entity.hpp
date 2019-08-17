@@ -107,10 +107,14 @@ struct entt_traits<std::uint64_t> {
 namespace internal {
 
 
-struct null {
+class null {
+    template<typename Entity>
+    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
+
+public:
     template<typename Entity>
     constexpr operator Entity() const ENTT_NOEXCEPT {
-        return Entity{entt_traits<std::underlying_type_t<Entity>>::entity_mask};
+        return Entity{traits_type<Entity>::entity_mask};
     }
 
     constexpr bool operator==(null) const ENTT_NOEXCEPT {
@@ -123,12 +127,12 @@ struct null {
 
     template<typename Entity>
     constexpr bool operator==(const Entity entity) const ENTT_NOEXCEPT {
-        return entity == static_cast<Entity>(*this);
+        return (to_integer(entity) & traits_type<Entity>::entity_mask) == to_integer(static_cast<Entity>(*this));
     }
 
     template<typename Entity>
     constexpr bool operator!=(const Entity entity) const ENTT_NOEXCEPT {
-        return entity != static_cast<Entity>(*this);
+        return !(entity == *this);
     }
 };
 
