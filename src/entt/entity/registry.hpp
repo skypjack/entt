@@ -1575,7 +1575,7 @@ public:
         using follow_fn_type = entity_type(const basic_registry &, const entity_type);
 
         const auto head = to_integer(destroyed);
-        const entity_type seed = destroyed == null ? destroyed : entity_type{head | (to_integer(entities[head]) & (traits_type::version_mask << traits_type::entity_shift))};
+        const entity_type seed = (destroyed == null) ? destroyed : entity_type{head | (to_integer(entities[head]) & (traits_type::version_mask << traits_type::entity_shift))};
 
         follow_fn_type *follow = [](const basic_registry &reg, const entity_type entity) -> entity_type {
             const auto &others = reg.entities;
@@ -1629,6 +1629,7 @@ public:
 
         reset();
         entities.clear();
+        destroyed = null;
 
         return { this, force };
     }
