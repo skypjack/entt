@@ -601,18 +601,10 @@ public:
         static_assert(std::is_convertible_v<entity_type, typename std::iterator_traits<It>::value_type>);
         const auto length = size_type(std::distance(first, last));
         const auto sz = std::min(available, length);
-        [[maybe_unused]] entity_type candidate{};
 
         available -= sz;
 
-        const auto tail = std::generate_n(first, sz, [this, &candidate]() mutable {
-            if constexpr(sizeof...(Component) > 0) {
-                candidate = entity_type{std::max(candidate, next)};
-            } else {
-                // suppress warnings
-                (void)candidate;
-            }
-
+        const auto tail = std::generate_n(first, sz, [this]() mutable {
             const auto entt = to_integer(next);
             const auto version = to_integer(entities[entt]) & (traits_type::version_mask << traits_type::entity_shift);
             next = entity_type{to_integer(entities[entt]) & traits_type::entity_mask};
@@ -1634,7 +1626,6 @@ public:
 
         reset();
         entities.clear();
-        available = {};
 
         return { this, force };
     }
