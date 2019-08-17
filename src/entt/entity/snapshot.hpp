@@ -211,14 +211,14 @@ class basic_snapshot_loader {
     }
 
     template<typename Archive>
-    void assure(Archive &archive, bool destroyed) const {
+    void assure(Archive &archive, bool discard) const {
         typename traits_type::entity_type length{};
         archive(length);
 
         while(length--) {
             Entity entt{};
             archive(entt);
-            force(*reg, entt, destroyed);
+            force(*reg, entt, discard);
         }
     }
 
@@ -228,17 +228,17 @@ class basic_snapshot_loader {
         archive(length);
 
         while(length--) {
-            static constexpr auto destroyed = false;
+            static constexpr auto discard = false;
             Entity entt{};
 
             if constexpr(std::is_empty_v<Type>) {
                 archive(entt);
-                force(*reg, entt, destroyed);
+                force(*reg, entt, discard);
                 reg->template assign<Type>(args..., entt);
             } else {
                 Type instance{};
                 archive(entt, instance);
-                force(*reg, entt, destroyed);
+                force(*reg, entt, discard);
                 reg->template assign<Type>(args..., entt, std::as_const(instance));
             }
         }
@@ -263,8 +263,8 @@ public:
      */
     template<typename Archive>
     const basic_snapshot_loader & entities(Archive &archive) const {
-        static constexpr auto destroyed = false;
-        assure(archive, destroyed);
+        static constexpr auto discard = false;
+        assure(archive, discard);
         return *this;
     }
 
@@ -280,8 +280,8 @@ public:
      */
     template<typename Archive>
     const basic_snapshot_loader & destroyed(Archive &archive) const {
-        static constexpr auto destroyed = true;
-        assure(archive, destroyed);
+        static constexpr auto discard = true;
+        assure(archive, discard);
         return *this;
     }
 

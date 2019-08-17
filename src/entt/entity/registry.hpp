@@ -233,10 +233,9 @@ class basic_registry {
         // lengthens the implicit list of destroyed entities
         const auto entt = to_integer(entity) & traits_type::entity_mask;
         const auto version = ((to_integer(entity) >> traits_type::entity_shift) + 1) << traits_type::entity_shift;
-        const auto node = to_integer(next) | version;
+        const auto node = to_integer(destroyed) | version;
         entities[entt] = Entity{node};
-        next = Entity{entt};
-        ++available;
+        destroyed = Entity{entt};
     }
 
     template<typename Component>
@@ -363,7 +362,15 @@ public:
      * @return Number of entities still in use.
      */
     size_type alive() const ENTT_NOEXCEPT {
-        return entities.size() - available;
+        auto curr = destroyed;
+        size_type cnt{};
+
+        while(curr != null) {
+            curr = entities[to_integer(curr) & traits_type::entity_mask];
+            ++cnt;
+        }
+
+        return entities.size() - cnt;
     }
 
     /**
@@ -438,7 +445,7 @@ public:
      * @return True if at least an entity is still in use, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
-        return entities.size() == available;
+        return !alive();
     }
 
     /**
@@ -563,17 +570,16 @@ public:
     decltype(auto) create() {
         entity_type entity;
 
-        if(available) {
-            const auto entt = to_integer(next);
-            const auto version = to_integer(entities[entt]) & (traits_type::version_mask << traits_type::entity_shift);
-            next = entity_type{to_integer(entities[entt]) & traits_type::entity_mask};
-            entity = entity_type{entt | version};
-            entities[entt] = entity;
-            --available;
-        } else {
+        if(destroyed == null) {
             entity = entities.emplace_back(entity_type(entities.size()));
             // traits_type::entity_mask is reserved to allow for null identifiers
             ENTT_ASSERT(to_integer(entity) < traits_type::entity_mask);
+        } else {
+            const auto entt = to_integer(destroyed);
+            const auto version = to_integer(entities[entt]) & (traits_type::version_mask << traits_type::entity_shift);
+            destroyed = entity_type{to_integer(entities[entt]) & traits_type::entity_mask};
+            entity = entity_type{entt | version};
+            entities[entt] = entity;
         }
 
         if constexpr(sizeof...(Component) == 0) {
@@ -599,20 +605,20 @@ public:
     template<typename... Component, typename It>
     auto create(It first, It last) {
         static_assert(std::is_convertible_v<entity_type, typename std::iterator_traits<It>::value_type>);
-        const auto length = size_type(std::distance(first, last));
-        const auto sz = std::min(available, length);
 
-        available -= sz;
+        std::generate(first, last, [this]() {
+            entity_type curr;
 
-        const auto tail = std::generate_n(first, sz, [this]() mutable {
-            const auto entt = to_integer(next);
-            const auto version = to_integer(entities[entt]) & (traits_type::version_mask << traits_type::entity_shift);
-            next = entity_type{to_integer(entities[entt]) & traits_type::entity_mask};
-            return (entities[entt] = entity_type{entt | version});
-        });
+            if(destroyed != null) {
+                const auto entt = to_integer(destroyed);
+                const auto version = to_integer(entities[entt]) & (traits_type::version_mask << traits_type::entity_shift);
+                destroyed = entity_type{to_integer(entities[entt]) & traits_type::entity_mask};
+                curr = (entities[entt] = entity_type{entt | version});
+            } else {
+                curr = entities.emplace_back(entity_type(entities.size()));
+            }
 
-        std::generate(tail, last, [this]() {
-            return entities.emplace_back(entity_type(entities.size()));
+            return curr;
         });
 
         if constexpr(sizeof...(Component) > 0) {
@@ -1162,7 +1168,11 @@ public:
     void each(Func func) const {
         static_assert(std::is_invocable_v<Func, entity_type>);
 
-        if(available) {
+        if(destroyed == null) {
+            for(auto pos = entities.size(); pos; --pos) {
+                func(entities[pos-1]);
+            }
+        } else {
             for(auto pos = entities.size(); pos; --pos) {
                 const auto curr = entity_type(pos - 1);
                 const auto entity = entities[to_integer(curr)];
@@ -1171,10 +1181,6 @@ public:
                 if(curr == entt) {
                     func(entity);
                 }
-            }
-        } else {
-            for(auto pos = entities.size(); pos; --pos) {
-                func(entities[pos-1]);
             }
         }
     }
@@ -1495,9 +1501,8 @@ public:
         }
 
         other.skip_family_pools = skip_family_pools;
+        other.destroyed = destroyed;
         other.entities = entities;
-        other.available = available;
-        other.next = next;
 
         other.pools.erase(std::remove_if(other.pools.begin()+skip_family_pools, other.pools.end(), [](const auto &pdata) {
             return !pdata.pool;
@@ -1569,10 +1574,8 @@ public:
     entt::basic_snapshot<Entity> snapshot() const ENTT_NOEXCEPT {
         using follow_fn_type = entity_type(const basic_registry &, const entity_type);
 
-        const auto head = to_integer(next);
-        const entity_type seed = available
-                ? entity_type{head | (to_integer(entities[head]) & (traits_type::version_mask << traits_type::entity_shift))}
-                : next;
+        const auto head = to_integer(destroyed);
+        const entity_type seed = destroyed == null ? destroyed : entity_type{head | (to_integer(entities[head]) & (traits_type::version_mask << traits_type::entity_shift))};
 
         follow_fn_type *follow = [](const basic_registry &reg, const entity_type entity) -> entity_type {
             const auto &others = reg.entities;
@@ -1602,7 +1605,7 @@ public:
     basic_snapshot_loader<Entity> loader() ENTT_NOEXCEPT {
         using force_fn_type = void(basic_registry &, const entity_type, const bool);
 
-        force_fn_type *force = [](basic_registry &reg, const entity_type entity, const bool destroyed) {
+        force_fn_type *force = [](basic_registry &reg, const entity_type entity, const bool discard) {
             const auto entt = to_integer(entity) & traits_type::entity_mask;
             auto &others = reg.entities;
 
@@ -1617,7 +1620,7 @@ public:
 
             others[entt] = entity;
 
-            if(destroyed) {
+            if(discard) {
                 reg.destroy(entity);
                 const auto version = to_integer(entity) & (traits_type::version_mask << traits_type::entity_shift);
                 others[entt] = entity_type{(to_integer(others[entt]) & traits_type::entity_mask) | version};
@@ -1742,8 +1745,7 @@ private:
     std::vector<group_data> groups{};
     std::vector<ctx_variable> vars{};
     std::vector<entity_type> entities{};
-    size_type available{};
-    entity_type next{null};
+    entity_type destroyed{null};
 };
 
 
