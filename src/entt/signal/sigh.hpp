@@ -42,9 +42,9 @@ class sigh;
 /**
  * @brief Unmanaged signal handler.
  *
- * It works directly with naked pointers to classes and pointers to member
- * functions as well as pointers to free functions. Users of this class are in
- * charge of disconnecting instances before deleting them.
+ * It works directly with references to classes and pointers to member functions
+ * as well as pointers to free functions. Users of this class are in charge of
+ * disconnecting instances before deleting them.
  *
  * This class serves mainly two purposes:
  *
@@ -305,7 +305,7 @@ class sink<Ret(Args...)> {
     using signal_type = sigh<Ret(Args...)>;
 
     template<auto Candidate, typename Type>
-    static void release(Type *value_or_instance, void *signal) {
+    static void release(Type &value_or_instance, void *signal) {
         sink{*static_cast<signal_type *>(signal)}.disconnect<Candidate>(value_or_instance);
     }
 
@@ -363,11 +363,11 @@ public:
      *
      * @tparam Candidate Member or free function to connect to the signal.
      * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid pointer that fits the purpose.
+     * @param value_or_instance A valid reference that fits the purpose.
      * @return A properly initialized connection object.
      */
     template<auto Candidate, typename Type>
-    connection connect(Type *value_or_instance) {
+    connection connect(Type &value_or_instance) {
         disconnect<Candidate>(value_or_instance);
         delegate<void(void *)> conn{};
         conn.template connect<&sink::release<Candidate, Type>>(value_or_instance);
@@ -392,10 +392,10 @@ public:
      * a signal.
      * @tparam Candidate Member or free function to disconnect from the signal.
      * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid pointer that fits the purpose.
+     * @param value_or_instance A valid reference that fits the purpose.
      */
     template<auto Candidate, typename Type>
-    void disconnect(Type *value_or_instance) {
+    void disconnect(Type &value_or_instance) {
         auto &calls = signal->calls;
         delegate<Ret(Args...)> delegate{};
         delegate.template connect<Candidate>(value_or_instance);
@@ -405,12 +405,14 @@ public:
     /**
      * @brief Disconnects member functions or free functions based on an
      * instance or specific payload.
-     * @param value_or_instance A valid pointer that fits the purpose.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid reference that fits the purpose.
      */
-    void disconnect(const void *value_or_instance) {
+    template<typename Type>
+    void disconnect(const Type &value_or_instance) {
         auto &calls = signal->calls;
-        calls.erase(std::remove_if(calls.begin(), calls.end(), [value_or_instance](const auto &delegate) {
-            return value_or_instance == delegate.instance();
+        calls.erase(std::remove_if(calls.begin(), calls.end(), [&value_or_instance](const auto &delegate) {
+            return delegate.instance() == &value_or_instance;
         }), calls.end());
     }
 

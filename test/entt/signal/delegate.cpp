@@ -6,8 +6,8 @@ int delegate_function(const int &i) {
     return i*i;
 }
 
-int curried_function(const int *i, int j) {
-    return *i+j;
+int curried_function(const int &i, int j) {
+    return i+j;
 }
 
 int non_const_reference(int &i) {
@@ -51,7 +51,7 @@ TEST(Delegate, Functionalities) {
     ASSERT_EQ(ff_del, mf_del);
 
     ff_del.connect<&delegate_function>();
-    mf_del.connect<&delegate_functor::operator()>(&functor);
+    mf_del.connect<&delegate_functor::operator()>(functor);
 
     ASSERT_TRUE(ff_del);
     ASSERT_TRUE(mf_del);
@@ -82,7 +82,7 @@ TEST(Delegate, DataMembers) {
     entt::delegate<double()> delegate;
     delegate_functor functor;
 
-    delegate.connect<&delegate_functor::data_member>(&functor);
+    delegate.connect<&delegate_functor::data_member>(functor);
 
     ASSERT_EQ(delegate(), 42);
 }
@@ -113,37 +113,37 @@ TEST(Delegate, Comparison) {
     ASSERT_TRUE(lhs == rhs);
     ASSERT_EQ(lhs, rhs);
 
-    lhs.connect<&curried_function>(&value);
+    lhs.connect<&curried_function>(value);
 
-    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_function>, &value}));
+    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_function>, value}));
     ASSERT_TRUE(lhs != rhs);
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
 
-    rhs.connect<&curried_function>(&value);
+    rhs.connect<&curried_function>(value);
 
-    ASSERT_EQ(rhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_function>, &value}));
+    ASSERT_EQ(rhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_function>, value}));
     ASSERT_FALSE(lhs != rhs);
     ASSERT_TRUE(lhs == rhs);
     ASSERT_EQ(lhs, rhs);
 
-    lhs.connect<&delegate_functor::operator()>(&functor);
+    lhs.connect<&delegate_functor::operator()>(functor);
 
-    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&delegate_functor::operator()>, &functor}));
+    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&delegate_functor::operator()>, functor}));
     ASSERT_TRUE(lhs != rhs);
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
 
-    rhs.connect<&delegate_functor::operator()>(&functor);
+    rhs.connect<&delegate_functor::operator()>(functor);
 
-    ASSERT_EQ(rhs, (entt::delegate<int(int)>{entt::connect_arg<&delegate_functor::operator()>, &functor}));
+    ASSERT_EQ(rhs, (entt::delegate<int(int)>{entt::connect_arg<&delegate_functor::operator()>, functor}));
     ASSERT_FALSE(lhs != rhs);
     ASSERT_TRUE(lhs == rhs);
     ASSERT_EQ(lhs, rhs);
 
-    lhs.connect<&delegate_functor::operator()>(&other);
+    lhs.connect<&delegate_functor::operator()>(other);
 
-    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&delegate_functor::operator()>, &other}));
+    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&delegate_functor::operator()>, other}));
     ASSERT_NE(lhs.instance(), rhs.instance());
     ASSERT_TRUE(lhs != rhs);
     ASSERT_FALSE(lhs == rhs);
@@ -168,16 +168,16 @@ TEST(Delegate, ConstNonConstNoExcept) {
     entt::delegate<void()> delegate;
     const_nonconst_noexcept functor;
 
-    delegate.connect<&const_nonconst_noexcept::f>(&functor);
+    delegate.connect<&const_nonconst_noexcept::f>(functor);
     delegate();
 
-    delegate.connect<&const_nonconst_noexcept::g>(&functor);
+    delegate.connect<&const_nonconst_noexcept::g>(functor);
     delegate();
 
-    delegate.connect<&const_nonconst_noexcept::h>(&functor);
+    delegate.connect<&const_nonconst_noexcept::h>(functor);
     delegate();
 
-    delegate.connect<&const_nonconst_noexcept::i>(&functor);
+    delegate.connect<&const_nonconst_noexcept::i>(functor);
     delegate();
 
     ASSERT_EQ(functor.cnt, 4);
@@ -188,17 +188,17 @@ TEST(Delegate, DeductionGuide) {
     int value = 0;
 
     entt::delegate func{entt::connect_arg<&delegate_function>};
-    entt::delegate curried_func{entt::connect_arg<&curried_function>, &value};
-    entt::delegate curried_func_const{entt::connect_arg<&curried_function>, &std::as_const(value)};
-    entt::delegate member_func_f{entt::connect_arg<&const_nonconst_noexcept::f>, &functor};
-    entt::delegate member_func_g{entt::connect_arg<&const_nonconst_noexcept::g>, &functor};
-    entt::delegate member_func_h{entt::connect_arg<&const_nonconst_noexcept::h>, &functor};
-    entt::delegate member_func_h_const{entt::connect_arg<&const_nonconst_noexcept::h>, &std::as_const(functor)};
-    entt::delegate member_func_i{entt::connect_arg<&const_nonconst_noexcept::i>, &functor};
-    entt::delegate member_func_i_const{entt::connect_arg<&const_nonconst_noexcept::i>, &std::as_const(functor)};
-    entt::delegate data_member_u{entt::connect_arg<&const_nonconst_noexcept::u>, &functor};
-    entt::delegate data_member_v{entt::connect_arg<&const_nonconst_noexcept::v>, &functor};
-    entt::delegate data_member_v_const{entt::connect_arg<&const_nonconst_noexcept::v>, &std::as_const(functor)};
+    entt::delegate curried_func{entt::connect_arg<&curried_function>, value};
+    entt::delegate curried_func_const{entt::connect_arg<&curried_function>, std::as_const(value)};
+    entt::delegate member_func_f{entt::connect_arg<&const_nonconst_noexcept::f>, functor};
+    entt::delegate member_func_g{entt::connect_arg<&const_nonconst_noexcept::g>, functor};
+    entt::delegate member_func_h{entt::connect_arg<&const_nonconst_noexcept::h>, functor};
+    entt::delegate member_func_h_const{entt::connect_arg<&const_nonconst_noexcept::h>, std::as_const(functor)};
+    entt::delegate member_func_i{entt::connect_arg<&const_nonconst_noexcept::i>, functor};
+    entt::delegate member_func_i_const{entt::connect_arg<&const_nonconst_noexcept::i>, std::as_const(functor)};
+    entt::delegate data_member_u{entt::connect_arg<&const_nonconst_noexcept::u>, functor};
+    entt::delegate data_member_v{entt::connect_arg<&const_nonconst_noexcept::v>, functor};
+    entt::delegate data_member_v_const{entt::connect_arg<&const_nonconst_noexcept::v>, std::as_const(functor)};
 
     static_assert(std::is_same_v<typename decltype(func)::function_type, int(const int &)>);
     static_assert(std::is_same_v<typename decltype(curried_func)::function_type, int(int)>);
@@ -233,7 +233,7 @@ TEST(Delegate, ConstInstance) {
 
     ASSERT_FALSE(delegate);
 
-    delegate.connect<&delegate_functor::identity>(&functor);
+    delegate.connect<&delegate_functor::identity>(functor);
 
     ASSERT_TRUE(delegate);
     ASSERT_EQ(delegate(3), 3);
@@ -266,7 +266,7 @@ TEST(Delegate, CurriedFunction) {
     entt::delegate<int(int)> delegate;
     const auto value = 3;
 
-    delegate.connect<&curried_function>(&value);
+    delegate.connect<&curried_function>(value);
 
     ASSERT_TRUE(delegate);
     ASSERT_EQ(delegate(1), 4);
@@ -278,8 +278,8 @@ TEST(Delegate, Constructors) {
 
     entt::delegate<int(int)> empty{};
     entt::delegate<int(int)> func{entt::connect_arg<&delegate_function>};
-    entt::delegate<int(int)> curr{entt::connect_arg<&curried_function>, &value};
-    entt::delegate<int(int)> member{entt::connect_arg<&delegate_functor::operator()>, &functor};
+    entt::delegate<int(int)> curr{entt::connect_arg<&curried_function>, value};
+    entt::delegate<int(int)> member{entt::connect_arg<&delegate_functor::operator()>, functor};
 
     ASSERT_FALSE(empty);
 
@@ -297,8 +297,8 @@ TEST(Delegate, VoidVsNonVoidReturnType) {
     delegate_functor functor;
 
     entt::delegate<void(int)> func{entt::connect_arg<&delegate_function>};
-    entt::delegate<void(int)> member{entt::connect_arg<&delegate_functor::operator()>, &functor};
-    entt::delegate<void(int)> cmember{entt::connect_arg<&delegate_functor::identity>, &std::as_const(functor)};
+    entt::delegate<void(int)> member{entt::connect_arg<&delegate_functor::operator()>, functor};
+    entt::delegate<void(int)> cmember{entt::connect_arg<&delegate_functor::identity>, std::as_const(functor)};
 
     ASSERT_TRUE(func);
     ASSERT_TRUE(member);
@@ -315,7 +315,7 @@ TEST(Delegate, TheLessTheBetter) {
     ASSERT_EQ(delegate(3, 'c'), 9);
 
     // int delegate_functor::operator()(int);
-    delegate.connect<&delegate_functor::operator()>(&functor);
+    delegate.connect<&delegate_functor::operator()>(functor);
 
     ASSERT_EQ(delegate(3, 'c'), 6);
 }

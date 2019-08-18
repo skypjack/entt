@@ -173,72 +173,72 @@ class basic_observer {
     template<typename... Reject, typename... Require, typename AnyOf>
     struct matcher_handler<matcher<matcher<type_list<Reject...>, type_list<Require...>>, AnyOf>> {
         template<std::size_t Index>
-        static void maybe_valid_if(basic_observer *obs, const basic_registry<Entity> &reg, const Entity entt) {
+        static void maybe_valid_if(basic_observer &obs, const basic_registry<Entity> &reg, const Entity entt) {
             if(reg.template has<Require...>(entt) && !(reg.template has<Reject>(entt) || ...)) {
-                auto *comp = obs->view.try_get(entt);
-                (comp ? *comp : obs->view.construct(entt)) |= (1 << Index);
+                auto *comp = obs.view.try_get(entt);
+                (comp ? *comp : obs.view.construct(entt)) |= (1 << Index);
             }
         }
 
         template<std::size_t Index>
-        static void discard_if(basic_observer *obs, const basic_registry<Entity> &, const Entity entt) {
-            if(auto *value = obs->view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
-                obs->view.destroy(entt);
+        static void discard_if(basic_observer &obs, const basic_registry<Entity> &, const Entity entt) {
+            if(auto *value = obs.view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
+                obs.view.destroy(entt);
             }
         }
 
         template<std::size_t Index>
         static void connect(basic_observer &obs, basic_registry<Entity> &reg) {
-            (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(&obs), ...);
-            (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(&obs), ...);
-            reg.template on_replace<AnyOf>().template connect<&maybe_valid_if<Index>>(&obs);
-            reg.template on_destroy<AnyOf>().template connect<&discard_if<Index>>(&obs);
+            (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(obs), ...);
+            (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(obs), ...);
+            reg.template on_replace<AnyOf>().template connect<&maybe_valid_if<Index>>(obs);
+            reg.template on_destroy<AnyOf>().template connect<&discard_if<Index>>(obs);
         }
 
         static void disconnect(basic_observer &obs, basic_registry<Entity> &reg) {
-            (reg.template on_destroy<Require>().disconnect(&obs), ...);
-            (reg.template on_construct<Reject>().disconnect(&obs), ...);
-            reg.template on_replace<AnyOf>().disconnect(&obs);
-            reg.template on_destroy<AnyOf>().disconnect(&obs);
+            (reg.template on_destroy<Require>().disconnect(obs), ...);
+            (reg.template on_construct<Reject>().disconnect(obs), ...);
+            reg.template on_replace<AnyOf>().disconnect(obs);
+            reg.template on_destroy<AnyOf>().disconnect(obs);
         }
     };
 
     template<typename... Reject, typename... Require, typename... NoneOf, typename... AllOf>
     struct matcher_handler<matcher<matcher<type_list<Reject...>, type_list<Require...>>, type_list<NoneOf...>, type_list<AllOf...>>> {
         template<std::size_t Index>
-        static void maybe_valid_if(basic_observer *obs, const basic_registry<Entity> &reg, const Entity entt) {
+        static void maybe_valid_if(basic_observer &obs, const basic_registry<Entity> &reg, const Entity entt) {
             if(reg.template has<AllOf...>(entt) && !(reg.template has<NoneOf>(entt) || ...)
                     && reg.template has<Require...>(entt) && !(reg.template has<Reject>(entt) || ...))
             {
-                auto *comp = obs->view.try_get(entt);
-                (comp ? *comp : obs->view.construct(entt)) |= (1 << Index);
+                auto *comp = obs.view.try_get(entt);
+                (comp ? *comp : obs.view.construct(entt)) |= (1 << Index);
             }
         }
 
         template<std::size_t Index>
-        static void discard_if(basic_observer *obs, const basic_registry<Entity> &, const Entity entt) {
-            if(auto *value = obs->view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
-                obs->view.destroy(entt);
+        static void discard_if(basic_observer &obs, const basic_registry<Entity> &, const Entity entt) {
+            if(auto *value = obs.view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
+                obs.view.destroy(entt);
             }
         }
 
         template<std::size_t Index>
         static void connect(basic_observer &obs, basic_registry<Entity> &reg) {
-            (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(&obs), ...);
-            (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(&obs), ...);
-            (reg.template on_construct<AllOf>().template connect<&maybe_valid_if<Index>>(&obs), ...);
-            (reg.template on_destroy<NoneOf>().template connect<&maybe_valid_if<Index>>(&obs), ...);
-            (reg.template on_destroy<AllOf>().template connect<&discard_if<Index>>(&obs), ...);
-            (reg.template on_construct<NoneOf>().template connect<&discard_if<Index>>(&obs), ...);
+            (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(obs), ...);
+            (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(obs), ...);
+            (reg.template on_construct<AllOf>().template connect<&maybe_valid_if<Index>>(obs), ...);
+            (reg.template on_destroy<NoneOf>().template connect<&maybe_valid_if<Index>>(obs), ...);
+            (reg.template on_destroy<AllOf>().template connect<&discard_if<Index>>(obs), ...);
+            (reg.template on_construct<NoneOf>().template connect<&discard_if<Index>>(obs), ...);
         }
 
         static void disconnect(basic_observer &obs, basic_registry<Entity> &reg) {
-            (reg.template on_destroy<Require>().disconnect(&obs), ...);
-            (reg.template on_construct<Reject>().disconnect(&obs), ...);
-            (reg.template on_construct<AllOf>().disconnect(&obs), ...);
-            (reg.template on_destroy<NoneOf>().disconnect(&obs), ...);
-            (reg.template on_destroy<AllOf>().disconnect(&obs), ...);
-            (reg.template on_construct<NoneOf>().disconnect(&obs), ...);
+            (reg.template on_destroy<Require>().disconnect(obs), ...);
+            (reg.template on_construct<Reject>().disconnect(obs), ...);
+            (reg.template on_construct<AllOf>().disconnect(obs), ...);
+            (reg.template on_destroy<NoneOf>().disconnect(obs), ...);
+            (reg.template on_destroy<AllOf>().disconnect(obs), ...);
+            (reg.template on_construct<NoneOf>().disconnect(obs), ...);
         }
     };
 

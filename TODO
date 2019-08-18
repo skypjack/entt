@@ -18,6 +18,7 @@
 * built-in support for dual (or N-) buffering
 * allow to "merge" registries easily
 * allow for custom stomp functions
+* deprecate/replace snapshot
 * remove prototype
 
 TODO

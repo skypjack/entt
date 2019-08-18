@@ -71,27 +71,27 @@ delegate.connect<&f>();
 
 // bind a member function to the delegate
 my_struct instance;
-delegate.connect<&my_struct::f>(&instance);
+delegate.connect<&my_struct::f>(instance);
 ```
 
 The delegate class accepts also data members, if needed. In this case, the
 function type of the delegate is such that the parameter list is empty and the
 value of the data member is at least convertible to the return type.
 
-Free functions having type equivalent to `void(T *, args...)` are accepted as
-well. In this case, `T *` is considered a payload and the function will receive
+Free functions having type equivalent to `void(T &, args...)` are accepted as
+well. In this case, `T &` is considered a payload and the function will receive
 it back every time it's invoked. In other terms, this works just fine with the
 above definition:
 
 ```cpp
-void g(const char *c, int i) { /* ... */ }
+void g(const char &c, int i) { /* ... */ }
 const char c = 'c';
 
-delegate.connect<&g>(&c);
+delegate.connect<&g>(c);
 delegate(42);
 ```
 
-The function `g` will be invoked with a pointer to `c` and `42`. However, the
+The function `g` will be invoked with a reference to `c` and `42`. However, the
 function type of the delegate is still `void(int)`. This is also the signature
 of its function call operator.
 
@@ -144,8 +144,8 @@ fine.
 
 # Signals
 
-Signal handlers work with naked pointers, function pointers and pointers to
-members. Listeners can be any kind of objects and users are in charge of
+Signal handlers work with references to classes, function pointers and pointers
+to members. Listeners can be any kind of objects and users are in charge of
 connecting and disconnecting them from a signal to avoid crashes due to
 different lifetimes. On the other side, performance shouldn't be affected that
 much by the presence of such a signal handler.<br/>
@@ -190,7 +190,7 @@ entt::sink sink{signal};
 listener instance;
 
 sink.connect<&foo>();
-sink.connect<&listener::bar>(&instance);
+sink.connect<&listener::bar>(instance);
 
 // ...
 
@@ -198,10 +198,10 @@ sink.connect<&listener::bar>(&instance);
 sink.disconnect<&foo>();
 
 // disconnect a member function of an instance
-sink.disconnect<&listener::bar>(&instance);
+sink.disconnect<&listener::bar>(instance);
 
 // disconnect all the member functions of an instance, if any
-sink.disconnect(&instance);
+sink.disconnect(instance);
 
 // discards all the listeners at once
 sink.disconnect();
@@ -280,7 +280,7 @@ This class shares part of its API with the one of the signal handler, but it
 doesn't require that all the types of events are specified when declared:
 
 ```cpp
-// define a general purpose dispatcher that works with naked pointers
+// define a general purpose dispatcher
 entt::dispatcher dispatcher{};
 ```
 
@@ -303,16 +303,16 @@ struct listener {
 // ...
 
 listener listener;
-dispatcher.sink<an_event>().connect<&listener::receive>(&listener);
-dispatcher.sink<another_event>().connect<&listener::method>(&listener);
+dispatcher.sink<an_event>().connect<&listener::receive>(listener);
+dispatcher.sink<another_event>().connect<&listener::method>(listener);
 ```
 
 The `disconnect` member function follows the same pattern and can be used to
 remove one listener at a time or all of them at once:
 
 ```cpp
-dispatcher.sink<an_event>().disconnect<&listener::receive>(&listener);
-dispatcher.sink<another_event>().disconnect(&listener);
+dispatcher.sink<an_event>().disconnect<&listener::receive>(listener);
+dispatcher.sink<another_event>().disconnect(listener);
 ```
 
 The `trigger` member function serves the purpose of sending an immediate event

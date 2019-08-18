@@ -348,13 +348,13 @@ notified on the creation of a component, use the `on_construct` member function:
 registry.on_construct<position>().connect<&my_free_function>();
 
 // connects a member function
-registry.on_construct<position>().connect<&my_class::member>(&instance);
+registry.on_construct<position>().connect<&my_class::member>(instance);
 
 // disconnects a free function
 registry.on_construct<position>().disconnect<&my_free_function>();
 
 // disconnects a member function
-registry.on_construct<position>().disconnect<&my_class::member>(&instance);
+registry.on_construct<position>().disconnect<&my_class::member>(instance);
 ```
 
 To be notified when components are destroyed, use the `on_destroy` member
@@ -656,9 +656,8 @@ brief, yet incomplete list of some of them:
   entity.<br/>
   Put aside the fact that having the prototypes separated from the simulation is
   useful in many cases, they make also the codebase easier to maintain, since
-  updating a template is much less error prone than jumping in the code to
-  update all the snippets copied and pasted around to initialize entities and
-  components.
+  updating a template is less error prone than jumping in the code to update all
+  the snippets copied and pasted around to initialize entities and components.
 
 * Literally _move_ entities from one registry to another (that is a copy
   followed by a destroy), which can be useful for solving problems such as the

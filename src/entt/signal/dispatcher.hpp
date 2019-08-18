@@ -24,9 +24,9 @@ namespace entt {
  * type `Event`, listeners are such that they can be invoked with an argument of
  * type `const Event &`, no matter what the return type is.
  *
- * The type of the instances is `Class *` (a naked pointer). It means that users
- * must guarantee that the lifetimes of the instances overcome the one of the
- * dispatcher itself to avoid crashes.
+ * The types of the instances are `Class &`. Users must guarantee that the
+ * lifetimes of the objects overcome the one of the dispatcher itself to avoid
+ * crashes.
  */
 class dispatcher {
     using event_family = family<struct internal_dispatcher_event_family>;

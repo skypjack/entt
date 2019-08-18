@@ -23,7 +23,7 @@ TEST(Dispatcher, Functionalities) {
     dispatcher.enqueue<one_more_event>();
     dispatcher.update<one_more_event>();
 
-    dispatcher.sink<an_event>().connect<&receiver::receive>(&receiver);
+    dispatcher.sink<an_event>().connect<&receiver::receive>(receiver);
     dispatcher.trigger<an_event>();
     dispatcher.enqueue<an_event>();
 
@@ -43,7 +43,7 @@ TEST(Dispatcher, Functionalities) {
 
     an_event event{};
 
-    dispatcher.sink<an_event>().disconnect<&receiver::receive>(&receiver);
+    dispatcher.sink<an_event>().disconnect<&receiver::receive>(receiver);
     dispatcher.trigger<an_event>();
     dispatcher.enqueue(event);
     dispatcher.update();

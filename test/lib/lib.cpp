@@ -68,8 +68,8 @@ TEST(Lib, Dispatcher) {
     entt::dispatcher dispatcher;
     listener listener;
 
-    dispatcher.sink<an_event>().connect<&listener::on_an_event>(&listener);
-    dispatcher.sink<another_event>().connect<&listener::on_another_event>(&listener);
+    dispatcher.sink<an_event>().connect<&listener::on_an_event>(listener);
+    dispatcher.sink<another_event>().connect<&listener::on_another_event>(listener);
 
     listener.value = 0;
 

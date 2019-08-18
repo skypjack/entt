@@ -96,43 +96,34 @@ TEST(SigH, Functions) {
     ASSERT_TRUE(sigh.empty());
     ASSERT_EQ(static_cast<entt::sigh<void(int &)>::size_type>(0), sigh.size());
     ASSERT_EQ(v, 0);
-
-    sink.connect<&sigh_listener::f>();
-
-    ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ(static_cast<entt::sigh<void(int &)>::size_type>(1), sigh.size());
-
-    sink.disconnect(nullptr);
-
-    ASSERT_TRUE(sigh.empty());
-    ASSERT_EQ(static_cast<entt::sigh<void(int &)>::size_type>(0), sigh.size());}
+}
 
 TEST(SigH, Members) {
     sigh_listener l1, l2;
     entt::sigh<bool(int)> sigh;
     entt::sink sink{sigh};
 
-    sink.connect<&sigh_listener::g>(&l1);
+    sink.connect<&sigh_listener::g>(l1);
     sigh.publish(42);
 
     ASSERT_TRUE(l1.k);
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(1), sigh.size());
 
-    sink.disconnect<&sigh_listener::g>(&l1);
+    sink.disconnect<&sigh_listener::g>(l1);
     sigh.publish(42);
 
     ASSERT_TRUE(l1.k);
     ASSERT_TRUE(sigh.empty());
     ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(0), sigh.size());
 
-    sink.connect<&sigh_listener::g>(&l1);
-    sink.connect<&sigh_listener::h>(&l2);
+    sink.connect<&sigh_listener::g>(l1);
+    sink.connect<&sigh_listener::h>(l2);
 
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(2), sigh.size());
 
-    sink.disconnect(&l1);
+    sink.disconnect(l1);
 
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(1), sigh.size());
@@ -144,8 +135,8 @@ TEST(SigH, Collector) {
     entt::sink sink{sigh};
     int cnt = 0;
 
-    sink.connect<&sigh_listener::g>(&listener);
-    sink.connect<&sigh_listener::h>(&listener);
+    sink.connect<&sigh_listener::g>(listener);
+    sink.connect<&sigh_listener::h>(listener);
 
     listener.k = true;
     sigh.collect([&listener, &cnt](bool value) {
@@ -174,8 +165,8 @@ TEST(SigH, CollectorVoid) {
     entt::sink sink{sigh};
     int cnt = 0;
 
-    sink.connect<&sigh_listener::g>(&listener);
-    sink.connect<&sigh_listener::h>(&listener);
+    sink.connect<&sigh_listener::g>(listener);
+    sink.connect<&sigh_listener::h>(listener);
     sigh.collect([&cnt]() { ++cnt; }, 42);
 
     ASSERT_FALSE(sigh.empty());
@@ -219,7 +210,7 @@ TEST(SigH, ScopedConnection) {
     {
         ASSERT_FALSE(listener.k);
 
-        entt::scoped_connection conn = sink.connect<&sigh_listener::g>(&listener);
+        entt::scoped_connection conn = sink.connect<&sigh_listener::g>(listener);
         sigh.publish(42);
 
         ASSERT_FALSE(sigh.empty());
@@ -244,7 +235,7 @@ TEST(SigH, ScopedConnectionConstructorsAndOperators) {
         ASSERT_FALSE(conn);
 
         entt::scoped_connection inner{};
-        inner = sink.connect<&sigh_listener::g>(&listener);
+        inner = sink.connect<&sigh_listener::g>(listener);
         sigh.publish(42);
 
         ASSERT_FALSE(sigh.empty());
@@ -256,7 +247,7 @@ TEST(SigH, ScopedConnectionConstructorsAndOperators) {
         ASSERT_TRUE(sigh.empty());
         ASSERT_FALSE(inner);
 
-        auto basic = sink.connect<&sigh_listener::g>(&listener);
+        auto basic = sink.connect<&sigh_listener::g>(listener);
         inner = std::as_const(basic);
         sigh.publish(42);
 
@@ -285,19 +276,19 @@ TEST(SigH, ConstNonConstNoExcept) {
     const_nonconst_noexcept functor;
     const const_nonconst_noexcept cfunctor;
 
-    sink.connect<&const_nonconst_noexcept::f>(&functor);
-    sink.connect<&const_nonconst_noexcept::g>(&functor);
-    sink.connect<&const_nonconst_noexcept::h>(&cfunctor);
-    sink.connect<&const_nonconst_noexcept::i>(&cfunctor);
+    sink.connect<&const_nonconst_noexcept::f>(functor);
+    sink.connect<&const_nonconst_noexcept::g>(functor);
+    sink.connect<&const_nonconst_noexcept::h>(cfunctor);
+    sink.connect<&const_nonconst_noexcept::i>(cfunctor);
     sigh.publish();
 
     ASSERT_EQ(functor.cnt, 2);
     ASSERT_EQ(cfunctor.cnt, 2);
 
-    sink.disconnect<&const_nonconst_noexcept::f>(&functor);
-    sink.disconnect<&const_nonconst_noexcept::g>(&functor);
-    sink.disconnect<&const_nonconst_noexcept::h>(&cfunctor);
-    sink.disconnect<&const_nonconst_noexcept::i>(&cfunctor);
+    sink.disconnect<&const_nonconst_noexcept::f>(functor);
+    sink.disconnect<&const_nonconst_noexcept::g>(functor);
+    sink.disconnect<&const_nonconst_noexcept::h>(cfunctor);
+    sink.disconnect<&const_nonconst_noexcept::i>(cfunctor);
     sigh.publish();
 
     ASSERT_EQ(functor.cnt, 2);

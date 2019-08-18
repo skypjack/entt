@@ -925,10 +925,10 @@ TEST(Registry, Signals) {
     entt::registry registry;
     listener listener;
 
-    registry.on_construct<empty_type>().connect<&listener::incr<empty_type>>(&listener);
-    registry.on_destroy<empty_type>().connect<&listener::decr<empty_type>>(&listener);
-    registry.on_construct<int>().connect<&listener::incr<int>>(&listener);
-    registry.on_destroy<int>().connect<&listener::decr<int>>(&listener);
+    registry.on_construct<empty_type>().connect<&listener::incr<empty_type>>(listener);
+    registry.on_destroy<empty_type>().connect<&listener::decr<empty_type>>(listener);
+    registry.on_construct<int>().connect<&listener::incr<int>>(listener);
+    registry.on_destroy<int>().connect<&listener::decr<int>>(listener);
 
     auto e0 = registry.create();
     auto e1 = registry.create();
@@ -951,8 +951,8 @@ TEST(Registry, Signals) {
     ASSERT_EQ(listener.counter, 2);
     ASSERT_EQ(listener.last, e0);
 
-    registry.on_destroy<empty_type>().disconnect<&listener::decr<empty_type>>(&listener);
-    registry.on_destroy<int>().disconnect<&listener::decr<int>>(&listener);
+    registry.on_destroy<empty_type>().disconnect<&listener::decr<empty_type>>(listener);
+    registry.on_destroy<int>().disconnect<&listener::decr<int>>(listener);
 
     registry.remove<empty_type>(e1);
     registry.remove<int>(e1);
@@ -960,8 +960,8 @@ TEST(Registry, Signals) {
     ASSERT_EQ(listener.counter, 2);
     ASSERT_EQ(listener.last, e0);
 
-    registry.on_construct<empty_type>().disconnect<&listener::incr<empty_type>>(&listener);
-    registry.on_construct<int>().disconnect<&listener::incr<int>>(&listener);
+    registry.on_construct<empty_type>().disconnect<&listener::incr<empty_type>>(listener);
+    registry.on_construct<int>().disconnect<&listener::incr<int>>(listener);
 
     registry.assign<empty_type>(e1);
     registry.assign<int>(e1);
@@ -969,8 +969,8 @@ TEST(Registry, Signals) {
     ASSERT_EQ(listener.counter, 2);
     ASSERT_EQ(listener.last, e0);
 
-    registry.on_construct<int>().connect<&listener::incr<int>>(&listener);
-    registry.on_destroy<int>().connect<&listener::decr<int>>(&listener);
+    registry.on_construct<int>().connect<&listener::incr<int>>(listener);
+    registry.on_destroy<int>().connect<&listener::decr<int>>(listener);
 
     registry.assign<int>(e0);
     registry.reset<int>(e1);
@@ -978,8 +978,8 @@ TEST(Registry, Signals) {
     ASSERT_EQ(listener.counter, 2);
     ASSERT_EQ(listener.last, e1);
 
-    registry.on_construct<empty_type>().connect<&listener::incr<empty_type>>(&listener);
-    registry.on_destroy<empty_type>().connect<&listener::decr<empty_type>>(&listener);
+    registry.on_construct<empty_type>().connect<&listener::incr<empty_type>>(listener);
+    registry.on_destroy<empty_type>().connect<&listener::decr<empty_type>>(listener);
 
     registry.reset<empty_type>(e1);
     registry.assign<empty_type>(e0);
@@ -1011,8 +1011,8 @@ TEST(Registry, Signals) {
     ASSERT_EQ(listener.counter, 2);
     ASSERT_EQ(listener.last, e0);
 
-    registry.on_destroy<empty_type>().disconnect<&listener::decr<empty_type>>(&listener);
-    registry.on_destroy<int>().disconnect<&listener::decr<int>>(&listener);
+    registry.on_destroy<empty_type>().disconnect<&listener::decr<empty_type>>(listener);
+    registry.on_destroy<int>().disconnect<&listener::decr<int>>(listener);
 
     registry.assign_or_replace<empty_type>(e0);
     registry.assign_or_replace<int>(e0);
@@ -1020,8 +1020,8 @@ TEST(Registry, Signals) {
     ASSERT_EQ(listener.counter, 2);
     ASSERT_EQ(listener.last, e0);
 
-    registry.on_replace<empty_type>().connect<&listener::incr<empty_type>>(&listener);
-    registry.on_replace<int>().connect<&listener::incr<int>>(&listener);
+    registry.on_replace<empty_type>().connect<&listener::incr<empty_type>>(listener);
+    registry.on_replace<int>().connect<&listener::incr<int>>(listener);
 
     registry.assign_or_replace<empty_type>(e0);
     registry.assign_or_replace<int>(e0);
@@ -1179,13 +1179,13 @@ TEST(Registry, CreateManyEntitiesWithComponentsAtOnceWithListener) {
     entt::entity entities[3];
     listener listener;
 
-    registry.on_construct<int>().connect<&listener::incr<int>>(&listener);
+    registry.on_construct<int>().connect<&listener::incr<int>>(listener);
     registry.create<int, char>(std::begin(entities), std::end(entities));
 
     ASSERT_EQ(listener.counter, 3);
 
-    registry.on_construct<int>().disconnect<&listener::incr<int>>(&listener);
-    registry.on_construct<empty_type>().connect<&listener::incr<empty_type>>(&listener);
+    registry.on_construct<int>().disconnect<&listener::incr<int>>(listener);
+    registry.on_construct<empty_type>().connect<&listener::incr<empty_type>>(listener);
     registry.create<char, empty_type>(std::begin(entities), std::end(entities));
 
     ASSERT_EQ(listener.counter, 6);
