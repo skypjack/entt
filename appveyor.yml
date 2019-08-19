@@ -1,21 +1,39 @@
 # can use variables like {build} and {branch}
 version: 1.0.{build}
 
-image: Visual Studio 2017
+skip_tags: true
+
+image:
+- Visual Studio 2019
+- Visual Studio 2017
 
 environment:
   BUILD_DIR: "%APPVEYOR_BUILD_FOLDER%\\build"
   CTEST_OUTPUT_ON_FAILURE: 1
 
-platform:
-  - Win32
-
 configuration:
   - Debug
 
+matrix:
+  fast_finish: true
+
+for:
+  -
+    matrix:
+      only:
+        - image: Visual Studio 2019
+    environment:
+      CMAKE_GENERATOR: "Visual Studio 16 2019"
+  -
+    matrix:
+      only:
+        - image: Visual Studio 2017
+    environment:
+      CMAKE_GENERATOR: "Visual Studio 15 2017"
+
 before_build:
   - cd %BUILD_DIR%
-  - cmake .. -DBUILD_TESTING=ON -DBUILD_LIB=ON -DCMAKE_CXX_FLAGS=/W1 -G"Visual Studio 15 2017"
+  - cmake .. -DBUILD_TESTING=ON -DBUILD_LIB=ON -DCMAKE_CXX_FLAGS=/W1 -G"%CMAKE_GENERATOR%"
 
 after_build:
   - ctest --timeout 5 -C Debug -j4
