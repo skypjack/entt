@@ -384,7 +384,7 @@ public:
         auto &calls = signal->calls;
         delegate<Ret(Args...)> delegate{};
         delegate.template connect<Function>();
-        calls.erase(std::remove(calls.begin(), calls.end(), std::move(delegate)), calls.end());
+        calls.erase(std::remove(calls.begin(), calls.end(), delegate), calls.end());
     }
 
     /**
@@ -399,7 +399,7 @@ public:
         auto &calls = signal->calls;
         delegate<Ret(Args...)> delegate{};
         delegate.template connect<Candidate>(value_or_instance);
-        calls.erase(std::remove(calls.begin(), calls.end(), std::move(delegate)), calls.end());
+        calls.erase(std::remove(calls.begin(), calls.end(), delegate), calls.end());
     }
 
     /**
