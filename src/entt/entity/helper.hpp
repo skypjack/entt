@@ -149,7 +149,8 @@ void dependency(basic_registry<Entity> &reg, const Entity entt) {
  */
 template<typename... Dependency, typename Component, typename Entity>
 void connect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sink) {
-    sink.template connect<dependency<Entity, Dependency...>>();
+    constexpr auto function = &dependency<Entity, Dependency...>;
+    sink.template connect<function>();
 }
 
 
@@ -173,7 +174,8 @@ void connect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sin
  */
 template<typename... Dependency, typename Component, typename Entity>
 void disconnect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sink) {
-    sink.template disconnect<dependency<Entity, Dependency...>>();
+    constexpr auto function = &dependency<Entity, Dependency...>;
+    sink.template disconnect<function>();
 }
 
 

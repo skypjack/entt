@@ -26,8 +26,12 @@ TEST(Helper, AsGroup) {
 TEST(Helper, Dependency) {
     entt::registry registry;
     const auto entity = registry.create();
+
+    ASSERT_TRUE(registry.on_construct<int>().empty());
+
     entt::connect<double, float>(registry.on_construct<int>());
 
+    ASSERT_FALSE(registry.on_construct<int>().empty());
     ASSERT_FALSE(registry.has<double>(entity));
     ASSERT_FALSE(registry.has<float>(entity));
 
@@ -62,9 +66,16 @@ TEST(Helper, Dependency) {
     registry.remove<int>(entity);
     registry.remove<double>(entity);
     registry.remove<float>(entity);
+
+    ASSERT_FALSE(registry.has<int>(entity));
+    ASSERT_FALSE(registry.has<double>(entity));
+    ASSERT_FALSE(registry.has<float>(entity));
+
     entt::disconnect<double, float>(registry.on_construct<int>());
     registry.assign<int>(entity);
 
+    ASSERT_TRUE(registry.on_construct<int>().empty());
+    ASSERT_TRUE(registry.has<int>(entity));
     ASSERT_FALSE(registry.has<double>(entity));
     ASSERT_FALSE(registry.has<float>(entity));
 }
