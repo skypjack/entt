@@ -149,7 +149,7 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index
 
 template<typename Type, auto Data, typename Policy>
 meta_any getter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index) {
-    auto dispatch = []([[maybe_unused]] auto &&value) {
+    auto dispatch = [](auto &&value) {
         if constexpr(std::is_same_v<Policy, as_void_t>) {
             return meta_any{std::in_place_type<void>};
         } else if constexpr(std::is_same_v<Policy, as_alias_t>) {
@@ -176,7 +176,7 @@ meta_any getter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any i
             return clazz ? dispatch(std::invoke(Data, clazz)) : meta_any{};
         }
     } else {
-        static_assert(std::is_pointer_v<decltype(Data)>);
+        static_assert(std::is_pointer_v<std::decay_t<decltype(Data)>>);
 
         if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
             auto *idx = index.try_cast<std::size_t>();
@@ -244,7 +244,7 @@ meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_
  */
 template<typename Type>
 class meta_factory {
-    static_assert(std::is_object_v<Type> && !(std::is_const_v<Type> || std::is_volatile_v<Type>));
+    static_assert(std::is_same_v<Type, std::decay_t<Type>>);
 
     template<typename Node>
     bool duplicate(const ENTT_ID_TYPE identifier, const Node *node) ENTT_NOEXCEPT {
@@ -642,8 +642,8 @@ public:
             node.prop = properties<std::integral_constant<decltype(Data), Data>>(std::forward<Property>(property)...);
             curr = &node;
         } else {
-            static_assert(std::is_pointer_v<decltype(Data)>);
-            using data_type = std::remove_pointer_t<decltype(Data)>;
+            static_assert(std::is_pointer_v<std::decay_t<decltype(Data)>>);
+            using data_type = std::remove_pointer_t<std::decay_t<decltype(Data)>>;
 
             static internal::meta_data_node node{
                 &internal::meta_info<Type>::template data<Data>,
