@@ -45,6 +45,7 @@ namespace entt {
 template<typename Entity>
 class basic_prototype {
     using basic_fn_type = void(const basic_prototype &, basic_registry<Entity> &, const Entity);
+    using grow_fn_type = void(basic_registry<Entity> &, size_t reserve);
 
     template<typename Component>
     struct component_wrapper { Component component; };
@@ -52,6 +53,15 @@ class basic_prototype {
     struct component_handler {
         basic_fn_type *assign_or_replace;
         basic_fn_type *assign;
+        grow_fn_type *grow;
+
+        template<typename It>
+        void batch_assign(const basic_prototype &proto, basic_registry<Entity> &other, It first, It last) {
+            grow(other, std::distance(first, last));
+            std::for_each(first, last, [this, &proto, &other](Entity dst) {
+                assign(proto, other, dst);
+            });
+        }
     };
 
     void release() {
@@ -133,17 +143,23 @@ public:
     Component & set(Args &&... args) {
         component_handler handler;
 
-        handler.assign_or_replace = [](const basic_prototype &proto, registry_type &other, const Entity dst) {
-            const auto &wrapper = proto.reg->template get<component_wrapper<Component>>(proto.entity);
-            other.template assign_or_replace<Component>(dst, wrapper.component);
-        };
-
-        handler.assign = [](const basic_prototype &proto, registry_type &other, const Entity dst) {
+        auto assign_func = [](const basic_prototype &proto, registry_type &other, const Entity dst) {
             if(!other.template has<Component>(dst)) {
                 const auto &wrapper = proto.reg->template get<component_wrapper<Component>>(proto.entity);
                 other.template assign<Component>(dst, wrapper.component);
             }
         };
+
+        handler.grow = [](registry_type &other, size_t reserve) {
+            other.template reserve<Component>(other.template size<Component>() + reserve);
+        };
+
+        handler.assign_or_replace = [](const basic_prototype &proto, registry_type &other, const Entity dst) {
+            const auto &wrapper = proto.reg->template get<component_wrapper<Component>>(proto.entity);
+            other.template assign_or_replace<Component>(dst, wrapper.component);
+        };
+
+        handler.assign = assign_func;
 
         handlers[reg->template type<Component>()] = handler;
         auto &wrapper = reg->template assign_or_replace<component_wrapper<Component>>(entity, Component{std::forward<Args>(args)...});
@@ -270,6 +286,35 @@ public:
     entity_type create() const {
         return create(*reg);
     }
+
+
+    /**
+     * @brief Creates an entity using range.
+     *
+     * @sa create
+     *
+     * @tparam It Type of forward iterator.
+     * @param first An iterator to the first element of the range to generate.
+     * @param last An iterator past the last element of the range to generate.
+     * @return No return value if the component list is empty, a tuple
+     * containing the pointers to the arrays of components just created and
+     * sorted the same of the entities otherwise.
+     */
+
+    template<typename It>
+    auto create(It first, It last) {
+        return create(first, last, *reg);
+    }
+
+    template<typename It>
+    auto create(It first, It last, registry_type &other) {
+        static_assert(std::is_convertible_v<entity_type, typename std::iterator_traits<It>::value_type>);
+        other.create(first, last);
+        for(auto &handler: handlers) {
+            handler.second.batch_assign(*this, other, first, last);
+        }
+    }
+
 
     /**
      * @brief Assigns the components of a prototype to a given entity.

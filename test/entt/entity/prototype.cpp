@@ -70,6 +70,20 @@ TEST(Prototype, SameRegistry) {
     ASSERT_EQ(registry.get<char>(e1), 'c');
 }
 
+
+TEST(Prototype, BatchCreate) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000);
+
+    entt::prototype prototype{registry};
+    prototype.set<int>(3);
+    prototype.set<char>('c');
+    prototype.create(entities.begin(), entities.end());
+
+    ASSERT_EQ(registry.size<int>(), 1000);
+    ASSERT_EQ(registry.get<int>(entities[999]), 3);
+}
+
 TEST(Prototype, OtherRegistry) {
     entt::registry registry;
     entt::registry repository;
