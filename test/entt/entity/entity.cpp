@@ -4,7 +4,7 @@
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 
-TEST(Traits, Null) {
+TEST(Entity, Null) {
     using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
 
     entt::registry registry{};

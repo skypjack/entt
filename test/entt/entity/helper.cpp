@@ -80,7 +80,7 @@ TEST(Helper, Dependency) {
     ASSERT_FALSE(registry.has<float>(entity));
 }
 
-TEST(Dependency, MultipleListenersOnTheSameType) {
+TEST(Helper, DependencyWithMultipleListenersOnTheSameType) {
     entt::registry registry;
     entt::connect<double>(registry.on_construct<int>());
     entt::connect<char>(registry.on_construct<int>());
