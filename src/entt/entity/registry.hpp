@@ -76,11 +76,11 @@ class basic_registry {
         decltype(auto) assign(basic_registry &registry, const Entity entt, Args &&... args) {
             if constexpr(std::is_empty_v<Component>) {
                 storage<Entity, Component>::construct(entt);
-                construction.publish(registry, entt, Component{});
+                construction.publish(entt, registry, Component{});
                 return Component{std::forward<Args>(args)...};
             } else {
                 auto &component = storage<Entity, Component>::construct(entt, std::forward<Args>(args)...);
-                construction.publish(registry, entt, component);
+                construction.publish(entt, registry, component);
                 return component;
             }
         }
@@ -94,7 +94,7 @@ class basic_registry {
 
                 if(!construction.empty()) {
                     std::for_each(first, last, [this, &registry](const auto entt) {
-                        construction.publish(registry, entt, Component{});
+                        construction.publish(entt, registry, Component{});
                     });
                 }
             } else {
@@ -102,7 +102,7 @@ class basic_registry {
 
                 if(!construction.empty()) {
                     std::for_each(first, last, [this, &registry, component](const auto entt) mutable {
-                        construction.publish(registry, entt, *(component++));
+                        construction.publish(entt, registry, *(component++));
                     });
                 }
             }
@@ -111,7 +111,7 @@ class basic_registry {
         }
 
         void remove(basic_registry &registry, const Entity entt) {
-            destruction.publish(registry, entt);
+            destruction.publish(entt, registry);
             storage<Entity, Component>::destroy(entt);
         }
 
@@ -119,20 +119,20 @@ class basic_registry {
         decltype(auto) replace(basic_registry &registry, const Entity entt, Args &&... args) {
             if constexpr(std::is_empty_v<Component>) {
                 ENTT_ASSERT((storage<Entity, Component>::has(entt)));
-                update.publish(registry, entt, Component{});
+                update.publish(entt, registry, Component{});
                 return Component{std::forward<Args>(args)...};
             } else {
                 Component component{std::forward<Args>(args)...};
-                update.publish(registry, entt, component);
+                update.publish(entt, registry, component);
                 return (storage<Entity, Component>::get(entt) = std::move(component));
             }
         }
 
     private:
         using reference_type = std::conditional_t<std::is_empty_v<Component>, const Component &, Component &>;
-        sigh<void(basic_registry &, const Entity, reference_type)> construction{};
-        sigh<void(basic_registry &, const Entity, reference_type)> update{};
-        sigh<void(basic_registry &, const Entity)> destruction{};
+        sigh<void(const Entity, basic_registry &, reference_type)> construction{};
+        sigh<void(const Entity, basic_registry &, reference_type)> update{};
+        sigh<void(const Entity, basic_registry &)> destruction{};
     };
 
     template<typename Component>
@@ -146,7 +146,7 @@ class basic_registry {
         std::tuple<pool_type<Get> *..., pool_type<Exclude> *...> cpools{};
 
         template<typename Component>
-        void maybe_valid_if(const basic_registry &, const Entity entt) {
+        void maybe_valid_if(const Entity entt) {
             if constexpr(std::disjunction_v<std::is_same<Get, Component>...>) {
                 if(((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
                         && !(std::get<pool_type<Exclude> *>(cpools)->has(entt) || ...))
@@ -161,7 +161,7 @@ class basic_registry {
             }
         }
 
-        void discard_if(const basic_registry &, const Entity entt) {
+        void discard_if(const Entity entt) {
             if(this->has(entt)) {
                 this->destroy(entt);
             }
@@ -173,7 +173,7 @@ class basic_registry {
         std::tuple<pool_type<Owned> *..., pool_type<Get> *..., pool_type<Exclude> *...> cpools{};
 
         template<typename Component>
-        void maybe_valid_if(const basic_registry &, const Entity entt) {
+        void maybe_valid_if(const Entity entt) {
             if constexpr(std::disjunction_v<std::is_same<Owned, Component>..., std::is_same<Get, Component>...>) {
                 if(((std::is_same_v<Component, Owned> || std::get<pool_type<Owned> *>(cpools)->has(entt)) && ...)
                         && ((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
@@ -193,7 +193,7 @@ class basic_registry {
             }
         }
 
-        void discard_if(const basic_registry &, const Entity entt) {
+        void discard_if(const Entity entt) {
             if(std::get<0>(cpools)->has(entt) && std::get<0>(cpools)->sparse_set<Entity>::get(entt) < this->owned) {
                 const auto pos = --this->owned;
                 (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->sparse_set<Entity>::get(entt), pos), ...);
@@ -906,7 +906,7 @@ public:
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(registry<Entity> &, Entity, Component &);
+     * void(Entity, registry<Entity> &, Component &);
      * @endcode
      *
      * Listeners are invoked **after** the component has been assigned to the
@@ -937,7 +937,7 @@ public:
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(registry<Entity> &, Entity, Component &);
+     * void(Entity, registry<Entity> &, Component &);
      * @endcode
      *
      * Listeners are invoked **before** the component has been replaced. The
@@ -969,7 +969,7 @@ public:
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(registry<Entity> &, Entity);
+     * void(Entity, registry<Entity> &);
      * @endcode
      *
      * Listeners are invoked **before** the component has been removed from the

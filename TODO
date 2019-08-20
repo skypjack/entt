@@ -19,6 +19,7 @@
 * allow to "merge" registries easily
 * allow for custom stomp functions
 * deprecate/replace snapshot
+* remove dependency
 * remove prototype
 
 TODO
@@ -27,6 +28,3 @@ TODO
 * make meta work across boundaries
   - inline variables are fine here, only the head represents a problem
   - we should always resolve by looking into the list of types when working across boundaries, no direct resolve
-* signals: entity/registry/component instead of registry/entity/component
-  - dependency becomes a short circuit on the registry
-  - deprecate dependency

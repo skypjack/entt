@@ -21,8 +21,8 @@ namespace entt {
  *
  * @deprecated
  * This class will be wiped out in a future version of the library.<br/>
- * Use a shadow registry and the new `registry::stomp` functionality to achieve
- * the same result in a more idiomatic way.
+ * Use a prototype registry and the new `registry::stomp` functionality to
+ * achieve the same result in a more idiomatic way.
  *
  * A prototype is used to define a _concept_ in terms of components.<br/>
  * Prototypes act as templates for those specific types of an application which

@@ -18,18 +18,18 @@
   * [Runtime components](#runtime-components)
     * [A journey through a plugin](#a-journey-through-a-plugin)
   * [Sorting: is it possible?](#sorting-is-it-possible)
-  * [Multiple registries to the rescue](#multiple-registries-to-the-rescue)
+  * [Helpers](#helpers)
+    * [Null entity](#null-entity)
+    * [Multiple registries](#multiple-registries)
+    * [Dependencies](#dependencies)
+    * [Tags](#tags)
+    * [Actor](#actor)
+    * [Context variables](#context-variables)
   * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
     * [Snapshot loader](#snapshot-loader)
     * [Continuous loader](#continuous-loader)
     * [Archives](#archives)
     * [One example to rule them all](#one-example-to-rule-them-all)
-  * [The actor class](#the-actor-class)
-  * [Helpers](#helpers)
-    * [Dependency function](#dependency-function)
-    * [Tags](#tags)
-  * [Null entity](#null-entity)
-  * [Context variables](#context-variables)
 * [Views and Groups](#views-and-groups)
   * [Views](#views)
   * [Runtime views](#runtime-views)
@@ -365,7 +365,7 @@ The function type of a listener for the construction signal should be equivalent
 to the following:
 
 ```cpp
-void(entt::registry &, entt::entity, Component &);
+void(entt::entity, entt::registry &, Component &);
 ```
 
 Where `Component` is intuitively the type of component of interest. In other
@@ -377,7 +377,7 @@ signature of which is the same of that of the construction signal. The one of
 the destruction signal is also similar, except for the `Component` parameter:
 
 ```cpp
-void(entt::registry &, entt::entity);
+void(entt::entity, entt::registry &);
 ```
 
 This is mainly due to performance reasons. While the component is made available
@@ -632,7 +632,41 @@ separately to the elements that are part of the group and to those that are not,
 effectively generating two partitions, both of which can be ordered
 independently of each other.
 
-## Multiple registries to the rescue
+## Helpers
+
+The so called _helpers_ are small classes and functions mainly designed to offer
+built-in support for the most basic functionalities.<br/>
+The list of helpers will grow longer as time passes and new ideas come out.
+
+### Null entity
+
+In `EnTT`, there exists a sort of _null entity_ made available to users that is
+accessible via the `entt::null` variable.<br/>
+The library guarantees that the following expression always returns false:
+
+```cpp
+registry.valid(entt::null);
+```
+
+In other terms, a registry will reject the null entity in all cases because it
+isn't considered valid. It means that the null entity cannot own components for
+obvious reasons.<br/>
+The type of the null entity is internal and should not be used for any purpose
+other than defining the null entity itself. However, there exist implicit
+conversions from the null entity to identifiers of any allowed type:
+
+```cpp
+entt::entity null = entt::null;
+```
+
+Similarly, the null entity can be compared to any other identifier:
+
+```cpp
+const auto entity = registry.create();
+const bool null = (entity == entt::null);
+```
+
+### Multiple registries
 
 The use of multiple registries is quite common. Examples of use are the
 separation of the UI from the simulation or the loading of different scenes in
@@ -645,36 +679,109 @@ different containers.
 Once there are multiple registries available, however, a method is needed to
 transfer information from one container to another and this results in the
 `stomp` member function of the `registry` class.<br/>
-This function allows to take an entity from a registry and copy it over another
-entity in another registry (or even in place, actually making a local copy).
+This function allows to take one or more entities from a registry and use them
+to _stomp_ other entities in another registry (or even the same, actually making
+local copies).<br/>
+It opens definitely the doors to a lot of interesting features like migrating
+entities between registries, prototypes, shadow registry, prefabs, shared
+components without an explicit owner and copy-on-write policies among the other
+things.
 
-It opens definitely the doors to a lot of interesting features. Below is a
-brief, yet incomplete list of some of them:
+### Dependencies
 
-* Prototypes or templates for high level _concepts_ to use to spawn new entities
-  when needed or to _apply_ a given set of components to an existing
-  entity.<br/>
-  Put aside the fact that having the prototypes separated from the simulation is
-  useful in many cases, they make also the codebase easier to maintain, since
-  updating a template is less error prone than jumping in the code to update all
-  the snippets copied and pasted around to initialize entities and components.
+The `registry` class is designed to create short circuits between its functions
+within certain limits. This allows to easily define dependencies between
+different operations.<br/>
+For example, the following adds (or replaces) the component `a_type` whenever
+`my_type` is assigned to an entity:
 
-* Literally _move_ entities from one registry to another (that is a copy
-  followed by a destroy), which can be useful for solving problems such as the
-  migration of entities between different scenes without loss of information.
+```cpp
+registry.on_construct<my_type>().connect<&entt::registry::assign_or_replace<a_type>>(registry);
+```
 
-* Even prefabs, shared instances without explicit owner and copy-on-write
-  policies among other things are easily achievable in this way and with the
-  _right_ types in use for the components.
+Similarly, the code shown below removes `a_type` from an entity whenever
+`my_type` is assigned to it:
 
-* Remove entities that are distant or not visible so as to reduce the processing
-  time, moving them to a _cold_ registry from which they can be easily resumed
-  at any time.
+```cpp
+registry.on_construct<my_type>().connect<&entt::registry::reset<a_type>>(registry);
+```
 
-And so on. There are many things that become possible by combining multiple
-containers but none is really useful without the right means to move entities
-and components between registries.<br/>
-Therefore, this seemed a good reason to implement such a feature.
+A dependency can also be easily broken as follows:
+
+```cpp
+registry.on_construct<my_type>().disconnect<&entt::registry::assign_or_replace<a_type>>(registry);
+```
+
+There are many other types of dependencies besides those shown above. In
+general, all functions that accept an entity as the first argument are good
+candidates for this purpose.
+
+### Tags
+
+There's nothing magical about the way tags can be assigned to entities while
+avoiding a performance hit at runtime. Nonetheless, the syntax can be annoying
+and that's why a more user-friendly shortcut is provided to do it.<br/>
+This shortcut is the alias template `entt::tag`.
+
+If used in combination with hashed strings, it helps to use tags where types
+would be required otherwise. As an example:
+
+```cpp
+registry.assign<entt::tag<"enemy"_hs>>(entity);
+```
+
+### Actor
+
+The `actor` class is designed for those who don't feel immediately comfortable
+working with components or for those who are migrating a project and want to
+approach it one step at a time.
+
+This class acts as a thin wrapper for an entity and for all its components. It's
+constructed with a registry to be used behind the scenes and is in charge of the
+destruction of the entity when it goes out of the scope.<br/>
+An actor offers all the functionalities required to work with components, such
+as the `assign` and` remove` member functions, but also `has`,` get`, `try_get`
+and so on.
+
+My advice isn't to use the `actor` class to hide entities and components behind
+a more object-oriented interface. Instead, users should rely on it only where
+strictly necessary. In all other cases, it's highly advisable to become familiar
+with the model of `EnTT` and work directly with the registry, the views and the
+groups, rather than with a tool that could introduce a performance degradation.
+
+### Context variables
+
+It is often convenient to assign context variables to a registry, so as to make
+it the only _source of truth_ of an application.<br/>
+This is possible by means of a member function named `set` to use to create a
+context variable from a given type. Later on, either `ctx` or `try_ctx` can be
+used to retrieve the newly created instance and `unset` is there to literally
+reset it if needed.
+
+Example of use:
+
+```cpp
+// creates a new context variable initialized with the given values
+registry.set<my_type>(42, 'c');
+
+// gets the context variable
+const auto &var = registry.ctx<my_type>();
+
+// if in doubts, probe the registry to avoid assertions in case of errors
+if(auto *ptr = registry.try_ctx<my_type>(); ptr) {
+    // uses the context variable associated with the registry, if any
+}
+
+// unsets the context variable
+registry.unset<my_type>();
+```
+
+The type of a context variable must be such that it's default constructible and
+can be moved. The `set` member function either creates a new instance of the
+context variable or overwrites an already existing one if any. The `try_ctx`
+member function returns a pointer to the context variable if it exists,
+otherwise it returns a null pointer. This fits well with the `if` statement with
+initializer.
 
 ## Snapshot: complete vs continuous
 
@@ -914,128 +1021,6 @@ the best way to do it. However, feel free to use it at your own risk.
 
 The basic idea is to store everything in a group of queues in memory, then bring
 everything back to the registry with different loaders.
-
-## The actor class
-
-The `actor` class is designed for those who don't feel immediately comfortable
-working with components or for those who are migrating a project and want to
-approach it one step at a time.
-
-This class acts as a thin wrapper for an entity and for all its components. It's
-constructed with a registry to be used behind the scenes and is in charge of the
-destruction of the entity when it goes out of the scope.<br/>
-An actor offers all the functionalities required to work with components, such
-as the `assign` and` remove` member functions, but also `has`,` get`, `try_get`
-and so on.
-
-My advice isn't to use the `actor` class to hide entities and components behind
-a more object-oriented interface. Instead, users should rely on it only where
-strictly necessary. In all other cases, it's highly advisable to become familiar
-with the model of `EnTT` and work directly with the registry, the views and the
-groups, rather than with a tool that could introduce a performance degradation.
-
-## Helpers
-
-The so called _helpers_ are small classes and functions mainly designed to offer
-built-in support for the most basic functionalities.<br/>
-The list of helpers will grow longer as time passes and new ideas come out.
-
-### Dependency function
-
-A _dependency function_ is a predefined listener, actually a function template
-to use to automatically assign components to an entity when a type has a
-dependency on some other types.<br/>
-The following adds components `a_type` and `another_type` whenever `my_type` is
-assigned to an entity:
-
-```cpp
-entt::connect<a_type, another_type>(registry.on_construct<my_type>());
-```
-
-A component is assigned to an entity and thus default initialized only in case
-the entity itself hasn't it yet. It means that already existent components won't
-be overriden.<br/>
-A dependency can easily be broken by means of the following function template:
-
-```cpp
-entt::disconnect<a_type, another_type>(registry.on_construct<my_type>());
-```
-
-### Tags
-
-There's nothing magical about the way tags can be assigned to entities while
-avoiding a performance hit at runtime. Nonetheless, the syntax can be annoying
-and that's why a more user-friendly shortcut is provided to do it.<br/>
-This shortcut is the alias template `entt::tag`.
-
-If used in combination with hashed strings, it helps to use tags where types
-would be required otherwise. As an example:
-
-```cpp
-registry.assign<entt::tag<"enemy"_hs>>(entity);
-```
-
-## Null entity
-
-In `EnTT`, there exists a sort of _null entity_ made available to users that is
-accessible via the `entt::null` variable.<br/>
-The library guarantees that the following expression always returns false:
-
-```cpp
-registry.valid(entt::null);
-```
-
-In other terms, a registry will reject the null entity in all cases because it
-isn't considered valid. It means that the null entity cannot own components for
-obvious reasons.<br/>
-The type of the null entity is internal and should not be used for any purpose
-other than defining the null entity itself. However, there exist implicit
-conversions from the null entity to identifiers of any allowed type:
-
-```cpp
-entt::entity null = entt::null;
-```
-
-Similarly, the null entity can be compared to any other identifier:
-
-```cpp
-const auto entity = registry.create();
-const bool null = (entity == entt::null);
-```
-
-## Context variables
-
-It is often convenient to assign context variables to a registry, so as to make
-it the only _source of truth_ of an application.<br/>
-This is possible by means of a member function named `set` to use to create a
-context variable from a given type. Later on, either `ctx` or `try_ctx` can be
-used to retrieve the newly created instance and `unset` is there to literally
-reset it if needed.
-
-Example of use:
-
-```cpp
-// creates a new context variable initialized with the given values
-registry.set<my_type>(42, 'c');
-
-// gets the context variable
-const auto &var = registry.ctx<my_type>();
-
-// if in doubts, probe the registry to avoid assertions in case of errors
-if(auto *ptr = registry.try_ctx<my_type>(); ptr) {
-    // uses the context variable associated with the registry, if any
-}
-
-// unsets the context variable
-registry.unset<my_type>();
-```
-
-The type of a context variable must be such that it's default constructible and
-can be moved. The `set` member function either creates a new instance of the
-context variable or overwrites an already existing one if any. The `try_ctx`
-member function returns a pointer to the context variable if it exists,
-otherwise it returns a null pointer. This fits well with the `if` statement with
-initializer.
 
 # Views and Groups
 

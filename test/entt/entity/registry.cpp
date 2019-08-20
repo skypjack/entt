@@ -15,7 +15,7 @@ struct empty_type {};
 
 struct listener {
     template<typename Component>
-    void incr(entt::registry &registry, entt::entity entity, const Component &) {
+    void incr(entt::entity entity, entt::registry &registry, const Component &) {
         ASSERT_TRUE(registry.valid(entity));
         ASSERT_TRUE(registry.has<Component>(entity));
         last = entity;
@@ -23,7 +23,7 @@ struct listener {
     }
 
     template<typename Component>
-    void decr(entt::registry &registry, entt::entity entity) {
+    void decr(entt::entity entity, entt::registry &registry) {
         ASSERT_TRUE(registry.valid(entity));
         ASSERT_TRUE(registry.has<Component>(entity));
         last = entity;
@@ -1523,4 +1523,33 @@ TEST(Registry, MoveOnlyComponent) {
     entt::registry registry;
     const auto entity = registry.create();
     registry.assign<std::unique_ptr<int>>(entity);
+}
+
+TEST(Registry, Dependencies) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.on_construct<int>().connect<&entt::registry::assign_or_replace<double>>(registry);
+    registry.on_destroy<int>().connect<&entt::registry::remove<double>>(registry);
+    registry.assign<double>(entity, .3);
+
+    ASSERT_FALSE(registry.has<int>(entity));
+    ASSERT_EQ(registry.get<double>(entity), .3);
+
+    registry.assign<int>(entity);
+
+    ASSERT_TRUE(registry.has<int>(entity));
+    ASSERT_EQ(registry.get<double>(entity), .0);
+
+    registry.remove<int>(entity);
+
+    ASSERT_FALSE(registry.has<int>(entity));
+    ASSERT_FALSE(registry.has<double>(entity));
+
+    registry.on_construct<int>().disconnect<&entt::registry::assign_or_replace<double>>(registry);
+    registry.on_destroy<int>().disconnect<&entt::registry::remove<double>>(registry);
+    registry.assign<int>(entity);
+
+    ASSERT_TRUE(registry.has<int>(entity));
+    ASSERT_FALSE(registry.has<double>(entity));
 }

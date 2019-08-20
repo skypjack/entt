@@ -112,6 +112,11 @@ as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>
 /**
  * @brief Dependency function prototype.
  *
+ * @deprecated
+ * This function will be wiped out in a future version of the library.<br/>
+ * Use shortcuts and cross links between registries to achieve the same result
+ * in a more idiomatic way.
+ *
  * A _dependency function_ is a built-in listener to use to automatically assign
  * components to an entity when a type has a dependency on some other types.
  *
@@ -120,17 +125,22 @@ as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Dependency Types of components to assign to an entity if triggered.
- * @param reg A valid reference to a registry.
  * @param entt A valid entity identifier.
+ * @param reg A valid reference to a registry.
  */
 template<typename Entity, typename... Dependency>
-void dependency(basic_registry<Entity> &reg, const Entity entt) {
+void dependency(const Entity entt, basic_registry<Entity> &reg) {
     ((reg.template has<Dependency>(entt) ? void() : (reg.template assign<Dependency>(entt), void())), ...);
 }
 
 
 /**
  * @brief Connects a dependency function to the given sink.
+ *
+ * @deprecated
+ * This function will be wiped out in a future version of the library.<br/>
+ * Use shortcuts and cross links between registries to achieve the same result
+ * in a more idiomatic way.
  *
  * A _dependency function_ is a built-in listener to use to automatically assign
  * components to an entity when a type has a dependency on some other types.
@@ -148,7 +158,7 @@ void dependency(basic_registry<Entity> &reg, const Entity entt) {
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Component, typename Entity>
-void connect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sink) {
+void connect(sink<void(const Entity, basic_registry<Entity> &, Component &)> sink) {
     constexpr auto function = &dependency<Entity, Dependency...>;
     sink.template connect<function>();
 }
@@ -156,6 +166,11 @@ void connect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sin
 
 /**
  * @brief Disconnects a dependency function from the given sink.
+ *
+ * @deprecated
+ * This function will be wiped out in a future version of the library.<br/>
+ * Use shortcuts and cross links between registries to achieve the same result
+ * in a more idiomatic way.
  *
  * A _dependency function_ is a built-in listener to use to automatically assign
  * components to an entity when a type has a dependency on some other types.
@@ -173,7 +188,7 @@ void connect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sin
  * @param sink A sink object properly initialized.
  */
 template<typename... Dependency, typename Component, typename Entity>
-void disconnect(sink<void(basic_registry<Entity> &, const Entity, Component &)> sink) {
+void disconnect(sink<void(const Entity, basic_registry<Entity> &, Component &)> sink) {
     constexpr auto function = &dependency<Entity, Dependency...>;
     sink.template disconnect<function>();
 }
