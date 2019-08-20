@@ -1440,6 +1440,37 @@ TEST(Registry, Stomp) {
     ASSERT_EQ(registry.get<char>(other), 'c');
 }
 
+
+TEST(Registry, StompBatch) {
+    entt::registry registry;
+
+    const auto entity = registry.create();
+    registry.assign<int>(entity, 3);
+    registry.assign<char>(entity, 'c');
+
+    std::vector<entt::entity> entities(1000);
+    registry.create(entities.begin(), entities.end());
+    registry.batch_stomp<int, char, double>(
+        entity, registry, entities.begin(), entities.end());
+
+    ASSERT_TRUE(std::all_of(entities.begin(), entities.end(), 
+        [&registry](auto other) {return registry.get<int>(other) == 3;}));
+    ASSERT_TRUE(std::all_of(entities.begin(), entities.end(), 
+        [&registry](auto other) {return registry.get<char>(other) == 'c';}));
+
+    registry.replace<int>(entity, 42);
+    registry.replace<char>(entity, 'a');
+
+    registry.batch_stomp(
+        entity, registry, entities.begin(), entities.end());
+
+    ASSERT_TRUE(std::all_of(entities.begin(), entities.end(), 
+        [&registry](auto other) {return registry.get<int>(other) == 42;}));
+    ASSERT_TRUE(std::all_of(entities.begin(), entities.end(), 
+        [&registry](auto other) {return registry.get<char>(other) == 'a';}));
+}
+
+
 TEST(Registry, StompExclude) {
     entt::registry registry;
 

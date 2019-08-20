@@ -1562,6 +1562,61 @@ public:
     }
 
     /**
+     * @brief Makes a full or partial copy of an entity to a range of entities.
+     *
+     * The components must be copyable for obvious reasons. The range of
+     * entities must all be valid.<br/>
+     * If no components are provided, the registry will try to copy all the
+     * existing types. The non-copyable ones will be ignored.
+     *
+     * This feature supports exclusion lists. The excluded types have higher
+     * priority than those indicated for copying. An excluded type will never be
+     * copied.
+     *
+     * @warning
+     * Attempting to copy components that aren't copyable results in unexpected
+     * behaviors.<br/>
+     * A static assertion will abort the compilation when the components
+     * provided aren't copy constructible. Otherwise, an assertion will abort
+     * the execution at runtime in debug mode in case one or more types cannot
+     * be copied.
+     *
+     * @warning
+     * Attempting to use invalid entities results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entities.
+     *
+     * @tparam Component Types of components to copy.
+     * @tparam Exclude Types of components not to be copied.
+     * @param from A valid entity identifier to be copied.
+     * @param other The registry that owns the target entity.
+     * @param first An iterator to the first element of the range to copy to.
+     * @param last An iterator past the last element of the range to copy to.
+     */
+    template<typename... Component, typename It, typename... Exclude>
+    void batch_stomp(const Entity from, registry &other, It first, It last, exclude_t<Exclude...> = {}) {
+        static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
+        static_assert(std::is_convertible_v<entity_type, typename std::iterator_traits<It>::value_type>);
+        ENTT_ASSERT(valid(from));
+        ENTT_ASSERT(std::all_of(first, last, [this](auto e){ return valid(e); }));
+
+        for(auto pos = pools.size(); pos; --pos) {
+            const auto &pdata = pools[pos-1];
+            ENTT_ASSERT(!sizeof...(Component) || !pdata.pool || pdata.stomp);
+
+            if(pdata.pool && pdata.stomp
+                    && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))
+                    && !((pdata.runtime_type == to_integer(type<Exclude>())) || ...)
+                    && pdata.pool->has(from))
+            {
+                std::for_each(first, last, [&pdata, &from, &other](const Entity to) {
+                    pdata.stomp(*pdata.pool, from, other, to);
+                });
+            }
+        }
+    }
+
+    /**
      * @brief Returns a temporary object to use to create snapshots.
      *
      * A snapshot is either a full or a partial dump of a registry.<br/>
