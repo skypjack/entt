@@ -1529,8 +1529,12 @@ TEST(Registry, Dependencies) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.on_construct<int>().connect<&entt::registry::assign_or_replace<double>>(registry);
-    registry.on_destroy<int>().connect<&entt::registry::remove<double>>(registry);
+    // required because of an issue of VS2019
+    constexpr auto assign_or_replace = &entt::registry::assign_or_replace<double>;
+    constexpr auto remove = &entt::registry::remove<double>;
+
+    registry.on_construct<int>().connect<assign_or_replace>(registry);
+    registry.on_destroy<int>().connect<remove>(registry);
     registry.assign<double>(entity, .3);
 
     ASSERT_FALSE(registry.has<int>(entity));
@@ -1546,8 +1550,8 @@ TEST(Registry, Dependencies) {
     ASSERT_FALSE(registry.has<int>(entity));
     ASSERT_FALSE(registry.has<double>(entity));
 
-    registry.on_construct<int>().disconnect<&entt::registry::assign_or_replace<double>>(registry);
-    registry.on_destroy<int>().disconnect<&entt::registry::remove<double>>(registry);
+    registry.on_construct<int>().disconnect<assign_or_replace>(registry);
+    registry.on_destroy<int>().disconnect<remove>(registry);
     registry.assign<int>(entity);
 
     ASSERT_TRUE(registry.has<int>(entity));
