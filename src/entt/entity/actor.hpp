@@ -10,7 +10,6 @@
 #include "entity.hpp"
 #include "fwd.hpp"
 
-
 namespace entt {
 
 
@@ -174,6 +173,7 @@ struct basic_actor {
         return entt;
     }
 
+
     /**
      * @brief Checks if an actor refers to a valid entity or not.
      * @return True if the actor refers to a valid entity, false otherwise.
@@ -185,6 +185,48 @@ struct basic_actor {
 private:
     registry_type *reg;
     entity_type entt;
+};
+
+template<typename Entity>
+class basic_proto_actor : public basic_actor<Entity> {
+
+    /*! @brief Type of registry used internally. */
+    using registry_type = basic_registry<Entity>;
+    /*! @brief Underlying entity identifier. */
+    using entity_type = Entity;
+
+public:
+    explicit basic_proto_actor(registry_type &ref)
+        : basic_actor<Entity>(ref)
+    {}
+    basic_proto_actor() ENTT_NOEXCEPT
+    {}
+
+    /**
+     * @brief create new prototype actor using same registry, and stomp
+     *     desired components to it. This is meant to allow for creating 
+     *     prototype factories derived from eachother.
+     */
+    template<typename... Component, typename... Exclude>
+    basic_proto_actor copy(exclude_t<Exclude...> exclude = {}) {
+        auto n = basic_proto_actor(basic_actor<Entity>::backend());
+        stomp<Component...>(basic_actor<Entity>::backend(), n.entity());
+        return std::move(n);
+    }
+    /**
+     * @brief Wraps registry batch_stomp
+     */
+    template<typename... Component, typename... Exclude>
+    void stomp(registry_type &other, const entity_type to, exclude_t<Exclude...> exclude = {}) {
+        basic_actor<Entity>::backend().template stomp<Component...>(entity(), other, to, exclude);
+    }
+    /**
+     * @brief Wraps registry batch_stomp
+     */
+    template<typename... Component, typename It, typename... Exclude>
+    void batch_stomp(registry_type &other, It first, It last, exclude_t<Exclude...> exclude = {}) {
+        basic_actor<Entity>::backend().template stomp<Component...>(entity(), other, first, last, exclude);
+    }
 };
 
 

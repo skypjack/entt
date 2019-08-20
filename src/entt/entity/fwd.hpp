@@ -33,6 +33,9 @@ class basic_observer;
 template <typename>
 struct basic_actor;
 
+template <typename>
+struct basic_proto_actor;
+
 /*! @class basic_prototype */
 template<typename>
 class basic_prototype;
@@ -63,6 +66,7 @@ using observer = basic_observer<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using actor = basic_actor<entity>;
+using proto_actor = basic_proto_actor<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using prototype = basic_prototype<entity>;

@@ -40,6 +40,30 @@ TEST(Actor, Component) {
     ASSERT_FALSE(actor.has<int>());
 }
 
+TEST(Actor, ProtoActor) {
+    entt::registry registry;
+
+    auto proto = entt::proto_actor{registry};
+    proto.assign<int>(2);
+
+    auto proto2 = proto.copy();
+    ASSERT_TRUE(proto.has<int>());
+    ASSERT_TRUE(proto2.has<int>());
+    ASSERT_EQ(registry.size(), 2);
+
+    proto.assign<int>(3);
+    ASSERT_EQ(proto2.get<int>(), 2);
+
+    ASSERT_TRUE(proto);
+    ASSERT_FALSE(registry.empty<int>());
+    ASSERT_FALSE(registry.empty());
+
+    registry.destroy(proto.entity());
+
+    ASSERT_FALSE(proto);
+    ASSERT_TRUE(proto2);
+}
+
 TEST(Actor, EntityLifetime) {
     entt::registry registry;
     entt::actor actor{};
