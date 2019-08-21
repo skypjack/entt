@@ -243,9 +243,9 @@ documentation:
 * `Doxygen` version 1.8 or later.
 
 Alternatively, `Bazel` is also supported as a build system (credits to
-[@zaucy](https://github.com/zaucy) who introduced what's required via
-[#291](https://github.com/skypjack/entt/pull/291) and offered to maintain
-it). Please refer to the pull request for more details.<br/>
+[zaucy](https://github.com/zaucy) who introduced what's required with
+[this](https://github.com/skypjack/entt/pull/291) pull request and offered to
+maintain it).<br/>
 In the documentation below I'll still refer to `CMake`, this being the official
 build system of the library.
 
