@@ -332,8 +332,8 @@ public:
     }
 
     /**
-     * @brief Assigns one or more entities to a storage and constructs their
-     * objects.
+     * @brief Assigns one or more entities to a storage and default constructs
+     * their objects.
      *
      * The object type must be at least move and default insertable.
      *
@@ -353,6 +353,30 @@ public:
     iterator_type batch(It first, It last) {
         const auto length = last - first;
         instances.resize(instances.size() + length);
+        // entity goes after component in case constructor throws
+        underlying_type::batch(first, last);
+        return begin();
+    }
+
+    /**
+     * @brief Assigns one or more entities to a storage and copy constructs
+     * their objects.
+     *
+     * The object type must be at least move and copy insertable.
+     *
+     * @sa batch
+     *
+     * @tparam It Type of forward iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     * @param value The value to initialize the new objects with.
+     * @return An iterator to the list of instances just created and sorted the
+     * same of the entities.
+     */
+    template<typename It>
+    iterator_type batch(It first, It last, const object_type &value) {
+        const auto length = last - first;
+        instances.resize(instances.size() + length, value);
         // entity goes after component in case constructor throws
         underlying_type::batch(first, last);
         return begin();
@@ -650,6 +674,8 @@ public:
     /**
      * @brief Assigns one or more entities to a storage.
      *
+     * The object type must be at least default constructible.
+     *
      * @warning
      * Attempting to assign an entity that already belongs to the storage
      * results in undefined behavior.<br/>
@@ -663,7 +689,7 @@ public:
      * same of the entities.
      */
     template<typename It>
-    iterator_type batch(It first, It last) {
+    iterator_type batch(It first, It last, const object_type & = {}) {
         underlying_type::batch(first, last);
         return begin();
     }

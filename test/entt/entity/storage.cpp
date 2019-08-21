@@ -100,25 +100,38 @@ TEST(Storage, BatchAdd) {
 
     entities[0] = entt::entity{3};
     entities[1] = entt::entity{42};
-
-    pool.reserve(4);
-    pool.construct(entt::entity{12}, 21);
     auto it = pool.batch(std::begin(entities), std::end(entities));
-    pool.construct(entt::entity{24}, 42);
 
     ASSERT_TRUE(pool.has(entities[0]));
     ASSERT_TRUE(pool.has(entities[1]));
-    ASSERT_FALSE(pool.has(entt::entity{0}));
-    ASSERT_FALSE(pool.has(entt::entity{9}));
-    ASSERT_TRUE(pool.has(entt::entity{12}));
-    ASSERT_TRUE(pool.has(entt::entity{24}));
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_EQ(pool.size(), 4u);
-    ASSERT_EQ(pool.get(entt::entity{12}), 21);
+    ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(pool.get(entities[0]), 0);
     ASSERT_EQ(pool.get(entities[1]), 0);
-    ASSERT_EQ(pool.get(entt::entity{24}), 42);
+
+    it[0] = 1;
+    it[1] = 2;
+
+    ASSERT_EQ(pool.get(entities[0]), 1);
+    ASSERT_EQ(pool.get(entities[1]), 2);
+}
+
+TEST(Storage, BatchAddByCopy) {
+    entt::storage<entt::entity, int> pool;
+    entt::entity entities[2];
+
+    entities[0] = entt::entity{3};
+    entities[1] = entt::entity{42};
+    auto it = pool.batch(std::begin(entities), std::end(entities), 3);
+
+    ASSERT_TRUE(pool.has(entities[0]));
+    ASSERT_TRUE(pool.has(entities[1]));
+
+    ASSERT_FALSE(pool.empty());
+    ASSERT_EQ(pool.size(), 2u);
+    ASSERT_EQ(pool.get(entities[0]), 3);
+    ASSERT_EQ(pool.get(entities[1]), 3);
 
     it[0] = 1;
     it[1] = 2;
@@ -134,20 +147,13 @@ TEST(Storage, BatchAddEmptyType) {
     entities[0] = entt::entity{3};
     entities[1] = entt::entity{42};
 
-    pool.reserve(4);
-    pool.construct(entt::entity{12});
     pool.batch(std::begin(entities), std::end(entities));
-    pool.construct(entt::entity{24});
 
     ASSERT_TRUE(pool.has(entities[0]));
     ASSERT_TRUE(pool.has(entities[1]));
-    ASSERT_FALSE(pool.has(entt::entity{0}));
-    ASSERT_FALSE(pool.has(entt::entity{9}));
-    ASSERT_TRUE(pool.has(entt::entity{12}));
-    ASSERT_TRUE(pool.has(entt::entity{24}));
 
     ASSERT_FALSE(pool.empty());
-    ASSERT_EQ(pool.size(), 4u);
+    ASSERT_EQ(pool.size(), 2u);
 
     auto &&component = pool.get(entities[0]);
 
