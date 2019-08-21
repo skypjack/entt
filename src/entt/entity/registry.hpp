@@ -193,7 +193,7 @@ class basic_registry {
         std::unique_ptr<sparse_set<Entity>> pool;
         void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
         std::unique_ptr<sparse_set<Entity>>(* clone)(const sparse_set<Entity> &);
-        void(* stomp)(const sparse_set<Entity> &, const Entity, registry &, const Entity);
+        void(* stomp)(const sparse_set<Entity> &, const Entity, basic_registry &, const Entity);
         ENTT_ID_TYPE runtime_type;
     };
 
@@ -282,7 +282,7 @@ class basic_registry {
                     return std::make_unique<pool_type<Component>>(static_cast<const pool_type<Component> &>(cpool));
                 };
 
-                pdata->stomp = [](const sparse_set<Entity> &cpool, const Entity from, registry &other, const Entity to) {
+                pdata->stomp = [](const sparse_set<Entity> &cpool, const Entity from, basic_registry &other, const Entity to) {
                     other.assign_or_replace<Component>(to, static_cast<const pool_type<Component> &>(cpool).get(from));
                 };
             } else {
@@ -1559,7 +1559,7 @@ public:
      * @param to A valid entity identifier to copy to.
      */
     template<typename... Component, typename... Exclude>
-    void stomp(const Entity from, registry &other, const Entity to, exclude_t<Exclude...> = {}) {
+    void stomp(const Entity from, basic_registry &other, const Entity to, exclude_t<Exclude...> = {}) {
         static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
         ENTT_ASSERT(valid(from) && other.valid(to));
 
