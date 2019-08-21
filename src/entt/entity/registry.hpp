@@ -664,6 +664,9 @@ public:
 
     /**
      * @brief Destroys all the entities in a range.
+     *
+     * @sa destroy
+     *
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
@@ -1489,7 +1492,7 @@ public:
 
             if(pdata.pool && pdata.clone
                     && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))
-                    && !((pdata.runtime_type == to_integer(type<Exclude>())) || ...))
+                    && ((pdata.runtime_type != to_integer(type<Exclude>())) && ...))
             {
                 auto &curr = other.pools[pos-1];
                 curr.remove = pdata.remove;
@@ -1553,7 +1556,7 @@ public:
 
             if(pdata.pool && pdata.stomp
                     && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))
-                    && !((pdata.runtime_type == to_integer(type<Exclude>())) || ...)
+                    && ((pdata.runtime_type != to_integer(type<Exclude>())) && ...)
                     && pdata.pool->has(from))
             {
                 pdata.stomp(*pdata.pool, from, other, to);
