@@ -1378,20 +1378,45 @@ public:
         }
     }
 
-    /*! @copydoc group */
+    /**
+     * @brief Returns a group for the given components.
+     *
+     * @sa group
+     *
+     * @tparam Owned Types of components owned by the group.
+     * @tparam Get Types of components observed by the group.
+     * @tparam Exclude Types of components used to filter the group.
+     * @return A newly created group.
+     */
     template<typename... Owned, typename... Get, typename... Exclude>
     entt::basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) const {
         static_assert(std::conjunction_v<std::is_const<Owned>..., std::is_const<Get>...>);
         return const_cast<basic_registry *>(this)->group<Owned...>(entt::get<Get...>, exclude<Exclude...>);
     }
 
-    /*! @copydoc group */
+    /**
+     * @brief Returns a group for the given components.
+     *
+     * @sa group
+     *
+     * @tparam Owned Types of components owned by the group.
+     * @tparam Exclude Types of components used to filter the group.
+     * @return A newly created group.
+     */
     template<typename... Owned, typename... Exclude>
     entt::basic_group<Entity, exclude_t<Exclude...>, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) {
         return group<Owned...>(entt::get<>, exclude<Exclude...>);
     }
 
-    /*! @copydoc group */
+    /**
+     * @brief Returns a group for the given components.
+     *
+     * @sa group
+     *
+     * @tparam Owned Types of components owned by the group.
+     * @tparam Exclude Types of components used to filter the group.
+     * @return A newly created group.
+     */
     template<typename... Owned, typename... Exclude>
     entt::basic_group<Entity, exclude_t<Exclude...>, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) const {
         static_assert(std::conjunction_v<std::is_const<Owned>...>);
