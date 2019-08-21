@@ -1,0 +1,11 @@
+load("//bazel:copts.bzl", "entt_copts")
+
+cc_binary(
+    name = "benchmark",
+    srcs = ["benchmark.cpp"],
+    copts = entt_copts,
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

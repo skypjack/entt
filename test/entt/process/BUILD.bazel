@@ -1,0 +1,21 @@
+load("//bazel:copts.bzl", "entt_copts")
+
+cc_test(
+    name = "process",
+    srcs = ["process.cpp"],
+    copts = entt_copts,
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "scheduler",
+    srcs = ["scheduler.cpp"],
+    copts = entt_copts,
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

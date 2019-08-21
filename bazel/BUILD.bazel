@@ -1,0 +1,1 @@
+exports_files(["copts.bzl"], visibility = ["//:__subpackages__"])

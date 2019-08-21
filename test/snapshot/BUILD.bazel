@@ -1,0 +1,12 @@
+load("//bazel:copts.bzl", "entt_copts")
+
+cc_test(
+    name = "snapshot",
+    srcs = ["snapshot.cpp"],
+    copts = entt_copts,
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+        "@bazelregistry_cereal//:cereal",
+    ],
+)
