@@ -555,7 +555,7 @@ public:
      * just created otherwise.
      */
     template<typename... Component>
-    decltype(auto) create() {
+    auto create() {
         entity_type entity;
 
         if(destroyed == null) {
