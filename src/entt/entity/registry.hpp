@@ -86,28 +86,16 @@ class basic_registry {
         }
 
         template<typename It>
-        Component * batch(basic_registry &registry, It first, It last) {
-            Component *component = nullptr;
+        auto batch(basic_registry &registry, It first, It last) {
+            auto it = storage<Entity, Component>::batch(first, last);
 
-            if constexpr(std::is_empty_v<Component>) {
-                storage<Entity, Component>::batch(first, last);
-
-                if(!construction.empty()) {
-                    std::for_each(first, last, [this, &registry](const auto entt) {
-                        construction.publish(entt, registry, Component{});
-                    });
-                }
-            } else {
-                component = storage<Entity, Component>::batch(first, last);
-
-                if(!construction.empty()) {
-                    std::for_each(first, last, [this, &registry, component](const auto entt) mutable {
-                        construction.publish(entt, registry, *(component++));
-                    });
-                }
+            if(!construction.empty()) {
+                std::for_each(first, last, [this, &registry, it](const auto entt) mutable {
+                    construction.publish(entt, registry, *(it++));
+                });
             }
 
-            return component;
+            return it;
         }
 
         void remove(basic_registry &registry, const Entity entt) {
@@ -599,7 +587,7 @@ public:
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
      * @return No return value if the component list is empty, a tuple
-     * containing the pointers to the arrays of components just created and
+     * containing the iterators to the lists of components just created and
      * sorted the same of the entities otherwise.
      */
     template<typename... Component, typename It>

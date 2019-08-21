@@ -116,7 +116,7 @@ TEST(SparseSet, Pagination) {
 
 TEST(SparseSet, BatchAdd) {
     entt::sparse_set<entt::entity> set;
-    entt::sparse_set<entt::entity>::entity_type entities[2];
+    entt::entity entities[2];
 
     entities[0] = entt::entity{3};
     entities[1] = entt::entity{42};
@@ -135,8 +135,8 @@ TEST(SparseSet, BatchAdd) {
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 4u);
     ASSERT_EQ(set.get(entt::entity{12}), 0u);
-    ASSERT_EQ(set.get(entities[0]), 1u);
-    ASSERT_EQ(set.get(entities[1]), 2u);
+    ASSERT_EQ(set.get(entities[0]), 2u);
+    ASSERT_EQ(set.get(entities[1]), 1u);
     ASSERT_EQ(set.get(entt::entity{24}), 3u);
 }
 

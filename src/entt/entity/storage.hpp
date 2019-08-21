@@ -28,7 +28,8 @@ namespace entt {
  *
  * @note
  * Entities and objects have the same order. It's guaranteed both in case of raw
- * access (either to entities or objects) and when using input iterators.
+ * access (either to entities or objects) and when using random or input access
+ * iterators.
  *
  * @note
  * Internal data structures arrange elements to maximize performance. Because of
@@ -215,8 +216,8 @@ public:
      * the storage is empty, the returned iterator will be equal to `end()`.
      *
      * @note
-     * Input iterators stay true to the order imposed by a call to either `sort`
-     * or `respect`.
+     * Random access iterators stay true to the order imposed by a call to
+     * either `sort` or `respect`.
      *
      * @return An iterator to the first instance of the given type.
      */
@@ -244,8 +245,8 @@ public:
      * results in undefined behavior.
      *
      * @note
-     * Input iterators stay true to the order imposed by a call to either `sort`
-     * or `respect`.
+     * Random access iterators stay true to the order imposed by a call to
+     * either `sort` or `respect`.
      *
      * @return An iterator to the element following the last instance of the
      * given type.
@@ -345,16 +346,16 @@ public:
      * @tparam It Type of forward iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @return A pointer to the array of instances just created and sorted the
+     * @return An iterator to the list of instances just created and sorted the
      * same of the entities.
      */
     template<typename It>
-    object_type * batch(It first, It last) {
+    iterator_type batch(It first, It last) {
         const auto length = last - first;
         instances.resize(instances.size() + length);
         // entity goes after component in case constructor throws
         underlying_type::batch(first, last);
-        return instances.data() + instances.size() - length;
+        return begin();
     }
 
     /**
@@ -644,6 +645,27 @@ public:
     object_type get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
         ENTT_ASSERT(underlying_type::has(entt));
         return {};
+    }
+
+    /**
+     * @brief Assigns one or more entities to a storage.
+     *
+     * @warning
+     * Attempting to assign an entity that already belongs to the storage
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * storage already contains the given entity.
+     *
+     * @tparam It Type of forward iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     * @return An iterator to the list of instances just created and sorted the
+     * same of the entities.
+     */
+    template<typename It>
+    iterator_type batch(It first, It last) {
+        underlying_type::batch(first, last);
+        return begin();
     }
 };
 

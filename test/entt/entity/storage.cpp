@@ -96,14 +96,14 @@ TEST(Storage, EmptyType) {
 
 TEST(Storage, BatchAdd) {
     entt::storage<entt::entity, int> pool;
-    entt::storage<entt::entity, int>::entity_type entities[2];
+    entt::entity entities[2];
 
     entities[0] = entt::entity{3};
     entities[1] = entt::entity{42};
 
     pool.reserve(4);
     pool.construct(entt::entity{12}, 21);
-    auto *component = pool.batch(std::begin(entities), std::end(entities));
+    auto it = pool.batch(std::begin(entities), std::end(entities));
     pool.construct(entt::entity{24}, 42);
 
     ASSERT_TRUE(pool.has(entities[0]));
@@ -120,8 +120,8 @@ TEST(Storage, BatchAdd) {
     ASSERT_EQ(pool.get(entities[1]), 0);
     ASSERT_EQ(pool.get(entt::entity{24}), 42);
 
-    component[0] = 1;
-    component[1] = 2;
+    it[0] = 1;
+    it[1] = 2;
 
     ASSERT_EQ(pool.get(entities[0]), 1);
     ASSERT_EQ(pool.get(entities[1]), 2);
@@ -129,7 +129,7 @@ TEST(Storage, BatchAdd) {
 
 TEST(Storage, BatchAddEmptyType) {
     entt::storage<entt::entity, empty_type> pool;
-    entt::storage<entt::entity, empty_type>::entity_type entities[2];
+    entt::entity entities[2];
 
     entities[0] = entt::entity{3};
     entities[1] = entt::entity{42};

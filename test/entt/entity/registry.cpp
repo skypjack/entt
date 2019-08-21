@@ -1138,10 +1138,6 @@ TEST(Registry, CreateManyEntitiesWithComponentsAtOnce) {
     ASSERT_FALSE(registry.empty<char>());
     ASSERT_FALSE(registry.empty<empty_type>());
 
-    ASSERT_NE(iptr, nullptr);
-    ASSERT_NE(cptr, nullptr);
-    ASSERT_EQ(eptr, nullptr);
-
     ASSERT_EQ(registry.size<int>(), entt::registry::size_type{3});
     ASSERT_EQ(registry.size<char>(), entt::registry::size_type{3});
     ASSERT_EQ(registry.size<empty_type>(), entt::registry::size_type{3});

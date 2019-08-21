@@ -318,7 +318,8 @@ public:
      * `end()`.
      *
      * @note
-     * Input iterators stay true to the order imposed by a call to `respect`.
+     * Random access iterators stay true to the order imposed by a call to
+     * `respect`.
      *
      * @return An iterator to the first entity of the internal packed array.
      */
@@ -335,7 +336,8 @@ public:
      * iterator results in undefined behavior.
      *
      * @note
-     * Input iterators stay true to the order imposed by a call to `respect`.
+     * Random access iterators stay true to the order imposed by a call to
+     * `respect`.
      *
      * @return An iterator to the element following the last entity of the
      * internal packed array.
@@ -417,7 +419,7 @@ public:
      */
     template<typename It>
     void batch(It first, It last) {
-        std::for_each(first, last, [this, next = direct.size()](const auto entt) mutable {
+        std::for_each(std::make_reverse_iterator(last), std::make_reverse_iterator(first), [this, next = direct.size()](const auto entt) mutable {
             ENTT_ASSERT(!has(entt));
             auto [page, offset] = index(entt);
             assure(page);

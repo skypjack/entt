@@ -28,3 +28,5 @@ TODO
 * make meta work across boundaries
   - inline variables are fine here, only the head represents a problem
   - we should always resolve by looking into the list of types when working across boundaries, no direct resolve
+* review stomp signature: first, last, other, from <-- the registry "acquires" the other entity
+* create from prototype (literally a stomp with batch creation)
