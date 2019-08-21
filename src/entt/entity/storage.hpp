@@ -334,7 +334,7 @@ public:
      * @brief Assigns one or more entities to a storage and constructs their
      * objects.
      *
-     * The object type must be at least default constructible.
+     * The object type must be at least move and default insertable.
      *
      * @warning
      * Attempting to assign an entity that already belongs to the storage
@@ -350,12 +350,11 @@ public:
      */
     template<typename It>
     object_type * batch(It first, It last) {
-        static_assert(std::is_default_constructible_v<object_type>);
-        const auto skip = instances.size();
-        instances.insert(instances.end(), last-first, {});
+        const auto length = last - first;
+        instances.resize(instances.size() + length);
         // entity goes after component in case constructor throws
         underlying_type::batch(first, last);
-        return instances.data() + skip;
+        return instances.data() + instances.size() - length;
     }
 
     /**
