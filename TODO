@@ -29,5 +29,4 @@ TODO
   - inline variables are fine here, only the head represents a problem
   - we should always resolve by looking into the list of types when working across boundaries, no direct resolve
 * nested groups: AB/ABC/ABCD/... (hints: sort, check functions)
-* use make_tuple and reference_wrapper instead of explicing tuple<T &>
 * improve multi-stomp so as to reuse the known pool and the known element

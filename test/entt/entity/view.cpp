@@ -141,11 +141,11 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     ASSERT_TRUE((std::is_same_v<decltype(cview.get(entt::entity{0})), const int &>));
     ASSERT_TRUE((std::is_same_v<decltype(cview.raw()), const int *>));
 
-    view.each([](auto, auto &&i) {
+    view.each([](auto &&i) {
         ASSERT_TRUE((std::is_same_v<decltype(i), int &>));
     });
 
-    cview.each([](auto, auto &&i) {
+    cview.each([](auto &&i) {
         ASSERT_TRUE((std::is_same_v<decltype(i), const int &>));
     });
 }
@@ -406,25 +406,28 @@ TEST(MultipleComponentView, EachWithHoles) {
 
 TEST(MultipleComponentView, ConstNonConstAndAllInBetween) {
     entt::registry registry;
-    auto view = registry.view<int, const char>();
+    auto view = registry.view<int, const char, entt::tag<"empty"_hs>>();
 
     ASSERT_EQ(view.size(), decltype(view.size()){0});
 
     const auto entity = registry.create();
     registry.assign<int>(entity, 0);
     registry.assign<char>(entity, 'c');
+    registry.assign<entt::tag<"empty"_hs>>(entity);
 
     ASSERT_EQ(view.size(), decltype(view.size()){1});
 
     ASSERT_TRUE((std::is_same_v<decltype(view.get<int>(entt::entity{0})), int &>));
     ASSERT_TRUE((std::is_same_v<decltype(view.get<const char>(entt::entity{0})), const char &>));
-    ASSERT_TRUE((std::is_same_v<decltype(view.get<int, const char>(entt::entity{0})), std::tuple<int &, const char &>>));
+    ASSERT_TRUE((std::is_same_v<decltype(view.get<entt::tag<"empty"_hs>>(entt::entity{0})), entt::tag<"empty"_hs>>));
+    ASSERT_TRUE((std::is_same_v<decltype(view.get<int, const char, entt::tag<"empty"_hs>>(entt::entity{0})), std::tuple<int &, const char &, entt::tag<"empty"_hs>>>));
     ASSERT_TRUE((std::is_same_v<decltype(view.raw<const char>()), const char *>));
     ASSERT_TRUE((std::is_same_v<decltype(view.raw<int>()), int *>));
 
-    view.each([](auto, auto &&i, auto &&c) {
+    view.each([](auto &&i, auto &&c, auto &&e) {
         ASSERT_TRUE((std::is_same_v<decltype(i), int &>));
         ASSERT_TRUE((std::is_same_v<decltype(c), const char &>));
+        ASSERT_TRUE((std::is_same_v<decltype(e), entt::tag<"empty"_hs> &&>));
     });
 }
 
