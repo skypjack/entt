@@ -28,5 +28,6 @@ TODO
 * make meta work across boundaries
   - inline variables are fine here, only the head represents a problem
   - we should always resolve by looking into the list of types when working across boundaries, no direct resolve
-* review stomp signature: first, last, other, from <-- the registry "acquires" the other entity
-* create from prototype (literally a stomp with batch creation)
+* nested groups: AB/ABC/ABCD/... (hints: sort, check functions)
+* use make_tuple and reference_wrapper instead of explicing tuple<T &>
+* improve multi-stomp so as to reuse the known pool and the known element

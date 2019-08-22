@@ -351,8 +351,7 @@ public:
      */
     template<typename It>
     iterator_type batch(It first, It last) {
-        const auto length = last - first;
-        instances.resize(instances.size() + length);
+        instances.resize(instances.size() + std::distance(first, last));
         // entity goes after component in case constructor throws
         underlying_type::batch(first, last);
         return begin();
@@ -375,8 +374,7 @@ public:
      */
     template<typename It>
     iterator_type batch(It first, It last, const object_type &value) {
-        const auto length = last - first;
-        instances.resize(instances.size() + length, value);
+        instances.resize(instances.size() + std::distance(first, last), value);
         // entity goes after component in case constructor throws
         underlying_type::batch(first, last);
         return begin();

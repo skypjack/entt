@@ -20,7 +20,7 @@
   * [Sorting: is it possible?](#sorting-is-it-possible)
   * [Helpers](#helpers)
     * [Null entity](#null-entity)
-    * [Multiple registries](#multiple-registries)
+    * [Stomp and spawn](#stomp-and-spawn)
     * [Dependencies](#dependencies)
     * [Tags](#tags)
     * [Actor](#actor)
@@ -44,6 +44,7 @@
 * [Empty type optimization](#empty-type-optimization)
 * [Multithreading](#multithreading)
   * [Iterators](#iterators)
+* [Beyond this document](#beyond-this-document)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -666,26 +667,29 @@ const auto entity = registry.create();
 const bool null = (entity == entt::null);
 ```
 
-### Multiple registries
+### Stomp and spawn
 
 The use of multiple registries is quite common. Examples of use are the
 separation of the UI from the simulation or the loading of different scenes in
 the background, possibly on a separate thread, without having to keep track of
 which entity belongs to which scene.<br/>
 In fact, with `EnTT` this is even a recommended practice, as the registry is
-nothing more than a container and different optimizations can be applied to
-different containers.
+nothing more than a container and different optimizations and strategies can be
+applied to different containers.
 
-Once there are multiple registries available, however, a method is needed to
-transfer information from one container to another and this results in the
-`stomp` member function of the `registry` class.<br/>
-This function allows to take one or more entities from a registry and use them
-to _stomp_ other entities in another registry (or even the same, actually making
-local copies).<br/>
-It opens definitely the doors to a lot of interesting features like migrating
-entities between registries, prototypes, shadow registry, prefabs, shared
-components without an explicit owner and copy-on-write policies among the other
-things.
+Once there are multiple registries available, however, one or more methods are
+needed to transfer information from one container to another and this results in
+the `stomp` member function and a couple of overloads of the `create` member
+function for the `registry` class .<br/>
+The `stomp` function allows to take one entity from a registry and use it to
+_stomp_ one or more entities in another registry (or even the same, actually
+making local copies). On the other hand, the overloads of the `create` member
+function can be used to spawn new entities from a prototype.
+
+These features open definitely the doors to a lot of interesting features like
+migrating entities between registries, prototypes, shadow registry, prefabs,
+shared components without an explicit owner and copy-on-write policies among the
+other things.
 
 ### Dependencies
 
@@ -1672,3 +1676,14 @@ This may change in the future and the iterators will almost certainly return
 both the entities and a list of references to their components sooner or later.
 Multi-pass guarantee won't break in any case and the performance should even
 benefit from it further.
+
+# Beyond this document
+
+There are many other features and functions not listed in this document.<br/>
+`EnTT` and in particular its ECS part is in continuous development and some
+things could be forgotten, others could have been omitted on purpose to reduce
+the size of this file. Unfortunately, some parts may even be outdated and still
+to be updated.
+
+For further information, it's recommended to refer to the documentation included
+in the code itself or join the official channels to ask a question.

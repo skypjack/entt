@@ -85,9 +85,9 @@ class basic_registry {
             }
         }
 
-        template<typename It>
-        auto batch(basic_registry &registry, It first, It last) {
-            auto it = storage<Entity, Component>::batch(first, last);
+        template<typename It, typename... Comp>
+        auto batch(basic_registry &registry, It first, It last, const Comp &... value) {
+            auto it = storage<Entity, Component>::batch(first, last, value...);
 
             if(!construction.empty()) {
                 std::for_each(first, last, [this, &registry, it](const auto entt) mutable {
@@ -543,11 +543,11 @@ public:
      * Users should not care about the type of the returned entity identifier.
      * In case entity identifers are stored around, the `valid` member
      * function can be used to know if they are still valid or the entity has
-     * been destroyed and potentially recycled.
+     * been destroyed and potentially recycled.<br/>
+     * The returned entity has assigned the given components, if any.
      *
-     * The returned entity has assigned the given components, if any. The
-     * components must be at least default constructible. A compilation error
-     * will occur otherwhise.
+     * The components must be at least default constructible. A compilation
+     * error will occur otherwhise.
      *
      * @tparam Component Types of components to assign to the entity.
      * @return A valid entity identifier if the component list is empty, a tuple
@@ -556,24 +556,14 @@ public:
      */
     template<typename... Component>
     auto create() {
-        entity_type entity;
-
-        if(destroyed == null) {
-            entity = entities.emplace_back(entity_type(entities.size()));
-            // traits_type::entity_mask is reserved to allow for null identifiers
-            ENTT_ASSERT(to_integer(entity) < traits_type::entity_mask);
-        } else {
-            const auto entt = to_integer(destroyed);
-            const auto version = to_integer(entities[entt]) & (traits_type::version_mask << traits_type::entity_shift);
-            destroyed = entity_type{to_integer(entities[entt]) & traits_type::entity_mask};
-            entity = entity_type{entt | version};
-            entities[entt] = entity;
-        }
+        entity_type entities[1]{};
 
         if constexpr(sizeof...(Component) == 0) {
-            return entity;
+            create<Component...>(std::begin(entities), std::end(entities));
+            return entities[0];
         } else {
-            return std::tuple<entity_type, decltype(assign<Component>(entity))...>{entity, assign<Component>(entity)...};
+            auto it = create<Component...>(std::begin(entities), std::end(entities));
+            return std::tuple<entity_type, decltype(assign<Component>(entities[0]))...>{entities[0], *std::get<typename pool_type<Component>::iterator_type>(it)...};
         }
     }
 
@@ -581,6 +571,9 @@ public:
      * @brief Assigns each element in a range an entity.
      *
      * @sa create
+     *
+     * The components must be at least move and default insertable. A
+     * compilation error will occur otherwhise.
      *
      * @tparam Component Types of components to assign to the entity.
      * @tparam It Type of forward iterator.
@@ -597,13 +590,16 @@ public:
         std::generate(first, last, [this]() {
             entity_type curr;
 
-            if(destroyed != null) {
+            if(destroyed == null) {
+                curr = entities.emplace_back(entity_type(entities.size()));
+                // traits_type::entity_mask is reserved to allow for null identifiers
+                ENTT_ASSERT(to_integer(curr) < traits_type::entity_mask);
+            } else {
                 const auto entt = to_integer(destroyed);
                 const auto version = to_integer(entities[entt]) & (traits_type::version_mask << traits_type::entity_shift);
                 destroyed = entity_type{to_integer(entities[entt]) & traits_type::entity_mask};
-                curr = (entities[entt] = entity_type{entt | version});
-            } else {
-                curr = entities.emplace_back(entity_type(entities.size()));
+                curr = entity_type{entt | version};
+                entities[entt] = curr;
             }
 
             return curr;
@@ -611,6 +607,48 @@ public:
 
         if constexpr(sizeof...(Component) > 0) {
             return std::make_tuple(assure<Component>()->batch(*this, first, last)...);
+        }
+    }
+
+    /**
+     * @brief Creates a new entity from a prototype entity.
+     *
+     * @sa create
+     *
+     * @tparam Component Types of components to copy.
+     * @tparam Exclude Types of components not to be copied.
+     * @param src A valid entity identifier to be copied.
+     * @param other The registry that owns the source entity.
+     * @return A valid entity identifier.
+     */
+    template<typename... Component, typename... Exclude>
+    auto create(entity_type src, basic_registry &other, exclude_t<Exclude...> = {}) {
+        entity_type entities[1]{};
+        create<Component...>(std::begin(entities), std::end(entities), src, other, exclude<Exclude...>);
+        return entities[0];
+    }
+
+    /**
+     * @brief Assigns each element in a range an entity from a prototype entity.
+     *
+     * @sa create
+     *
+     * @tparam Component Types of components to copy.
+     * @tparam Exclude Types of components not to be copied.
+     * @param first An iterator to the first element of the range to generate.
+     * @param last An iterator past the last element of the range to generate.
+     * @param src A valid entity identifier to be copied.
+     * @param other The registry that owns the source entity.
+     */
+    template<typename... Component, typename It, typename... Exclude>
+    void create(It first, It last, entity_type src, basic_registry &other, exclude_t<Exclude...> = {}) {
+        create(first, last);
+
+        if constexpr(sizeof...(Component) == 0) {
+            stomp<Component...>(first, last, src, other, exclude<Exclude...>);
+        } else {
+            static_assert(sizeof...(Component) == 0 || sizeof...(Exclude) == 0);
+            (assure<Component>()->batch(*this, first, last, other.get<Component>(src)), ...);
         }
     }
 
@@ -1528,16 +1566,15 @@ public:
     }
 
     /**
-     * @brief Makes a full or partial copy of an entity.
+     * @brief Stomps an entity and its components.
      *
      * The components must be copyable for obvious reasons. The entities
      * must be both valid.<br/>
      * If no components are provided, the registry will try to copy all the
      * existing types. The non-copyable ones will be ignored.
      *
-     * This feature supports exclusion lists. The excluded types have higher
-     * priority than those indicated for copying. An excluded type will never be
-     * copied.
+     * This feature supports exclusion lists as an alternative to component
+     * lists. An excluded type will never be copied.
      *
      * @warning
      * Attempting to copy components that aren't copyable results in unexpected
@@ -1554,25 +1591,45 @@ public:
      *
      * @tparam Component Types of components to copy.
      * @tparam Exclude Types of components not to be copied.
-     * @param from A valid entity identifier to be copied.
-     * @param other The registry that owns the target entity.
-     * @param to A valid entity identifier to copy to.
+     * @param dst A valid entity identifier to copy to.
+     * @param src A valid entity identifier to be copied.
+     * @param other The registry that owns the source entity.
      */
     template<typename... Component, typename... Exclude>
-    void stomp(const Entity from, basic_registry &other, const Entity to, exclude_t<Exclude...> = {}) {
-        static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
-        ENTT_ASSERT(valid(from) && other.valid(to));
+    void stomp(const entity_type dst, const entity_type src, basic_registry &other, exclude_t<Exclude...> = {}) {
+        const entity_type entities[1]{dst};
+        stomp<Component...>(std::begin(entities), std::end(entities), src, other, exclude<Exclude...>);
+    }
 
-        for(auto pos = pools.size(); pos; --pos) {
-            const auto &pdata = pools[pos-1];
+    /**
+     * @brief Stomps the entities in a range and their components.
+     *
+     * @sa stomp
+     *
+     * @tparam Component Types of components to copy.
+     * @tparam Exclude Types of components not to be copied.
+     * @param first An iterator to the first element of the range to stomp.
+     * @param last An iterator past the last element of the range to stomp.
+     * @param src A valid entity identifier to be copied.
+     * @param other The registry that owns the source entity.
+     */
+    template<typename... Component, typename It, typename... Exclude>
+    void stomp(It first, It last, const entity_type src, basic_registry &other, exclude_t<Exclude...> = {}) {
+        static_assert(sizeof...(Component) == 0 || sizeof...(Exclude) == 0);
+        static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
+
+        for(auto pos = other.pools.size(); pos; --pos) {
+            const auto &pdata = other.pools[pos-1];
             ENTT_ASSERT(!sizeof...(Component) || !pdata.pool || pdata.stomp);
 
             if(pdata.pool && pdata.stomp
                     && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))
                     && ((pdata.runtime_type != to_integer(type<Exclude>())) && ...)
-                    && pdata.pool->has(from))
+                    && pdata.pool->has(src))
             {
-                pdata.stomp(*pdata.pool, from, other, to);
+                std::for_each(first, last, [this, &pdata, src](const auto entity) {
+                    pdata.stomp(*pdata.pool, src, *this, entity);
+                });
             }
         }
     }
