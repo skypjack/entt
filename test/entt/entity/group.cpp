@@ -290,10 +290,10 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
 
     ASSERT_EQ(group.size(), decltype(group.size()){1});
 
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<int>(entt::entity{0})), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<const char>(entt::entity{0})), const char &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<entt::tag<"empty"_hs>>(entt::entity{0})), entt::tag<"empty"_hs>>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<int, const char, entt::tag<"empty"_hs>>(entt::entity{0})), std::tuple<int &, const char &, entt::tag<"empty"_hs>>>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<int>({})), int &>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<const char>({})), const char &>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<entt::tag<"empty"_hs>>({})), entt::tag<"empty"_hs>>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<int, const char, entt::tag<"empty"_hs>>({})), std::tuple<int &, const char &, entt::tag<"empty"_hs>>>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<const char>()), const char *>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<int>()), int *>));
 
@@ -805,12 +805,12 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
 
     ASSERT_EQ(group.size(), decltype(group.size()){1});
 
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<int>(entt::entity{0})), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<const char>(entt::entity{0})), const char &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<double>(entt::entity{0})), double &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<const float>(entt::entity{0})), const float &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<entt::tag<"empty"_hs>>(entt::entity{0})), entt::tag<"empty"_hs>>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<int, const char, double, const float, entt::tag<"empty"_hs>>(entt::entity{0})), std::tuple<int &, const char &, double &, const float &, entt::tag<"empty"_hs>>>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<int>({})), int &>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<const char>({})), const char &>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<double>({})), double &>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<const float>({})), const float &>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<entt::tag<"empty"_hs>>({})), entt::tag<"empty"_hs>>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<int, const char, double, const float, entt::tag<"empty"_hs>>({})), std::tuple<int &, const char &, double &, const float &, entt::tag<"empty"_hs>>>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<const float>()), const float *>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<double>()), double *>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<const char>()), const char *>));
