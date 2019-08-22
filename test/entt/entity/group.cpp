@@ -279,28 +279,28 @@ TEST(NonOwningGroup, IndexRebuiltOnDestroy) {
 
 TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
     entt::registry registry;
-    auto group = registry.group(entt::get<int, const char, entt::tag<"empty"_hs>>);
+    auto group = registry.group(entt::get<int, const char, std::true_type>);
 
     ASSERT_EQ(group.size(), decltype(group.size()){0});
 
     const auto entity = registry.create();
     registry.assign<int>(entity, 0);
     registry.assign<char>(entity, 'c');
-    registry.assign<entt::tag<"empty"_hs>>(entity);
+    registry.assign<std::true_type>(entity);
 
     ASSERT_EQ(group.size(), decltype(group.size()){1});
 
     ASSERT_TRUE((std::is_same_v<decltype(group.get<int>({})), int &>));
     ASSERT_TRUE((std::is_same_v<decltype(group.get<const char>({})), const char &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<entt::tag<"empty"_hs>>({})), entt::tag<"empty"_hs>>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<int, const char, entt::tag<"empty"_hs>>({})), std::tuple<int &, const char &, entt::tag<"empty"_hs>>>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<std::true_type>({})), std::true_type>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<int, const char, std::true_type>({})), std::tuple<int &, const char &, std::true_type>>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<const char>()), const char *>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<int>()), int *>));
 
     group.each([](auto &&i, auto &&c, auto &&e) {
         ASSERT_TRUE((std::is_same_v<decltype(i), int &>));
         ASSERT_TRUE((std::is_same_v<decltype(c), const char &>));
-        ASSERT_TRUE((std::is_same_v<decltype(e), entt::tag<"empty"_hs> &&>));
+        ASSERT_TRUE((std::is_same_v<decltype(e), std::true_type &&>));
     });
 }
 
@@ -792,7 +792,7 @@ TEST(OwningGroup, IndexRebuiltOnDestroy) {
 
 TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     entt::registry registry;
-    auto group = registry.group<int, const char>(entt::get<double, const float, entt::tag<"empty"_hs>>);
+    auto group = registry.group<int, const char>(entt::get<double, const float, std::true_type>);
 
     ASSERT_EQ(group.size(), decltype(group.size()){0});
 
@@ -801,7 +801,7 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     registry.assign<char>(entity, 'c');
     registry.assign<double>(entity, 0.);
     registry.assign<float>(entity, 0.f);
-    registry.assign<entt::tag<"empty"_hs>>(entity);
+    registry.assign<std::true_type>(entity);
 
     ASSERT_EQ(group.size(), decltype(group.size()){1});
 
@@ -809,8 +809,8 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     ASSERT_TRUE((std::is_same_v<decltype(group.get<const char>({})), const char &>));
     ASSERT_TRUE((std::is_same_v<decltype(group.get<double>({})), double &>));
     ASSERT_TRUE((std::is_same_v<decltype(group.get<const float>({})), const float &>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<entt::tag<"empty"_hs>>({})), entt::tag<"empty"_hs>>));
-    ASSERT_TRUE((std::is_same_v<decltype(group.get<int, const char, double, const float, entt::tag<"empty"_hs>>({})), std::tuple<int &, const char &, double &, const float &, entt::tag<"empty"_hs>>>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<std::true_type>({})), std::true_type>));
+    ASSERT_TRUE((std::is_same_v<decltype(group.get<int, const char, double, const float, std::true_type>({})), std::tuple<int &, const char &, double &, const float &, std::true_type>>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<const float>()), const float *>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<double>()), double *>));
     ASSERT_TRUE((std::is_same_v<decltype(group.raw<const char>()), const char *>));
@@ -821,7 +821,7 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
         ASSERT_TRUE((std::is_same_v<decltype(c), const char &>));
         ASSERT_TRUE((std::is_same_v<decltype(d), double &>));
         ASSERT_TRUE((std::is_same_v<decltype(f), const float &>));
-        ASSERT_TRUE((std::is_same_v<decltype(e), entt::tag<"empty"_hs> &&>));
+        ASSERT_TRUE((std::is_same_v<decltype(e), std::true_type &&>));
     });
 }
 

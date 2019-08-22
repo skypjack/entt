@@ -406,28 +406,28 @@ TEST(MultipleComponentView, EachWithHoles) {
 
 TEST(MultipleComponentView, ConstNonConstAndAllInBetween) {
     entt::registry registry;
-    auto view = registry.view<int, const char, entt::tag<"empty"_hs>>();
+    auto view = registry.view<int, const char, std::true_type>();
 
     ASSERT_EQ(view.size(), decltype(view.size()){0});
 
     const auto entity = registry.create();
     registry.assign<int>(entity, 0);
     registry.assign<char>(entity, 'c');
-    registry.assign<entt::tag<"empty"_hs>>(entity);
+    registry.assign<std::true_type>(entity);
 
     ASSERT_EQ(view.size(), decltype(view.size()){1});
 
     ASSERT_TRUE((std::is_same_v<decltype(view.get<int>({})), int &>));
     ASSERT_TRUE((std::is_same_v<decltype(view.get<const char>({})), const char &>));
-    ASSERT_TRUE((std::is_same_v<decltype(view.get<entt::tag<"empty"_hs>>({})), entt::tag<"empty"_hs>>));
-    ASSERT_TRUE((std::is_same_v<decltype(view.get<int, const char, entt::tag<"empty"_hs>>({})), std::tuple<int &, const char &, entt::tag<"empty"_hs>>>));
+    ASSERT_TRUE((std::is_same_v<decltype(view.get<std::true_type>({})), std::true_type>));
+    ASSERT_TRUE((std::is_same_v<decltype(view.get<int, const char, std::true_type>({})), std::tuple<int &, const char &, std::true_type>>));
     ASSERT_TRUE((std::is_same_v<decltype(view.raw<const char>()), const char *>));
     ASSERT_TRUE((std::is_same_v<decltype(view.raw<int>()), int *>));
 
     view.each([](auto &&i, auto &&c, auto &&e) {
         ASSERT_TRUE((std::is_same_v<decltype(i), int &>));
         ASSERT_TRUE((std::is_same_v<decltype(c), const char &>));
-        ASSERT_TRUE((std::is_same_v<decltype(e), entt::tag<"empty"_hs> &&>));
+        ASSERT_TRUE((std::is_same_v<decltype(e), std::true_type &&>));
     });
 }
 
