@@ -15,10 +15,12 @@ namespace entt {
 
 
 /**
- * @brief Dedicated to those who aren't confident with entity-component systems.
+ * @brief Dedicated to those who aren't confident with the
+ * entity-component-system architecture.
  *
  * Tiny wrapper around a registry, for all those users that aren't confident
- * with entity-component systems and prefer to iterate objects directly.
+ * with entity-component-system architecture and prefer to iterate objects
+ * directly.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
@@ -30,16 +32,27 @@ struct basic_actor {
     using entity_type = Entity;
 
     basic_actor() ENTT_NOEXCEPT
-        : reg{nullptr}, entt{entt::null}
+        : entt{entt::null}, reg{nullptr}
     {}
 
     /**
-     * @brief Constructs an actor by using the given registry.
-     * @param ref An entity-component system properly initialized.
+     * @brief Constructs an actor from a given registry.
+     * @param ref An instance of the registry class.
      */
     explicit basic_actor(registry_type &ref)
-        : reg{&ref}, entt{ref.create()}
+        : entt{ref.create()}, reg{&ref}
     {}
+
+    /**
+     * @brief Constructs an actor from a given entity.
+     * @param entity A valid entity identifier.
+     * @param ref An instance of the registry class.
+     */
+    explicit basic_actor(entity_type entity, registry_type &ref)
+        : entt{entity}, reg{&ref}
+    {
+        ENTT_ASSERT(ref.valid(entity));
+    }
 
     /*! @brief Default destructor. */
     virtual ~basic_actor() {
@@ -58,7 +71,7 @@ struct basic_actor {
      * @param other The instance to move from.
      */
     basic_actor(basic_actor &&other)
-        : reg{other.reg}, entt{other.entt}
+        : entt{other.entt}, reg{other.reg}
     {
         other.entt = null;
     }
@@ -112,13 +125,13 @@ struct basic_actor {
     }
 
     /**
-     * @brief Checks if an actor has the given component.
-     * @tparam Component Type of the component for which to perform the check.
-     * @return True if the actor has the component, false otherwise.
+     * @brief Checks if an actor has the given components.
+     * @tparam Component Components for which to perform the check.
+     * @return True if the actor has all the components, false otherwise.
      */
-    template<typename Component>
+    template<typename... Component>
     bool has() const ENTT_NOEXCEPT {
-        return reg->template has<Component>(entt);
+        return (reg->template has<Component>(entt) && ...);
     }
 
     /**
@@ -183,8 +196,8 @@ struct basic_actor {
     }
 
 private:
-    registry_type *reg;
     entity_type entt;
+    registry_type *reg;
 };
 
 

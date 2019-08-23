@@ -29,8 +29,7 @@ TEST(Actor, Component) {
 
     ASSERT_FALSE(registry.empty<int>());
     ASSERT_FALSE(registry.empty());
-    ASSERT_TRUE(actor.has<int>());
-    ASSERT_TRUE(actor.has<char>());
+    ASSERT_TRUE((actor.has<int, char>()));
     ASSERT_FALSE(actor.has<double>());
 
     actor.remove<int>();
@@ -38,6 +37,22 @@ TEST(Actor, Component) {
     ASSERT_TRUE(registry.empty<int>());
     ASSERT_FALSE(registry.empty());
     ASSERT_FALSE(actor.has<int>());
+}
+
+TEST(Actor, FromEntity) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.assign<int>(entity, 42);
+    registry.assign<char>(entity, 'c');
+
+    entt::actor actor{entity, registry};
+
+    ASSERT_TRUE(actor);
+    ASSERT_EQ(entity, actor.entity());
+    ASSERT_TRUE((actor.has<int, char>()));
+    ASSERT_EQ(actor.get<int>(), 42);
+    ASSERT_EQ(actor.get<char>(), 'c');
 }
 
 TEST(Actor, EntityLifetime) {
