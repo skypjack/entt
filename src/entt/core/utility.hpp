@@ -2,6 +2,9 @@
 #define ENTT_CORE_UTILITY_HPP
 
 
+#include "../config/config.h"
+
+
 namespace entt {
 
 
@@ -13,7 +16,7 @@ namespace entt {
  * @return Pointer to the member function.
  */
 template<typename Type, typename Class>
-constexpr auto overload(Type Class:: *member) { return member; }
+constexpr auto overload(Type Class:: *member) ENTT_NOEXCEPT { return member; }
 
 
 /**
@@ -23,7 +26,7 @@ constexpr auto overload(Type Class:: *member) { return member; }
  * @return Pointer to the function.
  */
 template<typename Type>
-constexpr auto overload(Type *func) { return func; }
+constexpr auto overload(Type *func) ENTT_NOEXCEPT { return func; }
 
 
 }
