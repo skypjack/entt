@@ -78,10 +78,7 @@ class basic_runtime_view {
         }
 
         bool valid() const ENTT_NOEXCEPT {
-            const auto entt = *begin;
-            const auto sz = size_type(to_integer(entt) & traits_type::entity_mask);
-
-            return std::all_of(from, to, [entt](const auto *view) {
+            return std::all_of(from, to, [entt = *begin](const auto *view) {
                 return view->has(entt);
             });
         }
