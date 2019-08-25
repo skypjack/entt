@@ -76,29 +76,18 @@ class basic_view {
     class iterator {
         friend class basic_view<Entity, Component...>;
 
-        using extent_type = typename sparse_set<Entity>::size_type;
-
         iterator(unchecked_type other, underlying_iterator_type first, underlying_iterator_type last) ENTT_NOEXCEPT
             : unchecked{other},
               begin{first},
-              end{last},
-              extent{min(std::make_index_sequence<other.size()>{})}
+              end{last}
         {
             if(begin != end && !valid()) {
                 ++(*this);
             }
         }
 
-        template<auto... Indexes>
-        extent_type min(std::index_sequence<Indexes...>) const ENTT_NOEXCEPT {
-            return std::min({ std::get<Indexes>(unchecked)->extent()... });
-        }
-
         bool valid() const ENTT_NOEXCEPT {
-            const auto entt = *begin;
-            const auto sz = size_type(to_integer(entt) & traits_type::entity_mask);
-
-            return sz < extent && std::all_of(unchecked.cbegin(), unchecked.cend(), [entt](const sparse_set<Entity> *view) {
+            return std::all_of(unchecked.cbegin(), unchecked.cend(), [entt = *begin](const sparse_set<Entity> *view) {
                 return view->has(entt);
             });
         }
@@ -141,7 +130,6 @@ class basic_view {
         unchecked_type unchecked;
         underlying_iterator_type begin;
         underlying_iterator_type end;
-        extent_type extent;
     };
 
     // we could use pool_type<Component> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
