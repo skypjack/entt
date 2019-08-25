@@ -204,7 +204,7 @@ Moreover, it can be used as an opaque container for unmanaged objects if needed:
 
 ```cpp
 int value;
-entt::meta_any any{std::in_place, value};
+entt::meta_any any{entt::as_alias, value};
 ```
 
 In this case, the contained instance is never destroyed and users must ensure
@@ -401,7 +401,7 @@ There are a few alternatives available at the moment:
       .func<&my_type::member_function, entt::as_void_t>("member"_hs);
   ```
 
-* The _as-alias_ policy, associated with the type `entt::as_alias_t`<br/>
+* The _as-alias_ policy, associated with the type `entt::as_alias_t`.<br/>
   It allows to build wrappers that act as aliases for the objects used to
   initialize them. Modifying the object contained in the wrapper for which the
   _aliasing_ was requested will make it possible to directly modify the instance
