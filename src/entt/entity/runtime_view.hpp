@@ -242,7 +242,7 @@ public:
      */
     bool contains(const entity_type entt) const ENTT_NOEXCEPT {
         return valid() && std::all_of(pools.cbegin(), pools.cend(), [entt](const auto *view) {
-            return view->has(entt) && view->data()[view->get(entt)] == entt;
+            return view->find(entt) != view->end();
         });
     }
 
