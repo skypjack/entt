@@ -61,18 +61,16 @@ class basic_runtime_view {
     friend class basic_registry<Entity>;
 
     using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
-    using extent_type = typename sparse_set<Entity>::size_type;
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     class iterator {
         friend class basic_runtime_view<Entity>;
 
-        iterator(underlying_iterator_type first, underlying_iterator_type last, const sparse_set<Entity> * const *others, const sparse_set<Entity> * const *length, extent_type ext) ENTT_NOEXCEPT
+        iterator(underlying_iterator_type first, underlying_iterator_type last, const sparse_set<Entity> * const *others, const sparse_set<Entity> * const *length) ENTT_NOEXCEPT
             : begin{first},
               end{last},
               from{others},
-              to{length},
-              extent{ext}
+              to{length}
         {
             if(begin != end && !valid()) {
                 ++(*this);
@@ -83,7 +81,7 @@ class basic_runtime_view {
             const auto entt = *begin;
             const auto sz = size_type(to_integer(entt) & traits_type::entity_mask);
 
-            return sz < extent && std::all_of(from, to, [entt](const auto *view) {
+            return std::all_of(from, to, [entt](const auto *view) {
                 return view->has(entt);
             });
         }
@@ -127,7 +125,6 @@ class basic_runtime_view {
         underlying_iterator_type end;
         const sparse_set<Entity> * const *from;
         const sparse_set<Entity> * const *to;
-        extent_type extent;
     };
 
     basic_runtime_view(std::vector<const sparse_set<Entity> *> others) ENTT_NOEXCEPT
@@ -139,20 +136,6 @@ class basic_runtime_view {
 
         // brings the best candidate (if any) on front of the vector
         std::rotate(pools.begin(), it, pools.end());
-    }
-
-    extent_type min() const ENTT_NOEXCEPT {
-        extent_type extent{};
-
-        if(valid()) {
-            const auto it = std::min_element(pools.cbegin(), pools.cend(), [](const auto *lhs, const auto *rhs) {
-                return lhs->extent() < rhs->extent();
-            });
-
-            extent = (*it)->extent();
-        }
-
-        return extent;
     }
 
     bool valid() const ENTT_NOEXCEPT {
@@ -203,7 +186,7 @@ public:
         if(valid()) {
             const auto &pool = *pools.front();
             const auto * const *data = pools.data();
-            it = { pool.begin(), pool.end(), data + 1, data + pools.size(), min() };
+            it = { pool.begin(), pool.end(), data + 1, data + pools.size() };
         }
 
         return it;
@@ -229,7 +212,7 @@ public:
 
         if(valid()) {
             const auto &pool = *pools.front();
-            it = { pool.end(), pool.end(), nullptr, nullptr, min() };
+            it = { pool.end(), pool.end(), nullptr, nullptr };
         }
 
         return it;
