@@ -166,7 +166,7 @@ class sparse_set {
         }
     }
 
-    auto index(const Entity entt) const ENTT_NOEXCEPT {
+    auto map(const Entity entt) const ENTT_NOEXCEPT {
         const auto identifier = to_integer(entt) & traits_type::entity_mask;
         const auto page = size_type(identifier / entt_per_page);
         const auto offset = size_type(identifier & (entt_per_page - 1));
@@ -231,7 +231,7 @@ public:
      *
      * @param cap Desired capacity.
      */
-    virtual void reserve(const size_type cap) {
+    void reserve(const size_type cap) {
         direct.reserve(cap);
     }
 
@@ -245,7 +245,7 @@ public:
     }
 
     /*! @brief Requests the removal of unused capacity. */
-    virtual void shrink_to_fit() {
+    void shrink_to_fit() {
         // conservative approach
         if(direct.empty()) {
             reverse.clear();
@@ -353,7 +353,7 @@ public:
      * iterator otherwise.
      */
     iterator_type find(const entity_type entt) const ENTT_NOEXCEPT {
-        return has(entt) ? --(end() - get(entt)) : end();
+        return has(entt) ? --(end() - index(entt)) : end();
     }
 
     /**
@@ -362,7 +362,7 @@ public:
      * @return True if the sparse set contains the entity, false otherwise.
      */
     bool has(const entity_type entt) const ENTT_NOEXCEPT {
-        auto [page, offset] = index(entt);
+        auto [page, offset] = map(entt);
         // testing against null permits to avoid accessing the direct vector
         return (page < reverse.size() && reverse[page] && reverse[page][offset] != null);
     }
@@ -379,9 +379,9 @@ public:
      * @param entt A valid entity identifier.
      * @return The position of the entity in the sparse set.
      */
-    size_type get(const entity_type entt) const ENTT_NOEXCEPT {
+    size_type index(const entity_type entt) const ENTT_NOEXCEPT {
         ENTT_ASSERT(has(entt));
-        auto [page, offset] = index(entt);
+        auto [page, offset] = map(entt);
         return size_type(reverse[page][offset]);
     }
 
@@ -398,7 +398,7 @@ public:
      */
     void construct(const entity_type entt) {
         ENTT_ASSERT(!has(entt));
-        auto [page, offset] = index(entt);
+        auto [page, offset] = map(entt);
         assure(page);
         reverse[page][offset] = entity_type(direct.size());
         direct.push_back(entt);
@@ -421,7 +421,7 @@ public:
     void batch(It first, It last) {
         std::for_each(std::make_reverse_iterator(last), std::make_reverse_iterator(first), [this, next = direct.size()](const auto entt) mutable {
             ENTT_ASSERT(!has(entt));
-            auto [page, offset] = index(entt);
+            auto [page, offset] = map(entt);
             assure(page);
             reverse[page][offset] = entity_type(next++);
         });
@@ -440,10 +440,10 @@ public:
      *
      * @param entt A valid entity identifier.
      */
-    virtual void destroy(const entity_type entt) {
+    void destroy(const entity_type entt) {
         ENTT_ASSERT(has(entt));
-        auto [from_page, from_offset] = index(entt);
-        auto [to_page, to_offset] = index(direct.back());
+        auto [from_page, from_offset] = map(entt);
+        auto [to_page, to_offset] = map(direct.back());
         direct[size_type(reverse[from_page][from_offset])] = entity_type(direct.back());
         reverse[to_page][to_offset] = reverse[from_page][from_offset];
         reverse[from_page][from_offset] = null;
@@ -468,8 +468,8 @@ public:
     virtual void swap(const size_type lhs, const size_type rhs) ENTT_NOEXCEPT {
         ENTT_ASSERT(lhs < direct.size());
         ENTT_ASSERT(rhs < direct.size());
-        auto [src_page, src_offset] = index(direct[lhs]);
-        auto [dst_page, dst_offset] = index(direct[rhs]);
+        auto [src_page, src_offset] = map(direct[lhs]);
+        auto [dst_page, dst_offset] = map(direct[rhs]);
         std::swap(reverse[src_page][src_offset], reverse[dst_page][dst_offset]);
         std::swap(direct[lhs], direct[rhs]);
     }
@@ -570,7 +570,7 @@ public:
         while(pos && from != to) {
             if(has(*from)) {
                 if(*from != direct[pos]) {
-                    swap(pos, get(*from));
+                    swap(pos, index(*from));
                 }
 
                 --pos;
@@ -583,7 +583,7 @@ public:
     /**
      * @brief Resets a sparse set.
      */
-    virtual void reset() {
+    void reset() {
         reverse.clear();
         direct.clear();
     }

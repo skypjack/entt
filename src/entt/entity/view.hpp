@@ -87,8 +87,8 @@ class basic_view {
         }
 
         bool valid() const ENTT_NOEXCEPT {
-            return std::all_of(unchecked.cbegin(), unchecked.cend(), [entt = *begin](const sparse_set<Entity> *view) {
-                return view->has(entt);
+            return std::all_of(unchecked.cbegin(), unchecked.cend(), [this](const sparse_set<Entity> *view) {
+                return view->has(*begin);
             });
         }
 

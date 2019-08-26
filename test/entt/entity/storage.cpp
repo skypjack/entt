@@ -697,15 +697,15 @@ TEST(Storage, RespectOverlapEmptyType) {
 
     rhs.construct(entt::entity{12});
 
-    ASSERT_EQ(lhs.sparse_set<entt::entity>::get(entt::entity{3}), 0u);
-    ASSERT_EQ(lhs.sparse_set<entt::entity>::get(entt::entity{12}), 1u);
-    ASSERT_EQ(lhs.sparse_set<entt::entity>::get(entt::entity{42}), 2u);
+    ASSERT_EQ(lhs.index(entt::entity{3}), 0u);
+    ASSERT_EQ(lhs.index(entt::entity{12}), 1u);
+    ASSERT_EQ(lhs.index(entt::entity{42}), 2u);
 
     lhs.respect(rhs);
 
-    ASSERT_EQ(std::as_const(lhs).sparse_set<entt::entity>::get(entt::entity{3}), 0u);
-    ASSERT_EQ(std::as_const(lhs).sparse_set<entt::entity>::get(entt::entity{12}), 2u);
-    ASSERT_EQ(std::as_const(lhs).sparse_set<entt::entity>::get(entt::entity{42}), 1u);
+    ASSERT_EQ(std::as_const(lhs).index(entt::entity{3}), 0u);
+    ASSERT_EQ(std::as_const(lhs).index(entt::entity{12}), 2u);
+    ASSERT_EQ(std::as_const(lhs).index(entt::entity{42}), 1u);
 }
 
 TEST(Storage, CanModifyDuringIteration) {

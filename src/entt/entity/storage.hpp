@@ -174,13 +174,13 @@ public:
      *
      * @param cap Desired capacity.
      */
-    void reserve(const size_type cap) override {
+    void reserve(const size_type cap) {
         underlying_type::reserve(cap);
         instances.reserve(cap);
     }
 
     /*! @brief Requests the removal of unused capacity. */
-    void shrink_to_fit() override {
+    void shrink_to_fit() {
         underlying_type::shrink_to_fit();
         instances.shrink_to_fit();
     }
@@ -278,7 +278,7 @@ public:
      * @return The object associated with the entity.
      */
     const object_type & get(const entity_type entt) const ENTT_NOEXCEPT {
-        return instances[underlying_type::get(entt)];
+        return instances[underlying_type::index(entt)];
     }
 
     /*! @copydoc get */
@@ -292,7 +292,7 @@ public:
      * @return The object associated with the entity, if any.
      */
     const object_type * try_get(const entity_type entt) const ENTT_NOEXCEPT {
-        return underlying_type::has(entt) ? (instances.data() + underlying_type::get(entt)) : nullptr;
+        return underlying_type::has(entt) ? (instances.data() + underlying_type::index(entt)) : nullptr;
     }
 
     /*! @copydoc try_get */
@@ -391,9 +391,9 @@ public:
      *
      * @param entt A valid entity identifier.
      */
-    void destroy(const entity_type entt) override {
+    void destroy(const entity_type entt) {
         auto other = std::move(instances.back());
-        instances[underlying_type::get(entt)] = std::move(other);
+        instances[underlying_type::index(entt)] = std::move(other);
         instances.pop_back();
         underlying_type::destroy(entt);
     }
@@ -472,7 +472,7 @@ public:
             static_assert(!std::is_empty_v<object_type>);
 
             underlying_type::sort(from, to, [this, compare = std::move(compare)](const auto lhs, const auto rhs) {
-                return compare(std::as_const(instances[underlying_type::get(lhs)]), std::as_const(instances[underlying_type::get(rhs)]));
+                return compare(std::as_const(instances[underlying_type::index(lhs)]), std::as_const(instances[underlying_type::index(rhs)]));
             }, std::move(algo), std::forward<Args>(args)...);
         } else {
             underlying_type::sort(from, to, std::move(compare), std::move(algo), std::forward<Args>(args)...);
@@ -480,7 +480,7 @@ public:
     }
 
     /*! @brief Resets a storage. */
-    void reset() override {
+    void reset() {
         underlying_type::reset();
         instances.clear();
     }

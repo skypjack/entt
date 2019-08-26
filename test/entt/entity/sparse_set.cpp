@@ -24,7 +24,7 @@ TEST(SparseSet, Functionalities) {
 
     set.construct(entt::entity{42});
 
-    ASSERT_EQ(set.get(entt::entity{42}), 0u);
+    ASSERT_EQ(set.index(entt::entity{42}), 0u);
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 1u);
@@ -32,7 +32,7 @@ TEST(SparseSet, Functionalities) {
     ASSERT_NE(set.begin(), set.end());
     ASSERT_FALSE(set.has(entt::entity{0}));
     ASSERT_TRUE(set.has(entt::entity{42}));
-    ASSERT_EQ(set.get(entt::entity{42}), 0u);
+    ASSERT_EQ(set.index(entt::entity{42}), 0u);
 
     set.destroy(entt::entity{42});
 
@@ -46,7 +46,7 @@ TEST(SparseSet, Functionalities) {
     set.construct(entt::entity{42});
 
     ASSERT_FALSE(set.empty());
-    ASSERT_EQ(set.get(entt::entity{42}), 0u);
+    ASSERT_EQ(set.index(entt::entity{42}), 0u);
 
     ASSERT_TRUE(std::is_move_constructible_v<decltype(set)>);
     ASSERT_TRUE(std::is_move_assignable_v<decltype(set)>);
@@ -56,8 +56,8 @@ TEST(SparseSet, Functionalities) {
 
     ASSERT_FALSE(set.empty());
     ASSERT_FALSE(cpy.empty());
-    ASSERT_EQ(set.get(entt::entity{42}), 0u);
-    ASSERT_EQ(cpy.get(entt::entity{42}), 0u);
+    ASSERT_EQ(set.index(entt::entity{42}), 0u);
+    ASSERT_EQ(cpy.index(entt::entity{42}), 0u);
 
     entt::sparse_set<entt::entity> other{std::move(set)};
 
@@ -66,7 +66,7 @@ TEST(SparseSet, Functionalities) {
 
     ASSERT_TRUE(set.empty());
     ASSERT_FALSE(other.empty());
-    ASSERT_EQ(other.get(entt::entity{42}), 0u);
+    ASSERT_EQ(other.index(entt::entity{42}), 0u);
 
     other.reset();
 
@@ -134,10 +134,10 @@ TEST(SparseSet, BatchAdd) {
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 4u);
-    ASSERT_EQ(set.get(entt::entity{12}), 0u);
-    ASSERT_EQ(set.get(entities[0]), 2u);
-    ASSERT_EQ(set.get(entities[1]), 1u);
-    ASSERT_EQ(set.get(entt::entity{24}), 3u);
+    ASSERT_EQ(set.index(entt::entity{12}), 0u);
+    ASSERT_EQ(set.index(entities[0]), 2u);
+    ASSERT_EQ(set.index(entities[1]), 1u);
+    ASSERT_EQ(set.index(entt::entity{24}), 3u);
 }
 
 TEST(SparseSet, Iterator) {
@@ -212,9 +212,9 @@ TEST(SparseSet, Data) {
     set.construct(entt::entity{12});
     set.construct(entt::entity{42});
 
-    ASSERT_EQ(set.get(entt::entity{3}), 0u);
-    ASSERT_EQ(set.get(entt::entity{12}), 1u);
-    ASSERT_EQ(set.get(entt::entity{42}), 2u);
+    ASSERT_EQ(set.index(entt::entity{3}), 0u);
+    ASSERT_EQ(set.index(entt::entity{12}), 1u);
+    ASSERT_EQ(set.index(entt::entity{42}), 2u);
 
     ASSERT_EQ(*(set.data() + 0u), entt::entity{3});
     ASSERT_EQ(*(set.data() + 1u), entt::entity{12});
@@ -403,15 +403,15 @@ TEST(SparseSet, RespectDisjoint) {
     lhs.construct(entt::entity{12});
     lhs.construct(entt::entity{42});
 
-    ASSERT_EQ(lhs.get(entt::entity{3}), 0u);
-    ASSERT_EQ(lhs.get(entt::entity{12}), 1u);
-    ASSERT_EQ(lhs.get(entt::entity{42}), 2u);
+    ASSERT_EQ(lhs.index(entt::entity{3}), 0u);
+    ASSERT_EQ(lhs.index(entt::entity{12}), 1u);
+    ASSERT_EQ(lhs.index(entt::entity{42}), 2u);
 
     lhs.respect(rhs);
 
-    ASSERT_EQ(std::as_const(lhs).get(entt::entity{3}), 0u);
-    ASSERT_EQ(std::as_const(lhs).get(entt::entity{12}), 1u);
-    ASSERT_EQ(std::as_const(lhs).get(entt::entity{42}), 2u);
+    ASSERT_EQ(std::as_const(lhs).index(entt::entity{3}), 0u);
+    ASSERT_EQ(std::as_const(lhs).index(entt::entity{12}), 1u);
+    ASSERT_EQ(std::as_const(lhs).index(entt::entity{42}), 2u);
 }
 
 TEST(SparseSet, RespectOverlap) {
@@ -424,15 +424,15 @@ TEST(SparseSet, RespectOverlap) {
 
     rhs.construct(entt::entity{12});
 
-    ASSERT_EQ(lhs.get(entt::entity{3}), 0u);
-    ASSERT_EQ(lhs.get(entt::entity{12}), 1u);
-    ASSERT_EQ(lhs.get(entt::entity{42}), 2u);
+    ASSERT_EQ(lhs.index(entt::entity{3}), 0u);
+    ASSERT_EQ(lhs.index(entt::entity{12}), 1u);
+    ASSERT_EQ(lhs.index(entt::entity{42}), 2u);
 
     lhs.respect(rhs);
 
-    ASSERT_EQ(std::as_const(lhs).get(entt::entity{3}), 0u);
-    ASSERT_EQ(std::as_const(lhs).get(entt::entity{12}), 2u);
-    ASSERT_EQ(std::as_const(lhs).get(entt::entity{42}), 1u);
+    ASSERT_EQ(std::as_const(lhs).index(entt::entity{3}), 0u);
+    ASSERT_EQ(std::as_const(lhs).index(entt::entity{12}), 2u);
+    ASSERT_EQ(std::as_const(lhs).index(entt::entity{42}), 1u);
 }
 
 TEST(SparseSet, RespectOrdered) {
@@ -445,11 +445,11 @@ TEST(SparseSet, RespectOrdered) {
     lhs.construct(entt::entity{4});
     lhs.construct(entt::entity{5});
 
-    ASSERT_EQ(lhs.get(entt::entity{1}), 0u);
-    ASSERT_EQ(lhs.get(entt::entity{2}), 1u);
-    ASSERT_EQ(lhs.get(entt::entity{3}), 2u);
-    ASSERT_EQ(lhs.get(entt::entity{4}), 3u);
-    ASSERT_EQ(lhs.get(entt::entity{5}), 4u);
+    ASSERT_EQ(lhs.index(entt::entity{1}), 0u);
+    ASSERT_EQ(lhs.index(entt::entity{2}), 1u);
+    ASSERT_EQ(lhs.index(entt::entity{3}), 2u);
+    ASSERT_EQ(lhs.index(entt::entity{4}), 3u);
+    ASSERT_EQ(lhs.index(entt::entity{5}), 4u);
 
     rhs.construct(entt::entity{6});
     rhs.construct(entt::entity{1});
@@ -458,21 +458,21 @@ TEST(SparseSet, RespectOrdered) {
     rhs.construct(entt::entity{4});
     rhs.construct(entt::entity{5});
 
-    ASSERT_EQ(rhs.get(entt::entity{6}), 0u);
-    ASSERT_EQ(rhs.get(entt::entity{1}), 1u);
-    ASSERT_EQ(rhs.get(entt::entity{2}), 2u);
-    ASSERT_EQ(rhs.get(entt::entity{3}), 3u);
-    ASSERT_EQ(rhs.get(entt::entity{4}), 4u);
-    ASSERT_EQ(rhs.get(entt::entity{5}), 5u);
+    ASSERT_EQ(rhs.index(entt::entity{6}), 0u);
+    ASSERT_EQ(rhs.index(entt::entity{1}), 1u);
+    ASSERT_EQ(rhs.index(entt::entity{2}), 2u);
+    ASSERT_EQ(rhs.index(entt::entity{3}), 3u);
+    ASSERT_EQ(rhs.index(entt::entity{4}), 4u);
+    ASSERT_EQ(rhs.index(entt::entity{5}), 5u);
 
     rhs.respect(lhs);
 
-    ASSERT_EQ(rhs.get(entt::entity{6}), 0u);
-    ASSERT_EQ(rhs.get(entt::entity{1}), 1u);
-    ASSERT_EQ(rhs.get(entt::entity{2}), 2u);
-    ASSERT_EQ(rhs.get(entt::entity{3}), 3u);
-    ASSERT_EQ(rhs.get(entt::entity{4}), 4u);
-    ASSERT_EQ(rhs.get(entt::entity{5}), 5u);
+    ASSERT_EQ(rhs.index(entt::entity{6}), 0u);
+    ASSERT_EQ(rhs.index(entt::entity{1}), 1u);
+    ASSERT_EQ(rhs.index(entt::entity{2}), 2u);
+    ASSERT_EQ(rhs.index(entt::entity{3}), 3u);
+    ASSERT_EQ(rhs.index(entt::entity{4}), 4u);
+    ASSERT_EQ(rhs.index(entt::entity{5}), 5u);
 }
 
 TEST(SparseSet, RespectReverse) {
@@ -485,11 +485,11 @@ TEST(SparseSet, RespectReverse) {
     lhs.construct(entt::entity{4});
     lhs.construct(entt::entity{5});
 
-    ASSERT_EQ(lhs.get(entt::entity{1}), 0u);
-    ASSERT_EQ(lhs.get(entt::entity{2}), 1u);
-    ASSERT_EQ(lhs.get(entt::entity{3}), 2u);
-    ASSERT_EQ(lhs.get(entt::entity{4}), 3u);
-    ASSERT_EQ(lhs.get(entt::entity{5}), 4u);
+    ASSERT_EQ(lhs.index(entt::entity{1}), 0u);
+    ASSERT_EQ(lhs.index(entt::entity{2}), 1u);
+    ASSERT_EQ(lhs.index(entt::entity{3}), 2u);
+    ASSERT_EQ(lhs.index(entt::entity{4}), 3u);
+    ASSERT_EQ(lhs.index(entt::entity{5}), 4u);
 
     rhs.construct(entt::entity{5});
     rhs.construct(entt::entity{4});
@@ -498,21 +498,21 @@ TEST(SparseSet, RespectReverse) {
     rhs.construct(entt::entity{1});
     rhs.construct(entt::entity{6});
 
-    ASSERT_EQ(rhs.get(entt::entity{5}), 0u);
-    ASSERT_EQ(rhs.get(entt::entity{4}), 1u);
-    ASSERT_EQ(rhs.get(entt::entity{3}), 2u);
-    ASSERT_EQ(rhs.get(entt::entity{2}), 3u);
-    ASSERT_EQ(rhs.get(entt::entity{1}), 4u);
-    ASSERT_EQ(rhs.get(entt::entity{6}), 5u);
+    ASSERT_EQ(rhs.index(entt::entity{5}), 0u);
+    ASSERT_EQ(rhs.index(entt::entity{4}), 1u);
+    ASSERT_EQ(rhs.index(entt::entity{3}), 2u);
+    ASSERT_EQ(rhs.index(entt::entity{2}), 3u);
+    ASSERT_EQ(rhs.index(entt::entity{1}), 4u);
+    ASSERT_EQ(rhs.index(entt::entity{6}), 5u);
 
     rhs.respect(lhs);
 
-    ASSERT_EQ(rhs.get(entt::entity{6}), 0u);
-    ASSERT_EQ(rhs.get(entt::entity{1}), 1u);
-    ASSERT_EQ(rhs.get(entt::entity{2}), 2u);
-    ASSERT_EQ(rhs.get(entt::entity{3}), 3u);
-    ASSERT_EQ(rhs.get(entt::entity{4}), 4u);
-    ASSERT_EQ(rhs.get(entt::entity{5}), 5u);
+    ASSERT_EQ(rhs.index(entt::entity{6}), 0u);
+    ASSERT_EQ(rhs.index(entt::entity{1}), 1u);
+    ASSERT_EQ(rhs.index(entt::entity{2}), 2u);
+    ASSERT_EQ(rhs.index(entt::entity{3}), 3u);
+    ASSERT_EQ(rhs.index(entt::entity{4}), 4u);
+    ASSERT_EQ(rhs.index(entt::entity{5}), 5u);
 }
 
 TEST(SparseSet, RespectUnordered) {
@@ -525,11 +525,11 @@ TEST(SparseSet, RespectUnordered) {
     lhs.construct(entt::entity{4});
     lhs.construct(entt::entity{5});
 
-    ASSERT_EQ(lhs.get(entt::entity{1}), 0u);
-    ASSERT_EQ(lhs.get(entt::entity{2}), 1u);
-    ASSERT_EQ(lhs.get(entt::entity{3}), 2u);
-    ASSERT_EQ(lhs.get(entt::entity{4}), 3u);
-    ASSERT_EQ(lhs.get(entt::entity{5}), 4u);
+    ASSERT_EQ(lhs.index(entt::entity{1}), 0u);
+    ASSERT_EQ(lhs.index(entt::entity{2}), 1u);
+    ASSERT_EQ(lhs.index(entt::entity{3}), 2u);
+    ASSERT_EQ(lhs.index(entt::entity{4}), 3u);
+    ASSERT_EQ(lhs.index(entt::entity{5}), 4u);
 
     rhs.construct(entt::entity{3});
     rhs.construct(entt::entity{2});
@@ -538,21 +538,21 @@ TEST(SparseSet, RespectUnordered) {
     rhs.construct(entt::entity{4});
     rhs.construct(entt::entity{5});
 
-    ASSERT_EQ(rhs.get(entt::entity{3}), 0u);
-    ASSERT_EQ(rhs.get(entt::entity{2}), 1u);
-    ASSERT_EQ(rhs.get(entt::entity{6}), 2u);
-    ASSERT_EQ(rhs.get(entt::entity{1}), 3u);
-    ASSERT_EQ(rhs.get(entt::entity{4}), 4u);
-    ASSERT_EQ(rhs.get(entt::entity{5}), 5u);
+    ASSERT_EQ(rhs.index(entt::entity{3}), 0u);
+    ASSERT_EQ(rhs.index(entt::entity{2}), 1u);
+    ASSERT_EQ(rhs.index(entt::entity{6}), 2u);
+    ASSERT_EQ(rhs.index(entt::entity{1}), 3u);
+    ASSERT_EQ(rhs.index(entt::entity{4}), 4u);
+    ASSERT_EQ(rhs.index(entt::entity{5}), 5u);
 
     rhs.respect(lhs);
 
-    ASSERT_EQ(rhs.get(entt::entity{6}), 0u);
-    ASSERT_EQ(rhs.get(entt::entity{1}), 1u);
-    ASSERT_EQ(rhs.get(entt::entity{2}), 2u);
-    ASSERT_EQ(rhs.get(entt::entity{3}), 3u);
-    ASSERT_EQ(rhs.get(entt::entity{4}), 4u);
-    ASSERT_EQ(rhs.get(entt::entity{5}), 5u);
+    ASSERT_EQ(rhs.index(entt::entity{6}), 0u);
+    ASSERT_EQ(rhs.index(entt::entity{1}), 1u);
+    ASSERT_EQ(rhs.index(entt::entity{2}), 2u);
+    ASSERT_EQ(rhs.index(entt::entity{3}), 3u);
+    ASSERT_EQ(rhs.index(entt::entity{4}), 4u);
+    ASSERT_EQ(rhs.index(entt::entity{5}), 5u);
 }
 
 TEST(SparseSet, CanModifyDuringIteration) {

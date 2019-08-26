@@ -840,10 +840,10 @@ public:
 
         for(auto next = *length; next; --next) {
             ([next = next-1, curr = cpool->data()[next-1]](auto *cpool) {
-                const auto pos = cpool->sparse_set<entity_type>::get(curr);
+                const auto pos = cpool->index(curr);
 
                 if(pos != next) {
-                    cpool->swap(next, cpool->sparse_set<entity_type>::get(curr));
+                    cpool->swap(next, cpool->index(curr));
                 }
             }(std::get<pool_type<Other> *>(pools)), ...);
         }
