@@ -1190,9 +1190,7 @@ thrown away. The reasons for this go far beyond the scope of this document.<br/>
 To iterate a runtime view, either use it in a range-for loop:
 
 ```cpp
-using component_type = typename decltype(registry)::component_type;
-component_type types[] = { registry.type<position>(), registry.type<velocity>() };
-
+entt::component types[] = { registry.type<position>(), registry.type<velocity>() };
 auto view = registry.runtime_view(std::cbegin(types), std::cend(types));
 
 for(auto entity: view) {
@@ -1210,10 +1208,9 @@ for(auto entity: view) {
 Or rely on the `each` member function to iterate entities:
 
 ```cpp
-using component_type = typename decltype(registry)::component_type;
-component_type types[] = { registry.type<position>(), registry.type<velocity>() };
+entt::component types[] = { registry.type<position>(), registry.type<velocity>() };
 
-auto view = registry.runtime_view(std::cbegin(types), std::cend(types)).each([](auto entity) {
+registry.runtime_view(std::cbegin(types), std::cend(types)).each([](auto entity) {
     // ...
 });
 ```
