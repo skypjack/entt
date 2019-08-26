@@ -87,6 +87,9 @@ I hope this list can grow much more in the future:
   * [Apparently](https://www.linkedin.com/in/skypjack/)
     [NIO](https://www.nio.io/): there was a collaboration to make some changes
     to `EnTT`, at the time used for internal projects.
+  * [Apparently](https://www.linkedin.com/jobs/view/architekt-c%2B%2B-at-tieto-1219512333/)
+    [Tieto](https://www.tieto.com/): they published a job post where `EnTT` was
+    listed on their software stack.
   * [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt): port of
     [Match One](https://github.com/sschmid/Match-One) for `Entitas-CSharp`.
   * GitHub contains also
