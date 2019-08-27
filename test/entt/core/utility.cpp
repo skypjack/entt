@@ -9,6 +9,13 @@ struct Functions {
     void bar() {}
 };
 
+TEST(Utility, Identity) {
+    entt::identity identity;
+    int value = 42;
+
+    ASSERT_EQ(identity(value), value);
+    ASSERT_EQ(&identity(value), &value);
+}
 
 TEST(Utility, Overload) {
     ASSERT_EQ(entt::overload<void(int)>(&Functions::foo), static_cast<void(*)(int)>(&Functions::foo));

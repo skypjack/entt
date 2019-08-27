@@ -8,6 +8,21 @@
 namespace entt {
 
 
+/*! @brief Identity function object (waiting for C++20). */
+struct identity {
+    /**
+     * @brief Returns its argument unchanged.
+     * @tparam Type Type of the argument.
+     * @param value The actual argument.
+     * @return The submitted value as-is.
+     */
+    template<class Type>
+    constexpr Type && operator()(Type &&value) const ENTT_NOEXCEPT {
+        return std::forward<Type>(value);
+    }
+};
+
+
 /**
  * @brief Constant utility to disambiguate overloaded member functions.
  * @tparam Type Function type of the desired overload.

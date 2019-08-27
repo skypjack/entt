@@ -2,9 +2,11 @@
 #define ENTT_CORE_ALGORITHM_HPP
 
 
-#include <functional>
-#include <algorithm>
 #include <utility>
+#include <iterator>
+#include <algorithm>
+#include <functional>
+#include "utility.hpp"
 
 
 namespace entt {
@@ -64,6 +66,71 @@ struct insertion_sort {
                 }
 
                 *pre = std::move(value);
+            }
+        }
+    }
+};
+
+
+/**
+ * @brief Function object for performing LSD radix sort.
+ * @tparam Bit Number of bits processed per pass.
+ * @tparam N Maximum number of bits to sort.
+ */
+template<std::size_t Bit, std::size_t N>
+struct radix_sort {
+    static_assert((N % Bit) == 0);
+
+    /**
+     * @brief Sorts the elements in a range.
+     *
+     * Sorts the elements in a range using the given _getter_ to access the
+     * actual data to be sorted.
+     *
+     * This implementation is inspired by the online book
+     * [Physically Based Rendering](http://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies.html#RadixSort).
+     *
+     * @tparam It Type of random access iterator.
+     * @tparam Getter Type of _getter_ function object.
+     * @param first An iterator to the first element of the range to sort.
+     * @param last An iterator past the last element of the range to sort.
+     * @param getter A valid _getter_ function object.
+     */
+    template<typename It, typename Getter = identity>
+    void operator()(It first, It last, Getter getter = Getter{}) const {
+        if(first < last) {
+            static constexpr auto mask = (1 << Bit) - 1;
+            static constexpr auto buckets = 1 << Bit;
+            static constexpr auto passes = N / Bit;
+
+            using value_type = typename std::iterator_traits<It>::value_type;
+            std::vector<value_type> aux(std::distance(first, last));
+
+            auto part = [getter = std::move(getter)](auto from, auto to, auto out, auto start) {
+                std::size_t index[buckets]{};
+                std::size_t count[buckets]{};
+
+                std::for_each(from, to, [&getter, &count, start](const value_type &item) {
+                    ++count[(getter(item) >> start) & mask];
+                });
+
+                std::for_each(std::next(std::begin(index)), std::end(index), [index = std::begin(index), count = std::begin(count)](auto &item) mutable {
+                    item = *(index++) + *(count++);
+                });
+
+                std::for_each(from, to, [&getter, &out, &index, start](value_type &item) {
+                    out[index[(getter(item) >> start) & mask]++] = std::move(item);
+                });
+            };
+
+            for(std::size_t pass = 0; pass < (passes & ~1); pass += 2) {
+                part(first, last, aux.begin(), pass * Bit);
+                part(aux.begin(), aux.end(), first, (pass + 1) * Bit);
+            }
+
+            if constexpr(passes & 1) {
+                part(first, last, aux.begin(), (passes - 1) * Bit);
+                std::move(aux.begin(), aux.end(), first);
             }
         }
     }
