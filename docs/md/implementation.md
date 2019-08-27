@@ -2,6 +2,8 @@
 
 The below is a breakdown of how [EnTT](https://github.com/skypjack/entt) works under the hood.
 
+Terminology is used to describe the concepts rather than the actual corresponding C++ names.
+
 # Part 1 - Essentials: Pools and Views
 
 ## Pools
