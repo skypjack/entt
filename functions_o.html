@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.1.0</span>
    </div>
   </td>
  </tr>
@@ -82,7 +82,9 @@ $(function() {
 : <a class="el" href="classentt_1_1emitter.html#a79834d452b0600ebe0e70c54f4a21fd6">entt::emitter&lt; Derived &gt;</a>
 </li>
 <li>operator bool()
-: <a class="el" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a73e1029cbb6359d803a6cc06b82f80d7">entt::delegate&lt; Ret(Args...)&gt;</a>
+: <a class="el" href="structentt_1_1basic__actor.html#ac53927bb871e3b54a74ebc8e90fd9ade">entt::basic_actor&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1connection.html#a6763393665228bcf52ad41a21105d468">entt::connection</a>
+, <a class="el" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a73e1029cbb6359d803a6cc06b82f80d7">entt::delegate&lt; Ret(Args...)&gt;</a>
 , <a class="el" href="classentt_1_1meta__any.html#ad1cbe0447f1b0df45706712566f1b2a0">entt::meta_any</a>
 , <a class="el" href="classentt_1_1meta__base.html#ad19d5a997c91281da3674a6b17d011bd">entt::meta_base</a>
 , <a class="el" href="classentt_1_1meta__conv.html#aa7b17a68e2b9f7a1b614a5aa1e4a7c1a">entt::meta_conv</a>
@@ -90,33 +92,37 @@ $(function() {
 , <a class="el" href="classentt_1_1meta__data.html#aebff3cb9edf609deb8577ed29225c508">entt::meta_data</a>
 , <a class="el" href="classentt_1_1meta__dtor.html#ad4b53dd0805dd47276c196b093258deb">entt::meta_dtor</a>
 , <a class="el" href="classentt_1_1meta__func.html#a436c57daae914c9222de41c7b7678584">entt::meta_func</a>
-, <a class="el" href="classentt_1_1meta__handle.html#a759d3375fd8e5811ca898cb8d6740eda">entt::meta_handle</a>
+, <a class="el" href="structentt_1_1meta__handle.html#a759d3375fd8e5811ca898cb8d6740eda">entt::meta_handle</a>
 , <a class="el" href="classentt_1_1meta__prop.html#adb6af4bef4db742083886a0b97646407">entt::meta_prop</a>
 , <a class="el" href="classentt_1_1meta__type.html#ae8101e23b4b79a4452f063736f86b3ad">entt::meta_type</a>
 , <a class="el" href="classentt_1_1resource__handle.html#a78608879425212e25817c16e3393ee07">entt::resource_handle&lt; Resource &gt;</a>
 </li>
-<li>operator const char *()
-: <a class="el" href="classentt_1_1hashed__string.html#ad2b28732fadfb525cab25b19310617d1">entt::hashed_string</a>
-</li>
 <li>operator const Resource &amp;()
 : <a class="el" href="classentt_1_1resource__handle.html#ab22a293cb18602690309a561b97d28cb">entt::resource_handle&lt; Resource &gt;</a>
 </li>
-<li>operator entt::basic_group&lt; Entity, get_t, Owned... &gt;()
-: <a class="el" href="structentt_1_1as__group.html#af21610b3a3c165daaeb8f7724ab2b12d">entt::as_group&lt; Const, Entity &gt;</a>
+<li>operator const value_type *()
+: <a class="el" href="classentt_1_1basic__hashed__string.html#ad0cc0b27f0dd52a07e25f5014ba426fc">entt::basic_hashed_string&lt; Char &gt;</a>
+</li>
+<li>operator entt::basic_group&lt; Entity, Exclude, Get, Owned... &gt;()
+: <a class="el" href="structentt_1_1as__group.html#a5bc540042a69aee98c28c8446152a47f">entt::as_group&lt; Const, Entity &gt;</a>
 </li>
 <li>operator entt::basic_view&lt; Entity, Component... &gt;()
 : <a class="el" href="structentt_1_1as__view.html#a6ca2fdd962761c71661b5178f3ec510b">entt::as_view&lt; Const, Entity &gt;</a>
 </li>
 <li>operator hash_type()
-: <a class="el" href="classentt_1_1hashed__string.html#abc56b22d4cddd7b05fb41e32adfea8e2">entt::hashed_string</a>
+: <a class="el" href="classentt_1_1basic__hashed__string.html#aa2009a1ac648d8bdaeac642a6476f2bd">entt::basic_hashed_string&lt; Char &gt;</a>
+</li>
+<li>operator Resource &amp;()
+: <a class="el" href="classentt_1_1resource__handle.html#a018fc3493748b50c4c523737203a2720">entt::resource_handle&lt; Resource &gt;</a>
 </li>
 <li>operator Type()
-: <a class="el" href="structentt_1_1monostate.html#ae48c2fc3cb5ca85e12b57a10fee54dfe">entt::monostate&lt; hash_type &gt;</a>
+: <a class="el" href="structentt_1_1monostate.html#aac27bfe6d1feb94cc601cc38077f923a">entt::monostate&lt; ENTT_ID_TYPE &gt;</a>
 </li>
 <li>operator()()
-: <a class="el" href="classentt_1_1basic__prototype.html#a463e0d4a93ce396a069bd181c59ba6e2">entt::basic_prototype&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0e53caedb53810bc96aa71bce199c990">entt::delegate&lt; Ret(Args...)&gt;</a>
+: <a class="el" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0e53caedb53810bc96aa71bce199c990">entt::delegate&lt; Ret(Args...)&gt;</a>
+, <a class="el" href="structentt_1_1identity.html#a4663a97f57bf16459d1ca94b74965b5e">entt::identity</a>
 , <a class="el" href="structentt_1_1insertion__sort.html#a73a5644fe5b683f9b9376c89ac47f2b8">entt::insertion_sort</a>
+, <a class="el" href="structentt_1_1radix__sort.html#a1989f6fbe18d3d82fdea9745d6b9ee96">entt::radix_sort&lt; Bit, N &gt;</a>
 , <a class="el" href="structentt_1_1std__sort.html#af25b38ddb03e206a71a1f47521eaea46">entt::std_sort</a>
 </li>
 <li>operator*()
@@ -128,20 +134,22 @@ $(function() {
 <li>operator=()
 : <a class="el" href="structentt_1_1basic__actor.html#a729116e0ae65677a6ed9ed9d21c111c6">entt::basic_actor&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1basic__continuous__loader.html#afd396d84cb27e070a6a812bd28140c75">entt::basic_continuous_loader&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1basic__prototype.html#a24a5c455ba9368897c959f722496fa54">entt::basic_prototype&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__observer.html#a03dcb6b0999d29bc39410d7ae6d9ac53">entt::basic_observer&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1basic__registry.html#a70f7acd3a0e9a8dc4ef7e85172f93a59">entt::basic_registry&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1basic__snapshot.html#a1484b609195cfd057bbdd8808d4392bc">entt::basic_snapshot&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1basic__snapshot__loader.html#aa55eeaad2ab4dd117524afff9d6e184b">entt::basic_snapshot_loader&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1connection.html#ad7dfbcc07f74bff317efcdf6988135fa">entt::connection</a>
 , <a class="el" href="classentt_1_1emitter.html#ab270d2c6d986621a781467e29e64629c">entt::emitter&lt; Derived &gt;</a>
-, <a class="el" href="classentt_1_1meta__any.html#a80b825c89dc1509a9099d807b528b3aa">entt::meta_any</a>
-, <a class="el" href="structentt_1_1monostate.html#a60244e7ef8dfc7c0eea55123b3ed294e">entt::monostate&lt; hash_type &gt;</a>
+, <a class="el" href="classentt_1_1meta__any.html#acfb1ce537c6072aabb53662658213e04">entt::meta_any</a>
+, <a class="el" href="structentt_1_1monostate.html#a2b2751ad1d49cbf5068fde7e0e8640ac">entt::monostate&lt; ENTT_ID_TYPE &gt;</a>
 , <a class="el" href="classentt_1_1resource__cache.html#a1aecfbf6c4faaadb05ce5005c202223c">entt::resource_cache&lt; Resource &gt;</a>
 , <a class="el" href="classentt_1_1scheduler.html#aea6ab78dbf00ba17c6e828ee0505afd9">entt::scheduler&lt; Delta &gt;</a>
+, <a class="el" href="structentt_1_1scoped__connection.html#a4cf8b6b0683310c58af3344077fd8e97">entt::scoped_connection</a>
 , <a class="el" href="classentt_1_1sparse__set.html#a32a00ca96cc7e78089fb7120d144de34">entt::sparse_set&lt; Entity &gt;</a>
 </li>
 <li>operator==()
-: <a class="el" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a54ca30c9a3f7a9662363c48db4e86aae">entt::delegate&lt; Ret(Args...)&gt;</a>
-, <a class="el" href="classentt_1_1hashed__string.html#a6f7720e526da38370d52636a8ecb1b50">entt::hashed_string</a>
+: <a class="el" href="classentt_1_1basic__hashed__string.html#a51311d6903443296ce076536df2b46da">entt::basic_hashed_string&lt; Char &gt;</a>
+, <a class="el" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a54ca30c9a3f7a9662363c48db4e86aae">entt::delegate&lt; Ret(Args...)&gt;</a>
 , <a class="el" href="classentt_1_1meta__any.html#a2673fdc066e710ce94cbb2f5c3994d42">entt::meta_any</a>
 , <a class="el" href="classentt_1_1meta__base.html#a6469955ac7550d5396cf185795c07a15">entt::meta_base</a>
 , <a class="el" href="classentt_1_1meta__conv.html#a176af5a8c4b2fae4dc1d862509705152">entt::meta_conv</a>
@@ -153,8 +161,8 @@ $(function() {
 , <a class="el" href="classentt_1_1meta__type.html#a838362aa3598bfa4cc18041d3445bace">entt::meta_type</a>
 </li>
 <li>operator[]()
-: <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#a9d0986a0b72def2ddbc12ffada355745">entt::basic_group&lt; Entity, get_t&lt; Get... &gt; &gt;</a>
-, <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01get__t_3_01Get_8_8_8_01_4_00_01Owned_8_8_8_01_4.html#abd790e8ea6c44818592481c8312fc718">entt::basic_group&lt; Entity, get_t&lt; Get... &gt;, Owned... &gt;</a>
+: <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_00_01Other_8_8_8_01_4_01_4.html#a2f801b988585a43f9b106390a6dfea30">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get, Other... &gt; &gt;</a>
+, <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_54ca6466fcd0506388705164ba2d896f.html#aadb0ddddb0d5610ed8fc9fe1d2347074">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get... &gt;, Owned, Other... &gt;</a>
 , <a class="el" href="classentt_1_1basic__view_3_01Entity_00_01Component_01_4.html#a08e5f6d88283b8e90ce252fcae447932">entt::basic_view&lt; Entity, Component &gt;</a>
 </li>
 <li>orphan()

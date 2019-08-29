@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>EnTT: Contributing</title>
+<title>EnTT: Crash Course: core functionalities</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.1.0</span>
    </div>
   </td>
  </tr>
@@ -60,20 +60,51 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">Contributing </div>  </div>
+<div class="title">Crash Course: core functionalities </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>First of all, thank you very much for taking the time to contribute to the <code>EnTT</code> framework.<br />
- How to do it mostly depends on the type of contribution:</p>
-<ul>
-<li>If you have a question, <b>please</b> ensure there isn't already an answer for you by searching on GitHub under <a href="https://github.com/skypjack/entt/issues">issues</a>. Do not forget to search also through the closed ones. If you are unable to find a proper answer, feel free to <a href="https://github.com/skypjack/entt/issues/new">open a new issue</a>. Usually, questions are marked as such and closed in a few days.</li>
-<li>If you want to fix a typo in the inline documentation or in the README file, if you want to add some new sections or if you want to help me with the language by reviewing what I wrote so far (I'm not a native speaker after all), <b>please</b> open a new <a href="https://github.com/skypjack/entt/pulls">pull request</a> with your changes.</li>
-<li>If you found a bug, <b>please</b> ensure there isn't already an answer for you by searching on GitHub under <a href="https://github.com/skypjack/entt/issues">issues</a>. If you are unable to find an open issue addressing the problem, feel free to <a href="https://github.com/skypjack/entt/issues/new">open a new one</a>. <b>Please</b>, do not forget to carefully describe how to reproduce the problem, then add all the information about the system on which you are experiencing it and point out the version of <code>EnTT</code> you are using (tag or commit).</li>
-<li>If you found a bug and you wrote a patch to fix it, open a new <a href="https://github.com/skypjack/entt/pulls">pull request</a> with your code. <b>Please</b>, add some tests to avoid regressions in future if possible, it would be really appreciated. Note that the <code>EnTT</code> framework has a <a href="https://coveralls.io/github/skypjack/entt?branch=master">coverage at 100%</a> (at least it was at 100% at the time I wrote this file) and this is the reason for which you can be confident with using it in a production environment.</li>
-<li>If you want to propose a new feature and you know how to code it, <b>please</b> do not issue directly a pull request. Before to do it, <a href="https://github.com/skypjack/entt/issues/new">create a new issue</a> to discuss your proposal. Other users could be interested in your idea and the discussion that will follow can refine it and therefore give us a better solution.</li>
-<li>If you want to request a new feature, I'm available for hiring. Take a look at <a href="https://github.com/skypjack">my profile</a> and feel free to write me. </li>
-</ul>
-</div></div><!-- contents -->
+<div class="textblock"><h1><a class="anchor" id="autotoc_md1"></a>
+Introduction</h1>
+<p><code>EnTT</code> comes with a bunch of core functionalities mostly used by the other parts of the library itself.<br />
+ Hardly users will include these features in their code, but it's worth describing what <code>EnTT</code> offers so as not to reinvent the wheel in case of need.</p>
+<h1><a class="anchor" id="autotoc_md2"></a>
+Compile-time identifiers</h1>
+<p>Sometimes it's useful to be able to give unique identifiers to types at compile-time.<br />
+ There are plenty of different solutions out there and I could have used one of them. However, I decided to spend my time to define a compact and versatile tool that fully embraces what the modern C++ has to offer.</p>
+<p>The <em>result of my efforts</em> is the <code>identifier</code> class template:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;ident.hpp&gt;</span></div><div class="line"></div><div class="line"><span class="comment">// defines the identifiers for the given types</span></div><div class="line"><span class="keyword">using</span> <span class="keywordtype">id</span> = <a class="code" href="classentt_1_1identifier.html">entt::identifier&lt;a_type, another_type&gt;</a>;</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><span class="keywordflow">switch</span>(a_type_identifier) {</div><div class="line"><span class="keywordflow">case</span> id::type&lt;a_type&gt;:</div><div class="line">    <span class="comment">// ...</span></div><div class="line">    <span class="keywordflow">break</span>;</div><div class="line"><span class="keywordflow">case</span> id::type&lt;another_type&gt;:</div><div class="line">    <span class="comment">// ...</span></div><div class="line">    <span class="keywordflow">break</span>;</div><div class="line"><span class="keywordflow">default</span>:</div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>This is all what the class template has to offer: a <code>type</code> inline variable that contains a numerical identifier for the given type. It can be used in any context where constant expressions are required.</p>
+<p>As long as the list remains unchanged, identifiers are also guaranteed to be the same for every run. In case they have been used in a production environment and a type has to be removed, one can just use a placeholder to left the other identifiers unchanged:</p>
+<div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt; <span class="keyword">struct </span>ignore_type {};</div><div class="line"></div><div class="line"><span class="keyword">using</span> <span class="keywordtype">id</span> = <a class="code" href="classentt_1_1identifier.html">entt::identifier</a>&lt;</div><div class="line">    a_type_still_valid,</div><div class="line">    ignore_type&lt;a_type_no_longer_valid&gt;,</div><div class="line">    another_type_still_valid</div><div class="line">&gt;;</div></div><!-- fragment --><p>A bit ugly to see, but it works at least.</p>
+<h1><a class="anchor" id="autotoc_md3"></a>
+Runtime identifiers</h1>
+<p>Sometimes it's useful to be able to give unique identifiers to types at runtime.<br />
+ There are plenty of different solutions out there and I could have used one of them. In fact, I adapted the most common one to my requirements and used it extensively within the entire library.</p>
+<p>It's the <code>family</code> class. Here is an example of use directly from the entity-component system:</p>
+<div class="fragment"><div class="line"><span class="keyword">using</span> component_family = <a class="code" href="classentt_1_1family.html">entt::family&lt;struct internal_registry_component_family&gt;</a>;</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Component&gt;</div><div class="line">component_type component() const noexcept {</div><div class="line">    <span class="keywordflow">return</span> component_family::type&lt;Component&gt;;</div><div class="line">}</div></div><!-- fragment --><p>This is all what a <em>family</em> has to offer: a <code>type</code> inline variable that contains a numerical identifier for the given type.</p>
+<p>Please, note that identifiers aren't guaranteed to be the same for every run. Indeed it mostly depends on the flow of execution.</p>
+<h1><a class="anchor" id="autotoc_md4"></a>
+Hashed strings</h1>
+<p>A hashed string is a zero overhead unique identifier. Users can use human-readable identifiers in the codebase while using their numeric counterparts at runtime, thus without affecting performance.<br />
+ The class has an implicit <code>constexpr</code> constructor that chews a bunch of characters. Once created, all what one can do with it is getting back the original string or converting it into a number.<br />
+ The good part is that a hashed string can be used wherever a constant expression is required and no <em>string-to-number</em> conversion will take place at runtime if used carefully.</p>
+<p>Example of use:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> load(<a class="code" href="classentt_1_1basic__hashed__string.html#a7ee7dca5383cf4507949dc1261ca5efd">entt::hashed_string::hash_type</a> resource) {</div><div class="line">    <span class="comment">// uses the numeric representation of the resource to load and return it</span></div><div class="line">}</div><div class="line"></div><div class="line"><span class="keyword">auto</span> resource = load(<a class="code" href="classentt_1_1basic__hashed__string.html">entt::hashed_string</a>{<span class="stringliteral">&quot;gui/background&quot;</span>});</div></div><!-- fragment --><p>There is also a <em>user defined literal</em> dedicated to hashed strings to make them more user-friendly:</p>
+<div class="fragment"><div class="line">constexpr <span class="keyword">auto</span> str = <span class="stringliteral">&quot;text&quot;</span>_hs;</div></div><!-- fragment --><h2><a class="anchor" id="autotoc_md5"></a>
+Wide characters</h2>
+<p>The hashed string has a design that is close to that of an <code>std::basic_string</code>. It means that <code>hashed_string</code> is nothing more than an alias for <code>basic_hashed_string&lt;char&gt;</code>. For those who want to use the C++ type for wide character representation, there exists also the alias <code>hashed_wstring</code> for <code>basic_hashed_string&lt;wchar_t&gt;</code>.<br />
+ In this case, the user defined literal to use to create hashed strings on the fly is <code>_hws</code>:</p>
+<div class="fragment"><div class="line">constexpr <span class="keyword">auto</span> str = <span class="stringliteral">&quot;text&quot;</span>_hws;</div></div><!-- fragment --><p>Note that the hash type of the <code>hashed_wstring</code> is the same of its counterpart.</p>
+<h2><a class="anchor" id="autotoc_md6"></a>
+Conflicts</h2>
+<p>The hashed string class uses internally FNV-1a to compute the numeric counterpart of a string. Because of the <em>pigeonhole principle</em>, conflicts are possible. This is a fact.<br />
+ There is no silver bullet to solve the problem of conflicts when dealing with hashing functions. In this case, the best solution seemed to be to give up. That's all.<br />
+ After all, human-readable unique identifiers aren't something strictly defined and over which users have not the control. Choosing a slightly different identifier is probably the best solution to make the conflict disappear in this case.</p>
+<h1><a class="anchor" id="autotoc_md7"></a>
+Monostate</h1>
+<p>The monostate pattern is often presented as an alternative to a singleton based configuration system. This is exactly its purpose in <code>EnTT</code>. Moreover, this implementation is thread safe by design (hopefully).<br />
+ Keys are represented by hashed strings, values are basic types like <code>int</code>s or <code>bool</code>s. Values of different types can be associated to each key, even more than one at a time. Because of this, users must pay attention to use the same type both during an assignment and when they try to read back their data. Otherwise, they will probably incur in unexpected results.</p>
+<p>Example of use:</p>
+<div class="fragment"><div class="line"><a class="code" href="structentt_1_1monostate.html">entt::monostate</a>&lt;<a class="code" href="classentt_1_1basic__hashed__string.html">entt::hashed_string</a>{<span class="stringliteral">&quot;mykey&quot;</span>}&gt;{} = <span class="keyword">true</span>;</div><div class="line"><a class="code" href="structentt_1_1monostate.html">entt::monostate</a>&lt;<span class="stringliteral">&quot;mykey&quot;</span>_hs&gt;{} = 42;</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"></div><div class="line"><span class="keyword">const</span> <span class="keywordtype">bool</span> b = <a class="code" href="structentt_1_1monostate.html">entt::monostate</a>&lt;<span class="stringliteral">&quot;mykey&quot;</span>_hs&gt;{};</div><div class="line"><span class="keyword">const</span> <span class="keywordtype">int</span> i = <a class="code" href="structentt_1_1monostate.html">entt::monostate</a>&lt;<a class="code" href="classentt_1_1basic__hashed__string.html">entt::hashed_string</a>{<span class="stringliteral">&quot;mykey&quot;</span>}&gt;{};</div></div><!-- fragment --> </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

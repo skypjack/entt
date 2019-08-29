@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['size',['size',['../structentt_1_1type__list.html#a430c0675bdbcbb40be9b8f13f7259484',1,'entt::type_list']]]
+  ['null',['null',['../namespaceentt.html#a588326af8f6f902a6c0b57d3f9fc6c17',1,'entt']]]
 ];

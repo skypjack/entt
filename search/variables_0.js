@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['connect_5farg',['connect_arg',['../namespaceentt.html#af1e73acd6f3d892955819677dc2664b7',1,'entt']]]
+  ['as_5falias',['as_alias',['../namespaceentt.html#abb24e649324b83ebcf9dea9c970b1e2d',1,'entt']]]
 ];

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['named_5ftype_5ftraits',['named_type_traits',['../structentt_1_1named__type__traits.html',1,'entt']]],
-  ['named_5ftype_5ftraits_3c_20const_20type_20_3e',['named_type_traits&lt; const Type &gt;',['../structentt_1_1named__type__traits_3_01const_01Type_01_4.html',1,'entt']]],
-  ['named_5ftype_5ftraits_3c_20type_20_3e',['named_type_traits&lt; Type &gt;',['../structentt_1_1named__type__traits.html',1,'entt']]]
+  ['process',['process',['../classentt_1_1process.html',1,'entt']]],
+  ['process_3c_20process_5fadaptor_3c_20func_2c_20delta_20_3e_2c_20delta_20_3e',['process&lt; process_adaptor&lt; Func, Delta &gt;, Delta &gt;',['../classentt_1_1process.html',1,'entt']]],
+  ['process_5fadaptor',['process_adaptor',['../structentt_1_1process__adaptor.html',1,'entt']]]
 ];

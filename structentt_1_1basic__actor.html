@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.1.0</span>
    </div>
   </td>
  </tr>
@@ -72,7 +72,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Dedicated to those who aren't confident with entity-component systems.  
+<p>Dedicated to those who aren't confident with the entity-component-system architecture.  
  <a href="structentt_1_1basic__actor.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="actor_8hpp_source.html">actor.hpp</a>&gt;</code></p>
@@ -91,8 +91,11 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="str
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a32635ae3046ebca665adef6b3ef87ef3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__actor.html#a32635ae3046ebca665adef6b3ef87ef3">basic_actor</a> (<a class="el" href="structentt_1_1basic__actor.html#a4577b087e2fe3e76dbd4516ae9064c6a">registry_type</a> &amp;ref)</td></tr>
-<tr class="memdesc:a32635ae3046ebca665adef6b3ef87ef3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an actor by using the given registry.  <a href="#a32635ae3046ebca665adef6b3ef87ef3">More...</a><br /></td></tr>
+<tr class="memdesc:a32635ae3046ebca665adef6b3ef87ef3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an actor from a given registry.  <a href="#a32635ae3046ebca665adef6b3ef87ef3">More...</a><br /></td></tr>
 <tr class="separator:a32635ae3046ebca665adef6b3ef87ef3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3633aea0c287c0de909dc1d7aad80aef"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__actor.html#a3633aea0c287c0de909dc1d7aad80aef">basic_actor</a> (<a class="el" href="structentt_1_1basic__actor.html#a2c2e10f12014f5269be0b9ab055acfca">entity_type</a> <a class="el" href="structentt_1_1basic__actor.html#af92d62c39e122692addbfd6b75ea6922">entity</a>, <a class="el" href="structentt_1_1basic__actor.html#a4577b087e2fe3e76dbd4516ae9064c6a">registry_type</a> &amp;ref)</td></tr>
+<tr class="memdesc:a3633aea0c287c0de909dc1d7aad80aef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an actor from a given entity.  <a href="#a3633aea0c287c0de909dc1d7aad80aef">More...</a><br /></td></tr>
+<tr class="separator:a3633aea0c287c0de909dc1d7aad80aef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46dc913885c448e059e9ca7cf3a21221"><td class="memItemLeft" align="right" valign="top"><a id="a46dc913885c448e059e9ca7cf3a21221"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__actor.html#a46dc913885c448e059e9ca7cf3a21221">~basic_actor</a> ()</td></tr>
 <tr class="memdesc:a46dc913885c448e059e9ca7cf3a21221"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor. <br /></td></tr>
@@ -111,9 +114,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 <tr class="memitem:ab740844d18ada7ad15988f808617a1a1"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__actor.html#ab740844d18ada7ad15988f808617a1a1">remove</a> ()</td></tr>
 <tr class="memdesc:ab740844d18ada7ad15988f808617a1a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the given component from an actor.  <a href="#ab740844d18ada7ad15988f808617a1a1">More...</a><br /></td></tr>
 <tr class="separator:ab740844d18ada7ad15988f808617a1a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e7a76ea53bc8a0cce33462def30b9ac"><td class="memTemplParams" colspan="2">template&lt;typename Component &gt; </td></tr>
+<tr class="memitem:a8e7a76ea53bc8a0cce33462def30b9ac"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
 <tr class="memitem:a8e7a76ea53bc8a0cce33462def30b9ac"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__actor.html#a8e7a76ea53bc8a0cce33462def30b9ac">has</a> () const ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:a8e7a76ea53bc8a0cce33462def30b9ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if an actor has the given component.  <a href="#a8e7a76ea53bc8a0cce33462def30b9ac">More...</a><br /></td></tr>
+<tr class="memdesc:a8e7a76ea53bc8a0cce33462def30b9ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if an actor has the given components.  <a href="#a8e7a76ea53bc8a0cce33462def30b9ac">More...</a><br /></td></tr>
 <tr class="separator:a8e7a76ea53bc8a0cce33462def30b9ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64d3d7ff9801b9efbb3cf08d93baca88"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
 <tr class="memitem:a64d3d7ff9801b9efbb3cf08d93baca88"><td class="memTemplItemLeft" align="right" valign="top">decltype(auto)&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__actor.html#a64d3d7ff9801b9efbb3cf08d93baca88">get</a> () const ENTT_NOEXCEPT</td></tr>
@@ -140,13 +143,16 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="s
 <tr class="memitem:af92d62c39e122692addbfd6b75ea6922"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structentt_1_1basic__actor.html#a2c2e10f12014f5269be0b9ab055acfca">entity_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__actor.html#af92d62c39e122692addbfd6b75ea6922">entity</a> () const ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:af92d62c39e122692addbfd6b75ea6922"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the entity associated with an actor.  <a href="#af92d62c39e122692addbfd6b75ea6922">More...</a><br /></td></tr>
 <tr class="separator:af92d62c39e122692addbfd6b75ea6922"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac53927bb871e3b54a74ebc8e90fd9ade"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1basic__actor.html#ac53927bb871e3b54a74ebc8e90fd9ade">operator bool</a> () const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:ac53927bb871e3b54a74ebc8e90fd9ade"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if an actor refers to a valid entity or not.  <a href="#ac53927bb871e3b54a74ebc8e90fd9ade">More...</a><br /></td></tr>
+<tr class="separator:ac53927bb871e3b54a74ebc8e90fd9ade"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Entity&gt;<br />
 class entt::basic_actor&lt; Entity &gt;</h3>
 
-<p>Dedicated to those who aren't confident with entity-component systems. </p>
-<p>Tiny wrapper around a registry, for all those users that aren't confident with entity-component systems and prefer to iterate objects directly.</p>
+<p>Dedicated to those who aren't confident with the entity-component-system architecture. </p>
+<p>Tiny wrapper around a registry, for all those users that aren't confident with entity-component-system architecture and prefer to iterate objects directly.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Entity</td><td>A valid entity type (see <a class="el" href="structentt_1_1entt__traits.html" title="Entity traits. ">entt_traits</a> for more details). </td></tr>
@@ -154,10 +160,10 @@ class entt::basic_actor&lt; Entity &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00026">26</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00028">28</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a32635ae3046ebca665adef6b3ef87ef3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a32635ae3046ebca665adef6b3ef87ef3">&#9670;&nbsp;</a></span>basic_actor() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a32635ae3046ebca665adef6b3ef87ef3">&#9670;&nbsp;</a></span>basic_actor() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -177,25 +183,74 @@ template&lt;typename Entity &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Constructs an actor by using the given registry. </p>
+<p>Constructs an actor from a given registry. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">ref</td><td>An entity-component system properly initialized. </td></tr>
+    <tr><td class="paramname">ref</td><td>An instance of the registry class. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00036">36</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00042">42</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a3633aea0c287c0de909dc1d7aad80aef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3633aea0c287c0de909dc1d7aad80aef">&#9670;&nbsp;</a></span>basic_actor() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structentt_1_1basic__actor.html">entt::basic_actor</a>&lt; Entity &gt;::<a class="el" href="structentt_1_1basic__actor.html">basic_actor</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structentt_1_1basic__actor.html#a2c2e10f12014f5269be0b9ab055acfca">entity_type</a>&#160;</td>
+          <td class="paramname"><em>entity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structentt_1_1basic__actor.html#a4577b087e2fe3e76dbd4516ae9064c6a">registry_type</a> &amp;&#160;</td>
+          <td class="paramname"><em>ref</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs an actor from a given entity. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entity</td><td>A valid entity identifier. </td></tr>
+    <tr><td class="paramname">ref</td><td>An instance of the registry class. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00051">51</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 
 </div>
 </div>
 <a id="a8c86ac43873d5b42c1774ea6646513e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c86ac43873d5b42c1774ea6646513e0">&#9670;&nbsp;</a></span>basic_actor() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c86ac43873d5b42c1774ea6646513e0">&#9670;&nbsp;</a></span>basic_actor() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -229,7 +284,7 @@ template&lt;typename Entity &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00054">54</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00073">73</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 
 </div>
 </div>
@@ -280,7 +335,7 @@ template&lt;typename Component , typename... Args&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the newly created component. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00095">95</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00114">114</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 
 </div>
 </div>
@@ -312,7 +367,7 @@ template&lt;typename Entity &gt; </div>
 <p>Returns a reference to the underlying registry. </p>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the underlying registry. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00154">154</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00173">173</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 
 </div>
 </div>
@@ -344,7 +399,7 @@ template&lt;typename Entity &gt; </div>
 <p>Returns a reference to the underlying registry. </p>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the underlying registry. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00159">159</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00178">178</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 
 </div>
 </div>
@@ -360,7 +415,7 @@ template&lt;typename Entity &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structentt_1_1basic__actor.html#a2c2e10f12014f5269be0b9ab055acfca">entity_type</a> <a class="el" href="structentt_1_1basic__actor.html">entt::basic_actor</a>&lt; Entity &gt;::<a class="el" href="namespaceentt.html#ad777a7dd756427c5ee570d7c0543d339">entity</a> </td>
+          <td class="memname"><a class="el" href="structentt_1_1basic__actor.html#a2c2e10f12014f5269be0b9ab055acfca">entity_type</a> <a class="el" href="structentt_1_1basic__actor.html">entt::basic_actor</a>&lt; Entity &gt;::entity </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -376,7 +431,7 @@ template&lt;typename Entity &gt; </div>
 <p>Returns the entity associated with an actor. </p>
 <dl class="section return"><dt>Returns</dt><dd>The entity associated with the actor. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00167">167</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00186">186</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 
 </div>
 </div>
@@ -416,7 +471,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>References to the components owned by the actor. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00124">124</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00143">143</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 
 </div>
 </div>
@@ -456,7 +511,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>References to the components owned by the actor. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00130">130</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00149">149</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 
 </div>
 </div>
@@ -468,7 +523,7 @@ template&lt;typename... Component&gt; </div>
 <div class="memtemplate">
 template&lt;typename Entity &gt; </div>
 <div class="memtemplate">
-template&lt;typename Component &gt; </div>
+template&lt;typename... Component&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -487,16 +542,48 @@ template&lt;typename Component &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Checks if an actor has the given component. </p>
+<p>Checks if an actor has the given components. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Component</td><td>Type of the component for which to perform the check. </td></tr>
+    <tr><td class="paramname">Component</td><td>Components for which to perform the check. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>True if the actor has the component, false otherwise. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the actor has all the components, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00114">114</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00133">133</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ac53927bb871e3b54a74ebc8e90fd9ade"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac53927bb871e3b54a74ebc8e90fd9ade">&#9670;&nbsp;</a></span>operator bool()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Entity &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structentt_1_1basic__actor.html">entt::basic_actor</a>&lt; Entity &gt;::operator bool </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if an actor refers to a valid entity or not. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if the actor refers to a valid entity, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00194">194</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 
 </div>
 </div>
@@ -536,7 +623,7 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>This actor. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00070">70</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00089">89</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 
 </div>
 </div>
@@ -575,7 +662,7 @@ template&lt;typename Component &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00104">104</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00123">123</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 
 </div>
 </div>
@@ -615,7 +702,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointers to the components owned by the actor. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00140">140</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00159">159</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 
 </div>
 </div>
@@ -655,7 +742,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointers to the components owned by the actor. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00146">146</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actor_8hpp_source.html#l00165">165</a> of file <a class="el" href="actor_8hpp_source.html">actor.hpp</a>.</p>
 
 </div>
 </div>

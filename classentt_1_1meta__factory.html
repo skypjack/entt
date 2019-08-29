@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.1.0</span>
    </div>
   </td>
  </tr>
@@ -65,7 +65,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="classentt_1_1meta__factory-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">entt::meta_factory&lt; Type &gt; Class Template Reference</div>  </div>
@@ -79,6 +78,10 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a0a17a25bc10cd8fa37d9583b7e156eb7"><td class="memTemplParams" colspan="2">template&lt;typename... Property&gt; </td></tr>
+<tr class="memitem:a0a17a25bc10cd8fa37d9583b7e156eb7"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#a0a17a25bc10cd8fa37d9583b7e156eb7">type</a> (const ENTT_ID_TYPE <a class="el" href="classentt_1_1identifier.html">identifier</a>, Property &amp;&amp;... property) ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a0a17a25bc10cd8fa37d9583b7e156eb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extends a meta type by assigning it an identifier and properties.  <a href="#a0a17a25bc10cd8fa37d9583b7e156eb7">More...</a><br /></td></tr>
+<tr class="separator:a0a17a25bc10cd8fa37d9583b7e156eb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08184dab6a4da744ad630ede2ac0856b"><td class="memTemplParams" colspan="2">template&lt;typename Base &gt; </td></tr>
 <tr class="memitem:a08184dab6a4da744ad630ede2ac0856b"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#a08184dab6a4da744ad630ede2ac0856b">base</a> () ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:a08184dab6a4da744ad630ede2ac0856b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a meta base to a meta type.  <a href="#a08184dab6a4da744ad630ede2ac0856b">More...</a><br /></td></tr>
@@ -87,48 +90,44 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a84633b1bc2d531e2322997fd9a8f44dd"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#a84633b1bc2d531e2322997fd9a8f44dd">conv</a> () ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:a84633b1bc2d531e2322997fd9a8f44dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a meta conversion function to a meta type.  <a href="#a84633b1bc2d531e2322997fd9a8f44dd">More...</a><br /></td></tr>
 <tr class="separator:a84633b1bc2d531e2322997fd9a8f44dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a452a2b2df406361785ec40c2e2f9a426"><td class="memTemplParams" colspan="2">template&lt;auto Func, typename... Property&gt; </td></tr>
-<tr class="memitem:a452a2b2df406361785ec40c2e2f9a426"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#a452a2b2df406361785ec40c2e2f9a426">ctor</a> (Property &amp;&amp;... property) ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:a452a2b2df406361785ec40c2e2f9a426"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a meta constructor to a meta type.  <a href="#a452a2b2df406361785ec40c2e2f9a426">More...</a><br /></td></tr>
-<tr class="separator:a452a2b2df406361785ec40c2e2f9a426"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84633b1bc2d531e2322997fd9a8f44dd"><td class="memTemplParams" colspan="2">template&lt;auto Candidate&gt; </td></tr>
+<tr class="memitem:a84633b1bc2d531e2322997fd9a8f44dd"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#a84633b1bc2d531e2322997fd9a8f44dd">conv</a> () ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a84633b1bc2d531e2322997fd9a8f44dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a meta conversion function to a meta type.  <a href="#a84633b1bc2d531e2322997fd9a8f44dd">More...</a><br /></td></tr>
+<tr class="separator:a84633b1bc2d531e2322997fd9a8f44dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b8059251d67918e1ed2d7723a19b3dc"><td class="memTemplParams" colspan="2">template&lt;auto Func, typename Policy  = as_is_t, typename... Property&gt; </td></tr>
+<tr class="memitem:a3b8059251d67918e1ed2d7723a19b3dc"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#a3b8059251d67918e1ed2d7723a19b3dc">ctor</a> (Property &amp;&amp;... property) ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:a3b8059251d67918e1ed2d7723a19b3dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a meta constructor to a meta type.  <a href="#a3b8059251d67918e1ed2d7723a19b3dc">More...</a><br /></td></tr>
+<tr class="separator:a3b8059251d67918e1ed2d7723a19b3dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a452a2b2df406361785ec40c2e2f9a426"><td class="memTemplParams" colspan="2">template&lt;typename... Args, typename... Property&gt; </td></tr>
 <tr class="memitem:a452a2b2df406361785ec40c2e2f9a426"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#a452a2b2df406361785ec40c2e2f9a426">ctor</a> (Property &amp;&amp;... property) ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:a452a2b2df406361785ec40c2e2f9a426"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a meta constructor to a meta type.  <a href="#a452a2b2df406361785ec40c2e2f9a426">More...</a><br /></td></tr>
 <tr class="separator:a452a2b2df406361785ec40c2e2f9a426"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0166de72ef9397be042ab7ad9087b0f"><td class="memTemplParams" colspan="2">template&lt;auto * Func&gt; </td></tr>
+<tr class="memitem:ac0166de72ef9397be042ab7ad9087b0f"><td class="memTemplParams" colspan="2">template&lt;auto Func&gt; </td></tr>
 <tr class="memitem:ac0166de72ef9397be042ab7ad9087b0f"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#ac0166de72ef9397be042ab7ad9087b0f">dtor</a> () ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:ac0166de72ef9397be042ab7ad9087b0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a meta destructor to a meta type.  <a href="#ac0166de72ef9397be042ab7ad9087b0f">More...</a><br /></td></tr>
 <tr class="separator:ac0166de72ef9397be042ab7ad9087b0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02634a64ff7fe7c644691d495e9ccc18"><td class="memTemplParams" colspan="2">template&lt;auto Data, typename... Property&gt; </td></tr>
-<tr class="memitem:a02634a64ff7fe7c644691d495e9ccc18"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#a02634a64ff7fe7c644691d495e9ccc18">data</a> (const char *str, Property &amp;&amp;... property) ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:a02634a64ff7fe7c644691d495e9ccc18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a meta data to a meta type.  <a href="#a02634a64ff7fe7c644691d495e9ccc18">More...</a><br /></td></tr>
-<tr class="separator:a02634a64ff7fe7c644691d495e9ccc18"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1226d202290aaff53c14db38bd505a2b"><td class="memTemplParams" colspan="2">template&lt;auto Setter, auto Getter, typename... Property&gt; </td></tr>
-<tr class="memitem:a1226d202290aaff53c14db38bd505a2b"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#a1226d202290aaff53c14db38bd505a2b">data</a> (const char *str, Property &amp;&amp;... property) ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:a1226d202290aaff53c14db38bd505a2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a meta data to a meta type by means of its setter and getter.  <a href="#a1226d202290aaff53c14db38bd505a2b">More...</a><br /></td></tr>
-<tr class="separator:a1226d202290aaff53c14db38bd505a2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4948c2fc844fe17a5a69dc71c845561"><td class="memTemplParams" colspan="2">template&lt;auto Func, typename... Property&gt; </td></tr>
-<tr class="memitem:ad4948c2fc844fe17a5a69dc71c845561"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#ad4948c2fc844fe17a5a69dc71c845561">func</a> (const char *str, Property &amp;&amp;... property) ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:ad4948c2fc844fe17a5a69dc71c845561"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a meta funcion to a meta type.  <a href="#ad4948c2fc844fe17a5a69dc71c845561">More...</a><br /></td></tr>
-<tr class="separator:ad4948c2fc844fe17a5a69dc71c845561"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:aa42fdb45a8b89dcb693ea717ec3106f2"><td class="memTemplParams" colspan="2">template&lt;typename Other , typename... Property&gt; </td></tr>
-<tr class="memitem:aa42fdb45a8b89dcb693ea717ec3106f2"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&lt; Other &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#aa42fdb45a8b89dcb693ea717ec3106f2">reflect</a> (const char *str, Property &amp;&amp;... property) ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:aa42fdb45a8b89dcb693ea717ec3106f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Basic function to use for reflection.  <a href="#aa42fdb45a8b89dcb693ea717ec3106f2">More...</a><br /></td></tr>
-<tr class="separator:aa42fdb45a8b89dcb693ea717ec3106f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa43299816c83740fdf20e6d7687f9055"><td class="memTemplParams" colspan="2">template&lt;typename Other &gt; </td></tr>
-<tr class="memitem:aa43299816c83740fdf20e6d7687f9055"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#aa43299816c83740fdf20e6d7687f9055">unregister</a> () ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:aa43299816c83740fdf20e6d7687f9055"><td class="mdescLeft">&#160;</td><td class="mdescRight">Basic function to unregister a type.  <a href="#aa43299816c83740fdf20e6d7687f9055">More...</a><br /></td></tr>
-<tr class="separator:aa43299816c83740fdf20e6d7687f9055"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac19722604f96d3e6e8268f24c73478d1"><td class="memTemplParams" colspan="2">template&lt;auto Data, typename Policy  = as_is_t, typename... Property&gt; </td></tr>
+<tr class="memitem:ac19722604f96d3e6e8268f24c73478d1"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#ac19722604f96d3e6e8268f24c73478d1">data</a> (const ENTT_ID_TYPE <a class="el" href="classentt_1_1identifier.html">identifier</a>, Property &amp;&amp;... property) ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:ac19722604f96d3e6e8268f24c73478d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a meta data to a meta type.  <a href="#ac19722604f96d3e6e8268f24c73478d1">More...</a><br /></td></tr>
+<tr class="separator:ac19722604f96d3e6e8268f24c73478d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afab9a09526618e25651e62f7968f6a9a"><td class="memTemplParams" colspan="2">template&lt;auto Setter, auto Getter, typename Policy  = as_is_t, typename... Property&gt; </td></tr>
+<tr class="memitem:afab9a09526618e25651e62f7968f6a9a"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#afab9a09526618e25651e62f7968f6a9a">data</a> (const ENTT_ID_TYPE <a class="el" href="classentt_1_1identifier.html">identifier</a>, Property &amp;&amp;... property) ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:afab9a09526618e25651e62f7968f6a9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a meta data to a meta type by means of its setter and getter.  <a href="#afab9a09526618e25651e62f7968f6a9a">More...</a><br /></td></tr>
+<tr class="separator:afab9a09526618e25651e62f7968f6a9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad27b56b2f89af6f406c5e4a4a481618b"><td class="memTemplParams" colspan="2">template&lt;auto Candidate, typename Policy  = as_is_t, typename... Property&gt; </td></tr>
+<tr class="memitem:ad27b56b2f89af6f406c5e4a4a481618b"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#ad27b56b2f89af6f406c5e4a4a481618b">func</a> (const ENTT_ID_TYPE <a class="el" href="classentt_1_1identifier.html">identifier</a>, Property &amp;&amp;... property) ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:ad27b56b2f89af6f406c5e4a4a481618b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns a meta funcion to a meta type.  <a href="#ad27b56b2f89af6f406c5e4a4a481618b">More...</a><br /></td></tr>
+<tr class="separator:ad27b56b2f89af6f406c5e4a4a481618b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa612a5d1c2435f48777d61d2708f2b7c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__factory.html#aa612a5d1c2435f48777d61d2708f2b7c">unregister</a> () ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:aa612a5d1c2435f48777d61d2708f2b7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unregisters a meta type and all its parts.  <a href="#aa612a5d1c2435f48777d61d2708f2b7c">More...</a><br /></td></tr>
+<tr class="separator:aa612a5d1c2435f48777d61d2708f2b7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Type&gt;<br />
 class entt::meta_factory&lt; Type &gt;</h3>
 
 <p>A meta factory to be used for reflection purposes. </p>
-<p>A meta factory is an utility class used to reflect types, data and functions of all sorts. This class ensures that the underlying web of types is built correctly and performs some checks in debug mode to ensure that there are no subtle errors at runtime.</p>
+<p>TURN_OFF_DOXYGEN A meta factory is an utility class used to reflect types, data and functions of all sorts. This class ensures that the underlying web of types is built correctly and performs some checks in debug mode to ensure that there are no subtle errors at runtime.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Type</td><td>Reflected type for which the factory was created. </td></tr>
@@ -136,7 +135,7 @@ class entt::meta_factory&lt; Type &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00017">17</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00246">246</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a08184dab6a4da744ad630ede2ac0856b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a08184dab6a4da744ad630ede2ac0856b">&#9670;&nbsp;</a></span>base()</h2>
@@ -175,12 +174,12 @@ template&lt;typename Base &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A meta factory for the parent type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00204">204</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00356">356</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
 
 </div>
 </div>
 <a id="a84633b1bc2d531e2322997fd9a8f44dd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a84633b1bc2d531e2322997fd9a8f44dd">&#9670;&nbsp;</a></span>conv()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a84633b1bc2d531e2322997fd9a8f44dd">&#9670;&nbsp;</a></span>conv() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -216,19 +215,61 @@ template&lt;typename To &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A meta factory for the parent type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00239">239</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00391">391</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a452a2b2df406361785ec40c2e2f9a426"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a452a2b2df406361785ec40c2e2f9a426">&#9670;&nbsp;</a></span>ctor() <span class="overload">[1/2]</span></h2>
+<a id="a84633b1bc2d531e2322997fd9a8f44dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84633b1bc2d531e2322997fd9a8f44dd">&#9670;&nbsp;</a></span>conv() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Type &gt; </div>
 <div class="memtemplate">
-template&lt;auto Func, typename... Property&gt; </div>
+template&lt;auto Candidate&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a> <a class="el" href="classentt_1_1meta__factory.html">entt::meta_factory</a>&lt; Type &gt;::conv </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assigns a meta conversion function to a meta type. </p>
+<p>Conversion functions can be either free functions or member functions.<br />
+ In case of free functions, they must accept a const reference to an instance of the parent type as an argument. In case of member functions, they should have no arguments at all.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Candidate</td><td>The actual function to use for the conversion. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A meta factory for the parent type. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00429">429</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a3b8059251d67918e1ed2d7723a19b3dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b8059251d67918e1ed2d7723a19b3dc">&#9670;&nbsp;</a></span>ctor() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type &gt; </div>
+<div class="memtemplate">
+template&lt;auto Func, typename Policy  = as_is_t, typename... Property&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -254,6 +295,7 @@ template&lt;auto Func, typename... Property&gt; </div>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Func</td><td>The actual function to use as a constructor. </td></tr>
+    <tr><td class="paramname">Policy</td><td>Optional policy (no policy set by default). </td></tr>
     <tr><td class="paramname">Property</td><td>Types of properties to assign to the meta data. </td></tr>
   </table>
   </dd>
@@ -266,7 +308,7 @@ template&lt;auto Func, typename... Property&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A meta factory for the parent type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00279">279</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00470">470</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -315,19 +357,19 @@ template&lt;typename... Args, typename... Property&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A meta factory for the parent type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00321">321</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00512">512</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a02634a64ff7fe7c644691d495e9ccc18"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a02634a64ff7fe7c644691d495e9ccc18">&#9670;&nbsp;</a></span>data() <span class="overload">[1/2]</span></h2>
+<a id="ac19722604f96d3e6e8268f24c73478d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac19722604f96d3e6e8268f24c73478d1">&#9670;&nbsp;</a></span>data() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Type &gt; </div>
 <div class="memtemplate">
-template&lt;auto Data, typename... Property&gt; </div>
+template&lt;auto Data, typename Policy  = as_is_t, typename... Property&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -335,8 +377,8 @@ template&lt;auto Data, typename... Property&gt; </div>
         <tr>
           <td class="memname"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a> <a class="el" href="classentt_1_1meta__factory.html">entt::meta_factory</a>&lt; Type &gt;::data </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>str</em>, </td>
+          <td class="paramtype">const ENTT_ID_TYPE&#160;</td>
+          <td class="paramname"><em>identifier</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -363,32 +405,33 @@ template&lt;auto Data, typename... Property&gt; </div>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Data</td><td>The actual variable to attach to the meta type. </td></tr>
+    <tr><td class="paramname">Policy</td><td>Optional policy (no policy set by default). </td></tr>
     <tr><td class="paramname">Property</td><td>Types of properties to assign to the meta data. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">str</td><td>The name to assign to the meta data. </td></tr>
+    <tr><td class="paramname">identifier</td><td>Unique identifier. </td></tr>
     <tr><td class="paramname">property</td><td>Properties to assign to the meta data. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A meta factory for the parent type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00406">406</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00598">598</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a1226d202290aaff53c14db38bd505a2b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1226d202290aaff53c14db38bd505a2b">&#9670;&nbsp;</a></span>data() <span class="overload">[2/2]</span></h2>
+<a id="afab9a09526618e25651e62f7968f6a9a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afab9a09526618e25651e62f7968f6a9a">&#9670;&nbsp;</a></span>data() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Type &gt; </div>
 <div class="memtemplate">
-template&lt;auto Setter, auto Getter, typename... Property&gt; </div>
+template&lt;auto Setter, auto Getter, typename Policy  = as_is_t, typename... Property&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -396,8 +439,8 @@ template&lt;auto Setter, auto Getter, typename... Property&gt; </div>
         <tr>
           <td class="memname"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a> <a class="el" href="classentt_1_1meta__factory.html">entt::meta_factory</a>&lt; Type &gt;::data </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>str</em>, </td>
+          <td class="paramtype">const ENTT_ID_TYPE&#160;</td>
+          <td class="paramname"><em>identifier</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -420,26 +463,27 @@ template&lt;auto Setter, auto Getter, typename... Property&gt; </div>
 
 <p>Assigns a meta data to a meta type by means of its setter and getter. </p>
 <p>Setters and getters can be either free functions, member functions or a mix of them.<br />
- In case of free functions, setters and getters must accept a pointer to an instance of the parent type as their first argument. A setter has then an extra argument of a type convertible to that of the parameter to set.<br />
+ In case of free functions, setters and getters must accept a reference to an instance of the parent type as their first argument. A setter has then an extra argument of a type convertible to that of the parameter to set.<br />
  In case of member functions, getters have no arguments at all, while setters has an argument of a type convertible to that of the parameter to set.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Setter</td><td>The actual function to use as a setter. </td></tr>
     <tr><td class="paramname">Getter</td><td>The actual function to use as a getter. </td></tr>
+    <tr><td class="paramname">Policy</td><td>Optional policy (no policy set by default). </td></tr>
     <tr><td class="paramname">Property</td><td>Types of properties to assign to the meta data. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">str</td><td>The name to assign to the meta data. </td></tr>
+    <tr><td class="paramname">identifier</td><td>Unique identifier. </td></tr>
     <tr><td class="paramname">property</td><td>Properties to assign to the meta data. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A meta factory for the parent type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00506">506</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00701">701</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -451,7 +495,7 @@ template&lt;auto Setter, auto Getter, typename... Property&gt; </div>
 <div class="memtemplate">
 template&lt;typename Type &gt; </div>
 <div class="memtemplate">
-template&lt;auto * Func&gt; </div>
+template&lt;auto Func&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -472,7 +516,7 @@ template&lt;auto * Func&gt; </div>
 
 <p>Assigns a meta destructor to a meta type. </p>
 <p>Free functions can be assigned to meta types in the role of destructors. The signature of the function should identical to the following:</p>
-<div class="fragment"><div class="line">void(Type *);</div></div><!-- fragment --><p>From a client's point of view, nothing changes if the destructor of a meta type is the default one or a custom one.</p>
+<div class="fragment"><div class="line">void(Type &amp;);</div></div><!-- fragment --><p>The purpose is to give users the ability to free up resources that require special treatment before an object is actually destroyed.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Func</td><td>The actual function to use as a destructor. </td></tr>
@@ -481,19 +525,19 @@ template&lt;auto * Func&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A meta factory for the parent type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00366">366</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00557">557</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ad4948c2fc844fe17a5a69dc71c845561"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad4948c2fc844fe17a5a69dc71c845561">&#9670;&nbsp;</a></span>func()</h2>
+<a id="ad27b56b2f89af6f406c5e4a4a481618b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad27b56b2f89af6f406c5e4a4a481618b">&#9670;&nbsp;</a></span>func()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Type &gt; </div>
 <div class="memtemplate">
-template&lt;auto Func, typename... Property&gt; </div>
+template&lt;auto Candidate, typename Policy  = as_is_t, typename... Property&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -501,8 +545,8 @@ template&lt;auto Func, typename... Property&gt; </div>
         <tr>
           <td class="memname"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a> <a class="el" href="classentt_1_1meta__factory.html">entt::meta_factory</a>&lt; Type &gt;::func </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>str</em>, </td>
+          <td class="paramtype">const ENTT_ID_TYPE&#160;</td>
+          <td class="paramname"><em>identifier</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -528,43 +572,43 @@ template&lt;auto Func, typename... Property&gt; </div>
  From a client's point of view, all the functions associated with the reflected object will appear as if they were part of the type itself.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Func</td><td>The actual function to attach to the meta type. </td></tr>
+    <tr><td class="paramname">Candidate</td><td>The actual function to attach to the meta type. </td></tr>
+    <tr><td class="paramname">Policy</td><td>Optional policy (no policy set by default). </td></tr>
     <tr><td class="paramname">Property</td><td>Types of properties to assign to the meta function. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">str</td><td>The name to assign to the meta function. </td></tr>
+    <tr><td class="paramname">identifier</td><td>Unique identifier. </td></tr>
     <tr><td class="paramname">property</td><td>Properties to assign to the meta function. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A meta factory for the parent type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00554">554</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00750">750</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
 
 </div>
 </div>
-<h2 class="groupheader">Friends And Related Function Documentation</h2>
-<a id="aa42fdb45a8b89dcb693ea717ec3106f2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa42fdb45a8b89dcb693ea717ec3106f2">&#9670;&nbsp;</a></span>reflect</h2>
+<a id="a0a17a25bc10cd8fa37d9583b7e156eb7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a17a25bc10cd8fa37d9583b7e156eb7">&#9670;&nbsp;</a></span>type()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Type &gt; </div>
 <div class="memtemplate">
-template&lt;typename Other , typename... Property&gt; </div>
+template&lt;typename... Property&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a>&lt;Other&gt; reflect </td>
+          <td class="memname"><a class="el" href="classentt_1_1meta__factory.html">meta_factory</a> <a class="el" href="classentt_1_1meta__factory.html">entt::meta_factory</a>&lt; Type &gt;::type </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>str</em>, </td>
+          <td class="paramtype">const ENTT_ID_TYPE&#160;</td>
+          <td class="paramname"><em>identifier</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -580,49 +624,44 @@ template&lt;typename Other , typename... Property&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Basic function to use for reflection. </p>
-<p>This is the point from which everything starts.<br />
- By invoking this function with a type that is not yet reflected, a meta type is created to which it will be possible to attach data and functions through a dedicated factory.</p>
+<p>Extends a meta type by assigning it an identifier and properties. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Type</td><td>Type to reflect. </td></tr>
-    <tr><td class="paramname">Property</td><td>Types of properties to assign to the reflected type. </td></tr>
+    <tr><td class="paramname">Property</td><td>Types of properties to assign to the meta type. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">str</td><td>The name to assign to the reflected type. </td></tr>
-    <tr><td class="paramname">property</td><td>Properties to assign to the reflected type. </td></tr>
+    <tr><td class="paramname">identifier</td><td>Unique identifier. </td></tr>
+    <tr><td class="paramname">property</td><td>Properties to assign to the meta type. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A meta factory for the given type. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A meta factory for the parent type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00606">606</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00334">334</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
 
 </div>
 </div>
-<a id="aa43299816c83740fdf20e6d7687f9055"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa43299816c83740fdf20e6d7687f9055">&#9670;&nbsp;</a></span>unregister</h2>
+<a id="aa612a5d1c2435f48777d61d2708f2b7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa612a5d1c2435f48777d61d2708f2b7c">&#9670;&nbsp;</a></span>unregister()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Type &gt; </div>
-<div class="memtemplate">
-template&lt;typename Other &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool unregister </td>
+          <td class="memname">bool <a class="el" href="classentt_1_1meta__factory.html">entt::meta_factory</a>&lt; Type &gt;::unregister </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -630,23 +669,17 @@ template&lt;typename Other &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Basic function to unregister a type. </p>
-<p>This function unregisters a type and all its data members, member functions and properties, as well as its constructors, destructors and conversion functions if any.<br />
+<p>Unregisters a meta type and all its parts. </p>
+<p>This function unregisters a meta type and all its data members, member functions and properties, as well as its constructors, destructors and conversion functions if any.<br />
  Base classes aren't unregistered but the link between the two types is removed.</p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Type</td><td>Type to unregister. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True if the type to unregister exists, false otherwise. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the meta type exists, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00641">641</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="factory_8hpp_source.html#l00796">796</a> of file <a class="el" href="factory_8hpp_source.html">factory.hpp</a>.</p>
 
 </div>
 </div>

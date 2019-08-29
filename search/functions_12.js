@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['unpause',['unpause',['../classentt_1_1process.html#a91fd8adb2ea48c88c6f9fb5818890f67',1,'entt::process']]],
-  ['unregister',['unregister',['../namespaceentt.html#a04658621584dae59cabe9863a38e0e7a',1,'entt']]],
-  ['unset',['unset',['../classentt_1_1basic__prototype.html#a05230038ddbafaca4d5da09dfb247186',1,'entt::basic_prototype::unset()'],['../classentt_1_1basic__registry.html#aaa23b74e76b1749bb510a86e9d31b9cd',1,'entt::basic_registry::unset()']]],
-  ['update',['update',['../structentt_1_1process__adaptor.html#a7514fabbbda491742872bc0e52dde5c2',1,'entt::process_adaptor::update()'],['../classentt_1_1scheduler.html#a827eae426378df9ed9190752156a4154',1,'entt::scheduler::update()'],['../classentt_1_1dispatcher.html#aabed6fd7fa4027dcfa3afc7bc20f2784',1,'entt::dispatcher::update()'],['../classentt_1_1dispatcher.html#ae15c11634047d7718db5e2e30675c80c',1,'entt::dispatcher::update() const']]]
+  ['valid',['valid',['../classentt_1_1basic__registry.html#ac7d145b7adb8ca486c49cfd44aebea73',1,'entt::basic_registry']]],
+  ['value',['value',['../classentt_1_1basic__hashed__string.html#afb3a92282e81fb50af66953f39671f3c',1,'entt::basic_hashed_string::value()'],['../classentt_1_1meta__prop.html#a38a979e40971692929b46f80c3f22f9e',1,'entt::meta_prop::value()']]],
+  ['version',['version',['../classentt_1_1basic__registry.html#a75f09d82b0cd6305ea7422d60162704e',1,'entt::basic_registry']]],
+  ['view',['view',['../classentt_1_1basic__registry.html#ab2ea1df9f827924f2ecba67921bf4845',1,'entt::basic_registry::view()'],['../classentt_1_1basic__registry.html#a1a2ffab3b15bb205ceef86b8d8b3fdcb',1,'entt::basic_registry::view() const']]]
 ];

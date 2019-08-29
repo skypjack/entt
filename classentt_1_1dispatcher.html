@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.1.0</span>
    </div>
   </td>
  </tr>
@@ -120,7 +120,7 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><p>Basic dispatcher implementation. </p>
 <p>A dispatcher can be used either to trigger an immediate event or to enqueue events to be published all together once per tick.<br />
  Listeners are provided in the form of member functions. For each event of type <code>Event</code>, listeners are such that they can be invoked with an argument of type <code>const Event &amp;</code>, no matter what the return type is.</p>
-<p>The type of the instances is <code>Class *</code> (a naked pointer). It means that users must guarantee that the lifetimes of the instances overcome the one of the dispatcher itself to avoid crashes. </p>
+<p>The types of the instances are <code>Class &amp;</code>. Users must guarantee that the lifetimes of the objects overcome the one of the dispatcher itself to avoid crashes. </p>
 
 <p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00031">31</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
@@ -243,7 +243,7 @@ template&lt;typename Event &gt; </div>
 <p>Returns a sink object for the given event. </p>
 <p>A sink is an opaque object used to connect listeners to events.</p>
 <p>The function type for a listener is: </p><div class="fragment"><div class="line">void(<span class="keyword">const</span> Event &amp;);</div></div><!-- fragment --><p>The order of invocation of the listeners isn't guaranteed.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1sink.html" title="Sink implementation. ">sink</a></dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classentt_1_1sink.html" title="Sink class. ">sink</a></dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Event</td><td>Type of event of which to get the sink. </td></tr>

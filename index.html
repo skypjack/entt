@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.1.0</span>
    </div>
   </td>
  </tr>
@@ -66,7 +66,7 @@ $(function() {
 <div class="textblock"><div class="image">
 <img src="https://user-images.githubusercontent.com/1812216/42513718-ee6e98d0-8457-11e8-9baf-8d83f61a3097.png" alt="EnTT: Gaming meets modern C++"/>
 </div>
-<h1><a class="anchor" id="autotoc_md83"></a>
+<h1><a class="anchor" id="autotoc_md92"></a>
 Introduction</h1>
 <p>The entity-component-system (also known as <em>ECS</em>) is an architectural pattern used mostly in game development. For further details:</p>
 <ul>
@@ -77,31 +77,31 @@ Introduction</h1>
 <p>This project started off as a pure entity-component system. Over time the codebase has grown as more and more classes and functionalities were added.<br />
  Here is a brief, yet incomplete list of what it offers today:</p>
 <ul>
-<li>Statically generated integer <b>identifiers for types</b> (assigned either at compile-time or at runtime).</li>
-<li>A <code>constexpr</code> utility for <b>human readable resource identifiers</b>.</li>
+<li>Statically generated integer <b>identifiers</b> for types (assigned either at compile-time or at runtime).</li>
+<li>A <code>constexpr</code> utility for human readable <b>resource names</b>.</li>
 <li>A minimal <b>configuration system</b> built using the monostate pattern.</li>
 <li>An incredibly fast <b>entity-component system</b> based on sparse sets, with its own <em>pay for what you use</em> policy to adjust performance and memory usage according to the users' requirements.</li>
 <li>Views and groups to iterate entities and components and allow different access patterns, from <b>perfect SoA</b> to fully random.</li>
-<li>A lot of <b>facilities</b> built on top of the entity-component system to support the users and avoid reinventing the wheel (dependencies, snapshot, actor class for those who aren't confident with the architecture and so on).</li>
+<li>A lot of <b>facilities</b> built on top of the entity-component system to help the users and avoid reinventing the wheel (dependencies, snapshot, actor class, support for <b>reactive systems</b> and so on).</li>
 <li>The smallest and most basic implementation of a <b>service locator</b> ever seen.</li>
-<li>A built-in, non-intrusive and macro-free <b>runtime reflection system</b>.</li>
+<li>A built-in, non-intrusive and macro-free runtime <b>reflection system</b>.</li>
 <li>A <b>cooperative scheduler</b> for processes of any type.</li>
 <li>All that is needed for <b>resource management</b> (cache, loaders, handles).</li>
-<li><b>Delegates</b>, <b>signal handlers</b> (with built-in support for collectors) and a tiny <b>event dispatcher</b> for immediate and delayed events to integrate in loops.</li>
+<li>Delegates, <b>signal handlers</b> (with built-in support for collectors) and a tiny event dispatcher for immediate and delayed events to integrate in loops.</li>
 <li>A general purpose <b>event emitter</b> as a CRTP idiom based class template.</li>
 <li>And <b>much more</b>! Check out the <a href="https://github.com/skypjack/entt/wiki"><b>wiki</b></a>.</li>
 </ul>
 <p>Consider this list a work in progress as well as the project. The whole API is fully documented in-code for those who are brave enough to read it.</p>
 <p>Currently, <code>EnTT</code> is tested on Linux, Microsoft Windows and OSX. It has proven to work also on both Android and iOS.<br />
  Most likely it won't be problematic on other systems as well, but it hasn't been sufficiently tested so far.</p>
-<h2><a class="anchor" id="autotoc_md84"></a>
+<h2><a class="anchor" id="autotoc_md93"></a>
 Code Example</h2>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entt.hpp&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;cstdint&gt;</span></div><div class="line"></div><div class="line"><span class="keyword">struct </span>position {</div><div class="line">    <span class="keywordtype">float</span> x;</div><div class="line">    <span class="keywordtype">float</span> y;</div><div class="line">};</div><div class="line"></div><div class="line"><span class="keyword">struct </span>velocity {</div><div class="line">    <span class="keywordtype">float</span> dx;</div><div class="line">    <span class="keywordtype">float</span> dy;</div><div class="line">};</div><div class="line"></div><div class="line"><span class="keywordtype">void</span> update(<a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;registry) {</div><div class="line">    <span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1basic__registry.html#ab2ea1df9f827924f2ecba67921bf4845">view</a>&lt;position, velocity&gt;();</div><div class="line"></div><div class="line">    <span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">        <span class="comment">// gets only the components that are going to be used ...</span></div><div class="line"></div><div class="line">        <span class="keyword">auto</span> &amp;vel = view.get&lt;velocity&gt;(entity);</div><div class="line"></div><div class="line">        vel.dx = 0.;</div><div class="line">        vel.dy = 0.;</div><div class="line"></div><div class="line">        <span class="comment">// ...</span></div><div class="line">    }</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">void</span> update(std::uint64_t dt, <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;registry) {</div><div class="line">    registry.<a class="code" href="classentt_1_1basic__registry.html#ab2ea1df9f827924f2ecba67921bf4845">view</a>&lt;position, velocity&gt;().each([dt](<span class="keyword">auto</span> &amp;pos, <span class="keyword">auto</span> &amp;vel) {</div><div class="line">        <span class="comment">// gets all the components of the view at once ...</span></div><div class="line"></div><div class="line">        pos.x += vel.dx * dt;</div><div class="line">        pos.y += vel.dy * dt;</div><div class="line"></div><div class="line">        <span class="comment">// ...</span></div><div class="line">    });</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> main() {</div><div class="line">    <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> registry;</div><div class="line">    std::uint64_t dt = 16;</div><div class="line"></div><div class="line">    <span class="keywordflow">for</span>(<span class="keyword">auto</span> i = 0; i &lt; 10; ++i) {</div><div class="line">        <span class="keyword">auto</span> entity = registry.<a class="code" href="classentt_1_1basic__registry.html#a1bb5d5d0c5af3bd98de3d902406ff372">create</a>();</div><div class="line">        registry.<a class="code" href="classentt_1_1basic__registry.html#a3deb5b8f14eb1414c92e6ccb2065ce0e">assign</a>&lt;position&gt;(entity, i * 1.f, i * 1.f);</div><div class="line">        <span class="keywordflow">if</span>(i % 2 == 0) { registry.<a class="code" href="classentt_1_1basic__registry.html#a3deb5b8f14eb1414c92e6ccb2065ce0e">assign</a>&lt;velocity&gt;(entity, i * .1f, i * .1f); }</div><div class="line">    }</div><div class="line"></div><div class="line">    update(dt, registry);</div><div class="line">    update(registry);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><h2><a class="anchor" id="autotoc_md85"></a>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entt.hpp&gt;</span></div><div class="line"><span class="preprocessor">#include &lt;cstdint&gt;</span></div><div class="line"></div><div class="line"><span class="keyword">struct </span>position {</div><div class="line">    <span class="keywordtype">float</span> x;</div><div class="line">    <span class="keywordtype">float</span> y;</div><div class="line">};</div><div class="line"></div><div class="line"><span class="keyword">struct </span>velocity {</div><div class="line">    <span class="keywordtype">float</span> dx;</div><div class="line">    <span class="keywordtype">float</span> dy;</div><div class="line">};</div><div class="line"></div><div class="line"><span class="keywordtype">void</span> update(<a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;registry) {</div><div class="line">    <span class="keyword">auto</span> view = registry.<a class="code" href="classentt_1_1basic__registry.html#ab2ea1df9f827924f2ecba67921bf4845">view</a>&lt;position, velocity&gt;();</div><div class="line"></div><div class="line">    <span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div><div class="line">        <span class="comment">// gets only the components that are going to be used ...</span></div><div class="line"></div><div class="line">        <span class="keyword">auto</span> &amp;vel = view.get&lt;velocity&gt;(entity);</div><div class="line"></div><div class="line">        vel.dx = 0.;</div><div class="line">        vel.dy = 0.;</div><div class="line"></div><div class="line">        <span class="comment">// ...</span></div><div class="line">    }</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">void</span> update(std::uint64_t dt, <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> &amp;registry) {</div><div class="line">    registry.<a class="code" href="classentt_1_1basic__registry.html#ab2ea1df9f827924f2ecba67921bf4845">view</a>&lt;position, velocity&gt;().each([dt](<span class="keyword">auto</span> &amp;pos, <span class="keyword">auto</span> &amp;vel) {</div><div class="line">        <span class="comment">// gets all the components of the view at once ...</span></div><div class="line"></div><div class="line">        pos.x += vel.dx * dt;</div><div class="line">        pos.y += vel.dy * dt;</div><div class="line"></div><div class="line">        <span class="comment">// ...</span></div><div class="line">    });</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordtype">int</span> main() {</div><div class="line">    <a class="code" href="classentt_1_1basic__registry.html">entt::registry</a> registry;</div><div class="line">    std::uint64_t dt = 16;</div><div class="line"></div><div class="line">    <span class="keywordflow">for</span>(<span class="keyword">auto</span> i = 0; i &lt; 10; ++i) {</div><div class="line">        <span class="keyword">auto</span> entity = registry.<a class="code" href="classentt_1_1basic__registry.html#a32d0bb4c8ad63d78c8ae455dfeb02c59">create</a>();</div><div class="line">        registry.<a class="code" href="classentt_1_1basic__registry.html#a3deb5b8f14eb1414c92e6ccb2065ce0e">assign</a>&lt;position&gt;(entity, i * 1.f, i * 1.f);</div><div class="line">        <span class="keywordflow">if</span>(i % 2 == 0) { registry.<a class="code" href="classentt_1_1basic__registry.html#a3deb5b8f14eb1414c92e6ccb2065ce0e">assign</a>&lt;velocity&gt;(entity, i * .1f, i * .1f); }</div><div class="line">    }</div><div class="line"></div><div class="line">    update(dt, registry);</div><div class="line">    update(registry);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><h2><a class="anchor" id="autotoc_md94"></a>
 Motivation</h2>
 <p>I started developing <code>EnTT</code> for the <em>wrong</em> reason: my goal was to design an entity-component system to beat another well known open source solution both in terms of performance and possibly memory usage.<br />
  In the end, I did it, but it wasn't very satisfying. Actually it wasn't satisfying at all. The fastest and nothing more, fairly little indeed. When I realized it, I tried hard to keep intact the great performance of <code>EnTT</code> and to add all the features I wanted to see in <em>my own library</em> at the same time.</p>
 <p>Nowadays, <code>EnTT</code> is finally what I was looking for: still faster than its <em>competitors</em>, lower memory usage in the average case, a really good API and an amazing set of features. And even more, of course.</p>
-<h2><a class="anchor" id="autotoc_md86"></a>
+<h2><a class="anchor" id="autotoc_md95"></a>
 Performance</h2>
 <p>As it stands right now, <code>EnTT</code> is just fast enough for my requirements when compared to my first choice (it was already amazingly fast actually).<br />
  Below is a comparison between the two (both of them compiled with GCC 7.3.0 on a Dell XPS 13 from mid 2014):</p>
@@ -152,31 +152,33 @@ Arrays are almost sorted, insertion sort </td><td>- </td><td><b>0.0007s</b> </td
 <p>The choice to use <code>EnTT</code> should be based on its carefully designed API, its set of features and the general performance, not because some single benchmark shows it to be the fastest tool available.</p>
 <p>In the future I'll likely try to get even better performance while still adding new features, mainly for fun.<br />
  If you want to contribute and/or have suggestions, feel free to make a PR or open an issue to discuss your idea.</p>
-<h1><a class="anchor" id="autotoc_md87"></a>
+<h1><a class="anchor" id="autotoc_md96"></a>
 Build Instructions</h1>
-<h2><a class="anchor" id="autotoc_md88"></a>
+<h2><a class="anchor" id="autotoc_md97"></a>
 Requirements</h2>
 <p>To be able to use <code>EnTT</code>, users must provide a full-featured compiler that supports at least C++17.<br />
  The requirements below are mandatory to compile the tests and to extract the documentation:</p>
 <ul>
-<li>CMake version 3.2 or later.</li>
-<li>Doxygen version 1.8 or later.</li>
+<li><code>CMake</code> version 3.2 or later.</li>
+<li><code>Doxygen</code> version 1.8 or later.</li>
 </ul>
+<p>Alternatively, <code>Bazel</code> is also supported as a build system (credits to <a href="https://github.com/zaucy">zaucy</a> who introduced what's required with <a href="https://github.com/skypjack/entt/pull/291">this</a> pull request and offered to maintain it).<br />
+ In the documentation below I'll still refer to <code>CMake</code>, this being the official build system of the library.</p>
 <p>If you are looking for a C++14 version of <code>EnTT</code>, check out the git tag <code>cpp14</code>.</p>
-<h2><a class="anchor" id="autotoc_md89"></a>
+<h2><a class="anchor" id="autotoc_md98"></a>
 Library</h2>
 <p><code>EnTT</code> is a header-only library. This means that including the <code><a class="el" href="entt_8hpp_source.html">entt.hpp</a></code> header is enough to include the library as a whole and use it. For those who are interested only in the entity-component system, consider to include the sole <code><a class="el" href="registry_8hpp_source.html">entity/registry.hpp</a></code> header instead.<br />
  It's a matter of adding the following line to the top of a file:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entt.hpp&gt;</span></div></div><!-- fragment --><p>Use the line below to include only the entity-component system instead:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;entt/entity/registry.hpp&gt;</span></div></div><!-- fragment --><p>Then pass the proper <code>-I</code> argument to the compiler to add the <code>src</code> directory to the include paths.</p>
-<h2><a class="anchor" id="autotoc_md90"></a>
+<h2><a class="anchor" id="autotoc_md99"></a>
 Documentation</h2>
 <p>The documentation is based on <a href="http://www.doxygen.nl/">doxygen</a>. To build it: </p><pre class="fragment">$ cd build
 $ cmake .. -DBUILD_DOCS=ON
 $ make
 </pre><p>The API reference will be created in HTML format within the directory <code>build/docs/html</code>. To navigate it with your favorite browser: </p><pre class="fragment">$ cd build
 $ your_favorite_browser docs/html/index.html
-</pre><h2><a class="anchor" id="autotoc_md91"></a>
+</pre><h2><a class="anchor" id="autotoc_md100"></a>
 Tests</h2>
 <p>To compile and run the tests, <code>EnTT</code> requires <em>googletest</em>.<br />
  <code>cmake</code> will download and compile the library before compiling anything else. In order to build the tests, set the CMake option <code>BUILD_TESTING</code> to <code>ON</code>.</p>
@@ -188,7 +190,7 @@ Tests</h2>
 <li><code>$ make test</code></li>
 </ul>
 <p>Note that benchmarks are not part of this set.</p>
-<h1><a class="anchor" id="autotoc_md92"></a>
+<h1><a class="anchor" id="autotoc_md101"></a>
 Packaging Tools</h1>
 <p><code>EnTT</code> is available for some of the most known packaging tools. In particular:</p>
 <ul>
@@ -198,7 +200,7 @@ Packaging Tools</h1>
 <li><a href="https://github.com/Microsoft/vcpkg/tree/master/ports/entt"><code>vcpkg</code></a>, Microsoft VC++ Packaging Tool.</li>
 </ul>
 <p>Consider this list a work in progress and help me to make it longer.</p>
-<h1><a class="anchor" id="autotoc_md93"></a>
+<h1><a class="anchor" id="autotoc_md102"></a>
 License</h1>
 <p>Code and documentation Copyright (c) 2017-2019 Michele Caini.<br />
  Logo Copyright (c) 2018-2019 Richard Caseres.</p>

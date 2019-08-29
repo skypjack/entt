@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.1.0</span>
    </div>
   </td>
  </tr>
@@ -89,9 +89,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:accdedbb8b1636f59967dc30ba5d7e753"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__type.html">meta_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__conv.html#accdedbb8b1636f59967dc30ba5d7e753">type</a> () const ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:accdedbb8b1636f59967dc30ba5d7e753"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the meta type of a given meta conversion function.  <a href="#accdedbb8b1636f59967dc30ba5d7e753">More...</a><br /></td></tr>
 <tr class="separator:accdedbb8b1636f59967dc30ba5d7e753"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa8acf7e218f317e9bb643d0a8d81b390"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__any.html">meta_any</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__conv.html#aa8acf7e218f317e9bb643d0a8d81b390">convert</a> (void *instance) const ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:aa8acf7e218f317e9bb643d0a8d81b390"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an instance to a given type.  <a href="#aa8acf7e218f317e9bb643d0a8d81b390">More...</a><br /></td></tr>
-<tr class="separator:aa8acf7e218f317e9bb643d0a8d81b390"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd513d5e76857918ecb6208f79c0b309"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1meta__any.html">meta_any</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__conv.html#acd513d5e76857918ecb6208f79c0b309">convert</a> (const void *instance) const ENTT_NOEXCEPT</td></tr>
+<tr class="memdesc:acd513d5e76857918ecb6208f79c0b309"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an instance to a given type.  <a href="#acd513d5e76857918ecb6208f79c0b309">More...</a><br /></td></tr>
+<tr class="separator:acd513d5e76857918ecb6208f79c0b309"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7b17a68e2b9f7a1b614a5aa1e4a7c1a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1meta__conv.html#aa7b17a68e2b9f7a1b614a5aa1e4a7c1a">operator bool</a> () const ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:aa7b17a68e2b9f7a1b614a5aa1e4a7c1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if a meta object is valid, false otherwise.  <a href="#aa7b17a68e2b9f7a1b614a5aa1e4a7c1a">More...</a><br /></td></tr>
 <tr class="separator:aa7b17a68e2b9f7a1b614a5aa1e4a7c1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -111,10 +111,10 @@ template&lt;typename &gt; </td></tr>
 <div class="textblock"><p>Meta conversion function object. </p>
 <p>A meta conversion function is an opaque container for a conversion function to be used to convert a given instance to another type. </p>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00885">885</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00931">931</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="aa8acf7e218f317e9bb643d0a8d81b390"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8acf7e218f317e9bb643d0a8d81b390">&#9670;&nbsp;</a></span>convert()</h2>
+<a id="acd513d5e76857918ecb6208f79c0b309"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd513d5e76857918ecb6208f79c0b309">&#9670;&nbsp;</a></span>convert()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -125,7 +125,7 @@ template&lt;typename &gt; </td></tr>
         <tr>
           <td class="memname"><a class="el" href="classentt_1_1meta__any.html">meta_any</a> entt::meta_conv::convert </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname"><em>instance</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -146,7 +146,7 @@ template&lt;typename &gt; </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An opaque pointer to the instance to convert. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00916">916</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00962">962</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -176,7 +176,7 @@ template&lt;typename &gt; </td></tr>
 <p>Returns true if a meta object is valid, false otherwise. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the meta object is valid, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00924">924</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00970">970</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -213,7 +213,7 @@ template&lt;typename &gt; </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the two meta objects refer to the same node, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00934">934</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00980">980</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -243,7 +243,7 @@ template&lt;typename &gt; </td></tr>
 <p>Returns the meta type to which a meta conversion function belongs. </p>
 <dl class="section return"><dt>Returns</dt><dd>The meta type to which the meta conversion function belongs. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01962">1962</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l02014">2014</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -273,7 +273,7 @@ template&lt;typename &gt; </td></tr>
 <p>Returns the meta type of a given meta conversion function. </p>
 <dl class="section return"><dt>Returns</dt><dd>The meta type of the meta conversion function. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01967">1967</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l02019">2019</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>

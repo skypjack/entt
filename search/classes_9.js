@@ -1,15 +1,6 @@
 var searchData=
 [
-  ['meta_5fany',['meta_any',['../classentt_1_1meta__any.html',1,'entt']]],
-  ['meta_5fbase',['meta_base',['../classentt_1_1meta__base.html',1,'entt']]],
-  ['meta_5fconv',['meta_conv',['../classentt_1_1meta__conv.html',1,'entt']]],
-  ['meta_5fctor',['meta_ctor',['../classentt_1_1meta__ctor.html',1,'entt']]],
-  ['meta_5fdata',['meta_data',['../classentt_1_1meta__data.html',1,'entt']]],
-  ['meta_5fdtor',['meta_dtor',['../classentt_1_1meta__dtor.html',1,'entt']]],
-  ['meta_5ffactory',['meta_factory',['../classentt_1_1meta__factory.html',1,'entt']]],
-  ['meta_5ffunc',['meta_func',['../classentt_1_1meta__func.html',1,'entt']]],
-  ['meta_5fhandle',['meta_handle',['../classentt_1_1meta__handle.html',1,'entt']]],
-  ['meta_5fprop',['meta_prop',['../classentt_1_1meta__prop.html',1,'entt']]],
-  ['meta_5ftype',['meta_type',['../classentt_1_1meta__type.html',1,'entt']]],
-  ['monostate',['monostate',['../structentt_1_1monostate.html',1,'entt']]]
+  ['named_5ftype_5ftraits',['named_type_traits',['../structentt_1_1named__type__traits.html',1,'entt']]],
+  ['named_5ftype_5ftraits_3c_20const_20type_20_3e',['named_type_traits&lt; const Type &gt;',['../structentt_1_1named__type__traits_3_01const_01Type_01_4.html',1,'entt']]],
+  ['named_5ftype_5ftraits_3c_20type_20_3e',['named_type_traits&lt; Type &gt;',['../structentt_1_1named__type__traits.html',1,'entt']]]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>EnTT: EnTT in Action</title>
+<title>EnTT: Push EnTT across boundaries</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.1.0</span>
    </div>
   </td>
  </tr>
@@ -60,55 +60,51 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">EnTT in Action </div>  </div>
+<div class="title">Push EnTT across boundaries </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><code>EnTT</code> is widely used in private and commercial applications. I cannot even mention most of them because of some signatures I put on some documents time ago. Fortunately, there are also people who took the time to implement open source projects based on <code>EnTT</code> and did not hold back when it came to documenting them.</p>
-<p>Below an incomplete list of games, applications and articles that can be used as a reference. Where I put the word <em>apparently</em> means that the use of <code>EnTT</code> is documented but the authors didn't make explicit announcements or contacted me directly.</p>
-<p>I hope this list can grow much more in the future:</p>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md58"></a>
+Introduction</h1>
+<p><code>EnTT</code> has historically had a limit when used across boundaries on Windows in general and on GNU/Linux when default visibility was set to <em>hidden</em>. The limitation is due mainly to a custom utility used to assign unique, sequential identifiers to different types. Unfortunately, this tool is used by several core classes (the <code>registry</code> among the others) that are thus almost unusable across boundaries.<br />
+ The reasons for that are beyond the purposes of this document. However, the good news is that <code>EnTT</code> also offers now a way to overcome this limit and to push things across boundaries without problems when needed.</p>
+<h1><a class="anchor" id="autotoc_md59"></a>
+Named types and traits class</h1>
+<p>To allow a type to work properly across boundaries when used by a class that requires to assign unique identifiers to types, users must specialize a class template to literally give a compile-time name to the type itself.<br />
+ The name of the class template is <code>name_type_traits</code> and the specialization must be such that it exposes a static constexpr data member named <code>value</code> having type either <code>ENTT_ID_TYPE</code> or <code><a class="el" href="classentt_1_1basic__hashed__string.html#a7ee7dca5383cf4507949dc1261ca5efd" title="Unsigned integer type. ">entt::hashed_string::hash_type</a></code>. Its value is the user defined unique identifier assigned to the specific type.<br />
+ Identifiers are not to be sequentially generated in this case.</p>
+<p>As an example:</p>
+<div class="fragment"><div class="line"><span class="keyword">struct </span>my_type { <span class="comment">/* ... */</span> };</div><div class="line"></div><div class="line"><span class="keyword">template</span>&lt;&gt;</div><div class="line"><span class="keyword">struct </span><a class="code" href="structentt_1_1named__type__traits.html">entt::named_type_traits</a>&lt;my_type&gt; {</div><div class="line">    <span class="keyword">static</span> constexpr <span class="keyword">auto</span> value = <span class="stringliteral">&quot;my_type&quot;</span>_hs;</div><div class="line">};</div></div><!-- fragment --><p>Because of the rules of the language, the specialization must reside in the global namespace or in the <code>entt</code> namespace. There is no way to change this rule unfortunately, because it doesn't depend on the library itself.</p>
+<p>The good aspect of this approach is that it's not intrusive at all. The other way around was in fact forcing users to inherit all their classes from a common base. Something to avoid, at least from my point of view.<br />
+ However, despite the fact that it's not intrusive, it would be great if it was also easier to use and a bit less error-prone. This is why a bunch of macros exist to ease defining named types.</p>
+<h2><a class="anchor" id="autotoc_md60"></a>
+Do not mix types</h2>
+<p>Someone might think that this trick is valid only for the types to push across boundaries. This isn't how things work. In fact, the problem is more complex than that.<br />
+ As a rule of thumb, users should never mix named and non-named types. Whenever a type is given a name, all the types must be given a name. As an example, consider the <code>registry</code> class template: in case it is pushed across boundaries, all the types of components should be assigned a name to avoid subtle bugs.</p>
+<p>Indeed, this constraint can be relaxed in many cases. However, it is difficult to define a general rule to follow that is not the most stringent, unless users know exactly what they are doing. Therefore, I won't elaborate on giving further details on the topic.</p>
+<h1><a class="anchor" id="autotoc_md61"></a>
+Macros, macros everywhere</h1>
+<p>The library comes with a set of predefined macros to use to declare named types or export already existing ones. In particular:</p>
 <ul>
-<li>Games:<ul>
-<li><a href="https://minecraft.net/en-us/attribution/">Minecraft</a> by <a href="https://mojang.com/">Mojang</a>: of course, <b>that</b> Minecraft, see the open source attributions page for more details.</li>
-<li><a href="https://play.google.com/store/apps/details?id=com.gamee.facesmash">Face Smash</a>: a game to play with your face.</li>
-<li><a href="https://github.com/Kerndog73/EnTT-Pacman">EnTT Pacman</a>: an example of how to make Pacman with <code>EnTT</code>.</li>
-<li><a href="https://github.com/kerndog73/Classic-Tower-Defence">Classic Tower Defence</a>: a tiny little tower defence game featuring a homemade font. <a href="https://indi-kernick.itch.io/classic-tower-defence">Check it out</a>.</li>
-<li><a href="https://github.com/Kerndog73/The-Machine">The Machine</a>: a box pushing puzzler with logic gates and other cool stuff. <a href="https://indi-kernick.itch.io/the-machine-web-version">Check it out</a>.</li>
-<li><a href="https://github.com/reworks/EnttPong">EnttPong</a>: an example of how to make Pong with <code>EnTT</code>.</li>
-<li><a href="https://github.com/gale93/randballs">Randballs</a>: simple <code>SFML</code> and <code>EnTT</code> playground.</li>
-<li><a href="https://github.com/Daivuk/tddod">EnTT Tower Defense</a>: a data oriented tower defense example.</li>
-<li><a href="https://github.com/vblanco20-1/entt-breakout">EnTT Breakout</a>: simple example of a breakout game, using <code>SDL</code> and <code>EnTT</code>.</li>
+<li><code>ENTT_NAMED_TYPE</code> can be used to assign a name to already existing types. This macro must be used in the global namespace even when the types to be named are not.</li>
 </ul>
-</li>
-<li>Engines/Frameworks:<ul>
-<li><a href="https://github.com/ConfettiFX/The-Forge">The Forge</a> by <a href="http://www.confettispecialfx.com/">Confett</a>: a cross-platform rendering framework.</li>
-<li><a href="https://teamwisp.github.io/credits/">Apparently</a> <a href="https://teamwisp.github.io/product/">Wisp</a> by <a href="https://teamwisp.github.io/">Team Wisp</a>: an advanced real-time ray tracing renderer built for the demands of video game artists.</li>
-<li><a href="https://github.com/DomRe/starlight">starlight</a>: game programming framework using <code>Allegro</code>, <code>Lua</code> and modern C++.</li>
-<li><a href="https://github.com/JosiahWI/qub3d-libdeps">Apparently</a> <a href="https://qub3d.org/">Qub3d</a>: because blocks should be open source.</li>
-<li><a href="https://github.com/Milerius/shiva">shiva</a>: modern C++ engine with modularity.</li>
+<div class="fragment"><div class="line">ENTT_NAMED_TYPE(my_type)</div><div class="line">ENTT_NAMED_TYPE(ns::another_type)</div></div><!-- fragment --><ul>
+<li><code>ENTT_NAMED_STRUCT</code> can be used to define and export a struct at the same time. It accepts also an optional namespace in which to define the given type. This macro must be used in the global namespace.</li>
 </ul>
-</li>
-<li>Emulators:<ul>
-<li><a href="https://github.com/novuscore/NovusCore">NovusCore</a>: A modern take on World of Warcraft emulation.</li>
+<div class="fragment"><div class="line">ENTT_NAMED_STRUCT(my_type, { <span class="comment">/* struct definition */</span>})</div><div class="line">ENTT_NAMED_STRUCT(ns, another_type, { <span class="comment">/* struct definition */</span>})</div></div><!-- fragment --><ul>
+<li><code>ENTT_NAMED_CLASS</code> can be used to define and export a class at the same time. It accepts also an optional namespace in which to define the given type. This macro must be used in the global namespace.</li>
 </ul>
-</li>
-<li>Articles and blog posts<ul>
-<li><a href="https://skypjack.github.io/tags/#entt">Some posts</a> on my personal <a href="https://skypjack.github.io/">blog</a> are about <code>EnTT</code>, for those who want to know <b>more</b> on this project.</li>
-<li><a href="http://victor.madtriangles.com/code%20experiment/2018/06/11/post-ecs-battle-huge.html">Space Battle: Huge edition</a>: huge space battle built entirely from scratch.</li>
-<li><a href="https://github.com/vblanco20-1/ECS_SpaceBattle">Space Battle</a>: huge space battle built on <code>UE4</code>.</li>
-<li><a href="http://victor.madtriangles.com/code%20experiment/2018/03/25/post-ue4-ecs-battle.html">Experimenting with ECS in UE4</a>: interesting article about <code>UE4</code> and <code>EnTT</code>.</li>
-<li><a href="https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1449913-implementing-ecs-architecture-in-ue4-giant-space-battle">Implementing ECS architecture in UE4</a>: giant space battle.</li>
-<li><a href="https://leinnan.github.io/blog/conan-adventuressfml-and-entt-in-c.html">Conan Adventures (SFML and EnTT in C++)</a>: create projects in modern C++ using <code>SFML</code>, <code>EnTT</code>, <code>Conan</code> and <code>CMake</code>.</li>
-</ul>
-</li>
-<li>Any Other Business:<ul>
-<li>The <a href="https://developers.arcgis.com/arcgis-runtime/">ArcGIS Runtime SDKs</a> by <a href="https://www.esri.com/">Esri</a>: they use <code>EnTT</code> for the internal ECS and the cross platform C++ rendering engine. The SDKs are utilized by a lot of enterprise custom apps, as well as by Esri for its own public applications such as <a href="https://play.google.com/store/apps/details?id=com.esri.explorer">Explorer</a>, <a href="https://play.google.com/store/apps/details?id=com.esri.arcgis.collector">Collector</a> and <a href="https://play.google.com/store/apps/details?id=com.esri.navigator">Navigator</a>.</li>
-<li><a href="https://www.linkedin.com/in/skypjack/">Apparently</a> <a href="https://www.nio.io/">NIO</a>: there was a collaboration to make some changes to <code>EnTT</code>, at the time used for internal projects.</li>
-<li><a href="https://github.com/mhaemmerle/MatchOneEntt">MatchOneEntt</a>: port of <a href="https://github.com/sschmid/Match-One">Match One</a> for <code>Entitas-CSharp</code>.</li>
-<li>GitHub contains also <a href="https://github.com/search?o=desc&amp;q=%22skypjack%2Fentt%22&amp;s=indexed&amp;type=Code">many other examples</a> of use of <code>EnTT</code> from which to take inspiration if interested.</li>
-</ul>
-</li>
-</ul>
-<p>If you know of other resources out there that are about <code>EnTT</code>, feel free to open an issue or a PR and I'll be glad to add them to this page. </p>
+<div class="fragment"><div class="line">ENTT_NAMED_CLASS(my_type, { <span class="comment">/* class definition */</span>})</div><div class="line">ENTT_NAMED_CLASS(ns, another_type, { <span class="comment">/* class definition */</span>})</div></div><!-- fragment --><p>Nested namespaces are supported out of the box as well in all cases. As an example:</p>
+<div class="fragment"><div class="line">ENTT_NAMED_STRUCT(nested::ns, my_type, { <span class="comment">/* struct definition */</span>})</div></div><!-- fragment --><p>These macros can be used to avoid specializing the <code>named_type_traits</code> class template. In all cases, the name of the class is used also as a seed to generate the compile-time unique identifier.</p>
+<h2><a class="anchor" id="autotoc_md62"></a>
+Conflicts</h2>
+<p>When using macros, unique identifiers are 32/64 bit integers generated by hashing strings during compilation. Therefore, conflicts are rare but still possible. In case of conflicts, everything simply will get broken at runtime and the strangest things will probably take place.<br />
+ Unfortunately, there is no safe way to prevent it. If this happens, it will be enough to give a different value to one of the conflicting types to solve the problem. To do this, users can either assign a different name to the class or directly define a specialization for the <code>named_type_traits</code> class template.</p>
+<h1><a class="anchor" id="autotoc_md63"></a>
+Allocations: the dark side of the force</h1>
+<p>As long as <code>EnTT</code> won't support custom allocators, another problem with allocations will remain alive instead. This is in fact easily solved, or at least it is if one knows it.</p>
+<p>To allow users to add types dynamically, the library makes extensive use of type erasure techniques and dynamic allocations for pools (whether they are for components, events or anything else). The problem occurs when, for example, a registry is created on one side of a boundary and a pool is dynamically created on the other side. In the best case, everything will crash at the exit, while at worst it will do so at runtime.<br />
+ To avoid problems, the pools must be generated from the same side of the boundary where the object that owns them is also created. As an example, when the registry is created in the main executable and used across boundaries for a given type of component, the pool for that type must be created before passing around the registry itself. To do this is fortunately quite easy, since it is sufficient to invoke any of the methods that involve the given type (continuing the example with the registry, a call to <code>reserve</code> or <code>size</code> is more than enough).</p>
+<p>Maybe one day some dedicated methods will be added that do nothing but create a pool for a given type. Until now it has been preferred to keep the API cleaner as they are not strictly necessary. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

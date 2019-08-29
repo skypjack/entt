@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.1.0</span>
    </div>
   </td>
  </tr>
@@ -135,6 +135,7 @@ class entt::basic_runtime_view&lt; Entity &gt;</h3>
 <ul>
 <li>New instances of the given components are created and assigned to entities.</li>
 <li>The entity currently pointed is modified (as an example, if one of the given components is removed from the entity to which the iterator points).</li>
+<li>The entity currently pointed is destroyed.</li>
 </ul>
 <p>In all the other cases, modifying the pools of the given components in any way invalidates all the iterators and using them results in undefined behavior.</p>
 <dl class="section note"><dt>Note</dt><dd>Views share references to the underlying data structures of the registry that generated them. Therefore any change to the entities and to the components made by means of the registry are immediately reflected by the views, unless a pool was missing when the view was built (in this case, the view won't have a valid reference and won't be updated accordingly).</dd></dl>
@@ -146,7 +147,7 @@ class entt::basic_runtime_view&lt; Entity &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="entity_2fwd_8hpp_source.html#l00021">21</a> of file <a class="el" href="entity_2fwd_8hpp_source.html">fwd.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="entity_2fwd_8hpp_source.html#l00022">22</a> of file <a class="el" href="entity_2fwd_8hpp_source.html">fwd.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="af47b1aff2d44990f17c9740cf24a2670"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af47b1aff2d44990f17c9740cf24a2670">&#9670;&nbsp;</a></span>begin()</h2>
@@ -178,7 +179,7 @@ template&lt;typename Entity &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00198">198</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00180">180</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
 
 </div>
 </div>
@@ -217,7 +218,7 @@ template&lt;typename Entity &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the view contains the given entity, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00241">241</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00223">223</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
 
 </div>
 </div>
@@ -265,7 +266,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00263">263</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00245">245</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
 
 </div>
 </div>
@@ -297,7 +298,7 @@ template&lt;typename Entity &gt; </div>
 <p>Checks if the view is definitely empty. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the view is definitely empty, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00180">180</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00162">162</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
 
 </div>
 </div>
@@ -331,7 +332,7 @@ template&lt;typename Entity &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the entity following the last entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00225">225</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00207">207</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
 
 </div>
 </div>
@@ -363,7 +364,7 @@ template&lt;typename Entity &gt; </div>
 <p>Estimates the number of entities that have the given components. </p>
 <dl class="section return"><dt>Returns</dt><dd>Estimated number of entities that have the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00172">172</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime__view_8hpp_source.html#l00154">154</a> of file <a class="el" href="runtime__view_8hpp_source.html">runtime_view.hpp</a>.</p>
 
 </div>
 </div>

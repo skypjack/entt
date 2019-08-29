@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.0.0</span>
+   &#160;<span id="projectnumber">3.1.0</span>
    </div>
   </td>
  </tr>
@@ -63,8 +63,8 @@ $(function() {
 
 <h3><a id="index_r"></a>- r -</h3><ul>
 <li>raw()
-: <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#a5563e4a99012122c42831db0587466b8">entt::basic_group&lt; Entity, get_t&lt; Get... &gt; &gt;</a>
-, <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01get__t_3_01Get_8_8_8_01_4_00_01Owned_8_8_8_01_4.html#a64c80eda73138d8510bc519b21209501">entt::basic_group&lt; Entity, get_t&lt; Get... &gt;, Owned... &gt;</a>
+: <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_00_01Other_8_8_8_01_4_01_4.html#a40e5fcc3317f3a30dcb9ddff33580af0">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get, Other... &gt; &gt;</a>
+, <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_54ca6466fcd0506388705164ba2d896f.html#a48caa1f53c1e8065f66d1200c89ea26c">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get... &gt;, Owned, Other... &gt;</a>
 , <a class="el" href="classentt_1_1basic__registry.html#a79751d793fe0f28e8f0e163e46638cb9">entt::basic_registry&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1basic__storage.html#a8e38d136d24bb38ef96c02135549c5d8">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
 , <a class="el" href="classentt_1_1basic__view.html#acb3b8c843b1ded37a8bac4e9d434d048">entt::basic_view&lt; Entity, Component &gt;</a>
@@ -74,6 +74,9 @@ $(function() {
 </li>
 <li>rejected()
 : <a class="el" href="classentt_1_1process.html#a6ac63863bf823806d813b046769b4419">entt::process&lt; Derived, Delta &gt;</a>
+</li>
+<li>release()
+: <a class="el" href="classentt_1_1connection.html#ae564477ab623301169916c1992c970a8">entt::connection</a>
 </li>
 <li>reload()
 : <a class="el" href="classentt_1_1resource__cache.html#aae5a27a1ecf361409846a5d64cc58088">entt::resource_cache&lt; Resource &gt;</a>
@@ -86,29 +89,30 @@ $(function() {
 : <a class="el" href="classentt_1_1meta__type.html#a89df1ddbee0b5aef2651f1fc712ada20">entt::meta_type</a>
 </li>
 <li>replace()
-: <a class="el" href="classentt_1_1basic__registry.html#a0411735fcddcc942613463c5401dd661">entt::basic_registry&lt; Entity &gt;</a>
+: <a class="el" href="structentt_1_1basic__collector_3_01matcher_3_01matcher_3_01type__list_3_01Reject_8_8_8_01_4_00_0f5f4fb3c1586eeb5723872d0d0e4f427.html#a3b18e99ac39865201bd9e8d818d8c8d8">entt::basic_collector&lt; matcher&lt; matcher&lt; type_list&lt; Reject... &gt;, type_list&lt; Require... &gt; &gt;, Rule... &gt;, Other... &gt;</a>
+, <a class="el" href="structentt_1_1basic__collector_3_4.html#a634ac3a53ee686d7fb7121404b14c17e">entt::basic_collector&lt;&gt;</a>
+, <a class="el" href="classentt_1_1basic__registry.html#a0411735fcddcc942613463c5401dd661">entt::basic_registry&lt; Entity &gt;</a>
 </li>
 <li>reserve()
 : <a class="el" href="classentt_1_1basic__registry.html#a632adf32f7b23f1dae8bf4f8800a0bbe">entt::basic_registry&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1basic__storage.html#a54d09089dd33cf9c0e5ac10a1be3fb29">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
-, <a class="el" href="classentt_1_1sparse__set.html#aabfddf33cb086063a471ee06d1778690">entt::sparse_set&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage.html#a8f2a2a968a241832acc338b8dca2f744">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
+, <a class="el" href="classentt_1_1sparse__set.html#a8b4b9dd989877bc333fdc455fcd068d7">entt::sparse_set&lt; Entity &gt;</a>
 </li>
 <li>reset()
-: <a class="el" href="classentt_1_1basic__registry.html#a95dd0483f9839dfbce8af5ed120b94c2">entt::basic_registry&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1basic__storage.html#af899b0dbc254608941bcac7b08a6a7ce">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
+: <a class="el" href="classentt_1_1basic__registry.html#a38a7c3696f749d0e873374086c3c0f88">entt::basic_registry&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage.html#a1ed587372f7bcf15ab0d17397c2dad81">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
 , <a class="el" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0d81bb1bde6abd78914cd0a07084bcd7">entt::delegate&lt; Ret(Args...)&gt;</a>
 , <a class="el" href="structentt_1_1service__locator.html#a4d655acab54d87058ad41a266830d0e8">entt::service_locator&lt; Service &gt;</a>
-, <a class="el" href="classentt_1_1sparse__set.html#a46d1553f6837b467f1ddf8ae3dece3d2">entt::sparse_set&lt; Entity &gt;</a>
+, <a class="el" href="classentt_1_1sparse__set.html#abcf1b927ccc18fba0fef178d168c1fa7">entt::sparse_set&lt; Entity &gt;</a>
 </li>
 <li>resource_cache()
-: <a class="el" href="classentt_1_1resource__cache.html#a919d10578aeda6ad9dd04e1b969b8a9c">entt::resource_cache&lt; Resource &gt;</a>
+: <a class="el" href="classentt_1_1resource__cache.html#ac785934919090b5755a87ab34804b163">entt::resource_cache&lt; Resource &gt;</a>
 </li>
 <li>resource_handle()
 : <a class="el" href="classentt_1_1resource__handle.html#ac0346238aa57dbf5df3ce775ceba856f">entt::resource_handle&lt; Resource &gt;</a>
 </li>
 <li>respect()
-: <a class="el" href="classentt_1_1basic__storage.html#aac84c253cdf3bf0357d6d729a7430635">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
-, <a class="el" href="classentt_1_1sparse__set.html#a600c39f7f77c58a71eb75eef32916e9d">entt::sparse_set&lt; Entity &gt;</a>
+: <a class="el" href="classentt_1_1sparse__set.html#ab0481dde89f07e9ca50d79777de898b6">entt::sparse_set&lt; Entity &gt;</a>
 </li>
 <li>ret()
 : <a class="el" href="classentt_1_1meta__func.html#a6a1bfe7f9b2e8c833dbfb5dff75bf1e9">entt::meta_func</a>
