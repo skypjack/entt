@@ -200,7 +200,7 @@ class basic_registry {
     struct group_data {
         const std::size_t extent[3];
         std::unique_ptr<void, void(*)(void *)> group;
-        bool(* const is_same)(const component *);
+        bool(* const is_same)(const component *) ENTT_NOEXCEPT;
     };
 
     struct ctx_variable {
@@ -1361,7 +1361,7 @@ public:
             groups.push_back(group_data{
                 { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) },
                 decltype(group_data::group){new handler_type{}, [](void *gptr) { delete static_cast<handler_type *>(gptr); }},
-                [](const component *other) {
+                [](const component *other) ENTT_NOEXCEPT {
                     const component ctypes[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
                     return std::equal(std::begin(ctypes), std::end(ctypes), other);
                 }
