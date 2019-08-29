@@ -200,7 +200,9 @@ class basic_registry {
     struct group_data {
         const std::size_t extent[3];
         std::unique_ptr<void, void(*)(void *)> group;
-        bool(* const is_same)(const component *) ENTT_NOEXCEPT;
+        bool(* const owned)(const component) ENTT_NOEXCEPT;
+        bool(* const get)(const component) ENTT_NOEXCEPT;
+        bool(* const exclude)(const component) ENTT_NOEXCEPT;
     };
 
     struct ctx_variable {
@@ -1363,13 +1365,14 @@ public:
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1);
 
         using handler_type = group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...>;
-
-        const std::size_t extent[] = { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) };
-        const component types[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
+        const std::size_t extent[3]{sizeof...(Owned), sizeof...(Get), sizeof...(Exclude)};
         handler_type *curr = nullptr;
 
-        if(auto it = std::find_if(groups.begin(), groups.end(), [&extent, &types](auto &&gdata) {
-            return std::equal(std::begin(extent), std::end(extent), gdata.extent) && gdata.is_same(types);
+        if(auto it = std::find_if(groups.cbegin(), groups.cend(), [&extent](const auto &gdata) {
+            return std::equal(std::begin(extent), std::end(extent), std::begin(gdata.extent))
+                    && (gdata.owned(type<Owned>()) && ...)
+                    && (gdata.get(type<Get>()) && ...)
+                    && (gdata.exclude(type<Exclude>()) && ...);
         }); it != groups.cend())
         {
             curr = static_cast<handler_type *>(it->group.get());
@@ -1379,10 +1382,9 @@ public:
             groups.push_back(group_data{
                 { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) },
                 decltype(group_data::group){new handler_type{}, [](void *gptr) { delete static_cast<handler_type *>(gptr); }},
-                [](const component *other) ENTT_NOEXCEPT {
-                    const component ctypes[] = { type<Owned>()..., type<Get>()..., type<Exclude>()... };
-                    return std::equal(std::begin(ctypes), std::end(ctypes), other);
-                }
+                [](const component ctype) ENTT_NOEXCEPT { return ((ctype == type<Owned>()) || ...); },
+                [](const component ctype) ENTT_NOEXCEPT { return ((ctype == type<Get>()) || ...); },
+                [](const component ctype) ENTT_NOEXCEPT { return ((ctype == type<Exclude>()) || ...); }
             });
 
             curr = static_cast<handler_type *>(groups.back().group.get());
