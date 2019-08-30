@@ -615,6 +615,14 @@ public:
      *
      * @sa create
      *
+     * The components must be copyable for obvious reasons. The source entity
+     * must be a valid one.<br/>
+     * If no components are provided, the registry will try to copy all the
+     * existing types. The non-copyable ones will be ignored.
+     *
+     * @note
+     * Specifying the list of components is ways faster than an opaque copy.
+     *
      * @tparam Component Types of components to copy.
      * @tparam Exclude Types of components not to be copied.
      * @param src A valid entity identifier to be copied.
@@ -632,6 +640,15 @@ public:
      * @brief Assigns each element in a range an entity from a prototype entity.
      *
      * @sa create
+     *
+     * The components must be copyable for obvious reasons. The entities must be
+     * all valid.<br/>
+     * If no components are provided, the registry will try to copy all the
+     * existing types. The non-copyable ones will be ignored.
+     *
+     * @note
+     * Specifying the list of components is ways faster than an opaque copy and
+     * uses the batch creation under the hood.
      *
      * @tparam Component Types of components to copy.
      * @tparam Exclude Types of components not to be copied.
