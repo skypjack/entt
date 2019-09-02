@@ -840,9 +840,7 @@ public:
 
         for(auto next = *length; next; --next) {
             ([next = next-1, curr = cpool->data()[next-1]](auto *cpool) {
-                const auto pos = cpool->index(curr);
-
-                if(pos != next) {
+                if(const auto pos = cpool->index(curr); pos != next) {
                     cpool->swap(next, pos);
                 }
             }(std::get<pool_type<Other> *>(pools)), ...);
