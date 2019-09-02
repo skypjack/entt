@@ -843,7 +843,7 @@ public:
                 const auto pos = cpool->index(curr);
 
                 if(pos != next) {
-                    cpool->swap(next, cpool->index(curr));
+                    cpool->swap(next, pos);
                 }
             }(std::get<pool_type<Other> *>(pools)), ...);
         }
