@@ -320,9 +320,10 @@ class meta_factory {
         }
     }
 
+public:
+    /*! @brief Default constructor. */
     meta_factory() ENTT_NOEXCEPT = default;
 
-public:
     /**
      * @brief Extends a meta type by assigning it an identifier and properties.
      * @tparam Property Types of properties to assign to the meta type.
