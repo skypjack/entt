@@ -160,7 +160,7 @@ class connection {
     {}
 
 public:
-    /*! Default constructor. */
+    /*! @brief Default constructor. */
     connection() = default;
 
     /*! @brief Default copy constructor. */
@@ -227,7 +227,7 @@ private:
  * when it goes out of scope.
  */
 struct scoped_connection: private connection {
-    /*! Default constructor. */
+    /*! @brief Default constructor. */
     scoped_connection() = default;
 
     /**
