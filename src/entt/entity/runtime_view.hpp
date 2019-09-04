@@ -141,9 +141,9 @@ class basic_runtime_view {
 
 public:
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename sparse_set<Entity>::entity_type;
+    using entity_type = Entity;
     /*! @brief Unsigned integer type. */
-    using size_type = typename sparse_set<Entity>::size_type;
+    using size_type = std::size_t;
     /*! @brief Input iterator type. */
     using iterator_type = iterator;
 

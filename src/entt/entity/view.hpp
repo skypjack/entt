@@ -191,9 +191,9 @@ class basic_view {
 
 public:
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename sparse_set<Entity>::entity_type;
+    using entity_type = Entity;
     /*! @brief Unsigned integer type. */
-    using size_type = typename sparse_set<Entity>::size_type;
+    using size_type = std::size_t;
     /*! @brief Input iterator type. */
     using iterator_type = iterator;
 
@@ -539,9 +539,9 @@ public:
     /*! @brief Type of component iterated by the view. */
     using raw_type = Component;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename pool_type::entity_type;
+    using entity_type = Entity;
     /*! @brief Unsigned integer type. */
-    using size_type = typename pool_type::size_type;
+    using size_type = std::size_t;
     /*! @brief Input iterator type. */
     using iterator_type = typename sparse_set<Entity>::iterator_type;
 
