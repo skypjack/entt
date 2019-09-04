@@ -204,11 +204,13 @@ Moreover, it can be used as an opaque container for unmanaged objects if needed:
 
 ```cpp
 int value;
-entt::meta_any any{entt::as_alias, value};
+entt::meta_any any{std::ref(value)};
 ```
 
-In this case, the contained instance is never destroyed and users must ensure
-that the lifetime of the object exceeds that of the container.
+In other words, whenever `meta_any` intercepts a `reference_wrapper`, it acts as
+a reference to the original instance rather than making a copy of it. The
+contained object is never destroyed and users must ensure that its lifetime
+exceeds that of the container.
 
 A meta any object has a `type` member function that returns the meta type of the
 contained value, if any. The member functions `try_cast`, `cast` and `convert`

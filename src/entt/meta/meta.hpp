@@ -9,7 +9,6 @@
 #include <utility>
 #include <type_traits>
 #include "../config/config.h"
-#include "policy.hpp"
 
 
 namespace entt {
@@ -416,11 +415,11 @@ public:
      * @param type An instance of an object to use to initialize the container.
      */
     template<typename Type>
-    explicit meta_any(as_alias_t, Type &type)
+    explicit meta_any(std::reference_wrapper<Type> type)
         : meta_any{}
     {
         node = internal::meta_info<Type>::resolve();
-        instance = &type;
+        instance = &type.get();
 
         compare_fn = [](const void *lhs, const void *rhs) {
             return compare(0, *static_cast<const Type *>(lhs), *static_cast<const Type *>(rhs));
@@ -638,7 +637,7 @@ public:
      * otherwise.
      */
     bool operator==(const meta_any &other) const ENTT_NOEXCEPT {
-        return node == other.node && ((!compare_fn && !other.compare_fn) || compare_fn(instance, other.instance));
+        return node == other.node && (!compare_fn || compare_fn(instance, other.instance));
     }
 
     /**
