@@ -135,9 +135,13 @@ TEST(SparseSet, BatchAdd) {
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(set.size(), 4u);
     ASSERT_EQ(set.index(entt::entity{12}), 0u);
-    ASSERT_EQ(set.index(entities[0]), 2u);
-    ASSERT_EQ(set.index(entities[1]), 1u);
+    ASSERT_EQ(set.index(entities[0]), 1u);
+    ASSERT_EQ(set.index(entities[1]), 2u);
     ASSERT_EQ(set.index(entt::entity{24}), 3u);
+    ASSERT_EQ(set.data()[set.index(entt::entity{12})], entt::entity{12});
+    ASSERT_EQ(set.data()[set.index(entities[0])], entities[0]);
+    ASSERT_EQ(set.data()[set.index(entities[1])], entities[1]);
+    ASSERT_EQ(set.data()[set.index(entt::entity{24})], entt::entity{24});
 }
 
 TEST(SparseSet, Iterator) {

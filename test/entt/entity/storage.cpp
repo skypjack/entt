@@ -113,8 +113,8 @@ TEST(Storage, BatchAdd) {
     it[0] = 1;
     it[1] = 2;
 
-    ASSERT_EQ(pool.get(entities[0]), 1);
-    ASSERT_EQ(pool.get(entities[1]), 2);
+    ASSERT_EQ(pool.get(entities[0]), 2);
+    ASSERT_EQ(pool.get(entities[1]), 1);
 }
 
 TEST(Storage, BatchAddByCopy) {
@@ -136,8 +136,8 @@ TEST(Storage, BatchAddByCopy) {
     it[0] = 1;
     it[1] = 2;
 
-    ASSERT_EQ(pool.get(entities[0]), 1);
-    ASSERT_EQ(pool.get(entities[1]), 2);
+    ASSERT_EQ(pool.get(entities[0]), 2);
+    ASSERT_EQ(pool.get(entities[1]), 1);
 }
 
 TEST(Storage, BatchAddEmptyType) {

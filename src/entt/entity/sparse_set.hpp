@@ -419,7 +419,7 @@ public:
      */
     template<typename It>
     void batch(It first, It last) {
-        std::for_each(std::make_reverse_iterator(last), std::make_reverse_iterator(first), [this, next = direct.size()](const auto entt) mutable {
+        std::for_each(first, last, [this, next = direct.size()](const auto entt) mutable {
             ENTT_ASSERT(!has(entt));
             auto [page, offset] = map(entt);
             assure(page);

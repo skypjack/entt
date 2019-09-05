@@ -606,7 +606,8 @@ public:
         });
 
         if constexpr(sizeof...(Component) > 0) {
-            return std::make_tuple(assure<Component>()->batch(*this, first, last)...);
+            // the reverse iterators guarantee the ordering between entities and components (hint: the pools return begin())
+            return std::make_tuple(assure<Component>()->batch(*this, std::make_reverse_iterator(last), std::make_reverse_iterator(first))...);
         }
     }
 
