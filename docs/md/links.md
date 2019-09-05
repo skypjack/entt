@@ -17,6 +17,8 @@ I hope this list can grow much more in the future:
   * [Minecraft](https://minecraft.net/en-us/attribution/) by
     [Mojang](https://mojang.com/): of course, **that** Minecraft, see the
     open source attributions page for more details.
+  * [Openblack](https://github.com/openblack/openblack): open source
+    reimplementation of the game Black & White (2001).
   * [Face Smash](https://play.google.com/store/apps/details?id=com.gamee.facesmash):
     a game to play with your face.
   * [EnTT Pacman](https://github.com/Kerndog73/EnTT-Pacman): an example of how
