@@ -86,7 +86,7 @@ TEST(SigH, Functions) {
     sigh.publish(v);
 
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ(static_cast<entt::sigh<void(int &)>::size_type>(1), sigh.size());
+    ASSERT_EQ(1u, sigh.size());
     ASSERT_EQ(42, v);
 
     v = 0;
@@ -94,7 +94,34 @@ TEST(SigH, Functions) {
     sigh.publish(v);
 
     ASSERT_TRUE(sigh.empty());
-    ASSERT_EQ(static_cast<entt::sigh<void(int &)>::size_type>(0), sigh.size());
+    ASSERT_EQ(0u, sigh.size());
+    ASSERT_EQ(v, 0);
+}
+
+TEST(SigH, FunctionsWithPayload) {
+    entt::sigh<void()> sigh;
+    entt::sink sink{sigh};
+    int v = 0;
+
+    sink.connect<&sigh_listener::f>(v);
+    sigh.publish();
+
+    ASSERT_FALSE(sigh.empty());
+    ASSERT_EQ(1u, sigh.size());
+    ASSERT_EQ(42, v);
+
+    v = 0;
+    sink.disconnect<&sigh_listener::f>(v);
+    sigh.publish();
+
+    ASSERT_TRUE(sigh.empty());
+    ASSERT_EQ(0u, sigh.size());
+    ASSERT_EQ(v, 0);
+
+    sink.connect<&sigh_listener::f>(v);
+    sink.disconnect(v);
+    sigh.publish();
+
     ASSERT_EQ(v, 0);
 }
 
@@ -108,25 +135,25 @@ TEST(SigH, Members) {
 
     ASSERT_TRUE(l1.k);
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(1), sigh.size());
+    ASSERT_EQ(1u, sigh.size());
 
     sink.disconnect<&sigh_listener::g>(l1);
     sigh.publish(42);
 
     ASSERT_TRUE(l1.k);
     ASSERT_TRUE(sigh.empty());
-    ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(0), sigh.size());
+    ASSERT_EQ(0u, sigh.size());
 
     sink.connect<&sigh_listener::g>(l1);
     sink.connect<&sigh_listener::h>(l2);
 
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(2), sigh.size());
+    ASSERT_EQ(2u, sigh.size());
 
     sink.disconnect(l1);
 
     ASSERT_FALSE(sigh.empty());
-    ASSERT_EQ(static_cast<entt::sigh<bool(int)>::size_type>(1), sigh.size());
+    ASSERT_EQ(1u, sigh.size());
 }
 
 TEST(SigH, Collector) {

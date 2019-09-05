@@ -409,10 +409,19 @@ public:
      * @param value_or_instance A valid reference that fits the purpose.
      */
     template<typename Type>
-    void disconnect(const Type &value_or_instance) {
+    void disconnect(Type &value_or_instance) {
+        disconnect(&value_or_instance);
+    }
+
+    /**
+     * @brief Disconnects member functions or free functions based on an opaque
+     * instance or payload.
+     * @param value_or_instance An opaque pointer that fits the purpose.
+     */
+    void disconnect(const void *value_or_instance) {
         auto &calls = signal->calls;
-        calls.erase(std::remove_if(calls.begin(), calls.end(), [&value_or_instance](const auto &delegate) {
-            return delegate.instance() == &value_or_instance;
+        calls.erase(std::remove_if(calls.begin(), calls.end(), [value_or_instance](const auto &delegate) {
+            return delegate.instance() == value_or_instance;
         }), calls.end());
     }
 
