@@ -333,9 +333,10 @@ public:
 
     /**
      * @brief Assigns one or more entities to a storage and default constructs
-     * their objects.
+     * or copy constructs their objects.
      *
-     * The object type must be at least move and default insertable.
+     * The object type must be at least move and default insertable if no
+     * arguments are provided, move and copy insertable otherwise.
      *
      * @warning
      * Attempting to assign an entity that already belongs to the storage
@@ -344,37 +345,21 @@ public:
      * storage already contains the given entity.
      *
      * @tparam It Type of forward iterator.
+     * @tparam Args Types of arguments to use to construct the object.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @param args Parameters to use to construct an object for the entities.
      * @return An iterator to the list of instances just created and sorted the
      * same of the entities.
      */
-    template<typename It>
-    iterator_type batch(It first, It last) {
-        instances.resize(instances.size() + std::distance(first, last));
-        // entity goes after component in case constructor throws
-        underlying_type::batch(first, last);
-        return begin();
-    }
+    template<typename It, typename... Args>
+    iterator_type batch(It first, It last, Args &&... args) {
+        if constexpr(sizeof...(Args) == 0) {
+            instances.resize(instances.size() + std::distance(first, last));
+        } else {
+            instances.resize(instances.size() + std::distance(first, last), Type{std::forward<Args>(args)...});
+        }
 
-    /**
-     * @brief Assigns one or more entities to a storage and copy constructs
-     * their objects.
-     *
-     * The object type must be at least move and copy insertable.
-     *
-     * @sa batch
-     *
-     * @tparam It Type of forward iterator.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     * @param value The value to initialize the new objects with.
-     * @return An iterator to the list of instances just created and sorted the
-     * same of the entities.
-     */
-    template<typename It>
-    iterator_type batch(It first, It last, const object_type &value) {
-        instances.resize(instances.size() + std::distance(first, last), value);
         // entity goes after component in case constructor throws
         underlying_type::batch(first, last);
         return begin();

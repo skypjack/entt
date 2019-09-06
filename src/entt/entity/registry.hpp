@@ -81,9 +81,9 @@ class basic_registry {
             }
         }
 
-        template<typename It, typename... Comp>
-        auto batch(basic_registry &registry, It first, It last, const Comp &... value) {
-            auto it = storage<Entity, Component>::batch(first, last, value...);
+        template<typename It, typename... Args>
+        auto batch(basic_registry &registry, It first, It last, Args &&... args) {
+            auto it = storage<Entity, Component>::batch(first, last, std::forward<Args>(args)...);
 
             if(!construction.empty()) {
                 std::for_each(first, last, [this, &registry, it](const auto entt) mutable {
