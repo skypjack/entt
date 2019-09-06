@@ -26,8 +26,8 @@ TODO
   - we should always resolve by looking into the list of types when working across boundaries, no direct resolve
 * nested groups: AB/ABC/ABCD/... (hints: sort, check functions)
 * snapshot rework/deprecation
-  * create(hint: entity) -> force-create
-  * assign<T...>(first, last)
+  - create(hint: entity) -> force-create
+  - assign<T...>(first, last)
 * use unordered_map for named pools and context variables:
-  * use direct access (pool-like) also for context variables
-  * improves multi-stomp
+  - use direct access (pool-like) also for context variables
+  - improves multi-stomp

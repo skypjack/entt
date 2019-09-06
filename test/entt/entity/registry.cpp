@@ -1548,12 +1548,31 @@ TEST(Registry, StompMulti) {
 
     entt::entity entities[2];
     registry.create(std::begin(entities), std::end(entities));
-    registry.stomp(std::begin(entities), std::end(entities), prototype, registry);
+    registry.stomp<int, char, double>(std::begin(entities), std::end(entities), prototype, registry);
 
     ASSERT_TRUE((registry.has<int, char>(entities[0])));
     ASSERT_TRUE((registry.has<int, char>(entities[1])));
     ASSERT_EQ(registry.get<int>(entities[0]), 3);
     ASSERT_EQ(registry.get<char>(entities[1]), 'c');
+}
+
+TEST(Registry, StompExcludeMulti) {
+    entt::registry registry;
+
+    const auto prototype = registry.create();
+    registry.assign<int>(prototype, 3);
+    registry.assign<char>(prototype, 'c');
+
+    entt::entity entities[2];
+    registry.create(std::begin(entities), std::end(entities));
+    registry.stomp(std::begin(entities), std::end(entities), prototype, registry, entt::exclude<char>);
+
+    ASSERT_TRUE((registry.has<int>(entities[0])));
+    ASSERT_TRUE((registry.has<int>(entities[1])));
+    ASSERT_FALSE((registry.has<char>(entities[0])));
+    ASSERT_FALSE((registry.has<char>(entities[1])));
+    ASSERT_EQ(registry.get<int>(entities[0]), 3);
+    ASSERT_EQ(registry.get<int>(entities[1]), 3);
 }
 
 TEST(Registry, StompMoveOnlyComponent) {

@@ -218,6 +218,24 @@ class basic_registry {
         }
     }
 
+    auto generate() {
+        Entity entt;
+
+        if(destroyed == null) {
+            entt = entities.emplace_back(entity_type(entities.size()));
+            // traits_type::entity_mask is reserved to allow for null identifiers
+            ENTT_ASSERT(to_integer(entt) < traits_type::entity_mask);
+        } else {
+            const auto curr = to_integer(destroyed);
+            const auto version = to_integer(entities[curr]) & (traits_type::version_mask << traits_type::entity_shift);
+            destroyed = entity_type{to_integer(entities[curr]) & traits_type::entity_mask};
+            entt = entity_type{curr | version};
+            entities[curr] = entt;
+        }
+
+        return entt;
+    }
+
     void release(const Entity entity) {
         // lengthens the implicit list of destroyed entities
         const auto entt = to_integer(entity) & traits_type::entity_mask;
@@ -557,14 +575,11 @@ public:
      */
     template<typename... Component>
     auto create() {
-        entity_type entities[1]{};
-
         if constexpr(sizeof...(Component) == 0) {
-            create<Component...>(std::begin(entities), std::end(entities));
-            return entities[0];
+            return generate();
         } else {
-            auto it = create<Component...>(std::begin(entities), std::end(entities));
-            return std::tuple<entity_type, decltype(assign<Component>(entities[0]))...>{entities[0], *std::get<typename pool_type<Component>::iterator_type>(it)...};
+            const entity_type entt = generate();
+            return std::tuple<entity_type, decltype(assign<Component>({}))...>{entt, assign<Component>(entt)...};
         }
     }
 
@@ -586,25 +601,7 @@ public:
      */
     template<typename... Component, typename It>
     auto create(It first, It last) {
-        static_assert(std::is_convertible_v<entity_type, typename std::iterator_traits<It>::value_type>);
-
-        std::generate(first, last, [this]() {
-            entity_type curr;
-
-            if(destroyed == null) {
-                curr = entities.emplace_back(entity_type(entities.size()));
-                // traits_type::entity_mask is reserved to allow for null identifiers
-                ENTT_ASSERT(to_integer(curr) < traits_type::entity_mask);
-            } else {
-                const auto entt = to_integer(destroyed);
-                const auto version = to_integer(entities[entt]) & (traits_type::version_mask << traits_type::entity_shift);
-                destroyed = entity_type{to_integer(entities[entt]) & traits_type::entity_mask};
-                curr = entity_type{entt | version};
-                entities[entt] = curr;
-            }
-
-            return curr;
-        });
+        std::generate(first, last, [this]() { return generate(); });
 
         if constexpr(sizeof...(Component) > 0) {
             // the reverse iterators guarantee the ordering between entities and components (hint: the pools return begin())
@@ -632,10 +629,10 @@ public:
      * @return A valid entity identifier.
      */
     template<typename... Component, typename... Exclude>
-    auto create(entity_type src, basic_registry &other, exclude_t<Exclude...> = {}) {
-        entity_type entities[1]{};
-        create<Component...>(std::begin(entities), std::end(entities), src, other, exclude<Exclude...>);
-        return entities[0];
+    entity_type create(entity_type src, basic_registry &other, exclude_t<Exclude...> = {}) {
+        const auto entt = create();
+        stomp<Component...>(entt, src, other, exclude<Exclude...>);
+        return entt;
     }
 
     /**
@@ -666,8 +663,8 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             stomp<Component...>(first, last, src, other, exclude<Exclude...>);
         } else {
-            static_assert(sizeof...(Component) == 0 || sizeof...(Exclude) == 0);
-            (assure<Component>()->batch(*this, first, last, other.get<Component>(src)), ...);
+            static_assert(sizeof...(Exclude) == 0);
+            (assure<Component>()->batch(*this, std::make_reverse_iterator(last), std::make_reverse_iterator(first), other.get<Component>(src)), ...);
         }
     }
 
@@ -1499,7 +1496,6 @@ public:
      */
     template<typename It>
     entt::basic_runtime_view<Entity> runtime_view(It first, It last) const {
-        static_assert(std::is_same_v<typename std::iterator_traits<It>::value_type, component>);
         std::vector<const sparse_set<Entity> *> set(std::distance(first, last));
 
         std::transform(first, last, set.begin(), [this](const component ctype) {
@@ -1613,8 +1609,8 @@ public:
      */
     template<typename... Component, typename... Exclude>
     void stomp(const entity_type dst, const entity_type src, basic_registry &other, exclude_t<Exclude...> = {}) {
-        const entity_type entities[1]{dst};
-        stomp<Component...>(std::begin(entities), std::end(entities), src, other, exclude<Exclude...>);
+        const entity_type entt[1]{dst};
+        stomp<Component...>(std::begin(entt), std::end(entt), src, other, exclude<Exclude...>);
     }
 
     /**
@@ -1632,7 +1628,6 @@ public:
     template<typename... Component, typename It, typename... Exclude>
     void stomp(It first, It last, const entity_type src, basic_registry &other, exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Component) == 0 || sizeof...(Exclude) == 0);
-        static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
 
         for(auto pos = other.pools.size(); pos; --pos) {
             const auto &pdata = other.pools[pos-1];
