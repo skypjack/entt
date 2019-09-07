@@ -629,7 +629,7 @@ public:
      * @return A valid entity identifier.
      */
     template<typename... Component, typename... Exclude>
-    entity_type create(entity_type src, basic_registry &other, exclude_t<Exclude...> = {}) {
+    entity_type create(entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
         const auto entt = create();
         stomp<Component...>(entt, src, other, exclude<Exclude...>);
         return entt;
@@ -657,7 +657,7 @@ public:
      * @param other The registry that owns the source entity.
      */
     template<typename... Component, typename It, typename... Exclude>
-    void create(It first, It last, entity_type src, basic_registry &other, exclude_t<Exclude...> = {}) {
+    void create(It first, It last, entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
         create(first, last);
 
         if constexpr(sizeof...(Component) == 0) {
@@ -1608,7 +1608,7 @@ public:
      * @param other The registry that owns the source entity.
      */
     template<typename... Component, typename... Exclude>
-    void stomp(const entity_type dst, const entity_type src, basic_registry &other, exclude_t<Exclude...> = {}) {
+    void stomp(const entity_type dst, const entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
         const entity_type entt[1]{dst};
         stomp<Component...>(std::begin(entt), std::end(entt), src, other, exclude<Exclude...>);
     }
@@ -1626,7 +1626,7 @@ public:
      * @param other The registry that owns the source entity.
      */
     template<typename... Component, typename It, typename... Exclude>
-    void stomp(It first, It last, const entity_type src, basic_registry &other, exclude_t<Exclude...> = {}) {
+    void stomp(It first, It last, const entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Component) == 0 || sizeof...(Exclude) == 0);
 
         for(auto pos = other.pools.size(); pos; --pos) {
