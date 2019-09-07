@@ -2,9 +2,9 @@
 #define ENTT_SIGNAL_SIGH_HPP
 
 
-#include <algorithm>
-#include <utility>
 #include <vector>
+#include <utility>
+#include <algorithm>
 #include <functional>
 #include <type_traits>
 #include "../config/config.h"
@@ -96,9 +96,9 @@ public:
      * @param args Arguments to use to invoke listeners.
      */
     void publish(Args... args) const {
-        for(auto pos = calls.size(); pos; --pos) {
-            calls[pos-1](args...);
-        }
+        std::for_each(calls.cbegin(), calls.cend(), [&args...](auto &&call) {
+            call(args...);
+        });
     }
 
     /**
@@ -117,22 +117,20 @@ public:
      */
     template<typename Func>
     void collect(Func func, Args... args) const {
-        bool stop = false;
-
-        for(auto pos = calls.size(); pos && !stop; --pos) {
+        for(auto &&call: calls) {
             if constexpr(std::is_void_v<Ret>) {
                 if constexpr(std::is_invocable_r_v<bool, Func>) {
-                    calls[pos-1](args...);
-                    stop = func();
+                    call(args...);
+                    if(func()) { break; }
                 } else {
-                    calls[pos-1](args...);
+                    call(args...);
                     func();
                 }
             } else {
                 if constexpr(std::is_invocable_r_v<bool, Func, Ret>) {
-                    stop = func(calls[pos-1](args...));
+                    if(func(call(args...))) { break; }
                 } else {
-                    func(calls[pos-1](args...));
+                    func(call(args...));
                 }
             }
         }
@@ -227,6 +225,9 @@ private:
  * when it goes out of scope.
  */
 struct scoped_connection: private connection {
+    using connection::operator bool;
+    using connection::release;
+
     /*! @brief Default constructor. */
     scoped_connection() = default;
 
@@ -280,9 +281,6 @@ struct scoped_connection: private connection {
         static_cast<connection &>(*this) = std::move(other);
         return *this;
     }
-
-    using connection::operator bool;
-    using connection::release;
 };
 
 
