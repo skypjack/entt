@@ -1679,7 +1679,7 @@ TEST_F(Meta, MetaTypeTraits) {
     ASSERT_TRUE(entt::resolve<union_type>().is_union());
     ASSERT_TRUE(entt::resolve<derived_type>().is_class());
     ASSERT_TRUE(entt::resolve<int *>().is_pointer());
-    ASSERT_TRUE(entt::resolve<decltype(empty_type::destroy)>().is_function());
+    ASSERT_TRUE(entt::resolve<decltype(&empty_type::destroy)>().is_function_pointer());
     ASSERT_TRUE(entt::resolve<decltype(&data_type::i)>().is_member_object_pointer());
     ASSERT_TRUE(entt::resolve<decltype(&func_type::g)>().is_member_function_pointer());
 }

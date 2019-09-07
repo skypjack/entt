@@ -244,15 +244,13 @@ meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_
  */
 template<typename Type>
 class meta_factory {
-    static_assert(std::is_same_v<Type, std::decay_t<Type>>);
-
     template<typename Node>
     bool duplicate(const ENTT_ID_TYPE identifier, const Node *node) ENTT_NOEXCEPT {
-        return node ? node->identifier == identifier || duplicate(identifier, node->next) : false;
+        return node && (node->identifier == identifier || duplicate(identifier, node->next));
     }
 
     bool duplicate(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
-        return node ? node->key() == key || duplicate(key, node->next) : false;
+        return node && (node->key() == key || duplicate(key, node->next));
     }
 
     template<typename>
@@ -563,9 +561,13 @@ public:
             &internal::meta_info<Type>::template dtor<Func>,
             type,
             [](meta_handle handle) {
-                return handle.type() == internal::meta_info<Type>::resolve()->meta()
-                        ? (std::invoke(Func, *handle.data<Type>()), true)
-                        : false;
+                const auto valid = (handle.type() == internal::meta_info<Type>::resolve()->meta());
+
+                if(valid) {
+                    std::invoke(Func, *handle.data<Type>());
+                }
+
+                return valid;
             },
             []() ENTT_NOEXCEPT -> meta_dtor {
                 return &node;

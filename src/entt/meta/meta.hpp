@@ -132,10 +132,11 @@ struct meta_type_node {
     const bool is_union;
     const bool is_class;
     const bool is_pointer;
-    const bool is_function;
+    const bool is_function_pointer;
     const bool is_member_object_pointer;
     const bool is_member_function_pointer;
     const size_type extent;
+    bool(* const compare)(const void *, const void *);
     meta_type(* const remove_pointer)() ENTT_NOEXCEPT;
     meta_type(* const meta)() ENTT_NOEXCEPT;
     meta_base_node *base{nullptr};
@@ -300,7 +301,6 @@ class meta_any {
     friend struct meta_handle;
 
     using storage_type = std::aligned_storage_t<sizeof(void *), alignof(void *)>;
-    using compare_fn_type = bool(const void *, const void *);
     using copy_fn_type = void *(storage_type &, const void *);
     using destroy_fn_type = void(void *);
     using steal_fn_type = void *(storage_type &, void *, destroy_fn_type *);
@@ -361,17 +361,6 @@ class meta_any {
         }
     };
 
-    template<typename Type>
-    static auto compare(int, const Type &lhs, const Type &rhs)
-    -> decltype(lhs == rhs, bool{}) {
-        return lhs == rhs;
-    }
-
-    template<typename Type>
-    static bool compare(char, const Type &lhs, const Type &rhs) {
-        return &lhs == &rhs;
-    }
-
 public:
     /*! @brief Default constructor. */
     meta_any() ENTT_NOEXCEPT
@@ -379,7 +368,6 @@ public:
           instance{nullptr},
           node{nullptr},
           destroy_fn{nullptr},
-          compare_fn{nullptr},
           copy_fn{nullptr},
           steal_fn{nullptr}
     {}
@@ -402,10 +390,6 @@ public:
             destroy_fn = &traits_type::destroy;
             copy_fn = &traits_type::copy;
             steal_fn = &traits_type::steal;
-
-            compare_fn = [](const void *lhs, const void *rhs) {
-                return compare(0, *static_cast<const Type *>(lhs), *static_cast<const Type *>(rhs));
-            };
         }
     }
 
@@ -420,10 +404,6 @@ public:
     {
         node = internal::meta_info<Type>::resolve();
         instance = &type.get();
-
-        compare_fn = [](const void *lhs, const void *rhs) {
-            return compare(0, *static_cast<const Type *>(lhs), *static_cast<const Type *>(rhs));
-        };
     }
 
     /**
@@ -446,7 +426,6 @@ public:
         node = other.node;
         instance = other.copy_fn ? other.copy_fn(storage, other.instance) : other.instance;
         destroy_fn = other.destroy_fn;
-        compare_fn = other.compare_fn;
         copy_fn = other.copy_fn;
         steal_fn = other.steal_fn;
     }
@@ -637,7 +616,7 @@ public:
      * otherwise.
      */
     bool operator==(const meta_any &other) const ENTT_NOEXCEPT {
-        return node == other.node && (!compare_fn || compare_fn(instance, other.instance));
+        return node == other.node && (!node || node->compare(instance, other.instance));
     }
 
     /**
@@ -663,7 +642,6 @@ public:
 
         std::swap(lhs.node, rhs.node);
         std::swap(lhs.destroy_fn, rhs.destroy_fn);
-        std::swap(lhs.compare_fn, rhs.compare_fn);
         std::swap(lhs.copy_fn, rhs.copy_fn);
         std::swap(lhs.steal_fn, rhs.steal_fn);
     }
@@ -673,7 +651,6 @@ private:
     void *instance;
     internal::meta_type_node *node;
     destroy_fn_type *destroy_fn;
-    compare_fn_type *compare_fn;
     copy_fn_type *copy_fn;
     steal_fn_type *steal_fn;
 };
@@ -1663,8 +1640,8 @@ public:
      * not.
      * @return True if the underlying type is a function, false otherwise.
      */
-    bool is_function() const ENTT_NOEXCEPT {
-        return node->is_function;
+    bool is_function_pointer() const ENTT_NOEXCEPT {
+        return node->is_function_pointer;
     }
 
     /**
@@ -2069,6 +2046,18 @@ inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
 namespace internal {
 
 
+template<typename Type, typename = std::enable_if_t<!std::is_void_v<Type> && !std::is_function_v<Type>>>
+static auto compare(int, const void *lhs, const void *rhs)
+-> decltype(std::declval<Type>() == std::declval<Type>(), bool{}) {
+    return *static_cast<const Type *>(lhs) == *static_cast<const Type *>(rhs);
+}
+
+template<typename>
+static bool compare(char, const void *lhs, const void *rhs) {
+    return lhs == rhs;
+}
+
+
 template<typename Type>
 inline meta_type_node * meta_node<Type>::resolve() ENTT_NOEXCEPT {
     if(!type) {
@@ -2084,10 +2073,13 @@ inline meta_type_node * meta_node<Type>::resolve() ENTT_NOEXCEPT {
             std::is_union_v<Type>,
             std::is_class_v<Type>,
             std::is_pointer_v<Type>,
-            std::is_function_v<Type>,
+            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
             std::is_member_object_pointer_v<Type>,
             std::is_member_function_pointer_v<Type>,
             std::extent_v<Type>,
+            [](const void *lhs, const void *rhs) {
+                return compare<Type>(0, lhs, rhs);
+            },
             []() ENTT_NOEXCEPT -> meta_type {
                 return internal::meta_info<std::remove_pointer_t<Type>>::resolve();
             },
