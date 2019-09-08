@@ -723,22 +723,6 @@ public:
     }
 
     /**
-     * @brief Tries to cast an instance to a given type.
-     * @tparam Type Type to which to cast the instance.
-     * @return A (possibly null) pointer to the underlying object.
-     */
-    template<typename Type>
-    const Type * try_cast() const ENTT_NOEXCEPT {
-        return internal::try_cast<Type>(node, instance);
-    }
-
-    /*! @copydoc try_cast */
-    template<typename Type>
-    Type * try_cast() ENTT_NOEXCEPT {
-        return const_cast<Type *>(std::as_const(*this).try_cast<Type>());
-    }
-
-    /**
      * @brief Returns false if a handle is empty, true otherwise.
      * @return False if the handle is empty, true otherwise.
      */
