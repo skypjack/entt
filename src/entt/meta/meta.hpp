@@ -15,7 +15,7 @@ namespace entt {
 
 
 class meta_any;
-struct meta_handle;
+class meta_handle;
 class meta_prop;
 class meta_base;
 class meta_conv;
@@ -298,7 +298,7 @@ inline auto ctor(std::index_sequence<Indexes...>, const meta_type_node *node) EN
  */
 class meta_any {
     /*! @brief A meta handle is allowed to _inherit_ from a meta any. */
-    friend struct meta_handle;
+    friend class meta_handle;
 
     using storage_type = std::aligned_storage_t<sizeof(void *), alignof(void *)>;
     using copy_fn_type = void *(storage_type &, const void *);
@@ -405,6 +405,12 @@ public:
         node = internal::meta_info<Type>::resolve();
         instance = &type.get();
     }
+
+    /**
+     * @brief Constructs a meta any from a meta handle object.
+     * @param handle A reference to an object to use to initialize the meta any.
+     */
+    inline meta_any(meta_handle handle) ENTT_NOEXCEPT;
 
     /**
      * @brief Constructs a meta any from a given value.
@@ -649,7 +655,7 @@ public:
 private:
     storage_type storage;
     void *instance;
-    internal::meta_type_node *node;
+    const internal::meta_type_node *node;
     destroy_fn_type *destroy_fn;
     copy_fn_type *copy_fn;
     steal_fn_type *steal_fn;
@@ -666,7 +672,11 @@ private:
  * responsible for ensuring that the target object remains alive for the entire
  * interval of use of the handle.
  */
-struct meta_handle {
+class meta_handle {
+    /*! @brief A meta any is allowed to _inherit_ from a meta handle. */
+    friend class meta_any;
+
+public:
     /*! @brief Default constructor. */
     meta_handle() ENTT_NOEXCEPT
         : node{nullptr},
@@ -718,14 +728,14 @@ struct meta_handle {
      * @return A (possibly null) pointer to the underlying object.
      */
     template<typename Type>
-    const Type * data() const ENTT_NOEXCEPT {
+    const Type * try_cast() const ENTT_NOEXCEPT {
         return internal::try_cast<Type>(node, instance);
     }
 
-    /*! @copydoc data */
+    /*! @copydoc try_cast */
     template<typename Type>
-    Type * data() ENTT_NOEXCEPT {
-        return const_cast<Type *>(std::as_const(*this).data<Type>());
+    Type * try_cast() ENTT_NOEXCEPT {
+        return const_cast<Type *>(std::as_const(*this).try_cast<Type>());
     }
 
     /**
@@ -1964,6 +1974,14 @@ private:
  */
 inline bool operator!=(const meta_type &lhs, const meta_type &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
+}
+
+
+inline meta_any::meta_any(meta_handle handle) ENTT_NOEXCEPT
+    : meta_any{}
+{
+    node = handle.node;
+    instance = handle.instance;
 }
 
 
