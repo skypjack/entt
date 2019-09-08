@@ -1133,6 +1133,7 @@ TEST(Registry, CreateManyEntitiesWithComponentsAtOnce) {
     registry.destroy(registry.create());
 
     const auto [iptr, cptr, eptr] = registry.create<int, char, empty_type>(std::begin(entities), std::end(entities));
+    static_assert(std::is_same_v<typename decltype(eptr)::reference, empty_type>);
 
     ASSERT_FALSE(registry.empty<int>());
     ASSERT_FALSE(registry.empty<char>());
