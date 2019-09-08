@@ -840,7 +840,7 @@ public:
 
         for(auto next = *length; next; --next) {
             const auto pos = next - 1;
-            const auto entt = cpool->data()[pos];
+            [[maybe_unused]] const auto entt = cpool->data()[pos];
             (std::get<pool_type<Other> *>(pools)->swap(pos, std::get<pool_type<Other> *>(pools)->index(entt)), ...);
         }
     }
