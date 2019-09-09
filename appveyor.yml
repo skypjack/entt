@@ -23,22 +23,34 @@ for:
       only:
         - image: Visual Studio 2019
     environment:
-      CMAKE_GENERATOR: "Visual Studio 16 2019"
+      CMAKE_GENERATOR: "Ninja"
+      VS_YEAR_VERSION: 2019
   -
     matrix:
       only:
         - image: Visual Studio 2017
     environment:
-      CMAKE_GENERATOR: "Visual Studio 15 2017"
+      CMAKE_GENERATOR: "Ninja"
+      VS_YEAR_VERSION: 2017
+
+install:
+  ############################################################################
+  # Install Ninja
+  ############################################################################
+  - set NINJA_URL="https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip"
+  - appveyor DownloadFile %NINJA_URL% -FileName ninja.zip
+  - 7z x ninja.zip -oC:\projects\deps\ninja > nul
+  - set PATH=C:\projects\deps\ninja;%PATH%
+  - ninja --version
+
 
 before_build:
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\%VS_YEAR_VERSION%\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
   - cd %BUILD_DIR%
   - cmake .. -DBUILD_TESTING=ON -DBUILD_LIB=ON -DCMAKE_CXX_FLAGS=/W1 -G"%CMAKE_GENERATOR%"
 
 after_build:
   - ctest --timeout 5 -C Debug -j4
 
-build:
-  parallel: true
-  project: build/entt.sln
-  verbosity: minimal
+build_script:
+  - cmd: cmake --build .
