@@ -98,7 +98,7 @@ struct func_type {
     int f(int v) const { return v*v; }
     void g(int v) { value = v*v; }
 
-    static int h(int v) { return v; }
+    static int h(int &v) { return (v *= value); }
     static void k(int v) { value = v; }
 
     int v(int v) const { return (value = v); }
@@ -1526,6 +1526,7 @@ TEST_F(Meta, MetaFuncRetVoid) {
 
 TEST_F(Meta, MetaFuncStatic) {
     auto func = entt::resolve<func_type>().func("h"_hs);
+    func_type::value = 2;
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
@@ -1537,13 +1538,13 @@ TEST_F(Meta, MetaFuncStatic) {
     ASSERT_EQ(func.arg(entt::meta_func::size_type{0}), entt::resolve<int>());
     ASSERT_FALSE(func.arg(entt::meta_func::size_type{1}));
 
-    auto any = func.invoke({}, 42);
+    auto any = func.invoke({}, 3);
     auto empty = func.invoke({}, 'c');
 
     ASSERT_FALSE(empty);
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<int>());
-    ASSERT_EQ(any.cast<int>(), 42);
+    ASSERT_EQ(any.cast<int>(), 6);
 
     func.prop([](auto prop) {
         ASSERT_TRUE(prop);
@@ -1639,6 +1640,18 @@ TEST_F(Meta, MetaFuncAsAlias) {
 
     ASSERT_EQ(func.ret(), entt::resolve<int>());
     ASSERT_EQ(instance.value, 3);
+}
+
+TEST_F(Meta, MetaFuncByReference) {
+    auto func = entt::resolve<func_type>().func("h"_hs);
+    func_type::value = 2;
+    entt::meta_any any{3};
+    int value = 4;
+
+    ASSERT_EQ(func.invoke({}, value).cast<int>(), 8);
+    ASSERT_EQ(func.invoke({}, any).cast<int>(), 6);
+    ASSERT_EQ(any.cast<int>(), 6);
+    ASSERT_EQ(value, 8);
 }
 
 TEST_F(Meta, MetaType) {
