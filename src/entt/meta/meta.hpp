@@ -1630,9 +1630,10 @@ public:
     }
 
     /**
-     * @brief Indicates whether a given meta type refers to a function type or
-     * not.
-     * @return True if the underlying type is a function, false otherwise.
+     * @brief Indicates whether a given meta type refers to a function pointer
+     * or not.
+     * @return True if the underlying type is a function pointer, false
+     * otherwise.
      */
     bool is_function_pointer() const ENTT_NOEXCEPT {
         return node->is_function_pointer;
