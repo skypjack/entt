@@ -10,6 +10,10 @@ struct one_more_event {};
 ENTT_NAMED_TYPE(an_event)
 
 struct receiver {
+    static void forward(entt::dispatcher &dispatcher, const an_event &event) {
+        dispatcher.enqueue(event);
+    }
+
     void receive(const an_event &) { ++cnt; }
     void reset() { cnt = 0; }
     int cnt{0};
@@ -39,6 +43,16 @@ TEST(Dispatcher, Functionalities) {
 
     ASSERT_EQ(receiver.cnt, 3);
 
+    dispatcher.enqueue<an_event>();
+    dispatcher.discard<an_event>();
+    dispatcher.update();
+
+    dispatcher.enqueue<an_event>();
+    dispatcher.discard();
+    dispatcher.update();
+
+    ASSERT_EQ(receiver.cnt, 3);
+
     receiver.reset();
 
     an_event event{};
@@ -50,4 +64,22 @@ TEST(Dispatcher, Functionalities) {
     dispatcher.trigger(std::as_const(event));
 
     ASSERT_EQ(receiver.cnt, 0);
+}
+
+TEST(Dispatcher, StopAndGo) {
+    entt::dispatcher dispatcher;
+    receiver receiver;
+
+    dispatcher.sink<an_event>().connect<&receiver::forward>(dispatcher);
+    dispatcher.sink<an_event>().connect<&receiver::receive>(receiver);
+
+    dispatcher.enqueue<an_event>();
+    dispatcher.update();
+
+    ASSERT_EQ(receiver.cnt, 1);
+
+    dispatcher.sink<an_event>().disconnect<&receiver::forward>(dispatcher);
+    dispatcher.update();
+
+    ASSERT_EQ(receiver.cnt, 2);
 }

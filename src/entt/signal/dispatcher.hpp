@@ -4,7 +4,9 @@
 
 #include <vector>
 #include <memory>
+#include <cstddef>
 #include <utility>
+#include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/family.hpp"
@@ -37,6 +39,7 @@ class dispatcher {
     struct base_wrapper {
         virtual ~base_wrapper() = default;
         virtual void publish() = 0;
+        virtual void clear() = 0;
     };
 
     template<typename Event>
@@ -45,12 +48,17 @@ class dispatcher {
         using sink_type = typename signal_type::sink_type;
 
         void publish() override {
-            for(const auto &event: events[current]) {
-                signal.publish(event);
+            const auto length = events.size();
+
+            for(std::size_t pos{}; pos < length; ++pos) {
+                signal.publish(events[pos]);
             }
 
-            events[current++].clear();
-            current %= std::extent<decltype(events)>::value;
+            events.erase(events.cbegin(), events.cbegin()+length);
+        }
+
+        void clear() override {
+            events.clear();
         }
 
         sink_type sink() ENTT_NOEXCEPT {
@@ -64,13 +72,12 @@ class dispatcher {
 
         template<typename... Args>
         void enqueue(Args &&... args) {
-            events[current].emplace_back(std::forward<Args>(args)...);
+            events.emplace_back(std::forward<Args>(args)...);
         }
 
     private:
         signal_type signal{};
-        std::vector<Event> events[2];
-        int current{};
+        std::vector<Event> events;
     };
 
     struct wrapper_data {
@@ -206,6 +213,27 @@ public:
     }
 
     /**
+     * @brief Discards all the events queued so far.
+     *
+     * If no types are provided, the dispatcher will clear all the existing
+     * pools.
+     *
+     * @tparam Event Type of events to discard.
+     */
+    template<typename... Event>
+    void discard() {
+        if constexpr(sizeof...(Event) == 0) {
+            std::for_each(wrappers.begin(), wrappers.end(), [](auto &&wdata) {
+                if(wdata.wrapper) {
+                    wdata.wrapper->clear();
+                }
+            });
+        } else {
+            (assure<std::decay_t<Event>>().clear(), ...);
+        }
+    }
+
+    /**
      * @brief Delivers all the pending events of the given type.
      *
      * This method is blocking and it doesn't return until all the events are
@@ -228,9 +256,7 @@ public:
      */
     void update() const {
         for(auto pos = wrappers.size(); pos; --pos) {
-            auto &wdata = wrappers[pos-1];
-
-            if(wdata.wrapper) {
+            if(auto &wdata = wrappers[pos-1]; wdata.wrapper) {
                 wdata.wrapper->publish();
             }
         }
