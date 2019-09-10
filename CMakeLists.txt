@@ -42,7 +42,7 @@ option(USE_COMPILE_OPTIONS "Use compile options from EnTT." ON)
 # Compiler stuff
 #
 
-if(NOT MSVC AND USE_LIBCPP)
+if(NOT WIN32 AND USE_LIBCPP)
     include(CheckCXXSourceCompiles)
     include(CMakePushCheckState)
 
@@ -83,16 +83,16 @@ target_compile_definitions(
 )
 
 if(USE_ASAN)
-    target_compile_options(EnTT INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-fsanitize=address -fno-omit-frame-pointer>)
-    target_link_libraries(EnTT INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-fsanitize=address -fno-omit-frame-pointer>)
+    target_compile_options(EnTT INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<PLATFORM_ID:Windows>>>:-fsanitize=address -fno-omit-frame-pointer>)
+    target_link_libraries(EnTT INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<PLATFORM_ID:Windows>>>:-fsanitize=address -fno-omit-frame-pointer>)
 endif()
 
 if(USE_COMPILE_OPTIONS)
     target_compile_options(
         EnTT
-        INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-O0 -g>
+        INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<PLATFORM_ID:Windows>>>:-O0 -g>
         # it seems that -O3 ruins a bit the performance when using clang ...
-        INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:Clang>>:-O2>
+        INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:Clang>,$<OR:$<PLATFORM_ID:Darwin>,$<PLATFORM_ID:Linux>>>:-O2>
         # ... on the other side, GCC is incredibly comfortable with it.
         INTERFACE $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:GNU>>:-O3>
     )
