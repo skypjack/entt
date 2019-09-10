@@ -16,7 +16,7 @@ endif()
 # Project configuration
 #
 
-project(EnTT VERSION 3.2.0)
+project(EnTT VERSION 3.2.0 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
@@ -190,6 +190,10 @@ if(BUILD_TESTING)
     option(BUILD_LIB "Build lib example." OFF)
     option(BUILD_MOD "Build mod example." OFF)
     option(BUILD_SNAPSHOT "Build snapshot example." OFF)
+
+    if(BUILD_MOD)
+        enable_language(C)
+    endif()
 
     enable_testing()
     add_subdirectory(test)
