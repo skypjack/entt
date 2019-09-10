@@ -33,7 +33,7 @@ for:
 
 before_build:
   - cd %BUILD_DIR%
-  - cmake .. -DBUILD_TESTING=ON -DBUILD_LIB=ON -DBUILD_MOD=ON -DCMAKE_CXX_FLAGS=/W1 -G"%CMAKE_GENERATOR%"
+  - cmake .. -DBUILD_TESTING=ON -DBUILD_LIB=ON -DCMAKE_CXX_FLAGS=/W1 -G"%CMAKE_GENERATOR%"
 
 after_build:
   - ctest --timeout 5 -C Debug -j4
