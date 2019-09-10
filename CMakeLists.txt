@@ -84,7 +84,7 @@ target_compile_definitions(
 
 if(USE_ASAN)
     target_compile_options(EnTT INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<PLATFORM_ID:Windows>>>:-fsanitize=address -fno-omit-frame-pointer>)
-    target_link_libraries(EnTT INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<PLATFORM_ID:MSVC>>>:-fsanitize=address -fno-omit-frame-pointer>)
+    target_link_libraries(EnTT INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<PLATFORM_ID:Windows>>>:-fsanitize=address -fno-omit-frame-pointer>)
 endif()
 
 if(USE_COMPILE_OPTIONS)
