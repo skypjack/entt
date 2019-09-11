@@ -382,29 +382,26 @@ public:
     }
 
     /**
-     * @brief Increases the capacity of the pool for the given component.
+     * @brief Increases the capacity of the registry or of the pools for the
+     * given components.
      *
-     * If the new capacity is greater than the current capacity, new storage is
-     * allocated, otherwise the method does nothing.
+     * If no components are specified, the capacity of the registry is
+     * increased, that is the number of entities it contains. Otherwise the
+     * capacity of the pools for the given components is increased.
      *
-     * @tparam Component Type of component for which to reserve storage.
+     * In both cases, if the new capacity is greater than the current capacity,
+     * new storage is allocated, otherwise the method does nothing.
+     *
+     * @tparam Component Types of components for which to reserve storage.
      * @param cap Desired capacity.
      */
-    template<typename Component>
+    template<typename... Component>
     void reserve(const size_type cap) {
-        assure<Component>()->reserve(cap);
-    }
-
-    /**
-     * @brief Increases the capacity of a registry in terms of entities.
-     *
-     * If the new capacity is greater than the current capacity, new storage is
-     * allocated, otherwise the method does nothing.
-     *
-     * @param cap Desired capacity.
-     */
-    void reserve(const size_type cap) {
-        entities.reserve(cap);
+        if constexpr(sizeof...(Component) == 0) {
+            entities.reserve(cap);
+        } else {
+            (assure<Component>()->reserve(cap), ...);
+        }
     }
 
     /**

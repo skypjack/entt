@@ -90,9 +90,8 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.size(), entt::registry::size_type{0});
     ASSERT_EQ(registry.alive(), entt::registry::size_type{0});
+    ASSERT_NO_THROW((registry.reserve<int, char>(8)));
     ASSERT_NO_THROW(registry.reserve(42));
-    ASSERT_NO_THROW(registry.reserve<int>(8));
-    ASSERT_NO_THROW(registry.reserve<char>(8));
     ASSERT_TRUE(registry.empty());
 
     ASSERT_EQ(registry.capacity(), entt::registry::size_type{42});
