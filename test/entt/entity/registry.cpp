@@ -442,13 +442,13 @@ TEST(Registry, View) {
     registry.assign<int>(e2, 0);
     registry.assign<char>(e2, 'c');
 
-    ASSERT_EQ(iview.size(), decltype(iview)::size_type{3});
-    ASSERT_EQ(cview.size(), decltype(cview)::size_type{2});
+    ASSERT_EQ(iview.size(), 3u);
+    ASSERT_EQ(cview.size(), 2u);
 
-    decltype(mview)::size_type cnt{0};
+    std::size_t cnt{};
     mview.each([&cnt](auto...) { ++cnt; });
 
-    ASSERT_EQ(cnt, decltype(mview)::size_type{2});
+    ASSERT_EQ(cnt, 2u);
 }
 
 TEST(Registry, NonOwningGroupInitOnFirstUse) {
@@ -468,13 +468,13 @@ TEST(Registry, NonOwningGroupInitOnFirstUse) {
     ASSERT_FALSE(registry.owned<int>());
     ASSERT_FALSE(registry.owned<char>());
 
+    std::size_t cnt{};
     auto group = registry.group<>(entt::get<int, char>);
-    decltype(group)::size_type cnt{0};
     group.each([&cnt](auto...) { ++cnt; });
 
     ASSERT_FALSE(registry.owned<int>());
     ASSERT_FALSE(registry.owned<char>());
-    ASSERT_EQ(cnt, decltype(group)::size_type{2});
+    ASSERT_EQ(cnt, 2u);
 }
 
 TEST(Registry, NonOwningGroupInitOnAssign) {
@@ -495,12 +495,12 @@ TEST(Registry, NonOwningGroupInitOnAssign) {
     ASSERT_FALSE(registry.owned<int>());
     ASSERT_FALSE(registry.owned<char>());
 
-    decltype(group)::size_type cnt{0};
+    std::size_t cnt{};
     group.each([&cnt](auto...) { ++cnt; });
 
     ASSERT_FALSE(registry.owned<int>());
     ASSERT_FALSE(registry.owned<char>());
-    ASSERT_EQ(cnt, decltype(group)::size_type{2});
+    ASSERT_EQ(cnt, 2u);
 }
 
 TEST(Registry, FullOwningGroupInitOnFirstUse) {
@@ -520,13 +520,13 @@ TEST(Registry, FullOwningGroupInitOnFirstUse) {
     ASSERT_FALSE(registry.owned<int>());
     ASSERT_FALSE(registry.owned<char>());
 
+    std::size_t cnt{};
     auto group = registry.group<int, char>();
-    decltype(group)::size_type cnt{0};
     group.each([&cnt](auto...) { ++cnt; });
 
     ASSERT_TRUE(registry.owned<int>());
     ASSERT_TRUE(registry.owned<char>());
-    ASSERT_EQ(cnt, decltype(group)::size_type{2});
+    ASSERT_EQ(cnt, 2u);
 }
 
 TEST(Registry, FullOwningGroupInitOnAssign) {
@@ -547,12 +547,12 @@ TEST(Registry, FullOwningGroupInitOnAssign) {
     ASSERT_TRUE(registry.owned<int>());
     ASSERT_TRUE(registry.owned<char>());
 
-    decltype(group)::size_type cnt{0};
+    std::size_t cnt{};
     group.each([&cnt](auto...) { ++cnt; });
 
     ASSERT_TRUE(registry.owned<int>());
     ASSERT_TRUE(registry.owned<char>());
-    ASSERT_EQ(cnt, decltype(group)::size_type{2});
+    ASSERT_EQ(cnt, 2u);
 }
 
 TEST(Registry, PartialOwningGroupInitOnFirstUse) {
@@ -572,13 +572,13 @@ TEST(Registry, PartialOwningGroupInitOnFirstUse) {
     ASSERT_FALSE(registry.owned<int>());
     ASSERT_FALSE(registry.owned<char>());
 
+    std::size_t cnt{};
     auto group = registry.group<int>(entt::get<char>);
-    decltype(group)::size_type cnt{0};
     group.each([&cnt](auto...) { ++cnt; });
 
     ASSERT_TRUE(registry.owned<int>());
     ASSERT_FALSE(registry.owned<char>());
-    ASSERT_EQ(cnt, decltype(group)::size_type{2});
+    ASSERT_EQ(cnt, 2u);
 
 }
 
@@ -600,12 +600,12 @@ TEST(Registry, PartialOwningGroupInitOnAssign) {
     ASSERT_TRUE(registry.owned<int>());
     ASSERT_FALSE(registry.owned<char>());
 
-    decltype(group)::size_type cnt{0};
+    std::size_t cnt{};
     group.each([&cnt](auto...) { ++cnt; });
 
     ASSERT_TRUE(registry.owned<int>());
     ASSERT_FALSE(registry.owned<char>());
-    ASSERT_EQ(cnt, decltype(group)::size_type{2});
+    ASSERT_EQ(cnt, 2u);
 }
 
 TEST(Registry, CleanViewAfterReset) {
@@ -1278,10 +1278,10 @@ TEST(Registry, NonOwningGroupInterleaved) {
     registry.assign<int>(entity);
     registry.assign<char>(entity);
 
-    decltype(group)::size_type cnt{0};
+    std::size_t cnt{};
     group.each([&cnt](auto...) { ++cnt; });
 
-    ASSERT_EQ(cnt, decltype(group)::size_type{2});
+    ASSERT_EQ(cnt, 2u);
 }
 
 TEST(Registry, FullOwningGroupInterleaved) {
@@ -1298,10 +1298,10 @@ TEST(Registry, FullOwningGroupInterleaved) {
     registry.assign<int>(entity);
     registry.assign<char>(entity);
 
-    decltype(group)::size_type cnt{0};
+    std::size_t cnt{};
     group.each([&cnt](auto...) { ++cnt; });
 
-    ASSERT_EQ(cnt, decltype(group)::size_type{2});
+    ASSERT_EQ(cnt, 2u);
 }
 
 TEST(Registry, PartialOwningGroupInterleaved) {
@@ -1318,10 +1318,10 @@ TEST(Registry, PartialOwningGroupInterleaved) {
     registry.assign<int>(entity);
     registry.assign<char>(entity);
 
-    decltype(group)::size_type cnt{0};
+    std::size_t cnt{};
     group.each([&cnt](auto...) { ++cnt; });
 
-    ASSERT_EQ(cnt, decltype(group)::size_type{2});
+    ASSERT_EQ(cnt, 2u);
 }
 
 TEST(Registry, NonOwningGroupSortInterleaved) {
@@ -1601,6 +1601,11 @@ TEST(Registry, GetOrAssign) {
 
 TEST(Registry, Constness) {
     entt::registry registry;
+
+    ASSERT_TRUE((std::is_same_v<decltype(registry.assign<int>({})), int &>));
+    ASSERT_TRUE((std::is_same_v<decltype(registry.assign<const int>({})), int &>));
+    ASSERT_TRUE((std::is_same_v<decltype(registry.assign<empty_type>({})), empty_type>));
+    ASSERT_TRUE((std::is_same_v<decltype(registry.assign<const empty_type>({})), empty_type>));
 
     ASSERT_TRUE((std::is_same_v<decltype(registry.get<int>({})), int &>));
     ASSERT_TRUE((std::is_same_v<decltype(registry.get<int, char>({})), std::tuple<int &, char &>>));
