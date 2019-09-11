@@ -425,12 +425,13 @@ public:
     }
 
     /**
-     * @brief Requests the removal of unused capacity for a given component.
-     * @tparam Component Type of component for which to reclaim unused capacity.
+     * @brief Requests the removal of unused capacity for the given components.
+     * @tparam Component Types of components for which to reclaim unused
+     * capacity.
      */
-    template<typename Component>
+    template<typename... Component>
     void shrink_to_fit() {
-        assure<Component>()->shrink_to_fit();
+        (assure<Component>()->shrink_to_fit(), ...);
     }
 
     /**

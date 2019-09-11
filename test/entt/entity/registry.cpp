@@ -245,8 +245,7 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.capacity<int>(), entt::registry::size_type{8});
     ASSERT_EQ(registry.capacity<char>(), entt::registry::size_type{8});
 
-    registry.shrink_to_fit<int>();
-    registry.shrink_to_fit<char>();
+    registry.shrink_to_fit<int, char>();
 
     ASSERT_EQ(registry.capacity<int>(), entt::registry::size_type{});
     ASSERT_EQ(registry.capacity<char>(), entt::registry::size_type{});
