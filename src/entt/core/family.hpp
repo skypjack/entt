@@ -18,7 +18,7 @@ namespace entt {
  */
 template<typename...>
 class family {
-    inline static ENTT_MAYBE_ATOMIC(ENTT_ID_TYPE) identifier;
+    inline static ENTT_MAYBE_ATOMIC(ENTT_ID_TYPE) identifier{};
 
     template<typename...>
     // clang (since version 9) started to complain if auto is used instead of ENTT_ID_TYPE
