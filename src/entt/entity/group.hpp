@@ -132,22 +132,19 @@ public:
     }
 
     /**
-     * @brief Checks whether the pool of a given component is empty.
-     * @tparam Component Type of component in which one is interested.
-     * @return True if the pool of the given component is empty, false
-     * otherwise.
+     * @brief Checks whether the group or the pools of the given components are
+     * empty.
+     * @tparam Component Types of components in which one is interested.
+     * @return True if the group or the pools of the given components are empty,
+     * false otherwise.
      */
-    template<typename Component>
+    template<typename... Component>
     bool empty() const ENTT_NOEXCEPT {
-        return std::get<pool_type<Component> *>(pools)->empty();
-    }
-
-    /**
-     * @brief Checks whether the group is empty.
-     * @return True if the group is empty, false otherwise.
-     */
-    bool empty() const ENTT_NOEXCEPT {
-        return handler->empty();
+        if constexpr(sizeof...(Component) == 0) {
+            return handler->empty();
+        } else {
+            return (std::get<pool_type<Component> *>(pools)->empty() && ...);
+        }
     }
 
     /**
@@ -550,22 +547,19 @@ public:
     }
 
     /**
-     * @brief Checks whether the pool of a given component is empty.
-     * @tparam Component Type of component in which one is interested.
-     * @return True if the pool of the given component is empty, false
-     * otherwise.
+     * @brief Checks whether the group or the pools of the given components are
+     * empty.
+     * @tparam Component Types of components in which one is interested.
+     * @return True if the group or the pools of the given components are empty,
+     * false otherwise.
      */
-    template<typename Component>
+    template<typename... Component>
     bool empty() const ENTT_NOEXCEPT {
-        return std::get<pool_type<Component> *>(pools)->empty();
-    }
-
-    /**
-     * @brief Checks whether the group is empty.
-     * @return True if the group is empty, false otherwise.
-     */
-    bool empty() const ENTT_NOEXCEPT {
-        return !*length;
+        if constexpr(sizeof...(Component) == 0) {
+            return !*length;
+        } else {
+            return (std::get<pool_type<Component> *>(pools)->empty() && ...);
+        }
     }
 
     /**

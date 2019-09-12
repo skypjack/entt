@@ -435,23 +435,24 @@ public:
     }
 
     /**
-     * @brief Checks whether the pool of a given component is empty.
-     * @tparam Component Type of component in which one is interested.
-     * @return True if the pool of the given component is empty, false
-     * otherwise.
+     * @brief Checks whether the registry or the pools of the given components
+     * are empty.
+     *
+     * A registry is considered empty when it doesn't contain entities that are
+     * still in use.
+     *
+     * @tparam Component Types of components in which one is interested.
+     * @return True if the registry or the pools of the given components are
+     * empty, false otherwise.
      */
-    template<typename Component>
+    template<typename... Component>
     bool empty() const ENTT_NOEXCEPT {
-        const auto *cpool = pool<Component>();
-        return cpool ? cpool->empty() : true;
-    }
-
-    /**
-     * @brief Checks if there exists at least an entity still in use.
-     * @return True if at least an entity is still in use, false otherwise.
-     */
-    bool empty() const ENTT_NOEXCEPT {
-        return !alive();
+        if constexpr(sizeof...(Component) == 0) {
+            return !alive();
+        } else {
+            [[maybe_unused]] const auto cpools = std::make_tuple(pool<Component>()...);
+            return ((!std::get<const pool_type<Component> *>(cpools) || std::get<const pool_type<Component> *>(cpools)->empty()) && ...);
+        }
     }
 
     /**
@@ -779,7 +780,7 @@ public:
     bool has(const entity_type entity) const ENTT_NOEXCEPT {
         ENTT_ASSERT(valid(entity));
         [[maybe_unused]] const auto cpools = std::make_tuple(pool<Component>()...);
-        return ((std::get<const pool_type<Component> *>(cpools) ? std::get<const pool_type<Component> *>(cpools)->has(entity) : false) && ...);
+        return ((std::get<const pool_type<Component> *>(cpools) && std::get<const pool_type<Component> *>(cpools)->has(entity)) && ...);
     }
 
     /**

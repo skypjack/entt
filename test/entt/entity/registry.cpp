@@ -99,8 +99,7 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.capacity<char>(), entt::registry::size_type{8});
     ASSERT_EQ(registry.size<int>(), entt::registry::size_type{0});
     ASSERT_EQ(registry.size<char>(), entt::registry::size_type{0});
-    ASSERT_TRUE(registry.empty<int>());
-    ASSERT_TRUE(registry.empty<char>());
+    ASSERT_TRUE((registry.empty<int, char>()));
 
     const auto e0 = registry.create();
     const auto e1 = registry.create();
@@ -227,8 +226,7 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.size<int>(), entt::registry::size_type{0});
     ASSERT_EQ(registry.size<char>(), entt::registry::size_type{0});
-    ASSERT_TRUE(registry.empty<int>());
-    ASSERT_TRUE(registry.empty<char>());
+    ASSERT_TRUE((registry.empty<int, char>()));
 
     const auto e4 = registry.create();
     const auto e5 = registry.create();

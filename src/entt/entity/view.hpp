@@ -216,22 +216,24 @@ public:
     }
 
     /**
-     * @brief Checks whether the pool of a given component is empty.
-     * @tparam Comp Type of component in which one is interested.
-     * @return True if the pool of the given component is empty, false
-     * otherwise.
+     * @brief Checks whether the view or the pools of the given components are
+     * empty.
+     *
+     * The view is definitely empty if one of the pools is empty. In all other
+     * cases, the view may be empty and not return entities even if this
+     * function returns false.
+     *
+     * @tparam Comp Types of components in which one is interested.
+     * @return True if the view or the pools of the given components are empty,
+     * false otherwise.
      */
-    template<typename Comp>
+    template<typename... Comp>
     bool empty() const ENTT_NOEXCEPT {
-        return std::get<pool_type<Comp> *>(pools)->empty();
-    }
-
-    /**
-     * @brief Checks if the view is definitely empty.
-     * @return True if the view is definitely empty, false otherwise.
-     */
-    bool empty() const ENTT_NOEXCEPT {
-        return (std::get<pool_type<Component> *>(pools)->empty() || ...);
+        if constexpr(sizeof...(Comp) == 0) {
+            return (std::get<pool_type<Component> *>(pools)->empty() || ...);
+        } else {
+            return (std::get<pool_type<Comp> *>(pools)->empty() && ...);
+        }
     }
 
     /**

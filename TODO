@@ -31,3 +31,5 @@ TODO
 * use unordered_map for named pools and context variables:
   - use direct access (pool-like) also for context variables
   - improves multi-stomp
+* improve registry::alive
+* allocation-less and faster sort
