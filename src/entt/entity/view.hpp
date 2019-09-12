@@ -358,7 +358,7 @@ public:
         if constexpr(sizeof...(Comp) == 1) {
             return (std::get<pool_type<Comp> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple<decltype(get<Comp>(entt))...>{get<Comp>(entt)...};
+            return std::tuple<decltype(get<Comp>({}))...>{get<Comp>(entt)...};
         }
     }
 

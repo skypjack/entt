@@ -803,7 +803,7 @@ public:
         if constexpr(sizeof...(Component) == 1) {
             return (pool<Component>()->get(entity), ...);
         } else {
-            return std::tuple<decltype(get<Component>(entity))...>{get<Component>(entity)...};
+            return std::tuple<decltype(get<Component>({}))...>{get<Component>(entity)...};
         }
     }
 
@@ -815,7 +815,7 @@ public:
         if constexpr(sizeof...(Component) == 1) {
             return (pool<Component>()->get(entity), ...);
         } else {
-            return std::tuple<decltype(get<Component>(entity))...>{get<Component>(entity)...};
+            return std::tuple<decltype(get<Component>({}))...>{get<Component>(entity)...};
         }
     }
 
