@@ -696,7 +696,7 @@ public:
             if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->has(entity)) {
                 pdata.remove(*pdata.pool, *this, entity);
             }
-        };
+        }
 
         // just a way to protect users from listeners that attach components
         ENTT_ASSERT(orphan(entity));
