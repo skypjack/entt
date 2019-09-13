@@ -392,13 +392,11 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * sparse set doesn't contain the given entities.
      *
-     * @param lhs A valid position within the sparse set.
-     * @param rhs A valid position within the sparse set.
+     * @param lhs A valid entity identifier.
+     * @param rhs A valid entity identifier.
      */
-    void swap(const size_type lhs, const size_type rhs) ENTT_NOEXCEPT override {
-        ENTT_ASSERT(lhs < instances.size());
-        ENTT_ASSERT(rhs < instances.size());
-        std::swap(instances[lhs], instances[rhs]);
+    void swap(const entity_type lhs, const entity_type rhs) ENTT_NOEXCEPT override {
+        std::swap(instances[underlying_type::index(lhs)], instances[underlying_type::index(rhs)]);
         underlying_type::swap(lhs, rhs);
     }
 

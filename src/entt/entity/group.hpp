@@ -835,7 +835,7 @@ public:
         for(auto next = *length; next; --next) {
             const auto pos = next - 1;
             [[maybe_unused]] const auto entt = cpool->data()[pos];
-            (std::get<pool_type<Other> *>(pools)->swap(pos, std::get<pool_type<Other> *>(pools)->index(entt)), ...);
+            (std::get<pool_type<Other> *>(pools)->swap(std::get<pool_type<Other> *>(pools)->data()[pos], entt), ...);
         }
     }
 

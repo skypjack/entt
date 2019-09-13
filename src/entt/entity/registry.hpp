@@ -167,7 +167,7 @@ class basic_registry {
                         && !(std::get<pool_type<Exclude> *>(cpools)->has(entt) || ...))
                 {
                     const auto pos = this->owned++;
-                    (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->index(entt), pos), ...);
+                    (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
                 }
             } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
                 if((std::get<pool_type<Owned> *>(cpools)->has(entt) && ...)
@@ -175,7 +175,7 @@ class basic_registry {
                         && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...))
                 {
                     const auto pos = this->owned++;
-                    (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->index(entt), pos), ...);
+                    (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
                 }
             }
         }
@@ -183,7 +183,7 @@ class basic_registry {
         void discard_if(const Entity entt) {
             if(std::get<0>(cpools)->has(entt) && std::get<0>(cpools)->index(entt) < this->owned) {
                 const auto pos = --this->owned;
-                (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->index(entt), pos), ...);
+                (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
             }
         }
     };
@@ -1415,7 +1415,7 @@ public:
                     } else {
                         const auto pos = curr->owned++;
                         // useless this-> used to suppress a warning with clang
-                        (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->index(entity), pos), ...);
+                        (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entity), ...);
                     }
                 }
             });

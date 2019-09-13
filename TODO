@@ -14,7 +14,6 @@
 * add opaque input iterators to views and groups that return tuples <entity, T &...> (proxy), multi-pass guaranteed
 * add fast lane for raw iterations, extend mt doc to describe allowed add/remove with pre-allocations on fast lanes
 * registry.each<T...>(first, last) by iterators, entities/components guaranteed
-* multi component registry::remove and some others?
 * built-in support for dual (or N-) buffering
 * allow for custom stomp functions
 * deprecate/replace snapshot
@@ -24,7 +23,6 @@ TODO
 * make meta work across boundaries
   - inline variables are fine here, only the head represents a problem
   - we should always resolve by looking into the list of types when working across boundaries, no direct resolve
-* nested groups: AB/ABC/ABCD/... (hints: sort, check functions)
 * snapshot rework/deprecation
   - create(hint: entity) -> force-create
   - assign<T...>(first, last)
@@ -32,4 +30,7 @@ TODO
   - use direct access (pool-like) also for context variables
   - improves multi-stomp
 * improve registry::alive
+* nested groups: AB/ABC/ABCD/... (hints: sort, check functions)
+* multi component registry::remove and some others?
+* range based registry::remove and some others?
 * allocation-less and faster sort

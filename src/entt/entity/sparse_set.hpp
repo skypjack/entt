@@ -462,16 +462,16 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * sparse set doesn't contain the given entities.
      *
-     * @param lhs A valid position within the sparse set.
-     * @param rhs A valid position within the sparse set.
+     * @param lhs A valid entity identifier.
+     * @param rhs A valid entity identifier.
      */
-    virtual void swap(const size_type lhs, const size_type rhs) ENTT_NOEXCEPT {
-        ENTT_ASSERT(lhs < direct.size());
-        ENTT_ASSERT(rhs < direct.size());
-        auto [src_page, src_offset] = map(direct[lhs]);
-        auto [dst_page, dst_offset] = map(direct[rhs]);
-        std::swap(reverse[src_page][src_offset], reverse[dst_page][dst_offset]);
-        std::swap(direct[lhs], direct[rhs]);
+    virtual void swap(const entity_type lhs, const entity_type rhs) ENTT_NOEXCEPT {
+        auto [src_page, src_offset] = map(lhs);
+        auto [dst_page, dst_offset] = map(rhs);
+        auto &from = reverse[src_page][src_offset];
+        auto &to = reverse[dst_page][dst_offset];
+        std::swap(direct[size_type(from)], direct[size_type(to)]);
+        std::swap(from, to);
     }
 
     /**
@@ -534,7 +534,7 @@ public:
             auto next = copy[curr];
 
             while(curr != next) {
-                swap(copy[curr] + offset, copy[next] + offset);
+                swap(direct[copy[curr] + offset], direct[copy[next] + offset]);
                 copy[curr] = curr;
                 curr = next;
                 next = copy[curr];
@@ -571,7 +571,7 @@ public:
         while(pos && from != to) {
             if(has(*from)) {
                 if(*from != direct[pos]) {
-                    swap(pos, index(*from));
+                    swap(direct[pos], *from);
                 }
 
                 --pos;
