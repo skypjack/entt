@@ -505,8 +505,8 @@ public:
      *
      * @note
      * Attempting to iterate elements using a raw pointer returned by a call to
-     * either `data` or `raw` gives no guarantees on the order, even though
-     * `sort` has been invoked.
+     * `data` gives no guarantees on the order, even though `sort` has been
+     * invoked.
      *
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
@@ -556,8 +556,9 @@ public:
      * more details.
      *
      * @note
-     * Attempting to iterate elements using the raw pointer returned by `data`
-     * gives no guarantees on the order, even though `respect` has been invoked.
+     * Attempting to iterate elements using a raw pointer returned by a call to
+     * `data` gives no guarantees on the order, even though `respect` has been
+     * invoked.
      *
      * @param other The sparse sets that imposes the order of the entities.
      */
