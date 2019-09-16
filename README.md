@@ -183,47 +183,36 @@ amazing set of features. And even more, of course.
 ## Performance
 
 As it stands right now, `EnTT` is just fast enough for my requirements when
-compared to my first choice (it was already amazingly fast actually).<br/>
-Below is a comparison between the two (both of them compiled with GCC 7.3.0 on a
-Dell XPS 13 from mid 2014):
+compared to my first choice (it was already amazingly fast actually).
 
-| Benchmark | EntityX (compile-time) | EnTT |
-|-----------|-------------|-------------|
-| Create 1M entities | 0.0147s | **0.0046s** |
-| Destroy 1M entities | 0.0053s | **0.0045s** |
-| 1M entities, one component | 0.0012s | **1.9e-07s** |
-| 1M entities, two components | 0.0012s | **3.8e-07s** |
-| 1M entities, two components<br/>Half of the entities have all the components | 0.0009s | **3.8e-07s** |
-| 1M entities, two components<br/>One of the entities has all the components | 0.0008s | **1.0e-06s** |
-| 1M entities, five components | 0.0010s | **7.0e-07s** |
-| 1M entities, ten components | 0.0011s | **1.2e-06s** |
-| 1M entities, ten components<br/>Half of the entities have all the components | 0.0010s | **1.2e-06s** |
-| 1M entities, ten components<br/>One of the entities has all the components | 0.0008s | **1.2e-06s** |
-| Sort 150k entities, one component<br/>Arrays are in reverse order | - | **0.0036s** |
-| Sort 150k entities, enforce permutation<br/>Arrays are in reverse order | - | **0.0005s** |
-| Sort 150k entities, one component<br/>Arrays are almost sorted, std::sort | - | **0.0035s** |
-| Sort 150k entities, one component<br/>Arrays are almost sorted, insertion sort | - | **0.0007s** |
+For a long time, this file contained also some benchmarks to show how fast
+`EnTT` was. However, I got tired of updating them whenever there is an
+improvement. Furthermore, there are a lot of projects out there that use `EnTT`
+as a basis for comparison (this should already tell you a lot) and offer their
+own more or less ad hoc results to show how they perform well downhill and with
+the wind at their back.<br/>
+Many of these benchmarks are completely wrong and cannot be used to evaluate any
+of the existing libraries, many others are simply incomplete, good at omitting
+some information and using the wrong function to compare a given feature.
+Certainly there are also good ones but they age quickly if nobody updates them,
+especially when the library they are dealing with is actively developed.<br/>
+Do you really want to have useless numbers on yet another README file?
 
-Note: The default version of `EntityX` (`master` branch) wasn't added to the
-comparison because it's already much slower than its compile-time counterpart.
+If you are interested, you can compile the `benchmark` test in release mode (to
+enable compiler optimizations, otherwise it would make little sense) by setting
+the `BUILD_BENCHMARK` option to `ON`, then evaluate yourself whether you're
+satisfied with the results or not.
 
-Pretty interesting results, aren't them? In fact, these benchmarks are the ones
-used by `EntityX` to show _how fast it is_. To be honest, they aren't so good
-and these results shouldn't be taken too seriously (indeed they are completely
-unrealistic).<br/>
-The proposed entity-component system is incredibly fast to iterate entities,
-this is a fact. The compiler can make a lot of optimizations because of how
-`EnTT` works, even more when components aren't used at all. This is exactly the
-case for these benchmarks. On the other hand, if we consider real world cases,
-`EnTT` is somewhere between a bit and much faster than the other solutions
-around when users also access the components and not just the entities, although
-it isn't as fast as reported by these benchmarks.<br/>
-This is why they are completely wrong and cannot be used to evaluate any of the
-entity-component-system libraries out there.
+The proposed entity-component system is incredibly fast to iterate entities and
+components, this is a fact. Some compilers make a lot of optimizations because
+of how `EnTT` works, even more when components aren't used at all. In general,
+if we consider real world cases, `EnTT` is somewhere between a bit and much
+faster than many of the other solutions around, although I couldn't check them
+all for obvious reasons.
 
 The choice to use `EnTT` should be based on its carefully designed API, its
-set of features and the general performance, not because some single benchmark
-shows it to be the fastest tool available.
+set of features and the general performance, **not** because some single
+benchmark shows it to be the fastest tool available.
 
 In the future I'll likely try to get even better performance while still adding
 new features, mainly for fun.<br/>

@@ -426,10 +426,6 @@ public:
      * * An iterator past the last element of the range to sort.
      * * A comparison function to use to compare the elements.
      *
-     * The comparison function object received by the sort function object
-     * hasn't necessarily the type of the one passed along with the other
-     * parameters to this member function.
-     *
      * @note
      * Attempting to iterate elements using a raw pointer returned by a call to
      * either `data` or `raw` gives no guarantees on the order, even though
@@ -446,19 +442,24 @@ public:
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort(iterator_type first, iterator_type last, Compare compare, Sort algo = Sort{}, Args &&... args) {
-        ENTT_ASSERT(!(first > last));
+        ENTT_ASSERT(!(last < first));
+        ENTT_ASSERT(!(last > end()));
 
         const auto from = underlying_type::begin() + std::distance(begin(), first);
         const auto to = from + std::distance(first, last);
 
+        const auto apply = [this](const auto lhs, const auto rhs) {
+            std::swap(instances[underlying_type::index(lhs)], instances[underlying_type::index(rhs)]);
+        };
+
         if constexpr(std::is_invocable_v<Compare, const object_type &, const object_type &>) {
             static_assert(!std::is_empty_v<object_type>);
 
-            underlying_type::sort(from, to, [this, compare = std::move(compare)](const auto lhs, const auto rhs) {
+            underlying_type::arrange(from, to, std::move(apply), [this, compare = std::move(compare)](const auto lhs, const auto rhs) {
                 return compare(std::as_const(instances[underlying_type::index(lhs)]), std::as_const(instances[underlying_type::index(rhs)]));
             }, std::move(algo), std::forward<Args>(args)...);
         } else {
-            underlying_type::sort(from, to, std::move(compare), std::move(algo), std::forward<Args>(args)...);
+            underlying_type::arrange(from, to, std::move(apply), std::move(compare), std::move(algo), std::forward<Args>(args)...);
         }
     }
 

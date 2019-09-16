@@ -499,10 +499,6 @@ public:
      * * An iterator past the last element of the range to sort.
      * * A comparison function to use to compare the elements.
      *
-     * The comparison function object received by the sort function object
-     * hasn't necessarily the type of the one passed along with the other
-     * parameters to this member function.
-     *
      * @note
      * Attempting to iterate elements using a raw pointer returned by a call to
      * `data` gives no guarantees on the order, even though `sort` has been
@@ -519,25 +515,74 @@ public:
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort(iterator_type first, iterator_type last, Compare compare, Sort algo = Sort{}, Args &&... args) {
-        ENTT_ASSERT(!(first > last));
+        ENTT_ASSERT(!(last < first));
+        ENTT_ASSERT(!(last > end()));
 
-        std::vector<size_type> copy(last - first);
-        const auto offset = std::distance(last, end());
-        std::iota(copy.begin(), copy.end(), size_type{});
+        const auto length = std::distance(first, last);
+        const auto skip = std::distance(last, end());
+        const auto to = direct.rend() - skip;
+        const auto from = to - length;
 
-        algo(copy.rbegin(), copy.rend(), [this, offset, compare = std::move(compare)](const auto lhs, const auto rhs) {
-            return compare(std::as_const(direct[lhs+offset]), std::as_const(direct[rhs+offset]));
-        }, std::forward<Args>(args)...);
+        algo(from, to, std::move(compare), std::forward<Args>(args)...);
 
-        for(size_type pos{}, length = copy.size(); pos < length; ++pos) {
+        for(size_type pos = skip, end = skip+length; pos < end; pos++) {
+            auto [page, offset] = map(direct[pos]);
+            reverse[page][offset] = entity_type(pos);
+        }
+    }
+
+    /**
+     * @brief Sort elements according to the given comparison function.
+     *
+     * @sa sort
+     *
+     * This function is a slightly slower version of `sort` that invokes the
+     * caller to indicate which entities are swapped.<br/>
+     * It's recommended when the caller wants to sort its own data structures to
+     * align them with the order induced in the sparse set.
+     *
+     * The signature of the callback should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * bool(const Entity, const Entity);
+     * @endcode
+     *
+     * @tparam Apply Type of function object to invoke to notify the caller.
+     * @tparam Compare Type of comparison function object.
+     * @tparam Sort Type of sort function object.
+     * @tparam Args Types of arguments to forward to the sort function object.
+     * @param first An iterator to the first element of the range to sort.
+     * @param last An iterator past the last element of the range to sort.
+     * @param apply A valid function object to use as a callback.
+     * @param compare A valid comparison function object.
+     * @param algo A valid sort function object.
+     * @param args Arguments to forward to the sort function object, if any.
+     */
+    template<typename Apply, typename Compare, typename Sort = std_sort, typename... Args>
+    void arrange(iterator_type first, iterator_type last, Apply apply, Compare compare, Sort algo = Sort{}, Args &&... args) {
+        ENTT_ASSERT(!(last < first));
+        ENTT_ASSERT(!(last > end()));
+
+        const auto length = std::distance(first, last);
+        const auto skip = std::distance(last, end());
+        const auto to = direct.rend() - skip;
+        const auto from = to - length;
+
+        algo(from, to, std::move(compare), std::forward<Args>(args)...);
+
+        for(size_type pos = skip, end = skip+length; pos < end; pos++) {
             auto curr = pos;
-            auto next = copy[curr];
+            auto next = index(direct[curr]);
 
             while(curr != next) {
-                swap(direct[copy[curr] + offset], direct[copy[next] + offset]);
-                copy[curr] = curr;
+                auto [src_page, src_offset] = map(direct[curr]);
+                auto [dst_page, dst_offset] = map(direct[next]);
+
+                apply(direct[curr], direct[next]);
+                std::swap(reverse[src_page][src_offset], reverse[dst_page][dst_offset]);
+
                 curr = next;
-                next = copy[curr];
+                next = index(direct[curr]);
             }
         }
     }

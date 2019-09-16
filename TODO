@@ -33,4 +33,3 @@ TODO
 * nested groups: AB/ABC/ABCD/... (hints: sort, check functions)
 * multi component registry::remove and some others?
 * range based registry::remove and some others?
-* allocation-less and faster sort
