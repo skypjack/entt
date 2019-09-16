@@ -182,33 +182,26 @@ amazing set of features. And even more, of course.
 
 ## Performance
 
-As it stands right now, `EnTT` is just fast enough for my requirements when
-compared to my first choice (it was already amazingly fast actually).
-
-For a long time, this file contained also some benchmarks to show how fast
-`EnTT` was. However, I got tired of updating them whenever there is an
-improvement. Furthermore, there are a lot of projects out there that use `EnTT`
-as a basis for comparison (this should already tell you a lot) and offer their
-own more or less ad hoc results to show how they perform well downhill and with
-the wind at their back.<br/>
-Many of these benchmarks are completely wrong and cannot be used to evaluate any
-of the existing libraries, many others are simply incomplete, good at omitting
-some information and using the wrong function to compare a given feature.
-Certainly there are also good ones but they age quickly if nobody updates them,
-especially when the library they are dealing with is actively developed.<br/>
-Do you really want to have useless numbers on yet another README file?
+The proposed entity-component system is incredibly fast to iterate entities and
+components, this is a fact. Some compilers make a lot of optimizations because
+of how `EnTT` works, some others aren't that good. In general, if we consider
+real world cases, `EnTT` is somewhere between a bit and much faster than many of
+the other solutions around, although I couldn't check them all for obvious
+reasons.
 
 If you are interested, you can compile the `benchmark` test in release mode (to
 enable compiler optimizations, otherwise it would make little sense) by setting
-the `BUILD_BENCHMARK` option to `ON`, then evaluate yourself whether you're
-satisfied with the results or not.
+the `BUILD_BENCHMARK` option of `CMake` to `ON`, then evaluate yourself whether
+you're satisfied with the results or not.
 
-The proposed entity-component system is incredibly fast to iterate entities and
-components, this is a fact. Some compilers make a lot of optimizations because
-of how `EnTT` works, even more when components aren't used at all. In general,
-if we consider real world cases, `EnTT` is somewhere between a bit and much
-faster than many of the other solutions around, although I couldn't check them
-all for obvious reasons.
+Honestly I got tired of updating the README file whenever there is an
+improvement.<br/>
+There are already a lot of projects out there that use `EnTT` as a basis for
+comparison (this should already tell you a lot). Many of these benchmarks are
+completely wrong, many others are simply incomplete, good at omitting some
+information and using the wrong function to compare a given feature. Certainly
+there are also good ones but they age quickly if nobody updates them, especially
+when the library they are dealing with is actively developed.
 
 The choice to use `EnTT` should be based on its carefully designed API, its
 set of features and the general performance, **not** because some single
