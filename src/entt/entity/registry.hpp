@@ -166,7 +166,7 @@ class basic_registry {
                         && ((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
                         && !(std::get<pool_type<Exclude> *>(cpools)->has(entt) || ...))
                 {
-                    const auto pos = this->owned++;
+                    const auto pos = owned++;
                     (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
                 }
             } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
@@ -174,15 +174,15 @@ class basic_registry {
                         && (std::get<pool_type<Get> *>(cpools)->has(entt) && ...)
                         && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...))
                 {
-                    const auto pos = this->owned++;
+                    const auto pos = owned++;
                     (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
                 }
             }
         }
 
         void discard_if(const Entity entt) {
-            if(std::get<0>(cpools)->has(entt) && std::get<0>(cpools)->index(entt) < this->owned) {
-                const auto pos = --this->owned;
+            if(std::get<0>(cpools)->has(entt) && std::get<0>(cpools)->index(entt) < owned) {
+                const auto pos = --owned;
                 (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
             }
         }
@@ -1414,7 +1414,6 @@ public:
                         curr->set.construct(entity);
                     } else {
                         const auto pos = curr->owned++;
-                        // useless this-> used to suppress a warning with clang
                         (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entity), ...);
                     }
                 }
