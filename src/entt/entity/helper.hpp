@@ -29,12 +29,13 @@ struct as_view {
 
     /**
      * @brief Conversion function from a registry to a view.
+     * @tparam Exclude Types of components used to filter the view.
      * @tparam Component Type of components used to construct the view.
      * @return A newly created view.
      */
-    template<typename... Component>
-    operator entt::basic_view<Entity, Component...>() const {
-        return reg.template view<Component...>();
+    template<typename Exclude, typename... Component>
+    operator entt::basic_view<Entity, Exclude, Component...>() const {
+        return reg.template view<Component...>(Exclude{});
     }
 
 private:

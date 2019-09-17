@@ -8,9 +8,11 @@ TEST(Helper, AsView) {
     entt::registry registry;
     const entt::registry cregistry;
 
-    ([](entt::view<int, char>) {})(entt::as_view{registry});
-    ([](entt::view<const int, char>) {})(entt::as_view{registry});
-    ([](entt::view<const double>) {})(entt::as_view{cregistry});
+    ([](entt::view<entt::exclude_t<>, int>) {})(entt::as_view{registry});
+    ([](entt::view<entt::exclude_t<int>, char, double>) {})(entt::as_view{registry});
+    ([](entt::view<entt::exclude_t<const int>, char, double>) {})(entt::as_view{registry});
+    ([](entt::view<entt::exclude_t<const int>, const char, double>) {})(entt::as_view{registry});
+    ([](entt::view<entt::exclude_t<const int>, const char, const double>) {})(entt::as_view{registry});
 }
 
 TEST(Helper, AsGroup) {

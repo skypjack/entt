@@ -14,7 +14,7 @@ template <typename>
 class basic_registry;
 
 /*! @class basic_view */
-template<typename, typename...>
+template<typename...>
 class basic_view;
 
 /*! @class basic_runtime_view */
@@ -71,7 +71,7 @@ using continuous_loader = basic_continuous_loader<entity>;
 
 /**
  * @brief Alias declaration for the most common use case.
- * @tparam Component Types of components iterated by the view.
+ * @tparam Types Types of components iterated by the group.
  */
 template<typename... Types>
 using view = basic_view<entity, Types...>;

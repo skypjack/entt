@@ -12,11 +12,22 @@
 #include "../core/type_traits.hpp"
 #include "sparse_set.hpp"
 #include "storage.hpp"
+#include "utility.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
 
 namespace entt {
+
+
+/**
+ * @brief View.
+ *
+ * Primary template isn't defined on purpose. All the specializations give a
+ * compile-time error, but for a few reasonable cases.
+ */
+template<typename...>
+class basic_view;
 
 
 /**
@@ -28,8 +39,7 @@ namespace entt {
  * reference to the smallest set of candidate entities in order to get a
  * performance boost when iterate.<br/>
  * Order of elements during iterations are highly dependent on the order of the
- * underlying data structures. See sparse_set and its specializations for more
- * details.
+ * underlying data structures. See sparse_set for more details.
  *
  * @b Important
  *
@@ -54,10 +64,11 @@ namespace entt {
  * In any other case, attempting to use a view results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Exclude Types of components used to filter the view.
  * @tparam Component Types of components iterated by the view.
  */
-template<typename Entity, typename... Component>
-class basic_view {
+template<typename Entity, typename... Exclude, typename... Component>
+class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     static_assert(sizeof...(Component) > 1);
 
     /*! @brief A registry is allowed to create views. */
@@ -74,7 +85,7 @@ class basic_view {
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     class iterator {
-        friend class basic_view<Entity, Component...>;
+        friend class basic_view<Entity, exclude_t<Exclude...>, Component...>;
 
         iterator(unchecked_type other, underlying_iterator_type first, underlying_iterator_type last) ENTT_NOEXCEPT
             : unchecked{other},
@@ -499,8 +510,7 @@ private:
  * performance. This kind of views can access the underlying data structure
  * directly and avoid superfluous checks.<br/>
  * Order of elements during iterations are highly dependent on the order of the
- * underlying data structure. See sparse_set and its specializations for more
- * details.
+ * underlying data structure. See sparse_set for more details.
  *
  * @b Important
  *
@@ -527,7 +537,7 @@ private:
  * @tparam Component Type of component iterated by the view.
  */
 template<typename Entity, typename Component>
-class basic_view<Entity, Component> {
+class basic_view<Entity, exclude_t<>, Component> {
     /*! @brief A registry is allowed to create views. */
     friend class basic_registry<Entity>;
 

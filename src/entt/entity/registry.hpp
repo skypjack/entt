@@ -1302,16 +1302,17 @@ public:
      * To get a performance boost, consider using a group instead.
      *
      * @tparam Component Type of components used to construct the view.
+     * @tparam Exclude Types of components used to filter the view.
      * @return A newly created view.
      */
-    template<typename... Component>
-    entt::basic_view<Entity, Component...> view() {
+    template<typename... Component, typename... Exclude>
+    entt::basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) {
         return { assure<Component>()... };
     }
 
     /*! @copydoc view */
-    template<typename... Component>
-    entt::basic_view<Entity, Component...> view() const {
+    template<typename... Component, typename... Exclude>
+    entt::basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) const {
         static_assert(std::conjunction_v<std::is_const<Component>...>);
         return const_cast<basic_registry *>(this)->view<Component...>();
     }
