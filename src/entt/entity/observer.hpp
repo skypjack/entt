@@ -52,7 +52,7 @@ struct basic_collector<> {
      */
     template<typename... AllOf, typename... NoneOf>
     static constexpr auto group(exclude_t<NoneOf...> = {}) ENTT_NOEXCEPT {
-        return basic_collector<matcher<matcher<type_list<>, type_list<>>, type_list<NoneOf...>, type_list<AllOf...>>>{};
+        return basic_collector<matcher<type_list<>, type_list<>, type_list<NoneOf...>, AllOf...>>{};
     }
 
     /**
@@ -62,18 +62,23 @@ struct basic_collector<> {
      */
     template<typename AnyOf>
     static constexpr auto replace() ENTT_NOEXCEPT {
-        return basic_collector<matcher<matcher<type_list<>, type_list<>>, AnyOf>>{};
+        return basic_collector<matcher<type_list<>, type_list<>, AnyOf>>{};
     }
 };
 
 /**
  * @brief Collector.
  * @copydetails basic_collector<>
- * @tparam AnyOf Types of components for which changes should be detected.
- * @tparam Matcher Types of grouping matchers.
+ * @tparam Reject Untracked types used to filter out entities.
+ * @tparam Require Untracked types required by the matcher.
+ * @tparam Rule Specific details of the current matcher.
+ * @tparam Other Other matchers.
  */
 template<typename... Reject, typename... Require, typename... Rule, typename... Other>
-struct basic_collector<matcher<matcher<type_list<Reject...>, type_list<Require...>>, Rule...>, Other...> {
+struct basic_collector<matcher<type_list<Reject...>, type_list<Require...>, Rule...>, Other...> {
+    /*! @brief Current matcher. */
+    using current_type = matcher<type_list<Reject...>, type_list<Require...>, Rule...>;
+
     /**
      * @brief Adds a grouping matcher to the collector.
      * @tparam AllOf Types of components tracked by the matcher.
@@ -82,8 +87,7 @@ struct basic_collector<matcher<matcher<type_list<Reject...>, type_list<Require..
      */
     template<typename... AllOf, typename... NoneOf>
     static constexpr auto group(exclude_t<NoneOf...> = {}) ENTT_NOEXCEPT {
-        using first = matcher<matcher<type_list<Reject...>, type_list<Require...>>, Rule...>;
-        return basic_collector<matcher<matcher<type_list<>, type_list<>>, type_list<NoneOf...>, type_list<AllOf...>>, first, Other...>{};
+        return basic_collector<matcher<type_list<>, type_list<>, type_list<NoneOf...>, AllOf...>, current_type, Other...>{};
     }
 
     /**
@@ -93,8 +97,7 @@ struct basic_collector<matcher<matcher<type_list<Reject...>, type_list<Require..
      */
     template<typename AnyOf>
     static constexpr auto replace() ENTT_NOEXCEPT {
-        using first = matcher<matcher<type_list<Reject...>, type_list<Require...>>, Rule...>;
-        return basic_collector<matcher<matcher<type_list<>, type_list<>>, AnyOf>, first, Other...>{};
+        return basic_collector<matcher<type_list<>, type_list<>, AnyOf>, current_type, Other...>{};
     }
 
     /**
@@ -105,7 +108,8 @@ struct basic_collector<matcher<matcher<type_list<Reject...>, type_list<Require..
      */
     template<typename... AllOf, typename... NoneOf>
     static constexpr auto where(exclude_t<NoneOf...> = {}) ENTT_NOEXCEPT {
-        return basic_collector<matcher<matcher<type_list<Reject..., NoneOf...>, type_list<Require..., AllOf...>>, Rule...>, Other...>{};
+        using extended_type = matcher<type_list<Reject..., NoneOf...>, type_list<Require..., AllOf...>, Rule...>;
+        return basic_collector<extended_type, Other...>{};
     }
 };
 
@@ -171,7 +175,7 @@ class basic_observer {
     struct matcher_handler;
 
     template<typename... Reject, typename... Require, typename AnyOf>
-    struct matcher_handler<matcher<matcher<type_list<Reject...>, type_list<Require...>>, AnyOf>> {
+    struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, AnyOf>> {
         template<std::size_t Index>
         static void maybe_valid_if(basic_observer &obs, const Entity entt, const basic_registry<Entity> &reg) {
             if(reg.template has<Require...>(entt) && !(reg.template has<Reject>(entt) || ...)) {
@@ -204,7 +208,7 @@ class basic_observer {
     };
 
     template<typename... Reject, typename... Require, typename... NoneOf, typename... AllOf>
-    struct matcher_handler<matcher<matcher<type_list<Reject...>, type_list<Require...>>, type_list<NoneOf...>, type_list<AllOf...>>> {
+    struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, type_list<NoneOf...>, AllOf...>> {
         template<std::size_t Index>
         static void maybe_valid_if(basic_observer &obs, const Entity entt, const basic_registry<Entity> &reg) {
             if(reg.template has<AllOf...>(entt) && !(reg.template has<NoneOf>(entt) || ...)

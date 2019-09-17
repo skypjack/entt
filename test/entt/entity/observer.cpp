@@ -1,4 +1,5 @@
 #include <tuple>
+#include <cstddef>
 #include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/entity/observer.hpp>
@@ -8,14 +9,14 @@ TEST(Observer, Functionalities) {
     entt::registry registry;
     entt::observer observer{registry, entt::collector.group<int>()};
 
-    ASSERT_EQ(observer.size(), entt::observer::size_type{});
+    ASSERT_EQ(observer.size(), 0u);
     ASSERT_TRUE(observer.empty());
     ASSERT_EQ(observer.data(), nullptr);
     ASSERT_EQ(observer.begin(), observer.end());
 
     const auto entity = std::get<0>(registry.create<int>());
 
-    ASSERT_EQ(observer.size(), entt::observer::size_type{1});
+    ASSERT_EQ(observer.size(), 1u);
     ASSERT_FALSE(observer.empty());
     ASSERT_NE(observer.data(), nullptr);
     ASSERT_EQ(*observer.data(), entity);
@@ -25,14 +26,14 @@ TEST(Observer, Functionalities) {
 
     observer.clear();
 
-    ASSERT_EQ(observer.size(), entt::observer::size_type{});
+    ASSERT_EQ(observer.size(), 0u);
     ASSERT_TRUE(observer.empty());
 
     observer.disconnect();
     registry.remove<int>(entity);
     registry.assign<int>(entity);
 
-    ASSERT_EQ(observer.size(), entt::observer::size_type{});
+    ASSERT_EQ(observer.size(), 0u);
     ASSERT_TRUE(observer.empty());
 }
 
@@ -50,7 +51,7 @@ TEST(Observer, AllOf) {
     registry.assign<int>(entity);
     registry.assign<char>(entity);
 
-    ASSERT_EQ(observer.size(), entt::observer::size_type{1});
+    ASSERT_EQ(observer.size(), 1u);
     ASSERT_FALSE(observer.empty());
     ASSERT_EQ(*observer.data(), entity);
 
@@ -96,7 +97,7 @@ TEST(Observer, AllOfFiltered) {
 
     registry.assign<int>(entity);
 
-    ASSERT_EQ(observer.size(), entt::observer::size_type{});
+    ASSERT_EQ(observer.size(), 0u);
     ASSERT_TRUE(observer.empty());
     ASSERT_EQ(observer.data(), nullptr);
 
@@ -111,7 +112,7 @@ TEST(Observer, AllOfFiltered) {
     registry.remove<double>(entity);
     registry.assign<int>(entity);
 
-    ASSERT_EQ(observer.size(), entt::observer::size_type{1});
+    ASSERT_EQ(observer.size(), 1u);
     ASSERT_FALSE(observer.empty());
     ASSERT_EQ(*observer.data(), entity);
 
@@ -126,72 +127,6 @@ TEST(Observer, AllOfFiltered) {
     observer.disconnect();
     registry.remove<int>(entity);
     registry.assign<int>(entity);
-
-    ASSERT_TRUE(observer.empty());
-}
-
-TEST(Observer, WhereChain) {
-    constexpr auto collector =  entt::collector
-            .replace<int>().where<char>()
-            .replace<double>().where<float>();
-
-    entt::registry registry;
-    entt::observer observer{registry, collector};
-    const auto entity = registry.create();
-
-    ASSERT_TRUE(observer.empty());
-
-    registry.assign<int>(entity);
-
-    ASSERT_TRUE(observer.empty());
-
-    registry.assign_or_replace<int>(entity);
-
-    ASSERT_TRUE(observer.empty());
-
-    registry.assign<char>(entity);
-
-    ASSERT_TRUE(observer.empty());
-
-    registry.assign_or_replace<int>(entity);
-
-    ASSERT_EQ(observer.size(), entt::observer::size_type{ 1 });
-    ASSERT_FALSE(observer.empty());
-    ASSERT_EQ(*observer.data(), entity);
-
-    observer.clear();
-    registry.assign<double>(entity);
-
-    ASSERT_TRUE(observer.empty());
-
-    registry.assign_or_replace<double>(entity);
-
-    ASSERT_TRUE(observer.empty());
-
-    registry.assign<float>(entity);
-
-    ASSERT_TRUE(observer.empty());
-
-    registry.assign_or_replace<double>(entity);
-
-    ASSERT_EQ(observer.size(), entt::observer::size_type{ 1 });
-    ASSERT_FALSE(observer.empty());
-    ASSERT_EQ(*observer.data(), entity);
-
-    registry.remove<float>(entity);
-
-    ASSERT_TRUE(observer.empty());
-
-    registry.assign_or_replace<int>(entity);
-
-    ASSERT_EQ(observer.size(), entt::observer::size_type{ 1 });
-    ASSERT_FALSE(observer.empty());
-    ASSERT_EQ(*observer.data(), entity);
-
-    observer.clear();
-    observer.disconnect();
-
-    registry.assign_or_replace<int>(entity);
 
     ASSERT_TRUE(observer.empty());
 }
@@ -210,7 +145,7 @@ TEST(Observer, Observe) {
 
     registry.assign_or_replace<int>(entity);
 
-    ASSERT_EQ(observer.size(), entt::observer::size_type{1});
+    ASSERT_EQ(observer.size(), 1u);
     ASSERT_FALSE(observer.empty());
     ASSERT_EQ(*observer.data(), entity);
 
@@ -243,7 +178,7 @@ TEST(Observer, ObserveFiltered) {
     registry.assign<int>(entity);
     registry.replace<int>(entity);
 
-    ASSERT_EQ(observer.size(), entt::observer::size_type{});
+    ASSERT_EQ(observer.size(), 0u);
     ASSERT_TRUE(observer.empty());
     ASSERT_EQ(observer.data(), nullptr);
 
@@ -256,7 +191,7 @@ TEST(Observer, ObserveFiltered) {
     registry.remove<double>(entity);
     registry.replace<int>(entity);
 
-    ASSERT_EQ(observer.size(), entt::observer::size_type{1});
+    ASSERT_EQ(observer.size(), 1u);
     ASSERT_FALSE(observer.empty());
     ASSERT_EQ(*observer.data(), entity);
 
@@ -288,7 +223,7 @@ TEST(Observer, AllOfObserve) {
     registry.replace<char>(entity);
     registry.remove<int>(entity);
 
-    ASSERT_EQ(observer.size(), entt::observer::size_type{1});
+    ASSERT_EQ(observer.size(), 1u);
     ASSERT_FALSE(observer.empty());
     ASSERT_EQ(*observer.data(), entity);
 
@@ -331,19 +266,75 @@ TEST(Observer, Each) {
     const auto entity = std::get<0>(registry.create<int>());
 
     ASSERT_FALSE(observer.empty());
-    ASSERT_EQ(observer.size(), entt::observer::size_type{1});
+    ASSERT_EQ(observer.size(), 1u);
 
     std::as_const(observer).each([entity](const auto entt) {
         ASSERT_EQ(entity, entt);
     });
 
     ASSERT_FALSE(observer.empty());
-    ASSERT_EQ(observer.size(), entt::observer::size_type{1});
+    ASSERT_EQ(observer.size(), 1u);
 
     observer.each([entity](const auto entt) {
         ASSERT_EQ(entity, entt);
     });
 
     ASSERT_TRUE(observer.empty());
-    ASSERT_EQ(observer.size(), entt::observer::size_type{});
+    ASSERT_EQ(observer.size(), 0u);
+}
+
+TEST(Observer, MultipleFilters) {
+    constexpr auto collector =  entt::collector
+            .replace<int>().where<char>()
+            .replace<double>().where<float>();
+
+    entt::registry registry;
+    entt::observer observer{registry, collector};
+    const auto entity = registry.create();
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign_or_replace<int>(entity);
+    registry.assign<char>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign_or_replace<int>(entity);
+
+    ASSERT_EQ(observer.size(), 1u);
+    ASSERT_FALSE(observer.empty());
+    ASSERT_EQ(*observer.data(), entity);
+
+    observer.clear();
+    registry.assign<double>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign_or_replace<double>(entity);
+    registry.assign<float>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign_or_replace<double>(entity);
+
+    ASSERT_EQ(observer.size(), 1u);
+    ASSERT_FALSE(observer.empty());
+    ASSERT_EQ(*observer.data(), entity);
+
+    registry.remove<float>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign_or_replace<int>(entity);
+
+    ASSERT_EQ(observer.size(), 1u);
+    ASSERT_FALSE(observer.empty());
+    ASSERT_EQ(*observer.data(), entity);
+
+    observer.clear();
+    observer.disconnect();
+
+    registry.assign_or_replace<int>(entity);
+
+    ASSERT_TRUE(observer.empty());
 }
