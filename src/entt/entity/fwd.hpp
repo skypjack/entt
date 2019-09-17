@@ -71,7 +71,7 @@ using continuous_loader = basic_continuous_loader<entity>;
 
 /**
  * @brief Alias declaration for the most common use case.
- * @tparam Types Types of components iterated by the group.
+ * @tparam Types Types of components iterated by the view.
  */
 template<typename... Types>
 using view = basic_view<entity, Types...>;
