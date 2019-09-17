@@ -130,6 +130,72 @@ TEST(Observer, AllOfFiltered) {
     ASSERT_TRUE(observer.empty());
 }
 
+TEST(Observer, WhereChain) {
+    constexpr auto collector =  entt::collector
+            .replace<int>().where<char>()
+            .replace<double>().where<float>();
+
+    entt::registry registry;
+    entt::observer observer{registry, collector};
+    const auto entity = registry.create();
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign<int>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign_or_replace<int>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign<char>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign_or_replace<int>(entity);
+
+    ASSERT_EQ(observer.size(), entt::observer::size_type{ 1 });
+    ASSERT_FALSE(observer.empty());
+    ASSERT_EQ(*observer.data(), entity);
+
+    observer.clear();
+    registry.assign<double>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign_or_replace<double>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign<float>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign_or_replace<double>(entity);
+
+    ASSERT_EQ(observer.size(), entt::observer::size_type{ 1 });
+    ASSERT_FALSE(observer.empty());
+    ASSERT_EQ(*observer.data(), entity);
+
+    registry.remove<float>(entity);
+
+    ASSERT_TRUE(observer.empty());
+
+    registry.assign_or_replace<int>(entity);
+
+    ASSERT_EQ(observer.size(), entt::observer::size_type{ 1 });
+    ASSERT_FALSE(observer.empty());
+    ASSERT_EQ(*observer.data(), entity);
+
+    observer.clear();
+    observer.disconnect();
+
+    registry.assign_or_replace<int>(entity);
+
+    ASSERT_TRUE(observer.empty());
+}
+
 TEST(Observer, Observe) {
     entt::registry registry;
     entt::observer observer{registry, entt::collector.replace<int>().replace<char>()};

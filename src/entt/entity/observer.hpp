@@ -83,7 +83,7 @@ struct basic_collector<matcher<matcher<type_list<Reject...>, type_list<Require..
     template<typename... AllOf, typename... NoneOf>
     static constexpr auto group(exclude_t<NoneOf...> = {}) ENTT_NOEXCEPT {
         using first = matcher<matcher<type_list<Reject...>, type_list<Require...>>, Rule...>;
-        return basic_collector<first, Other..., matcher<matcher<type_list<>, type_list<>>, type_list<NoneOf...>, type_list<AllOf...>>>{};
+        return basic_collector<matcher<matcher<type_list<>, type_list<>>, type_list<NoneOf...>, type_list<AllOf...>>, first, Other...>{};
     }
 
     /**
@@ -94,7 +94,7 @@ struct basic_collector<matcher<matcher<type_list<Reject...>, type_list<Require..
     template<typename AnyOf>
     static constexpr auto replace() ENTT_NOEXCEPT {
         using first = matcher<matcher<type_list<Reject...>, type_list<Require...>>, Rule...>;
-        return basic_collector<first, Other..., matcher<matcher<type_list<>, type_list<>>, AnyOf>>{};
+        return basic_collector<matcher<matcher<type_list<>, type_list<>>, AnyOf>, first, Other...>{};
     }
 
     /**
