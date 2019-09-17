@@ -134,7 +134,7 @@ class basic_registry {
         void maybe_valid_if(const Entity entt) {
             if constexpr(std::disjunction_v<std::is_same<Get, Component>...>) {
                 if(((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
-                        && !(std::get<pool_type<Exclude> *>(cpools)->has(entt) || ...))
+                        && (!std::get<pool_type<Exclude> *>(cpools)->has(entt) && ...))
                 {
                     set.construct(entt);
                 }
@@ -164,7 +164,7 @@ class basic_registry {
             if constexpr(std::disjunction_v<std::is_same<Owned, Component>..., std::is_same<Get, Component>...>) {
                 if(((std::is_same_v<Component, Owned> || std::get<pool_type<Owned> *>(cpools)->has(entt)) && ...)
                         && ((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
-                        && !(std::get<pool_type<Exclude> *>(cpools)->has(entt) || ...))
+                        && (!std::get<pool_type<Exclude> *>(cpools)->has(entt) && ...))
                 {
                     const auto pos = owned++;
                     (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
@@ -1307,14 +1307,15 @@ public:
      */
     template<typename... Component, typename... Exclude>
     entt::basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) {
-        return { assure<Component>()... };
+        static_assert(sizeof...(Component) > 0);
+        return { assure<Component>()..., assure<Exclude>()... };
     }
 
     /*! @copydoc view */
     template<typename... Component, typename... Exclude>
     entt::basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) const {
         static_assert(std::conjunction_v<std::is_const<Component>...>);
-        return const_cast<basic_registry *>(this)->view<Component...>();
+        return const_cast<basic_registry *>(this)->view<Component...>(exclude<Exclude...>);
     }
 
     /**
