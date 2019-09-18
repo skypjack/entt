@@ -67,6 +67,7 @@ endif()
 #
 
 add_library(EnTT INTERFACE)
+add_library(EnTT::EnTT ALIAS EnTT)
 
 configure_file(${EnTT_SOURCE_DIR}/cmake/in/version.h.in ${EnTT_SOURCE_DIR}/src/entt/config/version.h @ONLY)
 
@@ -123,6 +124,7 @@ install(
     EXPORT EnTTTargets
     FILE EnTTTargets.cmake
     DESTINATION ${CUSTOM_INSTALL_CONFIGDIR}
+    NAMESPACE EnTT::
 )
 
 #
