@@ -30,11 +30,11 @@ TEST(SingleComponentView, Functionalities) {
 
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{2});
 
-    view.get(e0) = '1';
+    view.get<char>(e0) = '1';
     view.get(e1) = '2';
 
     for(auto entity: view) {
-        ASSERT_TRUE(cview.get(entity) == '1' || cview.get(entity) == '2');
+        ASSERT_TRUE(cview.get<const char>(entity) == '1' || cview.get(entity) == '2');
     }
 
     ASSERT_EQ(*(view.data() + 0), e1);
@@ -214,7 +214,7 @@ TEST(SingleComponentView, Less) {
     });
 }
 
-TEST(MultipleComponentView, Functionalities) {
+TEST(MultiComponentView, Functionalities) {
     entt::registry registry;
     auto view = registry.view<int, char>();
     auto cview = std::as_const(registry).view<const int, const char>();
@@ -268,7 +268,7 @@ TEST(MultipleComponentView, Functionalities) {
     ASSERT_EQ(*(cview.raw<const char>() + 1), '2');
 }
 
-TEST(MultipleComponentView, Iterator) {
+TEST(MultiComponentView, Iterator) {
     entt::registry registry;
     const auto entity = registry.create();
     registry.assign<int>(entity);
@@ -290,7 +290,7 @@ TEST(MultipleComponentView, Iterator) {
     ASSERT_EQ(++view.begin(), view.end());
 }
 
-TEST(MultipleComponentView, Contains) {
+TEST(MultiComponentView, Contains) {
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -309,7 +309,7 @@ TEST(MultipleComponentView, Contains) {
     ASSERT_TRUE(view.contains(e1));
 }
 
-TEST(MultipleComponentView, Empty) {
+TEST(MultiComponentView, Empty) {
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -327,7 +327,7 @@ TEST(MultipleComponentView, Empty) {
     ASSERT_EQ(view.begin(), view.end());
 }
 
-TEST(MultipleComponentView, Each) {
+TEST(MultiComponentView, Each) {
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -353,7 +353,7 @@ TEST(MultipleComponentView, Each) {
     ASSERT_EQ(cnt, std::size_t{0});
 }
 
-TEST(MultipleComponentView, EachWithType) {
+TEST(MultiComponentView, EachWithType) {
     entt::registry registry;
 
     for(auto i = 0; i < 3; ++i) {
@@ -379,7 +379,7 @@ TEST(MultipleComponentView, EachWithType) {
     });
 }
 
-TEST(MultipleComponentView, EachWithHoles) {
+TEST(MultiComponentView, EachWithHoles) {
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -404,7 +404,7 @@ TEST(MultipleComponentView, EachWithHoles) {
     });
 }
 
-TEST(MultipleComponentView, ConstNonConstAndAllInBetween) {
+TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
     entt::registry registry;
     auto view = registry.view<int, const char, std::true_type>();
 
@@ -431,7 +431,7 @@ TEST(MultipleComponentView, ConstNonConstAndAllInBetween) {
     });
 }
 
-TEST(MultipleComponentView, Find) {
+TEST(MultiComponentView, Find) {
     entt::registry registry;
     auto view = registry.view<int, const char>();
 
@@ -474,6 +474,51 @@ TEST(MultipleComponentView, Find) {
 
     ASSERT_NE(view.find(e5), view.end());
     ASSERT_EQ(view.find(e4), view.end());
+}
+
+TEST(MultiComponentView, ExcludedComponents) {
+    entt::registry registry;
+
+    const auto e0 = registry.create();
+    registry.assign<int>(e0, 0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1, 1);
+    registry.assign<char>(e1);
+
+    const auto view = registry.view<int>(entt::exclude<char>);
+
+    const auto e2 = registry.create();
+    registry.assign<int>(e2, 2);
+
+    const auto e3 = registry.create();
+    registry.assign<int>(e3, 3);
+    registry.assign<char>(e3);
+
+    for(const auto entity: view) {
+        if(entity == e0) {
+            ASSERT_EQ(view.get<int>(e0), 0);
+        } else if(entity == e2) {
+            ASSERT_EQ(view.get(e2), 2);
+        } else {
+            FAIL();
+        }
+    }
+
+    registry.assign<char>(e0);
+    registry.assign<char>(e2);
+    registry.remove<char>(e1);
+    registry.remove<char>(e3);
+
+    for(const auto entity: view) {
+        if(entity == e1) {
+            ASSERT_EQ(view.get(e1), 1);
+        } else if(entity == e3) {
+            ASSERT_EQ(view.get<int>(e3), 3);
+        } else {
+            FAIL();
+        }
+    }
 }
 
 TEST(MultiComponentView, Less) {

@@ -34,4 +34,3 @@ TODO
 * range based registry::remove and some others?
 * nested groups: AB/ABC/ABCD/... (hints: sort, check functions)
   - sink::before and ordered calls
-* view and exclusion list

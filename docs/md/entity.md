@@ -1107,6 +1107,12 @@ auto single = registry.view<position>();
 auto multi = registry.view<position, velocity>();
 ```
 
+Filtering entities by components is also supported:
+
+```cpp
+auto view = registry.view<position, velocity>(entt::exclude<renderable>);
+```
+
 To iterate a view, either use it in a range-for loop:
 
 ```cpp
@@ -1141,21 +1147,8 @@ There exists also an alternative version of `each` named `less` that works
 exactly as its counterpart but for the fact that it doesn't return empty
 components to the caller.
 
-As a side note, when using a single component view, the most common error is to
-invoke `get` with the type of the component as a template parameter. This is
-probably due to the fact that it's required for multi component views:
-
-```cpp
-auto view = registry.view<position, const velocity>();
-
-for(auto entity: view) {
-    const auto &vel = view.get<const velocity>(entity);
-    // ...
-}
-```
-
-However, in case of a single component view, `get` doesn't accept a template
-parameter, since it's implicitly defined by the view itself:
+As a side note, in the case of single component views, `get` accepts but doesn't
+strictly require a template parameter, since the type is implicitly defined:
 
 ```cpp
 auto view = registry.view<const renderable>();
