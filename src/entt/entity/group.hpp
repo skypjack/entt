@@ -88,7 +88,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get, Other...>> {
             } else {
                 func(entt, std::get<pool_type<Weak> *>(pools)->get(entt)...);
             }
-        };
+        }
     }
 
 public:

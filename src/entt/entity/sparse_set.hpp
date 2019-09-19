@@ -575,11 +575,10 @@ public:
             auto next = index(direct[curr]);
 
             while(curr != next) {
-                auto [src_page, src_offset] = map(direct[curr]);
-                auto [dst_page, dst_offset] = map(direct[next]);
+                auto [page, offset] = map(direct[curr]);
 
                 apply(direct[curr], direct[next]);
-                std::swap(reverse[src_page][src_offset], reverse[dst_page][dst_offset]);
+                reverse[page][offset] = entity_type(pos);
 
                 curr = next;
                 next = index(direct[curr]);
