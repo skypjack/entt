@@ -338,6 +338,12 @@ TEST(Storage, SortOrdered) {
         return lhs.value < rhs.value;
     });
 
+    ASSERT_EQ(pool.index(entt::entity{12}), 0u);
+    ASSERT_EQ(pool.index(entt::entity{42}), 1u);
+    ASSERT_EQ(pool.index(entt::entity{7}), 2u);
+    ASSERT_EQ(pool.index(entt::entity{3}), 3u);
+    ASSERT_EQ(pool.index(entt::entity{9}), 4u);
+
     ASSERT_EQ((pool.raw() + 0u)->value, 12);
     ASSERT_EQ((pool.raw() + 1u)->value, 9);
     ASSERT_EQ((pool.raw() + 2u)->value, 6);
@@ -374,6 +380,12 @@ TEST(Storage, SortReverse) {
         return pool.get(lhs).value < pool.get(rhs).value;
     });
 
+    ASSERT_EQ(pool.index(entt::entity{9}), 0u);
+    ASSERT_EQ(pool.index(entt::entity{3}), 1u);
+    ASSERT_EQ(pool.index(entt::entity{7}), 2u);
+    ASSERT_EQ(pool.index(entt::entity{42}), 3u);
+    ASSERT_EQ(pool.index(entt::entity{12}), 4u);
+
     ASSERT_EQ((pool.raw() + 0u)->value, 12);
     ASSERT_EQ((pool.raw() + 1u)->value, 9);
     ASSERT_EQ((pool.raw() + 2u)->value, 6);
@@ -409,6 +421,12 @@ TEST(Storage, SortUnordered) {
     pool.sort(pool.begin(), pool.end(), [](auto lhs, auto rhs) {
         return lhs.value < rhs.value;
     });
+
+    ASSERT_EQ(pool.index(entt::entity{9}), 0u);
+    ASSERT_EQ(pool.index(entt::entity{3}), 1u);
+    ASSERT_EQ(pool.index(entt::entity{12}), 2u);
+    ASSERT_EQ(pool.index(entt::entity{42}), 3u);
+    ASSERT_EQ(pool.index(entt::entity{7}), 4u);
 
     ASSERT_EQ((pool.raw() + 0u)->value, 12);
     ASSERT_EQ((pool.raw() + 1u)->value, 9);
@@ -475,6 +493,12 @@ TEST(Storage, SortRange) {
     pool.sort(++pool.begin(), --pool.end(), [](auto lhs, auto rhs) {
         return lhs.value < rhs.value;
     });
+
+    ASSERT_EQ(pool.index(entt::entity{12}), 0u);
+    ASSERT_EQ(pool.index(entt::entity{3}), 1u);
+    ASSERT_EQ(pool.index(entt::entity{42}), 2u);
+    ASSERT_EQ(pool.index(entt::entity{7}), 3u);
+    ASSERT_EQ(pool.index(entt::entity{9}), 4u);
 
     ASSERT_EQ((pool.raw() + 0u)->value, 6);
     ASSERT_EQ((pool.raw() + 1u)->value, 9);

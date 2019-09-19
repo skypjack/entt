@@ -244,6 +244,12 @@ TEST(SparseSet, SortOrdered) {
 
     set.sort(set.begin(), set.end(), std::less{});
 
+    ASSERT_EQ(set.index(entt::entity{42}), 0u);
+    ASSERT_EQ(set.index(entt::entity{12}), 1u);
+    ASSERT_EQ(set.index(entt::entity{9}), 2u);
+    ASSERT_EQ(set.index(entt::entity{7}), 3u);
+    ASSERT_EQ(set.index(entt::entity{3}), 4u);
+
     ASSERT_EQ(*(set.data() + 0u), entt::entity{42});
     ASSERT_EQ(*(set.data() + 1u), entt::entity{12});
     ASSERT_EQ(*(set.data() + 2u), entt::entity{9});
@@ -278,6 +284,12 @@ TEST(SparseSet, SortReverse) {
 
     set.sort(set.begin(), set.end(), std::less{});
 
+    ASSERT_EQ(set.index(entt::entity{42}), 0u);
+    ASSERT_EQ(set.index(entt::entity{12}), 1u);
+    ASSERT_EQ(set.index(entt::entity{9}), 2u);
+    ASSERT_EQ(set.index(entt::entity{7}), 3u);
+    ASSERT_EQ(set.index(entt::entity{3}), 4u);
+
     ASSERT_EQ(*(set.data() + 0u), entt::entity{42});
     ASSERT_EQ(*(set.data() + 1u), entt::entity{12});
     ASSERT_EQ(*(set.data() + 2u), entt::entity{9});
@@ -311,6 +323,12 @@ TEST(SparseSet, SortUnordered) {
     ASSERT_EQ(*(set.data() + 4u), entt::entity{42});
 
     set.sort(set.begin(), set.end(), std::less{});
+
+    ASSERT_EQ(set.index(entt::entity{42}), 0u);
+    ASSERT_EQ(set.index(entt::entity{12}), 1u);
+    ASSERT_EQ(set.index(entt::entity{9}), 2u);
+    ASSERT_EQ(set.index(entt::entity{7}), 3u);
+    ASSERT_EQ(set.index(entt::entity{3}), 4u);
 
     ASSERT_EQ(*(set.data() + 0u), entt::entity{42});
     ASSERT_EQ(*(set.data() + 1u), entt::entity{12});
@@ -369,6 +387,12 @@ TEST(SparseSet, SortRange) {
     ASSERT_EQ(*(set.data() + 4u), entt::entity{42});
 
     set.sort(++set.begin(), --set.end(), std::less{});
+
+    ASSERT_EQ(set.index(entt::entity{9}), 0u);
+    ASSERT_EQ(set.index(entt::entity{12}), 1u);
+    ASSERT_EQ(set.index(entt::entity{7}), 2u);
+    ASSERT_EQ(set.index(entt::entity{3}), 3u);
+    ASSERT_EQ(set.index(entt::entity{42}), 4u);
 
     ASSERT_EQ(*(set.data() + 0u), entt::entity{9});
     ASSERT_EQ(*(set.data() + 1u), entt::entity{12});

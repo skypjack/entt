@@ -10,6 +10,10 @@
 struct empty_type {};
 struct boxed_int { int value; };
 
+bool operator==(const boxed_int &lhs, const boxed_int &rhs) {
+    return lhs.value == rhs.value;
+}
+
 TEST(NonOwningGroup, Functionalities) {
     entt::registry registry;
     auto group = registry.group(entt::get<int, char>);
@@ -170,10 +174,12 @@ TEST(NonOwningGroup, Sort) {
     const auto e0 = registry.create();
     const auto e1 = registry.create();
     const auto e2 = registry.create();
+    const auto e3 = registry.create();
 
     registry.assign<unsigned int>(e0, 0u);
     registry.assign<unsigned int>(e1, 1u);
     registry.assign<unsigned int>(e2, 2u);
+    registry.assign<unsigned int>(e3, 3u);
 
     registry.assign<int>(e0, 0);
     registry.assign<int>(e1, 1);
@@ -207,6 +213,12 @@ TEST(NonOwningGroup, Sort) {
     ASSERT_EQ(*(group.data() + 1u), e1);
     ASSERT_EQ(*(group.data() + 2u), e0);
 
+    ASSERT_EQ((group.get<const int, unsigned int>(e0)), (std::make_tuple(0, 0u)));
+    ASSERT_EQ((group.get<const int, unsigned int>(e1)), (std::make_tuple(1, 1u)));
+    ASSERT_EQ((group.get<const int, unsigned int>(e2)), (std::make_tuple(2, 2u)));
+
+    ASSERT_FALSE(group.contains(e3));
+
     group.sort<const int>([](const int lhs, const int rhs) {
         return lhs > rhs;
     });
@@ -214,6 +226,12 @@ TEST(NonOwningGroup, Sort) {
     ASSERT_EQ(*(group.data() + 0u), e0);
     ASSERT_EQ(*(group.data() + 1u), e1);
     ASSERT_EQ(*(group.data() + 2u), e2);
+
+    ASSERT_EQ((group.get<const int, unsigned int>(e0)), (std::make_tuple(0, 0u)));
+    ASSERT_EQ((group.get<const int, unsigned int>(e1)), (std::make_tuple(1, 1u)));
+    ASSERT_EQ((group.get<const int, unsigned int>(e2)), (std::make_tuple(2, 2u)));
+
+    ASSERT_FALSE(group.contains(e3));
 }
 
 TEST(NonOwningGroup, SortAsAPool) {
@@ -223,6 +241,7 @@ TEST(NonOwningGroup, SortAsAPool) {
     const auto e0 = registry.create();
     const auto e1 = registry.create();
     const auto e2 = registry.create();
+    const auto e3 = registry.create();
 
     auto uval = 0u;
     auto ival = 0;
@@ -230,6 +249,7 @@ TEST(NonOwningGroup, SortAsAPool) {
     registry.assign<unsigned int>(e0, uval++);
     registry.assign<unsigned int>(e1, uval++);
     registry.assign<unsigned int>(e2, uval++);
+    registry.assign<unsigned int>(e3, uval+1);
 
     registry.assign<int>(e0, ival++);
     registry.assign<int>(e1, ival++);
@@ -242,6 +262,12 @@ TEST(NonOwningGroup, SortAsAPool) {
 
     registry.sort<unsigned int>(std::less<unsigned int>{});
     group.sort<unsigned int>();
+
+    ASSERT_EQ((group.get<const int, unsigned int>(e0)), (std::make_tuple(0, 0u)));
+    ASSERT_EQ((group.get<const int, unsigned int>(e1)), (std::make_tuple(1, 1u)));
+    ASSERT_EQ((group.get<const int, unsigned int>(e2)), (std::make_tuple(2, 2u)));
+
+    ASSERT_FALSE(group.contains(e3));
 
     for(auto entity: group) {
         ASSERT_EQ(group.get<unsigned int>(entity), uval++);
@@ -628,13 +654,8 @@ TEST(OwningGroup, SortOrdered) {
     entt::registry registry;
     auto group = registry.group<boxed_int, char>();
 
-    entt::entity entities[5] = {
-        registry.create(),
-        registry.create(),
-        registry.create(),
-        registry.create(),
-        registry.create()
-    };
+    entt::entity entities[5]{};
+    registry.create(std::begin(entities), std::end(entities));
 
     registry.assign<boxed_int>(entities[0], 12);
     registry.assign<char>(entities[0], 'a');
@@ -667,19 +688,21 @@ TEST(OwningGroup, SortOrdered) {
     ASSERT_EQ(*(group.raw<char>() + 0u), 'a');
     ASSERT_EQ(*(group.raw<char>() + 1u), 'b');
     ASSERT_EQ(*(group.raw<char>() + 2u), 'c');
+
+    ASSERT_EQ((group.get<boxed_int, char>(entities[0])), (std::make_tuple(boxed_int{12}, 'a')));
+    ASSERT_EQ((group.get<boxed_int, char>(entities[1])), (std::make_tuple(boxed_int{9}, 'b')));
+    ASSERT_EQ((group.get<boxed_int, char>(entities[2])), (std::make_tuple(boxed_int{6}, 'c')));
+
+    ASSERT_FALSE(group.contains(entities[3]));
+    ASSERT_FALSE(group.contains(entities[4]));
 }
 
 TEST(OwningGroup, SortReverse) {
     entt::registry registry;
     auto group = registry.group<boxed_int, char>();
 
-    entt::entity entities[5] = {
-        registry.create(),
-        registry.create(),
-        registry.create(),
-        registry.create(),
-        registry.create()
-    };
+    entt::entity entities[5]{};
+    registry.create(std::begin(entities), std::end(entities));
 
     registry.assign<boxed_int>(entities[0], 6);
     registry.assign<char>(entities[0], 'a');
@@ -712,21 +735,21 @@ TEST(OwningGroup, SortReverse) {
     ASSERT_EQ(*(group.raw<char>() + 0u), 'c');
     ASSERT_EQ(*(group.raw<char>() + 1u), 'b');
     ASSERT_EQ(*(group.raw<char>() + 2u), 'a');
+
+    ASSERT_EQ((group.get<boxed_int, char>(entities[0])), (std::make_tuple(boxed_int{6}, 'a')));
+    ASSERT_EQ((group.get<boxed_int, char>(entities[1])), (std::make_tuple(boxed_int{9}, 'b')));
+    ASSERT_EQ((group.get<boxed_int, char>(entities[2])), (std::make_tuple(boxed_int{12}, 'c')));
+
+    ASSERT_FALSE(group.contains(entities[3]));
+    ASSERT_FALSE(group.contains(entities[4]));
 }
 
 TEST(OwningGroup, SortUnordered) {
     entt::registry registry;
     auto group = registry.group<boxed_int>(entt::get<char>);
 
-    entt::entity entities[7] = {
-        registry.create(),
-        registry.create(),
-        registry.create(),
-        registry.create(),
-        registry.create(),
-        registry.create(),
-        registry.create()
-    };
+    entt::entity entities[7]{};
+    registry.create(std::begin(entities), std::end(entities));
 
     registry.assign<boxed_int>(entities[0], 6);
     registry.assign<char>(entities[0], 'c');
@@ -771,6 +794,15 @@ TEST(OwningGroup, SortUnordered) {
     ASSERT_EQ(*(group.raw<char>() + 2u), 'a');
     ASSERT_EQ(*(group.raw<char>() + 3u), 'd');
     ASSERT_EQ(*(group.raw<char>() + 4u), 'e');
+
+    ASSERT_EQ((group.get<boxed_int, char>(entities[0])), (std::make_tuple(boxed_int{6}, 'c')));
+    ASSERT_EQ((group.get<boxed_int, char>(entities[1])), (std::make_tuple(boxed_int{3}, 'b')));
+    ASSERT_EQ((group.get<boxed_int, char>(entities[2])), (std::make_tuple(boxed_int{1}, 'a')));
+    ASSERT_EQ((group.get<boxed_int, char>(entities[3])), (std::make_tuple(boxed_int{9}, 'd')));
+    ASSERT_EQ((group.get<boxed_int, char>(entities[4])), (std::make_tuple(boxed_int{12}, 'e')));
+
+    ASSERT_FALSE(group.contains(entities[5]));
+    ASSERT_FALSE(group.contains(entities[6]));
 }
 
 TEST(OwningGroup, IndexRebuiltOnDestroy) {
