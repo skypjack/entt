@@ -134,13 +134,15 @@ class basic_registry {
         void maybe_valid_if(const Entity entt) {
             if constexpr(std::disjunction_v<std::is_same<Get, Component>...>) {
                 if(((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
-                        && (!std::get<pool_type<Exclude> *>(cpools)->has(entt) && ...))
+                        && (!std::get<pool_type<Exclude> *>(cpools)->has(entt) && ...)
+                        && !set.has(entt))
                 {
                     set.construct(entt);
                 }
             } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
                 if((std::get<pool_type<Get> *>(cpools)->has(entt) && ...)
-                        && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...))
+                        && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...)
+                        && !set.has(entt))
                 {
                     set.construct(entt);
                 }
@@ -164,7 +166,8 @@ class basic_registry {
             if constexpr(std::disjunction_v<std::is_same<Owned, Component>..., std::is_same<Get, Component>...>) {
                 if(((std::is_same_v<Component, Owned> || std::get<pool_type<Owned> *>(cpools)->has(entt)) && ...)
                         && ((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
-                        && (!std::get<pool_type<Exclude> *>(cpools)->has(entt) && ...))
+                        && (!std::get<pool_type<Exclude> *>(cpools)->has(entt) && ...)
+                        && !(std::get<0>(cpools)->index(entt) < owned))
                 {
                     const auto pos = owned++;
                     (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
@@ -172,7 +175,8 @@ class basic_registry {
             } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
                 if((std::get<pool_type<Owned> *>(cpools)->has(entt) && ...)
                         && (std::get<pool_type<Get> *>(cpools)->has(entt) && ...)
-                        && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...))
+                        && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...)
+                        && !(std::get<0>(cpools)->index(entt) < owned))
                 {
                     const auto pos = owned++;
                     (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);

@@ -463,6 +463,17 @@ TEST(NonOwningGroup, Less) {
     });
 }
 
+TEST(NonOwningGroup, SignalRace) {
+    entt::registry registry;
+    registry.on_construct<double>().connect<&entt::registry::assign_or_replace<int>>(registry);
+    registry.group(entt::get<int, double>);
+
+    auto entity = registry.create();
+    registry.assign<double>(entity);
+
+    ASSERT_EQ(registry.group(entt::get<int, double>).size(), 1u);
+}
+
 TEST(OwningGroup, Functionalities) {
     entt::registry registry;
     auto group = registry.group<int>(entt::get<char>);
@@ -982,4 +993,15 @@ TEST(OwningGroup, Less) {
     registry.group<double>(entt::get<int, char>).less([entity](const auto entt, double, int, char) {
         ASSERT_EQ(entity, entt);
     });
+}
+
+TEST(OwningGroup, SignalRace) {
+    entt::registry registry;
+    registry.on_construct<double>().connect<&entt::registry::assign_or_replace<int>>(registry);
+    registry.group<int>(entt::get<double>);
+
+    auto entity = registry.create();
+    registry.assign<double>(entity);
+
+    ASSERT_EQ(registry.group<int>(entt::get<double>).size(), 1u);
 }
