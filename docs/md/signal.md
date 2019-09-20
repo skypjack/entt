@@ -158,11 +158,10 @@ _publish_ functionality to the clients of a class. The basic idea is to impose a
 clear separation between the signal itself and the `sink` class, that is a tool
 to be used to connect and disconnect listeners on the fly.
 
-The API of a signal handler is straightforward. The most important thing is that
-it comes in two forms: with and without a collector. In case a signal is
-provided with a collector, all the values returned by the listeners can be
-literally _collected_ and used later by the caller. Otherwise it works just like
-a plain signal that emits events from time to time.<br/>
+The API of a signal handler is straightforward. If a collector is supplied to
+the signal when something is published, all the values returned by the listeners
+can be literally _collected_ and used later by the caller. Otherwise, the class
+works just like a plain signal that emits events from time to time.<br/>
 To create instances of signal handlers it is sufficient to provide the type of
 function to which they refer:
 
@@ -211,10 +210,20 @@ As shown above, the listeners don't have to strictly follow the signature of the
 signal. As long as a listener can be invoked with the given arguments to yield a
 result that is convertible to the given return type, everything works just
 fine.<br/>
-The `connect` member function returns by default a `connection` object to be
-used as an alternative to break a connection by means of its `release` member
-function. A `scoped_connection` can also be created from a connection. In this
-case, the link is broken automatically as soon as the object goes out of scope.
+It's also possible to connect a listener before other listeners already
+contained by the signal. The `before` function returns a `sink` object correctly
+initialized for the purpose that can be used to connect one or more listeners in
+order and in the desired position:
+
+```cpp
+sink.before<&foo>().connect<&listener::bar>(instance);
+```
+
+In all cases, the `connect` member function returns by default a `connection`
+object to be used as an alternative to break a connection by means of its
+`release` member function. A `scoped_connection` can also be created from a
+connection. In this case, the link is broken automatically as soon as the object
+goes out of scope.
 
 Once listeners are attached (or even if there are no listeners at all), events
 and data in general can be published through a signal by means of the `publish`
