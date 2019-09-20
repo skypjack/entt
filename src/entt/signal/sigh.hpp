@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <utility>
+#include <iterator>
 #include <algorithm>
 #include <functional>
 #include <type_traits>
@@ -301,6 +302,7 @@ struct scoped_connection: private connection {
 template<typename Ret, typename... Args>
 class sink<Ret(Args...)> {
     using signal_type = sigh<Ret(Args...)>;
+    using difference_type = typename std::iterator_traits<typename decltype(signal_type::calls)::iterator>::difference_type;
 
     template<auto Candidate, typename Type>
     static void release(Type &value_or_instance, void *signal) {
@@ -318,7 +320,8 @@ public:
      * @param ref A valid reference to a signal object.
      */
     sink(sigh<Ret(Args...)> &ref) ENTT_NOEXCEPT
-        : signal{&ref}
+        : offset{},
+          signal{&ref}
     {}
 
     /**
@@ -327,6 +330,79 @@ public:
      */
     bool empty() const ENTT_NOEXCEPT {
         return signal->calls.empty();
+    }
+
+    /**
+     * @brief Returns a sink that connects before a given function.
+     * @tparam Function A valid free function pointer.
+     * @return A properly initialized sink object.
+     */
+    template<auto Function>
+    sink before() {
+        sink other{*this};
+        auto &calls = signal->calls;
+        delegate<Ret(Args...)> delegate{entt::connect_arg<Function>};
+        const auto it = std::find(calls.cbegin(), calls.cend(), std::move(delegate));
+        other.offset = std::distance(it, calls.cend());
+        return other;
+    }
+
+    /**
+     * @brief Returns a sink that connects before a given member function or
+     * free function with payload.
+     * @tparam Candidate Member or free function to look for.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid reference that fits the purpose.
+     * @return A properly initialized sink object.
+     */
+    template<auto Candidate, typename Type>
+    sink before(Type &value_or_instance) {
+        sink other{*this};
+        auto &calls = signal->calls;
+        delegate<Ret(Args...)> delegate{entt::connect_arg<Candidate>, value_or_instance};
+        const auto it = std::find(calls.cbegin(), calls.cend(), std::move(delegate));
+        other.offset = std::distance(it, calls.cend());
+        return other;
+    }
+
+    /**
+     * @brief Returns a sink that connects before a given instance or specific
+     * payload.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid reference that fits the purpose.
+     * @return A properly initialized sink object.
+     */
+    template<typename Type>
+    sink before(Type &value_or_instance) {
+        return before(&value_or_instance);
+    }
+
+    /**
+     * @brief Returns a sink that connects before a given opaque instance or
+     * payload.
+     * @param value_or_instance An opaque pointer that fits the purpose.
+     * @return A properly initialized sink object.
+     */
+    sink before(const void *value_or_instance) {
+        sink other{*this};
+        auto &calls = signal->calls;
+        const auto it = std::find_if(calls.cbegin(), calls.cend(), [value_or_instance](const auto &delegate) {
+            return delegate.instance() == value_or_instance;
+        });
+
+        other.offset = std::distance(it, calls.cend());
+        return other;
+    }
+
+    /**
+     * @brief Returns a sink that connects before anything else.
+     * @return A properly initialized sink object.
+     */
+    sink before() {
+        sink other{*this};
+        auto &calls = signal->calls;
+        other.offset = std::distance(calls.cbegin(), calls.cend());
+        return other;
     }
 
     /**
@@ -341,10 +417,9 @@ public:
     template<auto Function>
     connection connect() {
         disconnect<Function>();
-        delegate<void(void *)> conn{};
-        conn.template connect<&release<Function>>();
-        signal->calls.emplace_back(delegate<Ret(Args...)>{connect_arg<Function>});
-        return { std::move(conn), signal };
+        const auto position = signal->calls.end() - offset;
+        signal->calls.insert(position, delegate<Ret(Args...)>{connect_arg<Function>});
+        return { delegate<void(void *)>{connect_arg<&release<Function>>}, signal };
     }
 
     /**
@@ -367,10 +442,9 @@ public:
     template<auto Candidate, typename Type>
     connection connect(Type &value_or_instance) {
         disconnect<Candidate>(value_or_instance);
-        delegate<void(void *)> conn{};
-        conn.template connect<&sink::release<Candidate, Type>>(value_or_instance);
-        signal->calls.emplace_back(delegate<Ret(Args...)>{connect_arg<Candidate>, value_or_instance});
-        return { std::move(conn), signal };
+        const auto position = signal->calls.end() - offset;
+        signal->calls.insert(position, delegate<Ret(Args...)>{connect_arg<Candidate>, value_or_instance});
+        return { delegate<void(void *)>{connect_arg<&sink::release<Candidate, Type>>, value_or_instance}, signal };
     }
 
     /**
@@ -380,9 +454,8 @@ public:
     template<auto Function>
     void disconnect() {
         auto &calls = signal->calls;
-        delegate<Ret(Args...)> delegate{};
-        delegate.template connect<Function>();
-        calls.erase(std::remove(calls.begin(), calls.end(), delegate), calls.end());
+        delegate<Ret(Args...)> delegate{entt::connect_arg<Function>};
+        calls.erase(std::remove(calls.begin(), calls.end(), std::move(delegate)), calls.end());
     }
 
     /**
@@ -395,9 +468,8 @@ public:
     template<auto Candidate, typename Type>
     void disconnect(Type &value_or_instance) {
         auto &calls = signal->calls;
-        delegate<Ret(Args...)> delegate{};
-        delegate.template connect<Candidate>(value_or_instance);
-        calls.erase(std::remove(calls.begin(), calls.end(), delegate), calls.end());
+        delegate<Ret(Args...)> delegate{entt::connect_arg<Candidate>, value_or_instance};
+        calls.erase(std::remove(calls.begin(), calls.end(), std::move(delegate)), calls.end());
     }
 
     /**
@@ -429,6 +501,7 @@ public:
     }
 
 private:
+    difference_type offset;
     signal_type *signal;
 };
 
