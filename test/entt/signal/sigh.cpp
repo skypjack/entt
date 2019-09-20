@@ -16,6 +16,22 @@ struct sigh_listener {
     bool k{false};
 };
 
+struct before_after {
+    void add(int v) { value += v; }
+    void mul(int v) { value *= v; }
+
+    static void static_add(int v) { before_after::value += v; }
+    static void static_mul(before_after &instance, int v) { instance.value *= v; }
+
+    static inline int value{};
+};
+
+struct SigH: public ::testing::Test {
+    void SetUp() override {
+        before_after::value = 0;
+    }
+};
+
 struct const_nonconst_noexcept {
     void f() { ++cnt; }
     void g() noexcept { ++cnt; }
@@ -24,7 +40,7 @@ struct const_nonconst_noexcept {
     mutable int cnt{0};
 };
 
-TEST(SigH, Lifetime) {
+TEST_F(SigH, Lifetime) {
     using signal = entt::sigh<void(void)>;
 
     ASSERT_NO_THROW(signal{});
@@ -39,7 +55,7 @@ TEST(SigH, Lifetime) {
     ASSERT_NO_THROW(delete new signal{});
 }
 
-TEST(SigH, Clear) {
+TEST_F(SigH, Clear) {
     entt::sigh<void(int &)> sigh;
     entt::sink sink{sigh};
 
@@ -54,7 +70,7 @@ TEST(SigH, Clear) {
     ASSERT_TRUE(sigh.empty());
 }
 
-TEST(SigH, Swap) {
+TEST_F(SigH, Swap) {
     entt::sigh<void(int &)> sigh1;
     entt::sigh<void(int &)> sigh2;
     entt::sink sink1{sigh1};
@@ -77,7 +93,7 @@ TEST(SigH, Swap) {
     ASSERT_FALSE(sigh2.empty());
 }
 
-TEST(SigH, Functions) {
+TEST_F(SigH, Functions) {
     entt::sigh<void(int &)> sigh;
     entt::sink sink{sigh};
     int v = 0;
@@ -98,7 +114,7 @@ TEST(SigH, Functions) {
     ASSERT_EQ(v, 0);
 }
 
-TEST(SigH, FunctionsWithPayload) {
+TEST_F(SigH, FunctionsWithPayload) {
     entt::sigh<void()> sigh;
     entt::sink sink{sigh};
     int v = 0;
@@ -125,7 +141,7 @@ TEST(SigH, FunctionsWithPayload) {
     ASSERT_EQ(v, 0);
 }
 
-TEST(SigH, Members) {
+TEST_F(SigH, Members) {
     sigh_listener l1, l2;
     entt::sigh<bool(int)> sigh;
     entt::sink sink{sigh};
@@ -156,7 +172,7 @@ TEST(SigH, Members) {
     ASSERT_EQ(1u, sigh.size());
 }
 
-TEST(SigH, Collector) {
+TEST_F(SigH, Collector) {
     sigh_listener listener;
     entt::sigh<bool(int)> sigh;
     entt::sink sink{sigh};
@@ -186,7 +202,7 @@ TEST(SigH, Collector) {
     ASSERT_EQ(cnt, 1);
 }
 
-TEST(SigH, CollectorVoid) {
+TEST_F(SigH, CollectorVoid) {
     sigh_listener listener;
     entt::sigh<void(int)> sigh;
     entt::sink sink{sigh};
@@ -208,7 +224,7 @@ TEST(SigH, CollectorVoid) {
     ASSERT_EQ(cnt, 1);
 }
 
-TEST(SigH, Connection) {
+TEST_F(SigH, Connection) {
     entt::sigh<void(int &)> sigh;
     entt::sink sink{sigh};
     int v = 0;
@@ -229,7 +245,7 @@ TEST(SigH, Connection) {
     ASSERT_EQ(0, v);
 }
 
-TEST(SigH, ScopedConnection) {
+TEST_F(SigH, ScopedConnection) {
     sigh_listener listener;
     entt::sigh<void(int)> sigh;
     entt::sink sink{sigh};
@@ -251,7 +267,7 @@ TEST(SigH, ScopedConnection) {
     ASSERT_TRUE(listener.k);
 }
 
-TEST(SigH, ScopedConnectionConstructorsAndOperators) {
+TEST_F(SigH, ScopedConnectionConstructorsAndOperators) {
     sigh_listener listener;
     entt::sigh<void(int)> sigh;
     entt::sink sink{sigh};
@@ -297,7 +313,7 @@ TEST(SigH, ScopedConnectionConstructorsAndOperators) {
     ASSERT_FALSE(listener.k);
 }
 
-TEST(SigH, ConstNonConstNoExcept) {
+TEST_F(SigH, ConstNonConstNoExcept) {
     entt::sigh<void()> sigh;
     entt::sink sink{sigh};
     const_nonconst_noexcept functor;
@@ -320,4 +336,93 @@ TEST(SigH, ConstNonConstNoExcept) {
 
     ASSERT_EQ(functor.cnt, 2);
     ASSERT_EQ(cfunctor.cnt, 2);
+}
+
+TEST_F(SigH, BeforeFunction) {
+    entt::sigh<void(int)> sigh;
+    entt::sink sink{sigh};
+    before_after functor;
+
+    sink.connect<&before_after::add>(functor);
+    sink.connect<&before_after::static_add>();
+    sink.before<&before_after::static_add>().connect<&before_after::mul>(functor);
+    sigh.publish(2);
+
+    ASSERT_EQ(functor.value, 6);
+}
+
+TEST_F(SigH, BeforeMemberFunction) {
+    entt::sigh<void(int)> sigh;
+    entt::sink sink{sigh};
+    before_after functor;
+
+    sink.connect<&before_after::static_add>();
+    sink.connect<&before_after::add>(functor);
+    sink.before<&before_after::add>(functor).connect<&before_after::mul>(functor);
+    sigh.publish(2);
+
+    ASSERT_EQ(functor.value, 6);
+}
+
+TEST_F(SigH, BeforeFunctionWithPayload) {
+    entt::sigh<void(int)> sigh;
+    entt::sink sink{sigh};
+    before_after functor;
+
+    sink.connect<&before_after::static_add>();
+    sink.connect<&before_after::static_mul>(functor);
+    sink.before<&before_after::static_mul>(functor).connect<&before_after::add>(functor);
+    sigh.publish(2);
+
+    ASSERT_EQ(functor.value, 8);
+}
+
+TEST_F(SigH, BeforeInstanceOrPayload) {
+    entt::sigh<void(int)> sigh;
+    entt::sink sink{sigh};
+    before_after functor;
+
+    sink.connect<&before_after::static_mul>(functor);
+    sink.connect<&before_after::add>(functor);
+    sink.before(functor).connect<&before_after::static_add>();
+    sigh.publish(2);
+
+    ASSERT_EQ(functor.value, 6);
+}
+
+TEST_F(SigH, BeforeOpaqueInstanceOrPayload) {
+    entt::sigh<void(int)> sigh;
+    entt::sink sink{sigh};
+    before_after functor;
+
+    sink.connect<&before_after::static_mul>(functor);
+    sink.connect<&before_after::add>(functor);
+    sink.before(&functor).connect<&before_after::static_add>();
+    sigh.publish(2);
+
+    ASSERT_EQ(functor.value, 6);
+}
+
+TEST_F(SigH, BeforeAnythingElse) {
+    entt::sigh<void(int)> sigh;
+    entt::sink sink{sigh};
+    before_after functor;
+
+    sink.connect<&before_after::add>(functor);
+    sink.before().connect<&before_after::mul>(functor);
+    sigh.publish(2);
+
+    ASSERT_EQ(functor.value, 2);
+}
+
+TEST_F(SigH, BeforeListenerNotPresent) {
+    entt::sigh<void(int)> sigh;
+    entt::sink sink{sigh};
+    before_after functor;
+
+    sink.connect<&before_after::mul>(functor);
+    sink.before<&before_after::add>(functor).connect<&before_after::add>(functor);
+    sigh.publish(2);
+
+    ASSERT_EQ(functor.value, 2);
 }
