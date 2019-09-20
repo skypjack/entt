@@ -341,8 +341,9 @@ public:
     sink before() {
         sink other{*this};
         auto &calls = signal->calls;
-        delegate<Ret(Args...)> delegate{entt::connect_arg<Function>};
-        const auto it = std::find(calls.cbegin(), calls.cend(), std::move(delegate));
+        delegate<Ret(Args...)> call{};
+        call.template connect<Function>();
+        const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
         other.offset = std::distance(it, calls.cend());
         return other;
     }
@@ -359,8 +360,9 @@ public:
     sink before(Type &value_or_instance) {
         sink other{*this};
         auto &calls = signal->calls;
-        delegate<Ret(Args...)> delegate{entt::connect_arg<Candidate>, value_or_instance};
-        const auto it = std::find(calls.cbegin(), calls.cend(), std::move(delegate));
+        delegate<Ret(Args...)> call{};
+        call.template connect<Candidate>(value_or_instance);
+        const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
         other.offset = std::distance(it, calls.cend());
         return other;
     }
@@ -417,9 +419,14 @@ public:
     template<auto Function>
     connection connect() {
         disconnect<Function>();
-        const auto position = signal->calls.end() - offset;
-        signal->calls.insert(position, delegate<Ret(Args...)>{connect_arg<Function>});
-        return { delegate<void(void *)>{connect_arg<&release<Function>>}, signal };
+
+        delegate<Ret(Args...)> call{};
+        call.template connect<Function>();
+        signal->calls.insert(signal->calls.end() - offset, std::move(call));
+
+        delegate<void(void *)> conn{};
+        conn.template connect<&release<Function>>();
+        return { std::move(conn), signal };
     }
 
     /**
@@ -442,9 +449,14 @@ public:
     template<auto Candidate, typename Type>
     connection connect(Type &value_or_instance) {
         disconnect<Candidate>(value_or_instance);
-        const auto position = signal->calls.end() - offset;
-        signal->calls.insert(position, delegate<Ret(Args...)>{connect_arg<Candidate>, value_or_instance});
-        return { delegate<void(void *)>{connect_arg<&sink::release<Candidate, Type>>, value_or_instance}, signal };
+
+        delegate<Ret(Args...)> call{};
+        call.template connect<Candidate>(value_or_instance);
+        signal->calls.insert(signal->calls.end() - offset, std::move(call));
+
+        delegate<void(void *)> conn{};
+        conn.template connect<&release<Candidate, Type>>(value_or_instance);
+        return { std::move(conn), signal };
     }
 
     /**
@@ -454,8 +466,9 @@ public:
     template<auto Function>
     void disconnect() {
         auto &calls = signal->calls;
-        delegate<Ret(Args...)> delegate{entt::connect_arg<Function>};
-        calls.erase(std::remove(calls.begin(), calls.end(), std::move(delegate)), calls.end());
+        delegate<Ret(Args...)> call{};
+        call.template connect<Function>();
+        calls.erase(std::remove(calls.begin(), calls.end(), std::move(call)), calls.end());
     }
 
     /**
@@ -468,8 +481,9 @@ public:
     template<auto Candidate, typename Type>
     void disconnect(Type &value_or_instance) {
         auto &calls = signal->calls;
-        delegate<Ret(Args...)> delegate{entt::connect_arg<Candidate>, value_or_instance};
-        calls.erase(std::remove(calls.begin(), calls.end(), std::move(delegate)), calls.end());
+        delegate<Ret(Args...)> call{};
+        call.template connect<Candidate>(value_or_instance);
+        calls.erase(std::remove(calls.begin(), calls.end(), std::move(call)), calls.end());
     }
 
     /**
