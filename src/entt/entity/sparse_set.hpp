@@ -578,7 +578,7 @@ public:
                 auto [page, offset] = map(direct[curr]);
 
                 apply(direct[curr], direct[next]);
-                reverse[page][offset] = entity_type(pos);
+                reverse[page][offset] = entity_type(curr);
 
                 curr = next;
                 next = index(direct[curr]);
