@@ -375,33 +375,31 @@ public:
      * @brief Returns a sink that connects before a given instance or specific
      * payload.
      * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid reference that fits the purpose.
+     * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized sink object.
      */
     template<typename Type>
-    sink before(Type &value_or_instance) {
-        return before(&value_or_instance);
-    }
+    sink before(Type &&value_or_instance) {
+        auto func = [this](const void *instance) {
+            sink other{*this};
 
-    /**
-     * @brief Returns a sink that connects before a given opaque instance or
-     * payload.
-     * @param value_or_instance An opaque pointer that fits the purpose.
-     * @return A properly initialized sink object.
-     */
-    sink before(const void *value_or_instance) {
-        sink other{*this};
+            if(instance) {
+                const auto &calls = signal->calls;
+                const auto it = std::find_if(calls.cbegin(), calls.cend(), [instance](const auto &delegate) {
+                    return delegate.instance() == instance;
+                });
 
-        if(value_or_instance) {
-            const auto &calls = signal->calls;
-            const auto it = std::find_if(calls.cbegin(), calls.cend(), [value_or_instance](const auto &delegate) {
-                return delegate.instance() == value_or_instance;
-            });
+                other.offset = std::distance(it, calls.cend());
+            }
 
-            other.offset = std::distance(it, calls.cend());
+            return other;
+        };
+
+        if constexpr(std::is_pointer_v<std::decay_t<Type>>) {
+            return func(value_or_instance);
+        } else {
+            return func(&value_or_instance);
         }
-
-        return other;
     }
 
     /**
@@ -497,24 +495,23 @@ public:
      * @brief Disconnects member functions or free functions based on an
      * instance or specific payload.
      * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid reference that fits the purpose.
+     * @param value_or_instance A valid object that fits the purpose.
      */
     template<typename Type>
-    void disconnect(Type &value_or_instance) {
-        disconnect(&value_or_instance);
-    }
+    void disconnect(Type &&value_or_instance) {
+        auto func = [this](const void *instance) {
+            if(instance) {
+                auto &calls = signal->calls;
+                calls.erase(std::remove_if(calls.begin(), calls.end(), [instance](const auto &delegate) {
+                    return delegate.instance() == instance;
+                }), calls.end());
+            }
+        };
 
-    /**
-     * @brief Disconnects member functions or free functions based on an opaque
-     * instance or payload.
-     * @param value_or_instance An opaque pointer that fits the purpose.
-     */
-    void disconnect(const void *value_or_instance) {
-        if(value_or_instance) {
-            auto &calls = signal->calls;
-            calls.erase(std::remove_if(calls.begin(), calls.end(), [value_or_instance](const auto &delegate) {
-                return delegate.instance() == value_or_instance;
-            }), calls.end());
+        if constexpr(std::is_pointer_v<std::decay_t<Type>>) {
+            func(value_or_instance);
+        } else {
+            func(&value_or_instance);
         }
     }
 

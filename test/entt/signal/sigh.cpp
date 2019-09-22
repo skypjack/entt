@@ -176,7 +176,7 @@ TEST_F(SigH, Members) {
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(2u, sigh.size());
 
-    sink.disconnect(l1);
+    sink.disconnect(&l1);
 
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(1u, sigh.size());
