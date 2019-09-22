@@ -339,11 +339,13 @@ public:
      */
     template<auto Function>
     sink before() {
-        sink other{*this};
-        auto &calls = signal->calls;
         delegate<Ret(Args...)> call{};
         call.template connect<Function>();
+
+        const auto &calls = signal->calls;
         const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
+
+        sink other{*this};
         other.offset = std::distance(it, calls.cend());
         return other;
     }
@@ -358,11 +360,13 @@ public:
      */
     template<auto Candidate, typename Type>
     sink before(Type &value_or_instance) {
-        sink other{*this};
-        auto &calls = signal->calls;
         delegate<Ret(Args...)> call{};
         call.template connect<Candidate>(value_or_instance);
+
+        const auto &calls = signal->calls;
         const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
+
+        sink other{*this};
         other.offset = std::distance(it, calls.cend());
         return other;
     }
@@ -387,12 +391,16 @@ public:
      */
     sink before(const void *value_or_instance) {
         sink other{*this};
-        auto &calls = signal->calls;
-        const auto it = std::find_if(calls.cbegin(), calls.cend(), [value_or_instance](const auto &delegate) {
-            return delegate.instance() == value_or_instance;
-        });
 
-        other.offset = std::distance(it, calls.cend());
+        if(value_or_instance) {
+            const auto &calls = signal->calls;
+            const auto it = std::find_if(calls.cbegin(), calls.cend(), [value_or_instance](const auto &delegate) {
+                return delegate.instance() == value_or_instance;
+            });
+
+            other.offset = std::distance(it, calls.cend());
+        }
+
         return other;
     }
 
@@ -402,8 +410,7 @@ public:
      */
     sink before() {
         sink other{*this};
-        auto &calls = signal->calls;
-        other.offset = std::distance(calls.cbegin(), calls.cend());
+        other.offset = signal->calls.size();
         return other;
     }
 
@@ -503,10 +510,12 @@ public:
      * @param value_or_instance An opaque pointer that fits the purpose.
      */
     void disconnect(const void *value_or_instance) {
-        auto &calls = signal->calls;
-        calls.erase(std::remove_if(calls.begin(), calls.end(), [value_or_instance](const auto &delegate) {
-            return delegate.instance() == value_or_instance;
-        }), calls.end());
+        if(value_or_instance) {
+            auto &calls = signal->calls;
+            calls.erase(std::remove_if(calls.begin(), calls.end(), [value_or_instance](const auto &delegate) {
+                return delegate.instance() == value_or_instance;
+            }), calls.end());
+        }
     }
 
     /*! @brief Disconnects all the listeners from a signal. */
