@@ -525,7 +525,7 @@ public:
 
         algo(from, to, std::move(compare), std::forward<Args>(args)...);
 
-        for(size_type pos = skip, end = skip+length; pos < end; pos++) {
+        for(size_type pos = skip, end = skip+length; pos < end; ++pos) {
             auto [page, offset] = map(direct[pos]);
             reverse[page][offset] = entity_type(pos);
         }
@@ -570,7 +570,7 @@ public:
 
         algo(from, to, std::move(compare), std::forward<Args>(args)...);
 
-        for(size_type pos = skip, end = skip+length; pos < end; pos++) {
+        for(size_type pos = skip, end = skip+length; pos < end; ++pos) {
             auto curr = pos;
             auto next = index(direct[curr]);
 
