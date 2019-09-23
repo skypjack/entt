@@ -373,15 +373,14 @@ public:
      * @return Number of entities still in use.
      */
     size_type alive() const ENTT_NOEXCEPT {
+        auto sz = entities.size();
         auto curr = destroyed;
-        size_type cnt{};
 
-        while(curr != null) {
+        for(; curr != null; --sz) {
             curr = entities[to_integer(curr) & traits_type::entity_mask];
-            ++cnt;
         }
 
-        return entities.size() - cnt;
+        return sz;
     }
 
     /**
