@@ -3,13 +3,14 @@
 <!--
 @cond TURN_OFF_DOXYGEN
 -->
-[![GitHub version](https://badge.fury.io/gh/skypjack%2Fentt.svg)](http://badge.fury.io/gh/skypjack%2Fentt)
-[![LoC](https://tokei.rs/b1/github/skypjack/entt)](https://github.com/skypjack/entt)
+[![GitHub version](https://badge.fury.io/gh/skypjack%2Fentt.svg)](https://github.com/skypjack/entt/releases)
 [![Build Status](https://travis-ci.org/skypjack/entt.svg?branch=master)](https://travis-ci.org/skypjack/entt)
 [![Build status](https://ci.appveyor.com/api/projects/status/rvhaabjmghg715ck?svg=true)](https://ci.appveyor.com/project/skypjack/entt)
 [![Coverage Status](https://coveralls.io/repos/github/skypjack/entt/badge.svg?branch=master)](https://coveralls.io/github/skypjack/entt?branch=master)
+[![Try online](https://img.shields.io/badge/try-online-brightgreen)](https://godbolt.org/z/v8txVr)
 [![Gitter chat](https://badges.gitter.im/skypjack/entt.png)](https://gitter.im/skypjack/entt)
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/skypjack)
+[![Donate](https://img.shields.io/badge/donate-paypal-blue.svg)](https://www.paypal.me/skypjack)
+[![Patreon](https://img.shields.io/badge/become-patron-red.svg)](https://www.patreon.com/bePatron?c=1772573)
 
 `EnTT` is a header-only, tiny and easy to use library for game programming and
 much more written in **modern C++**, mainly known for its innovative
