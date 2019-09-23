@@ -250,27 +250,7 @@ class basic_registry {
     }
 
     template<typename Component>
-    const pool_type<Component> * pool() const ENTT_NOEXCEPT {
-        const auto ctype = to_integer(type<Component>());
-
-        if constexpr(is_named_type_v<Component>) {
-            const auto it = std::find_if(pools.begin()+skip_family_pools, pools.end(), [ctype](const auto &candidate) {
-                return candidate.runtime_type == ctype;
-            });
-
-            return it == pools.cend() ? nullptr : static_cast<const pool_type<Component> *>(it->pool.get());
-        } else {
-            return ctype < skip_family_pools ? static_cast<const pool_type<Component> *>(pools[ctype].pool.get()) : nullptr;
-        }
-    }
-
-    template<typename Component>
-    pool_type<Component> * pool() ENTT_NOEXCEPT {
-        return const_cast<pool_type<Component> *>(std::as_const(*this).template pool<Component>());
-    }
-
-    template<typename Component>
-    pool_type<Component> * assure() {
+    const pool_type<Component> * assure() const {
         const auto ctype = to_integer(type<Component>());
         pool_data *pdata = nullptr;
 
@@ -317,6 +297,11 @@ class basic_registry {
         return static_cast<pool_type<Component> *>(pdata->pool.get());
     }
 
+    template<typename Component>
+    pool_type<Component> * assure() {
+        return const_cast<pool_type<Component> *>(std::as_const(*this).template assure<Component>());
+    }
+
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -356,8 +341,7 @@ public:
      */
     template<typename Component>
     size_type size() const ENTT_NOEXCEPT {
-        const auto *cpool = pool<Component>();
-        return cpool ? cpool->size() : size_type{};
+        return assure<Component>()->size();
     }
 
     /**
@@ -413,8 +397,7 @@ public:
      */
     template<typename Component>
     size_type capacity() const ENTT_NOEXCEPT {
-        const auto *cpool = pool<Component>();
-        return cpool ? cpool->capacity() : size_type{};
+        return assure<Component>()->capacity();
     }
 
     /**
@@ -452,8 +435,7 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             return !alive();
         } else {
-            [[maybe_unused]] const auto cpools = std::make_tuple(pool<Component>()...);
-            return ((!std::get<const pool_type<Component> *>(cpools) || std::get<const pool_type<Component> *>(cpools)->empty()) && ...);
+            return (assure<Component>()->empty() && ...);
         }
     }
 
@@ -477,8 +459,7 @@ public:
      */
     template<typename Component>
     const Component * raw() const ENTT_NOEXCEPT {
-        const auto *cpool = pool<Component>();
-        return cpool ? cpool->raw() : nullptr;
+        return assure<Component>()->raw();
     }
 
     /*! @copydoc raw */
@@ -502,8 +483,7 @@ public:
      */
     template<typename Component>
     const entity_type * data() const ENTT_NOEXCEPT {
-        const auto *cpool = pool<Component>();
-        return cpool ? cpool->data() : nullptr;
+        return assure<Component>()->data();
     }
 
     /**
@@ -763,7 +743,7 @@ public:
     template<typename Component>
     void remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
-        pool<Component>()->remove(*this, entity);
+        assure<Component>()->remove(*this, entity);
     }
 
     /**
@@ -781,8 +761,7 @@ public:
     template<typename... Component>
     bool has(const entity_type entity) const ENTT_NOEXCEPT {
         ENTT_ASSERT(valid(entity));
-        [[maybe_unused]] const auto cpools = std::make_tuple(pool<Component>()...);
-        return ((std::get<const pool_type<Component> *>(cpools) && std::get<const pool_type<Component> *>(cpools)->has(entity)) && ...);
+        return (assure<Component>()->has(entity) && ...);
     }
 
     /**
@@ -804,7 +783,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return (pool<Component>()->get(entity), ...);
+            return (assure<Component>()->get(entity), ...);
         } else {
             return std::tuple<decltype(get<Component>({}))...>{get<Component>(entity)...};
         }
@@ -816,7 +795,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return (pool<Component>()->get(entity), ...);
+            return (assure<Component>()->get(entity), ...);
         } else {
             return std::tuple<decltype(get<Component>({}))...>{get<Component>(entity)...};
         }
@@ -870,10 +849,9 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            const auto cpools = std::make_tuple(pool<Component>()...);
-            return ((std::get<const pool_type<Component> *>(cpools) ? std::get<const pool_type<Component> *>(cpools)->try_get(entity) : nullptr), ...);
+            return (assure<Component>()->try_get(entity), ...);
         } else {
-            return std::tuple<std::add_const_t<Component> *...>{try_get<Component>(entity)...};
+            return std::tuple<decltype(try_get<Component>({}))...>{try_get<Component>(entity)...};
         }
     }
 
@@ -881,9 +859,9 @@ public:
     template<typename... Component>
     auto try_get([[maybe_unused]] const entity_type entity) ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 1) {
-            return (const_cast<Component *>(std::as_const(*this).template try_get<Component>(entity)), ...);
+            return (assure<Component>()->try_get(entity), ...);
         } else {
-            return std::tuple<Component *...>{try_get<Component>(entity)...};
+            return std::tuple<decltype(try_get<Component>({}))...>{try_get<Component>(entity)...};
         }
     }
 
@@ -910,7 +888,7 @@ public:
     template<typename Component, typename... Args>
     decltype(auto) replace(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
-        return pool<Component>()->replace(*this, entity, std::forward<Args>(args)...);
+        return assure<Component>()->replace(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -1328,8 +1306,7 @@ public:
      */
     template<typename Component>
     bool owned() const ENTT_NOEXCEPT {
-        const auto *cpool = pool<Component>();
-        return cpool && cpool->owned;
+        return assure<Component>()->owned;
     }
 
     /**
@@ -1828,8 +1805,8 @@ public:
     }
 
 private:
-    std::size_t skip_family_pools{};
-    std::vector<pool_data> pools{};
+    mutable std::size_t skip_family_pools{};
+    mutable std::vector<pool_data> pools{};
     std::vector<group_data> groups{};
     std::vector<ctx_variable> vars{};
     std::vector<entity_type> entities{};
