@@ -33,4 +33,3 @@ TODO
 * multi component registry::remove and some others?
 * range based registry::remove and some others?
 * nested groups: AB/ABC/ABCD/... (hints: sort, check functions)
-* ::size_type - c'mon

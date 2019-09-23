@@ -155,8 +155,8 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     }
 
     unchecked_type unchecked(const sparse_set<Entity> *view) const ENTT_NOEXCEPT {
+        std::size_t pos{};
         unchecked_type other{};
-        typename unchecked_type::size_type pos{};
         ((std::get<pool_type<Component> *>(pools) == view ? nullptr : (other[pos++] = std::get<pool_type<Component> *>(pools))), ...);
         return other;
     }

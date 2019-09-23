@@ -93,9 +93,9 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get, Other...>> {
 
 public:
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename sparse_set<Entity>::entity_type;
+    using entity_type = Entity;
     /*! @brief Unsigned integer type. */
-    using size_type = typename sparse_set<Entity>::size_type;
+    using size_type = std::size_t;
     /*! @brief Input iterator type. */
     using iterator_type = typename sparse_set<Entity>::iterator_type;
 
@@ -494,7 +494,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned, Other...>
     using component_iterator_type = decltype(std::declval<pool_type<Component>>().begin());
 
     // we could use pool_type<Type> *..., but vs complains about it and refuses to compile for unknown reasons (most likely a bug)
-    basic_group(const typename basic_registry<Entity>::size_type *sz, storage<Entity, std::remove_const_t<Owned>> *owned, storage<Entity, std::remove_const_t<Other>> *... other, storage<Entity, std::remove_const_t<Get>> *... get) ENTT_NOEXCEPT
+    basic_group(const std::size_t *sz, storage<Entity, std::remove_const_t<Owned>> *owned, storage<Entity, std::remove_const_t<Other>> *... other, storage<Entity, std::remove_const_t<Get>> *... get) ENTT_NOEXCEPT
         : length{sz},
           pools{owned, other..., get...}
     {}
@@ -521,9 +521,9 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned, Other...>
 
 public:
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename sparse_set<Entity>::entity_type;
+    using entity_type = Entity;
     /*! @brief Unsigned integer type. */
-    using size_type = typename sparse_set<Entity>::size_type;
+    using size_type = std::size_t;
     /*! @brief Input iterator type. */
     using iterator_type = typename sparse_set<Entity>::iterator_type;
 
@@ -838,7 +838,7 @@ public:
     }
 
 private:
-    const typename basic_registry<Entity>::size_type *length;
+    const size_type *length;
     const std::tuple<pool_type<Owned> *, pool_type<Other> *..., pool_type<Get> *...> pools;
 };
 

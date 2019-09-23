@@ -111,7 +111,7 @@ class scheduler {
 
 public:
     /*! @brief Unsigned integer type. */
-    using size_type = typename std::vector<process_handler>::size_type;
+    using size_type = std::size_t;
 
     /*! @brief Default constructor. */
     scheduler() ENTT_NOEXCEPT = default;

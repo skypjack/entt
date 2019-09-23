@@ -323,7 +323,7 @@ public:
     /*! @brief Underlying version type. */
     using version_type = typename traits_type::version_type;
     /*! @brief Unsigned integer type. */
-    using size_type = typename sparse_set<Entity>::size_type;
+    using size_type = std::size_t;
 
     /*! @brief Default constructor. */
     basic_registry() ENTT_NOEXCEPT = default;

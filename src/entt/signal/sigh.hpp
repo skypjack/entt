@@ -62,7 +62,7 @@ class sigh<Ret(Args...)> {
 
 public:
     /*! @brief Unsigned integer type. */
-    using size_type = typename std::vector<delegate<Ret(Args...)>>::size_type;
+    using size_type = std::size_t;
     /*! @brief Sink type. */
     using sink_type = entt::sink<Ret(Args...)>;
 

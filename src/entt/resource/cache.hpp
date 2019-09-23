@@ -26,12 +26,9 @@ namespace entt {
  * @tparam Resource Type of resources managed by a cache.
  */
 template<typename Resource>
-class resource_cache {
-    using container_type = std::unordered_map<ENTT_ID_TYPE, std::shared_ptr<Resource>>;
-
-public:
+struct resource_cache {
     /*! @brief Unsigned integer type. */
-    using size_type = typename container_type::size_type;
+    using size_type = std::size_t;
     /*! @brief Type of resources managed by a cache. */
     using resource_type = ENTT_ID_TYPE;
 
@@ -231,7 +228,7 @@ public:
     }
 
 private:
-    container_type resources;
+    std::unordered_map<resource_type, std::shared_ptr<Resource>> resources;
 };
 
 
