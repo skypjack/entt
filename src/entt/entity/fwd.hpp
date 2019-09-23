@@ -29,7 +29,7 @@ class basic_group;
 template<typename>
 class basic_observer;
 
-/*! @class basic_actor */
+/*! @struct basic_actor */
 template <typename>
 struct basic_actor;
 

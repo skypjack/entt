@@ -8,7 +8,7 @@
 namespace entt {
 
 
-/*! @class resource_cache */
+/*! @struct resource_cache */
 template<typename>
 struct resource_cache;
 

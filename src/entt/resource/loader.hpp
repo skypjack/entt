@@ -44,7 +44,7 @@ namespace entt {
 template<typename Loader, typename Resource>
 class resource_loader {
     /*! @brief Resource loaders are friends of their caches. */
-    friend class resource_cache<Resource>;
+    friend struct resource_cache<Resource>;
 
     /**
      * @brief Loads the resource and returns it.
