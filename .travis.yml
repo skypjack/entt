@@ -54,19 +54,6 @@ matrix:
     osx_image: xcode10
     compiler: clang
     env: COMPILER=clang++
-  - os: linux
-    compiler: gcc
-    addons:
-      apt:
-        sources: ['ubuntu-toolchain-r-test']
-        packages: ['g++-7']
-    env:
-      - COMPILER=g++-7
-      - CXXFLAGS="-O0 --coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
-    before_script:
-      - pip install --user cpp-coveralls
-    after_success:
-      - coveralls --gcov gcov-7 --gcov-options '\-lp' --root ${TRAVIS_BUILD_DIR} --build-root ${TRAVIS_BUILD_DIR}/build --extension cpp --extension hpp --exclude deps --include src
   # Conan testing and uploading
   - <<: *conan-linux
     env: CONAN_GCC_VERSIONS=8 CONAN_DOCKER_IMAGE=conanio/gcc8

@@ -222,6 +222,8 @@ endif()
 add_custom_target(
     entt_aob
     SOURCES
+        .github/workflows/main.yml
+        .github/FUNDING.yml
         appveyor.yml
         AUTHORS
         CONTRIBUTING.md
