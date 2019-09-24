@@ -41,14 +41,14 @@ echo "Sedding..."
 
 # change the url in the formula file
 # the slashes in the URL must be escaped
-ESCAPED_URL="$(sed -e 's/[\/&]/\\&/g' <<< "$URL")"
+ESCAPED_URL="$(echo "$URL" | sed -e 's/[\/&]/\\&/g')"
 sed -i -e '/url/s/".*"/"'$ESCAPED_URL'"/' $FORMULA
 
 # change the hash in the formula file
 sed -i -e '/sha256/s/".*"/"'$HASH'"/' $FORMULA
 
 # delete temporary file created by sed
-rm "$FORMULA-e"
+rm -rf "$FORMULA-e"
 
 # update remote repo
 echo "Gitting..."

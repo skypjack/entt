@@ -35,7 +35,5 @@ TODO
 * nested groups: AB/ABC/ABCD/... (hints: sort, check functions)
 
 * GH actions:
+  - get rid of travis/appveyor
   - badge(s) from github actions
-  - deploy doc (github pages) on tags
-  - rebuild single file somehow, somewhere
-  - conan on tags

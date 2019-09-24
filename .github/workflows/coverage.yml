@@ -1,4 +1,4 @@
-name: coveralls
+name: coverage
 
 on: [push, pull_request]
 
@@ -34,4 +34,4 @@ jobs:
       run: |
         pip install --upgrade wheel
         pip install cpp-coveralls
-        coveralls --gcov gcov-7 --gcov-options '\-lp' -r . -b ./build -x cpp -x hpp -e ./deps -i ./src
+        coveralls --gcov gcov-7 --gcov-options '\-lp' -r . -b build -x cpp -x hpp -e deps -i src

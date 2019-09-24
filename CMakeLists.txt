@@ -219,11 +219,12 @@ endif()
 # AOB
 #
 
+FILE(GLOB GH_WORKFLOWS .github/workflows/*.yml)
+
 add_custom_target(
     entt_aob
     SOURCES
-        .github/workflows/ci.yml
-        .github/workflows/coveralls.yml
+        ${GH_WORKFLOWS}
         .github/FUNDING.yml
         appveyor.yml
         AUTHORS
