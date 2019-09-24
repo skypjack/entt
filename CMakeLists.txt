@@ -226,11 +226,9 @@ add_custom_target(
     SOURCES
         ${GH_WORKFLOWS}
         .github/FUNDING.yml
-        appveyor.yml
         AUTHORS
         CONTRIBUTING.md
         LICENSE
         README.md
         TODO
-        .travis.yml
 )

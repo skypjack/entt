@@ -35,5 +35,4 @@ TODO
 * nested groups: AB/ABC/ABCD/... (hints: sort, check functions)
 
 * GH actions:
-  - get rid of travis/appveyor
   - badge(s) from github actions
