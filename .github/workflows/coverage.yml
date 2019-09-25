@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
 
   coveralls:
-    timeout-minutes: 5
+    timeout-minutes: 30
     runs-on: ubuntu-latest
 
     steps:
@@ -37,3 +37,31 @@ jobs:
         pip install --upgrade wheel
         pip install cpp-coveralls
         coveralls --gcov gcov-7 --gcov-options '\-lp' -r . -b build -x cpp -x hpp -e deps -i src
+
+  codecov:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Compile tests
+      working-directory: build
+      env:
+        CXXFLAGS: "-O0 --coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
+        CXX: g++
+      run: |
+        cmake -DBUILD_TESTING=ON ..
+        make -j4
+    - name: Run tests
+      working-directory: build
+      env:
+        CTEST_OUTPUT_ON_FAILURE: 1
+      run: ctest --timeout 5 -C Debug -j4
+    - name: Upload coverage to Codecov
+      working-directory: build
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: |
+        wget https://codecov.io/bash -O codecov
+        chmod +x codecov
+        ./codecov -t $CODECOV_TOKEN -B $GITHUB_REF -s test/
