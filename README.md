@@ -5,7 +5,7 @@
 -->
 [![GitHub version](https://badge.fury.io/gh/skypjack%2Fentt.svg)](https://github.com/skypjack/entt/releases)
 [![Build Status](https://github.com/skypjack/entt/workflows/build/badge.svg)](https://github.com/skypjack/entt/actions)
-[![Coverage Status](https://coveralls.io/repos/github/skypjack/entt/badge.svg?branch=master)](https://coveralls.io/github/skypjack/entt?branch=master)
+[![Coverage](https://codecov.io/gh/skypjack/entt/branch/master/graph/badge.svg)](https://codecov.io/gh/skypjack/entt)
 [![Try online](https://img.shields.io/badge/try-online-brightgreen)](https://godbolt.org/z/v8txVr)
 [![Gitter chat](https://badges.gitter.im/skypjack/entt.png)](https://gitter.im/skypjack/entt)
 [![Donate](https://img.shields.io/badge/donate-paypal-blue.svg)](https://www.paypal.me/skypjack)
