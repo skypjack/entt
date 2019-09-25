@@ -486,9 +486,7 @@ TEST(SparseSet, ArrangeRange) {
     entt::entity entities[5]{entt::entity{9}, entt::entity{7}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
     set.batch(std::begin(entities), std::end(entities));
 
-    set.arrange(set.end(), set.end(), [&set, &entities](const auto lhs, const auto rhs) {
-        std::swap(entities[set.index(lhs)], entities[set.index(rhs)]);
-    }, std::less{});
+    set.arrange(set.end(), set.end(), [](const auto, const auto) { FAIL(); }, std::less{});
 
     ASSERT_EQ(*(set.data() + 0u), entt::entity{9});
     ASSERT_EQ(*(set.data() + 1u), entt::entity{7});
@@ -496,9 +494,7 @@ TEST(SparseSet, ArrangeRange) {
     ASSERT_EQ(*(set.data() + 3u), entt::entity{12});
     ASSERT_EQ(*(set.data() + 4u), entt::entity{42});
 
-    set.arrange(set.begin(), set.begin(), [&set, &entities](const auto lhs, const auto rhs) {
-        std::swap(entities[set.index(lhs)], entities[set.index(rhs)]);
-    }, std::less{});
+    set.arrange(set.begin(), set.begin(), [](const auto, const auto) { FAIL(); }, std::less{});
 
     ASSERT_EQ(*(set.data() + 0u), entt::entity{9});
     ASSERT_EQ(*(set.data() + 1u), entt::entity{7});
@@ -506,9 +502,7 @@ TEST(SparseSet, ArrangeRange) {
     ASSERT_EQ(*(set.data() + 3u), entt::entity{12});
     ASSERT_EQ(*(set.data() + 4u), entt::entity{42});
 
-    set.arrange(set.begin()+2, set.begin()+3, [&set, &entities](const auto lhs, const auto rhs) {
-        std::swap(entities[set.index(lhs)], entities[set.index(rhs)]);
-    }, std::less{});
+    set.arrange(set.begin()+2, set.begin()+3, [](const auto, const auto) { FAIL(); }, std::less{});
 
     ASSERT_EQ(*(set.data() + 0u), entt::entity{9});
     ASSERT_EQ(*(set.data() + 1u), entt::entity{7});

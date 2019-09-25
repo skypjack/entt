@@ -460,9 +460,7 @@ TEST(Storage, SortRange) {
     ASSERT_EQ(pool.get(entt::entity{3}).value, 9);
     ASSERT_EQ(pool.get(entt::entity{9}).value, 12);
 
-    pool.sort(pool.end(), pool.end(), [](auto lhs, auto rhs) {
-        return lhs.value < rhs.value;
-    });
+    pool.sort(pool.end(), pool.end(), std::less{});
 
     ASSERT_EQ(pool.get(entt::entity{12}).value, 6);
     ASSERT_EQ(pool.get(entt::entity{42}).value, 3);
@@ -470,9 +468,7 @@ TEST(Storage, SortRange) {
     ASSERT_EQ(pool.get(entt::entity{3}).value, 9);
     ASSERT_EQ(pool.get(entt::entity{9}).value, 12);
 
-    pool.sort(pool.begin(), pool.begin(), [](auto lhs, auto rhs) {
-        return lhs.value < rhs.value;
-    });
+    pool.sort(pool.begin(), pool.begin(), std::less{});
 
     ASSERT_EQ(pool.get(entt::entity{12}).value, 6);
     ASSERT_EQ(pool.get(entt::entity{42}).value, 3);
@@ -480,9 +476,7 @@ TEST(Storage, SortRange) {
     ASSERT_EQ(pool.get(entt::entity{3}).value, 9);
     ASSERT_EQ(pool.get(entt::entity{9}).value, 12);
 
-    pool.sort(pool.begin()+2, pool.begin()+3, [](auto lhs, auto rhs) {
-        return lhs.value < rhs.value;
-    });
+    pool.sort(pool.begin()+2, pool.begin()+3, std::less{});
 
     ASSERT_EQ(pool.get(entt::entity{12}).value, 6);
     ASSERT_EQ(pool.get(entt::entity{42}).value, 3);
@@ -787,8 +781,9 @@ TEST(Storage, ConstructorExceptionDoesNotAddToStorage) {
 
     try {
         pool.construct(entt::entity{0});
-        FAIL() << "Expected constructor_exception to be thrown";
     } catch (const throwing_component::constructor_exception &) {
         ASSERT_TRUE(pool.empty());
     }
+
+    ASSERT_TRUE(pool.empty());
 }

@@ -23,4 +23,12 @@ TEST(Utility, Overload) {
 
     ASSERT_EQ(entt::overload<void(int)>(&Functions::bar), static_cast<void(Functions:: *)(int)>(&Functions::bar));
     ASSERT_EQ(entt::overload<void()>(&Functions::bar), static_cast<void(Functions:: *)()>(&Functions::bar));
+
+    Functions instance;
+
+    ASSERT_NO_THROW(entt::overload<void(int)>(&Functions::foo)(0));
+    ASSERT_NO_THROW(entt::overload<void()>(&Functions::foo)());
+
+    ASSERT_NO_THROW((instance.*entt::overload<void(int)>(&Functions::bar))(0));
+    ASSERT_NO_THROW((instance.*entt::overload<void()>(&Functions::bar))());
 }

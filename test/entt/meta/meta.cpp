@@ -52,10 +52,6 @@ union union_type {
     double d;
 };
 
-bool operator!=(const fat_type &lhs, const fat_type &rhs) {
-    return !(lhs == rhs);
-}
-
 struct base_type {
     virtual ~base_type() = default;
 };

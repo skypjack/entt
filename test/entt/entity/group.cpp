@@ -468,8 +468,7 @@ TEST(NonOwningGroup, TrackEntitiesOnComponentDestruction) {
 
 TEST(NonOwningGroup, Less) {
     entt::registry registry;
-    const auto entity = std::get<0>(registry.create<int, entt::tag<"empty"_hs>>());
-    registry.create<char>();
+    const auto entity = std::get<0>(registry.create<int, char, entt::tag<"empty"_hs>>());
 
     registry.group(entt::get<int, char, entt::tag<"empty"_hs>>).less([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
@@ -484,8 +483,8 @@ TEST(NonOwningGroup, Less) {
         ASSERT_EQ(entity, entt);
     });
 
-    registry.group(entt::get<int, char, double>).less([entity](const auto entt, int, char, double) {
-        ASSERT_EQ(entity, entt);
+    registry.group(entt::get<int, char, double>).less([](const auto, int, char, double) {
+        FAIL();
     });
 }
 
@@ -1043,8 +1042,7 @@ TEST(OwningGroup, TrackEntitiesOnComponentDestruction) {
 
 TEST(OwningGroup, Less) {
     entt::registry registry;
-    const auto entity = std::get<0>(registry.create<int, entt::tag<"empty"_hs>>());
-    registry.create<char>();
+    const auto entity = std::get<0>(registry.create<int, char, entt::tag<"empty"_hs>>());
 
     registry.group<int>(entt::get<char, entt::tag<"empty"_hs>>).less([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
@@ -1059,8 +1057,8 @@ TEST(OwningGroup, Less) {
         ASSERT_EQ(entity, entt);
     });
 
-    registry.group<double>(entt::get<int, char>).less([entity](const auto entt, double, int, char) {
-        ASSERT_EQ(entity, entt);
+    registry.group<double>(entt::get<int, char>).less([](const auto, double, int, char) {
+        FAIL();
     });
 }
 

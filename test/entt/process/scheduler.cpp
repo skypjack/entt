@@ -100,9 +100,7 @@ TEST(Scheduler, Functor) {
         ASSERT_FALSE(second_functor);
         second_functor = true;
         reject();
-    }).then([](auto...){
-        FAIL();
-    });
+    }).then([](auto...){ FAIL(); });
 
     for(auto i = 0; i < 8; ++i) {
         scheduler.update(0);
