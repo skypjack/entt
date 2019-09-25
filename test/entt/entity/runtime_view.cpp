@@ -1,4 +1,5 @@
 #include <iterator>
+#include <algorithm>
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
@@ -105,10 +106,10 @@ TEST(RuntimeView, Empty) {
     entt::component types[] = { registry.type<char>(), registry.type<int>(), registry.type<float>() };
     auto view = registry.runtime_view(std::begin(types), std::end(types));
 
-    for(auto entity: view) {
-        (void)entity;
-        FAIL();
-    }
+    view.each([](auto) { FAIL(); });
+
+    ASSERT_EQ((std::find(view.begin(), view.end(), e0)), view.end());
+    ASSERT_EQ((std::find(view.begin(), view.end(), e1)), view.end());
 }
 
 TEST(RuntimeView, Each) {
@@ -172,10 +173,7 @@ TEST(RuntimeView, MissingPool) {
 
     view.each([](auto) { FAIL(); });
 
-    for(auto entity: view) {
-        (void)entity;
-        FAIL();
-    }
+    ASSERT_EQ((std::find(view.begin(), view.end(), e0)), view.end());
 }
 
 TEST(RuntimeView, EmptyRange) {
@@ -193,8 +191,5 @@ TEST(RuntimeView, EmptyRange) {
 
     view.each([](auto) { FAIL(); });
 
-    for(auto entity: view) {
-        (void)entity;
-        FAIL();
-    }
+    ASSERT_EQ((std::find(view.begin(), view.end(), e0)), view.end());
 }

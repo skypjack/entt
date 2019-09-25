@@ -802,9 +802,7 @@ TEST(Registry, SortOwned) {
     ASSERT_EQ(*(registry.raw<int>()+3), 3);
     ASSERT_EQ(*(registry.raw<int>()+4), 4);
 
-    registry.sort<int>([](const int lhs, const int rhs) {
-        return lhs < rhs;
-    });
+    registry.sort<int>(std::less{});
 
     ASSERT_EQ(*(registry.raw<int>()+0), 0);
     ASSERT_EQ(*(registry.raw<int>()+1), 1);
@@ -813,9 +811,7 @@ TEST(Registry, SortOwned) {
     ASSERT_EQ(*(registry.raw<int>()+4), 2);
 
     registry.reset<char>();
-    registry.sort<int>([](const int lhs, const int rhs) {
-        return lhs < rhs;
-    });
+    registry.sort<int>(std::less{});
 
     ASSERT_EQ(*(registry.raw<int>()+0), 4);
     ASSERT_EQ(*(registry.raw<int>()+1), 3);
@@ -827,9 +823,7 @@ TEST(Registry, SortOwned) {
         registry.assign<char>(entity);
     });
 
-    registry.sort<int>([](const int lhs, const int rhs) {
-        return lhs > rhs;
-    });
+    registry.sort<int>(std::greater{});
 
     ASSERT_EQ(*(registry.raw<int>()+0), 4);
     ASSERT_EQ(*(registry.raw<int>()+1), 3);
@@ -838,9 +832,7 @@ TEST(Registry, SortOwned) {
     ASSERT_EQ(*(registry.raw<int>()+4), 0);
 
     registry.reset<char>();
-    registry.sort<int>([](const int lhs, const int rhs) {
-        return lhs > rhs;
-    });
+    registry.sort<int>(std::greater{});
 
     ASSERT_EQ(*(registry.raw<int>()+0), 0);
     ASSERT_EQ(*(registry.raw<int>()+1), 1);
@@ -1332,8 +1324,8 @@ TEST(Registry, NonOwningGroupSortInterleaved) {
     registry.assign<int>(e1, 1);
     registry.assign<char>(e1, '1');
 
-    registry.sort<int>([](auto lhs, auto rhs) { return lhs > rhs; });
-    registry.sort<char>([](auto lhs, auto rhs) { return lhs < rhs; });
+    registry.sort<int>(std::greater{});
+    registry.sort<char>(std::less{});
 
     const auto e2 = registry.create();
     registry.assign<int>(e2, 2);

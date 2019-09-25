@@ -395,12 +395,9 @@ TEST(MultiComponentView, EachWithHoles) {
     auto view = registry.view<char, int>();
 
     view.each([e0](auto entity, const char &c, const int &i) {
-        if(e0 == entity) {
-            ASSERT_EQ(c, '0');
-            ASSERT_EQ(i, 0);
-        } else {
-            FAIL();
-        }
+        ASSERT_EQ(entity, e0);
+        ASSERT_EQ(c, '0');
+        ASSERT_EQ(i, 0);
     });
 }
 
@@ -496,12 +493,12 @@ TEST(MultiComponentView, ExcludedComponents) {
     registry.assign<char>(e3);
 
     for(const auto entity: view) {
+        ASSERT_TRUE(entity == e0 || entity == e2);
+
         if(entity == e0) {
             ASSERT_EQ(view.get<int>(e0), 0);
         } else if(entity == e2) {
             ASSERT_EQ(view.get(e2), 2);
-        } else {
-            FAIL();
         }
     }
 
@@ -511,12 +508,12 @@ TEST(MultiComponentView, ExcludedComponents) {
     registry.remove<char>(e3);
 
     for(const auto entity: view) {
+        ASSERT_TRUE(entity == e1 || entity == e3);
+
         if(entity == e1) {
             ASSERT_EQ(view.get(e1), 1);
         } else if(entity == e3) {
             ASSERT_EQ(view.get<int>(e3), 3);
-        } else {
-            FAIL();
         }
     }
 }

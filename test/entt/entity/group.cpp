@@ -395,12 +395,12 @@ TEST(NonOwningGroup, ExcludedComponents) {
     registry.assign<char>(e3);
 
     for(const auto entity: group) {
+        ASSERT_TRUE(entity == e0 || entity == e2);
+
         if(entity == e0) {
             ASSERT_EQ(group.get<int>(e0), 0);
         } else if(entity == e2) {
             ASSERT_EQ(group.get<int>(e2), 2);
-        } else {
-            FAIL();
         }
     }
 
@@ -413,12 +413,12 @@ TEST(NonOwningGroup, ExcludedComponents) {
     registry.remove<char>(e3);
 
     for(const auto entity: group) {
+        ASSERT_TRUE(entity == e1 || entity == e3);
+
         if(entity == e1) {
             ASSERT_EQ(group.get<int>(e1), 1);
         } else if(entity == e3) {
             ASSERT_EQ(group.get<int>(e3), 3);
-        } else {
-            FAIL();
         }
     }
 }
@@ -483,9 +483,7 @@ TEST(NonOwningGroup, Less) {
         ASSERT_EQ(entity, entt);
     });
 
-    registry.group(entt::get<int, char, double>).less([](const auto, int, char, double) {
-        FAIL();
-    });
+    registry.group(entt::get<int, char, double>).less([](const auto, int, char, double) { FAIL(); });
 }
 
 TEST(NonOwningGroup, SignalRace) {
@@ -969,12 +967,12 @@ TEST(OwningGroup, ExcludedComponents) {
     registry.assign<double>(e3);
 
     for(const auto entity: group) {
+        ASSERT_TRUE(entity == e0 || entity == e2);
+
         if(entity == e0) {
             ASSERT_EQ(group.get<int>(e0), 0);
         } else if(entity == e2) {
             ASSERT_EQ(group.get<int>(e2), 2);
-        } else {
-            FAIL();
         }
     }
 
@@ -987,12 +985,12 @@ TEST(OwningGroup, ExcludedComponents) {
     registry.remove<double>(e3);
 
     for(const auto entity: group) {
+        ASSERT_TRUE(entity == e1 || entity == e3);
+
         if(entity == e1) {
             ASSERT_EQ(group.get<int>(e1), 1);
         } else if(entity == e3) {
             ASSERT_EQ(group.get<int>(e3), 3);
-        } else {
-            FAIL();
         }
     }
 }
@@ -1057,9 +1055,7 @@ TEST(OwningGroup, Less) {
         ASSERT_EQ(entity, entt);
     });
 
-    registry.group<double>(entt::get<int, char>).less([](const auto, double, int, char) {
-        FAIL();
-    });
+    registry.group<double>(entt::get<int, char>).less([](const auto, double, int, char) { FAIL(); });
 }
 
 TEST(OwningGroup, SignalRace) {
