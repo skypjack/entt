@@ -16,6 +16,9 @@ extern void assign_velocity(int, entt::registry &);
 extern void trigger_an_event(int, entt::dispatcher &);
 extern void trigger_another_event(entt::dispatcher &);
 
+extern void emit_an_event(int, test_emitter &);
+extern void emit_another_event(test_emitter &);
+
 struct listener {
     void on_an_event(an_event event) { value = event.payload; }
     void on_another_event(another_event) {}
@@ -73,8 +76,8 @@ TEST(Lib, Dispatcher) {
 
     listener.value = 0;
 
-    trigger_another_event(dispatcher);
     trigger_an_event(3, dispatcher);
+    trigger_another_event(dispatcher);
 
     ASSERT_EQ(listener.value, 3);
 }
@@ -87,13 +90,13 @@ TEST(Lib, Emitter) {
         ASSERT_EQ(event.payload, 3);
     });
 
-    emitter.publish<an_event>(3);
-    emitter.publish<another_event>();
+    emit_an_event(3, emitter);
+    emit_another_event(emitter);
 
     emitter.once<an_event>([](an_event event, test_emitter &) {
         ASSERT_EQ(event.payload, 42);
     });
 
-    emitter.publish<another_event>();
-    emitter.publish<an_event>(42);
+    emit_an_event(42, emitter);
+    emit_another_event(emitter);
 }
