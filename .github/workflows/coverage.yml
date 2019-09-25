@@ -10,6 +10,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: Reattach HEAD
+      run: git checkout "$(echo ${{ github.ref }} | sed -E 's|refs/[a-zA-Z]+/||')"
     - name: Compile tests
       working-directory: build
       env:
