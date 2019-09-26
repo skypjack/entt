@@ -3,6 +3,7 @@ conan/test_package/build
 
 # IDEs
 .idea
+.vscode
 
 # Bazel
 /bazel-*
