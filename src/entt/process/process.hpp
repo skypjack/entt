@@ -188,7 +188,7 @@ public:
             current = state::ABORTED;
 
             if(immediately) {
-                tick(0);
+                tick({});
             }
         }
     }
