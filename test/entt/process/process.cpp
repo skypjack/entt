@@ -2,8 +2,19 @@
 #include <cstdint>
 #include <entt/process/process.hpp>
 
-struct fake_process: entt::process<fake_process, int> {
-    using process_type = entt::process<fake_process, int>;
+struct time_info {
+    uint64_t timestamp;
+    uint64_t prev_timestamp;
+    double timescale;
+    double dt() { 
+        return (timestamp - prev_timestamp) * timescale;
+    }
+};
+
+using delta_type = time_info;
+
+struct fake_process: entt::process<fake_process, delta_type> {
+    using process_type = entt::process<fake_process, delta_type>;
 
     void succeed() noexcept { process_type::succeed(); }
     void fail() noexcept { process_type::fail(); }
@@ -47,7 +58,7 @@ TEST(Process, Basics) {
     ASSERT_FALSE(process.dead());
     ASSERT_FALSE(process.paused());
 
-    process.tick(0);
+    process.tick({});
 
     ASSERT_TRUE(process.alive());
     ASSERT_FALSE(process.dead());
@@ -69,10 +80,10 @@ TEST(Process, Basics) {
 TEST(Process, Succeeded) {
     fake_process process;
 
-    process.tick(0);
-    process.tick(0);
+    process.tick({});
+    process.tick({});
     process.succeed();
-    process.tick(0);
+    process.tick({});
 
     ASSERT_FALSE(process.alive());
     ASSERT_TRUE(process.dead());
@@ -88,10 +99,10 @@ TEST(Process, Succeeded) {
 TEST(Process, Fail) {
     fake_process process;
 
-    process.tick(0);
-    process.tick(0);
+    process.tick({});
+    process.tick({});
     process.fail();
-    process.tick(0);
+    process.tick({});
 
     ASSERT_FALSE(process.alive());
     ASSERT_TRUE(process.dead());
@@ -108,10 +119,10 @@ TEST(Process, Data) {
     fake_process process;
     int value = 0;
 
-    process.tick(0);
-    process.tick(0, &value);
+    process.tick({});
+    process.tick({}, &value);
     process.succeed();
-    process.tick(0, &value);
+    process.tick({}, &value);
 
     ASSERT_FALSE(process.alive());
     ASSERT_TRUE(process.dead());
@@ -128,9 +139,9 @@ TEST(Process, Data) {
 TEST(Process, AbortNextTick) {
     fake_process process;
 
-    process.tick(0);
+    process.tick({});
     process.abort();
-    process.tick(0);
+    process.tick({});
 
     ASSERT_FALSE(process.alive());
     ASSERT_TRUE(process.dead());
@@ -146,7 +157,7 @@ TEST(Process, AbortNextTick) {
 TEST(Process, AbortImmediately) {
     fake_process process;
 
-    process.tick(0);
+    process.tick({});
     process.abort(true);
 
     ASSERT_FALSE(process.alive());
@@ -170,8 +181,8 @@ TEST(ProcessAdaptor, Resolved) {
 
     auto process = entt::process_adaptor<decltype(lambda), std::uint64_t>{lambda};
 
-    process.tick(0);
-    process.tick(0);
+    process.tick({});
+    process.tick({});
 
     ASSERT_TRUE(process.dead());
     ASSERT_TRUE(updated);
@@ -187,8 +198,8 @@ TEST(ProcessAdaptor, Rejected) {
 
     auto process = entt::process_adaptor<decltype(lambda), std::uint64_t>{lambda};
 
-    process.tick(0);
-    process.tick(0);
+    process.tick({});
+    process.tick({});
 
     ASSERT_TRUE(process.rejected());
     ASSERT_TRUE(updated);
@@ -204,8 +215,8 @@ TEST(ProcessAdaptor, Data) {
 
     auto process = entt::process_adaptor<decltype(lambda), std::uint64_t>{lambda};
 
-    process.tick(0);
-    process.tick(0, &value);
+    process.tick({});
+    process.tick({}, &value);
 
     ASSERT_TRUE(process.dead());
     ASSERT_EQ(value, 42);
