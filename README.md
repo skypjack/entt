@@ -301,14 +301,32 @@ Note that benchmarks are not part of this set.
 
 * [`Conan`](https://bintray.com/skypjack/conan/entt%3Askypjack/_latestVersion),
   the C/C++ Package Manager for Developers.
+
+* [`vcpkg`](https://github.com/Microsoft/vcpkg/tree/master/ports/entt),
+  Microsoft VC++ Packaging Tool.<br/>
+  You can download and install `EnTT` in just a few simple steps:
+
+  ```
+  $ git clone https://github.com/Microsoft/vcpkg.git
+  $ cd vcpkg
+  $ ./bootstrap-vcpkg.sh
+  $ ./vcpkg integrate install
+  $ vcpkg install entt
+  ```
+
+  The `EnTT` port in `vcpkg` is kept up to date by Microsoft team members and
+  community contributors.<br/>
+  If the version is out of date, please
+  [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the
+  `vcpkg` repository.
+
 * [`Homebrew`](https://github.com/skypjack/homebrew-entt), the missing package
   manager for macOS.<br/>
   Available as a homebrew formula. Just type the following to install it:
+
   ```
   brew install skypjack/entt/entt
   ```
-* [`vcpkg`](https://github.com/Microsoft/vcpkg/tree/master/ports/entt),
-  Microsoft VC++ Packaging Tool.
 
 Consider this list a work in progress and help me to make it longer.
 
