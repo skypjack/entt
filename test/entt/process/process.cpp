@@ -11,10 +11,9 @@ struct time_info {
     }
 };
 
-using delta_type = time_info;
-
-struct fake_process: entt::process<fake_process, delta_type> {
-    using process_type = entt::process<fake_process, delta_type>;
+template<typename Delta>
+struct fake_process: entt::process<fake_process<Delta>, Delta> {
+    using process_type = entt::process<fake_process<Delta>, Delta>;
 
     void succeed() noexcept { process_type::succeed(); }
     void fail() noexcept { process_type::fail(); }
@@ -26,7 +25,7 @@ struct fake_process: entt::process<fake_process, delta_type> {
     void failed() { failed_invoked = true; }
     void aborted() { aborted_invoked = true; }
 
-    void update(delta_type, void *data) {
+    void update(Delta, void *data) {
         if(data) {
             (*static_cast<int *>(data))++;
         }
@@ -42,182 +41,227 @@ struct fake_process: entt::process<fake_process, delta_type> {
 };
 
 TEST(Process, Basics) {
-    fake_process process;
+    auto test = [](auto delta) {
+        fake_process<decltype(delta)> process;
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
-    ASSERT_FALSE(process.paused());
+        ASSERT_FALSE(process.alive());
+        ASSERT_FALSE(process.dead());
+        ASSERT_FALSE(process.paused());
 
-    process.succeed();
-    process.fail();
-    process.abort();
-    process.pause();
-    process.unpause();
+        process.succeed();
+        process.fail();
+        process.abort();
+        process.pause();
+        process.unpause();
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_FALSE(process.dead());
-    ASSERT_FALSE(process.paused());
+        ASSERT_FALSE(process.alive());
+        ASSERT_FALSE(process.dead());
+        ASSERT_FALSE(process.paused());
 
-    process.tick({});
+        process.tick({});
 
-    ASSERT_TRUE(process.alive());
-    ASSERT_FALSE(process.dead());
-    ASSERT_FALSE(process.paused());
+        ASSERT_TRUE(process.alive());
+        ASSERT_FALSE(process.dead());
+        ASSERT_FALSE(process.paused());
 
-    process.pause();
+        process.pause();
 
-    ASSERT_TRUE(process.alive());
-    ASSERT_FALSE(process.dead());
-    ASSERT_TRUE(process.paused());
+        ASSERT_TRUE(process.alive());
+        ASSERT_FALSE(process.dead());
+        ASSERT_TRUE(process.paused());
 
-    process.unpause();
+        process.unpause();
 
-    ASSERT_TRUE(process.alive());
-    ASSERT_FALSE(process.dead());
-    ASSERT_FALSE(process.paused());
+        ASSERT_TRUE(process.alive());
+        ASSERT_FALSE(process.dead());
+        ASSERT_FALSE(process.paused());
+    };
+
+    test(int{});
+    test(time_info{});
 }
 
 TEST(Process, Succeeded) {
-    fake_process process;
+    auto test = [](auto delta) {
+        fake_process<decltype(delta)> process;
 
-    process.tick({});
-    process.tick({});
-    process.succeed();
-    process.tick({});
+        process.tick({});
+        process.tick({});
+        process.succeed();
+        process.tick({});
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_TRUE(process.dead());
-    ASSERT_FALSE(process.paused());
+        ASSERT_FALSE(process.alive());
+        ASSERT_TRUE(process.dead());
+        ASSERT_FALSE(process.paused());
 
-    ASSERT_TRUE(process.init_invoked);
-    ASSERT_TRUE(process.update_invoked);
-    ASSERT_TRUE(process.succeeded_invoked);
-    ASSERT_FALSE(process.failed_invoked);
-    ASSERT_FALSE(process.aborted_invoked);
+        ASSERT_TRUE(process.init_invoked);
+        ASSERT_TRUE(process.update_invoked);
+        ASSERT_TRUE(process.succeeded_invoked);
+        ASSERT_FALSE(process.failed_invoked);
+        ASSERT_FALSE(process.aborted_invoked);
+    };
+
+    test(int{});
+    test(time_info{});
 }
 
 TEST(Process, Fail) {
-    fake_process process;
+    auto test = [](auto delta) {
+        fake_process<decltype(delta)> process;
 
-    process.tick({});
-    process.tick({});
-    process.fail();
-    process.tick({});
+        process.tick({});
+        process.tick({});
+        process.fail();
+        process.tick({});
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_TRUE(process.dead());
-    ASSERT_FALSE(process.paused());
+        ASSERT_FALSE(process.alive());
+        ASSERT_TRUE(process.dead());
+        ASSERT_FALSE(process.paused());
 
-    ASSERT_TRUE(process.init_invoked);
-    ASSERT_TRUE(process.update_invoked);
-    ASSERT_FALSE(process.succeeded_invoked);
-    ASSERT_TRUE(process.failed_invoked);
-    ASSERT_FALSE(process.aborted_invoked);
+        ASSERT_TRUE(process.init_invoked);
+        ASSERT_TRUE(process.update_invoked);
+        ASSERT_FALSE(process.succeeded_invoked);
+        ASSERT_TRUE(process.failed_invoked);
+        ASSERT_FALSE(process.aborted_invoked);
+    };
+
+    test(int{});
+    test(time_info{});
 }
 
 TEST(Process, Data) {
-    fake_process process;
-    int value = 0;
+    auto test = [](auto delta) {
+        fake_process<decltype(delta)> process;
+        int value = 0;
 
-    process.tick({});
-    process.tick({}, &value);
-    process.succeed();
-    process.tick({}, &value);
+        process.tick({});
+        process.tick({}, &value);
+        process.succeed();
+        process.tick({}, &value);
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_TRUE(process.dead());
-    ASSERT_FALSE(process.paused());
+        ASSERT_FALSE(process.alive());
+        ASSERT_TRUE(process.dead());
+        ASSERT_FALSE(process.paused());
 
-    ASSERT_EQ(value, 1);
-    ASSERT_TRUE(process.init_invoked);
-    ASSERT_TRUE(process.update_invoked);
-    ASSERT_TRUE(process.succeeded_invoked);
-    ASSERT_FALSE(process.failed_invoked);
-    ASSERT_FALSE(process.aborted_invoked);
+        ASSERT_EQ(value, 1);
+        ASSERT_TRUE(process.init_invoked);
+        ASSERT_TRUE(process.update_invoked);
+        ASSERT_TRUE(process.succeeded_invoked);
+        ASSERT_FALSE(process.failed_invoked);
+        ASSERT_FALSE(process.aborted_invoked);
+    };
+
+    test(int{});
+    test(time_info{});
 }
 
 TEST(Process, AbortNextTick) {
-    fake_process process;
+    auto test = [](auto delta) {
+        fake_process<decltype(delta)> process;
 
-    process.tick({});
-    process.abort();
-    process.tick({});
+        process.tick({});
+        process.abort();
+        process.tick({});
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_TRUE(process.dead());
-    ASSERT_FALSE(process.paused());
+        ASSERT_FALSE(process.alive());
+        ASSERT_TRUE(process.dead());
+        ASSERT_FALSE(process.paused());
 
-    ASSERT_TRUE(process.init_invoked);
-    ASSERT_FALSE(process.update_invoked);
-    ASSERT_FALSE(process.succeeded_invoked);
-    ASSERT_FALSE(process.failed_invoked);
-    ASSERT_TRUE(process.aborted_invoked);
+        ASSERT_TRUE(process.init_invoked);
+        ASSERT_FALSE(process.update_invoked);
+        ASSERT_FALSE(process.succeeded_invoked);
+        ASSERT_FALSE(process.failed_invoked);
+        ASSERT_TRUE(process.aborted_invoked);
+    };
+
+    test(int{});
+    test(time_info{});
 }
 
 TEST(Process, AbortImmediately) {
-    fake_process process;
+    auto test = [](auto delta) {
+        fake_process<decltype(delta)> process;
 
-    process.tick({});
-    process.abort(true);
+        process.tick({});
+        process.abort(true);
 
-    ASSERT_FALSE(process.alive());
-    ASSERT_TRUE(process.dead());
-    ASSERT_FALSE(process.paused());
+        ASSERT_FALSE(process.alive());
+        ASSERT_TRUE(process.dead());
+        ASSERT_FALSE(process.paused());
 
-    ASSERT_TRUE(process.init_invoked);
-    ASSERT_FALSE(process.update_invoked);
-    ASSERT_FALSE(process.succeeded_invoked);
-    ASSERT_FALSE(process.failed_invoked);
-    ASSERT_TRUE(process.aborted_invoked);
+        ASSERT_TRUE(process.init_invoked);
+        ASSERT_FALSE(process.update_invoked);
+        ASSERT_FALSE(process.succeeded_invoked);
+        ASSERT_FALSE(process.failed_invoked);
+        ASSERT_TRUE(process.aborted_invoked);
+    };
+
+    test(int{});
+    test(time_info{});
 }
 
 TEST(ProcessAdaptor, Resolved) {
-    bool updated = false;
-    auto lambda = [&updated](std::uint64_t, void *, auto resolve, auto) {
-        ASSERT_FALSE(updated);
-        updated = true;
-        resolve();
+    auto test = [](auto delta) {
+        bool updated = false;
+        auto lambda = [&updated](decltype(delta), void *, auto resolve, auto) {
+            ASSERT_FALSE(updated);
+            updated = true;
+            resolve();
+        };
+
+        auto process = entt::process_adaptor<decltype(lambda), decltype(delta)>{lambda};
+
+        process.tick({});
+        process.tick({});
+
+        ASSERT_TRUE(process.dead());
+        ASSERT_TRUE(updated);
     };
 
-    auto process = entt::process_adaptor<decltype(lambda), std::uint64_t>{lambda};
-
-    process.tick({});
-    process.tick({});
-
-    ASSERT_TRUE(process.dead());
-    ASSERT_TRUE(updated);
+    test(std::uint64_t{});
+    test(time_info{});
 }
 
 TEST(ProcessAdaptor, Rejected) {
-    bool updated = false;
-    auto lambda = [&updated](std::uint64_t, void *, auto, auto rejected) {
-        ASSERT_FALSE(updated);
-        updated = true;
-        rejected();
+    auto test = [](auto delta) {
+        bool updated = false;
+        auto lambda = [&updated](decltype(delta), void *, auto, auto rejected) {
+            ASSERT_FALSE(updated);
+            updated = true;
+            rejected();
+        };
+
+        auto process = entt::process_adaptor<decltype(lambda), decltype(delta)>{lambda};
+
+        process.tick({});
+        process.tick({});
+
+        ASSERT_TRUE(process.rejected());
+        ASSERT_TRUE(updated);
     };
 
-    auto process = entt::process_adaptor<decltype(lambda), std::uint64_t>{lambda};
-
-    process.tick({});
-    process.tick({});
-
-    ASSERT_TRUE(process.rejected());
-    ASSERT_TRUE(updated);
+    test(std::uint64_t{});
+    test(time_info{});
 }
 
 TEST(ProcessAdaptor, Data) {
-    int value = 0;
+    auto test = [](auto delta) {
+        int value = 0;
 
-    auto lambda = [](std::uint64_t, void *data, auto resolve, auto) {
-        *static_cast<int *>(data) = 42;
-        resolve();
+        auto lambda = [](decltype(delta), void *data, auto resolve, auto) {
+            *static_cast<int *>(data) = 42;
+            resolve();
+        };
+
+        auto process = entt::process_adaptor<decltype(lambda), decltype(delta)>{lambda};
+
+        process.tick({});
+        process.tick({}, &value);
+
+        ASSERT_TRUE(process.dead());
+        ASSERT_EQ(value, 42);
     };
 
-    auto process = entt::process_adaptor<decltype(lambda), std::uint64_t>{lambda};
-
-    process.tick({});
-    process.tick({}, &value);
-
-    ASSERT_TRUE(process.dead());
-    ASSERT_EQ(value, 42);
+    test(std::uint64_t{});
+    test(time_info{});
 }
