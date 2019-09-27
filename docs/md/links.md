@@ -17,8 +17,10 @@ I hope this list can grow much more in the future:
   * [Minecraft](https://minecraft.net/en-us/attribution/) by
     [Mojang](https://mojang.com/): of course, **that** Minecraft, see the
     open source attributions page for more details.
+  * [Land of the Rair](https://github.com/LandOfTheRair/core2): the new backend
+    of [a retro-style MUD](https://rair.land/) for the new age.
   * [Openblack](https://github.com/openblack/openblack): open source
-    reimplementation of the game Black & White (2001).
+    reimplementation of the game _Black & White_ (2001).
   * [Face Smash](https://play.google.com/store/apps/details?id=com.gamee.facesmash):
     a game to play with your face.
   * [EnTT Pacman](https://github.com/Kerndog73/EnTT-Pacman): an example of how
@@ -44,6 +46,8 @@ I hope this list can grow much more in the future:
     made in C++ with the `SDL2` and `EnTT` libraries.
 
 * Engines and the like:
+  * [Fling Engine](https://github.com/flingengine/FlingEngine): A Vulkan game
+    engine with a focus on data oriented design.
   * [Apparently](https://teamwisp.github.io/credits/)
     [Wisp](https://teamwisp.github.io/product/) by
     [Team Wisp](https://teamwisp.github.io/): an advanced real-time ray tracing
@@ -61,7 +65,7 @@ I hope this list can grow much more in the future:
     graphical backend (with
     [demo code](https://github.com/Green-Sky/imgui_entt_entity_editor_demo)).
 
-* Articles and blog posts
+* Articles and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
     [blog](https://skypjack.github.io/) are about `EnTT`, for those who want to
     know **more** on this project.
@@ -92,6 +96,13 @@ I hope this list can grow much more in the future:
   * [Apparently](https://www.linkedin.com/jobs/view/architekt-c%2B%2B-at-tieto-1219512333/)
     [Tieto](https://www.tieto.com/): they published a job post where `EnTT` was
     listed on their software stack.
+  * [Godot meets EnTT](https://github.com/portaloffreedom/godot_entt_example/):
+    A simple example on how to use `EnTT` within
+    [`Godot`](https://godotengine.org/).
+  * [Godot and GameNetworkingSockets meet EnTT](https://github.com/portaloffreedom/godot_entt_net_example):
+    A simple example on how to use `EnTT` and
+    [`GameNetworkingSockets`](https://github.com/ValveSoftware/GameNetworkingSockets)
+    within [`Godot`](https://godotengine.org/).
   * [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt): port of
     [Match One](https://github.com/sschmid/Match-One) for `Entitas-CSharp`.
   * GitHub contains also
