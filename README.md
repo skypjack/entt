@@ -218,6 +218,17 @@ open an issue to discuss your idea.
 
 To be able to use `EnTT`, users must provide a full-featured compiler that
 supports at least C++17.<br/>
+
+You can download and install `EnTT` using the [vcpkg](https://github.com/Microsoft/vcpkg/) dependency manager:
+
+    git clone https://github.com/Microsoft/vcpkg.git
+    cd vcpkg
+    ./bootstrap-vcpkg.sh
+    ./vcpkg integrate install
+    vcpkg install entt
+
+The `EnTT` port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
+
 The requirements below are mandatory to compile the tests and to extract the
 documentation:
 
