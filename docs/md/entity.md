@@ -390,11 +390,14 @@ Note also that:
 
 * Listeners for the construction signal are invoked **after** components have
   been assigned to entities.
+
 * Listeners designed to observe changes are invoked **before** components have
   been replaced and therefore before newly created instances have been assigned
   to entities.
+
 * Listeners for the destruction signal are invoked **before** components have
   been removed from entities.
+
 * The order of invocation of the listeners isn't guaranteed in any case.
 
 There are also some limitations on what a listener can and cannot do. In
@@ -402,6 +405,7 @@ particular:
 
 * Connecting and disconnecting other functions from within the body of a
   listener should be avoided. It can lead to undefined behavior in some cases.
+
 * Assigning and removing components from within the body of a listener that
   observes the destruction of instances of a given type should be avoided. It
   can lead to undefined behavior in some cases. This type of listeners is
@@ -466,6 +470,7 @@ However, the most important features of this class are that:
 
 * It's iterable and therefore users can easily walk through the list of entities
   by means of a range-for loop or the `each` member function.
+
 * It's clearable and therefore users can consume the entities and literally
   reset the observer after each iteration.
 
@@ -1500,6 +1505,7 @@ and components during iterations.<br/>
 
 * Creating entities and components is allowed during iterations in almost all
   cases.
+
 * Deleting the current entity or removing its components is allowed during
   iterations. For all the other entities, destroying them or removing their
   components isn't allowed and can result in undefined behavior.
@@ -1527,6 +1533,7 @@ To work around it, possible approaches are:
 
 * Store aside the entities and the components to be removed and perform the
   operations at the end of the iteration.
+
 * Mark entities and components with a proper tag component that indicates they
   must be purged, then perform a second iteration to clean them up one by one.
 
