@@ -1395,7 +1395,7 @@ required. Sorting a non-owning group affects all the instance of the same group
 (it means that users don't have to call `sort` on each instance to sort all of
 them because they share the set of entities).
 
-# Types: const, non-const and all in between
+## Types: const, non-const and all in between
 
 The `registry` class offers two overloads when it comes to constructing views
 and groups: a const version and a non-const one. The former accepts both const
