@@ -1,9 +1,13 @@
-#include <gtest/gtest.h>
 #include <cstdint>
+#include <gtest/gtest.h>
 #include <entt/process/process.hpp>
 
-struct fake_process: entt::process<fake_process, int> {
-    using process_type = entt::process<fake_process, int>;
+struct fake_delta {};
+
+template<typename Delta>
+struct fake_process: entt::process<fake_process<Delta>, Delta> {
+    using process_type = entt::process<fake_process<Delta>, Delta>;
+    using delta_type = typename process_type::delta_type;
 
     void succeed() noexcept { process_type::succeed(); }
     void fail() noexcept { process_type::fail(); }
@@ -15,7 +19,7 @@ struct fake_process: entt::process<fake_process, int> {
     void failed() { failed_invoked = true; }
     void aborted() { aborted_invoked = true; }
 
-    void update(delta_type, void *data) {
+    void update(typename entt::process<fake_process<Delta>, Delta>::delta_type, void *data) {
         if(data) {
             (*static_cast<int *>(data))++;
         }
@@ -31,7 +35,7 @@ struct fake_process: entt::process<fake_process, int> {
 };
 
 TEST(Process, Basics) {
-    fake_process process;
+    fake_process<int> process;
 
     ASSERT_FALSE(process.alive());
     ASSERT_FALSE(process.dead());
@@ -67,12 +71,12 @@ TEST(Process, Basics) {
 }
 
 TEST(Process, Succeeded) {
-    fake_process process;
+    fake_process<fake_delta> process;
 
-    process.tick(0);
-    process.tick(0);
+    process.tick({});
+    process.tick({});
     process.succeed();
-    process.tick(0);
+    process.tick({});
 
     ASSERT_FALSE(process.alive());
     ASSERT_TRUE(process.dead());
@@ -86,7 +90,7 @@ TEST(Process, Succeeded) {
 }
 
 TEST(Process, Fail) {
-    fake_process process;
+    fake_process<int> process;
 
     process.tick(0);
     process.tick(0);
@@ -105,13 +109,13 @@ TEST(Process, Fail) {
 }
 
 TEST(Process, Data) {
-    fake_process process;
+    fake_process<fake_delta> process;
     int value = 0;
 
-    process.tick(0);
-    process.tick(0, &value);
+    process.tick({});
+    process.tick({}, &value);
     process.succeed();
-    process.tick(0, &value);
+    process.tick({}, &value);
 
     ASSERT_FALSE(process.alive());
     ASSERT_TRUE(process.dead());
@@ -126,7 +130,7 @@ TEST(Process, Data) {
 }
 
 TEST(Process, AbortNextTick) {
-    fake_process process;
+    fake_process<int> process;
 
     process.tick(0);
     process.abort();
@@ -144,9 +148,9 @@ TEST(Process, AbortNextTick) {
 }
 
 TEST(Process, AbortImmediately) {
-    fake_process process;
+    fake_process<fake_delta> process;
 
-    process.tick(0);
+    process.tick({});
     process.abort(true);
 
     ASSERT_FALSE(process.alive());
