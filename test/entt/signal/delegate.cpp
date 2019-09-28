@@ -6,8 +6,12 @@ int delegate_function(const int &i) {
     return i*i;
 }
 
-int curried_function(const int &i, int j) {
+int curried_by_ref(const int &i, int j) {
     return i+j;
+}
+
+int curried_by_ptr(const int *i, int j) {
+    return (*i)+j;
 }
 
 int non_const_reference(int &i) {
@@ -113,16 +117,30 @@ TEST(Delegate, Comparison) {
     ASSERT_TRUE(lhs == rhs);
     ASSERT_EQ(lhs, rhs);
 
-    lhs.connect<&curried_function>(value);
+    lhs.connect<&curried_by_ref>(value);
 
-    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_function>, value}));
+    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_by_ref>, value}));
     ASSERT_TRUE(lhs != rhs);
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
 
-    rhs.connect<&curried_function>(value);
+    rhs.connect<&curried_by_ref>(value);
 
-    ASSERT_EQ(rhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_function>, value}));
+    ASSERT_EQ(rhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_by_ref>, value}));
+    ASSERT_FALSE(lhs != rhs);
+    ASSERT_TRUE(lhs == rhs);
+    ASSERT_EQ(lhs, rhs);
+
+    lhs.connect<&curried_by_ptr>(&value);
+
+    ASSERT_EQ(lhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_by_ptr>, &value}));
+    ASSERT_TRUE(lhs != rhs);
+    ASSERT_FALSE(lhs == rhs);
+    ASSERT_NE(lhs, rhs);
+
+    rhs.connect<&curried_by_ptr>(&value);
+
+    ASSERT_EQ(rhs, (entt::delegate<int(int)>{entt::connect_arg<&curried_by_ptr>, &value}));
     ASSERT_FALSE(lhs != rhs);
     ASSERT_TRUE(lhs == rhs);
     ASSERT_EQ(lhs, rhs);
@@ -188,8 +206,10 @@ TEST(Delegate, DeductionGuide) {
     int value = 0;
 
     entt::delegate func{entt::connect_arg<&delegate_function>};
-    entt::delegate curried_func{entt::connect_arg<&curried_function>, value};
-    entt::delegate curried_func_const{entt::connect_arg<&curried_function>, std::as_const(value)};
+    entt::delegate curried_func_with_ref{entt::connect_arg<&curried_by_ref>, value};
+    entt::delegate curried_func_with_const_ref{entt::connect_arg<&curried_by_ref>, std::as_const(value)};
+    entt::delegate curried_func_with_ptr{entt::connect_arg<&curried_by_ptr>, &value};
+    entt::delegate curried_func_with_const_ptr{entt::connect_arg<&curried_by_ptr>, &std::as_const(value)};
     entt::delegate member_func_f{entt::connect_arg<&const_nonconst_noexcept::f>, functor};
     entt::delegate member_func_g{entt::connect_arg<&const_nonconst_noexcept::g>, functor};
     entt::delegate member_func_h{entt::connect_arg<&const_nonconst_noexcept::h>, functor};
@@ -201,8 +221,10 @@ TEST(Delegate, DeductionGuide) {
     entt::delegate data_member_v_const{entt::connect_arg<&const_nonconst_noexcept::v>, std::as_const(functor)};
 
     static_assert(std::is_same_v<typename decltype(func)::function_type, int(const int &)>);
-    static_assert(std::is_same_v<typename decltype(curried_func)::function_type, int(int)>);
-    static_assert(std::is_same_v<typename decltype(curried_func_const)::function_type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(curried_func_with_ref)::function_type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(curried_func_with_const_ref)::function_type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(curried_func_with_ptr)::function_type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(curried_func_with_const_ptr)::function_type, int(int)>);
     static_assert(std::is_same_v<typename decltype(member_func_f)::function_type, void()>);
     static_assert(std::is_same_v<typename decltype(member_func_g)::function_type, void()>);
     static_assert(std::is_same_v<typename decltype(member_func_h)::function_type, void()>);
@@ -214,8 +236,10 @@ TEST(Delegate, DeductionGuide) {
     static_assert(std::is_same_v<typename decltype(data_member_v_const)::function_type, const int()>);
 
     ASSERT_TRUE(func);
-    ASSERT_TRUE(curried_func);
-    ASSERT_TRUE(curried_func_const);
+    ASSERT_TRUE(curried_func_with_ref);
+    ASSERT_TRUE(curried_func_with_const_ref);
+    ASSERT_TRUE(curried_func_with_ptr);
+    ASSERT_TRUE(curried_func_with_const_ptr);
     ASSERT_TRUE(member_func_f);
     ASSERT_TRUE(member_func_g);
     ASSERT_TRUE(member_func_h);
@@ -266,10 +290,15 @@ TEST(Delegate, CurriedFunction) {
     entt::delegate<int(int)> delegate;
     const auto value = 3;
 
-    delegate.connect<&curried_function>(value);
+    delegate.connect<&curried_by_ref>(value);
 
     ASSERT_TRUE(delegate);
     ASSERT_EQ(delegate(1), 4);
+
+    delegate.connect<&curried_by_ptr>(&value);
+
+    ASSERT_TRUE(delegate);
+    ASSERT_EQ(delegate(2), 5);
 }
 
 TEST(Delegate, Constructors) {
@@ -278,7 +307,8 @@ TEST(Delegate, Constructors) {
 
     entt::delegate<int(int)> empty{};
     entt::delegate<int(int)> func{entt::connect_arg<&delegate_function>};
-    entt::delegate<int(int)> curr{entt::connect_arg<&curried_function>, value};
+    entt::delegate<int(int)> ref{entt::connect_arg<&curried_by_ref>, value};
+    entt::delegate<int(int)> ptr{entt::connect_arg<&curried_by_ptr>, &value};
     entt::delegate<int(int)> member{entt::connect_arg<&delegate_functor::operator()>, functor};
 
     ASSERT_FALSE(empty);
@@ -286,8 +316,11 @@ TEST(Delegate, Constructors) {
     ASSERT_TRUE(func);
     ASSERT_EQ(9, func(3));
 
-    ASSERT_TRUE(curr);
-    ASSERT_EQ(5, curr(3));
+    ASSERT_TRUE(ref);
+    ASSERT_EQ(5, ref(3));
+
+    ASSERT_TRUE(ptr);
+    ASSERT_EQ(5, ref(3));
 
     ASSERT_TRUE(member);
     ASSERT_EQ(6, member(3));
@@ -306,8 +339,8 @@ TEST(Delegate, VoidVsNonVoidReturnType) {
 }
 
 TEST(Delegate, TheLessTheBetter) {
-    delegate_functor functor;
     entt::delegate<int(int, char)> delegate;
+    delegate_functor functor;
 
     // int delegate_function(const int &);
     delegate.connect<&delegate_function>();
