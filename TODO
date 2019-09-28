@@ -18,7 +18,6 @@
 * allow for custom stomp functions
 * deprecate/replace snapshot
 * experiment with hi-bitset for views
-* pointer payload optimization for delegates
 * custom (decoupled) pools ==> double buffering, shared components, multi-model
 * make meta work across boundaries
   - inline variables are fine here, only the head represents a problem
@@ -34,3 +33,4 @@
   - auto foo(It first, It last = entity_type{null})
 * range based registry::remove and some others?
 * nested groups: AB/ABC/ABCD/... (hints: sort, check functions)
+* pointer payload optimization for delegates
