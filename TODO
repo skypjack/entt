@@ -33,4 +33,3 @@
   - auto foo(It first, It last = entity_type{null})
 * range based registry::remove and some others?
 * nested groups: AB/ABC/ABCD/... (hints: sort, check functions)
-* pointer payload optimization for sigh

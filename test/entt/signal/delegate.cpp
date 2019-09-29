@@ -212,13 +212,13 @@ TEST(Delegate, DeductionGuide) {
     entt::delegate curried_func_with_const_ptr{entt::connect_arg<&curried_by_ptr>, &std::as_const(value)};
     entt::delegate member_func_f{entt::connect_arg<&const_nonconst_noexcept::f>, functor};
     entt::delegate member_func_g{entt::connect_arg<&const_nonconst_noexcept::g>, functor};
-    entt::delegate member_func_h{entt::connect_arg<&const_nonconst_noexcept::h>, functor};
-    entt::delegate member_func_h_const{entt::connect_arg<&const_nonconst_noexcept::h>, std::as_const(functor)};
+    entt::delegate member_func_h{entt::connect_arg<&const_nonconst_noexcept::h>, &functor};
+    entt::delegate member_func_h_const{entt::connect_arg<&const_nonconst_noexcept::h>, &std::as_const(functor)};
     entt::delegate member_func_i{entt::connect_arg<&const_nonconst_noexcept::i>, functor};
     entt::delegate member_func_i_const{entt::connect_arg<&const_nonconst_noexcept::i>, std::as_const(functor)};
     entt::delegate data_member_u{entt::connect_arg<&const_nonconst_noexcept::u>, functor};
-    entt::delegate data_member_v{entt::connect_arg<&const_nonconst_noexcept::v>, functor};
-    entt::delegate data_member_v_const{entt::connect_arg<&const_nonconst_noexcept::v>, std::as_const(functor)};
+    entt::delegate data_member_v{entt::connect_arg<&const_nonconst_noexcept::v>, &functor};
+    entt::delegate data_member_v_const{entt::connect_arg<&const_nonconst_noexcept::v>, &std::as_const(functor)};
 
     static_assert(std::is_same_v<typename decltype(func)::function_type, int(const int &)>);
     static_assert(std::is_same_v<typename decltype(curried_func_with_ref)::function_type, int(int)>);
@@ -330,8 +330,8 @@ TEST(Delegate, VoidVsNonVoidReturnType) {
     delegate_functor functor;
 
     entt::delegate<void(int)> func{entt::connect_arg<&delegate_function>};
-    entt::delegate<void(int)> member{entt::connect_arg<&delegate_functor::operator()>, functor};
-    entt::delegate<void(int)> cmember{entt::connect_arg<&delegate_functor::identity>, std::as_const(functor)};
+    entt::delegate<void(int)> member{entt::connect_arg<&delegate_functor::operator()>, &functor};
+    entt::delegate<void(int)> cmember{entt::connect_arg<&delegate_functor::identity>, &std::as_const(functor)};
 
     ASSERT_TRUE(func);
     ASSERT_TRUE(member);

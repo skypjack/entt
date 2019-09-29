@@ -165,7 +165,7 @@ TEST_F(SigH, Members) {
     ASSERT_TRUE(sigh.empty());
     ASSERT_EQ(0u, sigh.size());
 
-    sink.connect<&sigh_listener::g>(l1);
+    sink.connect<&sigh_listener::g>(&l1);
     sink.connect<&sigh_listener::h>(l2);
 
     ASSERT_FALSE(sigh.empty());
@@ -188,7 +188,7 @@ TEST_F(SigH, Collector) {
     entt::sink sink{sigh};
     int cnt = 0;
 
-    sink.connect<&sigh_listener::g>(listener);
+    sink.connect<&sigh_listener::g>(&listener);
     sink.connect<&sigh_listener::h>(listener);
 
     listener.k = true;
@@ -218,7 +218,7 @@ TEST_F(SigH, CollectorVoid) {
     entt::sink sink{sigh};
     int cnt = 0;
 
-    sink.connect<&sigh_listener::g>(listener);
+    sink.connect<&sigh_listener::g>(&listener);
     sink.connect<&sigh_listener::h>(listener);
     sigh.collect([&cnt]() { ++cnt; }, 42);
 
@@ -330,18 +330,18 @@ TEST_F(SigH, ConstNonConstNoExcept) {
     const const_nonconst_noexcept cfunctor;
 
     sink.connect<&const_nonconst_noexcept::f>(functor);
-    sink.connect<&const_nonconst_noexcept::g>(functor);
+    sink.connect<&const_nonconst_noexcept::g>(&functor);
     sink.connect<&const_nonconst_noexcept::h>(cfunctor);
-    sink.connect<&const_nonconst_noexcept::i>(cfunctor);
+    sink.connect<&const_nonconst_noexcept::i>(&cfunctor);
     sigh.publish();
 
     ASSERT_EQ(functor.cnt, 2);
     ASSERT_EQ(cfunctor.cnt, 2);
 
     sink.disconnect<&const_nonconst_noexcept::f>(functor);
-    sink.disconnect<&const_nonconst_noexcept::g>(functor);
+    sink.disconnect<&const_nonconst_noexcept::g>(&functor);
     sink.disconnect<&const_nonconst_noexcept::h>(cfunctor);
-    sink.disconnect<&const_nonconst_noexcept::i>(cfunctor);
+    sink.disconnect<&const_nonconst_noexcept::i>(&cfunctor);
     sigh.publish();
 
     ASSERT_EQ(functor.cnt, 2);
@@ -444,7 +444,7 @@ TEST_F(SigH, BeforeListenerNotPresent) {
     before_after functor;
 
     sink.connect<&before_after::mul>(functor);
-    sink.before<&before_after::add>(functor).connect<&before_after::add>(functor);
+    sink.before<&before_after::add>(&functor).connect<&before_after::add>(functor);
     sigh.publish(2);
 
     ASSERT_EQ(functor.value, 2);
