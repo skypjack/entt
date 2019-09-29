@@ -64,7 +64,7 @@ TEST_F(SigH, Clear) {
     ASSERT_FALSE(sink.empty());
     ASSERT_FALSE(sigh.empty());
 
-    sink.disconnect(nullptr);
+    sink.disconnect(static_cast<const void *>(nullptr));
 
     ASSERT_FALSE(sink.empty());
     ASSERT_FALSE(sigh.empty());
@@ -171,7 +171,7 @@ TEST_F(SigH, Members) {
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(2u, sigh.size());
 
-    sink.disconnect(nullptr);
+    sink.disconnect(static_cast<const void *>(nullptr));
 
     ASSERT_FALSE(sigh.empty());
     ASSERT_EQ(2u, sigh.size());
@@ -398,32 +398,6 @@ TEST_F(SigH, BeforeInstanceOrPayload) {
     sigh.publish(2);
 
     ASSERT_EQ(functor.value, 6);
-}
-
-TEST_F(SigH, BeforeOpaqueInstanceOrPayload) {
-    entt::sigh<void(int)> sigh;
-    entt::sink sink{sigh};
-    before_after functor;
-
-    sink.connect<&before_after::static_mul>(functor);
-    sink.connect<&before_after::add>(functor);
-    sink.before(&functor).connect<&before_after::static_add>();
-    sigh.publish(2);
-
-    ASSERT_EQ(functor.value, 6);
-}
-
-TEST_F(SigH, BeforeNullOpaqueInstanceOrPayload) {
-    entt::sigh<void(int)> sigh;
-    entt::sink sink{sigh};
-    before_after functor;
-
-    sink.connect<&before_after::static_mul>(functor);
-    sink.connect<&before_after::add>(functor);
-    sink.before(nullptr).connect<&before_after::static_add>();
-    sigh.publish(2);
-
-    ASSERT_EQ(functor.value, 4);
 }
 
 TEST_F(SigH, BeforeAnythingElse) {

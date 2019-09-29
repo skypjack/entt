@@ -405,11 +405,14 @@ public:
     }
 
     /**
-     * @brief Returns a sink that connects before an opaque instance or payload.
-     * @param value_or_instance An opaque pointer that fits the purpose.
+     * @brief Returns a sink that connects before a given instance or specific
+     * payload.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid pointer that fits the purpose.
      * @return A properly initialized sink object.
      */
-    sink before(const void *value_or_instance) {
+    template<typename Type>
+    sink before(Type *value_or_instance) {
         sink other{*this};
 
         if(value_or_instance) {
@@ -570,11 +573,13 @@ public:
     }
 
     /**
-     * @brief Disconnects member functions or free functions based on an opaque
-     * instance or payload.
-     * @param value_or_instance An opaque pointer that fits the purpose.
+     * @brief Disconnects member functions or free functions based on an
+     * instance or specific payload.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid pointer that fits the purpose.
      */
-    void disconnect(const void *value_or_instance) {
+    template<typename Type>
+    void disconnect(Type *value_or_instance) {
         if(value_or_instance) {
             auto &calls = signal->calls;
             calls.erase(std::remove_if(calls.begin(), calls.end(), [value_or_instance](const auto &delegate) {
