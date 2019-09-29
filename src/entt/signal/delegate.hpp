@@ -27,12 +27,12 @@ template<typename Ret, typename... Args>
 auto to_function_pointer(Ret(*)(Args...)) -> Ret(*)(Args...);
 
 
-template<typename Ret, typename... Args, typename Type, typename Payload, typename = std::enable_if_t<std::is_convertible_v<Payload &, Type &>>>
-auto to_function_pointer(Ret(*)(Type &, Args...), Payload &) -> Ret(*)(Args...);
+template<typename Ret, typename... Args, typename Type, typename Payload, typename = std::enable_if_t<std::is_convertible_v<const Payload &, const Type &>>>
+auto to_function_pointer(Ret(*)(Type &, Args...), const Payload &) -> Ret(*)(Args...);
 
 
-template<typename Ret, typename... Args, typename Type, typename Payload, typename = std::enable_if_t<std::is_convertible_v<Payload *, Type *>>>
-auto to_function_pointer(Ret(*)(Type *, Args...), Payload *) -> Ret(*)(Args...);
+template<typename Ret, typename... Args, typename Type, typename Payload, typename = std::enable_if_t<std::is_convertible_v<const Payload *, const Type *>>>
+auto to_function_pointer(Ret(*)(Type *, Args...), const Payload *) -> Ret(*)(Args...);
 
 
 template<typename Class, typename Ret, typename... Args>
@@ -45,6 +45,10 @@ auto to_function_pointer(Ret(Class:: *)(Args...) const, const Class &) -> Ret(*)
 
 template<typename Class, typename Type>
 auto to_function_pointer(Type Class:: *, const Class &) -> Type(*)();
+
+
+template<typename... Type>
+using to_function_pointer_t = decltype(internal::to_function_pointer(std::declval<Type>()...));
 
 
 template<typename>
@@ -182,7 +186,7 @@ public:
      */
     template<auto Function>
     void connect() ENTT_NOEXCEPT {
-        constexpr auto extent = internal::function_extent_v<decltype(internal::to_function_pointer(std::declval<decltype(Function)>()))>;
+        constexpr auto extent = internal::function_extent_v<internal::to_function_pointer_t<decltype(Function)>>;
         connect<Function>(std::make_index_sequence<extent>{});
     }
 
@@ -203,8 +207,8 @@ public:
      */
     template<auto Candidate, typename Type>
     void connect(Type &&value_or_instance) ENTT_NOEXCEPT {
-        constexpr auto extent = internal::function_extent_v<decltype(internal::to_function_pointer(std::declval<decltype(Candidate)>(), std::forward<Type>(value_or_instance)))>;
-        connect<Candidate>(std::forward<Type>(value_or_instance), std::make_index_sequence<extent>{});
+        constexpr auto extent = internal::function_extent_v<internal::to_function_pointer_t<decltype(Candidate), Type>>;
+        connect<Candidate>(std::forward<Type>(std::forward<Type>(value_or_instance)), std::make_index_sequence<extent>{});
     }
 
     /**
@@ -292,7 +296,7 @@ bool operator!=(const delegate<Ret(Args...)> &lhs, const delegate<Ret(Args...)> 
  */
 template<auto Function>
 delegate(connect_arg_t<Function>) ENTT_NOEXCEPT
--> delegate<std::remove_pointer_t<decltype(internal::to_function_pointer(Function))>>;
+-> delegate<std::remove_pointer_t<internal::to_function_pointer_t<decltype(Function)>>>;
 
 
 /**
@@ -307,7 +311,7 @@ delegate(connect_arg_t<Function>) ENTT_NOEXCEPT
  */
 template<auto Candidate, typename Type>
 delegate(connect_arg_t<Candidate>, Type &&value_or_instance) ENTT_NOEXCEPT
--> delegate<std::remove_pointer_t<decltype(internal::to_function_pointer(Candidate, std::forward<Type>(value_or_instance)))>>;
+-> delegate<std::remove_pointer_t<internal::to_function_pointer_t<decltype(Candidate), Type>>>;
 
 
 }
