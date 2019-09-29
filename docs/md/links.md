@@ -44,6 +44,8 @@ I hope this list can grow much more in the future:
     arcade puzzle game made in C++ using the `SDL2` and `EnTT` libraries.
   * [Snake with EnTT](https://github.com/MasonRG/SnakeGame): simple snake game
     made in C++ with the `SDL2` and `EnTT` libraries.
+  * [Mirrors lasers and robots](https://github.com/guillaume-haerinck/imac-tower-defense):
+    a small tower defense game based on mirror orientation.
 
 * Engines and the like:
   * [Fling Engine](https://github.com/flingengine/FlingEngine): A Vulkan game
