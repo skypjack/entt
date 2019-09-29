@@ -37,6 +37,7 @@
     * [Full-owning groups](#full-owning-groups)
     * [Partial-owning groups](#partial-owning-groups)
     * [Non-owning groups](#non-owning-groups)
+    * [Nested groups](#nested-groups)
   * [Types: const, non-const and all in between](#types-const-non-const-and-all-in-between)
   * [Give me everything](#give-me-everything)
   * [What is allowed and what is not](#what-is-allowed-and-what-is-not)
@@ -194,9 +195,9 @@ registry.destroy(view.begin(), view.end());
 ```
 
 In both cases, the `create` member function accepts also a list of default
-constructible types of components to assign to the entities before to return.
-It's a faster alternative to the creation and subsequent assignment of
-components in separate steps.
+constructible component types to assign to the entities before to return. It's a
+faster alternative to the creation and subsequent assignment of components in
+separate steps.
 
 When an entity is destroyed, the registry can freely reuse it internally with a
 slightly different identifier. In particular, the version of an entity is
@@ -847,7 +848,7 @@ consequence of a couple of design choices from the past and in the present:
   correctly from scratch.
 
 * Furthermore, the registry makes heavy use of _type-erasure_ techniques
-  internally and doesn't know at any time what types of components it contains.
+  internally and doesn't know at any time what component types it contains.
   Therefore being explicit at the call point is mandatory.
 
 There exists also another version of the `component` member function that
@@ -1061,11 +1062,11 @@ other functionality of the registry and keep memory usage at a minimum.
 Groups come in three different flavors: _full-owning groups_, _partial-owning
 groups_ and _non-owning groups_. The main difference between them is in terms of
 performance.<br/>
-Groups can literally _own_ one or more types of components. It means that they
-will be allowed to rearrange pools so as to speed up iterations. Roughly
-speaking: the more components a group owns, the faster it is to iterate them.
-On the other side, a given component can belong only to one group, so users have
-to define groups carefully to get the best out of them.
+Groups can literally _own_ one or more component types. It means that they will
+be allowed to rearrange pools so as to speed up iterations. Roughly speaking:
+the more components a group owns, the faster it is to iterate them. On the other
+side, a given component can belong to multiple groups only if they are _nested_,
+so users have to define groups carefully to get the best out of them.
 
 Continue reading for more details or refer to the inline documentation.
 
@@ -1223,9 +1224,9 @@ views.
 
 ## Groups
 
-Groups are meant to iterate multiple components at once and offer a faster
-alternative to views. Roughly speaking, they just play in another league when
-compared to views.<br/>
+Groups are meant to iterate multiple components at once and offer a (much)
+faster alternative to views. Roughly speaking, they just play in another league
+when compared to views.<br/>
 Groups overcome the performance of the other tools available but require to get
 the ownership of components and this sets some constraints on pools. On the
 other side, groups aren't an automatism that increases memory consumption,
@@ -1332,9 +1333,7 @@ Sorting owned components is no longer allowed once the group has been created.
 However, full-owning groups can be sorted by means of their `sort` member
 functions, if required. Sorting a full-owning group affects all the instances of
 the same group (it means that users don't have to call `sort` on each instance
-to sort all of them because they share the underlying data structure).<br/>
-The elements that aren't part of the group can still be sorted separately for
-each pool using the `sort` member function of the registry.
+to sort all of them because they share the underlying data structure).
 
 ### Partial-owning groups
 
@@ -1366,10 +1365,7 @@ However, partial-owning groups can be sorted by means of their `sort` member
 functions, if required. Sorting a partial-owning group affects all the instances
 of the same group (it means that users don't have to call `sort` on each
 instance to sort all of them because they share the underlying data
-structure).<br/>
-Regarding the owned types, the elements that aren't part of the group can still
-be sorted separately for each pool using the `sort` member function of the
-registry.
+structure).
 
 ### Non-owning groups
 
@@ -1399,6 +1395,88 @@ Non-owning groups can be sorted by means of their `sort` member functions, if
 required. Sorting a non-owning group affects all the instance of the same group
 (it means that users don't have to call `sort` on each instance to sort all of
 them because they share the set of entities).
+
+### Nested groups
+
+A type of component cannot be owned by two or more conflicting groups such as:
+
+* `registry.group<transform, sprite>()`.
+* `registry.group<transform, rotation>()`.
+
+However, the same type can be owned by groups belonging to the same _family_,
+also called _nested groups_, such as:
+
+* `registry.group<sprite, transform>()`.
+* `registry.group<sprite, transform, rotation>()`.
+
+Fortunately, these are also very common cases if not the most common ones.<br/>
+This allows users to have the highest possible performance on a greater number
+of component combinations.
+
+Two nested groups are such that they own at least one type of component and the
+list of component types involved by one of them is contained entirely in that of
+the other. More specifically, this applies independently to all component lists
+used to define a group.<br/>
+Therefore, the rules for defining whether two or more groups are nested can be
+summarized as:
+
+* One of the groups involves one or more additional component types with respect
+  to the other, whether they are owned, observed or excluded.
+
+* The list of component types owned by the most restrictive group is the same or
+  contains entirely that of the others. This also applies to the list of
+  observed and excluded components.
+
+It means that more nested groups _extend_ the their parents by adding more
+conditions in the form of new components.
+
+As mentioned, the components don't necessarily have to be all _owned_ so that
+two groups can be considered nested. In other words, the following definitions
+are fully valid:
+
+* `registry.group<sprite>(entt::get<renderable>)`.
+* `registry.group<sprite, transform>(entt::get<renderable>)`.
+* `registry.group<sprite, transform>(entt::get<renderable, rotation>)`.
+
+Exclusion lists also play their part in this respect. When it comes to defining
+nested groups, an excluded type of component `T` is treated as being an observed
+type `not_T`. Therefore, these two definitions:
+
+* `registry.group<sprite, transform>()`.
+* `registry.group<sprite, transform>(entt::exclude<rotation>)`.
+
+Are treated as if users were defining the following groups:
+
+* `group<sprite, transform>()`.
+* `group<sprite, transform>(entt::get<not_rotation>)`.
+
+Where `not_rotation` is an empty tag present only when `rotation` is not.
+
+Because of this, to define a new group that is more restrictive than an existing
+one, it's enough to take the list of component types of the latter and extend it
+by adding new component types either owned, observed or excluded, without any
+precautions depending on the case.<br/>
+The opposite is also true. To define a _larger_ group, it will be enough to take
+an existing one and remove _constraints_ from it, in whatever form they are
+expressed.<br/>
+Note that the greater the number of component types involved by a group, the
+more restrictive it is.
+
+Despite the extreme flexibility of nested groups, which allow to independently
+use component types either owned, observed or excluded, the real strength of
+this tool lies in the possibility of defining a greater number of groups that
+**own** the same components, thus offering the best performance in more
+cases.<br/>
+In fact, given a list of component types involved by a group, the greater the
+number of those owned, the greater the performance of the group itself.
+
+As a side note, it's no longer possible to sort all groups when defining nested
+ones. This is because the most restrictive groups share the elements with the
+less restrictive ones and ordering the latter would invalidate the former.<br/>
+However, given a family of nested groups, it's still possible to sort the most
+restrictive of them. To prevent users from having to remember which of their
+groups is the most restrictive, they offer the `sortable` member function to
+know if their items can be sorted or not.
 
 ## Types: const, non-const and all in between
 
