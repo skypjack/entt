@@ -44,6 +44,60 @@ template<typename Type>
 constexpr auto overload(Type *func) ENTT_NOEXCEPT { return func; }
 
 
+/**
+ * @brief Helper type for visitors.
+ * @tparam Func Types of function objects.
+ */
+template<class... Func>
+struct overloaded: Func... {
+    using Func::operator()...;
+};
+
+
+/**
+ * @brief Deduction guide.
+ * @tparam Func Types of function objects.
+ */
+template<class... Type>
+overloaded(Type...) -> overloaded<Type...>;
+
+
+/**
+ * @brief Basic implementation of a y-combinator.
+ * @tparam Func Type of a potentially recursive function.
+ */
+template<class Func>
+struct y_combinator {
+    /**
+     * @brief Constructs a y-combinator from a given function.
+     * @param recursive A potentially recursive function.
+     */
+    y_combinator(Func recursive):
+        func{std::move(recursive)}
+    {}
+
+    /**
+     * @brief Invokes a y-combinator and therefore its underlying function.
+     * @tparam Args Types of arguments to use to invoke the underlying function.
+     * @param args Parameters to use to invoke the underlying function.
+     * @return Return value of the underlying function, if any.
+     */
+    template <class... Args>
+    decltype(auto) operator()(Args &&... args) const {
+        return func(*this, std::forward<Args>(args)...);
+    }
+
+    /*! @copydoc operator()() */
+    template <class... Args>
+    decltype(auto) operator()(Args &&... args) {
+        return func(*this, std::forward<Args>(args)...);
+    }
+
+private:
+    Func func;
+};
+
+
 }
 
 
