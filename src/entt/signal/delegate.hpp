@@ -340,12 +340,11 @@ delegate(connect_arg_t<Function>) ENTT_NOEXCEPT
  * It allows to deduce the function type of the delegate directly from a member
  * or a free function with payload provided to the constructor.
  *
- * @param value_or_instance A valid reference that fits the purpose.
  * @tparam Candidate Member or free function to connect to the delegate.
  * @tparam Type Type of class or type of payload.
  */
 template<auto Candidate, typename Type>
-delegate(connect_arg_t<Candidate>, Type &value_or_instance) ENTT_NOEXCEPT
+delegate(connect_arg_t<Candidate>, Type &) ENTT_NOEXCEPT
 -> delegate<std::remove_pointer_t<internal::to_function_pointer_t<decltype(Candidate), Type *>>>;
 
 
@@ -355,12 +354,11 @@ delegate(connect_arg_t<Candidate>, Type &value_or_instance) ENTT_NOEXCEPT
  * It allows to deduce the function type of the delegate directly from a member
  * or a free function with payload provided to the constructor.
  *
- * @param value_or_instance A valid pointer that fits the purpose.
  * @tparam Candidate Member or free function to connect to the delegate.
  * @tparam Type Type of class or type of payload.
  */
 template<auto Candidate, typename Type>
-delegate(connect_arg_t<Candidate>, Type *value_or_instance) ENTT_NOEXCEPT
+delegate(connect_arg_t<Candidate>, Type *) ENTT_NOEXCEPT
 -> delegate<std::remove_pointer_t<internal::to_function_pointer_t<decltype(Candidate), Type *>>>;
 
 
