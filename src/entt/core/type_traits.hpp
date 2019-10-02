@@ -216,7 +216,8 @@ constexpr auto is_named_type_v = is_named_type<Type>::value;
     struct entt::named_type_traits<type>\
         : std::integral_constant<ENTT_ID_TYPE, entt::basic_hashed_string<std::remove_cv_t<std::remove_pointer_t<std::decay_t<decltype(#type)>>>>{#type}>\
     {\
-        static_assert(std::is_same_v<std::decay_t<type>, type>);\
+        static_assert(std::is_same_v<std::remove_cv_t<type>, type>);\
+        static_assert(std::is_object_v<type>);\
     };
 
 
