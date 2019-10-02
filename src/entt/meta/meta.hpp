@@ -216,7 +216,7 @@ auto find_if(Op op, const meta_type_node *node) ENTT_NOEXCEPT
 
 template<typename Type>
 const Type * try_cast(const meta_type_node *node, void *instance) ENTT_NOEXCEPT {
-    const auto *type = meta_info<Type>::resolve();
+    const auto * const type = meta_info<Type>::resolve();
     void *ret = nullptr;
 
     if(node == type) {
@@ -293,8 +293,8 @@ class meta_any {
         }
 
         static void destroy(void *instance) {
-            auto *node = internal::meta_info<Type>::resolve();
-            auto *actual = static_cast<Type *>(instance);
+            auto * const node = internal::meta_info<Type>::resolve();
+            auto * const actual = static_cast<Type *>(instance);
             [[maybe_unused]] const bool destroyed = node->meta().destroy(*actual);
             ENTT_ASSERT(destroyed);
             delete actual;
@@ -307,7 +307,7 @@ class meta_any {
         }
 
         static void * steal(storage_type &to, void *from, destroy_fn_type *) {
-            auto *instance = static_cast<Type *>(from);
+            auto * const instance = static_cast<Type *>(from);
             new (&to) Type *{instance};
             return instance;
         }
@@ -321,8 +321,8 @@ class meta_any {
         }
 
         static void destroy(void *instance) {
-            auto *node = internal::meta_info<Type>::resolve();
-            auto *actual = static_cast<Type *>(instance);
+            auto * const node = internal::meta_info<Type>::resolve();
+            auto * const actual = static_cast<Type *>(instance);
             [[maybe_unused]] const bool destroyed = node->meta().destroy(*actual);
             ENTT_ASSERT(destroyed);
             actual->~Type();
@@ -333,7 +333,7 @@ class meta_any {
         }
 
         static void * steal(storage_type &to, void *from, destroy_fn_type *destroy_fn) {
-            void *instance = new (&to) Type{std::move(*static_cast<Type *>(from))};
+            void * const instance = new (&to) Type{std::move(*static_cast<Type *>(from))};
             destroy_fn(from);
             return instance;
         }
@@ -518,7 +518,7 @@ public:
      */
     template<typename Type>
     const Type & cast() const ENTT_NOEXCEPT {
-        auto *actual = try_cast<Type>();
+        auto * const actual = try_cast<Type>();
         ENTT_ASSERT(actual);
         return *actual;
     }
@@ -539,10 +539,10 @@ public:
     meta_any convert() const {
         meta_any any{};
 
-        if(const auto *type = internal::meta_info<Type>::resolve(); node == type) {
+        if(const auto * const type = internal::meta_info<Type>::resolve(); node == type) {
             any = *static_cast<const Type *>(instance);
         } else {
-            const auto *conv = internal::find_if<&internal::meta_type_node::conv>([type](auto *other) {
+            const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([type](auto *other) {
                 return other->type() == type;
             }, node);
 
@@ -611,7 +611,7 @@ public:
     friend void swap(meta_any &lhs, meta_any &rhs) ENTT_NOEXCEPT {
         if(lhs.steal_fn && rhs.steal_fn) {
             storage_type buffer;
-            auto *temp = lhs.steal_fn(buffer, lhs.instance, lhs.destroy_fn);
+            auto * const temp = lhs.steal_fn(buffer, lhs.instance, lhs.destroy_fn);
             lhs.instance = rhs.steal_fn(lhs.storage, rhs.instance, rhs.destroy_fn);
             rhs.instance = lhs.steal_fn(rhs.storage, temp, lhs.destroy_fn);
         } else if(lhs.steal_fn) {
@@ -1034,7 +1034,7 @@ public:
     template<typename Key>
     std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
+        const auto * const curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
             return candidate->key() == key;
         }, node->prop);
 
@@ -1299,7 +1299,7 @@ public:
     template<typename Key>
     std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
+        const auto * const curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
             return candidate->key() == key;
         }, node->prop);
 
@@ -1468,7 +1468,7 @@ public:
     template<typename Key>
     std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
+        const auto * const curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
             return candidate->key() == key;
         }, node->prop);
 
@@ -1682,7 +1682,7 @@ public:
      * @return The meta base associated with the given identifier, if any.
      */
     meta_base base(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if<&internal::meta_type_node::base>([identifier](auto *candidate) {
+        const auto * const curr = internal::find_if<&internal::meta_type_node::base>([identifier](auto *candidate) {
             return candidate->type()->identifier == identifier;
         }, node);
 
@@ -1717,7 +1717,7 @@ public:
      */
     template<typename Type>
     meta_conv conv() const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if<&internal::meta_type_node::conv>([type = internal::meta_info<Type>::resolve()](auto *candidate) {
+        const auto * const curr = internal::find_if<&internal::meta_type_node::conv>([type = internal::meta_info<Type>::resolve()](auto *candidate) {
             return candidate->type() == type;
         }, node);
 
@@ -1743,7 +1743,7 @@ public:
      */
     template<typename... Args>
     meta_ctor ctor() const ENTT_NOEXCEPT {
-        const auto *curr = internal::ctor<Args...>(std::make_index_sequence<sizeof...(Args)>{}, node);
+        const auto * const curr = internal::ctor<Args...>(std::make_index_sequence<sizeof...(Args)>{}, node);
         return curr ? curr->meta() : meta_ctor{};
     }
 
@@ -1783,7 +1783,7 @@ public:
      * @return The meta data associated with the given identifier, if any.
      */
     meta_data data(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if<&internal::meta_type_node::data>([identifier](auto *candidate) {
+        const auto * const curr = internal::find_if<&internal::meta_type_node::data>([identifier](auto *candidate) {
             return candidate->identifier == identifier;
         }, node);
 
@@ -1819,7 +1819,7 @@ public:
      * @return The meta function associated with the given identifier, if any.
      */
     meta_func func(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if<&internal::meta_type_node::func>([identifier](auto *candidate) {
+        const auto * const curr = internal::find_if<&internal::meta_type_node::func>([identifier](auto *candidate) {
             return candidate->identifier == identifier;
         }, node);
 
@@ -1900,7 +1900,7 @@ public:
     template<typename Key>
     std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        const auto *curr = internal::find_if<&internal::meta_type_node::prop>([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
+        const auto * const curr = internal::find_if<&internal::meta_type_node::prop>([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
             return candidate->key() == key;
         }, node);
 

@@ -94,8 +94,8 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index
             using helper_type = meta_function_helper_t<decltype(Data)>;
             using data_type = std::tuple_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>;
             static_assert(std::is_invocable_v<decltype(Data), Type &, data_type>);
-            auto *clazz = meta_any{handle}.try_cast<Type>();
-            auto *direct = value.try_cast<data_type>();
+            auto * const clazz = meta_any{handle}.try_cast<Type>();
+            auto * const direct = value.try_cast<data_type>();
 
             if(clazz && (direct || value.convert<data_type>())) {
                 std::invoke(Data, *clazz, direct ? *direct : value.cast<data_type>());
@@ -104,19 +104,19 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index
         } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
             static_assert(std::is_invocable_v<decltype(Data), Type *>);
-            auto *clazz = meta_any{handle}.try_cast<Type>();
+            auto * const clazz = meta_any{handle}.try_cast<Type>();
 
             if constexpr(std::is_array_v<data_type>) {
                 using underlying_type = std::remove_extent_t<data_type>;
-                auto *direct = value.try_cast<underlying_type>();
-                auto *idx = index.try_cast<std::size_t>();
+                auto * const direct = value.try_cast<underlying_type>();
+                auto * const idx = index.try_cast<std::size_t>();
 
                 if(clazz && idx && (direct || value.convert<underlying_type>())) {
                     std::invoke(Data, clazz)[*idx] = direct ? *direct : value.cast<underlying_type>();
                     accepted = true;
                 }
             } else {
-                auto *direct = value.try_cast<data_type>();
+                auto * const direct = value.try_cast<data_type>();
 
                 if(clazz && (direct || value.convert<data_type>())) {
                     std::invoke(Data, clazz) = (direct ? *direct : value.cast<data_type>());
@@ -129,15 +129,15 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index
 
             if constexpr(std::is_array_v<data_type>) {
                 using underlying_type = std::remove_extent_t<data_type>;
-                auto *direct = value.try_cast<underlying_type>();
-                auto *idx = index.try_cast<std::size_t>();
+                auto * const direct = value.try_cast<underlying_type>();
+                auto * const idx = index.try_cast<std::size_t>();
 
                 if(idx && (direct || value.convert<underlying_type>())) {
                     (*Data)[*idx] = (direct ? *direct : value.cast<underlying_type>());
                     accepted = true;
                 }
             } else {
-                auto *direct = value.try_cast<data_type>();
+                auto * const direct = value.try_cast<data_type>();
 
                 if(direct || value.convert<data_type>()) {
                     *Data = (direct ? *direct : value.cast<data_type>());
@@ -166,15 +166,15 @@ meta_any getter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any i
 
     if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>> || std::is_member_function_pointer_v<decltype(Data)>) {
         static_assert(std::is_invocable_v<decltype(Data), Type &>);
-        auto *clazz = meta_any{handle}.try_cast<Type>();
+        auto * const clazz = meta_any{handle}.try_cast<Type>();
         return clazz ? dispatch(std::invoke(Data, *clazz)) : meta_any{};
     } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
         using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
         static_assert(std::is_invocable_v<decltype(Data), Type *>);
-        auto *clazz = meta_any{handle}.try_cast<Type>();
+        auto * const clazz = meta_any{handle}.try_cast<Type>();
 
         if constexpr(std::is_array_v<data_type>) {
-            auto *idx = index.try_cast<std::size_t>();
+            auto * const idx = index.try_cast<std::size_t>();
             return (clazz && idx) ? dispatch(std::invoke(Data, clazz)[*idx]) : meta_any{};
         } else {
             return clazz ? dispatch(std::invoke(Data, clazz)) : meta_any{};
@@ -183,7 +183,7 @@ meta_any getter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any i
         static_assert(std::is_pointer_v<std::decay_t<decltype(Data)>>);
 
         if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
-            auto *idx = index.try_cast<std::size_t>();
+            auto * const idx = index.try_cast<std::size_t>();
             return idx ? dispatch((*Data)[*idx]) : meta_any{};
         } else {
             return dispatch(*Data);
@@ -221,7 +221,7 @@ meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_
     if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Candidate)>>) {
         return (std::get<Indexes>(direct) && ...) ? dispatch(std::get<Indexes>(direct)...) : meta_any{};
     } else {
-        auto *clazz = meta_any{handle}.try_cast<Type>();
+        auto * const clazz = meta_any{handle}.try_cast<Type>();
         return (clazz && (std::get<Indexes>(direct) && ...)) ? dispatch(clazz, std::get<Indexes>(direct)...) : meta_any{};
     }
 }
