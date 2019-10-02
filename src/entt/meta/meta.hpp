@@ -47,7 +47,6 @@ struct meta_prop_node {
 
 
 struct meta_base_node {
-    meta_base_node ** const underlying;
     meta_type_node * const parent;
     meta_base_node * next;
     meta_type_node *(* const type)() ENTT_NOEXCEPT;
@@ -57,7 +56,6 @@ struct meta_base_node {
 
 
 struct meta_conv_node {
-    meta_conv_node ** const underlying;
     meta_type_node * const parent;
     meta_conv_node * next;
     meta_type_node *(* const type)() ENTT_NOEXCEPT;
@@ -68,7 +66,6 @@ struct meta_conv_node {
 
 struct meta_ctor_node {
     using size_type = std::size_t;
-    meta_ctor_node ** const underlying;
     meta_type_node * const parent;
     meta_ctor_node * next;
     meta_prop_node * prop;
@@ -80,7 +77,6 @@ struct meta_ctor_node {
 
 
 struct meta_dtor_node {
-    meta_dtor_node ** const underlying;
     meta_type_node * const parent;
     bool(* const invoke)(meta_handle);
     meta_dtor(* const meta)() ENTT_NOEXCEPT;
@@ -88,7 +84,6 @@ struct meta_dtor_node {
 
 
 struct meta_data_node {
-    meta_data_node ** const underlying;
     ENTT_ID_TYPE identifier;
     meta_type_node * const parent;
     meta_data_node * next;
@@ -104,7 +99,6 @@ struct meta_data_node {
 
 struct meta_func_node {
     using size_type = std::size_t;
-    meta_func_node ** const underlying;
     ENTT_ID_TYPE identifier;
     meta_type_node * const parent;
     meta_func_node * next;
@@ -149,33 +143,17 @@ struct meta_type_node {
 
 
 template<typename...>
-struct meta_node {
+struct meta_node;
+
+
+template<>
+struct meta_node<> {
     inline static meta_type_node *type = nullptr;
 };
 
 
 template<typename Type>
 struct meta_node<Type> {
-    inline static meta_type_node *type = nullptr;
-
-    template<typename>
-    inline static meta_base_node *base = nullptr;
-
-    template<typename>
-    inline static meta_conv_node *conv = nullptr;
-
-    template<typename>
-    inline static meta_ctor_node *ctor = nullptr;
-
-    template<auto>
-    inline static meta_dtor_node *dtor = nullptr;
-
-    template<auto...>
-    inline static meta_data_node *data = nullptr;
-
-    template<auto>
-    inline static meta_func_node *func = nullptr;
-
     inline static meta_type_node * resolve() ENTT_NOEXCEPT;
 };
 
@@ -2064,38 +2042,34 @@ static bool compare(char, const void *lhs, const void *rhs) {
 
 template<typename Type>
 inline meta_type_node * meta_node<Type>::resolve() ENTT_NOEXCEPT {
-    if(!type) {
-        static meta_type_node node{
-            {},
-            nullptr,
-            nullptr,
-            std::is_void_v<Type>,
-            std::is_integral_v<Type>,
-            std::is_floating_point_v<Type>,
-            std::is_array_v<Type>,
-            std::is_enum_v<Type>,
-            std::is_union_v<Type>,
-            std::is_class_v<Type>,
-            std::is_pointer_v<Type>,
-            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
-            std::is_member_object_pointer_v<Type>,
-            std::is_member_function_pointer_v<Type>,
-            std::extent_v<Type>,
-            [](const void *lhs, const void *rhs) {
-                return compare<Type>(0, lhs, rhs);
-            },
-            []() ENTT_NOEXCEPT -> meta_type {
-                return internal::meta_info<std::remove_pointer_t<Type>>::resolve();
-            },
-            []() ENTT_NOEXCEPT -> meta_type {
-                return &node;
-            }
-        };
+    static meta_type_node node{
+        {},
+        nullptr,
+        nullptr,
+        std::is_void_v<Type>,
+        std::is_integral_v<Type>,
+        std::is_floating_point_v<Type>,
+        std::is_array_v<Type>,
+        std::is_enum_v<Type>,
+        std::is_union_v<Type>,
+        std::is_class_v<Type>,
+        std::is_pointer_v<Type>,
+        std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
+        std::is_member_object_pointer_v<Type>,
+        std::is_member_function_pointer_v<Type>,
+        std::extent_v<Type>,
+        [](const void *lhs, const void *rhs) {
+            return compare<Type>(0, lhs, rhs);
+        },
+        []() ENTT_NOEXCEPT -> meta_type {
+            return internal::meta_info<std::remove_pointer_t<Type>>::resolve();
+        },
+        []() ENTT_NOEXCEPT -> meta_type {
+            return &node;
+        }
+    };
 
-        type = &node;
-    }
-
-    return type;
+    return &node;
 }
 
 

@@ -19,9 +19,6 @@
 * deprecate/replace snapshot
 * hibitset, views and non-owning groups
 * custom (decoupled) pools ==> double buffering, shared components, multi-model
-* make meta work across boundaries
-  - inline variables are fine here, only the head represents a problem
-  - we should always resolve by looking into the list of types when working across boundaries, no direct resolve
 * snapshot rework/deprecation
   - create(hint: entity) -> force-create
   - assign<T...>(first, last)
@@ -32,3 +29,8 @@
 * multi component registry::remove and some others?
   - auto foo(It first, It last = entity_type{null})
 * range based registry::remove and some others?
+
+* make meta work across boundaries
+  - inline variables are fine here, only the head represents a problem
+  - we should always resolve by looking into the list of types when working across boundaries, no direct resolve
+  - factory: allow to attach multiple times the same type, data, func, ctor
