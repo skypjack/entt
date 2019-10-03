@@ -555,10 +555,7 @@ public:
                 true,
                 &internal::meta_info<Type>::resolve,
                 [](meta_handle, meta_any, meta_any) { return false; },
-                [](meta_handle, meta_any) -> meta_any { return Data; },
-                []() ENTT_NOEXCEPT -> meta_data {
-                    return &node;
-                }
+                [](meta_handle, meta_any) -> meta_any { return Data; }
             };
 
             node.prop = properties<std::integral_constant<Type, Data>>(std::forward<Property>(property)...);
@@ -575,10 +572,7 @@ public:
                 !std::is_member_object_pointer_v<decltype(Data)>,
                 &internal::meta_info<data_type>::resolve,
                 &internal::setter<std::is_const_v<data_type>, Type, Data>,
-                &internal::getter<Type, Data, Policy>,
-                []() ENTT_NOEXCEPT -> meta_data {
-                    return &node;
-                }
+                &internal::getter<Type, Data, Policy>
             };
 
             node.prop = properties<std::integral_constant<decltype(Data), Data>>(std::forward<Property>(property)...);
@@ -596,10 +590,7 @@ public:
                 !std::is_member_object_pointer_v<decltype(Data)>,
                 &internal::meta_info<data_type>::resolve,
                 &internal::setter<std::is_const_v<data_type>, Type, Data>,
-                &internal::getter<Type, Data, Policy>,
-                []() ENTT_NOEXCEPT -> meta_data {
-                    return &node;
-                }
+                &internal::getter<Type, Data, Policy>
             };
 
             node.prop = properties<std::integral_constant<decltype(Data), Data>>(std::forward<Property>(property)...);
@@ -653,10 +644,7 @@ public:
             false,
             &internal::meta_info<underlying_type>::resolve,
             &internal::setter<false, Type, Setter>,
-            &internal::getter<Type, Getter, Policy>,
-            []() ENTT_NOEXCEPT -> meta_data {
-                return &node;
-            }
+            &internal::getter<Type, Getter, Policy>
         };
 
         node.identifier = identifier;

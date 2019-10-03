@@ -17,7 +17,6 @@ namespace entt {
 class meta_any;
 class meta_handle;
 class meta_prop;
-class meta_data;
 class meta_func;
 class meta_type;
 
@@ -85,7 +84,6 @@ struct meta_data_node {
     meta_type_node *(* const type)() ENTT_NOEXCEPT;
     bool(* const set)(meta_handle, meta_any, meta_any);
     meta_any(* const get)(meta_handle, meta_any);
-    meta_data(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -1127,18 +1125,13 @@ inline bool operator!=(const meta_dtor &lhs, const meta_dtor &rhs) ENTT_NOEXCEPT
  * A meta data is an opaque container for a data member associated with a given
  * type.
  */
-class meta_data {
-    /*! @brief A meta factory is allowed to create meta objects. */
-    template<typename> friend class meta_factory;
-
-    meta_data(const internal::meta_data_node *curr) ENTT_NOEXCEPT
+struct meta_data {
+    /**
+     * @brief Constructs an instance from a given node.
+     * @param curr The underlying node with which to construct the instance.
+     */
+    meta_data(const internal::meta_data_node *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
-    {}
-
-public:
-    /*! @brief Default constructor. */
-    meta_data() ENTT_NOEXCEPT
-        : node{nullptr}
     {}
 
     /**
@@ -1735,7 +1728,7 @@ public:
     std::enable_if_t<std::is_invocable_v<Op, meta_data>, void>
     data(Op op) const ENTT_NOEXCEPT {
         internal::iterate<&internal::meta_type_node::data>([op = std::move(op)](auto *curr) {
-            op(curr->meta());
+            op(meta_data{curr});
         }, node);
     }
 
@@ -1750,11 +1743,9 @@ public:
      * @return The meta data associated with the given identifier, if any.
      */
     meta_data data(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
-        const auto * const curr = internal::find_if<&internal::meta_type_node::data>([identifier](auto *candidate) {
+        return internal::find_if<&internal::meta_type_node::data>([identifier](auto *candidate) {
             return candidate->identifier == identifier;
         }, node);
-
-        return curr ? curr->meta() : meta_data{};
     }
 
     /**
