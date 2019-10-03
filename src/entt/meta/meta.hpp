@@ -117,7 +117,7 @@ struct meta_type_node {
     const bool is_member_function_pointer;
     const size_type extent;
     bool(* const compare)(const void *, const void *);
-    meta_type(* const remove_pointer)() ENTT_NOEXCEPT;
+    meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
     meta_type(* const meta)() ENTT_NOEXCEPT;
     meta_base_node *base{nullptr};
     meta_conv_node *conv{nullptr};
@@ -1995,7 +1995,7 @@ inline meta_type_node * meta_node<Type>::resolve() ENTT_NOEXCEPT {
         [](const void *lhs, const void *rhs) {
             return compare<Type>(0, lhs, rhs);
         },
-        []() ENTT_NOEXCEPT -> meta_type {
+        []() ENTT_NOEXCEPT -> meta_type_node * {
             return internal::meta_info<std::remove_pointer_t<Type>>::resolve();
         },
         []() ENTT_NOEXCEPT -> meta_type {
