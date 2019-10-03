@@ -16,7 +16,6 @@ namespace entt {
 
 class meta_any;
 class meta_handle;
-class meta_prop;
 class meta_type;
 
 
@@ -36,7 +35,6 @@ struct meta_prop_node {
     meta_prop_node * next;
     meta_any(* const key)();
     meta_any(* const value)();
-    meta_prop(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -719,18 +717,13 @@ inline bool operator!=(const meta_any &lhs, const meta_any &rhs) ENTT_NOEXCEPT {
  * A meta property is an opaque container for a key/value pair.<br/>
  * Properties are associated with any other meta object to enrich it.
  */
-class meta_prop {
-    /*! @brief A meta factory is allowed to create meta objects. */
-    template<typename> friend class meta_factory;
-
-    meta_prop(const internal::meta_prop_node *curr) ENTT_NOEXCEPT
+struct meta_prop {
+    /**
+     * @brief Constructs an instance from a given node.
+     * @param curr The underlying node with which to construct the instance.
+     */
+    meta_prop(const internal::meta_prop_node *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
-    {}
-
-public:
-    /*! @brief Default constructor. */
-    meta_prop() ENTT_NOEXCEPT
-        : node{nullptr}
     {}
 
     /**
@@ -994,7 +987,7 @@ struct meta_ctor {
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
         internal::iterate([op = std::move(op)](auto *curr) {
-            op(curr->meta());
+            op(meta_prop{curr});
         }, node->prop);
     }
 
@@ -1007,11 +1000,9 @@ struct meta_ctor {
     template<typename Key>
     std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        const auto * const curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
+        return internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
             return candidate->key() == key;
         }, node->prop);
-
-        return curr ? curr->meta() : meta_prop{};
     }
 
     /**
@@ -1249,7 +1240,7 @@ struct meta_data {
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
         internal::iterate([op = std::move(op)](auto *curr) {
-            op(curr->meta());
+            op(meta_prop{curr});
         }, node->prop);
     }
 
@@ -1262,11 +1253,9 @@ struct meta_data {
     template<typename Key>
     std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        const auto * const curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
+        return internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
             return candidate->key() == key;
         }, node->prop);
-
-        return curr ? curr->meta() : meta_prop{};
     }
 
     /**
@@ -1413,7 +1402,7 @@ struct meta_func {
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
         internal::iterate([op = std::move(op)](auto *curr) {
-            op(curr->meta());
+            op(meta_prop{curr});
         }, node->prop);
     }
 
@@ -1426,11 +1415,9 @@ struct meta_func {
     template<typename Key>
     std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        const auto * const curr = internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
+        return internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
             return candidate->key() == key;
         }, node->prop);
-
-        return curr ? curr->meta() : meta_prop{};
     }
 
     /**
@@ -1831,7 +1818,7 @@ public:
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
         internal::iterate<&internal::meta_type_node::prop>([op = std::move(op)](auto *curr) {
-            op(curr->meta());
+            op(meta_prop{curr});
         }, node);
     }
 
@@ -1849,11 +1836,9 @@ public:
     template<typename Key>
     std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
     prop(Key &&key) const ENTT_NOEXCEPT {
-        const auto * const curr = internal::find_if<&internal::meta_type_node::prop>([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
+        return internal::find_if<&internal::meta_type_node::prop>([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
             return candidate->key() == key;
         }, node);
-
-        return curr ? curr->meta() : meta_prop{};
     }
 
     /**

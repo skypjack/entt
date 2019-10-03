@@ -278,9 +278,6 @@ class meta_factory {
             },
             []() -> meta_any {
                 return std::as_const(std::get<1>(prop));
-            },
-            []() ENTT_NOEXCEPT -> meta_prop {
-                return &node;
             }
         };
 
