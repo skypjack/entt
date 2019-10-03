@@ -17,7 +17,6 @@ namespace entt {
 class meta_any;
 class meta_handle;
 class meta_prop;
-class meta_ctor;
 class meta_dtor;
 class meta_data;
 class meta_func;
@@ -68,7 +67,6 @@ struct meta_ctor_node {
     const size_type size;
     meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_any * const);
-    meta_ctor(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -937,21 +935,16 @@ inline bool operator!=(const meta_conv &lhs, const meta_conv &rhs) ENTT_NOEXCEPT
  * A meta constructor is an opaque container for a function to be used to
  * construct instances of a given type.
  */
-class meta_ctor {
-    /*! @brief A meta factory is allowed to create meta objects. */
-    template<typename> friend class meta_factory;
-
-    meta_ctor(const internal::meta_ctor_node *curr) ENTT_NOEXCEPT
-        : node{curr}
-    {}
-
-public:
+struct meta_ctor {
     /*! @brief Unsigned integer type. */
     using size_type = typename internal::meta_ctor_node::size_type;
 
-    /*! @brief Default constructor. */
-    meta_ctor() ENTT_NOEXCEPT
-        : node{nullptr}
+    /**
+     * @brief Constructs an instance from a given node.
+     * @param curr The underlying node with which to construct the instance.
+     */
+    meta_ctor(const internal::meta_ctor_node *curr = nullptr) ENTT_NOEXCEPT
+        : node{curr}
     {}
 
     /**
@@ -1714,7 +1707,7 @@ public:
     template<typename Op>
     void ctor(Op op) const ENTT_NOEXCEPT {
         internal::iterate([op = std::move(op)](auto *curr) {
-            op(curr->meta());
+            op(meta_ctor{curr});
         }, node->ctor);
     }
 
@@ -1725,8 +1718,7 @@ public:
      */
     template<typename... Args>
     meta_ctor ctor() const ENTT_NOEXCEPT {
-        const auto * const curr = internal::ctor<Args...>(std::make_index_sequence<sizeof...(Args)>{}, node);
-        return curr ? curr->meta() : meta_ctor{};
+        return internal::ctor<Args...>(std::make_index_sequence<sizeof...(Args)>{}, node);
     }
 
     /**

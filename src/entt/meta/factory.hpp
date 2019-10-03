@@ -436,9 +436,6 @@ public:
             &helper_type::arg,
             [](meta_any * const any) {
                 return internal::invoke<Type, Func, Policy>({}, any, std::make_index_sequence<helper_type::size>{});
-            },
-            []() ENTT_NOEXCEPT -> meta_ctor {
-                return &node;
             }
         };
 
@@ -475,9 +472,6 @@ public:
             &helper_type::arg,
             [](meta_any * const any) {
                 return internal::construct<Type, std::remove_cv_t<std::remove_reference_t<Args>>...>(any, std::make_index_sequence<helper_type::size>{});
-            },
-            []() ENTT_NOEXCEPT -> meta_ctor {
-                return &node;
             }
         };
 
