@@ -147,23 +147,23 @@ template<typename... Type>
 struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> {};
 
 
-template<typename Op, typename Node>
+template<typename Type, typename Op, typename Node>
 void iterate(Op op, const Node *curr) ENTT_NOEXCEPT {
     while(curr) {
-        op(curr);
+        op(Type{curr});
         curr = curr->next;
     }
 }
 
 
-template<auto Member, typename Op>
+template<auto Member, typename Type, typename Op>
 void iterate(Op op, const meta_type_node *node) ENTT_NOEXCEPT {
     if(node) {
         auto *curr = node->base;
-        iterate(op, node->*Member);
+        iterate<Type>(op, node->*Member);
 
         while(curr) {
-            iterate<Member>(op, curr->type());
+            iterate<Member, Type>(op, curr->type());
             curr = curr->next;
         }
     }
@@ -985,9 +985,7 @@ struct meta_ctor {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
-        internal::iterate([op = std::move(op)](auto *curr) {
-            op(meta_prop{curr});
-        }, node->prop);
+        internal::iterate<meta_prop>(std::move(op), node->prop);
     }
 
     /**
@@ -1238,9 +1236,7 @@ struct meta_data {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
-        internal::iterate([op = std::move(op)](auto *curr) {
-            op(meta_prop{curr});
-        }, node->prop);
+        internal::iterate<meta_prop>(std::move(op), node->prop);
     }
 
     /**
@@ -1400,9 +1396,7 @@ struct meta_func {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
-        internal::iterate([op = std::move(op)](auto *curr) {
-            op(meta_prop{curr});
-        }, node->prop);
+        internal::iterate<meta_prop>(std::move(op), node->prop);
     }
 
     /**
@@ -1607,9 +1601,7 @@ struct meta_type {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_base>, void>
     base(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::base>([op = std::move(op)](auto *curr) {
-            op(meta_base{curr});
-        }, node);
+        internal::iterate<&internal::meta_type_node::base, meta_base>(std::move(op), node);
     }
 
     /**
@@ -1637,9 +1629,7 @@ struct meta_type {
      */
     template<typename Op>
     void conv(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::conv>([op = std::move(op)](auto *curr) {
-            op(meta_conv{curr});
-        }, node);
+        internal::iterate<&internal::meta_type_node::conv, meta_conv>(std::move(op), node);
     }
 
     /**
@@ -1666,9 +1656,7 @@ struct meta_type {
      */
     template<typename Op>
     void ctor(Op op) const ENTT_NOEXCEPT {
-        internal::iterate([op = std::move(op)](auto *curr) {
-            op(meta_ctor{curr});
-        }, node->ctor);
+        internal::iterate<meta_ctor>(std::move(op), node->ctor);
     }
 
     /**
@@ -1701,9 +1689,7 @@ struct meta_type {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_data>, void>
     data(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::data>([op = std::move(op)](auto *curr) {
-            op(meta_data{curr});
-        }, node);
+        internal::iterate<&internal::meta_type_node::data, meta_data>(std::move(op), node);
     }
 
     /**
@@ -1735,9 +1721,7 @@ struct meta_type {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_func>, void>
     func(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::func>([op = std::move(op)](auto *curr) {
-            op(meta_func{curr});
-        }, node);
+        internal::iterate<&internal::meta_type_node::func, meta_func>(std::move(op), node);
     }
 
     /**
@@ -1811,9 +1795,7 @@ struct meta_type {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::prop>([op = std::move(op)](auto *curr) {
-            op(meta_prop{curr});
-        }, node);
+        internal::iterate<&internal::meta_type_node::prop, meta_prop>(std::move(op), node);
     }
 
     /**

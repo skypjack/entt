@@ -831,9 +831,7 @@ inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
 template<typename Op>
 inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
 resolve(Op op) ENTT_NOEXCEPT {
-    internal::iterate([op = std::move(op)](auto *curr) {
-        op(meta_type{curr});
-    }, internal::meta_info<>::type);
+    internal::iterate<meta_type>(std::move(op), internal::meta_info<>::type);
 }
 
 
