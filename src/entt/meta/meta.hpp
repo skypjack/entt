@@ -17,7 +17,6 @@ namespace entt {
 class meta_any;
 class meta_handle;
 class meta_prop;
-class meta_base;
 class meta_ctor;
 class meta_dtor;
 class meta_data;
@@ -50,7 +49,6 @@ struct meta_base_node {
     meta_base_node * next;
     meta_type_node *(* const type)() ENTT_NOEXCEPT;
     void *(* const cast)(void *) ENTT_NOEXCEPT;
-    meta_base(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -799,18 +797,13 @@ inline bool operator!=(const meta_prop &lhs, const meta_prop &rhs) ENTT_NOEXCEPT
  * A meta base is an opaque container for a base class to be used to walk
  * through hierarchies.
  */
-class meta_base {
-    /*! @brief A meta factory is allowed to create meta objects. */
-    template<typename> friend class meta_factory;
-
-    meta_base(const internal::meta_base_node *curr) ENTT_NOEXCEPT
+struct meta_base {
+    /**
+     * @brief Constructs an instance from a given node.
+     * @param curr The underlying node with which to construct the instance.
+     */
+    meta_base(const internal::meta_base_node *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
-    {}
-
-public:
-    /*! @brief Default constructor. */
-    meta_base() ENTT_NOEXCEPT
-        : node{nullptr}
     {}
 
     /**
@@ -876,8 +869,8 @@ inline bool operator!=(const meta_base &lhs, const meta_base &rhs) ENTT_NOEXCEPT
  */
 struct meta_conv {
     /**
-     * @brief Constructs an instance from the given node.
-     * @param curr A valid node that fits the purpose, if any.
+     * @brief Constructs an instance from a given node.
+     * @param curr The underlying node with which to construct the instance.
      */
     meta_conv(const internal::meta_conv_node *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
@@ -1662,7 +1655,7 @@ public:
     std::enable_if_t<std::is_invocable_v<Op, meta_base>, void>
     base(Op op) const ENTT_NOEXCEPT {
         internal::iterate<&internal::meta_type_node::base>([op = std::move(op)](auto *curr) {
-            op(curr->meta());
+            op(meta_base{curr});
         }, node);
     }
 
@@ -1675,11 +1668,9 @@ public:
      * @return The meta base associated with the given identifier, if any.
      */
     meta_base base(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
-        const auto * const curr = internal::find_if<&internal::meta_type_node::base>([identifier](auto *candidate) {
+        return internal::find_if<&internal::meta_type_node::base>([identifier](auto *candidate) {
             return candidate->type()->identifier == identifier;
         }, node);
-
-        return curr ? curr->meta() : meta_base{};
     }
 
     /**

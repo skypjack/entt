@@ -334,9 +334,6 @@ public:
             &internal::meta_info<Base>::resolve,
             [](void *instance) ENTT_NOEXCEPT -> void * {
                 return static_cast<Base *>(static_cast<Type *>(instance));
-            },
-            []() ENTT_NOEXCEPT -> meta_base {
-                return &node;
             }
         };
 
