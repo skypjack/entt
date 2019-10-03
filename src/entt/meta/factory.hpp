@@ -690,9 +690,6 @@ public:
             &helper_type::arg,
             [](meta_handle handle, meta_any *any) {
                 return internal::invoke<Type, Candidate, Policy>(handle, any, std::make_index_sequence<helper_type::size>{});
-            },
-            []() ENTT_NOEXCEPT -> meta_func {
-                return &node;
             }
         };
 

@@ -17,7 +17,6 @@ namespace entt {
 class meta_any;
 class meta_handle;
 class meta_prop;
-class meta_func;
 class meta_type;
 
 
@@ -99,7 +98,6 @@ struct meta_func_node {
     meta_type_node *(* const ret)() ENTT_NOEXCEPT;
     meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_handle, meta_any *);
-    meta_func(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -1311,21 +1309,16 @@ inline bool operator!=(const meta_data &lhs, const meta_data &rhs) ENTT_NOEXCEPT
  * A meta function is an opaque container for a member function associated with
  * a given type.
  */
-class meta_func {
-    /*! @brief A meta factory is allowed to create meta objects. */
-    template<typename> friend class meta_factory;
-
-    meta_func(const internal::meta_func_node *curr) ENTT_NOEXCEPT
-        : node{curr}
-    {}
-
-public:
+struct meta_func {
     /*! @brief Unsigned integer type. */
     using size_type = typename internal::meta_func_node::size_type;
 
-    /*! @brief Default constructor. */
-    meta_func() ENTT_NOEXCEPT
-        : node{nullptr}
+    /**
+     * @brief Constructs an instance from a given node.
+     * @param curr The underlying node with which to construct the instance.
+     */
+    meta_func(const internal::meta_func_node *curr = nullptr) ENTT_NOEXCEPT
+        : node{curr}
     {}
 
     /**
@@ -1762,7 +1755,7 @@ public:
     std::enable_if_t<std::is_invocable_v<Op, meta_func>, void>
     func(Op op) const ENTT_NOEXCEPT {
         internal::iterate<&internal::meta_type_node::func>([op = std::move(op)](auto *curr) {
-            op(curr->meta());
+            op(meta_func{curr});
         }, node);
     }
 
@@ -1777,11 +1770,9 @@ public:
      * @return The meta function associated with the given identifier, if any.
      */
     meta_func func(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
-        const auto * const curr = internal::find_if<&internal::meta_type_node::func>([identifier](auto *candidate) {
+        return internal::find_if<&internal::meta_type_node::func>([identifier](auto *candidate) {
             return candidate->identifier == identifier;
         }, node);
-
-        return curr ? curr->meta() : meta_func{};
     }
 
     /**
