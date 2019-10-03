@@ -16,7 +16,7 @@ namespace entt {
 
 class meta_any;
 class meta_handle;
-class meta_type;
+struct meta_type;
 
 
 /**
@@ -118,7 +118,6 @@ struct meta_type_node {
     const size_type extent;
     bool(* const compare)(const void *, const void *);
     meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
-    meta_type(* const meta)() ENTT_NOEXCEPT;
     meta_base_node *base{nullptr};
     meta_conv_node *conv{nullptr};
     meta_ctor_node *ctor{nullptr};
@@ -269,6 +268,14 @@ class meta_any {
     using destroy_fn_type = void(void *);
     using steal_fn_type = void *(storage_type &, void *, destroy_fn_type *);
 
+    template<typename Type>
+    static Type * release(Type *instance) {
+        auto * const node = internal::meta_info<Type>::resolve();
+        [[maybe_unused]] const bool destroyed = (!node->dtor || node->dtor->invoke(*instance));
+        ENTT_ASSERT(destroyed);
+        return instance;
+    }
+
     template<typename Type, typename = std::void_t<>>
     struct type_traits {
         template<typename... Args>
@@ -279,11 +286,7 @@ class meta_any {
         }
 
         static void destroy(void *instance) {
-            auto * const node = internal::meta_info<Type>::resolve();
-            auto * const actual = static_cast<Type *>(instance);
-            [[maybe_unused]] const bool destroyed = node->meta().destroy(*actual);
-            ENTT_ASSERT(destroyed);
-            delete actual;
+            delete release<Type>(static_cast<Type *>(instance));
         }
 
         static void * copy(storage_type &storage, const void *other) {
@@ -307,11 +310,7 @@ class meta_any {
         }
 
         static void destroy(void *instance) {
-            auto * const node = internal::meta_info<Type>::resolve();
-            auto * const actual = static_cast<Type *>(instance);
-            [[maybe_unused]] const bool destroyed = node->meta().destroy(*actual);
-            ENTT_ASSERT(destroyed);
-            actual->~Type();
+            release<Type>(static_cast<Type *>(instance))->~Type();
         }
 
         static void * copy(storage_type &storage, const void *instance) {
@@ -1460,21 +1459,16 @@ inline bool operator!=(const meta_func &lhs, const meta_func &rhs) ENTT_NOEXCEPT
  * A meta type is the starting point for accessing a reflected type, thus being
  * able to work through it on real objects.
  */
-class meta_type {
-    /*! @brief A meta node is allowed to create meta objects. */
-    template<typename...> friend struct internal::meta_node;
-
-    meta_type(const internal::meta_type_node *curr) ENTT_NOEXCEPT
-        : node{curr}
-    {}
-
-public:
+struct meta_type {
     /*! @brief Unsigned integer type. */
     using size_type = typename internal::meta_type_node::size_type;
 
-    /*! @brief Default constructor. */
-    meta_type() ENTT_NOEXCEPT
-        : node{nullptr}
+    /**
+     * @brief Constructs an instance from a given node.
+     * @param curr The underlying node with which to construct the instance.
+     */
+    meta_type(const internal::meta_type_node *curr = nullptr) ENTT_NOEXCEPT
+        : node{curr}
     {}
 
     /**
@@ -1802,7 +1796,7 @@ public:
      * @return True in case of success, false otherwise.
      */
     bool destroy(meta_handle handle) const {
-        return (handle.type() == node->meta()) && (!node->dtor || node->dtor->invoke(handle));
+        return (handle.type() == node) && (!node->dtor || node->dtor->invoke(handle));
     }
 
     /**
@@ -1884,72 +1878,72 @@ inline meta_any::meta_any(meta_handle handle) ENTT_NOEXCEPT
 
 
 inline meta_type meta_any::type() const ENTT_NOEXCEPT {
-    return node ? node->meta() : meta_type{};
+    return node;
 }
 
 
 inline meta_type meta_handle::type() const ENTT_NOEXCEPT {
-    return node ? node->meta() : meta_type{};
+    return node;
 }
 
 
 inline meta_type meta_base::parent() const ENTT_NOEXCEPT {
-    return node->parent->meta();
+    return node->parent;
 }
 
 
 inline meta_type meta_base::type() const ENTT_NOEXCEPT {
-    return node->type()->meta();
+    return node->type();
 }
 
 
 inline meta_type meta_conv::parent() const ENTT_NOEXCEPT {
-    return node->parent->meta();
+    return node->parent;
 }
 
 
 inline meta_type meta_conv::type() const ENTT_NOEXCEPT {
-    return node->type()->meta();
+    return node->type();
 }
 
 
 inline meta_type meta_ctor::parent() const ENTT_NOEXCEPT {
-    return node->parent->meta();
+    return node->parent;
 }
 
 
 inline meta_type meta_ctor::arg(size_type index) const ENTT_NOEXCEPT {
-    return index < size() ? node->arg(index)->meta() : meta_type{};
+    return index < size() ? node->arg(index) : nullptr;
 }
 
 
 inline meta_type meta_dtor::parent() const ENTT_NOEXCEPT {
-    return node->parent->meta();
+    return node->parent;
 }
 
 
 inline meta_type meta_data::parent() const ENTT_NOEXCEPT {
-    return node->parent->meta();
+    return node->parent;
 }
 
 
 inline meta_type meta_data::type() const ENTT_NOEXCEPT {
-    return node->type()->meta();
+    return node->type();
 }
 
 
 inline meta_type meta_func::parent() const ENTT_NOEXCEPT {
-    return node->parent->meta();
+    return node->parent;
 }
 
 
 inline meta_type meta_func::ret() const ENTT_NOEXCEPT {
-    return node->ret()->meta();
+    return node->ret();
 }
 
 
 inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
-    return index < size() ? node->arg(index)->meta() : meta_type{};
+    return index < size() ? node->arg(index) : nullptr;
 }
 
 
@@ -1997,9 +1991,6 @@ inline meta_type_node * meta_node<Type>::resolve() ENTT_NOEXCEPT {
         },
         []() ENTT_NOEXCEPT -> meta_type_node * {
             return internal::meta_info<std::remove_pointer_t<Type>>::resolve();
-        },
-        []() ENTT_NOEXCEPT -> meta_type {
-            return &node;
         }
     };
 

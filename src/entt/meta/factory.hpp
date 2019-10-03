@@ -504,7 +504,7 @@ public:
         static internal::meta_dtor_node node{
             type,
             [](meta_handle handle) {
-                const auto valid = (handle.type() == internal::meta_info<Type>::resolve()->meta());
+                const auto valid = (handle.type() == internal::meta_info<Type>::resolve());
 
                 if(valid) {
                     std::invoke(Func, *meta_any{handle}.try_cast<Type>());
@@ -807,7 +807,7 @@ inline void unregister() ENTT_NOEXCEPT {
  */
 template<typename Type>
 inline meta_type resolve() ENTT_NOEXCEPT {
-    return internal::meta_info<Type>::resolve()->meta();
+    return internal::meta_info<Type>::resolve();
 }
 
 
@@ -817,11 +817,9 @@ inline meta_type resolve() ENTT_NOEXCEPT {
  * @return The meta type associated with the given identifier, if any.
  */
 inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
-    const auto *curr = internal::find_if([identifier](auto *node) {
+    return internal::find_if([identifier](auto *node) {
         return node->identifier == identifier;
     }, internal::meta_info<>::type);
-
-    return curr ? curr->meta() : meta_type{};
 }
 
 
@@ -833,8 +831,8 @@ inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
 template<typename Op>
 inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
 resolve(Op op) ENTT_NOEXCEPT {
-    internal::iterate([op = std::move(op)](auto *node) {
-        op(node->meta());
+    internal::iterate([op = std::move(op)](auto *curr) {
+        op(meta_type{curr});
     }, internal::meta_info<>::type);
 }
 
