@@ -17,7 +17,6 @@ namespace entt {
 class meta_any;
 class meta_handle;
 class meta_prop;
-class meta_dtor;
 class meta_data;
 class meta_func;
 class meta_type;
@@ -73,7 +72,6 @@ struct meta_ctor_node {
 struct meta_dtor_node {
     meta_type_node * const parent;
     bool(* const invoke)(meta_handle);
-    meta_dtor(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -1060,18 +1058,13 @@ inline bool operator!=(const meta_ctor &lhs, const meta_ctor &rhs) ENTT_NOEXCEPT
  * A meta destructor is an opaque container for a function to be used to
  * destroy instances of a given type.
  */
-class meta_dtor {
-    /*! @brief A meta factory is allowed to create meta objects. */
-    template<typename> friend class meta_factory;
-
-    meta_dtor(const internal::meta_dtor_node *curr) ENTT_NOEXCEPT
+struct meta_dtor {
+    /**
+     * @brief Constructs an instance from a given node.
+     * @param curr The underlying node with which to construct the instance.
+     */
+    meta_dtor(const internal::meta_dtor_node *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
-    {}
-
-public:
-    /*! @brief Default constructor. */
-    meta_dtor() ENTT_NOEXCEPT
-        : node{nullptr}
     {}
 
     /**
@@ -1726,7 +1719,7 @@ public:
      * @return The meta destructor associated with the given type, if any.
      */
     meta_dtor dtor() const ENTT_NOEXCEPT {
-        return node->dtor ? node->dtor->meta() : meta_dtor{};
+        return node->dtor;
     }
 
     /**

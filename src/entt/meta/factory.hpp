@@ -514,9 +514,6 @@ public:
                 }
 
                 return valid;
-            },
-            []() ENTT_NOEXCEPT -> meta_dtor {
-                return &node;
             }
         };
 
