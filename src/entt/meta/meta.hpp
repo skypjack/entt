@@ -18,7 +18,6 @@ class meta_any;
 class meta_handle;
 class meta_prop;
 class meta_base;
-class meta_conv;
 class meta_ctor;
 class meta_dtor;
 class meta_data;
@@ -60,7 +59,6 @@ struct meta_conv_node {
     meta_conv_node * next;
     meta_type_node *(* const type)() ENTT_NOEXCEPT;
     meta_any(* const conv)(const void *);
-    meta_conv(* const meta)() ENTT_NOEXCEPT;
 };
 
 
@@ -876,18 +874,13 @@ inline bool operator!=(const meta_base &lhs, const meta_base &rhs) ENTT_NOEXCEPT
  * A meta conversion function is an opaque container for a conversion function
  * to be used to convert a given instance to another type.
  */
-class meta_conv {
-    /*! @brief A meta factory is allowed to create meta objects. */
-    template<typename> friend class meta_factory;
-
-    meta_conv(const internal::meta_conv_node *curr) ENTT_NOEXCEPT
+struct meta_conv {
+    /**
+     * @brief Constructs an instance from the given node.
+     * @param curr A valid node that fits the purpose, if any.
+     */
+    meta_conv(const internal::meta_conv_node *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
-    {}
-
-public:
-    /*! @brief Default constructor. */
-    meta_conv() ENTT_NOEXCEPT
-        : node{nullptr}
     {}
 
     /**
@@ -1701,7 +1694,7 @@ public:
     template<typename Op>
     void conv(Op op) const ENTT_NOEXCEPT {
         internal::iterate<&internal::meta_type_node::conv>([op = std::move(op)](auto *curr) {
-            op(curr->meta());
+            op(meta_conv{curr});
         }, node);
     }
 
@@ -1717,11 +1710,9 @@ public:
      */
     template<typename Type>
     meta_conv conv() const ENTT_NOEXCEPT {
-        const auto * const curr = internal::find_if<&internal::meta_type_node::conv>([type = internal::meta_info<Type>::resolve()](auto *candidate) {
+        return internal::find_if<&internal::meta_type_node::conv>([type = internal::meta_info<Type>::resolve()](auto *candidate) {
             return candidate->type() == type;
         }, node);
-
-        return curr ? curr->meta() : meta_conv{};
     }
 
     /**

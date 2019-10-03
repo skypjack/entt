@@ -367,9 +367,6 @@ public:
             &internal::meta_info<To>::resolve,
             [](const void *instance) -> meta_any {
                 return static_cast<To>(*static_cast<const Type *>(instance));
-            },
-            []() ENTT_NOEXCEPT -> meta_conv {
-                return &node;
             }
         };
 
@@ -403,9 +400,6 @@ public:
             &internal::meta_info<conv_type>::resolve,
             [](const void *instance) -> meta_any {
                 return std::invoke(Candidate, *static_cast<const Type *>(instance));
-            },
-            []() ENTT_NOEXCEPT -> meta_conv {
-                return &node;
             }
         };
 
