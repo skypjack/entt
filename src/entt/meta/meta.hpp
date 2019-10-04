@@ -248,9 +248,7 @@ inline auto ctor(std::index_sequence<Indexes...>, const meta_type_node *node) EN
 
 
 /**
- * @brief Meta any object.
- *
- * A meta any is an opaque container for single values of any type.
+ * @brief Opaque container for values of any type.
  *
  * This class uses a technique called small buffer optimization (SBO) to
  * completely eliminate the need to allocate memory, where possible.<br/>
@@ -626,9 +624,7 @@ private:
 
 
 /**
- * @brief Meta handle object.
- *
- * A meta handle is an opaque pointer to an instance of any type.
+ * @brief Opaque pointers to instances of any type.
  *
  * A handle doesn't perform copies and isn't responsible for the contained
  * object. It doesn't prolong the lifetime of the pointed instance. Users are
@@ -666,16 +662,10 @@ public:
           instance{&obj}
     {}
 
-    /**
-     * @brief Returns the meta type of the underlying object.
-     * @return The meta type of the underlying object, if any.
-     */
+    /*! @copydoc meta_any::type */
     inline meta_type type() const ENTT_NOEXCEPT;
 
-    /**
-     * @brief Returns an opaque pointer to the contained instance.
-     * @return An opaque pointer the contained instance, if any.
-     */
+    /*! @copydoc meta_any::data */
     const void * data() const ENTT_NOEXCEPT {
         return instance;
     }
@@ -710,12 +700,7 @@ inline bool operator!=(const meta_any &lhs, const meta_any &rhs) ENTT_NOEXCEPT {
 }
 
 
-/**
- * @brief Meta property object.
- *
- * A meta property is an opaque container for a key/value pair.<br/>
- * Properties are associated with any other meta object to enrich it.
- */
+/*! @brief Opaque container for meta properties of any type. */
 struct meta_prop {
     /**
      * @brief Constructs an instance from a given node.
@@ -775,31 +760,20 @@ inline bool operator!=(const meta_prop &lhs, const meta_prop &rhs) ENTT_NOEXCEPT
 }
 
 
-/**
- * @brief Meta base object.
- *
- * A meta base is an opaque container for a base class to be used to walk
- * through hierarchies.
- */
+/*! @brief Opaque container for meta base classes. */
 struct meta_base {
-    /**
-     * @brief Constructs an instance from a given node.
-     * @param curr The underlying node with which to construct the instance.
-     */
+    /*! @copydoc meta_prop::meta_prop */
     meta_base(const internal::meta_base_node *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
     /**
-     * @brief Returns the meta type to which a meta base belongs.
-     * @return The meta type to which the meta base belongs.
+     * @brief Returns the meta type to which a meta object belongs.
+     * @return The meta type to which the meta object belongs.
      */
     inline meta_type parent() const ENTT_NOEXCEPT;
 
-    /**
-     * @brief Returns the meta type of a given meta base.
-     * @return The meta type of the meta base.
-     */
+    /*! @copydoc meta_any::type */
     inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
@@ -819,12 +793,7 @@ struct meta_base {
         return node;
     }
 
-    /**
-     * @brief Checks if two meta objects refer to the same node.
-     * @param other The meta object with which to compare.
-     * @return True if the two meta objects refer to the same node, false
-     * otherwise.
-     */
+    /*! @copydoc meta_prop::operator== */
     bool operator==(const meta_base &other) const ENTT_NOEXCEPT {
         return node == other.node;
     }
@@ -834,42 +803,23 @@ private:
 };
 
 
-/**
- * @brief Checks if two meta objects refer to the same node.
- * @param lhs A meta object, either valid or not.
- * @param rhs A meta object, either valid or not.
- * @return True if the two meta objects refer to the same node, false otherwise.
- */
+/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
 inline bool operator!=(const meta_base &lhs, const meta_base &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
 
-/**
- * @brief Meta conversion function object.
- *
- * A meta conversion function is an opaque container for a conversion function
- * to be used to convert a given instance to another type.
- */
+/*! @brief Opaque container for meta conversion functions. */
 struct meta_conv {
-    /**
-     * @brief Constructs an instance from a given node.
-     * @param curr The underlying node with which to construct the instance.
-     */
+    /*! @copydoc meta_prop::meta_prop */
     meta_conv(const internal::meta_conv_node *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
-    /**
-     * @brief Returns the meta type to which a meta conversion function belongs.
-     * @return The meta type to which the meta conversion function belongs.
-     */
+    /*! @copydoc meta_base::parent */
     inline meta_type parent() const ENTT_NOEXCEPT;
 
-    /**
-     * @brief Returns the meta type of a given meta conversion function.
-     * @return The meta type of the meta conversion function.
-     */
+    /*! @copydoc meta_any::type */
     inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
@@ -889,12 +839,7 @@ struct meta_conv {
         return node;
     }
 
-    /**
-     * @brief Checks if two meta objects refer to the same node.
-     * @param other The meta object with which to compare.
-     * @return True if the two meta objects refer to the same node, false
-     * otherwise.
-     */
+    /*! @copydoc meta_prop::operator== */
     bool operator==(const meta_conv &other) const ENTT_NOEXCEPT {
         return node == other.node;
     }
@@ -904,39 +849,23 @@ private:
 };
 
 
-/**
- * @brief Checks if two meta objects refer to the same node.
- * @param lhs A meta object, either valid or not.
- * @param rhs A meta object, either valid or not.
- * @return True if the two meta objects refer to the same node, false otherwise.
- */
+/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
 inline bool operator!=(const meta_conv &lhs, const meta_conv &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
 
-/**
- * @brief Meta constructor object.
- *
- * A meta constructor is an opaque container for a function to be used to
- * construct instances of a given type.
- */
+/*! @brief Opaque container for meta constructors. */
 struct meta_ctor {
     /*! @brief Unsigned integer type. */
     using size_type = typename internal::meta_ctor_node::size_type;
 
-    /**
-     * @brief Constructs an instance from a given node.
-     * @param curr The underlying node with which to construct the instance.
-     */
+    /*! @copydoc meta_prop::meta_prop */
     meta_ctor(const internal::meta_ctor_node *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
-    /**
-     * @brief Returns the meta type to which a meta constructor belongs.
-     * @return The meta type to which the meta constructor belongs.
-     */
+    /*! @copydoc meta_base::parent */
     inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
@@ -1010,12 +939,7 @@ struct meta_ctor {
         return node;
     }
 
-    /**
-     * @brief Checks if two meta objects refer to the same node.
-     * @param other The meta object with which to compare.
-     * @return True if the two meta objects refer to the same node, false
-     * otherwise.
-     */
+    /*! @copydoc meta_prop::operator== */
     bool operator==(const meta_ctor &other) const ENTT_NOEXCEPT {
         return node == other.node;
     }
@@ -1025,36 +949,20 @@ private:
 };
 
 
-/**
- * @brief Checks if two meta objects refer to the same node.
- * @param lhs A meta object, either valid or not.
- * @param rhs A meta object, either valid or not.
- * @return True if the two meta objects refer to the same node, false otherwise.
- */
+/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
 inline bool operator!=(const meta_ctor &lhs, const meta_ctor &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
 
-/**
- * @brief Meta destructor object.
- *
- * A meta destructor is an opaque container for a function to be used to
- * destroy instances of a given type.
- */
+/*! @brief Opaque container for meta destructors. */
 struct meta_dtor {
-    /**
-     * @brief Constructs an instance from a given node.
-     * @param curr The underlying node with which to construct the instance.
-     */
+    /*! @copydoc meta_prop::meta_prop */
     meta_dtor(const internal::meta_dtor_node *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
-    /**
-     * @brief Returns the meta type to which a meta destructor belongs.
-     * @return The meta type to which the meta destructor belongs.
-     */
+    /*! @copydoc meta_base::parent */
     inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
@@ -1079,12 +987,7 @@ struct meta_dtor {
         return node;
     }
 
-    /**
-     * @brief Checks if two meta objects refer to the same node.
-     * @param other The meta object with which to compare.
-     * @return True if the two meta objects refer to the same node, false
-     * otherwise.
-     */
+    /*! @copydoc meta_prop::operator== */
     bool operator==(const meta_dtor &other) const ENTT_NOEXCEPT {
         return node == other.node;
     }
@@ -1094,44 +997,25 @@ private:
 };
 
 
-/**
- * @brief Checks if two meta objects refer to the same node.
- * @param lhs A meta object, either valid or not.
- * @param rhs A meta object, either valid or not.
- * @return True if the two meta objects refer to the same node, false otherwise.
- */
+/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
 inline bool operator!=(const meta_dtor &lhs, const meta_dtor &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
 
-/**
- * @brief Meta data object.
- *
- * A meta data is an opaque container for a data member associated with a given
- * type.
- */
+/*! @brief Opaque container for meta data. */
 struct meta_data {
-    /**
-     * @brief Constructs an instance from a given node.
-     * @param curr The underlying node with which to construct the instance.
-     */
+    /*! @copydoc meta_prop::meta_prop */
     meta_data(const internal::meta_data_node *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
-    /**
-     * @brief Returns the identifier assigned to a given meta data.
-     * @return The identifier assigned to the meta data.
-     */
+    /*! @copydoc meta_type::identifier */
     ENTT_ID_TYPE identifier() const ENTT_NOEXCEPT {
         return node->identifier;
     }
 
-    /**
-     * @brief Returns the meta type to which a meta data belongs.
-     * @return The meta type to which the meta data belongs.
-     */
+    /*! @copydoc meta_base::parent */
     inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
@@ -1154,10 +1038,7 @@ struct meta_data {
         return node->is_static;
     }
 
-    /**
-     * @brief Returns the meta type of a given meta data.
-     * @return The meta type of the meta data.
-     */
+    /*! @copydoc meta_any::type */
     inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
@@ -1261,12 +1142,7 @@ struct meta_data {
         return node;
     }
 
-    /**
-     * @brief Checks if two meta objects refer to the same node.
-     * @param other The meta object with which to compare.
-     * @return True if the two meta objects refer to the same node, false
-     * otherwise.
-     */
+    /*! @copydoc meta_prop::operator== */
     bool operator==(const meta_data &other) const ENTT_NOEXCEPT {
         return node == other.node;
     }
@@ -1276,47 +1152,28 @@ private:
 };
 
 
-/**
- * @brief Checks if two meta objects refer to the same node.
- * @param lhs A meta object, either valid or not.
- * @param rhs A meta object, either valid or not.
- * @return True if the two meta objects refer to the same node, false otherwise.
- */
+/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
 inline bool operator!=(const meta_data &lhs, const meta_data &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
 
-/**
- * @brief Meta function object.
- *
- * A meta function is an opaque container for a member function associated with
- * a given type.
- */
+/*! @brief Opaque container for meta functions. */
 struct meta_func {
     /*! @brief Unsigned integer type. */
     using size_type = typename internal::meta_func_node::size_type;
 
-    /**
-     * @brief Constructs an instance from a given node.
-     * @param curr The underlying node with which to construct the instance.
-     */
+    /*! @copydoc meta_prop::meta_prop */
     meta_func(const internal::meta_func_node *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
-    /**
-     * @brief Returns the identifier assigned to a given meta function.
-     * @return The identifier assigned to the meta function.
-     */
+    /*! @copydoc meta_type::identifier */
     ENTT_ID_TYPE identifier() const ENTT_NOEXCEPT {
         return node->identifier;
     }
 
-    /**
-     * @brief Returns the meta type to which a meta function belongs.
-     * @return The meta type to which the meta function belongs.
-     */
+    /*! @copydoc meta_base::parent */
     inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
@@ -1421,12 +1278,7 @@ struct meta_func {
         return node;
     }
 
-    /**
-     * @brief Checks if two meta objects refer to the same node.
-     * @param other The meta object with which to compare.
-     * @return True if the two meta objects refer to the same node, false
-     * otherwise.
-     */
+    /*! @copydoc meta_prop::operator== */
     bool operator==(const meta_func &other) const ENTT_NOEXCEPT {
         return node == other.node;
     }
@@ -1436,38 +1288,25 @@ private:
 };
 
 
-/**
- * @brief Checks if two meta objects refer to the same node.
- * @param lhs A meta object, either valid or not.
- * @param rhs A meta object, either valid or not.
- * @return True if the two meta objects refer to the same node, false otherwise.
- */
+/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
 inline bool operator!=(const meta_func &lhs, const meta_func &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
 
-/**
- * @brief Meta type object.
- *
- * A meta type is the starting point for accessing a reflected type, thus being
- * able to work through it on real objects.
- */
+/*! @brief Opaque container for meta types. */
 struct meta_type {
     /*! @brief Unsigned integer type. */
     using size_type = typename internal::meta_type_node::size_type;
 
-    /**
-     * @brief Constructs an instance from a given node.
-     * @param curr The underlying node with which to construct the instance.
-     */
+    /*! @copydoc meta_prop::meta_prop */
     meta_type(const internal::meta_type_node *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
     /**
-     * @brief Returns the identifier assigned to a given meta type.
-     * @return The identifier assigned to the meta type.
+     * @brief Returns the identifier assigned to a given meta object.
+     * @return The identifier assigned to the meta object.
      */
     ENTT_ID_TYPE identifier() const ENTT_NOEXCEPT {
         return node->identifier;
@@ -1825,12 +1664,7 @@ struct meta_type {
         return node;
     }
 
-    /**
-     * @brief Checks if two meta objects refer to the same node.
-     * @param other The meta object with which to compare.
-     * @return True if the two meta objects refer to the same node, false
-     * otherwise.
-     */
+    /*! @copydoc meta_prop::operator== */
     bool operator==(const meta_type &other) const ENTT_NOEXCEPT {
         return node == other.node;
     }
@@ -1840,12 +1674,7 @@ private:
 };
 
 
-/**
- * @brief Checks if two meta objects refer to the same node.
- * @param lhs A meta object, either valid or not.
- * @param rhs A meta object, either valid or not.
- * @return True if the two meta objects refer to the same node, false otherwise.
- */
+/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
 inline bool operator!=(const meta_type &lhs, const meta_type &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
