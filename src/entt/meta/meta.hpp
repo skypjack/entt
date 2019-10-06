@@ -9,6 +9,7 @@
 #include <utility>
 #include <type_traits>
 #include "../config/config.h"
+#include "../core/type_traits.hpp"
 
 
 namespace entt {
@@ -138,8 +139,42 @@ struct meta_node<> {
 
 
 template<typename Type>
+static bool compare(const void *lhs, const void *rhs) {
+    if constexpr(!std::is_function_v<Type> && is_equality_comparable_v<Type>) {
+        return *static_cast<const Type *>(lhs) == *static_cast<const Type *>(rhs);
+    } else {
+        return lhs == rhs;
+    }
+}
+
+
+template<typename Type>
 struct meta_node<Type> {
-    inline static meta_type_node * resolve() ENTT_NOEXCEPT;
+    static meta_type_node * resolve() ENTT_NOEXCEPT {
+        static meta_type_node node{
+            {},
+            nullptr,
+            nullptr,
+            std::is_void_v<Type>,
+            std::is_integral_v<Type>,
+            std::is_floating_point_v<Type>,
+            std::is_array_v<Type>,
+            std::is_enum_v<Type>,
+            std::is_union_v<Type>,
+            std::is_class_v<Type>,
+            std::is_pointer_v<Type>,
+            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
+            std::is_member_object_pointer_v<Type>,
+            std::is_member_function_pointer_v<Type>,
+            std::extent_v<Type>,
+            &compare<Type>, // workaround for an issue with VS2017
+            []() ENTT_NOEXCEPT -> meta_type_node * {
+                return meta_node<std::remove_const_t<std::remove_pointer_t<Type>>>::resolve();
+            }
+        };
+
+        return &node;
+    }
 };
 
 
@@ -1756,66 +1791,6 @@ inline meta_type meta_func::ret() const ENTT_NOEXCEPT {
 inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
     return index < size() ? node->arg(index) : nullptr;
 }
-
-
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
-
-namespace internal {
-
-
-template<typename Type, typename = std::enable_if_t<!std::is_void_v<Type> && !std::is_function_v<Type>>>
-static auto compare(int, const void *lhs, const void *rhs)
--> decltype(std::declval<Type>() == std::declval<Type>(), bool{}) {
-    return *static_cast<const Type *>(lhs) == *static_cast<const Type *>(rhs);
-}
-
-template<typename>
-static bool compare(char, const void *lhs, const void *rhs) {
-    return lhs == rhs;
-}
-
-
-template<typename Type>
-inline meta_type_node * meta_node<Type>::resolve() ENTT_NOEXCEPT {
-    static meta_type_node node{
-        {},
-        nullptr,
-        nullptr,
-        std::is_void_v<Type>,
-        std::is_integral_v<Type>,
-        std::is_floating_point_v<Type>,
-        std::is_array_v<Type>,
-        std::is_enum_v<Type>,
-        std::is_union_v<Type>,
-        std::is_class_v<Type>,
-        std::is_pointer_v<Type>,
-        std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
-        std::is_member_object_pointer_v<Type>,
-        std::is_member_function_pointer_v<Type>,
-        std::extent_v<Type>,
-        [](const void *lhs, const void *rhs) {
-            return compare<Type>(0, lhs, rhs);
-        },
-        []() ENTT_NOEXCEPT -> meta_type_node * {
-            return internal::meta_info<std::remove_pointer_t<Type>>::resolve();
-        }
-    };
-
-    return &node;
-}
-
-
-}
-
-
-/**
- * Internal details not to be documented.
- * @endcond TURN_OFF_DOXYGEN
- */
 
 
 }
