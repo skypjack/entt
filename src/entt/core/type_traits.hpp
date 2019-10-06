@@ -120,6 +120,28 @@ template<typename Type>
 using type_list_unique_t = typename type_list_unique<Type>::type;
 
 
+/**
+ * @brief Provides the member constant `value` to true if a given type is
+ * equality comparable, false otherwise.
+ * @tparam Type Potentially equality comparable type.
+ */
+template<typename Type, typename = std::void_t<>>
+struct is_equality_comparable: std::false_type {};
+
+
+/*! @copydoc is_equality_comparable */
+template<typename Type>
+struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>: std::true_type {};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially equality comparable type.
+ */
+template<class Type>
+constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
+
+
 /*! @brief Traits class used mainly to push things across boundaries. */
 template<typename>
 struct named_type_traits;
@@ -146,16 +168,13 @@ using named_type_traits_t = typename named_type_traits<Type>::type;
 /**
  * @brief Provides the member constant `value` to true if a given type has a
  * name. In all other cases, `value` is false.
+ * @tparam Type Potentially named type.
  */
-template<typename, typename = std::void_t<>>
+template<typename Type, typename = std::void_t<>>
 struct is_named_type: std::false_type {};
 
 
-/**
- * @brief Provides the member constant `value` to true if a given type has a
- * name. In all other cases, `value` is false.
- * @tparam Type Potentially named type.
- */
+/*! @copydoc is_named_type */
 template<typename Type>
 struct is_named_type<Type, std::void_t<named_type_traits_t<std::decay_t<Type>>>>: std::true_type {};
 
