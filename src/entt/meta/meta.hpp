@@ -10,6 +10,7 @@
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
+#include "../core/utility.hpp"
 
 
 namespace entt {
@@ -17,7 +18,7 @@ namespace entt {
 
 class meta_any;
 class meta_handle;
-struct meta_type;
+class meta_type;
 
 
 /**
@@ -128,60 +129,6 @@ struct meta_type_node {
 };
 
 
-template<typename...>
-struct meta_node;
-
-
-template<>
-struct meta_node<> {
-    inline static meta_type_node *type = nullptr;
-};
-
-
-template<typename Type>
-static bool compare(const void *lhs, const void *rhs) {
-    if constexpr(!std::is_function_v<Type> && is_equality_comparable_v<Type>) {
-        return *static_cast<const Type *>(lhs) == *static_cast<const Type *>(rhs);
-    } else {
-        return lhs == rhs;
-    }
-}
-
-
-template<typename Type>
-struct meta_node<Type> {
-    static meta_type_node * resolve() ENTT_NOEXCEPT {
-        static meta_type_node node{
-            {},
-            nullptr,
-            nullptr,
-            std::is_void_v<Type>,
-            std::is_integral_v<Type>,
-            std::is_floating_point_v<Type>,
-            std::is_array_v<Type>,
-            std::is_enum_v<Type>,
-            std::is_union_v<Type>,
-            std::is_class_v<Type>,
-            std::is_pointer_v<Type>,
-            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
-            std::is_member_object_pointer_v<Type>,
-            std::is_member_function_pointer_v<Type>,
-            std::extent_v<Type>,
-            &compare<Type>, // workaround for an issue with VS2017
-            []() ENTT_NOEXCEPT -> meta_type_node * {
-                return meta_node<std::remove_const_t<std::remove_pointer_t<Type>>>::resolve();
-            }
-        };
-
-        return &node;
-    }
-};
-
-
-template<typename... Type>
-struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> {};
-
-
 template<typename Type, typename Op, typename Node>
 void iterate(Op op, const Node *curr) ENTT_NOEXCEPT {
     while(curr) {
@@ -235,42 +182,110 @@ auto find_if(Op op, const meta_type_node *node) ENTT_NOEXCEPT
 
 
 template<typename Type>
-const Type * try_cast(const meta_type_node *node, void *instance) ENTT_NOEXCEPT {
-    const auto * const type = meta_info<Type>::resolve();
-    void *ret = nullptr;
-
-    if(node == type) {
-        ret = instance;
+static bool compare(const void *lhs, const void *rhs) {
+    if constexpr(!std::is_function_v<Type> && is_equality_comparable_v<Type>) {
+        return *static_cast<const Type *>(lhs) == *static_cast<const Type *>(rhs);
     } else {
-        const auto *base = find_if<&meta_type_node::base>([type](auto *candidate) {
-            return candidate->type() == type;
-        }, node);
+        return lhs == rhs;
+    }
+}
 
-        ret = base ? base->cast(instance) : nullptr;
+
+template<typename...>
+struct meta_node;
+
+
+template<>
+struct meta_node<> {
+    inline static meta_type_node *local = nullptr;
+    inline static meta_type_node **ctx = &local;
+};
+
+
+template<typename Type>
+struct meta_node<Type> {
+    static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>);
+    inline static meta_type_node *type = nullptr;
+
+    static void reset() ENTT_NOEXCEPT {
+        auto * const node = type ? type : resolve();
+        auto **curr = meta_node<>::ctx;
+
+        while(*curr && *curr != node) {
+            curr = &(*curr)->next;
+        }
+
+        if(*curr) {
+            *curr = (*curr)->next;
+        }
+
+        const auto unregister_all = y_combinator{
+            [](auto &&self, auto **node, auto... member) {
+                while(*node) {
+                    auto *curr = *node;
+                    (self(&(curr->*member)), ...);
+                    *node = curr->next;
+                    curr->next = nullptr;
+                }
+            }
+        };
+
+        unregister_all(&node->prop);
+        unregister_all(&node->base);
+        unregister_all(&node->conv);
+        unregister_all(&node->ctor, &internal::meta_ctor_node::prop);
+        unregister_all(&node->data, &internal::meta_data_node::prop);
+        unregister_all(&node->func, &internal::meta_func_node::prop);
+
+        node->identifier = {};
+        node->dtor = nullptr;
+        node->next = nullptr;
+
+        type = nullptr;
     }
 
-    return static_cast<const Type *>(ret);
-}
+    static meta_type_node * resolve() ENTT_NOEXCEPT {
+        static meta_type_node node{
+            {},
+            nullptr,
+            nullptr,
+            std::is_void_v<Type>,
+            std::is_integral_v<Type>,
+            std::is_floating_point_v<Type>,
+            std::is_array_v<Type>,
+            std::is_enum_v<Type>,
+            std::is_union_v<Type>,
+            std::is_class_v<Type>,
+            std::is_pointer_v<Type>,
+            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
+            std::is_member_object_pointer_v<Type>,
+            std::is_member_function_pointer_v<Type>,
+            std::extent_v<Type>,
+            &compare<Type>, // workaround for an issue with VS2017
+            []() ENTT_NOEXCEPT -> meta_type_node * {
+                return meta_node<std::remove_const_t<std::remove_pointer_t<Type>>>::resolve();
+            }
+        };
+
+        if(!type) {
+            if constexpr(is_named_type_v<Type>) {
+                iterate<meta_type_node>([](const auto *node) {
+                    if(node->identifer == named_type_traits<Type>::value) {
+                        type = node;
+                    }
+                }, *meta_node<>::ctx);
+            } else {
+                type = &node;
+            }
+        }
+
+        return type;
+    }
+};
 
 
-template<auto Member>
-inline bool can_cast_or_convert(const meta_type_node *from, const meta_type_node *to) ENTT_NOEXCEPT {
-    return (from == to) || find_if<Member>([to](auto *node) {
-        return node->type() == to;
-    }, from);
-}
-
-
-template<typename... Args, std::size_t... Indexes>
-inline auto ctor(std::index_sequence<Indexes...>, const meta_type_node *node) ENTT_NOEXCEPT {
-    return internal::find_if([](auto *candidate) {
-        return candidate->size == sizeof...(Args) &&
-                (([](auto *from, auto *to) {
-                    return internal::can_cast_or_convert<&internal::meta_type_node::base>(from, to)
-                            || internal::can_cast_or_convert<&internal::meta_type_node::conv>(from, to);
-                }(internal::meta_info<Args>::resolve(), candidate->arg(Indexes))) && ...);
-    }, node->ctor);
-}
+template<typename... Type>
+struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> {};
 
 
 }
@@ -511,7 +526,20 @@ public:
      */
     template<typename Type>
     const Type * try_cast() const ENTT_NOEXCEPT {
-        return internal::try_cast<Type>(node, instance);
+        const auto * const type = internal::meta_info<Type>::resolve();
+        void *ret = nullptr;
+
+        if(node == type) {
+            ret = instance;
+        } else {
+            const auto *base = internal::find_if<&internal::meta_type_node::base>([type](auto *candidate) {
+                return candidate->type() == type;
+            }, node);
+
+            ret = base ? base->cast(instance) : nullptr;
+        }
+
+        return static_cast<const Type *>(ret);
     }
 
     /*! @copydoc try_cast */
@@ -599,7 +627,7 @@ public:
      * @param args Parameters to use to construct the instance.
      */
     template<typename Type, typename... Args>
-    void emplace(Args&& ... args) {
+    void emplace(Args &&... args) {
         *this = meta_any{std::in_place_type_t<Type>{}, std::forward<Args>(args)...};
     }
 
@@ -1330,7 +1358,18 @@ inline bool operator!=(const meta_func &lhs, const meta_func &rhs) ENTT_NOEXCEPT
 
 
 /*! @brief Opaque container for meta types. */
-struct meta_type {
+class meta_type {
+    template<typename... Args, std::size_t... Indexes>
+    auto ctor(std::index_sequence<Indexes...>, const internal::meta_type_node *node) const ENTT_NOEXCEPT {
+        return internal::find_if([](auto *candidate) {
+            return candidate->size == sizeof...(Args) && ([](auto *from, auto *to) {
+                return (from == to) || internal::find_if<&internal::meta_type_node::base>([to](auto *node) { return node->type() == to; }, from)
+                        || internal::find_if<&internal::meta_type_node::conv>([to](auto *node) { return node->type() == to; }, from);
+            }(internal::meta_info<Args>::resolve(), candidate->arg(Indexes)) && ...);
+        }, node->ctor);
+    }
+
+public:
     /*! @brief Unsigned integer type. */
     using size_type = typename internal::meta_type_node::size_type;
 
@@ -1540,7 +1579,7 @@ struct meta_type {
      */
     template<typename... Args>
     meta_ctor ctor() const ENTT_NOEXCEPT {
-        return internal::ctor<Args...>(std::make_index_sequence<sizeof...(Args)>{}, node);
+        return ctor<Args...>(std::make_index_sequence<sizeof...(Args)>{}, node);
     }
 
     /**

@@ -1969,20 +1969,27 @@ TEST_F(Meta, Variables) {
 }
 
 TEST_F(Meta, Unregister) {
-    entt::unregister<double>();
+    ASSERT_NE(*entt::internal::meta_info<>::ctx, nullptr);
+    ASSERT_NE(entt::internal::meta_info<>::local, nullptr);
+
     entt::unregister<char>();
-    entt::unregister<properties>();
-    entt::unregister<unsigned int>();
-    entt::unregister<base_type>();
-    entt::unregister<derived_type>();
-    entt::unregister<empty_type>();
+    entt::unregister<concrete_type>();
+    entt::unregister<setter_getter_type>();
     entt::unregister<fat_type>();
     entt::unregister<data_type>();
     entt::unregister<func_type>();
-    entt::unregister<setter_getter_type>();
+    entt::unregister<array_type>();
+    entt::unregister<double>();
+    entt::unregister<properties>();
+    entt::unregister<base_type>();
+    entt::unregister<derived_type>();
+    entt::unregister<empty_type>();
     entt::unregister<an_abstract_type>();
     entt::unregister<another_abstract_type>();
-    entt::unregister<concrete_type>();
+    entt::unregister<unsigned int>();
+
+    ASSERT_EQ(*entt::internal::meta_info<>::ctx, nullptr);
+    ASSERT_EQ(entt::internal::meta_info<>::local, nullptr);
 
     ASSERT_FALSE(entt::resolve("char"_hs));
     ASSERT_FALSE(entt::resolve("base"_hs));

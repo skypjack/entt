@@ -9,7 +9,6 @@
 #include <functional>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/utility.hpp"
 #include "policy.hpp"
 #include "meta.hpp"
 
@@ -304,10 +303,10 @@ public:
 
         node->identifier = identifier;
         node->prop = properties<Type>(std::forward<Property>(property)...);
-        ENTT_ASSERT(!duplicate(identifier, internal::meta_info<>::type));
-        ENTT_ASSERT(!duplicate(node, internal::meta_info<>::type));
-        node->next = internal::meta_info<>::type;
-        internal::meta_info<>::type = node;
+        ENTT_ASSERT(!duplicate(identifier, *internal::meta_info<>::ctx));
+        ENTT_ASSERT(!duplicate(node, *internal::meta_info<>::ctx));
+        node->next = *internal::meta_info<>::ctx;
+        *internal::meta_info<>::ctx = node;
 
         return *this;
     }
@@ -710,38 +709,7 @@ public:
      * removed.
      */
     void unregister() ENTT_NOEXCEPT {
-        auto * const node = internal::meta_info<Type>::resolve();
-        auto **curr = &internal::meta_info<>::type;
-
-        while(*curr && *curr != node) {
-            curr = &(*curr)->next;
-        }
-
-        if(*curr) {
-            *curr = (*curr)->next;
-        }
-
-        const auto unregister_all = y_combinator{
-            [](auto &&self, auto **node, auto... member) {
-                while(*node) {
-                    auto *curr = *node;
-                    (self(&(curr->*member)), ...);
-                    *node = curr->next;
-                    curr->next = nullptr;
-                }
-            }
-        };
-
-        unregister_all(&node->prop);
-        unregister_all(&node->base);
-        unregister_all(&node->conv);
-        unregister_all(&node->ctor, &internal::meta_ctor_node::prop);
-        unregister_all(&node->data, &internal::meta_data_node::prop);
-        unregister_all(&node->func, &internal::meta_func_node::prop);
-
-        node->dtor = nullptr;
-        node->identifier = {};
-        node->next = nullptr;
+        internal::meta_info<Type>::reset();
     }
 };
 
@@ -819,7 +787,7 @@ inline meta_type resolve() ENTT_NOEXCEPT {
 inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
     return internal::find_if([identifier](auto *node) {
         return node->identifier == identifier;
-    }, internal::meta_info<>::type);
+    }, *internal::meta_info<>::ctx);
 }
 
 
@@ -831,7 +799,7 @@ inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
 template<typename Op>
 inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
 resolve(Op op) ENTT_NOEXCEPT {
-    internal::iterate<meta_type>(std::move(op), internal::meta_info<>::type);
+    internal::iterate<meta_type>(std::move(op), *internal::meta_info<>::ctx);
 }
 
 
