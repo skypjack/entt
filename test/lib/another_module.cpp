@@ -13,17 +13,12 @@
 #endif
 #endif
 
-ENTT_NAMED_TYPE(int)
-ENTT_NAMED_TYPE(char)
-ENTT_NAMED_TYPE(double)
-ENTT_NAMED_TYPE(float)
-
 LIB_EXPORT typename entt::component another_module_int_type() {
     entt::registry registry;
 
     (void)registry.type<char>();
-    (void)registry.type<const int>();
     (void)registry.type<double>();
+    (void)registry.type<const int>();
     (void)registry.type<const char>();
     (void)registry.type<float>();
 
@@ -34,8 +29,8 @@ LIB_EXPORT typename entt::component another_module_char_type() {
     entt::registry registry;
 
     (void)registry.type<int>();
-    (void)registry.type<const char>();
     (void)registry.type<float>();
+    (void)registry.type<const char>();
     (void)registry.type<const int>();
     (void)registry.type<double>();
 

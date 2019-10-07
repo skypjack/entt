@@ -26,9 +26,6 @@ struct listener {
     int value;
 };
 
-ENTT_NAMED_TYPE(int)
-ENTT_NAMED_TYPE(char)
-
 TEST(Lib, Types) {
     entt::registry registry;
 

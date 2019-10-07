@@ -20,3 +20,6 @@ ENTT_NAMED_STRUCT(an_event, {
 })
 
 ENTT_NAMED_STRUCT(another_event, {})
+
+ENTT_NAMED_TYPE(int)
+ENTT_NAMED_TYPE(char)

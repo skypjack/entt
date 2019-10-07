@@ -13,11 +13,6 @@
 #endif
 #endif
 
-ENTT_NAMED_TYPE(int)
-ENTT_NAMED_TYPE(char)
-ENTT_NAMED_TYPE(double)
-ENTT_NAMED_TYPE(float)
-
 LIB_EXPORT typename entt::component a_module_int_type() {
     entt::registry registry;
 
