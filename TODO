@@ -29,8 +29,5 @@
 * multi component registry::remove and some others?
   - auto foo(It first, It last = entity_type{null})
 * range based registry::remove and some others?
-
+* add examples (and credits) from @alanjfs :)
 * make meta work across boundaries
-  - inline variables are fine here, only the head represents a problem
-  - we should always resolve by looking into the list of types when working across boundaries, no direct resolve
-  - factory: allow to attach multiple times the same type, data, func, ctor
