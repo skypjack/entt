@@ -34,12 +34,11 @@ Check out the
 your answers may already be there.
 
 If you use `EnTT` and you want to say thanks or support the project, please
-**consider becoming a patron**:
-
-[![Patreon](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/bePatron?c=1772573)
-
-[Many thanks](https://skypjack.github.io/patreon/) to those who supported me and
-still support me today.
+**consider becoming a
+[sponsor](https://github.com/users/skypjack/sponsorship)**.<br/>
+You can help me make the difference.
+[Many thanks](https://skypjack.github.io/sponsorship/) to those who supported me
+and still support me today.
 
 # Table of Contents
 
@@ -57,9 +56,6 @@ still support me today.
 * [Contributors](#contributors)
 * [License](#license)
 * [Support](#support)
-  * [Patreon](#patreon)
-  * [Donation](#donation)
-  * [Hire me](#hire-me)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -390,34 +386,10 @@ Logo released under
 -->
 # Support
 
-## Patreon
-
-Become a [patron](https://www.patreon.com/bePatron?c=1772573) and get access to
-extra content, help me spend more time on the projects you love and create new
-ones for you. Your support will help me to continue the work done so far and
-make it more professional and feature-rich every day.<br/>
-It takes very little to
-[become a patron](https://www.patreon.com/bePatron?c=1772573) and thus help the
-software you use every day. Don't miss the chance.
-
-## Donation
-
-Developing and maintaining `EnTT` takes some time and lots of coffee. I'd like
-to add more and more functionalities in future and turn it in a full-featured
-solution.<br/>
-If you want to support this project, you can offer me an espresso. I'm from
-Italy, we're used to turning the best coffee ever in code. If you find that
-it's not enough, feel free to support me the way you prefer.<br/>
-Take a look at the donation button at the top of the page for more details or
-just click [here](https://www.paypal.me/skypjack).
-
-## Hire me
-
-If you start using `EnTT` and need help, if you want a new feature and want me
-to give it the highest priority, if you have any other reason to contact me:
-do not hesitate. I'm available for hiring.<br/>
-Feel free to take a look at my [profile](https://github.com/skypjack) and
-contact me by mail.
+If you want to support this project, you can
+[offer me](https://github.com/users/skypjack/sponsorship) an espresso.<br/>
+If you find that it's not enough, feel free to
+[help me](https://www.paypal.me/skypjack) the way you prefer.
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
