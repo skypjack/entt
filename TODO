@@ -30,4 +30,10 @@
   - auto foo(It first, It last = entity_type{null})
 * range based registry::remove and some others?
 * add examples (and credits) from @alanjfs :)
+* explore the possibility to wrap other backend with a XHandler component
+
 * make meta work across boundaries
+  - name-less reflect with properties
+  - forbid reflecting two times the same type
+  - entt::reflect -> entt::meta
+  - tests, doc
