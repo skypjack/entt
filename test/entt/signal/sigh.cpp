@@ -26,7 +26,7 @@ struct before_after {
     static inline int value{};
 };
 
-struct SigH: public ::testing::Test {
+struct SigH: ::testing::Test {
     void SetUp() override {
         before_after::value = 0;
     }

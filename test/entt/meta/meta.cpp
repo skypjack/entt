@@ -141,7 +141,7 @@ struct concrete_type: an_abstract_type, another_abstract_type {
     void h(char c) override { j = c; }
 };
 
-struct Meta: public ::testing::Test {
+struct Meta: ::testing::Test {
     static void SetUpTestCase() {
         entt::reflect<double>().conv<int>();
 
