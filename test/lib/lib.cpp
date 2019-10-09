@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/meta/factory.hpp>
 #include <entt/signal/dispatcher.hpp>
 #include <entt/signal/emitter.hpp>
 #include "types.h"
@@ -18,6 +19,15 @@ extern void trigger_another_event(entt::dispatcher &);
 
 extern void emit_an_event(int, test_emitter &);
 extern void emit_another_event(test_emitter &);
+
+extern void a_module_meta_ctx(entt::meta_ctx);
+extern void another_module_meta_ctx(entt::meta_ctx);
+
+extern void a_module_meta_init();
+extern void another_module_meta_init();
+
+extern void a_module_meta_deinit();
+extern void another_module_meta_deinit();
 
 struct listener {
     void on_an_event(an_event event) { value = event.payload; }
@@ -96,4 +106,35 @@ TEST(Lib, Emitter) {
 
     emit_an_event(42, emitter);
     emit_another_event(emitter);
+}
+
+TEST(Lib, Meta) {
+    ASSERT_FALSE(entt::resolve("double"_hs));
+    ASSERT_FALSE(entt::resolve("char"_hs));
+    ASSERT_FALSE(entt::resolve("int"_hs));
+    ASSERT_FALSE(entt::resolve<int>().data("0"_hs));
+    ASSERT_FALSE(entt::resolve<char>().data("c"_hs));
+
+    a_module_meta_ctx(entt::meta_ctx{});
+    another_module_meta_ctx(entt::meta_ctx{});
+
+    entt::reflect<double>("double"_hs).conv<int>();
+    another_module_meta_init();
+    a_module_meta_init();
+
+    ASSERT_TRUE(entt::resolve("double"_hs));
+    ASSERT_TRUE(entt::resolve("char"_hs));
+    ASSERT_TRUE(entt::resolve("int"_hs));
+    ASSERT_TRUE(entt::resolve<int>().data("0"_hs));
+    ASSERT_TRUE(entt::resolve<char>().data("c"_hs));
+
+    a_module_meta_deinit();
+    another_module_meta_deinit();
+    entt::unregister<double>();
+
+    ASSERT_FALSE(entt::resolve("double"_hs));
+    ASSERT_FALSE(entt::resolve("char"_hs));
+    ASSERT_FALSE(entt::resolve("int"_hs));
+    ASSERT_FALSE(entt::resolve<int>().data("0"_hs));
+    ASSERT_FALSE(entt::resolve<char>().data("c"_hs));
 }

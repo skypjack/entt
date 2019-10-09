@@ -1,4 +1,5 @@
 #include <entt/entity/registry.hpp>
+#include <entt/meta/factory.hpp>
 #include <entt/signal/dispatcher.hpp>
 #include <entt/signal/emitter.hpp>
 #include "types.h"
@@ -49,4 +50,16 @@ LIB_EXPORT void trigger_an_event(int payload, entt::dispatcher &dispatcher) {
 
 LIB_EXPORT void emit_an_event(int payload, test_emitter &emitter) {
     emitter.publish<an_event>(payload);
+}
+
+LIB_EXPORT void another_module_meta_ctx(entt::meta_ctx context) {
+    context.set();
+}
+
+LIB_EXPORT void another_module_meta_init() {
+    entt::reflect<int>("int"_hs).data<0>("0"_hs);
+}
+
+LIB_EXPORT void another_module_meta_deinit() {
+    entt::unregister<int>();
 }

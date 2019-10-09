@@ -1742,39 +1742,14 @@ private:
 
 
 /*! @brief Opaque container for a meta context. */
-class meta_ctx {
-    auto ctx() const ENTT_NOEXCEPT {
-        return &internal::meta_info<>::local;
+struct meta_ctx {
+    /*! @brief Sets the context as the current one. */
+    void set() const ENTT_NOEXCEPT {
+        internal::meta_info<>::ctx = ctx;
     }
 
-public:
-    /*! @brief Default constructor. */
-    meta_ctx() ENTT_NOEXCEPT = default;
-
-    /*! @brief Default copy constructor, deleted on purpose. */
-    meta_ctx(const meta_ctx &) = delete;
-    /*! @brief Default move constructor, deleted on purpose. */
-    meta_ctx(meta_ctx &&) = delete;
-
-    /**
-     * @brief Copy assignment operator.
-     * @param other The instance to copy from.
-     * @return This meta object.
-     */
-    meta_ctx & operator=(const meta_ctx &other) {
-        internal::meta_info<>::ctx = other.ctx();
-        return *this;
-    }
-
-    /**
-     * @brief Move assignment operator.
-     * @param other The instance to move from.
-     * @return This meta object.
-     */
-    meta_ctx & operator=(meta_ctx &&other) {
-        internal::meta_info<>::ctx = other.ctx();
-        return *this;
-    }
+private:
+    internal::meta_type_node **ctx{&internal::meta_info<>::local};
 };
 
 
