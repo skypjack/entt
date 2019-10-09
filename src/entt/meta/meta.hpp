@@ -130,7 +130,7 @@ struct meta_type_node {
 
 
 template<typename Type, typename Op, typename Node>
-void iterate(Op op, const Node *curr) ENTT_NOEXCEPT {
+void iterate(Op op, Node *curr) ENTT_NOEXCEPT {
     while(curr) {
         op(Type{curr});
         curr = curr->next;
@@ -153,7 +153,7 @@ void iterate(Op op, const meta_type_node *node) ENTT_NOEXCEPT {
 
 
 template<typename Op, typename Node>
-auto find_if(Op op, const Node *curr) ENTT_NOEXCEPT {
+auto find_if(Op op, Node *curr) ENTT_NOEXCEPT {
     while(curr && !op(curr)) {
         curr = curr->next;
     }
@@ -205,10 +205,9 @@ struct meta_node<> {
 template<typename Type>
 struct meta_node<Type> {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>);
-    inline static meta_type_node *type = nullptr;
 
     static void reset() ENTT_NOEXCEPT {
-        auto * const node = type ? type : resolve();
+        auto * const node = resolve();
         auto **curr = meta_node<>::ctx;
 
         while(*curr && *curr != node) {
@@ -240,8 +239,6 @@ struct meta_node<Type> {
         node->identifier = {};
         node->dtor = nullptr;
         node->next = nullptr;
-
-        type = nullptr;
     }
 
     static meta_type_node * resolve() ENTT_NOEXCEPT {
@@ -267,19 +264,15 @@ struct meta_node<Type> {
             }
         };
 
-        if(!type) {
-            if constexpr(is_named_type_v<Type>) {
-                iterate<meta_type_node>([](const auto *node) {
-                    if(node->identifer == named_type_traits<Type>::value) {
-                        type = node;
-                    }
-                }, *meta_node<>::ctx);
-            } else {
-                type = &node;
-            }
-        }
+        if constexpr(is_named_type_v<Type>) {
+            auto *candidate = internal::find_if([](auto *candidate) {
+                return candidate->identifier == named_type_traits<Type>::value;
+            }, *meta_node<>::ctx);
 
-        return type;
+            return candidate ? candidate : &node;
+        } else {
+            return &node;
+        }
     }
 };
 
