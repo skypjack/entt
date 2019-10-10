@@ -12,9 +12,9 @@ namespace entt {
 template<typename>
 struct resource_cache;
 
-/*! @class resource_handle */
+/*! @class handle */
 template<typename>
-class resource_handle;
+class handle;
 
 /*! @class loader */
 template<typename, typename>

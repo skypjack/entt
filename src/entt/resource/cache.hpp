@@ -90,20 +90,20 @@ struct resource_cache {
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    resource_handle<Resource> load(const resource_type id, Args &&... args) {
+    entt::handle<Resource> load(const resource_type id, Args &&... args) {
         static_assert(std::is_base_of_v<loader<Loader, Resource>, Loader>);
-        resource_handle<Resource> handle{};
+        entt::handle<Resource> resource{};
 
         if(auto it = resources.find(id); it == resources.cend()) {
-            if(auto resource = Loader{}.get(std::forward<Args>(args)...); resource) {
-                resources[id] = resource;
-                handle = std::move(resource);
+            if(auto instance = Loader{}.get(std::forward<Args>(args)...); instance) {
+                resources[id] = instance;
+                resource = std::move(instance);
             }
         } else {
-            handle = it->second;
+            resource = it->second;
         }
 
-        return handle;
+        return resource;
     }
 
     /**
@@ -130,7 +130,7 @@ struct resource_cache {
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    resource_handle<Resource> reload(const resource_type id, Args &&... args) {
+    entt::handle<Resource> reload(const resource_type id, Args &&... args) {
         return (discard(id), load<Loader>(id, std::forward<Args>(args)...));
     }
 
@@ -147,7 +147,7 @@ struct resource_cache {
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    resource_handle<Resource> temp(Args &&... args) const {
+    entt::handle<Resource> temp(Args &&... args) const {
         return { Loader{}.get(std::forward<Args>(args)...) };
     }
 
@@ -159,12 +159,12 @@ struct resource_cache {
      * cache contains the resource itself. Otherwise the returned handle is
      * uninitialized and accessing it results in undefined behavior.
      *
-     * @sa resource_handle
+     * @sa handle
      *
      * @param id Unique resource identifier.
      * @return A handle for the given resource.
      */
-    resource_handle<Resource> handle(const resource_type id) const {
+    entt::handle<Resource> handle(const resource_type id) const {
         auto it = resources.find(id);
         return { it == resources.end() ? nullptr : it->second };
     }
@@ -202,8 +202,8 @@ struct resource_cache {
      *
      * @code{.cpp}
      * void(const resource_type);
-     * void(resource_handle<Resource>);
-     * void(const resource_type, resource_handle<Resource>);
+     * void(handle<Resource>);
+     * void(const resource_type, handle<Resource>);
      * @endcode
      *
      * @tparam Func Type of the function object to invoke.
@@ -219,10 +219,10 @@ struct resource_cache {
 
             if constexpr(std::is_invocable_v<Func, resource_type>) {
                 func(curr->first);
-            } else if constexpr(std::is_invocable_v<Func, resource_handle<Resource>>) {
-                func(resource_handle{ curr->second });
+            } else if constexpr(std::is_invocable_v<Func, entt::handle<Resource>>) {
+                func(entt::handle{ curr->second });
             } else {
-                func(curr->first, resource_handle{ curr->second });
+                func(curr->first, entt::handle{ curr->second });
             }
         }
     }
