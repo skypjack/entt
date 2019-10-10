@@ -118,7 +118,7 @@ TEST(Lib, Meta) {
     a_module_meta_ctx(entt::meta_ctx{});
     another_module_meta_ctx(entt::meta_ctx{});
 
-    entt::reflect<double>("double"_hs).conv<int>();
+    entt::meta<double>().type("double"_hs).conv<int>();
     another_module_meta_init();
     a_module_meta_init();
 
@@ -130,7 +130,7 @@ TEST(Lib, Meta) {
 
     a_module_meta_deinit();
     another_module_meta_deinit();
-    entt::unregister<double>();
+    entt::meta<double>().reset();
 
     ASSERT_FALSE(entt::resolve("double"_hs));
     ASSERT_FALSE(entt::resolve("char"_hs));

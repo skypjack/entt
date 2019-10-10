@@ -52,9 +52,9 @@ LIB_EXPORT void a_module_meta_ctx(entt::meta_ctx context) {
 }
 
 LIB_EXPORT void a_module_meta_init() {
-    entt::reflect<char>("char"_hs).data<'c'>("c"_hs);
+    entt::meta<char>().type("char"_hs).data<'c'>("c"_hs);
 }
 
 LIB_EXPORT void a_module_meta_deinit() {
-    entt::unregister<char>();
+    entt::meta<char>().reset();
 }

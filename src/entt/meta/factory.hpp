@@ -700,15 +700,14 @@ public:
     }
 
     /**
-     * @brief Unregisters a meta type and all its parts.
+     * @brief Resets a meta type and all its parts.
      *
-     * This function unregisters a meta type and all its data members, member
+     * This function resets a meta type and all its data members, member
      * functions and properties, as well as its constructors, destructors and
      * conversion functions if any.<br/>
-     * Base classes aren't unregistered but the link between the two types is
-     * removed.
+     * Base classes aren't reset but the link between the two types is removed.
      */
-    void unregister() ENTT_NOEXCEPT {
+    void reset() ENTT_NOEXCEPT {
         internal::meta_info<Type>::reset();
     }
 };
@@ -719,52 +718,15 @@ public:
  *
  * This is the point from which everything starts.<br/>
  * By invoking this function with a type that is not yet reflected, a meta type
- * is created to which it will be possible to attach data and functions through
- * a dedicated factory.
- *
- * @tparam Type Type to reflect.
- * @tparam Property Types of properties to assign to the reflected type.
- * @param identifier Unique identifier.
- * @param property Properties to assign to the reflected type.
- * @return A meta factory for the given type.
- */
-template<typename Type, typename... Property>
-inline meta_factory<Type> reflect(const ENTT_ID_TYPE identifier, Property &&... property) ENTT_NOEXCEPT {
-    return meta_factory<Type>{}.type(identifier, std::forward<Property>(property)...);
-}
-
-
-/**
- * @brief Utility function to use for reflection.
- *
- * This is the point from which everything starts.<br/>
- * By invoking this function with a type that is not yet reflected, a meta type
- * is created to which it will be possible to attach data and functions through
- * a dedicated factory.
+ * is created to which it will be possible to attach meta objects through a
+ * dedicated factory.
  *
  * @tparam Type Type to reflect.
  * @return A meta factory for the given type.
  */
 template<typename Type>
-inline meta_factory<Type> reflect() ENTT_NOEXCEPT {
+inline meta_factory<Type> meta() ENTT_NOEXCEPT {
     return meta_factory<Type>{};
-}
-
-
-/**
- * @brief Utility function to unregister a type.
- *
- * This function unregisters a type and all its data members, member functions
- * and properties, as well as its constructors, destructors and conversion
- * functions if any.<br/>
- * Base classes aren't unregistered but the link between the two types is
- * removed.
- *
- * @tparam Type Type to unregister.
- */
-template<typename Type>
-inline void unregister() ENTT_NOEXCEPT {
-    meta_factory<Type>{}.unregister();
 }
 
 
