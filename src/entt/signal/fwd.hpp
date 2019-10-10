@@ -2,9 +2,6 @@
 #define ENTT_SIGNAL_FWD_HPP
 
 
-#include "../config/config.h"
-
-
 namespace entt {
 
 

@@ -2,7 +2,6 @@
 #define ENTT_ENTITY_FWD_HPP
 
 
-#include <cstdint>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
 

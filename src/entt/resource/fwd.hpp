@@ -2,9 +2,6 @@
 #define ENTT_RESOURCE_FWD_HPP
 
 
-#include "../config/config.h"
-
-
 namespace entt {
 
 
