@@ -128,7 +128,7 @@ TEST(Resource, Each) {
     ASSERT_FALSE(cache.empty());
     ASSERT_EQ(cache.handle("resource"_hs)->value, 2);
 
-    cache.each([&cache](entt::cache<resource>::resource_type id) {
+    cache.each([&cache](entt::cache<resource>::id_type id) {
         cache.discard(id);
     });
 

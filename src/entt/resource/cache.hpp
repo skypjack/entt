@@ -30,7 +30,9 @@ struct cache {
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Type of resources managed by a cache. */
-    using resource_type = ENTT_ID_TYPE;
+    using resource_type = Resource;
+    /*! @brief Unique identifier type for resources. */
+    using id_type = ENTT_ID_TYPE;
 
     /*! @brief Default constructor. */
     cache() = default;
@@ -90,7 +92,7 @@ struct cache {
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    entt::handle<Resource> load(const resource_type id, Args &&... args) {
+    entt::handle<Resource> load(const id_type id, Args &&... args) {
         static_assert(std::is_base_of_v<loader<Loader, Resource>, Loader>);
         entt::handle<Resource> resource{};
 
@@ -130,7 +132,7 @@ struct cache {
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    entt::handle<Resource> reload(const resource_type id, Args &&... args) {
+    entt::handle<Resource> reload(const id_type id, Args &&... args) {
         return (discard(id), load<Loader>(id, std::forward<Args>(args)...));
     }
 
@@ -164,7 +166,7 @@ struct cache {
      * @param id Unique resource identifier.
      * @return A handle for the given resource.
      */
-    entt::handle<Resource> handle(const resource_type id) const {
+    entt::handle<Resource> handle(const id_type id) const {
         auto it = resources.find(id);
         return { it == resources.end() ? nullptr : it->second };
     }
@@ -174,7 +176,7 @@ struct cache {
      * @param id Unique resource identifier.
      * @return True if the cache contains the resource, false otherwise.
      */
-    bool contains(const resource_type id) const ENTT_NOEXCEPT {
+    bool contains(const id_type id) const ENTT_NOEXCEPT {
         return (resources.find(id) != resources.cend());
     }
 
@@ -186,7 +188,7 @@ struct cache {
      *
      * @param id Unique resource identifier.
      */
-    void discard(const resource_type id) ENTT_NOEXCEPT {
+    void discard(const id_type id) ENTT_NOEXCEPT {
         if(auto it = resources.find(id); it != resources.end()) {
             resources.erase(it);
         }
@@ -201,9 +203,9 @@ struct cache {
      * forms:
      *
      * @code{.cpp}
-     * void(const resource_type);
+     * void(const id_type);
      * void(handle<Resource>);
-     * void(const resource_type, handle<Resource>);
+     * void(const id_type, handle<Resource>);
      * @endcode
      *
      * @tparam Func Type of the function object to invoke.
@@ -217,7 +219,7 @@ struct cache {
         while(begin != end) {
             auto curr = begin++;
 
-            if constexpr(std::is_invocable_v<Func, resource_type>) {
+            if constexpr(std::is_invocable_v<Func, id_type>) {
                 func(curr->first);
             } else if constexpr(std::is_invocable_v<Func, entt::handle<Resource>>) {
                 func(entt::handle{ curr->second });
@@ -228,7 +230,7 @@ struct cache {
     }
 
 private:
-    std::unordered_map<resource_type, std::shared_ptr<Resource>> resources;
+    std::unordered_map<id_type, std::shared_ptr<Resource>> resources;
 };
 
 

@@ -109,15 +109,14 @@ Before to explore this part of the interface, it makes sense to mention how
 resources are identified. The type of the identifiers to use is defined as:
 
 ```cpp
-entt::cache<resource>::resource_type
+entt::cache<resource>::id_type
 ```
 
-Where `resource_type` is an alias for `entt::hashed_string::hash_type`.
-Therefore, resource identifiers are created explicitly as in the following
-example:
+Where `id_type` is an alias for `entt::hashed_string::hash_type`. Therefore,
+resource identifiers are created explicitly as in the following example:
 
 ```cpp
-constexpr auto identifier = entt::cache<resource>::resource_type{"my/resource/identifier"_hs};
+constexpr auto identifier = entt::cache<resource>::id_type{"my/resource/identifier"_hs};
 // this is equivalent to the following
 constexpr auto hs = entt::hashed_string{"my/resource/identifier"};
 ```
