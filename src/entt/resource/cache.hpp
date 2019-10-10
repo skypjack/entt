@@ -26,20 +26,20 @@ namespace entt {
  * @tparam Resource Type of resources managed by a cache.
  */
 template<typename Resource>
-struct resource_cache {
+struct cache {
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Type of resources managed by a cache. */
     using resource_type = ENTT_ID_TYPE;
 
     /*! @brief Default constructor. */
-    resource_cache() = default;
+    cache() = default;
 
     /*! @brief Default move constructor. */
-    resource_cache(resource_cache &&) = default;
+    cache(cache &&) = default;
 
     /*! @brief Default move assignment operator. @return This cache. */
-    resource_cache & operator=(resource_cache &&) = default;
+    cache & operator=(cache &&) = default;
 
     /**
      * @brief Number of resources managed by a cache.

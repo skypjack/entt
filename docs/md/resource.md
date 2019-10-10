@@ -76,11 +76,11 @@ Finally, a cache is a specialization of a class template tailored to a specific
 resource:
 
 ```cpp
-using my_resource_cache = entt::resource_cache<my_resource>;
+using my_cache = entt::cache<my_resource>;
 
 // ...
 
-my_resource_cache cache{};
+my_cache cache{};
 ```
 
 The idea is to create different caches for different types of resources and to
@@ -109,7 +109,7 @@ Before to explore this part of the interface, it makes sense to mention how
 resources are identified. The type of the identifiers to use is defined as:
 
 ```cpp
-entt::resource_cache<resource>::resource_type
+entt::cache<resource>::resource_type
 ```
 
 Where `resource_type` is an alias for `entt::hashed_string::hash_type`.
@@ -117,7 +117,7 @@ Therefore, resource identifiers are created explicitly as in the following
 example:
 
 ```cpp
-constexpr auto identifier = entt::resource_cache<resource>::resource_type{"my/resource/identifier"_hs};
+constexpr auto identifier = entt::cache<resource>::resource_type{"my/resource/identifier"_hs};
 // this is equivalent to the following
 constexpr auto hs = entt::hashed_string{"my/resource/identifier"};
 ```

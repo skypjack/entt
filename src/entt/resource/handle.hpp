@@ -26,7 +26,7 @@ namespace entt {
 template<typename Resource>
 class handle {
     /*! @brief Resource handles are friends of their caches. */
-    friend struct resource_cache<Resource>;
+    friend struct cache<Resource>;
 
     handle(std::shared_ptr<Resource> res) ENTT_NOEXCEPT
         : resource{std::move(res)}

@@ -18,12 +18,12 @@ struct broken_loader: entt::loader<broken_loader, resource> {
 };
 
 TEST(Resource, Functionalities) {
-    entt::resource_cache<resource> cache;
+    entt::cache<resource> cache;
 
     constexpr auto hs1 = entt::hashed_string{"res1"};
     constexpr auto hs2 = entt::hashed_string{"res2"};
 
-    ASSERT_EQ(cache.size(), entt::resource_cache<resource>::size_type{});
+    ASSERT_EQ(cache.size(), entt::cache<resource>::size_type{});
     ASSERT_TRUE(cache.empty());
     ASSERT_FALSE(cache.contains(hs1));
     ASSERT_FALSE(cache.contains(hs2));
@@ -31,7 +31,7 @@ TEST(Resource, Functionalities) {
     ASSERT_FALSE(cache.load<broken_loader>(hs1, 42));
     ASSERT_FALSE(cache.reload<broken_loader>(hs1, 42));
 
-    ASSERT_EQ(cache.size(), entt::resource_cache<resource>::size_type{});
+    ASSERT_EQ(cache.size(), entt::cache<resource>::size_type{});
     ASSERT_TRUE(cache.empty());
     ASSERT_FALSE(cache.contains(hs1));
     ASSERT_FALSE(cache.contains(hs2));
@@ -39,7 +39,7 @@ TEST(Resource, Functionalities) {
     ASSERT_TRUE(cache.load<loader>(hs1, 42));
     ASSERT_TRUE(cache.reload<loader>(hs1, 42));
 
-    ASSERT_NE(cache.size(), entt::resource_cache<resource>::size_type{});
+    ASSERT_NE(cache.size(), entt::cache<resource>::size_type{});
     ASSERT_FALSE(cache.empty());
     ASSERT_TRUE(cache.contains(hs1));
     ASSERT_FALSE(cache.contains(hs2));
@@ -48,7 +48,7 @@ TEST(Resource, Functionalities) {
     ASSERT_TRUE(cache.load<loader>(hs1, 42));
     ASSERT_TRUE(cache.load<loader>(hs2, 42));
 
-    ASSERT_NE(cache.size(), entt::resource_cache<resource>::size_type{});
+    ASSERT_NE(cache.size(), entt::cache<resource>::size_type{});
     ASSERT_FALSE(cache.empty());
     ASSERT_TRUE(cache.contains(hs1));
     ASSERT_TRUE(cache.contains(hs2));
@@ -64,14 +64,14 @@ TEST(Resource, Functionalities) {
     ASSERT_TRUE(cache.load<loader>(hs1, 42));
     ASSERT_NO_THROW(cache.clear());
 
-    ASSERT_EQ(cache.size(), entt::resource_cache<resource>::size_type{});
+    ASSERT_EQ(cache.size(), entt::cache<resource>::size_type{});
     ASSERT_TRUE(cache.empty());
     ASSERT_FALSE(cache.contains(hs1));
     ASSERT_FALSE(cache.contains(hs2));
 
     ASSERT_TRUE(cache.load<loader>(hs1, 42));
 
-    ASSERT_NE(cache.size(), entt::resource_cache<resource>::size_type{});
+    ASSERT_NE(cache.size(), entt::cache<resource>::size_type{});
     ASSERT_FALSE(cache.empty());
     ASSERT_TRUE(cache.handle(hs1));
     ASSERT_FALSE(cache.handle(hs2));
@@ -80,7 +80,7 @@ TEST(Resource, Functionalities) {
     ASSERT_EQ(&cache.handle(hs1).get(), &static_cast<const resource &>(cache.handle(hs1)));
     ASSERT_NO_THROW(cache.clear());
 
-    ASSERT_EQ(cache.size(), entt::resource_cache<resource>::size_type{});
+    ASSERT_EQ(cache.size(), entt::cache<resource>::size_type{});
     ASSERT_TRUE(cache.empty());
 
     ASSERT_TRUE(cache.temp<loader>(42));
@@ -94,7 +94,7 @@ TEST(Resource, Functionalities) {
 }
 
 TEST(Resource, MutableHandle) {
-    entt::resource_cache<resource> cache;
+    entt::cache<resource> cache;
 
     constexpr auto hs = entt::hashed_string{"res"};
     auto handle = cache.load<loader>(hs, 0);
@@ -110,7 +110,7 @@ TEST(Resource, MutableHandle) {
 }
 
 TEST(Resource, Each) {
-    entt::resource_cache<resource> cache;
+    entt::cache<resource> cache;
     cache.load<loader>("resource"_hs, 0);
 
     cache.each([](entt::handle<resource> res) {
@@ -128,7 +128,7 @@ TEST(Resource, Each) {
     ASSERT_FALSE(cache.empty());
     ASSERT_EQ(cache.handle("resource"_hs)->value, 2);
 
-    cache.each([&cache](entt::resource_cache<resource>::resource_type id) {
+    cache.each([&cache](entt::cache<resource>::resource_type id) {
         cache.discard(id);
     });
 

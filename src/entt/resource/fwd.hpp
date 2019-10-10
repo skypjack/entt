@@ -8,9 +8,9 @@
 namespace entt {
 
 
-/*! @struct resource_cache */
+/*! @struct cache */
 template<typename>
-struct resource_cache;
+struct cache;
 
 /*! @class handle */
 template<typename>
