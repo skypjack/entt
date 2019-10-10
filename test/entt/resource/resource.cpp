@@ -5,13 +5,13 @@
 
 struct resource { int value; };
 
-struct loader: entt::resource_loader<loader, resource> {
+struct loader: entt::loader<loader, resource> {
     std::shared_ptr<resource> load(int value) const {
         return std::shared_ptr<resource>(new resource{ value });
     }
 };
 
-struct broken_loader: entt::resource_loader<broken_loader, resource> {
+struct broken_loader: entt::loader<broken_loader, resource> {
     std::shared_ptr<resource> load(int) const {
         return nullptr;
     }

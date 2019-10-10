@@ -45,7 +45,7 @@ A _loader_ is a class the aim of which is to load a specific resource. It has to
 inherit directly from the dedicated base class as in the following example:
 
 ```cpp
-struct my_loader final: entt::resource_loader<my_loader, my_resource> {
+struct my_loader final: entt::loader<my_loader, my_resource> {
     // ...
 };
 ```
@@ -57,7 +57,7 @@ resource.<br/>
 As an example:
 
 ```cpp
-struct my_loader: entt::resource_loader<my_loader, my_resource> {
+struct my_loader: entt::loader<my_loader, my_resource> {
     std::shared_ptr<my_resource> load(int value) const {
         // ...
         return std::shared_ptr<my_resource>(new my_resource{ value });

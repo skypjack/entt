@@ -91,7 +91,7 @@ struct resource_cache {
      */
     template<typename Loader, typename... Args>
     resource_handle<Resource> load(const resource_type id, Args &&... args) {
-        static_assert(std::is_base_of_v<resource_loader<Loader, Resource>, Loader>);
+        static_assert(std::is_base_of_v<loader<Loader, Resource>, Loader>);
         resource_handle<Resource> handle{};
 
         if(auto it = resources.find(id); it == resources.cend()) {

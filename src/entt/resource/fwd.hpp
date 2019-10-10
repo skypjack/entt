@@ -16,9 +16,9 @@ struct resource_cache;
 template<typename>
 class resource_handle;
 
-/*! @class resource_loader */
+/*! @class loader */
 template<typename, typename>
-class resource_loader;
+class loader;
 
 
 }
