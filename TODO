@@ -34,8 +34,10 @@
 * use [[nodiscard]] consistently for safety purposes
 
 * make meta work across boundaries
-  - type(id, props...) -> type(id).properties(props...) with internal meta_prop_node ** as a sink
+  - ::prop: use meta_any as arguments rather than sfinae all around
+  - extend and make factory::prop more flexible
   - entt::reflect<T>().type("foo"_hs, entt::as_property); or similar
-  - name-less reflect with properties
   - forbid reflecting two times the same type
+  - name-less reflect/type (for named types)
+  - a better context
   - tests, doc
