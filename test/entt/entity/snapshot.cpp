@@ -1,3 +1,4 @@
+#include <map>
 #include <tuple>
 #include <queue>
 #include <vector>
@@ -52,6 +53,13 @@ struct another_component {
 struct what_a_component {
     entt::entity bar;
     std::vector<entt::entity> quux;
+};
+
+struct what_a_map_component {
+    entt::entity bar;
+    std::map<entt::entity, int> entity_keys;
+    std::map<int, entt::entity> entity_values;
+    std::map<entt::entity, entt::entity> entity_keys_and_values;
 };
 
 TEST(Snapshot, Dump) {
@@ -266,6 +274,7 @@ TEST(Snapshot, Continuous) {
         std::queue<entt::entity>,
         std::queue<another_component>,
         std::queue<what_a_component>,
+        std::queue<what_a_map_component>,
         std::queue<double>
     >;
 
@@ -288,6 +297,8 @@ TEST(Snapshot, Continuous) {
 
         if(i % 2) {
             src.assign<what_a_component>(entity, entity);
+        } else {
+            src.assign<what_a_map_component>(entity, entity);
         }
     }
 
@@ -295,23 +306,44 @@ TEST(Snapshot, Continuous) {
         what_a_component.quux.insert(what_a_component.quux.begin(), entities.begin(), entities.end());
     });
 
+    src.view<what_a_map_component>().each([&entities](auto, auto &what_a_map_component) {
+        std::map<entt::entity, int> m1;
+        std::map<int, entt::entity> m2;
+        std::map<entt::entity, entt::entity> m3;
+        for( size_t i = 0; i < entities.size(); ++i)
+        {
+            what_a_map_component.entity_keys.insert({entities[i], int(i)});
+            what_a_map_component.entity_values.insert({int(i), entities[i]});
+            what_a_map_component.entity_keys_and_values.insert({entities[entities.size() - i - 1], entities[i]});
+        }
+    });
+
     entity = dst.create();
     dst.assign<a_component>(entity);
     dst.assign<another_component>(entity, -1, -1);
 
     src.snapshot()
-            .entities(output)
-            .destroyed(output)
-            .component<a_component, another_component, what_a_component>(output);
+       .entities(output)
+       .destroyed(output)
+       .component<a_component, another_component, what_a_component, what_a_map_component>(output);
 
     loader.entities(input)
-            .destroyed(input)
-            .component<a_component, another_component, what_a_component>(input, &what_a_component::bar, &what_a_component::quux)
-            .orphans();
+        .destroyed(input)
+        .component<a_component, another_component, what_a_component, what_a_map_component>(
+            input,
+            &what_a_component::bar,
+            &what_a_component::quux,
+            &what_a_map_component::bar,
+            &what_a_map_component::entity_keys,
+            &what_a_map_component::entity_values,
+            &what_a_map_component::entity_keys_and_values
+            )
+        .orphans();
 
     decltype(dst.size()) a_component_cnt{};
     decltype(dst.size()) another_component_cnt{};
     decltype(dst.size()) what_a_component_cnt{};
+    decltype(dst.size()) what_a_map_component_cnt{};
 
     dst.each([&dst, &a_component_cnt](auto entt) {
         ASSERT_TRUE(dst.has<a_component>(entt));
@@ -333,6 +365,22 @@ TEST(Snapshot, Continuous) {
         ++what_a_component_cnt;
     });
 
+    dst.view<what_a_map_component>().each([&dst, &what_a_map_component_cnt](auto entt, const auto &component) {
+        ASSERT_EQ(entt, component.bar);
+
+        for(auto child: component.entity_keys) {
+            ASSERT_TRUE(dst.valid(child.first));
+        }
+        for(auto child: component.entity_values) {
+            ASSERT_TRUE(dst.valid(child.second));
+        }
+        for(auto child: component.entity_keys_and_values) {
+            ASSERT_TRUE(dst.valid(child.first));
+            ASSERT_TRUE(dst.valid(child.second));
+        }
+        ++what_a_map_component_cnt;
+    });
+
     src.view<another_component>().each([](auto, auto &component) {
         component.value = 2 * component.key;
     });
@@ -340,20 +388,29 @@ TEST(Snapshot, Continuous) {
     auto size = dst.size();
 
     src.snapshot()
-            .entities(output)
-            .destroyed(output)
-            .component<a_component, what_a_component, another_component>(output);
+        .entities(output)
+        .destroyed(output)
+        .component<a_component, what_a_component, what_a_map_component, another_component>(output);
 
     loader.entities(input)
-            .destroyed(input)
-            .component<a_component, what_a_component, another_component>(input, &what_a_component::bar, &what_a_component::quux)
-            .orphans();
+        .destroyed(input)
+        .component<a_component, what_a_component, what_a_map_component, another_component>(
+            input,
+            &what_a_component::bar,
+            &what_a_component::quux,
+            &what_a_map_component::bar,
+            &what_a_map_component::entity_keys,
+            &what_a_map_component::entity_values,
+            &what_a_map_component::entity_keys_and_values
+            )
+        .orphans();
 
     ASSERT_EQ(size, dst.size());
 
     ASSERT_EQ(dst.size<a_component>(), a_component_cnt);
     ASSERT_EQ(dst.size<another_component>(), another_component_cnt);
     ASSERT_EQ(dst.size<what_a_component>(), what_a_component_cnt);
+    ASSERT_EQ(dst.size<what_a_map_component>(), what_a_map_component_cnt);
 
     dst.view<another_component>().each([](auto, auto &component) {
         ASSERT_EQ(component.value, component.key < 0 ? -1 : (2 * component.key));
@@ -365,17 +422,33 @@ TEST(Snapshot, Continuous) {
         component.bar = entity;
     });
 
+    src.view<what_a_map_component>().each([entity](auto, auto &component) {
+        component.bar = entity;
+    });
+
     src.snapshot()
-            .entities(output)
-            .destroyed(output)
-            .component<what_a_component, a_component, another_component>(output);
+        .entities(output)
+        .destroyed(output)
+        .component<what_a_component, what_a_map_component, a_component, another_component>(output);
 
     loader.entities(input)
-            .destroyed(input)
-            .component<what_a_component, a_component, another_component>(input, &what_a_component::bar, &what_a_component::quux)
-            .orphans();
+        .destroyed(input)
+        .component<what_a_component, what_a_map_component, a_component, another_component>(
+            input,
+            &what_a_component::bar,
+            &what_a_component::quux,
+            &what_a_map_component::bar,
+            &what_a_map_component::entity_keys,
+            &what_a_map_component::entity_values,
+            &what_a_map_component::entity_keys_and_values
+          )
+        .orphans();
 
     dst.view<what_a_component>().each([&loader, entity](auto, auto &component) {
+        ASSERT_EQ(component.bar, loader.map(entity));
+    });
+
+    dst.view<what_a_map_component>().each([&loader, entity](auto, auto &component) {
         ASSERT_EQ(component.bar, loader.map(entity));
     });
 
@@ -388,17 +461,29 @@ TEST(Snapshot, Continuous) {
     loader.shrink();
 
     src.snapshot()
-            .entities(output)
-            .destroyed(output)
-            .component<a_component, another_component, what_a_component>(output);
+        .entities(output)
+        .destroyed(output)
+        .component<a_component, another_component, what_a_component, what_a_map_component>(output);
 
     loader.entities(input)
-            .destroyed(input)
-            .component<a_component, another_component, what_a_component>(input, &what_a_component::bar, &what_a_component::quux)
-            .orphans()
-            .shrink();
+        .destroyed(input)
+        .component<a_component, another_component, what_a_component, what_a_map_component>(
+            input,
+            &what_a_component::bar,
+            &what_a_component::quux,
+            &what_a_map_component::bar,
+            &what_a_map_component::entity_keys,
+            &what_a_map_component::entity_values,
+            &what_a_map_component::entity_keys_and_values
+            )
+        .orphans()
+        .shrink();
 
     dst.view<what_a_component>().each([&dst](auto, auto &component) {
+        ASSERT_FALSE(dst.valid(component.bar));
+    });
+
+    dst.view<what_a_map_component>().each([&dst](auto, auto &component) {
         ASSERT_FALSE(dst.valid(component.bar));
     });
 
@@ -410,18 +495,30 @@ TEST(Snapshot, Continuous) {
         component.bar = entity;
     });
 
+    src.view<what_a_map_component>().each([entity](auto, auto &component) {
+        component.bar = entity;
+    });
+
     dst.reset<a_component>();
     a_component_cnt = src.size<a_component>();
 
     src.snapshot()
-            .entities(output)
-            .destroyed(output)
-            .component<a_component, what_a_component, another_component>(output);
+        .entities(output)
+        .destroyed(output)
+        .component<a_component, what_a_component, what_a_map_component, another_component>(output);
 
     loader.entities(input)
-            .destroyed(input)
-            .component<a_component, what_a_component, another_component>(input, &what_a_component::bar, &what_a_component::quux)
-            .orphans();
+        .destroyed(input)
+        .component<a_component, what_a_component, what_a_map_component, another_component>(
+            input,
+            &what_a_component::bar,
+            &what_a_component::quux,
+            &what_a_map_component::bar,
+            &what_a_map_component::entity_keys,
+            &what_a_map_component::entity_values,
+            &what_a_map_component::entity_keys_and_values
+            )
+        .orphans();
 
     ASSERT_EQ(dst.size<a_component>(), a_component_cnt);
 
@@ -429,14 +526,22 @@ TEST(Snapshot, Continuous) {
     a_component_cnt = {};
 
     src.snapshot()
-            .entities(output)
-            .destroyed(output)
-            .component<what_a_component, a_component, another_component>(output);
+        .entities(output)
+        .destroyed(output)
+        .component<what_a_component, what_a_map_component, a_component, another_component>(output);
 
     loader.entities(input)
-            .destroyed(input)
-            .component<what_a_component, a_component, another_component>(input, &what_a_component::bar, &what_a_component::quux)
-            .orphans();
+        .destroyed(input)
+        .component<what_a_component, what_a_map_component, a_component, another_component>(
+            input,
+            &what_a_component::bar,
+            &what_a_component::quux,
+            &what_a_map_component::bar,
+            &what_a_map_component::entity_keys,
+            &what_a_map_component::entity_values,
+            &what_a_map_component::entity_keys_and_values
+            )
+        .orphans();
 
     ASSERT_EQ(dst.size<a_component>(), a_component_cnt);
 }
@@ -452,7 +557,7 @@ TEST(Snapshot, MoreOnShrink) {
     using storage_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>
-    >;
+        >;
 
     storage_type storage;
     output_archive<storage_type> output{storage};
@@ -480,8 +585,9 @@ TEST(Snapshot, SyncDataMembers) {
     using storage_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
-        std::queue<what_a_component>
-    >;
+        std::queue<what_a_component>,
+        std::queue<what_a_map_component>
+        >;
 
     storage_type storage;
     output_archive<storage_type> output{storage};
@@ -495,11 +601,26 @@ TEST(Snapshot, SyncDataMembers) {
     auto parent = src.create();
     auto child = src.create();
 
+
     src.assign<what_a_component>(parent, entt::null);
     src.assign<what_a_component>(child, parent).quux.push_back(child);
 
-    src.snapshot().entities(output).component<what_a_component>(output);
-    loader.entities(input).component<what_a_component>(input, &what_a_component::bar, &what_a_component::quux);
+    src.assign<what_a_map_component>(parent, entt::null);
+    auto map1 = decltype(what_a_map_component::entity_keys){{{child,10}}};
+    auto map2 = decltype(what_a_map_component::entity_values){{{10,child}}};
+    auto map3 = decltype(what_a_map_component::entity_keys_and_values){{{child,child}}};
+    src.assign<what_a_map_component>(child, parent, map1, map2, map3);
+
+    src.snapshot().entities(output).component<what_a_component, what_a_map_component>(output);
+    loader.entities(input).component<what_a_component, what_a_map_component>(
+        input,
+        &what_a_component::bar,
+        &what_a_component::quux,
+        &what_a_map_component::bar,
+        &what_a_map_component::entity_keys,
+        &what_a_map_component::entity_values,
+        &what_a_map_component::entity_keys_and_values
+        );
 
     ASSERT_FALSE(dst.valid(parent));
     ASSERT_FALSE(dst.valid(child));
@@ -507,10 +628,20 @@ TEST(Snapshot, SyncDataMembers) {
     ASSERT_TRUE(dst.has<what_a_component>(loader.map(parent)));
     ASSERT_TRUE(dst.has<what_a_component>(loader.map(child)));
 
+
     ASSERT_EQ(dst.get<what_a_component>(loader.map(parent)).bar, static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(dst.get<what_a_map_component>(loader.map(parent)).bar, static_cast<entt::entity>(entt::null));
+
+
 
     const auto &component = dst.get<what_a_component>(loader.map(child));
 
     ASSERT_EQ(component.bar, loader.map(parent));
     ASSERT_EQ(component.quux[0], loader.map(child));
+
+    const auto &map_component = dst.get<what_a_map_component>(loader.map(child));
+    ASSERT_EQ(map_component.bar, loader.map(parent));
+    ASSERT_EQ(map_component.entity_keys.at(loader.map(child)), 10);
+    ASSERT_EQ(map_component.entity_values.at(10), loader.map(child));
+    ASSERT_EQ(map_component.entity_keys_and_values.at(loader.map(child)), loader.map(child));
 }
