@@ -371,16 +371,46 @@ class basic_continuous_loader {
         }
     }
 
+    template<typename T, typename U = void>
+    struct has_key_value_impl : std::false_type { };
+    template<typename T>
+    struct has_key_value_impl<T, std::void_t<typename T::key_type,
+                                             typename T::mapped_type,
+                                             decltype(std::declval<T&>()[std::declval<const typename T::key_type&>()])>>
+        : std::true_type {};
+    template<typename T>
+    struct has_key_value : has_key_value_impl<T>::type { };
+
     template<typename Other, typename Type, typename Member>
     void update(Other &instance, Member Type:: *member) {
         if constexpr(!std::is_same_v<Other, Type>) {
             return;
         } else if constexpr(std::is_same_v<Member, Entity>) {
             instance.*member = map(instance.*member);
+        } else if constexpr( has_key_value<Member>::value ){
+            // it's some kind of map
+            if constexpr(std::is_same_v<typename Member::key_type, Entity> && std::is_same_v<typename Member::mapped_type, Entity>){
+                Member newMap;
+                for(auto &pair : instance.*member) {
+                    newMap.emplace(map(pair.first), map(pair.second));
+                }
+                instance.*member = std::move(newMap);
+            } else if constexpr(std::is_same_v<typename Member::key_type, Entity>){
+                Member newMap;
+                for(auto &pair : instance.*member) {
+                    newMap.emplace(map(pair.first), std::move(pair.second));
+                }
+                instance.*member = std::move(newMap);
+            } else if constexpr(std::is_same_v<typename Member::mapped_type, Entity>) {
+                for(auto &pair : instance.*member) {
+                    pair.second = map(pair.second);
+                }
+            }
+
         } else {
             // maybe a container? let's try...
-            for(auto &entt: instance.*member) {
-                entt = map(entt);
+            for(auto &entt : instance.*member) {
+                    entt = map(entt);
             }
         }
     }
