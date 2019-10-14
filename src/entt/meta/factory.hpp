@@ -271,9 +271,9 @@ public:
     auto type(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        node->identifier = identifier;
         ENTT_ASSERT(!duplicate(identifier, *internal::meta_info<>::ctx));
         ENTT_ASSERT(!duplicate(node, *internal::meta_info<>::ctx));
+        node->identifier = identifier;
         node->next = *internal::meta_info<>::ctx;
         *internal::meta_info<>::ctx = node;
 
@@ -551,9 +551,9 @@ public:
             curr = &node;
         }
 
-        curr->identifier = identifier;
         ENTT_ASSERT(!duplicate(identifier, type->data));
         ENTT_ASSERT(!duplicate(curr, type->data));
+        curr->identifier = identifier;
         curr->next = type->data;
         type->data = curr;
 
@@ -598,9 +598,9 @@ public:
             &internal::getter<Type, Getter, Policy>
         };
 
-        node.identifier = identifier;
         ENTT_ASSERT(!duplicate(identifier, type->data));
         ENTT_ASSERT(!duplicate(&node, type->data));
+        node.identifier = identifier;
         node.next = type->data;
         type->data = &node;
 
@@ -640,9 +640,9 @@ public:
             }
         };
 
-        node.identifier = identifier;
         ENTT_ASSERT(!duplicate(identifier, type->func));
         ENTT_ASSERT(!duplicate(&node, type->func));
+        node.identifier = identifier;
         node.next = type->func;
         type->func = &node;
 

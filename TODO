@@ -36,7 +36,6 @@
 * make meta work across boundaries
   - extend and make factory::prop more flexible
   - entt::reflect<T>().type("foo"_hs, entt::as_property); or similar
-  - forbid reflecting two times the same type
   - name-less reflect/type (for named types)
   - a better context
   - tests, doc
