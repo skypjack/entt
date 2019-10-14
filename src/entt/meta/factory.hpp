@@ -696,22 +696,6 @@ class extended_meta_factory: public meta_factory<Type> {
         return node && (node->key() == key || duplicate(key, node->next));
     }
 
-    template<auto Key, auto Value>
-    void prop(property<Key, Value>) {
-        static internal::meta_prop_node node{
-            *props,
-            []() -> meta_any {
-                return Key;
-            },
-            []() -> meta_any {
-                return Value;
-            }
-        };
-
-        ENTT_ASSERT(!duplicate(meta_any{Key}, *props));
-        *props = &node;
-    }
-
     extended_meta_factory(entt::internal::meta_prop_node **target)
         : props{target}
     {}
@@ -719,13 +703,31 @@ class extended_meta_factory: public meta_factory<Type> {
 public:
     /**
      * @brief Assigns properties to the last meta object created.
-     * @tparam Property Properties to assign to the meta object.
+     * @tparam Key Type of the property key.
+     * @tparam Value Type of the property value.
+     * @param pkey Property key.
+     * @param pvalue Property value.
      * @return A meta factory for the parent type.
      */
-    template<typename... Property>
-    auto prop() {
+    template<typename Key, typename Value>
+    auto prop(Key &&pkey, Value &&pvalue) {
         ENTT_ASSERT(props);
-        (prop(Property{}), ...);
+        static auto key{std::forward<Key>(pkey)};
+        static auto value{std::forward<Value>(pvalue)};
+
+        static internal::meta_prop_node node{
+            *props,
+            []() -> meta_any {
+                return key;
+            },
+            []() -> meta_any {
+                return value;
+            }
+        };
+
+        ENTT_ASSERT(!duplicate(key, *props));
+        *props = &node;
+
         return *this;
     }
 

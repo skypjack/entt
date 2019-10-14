@@ -121,20 +121,6 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 
 
 /**
- * @brief A class to use to push around constexpr properties, nothing more.
- * @tparam Key Property key.
- * @tparam Value Property value.
- */
-template<auto Key, auto Value>
-struct property {
-    /*! @brief Property key. */
-    static constexpr auto key = Key;
-    /*! @brief Property value. */
-    static constexpr auto value = Value;
-};
-
-
-/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.

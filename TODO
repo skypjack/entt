@@ -36,6 +36,5 @@
 
 * make meta work across boundaries
   - extend and make factory::prop more flexible
-  - entt::reflect<T>().type("foo"_hs, entt::as_property); or similar
   - a better context
   - tests, doc
