@@ -57,7 +57,7 @@ LIB_EXPORT void another_module_meta_ctx(entt::meta_ctx context) {
 }
 
 LIB_EXPORT void another_module_meta_init() {
-    entt::meta<int>().type("int"_hs).data<0>("0"_hs);
+    entt::meta<int>().type().data<0>("0"_hs);
 }
 
 LIB_EXPORT void another_module_meta_deinit() {
