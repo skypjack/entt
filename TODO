@@ -36,5 +36,4 @@
 
 * make meta work across boundaries
   - extend and make factory::prop more flexible
-  - a better context
-  - tests, doc
+  - doc

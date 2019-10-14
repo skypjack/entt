@@ -1731,9 +1731,12 @@ private:
 
 /*! @brief Opaque container for a meta context. */
 struct meta_ctx {
-    /*! @brief Sets the context as the current one. */
-    void set() const ENTT_NOEXCEPT {
-        internal::meta_info<>::global = ctx;
+    /**
+     * @brief Binds the meta system to the given context.
+     * @param other A valid context to which to bind.
+     */
+    static void bind(meta_ctx other) ENTT_NOEXCEPT {
+        internal::meta_info<>::global = other.ctx;
     }
 
 private:

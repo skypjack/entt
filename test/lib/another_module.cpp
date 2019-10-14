@@ -52,8 +52,8 @@ LIB_EXPORT void emit_an_event(int payload, test_emitter &emitter) {
     emitter.publish<an_event>(payload);
 }
 
-LIB_EXPORT void another_module_meta_ctx(entt::meta_ctx context) {
-    context.set();
+LIB_EXPORT void another_module_bind_ctx(entt::meta_ctx context) {
+    entt::meta_ctx::bind(context);
 }
 
 LIB_EXPORT void another_module_meta_init() {

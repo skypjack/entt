@@ -20,8 +20,8 @@ extern void trigger_another_event(entt::dispatcher &);
 extern void emit_an_event(int, test_emitter &);
 extern void emit_another_event(test_emitter &);
 
-extern void a_module_meta_ctx(entt::meta_ctx);
-extern void another_module_meta_ctx(entt::meta_ctx);
+extern void a_module_bind_ctx(entt::meta_ctx);
+extern void another_module_bind_ctx(entt::meta_ctx);
 
 extern void a_module_meta_init();
 extern void another_module_meta_init();
@@ -115,8 +115,8 @@ TEST(Lib, Meta) {
     ASSERT_FALSE(entt::resolve<int>().data("0"_hs));
     ASSERT_FALSE(entt::resolve<char>().data("c"_hs));
 
-    a_module_meta_ctx(entt::meta_ctx{});
-    another_module_meta_ctx(entt::meta_ctx{});
+    a_module_bind_ctx(entt::meta_ctx{});
+    another_module_bind_ctx(entt::meta_ctx{});
 
     entt::meta<double>().type("double"_hs).conv<int>();
     another_module_meta_init();
