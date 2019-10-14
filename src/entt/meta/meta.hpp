@@ -975,14 +975,11 @@ struct meta_ctor {
 
     /**
      * @brief Returns the property associated with a given key.
-     * @tparam Key Type of key to use to search for a property.
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
-    template<typename Key>
-    std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
-    prop(Key &&key) const ENTT_NOEXCEPT {
-        return internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
+    meta_prop prop(meta_any key) const ENTT_NOEXCEPT {
+        return internal::find_if([key = std::move(key)](auto *candidate) {
             return candidate->key() == key;
         }, node->prop);
     }
@@ -1178,14 +1175,11 @@ struct meta_data {
 
     /**
      * @brief Returns the property associated with a given key.
-     * @tparam Key Type of key to use to search for a property.
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
-    template<typename Key>
-    std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
-    prop(Key &&key) const ENTT_NOEXCEPT {
-        return internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
+    meta_prop prop(meta_any key) const ENTT_NOEXCEPT {
+        return internal::find_if([key = std::move(key)](auto *candidate) {
             return candidate->key() == key;
         }, node->prop);
     }
@@ -1314,14 +1308,11 @@ struct meta_func {
 
     /**
      * @brief Returns the property associated with a given key.
-     * @tparam Key Type of key to use to search for a property.
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
-    template<typename Key>
-    std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
-    prop(Key &&key) const ENTT_NOEXCEPT {
-        return internal::find_if([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
+    meta_prop prop(meta_any key) const ENTT_NOEXCEPT {
+        return internal::find_if([key = std::move(key)](auto *candidate) {
             return candidate->key() == key;
         }, node->prop);
     }
@@ -1711,14 +1702,11 @@ public:
      * means that the properties of the base classes will also be inspected, if
      * any.
      *
-     * @tparam Key Type of key to use to search for a property.
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
-    template<typename Key>
-    std::enable_if_t<!std::is_invocable_v<Key, meta_prop>, meta_prop>
-    prop(Key &&key) const ENTT_NOEXCEPT {
-        return internal::find_if<&internal::meta_type_node::prop>([key = meta_any{std::forward<Key>(key)}](auto *candidate) {
+    meta_prop prop(meta_any key) const ENTT_NOEXCEPT {
+        return internal::find_if<&internal::meta_type_node::prop>([key = std::move(key)](auto *candidate) {
             return candidate->key() == key;
         }, node);
     }

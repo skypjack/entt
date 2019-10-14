@@ -34,7 +34,6 @@
 * use [[nodiscard]] consistently for safety purposes
 
 * make meta work across boundaries
-  - ::prop: use meta_any as arguments rather than sfinae all around
   - extend and make factory::prop more flexible
   - entt::reflect<T>().type("foo"_hs, entt::as_property); or similar
   - forbid reflecting two times the same type
