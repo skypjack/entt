@@ -265,11 +265,11 @@ class meta_factory {
     auto record(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!duplicate(identifier, *internal::meta_info<>::ctx));
-        ENTT_ASSERT(!duplicate(node, *internal::meta_info<>::ctx));
+        ENTT_ASSERT(!duplicate(identifier, *internal::meta_info<>::global));
+        ENTT_ASSERT(!duplicate(node, *internal::meta_info<>::global));
         node->identifier = identifier;
-        node->next = *internal::meta_info<>::ctx;
-        *internal::meta_info<>::ctx = node;
+        node->next = *internal::meta_info<>::global;
+        *internal::meta_info<>::global = node;
 
         return extended_meta_factory<Type>{&node->prop};
     }
@@ -772,7 +772,7 @@ inline meta_type resolve() ENTT_NOEXCEPT {
 inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
     return internal::find_if([identifier](auto *node) {
         return node->identifier == identifier;
-    }, *internal::meta_info<>::ctx);
+    }, *internal::meta_info<>::global);
 }
 
 
@@ -784,7 +784,7 @@ inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
 template<typename Op>
 inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
 resolve(Op op) ENTT_NOEXCEPT {
-    internal::iterate<meta_type>(std::move(op), *internal::meta_info<>::ctx);
+    internal::iterate<meta_type>(std::move(op), *internal::meta_info<>::global);
 }
 
 

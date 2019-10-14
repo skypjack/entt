@@ -2014,7 +2014,7 @@ TEST_F(Meta, SharedProperties) {
 }
 
 TEST_F(Meta, Reset) {
-    ASSERT_NE(*entt::internal::meta_info<>::ctx, nullptr);
+    ASSERT_NE(*entt::internal::meta_info<>::global, nullptr);
     ASSERT_NE(entt::internal::meta_info<>::local, nullptr);
 
     entt::meta<char>().reset();
@@ -2033,7 +2033,7 @@ TEST_F(Meta, Reset) {
     entt::meta<another_abstract_type>().reset();
     entt::meta<unsigned int>().reset();
 
-    ASSERT_EQ(*entt::internal::meta_info<>::ctx, nullptr);
+    ASSERT_EQ(*entt::internal::meta_info<>::global, nullptr);
     ASSERT_EQ(entt::internal::meta_info<>::local, nullptr);
 
     ASSERT_FALSE(entt::resolve("char"_hs));

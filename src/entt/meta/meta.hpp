@@ -198,7 +198,7 @@ struct meta_node;
 template<>
 struct meta_node<> {
     inline static meta_type_node *local = nullptr;
-    inline static meta_type_node **ctx = &local;
+    inline static meta_type_node **global = &local;
 };
 
 
@@ -208,7 +208,7 @@ struct meta_node<Type> {
 
     static void reset() ENTT_NOEXCEPT {
         auto * const node = resolve();
-        auto **curr = meta_node<>::ctx;
+        auto **curr = meta_node<>::global;
 
         while(*curr && *curr != node) {
             curr = &(*curr)->next;
@@ -267,7 +267,7 @@ struct meta_node<Type> {
         if constexpr(is_named_type_v<Type>) {
             auto *candidate = internal::find_if([](auto *candidate) {
                 return candidate->identifier == named_type_traits<Type>::value;
-            }, *meta_node<>::ctx);
+            }, *meta_node<>::global);
 
             return candidate ? candidate : &node;
         } else {
@@ -1733,7 +1733,7 @@ private:
 struct meta_ctx {
     /*! @brief Sets the context as the current one. */
     void set() const ENTT_NOEXCEPT {
-        internal::meta_info<>::ctx = ctx;
+        internal::meta_info<>::global = ctx;
     }
 
 private:
