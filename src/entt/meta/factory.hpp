@@ -703,6 +703,9 @@ class extended_meta_factory: public meta_factory<Type> {
 public:
     /**
      * @brief Assigns properties to the last meta object created.
+     *
+     * Both the key and the value must be at least copy constructible.
+     *
      * @tparam Key Type of the property key.
      * @tparam Value Type of the property value.
      * @param pkey Property key.

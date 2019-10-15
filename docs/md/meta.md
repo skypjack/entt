@@ -46,13 +46,13 @@ identifier is required, it's likely that a user defined literal is used as
 follows:
 
 ```cpp
-auto factory = entt::reflect<my_type>("reflected_type"_hs);
+auto factory = entt::meta<my_type>().type("reflected_type"_hs);
 ```
 
 For what it's worth, this is likely completely equivalent to:
 
 ```cpp
-auto factory = entt::reflect<my_type>(42);
+auto factory = entt::meta<my_type>().type(42);
 ```
 
 Obviously, human-readable identifiers are more convenient to use and highly
@@ -63,23 +63,33 @@ recommended.
 Reflection always starts from real types (users cannot reflect imaginary types
 and it would not make much sense, we wouldn't be talking about reflection
 anymore).<br/>
-To _reflect_ a type, the library provides the `reflect` function:
+To create a meta node, the library provides the `meta` function that accepts a
+type to reflect as a template parameter:
 
 ```cpp
-auto factory = entt::reflect<my_type>("reflected_type"_hs);
+auto factory = entt::meta<my_type>();
 ```
 
-It accepts the type to reflect as a template parameter and an optional
-identifier as an argument. Identifiers are important because users can retrieve
-meta types at runtime by searching for them by _name_. However, there are cases
-in which users can be interested in adding features to a reflected type so that
-the reflection system can use it correctly under the hood, but they don't want
-to allow searching the type by _name_.<br/>
-In both cases, the returned value is a factory object to use to continue
-building the meta type.
+This isn't enough to _export_ the given type and make it visible though.<br/>
+The returned value is a factory object to use to continue building the meta
+type. In order to make the type _visible_, users can assign it an identifier:
 
-A factory is such that all its member functions returns the factory itself.
-It can be used to extend the reflected type and add the following:
+```cpp
+auto factory = entt::meta<my_type>().type("reflected_type"_hs);
+```
+
+When working with named types, it isn't even necessary to specify the
+identifier. In fact, it isn't allowed and it will trigger a compilation
+error.<br/>
+Identifiers are important because users can retrieve meta types at runtime by
+searching for them by _name_ other than by type. On the other hand, there are
+cases in which users can be interested in adding features to a reflected type so
+that the reflection system can use it correctly under the hood, but they don't
+want to allow searching the type by _name_. In this case, it's sufficient not
+to invoke `type` and the type will not be searchable _by name_.
+
+A factory is such that all its member functions returns the factory itself or
+a decorated version of it. This object can be used to add the following:
 
 * _Constructors_. Actual constructors can be assigned to a reflected type by
   specifying their list of arguments. Free functions (namely, factories) can be
@@ -89,7 +99,7 @@ It can be used to extend the reflected type and add the following:
   Use the `ctor` member function for this purpose:
 
   ```cpp
-  entt::reflect<my_type>("reflected"_hs).ctor<int, char>().ctor<&factory>();
+  entt::meta<my_type>().ctor<int, char>().ctor<&factory>();
   ```
 
 * _Destructors_. Free functions can be set as destructors of reflected types.
@@ -98,7 +108,7 @@ It can be used to extend the reflected type and add the following:
   Use the `dtor` member function for this purpose:
 
   ```cpp
-  entt::reflect<my_type>("reflected"_hs).dtor<&destroy>();
+  entt::meta<my_type>().dtor<&destroy>();
   ```
 
   A function should neither delete nor explicitly invoke the destructor of a
@@ -111,7 +121,7 @@ It can be used to extend the reflected type and add the following:
   Use the `data` member function for this purpose:
 
   ```cpp
-  entt::reflect<my_type>("reflected"_hs)
+  entt::meta<my_type>()
       .data<&my_type::static_variable>("static"_hs)
       .data<&my_type::data_member>("member"_hs)
       .data<&global_variable>("global"_hs);
@@ -132,7 +142,7 @@ It can be used to extend the reflected type and add the following:
   Use the `func` member function for this purpose:
 
   ```cpp
-  entt::reflect<my_type>("reflected"_hs)
+  entt::meta<my_type>()
       .func<&my_type::static_function>("static"_hs)
       .func<&my_type::member_function>("member"_hs)
       .func<&free_function>("free"_hs);
@@ -148,7 +158,7 @@ It can be used to extend the reflected type and add the following:
   Use the `base` member function for this purpose:
 
   ```cpp
-  entt::reflect<derived_type>("derived"_hs).base<base_type>();
+  entt::meta<derived_type>().base<base_type>();
   ```
 
   From now on, wherever a `base_type` is required, an instance of `derived_type`
@@ -161,7 +171,7 @@ It can be used to extend the reflected type and add the following:
   Use the `conv` member function for this purpose:
 
   ```cpp
-  entt::reflect<double>().conv<int>();
+  entt::meta<double>().conv<int>();
   ```
 
 That's all, everything users need to create meta types and enjoy the reflection
@@ -173,7 +183,7 @@ definitely worth the price, at least for me.
 
 ## Any as in any type
 
-The reflection system comes with its own meta any type. It may seem redundant
+The reflection system comes with its own `meta_any` type. It may seem redundant
 since C++17 introduced `std::any`, but it is not.<br/>
 In fact, the _type_ returned by an `std::any` is a const reference to an
 `std::type_info`, an implementation defined class that's not something everyone
@@ -181,26 +191,33 @@ wants to see in a software. Furthermore, the class `std::type_info` suffers from
 some design flaws and there is even no way to _convert_ an `std::type_info` into
 a meta type, thus linking the two worlds.
 
-A meta any object provides an API similar to that of its most famous counterpart
-and serves the same purpose of being an opaque container for any type of
-value.<br/>
+The class `meta_any` offers an API similar to that of its most famous
+counterpart and serves the same purpose of being an opaque container for any
+type of value.<br/>
 It minimizes the allocations required, which are almost absent thanks to _SBO_
 techniques. In fact, unless users deal with _fat types_ and create instances of
-them though the reflection system, allocations are at zero.
+them through the reflection system, allocations are at zero.
 
-A meta any object can be created by any other object or as an empty container
-to initialize later:
+Creating instances of `meta_any`, whether empty or from existing objects, is
+trivial:
 
 ```cpp
-// a meta any object that contains an int
+// a container for an int
 entt::meta_any any{0};
 
-// an empty meta any object
+// an empty container
 entt::meta_any empty{};
 ```
 
-It takes the burden of destroying the contained instance when required.<br/>
-Moreover, it can be used as an opaque container for unmanaged objects if needed:
+The `meta_any` class takes also the burden of destroying the contained object
+when required.<br/>
+Furthermore, an instance of `meta_any` is not tied to a specific type.
+Therefore, the wrapper will be reconfigured by assigning it an object of a
+different type than the one contained, so as to be able to handle the new
+instance.
+
+A particularly interesting feature of this class is that it can also be used as
+an opaque container for unmanaged objects:
 
 ```cpp
 int value;
@@ -212,10 +229,10 @@ a reference to the original instance rather than making a copy of it. The
 contained object is never destroyed and users must ensure that its lifetime
 exceeds that of the container.
 
-A meta any object has a `type` member function that returns the meta type of the
-contained value, if any. The member functions `try_cast`, `cast` and `convert`
-are used to know if the underlying object has a given type as a base or if it
-can be converted implicitly to it.
+The `meta_any` class has also a `type` member function that returns the meta
+type of the contained value, if any. The member functions `try_cast`, `cast` and
+`convert` are used to know if the underlying object has a given type as a base
+or if it can be converted implicitly to it.
 
 ## Enjoy the runtime
 
@@ -245,10 +262,10 @@ resolve([](auto type) {
 });
 ```
 
-In all cases, the returned value is an instance of `meta_type`. This type of
-objects offer an API to know the _runtime identifier_ of the type, to iterate
-all the meta objects associated with them and even to build or destroy instances
-of the underlying type.<br/>
+In all cases, the returned value is an instance of `meta_type`. This kind of
+objects offer an API to know their _runtime identifiers_, to iterate all the
+meta objects associated with them and even to build or destroy instances of the
+underlying type.<br/>
 Refer to the inline documentation for all the details.
 
 The meta objects that compose a meta type are accessed in the following ways:
@@ -285,9 +302,9 @@ The meta objects that compose a meta type are accessed in the following ways:
 
   The returned type is `meta_data` and may be invalid if there is no meta data
   object associated with the given identifier.<br/>
-  A meta data object offers an API to query the underlying type (ie to know if
-  it's a const or a static one), to get the meta type of the variable and to set
-  or get the contained value.
+  A meta data object offers an API to query the underlying type (for example, to
+  know if it's a const or a static one), to get the meta type of the variable
+  and to set or get the contained value.
 
 * _Meta functions_. They are accessed by _name_:
 
@@ -297,11 +314,11 @@ The meta objects that compose a meta type are accessed in the following ways:
 
   The returned type is `meta_func` and may be invalid if there is no meta
   function object associated with the given identifier.<br/>
-  A meta function object offers an API to query the underlying type (ie to know
-  if it's a const or a static function), to know the number of arguments, the
-  meta return type and the meta types of the parameters. In addition, a meta
-  function object can be used to invoke the underlying function and then get the
-  return value in the form of meta any object.
+  A meta function object offers an API to query the underlying type (for
+  example, to know if it's a const or a static function), to know the number of
+  arguments, the meta return type and the meta types of the parameters. In
+  addition, a meta function object can be used to invoke the underlying function
+  and then get the return value in the form of a `meta_any` object.
 
 * _Meta bases_. They are accessed through the _name_ of the base types:
 
@@ -325,16 +342,14 @@ The meta objects that compose a meta type are accessed in the following ways:
   conversion function associated with the given type.<br/>
   The meta conversion functions are as thin as the meta bases and with a very
   similar interface. The sole difference is that they return a newly created
-  instance wrapped in a meta any object when they convert between different
+  instance wrapped in a `meta_any` object when they convert between different
   types.
 
 All the objects thus obtained as well as the meta types can be explicitly
 converted to a boolean value to check if they are valid:
 
 ```cpp
-auto func = entt::resolve<my_type>().func("member"_hs);
-
-if(func) {
+if(auto func = entt::resolve<my_type>().func("member"_hs); func) {
     // ...
 }
 ```
@@ -356,7 +371,7 @@ arguments and searches for a match. It returns a `meta_any` object that may or
 may not be initialized, depending on whether a suitable constructor has been
 found or not. On the other side, the `destroy` member function accepts instances
 of `meta_any` as well as actual objects by reference and invokes the registered
-destructor if any.<br/>
+destructor, if any.<br/>
 Be aware that the result of a call to `destroy` may not be what is expected. The
 purpose is to give users the ability to free up resources that require special
 treatment and **not** to actually destroy instances.
@@ -365,7 +380,7 @@ Meta types and meta objects in general contain much more than what is said: a
 plethora of functions in addition to those listed whose purposes and uses go
 unfortunately beyond the scope of this document.<br/>
 I invite anyone interested in the subject to look at the code, experiment and
-read the official documentation to get the best out of this powerful tool.
+read the inline documentation to get the best out of this powerful tool.
 
 ## Policies: the more, the less
 
@@ -393,14 +408,12 @@ There are a few alternatives available at the moment:
   If the use with functions is obvious, it must be said that it's also possible
   to use this policy with constructors and data members. In the first case, the
   constructor will be invoked but the returned wrapper will actually be empty.
-  In the second case, instead, the property will not be accessible for
-  reading.
+  In the second case, instead, the property will not be accessible for reading.
 
   As an example of use:
 
   ```cpp
-  entt::reflect<my_type>("reflected"_hs)
-      .func<&my_type::member_function, entt::as_void_t>("member"_hs);
+  entt::meta<my_type>().func<&my_type::member_function, entt::as_void_t>("member"_hs);
   ```
 
 * The _as-alias_ policy, associated with the type `entt::as_alias_t`.<br/>
@@ -415,8 +428,7 @@ There are a few alternatives available at the moment:
   As an example of use:
 
   ```cpp
-  entt::reflect<my_type>("reflected"_hs)
-      .data<&my_type::data_member, entt::as_alias_t>("member"_hs);
+  entt::meta<my_type>().data<&my_type::data_member, entt::as_alias_t>("member"_hs);
   ```
 
 Some uses are rather trivial, but it's useful to note that there are some less
@@ -441,11 +453,11 @@ members of the reflected types.
 Exporting constant values or elements from an enum is as simple as ever:
 
 ```cpp
-entt::reflect<my_enum>()
+entt::meta<my_enum>()
         .data<my_enum::a_value>("a_value"_hs)
         .data<my_enum::another_value>("another_value"_hs);
 
-entt::reflect<int>().data<2048>("max_int"_hs);
+entt::meta<int>().data<2048>("max_int"_hs);
 ```
 
 It goes without saying that accessing them is trivial as well. It's a matter of
@@ -457,7 +469,7 @@ auto max = entt::resolve<int>().data("max_int"_hs).get({}).cast<int>();
 ```
 
 As a side note, remember that all this happens behind the scenes without any
-allocation because of the small object optimization performed by the meta any
+allocation because of the small object optimization performed by the `meta_any`
 class.
 
 ## Properties and meta objects
@@ -465,15 +477,26 @@ class.
 Sometimes (for example, when it comes to creating an editor) it might be useful
 to be able to attach properties to the meta objects created. Fortunately, this
 is possible for most of them.<br/>
-To attach a property to a meta object, no matter what as long as it supports
-properties, it is sufficient to provide an object at the time of construction
-such that `std::get<0>` and `std::get<1>` are valid for it. In other terms, the
-properties are nothing more than key/value pairs users can put in an
-`std::pair`. As an example:
+For the meta objects that support properties, the member functions of the
+factory used for registering them will return a decorated version of the factory
+itself. The latter can be used to attach properties to the last created meta
+object.<br/>
+Apparently, it's more difficult to say than to do:
 
-```cpp
-entt::reflect<my_type>("reflected"_hs, std::make_pair("tooltip"_hs, "message"));
 ```
+entt::meta<my_type>()
+        .type("reflected_type"_hs)
+            .prop(entt::hashed_string{"Name"}, "Reflected Type")
+            .prop("tooltip"_hs, "message")
+            .prop(my_enum::a_value, 42);
+```
+
+Properties are always in the key/value form. There are no restrictions on the
+type of the key or value, as long as they are copy constructible objects.<br/>
+The meta objects for which properties are supported are currently the meta
+types, meta constructors, meta data and meta functions. It's not possible to
+attach properties to other types of meta objects and the factory returned as a
+result of their construction won't allow such an operation.
 
 The meta objects that support properties offer then a couple of member functions
 named `prop` to iterate them at once and to search a specific property by key:
@@ -490,7 +513,7 @@ auto prop = entt::resolve<my_type>().prop("tooltip"_hs);
 
 Meta properties are objects having a fairly poor interface, all in all. They
 only provide the `key` and the `value` member functions to be used to retrieve
-the key and the value contained in the form of meta any objects, respectively.
+the key and the value contained in the form of `meta_any` objects, respectively.
 
 ## Unregister types
 
@@ -499,15 +522,13 @@ means unregistering all its data members, member functions, conversion functions
 and so on. However, the base classes won't be unregistered, since they don't
 necessarily depend on it. Similarly, implicitly generated types (as an example,
 the meta types implicitly generated for function parameters when needed) won't
-be unregistered.
-
-To unregister a type, users can use the `unregister` function from the global
-namespace:
+be unregistered.<br/>
+Roughly speaking, unregistering a type means disconnecting all associated meta
+objects from it and making its identifier no longer visible. The underlying node
+will remain available though, as if it were implicitly generated:
 
 ```cpp
-entt::unregister<my_type>();
+entt::meta<my_type>().reset();
 ```
 
-This function returns a boolean value that is true if the type is actually
-registered with the reflection system, false otherwise.<br/>
 The type can be re-registered later with a completely different name and form.
