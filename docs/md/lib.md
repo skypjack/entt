@@ -10,6 +10,7 @@
   * [Do not mix types](#do-not-mix-types)
 * [Macros, macros everywhere](#macros-macros-everywhere)
   * [Conflicts](#conflicts)
+* [Runtime reflection system](#runtime-reflection-system)
 * [Allocations: the dark side of the force](#allocations-the-dark-side-of-the-force)
 <!--
 @endcond TURN_OFF_DOXYGEN
@@ -128,6 +129,46 @@ Unfortunately, there is no safe way to prevent it. If this happens, it will be
 enough to give a different value to one of the conflicting types to solve the
 problem. To do this, users can either assign a different name to the class or
 directly define a specialization for the `named_type_traits` class template.
+
+# Runtime reflection system
+
+The runtime reflection system deserves a special mention when it comes to using
+it across boundaries.<br/>
+As in all other cases, it's necessary to give a name to the types. However, this
+time this isn't enough to get the job done.
+
+The runtime reflection system is linked to a static context to which the visible
+components are linked. A component is visible when it's given a name, so the
+named components are implicitly visible.<br/>
+Different contexts don't relate to each other. Therefore, to allow the use of
+named types across boundaries, a context must also be shared.
+
+Sharing a context is straightforward. First of all, the local one must be
+acquired:
+
+```
+entt::meta_ctx ctx{};
+```
+
+Then, it must be pushed across boundaries and the receiving space must set it as
+its global context, thus releasing the local one that remains available but is
+no longer referred to by the runtime reflection system:
+
+```
+entt::meta_ctx::bind(ctx);
+```
+
+From now on, both spaces will refer to the same context and on it will be
+associated the new visible meta types, no matter _where_ they are created.
+
+A context can also be reset and then associated again locally as:
+
+```
+entt::meta_ctx::bind{entt::meta_ctx{});
+```
+
+This is allowed because local and global contexts are separated. Therefore, it's
+always possible to make the local context the current one again.
 
 # Allocations: the dark side of the force
 

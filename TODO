@@ -36,4 +36,3 @@
 
 * make meta work across boundaries
   - extend and make factory::prop more flexible
-  - doc (lib.md)
