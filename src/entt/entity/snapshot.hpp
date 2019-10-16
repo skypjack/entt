@@ -135,25 +135,7 @@ public:
      */
     template<typename... Component, typename Archive>
     const basic_snapshot & component(Archive &archive) const {
-        if constexpr(sizeof...(Component) == 1) {
-            const auto sz = reg->template size<Component...>();
-            const auto *entities = reg->template data<Component...>();
-
-            archive(typename traits_type::entity_type(sz));
-
-            for(std::remove_const_t<decltype(sz)> pos{}; pos < sz; ++pos) {
-                const auto entt = entities[pos];
-
-                if constexpr(std::is_empty_v<Component...>) {
-                    archive(entt);
-                } else {
-                    archive(entt, reg->template get<Component...>(entt));
-                }
-            };
-        } else {
-            (component<Component>(archive), ...);
-        }
-
+        (component<Component>(archive, reg->template data<Component>(), reg->template data<Component>() + reg->template size<Component>()), ...);
         return *this;
     }
 

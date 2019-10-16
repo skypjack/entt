@@ -72,8 +72,8 @@ class basic_registry {
         decltype(auto) assign(basic_registry &registry, const Entity entt, Args &&... args) {
             if constexpr(std::is_empty_v<Component>) {
                 storage<Entity, Component>::construct(entt);
-                construction.publish(entt, registry, Component{std::forward<Args>(args)...});
-                return Component{};
+                construction.publish(entt, registry, Component{});
+                return Component{std::forward<Args>(args)...};
             } else {
                 auto &component = storage<Entity, Component>::construct(entt, std::forward<Args>(args)...);
                 construction.publish(entt, registry, component);
