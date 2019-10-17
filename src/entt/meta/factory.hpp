@@ -747,6 +747,24 @@ public:
         return *this;
     }
 
+    /**
+     * @brief Assigns properties to the last meta object created.
+     *
+     * Both the keys and the values (if any) must be at least copy constructible.
+     *
+     * @tparam Key Types of the properties keys.
+     * @tparam Value Optional types of the property values.
+     * @param pkey Property keys.
+     * @param pvalue Optional property values.
+     * @return A meta factory for the parent type.
+     */
+    template <typename... Property>
+    auto props(Property... ps) {
+		(unpack (0, ps), ...);
+
+        return *this;
+    }
+
 private:
     entt::internal::meta_prop_node **curr{nullptr};
 };
