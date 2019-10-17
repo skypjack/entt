@@ -730,7 +730,7 @@ class extended_meta_factory: public meta_factory<Type> {
 
 public:
     /**
-     * @brief Assigns properties to the last meta object created.
+     * @brief Assigns property to the last meta object created.
      *
      * Both the key and the value (if any) must be at least copy constructible.
      *
