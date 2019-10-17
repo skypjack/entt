@@ -19,7 +19,8 @@ Type get(Type &prop) {
 
 enum class properties {
     prop_int,
-    prop_bool
+    prop_bool,
+    key_only
 };
 
 struct empty_type {
@@ -156,6 +157,9 @@ struct Meta: ::testing::Test {
                 .data<properties::prop_int>("prop_int"_hs)
                     .prop(properties::prop_bool, true)
                     .prop(properties::prop_int, 0)
+                    .prop(properties::key_only)
+                .data<properties::key_only>("key_only"_hs)
+                    .prop(properties::key_only)
                 .data<&set<properties>, &get<properties>>("value"_hs);
 
         entt::meta<unsigned int>().data<0u>("min"_hs).data<100u>("max"_hs);
@@ -2011,6 +2015,17 @@ TEST_F(Meta, SharedProperties) {
 
     ASSERT_TRUE(prop_int.prop(properties::prop_int));
     ASSERT_TRUE(prop_int.prop(properties::prop_bool));
+}
+
+TEST_F(Meta, KeyOnlyProperties) {
+    const auto type = entt::resolve<properties>();
+    const auto prop = type.data("key_only"_hs).prop(properties::key_only);
+
+    ASSERT_TRUE(prop);
+    ASSERT_TRUE(prop.key());
+    ASSERT_EQ(prop.key().type(), entt::resolve<properties>());
+    ASSERT_EQ(prop.key().cast<properties>(), properties::key_only);
+    ASSERT_FALSE(prop.value());
 }
 
 TEST_F(Meta, Reset) {

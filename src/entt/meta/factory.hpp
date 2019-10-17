@@ -704,31 +704,34 @@ public:
     /**
      * @brief Assigns properties to the last meta object created.
      *
-     * Both the key and the value must be at least copy constructible.
+     * Both the key and the value (if any) must be at least copy constructible.
      *
      * @tparam Key Type of the property key.
-     * @tparam Value Type of the property value.
+     * @tparam Value Optional type of the property value.
      * @param pkey Property key.
-     * @param pvalue Property value.
+     * @param pvalue Optional property value.
      * @return A meta factory for the parent type.
      */
-    template<typename Key, typename Value>
-    auto prop(Key &&pkey, Value &&pvalue) {
-        ENTT_ASSERT(props);
-        static auto key{std::forward<Key>(pkey)};
-        static auto value{std::forward<Value>(pvalue)};
+    template<typename Key, typename... Value>
+    auto prop(Key &&pkey, Value &&... pvalue) {
+        static_assert(sizeof...(Value) <= 1);
+        static auto property{std::make_tuple(std::forward<Key>(pkey), std::forward<Value>(pvalue)...)};
 
         static internal::meta_prop_node node{
             *props,
             []() -> meta_any {
-                return key;
+                return std::get<0>(property);
             },
             []() -> meta_any {
-                return value;
+                if constexpr(sizeof...(Value) == 0) {
+                    return {};
+                } else {
+                    return std::get<1>(property);
+                }
             }
         };
 
-        ENTT_ASSERT(!duplicate(key, *props));
+        ENTT_ASSERT(!duplicate(node.key(), *props));
         *props = &node;
 
         return *this;
