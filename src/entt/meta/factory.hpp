@@ -696,29 +696,18 @@ class extended_meta_factory: public meta_factory<Type> {
         return node && (node->key() == key || duplicate(key, node->next));
     }
 
-    extended_meta_factory(entt::internal::meta_prop_node **target)
-        : props{target}
-    {}
+    template<typename Property>
+    auto unpack(int, Property &&property)
+    -> decltype(std::get<1>(property), void()) {
+        unpack(0, std::get<0>(property), std::get<1>(property));
+    }
 
-public:
-    /**
-     * @brief Assigns properties to the last meta object created.
-     *
-     * Both the key and the value (if any) must be at least copy constructible.
-     *
-     * @tparam Key Type of the property key.
-     * @tparam Value Optional type of the property value.
-     * @param pkey Property key.
-     * @param pvalue Optional property value.
-     * @return A meta factory for the parent type.
-     */
     template<typename Key, typename... Value>
-    auto prop(Key &&pkey, Value &&... pvalue) {
-        static_assert(sizeof...(Value) <= 1);
+    void unpack(char, Key &&pkey, Value &&... pvalue) {
         static auto property{std::make_tuple(std::forward<Key>(pkey), std::forward<Value>(pvalue)...)};
 
         static internal::meta_prop_node node{
-            *props,
+            *curr,
             []() -> meta_any {
                 return std::get<0>(property);
             },
@@ -731,14 +720,35 @@ public:
             }
         };
 
-        ENTT_ASSERT(!duplicate(node.key(), *props));
-        *props = &node;
+        ENTT_ASSERT(!duplicate(node.key(), *curr));
+        *curr = &node;
+    }
 
+    extended_meta_factory(entt::internal::meta_prop_node **target)
+        : curr{target}
+    {}
+
+public:
+    /**
+     * @brief Assigns properties to the last meta object created.
+     *
+     * Both the key and the value (if any) must be at least copy constructible.
+     *
+     * @tparam PropertyOrKey Type of the property or property key.
+     * @tparam Value Optional type of the property value.
+     * @param property_or_key Property or property key.
+     * @param value Optional property value.
+     * @return A meta factory for the parent type.
+     */
+    template<typename PropertyOrKey, typename... Value>
+    auto prop(PropertyOrKey &&property_or_key, Value &&... value) {
+        static_assert(sizeof...(Value) <= 1);
+        unpack(0, std::forward<PropertyOrKey>(property_or_key), std::forward<Value>(value)...);
         return *this;
     }
 
 private:
-    entt::internal::meta_prop_node **props{nullptr};
+    entt::internal::meta_prop_node **curr{nullptr};
 };
 
 

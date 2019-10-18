@@ -483,26 +483,55 @@ itself. The latter can be used to attach properties to the last created meta
 object.<br/>
 Apparently, it's more difficult to say than to do:
 
-```
-entt::meta<my_type>()
-        .type("reflected_type"_hs)
-            .prop(entt::hashed_string{"Name"}, "Reflected Type")
-            .prop("tooltip"_hs, "message")
-            .prop(my_enum::a_value, 42);
+```cpp
+entt::meta<my_type>().type("reflected_type"_hs).prop("tooltip"_hs, "message");
 ```
 
 Properties are always in the key/value form. There are no restrictions on the
 type of the key or value, as long as they are copy constructible objects.<br/>
+Furthermore, the `prop` function supports different formats for properties:
+
+* Properties as key/value pairs:
+
+  ```cpp
+  entt::meta<my_type>().type("reflected_type"_hs).prop("tooltip"_hs, "message");
+  ```
+
+* Properties as _`std::get<1>`-table_ objects:
+
+  ```cpp
+  entt::meta<my_type>().type("reflected_type"_hs).prop(std::make_pair("tooltip"_hs, "message"));
+  ```
+
+* Key only properties:
+
+  ```cpp
+  entt::meta<my_type>().type("reflected_type"_hs).prop("tooltip"_hs, "message");
+  ```
+
+In any case, one property can be associated at a time. However, it's possible to
+invoke the `prop` function several times, one for each property to associate
+with the last meta object created:
+
+```cpp
+entt::meta<my_type>()
+        .type("reflected_type"_hs)
+            .prop(entt::hashed_string{"Name"}, "Reflected Type")
+        .data<&my_type::data_member>("member"_hs)
+            .prop(std::make_pair("tooltip"_hs, "Member"))
+            .prop(my_enum::a_value, 42);
+```
+
 The meta objects for which properties are supported are currently the meta
 types, meta constructors, meta data and meta functions. It's not possible to
 attach properties to other types of meta objects and the factory returned as a
 result of their construction won't allow such an operation.
 
-The meta objects that support properties offer then a couple of member functions
-named `prop` to iterate them at once and to search a specific property by key:
+These types offer a couple of member functions named `prop` to iterate all
+properties at once or to search a specific property by key:
 
 ```cpp
-// iterate all the properties of a meta type
+// iterate all properties of a meta type
 entt::resolve<my_type>().prop([](auto prop) {
     // ...
 });
