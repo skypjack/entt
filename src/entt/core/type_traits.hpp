@@ -2,12 +2,31 @@
 #define ENTT_CORE_TYPE_TRAITS_HPP
 
 
+#include <cstddef>
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/hashed_string.hpp"
 
 
 namespace entt {
+
+
+/**
+ * @brief Utility class to disambiguate overloaded functions.
+ * @tparam N Current step.
+ */
+template<std::size_t N>
+struct choice
+        // Unfortunately, doxygen cannot parse such a construct.
+        /*! @cond TURN_OFF_DOXYGEN */
+        : choice<N-1>
+        /*! @endcond TURN_OFF_DOXYGEN */
+{};
+
+
+/*! @copybrief choice */
+template<>
+struct choice<0> {};
 
 
 /*! @brief A class to use to push around lists of types, nothing more. */
