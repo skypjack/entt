@@ -506,7 +506,7 @@ Furthermore, the `prop` function supports different formats for properties:
 * Key only properties:
 
   ```cpp
-  entt::meta<my_type>().type("reflected_type"_hs).prop("tooltip"_hs, "message");
+  entt::meta<my_type>().type("reflected_type"_hs).prop(my_enum::key_only);
   ```
 
 In any case, one property can be associated at a time. However, it's possible to
