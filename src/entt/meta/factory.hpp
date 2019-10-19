@@ -712,9 +712,9 @@ class extended_meta_factory: public meta_factory<Type> {
     }
 
     template<typename Func>
-    auto unpack(choice_t<1>, Func func)
-    -> decltype(unpack(choice<3>, func())) {
-        unpack(choice<3>, func());
+    std::enable_if_t<std::is_invocable_v<Func>, void>
+    unpack(choice_t<1>, Func &&func) {
+        unpack(choice<3>, std::forward<Func>(func)());
     }
 
     template<typename Key, typename... Value>
