@@ -287,7 +287,7 @@ public:
           release{},
           view{}
     {
-        connect<Matcher...>(reg, std::make_index_sequence<sizeof...(Matcher)>{});
+        connect<Matcher...>(reg, std::index_sequence_for<Matcher...>{});
     }
 
     /*! @brief Default destructor. */
@@ -313,7 +313,7 @@ public:
     template<typename... Matcher>
     void connect(basic_registry<entity_type> &reg, basic_collector<Matcher...>) {
         disconnect();
-        connect<Matcher...>(reg, std::make_index_sequence<sizeof...(Matcher)>{});
+        connect<Matcher...>(reg, std::index_sequence_for<Matcher...>{});
         target = &reg;
         view.reset();
     }

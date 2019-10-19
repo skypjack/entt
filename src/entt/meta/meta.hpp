@@ -1563,7 +1563,7 @@ public:
      */
     template<typename... Args>
     meta_ctor ctor() const ENTT_NOEXCEPT {
-        return ctor<Args...>(std::make_index_sequence<sizeof...(Args)>{}, node);
+        return ctor<Args...>(std::index_sequence_for<Args...>{}, node);
     }
 
     /**

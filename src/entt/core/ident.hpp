@@ -54,7 +54,7 @@ public:
 
     /*! @brief Statically generated unique identifier for the given type. */
     template<typename Type>
-    static constexpr identifier_type type = get<std::decay_t<Type>>(std::make_index_sequence<sizeof...(Types)>{});
+    static constexpr identifier_type type = get<std::decay_t<Type>>(std::index_sequence_for<Types...>{});
 };
 
 

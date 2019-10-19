@@ -51,18 +51,10 @@ template<typename... Type>
 using to_function_pointer_t = decltype(internal::to_function_pointer(std::declval<Type>()...));
 
 
-template<typename>
-struct function_extent;
-
-
 template<typename Ret, typename... Args>
-struct function_extent<Ret(*)(Args...)> {
-    static constexpr auto value = sizeof...(Args);
-};
-
-
-template<typename Func>
-constexpr auto function_extent_v = function_extent<Func>::value;
+constexpr auto index_sequence_for(Ret(*)(Args...)) {
+    return std::index_sequence_for<Args...>{};
+}
 
 
 }
@@ -200,8 +192,7 @@ public:
      */
     template<auto Function>
     void connect() ENTT_NOEXCEPT {
-        constexpr auto extent = internal::function_extent_v<internal::to_function_pointer_t<decltype(Function)>>;
-        connect<Function>(std::make_index_sequence<extent>{});
+        connect<Function>(internal::index_sequence_for(internal::to_function_pointer_t<decltype(Function)>{}));
     }
 
     /**
@@ -221,8 +212,7 @@ public:
      */
     template<auto Candidate, typename Type>
     void connect(Type &value_or_instance) ENTT_NOEXCEPT {
-        constexpr auto extent = internal::function_extent_v<internal::to_function_pointer_t<decltype(Candidate), Type *>>;
-        connect<Candidate>(value_or_instance, std::make_index_sequence<extent>{});
+        connect<Candidate>(value_or_instance, internal::index_sequence_for(internal::to_function_pointer_t<decltype(Candidate), Type *>{}));
     }
 
     /**
@@ -242,8 +232,7 @@ public:
      */
     template<auto Candidate, typename Type>
     void connect(Type *value_or_instance) ENTT_NOEXCEPT {
-        constexpr auto extent = internal::function_extent_v<internal::to_function_pointer_t<decltype(Candidate), Type *>>;
-        connect<Candidate>(value_or_instance, std::make_index_sequence<extent>{});
+        connect<Candidate>(value_or_instance, internal::index_sequence_for(internal::to_function_pointer_t<decltype(Candidate), Type *>{}));
     }
 
     /**

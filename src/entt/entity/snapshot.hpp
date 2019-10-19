@@ -155,7 +155,7 @@ public:
      */
     template<typename... Component, typename Archive, typename It>
     const basic_snapshot & component(Archive &archive, It first, It last) const {
-        component<Component...>(archive, first, last, std::make_index_sequence<sizeof...(Component)>{});
+        component<Component...>(archive, first, last, std::index_sequence_for<Component...>{});
         return *this;
     }
 
