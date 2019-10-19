@@ -509,9 +509,19 @@ Furthermore, the `prop` function supports different formats for properties:
   entt::meta<my_type>().type("reflected_type"_hs).prop(my_enum::key_only);
   ```
 
-In any case, one property can be associated at a time. However, it's possible to
-invoke the `prop` function several times, one for each property to associate
-with the last meta object created:
+* Properties as `std::tuple`s:
+
+  ```cpp
+  entt::meta<my_type>().type("reflected_type"_hs)
+          .prop(std::make_tuple(std::make_pair("tooltip"_hs, "message"), my_enum::key_only));
+  ```
+
+  A tuple can contain one or more properties expressed as described above,
+  except for the key/value form. It will be unpacked and the properties will be
+  treated individually.
+
+It's possible to invoke the `prop` function several times if needed, one for
+each property to associate with the last meta object created:
 
 ```cpp
 entt::meta<my_type>()

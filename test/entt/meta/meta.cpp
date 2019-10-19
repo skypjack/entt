@@ -156,14 +156,13 @@ struct Meta: ::testing::Test {
                 .data<properties::prop_bool>("prop_bool"_hs)
                     .prop(properties::prop_int, 0)
                 .data<properties::prop_int>("prop_int"_hs)
-                    .prop(std::make_pair(properties::prop_bool, true))
-                    .prop(std::make_pair(properties::prop_int, 0))
+                    .prop(std::make_tuple(std::make_pair(properties::prop_bool, true), std::make_pair(properties::prop_int, 0)))
                     .prop(properties::key_only)
                 .data<properties::key_only>("key_only"_hs)
                     .prop(properties::key_only)
                 .data<&set<properties>, &get<properties>>("value"_hs)
                 .data<properties::prop_list>("prop_list"_hs)
-                    .props(std::pair{properties::prop_bool, true}, std::pair{properties::prop_int, 0}, properties::key_only);
+                    .props(std::make_pair(properties::prop_bool, true), std::make_pair(properties::prop_int, 0), properties::key_only);
 
         entt::meta<unsigned int>().data<0u>("min"_hs).data<100u>("max"_hs);
 

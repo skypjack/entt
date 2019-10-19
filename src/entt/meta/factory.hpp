@@ -35,7 +35,7 @@ struct meta_function_helper<Ret(Args...)> {
     using return_type = std::remove_cv_t<std::remove_reference_t<Ret>>;
     using args_type = std::tuple<std::remove_cv_t<std::remove_reference_t<Args>>...>;
 
-    static constexpr auto size = sizeof...(Args);
+    static constexpr std::index_sequence_for<Args...> index_sequence{};
     static constexpr auto is_const = false;
 
     static auto arg(typename internal::meta_func_node::size_type index) ENTT_NOEXCEPT {
@@ -415,10 +415,10 @@ public:
             type,
             nullptr,
             nullptr,
-            helper_type::size,
+            helper_type::index_sequence.size(),
             &helper_type::arg,
             [](meta_any * const any) {
-                return internal::invoke<Type, Func, Policy>({}, any, std::make_index_sequence<helper_type::size>{});
+                return internal::invoke<Type, Func, Policy>({}, any, helper_type::index_sequence);
             }
         };
 
@@ -448,10 +448,10 @@ public:
             type,
             nullptr,
             nullptr,
-            helper_type::size,
+            helper_type::index_sequence.size(),
             &helper_type::arg,
             [](meta_any * const any) {
-                return internal::construct<Type, std::remove_cv_t<std::remove_reference_t<Args>>...>(any, std::make_index_sequence<helper_type::size>{});
+                return internal::construct<Type, std::remove_cv_t<std::remove_reference_t<Args>>...>(any, helper_type::index_sequence);
             }
         };
 
@@ -650,13 +650,13 @@ public:
             type,
             nullptr,
             nullptr,
-            helper_type::size,
+            helper_type::index_sequence.size(),
             helper_type::is_const,
             !std::is_member_function_pointer_v<decltype(Candidate)>,
             &internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename helper_type::return_type>>::resolve,
             &helper_type::arg,
             [](meta_handle handle, meta_any *any) {
-                return internal::invoke<Type, Candidate, Policy>(handle, any, std::make_index_sequence<helper_type::size>{});
+                return internal::invoke<Type, Candidate, Policy>(handle, any, helper_type::index_sequence);
             }
         };
 
@@ -696,13 +696,23 @@ class extended_meta_factory: public meta_factory<Type> {
         return node && (node->key() == key || duplicate(key, node->next));
     }
 
+    template<typename... Property, std::size_t... Index>
+    void unpack(std::tuple<Property...> property, std::index_sequence<Index...>) {
+        (unpack(choice<2>, std::get<Index>(property)), ...);
+    }
+
     template<typename... Property>
-    void unpack(int, std::pair<Property...> property) {
-        unpack(0, std::get<0>(property), std::get<1>(property));
+    void unpack(choice_t<2>, std::tuple<Property...> property) {
+        unpack(std::move(property), std::index_sequence_for<Property...>{});
+    }
+
+    template<typename... KeyOrValue>
+    void unpack(choice_t<1>, std::pair<KeyOrValue...> property) {
+        unpack(choice<0>, std::move(property.first), std::move(property.second));
     }
 
     template<typename Key, typename... Value>
-    void unpack(char, Key &&key, Value &&... value) {
+    void unpack(choice_t<0>, Key &&key, Value &&... value) {
         static auto property{std::make_tuple(std::forward<Key>(key), std::forward<Value>(value)...)};
 
         static internal::meta_prop_node node{
@@ -742,7 +752,7 @@ public:
     template<typename PropertyOrKey, typename... Value>
     auto prop(PropertyOrKey &&property_or_key, Value &&... value) {
         static_assert(sizeof...(Value) <= 1);
-        unpack(0, std::forward<PropertyOrKey>(property_or_key), std::forward<Value>(value)...);
+        unpack(choice<2>, std::forward<PropertyOrKey>(property_or_key), std::forward<Value>(value)...);
         return *this;
     }
 
@@ -758,7 +768,7 @@ public:
      */
     template <typename... Property>
     auto props(Property... property) {
-        (unpack(0, property), ...);
+        (prop(property), ...);
         return *this;
     }
 
