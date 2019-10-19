@@ -159,7 +159,7 @@ struct Meta: ::testing::Test {
                     .prop(std::make_tuple(std::make_pair(properties::prop_bool, true), std::make_pair(properties::prop_int, 0)))
                     .prop(properties::key_only)
                 .data<properties::key_only>("key_only"_hs)
-                    .prop(properties::key_only)
+                    .prop([]() { return properties::key_only; })
                 .data<&set<properties>, &get<properties>>("value"_hs)
                 .data<properties::prop_list>("prop_list"_hs)
                     .props(std::make_pair(properties::prop_bool, true), std::make_pair(properties::prop_int, 0), properties::key_only);

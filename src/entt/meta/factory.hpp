@@ -698,17 +698,23 @@ class extended_meta_factory: public meta_factory<Type> {
 
     template<typename... Property, std::size_t... Index>
     void unpack(std::tuple<Property...> property, std::index_sequence<Index...>) {
-        (unpack(choice<2>, std::get<Index>(property)), ...);
+        (unpack(choice<3>, std::get<Index>(property)), ...);
     }
 
     template<typename... Property>
-    void unpack(choice_t<2>, std::tuple<Property...> property) {
+    void unpack(choice_t<3>, std::tuple<Property...> property) {
         unpack(std::move(property), std::index_sequence_for<Property...>{});
     }
 
     template<typename... KeyOrValue>
-    void unpack(choice_t<1>, std::pair<KeyOrValue...> property) {
+    void unpack(choice_t<2>, std::pair<KeyOrValue...> property) {
         unpack(choice<0>, std::move(property.first), std::move(property.second));
+    }
+
+    template<typename Func>
+    auto unpack(choice_t<1>, Func func)
+    -> decltype(unpack(choice<3>, func())) {
+        unpack(choice<3>, func());
     }
 
     template<typename Key, typename... Value>
@@ -752,7 +758,7 @@ public:
     template<typename PropertyOrKey, typename... Value>
     auto prop(PropertyOrKey &&property_or_key, Value &&... value) {
         static_assert(sizeof...(Value) <= 1);
-        unpack(choice<2>, std::forward<PropertyOrKey>(property_or_key), std::forward<Value>(value)...);
+        unpack(choice<3>, std::forward<PropertyOrKey>(property_or_key), std::forward<Value>(value)...);
         return *this;
     }
 

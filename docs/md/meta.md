@@ -516,9 +516,18 @@ Furthermore, the `prop` function supports different formats for properties:
           .prop(std::make_tuple(std::make_pair("tooltip"_hs, "message"), my_enum::key_only));
   ```
 
-  A tuple can contain one or more properties expressed as described above,
-  except for the key/value form. It will be unpacked and the properties will be
-  treated individually.
+  A tuple can contain one or more properties defined as described above, except
+  for the key/value form. The properties will be treated individually.
+
+* Annotations:
+
+  ```cpp
+  entt::meta<my_type>().type("reflected_type"_hs).prop(&property_generator);
+  ```
+
+  An annotation is an invocable object that returns one or more properties
+  defined as described above, except for the key/value form. The properties will
+  be treated individually.
 
 It's possible to invoke the `prop` function several times if needed, one for
 each property to associate with the last meta object created:
