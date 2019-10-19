@@ -497,7 +497,7 @@ Furthermore, the `prop` function supports different formats for properties:
   entt::meta<my_type>().type("reflected_type"_hs).prop("tooltip"_hs, "message");
   ```
 
-* Properties as _`std::get<1>`-table_ objects:
+* Properties as `std::pair`s:
 
   ```cpp
   entt::meta<my_type>().type("reflected_type"_hs).prop(std::make_pair("tooltip"_hs, "message"));

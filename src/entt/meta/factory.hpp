@@ -696,9 +696,8 @@ class extended_meta_factory: public meta_factory<Type> {
         return node && (node->key() == key || duplicate(key, node->next));
     }
 
-    template<typename Property>
-    auto unpack(int, Property &&property)
-    -> decltype(std::get<1>(property), void()) {
+    template<typename... Property>
+    void unpack(int, std::pair<Property...> property) {
         unpack(0, std::get<0>(property), std::get<1>(property));
     }
 
