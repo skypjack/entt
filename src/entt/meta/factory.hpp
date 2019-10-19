@@ -703,8 +703,8 @@ class extended_meta_factory: public meta_factory<Type> {
     }
 
     template<typename Key, typename... Value>
-    void unpack(char, Key &&pkey, Value &&... pvalue) {
-        static auto property{std::make_tuple(std::forward<Key>(pkey), std::forward<Value>(pvalue)...)};
+    void unpack(char, Key &&key, Value &&... value) {
+        static auto property{std::make_tuple(std::forward<Key>(key), std::forward<Value>(value)...)};
 
         static internal::meta_prop_node node{
             *curr,
@@ -730,7 +730,7 @@ class extended_meta_factory: public meta_factory<Type> {
 
 public:
     /**
-     * @brief Assigns properties to the last meta object created.
+     * @brief Assigns a property to the last meta object created.
      *
      * Both the key and the value (if any) must be at least copy constructible.
      *
@@ -744,6 +744,22 @@ public:
     auto prop(PropertyOrKey &&property_or_key, Value &&... value) {
         static_assert(sizeof...(Value) <= 1);
         unpack(0, std::forward<PropertyOrKey>(property_or_key), std::forward<Value>(value)...);
+        return *this;
+    }
+
+    /**
+     * @brief Assigns properties to the last meta object created.
+     *
+     * Both the keys and the values (if any) must be at least copy
+     * constructible.
+     *
+     * @tparam Property Types of the properties.
+     * @param property Properties to assign to the last meta object created.
+     * @return A meta factory for the parent type.
+     */
+    template <typename... Property>
+    auto props(Property... property) {
+        (unpack(0, property), ...);
         return *this;
     }
 

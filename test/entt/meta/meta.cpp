@@ -20,7 +20,8 @@ Type get(Type &prop) {
 enum class properties {
     prop_int,
     prop_bool,
-    key_only
+    key_only,
+    prop_list
 };
 
 struct empty_type {
@@ -160,7 +161,9 @@ struct Meta: ::testing::Test {
                     .prop(properties::key_only)
                 .data<properties::key_only>("key_only"_hs)
                     .prop(properties::key_only)
-                .data<&set<properties>, &get<properties>>("value"_hs);
+                .data<&set<properties>, &get<properties>>("value"_hs)
+                .data<properties::prop_list>("prop_list"_hs)
+                    .props(std::pair{properties::prop_bool, true}, std::pair{properties::prop_int, 0}, properties::key_only);
 
         entt::meta<unsigned int>().data<0u>("min"_hs).data<100u>("max"_hs);
 
@@ -2026,6 +2029,32 @@ TEST_F(Meta, KeyOnlyProperties) {
     ASSERT_EQ(prop.key().type(), entt::resolve<properties>());
     ASSERT_EQ(prop.key().cast<properties>(), properties::key_only);
     ASSERT_FALSE(prop.value());
+}
+
+TEST_F(Meta, PropertyList) {
+    const auto type = entt::resolve<properties>();
+    const auto prop_list = type.data("prop_list"_hs);
+    const auto prop_bool = prop_list.prop(properties::prop_bool);
+    const auto prop_int =  prop_list.prop(properties::prop_int);
+    const auto key_prop = prop_list.prop(properties::key_only);
+
+    ASSERT_TRUE(prop_bool);
+    ASSERT_EQ(prop_bool.key().type(), entt::resolve<properties>());
+    ASSERT_EQ(prop_bool.key().cast<properties>(), properties::prop_bool);
+    ASSERT_TRUE(prop_bool.value());
+    ASSERT_TRUE(prop_bool.value().try_cast<bool>());
+
+    ASSERT_TRUE(prop_int);
+    ASSERT_EQ(prop_int.key().type(), entt::resolve<properties>());
+    ASSERT_EQ(prop_int.key().cast<properties>(), properties::prop_int);
+    ASSERT_TRUE(prop_int.value());
+    ASSERT_TRUE(prop_int.value().try_cast<int>());
+
+    ASSERT_TRUE(key_prop);
+    ASSERT_TRUE(key_prop.key());
+    ASSERT_EQ(key_prop.key().type(), entt::resolve<properties>());
+    ASSERT_EQ(key_prop.key().cast<properties>(), properties::key_only);
+    ASSERT_FALSE(key_prop.value());
 }
 
 TEST_F(Meta, Reset) {

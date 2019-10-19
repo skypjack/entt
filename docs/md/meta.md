@@ -522,6 +522,11 @@ entt::meta<my_type>()
             .prop(my_enum::a_value, 42);
 ```
 
+Alternatively, the `props` function is available to associate several properties
+at a time. However, in this case properties in the key/value form aren't
+allowed, since they would be interpreted as two different properties rather than
+a single one.
+
 The meta objects for which properties are supported are currently the meta
 types, meta constructors, meta data and meta functions. It's not possible to
 attach properties to other types of meta objects and the factory returned as a
