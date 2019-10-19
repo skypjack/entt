@@ -13,20 +13,28 @@ namespace entt {
 
 /**
  * @brief Utility class to disambiguate overloaded functions.
- * @tparam N Current step.
+ * @tparam N Number of choices available.
  */
 template<std::size_t N>
-struct choice
+struct choice_t
         // Unfortunately, doxygen cannot parse such a construct.
         /*! @cond TURN_OFF_DOXYGEN */
-        : choice<N-1>
+        : choice_t<N-1>
         /*! @endcond TURN_OFF_DOXYGEN */
 {};
 
 
-/*! @copybrief choice */
+/*! @copybrief choice_t */
 template<>
-struct choice<0> {};
+struct choice_t<0> {};
+
+
+/**
+ * @brief Variable template for the choice trick.
+ * @tparam N Number of choices available.
+ */
+template<std::size_t N>
+constexpr choice_t<N> choice{};
 
 
 /*! @brief A class to use to push around lists of types, nothing more. */
