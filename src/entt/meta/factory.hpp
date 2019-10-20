@@ -686,39 +686,47 @@ public:
 /**
  * @brief Extended meta factory to be used for reflection purposes.
  * @tparam Type Reflected type for which the factory was created.
+ * @tparam Spec Property specialization pack used to disambiguate overloads.
  */
-template<typename Type, typename...>
+template<typename Type, typename... Spec>
 class extended_meta_factory: public meta_factory<Type> {
-    /*! @brief A meta factory is allowed to _extend_ itself. */
-    friend class meta_factory<Type>;
-
     bool duplicate(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
         return node && (node->key() == key || duplicate(key, node->next));
     }
 
-    template<typename... Property, std::size_t... Index>
-    void unpack(std::tuple<Property...> property, std::index_sequence<Index...>) {
-        (unpack(choice<3>, std::get<Index>(property)), ...);
+    template<std::size_t Step = 0, std::size_t... Index, typename... Property, typename... Other>
+    void unpack(std::index_sequence<Index...>, std::tuple<Property...> property, Other &&... other) {
+        unroll<Step>(choice<3>, std::move(std::get<Index>(property))..., std::forward<Other>(other)...);
     }
 
-    template<typename... Property>
-    void unpack(choice_t<3>, std::tuple<Property...> property) {
-        unpack(std::move(property), std::index_sequence_for<Property...>{});
+    template<std::size_t Step = 0, typename... Property, typename... Other>
+    void unroll(choice_t<3>, std::tuple<Property...> property, Other &&... other) {
+        unpack<Step>(std::index_sequence_for<Property...>{}, std::move(property), std::forward<Other>(other)...);
     }
 
-    template<typename... KeyOrValue>
-    void unpack(choice_t<2>, std::pair<KeyOrValue...> property) {
-        unpack(choice<0>, std::move(property.first), std::move(property.second));
+    template<std::size_t Step = 0, typename... Property, typename... Other>
+    void unroll(choice_t<2>, std::pair<Property...> property, Other &&... other) {
+        assign<Step>(std::move(property.first), std::move(property.second));
+        unroll<Step+1>(choice<3>, std::forward<Other>(other)...);
     }
 
-    template<typename Func>
-    std::enable_if_t<std::is_invocable_v<Func>, void>
-    unpack(choice_t<1>, Func &&func) {
-        unpack(choice<3>, std::forward<Func>(func)());
+    template<std::size_t Step = 0, typename Property, typename... Other>
+    std::enable_if_t<!std::is_invocable_v<Property>>
+    unroll(choice_t<1>, Property &&property, Other &&... other) {
+        assign<Step>(std::forward<Property>(property));
+        unroll<Step+1>(choice<3>, std::forward<Other>(other)...);
     }
 
-    template<typename Key, typename... Value>
-    void unpack(choice_t<0>, Key &&key, Value &&... value) {
+    template<std::size_t Step = 0, typename Func, typename... Other>
+    void unroll(choice_t<0>, Func &&func, Other &&... other) {
+        unroll<Step>(choice<3>, std::forward<Func>(func)(), std::forward<Other>(other)...);
+    }
+
+    template<std::size_t>
+    void unroll(choice_t<0>) {}
+
+    template<std::size_t = 0, typename Key, typename... Value>
+    void assign(Key &&key, Value &&... value) {
         static auto property{std::make_tuple(std::forward<Key>(key), std::forward<Value>(value)...)};
 
         static internal::meta_prop_node node{
@@ -739,11 +747,15 @@ class extended_meta_factory: public meta_factory<Type> {
         *curr = &node;
     }
 
+public:
+    /**
+     * @brief Constructs an extended factory from a given node.
+     * @param target The underlying node to which to assign the properties.
+     */
     extended_meta_factory(entt::internal::meta_prop_node **target)
         : curr{target}
     {}
 
-public:
     /**
      * @brief Assigns a property to the last meta object created.
      *
@@ -756,10 +768,14 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename PropertyOrKey, typename... Value>
-    auto prop(PropertyOrKey &&property_or_key, Value &&... value) {
-        static_assert(sizeof...(Value) <= 1);
-        unpack(choice<3>, std::forward<PropertyOrKey>(property_or_key), std::forward<Value>(value)...);
-        return *this;
+    auto prop(PropertyOrKey &&property_or_key, Value &&... value) && {
+        if constexpr(sizeof...(Value) == 0) {
+            unroll(choice<3>, std::forward<PropertyOrKey>(property_or_key));
+        } else {
+            assign(std::forward<PropertyOrKey>(property_or_key), std::forward<Value>(value)...);
+        }
+
+        return extended_meta_factory<Type, Spec..., PropertyOrKey, Value...>{curr};
     }
 
     /**
@@ -773,9 +789,9 @@ public:
      * @return A meta factory for the parent type.
      */
     template <typename... Property>
-    auto props(Property... property) {
-        (prop(property), ...);
-        return *this;
+    auto props(Property... property) && {
+        unroll(choice<3>, std::forward<Property>(property)...);
+        return extended_meta_factory<Type, Spec..., Property...>{curr};
     }
 
 private:

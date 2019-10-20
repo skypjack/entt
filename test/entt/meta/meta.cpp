@@ -17,8 +17,9 @@ Type get(Type &prop) {
     return prop;
 }
 
-enum class properties {
+enum class props {
     prop_int,
+    prop_value,
     prop_bool,
     key_only,
     prop_list
@@ -149,20 +150,21 @@ struct Meta: ::testing::Test {
 
         entt::meta<char>()
                 .type("char"_hs)
-                    .prop(properties::prop_int, 42)
+                    .prop(props::prop_int, 42)
                 .data<&set<char>, &get<char>>("value"_hs);
 
-        entt::meta<properties>()
-                .data<properties::prop_bool>("prop_bool"_hs)
-                    .prop(properties::prop_int, 0)
-                .data<properties::prop_int>("prop_int"_hs)
-                    .prop(std::make_tuple(std::make_pair(properties::prop_bool, true), std::make_pair(properties::prop_int, 0)))
-                    .prop(properties::key_only)
-                .data<properties::key_only>("key_only"_hs)
-                    .prop([]() { return properties::key_only; })
-                .data<&set<properties>, &get<properties>>("value"_hs)
-                .data<properties::prop_list>("prop_list"_hs)
-                    .props(std::make_pair(properties::prop_bool, true), std::make_pair(properties::prop_int, 0), properties::key_only);
+        entt::meta<props>()
+                .data<props::prop_bool>("prop_bool"_hs)
+                    .prop(props::prop_int, 0)
+                    .prop(props::prop_value, 3)
+                .data<props::prop_int>("prop_int"_hs)
+                    .prop(std::make_tuple(std::make_pair(props::prop_bool, true), std::make_pair(props::prop_int, 0), std::make_pair(props::prop_value, 3)))
+                    .prop(props::key_only)
+                .data<props::key_only>("key_only"_hs)
+                    .prop([]() { return props::key_only; })
+                .data<&set<props>, &get<props>>("value"_hs)
+                .data<props::prop_list>("prop_list"_hs)
+                    .props(std::make_pair(props::prop_bool, false), std::make_pair(props::prop_int, 0), std::make_pair(props::prop_value, 3), props::key_only);
 
         entt::meta<unsigned int>().data<0u>("min"_hs).data<100u>("max"_hs);
 
@@ -171,12 +173,12 @@ struct Meta: ::testing::Test {
 
         entt::meta<derived_type>()
                 .type("derived"_hs)
-                    .prop(properties::prop_int, 99)
+                    .prop(props::prop_int, 99)
                 .base<base_type>()
                 .ctor<const base_type &, int, char>()
-                    .prop(properties::prop_bool, false)
+                    .prop(props::prop_bool, false)
                 .ctor<&derived_factory>()
-                    .prop(properties::prop_int, 42)
+                    .prop(props::prop_int, 42)
                 .conv<&derived_type::f>()
                 .conv<&derived_type::g>();
 
@@ -192,13 +194,13 @@ struct Meta: ::testing::Test {
         entt::meta<data_type>()
                 .type("data"_hs)
                 .data<&data_type::i, entt::as_alias_t>("i"_hs)
-                    .prop(properties::prop_int, 0)
+                    .prop(props::prop_int, 0)
                 .data<&data_type::j>("j"_hs)
-                    .prop(properties::prop_int, 1)
+                    .prop(props::prop_int, 1)
                 .data<&data_type::h>("h"_hs)
-                    .prop(properties::prop_int, 2)
+                    .prop(props::prop_int, 2)
                 .data<&data_type::k>("k"_hs)
-                    .prop(properties::prop_int, 3)
+                    .prop(props::prop_int, 3)
                 .data<&data_type::empty>("empty"_hs)
                 .data<&data_type::v, entt::as_void_t>("v"_hs);
 
@@ -211,15 +213,15 @@ struct Meta: ::testing::Test {
                 .type("func"_hs)
                 .func<entt::overload<int(const base_type &, int, int)>(&func_type::f)>("f3"_hs)
                 .func<entt::overload<int(int, int)>(&func_type::f)>("f2"_hs)
-                    .prop(properties::prop_bool, false)
+                    .prop(props::prop_bool, false)
                 .func<entt::overload<int(int) const>(&func_type::f)>("f1"_hs)
-                    .prop(properties::prop_bool, false)
+                    .prop(props::prop_bool, false)
                 .func<&func_type::g>("g"_hs)
-                    .prop(properties::prop_bool, false)
+                    .prop(props::prop_bool, false)
                 .func<&func_type::h>("h"_hs)
-                    .prop(properties::prop_bool, false)
+                    .prop(props::prop_bool, false)
                 .func<&func_type::k>("k"_hs)
-                    .prop(properties::prop_bool, false)
+                    .prop(props::prop_bool, false)
                 .func<&func_type::v, entt::as_void_t>("v"_hs)
                 .func<&func_type::a, entt::as_alias_t>("a"_hs);
 
@@ -232,14 +234,14 @@ struct Meta: ::testing::Test {
 
         entt::meta<an_abstract_type>()
                 .type("an_abstract_type"_hs)
-                    .prop(properties::prop_bool, false)
+                    .prop(props::prop_bool, false)
                 .data<&an_abstract_type::i>("i"_hs)
                 .func<&an_abstract_type::f>("f"_hs)
                 .func<&an_abstract_type::g>("g"_hs);
 
         entt::meta<another_abstract_type>()
                 .type("another_abstract_type"_hs)
-                    .prop(properties::prop_int, 42)
+                    .prop(props::prop_int, 42)
                 .data<&another_abstract_type::j>("j"_hs)
                 .func<&another_abstract_type::h>("h"_hs);
 
@@ -255,7 +257,7 @@ struct Meta: ::testing::Test {
 
         entt::meta<derived_type>()
                 .type("my_type"_hs)
-                    .prop(properties::prop_bool, false)
+                    .prop(props::prop_bool, false)
                 .ctor<>();
 
         entt::meta<another_abstract_type>()
@@ -924,11 +926,11 @@ TEST_F(Meta, MetaHandleEmpty) {
 }
 
 TEST_F(Meta, MetaProp) {
-    auto prop = entt::resolve<char>().prop(properties::prop_int);
+    auto prop = entt::resolve<char>().prop(props::prop_int);
 
     ASSERT_TRUE(prop);
     ASSERT_NE(prop, entt::meta_prop{});
-    ASSERT_EQ(prop.key(), properties::prop_int);
+    ASSERT_EQ(prop.key(), props::prop_int);
     ASSERT_EQ(prop.value(), 42);
 }
 
@@ -1014,16 +1016,16 @@ TEST_F(Meta, MetaCtor) {
 
     ctor.prop([](auto prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop.key(), properties::prop_bool);
+        ASSERT_EQ(prop.key(), props::prop_bool);
         ASSERT_FALSE(prop.value().template cast<bool>());
     });
 
-    ASSERT_FALSE(ctor.prop(properties::prop_int));
+    ASSERT_FALSE(ctor.prop(props::prop_int));
 
-    auto prop = ctor.prop(properties::prop_bool);
+    auto prop = ctor.prop(props::prop_bool);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::prop_bool);
+    ASSERT_EQ(prop.key(), props::prop_bool);
     ASSERT_FALSE(prop.value().template cast<bool>());
 }
 
@@ -1048,16 +1050,16 @@ TEST_F(Meta, MetaCtorFunc) {
 
     ctor.prop([](auto prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop.key(), properties::prop_int);
+        ASSERT_EQ(prop.key(), props::prop_int);
         ASSERT_EQ(prop.value(), 42);
     });
 
-    ASSERT_FALSE(ctor.prop(properties::prop_bool));
+    ASSERT_FALSE(ctor.prop(props::prop_bool));
 
-    auto prop = ctor.prop(properties::prop_int);
+    auto prop = ctor.prop(props::prop_int);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::prop_int);
+    ASSERT_EQ(prop.key(), props::prop_int);
     ASSERT_EQ(prop.value(), 42);
 }
 
@@ -1155,16 +1157,16 @@ TEST_F(Meta, MetaData) {
 
     data.prop([](auto prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop.key(), properties::prop_int);
+        ASSERT_EQ(prop.key(), props::prop_int);
         ASSERT_EQ(prop.value(), 0);
     });
 
-    ASSERT_FALSE(data.prop(properties::prop_bool));
+    ASSERT_FALSE(data.prop(props::prop_bool));
 
-    auto prop = data.prop(properties::prop_int);
+    auto prop = data.prop(props::prop_int);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::prop_int);
+    ASSERT_EQ(prop.key(), props::prop_int);
     ASSERT_EQ(prop.value(), 0);
 }
 
@@ -1184,16 +1186,16 @@ TEST_F(Meta, MetaDataConst) {
 
     data.prop([](auto prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop.key(), properties::prop_int);
+        ASSERT_EQ(prop.key(), props::prop_int);
         ASSERT_EQ(prop.value(), 1);
     });
 
-    ASSERT_FALSE(data.prop(properties::prop_bool));
+    ASSERT_FALSE(data.prop(props::prop_bool));
 
-    auto prop = data.prop(properties::prop_int);
+    auto prop = data.prop(props::prop_int);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::prop_int);
+    ASSERT_EQ(prop.key(), props::prop_int);
     ASSERT_EQ(prop.value(), 1);
 }
 
@@ -1212,16 +1214,16 @@ TEST_F(Meta, MetaDataStatic) {
 
     data.prop([](auto prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop.key(), properties::prop_int);
+        ASSERT_EQ(prop.key(), props::prop_int);
         ASSERT_EQ(prop.value(), 2);
     });
 
-    ASSERT_FALSE(data.prop(properties::prop_bool));
+    ASSERT_FALSE(data.prop(props::prop_bool));
 
-    auto prop = data.prop(properties::prop_int);
+    auto prop = data.prop(props::prop_int);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::prop_int);
+    ASSERT_EQ(prop.key(), props::prop_int);
     ASSERT_EQ(prop.value(), 2);
 }
 
@@ -1240,16 +1242,16 @@ TEST_F(Meta, MetaDataConstStatic) {
 
     data.prop([](auto prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop.key(), properties::prop_int);
+        ASSERT_EQ(prop.key(), props::prop_int);
         ASSERT_EQ(prop.value(), 3);
     });
 
-    ASSERT_FALSE(data.prop(properties::prop_bool));
+    ASSERT_FALSE(data.prop(props::prop_bool));
 
-    auto prop = data.prop(properties::prop_int);
+    auto prop = data.prop(props::prop_int);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::prop_int);
+    ASSERT_EQ(prop.key(), props::prop_int);
     ASSERT_EQ(prop.value(), 3);
 }
 
@@ -1474,16 +1476,16 @@ TEST_F(Meta, MetaFunc) {
 
     func.prop([](auto prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop.key(), properties::prop_bool);
+        ASSERT_EQ(prop.key(), props::prop_bool);
         ASSERT_FALSE(prop.value().template cast<bool>());
     });
 
-    ASSERT_FALSE(func.prop(properties::prop_int));
+    ASSERT_FALSE(func.prop(props::prop_int));
 
-    auto prop = func.prop(properties::prop_bool);
+    auto prop = func.prop(props::prop_bool);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::prop_bool);
+    ASSERT_EQ(prop.key(), props::prop_bool);
     ASSERT_FALSE(prop.value().cast<bool>());
 }
 
@@ -1511,16 +1513,16 @@ TEST_F(Meta, MetaFuncConst) {
 
     func.prop([](auto prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop.key(), properties::prop_bool);
+        ASSERT_EQ(prop.key(), props::prop_bool);
         ASSERT_FALSE(prop.value().template cast<bool>());
     });
 
-    ASSERT_FALSE(func.prop(properties::prop_int));
+    ASSERT_FALSE(func.prop(props::prop_int));
 
-    auto prop = func.prop(properties::prop_bool);
+    auto prop = func.prop(props::prop_bool);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::prop_bool);
+    ASSERT_EQ(prop.key(), props::prop_bool);
     ASSERT_FALSE(prop.value().cast<bool>());
 }
 
@@ -1546,16 +1548,16 @@ TEST_F(Meta, MetaFuncRetVoid) {
 
     func.prop([](auto prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop.key(), properties::prop_bool);
+        ASSERT_EQ(prop.key(), props::prop_bool);
         ASSERT_FALSE(prop.value().template cast<bool>());
     });
 
-    ASSERT_FALSE(func.prop(properties::prop_int));
+    ASSERT_FALSE(func.prop(props::prop_int));
 
-    auto prop = func.prop(properties::prop_bool);
+    auto prop = func.prop(props::prop_bool);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::prop_bool);
+    ASSERT_EQ(prop.key(), props::prop_bool);
     ASSERT_FALSE(prop.value().cast<bool>());
 }
 
@@ -1583,16 +1585,16 @@ TEST_F(Meta, MetaFuncStatic) {
 
     func.prop([](auto prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop.key(), properties::prop_bool);
+        ASSERT_EQ(prop.key(), props::prop_bool);
         ASSERT_FALSE(prop.value().template cast<bool>());
     });
 
-    ASSERT_FALSE(func.prop(properties::prop_int));
+    ASSERT_FALSE(func.prop(props::prop_int));
 
-    auto prop = func.prop(properties::prop_bool);
+    auto prop = func.prop(props::prop_bool);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::prop_bool);
+    ASSERT_EQ(prop.key(), props::prop_bool);
     ASSERT_FALSE(prop.value().cast<bool>());
 }
 
@@ -1617,16 +1619,16 @@ TEST_F(Meta, MetaFuncStaticRetVoid) {
 
     func.prop([](auto *prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop->key(), properties::prop_bool);
+        ASSERT_EQ(prop->key(), props::prop_bool);
         ASSERT_FALSE(prop->value().template cast<bool>());
     });
 
-    ASSERT_FALSE(func.prop(properties::prop_int));
+    ASSERT_FALSE(func.prop(props::prop_int));
 
-    auto prop = func.prop(properties::prop_bool);
+    auto prop = func.prop(props::prop_bool);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::prop_bool);
+    ASSERT_EQ(prop.key(), props::prop_bool);
     ASSERT_FALSE(prop.value().cast<bool>());
 }
 
@@ -1698,16 +1700,16 @@ TEST_F(Meta, MetaType) {
 
     type.prop([](auto prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop.key(), properties::prop_int);
+        ASSERT_EQ(prop.key(), props::prop_int);
         ASSERT_EQ(prop.value(), 99);
     });
 
-    ASSERT_FALSE(type.prop(properties::prop_bool));
+    ASSERT_FALSE(type.prop(props::prop_bool));
 
-    auto prop = type.prop(properties::prop_int);
+    auto prop = type.prop(props::prop_int);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::prop_int);
+    ASSERT_EQ(prop.key(), props::prop_int);
     ASSERT_EQ(prop.value(), 99);
 }
 
@@ -1715,7 +1717,7 @@ TEST_F(Meta, MetaTypeTraits) {
     ASSERT_TRUE(entt::resolve<void>().is_void());
     ASSERT_TRUE(entt::resolve<bool>().is_integral());
     ASSERT_TRUE(entt::resolve<double>().is_floating_point());
-    ASSERT_TRUE(entt::resolve<properties>().is_enum());
+    ASSERT_TRUE(entt::resolve<props>().is_enum());
     ASSERT_TRUE(entt::resolve<union_type>().is_union());
     ASSERT_TRUE(entt::resolve<derived_type>().is_class());
     ASSERT_TRUE(entt::resolve<int *>().is_pointer());
@@ -1934,8 +1936,8 @@ TEST_F(Meta, MetaFuncFromBase) {
 
 TEST_F(Meta, MetaPropFromBase) {
     auto type = entt::resolve<concrete_type>();
-    auto prop_bool = type.prop(properties::prop_bool);
-    auto prop_int = type.prop(properties::prop_int);
+    auto prop_bool = type.prop(props::prop_bool);
+    auto prop_int = type.prop(props::prop_int);
 
     ASSERT_TRUE(prop_bool);
     ASSERT_TRUE(prop_int);
@@ -1960,7 +1962,7 @@ TEST_F(Meta, AbstractClass) {
 }
 
 TEST_F(Meta, EnumAndNamedConstants) {
-    auto type = entt::resolve<properties>();
+    auto type = entt::resolve<props>();
 
     ASSERT_TRUE(type.data("prop_bool"_hs));
     ASSERT_TRUE(type.data("prop_int"_hs));
@@ -1968,11 +1970,11 @@ TEST_F(Meta, EnumAndNamedConstants) {
     ASSERT_EQ(type.data("prop_bool"_hs).type(), type);
     ASSERT_EQ(type.data("prop_int"_hs).type(), type);
 
-    ASSERT_FALSE(type.data("prop_bool"_hs).set({}, properties::prop_int));
-    ASSERT_FALSE(type.data("prop_int"_hs).set({}, properties::prop_bool));
+    ASSERT_FALSE(type.data("prop_bool"_hs).set({}, props::prop_int));
+    ASSERT_FALSE(type.data("prop_int"_hs).set({}, props::prop_bool));
 
-    ASSERT_EQ(type.data("prop_bool"_hs).get({}).cast<properties>(), properties::prop_bool);
-    ASSERT_EQ(type.data("prop_int"_hs).get({}).cast<properties>(), properties::prop_int);
+    ASSERT_EQ(type.data("prop_bool"_hs).get({}).cast<props>(), props::prop_bool);
+    ASSERT_EQ(type.data("prop_int"_hs).get({}).cast<props>(), props::prop_int);
 }
 
 TEST_F(Meta, ArithmeticTypeAndNamedConstants) {
@@ -1992,68 +1994,38 @@ TEST_F(Meta, ArithmeticTypeAndNamedConstants) {
 }
 
 TEST_F(Meta, Variables) {
-    auto p_data = entt::resolve<properties>().data("value"_hs);
+    auto p_data = entt::resolve<props>().data("value"_hs);
     auto c_data = entt::resolve("char"_hs).data("value"_hs);
 
-    properties prop{properties::prop_int};
+    props prop{props::prop_int};
     char c = 'c';
 
-    p_data.set(prop, properties::prop_bool);
+    p_data.set(prop, props::prop_bool);
     c_data.set(c, 'x');
 
-    ASSERT_EQ(p_data.get(prop).cast<properties>(), properties::prop_bool);
+    ASSERT_EQ(p_data.get(prop).cast<props>(), props::prop_bool);
     ASSERT_EQ(c_data.get(c).cast<char>(), 'x');
-    ASSERT_EQ(prop, properties::prop_bool);
+    ASSERT_EQ(prop, props::prop_bool);
     ASSERT_EQ(c, 'x');
 }
 
-TEST_F(Meta, SharedProperties) {
-    const auto type = entt::resolve<properties>();
-    const auto prop_bool = type.data("prop_bool"_hs);
-    const auto prop_int = type.data("prop_int"_hs);
+TEST_F(Meta, PropertiesAndCornerCases) {
+    auto type = entt::resolve<props>();
 
-    ASSERT_TRUE(prop_bool.prop(properties::prop_int));
-    ASSERT_FALSE(prop_bool.prop(properties::prop_bool));
+    ASSERT_EQ(type.data("prop_bool"_hs).prop(props::prop_int).value().cast<int>(), 0);
+    ASSERT_EQ(type.data("prop_bool"_hs).prop(props::prop_value).value().cast<int>(), 3);
 
-    ASSERT_TRUE(prop_int.prop(properties::prop_int));
-    ASSERT_TRUE(prop_int.prop(properties::prop_bool));
-}
+    ASSERT_EQ(type.data("prop_int"_hs).prop(props::prop_bool).value().cast<bool>(), true);
+    ASSERT_EQ(type.data("prop_int"_hs).prop(props::prop_int).value().cast<int>(), 0);
+    ASSERT_EQ(type.data("prop_int"_hs).prop(props::prop_value).value().cast<int>(), 3);
+    ASSERT_TRUE(type.data("prop_int"_hs).prop(props::key_only));
+    ASSERT_FALSE(type.data("prop_int"_hs).prop(props::key_only).value());
 
-TEST_F(Meta, KeyOnlyProperties) {
-    const auto type = entt::resolve<properties>();
-    const auto prop = type.data("key_only"_hs).prop(properties::key_only);
-
-    ASSERT_TRUE(prop);
-    ASSERT_TRUE(prop.key());
-    ASSERT_EQ(prop.key().type(), entt::resolve<properties>());
-    ASSERT_EQ(prop.key().cast<properties>(), properties::key_only);
-    ASSERT_FALSE(prop.value());
-}
-
-TEST_F(Meta, PropertyList) {
-    const auto type = entt::resolve<properties>();
-    const auto prop_list = type.data("prop_list"_hs);
-    const auto prop_bool = prop_list.prop(properties::prop_bool);
-    const auto prop_int =  prop_list.prop(properties::prop_int);
-    const auto key_prop = prop_list.prop(properties::key_only);
-
-    ASSERT_TRUE(prop_bool);
-    ASSERT_EQ(prop_bool.key().type(), entt::resolve<properties>());
-    ASSERT_EQ(prop_bool.key().cast<properties>(), properties::prop_bool);
-    ASSERT_TRUE(prop_bool.value());
-    ASSERT_TRUE(prop_bool.value().try_cast<bool>());
-
-    ASSERT_TRUE(prop_int);
-    ASSERT_EQ(prop_int.key().type(), entt::resolve<properties>());
-    ASSERT_EQ(prop_int.key().cast<properties>(), properties::prop_int);
-    ASSERT_TRUE(prop_int.value());
-    ASSERT_TRUE(prop_int.value().try_cast<int>());
-
-    ASSERT_TRUE(key_prop);
-    ASSERT_TRUE(key_prop.key());
-    ASSERT_EQ(key_prop.key().type(), entt::resolve<properties>());
-    ASSERT_EQ(key_prop.key().cast<properties>(), properties::key_only);
-    ASSERT_FALSE(key_prop.value());
+    ASSERT_EQ(type.data("prop_list"_hs).prop(props::prop_bool).value().cast<bool>(), false);
+    ASSERT_EQ(type.data("prop_list"_hs).prop(props::prop_int).value().cast<int>(), 0);
+    ASSERT_EQ(type.data("prop_list"_hs).prop(props::prop_value).value().cast<int>(), 3);
+    ASSERT_TRUE(type.data("prop_list"_hs).prop(props::key_only));
+    ASSERT_FALSE(type.data("prop_list"_hs).prop(props::key_only).value());
 }
 
 TEST_F(Meta, Reset) {
@@ -2068,7 +2040,7 @@ TEST_F(Meta, Reset) {
     entt::meta<func_type>().reset();
     entt::meta<array_type>().reset();
     entt::meta<double>().reset();
-    entt::meta<properties>().reset();
+    entt::meta<props>().reset();
     entt::meta<base_type>().reset();
     entt::meta<derived_type>().reset();
     entt::meta<empty_type>().reset();
@@ -2103,7 +2075,7 @@ TEST_F(Meta, Reset) {
 
     entt::resolve<derived_type>().prop([](auto prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop.key(), properties::prop_bool);
+        ASSERT_EQ(prop.key(), props::prop_bool);
         ASSERT_FALSE(prop.value().template cast<bool>());
     });
 

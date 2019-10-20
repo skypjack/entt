@@ -475,8 +475,8 @@ class.
 ## Properties and meta objects
 
 Sometimes (for example, when it comes to creating an editor) it might be useful
-to be able to attach properties to the meta objects created. Fortunately, this
-is possible for most of them.<br/>
+to attach properties to the meta objects created. Fortunately, this is possible
+for most of them.<br/>
 For the meta objects that support properties, the member functions of the
 factory used for registering them will return a decorated version of the factory
 itself. The latter can be used to attach properties to the last created meta
@@ -489,7 +489,7 @@ entt::meta<my_type>().type("reflected_type"_hs).prop("tooltip"_hs, "message");
 
 Properties are always in the key/value form. There are no restrictions on the
 type of the key or value, as long as they are copy constructible objects.<br/>
-Furthermore, the `prop` function supports different formats for properties:
+Multiple formats are supported when it comes to defining a property:
 
 * Properties as key/value pairs:
 
@@ -516,8 +516,7 @@ Furthermore, the `prop` function supports different formats for properties:
           .prop(std::make_tuple(std::make_pair("tooltip"_hs, "message"), my_enum::key_only));
   ```
 
-  A tuple can contain one or more properties defined as described above, except
-  for the key/value form. The properties will be treated individually.
+  A tuple contains one or more properties. All of them are treated individually.
 
 * Annotations:
 
@@ -525,9 +524,8 @@ Furthermore, the `prop` function supports different formats for properties:
   entt::meta<my_type>().type("reflected_type"_hs).prop(&property_generator);
   ```
 
-  An annotation is an invocable object that returns one or more properties
-  defined as described above, except for the key/value form. The properties will
-  be treated individually.
+  An annotation is an invocable object that returns one or more properties. All
+  of them are treated individually.
 
 It's possible to invoke the `prop` function several times if needed, one for
 each property to associate with the last meta object created:
