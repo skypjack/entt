@@ -33,6 +33,4 @@
 * explore the possibility to wrap other backend with a XHandler component
 * use [[nodiscard]] consistently for safety purposes
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...>
-
-* make meta work across boundaries
-  - extend and make factory::prop more flexible
+* null support for entt::component
