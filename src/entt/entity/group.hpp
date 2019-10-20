@@ -344,7 +344,7 @@ public:
      */
     template<typename Func>
     void less(Func func) const {
-        using get_type_list = type_list_cat_t<std::conditional_t<std::is_empty_v<Get>, type_list<>, type_list<Get>>...>;
+        using get_type_list = type_list_cat_t<std::conditional_t<ENTT_ENABLE_ETO(Get), type_list<>, type_list<Get>>...>;
         traverse(std::move(func), get_type_list{});
     }
 
@@ -763,8 +763,8 @@ public:
      */
     template<typename Func>
     void less(Func func) const {
-        using owned_type_list = type_list_cat_t<std::conditional_t<std::is_empty_v<Owned>, type_list<>, type_list<Owned>>...>;
-        using get_type_list = type_list_cat_t<std::conditional_t<std::is_empty_v<Get>, type_list<>, type_list<Get>>...>;
+        using owned_type_list = type_list_cat_t<std::conditional_t<ENTT_ENABLE_ETO(Owned), type_list<>, type_list<Owned>>...>;
+        using get_type_list = type_list_cat_t<std::conditional_t<ENTT_ENABLE_ETO(Get), type_list<>, type_list<Get>>...>;
         traverse(std::move(func), owned_type_list{}, get_type_list{});
     }
 

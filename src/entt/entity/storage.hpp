@@ -453,8 +453,6 @@ public:
         };
 
         if constexpr(std::is_invocable_v<Compare, const object_type &, const object_type &>) {
-            static_assert(!std::is_empty_v<object_type>);
-
             underlying_type::arrange(from, to, std::move(apply), [this, compare = std::move(compare)](const auto lhs, const auto rhs) {
                 return compare(std::as_const(instances[underlying_type::index(lhs)]), std::as_const(instances[underlying_type::index(rhs)]));
             }, std::move(algo), std::forward<Args>(args)...);
@@ -476,7 +474,7 @@ private:
 
 /*! @copydoc basic_storage */
 template<typename Entity, typename Type>
-class basic_storage<Entity, Type, std::enable_if_t<std::is_empty_v<Type>>>: public sparse_set<Entity> {
+class basic_storage<Entity, Type, std::enable_if_t<ENTT_ENABLE_ETO(Type)>>: public sparse_set<Entity> {
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
     using underlying_type = sparse_set<Entity>;
 

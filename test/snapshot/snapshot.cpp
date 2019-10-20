@@ -21,17 +21,17 @@ struct relationship {
 
 template<typename Archive>
 void serialize(Archive &archive, position &position) {
-  archive(position.x, position.y);
+    archive(position.x, position.y);
 }
 
 template<typename Archive>
 void serialize(Archive &archive, timer &timer) {
-  archive(timer.duration);
+    archive(timer.duration);
 }
 
 template<typename Archive>
 void serialize(Archive &archive, relationship &relationship) {
-  archive(relationship.parent);
+    archive(relationship.parent);
 }
 
 TEST(Snapshot, Full) {

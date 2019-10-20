@@ -70,7 +70,7 @@ class basic_registry {
 
         template<typename... Args>
         decltype(auto) assign(basic_registry &registry, const Entity entt, Args &&... args) {
-            if constexpr(std::is_empty_v<Component>) {
+            if constexpr(ENTT_ENABLE_ETO(Component)) {
                 storage<Entity, Component>::construct(entt);
                 construction.publish(entt, registry, Component{});
                 return Component{std::forward<Args>(args)...};
@@ -101,7 +101,7 @@ class basic_registry {
 
         template<typename... Args>
         decltype(auto) replace(basic_registry &registry, const Entity entt, Args &&... args) {
-            if constexpr(std::is_empty_v<Component>) {
+            if constexpr(ENTT_ENABLE_ETO(Component)) {
                 ENTT_ASSERT((storage<Entity, Component>::has(entt)));
                 update.publish(entt, registry, Component{});
                 return Component{std::forward<Args>(args)...};
@@ -113,7 +113,7 @@ class basic_registry {
         }
 
     private:
-        using reference_type = std::conditional_t<std::is_empty_v<Component>, const Component &, Component &>;
+        using reference_type = std::conditional_t<ENTT_ENABLE_ETO(Component), const Component &, Component &>;
         sigh<void(const Entity, basic_registry &, reference_type)> construction{};
         sigh<void(const Entity, basic_registry &, reference_type)> update{};
         sigh<void(const Entity, basic_registry &)> destruction{};

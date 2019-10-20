@@ -503,7 +503,7 @@ public:
     template<typename Comp, typename Func>
     void less(Func func) const {
         using other_type = type_list_cat_t<std::conditional_t<std::is_same_v<Comp, Component>, type_list<>, type_list<Component>>...>;
-        using non_empty_type = type_list_cat_t<std::conditional_t<std::is_empty_v<Component>, type_list<>, type_list<Component>>...>;
+        using non_empty_type = type_list_cat_t<std::conditional_t<ENTT_ENABLE_ETO(Component), type_list<>, type_list<Component>>...>;
         traverse<Comp>(std::move(func), other_type{}, non_empty_type{});
     }
 
@@ -767,7 +767,7 @@ public:
      */
     template<typename Func>
     void less(Func func) const {
-        if constexpr(std::is_empty_v<Component>) {
+        if constexpr(ENTT_ENABLE_ETO(Component)) {
             if constexpr(std::is_invocable_v<Func>) {
                 for(auto pos = pool->size(); pos; --pos) {
                     func();

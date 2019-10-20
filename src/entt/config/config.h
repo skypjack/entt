@@ -25,6 +25,15 @@
 #endif // ENTT_NO_ATOMIC
 
 
+#ifndef ENTT_DISABLE_ETO
+#include <type_traits>
+#define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#else // ENTT_DISABLE_ETO
+// sfinae-friendly definition
+#define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#endif // ENTT_DISABLE_ETO
+
+
 #ifndef ENTT_ID_TYPE
 #include <cstdint>
 #define ENTT_ID_TYPE std::uint32_t
