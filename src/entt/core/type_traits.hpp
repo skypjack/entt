@@ -224,7 +224,8 @@ constexpr auto is_named_type_v = is_named_type<Type>::value;
     enum class clazz: type {};\
     constexpr auto to_integer(const clazz id) ENTT_NOEXCEPT {\
         return std::underlying_type_t<clazz>(id);\
-    }
+    }\
+    static_assert(true)
 
 
 }
@@ -264,7 +265,7 @@ constexpr auto is_named_type_v = is_named_type<Type>::value;
     {\
         static_assert(std::is_same_v<std::remove_cv_t<type>, type>);\
         static_assert(std::is_object_v<type>);\
-    };
+    }
 
 
 /**

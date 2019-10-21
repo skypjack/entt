@@ -34,5 +34,5 @@
 * use [[nodiscard]] consistently for safety purposes
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...>
 * null support for entt::component
-* make macros require a trailing ;
 * named_type_traits<Type>::value -> named_type_traits_v<Type>
+* extend to_integer to &, |, and so on...

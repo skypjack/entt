@@ -7,7 +7,7 @@ struct an_event {};
 struct another_event {};
 struct one_more_event {};
 
-ENTT_NAMED_TYPE(an_event)
+ENTT_NAMED_TYPE(an_event);
 
 struct receiver {
     static void forward(entt::dispatcher &dispatcher, const an_event &event) {

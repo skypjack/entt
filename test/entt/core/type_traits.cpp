@@ -2,8 +2,8 @@
 #include <entt/core/type_traits.hpp>
 
 ENTT_NAMED_TYPE(int);
-ENTT_NAMED_STRUCT(named_struct, {})
-ENTT_NAMED_CLASS(named_class, {})
+ENTT_NAMED_STRUCT(named_struct, {});
+ENTT_NAMED_CLASS(named_class, {});
 
 TEST(Choice, Functionalities) {
     ASSERT_TRUE((std::is_base_of_v<entt::choice_t<0>, entt::choice_t<1>>));
