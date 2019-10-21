@@ -34,5 +34,5 @@
 * use [[nodiscard]] consistently for safety purposes
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...>
 * null support for entt::component
-* named_type_traits<Type>::value -> named_type_traits_v<Type>
-* extend to_integer to &, |, and so on...
+* add ENTT_CUSTOM_NAMED_TYPE for custom names
+* Make another attempt to overcome named types

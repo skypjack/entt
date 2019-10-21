@@ -266,7 +266,7 @@ struct meta_node<Type> {
 
         if constexpr(is_named_type_v<Type>) {
             auto *candidate = internal::find_if([](auto *candidate) {
-                return candidate->identifier == named_type_traits<Type>::value;
+                return candidate->identifier == named_type_traits_v<Type>;
             }, *meta_node<>::global);
 
             return candidate ? candidate : &node;

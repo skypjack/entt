@@ -123,7 +123,7 @@ class emitter {
     template<typename Event>
     static auto type() ENTT_NOEXCEPT {
         if constexpr(is_named_type_v<Event>) {
-            return named_type_traits<Event>::value;
+            return named_type_traits_v<Event>;
         } else {
             return handler_family::type<Event>;
         }

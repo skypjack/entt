@@ -193,6 +193,14 @@ using named_type_traits_t = typename named_type_traits<Type>::type;
 
 
 /**
+ * @brief Helper variable template.
+ * @tparam Type Potentially named type.
+ */
+template<class Type>
+constexpr auto named_type_traits_v = named_type_traits<Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type has a
  * name. In all other cases, `value` is false.
  * @tparam Type Potentially named type.

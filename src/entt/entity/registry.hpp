@@ -216,7 +216,7 @@ class basic_registry {
     template<typename Type, typename Family>
     static ENTT_ID_TYPE runtime_type() ENTT_NOEXCEPT {
         if constexpr(is_named_type_v<Type>) {
-            return named_type_traits<Type>::value;
+            return named_type_traits_v<Type>;
         } else {
             return Family::template type<Type>;
         }
