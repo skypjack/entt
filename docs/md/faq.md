@@ -161,3 +161,36 @@ so as to get rid of the extra definitions:
 
 Please refer to [this](https://github.com/skypjack/entt/issues/96) issue for
 more details.
+
+## Non copyable components
+
+The registry uses the trait
+[std::is_copy_constructible](https://en.cppreference.com/w/cpp/types/is_copy_constructible)
+to check if a component is actually copyable. This trait does not check if the
+object can actually be copied but only verifies if there is a copy constructor
+and this may lead to [surprising result](https://stackoverflow.com/questions/18404108/false-positive-with-is-copy-constructible-on-vectorunique-ptr).
+
+For example, the following component is actually not copyable but
+`std::is_copy_constructible` will tell the opposite, this is because
+[std::vector](https://en.cppreference.com/w/cpp/container/vector) defines a
+copy constructor no matter what its underlying object is copyable or not.
+
+```cpp
+struct component {
+    std::vector<std::unique_ptr<action>> actions;
+};
+```
+
+When trying to assign this component to an entity, you'll get a compiler error,
+instead you must explicitly mark the object as non copyable:
+
+```cpp
+struct component {
+    std::vector<std::unique_ptr<action>> actions;
+
+    component(const component&) = delete;
+    component& operator=(const component&) = delete;
+};
+```
+
+Unfortunately, this will also disable aggregate initialization.
