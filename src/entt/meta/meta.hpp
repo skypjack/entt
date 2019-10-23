@@ -120,6 +120,7 @@ struct meta_type_node {
     const size_type extent;
     bool(* const compare)(const void *, const void *);
     meta_type_node *(* const remove_pointer)() ENTT_NOEXCEPT;
+    meta_type_node *(* const remove_extent)() ENTT_NOEXCEPT;
     meta_base_node *base{nullptr};
     meta_conv_node *conv{nullptr};
     meta_ctor_node *ctor{nullptr};
@@ -261,6 +262,9 @@ struct meta_node<Type> {
             &compare<Type>, // workaround for an issue with VS2017
             []() ENTT_NOEXCEPT -> meta_type_node * {
                 return meta_node<std::remove_const_t<std::remove_pointer_t<Type>>>::resolve();
+            },
+            []() ENTT_NOEXCEPT -> meta_type_node * {
+                return meta_node<std::remove_const_t<std::remove_extent_t<Type>>>::resolve();
             }
         };
 
@@ -1485,6 +1489,15 @@ public:
      */
     meta_type remove_pointer() const ENTT_NOEXCEPT {
         return node->remove_pointer();
+    }
+
+    /**
+     * @brief Provides the meta type for which the array is defined.
+     * @return The meta type for which the array is defined or this meta type
+     * if it doesn't refer to an array type.
+     */
+    meta_type remove_extent() const ENTT_NOEXCEPT {
+        return node->remove_extent();
     }
 
     /**
