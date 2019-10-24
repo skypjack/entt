@@ -12,6 +12,7 @@
   * [Custom entity identifiers: yay or nay?](#custom-entity-identifiers-yay-or-nay)
   * [Warning C4307: integral constant overflow](#warning-C4307-integral-constant-overflow)
   * [Warning C4003: the min, the max and the macro](#warning-C4003-the-min-the-max-and-the-macro)
+  * [The standard and the non-copyable types](#the-standard-and-the-non-copyable-types)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -161,3 +162,38 @@ so as to get rid of the extra definitions:
 
 Please refer to [this](https://github.com/skypjack/entt/issues/96) issue for
 more details.
+
+## The standard and the non-copyable types
+
+`EnTT` uses internally the trait `std::is_copy_constructible_v` to check if a
+component is actually copyable. This trait doesn't check if an object can
+actually be copied but only verifies if there is a copy constructor
+available.<br/>
+This can lead to surprising results due to some idiosyncrasies of the standard
+mainly related to the need to guarantee backward compatibility.
+
+For example, `std::vector` defines a copy constructor no matter if its value
+type is copyable or not. As a result, `std::is_copy_constructible_v` is true
+for the following specialization:
+
+```cpp
+struct type {
+    std::vector<std::unique_ptr<action>> vec;
+};
+```
+
+When trying to assign an instance of this type to an entity in the ECS part,
+this may trigger a compilation error because we cannot really make a copy of
+it.<br/>
+As a workaround, users can mark the type explicitly as non-copyable:
+
+```cpp
+struct type {
+    type(const type &) = delete;
+    type & operator=(const type &) = delete;
+
+    std::vector<std::unique_ptr<action>> vec;
+};
+```
+
+Unfortunately, this will also disable aggregate initialization.
