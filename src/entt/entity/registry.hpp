@@ -334,6 +334,15 @@ public:
     }
 
     /**
+     * @brief Prepares pools for the given types if required.
+     * @tparam Component Types of components for which to prepare pools.
+     */
+    template<typename... Component>
+    void prepare() {
+        (assure<Component>(), ...);
+    }
+
+    /**
      * @brief Returns the number of existing components of the given type.
      * @tparam Component Type of component of which to return the size.
      * @return Number of existing components of the given type.

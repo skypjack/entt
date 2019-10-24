@@ -101,6 +101,8 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.size<char>(), entt::registry::size_type{0});
     ASSERT_TRUE((registry.empty<int, char>()));
 
+    registry.prepare<double>();
+
     const auto e0 = registry.create();
     const auto e1 = registry.create();
 
