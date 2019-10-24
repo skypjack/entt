@@ -638,6 +638,7 @@ public:
      * uses the batch creation under the hood.
      *
      * @tparam Component Types of components to copy.
+     * @tparam It Type of input iterator.
      * @tparam Exclude Types of components not to be copied.
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
@@ -1628,6 +1629,7 @@ public:
      * @sa stomp
      *
      * @tparam Component Types of components to copy.
+     * @tparam It Type of input iterator.
      * @tparam Exclude Types of components not to be copied.
      * @param first An iterator to the first element of the range to stomp.
      * @param last An iterator past the last element of the range to stomp.
