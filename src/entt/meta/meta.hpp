@@ -303,6 +303,11 @@ struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> 
  * allocations will reduce the jumps in memory and therefore will avoid chasing
  * of pointers. This will greatly improve the use of the cache, thus increasing
  * the overall performance.
+ *
+ * @warning
+ * Only copy constructible types are suitable for use with this class. A static
+ * assertion will abort the compilation when the type provided isn't copy
+ * constructible.
  */
 class meta_any {
     /*! @brief A meta handle is allowed to _inherit_ from a meta any. */
@@ -394,6 +399,8 @@ public:
 
         if constexpr(!std::is_void_v<Type>) {
             using traits_type = type_traits<std::remove_cv_t<std::remove_reference_t<Type>>>;
+            static_assert(std::is_copy_constructible_v<Type>);
+
             instance = traits_type::instance(storage, std::forward<Args>(args)...);
             destroy_fn = &traits_type::destroy;
             copy_fn = &traits_type::copy;
