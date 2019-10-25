@@ -262,42 +262,22 @@ class meta_factory {
         return node && (node->identifier == identifier || duplicate(identifier, node->next));
     }
 
-    auto record(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
-        auto * const node = internal::meta_info<Type>::resolve();
-
-        ENTT_ASSERT(!duplicate(identifier, *internal::meta_info<>::global));
-        ENTT_ASSERT(!duplicate(node, *internal::meta_info<>::global));
-        node->identifier = identifier;
-        node->next = *internal::meta_info<>::global;
-        *internal::meta_info<>::global = node;
-
-        return extended_meta_factory<Type>{&node->prop};
-    }
-
 public:
     /**
      * @brief Extends a meta type by assigning it an identifier.
-     *
-     * This function is intended only for unnamed types.
-     *
      * @param identifier Unique identifier.
      * @return An extended meta factory for the parent type.
      */
     auto type(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
-        static_assert(!is_named_type_v<Type>);
-        return record(identifier);
-    }
+        auto * const node = internal::meta_info<Type>::resolve();
 
-    /**
-     * @brief Extends a meta type by assigning it an identifier.
-     *
-     * This function is intended only for named types
-     *
-     * @return An extended meta factory for the parent type.
-     */
-    auto type() ENTT_NOEXCEPT {
-        static_assert(is_named_type_v<Type>);
-        return record(named_type_traits_t<Type>::value);
+        ENTT_ASSERT(!duplicate(identifier, internal::meta_info<>::type));
+        ENTT_ASSERT(!duplicate(node, internal::meta_info<>::type));
+        node->identifier = identifier;
+        node->next = internal::meta_info<>::type;
+        internal::meta_info<>::type = node;
+
+        return extended_meta_factory<Type>{&node->prop};
     }
 
     /**
@@ -835,7 +815,7 @@ inline meta_type resolve() ENTT_NOEXCEPT {
 inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
     return internal::find_if([identifier](auto *node) {
         return node->identifier == identifier;
-    }, *internal::meta_info<>::global);
+    }, internal::meta_info<>::type);
 }
 
 
@@ -847,7 +827,7 @@ inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
 template<typename Op>
 inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
 resolve(Op op) ENTT_NOEXCEPT {
-    internal::iterate<meta_type>(std::move(op), *internal::meta_info<>::global);
+    internal::iterate<meta_type>(std::move(op), internal::meta_info<>::type);
 }
 
 

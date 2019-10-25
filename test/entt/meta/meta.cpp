@@ -2035,8 +2035,7 @@ TEST_F(Meta, PropertiesAndCornerCases) {
 }
 
 TEST_F(Meta, Reset) {
-    ASSERT_NE(*entt::internal::meta_info<>::global, nullptr);
-    ASSERT_NE(entt::internal::meta_info<>::local, nullptr);
+    ASSERT_NE(entt::internal::meta_info<>::type, nullptr);
 
     entt::meta<char>().reset();
     entt::meta<concrete_type>().reset();
@@ -2054,8 +2053,7 @@ TEST_F(Meta, Reset) {
     entt::meta<another_abstract_type>().reset();
     entt::meta<unsigned int>().reset();
 
-    ASSERT_EQ(*entt::internal::meta_info<>::global, nullptr);
-    ASSERT_EQ(entt::internal::meta_info<>::local, nullptr);
+    ASSERT_EQ(entt::internal::meta_info<>::type, nullptr);
 
     ASSERT_FALSE(entt::resolve("char"_hs));
     ASSERT_FALSE(entt::resolve("base"_hs));

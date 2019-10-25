@@ -9,8 +9,6 @@
 #include <entt/entity/registry.hpp>
 #include <entt/entity/entity.hpp>
 
-ENTT_NAMED_TYPE(int);
-
 struct empty_type {};
 
 struct listener {

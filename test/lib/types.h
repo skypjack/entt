@@ -5,21 +5,18 @@ struct test_emitter
         : entt::emitter<test_emitter>
 {};
 
-ENTT_NAMED_STRUCT(position, {
+struct position {
     int x;
     int y;
-});
+};
 
-ENTT_NAMED_STRUCT(velocity, {
+struct velocity {
     int dx;
     int dy;
-});
+};
 
-ENTT_NAMED_STRUCT(an_event, {
+struct an_event {
     int payload;
-});
+};
 
-ENTT_NAMED_STRUCT(another_event, {});
-
-ENTT_NAMED_TYPE(int);
-ENTT_NAMED_TYPE(char);
+struct another_event {};

@@ -198,8 +198,7 @@ struct meta_node;
 
 template<>
 struct meta_node<> {
-    inline static meta_type_node *local = nullptr;
-    inline static meta_type_node **global = &local;
+    inline static meta_type_node *type = nullptr;
 };
 
 
@@ -209,7 +208,7 @@ struct meta_node<Type> {
 
     static void reset() ENTT_NOEXCEPT {
         auto * const node = resolve();
-        auto **curr = meta_node<>::global;
+        auto **curr = &meta_node<>::type;
 
         while(*curr && *curr != node) {
             curr = &(*curr)->next;
@@ -268,15 +267,7 @@ struct meta_node<Type> {
             }
         };
 
-        if constexpr(is_named_type_v<Type>) {
-            auto *candidate = internal::find_if([](auto *candidate) {
-                return candidate->identifier == named_type_traits_v<Type>;
-            }, *meta_node<>::global);
-
-            return candidate ? candidate : &node;
-        } else {
-            return &node;
-        }
+        return &node;
     }
 };
 
@@ -1746,21 +1737,6 @@ public:
 
 private:
     const internal::meta_type_node *node;
-};
-
-
-/*! @brief Opaque container for a meta context. */
-struct meta_ctx {
-    /**
-     * @brief Binds the meta system to the given context.
-     * @param other A valid context to which to bind.
-     */
-    static void bind(meta_ctx other) ENTT_NOEXCEPT {
-        internal::meta_info<>::global = other.ctx;
-    }
-
-private:
-    internal::meta_type_node **ctx{&internal::meta_info<>::local};
 };
 
 

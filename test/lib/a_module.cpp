@@ -47,12 +47,8 @@ LIB_EXPORT void emit_another_event(test_emitter &emitter) {
     emitter.publish<another_event>();
 }
 
-LIB_EXPORT void a_module_bind_ctx(entt::meta_ctx context) {
-    entt::meta_ctx::bind(context);
-}
-
 LIB_EXPORT void a_module_meta_init() {
-    entt::meta<char>().type().data<'c'>("c"_hs);
+    entt::meta<char>().type("char"_hs).data<'c'>("c"_hs);
 }
 
 LIB_EXPORT void a_module_meta_deinit() {

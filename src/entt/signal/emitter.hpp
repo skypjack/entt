@@ -115,51 +115,19 @@ class emitter {
         container_type on_list{};
     };
 
-    struct handler_data {
-        std::unique_ptr<base_handler> handler;
-        ENTT_ID_TYPE runtime_type;
-    };
-
-    template<typename Event>
-    static auto type() ENTT_NOEXCEPT {
-        if constexpr(is_named_type_v<Event>) {
-            return named_type_traits_v<Event>;
-        } else {
-            return handler_family::type<Event>;
-        }
-    }
-
     template<typename Event>
     event_handler<Event> * assure() const ENTT_NOEXCEPT {
-        const auto htype = type<Event>();
-        handler_data *hdata = nullptr;
+        const auto htype = handler_family::type<Event>;
 
-        if constexpr(is_named_type_v<Event>) {
-            const auto it = std::find_if(handlers.begin(), handlers.end(), [htype](const auto &candidate) {
-                return candidate.handler && candidate.runtime_type == htype;
-            });
-
-            hdata = (it == handlers.cend() ? &handlers.emplace_back() : &(*it));
-        } else {
-            if(!(htype < handlers.size())) {
-                handlers.resize(htype+1);
-            }
-
-            hdata = &handlers[htype];
-
-            if(hdata->handler && hdata->runtime_type != htype) {
-                handlers.emplace_back();
-                std::swap(handlers[htype], handlers.back());
-                hdata = &handlers[htype];
-            }
+        if(!(htype < handlers.size())) {
+            handlers.resize(htype+1);
         }
 
-        if(!hdata->handler) {
-            hdata->handler = std::make_unique<event_handler<Event>>();
-            hdata->runtime_type = htype;
+        if(!handlers[htype]) {
+            handlers[htype] = std::make_unique<event_handler<Event>>();
         }
 
-        return static_cast<event_handler<Event> *>(hdata->handler.get());
+        return static_cast<event_handler<Event> *>(handlers[htype].get());
     }
 
 public:
@@ -307,8 +275,8 @@ public:
      * results in undefined behavior.
      */
     void clear() ENTT_NOEXCEPT {
-        std::for_each(handlers.begin(), handlers.end(), [](auto &&hdata) {
-            return hdata.handler ? hdata.handler->clear() : void();
+        std::for_each(handlers.begin(), handlers.end(), [](auto &&handler) {
+            return handler ? handler->clear() : void();
         });
     }
 
@@ -327,13 +295,13 @@ public:
      * @return True if there are no listeners registered, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
-        return std::all_of(handlers.cbegin(), handlers.cend(), [](auto &&hdata) {
-            return !hdata.handler || hdata.handler->empty();
+        return std::all_of(handlers.cbegin(), handlers.cend(), [](auto &&handler) {
+            return !handler || handler->empty();
         });
     }
 
 private:
-    mutable std::vector<handler_data> handlers{};
+    mutable std::vector<std::unique_ptr<base_handler>> handlers{};
 };
 
 

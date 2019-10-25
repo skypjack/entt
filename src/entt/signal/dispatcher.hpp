@@ -36,14 +36,14 @@ class dispatcher {
     template<typename Class, typename Event>
     using instance_type = typename sigh<void(const Event &)>::template instance_type<Class>;
 
-    struct base_wrapper {
-        virtual ~base_wrapper() = default;
+    struct base_handler {
+        virtual ~base_handler() = default;
         virtual void publish() = 0;
         virtual void clear() = 0;
     };
 
     template<typename Event>
-    struct signal_wrapper: base_wrapper {
+    struct signal_handler: base_handler {
         using signal_type = sigh<void(const Event &)>;
         using sink_type = typename signal_type::sink_type;
 
@@ -80,57 +80,25 @@ class dispatcher {
         std::vector<Event> events;
     };
 
-    struct wrapper_data {
-        std::unique_ptr<base_wrapper> wrapper;
-        ENTT_ID_TYPE runtime_type;
-    };
-
     template<typename Event>
-    static auto type() ENTT_NOEXCEPT {
-        if constexpr(is_named_type_v<Event>) {
-            return named_type_traits_v<Event>;
-        } else {
-            return event_family::type<Event>;
-        }
-    }
+    signal_handler<Event> * assure() {
+        const auto wtype = event_family::type<Event>;
 
-    template<typename Event>
-    signal_wrapper<Event> & assure() {
-        const auto wtype = type<Event>();
-        wrapper_data *wdata = nullptr;
-
-        if constexpr(is_named_type_v<Event>) {
-            const auto it = std::find_if(wrappers.begin(), wrappers.end(), [wtype](const auto &candidate) {
-                return candidate.wrapper && candidate.runtime_type == wtype;
-            });
-
-            wdata = (it == wrappers.cend() ? &wrappers.emplace_back() : &(*it));
-        } else {
-            if(!(wtype < wrappers.size())) {
-                wrappers.resize(wtype+1);
-            }
-
-            wdata = &wrappers[wtype];
-
-            if(wdata->wrapper && wdata->runtime_type != wtype) {
-                wrappers.emplace_back();
-                std::swap(wrappers[wtype], wrappers.back());
-                wdata = &wrappers[wtype];
-            }
+        if(!(wtype < handlers.size())) {
+            handlers.resize(wtype+1);
         }
 
-        if(!wdata->wrapper) {
-            wdata->wrapper = std::make_unique<signal_wrapper<Event>>();
-            wdata->runtime_type = wtype;
+        if(!handlers[wtype]) {
+            handlers[wtype] = std::make_unique<signal_handler<Event>>();
         }
 
-        return static_cast<signal_wrapper<Event> &>(*wdata->wrapper);
+        return static_cast<signal_handler<Event> *>(handlers[wtype].get());
     }
 
 public:
     /*! @brief Type of sink for the given event. */
     template<typename Event>
-    using sink_type = typename signal_wrapper<Event>::sink_type;
+    using sink_type = typename signal_handler<Event>::sink_type;
 
     /**
      * @brief Returns a sink object for the given event.
@@ -151,7 +119,7 @@ public:
      */
     template<typename Event>
     sink_type<Event> sink() ENTT_NOEXCEPT {
-        return assure<Event>().sink();
+        return assure<Event>()->sink();
     }
 
     /**
@@ -166,7 +134,7 @@ public:
      */
     template<typename Event, typename... Args>
     void trigger(Args &&... args) {
-        assure<Event>().trigger(std::forward<Args>(args)...);
+        assure<Event>()->trigger(std::forward<Args>(args)...);
     }
 
     /**
@@ -180,7 +148,7 @@ public:
      */
     template<typename Event>
     void trigger(Event &&event) {
-        assure<std::decay_t<Event>>().trigger(std::forward<Event>(event));
+        assure<std::decay_t<Event>>()->trigger(std::forward<Event>(event));
     }
 
     /**
@@ -195,7 +163,7 @@ public:
      */
     template<typename Event, typename... Args>
     void enqueue(Args &&... args) {
-        assure<Event>().enqueue(std::forward<Args>(args)...);
+        assure<Event>()->enqueue(std::forward<Args>(args)...);
     }
 
     /**
@@ -209,7 +177,7 @@ public:
      */
     template<typename Event>
     void enqueue(Event &&event) {
-        assure<std::decay_t<Event>>().enqueue(std::forward<Event>(event));
+        assure<std::decay_t<Event>>()->enqueue(std::forward<Event>(event));
     }
 
     /**
@@ -223,13 +191,13 @@ public:
     template<typename... Event>
     void discard() {
         if constexpr(sizeof...(Event) == 0) {
-            std::for_each(wrappers.begin(), wrappers.end(), [](auto &&wdata) {
-                if(wdata.wrapper) {
-                    wdata.wrapper->clear();
+            std::for_each(handlers.begin(), handlers.end(), [](auto &&handler) {
+                if(handler) {
+                    handler->clear();
                 }
             });
         } else {
-            (assure<std::decay_t<Event>>().clear(), ...);
+            (assure<std::decay_t<Event>>()->clear(), ...);
         }
     }
 
@@ -244,7 +212,7 @@ public:
      */
     template<typename Event>
     void update() {
-        assure<Event>().publish();
+        assure<Event>()->publish();
     }
 
     /**
@@ -255,15 +223,15 @@ public:
      * to reduce at a minimum the time spent in the bodies of the listeners.
      */
     void update() const {
-        for(auto pos = wrappers.size(); pos; --pos) {
-            if(auto &wdata = wrappers[pos-1]; wdata.wrapper) {
-                wdata.wrapper->publish();
+        for(auto pos = handlers.size(); pos; --pos) {
+            if(auto &handler = handlers[pos-1]; handler) {
+                handler->publish();
             }
         }
     }
 
 private:
-    std::vector<wrapper_data> wrappers;
+    std::vector<std::unique_ptr<base_handler>> handlers;
 };
 
 
