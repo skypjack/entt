@@ -12,6 +12,7 @@
 #        define ENTT_EXPORT __attribute__((visibility("default")))
 #        define ENTT_IMPORT __attribute__((visibility("default")))
 #    else
+#        error "Unsupported compoler"
 #        define ENTT_EXPORT
 #        define ENTT_IMPORT
 #    endif
