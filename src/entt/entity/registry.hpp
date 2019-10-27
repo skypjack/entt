@@ -218,7 +218,7 @@ class basic_registry {
         if constexpr(is_named_type_v<Type>) {
             return named_type_traits_v<Type>;
         } else {
-            return Family::template type<Type>;
+            return Family::template type<std::decay_t<Type>>;
         }
     }
 

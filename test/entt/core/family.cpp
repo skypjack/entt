@@ -16,7 +16,7 @@ TEST(Family, Functionalities) {
 }
 
 TEST(Family, Uniqueness) {
-    ASSERT_EQ(a_family::type<int>, a_family::type<int &>);
-    ASSERT_EQ(a_family::type<int>, a_family::type<int &&>);
-    ASSERT_EQ(a_family::type<int>, a_family::type<const int &>);
+    ASSERT_NE(a_family::type<int>, a_family::type<int &>);
+    ASSERT_NE(a_family::type<int>, a_family::type<int &&>);
+    ASSERT_NE(a_family::type<int>, a_family::type<const int &>);
 }

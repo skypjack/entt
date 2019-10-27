@@ -90,7 +90,7 @@ class dispatcher {
         if constexpr(is_named_type_v<Event>) {
             return named_type_traits_v<Event>;
         } else {
-            return event_family::type<Event>;
+            return event_family::type<std::decay_t<Event>>;
         }
     }
 
