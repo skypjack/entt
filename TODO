@@ -45,3 +45,4 @@
     * locator
   - update doc
   - update tests
+    * delete old tests (and files) with a_module, another_module, lib

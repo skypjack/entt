@@ -5,7 +5,8 @@
 include_directories($<TARGET_PROPERTY:EnTT,INTERFACE_INCLUDE_DIRECTORIES>)
 add_compile_options($<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_OPTIONS>)
 
-macro(SETUP_LIBRARY_TARGET LIB_TARGET)
+macro(SETUP_LIBRARY_TARGET LIB_TARGET LIB_TYPE LIB_SOURCE)
+    add_library(${LIB_TARGET} ${LIB_TYPE} ${LIB_SOURCE})
     set_target_properties(${LIB_TARGET} PROPERTIES CXX_EXTENSIONS OFF CXX_VISIBILITY_PRESET hidden)
     target_compile_definitions(${LIB_TARGET} PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_DEFINITIONS>)
     target_compile_features(${LIB_TARGET} PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_FEATURES>)
@@ -13,8 +14,8 @@ macro(SETUP_LIBRARY_TARGET LIB_TARGET)
     target_compile_options(${LIB_TARGET} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/EHsc>)
 endmacro()
 
-add_library(odr OBJECT odr.cpp)
-SETUP_LIBRARY_TARGET(odr)
+SETUP_LIBRARY_TARGET(odr OBJECT odr.cpp)
+set_target_properties(odr PROPERTIES CXX_VISIBILITY_PRESET default)
 
 macro(SETUP_AND_ADD_TEST TEST_NAME TEST_SOURCE)
     add_executable(${TEST_NAME} $<TARGET_OBJECTS:odr> ${TEST_SOURCE})
@@ -36,21 +37,16 @@ endif()
 # Test lib
 
 if(BUILD_LIB)
-    add_library(a_module_shared SHARED lib/a_module.cpp)
-    add_library(a_module_static STATIC lib/a_module.cpp)
-    add_library(another_module_shared SHARED lib/another_module.cpp)
-    add_library(another_module_static STATIC lib/another_module.cpp)
+#   Test dispatcher across boundaries
 
-    SETUP_LIBRARY_TARGET(a_module_shared)
-    SETUP_LIBRARY_TARGET(a_module_static)
-    SETUP_LIBRARY_TARGET(another_module_shared)
-    SETUP_LIBRARY_TARGET(another_module_static)
-
-    SETUP_AND_ADD_TEST(lib_shared lib/lib.cpp)
-    target_link_libraries(lib_shared PRIVATE a_module_shared another_module_shared)
-
-    SETUP_AND_ADD_TEST(lib_static lib/lib.cpp)
-    target_link_libraries(lib_static PRIVATE a_module_static another_module_static)
+#    SETUP_LIBRARY_TARGET(lib_dispatcher_common SHARED lib/dispatcher/common.cpp)
+#    SETUP_LIBRARY_TARGET(lib_dispatcher_lib1 SHARED lib/dispatcher/lib1.cpp)
+#    SETUP_LIBRARY_TARGET(lib_dispatcher_lib2 SHARED lib/dispatcher/lib2.cpp)
+#    SETUP_AND_ADD_TEST(lib_dispatcher lib/dispatcher/main.cpp)
+#
+#    target_link_libraries(lib_dispatcher_lib1 PRIVATE lib_dispatcher_common)
+#    target_link_libraries(lib_dispatcher_lib2 PRIVATE lib_dispatcher_common)
+#    target_link_libraries(lib_dispatcher PRIVATE lib_dispatcher_common lib_dispatcher_lib1 lib_dispatcher_lib2)
 endif()
 
 # Test mod
