@@ -270,16 +270,14 @@ const duk_function_list_entry js_duktape_registry_methods[] = {
 };
 
 void export_types(duk_context *context, entt::registry &registry) {
-    auto export_type = [](auto *ctx, auto &reg, auto idx, auto type, const auto *name) {
+    auto export_type = [idx = duk_push_object(context)](auto *ctx, auto &reg, auto type, const auto *name) {
         duk_push_string(ctx, name);
         duk_push_uint(ctx, to_integer(reg.template type<typename decltype(type)::type>()));
         duk_def_prop(ctx, idx, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE);
     };
 
-    auto idx = duk_push_object(context);
-
-    export_type(context, registry, idx, tag<position>{}, "position");
-    export_type(context, registry, idx, tag<renderable>{}, "renderable");
+    export_type(context, registry, tag<position>{}, "position");
+    export_type(context, registry, tag<renderable>{}, "renderable");
 
     duk_put_global_string(context, "Types");
 }

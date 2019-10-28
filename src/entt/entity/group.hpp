@@ -74,9 +74,9 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
     using pool_type = std::conditional_t<std::is_const_v<Component>, const storage<Entity, std::remove_const_t<Component>>, storage<Entity, Component>>;
 
     // we could use pool_type<Type> *..., but vs complains about it and refuses to compile for unknown reasons (most likely a bug)
-    basic_group(sparse_set<Entity> *ref, storage<Entity, std::remove_const_t<Get>> *... get) ENTT_NOEXCEPT
+    basic_group(sparse_set<Entity> *ref, storage<Entity, std::remove_const_t<Get>> *... gpool) ENTT_NOEXCEPT
         : handler{ref},
-          pools{get...}
+          pools{gpool...}
     {}
 
     template<typename Func, typename... Weak>
@@ -491,28 +491,28 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
     using component_iterator_type = decltype(std::declval<pool_type<Component>>().begin());
 
     // we could use pool_type<Type> *..., but vs complains about it and refuses to compile for unknown reasons (most likely a bug)
-    basic_group(const std::size_t *ref, const std::size_t *extent, storage<Entity, std::remove_const_t<Owned>> *... owned, storage<Entity, std::remove_const_t<Get>> *... get) ENTT_NOEXCEPT
-        : pools{owned..., get...},
+    basic_group(const std::size_t *ref, const std::size_t *extent, storage<Entity, std::remove_const_t<Owned>> *... opool, storage<Entity, std::remove_const_t<Get>> *... gpool) ENTT_NOEXCEPT
+        : pools{opool..., gpool...},
           length{extent},
           super{ref}
     {}
 
     template<typename Func, typename... Strong, typename... Weak>
     void traverse(Func func, type_list<Strong...>, type_list<Weak...>) const {
-        [[maybe_unused]] auto raw = std::make_tuple((std::get<pool_type<Strong> *>(pools)->end() - *length)...);
+        [[maybe_unused]] auto it = std::make_tuple((std::get<pool_type<Strong> *>(pools)->end() - *length)...);
         [[maybe_unused]] auto data = std::get<0>(pools)->sparse_set<entity_type>::end() - *length;
 
         for(auto next = *length; next; --next) {
             if constexpr(std::is_invocable_v<Func, decltype(get<Strong>({}))..., decltype(get<Weak>({}))...>) {
                 if constexpr(sizeof...(Weak) == 0) {
-                    func(*(std::get<component_iterator_type<Strong>>(raw)++)...);
+                    func(*(std::get<component_iterator_type<Strong>>(it)++)...);
                 } else {
                     const auto entt = *(data++);
-                    func(*(std::get<component_iterator_type<Strong>>(raw)++)..., std::get<pool_type<Weak> *>(pools)->get(entt)...);
+                    func(*(std::get<component_iterator_type<Strong>>(it)++)..., std::get<pool_type<Weak> *>(pools)->get(entt)...);
                 }
             } else {
                 const auto entt = *(data++);
-                func(entt, *(std::get<component_iterator_type<Strong>>(raw)++)..., std::get<pool_type<Weak> *>(pools)->get(entt)...);
+                func(entt, *(std::get<component_iterator_type<Strong>>(it)++)..., std::get<pool_type<Weak> *>(pools)->get(entt)...);
             }
         }
     }
@@ -837,13 +837,13 @@ public:
             }, std::move(algo), std::forward<Args>(args)...);
         }
 
-        [](std::size_t length, auto *cpool, auto *... other) {
-            for(auto next = length; next; --next) {
+        [this](auto *head, auto *... other) {
+            for(auto next = *length; next; --next) {
                 const auto pos = next - 1;
-                [[maybe_unused]] const auto entt = cpool->data()[pos];
+                [[maybe_unused]] const auto entt = head->data()[pos];
                 (other->swap(other->data()[pos], entt), ...);
             }
-        }(*length, std::get<pool_type<Owned> *>(pools)...);
+        }(std::get<pool_type<Owned> *>(pools)...);
     }
 
 private:

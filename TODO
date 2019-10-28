@@ -36,3 +36,5 @@
 * null support for entt::component
 * add ENTT_CUSTOM_NAMED_TYPE for custom names
 * Make another attempt to overcome named types
+* meta: members+class as fake functions, is it possible?
+* named types: almost-stable index optimization for direct access to pools, no more linear searches

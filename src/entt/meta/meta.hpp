@@ -209,23 +209,23 @@ struct meta_node<Type> {
 
     static void reset() ENTT_NOEXCEPT {
         auto * const node = resolve();
-        auto **curr = meta_node<>::global;
+        auto **it = meta_node<>::global;
 
-        while(*curr && *curr != node) {
-            curr = &(*curr)->next;
+        while(*it && *it != node) {
+            it = &(*it)->next;
         }
 
-        if(*curr) {
-            *curr = (*curr)->next;
+        if(*it) {
+            *it = (*it)->next;
         }
 
         const auto unregister_all = y_combinator{
-            [](auto &&self, auto **node, auto... member) {
-                while(*node) {
-                    auto *curr = *node;
-                    (self(&(curr->*member)), ...);
-                    *node = curr->next;
-                    curr->next = nullptr;
+            [](auto &&self, auto **curr, auto... member) {
+                while(*curr) {
+                    auto *prev = *curr;
+                    (self(&(prev->*member)), ...);
+                    *curr = prev->next;
+                    prev->next = nullptr;
                 }
             }
         };
@@ -269,8 +269,8 @@ struct meta_node<Type> {
         };
 
         if constexpr(is_named_type_v<Type>) {
-            auto *candidate = internal::find_if([](auto *candidate) {
-                return candidate->identifier == named_type_traits_v<Type>;
+            auto *candidate = internal::find_if([](auto *curr) {
+                return curr->identifier == named_type_traits_v<Type>;
             }, *meta_node<>::global);
 
             return candidate ? candidate : &node;
@@ -1355,11 +1355,11 @@ inline bool operator!=(const meta_func &lhs, const meta_func &rhs) ENTT_NOEXCEPT
 /*! @brief Opaque container for meta types. */
 class meta_type {
     template<typename... Args, std::size_t... Indexes>
-    auto ctor(std::index_sequence<Indexes...>, const internal::meta_type_node *node) const ENTT_NOEXCEPT {
+    auto ctor(std::index_sequence<Indexes...>) const ENTT_NOEXCEPT {
         return internal::find_if([](auto *candidate) {
             return candidate->size == sizeof...(Args) && ([](auto *from, auto *to) {
-                return (from == to) || internal::find_if<&internal::meta_type_node::base>([to](auto *node) { return node->type() == to; }, from)
-                        || internal::find_if<&internal::meta_type_node::conv>([to](auto *node) { return node->type() == to; }, from);
+                return (from == to) || internal::find_if<&internal::meta_type_node::base>([to](auto *curr) { return curr->type() == to; }, from)
+                        || internal::find_if<&internal::meta_type_node::conv>([to](auto *curr) { return curr->type() == to; }, from);
             }(internal::meta_info<Args>::resolve(), candidate->arg(Indexes)) && ...);
         }, node->ctor);
     }
@@ -1583,7 +1583,7 @@ public:
      */
     template<typename... Args>
     meta_ctor ctor() const ENTT_NOEXCEPT {
-        return ctor<Args...>(std::index_sequence_for<Args...>{}, node);
+        return ctor<Args...>(std::index_sequence_for<Args...>{});
     }
 
     /**
