@@ -69,45 +69,45 @@ class basic_registry {
         }
 
         template<typename... Args>
-        decltype(auto) assign(basic_registry &registry, const Entity entt, Args &&... args) {
+        decltype(auto) assign(basic_registry &owner, const Entity entt, Args &&... args) {
             if constexpr(ENTT_ENABLE_ETO(Component)) {
                 storage<Entity, Component>::construct(entt);
-                construction.publish(entt, registry, Component{});
+                construction.publish(entt, owner, Component{});
                 return Component{std::forward<Args>(args)...};
             } else {
                 auto &component = storage<Entity, Component>::construct(entt, std::forward<Args>(args)...);
-                construction.publish(entt, registry, component);
+                construction.publish(entt, owner, component);
                 return component;
             }
         }
 
         template<typename It, typename... Args>
-        auto batch(basic_registry &registry, It first, It last, Args &&... args) {
+        auto batch(basic_registry &owner, It first, It last, Args &&... args) {
             auto it = storage<Entity, Component>::batch(first, last, std::forward<Args>(args)...);
 
             if(!construction.empty()) {
-                std::for_each(first, last, [this, &registry, it](const auto entt) mutable {
-                    construction.publish(entt, registry, *(it++));
+                std::for_each(first, last, [this, &owner, it](const auto entt) mutable {
+                    construction.publish(entt, owner, *(it++));
                 });
             }
 
             return it;
         }
 
-        void remove(basic_registry &registry, const Entity entt) {
-            destruction.publish(entt, registry);
+        void remove(basic_registry &owner, const Entity entt) {
+            destruction.publish(entt, owner);
             storage<Entity, Component>::destroy(entt);
         }
 
         template<typename... Args>
-        decltype(auto) replace(basic_registry &registry, const Entity entt, Args &&... args) {
+        decltype(auto) replace(basic_registry &owner, const Entity entt, Args &&... args) {
             if constexpr(ENTT_ENABLE_ETO(Component)) {
                 ENTT_ASSERT((storage<Entity, Component>::has(entt)));
-                update.publish(entt, registry, Component{});
+                update.publish(entt, owner, Component{});
                 return Component{std::forward<Args>(args)...};
             } else {
                 Component component{std::forward<Args>(args)...};
-                update.publish(entt, registry, component);
+                update.publish(entt, owner, component);
                 return (storage<Entity, Component>::get(entt) = std::move(component));
             }
         }
@@ -276,8 +276,8 @@ class basic_registry {
             pdata->runtime_type = ctype;
             pdata->pool = std::make_unique<pool_type<Component>>();
 
-            pdata->remove = [](sparse_set<Entity> &cpool, basic_registry &registry, const Entity entt) {
-                static_cast<pool_type<Component> &>(cpool).remove(registry, entt);
+            pdata->remove = [](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
+                static_cast<pool_type<Component> &>(cpool).remove(owner, entt);
             };
 
             if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
@@ -1351,7 +1351,7 @@ public:
         [[maybe_unused]] constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         const auto cpools = std::make_tuple(assure<Owned>()..., assure<Get>()..., assure<Exclude>()...);
         const std::size_t extent[3]{sizeof...(Owned), sizeof...(Get), sizeof...(Exclude)};
-        handler_type *curr = nullptr;
+        handler_type *handler = nullptr;
 
         if(auto it = std::find_if(groups.cbegin(), groups.cend(), [&extent](const auto &gdata) {
             return std::equal(std::begin(extent), std::end(extent), std::begin(gdata.extent))
@@ -1360,10 +1360,10 @@ public:
                     && (gdata.exclude(type<Exclude>()) && ...);
         }); it != groups.cend())
         {
-            curr = static_cast<handler_type *>(it->group.get());
+            handler = static_cast<handler_type *>(it->group.get());
         }
 
-        if(!curr) {
+        if(!handler) {
             const void *maybe_valid_if = nullptr;
             const void *discard_if = nullptr;
 
@@ -1376,36 +1376,36 @@ public:
             };
 
             if constexpr(sizeof...(Owned) == 0) {
-                curr = static_cast<handler_type *>(groups.emplace_back(std::move(gdata)).group.get());
+                handler = static_cast<handler_type *>(groups.emplace_back(std::move(gdata)).group.get());
             } else {
-                ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [&extent](const auto &gdata) {
-                    const std::size_t diff[3]{ (0u + ... + gdata.owned(type<Owned>())), (0u + ... + gdata.get(type<Get>())), (0u + ... + gdata.exclude(type<Exclude>())) };
-                    return !diff[0] || ((std::equal(std::begin(diff), std::end(diff), extent) || std::equal(std::begin(diff), std::end(diff), gdata.extent)));
+                ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [&extent](const auto &curr) {
+                    const std::size_t diff[3]{ (0u + ... + curr.owned(type<Owned>())), (0u + ... + curr.get(type<Get>())), (0u + ... + curr.exclude(type<Exclude>())) };
+                    return !diff[0] || ((std::equal(std::begin(diff), std::end(diff), extent) || std::equal(std::begin(diff), std::end(diff), curr.extent)));
                 }));
 
-                const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [&size](const auto &gdata) {
-                    const std::size_t diff = (0u + ... + gdata.owned(type<Owned>()));
-                    return !diff || (size > (gdata.extent[0] + gdata.extent[1] + gdata.extent[2]));
+                const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [&size](const auto &curr) {
+                    const std::size_t diff = (0u + ... + curr.owned(type<Owned>()));
+                    return !diff || (size > (curr.extent[0] + curr.extent[1] + curr.extent[2]));
                 });
 
-                const auto prev = std::find_if(std::make_reverse_iterator(next), groups.crend(), [](const auto &gdata) {
-                    return (0u + ... + gdata.owned(type<Owned>()));
+                const auto prev = std::find_if(std::make_reverse_iterator(next), groups.crend(), [](const auto &curr) {
+                    return (0u + ... + curr.owned(type<Owned>()));
                 });
 
                 maybe_valid_if = (next == groups.cend() ? maybe_valid_if : next->group.get());
                 discard_if = (prev == groups.crend() ? discard_if : prev->group.get());
-                curr = static_cast<handler_type *>(groups.insert(next, std::move(gdata))->group.get());
+                handler = static_cast<handler_type *>(groups.insert(next, std::move(gdata))->group.get());
             }
 
             ((std::get<pool_type<Owned> *>(cpools)->super = std::max(std::get<pool_type<Owned> *>(cpools)->super, size)), ...);
 
-            (std::get<pool_type<Owned> *>(cpools)->on_construct().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<Owned>>(*curr), ...);
-            (std::get<pool_type<Get> *>(cpools)->on_construct().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<Get>>(*curr), ...);
-            (std::get<pool_type<Exclude> *>(cpools)->on_destroy().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<Exclude>>(*curr), ...);
+            (std::get<pool_type<Owned> *>(cpools)->on_construct().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<Owned>>(*handler), ...);
+            (std::get<pool_type<Get> *>(cpools)->on_construct().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<Get>>(*handler), ...);
+            (std::get<pool_type<Exclude> *>(cpools)->on_destroy().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<Exclude>>(*handler), ...);
 
-            (std::get<pool_type<Owned> *>(cpools)->on_destroy().before(discard_if).template connect<&handler_type::discard_if>(*curr), ...);
-            (std::get<pool_type<Get> *>(cpools)->on_destroy().before(discard_if).template connect<&handler_type::discard_if>(*curr), ...);
-            (std::get<pool_type<Exclude> *>(cpools)->on_construct().before(discard_if).template connect<&handler_type::discard_if>(*curr), ...);
+            (std::get<pool_type<Owned> *>(cpools)->on_destroy().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            (std::get<pool_type<Get> *>(cpools)->on_destroy().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            (std::get<pool_type<Exclude> *>(cpools)->on_construct().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
 
             const auto *cpool = std::min({
                 static_cast<sparse_set<Entity> *>(std::get<pool_type<Owned> *>(cpools))...,
@@ -1415,16 +1415,16 @@ public:
             });
 
             // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-            std::for_each(cpool->data(), cpool->data() + cpool->size(), [cpools, curr](const auto entity) {
+            std::for_each(cpool->data(), cpool->data() + cpool->size(), [cpools, handler](const auto entity) {
                 if((std::get<pool_type<Owned> *>(cpools)->has(entity) && ...)
                         && (std::get<pool_type<Get> *>(cpools)->has(entity) && ...)
                         && !(std::get<pool_type<Exclude> *>(cpools)->has(entity) || ...))
                 {
                     if constexpr(sizeof...(Owned) == 0) {
-                        curr->set.construct(entity);
+                        handler->set.construct(entity);
                     } else {
-                        if(!(std::get<0>(cpools)->index(entity) < curr->owned)) {
-                            const auto pos = curr->owned++;
+                        if(!(std::get<0>(cpools)->index(entity) < handler->owned)) {
+                            const auto pos = handler->owned++;
                             (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entity), ...);
                         }
                     }
@@ -1433,9 +1433,9 @@ public:
         }
 
         if constexpr(sizeof...(Owned) == 0) {
-            return { &curr->set, std::get<pool_type<Get> *>(cpools)... };
+            return { &handler->set, std::get<pool_type<Get> *>(cpools)... };
         } else {
-            return { &std::get<0>(cpools)->super, &curr->owned, std::get<pool_type<Owned> *>(cpools)... , std::get<pool_type<Get> *>(cpools)... };
+            return { &std::get<0>(cpools)->super, &handler->owned, std::get<pool_type<Owned> *>(cpools)... , std::get<pool_type<Get> *>(cpools)... };
         }
     }
 
@@ -1506,9 +1506,9 @@ public:
      */
     template<typename It>
     entt::basic_runtime_view<Entity> runtime_view(It first, It last) const {
-        std::vector<const sparse_set<Entity> *> set(std::distance(first, last));
+        std::vector<const sparse_set<Entity> *> selected(std::distance(first, last));
 
-        std::transform(first, last, set.begin(), [this](const component ctype) {
+        std::transform(first, last, selected.begin(), [this](const component ctype) {
             auto it = std::find_if(pools.begin(), pools.end(), [ctype = to_integer(ctype)](const auto &pdata) {
                 return pdata.pool && pdata.runtime_type == ctype;
             });
@@ -1516,7 +1516,7 @@ public:
             return it != pools.cend() && it->pool ? it->pool.get() : nullptr;
         });
 
-        return { std::move(set) };
+        return { std::move(selected) };
     }
 
     /**
@@ -1785,8 +1785,8 @@ public:
      */
     template<typename Type, typename... Args>
     Type & ctx_or_set(Args &&... args) {
-        auto *type = try_ctx<Type>();
-        return type ? *type : set<Type>(std::forward<Args>(args)...);
+        auto *value = try_ctx<Type>();
+        return value ? *value : set<Type>(std::forward<Args>(args)...);
     }
 
     /**

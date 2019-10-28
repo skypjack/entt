@@ -196,15 +196,15 @@ template<typename Type, auto Candidate, typename Policy, std::size_t... Indexes>
 meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_sequence<Indexes...>) {
     using helper_type = meta_function_helper_t<decltype(Candidate)>;
 
-    auto dispatch = [](auto *... args) {
+    auto dispatch = [](auto *... params) {
         if constexpr(std::is_void_v<typename helper_type::return_type> || std::is_same_v<Policy, as_void_t>) {
-            std::invoke(Candidate, *args...);
+            std::invoke(Candidate, *params...);
             return meta_any{std::in_place_type<void>};
         } else if constexpr(std::is_same_v<Policy, as_alias_t>) {
-            return meta_any{std::ref(std::invoke(Candidate, *args...))};
+            return meta_any{std::ref(std::invoke(Candidate, *params...))};
         } else {
             static_assert(std::is_same_v<Policy, as_is_t>);
-            return meta_any{std::invoke(Candidate, *args...)};
+            return meta_any{std::invoke(Candidate, *params...)};
         }
     };
 
@@ -718,8 +718,8 @@ class extended_meta_factory: public meta_factory<Type> {
     }
 
     template<std::size_t Step = 0, typename Func, typename... Other>
-    void unroll(choice_t<0>, Func &&func, Other &&... other) {
-        unroll<Step>(choice<3>, std::forward<Func>(func)(), std::forward<Other>(other)...);
+    void unroll(choice_t<0>, Func &&invocable, Other &&... other) {
+        unroll<Step>(choice<3>, std::forward<Func>(invocable)(), std::forward<Other>(other)...);
     }
 
     template<std::size_t>

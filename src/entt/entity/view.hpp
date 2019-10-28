@@ -85,11 +85,11 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     class iterator {
         friend class basic_view<Entity, exclude_t<Exclude...>, Component...>;
 
-        iterator(underlying_iterator_type first, underlying_iterator_type last, unchecked_type other, filter_type exclude) ENTT_NOEXCEPT
+        iterator(underlying_iterator_type first, underlying_iterator_type last, unchecked_type other, filter_type ignore) ENTT_NOEXCEPT
             : begin{first},
               end{last},
               unchecked{other},
-              filter{exclude}
+              filter{ignore}
         {
             if(begin != end && !valid()) {
                 ++(*this);
@@ -143,9 +143,9 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     };
 
     // we could use pool_type<Component> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    basic_view(storage<Entity, std::remove_const_t<Component>> *... component, storage<Entity, std::remove_const_t<Exclude>> *... exclude) ENTT_NOEXCEPT
+    basic_view(storage<Entity, std::remove_const_t<Component>> *... component, storage<Entity, std::remove_const_t<Exclude>> *... epool) ENTT_NOEXCEPT
         : pools{component...},
-          filter{exclude...}
+          filter{epool...}
     {}
 
     const sparse_set<Entity> * candidate() const ENTT_NOEXCEPT {
@@ -304,8 +304,8 @@ public:
      */
     iterator_type begin() const ENTT_NOEXCEPT {
         const auto *view = candidate();
-        const filter_type exclude{std::get<pool_type<Exclude> *>(filter)...};
-        return iterator_type{view->begin(), view->end(), unchecked(view), exclude};
+        const filter_type ignore{std::get<pool_type<Exclude> *>(filter)...};
+        return iterator_type{view->begin(), view->end(), unchecked(view), ignore};
     }
 
     /**
@@ -325,8 +325,8 @@ public:
      */
     iterator_type end() const ENTT_NOEXCEPT {
         const auto *view = candidate();
-        const filter_type exclude{std::get<pool_type<Exclude> *>(filter)...};
-        return iterator_type{view->end(), view->end(), unchecked(view), exclude};
+        const filter_type ignore{std::get<pool_type<Exclude> *>(filter)...};
+        return iterator_type{view->end(), view->end(), unchecked(view), ignore};
     }
 
     /**
@@ -337,8 +337,8 @@ public:
      */
     iterator_type find(const entity_type entt) const ENTT_NOEXCEPT {
         const auto *view = candidate();
-        const filter_type exclude{std::get<pool_type<Exclude> *>(filter)...};
-        iterator_type it{view->find(entt), view->end(), unchecked(view), exclude};
+        const filter_type ignore{std::get<pool_type<Exclude> *>(filter)...};
+        iterator_type it{view->find(entt), view->end(), unchecked(view), ignore};
         return (it != end() && *it == entt) ? it : end();
     }
 
