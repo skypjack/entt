@@ -592,8 +592,8 @@ public:
         std::generate(first, last, [this]() { return generate(); });
 
         if constexpr(sizeof...(Component) > 0) {
-            // the reverse iterators guarantee the ordering between entities and components (hint: the pools return begin())
-            return std::make_tuple(assure<Component>()->batch(*this, std::make_reverse_iterator(last), std::make_reverse_iterator(first))...);
+            const auto distance = std::distance(first, last);
+            return std::make_tuple(std::make_reverse_iterator(assure<Component>()->batch(*this, first, last) + distance)...);
         }
     }
 
@@ -653,7 +653,7 @@ public:
             stomp<Component...>(first, last, src, other, exclude<Exclude...>);
         } else {
             static_assert(sizeof...(Exclude) == 0);
-            (assure<Component>()->batch(*this, std::make_reverse_iterator(last), std::make_reverse_iterator(first), other.get<Component>(src)), ...);
+            (assure<Component>()->batch(*this, first, last, other.get<Component>(src)), ...);
         }
     }
 
@@ -729,9 +729,27 @@ public:
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    decltype(auto) assign(const entity_type entity, [[maybe_unused]] Args &&... args) {
+    decltype(auto) assign(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
         return assure<Component>()->assign(*this, entity, std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Assigns each entity in a range the given component.
+     *
+     * @sa assign
+     *
+     * @tparam Component Type of component to create.
+     * @tparam It Type of input iterator.
+     * @tparam Args Types of arguments to use to construct the component.
+     * @param first An iterator to the first element of the range to assign.
+     * @param last An iterator past the last element of the range to assign.
+     * @param args Parameters to use to initialize the component.
+     * @return An iterator to the list of components just created.
+     */
+    template<typename Component, typename It, typename... Args>
+    auto assign_each(It first, It last, Args &&... args) {
+        return std::make_reverse_iterator(assure<Component>()->batch(*this, first, last, std::forward<Args>(args)...) + std::distance(first, last));
     }
 
     /**

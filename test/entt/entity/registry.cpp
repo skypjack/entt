@@ -1024,7 +1024,7 @@ TEST(Registry, Signals) {
     ASSERT_EQ(listener.last, e0);
 }
 
-TEST(Registry, DestroyByComponents) {
+TEST(Registry, RangeDestroy) {
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -1061,6 +1061,40 @@ TEST(Registry, DestroyByComponents) {
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
     ASSERT_FALSE(registry.valid(e2));
+}
+
+TEST(Registry, RangeAssign) {
+    entt::registry registry;
+
+    const auto e0 = registry.create();
+    const auto e1 = registry.create();
+    const auto e2 = registry.create();
+
+    registry.assign<int>(e0);
+    registry.assign<char>(e0);
+    registry.assign<double>(e0);
+
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
+
+    registry.assign<int>(e2);
+
+    ASSERT_FALSE(registry.has<float>(e0));
+    ASSERT_FALSE(registry.has<float>(e1));
+    ASSERT_FALSE(registry.has<float>(e2));
+
+    const auto view = registry.view<int, char>();
+    auto it = registry.assign_each<float>(view.begin(), view.end());
+
+    ASSERT_TRUE(registry.has<float>(e0));
+    ASSERT_TRUE(registry.has<float>(e1));
+    ASSERT_FALSE(registry.has<float>(e2));
+
+    *it = 0.f;
+    *(it+1) = 1.f;
+
+    ASSERT_EQ(registry.get<float>(*view.begin()), 0.f);
+    ASSERT_EQ(registry.get<float>(*(++view.begin())), 1.f);
 }
 
 TEST(Registry, CreateManyEntitiesAtOnce) {

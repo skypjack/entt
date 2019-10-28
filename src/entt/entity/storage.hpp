@@ -353,7 +353,7 @@ public:
      * same of the entities.
      */
     template<typename It, typename... Args>
-    iterator_type batch(It first, It last, Args &&... args) {
+    iterator_type batch(It first, It last, [[maybe_unused]] Args &&... args) {
         if constexpr(sizeof...(Args) == 0) {
             instances.resize(instances.size() + std::distance(first, last));
         } else {
