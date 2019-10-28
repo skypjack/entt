@@ -235,6 +235,9 @@ vel.dx = 0.;
 vel.dy = 0.;
 ```
 
+Similarly, the `assign_each` member function accepts two iterators, that is a
+range of entities to which to assign the component.
+
 If an entity already has the given component, the `replace` member function
 template can be used to replace it:
 

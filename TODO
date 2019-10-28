@@ -26,15 +26,18 @@
   - use direct access (pool-like) also for context variables
   - allow for key/value variables where the key is an ENTT_ID_TYPE
   - improves multi-stomp
-* multi component registry::remove and some others?
-  - auto foo(It first, It last = entity_type{null})
 * range based registry::remove and some others?
 * add examples (and credits) from @alanjfs :)
 * explore the possibility to wrap other backend with a XHandler component
 * use [[nodiscard]] consistently for safety purposes
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...>
 * null support for entt::component
-* add ENTT_CUSTOM_NAMED_TYPE for custom names
+* ENTT_NAMED_TYPE -> ENTT_EXPORT and add also ENTT_EXPORT_WITH_NAME
 * Make another attempt to overcome named types
 * meta: members+class as fake functions, is it possible?
+* meta: are fake types not backed by actual types possible?
 * named types: almost-stable index optimization for direct access to pools, no more linear searches
+* multi component registry::remove and some others?
+  - range destroy and range stomp -> destroy_each, stomp_each
+  - remove create overload for spwaning
+  - clean up stomp functions
