@@ -699,8 +699,8 @@ public:
      * @sa destroy
      *
      * @tparam It Type of input iterator.
-     * @param first An iterator to the first element of the range to generate.
-     * @param last An iterator past the last element of the range to generate.
+     * @param first An iterator to the first element of the range to destroy.
+     * @param last An iterator past the last element of the range to destroy.
      */
     template<typename It>
     void destroy(It first, It last) {
