@@ -1571,7 +1571,7 @@ TEST(Registry, StompMulti) {
 
     entt::entity entities[2];
     registry.create(std::begin(entities), std::end(entities));
-    registry.stomp<int, char, double>(std::begin(entities), std::end(entities), prototype, registry);
+    registry.stomp_each<int, char, double>(std::begin(entities), std::end(entities), prototype, registry);
 
     ASSERT_TRUE((registry.has<int, char>(entities[0])));
     ASSERT_TRUE((registry.has<int, char>(entities[1])));
@@ -1588,7 +1588,7 @@ TEST(Registry, StompExcludeMulti) {
 
     entt::entity entities[2];
     registry.create(std::begin(entities), std::end(entities));
-    registry.stomp(std::begin(entities), std::end(entities), prototype, registry, entt::exclude<char>);
+    registry.stomp_each(std::begin(entities), std::end(entities), prototype, registry, entt::exclude<char>);
 
     ASSERT_TRUE((registry.has<int>(entities[0])));
     ASSERT_TRUE((registry.has<int>(entities[1])));

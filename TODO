@@ -38,6 +38,5 @@
 * meta: are fake types not backed by actual types possible?
 * named types: almost-stable index optimization for direct access to pools, no more linear searches
 * multi component registry::remove and some others?
-  - range stomp -> stomp_each
   - remove create overload for spwaning
   - clean up stomp functions
