@@ -749,6 +749,7 @@ public:
      */
     template<typename Component, typename It, typename... Args>
     auto assign_each(It first, It last, Args &&... args) {
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
         return std::make_reverse_iterator(assure<Component>()->batch(*this, first, last, std::forward<Args>(args)...) + std::distance(first, last));
     }
 
