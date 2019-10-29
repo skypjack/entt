@@ -6,6 +6,14 @@
 #include "../config/config.h"
 
 
+#if defined(_MSC_VER)
+#   define ENTT_HASHED_STRING_SUPPRESS_WARNING                                \
+        __pragma (warning (suppress : 4307))
+#else
+#   define ENTT_HASHED_STRING_SUPPRESS_WARNING
+#endif
+
+
 namespace entt {
 
 

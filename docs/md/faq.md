@@ -128,10 +128,8 @@ here is a workaround in the form of a macro:
 ```cpp
 #if defined(_MSC_VER)
     #define HS(str)\
-        __pragma(warning(push))\
-        __pragma(warning(disable:4307))\
+        __pragma(warning(suppress:4307))\
         entt::hashed_string{str}\
-        __pragma(warning(pop))
 #else
     #define HS(str) entt::hashed_string{str}
 #endif
@@ -144,6 +142,16 @@ constexpr auto identifier = HS("my/resource/identifier");
 ```
 
 Thanks to [huwpascoe](https://github.com/huwpascoe) for the courtesy.
+
+Alternatively it is possible to use the macro provided by EnTT:
+
+```cpp
+ #define HS(str) ENTT_HASHED_STRING_SUPPRESS_WARNING entt::hashed_string{str}
+```
+
+This macro can be used in all cases where `entt::hashed_string` is used in
+constexpr context, for example, when specialising the `entt::named_type_traits`
+class.
 
 ## Warning C4003: the min, the max and the macro
 
