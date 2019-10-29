@@ -703,7 +703,7 @@ public:
      * @param last An iterator past the last element of the range to destroy.
      */
     template<typename It>
-    void destroy(It first, It last) {
+    void destroy_each(It first, It last) {
         // useless this-> used to suppress a warning with clang
         std::for_each(first, last, [this](const auto entity) { this->destroy(entity); });
     }
