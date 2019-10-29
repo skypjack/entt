@@ -184,14 +184,15 @@ auto entity = registry.create();
 registry.destroy(entity);
 ```
 
-There exists also an overload of the `create` and `destroy` member functions
-that accepts two iterators, that is a range to assign or to destroy. It can be
-used to create or destroy multiple entities at once:
+The `create` member function has also an overload that accepts two iterators and
+can be used to generate multiple entities at once efficiently. Similarly, the
+`destroy_each` member function works with a range of entities and destroys them
+all:
 
 ```cpp
 // destroys all the entities in a range
 auto view = registry.view<a_component, another_component>();
-registry.destroy(view.begin(), view.end());
+registry.destroy_each(view.begin(), view.end());
 ```
 
 In both cases, the `create` member function accepts also a list of default
@@ -235,8 +236,8 @@ vel.dx = 0.;
 vel.dy = 0.;
 ```
 
-Similarly, the `assign_each` member function accepts two iterators, that is a
-range of entities to which to assign the component.
+Similarly, the `assign_each` member function template accepts two iterators,
+that is a range of entities to which to assign a component.
 
 If an entity already has the given component, the `replace` member function
 template can be used to replace it:

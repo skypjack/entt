@@ -1046,7 +1046,7 @@ TEST(Registry, RangeDestroy) {
 
     {
         const auto view = registry.view<int, char>();
-        registry.destroy(view.begin(), view.end());
+        registry.destroy_each(view.begin(), view.end());
     }
 
     ASSERT_FALSE(registry.valid(e0));
@@ -1055,7 +1055,7 @@ TEST(Registry, RangeDestroy) {
 
     {
         const auto view = registry.view<int>();
-        registry.destroy(view.begin(), view.end());
+        registry.destroy_each(view.begin(), view.end());
     }
 
     ASSERT_FALSE(registry.valid(e0));
