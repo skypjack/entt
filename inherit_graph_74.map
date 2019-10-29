@@ -1,5 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structentt_1_1type__list.html" title="entt::type_list\&lt; Type... \&gt;" alt="" coords="5,31,172,57"/>
-<area shape="rect" id="node2" href="$structentt_1_1exclude__t.html" title="Alias for exclusion lists. " alt="" coords="220,5,381,32"/>
-<area shape="rect" id="node3" href="$structentt_1_1get__t.html" title="Alias for lists of observed components. " alt="" coords="233,56,368,83"/>
+<area shape="rect" id="node1" href="$classentt_1_1sparse__set.html" title="Basic sparse set implementation. " alt="" coords="5,111,180,138"/>
+<area shape="rect" id="node2" href="$classentt_1_1basic__storage.html" title="entt::basic_storage\l\&lt; Entity, Component \&gt;" alt="" coords="251,5,405,47"/>
+<area shape="rect" id="node4" href="$classentt_1_1basic__storage.html" title="entt::basic_storage\l\&lt; Entity, Type \&gt;" alt="" coords="261,71,395,112"/>
+<area shape="rect" id="node5" href="$classentt_1_1basic__storage.html" title="Basic storage implementation. " alt="" coords="237,136,419,177"/>
+<area shape="rect" id="node7" href="$classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01ENTT__ENABLE__ETO_07Type_08_4_01_4.html" title="Basic storage implementation. " alt="" coords="228,201,428,272"/>
+<area shape="rect" id="node3" href="$structentt_1_1storage.html" title="entt::storage\&lt; Entity,\l Component \&gt;" alt="" coords="476,5,621,47"/>
+<area shape="rect" id="node6" href="$structentt_1_1storage.html" title="Basic storage implementation. " alt="" coords="476,136,621,177"/>
 </map>

@@ -1,8 +1,8 @@
 <map id="entt::sparse_set&lt; Entity &gt;" name="entt::sparse_set&lt; Entity &gt;">
-<area shape="rect" id="node2" href="$classentt_1_1basic__storage.html" title="basic_storage\&lt; Entity,\l Component \&gt;" alt="" coords="229,5,383,47"/>
-<area shape="rect" id="node4" href="$classentt_1_1basic__storage.html" title="basic_storage\&lt; Entity,\l Type \&gt;" alt="" coords="229,71,383,112"/>
-<area shape="rect" id="node5" href="$classentt_1_1basic__storage.html" title="Basic storage implementation. " alt="" coords="239,136,373,177"/>
-<area shape="rect" id="node7" href="$classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01std_1_1is__empty__v_3_01Type_01_4_01_4_01_4.html" title="Basic storage implementation. " alt="" coords="228,201,384,272"/>
-<area shape="rect" id="node3" href="$structentt_1_1storage.html" title="entt::storage\&lt; Entity,\l Component \&gt;" alt="" coords="432,5,577,47"/>
-<area shape="rect" id="node6" href="$structentt_1_1storage.html" title="Basic storage implementation. " alt="" coords="432,136,577,177"/>
+<area shape="rect" id="node2" href="$classentt_1_1basic__storage.html" title="basic_storage\&lt; Entity,\l Component \&gt;" alt="" coords="251,5,405,47"/>
+<area shape="rect" id="node4" href="$classentt_1_1basic__storage.html" title="basic_storage\&lt; Entity,\l Type \&gt;" alt="" coords="251,71,405,112"/>
+<area shape="rect" id="node5" href="$classentt_1_1basic__storage.html" title="Basic storage implementation. " alt="" coords="261,136,395,177"/>
+<area shape="rect" id="node7" href="$classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01ENTT__ENABLE__ETO_07Type_08_4_01_4.html" title="Basic storage implementation. " alt="" coords="228,201,428,272"/>
+<area shape="rect" id="node3" href="$structentt_1_1storage.html" title="entt::storage\&lt; Entity,\l Component \&gt;" alt="" coords="476,5,621,47"/>
+<area shape="rect" id="node6" href="$structentt_1_1storage.html" title="Basic storage implementation. " alt="" coords="476,136,621,177"/>
 </map>

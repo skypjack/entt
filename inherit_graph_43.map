@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classentt_1_1meta__base.html" title="Meta base object. " alt="" coords="5,5,121,32"/>
+<area shape="rect" id="node2" href="$structentt_1_1is__equality__comparable_3_01Type_00_01std_1_1void__t_3_01decltype_07std_1_1declva22225425f92ebe2943dca66f125cfda1.html" title="Provides the member constant value to true if a given type is equality comparable, false otherwise. " alt="" coords="129,5,323,76"/>
+<area shape="rect" id="node3" href="$structentt_1_1is__named__type_3_01Type_00_01std_1_1void__t_3_01named__type__traits__t_3_01std_1_268fa5a871b2de95e24d77c0786df19e.html" title="Provides the member constant value to true if a given type has a name. In all other cases..." alt="" coords="147,101,305,186"/>
 </map>

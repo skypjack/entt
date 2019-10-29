@@ -109,13 +109,10 @@ Public Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#a6cc71def601dfb3a1c224b74a5c91da5">shrink_to_fit</a> ()</td></tr>
 <tr class="memdesc:a6cc71def601dfb3a1c224b74a5c91da5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Requests the removal of unused capacity. <br /></td></tr>
 <tr class="separator:a6cc71def601dfb3a1c224b74a5c91da5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3cd0ed624125b56cf2dacd9b06d6fff6"><td class="memTemplParams" colspan="2">template&lt;typename Component &gt; </td></tr>
+<tr class="memitem:a3cd0ed624125b56cf2dacd9b06d6fff6"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
 <tr class="memitem:a3cd0ed624125b56cf2dacd9b06d6fff6"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#a3cd0ed624125b56cf2dacd9b06d6fff6">empty</a> () const ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:a3cd0ed624125b56cf2dacd9b06d6fff6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the pool of a given component is empty.  <a href="#a3cd0ed624125b56cf2dacd9b06d6fff6">More...</a><br /></td></tr>
+<tr class="memdesc:a3cd0ed624125b56cf2dacd9b06d6fff6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the group or the pools of the given components are empty.  <a href="#a3cd0ed624125b56cf2dacd9b06d6fff6">More...</a><br /></td></tr>
 <tr class="separator:a3cd0ed624125b56cf2dacd9b06d6fff6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a570955dab379090129a528bf15dbff3a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#a570955dab379090129a528bf15dbff3a">empty</a> () const ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:a570955dab379090129a528bf15dbff3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the group is empty.  <a href="#a570955dab379090129a528bf15dbff3a">More...</a><br /></td></tr>
-<tr class="separator:a570955dab379090129a528bf15dbff3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5be80cb2fc104116469c1fa65b992149"><td class="memTemplParams" colspan="2">template&lt;typename Component &gt; </td></tr>
 <tr class="memitem:a5be80cb2fc104116469c1fa65b992149"><td class="memTemplItemLeft" align="right" valign="top">Component *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#a5be80cb2fc104116469c1fa65b992149">raw</a> () const ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:a5be80cb2fc104116469c1fa65b992149"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direct access to the list of components of a given pool.  <a href="#a5be80cb2fc104116469c1fa65b992149">More...</a><br /></td></tr>
@@ -229,7 +226,7 @@ template&lt;typename Entity , typename... Exclude, typename... Get&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the first entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00220">220</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00217">217</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>
@@ -300,7 +297,7 @@ template&lt;typename Entity , typename... Exclude, typename... Get&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the group contains the given entity, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00268">268</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00265">265</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>
@@ -342,7 +339,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the array of entities. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00186">186</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00183">183</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>
@@ -376,7 +373,7 @@ template&lt;typename Entity , typename... Exclude, typename... Get&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>There are no guarantees on the order of the entities. Use <code>begin</code> and <code>end</code> if you want to iterate the group in the expected order.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the array of entities. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00202">202</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00199">199</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>
@@ -425,19 +422,19 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00324">324</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00321">321</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>
 <a id="a3cd0ed624125b56cf2dacd9b06d6fff6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3cd0ed624125b56cf2dacd9b06d6fff6">&#9670;&nbsp;</a></span>empty() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cd0ed624125b56cf2dacd9b06d6fff6">&#9670;&nbsp;</a></span>empty()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Entity , typename... Exclude, typename... Get&gt; </div>
 <div class="memtemplate">
-template&lt;typename Component &gt; </div>
+template&lt;typename... Component&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -456,48 +453,16 @@ template&lt;typename Component &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Checks whether the pool of a given component is empty. </p>
+<p>Checks whether the group or the pools of the given components are empty. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Component</td><td>Type of component in which one is interested. </td></tr>
+    <tr><td class="paramname">Component</td><td>Types of components in which one is interested. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>True if the pool of the given component is empty, false otherwise. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the group or the pools of the given components are empty, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00140">140</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a570955dab379090129a528bf15dbff3a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a570955dab379090129a528bf15dbff3a">&#9670;&nbsp;</a></span>empty() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Entity , typename... Exclude, typename... Get&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classentt_1_1basic__group.html">entt::basic_group</a>&lt; Entity, <a class="el" href="structentt_1_1exclude__t.html">exclude_t</a>&lt; Exclude... &gt;, <a class="el" href="structentt_1_1get__t.html">get_t</a>&lt; Get... &gt; &gt;::empty </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Checks whether the group is empty. </p>
-<dl class="section return"><dt>Returns</dt><dd>True if the group is empty, false otherwise. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00148">148</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00141">141</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>
@@ -531,7 +496,7 @@ template&lt;typename Entity , typename... Exclude, typename... Get&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>Input iterators stay true to the order imposed to the underlying data structures.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the entity following the last entity that has the given components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00239">239</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00236">236</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>
@@ -570,7 +535,7 @@ template&lt;typename Entity , typename... Exclude, typename... Get&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator to the given entity if it's found, past the end iterator otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00249">249</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00246">246</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>
@@ -620,7 +585,7 @@ template&lt;typename... Component&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The components assigned to the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00290">290</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00287">287</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>
@@ -669,7 +634,7 @@ template&lt;typename Func &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00349">349</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00346">346</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>
@@ -708,7 +673,7 @@ template&lt;typename Entity , typename... Exclude, typename... Get&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The identifier that occupies the given position. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00259">259</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00256">256</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>
@@ -750,7 +715,7 @@ template&lt;typename Component &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the array of components. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00167">167</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00164">164</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>
@@ -881,7 +846,6 @@ template&lt;typename... Component, typename Compare , typename Sort  = std_sort,
 <li>An iterator past the last element of the range to sort.</li>
 <li>A comparison function to use to compare the elements.</li>
 </ul>
-<p>The comparison function object received by the sort function object hasn't necessarily the type of the one passed along with the other parameters to this member function.</p>
 <dl class="section note"><dt>Note</dt><dd>Attempting to iterate elements using a raw pointer returned by a call to either <code>data</code> or <code>raw</code> gives no guarantees on the order, even though <code>sort</code> has been invoked.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -901,7 +865,7 @@ template&lt;typename... Component, typename Compare , typename Sort  = std_sort,
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00400">400</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00393">393</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>
@@ -942,7 +906,7 @@ template&lt;typename Component &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00429">429</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="group_8hpp_source.html#l00425">425</a> of file <a class="el" href="group_8hpp_source.html">group.hpp</a>.</p>
 
 </div>
 </div>

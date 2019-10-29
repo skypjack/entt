@@ -1,4 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structentt_1_1named__type__traits.html" title="entt::named_type_traits\l\&lt; Type \&gt;" alt="" coords="5,5,164,47"/>
-<area shape="rect" id="node2" href="$structentt_1_1named__type__traits_3_01const_01Type_01_4.html" title="Specialization used to get rid of constness. " alt="" coords="212,5,371,47"/>
+<area shape="rect" id="node1" href="$classentt_1_1meta__factory.html" title="A meta factory to be used for reflection purposes. " alt="" coords="5,5,133,47"/>
+<area shape="rect" id="node2" href="$classentt_1_1extended__meta__factory.html" title="Extended meta factory to be used for reflection purposes. " alt="" coords="181,5,341,47"/>
 </map>

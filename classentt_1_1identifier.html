@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.1.1</span>
+   &#160;<span id="projectnumber">3.2.0</span>
    </div>
   </td>
  </tr>
@@ -88,7 +88,7 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 Static Public Attributes</h2></td></tr>
 <tr class="memitem:adb3aad553b8d57ef94581af39fc53178"><td class="memTemplParams" colspan="2"><a id="adb3aad553b8d57ef94581af39fc53178"></a>
 template&lt;typename Type &gt; </td></tr>
-<tr class="memitem:adb3aad553b8d57ef94581af39fc53178"><td class="memTemplItemLeft" align="right" valign="top">static constexpr <a class="el" href="classentt_1_1identifier.html#ae35c46f5811183291dd25294e7d82f92">identifier_type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1identifier.html#adb3aad553b8d57ef94581af39fc53178">type</a> = get&lt;std::decay_t&lt;Type&gt;&gt;(std::make_index_sequence&lt;sizeof...(Types)&gt;{})</td></tr>
+<tr class="memitem:adb3aad553b8d57ef94581af39fc53178"><td class="memTemplItemLeft" align="right" valign="top">static constexpr <a class="el" href="classentt_1_1identifier.html#ae35c46f5811183291dd25294e7d82f92">identifier_type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1identifier.html#adb3aad553b8d57ef94581af39fc53178">type</a> = get&lt;std::decay_t&lt;Type&gt;&gt;(std::index_sequence_for&lt;Types...&gt;{})</td></tr>
 <tr class="memdesc:adb3aad553b8d57ef94581af39fc53178"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statically generated unique identifier for the given type. <br /></td></tr>
 <tr class="separator:adb3aad553b8d57ef94581af39fc53178"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>

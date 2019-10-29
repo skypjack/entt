@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.1.1</span>
+   &#160;<span id="projectnumber">3.2.0</span>
    </div>
   </td>
  </tr>
@@ -89,10 +89,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a820ab4da509a0fb60c4edf8ea24b748a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1as__view.html#a820ab4da509a0fb60c4edf8ea24b748a">as_view</a> (<a class="el" href="structentt_1_1as__view.html#a458942b049c7ef96d45600337d57a70b">registry_type</a> &amp;source) ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:a820ab4da509a0fb60c4edf8ea24b748a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a converter for a given registry.  <a href="#a820ab4da509a0fb60c4edf8ea24b748a">More...</a><br /></td></tr>
 <tr class="separator:a820ab4da509a0fb60c4edf8ea24b748a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ca2fdd962761c71661b5178f3ec510b"><td class="memTemplParams" colspan="2">template&lt;typename... Component&gt; </td></tr>
-<tr class="memitem:a6ca2fdd962761c71661b5178f3ec510b"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1as__view.html#a6ca2fdd962761c71661b5178f3ec510b">operator entt::basic_view&lt; Entity, Component... &gt;</a> () const</td></tr>
-<tr class="memdesc:a6ca2fdd962761c71661b5178f3ec510b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion function from a registry to a view.  <a href="#a6ca2fdd962761c71661b5178f3ec510b">More...</a><br /></td></tr>
-<tr class="separator:a6ca2fdd962761c71661b5178f3ec510b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac140def0e18cd8dc04c486f6d5813da"><td class="memTemplParams" colspan="2">template&lt;typename Exclude , typename... Component&gt; </td></tr>
+<tr class="memitem:aac140def0e18cd8dc04c486f6d5813da"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structentt_1_1as__view.html#aac140def0e18cd8dc04c486f6d5813da">operator entt::basic_view&lt; Entity, Exclude, Component... &gt;</a> () const</td></tr>
+<tr class="memdesc:aac140def0e18cd8dc04c486f6d5813da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion function from a registry to a view.  <a href="#aac140def0e18cd8dc04c486f6d5813da">More...</a><br /></td></tr>
+<tr class="separator:aac140def0e18cd8dc04c486f6d5813da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;bool Const, typename Entity&gt;<br />
@@ -148,21 +148,21 @@ template&lt;bool Const, typename Entity &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a6ca2fdd962761c71661b5178f3ec510b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6ca2fdd962761c71661b5178f3ec510b">&#9670;&nbsp;</a></span>operator entt::basic_view< Entity, Component... >()</h2>
+<a id="aac140def0e18cd8dc04c486f6d5813da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac140def0e18cd8dc04c486f6d5813da">&#9670;&nbsp;</a></span>operator entt::basic_view< Entity, Exclude, Component... >()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;bool Const, typename Entity &gt; </div>
 <div class="memtemplate">
-template&lt;typename... Component&gt; </div>
+template&lt;typename Exclude , typename... Component&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structentt_1_1as__view.html">entt::as_view</a>&lt; Const, Entity &gt;::operator <a class="el" href="classentt_1_1basic__view.html">entt::basic_view</a>&lt; Entity, Component... &gt; </td>
+          <td class="memname"><a class="el" href="structentt_1_1as__view.html">entt::as_view</a>&lt; Const, Entity &gt;::operator <a class="el" href="classentt_1_1basic__view.html">entt::basic_view</a>&lt; Entity, Exclude, Component... &gt; </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -178,13 +178,14 @@ template&lt;typename... Component&gt; </div>
 <p>Conversion function from a registry to a view. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
+    <tr><td class="paramname">Exclude</td><td>Types of components used to filter the view. </td></tr>
     <tr><td class="paramname">Component</td><td>Type of components used to construct the view. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A newly created view. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00036">36</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="helper_8hpp_source.html#l00037">37</a> of file <a class="el" href="helper_8hpp_source.html">helper.hpp</a>.</p>
 
 </div>
 </div>

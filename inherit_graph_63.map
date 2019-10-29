@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structentt_1_1service__locator.html" title="Service locator, nothing more. " alt="" coords="5,5,145,47"/>
+<area shape="rect" id="node2" href="$structentt_1_1overloaded.html" title="Helper type for visitors. " alt="" coords="209,5,377,32"/>
+<area shape="rect" id="node3" href="$structentt_1_1process__adaptor.html" title="Adaptor for lambdas and functors to turn them into processes. " alt="" coords="219,59,367,101"/>
+<area shape="rect" id="node4" href="$classentt_1_1process.html" title="entt::process\&lt; process\l_adaptor\&lt; Func, Delta\l \&gt;, Delta \&gt;" alt="" coords="5,56,161,112"/>
 </map>

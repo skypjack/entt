@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['emitter',['emitter',['../structentt_1_1emitter_1_1connection.html#a0f3bb10ad57dc0e06298fc9ba38a7bd9',1,'entt::emitter::connection']]]
+  ['cache_3c_20resource_20_3e',['cache&lt; Resource &gt;',['../classentt_1_1handle.html#adcd47fa89dbe180ef0db46d3f0c43762',1,'entt::handle::cache&lt; Resource &gt;()'],['../classentt_1_1loader.html#adcd47fa89dbe180ef0db46d3f0c43762',1,'entt::loader::cache&lt; Resource &gt;()']]]
 ];

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.1.1</span>
+   &#160;<span id="projectnumber">3.2.0</span>
    </div>
   </td>
  </tr>
@@ -66,7 +66,7 @@ $(function() {
 : <a class="el" href="structentt_1_1basic__actor.html#a079bddd72566b14843729a154a8f684e">entt::basic_actor&lt; Entity &gt;</a>
 </li>
 <li>base()
-: <a class="el" href="classentt_1_1meta__factory.html#a08184dab6a4da744ad630ede2ac0856b">entt::meta_factory&lt; Type &gt;</a>
+: <a class="el" href="classentt_1_1meta__factory.html#a2387e5bc85a87e3c936d82a956805bfb">entt::meta_factory&lt; Type &gt;</a>
 , <a class="el" href="classentt_1_1meta__type.html#ace805045bd4049fb839d1b92f89b1999">entt::meta_type</a>
 </li>
 <li>basic_actor()
@@ -91,19 +91,26 @@ $(function() {
 : <a class="el" href="classentt_1_1basic__snapshot__loader.html#acc078b2e9068ae41a2910168b40322d4">entt::basic_snapshot_loader&lt; Entity &gt;</a>
 </li>
 <li>batch()
-: <a class="el" href="classentt_1_1basic__storage.html#ad00076491350dff51f9a057da5c88dc0">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
-, <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01std_1_1is__empty__v_3_01Type_01_4_01_4_01_4.html#a97fe579a005cb4b53e30ab988a0d05cf">entt::basic_storage&lt; Entity, Type, std::enable_if_t&lt; std::is_empty_v&lt; Type &gt; &gt; &gt;</a>
+: <a class="el" href="classentt_1_1basic__storage.html#a5ef85c69a23deffd46b2dcfafcc4a668">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01ENTT__ENABLE__ETO_07Type_08_4_01_4.html#a66175004c693a405d57722c67b1ceda3">entt::basic_storage&lt; Entity, Type, std::enable_if_t&lt; ENTT_ENABLE_ETO(Type)&gt; &gt;</a>
 , <a class="el" href="classentt_1_1sparse__set.html#a642460f7f0ca8e42220c43c785467063">entt::sparse_set&lt; Entity &gt;</a>
 </li>
+<li>before()
+: <a class="el" href="classentt_1_1sink_3_01Ret_07Args_8_8_8_08_4.html#ab8247ff409a75c0276dd003735247863">entt::sink&lt; Ret(Args...)&gt;</a>
+</li>
 <li>begin()
-: <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_00_01Other_8_8_8_01_4_01_4.html#ae8586e583284a89492e391639366e39a">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get, Other... &gt; &gt;</a>
-, <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_54ca6466fcd0506388705164ba2d896f.html#aa1d827213526124152a3fc216b4cd1f2">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get... &gt;, Owned, Other... &gt;</a>
+: <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_8_8_8_01_4_01_4.html#a98d938206557463317eac00c8eeaa73e">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get... &gt; &gt;</a>
+, <a class="el" href="classentt_1_1basic__group_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01get__t_3_01Get_1aada3a14110654dc27700c17c9c2396.html#acc9327669866ff8d39c4a6e6d2bd2333">entt::basic_group&lt; Entity, exclude_t&lt; Exclude... &gt;, get_t&lt; Get... &gt;, Owned... &gt;</a>
 , <a class="el" href="classentt_1_1basic__observer.html#a33bca86113be57e75ca1da80620763d1">entt::basic_observer&lt; Entity &gt;</a>
 , <a class="el" href="classentt_1_1basic__runtime__view.html#af47b1aff2d44990f17c9740cf24a2670">entt::basic_runtime_view&lt; Entity &gt;</a>
-, <a class="el" href="classentt_1_1basic__storage.html#ab963b76ebe297a1ad4a2c433aa55f2b5">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
-, <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01std_1_1is__empty__v_3_01Type_01_4_01_4_01_4.html#aa4a66c77a01df615cbdf02c07e184bd1">entt::basic_storage&lt; Entity, Type, std::enable_if_t&lt; std::is_empty_v&lt; Type &gt; &gt; &gt;</a>
-, <a class="el" href="classentt_1_1basic__view.html#a00d2bb01727273bf40acdf1a57588fc7">entt::basic_view&lt; Entity, Component &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage.html#aecc4b13b67a7664c5c36596f2b927bed">entt::basic_storage&lt; Entity, Type, typename &gt;</a>
+, <a class="el" href="classentt_1_1basic__storage_3_01Entity_00_01Type_00_01std_1_1enable__if__t_3_01ENTT__ENABLE__ETO_07Type_08_4_01_4.html#a9676a3940e684f720bd2fc06128a4e2e">entt::basic_storage&lt; Entity, Type, std::enable_if_t&lt; ENTT_ENABLE_ETO(Type)&gt; &gt;</a>
+, <a class="el" href="classentt_1_1basic__view_3_01Entity_00_01exclude__t_3_01Exclude_8_8_8_01_4_00_01Component_8_8_8_01_4.html#a2ec860ee4a88c8ff309b614070b98b15">entt::basic_view&lt; Entity, exclude_t&lt; Exclude... &gt;, Component... &gt;</a>
+, <a class="el" href="classentt_1_1basic__view_3_01Entity_00_01exclude__t_3_4_00_01Component_01_4.html#a2b0108681a38c823de6a4ba49baa3957">entt::basic_view&lt; Entity, exclude_t&lt;&gt;, Component &gt;</a>
 , <a class="el" href="classentt_1_1sparse__set.html#a06743336f265989b48e106a3d3bd1562">entt::sparse_set&lt; Entity &gt;</a>
+</li>
+<li>bind()
+: <a class="el" href="structentt_1_1meta__ctx.html#a43f914e2d2470e82b1e5415f60a4f803">entt::meta_ctx</a>
 </li>
 </ul>
 </div><!-- contents -->
