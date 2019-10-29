@@ -688,13 +688,13 @@ nothing more than a container and different optimizations and strategies can be
 applied to different containers.
 
 Once there are multiple registries available, however, one or more methods are
-needed to transfer information from one container to another and this results in
-the `stomp` member function and a couple of overloads of the `create` member
-function for the `registry` class .<br/>
-The `stomp` function allows to take one entity from a registry and use it to
-_stomp_ one or more entities in another registry (or even the same, actually
-making local copies). On the other hand, the overloads of the `create` member
-function can be used to spawn new entities from a prototype.
+needed to transfer information from one container to another. This results in
+the `stomp` and `stomp_each` member functions, other than a couple of overloads
+of the `create` member function for the `registry` class .<br/>
+These functions allow to take one entity from a registry and use it to _stomp_
+one or more entities in another registry (or even the same, actually making
+local copies). On the other hand, the overloads of the `create` member function
+can be used to spawn new entities from a prototype.
 
 These features open definitely the doors to a lot of interesting features like
 migrating entities between registries, prototypes, shadow registry, prefabs,

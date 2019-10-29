@@ -650,7 +650,7 @@ public:
         create(first, last);
 
         if constexpr(sizeof...(Component) == 0) {
-            stomp<Component...>(first, last, src, other, exclude<Exclude...>);
+            stomp_each<Component...>(first, last, src, other, exclude<Exclude...>);
         } else {
             static_assert(sizeof...(Exclude) == 0);
             (assure<Component>()->batch(*this, first, last, other.get<Component>(src)), ...);
@@ -1639,7 +1639,7 @@ public:
     template<typename... Component, typename... Exclude>
     void stomp(const entity_type dst, const entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
         const entity_type entt[1]{dst};
-        stomp<Component...>(std::begin(entt), std::end(entt), src, other, exclude<Exclude...>);
+        stomp_each<Component...>(std::begin(entt), std::end(entt), src, other, exclude<Exclude...>);
     }
 
     /**
@@ -1656,7 +1656,7 @@ public:
      * @param other The registry that owns the source entity.
      */
     template<typename... Component, typename It, typename... Exclude>
-    void stomp(It first, It last, const entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
+    void stomp_each(It first, It last, const entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Component) == 0 || sizeof...(Exclude) == 0);
 
         for(auto pos = other.pools.size(); pos; --pos) {
