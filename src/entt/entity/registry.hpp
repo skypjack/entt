@@ -650,7 +650,7 @@ public:
         create(first, last);
 
         if constexpr(sizeof...(Component) == 0) {
-            stomp_each<Component...>(first, last, src, other, exclude<Exclude...>);
+            stomp<Component...>(first, last, src, other, exclude<Exclude...>);
         } else {
             static_assert(sizeof...(Exclude) == 0);
             (assure<Component>()->batch(*this, first, last, other.get<Component>(src)), ...);
@@ -703,7 +703,7 @@ public:
      * @param last An iterator past the last element of the range to destroy.
      */
     template<typename It>
-    void destroy_each(It first, It last) {
+    void destroy(It first, It last) {
         // useless this-> used to suppress a warning with clang
         std::for_each(first, last, [this](const auto entity) { this->destroy(entity); });
     }
@@ -748,7 +748,8 @@ public:
      * @return An iterator to the list of components just created.
      */
     template<typename Component, typename It, typename... Args>
-    auto assign_each(It first, It last, Args &&... args) {
+    std::enable_if_t<!std::is_same_v<It, entity_type>, std::reverse_iterator<typename pool_type<Component>::iterator_type>>
+    assign(It first, It last, Args &&... args) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
         return std::make_reverse_iterator(assure<Component>()->batch(*this, first, last, std::forward<Args>(args)...) + std::distance(first, last));
     }
@@ -1639,7 +1640,7 @@ public:
     template<typename... Component, typename... Exclude>
     void stomp(const entity_type dst, const entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
         const entity_type entt[1]{dst};
-        stomp_each<Component...>(std::begin(entt), std::end(entt), src, other, exclude<Exclude...>);
+        stomp<Component...>(std::begin(entt), std::end(entt), src, other, exclude<Exclude...>);
     }
 
     /**
@@ -1656,7 +1657,7 @@ public:
      * @param other The registry that owns the source entity.
      */
     template<typename... Component, typename It, typename... Exclude>
-    void stomp_each(It first, It last, const entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
+    void stomp(It first, It last, const entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Component) == 0 || sizeof...(Exclude) == 0);
 
         for(auto pos = other.pools.size(); pos; --pos) {

@@ -1030,7 +1030,7 @@ TEST(Registry, RangeDestroy) {
 
     {
         const auto view = registry.view<int, char>();
-        registry.destroy_each(view.begin(), view.end());
+        registry.destroy(view.begin(), view.end());
     }
 
     ASSERT_FALSE(registry.valid(e0));
@@ -1039,7 +1039,7 @@ TEST(Registry, RangeDestroy) {
 
     {
         const auto view = registry.view<int>();
-        registry.destroy_each(view.begin(), view.end());
+        registry.destroy(view.begin(), view.end());
     }
 
     ASSERT_FALSE(registry.valid(e0));
@@ -1068,7 +1068,7 @@ TEST(Registry, RangeAssign) {
     ASSERT_FALSE(registry.has<float>(e2));
 
     const auto view = registry.view<int, char>();
-    auto it = registry.assign_each<float>(view.begin(), view.end());
+    auto it = registry.assign<float>(view.begin(), view.end());
 
     ASSERT_TRUE(registry.has<float>(e0));
     ASSERT_TRUE(registry.has<float>(e1));
@@ -1555,7 +1555,7 @@ TEST(Registry, StompMulti) {
 
     entt::entity entities[2];
     registry.create(std::begin(entities), std::end(entities));
-    registry.stomp_each<int, char, double>(std::begin(entities), std::end(entities), prototype, registry);
+    registry.stomp<int, char, double>(std::begin(entities), std::end(entities), prototype, registry);
 
     ASSERT_TRUE((registry.has<int, char>(entities[0])));
     ASSERT_TRUE((registry.has<int, char>(entities[1])));
@@ -1572,7 +1572,7 @@ TEST(Registry, StompExcludeMulti) {
 
     entt::entity entities[2];
     registry.create(std::begin(entities), std::end(entities));
-    registry.stomp_each(std::begin(entities), std::end(entities), prototype, registry, entt::exclude<char>);
+    registry.stomp(std::begin(entities), std::end(entities), prototype, registry, entt::exclude<char>);
 
     ASSERT_TRUE((registry.has<int>(entities[0])));
     ASSERT_TRUE((registry.has<int>(entities[1])));

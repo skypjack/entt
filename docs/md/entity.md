@@ -186,13 +186,13 @@ registry.destroy(entity);
 
 The `create` member function has also an overload that accepts two iterators and
 can be used to generate multiple entities at once efficiently. Similarly, the
-`destroy_each` member function works with a range of entities and destroys them
+`destroy` member function works also with a range of entities and destroys them
 all:
 
 ```cpp
 // destroys all the entities in a range
 auto view = registry.view<a_component, another_component>();
-registry.destroy_each(view.begin(), view.end());
+registry.destroy(view.begin(), view.end());
 ```
 
 In both cases, the `create` member function accepts also a list of default
@@ -236,8 +236,8 @@ vel.dx = 0.;
 vel.dy = 0.;
 ```
 
-Similarly, the `assign_each` member function template accepts two iterators,
-that is a range of entities to which to assign a component.
+This function is overloaded and can receive also a couple of iterators to be
+used to assign the same component to multiple entities at once.
 
 If an entity already has the given component, the `replace` member function
 template can be used to replace it:
@@ -689,8 +689,8 @@ applied to different containers.
 
 Once there are multiple registries available, however, one or more methods are
 needed to transfer information from one container to another. This results in
-the `stomp` and `stomp_each` member functions, other than a couple of overloads
-of the `create` member function for the `registry` class .<br/>
+the `stomp` member functions and a couple of overloads of the `create` member
+function for the `registry` class .<br/>
 These functions allow to take one entity from a registry and use it to _stomp_
 one or more entities in another registry (or even the same, actually making
 local copies). On the other hand, the overloads of the `create` member function
