@@ -279,9 +279,9 @@ The meta objects that compose a meta type are accessed in the following ways:
   The returned type is `meta_ctor` and may be invalid if there is no constructor
   that accepts the supplied arguments or at least some types from which they are
   derived or to which they can be converted.<br/>
-  A meta constructor offers an API to know the number of arguments, the expected
-  meta types and to invoke it, therefore to construct a new instance of the
-  underlying type.
+  A meta constructor offers an API to know the number of its arguments and their
+  expected meta types. Furthermor, it's possible to invoke it and therefore to
+  construct new instances of the underlying type.
 
 * _Meta destructor_. It's returned by a dedicated function:
 
