@@ -8,7 +8,6 @@
 
 #define ENTT_DISPATCHER_EXPORT(clazz, attribute)\
     namespace entt {\
-        template attribute const ENTT_ID_TYPE family<struct internal_dispatcher_event_family>::inner<clazz>;\
         template attribute const ENTT_ID_TYPE family<struct internal_dispatcher_event_family>::type<clazz>;\
     }\
     static_assert(true)
