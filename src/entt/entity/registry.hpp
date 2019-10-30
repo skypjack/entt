@@ -70,20 +70,16 @@ class basic_registry {
 
         template<typename... Args>
         decltype(auto) assign(basic_registry &owner, const Entity entt, Args &&... args) {
-            if constexpr(ENTT_ENABLE_ETO(Component)) {
-                storage<Entity, Component>::construct(entt);
-                construction.publish(entt, owner, Component{});
-                return Component{std::forward<Args>(args)...};
-            } else {
-                auto &component = storage<Entity, Component>::construct(entt, std::forward<Args>(args)...);
-                construction.publish(entt, owner, component);
-                return component;
-            }
+            using component_type = std::conditional_t<ENTT_ENABLE_ETO(Component), Component, Component &>;
+            component_type component = storage<Entity, Component>::construct(entt, std::forward<Args>(args)...);
+            construction.publish(entt, owner, component);
+            return component;
         }
 
         template<typename It, typename... Args>
-        auto batch(basic_registry &owner, It first, It last, Args &&... args) {
-            auto it = storage<Entity, Component>::batch(first, last, std::forward<Args>(args)...);
+        std::enable_if_t<!std::is_same_v<It, Entity>, typename storage<Entity, Component>::reverse_iterator_type>
+        assign(basic_registry &owner, It first, It last, Args &&... args) {
+            auto it = storage<Entity, Component>::construct(first, last, std::forward<Args>(args)...);
 
             if(!construction.empty()) {
                 std::for_each(first, last, [this, &owner, it](const auto entt) mutable {
@@ -101,15 +97,9 @@ class basic_registry {
 
         template<typename... Args>
         decltype(auto) replace(basic_registry &owner, const Entity entt, Args &&... args) {
-            if constexpr(ENTT_ENABLE_ETO(Component)) {
-                ENTT_ASSERT((storage<Entity, Component>::has(entt)));
-                update.publish(entt, owner, Component{});
-                return Component{std::forward<Args>(args)...};
-            } else {
-                Component component{std::forward<Args>(args)...};
-                update.publish(entt, owner, component);
-                return (storage<Entity, Component>::get(entt) = std::move(component));
-            }
+            Component component{std::forward<Args>(args)...};
+            update.publish(entt, owner, component);
+            return (storage<Entity, Component>::get(entt) = std::move(component));
         }
 
     private:
@@ -592,8 +582,7 @@ public:
         std::generate(first, last, [this]() { return generate(); });
 
         if constexpr(sizeof...(Component) > 0) {
-            const auto distance = std::distance(first, last);
-            return std::make_tuple(std::make_reverse_iterator(assure<Component>()->batch(*this, first, last) + distance)...);
+            return std::make_tuple(assure<Component>()->assign(*this, first, last)...);
         }
     }
 
@@ -634,8 +623,8 @@ public:
      * existing types. The non-copyable ones will be ignored.
      *
      * @note
-     * Specifying the list of components is ways faster than an opaque copy and
-     * uses the batch creation under the hood.
+     * Specifying the list of components is faster than an opaque copy and uses
+     * the batch creation under the hood.
      *
      * @tparam Component Types of components to copy.
      * @tparam It Type of input iterator.
@@ -653,7 +642,7 @@ public:
             stomp<Component...>(first, last, src, other, exclude<Exclude...>);
         } else {
             static_assert(sizeof...(Exclude) == 0);
-            (assure<Component>()->batch(*this, first, last, other.get<Component>(src)), ...);
+            (assure<Component>()->assign(*this, first, last, other.get<Component>(src)), ...);
         }
     }
 
@@ -748,10 +737,10 @@ public:
      * @return An iterator to the list of components just created.
      */
     template<typename Component, typename It, typename... Args>
-    std::enable_if_t<!std::is_same_v<It, entity_type>, std::reverse_iterator<typename pool_type<Component>::iterator_type>>
+    std::enable_if_t<!std::is_same_v<It, entity_type>, typename pool_type<Component>::reverse_iterator_type>
     assign(It first, It last, Args &&... args) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        return std::make_reverse_iterator(assure<Component>()->batch(*this, first, last, std::forward<Args>(args)...) + std::distance(first, last));
+        return assure<Component>()->assign(*this, first, last, std::forward<Args>(args)...);
     }
 
     /**
