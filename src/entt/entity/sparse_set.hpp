@@ -418,7 +418,7 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    void batch(It first, It last) {
+    void construct(It first, It last) {
         std::for_each(first, last, [this, next = direct.size()](const auto entt) mutable {
             ENTT_ASSERT(!has(entt));
             auto [page, offset] = map(entt);

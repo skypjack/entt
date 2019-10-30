@@ -165,6 +165,8 @@ public:
     using iterator_type = iterator<false>;
     /*! @brief Constant random access iterator type. */
     using const_iterator_type = iterator<true>;
+    /*! @brief Reverse iterator type. */
+    using reverse_iterator_type = std::reverse_iterator<iterator<false>>;
 
     /**
      * @brief Increases the capacity of a storage.
@@ -353,7 +355,8 @@ public:
      * same of the entities.
      */
     template<typename It, typename... Args>
-    iterator_type batch(It first, It last, [[maybe_unused]] Args &&... args) {
+    std::enable_if_t<!std::is_same_v<It, entity_type>, reverse_iterator_type>
+    construct(It first, It last, [[maybe_unused]] Args &&... args) {
         if constexpr(sizeof...(Args) == 0) {
             instances.resize(instances.size() + std::distance(first, last));
         } else {
@@ -361,8 +364,8 @@ public:
         }
 
         // entity goes after component in case constructor throws
-        underlying_type::batch(first, last);
-        return begin();
+        underlying_type::construct(first, last);
+        return std::make_reverse_iterator(begin() + std::distance(first, last));
     }
 
     /**
@@ -589,6 +592,8 @@ public:
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
     using iterator_type = iterator;
+    /*! @brief Reverse iterator type. */
+    using reverse_iterator_type = std::reverse_iterator<iterator>;
 
     /**
      * @brief Returns an iterator to the beginning.
@@ -657,9 +662,34 @@ public:
     }
 
     /**
+     * @brief Assigns an entity to a storage and constructs its object.
+     *
+     * The object type must be at least copy constructible.
+     *
+     * @warning
+     * Attempting to use an entity that already belongs to the storage results
+     * in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * storage already contains the given entity.
+     *
+     * @tparam Args Types of arguments to use to construct the object.
+     * @param entt A valid entity identifier.
+     * @param args Parameters to use to construct an object for the entity.
+     * @return The object associated with the entity.
+     */
+    template<typename... Args>
+    object_type construct(const entity_type entt, Args &&... args) {
+        object_type instance{std::forward<Args>(args)...};
+        // entity goes after component in case constructor throws
+        underlying_type::construct(entt);
+        return instance;
+    }
+
+    /**
      * @brief Assigns one or more entities to a storage.
      *
-     * The object type must be at least default constructible.
+     * The object type must be at least default constructible if no arguments
+     * are provided.
      *
      * @warning
      * Attempting to assign an entity that already belongs to the storage
@@ -668,15 +698,20 @@ public:
      * storage already contains the given entity.
      *
      * @tparam It Type of forward iterator.
+     * @tparam Args Types of arguments to use to construct the object.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @param args Parameters to use to construct an object for the entities.
      * @return An iterator to the list of instances just created and sorted the
      * same of the entities.
      */
-    template<typename It>
-    iterator_type batch(It first, It last, const object_type & = {}) {
-        underlying_type::batch(first, last);
-        return begin();
+    template<typename It, typename... Args>
+    std::enable_if_t<!std::is_same_v<It, entity_type>, reverse_iterator_type>
+    construct(It first, It last, Args &&... args) {
+        [[maybe_unused]] object_type instance{std::forward<Args>(args)...};
+        // entity goes after component in case constructor throws
+        underlying_type::construct(first, last);
+        return std::make_reverse_iterator(begin() + std::distance(first, last));
     }
 
     /*! @copydoc storage::sort */
