@@ -1480,7 +1480,7 @@ TEST(Registry, CloneExclude) {
     registry.assign<int>(entity);
     registry.assign<char>(entity);
 
-    other = registry.clone<int, char>(entt::exclude<char>);
+    other = registry.clone<int>();
 
     ASSERT_TRUE(other.has(entity));
     ASSERT_TRUE(other.has<int>(entity));
