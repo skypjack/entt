@@ -14,9 +14,3 @@ struct velocity {
     int dx;
     int dy;
 };
-
-struct an_event {
-    int payload;
-};
-
-struct another_event {};
