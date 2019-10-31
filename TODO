@@ -3,22 +3,17 @@
 * long term feature: shared_ptr less resource cache
 * custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
-* runner proposal: https://en.wikipedia.org/wiki/Fork%E2%80%93join_model https://slide-rs.github.io/specs/03_dispatcher.html
 * work stealing job system (see #100)
   - mt scheduler based on const awareness for types
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
+  - remove runtime views, welcome reflection and what about snapshot?
 * allow for built-in parallel each if possible
 * allow to replace std:: with custom implementations
-* remove runtime views, welcome reflection and what about snapshot?
 * types defined at runtime that refer to the same compile-time type (but to different pools) are possible, the library is almost there
 * add opaque input iterators to views and groups that return tuples <entity, T &...> (proxy), multi-pass guaranteed
-* add fast lane for raw iterations, extend mt doc to describe allowed add/remove with pre-allocations on fast lanes
-* registry.each<T...>(first, last) by iterators, entities/components guaranteed
-* built-in support for dual (or N-) buffering
 * allow for custom stomp functions
-* deprecate/replace snapshot
-* hibitset, views and non-owning groups
-* custom (decoupled) pools ==> double buffering, shared components, multi-model
+* custom (decoupled) pools ==> N-buffering, shared components, multi-model, hibitsets, and so on
+  - explore the possibility to wrap other backend with a XHandler component
 * snapshot rework/deprecation
   - create(hint: entity) -> force-create
   - assign<T...>(first, last)
@@ -28,15 +23,18 @@
   - improves multi-stomp
 * range based registry::remove and some others?
 * add examples (and credits) from @alanjfs :)
-* explore the possibility to wrap other backend with a XHandler component
 * use [[nodiscard]] consistently for safety purposes
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...>
-* null support for entt::component
 * ENTT_NAMED_TYPE -> ENTT_EXPORT and add also ENTT_EXPORT_WITH_NAME
-* Make another attempt to overcome named types
 * meta: members+class as fake functions, is it possible?
 * meta: are fake types not backed by actual types possible?
+* meta: export implicitly generated named types if possible
+* add meta support to registry:
+  - entity for each component
+  - opaque get
+  - and so on (I'm lazy) :)
 * named types: almost-stable index optimization for direct access to pools, no more linear searches
+  - can implicitly generate types for meta benefit from a similar approach?
 * multi component registry::remove and some others?
   - remove create overload for spwaning
   - clean up stomp functions
