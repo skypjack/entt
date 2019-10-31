@@ -637,13 +637,7 @@ public:
     template<typename... Component, typename It, typename... Exclude>
     void create(It first, It last, entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
         create(first, last);
-
-        if constexpr(sizeof...(Component) == 0) {
-            stomp<Component...>(first, last, src, other, exclude<Exclude...>);
-        } else {
-            static_assert(sizeof...(Exclude) == 0);
-            (assure<Component>()->assign(*this, first, last, other.get<Component>(src)), ...);
-        }
+        stomp<Component...>(first, last, src, other, exclude<Exclude...>);
     }
 
     /**
@@ -1563,16 +1557,13 @@ public:
      */
     template<typename... Component, typename... Exclude>
     basic_registry clone(exclude_t<Exclude...> = {}) const {
-        static_assert(std::conjunction_v<std::is_copy_constructible<Component>...>);
-        basic_registry other;
+        static_assert((sizeof...(Component) == 0 || sizeof...(Exclude) == 0) && std::conjunction_v<std::is_copy_constructible<Component>...>);
 
+        basic_registry other;
         other.pools.resize(pools.size());
 
         for(auto pos = pools.size(); pos; --pos) {
-            const auto &pdata = pools[pos-1];
-            ENTT_ASSERT(!sizeof...(Component) || !pdata.pool || pdata.clone);
-
-            if(pdata.pool && pdata.clone
+            if(const auto &pdata = pools[pos-1]; pdata.pool && pdata.clone
                     && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))
                     && ((pdata.runtime_type != to_integer(type<Exclude>())) && ...))
             {
@@ -1580,7 +1571,7 @@ public:
                 curr.remove = pdata.remove;
                 curr.clone = pdata.clone;
                 curr.stomp = pdata.stomp;
-                curr.pool = pdata.clone ? pdata.clone(*pdata.pool) : nullptr;
+                curr.pool = pdata.clone(*pdata.pool);
                 curr.runtime_type = pdata.runtime_type;
             }
         }
@@ -1647,13 +1638,10 @@ public:
      */
     template<typename... Component, typename It, typename... Exclude>
     void stomp(It first, It last, const entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
-        static_assert(sizeof...(Component) == 0 || sizeof...(Exclude) == 0);
+        static_assert((sizeof...(Component) == 0 || sizeof...(Exclude) == 0) && std::conjunction_v<std::is_copy_constructible<Component>...>);
 
         for(auto pos = other.pools.size(); pos; --pos) {
-            const auto &pdata = other.pools[pos-1];
-            ENTT_ASSERT(!sizeof...(Component) || !pdata.pool || pdata.stomp);
-
-            if(pdata.pool && pdata.stomp
+            if(const auto &pdata = other.pools[pos-1]; pdata.pool && pdata.stomp
                     && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))
                     && ((pdata.runtime_type != to_integer(type<Exclude>())) && ...)
                     && pdata.pool->has(src))
