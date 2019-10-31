@@ -1,7 +1,10 @@
 #include <entt/lib/attribute.h>
 #include <entt/signal/dispatcher.hpp>
+
 #include "common.h"
 
-ENTT_EXPORT void trigger_an_event(int payload, entt::dispatcher &dispatcher) {
-    dispatcher.trigger<an_event>(payload);
+#include "lib2.hpp"
+
+void trigger_common_payload_event(int payload, entt::dispatcher &dispatcher) {
+    dispatcher.trigger<common_payload_event>(payload);
 }

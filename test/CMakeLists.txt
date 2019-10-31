@@ -39,14 +39,44 @@ endif()
 if(BUILD_LIB)
 #   Test dispatcher across boundaries
 
-   SETUP_LIBRARY_TARGET(lib_dispatcher_common SHARED lib/dispatcher/common.cpp)
-   SETUP_LIBRARY_TARGET(lib_dispatcher_lib1 SHARED lib/dispatcher/lib1.cpp)
-   SETUP_LIBRARY_TARGET(lib_dispatcher_lib2 SHARED lib/dispatcher/lib2.cpp)
+   SETUP_LIBRARY_TARGET(
+     lib_dispatcher_common SHARED
+     lib/dispatcher/common.cpp
+     lib/dispatcher/common.hpp)
+   target_compile_definitions (
+     lib_dispatcher_common
+     PRIVATE
+     EXPORT_COMMON
+     )
+
+   SETUP_LIBRARY_TARGET(
+     lib_dispatcher_lib1 SHARED
+     lib/dispatcher/lib1.cpp
+     lib/dispatcher/lib1.hpp)
+   target_compile_definitions (
+     lib_dispatcher_lib1
+     PRIVATE
+     EXPORT_LIB1
+     )
+
+   SETUP_LIBRARY_TARGET(
+     lib_dispatcher_lib2 SHARED
+     lib/dispatcher/lib2.cpp
+     lib/dispatcher/lib2.hpp)
+   target_compile_definitions (
+     lib_dispatcher_lib2
+     PRIVATE
+     EXPORT_LIB2
+     )
+
    SETUP_AND_ADD_TEST(lib_dispatcher lib/dispatcher/main.cpp)
 
    target_link_libraries(lib_dispatcher_lib1 PRIVATE lib_dispatcher_common)
    target_link_libraries(lib_dispatcher_lib2 PRIVATE lib_dispatcher_common)
-   target_link_libraries(lib_dispatcher PRIVATE lib_dispatcher_common lib_dispatcher_lib1 lib_dispatcher_lib2)
+   target_link_libraries(lib_dispatcher PRIVATE
+     lib_dispatcher_common
+     lib_dispatcher_lib1
+     lib_dispatcher_lib2)
 endif()
 
 # Test mod

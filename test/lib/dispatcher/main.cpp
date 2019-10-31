@@ -1,28 +1,37 @@
 #include <gtest/gtest.h>
 #include <entt/signal/dispatcher.hpp>
+
 #include "common.h"
 
-extern void trigger_an_event(int, entt::dispatcher &);
-extern void trigger_another_event(entt::dispatcher &);
+#include "lib1.hpp"
+#include "lib2.hpp"
+
 
 struct listener {
-    void on_an_event(an_event event) { value = event.payload; }
-    void on_another_event(another_event) {}
+	template<typename PayloadEvent>
+    void on_payload_event(PayloadEvent event) { value = event.payload; }
+
+	template<typename EmptyEvent>
+    void on_empty_event(EmptyEvent) {}
 
     int value;
 };
 
-TEST(Lib, Dispatcher) {
+TEST(Lib, CommonEventTypes) {
     entt::dispatcher dispatcher;
     listener listener;
 
-    dispatcher.sink<an_event>().connect<&listener::on_an_event>(listener);
-    dispatcher.sink<another_event>().connect<&listener::on_another_event>(listener);
+    dispatcher
+		.sink<common_payload_event>()
+		.connect<&listener::on_payload_event<common_payload_event>>(listener);
+    dispatcher
+		.sink<common_empty_event>()
+		.connect<&listener::on_empty_event<common_empty_event>>(listener);
 
     listener.value = 0;
 
-    trigger_an_event(3, dispatcher);
-    trigger_another_event(dispatcher);
+    trigger_common_payload_event(3, dispatcher);
+    trigger_common_empty_event(dispatcher);
 
     ASSERT_EQ(listener.value, 3);
 }

@@ -1,3 +1,7 @@
+#ifndef TEST_LIB_DISPATCHER_COMMON_H
+#define TEST_LIB_DISPATCHER_COMMON_H
+
+
 #include <entt/lib/attribute.h>
 #include <entt/lib/export.h>
 
@@ -10,14 +14,17 @@
 
 
 
-struct an_event {
+struct common_empty_event {};
+
+struct common_payload_event {
     int payload;
 };
-
-struct another_event {};
 
 
 ENTT_DISPATCHER_EXPORT(EXPORT_ATTRIBUTE);
 
-ENTT_DISPATCHER_TYPE_EXPORT(an_event, EXPORT_ATTRIBUTE);
-ENTT_DISPATCHER_TYPE_EXPORT(another_event, EXPORT_ATTRIBUTE);
+ENTT_DISPATCHER_TYPE_EXPORT(common_empty_event, EXPORT_ATTRIBUTE);
+ENTT_DISPATCHER_TYPE_EXPORT(common_payload_event, EXPORT_ATTRIBUTE);
+
+
+#endif /* TEST_LIB_DISPATCHER_COMMON_H */
