@@ -239,8 +239,8 @@ class basic_registry {
         destroyed = Entity{entt};
     }
 
-    template<typename Component>
-    const pool_type<Component> * assure() const {
+    template<typename Component, typename... Args>
+    const pool_type<Component> * assure(Args &&... args) const {
         const auto ctype = to_integer(type<Component>());
         pool_data *pdata = nullptr;
 
@@ -264,7 +264,7 @@ class basic_registry {
 
         if(!pdata->pool) {
             pdata->runtime_type = ctype;
-            pdata->pool = std::make_unique<pool_type<Component>>();
+            pdata->pool = std::make_unique<pool_type<Component>>(std::forward<Args>(args)...);
 
             pdata->remove = [](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
                 static_cast<pool_type<Component> &>(cpool).remove(owner, entt);
@@ -324,12 +324,14 @@ public:
     }
 
     /**
-     * @brief Prepares pools for the given types if required.
-     * @tparam Component Types of components for which to prepare pools.
+     * @brief Prepares a pool for the given type if required.
+     * @tparam Component Type of component for which to prepare a pool.
+     * @tparam Args Types of arguments to use to prepare the pool.
+     * @param args Parameters to use to initialize the pool.
      */
-    template<typename... Component>
-    void prepare() {
-        (assure<Component>(), ...);
+    template<typename Component, typename... Args>
+    void prepare(Args &&... args) {
+        assure<Component>(std::forward<Args>(args)...);
     }
 
     /**
