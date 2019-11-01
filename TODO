@@ -38,3 +38,4 @@
 * multi component registry::remove and some others?
   - remove create overload for spwaning
   - clean up stomp functions
+* get rid of registry::skip_family_pools
