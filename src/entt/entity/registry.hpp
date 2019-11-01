@@ -577,60 +577,6 @@ public:
     }
 
     /**
-     * @brief Creates a new entity from a prototype entity.
-     *
-     * @sa create
-     *
-     * The components must be copyable for obvious reasons. The source entity
-     * must be a valid one.<br/>
-     * If no components are provided, the registry will try to copy all the
-     * existing types. The non-copyable ones will be ignored.
-     *
-     * @note
-     * Specifying the list of components is ways faster than an opaque copy.
-     *
-     * @tparam Component Types of components to copy.
-     * @tparam Exclude Types of components not to be copied.
-     * @param src A valid entity identifier to be copied.
-     * @param other The registry that owns the source entity.
-     * @return A valid entity identifier.
-     */
-    template<typename... Component, typename... Exclude>
-    entity_type create(entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
-        const auto entt = create();
-        stomp<Component...>(entt, src, other, exclude<Exclude...>);
-        return entt;
-    }
-
-    /**
-     * @brief Assigns each element in a range an entity from a prototype entity.
-     *
-     * @sa create
-     *
-     * The components must be copyable for obvious reasons. The entities must be
-     * all valid.<br/>
-     * If no components are provided, the registry will try to copy all the
-     * existing types. The non-copyable ones will be ignored.
-     *
-     * @note
-     * Specifying the list of components is faster than an opaque copy and uses
-     * the batch creation under the hood.
-     *
-     * @tparam Component Types of components to copy.
-     * @tparam It Type of input iterator.
-     * @tparam Exclude Types of components not to be copied.
-     * @param first An iterator to the first element of the range to generate.
-     * @param last An iterator past the last element of the range to generate.
-     * @param src A valid entity identifier to be copied.
-     * @param other The registry that owns the source entity.
-     */
-    template<typename... Component, typename It, typename... Exclude>
-    void create(It first, It last, entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
-        create(first, last);
-        stomp<Component...>(first, last, src, other, exclude<Exclude...>);
-    }
-
-    /**
      * @brief Destroys an entity and lets the registry recycle the identifier.
      *
      * When an entity is destroyed, its version is updated and the identifier
