@@ -122,20 +122,16 @@ class basic_registry {
 
         template<typename Component>
         void maybe_valid_if(const Entity entt) {
-            if constexpr(std::disjunction_v<std::is_same<Get, Component>...>) {
-                if(((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
-                        && (!std::get<pool_type<Exclude> *>(cpools)->has(entt) && ...)
-                        && !set.has(entt))
-                {
-                    set.construct(entt);
+            if([this, entt]() {
+                if constexpr(std::disjunction_v<std::is_same<Get, Component>...>) {
+                    return ((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
+                            && (!std::get<pool_type<Exclude> *>(cpools)->has(entt) && ...);
+                } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
+                    return (std::get<pool_type<Get> *>(cpools)->has(entt) && ...)
+                            && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...);
                 }
-            } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
-                if((std::get<pool_type<Get> *>(cpools)->has(entt) && ...)
-                        && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...)
-                        && !set.has(entt))
-                {
-                    set.construct(entt);
-                }
+            }() && !set.has(entt)) {
+                set.construct(entt);
             }
         }
 
@@ -153,24 +149,19 @@ class basic_registry {
 
         template<typename Component>
         void maybe_valid_if(const Entity entt) {
-            if constexpr(std::disjunction_v<std::is_same<Owned, Component>..., std::is_same<Get, Component>...>) {
-                if(((std::is_same_v<Component, Owned> || std::get<pool_type<Owned> *>(cpools)->has(entt)) && ...)
-                        && ((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
-                        && (!std::get<pool_type<Exclude> *>(cpools)->has(entt) && ...)
-                        && !(std::get<0>(cpools)->index(entt) < owned))
-                {
-                    const auto pos = owned++;
-                    (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
+            if([this, entt]() {
+                if constexpr(std::disjunction_v<std::is_same<Owned, Component>..., std::is_same<Get, Component>...>) {
+                    return ((std::is_same_v<Component, Owned> || std::get<pool_type<Owned> *>(cpools)->has(entt)) && ...)
+                            && ((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
+                            && (!std::get<pool_type<Exclude> *>(cpools)->has(entt) && ...);
+                } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
+                    return (std::get<pool_type<Owned> *>(cpools)->has(entt) && ...)
+                            && (std::get<pool_type<Get> *>(cpools)->has(entt) && ...)
+                            && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...);
                 }
-            } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
-                if((std::get<pool_type<Owned> *>(cpools)->has(entt) && ...)
-                        && (std::get<pool_type<Get> *>(cpools)->has(entt) && ...)
-                        && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...)
-                        && !(std::get<0>(cpools)->index(entt) < owned))
-                {
-                    const auto pos = owned++;
-                    (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
-                }
+            }() && !(std::get<0>(cpools)->index(entt) < owned)) {
+                const auto pos = owned++;
+                (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
             }
         }
 
@@ -278,9 +269,6 @@ class basic_registry {
                 pdata->stomp = [](const sparse_set<Entity> &cpool, const Entity from, basic_registry &other, const Entity to) {
                     other.assign_or_replace<Component>(to, static_cast<const pool_type<Component> &>(cpool).get(from));
                 };
-            } else {
-                pdata->clone = nullptr;
-                pdata->stomp = nullptr;
             }
         }
 
