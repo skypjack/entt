@@ -20,7 +20,7 @@
   * [Sorting: is it possible?](#sorting-is-it-possible)
   * [Helpers](#helpers)
     * [Null entity](#null-entity)
-    * [Stomp and spawn](#stomp-and-spawn)
+    * [Stomp](#stomp)
     * [Dependencies](#dependencies)
     * [Tags](#tags)
     * [Actor](#actor)
@@ -677,29 +677,26 @@ const auto entity = registry.create();
 const bool null = (entity == entt::null);
 ```
 
-### Stomp and spawn
+### Stomp
 
-The use of multiple registries is quite common. Examples of use are the
+Using multiple registries at the same time is quite common. Examples are the
 separation of the UI from the simulation or the loading of different scenes in
 the background, possibly on a separate thread, without having to keep track of
 which entity belongs to which scene.<br/>
 In fact, with `EnTT` this is even a recommended practice, as the registry is
-nothing more than a container and different optimizations and strategies can be
-applied to different containers.
+nothing more than an opaque container you can swap at any time.
 
 Once there are multiple registries available, however, one or more methods are
 needed to transfer information from one container to another. This results in
-the `stomp` member functions and a couple of overloads of the `create` member
-function for the `registry` class .<br/>
+the `stomp` member functions of the `registry` class .<br/>
 These functions allow to take one entity from a registry and use it to _stomp_
 one or more entities in another registry (or even the same, actually making
-local copies). On the other hand, the overloads of the `create` member function
-can be used to spawn new entities from a prototype.
+local copies).
 
 These features open definitely the doors to a lot of interesting features like
 migrating entities between registries, prototypes, shadow registry, prefabs,
-shared components without an explicit owner and copy-on-write policies among the
-other things.
+shared components without explicit ownership and copy-on-write policies among
+the other things.
 
 ### Dependencies
 
