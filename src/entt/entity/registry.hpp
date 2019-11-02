@@ -77,7 +77,7 @@ class basic_registry {
         }
 
         template<typename It, typename... Args>
-        std::enable_if_t<!std::is_same_v<It, Entity>, typename storage<Entity, Component>::reverse_iterator_type>
+        std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, Entity>, typename storage<Entity, Component>::reverse_iterator_type>
         assign(basic_registry &owner, It first, It last, Args &&... args) {
             auto it = storage<Entity, Component>::construct(first, last, std::forward<Args>(args)...);
 
@@ -721,7 +721,7 @@ public:
      * @return An iterator to the list of components just created.
      */
     template<typename Component, typename It, typename... Args>
-    std::enable_if_t<!std::is_same_v<It, entity_type>, typename pool_type<Component>::reverse_iterator_type>
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, typename pool_type<Component>::reverse_iterator_type>
     assign(It first, It last, Args &&... args) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
         return assure<Component>()->assign(*this, first, last, std::forward<Args>(args)...);
