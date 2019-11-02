@@ -355,7 +355,7 @@ public:
      * same of the entities.
      */
     template<typename It, typename... Args>
-    std::enable_if_t<!std::is_same_v<It, entity_type>, reverse_iterator_type>
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, reverse_iterator_type>
     construct(It first, It last, [[maybe_unused]] Args &&... args) {
         if constexpr(sizeof...(Args) == 0) {
             instances.resize(instances.size() + std::distance(first, last));
@@ -706,7 +706,7 @@ public:
      * same of the entities.
      */
     template<typename It, typename... Args>
-    std::enable_if_t<!std::is_same_v<It, entity_type>, reverse_iterator_type>
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, reverse_iterator_type>
     construct(It first, It last, Args &&... args) {
         [[maybe_unused]] object_type instance{std::forward<Args>(args)...};
         // entity goes after component in case constructor throws
