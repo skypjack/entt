@@ -730,7 +730,7 @@ class extended_meta_factory: public meta_factory<Type> {
         static auto property{std::make_tuple(std::forward<Key>(key), std::forward<Value>(value)...)};
 
         static internal::meta_prop_node node{
-            *curr,
+            nullptr,
             []() -> meta_any {
                 return std::get<0>(property);
             },
@@ -744,6 +744,7 @@ class extended_meta_factory: public meta_factory<Type> {
         };
 
         ENTT_ASSERT(!duplicate(node.key(), *curr));
+        node.next = *curr;
         *curr = &node;
     }
 
