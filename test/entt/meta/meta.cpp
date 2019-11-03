@@ -2094,3 +2094,96 @@ TEST_F(Meta, Reset) {
     ASSERT_TRUE(entt::resolve("your_type"_hs).func("a_member_function"_hs));
     ASSERT_FALSE(entt::resolve("your_type"_hs).func("another_member_function"_hs));
 }
+
+
+TEST_F(Meta, ReRegistrationAfterResetSuccessSingular) {
+    struct singular_prop_ok {};
+
+    entt::meta<singular_prop_ok>()
+        .type("singular_prop_ok"_hs)
+        .prop("required_prop"_hs);
+
+    ASSERT_TRUE(entt::resolve<singular_prop_ok>().prop("required_prop"_hs));
+
+    entt::meta<singular_prop_ok>().reset();
+
+    entt::meta<singular_prop_ok>()
+        .type("singular_prop_ok"_hs)
+        .prop("required_prop"_hs)
+        .prop("any_property"_hs);
+
+    ASSERT_TRUE(entt::resolve<singular_prop_ok>().prop("required_prop"_hs));
+    ASSERT_TRUE(entt::resolve<singular_prop_ok>().prop("any_property"_hs));
+
+    entt::meta<singular_prop_ok>().reset();
+}
+
+
+TEST_F(Meta, ReRegistrationAfterResetFailureSingular) {
+    struct singular_prop_fail {};
+
+    entt::meta<singular_prop_fail>()
+        .type("singular_prop_fail"_hs)
+        .prop("required_prop"_hs)
+        .prop("any_property"_hs);
+
+    ASSERT_TRUE(entt::resolve<singular_prop_fail>().prop("required_prop"_hs));
+    ASSERT_TRUE(entt::resolve<singular_prop_fail>().prop("any_property"_hs));
+
+    entt::meta<singular_prop_fail>().reset();
+
+    entt::meta<singular_prop_fail>()
+        .type("singular_prop_fail"_hs)
+        .prop("required_prop"_hs)
+        .prop("any_property"_hs);
+
+    ASSERT_TRUE(entt::resolve<singular_prop_fail>().prop("required_prop"_hs));
+    ASSERT_TRUE(entt::resolve<singular_prop_fail>().prop("any_property"_hs));
+
+    entt::meta<singular_prop_fail>().reset();
+}
+
+
+TEST_F(Meta, ReRegistrationAfterResetSuccessPlural) {
+    struct plural_prop_ok {};
+
+    entt::meta<plural_prop_ok>()
+        .type("plural_prop_ok"_hs)
+        .props("required_prop"_hs);
+
+    ASSERT_TRUE(entt::resolve<plural_prop_ok>().prop("required_prop"_hs));
+
+    entt::meta<plural_prop_ok>().reset();
+
+    entt::meta<plural_prop_ok>()
+        .type("plural_prop_ok"_hs)
+        .props("required_prop"_hs, "any_property"_hs);
+
+    ASSERT_TRUE(entt::resolve<plural_prop_ok>().prop("required_prop"_hs));
+    ASSERT_TRUE(entt::resolve<plural_prop_ok>().prop("any_property"_hs));
+
+    entt::meta<plural_prop_ok>().reset();
+}
+
+
+TEST_F(Meta, ReRegistrationAfterResetFailurePlural) {
+    struct plural_prop_fail {};
+
+    entt::meta<plural_prop_fail>()
+        .type("plural_prop_fail"_hs)
+        .props("required_prop"_hs, "any_property"_hs);
+
+    ASSERT_TRUE(entt::resolve<plural_prop_fail>().prop("required_prop"_hs));
+    ASSERT_TRUE(entt::resolve<plural_prop_fail>().prop("any_property"_hs));
+
+    entt::meta<plural_prop_fail>().reset();
+
+    entt::meta<plural_prop_fail>()
+        .type("plural_prop_fail"_hs)
+        .prop("required_prop"_hs, "any_property"_hs);
+
+    ASSERT_TRUE(entt::resolve<plural_prop_fail>().prop("required_prop"_hs));
+    ASSERT_TRUE(entt::resolve<plural_prop_fail>().prop("any_property"_hs));
+
+    entt::meta<plural_prop_fail>().reset();
+}
