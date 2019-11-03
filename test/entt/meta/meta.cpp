@@ -255,6 +255,11 @@ struct Meta: ::testing::Test {
     static void SetUpAfterUnregistration() {
         entt::meta<double>().conv<float>();
 
+        entt::meta<props>()
+                .data<props::prop_bool>("prop_bool"_hs)
+                    .prop(props::prop_int, 0)
+                    .prop(props::prop_value, 3);
+
         entt::meta<derived_type>()
                 .type("my_type"_hs)
                     .prop(props::prop_bool, false)
@@ -2093,4 +2098,19 @@ TEST_F(Meta, Reset) {
 
     ASSERT_TRUE(entt::resolve("your_type"_hs).func("a_member_function"_hs));
     ASSERT_FALSE(entt::resolve("your_type"_hs).func("another_member_function"_hs));
+}
+
+TEST_F(Meta, ReRegistrationAfterReset) {
+    ASSERT_TRUE(entt::resolve<props>().data("prop_bool"_hs).prop(props::prop_int));
+    ASSERT_TRUE(entt::resolve<props>().data("prop_bool"_hs).prop(props::prop_value));
+
+    entt::meta<double>().reset();
+    entt::meta<props>().reset();
+    entt::meta<derived_type>().reset();
+    entt::meta<another_abstract_type>().reset();
+
+    Meta::SetUpAfterUnregistration();
+
+    ASSERT_TRUE(entt::resolve<props>().data("prop_bool"_hs).prop(props::prop_int));
+    ASSERT_TRUE(entt::resolve<props>().data("prop_bool"_hs).prop(props::prop_value));
 }
