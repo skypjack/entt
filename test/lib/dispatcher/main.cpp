@@ -35,3 +35,22 @@ TEST(Lib, CommonEventTypes) {
 
     ASSERT_EQ(listener.value, 3);
 }
+
+TEST(Lib, Lib1EventTypes) {
+    entt::dispatcher dispatcher;
+    listener listener;
+
+    dispatcher
+		.sink<lib1_payload_event>()
+		.connect<&listener::on_payload_event<lib1_payload_event>>(listener);
+    dispatcher
+		.sink<lib1_empty_event>()
+		.connect<&listener::on_empty_event<lib1_empty_event>>(listener);
+
+    listener.value = 0;
+
+    trigger_lib1_payload_plus_1_event(3, dispatcher);
+    trigger_lib1_empty_event(dispatcher);
+
+    ASSERT_EQ(listener.value, 4);
+}
