@@ -21,4 +21,11 @@
 #endif
 
 
+#if defined(_MSC_VER) || defined(__INTEL_COMPILER) || defined(__CUDACC__) || defined(__clang__)
+#    define ENTT_TEMPLATE_SPECIALIZATION_PARAMETER_LIST_FIX_FOR_GCC template <>
+#else
+#    define ENTT_TEMPLATE_SPECIALIZATION_PARAMETER_LIST_FIX_FOR_GCC
+#endif
+
+
 #endif // ENTT_LIB_ATTRIBUTE_H

@@ -7,21 +7,22 @@
 
 #define ENTT_FAMILY_IDENTIFIER_GENERATOR_EXPORT(family_tag, attribute)         \
   namespace entt {                                                             \
-  extern template attribute ENTT_ID_TYPE                                       \
-  family<family_tag>::generate_identifier();                                   \
+  ENTT_TEMPLATE_SPECIALIZATION_PARAMETER_LIST_FIX_FOR_GCC                      \
+  attribute ENTT_ID_TYPE family<family_tag>::generate_identifier();            \
   }                                                                            \
   static_assert(true)
 
 #define ENTT_FAMILY_TYPE_IDENTIFIER_EXPORT(family_tag, clazz, attribute)       \
   namespace entt {                                                             \
-  extern template attribute ENTT_ID_TYPE                                       \
-  family<family_tag>::generate_type_id<clazz>();                               \
+  ENTT_TEMPLATE_SPECIALIZATION_PARAMETER_LIST_FIX_FOR_GCC                      \
+  ENTT_TEMPLATE_SPECIALIZATION_PARAMETER_LIST_FIX_FOR_GCC                      \
+  attribute ENTT_ID_TYPE family<family_tag>::generate_type_id<clazz>();        \
   }                                                                            \
   static_assert(true)
 
 #define ENTT_FAMILY_IDENTIFIER_GENERATOR_IMPL(family_tag)                      \
   namespace entt {                                                             \
-  template <>                                                                  \
+  ENTT_TEMPLATE_SPECIALIZATION_PARAMETER_LIST_FIX_FOR_GCC                      \
   ENTT_EXPORT ENTT_ID_TYPE family<family_tag>::generate_identifier() {         \
     static ENTT_MAYBE_ATOMIC(ENTT_ID_TYPE) identifier{};                       \
                                                                                \
@@ -30,10 +31,14 @@
   }                                                                            \
   static_assert(true)
 
+/*
+  GCC is broken with respect to multiple template parameter list at explicit
+  specialisation.
+*/
 #define ENTT_FAMILY_TYPE_IDENTIFIER_IMPL(family_tag, clazz)                    \
   namespace entt {                                                             \
-  template <>                                                                  \
-  template <>                                                                  \
+  ENTT_TEMPLATE_SPECIALIZATION_PARAMETER_LIST_FIX_FOR_GCC                      \
+  ENTT_TEMPLATE_SPECIALIZATION_PARAMETER_LIST_FIX_FOR_GCC                      \
   ENTT_EXPORT ENTT_ID_TYPE family<family_tag>::generate_type_id<clazz>() {     \
     static const ENTT_ID_TYPE type_id = generate_identifier();                 \
                                                                                \
