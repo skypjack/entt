@@ -24,7 +24,8 @@
 #define ENTT_EXPORT_FAMILY_TYPE_ID(family_tag, clazz, attribute) static_assert(true)
 #else
 #define ENTT_EXPORT_FAMILY_TYPE_ID(family_tag, clazz, attribute)			\
-	template attribute const ENTT_ID_TYPE family<family_tag>::type<clazz>
+	static_assert(true)
+//	template attribute const ENTT_ID_TYPE family<family_tag>::type<clazz>
 #endif
 
 
