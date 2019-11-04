@@ -23,13 +23,16 @@ struct lib1_payload_event {
 
 
 LIB1_EXPORT_ATTRIBUTE void
-trigger_common_empty_event(entt::dispatcher &dispatcher);
+ntrigger_common_empty_event(entt::dispatcher &dispatcher);
+
+LIB1_EXPORT_ATTRIBUTE void
+trigger_lib1_empty_event(entt::dispatcher &dispatcher);
 
 LIB1_EXPORT_ATTRIBUTE void
 trigger_lib1_payload_plus_1_event(int payload, entt::dispatcher &dispatcher);
 
 LIB1_EXPORT_ATTRIBUTE void
-trigger_lib1_empty_event(entt::dispatcher &dispatcher);
+trigger_lib1_payload_plus_3_event(int payload, entt::dispatcher &dispatcher);
 
 
 ENTT_DISPATCHER_TYPE_EXPORT(lib1_empty_event, LIB1_EXPORT_ATTRIBUTE);
