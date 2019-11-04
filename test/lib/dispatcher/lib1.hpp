@@ -10,8 +10,10 @@
 
 #ifdef EXPORT_LIB1
 #define LIB1_EXPORT_ATTRIBUTE ENTT_EXPORT
+#define LIB1_EXTERN_ATTRIBUTE
 #else
 #define LIB1_EXPORT_ATTRIBUTE ENTT_IMPORT
+#define LIB1_EXTERN_ATTRIBUTE extern
 #endif
 
 
@@ -23,7 +25,7 @@ struct lib1_payload_event {
 
 
 LIB1_EXPORT_ATTRIBUTE void
-ntrigger_common_empty_event(entt::dispatcher &dispatcher);
+trigger_common_empty_event(entt::dispatcher &dispatcher);
 
 LIB1_EXPORT_ATTRIBUTE void
 trigger_lib1_empty_event(entt::dispatcher &dispatcher);
@@ -35,7 +37,7 @@ LIB1_EXPORT_ATTRIBUTE void
 trigger_lib1_payload_plus_3_event(int payload, entt::dispatcher &dispatcher);
 
 
-ENTT_DISPATCHER_TYPE_EXPORT(lib1_empty_event, LIB1_EXPORT_ATTRIBUTE);
-ENTT_DISPATCHER_TYPE_EXPORT(lib1_payload_event, LIB1_EXPORT_ATTRIBUTE);
+ENTT_DISPATCHER_TYPE_EXPORT(lib1_empty_event, LIB1_EXPORT_ATTRIBUTE, LIB1_EXTERN_ATTRIBUTE);
+ENTT_DISPATCHER_TYPE_EXPORT(lib1_payload_event, LIB1_EXPORT_ATTRIBUTE, LIB1_EXTERN_ATTRIBUTE);
 
 #endif /* TEST_LIB_DISPATCHER_LIB1_HPP */

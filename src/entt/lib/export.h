@@ -6,16 +6,16 @@
 #include "../core/family.hpp"
 
 
-#define ENTT_FAMILY_IDENTIFIER_GENERATOR_EXPORT(family_tag, attribute)	\
+#define ENTT_FAMILY_IDENTIFIER_GENERATOR_EXPORT(family_tag, attribute, extern_attr)	\
 	namespace entt {\
-        template attribute ENTT_ID_TYPE family<family_tag>::generate_identifier();\
+        extern_attr template attribute ENTT_ID_TYPE family<family_tag>::generate_identifier();\
     }\
     static_assert(true)
 
 
-#define ENTT_FAMILY_TYPE_IDENTIFIER_EXPORT(family_tag, clazz, attribute) \
+#define ENTT_FAMILY_TYPE_IDENTIFIER_EXPORT(family_tag, clazz, attribute, extern_attr) \
 	namespace entt {\
-        template attribute ENTT_ID_TYPE family<family_tag>::generate_type_id<clazz>();\
+        extern_attr template attribute ENTT_ID_TYPE family<family_tag>::generate_type_id<clazz>();\
     }\
     static_assert(true)
 
@@ -32,8 +32,8 @@
    import clause depending on whether the exported library is build or consumed
    respectively.
 */
-#define ENTT_DISPATCHER_EXPORT(attribute)\
-    ENTT_FAMILY_IDENTIFIER_GENERATOR_EXPORT(struct internal_dispatcher_event_family, attribute)
+#define ENTT_DISPATCHER_EXPORT(attribute, extern_attr)\
+    ENTT_FAMILY_IDENTIFIER_GENERATOR_EXPORT(struct internal_dispatcher_event_family, attribute, extern_attr)
 
 
 /**
@@ -44,8 +44,8 @@
    import clause depending on whether the exported library is build or consumed
    respectively.
 */
-#define ENTT_DISPATCHER_TYPE_EXPORT(clazz, attribute)\
-	ENTT_FAMILY_TYPE_IDENTIFIER_EXPORT(struct internal_dispatcher_event_family, clazz, attribute)
+#define ENTT_DISPATCHER_TYPE_EXPORT(clazz, attribute, extern_attr)\
+	ENTT_FAMILY_TYPE_IDENTIFIER_EXPORT(struct internal_dispatcher_event_family, clazz, attribute, extern_attr)
 
 
 #endif // ENTT_LIB_LIB_H
