@@ -8,9 +8,11 @@
 #    if defined _WIN32 || defined __CYGWIN__ || defined _MSC_VER
 #        define ENTT_EXPORT __declspec(dllexport)
 #        define ENTT_IMPORT __declspec(dllimport)
+#        define ENTT_NO_EXPORT
 #    elif defined __GNUC__ && __GNUC__ >= 4
 #        define ENTT_EXPORT __attribute__((visibility("default")))
 #        define ENTT_IMPORT __attribute__((visibility("default")))
+#        define ENTT_NO_EXPORT __attribute__((visibility("hidden")))
 #    else
 #        error "Unsupported compoler"
 #        define ENTT_EXPORT
