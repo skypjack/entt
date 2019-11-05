@@ -108,15 +108,12 @@ class dispatcher {
         } else {
             if(!(wtype < wrappers.size())) {
                 wrappers.resize(wtype+1);
+            } else if(wrappers[wtype].wrapper && wrappers[wtype].runtime_type != wtype) {
+                wrappers.emplace_back();
+                std::swap(wrappers[wtype], wrappers.back());
             }
 
             wdata = &wrappers[wtype];
-
-            if(wdata->wrapper && wdata->runtime_type != wtype) {
-                wrappers.emplace_back();
-                std::swap(wrappers[wtype], wrappers.back());
-                wdata = &wrappers[wtype];
-            }
         }
 
         if(!wdata->wrapper) {

@@ -143,15 +143,12 @@ class emitter {
         } else {
             if(!(htype < handlers.size())) {
                 handlers.resize(htype+1);
+            } else if(handlers[htype].handler && handlers[htype].runtime_type != htype) {
+                handlers.emplace_back();
+                std::swap(handlers[htype], handlers.back());
             }
 
             hdata = &handlers[htype];
-
-            if(hdata->handler && hdata->runtime_type != htype) {
-                handlers.emplace_back();
-                std::swap(handlers[htype], handlers.back());
-                hdata = &handlers[htype];
-            }
         }
 
         if(!hdata->handler) {
