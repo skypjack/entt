@@ -237,18 +237,17 @@ class basic_registry {
         pool_data *pdata = nullptr;
 
         if constexpr(is_named_type_v<Component>) {
-            const auto it = std::find_if(pools.begin()+skip_family_pools, pools.end(), [ctype](const auto &candidate) {
+            const auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &candidate) {
                 return candidate.runtime_type == ctype;
             });
 
             pdata = (it == pools.cend() ? &pools.emplace_back() : &(*it));
         } else {
-            if(!(ctype < skip_family_pools)) {
-                pools.reserve(pools.size()+ctype-skip_family_pools+1);
-
-                while(!(ctype < skip_family_pools)) {
-                    pools.emplace(pools.begin()+(skip_family_pools++), pool_data{});
-                }
+            if(!(ctype < pools.size())) {
+                pools.resize(ctype+1);
+            } else if(pools[ctype].pool && pools[ctype].runtime_type != ctype) {
+                pools.emplace_back();
+                std::swap(pools[ctype], pools.back());
             }
 
             pdata = &pools[ctype];
@@ -1745,7 +1744,6 @@ public:
     }
 
 private:
-    mutable std::size_t skip_family_pools{};
     mutable std::vector<pool_data> pools{};
     std::vector<group_data> groups{};
     std::vector<ctx_variable> vars{};
