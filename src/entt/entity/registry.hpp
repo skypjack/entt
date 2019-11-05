@@ -176,7 +176,7 @@ class basic_registry {
     struct pool_data {
         std::unique_ptr<sparse_set<Entity>> pool;
         void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
-        std::unique_ptr<sparse_set<Entity>>(* clone)(const sparse_set<Entity> &);
+        void(* assure)(basic_registry &, const sparse_set<Entity> &);
         const void *(* get)(const sparse_set<Entity> &, const Entity);
         void(* set)(basic_registry &, const Entity, const void *);
         ENTT_ID_TYPE runtime_type;
@@ -271,12 +271,12 @@ class basic_registry {
             };
 
             if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
-                pdata->clone = [](const sparse_set<Entity> &cpool) -> std::unique_ptr<sparse_set<Entity>> {
-                    return std::make_unique<pool_type<Component>>(static_cast<const pool_type<Component> &>(cpool));
+                pdata->assure = [](basic_registry &other, const sparse_set<Entity> &cpool) {
+                    other.assure<Component>(static_cast<const pool_type<Component> &>(cpool));
                 };
 
-                pdata->set = [](basic_registry &target, const Entity entt, const void *instance) {
-                    target.assign_or_replace<Component>(entt, *static_cast<const std::decay_t<Component> *>(instance));
+                pdata->set = [](basic_registry &other, const Entity entt, const void *instance) {
+                    other.assign_or_replace<Component>(entt, *static_cast<const std::decay_t<Component> *>(instance));
                 };
             }
         }
@@ -1502,33 +1502,21 @@ public:
      */
     template<typename... Component, typename... Exclude>
     basic_registry clone(exclude_t<Exclude...> = {}) const {
-        static_assert((sizeof...(Component) == 0 || sizeof...(Exclude) == 0) && std::conjunction_v<std::is_copy_constructible<Component>...>);
-
         basic_registry other;
-        other.pools.resize(pools.size());
 
-        for(auto pos = pools.size(); pos; --pos) {
-            if(const auto &pdata = pools[pos-1]; pdata.pool && pdata.clone
-                    && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))
-                    && ((pdata.runtime_type != to_integer(type<Exclude>())) && ...))
-            {
-                auto &curr = other.pools[pos-1];
-                curr.remove = pdata.remove;
-                curr.clone = pdata.clone;
-                curr.set = pdata.set;
-                curr.get = pdata.get;
-                curr.pool = pdata.clone(*pdata.pool);
-                curr.runtime_type = pdata.runtime_type;
-            }
-        }
-
-        other.skip_family_pools = skip_family_pools;
         other.destroyed = destroyed;
         other.entities = entities;
 
-        other.pools.erase(std::remove_if(other.pools.begin()+skip_family_pools, other.pools.end(), [](const auto &pdata) {
-            return !pdata.pool;
-        }), other.pools.end());
+        if constexpr(sizeof...(Component) == 0) {
+            for(auto pos = pools.size(); pos; --pos) {
+                if(const auto &pdata = pools[pos-1]; pdata.assure && ((pdata.runtime_type != to_integer(type<Exclude>())) && ...)) {
+                    pdata.assure(other, *pdata.pool);
+                }
+            }
+        } else {
+            static_assert(sizeof...(Exclude) == 0 && std::conjunction_v<std::is_copy_constructible<Component>...>);
+            (other.assure<Component>(*assure<Component>()), ...);
+        }
 
         return other;
     }
@@ -1572,6 +1560,7 @@ public:
                 }
             }
         } else {
+            static_assert(sizeof...(Exclude) == 0 && std::conjunction_v<std::is_copy_constructible<Component>...>);
             (assign_or_replace<Component>(dst, other.get<Component>(src)), ...);
         }
     }

@@ -23,7 +23,6 @@
   - improves multi-stomp
 * range based registry::remove and some others?
 * add examples (and credits) from @alanjfs :)
-* use [[nodiscard]] consistently for safety purposes
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...>
 * ENTT_NAMED_TYPE -> ENTT_EXPORT and add also ENTT_EXPORT_WITH_NAME
 * meta: members+class as fake functions, is it possible?
@@ -36,7 +35,5 @@
 * named types: almost-stable index optimization for direct access to pools, no more linear searches
   - can implicitly generate types for meta benefit from a similar approach?
 * multi component registry::remove and some others?
-  - remove create overload for spwaning
-  - clean up stomp functions
-  - review internal clone
 * get rid of registry::skip_family_pools
+* registry::prepare is unsafe
