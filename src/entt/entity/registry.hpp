@@ -177,7 +177,8 @@ class basic_registry {
         std::unique_ptr<sparse_set<Entity>> pool;
         void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
         std::unique_ptr<sparse_set<Entity>>(* clone)(const sparse_set<Entity> &);
-        void(* stomp)(const sparse_set<Entity> &, const Entity, basic_registry &, const Entity);
+        const void *(* get)(const sparse_set<Entity> &, const Entity);
+        void(* set)(basic_registry &, const Entity, const void *);
         ENTT_ID_TYPE runtime_type;
     };
 
@@ -261,13 +262,21 @@ class basic_registry {
                 static_cast<pool_type<Component> &>(cpool).remove(owner, entt);
             };
 
+            pdata->get = [](const sparse_set<Entity> &cpool, const Entity entt) -> const void * {
+                if constexpr(ENTT_ENABLE_ETO(Component)) {
+                    return nullptr;
+                } else {
+                    return static_cast<const pool_type<Component> &>(cpool).try_get(entt);
+                }
+            };
+
             if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
                 pdata->clone = [](const sparse_set<Entity> &cpool) -> std::unique_ptr<sparse_set<Entity>> {
                     return std::make_unique<pool_type<Component>>(static_cast<const pool_type<Component> &>(cpool));
                 };
 
-                pdata->stomp = [](const sparse_set<Entity> &cpool, const Entity from, basic_registry &other, const Entity to) {
-                    other.assign_or_replace<Component>(to, static_cast<const pool_type<Component> &>(cpool).get(from));
+                pdata->set = [](basic_registry &target, const Entity entt, const void *instance) {
+                    target.assign_or_replace<Component>(entt, *static_cast<const std::decay_t<Component> *>(instance));
                 };
             }
         }
@@ -1506,7 +1515,8 @@ public:
                 auto &curr = other.pools[pos-1];
                 curr.remove = pdata.remove;
                 curr.clone = pdata.clone;
-                curr.stomp = pdata.stomp;
+                curr.set = pdata.set;
+                curr.get = pdata.get;
                 curr.pool = pdata.clone(*pdata.pool);
                 curr.runtime_type = pdata.runtime_type;
             }
@@ -1555,37 +1565,14 @@ public:
      */
     template<typename... Component, typename... Exclude>
     void stomp(const entity_type dst, const entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
-        const entity_type entt[1]{dst};
-        stomp<Component...>(std::begin(entt), std::end(entt), src, other, exclude<Exclude...>);
-    }
-
-    /**
-     * @brief Stomps the entities in a range and their components.
-     *
-     * @sa stomp
-     *
-     * @tparam Component Types of components to copy.
-     * @tparam It Type of input iterator.
-     * @tparam Exclude Types of components not to be copied.
-     * @param first An iterator to the first element of the range to stomp.
-     * @param last An iterator past the last element of the range to stomp.
-     * @param src A valid entity identifier to be copied.
-     * @param other The registry that owns the source entity.
-     */
-    template<typename... Component, typename It, typename... Exclude>
-    void stomp(It first, It last, const entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
-        static_assert((sizeof...(Component) == 0 || sizeof...(Exclude) == 0) && std::conjunction_v<std::is_copy_constructible<Component>...>);
-
-        for(auto pos = other.pools.size(); pos; --pos) {
-            if(const auto &pdata = other.pools[pos-1]; pdata.pool && pdata.stomp
-                    && (!sizeof...(Component) || ... || (pdata.runtime_type == to_integer(type<Component>())))
-                    && ((pdata.runtime_type != to_integer(type<Exclude>())) && ...)
-                    && pdata.pool->has(src))
-            {
-                std::for_each(first, last, [this, &pdata, src](const auto entity) {
-                    pdata.stomp(*pdata.pool, src, *this, entity);
-                });
+        if constexpr(sizeof...(Component) == 0) {
+            for(auto pos = other.pools.size(); pos; --pos) {
+                if(const auto &pdata = other.pools[pos-1]; pdata.set && ((pdata.runtime_type != to_integer(type<Exclude>())) && ...) && pdata.pool->has(src)) {
+                    pdata.set(*this, dst, pdata.get(*pdata.pool, src));
+                }
             }
+        } else {
+            (assign_or_replace<Component>(dst, other.get<Component>(src)), ...);
         }
     }
 
