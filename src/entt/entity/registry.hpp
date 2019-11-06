@@ -253,6 +253,11 @@ class basic_registry {
             pdata = &pools[ctype];
         }
 
+        if constexpr(sizeof...(Args) != 0) {
+            ENTT_ASSERT(!pdata->pool || !pdata->pool->size());
+            pdata->pool.reset();
+        }
+
         if(!pdata->pool) {
             pdata->runtime_type = ctype;
             pdata->pool = std::make_unique<pool_type<Component>>(std::forward<Args>(args)...);
@@ -327,7 +332,9 @@ public:
      */
     template<typename Component, typename... Args>
     void prepare(Args &&... args) {
-        assure<Component>(std::forward<Args>(args)...);
+        ENTT_ASSERT(std::none_of(pools.cbegin(), pools.cend(), [ctype = to_integer(type<Component>())](auto &&pdata) {return pdata.runtime_type == ctype; }));
+        [[maybe_unused]] auto *cpool = assure<Component>(std::forward<Args>(args)...);
+        ENTT_ASSERT(cpool->size() == 0);
     }
 
     /**

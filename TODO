@@ -35,4 +35,3 @@
 * named types: almost-stable index optimization for direct access to pools, no more linear searches
   - can implicitly generate types for meta benefit from a similar approach?
 * multi component registry::remove and some others?
-* registry::prepare is unsafe
