@@ -42,6 +42,10 @@ namespace entt {
  */
 template<typename Entity>
 class basic_registry {
+    /*! @brief Registries are friend with one another. */
+    template<typename>
+    friend class basic_registry;
+
     using context_family = family<struct internal_registry_context_family>;
     using component_family = family<struct internal_registry_component_family>;
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
@@ -1542,6 +1546,13 @@ public:
      * lists. An excluded type will never be copied.
      *
      * @warning
+     * Stomping entities between registries with different types of identifiers
+     * without a component list is allowed only if the target registry already
+     * contains the required pools.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case a
+     * pool is missing.
+     *
+     * @warning
      * Attempting to copy components that aren't copyable results in unexpected
      * behaviors.<br/>
      * A static assertion will abort the compilation when the components
@@ -1555,22 +1566,33 @@ public:
      * invalid entities.
      *
      * @tparam Component Types of components to copy.
+     * @tparam Entt A valid entity type (see entt_traits for more details).
      * @tparam Exclude Types of components not to be copied.
      * @param dst A valid entity identifier to copy to.
      * @param src A valid entity identifier to be copied.
      * @param other The registry that owns the source entity.
      */
-    template<typename... Component, typename... Exclude>
-    void stomp(const entity_type dst, const entity_type src, const basic_registry &other, exclude_t<Exclude...> = {}) {
+    template<typename... Component, typename Entt, typename... Exclude>
+    void stomp(const entity_type dst, const Entt src, const basic_registry<Entt> &other, exclude_t<Exclude...> = {}) {
         if constexpr(sizeof...(Component) == 0) {
             for(auto pos = other.pools.size(); pos; --pos) {
                 if(const auto &pdata = other.pools[pos-1]; pdata.set && ((pdata.runtime_type != to_integer(type<Exclude>())) && ...) && pdata.pool->has(src)) {
-                    pdata.set(*this, dst, pdata.get(*pdata.pool, src));
+                    if constexpr(std::is_same_v<entity_type, Entt>) {
+                        pdata.set(*this, dst, pdata.get(*pdata.pool, src));
+                    } else {
+                        if(const auto ctype = pdata.runtime_type; ctype < pools.size() && pools[ctype].pool && pools[ctype].runtime_type == ctype) {
+                            pools[ctype].set(*this, dst, pdata.get(*pdata.pool, src));
+                        } else {
+                            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&curr) { return curr.pool && curr.runtime_type == ctype; });
+                            ENTT_ASSERT(it != pools.cend());
+                            it->set(*this, dst, pdata.get(*pdata.pool, src));
+                        }
+                    }
                 }
             }
         } else {
             static_assert(sizeof...(Exclude) == 0 && std::conjunction_v<std::is_copy_constructible<Component>...>);
-            (assign_or_replace<Component>(dst, other.get<Component>(src)), ...);
+            (assign_or_replace<Component>(dst, other.template get<Component>(src)), ...);
         }
     }
 

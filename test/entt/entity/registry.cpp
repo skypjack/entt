@@ -6,9 +6,11 @@
 #include <cstdint>
 #include <type_traits>
 #include <gtest/gtest.h>
+#include <entt/core/type_traits.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/entity.hpp>
 
+ENTT_OPAQUE_TYPE(opaque, std::uint64_t);
 ENTT_NAMED_TYPE(int);
 
 struct empty_type {};
@@ -1498,6 +1500,27 @@ TEST(Registry, StompMoveOnlyComponent) {
 
     ASSERT_TRUE(registry.has<char>(entity));
     ASSERT_FALSE(registry.has<std::unique_ptr<int>>(entity));
+}
+
+TEST(Registry, StompBetweenRegistriesWithDifferentIdentifiers) {
+    entt::basic_registry<opaque> source;
+    entt::registry destination;
+
+    const auto entity = source.create();
+    const auto other = destination.create();
+
+    source.assign<char>(entity, 'c');
+    source.assign<double>(entity, 0.);
+    source.assign<int>(entity, 42);
+
+    destination.prepare<int>();
+    destination.prepare<char>();
+    destination.stomp(other, entity, source, entt::exclude<double>);
+
+    ASSERT_TRUE((destination.has<char, int>(other)));
+    ASSERT_FALSE(destination.has<double>(other));
+    ASSERT_EQ(destination.get<char>(other), 'c');
+    ASSERT_EQ(destination.get<int>(other), 42);
 }
 
 TEST(Registry, GetOrAssign) {

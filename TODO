@@ -21,7 +21,6 @@
   - use direct access (pool-like) also for context variables
   - allow for key/value variables where the key is an ENTT_ID_TYPE
   - improves multi-stomp
-* range based registry::remove and some others?
 * add examples (and credits) from @alanjfs :)
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...>
 * ENTT_NAMED_TYPE -> ENTT_EXPORT and add also ENTT_EXPORT_WITH_NAME
@@ -34,4 +33,5 @@
   - and so on (I'm lazy) :)
 * named types: almost-stable index optimization for direct access to pools, no more linear searches
   - can implicitly generate types for meta benefit from a similar approach?
+  * registry::each to iterate all components of an entity
 * multi component registry::remove and some others?
