@@ -332,7 +332,10 @@ public:
      */
     template<typename Component, typename... Args>
     void prepare(Args &&... args) {
-        ENTT_ASSERT(std::none_of(pools.cbegin(), pools.cend(), [ctype = to_integer(type<Component>())](auto &&pdata) {return pdata.runtime_type == ctype; }));
+        ENTT_ASSERT(std::none_of(pools.cbegin(), pools.cend(), [ctype = to_integer(type<Component>())](auto &&pdata) {
+            return pdata.pool && pdata.runtime_type == ctype;
+        }));
+
         [[maybe_unused]] auto *cpool = assure<Component>(std::forward<Args>(args)...);
         ENTT_ASSERT(cpool->size() == 0);
     }
