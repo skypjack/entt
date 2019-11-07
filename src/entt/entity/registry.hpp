@@ -1,4 +1,4 @@
-#ifndef ENTT_ENTITY_REGISTRY_HPP
+﻿#ifndef ENTT_ENTITY_REGISTRY_HPP
 #define ENTT_ENTITY_REGISTRY_HPP
 
 
@@ -640,8 +640,8 @@ public:
      * @sa destroy
      *
      * @tparam It Type of input iterator.
-     * @param first An iterator to the first element of the range to destroy.
-     * @param last An iterator past the last element of the range to destroy.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
     void destroy(It first, It last) {
@@ -683,8 +683,8 @@ public:
      * @tparam Component Type of component to create.
      * @tparam It Type of input iterator.
      * @tparam Args Types of arguments to use to construct the component.
-     * @param first An iterator to the first element of the range to assign.
-     * @param last An iterator past the last element of the range to assign.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
      * @param args Parameters to use to initialize the component.
      * @return An iterator to the list of components just created.
      */
@@ -712,6 +712,23 @@ public:
     void remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
         (assure<Component>()->remove(*this, entity), ...);
+    }
+
+    /**
+     * @brief Removes the given components from all the entities in a range.
+     *
+     * @see remove
+     *
+     * @tparam Component Types of components to remove.
+     * @tparam It Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     */
+    template<typename... Component, typename It>
+    void remove(It first, It last) {
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
+        // useless this-> used to suppress a warning with clang
+        std::for_each(first, last, [this](const auto entity) { this->remove<Component...>(entity); });
     }
 
     /**

@@ -1099,6 +1099,34 @@ TEST(Registry, RangeAssign) {
     ASSERT_EQ(registry.get<float>(*(++view.begin())), 1.f);
 }
 
+TEST(Registry, RangeRemove) {
+    entt::registry registry;
+
+    const auto e0 = registry.create();
+    const auto e1 = registry.create();
+    const auto e2 = registry.create();
+
+    registry.assign<int>(e0);
+    registry.assign<char>(e0);
+    registry.assign<double>(e0);
+
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
+
+    registry.assign<int>(e2);
+
+    ASSERT_TRUE(registry.has<int>(e0));
+    ASSERT_TRUE(registry.has<int>(e1));
+    ASSERT_TRUE(registry.has<int>(e2));
+
+    const auto view = registry.view<int, char>();
+    registry.remove<int>(view.begin(), view.end());
+
+    ASSERT_FALSE(registry.has<int>(e0));
+    ASSERT_FALSE(registry.has<int>(e1));
+    ASSERT_TRUE(registry.has<int>(e2));
+}
+
 TEST(Registry, CreateManyEntitiesAtOnce) {
     entt::registry registry;
     entt::entity entities[3];
