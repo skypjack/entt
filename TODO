@@ -34,3 +34,4 @@
 * registry::each to iterate all components of an entity
 * named types: almost-stable index optimization for direct access to pools, no more linear searches
   - can implicitly generate types for meta benefit from a similar approach?
+* detect family on a macro based model
