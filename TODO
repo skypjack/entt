@@ -31,7 +31,6 @@
   - entity for each component
   - opaque get
   - and so on (I'm lazy) :)
+* registry::each to iterate all components of an entity
 * named types: almost-stable index optimization for direct access to pools, no more linear searches
   - can implicitly generate types for meta benefit from a similar approach?
-  * registry::each to iterate all components of an entity
-* multi component registry::remove and some others?
