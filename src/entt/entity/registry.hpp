@@ -696,7 +696,7 @@ public:
     }
 
     /**
-     * @brief Removes the given component from an entity.
+     * @brief Removes the given components from an entity.
      *
      * @warning
      * Attempting to use an invalid entity or to remove a component from an
@@ -705,13 +705,13 @@ public:
      * invalid entity or if the entity doesn't own an instance of the given
      * component.
      *
-     * @tparam Component Type of component to remove.
+     * @tparam Component Types of components to remove.
      * @param entity A valid entity identifier.
      */
-    template<typename Component>
+    template<typename... Component>
     void remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
-        assure<Component>()->remove(*this, entity);
+        (assure<Component>()->remove(*this, entity), ...);
     }
 
     /**
@@ -886,6 +886,146 @@ public:
         ENTT_ASSERT(valid(entity));
         auto *cpool = assure<Component>();
         return cpool->has(entity) ? cpool->replace(*this, entity, std::forward<Args>(args)...) : cpool->assign(*this, entity, std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Resets the given component for an entity.
+     *
+     * If the entity has an instance of the component, this function removes the
+     * component from the entity. Otherwise it does nothing.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @tparam Component Type of component to reset.
+     * @param entity A valid entity identifier.
+     */
+    template<typename Component>
+    void reset(const entity_type entity) {
+        ENTT_ASSERT(valid(entity));
+
+        if(auto *cpool = assure<Component>(); cpool->has(entity)) {
+            cpool->remove(*this, entity);
+        }
+    }
+
+    /**
+     * @brief Resets the pool of the given component.
+     *
+     * For each entity that has an instance of the given component, the
+     * component itself is removed and thus destroyed.
+     *
+     * @tparam Component Type of component whose pool must be reset.
+     */
+    template<typename Component>
+    void reset() {
+        if(auto *cpool = assure<Component>(); cpool->on_destroy().empty()) {
+            // no group set, otherwise the signal wouldn't be empty
+            cpool->reset();
+        } else {
+            for(const auto entity: static_cast<const sparse_set<entity_type> &>(*cpool)) {
+                cpool->remove(*this, entity);
+            }
+        }
+    }
+
+    /**
+     * @brief Resets a whole registry.
+     *
+     * Destroys all the entities. After a call to `reset`, all the entities
+     * still in use are recycled with a new version number. In case entity
+     * identifers are stored around, the `valid` member function can be used
+     * to know if they are still valid.
+     */
+    void reset() {
+        each([this](const auto entity) {
+            // useless this-> used to suppress a warning with clang
+            this->destroy(entity);
+        });
+    }
+
+    /**
+     * @brief Iterates all the entities that are still in use.
+     *
+     * The function object is invoked for each entity that is still in use.<br/>
+     * The signature of the function should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * void(const Entity);
+     * @endcode
+     *
+     * This function is fairly slow and should not be used frequently. However,
+     * it's useful for iterating all the entities still in use, regardless of
+     * their components.
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void each(Func func) const {
+        static_assert(std::is_invocable_v<Func, entity_type>);
+
+        if(destroyed == null) {
+            for(auto pos = entities.size(); pos; --pos) {
+                func(entities[pos-1]);
+            }
+        } else {
+            for(auto pos = entities.size(); pos; --pos) {
+                const auto curr = entity_type(pos - 1);
+                const auto entity = entities[to_integer(curr)];
+                const auto entt = entity_type{to_integer(entity) & traits_type::entity_mask};
+
+                if(curr == entt) {
+                    func(entity);
+                }
+            }
+        }
+    }
+
+    /**
+     * @brief Checks if an entity has components assigned.
+     * @param entity A valid entity identifier.
+     * @return True if the entity has no components assigned, false otherwise.
+     */
+    bool orphan(const entity_type entity) const {
+        ENTT_ASSERT(valid(entity));
+        bool orphan = true;
+
+        for(std::size_t pos{}, last = pools.size(); pos < last && orphan; ++pos) {
+            const auto &pdata = pools[pos];
+            orphan = !(pdata.pool && pdata.pool->has(entity));
+        }
+
+        return orphan;
+    }
+
+    /**
+     * @brief Iterates orphans and applies them the given function object.
+     *
+     * The function object is invoked for each entity that is still in use and
+     * has no components assigned.<br/>
+     * The signature of the function should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * void(const Entity);
+     * @endcode
+     *
+     * This function can be very slow and should not be used frequently.
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void orphans(Func func) const {
+        static_assert(std::is_invocable_v<Func, entity_type>);
+
+        each([this, &func](const auto entity) {
+            if(orphan(entity)) {
+                func(entity);
+            }
+        });
     }
 
     /**
@@ -1077,146 +1217,6 @@ public:
         auto *cpool = assure<To>();
         ENTT_ASSERT(!cpool->super);
         cpool->respect(*assure<From>());
-    }
-
-    /**
-     * @brief Resets the given component for an entity.
-     *
-     * If the entity has an instance of the component, this function removes the
-     * component from the entity. Otherwise it does nothing.
-     *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
-     *
-     * @tparam Component Type of component to reset.
-     * @param entity A valid entity identifier.
-     */
-    template<typename Component>
-    void reset(const entity_type entity) {
-        ENTT_ASSERT(valid(entity));
-
-        if(auto *cpool = assure<Component>(); cpool->has(entity)) {
-            cpool->remove(*this, entity);
-        }
-    }
-
-    /**
-     * @brief Resets the pool of the given component.
-     *
-     * For each entity that has an instance of the given component, the
-     * component itself is removed and thus destroyed.
-     *
-     * @tparam Component Type of component whose pool must be reset.
-     */
-    template<typename Component>
-    void reset() {
-        if(auto *cpool = assure<Component>(); cpool->on_destroy().empty()) {
-            // no group set, otherwise the signal wouldn't be empty
-            cpool->reset();
-        } else {
-            for(const auto entity: static_cast<const sparse_set<entity_type> &>(*cpool)) {
-                cpool->remove(*this, entity);
-            }
-        }
-    }
-
-    /**
-     * @brief Resets a whole registry.
-     *
-     * Destroys all the entities. After a call to `reset`, all the entities
-     * still in use are recycled with a new version number. In case entity
-     * identifers are stored around, the `valid` member function can be used
-     * to know if they are still valid.
-     */
-    void reset() {
-        each([this](const auto entity) {
-            // useless this-> used to suppress a warning with clang
-            this->destroy(entity);
-        });
-    }
-
-    /**
-     * @brief Iterates all the entities that are still in use.
-     *
-     * The function object is invoked for each entity that is still in use.<br/>
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(const Entity);
-     * @endcode
-     *
-     * This function is fairly slow and should not be used frequently. However,
-     * it's useful for iterating all the entities still in use, regardless of
-     * their components.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void each(Func func) const {
-        static_assert(std::is_invocable_v<Func, entity_type>);
-
-        if(destroyed == null) {
-            for(auto pos = entities.size(); pos; --pos) {
-                func(entities[pos-1]);
-            }
-        } else {
-            for(auto pos = entities.size(); pos; --pos) {
-                const auto curr = entity_type(pos - 1);
-                const auto entity = entities[to_integer(curr)];
-                const auto entt = entity_type{to_integer(entity) & traits_type::entity_mask};
-
-                if(curr == entt) {
-                    func(entity);
-                }
-            }
-        }
-    }
-
-    /**
-     * @brief Checks if an entity has components assigned.
-     * @param entity A valid entity identifier.
-     * @return True if the entity has no components assigned, false otherwise.
-     */
-    bool orphan(const entity_type entity) const {
-        ENTT_ASSERT(valid(entity));
-        bool orphan = true;
-
-        for(std::size_t pos{}, last = pools.size(); pos < last && orphan; ++pos) {
-            const auto &pdata = pools[pos];
-            orphan = !(pdata.pool && pdata.pool->has(entity));
-        }
-
-        return orphan;
-    }
-
-    /**
-     * @brief Iterates orphans and applies them the given function object.
-     *
-     * The function object is invoked for each entity that is still in use and
-     * has no components assigned.<br/>
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(const Entity);
-     * @endcode
-     *
-     * This function can be very slow and should not be used frequently.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void orphans(Func func) const {
-        static_assert(std::is_invocable_v<Func, entity_type>);
-
-        each([this, &func](const auto entity) {
-            if(orphan(entity)) {
-                func(entity);
-            }
-        });
     }
 
     /**
