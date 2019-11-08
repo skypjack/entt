@@ -8,7 +8,6 @@
 #include <vector>
 #include <memory>
 #include <cstddef>
-#include <numeric>
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
