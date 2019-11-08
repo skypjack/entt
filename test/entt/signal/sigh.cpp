@@ -281,13 +281,14 @@ TEST_F(SigH, ScopedConnectionConstructorsAndOperators) {
     sigh_listener listener;
     entt::sigh<void(int)> sigh;
     entt::sink sink{sigh};
-    entt::scoped_connection conn;
 
     {
-        ASSERT_FALSE(listener.k);
-        ASSERT_FALSE(conn);
-
         entt::scoped_connection inner{};
+
+        ASSERT_TRUE(sigh.empty());
+        ASSERT_FALSE(listener.k);
+        ASSERT_FALSE(inner);
+
         inner = sink.connect<&sigh_listener::g>(listener);
         sigh.publish(42);
 
@@ -307,16 +308,8 @@ TEST_F(SigH, ScopedConnectionConstructorsAndOperators) {
         ASSERT_FALSE(sigh.empty());
         ASSERT_FALSE(listener.k);
         ASSERT_TRUE(inner);
-
-        conn = std::move(inner);
-
-        ASSERT_FALSE(inner);
-        ASSERT_TRUE(conn);
     }
 
-    ASSERT_TRUE(conn);
-
-    conn.release();
     sigh.publish(42);
 
     ASSERT_TRUE(sigh.empty());
