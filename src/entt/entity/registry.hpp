@@ -119,60 +119,39 @@ class basic_registry {
     template<typename...>
     struct group_handler;
 
-    template<typename... Exclude, typename... Get>
-    struct group_handler<exclude_t<Exclude...>, get_t<Get...>> {
-        const std::tuple<pool_type<Get> *..., pool_type<Exclude> *...> cpools{};
-        sparse_set<Entity> set{};
-
-        template<typename Component>
-        void maybe_valid_if(const Entity entt) {
-            if([this, entt]() {
-                if constexpr(std::disjunction_v<std::is_same<Get, Component>...>) {
-                    return ((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
-                            && (!std::get<pool_type<Exclude> *>(cpools)->has(entt) && ...);
-                } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
-                    return (std::get<pool_type<Get> *>(cpools)->has(entt) && ...)
-                            && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...);
-                }
-            }() && !set.has(entt)) {
-                set.construct(entt);
-            }
-        }
-
-        void discard_if(const Entity entt) {
-            if(set.has(entt)) {
-                set.destroy(entt);
-            }
-        }
-    };
-
     template<typename... Exclude, typename... Get, typename... Owned>
     struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
         const std::tuple<pool_type<Owned> *..., pool_type<Get> *..., pool_type<Exclude> *...> cpools{};
-        std::size_t owned{};
+        std::conditional_t<sizeof...(Owned) == 0, sparse_set<Entity>, std::size_t> owned{};
 
         template<typename Component>
         void maybe_valid_if(const Entity entt) {
-            if([this, entt]() {
-                if constexpr(std::disjunction_v<std::is_same<Owned, Component>..., std::is_same<Get, Component>...>) {
-                    return ((std::is_same_v<Component, Owned> || std::get<pool_type<Owned> *>(cpools)->has(entt)) && ...)
-                            && ((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
-                            && (!std::get<pool_type<Exclude> *>(cpools)->has(entt) && ...);
-                } else if constexpr(std::disjunction_v<std::is_same<Exclude, Component>...>) {
-                    return (std::get<pool_type<Owned> *>(cpools)->has(entt) && ...)
-                            && (std::get<pool_type<Get> *>(cpools)->has(entt) && ...)
-                            && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...);
+            const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<pool_type<Owned> *>(cpools)->has(entt)) && ...)
+                    && ((std::is_same_v<Component, Get> || std::get<pool_type<Get> *>(cpools)->has(entt)) && ...)
+                    && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> *>(cpools)->has(entt)) && ...);
+
+            if constexpr(sizeof...(Owned) == 0) {
+                if(is_valid && !owned.has(entt)) {
+                    owned.construct(entt);
                 }
-            }() && !(std::get<0>(cpools)->index(entt) < owned)) {
-                const auto pos = owned++;
-                (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
+            } else {
+                if(is_valid && !(std::get<0>(cpools)->index(entt) < owned)) {
+                    const auto pos = owned++;
+                    (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
+                }
             }
         }
 
         void discard_if(const Entity entt) {
-            if(std::get<0>(cpools)->has(entt) && std::get<0>(cpools)->index(entt) < owned) {
-                const auto pos = --owned;
-                (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
+            if constexpr(sizeof...(Owned) == 0) {
+                if(owned.has(entt)) {
+                    owned.destroy(entt);
+                }
+            } else {
+                if(std::get<0>(cpools)->has(entt) && std::get<0>(cpools)->index(entt) < owned) {
+                    const auto pos = --owned;
+                    (std::get<pool_type<Owned> *>(cpools)->swap(std::get<pool_type<Owned> *>(cpools)->data()[pos], entt), ...);
+                }
             }
         }
     };
@@ -1399,7 +1378,7 @@ public:
                         && !(std::get<pool_type<Exclude> *>(cpools)->has(entity) || ...))
                 {
                     if constexpr(sizeof...(Owned) == 0) {
-                        handler->set.construct(entity);
+                        handler->owned.construct(entity);
                     } else {
                         if(!(std::get<0>(cpools)->index(entity) < handler->owned)) {
                             const auto pos = handler->owned++;
@@ -1411,7 +1390,7 @@ public:
         }
 
         if constexpr(sizeof...(Owned) == 0) {
-            return { &handler->set, std::get<pool_type<Get> *>(cpools)... };
+            return { &handler->owned, std::get<pool_type<Get> *>(cpools)... };
         } else {
             return { &std::get<0>(cpools)->super, &handler->owned, std::get<pool_type<Owned> *>(cpools)... , std::get<pool_type<Get> *>(cpools)... };
         }
