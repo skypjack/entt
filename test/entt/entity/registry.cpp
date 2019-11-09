@@ -1494,24 +1494,24 @@ TEST(Registry, StompExclude) {
     const auto prototype = registry.create();
     registry.assign<int>(prototype, 3);
     registry.assign<char>(prototype, 'c');
+    registry.assign<empty_type>(prototype);
 
     const auto entity = registry.create();
     registry.stomp(entity, prototype, registry, entt::exclude<char>);
 
-    ASSERT_TRUE(registry.has<int>(entity));
+    ASSERT_TRUE((registry.has<int, empty_type>(entity)));
     ASSERT_FALSE(registry.has<char>(entity));
     ASSERT_EQ(registry.get<int>(entity), 3);
 
     registry.replace<int>(prototype, 42);
     registry.stomp(entity, prototype, registry, entt::exclude<int>);
 
-    ASSERT_TRUE((registry.has<int, char>(entity)));
+    ASSERT_TRUE((registry.has<int, char, empty_type>(entity)));
     ASSERT_EQ(registry.get<int>(entity), 3);
     ASSERT_EQ(registry.get<char>(entity), 'c');
 
-    registry.remove<int>(entity);
-    registry.remove<char>(entity);
-    registry.stomp(entity, prototype, registry, entt::exclude<int, char>);
+    registry.remove<int, char, empty_type>(entity);
+    registry.stomp(entity, prototype, registry, entt::exclude<int, char, empty_type>);
 
     ASSERT_TRUE(registry.orphan(entity));
 }

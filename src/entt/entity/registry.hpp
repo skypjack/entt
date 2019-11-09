@@ -262,8 +262,12 @@ class basic_registry {
                     other.assure<Component>(static_cast<const pool_type<Component> &>(cpool));
                 };
 
-                pdata->set = [](basic_registry &other, const Entity entt, const void *instance) {
-                    other.assign_or_replace<Component>(entt, *static_cast<const std::decay_t<Component> *>(instance));
+                pdata->set = [](basic_registry &other, const Entity entt, [[maybe_unused]] const void *instance) {
+                    if constexpr(ENTT_ENABLE_ETO(Component)) {
+                        other.assign_or_replace<Component>(entt);
+                    } else {
+                        other.assign_or_replace<Component>(entt, *static_cast<const std::decay_t<Component> *>(instance));
+                    }
                 };
             }
         }
