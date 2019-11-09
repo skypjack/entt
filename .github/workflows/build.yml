@@ -33,9 +33,14 @@ jobs:
 
     strategy:
       matrix:
-        generator: [Visual Studio 16 2019]
+        os: [windows-latest, windows-2016]
+        include:
+          - os: windows-latest
+            generator: Visual Studio 16 2019
+          - os: windows-2016
+            generator: Visual Studio 15 2017
 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v1
