@@ -227,6 +227,20 @@ meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_
 }
 
 
+struct meta_binding_node {
+    using unbind_function = void(*)();
+
+    meta_binding_node(unbind_function unbind) : do_unbind{unbind} {}
+
+    void unbind() {
+        if (do_unbind) {
+            do_unbind();
+        }
+    }
+
+    meta_binding_node* next = nullptr;
+    unbind_function do_unbind = nullptr;
+};
 }
 
 
@@ -238,6 +252,82 @@ meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_
 
 template<typename, typename...>
 class extended_meta_factory;
+
+/**
+ * @brief A meta registration chain for automatic type unregistering
+ *
+ * A meta chain is an utility class for automatic type unregistering upon chain
+ * object lifetime end. Chains are non-copyable but movable so that meta-types
+ * registration life-time can be extended as long as required.
+ */
+struct meta_chain {
+    meta_chain() = default;
+
+    meta_chain (meta_chain const&) = delete;
+
+    meta_chain(meta_chain&& src) ENTT_NOEXCEPT {
+        *this = std::move(src);
+    };
+
+    meta_chain& operator=(meta_chain const&) = delete;
+
+    meta_chain &operator=(meta_chain && rhs) ENTT_NOEXCEPT {
+        ENTT_ASSERT(!binding_chain);
+
+        binding_chain = rhs.binding_chain;
+
+        rhs.binding_chain = nullptr;
+
+        return *this;
+    }
+
+    /**
+     * @internal
+     * @brief Appends a meta-binding node to the chain
+     *
+     * @param node A meta-binding node for appending to this chain.
+     *
+     * @note The attached node life-time must be such that it outlives the chain
+     * it's attached to.
+     */
+    void append(internal::meta_binding_node& node) ENTT_NOEXCEPT {
+        if (binding_chain) {
+            node.next = binding_chain;
+            binding_chain = &node;
+        }
+        else {
+            binding_chain = &node;
+        }
+    }
+
+    /**
+     * @brief Appends one chain to the other
+     *
+     * The appended chain will no longer unregister meta-types bound by it.
+     *
+     * @param chain A meta-binding chain for appending to this chain.
+     */
+    void append(meta_chain&& chain) ENTT_NOEXCEPT {
+        auto binding = binding_chain;
+
+        while (binding && binding->next) {
+            binding = binding->next;
+        }
+
+        binding->next = chain.binding_chain;
+
+        chain.binding_chain = nullptr;
+    }
+
+    ~meta_chain() {
+        for (auto binding = binding_chain; binding; binding = binding->next) {
+            binding->unbind();
+        }
+    }
+
+private:
+    internal::meta_binding_node* binding_chain = nullptr;
+};
 
 
 /**
@@ -813,6 +903,27 @@ private:
  */
 template<typename Type>
 inline meta_factory<Type> meta() ENTT_NOEXCEPT {
+    return meta_factory<Type>{};
+}
+
+
+/**
+ * @brief Utility function to use for scoped reflection.
+ *
+ * The same as `meta()` but also appends the registered type to the given
+ * meta-registration chain for automatic unregistration upon leaving the scope.
+ *
+ * @tparam Type Type to reflect.
+ * @param chain A meta-registration chain to which to append the newly registered type.
+ * @return A meta factory for the given type.
+ * @see meta
+ */
+template<typename Type>
+inline meta_factory<Type> meta(meta_chain& chain) ENTT_NOEXCEPT {
+    static auto binding_node = internal::meta_binding_node{[] { meta<Type>().reset(); }};
+
+    chain.append(binding_node);
+
     return meta_factory<Type>{};
 }
 

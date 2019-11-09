@@ -2114,3 +2114,62 @@ TEST_F(Meta, ReRegistrationAfterReset) {
     ASSERT_TRUE(entt::resolve<props>().data("prop_bool"_hs).prop(props::prop_int));
     ASSERT_TRUE(entt::resolve<props>().data("prop_bool"_hs).prop(props::prop_value));
 }
+
+TEST_F(Meta, ScopedMetaUnbinding) {
+    struct first_scope_registered {
+        int data;
+    };
+    struct second_scope_registered {
+        int data;
+    };
+    struct third_scope_registered {
+        int data;
+    };
+
+    {
+        auto chain = entt::meta_chain{};
+
+        {
+            auto temp_chain = entt::meta_chain{};
+
+            entt::meta<first_scope_registered>(temp_chain)
+                .type("1"_hs)
+                .data<&first_scope_registered::data>("data"_hs);
+
+            chain = std::move (temp_chain);
+        }
+
+        {
+            auto nested_chain= entt::meta_chain{};
+
+            entt::meta<second_scope_registered>(nested_chain)
+                .type("2"_hs)
+                .data<&second_scope_registered::data>("data"_hs);
+            entt::meta<third_scope_registered>(nested_chain)
+                .type("3"_hs)
+                .data<&third_scope_registered::data>("data"_hs);
+
+            chain.append (std::move(nested_chain));
+        }
+
+        ASSERT_TRUE (entt::resolve<first_scope_registered>().data("data"_hs));
+        ASSERT_TRUE (entt::resolve<second_scope_registered>().data("data"_hs));
+        ASSERT_TRUE (entt::resolve<third_scope_registered>().data("data"_hs));
+
+        ASSERT_TRUE (entt::resolve("1"_hs));
+        ASSERT_TRUE (entt::resolve("2"_hs));
+        ASSERT_TRUE (entt::resolve("3"_hs));
+
+        ASSERT_TRUE (entt::resolve("1"_hs).data("data"_hs));
+        ASSERT_TRUE (entt::resolve("2"_hs).data("data"_hs));
+        ASSERT_TRUE (entt::resolve("3"_hs).data("data"_hs));
+    }
+
+    ASSERT_FALSE (entt::resolve<first_scope_registered>().data("data"_hs));
+    ASSERT_FALSE (entt::resolve<second_scope_registered>().data("data"_hs));
+    ASSERT_FALSE (entt::resolve<third_scope_registered>().data("data"_hs));
+
+    ASSERT_FALSE (entt::resolve("1"_hs));
+    ASSERT_FALSE (entt::resolve("2"_hs));
+    ASSERT_FALSE (entt::resolve("3"_hs));
+}
