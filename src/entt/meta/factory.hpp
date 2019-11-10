@@ -248,28 +248,6 @@ template<typename...>
 class meta_factory;
 
 
-/*! @brief Generic meta factory to be used for reflection purposes. */
-template<>
-class meta_factory<> {
-public:
-    /**
-     * @brief Resets all meta types and all their parts.
-     *
-     * This function resets all meta type and their data members, member
-     * functions and properties, as well as their constructors, destructors,
-     * base classes and conversion functions if any.
-     */
-    void reset() ENTT_NOEXCEPT {
-        auto *it = internal::meta_info<>::context;
-
-        while(it) {
-            internal::meta_info<>::reset(it);
-            it = it->context;
-        }
-    }
-};
-
-
 /**
  * @brief Extended meta factory to be used for reflection purposes.
  * @tparam Type Reflected type for which the factory was created.
@@ -410,8 +388,6 @@ class meta_factory<Type> {
         ENTT_ASSERT(!duplicate(node, *internal::meta_info<>::global));
         node->identifier = identifier;
         node->next = *internal::meta_info<>::global;
-        if(node->next) { node->next->hook = &node->next; }
-        node->hook = internal::meta_info<>::global;
         *internal::meta_info<>::global = node;
 
         return meta_factory<Type, Type>{&node->prop};
@@ -832,21 +808,16 @@ public:
  * This is the point from which everything starts.<br/>
  * By invoking this function with a type that is not yet reflected, a meta type
  * is created to which it will be possible to attach meta objects through a
- * dedicated factory. If no type is provided instead, a generic meta factory is
- * returned.
+ * dedicated factory.
  *
- * @tparam Type Type to reflect, if any.
- * @return An eventually generic meta factory.
+ * @tparam Type Type to reflect.
+ * @return An meta factory for the given type.
  */
-template<typename... Type>
-inline meta_factory<Type...> meta() ENTT_NOEXCEPT {
-    if constexpr(sizeof...(Type) == 0) {
-        return meta_factory{};
-    } else {
-        auto * const node = internal::meta_info<Type...>::resolve();
-        // extended meta factory to allow assigning properties to opaque meta types
-        return meta_factory<Type..., Type...>{&node->prop};
-    }
+template<typename Type>
+inline meta_factory<Type> meta() ENTT_NOEXCEPT {
+    auto * const node = internal::meta_info<Type>::resolve();
+    // extended meta factory to allow assigning properties to opaque meta types
+    return meta_factory<Type, Type>{&node->prop};
 }
 
 

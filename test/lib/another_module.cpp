@@ -61,5 +61,5 @@ LIB_EXPORT void another_module_meta_init() {
 }
 
 LIB_EXPORT void another_module_meta_deinit() {
-    entt::meta().reset();
+    entt::meta<int>().reset();
 }
