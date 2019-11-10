@@ -236,10 +236,6 @@ meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_
  */
 
 
-template<typename, typename...>
-class extended_meta_factory;
-
-
 /**
  * @brief Meta factory to be used for reflection purposes.
  *
@@ -275,6 +271,123 @@ public:
 
 
 /**
+ * @brief Extended meta factory to be used for reflection purposes.
+ * @tparam Type Reflected type for which the factory was created.
+ * @tparam Spec Property specialization pack used to disambiguate overloads.
+ */
+template<typename Type, typename... Spec>
+class meta_factory<Type, Spec...>: public meta_factory<Type> {
+    bool duplicate(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
+        return node && (node->key() == key || duplicate(key, node->next));
+    }
+
+    template<std::size_t Step = 0, std::size_t... Index, typename... Property, typename... Other>
+    void unpack(std::index_sequence<Index...>, std::tuple<Property...> property, Other &&... other) {
+        unroll<Step>(choice<3>, std::move(std::get<Index>(property))..., std::forward<Other>(other)...);
+    }
+
+    template<std::size_t Step = 0, typename... Property, typename... Other>
+    void unroll(choice_t<3>, std::tuple<Property...> property, Other &&... other) {
+        unpack<Step>(std::index_sequence_for<Property...>{}, std::move(property), std::forward<Other>(other)...);
+    }
+
+    template<std::size_t Step = 0, typename... Property, typename... Other>
+    void unroll(choice_t<2>, std::pair<Property...> property, Other &&... other) {
+        assign<Step>(std::move(property.first), std::move(property.second));
+        unroll<Step+1>(choice<3>, std::forward<Other>(other)...);
+    }
+
+    template<std::size_t Step = 0, typename Property, typename... Other>
+    std::enable_if_t<!std::is_invocable_v<Property>>
+    unroll(choice_t<1>, Property &&property, Other &&... other) {
+        assign<Step>(std::forward<Property>(property));
+        unroll<Step+1>(choice<3>, std::forward<Other>(other)...);
+    }
+
+    template<std::size_t Step = 0, typename Func, typename... Other>
+    void unroll(choice_t<0>, Func &&invocable, Other &&... other) {
+        unroll<Step>(choice<3>, std::forward<Func>(invocable)(), std::forward<Other>(other)...);
+    }
+
+    template<std::size_t>
+    void unroll(choice_t<0>) {}
+
+    template<std::size_t = 0, typename Key, typename... Value>
+    void assign(Key &&key, Value &&... value) {
+        static auto property{std::make_tuple(std::forward<Key>(key), std::forward<Value>(value)...)};
+
+        static internal::meta_prop_node node{
+            nullptr,
+            []() -> meta_any {
+                return std::get<0>(property);
+            },
+            []() -> meta_any {
+                if constexpr(sizeof...(Value) == 0) {
+                    return {};
+                } else {
+                    return std::get<1>(property);
+                }
+            }
+        };
+
+        ENTT_ASSERT(!duplicate(node.key(), *curr));
+        node.next = *curr;
+        *curr = &node;
+    }
+
+public:
+    /**
+     * @brief Constructs an extended factory from a given node.
+     * @param target The underlying node to which to assign the properties.
+     */
+    meta_factory(entt::internal::meta_prop_node **target)
+        : curr{target}
+    {}
+
+    /**
+     * @brief Assigns a property to the last meta object created.
+     *
+     * Both the key and the value (if any) must be at least copy constructible.
+     *
+     * @tparam PropertyOrKey Type of the property or property key.
+     * @tparam Value Optional type of the property value.
+     * @param property_or_key Property or property key.
+     * @param value Optional property value.
+     * @return A meta factory for the parent type.
+     */
+    template<typename PropertyOrKey, typename... Value>
+    auto prop(PropertyOrKey &&property_or_key, Value &&... value) && {
+        if constexpr(sizeof...(Value) == 0) {
+            unroll(choice<3>, std::forward<PropertyOrKey>(property_or_key));
+        } else {
+            assign(std::forward<PropertyOrKey>(property_or_key), std::forward<Value>(value)...);
+        }
+
+        return meta_factory<Type, Spec..., PropertyOrKey, Value...>{curr};
+    }
+
+    /**
+     * @brief Assigns properties to the last meta object created.
+     *
+     * Both the keys and the values (if any) must be at least copy
+     * constructible.
+     *
+     * @tparam Property Types of the properties.
+     * @param property Properties to assign to the last meta object created.
+     * @return A meta factory for the parent type.
+     */
+    template <typename... Property>
+    auto props(Property... property) && {
+        unroll(choice<3>, std::forward<Property>(property)...);
+        return meta_factory<Type, Spec..., Property...>{curr};
+    }
+
+private:
+    entt::internal::meta_prop_node **curr{nullptr};
+};
+
+
+/**
  * @brief Basic meta factory to be used for reflection purposes.
  * @tparam Type Reflected type for which the factory was created.
  */
@@ -301,7 +414,7 @@ class meta_factory<Type> {
         node->hook = internal::meta_info<>::global;
         *internal::meta_info<>::global = node;
 
-        return extended_meta_factory<Type>{&node->prop};
+        return meta_factory<Type, Type>{&node->prop};
     }
 
 public:
@@ -456,7 +569,7 @@ public:
         node.next = type->ctor;
         type->ctor = &node;
 
-        return extended_meta_factory<Type, std::integral_constant<decltype(Func), Func>>{&node.prop};
+        return meta_factory<Type, std::integral_constant<decltype(Func), Func>>{&node.prop};
     }
 
     /**
@@ -489,7 +602,7 @@ public:
         node.next = type->ctor;
         type->ctor = &node;
 
-        return extended_meta_factory<Type, Type(Args...)>{&node.prop};
+        return meta_factory<Type, Type(Args...)>{&node.prop};
     }
 
     /**
@@ -607,7 +720,7 @@ public:
         curr->next = type->data;
         type->data = curr;
 
-        return extended_meta_factory<Type, std::integral_constant<decltype(Data), Data>>{&curr->prop};
+        return meta_factory<Type, std::integral_constant<decltype(Data), Data>>{&curr->prop};
     }
 
     /**
@@ -654,7 +767,7 @@ public:
         node.next = type->data;
         type->data = &node;
 
-        return extended_meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
+        return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
     }
 
     /**
@@ -696,7 +809,7 @@ public:
         node.next = type->func;
         type->func = &node;
 
-        return extended_meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
+        return meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
     }
 
     /**
@@ -714,137 +827,26 @@ public:
 
 
 /**
- * @brief Extended meta factory to be used for reflection purposes.
- * @tparam Type Reflected type for which the factory was created.
- * @tparam Spec Property specialization pack used to disambiguate overloads.
- */
-template<typename Type, typename... Spec>
-class extended_meta_factory: public meta_factory<Type> {
-    bool duplicate(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
-        return node && (node->key() == key || duplicate(key, node->next));
-    }
-
-    template<std::size_t Step = 0, std::size_t... Index, typename... Property, typename... Other>
-    void unpack(std::index_sequence<Index...>, std::tuple<Property...> property, Other &&... other) {
-        unroll<Step>(choice<3>, std::move(std::get<Index>(property))..., std::forward<Other>(other)...);
-    }
-
-    template<std::size_t Step = 0, typename... Property, typename... Other>
-    void unroll(choice_t<3>, std::tuple<Property...> property, Other &&... other) {
-        unpack<Step>(std::index_sequence_for<Property...>{}, std::move(property), std::forward<Other>(other)...);
-    }
-
-    template<std::size_t Step = 0, typename... Property, typename... Other>
-    void unroll(choice_t<2>, std::pair<Property...> property, Other &&... other) {
-        assign<Step>(std::move(property.first), std::move(property.second));
-        unroll<Step+1>(choice<3>, std::forward<Other>(other)...);
-    }
-
-    template<std::size_t Step = 0, typename Property, typename... Other>
-    std::enable_if_t<!std::is_invocable_v<Property>>
-    unroll(choice_t<1>, Property &&property, Other &&... other) {
-        assign<Step>(std::forward<Property>(property));
-        unroll<Step+1>(choice<3>, std::forward<Other>(other)...);
-    }
-
-    template<std::size_t Step = 0, typename Func, typename... Other>
-    void unroll(choice_t<0>, Func &&invocable, Other &&... other) {
-        unroll<Step>(choice<3>, std::forward<Func>(invocable)(), std::forward<Other>(other)...);
-    }
-
-    template<std::size_t>
-    void unroll(choice_t<0>) {}
-
-    template<std::size_t = 0, typename Key, typename... Value>
-    void assign(Key &&key, Value &&... value) {
-        static auto property{std::make_tuple(std::forward<Key>(key), std::forward<Value>(value)...)};
-
-        static internal::meta_prop_node node{
-            nullptr,
-            []() -> meta_any {
-                return std::get<0>(property);
-            },
-            []() -> meta_any {
-                if constexpr(sizeof...(Value) == 0) {
-                    return {};
-                } else {
-                    return std::get<1>(property);
-                }
-            }
-        };
-
-        ENTT_ASSERT(!duplicate(node.key(), *curr));
-        node.next = *curr;
-        *curr = &node;
-    }
-
-public:
-    /**
-     * @brief Constructs an extended factory from a given node.
-     * @param target The underlying node to which to assign the properties.
-     */
-    extended_meta_factory(entt::internal::meta_prop_node **target)
-        : curr{target}
-    {}
-
-    /**
-     * @brief Assigns a property to the last meta object created.
-     *
-     * Both the key and the value (if any) must be at least copy constructible.
-     *
-     * @tparam PropertyOrKey Type of the property or property key.
-     * @tparam Value Optional type of the property value.
-     * @param property_or_key Property or property key.
-     * @param value Optional property value.
-     * @return A meta factory for the parent type.
-     */
-    template<typename PropertyOrKey, typename... Value>
-    auto prop(PropertyOrKey &&property_or_key, Value &&... value) && {
-        if constexpr(sizeof...(Value) == 0) {
-            unroll(choice<3>, std::forward<PropertyOrKey>(property_or_key));
-        } else {
-            assign(std::forward<PropertyOrKey>(property_or_key), std::forward<Value>(value)...);
-        }
-
-        return extended_meta_factory<Type, Spec..., PropertyOrKey, Value...>{curr};
-    }
-
-    /**
-     * @brief Assigns properties to the last meta object created.
-     *
-     * Both the keys and the values (if any) must be at least copy
-     * constructible.
-     *
-     * @tparam Property Types of the properties.
-     * @param property Properties to assign to the last meta object created.
-     * @return A meta factory for the parent type.
-     */
-    template <typename... Property>
-    auto props(Property... property) && {
-        unroll(choice<3>, std::forward<Property>(property)...);
-        return extended_meta_factory<Type, Spec..., Property...>{curr};
-    }
-
-private:
-    entt::internal::meta_prop_node **curr{nullptr};
-};
-
-
-/**
  * @brief Utility function to use for reflection.
  *
  * This is the point from which everything starts.<br/>
  * By invoking this function with a type that is not yet reflected, a meta type
  * is created to which it will be possible to attach meta objects through a
- * dedicated factory. If no type is provided, a generic meta factory is returned
- * instead.
+ * dedicated factory. If no type is provided instead, a generic meta factory is
+ * returned.
  *
  * @tparam Type Type to reflect, if any.
  * @return An eventually generic meta factory.
  */
 template<typename... Type>
 inline meta_factory<Type...> meta() ENTT_NOEXCEPT {
-    return meta_factory<Type...>{};
+    if constexpr(sizeof...(Type) == 0) {
+        return meta_factory{};
+    } else {
+        auto * const node = internal::meta_info<Type...>::resolve();
+        // extended meta factory to allow assigning properties to opaque meta types
+        return meta_factory<Type..., Type...>{&node->prop};
+    }
 }
 
 
