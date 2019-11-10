@@ -2043,36 +2043,21 @@ TEST_F(Meta, Reset) {
     ASSERT_NE(*entt::internal::meta_info<>::global, nullptr);
     ASSERT_NE(entt::internal::meta_info<>::local, nullptr);
 
-    entt::meta<char>().reset();
-    entt::meta<concrete_type>().reset();
-    entt::meta<setter_getter_type>().reset();
-    entt::meta<fat_type>().reset();
-    entt::meta<data_type>().reset();
-    entt::meta<func_type>().reset();
-    entt::meta<array_type>().reset();
-    entt::meta<double>().reset();
-    entt::meta<props>().reset();
-    entt::meta<base_type>().reset();
-    entt::meta<derived_type>().reset();
-    entt::meta<empty_type>().reset();
-    entt::meta<an_abstract_type>().reset();
-    entt::meta<another_abstract_type>().reset();
-    entt::meta<unsigned int>().reset();
+    ASSERT_TRUE(entt::resolve("char"_hs));
+    ASSERT_TRUE(entt::resolve("base"_hs));
 
-    ASSERT_EQ(*entt::internal::meta_info<>::global, nullptr);
-    ASSERT_EQ(entt::internal::meta_info<>::local, nullptr);
+    entt::meta<char>().reset();
+
+    ASSERT_FALSE(entt::resolve("char"_hs));
+    ASSERT_TRUE(entt::resolve("base"_hs));
+
+    entt::meta().reset();
 
     ASSERT_FALSE(entt::resolve("char"_hs));
     ASSERT_FALSE(entt::resolve("base"_hs));
-    ASSERT_FALSE(entt::resolve("derived"_hs));
-    ASSERT_FALSE(entt::resolve("empty"_hs));
-    ASSERT_FALSE(entt::resolve("fat"_hs));
-    ASSERT_FALSE(entt::resolve("data"_hs));
-    ASSERT_FALSE(entt::resolve("func"_hs));
-    ASSERT_FALSE(entt::resolve("setter_getter"_hs));
-    ASSERT_FALSE(entt::resolve("an_abstract_type"_hs));
-    ASSERT_FALSE(entt::resolve("another_abstract_type"_hs));
-    ASSERT_FALSE(entt::resolve("concrete"_hs));
+
+    ASSERT_EQ(*entt::internal::meta_info<>::global, nullptr);
+    ASSERT_EQ(entt::internal::meta_info<>::local, nullptr);
 
     Meta::SetUpAfterUnregistration();
     entt::meta_any any{42.};

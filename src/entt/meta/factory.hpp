@@ -241,17 +241,45 @@ class extended_meta_factory;
 
 
 /**
- * @brief A meta factory to be used for reflection purposes.
+ * @brief Meta factory to be used for reflection purposes.
  *
- * A meta factory is an utility class used to reflect types, data and functions
- * of all sorts. This class ensures that the underlying web of types is built
- * correctly and performs some checks in debug mode to ensure that there are no
- * subtle errors at runtime.
- *
+ * The meta factory is an utility class used to reflect types, data members and
+ * functions of all sorts. This class ensures that the underlying web of types
+ * is built correctly and performs some checks in debug mode to ensure that
+ * there are no subtle errors at runtime.
+ */
+template<typename...>
+class meta_factory;
+
+
+/*! @brief Generic meta factory to be used for reflection purposes. */
+template<>
+class meta_factory<> {
+public:
+    /**
+     * @brief Resets all meta types and all their parts.
+     *
+     * This function resets all meta type and their data members, member
+     * functions and properties, as well as their constructors, destructors,
+     * base classes and conversion functions if any.
+     */
+    void reset() ENTT_NOEXCEPT {
+        auto *it = internal::meta_info<>::context;
+
+        while(it) {
+            internal::meta_info<>::reset(it);
+            it = it->context;
+        }
+    }
+};
+
+
+/**
+ * @brief Basic meta factory to be used for reflection purposes.
  * @tparam Type Reflected type for which the factory was created.
  */
 template<typename Type>
-class meta_factory {
+class meta_factory<Type> {
     template<typename Node>
     bool duplicate(const Node *candidate, const Node *node) ENTT_NOEXCEPT {
         return node && (node == candidate || duplicate(candidate, node->next));
@@ -269,6 +297,8 @@ class meta_factory {
         ENTT_ASSERT(!duplicate(node, *internal::meta_info<>::global));
         node->identifier = identifier;
         node->next = *internal::meta_info<>::global;
+        if(node->next) { node->next->hook = &node->next; }
+        node->hook = internal::meta_info<>::global;
         *internal::meta_info<>::global = node;
 
         return extended_meta_factory<Type>{&node->prop};
@@ -281,7 +311,7 @@ public:
      * This function is intended only for unnamed types.
      *
      * @param identifier Unique identifier.
-     * @return An extended meta factory for the parent type.
+     * @return An extended meta factory for the given type.
      */
     auto type(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
         static_assert(!is_named_type_v<Type>);
@@ -293,7 +323,7 @@ public:
      *
      * This function is intended only for named types
      *
-     * @return An extended meta factory for the parent type.
+     * @return An extended meta factory for the given type.
      */
     auto type() ENTT_NOEXCEPT {
         static_assert(is_named_type_v<Type>);
@@ -678,7 +708,7 @@ public:
      * Base classes aren't reset but the link between the two types is removed.
      */
     void reset() ENTT_NOEXCEPT {
-        internal::meta_info<Type>::reset();
+        internal::meta_info<>::reset(internal::meta_info<Type>::resolve());
     }
 };
 
@@ -806,14 +836,15 @@ private:
  * This is the point from which everything starts.<br/>
  * By invoking this function with a type that is not yet reflected, a meta type
  * is created to which it will be possible to attach meta objects through a
- * dedicated factory.
+ * dedicated factory. If no type is provided, a generic meta factory is returned
+ * instead.
  *
- * @tparam Type Type to reflect.
- * @return A meta factory for the given type.
+ * @tparam Type Type to reflect, if any.
+ * @return An eventually generic meta factory.
  */
-template<typename Type>
-inline meta_factory<Type> meta() ENTT_NOEXCEPT {
-    return meta_factory<Type>{};
+template<typename... Type>
+inline meta_factory<Type...> meta() ENTT_NOEXCEPT {
+    return meta_factory<Type...>{};
 }
 
 

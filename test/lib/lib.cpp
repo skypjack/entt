@@ -129,8 +129,8 @@ TEST(Lib, Meta) {
     ASSERT_TRUE(entt::resolve<char>().data("c"_hs));
 
     a_module_meta_deinit();
+    entt::meta().reset();
     another_module_meta_deinit();
-    entt::meta<double>().reset();
 
     ASSERT_FALSE(entt::resolve("double"_hs));
     ASSERT_FALSE(entt::resolve("char"_hs));
