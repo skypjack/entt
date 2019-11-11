@@ -153,23 +153,26 @@ class sparse_set {
         index_type index;
     };
 
-    void assure(const std::size_t page) {
-        if(!(page < reverse.size())) {
-            reverse.resize(page+1);
-        }
-
-        if(!reverse[page]) {
-            reverse[page] = std::make_unique<entity_type[]>(entt_per_page);
-            // null is safe in all cases for our purposes
-            std::fill_n(reverse[page].get(), entt_per_page, null);
-        }
+    auto page(const Entity entt) const ENTT_NOEXCEPT {
+        return std::size_t{(to_integer(entt) & traits_type::entity_mask) / entt_per_page};
     }
 
-    auto map(const Entity entt) const ENTT_NOEXCEPT {
-        const auto identifier = to_integer(entt) & traits_type::entity_mask;
-        const auto page = size_type(identifier / entt_per_page);
-        const auto offset = size_type(identifier & (entt_per_page - 1));
-        return std::make_pair(page, offset);
+    auto offset(const Entity entt) const ENTT_NOEXCEPT {
+        return std::size_t{to_integer(entt) & (entt_per_page - 1)};
+    }
+
+    Entity * assure(const std::size_t pos) {
+        if(!(pos < reverse.size())) {
+            reverse.resize(pos+1);
+        }
+
+        if(!reverse[pos]) {
+            reverse[pos] = std::make_unique<entity_type[]>(entt_per_page);
+            // null is safe in all cases for our purposes
+            std::fill_n(reverse[pos].get(), entt_per_page, null);
+        }
+
+        return reverse[pos].get();
     }
 
 public:
@@ -193,8 +196,7 @@ public:
     {
         for(size_type pos{}, last = other.reverse.size(); pos < last; ++pos) {
             if(other.reverse[pos]) {
-                assure(pos);
-                std::copy_n(other.reverse[pos].get(), entt_per_page, reverse[pos].get());
+                std::copy_n(other.reverse[pos].get(), entt_per_page, assure(pos));
             }
         }
     }
@@ -361,9 +363,9 @@ public:
      * @return True if the sparse set contains the entity, false otherwise.
      */
     bool has(const entity_type entt) const ENTT_NOEXCEPT {
-        auto [page, offset] = map(entt);
+        const auto curr = page(entt);
         // testing against null permits to avoid accessing the direct vector
-        return (page < reverse.size() && reverse[page] && reverse[page][offset] != null);
+        return (curr < reverse.size() && reverse[curr] && reverse[curr][offset(entt)] != null);
     }
 
     /**
@@ -380,8 +382,7 @@ public:
      */
     size_type index(const entity_type entt) const ENTT_NOEXCEPT {
         ENTT_ASSERT(has(entt));
-        auto [page, offset] = map(entt);
-        return size_type(reverse[page][offset]);
+        return size_type(reverse[page(entt)][offset(entt)]);
     }
 
     /**
@@ -397,9 +398,7 @@ public:
      */
     void construct(const entity_type entt) {
         ENTT_ASSERT(!has(entt));
-        auto [page, offset] = map(entt);
-        assure(page);
-        reverse[page][offset] = entity_type(direct.size());
+        assure(page(entt))[offset(entt)] = entity_type(direct.size());
         direct.push_back(entt);
     }
 
@@ -420,9 +419,7 @@ public:
     void construct(It first, It last) {
         std::for_each(first, last, [this, next = direct.size()](const auto entt) mutable {
             ENTT_ASSERT(!has(entt));
-            auto [page, offset] = map(entt);
-            assure(page);
-            reverse[page][offset] = entity_type(next++);
+            assure(page(entt))[offset(entt)] = entity_type(next++);
         });
 
         direct.insert(direct.end(), first, last);
@@ -441,11 +438,11 @@ public:
      */
     void destroy(const entity_type entt) {
         ENTT_ASSERT(has(entt));
-        auto [from_page, from_offset] = map(entt);
-        auto [to_page, to_offset] = map(direct.back());
-        direct[size_type(reverse[from_page][from_offset])] = entity_type(direct.back());
-        reverse[to_page][to_offset] = reverse[from_page][from_offset];
-        reverse[from_page][from_offset] = null;
+        const auto curr = page(entt);
+        const auto pos = offset(entt);
+        direct[size_type(reverse[curr][pos])] = entity_type(direct.back());
+        reverse[page(direct.back())][offset(direct.back())] = reverse[curr][pos];
+        reverse[curr][pos] = null;
         direct.pop_back();
     }
 
@@ -465,10 +462,8 @@ public:
      * @param rhs A valid entity identifier.
      */
     virtual void swap(const entity_type lhs, const entity_type rhs) ENTT_NOEXCEPT {
-        auto [src_page, src_offset] = map(lhs);
-        auto [dst_page, dst_offset] = map(rhs);
-        auto &from = reverse[src_page][src_offset];
-        auto &to = reverse[dst_page][dst_offset];
+        auto &from = reverse[page(lhs)][offset(lhs)];
+        auto &to = reverse[page(rhs)][offset(rhs)];
         std::swap(direct[size_type(from)], direct[size_type(to)]);
         std::swap(from, to);
     }
@@ -525,8 +520,7 @@ public:
         algo(from, to, std::move(compare), std::forward<Args>(args)...);
 
         for(size_type pos = skip, end = skip+length; pos < end; ++pos) {
-            auto [page, offset] = map(direct[pos]);
-            reverse[page][offset] = entity_type(pos);
+            reverse[page(direct[pos])][offset(direct[pos])] = entity_type(pos);
         }
     }
 
@@ -575,8 +569,7 @@ public:
 
             while(curr != next) {
                 apply(direct[curr], direct[next]);
-                auto [page, offset] = map(direct[curr]);
-                reverse[page][offset] = entity_type(curr);
+                reverse[page(direct[curr])][offset(direct[curr])] = entity_type(curr);
 
                 curr = next;
                 next = index(direct[curr]);
