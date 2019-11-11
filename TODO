@@ -27,7 +27,6 @@
 * meta: members+class as fake functions, is it possible?
 * meta: are fake types not backed by actual types possible?
 * meta: export implicitly generated named types if possible
-* flip ENTT_NO_ATOMIC and make it opt-in rather than opt-out
 * welcome -ftime-trace to inspect compilation time
 * add meta support to registry:
   - entity for each component

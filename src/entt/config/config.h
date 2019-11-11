@@ -17,12 +17,12 @@
 #endif // ENTT_HWS_SUFFIX
 
 
-#ifndef ENTT_NO_ATOMIC
+#ifndef ENTT_USE_ATOMIC
+#define ENTT_MAYBE_ATOMIC(Type) Type
+#else // ENTT_USE_ATOMIC
 #include <atomic>
 #define ENTT_MAYBE_ATOMIC(Type) std::atomic<Type>
-#else // ENTT_NO_ATOMIC
-#define ENTT_MAYBE_ATOMIC(Type) Type
-#endif // ENTT_NO_ATOMIC
+#endif // ENTT_USE_ATOMIC
 
 
 #ifndef ENTT_DISABLE_ETO
