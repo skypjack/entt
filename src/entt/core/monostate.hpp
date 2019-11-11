@@ -2,7 +2,6 @@
 #define ENTT_CORE_MONOSTATE_HPP
 
 
-#include <cassert>
 #include "../config/config.h"
 
 

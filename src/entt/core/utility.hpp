@@ -2,6 +2,7 @@
 #define ENTT_CORE_UTILITY_HPP
 
 
+#include <utility>
 #include "../config/config.h"
 
 

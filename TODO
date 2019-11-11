@@ -25,7 +25,6 @@
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...>
 * ENTT_NAMED_TYPE -> ENTT_EXPORT and add also ENTT_EXPORT_WITH_NAME
 * meta: members+class as fake functions, is it possible?
-* meta: are fake types not backed by actual types possible?
 * meta: export implicitly generated named types if possible
 * welcome -ftime-trace to inspect compilation time
 * add meta support to registry:

@@ -2,7 +2,6 @@
 #define ENTT_ENTITY_ACTOR_HPP
 
 
-#include <cassert>
 #include <utility>
 #include <type_traits>
 #include "../config/config.h"
