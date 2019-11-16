@@ -43,7 +43,7 @@
 */
 #define ENTT_DISPATCHER_EXPORT(attribute)                                      \
   ENTT_FAMILY_IDENTIFIER_GENERATOR_EXPORT(                                     \
-      entt::dispatcher::internal_dispatcher_event_family, attribute)
+      struct internal_dispatcher_event_family, attribute)
 
 /**
    @brief Exports dispatcher for the given type
@@ -55,6 +55,6 @@
 */
 #define ENTT_DISPATCHER_TYPE_EXPORT(clazz, attribute)                          \
   ENTT_FAMILY_TYPE_IDENTIFIER_EXPORT(                                          \
-      entt::dispatcher::internal_dispatcher_event_family, clazz, attribute)
+      struct internal_dispatcher_event_family, clazz, attribute)
 
 #endif // ENTT_LIB_LIB_H

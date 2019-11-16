@@ -31,10 +31,7 @@ namespace entt {
  * crashes.
  */
 class dispatcher {
-public:
-	struct internal_dispatcher_event_family;
-private:
-    using event_family = family<internal_dispatcher_event_family>;
+    using event_family = family<struct internal_dispatcher_event_family>;
 
     template<typename Class, typename Event>
     using instance_type = typename sigh<void(const Event &)>::template instance_type<Class>;
