@@ -8,7 +8,8 @@
 #define ENTT_FAMILY_IDENTIFIER_GENERATOR_EXPORT(family_tag, attribute)         \
   namespace entt {                                                             \
   namespace family_internal {                                                  \
-  template <> attribute auto generate_identifier<family<family_tag>>() {       \
+  template <>                                                                  \
+  attribute inline auto generate_identifier<family<family_tag>>() {            \
     static ENTT_MAYBE_ATOMIC(ENTT_ID_TYPE) identifier{};                       \
                                                                                \
     return identifier++;                                                       \
@@ -20,7 +21,7 @@
 #define ENTT_FAMILY_TYPE_IDENTIFIER_EXPORT(family_tag, clazz, attribute)       \
   namespace entt {                                                             \
   namespace family_internal {                                                  \
-  template <> attribute auto type_id<family<family_tag>, clazz>() {            \
+  template <> attribute inline auto type_id<family<family_tag>, clazz>() {     \
     static ENTT_ID_TYPE type = generate_identifier<family<family_tag>>();      \
                                                                                \
     return type;                                                               \
@@ -54,7 +55,7 @@
    respectively.
 */
 #define ENTT_DISPATCHER_TYPE_EXPORT(clazz, attribute)                          \
-  ENTT_FAMILY_TYPE_IDENTIFIER_EXPORT(                                          \
-      struct internal_dispatcher_event_family, clazz, attribute)
+  ENTT_FAMILY_TYPE_IDENTIFIER_EXPORT(struct internal_dispatcher_event_family,  \
+                                     clazz, attribute)
 
 #endif // ENTT_LIB_LIB_H
