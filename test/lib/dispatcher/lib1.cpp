@@ -3,8 +3,6 @@
 
 #include "lib1.hpp"
 
-ENTT_DISPATCHER_TYPE_IMPL(lib1_empty_event);
-ENTT_DISPATCHER_TYPE_IMPL(lib1_payload_event);
 
 ENTT_NO_EXPORT
 void trigger_lib1_payload_plus_1_hidden_event(
