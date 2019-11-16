@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
 
   codecov:
-    timeout-minutes: 30
+    timeout-minutes: 10
     runs-on: ubuntu-latest
 
     steps:

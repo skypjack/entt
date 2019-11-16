@@ -179,7 +179,7 @@ public:
         friend class emitter;
 
         /*! @brief Default constructor. */
-        connection() ENTT_NOEXCEPT = default;
+        connection() noexcept(noexcept(typename event_handler<Event>::connection_type{})) = default;
 
         /**
          * @brief Creates a connection that wraps its underlying instance.

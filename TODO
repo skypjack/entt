@@ -36,3 +36,4 @@
   - can implicitly generate types for meta benefit from a similar approach?
 * detect family on a macro based model
 * is it possible to make named type constraints namespace-free?
+* stomp -> merge (naming is hard as heck, it's known thing)

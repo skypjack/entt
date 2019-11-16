@@ -5,25 +5,26 @@
 include_directories($<TARGET_PROPERTY:EnTT,INTERFACE_INCLUDE_DIRECTORIES>)
 add_compile_options($<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_OPTIONS>)
 
-macro(SETUP_LIBRARY_TARGET LIB_TARGET)
-    set_target_properties(${LIB_TARGET} PROPERTIES CXX_EXTENSIONS OFF)
-    target_compile_definitions(${LIB_TARGET} PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_DEFINITIONS>)
-    target_compile_features(${LIB_TARGET} PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_FEATURES>)
-    target_compile_options(${LIB_TARGET} PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -Wall -Wshadow>)
-    target_compile_options(${LIB_TARGET} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/EHsc /W2>)
+macro(SETUP_TARGET TARGET_NAME)
+    set_target_properties(${TARGET_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+    target_link_libraries(${TARGET_NAME} PRIVATE EnTT)
+
+    target_compile_options(
+        ${TARGET_NAME}
+        PRIVATE $<$<AND:$<CONFIG:Debug>,$<NOT:$<PLATFORM_ID:Windows>>>:-O0 -g -pedantic -Wall -Wshadow>
+        PRIVATE $<$<AND:$<CONFIG:Release>,$<NOT:$<PLATFORM_ID:Windows>>>:-O2 -pedantic -Wall -Wshadow>
+        PRIVATE $<$<AND:$<CONFIG:Debug>,$<PLATFORM_ID:Windows>>:/EHsc /W1>
+        PRIVATE $<$<AND:$<CONFIG:Release>,$<PLATFORM_ID:Windows>>:/EHsc /W1 /O2>
+    )
 endmacro()
 
 add_library(odr OBJECT odr.cpp)
-SETUP_LIBRARY_TARGET(odr)
+SETUP_TARGET(odr)
 
 macro(SETUP_AND_ADD_TEST TEST_NAME TEST_SOURCE)
     add_executable(${TEST_NAME} $<TARGET_OBJECTS:odr> ${TEST_SOURCE})
-    set_target_properties(${TEST_NAME} PROPERTIES CXX_EXTENSIONS OFF)
-    target_link_libraries(${TEST_NAME} PRIVATE EnTT GTest::Main Threads::Threads)
-    target_compile_definitions(${TEST_NAME} PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_DEFINITIONS>)
-    target_compile_features(${TEST_NAME} PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_FEATURES>)
-    target_compile_options(${TEST_NAME} PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -Wall -Wshadow>)
-    target_compile_options(${TEST_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/EHsc /W2>)
+    target_link_libraries(${TEST_NAME} PRIVATE GTest::Main Threads::Threads)
+    SETUP_TARGET(${TEST_NAME})
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 endmacro()
 
@@ -41,10 +42,10 @@ if(BUILD_LIB)
     add_library(another_module_shared SHARED lib/another_module.cpp)
     add_library(another_module_static STATIC lib/another_module.cpp)
 
-    SETUP_LIBRARY_TARGET(a_module_shared)
-    SETUP_LIBRARY_TARGET(a_module_static)
-    SETUP_LIBRARY_TARGET(another_module_shared)
-    SETUP_LIBRARY_TARGET(another_module_static)
+    SETUP_TARGET(a_module_shared)
+    SETUP_TARGET(a_module_static)
+    SETUP_TARGET(another_module_shared)
+    SETUP_TARGET(another_module_static)
 
     SETUP_AND_ADD_TEST(lib_shared lib/lib.cpp)
     target_link_libraries(lib_shared PRIVATE a_module_shared another_module_shared)
