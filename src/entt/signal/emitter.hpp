@@ -191,10 +191,10 @@ public:
     };
 
     /*! @brief Default constructor. */
-    emitter() ENTT_NOEXCEPT = default;
+    emitter() = default;
 
     /*! @brief Default destructor. */
-    virtual ~emitter() ENTT_NOEXCEPT {
+    virtual ~emitter() {
         static_assert(std::is_base_of_v<emitter<Derived>, Derived>);
     }
 
