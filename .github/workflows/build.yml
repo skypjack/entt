@@ -36,10 +36,15 @@ jobs:
       matrix:
         os: [windows-2019, windows-2016]
         include:
-          - os: windows-2019
+          - os: windows-latest
             generator: Visual Studio 16 2019
+            toolset: v142
+          - os: windows-latest
+            generator: Visual Studio 16 2019
+            toolset: ClangCl
           - os: windows-2016
             generator: Visual Studio 15 2017
+            toolset: v141
 
     runs-on: ${{ matrix.os }}
 
@@ -48,7 +53,7 @@ jobs:
     - name: Compile tests
       working-directory: build
       run: |
-        cmake -DBUILD_TESTING=ON -DBUILD_LIB=ON -DCMAKE_CXX_FLAGS=/W1 -G"${{ matrix.generator }}" ..
+        cmake -DBUILD_TESTING=ON -DBUILD_LIB=ON -DCMAKE_CXX_FLAGS=/W1 -G"${{ matrix.generator }}" -T ${{ matrix.toolset }} ..
         cmake --build . -j 4
     - name: Run tests
       working-directory: build
