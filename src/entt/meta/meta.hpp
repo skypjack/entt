@@ -130,35 +130,35 @@ struct meta_type_node {
 
 
 template<typename Type, typename Op, typename Node>
-void iterate(Op op, Node *curr) ENTT_NOEXCEPT {
-    while(curr) {
-        op(Type{curr});
-        curr = curr->next;
+void visit(Op op, Node *node) ENTT_NOEXCEPT {
+    while(node) {
+        op(Type{node});
+        node = node->next;
     }
 }
 
 
 template<auto Member, typename Type, typename Op>
-void iterate(Op op, const meta_type_node *node) ENTT_NOEXCEPT {
+void visit(Op op, const internal::meta_type_node *node) ENTT_NOEXCEPT {
     if(node) {
-        auto *curr = node->base;
-        iterate<Type>(op, node->*Member);
+        internal::visit<Type>(op, node->*Member);
+        auto *next = node->base;
 
-        while(curr) {
-            iterate<Member, Type>(op, curr->type());
-            curr = curr->next;
+        while(next) {
+            visit<Member, Type>(op, next->type());
+            next = next->next;
         }
     }
 }
 
 
 template<typename Op, typename Node>
-auto find_if(Op op, Node *curr) ENTT_NOEXCEPT {
-    while(curr && !op(curr)) {
-        curr = curr->next;
+auto find_if(Op op, Node *node) ENTT_NOEXCEPT {
+    while(node && !op(node)) {
+        node = node->next;
     }
 
-    return curr;
+    return node;
 }
 
 
@@ -169,11 +169,11 @@ auto find_if(Op op, const meta_type_node *node) ENTT_NOEXCEPT
 
     if(node) {
         ret = find_if(op, node->*Member);
-        auto *curr = node->base;
+        auto *next = node->base;
 
-        while(curr && !ret) {
-            ret = find_if<Member>(op, curr->type());
-            curr = curr->next;
+        while(next && !ret) {
+            ret = find_if<Member>(op, next->type());
+            next = next->next;
         }
     }
 
@@ -267,7 +267,7 @@ struct meta_node<Type> {
         };
 
         if constexpr(is_named_type_v<Type>) {
-            auto *candidate = internal::find_if([](auto *curr) {
+            auto *candidate = internal::find_if([](const auto *curr) {
                 return curr->identifier == named_type_traits_v<Type>;
             }, *meta_node<>::global);
 
@@ -295,16 +295,12 @@ struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> 
 /**
  * @brief Opaque container for values of any type.
  *
- * This class uses a technique called small buffer optimization (SBO) to
- * completely eliminate the need to allocate memory, where possible.<br/>
- * From the user's point of view, nothing will change, but the elimination of
- * allocations will reduce the jumps in memory and therefore will avoid chasing
- * of pointers. This will greatly improve the use of the cache, thus increasing
- * the overall performance.
+ * This class uses a technique called small buffer optimization (SBO) to get rid
+ * of memory allocations if possible. This should improve overall performance.
  *
  * @warning
- * Only copy constructible types are suitable for use with this class. A static
- * assertion will abort the compilation when the type provided isn't copy
+ * Only copy constructible types are suitable for use with this class.<br/>
+ * A static assertion will abort the compilation when the type isn't copy
  * constructible.
  */
 class meta_any {
@@ -374,14 +370,7 @@ class meta_any {
 
 public:
     /*! @brief Default constructor. */
-    meta_any() ENTT_NOEXCEPT
-        : storage{},
-          instance{nullptr},
-          node{nullptr},
-          destroy_fn{nullptr},
-          copy_fn{nullptr},
-          steal_fn{nullptr}
-    {}
+    meta_any() ENTT_NOEXCEPT = default;
 
     /**
      * @brief Constructs a meta any by directly initializing the new object.
@@ -452,9 +441,8 @@ public:
     /**
      * @brief Move constructor.
      *
-     * After meta any move construction, instances that have been moved from
-     * are placed in a valid but unspecified state. It's highly discouraged to
-     * continue using them.
+     * After move construction, instances that have been moved from are placed
+     * in a valid but unspecified state.
      *
      * @param other The instance to move from.
      */
@@ -528,17 +516,12 @@ public:
      */
     template<typename Type>
     const Type * try_cast() const ENTT_NOEXCEPT {
-        const auto * const type = internal::meta_info<Type>::resolve();
         void *ret = nullptr;
 
-        if(node == type) {
+        if(const auto * const type = internal::meta_info<Type>::resolve(); type == node) {
             ret = instance;
-        } else {
-            const auto *base = internal::find_if<&internal::meta_type_node::base>([type](auto *candidate) {
-                return candidate->type() == type;
-            }, node);
-
-            ret = base ? base->cast(instance) : nullptr;
+        } else if(const auto *base = internal::find_if<&internal::meta_type_node::base>([type](const auto *curr) { return curr->type() == type; }, node); base) {
+            ret = base->cast(instance);
         }
 
         return static_cast<const Type *>(ret);
@@ -589,14 +572,8 @@ public:
 
         if(const auto * const type = internal::meta_info<Type>::resolve(); node == type) {
             any = *static_cast<const Type *>(instance);
-        } else {
-            const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([type](auto *other) {
-                return other->type() == type;
-            }, node);
-
-            if(conv) {
-                any = conv->conv(instance);
-            }
+        } else if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([type](const auto *curr) { return curr->type() == type; }, node); conv) {
+            any = conv->conv(instance);
         }
 
         return any;
@@ -612,9 +589,8 @@ public:
         bool valid = (node == internal::meta_info<Type>::resolve());
 
         if(!valid) {
-            if(auto any = std::as_const(*this).convert<Type>(); any) {
+            if(auto any = std::as_const(*this).convert<Type>(); (valid = static_cast<bool>(any))) {
                 swap(any, *this);
-                valid = true;
             }
         }
 
@@ -702,10 +678,7 @@ class meta_handle {
 
 public:
     /*! @brief Default constructor. */
-    meta_handle() ENTT_NOEXCEPT
-        : node{nullptr},
-          instance{nullptr}
-    {}
+    meta_handle() ENTT_NOEXCEPT = default;
 
     /**
      * @brief Constructs a meta handle from a meta any object.
@@ -951,9 +924,9 @@ struct meta_ctor {
     /**
      * @brief Creates an instance of the underlying type, if possible.
      *
-     * To create a valid instance, the types of the parameters must coincide
-     * exactly with those required by the underlying meta constructor.
-     * Otherwise, an empty and then invalid container is returned.
+     * To create a valid instance, the parameters must be such that a cast or
+     * conversion to the required types is possible. Otherwise, an empty and
+     * thus invalid container is returned.
      *
      * @tparam Args Types of arguments to use to construct the instance.
      * @param args Parameters to use to construct the instance.
@@ -962,13 +935,7 @@ struct meta_ctor {
     template<typename... Args>
     meta_any invoke(Args &&... args) const {
         std::array<meta_any, sizeof...(Args)> arguments{{std::forward<Args>(args)...}};
-        meta_any any{};
-
-        if(sizeof...(Args) == size()) {
-            any = node->invoke(arguments.data());
-        }
-
-        return any;
+        return sizeof...(Args) == size() ? node->invoke(arguments.data()) : meta_any{};
     }
 
     /**
@@ -979,7 +946,7 @@ struct meta_ctor {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<meta_prop>(std::move(op), node->prop);
+        internal::visit<meta_prop>(std::move(op), node->prop);
     }
 
     /**
@@ -988,8 +955,8 @@ struct meta_ctor {
      * @return The property associated with the given key, if any.
      */
     meta_prop prop(meta_any key) const ENTT_NOEXCEPT {
-        return internal::find_if([key = std::move(key)](auto *candidate) {
-            return candidate->key() == key;
+        return internal::find_if([key = std::move(key)](const auto *curr) {
+            return curr->key() == key;
         }, node->prop);
     }
 
@@ -1090,10 +1057,6 @@ struct meta_data {
 
     /**
      * @brief Indicates whether a given meta data is static or not.
-     *
-     * A static meta data is such that it can be accessed using a null pointer
-     * as an instance.
-     *
      * @return True if the meta data is static, false otherwise.
      */
     bool is_static() const ENTT_NOEXCEPT {
@@ -1109,8 +1072,8 @@ struct meta_data {
      * It must be possible to cast the instance to the parent type of the meta
      * data. Otherwise, invoking the setter results in an undefined
      * behavior.<br/>
-     * The type of the value must coincide exactly with that of the variable
-     * enclosed by the meta data. Otherwise, invoking the setter does nothing.
+     * The type of the value must be such that a cast or conversion to the type
+     * of the variable is possible. Otherwise, invoking the setter does nothing.
      *
      * @tparam Type Type of value to assign.
      * @param handle An opaque pointer to an instance of the underlying type.
@@ -1128,8 +1091,8 @@ struct meta_data {
      * It must be possible to cast the instance to the parent type of the meta
      * data. Otherwise, invoking the setter results in an undefined
      * behavior.<br/>
-     * The type of the value must coincide exactly with that of the array type
-     * enclosed by the meta data. Otherwise, invoking the setter does nothing.
+     * The type of the value must be such that a cast or conversion to the array
+     * type is possible. Otherwise, invoking the setter does nothing.
      *
      * @tparam Type Type of value to assign.
      * @param handle An opaque pointer to an instance of the underlying type.
@@ -1179,7 +1142,7 @@ struct meta_data {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<meta_prop>(std::move(op), node->prop);
+        internal::visit<meta_prop>(std::move(op), node->prop);
     }
 
     /**
@@ -1188,8 +1151,8 @@ struct meta_data {
      * @return The property associated with the given key, if any.
      */
     meta_prop prop(meta_any key) const ENTT_NOEXCEPT {
-        return internal::find_if([key = std::move(key)](auto *candidate) {
-            return candidate->key() == key;
+        return internal::find_if([key = std::move(key)](const auto *curr) {
+            return curr->key() == key;
         }, node->prop);
     }
 
@@ -1253,10 +1216,6 @@ struct meta_func {
 
     /**
      * @brief Indicates whether a given meta function is static or not.
-     *
-     * A static meta function is such that it can be invoked using a null
-     * pointer as an instance.
-     *
      * @return True if the meta function is static, false otherwise.
      */
     bool is_static() const ENTT_NOEXCEPT {
@@ -1279,9 +1238,9 @@ struct meta_func {
     /**
      * @brief Invokes the underlying function, if possible.
      *
-     * To invoke a meta function, the types of the parameters must coincide
-     * exactly with those required by the underlying function. Otherwise, an
-     * empty and then invalid container is returned.<br/>
+     * To invoke a meta function, the parameters must be such that a cast or
+     * conversion to the required types is possible. Otherwise, an empty and
+     * thus invalid container is returned.<br/>
      * It must be possible to cast the instance to the parent type of the meta
      * function. Otherwise, invoking the underlying function results in an
      * undefined behavior.
@@ -1295,13 +1254,7 @@ struct meta_func {
     meta_any invoke(meta_handle handle, Args &&... args) const {
         // makes aliasing on the values and passes forward references if any
         std::array<meta_any, sizeof...(Args)> arguments{{meta_handle{args}...}};
-        meta_any any{};
-
-        if(sizeof...(Args) == size()) {
-            any = node->invoke(handle, arguments.data());
-        }
-
-        return any;
+        return sizeof...(Args) == size() ? node->invoke(handle, arguments.data()) : meta_any{};
     }
 
     /**
@@ -1312,7 +1265,7 @@ struct meta_func {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<meta_prop>(std::move(op), node->prop);
+        internal::visit<meta_prop>(std::move(op), node->prop);
     }
 
     /**
@@ -1321,8 +1274,8 @@ struct meta_func {
      * @return The property associated with the given key, if any.
      */
     meta_prop prop(meta_any key) const ENTT_NOEXCEPT {
-        return internal::find_if([key = std::move(key)](auto *candidate) {
-            return candidate->key() == key;
+        return internal::find_if([key = std::move(key)](const auto *curr) {
+            return curr->key() == key;
         }, node->prop);
     }
 
@@ -1354,10 +1307,10 @@ inline bool operator!=(const meta_func &lhs, const meta_func &rhs) ENTT_NOEXCEPT
 class meta_type {
     template<typename... Args, std::size_t... Indexes>
     auto ctor(std::index_sequence<Indexes...>) const ENTT_NOEXCEPT {
-        return internal::find_if([](auto *candidate) {
+        return internal::find_if([](const auto *candidate) {
             return candidate->size == sizeof...(Args) && ([](auto *from, auto *to) {
-                return (from == to) || internal::find_if<&internal::meta_type_node::base>([to](auto *curr) { return curr->type() == to; }, from)
-                        || internal::find_if<&internal::meta_type_node::conv>([to](auto *curr) { return curr->type() == to; }, from);
+                return (from == to) || internal::find_if<&internal::meta_type_node::base>([to](const auto *curr) { return curr->type() == to; }, from)
+                        || internal::find_if<&internal::meta_type_node::conv>([to](const auto *curr) { return curr->type() == to; }, from);
             }(internal::meta_info<Args>::resolve(), candidate->arg(Indexes)) && ...);
         }, node->ctor);
     }
@@ -1506,61 +1459,47 @@ public:
     }
 
     /**
-     * @brief Iterates all the meta base of a meta type.
-     *
-     * Iteratively returns **all** the base classes of the given type.
-     *
+     * @brief Iterates all the meta bases of a meta type.
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
      */
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_base>, void>
     base(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::base, meta_base>(std::move(op), node);
+        internal::visit<&internal::meta_type_node::base, meta_base>(std::move(op), node);
     }
 
     /**
      * @brief Returns the meta base associated with a given identifier.
-     *
-     * Searches recursively among **all** the base classes of the given type.
-     *
      * @param identifier Unique identifier.
      * @return The meta base associated with the given identifier, if any.
      */
     meta_base base(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
-        return internal::find_if<&internal::meta_type_node::base>([identifier](auto *candidate) {
-            return candidate->type()->identifier == identifier;
+        return internal::find_if<&internal::meta_type_node::base>([identifier](const auto *curr) {
+            return curr->type()->identifier == identifier;
         }, node);
     }
 
     /**
      * @brief Iterates all the meta conversion functions of a meta type.
-     *
-     * Iteratively returns **all** the meta conversion functions of the given
-     * type.
-     *
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
      */
     template<typename Op>
     void conv(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::conv, meta_conv>(std::move(op), node);
+        internal::visit<&internal::meta_type_node::conv, meta_conv>(std::move(op), node);
     }
 
     /**
      * @brief Returns the meta conversion function associated with a given type.
-     *
-     * Searches recursively among **all** the conversion functions of the given
-     * type.
-     *
      * @tparam Type The type to use to search for a meta conversion function.
      * @return The meta conversion function associated with the given type, if
      * any.
      */
     template<typename Type>
     meta_conv conv() const ENTT_NOEXCEPT {
-        return internal::find_if<&internal::meta_type_node::conv>([type = internal::meta_info<Type>::resolve()](auto *candidate) {
-            return candidate->type() == type;
+        return internal::find_if<&internal::meta_type_node::conv>([type = internal::meta_info<Type>::resolve()](const auto *curr) {
+            return curr->type() == type;
         }, node);
     }
 
@@ -1571,7 +1510,7 @@ public:
      */
     template<typename Op>
     void ctor(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<meta_ctor>(std::move(op), node->ctor);
+        internal::visit<meta_ctor>(std::move(op), node->ctor);
     }
 
     /**
@@ -1595,8 +1534,7 @@ public:
     /**
      * @brief Iterates all the meta data of a meta type.
      *
-     * Iteratively returns **all** the meta data of the given type. This means
-     * that the meta data of the base classes will also be returned, if any.
+     * The meta data of the base classes will also be returned, if any.
      *
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
@@ -1604,31 +1542,27 @@ public:
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_data>, void>
     data(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::data, meta_data>(std::move(op), node);
+        internal::visit<&internal::meta_type_node::data, meta_data>(std::move(op), node);
     }
 
     /**
      * @brief Returns the meta data associated with a given identifier.
      *
-     * Searches recursively among **all** the meta data of the given type. This
-     * means that the meta data of the base classes will also be inspected, if
-     * any.
+     * The meta data of the base classes will also be visited, if any.
      *
      * @param identifier Unique identifier.
      * @return The meta data associated with the given identifier, if any.
      */
     meta_data data(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
-        return internal::find_if<&internal::meta_type_node::data>([identifier](auto *candidate) {
-            return candidate->identifier == identifier;
+        return internal::find_if<&internal::meta_type_node::data>([identifier](const auto *curr) {
+            return curr->identifier == identifier;
         }, node);
     }
 
     /**
      * @brief Iterates all the meta functions of a meta type.
      *
-     * Iteratively returns **all** the meta functions of the given type. This
-     * means that the meta functions of the base classes will also be returned,
-     * if any.
+     * The meta functions of the base classes will also be returned, if any.
      *
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
@@ -1636,31 +1570,29 @@ public:
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_func>, void>
     func(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::func, meta_func>(std::move(op), node);
+        internal::visit<&internal::meta_type_node::func, meta_func>(std::move(op), node);
     }
 
     /**
      * @brief Returns the meta function associated with a given identifier.
      *
-     * Searches recursively among **all** the meta functions of the given type.
-     * This means that the meta functions of the base classes will also be
-     * inspected, if any.
+     * The meta functions of the base classes will also be visited, if any.
      *
      * @param identifier Unique identifier.
      * @return The meta function associated with the given identifier, if any.
      */
     meta_func func(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
-        return internal::find_if<&internal::meta_type_node::func>([identifier](auto *candidate) {
-            return candidate->identifier == identifier;
+        return internal::find_if<&internal::meta_type_node::func>([identifier](const auto *curr) {
+            return curr->identifier == identifier;
         }, node);
     }
 
     /**
      * @brief Creates an instance of the underlying type, if possible.
      *
-     * To create a valid instance, the types of the parameters must coincide
-     * exactly with those required by the underlying meta constructor.
-     * Otherwise, an empty and then invalid container is returned.
+     * To create a valid instance, the parameters must be such that a cast or
+     * conversion to the required types is possible. Otherwise, an empty and
+     * thus invalid container is returned.
      *
      * @tparam Args Types of arguments to use to construct the instance.
      * @param args Parameters to use to construct the instance.
@@ -1671,7 +1603,7 @@ public:
         std::array<meta_any, sizeof...(Args)> arguments{{std::forward<Args>(args)...}};
         meta_any any{};
 
-        internal::find_if<&internal::meta_type_node::ctor>([data = arguments.data(), &any](auto *curr) -> bool {
+        internal::find_if<&internal::meta_type_node::ctor>([data = arguments.data(), &any](const auto *curr) {
             if(curr->size == sizeof...(args)) {
                 any = curr->invoke(data);
             }
@@ -1701,8 +1633,7 @@ public:
     /**
      * @brief Iterates all the properties assigned to a meta type.
      *
-     * Iteratively returns **all** the properties of the given type. This means
-     * that the properties of the base classes will also be returned, if any.
+     * The properties of the base classes will also be returned, if any.
      *
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
@@ -1710,22 +1641,20 @@ public:
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const ENTT_NOEXCEPT {
-        internal::iterate<&internal::meta_type_node::prop, meta_prop>(std::move(op), node);
+        internal::visit<&internal::meta_type_node::prop, meta_prop>(std::move(op), node);
     }
 
     /**
      * @brief Returns the property associated with a given key.
      *
-     * Searches recursively among **all** the properties of the given type. This
-     * means that the properties of the base classes will also be inspected, if
-     * any.
+     * The properties of the base classes will also be visited, if any.
      *
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
     meta_prop prop(meta_any key) const ENTT_NOEXCEPT {
-        return internal::find_if<&internal::meta_type_node::prop>([key = std::move(key)](auto *candidate) {
-            return candidate->key() == key;
+        return internal::find_if<&internal::meta_type_node::prop>([key = std::move(key)](const auto *curr) {
+            return curr->key() == key;
         }, node);
     }
 

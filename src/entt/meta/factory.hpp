@@ -208,14 +208,14 @@ meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_
         }
     };
 
-    [[maybe_unused]] const auto direct = std::make_tuple([](meta_any *any, auto *instance) {
-        using arg_type = std::remove_reference_t<decltype(*instance)>;
+    [[maybe_unused]] const auto direct = std::make_tuple([](meta_any *any, auto *value) {
+        using arg_type = std::remove_reference_t<decltype(*value)>;
 
-        if(!instance && any->convert<arg_type>()) {
-            instance = any->try_cast<arg_type>();
+        if(!value && any->convert<arg_type>()) {
+            value = any->try_cast<arg_type>();
         }
 
-        return instance;
+        return value;
     }(args+Indexes, (args+Indexes)->try_cast<std::tuple_element_t<Indexes, typename helper_type::args_type>>())...);
 
     if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Candidate)>>>) {
@@ -838,8 +838,8 @@ inline meta_type resolve() ENTT_NOEXCEPT {
  * @return The meta type associated with the given identifier, if any.
  */
 inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
-    return internal::find_if([identifier](auto *node) {
-        return node->identifier == identifier;
+    return internal::find_if([identifier](const auto *curr) {
+        return curr->identifier == identifier;
     }, *internal::meta_info<>::global);
 }
 
@@ -852,7 +852,7 @@ inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
 template<typename Op>
 inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
 resolve(Op op) ENTT_NOEXCEPT {
-    internal::iterate<meta_type>(std::move(op), *internal::meta_info<>::global);
+    internal::visit<meta_type>(std::move(op), *internal::meta_info<>::global);
 }
 
 
