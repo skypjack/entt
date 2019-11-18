@@ -278,12 +278,12 @@ public:
      * @param entt A valid entity identifier.
      * @return The object associated with the entity.
      */
-    const object_type & get(const entity_type entt) const ENTT_NOEXCEPT {
+    const object_type & get(const entity_type entt) const {
         return instances[underlying_type::index(entt)];
     }
 
     /*! @copydoc get */
-    object_type & get(const entity_type entt) ENTT_NOEXCEPT {
+    object_type & get(const entity_type entt) {
         return const_cast<object_type &>(std::as_const(*this).get(entt));
     }
 
@@ -292,12 +292,12 @@ public:
      * @param entt A valid entity identifier.
      * @return The object associated with the entity, if any.
      */
-    const object_type * try_get(const entity_type entt) const ENTT_NOEXCEPT {
+    const object_type * try_get(const entity_type entt) const {
         return underlying_type::has(entt) ? (instances.data() + underlying_type::index(entt)) : nullptr;
     }
 
     /*! @copydoc try_get */
-    object_type * try_get(const entity_type entt) ENTT_NOEXCEPT {
+    object_type * try_get(const entity_type entt) {
         return const_cast<object_type *>(std::as_const(*this).try_get(entt));
     }
 
@@ -397,7 +397,7 @@ public:
      * @param lhs A valid entity identifier.
      * @param rhs A valid entity identifier.
      */
-    void swap(const entity_type lhs, const entity_type rhs) ENTT_NOEXCEPT override {
+    void swap(const entity_type lhs, const entity_type rhs) override {
         std::swap(instances[underlying_type::index(lhs)], instances[underlying_type::index(rhs)]);
         underlying_type::swap(lhs, rhs);
     }
@@ -655,7 +655,7 @@ public:
      * @param entt A valid entity identifier.
      * @return The object associated with the entity.
      */
-    object_type get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
+    object_type get([[maybe_unused]] const entity_type entt) const {
         ENTT_ASSERT(underlying_type::has(entt));
         return {};
     }

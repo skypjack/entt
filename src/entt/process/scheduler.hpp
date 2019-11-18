@@ -114,7 +114,7 @@ public:
     using size_type = std::size_t;
 
     /*! @brief Default constructor. */
-    scheduler() ENTT_NOEXCEPT = default;
+    scheduler() = default;
 
     /*! @brief Default move constructor. */
     scheduler(scheduler &&) = default;

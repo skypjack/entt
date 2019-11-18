@@ -44,7 +44,7 @@ class identifier {
     using tuple_type = std::tuple<std::decay_t<Types>...>;
 
     template<typename Type, std::size_t... Indexes>
-    static constexpr ENTT_ID_TYPE get(std::index_sequence<Indexes...>) ENTT_NOEXCEPT {
+    static constexpr ENTT_ID_TYPE get(std::index_sequence<Indexes...>) {
         static_assert(std::disjunction_v<std::is_same<Type, Types>...>);
         return (0 + ... + (std::is_same_v<Type, std::tuple_element_t<Indexes, tuple_type>> ? ENTT_ID_TYPE(Indexes) : ENTT_ID_TYPE{}));
     }

@@ -81,7 +81,7 @@ class emitter {
             return on_list.emplace(on_list.cend(), false, std::move(listener));
         }
 
-        void erase(connection_type conn) ENTT_NOEXCEPT {
+        void erase(connection_type conn) {
             conn->first = true;
 
             if(!publishing) {
@@ -130,7 +130,7 @@ class emitter {
     }
 
     template<typename Event>
-    event_handler<Event> * assure() const ENTT_NOEXCEPT {
+    event_handler<Event> * assure() const {
         const auto htype = type<Event>();
         handler_data *hdata = nullptr;
 
@@ -179,7 +179,7 @@ public:
         friend class emitter;
 
         /*! @brief Default constructor. */
-        connection() noexcept(noexcept(typename event_handler<Event>::connection_type{})) = default;
+        connection() = default;
 
         /**
          * @brief Creates a connection that wraps its underlying instance.
@@ -280,7 +280,7 @@ public:
      * @param conn A valid connection.
      */
     template<typename Event>
-    void erase(connection<Event> conn) ENTT_NOEXCEPT {
+    void erase(connection<Event> conn) {
         assure<Event>()->erase(std::move(conn));
     }
 

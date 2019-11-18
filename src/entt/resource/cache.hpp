@@ -176,7 +176,7 @@ struct cache {
      * @param id Unique resource identifier.
      * @return True if the cache contains the resource, false otherwise.
      */
-    bool contains(const id_type id) const ENTT_NOEXCEPT {
+    bool contains(const id_type id) const {
         return (resources.find(id) != resources.cend());
     }
 
@@ -188,7 +188,7 @@ struct cache {
      *
      * @param id Unique resource identifier.
      */
-    void discard(const id_type id) ENTT_NOEXCEPT {
+    void discard(const id_type id) {
         if(auto it = resources.find(id); it != resources.end()) {
             resources.erase(it);
         }

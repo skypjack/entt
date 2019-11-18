@@ -171,7 +171,7 @@ public:
     using delta_type = Delta;
 
     /*! @brief Default destructor. */
-    virtual ~process() ENTT_NOEXCEPT {
+    virtual ~process() {
         static_assert(std::is_base_of_v<process, Derived>);
     }
 
@@ -183,7 +183,7 @@ public:
      *
      * @param immediately Requests an immediate operation.
      */
-    void abort(const bool immediately = false) ENTT_NOEXCEPT {
+    void abort(const bool immediately = false) {
         if(alive()) {
             current = state::ABORTED;
 

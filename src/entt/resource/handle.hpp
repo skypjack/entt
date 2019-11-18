@@ -93,7 +93,9 @@ public:
      * @brief Returns true if a handle contains a resource, false otherwise.
      * @return True if the handle contains a resource, false otherwise.
      */
-    explicit operator bool() const { return static_cast<bool>(resource); }
+    explicit operator bool() const ENTT_NOEXCEPT {
+        return static_cast<bool>(resource);
+    }
 
 private:
     std::shared_ptr<Resource> resource;

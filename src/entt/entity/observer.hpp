@@ -265,7 +265,7 @@ public:
     using iterator_type = typename sparse_set<Entity>::iterator_type;
 
     /*! @brief Default constructor. */
-    basic_observer() ENTT_NOEXCEPT
+    basic_observer()
         : target{}, release{}, view{}
     {}
 
@@ -280,7 +280,7 @@ public:
      * @param reg A valid reference to a registry.
      */
     template<typename... Matcher>
-    basic_observer(basic_registry<entity_type> &reg, basic_collector<Matcher...>) ENTT_NOEXCEPT
+    basic_observer(basic_registry<entity_type> &reg, basic_collector<Matcher...>)
         : target{&reg},
           release{},
           view{}
@@ -383,7 +383,7 @@ public:
     }
 
     /*! @brief Resets the underlying container. */
-    void clear() {
+    void clear() ENTT_NOEXCEPT {
         view.reset();
     }
 

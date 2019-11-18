@@ -47,7 +47,7 @@ struct basic_actor {
      * @param entity A valid entity identifier.
      * @param ref An instance of the registry class.
      */
-    explicit basic_actor(entity_type entity, registry_type &ref)
+    explicit basic_actor(entity_type entity, registry_type &ref) ENTT_NOEXCEPT
         : entt{entity}, reg{&ref}
     {
         ENTT_ASSERT(ref.valid(entity));
@@ -69,7 +69,7 @@ struct basic_actor {
      *
      * @param other The instance to move from.
      */
-    basic_actor(basic_actor &&other)
+    basic_actor(basic_actor &&other) ENTT_NOEXCEPT
         : entt{other.entt}, reg{other.reg}
     {
         other.entt = null;
@@ -85,7 +85,7 @@ struct basic_actor {
      * @param other The instance to move from.
      * @return This actor.
      */
-    basic_actor & operator=(basic_actor &&other) {
+    basic_actor & operator=(basic_actor &&other) ENTT_NOEXCEPT {
         if(this != &other) {
             auto tmp{std::move(other)};
             std::swap(reg, tmp.reg);
@@ -129,7 +129,7 @@ struct basic_actor {
      * @return True if the actor has all the components, false otherwise.
      */
     template<typename... Component>
-    bool has() const ENTT_NOEXCEPT {
+    bool has() const {
         return (reg->template has<Component>(entt) && ...);
     }
 
@@ -139,13 +139,13 @@ struct basic_actor {
      * @return References to the components owned by the actor.
      */
     template<typename... Component>
-    decltype(auto) get() const ENTT_NOEXCEPT {
+    decltype(auto) get() const {
         return std::as_const(*reg).template get<Component...>(entt);
     }
 
     /*! @copydoc get */
     template<typename... Component>
-    decltype(auto) get() ENTT_NOEXCEPT {
+    decltype(auto) get() {
         return reg->template get<Component...>(entt);
     }
 
@@ -155,13 +155,13 @@ struct basic_actor {
      * @return Pointers to the components owned by the actor.
      */
     template<typename... Component>
-    auto try_get() const ENTT_NOEXCEPT {
+    auto try_get() const {
         return std::as_const(*reg).template try_get<Component...>(entt);
     }
 
     /*! @copydoc try_get */
     template<typename... Component>
-    auto try_get() ENTT_NOEXCEPT {
+    auto try_get() {
         return reg->template try_get<Component...>(entt);
     }
 
@@ -190,7 +190,7 @@ struct basic_actor {
      * @brief Checks if an actor refers to a valid entity or not.
      * @return True if the actor refers to a valid entity, false otherwise.
      */
-    explicit operator bool() const ENTT_NOEXCEPT {
+    explicit operator bool() const {
         return reg && reg->valid(entt);
     }
 

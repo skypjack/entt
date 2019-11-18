@@ -243,7 +243,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator_type find(const entity_type entt) const ENTT_NOEXCEPT {
+    iterator_type find(const entity_type entt) const {
         const auto it = handler->find(entt);
         return it != end() && *it == entt ? it : end();
     }
@@ -253,7 +253,7 @@ public:
      * @param pos Position of the element to return.
      * @return The identifier that occupies the given position.
      */
-    entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
+    entity_type operator[](const size_type pos) const {
         return begin()[pos];
     }
 
@@ -262,7 +262,7 @@ public:
      * @param entt A valid entity identifier.
      * @return True if the group contains the given entity, false otherwise.
      */
-    bool contains(const entity_type entt) const ENTT_NOEXCEPT {
+    bool contains(const entity_type entt) const {
         return find(entt) != end();
     }
 
@@ -284,7 +284,7 @@ public:
      * @return The components assigned to the entity.
      */
     template<typename... Component>
-    decltype(auto) get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
+    decltype(auto) get([[maybe_unused]] const entity_type entt) const {
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Component) == 1) {
@@ -662,7 +662,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator_type find(const entity_type entt) const ENTT_NOEXCEPT {
+    iterator_type find(const entity_type entt) const {
         const auto it = std::get<0>(pools)->find(entt);
         return it != end() && it >= begin() && *it == entt ? it : end();
     }
@@ -672,7 +672,7 @@ public:
      * @param pos Position of the element to return.
      * @return The identifier that occupies the given position.
      */
-    entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
+    entity_type operator[](const size_type pos) const {
         return begin()[pos];
     }
 
@@ -681,7 +681,7 @@ public:
      * @param entt A valid entity identifier.
      * @return True if the group contains the given entity, false otherwise.
      */
-    bool contains(const entity_type entt) const ENTT_NOEXCEPT {
+    bool contains(const entity_type entt) const {
         return find(entt) != end();
     }
 
@@ -703,7 +703,7 @@ public:
      * @return The components assigned to the entity.
      */
     template<typename... Component>
-    decltype(auto) get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
+    decltype(auto) get([[maybe_unused]] const entity_type entt) const {
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Component) == 1) {

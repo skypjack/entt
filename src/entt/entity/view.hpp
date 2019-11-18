@@ -96,7 +96,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             }
         }
 
-        bool valid() const ENTT_NOEXCEPT {
+        bool valid() const {
             return std::all_of(unchecked.cbegin(), unchecked.cend(), [this](const sparse_set<Entity> *view) { return view->has(*begin); })
                     && std::none_of(filter.cbegin(), filter.cend(), [this](const sparse_set<Entity> *view) { return view->has(*begin); });
         }
@@ -110,11 +110,11 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
         iterator() ENTT_NOEXCEPT = default;
 
-        iterator & operator++() ENTT_NOEXCEPT {
+        iterator & operator++() {
             return (++begin != end && !valid()) ? ++(*this) : *this;
         }
 
-        iterator operator++(int) ENTT_NOEXCEPT {
+        iterator operator++(int) {
             iterator orig = *this;
             return ++(*this), orig;
         }
@@ -127,11 +127,11 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             return !(*this == other);
         }
 
-        pointer operator->() const ENTT_NOEXCEPT {
+        pointer operator->() const {
             return begin.operator->();
         }
 
-        reference operator*() const ENTT_NOEXCEPT {
+        reference operator*() const {
             return *operator->();
         }
 
@@ -154,7 +154,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         });
     }
 
-    unchecked_type unchecked(const sparse_set<Entity> *view) const ENTT_NOEXCEPT {
+    unchecked_type unchecked(const sparse_set<Entity> *view) const {
         std::size_t pos{};
         unchecked_type other{};
         ((std::get<pool_type<Component> *>(pools) == view ? nullptr : (other[pos++] = std::get<pool_type<Component> *>(pools))), ...);
@@ -162,7 +162,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     }
 
     template<typename Comp, typename Other>
-    decltype(auto) get([[maybe_unused]] component_iterator_type<Comp> it, [[maybe_unused]] pool_type<Other> *cpool, [[maybe_unused]] const Entity entt) const ENTT_NOEXCEPT {
+    decltype(auto) get([[maybe_unused]] component_iterator_type<Comp> it, [[maybe_unused]] pool_type<Other> *cpool, [[maybe_unused]] const Entity entt) const {
         if constexpr(std::is_same_v<Comp, Other>) {
             return *it;
         } else {
@@ -302,7 +302,7 @@ public:
      *
      * @return An iterator to the first entity that has the given components.
      */
-    iterator_type begin() const ENTT_NOEXCEPT {
+    iterator_type begin() const {
         const auto *view = candidate();
         const filter_type ignore{std::get<pool_type<Exclude> *>(filter)...};
         return iterator_type{view->begin(), view->end(), unchecked(view), ignore};
@@ -323,7 +323,7 @@ public:
      * @return An iterator to the entity following the last entity that has the
      * given components.
      */
-    iterator_type end() const ENTT_NOEXCEPT {
+    iterator_type end() const {
         const auto *view = candidate();
         const filter_type ignore{std::get<pool_type<Exclude> *>(filter)...};
         return iterator_type{view->end(), view->end(), unchecked(view), ignore};
@@ -335,7 +335,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator_type find(const entity_type entt) const ENTT_NOEXCEPT {
+    iterator_type find(const entity_type entt) const {
         const auto *view = candidate();
         const filter_type ignore{std::get<pool_type<Exclude> *>(filter)...};
         iterator_type it{view->find(entt), view->end(), unchecked(view), ignore};
@@ -347,7 +347,7 @@ public:
      * @param entt A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
-    bool contains(const entity_type entt) const ENTT_NOEXCEPT {
+    bool contains(const entity_type entt) const {
         return find(entt) != end();
     }
 
@@ -369,7 +369,7 @@ public:
      * @return The components assigned to the entity.
      */
     template<typename... Comp>
-    decltype(auto) get([[maybe_unused]] const entity_type entt) const ENTT_NOEXCEPT {
+    decltype(auto) get([[maybe_unused]] const entity_type entt) const {
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Comp) == 0) {
@@ -658,7 +658,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator_type find(const entity_type entt) const ENTT_NOEXCEPT {
+    iterator_type find(const entity_type entt) const {
         const auto it = pool->find(entt);
         return it != end() && *it == entt ? it : end();
     }
@@ -668,7 +668,7 @@ public:
      * @param pos Position of the element to return.
      * @return The identifier that occupies the given position.
      */
-    entity_type operator[](const size_type pos) const ENTT_NOEXCEPT {
+    entity_type operator[](const size_type pos) const {
         return begin()[pos];
     }
 
@@ -677,7 +677,7 @@ public:
      * @param entt A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
-    bool contains(const entity_type entt) const ENTT_NOEXCEPT {
+    bool contains(const entity_type entt) const {
         return find(entt) != end();
     }
 
@@ -697,7 +697,7 @@ public:
      * @return The component assigned to the entity.
      */
     template<typename Comp = Component>
-    decltype(auto) get(const entity_type entt) const ENTT_NOEXCEPT {
+    decltype(auto) get(const entity_type entt) const {
         static_assert(std::is_same_v<Comp, Component>);
         ENTT_ASSERT(contains(entt));
         return pool->get(entt);

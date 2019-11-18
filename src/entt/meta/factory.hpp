@@ -318,7 +318,7 @@ public:
      * @brief Constructs an extended factory from a given node.
      * @param target The underlying node to which to assign the properties.
      */
-    meta_factory(entt::internal::meta_prop_node **target)
+    meta_factory(entt::internal::meta_prop_node **target) ENTT_NOEXCEPT
         : curr{target}
     {}
 
@@ -851,7 +851,7 @@ inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
  */
 template<typename Op>
 inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
-resolve(Op op) ENTT_NOEXCEPT {
+resolve(Op op) {
     internal::visit<meta_type>(std::move(op), *internal::meta_info<>::global);
 }
 

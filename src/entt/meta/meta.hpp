@@ -129,7 +129,7 @@ struct meta_type_node {
 
 
 template<typename Type, typename Op, typename Node>
-void visit(Op op, Node *node) ENTT_NOEXCEPT {
+void visit(Op op, Node *node) {
     while(node) {
         op(Type{node});
         node = node->next;
@@ -138,7 +138,7 @@ void visit(Op op, Node *node) ENTT_NOEXCEPT {
 
 
 template<auto Member, typename Type, typename Op>
-void visit(Op op, const internal::meta_type_node *node) ENTT_NOEXCEPT {
+void visit(Op op, const internal::meta_type_node *node) {
     if(node) {
         internal::visit<Type>(op, node->*Member);
         auto *next = node->base;
@@ -152,7 +152,7 @@ void visit(Op op, const internal::meta_type_node *node) ENTT_NOEXCEPT {
 
 
 template<typename Op, typename Node>
-auto find_if(Op op, Node *node) ENTT_NOEXCEPT {
+auto find_if(Op op, Node *node) {
     while(node && !op(node)) {
         node = node->next;
     }
@@ -162,7 +162,7 @@ auto find_if(Op op, Node *node) ENTT_NOEXCEPT {
 
 
 template<auto Member, typename Op>
-auto find_if(Op op, const meta_type_node *node) ENTT_NOEXCEPT
+auto find_if(Op op, const meta_type_node *node)
 -> decltype(find_if(op, node->*Member)) {
     decltype(find_if(op, node->*Member)) ret = nullptr;
 
@@ -439,7 +439,7 @@ public:
      *
      * @param other The instance to move from.
      */
-    meta_any(meta_any &&other) ENTT_NOEXCEPT
+    meta_any(meta_any &&other)
         : meta_any{}
     {
         swap(*this, other);
@@ -477,7 +477,7 @@ public:
      * @param other The instance to assign.
      * @return This meta any object.
      */
-    meta_any & operator=(meta_any &&other) ENTT_NOEXCEPT {
+    meta_any & operator=(meta_any &&other) {
         meta_any any{std::move(other)};
         swap(any, *this);
         return *this;
@@ -508,7 +508,7 @@ public:
      * @return A (possibly null) pointer to the contained instance.
      */
     template<typename Type>
-    const Type * try_cast() const ENTT_NOEXCEPT {
+    const Type * try_cast() const {
         void *ret = nullptr;
 
         if(const auto * const type = internal::meta_info<Type>::resolve(); type == node) {
@@ -522,7 +522,7 @@ public:
 
     /*! @copydoc try_cast */
     template<typename Type>
-    Type * try_cast() ENTT_NOEXCEPT {
+    Type * try_cast() {
         return const_cast<Type *>(std::as_const(*this).try_cast<Type>());
     }
 
@@ -541,7 +541,7 @@ public:
      * @return A reference to the contained instance.
      */
     template<typename Type>
-    const Type & cast() const ENTT_NOEXCEPT {
+    const Type & cast() const {
         auto * const actual = try_cast<Type>();
         ENTT_ASSERT(actual);
         return *actual;
@@ -549,7 +549,7 @@ public:
 
     /*! @copydoc cast */
     template<typename Type>
-    Type & cast() ENTT_NOEXCEPT {
+    Type & cast() {
         return const_cast<Type &>(std::as_const(*this).cast<Type>());
     }
 
@@ -616,7 +616,7 @@ public:
      * @return False if the two containers differ in their content, true
      * otherwise.
      */
-    bool operator==(const meta_any &other) const ENTT_NOEXCEPT {
+    bool operator==(const meta_any &other) const {
         return node == other.node && (!node || node->compare(instance, other.instance));
     }
 
@@ -625,7 +625,7 @@ public:
      * @param lhs A valid meta any object.
      * @param rhs A valid meta any object.
      */
-    friend void swap(meta_any &lhs, meta_any &rhs) ENTT_NOEXCEPT {
+    friend void swap(meta_any &lhs, meta_any &rhs) {
         if(lhs.steal_fn && rhs.steal_fn) {
             meta_any buffer{};
             lhs.steal_fn(buffer, lhs);
@@ -743,7 +743,7 @@ struct meta_prop {
      * @brief Returns the stored key.
      * @return A meta any containing the key stored with the given property.
      */
-    meta_any key() const ENTT_NOEXCEPT {
+    meta_any key() const {
         return node->key();
     }
 
@@ -751,7 +751,7 @@ struct meta_prop {
      * @brief Returns the stored value.
      * @return A meta any containing the value stored with the given property.
      */
-    meta_any value() const ENTT_NOEXCEPT {
+    meta_any value() const {
         return node->value();
     }
 
@@ -856,7 +856,7 @@ struct meta_conv {
      * @param instance The instance to convert.
      * @return An opaque pointer to the instance to convert.
      */
-    meta_any convert(const void *instance) const ENTT_NOEXCEPT {
+    meta_any convert(const void *instance) const {
         return node->conv(instance);
     }
 
@@ -936,7 +936,7 @@ struct meta_ctor {
      */
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
-    prop(Op op) const ENTT_NOEXCEPT {
+    prop(Op op) const {
         internal::visit<meta_prop>(std::move(op), node->prop);
     }
 
@@ -945,7 +945,7 @@ struct meta_ctor {
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
-    meta_prop prop(meta_any key) const ENTT_NOEXCEPT {
+    meta_prop prop(meta_any key) const {
         return internal::find_if([key = std::move(key)](const auto *curr) {
             return curr->key() == key;
         }, node->prop);
@@ -1106,7 +1106,7 @@ struct meta_data {
      * @param handle An opaque pointer to an instance of the underlying type.
      * @return A meta any containing the value of the underlying variable.
      */
-    meta_any get(meta_handle handle) const ENTT_NOEXCEPT {
+    meta_any get(meta_handle handle) const {
         return node->get(handle, meta_any{});
     }
 
@@ -1120,7 +1120,7 @@ struct meta_data {
      * @param index Position of the underlying element to get.
      * @return A meta any containing the value of the underlying element.
      */
-    meta_any get(meta_handle handle, std::size_t index) const ENTT_NOEXCEPT {
+    meta_any get(meta_handle handle, std::size_t index) const {
         ENTT_ASSERT(index < node->type()->extent);
         return node->get(handle, index);
     }
@@ -1132,7 +1132,7 @@ struct meta_data {
      */
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
-    prop(Op op) const ENTT_NOEXCEPT {
+    prop(Op op) const {
         internal::visit<meta_prop>(std::move(op), node->prop);
     }
 
@@ -1141,7 +1141,7 @@ struct meta_data {
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
-    meta_prop prop(meta_any key) const ENTT_NOEXCEPT {
+    meta_prop prop(meta_any key) const {
         return internal::find_if([key = std::move(key)](const auto *curr) {
             return curr->key() == key;
         }, node->prop);
@@ -1255,7 +1255,7 @@ struct meta_func {
      */
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
-    prop(Op op) const ENTT_NOEXCEPT {
+    prop(Op op) const {
         internal::visit<meta_prop>(std::move(op), node->prop);
     }
 
@@ -1264,7 +1264,7 @@ struct meta_func {
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
-    meta_prop prop(meta_any key) const ENTT_NOEXCEPT {
+    meta_prop prop(meta_any key) const {
         return internal::find_if([key = std::move(key)](const auto *curr) {
             return curr->key() == key;
         }, node->prop);
@@ -1297,7 +1297,7 @@ inline bool operator!=(const meta_func &lhs, const meta_func &rhs) ENTT_NOEXCEPT
 /*! @brief Opaque container for meta types. */
 class meta_type {
     template<typename... Args, std::size_t... Indexes>
-    auto ctor(std::index_sequence<Indexes...>) const ENTT_NOEXCEPT {
+    auto ctor(std::index_sequence<Indexes...>) const {
         return internal::find_if([](const auto *candidate) {
             return candidate->size == sizeof...(Args) && ([](auto *from, auto *to) {
                 return (from == to) || internal::find_if<&internal::meta_type_node::base>([to](const auto *curr) { return curr->type() == to; }, from)
@@ -1456,7 +1456,7 @@ public:
      */
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_base>, void>
-    base(Op op) const ENTT_NOEXCEPT {
+    base(Op op) const {
         internal::visit<&internal::meta_type_node::base, meta_base>(std::move(op), node);
     }
 
@@ -1465,7 +1465,7 @@ public:
      * @param identifier Unique identifier.
      * @return The meta base associated with the given identifier, if any.
      */
-    meta_base base(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
+    meta_base base(const ENTT_ID_TYPE identifier) const {
         return internal::find_if<&internal::meta_type_node::base>([identifier](const auto *curr) {
             return curr->type()->identifier == identifier;
         }, node);
@@ -1477,7 +1477,7 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    void conv(Op op) const ENTT_NOEXCEPT {
+    void conv(Op op) const {
         internal::visit<&internal::meta_type_node::conv, meta_conv>(std::move(op), node);
     }
 
@@ -1488,7 +1488,7 @@ public:
      * any.
      */
     template<typename Type>
-    meta_conv conv() const ENTT_NOEXCEPT {
+    meta_conv conv() const {
         return internal::find_if<&internal::meta_type_node::conv>([type = internal::meta_info<Type>::resolve()](const auto *curr) {
             return curr->type() == type;
         }, node);
@@ -1500,7 +1500,7 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    void ctor(Op op) const ENTT_NOEXCEPT {
+    void ctor(Op op) const {
         internal::visit<meta_ctor>(std::move(op), node->ctor);
     }
 
@@ -1510,7 +1510,7 @@ public:
      * @return The requested meta constructor, if any.
      */
     template<typename... Args>
-    meta_ctor ctor() const ENTT_NOEXCEPT {
+    meta_ctor ctor() const {
         return ctor<Args...>(std::index_sequence_for<Args...>{});
     }
 
@@ -1532,7 +1532,7 @@ public:
      */
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_data>, void>
-    data(Op op) const ENTT_NOEXCEPT {
+    data(Op op) const {
         internal::visit<&internal::meta_type_node::data, meta_data>(std::move(op), node);
     }
 
@@ -1544,7 +1544,7 @@ public:
      * @param identifier Unique identifier.
      * @return The meta data associated with the given identifier, if any.
      */
-    meta_data data(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
+    meta_data data(const ENTT_ID_TYPE identifier) const {
         return internal::find_if<&internal::meta_type_node::data>([identifier](const auto *curr) {
             return curr->identifier == identifier;
         }, node);
@@ -1560,7 +1560,7 @@ public:
      */
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_func>, void>
-    func(Op op) const ENTT_NOEXCEPT {
+    func(Op op) const {
         internal::visit<&internal::meta_type_node::func, meta_func>(std::move(op), node);
     }
 
@@ -1572,7 +1572,7 @@ public:
      * @param identifier Unique identifier.
      * @return The meta function associated with the given identifier, if any.
      */
-    meta_func func(const ENTT_ID_TYPE identifier) const ENTT_NOEXCEPT {
+    meta_func func(const ENTT_ID_TYPE identifier) const {
         return internal::find_if<&internal::meta_type_node::func>([identifier](const auto *curr) {
             return curr->identifier == identifier;
         }, node);
@@ -1631,7 +1631,7 @@ public:
      */
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
-    prop(Op op) const ENTT_NOEXCEPT {
+    prop(Op op) const {
         internal::visit<&internal::meta_type_node::prop, meta_prop>(std::move(op), node);
     }
 
@@ -1643,7 +1643,7 @@ public:
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
-    meta_prop prop(meta_any key) const ENTT_NOEXCEPT {
+    meta_prop prop(meta_any key) const {
         return internal::find_if<&internal::meta_type_node::prop>([key = std::move(key)](const auto *curr) {
             return curr->key() == key;
         }, node);

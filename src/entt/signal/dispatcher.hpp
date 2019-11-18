@@ -39,7 +39,7 @@ class dispatcher {
     struct base_wrapper {
         virtual ~base_wrapper() = default;
         virtual void publish() = 0;
-        virtual void clear() = 0;
+        virtual void clear() ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
@@ -57,7 +57,7 @@ class dispatcher {
             events.erase(events.cbegin(), events.cbegin()+length);
         }
 
-        void clear() override {
+        void clear() ENTT_NOEXCEPT override {
             events.clear();
         }
 
@@ -218,7 +218,7 @@ public:
      * @tparam Event Type of events to discard.
      */
     template<typename... Event>
-    void discard() {
+    void discard() ENTT_NOEXCEPT {
         if constexpr(sizeof...(Event) == 0) {
             std::for_each(wrappers.begin(), wrappers.end(), [](auto &&wdata) {
                 if(wdata.wrapper) {
