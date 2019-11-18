@@ -35,6 +35,21 @@ struct basic_actor {
     {}
 
     /**
+     * @brief Move constructor.
+     *
+     * After actor move construction, instances that have been moved from are
+     * placed in a valid but unspecified state. It's highly discouraged to
+     * continue using them.
+     *
+     * @param other The instance to move from.
+     */
+    basic_actor(basic_actor &&other) ENTT_NOEXCEPT
+        : entt{other.entt}, reg{other.reg}
+    {
+        other.entt = null;
+    }
+
+    /**
      * @brief Constructs an actor from a given registry.
      * @param ref An instance of the registry class.
      */
@@ -58,21 +73,6 @@ struct basic_actor {
         if(*this) {
             reg->destroy(entt);
         }
-    }
-
-    /**
-     * @brief Move constructor.
-     *
-     * After actor move construction, instances that have been moved from are
-     * placed in a valid but unspecified state. It's highly discouraged to
-     * continue using them.
-     *
-     * @param other The instance to move from.
-     */
-    basic_actor(basic_actor &&other) ENTT_NOEXCEPT
-        : entt{other.entt}, reg{other.reg}
-    {
-        other.entt = null;
     }
 
     /**

@@ -458,28 +458,18 @@ public:
      * @param type An instance of an object to use to initialize the container.
      * @return This meta any object.
      */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>>>
+    template<typename Type>
     meta_any & operator=(Type &&type) {
         return (*this = meta_any{std::forward<Type>(type)});
     }
 
     /**
-     * @brief Copy assignment operator.
-     * @param other The instance to assign.
+     * @brief Assignment operator.
+     * @param other The instance to assign from.
      * @return This meta any object.
      */
-    meta_any & operator=(const meta_any &other) {
-        return (*this = meta_any{other});
-    }
-
-    /**
-     * @brief Move assignment operator.
-     * @param other The instance to assign.
-     * @return This meta any object.
-     */
-    meta_any & operator=(meta_any &&other) {
-        meta_any any{std::move(other)};
-        swap(any, *this);
+    meta_any & operator=(meta_any other) {
+        swap(other, *this);
         return *this;
     }
 
