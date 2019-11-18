@@ -3,7 +3,6 @@
 
 
 #include <array>
-#include <memory>
 #include <cstddef>
 #include <utility>
 #include <type_traits>
@@ -308,63 +307,58 @@ class meta_any {
     friend class meta_handle;
 
     using storage_type = std::aligned_storage_t<sizeof(void *), alignof(void *)>;
-    using copy_fn_type = void *(storage_type &, const void *);
-    using destroy_fn_type = void(void *);
-    using steal_fn_type = void *(storage_type &, void *, destroy_fn_type *);
-
-    template<typename Type>
-    static Type * release(Type *instance) {
-        const auto * const node = internal::meta_info<Type>::resolve();
-        [[maybe_unused]] const bool destroyed = (!node->dtor || node->dtor->invoke(*instance));
-        ENTT_ASSERT(destroyed);
-        return instance;
-    }
+    using copy_fn_type = void(meta_any &, const meta_any &);
+    using steal_fn_type = void(meta_any &, meta_any &);
+    using destroy_fn_type = void(meta_any &);
 
     template<typename Type, typename = std::void_t<>>
     struct type_traits {
         template<typename... Args>
-        static void * instance(storage_type &storage, Args &&... args) {
-            auto instance = std::make_unique<Type>(std::forward<Args>(args)...);
-            new (&storage) Type *{instance.get()};
-            return instance.release();
+        static void instance(meta_any &any, Args &&... args) {
+            any.instance = new Type{std::forward<Args>(args)...};
+            new (&any.storage) Type *{static_cast<Type *>(any.instance)};
         }
 
-        static void destroy(void *instance) {
-            delete release<Type>(static_cast<Type *>(instance));
+        static void destroy(meta_any &any) {
+            const auto * const node = internal::meta_info<Type>::resolve();
+            [[maybe_unused]] const bool destroyed = (!node->dtor || node->dtor->invoke(any));
+            delete static_cast<Type *>(any.instance);
+            ENTT_ASSERT(destroyed);
         }
 
-        static void * copy(storage_type &storage, const void *other) {
-            auto instance = std::make_unique<Type>(*static_cast<const Type *>(other));
-            new (&storage) Type *{instance.get()};
-            return instance.release();
+        static void copy(meta_any &to, const meta_any &from) {
+            auto *instance = new Type{*static_cast<const Type *>(from.instance)};
+            new (&to.storage) Type *{instance};
+            to.instance = instance;
         }
 
-        static void * steal(storage_type &to, void *from, destroy_fn_type *) {
-            auto * const instance = static_cast<Type *>(from);
-            new (&to) Type *{instance};
-            return instance;
+        static void steal(meta_any &to, meta_any &from) {
+            new (&to.storage) Type *{static_cast<Type *>(from.instance)};
+            to.instance = from.instance;
         }
     };
 
     template<typename Type>
     struct type_traits<Type, std::enable_if_t<sizeof(Type) <= sizeof(void *) && std::is_nothrow_move_constructible_v<Type>>> {
         template<typename... Args>
-        static void * instance(storage_type &storage, Args &&... args) {
-            return new (&storage) Type{std::forward<Args>(args)...};
+        static void instance(meta_any &any, Args &&... args) {
+            any.instance = new (&any.storage) Type{std::forward<Args>(args)...};
         }
 
-        static void destroy(void *instance) {
-            release<Type>(static_cast<Type *>(instance))->~Type();
+        static void destroy(meta_any &any) {
+            const auto * const node = internal::meta_info<Type>::resolve();
+            [[maybe_unused]] const bool destroyed = (!node->dtor || node->dtor->invoke(any));
+            static_cast<Type *>(any.instance)->~Type();
+            ENTT_ASSERT(destroyed);
         }
 
-        static void * copy(storage_type &storage, const void *instance) {
-            return new (&storage) Type{*static_cast<const Type *>(instance)};
+        static void copy(meta_any &to, const meta_any &from) {
+            to.instance = new (&to.storage) Type{*static_cast<const Type *>(from.instance)};
         }
 
-        static void * steal(storage_type &to, void *from, destroy_fn_type *destroy_fn) {
-            void * const instance = new (&to) Type{std::move(*static_cast<Type *>(from))};
-            destroy_fn(from);
-            return instance;
+        static void steal(meta_any &to, meta_any &from) {
+            to.instance = new (&to.storage) Type{std::move(*static_cast<Type *>(from.instance))};
+            destroy(from);
         }
     };
 
@@ -385,10 +379,9 @@ public:
         node = internal::meta_info<Type>::resolve();
 
         if constexpr(!std::is_void_v<Type>) {
-            using traits_type = type_traits<std::remove_cv_t<std::remove_reference_t<Type>>>;
             static_assert(std::is_copy_constructible_v<Type>);
-
-            instance = traits_type::instance(storage, std::forward<Args>(args)...);
+            using traits_type = type_traits<std::remove_cv_t<std::remove_reference_t<Type>>>;
+            traits_type::instance(*this, std::forward<Args>(args)...);
             destroy_fn = &traits_type::destroy;
             copy_fn = &traits_type::copy;
             steal_fn = &traits_type::steal;
@@ -432,7 +425,7 @@ public:
         : meta_any{}
     {
         node = other.node;
-        instance = other.copy_fn ? other.copy_fn(storage, other.instance) : other.instance;
+        (other.copy_fn ? other.copy_fn : [](meta_any &to, const meta_any &from) { to.instance = from.instance; })(*this, other);
         destroy_fn = other.destroy_fn;
         copy_fn = other.copy_fn;
         steal_fn = other.steal_fn;
@@ -455,7 +448,7 @@ public:
     /*! @brief Frees the internal storage, whatever it means. */
     ~meta_any() {
         if(destroy_fn) {
-            destroy_fn(instance);
+            destroy_fn(*this);
         }
     }
 
@@ -634,16 +627,14 @@ public:
      */
     friend void swap(meta_any &lhs, meta_any &rhs) ENTT_NOEXCEPT {
         if(lhs.steal_fn && rhs.steal_fn) {
-            storage_type buffer;
-            auto * const temp = lhs.steal_fn(buffer, lhs.instance, lhs.destroy_fn);
-            lhs.instance = rhs.steal_fn(lhs.storage, rhs.instance, rhs.destroy_fn);
-            rhs.instance = lhs.steal_fn(rhs.storage, temp, lhs.destroy_fn);
+            meta_any buffer{};
+            lhs.steal_fn(buffer, lhs);
+            rhs.steal_fn(lhs, rhs);
+            lhs.steal_fn(rhs, buffer);
         } else if(lhs.steal_fn) {
-            lhs.instance = lhs.steal_fn(rhs.storage, lhs.instance, lhs.destroy_fn);
-            std::swap(rhs.instance, lhs.instance);
+            lhs.steal_fn(rhs, lhs);
         } else if(rhs.steal_fn) {
-            rhs.instance = rhs.steal_fn(lhs.storage, rhs.instance, rhs.destroy_fn);
-            std::swap(rhs.instance, lhs.instance);
+            rhs.steal_fn(lhs, rhs);
         } else {
             std::swap(lhs.instance, rhs.instance);
         }
