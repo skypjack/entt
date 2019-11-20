@@ -417,10 +417,10 @@ There are a few alternatives available at the moment:
   ```
 
 * The _as-alias_ policy, associated with the type `entt::as_alias_t`.<br/>
-  It allows to build wrappers that act as aliases for the objects used to
-  initialize them. Modifying the object contained in the wrapper for which the
-  _aliasing_ was requested will make it possible to directly modify the instance
-  used to initialize the wrapper itself.<br/>
+  It allows to build wrappers that act as aliases for the objects that generated
+  them. Modifying the object contained in the wrapper for which the _aliasing_
+  was requested will make it possible to directly modify the instance used to
+  initialize the wrapper itself.<br/>
   This policy works with constructors (for example, when objects are taken from
   an external container rather than created on demand), data members and
   functions in general (as long as their return types are lvalue references).

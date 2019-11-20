@@ -289,22 +289,6 @@ TEST_F(Meta, Resolve) {
     ASSERT_TRUE(found);
 }
 
-TEST_F(Meta, MetaAnyFromMetaHandle) {
-    int value = 42;
-    entt::meta_handle handle{value};
-    entt::meta_any any{handle};
-    any.cast<int>() = 3;
-
-    ASSERT_TRUE(any);
-    ASSERT_EQ(any.type(), entt::resolve<int>());
-    ASSERT_EQ(any.try_cast<std::size_t>(), nullptr);
-    ASSERT_EQ(any.try_cast<int>(), handle.data());
-    ASSERT_EQ(std::as_const(any).try_cast<int>(), handle.data());
-    ASSERT_EQ(any.data(), handle.data());
-    ASSERT_EQ(std::as_const(any).data(), handle.data());
-    ASSERT_EQ(value, 3);
-}
-
 TEST_F(Meta, MetaAnySBO) {
     entt::meta_any any{'c'};
 
@@ -901,35 +885,6 @@ TEST_F(Meta, MetaAnyConstConvert) {
     ASSERT_EQ(other.cast<int>(), 42);
 }
 
-TEST_F(Meta, MetaHandleFromObject) {
-    empty_type empty{};
-    entt::meta_handle handle{empty};
-
-    ASSERT_TRUE(handle);
-    ASSERT_EQ(handle.type(), entt::resolve<empty_type>());
-    ASSERT_EQ(std::as_const(handle).data(), &empty);
-    ASSERT_EQ(handle.data(), &empty);
-}
-
-TEST_F(Meta, MetaHandleFromMetaAny) {
-    entt::meta_any any{42};
-    entt::meta_handle handle{any};
-
-    ASSERT_TRUE(handle);
-    ASSERT_EQ(handle.type(), entt::resolve<int>());
-    ASSERT_EQ(std::as_const(handle).data(), any.data());
-    ASSERT_EQ(handle.data(), any.data());
-}
-
-TEST_F(Meta, MetaHandleEmpty) {
-    entt::meta_handle handle{};
-
-    ASSERT_FALSE(handle);
-    ASSERT_FALSE(handle.type());
-    ASSERT_EQ(std::as_const(handle).data(), nullptr);
-    ASSERT_EQ(handle.data(), nullptr);
-}
-
 TEST_F(Meta, MetaProp) {
     auto prop = entt::resolve<char>().prop(props::prop_int);
 
@@ -1117,33 +1072,6 @@ TEST_F(Meta, MetaCtorFuncCastAndConvert) {
     ASSERT_EQ(any.cast<derived_type>().i, 42);
     ASSERT_EQ(any.cast<derived_type>().c, 'c');
 }
-
-TEST_F(Meta, MetaDtor) {
-    auto dtor = entt::resolve<empty_type>().dtor();
-    empty_type empty{};
-
-    ASSERT_TRUE(dtor);
-    ASSERT_NE(dtor, entt::meta_dtor{});
-    ASSERT_EQ(dtor.parent(), entt::resolve("empty"_hs));
-    ASSERT_EQ(empty_type::counter, 0);
-    ASSERT_TRUE(dtor.invoke(empty));
-    ASSERT_EQ(empty_type::counter, 1);
-}
-
-TEST_F(Meta, MetaDtorMetaAnyArg) {
-    auto dtor = entt::resolve<empty_type>().dtor();
-    entt::meta_any any{empty_type{}};
-
-    ASSERT_EQ(empty_type::counter, 0);
-    ASSERT_TRUE(dtor.invoke(any));
-    ASSERT_EQ(empty_type::counter, 1);
-}
-
-TEST_F(Meta, MetaDtorMetaAnyInvalidArg) {
-    auto instance = 0;
-    ASSERT_FALSE(entt::resolve<empty_type>().dtor().invoke(instance));
-}
-
 
 TEST_F(Meta, MetaData) {
     auto data = entt::resolve<data_type>().data("i"_hs);
@@ -1690,8 +1618,8 @@ TEST_F(Meta, MetaFuncByReference) {
     entt::meta_any any{3};
     int value = 4;
 
-    ASSERT_EQ(func.invoke({}, value).cast<int>(), 8);
-    ASSERT_EQ(func.invoke({}, any).cast<int>(), 6);
+    ASSERT_EQ(func.invoke({}, std::ref(value)).cast<int>(), 8);
+    ASSERT_EQ(func.invoke({}, *any).cast<int>(), 6);
     ASSERT_EQ(any.cast<int>(), 6);
     ASSERT_EQ(value, 8);
 }
@@ -1786,11 +1714,6 @@ TEST_F(Meta, MetaTypeCtor) {
     ASSERT_TRUE((type.ctor<const derived_type &, double>()));
 }
 
-TEST_F(Meta, MetaTypeDtor) {
-    ASSERT_TRUE(entt::resolve<fat_type>().dtor());
-    ASSERT_FALSE(entt::resolve<int>().dtor());
-}
-
 TEST_F(Meta, MetaTypeData) {
     auto type = entt::resolve<data_type>();
     int counter{};
@@ -1855,52 +1778,6 @@ TEST_F(Meta, MetaTypeConstructCastAndConvert) {
     ASSERT_TRUE(any.try_cast<derived_type>());
     ASSERT_EQ(any.cast<derived_type>().i, 42);
     ASSERT_EQ(any.cast<derived_type>().c, 'c');
-}
-
-TEST_F(Meta, MetaTypeDestroyDtor) {
-    auto type = entt::resolve<empty_type>();
-    empty_type instance;
-
-    ASSERT_EQ(empty_type::counter, 0);
-    ASSERT_TRUE(type.destroy(instance));
-    ASSERT_EQ(empty_type::counter, 1);
-}
-
-TEST_F(Meta, MetaTypeDestroyDtorInvalidArg) {
-    auto type = entt::resolve<empty_type>();
-    auto instance = 'c';
-
-    ASSERT_EQ(empty_type::counter, 0);
-    ASSERT_FALSE(type.destroy(instance));
-    ASSERT_EQ(empty_type::counter, 0);
-}
-
-TEST_F(Meta, MetaTypeDestroyDtorCastAndConvert) {
-    auto type = entt::resolve<empty_type>();
-    fat_type instance{};
-
-    ASSERT_EQ(empty_type::counter, 0);
-    ASSERT_FALSE(type.destroy(instance));
-    ASSERT_EQ(empty_type::counter, 0);
-}
-
-TEST_F(Meta, MetaTypeDestroyNoDtor) {
-    auto instance = 'c';
-    ASSERT_TRUE(entt::resolve<char>().destroy(instance));
-}
-
-TEST_F(Meta, MetaTypeDestroyNoDtorInvalidArg) {
-    auto instance = 42;
-    ASSERT_FALSE(entt::resolve<char>().destroy(instance));
-}
-
-TEST_F(Meta, MetaTypeDestroyNoDtorVoid) {
-    ASSERT_FALSE(entt::resolve<void>().destroy({}));
-}
-
-TEST_F(Meta, MetaTypeDestroyNoDtorCastAndConvert) {
-    auto instance = 42.;
-    ASSERT_FALSE(entt::resolve<int>().destroy(instance));
 }
 
 TEST_F(Meta, MetaDataFromBase) {

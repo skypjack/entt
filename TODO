@@ -37,4 +37,6 @@
 * is it possible to make named type constraints namespace-free?
 * stomp -> merge (naming is hard as heck, it's known thing)
 * observer: user defined filters (eg .replace<T, &function> or .group<T, U, &func>)
-* use meta_handle for inputs to invoke/ctor/...
+* any-of rule for views/groups (eg entity has A and any of B/C/D)
+* meta
+  - update doc

@@ -2,9 +2,9 @@
 #define ENTT_META_META_HPP
 
 
-#include <array>
 #include <cstddef>
 #include <utility>
+#include <functional>
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
@@ -15,7 +15,6 @@ namespace entt {
 
 
 class meta_any;
-class meta_handle;
 class meta_type;
 
 
@@ -67,7 +66,7 @@ struct meta_ctor_node {
 
 struct meta_dtor_node {
     meta_type_node * const parent;
-    bool(* const invoke)(meta_handle);
+    void(* const invoke)(void *);
 };
 
 
@@ -79,8 +78,8 @@ struct meta_data_node {
     const bool is_const;
     const bool is_static;
     meta_type_node *(* const type)() ENTT_NOEXCEPT;
-    bool(* const set)(meta_handle, meta_any, meta_any);
-    meta_any(* const get)(meta_handle, meta_any);
+    bool(* const set)(meta_any, meta_any, meta_any);
+    meta_any(* const get)(meta_any, meta_any);
 };
 
 
@@ -95,7 +94,7 @@ struct meta_func_node {
     const bool is_static;
     meta_type_node *(* const ret)() ENTT_NOEXCEPT;
     meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
-    meta_any(* const invoke)(meta_handle, meta_any *);
+    meta_any(* const invoke)(meta_any, meta_any *);
 };
 
 
@@ -303,9 +302,6 @@ struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> 
  * constructible.
  */
 class meta_any {
-    /*! @brief A meta handle is allowed to _inherit_ from a meta any. */
-    friend class meta_handle;
-
     using storage_type = std::aligned_storage_t<sizeof(void *), alignof(void *)>;
     using copy_fn_type = void(meta_any &, const meta_any &);
     using steal_fn_type = void(meta_any &, meta_any &);
@@ -321,9 +317,8 @@ class meta_any {
 
         static void destroy(meta_any &any) {
             const auto * const node = internal::meta_info<Type>::resolve();
-            [[maybe_unused]] const bool destroyed = (!node->dtor || node->dtor->invoke(any));
+            if(node->dtor) { node->dtor->invoke(any.instance); }
             delete static_cast<Type *>(any.instance);
-            ENTT_ASSERT(destroyed);
         }
 
         static void copy(meta_any &to, const meta_any &from) {
@@ -347,9 +342,8 @@ class meta_any {
 
         static void destroy(meta_any &any) {
             const auto * const node = internal::meta_info<Type>::resolve();
-            [[maybe_unused]] const bool destroyed = (!node->dtor || node->dtor->invoke(any));
+            if(node->dtor) { node->dtor->invoke(any.instance); }
             static_cast<Type *>(any.instance)->~Type();
-            ENTT_ASSERT(destroyed);
         }
 
         static void copy(meta_any &to, const meta_any &from) {
@@ -361,6 +355,13 @@ class meta_any {
             destroy(from);
         }
     };
+
+    meta_any(const internal::meta_type_node *curr, void *ref) ENTT_NOEXCEPT
+        : meta_any{}
+    {
+        node = curr;
+        instance = ref;
+    }
 
 public:
     /*! @brief Default constructor. */
@@ -391,30 +392,21 @@ public:
     /**
      * @brief Constructs a meta any that holds an unmanaged object.
      * @tparam Type Type of object to use to initialize the container.
-     * @param type An instance of an object to use to initialize the container.
+     * @param value An instance of an object to use to initialize the container.
      */
     template<typename Type>
-    explicit meta_any(std::reference_wrapper<Type> type)
-        : meta_any{}
-    {
-        node = internal::meta_info<Type>::resolve();
-        instance = &type.get();
-    }
-
-    /**
-     * @brief Constructs a meta any from a meta handle object.
-     * @param handle A reference to an object to use to initialize the meta any.
-     */
-    inline meta_any(meta_handle handle) ENTT_NOEXCEPT;
+    meta_any(std::reference_wrapper<Type> value)
+        : meta_any{internal::meta_info<Type>::resolve(), &value.get()}
+    {}
 
     /**
      * @brief Constructs a meta any from a given value.
      * @tparam Type Type of object to use to initialize the container.
-     * @param type An instance of an object to use to initialize the container.
+     * @param value An instance of an object to use to initialize the container.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>>>
-    meta_any(Type &&type)
-        : meta_any{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(type)}
+    meta_any(Type &&value)
+        : meta_any{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
     {}
 
     /**
@@ -455,12 +447,12 @@ public:
     /**
      * @brief Assignment operator.
      * @tparam Type Type of object to use to initialize the container.
-     * @param type An instance of an object to use to initialize the container.
+     * @param value An instance of an object to use to initialize the container.
      * @return This meta any object.
      */
     template<typename Type>
-    meta_any & operator=(Type &&type) {
-        return (*this = meta_any{std::forward<Type>(type)});
+    meta_any & operator=(Type &&value) {
+        return (*this = meta_any{std::forward<Type>(value)});
     }
 
     /**
@@ -593,6 +585,14 @@ public:
     }
 
     /**
+     * @brief Indirection operator for aliasing construction.
+     * @return An alias to the contained object.
+     */
+    meta_any operator *() const ENTT_NOEXCEPT {
+        return meta_any{node, instance};
+    }
+
+    /**
      * @brief Returns false if a container is empty, true otherwise.
      * @return False if the container is empty, true otherwise.
      */
@@ -649,62 +649,37 @@ private:
  * @brief Opaque pointers to instances of any type.
  *
  * A handle doesn't perform copies and isn't responsible for the contained
- * object. It doesn't prolong the lifetime of the pointed instance. Users are
- * responsible for ensuring that the target object remains alive for the entire
- * interval of use of the handle.
+ * object. It doesn't prolong the lifetime of the pointed instance.<br/>
+ * Handles are used mainly to gnerate aliases for actual objects when needed.
  */
-class meta_handle {
-    /*! @brief A meta any is allowed to _inherit_ from a meta handle. */
-    friend class meta_any;
-
-public:
+struct meta_handle {
     /*! @brief Default constructor. */
-    meta_handle() ENTT_NOEXCEPT = default;
+    meta_handle() = default;
 
     /**
-     * @brief Constructs a meta handle from a meta any object.
-     * @param any A reference to an object to use to initialize the handle.
+     * @brief Creates an alias for the actual object.
+     * @tparam Type Type of object to use to initialize the container.
+     * @param value An instance of an object to use to initialize the container.
      */
-    meta_handle(meta_any &any) ENTT_NOEXCEPT
-        : node{any.node},
-          instance{any.instance}
-    {}
-
-    /**
-     * @brief Constructs a meta handle from a given instance.
-     * @tparam Type Type of object to use to initialize the handle.
-     * @param obj A reference to an object to use to initialize the handle.
-     */
-    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_handle>>>
-    meta_handle(Type &obj) ENTT_NOEXCEPT
-        : node{internal::meta_info<Type>::resolve()},
-          instance{&obj}
-    {}
-
-    /*! @copydoc meta_any::type */
-    inline meta_type type() const ENTT_NOEXCEPT;
-
-    /*! @copydoc meta_any::data */
-    const void * data() const ENTT_NOEXCEPT {
-        return instance;
+    template<typename Type>
+    meta_handle(Type &&value) ENTT_NOEXCEPT
+        : meta_handle{}
+    {
+        if constexpr(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>) {
+            any = *value;
+        } else {
+            static_assert(std::is_lvalue_reference_v<Type>);
+            any = std::ref(value);
+        }
     }
 
-    /*! @copydoc data */
-    void * data() ENTT_NOEXCEPT {
-        return const_cast<void *>(std::as_const(*this).data());
-    }
-
-    /**
-     * @brief Returns false if a handle is empty, true otherwise.
-     * @return False if the handle is empty, true otherwise.
-     */
-    explicit operator bool() const ENTT_NOEXCEPT {
-        return instance;
+    /*! @copydoc meta_any::operator* */
+    meta_any operator *() const {
+        return any;
     }
 
 private:
-    const internal::meta_type_node *node;
-    void *instance;
+    meta_any any;
 };
 
 
@@ -914,9 +889,13 @@ struct meta_ctor {
      * @return A meta any containing the new instance, if any.
      */
     template<typename... Args>
-    meta_any invoke(Args &&... args) const {
-        std::array<meta_any, sizeof...(Args)> arguments{{std::forward<Args>(args)...}};
-        return sizeof...(Args) == size() ? node->invoke(arguments.data()) : meta_any{};
+    meta_any invoke([[maybe_unused]] Args &&... args) const {
+        if constexpr(sizeof...(Args) == 0) {
+            return sizeof...(Args) == size() ? node->invoke(nullptr) : meta_any{};
+        } else {
+            meta_any arguments[]{std::forward<Args>(args)...};
+            return sizeof...(Args) == size() ? node->invoke(arguments) : meta_any{};
+        }
     }
 
     /**
@@ -965,54 +944,6 @@ inline bool operator!=(const meta_ctor &lhs, const meta_ctor &rhs) ENTT_NOEXCEPT
 }
 
 
-/*! @brief Opaque container for meta destructors. */
-struct meta_dtor {
-    /*! @copydoc meta_prop::meta_prop */
-    meta_dtor(const internal::meta_dtor_node *curr = nullptr) ENTT_NOEXCEPT
-        : node{curr}
-    {}
-
-    /*! @copydoc meta_base::parent */
-    inline meta_type parent() const ENTT_NOEXCEPT;
-
-    /**
-     * @brief Destroys an instance of the underlying type.
-     *
-     * It must be possible to cast the instance to the parent type of the meta
-     * destructor. Otherwise, invoking the meta destructor results in an
-     * undefined behavior.
-     *
-     * @param handle An opaque pointer to an instance of the underlying type.
-     * @return True in case of success, false otherwise.
-     */
-    bool invoke(meta_handle handle) const {
-        return node->invoke(handle);
-    }
-
-    /**
-     * @brief Returns true if a meta object is valid, false otherwise.
-     * @return True if the meta object is valid, false otherwise.
-     */
-    explicit operator bool() const ENTT_NOEXCEPT {
-        return node;
-    }
-
-    /*! @copydoc meta_prop::operator== */
-    bool operator==(const meta_dtor &other) const ENTT_NOEXCEPT {
-        return node == other.node;
-    }
-
-private:
-    const internal::meta_dtor_node *node;
-};
-
-
-/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
-inline bool operator!=(const meta_dtor &lhs, const meta_dtor &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
-
-
 /*! @brief Opaque container for meta data. */
 struct meta_data {
     /*! @copydoc meta_prop::meta_prop */
@@ -1057,13 +988,13 @@ struct meta_data {
      * of the variable is possible. Otherwise, invoking the setter does nothing.
      *
      * @tparam Type Type of value to assign.
-     * @param handle An opaque pointer to an instance of the underlying type.
+     * @param instance An opaque instance of the underlying type.
      * @param value Parameter to use to set the underlying variable.
      * @return True in case of success, false otherwise.
      */
     template<typename Type>
-    bool set(meta_handle handle, Type &&value) const {
-        return node->set(handle, meta_any{}, std::forward<Type>(value));
+    bool set(meta_handle instance, Type &&value) const {
+        return node->set(*instance, {}, std::forward<Type>(value));
     }
 
     /**
@@ -1076,15 +1007,15 @@ struct meta_data {
      * type is possible. Otherwise, invoking the setter does nothing.
      *
      * @tparam Type Type of value to assign.
-     * @param handle An opaque pointer to an instance of the underlying type.
+     * @param instance An opaque instance of the underlying type.
      * @param index Position of the underlying element to set.
      * @param value Parameter to use to set the underlying element.
      * @return True in case of success, false otherwise.
      */
     template<typename Type>
-    bool set(meta_handle handle, std::size_t index, Type &&value) const {
+    bool set(meta_handle instance, std::size_t index, Type &&value) const {
         ENTT_ASSERT(index < node->type()->extent);
-        return node->set(handle, index, std::forward<Type>(value));
+        return node->set(*instance, index, std::forward<Type>(value));
     }
 
     /**
@@ -1093,11 +1024,11 @@ struct meta_data {
      * It must be possible to cast the instance to the parent type of the meta
      * data. Otherwise, invoking the getter results in an undefined behavior.
      *
-     * @param handle An opaque pointer to an instance of the underlying type.
+     * @param instance An opaque instance of the underlying type.
      * @return A meta any containing the value of the underlying variable.
      */
-    meta_any get(meta_handle handle) const {
-        return node->get(handle, meta_any{});
+    meta_any get(meta_handle instance) const {
+        return node->get(*instance, {});
     }
 
     /**
@@ -1106,13 +1037,13 @@ struct meta_data {
      * It must be possible to cast the instance to the parent type of the meta
      * data. Otherwise, invoking the getter results in an undefined behavior.
      *
-     * @param handle An opaque pointer to an instance of the underlying type.
+     * @param instance An opaque instance of the underlying type.
      * @param index Position of the underlying element to get.
      * @return A meta any containing the value of the underlying element.
      */
-    meta_any get(meta_handle handle, std::size_t index) const {
+    meta_any get(meta_handle instance, std::size_t index) const {
         ENTT_ASSERT(index < node->type()->extent);
-        return node->get(handle, index);
+        return node->get(*instance, index);
     }
 
     /**
@@ -1227,15 +1158,14 @@ struct meta_func {
      * undefined behavior.
      *
      * @tparam Args Types of arguments to use to invoke the function.
-     * @param handle An opaque pointer to an instance of the underlying type.
+     * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
      * @return A meta any containing the returned value, if any.
      */
     template<typename... Args>
-    meta_any invoke(meta_handle handle, Args &&... args) const {
-        // makes aliasing on the values and passes forward references if any
-        std::array<meta_any, sizeof...(Args)> arguments{{meta_handle{args}...}};
-        return sizeof...(Args) == size() ? node->invoke(handle, arguments.data()) : meta_any{};
+    meta_any invoke(meta_handle instance, Args &&... args) const {
+        meta_any arguments[]{*instance, std::forward<Args>(args)...};
+        return sizeof...(Args) == size() ? node->invoke(arguments[0], &arguments[sizeof...(Args) != 0]) : meta_any{};
     }
 
     /**
@@ -1505,14 +1435,6 @@ public:
     }
 
     /**
-     * @brief Returns the meta destructor associated with a given type.
-     * @return The meta destructor associated with the given type, if any.
-     */
-    meta_dtor dtor() const ENTT_NOEXCEPT {
-        return node->dtor;
-    }
-
-    /**
      * @brief Iterates all the meta data of a meta type.
      *
      * The meta data of the base classes will also be returned, if any.
@@ -1581,34 +1503,22 @@ public:
      */
     template<typename... Args>
     meta_any construct(Args &&... args) const {
-        std::array<meta_any, sizeof...(Args)> arguments{{std::forward<Args>(args)...}};
-        meta_any any{};
+        auto construct_if = [this](auto *params) {
+            meta_any any{};
 
-        internal::find_if<&internal::meta_type_node::ctor>([data = arguments.data(), &any](const auto *curr) {
-            if(curr->size == sizeof...(args)) {
-                any = curr->invoke(data);
-            }
+            internal::find_if<&internal::meta_type_node::ctor>([params, &any](const auto *curr) {
+                return (curr->size == sizeof...(args)) && (any = curr->invoke(params));
+            }, node);
 
-            return static_cast<bool>(any);
-        }, node);
+            return any;
+        };
 
-        return any;
-    }
-
-    /**
-     * @brief Destroys an instance of the underlying type.
-     *
-     * It must be possible to cast the instance to the underlying type.
-     * Otherwise, invoking the meta destructor results in an undefined
-     * behavior.<br/>
-     * If no destructor has been set, this function returns true without doing
-     * anything.
-     *
-     * @param handle An opaque pointer to an instance of the underlying type.
-     * @return True in case of success, false otherwise.
-     */
-    bool destroy(meta_handle handle) const {
-        return (handle.type() == node) && (!node->dtor || node->dtor->invoke(handle));
+        if constexpr(sizeof...(Args) == 0) {
+            return construct_if(nullptr);
+        } else {
+            meta_any arguments[]{std::forward<Args>(args)...};
+            return construct_if(arguments);
+        }
     }
 
     /**
@@ -1678,20 +1588,7 @@ inline bool operator!=(const meta_type &lhs, const meta_type &rhs) ENTT_NOEXCEPT
 }
 
 
-inline meta_any::meta_any(meta_handle handle) ENTT_NOEXCEPT
-    : meta_any{}
-{
-    node = handle.node;
-    instance = handle.instance;
-}
-
-
 inline meta_type meta_any::type() const ENTT_NOEXCEPT {
-    return node;
-}
-
-
-inline meta_type meta_handle::type() const ENTT_NOEXCEPT {
     return node;
 }
 
@@ -1723,11 +1620,6 @@ inline meta_type meta_ctor::parent() const ENTT_NOEXCEPT {
 
 inline meta_type meta_ctor::arg(size_type index) const ENTT_NOEXCEPT {
     return index < size() ? node->arg(index) : nullptr;
-}
-
-
-inline meta_type meta_dtor::parent() const ENTT_NOEXCEPT {
-    return node->parent;
 }
 
 

@@ -86,7 +86,7 @@ meta_any construct(meta_any * const args, std::index_sequence<Indexes...>) {
 
 
 template<bool Const, typename Type, auto Data>
-bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index, [[maybe_unused]] meta_any value) {
+bool setter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any index, [[maybe_unused]] meta_any value) {
     bool accepted = false;
 
     if constexpr(!Const) {
@@ -94,7 +94,7 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index
             using helper_type = meta_function_helper_t<decltype(Data)>;
             using data_type = std::tuple_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>;
             static_assert(std::is_invocable_v<decltype(Data), Type &, data_type>);
-            auto * const clazz = meta_any{handle}.try_cast<Type>();
+            auto * const clazz = instance.try_cast<Type>();
             auto * const direct = value.try_cast<data_type>();
 
             if(clazz && (direct || value.convert<data_type>())) {
@@ -104,7 +104,7 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index
         } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
             static_assert(std::is_invocable_v<decltype(Data), Type *>);
-            auto * const clazz = meta_any{handle}.try_cast<Type>();
+            auto * const clazz = instance.try_cast<Type>();
 
             if constexpr(std::is_array_v<data_type>) {
                 using underlying_type = std::remove_extent_t<data_type>;
@@ -152,7 +152,7 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index
 
 
 template<typename Type, auto Data, typename Policy>
-meta_any getter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index) {
+meta_any getter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any index) {
     auto dispatch = [](auto &&value) {
         if constexpr(std::is_same_v<Policy, as_void_t>) {
             return meta_any{std::in_place_type<void>};
@@ -166,12 +166,12 @@ meta_any getter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any i
 
     if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
         static_assert(std::is_invocable_v<decltype(Data), Type &>);
-        auto * const clazz = meta_any{handle}.try_cast<Type>();
+        auto * const clazz = instance.try_cast<Type>();
         return clazz ? dispatch(std::invoke(Data, *clazz)) : meta_any{};
     } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
         using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
         static_assert(std::is_invocable_v<decltype(Data), Type *>);
-        auto * const clazz = meta_any{handle}.try_cast<Type>();
+        auto * const clazz = instance.try_cast<Type>();
 
         if constexpr(std::is_array_v<data_type>) {
             auto * const idx = index.try_cast<std::size_t>();
@@ -193,7 +193,7 @@ meta_any getter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any i
 
 
 template<typename Type, auto Candidate, typename Policy, std::size_t... Indexes>
-meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_sequence<Indexes...>) {
+meta_any invoke([[maybe_unused]] meta_any instance, meta_any *args, std::index_sequence<Indexes...>) {
     using helper_type = meta_function_helper_t<decltype(Candidate)>;
 
     auto dispatch = [](auto *... params) {
@@ -221,7 +221,7 @@ meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_
     if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Candidate)>>>) {
         return (std::get<Indexes>(direct) && ...) ? dispatch(std::get<Indexes>(direct)...) : meta_any{};
     } else {
-        auto * const clazz = meta_any{handle}.try_cast<Type>();
+        auto * const clazz = instance.try_cast<Type>();
         return (clazz && (std::get<Indexes>(direct) && ...)) ? dispatch(clazz, std::get<Indexes>(direct)...) : meta_any{};
     }
 }
@@ -604,14 +604,10 @@ public:
 
         static internal::meta_dtor_node node{
             type,
-            [](meta_handle handle) {
-                const auto valid = (handle.type() == internal::meta_info<Type>::resolve());
-
-                if(valid) {
-                    std::invoke(Func, *meta_any{handle}.try_cast<Type>());
+            [](void *instance) {
+                if(instance) {
+                    std::invoke(Func, *static_cast<Type *>(instance));
                 }
-
-                return valid;
             }
         };
 
@@ -650,8 +646,8 @@ public:
                 true,
                 true,
                 &internal::meta_info<Type>::resolve,
-                [](meta_handle, meta_any, meta_any) { return false; },
-                [](meta_handle, meta_any) -> meta_any { return Data; }
+                [](meta_any, meta_any, meta_any) { return false; },
+                [](meta_any, meta_any) -> meta_any { return Data; }
             };
 
             curr = &node;
@@ -774,8 +770,8 @@ public:
             !std::is_member_function_pointer_v<decltype(Candidate)>,
             &internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename helper_type::return_type>>::resolve,
             &helper_type::arg,
-            [](meta_handle handle, meta_any *any) {
-                return internal::invoke<Type, Candidate, Policy>(handle, any, helper_type::index_sequence);
+            [](meta_any instance, meta_any *args) {
+                return internal::invoke<Type, Candidate, Policy>(std::move(instance), args, helper_type::index_sequence);
             }
         };
 
