@@ -714,9 +714,11 @@ Similarly, the code shown below removes `a_type` from an entity whenever
 `my_type` is assigned to it:
 
 ```cpp
-registry.on_construct<my_type>().connect<&entt::registry::reset<a_type>>(registry);
+registry.on_construct<my_type>().connect<entt::overload<void(entt::entity)>(&entt::registry::reset<a_type>)>(registry);
 ```
 
+In this case, to prevent the _wrong_ overload for `reset` being selected,
+`entt::overload` is used to help the compiler make the right choice.<br/>
 A dependency can also be easily broken as follows:
 
 ```cpp
