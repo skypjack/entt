@@ -74,8 +74,7 @@ class basic_registry {
 
         template<typename... Args>
         decltype(auto) assign(basic_registry &owner, const Entity entt, Args &&... args) {
-            using component_type = std::conditional_t<ENTT_ENABLE_ETO(Component), Component, Component &>;
-            component_type component = storage<Entity, Component>::construct(entt, std::forward<Args>(args)...);
+            decltype(auto) component = storage<Entity, Component>::construct(entt, std::forward<Args>(args)...);
             construction.publish(entt, owner, component);
             return component;
         }
@@ -85,11 +84,9 @@ class basic_registry {
         assign(basic_registry &owner, It first, It last, Args &&... args) {
             auto it = storage<Entity, Component>::construct(first, last, std::forward<Args>(args)...);
 
-            if(!construction.empty()) {
-                std::for_each(first, last, [this, &owner, it](const auto entt) mutable {
-                    construction.publish(entt, owner, *(it++));
-                });
-            }
+            std::for_each_n(it, !construction.empty() * std::distance(first, last), [this, &owner, &first](decltype(*it) component) {
+                construction.publish(*(first++), owner, component);
+            });
 
             return it;
         }
@@ -107,10 +104,9 @@ class basic_registry {
         }
 
     private:
-        using reference_type = std::conditional_t<ENTT_ENABLE_ETO(Component), const Component &, Component &>;
-        sigh<void(const Entity, basic_registry &, reference_type)> construction{};
-        sigh<void(const Entity, basic_registry &, reference_type)> update{};
+        sigh<void(const Entity, basic_registry &, decltype(std::declval<storage<Entity, Component>>().get({})))> construction{};
         sigh<void(const Entity, basic_registry &)> destruction{};
+        decltype(construction) update{};
     };
 
     template<typename Component>
@@ -263,11 +259,7 @@ class basic_registry {
                 };
 
                 pdata->set = [](basic_registry &other, const Entity entt, [[maybe_unused]] const void *instance) {
-                    if constexpr(ENTT_ENABLE_ETO(Component)) {
-                        other.assign_or_replace<Component>(entt);
-                    } else {
-                        other.assign_or_replace<Component>(entt, *static_cast<const std::decay_t<Component> *>(instance));
-                    }
+                    other.assign_or_replace<Component>(entt, instance ? *static_cast<const std::decay_t<Component> *>(instance) : std::decay_t<Component>{});
                 };
             }
         }
@@ -1648,7 +1640,7 @@ public:
                 auto curr = others.size();
                 others.resize(entt + 1);
 
-                std::generate(others.data() + curr, others.data() + entt, [curr]() mutable {
+                std::generate(others.data() + curr, others.data() + entt, [&curr]() {
                     return entity_type(curr++);
                 });
             }
