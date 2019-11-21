@@ -14,7 +14,6 @@
 #include "../core/family.hpp"
 #include "../core/algorithm.hpp"
 #include "../core/type_traits.hpp"
-#include "../signal/delegate.hpp"
 #include "../signal/sigh.hpp"
 #include "runtime_view.hpp"
 #include "sparse_set.hpp"

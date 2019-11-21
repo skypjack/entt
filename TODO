@@ -39,5 +39,3 @@
 * observer: user defined filters (eg .replace<T, &function> or .group<T, U, &func>)
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
 * sparse set: there exists an alternative to paginated sparse arrays?
-* meta
-  - update doc
