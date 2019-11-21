@@ -1474,7 +1474,7 @@ TEST(Registry, Stomp) {
     registry.assign<char>(prototype, 'c');
 
     auto entity = registry.create();
-    registry.stomp<int, char>(entity, prototype, registry);
+    registry.stomp<int, char>(entity, registry, prototype);
 
     ASSERT_TRUE((registry.has<int, char>(entity)));
     ASSERT_EQ(registry.get<int>(entity), 3);
@@ -1482,7 +1482,7 @@ TEST(Registry, Stomp) {
 
     registry.replace<int>(prototype, 42);
     registry.replace<char>(prototype, 'a');
-    registry.stomp<int>(entity, prototype, registry);
+    registry.stomp<int>(entity, registry, prototype);
 
     ASSERT_EQ(registry.get<int>(entity), 42);
     ASSERT_EQ(registry.get<char>(entity), 'c');
@@ -1497,21 +1497,21 @@ TEST(Registry, StompExclude) {
     registry.assign<empty_type>(prototype);
 
     const auto entity = registry.create();
-    registry.stomp(entity, prototype, registry, entt::exclude<char>);
+    registry.stomp(entity, registry, prototype, entt::exclude<char>);
 
     ASSERT_TRUE((registry.has<int, empty_type>(entity)));
     ASSERT_FALSE(registry.has<char>(entity));
     ASSERT_EQ(registry.get<int>(entity), 3);
 
     registry.replace<int>(prototype, 42);
-    registry.stomp(entity, prototype, registry, entt::exclude<int>);
+    registry.stomp(entity, registry, prototype, entt::exclude<int>);
 
     ASSERT_TRUE((registry.has<int, char, empty_type>(entity)));
     ASSERT_EQ(registry.get<int>(entity), 3);
     ASSERT_EQ(registry.get<char>(entity), 'c');
 
     registry.remove<int, char, empty_type>(entity);
-    registry.stomp(entity, prototype, registry, entt::exclude<int, char, empty_type>);
+    registry.stomp(entity, registry, prototype, entt::exclude<int, char, empty_type>);
 
     ASSERT_TRUE(registry.orphan(entity));
 }
@@ -1524,31 +1524,10 @@ TEST(Registry, StompMoveOnlyComponent) {
     registry.assign<char>(prototype);
 
     const auto entity = registry.create();
-    registry.stomp(entity, prototype, registry);
+    registry.stomp(entity, registry, prototype);
 
     ASSERT_TRUE(registry.has<char>(entity));
     ASSERT_FALSE(registry.has<std::unique_ptr<int>>(entity));
-}
-
-TEST(Registry, StompBetweenRegistriesWithDifferentIdentifiers) {
-    entt::basic_registry<opaque> source;
-    entt::registry destination;
-
-    const auto entity = source.create();
-    const auto other = destination.create();
-
-    source.assign<char>(entity, 'c');
-    source.assign<double>(entity, 0.);
-    source.assign<int>(entity, 42);
-
-    destination.prepare<int>();
-    destination.prepare<char>();
-    destination.stomp(other, entity, source, entt::exclude<double>);
-
-    ASSERT_TRUE((destination.has<char, int>(other)));
-    ASSERT_FALSE(destination.has<double>(other));
-    ASSERT_EQ(destination.get<char>(other), 'c');
-    ASSERT_EQ(destination.get<int>(other), 42);
 }
 
 TEST(Registry, GetOrAssign) {
