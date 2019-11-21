@@ -328,8 +328,8 @@ const auto &crenderable = cregistry.get<renderable>(entity);
 auto &renderable = registry.get<renderable>(entity);
 
 // const and non-const references
-const auto &[cpos, cvel] = cregistry.get<position, velocity>(entity);
-auto &[pos, vel] = registry.get<position, velocity>(entity);
+const auto [cpos, cvel] = cregistry.get<position, velocity>(entity);
+auto [pos, vel] = registry.get<position, velocity>(entity);
 ```
 
 The `get` member function template gives direct access to the component of an
@@ -1133,7 +1133,7 @@ for(auto entity: view) {
     auto &velocity = view.get<velocity>(entity);
 
     // ... or multiple components at once
-    auto &[pos, vel] = view.get<position, velocity>(entity);
+    auto [pos, vel] = view.get<position, velocity>(entity);
 
     // ...
 }
@@ -1201,7 +1201,7 @@ for(auto entity: view) {
     auto &velocity = registry.get<velocity>(entity);
 
     // ... or multiple components at once
-    auto &[pos, vel] = registry.get<position, velocity>(entity);
+    auto [pos, vel] = registry.get<position, velocity>(entity);
 
     // ...
 }
@@ -1280,7 +1280,7 @@ for(auto entity: group) {
     auto &velocity = group.get<velocity>(entity);
 
     // ... or multiple components at once
-    auto &[pos, vel] = group.get<position, velocity>(entity);
+    auto [pos, vel] = group.get<position, velocity>(entity);
 
     // ...
 }
