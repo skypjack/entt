@@ -82,8 +82,9 @@ class basic_registry {
         std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, Entity>, typename storage<Entity, Component>::reverse_iterator_type>
         assign(basic_registry &owner, It first, It last, Args &&... args) {
             auto it = storage<Entity, Component>::construct(first, last, std::forward<Args>(args)...);
+            const auto end = it + (!construction.empty() * std::distance(first, last));
 
-            std::for_each_n(it, !construction.empty() * std::distance(first, last), [this, &owner, &first](decltype(*it) component) {
+            std::for_each(it, end, [this, &owner, &first](decltype(*it) component) {
                 construction.publish(*(first++), owner, component);
             });
 
