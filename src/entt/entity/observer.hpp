@@ -211,9 +211,7 @@ class basic_observer {
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, type_list<NoneOf...>, AllOf...>> {
         template<std::size_t Index>
         static void maybe_valid_if(basic_observer &obs, const Entity entt, const basic_registry<Entity> &reg) {
-            if(reg.template has<AllOf...>(entt) && !(reg.template has<NoneOf>(entt) || ...)
-                    && reg.template has<Require...>(entt) && !(reg.template has<Reject>(entt) || ...))
-            {
+            if(reg.template has<AllOf..., Require...>(entt) && !(reg.template has<NoneOf>(entt) || ...) && !(reg.template has<Reject>(entt) || ...)) {
                 auto *comp = obs.view.try_get(entt);
                 (comp ? *comp : obs.view.construct(entt)) |= (1 << Index);
             }
