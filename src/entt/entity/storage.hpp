@@ -431,6 +431,11 @@ public:
      * either `data` or `raw` gives no guarantees on the order, even though
      * `sort` has been invoked.
      *
+     * @warning
+     * Empty types are never instantiated. Therefore, only comparison function
+     * objects that require to return entities rather than components are
+     * accepted.
+     *
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
@@ -672,6 +677,18 @@ public:
     iterator_type batch(It first, It last, const object_type & = {}) {
         underlying_type::batch(first, last);
         return begin();
+    }
+
+    /*! @copydoc storage::sort */
+    template<typename Compare, typename Sort = std_sort, typename... Args>
+    void sort(iterator_type first, iterator_type last, Compare compare, Sort algo = Sort{}, Args &&... args) {
+        ENTT_ASSERT(!(last < first));
+        ENTT_ASSERT(!(last > end()));
+
+        const auto from = underlying_type::begin() + std::distance(begin(), first);
+        const auto to = from + std::distance(first, last);
+
+        underlying_type::sort(from, to, std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 };
 

@@ -1672,7 +1672,15 @@ only the entities to which it's assigned are made available. All the iterators
 as well as the `get` member functions of the registry, the views and the groups
 will return temporary objects. Similarly, some functions such as `try_get` or
 the raw access to the list of components aren't available for this kind of
-types.<br/>
+types. Finally, the `sort` functionality accepts only callbacks that require to
+return entities rather than components:
+
+```cpp
+registry.sort<empty_type>([](const entt::entity lhs, const entt::entity rhs) {
+    return entt::registry::entity(lhs) < entt::registry::entity(rhs);
+});
+```
+
 On the other hand, iterations are faster because only the entities to which the
 type is assigned are considered. Moreover, less memory is used, since there
 doesn't exist any instance of the component, no matter how many entities it is

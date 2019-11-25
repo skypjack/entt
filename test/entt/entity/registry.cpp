@@ -825,6 +825,22 @@ TEST(Registry, SortMulti) {
     }
 }
 
+TEST(Registry, SortEmpty) {
+    entt::registry registry;
+
+    registry.assign<empty_type>(registry.create());
+    registry.assign<empty_type>(registry.create());
+    registry.assign<empty_type>(registry.create());
+
+    ASSERT_LT(registry.data<empty_type>()[0], registry.data<empty_type>()[1]);
+    ASSERT_LT(registry.data<empty_type>()[1], registry.data<empty_type>()[2]);
+
+    registry.sort<empty_type>(std::less<entt::entity>{});
+
+    ASSERT_GT(registry.data<empty_type>()[0], registry.data<empty_type>()[1]);
+    ASSERT_GT(registry.data<empty_type>()[1], registry.data<empty_type>()[2]);
+}
+
 TEST(Registry, ComponentsWithTypesFromStandardTemplateLibrary) {
     // see #37 - the test shouldn't crash, that's all
     entt::registry registry;
