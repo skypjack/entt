@@ -1,0 +1,15 @@
+load("//bazel:copts.bzl", "entt_copts")
+
+cc_test(
+    name = "lib_meta",
+    srcs = [
+        "types.h",
+        "lib.cpp",
+        "main.cpp",
+    ],
+    copts = entt_copts,
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

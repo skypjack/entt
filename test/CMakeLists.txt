@@ -11,8 +11,8 @@ macro(SETUP_TARGET TARGET_NAME)
 
     target_compile_options(
         ${TARGET_NAME}
-        PRIVATE $<$<AND:$<CONFIG:Debug>,$<NOT:$<PLATFORM_ID:Windows>>>:-O0 -g -pedantic -Wall -Wshadow>
-        PRIVATE $<$<AND:$<CONFIG:Release>,$<NOT:$<PLATFORM_ID:Windows>>>:-O2 -pedantic -Wall -Wshadow>
+        PRIVATE $<$<AND:$<CONFIG:Debug>,$<NOT:$<PLATFORM_ID:Windows>>>:-O0 -g -pedantic -Wall -Wshadow -fvisibility=hidden>
+        PRIVATE $<$<AND:$<CONFIG:Release>,$<NOT:$<PLATFORM_ID:Windows>>>:-O2 -pedantic -Wall -Wshadow -fvisibility=hidden>
         PRIVATE $<$<AND:$<CONFIG:Debug>,$<PLATFORM_ID:Windows>>:/EHsc /W1>
         PRIVATE $<$<AND:$<CONFIG:Release>,$<PLATFORM_ID:Windows>>:/EHsc /W1 /O2>
     )
@@ -28,6 +28,13 @@ macro(SETUP_AND_ADD_TEST TEST_NAME TEST_SOURCE)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
 endmacro()
 
+macro(SETUP_AND_ADD_LIB_TEST TEST_NAME)
+    add_library(dyn_${TEST_NAME} SHARED lib/${TEST_NAME}/lib.cpp)
+    SETUP_TARGET(dyn_${TEST_NAME})
+    SETUP_AND_ADD_TEST(lib_${TEST_NAME} lib/${TEST_NAME}/main.cpp)
+    target_link_libraries(lib_${TEST_NAME} PRIVATE dyn_${TEST_NAME})
+endmacro()
+
 # Test benchmark
 
 if(BUILD_BENCHMARK)
@@ -37,21 +44,10 @@ endif()
 # Test lib
 
 if(BUILD_LIB)
-    add_library(a_module_shared SHARED lib/a_module.cpp)
-    add_library(a_module_static STATIC lib/a_module.cpp)
-    add_library(another_module_shared SHARED lib/another_module.cpp)
-    add_library(another_module_static STATIC lib/another_module.cpp)
-
-    SETUP_TARGET(a_module_shared)
-    SETUP_TARGET(a_module_static)
-    SETUP_TARGET(another_module_shared)
-    SETUP_TARGET(another_module_static)
-
-    SETUP_AND_ADD_TEST(lib_shared lib/lib.cpp)
-    target_link_libraries(lib_shared PRIVATE a_module_shared another_module_shared)
-
-    SETUP_AND_ADD_TEST(lib_static lib/lib.cpp)
-    target_link_libraries(lib_static PRIVATE a_module_static another_module_static)
+    SETUP_AND_ADD_LIB_TEST(dispatcher)
+    SETUP_AND_ADD_LIB_TEST(emitter)
+    SETUP_AND_ADD_LIB_TEST(meta)
+    SETUP_AND_ADD_LIB_TEST(registry)
 endif()
 
 # Test mod
