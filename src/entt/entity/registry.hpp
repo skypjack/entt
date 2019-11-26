@@ -326,7 +326,7 @@ public:
      * Identifiers aren't guaranteed to be stable between different runs.
      *
      * @tparam Component Type of component to query.
-     * @return Runtime the opaque identifier of the given type of component.
+     * @return The opaque identifier of the given type of component.
      */
     template<typename Component>
     static component type() ENTT_NOEXCEPT {
