@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.2.0</span>
+   &#160;<span id="projectnumber">3.2.1</span>
    </div>
   </td>
  </tr>
@@ -934,6 +934,7 @@ template&lt;typename Compare , typename Sort  = std_sort, typename... Args&gt; <
 <li>A comparison function to use to compare the elements.</li>
 </ul>
 <dl class="section note"><dt>Note</dt><dd>Attempting to iterate elements using a raw pointer returned by a call to either <code>data</code> or <code>raw</code> gives no guarantees on the order, even though <code>sort</code> has been invoked.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Empty types are never instantiated. Therefore, only comparison function objects that require to return entities rather than components are accepted.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Compare</td><td>Type of comparison function object. </td></tr>
@@ -953,7 +954,7 @@ template&lt;typename Compare , typename Sort  = std_sort, typename... Args&gt; <
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00444">444</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="storage_8hpp_source.html#l00449">449</a> of file <a class="el" href="storage_8hpp_source.html">storage.hpp</a>.</p>
 
 </div>
 </div>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.2.0</span>
+   &#160;<span id="projectnumber">3.2.1</span>
    </div>
   </td>
  </tr>
@@ -505,8 +505,8 @@ More performance, more constraints</h3>
 Empty type optimization</h1>
 <p>An empty type <code>T</code> is such that <code>std::is_empty_v&lt;T&gt;</code> returns true. They are also the same types for which <em>empty base optimization</em> (EBO) is possibile.<br />
  <code>EnTT</code> handles these types in a special way, optimizing both in terms of performance and memory usage. However, this also has consequences that are worth mentioning.</p>
-<p>When an empty type is detected, it's not instantiated in any case. Therefore, only the entities to which it's assigned are made available. All the iterators as well as the <code>get</code> member functions of the registry, the views and the groups will return temporary objects. Similarly, some functions such as <code>try_get</code> or the raw access to the list of components aren't available for this kind of types.<br />
- On the other hand, iterations are faster because only the entities to which the type is assigned are considered. Moreover, less memory is used, since there doesn't exist any instance of the component, no matter how many entities it is assigned to.</p>
+<p>When an empty type is detected, it's not instantiated in any case. Therefore, only the entities to which it's assigned are made available. All the iterators as well as the <code>get</code> member functions of the registry, the views and the groups will return temporary objects. Similarly, some functions such as <code>try_get</code> or the raw access to the list of components aren't available for this kind of types. Finally, the <code>sort</code> functionality accepts only callbacks that require to return entities rather than components:</p>
+<div class="fragment"><div class="line">registry.<a class="code" href="classentt_1_1basic__registry.html#a38ac2a883e3d881c6ae5a05a0252b7ae">sort</a>&lt;empty_type&gt;([](<span class="keyword">const</span> entt::entity lhs, <span class="keyword">const</span> entt::entity rhs) {</div><div class="line">    <span class="keywordflow">return</span> <a class="code" href="classentt_1_1basic__registry.html#a5d07b2e0105da47d25ceef530d91bb8b">entt::registry::entity</a>(lhs) &lt; <a class="code" href="classentt_1_1basic__registry.html#a5d07b2e0105da47d25ceef530d91bb8b">entt::registry::entity</a>(rhs);</div><div class="line">});</div></div><!-- fragment --><p>On the other hand, iterations are faster because only the entities to which the type is assigned are considered. Moreover, less memory is used, since there doesn't exist any instance of the component, no matter how many entities it is assigned to.</p>
 <p>For similar reasons, wherever a function type of a listener accepts a component, it cannot be caught by a non-const reference. Capture it by copy or by const reference instead.</p>
 <p>More in general, none of the features offered by the library is affected, but for the ones that require to return actual instances.<br />
  This optimization can be disabled by defining the <code>ENTT_DISABLE_ETO</code> macro. In this case, the empty types will be treated like all other types, no matter what.</p>
