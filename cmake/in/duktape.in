@@ -7,6 +7,7 @@ ExternalProject_Add(
     duktape
     GIT_REPOSITORY https://github.com/svaarala/duktape-releases.git
     GIT_TAG v2.2.0
+    GIT_SHALLOW 1
     DOWNLOAD_DIR ${DUKTAPE_DEPS_DIR}
     TMP_DIR ${DUKTAPE_DEPS_DIR}/tmp
     STAMP_DIR ${DUKTAPE_DEPS_DIR}/stamp

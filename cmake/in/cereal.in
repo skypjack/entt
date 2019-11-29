@@ -7,6 +7,7 @@ ExternalProject_Add(
     cereal
     GIT_REPOSITORY https://github.com/USCiLab/cereal.git
     GIT_TAG v1.2.2
+    GIT_SHALLOW 1
     DOWNLOAD_DIR ${CEREAL_DEPS_DIR}
     TMP_DIR ${CEREAL_DEPS_DIR}/tmp
     STAMP_DIR ${CEREAL_DEPS_DIR}/stamp
