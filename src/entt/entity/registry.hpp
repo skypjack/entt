@@ -50,10 +50,10 @@ class basic_registry {
     struct pool_handler: storage<Entity, Component> {
         std::size_t super{};
 
-        pool_handler() ENTT_NOEXCEPT = default;
-
-        pool_handler(const storage<Entity, Component> &other)
-            : storage<Entity, Component>{other}
+        template<typename... Args>
+        pool_handler(Args &&... args)
+            : storage<Entity, Component>{std::forward<Args>(args)...},
+              super{}
         {}
 
         auto on_construct() ENTT_NOEXCEPT {
