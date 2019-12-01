@@ -264,15 +264,7 @@ struct meta_node<Type> {
             }
         };
 
-        if constexpr(is_named_type_v<Type>) {
-            auto *candidate = internal::find_if([](const auto *curr) {
-                return curr->identifier == named_type_traits_v<Type>;
-            }, *meta_node<>::global);
-
-            return candidate ? candidate : &node;
-        } else {
-            return &node;
-        }
+        return &node;
     }
 };
 

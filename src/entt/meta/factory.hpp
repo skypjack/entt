@@ -381,7 +381,13 @@ class meta_factory<Type> {
         return node && (node->identifier == identifier || duplicate(identifier, node->next));
     }
 
-    auto record(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
+public:
+    /**
+     * @brief Extends a meta type by assigning it an identifier.
+     * @param identifier Unique identifier.
+     * @return An extended meta factory for the given type.
+     */
+    auto type(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
 
         ENTT_ASSERT(!duplicate(identifier, *internal::meta_info<>::global));
@@ -391,32 +397,6 @@ class meta_factory<Type> {
         *internal::meta_info<>::global = node;
 
         return meta_factory<Type, Type>{&node->prop};
-    }
-
-public:
-    /**
-     * @brief Extends a meta type by assigning it an identifier.
-     *
-     * This function is intended only for unnamed types.
-     *
-     * @param identifier Unique identifier.
-     * @return An extended meta factory for the given type.
-     */
-    auto type(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
-        static_assert(!is_named_type_v<Type>);
-        return record(identifier);
-    }
-
-    /**
-     * @brief Extends a meta type by assigning it an identifier.
-     *
-     * This function is intended only for named types
-     *
-     * @return An extended meta factory for the given type.
-     */
-    auto type() ENTT_NOEXCEPT {
-        static_assert(is_named_type_v<Type>);
-        return record(named_type_traits_t<Type>::value);
     }
 
     /**
