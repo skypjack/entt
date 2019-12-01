@@ -281,9 +281,8 @@ public:
      */
     template<typename Component, typename... Args>
     void prepare(Args &&... args) {
-        ENTT_ASSERT(to_integer(type<Component>()) < pools.size() || !pools[to_integer(type<Component>())].pool);
-        [[maybe_unused]] auto *cpool = assure<Component>(std::forward<Args>(args)...);
-        ENTT_ASSERT(cpool->size() == 0);
+        ENTT_ASSERT(!(to_integer(type<Component>()) < pools.size()) || !pools[to_integer(type<Component>())].pool);
+        assure<Component>(std::forward<Args>(args)...);
     }
 
     /**
