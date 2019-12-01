@@ -92,10 +92,6 @@ class dispatcher {
     }
 
 public:
-    /*! @brief Type of sink for the given event. */
-    template<typename Event>
-    using sink_type = typename pool_handler<Event>::sink_type;
-
     /**
      * @brief Returns a sink object for the given event.
      *
@@ -114,7 +110,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Event>
-    sink_type<Event> sink() ENTT_NOEXCEPT {
+    auto sink() ENTT_NOEXCEPT {
         return assure<Event>().sink();
     }
 
