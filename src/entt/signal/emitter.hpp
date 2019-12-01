@@ -11,7 +11,6 @@
 #include <list>
 #include "../config/config.h"
 #include "../core/family.hpp"
-#include "../core/type_traits.hpp"
 
 
 namespace entt {
@@ -40,16 +39,16 @@ namespace entt {
  */
 template<typename Derived>
 class emitter {
-    using handler_family = family<struct internal_emitter_handler_family>;
+    using event_family = family<struct internal_emitter_event_family>;
 
-    struct base_handler {
-        virtual ~base_handler() = default;
+    struct basic_pool {
+        virtual ~basic_pool() = default;
         virtual bool empty() const ENTT_NOEXCEPT = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
-    struct event_handler: base_handler {
+    struct pool_handler: basic_pool {
         using listener_type = std::function<void(const Event &, Derived &)>;
         using element_type = std::pair<bool, listener_type>;
         using container_type = std::list<element_type>;
@@ -115,54 +114,25 @@ class emitter {
         container_type on_list{};
     };
 
-    struct handler_data {
-        std::unique_ptr<base_handler> handler;
-        ENTT_ID_TYPE runtime_type;
-    };
-
     template<typename Event>
-    static auto type() ENTT_NOEXCEPT {
-        if constexpr(is_named_type_v<Event>) {
-            return named_type_traits_v<Event>;
-        } else {
-            return handler_family::type<std::decay_t<Event>>;
-        }
-    }
+    pool_handler<Event> & assure() const {
+        const auto etype = event_family::type<std::decay_t<Event>>;
 
-    template<typename Event>
-    event_handler<Event> * assure() const {
-        const auto htype = type<Event>();
-        handler_data *hdata = nullptr;
-
-        if constexpr(is_named_type_v<Event>) {
-            const auto it = std::find_if(handlers.begin(), handlers.end(), [htype](const auto &candidate) {
-                return candidate.handler && candidate.runtime_type == htype;
-            });
-
-            hdata = (it == handlers.cend() ? &handlers.emplace_back() : &(*it));
-        } else {
-            if(!(htype < handlers.size())) {
-                handlers.resize(htype+1);
-            } else if(handlers[htype].handler && handlers[htype].runtime_type != htype) {
-                handlers.emplace_back();
-                std::swap(handlers[htype], handlers.back());
-            }
-
-            hdata = &handlers[htype];
+        if(!(etype < pools.size())) {
+            pools.resize(etype+1);
         }
 
-        if(!hdata->handler) {
-            hdata->handler = std::make_unique<event_handler<Event>>();
-            hdata->runtime_type = htype;
+        if(!pools[etype]) {
+            pools[etype] = std::make_unique<pool_handler<Event>>();
         }
 
-        return static_cast<event_handler<Event> *>(hdata->handler.get());
+        return static_cast<pool_handler<Event> &>(*pools[etype]);
     }
 
 public:
     /** @brief Type of listeners accepted for the given event. */
     template<typename Event>
-    using listener = typename event_handler<Event>::listener_type;
+    using listener = typename pool_handler<Event>::listener_type;
 
     /**
      * @brief Generic connection type for events.
@@ -174,7 +144,7 @@ public:
      * @tparam Event Type of event for which the connection is created.
      */
     template<typename Event>
-    struct connection: private event_handler<Event>::connection_type {
+    struct connection: private pool_handler<Event>::connection_type {
         /** @brief Event emitters are friend classes of connections. */
         friend class emitter;
 
@@ -185,8 +155,8 @@ public:
          * @brief Creates a connection that wraps its underlying instance.
          * @param conn A connection object to wrap.
          */
-        connection(typename event_handler<Event>::connection_type conn)
-            : event_handler<Event>::connection_type{std::move(conn)}
+        connection(typename pool_handler<Event>::connection_type conn)
+            : pool_handler<Event>::connection_type{std::move(conn)}
         {}
     };
 
@@ -217,7 +187,7 @@ public:
      */
     template<typename Event, typename... Args>
     void publish(Args &&... args) {
-        assure<Event>()->publish({ std::forward<Args>(args)... }, *static_cast<Derived *>(this));
+        assure<Event>().publish({ std::forward<Args>(args)... }, *static_cast<Derived *>(this));
     }
 
     /**
@@ -242,7 +212,7 @@ public:
      */
     template<typename Event>
     connection<Event> on(listener<Event> instance) {
-        return assure<Event>()->on(std::move(instance));
+        return assure<Event>().on(std::move(instance));
     }
 
     /**
@@ -267,7 +237,7 @@ public:
      */
     template<typename Event>
     connection<Event> once(listener<Event> instance) {
-        return assure<Event>()->once(std::move(instance));
+        return assure<Event>().once(std::move(instance));
     }
 
     /**
@@ -281,7 +251,7 @@ public:
      */
     template<typename Event>
     void erase(connection<Event> conn) {
-        assure<Event>()->erase(std::move(conn));
+        assure<Event>().erase(std::move(conn));
     }
 
     /**
@@ -294,7 +264,7 @@ public:
      */
     template<typename Event>
     void clear() ENTT_NOEXCEPT {
-        assure<Event>()->clear();
+        assure<Event>().clear();
     }
 
     /**
@@ -304,8 +274,10 @@ public:
      * results in undefined behavior.
      */
     void clear() ENTT_NOEXCEPT {
-        std::for_each(handlers.begin(), handlers.end(), [](auto &&hdata) {
-            return hdata.handler ? hdata.handler->clear() : void();
+        std::for_each(pools.begin(), pools.end(), [](auto &&cpool) {
+            if(cpool) {
+                cpool->clear();
+            }
         });
     }
 
@@ -316,7 +288,7 @@ public:
      */
     template<typename Event>
     bool empty() const ENTT_NOEXCEPT {
-        return assure<Event>()->empty();
+        return assure<Event>().empty();
     }
 
     /**
@@ -324,13 +296,13 @@ public:
      * @return True if there are no listeners registered, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
-        return std::all_of(handlers.cbegin(), handlers.cend(), [](auto &&hdata) {
-            return !hdata.handler || hdata.handler->empty();
+        return std::all_of(pools.cbegin(), pools.cend(), [](auto &&cpool) {
+            return !cpool || cpool->empty();
         });
     }
 
 private:
-    mutable std::vector<handler_data> handlers{};
+    mutable std::vector<std::unique_ptr<basic_pool>> pools{};
 };
 
 
