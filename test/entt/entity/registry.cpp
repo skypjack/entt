@@ -11,7 +11,6 @@
 #include <entt/entity/entity.hpp>
 
 ENTT_OPAQUE_TYPE(opaque, std::uint64_t);
-ENTT_NAMED_TYPE(int);
 
 struct empty_type {};
 
