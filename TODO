@@ -39,3 +39,19 @@
 * observer: user defined filters (eg .replace<T, &function> or .group<T, U, &func>)
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
 * sparse set: there exists an alternative to paginated sparse arrays?
+
+* Mission: get rid of named types
+  - make it possible to use custom generators (eg for plugins)
+  - registry::ctx_variable can be removed
+  - dispatcher::wrapper_data can be removed
+  - emitter::handler_data can be removed
+  - registry::group improve, reduce code
+  - Make the following parts work across boundaries (define proper macros):
+    * dispatcher
+    * emitter
+    * registry
+    * meta
+    * monostate
+    * locator
+  - update doc
+  - update tests
