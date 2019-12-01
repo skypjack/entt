@@ -29,10 +29,10 @@ macro(SETUP_AND_ADD_TEST TEST_NAME TEST_SOURCE)
 endmacro()
 
 macro(SETUP_AND_ADD_LIB_TEST TEST_NAME)
-    add_library(dyn_${TEST_NAME} SHARED lib/${TEST_NAME}/lib.cpp)
-    SETUP_TARGET(dyn_${TEST_NAME})
+    add_library(_${TEST_NAME} SHARED lib/${TEST_NAME}/lib.cpp)
+    SETUP_TARGET(_${TEST_NAME})
     SETUP_AND_ADD_TEST(lib_${TEST_NAME} lib/${TEST_NAME}/main.cpp)
-    target_link_libraries(lib_${TEST_NAME} PRIVATE dyn_${TEST_NAME})
+    target_link_libraries(lib_${TEST_NAME} PRIVATE _${TEST_NAME})
 endmacro()
 
 # Test benchmark
@@ -44,10 +44,10 @@ endif()
 # Test lib
 
 if(BUILD_LIB)
-    SETUP_AND_ADD_LIB_TEST(dispatcher)
-    SETUP_AND_ADD_LIB_TEST(emitter)
-    SETUP_AND_ADD_LIB_TEST(meta)
-    SETUP_AND_ADD_LIB_TEST(registry)
+#    SETUP_AND_ADD_LIB_TEST(dispatcher)
+#    SETUP_AND_ADD_LIB_TEST(emitter)
+#    SETUP_AND_ADD_LIB_TEST(meta)
+#    SETUP_AND_ADD_LIB_TEST(registry)
 endif()
 
 # Test mod
