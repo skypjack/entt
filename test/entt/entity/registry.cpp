@@ -10,8 +10,6 @@
 #include <entt/entity/registry.hpp>
 #include <entt/entity/entity.hpp>
 
-ENTT_OPAQUE_TYPE(opaque, std::uint64_t);
-
 struct empty_type {};
 
 struct listener {
