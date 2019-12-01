@@ -1641,7 +1641,7 @@ public:
      */
     template<typename Type>
     void unset() {
-        if(const auto vtype = context_family::template type<std::decay_t<Type>>; vtype < vars.size()) {
+        if(const auto vtype = context_family::type<std::decay_t<Type>>; vtype < vars.size()) {
             vars[vtype].reset();
         }
     }
