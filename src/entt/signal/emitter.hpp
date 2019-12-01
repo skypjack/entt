@@ -115,7 +115,7 @@ class emitter {
     };
 
     template<typename Event>
-    pool_handler<Event> & assure() const {
+    const pool_handler<Event> & assure() const {
         const auto etype = event_family::type<std::decay_t<Event>>;
 
         if(!(etype < pools.size())) {
@@ -126,7 +126,12 @@ class emitter {
             pools[etype] = std::make_unique<pool_handler<Event>>();
         }
 
-        return static_cast<pool_handler<Event> &>(*pools[etype]);
+        return static_cast<const pool_handler<Event> &>(*pools[etype]);
+    }
+
+    template<typename Event>
+    pool_handler<Event> & assure() {
+        return const_cast<pool_handler<Event> &>(std::as_const(*this).template assure<Event>());
     }
 
 public:
