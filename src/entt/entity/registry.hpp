@@ -270,7 +270,7 @@ public:
      */
     template<typename Component>
     static component type() ENTT_NOEXCEPT {
-        return component{component_family::template type<std::decay_t<Component>>};
+        return component{component_family::type<std::decay_t<Component>>};
     }
 
     /**
