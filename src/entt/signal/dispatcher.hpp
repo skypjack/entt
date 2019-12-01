@@ -10,7 +10,6 @@
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/family.hpp"
-#include "../core/type_traits.hpp"
 #include "sigh.hpp"
 
 
@@ -33,17 +32,14 @@ namespace entt {
 class dispatcher {
     using event_family = family<struct internal_dispatcher_event_family>;
 
-    template<typename Class, typename Event>
-    using instance_type = typename sigh<void(const Event &)>::template instance_type<Class>;
-
-    struct base_wrapper {
-        virtual ~base_wrapper() = default;
+    struct basic_pool {
+        virtual ~basic_pool() = default;
         virtual void publish() = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
-    struct signal_wrapper: base_wrapper {
+    struct pool_handler: basic_pool {
         using signal_type = sigh<void(const Event &)>;
         using sink_type = typename signal_type::sink_type;
 
@@ -80,54 +76,25 @@ class dispatcher {
         std::vector<Event> events;
     };
 
-    struct wrapper_data {
-        std::unique_ptr<base_wrapper> wrapper;
-        ENTT_ID_TYPE runtime_type;
-    };
-
     template<typename Event>
-    static auto type() ENTT_NOEXCEPT {
-        if constexpr(is_named_type_v<Event>) {
-            return named_type_traits_v<Event>;
-        } else {
-            return event_family::type<std::decay_t<Event>>;
-        }
-    }
+    pool_handler<Event> & assure() {
+        const auto etype = event_family::type<std::decay_t<Event>>;
 
-    template<typename Event>
-    signal_wrapper<Event> & assure() {
-        const auto wtype = type<Event>();
-        wrapper_data *wdata = nullptr;
-
-        if constexpr(is_named_type_v<Event>) {
-            const auto it = std::find_if(wrappers.begin(), wrappers.end(), [wtype](const auto &candidate) {
-                return candidate.wrapper && candidate.runtime_type == wtype;
-            });
-
-            wdata = (it == wrappers.cend() ? &wrappers.emplace_back() : &(*it));
-        } else {
-            if(!(wtype < wrappers.size())) {
-                wrappers.resize(wtype+1);
-            } else if(wrappers[wtype].wrapper && wrappers[wtype].runtime_type != wtype) {
-                wrappers.emplace_back();
-                std::swap(wrappers[wtype], wrappers.back());
-            }
-
-            wdata = &wrappers[wtype];
+        if(!(etype < pools.size())) {
+            pools.resize(etype+1);
         }
 
-        if(!wdata->wrapper) {
-            wdata->wrapper = std::make_unique<signal_wrapper<Event>>();
-            wdata->runtime_type = wtype;
+        if(!pools[etype]) {
+            pools[etype] = std::make_unique<pool_handler<Event>>();
         }
 
-        return static_cast<signal_wrapper<Event> &>(*wdata->wrapper);
+        return static_cast<pool_handler<Event> &>(*pools[etype]);
     }
 
 public:
     /*! @brief Type of sink for the given event. */
     template<typename Event>
-    using sink_type = typename signal_wrapper<Event>::sink_type;
+    using sink_type = typename pool_handler<Event>::sink_type;
 
     /**
      * @brief Returns a sink object for the given event.
@@ -220,9 +187,9 @@ public:
     template<typename... Event>
     void discard() ENTT_NOEXCEPT {
         if constexpr(sizeof...(Event) == 0) {
-            std::for_each(wrappers.begin(), wrappers.end(), [](auto &&wdata) {
-                if(wdata.wrapper) {
-                    wdata.wrapper->clear();
+            std::for_each(pools.begin(), pools.end(), [](auto &&cpool) {
+                if(cpool) {
+                    cpool->clear();
                 }
             });
         } else {
@@ -252,15 +219,15 @@ public:
      * to reduce at a minimum the time spent in the bodies of the listeners.
      */
     void update() const {
-        for(auto pos = wrappers.size(); pos; --pos) {
-            if(auto &wdata = wrappers[pos-1]; wdata.wrapper) {
-                wdata.wrapper->publish();
+        for(auto pos = pools.size(); pos; --pos) {
+            if(auto &cpool = pools[pos-1]; cpool) {
+                cpool->publish();
             }
         }
     }
 
 private:
-    std::vector<wrapper_data> wrappers;
+    std::vector<std::unique_ptr<basic_pool>> pools;
 };
 
 
