@@ -28,7 +28,7 @@ namespace entt {
  * }
  * @endcode
  *
- * Handlers for the type of events are created internally on the fly. It's not
+ * Pools for the type of events are created internally on the fly. It's not
  * required to specify in advance the full list of accepted types.<br/>
  * Moreover, whenever an event is published, an emitter provides the listeners
  * with a reference to itself along with a const reference to the event.
