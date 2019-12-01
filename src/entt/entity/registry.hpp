@@ -157,7 +157,6 @@ class basic_registry {
         void(* assure)(basic_registry &, const sparse_set<Entity> &);
         void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
         void(* stomp)(basic_registry &, const Entity, const sparse_set<Entity> &, const Entity);
-        ENTT_ID_TYPE runtime_type;
     };
 
     struct group_data {
@@ -168,19 +167,19 @@ class basic_registry {
         bool(* exclude)(const component) ENTT_NOEXCEPT;
     };
 
-    struct ctx_variable {
-        std::unique_ptr<void, void(*)(void *)> value;
-        ENTT_ID_TYPE runtime_type;
+    struct basic_variable {
+        virtual ~basic_variable() = default;
     };
 
-    template<typename Type, typename Family>
-    static ENTT_ID_TYPE runtime_type() ENTT_NOEXCEPT {
-        if constexpr(is_named_type_v<Type>) {
-            return named_type_traits_v<Type>;
-        } else {
-            return Family::template type<std::decay_t<Type>>;
-        }
-    }
+    template<typename Type>
+    struct variable_handler: basic_variable {
+        template<typename... Args>
+        variable_handler(Args &&... args)
+            : value{std::forward<Args>(args)...}
+        {}
+
+        Type value;
+    };
 
     auto generate() {
         Entity entt;
@@ -212,50 +211,30 @@ class basic_registry {
     template<typename Component, typename... Args>
     const pool_type<Component> * assure(Args &&... args) const {
         const auto ctype = to_integer(type<Component>());
-        pool_data *pdata = nullptr;
 
-        if constexpr(is_named_type_v<Component>) {
-            const auto it = std::find_if(pools.begin(), pools.end(), [ctype](const auto &candidate) {
-                return candidate.runtime_type == ctype;
-            });
-
-            pdata = (it == pools.cend() ? &pools.emplace_back() : &(*it));
-        } else {
-            if(!(ctype < pools.size())) {
-                pools.resize(ctype+1);
-            } else if(pools[ctype].pool && pools[ctype].runtime_type != ctype) {
-                pools.emplace_back();
-                std::swap(pools[ctype], pools.back());
-            }
-
-            pdata = &pools[ctype];
+        if(!(ctype < pools.size())) {
+            pools.resize(ctype+1);
         }
 
-        if constexpr(sizeof...(Args) != 0) {
-            ENTT_ASSERT(!pdata->pool || !pdata->pool->size());
-            pdata->pool.reset();
-        }
+        if(!pools[ctype].pool) {
+            pools[ctype].pool = std::make_unique<pool_type<Component>>(std::forward<Args>(args)...);
 
-        if(!pdata->pool) {
-            pdata->runtime_type = ctype;
-            pdata->pool = std::make_unique<pool_type<Component>>(std::forward<Args>(args)...);
-
-            pdata->remove = [](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
+            pools[ctype].remove = [](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
                 static_cast<pool_type<Component> &>(cpool).remove(owner, entt);
             };
 
             if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
-                pdata->assure = [](basic_registry &other, const sparse_set<Entity> &cpool) {
+                pools[ctype].assure = [](basic_registry &other, const sparse_set<Entity> &cpool) {
                     other.assure<Component>(static_cast<const pool_type<Component> &>(cpool));
                 };
 
-                pdata->stomp = [](basic_registry &other, const Entity dst, const sparse_set<Entity> &cpool, const Entity src) {
+                pools[ctype].stomp = [](basic_registry &other, const Entity dst, const sparse_set<Entity> &cpool, const Entity src) {
                     other.assign_or_replace<Component>(dst, static_cast<const pool_type<Component> &>(cpool).get(src));
                 };
             }
         }
 
-        return static_cast<pool_type<Component> *>(pdata->pool.get());
+        return static_cast<pool_type<Component> *>(pools[ctype].pool.get());
     }
 
     template<typename Component>
@@ -291,7 +270,7 @@ public:
      */
     template<typename Component>
     static component type() ENTT_NOEXCEPT {
-        return component{runtime_type<Component, component_family>()};
+        return component{component_family::template type<std::decay_t<Component>>};
     }
 
     /**
@@ -302,10 +281,7 @@ public:
      */
     template<typename Component, typename... Args>
     void prepare(Args &&... args) {
-        ENTT_ASSERT(std::none_of(pools.cbegin(), pools.cend(), [ctype = to_integer(type<Component>())](auto &&pdata) {
-            return pdata.pool && pdata.runtime_type == ctype;
-        }));
-
+        ENTT_ASSERT(to_integer(type<Component>()) < pools.size() || !pools[to_integer(type<Component>())].pool);
         [[maybe_unused]] auto *cpool = assure<Component>(std::forward<Args>(args)...);
         ENTT_ASSERT(cpool->size() == 0);
     }
@@ -1453,11 +1429,7 @@ public:
         std::vector<const sparse_set<Entity> *> selected(std::distance(first, last));
 
         std::transform(first, last, selected.begin(), [this](const component ctype) {
-            auto it = std::find_if(pools.begin(), pools.end(), [ctype = to_integer(ctype)](const auto &pdata) {
-                return pdata.pool && pdata.runtime_type == ctype;
-            });
-
-            return it != pools.cend() && it->pool ? it->pool.get() : nullptr;
+            return to_integer(ctype) < pools.size() ? pools[to_integer(ctype)].pool.get() : nullptr;
         });
 
         return { std::move(selected) };
@@ -1504,11 +1476,11 @@ public:
         other.entities = entities;
 
         if constexpr(sizeof...(Component) == 0) {
-            std::for_each(pools.cbegin(), pools.cend(), [&other](const auto &pdata) {
-                if(pdata.assure && ((pdata.runtime_type != to_integer(type<Exclude>())) && ...)) {
+            for(size_type pos{}; pos < pools.size(); ++pos) {
+                if(const auto &pdata = pools[pos]; pdata.assure && ((pos != to_integer(type<Exclude>())) && ...)) {
                     pdata.assure(other, *pdata.pool);
                 }
-            });
+            }
         } else {
             static_assert(sizeof...(Exclude) == 0 && std::conjunction_v<std::is_copy_constructible<Component>...>);
             (other.assure<Component>(*assure<Component>()), ...);
@@ -1557,11 +1529,11 @@ public:
     template<typename... Component, typename... Exclude>
     void stomp(const entity_type dst, const basic_registry &other, const entity_type src, exclude_t<Exclude...> = {}) {
         if constexpr(sizeof...(Component) == 0) {
-            std::for_each(other.pools.cbegin(), other.pools.cend(), [this, dst, src](const auto &pdata) {
-                if(pdata.stomp && ((pdata.runtime_type != to_integer(type<Exclude>())) && ...) && pdata.pool->has(src)) {
+            for(size_type pos{}; pos < other.pools.size(); ++pos) {
+                if(const auto &pdata = other.pools[pos]; pdata.stomp && ((pos != to_integer(type<Exclude>())) && ...) && pdata.pool->has(src)) {
                     pdata.stomp(*this, dst, *pdata.pool, src);
                 }
-            });
+            }
         } else {
             static_assert(sizeof...(Exclude) == 0 && std::conjunction_v<std::is_copy_constructible<Component>...>);
             (assign_or_replace<Component>(dst, other.template get<Component>(src)), ...);
@@ -1654,23 +1626,14 @@ public:
      */
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
-        const auto ctype = runtime_type<Type, context_family>();
-        auto it = std::find_if(vars.begin(), vars.end(), [ctype](const auto &candidate) {
-            return candidate.runtime_type == ctype;
-        });
+        const auto vtype = context_family::type<std::decay_t<Type>>;
 
-        if(it == vars.cend()) {
-            vars.push_back({
-                decltype(ctx_variable::value){new Type{std::forward<Args>(args)...}, [](void *ptr) { delete static_cast<Type *>(ptr); }},
-                ctype
-            });
-
-            it = std::prev(vars.end());
-        } else {
-            it->value.reset(new Type{std::forward<Args>(args)...});
+        if(!(vtype < vars.size())) {
+            vars.resize(vtype+1);
         }
 
-        return *static_cast<Type *>(it->value.get());
+        vars[vtype] = std::make_unique<variable_handler<Type>>(std::forward<Args>(args)...);
+        return static_cast<variable_handler<Type> &>(*vars[vtype]).value;
     }
 
     /**
@@ -1679,9 +1642,9 @@ public:
      */
     template<typename Type>
     void unset() {
-        vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &var) {
-            return var.runtime_type == runtime_type<Type, context_family>();
-        }), vars.end());
+        if(const auto vtype = context_family::template type<std::decay_t<Type>>; vtype < vars.size()) {
+            vars[vtype].reset();
+        }
     }
 
     /**
@@ -1709,11 +1672,8 @@ public:
      */
     template<typename Type>
     const Type * try_ctx() const {
-        const auto it = std::find_if(vars.begin(), vars.end(), [](const auto &var) {
-            return var.runtime_type == runtime_type<Type, context_family>();
-        });
-
-        return (it == vars.cend()) ? nullptr : static_cast<const Type *>(it->value.get());
+        const auto vtype = context_family::type<std::decay_t<Type>>;
+        return vtype < vars.size() && vars[vtype] ? &static_cast<variable_handler<Type> &>(*vars[vtype]).value : nullptr;
     }
 
     /*! @copydoc try_ctx */
@@ -1750,7 +1710,7 @@ public:
 private:
     mutable std::vector<pool_data> pools{};
     std::vector<group_data> groups{};
-    std::vector<ctx_variable> vars{};
+    std::vector<std::unique_ptr<basic_variable>> vars{};
     std::vector<entity_type> entities{};
     entity_type destroyed{null};
 };

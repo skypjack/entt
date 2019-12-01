@@ -42,9 +42,7 @@
 
 * Mission: get rid of named types
   - make it possible to use custom generators (eg for plugins)
-  - registry::ctx_variable can be removed
-  - dispatcher::wrapper_data can be removed
-  - emitter::handler_data can be removed
+  - registry::assure -> pool_type<T> &
   - registry::group improve, reduce code
   - Make the following parts work across boundaries (define proper macros):
     * dispatcher
