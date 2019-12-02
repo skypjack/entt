@@ -8,7 +8,6 @@
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
-#include "../core/utility.hpp"
 
 
 namespace entt {
@@ -195,42 +194,7 @@ struct meta_node;
 
 template<>
 struct meta_node<> {
-    inline static meta_type_node *local = nullptr;
-    inline static meta_type_node **global = &local;
-
-    static void reset(meta_type_node *node) ENTT_NOEXCEPT {
-        auto **it = global;
-
-        while(*it && *it != node) {
-            it = &(*it)->next;
-        }
-
-        if(*it) {
-            *it = (*it)->next;
-        }
-
-        const auto unregister_all = y_combinator{
-            [](auto &&self, auto **curr, auto... member) {
-                while(*curr) {
-                    auto *prev = *curr;
-                    (self(&(prev->*member)), ...);
-                    *curr = prev->next;
-                    prev->next = nullptr;
-                }
-            }
-        };
-
-        unregister_all(&node->prop);
-        unregister_all(&node->base);
-        unregister_all(&node->conv);
-        unregister_all(&node->ctor, &internal::meta_ctor_node::prop);
-        unregister_all(&node->data, &internal::meta_data_node::prop);
-        unregister_all(&node->func, &internal::meta_func_node::prop);
-
-        node->identifier = {};
-        node->next = nullptr;
-        node->dtor = nullptr;
-    }
+    inline static meta_type_node *node = nullptr;
 };
 
 
@@ -1556,21 +1520,6 @@ public:
 
 private:
     const internal::meta_type_node *node;
-};
-
-
-/*! @brief Opaque container for a meta context. */
-struct meta_ctx {
-    /**
-     * @brief Binds the meta system to the given context.
-     * @param other A valid context to which to bind.
-     */
-    static void bind(meta_ctx other) ENTT_NOEXCEPT {
-        internal::meta_info<>::global = other.ctx;
-    }
-
-private:
-    internal::meta_type_node **ctx{&internal::meta_info<>::local};
 };
 
 
