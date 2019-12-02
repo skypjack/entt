@@ -180,7 +180,7 @@ auto find_if(Op op, const meta_type_node *node)
 
 
 template<typename Type>
-static bool compare(const void *lhs, const void *rhs) {
+bool compare(const void *lhs, const void *rhs) {
     if constexpr(!std::is_function_v<Type> && is_equality_comparable_v<Type>) {
         return *static_cast<const Type *>(lhs) == *static_cast<const Type *>(rhs);
     } else {
