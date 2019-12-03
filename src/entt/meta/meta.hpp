@@ -8,6 +8,7 @@
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
+#include "../lib/attribute.h"
 
 
 namespace entt {
@@ -188,48 +189,44 @@ bool compare(const void *lhs, const void *rhs) {
 }
 
 
-template<typename...>
-struct meta_node;
-
-
-template<>
-struct meta_node<> {
-    inline static meta_type_node *node = nullptr;
-};
-
-
-template<typename Type>
-struct meta_node<Type> {
-    static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>);
+template<typename... Type>
+struct ENTT_API meta_node {
+    static_assert(std::is_same_v<Type..., std::remove_cv_t<std::remove_reference_t<Type>>...>);
 
     static meta_type_node * resolve() ENTT_NOEXCEPT {
         static meta_type_node node{
             {},
             nullptr,
             nullptr,
-            std::is_void_v<Type>,
-            std::is_integral_v<Type>,
-            std::is_floating_point_v<Type>,
-            std::is_array_v<Type>,
-            std::is_enum_v<Type>,
-            std::is_union_v<Type>,
-            std::is_class_v<Type>,
-            std::is_pointer_v<Type>,
-            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
-            std::is_member_object_pointer_v<Type>,
-            std::is_member_function_pointer_v<Type>,
-            std::extent_v<Type>,
-            &compare<Type>, // workaround for an issue with VS2017
+            std::is_void_v<Type...>,
+            std::is_integral_v<Type...>,
+            std::is_floating_point_v<Type...>,
+            std::is_array_v<Type...>,
+            std::is_enum_v<Type...>,
+            std::is_union_v<Type...>,
+            std::is_class_v<Type...>,
+            std::is_pointer_v<Type...>,
+            std::is_pointer_v<Type...> && std::is_function_v<std::remove_pointer_t<Type>...>,
+            std::is_member_object_pointer_v<Type...>,
+            std::is_member_function_pointer_v<Type...>,
+            std::extent_v<Type...>,
+            &compare<Type...>, // workaround for an issue with VS2017
             []() ENTT_NOEXCEPT -> meta_type_node * {
-                return meta_node<std::remove_const_t<std::remove_pointer_t<Type>>>::resolve();
+                return meta_node<std::remove_const_t<std::remove_pointer_t<Type>>...>::resolve();
             },
             []() ENTT_NOEXCEPT -> meta_type_node * {
-                return meta_node<std::remove_const_t<std::remove_extent_t<Type>>>::resolve();
+                return meta_node<std::remove_const_t<std::remove_extent_t<Type>>...>::resolve();
             }
         };
 
         return &node;
     }
+};
+
+
+template<>
+struct ENTT_API meta_node<> {
+    inline static meta_type_node *node = nullptr;
 };
 
 

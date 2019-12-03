@@ -1,26 +1,34 @@
+#define ENTT_API_EXPORT
+
+#include <entt/core/hashed_string.hpp>
+#include <entt/lib/attribute.h>
 #include <entt/meta/factory.hpp>
+#include <entt/meta/meta.hpp>
 #include "types.h"
 
-#ifndef LIB_EXPORT
-#if defined _WIN32 || defined __CYGWIN__
-#define LIB_EXPORT __declspec(dllexport)
-#elif defined __GNUC__
-#define LIB_EXPORT __attribute__((visibility("default")))
-#else
-#define LIB_EXPORT
-#endif
-#endif
 
-LIB_EXPORT void bind_ctx(entt::meta_ctx context) {
-    entt::meta_ctx::bind(context);
+position create_position(int x, int y) {
+    return position{x, y};
 }
 
-LIB_EXPORT void meta_init() {
-    entt::meta<char>().type().data<'c'>("c"_hs);
-    entt::meta<int>().type().data<0>("0"_hs);
+ENTT_EXPORT void meta_set_up() {
+    entt::meta<position>()
+            .type("position"_hs)
+            .ctor<&create_position>()
+            .data<&position::x>("x"_hs)
+            .data<&position::y>("y"_hs);
+
+    entt::meta<velocity>()
+            .ctor<>()
+            .data<&velocity::dx>("dx"_hs)
+            .data<&velocity::dy>("dy"_hs);
 }
 
-LIB_EXPORT void meta_deinit() {
-    entt::meta<char>().reset();
-    entt::meta<int>().reset();
+ENTT_EXPORT void meta_tear_down() {
+    entt::meta<position>().reset();
+    entt::meta<velocity>().reset();
+}
+
+ENTT_EXPORT entt::meta_any wrap_int(int value) {
+    return value;
 }

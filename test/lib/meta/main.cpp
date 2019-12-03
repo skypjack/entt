@@ -1,34 +1,39 @@
+#define ENTT_API_IMPORT
+
 #include <gtest/gtest.h>
+#include <entt/lib/attribute.h>
 #include <entt/meta/factory.hpp>
+#include <entt/meta/meta.hpp>
 #include "types.h"
 
-extern void bind_ctx(entt::meta_ctx);
-extern void meta_init();
-extern void meta_deinit();
+ENTT_IMPORT void meta_set_up();
+ENTT_IMPORT void meta_tear_down();
+ENTT_IMPORT entt::meta_any wrap_int(int);
 
 TEST(Lib, Meta) {
-    ASSERT_FALSE(entt::resolve("double"_hs));
-    ASSERT_FALSE(entt::resolve("char"_hs));
-    ASSERT_FALSE(entt::resolve("int"_hs));
-    ASSERT_FALSE(entt::resolve<int>().data("0"_hs));
-    ASSERT_FALSE(entt::resolve<char>().data("c"_hs));
+    ASSERT_FALSE(entt::resolve("position"_hs));
 
-    bind_ctx(entt::meta_ctx{});
-    entt::meta<double>().type("double"_hs).conv<int>();
-    meta_init();
+    meta_set_up();
+    entt::meta<double>().conv<int>();
 
-    ASSERT_TRUE(entt::resolve("double"_hs));
-    ASSERT_TRUE(entt::resolve("char"_hs));
-    ASSERT_TRUE(entt::resolve("int"_hs));
-    ASSERT_TRUE(entt::resolve<int>().data("0"_hs));
-    ASSERT_TRUE(entt::resolve<char>().data("c"_hs));
+    ASSERT_TRUE(entt::resolve("position"_hs));
 
-    meta_deinit();
-    entt::meta<double>().reset();
+    auto pos = entt::resolve("position"_hs).construct(42., 3.);
+    auto vel = entt::resolve<velocity>().ctor().invoke();
 
-    ASSERT_FALSE(entt::resolve("double"_hs));
-    ASSERT_FALSE(entt::resolve("char"_hs));
-    ASSERT_FALSE(entt::resolve("int"_hs));
-    ASSERT_FALSE(entt::resolve<int>().data("0"_hs));
-    ASSERT_FALSE(entt::resolve<char>().data("c"_hs));
+    ASSERT_TRUE(pos && vel);
+
+    ASSERT_EQ(pos.type().data("x"_hs).type(), entt::resolve<int>());
+    ASSERT_TRUE(pos.type().data("y"_hs).get(*pos).try_cast<int>());
+    ASSERT_EQ(pos.type().data("x"_hs).get(*pos).cast<int>(), 42);
+    ASSERT_EQ(pos.type().data("y"_hs).get(*pos).cast<int>(), 3);
+
+    ASSERT_EQ(vel.type().data("dx"_hs).type(), entt::resolve<double>());
+    ASSERT_TRUE(vel.type().data("dy"_hs).get(*vel).convert<int>());
+    ASSERT_EQ(vel.type().data("dx"_hs).get(*vel).cast<double>(), 0.);
+    ASSERT_EQ(vel.type().data("dy"_hs).get(*vel).cast<double>(), 0.);
+
+    ASSERT_EQ(wrap_int(1).type(), entt::resolve<int>());
+
+    meta_tear_down();
 }
