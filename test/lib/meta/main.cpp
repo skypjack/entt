@@ -6,14 +6,14 @@
 #include <entt/meta/meta.hpp>
 #include "types.h"
 
-ENTT_IMPORT void meta_set_up();
-ENTT_IMPORT void meta_tear_down();
+ENTT_IMPORT void set_up();
+ENTT_IMPORT void tear_down();
 ENTT_IMPORT entt::meta_any wrap_int(int);
 
 TEST(Lib, Meta) {
     ASSERT_FALSE(entt::resolve("position"_hs));
 
-    meta_set_up();
+    set_up();
     entt::meta<double>().conv<int>();
 
     ASSERT_TRUE(entt::resolve("position"_hs));
@@ -35,5 +35,5 @@ TEST(Lib, Meta) {
 
     ASSERT_EQ(wrap_int(1).type(), entt::resolve<int>());
 
-    meta_tear_down();
+    tear_down();
 }

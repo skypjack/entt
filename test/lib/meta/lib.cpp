@@ -6,12 +6,11 @@
 #include <entt/meta/meta.hpp>
 #include "types.h"
 
-
 position create_position(int x, int y) {
     return position{x, y};
 }
 
-ENTT_EXPORT void meta_set_up() {
+ENTT_EXPORT void set_up() {
     entt::meta<position>()
             .type("position"_hs)
             .ctor<&create_position>()
@@ -24,7 +23,7 @@ ENTT_EXPORT void meta_set_up() {
             .data<&velocity::dy>("dy"_hs);
 }
 
-ENTT_EXPORT void meta_tear_down() {
+ENTT_EXPORT void tear_down() {
     entt::meta<position>().reset();
     entt::meta<velocity>().reset();
 }
