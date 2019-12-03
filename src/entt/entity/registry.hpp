@@ -14,6 +14,7 @@
 #include "../core/family.hpp"
 #include "../core/algorithm.hpp"
 #include "../core/type_traits.hpp"
+#include "../lib/attribute.h"
 #include "../signal/sigh.hpp"
 #include "runtime_view.hpp"
 #include "sparse_set.hpp"
@@ -45,8 +46,12 @@ class basic_registry {
     template<typename>
     friend class basic_registry;
 
-    using context_family = family<struct internal_registry_context_family>;
-    using component_family = family<struct internal_registry_component_family>;
+    template<typename Type>
+    using context_family = family<Type, struct ENTT_API internal_registry_context_family>;
+
+    template<typename Type>
+    using component_family = family<Type, struct ENTT_API internal_registry_component_family>;
+
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     template<typename Component>
@@ -270,7 +275,7 @@ public:
      */
     template<typename Component>
     static component type() ENTT_NOEXCEPT {
-        return component{component_family::type<std::decay_t<Component>>};
+        return component{component_family<std::decay_t<Component>>::type};
     }
 
     /**
@@ -1625,7 +1630,7 @@ public:
      */
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
-        const auto vtype = context_family::type<std::decay_t<Type>>;
+        const auto vtype = context_family<std::decay_t<Type>>::type;
 
         if(!(vtype < vars.size())) {
             vars.resize(vtype+1);
@@ -1641,7 +1646,7 @@ public:
      */
     template<typename Type>
     void unset() {
-        if(const auto vtype = context_family::type<std::decay_t<Type>>; vtype < vars.size()) {
+        if(const auto vtype = context_family<std::decay_t<Type>>::type; vtype < vars.size()) {
             vars[vtype].reset();
         }
     }
@@ -1671,7 +1676,7 @@ public:
      */
     template<typename Type>
     const Type * try_ctx() const {
-        const auto vtype = context_family::type<std::decay_t<Type>>;
+        const auto vtype = context_family<std::decay_t<Type>>::type;
         return vtype < vars.size() && vars[vtype] ? &static_cast<variable_handler<Type> &>(*vars[vtype]).value : nullptr;
     }
 

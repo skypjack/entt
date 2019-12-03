@@ -10,6 +10,7 @@
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/family.hpp"
+#include "../lib/attribute.h"
 #include "sigh.hpp"
 
 
@@ -30,7 +31,8 @@ namespace entt {
  * crashes.
  */
 class dispatcher {
-    using event_family = family<struct internal_dispatcher_event_family>;
+    template<typename Type>
+    using event_family = family<Type, struct ENTT_API internal_dispatcher_event_family>;
 
     struct basic_pool {
         virtual ~basic_pool() = default;
@@ -78,7 +80,7 @@ class dispatcher {
 
     template<typename Event>
     pool_handler<Event> & assure() {
-        const auto etype = event_family::type<std::decay_t<Event>>;
+        const auto etype = event_family<Event>::type;
 
         if(!(etype < pools.size())) {
             pools.resize(etype+1);

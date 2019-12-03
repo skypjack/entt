@@ -11,6 +11,7 @@
 #include <list>
 #include "../config/config.h"
 #include "../core/family.hpp"
+#include "../lib/attribute.h"
 
 
 namespace entt {
@@ -39,7 +40,8 @@ namespace entt {
  */
 template<typename Derived>
 class emitter {
-    using event_family = family<struct internal_emitter_event_family>;
+    template<typename Type>
+    using event_family = family<Type, struct ENTT_API internal_emitter_event_family>;
 
     struct basic_pool {
         virtual ~basic_pool() = default;
@@ -116,7 +118,7 @@ class emitter {
 
     template<typename Event>
     const pool_handler<Event> & assure() const {
-        const auto etype = event_family::type<std::decay_t<Event>>;
+        const auto etype = event_family<std::decay_t<Event>>::type;
 
         if(!(etype < pools.size())) {
             pools.resize(etype+1);

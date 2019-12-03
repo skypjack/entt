@@ -51,5 +51,5 @@
     * meta
     * monostate
     * locator
-  - update doc
+  - update doc: family, dispatcher, emitter, registry, meta, across boundaries
   - update tests
