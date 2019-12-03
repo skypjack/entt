@@ -30,8 +30,14 @@ struct ENTT_API generator {
  */
 template<typename Type, typename... Generator>
 struct ENTT_API family {
-    /*! @brief Statically generated unique identifier for the given type. */
-    inline static const ENTT_ID_TYPE type = generator<Generator...>::next();
+    /**
+     * @brief Statically generated unique identifier for a given type.
+     * @return The runtime unique identifier for the given type.
+     */
+    static ENTT_ID_TYPE type() ENTT_NOEXCEPT {
+        static const ENTT_ID_TYPE value = generator<Generator...>::next();
+        return value;
+    }
 };
 
 

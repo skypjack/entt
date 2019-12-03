@@ -275,7 +275,7 @@ public:
      */
     template<typename Component>
     static component type() ENTT_NOEXCEPT {
-        return component{component_family<std::decay_t<Component>>::type};
+        return component{component_family<std::decay_t<Component>>::type()};
     }
 
     /**
@@ -1630,7 +1630,7 @@ public:
      */
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
-        const auto vtype = context_family<std::decay_t<Type>>::type;
+        const auto vtype = context_family<std::decay_t<Type>>::type();
 
         if(!(vtype < vars.size())) {
             vars.resize(vtype+1);
@@ -1646,7 +1646,7 @@ public:
      */
     template<typename Type>
     void unset() {
-        if(const auto vtype = context_family<std::decay_t<Type>>::type; vtype < vars.size()) {
+        if(const auto vtype = context_family<std::decay_t<Type>>::type(); vtype < vars.size()) {
             vars[vtype].reset();
         }
     }
@@ -1676,7 +1676,7 @@ public:
      */
     template<typename Type>
     const Type * try_ctx() const {
-        const auto vtype = context_family<std::decay_t<Type>>::type;
+        const auto vtype = context_family<std::decay_t<Type>>::type();
         return vtype < vars.size() && vars[vtype] ? &static_cast<variable_handler<Type> &>(*vars[vtype]).value : nullptr;
     }
 

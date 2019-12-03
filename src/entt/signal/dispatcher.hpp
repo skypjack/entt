@@ -31,8 +31,10 @@ namespace entt {
  * crashes.
  */
 class dispatcher {
+    struct ENTT_API dispatcher_event_family;
+
     template<typename Type>
-    using event_family = family<Type, struct ENTT_API internal_dispatcher_event_family>;
+    using event_family = family<Type, dispatcher_event_family>;
 
     struct basic_pool {
         virtual ~basic_pool() = default;
@@ -80,7 +82,7 @@ class dispatcher {
 
     template<typename Event>
     pool_handler<Event> & assure() {
-        const auto etype = event_family<Event>::type;
+        const auto etype = event_family<Event>::type();
 
         if(!(etype < pools.size())) {
             pools.resize(etype+1);

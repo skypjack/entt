@@ -1,16 +1,11 @@
+#define ENTT_API_EXPORT
+
+#include <entt/lib/attribute.h>
 #include <entt/signal/dispatcher.hpp>
 #include "types.h"
 
-#ifndef LIB_EXPORT
-#if defined _WIN32 || defined __CYGWIN__
-#define LIB_EXPORT __declspec(dllexport)
-#elif defined __GNUC__
-#define LIB_EXPORT __attribute__((visibility("default")))
-#else
-#define LIB_EXPORT
-#endif
-#endif
+template struct entt::family<event, entt::dispatcher::dispatcher_event_family>;
 
-LIB_EXPORT void trigger_event(int value, entt::dispatcher &dispatcher) {
-    dispatcher.trigger<event>(value);
+ENTT_EXPORT void trigger(int value, entt::dispatcher &dispatcher) {
+    dispatcher.trigger<message>(value);
 }

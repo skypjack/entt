@@ -44,7 +44,7 @@ endif()
 # Test lib
 
 if(BUILD_LIB)
-#    SETUP_AND_ADD_LIB_TEST(dispatcher)
+    SETUP_AND_ADD_LIB_TEST(dispatcher)
 #    SETUP_AND_ADD_LIB_TEST(emitter)
     SETUP_AND_ADD_LIB_TEST(meta)
 #    SETUP_AND_ADD_LIB_TEST(registry)

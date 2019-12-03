@@ -118,7 +118,7 @@ class emitter {
 
     template<typename Event>
     const pool_handler<Event> & assure() const {
-        const auto etype = event_family<std::decay_t<Event>>::type;
+        const auto etype = event_family<std::decay_t<Event>>::type();
 
         if(!(etype < pools.size())) {
             pools.resize(etype+1);
