@@ -40,8 +40,10 @@ namespace entt {
  */
 template<typename Derived>
 class emitter {
+    struct ENTT_API emitter_event_family;
+
     template<typename Type>
-    using event_family = family<Type, struct ENTT_API internal_emitter_event_family>;
+    using event_family = family<Type, emitter_event_family>;
 
     struct basic_pool {
         virtual ~basic_pool() = default;

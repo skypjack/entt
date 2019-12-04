@@ -43,13 +43,17 @@
 
 * Mission: get rid of named types
   - make it possible to use custom generators (eg for plugins)
-  - registry::assure -> pool_type<T> &
-  - registry::group improve, reduce code
-  - Make the following parts work across boundaries (define proper macros):
     * dispatcher
     * emitter
     * registry
     * meta
+    * monostate
+    * locator
+  - registry::assure -> pool_type<T> &
+  - registry::group improve, reduce code
+  - families should be defined as out-of-class to guarantee the same identifiers for the same types
+  - Make the following parts work across boundaries:
+    * registry
     * monostate
     * locator
   - update doc: family, dispatcher, emitter, registry, meta, across boundaries
