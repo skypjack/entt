@@ -6,9 +6,9 @@
 #include <entt/meta/meta.hpp>
 #include "types.h"
 
-ENTT_IMPORT void set_up();
-ENTT_IMPORT void tear_down();
-ENTT_IMPORT entt::meta_any wrap_int(int);
+ENTT_API void set_up();
+ENTT_API void tear_down();
+ENTT_API entt::meta_any wrap_int(int);
 
 TEST(Lib, Meta) {
     ASSERT_FALSE(entt::resolve("position"_hs));

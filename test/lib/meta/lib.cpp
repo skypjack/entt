@@ -10,7 +10,7 @@ position create_position(int x, int y) {
     return position{x, y};
 }
 
-ENTT_EXPORT void set_up() {
+ENTT_API void set_up() {
     entt::meta<position>()
             .type("position"_hs)
             .ctor<&create_position>()
@@ -23,11 +23,11 @@ ENTT_EXPORT void set_up() {
             .data<&velocity::dy>("dy"_hs);
 }
 
-ENTT_EXPORT void tear_down() {
+ENTT_API void tear_down() {
     entt::meta<position>().reset();
     entt::meta<velocity>().reset();
 }
 
-ENTT_EXPORT entt::meta_any wrap_int(int value) {
+ENTT_API entt::meta_any wrap_int(int value) {
     return value;
 }

@@ -6,6 +6,6 @@
 
 template struct entt::family<event, test_emitter::emitter_event_family>;
 
-ENTT_EXPORT void emit(int value, test_emitter &emitter) {
+ENTT_API void emit(int value, test_emitter &emitter) {
     emitter.publish<message>(value);
 }
