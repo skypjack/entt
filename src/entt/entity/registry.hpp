@@ -42,10 +42,6 @@ namespace entt {
  */
 template<typename Entity>
 class basic_registry {
-    /*! @brief Registries are friend with one another. */
-    template<typename>
-    friend class basic_registry;
-
     template<typename Type>
     using context_family = family<Type, struct ENTT_API internal_registry_context_family>;
 
