@@ -42,11 +42,14 @@ namespace entt {
  */
 template<typename Entity>
 class basic_registry {
-    template<typename Type>
-    using context_family = family<Type, struct ENTT_API internal_registry_context_family>;
+    struct ENTT_API registry_context_family;
+    struct ENTT_API registry_component_family;
 
     template<typename Type>
-    using component_family = family<Type, struct ENTT_API internal_registry_component_family>;
+    using context_family = family<Type, registry_context_family>;
+
+    template<typename Type>
+    using component_family = family<Type, registry_component_family>;
 
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 

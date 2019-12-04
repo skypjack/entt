@@ -1,13 +1,16 @@
+#define ENTT_API_IMPORT
+
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/lib/attribute.h>
 #include "types.h"
 
-extern typename entt::component int_type();
-extern typename entt::component char_type();
+ENTT_API entt::component int_type();
+ENTT_API entt::component char_type();
 
-extern void update_position(int, entt::registry &);
-extern void assign_velocity(int, entt::registry &);
+ENTT_API void update_position(int, entt::registry &);
+ENTT_API void assign_velocity(int, entt::registry &);
 
 TEST(Lib, Types) {
     entt::registry registry;
@@ -32,8 +35,8 @@ TEST(Lib, Registry) {
 
     assign_velocity(2, registry);
 
-    ASSERT_EQ(registry.size<position>(), entt::registry::size_type{3});
-    ASSERT_EQ(registry.size<velocity>(), entt::registry::size_type{3});
+    ASSERT_EQ(registry.size<position>(), 3u);
+    ASSERT_EQ(registry.size<velocity>(), 3u);
 
     update_position(1, registry);
 

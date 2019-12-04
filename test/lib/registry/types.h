@@ -1,14 +1,16 @@
-#include <entt/core/type_traits.hpp>
+#ifndef ENTT_LIB_REGISTRY_TYPES_H
+#define ENTT_LIB_REGISTRY_TYPES_H
 
-ENTT_NAMED_STRUCT(position, {
+#include <entt/lib/attribute.h>
+
+struct ENTT_API position {
     int x;
     int y;
-});
+};
 
-ENTT_NAMED_STRUCT(velocity, {
+struct ENTT_API velocity {
     int dx;
     int dy;
-});
+};
 
-ENTT_NAMED_TYPE(int);
-ENTT_NAMED_TYPE(char);
+#endif // ENTT_LIB_REGISTRY_TYPES_H
