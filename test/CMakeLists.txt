@@ -2,6 +2,24 @@
 # Tests configuration
 #
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
+if(FIND_GTEST_PACKAGE)
+    find_package(GTest REQUIRED)
+else()
+    # gtest, gtest_main, gmock and gmock_main targets are available from now on
+    set(GOOGLETEST_DEPS_DIR ${EnTT_SOURCE_DIR}/deps/googletest)
+    configure_file(${EnTT_SOURCE_DIR}/cmake/in/googletest.in ${GOOGLETEST_DEPS_DIR}/CMakeLists.txt)
+    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY ${GOOGLETEST_DEPS_DIR})
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${GOOGLETEST_DEPS_DIR})
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    add_subdirectory(${GOOGLETEST_DEPS_DIR}/src ${GOOGLETEST_DEPS_DIR}/build)
+    target_compile_features(gmock_main PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_FEATURES>)
+    target_compile_features(gmock PRIVATE $<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_FEATURES>)
+    add_library(GTest::Main ALIAS gtest_main)
+endif()
+
 include_directories($<TARGET_PROPERTY:EnTT,INTERFACE_INCLUDE_DIRECTORIES>)
 add_compile_options($<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_OPTIONS>)
 
@@ -48,11 +66,21 @@ if(BUILD_LIB)
     SETUP_AND_ADD_LIB_TEST(emitter)
     SETUP_AND_ADD_LIB_TEST(meta)
     SETUP_AND_ADD_LIB_TEST(registry)
+
+    set(CR_DEPS_DIR ${EnTT_SOURCE_DIR}/deps/cr)
+    configure_file(${EnTT_SOURCE_DIR}/cmake/in/cr.in ${CR_DEPS_DIR}/CMakeLists.txt)
+    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY ${CR_DEPS_DIR})
+    execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${CR_DEPS_DIR})
+    set(CR_SRC_DIR ${CR_DEPS_DIR}/src)
+
+    # TODO
 endif()
 
 # Test mod
 
 if(BUILD_MOD)
+    enable_language(C)
+
     set(DUKTAPE_DEPS_DIR ${EnTT_SOURCE_DIR}/deps/duktape)
     configure_file(${EnTT_SOURCE_DIR}/cmake/in/duktape.in ${DUKTAPE_DEPS_DIR}/CMakeLists.txt)
     execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY ${DUKTAPE_DEPS_DIR})

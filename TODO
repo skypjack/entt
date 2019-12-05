@@ -40,6 +40,9 @@
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
 * sparse set: there exists an alternative to paginated sparse arrays?
 * see warning (vs2017 only): d:\a\entt\entt\src\entt\entity\registry.hpp(108)
+* registry
+  - ::assure -> pool_type<T> &
+  - ::group improve, reduce code
 
 * Mission: get rid of named types
   - make it possible to use custom generators (eg for plugins)
@@ -49,12 +52,6 @@
     * meta
     * monostate
     * locator
-  - registry::assure -> pool_type<T> &
-  - registry::group improve, reduce code
   - families should be defined as out-of-class to guarantee the same identifiers for the same types
-  - Make the following parts work across boundaries:
-    * registry
-    * monostate
-    * locator
   - update doc: family, dispatcher, emitter, registry, meta, across boundaries
   - update tests
