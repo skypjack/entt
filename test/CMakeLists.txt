@@ -50,6 +50,8 @@ macro(SETUP_LIB_TEST TEST_NAME)
     add_library(_${TEST_NAME} SHARED lib/${TEST_NAME}/lib.cpp)
     SETUP_TARGET(_${TEST_NAME})
     SETUP_BASIC_TEST(lib_${TEST_NAME} lib/${TEST_NAME}/main.cpp)
+    target_compile_definitions(_${TEST_NAME} PRIVATE ENTT_API_EXPORT)
+    target_compile_definitions(lib_${TEST_NAME} PRIVATE ENTT_API_IMPORT)
     target_link_libraries(lib_${TEST_NAME} PRIVATE _${TEST_NAME})
 endmacro()
 

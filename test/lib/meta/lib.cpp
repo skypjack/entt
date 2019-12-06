@@ -1,5 +1,3 @@
-#define ENTT_API_EXPORT
-
 #include <entt/core/hashed_string.hpp>
 #include <entt/lib/attribute.h>
 #include <entt/meta/factory.hpp>

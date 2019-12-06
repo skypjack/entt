@@ -1,5 +1,3 @@
-#define ENTT_API_EXPORT
-
 #include <entt/lib/attribute.h>
 #include <entt/signal/emitter.hpp>
 #include "types.h"

@@ -1,5 +1,3 @@
-#define ENTT_API_EXPORT
-
 #include <entt/entity/registry.hpp>
 #include <entt/lib/attribute.h>
 #include "types.h"

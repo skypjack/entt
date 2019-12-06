@@ -1,5 +1,3 @@
-#define ENTT_API_IMPORT
-
 #include <gtest/gtest.h>
 #include <entt/lib/attribute.h>
 #include <entt/meta/factory.hpp>

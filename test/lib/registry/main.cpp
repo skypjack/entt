@@ -1,5 +1,3 @@
-#define ENTT_API_IMPORT
-
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
