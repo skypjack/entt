@@ -9,7 +9,7 @@
 ENTT_API void trigger(int, entt::dispatcher &);
 
 struct listener {
-    void on(event) { FAIL(); }
+    void on(event) {}
     void on(message msg) { value = msg.payload; }
     int value{};
 };

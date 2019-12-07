@@ -11,7 +11,7 @@ TEST(Lib, Emitter) {
     test_emitter emitter;
     int value{};
 
-    emitter.once<event>([](event, test_emitter &) { FAIL(); });
+    emitter.once<event>([](event, test_emitter &) {});
     emitter.once<message>([&](message msg, test_emitter &) {
         ASSERT_EQ(msg.payload, 42);
         value = msg.payload;
