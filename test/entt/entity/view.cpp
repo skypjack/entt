@@ -286,8 +286,14 @@ TEST(MultiComponentView, Iterator) {
     ASSERT_EQ(end, view.end());
     ASSERT_NE(begin, end);
 
-    ASSERT_EQ(view.begin()++, view.begin());
-    ASSERT_EQ(++view.begin(), view.end());
+    ASSERT_EQ(begin++, view.begin());
+    ASSERT_EQ(begin--, view.end());
+
+    ASSERT_EQ(++begin, view.end());
+    ASSERT_EQ(--begin, view.begin());
+
+    ASSERT_EQ(*begin, entity);
+    ASSERT_EQ(*begin.operator->(), entity);
 }
 
 TEST(MultiComponentView, Contains) {

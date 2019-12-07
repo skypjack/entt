@@ -64,20 +64,20 @@ class basic_runtime_view {
     class iterator {
         friend class basic_runtime_view<Entity>;
 
-        iterator(underlying_iterator_type first, underlying_iterator_type last, const sparse_set<Entity> * const *others, const sparse_set<Entity> * const *length) ENTT_NOEXCEPT
-            : begin{first},
-              end{last},
-              from{others},
-              to{length}
+        using direct_type = std::vector<const sparse_set<Entity> *>;
+
+        iterator(const direct_type *all, underlying_iterator_type curr) ENTT_NOEXCEPT
+            : pools{all},
+              it{curr}
         {
-            if(begin != end && !valid()) {
+            if(it != (*pools)[0]->end() && !valid()) {
                 ++(*this);
             }
         }
 
         bool valid() const {
-            return std::all_of(from, to, [entt = *begin](const auto *view) {
-                return view->has(entt);
+            return std::all_of(pools->begin()++, pools->end(), [entt = *it](const auto *curr) {
+                return curr->has(entt);
             });
         }
 
@@ -86,12 +86,13 @@ class basic_runtime_view {
         using value_type = typename underlying_iterator_type::value_type;
         using pointer = typename underlying_iterator_type::pointer;
         using reference = typename underlying_iterator_type::reference;
-        using iterator_category = std::forward_iterator_tag;
+        using iterator_category = std::bidirectional_iterator_tag;
 
         iterator() ENTT_NOEXCEPT = default;
 
         iterator & operator++() {
-            return (++begin != end && !valid()) ? ++(*this) : *this;
+            while(++it != (*pools)[0]->end() && !valid());
+            return *this;
         }
 
         iterator operator++(int) {
@@ -99,8 +100,18 @@ class basic_runtime_view {
             return ++(*this), orig;
         }
 
+        iterator & operator--() ENTT_NOEXCEPT {
+            while(--it != (*pools)[0]->begin() && !valid());
+            return *this;
+        }
+
+        iterator operator--(int) ENTT_NOEXCEPT {
+            iterator orig = *this;
+            return --(*this), orig;
+        }
+
         bool operator==(const iterator &other) const ENTT_NOEXCEPT {
-            return other.begin == begin;
+            return other.it == it;
         }
 
         bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
@@ -108,7 +119,7 @@ class basic_runtime_view {
         }
 
         pointer operator->() const {
-            return begin.operator->();
+            return it.operator->();
         }
 
         reference operator*() const {
@@ -116,10 +127,8 @@ class basic_runtime_view {
         }
 
     private:
-        underlying_iterator_type begin;
-        underlying_iterator_type end;
-        const sparse_set<Entity> * const *from;
-        const sparse_set<Entity> * const *to;
+        const direct_type *pools;
+        underlying_iterator_type it;
     };
 
     basic_runtime_view(std::vector<const sparse_set<Entity> *> others) ENTT_NOEXCEPT
@@ -179,9 +188,7 @@ public:
         iterator_type it{};
 
         if(valid()) {
-            const auto &pool = *pools.front();
-            const auto * const *data = pools.data();
-            it = { pool.begin(), pool.end(), data + 1, data + pools.size() };
+            it = { &pools, pools[0]->begin() };
         }
 
         return it;
@@ -206,8 +213,7 @@ public:
         iterator_type it{};
 
         if(valid()) {
-            const auto &pool = *pools.front();
-            it = { pool.end(), pool.end(), nullptr, nullptr };
+            it = { &pools, pools[0]->end() };
         }
 
         return it;

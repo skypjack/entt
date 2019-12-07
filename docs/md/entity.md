@@ -1734,9 +1734,9 @@ expedients.
 
 ## Iterators
 
-A special mention is needed for the iterators returned by the views and the
-groups. Most of the time they meet the requirements of random access iterators,
-in all cases they meet at least the requirements of forward iterators.<br/>
+A special mention is needed for the iterators returned by views and groups. Most
+of the times they meet the requirements of random access iterators, in all cases
+they meet at least the requirements of bidirectional iterators.<br/>
 In other terms, they are suitable for use with the parallel algorithms of the
 standard library. If it's not clear, this is a great thing.
 

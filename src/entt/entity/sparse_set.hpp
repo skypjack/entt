@@ -55,10 +55,10 @@ class sparse_set {
     class iterator {
         friend class sparse_set<Entity>;
 
-        using direct_type = const std::vector<Entity>;
+        using direct_type = std::vector<Entity>;
         using index_type = typename traits_type::difference_type;
 
-        iterator(direct_type *ref, const index_type idx) ENTT_NOEXCEPT
+        iterator(const direct_type *ref, const index_type idx) ENTT_NOEXCEPT
             : direct{ref}, index{idx}
         {}
 
@@ -149,7 +149,7 @@ class sparse_set {
         }
 
     private:
-        direct_type *direct;
+        const direct_type *direct;
         index_type index;
     };
 

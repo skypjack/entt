@@ -26,13 +26,13 @@ TEST(RuntimeView, Functionalities) {
 
     registry.assign<char>(e1);
 
-    auto it = registry.runtime_view(std::begin(types), std::end(types)).begin();
+    auto it = view.begin();
 
     ASSERT_EQ(*it, e1);
-    ASSERT_EQ(++it, (registry.runtime_view(std::begin(types), std::end(types)).end()));
+    ASSERT_EQ(++it, (view.end()));
 
-    ASSERT_NO_THROW((registry.runtime_view(std::begin(types), std::end(types)).begin()++));
-    ASSERT_NO_THROW((++registry.runtime_view(std::begin(types), std::end(types)).begin()));
+    ASSERT_NO_THROW((view.begin()++));
+    ASSERT_NO_THROW((++view.begin()));
 
     ASSERT_NE(view.begin(), view.end());
     ASSERT_EQ(view.size(), decltype(view.size()){1});
@@ -67,8 +67,14 @@ TEST(RuntimeView, Iterator) {
     ASSERT_EQ(end, view.end());
     ASSERT_NE(begin, end);
 
-    ASSERT_EQ(view.begin()++, view.begin());
-    ASSERT_EQ(++view.begin(), view.end());
+    ASSERT_EQ(begin++, view.begin());
+    ASSERT_EQ(begin--, view.end());
+
+    ASSERT_EQ(++begin, view.end());
+    ASSERT_EQ(--begin, view.begin());
+
+    ASSERT_EQ(*begin, entity);
+    ASSERT_EQ(*begin.operator->(), entity);
 }
 
 TEST(RuntimeView, Contains) {
