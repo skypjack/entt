@@ -8,10 +8,10 @@ struct ENTT_API test_emitter
         : entt::emitter<test_emitter>
 {};
 
-struct ENTT_API event {};
-
 struct ENTT_API message {
     int payload;
 };
+
+struct ENTT_API event: message {};
 
 #endif // ENTT_LIB_EMITTER_TYPES_H

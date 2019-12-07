@@ -9,11 +9,11 @@ TEST(Lib, Emitter) {
     test_emitter emitter;
     int value{};
 
-    emitter.once<event>([](event, test_emitter &) {});
-    emitter.once<message>([&](message msg, test_emitter &) {
-        ASSERT_EQ(msg.payload, 42);
-        value = msg.payload;
-    });
+    emitter.once<event>([&](event ev, test_emitter &) { value = ev.payload; });
+    emitter.once<message>([&](message msg, test_emitter &) { value = msg.payload; });
+    emitter.publish<event>(3);
+
+    ASSERT_EQ(value, 3);
 
     emit(42, emitter);
     emit(3, emitter);

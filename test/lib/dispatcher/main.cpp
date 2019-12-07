@@ -7,7 +7,7 @@
 ENTT_API void trigger(int, entt::dispatcher &);
 
 struct listener {
-    void on(event) {}
+    void on(event ev) { value = ev.payload; }
     void on(message msg) { value = msg.payload; }
     int value{};
 };
@@ -18,6 +18,10 @@ TEST(Lib, Dispatcher) {
 
     dispatcher.sink<event>().connect<entt::overload<void(event)>(&listener::on)>(listener);
     dispatcher.sink<message>().connect<entt::overload<void(message)>(&listener::on)>(listener);
+    dispatcher.trigger<event>(3);
+
+    ASSERT_EQ(listener.value, 3);
+
     trigger(42, dispatcher);
 
     ASSERT_EQ(listener.value, 42);

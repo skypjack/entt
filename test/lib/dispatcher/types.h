@@ -3,10 +3,10 @@
 
 #include <entt/lib/attribute.h>
 
-struct ENTT_API event {};
-
 struct ENTT_API message {
     int payload;
 };
+
+struct ENTT_API event: message {};
 
 #endif // ENTT_LIB_DISPATCHER_TYPES_H
