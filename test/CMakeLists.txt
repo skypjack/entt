@@ -56,7 +56,7 @@ macro(SETUP_LIB_TEST TEST_NAME)
 endmacro()
 
 macro(SETUP_PLUGIN_TEST TEST_NAME)
-    add_library(_${TEST_NAME}_plugin SHARED plugin/${TEST_NAME}/plugin.cpp)
+    add_library(_${TEST_NAME}_plugin MODULE plugin/${TEST_NAME}/plugin.cpp)
     SETUP_TARGET(_${TEST_NAME}_plugin)
     SETUP_BASIC_TEST(lib_${TEST_NAME}_plugin plugin/${TEST_NAME}/main.cpp)
     target_link_libraries(lib_${TEST_NAME}_plugin PRIVATE ${CMAKE_DL_LIBS})
