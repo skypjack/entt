@@ -1,40 +1,19 @@
-* long term feature: templated generic vm
-* long term feature: shared_ptr less locator
-* long term feature: shared_ptr less resource cache
+* long term feature: shared_ptr less locator and resource cache
 * custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
-* work stealing job system (see #100)
-  - mt scheduler based on const awareness for types
-* meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects
-  - remove runtime views, welcome reflection and what about snapshot?
-* allow for built-in parallel each if possible
-* allow to replace std:: with custom implementations
-* types defined at runtime that refer to the same compile-time type (but to different pools) are possible, the library is almost there
+* work stealing job system (see #100) + mt scheduler based on const awareness for types
+* meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects (remove runtime views, welcome reflection and what about snapshot?)
 * add opaque input iterators to views and groups that return tuples <entity, T &...> (proxy), multi-pass guaranteed
+* allow to replace std:: with custom implementations
 * allow for custom stomp functions
 * custom (decoupled) pools ==> N-buffering, shared components, multi-model, hibitsets, and so on
-  - explore the possibility to wrap other backend with a XHandler component
 * snapshot rework/deprecation
   - create(hint: entity) -> force-create
   - assign<T...>(first, last)
-* use unordered_map for named pools and context variables:
-  - use direct access (pool-like) also for context variables
-  - allow for key/value variables where the key is an ENTT_ID_TYPE
-  - improves multi-stomp
+* allow for key/value variables where the key is an ENTT_ID_TYPE
 * add examples (and credits) from @alanjfs :)
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...>
-* ENTT_NAMED_TYPE -> ENTT_EXPORT and add also ENTT_EXPORT_WITH_NAME
-* meta: members+class as fake functions, is it possible?
-* meta: export implicitly generated named types if possible
-* add meta support to registry:
-  - entity for each component
-  - opaque get
-  - and so on (I'm lazy) :)
-* registry::each to iterate all components of an entity
-* named types: almost-stable index optimization for direct access to pools, no more linear searches
-  - can implicitly generate types for meta benefit from a similar approach?
-* detect family on a macro based model
-* is it possible to make named type constraints namespace-free?
+* add meta support to registry (eg entity for each component and opaque get)
 * stomp -> merge (naming is hard as heck, it's known thing)
 * observer: user defined filters (eg .replace<T, &function> or .group<T, U, &func>)
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
@@ -46,12 +25,14 @@
 
 * Mission: get rid of named types
   - make it possible to use custom generators (eg for plugins)
-    * dispatcher
-    * emitter
-    * registry
+    * dispatcher, emitter, registry
+      - generators as arguments to family::type overloads
+      - generators to constructors
+      - bind identifiers by name (as for meta)
     * meta
-    * monostate
-    * locator
+      - shared context
+      - bind<T>("name"_hs)
+  - reintroduce old-fashion family and add a new family-like thing with generators
   - families should be defined as out-of-class to guarantee the same identifiers for the same types
   - update doc: family, dispatcher, emitter, registry, meta, across boundaries
   - update tests
