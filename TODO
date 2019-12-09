@@ -29,10 +29,9 @@
       - generators as arguments to family::type overloads
       - generators to constructors
       - bind identifiers by name (as for meta)
-    * meta
-      - shared context
-      - bind<T>("name"_hs)
   - reintroduce old-fashion family and add a new family-like thing with generators
   - families should be defined as out-of-class to guarantee the same identifiers for the same types
   - update doc: family, dispatcher, emitter, registry, meta, across boundaries
   - update tests
+  - review and suppress warnings, if any
+  - remove ENTT_API from OPAQUE_TYPE

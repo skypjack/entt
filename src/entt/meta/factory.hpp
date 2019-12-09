@@ -256,8 +256,8 @@ class meta_factory;
  */
 template<typename Type, typename... Spec>
 class meta_factory<Type, Spec...>: public meta_factory<Type> {
-    bool duplicate(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
-        return node && (node->key() == key || duplicate(key, node->next));
+    bool exists(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
+        return node && (node->key() == key || exists(key, node->next));
     }
 
     template<std::size_t Step = 0, std::size_t... Index, typename... Property, typename... Other>
@@ -309,7 +309,7 @@ class meta_factory<Type, Spec...>: public meta_factory<Type> {
             }
         };
 
-        ENTT_ASSERT(!duplicate(node.key(), *curr));
+        ENTT_ASSERT(!exists(node.key(), *curr));
         node.next = *curr;
         *curr = &node;
     }
@@ -373,13 +373,13 @@ private:
 template<typename Type>
 class meta_factory<Type> {
     template<typename Node>
-    bool duplicate(const Node *candidate, const Node *node) ENTT_NOEXCEPT {
-        return node && (node == candidate || duplicate(candidate, node->next));
+    bool exists(const Node *candidate, const Node *node) ENTT_NOEXCEPT {
+        return node && (node == candidate || exists(candidate, node->next));
     }
 
     template<typename Node>
-    bool duplicate(const ENTT_ID_TYPE identifier, const Node *node) ENTT_NOEXCEPT {
-        return node && (node->identifier == identifier || duplicate(identifier, node->next));
+    bool exists(const ENTT_ID_TYPE identifier, const Node *node) ENTT_NOEXCEPT {
+        return node && (node->identifier == identifier || exists(identifier, node->next));
     }
 
 public:
@@ -391,11 +391,11 @@ public:
     auto type(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!duplicate(identifier, internal::meta_info<>::node));
-        ENTT_ASSERT(!duplicate(node, internal::meta_info<>::node));
+        ENTT_ASSERT(!exists(identifier, *internal::meta_info<>::context()));
+        ENTT_ASSERT(!exists(node, *internal::meta_info<>::context()));
         node->identifier = identifier;
-        node->next = internal::meta_info<>::node;
-        internal::meta_info<>::node = node;
+        node->next = *internal::meta_info<>::context();
+        *internal::meta_info<>::context() = node;
 
         return meta_factory<Type, Type>{&node->prop};
     }
@@ -422,7 +422,7 @@ public:
             }
         };
 
-        ENTT_ASSERT(!duplicate(&node, type->base));
+        ENTT_ASSERT(!exists(&node, type->base));
         node.next = type->base;
         type->base = &node;
 
@@ -452,7 +452,7 @@ public:
             }
         };
 
-        ENTT_ASSERT(!duplicate(&node, type->conv));
+        ENTT_ASSERT(!exists(&node, type->conv));
         node.next = type->conv;
         type->conv = &node;
 
@@ -485,7 +485,7 @@ public:
             }
         };
 
-        ENTT_ASSERT(!duplicate(&node, type->conv));
+        ENTT_ASSERT(!exists(&node, type->conv));
         node.next = type->conv;
         type->conv = &node;
 
@@ -522,7 +522,7 @@ public:
             }
         };
 
-        ENTT_ASSERT(!duplicate(&node, type->ctor));
+        ENTT_ASSERT(!exists(&node, type->ctor));
         node.next = type->ctor;
         type->ctor = &node;
 
@@ -555,7 +555,7 @@ public:
             }
         };
 
-        ENTT_ASSERT(!duplicate(&node, type->ctor));
+        ENTT_ASSERT(!exists(&node, type->ctor));
         node.next = type->ctor;
         type->ctor = &node;
 
@@ -667,8 +667,8 @@ public:
             curr = &node;
         }
 
-        ENTT_ASSERT(!duplicate(identifier, type->data));
-        ENTT_ASSERT(!duplicate(curr, type->data));
+        ENTT_ASSERT(!exists(identifier, type->data));
+        ENTT_ASSERT(!exists(curr, type->data));
         curr->identifier = identifier;
         curr->next = type->data;
         type->data = curr;
@@ -714,8 +714,8 @@ public:
             &internal::getter<Type, Getter, Policy>
         };
 
-        ENTT_ASSERT(!duplicate(identifier, type->data));
-        ENTT_ASSERT(!duplicate(&node, type->data));
+        ENTT_ASSERT(!exists(identifier, type->data));
+        ENTT_ASSERT(!exists(&node, type->data));
         node.identifier = identifier;
         node.next = type->data;
         type->data = &node;
@@ -756,8 +756,8 @@ public:
             }
         };
 
-        ENTT_ASSERT(!duplicate(identifier, type->func));
-        ENTT_ASSERT(!duplicate(&node, type->func));
+        ENTT_ASSERT(!exists(identifier, type->func));
+        ENTT_ASSERT(!exists(&node, type->func));
         node.identifier = identifier;
         node.next = type->func;
         type->func = &node;
@@ -772,10 +772,12 @@ public:
      * functions and properties, as well as its constructors, destructors and
      * conversion functions if any.<br/>
      * Base classes aren't reset but the link between the two types is removed.
+     *
+     * @return An extended meta factory for the given type.
      */
-    void reset() ENTT_NOEXCEPT {
+    auto reset() ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
-        auto **it = &internal::meta_node<>::node;
+        auto **it = internal::meta_info<>::context();
 
         while(*it && *it != node) {
             it = &(*it)->next;
@@ -806,6 +808,26 @@ public:
         node->identifier = {};
         node->next = nullptr;
         node->dtor = nullptr;
+
+        return meta_factory<Type, Type>{&node->prop};
+    }
+
+    /**
+     * @brief Imports a meta type from another context.
+     * @param identifier Unique identifier.
+     * @return An extended meta factory for the given type.
+     */
+    auto import(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
+        auto * const ctx = *internal::meta_info<>::context();
+
+        ENTT_ASSERT(exists(identifier, ctx));
+        ENTT_ASSERT(!exists(internal::meta_info<Type>::resolve(), ctx));
+
+        internal::meta_info<Type>::alias = internal::find_if([identifier](const auto *curr) {
+            return curr->identifier == identifier;
+        }, ctx);
+
+        return meta_factory<Type, Type>{&internal::meta_info<Type>::resolve()->prop};
     }
 };
 
@@ -848,7 +870,7 @@ inline meta_type resolve() ENTT_NOEXCEPT {
 inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
     return internal::find_if([identifier](const auto *curr) {
         return curr->identifier == identifier;
-    }, internal::meta_info<>::node);
+    }, *internal::meta_info<>::context());
 }
 
 
@@ -860,7 +882,7 @@ inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
 template<typename Op>
 inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
 resolve(Op op) {
-    internal::visit<meta_type>(std::move(op), internal::meta_info<>::node);
+    internal::visit<meta_type>(std::move(op), *internal::meta_info<>::context());
 }
 
 

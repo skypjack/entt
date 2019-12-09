@@ -192,8 +192,9 @@ bool compare(const void *lhs, const void *rhs) {
 template<typename... Type>
 struct ENTT_API meta_node {
     static_assert(std::is_same_v<Type..., std::remove_cv_t<std::remove_reference_t<Type>>...>);
+    inline static meta_type_node *alias = nullptr;
 
-    static meta_type_node * resolve() ENTT_NOEXCEPT {
+    inline static meta_type_node * resolve() ENTT_NOEXCEPT {
         static meta_type_node node{
             {},
             nullptr,
@@ -211,22 +212,23 @@ struct ENTT_API meta_node {
             std::is_member_function_pointer_v<Type...>,
             std::extent_v<Type...>,
             &compare<Type...>, // workaround for an issue with VS2017
-            []() ENTT_NOEXCEPT -> meta_type_node * {
-                return meta_node<std::remove_const_t<std::remove_pointer_t<Type>>...>::resolve();
-            },
-            []() ENTT_NOEXCEPT -> meta_type_node * {
-                return meta_node<std::remove_const_t<std::remove_extent_t<Type>>...>::resolve();
-            }
+            &meta_node<std::remove_const_t<std::remove_pointer_t<Type>>...>::resolve,
+            &meta_node<std::remove_const_t<std::remove_extent_t<Type>>...>::resolve
         };
 
-        return &node;
+        return alias ? alias : &node;
     }
 };
 
 
 template<>
 struct ENTT_API meta_node<> {
-    inline static meta_type_node *node = nullptr;
+    inline static meta_type_node **shared = nullptr;
+
+    inline static meta_type_node ** context() ENTT_NOEXCEPT {
+        static meta_type_node *local = nullptr;
+        return shared ? shared : &local;
+    }
 };
 
 
@@ -241,6 +243,22 @@ struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> 
  * Internal details not to be documented.
  * @endcond TURN_OFF_DOXYGEN
  */
+
+
+/*! @brief Opaque container for a meta context. */
+struct meta_ctx {
+    /**
+     * @brief Binds the meta system to the given context.
+     * @param other A valid context to which to bind.
+     */
+    static void bind(meta_ctx other) ENTT_NOEXCEPT {
+        ENTT_ASSERT(!internal::meta_info<>::shared);
+        internal::meta_info<>::shared = other.ctx;
+    }
+
+private:
+    internal::meta_type_node **ctx{internal::meta_info<>::context()};
+};
 
 
 /**

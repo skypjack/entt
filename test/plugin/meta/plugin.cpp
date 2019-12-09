@@ -1,0 +1,53 @@
+#include <cr.h>
+#include <entt/core/hashed_string.hpp>
+#include <entt/meta/factory.hpp>
+#include <entt/meta/meta.hpp>
+#include "types.h"
+
+position create_position(int x, int y) {
+    return position{x, y};
+}
+
+void set_up() {
+    entt::meta<double>().import("double"_hs);
+    entt::meta<int>().import("int"_hs);
+
+    entt::meta<double>().conv<int>();
+
+    entt::meta<position>()
+            .type("position"_hs)
+            .ctor<&create_position>()
+            .data<&position::x>("x"_hs)
+            .data<&position::y>("y"_hs);
+
+    entt::meta<velocity>()
+            .type("velocity"_hs)
+            .ctor<>()
+            .data<&velocity::dx>("dx"_hs)
+            .data<&velocity::dy>("dy"_hs);
+}
+
+void tear_down() {
+    entt::meta<position>().reset();
+    entt::meta<velocity>().reset();
+}
+
+CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
+    switch (operation) {
+    case CR_LOAD:
+        entt::meta_ctx::bind(static_cast<userdata *>(ctx->userdata)->ctx);
+        set_up();
+        break;
+    case CR_STEP:
+        static_cast<userdata *>(ctx->userdata)->any = 42;
+        break;
+    case CR_UNLOAD:
+        tear_down();
+        break;
+    case CR_CLOSE:
+        // nothing to do here, this is only a test.
+        break;
+    }
+
+    return 0;
+}

@@ -1917,7 +1917,7 @@ TEST_F(Meta, PropertiesAndCornerCases) {
 }
 
 TEST_F(Meta, Reset) {
-    ASSERT_NE(entt::internal::meta_info<>::node, nullptr);
+    ASSERT_NE(*entt::internal::meta_info<>::context(), nullptr);
 
     entt::meta<char>().reset();
     entt::meta<concrete_type>().reset();
@@ -1935,7 +1935,7 @@ TEST_F(Meta, Reset) {
     entt::meta<another_abstract_type>().reset();
     entt::meta<unsigned int>().reset();
 
-    ASSERT_EQ(entt::internal::meta_info<>::node, nullptr);
+    ASSERT_EQ(*entt::internal::meta_info<>::context(), nullptr);
 
     ASSERT_FALSE(entt::resolve("char"_hs));
     ASSERT_FALSE(entt::resolve("base"_hs));
@@ -1949,7 +1949,7 @@ TEST_F(Meta, Reset) {
     ASSERT_FALSE(entt::resolve("another_abstract_type"_hs));
     ASSERT_FALSE(entt::resolve("concrete"_hs));
 
-    ASSERT_EQ(entt::internal::meta_info<>::node, nullptr);
+    ASSERT_EQ(*entt::internal::meta_info<>::context(), nullptr);
 
     Meta::SetUpAfterUnregistration();
     entt::meta_any any{42.};
