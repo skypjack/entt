@@ -7,6 +7,8 @@ struct ENTT_API message {
     int payload;
 };
 
-struct ENTT_API event: message {};
+struct ENTT_API event {
+    int payload;
+};
 
 #endif // ENTT_LIB_DISPATCHER_TYPES_H

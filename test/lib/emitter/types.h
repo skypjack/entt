@@ -12,6 +12,8 @@ struct ENTT_API message {
     int payload;
 };
 
-struct ENTT_API event: message {};
+struct ENTT_API event {
+    int payload;
+};
 
 #endif // ENTT_LIB_EMITTER_TYPES_H

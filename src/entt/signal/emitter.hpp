@@ -196,7 +196,7 @@ public:
      */
     template<typename Event, typename... Args>
     void publish(Args &&... args) {
-        assure<Event>().publish({ std::forward<Args>(args)... }, *static_cast<Derived *>(this));
+        assure<Event>().publish(Event{std::forward<Args>(args)...}, *static_cast<Derived *>(this));
     }
 
     /**

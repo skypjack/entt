@@ -67,7 +67,7 @@ class dispatcher {
 
         template<typename... Args>
         void trigger(Args &&... args) {
-            signal.publish({ std::forward<Args>(args)... });
+            signal.publish(Event{std::forward<Args>(args)...});
         }
 
         template<typename... Args>
