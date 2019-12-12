@@ -6,11 +6,11 @@
 #include <memory>
 #include <cstddef>
 #include <utility>
+#include <iterator>
 #include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/attribute.h"
-#include "../core/family.hpp"
+#include "../core/type_info.hpp"
 #include "sigh.hpp"
 
 
@@ -31,15 +31,11 @@ namespace entt {
  * crashes.
  */
 class dispatcher {
-    struct ENTT_API dispatcher_event_family;
-
-    template<typename Type>
-    using event_family = family<Type, dispatcher_event_family>;
-
     struct basic_pool {
         virtual ~basic_pool() = default;
         virtual void publish() = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
+        virtual ENTT_ID_TYPE id() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
@@ -75,6 +71,10 @@ class dispatcher {
             events.emplace_back(std::forward<Args>(args)...);
         }
 
+        ENTT_ID_TYPE id() const ENTT_NOEXCEPT override {
+            return type_id_v<Event>;
+        }
+
     private:
         signal_type signal{};
         std::vector<Event> events;
@@ -82,17 +82,19 @@ class dispatcher {
 
     template<typename Event>
     pool_handler<Event> & assure() {
-        const auto etype = event_family<Event>::type();
+        static const auto index = std::distance(pools.cbegin(), std::find_if(pools.cbegin(), pools.cend(), [](auto &&curr) {
+            return curr && curr->id() == type_id_v<Event>;
+        }));
 
-        if(!(etype < pools.size())) {
-            pools.resize(etype+1);
+        if(!(index < pools.size())) {
+            pools.resize(index+1);
         }
 
-        if(!pools[etype]) {
-            pools[etype] = std::make_unique<pool_handler<Event>>();
+        if(!pools[index]) {
+            pools[index] = std::make_unique<pool_handler<Event>>();
         }
 
-        return static_cast<pool_handler<Event> &>(*pools[etype]);
+        return static_cast<pool_handler<Event> &>(*pools[index]);
     }
 
 public:
