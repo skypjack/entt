@@ -52,15 +52,15 @@ TEST(HashedString, ToValue) {
 
     const char *foobar = "foobar";
 
-    ASSERT_EQ(entt::hashed_string::to_value(foobar), 0xbf9cf968);
+    ASSERT_EQ(entt::hashed_string::value(foobar), 0xbf9cf968);
     // how would you test a constexpr otherwise?
-    (void)std::integral_constant<hash_type, entt::hashed_string::to_value("quux")>{};
+    (void)std::integral_constant<hash_type, entt::hashed_string::value("quux")>{};
 }
 
 TEST(HashedString, StringView) {
     std::string str{"__foobar__"};
     std::string_view view{str.data()+2, 6};
-    ASSERT_EQ(entt::hashed_string::to_value(view.data(), view.size()), 0xbf9cf968);
+    ASSERT_EQ(entt::hashed_string::value(view.data(), view.size()), 0xbf9cf968);
 }
 
 TEST(HashedWString, Functionalities) {
@@ -111,15 +111,15 @@ TEST(HashedWString, ToValue) {
 
     const wchar_t *foobar = L"foobar";
 
-    ASSERT_EQ(entt::hashed_wstring::to_value(foobar), 0xbf9cf968);
+    ASSERT_EQ(entt::hashed_wstring::value(foobar), 0xbf9cf968);
     // how would you test a constexpr otherwise?
-    (void)std::integral_constant<hash_type, entt::hashed_wstring::to_value(L"quux")>{};
+    (void)std::integral_constant<hash_type, entt::hashed_wstring::value(L"quux")>{};
 }
 
 TEST(HashedWString, StringView) {
     std::wstring str{L"__foobar__"};
     std::wstring_view view{str.data()+2, 6};
-    ASSERT_EQ(entt::hashed_wstring::to_value(view.data(), view.size()), 0xbf9cf968);
+    ASSERT_EQ(entt::hashed_wstring::value(view.data(), view.size()), 0xbf9cf968);
 }
 
 TEST(BasicHashedString, DeductionGuide) {

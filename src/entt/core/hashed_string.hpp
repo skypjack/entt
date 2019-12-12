@@ -94,7 +94,7 @@ public:
      * @return The numeric representation of the string.
      */
     template<std::size_t N>
-    static constexpr hash_type to_value(const value_type (&str)[N]) ENTT_NOEXCEPT {
+    static constexpr hash_type value(const value_type (&str)[N]) ENTT_NOEXCEPT {
         return helper(traits_type::offset, str);
     }
 
@@ -103,7 +103,7 @@ public:
      * @param wrapper Helps achieving the purpose by relying on overloading.
      * @return The numeric representation of the string.
      */
-    static hash_type to_value(const_wrapper wrapper) ENTT_NOEXCEPT {
+    static hash_type value(const_wrapper wrapper) ENTT_NOEXCEPT {
         return helper(traits_type::offset, wrapper.str);
     }
 
@@ -113,7 +113,7 @@ public:
      * @param size Length of the string to hash.
      * @return The numeric representation of the string.
      */
-    static hash_type to_value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
+    static hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
         ENTT_ID_TYPE partial{traits_type::offset};
         while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
         return partial;
