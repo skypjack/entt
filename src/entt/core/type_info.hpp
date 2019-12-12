@@ -16,8 +16,6 @@ namespace entt {
  */
 template<typename... Type>
 struct type_id {
-    static_assert(sizeof...(Type) == ((bool{true || sizeof(Type)}) + ...));
-
 #if defined _MSC_VER
     /**
      * @brief Returns the numeric representation of a given type.
