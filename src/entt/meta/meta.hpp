@@ -7,8 +7,8 @@
 #include <functional>
 #include <type_traits>
 #include "../config/config.h"
+#include "../core/attribute.h"
 #include "../core/type_traits.hpp"
-#include "../lib/attribute.h"
 
 
 namespace entt {

@@ -9,8 +9,8 @@
 #include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
+#include "../core/attribute.h"
 #include "../core/family.hpp"
-#include "../lib/attribute.h"
 #include "sigh.hpp"
 
 

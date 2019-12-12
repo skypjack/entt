@@ -1,7 +1,7 @@
 #ifndef ENTT_LIB_META_TYPES_H
 #define ENTT_LIB_META_TYPES_H
 
-#include <entt/lib/attribute.h>
+#include <entt/core/attribute.h>
 
 struct ENTT_API position {
     int x{};

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <entt/lib/attribute.h>
+#include <entt/core/attribute.h>
 #include <entt/signal/emitter.hpp>
 #include "types.h"
 

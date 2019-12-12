@@ -3,7 +3,7 @@
 
 
 #include "../config/config.h"
-#include "../lib/attribute.h"
+#include "../core/attribute.h"
 
 
 namespace entt {

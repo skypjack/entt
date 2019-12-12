@@ -1,4 +1,4 @@
-#include <entt/lib/attribute.h>
+#include <entt/core/attribute.h>
 #include <entt/signal/dispatcher.hpp>
 #include "types.h"
 

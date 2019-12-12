@@ -10,8 +10,8 @@
 #include <vector>
 #include <list>
 #include "../config/config.h"
+#include "../core/attribute.h"
 #include "../core/family.hpp"
-#include "../lib/attribute.h"
 
 
 namespace entt {

@@ -1,5 +1,5 @@
+#include <entt/core/attribute.h>
 #include <entt/entity/registry.hpp>
-#include <entt/lib/attribute.h>
 #include "types.h"
 
 ENTT_API entt::component int_type() {

@@ -1,7 +1,7 @@
 #ifndef ENTT_LIB_EMITTER_TYPES_H
 #define ENTT_LIB_EMITTER_TYPES_H
 
-#include <entt/lib/attribute.h>
+#include <entt/core/attribute.h>
 #include <entt/signal/emitter.hpp>
 
 struct ENTT_API test_emitter

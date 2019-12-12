@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <entt/lib/attribute.h>
+#include <entt/core/attribute.h>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include "types.h"

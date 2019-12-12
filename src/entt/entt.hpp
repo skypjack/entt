@@ -1,4 +1,5 @@
 #include "core/algorithm.hpp"
+#include "core/attribute.h"
 #include "core/family.hpp"
 #include "core/hashed_string.hpp"
 #include "core/ident.hpp"
@@ -17,7 +18,6 @@
 #include "entity/storage.hpp"
 #include "entity/utility.hpp"
 #include "entity/view.hpp"
-#include "lib/attribute.h"
 #include "locator/locator.hpp"
 #include "meta/factory.hpp"
 #include "meta/meta.hpp"
