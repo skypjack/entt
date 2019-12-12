@@ -10,8 +10,7 @@
 #include <vector>
 #include <list>
 #include "../config/config.h"
-#include "../core/attribute.h"
-#include "../core/family.hpp"
+#include "../core/type_info.hpp"
 
 
 namespace entt {
@@ -40,15 +39,11 @@ namespace entt {
  */
 template<typename Derived>
 class emitter {
-    struct ENTT_API emitter_event_family;
-
-    template<typename Type>
-    using event_family = family<Type, emitter_event_family>;
-
     struct basic_pool {
         virtual ~basic_pool() = default;
         virtual bool empty() const ENTT_NOEXCEPT = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
+        virtual ENTT_ID_TYPE id() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
@@ -112,6 +107,10 @@ class emitter {
             on_list.remove_if([](auto &&element) { return element.first; });
         }
 
+        ENTT_ID_TYPE id() const ENTT_NOEXCEPT override {
+            return type_id_v<Event>;
+        }
+
     private:
         bool publishing{false};
         container_type once_list{};
@@ -120,17 +119,19 @@ class emitter {
 
     template<typename Event>
     const pool_handler<Event> & assure() const {
-        const auto etype = event_family<std::decay_t<Event>>::type();
+        static const auto index = std::distance(pools.cbegin(), std::find_if(pools.cbegin(), pools.cend(), [](auto &&curr) {
+            return curr && curr->id() == type_id_v<Event>;
+        }));
 
-        if(!(etype < pools.size())) {
-            pools.resize(etype+1);
+        if(!(index < pools.size())) {
+            pools.resize(index+1);
         }
 
-        if(!pools[etype]) {
-            pools[etype] = std::make_unique<pool_handler<Event>>();
+        if(!pools[index]) {
+            pools[index] = std::make_unique<pool_handler<Event>>();
         }
 
-        return static_cast<const pool_handler<Event> &>(*pools[etype]);
+        return static_cast<const pool_handler<Event> &>(*pools[index]);
     }
 
     template<typename Event>

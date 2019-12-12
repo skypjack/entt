@@ -26,9 +26,8 @@
 * Mission: get rid of named types
   - make it possible to use custom generators (eg for plugins)
     * dispatcher, emitter, registry
-      - generators as arguments to family::type overloads
-      - generators to constructors
-      - bind identifiers by name (as for meta)
+    * dispatcher/emitter: id shouldn't be part of the class (upcoming feature discard will create a hole otherwise)
+    * type_id_enabled and fallback on old-fashioned families otherwise
   - reintroduce old-fashion family and add a new family-like thing with generators
   - families should be defined as out-of-class to guarantee the same identifiers for the same types
   - update doc: family, dispatcher, emitter, registry, meta, across boundaries
