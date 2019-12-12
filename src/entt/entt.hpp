@@ -4,6 +4,7 @@
 #include "core/hashed_string.hpp"
 #include "core/ident.hpp"
 #include "core/monostate.hpp"
+#include "core/type_info.hpp"
 #include "core/type_traits.hpp"
 #include "core/utility.hpp"
 #include "entity/actor.hpp"

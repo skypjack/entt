@@ -131,6 +131,7 @@ SETUP_BASIC_TEST(family entt/core/family.cpp)
 SETUP_BASIC_TEST(hashed_string entt/core/hashed_string.cpp)
 SETUP_BASIC_TEST(ident entt/core/ident.cpp)
 SETUP_BASIC_TEST(monostate entt/core/monostate.cpp)
+SETUP_BASIC_TEST(type_info entt/core/type_info.cpp)
 SETUP_BASIC_TEST(type_traits entt/core/type_traits.cpp)
 SETUP_BASIC_TEST(utility entt/core/utility.cpp)
 

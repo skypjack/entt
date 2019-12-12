@@ -51,6 +51,16 @@ cc_test(
 )
 
 cc_test(
+    name = "type_info",
+    srcs = ["type_info.cpp"],
+    copts = entt_copts,
+    deps = [
+        "//:entt",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "type_traits",
     srcs = ["type_traits.cpp"],
     copts = entt_copts,
