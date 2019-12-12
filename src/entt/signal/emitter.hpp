@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 #include <list>
+#include <iterator>
 #include "../config/config.h"
 #include "../core/type_info.hpp"
 
