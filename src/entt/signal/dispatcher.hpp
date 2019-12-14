@@ -6,7 +6,6 @@
 #include <memory>
 #include <cstddef>
 #include <utility>
-#include <iterator>
 #include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
@@ -82,16 +81,16 @@ class dispatcher {
 
     template<typename Event>
     pool_handler<Event> & assure() {
-        static const auto index = std::distance(pools.cbegin(), std::find_if(pools.cbegin(), pools.cend(), [](auto &&curr) {
-            return curr && curr->id() == type_id_v<Event>;
-        }));
+        static std::size_t index{pools.size()};
 
-        if(!(index < pools.size())) {
-            pools.resize(index+1);
-        }
+        if(!(index < pools.size()) || pools[index]->id() != type_id_v<Event>) {
+            index = std::find_if(pools.cbegin(), pools.cend(), [](auto &&cpool) {
+                return cpool->id() == type_id_v<Event>;
+            }) - pools.begin();
 
-        if(!pools[index]) {
-            pools[index] = std::make_unique<pool_handler<Event>>();
+            if(index == pools.size()) {
+                pools.push_back(std::make_unique<pool_handler<Event>>());
+            }
         }
 
         return static_cast<pool_handler<Event> &>(*pools[index]);
@@ -190,9 +189,7 @@ public:
     void discard() ENTT_NOEXCEPT {
         if constexpr(sizeof...(Event) == 0) {
             std::for_each(pools.begin(), pools.end(), [](auto &&cpool) {
-                if(cpool) {
-                    cpool->clear();
-                }
+                cpool->clear();
             });
         } else {
             (assure<std::decay_t<Event>>().clear(), ...);
@@ -222,9 +219,7 @@ public:
      */
     void update() const {
         for(auto pos = pools.size(); pos; --pos) {
-            if(auto &cpool = pools[pos-1]; cpool) {
-                cpool->publish();
-            }
+            pools[pos-1]->publish();
         }
     }
 

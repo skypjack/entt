@@ -120,19 +120,19 @@ class emitter {
 
     template<typename Event>
     const pool_handler<Event> & assure() const {
-        static const auto index = std::distance(pools.cbegin(), std::find_if(pools.cbegin(), pools.cend(), [](auto &&curr) {
-            return curr && curr->id() == type_id_v<Event>;
-        }));
+        static std::size_t index{pools.size()};
 
-        if(!(index < pools.size())) {
-            pools.resize(index+1);
+        if(!(index < pools.size()) || pools[index]->id() != type_id_v<Event>) {
+            index = std::find_if(pools.cbegin(), pools.cend(), [](auto &&cpool) {
+                return cpool->id() == type_id_v<Event>;
+            }) - pools.begin();
+
+            if(index == pools.size()) {
+                pools.push_back(std::make_unique<pool_handler<Event>>());
+            }
         }
 
-        if(!pools[index]) {
-            pools[index] = std::make_unique<pool_handler<Event>>();
-        }
-
-        return static_cast<const pool_handler<Event> &>(*pools[index]);
+        return static_cast<pool_handler<Event> &>(*pools[index]);
     }
 
     template<typename Event>
@@ -286,9 +286,7 @@ public:
      */
     void clear() ENTT_NOEXCEPT {
         std::for_each(pools.begin(), pools.end(), [](auto &&cpool) {
-            if(cpool) {
-                cpool->clear();
-            }
+            cpool->clear();
         });
     }
 
@@ -308,7 +306,7 @@ public:
      */
     bool empty() const ENTT_NOEXCEPT {
         return std::all_of(pools.cbegin(), pools.cend(), [](auto &&cpool) {
-            return !cpool || cpool->empty();
+            return cpool->empty();
         });
     }
 
