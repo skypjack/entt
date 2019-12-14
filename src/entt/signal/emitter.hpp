@@ -120,6 +120,7 @@ class emitter {
 
     template<typename Event>
     const pool_handler<Event> & assure() const {
+        static_assert(std::is_same_v<Event, std::decay_t<Event>>);
         static std::size_t index{pools.size()};
 
         if(!(index < pools.size()) || pools[index]->id() != type_id_v<Event>) {

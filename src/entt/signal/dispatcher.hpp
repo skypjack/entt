@@ -81,6 +81,7 @@ class dispatcher {
 
     template<typename Event>
     pool_handler<Event> & assure() {
+        static_assert(std::is_same_v<Event, std::decay_t<Event>>);
         static std::size_t index{pools.size()};
 
         if(!(index < pools.size()) || pools[index]->id() != type_id_v<Event>) {
@@ -192,7 +193,7 @@ public:
                 cpool->clear();
             });
         } else {
-            (assure<std::decay_t<Event>>().clear(), ...);
+            (assure<Event>().clear(), ...);
         }
     }
 
