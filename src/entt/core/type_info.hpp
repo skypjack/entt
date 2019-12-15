@@ -14,7 +14,7 @@ namespace entt {
  * @brief Types identifiers.
  * @tparam Type Type for which to generate an identifier.
  */
-template<typename... Type>
+template<typename Type, typename = std::void_t<>>
 struct type_id {
 #if defined _MSC_VER
     /**
@@ -22,7 +22,6 @@ struct type_id {
      * @return The numeric representation of the given type.
      */
     static constexpr ENTT_ID_TYPE value() ENTT_NOEXCEPT {
-        static_assert(std::is_same_v<Type..., Type...>);
         return entt::hashed_string{__FUNCSIG__};
     }
 #elif defined __GNUC__
@@ -31,7 +30,6 @@ struct type_id {
      * @return The numeric representation of the given type.
      */
     static constexpr ENTT_ID_TYPE value() ENTT_NOEXCEPT {
-        static_assert(std::is_same_v<Type..., Type...>);
         return entt::hashed_string{__PRETTY_FUNCTION__};
     }
 #endif
