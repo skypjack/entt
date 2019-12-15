@@ -17,6 +17,11 @@ Type get(Type &prop) {
     return prop;
 }
 
+template<typename Type>
+Type sqr(Type value) {
+    return value * value;
+}
+
 enum class props {
     prop_int,
     prop_value,
@@ -103,6 +108,9 @@ struct func_type {
     int v(int v) const { return (value = v); }
     int & a() const { return value; }
 
+    template<typename Type>
+    Type c(Type a, Type b) { return a * b; }
+
     inline static int value = 0;
 };
 
@@ -114,6 +122,11 @@ struct setter_getter_type {
 
     int setter_with_ref(const int &val) { return value = val; }
     const int & getter_with_ref() { return value; }
+    
+    template<typename Type>
+    Type template_setter(Type val) { return static_cast<Type>(value = static_cast<int>(val)); }
+    template<typename Type>
+    Type template_getter() { return static_cast<Type>(value); }
 
     static int static_setter(setter_getter_type &type, int value) { return type.value = value; }
     static int static_getter(const setter_getter_type &type) { return type.value; }
@@ -151,7 +164,8 @@ struct Meta: ::testing::Test {
         entt::meta<char>()
                 .type("char"_hs)
                     .prop(props::prop_int, 42)
-                .data<&set<char>, &get<char>>("value"_hs);
+                .data<&set<char>, &get<char>>("value"_hs)
+                .func<&sqr<char>>("sqr"_hs);
 
         entt::meta<props>()
                 .data<props::prop_bool>("prop_bool"_hs)
@@ -223,14 +237,16 @@ struct Meta: ::testing::Test {
                 .func<&func_type::k>("k"_hs)
                     .prop(props::prop_bool, false)
                 .func<&func_type::v, entt::as_void_t>("v"_hs)
-                .func<&func_type::a, entt::as_alias_t>("a"_hs);
+                .func<&func_type::a, entt::as_alias_t>("a"_hs)
+                .func<&func_type::c<int>>("c"_hs);
 
         entt::meta<setter_getter_type>()
                 .type("setter_getter"_hs)
                 .data<&setter_getter_type::static_setter, &setter_getter_type::static_getter>("x"_hs)
                 .data<&setter_getter_type::setter, &setter_getter_type::getter>("y"_hs)
                 .data<&setter_getter_type::static_setter, &setter_getter_type::getter>("z"_hs)
-                .data<&setter_getter_type::setter_with_ref, &setter_getter_type::getter_with_ref>("w"_hs);
+                .data<&setter_getter_type::setter_with_ref, &setter_getter_type::getter_with_ref>("w"_hs)
+                .data<&setter_getter_type::template_setter<double>, &setter_getter_type::template_getter<double>>("a"_hs);
 
         entt::meta<an_abstract_type>()
                 .type("an_abstract_type"_hs)
@@ -1372,6 +1388,22 @@ TEST_F(Meta, MetaDataSetterGetterMixed) {
     ASSERT_EQ(data.get(instance).cast<int>(), 42);
 }
 
+TEST_F(Meta, MetaDataSetterGetterAsTemplateMemberFunctions) {
+    auto data = entt::resolve<setter_getter_type>().data("a"_hs);
+    setter_getter_type instance{};
+
+    ASSERT_TRUE(data);
+    ASSERT_NE(data, entt::meta_data{});
+    ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
+    ASSERT_EQ(data.type(), entt::resolve<double>());
+    ASSERT_EQ(data.identifier(), "a"_hs);
+    ASSERT_FALSE(data.is_const());
+    ASSERT_FALSE(data.is_static());
+    ASSERT_DOUBLE_EQ(data.get(instance).cast<double>(), 0.0);
+    ASSERT_TRUE(data.set(instance, 42.3));
+    ASSERT_DOUBLE_EQ(data.get(instance).cast<double>(), 42.0);
+}
+
 TEST_F(Meta, MetaDataArrayStatic) {
     auto data = entt::resolve<array_type>().data("global"_hs);
 
@@ -1696,6 +1728,30 @@ TEST_F(Meta, MetaFuncByReference) {
     ASSERT_EQ(value, 8);
 }
 
+TEST_F(Meta, MetaFuncTemplate) {
+    auto func = entt::resolve<func_type>().func("c"_hs);
+    func_type instance{};
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
+    ASSERT_EQ(func.identifier(), "c"_hs);
+    ASSERT_EQ(func.size(), entt::meta_func::size_type{ 2 });
+    ASSERT_FALSE(func.is_const());
+    ASSERT_FALSE(func.is_static());
+    ASSERT_EQ(func.ret(), entt::resolve<int>());
+    ASSERT_EQ(func.arg(entt::meta_func::size_type{ 0 }), entt::resolve<int>());
+    ASSERT_EQ(func.arg(entt::meta_func::size_type{ 1 }), entt::resolve<int>());
+    ASSERT_FALSE(func.arg(entt::meta_func::size_type{ 2 }));
+
+    auto any = func.invoke(instance, 5, 6);
+    auto empty = func.invoke(instance, 'c');
+
+    ASSERT_FALSE(empty);
+    ASSERT_TRUE(any);
+    ASSERT_EQ(any.type(), entt::resolve<int>());
+    ASSERT_EQ(any.cast<int>(), 30);
+}
+
 TEST_F(Meta, MetaType) {
     auto type = entt::resolve<derived_type>();
 
@@ -1811,7 +1867,7 @@ TEST_F(Meta, MetaTypeFunc) {
         ++counter;
     });
 
-    ASSERT_EQ(counter, 8);
+    ASSERT_EQ(counter, 9);
     ASSERT_TRUE(type.func("f1"_hs));
 }
 
