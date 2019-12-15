@@ -275,7 +275,7 @@ public:
      * @tparam Event Type of event to reset.
      */
     template<typename Event>
-    void clear() ENTT_NOEXCEPT {
+    void clear() {
         assure<Event>().clear();
     }
 
@@ -297,7 +297,7 @@ public:
      * @return True if there are no listeners registered, false otherwise.
      */
     template<typename Event>
-    bool empty() const ENTT_NOEXCEPT {
+    bool empty() const {
         return assure<Event>().empty();
     }
 

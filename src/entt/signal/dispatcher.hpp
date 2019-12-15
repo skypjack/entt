@@ -116,7 +116,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Event>
-    auto sink() ENTT_NOEXCEPT {
+    auto sink() {
         return assure<Event>().sink();
     }
 
@@ -187,7 +187,7 @@ public:
      * @tparam Event Type of events to discard.
      */
     template<typename... Event>
-    void discard() ENTT_NOEXCEPT {
+    void discard() {
         if constexpr(sizeof...(Event) == 0) {
             std::for_each(pools.begin(), pools.end(), [](auto &&cpool) {
                 cpool->clear();
