@@ -126,7 +126,7 @@ class emitter {
         if(!(index < pools.size()) || pools[index]->id() != type_id_v<Event>) {
             index = std::find_if(pools.cbegin(), pools.cend(), [](auto &&cpool) {
                 return cpool->id() == type_id_v<Event>;
-            }) - pools.begin();
+            }) - pools.cbegin();
 
             if(index == pools.size()) {
                 pools.push_back(std::make_unique<pool_handler<Event>>());

@@ -4,24 +4,8 @@
 #include <entt/entity/registry.hpp>
 #include "types.h"
 
-ENTT_API entt::component int_type();
-ENTT_API entt::component char_type();
-
 ENTT_API void update_position(int, entt::registry &);
 ENTT_API void assign_velocity(int, entt::registry &);
-
-TEST(Lib, Types) {
-    entt::registry registry;
-
-    ASSERT_EQ(registry.type<int>(), registry.type<const int>());
-    ASSERT_EQ(registry.type<char>(), registry.type<const char>());
-
-    ASSERT_EQ(registry.type<int>(), int_type());
-    ASSERT_EQ(registry.type<char>(), char_type());
-
-    ASSERT_EQ(registry.type<const char>(), char_type());
-    ASSERT_EQ(registry.type<const int>(), int_type());
-}
 
 TEST(Lib, Registry) {
     entt::registry registry;

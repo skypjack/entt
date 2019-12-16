@@ -19,6 +19,7 @@
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
 * sparse set: there exists an alternative to paginated sparse arrays?
 * see warning (vs2017 only): d:\a\entt\entt\src\entt\entity\registry.hpp(108)
+* remove duktape example (and eventually provide a new one)?
 * registry
   - ::assure -> pool_type<T> &
   - ::group improve, reduce code
@@ -26,6 +27,10 @@
 * Mission: get rid of named types
   - make it possible to use custom generators (eg for plugins)
     * registry
+    * remove entt::component
+    * clean-up superfluous to_integer
+    * ENTT_ID_TYPE id() (eg dispatcher) can be a data member rather than a virtual function
+    * define a kind of assure also for context variables
     * meta: use type_id, remove import, everything should work transparently
     * type_id_enabled and fallback on old-fashioned families otherwise
     * add discard pool functionality (+ test)

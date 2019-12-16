@@ -78,12 +78,6 @@ TEST(Registry, Context) {
     ASSERT_EQ(registry.try_ctx<float>(), nullptr);
 }
 
-TEST(Registry, Types) {
-    entt::registry registry;
-    ASSERT_EQ(registry.type<int>(), registry.type<int>());
-    ASSERT_NE(registry.type<double>(), registry.type<int>());
-}
-
 TEST(Registry, Functionalities) {
     entt::registry registry;
 
@@ -1540,9 +1534,7 @@ TEST(Registry, Constness) {
     entt::registry registry;
 
     ASSERT_TRUE((std::is_same_v<decltype(registry.assign<int>({})), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(registry.assign<const int>({})), int &>));
     ASSERT_TRUE((std::is_same_v<decltype(registry.assign<empty_type>({})), empty_type>));
-    ASSERT_TRUE((std::is_same_v<decltype(registry.assign<const empty_type>({})), empty_type>));
 
     ASSERT_TRUE((std::is_same_v<decltype(registry.get<int>({})), int &>));
     ASSERT_TRUE((std::is_same_v<decltype(registry.get<int, char>({})), std::tuple<int &, char &>>));

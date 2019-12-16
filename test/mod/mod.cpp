@@ -4,6 +4,7 @@
 #include <string>
 #include <duktape.h>
 #include <gtest/gtest.h>
+#include <entt/core/type_info.hpp>
 #include <entt/entity/registry.hpp>
 
 template<typename Type>
@@ -122,9 +123,6 @@ duk_ret_t get(duk_context *ctx, entt::registry &registry) {
 }
 
 class duktape_registry {
-    // I'm pretty sure I won't have more than 99 components in the example
-    static constexpr ENTT_ID_TYPE udef = 100;
-
     struct func_map {
         using func_type = duk_ret_t(*)(duk_context *, entt::registry &);
 
@@ -136,7 +134,7 @@ class duktape_registry {
 
     template<typename... Comp>
     void reg() {
-        ((func[to_integer(registry.type<Comp>())] = {
+        ((func[entt::type_id_v<Comp>] = {
                 &::set<Comp>,
                 &::unset<Comp>,
                 &::has<Comp>,
@@ -162,13 +160,11 @@ class duktape_registry {
         auto &registry = dreg.registry;
         auto type = duk_require_uint(ctx, 1);
 
-        if(type >= udef) {
-            type = to_integer(registry.type<duktape_runtime>());
-        }
+        const auto it = func.find(type);
 
-        assert(func.find(type) != func.cend());
-
-        return (func[type].*Op)(ctx, registry);
+        return (it == func.cend())
+                ? (func[entt::type_id_v<duktape_runtime>].*Op)(ctx, registry)
+                : (it->second.*Op)(ctx, registry);
     }
 
 public:
@@ -179,7 +175,7 @@ public:
     }
 
     static duk_ret_t identifier(duk_context *ctx) {
-        static auto next = udef;
+        static ENTT_ID_TYPE next{};
         duk_push_uint(ctx, next++);
         return 1;
     }
@@ -210,7 +206,6 @@ public:
     static duk_ret_t entities(duk_context *ctx) {
         const duk_idx_t nargs = duk_get_top(ctx);
         auto &dreg = instance(ctx);
-        duk_uarridx_t pos = 0;
 
         duk_push_array(ctx);
 
@@ -220,18 +215,19 @@ public:
         for(duk_idx_t arg = 0; arg < nargs; arg++) {
             auto type = duk_require_uint(ctx, arg);
 
-            if(type < udef) {
-                components.push_back(entt::component{type});
-            } else {
+            if(dreg.func.find(type) == dreg.func.cend()) {
                 if(runtime.empty()) {
-                    components.push_back(dreg.registry.type<duktape_runtime>());
+                    components.push_back(entt::component{entt::type_id_v<duktape_runtime>});
                 }
 
                 runtime.push_back(entt::component{type});
+            } else {
+                components.push_back(entt::component{type});
             }
         }
 
         auto view = dreg.registry.runtime_view(components.cbegin(), components.cend());
+        duk_uarridx_t pos = 0;
 
         for(const auto entity: view) {
             if(runtime.empty()) {
@@ -269,15 +265,15 @@ const duk_function_list_entry js_duktape_registry_methods[] = {
     { nullptr, nullptr, 0 }
 };
 
-void export_types(duk_context *context, entt::registry &registry) {
-    auto export_type = [idx = duk_push_object(context)](auto *ctx, auto &reg, auto type, const auto *name) {
+void export_types(duk_context *context) {
+    auto export_type = [idx = duk_push_object(context)](auto *ctx, auto type, const auto *name) {
         duk_push_string(ctx, name);
-        duk_push_uint(ctx, to_integer(reg.template type<typename decltype(type)::type>()));
+        duk_push_uint(ctx, entt::type_id_v<typename decltype(type)::type>);
         duk_def_prop(ctx, idx, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE);
     };
 
-    export_type(context, registry, tag<position>{}, "position");
-    export_type(context, registry, tag<renderable>{}, "renderable");
+    export_type(context, tag<position>{}, "position");
+    export_type(context, tag<renderable>{}, "renderable");
 
     duk_put_global_string(context, "Types");
 }
@@ -302,7 +298,7 @@ TEST(Mod, Duktape) {
         FAIL();
     }
 
-    export_types(ctx, registry);
+    export_types(ctx);
     export_duktape_registry(ctx, dreg);
 
     const char *s0 = ""

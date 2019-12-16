@@ -11,9 +11,8 @@
 #include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/family.hpp"
 #include "../core/algorithm.hpp"
-#include "../core/attribute.h"
+#include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/sigh.hpp"
 #include "runtime_view.hpp"
@@ -42,15 +41,6 @@ namespace entt {
  */
 template<typename Entity>
 class basic_registry {
-    struct ENTT_API registry_context_family;
-    struct ENTT_API registry_component_family;
-
-    template<typename Type>
-    using context_family = family<Type, registry_context_family>;
-
-    template<typename Type>
-    using component_family = family<Type, registry_component_family>;
-
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     template<typename Component>
@@ -157,6 +147,7 @@ class basic_registry {
     };
 
     struct pool_data {
+        ENTT_ID_TYPE id;
         std::unique_ptr<sparse_set<Entity>> pool;
         void(* assure)(basic_registry &, const sparse_set<Entity> &);
         void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
@@ -166,23 +157,28 @@ class basic_registry {
     struct group_data {
         std::size_t extent[3];
         std::unique_ptr<void, void(*)(void *)> group;
-        bool(* owned)(const component) ENTT_NOEXCEPT;
-        bool(* get)(const component) ENTT_NOEXCEPT;
-        bool(* exclude)(const component) ENTT_NOEXCEPT;
+        bool(* owned)(const ENTT_ID_TYPE) ENTT_NOEXCEPT;
+        bool(* get)(const ENTT_ID_TYPE) ENTT_NOEXCEPT;
+        bool(* exclude)(const ENTT_ID_TYPE) ENTT_NOEXCEPT;
     };
 
     struct basic_variable {
         virtual ~basic_variable() = default;
+        virtual ENTT_ID_TYPE id() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Type>
     struct variable_handler: basic_variable {
+        Type value;
+
         template<typename... Args>
         variable_handler(Args &&... args)
             : value{std::forward<Args>(args)...}
         {}
 
-        Type value;
+        ENTT_ID_TYPE id() const ENTT_NOEXCEPT override {
+            return type_id_v<Type>;
+        }
     };
 
     auto generate() {
@@ -214,31 +210,37 @@ class basic_registry {
 
     template<typename Component, typename... Args>
     const pool_type<Component> * assure(Args &&... args) const {
-        const auto ctype = to_integer(type<Component>());
+        static_assert(std::is_same_v<Component, std::decay_t<Component>>);
+        static std::size_t index{pools.size()};
 
-        if(!(ctype < pools.size())) {
-            pools.resize(ctype+1);
-        }
+        if(!(index < pools.size()) || pools[index].id != type_id_v<Component>) {
+            index = std::find_if(pools.cbegin(), pools.cend(), [](auto &&cpool) {
+                return cpool.id == type_id_v<Component>;
+            }) - pools.cbegin();
 
-        if(!pools[ctype].pool) {
-            pools[ctype].pool = std::make_unique<pool_type<Component>>(std::forward<Args>(args)...);
+            if(index == pools.size()) {
+                auto &&pdata = pools.emplace_back();
 
-            pools[ctype].remove = [](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
-                static_cast<pool_type<Component> &>(cpool).remove(owner, entt);
-            };
+                pdata.id = type_id_v<Component>;
+                pdata.pool = std::make_unique<pool_type<Component>>(std::forward<Args>(args)...);
 
-            if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
-                pools[ctype].assure = [](basic_registry &other, const sparse_set<Entity> &cpool) {
-                    other.assure<Component>(static_cast<const pool_type<Component> &>(cpool));
+                pdata.remove = [](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
+                    static_cast<pool_type<Component> &>(cpool).remove(owner, entt);
                 };
 
-                pools[ctype].stomp = [](basic_registry &other, const Entity dst, const sparse_set<Entity> &cpool, const Entity src) {
-                    other.assign_or_replace<Component>(dst, static_cast<const pool_type<Component> &>(cpool).get(src));
-                };
+                if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
+                    pdata.assure = [](basic_registry &other, const sparse_set<Entity> &cpool) {
+                        other.assure<Component>(static_cast<const pool_type<Component> &>(cpool));
+                    };
+
+                    pdata.stomp = [](basic_registry &other, const Entity dst, const sparse_set<Entity> &cpool, const Entity src) {
+                        other.assign_or_replace<Component>(dst, static_cast<const pool_type<Component> &>(cpool).get(src));
+                    };
+                }
             }
         }
 
-        return static_cast<pool_type<Component> *>(pools[ctype].pool.get());
+        return static_cast<pool_type<Component> *>(pools[index].pool.get());
     }
 
     template<typename Component>
@@ -264,20 +266,6 @@ public:
     basic_registry & operator=(basic_registry &&) = default;
 
     /**
-     * @brief Returns the opaque identifier of a component.
-     *
-     * The given component doesn't need to be necessarily in use.<br/>
-     * Identifiers aren't guaranteed to be stable between different runs.
-     *
-     * @tparam Component Type of component to query.
-     * @return The opaque identifier of the given type of component.
-     */
-    template<typename Component>
-    static component type() ENTT_NOEXCEPT {
-        return component{component_family<std::decay_t<Component>>::type()};
-    }
-
-    /**
      * @brief Prepares a pool for the given type if required.
      * @tparam Component Type of component for which to prepare a pool.
      * @tparam Args Types of arguments to use to prepare the pool.
@@ -285,7 +273,7 @@ public:
      */
     template<typename Component, typename... Args>
     void prepare(Args &&... args) {
-        ENTT_ASSERT(!(to_integer(type<Component>()) < pools.size()) || !pools[to_integer(type<Component>())].pool);
+        ENTT_ASSERT(std::none_of(pools.cbegin(), pools.cend(), [](auto &&pdata) { return pdata.id == type_id_v<Component>; }));
         assure<Component>(std::forward<Args>(args)...);
     }
 
@@ -569,7 +557,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         for(auto pos = pools.size(); pos; --pos) {
-            if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->has(entity)) {
+            if(auto &pdata = pools[pos-1]; pdata.pool->has(entity)) {
                 pdata.remove(*pdata.pool, *this, entity);
             }
         }
@@ -956,8 +944,7 @@ public:
         bool orphan = true;
 
         for(std::size_t pos{}, last = pools.size(); pos < last && orphan; ++pos) {
-            const auto &pdata = pools[pos];
-            orphan = !(pdata.pool && pdata.pool->has(entity));
+            orphan = !pools[pos].pool->has(entity);
         }
 
         return orphan;
@@ -1216,7 +1203,7 @@ public:
     template<typename... Component, typename... Exclude>
     entt::basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Component) > 0);
-        return { assure<Component>()..., assure<Exclude>()... };
+        return { assure<std::decay_t<Component>>()..., assure<Exclude>()... };
     }
 
     /*! @copydoc view */
@@ -1272,15 +1259,15 @@ public:
         using handler_type = group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...>;
 
         [[maybe_unused]] constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
-        const auto cpools = std::make_tuple(assure<Owned>()..., assure<Get>()..., assure<Exclude>()...);
+        const auto cpools = std::make_tuple(assure<std::decay_t<Owned>>()..., assure<std::decay_t<Get>>()..., assure<Exclude>()...);
         const std::size_t extent[3]{sizeof...(Owned), sizeof...(Get), sizeof...(Exclude)};
         handler_type *handler = nullptr;
 
         if(auto it = std::find_if(groups.cbegin(), groups.cend(), [&extent](const auto &gdata) {
             return std::equal(std::begin(extent), std::end(extent), std::begin(gdata.extent))
-                    && (gdata.owned(type<Owned>()) && ...)
-                    && (gdata.get(type<Get>()) && ...)
-                    && (gdata.exclude(type<Exclude>()) && ...);
+                    && (gdata.owned(type_id_v<std::decay_t<Owned>>) && ...)
+                    && (gdata.get(type_id_v<std::decay_t<Get>>) && ...)
+                    && (gdata.exclude(type_id_v<Exclude>) && ...);
         }); it != groups.cend())
         {
             handler = static_cast<handler_type *>(it->group.get());
@@ -1293,26 +1280,31 @@ public:
             group_data gdata{
                 { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) },
                 decltype(group_data::group){new handler_type{cpools}, [](void *gptr) { delete static_cast<handler_type *>(gptr); }},
-                [](const component ctype) ENTT_NOEXCEPT { return ((ctype == type<Owned>()) || ...); },
-                [](const component ctype) ENTT_NOEXCEPT { return ((ctype == type<Get>()) || ...); },
-                [](const component ctype) ENTT_NOEXCEPT { return ((ctype == type<Exclude>()) || ...); }
+                [](const auto ctype) ENTT_NOEXCEPT { return ((ctype == type_id_v<std::decay_t<Owned>>) || ...); },
+                [](const auto ctype) ENTT_NOEXCEPT { return ((ctype == type_id_v<std::decay_t<Get>>) || ...); },
+                [](const auto ctype) ENTT_NOEXCEPT { return ((ctype == type_id_v<Exclude>) || ...); }
             };
 
             if constexpr(sizeof...(Owned) == 0) {
                 handler = static_cast<handler_type *>(groups.emplace_back(std::move(gdata)).group.get());
             } else {
                 ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [&extent](const auto &curr) {
-                    const std::size_t diff[3]{ (0u + ... + curr.owned(type<Owned>())), (0u + ... + curr.get(type<Get>())), (0u + ... + curr.exclude(type<Exclude>())) };
+                    const std::size_t diff[3]{
+                        (0u + ... + curr.owned(type_id_v<std::decay_t<Owned>>)),
+                        (0u + ... + curr.get(type_id_v<std::decay_t<Get>>)),
+                        (0u + ... + curr.exclude(type_id_v<Exclude>))
+                    };
+
                     return !diff[0] || ((std::equal(std::begin(diff), std::end(diff), extent) || std::equal(std::begin(diff), std::end(diff), curr.extent)));
                 }));
 
                 const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [&size](const auto &curr) {
-                    const std::size_t diff = (0u + ... + curr.owned(type<Owned>()));
+                    const std::size_t diff = (0u + ... + curr.owned(type_id_v<std::decay_t<Owned>>));
                     return !diff || (size > (curr.extent[0] + curr.extent[1] + curr.extent[2]));
                 });
 
                 const auto prev = std::find_if(std::make_reverse_iterator(next), groups.crend(), [](const auto &curr) {
-                    return (0u + ... + curr.owned(type<Owned>()));
+                    return (0u + ... + curr.owned(type_id_v<std::decay_t<Owned>>));
                 });
 
                 maybe_valid_if = (next == groups.cend() ? maybe_valid_if : next->group.get());
@@ -1432,7 +1424,11 @@ public:
         std::vector<const sparse_set<Entity> *> selected(std::distance(first, last));
 
         std::transform(first, last, selected.begin(), [this](const component ctype) {
-            return to_integer(ctype) < pools.size() ? pools[to_integer(ctype)].pool.get() : nullptr;
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) {
+                return pdata.id == to_integer(ctype);
+            });
+
+            return it == pools.cend() ? nullptr : it->pool.get();
         });
 
         return { std::move(selected) };
@@ -1480,7 +1476,7 @@ public:
 
         if constexpr(sizeof...(Component) == 0) {
             for(size_type pos{}; pos < pools.size(); ++pos) {
-                if(const auto &pdata = pools[pos]; pdata.assure && ((pos != to_integer(type<Exclude>())) && ...)) {
+                if(const auto &pdata = pools[pos]; pdata.assure && ((pdata.id != type_id_v<Exclude>) && ...)) {
                     pdata.assure(other, *pdata.pool);
                 }
             }
@@ -1533,7 +1529,7 @@ public:
     void stomp(const entity_type dst, const basic_registry &other, const entity_type src, exclude_t<Exclude...> = {}) {
         if constexpr(sizeof...(Component) == 0) {
             for(size_type pos{}; pos < other.pools.size(); ++pos) {
-                if(const auto &pdata = other.pools[pos]; pdata.stomp && ((pos != to_integer(type<Exclude>())) && ...) && pdata.pool->has(src)) {
+                if(const auto &pdata = other.pools[pos]; pdata.stomp && ((pdata.id != type_id_v<Exclude>) && ...) && pdata.pool->has(src)) {
                     pdata.stomp(*this, dst, *pdata.pool, src);
                 }
             }
@@ -1629,14 +1625,9 @@ public:
      */
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
-        const auto vtype = context_family<std::decay_t<Type>>::type();
-
-        if(!(vtype < vars.size())) {
-            vars.resize(vtype+1);
-        }
-
-        vars[vtype] = std::make_unique<variable_handler<Type>>(std::forward<Args>(args)...);
-        return static_cast<variable_handler<Type> &>(*vars[vtype]).value;
+        unset<Type>();
+        vars.push_back(std::make_unique<variable_handler<Type>>(std::forward<Args>(args)...));
+        return static_cast<variable_handler<Type> &>(*vars.back()).value;
     }
 
     /**
@@ -1645,9 +1636,9 @@ public:
      */
     template<typename Type>
     void unset() {
-        if(const auto vtype = context_family<std::decay_t<Type>>::type(); vtype < vars.size()) {
-            vars[vtype].reset();
-        }
+        vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &&handler) {
+            return handler->id() == type_id_v<Type>;
+        }), vars.end());
     }
 
     /**
@@ -1675,8 +1666,11 @@ public:
      */
     template<typename Type>
     const Type * try_ctx() const {
-        const auto vtype = context_family<std::decay_t<Type>>::type();
-        return vtype < vars.size() && vars[vtype] ? &static_cast<variable_handler<Type> &>(*vars[vtype]).value : nullptr;
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&handler) {
+            return handler->id() == type_id_v<Type>;
+        });
+
+        return it == vars.cend() ? nullptr : &static_cast<const variable_handler<Type> &>(*it->get()).value;
     }
 
     /*! @copydoc try_ctx */
