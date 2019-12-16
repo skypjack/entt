@@ -26,11 +26,7 @@
 
 * Mission: get rid of named types
   - make it possible to use custom generators (eg for plugins)
-    * registry
-    * remove entt::component
-    * clean-up superfluous to_integer
     * ENTT_ID_TYPE id() (eg dispatcher) can be a data member rather than a virtual function
-    * define a kind of assure also for context variables
     * meta: use type_id, remove import, everything should work transparently
     * type_id_enabled and fallback on old-fashioned families otherwise
     * add discard pool functionality (+ test)
@@ -38,6 +34,6 @@
   - reintroduce old-fashion family and add a new family-like thing with generators
   - families should be defined as out-of-class to guarantee the same identifiers for the same types
   - update doc: family, dispatcher, emitter, registry, meta, across boundaries
-  - update tests
+  - update/improve/review tests
   - review and suppress warnings, if any
   - remove ENTT_API from OPAQUE_TYPE

@@ -209,20 +209,20 @@ public:
 
         duk_push_array(ctx);
 
-        std::vector<entt::component> components;
-        std::vector<entt::component> runtime;
+        std::vector<ENTT_ID_TYPE> components;
+        std::vector<ENTT_ID_TYPE> runtime;
 
         for(duk_idx_t arg = 0; arg < nargs; arg++) {
             auto type = duk_require_uint(ctx, arg);
 
             if(dreg.func.find(type) == dreg.func.cend()) {
                 if(runtime.empty()) {
-                    components.push_back(entt::component{entt::type_id_v<duktape_runtime>});
+                    components.push_back(entt::type_id_v<duktape_runtime>);
                 }
 
-                runtime.push_back(entt::component{type});
+                runtime.push_back(type);
             } else {
-                components.push_back(entt::component{type});
+                components.push_back(type);
             }
         }
 
@@ -236,7 +236,7 @@ public:
             } else {
                 const auto &others = dreg.registry.get<duktape_runtime>(entity).components;
                 const auto match = std::all_of(runtime.cbegin(), runtime.cend(), [&others](const auto type) {
-                    return others.find(to_integer(type)) != others.cend();
+                    return others.find(type) != others.cend();
                 });
 
                 if(match) {

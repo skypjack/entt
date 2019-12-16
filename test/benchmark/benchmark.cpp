@@ -168,7 +168,7 @@ TEST(Benchmark, IterateSingleComponentRuntime1M) {
     }
 
     auto test = [&registry](auto func) {
-        entt::component types[] = { entt::component{entt::type_id_v<position>} };
+        ENTT_ID_TYPE types[] = { entt::type_id_v<position> };
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -333,7 +333,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1M) {
     }
 
     auto test = [&registry](auto func) {
-        entt::component types[] = { entt::component{entt::type_id_v<position>}, entt::component{entt::type_id_v<velocity>} };
+        ENTT_ID_TYPE types[] = { entt::type_id_v<position>, entt::type_id_v<velocity> };
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -361,7 +361,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
     }
 
     auto test = [&registry](auto func) {
-        entt::component types[] = { entt::component{entt::type_id_v<position>}, entt::component{entt::type_id_v<velocity>} };
+        ENTT_ID_TYPE types[] = { entt::type_id_v<position>, entt::type_id_v<velocity> };
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -389,7 +389,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
     }
 
     auto test = [&registry](auto func) {
-        entt::component types[] = { entt::component{entt::type_id_v<position>}, entt::component{entt::type_id_v<velocity>} };
+        ENTT_ID_TYPE types[] = { entt::type_id_v<position>, entt::type_id_v<velocity> };
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -562,7 +562,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1M) {
     }
 
     auto test = [&registry](auto func) {
-        entt::component types[] = { entt::component{entt::type_id_v<position>}, entt::component{entt::type_id_v<velocity>}, entt::component{entt::type_id_v<comp<0>>} };
+        ENTT_ID_TYPE types[] = { entt::type_id_v<position>, entt::type_id_v<velocity>, entt::type_id_v<comp<0>> };
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -592,7 +592,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
     }
 
     auto test = [&registry](auto func) {
-        entt::component types[] = { entt::component{entt::type_id_v<position>}, entt::component{entt::type_id_v<velocity>}, entt::component{entt::type_id_v<comp<0>>} };
+        ENTT_ID_TYPE types[] = { entt::type_id_v<position>, entt::type_id_v<velocity>, entt::type_id_v<comp<0>> };
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -622,7 +622,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
     }
 
     auto test = [&registry](auto func) {
-        entt::component types[] = { entt::component{entt::type_id_v<position>}, entt::component{entt::type_id_v<velocity>}, entt::component{entt::type_id_v<comp<0>>} };
+        ENTT_ID_TYPE types[] = { entt::type_id_v<position>, entt::type_id_v<velocity>, entt::type_id_v<comp<0>> };
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -836,12 +836,12 @@ TEST(Benchmark, IterateFiveComponentsRuntime1M) {
     }
 
     auto test = [&registry](auto func) {
-        entt::component types[] = {
-            entt::component{entt::type_id_v<position>},
-            entt::component{entt::type_id_v<velocity>},
-            entt::component{entt::type_id_v<comp<0>>},
-            entt::component{entt::type_id_v<comp<1>>},
-            entt::component{entt::type_id_v<comp<2>>}
+        ENTT_ID_TYPE types[] = {
+            entt::type_id_v<position>,
+            entt::type_id_v<velocity>,
+            entt::type_id_v<comp<0>>,
+            entt::type_id_v<comp<1>>,
+            entt::type_id_v<comp<2>>
         };
 
         timer timer;
@@ -876,12 +876,12 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
     }
 
     auto test = [&registry](auto func) {
-        entt::component types[] = {
-            entt::component{entt::type_id_v<position>},
-            entt::component{entt::type_id_v<velocity>},
-            entt::component{entt::type_id_v<comp<0>>},
-            entt::component{entt::type_id_v<comp<1>>},
-            entt::component{entt::type_id_v<comp<2>>}
+        ENTT_ID_TYPE types[] = {
+            entt::type_id_v<position>,
+            entt::type_id_v<velocity>,
+            entt::type_id_v<comp<0>>,
+            entt::type_id_v<comp<1>>,
+            entt::type_id_v<comp<2>>
         };
 
         timer timer;
@@ -916,12 +916,12 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
     }
 
     auto test = [&registry](auto func) {
-        entt::component types[] = {
-            entt::component{entt::type_id_v<position>},
-            entt::component{entt::type_id_v<velocity>},
-            entt::component{entt::type_id_v<comp<0>>},
-            entt::component{entt::type_id_v<comp<1>>},
-            entt::component{entt::type_id_v<comp<2>>}
+        ENTT_ID_TYPE types[] = {
+            entt::type_id_v<position>,
+            entt::type_id_v<velocity>,
+            entt::type_id_v<comp<0>>,
+            entt::type_id_v<comp<1>>,
+            entt::type_id_v<comp<2>>
         };
 
         timer timer;

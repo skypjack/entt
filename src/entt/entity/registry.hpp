@@ -1423,9 +1423,9 @@ public:
     entt::basic_runtime_view<Entity> runtime_view(It first, It last) const {
         std::vector<const sparse_set<Entity> *> selected(std::distance(first, last));
 
-        std::transform(first, last, selected.begin(), [this](const component ctype) {
+        std::transform(first, last, selected.begin(), [this](const auto ctype) {
             const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) {
-                return pdata.id == to_integer(ctype);
+                return pdata.id == ctype;
             });
 
             return it == pools.cend() ? nullptr : it->pool.get();

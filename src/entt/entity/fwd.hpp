@@ -48,9 +48,6 @@ class basic_continuous_loader;
 ENTT_OPAQUE_TYPE(entity, ENTT_ID_TYPE);
 
 /*! @brief Alias declaration for the most common use case. */
-ENTT_OPAQUE_TYPE(component, ENTT_ID_TYPE);
-
-/*! @brief Alias declaration for the most common use case. */
 using registry = basic_registry<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
