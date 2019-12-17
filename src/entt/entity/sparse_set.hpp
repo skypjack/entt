@@ -154,11 +154,11 @@ class sparse_set {
     };
 
     auto page(const Entity entt) const ENTT_NOEXCEPT {
-        return std::size_t{(to_integer(entt) & traits_type::entity_mask) / entt_per_page};
+        return std::size_t{(to_integral(entt) & traits_type::entity_mask) / entt_per_page};
     }
 
     auto offset(const Entity entt) const ENTT_NOEXCEPT {
-        return std::size_t{to_integer(entt) & (entt_per_page - 1)};
+        return std::size_t{to_integral(entt) & (entt_per_page - 1)};
     }
 
     Entity * assure(const std::size_t pos) {

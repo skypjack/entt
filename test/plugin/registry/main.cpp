@@ -25,8 +25,8 @@ TEST(Lib, Registry) {
     ASSERT_FALSE(registry.empty<velocity>());
 
     registry.view<position>().each([](auto entity, auto &position) {
-        ASSERT_EQ(position.x, entt::to_integer(entity) + 2);
-        ASSERT_EQ(position.y, entt::to_integer(entity) + 3);
+        ASSERT_EQ(position.x, entt::to_integral(entity) + 2);
+        ASSERT_EQ(position.y, entt::to_integral(entity) + 3);
     });
 
     cr_plugin_close(ctx);

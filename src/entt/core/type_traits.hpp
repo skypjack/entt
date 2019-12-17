@@ -178,7 +178,7 @@ constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
  */
 #define ENTT_OPAQUE_TYPE(clazz, type)\
     enum class ENTT_API clazz: type {};\
-    constexpr auto to_integer(const clazz id) ENTT_NOEXCEPT {\
+    constexpr auto to_integral(const clazz id) ENTT_NOEXCEPT {\
         return std::underlying_type_t<clazz>(id);\
     }\
     static_assert(true)
