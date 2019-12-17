@@ -60,9 +60,10 @@ macro(SETUP_PLUGIN_TEST TEST_NAME)
     SETUP_TARGET(_${TEST_NAME}_plugin)
     SETUP_BASIC_TEST(lib_${TEST_NAME}_plugin plugin/${TEST_NAME}/main.cpp)
     target_link_libraries(lib_${TEST_NAME}_plugin PRIVATE ${CMAKE_DL_LIBS})
-    target_compile_definitions(lib_${TEST_NAME}_plugin PRIVATE PLUGIN="$<TARGET_FILE:_${TEST_NAME}_plugin>")
     target_include_directories(lib_${TEST_NAME}_plugin PRIVATE ${CR_SRC_DIR})
+    target_compile_definitions(lib_${TEST_NAME}_plugin PRIVATE NOMINMAX PLUGIN="$<TARGET_FILE:_${TEST_NAME}_plugin>")
     target_include_directories(_${TEST_NAME}_plugin PRIVATE ${CR_SRC_DIR})
+    target_compile_definitions(_${TEST_NAME}_plugin PRIVATE NOMINMAX)
 endmacro()
 
 # Test benchmark

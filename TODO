@@ -30,6 +30,7 @@
     * meta: use type_id, remove import, everything should work transparently
     * type_id_enabled and fallback on old-fashioned families otherwise
     * add discard pool functionality (+ test)
+  - clean up target_compile_definitions test/CMakeLists.txt (_EXPORT/_IMPORT)
   - use type_id also for groups, get rid of extent and subfunctions, is it possible?
   - reintroduce old-fashion family and add a new family-like thing with generators
   - families should be defined as out-of-class to guarantee the same identifiers for the same types
