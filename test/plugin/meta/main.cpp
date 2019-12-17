@@ -21,6 +21,7 @@ TEST(Lib, Meta) {
     cr_plugin_update(ctx);
 
     ASSERT_TRUE(entt::resolve("position"_hs));
+    ASSERT_TRUE(entt::resolve("velocity"_hs));
     ASSERT_TRUE(entt::resolve<double>().conv<int>());
 
     auto pos = entt::resolve("position"_hs).construct(42., 3.);
@@ -47,4 +48,7 @@ TEST(Lib, Meta) {
     ud.any.emplace<void>();
 
     cr_plugin_close(ctx);
+
+    ASSERT_FALSE(entt::resolve("position"_hs));
+    ASSERT_FALSE(entt::resolve("velocity"_hs));
 }
