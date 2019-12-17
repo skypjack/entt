@@ -168,14 +168,14 @@ public:
         return hash;
     }
 
-    /**
-     * @brief Returns the human-readable representation of a hashed string.
-     * @return The string used to initialize the instance.
-     */
-    constexpr operator const value_type *() const ENTT_NOEXCEPT { return str; }
+    /*! @copydoc data */
+    constexpr operator const value_type *() const ENTT_NOEXCEPT { return data(); }
 
-    /*! @copydoc value */
-    constexpr operator hash_type() const ENTT_NOEXCEPT { return hash; }
+    /**
+     * @brief Returns the numeric representation of a hashed string.
+     * @return The numeric representation of the instance.
+     */
+    constexpr operator hash_type() const ENTT_NOEXCEPT { return value(); }
 
     /**
      * @brief Compares two hashed strings.
