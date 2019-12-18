@@ -889,7 +889,6 @@ TEST_F(Meta, MetaProp) {
     auto prop = entt::resolve<char>().prop(props::prop_int);
 
     ASSERT_TRUE(prop);
-    ASSERT_NE(prop, entt::meta_prop{});
     ASSERT_EQ(prop.key(), props::prop_int);
     ASSERT_EQ(prop.value(), 42);
 }
@@ -899,7 +898,6 @@ TEST_F(Meta, MetaBase) {
     derived_type derived{};
 
     ASSERT_TRUE(base);
-    ASSERT_NE(base, entt::meta_base{});
     ASSERT_EQ(base.parent(), entt::resolve("derived"_hs));
     ASSERT_EQ(base.type(), entt::resolve<base_type>());
     ASSERT_EQ(base.cast(&derived), static_cast<base_type *>(&derived));
@@ -910,7 +908,6 @@ TEST_F(Meta, MetaConv) {
     double value = 3.;
 
     ASSERT_TRUE(conv);
-    ASSERT_NE(conv, entt::meta_conv{});
     ASSERT_EQ(conv.parent(), entt::resolve<double>());
     ASSERT_EQ(conv.type(), entt::resolve<int>());
 
@@ -926,7 +923,6 @@ TEST_F(Meta, MetaConvAsFreeFunctions) {
     derived_type derived{derived_type{}, 42, 'c'};
 
     ASSERT_TRUE(conv);
-    ASSERT_NE(conv, entt::meta_conv{});
     ASSERT_EQ(conv.parent(), entt::resolve<derived_type>());
     ASSERT_EQ(conv.type(), entt::resolve<int>());
 
@@ -942,7 +938,6 @@ TEST_F(Meta, MetaConvAsMemberFunctions) {
     derived_type derived{derived_type{}, 42, 'c'};
 
     ASSERT_TRUE(conv);
-    ASSERT_NE(conv, entt::meta_conv{});
     ASSERT_EQ(conv.parent(), entt::resolve<derived_type>());
     ASSERT_EQ(conv.type(), entt::resolve<char>());
 
@@ -957,7 +952,6 @@ TEST_F(Meta, MetaCtor) {
     auto ctor = entt::resolve<derived_type>().ctor<const base_type &, int, char>();
 
     ASSERT_TRUE(ctor);
-    ASSERT_NE(ctor, entt::meta_ctor{});
     ASSERT_EQ(ctor.parent(), entt::resolve("derived"_hs));
     ASSERT_EQ(ctor.size(), entt::meta_ctor::size_type{3});
     ASSERT_EQ(ctor.arg(entt::meta_ctor::size_type{0}), entt::resolve<base_type>());
@@ -1078,7 +1072,6 @@ TEST_F(Meta, MetaData) {
     data_type instance{};
 
     ASSERT_TRUE(data);
-    ASSERT_NE(data, entt::meta_data{});
     ASSERT_EQ(data.parent(), entt::resolve("data"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.identifier(), "i"_hs);
@@ -1241,7 +1234,6 @@ TEST_F(Meta, MetaDataSetterGetterAsFreeFunctions) {
     setter_getter_type instance{};
 
     ASSERT_TRUE(data);
-    ASSERT_NE(data, entt::meta_data{});
     ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.identifier(), "x"_hs);
@@ -1257,7 +1249,6 @@ TEST_F(Meta, MetaDataSetterGetterAsMemberFunctions) {
     setter_getter_type instance{};
 
     ASSERT_TRUE(data);
-    ASSERT_NE(data, entt::meta_data{});
     ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.identifier(), "y"_hs);
@@ -1273,7 +1264,6 @@ TEST_F(Meta, MetaDataSetterGetterWithRefAsMemberFunctions) {
     setter_getter_type instance{};
 
     ASSERT_TRUE(data);
-    ASSERT_NE(data, entt::meta_data{});
     ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.identifier(), "w"_hs);
@@ -1289,7 +1279,6 @@ TEST_F(Meta, MetaDataSetterGetterMixed) {
     setter_getter_type instance{};
 
     ASSERT_TRUE(data);
-    ASSERT_NE(data, entt::meta_data{});
     ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.identifier(), "z"_hs);
@@ -1308,7 +1297,6 @@ TEST_F(Meta, MetaDataArrayStatic) {
     array_type::global[2] = 7;
 
     ASSERT_TRUE(data);
-    ASSERT_NE(data, entt::meta_data{});
     ASSERT_EQ(data.parent(), entt::resolve("array"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int[3]>());
     ASSERT_EQ(data.identifier(), "global"_hs);
@@ -1338,7 +1326,6 @@ TEST_F(Meta, MetaDataArray) {
     instance.local[2] = 7;
 
     ASSERT_TRUE(data);
-    ASSERT_NE(data, entt::meta_data{});
     ASSERT_EQ(data.parent(), entt::resolve("array"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int[3]>());
     ASSERT_EQ(data.identifier(), "local"_hs);
@@ -1387,7 +1374,6 @@ TEST_F(Meta, MetaFunc) {
     func_type instance{};
 
     ASSERT_TRUE(func);
-    ASSERT_NE(func, entt::meta_func{});
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.identifier(), "f2"_hs);
     ASSERT_EQ(func.size(), entt::meta_func::size_type{2});

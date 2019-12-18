@@ -699,30 +699,9 @@ struct meta_prop {
         return node;
     }
 
-    /**
-     * @brief Checks if two meta objects refer to the same node.
-     * @param other The meta object with which to compare.
-     * @return True if the two meta objects refer to the same node, false
-     * otherwise.
-     */
-    bool operator==(const meta_prop &other) const ENTT_NOEXCEPT {
-        return node == other.node;
-    }
-
 private:
     const internal::meta_prop_node *node;
 };
-
-
-/**
- * @brief Checks if two meta objects refer to the same node.
- * @param lhs A meta object, either valid or not.
- * @param rhs A meta object, either valid or not.
- * @return True if the two meta objects refer to the same node, false otherwise.
- */
-inline bool operator!=(const meta_prop &lhs, const meta_prop &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
 
 
 /*! @brief Opaque container for meta base classes. */
@@ -758,20 +737,9 @@ struct meta_base {
         return node;
     }
 
-    /*! @copydoc meta_prop::operator== */
-    bool operator==(const meta_base &other) const ENTT_NOEXCEPT {
-        return node == other.node;
-    }
-
 private:
     const internal::meta_base_node *node;
 };
-
-
-/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
-inline bool operator!=(const meta_base &lhs, const meta_base &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
 
 
 /*! @brief Opaque container for meta conversion functions. */
@@ -804,20 +772,9 @@ struct meta_conv {
         return node;
     }
 
-    /*! @copydoc meta_prop::operator== */
-    bool operator==(const meta_conv &other) const ENTT_NOEXCEPT {
-        return node == other.node;
-    }
-
 private:
     const internal::meta_conv_node *node;
 };
-
-
-/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
-inline bool operator!=(const meta_conv &lhs, const meta_conv &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
 
 
 /*! @brief Opaque container for meta constructors. */
@@ -899,20 +856,9 @@ struct meta_ctor {
         return node;
     }
 
-    /*! @copydoc meta_prop::operator== */
-    bool operator==(const meta_ctor &other) const ENTT_NOEXCEPT {
-        return node == other.node;
-    }
-
 private:
     const internal::meta_ctor_node *node;
 };
-
-
-/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
-inline bool operator!=(const meta_ctor &lhs, const meta_ctor &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
 
 
 /*! @brief Opaque container for meta data. */
@@ -1047,20 +993,9 @@ struct meta_data {
         return node;
     }
 
-    /*! @copydoc meta_prop::operator== */
-    bool operator==(const meta_data &other) const ENTT_NOEXCEPT {
-        return node == other.node;
-    }
-
 private:
     const internal::meta_data_node *node;
 };
-
-
-/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
-inline bool operator!=(const meta_data &lhs, const meta_data &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
 
 
 /*! @brief Opaque container for meta functions. */
@@ -1169,20 +1104,9 @@ struct meta_func {
         return node;
     }
 
-    /*! @copydoc meta_prop::operator== */
-    bool operator==(const meta_func &other) const ENTT_NOEXCEPT {
-        return node == other.node;
-    }
-
 private:
     const internal::meta_func_node *node;
 };
-
-
-/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
-inline bool operator!=(const meta_func &lhs, const meta_func &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
 
 
 /*! @brief Opaque container for meta types. */
@@ -1528,7 +1452,12 @@ public:
         return node;
     }
 
-    /*! @copydoc meta_prop::operator== */
+    /**
+     * @brief Checks if two meta objects refer to the same type.
+     * @param other The meta object with which to compare.
+     * @return True if the two meta objects refer to the same type, false
+     * otherwise.
+     */
     bool operator==(const meta_type &other) const ENTT_NOEXCEPT {
         return node == other.node;
     }
@@ -1538,7 +1467,12 @@ private:
 };
 
 
-/*! @copydoc operator!=(const meta_prop &, const meta_prop &) */
+/**
+ * @brief Checks if two meta objects refer to the same type.
+ * @param lhs A meta object, either valid or not.
+ * @param rhs A meta object, either valid or not.
+ * @return False if the two meta objects refer to the same node, true otherwise.
+ */
 inline bool operator!=(const meta_type &lhs, const meta_type &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
