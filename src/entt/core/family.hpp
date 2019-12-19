@@ -3,41 +3,30 @@
 
 
 #include "../config/config.h"
-#include "../core/attribute.h"
 
 
 namespace entt {
 
 
-/*! @brief Sequential number generator. */
-template<typename...>
-struct ENTT_API generator {
-    /**
-     * @brief Returns the next available value.
-     * @return The next available value.
-     */
-    static ENTT_ID_TYPE next() ENTT_NOEXCEPT {
-        static ENTT_MAYBE_ATOMIC(ENTT_ID_TYPE) value{};
-        return value++;
-    }
-};
-
-
 /**
- * @brief Runtime type unique identifier.
- * @tparam Type Type for which to generate an unique identifier.
- * @tparam Generator Tags to use to discriminate between different generators.
+ * @brief Dynamic identifier generator.
+ *
+ * Utility class template that can be used to assign unique identifiers to types
+ * at runtime. Use different specializations to create separate sets of
+ * identifiers.
  */
-template<typename Type, typename... Generator>
-struct ENTT_API family {
-    /**
-     * @brief Statically generated unique identifier for a given type.
-     * @return The runtime unique identifier for the given type.
-     */
-    static ENTT_ID_TYPE type() ENTT_NOEXCEPT {
-        static const ENTT_ID_TYPE value = generator<Generator...>::next();
-        return value;
-    }
+template<typename...>
+class family {
+    inline static ENTT_MAYBE_ATOMIC(ENTT_ID_TYPE) identifier{};
+
+public:
+    /*! @brief Unsigned integer type. */
+    using family_type = ENTT_ID_TYPE;
+
+    /*! @brief Statically generated unique identifier for the given type. */
+    template<typename... Type>
+    // at the time I'm writing, clang crashes during compilation if auto is used instead of family_type
+    inline static const family_type type = identifier++;
 };
 
 
