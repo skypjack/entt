@@ -1,3 +1,5 @@
 <map id="entt::process_adaptor&lt; Func, Delta &gt;" name="entt::process_adaptor&lt; Func, Delta &gt;">
-<area shape="rect" id="node2" href="$classentt_1_1process.html" title="entt::process\&lt; process\l_adaptor\&lt; Func, Delta\l \&gt;, Delta \&gt;" alt="" coords="5,5,161,61"/>
+<area shape="rect" id="node1" title="Adaptor for lambdas and functors to turn them into processes." alt="" coords="73,109,221,151"/>
+<area shape="rect" id="node2" href="$classentt_1_1process.html" title=" " alt="" coords="5,5,161,61"/>
+<area shape="rect" id="node3" title=" " alt="" coords="186,20,237,47"/>
 </map>
