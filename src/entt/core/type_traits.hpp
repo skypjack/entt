@@ -5,7 +5,6 @@
 #include <cstddef>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/attribute.h"
 #include "../core/hashed_string.hpp"
 
 
@@ -177,7 +176,7 @@ constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
  * @param type The underlying type for the enum class.
  */
 #define ENTT_OPAQUE_TYPE(clazz, type)\
-    enum class ENTT_API clazz: type {};\
+    enum class clazz: type {};\
     constexpr auto to_integral(const clazz id) ENTT_NOEXCEPT {\
         return std::underlying_type_t<clazz>(id);\
     }\
