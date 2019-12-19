@@ -7765,10 +7765,10 @@ class basic_registry {
     struct pool_handler: storage<Entity, Component> {
         std::size_t super{};
 
-        pool_handler() ENTT_NOEXCEPT = default;
-
-        pool_handler(const storage<Entity, Component> &other)
-            : storage<Entity, Component>{other}
+        template<typename... Args>
+        pool_handler(Args &&... args)
+            : storage<Entity, Component>{std::forward<Args>(args)...},
+              super{}
         {}
 
         auto on_construct() ENTT_NOEXCEPT {
@@ -8041,7 +8041,7 @@ public:
      * Identifiers aren't guaranteed to be stable between different runs.
      *
      * @tparam Component Type of component to query.
-     * @return Runtime the opaque identifier of the given type of component.
+     * @return The opaque identifier of the given type of component.
      */
     template<typename Component>
     static component type() ENTT_NOEXCEPT {
@@ -10134,9 +10134,7 @@ class basic_observer {
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, type_list<NoneOf...>, AllOf...>> {
         template<std::size_t Index>
         static void maybe_valid_if(basic_observer &obs, const Entity entt, const basic_registry<Entity> &reg) {
-            if(reg.template has<AllOf...>(entt) && !(reg.template has<NoneOf>(entt) || ...)
-                    && reg.template has<Require...>(entt) && !(reg.template has<Reject>(entt) || ...))
-            {
+            if(reg.template has<AllOf..., Require...>(entt) && !(reg.template has<NoneOf>(entt) || ...) && !(reg.template has<Reject>(entt) || ...)) {
                 auto *comp = obs.view.try_get(entt);
                 (comp ? *comp : obs.view.construct(entt)) |= (1 << Index);
             }
@@ -11356,7 +11354,6 @@ struct as_void_t {};
 
 #include <array>
 #include <memory>
-#include <cstring>
 #include <cstddef>
 #include <utility>
 #include <type_traits>
@@ -13391,7 +13388,7 @@ bool setter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any index
     bool accepted = false;
 
     if constexpr(!Const) {
-        if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>> || std::is_member_function_pointer_v<decltype(Data)>) {
+        if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
             using helper_type = meta_function_helper_t<decltype(Data)>;
             using data_type = std::tuple_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>;
             static_assert(std::is_invocable_v<decltype(Data), Type &, data_type>);
@@ -13465,7 +13462,7 @@ meta_any getter([[maybe_unused]] meta_handle handle, [[maybe_unused]] meta_any i
         }
     };
 
-    if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Data)>> || std::is_member_function_pointer_v<decltype(Data)>) {
+    if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
         static_assert(std::is_invocable_v<decltype(Data), Type &>);
         auto * const clazz = meta_any{handle}.try_cast<Type>();
         return clazz ? dispatch(std::invoke(Data, *clazz)) : meta_any{};
@@ -13519,7 +13516,7 @@ meta_any invoke([[maybe_unused]] meta_handle handle, meta_any *args, std::index_
         return instance;
     }(args+Indexes, (args+Indexes)->try_cast<std::tuple_element_t<Indexes, typename helper_type::args_type>>())...);
 
-    if constexpr(std::is_function_v<std::remove_pointer_t<decltype(Candidate)>>) {
+    if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Candidate)>>>) {
         return (std::get<Indexes>(direct) && ...) ? dispatch(std::get<Indexes>(direct)...) : meta_any{};
     } else {
         auto * const clazz = meta_any{handle}.try_cast<Type>();
