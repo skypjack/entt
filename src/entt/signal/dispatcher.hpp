@@ -187,7 +187,7 @@ public:
      * @tparam Event Type of events to discard.
      */
     template<typename... Event>
-    void discard() {
+    void clear() {
         if constexpr(sizeof...(Event) == 0) {
             std::for_each(pools.begin(), pools.end(), [](auto &&cpool) {
                 cpool->clear();

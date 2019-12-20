@@ -107,7 +107,7 @@ delegate(42);
 ```
 
 Where the function type of the delegate is `void(int)` as above. It goes without
-saying that the extra arguments are silently discarded internally.<br/>v
+saying that the extra arguments are silently discarded internally.<br/>
 This is a nice-to-have feature in a lot of cases, as an example when the
 `delegate` class is used as a building block of a signal-slot system.
 

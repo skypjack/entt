@@ -42,11 +42,11 @@ TEST(Dispatcher, Functionalities) {
     ASSERT_EQ(receiver.cnt, 3);
 
     dispatcher.enqueue<an_event>();
-    dispatcher.discard<an_event>();
+    dispatcher.clear<an_event>();
     dispatcher.update();
 
     dispatcher.enqueue<an_event>();
-    dispatcher.discard();
+    dispatcher.clear();
     dispatcher.update();
 
     ASSERT_EQ(receiver.cnt, 3);
