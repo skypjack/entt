@@ -2,7 +2,6 @@
 #define ENTT_CORE_TYPE_INFO_HPP
 
 
-#include <type_traits>
 #include "../config/config.h"
 #include "hashed_string.hpp"
 
@@ -14,7 +13,7 @@ namespace entt {
  * @brief Types identifiers.
  * @tparam Type Type for which to generate an identifier.
  */
-template<typename Type, typename = std::void_t<>>
+template<typename Type, typename = void>
 struct type_id {
 #if defined _MSC_VER
     /**

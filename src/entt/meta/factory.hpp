@@ -293,7 +293,7 @@ class meta_factory<Type, Spec...>: public meta_factory<Type> {
 
     template<std::size_t = 0, typename Key, typename... Value>
     void assign(Key &&key, Value &&... value) {
-        static auto property{std::make_tuple(std::forward<Key>(key), std::forward<Value>(value)...)};
+        static const auto property{std::make_tuple(std::forward<Key>(key), std::forward<Value>(value)...)};
 
         static internal::meta_prop_node node{
             nullptr,

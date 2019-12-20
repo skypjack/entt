@@ -169,6 +169,9 @@ template<class Type>
 constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
 
 
+}
+
+
 /**
  * @brief Defines an enum class to use for opaque identifiers and a dedicate
  * `to_integer` function to convert the identifiers to their underlying type.
@@ -181,9 +184,6 @@ constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
         return std::underlying_type_t<clazz>(id);\
     }\
     static_assert(true)
-
-
-}
 
 
 #endif // ENTT_CORE_TYPE_TRAITS_HPP

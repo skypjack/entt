@@ -37,8 +37,6 @@ CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
         static_cast<userdata *>(ctx->userdata)->any = 42;
         break;
     case CR_UNLOAD:
-        // nothing to do here, this is only a test.
-        break;
     case CR_CLOSE:
         tear_down();
         break;

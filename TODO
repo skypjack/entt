@@ -25,10 +25,6 @@
   - ::group improve, reduce code
 
 * Mission: get rid of named types
-  - make it possible to use custom generators (eg for plugins)
-    * ENTT_ID_TYPE id() (eg dispatcher) can be a data member rather than a virtual function
-    * add discard pool functionality (+ test)
-  - use type_id also for groups, get rid of extent and subfunctions, is it possible?
+  - add discard pool functionality (+ test)
   - update doc: dispatcher, emitter, registry, meta, across boundaries
-  - update/improve/review tests
   - review and suppress warnings, if any
