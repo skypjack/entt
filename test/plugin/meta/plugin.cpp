@@ -9,11 +9,6 @@ position create_position(int x, int y) {
 }
 
 void set_up() {
-    entt::meta<double>().import("double"_hs);
-    entt::meta<int>().import("int"_hs);
-
-    entt::meta<double>().conv<int>();
-
     entt::meta<position>()
             .type("position"_hs)
             .ctor<&create_position>()

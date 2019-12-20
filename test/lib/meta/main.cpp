@@ -4,20 +4,21 @@
 #include <entt/meta/meta.hpp>
 #include "types.h"
 
-ENTT_API void set_up();
+ENTT_API void set_up(entt::meta_ctx);
 ENTT_API void tear_down();
 ENTT_API entt::meta_any wrap_int(int);
 
 TEST(Lib, Meta) {
     ASSERT_FALSE(entt::resolve("position"_hs));
 
-    set_up();
+    set_up(entt::meta_ctx{});
     entt::meta<double>().conv<int>();
 
     ASSERT_TRUE(entt::resolve("position"_hs));
+    ASSERT_TRUE(entt::resolve("velocity"_hs));
 
     auto pos = entt::resolve("position"_hs).construct(42., 3.);
-    auto vel = entt::resolve<velocity>().ctor().invoke();
+    auto vel = entt::resolve("velocity"_hs).ctor().invoke();
 
     ASSERT_TRUE(pos && vel);
 
@@ -27,11 +28,15 @@ TEST(Lib, Meta) {
     ASSERT_EQ(pos.type().data("y"_hs).get(*pos).cast<int>(), 3);
 
     ASSERT_EQ(vel.type().data("dx"_hs).type(), entt::resolve<double>());
-    ASSERT_TRUE(vel.type().data("dy"_hs).get(*vel).convert<int>());
+    ASSERT_TRUE(vel.type().data("dy"_hs).get(*vel).convert<double>());
     ASSERT_EQ(vel.type().data("dx"_hs).get(*vel).cast<double>(), 0.);
     ASSERT_EQ(vel.type().data("dy"_hs).get(*vel).cast<double>(), 0.);
 
-    ASSERT_EQ(wrap_int(1).type(), entt::resolve<int>());
+    ASSERT_EQ(wrap_int(42).type(), entt::resolve<int>());
+    ASSERT_EQ(wrap_int(42).cast<int>(), 42);
 
     tear_down();
+
+    ASSERT_FALSE(entt::resolve("position"_hs));
+    ASSERT_FALSE(entt::resolve("velocity"_hs));
 }

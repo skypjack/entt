@@ -391,11 +391,11 @@ public:
     auto type(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!exists(identifier, *internal::meta_info<>::context()));
-        ENTT_ASSERT(!exists(node, *internal::meta_info<>::context()));
+        ENTT_ASSERT(!exists(identifier, *internal::meta_info<>::global));
+        ENTT_ASSERT(!exists(node, *internal::meta_info<>::global));
         node->identifier = identifier;
-        node->next = *internal::meta_info<>::context();
-        *internal::meta_info<>::context() = node;
+        node->next = *internal::meta_info<>::global;
+        *internal::meta_info<>::global = node;
 
         return meta_factory<Type, Type>{&node->prop};
     }
@@ -777,7 +777,7 @@ public:
      */
     auto reset() ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
-        auto **it = internal::meta_info<>::context();
+        auto **it = internal::meta_info<>::global;
 
         while(*it && *it != node) {
             it = &(*it)->next;
@@ -810,24 +810,6 @@ public:
         node->dtor = nullptr;
 
         return meta_factory<Type, Type>{&node->prop};
-    }
-
-    /**
-     * @brief Imports a meta type from another context.
-     * @param identifier Unique identifier.
-     * @return An extended meta factory for the given type.
-     */
-    auto import(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
-        auto * const ctx = *internal::meta_info<>::context();
-
-        ENTT_ASSERT(exists(identifier, ctx));
-        ENTT_ASSERT(!exists(internal::meta_info<Type>::resolve(), ctx));
-
-        internal::meta_info<Type>::alias = internal::find_if([identifier](const auto *curr) {
-            return curr->identifier == identifier;
-        }, ctx);
-
-        return meta_factory<Type, Type>{&internal::meta_info<Type>::resolve()->prop};
     }
 };
 
@@ -870,7 +852,7 @@ inline meta_type resolve() ENTT_NOEXCEPT {
 inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
     return internal::find_if([identifier](const auto *curr) {
         return curr->identifier == identifier;
-    }, *internal::meta_info<>::context());
+    }, *internal::meta_info<>::global);
 }
 
 
@@ -882,7 +864,7 @@ inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
 template<typename Op>
 inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
 resolve(Op op) {
-    internal::visit<meta_type>(std::move(op), *internal::meta_info<>::context());
+    internal::visit<meta_type>(std::move(op), *internal::meta_info<>::global);
 }
 
 

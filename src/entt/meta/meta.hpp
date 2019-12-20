@@ -7,7 +7,7 @@
 #include <functional>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/attribute.h"
+#include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 
 
@@ -100,6 +100,7 @@ struct meta_func_node {
 
 struct meta_type_node {
     using size_type = std::size_t;
+    const ENTT_ID_TYPE id;
     ENTT_ID_TYPE identifier;
     meta_type_node * next;
     meta_prop_node * prop;
@@ -190,12 +191,12 @@ bool compare(const void *lhs, const void *rhs) {
 
 
 template<typename... Type>
-struct ENTT_API meta_node {
+struct meta_node {
     static_assert(std::is_same_v<Type..., std::remove_cv_t<std::remove_reference_t<Type>>...>);
-    inline static meta_type_node *alias = nullptr;
 
     inline static meta_type_node * resolve() ENTT_NOEXCEPT {
         static meta_type_node node{
+            type_id_v<Type...>,
             {},
             nullptr,
             nullptr,
@@ -216,19 +217,15 @@ struct ENTT_API meta_node {
             &meta_node<std::remove_const_t<std::remove_extent_t<Type>>...>::resolve
         };
 
-        return alias ? alias : &node;
+        return &node;
     }
 };
 
 
 template<>
-struct ENTT_API meta_node<> {
-    inline static meta_type_node **shared = nullptr;
-
-    inline static meta_type_node ** context() ENTT_NOEXCEPT {
-        static meta_type_node *local = nullptr;
-        return shared ? shared : &local;
-    }
+struct meta_node<> {
+    inline static meta_type_node *local = nullptr;
+    inline static meta_type_node **global = &local;
 };
 
 
@@ -252,12 +249,11 @@ struct meta_ctx {
      * @param other A valid context to which to bind.
      */
     static void bind(meta_ctx other) ENTT_NOEXCEPT {
-        ENTT_ASSERT(!internal::meta_info<>::shared);
-        internal::meta_info<>::shared = other.ctx;
+        internal::meta_info<>::global = other.ctx;
     }
 
 private:
-    internal::meta_type_node **ctx{internal::meta_info<>::context()};
+    internal::meta_type_node **ctx{&internal::meta_info<>::local};
 };
 
 
@@ -464,9 +460,9 @@ public:
     const Type * try_cast() const {
         void *ret = nullptr;
 
-        if(const auto * const type = internal::meta_info<Type>::resolve(); type == node) {
+        if(const auto id = internal::meta_info<Type>::resolve()->id; node && node->id == id) {
             ret = instance;
-        } else if(const auto *base = internal::find_if<&internal::meta_type_node::base>([type](const auto *curr) { return curr->type() == type; }, node); base) {
+        } else if(const auto *base = internal::find_if<&internal::meta_type_node::base>([id](const auto *curr) { return curr->type()->id == id; }, node); base) {
             ret = base->cast(instance);
         }
 
@@ -516,9 +512,9 @@ public:
     meta_any convert() const {
         meta_any any{};
 
-        if(const auto * const type = internal::meta_info<Type>::resolve(); node == type) {
+        if(const auto id = internal::meta_info<Type>::resolve()->id; node && node->id == id) {
             any = *static_cast<const Type *>(instance);
-        } else if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([type](const auto *curr) { return curr->type() == type; }, node); conv) {
+        } else if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([id](const auto *curr) { return curr->type()->id == id; }, node); conv) {
             any = conv->conv(instance);
         }
 
@@ -532,7 +528,7 @@ public:
      */
     template<typename Type>
     bool convert() {
-        bool valid = (node == internal::meta_info<Type>::resolve());
+        bool valid = (node && node->id == internal::meta_info<Type>::resolve()->id);
 
         if(!valid) {
             if(auto any = std::as_const(*this).convert<Type>(); (valid = static_cast<bool>(any))) {
@@ -578,7 +574,7 @@ public:
      * otherwise.
      */
     bool operator==(const meta_any &other) const {
-        return node == other.node && (!node || node->compare(instance, other.instance));
+        return (!node && !other.node) || (node && other.node && node->id == other.node->id && node->compare(instance, other.instance));
     }
 
     /**
@@ -1115,8 +1111,9 @@ class meta_type {
     auto ctor(std::index_sequence<Indexes...>) const {
         return internal::find_if([](const auto *candidate) {
             return candidate->size == sizeof...(Args) && ([](auto *from, auto *to) {
-                return (from == to) || internal::find_if<&internal::meta_type_node::base>([to](const auto *curr) { return curr->type() == to; }, from)
-                        || internal::find_if<&internal::meta_type_node::conv>([to](const auto *curr) { return curr->type() == to; }, from);
+                return (from->id == to->id)
+                        || internal::find_if<&internal::meta_type_node::base>([to](const auto *curr) { return curr->type()->id == to->id; }, from)
+                        || internal::find_if<&internal::meta_type_node::conv>([to](const auto *curr) { return curr->type()->id == to->id; }, from);
             }(internal::meta_info<Args>::resolve(), candidate->arg(Indexes)) && ...);
         }, node->ctor);
     }
@@ -1304,8 +1301,8 @@ public:
      */
     template<typename Type>
     meta_conv conv() const {
-        return internal::find_if<&internal::meta_type_node::conv>([type = internal::meta_info<Type>::resolve()](const auto *curr) {
-            return curr->type() == type;
+        return internal::find_if<&internal::meta_type_node::conv>([id = internal::meta_info<Type>::resolve()->id](const auto *curr) {
+            return curr->type()->id == id;
         }, node);
     }
 
@@ -1459,7 +1456,7 @@ public:
      * otherwise.
      */
     bool operator==(const meta_type &other) const ENTT_NOEXCEPT {
-        return node == other.node;
+        return (!node && !other.node) || (node && other.node && node->id == other.node->id);
     }
 
 private:

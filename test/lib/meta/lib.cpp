@@ -8,7 +8,9 @@ position create_position(int x, int y) {
     return position{x, y};
 }
 
-ENTT_API void set_up() {
+ENTT_API void set_up(entt::meta_ctx ctx) {
+    entt::meta_ctx::bind(ctx);
+
     entt::meta<position>()
             .type("position"_hs)
             .ctor<&create_position>()
@@ -16,6 +18,7 @@ ENTT_API void set_up() {
             .data<&position::y>("y"_hs);
 
     entt::meta<velocity>()
+            .type("velocity"_hs)
             .ctor<>()
             .data<&velocity::dx>("dx"_hs)
             .data<&velocity::dy>("dy"_hs);

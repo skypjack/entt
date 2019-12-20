@@ -27,8 +27,6 @@
 * Mission: get rid of named types
   - make it possible to use custom generators (eg for plugins)
     * ENTT_ID_TYPE id() (eg dispatcher) can be a data member rather than a virtual function
-    * meta: use type_id, remove import, everything should work transparently
-    * type_id_enabled and fallback on old-fashioned families otherwise
     * add discard pool functionality (+ test)
   - use type_id also for groups, get rid of extent and subfunctions, is it possible?
   - update doc: dispatcher, emitter, registry, meta, across boundaries
