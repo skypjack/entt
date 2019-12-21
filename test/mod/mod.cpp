@@ -175,7 +175,7 @@ public:
     }
 
     static duk_ret_t identifier(duk_context *ctx) {
-        static ENTT_ID_TYPE next{};
+        static ENTT_ID_TYPE next{1000u};
         duk_push_uint(ctx, next++);
         return 1;
     }
