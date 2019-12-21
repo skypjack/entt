@@ -251,4 +251,4 @@ constexpr entt::hashed_wstring operator"" ENTT_HWS_SUFFIX(const wchar_t *str, st
 }
 
 
-#endif // ENTT_CORE_HASHED_STRING_HPP
+#endif

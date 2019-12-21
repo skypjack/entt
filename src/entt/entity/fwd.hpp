@@ -86,4 +86,4 @@ using group = basic_group<entity, Types...>;
 }
 
 
-#endif // ENTT_ENTITY_FWD_HPP
+#endif

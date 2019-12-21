@@ -871,4 +871,4 @@ resolve(Op op) {
 }
 
 
-#endif // ENTT_META_FACTORY_HPP
+#endif

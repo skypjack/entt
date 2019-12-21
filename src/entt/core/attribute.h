@@ -30,4 +30,4 @@
 #endif
 
 
-#endif // ENTT_LIB_ATTRIBUTE_H
+#endif

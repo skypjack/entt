@@ -43,4 +43,4 @@ constexpr get_t<Type...> get{};
 }
 
 
-#endif // ENTT_ENTITY_UTILITY_HPP
+#endif

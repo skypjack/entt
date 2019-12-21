@@ -33,4 +33,4 @@ public:
 }
 
 
-#endif // ENTT_CORE_FAMILY_HPP
+#endif

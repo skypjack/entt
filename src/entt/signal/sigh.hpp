@@ -577,4 +577,4 @@ sink(sigh<Ret(Args...)> &) ENTT_NOEXCEPT -> sink<Ret(Args...)>;
 }
 
 
-#endif // ENTT_SIGNAL_SIGH_HPP
+#endif

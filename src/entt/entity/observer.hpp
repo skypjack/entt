@@ -437,4 +437,4 @@ private:
 }
 
 
-#endif // ENTT_ENTITY_OBSERVER_HPP
+#endif

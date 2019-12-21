@@ -62,4 +62,4 @@ public:
 }
 
 
-#endif // ENTT_CORE_IDENT_HPP
+#endif

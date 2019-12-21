@@ -856,4 +856,4 @@ private:
 }
 
 
-#endif // ENTT_ENTITY_GROUP_HPP
+#endif

@@ -337,4 +337,4 @@ struct process_adaptor: process<process_adaptor<Func, Delta>, Delta>, private Fu
 }
 
 
-#endif // ENTT_PROCESS_PROCESS_HPP
+#endif

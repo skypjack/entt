@@ -734,4 +734,4 @@ struct storage: basic_storage<Entity, Type> {};
 }
 
 
-#endif // ENTT_ENTITY_STORAGE_HPP
+#endif

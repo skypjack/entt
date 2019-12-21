@@ -34,4 +34,4 @@ class sigh;
 }
 
 
-#endif // ENTT_SIGNAL_FWD_HPP
+#endif

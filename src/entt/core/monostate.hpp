@@ -58,4 +58,4 @@ inline monostate<Value> monostate_v = {};
 }
 
 
-#endif // ENTT_CORE_MONOSTATE_HPP
+#endif

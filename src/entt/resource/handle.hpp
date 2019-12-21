@@ -105,4 +105,4 @@ private:
 }
 
 
-#endif // ENTT_RESOURCE_HANDLE_HPP
+#endif

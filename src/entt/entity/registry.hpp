@@ -1727,4 +1727,4 @@ private:
 }
 
 
-#endif // ENTT_ENTITY_REGISTRY_HPP
+#endif

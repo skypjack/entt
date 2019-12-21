@@ -243,4 +243,4 @@ private:
 }
 
 
-#endif // ENTT_SIGNAL_DISPATCHER_HPP
+#endif

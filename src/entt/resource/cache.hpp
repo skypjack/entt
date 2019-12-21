@@ -237,4 +237,4 @@ private:
 }
 
 
-#endif // ENTT_RESOURCE_CACHE_HPP
+#endif

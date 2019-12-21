@@ -800,4 +800,4 @@ private:
 }
 
 
-#endif // ENTT_ENTITY_VIEW_HPP
+#endif

@@ -330,4 +330,4 @@ private:
 }
 
 
-#endif // ENTT_SIGNAL_EMITTER_HPP
+#endif

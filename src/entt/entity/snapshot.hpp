@@ -602,4 +602,4 @@ private:
 }
 
 
-#endif // ENTT_ENTITY_SNAPSHOT_HPP
+#endif

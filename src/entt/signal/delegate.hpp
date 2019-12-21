@@ -354,4 +354,4 @@ delegate(connect_arg_t<Candidate>, Type *) ENTT_NOEXCEPT
 }
 
 
-#endif // ENTT_SIGNAL_DELEGATE_HPP
+#endif

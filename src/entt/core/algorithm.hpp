@@ -140,4 +140,4 @@ struct radix_sort {
 }
 
 
-#endif // ENTT_CORE_ALGORITHM_HPP
+#endif

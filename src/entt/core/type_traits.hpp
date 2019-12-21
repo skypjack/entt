@@ -186,4 +186,4 @@ constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
     static_assert(true)
 
 
-#endif // ENTT_CORE_TYPE_TRAITS_HPP
+#endif

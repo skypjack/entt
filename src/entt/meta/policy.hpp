@@ -24,4 +24,4 @@ struct as_void_t {};
 }
 
 
-#endif // ENTT_META_POLICY_HPP
+#endif

@@ -136,4 +136,4 @@ using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
 }
 
 
-#endif // ENTT_ENTITY_HELPER_HPP
+#endif

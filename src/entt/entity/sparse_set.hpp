@@ -633,4 +633,4 @@ private:
 }
 
 
-#endif // ENTT_ENTITY_SPARSE_SET_HPP
+#endif

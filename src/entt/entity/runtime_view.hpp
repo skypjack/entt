@@ -258,4 +258,4 @@ private:
 }
 
 
-#endif // ENTT_ENTITY_RUNTIME_VIEW_HPP
+#endif

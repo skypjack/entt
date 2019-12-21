@@ -62,4 +62,4 @@ class loader {
 }
 
 
-#endif // ENTT_RESOURCE_LOADER_HPP
+#endif

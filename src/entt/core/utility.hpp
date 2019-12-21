@@ -102,4 +102,4 @@ private:
 }
 
 
-#endif // ENTT_CORE_UTILITY_HPP
+#endif

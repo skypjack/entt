@@ -21,4 +21,4 @@ class loader;
 }
 
 
-#endif // ENTT_RESOURCE_FWD_HPP
+#endif

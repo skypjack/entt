@@ -69,4 +69,4 @@ ENTT_ID_TYPE type_info<Type, Cond>::id() ENTT_NOEXCEPT {
 }
 
 
-#endif // ENTT_CORE_TYPE_INFO_HPP
+#endif

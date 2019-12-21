@@ -171,4 +171,4 @@ constexpr auto null = internal::null{};
 }
 
 
-#endif // ENTT_ENTITY_ENTITY_HPP
+#endif

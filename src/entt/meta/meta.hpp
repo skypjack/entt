@@ -1538,4 +1538,4 @@ inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
 }
 
 
-#endif // ENTT_META_META_HPP
+#endif

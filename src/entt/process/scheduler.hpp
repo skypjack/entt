@@ -297,4 +297,4 @@ private:
 }
 
 
-#endif // ENTT_PROCESS_SCHEDULER_HPP
+#endif
