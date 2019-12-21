@@ -25,5 +25,6 @@
   - ::group improve, reduce code
 
 * Mission: get rid of named types
+  - make family-like fallback for type_info::id work across boundaries
   - update doc: dispatcher, emitter, registry, meta, across boundaries
   - review and suppress warnings, if any
