@@ -10,23 +10,19 @@ TEST(Lib, Registry) {
 
     for(auto i = 0; i < 3; ++i) {
         const auto entity = registry.create();
-        registry.assign<position>(entity, i, i+1);
+        registry.assign<position>(entity, i, i);
     }
-
-    ASSERT_FALSE(registry.empty<position>());
-    ASSERT_TRUE(registry.empty<velocity>());
 
     cr_plugin ctx;
     ctx.userdata = &registry;
     cr_plugin_load(ctx, PLUGIN);
     cr_plugin_update(ctx);
 
-    ASSERT_FALSE(registry.empty<position>());
-    ASSERT_FALSE(registry.empty<velocity>());
+    ASSERT_EQ(registry.size<position>(), registry.size<velocity>());
 
     registry.view<position>().each([](auto entity, auto &position) {
-        ASSERT_EQ(position.x, entt::to_integral(entity) + 2);
-        ASSERT_EQ(position.y, entt::to_integral(entity) + 3);
+        ASSERT_EQ(position.x, entt::to_integral(entity) + 16);
+        ASSERT_EQ(position.y, entt::to_integral(entity) + 16);
     });
 
     cr_plugin_close(ctx);

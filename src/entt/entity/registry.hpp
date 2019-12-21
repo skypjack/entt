@@ -147,7 +147,7 @@ class basic_registry {
     };
 
     struct pool_data {
-        ENTT_ID_TYPE id;
+        ENTT_ID_TYPE type_id;
         std::unique_ptr<sparse_set<Entity>> pool;
         void(* assure)(basic_registry &, const sparse_set<Entity> &);
         void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
@@ -213,15 +213,15 @@ class basic_registry {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>);
         static std::size_t index{pools.size()};
 
-        if(!(index < pools.size()) || pools[index].id != type_id_v<Component>) {
+        if(!(index < pools.size()) || pools[index].type_id != type_id_v<Component>) {
             index = std::find_if(pools.cbegin(), pools.cend(), [](auto &&cpool) {
-                return cpool.id == type_id_v<Component>;
+                return cpool.type_id == type_id_v<Component>;
             }) - pools.cbegin();
 
             if(index == pools.size()) {
                 auto &&pdata = pools.emplace_back();
 
-                pdata.id = type_id_v<Component>;
+                pdata.type_id = type_id_v<Component>;
                 pdata.pool = std::make_unique<pool_type<Component>>(std::forward<Args>(args)...);
 
                 pdata.remove = [](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
@@ -273,8 +273,19 @@ public:
      */
     template<typename Component, typename... Args>
     void prepare(Args &&... args) {
-        ENTT_ASSERT(std::none_of(pools.cbegin(), pools.cend(), [](auto &&pdata) { return pdata.id == type_id_v<Component>; }));
+        ENTT_ASSERT(std::none_of(pools.cbegin(), pools.cend(), [](auto &&pdata) { return pdata.type_id == type_id_v<Component>; }));
         assure<Component>(std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Discards the pools for the given components.
+     * @tparam Component Types of components for which to discard the pools.
+     */
+    template<typename... Component>
+    void discard() {
+        pools.erase(std::remove_if(pools.begin(), pools.end(), [](auto &&pdata) {
+            return ((pdata.type_id == type_id_v<Component>) || ...);
+        }), pools.end());
     }
 
     /**
@@ -1425,7 +1436,7 @@ public:
 
         std::transform(first, last, selected.begin(), [this](const auto ctype) {
             const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) {
-                return pdata.id == ctype;
+                return pdata.type_id == ctype;
             });
 
             return it == pools.cend() ? nullptr : it->pool.get();
@@ -1476,7 +1487,7 @@ public:
 
         if constexpr(sizeof...(Component) == 0) {
             for(size_type pos{}; pos < pools.size(); ++pos) {
-                if(const auto &pdata = pools[pos]; pdata.assure && ((pdata.id != type_id_v<Exclude>) && ...)) {
+                if(const auto &pdata = pools[pos]; pdata.assure && ((pdata.type_id != type_id_v<Exclude>) && ...)) {
                     pdata.assure(other, *pdata.pool);
                 }
             }
@@ -1529,7 +1540,7 @@ public:
     void stomp(const entity_type dst, const basic_registry &other, const entity_type src, exclude_t<Exclude...> = {}) {
         if constexpr(sizeof...(Component) == 0) {
             for(size_type pos{}; pos < other.pools.size(); ++pos) {
-                if(const auto &pdata = other.pools[pos]; pdata.stomp && ((pdata.id != type_id_v<Exclude>) && ...) && pdata.pool->has(src)) {
+                if(const auto &pdata = other.pools[pos]; pdata.stomp && ((pdata.type_id != type_id_v<Exclude>) && ...) && pdata.pool->has(src)) {
                     pdata.stomp(*this, dst, *pdata.pool, src);
                 }
             }

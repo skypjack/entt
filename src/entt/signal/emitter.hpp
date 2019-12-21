@@ -187,8 +187,8 @@ public:
     emitter & operator=(emitter &&) = default;
 
     /**
-     * @brief Discards the pool for the given event.
-     * @tparam Event Type of event for which to discard the pool.
+     * @brief Discards the pools for the given events.
+     * @tparam Event Types of events for which to discard the pools.
      */
     template<typename... Event>
     void discard() {

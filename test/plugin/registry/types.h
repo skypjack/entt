@@ -7,8 +7,8 @@ struct position {
 };
 
 struct velocity {
-    int dx;
-    int dy;
+    double dx;
+    double dy;
 };
 
 #endif // ENTT_PLUGIN_REGISTRY_TYPES_H

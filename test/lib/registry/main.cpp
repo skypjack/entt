@@ -4,26 +4,24 @@
 #include <entt/entity/registry.hpp>
 #include "types.h"
 
-ENTT_API void update_position(int, entt::registry &);
-ENTT_API void assign_velocity(int, entt::registry &);
+ENTT_API void update_position(entt::registry &);
+ENTT_API void assign_velocity(entt::registry &);
 
 TEST(Lib, Registry) {
     entt::registry registry;
 
     for(auto i = 0; i < 3; ++i) {
         const auto entity = registry.create();
-        registry.assign<position>(entity, i, i+1);
+        registry.assign<position>(entity, i, i);
     }
 
-    assign_velocity(2, registry);
+    assign_velocity(registry);
+    update_position(registry);
 
-    ASSERT_EQ(registry.size<position>(), 3u);
-    ASSERT_EQ(registry.size<velocity>(), 3u);
-
-    update_position(1, registry);
+    ASSERT_EQ(registry.size<position>(), registry.size<velocity>());
 
     registry.view<position>().each([](auto entity, auto &position) {
-        ASSERT_EQ(position.x, entt::to_integral(entity) + 2);
-        ASSERT_EQ(position.y, entt::to_integral(entity) + 3);
+        ASSERT_EQ(position.x, entt::to_integral(entity) + 16);
+        ASSERT_EQ(position.y, entt::to_integral(entity) + 16);
     });
 }

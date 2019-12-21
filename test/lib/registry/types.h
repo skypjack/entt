@@ -9,8 +9,8 @@ struct ENTT_API position {
 };
 
 struct ENTT_API velocity {
-    int dx;
-    int dy;
+    double dx;
+    double dy;
 };
 
 #endif // ENTT_LIB_REGISTRY_TYPES_H

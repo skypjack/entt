@@ -25,6 +25,5 @@
   - ::group improve, reduce code
 
 * Mission: get rid of named types
-  - add discard pool functionality (+ test)
   - update doc: dispatcher, emitter, registry, meta, across boundaries
   - review and suppress warnings, if any
