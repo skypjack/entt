@@ -187,6 +187,17 @@ public:
     emitter & operator=(emitter &&) = default;
 
     /**
+     * @brief Discards the pool for the given event.
+     * @tparam Event Type of event for which to discard the pool.
+     */
+    template<typename... Event>
+    void discard() {
+        pools.erase(std::remove_if(pools.begin(), pools.end(), [](auto &&cpool) {
+            return ((cpool->id() == type_id_v<Event>) || ...);
+        }), pools.end());
+    }
+
+    /**
      * @brief Emits the given event.
      *
      * All the listeners registered for the specific event type are invoked with

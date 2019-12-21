@@ -11,8 +11,6 @@ struct message {
     int payload;
 };
 
-struct event {
-    int payload;
-};
+struct event {};
 
 #endif // ENTT_PLUGIN_EMITTER_TYPES_H

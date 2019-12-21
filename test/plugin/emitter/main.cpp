@@ -9,11 +9,9 @@ TEST(Lib, Emitter) {
     test_emitter emitter;
     int value{};
 
-    emitter.once<event>([&](event ev, test_emitter &) { value = ev.payload; });
-    emitter.once<message>([&](message msg, test_emitter &) { value = msg.payload; });
-    emitter.publish<event>(3);
+    ASSERT_EQ(value, 0);
 
-    ASSERT_EQ(value, 3);
+    emitter.once<message>([&](message msg, test_emitter &) { value = msg.payload; });
 
     cr_plugin ctx;
     ctx.userdata = &emitter;
