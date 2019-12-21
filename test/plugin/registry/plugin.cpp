@@ -7,6 +7,8 @@ CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
     case CR_STEP:
         [ctx]() {
             auto *registry = static_cast<entt::registry *>(ctx->userdata);
+            // forces the creation of the pool for the velocity component
+            registry->prepare<velocity>();
 
             for(auto entity: registry->view<position>()) {
                 registry->assign<velocity>(entity, 1., 1.);
