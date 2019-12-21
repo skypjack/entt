@@ -99,6 +99,17 @@ class dispatcher {
 
 public:
     /**
+     * @brief Discards the pool for the given event.
+     * @tparam Event Type of event for which to discard the pool.
+     */
+    template<typename... Event>
+    void discard() {
+        pools.erase(std::remove_if(pools.begin(), pools.end(), [](auto &&cpool) {
+            return ((cpool->id() == type_id_v<Event>) || ...);
+        }), pools.end());
+    }
+
+    /**
      * @brief Returns a sink object for the given event.
      *
      * A sink is an opaque object used to connect listeners to events.

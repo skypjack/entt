@@ -5,8 +5,6 @@ struct message {
     int payload;
 };
 
-struct event {
-    int payload;
-};
+struct event {};
 
 #endif // ENTT_LIB_DISPATCHER_TYPES_H
