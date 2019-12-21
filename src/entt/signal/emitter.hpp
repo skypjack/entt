@@ -44,7 +44,7 @@ class emitter {
         virtual ~basic_pool() = default;
         virtual bool empty() const ENTT_NOEXCEPT = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
-        virtual ENTT_ID_TYPE id() const ENTT_NOEXCEPT = 0;
+        virtual ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
@@ -108,8 +108,8 @@ class emitter {
             on_list.remove_if([](auto &&element) { return element.first; });
         }
 
-        ENTT_ID_TYPE id() const ENTT_NOEXCEPT override {
-            return type_id_v<Event>;
+        ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT override {
+            return type_info<Event>::id();
         }
 
     private:
@@ -123,9 +123,9 @@ class emitter {
         static_assert(std::is_same_v<Event, std::decay_t<Event>>);
         static std::size_t index{pools.size()};
 
-        if(!(index < pools.size()) || pools[index]->id() != type_id_v<Event>) {
+        if(!(index < pools.size()) || pools[index]->type_id() != type_info<Event>::id()) {
             index = std::find_if(pools.cbegin(), pools.cend(), [](auto &&cpool) {
-                return cpool->id() == type_id_v<Event>;
+                return cpool->type_id() == type_info<Event>::id();
             }) - pools.cbegin();
 
             if(index == pools.size()) {
@@ -193,7 +193,7 @@ public:
     template<typename... Event>
     void discard() {
         pools.erase(std::remove_if(pools.begin(), pools.end(), [](auto &&cpool) {
-            return ((cpool->id() == type_id_v<Event>) || ...);
+            return ((cpool->type_id() == type_info<Event>::id()) || ...);
         }), pools.end());
     }
 

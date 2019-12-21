@@ -134,7 +134,7 @@ class duktape_registry {
 
     template<typename... Comp>
     void reg() {
-        ((func[entt::type_id_v<Comp>] = {
+        ((func[entt::type_info<Comp>::id()] = {
                 &::set<Comp>,
                 &::unset<Comp>,
                 &::has<Comp>,
@@ -163,7 +163,7 @@ class duktape_registry {
         const auto it = func.find(type);
 
         return (it == func.cend())
-                ? (func[entt::type_id_v<duktape_runtime>].*Op)(ctx, registry)
+                ? (func[entt::type_info<duktape_runtime>::id()].*Op)(ctx, registry)
                 : (it->second.*Op)(ctx, registry);
     }
 
@@ -217,7 +217,7 @@ public:
 
             if(dreg.func.find(type) == dreg.func.cend()) {
                 if(runtime.empty()) {
-                    components.push_back(entt::type_id_v<duktape_runtime>);
+                    components.push_back(entt::type_info<duktape_runtime>::id());
                 }
 
                 runtime.push_back(type);
@@ -268,7 +268,7 @@ const duk_function_list_entry js_duktape_registry_methods[] = {
 void export_types(duk_context *context) {
     auto export_type = [idx = duk_push_object(context)](auto *ctx, auto type, const auto *name) {
         duk_push_string(ctx, name);
-        duk_push_uint(ctx, entt::type_id_v<typename decltype(type)::type>);
+        duk_push_uint(ctx, entt::type_info<typename decltype(type)::type>::id());
         duk_def_prop(ctx, idx, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE);
     };
 

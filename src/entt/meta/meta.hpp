@@ -196,7 +196,7 @@ struct meta_node {
 
     inline static meta_type_node * resolve() ENTT_NOEXCEPT {
         static meta_type_node node{
-            type_id_v<Type...>,
+            type_info<Type...>::id(),
             {},
             nullptr,
             nullptr,
