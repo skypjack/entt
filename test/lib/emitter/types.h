@@ -13,4 +13,4 @@ struct message {
 
 struct event {};
 
-#endif // ENTT_LIB_EMITTER_TYPES_H
+#endif

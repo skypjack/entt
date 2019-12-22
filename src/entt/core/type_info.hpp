@@ -3,6 +3,7 @@
 
 
 #include "../config/config.h"
+#include "../core/attribute.h"
 #include "hashed_string.hpp"
 
 
@@ -14,18 +15,14 @@ namespace entt {
  * @tparam Type Type for which to generate an identifier.
  */
 template<typename Type, typename = void>
-struct type_info {
+struct ENTT_API type_info {
     /**
      * @brief Returns the numeric representation of a given type.
      * @return The numeric representation of the given type.
      */
-#if defined _MSC_VER
+#if defined ENTT_PRETTY_FUNCTION
     static constexpr ENTT_ID_TYPE id() ENTT_NOEXCEPT {
-        return entt::hashed_string{__FUNCSIG__};
-    }
-#elif defined __GNUC__
-    static constexpr ENTT_ID_TYPE id() ENTT_NOEXCEPT {
-        return entt::hashed_string{__PRETTY_FUNCTION__};
+        return entt::hashed_string{ENTT_PRETTY_FUNCTION};
     }
 #else
     static ENTT_ID_TYPE id() ENTT_NOEXCEPT;
@@ -41,7 +38,7 @@ struct type_info {
 namespace internal {
 
 
-struct type_id_generator {
+struct ENTT_API type_id_generator {
     static ENTT_ID_TYPE next() ENTT_NOEXCEPT {
         static ENTT_ID_TYPE value{};
         return value++;

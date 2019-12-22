@@ -53,10 +53,12 @@
 #endif
 
 
-#if defined _MSC_VER
-#   define ENTT_PRETTY_FUNCTION __FUNCSIG__
-#elif defined __GNUC__
-#   define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#ifndef ENTT_STANDARD_CPP
+#   if defined _MSC_VER
+#      define ENTT_PRETTY_FUNCTION __FUNCSIG__
+#   elif defined __GNUC__
+#      define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#   endif
 #endif
 
 

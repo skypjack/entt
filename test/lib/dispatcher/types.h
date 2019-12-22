@@ -7,4 +7,4 @@ struct message {
 
 struct event {};
 
-#endif // ENTT_LIB_DISPATCHER_TYPES_H
+#endif

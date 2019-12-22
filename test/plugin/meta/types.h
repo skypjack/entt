@@ -18,4 +18,4 @@ struct userdata {
     entt::meta_any any;
 };
 
-#endif // ENTT_PLUGIN_META_TYPES_H
+#endif

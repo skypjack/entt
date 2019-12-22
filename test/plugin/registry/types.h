@@ -11,4 +11,4 @@ struct velocity {
     double dy;
 };
 
-#endif // ENTT_PLUGIN_REGISTRY_TYPES_H
+#endif
