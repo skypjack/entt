@@ -16,7 +16,7 @@ jobs:
         CXXFLAGS: "-O0 --coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
         CXX: g++
       run: |
-        cmake -DBUILD_TESTING=ON -DBUILD_LIB=ON -DBUILD_PLUGIN=ON ..
+        cmake -DBUILD_TESTING=ON -DBUILD_LIB=ON ..
         make -j4
     - name: Run tests
       working-directory: build

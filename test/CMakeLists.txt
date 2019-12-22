@@ -56,14 +56,14 @@ macro(SETUP_LIB_TEST TEST_NAME)
 endmacro()
 
 macro(SETUP_PLUGIN_TEST TEST_NAME)
-    add_library(_${TEST_NAME}_plugin MODULE plugin/${TEST_NAME}/plugin.cpp)
-    SETUP_TARGET(_${TEST_NAME}_plugin)
-    SETUP_BASIC_TEST(lib_${TEST_NAME}_plugin plugin/${TEST_NAME}/main.cpp)
-    target_link_libraries(lib_${TEST_NAME}_plugin PRIVATE ${CMAKE_DL_LIBS})
-    target_include_directories(lib_${TEST_NAME}_plugin PRIVATE ${CR_SRC_DIR})
-    target_compile_definitions(lib_${TEST_NAME}_plugin PRIVATE NOMINMAX PLUGIN="$<TARGET_FILE:_${TEST_NAME}_plugin>")
-    target_include_directories(_${TEST_NAME}_plugin PRIVATE ${CR_SRC_DIR})
-    target_compile_definitions(_${TEST_NAME}_plugin PRIVATE NOMINMAX)
+    add_library(_${TEST_NAME} MODULE lib/${TEST_NAME}/plugin.cpp)
+    SETUP_TARGET(_${TEST_NAME})
+    SETUP_BASIC_TEST(lib_${TEST_NAME} lib/${TEST_NAME}/main.cpp)
+    target_link_libraries(lib_${TEST_NAME} PRIVATE ${CMAKE_DL_LIBS})
+    target_include_directories(lib_${TEST_NAME} PRIVATE ${CR_SRC_DIR})
+    target_compile_definitions(lib_${TEST_NAME} PRIVATE NOMINMAX PLUGIN="$<TARGET_FILE:_${TEST_NAME}>")
+    target_include_directories(_${TEST_NAME} PRIVATE ${CR_SRC_DIR})
+    target_compile_definitions(_${TEST_NAME} PRIVATE NOMINMAX)
 endmacro()
 
 # Test benchmark
@@ -75,25 +75,21 @@ endif()
 # Test lib
 
 if(BUILD_LIB)
-    SETUP_LIB_TEST(dispatcher)
-    SETUP_LIB_TEST(emitter)
-    SETUP_LIB_TEST(meta)
-    SETUP_LIB_TEST(registry)
-endif()
-
-# Test plugin
-
-if(BUILD_PLUGIN)
     set(CR_DEPS_DIR ${EnTT_SOURCE_DIR}/deps/cr)
     configure_file(${EnTT_SOURCE_DIR}/cmake/in/cr.in ${CR_DEPS_DIR}/CMakeLists.txt)
     execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY ${CR_DEPS_DIR})
     execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${CR_DEPS_DIR})
     set(CR_SRC_DIR ${CR_DEPS_DIR}/src)
 
-    SETUP_PLUGIN_TEST(dispatcher)
-    SETUP_PLUGIN_TEST(emitter)
-    SETUP_PLUGIN_TEST(meta)
-    SETUP_PLUGIN_TEST(registry)
+    SETUP_LIB_TEST(dispatcher)
+    SETUP_LIB_TEST(emitter)
+    SETUP_LIB_TEST(meta)
+    SETUP_LIB_TEST(registry)
+
+    SETUP_PLUGIN_TEST(dispatcher_plugin)
+    SETUP_PLUGIN_TEST(emitter_plugin)
+    SETUP_PLUGIN_TEST(meta_plugin)
+    SETUP_PLUGIN_TEST(registry_plugin)
 endif()
 
 # Test mod
