@@ -217,7 +217,7 @@ supports at least C++17.<br/>
 The requirements below are mandatory to compile the tests and to extract the
 documentation:
 
-* `CMake` version 3.2 or later.
+* `CMake` version 3.7 or later.
 * `Doxygen` version 1.8 or later.
 
 If you are looking for a C++14 version of `EnTT`, check out the git tag `cpp14`.
