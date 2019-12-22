@@ -220,13 +220,6 @@ documentation:
 * `CMake` version 3.2 or later.
 * `Doxygen` version 1.8 or later.
 
-Alternatively, `Bazel` is also supported as a build system (credits to
-[zaucy](https://github.com/zaucy) who introduced what's required with
-[this](https://github.com/skypjack/entt/pull/291) pull request and offered to
-maintain it).<br/>
-In the documentation below I'll still refer to `CMake`, this being the official
-build system of the library.
-
 If you are looking for a C++14 version of `EnTT`, check out the git tag `cpp14`.
 
 ## Library

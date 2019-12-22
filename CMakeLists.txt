@@ -187,13 +187,11 @@ endif()
 #
 
 FILE(GLOB GH_WORKFLOWS .github/workflows/*.yml)
-FILE(GLOB_RECURSE BUILD_BAZEL test/BUILD.bazel)
 
 add_custom_target(
     entt_aob
     SOURCES
         ${GH_WORKFLOWS}
-        ${BUILD_BAZEL}
         .github/FUNDING.yml
         AUTHORS
         CONTRIBUTING.md

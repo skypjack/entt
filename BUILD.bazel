@@ -1,9 +1,0 @@
-load("//bazel:copts.bzl", "entt_copts")
-
-cc_library(
-    name = "entt",
-    visibility = ["//visibility:public"],
-    strip_include_prefix = "src",
-    hdrs = glob(["src/**/*.h", "src/**/*.hpp"]),
-    copts = entt_copts,
-)
