@@ -1,5 +1,5 @@
-#ifndef ENTT_PLUGIN_META_TYPES_H
-#define ENTT_PLUGIN_META_TYPES_H
+#ifndef ENTT_LIB_META_PLUGIN_TYPES_H
+#define ENTT_LIB_META_PLUGIN_TYPES_H
 
 #include <entt/meta/meta.hpp>
 

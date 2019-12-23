@@ -26,6 +26,6 @@
   - ::group improve, reduce code
 
 * Mission: get rid of named types
-  - add tests for type_info fallback and type_info specializations
+  - add tests for type_info specializations (eg dispatcher_plugin_std)
   - update doc: dispatcher, emitter, registry, meta, across boundaries
   - review and suppress warnings, if any

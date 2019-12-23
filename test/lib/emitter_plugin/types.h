@@ -1,5 +1,5 @@
-#ifndef ENTT_PLUGIN_EMITTER_TYPES_H
-#define ENTT_PLUGIN_EMITTER_TYPES_H
+#ifndef ENTT_LIB_EMITTER_PLUGIN_TYPES_H
+#define ENTT_LIB_EMITTER_PLUGIN_TYPES_H
 
 #include <entt/signal/emitter.hpp>
 
