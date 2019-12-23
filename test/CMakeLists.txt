@@ -59,11 +59,11 @@ macro(SETUP_PLUGIN_TEST TEST_NAME)
     add_library(_${TEST_NAME} MODULE lib/${TEST_NAME}/plugin.cpp)
     SETUP_TARGET(_${TEST_NAME})
     SETUP_BASIC_TEST(lib_${TEST_NAME} lib/${TEST_NAME}/main.cpp)
-    target_link_libraries(lib_${TEST_NAME} PRIVATE ${CMAKE_DL_LIBS})
-    target_include_directories(lib_${TEST_NAME} PRIVATE ${CR_SRC_DIR})
-    target_compile_definitions(lib_${TEST_NAME} PRIVATE NOMINMAX PLUGIN="$<TARGET_FILE:_${TEST_NAME}>")
     target_include_directories(_${TEST_NAME} PRIVATE ${CR_SRC_DIR})
-    target_compile_definitions(_${TEST_NAME} PRIVATE NOMINMAX)
+    target_include_directories(lib_${TEST_NAME} PRIVATE ${CR_SRC_DIR})
+    target_compile_definitions(lib_${TEST_NAME} PRIVATE NOMINMAX PLUGIN="$<TARGET_FILE:_${TEST_NAME}>" ${ARGV1})
+    target_compile_definitions(_${TEST_NAME} PRIVATE NOMINMAX ${ARGV1})
+    target_link_libraries(lib_${TEST_NAME} PRIVATE ${CMAKE_DL_LIBS})
 endmacro()
 
 # Test benchmark
@@ -95,6 +95,11 @@ if(BUILD_LIB)
     SETUP_PLUGIN_TEST(emitter_plugin)
     SETUP_PLUGIN_TEST(meta_plugin)
     SETUP_PLUGIN_TEST(registry_plugin)
+
+    SETUP_PLUGIN_TEST(dispatcher_plugin_std ENTT_STANDARD_CPP)
+    SETUP_PLUGIN_TEST(emitter_plugin_std ENTT_STANDARD_CPP)
+    SETUP_PLUGIN_TEST(meta_plugin_std ENTT_STANDARD_CPP)
+    SETUP_PLUGIN_TEST(registry_plugin_std ENTT_STANDARD_CPP)
 endif()
 
 # Test mod
