@@ -6,12 +6,9 @@
 # Table of Contents
 
 * [Introduction](#introduction)
-* [Named types and traits class](#named-types-and-traits-class)
-  * [Do not mix types](#do-not-mix-types)
-* [Macros, macros everywhere](#macros-macros-everywhere)
-  * [Conflicts](#conflicts)
-* [Runtime reflection system](#runtime-reflection-system)
-* [Allocations: the dark side of the force](#allocations-the-dark-side-of-the-force)
+* [The EnTT way](#the-entt-way)
+* [Meta context](#meta-context)
+* [Memory management](#memory-management)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -19,178 +16,93 @@
 # Introduction
 
 `EnTT` has historically had a limit when used across boundaries on Windows in
-general and on GNU/Linux when default visibility was set to _hidden_. The
-limitation is due mainly to a custom utility used to assign unique, sequential
-identifiers to different types. Unfortunately, this tool is used by several core
-classes (the `registry` among the others) that are thus almost unusable across
-boundaries.<br/>
-The reasons for that are beyond the purposes of this document. However, the good
-news is that `EnTT` also offers now a way to overcome this limit and to push
-things across boundaries without problems when needed.
+general and on GNU/Linux when default visibility was set to hidden. The
+limitation was mainly due to a custom utility used to assign unique, sequential
+identifiers to different types.<br/>
+Fortunately, nowadays using `EnTT` across boundaries is straightforward. In
+fact, everything just works transparently in almost all cases. There are only a
+few exceptions, easy to deal with anyway.
 
-# Named types and traits class
+# The EnTT way
 
-To allow a type to work properly across boundaries when used by a class that
-requires to assign unique identifiers to types, users must specialize a class
-template to literally give a compile-time name to the type itself.<br/>
-The name of the class template is `name_type_traits` and the specialization must
-be such that it exposes a static constexpr data member named `value` having type
-either `ENTT_ID_TYPE` or `entt::hashed_string::hash_type`. Its value is the user
-defined unique identifier assigned to the specific type.<br/>
-Identifiers are not to be sequentially generated in this case.
+Many classes in `EnTT` make extensive use of type erasure for their purposes.
+This isn't a problem in itself (in fact, it's the basis of an API so convenient
+to use). However, a way is needed to recognize the objects whose type has been
+erased on the other side of a boundary.<br/>
+The `type_info` class template is how identifiers are generated and thus made
+available to the rest of the library.
 
-As an example:
+The only case in which this may arouse some interest is in case of conflicts
+between identifiers (definitely uncommon though) or where the default solution
+proposed by `EnTT` is not suitable for the user's purposes.<br/>
+Please refer to the dedicated section for more details.
 
-```cpp
-struct my_type { /* ... */ };
-
-template<>
-struct entt::named_type_traits<my_type> {
-    static constexpr auto value = "my_type"_hs;
-};
-```
-
-Because of the rules of the language, the specialization must reside in the
-global namespace or in the `entt` namespace. There is no way to change this rule
-unfortunately, because it doesn't depend on the library itself.
-
-The good aspect of this approach is that it's not intrusive at all. The other
-way around was in fact forcing users to inherit all their classes from a common
-base. Something to avoid, at least from my point of view.<br/>
-However, despite the fact that it's not intrusive, it would be great if it was
-also easier to use and a bit less error-prone. This is why a bunch of macros
-exist to ease defining named types.
-
-## Do not mix types
-
-Someone might think that this trick is valid only for the types to push across
-boundaries. This isn't how things work. In fact, the problem is more complex
-than that.<br/>
-As a rule of thumb, users should never mix named and non-named types. Whenever
-a type is given a name, all the types must be given a name. As an example,
-consider the `registry` class template: in case it is pushed across boundaries,
-all the types of components should be assigned a name to avoid subtle bugs.
-
-Indeed, this constraint can be relaxed in many cases. However, it is difficult
-to define a general rule to follow that is not the most stringent, unless users
-know exactly what they are doing. Therefore, I won't elaborate on giving further
-details on the topic.
-
-# Macros, macros everywhere
-
-The library comes with a set of predefined macros to use to declare named types
-or export already existing ones. In particular:
-
-* `ENTT_NAMED_TYPE` can be used to assign a name to already existing types. This
-  macro must be used in the global namespace even when the types to be named are
-  not.
-
-  ```cpp
-  ENTT_NAMED_TYPE(my_type)
-  ENTT_NAMED_TYPE(ns::another_type)
-  ```
-
-* `ENTT_NAMED_STRUCT` can be used to define and export a struct at the same
-  time. It accepts also an optional namespace in which to define the given type.
-  This macro must be used in the global namespace.
-
-  ```cpp
-  ENTT_NAMED_STRUCT(my_type, { /* struct definition */})
-  ENTT_NAMED_STRUCT(ns, another_type, { /* struct definition */})
-  ```
-
-* `ENTT_NAMED_CLASS` can be used to define and export a class at the same
-  time. It accepts also an optional namespace in which to define the given type.
-  This macro must be used in the global namespace.
-
-  ```cpp
-  ENTT_NAMED_CLASS(my_type, { /* class definition */})
-  ENTT_NAMED_CLASS(ns, another_type, { /* class definition */})
-  ```
-
-Nested namespaces are supported out of the box as well in all cases. As an
-example:
-
-```cpp
-ENTT_NAMED_STRUCT(nested::ns, my_type, { /* struct definition */})
-```
-
-These macros can be used to avoid specializing the `named_type_traits` class
-template. In all cases, the name of the class is used also as a seed to generate
-the compile-time unique identifier.
-
-## Conflicts
-
-When using macros, unique identifiers are 32/64 bit integers generated by
-hashing strings during compilation. Therefore, conflicts are rare but still
-possible. In case of conflicts, everything simply will get broken at runtime and
-the strangest things will probably take place.<br/>
-Unfortunately, there is no safe way to prevent it. If this happens, it will be
-enough to give a different value to one of the conflicting types to solve the
-problem. To do this, users can either assign a different name to the class or
-directly define a specialization for the `named_type_traits` class template.
-
-# Runtime reflection system
+# Meta context
 
 The runtime reflection system deserves a special mention when it comes to using
 it across boundaries.<br/>
-As in all other cases, it's necessary to give a name to the types. However, this
-time this isn't enough to get the job done.
+Since it's linked to a static context to which the visible components are
+attached and different contexts don't relate to each other, they must be
+_shared_ to allow the use of meta types across boundaries.
 
-The runtime reflection system is linked to a static context to which the visible
-components are linked. A component is visible when it's given a name, so the
-named components are implicitly visible.<br/>
-Different contexts don't relate to each other. Therefore, to allow the use of
-named types across boundaries, a context must also be shared.
+Sharing a context is trivial though. First of all, the local one must be
+acquired in the main space:
 
-Sharing a context is straightforward. First of all, the local one must be
-acquired:
-
-```
+```cpp
 entt::meta_ctx ctx{};
 ```
 
-Then, it must be pushed across boundaries and the receiving space must set it as
-its global context, thus releasing the local one that remains available but is
-no longer referred to by the runtime reflection system:
+Then, it must passed to the receiving space that will set it as its global
+context, thus releasing the local one that remains available but is no longer
+referred to by the runtime reflection system:
 
-```
+```cpp
 entt::meta_ctx::bind(ctx);
 ```
 
 From now on, both spaces will refer to the same context and on it will be
-associated the new visible meta types, no matter _where_ they are created.
-
+attached the new visible meta types, no matter where they are created.<br/>
 A context can also be reset and then associated again locally as:
 
-```
+```cpp
 entt::meta_ctx::bind{entt::meta_ctx{});
 ```
 
 This is allowed because local and global contexts are separated. Therefore, it's
 always possible to make the local context the current one again.
 
-# Allocations: the dark side of the force
+Before to release a context, all locally registered types should be reset to
+avoid dangling references. Otherwise, if a type is accessed from another space
+by name, there could be an attempt to address its parts that are no longer
+available.
 
-As long as `EnTT` won't support custom allocators, another problem with
-allocations will remain alive instead. This is in fact easily solved, or at
-least it is if one knows it.
+# Memory Management
 
-To allow users to add types dynamically, the library makes extensive use of type
-erasure techniques and dynamic allocations for pools (whether they are for
-components, events or anything else). The problem occurs when, for example, a
-registry is created on one side of a boundary and a pool is dynamically created
-on the other side. In the best case, everything will crash at the exit, while at
-worst it will do so at runtime.<br/>
-To avoid problems, the pools must be generated from the same side of the
-boundary where the object that owns them is also created. As an example, when
-the registry is created in the main executable and used across boundaries for a
-given type of component, the pool for that type must be created before passing
-around the registry itself. To do this is fortunately quite easy, since it is
-sufficient to invoke any of the methods that involve the given type (continuing
-the example with the registry, a call to `reserve` or `size` is more than
-enough).
+There is another subtle problem due to memory management that can lead to
+headaches.<br/>
+This can occur where there are pools of objects (such as components or events)
+dynamically created on demand.
 
-Maybe one day some dedicated methods will be added that do nothing but create a
-pool for a given type. Until now it has been preferred to keep the API cleaner
-as they are not strictly necessary.
+As an example, imagine creating an instance of `registry` in the main executable
+and share it with a plugin. If the latter starts working with a component that
+is unknown to the former, a dedicated pool is created within the registry on
+first use.<br/>
+As one can guess, this pool is instantiated on a different side of the boundary
+from the `registry`. Therefore, the instance is now managing memory from
+different spaces and this can quickly lead to crashes if not properly addressed.
+
+Fortunately, all classes that could potentially suffer from this problem offer
+also a `discard` member function to get rid of these pools:
+
+```cpp
+registry.discard<local_type>();
+```
+
+This is all there is to do to get around this. Again, `discard` is only to be
+invoked if it's certain that the container and pools are instantiated on
+different sides of the boundary.
+
+If in doubts or to avoid risks, simply invoke the `prepare` member function or
+any of the other functions that refer to the desired type to force the
+generation of the pools that are used on both sides of the boundary.<br/>
+This is something to be done usually in the main context when needed.

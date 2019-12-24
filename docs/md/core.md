@@ -12,6 +12,8 @@
   * [Wide characters](wide-characters)
   * [Conflicts](#conflicts)
 * [Monostate](#monostate)
+* [Type info](#type-info)
+  * [Conflicts](#conflicts)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -182,3 +184,67 @@ entt::monostate<"mykey"_hs>{} = 42;
 const bool b = entt::monostate<"mykey"_hs>{};
 const int i = entt::monostate<entt::hashed_string{"mykey"}>{};
 ```
+
+# Type info
+
+The `type_info` class template is meant to provide some basic information about
+types of all kinds.<br/>
+Currently, the only information available is the numeric identifier associated
+with a given type:
+
+```cpp
+auto id = entt::type_info<my_type>::id();
+```
+
+In general, the `id` function is also `constexpr` but this isn't guaranteed for
+all compilers and platforms (although it's valid with the most well-known and
+popular compilers).<br/>
+This function **can** use non-standard features of the language for its own
+purposes. This allows it to provide compile-time identifiers that remain stable
+between different runs. However, it's possible to force the use of standard
+features only by defining the macro `ENTT_STANDARD_CPP`. In this case, there is
+no guarantee that the identifiers are stable across executions though. Moreover,
+identifiers are generated at runtime and are no longer a compile-time thing.
+
+An external type system can also be used if needed. In fact, `type_info` can be
+specialized by type and is also _sfinae-friendly_ in order to allow more refined
+specializations such as:
+
+```cpp
+template<typename Type>
+struct entt::type_info<Type, std::void_d<decltype(Type::custom_id())>> {
+    static constexpr ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+        return Type::custom_id();
+    }
+};
+```
+
+Note that this class template and its specializations are widely used within
+`EnTT`. It also plays a very important role in making `EnTT` work transparently
+across boundaries.<br/>
+Please refer to the dedicated section for more details.
+
+## Conflicts
+
+Since the default, non-standard implementation makes use of hashed strings, it
+may happen that two types are assigned the same numeric identifier.<br/>
+In fact, although this is quite rare, it's not entirely excluded.
+
+In this case, there are many ways to deal with it:
+
+* The most trivial one is to define the `ENTT_STANDARD_CPP` macro. Note that
+  runtime identifiers don't suffer from this problem. However, this solution
+  doesn't work well with a plugin system, where the libraries aren't linked.
+
+* Another possibility is to specialize the `type_info` class for one of the
+  conflicting types, in order to assign it a custom identifier. This is probably
+  the easiest solution that also preserves the feature of the tool.
+
+* A fully customized identifier generation policy (based for example on enum
+  classes or preprocessing steps) may represent yet another option.
+
+These are just some examples of possible approaches to the problem but there are
+many others. As already mentioned above, since users have full control over
+their types, this problem is in any case easy to solve and should not worry too
+much.<br/>
+In all likelihood, it will never happen to run into a conflict anyway.

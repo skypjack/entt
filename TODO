@@ -21,11 +21,8 @@
 * see warning (vs2017 only): d:\a\entt\entt\src\entt\entity\registry.hpp(108)
 * remove duktape example (and eventually provide a new one)?
 * meta: rebind meta types from any across boundaries (eg conv corner case across boundary)
+* review and suppress warnings, if any
+* extract only the type within type_info, hash its name (more portable)
 * registry
   - ::assure -> pool_type<T> &
   - ::group improve, reduce code
-
-* Mission: get rid of named types
-  - add tests for type_info specializations (eg dispatcher_plugin_std)
-  - update doc: dispatcher, emitter, registry, meta, across boundaries
-  - review and suppress warnings, if any
