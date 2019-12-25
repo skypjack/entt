@@ -1511,13 +1511,6 @@ public:
      * lists. An excluded type will never be copied.
      *
      * @warning
-     * Stomping entities between registries with different types of identifiers
-     * without a component list is allowed only if the target registry already
-     * contains the required pools.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case a
-     * pool is missing.
-     *
-     * @warning
      * Attempting to copy components that aren't copyable results in unexpected
      * behaviors.<br/>
      * A static assertion will abort the compilation when the components
@@ -1594,7 +1587,7 @@ public:
     basic_snapshot_loader<Entity> loader() {
         using force_fn_type = void(basic_registry &, const entity_type, const bool);
 
-        force_fn_type *force = [](basic_registry &reg, const entity_type entity, const bool discard) {
+        force_fn_type *force = [](basic_registry &reg, const entity_type entity, const bool drop) {
             const auto entt = to_integral(entity) & traits_type::entity_mask;
             auto &others = reg.entities;
 
@@ -1609,7 +1602,7 @@ public:
 
             others[entt] = entity;
 
-            if(discard) {
+            if(drop) {
                 reg.destroy(entity);
                 const auto version = to_integral(entity) & (traits_type::version_mask << traits_type::entity_shift);
                 others[entt] = entity_type{(to_integral(others[entt]) & traits_type::entity_mask) | version};
