@@ -22,5 +22,4 @@
 * remove duktape example (and eventually provide a new one)?
 * review and suppress warnings, if any
 * extract only the type within type_info, hash its name (more portable)
-* registry
-  - ::group improve, reduce code
+* registry: groups can break after a discard -> cleanup them

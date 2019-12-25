@@ -1333,26 +1333,16 @@ public:
             (std::get<pool_type<Get> &>(cpools).on_destroy().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
             (std::get<pool_type<Exclude> &>(cpools).on_construct().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
 
-            const auto &cpool = std::min({
-                static_cast<sparse_set<Entity> &>(std::get<pool_type<Owned> &>(cpools))...,
-                static_cast<sparse_set<Entity> &>(std::get<pool_type<Get> &>(cpools))...
-            }, [](const auto &lhs, const auto &rhs) {
-                return lhs.size() < rhs.size();
-            });
+            auto init = view<Owned..., Get...>(entt::exclude<Exclude...>);
 
             // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-            std::for_each(cpool.data(), cpool.data() + cpool.size(), [cpools, handler](const auto entity) {
-                if((std::get<pool_type<Owned> &>(cpools).has(entity) && ...)
-                        && (std::get<pool_type<Get> &>(cpools).has(entity) && ...)
-                        && !(std::get<pool_type<Exclude> &>(cpools).has(entity) || ...))
-                {
-                    if constexpr(sizeof...(Owned) == 0) {
-                        handler->owned.construct(entity);
-                    } else {
-                        if(!(std::get<0>(cpools).index(entity) < handler->owned)) {
-                            const auto pos = handler->owned++;
-                            (std::get<pool_type<Owned> &>(cpools).swap(std::get<pool_type<Owned> &>(cpools).data()[pos], entity), ...);
-                        }
+            std::for_each(std::make_reverse_iterator(init.end()), std::make_reverse_iterator(init.begin()), [handler](const auto entity) {
+                if constexpr(sizeof...(Owned) == 0) {
+                    handler->owned.construct(entity);
+                } else {
+                    if(!(std::get<0>(handler->cpools).index(entity) < handler->owned)) {
+                        const auto pos = handler->owned++;
+                        (std::get<pool_type<Owned> &>(handler->cpools).swap(std::get<pool_type<Owned> &>(handler->cpools).data()[pos], entity), ...);
                     }
                 }
             });
