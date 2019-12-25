@@ -154,10 +154,10 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         underlying_iterator_type it;
     };
 
-    // we could use pool_type<Component> *..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    basic_view(storage<Entity, std::remove_const_t<Component>> *... component, storage<Entity, std::remove_const_t<Exclude>> *... epool) ENTT_NOEXCEPT
-        : pools{component...},
-          filter{epool...}
+    // we could use pool_type<Component> &..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
+    basic_view(storage<Entity, std::remove_const_t<Component>> &... component, storage<Entity, std::remove_const_t<Exclude>> &... epool) ENTT_NOEXCEPT
+        : pools{&component...},
+          filter{&epool...}
     {}
 
     const sparse_set<Entity> * candidate() const ENTT_NOEXCEPT {
@@ -565,8 +565,8 @@ class basic_view<Entity, exclude_t<>, Component> {
 
     using pool_type = std::conditional_t<std::is_const_v<Component>, const storage<Entity, std::remove_const_t<Component>>, storage<Entity, Component>>;
 
-    basic_view(pool_type *ref) ENTT_NOEXCEPT
-        : pool{ref}
+    basic_view(pool_type &ref) ENTT_NOEXCEPT
+        : pool{&ref}
     {}
 
 public:

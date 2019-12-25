@@ -73,10 +73,10 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
     template<typename Component>
     using pool_type = std::conditional_t<std::is_const_v<Component>, const storage<Entity, std::remove_const_t<Component>>, storage<Entity, Component>>;
 
-    // we could use pool_type<Type> *..., but vs complains about it and refuses to compile for unknown reasons (most likely a bug)
-    basic_group(sparse_set<Entity> *ref, storage<Entity, std::remove_const_t<Get>> *... gpool) ENTT_NOEXCEPT
-        : handler{ref},
-          pools{gpool...}
+    // we could use pool_type<Type> &..., but vs complains about it and refuses to compile for unknown reasons (most likely a bug)
+    basic_group(sparse_set<Entity> &ref, storage<Entity, std::remove_const_t<Get>> &... gpool) ENTT_NOEXCEPT
+        : handler{&ref},
+          pools{&gpool...}
     {}
 
     template<typename Func, typename... Weak>
@@ -490,11 +490,11 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
     template<typename Component>
     using component_iterator_type = decltype(std::declval<pool_type<Component>>().begin());
 
-    // we could use pool_type<Type> *..., but vs complains about it and refuses to compile for unknown reasons (most likely a bug)
-    basic_group(const std::size_t *ref, const std::size_t *extent, storage<Entity, std::remove_const_t<Owned>> *... opool, storage<Entity, std::remove_const_t<Get>> *... gpool) ENTT_NOEXCEPT
-        : pools{opool..., gpool...},
-          length{extent},
-          super{ref}
+    // we could use pool_type<Type> &..., but vs complains about it and refuses to compile for unknown reasons (most likely a bug)
+    basic_group(const std::size_t &ref, const std::size_t &extent, storage<Entity, std::remove_const_t<Owned>> &... opool, storage<Entity, std::remove_const_t<Get>> &... gpool) ENTT_NOEXCEPT
+        : pools{&opool..., &gpool...},
+          length{&extent},
+          super{&ref}
     {}
 
     template<typename Func, typename... Strong, typename... Weak>
