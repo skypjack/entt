@@ -156,8 +156,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
     // we could use pool_type<Component> &..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
     basic_view(storage<Entity, std::remove_const_t<Component>> &... component, storage<Entity, std::remove_const_t<Exclude>> &... epool) ENTT_NOEXCEPT
-        : pools{&component...},
-          filter{&epool...}
+        : pools{&component..., &epool...}
     {}
 
     const sparse_set<Entity> * candidate() const ENTT_NOEXCEPT {
@@ -191,7 +190,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             std::for_each(begin, end, [this, raw = std::get<pool_type<Comp> *>(pools)->begin(), &func](const auto entity) mutable {
                 auto curr = raw++;
 
-                if((std::get<pool_type<Other> *>(pools)->has(entity) && ...) && (!std::get<pool_type<Exclude> *>(filter)->has(entity) && ...)) {
+                if((std::get<pool_type<Other> *>(pools)->has(entity) && ...) && (!std::get<pool_type<Exclude> *>(pools)->has(entity) && ...)) {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
                         func(get<Comp, Type>(curr, std::get<pool_type<Type> *>(pools), entity)...);
                     } else {
@@ -201,7 +200,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             });
         } else {
             std::for_each(begin, end, [this, &func](const auto entity) {
-                if((std::get<pool_type<Other> *>(pools)->has(entity) && ...) && (!std::get<pool_type<Exclude> *>(filter)->has(entity) && ...)) {
+                if((std::get<pool_type<Other> *>(pools)->has(entity) && ...) && (!std::get<pool_type<Exclude> *>(pools)->has(entity) && ...)) {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
                         func(std::get<pool_type<Type> *>(pools)->get(entity)...);
                     } else {
@@ -316,7 +315,7 @@ public:
      */
     iterator_type begin() const {
         const auto *view = candidate();
-        const filter_type ignore{std::get<pool_type<Exclude> *>(filter)...};
+        const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
         return iterator_type{view, unchecked(view), ignore, view->begin()};
     }
 
@@ -337,7 +336,7 @@ public:
      */
     iterator_type end() const {
         const auto *view = candidate();
-        const filter_type ignore{std::get<pool_type<Exclude> *>(filter)...};
+        const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
         return iterator_type{view, unchecked(view), ignore, view->end()};
     }
 
@@ -349,7 +348,7 @@ public:
      */
     iterator_type find(const entity_type entt) const {
         const auto *view = candidate();
-        const filter_type ignore{std::get<pool_type<Exclude> *>(filter)...};
+        const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
         iterator_type it{view, unchecked(view), ignore, view->find(entt)};
         return (it != end() && *it == entt) ? it : end();
     }
@@ -520,8 +519,7 @@ public:
     }
 
 private:
-    const std::tuple<pool_type<Component> *...> pools;
-    const std::tuple<pool_type<Exclude> *...> filter;
+    const std::tuple<pool_type<Component> *..., pool_type<Exclude> *...> pools;
 };
 
 
