@@ -123,6 +123,14 @@ struct not_comparable_type {
     bool operator==(const not_comparable_type &) const = delete;
 };
 
+struct unmanageable_type {
+    unmanageable_type() = default;
+    unmanageable_type(const unmanageable_type &) = delete;
+    unmanageable_type(unmanageable_type &&) = delete;
+    unmanageable_type & operator=(const unmanageable_type &) = delete;
+    unmanageable_type & operator=(unmanageable_type &&) = delete;
+};
+
 bool operator!=(const not_comparable_type &, const not_comparable_type &) = delete;
 
 struct an_abstract_type {
@@ -883,6 +891,28 @@ TEST_F(Meta, MetaAnyConstConvert) {
     ASSERT_EQ(any.cast<double>(), 42.);
     ASSERT_EQ(other.type(), entt::resolve<int>());
     ASSERT_EQ(other.cast<int>(), 42);
+}
+
+TEST_F(Meta, MetaAnyUnmanageableType) {
+    unmanageable_type instance;
+    entt::meta_any any{std::ref(instance)};
+    entt::meta_any other = any;
+
+    std::swap(any, other);
+
+    ASSERT_TRUE(any);
+    ASSERT_TRUE(other);
+
+    ASSERT_EQ(any.type(), entt::resolve<unmanageable_type>());
+    ASSERT_NE(any.data(), nullptr);
+    ASSERT_EQ(any.try_cast<int>(), nullptr);
+    ASSERT_NE(any.try_cast<unmanageable_type>(), nullptr);
+
+    ASSERT_TRUE(any.convert<unmanageable_type>());
+    ASSERT_FALSE(any.convert<int>());
+
+    ASSERT_TRUE(std::as_const(any).convert<unmanageable_type>());
+    ASSERT_FALSE(std::as_const(any).convert<int>());
 }
 
 TEST_F(Meta, MetaProp) {

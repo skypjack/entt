@@ -262,11 +262,6 @@ private:
  *
  * This class uses a technique called small buffer optimization (SBO) to get rid
  * of memory allocations if possible. This should improve overall performance.
- *
- * @warning
- * Only copy constructible types are suitable for use with this class.<br/>
- * A static assertion will abort the compilation when the type isn't copy
- * constructible.
  */
 class meta_any {
     using storage_type = std::aligned_storage_t<sizeof(void *), alignof(void *)>;
@@ -513,7 +508,7 @@ public:
         meta_any any{};
 
         if(const auto id = internal::meta_info<Type>::resolve()->id; node && node->id == id) {
-            any = *static_cast<const Type *>(instance);
+            any = *this;
         } else if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([id](const auto *curr) { return curr->type()->id == id; }, node); conv) {
             any = conv->conv(instance);
         }
