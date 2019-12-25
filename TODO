@@ -23,5 +23,4 @@
 * review and suppress warnings, if any
 * extract only the type within type_info, hash its name (more portable)
 * registry
-  - ::get -> use std::forward/forward_as_tuple and remove one of them (also try_get and the others)
   - ::group improve, reduce code

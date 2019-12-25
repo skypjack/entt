@@ -513,7 +513,7 @@ public:
             return generate();
         } else {
             const entity_type entt = generate();
-            return std::tuple<entity_type, decltype(assign<Component>({}))...>{entt, assign<Component>(entt)...};
+            return std::tuple_cat(std::make_tuple(entt), std::forward_as_tuple(assign<Component>(entt)...));
         }
     }
 
@@ -714,7 +714,7 @@ public:
         if constexpr(sizeof...(Component) == 1) {
             return (assure<Component>().get(entity), ...);
         } else {
-            return std::tuple<decltype(get<Component>({}))...>{get<Component>(entity)...};
+            return std::forward_as_tuple(get<Component>(entity)...);
         }
     }
 
@@ -726,7 +726,7 @@ public:
         if constexpr(sizeof...(Component) == 1) {
             return (assure<Component>().get(entity), ...);
         } else {
-            return std::tuple<decltype(get<Component>({}))...>{get<Component>(entity)...};
+            return std::forward_as_tuple(get<Component>(entity)...);
         }
     }
 
@@ -780,7 +780,7 @@ public:
         if constexpr(sizeof...(Component) == 1) {
             return (assure<Component>().try_get(entity), ...);
         } else {
-            return std::tuple<decltype(try_get<Component>({}))...>{try_get<Component>(entity)...};
+            return std::make_tuple(try_get<Component>(entity)...);
         }
     }
 
@@ -790,7 +790,7 @@ public:
         if constexpr(sizeof...(Component) == 1) {
             return (assure<Component>().try_get(entity), ...);
         } else {
-            return std::tuple<decltype(try_get<Component>({}))...>{try_get<Component>(entity)...};
+            return std::make_tuple(try_get<Component>(entity)...);
         }
     }
 
