@@ -109,24 +109,61 @@ class basic_registry {
     template<typename...>
     struct group_handler;
 
+    template<>
+    struct group_handler<> {
+        const std::size_t extent[3];
+
+        group_handler(const std::size_t osize, const std::size_t gsize, const std::size_t esize)
+            : extent{osize, gsize, esize}
+        {}
+
+        virtual ~group_handler() = default;
+
+        virtual bool owned(const ENTT_ID_TYPE) ENTT_NOEXCEPT = 0;
+        virtual bool get(const ENTT_ID_TYPE) ENTT_NOEXCEPT = 0;
+        virtual bool exclude(const ENTT_ID_TYPE) ENTT_NOEXCEPT = 0;
+    };
+
     template<typename... Exclude, typename... Get, typename... Owned>
-    struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
-        const std::tuple<pool_type<Owned> &..., pool_type<Get> &..., pool_type<Exclude> &...> cpools{};
-        std::conditional_t<sizeof...(Owned) == 0, sparse_set<Entity>, std::size_t> owned{};
+    struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...>: group_handler<> {
+        static_assert((std::is_same_v<Owned, std::decay_t<Owned>> && ...) && (std::is_same_v<Get, std::decay_t<Get>> && ...));
+        std::conditional_t<sizeof...(Owned) == 0, sparse_set<Entity>, std::size_t> current;
+        basic_registry *owner;
+
+        group_handler(basic_registry &parent)
+            : group_handler<>{sizeof...(Owned), sizeof...(Get), sizeof...(Exclude)},
+              current{},
+              owner{&parent}
+        {}
+
+        bool owned(const ENTT_ID_TYPE ctype) ENTT_NOEXCEPT override {
+            return ((ctype == type_info<Owned>::id()) || ...);
+        }
+
+        bool get(const ENTT_ID_TYPE ctype) ENTT_NOEXCEPT override {
+            return ((ctype == type_info<Get>::id()) || ...);
+        }
+
+        bool exclude(const ENTT_ID_TYPE ctype) ENTT_NOEXCEPT override {
+            return ((ctype == type_info<Exclude>::id()) || ...);
+        }
 
         template<typename Component>
         void maybe_valid_if(const Entity entt) {
+            static_assert(std::is_same_v<Component, std::decay_t<Component>>);
+            const auto cpools = std::forward_as_tuple(owner->assure<Owned>()...);
+
             const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<pool_type<Owned> &>(cpools).has(entt)) && ...)
-                    && ((std::is_same_v<Component, Get> || std::get<pool_type<Get> &>(cpools).has(entt)) && ...)
-                    && ((std::is_same_v<Exclude, Component> || !std::get<pool_type<Exclude> &>(cpools).has(entt)) && ...);
+                    && ((std::is_same_v<Component, Get> || owner->assure<Get>().has(entt)) && ...)
+                    && ((std::is_same_v<Component, Exclude> || !owner->assure<Exclude>().has(entt)) && ...);
 
             if constexpr(sizeof...(Owned) == 0) {
-                if(is_valid && !owned.has(entt)) {
-                    owned.construct(entt);
+                if(is_valid && !current.has(entt)) {
+                    current.construct(entt);
                 }
             } else {
-                if(is_valid && !(std::get<0>(cpools).index(entt) < owned)) {
-                    const auto pos = owned++;
+                if(is_valid && !(std::get<0>(cpools).index(entt) < current)) {
+                    const auto pos = current++;
                     (std::get<pool_type<Owned> &>(cpools).swap(std::get<pool_type<Owned> &>(cpools).data()[pos], entt), ...);
                 }
             }
@@ -134,12 +171,12 @@ class basic_registry {
 
         void discard_if(const Entity entt) {
             if constexpr(sizeof...(Owned) == 0) {
-                if(owned.has(entt)) {
-                    owned.destroy(entt);
+                if(current.has(entt)) {
+                    current.destroy(entt);
                 }
             } else {
-                if(std::get<0>(cpools).has(entt) && std::get<0>(cpools).index(entt) < owned) {
-                    const auto pos = --owned;
+                if(const auto cpools = std::forward_as_tuple(owner->assure<Owned>()...); std::get<0>(cpools).has(entt) && std::get<0>(cpools).index(entt) < current) {
+                    const auto pos = --current;
                     (std::get<pool_type<Owned> &>(cpools).swap(std::get<pool_type<Owned> &>(cpools).data()[pos], entt), ...);
                 }
             }
@@ -152,14 +189,6 @@ class basic_registry {
         void(* assure)(basic_registry &, const sparse_set<Entity> &);
         void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
         void(* stomp)(basic_registry &, const Entity, const sparse_set<Entity> &, const Entity);
-    };
-
-    struct group_data {
-        std::size_t extent[3];
-        std::unique_ptr<void, void(*)(void *)> group;
-        bool(* owned)(const ENTT_ID_TYPE) ENTT_NOEXCEPT;
-        bool(* get)(const ENTT_ID_TYPE) ENTT_NOEXCEPT;
-        bool(* exclude)(const ENTT_ID_TYPE) ENTT_NOEXCEPT;
     };
 
     struct basic_variable {
@@ -1267,91 +1296,87 @@ public:
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0);
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1);
 
-        using handler_type = group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...>;
+        using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::decay_t<Get>...>, std::decay_t<Owned>...>;
 
         [[maybe_unused]] constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
-        const auto cpools = std::forward_as_tuple(assure<std::decay_t<Owned>>()..., assure<std::decay_t<Get>>()..., assure<Exclude>()...);
         const std::size_t extent[3]{sizeof...(Owned), sizeof...(Get), sizeof...(Exclude)};
+        const auto cpools = std::forward_as_tuple(assure<std::decay_t<Owned>>()...);
         handler_type *handler = nullptr;
 
-        if(auto it = std::find_if(groups.cbegin(), groups.cend(), [&extent](const auto &gdata) {
-            return std::equal(std::begin(extent), std::end(extent), std::begin(gdata.extent))
-                    && (gdata.owned(type_info<std::decay_t<Owned>>::id()) && ...)
-                    && (gdata.get(type_info<std::decay_t<Get>>::id()) && ...)
-                    && (gdata.exclude(type_info<Exclude>::id()) && ...);
+        if(auto it = std::find_if(groups.cbegin(), groups.cend(), [&extent](const auto &curr) {
+            return std::equal(std::begin(extent), std::end(extent), std::begin(curr->extent))
+                    && (curr->owned(type_info<std::decay_t<Owned>>::id()) && ...)
+                    && (curr->get(type_info<std::decay_t<Get>>::id()) && ...)
+                    && (curr->exclude(type_info<Exclude>::id()) && ...);
         }); it != groups.cend())
         {
-            handler = static_cast<handler_type *>(it->group.get());
+            handler = static_cast<handler_type *>(it->get());
         }
 
         if(!handler) {
+            auto grp = std::make_unique<handler_type>(*this);
             const void *maybe_valid_if = nullptr;
             const void *discard_if = nullptr;
 
-            group_data gdata{
-                { sizeof...(Owned), sizeof...(Get), sizeof...(Exclude) },
-                decltype(group_data::group){new handler_type{cpools}, [](void *gptr) { delete static_cast<handler_type *>(gptr); }},
-                [](const auto ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Owned>>::id()) || ...); },
-                [](const auto ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Get>>::id()) || ...); },
-                [](const auto ctype) ENTT_NOEXCEPT { return ((ctype == type_info<Exclude>::id()) || ...); }
-            };
-
             if constexpr(sizeof...(Owned) == 0) {
-                handler = static_cast<handler_type *>(groups.emplace_back(std::move(gdata)).group.get());
+                handler = static_cast<handler_type *>(groups.emplace_back(std::move(grp)).get());
             } else {
                 ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [&extent](const auto &curr) {
                     const std::size_t diff[3]{
-                        (0u + ... + curr.owned(type_info<std::decay_t<Owned>>::id())),
-                        (0u + ... + curr.get(type_info<std::decay_t<Get>>::id())),
-                        (0u + ... + curr.exclude(type_info<Exclude>::id()))
+                        (0u + ... + curr->owned(type_info<std::decay_t<Owned>>::id())),
+                        (0u + ... + curr->get(type_info<std::decay_t<Get>>::id())),
+                        (0u + ... + curr->exclude(type_info<Exclude>::id()))
                     };
 
-                    return !diff[0] || ((std::equal(std::begin(diff), std::end(diff), extent) || std::equal(std::begin(diff), std::end(diff), curr.extent)));
+                    return !diff[0] || ((std::equal(std::begin(diff), std::end(diff), extent) || std::equal(std::begin(diff), std::end(diff), curr->extent)));
                 }));
 
                 const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [&size](const auto &curr) {
-                    const std::size_t diff = (0u + ... + curr.owned(type_info<std::decay_t<Owned>>::id()));
-                    return !diff || (size > (curr.extent[0] + curr.extent[1] + curr.extent[2]));
+                    const std::size_t diff = (0u + ... + curr->owned(type_info<std::decay_t<Owned>>::id()));
+                    return !diff || (size > (curr->extent[0] + curr->extent[1] + curr->extent[2]));
                 });
 
                 const auto prev = std::find_if(std::make_reverse_iterator(next), groups.crend(), [](const auto &curr) {
-                    return (0u + ... + curr.owned(type_info<std::decay_t<Owned>>::id()));
+                    return (0u + ... + curr->owned(type_info<std::decay_t<Owned>>::id()));
                 });
 
-                maybe_valid_if = (next == groups.cend() ? maybe_valid_if : next->group.get());
-                discard_if = (prev == groups.crend() ? discard_if : prev->group.get());
-                handler = static_cast<handler_type *>(groups.insert(next, std::move(gdata))->group.get());
+                maybe_valid_if = (next == groups.cend() ? maybe_valid_if : next->get());
+                discard_if = (prev == groups.crend() ? discard_if : prev->get());
+                handler = static_cast<handler_type *>(groups.insert(next, std::move(grp))->get());
             }
 
             ((std::get<pool_type<Owned> &>(cpools).super = std::max(std::get<pool_type<Owned> &>(cpools).super, size)), ...);
 
-            (std::get<pool_type<Owned> &>(cpools).on_construct().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<Owned>>(*handler), ...);
-            (std::get<pool_type<Get> &>(cpools).on_construct().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<Get>>(*handler), ...);
-            (std::get<pool_type<Exclude> &>(cpools).on_destroy().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<Exclude>>(*handler), ...);
+            (on_construct<std::decay_t<Owned>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::decay_t<Owned>>>(*handler), ...);
+            (on_construct<std::decay_t<Get>>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<std::decay_t<Get>>>(*handler), ...);
+            (on_destroy<Exclude>().before(maybe_valid_if).template connect<&handler_type::template maybe_valid_if<Exclude>>(*handler), ...);
 
-            (std::get<pool_type<Owned> &>(cpools).on_destroy().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
-            (std::get<pool_type<Get> &>(cpools).on_destroy().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
-            (std::get<pool_type<Exclude> &>(cpools).on_construct().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            (on_destroy<std::decay_t<Owned>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            (on_destroy<std::decay_t<Get>>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
+            (on_construct<Exclude>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
 
             auto init = view<Owned..., Get...>(entt::exclude<Exclude...>);
 
             // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-            std::for_each(std::make_reverse_iterator(init.end()), std::make_reverse_iterator(init.begin()), [handler](const auto entity) {
-                if constexpr(sizeof...(Owned) == 0) {
-                    handler->owned.construct(entity);
-                } else {
-                    if(!(std::get<0>(handler->cpools).index(entity) < handler->owned)) {
-                        const auto pos = handler->owned++;
-                        (std::get<pool_type<Owned> &>(handler->cpools).swap(std::get<pool_type<Owned> &>(handler->cpools).data()[pos], entity), ...);
+            if constexpr(sizeof...(Owned) == 0) {
+                std::for_each(std::make_reverse_iterator(init.end()), std::make_reverse_iterator(init.begin()), [handler](const auto entity) {
+                    handler->current.construct(entity);
+                });
+            } else {
+                std::for_each(std::make_reverse_iterator(init.end()), std::make_reverse_iterator(init.begin()), [handler, cpools](const auto entity) {
+                    if(!(std::get<0>(cpools).index(entity) < handler->current)) {
+                        const auto pos = handler->current++;
+                        (std::get<pool_type<Owned> &>(cpools).swap(std::get<pool_type<Owned> &>(cpools).data()[pos], entity), ...);
                     }
-                }
-            });
+                });
+
+            }
         }
 
         if constexpr(sizeof...(Owned) == 0) {
-            return { handler->owned, std::get<pool_type<Get> &>(cpools)... };
+            return { handler->current, assure<std::decay_t<Get>>()... };
         } else {
-            return { std::get<0>(cpools).super, handler->owned, std::get<pool_type<Owned> &>(cpools)... , std::get<pool_type<Get> &>(cpools)... };
+            return { std::get<0>(cpools).super, handler->current, std::get<pool_type<Owned> &>(cpools)... , assure<std::decay_t<Get>>()... };
         }
     }
 
@@ -1700,7 +1725,7 @@ public:
 
 private:
     mutable std::vector<pool_data> pools{};
-    std::vector<group_data> groups{};
+    std::vector<std::unique_ptr<group_handler<>>> groups{};
     std::vector<std::unique_ptr<basic_variable>> vars{};
     std::vector<entity_type> entities{};
     entity_type destroyed{null};

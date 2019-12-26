@@ -23,3 +23,4 @@
 * review and suppress warnings, if any
 * extract only the type within type_info, hash its name (more portable)
 * registry: groups can break after a discard -> cleanup them
+  - group_handler: user registry rather than group
