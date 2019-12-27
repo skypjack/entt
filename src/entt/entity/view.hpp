@@ -359,7 +359,8 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     bool contains(const entity_type entt) const {
-        return find(entt) != end();
+        return (std::get<pool_type<Component> *>(pools)->has(entt) && ...)
+                && (!std::get<pool_type<Exclude> *>(pools)->has(entt) && ...);
     }
 
     /**
@@ -688,7 +689,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     bool contains(const entity_type entt) const {
-        return find(entt) != end();
+        return pool->has(entt);
     }
 
     /**
