@@ -263,7 +263,7 @@ public:
      * @return True if the group contains the given entity, false otherwise.
      */
     bool contains(const entity_type entt) const {
-        return find(entt) != end();
+        return handler->has(entt);
     }
 
     /**
@@ -682,7 +682,7 @@ public:
      * @return True if the group contains the given entity, false otherwise.
      */
     bool contains(const entity_type entt) const {
-        return find(entt) != end();
+        return std::get<0>(pools)->has(entt) && (std::get<0>(pools)->index(entt) < (*length));
     }
 
     /**
