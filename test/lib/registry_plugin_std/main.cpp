@@ -3,10 +3,26 @@
 #include <cr.h>
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
+#include "proxy.h"
 #include "types.h"
+
+proxy::proxy(entt::registry &ref)
+    : registry{&ref}
+{}
+
+void proxy::for_each(void(*cb)(position &, velocity &)) {
+    registry->view<position, velocity>().each(cb);
+}
+
+void proxy::assign(velocity vel) {
+    for(auto entity: registry->view<position>()) {
+        registry->assign<velocity>(entity, vel);
+    }
+}
 
 TEST(Lib, Registry) {
     entt::registry registry;
+    proxy handler{registry};
 
     for(auto i = 0; i < 3; ++i) {
         const auto entity = registry.create();
@@ -14,7 +30,7 @@ TEST(Lib, Registry) {
     }
 
     cr_plugin ctx;
-    ctx.userdata = &registry;
+    ctx.userdata = &handler;
     cr_plugin_load(ctx, PLUGIN);
     cr_plugin_update(ctx);
 

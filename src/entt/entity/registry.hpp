@@ -155,7 +155,7 @@ class basic_registry {
         template<typename Component>
         void maybe_valid_if(const Entity entt, basic_registry &owner) {
             static_assert(std::is_same_v<Component, std::decay_t<Component>>);
-            const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...);
+            [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...);
 
             const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<pool_type<Owned> &>(cpools).has(entt)) && ...)
                     && ((std::is_same_v<Component, Get> || owner.assure<Get>().has(entt)) && ...)
@@ -300,17 +300,6 @@ public:
     void prepare(Args &&... args) {
         ENTT_ASSERT(std::none_of(pools.cbegin(), pools.cend(), [](auto &&pdata) { return pdata.type_id == type_info<Component>::id(); }));
         assure<Component>(std::forward<Args>(args)...);
-    }
-
-    /**
-     * @brief Discards the pools for the given components.
-     * @tparam Component Types of components for which to discard the pools.
-     */
-    template<typename... Component>
-    void discard() {
-        pools.erase(std::remove_if(pools.begin(), pools.end(), [](auto &&pdata) {
-            return ((pdata.type_id == type_info<Component>::id()) || ...);
-        }), pools.end());
     }
 
     /**

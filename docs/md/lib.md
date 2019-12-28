@@ -32,10 +32,12 @@ erased on the other side of a boundary.<br/>
 The `type_info` class template is how identifiers are generated and thus made
 available to the rest of the library.
 
-The only case in which this may arouse some interest is in case of conflicts
-between identifiers (definitely uncommon though) or where the default solution
-proposed by `EnTT` is not suitable for the user's purposes.<br/>
-Please refer to the dedicated section for more details.
+In general, this class doesn't arouse much interest. The only exception is in
+case of conflicts between identifiers (definitely uncommon though) or where the
+default solution proposed by `EnTT` isn't suitable for the user's purposes.<br/>
+The section dedicated to this core class contains all the details to get around
+the problem in a concise and elegant way. Please refer to the specific
+documentation.
 
 # Meta context
 
@@ -80,29 +82,22 @@ available.
 
 There is another subtle problem due to memory management that can lead to
 headaches.<br/>
-This can occur where there are pools of objects (such as components or events)
-dynamically created on demand.
+It can occur where there are pools of objects (such as components or events)
+dynamically created on demand. This is usually not a problem when working with
+linked libraries that rely on the same dynamic runtime. However, it can occur in
+the case of plugins or statically linked runtimes.
 
 As an example, imagine creating an instance of `registry` in the main executable
-and share it with a plugin. If the latter starts working with a component that
+and sharing it with a plugin. If the latter starts working with a component that
 is unknown to the former, a dedicated pool is created within the registry on
 first use.<br/>
 As one can guess, this pool is instantiated on a different side of the boundary
 from the `registry`. Therefore, the instance is now managing memory from
 different spaces and this can quickly lead to crashes if not properly addressed.
 
-Fortunately, all classes that could potentially suffer from this problem offer
-also a `discard` member function to get rid of these pools:
-
-```cpp
-registry.discard<local_type>();
-```
-
-This is all there is to do to get around this. Again, `discard` is only to be
-invoked if it's certain that the container and pools are instantiated on
-different sides of the boundary.
-
-If in doubts or to avoid risks, simply invoke the `prepare` member function or
-any of the other functions that refer to the desired type to force the
-generation of the pools that are used on both sides of the boundary.<br/>
-This is something to be done usually in the main context when needed.
+To overcome the risk, it's recommended to use well-defined interfaces that make
+fundamental types pass through the boundaries, isolating the instances of the
+`EnTT` classes from time to time and as appropriate.<br/>
+Refer to the test suite for some examples, read the documentation available
+online about this type of issues or consult someone who has already had such
+experiences to avoid problems.

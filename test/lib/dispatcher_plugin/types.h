@@ -7,4 +7,10 @@ struct message {
 
 struct event {};
 
+struct dispatcher_proxy {
+    virtual ~dispatcher_proxy() = default;
+    virtual void trigger(message) = 0;
+    virtual void trigger(event) = 0;
+};
+
 #endif
