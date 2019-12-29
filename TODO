@@ -17,5 +17,4 @@
 * observer: user defined filters (eg .replace<T, &function> or .group<T, U, &func>)
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none
-* remove duktape example (and eventually provide a new one)?
 * extract only the type within type_info, hash its name (more portable)

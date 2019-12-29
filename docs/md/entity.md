@@ -15,8 +15,6 @@
 * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
   * [Observe changes](#observe-changes)
     * [They call me Reactive System](#they-call-me-reactive-system)
-  * [Runtime components](#runtime-components)
-    * [A journey through a plugin](#a-journey-through-a-plugin)
   * [Sorting: is it possible?](#sorting-is-it-possible)
   * [Helpers](#helpers)
     * [Null entity](#null-entity)
@@ -30,6 +28,7 @@
     * [Continuous loader](#continuous-loader)
     * [Archives](#archives)
     * [One example to rule them all](#one-example-to-rule-them-all)
+  * [Runtime components](#runtime-components)
 * [Views and Groups](#views-and-groups)
   * [Views](#views)
   * [Runtime views](#runtime-views)
@@ -551,54 +550,6 @@ multiple elements in the exclusion list. Moreover, every matcher can have it's
 own clause and multiple clauses for the same matcher are combined in a single
 one.
 
-## Runtime components
-
-Defining components at runtime is useful to support plugin systems and mods in
-general. However, it seems impossible with a tool designed around a bunch of
-templates. Indeed it's not that difficult.<br/>
-Of course, some features cannot be easily exported into a runtime
-environment. As an example, sorting a group of components defined at runtime
-isn't for free if compared to most of the other operations. However, the basic
-functionalities of an entity-component system such as `EnTT` fit the problem
-perfectly and can also be used to manage runtime components if required.<br/>
-All that is necessary to do it is to know the identifiers of the components. An
-identifier is nothing more than a number or similar that can be used at runtime
-to work with the type system.
-
-In `EnTT`, identifiers are easily accessible:
-
-```cpp
-entt::registry registry;
-
-// component identifier
-auto type = registry.type<position>();
-```
-
-Once the identifiers are made available, almost everything becomes pretty
-simple.
-
-### A journey through a plugin
-
-`EnTT` comes with an example (actually a test) that shows how to integrate
-compile-time and runtime components in a stack based JavaScript environment. It
-uses [`Duktape`](https://github.com/svaarala/duktape) under the hood, mainly
-because I wanted to learn how it works at the time I was writing the code.
-
-The code is not production-ready and overall performance can be highly improved.
-However, I sacrificed optimizations in favor of a more readable piece of code. I
-hope I succeeded.<br/>
-Note also that this isn't neither the only nor (probably) the best way to do it.
-In fact, the right way depends on the scripting language and the problem one is
-facing in general.<br/>
-That being said, feel free to use it at your own risk.
-
-The basic idea is that of creating a compile-time component aimed to map all the
-runtime components assigned to an entity.<br/>
-Identifiers come in use to address the right function from a map when invoked
-from the runtime environment and to filter entities when iterating.<br/>
-With a bit of gymnastic, one can narrow views and improve the performance to
-some extent but it was not the goal of the example.
-
 ## Sorting: is it possible?
 
 It goes without saying that sorting entities and components is possible with
@@ -1035,6 +986,30 @@ the best way to do it. However, feel free to use it at your own risk.
 The basic idea is to store everything in a group of queues in memory, then bring
 everything back to the registry with different loaders.
 
+## Runtime components
+
+Defining components at runtime is useful to support plugin systems and mods in
+general. However, it seems impossible with a tool designed around a bunch of
+templates. Indeed it's not that difficult.<br/>
+Of course, some features cannot be easily exported into a runtime environment.
+As an example, sorting a group of components defined at runtime isn't for free
+if compared to most of the other operations. However, the basic functionalities
+of an entity-component system such as `EnTT` fit the problem perfectly and can
+also be used to manage runtime components if required.<br/>
+All that is necessary to do it is to know the identifiers of the components. An
+identifier is nothing more than a number or similar that can be used at runtime
+to work with the type system.
+
+In `EnTT`, identifiers are easily accessible:
+
+```cpp
+// component identifier
+const auto type = entt::type_info<position>::id();
+```
+
+Once the identifiers are made available, almost everything becomes pretty
+simple.
+
 # Views and Groups
 
 First of all, it is worth answering an obvious question: why views and
@@ -1192,7 +1167,7 @@ thrown away. The reasons for this go far beyond the scope of this document.<br/>
 To iterate a runtime view, either use it in a range-for loop:
 
 ```cpp
-entt::component types[] = { registry.type<position>(), registry.type<velocity>() };
+entt::component types[] = { entt::type_info<position>::id(), entt::type_info<velocity>::id() };
 auto view = registry.runtime_view(std::cbegin(types), std::cend(types));
 
 for(auto entity: view) {
@@ -1210,7 +1185,7 @@ for(auto entity: view) {
 Or rely on the `each` member function to iterate entities:
 
 ```cpp
-entt::component types[] = { registry.type<position>(), registry.type<velocity>() };
+entt::component types[] = { entt::type_info<position>::id(), entt::type_info<velocity>::id() };
 
 registry.runtime_view(std::cbegin(types), std::cend(types)).each([](auto entity) {
     // ...

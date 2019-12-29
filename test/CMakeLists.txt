@@ -102,22 +102,6 @@ if(BUILD_LIB)
     SETUP_PLUGIN_TEST(registry_plugin_std ENTT_STANDARD_CPP)
 endif()
 
-# Test mod
-
-if(BUILD_MOD)
-    enable_language(C)
-
-    set(DUKTAPE_DEPS_DIR ${EnTT_SOURCE_DIR}/deps/duktape)
-    configure_file(${EnTT_SOURCE_DIR}/cmake/in/duktape.in ${DUKTAPE_DEPS_DIR}/CMakeLists.txt)
-    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY ${DUKTAPE_DEPS_DIR})
-    execute_process(COMMAND ${CMAKE_COMMAND} --build . WORKING_DIRECTORY ${DUKTAPE_DEPS_DIR})
-    set(DUKTAPE_SRC_DIR ${DUKTAPE_DEPS_DIR}/src/src)
-
-    set(MOD_TEST_SOURCE ${DUKTAPE_SRC_DIR}/duktape.c mod/mod.cpp)
-    SETUP_BASIC_TEST(mod "${MOD_TEST_SOURCE}")
-    target_include_directories(mod PRIVATE ${DUKTAPE_SRC_DIR})
-endif()
-
 # Test snapshot
 
 if(BUILD_SNAPSHOT)
