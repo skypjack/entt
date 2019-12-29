@@ -66,6 +66,8 @@ I hope this list can grow much more in the future:
     A drop-in, single-file entity editor for `EnTT` that uses `ImGui` as
     graphical backend (with
     [demo code](https://github.com/Green-Sky/imgui_entt_entity_editor_demo)).
+  * [SgOgl](https://github.com/stwe/SgOgl): A game engine library for OpenGL
+    developed for educational purposes.
 
 * Articles and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
