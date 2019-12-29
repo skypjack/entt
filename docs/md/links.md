@@ -48,7 +48,7 @@ I hope this list can grow much more in the future:
     a small tower defense game based on mirror orientation.
 
 * Engines and the like:
-  * [Fling Engine](https://github.com/flingengine/FlingEngine): A Vulkan game
+  * [Fling Engine](https://github.com/flingengine/FlingEngine): a Vulkan game
     engine with a focus on data oriented design.
   * [Apparently](https://teamwisp.github.io/credits/)
     [Wisp](https://teamwisp.github.io/product/) by
@@ -60,13 +60,13 @@ I hope this list can grow much more in the future:
     [Qub3d](https://qub3d.org/): because blocks should be open source.
   * [shiva](https://github.com/Milerius/shiva): modern C++ engine with
     modularity.
-  * [NovusCore](https://github.com/novuscore/NovusCore): A modern take on World
+  * [NovusCore](https://github.com/novuscore/NovusCore): a modern take on World
     of Warcraft emulation.
   * [ImGui/EnTT editor](https://github.com/Green-Sky/imgui_entt_entity_editor):
-    A drop-in, single-file entity editor for `EnTT` that uses `ImGui` as
+    a drop-in, single-file entity editor for `EnTT` that uses `ImGui` as
     graphical backend (with
     [demo code](https://github.com/Green-Sky/imgui_entt_entity_editor_demo)).
-  * [SgOgl](https://github.com/stwe/SgOgl): A game engine library for OpenGL
+  * [SgOgl](https://github.com/stwe/SgOgl): a game engine library for OpenGL
     developed for educational purposes.
 
 * Articles and blog posts:
@@ -101,10 +101,10 @@ I hope this list can grow much more in the future:
     [Tieto](https://www.tieto.com/): they published a job post where `EnTT` was
     listed on their software stack.
   * [Godot meets EnTT](https://github.com/portaloffreedom/godot_entt_example/):
-    A simple example on how to use `EnTT` within
+    a simple example on how to use `EnTT` within
     [`Godot`](https://godotengine.org/).
   * [Godot and GameNetworkingSockets meet EnTT](https://github.com/portaloffreedom/godot_entt_net_example):
-    A simple example on how to use `EnTT` and
+    a simple example on how to use `EnTT` and
     [`GameNetworkingSockets`](https://github.com/ValveSoftware/GameNetworkingSockets)
     within [`Godot`](https://godotengine.org/).
   * [MatchOneEntt](https://github.com/mhaemmerle/MatchOneEntt): port of
