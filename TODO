@@ -2,25 +2,20 @@
 * custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
-* meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects (remove runtime views, welcome reflection and what about snapshot?)
+* meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects (remove runtime views, welcome reflection)
 * add opaque input iterators to views and groups that return tuples <entity, T &...> (proxy), multi-pass guaranteed
 * allow to replace std:: with custom implementations
-* allow for custom stomp functions
 * custom (decoupled) pools ==> N-buffering, shared components, multi-model, hibitsets, and so on
 * snapshot rework/deprecation
   - create(hint: entity) -> force-create
   - assign<T...>(first, last)
-* allow for key/value variables where the key is an ENTT_ID_TYPE
 * add examples (and credits) from @alanjfs :)
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...>
 * add meta support to registry (eg entity for each component and opaque get)
 * stomp -> merge (naming is hard as heck, it's known thing)
+  - allow for custom stomp functions
 * observer: user defined filters (eg .replace<T, &function> or .group<T, U, &func>)
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none
-* see warning (vs2017 only): d:\a\entt\entt\src\entt\entity\registry.hpp(108)
 * remove duktape example (and eventually provide a new one)?
-* review and suppress warnings, if any
 * extract only the type within type_info, hash its name (more portable)
-* registry: groups can break after a discard -> cleanup them
-  - group_handler: user registry rather than group
