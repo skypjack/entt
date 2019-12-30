@@ -111,7 +111,7 @@ class basic_registry {
         std::unique_ptr<sparse_set<Entity>> pool;
         void(* assure)(basic_registry &, const sparse_set<Entity> &);
         void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
-        void(* stomp)(basic_registry &, const Entity, const sparse_set<Entity> &, const Entity);
+        void(* stamp)(basic_registry &, const Entity, const sparse_set<Entity> &, const Entity);
     };
 
     struct group_data {
@@ -258,7 +258,7 @@ class basic_registry {
                         other.assure<Component>(static_cast<const pool_type<Component> &>(cpool));
                     };
 
-                    pdata.stomp = [](basic_registry &other, const Entity dst, const sparse_set<Entity> &cpool, const Entity src) {
+                    pdata.stamp = [](basic_registry &other, const Entity dst, const sparse_set<Entity> &cpool, const Entity src) {
                         other.assign_or_replace<Component>(dst, static_cast<const pool_type<Component> &>(cpool).get(src));
                     };
                 }
@@ -1504,7 +1504,7 @@ public:
     }
 
     /**
-     * @brief Stomps an entity and its components.
+     * @brief Stamps an entity onto another entity.
      *
      * The components must be copyable for obvious reasons. The entities
      * must be both valid.<br/>
@@ -1534,11 +1534,11 @@ public:
      * @param src A valid entity identifier to be copied.
      */
     template<typename... Component, typename... Exclude>
-    void stomp(const entity_type dst, const basic_registry &other, const entity_type src, exclude_t<Exclude...> = {}) {
+    void stamp(const entity_type dst, const basic_registry &other, const entity_type src, exclude_t<Exclude...> = {}) {
         if constexpr(sizeof...(Component) == 0) {
             for(size_type pos{}; pos < other.pools.size(); ++pos) {
-                if(const auto &pdata = other.pools[pos]; pdata.stomp && ((pdata.type_id != type_info<Exclude>::id()) && ...) && pdata.pool->has(src)) {
-                    pdata.stomp(*this, dst, *pdata.pool, src);
+                if(const auto &pdata = other.pools[pos]; pdata.stamp && ((pdata.type_id != type_info<Exclude>::id()) && ...) && pdata.pool->has(src)) {
+                    pdata.stamp(*this, dst, *pdata.pool, src);
                 }
             }
         } else {
