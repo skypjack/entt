@@ -13,7 +13,7 @@
   * [Conflicts](#conflicts)
 * [Monostate](#monostate)
 * [Type info](#type-info)
-  * [Conflicts](#conflicts)
+  * [Almost unique identifiers](#almost-unique-identifiers)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -224,16 +224,24 @@ Note that this class template and its specializations are widely used within
 across boundaries.<br/>
 Please refer to the dedicated section for more details.
 
-## Conflicts
+## Almost unique identifiers
 
-Since the default, non-standard implementation makes use of hashed strings, it
-may happen that two types are assigned the same numeric identifier.<br/>
+Since the default non-standard, compile-time implementation makes use of hashed
+strings, it may happen that two types are assigned the same numeric
+identifier.<br/>
 In fact, although this is quite rare, it's not entirely excluded.
 
-In this case, there are many ways to deal with it:
+Another case where two types are assigned the same identifier is when classes
+from different contexts (for example two or more libraries loaded at runtime)
+have the same fully qualified name.<br/>
+Since the default model is based on the name of the classes, if the types belong
+to the same namespace then their identifiers _could_ be identical (they won't
+necessarily be the same though).
+
+Fortunately, there are several easy ways to deal with this:
 
 * The most trivial one is to define the `ENTT_STANDARD_CPP` macro. Note that
-  runtime identifiers don't suffer from this problem. However, this solution
+  runtime identifiers don't suffer from the sam problem. However, this solution
   doesn't work well with a plugin system, where the libraries aren't linked.
 
 * Another possibility is to specialize the `type_info` class for one of the
