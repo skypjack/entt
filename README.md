@@ -262,8 +262,8 @@ The API reference will be created in HTML format within the directory
 @cond TURN_OFF_DOXYGEN
 -->
 It's also available [online](https://skypjack.github.io/entt/) for the latest
-version.<br/>
-Finally, there exists a [wiki](https://github.com/skypjack/entt/wiki) dedicated
+version, that is the last stable tag.<br/>
+Moreover, there exists a [wiki](https://github.com/skypjack/entt/wiki) dedicated
 to the project where users can find all related documentation pages.
 <!--
 @endcond TURN_OFF_DOXYGEN

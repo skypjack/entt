@@ -388,8 +388,7 @@ public:
     }
 
     /**
-     * @brief Iterates entities and applies the given function object to them,
-     * then clears the observer.
+     * @brief Iterates entities and applies the given function object to them.
      *
      * The function object is invoked for each entity.<br/>
      * The signature of the function must be equivalent to the following form:
@@ -411,12 +410,7 @@ public:
      * @brief Iterates entities and applies the given function object to them,
      * then clears the observer.
      *
-     * The function object is invoked for each entity.<br/>
-     * The signature of the function must be equivalent to the following form:
-     *
-     * @code{.cpp}
-     * void(const entity_type);
-     * @endcode
+     * @sa each
      *
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.

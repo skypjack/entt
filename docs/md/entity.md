@@ -546,7 +546,7 @@ and has not `velocity` before to store it aside. If one of the two conditions of
 the filter isn't respected, the entity is discared, no matter what.
 
 A `where` clause accepts a theoretically unlimited number of types as well as
-multiple elements in the exclusion list. Moreover, every matcher can have it's
+multiple elements in the exclusion list. Moreover, every matcher can have its
 own clause and multiple clauses for the same matcher are combined in a single
 one.
 
