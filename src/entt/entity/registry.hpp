@@ -1263,7 +1263,7 @@ public:
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         handler_type *handler = nullptr;
 
-        if(auto it = std::find_if(groups.cbegin(), groups.cend(), [](const auto &gdata) {
+        if(auto it = std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
             return gdata.size == size
                 && (gdata.owned(type_info<std::decay_t<Owned>>::id()) && ...)
                 && (gdata.get(type_info<std::decay_t<Get>>::id()) && ...)
@@ -1290,13 +1290,13 @@ public:
             if constexpr(sizeof...(Owned) == 0) {
                 groups.push_back(std::move(gdata));
             } else {
-                ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [](const auto &gdata) {
+                ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
                     const auto overlapping = (0u + ... + gdata.owned(type_info<std::decay_t<Owned>>::id()));
                     const auto sz = overlapping + (0u + ... + gdata.get(type_info<std::decay_t<Get>>::id())) + (0u + ... + gdata.exclude(type_info<Exclude>::id()));
                     return !overlapping || ((sz == size) || (sz == gdata.size));
                 }));
 
-                const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [&size](const auto &gdata) {
+                const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
                     return !(0u + ... + gdata.owned(type_info<std::decay_t<Owned>>::id())) || (size > (gdata.size));
                 });
 
