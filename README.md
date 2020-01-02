@@ -288,11 +288,11 @@ Note that benchmarks are not part of this set.
 
 `EnTT` is available for some of the most known packaging tools. In particular:
 
-* [`Conan`](https://bintray.com/skypjack/conan/entt%3Askypjack/_latestVersion),
-  the C/C++ Package Manager for Developers.
+* [`Conan`](https://github.com/conan-io/conan-center-index), the C/C++ Package
+  Manager for Developers.
 
-* [`vcpkg`](https://github.com/Microsoft/vcpkg/tree/master/ports/entt),
-  Microsoft VC++ Packaging Tool.<br/>
+* [`vcpkg`](https://github.com/Microsoft/vcpkg), Microsoft VC++ Packaging
+  Tool.<br/>
   You can download and install `EnTT` in just a few simple steps:
 
   ```
