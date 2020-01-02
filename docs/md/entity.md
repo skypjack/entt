@@ -628,6 +628,11 @@ const auto entity = registry.create();
 const bool null = (entity == entt::null);
 ```
 
+Be aware that `entt::null` and entity 0 aren't the same thing. Likewise, a zero
+initialized entity isn't the same as `entt::null`. Therefore, although
+`entt::entity{}` is in some sense an alias for entity 0, none of them can be
+used to create a null entity.
+
 ### Stomp
 
 Using multiple registries at the same time is quite common. Examples are the
