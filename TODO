@@ -14,5 +14,6 @@
 * add meta support to registry (eg entity for each component and opaque get)
 * allow for custom stamp functions
 * observer: user defined filters (eg .replace<T, &function> or .group<T, U, &func>)
+* use underlying_type as entity type within pools and registry? it would make different registries work together flawlessy
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none

@@ -18,7 +18,7 @@
   * [Sorting: is it possible?](#sorting-is-it-possible)
   * [Helpers](#helpers)
     * [Null entity](#null-entity)
-    * [Stomp](#stomp)
+    * [Stamp](#stamp)
     * [Dependencies](#dependencies)
     * [Tags](#tags)
     * [Actor](#actor)
@@ -633,7 +633,7 @@ initialized entity isn't the same as `entt::null`. Therefore, although
 `entt::entity{}` is in some sense an alias for entity 0, none of them can be
 used to create a null entity.
 
-### Stomp
+### Stamp
 
 Using multiple registries at the same time is quite common. Examples are the
 separation of the UI from the simulation or the loading of different scenes in
@@ -644,8 +644,8 @@ nothing more than an opaque container you can swap at any time.
 
 Once there are multiple registries available, however, one or more methods are
 needed to transfer information from one container to another. This results in
-the `stomp` member functions of the `registry` class .<br/>
-These functions allow to take one entity from a registry and use it to _stomp_
+the `stamp` member functions of the `registry` class .<br/>
+These functions allow to take one entity from a registry and use it to _stamp_
 one or more entities in another registry (or even the same, actually making
 local copies).
 
