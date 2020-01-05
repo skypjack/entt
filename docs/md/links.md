@@ -94,6 +94,8 @@ I hope this list can grow much more in the future:
     [Collector](https://play.google.com/store/apps/details?id=com.esri.arcgis.collector)
     and
     [Navigator](https://play.google.com/store/apps/details?id=com.esri.navigator).
+  * [Sequentity](https://github.com/alanjfs/sequentity): A MIDI-like
+    sequencer/tracker for C++ and `ImGui` (with `Magnum` and `EnTT`).
   * [Apparently](https://www.linkedin.com/in/skypjack/)
     [NIO](https://www.nio.io/): there was a collaboration to make some changes
     to `EnTT`, at the time used for internal projects.
