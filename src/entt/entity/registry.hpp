@@ -68,7 +68,7 @@ class basic_registry {
 
         template<typename... Args>
         decltype(auto) assign(basic_registry &owner, const Entity entt, Args &&... args) {
-            decltype(auto) component = storage<Entity, Component>::construct(entt, std::forward<Args>(args)...);
+            decltype(auto) component = storage<entity_type, Component>::construct(entt, std::forward<Args>(args)...);
             construction.publish(entt, owner, component);
             return component;
         }
@@ -76,7 +76,7 @@ class basic_registry {
         template<typename It, typename... Args>
         std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, Entity>, typename storage<Entity, Component>::reverse_iterator_type>
         assign(basic_registry &owner, It first, It last, Args &&... args) {
-            auto it = storage<Entity, Component>::construct(first, last, std::forward<Args>(args)...);
+            auto it = storage<entity_type, Component>::construct(first, last, std::forward<Args>(args)...);
             const auto end = it + (!construction.empty() * std::distance(first, last));
 
             std::for_each(it, end, [this, &owner, &first](decltype(*it) component) {
@@ -88,14 +88,14 @@ class basic_registry {
 
         void remove(basic_registry &owner, const Entity entt) {
             destruction.publish(entt, owner);
-            storage<Entity, Component>::destroy(entt);
+            storage<entity_type, Component>::destroy(entt);
         }
 
         template<typename... Args>
         decltype(auto) replace(basic_registry &owner, const Entity entt, Args &&... args) {
             Component component{std::forward<Args>(args)...};
             update.publish(entt, owner, component);
-            return (storage<Entity, Component>::get(entt) = std::move(component));
+            return (storage<entity_type, Component>::get(entt) = std::move(component));
         }
 
     private:
@@ -194,8 +194,7 @@ class basic_registry {
             const auto curr = to_integral(destroyed);
             const auto version = to_integral(entities[curr]) & (traits_type::version_mask << traits_type::entity_shift);
             destroyed = entity_type{to_integral(entities[curr]) & traits_type::entity_mask};
-            entt = entity_type{curr | version};
-            entities[curr] = entt;
+            entt = entities[curr] = entity_type{curr | version};
         }
 
         return entt;
@@ -205,9 +204,8 @@ class basic_registry {
         // lengthens the implicit list of destroyed entities
         const auto entt = to_integral(entity) & traits_type::entity_mask;
         const auto version = ((to_integral(entity) >> traits_type::entity_shift) + 1) << traits_type::entity_shift;
-        const auto node = to_integral(destroyed) | version;
-        entities[entt] = Entity{node};
-        destroyed = Entity{entt};
+        entities[entt] = entity_type{to_integral(destroyed) | version};
+        destroyed = entity_type{entt};
     }
 
     template<typename Component, typename... Args>
@@ -225,16 +223,16 @@ class basic_registry {
                 pdata.type_id = type_info<Component>::id();
                 pdata.pool = std::make_unique<pool_handler<Component>>(std::forward<Args>(args)...);
 
-                pdata.remove = [](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
+                pdata.remove = [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
                     static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
                 };
 
                 if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
-                    pdata.assure = [](basic_registry &other, const sparse_set<Entity> &cpool) {
+                    pdata.assure = [](basic_registry &other, const sparse_set<entity_type> &cpool) {
                         other.assure<Component>(static_cast<const pool_handler<Component> &>(cpool));
                     };
 
-                    pdata.stamp = [](basic_registry &other, const Entity dst, const sparse_set<Entity> &cpool, const Entity src) {
+                    pdata.stamp = [](basic_registry &other, const entity_type dst, const sparse_set<entity_type> &cpool, const entity_type src) {
                         other.assign_or_replace<Component>(dst, static_cast<const pool_handler<Component> &>(cpool).get(src));
                     };
                 }
@@ -529,6 +527,50 @@ public:
 
         if constexpr(sizeof...(Component) > 0) {
             return std::make_tuple(assure<Component>().assign(*this, first, last)...);
+        }
+    }
+
+    /**
+     * @brief Creates a new entity and returns it.
+     *
+     * @sa create
+     *
+     * If the requested entity isn't in use, the suggested identifier is created
+     * and returned. Otherwise, a new one will be generated for this purpose.
+     *
+     * @tparam Component Types of components to assign to the entity.
+     * @param hint A desired entity identifier.
+     * @return A valid entity identifier if the component list is empty, a tuple
+     * containing the entity identifier and the references to the components
+     * just created otherwise.
+     */
+    template<typename... Component>
+    auto create(const entity_type hint) {
+        ENTT_ASSERT(hint != null);
+        entity_type entt;
+
+        if(const auto req = (to_integral(hint) & traits_type::entity_mask); !(req < entities.size())) {
+            entities.reserve(req + 1);
+
+            for(auto pos = entities.size(); pos < req; ++pos) {
+                entities.emplace_back(destroyed);
+                destroyed = entity_type(pos);
+            }
+
+            entt = entities.emplace_back(hint);
+        } else if(const auto curr = (to_integral(entities[req]) & traits_type::entity_mask); req == curr) {
+            entt = create();
+        } else {
+            auto *it = &destroyed;
+            for(; (to_integral(*it) & traits_type::entity_mask) != req; it = &entities[to_integral(*it) & traits_type::entity_mask]);
+            *it = entity_type{curr | (to_integral(*it) & (traits_type::version_mask << traits_type::entity_shift))};
+            entt = entities[req] = hint;
+        }
+
+        if constexpr(sizeof...(Component) == 0) {
+            return entt;
+        } else {
+            return std::tuple_cat(std::make_tuple(entt), std::forward_as_tuple(assign<Component>(entt)...));
         }
     }
 

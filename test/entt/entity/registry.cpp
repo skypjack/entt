@@ -1231,6 +1231,39 @@ TEST(Registry, CreateManyEntitiesWithComponentsAtOnceWithListener) {
     ASSERT_EQ(listener.counter, 6);
 }
 
+TEST(Registry, CreateWithHint) {
+    entt::registry registry;
+    auto e3 = registry.create(entt::entity{3});
+    auto e2 = registry.create(entt::entity{3});
+
+    ASSERT_EQ(e2, entt::entity{2});
+    ASSERT_FALSE(registry.valid(entt::entity{1}));
+    ASSERT_EQ(e3, entt::entity{3});
+
+    registry.destroy(e2);
+
+    ASSERT_EQ(registry.version(e2), 0);
+    ASSERT_EQ(registry.current(e2), 1);
+
+    e2 = registry.create();
+    auto e1 = registry.create(entt::entity{2});
+
+    ASSERT_EQ(registry.entity(e2), entt::entity{2});
+    ASSERT_EQ(registry.version(e2), 1);
+
+    ASSERT_EQ(registry.entity(e1), entt::entity{1});
+    ASSERT_EQ(registry.version(e1), 0);
+
+    registry.destroy(e1);
+    registry.destroy(e2);
+    auto e0 = std::get<0>(registry.create<int>(entt::entity{0}));
+
+    ASSERT_EQ(e0, entt::entity{0});
+    ASSERT_EQ(registry.version(e0), 0);
+    ASSERT_TRUE(registry.has<int>(e0));
+    ASSERT_FALSE(registry.has<char>(e0));
+}
+
 TEST(Registry, NonOwningGroupInterleaved) {
     entt::registry registry;
     typename entt::entity entity = entt::null;
