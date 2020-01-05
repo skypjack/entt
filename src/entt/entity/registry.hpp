@@ -559,7 +559,7 @@ public:
 
             entt = entities.emplace_back(hint);
         } else if(const auto curr = (to_integral(entities[req]) & traits_type::entity_mask); req == curr) {
-            entt = create();
+            entt = generate();
         } else {
             auto *it = &destroyed;
             for(; (to_integral(*it) & traits_type::entity_mask) != req; it = &entities[to_integral(*it) & traits_type::entity_mask]);
