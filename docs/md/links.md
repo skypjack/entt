@@ -46,6 +46,8 @@ I hope this list can grow much more in the future:
     made in C++ with the `SDL2` and `EnTT` libraries.
   * [Mirrors lasers and robots](https://github.com/guillaume-haerinck/imac-tower-defense):
     a small tower defense game based on mirror orientation.
+  * [PopHead](https://github.com/SPC-Some-Polish-Coders/PopHead/): 2D, Zombie,
+    RPG game made from scratch in C++.
 
 * Engines and the like:
   * [Fling Engine](https://github.com/flingengine/FlingEngine): a Vulkan game
