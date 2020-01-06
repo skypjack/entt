@@ -304,6 +304,27 @@ TEST(Registry, CreateManyEntitiesAtOnce) {
     ASSERT_EQ(registry.version(entities[2]), entt::registry::version_type{0});
 }
 
+TEST(Registry, CreateManyEntitiesAtOnceWithListener) {
+    entt::registry registry;
+    entt::entity entities[3];
+    listener listener;
+
+    registry.on_construct<int>().connect<&listener::incr<int>>(listener);
+    registry.create(std::begin(entities), std::end(entities));
+    registry.assign<int>(std::begin(entities), std::end(entities));
+    registry.assign<char>(std::begin(entities), std::end(entities));
+
+    ASSERT_EQ(listener.counter, 3);
+
+    registry.on_construct<int>().disconnect<&listener::incr<int>>(listener);
+    registry.on_construct<empty_type>().connect<&listener::incr<empty_type>>(listener);
+    registry.create(std::begin(entities), std::end(entities));
+    registry.assign<char>(std::begin(entities), std::end(entities));
+    registry.assign<empty_type>(std::begin(entities), std::end(entities));
+
+    ASSERT_EQ(listener.counter, 6);
+}
+
 TEST(Registry, CreateWithHint) {
     entt::registry registry;
     auto e3 = registry.create(entt::entity{3});
