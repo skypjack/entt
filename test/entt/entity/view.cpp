@@ -192,8 +192,14 @@ TEST(SingleComponentView, Find) {
 
 TEST(SingleComponentView, Less) {
     entt::registry registry;
-    const auto entity = std::get<0>(registry.create<int, entt::tag<"empty"_hs>>());
-    registry.create<char>();
+    auto create = [&](auto... component) {
+        const auto entity = registry.create();
+        (registry.assign<decltype(component)>(entity, component), ...);
+        return entity;
+    };
+
+    const auto entity = create(0, entt::tag<"empty"_hs>{});
+    create('c');
 
     registry.view<entt::tag<"empty"_hs>>().less([entity](const auto entt) {
         ASSERT_EQ(entity, entt);
@@ -526,8 +532,16 @@ TEST(MultiComponentView, ExcludedComponents) {
 
 TEST(MultiComponentView, Less) {
     entt::registry registry;
-    const auto entity = std::get<0>(registry.create<int, char, double, entt::tag<"empty"_hs>>());
-    registry.create<int, char>();
+
+    const auto entity = registry.create();
+    registry.assign<int>(entity);
+    registry.assign<char>(entity);
+    registry.assign<double>(entity);
+    registry.assign<entt::tag<"empty"_hs>>(entity);
+
+    const auto other = registry.create();
+    registry.assign<int>(other);
+    registry.assign<char>(other);
 
     registry.view<int, char, entt::tag<"empty"_hs>>().less([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);

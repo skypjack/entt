@@ -172,10 +172,6 @@ auto view = registry.view<a_component, another_component>();
 registry.destroy(view.begin(), view.end());
 ```
 
-In all cases, the `create` member function accepts also a list of default
-constructible component types to assign to the entities before to return. It's a
-faster alternative to the creation and subsequent assignment of components.
-
 When an entity is destroyed, the registry can freely reuse it internally with a
 slightly different identifier. In particular, the version of an entity is
 increased after destruction.<br/>

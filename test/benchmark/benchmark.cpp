@@ -114,7 +114,9 @@ TEST(Benchmark, ConstructManyWithComponents) {
     std::cout << "Constructing 1000000 entities at once with components" << std::endl;
 
     timer timer;
-    registry.create<position, velocity>(entities.begin(), entities.end());
+    registry.create(entities.begin(), entities.end());
+    registry.assign<position>(entities.begin(), entities.end());
+    registry.assign<velocity>(entities.begin(), entities.end());
     timer.elapsed();
 }
 

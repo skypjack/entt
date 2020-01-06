@@ -14,7 +14,8 @@ TEST(Observer, Functionalities) {
     ASSERT_EQ(observer.data(), nullptr);
     ASSERT_EQ(observer.begin(), observer.end());
 
-    const auto entity = std::get<0>(registry.create<int>());
+    const auto entity = registry.create();
+    registry.assign<int>(entity);
 
     ASSERT_EQ(observer.size(), 1u);
     ASSERT_FALSE(observer.empty());
@@ -263,7 +264,8 @@ TEST(Observer, CrossRulesCornerCase) {
 TEST(Observer, Each) {
     entt::registry registry;
     entt::observer observer{registry, entt::collector.group<int>()};
-    const auto entity = std::get<0>(registry.create<int>());
+    const auto entity = registry.create();
+    registry.assign<int>(entity);
 
     ASSERT_FALSE(observer.empty());
     ASSERT_EQ(observer.size(), 1u);

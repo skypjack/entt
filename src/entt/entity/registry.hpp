@@ -183,31 +183,6 @@ class basic_registry {
         }
     };
 
-    auto generate() {
-        Entity entt;
-
-        if(destroyed == null) {
-            entt = entities.emplace_back(entity_type(entities.size()));
-            // traits_type::entity_mask is reserved to allow for null identifiers
-            ENTT_ASSERT(to_integral(entt) < traits_type::entity_mask);
-        } else {
-            const auto curr = to_integral(destroyed);
-            const auto version = to_integral(entities[curr]) & (traits_type::version_mask << traits_type::entity_shift);
-            destroyed = entity_type{to_integral(entities[curr]) & traits_type::entity_mask};
-            entt = entities[curr] = entity_type{curr | version};
-        }
-
-        return entt;
-    }
-
-    void release(const Entity entity) {
-        // lengthens the implicit list of destroyed entities
-        const auto entt = to_integral(entity) & traits_type::entity_mask;
-        const auto version = ((to_integral(entity) >> traits_type::entity_shift) + 1) << traits_type::entity_shift;
-        entities[entt] = entity_type{to_integral(destroyed) | version};
-        destroyed = entity_type{entt};
-    }
-
     template<typename Component, typename... Args>
     const pool_handler<Component> & assure(Args &&... args) const {
         static std::size_t index{pools.size()};
@@ -476,33 +451,28 @@ public:
     /**
      * @brief Creates a new entity and returns it.
      *
-     * There are two kinds of entity identifiers:
+     * There are two kinds of possible entity identifiers:
      *
      * * Newly created ones in case no entities have been previously destroyed.
      * * Recycled ones with updated versions.
      *
-     * Users should not care about the type of the returned entity identifier.
-     * In case entity identifers are stored around, the `valid` member
-     * function can be used to know if they are still valid or the entity has
-     * been destroyed and potentially recycled.<br/>
-     * The returned entity has assigned the given components, if any.
-     *
-     * The components must be at least default constructible. A compilation
-     * error will occur otherwhise.
-     *
-     * @tparam Component Types of components to assign to the entity.
-     * @return A valid entity identifier if the component list is empty, a tuple
-     * containing the entity identifier and the references to the components
-     * just created otherwise.
+     * @return A valid entity identifier.
      */
-    template<typename... Component>
-    auto create() {
-        if constexpr(sizeof...(Component) == 0) {
-            return generate();
+    entity_type create() {
+        entity_type entt;
+
+        if(destroyed == null) {
+            entt = entities.emplace_back(entity_type(entities.size()));
+            // traits_type::entity_mask is reserved to allow for null identifiers
+            ENTT_ASSERT(to_integral(entt) < traits_type::entity_mask);
         } else {
-            const entity_type entt = generate();
-            return std::tuple_cat(std::make_tuple(entt), std::forward_as_tuple(assign<Component>(entt)...));
+            const auto curr = to_integral(destroyed);
+            const auto version = to_integral(entities[curr]) & (traits_type::version_mask << traits_type::entity_shift);
+            destroyed = entity_type{to_integral(entities[curr]) & traits_type::entity_mask};
+            entt = entities[curr] = entity_type{curr | version};
         }
+
+        return entt;
     }
 
     /**
@@ -510,24 +480,13 @@ public:
      *
      * @sa create
      *
-     * The components must be at least move and default insertable. A
-     * compilation error will occur otherwhise.
-     *
-     * @tparam Component Types of components to assign to the entity.
      * @tparam It Type of forward iterator.
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
-     * @return No return value if the component list is empty, a tuple
-     * containing the iterators to the lists of components just created and
-     * sorted the same of the entities otherwise.
      */
-    template<typename... Component, typename It>
-    auto create(It first, It last) {
-        std::generate(first, last, [this]() { return generate(); });
-
-        if constexpr(sizeof...(Component) > 0) {
-            return std::make_tuple(assure<Component>().assign(*this, first, last)...);
-        }
+    template<typename It>
+    void create(It first, It last) {
+        std::generate(first, last, [this]() { return create(); });
     }
 
     /**
@@ -538,14 +497,11 @@ public:
      * If the requested entity isn't in use, the suggested identifier is created
      * and returned. Otherwise, a new one will be generated for this purpose.
      *
-     * @tparam Component Types of components to assign to the entity.
      * @param hint A desired entity identifier.
-     * @return A valid entity identifier if the component list is empty, a tuple
-     * containing the entity identifier and the references to the components
-     * just created otherwise.
+     * @return A valid entity identifier.
      */
     template<typename... Component>
-    auto create(const entity_type hint) {
+    entity_type create(const entity_type hint) {
         ENTT_ASSERT(hint != null);
         entity_type entt;
 
@@ -559,7 +515,7 @@ public:
 
             entt = entities.emplace_back(hint);
         } else if(const auto curr = (to_integral(entities[req]) & traits_type::entity_mask); req == curr) {
-            entt = generate();
+            entt = create();
         } else {
             auto *it = &destroyed;
             for(; (to_integral(*it) & traits_type::entity_mask) != req; it = &entities[to_integral(*it) & traits_type::entity_mask]);
@@ -567,20 +523,14 @@ public:
             entt = entities[req] = hint;
         }
 
-        if constexpr(sizeof...(Component) == 0) {
-            return entt;
-        } else {
-            return std::tuple_cat(std::make_tuple(entt), std::forward_as_tuple(assign<Component>(entt)...));
-        }
+        return entt;
     }
 
     /**
      * @brief Destroys an entity and lets the registry recycle the identifier.
      *
      * When an entity is destroyed, its version is updated and the identifier
-     * can be recycled at any time. In case entity identifers are stored around,
-     * the `valid` member function can be used to know if they are still valid
-     * or the entity has been destroyed and potentially recycled.
+     * can be recycled at any time.
      *
      * @warning
      * In case there are listeners that observe the destruction of components
@@ -607,7 +557,12 @@ public:
 
         // just a way to protect users from listeners that attach components
         ENTT_ASSERT(orphan(entity));
-        release(entity);
+
+        // lengthens the implicit list of destroyed entities
+        const auto entt = to_integral(entity) & traits_type::entity_mask;
+        const auto version = ((to_integral(entity) >> traits_type::entity_shift) + 1) << traits_type::entity_shift;
+        entities[entt] = entity_type{to_integral(destroyed) | version};
+        destroyed = entity_type{entt};
     }
 
     /**
@@ -658,10 +613,10 @@ public:
      *
      * @tparam Component Type of component to create.
      * @tparam It Type of input iterator.
-     * @tparam Args Types of arguments to use to construct the component.
+     * @tparam Args Types of arguments to use to construct the components.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param args Parameters to use to initialize the component.
+     * @param args Parameters to use to initialize the components.
      * @return An iterator to the list of components just created.
      */
     template<typename Component, typename It, typename... Args>
