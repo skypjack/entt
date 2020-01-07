@@ -188,8 +188,8 @@ class basic_registry {
         static std::size_t index{pools.size()};
 
         if(!(index < pools.size()) || pools[index].type_id != type_info<Component>::id()) {
-            index = std::find_if(pools.cbegin(), pools.cend(), [](auto &&cpool) {
-                return cpool.type_id == type_info<Component>::id();
+            index = std::find_if(pools.cbegin(), pools.cend(), [](auto &&pdata) {
+                return pdata.type_id == type_info<Component>::id();
             }) - pools.cbegin();
 
             if(index == pools.size()) {
@@ -500,7 +500,6 @@ public:
      * @param hint A desired entity identifier.
      * @return A valid entity identifier.
      */
-    template<typename... Component>
     entity_type create(const entity_type hint) {
         ENTT_ASSERT(hint != null);
         entity_type entt;
@@ -888,10 +887,8 @@ public:
      * to know if they are still valid.
      */
     void reset() {
-        each([this](const auto entity) {
-            // useless this-> used to suppress a warning with clang
-            this->destroy(entity);
-        });
+        // useless this-> used to suppress a warning with clang
+        each([this](const auto entity) { this->destroy(entity); });
     }
 
     /**
@@ -921,12 +918,8 @@ public:
             }
         } else {
             for(auto pos = entities.size(); pos; --pos) {
-                const auto curr = entity_type(pos - 1);
-                const auto entity = entities[to_integral(curr)];
-                const auto entt = entity_type{to_integral(entity) & traits_type::entity_mask};
-
-                if(curr == entt) {
-                    func(entity);
+                if(const auto entt = entities[pos - 1]; (to_integral(entt) & traits_type::entity_mask) == (pos - 1)) {
+                    func(entt);
                 }
             }
         }
@@ -939,13 +932,7 @@ public:
      */
     bool orphan(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
-        bool orphan = true;
-
-        for(std::size_t pos{}, last = pools.size(); pos < last && orphan; ++pos) {
-            orphan = !pools[pos].pool->has(entity);
-        }
-
-        return orphan;
+        return std::none_of(pools.cbegin(), pools.cend(), [entity](auto &&pdata) { return pdata.pool->has(entity); });
     }
 
     /**
@@ -1415,10 +1402,7 @@ public:
         std::vector<const sparse_set<Entity> *> selected(std::distance(first, last));
 
         std::transform(first, last, selected.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) {
-                return pdata.type_id == ctype;
-            });
-
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.type_id == ctype; });
             return it == pools.cend() ? nullptr : it->pool.get();
         });
 
@@ -1574,10 +1558,7 @@ public:
             if(!(entt < others.size())) {
                 auto curr = others.size();
                 others.resize(entt + 1);
-
-                std::generate(others.data() + curr, others.data() + entt, [&curr]() {
-                    return entity_type(curr++);
-                });
+                std::generate(others.data() + curr, others.data() + entt, [&curr]() { return entity_type(curr++); });
             }
 
             others[entt] = entity;
@@ -1634,7 +1615,7 @@ public:
      * @tparam Type Type of object to set.
      * @tparam Args Types of arguments to use to construct the object.
      * @param args Parameters to use to initialize the object.
-     * @return Reference to the object.
+     * @return A reference to the object in the context of the registry.
      */
     template<typename Type, typename... Args>
     Type & ctx_or_set(Args &&... args) {
@@ -1650,10 +1631,7 @@ public:
      */
     template<typename Type>
     const Type * try_ctx() const {
-        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&handler) {
-            return handler->id() == type_info<Type>::id();
-        });
-
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&handler) { return handler->id() == type_info<Type>::id(); });
         return it == vars.cend() ? nullptr : &static_cast<const variable_handler<Type> &>(*it->get()).value;
     }
 
