@@ -313,7 +313,7 @@ public:
         disconnect();
         connect<Matcher...>(reg, std::index_sequence_for<Matcher...>{});
         target = &reg;
-        view.reset();
+        view.clear();
     }
 
     /*! @brief Disconnects an observer from the registry it keeps track of. */
@@ -382,9 +382,9 @@ public:
         return view.sparse_set<entity_type>::end();
     }
 
-    /*! @brief Resets the underlying container. */
+    /*! @brief Clears the underlying container. */
     void clear() ENTT_NOEXCEPT {
-        view.reset();
+        view.clear();
     }
 
     /**

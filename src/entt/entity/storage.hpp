@@ -468,9 +468,9 @@ public:
         }
     }
 
-    /*! @brief Resets a storage. */
-    void reset() {
-        underlying_type::reset();
+    /*! @brief Clears a storage. */
+    void clear() {
+        underlying_type::clear();
         instances.clear();
     }
 

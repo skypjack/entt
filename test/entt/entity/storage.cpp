@@ -60,7 +60,7 @@ TEST(Storage, Functionalities) {
     ASSERT_EQ(*pool.try_get(entt::entity{41}), 12);
     ASSERT_EQ(pool.try_get(entt::entity{99}), nullptr);
 
-    pool.reset();
+    pool.clear();
 
     ASSERT_TRUE(pool.empty());
     ASSERT_EQ(pool.size(), 0u);

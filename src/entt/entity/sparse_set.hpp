@@ -617,9 +617,9 @@ public:
     }
 
     /**
-     * @brief Resets a sparse set.
+     * @brief Clears a sparse set.
      */
-    void reset() ENTT_NOEXCEPT {
+    void clear() ENTT_NOEXCEPT {
         reverse.clear();
         direct.clear();
     }

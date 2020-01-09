@@ -70,7 +70,7 @@ TEST(SparseSet, Functionalities) {
     ASSERT_FALSE(other.empty());
     ASSERT_EQ(other.index(entt::entity{42}), 0u);
 
-    other.reset();
+    other.clear();
 
     ASSERT_TRUE(other.empty());
     ASSERT_EQ(other.size(), 0u);

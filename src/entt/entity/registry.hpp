@@ -869,7 +869,7 @@ public:
     void reset() {
         if(auto &cpool = assure<Component>(); cpool.on_destroy().empty()) {
             // no group set, otherwise the signal wouldn't be empty
-            cpool.reset();
+            cpool.clear();
         } else {
             for(const auto entity: static_cast<const sparse_set<entity_type> &>(cpool)) {
                 cpool.remove(*this, entity);
