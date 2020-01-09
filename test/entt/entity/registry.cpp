@@ -14,6 +14,11 @@ struct empty_type {};
 
 struct listener {
     template<typename Component>
+    static void sort(entt::entity, entt::registry &registry) {
+        registry.sort<Component>([](auto lhs, auto rhs) { return lhs < rhs; });
+    }
+
+    template<typename Component>
     void incr(entt::entity entity, entt::registry &registry, const Component &) {
         ASSERT_TRUE(registry.valid(entity));
         ASSERT_TRUE(registry.has<Component>(entity));
@@ -1587,4 +1592,12 @@ TEST(Registry, Dependencies) {
 
     ASSERT_TRUE(registry.has<int>(entity));
     ASSERT_FALSE(registry.has<double>(entity));
+}
+
+TEST(Registry, StableAssign) {
+    entt::registry registry;
+    registry.on_construct<int>().connect<&listener::sort<int>>();
+    registry.assign<int>(registry.create(), 0);
+
+    ASSERT_EQ(registry.assign<int>(registry.create(), 1), 1);
 }
