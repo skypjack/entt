@@ -417,7 +417,7 @@ class basic_continuous_loader {
             const auto local = ref.second.first;
 
             if(reg->valid(local)) {
-                reg->template reset<Component>(local);
+                reg->template remove_if_exists<Component>(local);
             }
         }
     }

@@ -77,17 +77,27 @@ class basic_registry {
         assign(basic_registry &owner, It first, It last, Args &&... args) {
             auto it = this->construct(first, last, std::forward<Args>(args)...);
             const auto end = it + (!construction.empty() * std::distance(first, last));
-
-            std::for_each(it, end, [this, &owner, &first](decltype(*it) component) {
-                construction.publish(*(first++), owner, component);
-            });
-
+            std::for_each(it, end, [this, &owner, &first](decltype(*it) component) { construction.publish(*(first++), owner, component); });
             return it;
         }
 
         void remove(basic_registry &owner, const Entity entt) {
             destruction.publish(entt, owner);
             this->destroy(entt);
+        }
+
+        template<typename It>
+        void remove(basic_registry &owner, It first, It last) {
+            if(std::distance(first, last) == this->size()) {
+                if(!destruction.empty()) {
+                    std::for_each(first, last, [this, &owner](const auto entt) { destruction.publish(entt, owner); });
+                }
+
+                this->clear();
+            } else {
+                // useless this-> used to suppress a warning with clang
+                std::for_each(first, last, [this, &owner](const auto entt) { this->remove(owner, entt); });
+            }
         }
 
         template<typename... Args>
@@ -146,7 +156,7 @@ class basic_registry {
                     current.destroy(entt);
                 }
             } else {
-                if(const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...); std::get<0>(cpools).has(entt) && std::get<0>(cpools).index(entt) < current) {
+                if(const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...); std::get<0>(cpools).has(entt) && (std::get<0>(cpools).index(entt) < current)) {
                     const auto pos = --current;
                     (std::get<pool_handler<Owned> &>(cpools).swap(std::get<pool_handler<Owned> &>(cpools).data()[pos], entt), ...);
                 }
@@ -625,6 +635,61 @@ public:
     }
 
     /**
+     * @brief Assigns or replaces the given component for an entity.
+     *
+     * Equivalent to the following snippet (pseudocode):
+     *
+     * @code{.cpp}
+     * auto &component = registry.has<Component>(entity) ? registry.replace<Component>(entity, args...) : registry.assign<Component>(entity, args...);
+     * @endcode
+     *
+     * Prefer this function anyway because it has slightly better performance.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @tparam Component Type of component to assign or replace.
+     * @tparam Args Types of arguments to use to construct the component.
+     * @param entity A valid entity identifier.
+     * @param args Parameters to use to initialize the component.
+     * @return A reference to the newly created component.
+     */
+    template<typename Component, typename... Args>
+    decltype(auto) assign_or_replace(const entity_type entity, Args &&... args) {
+        ENTT_ASSERT(valid(entity));
+        auto &cpool = assure<Component>();
+        return cpool.has(entity) ? cpool.replace(*this, entity, std::forward<Args>(args)...) : cpool.assign(*this, entity, std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Replaces the given component for an entity.
+     *
+     * A new instance of the given component is created and initialized with the
+     * arguments provided (the component must have a proper constructor or be of
+     * aggregate type). Then the component is assigned to the given entity.
+     *
+     * @warning
+     * Attempting to use an invalid entity or to replace a component of an
+     * entity that doesn't own it results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity doesn't own an instance of the given
+     * component.
+     *
+     * @tparam Component Type of component to replace.
+     * @tparam Args Types of arguments to use to construct the component.
+     * @param entity A valid entity identifier.
+     * @param args Parameters to use to initialize the component.
+     * @return A reference to the newly created component.
+     */
+    template<typename Component, typename... Args>
+    decltype(auto) replace(const entity_type entity, Args &&... args) {
+        ENTT_ASSERT(valid(entity));
+        return assure<Component>().replace(*this, entity, std::forward<Args>(args)...);
+    }
+
+    /**
      * @brief Removes the given components from an entity.
      *
      * @warning
@@ -656,8 +721,32 @@ public:
     template<typename... Component, typename It>
     void remove(It first, It last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        // useless this-> used to suppress a warning with clang
-        std::for_each(first, last, [this](const auto entity) { this->remove<Component...>(entity); });
+        (assure<Component>().remove(*this, first, last), ...);
+    }
+
+    /**
+     * @brief Removes the given components from an entity.
+     *
+     * Equivalent to the following snippet (pseudocode):
+     *
+     * @code{.cpp}
+     * if(registry.has<Component>(entity)) { registry.remove<Component>(entity) }
+     * @endcode
+     *
+     * Prefer this function anyway because it has slightly better performance.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @tparam Component Types of components to remove.
+     * @param entity A valid entity identifier.
+     */
+    template<typename... Component>
+    void remove_if_exists(const entity_type entity) {
+        ENTT_ASSERT(valid(entity));
+        ([this, entity]() { if(auto &cpool = assure<Component>(); cpool.has(entity)) { cpool.remove(*this, entity); } }(), ...);
     }
 
     /**
@@ -780,114 +869,18 @@ public:
     }
 
     /**
-     * @brief Replaces the given component for an entity.
-     *
-     * A new instance of the given component is created and initialized with the
-     * arguments provided (the component must have a proper constructor or be of
-     * aggregate type). Then the component is assigned to the given entity.
-     *
-     * @warning
-     * Attempting to use an invalid entity or to replace a component of an
-     * entity that doesn't own it results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity or if the entity doesn't own an instance of the given
-     * component.
-     *
-     * @tparam Component Type of component to replace.
-     * @tparam Args Types of arguments to use to construct the component.
-     * @param entity A valid entity identifier.
-     * @param args Parameters to use to initialize the component.
-     * @return A reference to the newly created component.
-     */
-    template<typename Component, typename... Args>
-    decltype(auto) replace(const entity_type entity, Args &&... args) {
-        ENTT_ASSERT(valid(entity));
-        return assure<Component>().replace(*this, entity, std::forward<Args>(args)...);
-    }
 
-    /**
-     * @brief Assigns or replaces the given component for an entity.
-     *
-     * Equivalent to the following snippet (pseudocode):
-     *
-     * @code{.cpp}
-     * auto &component = registry.has<Component>(entity) ? registry.replace<Component>(entity, args...) : registry.assign<Component>(entity, args...);
-     * @endcode
-     *
-     * Prefer this function anyway because it has slightly better performance.
-     *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
-     *
-     * @tparam Component Type of component to assign or replace.
-     * @tparam Args Types of arguments to use to construct the component.
-     * @param entity A valid entity identifier.
-     * @param args Parameters to use to initialize the component.
-     * @return A reference to the newly created component.
+     * @brief Clears a whole registry or the pools for the given components.
+     * @tparam Component Types of components to remove from their entities.
      */
-    template<typename Component, typename... Args>
-    decltype(auto) assign_or_replace(const entity_type entity, Args &&... args) {
-        ENTT_ASSERT(valid(entity));
-        auto &cpool = assure<Component>();
-        return cpool.has(entity) ? cpool.replace(*this, entity, std::forward<Args>(args)...) : cpool.assign(*this, entity, std::forward<Args>(args)...);
-    }
-
-    /**
-     * @brief Resets the given component for an entity.
-     *
-     * If the entity has an instance of the component, this function removes the
-     * component from the entity. Otherwise it does nothing.
-     *
-     * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
-     *
-     * @tparam Component Type of component to reset.
-     * @param entity A valid entity identifier.
-     */
-    template<typename Component>
-    void reset(const entity_type entity) {
-        ENTT_ASSERT(valid(entity));
-
-        if(auto &cpool = assure<Component>(); cpool.has(entity)) {
-            cpool.remove(*this, entity);
-        }
-    }
-
-    /**
-     * @brief Resets the pool of the given component.
-     *
-     * For each entity that has an instance of the given component, the
-     * component itself is removed and thus destroyed.
-     *
-     * @tparam Component Type of component whose pool must be reset.
-     */
-    template<typename Component>
-    void reset() {
-        if(auto &cpool = assure<Component>(); cpool.on_destroy().empty()) {
-            // no group set, otherwise the signal wouldn't be empty
-            cpool.clear();
+    template<typename... Component>
+    void clear() {
+        if constexpr(sizeof...(Component) == 0) {
+            // useless this-> used to suppress a warning with clang
+            each([this](const auto entity) { this->destroy(entity); });
         } else {
-            for(const auto entity: static_cast<const sparse_set<entity_type> &>(cpool)) {
-                cpool.remove(*this, entity);
-            }
+            ([this](auto &&cpool) { cpool.remove(*this, cpool.sparse_set<entity_type>::begin(), cpool.sparse_set<entity_type>::end()); }(assure<Component>()), ...);
         }
-    }
-
-    /**
-     * @brief Resets a whole registry.
-     *
-     * Destroys all the entities. After a call to `reset`, all the entities
-     * still in use are recycled with a new version number. In case entity
-     * identifers are stored around, the `valid` member function can be used
-     * to know if they are still valid.
-     */
-    void reset() {
-        // useless this-> used to suppress a warning with clang
-        each([this](const auto entity) { this->destroy(entity); });
     }
 
     /**
@@ -1569,7 +1562,7 @@ public:
             }
         };
 
-        reset();
+        clear();
         entities.clear();
         destroyed = null;
 

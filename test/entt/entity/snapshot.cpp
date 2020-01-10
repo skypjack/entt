@@ -102,7 +102,7 @@ TEST(Snapshot, Dump) {
             .destroyed(output)
             .component<int, char, double, a_component, another_component>(output);
 
-    registry.reset();
+    registry.clear();
 
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -173,7 +173,7 @@ TEST(Snapshot, Partial) {
             .destroyed(output)
             .component<char, int>(output);
 
-    registry.reset();
+    registry.clear();
 
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -201,7 +201,7 @@ TEST(Snapshot, Partial) {
             .entities(output)
             .destroyed(output);
 
-    registry.reset();
+    registry.clear();
 
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -247,7 +247,7 @@ TEST(Snapshot, Iterator) {
     const auto size = view.size();
 
     registry.snapshot().component<another_component>(output, view.begin(), view.end());
-    registry.reset();
+    registry.clear();
     registry.loader().component<another_component>(input);
 
     ASSERT_EQ(registry.view<another_component>().size(), size);
@@ -285,7 +285,7 @@ TEST(Snapshot, Continuous) {
         src.create();
     }
 
-    src.reset();
+    src.clear();
 
     for(int i = 0; i < 5; ++i) {
         entity = src.create();
@@ -470,7 +470,7 @@ TEST(Snapshot, Continuous) {
         component.bar = entity;
     });
 
-    dst.reset<a_component>();
+    dst.clear<a_component>();
     a_component_cnt = src.size<a_component>();
 
     src.snapshot()
@@ -491,7 +491,7 @@ TEST(Snapshot, Continuous) {
 
     ASSERT_EQ(dst.size<a_component>(), a_component_cnt);
 
-    src.reset<a_component>();
+    src.clear<a_component>();
     a_component_cnt = {};
 
     src.snapshot()
@@ -563,7 +563,7 @@ TEST(Snapshot, SyncDataMembers) {
     src.create();
     src.create();
 
-    src.reset();
+    src.clear();
 
     auto parent = src.create();
     auto child = src.create();

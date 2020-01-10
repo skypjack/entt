@@ -81,7 +81,7 @@ TEST(Observer, AllOf) {
     observer.disconnect();
     registry.assign_or_replace<int>(entity);
     registry.assign_or_replace<char>(entity);
-    registry.reset<float>(entity);
+    registry.remove_if_exists<float>(entity);
 
     ASSERT_TRUE(observer.empty());
 }

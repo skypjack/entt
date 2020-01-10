@@ -258,28 +258,26 @@ If the goal is to delete a single component from an entity that owns it, the
 registry.remove<position>(entity);
 ```
 
-When in doubt whether the entity owns the component or not, use the `reset`
+When in doubt whether the entity owns the component, use the `remove_if_exists`
 member function instead. It behaves similarly to `remove` but it discards the
 component if and only if it exists, otherwise it returns safely to the caller:
 
 ```cpp
-registry.reset<position>(entity);
+registry.remove_if_exists<position>(entity);
 ```
 
-There exist also two other _versions_ of the `reset` member function:
+The `clear` member function works similarly and can be used to either:
 
-* If no entity is passed to it, `reset` will remove the given component from
-  each entity that has it:
+* Remove all instances of the given components from the entities that own them:
 
   ```cpp
-  registry.reset<position>();
+  registry.clear<position>();
   ```
 
-* If neither the entity nor the component are specified, all the entities still
-  in use and their components are destroyed:
+* Or destroy all entities in a registry at once:
 
   ```cpp
-  registry.reset();
+  registry.clear();
   ```
 
 Finally, references to components can be retrieved simply as:
@@ -614,11 +612,9 @@ Similarly, the code shown below removes `a_type` from an entity whenever
 `my_type` is assigned to it:
 
 ```cpp
-registry.on_construct<my_type>().connect<entt::overload<void(entt::entity)>(&entt::registry::reset<a_type>)>(registry);
+registry.on_construct<my_type>().connect<&entt::registry::remove<a_type>>(registry);
 ```
 
-In this case, to prevent the _wrong_ overload for `reset` being selected,
-`entt::overload` is used to help the compiler make the right choice.<br/>
 A dependency can also be easily broken as follows:
 
 ```cpp
@@ -667,8 +663,8 @@ It is often convenient to assign context variables to a registry, so as to make
 it the only _source of truth_ of an application.<br/>
 This is possible by means of a member function named `set` to use to create a
 context variable from a given type. Either `ctx` or `try_ctx` can be used to
-retrieve the newly created instance, while `unset` is meant to literally reset
-the variable if needed.
+retrieve the newly created instance, while `unset` is meant to clear the
+variable if needed.
 
 Example of use:
 
