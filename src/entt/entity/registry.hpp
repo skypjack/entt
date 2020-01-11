@@ -1458,44 +1458,32 @@ public:
     /**
      * @brief Stamps an entity onto another entity.
      *
-     * The components must be copyable for obvious reasons. The entities
-     * must be both valid.<br/>
-     * If no components are provided, the registry will try to copy all the
-     * existing types. The non-copyable ones will be ignored.
-     *
-     * This feature supports exclusion lists as an alternative to component
-     * lists. An excluded type will never be copied.
+     * This function supports exclusion lists. An excluded type will never be
+     * copied.
      *
      * @warning
      * Attempting to copy components that aren't copyable results in unexpected
      * behaviors.<br/>
-     * A static assertion will abort the compilation when the components
-     * provided aren't copy constructible. Otherwise, an assertion will abort
-     * the execution at runtime in debug mode in case one or more types cannot
-     * be copied.
+     * An assertion will abort the execution at runtime in debug mode in case
+     * one or more types cannot be copied.
      *
      * @warning
      * Attempting to use invalid entities results in undefined behavior.<br/>
      * An assertion will abort the execution at runtime in debug mode in case of
      * invalid entities.
      *
-     * @tparam Component Types of components to copy.
      * @tparam Exclude Types of components not to be copied.
      * @param dst A valid entity identifier to copy to.
      * @param other The registry that owns the source entity.
      * @param src A valid entity identifier to be copied.
      */
-    template<typename... Component, typename... Exclude>
+    template<typename... Exclude>
     void stamp(const entity_type dst, const basic_registry &other, const entity_type src, exclude_t<Exclude...> = {}) {
-        if constexpr(sizeof...(Component) == 0) {
-            for(size_type pos{}; pos < other.pools.size(); ++pos) {
-                if(const auto &pdata = other.pools[pos]; pdata.stamp && ((pdata.type_id != type_info<Exclude>::id()) && ...) && pdata.pool->has(src)) {
-                    pdata.stamp(*this, dst, *pdata.pool, src);
-                }
+        for(size_type pos{}; pos < other.pools.size(); ++pos) {
+            if(const auto &pdata = other.pools[pos]; ((pdata.type_id != type_info<Exclude>::id()) && ...) && pdata.pool->has(src)) {
+                ENTT_ASSERT(pdata.stamp);
+                pdata.stamp(*this, dst, *pdata.pool, src);
             }
-        } else {
-            static_assert(sizeof...(Exclude) == 0 && std::conjunction_v<std::is_copy_constructible<Component>...>);
-            (assign_or_replace<Component>(dst, other.template get<Component>(src)), ...);
         }
     }
 

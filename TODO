@@ -14,7 +14,6 @@
 * observer: user defined filters (eg .replace<T, &function> or .group<T, U, &func>)
 * use underlying_type as entity type within pools and registry? it would make different registries work together flawlessy
 * can we write a bool conv func for entt::entity that silently compares it to null?
-* stamp makes sense only when the list of components is empty
 * reset... reset everywhere...
 * document undocumented parts (entt::overload and a few others)
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
