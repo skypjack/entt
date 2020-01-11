@@ -746,7 +746,7 @@ public:
     template<typename... Component>
     void remove_if_exists(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
-        ([this, entity]() { if(auto &cpool = assure<Component>(); cpool.has(entity)) { cpool.remove(*this, entity); } }(), ...);
+        ([this, entity](auto &&cpool) { if(cpool.has(entity)) { cpool.remove(*this, entity); } }(assure<Component>()), ...);
     }
 
     /**
