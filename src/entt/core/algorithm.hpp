@@ -2,6 +2,7 @@
 #define ENTT_CORE_ALGORITHM_HPP
 
 
+#include <vector>
 #include <utility>
 #include <iterator>
 #include <algorithm>
