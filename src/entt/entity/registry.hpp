@@ -88,7 +88,7 @@ class basic_registry {
 
         template<typename It>
         void remove(basic_registry &owner, It first, It last) {
-            if(std::distance(first, last) == this->size()) {
+            if(std::distance(first, last) == std::distance(this->begin(), this->end())) {
                 if(!destruction.empty()) {
                     std::for_each(first, last, [this, &owner](const auto entt) { destruction.publish(entt, owner); });
                 }
@@ -485,20 +485,6 @@ public:
     }
 
     /**
-     * @brief Assigns each element in a range an entity.
-     *
-     * @sa create
-     *
-     * @tparam It Type of forward iterator.
-     * @param first An iterator to the first element of the range to generate.
-     * @param last An iterator past the last element of the range to generate.
-     */
-    template<typename It>
-    void create(It first, It last) {
-        std::generate(first, last, [this]() { return create(); });
-    }
-
-    /**
      * @brief Creates a new entity and returns it.
      *
      * @sa create
@@ -532,6 +518,20 @@ public:
         }
 
         return entt;
+    }
+
+    /**
+     * @brief Assigns each element in a range an entity.
+     *
+     * @sa create
+     *
+     * @tparam It Type of forward iterator.
+     * @param first An iterator to the first element of the range to generate.
+     * @param last An iterator past the last element of the range to generate.
+     */
+    template<typename It>
+    void create(It first, It last) {
+        std::generate(first, last, [this]() { return create(); });
     }
 
     /**
@@ -1250,7 +1250,7 @@ public:
         }
 
         if(!handler) {
-            group_data gdata = {
+            group_data candidate = {
                 size,
                 { new handler_type{}, [](void *instance) { delete static_cast<handler_type *>(instance); } },
                 [](const ENTT_ID_TYPE ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Owned>>::id()) || ...); },
@@ -1258,13 +1258,13 @@ public:
                 [](const ENTT_ID_TYPE ctype) ENTT_NOEXCEPT { return ((ctype == type_info<Exclude>::id()) || ...); },
             };
 
-            handler = static_cast<handler_type *>(gdata.group.get());
+            handler = static_cast<handler_type *>(candidate.group.get());
 
             const void *maybe_valid_if = nullptr;
             const void *discard_if = nullptr;
 
             if constexpr(sizeof...(Owned) == 0) {
-                groups.push_back(std::move(gdata));
+                groups.push_back(std::move(candidate));
             } else {
                 ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
                     const auto overlapping = (0u + ... + gdata.owned(type_info<std::decay_t<Owned>>::id()));
@@ -1282,7 +1282,7 @@ public:
 
                 maybe_valid_if = (next == groups.cend() ? maybe_valid_if : next->group.get());
                 discard_if = (prev == groups.crend() ? discard_if : prev->group.get());
-                groups.insert(next, std::move(gdata));
+                groups.insert(next, std::move(candidate));
             }
 
             ((std::get<pool_handler<std::decay_t<Owned>> &>(cpools).super = std::max(std::get<pool_handler<std::decay_t<Owned>> &>(cpools).super, size)), ...);
@@ -1442,11 +1442,11 @@ public:
         other.entities = entities;
 
         if constexpr(sizeof...(Component) == 0) {
-            for(size_type pos{}; pos < pools.size(); ++pos) {
-                if(const auto &pdata = pools[pos]; pdata.assure && ((pdata.type_id != type_info<Exclude>::id()) && ...)) {
+            std::for_each(pools.cbegin(), pools.cend(), [&other](auto &&pdata) {
+                if(pdata.assure && ((pdata.type_id != type_info<Exclude>::id()) && ...)) {
                     pdata.assure(other, *pdata.pool);
                 }
-            }
+            });
         } else {
             static_assert(sizeof...(Exclude) == 0 && std::conjunction_v<std::is_copy_constructible<Component>...>);
             (other.assure<Component>(assure<Component>()), ...);
@@ -1479,12 +1479,12 @@ public:
      */
     template<typename... Exclude>
     void stamp(const entity_type dst, const basic_registry &other, const entity_type src, exclude_t<Exclude...> = {}) {
-        for(size_type pos{}; pos < other.pools.size(); ++pos) {
-            if(const auto &pdata = other.pools[pos]; ((pdata.type_id != type_info<Exclude>::id()) && ...) && pdata.pool->has(src)) {
+        std::for_each(other.pools.cbegin(), other.pools.cend(), [this, dst, src](auto &&pdata) {
+            if(((pdata.type_id != type_info<Exclude>::id()) && ...) && pdata.pool->has(src)) {
                 ENTT_ASSERT(pdata.stamp);
                 pdata.stamp(*this, dst, *pdata.pool, src);
             }
-        }
+        });
     }
 
     /**

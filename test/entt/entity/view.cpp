@@ -193,9 +193,9 @@ TEST(SingleComponentView, Find) {
 TEST(SingleComponentView, Less) {
     entt::registry registry;
     auto create = [&](auto... component) {
-        const auto entity = registry.create();
-        (registry.assign<decltype(component)>(entity, component), ...);
-        return entity;
+        const auto entt = registry.create();
+        (registry.assign<decltype(component)>(entt, component), ...);
+        return entt;
     };
 
     const auto entity = create(0, entt::tag<"empty"_hs>{});

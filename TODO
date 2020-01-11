@@ -16,5 +16,7 @@
 * can we write a bool conv func for entt::entity that silently compares it to null?
 * reset... reset everywhere...
 * document undocumented parts (entt::overload and a few others)
+* range-assign cannot return iterators (eg group or sort-like listeners, see #386)
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none
+* registry::clear should clear entities etc
