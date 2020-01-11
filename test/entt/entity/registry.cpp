@@ -267,21 +267,27 @@ TEST(Registry, Identifiers) {
 
 TEST(Registry, RawData) {
     entt::registry registry;
+
+    ASSERT_EQ(std::as_const(registry).data(), nullptr);
+
     const auto entity = registry.create();
 
     ASSERT_EQ(registry.raw<int>(), nullptr);
     ASSERT_EQ(std::as_const(registry).raw<int>(), nullptr);
     ASSERT_EQ(std::as_const(registry).data<int>(), nullptr);
+    ASSERT_EQ(*std::as_const(registry).data(), entity);
 
     registry.assign<int>(entity, 42);
-
-    ASSERT_NE(registry.raw<int>(), nullptr);
-    ASSERT_NE(std::as_const(registry).raw<int>(), nullptr);
-    ASSERT_NE(std::as_const(registry).data<int>(), nullptr);
 
     ASSERT_EQ(*registry.raw<int>(), 42);
     ASSERT_EQ(*std::as_const(registry).raw<int>(), 42);
     ASSERT_EQ(*std::as_const(registry).data<int>(), entity);
+
+    const auto other = registry.create();
+    registry.destroy(entity);
+
+    ASSERT_NE(*std::as_const(registry).data(), entity);
+    ASSERT_EQ(*(std::as_const(registry).data() + 1u), other);
 }
 
 TEST(Registry, CreateManyEntitiesAtOnce) {

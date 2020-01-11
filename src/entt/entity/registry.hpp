@@ -411,6 +411,22 @@ public:
     }
 
     /**
+     * @brief Direct access to the list of entities of a registry.
+     *
+     * The returned pointer is such that range `[data(), data() + size()]` is
+     * always a valid range, even if the container is empty.
+     *
+     * @warning
+     * This list contains both valid and destroyed entities and isn't suitable
+     * for direct use.
+     *
+     * @return A pointer to the array of entities.
+     */
+    const entity_type * data() const ENTT_NOEXCEPT {
+        return entities.data();
+    }
+
+    /**
      * @brief Checks if an entity identifier refers to a valid entity.
      * @param entity An entity identifier, either valid or not.
      * @return True if the identifier is valid, false otherwise.
