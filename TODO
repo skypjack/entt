@@ -6,7 +6,6 @@
 * add opaque input iterators to views and groups that return tuples <entity, T &...> (proxy), multi-pass guaranteed
 * allow to replace std:: with custom implementations
 * custom (decoupled) pools ==> N-buffering, shared components, multi-model, hibitsets, and so on
-* snapshot rework/deprecation
 * add examples (and credits) from @alanjfs :)
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...>
 * add meta support to registry (eg entity for each component and opaque get)
@@ -16,7 +15,9 @@
 * can we write a bool conv func for entt::entity that silently compares it to null?
 * reset... reset everywhere...
 * document undocumented parts (entt::overload and a few others)
-* range-assign cannot return iterators (eg group or sort-like listeners, see #386)
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none
-* registry::clear should clear entities etc
+
+* WIP: snapshot rework/deprecation
+ - range-assign cannot return iterators (eg group or sort-like listeners, see #386)
+ - remove snapshot/loader from registry, make them external (faster) tools

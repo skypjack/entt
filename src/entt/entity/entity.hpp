@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <type_traits>
 #include "../config/config.h"
+#include "../core/type_traits.hpp"
 
 
 namespace entt {

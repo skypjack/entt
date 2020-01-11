@@ -651,6 +651,32 @@ public:
     }
 
     /**
+     * @brief Assigns entities to an empty registry.
+     *
+     * @warning
+     * An assertion will abort the execution at runtime in debug mode if all
+     * pools aren't empty. Groups and context variables are ignored.
+     *
+     * @tparam It Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     */
+    template<typename It>
+    void assign(It first, It last) {
+        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [](auto &&cpool) { return cpool.pool->empty(); }));
+        entities.assign(first, last);
+        destroyed = null;
+
+        for(std::size_t pos{}, end = entities.size(); pos < end; ++pos) {
+            if((to_integral(entities[pos]) & traits_type::entity_mask) != pos) {
+                const auto version = to_integral(entities[pos]) & (traits_type::version_mask << traits_type::entity_shift);
+                entities[pos] = entity_type{to_integral(destroyed) | version};
+                destroyed = entity_type(pos);
+            }
+        }
+    }
+
+    /**
      * @brief Assigns or replaces the given component for an entity.
      *
      * Equivalent to the following snippet (pseudocode):

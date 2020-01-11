@@ -1593,3 +1593,21 @@ TEST(Registry, StableAssign) {
 
     ASSERT_EQ(registry.assign<int>(registry.create(), 1), 1);
 }
+
+TEST(Registry, AssignEntities) {
+    entt::registry registry;
+    entt::entity entities[3];
+    registry.create(std::begin(entities), std::end(entities));
+    registry.destroy(entities[1]);
+    registry.destroy(entities[2]);
+
+    entt::registry other;
+    other.assign(registry.data(), registry.data() + registry.size());
+
+    ASSERT_EQ(registry.size(), other.size());
+    ASSERT_TRUE(other.valid(entities[0]));
+    ASSERT_FALSE(other.valid(entities[1]));
+    ASSERT_FALSE(other.valid(entities[2]));
+    ASSERT_EQ(registry.create(), other.create());
+    ASSERT_EQ(other.entity(other.create()), entities[1]);
+}
