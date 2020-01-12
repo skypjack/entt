@@ -357,9 +357,9 @@ public:
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, reverse_iterator_type>
     construct(It first, It last, [[maybe_unused]] Args &&... args) {
         if constexpr(sizeof...(Args) == 0) {
-            instances.resize(instances.size() + std::distance(first, last));
+            instances.insert(instances.end(), std::distance(first, last), object_type{});
         } else {
-            instances.resize(instances.size() + std::distance(first, last), Type{std::forward<Args>(args)...});
+            instances.insert(instances.end(), std::distance(first, last), object_type{std::forward<Args>(args)...});
         }
 
         // entity goes after component in case constructor throws
