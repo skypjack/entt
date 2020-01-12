@@ -19,5 +19,6 @@
   - get -> all, exclude -> none
 
 * WIP: snapshot rework/deprecation
- - range-assign cannot return iterators (eg group or sort-like listeners, see #386)
+ - range-assign cannot return iterators (eg group or sort-like listeners, see #386 - probably we cannot pass the component to the callback...)
+ - range-assign should accept also an iterator from which to "copy" instances
  - remove snapshot/loader from registry, make them external (faster) tools

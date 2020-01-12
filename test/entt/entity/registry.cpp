@@ -19,7 +19,7 @@ struct listener {
     }
 
     template<typename Component>
-    void incr(entt::entity entity, entt::registry &registry, const Component &) {
+    void incr(entt::entity entity, entt::registry &registry) {
         ASSERT_TRUE(registry.valid(entity));
         ASSERT_TRUE(registry.has<Component>(entity));
         last = entity;
