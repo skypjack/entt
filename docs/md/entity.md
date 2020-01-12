@@ -205,8 +205,8 @@ vel.dx = 0.;
 vel.dy = 0.;
 ```
 
-This function is overloaded and can receive also a couple of iterators to be
-used to assign the same component to multiple entities at once.
+This function is overloaded and accepts also a couple of iterators to be used to
+assign the same component to multiple entities at once.
 
 If an entity already has the given component, the `replace` member function
 template can be used to replace it:
@@ -238,9 +238,9 @@ This is a slightly faster alternative for the following snippet:
 
 ```cpp
 if(registry.has<comp>(entity)) {
-    registry.replace<comp>(entity, arg1, argN);
+    registry.replace<velocity>(entity, 0., 0.);
 } else {
-    registry.assign<comp>(entity, arg1, argN);
+    registry.assign<velocity>(entity, 0., 0.);
 }
 ```
 
@@ -367,6 +367,9 @@ There are also some limitations on what a listener can and cannot do:
 
 * Connecting and disconnecting other functions from within the body of a
   listener should be avoided. It can lead to undefined behavior in some cases.
+
+* Removing the component from within the body of a listener that observes the
+  construction or replacement of instances of a given type isn't allowed.
 
 * Assigning and removing components from within the body of a listener that
   observes the destruction of instances of a given type should be avoided. It
