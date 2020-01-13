@@ -45,9 +45,9 @@ void pathological(Func func) {
 
     for(auto i = 0; i < 10; ++i) {
         registry.each([i = 0, &registry](const auto entity) mutable {
-            if(!(++i % 7)) { registry.reset<position>(entity); }
-            if(!(++i % 11)) { registry.reset<velocity>(entity); }
-            if(!(++i % 13)) { registry.reset<comp<0>>(entity); }
+            if(!(++i % 7)) { registry.remove_if_exists<position>(entity); }
+            if(!(++i % 11)) { registry.remove_if_exists<velocity>(entity); }
+            if(!(++i % 13)) { registry.remove_if_exists<comp<0>>(entity); }
             if(!(++i % 17)) { registry.destroy(entity); }
         });
 
