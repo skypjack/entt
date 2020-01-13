@@ -133,6 +133,33 @@ template<ENTT_ID_TYPE Value>
 using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
 
 
+namespace internal {
+
+template <typename Arg, typename... Args>
+auto component_type(void (*)(Arg, Args...)) -> std::decay_t<Arg>;
+
+template <typename Class, typename... Args>
+auto component_type(void (Class::*)(Args...)) -> Class;
+
+template <typename Class, typename... Args>
+auto component_type(void (Class::*)(Args...) const) -> Class;
+
+}
+
+template <auto Func, typename Entity = entt::entity>
+void invoke_on_component(const Entity entity, entt::basic_registry<Entity> &reg) {
+    using Component = decltype(internal::component_type(Func));
+    // decltype(auto) instead of Component & to handle the empty component optimization
+    decltype(auto) comp = reg.template get<Component>(entity);
+    if constexpr (std::is_invocable_v<decltype(Func), decltype(comp), Entity, decltype(reg)>) {
+        std::invoke(Func, comp, entity, reg);
+    } else if constexpr (std::is_invocable_v<decltype(Func), decltype(comp), Entity>) {
+        std::invoke(Func, comp, entity);
+    } else {
+        std::invoke(Func, comp);
+    }
+}
+
 }
 
 

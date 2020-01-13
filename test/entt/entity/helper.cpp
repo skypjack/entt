@@ -47,3 +47,54 @@ TEST(Helper, Tag) {
 
     ASSERT_EQ(counter, 0);
 }
+
+struct my_component {
+    mutable int *foo;
+
+    static void create_s(my_component &c)                   { *(c.foo) |=  0b00000001; }
+    void create()                                           { *(  foo) |=  0b00000010; }
+    void create_e(entt::entity)                             { *(  foo) |=  0b00000100; }
+    void create_er(entt::entity, entt::registry &)          { *(  foo) |=  0b00001000; }
+    static void create_s_c(const my_component &c)           { *(c.foo) |=  0b00010000; }
+    void create_c() const                                   { *(  foo) |=  0b00100000; }
+    void create_e_c(entt::entity) const                     { *(  foo) |=  0b01000000; }
+    void create_er_c(entt::entity, entt::registry &) const  { *(  foo) |=  0b10000000; }
+
+    static void destroy_s(my_component &c)                  { *(c.foo) &= ~0b00000001; }
+    void destroy()                                          { *(  foo) &= ~0b00000010; }
+    void destroy_e(entt::entity)                            { *(  foo) &= ~0b00000100; }
+    void destroy_er(entt::entity, entt::registry &)         { *(  foo) &= ~0b00001000; }
+    static void destroy_s_c(const my_component &c)          { *(c.foo) &= ~0b00010000; }
+    void destroy_c() const                                  { *(  foo) &= ~0b00100000; }
+    void destroy_e_c(entt::entity) const                    { *(  foo) &= ~0b01000000; }
+    void destroy_er_c(entt::entity, entt::registry &) const { *(  foo) &= ~0b10000000; }
+};
+
+TEST(Helper, InvokeOnComponent) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.on_construct<my_component>().connect<entt::invoke_on_component<&my_component::create_s>>();
+    registry.on_construct<my_component>().connect<entt::invoke_on_component<&my_component::create>>();
+    registry.on_construct<my_component>().connect<entt::invoke_on_component<&my_component::create_e>>();
+    registry.on_construct<my_component>().connect<entt::invoke_on_component<&my_component::create_er>>();
+    registry.on_construct<my_component>().connect<entt::invoke_on_component<&my_component::create_s_c>>();
+    registry.on_construct<my_component>().connect<entt::invoke_on_component<&my_component::create_c>>();
+    registry.on_construct<my_component>().connect<entt::invoke_on_component<&my_component::create_e_c>>();
+    registry.on_construct<my_component>().connect<entt::invoke_on_component<&my_component::create_er_c>>();
+
+    registry.on_destroy<my_component>().connect<entt::invoke_on_component<&my_component::destroy_s>>();
+    registry.on_destroy<my_component>().connect<entt::invoke_on_component<&my_component::destroy>>();
+    registry.on_destroy<my_component>().connect<entt::invoke_on_component<&my_component::destroy_e>>();
+    registry.on_destroy<my_component>().connect<entt::invoke_on_component<&my_component::destroy_er>>();
+    registry.on_destroy<my_component>().connect<entt::invoke_on_component<&my_component::destroy_s_c>>();
+    registry.on_destroy<my_component>().connect<entt::invoke_on_component<&my_component::destroy_c>>();
+    registry.on_destroy<my_component>().connect<entt::invoke_on_component<&my_component::destroy_e_c>>();
+    registry.on_destroy<my_component>().connect<entt::invoke_on_component<&my_component::destroy_er_c>>();
+
+    int result = 0;
+    registry.assign<my_component>(entity, &result);
+    ASSERT_EQ(result, 0b11111111);
+    registry.remove<my_component>(entity);
+    ASSERT_EQ(result, 0);
+}
