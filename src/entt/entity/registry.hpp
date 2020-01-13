@@ -68,7 +68,8 @@ class basic_registry {
 
         template<typename... Args>
         decltype(auto) assign(basic_registry &owner, const Entity entt, Args &&... args) {
-            construction.publish(entt, owner, this->construct(entt, std::forward<Args>(args)...));
+            this->construct(entt, std::forward<Args>(args)...);
+            construction.publish(entt, owner);
             return this->get(entt);
         }
 
@@ -76,8 +77,7 @@ class basic_registry {
         std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, Entity>, typename storage<Entity, Component>::reverse_iterator_type>
         assign(basic_registry &owner, It first, It last, Args &&... args) {
             auto it = this->construct(first, last, std::forward<Args>(args)...);
-            const auto end = it + (!construction.empty() * std::distance(first, last));
-            std::for_each(it, end, [this, &owner, &first](decltype(*it) component) { construction.publish(*(first++), owner, component); });
+            std::for_each(first, last, [this, &owner](const auto entt) { construction.publish(entt, owner); });
             return it;
         }
 
@@ -108,9 +108,9 @@ class basic_registry {
         }
 
     private:
-        sigh<void(const Entity, basic_registry &, decltype(std::declval<storage<Entity, Component>>().get({})))> construction{};
+        sigh<void(const Entity, basic_registry &)> construction{};
         sigh<void(const Entity, basic_registry &)> destruction{};
-        decltype(construction) update{};
+        sigh<void(const Entity, basic_registry &, decltype(std::declval<storage<Entity, Component>>().get({})))> update{};
     };
 
     struct pool_data {
@@ -1007,11 +1007,11 @@ public:
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(Entity, registry<Entity> &, Component &);
+     * void(Entity, registry<Entity> &);
      * @endcode
      *
      * Listeners are invoked **after** the component has been assigned to the
-     * entity. The order of invocation of the listeners isn't guaranteed.
+     * entity.
      *
      * @note
      * Empty types aren't explicitly instantiated. Therefore, temporary objects
@@ -1041,8 +1041,7 @@ public:
      * void(Entity, registry<Entity> &, Component &);
      * @endcode
      *
-     * Listeners are invoked **before** the component has been replaced. The
-     * order of invocation of the listeners isn't guaranteed.
+     * Listeners are invoked **before** the component has been replaced.
      *
      * @note
      * Empty types aren't explicitly instantiated. Therefore, temporary objects
@@ -1074,7 +1073,7 @@ public:
      * @endcode
      *
      * Listeners are invoked **before** the component has been removed from the
-     * entity. The order of invocation of the listeners isn't guaranteed.
+     * entity.
      *
      * @note
      * Empty types aren't explicitly instantiated. Therefore, temporary objects

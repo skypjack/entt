@@ -329,27 +329,25 @@ To be notified when components are destroyed, use the `on_destroy` member
 function instead. Finally, the `on_replace` member function will return a sink
 to which to connect listeners to observe changes.
 
-The function type of a listener for the construction signal should be equivalent
-to the following:
-
-```cpp
-void(entt::entity, entt::registry &, Component &);
-```
-
-Where `Component` is intuitively the type of component of interest. The listener
-is provided with the registry that triggered the notification, the entity
-affected by the change and the newly created instance.<br/>
-The sink returned by the `on_replace` member function accepts listeners the
-signature of which is the same of that of the construction signal. The one of
-the destruction signal is also similar, except for the `Component` parameter:
+The function type of a listener for the construction and destruction signals
+should be equivalent to the following:
 
 ```cpp
 void(entt::entity, entt::registry &);
 ```
 
-This is mainly due to performance reasons. While the component is made available
-after the construction, it is not when destroyed. Because of that, there are no
-reasons to get it from the underlying storage unless the user requires so.
+In both cases, listeners are provided with the registry that triggered the
+notification and the entity affected by the change.<br/>
+The function type of a listener that observes changes to components is slightly
+different instead:
+
+```cpp
+void(entt::entity, entt::registry &, Component &);
+```
+
+In this case, `Component` is intuitively the type of component of interest. The
+extra argument is required because the registry cannot store and therefore
+return both the instances of the given type for an entity.
 
 Note also that:
 

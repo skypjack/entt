@@ -317,10 +317,9 @@ public:
      * @tparam Args Types of arguments to use to construct the object.
      * @param entt A valid entity identifier.
      * @param args Parameters to use to construct an object for the entity.
-     * @return The object associated with the entity.
      */
     template<typename... Args>
-    object_type & construct(const entity_type entt, Args &&... args) {
+    void construct(const entity_type entt, Args &&... args) {
         if constexpr(std::is_aggregate_v<object_type>) {
             instances.emplace_back(Type{std::forward<Args>(args)...});
         } else {
@@ -329,7 +328,6 @@ public:
 
         // entity goes after component in case constructor throws
         underlying_type::construct(entt);
-        return instances.back();
     }
 
     /**
@@ -674,14 +672,12 @@ public:
      * @tparam Args Types of arguments to use to construct the object.
      * @param entt A valid entity identifier.
      * @param args Parameters to use to construct an object for the entity.
-     * @return The object associated with the entity.
      */
     template<typename... Args>
-    object_type construct(const entity_type entt, Args &&... args) {
-        object_type instance{std::forward<Args>(args)...};
+    void construct(const entity_type entt, Args &&... args) {
+        [[maybe_unused]] object_type instance{std::forward<Args>(args)...};
         // entity goes after component in case constructor throws
         underlying_type::construct(entt);
-        return instance;
     }
 
     /**

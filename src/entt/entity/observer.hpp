@@ -179,8 +179,11 @@ class basic_observer {
         template<std::size_t Index>
         static void maybe_valid_if(basic_observer &obs, const Entity entt, const basic_registry<Entity> &reg) {
             if(reg.template has<Require...>(entt) && !(reg.template has<Reject>(entt) || ...)) {
-                auto *comp = obs.view.try_get(entt);
-                (comp ? *comp : obs.view.construct(entt)) |= (1 << Index);
+                if(auto *comp = obs.view.try_get(entt); !comp) {
+                    obs.view.construct(entt);
+                }
+
+                obs.view.get(entt) |= (1 << Index);
             }
         }
 
@@ -212,8 +215,11 @@ class basic_observer {
         template<std::size_t Index>
         static void maybe_valid_if(basic_observer &obs, const Entity entt, const basic_registry<Entity> &reg) {
             if(reg.template has<AllOf..., Require...>(entt) && !(reg.template has<NoneOf>(entt) || ...) && !(reg.template has<Reject>(entt) || ...)) {
-                auto *comp = obs.view.try_get(entt);
-                (comp ? *comp : obs.view.construct(entt)) |= (1 << Index);
+                if(auto *comp = obs.view.try_get(entt); !comp) {
+                    obs.view.construct(entt);
+                }
+
+                obs.view.get(entt) |= (1 << Index);
             }
         }
 
