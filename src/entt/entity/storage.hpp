@@ -340,7 +340,7 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * storage already contains the given entity.
      *
-     * @tparam It Type of forward iterator.
+     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
@@ -348,7 +348,33 @@ public:
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
     construct(It first, It last) {
         instances.resize(instances.size() + std::distance(first, last), object_type{});
-        // entity goes after component in case constructor throws
+        // entities go after components in case constructors throw
+        underlying_type::construct(first, last);
+    }
+
+    /**
+     * @brief Assigns one or more entities to a storage and assigns them the
+     * given objects.
+     *
+     * The object type must be at least copy assignable and copy insertable.
+     *
+     * @warning
+     * Attempting to assign an entity that already belongs to the storage
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * storage already contains the given entity.
+     *
+     * @tparam It Type of input iterator.
+     * @tparam Other Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     * @param other An iterator to the first element of the range of objects.
+     */
+    template<typename It, typename Other>
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
+    construct(It first, It last, Other other) {
+        instances.insert(instances.cend(), other, other + std::distance(first, last));
+        // entities go after components in case constructors throw
         underlying_type::construct(first, last);
     }
 
@@ -669,7 +695,7 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * storage already contains the given entity.
      *
-     * @tparam It Type of forward iterator.
+     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */

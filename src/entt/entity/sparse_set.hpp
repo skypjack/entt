@@ -411,7 +411,7 @@ public:
      * An assertion will abort the execution at runtime in debug mode if the
      * sparse set already contains the given entity.
      *
-     * @tparam It Type of forward iterator.
+     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
