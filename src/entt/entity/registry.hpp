@@ -73,10 +73,10 @@ class basic_registry {
             return this->get(entt);
         }
 
-        template<typename It, typename... Args>
+        template<typename It>
         std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, Entity>, typename storage<Entity, Component>::reverse_iterator_type>
-        assign(basic_registry &owner, It first, It last, Args &&... args) {
-            auto it = this->construct(first, last, std::forward<Args>(args)...);
+        assign(basic_registry &owner, It first, It last) {
+            auto it = this->construct(first, last);
             std::for_each(first, last, [this, &owner](const auto entt) { construction.publish(entt, owner); });
             return it;
         }
@@ -633,21 +633,21 @@ public:
     /**
      * @brief Assigns each entity in a range the given component.
      *
+     * The component type must be at least move and default insertable.
+     *
      * @sa assign
      *
      * @tparam Component Type of component to create.
      * @tparam It Type of input iterator.
-     * @tparam Args Types of arguments to use to construct the components.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param args Parameters to use to initialize the components.
      * @return An iterator to the list of components just created.
      */
-    template<typename Component, typename It, typename... Args>
+    template<typename Component, typename It>
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, typename pool_handler<Component>::reverse_iterator_type>
-    assign(It first, It last, Args &&... args) {
+    assign(It first, It last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        return assure<Component>().assign(*this, first, last, std::forward<Args>(args)...);
+        return assure<Component>().assign(*this, first, last);
     }
 
     /**
