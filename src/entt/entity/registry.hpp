@@ -1351,8 +1351,7 @@ public:
 
                 // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
                 std::for_each(std::make_reverse_iterator(cpool.end()), std::make_reverse_iterator(cpool.begin()), [cpools, handler, curr = view<Owned..., Get...>(entt::exclude<Exclude...>)](const auto entity) {
-                    if(curr.contains(entity) && !(std::get<0>(cpools).index(entity) < handler->current)) {
-                        const auto pos = handler->current++;
+                    if(const auto pos = handler->current; curr.contains(entity) && !(std::get<0>(cpools).index(entity) < ++handler->current)) {
                         (std::get<pool_handler<std::decay_t<Owned>> &>(cpools).swap(std::get<pool_handler<std::decay_t<Owned>> &>(cpools).data()[pos], entity), ...);
                     }
                 });
