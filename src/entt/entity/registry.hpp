@@ -74,11 +74,13 @@ class basic_registry {
         }
 
         template<typename It>
-        std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, Entity>, typename storage<Entity, Component>::reverse_iterator_type>
+        std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, Entity>, void>
         assign(basic_registry &owner, It first, It last) {
-            auto it = this->construct(first, last);
-            std::for_each(first, last, [this, &owner](const auto entt) { construction.publish(entt, owner); });
-            return it;
+            this->construct(first, last);
+
+            if(!construction.empty()) {
+                std::for_each(first, last, [this, &owner](const auto entt) { construction.publish(entt, owner); });
+            }
         }
 
         void remove(basic_registry &owner, const Entity entt) {
@@ -641,13 +643,12 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @return An iterator to the list of components just created.
      */
     template<typename Component, typename It>
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, typename pool_handler<Component>::reverse_iterator_type>
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
     assign(It first, It last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        return assure<Component>().assign(*this, first, last);
+        assure<Component>().assign(*this, first, last);
     }
 
     /**

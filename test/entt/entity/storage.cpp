@@ -100,7 +100,7 @@ TEST(Storage, BatchAdd) {
 
     entities[0] = entt::entity{3};
     entities[1] = entt::entity{42};
-    auto it = pool.construct(std::begin(entities), std::end(entities));
+    pool.construct(std::begin(entities), std::end(entities));
 
     ASSERT_TRUE(pool.has(entities[0]));
     ASSERT_TRUE(pool.has(entities[1]));
@@ -109,12 +109,6 @@ TEST(Storage, BatchAdd) {
     ASSERT_EQ(pool.size(), 2u);
     ASSERT_EQ(pool.get(entities[0]), 0);
     ASSERT_EQ(pool.get(entities[1]), 0);
-
-    it[0] = 1;
-    it[1] = 2;
-
-    ASSERT_EQ(pool.get(entities[0]), 1);
-    ASSERT_EQ(pool.get(entities[1]), 2);
 }
 
 TEST(Storage, BatchAddEmptyType) {

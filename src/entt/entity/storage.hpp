@@ -164,8 +164,6 @@ public:
     using iterator_type = iterator<false>;
     /*! @brief Constant random access iterator type. */
     using const_iterator_type = iterator<true>;
-    /*! @brief Reverse iterator type. */
-    using reverse_iterator_type = std::reverse_iterator<iterator<false>>;
 
     /**
      * @brief Increases the capacity of a storage.
@@ -345,16 +343,13 @@ public:
      * @tparam It Type of forward iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @return An iterator to the list of instances just created and sorted the
-     * same of the entities.
      */
     template<typename It>
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, reverse_iterator_type>
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
     construct(It first, It last) {
-        instances.insert(instances.end(), std::distance(first, last), object_type{});
+        instances.resize(instances.size() + std::distance(first, last), object_type{});
         // entity goes after component in case constructor throws
         underlying_type::construct(first, last);
-        return std::make_reverse_iterator(begin() + std::distance(first, last));
     }
 
     /**
@@ -581,8 +576,6 @@ public:
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
     using iterator_type = iterator;
-    /*! @brief Reverse iterator type. */
-    using reverse_iterator_type = std::reverse_iterator<iterator>;
 
     /**
      * @brief Returns an iterator to the beginning.
@@ -679,14 +672,11 @@ public:
      * @tparam It Type of forward iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @return An iterator to the list of instances just created and sorted the
-     * same of the entities.
      */
     template<typename It>
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, reverse_iterator_type>
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
     construct(It first, It last) {
         underlying_type::construct(first, last);
-        return std::make_reverse_iterator(begin() + std::distance(first, last));
     }
 
     /*! @copydoc storage::sort */

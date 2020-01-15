@@ -1191,17 +1191,11 @@ TEST(Registry, RangeAssign) {
     ASSERT_FALSE(registry.has<float>(e2));
 
     const auto view = registry.view<int, char>();
-    auto it = registry.assign<float>(view.begin(), view.end());
+    registry.assign<float>(view.begin(), view.end());
 
     ASSERT_TRUE(registry.has<float>(e0));
     ASSERT_TRUE(registry.has<float>(e1));
     ASSERT_FALSE(registry.has<float>(e2));
-
-    *it = 0.f;
-    *(it+1) = 1.f;
-
-    ASSERT_EQ(registry.get<float>(*view.begin()), 0.f);
-    ASSERT_EQ(registry.get<float>(*(++view.begin())), 1.f);
 }
 
 TEST(Registry, RangeRemove) {
