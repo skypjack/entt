@@ -111,24 +111,6 @@ TEST(Storage, BatchAdd) {
     ASSERT_EQ(pool.get(entities[1]), 0);
 }
 
-TEST(Storage, BatchAddByCopy) {
-    entt::storage<entt::entity, int> pool;
-    entt::entity entities[2];
-    int values[2]{3, 7};
-
-    entities[0] = entt::entity{3};
-    entities[1] = entt::entity{42};
-    pool.construct(std::begin(entities), std::end(entities), std::begin(values));
-
-    ASSERT_TRUE(pool.has(entities[0]));
-    ASSERT_TRUE(pool.has(entities[1]));
-
-    ASSERT_FALSE(pool.empty());
-    ASSERT_EQ(pool.size(), 2u);
-    ASSERT_EQ(pool.get(entities[0]), 3);
-    ASSERT_EQ(pool.get(entities[1]), 7);
-}
-
 TEST(Storage, BatchAddEmptyType) {
     entt::storage<entt::entity, empty_type> pool;
     entt::entity entities[2];
