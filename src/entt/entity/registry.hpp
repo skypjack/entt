@@ -73,10 +73,11 @@ class basic_registry {
             return this->get(entt);
         }
 
-        template<typename It>
+        template<typename It, typename... Func>
         std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, Entity>, void>
-        assign(basic_registry &owner, It first, It last) {
+        assign(basic_registry &owner, It first, It last, Func... func) {
             this->construct(first, last);
+            (func(this->raw() + this->size() - std::distance(first, last)), ...);
 
             if(!construction.empty()) {
                 std::for_each(first, last, [this, &owner](const auto entt) { construction.publish(entt, owner); });
@@ -635,20 +636,32 @@ public:
     /**
      * @brief Assigns each entity in a range the given component.
      *
-     * The component type must be at least move and default insertable.
+     * Function objects are optional. They are invoked to give the caller a
+     * chance to initialize the components before they are passed to any
+     * registered listener.<br/>
+     * The signature of the functions should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * void(It it);
+     * @endcode
+     *
+     * Where `it` is an iterator to the first element of the range of newly
+     * created objects.
      *
      * @sa assign
      *
      * @tparam Component Type of component to create.
      * @tparam It Type of input iterator.
+     * @tparam Func Types of the function objects to invoke.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @param func Valid function objects.
      */
-    template<typename Component, typename It>
+    template<typename Component, typename It, typename... Func>
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    assign(It first, It last) {
+    assign(It first, It last, Func... func) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        assure<Component>().assign(*this, first, last);
+        assure<Component>().assign(*this, first, last, std::move(func)...);
     }
 
     /**

@@ -1193,9 +1193,16 @@ TEST(Registry, RangeAssign) {
     const auto view = registry.view<int, char>();
     registry.assign<float>(view.begin(), view.end());
 
-    ASSERT_TRUE(registry.has<float>(e0));
-    ASSERT_TRUE(registry.has<float>(e1));
+    ASSERT_EQ(registry.get<float>(e0), 0.f);
+    ASSERT_EQ(registry.get<float>(e1), 0.f);
     ASSERT_FALSE(registry.has<float>(e2));
+
+    registry.clear<float>();
+    registry.assign<float>(registry.data<int>(), registry.data<int>() + registry.size<int>(), [](float *raw) { *(++raw) = 1.f; });
+
+    ASSERT_EQ(registry.get<float>(e0), 0.f);
+    ASSERT_EQ(registry.get<float>(e1), 1.f);
+    ASSERT_EQ(registry.get<float>(e2), 0.f);
 }
 
 TEST(Registry, RangeRemove) {

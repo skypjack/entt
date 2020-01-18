@@ -14,6 +14,7 @@
 * use underlying_type as entity type within pools and registry? it would make different registries work together flawlessy
 * can we write a bool conv func for entt::entity that silently compares it to null?
 * reset... reset everywhere...
+* is it possible to make 0 the entity null?
 * document undocumented parts (entt::overload and a few others)
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none
