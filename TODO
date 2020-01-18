@@ -20,6 +20,5 @@
   - get -> all, exclude -> none
 
 * WIP: snapshot rework/deprecation
- - range-assign cannot return iterators (see #386)
- - range-assign should accept also an iterator from which to "copy" instances
  - remove snapshot/loader from registry, make them external (faster) tools
+ - deprecate snapshot classes, update documentation to describe alternatives

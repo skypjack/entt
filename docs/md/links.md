@@ -70,6 +70,8 @@ I hope this list can grow much more in the future:
     [demo code](https://github.com/Green-Sky/imgui_entt_entity_editor_demo)).
   * [SgOgl](https://github.com/stwe/SgOgl): a game engine library for OpenGL
     developed for educational purposes.
+  * [Lumos](https://github.com/jmorton06/Lumos): game engine written in C++
+    using OpenGL and Vulkan.
 
 * Articles and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
