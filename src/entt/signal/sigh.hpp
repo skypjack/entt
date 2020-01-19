@@ -266,14 +266,9 @@ class sink<Ret(Args...)> {
     using signal_type = sigh<Ret(Args...)>;
     using difference_type = typename std::iterator_traits<typename decltype(signal_type::calls)::iterator>::difference_type;
 
-    template<auto Candidate, typename Type>
-    static void release(Type value_or_instance, void *signal) {
-        sink{*static_cast<signal_type *>(signal)}.disconnect<Candidate>(value_or_instance);
-    }
-
-    template<auto Function>
-    static void release(void *signal) {
-        sink{*static_cast<signal_type *>(signal)}.disconnect<Function>();
+    template<auto Candidate, typename... Type>
+    static void release(Type... value_or_instance, void *signal) {
+        sink{*static_cast<signal_type *>(signal)}.disconnect<Candidate>(value_or_instance...);
     }
 
 public:
@@ -295,7 +290,8 @@ public:
     }
 
     /**
-     * @brief Returns a sink that connects before a given function.
+     * @brief Returns a sink that connects before a given free function or an
+     * unbound member.
      * @tparam Function A valid free function pointer.
      * @return A properly initialized sink object.
      */
@@ -313,38 +309,17 @@ public:
     }
 
     /**
-     * @brief Returns a sink that connects before a given member function or
-     * free function with payload.
+     * @brief Returns a sink that connects before a free function with payload
+     * or a bound member.
      * @tparam Candidate Member or free function to look for.
      * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid reference that fits the purpose.
      * @return A properly initialized sink object.
      */
     template<auto Candidate, typename Type>
-    sink before(Type &value_or_instance) {
+    sink before(Type &&value_or_instance) {
         delegate<Ret(Args...)> call{};
-        call.template connect<Candidate>(value_or_instance);
-
-        const auto &calls = signal->calls;
-        const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
-
-        sink other{*this};
-        other.offset = std::distance(it, calls.cend());
-        return other;
-    }
-
-    /**
-     * @brief Returns a sink that connects before a given member function or
-     * free function with payload.
-     * @tparam Candidate Member or free function to look for.
-     * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid pointer that fits the purpose.
-     * @return A properly initialized sink object.
-     */
-    template<auto Candidate, typename Type>
-    sink before(Type *value_or_instance) {
-        delegate<Ret(Args...)> call{};
-        call.template connect<Candidate>(value_or_instance);
+        call.template connect<Candidate>(std::forward<Type>(value_or_instance));
 
         const auto &calls = signal->calls;
         const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
@@ -400,29 +375,29 @@ public:
     }
 
     /**
-     * @brief Connects a free function to a signal.
+     * @brief Connects a free function or an unbound member to a signal.
      *
-     * The signal handler performs checks to avoid multiple connections for free
-     * functions.
+     * The signal handler performs checks to avoid multiple connections for the
+     * same function.
      *
-     * @tparam Function A valid free function pointer.
+     * @tparam Candidate Function or member to connect to the signal.
      * @return A properly initialized connection object.
      */
-    template<auto Function>
+    template<auto Candidate>
     connection connect() {
-        disconnect<Function>();
+        disconnect<Candidate>();
 
         delegate<Ret(Args...)> call{};
-        call.template connect<Function>();
+        call.template connect<Candidate>();
         signal->calls.insert(signal->calls.end() - offset, std::move(call));
 
         delegate<void(void *)> conn{};
-        conn.template connect<&release<Function>>();
+        conn.template connect<&release<Candidate>>();
         return { std::move(conn), signal };
     }
 
     /**
-     * @brief Connects a member function or a free function with payload to a
+     * @brief Connects a free function with payload or a bound member to a
      * signal.
      *
      * The signal isn't responsible for the connected object or the payload.
@@ -433,13 +408,13 @@ public:
      * such that the instance is the first argument before the ones used to
      * define the delegate itself.
      *
-     * @tparam Candidate Member or free function to connect to the signal.
+     * @tparam Candidate Function or member to connect to the delegate.
      * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid reference that fits the purpose.
      * @return A properly initialized connection object.
      */
     template<auto Candidate, typename Type>
-    connection connect(Type &value_or_instance) {
+    connection connect(Type &&value_or_instance) {
         disconnect<Candidate>(value_or_instance);
 
         delegate<Ret(Args...)> call{};
@@ -447,85 +422,40 @@ public:
         signal->calls.insert(signal->calls.end() - offset, std::move(call));
 
         delegate<void(void *)> conn{};
-        conn.template connect<&release<Candidate, Type &>>(value_or_instance);
+        conn.template connect<&release<Candidate, Type>>(value_or_instance);
         return { std::move(conn), signal };
     }
 
     /**
-     * @brief Connects a member function or a free function with payload to a
-     * signal.
-     *
-     * The signal isn't responsible for the connected object or the payload.
-     * Users must always guarantee that the lifetime of the instance overcomes
-     * the one  of the delegate. On the other side, the signal handler performs
-     * checks to avoid multiple connections for the same function.<br/>
-     * When used to connect a free function with payload, its signature must be
-     * such that the instance is the first argument before the ones used to
-     * define the delegate itself.
-     *
-     * @tparam Candidate Member or free function to connect to the signal.
-     * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid pointer that fits the purpose.
-     * @return A properly initialized connection object.
+     * @brief Disconnects a free function or an unbound member from a signal.
+     * @tparam Candidate Function or member to disconnect from the delegate.
      */
-    template<auto Candidate, typename Type>
-    connection connect(Type *value_or_instance) {
-        disconnect<Candidate>(value_or_instance);
-
-        delegate<Ret(Args...)> call{};
-        call.template connect<Candidate>(value_or_instance);
-        signal->calls.insert(signal->calls.end() - offset, std::move(call));
-
-        delegate<void(void *)> conn{};
-        conn.template connect<&release<Candidate, Type *>>(value_or_instance);
-        return { std::move(conn), signal };
-    }
-
-    /**
-     * @brief Disconnects a free function from a signal.
-     * @tparam Function A valid free function pointer.
-     */
-    template<auto Function>
+    template<auto Candidate>
     void disconnect() {
         auto &calls = signal->calls;
         delegate<Ret(Args...)> call{};
-        call.template connect<Function>();
+        call.template connect<Candidate>();
         calls.erase(std::remove(calls.begin(), calls.end(), std::move(call)), calls.end());
     }
 
     /**
-     * @brief Disconnects a member function or a free function with payload from
-     * a signal.
-     * @tparam Candidate Member or free function to disconnect from the signal.
+     * @brief Disconnects a free function with payload or a bound member from a
+     * signal.
+     * @tparam Candidate Function or member to disconnect from the delegate.
      * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid reference that fits the purpose.
      */
     template<auto Candidate, typename Type>
-    void disconnect(Type &value_or_instance) {
+    void disconnect(Type &&value_or_instance) {
         auto &calls = signal->calls;
         delegate<Ret(Args...)> call{};
-        call.template connect<Candidate>(value_or_instance);
+        call.template connect<Candidate>(std::forward<Type>(value_or_instance));
         calls.erase(std::remove(calls.begin(), calls.end(), std::move(call)), calls.end());
     }
 
     /**
-     * @brief Disconnects a member function or a free function with payload from
-     * a signal.
-     * @tparam Candidate Member or free function to disconnect from the signal.
-     * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid pointer that fits the purpose.
-     */
-    template<auto Candidate, typename Type>
-    void disconnect(Type *value_or_instance) {
-        auto &calls = signal->calls;
-        delegate<Ret(Args...)> call{};
-        call.template connect<Candidate>(value_or_instance);
-        calls.erase(std::remove(calls.begin(), calls.end(), std::move(call)), calls.end());
-    }
-
-    /**
-     * @brief Disconnects member functions or free functions based on an
-     * instance or specific payload.
+     * @brief Disconnects free functions with payload or bound members from a
+     * signal.
      * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
@@ -535,10 +465,10 @@ public:
     }
 
     /**
-     * @brief Disconnects member functions or free functions based on an
-     * instance or specific payload.
+     * @brief Disconnects free functions with payload or bound members from a
+     * signal.
      * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid pointer that fits the purpose.
+     * @param value_or_instance A valid object that fits the purpose.
      */
     template<typename Type>
     void disconnect(Type *value_or_instance) {

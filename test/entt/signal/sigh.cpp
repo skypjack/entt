@@ -416,3 +416,29 @@ TEST_F(SigH, BeforeListenerNotPresent) {
 
     ASSERT_EQ(functor.value, 2);
 }
+
+TEST_F(SigH, UnboundDataMember) {
+    sigh_listener listener;
+    entt::sigh<bool &(sigh_listener &)> sigh;
+    entt::sink sink{sigh};
+
+    ASSERT_FALSE(listener.k);
+
+    sink.connect<&sigh_listener::k>();
+    sigh.collect([](bool &value) { value = !value; }, listener);
+
+    ASSERT_TRUE(listener.k);
+}
+
+TEST_F(SigH, UnboundMemberFunction) {
+    sigh_listener listener;
+    entt::sigh<void(sigh_listener *, int)> sigh;
+    entt::sink sink{sigh};
+
+    ASSERT_FALSE(listener.k);
+
+    sink.connect<&sigh_listener::g>();
+    sigh.publish(&listener, 42);
+
+    ASSERT_TRUE(listener.k);
+}
