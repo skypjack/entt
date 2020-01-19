@@ -266,9 +266,14 @@ class sink<Ret(Args...)> {
     using signal_type = sigh<Ret(Args...)>;
     using difference_type = typename std::iterator_traits<typename decltype(signal_type::calls)::iterator>::difference_type;
 
-    template<auto Candidate, typename... Type>
-    static void release(Type... value_or_instance, void *signal) {
-        sink{*static_cast<signal_type *>(signal)}.disconnect<Candidate>(value_or_instance...);
+    template<auto Candidate, typename Type>
+    static void release(Type value_or_instance, void *signal) {
+        sink{*static_cast<signal_type *>(signal)}.disconnect<Candidate>(value_or_instance);
+    }
+
+    template<auto Candidate>
+    static void release(void *signal) {
+        sink{*static_cast<signal_type *>(signal)}.disconnect<Candidate>();
     }
 
 public:
