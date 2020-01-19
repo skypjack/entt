@@ -37,7 +37,7 @@ lightweight classes to solve the same and many other problems.
 A delegate can be used as a general purpose invoker with no memory overhead for
 free functions and members provided along with an instance on which to invoke
 them.<br/>
-It does not claim to be a drop-in replacement for an `std::function`, so do not
+It doesn't claim to be a drop-in replacement for an `std::function`, so don't
 expect to use it whenever an `std::function` fits well. That said, it's most
 likely even a better fit than an `std::function` in a lot of cases, so expect to
 use it quite a lot anyway.
@@ -79,9 +79,9 @@ function type of the delegate is such that the parameter list is empty and the
 value of the data member is at least convertible to the return type.
 
 Free functions having type equivalent to `void(T &, args...)` are accepted as
-well. In this case, `T &` is considered a payload and the function will receive
-it back every time it's invoked. In other terms, this works just fine with the
-above definition:
+well. The first argument `T &` is considered a payload and the function will
+receive it back every time it's invoked. In other terms, this works just fine
+with the above definition:
 
 ```cpp
 void g(const char &c, int i) { /* ... */ }
@@ -142,6 +142,24 @@ delegate. As long as a listener can be invoked with the given arguments to yield
 a result that is convertible to the given result type, everything works just
 fine.
 
+As a side note, note that members of a class may or may not be associated with
+instances. If they are not, the first argument of the function type must be that
+of the class on which the members operate and an instance of this class must
+obviously be passed when invoking the delegate:
+
+```
+entt::delegate<void(my_struct &, int)> delegate;
+delegate.connect<&my_struct::f>();
+
+my_struct instance;
+delegate(instance, 42);
+```
+
+In this case, it's not possible to deduce the function type since the first
+argument doesn't necessarily have to be a reference (for example, it can be a
+pointer, as well as a const reference).<br/>
+Therefore, the function type must be declared explicitly for unbound members.
+
 # Signals
 
 Signal handlers work with references to classes, function pointers and pointers
@@ -199,10 +217,10 @@ sink.disconnect<&foo>();
 // disconnect a member function of an instance
 sink.disconnect<&listener::bar>(instance);
 
-// disconnect all the member functions of an instance, if any
+// disconnect all member functions of an instance, if any
 sink.disconnect(instance);
 
-// discards all the listeners at once
+// discards all listeners at once
 sink.disconnect();
 ```
 
