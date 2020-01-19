@@ -352,3 +352,19 @@ TEST(Delegate, TheLessTheBetter) {
 
     ASSERT_EQ(delegate(3, 'c'), 6);
 }
+
+TEST(Delegate, UnboundDataMember) {
+    entt::delegate<int(const delegate_functor &)> delegate;
+    delegate.connect<&delegate_functor::data_member>();
+    delegate_functor functor;
+
+    ASSERT_EQ(delegate(functor), 42);
+}
+
+TEST(Delegate, UnboundMemberFunction) {
+    entt::delegate<int(delegate_functor *, const int &i)> delegate;
+    delegate.connect<&delegate_functor::operator()>();
+    delegate_functor functor;
+
+    ASSERT_EQ(delegate(&functor, 3), 6);
+}
