@@ -4,7 +4,6 @@
 
 #include <type_traits>
 #include "../config/config.h"
-#include "../signal/sigh.hpp"
 #include "registry.hpp"
 
 

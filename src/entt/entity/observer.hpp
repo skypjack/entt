@@ -177,7 +177,7 @@ class basic_observer {
     template<typename... Reject, typename... Require, typename AnyOf>
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, AnyOf>> {
         template<std::size_t Index>
-        static void maybe_valid_if(basic_observer &obs, const Entity entt, const basic_registry<Entity> &reg) {
+        static void maybe_valid_if(basic_observer &obs, const basic_registry<Entity> &reg, const Entity entt) {
             if(reg.template has<Require...>(entt) && !(reg.template has<Reject>(entt) || ...)) {
                 if(auto *comp = obs.view.try_get(entt); !comp) {
                     obs.view.construct(entt);
@@ -188,7 +188,7 @@ class basic_observer {
         }
 
         template<std::size_t Index>
-        static void discard_if(basic_observer &obs, const Entity entt) {
+        static void discard_if(basic_observer &obs, const basic_registry<Entity> &, const Entity entt) {
             if(auto *value = obs.view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
                 obs.view.destroy(entt);
             }
@@ -213,7 +213,7 @@ class basic_observer {
     template<typename... Reject, typename... Require, typename... NoneOf, typename... AllOf>
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, type_list<NoneOf...>, AllOf...>> {
         template<std::size_t Index>
-        static void maybe_valid_if(basic_observer &obs, const Entity entt, const basic_registry<Entity> &reg) {
+        static void maybe_valid_if(basic_observer &obs, const basic_registry<Entity> &reg, const Entity entt) {
             if(reg.template has<AllOf..., Require...>(entt) && !(reg.template has<NoneOf>(entt) || ...) && !(reg.template has<Reject>(entt) || ...)) {
                 if(auto *comp = obs.view.try_get(entt); !comp) {
                     obs.view.construct(entt);
@@ -224,7 +224,7 @@ class basic_observer {
         }
 
         template<std::size_t Index>
-        static void discard_if(basic_observer &obs, const Entity entt) {
+        static void discard_if(basic_observer &obs, const basic_registry<Entity> &, const Entity entt) {
             if(auto *value = obs.view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
                 obs.view.destroy(entt);
             }

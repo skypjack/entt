@@ -492,7 +492,7 @@ TEST(NonOwningGroup, Less) {
 
 TEST(NonOwningGroup, SignalRace) {
     entt::registry registry;
-    registry.on_construct<double>().connect<&entt::registry::assign_or_replace<int>>(registry);
+    registry.on_construct<double>().connect<&entt::registry::assign_or_replace<int>>();
     registry.group(entt::get<int, double>);
 
     auto entity = registry.create();
@@ -1068,7 +1068,7 @@ TEST(OwningGroup, Less) {
 
 TEST(OwningGroup, SignalRace) {
     entt::registry registry;
-    registry.on_construct<double>().connect<&entt::registry::assign_or_replace<int>>(registry);
+    registry.on_construct<double>().connect<&entt::registry::assign_or_replace<int>>();
     registry.group<int>(entt::get<double>);
 
     auto entity = registry.create();

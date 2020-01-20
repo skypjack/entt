@@ -14,12 +14,12 @@ struct empty_type {};
 
 struct listener {
     template<typename Component>
-    static void sort(entt::entity, entt::registry &registry) {
+    static void sort(entt::registry &registry) {
         registry.sort<Component>([](auto lhs, auto rhs) { return lhs < rhs; });
     }
 
     template<typename Component>
-    void incr(entt::entity entity, entt::registry &registry) {
+    void incr(const entt::registry &registry, entt::entity entity) {
         ASSERT_TRUE(registry.valid(entity));
         ASSERT_TRUE(registry.has<Component>(entity));
         last = entity;
@@ -27,7 +27,7 @@ struct listener {
     }
 
     template<typename Component>
-    void decr(entt::entity entity, entt::registry &registry) {
+    void decr(const entt::registry &registry, entt::entity entity) {
         ASSERT_TRUE(registry.valid(entity));
         ASSERT_TRUE(registry.has<Component>(entity));
         last = entity;
@@ -1562,8 +1562,8 @@ TEST(Registry, Dependencies) {
     constexpr auto assign_or_replace = &entt::registry::assign_or_replace<double>;
     constexpr auto remove = &entt::registry::remove<double>;
 
-    registry.on_construct<int>().connect<assign_or_replace>(registry);
-    registry.on_destroy<int>().connect<remove>(registry);
+    registry.on_construct<int>().connect<assign_or_replace>();
+    registry.on_destroy<int>().connect<remove>();
     registry.assign<double>(entity, .3);
 
     ASSERT_FALSE(registry.has<int>(entity));
@@ -1579,8 +1579,8 @@ TEST(Registry, Dependencies) {
     ASSERT_FALSE(registry.has<int>(entity));
     ASSERT_FALSE(registry.has<double>(entity));
 
-    registry.on_construct<int>().disconnect<assign_or_replace>(registry);
-    registry.on_destroy<int>().disconnect<remove>(registry);
+    registry.on_construct<int>().disconnect<assign_or_replace>();
+    registry.on_destroy<int>().disconnect<remove>();
     registry.assign<int>(entity);
 
     ASSERT_TRUE(registry.has<int>(entity));

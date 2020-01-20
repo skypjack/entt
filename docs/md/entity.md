@@ -333,7 +333,7 @@ The function type of a listener for the construction and destruction signals
 should be equivalent to the following:
 
 ```cpp
-void(entt::entity, entt::registry &);
+void(entt::registry &, entt::entity);
 ```
 
 In both cases, listeners are provided with the registry that triggered the
@@ -342,7 +342,7 @@ The function type of a listener that observes changes to components is slightly
 different instead:
 
 ```cpp
-void(entt::entity, entt::registry &, Component &);
+void(entt::registry &, entt::entity, Component &);
 ```
 
 In this case, `Component` is intuitively the type of component of interest. The
@@ -600,26 +600,27 @@ the other things.
 
 ### Dependencies
 
-The `registry` class is designed to create short circuits between its functions.
-This makes easy to define dependencies between different operations.<br/>
+The `registry` class is designed to be able to create short circuits between its
+functions. This simplifies the definition of _dependencies_ between different
+operations.<br/>
 For example, the following adds (or replaces) the component `a_type` whenever
 `my_type` is assigned to an entity:
 
 ```cpp
-registry.on_construct<my_type>().connect<&entt::registry::assign_or_replace<a_type>>(registry);
+registry.on_construct<my_type>().connect<&entt::registry::assign_or_replace<a_type>>();
 ```
 
 Similarly, the code shown below removes `a_type` from an entity whenever
 `my_type` is assigned to it:
 
 ```cpp
-registry.on_construct<my_type>().connect<&entt::registry::remove<a_type>>(registry);
+registry.on_construct<my_type>().connect<&entt::registry::remove<a_type>>();
 ```
 
 A dependency can also be easily broken as follows:
 
 ```cpp
-registry.on_construct<my_type>().disconnect<&entt::registry::assign_or_replace<a_type>>(registry);
+registry.on_construct<my_type>().disconnect<&entt::registry::assign_or_replace<a_type>>();
 ```
 
 There are many other types of dependencies. In general, all functions that

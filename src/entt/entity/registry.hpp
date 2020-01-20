@@ -69,7 +69,7 @@ class basic_registry {
         template<typename... Args>
         decltype(auto) assign(basic_registry &owner, const Entity entt, Args &&... args) {
             this->construct(entt, std::forward<Args>(args)...);
-            construction.publish(entt, owner);
+            construction.publish(owner, entt);
             return this->get(entt);
         }
 
@@ -80,12 +80,12 @@ class basic_registry {
             (func(this->raw() + this->size() - std::distance(first, last)), ...);
 
             if(!construction.empty()) {
-                std::for_each(first, last, [this, &owner](const auto entt) { construction.publish(entt, owner); });
+                std::for_each(first, last, [this, &owner](const auto entt) { construction.publish(owner, entt); });
             }
         }
 
         void remove(basic_registry &owner, const Entity entt) {
-            destruction.publish(entt, owner);
+            destruction.publish(owner, entt);
             this->destroy(entt);
         }
 
@@ -93,7 +93,7 @@ class basic_registry {
         void remove(basic_registry &owner, It first, It last) {
             if(std::distance(first, last) == std::distance(this->begin(), this->end())) {
                 if(!destruction.empty()) {
-                    std::for_each(first, last, [this, &owner](const auto entt) { destruction.publish(entt, owner); });
+                    std::for_each(first, last, [this, &owner](const auto entt) { destruction.publish(owner, entt); });
                 }
 
                 this->clear();
@@ -106,14 +106,14 @@ class basic_registry {
         template<typename... Args>
         decltype(auto) replace(basic_registry &owner, const Entity entt, Args &&... args) {
             Component component{std::forward<Args>(args)...};
-            update.publish(entt, owner, component);
+            update.publish(owner, entt, component);
             return (this->get(entt) = std::move(component));
         }
 
     private:
-        sigh<void(const Entity, basic_registry &)> construction{};
-        sigh<void(const Entity, basic_registry &)> destruction{};
-        sigh<void(const Entity, basic_registry &, decltype(std::declval<storage<Entity, Component>>().get({})))> update{};
+        sigh<void(basic_registry &, const Entity)> construction{};
+        sigh<void(basic_registry &, const Entity)> destruction{};
+        sigh<void(basic_registry &, const Entity, decltype(std::declval<storage<Entity, Component>>().get({})))> update{};
     };
 
     struct pool_data {
@@ -133,7 +133,7 @@ class basic_registry {
         std::conditional_t<sizeof...(Owned) == 0, sparse_set<Entity>, std::size_t> current{};
 
         template<typename Component>
-        void maybe_valid_if(const Entity entt, basic_registry &owner) {
+        void maybe_valid_if(basic_registry &owner, const Entity entt) {
             static_assert(std::disjunction_v<std::is_same<Owned, std::decay_t<Owned>>..., std::is_same<Get, std::decay_t<Get>>..., std::is_same<Exclude, std::decay_t<Exclude>>...>);
             [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...);
 
@@ -153,7 +153,7 @@ class basic_registry {
             }
         }
 
-        void discard_if(const Entity entt, basic_registry &owner) {
+        void discard_if([[maybe_unused]] basic_registry &owner, const Entity entt) {
             if constexpr(sizeof...(Owned) == 0) {
                 if(current.has(entt)) {
                     current.destroy(entt);
@@ -1021,7 +1021,7 @@ public:
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(Entity, registry<Entity> &);
+     * void(registry<Entity> &, Entity);
      * @endcode
      *
      * Listeners are invoked **after** the component has been assigned to the
@@ -1052,7 +1052,7 @@ public:
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(Entity, registry<Entity> &, Component &);
+     * void(registry<Entity> &, Entity, Component &);
      * @endcode
      *
      * Listeners are invoked **before** the component has been replaced.
@@ -1083,7 +1083,7 @@ public:
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(Entity, registry<Entity> &);
+     * void(registry<Entity> &, Entity);
      * @endcode
      *
      * Listeners are invoked **before** the component has been removed from the
