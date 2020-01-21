@@ -824,6 +824,25 @@ public:
     }
 
     /**
+     * @brief Checks if an entity has at least one of the given components.
+     *
+     * @warning
+     * Attempting to use an invalid entity results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity.
+     *
+     * @tparam Component Components for which to perform the check.
+     * @param entity A valid entity identifier.
+     * @return True if the entity has at least one of the given components,
+     * false otherwise.
+     */
+    template<typename... Component>
+    bool any(const entity_type entity) const {
+        ENTT_ASSERT(valid(entity));
+        return (assure<Component>().has(entity) || ...);
+    }
+
+    /**
      * @brief Returns references to the given components for an entity.
      *
      * @warning

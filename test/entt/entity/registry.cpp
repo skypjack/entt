@@ -108,7 +108,7 @@ TEST(Registry, Functionalities) {
     registry.assign<char>(e1);
 
     ASSERT_TRUE(registry.has<>(e0));
-    ASSERT_TRUE(registry.has<>(e1));
+    ASSERT_FALSE(registry.any<>(e1));
 
     ASSERT_EQ(registry.size<int>(), entt::registry::size_type{1});
     ASSERT_EQ(registry.size<char>(), entt::registry::size_type{1});
@@ -117,12 +117,10 @@ TEST(Registry, Functionalities) {
 
     ASSERT_NE(e0, e1);
 
-    ASSERT_FALSE(registry.has<int>(e0));
-    ASSERT_TRUE(registry.has<int>(e1));
-    ASSERT_FALSE(registry.has<char>(e0));
-    ASSERT_TRUE(registry.has<char>(e1));
     ASSERT_FALSE((registry.has<int, char>(e0)));
     ASSERT_TRUE((registry.has<int, char>(e1)));
+    ASSERT_FALSE((registry.any<int, double>(e0)));
+    ASSERT_TRUE((registry.any<int, double>(e1)));
 
     ASSERT_EQ(registry.try_get<int>(e0), nullptr);
     ASSERT_NE(registry.try_get<int>(e1), nullptr);
@@ -136,20 +134,17 @@ TEST(Registry, Functionalities) {
     ASSERT_NO_THROW(registry.remove<int>(e1));
     ASSERT_NO_THROW(registry.remove<char>(e1));
 
-    ASSERT_TRUE(registry.has<int>(e0));
-    ASSERT_FALSE(registry.has<int>(e1));
-    ASSERT_TRUE(registry.has<char>(e0));
-    ASSERT_FALSE(registry.has<char>(e1));
     ASSERT_TRUE((registry.has<int, char>(e0)));
     ASSERT_FALSE((registry.has<int, char>(e1)));
+    ASSERT_TRUE((registry.any<int, double>(e0)));
+    ASSERT_FALSE((registry.any<int, double>(e1)));
 
     const auto e2 = registry.create();
 
     registry.assign_or_replace<int>(e2, registry.get<int>(e0));
     registry.assign_or_replace<char>(e2, registry.get<char>(e0));
 
-    ASSERT_TRUE(registry.has<int>(e2));
-    ASSERT_TRUE(registry.has<char>(e2));
+    ASSERT_TRUE((registry.has<int, char>(e2)));
     ASSERT_EQ(registry.get<int>(e0), 42);
     ASSERT_EQ(registry.get<char>(e0), 'c');
 
@@ -210,8 +205,7 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.size<char>(), entt::registry::size_type{1});
     ASSERT_FALSE(registry.empty<int>());
     ASSERT_FALSE(registry.empty<char>());
-    ASSERT_TRUE(registry.has<int>(e3));
-    ASSERT_TRUE(registry.has<char>(e3));
+    ASSERT_TRUE((registry.has<int, char>(e3)));
     ASSERT_EQ(registry.get<int>(e3), 3);
     ASSERT_EQ(registry.get<char>(e3), 'c');
 
@@ -1359,7 +1353,7 @@ TEST(Registry, Clone) {
     ASSERT_FALSE(other.valid(e1));
     ASSERT_TRUE(other.valid(e2));
 
-    ASSERT_TRUE((other.has<int>(e0)));
+    ASSERT_TRUE((other.any<int, double>(e0)));
     ASSERT_FALSE((other.has<double>(e0)));
     ASSERT_TRUE((other.has<int, char>(e2)));
 
@@ -1407,8 +1401,7 @@ TEST(Registry, Clone) {
     ASSERT_TRUE(other.valid(e2));
     ASSERT_FALSE(other.valid(e3));
 
-    ASSERT_FALSE((other.has<int>(e0)));
-    ASSERT_FALSE((other.has<double>(e0)));
+    ASSERT_FALSE((other.any<int, double>(e0)));
     ASSERT_FALSE((other.has<int>(e2)));
     ASSERT_TRUE((other.has<char>(e2)));
 
@@ -1576,14 +1569,13 @@ TEST(Registry, Dependencies) {
 
     registry.remove<int>(entity);
 
-    ASSERT_FALSE(registry.has<int>(entity));
-    ASSERT_FALSE(registry.has<double>(entity));
+    ASSERT_FALSE((registry.any<int, double>(entity)));
 
     registry.on_construct<int>().disconnect<assign_or_replace>();
     registry.on_destroy<int>().disconnect<remove>();
     registry.assign<int>(entity);
 
-    ASSERT_TRUE(registry.has<int>(entity));
+    ASSERT_TRUE((registry.any<int, double>(entity)));
     ASSERT_FALSE(registry.has<double>(entity));
 }
 

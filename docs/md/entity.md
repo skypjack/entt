@@ -244,11 +244,15 @@ if(registry.has<comp>(entity)) {
 }
 ```
 
-The `has` member function may also be useful if in doubt about whether or not an
-entity has one or more components:
+The `has` and `any` member functions may also be useful if in doubt about
+whether or not an entity has all the components in a set or any of them:
 
 ```cpp
-bool b = registry.has<position, velocity>(entity);
+// true if entity has all the given components
+bool all = registry.has<position, velocity>(entity);
+
+// true if entity has at least one of the given components
+bool any = registry.any<position, velocity>(entity);
 ```
 
 If the goal is to delete a single component from an entity that owns it, the
