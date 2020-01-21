@@ -12,7 +12,7 @@
 #include "../core/type_traits.hpp"
 #include "sparse_set.hpp"
 #include "storage.hpp"
-#include "utility.hpp"
+#include "helper.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 

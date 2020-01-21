@@ -19,7 +19,6 @@
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none
 * deprecate sigh::publish, use operator()
-* merge entity/helper and entt/utility
 
 * WIP: snapshot rework/deprecation
  - remove snapshot/loader from registry, make them external (faster) tools
