@@ -29,11 +29,9 @@ class basic_group;
 /**
  * @brief Non-owning group.
  *
- * A non-owning group returns all the entities and only the entities that have
- * at least the given components. Moreover, it's guaranteed that the entity list
- * is tightly packed in memory for fast iterations.<br/>
- * In general, non-owning groups don't stay true to the order of any set of
- * components unless users explicitly sort them.
+ * A non-owning group returns all entities and only the entities that have at
+ * least the given components. Moreover, it's guaranteed that the entity list
+ * is tightly packed in memory for fast iterations.
  *
  * @b Important
  *
@@ -44,18 +42,17 @@ class basic_group;
  *   given components is removed from the entity to which the iterator points).
  * * The entity currently pointed is destroyed.
  *
- * In all the other cases, modifying the pools of the given components in any
- * way invalidates all the iterators and using them results in undefined
- * behavior.
+ * In all other cases, modifying the pools iterated by the group in any way
+ * invalidates all the iterators and using them results in undefined behavior.
  *
  * @note
  * Groups share references to the underlying data structures of the registry
  * that generated them. Therefore any change to the entities and to the
  * components made by means of the registry are immediately reflected by all the
  * groups.<br/>
- * Moreover, sorting a non-owning group affects all the instance of the same
+ * Moreover, sorting a non-owning group affects all the instances of the same
  * group (it means that users don't have to call `sort` on each instance to sort
- * all of them because they share the set of entities).
+ * all of them because they _share_ entities and components).
  *
  * @warning
  * Lifetime of a group must overcome the one of the registry that generated it.
@@ -131,11 +128,9 @@ public:
     }
 
     /**
-     * @brief Checks whether the group or the pools of the given components are
-     * empty.
+     * @brief Checks whether a group or some pools are empty.
      * @tparam Component Types of components in which one is interested.
-     * @return True if the group or the pools of the given components are empty,
-     * false otherwise.
+     * @return True if the group or the pools are empty, false otherwise.
      */
     template<typename... Component>
     bool empty() const ENTT_NOEXCEPT {
@@ -270,7 +265,7 @@ public:
      * @brief Returns the components assigned to the given entity.
      *
      * Prefer this function instead of `registry::get` during iterations. It has
-     * far better performance than its companion function.
+     * far better performance than its counterpart.
      *
      * @warning
      * Attempting to use an invalid component type results in a compilation
@@ -409,7 +404,7 @@ public:
      * @brief Sort the shared pool of entities according to the given component.
      *
      * Non-owning groups of the same type share with the registry a pool of
-     * entities with  its own order that doesn't depend on the order of any pool
+     * entities with its own order that doesn't depend on the order of any pool
      * of components. Users can order the underlying data structure so that it
      * respects the order of the pool of the given component.
      *
@@ -435,15 +430,15 @@ private:
 /**
  * @brief Owning group.
  *
- * Owning groups return all the entities and only the entities that have at
- * least the given components. Moreover:
+ * Owning groups return all entities and only the entities that have at least
+ * the given components. Moreover:
  *
  * * It's guaranteed that the entity list is tightly packed in memory for fast
  *   iterations.
  * * It's guaranteed that the lists of owned components are tightly packed in
  *   memory for even faster iterations and to allow direct access.
- * * They stay true to the order of the owned components and all the owned
- *   components have the same order in memory.
+ * * They stay true to the order of the owned components and all instances have
+ *   the same order in memory.
  *
  * The more types of components are owned by a group, the faster it is to
  * iterate them.
@@ -457,9 +452,8 @@ private:
  *   given components is removed from the entity to which the iterator points).
  * * The entity currently pointed is destroyed.
  *
- * In all the other cases, modifying the pools of the given components in any
- * way invalidates all the iterators and using them results in undefined
- * behavior.
+ * In all other cases, modifying the pools iterated by the group in any way
+ * invalidates all the iterators and using them results in undefined behavior.
  *
  * @note
  * Groups share references to the underlying data structures of the registry
@@ -544,11 +538,9 @@ public:
     }
 
     /**
-     * @brief Checks whether the group or the pools of the given components are
-     * empty.
+     * @brief Checks whether a group or some pools are empty.
      * @tparam Component Types of components in which one is interested.
-     * @return True if the group or the pools of the given components are empty,
-     * false otherwise.
+     * @return True if the group or the pools are empty, false otherwise.
      */
     template<typename... Component>
     bool empty() const ENTT_NOEXCEPT {
@@ -689,7 +681,7 @@ public:
      * @brief Returns the components assigned to the given entity.
      *
      * Prefer this function instead of `registry::get` during iterations. It has
-     * far better performance than its companion function.
+     * far better performance than its counterpart.
      *
      * @warning
      * Attempting to use an invalid component type results in a compilation

@@ -35,11 +35,8 @@ class basic_view;
  *
  * Multi component views iterate over those entities that have at least all the
  * given components in their bags. During initialization, a multi component view
- * looks at the number of entities available for each component and picks up a
- * reference to the smallest set of candidate entities in order to get a
- * performance boost when iterate.<br/>
- * Order of elements during iterations are highly dependent on the order of the
- * underlying data structures. See sparse_set for more details.
+ * looks at the number of entities available for each component and uses the
+ * smallest set in order to get a performance boost when iterate.
  *
  * @b Important
  *
@@ -50,9 +47,8 @@ class basic_view;
  *   given components is removed from the entity to which the iterator points).
  * * The entity currently pointed is destroyed.
  *
- * In all the other cases, modifying the pools of the given components in any
- * way invalidates all the iterators and using them results in undefined
- * behavior.
+ * In all other cases, modifying the pools iterated by the view in any way
+ * invalidates all the iterators and using them results in undefined behavior.
  *
  * @note
  * Views share references to the underlying data structures of the registry that
@@ -241,16 +237,14 @@ public:
     }
 
     /**
-     * @brief Checks whether the view or the pools of the given components are
-     * empty.
+     * @brief Checks whether a view or some pools are empty.
      *
-     * The view is definitely empty if one of the pools of the given components
-     * is empty. In all other cases, the view may be empty and not return
-     * entities even if this function returns false.
+     * The view is definitely empty if one of the pools it uses is empty. In all
+     * other cases, the view may be empty and not return entities even if this
+     * function returns false.
      *
      * @tparam Comp Types of components in which one is interested.
-     * @return True if the view or the pools of the given components are empty,
-     * false otherwise.
+     * @return True if the view or the pools are empty, false otherwise.
      */
     template<typename... Comp>
     bool empty() const ENTT_NOEXCEPT {
@@ -367,7 +361,7 @@ public:
      * @brief Returns the components assigned to the given entity.
      *
      * Prefer this function instead of `registry::get` during iterations. It has
-     * far better performance than its companion function.
+     * far better performance than its counterpart.
      *
      * @warning
      * Attempting to use an invalid component type results in a compilation
@@ -529,9 +523,7 @@ private:
  *
  * Single component views are specialized in order to get a boost in terms of
  * performance. This kind of views can access the underlying data structure
- * directly and avoid superfluous checks.<br/>
- * Order of elements during iterations are highly dependent on the order of the
- * underlying data structure. See sparse_set for more details.
+ * directly and avoid superfluous checks.
  *
  * @b Important
  *
@@ -542,7 +534,7 @@ private:
  *   component is removed from the entity to which the iterator points).
  * * The entity currently pointed is destroyed.
  *
- * In all the other cases, modifying the pool of the given component in any way
+ * In all other cases, modifying the pool iterated by the view in any way
  * invalidates all the iterators and using them results in undefined behavior.
  *
  * @note
@@ -587,7 +579,7 @@ public:
     }
 
     /**
-     * @brief Checks whether the view is empty.
+     * @brief Checks whether a view is empty.
      * @return True if the view is empty, false otherwise.
      */
     bool empty() const ENTT_NOEXCEPT {
@@ -696,7 +688,7 @@ public:
      * @brief Returns the component assigned to the given entity.
      *
      * Prefer this function instead of `registry::get` during iterations. It has
-     * far better performance than its companion function.
+     * far better performance than its counterpart.
      *
      * @warning
      * Attempting to use an entity that doesn't belong to the view results in
