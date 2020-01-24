@@ -57,7 +57,8 @@ struct ENTT_TYPE_ID_API type_info {
      */
 #ifdef ENTT_PRETTY_FUNCTION
     static constexpr ENTT_ID_TYPE id() ENTT_NOEXCEPT {
-        return entt::hashed_string{ENTT_PRETTY_FUNCTION};
+        constexpr auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
+        return value;
     }
 #else
     static ENTT_ID_TYPE id() ENTT_NOEXCEPT {
