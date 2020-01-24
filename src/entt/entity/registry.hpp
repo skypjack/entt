@@ -199,10 +199,8 @@ class basic_registry {
     const pool_handler<Component> & assure(Args &&... args) const {
         static std::size_t index{pools.size()};
 
-        if(!(index < pools.size()) || pools[index].type_id != type_info<Component>::id()) {
-            index = std::find_if(pools.cbegin(), pools.cend(), [](auto &&pdata) {
-                return pdata.type_id == type_info<Component>::id();
-            }) - pools.cbegin();
+        if(const auto length = pools.size(); !(index < length) || pools[index].type_id != type_info<Component>::id()) {
+            for(index = {}; index < length && pools[index].type_id != type_info<Component>::id(); ++index);
 
             if(index == pools.size()) {
                 auto &&pdata = pools.emplace_back();

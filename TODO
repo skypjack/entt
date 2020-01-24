@@ -19,6 +19,7 @@
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none
 * deprecate sigh::publish, use operator()
+* remove args... from registry::assure and the others (index would be duplicated)
 
 * WIP: snapshot rework/deprecation
  - remove snapshot/loader from registry, make them external (faster) tools
