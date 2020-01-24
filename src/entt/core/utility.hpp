@@ -25,11 +25,11 @@ struct identity {
 
 
 /**
- * @brief Constant utility to disambiguate overloaded member functions.
- * @tparam Type Function type of the desired overload.
- * @tparam Class Type of class to which the member functions belong.
- * @param member A valid pointer to a member function.
- * @return Pointer to the member function.
+ * @brief Constant utility to disambiguate overloaded members of a class.
+ * @tparam Type Type of the desired overload.
+ * @tparam Class Type of class to which the member belongs.
+ * @param member A valid pointer to a member.
+ * @return Pointer to the member.
  */
 template<typename Type, typename Class>
 constexpr auto overload(Type Class:: *member) ENTT_NOEXCEPT { return member; }
@@ -37,12 +37,12 @@ constexpr auto overload(Type Class:: *member) ENTT_NOEXCEPT { return member; }
 
 /**
  * @brief Constant utility to disambiguate overloaded functions.
- * @tparam Type Function type of the desired overload.
+ * @tparam Func Function type of the desired overload.
  * @param func A valid pointer to a function.
  * @return Pointer to the function.
  */
-template<typename Type>
-constexpr auto overload(Type *func) ENTT_NOEXCEPT { return func; }
+template<typename Func>
+constexpr auto overload(Func *func) ENTT_NOEXCEPT { return func; }
 
 
 /**
@@ -59,8 +59,8 @@ struct overloaded: Func... {
  * @brief Deduction guide.
  * @tparam Func Types of function objects.
  */
-template<class... Type>
-overloaded(Type...) -> overloaded<Type...>;
+template<class... Func>
+overloaded(Func...) -> overloaded<Func...>;
 
 
 /**
