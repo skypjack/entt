@@ -56,6 +56,10 @@
 #ifndef ENTT_STANDARD_CPP
 #   if defined _MSC_VER
 #      define ENTT_PRETTY_FUNCTION __FUNCSIG__
+#      define ENTT_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
+#   elif defined __clang__ || (defined __GNUC__ && __GNUC__ > 8)
+#      define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#      define ENTT_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
 #   elif defined __GNUC__
 #      define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
 #   endif

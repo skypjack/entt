@@ -7,10 +7,10 @@
 #include "hashed_string.hpp"
 
 
-#ifdef ENTT_PRETTY_FUNCTION
-#   define ENTT_TYPE_ID_API
-#else
+#ifndef ENTT_PRETTY_FUNCTION
 #   define ENTT_TYPE_ID_API ENTT_API
+#else
+#   define ENTT_TYPE_ID_API
 #endif
 
 
@@ -55,9 +55,14 @@ struct ENTT_TYPE_ID_API type_info {
      * @brief Returns the numeric representation of a given type.
      * @return The numeric representation of the given type.
      */
-#ifdef ENTT_PRETTY_FUNCTION
+#if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
     static constexpr ENTT_ID_TYPE id() ENTT_NOEXCEPT {
-        constexpr auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
+        constexpr auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION_CONSTEXPR);
+        return value;
+    }
+#elif defined ENTT_PRETTY_FUNCTION
+    static ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+        static const auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
         return value;
     }
 #else
