@@ -68,8 +68,14 @@ class basic_hashed_string {
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    static constexpr ENTT_ID_TYPE helper(ENTT_ID_TYPE partial, const Char *curr) ENTT_NOEXCEPT {
-        return curr[0] == 0 ? partial : helper((partial^curr[0])*traits_type::prime, curr+1);
+    static constexpr ENTT_ID_TYPE helper(const Char *curr) ENTT_NOEXCEPT {
+        auto value = traits_type::offset;
+
+        while(*curr != 0) {
+            value = (value ^ (*(curr++))) * traits_type::prime;
+        }
+
+        return value;
     }
 
 public:
@@ -95,7 +101,7 @@ public:
      */
     template<std::size_t N>
     static constexpr hash_type value(const value_type (&str)[N]) ENTT_NOEXCEPT {
-        return helper(traits_type::offset, str);
+        return helper(str);
     }
 
     /**
@@ -104,7 +110,7 @@ public:
      * @return The numeric representation of the string.
      */
     static hash_type value(const_wrapper wrapper) ENTT_NOEXCEPT {
-        return helper(traits_type::offset, wrapper.str);
+        return helper(wrapper.str);
     }
 
     /**
@@ -140,7 +146,7 @@ public:
      */
     template<std::size_t N>
     constexpr basic_hashed_string(const value_type (&curr)[N]) ENTT_NOEXCEPT
-        : str{curr}, hash{helper(traits_type::offset, curr)}
+        : str{curr}, hash{helper(curr)}
     {}
 
     /**
@@ -149,7 +155,7 @@ public:
      * @param wrapper Helps achieving the purpose by relying on overloading.
      */
     explicit constexpr basic_hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
-        : str{wrapper.str}, hash{helper(traits_type::offset, wrapper.str)}
+        : str{wrapper.str}, hash{helper(wrapper.str)}
     {}
 
     /**
