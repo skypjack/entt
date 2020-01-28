@@ -7,7 +7,7 @@
 * allow to replace std:: with custom implementations
 * custom (decoupled) pools ==> N-buffering, shared components, multi-model, hibitsets, and so on
 * add examples (and credits) from @alanjfs :)
-* static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...>
+* static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...> (see #342)
 * add meta support to registry (eg entity for each component and opaque get)
 * allow for custom stamp functions
 * observer: user defined filters (eg .replace<T, &function> or .group<T, U, &func>)

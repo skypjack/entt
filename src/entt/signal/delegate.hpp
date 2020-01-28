@@ -95,40 +95,31 @@ class delegate;
  */
 template<typename Ret, typename... Args>
 class delegate<Ret(Args...)> {
-    using proto_fn_type = Ret(const void *, std::tuple<Args &&...>);
+    using proto_fn_type = Ret(const void *, Args...);
 
     template<auto Candidate, std::size_t... Index>
-    void connect(std::index_sequence<Index...>) ENTT_NOEXCEPT {
-        static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), std::tuple_element_t<Index, std::tuple<Args...>>...>);
-        data = nullptr;
-
-        fn = [](const void *, std::tuple<Args &&...> args) -> Ret {
-            // Ret(...) makes void(...) eat the return values to avoid errors
-            return Ret(std::invoke(Candidate, std::forward<std::tuple_element_t<Index, std::tuple<Args...>>>(std::get<Index>(args))...));
+    auto wrap(std::index_sequence<Index...>) ENTT_NOEXCEPT {
+        return [](const void *, Args... args) -> Ret {
+            const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
+            return Ret(std::invoke(Candidate, std::forward<std::tuple_element_t<Index, std::tuple<Args...>>>(std::get<Index>(arguments))...));
         };
     }
 
     template<auto Candidate, typename Type, std::size_t... Index>
-    void connect(Type &value_or_instance, std::index_sequence<Index...>) ENTT_NOEXCEPT {
-        static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), Type &, std::tuple_element_t<Index, std::tuple<Args...>>...>);
-        data = &value_or_instance;
-
-        fn = [](const void *payload, std::tuple<Args &&...> args) -> Ret {
+    auto wrap(Type &value_or_instance, std::index_sequence<Index...>) ENTT_NOEXCEPT {
+        return [](const void *payload, Args... args) -> Ret {
+            const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
             Type *curr = static_cast<Type *>(const_cast<std::conditional_t<std::is_const_v<Type>, const void *, void *>>(payload));
-            // Ret(...) makes void(...) eat the return values to avoid errors
-            return Ret(std::invoke(Candidate, *curr, std::forward<std::tuple_element_t<Index, std::tuple<Args...>>>(std::get<Index>(args))...));
+            return Ret(std::invoke(Candidate, *curr, std::forward<std::tuple_element_t<Index, std::tuple<Args...>>>(std::get<Index>(arguments))...));
         };
     }
 
     template<auto Candidate, typename Type, std::size_t... Index>
-    void connect(Type *value_or_instance, std::index_sequence<Index...>) ENTT_NOEXCEPT {
-        static_assert(std::is_invocable_r_v<Ret, decltype(Candidate), Type *, std::tuple_element_t<Index, std::tuple<Args...>>...>);
-        data = value_or_instance;
-
-        fn = [](const void *payload, std::tuple<Args &&...> args) -> Ret {
+    auto wrap(Type *value_or_instance, std::index_sequence<Index...>) ENTT_NOEXCEPT {
+        return [](const void *payload, Args... args) -> Ret {
+            const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
             Type *curr = static_cast<Type *>(const_cast<std::conditional_t<std::is_const_v<Type>, const void *, void *>>(payload));
-            // Ret(...) makes void(...) eat the return values to avoid errors
-            return Ret(std::invoke(Candidate, curr, std::forward<std::tuple_element_t<Index, std::tuple<Args...>>>(std::get<Index>(args))...));
+            return Ret(std::invoke(Candidate, curr, std::forward<std::tuple_element_t<Index, std::tuple<Args...>>>(std::get<Index>(arguments))...));
         };
     }
 
@@ -158,7 +149,7 @@ public:
      * a bound member.
      * @tparam Candidate Function or member to connect to the delegate.
      * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid reference that fits the purpose.
+     * @param value_or_instance A valid object that fits the purpose.
      */
     template<auto Candidate, typename Type>
     delegate(connect_arg_t<Candidate>, Type &&value_or_instance) ENTT_NOEXCEPT
@@ -173,10 +164,16 @@ public:
      */
     template<auto Candidate>
     void connect() ENTT_NOEXCEPT {
-        if constexpr(std::is_member_pointer_v<decltype(Candidate)>) {
-            connect<Candidate>(internal::index_sequence_for<std::tuple_element_t<0, std::tuple<Args...>>>(internal::function_pointer_t<decltype(Candidate)>{}));
+        data = nullptr;
+
+        if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Args...>) {
+            fn = [](const void *, Args... args) -> Ret {
+                return Ret(std::invoke(Candidate, std::forward<Args>(args)...));
+            };
+        } else if constexpr(std::is_member_pointer_v<decltype(Candidate)>) {
+            fn = wrap<Candidate>(internal::index_sequence_for<std::tuple_element_t<0, std::tuple<Args...>>>(internal::function_pointer_t<decltype(Candidate)>{}));
         } else {
-            connect<Candidate>(internal::index_sequence_for(internal::function_pointer_t<decltype(Candidate)>{}));
+            fn = wrap<Candidate>(internal::index_sequence_for(internal::function_pointer_t<decltype(Candidate)>{}));
         }
     }
 
@@ -196,8 +193,41 @@ public:
      * @param value_or_instance A valid reference that fits the purpose.
      */
     template<auto Candidate, typename Type>
-    void connect(Type &&value_or_instance) ENTT_NOEXCEPT {
-        connect<Candidate>(std::forward<Type>(value_or_instance), internal::index_sequence_for(internal::function_pointer_t<decltype(Candidate), Type>{}));
+    void connect(Type &value_or_instance) ENTT_NOEXCEPT {
+        data = &value_or_instance;
+
+        if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Type &, Args...>) {
+            fn = [](const void *payload, Args... args) -> Ret {
+                Type *curr = static_cast<Type *>(const_cast<std::conditional_t<std::is_const_v<Type>, const void *, void *>>(payload));
+                return Ret(std::invoke(Candidate, *curr, std::forward<Args>(args)...));
+            };
+        } else {
+            fn = wrap<Candidate>(value_or_instance, internal::index_sequence_for(internal::function_pointer_t<decltype(Candidate), Type>{}));
+        }
+    }
+
+    /**
+     * @brief Connects a free function with payload or a bound member to a
+     * delegate.
+     *
+     * @sa connect(Type &)
+     *
+     * @tparam Candidate Function or member to connect to the delegate.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid pointer that fits the purpose.
+     */
+    template<auto Candidate, typename Type>
+    void connect(Type *value_or_instance) ENTT_NOEXCEPT {
+        data = value_or_instance;
+
+        if constexpr(std::is_invocable_r_v<Ret, decltype(Candidate), Type *, Args...>) {
+            fn = [](const void *payload, Args... args) -> Ret {
+                Type *curr = static_cast<Type *>(const_cast<std::conditional_t<std::is_const_v<Type>, const void *, void *>>(payload));
+                return Ret(std::invoke(Candidate, curr, std::forward<Args>(args)...));
+            };
+        } else {
+            fn = wrap<Candidate>(value_or_instance, internal::index_sequence_for(internal::function_pointer_t<decltype(Candidate), Type>{}));
+        }
     }
 
     /**
@@ -234,7 +264,7 @@ public:
      */
     Ret operator()(Args... args) const {
         ENTT_ASSERT(fn);
-        return fn(data, std::forward_as_tuple(std::forward<Args>(args)...));
+        return fn(data, std::forward<Args>(args)...);
     }
 
     /**

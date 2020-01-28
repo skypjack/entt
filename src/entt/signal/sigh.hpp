@@ -97,9 +97,9 @@ public:
      * @param args Arguments to use to invoke listeners.
      */
     void publish(Args... args) const {
-        std::for_each(calls.cbegin(), calls.cend(), [&args...](auto &&call) {
+        for(auto &&call: std::as_const(calls)) {
             call(args...);
-        });
+        }
     }
 
     /**
@@ -318,7 +318,7 @@ public:
      * or a bound member.
      * @tparam Candidate Member or free function to look for.
      * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid reference that fits the purpose.
+     * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized sink object.
      */
     template<auto Candidate, typename Type>
@@ -415,7 +415,7 @@ public:
      *
      * @tparam Candidate Function or member to connect to the delegate.
      * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid reference that fits the purpose.
+     * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized connection object.
      */
     template<auto Candidate, typename Type>
@@ -448,7 +448,7 @@ public:
      * signal.
      * @tparam Candidate Function or member to disconnect from the delegate.
      * @tparam Type Type of class or type of payload.
-     * @param value_or_instance A valid reference that fits the purpose.
+     * @param value_or_instance A valid object that fits the purpose.
      */
     template<auto Candidate, typename Type>
     void disconnect(Type &&value_or_instance) {
