@@ -14,6 +14,9 @@
 #endif
 
 
+namespace entt {
+
+
 #ifndef ENTT_PRETTY_FUNCTION
 /**
  * @cond TURN_OFF_DOXYGEN
@@ -21,7 +24,7 @@
  */
 
 
-namespace entt::internal {
+namespace internal {
 
 
 struct ENTT_API type_id_generator {
@@ -40,9 +43,6 @@ struct ENTT_API type_id_generator {
  * @endcond TURN_OFF_DOXYGEN
  */
 #endif
-
-
-namespace entt {
 
 
 /**
