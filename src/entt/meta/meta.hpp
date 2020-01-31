@@ -327,7 +327,14 @@ class meta_any {
 
 public:
     /*! @brief Default constructor. */
-    meta_any() ENTT_NOEXCEPT = default;
+    meta_any() ENTT_NOEXCEPT
+        : storage{},
+          instance{},
+          node{},
+          destroy_fn{},
+          copy_fn{},
+          steal_fn{}
+    {}
 
     /**
      * @brief Constructs a meta any by directly initializing the new object.
@@ -616,7 +623,9 @@ private:
  */
 struct meta_handle {
     /*! @brief Default constructor. */
-    meta_handle() = default;
+    meta_handle()
+        : any{}
+    {}
 
     /**
      * @brief Creates an alias for the actual object.

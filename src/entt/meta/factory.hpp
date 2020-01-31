@@ -362,7 +362,7 @@ public:
     }
 
 private:
-    entt::internal::meta_prop_node **curr{nullptr};
+    entt::internal::meta_prop_node **curr;
 };
 
 
