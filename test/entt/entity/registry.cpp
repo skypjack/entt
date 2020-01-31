@@ -1,4 +1,3 @@
-#include <unordered_map>
 #include <unordered_set>
 #include <functional>
 #include <iterator>
@@ -957,59 +956,6 @@ TEST(Registry, ConstructWithComponents) {
     registry.assign<int>(registry.create(), value);
 }
 
-TEST(Registry, MergeTwoRegistries) {
-    entt::registry src;
-    entt::registry dst;
-
-    std::unordered_map<entt::entity, entt::entity> ref;
-
-    auto merge = [&ref, &dst](const auto &view) {
-        view.each([&](auto entity, const auto &component) {
-            if(ref.find(entity) == ref.cend()) {
-                const auto other = dst.create();
-                dst.template assign<std::decay_t<decltype(component)>>(other, component);
-                ref.emplace(entity, other);
-            } else {
-                using component_type = std::decay_t<decltype(component)>;
-                dst.template assign<component_type>(ref[entity], component);
-            }
-        });
-    };
-
-    auto e0 = src.create();
-    src.assign<int>(e0);
-    src.assign<float>(e0);
-    src.assign<double>(e0);
-
-    auto e1 = src.create();
-    src.assign<char>(e1);
-    src.assign<float>(e1);
-    src.assign<int>(e1);
-
-    auto e2 = dst.create();
-    dst.assign<int>(e2);
-    dst.assign<char>(e2);
-    dst.assign<double>(e2);
-
-    auto e3 = dst.create();
-    dst.assign<float>(e3);
-    dst.assign<int>(e3);
-
-    auto eq = [](auto begin, auto end) { ASSERT_EQ(begin, end); };
-    auto ne = [](auto begin, auto end) { ASSERT_NE(begin, end); };
-
-    eq(dst.view<int, float, double>().begin(), dst.view<int, float, double>().end());
-    eq(dst.view<char, float, int>().begin(), dst.view<char, float, int>().end());
-
-    merge(src.view<int>());
-    merge(src.view<char>());
-    merge(src.view<double>());
-    merge(src.view<float>());
-
-    ne(dst.view<int, float, double>().begin(), dst.view<int, float, double>().end());
-    ne(dst.view<char, float, int>().begin(), dst.view<char, float, int>().end());
-}
-
 TEST(Registry, Signals) {
     entt::registry registry;
     listener listener;
@@ -1603,4 +1549,42 @@ TEST(Registry, AssignEntities) {
     ASSERT_FALSE(other.valid(entities[2]));
     ASSERT_EQ(registry.create(), other.create());
     ASSERT_EQ(other.entity(other.create()), entities[1]);
+}
+
+TEST(Registry, Visit) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    const auto other = registry.create();
+
+    registry.assign<int>(entity);
+    registry.assign<double>(other);
+    registry.assign<char>(entity);
+
+    bool has[3]{};
+
+    auto total = 0;
+    auto esize = 0;
+    auto osize = 0;
+
+    registry.visit([&total](const auto component) {
+        ASSERT_TRUE(total != 0 || component == entt::type_info<char>::id());
+        ASSERT_TRUE(total != 1 || component == entt::type_info<double>::id());
+        ASSERT_TRUE(total != 2 || component == entt::type_info<int>::id());
+        ++total;
+    });
+
+    registry.visit(entity, [&esize](const auto component) {
+        ASSERT_TRUE(esize != 0 || component == entt::type_info<char>::id());
+        ASSERT_TRUE(esize != 1 || component == entt::type_info<int>::id());
+        ++esize;
+    });
+
+    registry.visit(other, [&osize](const auto component) {
+        ASSERT_TRUE(osize != 0 || component == entt::type_info<double>::id());
+        ++osize;
+    });
+
+    ASSERT_EQ(total, 3);
+    ASSERT_EQ(esize, 2);
+    ASSERT_EQ(osize, 1);
 }
