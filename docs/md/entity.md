@@ -23,6 +23,7 @@
     * [Tags](#tags)
     * [Actor](#actor)
     * [Context variables](#context-variables)
+  * [Meet the runtime](#meet-the-runtime)
   * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
     * [Snapshot loader](#snapshot-loader)
     * [Continuous loader](#continuous-loader)
@@ -695,6 +696,32 @@ can be moved. The `set` member function either creates a new instance of the
 context variable or overwrites an already existing one if any. The `try_ctx`
 member function returns a pointer to the context variable if it exists,
 otherwise it returns a null pointer.
+
+## Meet the runtime
+
+Type identifiers are stable in `EnTT` during executions and most of the times
+also across different executions. This makes them suitable to mix runtime and
+compile-time features.<br/>
+The registry offers a couple of functions to _visit_ it and get the types of
+components it manages:
+
+```cpp
+registry.visit([](const auto component) {
+    // ...
+});
+```
+
+Moreover, there exists an overload to _visit_ a specific entity:
+
+```cpp
+registry.visit(entity, [](const auto component) {
+    // ...
+});
+```
+
+This helps to create a bridge between the registry, that is heavily based on the
+C++ type system, and any other context where the compile-time isn't an option.
+For example: plugin systems, meta system, serialization, and so on.
 
 ## Snapshot: complete vs continuous
 
