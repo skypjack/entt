@@ -1560,8 +1560,6 @@ TEST(Registry, Visit) {
     registry.assign<double>(other);
     registry.assign<char>(entity);
 
-    bool has[3]{};
-
     auto total = 0;
     auto esize = 0;
     auto osize = 0;
