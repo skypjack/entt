@@ -202,7 +202,8 @@ class basic_registry {
                 auto &&pdata = pools.emplace_back();
 
                 pdata.type_id = type_info<Component>::id();
-                pdata.pool = std::make_unique<pool_handler<Component>>(std::forward<Args>(args)...);
+                // use reset and new to avoid instantiating an std::unique_ptr for pool_handler<Component>
+                pdata.pool.reset(new pool_handler<Component>(std::forward<Args>(args)...));
 
                 pdata.remove = [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
                     static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
