@@ -50,10 +50,15 @@ First of all, there are two things to do in a Windows project:
 * Set the [`_ITERATOR_DEBUG_LEVEL`](https://docs.microsoft.com/cpp/standard-library/iterator-debug-level)
   macro to 0. This will disable checked iterators and iterator debugging.
 
-Moreover, the macro `ENTT_DISABLE_ASSERT` should be defined to disable internal
-checks made by `EnTT` in debug. These are asserts introduced to help the users,
-but require to access to the underlying containers and therefore risk ruining
-the performance in some cases.
+Moreover, the macro `ENTT_ASSERT` should be redefined to disable internal checks
+made by `EnTT` in debug:
+
+```cpp
+#define ENTT_ASSERT(...) ((void)0)
+```
+
+These asserts are introduced to help the users but they require to access to the
+underlying containers and therefore risk ruining the performance in some cases.
 
 With these changes, debug performance should increase enough for most cases. If
 you want something more, you can can also switch to an optimization level `O0`
