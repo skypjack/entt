@@ -20,6 +20,11 @@
   - get -> all, exclude -> none
 * deprecate sigh::publish, use operator()
 * remove args... from registry::assure and the others (index would be duplicated)
+  - use prepare properly and do not forward to assure
+
+* WIP:
+ - deprecate clone, stamp, snapshot, loader, ...
+ - provide documentation to describe alternatives
 
 * WIP: snapshot rework/deprecation
  - remove snapshot/loader from registry, make them external (faster) tools

@@ -17,7 +17,9 @@ much more written in **modern C++**, mainly known for its innovative
 [Among others](https://github.com/skypjack/entt/wiki/EnTT-in-Action), it's used
 in [**Minecraft**](https://minecraft.net/en-us/attribution/) by Mojang and the
 [**ArcGIS Runtime SDKs**](https://developers.arcgis.com/arcgis-runtime/) by
-Esri. Open an issue or submit a PR if you don't see your project in the list!
+Esri.<br/>
+If you don't see your project in the list, please open an issue, submit a PR or
+add the [#entt](https://github.com/topics/entt) tag to your _topics_! :+1:
 
 ---
 
