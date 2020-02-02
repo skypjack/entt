@@ -179,31 +179,30 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
     template<typename Comp, typename Func, typename... Other, typename... Type>
     void traverse(Func func, type_list<Other...>, type_list<Type...>) const {
-        const auto end = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::end();
-        auto begin = std::get<pool_type<Comp> *>(pools)->sparse_set<Entity>::begin();
-
         if constexpr(std::disjunction_v<std::is_same<Comp, Type>...>) {
-            std::for_each(begin, end, [this, raw = std::get<pool_type<Comp> *>(pools)->begin(), &func](const auto entity) mutable {
+            auto raw = std::get<pool_type<Comp> *>(pools)->begin();
+
+            for(const auto entt: static_cast<const sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
                 auto curr = raw++;
 
-                if((std::get<pool_type<Other> *>(pools)->has(entity) && ...) && (!std::get<pool_type<Exclude> *>(pools)->has(entity) && ...)) {
+                if((std::get<pool_type<Other> *>(pools)->has(entt) && ...) && (!std::get<pool_type<Exclude> *>(pools)->has(entt) && ...)) {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
-                        func(get<Comp, Type>(curr, std::get<pool_type<Type> *>(pools), entity)...);
+                        func(get<Comp, Type>(curr, std::get<pool_type<Type> *>(pools), entt)...);
                     } else {
-                        func(entity, get<Comp, Type>(curr, std::get<pool_type<Type> *>(pools), entity)...);
+                        func(entt, get<Comp, Type>(curr, std::get<pool_type<Type> *>(pools), entt)...);
                     }
                 }
-            });
+            }
         } else {
-            std::for_each(begin, end, [this, &func](const auto entity) {
-                if((std::get<pool_type<Other> *>(pools)->has(entity) && ...) && (!std::get<pool_type<Exclude> *>(pools)->has(entity) && ...)) {
+            for(const auto entt: static_cast<const sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
+                if((std::get<pool_type<Other> *>(pools)->has(entt) && ...) && (!std::get<pool_type<Exclude> *>(pools)->has(entt) && ...)) {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
-                        func(std::get<pool_type<Type> *>(pools)->get(entity)...);
+                        func(std::get<pool_type<Type> *>(pools)->get(entt)...);
                     } else {
-                        func(entity, std::get<pool_type<Type> *>(pools)->get(entity)...);
+                        func(entt, std::get<pool_type<Type> *>(pools)->get(entt)...);
                     }
                 }
-            });
+            }
         }
     }
 
@@ -732,11 +731,15 @@ public:
     template<typename Func>
     void each(Func func) const {
         if constexpr(std::is_invocable_v<Func, decltype(get({}))>) {
-            std::for_each(pool->begin(), pool->end(), std::move(func));
+            for(auto &&component: *pool) {
+                func(component);
+            }
         } else {
-            std::for_each(pool->sparse_set<Entity>::begin(), pool->sparse_set<Entity>::end(), [&func, raw = pool->begin()](const auto entt) mutable {
+            auto raw = pool->begin();
+
+            for(const auto entt: *this) {
                 func(entt, *(raw++));
-            });
+            }
         }
     }
 
@@ -776,7 +779,9 @@ public:
                     func();
                 }
             } else {
-                std::for_each(pool->sparse_set<Entity>::begin(), pool->sparse_set<Entity>::end(), std::move(func));
+                for(const auto entt: *this) {
+                    func(entt);
+                }
             }
         } else {
             each(std::move(func));

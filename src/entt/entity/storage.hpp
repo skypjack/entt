@@ -347,7 +347,7 @@ public:
     template<typename It>
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
     construct(It first, It last) {
-        instances.resize(instances.size() + std::distance(first, last), object_type{});
+        instances.insert(instances.end(), std::distance(first, last), object_type{});
         // entities go after components in case constructors throw
         underlying_type::construct(first, last);
     }

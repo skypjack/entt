@@ -87,7 +87,7 @@ class dispatcher {
             for(index = {}; index < length && pools[index]->type_id() != type_info<Event>::id(); ++index);
 
             if(index == pools.size()) {
-                pools.push_back(std::make_unique<pool_handler<Event>>());
+                pools.emplace_back(new pool_handler<Event>{});
             }
         }
 
