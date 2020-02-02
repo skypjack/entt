@@ -1274,12 +1274,12 @@ TEST(Registry, Clone) {
 
     const auto e0 = registry.create();
     registry.assign<int>(e0, 0);
-    registry.assign<double>(e0, 0.0);
+    registry.assign<empty_type>(e0);
 
     const auto e1 = registry.create();
     registry.assign<int>(e1, 1);
     registry.assign<char>(e1, '1');
-    registry.assign<double>(e1, 1.1);
+    registry.assign<empty_type>(e1);
 
     const auto e2 = registry.create();
     registry.assign<int>(e2, 2);
@@ -1299,8 +1299,8 @@ TEST(Registry, Clone) {
     ASSERT_FALSE(other.valid(e1));
     ASSERT_TRUE(other.valid(e2));
 
-    ASSERT_TRUE((other.any<int, double>(e0)));
-    ASSERT_FALSE((other.has<double>(e0)));
+    ASSERT_TRUE((other.any<int, empty_type>(e0)));
+    ASSERT_FALSE((other.has<empty_type>(e0)));
     ASSERT_TRUE((other.has<int, char>(e2)));
 
     ASSERT_EQ(other.get<int>(e0), 0);
@@ -1329,11 +1329,11 @@ TEST(Registry, Clone) {
     ASSERT_TRUE(other.valid(e2));
     ASSERT_FALSE(other.valid(e3));
 
-    ASSERT_TRUE((other.has<int, double>(e0)));
+    ASSERT_TRUE((other.has<int, empty_type>(e0)));
     ASSERT_TRUE((other.has<int, char>(e2)));
 
     ASSERT_EQ(other.get<int>(e0), 0);
-    ASSERT_EQ(other.get<double>(e0), 0.);
+    ASSERT_TRUE(other.has<empty_type>(e0));
     ASSERT_EQ(other.get<int>(e2), 2);
     ASSERT_EQ(other.get<char>(e2), '2');
 
@@ -1347,7 +1347,7 @@ TEST(Registry, Clone) {
     ASSERT_TRUE(other.valid(e2));
     ASSERT_FALSE(other.valid(e3));
 
-    ASSERT_FALSE((other.any<int, double>(e0)));
+    ASSERT_FALSE((other.any<int, empty_type>(e0)));
     ASSERT_FALSE((other.has<int>(e2)));
     ASSERT_TRUE((other.has<char>(e2)));
 
