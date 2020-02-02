@@ -74,6 +74,10 @@ Here is a minimal example for the sake of curiosity:
 struct my_process: entt::process<my_process, std::uint32_t> {
     using delta_type = std::uint32_t;
 
+    my_process(delta_type delay)
+        : remaining{delay}
+    {}
+
     void update(delta_type delta, void *) {
         remaining -= std::min(remaining, delta);
 
@@ -85,7 +89,7 @@ struct my_process: entt::process<my_process, std::uint32_t> {
     }
 
 private:
-    delta_type remaining{1000u};
+    delta_type remaining;
 };
 ```
 
@@ -158,7 +162,7 @@ To attach a process to a scheduler there are mainly two ways:
   the `attach` member function:
 
   ```cpp
-  scheduler.attach<my_process>("foobar");
+  scheduler.attach<my_process>(1000u);
   ```
 
 * Otherwise, in case of a lambda or a functor, it's enough to provide an
@@ -182,7 +186,7 @@ scheduler.attach([](auto delta, void *, auto succeed, auto fail) {
     // ...
 })
 // appends a child in the form of a process class
-.then<my_process>();
+.then<my_process>(1000u);
 ```
 
 To update a scheduler and therefore all its processes, the `update` member

@@ -19,6 +19,9 @@
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none
 * deprecate sigh::publish, use operator()
+* meta:
+  - type -> alias, resolve search by type id and alias
+  - no longer detached unnamed types, all them are "searchable"
 * remove args... from registry::assure and the others (index would be duplicated)
   - use prepare properly and do not forward to assure
 
