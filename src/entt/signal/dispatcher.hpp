@@ -6,7 +6,6 @@
 #include <memory>
 #include <cstddef>
 #include <utility>
-#include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/type_info.hpp"
@@ -84,10 +83,8 @@ class dispatcher {
         static_assert(std::is_same_v<Event, std::decay_t<Event>>);
         static std::size_t index{pools.size()};
 
-        if(!(index < pools.size()) || pools[index]->type_id() != type_info<Event>::id()) {
-            index = std::find_if(pools.cbegin(), pools.cend(), [](auto &&cpool) {
-                return cpool->type_id() == type_info<Event>::id();
-            }) - pools.cbegin();
+        if(const auto length = pools.size(); !(index < length) || pools[index]->type_id() != type_info<Event>::id()) {
+            for(index = {}; index < length && pools[index]->type_id() != type_info<Event>::id(); ++index);
 
             if(index == pools.size()) {
                 pools.push_back(std::make_unique<pool_handler<Event>>());
@@ -189,9 +186,9 @@ public:
     template<typename... Event>
     void clear() {
         if constexpr(sizeof...(Event) == 0) {
-            std::for_each(pools.begin(), pools.end(), [](auto &&cpool) {
+            for(auto &&cpool: pools) {
                 cpool->clear();
-            });
+            }
         } else {
             (assure<Event>().clear(), ...);
         }
