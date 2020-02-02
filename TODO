@@ -22,8 +22,7 @@
 * meta:
   - type -> alias, resolve search by type id and alias
   - no longer detached unnamed types, all them are "searchable"
-* remove args... from registry::assure and the others (index would be duplicated)
-  - use prepare properly and do not forward to assure
+* review prepare after clone and the others have been removed
 
 * WIP:
  - deprecate clone, stamp, snapshot, loader, ...
