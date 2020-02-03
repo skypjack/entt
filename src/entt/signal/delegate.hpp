@@ -106,7 +106,7 @@ class delegate<Ret(Args...)> {
     }
 
     template<auto Candidate, typename Type, std::size_t... Index>
-    auto wrap(Type &value_or_instance, std::index_sequence<Index...>) ENTT_NOEXCEPT {
+    auto wrap(Type &, std::index_sequence<Index...>) ENTT_NOEXCEPT {
         return [](const void *payload, Args... args) -> Ret {
             const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
             Type *curr = static_cast<Type *>(const_cast<std::conditional_t<std::is_const_v<Type>, const void *, void *>>(payload));
@@ -115,7 +115,7 @@ class delegate<Ret(Args...)> {
     }
 
     template<auto Candidate, typename Type, std::size_t... Index>
-    auto wrap(Type *value_or_instance, std::index_sequence<Index...>) ENTT_NOEXCEPT {
+    auto wrap(Type *, std::index_sequence<Index...>) ENTT_NOEXCEPT {
         return [](const void *payload, Args... args) -> Ret {
             const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
             Type *curr = static_cast<Type *>(const_cast<std::conditional_t<std::is_const_v<Type>, const void *, void *>>(payload));
