@@ -11,6 +11,11 @@
 
 struct empty_type {};
 
+struct non_default_constructible {
+    non_default_constructible(int i): i{i} {}
+    int i;
+};
+
 struct listener {
     template<typename Component>
     static void sort(entt::registry &registry) {
@@ -1492,10 +1497,15 @@ TEST(Registry, BatchCreateAmbiguousCall) {
 }
 
 TEST(Registry, MoveOnlyComponent) {
-    // the purpose is to ensure that move only components are always accepted
     entt::registry registry;
-    const auto entity = registry.create();
-    registry.assign<std::unique_ptr<int>>(entity);
+    // the purpose is to ensure that move only types are always accepted
+    registry.assign<std::unique_ptr<int>>(registry.create());
+}
+
+TEST(Registry, NonDefaultConstructibleComponent) {
+    entt::registry registry;
+    // the purpose is to ensure that non default constructible type are always accepted
+    registry.assign<non_default_constructible>(registry.create(), 42);
 }
 
 TEST(Registry, Dependencies) {
