@@ -315,17 +315,21 @@ TEST(Registry, CreateManyEntitiesAtOnceWithListener) {
 
     registry.on_construct<int>().connect<&listener::incr<int>>(listener);
     registry.create(std::begin(entities), std::end(entities));
-    registry.assign<int>(std::begin(entities), std::end(entities));
-    registry.assign<char>(std::begin(entities), std::end(entities));
+    registry.assign(std::begin(entities), std::end(entities), 42);
+    registry.assign(std::begin(entities), std::end(entities), 'c');
 
+    ASSERT_EQ(registry.get<int>(entities[0]), 42);
+    ASSERT_EQ(registry.get<char>(entities[1]), 'c');
     ASSERT_EQ(listener.counter, 3);
 
     registry.on_construct<int>().disconnect<&listener::incr<int>>(listener);
     registry.on_construct<empty_type>().connect<&listener::incr<empty_type>>(listener);
     registry.create(std::begin(entities), std::end(entities));
-    registry.assign<char>(std::begin(entities), std::end(entities));
+    registry.assign(std::begin(entities), std::end(entities), 'a');
     registry.assign<empty_type>(std::begin(entities), std::end(entities));
 
+    ASSERT_TRUE(registry.has<empty_type>(entities[0]));
+    ASSERT_EQ(registry.get<char>(entities[2]), 'a');
     ASSERT_EQ(listener.counter, 6);
 }
 
@@ -1131,18 +1135,19 @@ TEST(Registry, RangeAssign) {
     ASSERT_FALSE(registry.has<float>(e2));
 
     const auto view = registry.view<int, char>();
-    registry.assign<float>(view.begin(), view.end());
+    registry.assign(view.begin(), view.end(), 3.f);
 
-    ASSERT_EQ(registry.get<float>(e0), 0.f);
-    ASSERT_EQ(registry.get<float>(e1), 0.f);
+    ASSERT_EQ(registry.get<float>(e0), 3.f);
+    ASSERT_EQ(registry.get<float>(e1), 3.f);
     ASSERT_FALSE(registry.has<float>(e2));
 
     registry.clear<float>();
-    registry.assign<float>(registry.data<int>(), registry.data<int>() + registry.size<int>(), [](float *raw) { *(++raw) = 1.f; });
+    float value[3]{0.f, 1.f, 2.f};
+    registry.assign<float>(registry.data<int>(), registry.data<int>() + registry.size<int>(), value);
 
     ASSERT_EQ(registry.get<float>(e0), 0.f);
     ASSERT_EQ(registry.get<float>(e1), 1.f);
-    ASSERT_EQ(registry.get<float>(e2), 0.f);
+    ASSERT_EQ(registry.get<float>(e2), 2.f);
 }
 
 TEST(Registry, RangeRemove) {

@@ -329,10 +329,8 @@ public:
     }
 
     /**
-     * @brief Assigns one or more entities to a storage and default constructs
-     * their objects.
-     *
-     * The object type must be at least move and default insertable.
+     * @brief Assigns one or more entities to a storage and constructs their
+     * objects with from a given instance.
      *
      * @warning
      * Attempting to assign an entity that already belongs to the storage
@@ -343,11 +341,32 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @param value An instance of the object to construct.
      */
     template<typename It>
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    construct(It first, It last) {
-        instances.insert(instances.end(), std::distance(first, last), object_type{});
+    construct(It first, It last, const object_type &value = {}) {
+        instances.insert(instances.end(), std::distance(first, last), value);
+        // entities go after components in case constructors throw
+        underlying_type::construct(first, last);
+    }
+
+    /**
+     * @brief Assigns one or more entities to a storage and constructs their
+     * objects from a given range.
+     *
+     * @sa construct
+     *
+     * @tparam EIt Type of input iterator.
+     * @tparam CIt Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     * @param value An iterator to the first element of the range of objects.
+     */
+    template<typename EIt, typename CIt>
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<EIt>::value_type, entity_type>, void>
+    construct(EIt first, EIt last, CIt value) {
+        instances.insert(instances.end(), value, value + std::distance(first, last));
         // entities go after components in case constructors throw
         underlying_type::construct(first, last);
     }
@@ -675,7 +694,7 @@ public:
      */
     template<typename It>
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    construct(It first, It last) {
+    construct(It first, It last, const object_type & = {}) {
         underlying_type::construct(first, last);
     }
 

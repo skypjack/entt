@@ -69,11 +69,10 @@ class basic_registry {
             return this->get(entt);
         }
 
-        template<typename It, typename... Func>
+        template<typename It, typename... Value>
         std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, Entity>, void>
-        assign(basic_registry &owner, It first, It last, Func... func) {
-            this->construct(first, last);
-            (func(this->raw() + this->size() - std::distance(first, last)), ...);
+        assign(basic_registry &owner, It first, It last, Value &&... value) {
+            this->construct(first, last, std::forward<Value>(value)...);
 
             if(!construction.empty()) {
                 std::for_each(first, last, [this, &owner](const auto entt) { construction.publish(owner, entt); });
@@ -213,10 +212,7 @@ class basic_registry {
                         if constexpr(ENTT_ENABLE_ETO(Component)) {
                             other.assure<Component>().assign(other, cpool.begin(), cpool.end());
                         } else {
-                            other.assure<Component>().assign(other, cpool.begin(), cpool.end(), [&cpool](auto *instance) {
-                                const auto &source = static_cast<const pool_handler<Component> &>(cpool);
-                                std::copy(source.cbegin(), source.cend(), instance);
-                            });
+                            other.assure<Component>().assign(other, cpool.begin(), cpool.end(), static_cast<const pool_handler<Component> &>(cpool).cbegin());
                         }
                     };
 
@@ -635,32 +631,38 @@ public:
     /**
      * @brief Assigns each entity in a range the given component.
      *
-     * Function objects are optional. They are invoked to give the caller a
-     * chance to initialize the components before they are passed to any
-     * registered listener.<br/>
-     * The signature of the functions should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(It it);
-     * @endcode
-     *
-     * Where `it` is an iterator to the first element of the range of newly
-     * created objects.
-     *
      * @sa assign
      *
      * @tparam Component Type of component to create.
      * @tparam It Type of input iterator.
-     * @tparam Func Types of the function objects to invoke.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param func Valid function objects.
+     * @param value An instance of the component to assign.
      */
-    template<typename Component, typename It, typename... Func>
+    template<typename Component, typename It>
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    assign(It first, It last, Func... func) {
+    assign(It first, It last, const Component &value = {}) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        assure<Component>().assign(*this, first, last, std::move(func)...);
+        assure<Component>().assign(*this, first, last, value);
+    }
+
+    /**
+     * @brief Assigns each entity in a range the given components.
+     *
+     * @sa assign
+     *
+     * @tparam Component Type of component to create.
+     * @tparam EIt Type of input iterator.
+     * @tparam CIt Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     * @param value An iterator to the first element of the range of components.
+     */
+    template<typename Component, typename EIt, typename CIt>
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<EIt>::value_type, entity_type>, void>
+    assign(EIt first, EIt last, CIt value) {
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
+        assure<Component>().assign(*this, first, last, value);
     }
 
     /**

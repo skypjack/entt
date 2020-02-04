@@ -100,7 +100,7 @@ TEST(Storage, BatchAdd) {
 
     entities[0] = entt::entity{3};
     entities[1] = entt::entity{42};
-    pool.construct(std::begin(entities), std::end(entities));
+    pool.construct(std::begin(entities), std::end(entities), {});
 
     ASSERT_TRUE(pool.has(entities[0]));
     ASSERT_TRUE(pool.has(entities[1]));

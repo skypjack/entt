@@ -206,8 +206,26 @@ vel.dx = 0.;
 vel.dy = 0.;
 ```
 
-This function is overloaded and accepts also a couple of iterators to be used to
-assign the same component to multiple entities at once.
+This function is overloaded and accepts also a couple of iterators in order to:
+
+* Assign the same component to multiple entities at once when a type is
+  specified as a template parameter or an instance is passed as an argument.
+
+  ```cpp
+  // default initialized type assigned by copy to all entities
+  registry.assign<position>(first, last);
+
+  // user-defined instance assigned by copy to all entities
+  registry.assign(from, to, position{0., 0.});
+  ```
+
+* Assign a range of components to multiple entities when a range is provided
+  (the length of the range of components must be the same of that of entities):
+
+  ```cpp
+  // first and last specify the range of entities, instances points to the first element of the range of components
+  registry.assign<position>(first, last, instances);
+  ```
 
 If an entity already has the given component, the `replace` member function
 template can be used to replace it:
