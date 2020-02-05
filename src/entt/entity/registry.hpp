@@ -1633,6 +1633,63 @@ public:
     }
 
     /**
+     * @brief Visits an entity and returns the types for its components.
+     *
+     * The signature of the function should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * void(const ENTT_ID_TYPE);
+     * @endcode
+     *
+     * Returned identifiers are those of the components owned by the entity.
+     *
+     * @sa type_info
+     *
+     * @warning
+     * It's not specified whether a component attached to or removed from the
+     * given entity during the visit is returned or not to the caller.
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param entity A valid entity identifier.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void visit(entity_type entity, Func func) const {
+        for(auto pos = pools.size(); pos; --pos) {
+            if(auto &pdata = pools[pos-1]; pdata.pool->has(entity)) {
+                func(pdata.type_id);
+            }
+        }
+    }
+
+    /**
+     * @brief Visits a registry and returns the types for its components.
+     *
+     * The signature of the function should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * void(const ENTT_ID_TYPE);
+     * @endcode
+     *
+     * Returned identifiers are those of the components managed by the registry.
+     *
+     * @sa type_info
+     *
+     * @warning
+     * It's not specified whether a component for which a pool is created during
+     * the visit is returned or not to the caller.
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void visit(Func func) const {
+        for(auto pos = pools.size(); pos; --pos) {
+            func(pools[pos-1].type_id);
+        }
+    }
+
+    /**
      * @brief Binds an object to the context of the registry.
      *
      * If the value already exists it is overwritten, otherwise a new instance
@@ -1719,63 +1776,6 @@ public:
     template<typename Type>
     Type & ctx() {
         return const_cast<Type &>(std::as_const(*this).template ctx<Type>());
-    }
-
-    /**
-     * @brief Visits an entity and returns the types for its components.
-     *
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(const ENTT_ID_TYPE);
-     * @endcode
-     *
-     * Returned identifiers are those of the components owned by the entity.
-     *
-     * @sa type_info
-     *
-     * @warning
-     * It's not specified whether a component attached to or removed from the
-     * given entity during the visit is returned or not to the caller.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param entity A valid entity identifier.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void visit(entity_type entity, Func func) {
-        for(auto pos = pools.size(); pos; --pos) {
-            if(auto &pdata = pools[pos-1]; pdata.pool->has(entity)) {
-                func(pdata.type_id);
-            }
-        }
-    }
-
-    /**
-     * @brief Visits a registry and returns the types for its components.
-     *
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(const ENTT_ID_TYPE);
-     * @endcode
-     *
-     * Returned identifiers are those of the components managed by the registry.
-     *
-     * @sa type_info
-     *
-     * @warning
-     * It's not specified whether a component for which a pool is created during
-     * the visit is returned or not to the caller.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void visit(Func func) {
-        for(auto pos = pools.size(); pos; --pos) {
-            func(pools[pos-1].type_id);
-        }
     }
 
 private:
