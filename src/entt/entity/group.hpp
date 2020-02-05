@@ -233,6 +233,26 @@ public:
     }
 
     /**
+     * @brief Returns the first entity that has the given components, if any.
+     * @return The first entity that has the given components if one exists, the
+     * null entity otherwise.
+     */
+    entity_type front() const {
+        const auto it = begin();
+        return it != end() ? *it : null;
+    }
+
+    /**
+     * @brief Returns the last entity that has the given components, if any.
+     * @return The last entity that has the given components if one exists, the
+     * null entity otherwise.
+     */
+    entity_type back() const {
+        const auto it = std::make_reverse_iterator(end());
+        return it != std::make_reverse_iterator(begin()) ? *it : null;
+    }
+
+    /**
      * @brief Finds an entity.
      * @param entt A valid entity identifier.
      * @return An iterator to the given entity if it's found, past the end
@@ -646,6 +666,26 @@ public:
      */
     iterator_type end() const ENTT_NOEXCEPT {
         return std::get<0>(pools)->sparse_set<entity_type>::end();
+    }
+
+    /**
+     * @brief Returns the first entity that has the given components, if any.
+     * @return The first entity that has the given components if one exists, the
+     * null entity otherwise.
+     */
+    entity_type front() const {
+        const auto it = begin();
+        return it != end() ? *it : null;
+    }
+
+    /**
+     * @brief Returns the last entity that has the given components, if any.
+     * @return The last entity that has the given components if one exists, the
+     * null entity otherwise.
+     */
+    entity_type back() const {
+        const auto it = std::make_reverse_iterator(end());
+        return it != std::make_reverse_iterator(begin()) ? *it : null;
     }
 
     /**

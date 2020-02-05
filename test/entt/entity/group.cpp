@@ -490,6 +490,28 @@ TEST(NonOwningGroup, Less) {
     registry.group(entt::get<int, char, double>).less([](const auto, int, char, double) { FAIL(); });
 }
 
+TEST(NonOwningGroup, FrontBack) {
+    entt::registry registry;
+    auto group = registry.group<>(entt::get<const int, const char>);
+
+    ASSERT_EQ(group.front(), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(group.back(), static_cast<entt::entity>(entt::null));
+
+    const auto e0 = registry.create();
+    registry.assign<int>(e0);
+    registry.assign<char>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
+
+    const auto entity = registry.create();
+    registry.assign<char>(entity);
+
+    ASSERT_EQ(group.front(), e1);
+    ASSERT_EQ(group.back(), e0);
+}
+
 TEST(NonOwningGroup, SignalRace) {
     entt::registry registry;
     registry.on_construct<double>().connect<&entt::registry::assign_or_replace<int>>();
@@ -1064,6 +1086,28 @@ TEST(OwningGroup, Less) {
     });
 
     registry.group<double>(entt::get<int, char>).less([](const auto, double, int, char) { FAIL(); });
+}
+
+TEST(OwningGroup, FrontBack) {
+    entt::registry registry;
+    auto group = registry.group<const char>(entt::get<const int>);
+
+    ASSERT_EQ(group.front(), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(group.back(), static_cast<entt::entity>(entt::null));
+
+    const auto e0 = registry.create();
+    registry.assign<int>(e0);
+    registry.assign<char>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
+
+    const auto entity = registry.create();
+    registry.assign<char>(entity);
+
+    ASSERT_EQ(group.front(), e1);
+    ASSERT_EQ(group.back(), e0);
 }
 
 TEST(OwningGroup, SignalRace) {
