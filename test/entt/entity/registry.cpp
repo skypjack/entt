@@ -60,6 +60,15 @@ TEST(Registry, Context) {
     registry.unset<int>();
     registry.unset<double>();
 
+    auto count = 0;
+
+    registry.ctx([&count](const auto var) {
+        ASSERT_EQ(var, entt::type_info<char>::id());
+        ++count;
+    });
+
+    ASSERT_EQ(count, 1);
+
     ASSERT_NE(registry.try_ctx<char>(), nullptr);
     ASSERT_EQ(registry.try_ctx<int>(), nullptr);
     ASSERT_EQ(registry.try_ctx<double>(), nullptr);

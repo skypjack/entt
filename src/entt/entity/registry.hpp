@@ -172,7 +172,7 @@ class basic_registry {
 
     struct basic_variable {
         virtual ~basic_variable() = default;
-        virtual ENTT_ID_TYPE id() const ENTT_NOEXCEPT = 0;
+        virtual ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Type>
@@ -185,7 +185,7 @@ class basic_registry {
             : value{std::forward<Args>(args)...}
         {}
 
-        ENTT_ID_TYPE id() const ENTT_NOEXCEPT override {
+        ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT override {
             return type_info<Type>::id();
         }
     };
@@ -1714,7 +1714,7 @@ public:
     template<typename Type>
     void unset() {
         vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &&handler) {
-            return handler->id() == type_info<Type>::id();
+            return handler->type_id() == type_info<Type>::id();
         }), vars.end());
     }
 
@@ -1743,7 +1743,7 @@ public:
      */
     template<typename Type>
     const Type * try_ctx() const {
-        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&handler) { return handler->id() == type_info<Type>::id(); });
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&handler) { return handler->type_id() == type_info<Type>::id(); });
         return it == vars.cend() ? nullptr : &static_cast<const variable_handler<Type> &>(*it->get()).value;
     }
 
@@ -1776,6 +1776,33 @@ public:
     template<typename Type>
     Type & ctx() {
         return const_cast<Type &>(std::as_const(*this).template ctx<Type>());
+    }
+
+    /**
+     * @brief Visits a registry and returns the types for its context variables.
+     *
+     * The signature of the function should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * void(const ENTT_ID_TYPE);
+     * @endcode
+     *
+     * Returned identifiers are those of the context variables currently set.
+     *
+     * @sa type_info
+     *
+     * @warning
+     * It's not specified whether a context variable created during the visit is
+     * returned or not to the caller.
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void ctx(Func func) const {
+        for(auto pos = vars.size(); pos; --pos) {
+            func(vars[pos-1]->type_id());
+        }
     }
 
 private:
