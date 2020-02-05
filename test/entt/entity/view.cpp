@@ -220,6 +220,23 @@ TEST(SingleComponentView, Less) {
     });
 }
 
+TEST(SingleComponentView, FrontBack) {
+    entt::registry registry;
+    auto view = registry.view<const int>();
+
+    ASSERT_EQ(view.front(), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(view.back(), static_cast<entt::entity>(entt::null));
+
+    const auto e0 = registry.create();
+    registry.assign<int>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+
+    ASSERT_EQ(view.front(), e1);
+    ASSERT_EQ(view.back(), e0);
+}
+
 TEST(MultiComponentView, Functionalities) {
     entt::registry registry;
     auto view = registry.view<int, char>();
@@ -568,4 +585,26 @@ TEST(MultiComponentView, Less) {
     registry.view<int, char, double>().less([entity](const auto entt, int, char, double) {
         ASSERT_EQ(entity, entt);
     });
+}
+
+TEST(MultiComponentView, FrontBack) {
+    entt::registry registry;
+    auto view = registry.view<const int, const char>();
+
+    ASSERT_EQ(view.front(), static_cast<entt::entity>(entt::null));
+    ASSERT_EQ(view.back(), static_cast<entt::entity>(entt::null));
+
+    const auto e0 = registry.create();
+    registry.assign<int>(e0);
+    registry.assign<char>(e0);
+
+    const auto e1 = registry.create();
+    registry.assign<int>(e1);
+    registry.assign<char>(e1);
+
+    const auto entity = registry.create();
+    registry.assign<char>(entity);
+
+    ASSERT_EQ(view.front(), e1);
+    ASSERT_EQ(view.back(), e0);
 }
