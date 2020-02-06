@@ -1,4 +1,4 @@
-﻿#ifndef ENTT_ENTITY_REGISTRY_HPP
+#ifndef ENTT_ENTITY_REGISTRY_HPP
 #define ENTT_ENTITY_REGISTRY_HPP
 
 
@@ -48,7 +48,11 @@ class basic_registry {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>);
         std::size_t super{};
 
-        using storage<Entity, Component>::storage;
+        template<typename... Args>
+        pool_handler(Args &&... args)
+            : storage<Entity, Component>{std::forward<Args>(args)...},
+              super{}
+        {}
 
         auto on_construct() ENTT_NOEXCEPT {
             return sink{construction};
@@ -103,7 +107,7 @@ class basic_registry {
         decltype(auto) replace(basic_registry &owner, const Entity entt, Args &&... args) {
             Component component{std::forward<Args>(args)...};
             update.publish(owner, entt, component);
-            return (this->get(entt) = std::move(component));
+            return storage<Entity, Component>::replace(entt, std::move(component));
         }
 
     private:
@@ -191,8 +195,8 @@ class basic_registry {
         }
     };
 
-    template<typename Component>
-    const pool_handler<Component> & assure() const {
+    template<typename Component, typename... Args>
+    const pool_handler<Component> & assure(Args &&... args) const {
         static std::size_t index{pools.size()};
 
         if(const auto length = pools.size(); !(index < length) || pools[index].type_id != type_info<Component>::id()) {
@@ -202,8 +206,7 @@ class basic_registry {
                 auto &&pdata = pools.emplace_back();
 
                 pdata.type_id = type_info<Component>::id();
-                // use reset and new to avoid instantiating std::unique_ptr with pool_handler<Component>
-                pdata.pool.reset(new pool_handler<Component>());
+                pdata.pool = std::make_unique<pool_handler<Component>>(std::forward<Args>(args)...);
 
                 pdata.remove = [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
                     static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
@@ -211,14 +214,7 @@ class basic_registry {
 
                 if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
                     pdata.assure = [](basic_registry &other, const sparse_set<entity_type> &cpool) {
-                        if constexpr(ENTT_ENABLE_ETO(Component)) {
-                            other.assure<Component>().assign(other, cpool.begin(), cpool.end());
-                        } else {
-                            other.assure<Component>().assign(other, cpool.begin(), cpool.end(), [&cpool](auto *instance) {
-                                const auto &source = static_cast<const pool_handler<Component> &>(cpool);
-                                std::copy(source.cbegin(), source.cend(), instance);
-                            });
-                        }
+                        other.assure<Component>(static_cast<const pool_handler<Component> &>(cpool));
                     };
 
                     pdata.stamp = [](basic_registry &other, const entity_type dst, const sparse_set<entity_type> &cpool, const entity_type src) {
@@ -256,11 +252,13 @@ public:
     /**
      * @brief Prepares a pool for the given type if required.
      * @tparam Component Type of component for which to prepare a pool.
+     * @tparam Args Types of arguments to use to prepare the pool.
+     * @param args Parameters to use to initialize the pool.
      */
-    template<typename Component>
-    void prepare() {
+    template<typename Component, typename... Args>
+    void prepare(Args &&... args) {
         ENTT_ASSERT(std::none_of(pools.cbegin(), pools.cend(), [](auto &&pdata) { return pdata.type_id == type_info<Component>::id(); }));
-        assure<Component>();
+        assure<Component>(std::forward<Args>(args)...);
     }
 
     /**
@@ -944,6 +942,7 @@ public:
     }
 
     /**
+
      * @brief Clears a whole registry or the pools for the given components.
      * @tparam Component Types of components to remove from their entities.
      */
@@ -1513,18 +1512,16 @@ public:
         other.destroyed = destroyed;
         other.entities = entities;
 
-        std::for_each(pools.cbegin(), pools.cend(), [&other](auto &&pdata) {
-            if constexpr(sizeof...(Component) == 0) {
+        if constexpr(sizeof...(Component) == 0) {
+            std::for_each(pools.cbegin(), pools.cend(), [&other](auto &&pdata) {
                 if(pdata.assure && ((pdata.type_id != type_info<Exclude>::id()) && ...)) {
                     pdata.assure(other, *pdata.pool);
                 }
-            } else {
-                static_assert(sizeof...(Exclude) == 0 && std::conjunction_v<std::is_copy_constructible<Component>...>);
-                if(pdata.assure && ((pdata.type_id == type_info<Component>::id()) || ...)) {
-                    pdata.assure(other, *pdata.pool);
-                }
-            }
-        });
+            });
+        } else {
+            static_assert(sizeof...(Exclude) == 0 && std::conjunction_v<std::is_copy_constructible<Component>...>);
+            (other.assure<Component>(assure<Component>()), ...);
+        }
 
         return other;
     }
@@ -1718,63 +1715,6 @@ public:
     template<typename Type>
     Type & ctx() {
         return const_cast<Type &>(std::as_const(*this).template ctx<Type>());
-    }
-
-    /**
-     * @brief Visits an entity and returns the types for its components.
-     *
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(const ENTT_ID_TYPE);
-     * @endcode
-     *
-     * Returned identifiers are those of the components owned by the entity.
-     *
-     * @sa type_info
-     *
-     * @warning
-     * It's not specified whether a component attached to or removed from the
-     * given entity during the visit is returned or not to the caller.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param entity A valid entity identifier.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void visit(entity_type entity, Func func) {
-        for(auto pos = pools.size(); pos; --pos) {
-            if(auto &pdata = pools[pos-1]; pdata.pool->has(entity)) {
-                func(pdata.type_id);
-            }
-        }
-    }
-
-    /**
-     * @brief Visits a registry and returns the types for its components.
-     *
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(const ENTT_ID_TYPE);
-     * @endcode
-     *
-     * Returned identifiers are those of the components managed by the registry.
-     *
-     * @sa type_info
-     *
-     * @warning
-     * It's not specified whether a component for which a pool is created during
-     * the visit is returned or not to the caller.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void visit(Func func) {
-        for(auto pos = pools.size(); pos; --pos) {
-            func(pools[pos-1].type_id);
-        }
     }
 
 private:

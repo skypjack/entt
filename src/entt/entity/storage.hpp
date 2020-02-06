@@ -286,6 +286,25 @@ public:
     }
 
     /**
+     * @brief Replaces the object associated with an entity.
+     *
+     * @warning
+     * Attempting to use an entity that doesn't belong to the storage results in
+     * undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * storage doesn't contain the given entity.
+     *
+     * @param entt A valid entity identifier.
+     * @param object - the replacement component
+     * @return The new object associated with the entity.
+     */
+    object_type & replace(const entity_type entt, object_type&& object)
+    {
+        return get(entt) = std::move(object);
+    }
+
+
+    /**
      * @brief Returns a pointer to the object associated with an entity, if any.
      * @param entt A valid entity identifier.
      * @return The object associated with the entity, if any.
@@ -641,6 +660,28 @@ public:
     object_type get([[maybe_unused]] const entity_type entt) const {
         ENTT_ASSERT(underlying_type::has(entt));
         return {};
+    }
+
+    /**
+    * @brief Replaces the object associated with an entity.
+    *
+    * @note
+    * Empty types aren't explicitly instantiated. Therefore, this function
+    * always returns what is passed in.
+    *
+    * @warning
+    * Attempting to use an entity that doesn't belong to the storage results in
+    * undefined behavior.<br/>
+    * An assertion will abort the execution at runtime in debug mode if the
+    * storage doesn't contain the given entity.
+    *
+    * @param entt A valid entity identifier.
+    * @param object The 'replacement' object 
+    * @return The object associated with the entity.
+    */
+    object_type replace([[maybe_unused]] const entity_type entt, object_type&& object) const {
+        ENTT_ASSERT(underlying_type::has(entt));
+        return object;
     }
 
     /**
