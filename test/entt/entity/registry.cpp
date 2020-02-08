@@ -12,8 +12,8 @@
 struct empty_type {};
 
 struct non_default_constructible {
-    non_default_constructible(int i): i{i} {}
-    int i;
+    non_default_constructible(int v): value{v} {}
+    int value;
 };
 
 struct listener {

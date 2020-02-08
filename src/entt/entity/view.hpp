@@ -180,10 +180,10 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     template<typename Comp, typename Func, typename... Other, typename... Type>
     void traverse(Func func, type_list<Other...>, type_list<Type...>) const {
         if constexpr(std::disjunction_v<std::is_same<Comp, Type>...>) {
-            auto raw = std::get<pool_type<Comp> *>(pools)->begin();
+            auto it = std::get<pool_type<Comp> *>(pools)->begin();
 
             for(const auto entt: static_cast<const sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
-                auto curr = raw++;
+                auto curr = it++;
 
                 if((std::get<pool_type<Other> *>(pools)->has(entt) && ...) && (!std::get<pool_type<Exclude> *>(pools)->has(entt) && ...)) {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
