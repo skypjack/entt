@@ -2,7 +2,7 @@
 # EnTT
 #
 
-cmake_minimum_required(VERSION 3.7.2)
+cmake_minimum_required(VERSION 3.12.4)
 
 #
 # Building in-tree is not allowed (we take care of your craziness).
@@ -16,7 +16,12 @@ endif()
 # Project configuration
 #
 
-project(EnTT VERSION 3.3.0 LANGUAGES CXX)
+project(
+    EnTT
+    VERSION 3.3.0
+    DESCRIPTION "Gaming meets modern C++ - a fast and reliable entity-component system (ECS) and much more"
+    HOMEPAGE_URL "https://github.com/skypjack/entt"
+    LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
@@ -24,14 +29,9 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-set(SETTINGS_ORGANIZATION "Michele Caini")
-set(SETTINGS_APPLICATION ${PROJECT_NAME})
-set(PROJECT_AUTHOR "Michele Caini")
-set(PROJECT_AUTHOR_EMAIL "michele.caini@gmail.com")
-
 message("*")
 message("* ${PROJECT_NAME} v${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
-message("* Copyright (c) 2017-2020 ${PROJECT_AUTHOR} <${PROJECT_AUTHOR_EMAIL}>")
+message("* Copyright (c) 2017-2020 Michele Caini <michele.caini@gmail.com>")
 message("*")
 
 option(USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if availbale." ON)
@@ -71,15 +71,17 @@ add_library(EnTT::EnTT ALIAS EnTT)
 configure_file(${EnTT_SOURCE_DIR}/cmake/in/version.h.in ${EnTT_SOURCE_DIR}/src/entt/config/version.h @ONLY)
 
 target_include_directories(
-    EnTT INTERFACE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    EnTT
+    INTERFACE
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 target_compile_definitions(
     EnTT
-    INTERFACE $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:DEBUG>
-    INTERFACE $<$<AND:$<CONFIG:Release>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:RELEASE>
+    INTERFACE
+        $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:DEBUG>
+        $<$<AND:$<CONFIG:Release>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:RELEASE>
 )
 
 if(USE_ASAN)
@@ -157,7 +159,6 @@ option(BUILD_TESTING "Enable testing with ctest." OFF)
 
 if(BUILD_TESTING)
     option(FIND_GTEST_PACKAGE "Enable finding gtest package." OFF)
-
     option(BUILD_BENCHMARK "Build benchmark." OFF)
     option(BUILD_LIB "Build lib example." OFF)
     option(BUILD_SNAPSHOT "Build snapshot example." OFF)

@@ -23,39 +23,40 @@ endif()
 include_directories($<TARGET_PROPERTY:EnTT,INTERFACE_INCLUDE_DIRECTORIES>)
 add_compile_options($<TARGET_PROPERTY:EnTT,INTERFACE_COMPILE_OPTIONS>)
 
-macro(SETUP_TARGET TARGET_NAME)
+function(SETUP_TARGET TARGET_NAME)
     set_target_properties(${TARGET_NAME} PROPERTIES CXX_EXTENSIONS OFF)
     target_link_libraries(${TARGET_NAME} PRIVATE EnTT)
 
     target_compile_options(
         ${TARGET_NAME}
-        PRIVATE $<$<AND:$<CONFIG:Debug>,$<NOT:$<PLATFORM_ID:Windows>>>:-O0 -g -pedantic -Wall -Wshadow -fvisibility=hidden>
-        PRIVATE $<$<AND:$<CONFIG:Release>,$<NOT:$<PLATFORM_ID:Windows>>>:-O2 -pedantic -Wall -Wshadow -fvisibility=hidden>
-        PRIVATE $<$<AND:$<CONFIG:Debug>,$<PLATFORM_ID:Windows>>:/EHsc /W1>
-        PRIVATE $<$<AND:$<CONFIG:Release>,$<PLATFORM_ID:Windows>>:/EHsc /W1 /O2>
+        PRIVATE
+            $<$<AND:$<CONFIG:Debug>,$<NOT:$<PLATFORM_ID:Windows>>>:-O0 -g -pedantic -Wall -Wshadow -fvisibility=hidden>
+            $<$<AND:$<CONFIG:Release>,$<NOT:$<PLATFORM_ID:Windows>>>:-O2 -pedantic -Wall -Wshadow -fvisibility=hidden>
+            $<$<AND:$<CONFIG:Debug>,$<PLATFORM_ID:Windows>>:/EHsc /W1>
+            $<$<AND:$<CONFIG:Release>,$<PLATFORM_ID:Windows>>:/EHsc /W1 /O2>
     )
-endmacro()
+endfunction()
 
 add_library(odr OBJECT odr.cpp)
 SETUP_TARGET(odr)
 
-macro(SETUP_BASIC_TEST TEST_NAME TEST_SOURCE)
+function(SETUP_BASIC_TEST TEST_NAME TEST_SOURCE)
     add_executable(${TEST_NAME} $<TARGET_OBJECTS:odr> ${TEST_SOURCE})
     target_link_libraries(${TEST_NAME} PRIVATE GTest::Main Threads::Threads)
     SETUP_TARGET(${TEST_NAME})
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
-endmacro()
+endfunction()
 
-macro(SETUP_LIB_TEST TEST_NAME)
+function(SETUP_LIB_TEST TEST_NAME)
     add_library(_${TEST_NAME} SHARED lib/${TEST_NAME}/lib.cpp)
     SETUP_TARGET(_${TEST_NAME})
     SETUP_BASIC_TEST(lib_${TEST_NAME} lib/${TEST_NAME}/main.cpp)
     target_compile_definitions(_${TEST_NAME} PRIVATE ENTT_API_EXPORT ${ARGV1})
     target_compile_definitions(lib_${TEST_NAME} PRIVATE ENTT_API_IMPORT ${ARGV1})
     target_link_libraries(lib_${TEST_NAME} PRIVATE _${TEST_NAME})
-endmacro()
+endfunction()
 
-macro(SETUP_PLUGIN_TEST TEST_NAME)
+function(SETUP_PLUGIN_TEST TEST_NAME)
     add_library(_${TEST_NAME} MODULE lib/${TEST_NAME}/plugin.cpp)
     SETUP_TARGET(_${TEST_NAME})
     SETUP_BASIC_TEST(lib_${TEST_NAME} lib/${TEST_NAME}/main.cpp)
@@ -64,7 +65,7 @@ macro(SETUP_PLUGIN_TEST TEST_NAME)
     target_compile_definitions(lib_${TEST_NAME} PRIVATE NOMINMAX PLUGIN="$<TARGET_FILE:_${TEST_NAME}>" ${ARGV1})
     target_compile_definitions(_${TEST_NAME} PRIVATE NOMINMAX ${ARGV1})
     target_link_libraries(lib_${TEST_NAME} PRIVATE ${CMAKE_DL_LIBS})
-endmacro()
+endfunction()
 
 # Test benchmark
 
