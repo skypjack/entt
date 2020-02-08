@@ -99,7 +99,7 @@ class basic_registry {
         }
 
         template<typename... Args>
-        decltype(auto) replace(basic_registry &owner, const Entity entt, Args &&... args) {
+        auto replace(basic_registry &owner, const Entity entt, Args &&... args) -> decltype(this->get(entt)) {
             Component component{std::forward<Args>(args)...};
             update.publish(owner, entt, component);
             return (this->get(entt) = std::move(component));
