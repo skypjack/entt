@@ -23,8 +23,6 @@ project(
     HOMEPAGE_URL "https://github.com/skypjack/entt"
     LANGUAGES CXX)
 
-include(GNUInstallDirs)
-
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
@@ -64,6 +62,8 @@ endif()
 #
 # Add EnTT target
 #
+
+include(GNUInstallDirs)
 
 add_library(EnTT INTERFACE)
 add_library(EnTT::EnTT ALIAS EnTT)
@@ -185,16 +185,17 @@ endif()
 # AOB
 #
 
-FILE(GLOB GH_WORKFLOWS .github/workflows/*.yml)
-
-add_custom_target(
-    entt_aob
-    SOURCES
-        ${GH_WORKFLOWS}
-        .github/FUNDING.yml
-        AUTHORS
-        CONTRIBUTING.md
-        LICENSE
-        README.md
-        TODO
+set(
+    AOB_SOURCES
+    .github/workflows/build.yml
+    .github/workflows/coverage.yml
+    .github/FUNDING.yml
+    AUTHORS
+    CONTRIBUTING.md
+    LICENSE
+    README.md
+    TODO
 )
+
+add_custom_target(aob SOURCES ${AOB_SOURCES})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${AOB_SOURCES})
