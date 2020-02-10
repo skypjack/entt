@@ -937,6 +937,8 @@ public:
     /*! @copydoc try_get */
     template<typename... Component>
     auto try_get([[maybe_unused]] const entity_type entity) {
+        ENTT_ASSERT(valid(entity));
+
         if constexpr(sizeof...(Component) == 1) {
             return (assure<Component>().try_get(entity), ...);
         } else {
