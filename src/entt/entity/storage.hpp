@@ -47,13 +47,13 @@ namespace entt {
  * @tparam Type Type of objects assigned to the entities.
  */
 template<typename Entity, typename Type, typename = std::void_t<>>
-class basic_storage: public sparse_set<Entity> {
+class storage: public sparse_set<Entity> {
     using underlying_type = sparse_set<Entity>;
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     template<bool Const>
     class iterator {
-        friend class basic_storage<Entity, Type>;
+        friend class storage<Entity, Type>;
 
         using instance_type = std::conditional_t<Const, const std::vector<Type>, std::vector<Type>>;
         using index_type = typename traits_type::difference_type;
@@ -483,14 +483,14 @@ private:
 };
 
 
-/*! @copydoc basic_storage */
+/*! @copydoc storage */
 template<typename Entity, typename Type>
-class basic_storage<Entity, Type, std::enable_if_t<ENTT_ENABLE_ETO(Type)>>: public sparse_set<Entity> {
+class storage<Entity, Type, std::enable_if_t<ENTT_ENABLE_ETO(Type)>>: public sparse_set<Entity> {
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
     using underlying_type = sparse_set<Entity>;
 
     class iterator {
-        friend class basic_storage<Entity, Type>;
+        friend class storage<Entity, Type>;
 
         using index_type = typename traits_type::difference_type;
 
@@ -710,10 +710,6 @@ public:
         underlying_type::sort(from, to, std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 };
-
-/*! @copydoc basic_storage */
-template<typename Entity, typename Type>
-struct storage: basic_storage<Entity, Type> {};
 
 
 }
