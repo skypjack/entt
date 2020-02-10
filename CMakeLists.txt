@@ -13,15 +13,25 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 #
+# Read project version
+#
+
+set(ENTT_VERSION_REGEX "#define ENTT_VERSION_.*[ \t]+(.+)")
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/src/entt/config/version.h" ENTT_VERSION REGEX ${ENTT_VERSION_REGEX})
+list(TRANSFORM ENTT_VERSION REPLACE ${ENTT_VERSION_REGEX} "\\1")
+string(JOIN "." ENTT_VERSION ${ENTT_VERSION})
+
+#
 # Project configuration
 #
 
 project(
     EnTT
-    VERSION 3.3.0
+    VERSION ${ENTT_VERSION}
     DESCRIPTION "Gaming meets modern C++ - a fast and reliable entity-component system (ECS) and much more"
     HOMEPAGE_URL "https://github.com/skypjack/entt"
-    LANGUAGES CXX)
+    LANGUAGES CXX
+)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
@@ -67,8 +77,6 @@ include(GNUInstallDirs)
 
 add_library(EnTT INTERFACE)
 add_library(EnTT::EnTT ALIAS EnTT)
-
-configure_file(${EnTT_SOURCE_DIR}/cmake/in/version.h.in ${EnTT_SOURCE_DIR}/src/entt/config/version.h @ONLY)
 
 target_include_directories(
     EnTT
