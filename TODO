@@ -17,9 +17,6 @@
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none
 * review prepare after clone and the others have been removed
-* build system
-  - avoid showing gtest and the others in the ide
-  - use fetch content rather then external add
 
 * WIP:
  - deprecate clone, stamp, snapshot, loader, ...
