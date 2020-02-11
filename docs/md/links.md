@@ -50,6 +50,8 @@ I hope this list can grow much more in the future:
     RPG game made from scratch in C++.
   * [Robotligan](https://github.com/Trisslotten/robotligan): multiplayer
     football game.
+  * [DungeonSlayer](https://github.com/alohaeee/DungeonSlayer): 2D game made
+    from scratch in C++.
 
 * Engines and the like:
   * [Fling Engine](https://github.com/flingengine/FlingEngine): a Vulkan game
