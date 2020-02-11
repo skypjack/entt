@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
+#include <entt/core/type_info.hpp>
 #include <entt/core/utility.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
@@ -157,7 +158,7 @@ struct Meta: ::testing::Test {
         entt::meta<double>().conv<int>();
 
         entt::meta<char>()
-                .type("char"_hs)
+                .alias("char"_hs)
                     .prop(props::prop_int, 42)
                 .data<&set<char>, &get<char>>("value"_hs);
 
@@ -177,10 +178,10 @@ struct Meta: ::testing::Test {
         entt::meta<unsigned int>().data<0u>("min"_hs).data<100u>("max"_hs);
 
         entt::meta<base_type>()
-                .type("base"_hs);
+                .alias("base"_hs);
 
         entt::meta<derived_type>()
-                .type("derived"_hs)
+                .alias("derived"_hs)
                     .prop(props::prop_int, 99)
                 .base<base_type>()
                 .ctor<const base_type &, int, char>()
@@ -191,16 +192,16 @@ struct Meta: ::testing::Test {
                 .conv<&derived_type::g>();
 
         entt::meta<empty_type>()
-                .type("empty"_hs)
+                .alias("empty"_hs)
                 .dtor<&empty_type::destroy>();
 
         entt::meta<fat_type>()
-                .type("fat"_hs)
+                .alias("fat"_hs)
                 .base<empty_type>()
                 .dtor<&fat_type::destroy>();
 
         entt::meta<data_type>()
-                .type("data"_hs)
+                .alias("data"_hs)
                 .data<&data_type::i, entt::as_alias_t>("i"_hs)
                     .prop(props::prop_int, 0)
                 .data<&data_type::j>("j"_hs)
@@ -213,12 +214,12 @@ struct Meta: ::testing::Test {
                 .data<&data_type::v, entt::as_void_t>("v"_hs);
 
         entt::meta<array_type>()
-                .type("array"_hs)
+                .alias("array"_hs)
                 .data<&array_type::global>("global"_hs)
                 .data<&array_type::local>("local"_hs);
 
         entt::meta<func_type>()
-                .type("func"_hs)
+                .alias("func"_hs)
                 .func<entt::overload<int(const base_type &, int, int)>(&func_type::f)>("f3"_hs)
                 .func<entt::overload<int(int, int)>(&func_type::f)>("f2"_hs)
                     .prop(props::prop_bool, false)
@@ -234,27 +235,27 @@ struct Meta: ::testing::Test {
                 .func<&func_type::a, entt::as_alias_t>("a"_hs);
 
         entt::meta<setter_getter_type>()
-                .type("setter_getter"_hs)
+                .alias("setter_getter"_hs)
                 .data<&setter_getter_type::static_setter, &setter_getter_type::static_getter>("x"_hs)
                 .data<&setter_getter_type::setter, &setter_getter_type::getter>("y"_hs)
                 .data<&setter_getter_type::static_setter, &setter_getter_type::getter>("z"_hs)
                 .data<&setter_getter_type::setter_with_ref, &setter_getter_type::getter_with_ref>("w"_hs);
 
         entt::meta<an_abstract_type>()
-                .type("an_abstract_type"_hs)
+                .alias("an_abstract_type"_hs)
                     .prop(props::prop_bool, false)
                 .data<&an_abstract_type::i>("i"_hs)
                 .func<&an_abstract_type::f>("f"_hs)
                 .func<&an_abstract_type::g>("g"_hs);
 
         entt::meta<another_abstract_type>()
-                .type("another_abstract_type"_hs)
+                .alias("another_abstract_type"_hs)
                     .prop(props::prop_int, 42)
                 .data<&another_abstract_type::j>("j"_hs)
                 .func<&another_abstract_type::h>("h"_hs);
 
         entt::meta<concrete_type>()
-                .type("concrete"_hs)
+                .alias("concrete"_hs)
                 .base<an_abstract_type>()
                 .base<another_abstract_type>()
                 .func<&concrete_type::f>("f"_hs);
@@ -269,12 +270,12 @@ struct Meta: ::testing::Test {
                     .prop(props::prop_value, 3);
 
         entt::meta<derived_type>()
-                .type("my_type"_hs)
+                .alias("my_type"_hs)
                     .prop(props::prop_bool, false)
                 .ctor<>();
 
         entt::meta<another_abstract_type>()
-                .type("your_type"_hs)
+                .alias("your_type"_hs)
                 .data<&another_abstract_type::j>("a_data_member"_hs)
                 .func<&another_abstract_type::h>("a_member_function"_hs);
     }
@@ -1044,7 +1045,7 @@ TEST_F(Meta, MetaData) {
     ASSERT_TRUE(data);
     ASSERT_EQ(data.parent(), entt::resolve("data"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
-    ASSERT_EQ(data.identifier(), "i"_hs);
+    ASSERT_EQ(data.alias(), "i"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
@@ -1072,7 +1073,7 @@ TEST_F(Meta, MetaDataConst) {
     ASSERT_TRUE(data);
     ASSERT_EQ(data.parent(), entt::resolve("data"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
-    ASSERT_EQ(data.identifier(), "j"_hs);
+    ASSERT_EQ(data.alias(), "j"_hs);
     ASSERT_TRUE(data.is_const());
     ASSERT_FALSE(data.is_static());
     ASSERT_EQ(data.get(instance).cast<int>(), 1);
@@ -1099,7 +1100,7 @@ TEST_F(Meta, MetaDataStatic) {
     ASSERT_TRUE(data);
     ASSERT_EQ(data.parent(), entt::resolve("data"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
-    ASSERT_EQ(data.identifier(), "h"_hs);
+    ASSERT_EQ(data.alias(), "h"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_TRUE(data.is_static());
     ASSERT_EQ(data.get({}).cast<int>(), 2);
@@ -1126,7 +1127,7 @@ TEST_F(Meta, MetaDataConstStatic) {
     ASSERT_TRUE(data);
     ASSERT_EQ(data.parent(), entt::resolve("data"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
-    ASSERT_EQ(data.identifier(), "k"_hs);
+    ASSERT_EQ(data.alias(), "k"_hs);
     ASSERT_TRUE(data.is_const());
     ASSERT_TRUE(data.is_static());
     ASSERT_EQ(data.get({}).cast<int>(), 3);
@@ -1198,7 +1199,7 @@ TEST_F(Meta, MetaDataSetterGetterAsFreeFunctions) {
     ASSERT_TRUE(data);
     ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
-    ASSERT_EQ(data.identifier(), "x"_hs);
+    ASSERT_EQ(data.alias(), "x"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
@@ -1213,7 +1214,7 @@ TEST_F(Meta, MetaDataSetterGetterAsMemberFunctions) {
     ASSERT_TRUE(data);
     ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
-    ASSERT_EQ(data.identifier(), "y"_hs);
+    ASSERT_EQ(data.alias(), "y"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
@@ -1228,7 +1229,7 @@ TEST_F(Meta, MetaDataSetterGetterWithRefAsMemberFunctions) {
     ASSERT_TRUE(data);
     ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
-    ASSERT_EQ(data.identifier(), "w"_hs);
+    ASSERT_EQ(data.alias(), "w"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
@@ -1243,7 +1244,7 @@ TEST_F(Meta, MetaDataSetterGetterMixed) {
     ASSERT_TRUE(data);
     ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
-    ASSERT_EQ(data.identifier(), "z"_hs);
+    ASSERT_EQ(data.alias(), "z"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
@@ -1261,7 +1262,7 @@ TEST_F(Meta, MetaDataArrayStatic) {
     ASSERT_TRUE(data);
     ASSERT_EQ(data.parent(), entt::resolve("array"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int[3]>());
-    ASSERT_EQ(data.identifier(), "global"_hs);
+    ASSERT_EQ(data.alias(), "global"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_TRUE(data.is_static());
     ASSERT_TRUE(data.type().is_array());
@@ -1290,7 +1291,7 @@ TEST_F(Meta, MetaDataArray) {
     ASSERT_TRUE(data);
     ASSERT_EQ(data.parent(), entt::resolve("array"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int[3]>());
-    ASSERT_EQ(data.identifier(), "local"_hs);
+    ASSERT_EQ(data.alias(), "local"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
     ASSERT_TRUE(data.type().is_array());
@@ -1337,7 +1338,7 @@ TEST_F(Meta, MetaFunc) {
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
-    ASSERT_EQ(func.identifier(), "f2"_hs);
+    ASSERT_EQ(func.alias(), "f2"_hs);
     ASSERT_EQ(func.size(), 2u);
     ASSERT_FALSE(func.is_const());
     ASSERT_FALSE(func.is_static());
@@ -1375,7 +1376,7 @@ TEST_F(Meta, MetaFuncConst) {
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
-    ASSERT_EQ(func.identifier(), "f1"_hs);
+    ASSERT_EQ(func.alias(), "f1"_hs);
     ASSERT_EQ(func.size(), 1u);
     ASSERT_TRUE(func.is_const());
     ASSERT_FALSE(func.is_static());
@@ -1411,7 +1412,7 @@ TEST_F(Meta, MetaFuncRetVoid) {
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
-    ASSERT_EQ(func.identifier(), "g"_hs);
+    ASSERT_EQ(func.alias(), "g"_hs);
     ASSERT_EQ(func.size(), 1u);
     ASSERT_FALSE(func.is_const());
     ASSERT_FALSE(func.is_static());
@@ -1445,7 +1446,7 @@ TEST_F(Meta, MetaFuncStatic) {
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
-    ASSERT_EQ(func.identifier(), "h"_hs);
+    ASSERT_EQ(func.alias(), "h"_hs);
     ASSERT_EQ(func.size(), 1u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
@@ -1480,7 +1481,7 @@ TEST_F(Meta, MetaFuncStaticRetVoid) {
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
-    ASSERT_EQ(func.identifier(), "k"_hs);
+    ASSERT_EQ(func.alias(), "k"_hs);
     ASSERT_EQ(func.size(), 1u);
     ASSERT_FALSE(func.is_const());
     ASSERT_TRUE(func.is_static());
@@ -1568,7 +1569,8 @@ TEST_F(Meta, MetaType) {
 
     ASSERT_TRUE(type);
     ASSERT_NE(type, entt::meta_type{});
-    ASSERT_EQ(type.identifier(), "derived"_hs);
+    ASSERT_EQ(type.alias(), "derived"_hs);
+    ASSERT_EQ(type.id(), entt::type_info<derived_type>::id());
 
     type.prop([](auto prop) {
         ASSERT_EQ(prop.key(), props::prop_int);
@@ -1766,6 +1768,7 @@ TEST_F(Meta, AbstractClass) {
     auto type = entt::resolve<an_abstract_type>();
     concrete_type instance;
 
+    ASSERT_EQ(type.id(), entt::type_info<an_abstract_type>::id());
     ASSERT_EQ(instance.i, 0);
 
     type.func("f"_hs).invoke(instance, 3);

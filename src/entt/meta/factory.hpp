@@ -378,26 +378,32 @@ class meta_factory<Type> {
     }
 
     template<typename Node>
-    bool exists(const ENTT_ID_TYPE identifier, const Node *node) ENTT_NOEXCEPT {
-        return node && (node->identifier == identifier || exists(identifier, node->next));
+    bool exists(const ENTT_ID_TYPE alias, const Node *node) ENTT_NOEXCEPT {
+        return node && (node->alias == alias || exists(alias, node->next));
     }
 
 public:
     /**
-     * @brief Extends a meta type by assigning it an identifier.
-     * @param identifier Unique identifier.
+     * @brief Extends a meta type by assigning it an alias.
+     * @param value Unique identifier.
      * @return An extended meta factory for the given type.
      */
-    auto type(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
+    auto alias(const ENTT_ID_TYPE value) ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!exists(identifier, *internal::meta_info<>::global));
+        ENTT_ASSERT(!exists(value, *internal::meta_info<>::global));
         ENTT_ASSERT(!exists(node, *internal::meta_info<>::global));
-        node->identifier = identifier;
+        node->alias = value;
         node->next = *internal::meta_info<>::global;
         *internal::meta_info<>::global = node;
 
         return meta_factory<Type, Type>{&node->prop};
+    }
+
+    /*! @copydoc alias */
+    [[deprecated("Use ::alias instead")]]
+    auto type(const ENTT_ID_TYPE value) ENTT_NOEXCEPT {
+        return alias(value);
     }
 
     /**
@@ -608,11 +614,11 @@ public:
      *
      * @tparam Data The actual variable to attach to the meta type.
      * @tparam Policy Optional policy (no policy set by default).
-     * @param identifier Unique identifier.
+     * @param alias Unique identifier.
      * @return An extended meta factory for the parent type.
      */
     template<auto Data, typename Policy = as_is_t>
-    auto data(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
+    auto data(const ENTT_ID_TYPE alias) ENTT_NOEXCEPT {
         auto * const type = internal::meta_info<Type>::resolve();
         internal::meta_data_node *curr = nullptr;
 
@@ -667,9 +673,9 @@ public:
             curr = &node;
         }
 
-        ENTT_ASSERT(!exists(identifier, type->data));
+        ENTT_ASSERT(!exists(alias, type->data));
         ENTT_ASSERT(!exists(curr, type->data));
-        curr->identifier = identifier;
+        curr->alias = alias;
         curr->next = type->data;
         type->data = curr;
 
@@ -693,11 +699,11 @@ public:
      * @tparam Setter The actual function to use as a setter.
      * @tparam Getter The actual function to use as a getter.
      * @tparam Policy Optional policy (no policy set by default).
-     * @param identifier Unique identifier.
+     * @param alias Unique identifier.
      * @return An extended meta factory for the parent type.
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
-    auto data(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
+    auto data(const ENTT_ID_TYPE alias) ENTT_NOEXCEPT {
         using underlying_type = std::invoke_result_t<decltype(Getter), Type &>;
         static_assert(std::is_invocable_v<decltype(Setter), Type &, underlying_type>);
         auto * const type = internal::meta_info<Type>::resolve();
@@ -714,9 +720,9 @@ public:
             &internal::getter<Type, Getter, Policy>
         };
 
-        ENTT_ASSERT(!exists(identifier, type->data));
+        ENTT_ASSERT(!exists(alias, type->data));
         ENTT_ASSERT(!exists(&node, type->data));
-        node.identifier = identifier;
+        node.alias = alias;
         node.next = type->data;
         type->data = &node;
 
@@ -733,11 +739,11 @@ public:
      *
      * @tparam Candidate The actual function to attach to the meta type.
      * @tparam Policy Optional policy (no policy set by default).
-     * @param identifier Unique identifier.
+     * @param alias Unique identifier.
      * @return An extended meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_is_t>
-    auto func(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
+    auto func(const ENTT_ID_TYPE alias) ENTT_NOEXCEPT {
         using helper_type = internal::meta_function_helper_t<decltype(Candidate)>;
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -756,9 +762,9 @@ public:
             }
         };
 
-        ENTT_ASSERT(!exists(identifier, type->func));
+        ENTT_ASSERT(!exists(alias, type->func));
         ENTT_ASSERT(!exists(&node, type->func));
-        node.identifier = identifier;
+        node.alias = alias;
         node.next = type->func;
         type->func = &node;
 
@@ -805,7 +811,7 @@ public:
         unregister_all(&node->data, &internal::meta_data_node::prop);
         unregister_all(&node->func, &internal::meta_func_node::prop);
 
-        node->identifier = {};
+        node->alias = {};
         node->next = nullptr;
         node->dtor = nullptr;
 
@@ -845,13 +851,13 @@ inline meta_type resolve() ENTT_NOEXCEPT {
 
 
 /**
- * @brief Returns the meta type associated with a given identifier.
- * @param identifier Unique identifier.
- * @return The meta type associated with the given identifier, if any.
+ * @brief Returns the meta type associated with a given alias.
+ * @param alias Unique identifier.
+ * @return The meta type associated with the given alias, if any.
  */
-inline meta_type resolve(const ENTT_ID_TYPE identifier) ENTT_NOEXCEPT {
-    return internal::find_if([identifier](const auto *curr) {
-        return curr->identifier == identifier;
+inline meta_type resolve(const ENTT_ID_TYPE alias) ENTT_NOEXCEPT {
+    return internal::find_if([alias](const auto *curr) {
+        return curr->alias == alias;
     }, *internal::meta_info<>::global);
 }
 
