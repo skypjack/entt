@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <utility>
-#include <algorithm>
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
@@ -409,7 +408,10 @@ public:
     template<typename Func>
     void each(Func func) const {
         static_assert(std::is_invocable_v<Func, entity_type>);
-        std::for_each(begin(), end(), std::move(func));
+
+        for(const auto entity: *this) {
+            func(entity);
+        }
     }
 
     /**

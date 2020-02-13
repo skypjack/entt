@@ -63,9 +63,13 @@ class emitter {
 
         void clear() ENTT_NOEXCEPT override {
             if(publishing) {
-                auto func = [](auto &&element) { element.first = true; };
-                std::for_each(once_list.begin(), once_list.end(), func);
-                std::for_each(on_list.begin(), on_list.end(), func);
+                for(auto &&element: once_list) {
+                    element.first = true;
+                }
+
+                for(auto &&element: on_list) {
+                    element.first = true;
+                }
             } else {
                 once_list.clear();
                 on_list.clear();
@@ -94,14 +98,15 @@ class emitter {
             container_type swap_list;
             once_list.swap(swap_list);
 
-            auto func = [&event, &ref](auto &&element) {
-                return element.first ? void() : element.second(event, ref);
-            };
-
             publishing = true;
 
-            std::for_each(on_list.rbegin(), on_list.rend(), func);
-            std::for_each(swap_list.rbegin(), swap_list.rend(), func);
+            for(auto &&element: on_list) {
+                element.first ? void() : element.second(event, ref);
+            }
+
+            for(auto &&element: swap_list) {
+                element.first ? void() : element.second(event, ref);
+            }
 
             publishing = false;
 
@@ -284,9 +289,9 @@ public:
      * results in undefined behavior.
      */
     void clear() ENTT_NOEXCEPT {
-        std::for_each(pools.begin(), pools.end(), [](auto &&cpool) {
+        for(auto &&cpool: pools) {
             cpool->clear();
-        });
+        }
     }
 
     /**

@@ -17,6 +17,7 @@
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none
 * review prepare after clone and the others have been removed
+* remove copy-ctor/op from sparse set and storage (it doesn't make much sense)
 
 * WIP:
  - deprecate clone, stamp, snapshot, loader, ...

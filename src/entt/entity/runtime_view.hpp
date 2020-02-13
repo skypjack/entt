@@ -247,7 +247,9 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        std::for_each(begin(), end(), func);
+        for(const auto entity: *this) {
+            func(entity);
+        }
     }
 
 private:

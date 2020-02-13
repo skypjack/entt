@@ -281,9 +281,9 @@ public:
         decltype(handlers) exec;
         exec.swap(handlers);
 
-        std::for_each(exec.begin(), exec.end(), [immediately](auto &handler) {
+        for(auto &&handler: exec) {
             handler.abort(handler, immediately);
-        });
+        }
 
         std::move(handlers.begin(), handlers.end(), std::back_inserter(exec));
         handlers.swap(exec);
