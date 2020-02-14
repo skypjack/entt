@@ -26,6 +26,11 @@ else()
     endif()
 
     add_library(GTest::Main ALIAS gtest_main)
+
+    target_compile_features(gtest PUBLIC cxx_std_17)
+    target_compile_features(gtest_main PUBLIC cxx_std_17)
+    target_compile_features(gmock PUBLIC cxx_std_17)
+    target_compile_features(gmock_main PUBLIC cxx_std_17)
 endif()
 
 include_directories($<TARGET_PROPERTY:EnTT,INTERFACE_INCLUDE_DIRECTORIES>)
