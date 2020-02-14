@@ -38,10 +38,17 @@ function(SETUP_TARGET TARGET_NAME)
     target_compile_options(
         ${TARGET_NAME}
         PRIVATE
-            $<$<AND:$<CONFIG:Debug>,$<NOT:$<PLATFORM_ID:Windows>>>:-O0 -g -pedantic -Wall -Wshadow -fvisibility=hidden>
-            $<$<AND:$<CONFIG:Release>,$<NOT:$<PLATFORM_ID:Windows>>>:-O2 -pedantic -Wall -Wshadow -fvisibility=hidden>
-            $<$<AND:$<CONFIG:Debug>,$<PLATFORM_ID:Windows>>:/EHsc /W1>
-            $<$<AND:$<CONFIG:Release>,$<PLATFORM_ID:Windows>>:/EHsc /W1 /O2>
+            $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-pedantic -fvisibility=hidden -Wall -Wshadow -Wno-deprecated-declarations>
+            $<$<CXX_COMPILER_ID:MSVC>:/EHsc /W1 /wd4996>
+    )
+
+    target_compile_options(
+        ${TARGET_NAME}
+        PRIVATE
+            $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-O0 -g>
+            $<$<AND:$<CONFIG:Release>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-O2>
+            $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:MSVC>>:/Od>
+            $<$<AND:$<CONFIG:Release>,$<CXX_COMPILER_ID:MSVC>>:/O2>
     )
 endfunction()
 
