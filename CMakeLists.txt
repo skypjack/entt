@@ -206,4 +206,3 @@ set(
 )
 
 add_custom_target(aob SOURCES ${AOB_SOURCES})
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${AOB_SOURCES})
