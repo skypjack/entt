@@ -114,7 +114,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
         iterator operator++(int) {
             iterator orig = *this;
-            return ++(*this), orig;
+            return operator++(), orig;
         }
 
         iterator & operator--() ENTT_NOEXCEPT {
@@ -124,7 +124,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
         iterator operator--(int) ENTT_NOEXCEPT {
             iterator orig = *this;
-            return --(*this), orig;
+            return operator--(), orig;
         }
 
         bool operator==(const iterator &other) const ENTT_NOEXCEPT {

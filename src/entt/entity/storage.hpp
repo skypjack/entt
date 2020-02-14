@@ -77,7 +77,7 @@ class storage: public sparse_set<Entity> {
 
         iterator operator++(int) ENTT_NOEXCEPT {
             iterator orig = *this;
-            return ++(*this), orig;
+            return operator++(), orig;
         }
 
         iterator & operator--() ENTT_NOEXCEPT {
@@ -86,7 +86,7 @@ class storage: public sparse_set<Entity> {
 
         iterator operator--(int) ENTT_NOEXCEPT {
             iterator orig = *this;
-            return --(*this), orig;
+            return operator--(), orig;
         }
 
         iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
@@ -513,7 +513,7 @@ class storage<Entity, Type, std::enable_if_t<ENTT_ENABLE_ETO(Type)>>: public spa
 
         iterator operator++(int) ENTT_NOEXCEPT {
             iterator orig = *this;
-            return ++(*this), orig;
+            return operator++(), orig;
         }
 
         iterator & operator--() ENTT_NOEXCEPT {
@@ -522,7 +522,7 @@ class storage<Entity, Type, std::enable_if_t<ENTT_ENABLE_ETO(Type)>>: public spa
 
         iterator operator--(int) ENTT_NOEXCEPT {
             iterator orig = *this;
-            return --(*this), orig;
+            return operator--(), orig;
         }
 
         iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {

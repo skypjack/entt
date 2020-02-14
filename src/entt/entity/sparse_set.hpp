@@ -77,7 +77,7 @@ class sparse_set {
 
         iterator operator++(int) ENTT_NOEXCEPT {
             iterator orig = *this;
-            return ++(*this), orig;
+            return operator++(), orig;
         }
 
         iterator & operator--() ENTT_NOEXCEPT {
@@ -86,7 +86,7 @@ class sparse_set {
 
         iterator operator--(int) ENTT_NOEXCEPT {
             iterator orig = *this;
-            return --(*this), orig;
+            return operator--(), orig;
         }
 
         iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
