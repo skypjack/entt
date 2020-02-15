@@ -98,17 +98,16 @@ class basic_registry {
             }
         }
 
-        template<typename... Args>
-        auto replace(basic_registry &owner, const Entity entt, Args &&... args) -> decltype(this->get(entt)) {
-            Component component{std::forward<Args>(args)...};
-            update.publish(owner, entt, component);
-            return (this->get(entt) = std::move(component));
+        template<typename... Func>
+        void replace(basic_registry &owner, const Entity entt, Func &&... func) {
+            (std::forward<Func>(func)(this->get(entt)), ...);
+            update.publish(owner, entt);
         }
 
     private:
         sigh<void(basic_registry &, const Entity)> construction{};
         sigh<void(basic_registry &, const Entity)> destruction{};
-        sigh<void(basic_registry &, const Entity, decltype(std::declval<storage<Entity, Component>>().get({})))> update{};
+        sigh<void(basic_registry &, const Entity)> update{};
     };
 
     struct pool_data {
@@ -717,11 +716,38 @@ public:
     decltype(auto) assign_or_replace(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
         auto &cpool = assure<Component>();
-        return cpool.has(entity) ? cpool.replace(*this, entity, std::forward<Args>(args)...) : cpool.assign(*this, entity, std::forward<Args>(args)...);
+
+        return cpool.has(entity)
+                ? (cpool.replace(*this, entity, [args = std::forward_as_tuple(std::forward<Args>(args)...)](auto &&component) { component = std::make_from_tuple<Component>(std::move(args)); }), cpool.get(entity))
+                : cpool.assign(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
      * @brief Replaces the given component for an entity.
+     *
+     * The signature of the functions should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * void(Component &);
+     * @endcode
+     *
+     * Temporary objects are returned for empty types though. Capture them by
+     * copy or by const reference if needed.
+     *
+     * @tparam Component Type of component to replace.
+     * @tparam Func Types of the function objects to invoke.
+     * @param entity A valid entity identifier.
+     * @param func Valid function objects.
+     */
+    template<typename Component, typename... Func>
+    auto replace(const entity_type entity, Func &&... func)
+    -> decltype(std::enable_if_t<sizeof...(Func) != 0>(), (func(std::declval<Component &>()), ...), void()) {
+        ENTT_ASSERT(valid(entity));
+        assure<Component>().replace(*this, entity, std::forward<Func>(func)...);
+    }
+
+    /**
+     * @copybrief replace
      *
      * A new instance of the given component is created and initialized with the
      * arguments provided (the component must have a proper constructor or be of
@@ -738,12 +764,17 @@ public:
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the component.
-     * @return A reference to the newly created component.
+     * @return A reference to the component being replaced.
      */
     template<typename Component, typename... Args>
-    decltype(auto) replace(const entity_type entity, Args &&... args) {
-        ENTT_ASSERT(valid(entity));
-        return assure<Component>().replace(*this, entity, std::forward<Args>(args)...);
+    [[deprecated("use in-place replace instead")]]
+    auto replace(const entity_type entity, Args &&... args)
+    -> decltype(Component{std::forward<Args>(args)...}, assure<Component>().get(entity)) {
+        replace<Component>(entity, [args = std::forward_as_tuple(std::forward<Args>(args)...)](auto &&component) {
+            component = std::make_from_tuple<Component>(std::move(args));
+        });
+
+        return assure<Component>().get(entity);
     }
 
     /**

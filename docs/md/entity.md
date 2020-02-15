@@ -228,16 +228,10 @@ This function is overloaded and accepts also a couple of iterators in order to:
   ```
 
 If an entity already has the given component, the `replace` member function
-template can be used to replace it:
+template can be used to edit it in-place:
 
 ```cpp
-registry.replace<position>(entity, 0., 0.);
-
-// ...
-
-auto &velocity = registry.replace<velocity>(entity);
-vel.dx = 0.;
-vel.dy = 0.;
+registry.replace<position>(entity, [](auto &pos) { pos.x = pos.y = 0.; });
 ```
 
 When it's unknown whether an entity already owns an instance of a component,
@@ -245,19 +239,13 @@ When it's unknown whether an entity already owns an instance of a component,
 
 ```cpp
 registry.assign_or_replace<position>(entity, 0., 0.);
-
-// ...
-
-auto &velocity = registry.assign_or_replace<velocity>(entity);
-vel.dx = 0.;
-vel.dy = 0.;
 ```
 
 This is a slightly faster alternative for the following snippet:
 
 ```cpp
 if(registry.has<comp>(entity)) {
-    registry.replace<velocity>(entity, 0., 0.);
+    registry.replace<velocity>(entity, [](auto &vel) { vel.dx = vel.dy = 0.; });
 } else {
     registry.assign<velocity>(entity, 0., 0.);
 }
@@ -352,36 +340,24 @@ To be notified when components are destroyed, use the `on_destroy` member
 function instead. Finally, the `on_replace` member function will return a sink
 to which to connect listeners to observe changes.
 
-The function type of a listener for the construction and destruction signals
-should be equivalent to the following:
+The function type of a listener should be equivalent to the following:
 
 ```cpp
 void(entt::registry &, entt::entity);
 ```
 
-In both cases, listeners are provided with the registry that triggered the
-notification and the entity affected by the change.<br/>
-The function type of a listener that observes changes to components is slightly
-different instead:
-
-```cpp
-void(entt::registry &, entt::entity, Component &);
-```
-
-In this case, `Component` is intuitively the type of component of interest. The
-extra argument is required because the registry cannot store and therefore
-return both the instances of the given type for an entity.
+In all cases, listeners are provided with the registry that triggered the
+notification and the involved entity.
 
 Note also that:
 
-* Listeners for the construction signal are invoked **after** components have
+* Listeners for the construction signals are invoked **after** components have
   been assigned to entities.
 
-* Listeners designed to observe changes are invoked **before** components have
-  been replaced and therefore before newly created instances have been assigned
-  to entities.
+* Listeners designed to observe changes are invoked **after** components have
+  been updated.
 
-* Listeners for the destruction signal are invoked **before** components have
+* Listeners for the destruction signals are invoked **before** components have
   been removed from entities.
 
 There are also some limitations on what a listener can and cannot do:
@@ -390,7 +366,7 @@ There are also some limitations on what a listener can and cannot do:
   listener should be avoided. It can lead to undefined behavior in some cases.
 
 * Removing the component from within the body of a listener that observes the
-  construction or replacement of instances of a given type isn't allowed.
+  construction or update of instances of a given type isn't allowed.
 
 * Assigning and removing components from within the body of a listener that
   observes the destruction of instances of a given type should be avoided. It
@@ -646,8 +622,9 @@ A dependency can also be easily broken as follows:
 registry.on_construct<my_type>().disconnect<&entt::registry::assign_or_replace<a_type>>();
 ```
 
-There are many other types of dependencies. In general, all functions that
-accept an entity as the first argument are good candidates for this purpose.
+There are many other types of dependencies. In general, most of the functions
+that accept an entity as the first argument are good candidates for this
+purpose.
 
 ### Tags
 
