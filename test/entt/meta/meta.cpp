@@ -192,6 +192,7 @@ struct Meta: ::testing::Test {
                 .conv<&derived_type::g>();
 
         entt::meta<empty_type>()
+                .ctor<>()
                 .alias("empty"_hs)
                 .dtor<&empty_type::destroy>();
 
@@ -1684,6 +1685,13 @@ TEST_F(Meta, MetaTypeConstruct) {
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<derived_type>().i, 42);
     ASSERT_EQ(any.cast<derived_type>().c, 'c');
+}
+
+TEST_F(Meta, MetaTypeConstructNoArgs) {
+    // this should work, no other tests required
+    auto any = entt::resolve<empty_type>().construct();
+
+    ASSERT_TRUE(any);
 }
 
 TEST_F(Meta, MetaTypeConstructMetaAnyArgs) {

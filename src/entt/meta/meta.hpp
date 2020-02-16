@@ -1425,7 +1425,7 @@ public:
      */
     template<typename... Args>
     meta_any construct(Args &&... args) const {
-        auto construct_if = [this](auto *params) {
+        auto construct_if = [this](meta_any *params) {
             meta_any any{};
 
             internal::find_if<&internal::meta_type_node::ctor>([params, &any](const auto *curr) {
