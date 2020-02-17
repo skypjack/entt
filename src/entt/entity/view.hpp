@@ -177,15 +177,15 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         }
     }
 
-    template<typename Comp, typename Func, typename... Other, typename... Type>
-    void traverse(Func func, type_list<Other...>, type_list<Type...>) const {
+    template<typename Comp, typename Func, typename... Type>
+    void traverse(Func func, type_list<Type...>) const {
         if constexpr(std::disjunction_v<std::is_same<Comp, Type>...>) {
             auto it = std::get<pool_type<Comp> *>(pools)->begin();
 
             for(const auto entt: static_cast<const sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
                 auto curr = it++;
 
-                if((std::get<pool_type<Other> *>(pools)->has(entt) && ...) && (!std::get<pool_type<Exclude> *>(pools)->has(entt) && ...)) {
+                if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->has(entt)) && ...) && (!std::get<pool_type<Exclude> *>(pools)->has(entt) && ...)) {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
                         func(get<Comp, Type>(curr, std::get<pool_type<Type> *>(pools), entt)...);
                     } else {
@@ -195,7 +195,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             }
         } else {
             for(const auto entt: static_cast<const sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
-                if((std::get<pool_type<Other> *>(pools)->has(entt) && ...) && (!std::get<pool_type<Exclude> *>(pools)->has(entt) && ...)) {
+                if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->has(entt)) && ...) && (!std::get<pool_type<Exclude> *>(pools)->has(entt) && ...)) {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
                         func(std::get<pool_type<Type> *>(pools)->get(entt)...);
                     } else {
@@ -468,8 +468,7 @@ public:
      */
     template<typename Comp, typename Func>
     void each(Func func) const {
-        using other_type = type_list_cat_t<std::conditional_t<std::is_same_v<Comp, Component>, type_list<>, type_list<Component>>...>;
-        traverse<Comp>(std::move(func), other_type{}, type_list<Component...>{});
+        traverse<Comp>(std::move(func), type_list<Component...>{});
     }
 
     /**
@@ -527,9 +526,8 @@ public:
      */
     template<typename Comp, typename Func>
     void less(Func func) const {
-        using other_type = type_list_cat_t<std::conditional_t<std::is_same_v<Comp, Component>, type_list<>, type_list<Component>>...>;
         using non_empty_type = type_list_cat_t<std::conditional_t<ENTT_ENABLE_ETO(Component), type_list<>, type_list<Component>>...>;
-        traverse<Comp>(std::move(func), other_type{}, non_empty_type{});
+        traverse<Comp>(std::move(func), non_empty_type{});
     }
 
 private:
