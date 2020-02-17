@@ -3,6 +3,7 @@
 
 
 #include <cstddef>
+#include <utility>
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/hashed_string.hpp"
@@ -167,6 +168,37 @@ struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() ==
  */
 template<class Type>
 constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
+
+
+/**
+ * @brief Extracts the class of a non-static member object or function.
+ * @tparam Member A pointer to a non-static member object or function.
+ */
+template<typename Member>
+class member_class {
+    static_assert(std::is_member_pointer_v<Member>);
+
+    template<typename Class, typename Ret, typename... Args>
+    static Class * clazz(Ret(Class:: *)(Args...));
+
+    template<typename Class, typename Ret, typename... Args>
+    static Class * clazz(Ret(Class:: *)(Args...) const);
+
+    template<typename Class, typename Type>
+    static Class * clazz(Type Class:: *);
+
+public:
+    /*! @brief The class of the given non-static member object or function. */
+    using type = std::remove_pointer_t<decltype(clazz(std::declval<Member>()))>;
+};
+
+
+/**
+ * @brief Helper type.
+ * @tparam Member A pointer to a non-static member object or function.
+ */
+template<typename Member>
+using member_class_t = typename member_class<Member>::type;
 
 
 }

@@ -22,3 +22,15 @@ TEST(IsEqualityComparable, Functionalities) {
     ASSERT_TRUE(entt::is_equality_comparable_v<int>);
     ASSERT_FALSE(entt::is_equality_comparable_v<void>);
 }
+
+TEST(MemberClass, Functionalities) {
+    struct clazz {
+        char foo(int) { return {}; }
+        int bar(double, float) const { return {}; }
+        bool quux;
+    };
+
+    ASSERT_TRUE((std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::foo)>>));
+    ASSERT_TRUE((std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::bar)>>));
+    ASSERT_TRUE((std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::quux)>>));
+}
