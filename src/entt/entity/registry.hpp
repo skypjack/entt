@@ -1535,6 +1535,7 @@ public:
      * @return A fresh copy of the registry.
      */
     template<typename... Component, typename... Exclude>
+    [[deprecated("use ::visit and custom (eventually erased) functions instead")]]
     basic_registry clone(exclude_t<Exclude...> = {}) const {
         basic_registry other;
 
@@ -1580,6 +1581,7 @@ public:
      * @param src A valid entity identifier to be copied.
      */
     template<typename... Exclude>
+    [[deprecated("use ::visit and custom (eventually erased) functions instead")]]
     void stamp(const entity_type dst, const basic_registry &other, const entity_type src, exclude_t<Exclude...> = {}) {
         std::for_each(other.pools.cbegin(), other.pools.cend(), [this, dst, src](auto &&pdata) {
             if(((pdata.type_id != type_info<Exclude>::id()) && ...) && pdata.pool->has(src)) {

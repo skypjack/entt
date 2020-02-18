@@ -20,7 +20,7 @@
 * remove copy-ctor/op from sparse set and storage (it doesn't make much sense)
 
 * WIP:
- - deprecate clone, stamp, snapshot, loader, ...
+ - deprecate snapshot, loader, ...
  - provide documentation to describe alternatives
 
 * WIP: snapshot rework/deprecation

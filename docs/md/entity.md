@@ -18,11 +18,12 @@
   * [Sorting: is it possible?](#sorting-is-it-possible)
   * [Helpers](#helpers)
     * [Null entity](#null-entity)
-    * [Stamp](#stamp)
     * [Dependencies](#dependencies)
     * [Actor](#actor)
     * [Context variables](#context-variables)
   * [Meet the runtime](#meet-the-runtime)
+    * [Cloning a registry](#cloning-a-registry)
+    * [Stamping an entity](#stamping-an-entity)
   * [Snapshot: complete vs continuous](#snapshot-complete-vs-continuous)
     * [Snapshot loader](#snapshot-loader)
     * [Continuous loader](#continuous-loader)
@@ -576,26 +577,6 @@ initialized entity isn't the same as `entt::null`. Therefore, although
 `entt::entity{}` is in some sense an alias for entity 0, none of them can be
 used to create a null entity.
 
-### Stamp
-
-Using multiple registries at the same time is quite common. Examples are the
-separation of the UI from the simulation or the loading of different scenes in
-the background, possibly on a separate thread, without having to keep track of
-which entity belongs to which scene.<br/>
-In fact, with `EnTT` this is even a recommended practice, as the registry is
-nothing more than an opaque container you can swap at any time.
-
-Once there are multiple registries available, one or more methods are needed to
-transfer information from one container to another. This results in the `stamp`
-member functions of the `registry` class.<br/>
-This function takes one entity from a registry and uses it to _stamp_ one or
-more entities in another registry (or even the same, making local copies).
-
-It opens definitely the doors to a lot of interesting features like migrating
-entities between registries, prototypes, shadow registry, prefabs, shared
-components without explicit ownership models and copy-on-write policies among
-the other things.
-
 ### Dependencies
 
 The `registry` class is designed to be able to create short circuits between its
@@ -680,10 +661,10 @@ otherwise it returns a null pointer.
 ## Meet the runtime
 
 Type identifiers are stable in `EnTT` during executions and most of the times
-also across different executions. This makes them suitable to mix runtime and
-compile-time features.<br/>
-The registry offers a couple of functions to _visit_ it and get the types of
-components it manages:
+also across different executions and across boundaries. This makes them suitable
+to mix runtime and compile-time features.<br/>
+The registry offers a function to _visit_ it and get the types of components it
+manages:
 
 ```cpp
 registry.visit([](const auto component) {
@@ -702,6 +683,122 @@ registry.visit(entity, [](const auto component) {
 This helps to create a bridge between the registry, that is heavily based on the
 C++ type system, and any other context where the compile-time isn't an option.
 For example: plugin systems, meta system, serialization, and so on.
+
+### Cloning a registry
+
+Cloning a registry isn't a suggested practice since it could trigger many copies
+and cut down the performance. Moreover, because of how the `registry` class is
+designed, supporting this as a built-in feature would increase the compilation
+times also for the users that aren't interested in cloning. Even worse, it would
+make difficult to define different _cloning policies_ for different types when
+required.<br/>
+This is why function definitions for cloning have been moved to the user space.
+The `visit` member function of the `registry` class can help filling the gap,
+along with the range-`assign` functionality.
+
+A general purpose cloning function could be defined as:
+
+```cpp
+template<typename Type>
+void clone(const entt::registry &from, entt::registry &to) {
+    to.assign<Type>(from.data<Type>(), from.data<Type>() + from.size<Type>(), from.raw<Type>());
+}
+```
+
+This is probably the fastest method to inject entities and components in a
+registry that isn't necessarily empty. All new elements are _appended_ to the
+existing ones, if any.<br/>
+This function is also eligible for type erasure in order to create a mapping
+between type identifiers and opaque methods for cloning:
+
+```cpp
+using clone_fn_type = void(const entt::registry &, entt::registry &);
+std::unordered_map<ENTT_ID_TYPE, clone_fn_type *> clone_functions;
+
+// ...
+
+clone_functions[entt::type_info<position>::id()] = &clone<position>;
+clone_functions[entt::type_info<velocity>::id()] = &clone<velocity>;
+```
+
+Stamping a registry becomes straightforward with such a mapping then:
+
+```cpp
+entt::registry from;
+entt::registry to;
+
+// ...
+
+from.visit([this, &to](const auto type_id) {
+    clone_functions[type_id](from, to);
+});
+```
+
+Custom cloning functions are also pretty easy to define. Moreover, also cloning
+registries specialized with different identifiers is possible this way.<br/>
+As a side note, cloning functions could be also attached to a reflection system
+where meta types are resolved using the runtime type identifiers.
+
+### Stamping an entity
+
+Using multiple registries at the same time is quite common. Examples are the
+separation of the UI from the simulation or the loading of different scenes in
+the background, possibly on a separate thread, without having to keep track of
+which entity belongs to which scene.<br/>
+In fact, with `EnTT` this is even a recommended practice, as the registry is
+nothing more than an opaque container you can swap at any time.
+
+Once there are multiple registries available, one or more methods are needed to
+transfer information from one container to another though.<br/>
+This is where the `visit` member function of the `registry` class enters the
+game.
+
+Since stamping a component could require different methods for different types
+and not all users want to benefit from this feature, function definitions have
+been moved from the registry to the user space.<br/>
+This helped to reduce compilation times and to allow for maximum flexibility,
+even though it requires users to set up their own stamping functions.
+
+The best bet here is probably to define a reflection system or a mapping between
+the type identifiers and their opaque functions for stamping. As an example:
+
+```
+template<typename Type>
+void stamp(const entt::registry &from, const entt::entity src, entt::registry &to, const entt::entity dst) {
+    to.assign_or_replace<Type>(dst, from.get_or_assign<Type>(src));
+}
+```
+
+If the definition above is treated as a general purpose function for stamping,
+one can easily construct a map like the following one as a data member of a
+dedicate system:
+
+```cpp
+using stamp_fn_type = void(const entt::registry &, const entt::entity, entt::registry &, const entt::entity);
+std::unordered_map<ENTT_ID_TYPE, stamp_fn_type *> stamp_functions;
+
+// ...
+
+stamp_functions[entt::type_info<position>::id()] = &stamp<position>;
+stamp_functions[entt::type_info<velocity>::id()] = &stamp<velocity>;
+```
+
+Then _stamp_ entities across different registries as:
+
+```cpp
+entt::registry from;
+entt::registry to;
+
+// ...
+
+from.visit(src, [this, &to, dst](const auto type_id) {
+    stamp_functions[type_id](from, src, to, dst);
+});
+```
+
+This way it's also pretty easy to define custom stamping functions for _special_
+types if needed. Moreover, stamping entities across registries specialized with
+different identifiers is possibile in practice.
 
 ## Snapshot: complete vs continuous
 
