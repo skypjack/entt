@@ -1,4 +1,6 @@
 #include <gtest/gtest.h>
+#include <entt/config/config.h>
+#include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
 
 TEST(Choice, Functionalities) {
@@ -33,4 +35,9 @@ TEST(MemberClass, Functionalities) {
     ASSERT_TRUE((std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::foo)>>));
     ASSERT_TRUE((std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::bar)>>));
     ASSERT_TRUE((std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::quux)>>));
+}
+
+TEST(Tag, Functionalities) {
+    ASSERT_EQ(entt::tag<"foobar"_hs>::value, entt::hashed_string::value("foobar"));
+    ASSERT_TRUE((std::is_same_v<typename entt::tag<"foobar"_hs>::value_type, ENTT_ID_TYPE>));
 }

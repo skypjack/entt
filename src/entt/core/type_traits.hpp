@@ -201,6 +201,14 @@ template<typename Member>
 using member_class_t = typename member_class<Member>::type;
 
 
+/**
+ * @brief Alias template to ease the creation of named values.
+ * @tparam Value A constant value at least convertible to `ENTT_ID_TYPE`.
+ */
+template<ENTT_ID_TYPE Value>
+using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
+
+
 }
 
 

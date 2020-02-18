@@ -20,7 +20,6 @@
     * [Null entity](#null-entity)
     * [Stamp](#stamp)
     * [Dependencies](#dependencies)
-    * [Tags](#tags)
     * [Actor](#actor)
     * [Context variables](#context-variables)
   * [Meet the runtime](#meet-the-runtime)
@@ -625,20 +624,6 @@ registry.on_construct<my_type>().disconnect<&entt::registry::assign_or_replace<a
 There are many other types of dependencies. In general, most of the functions
 that accept an entity as the first argument are good candidates for this
 purpose.
-
-### Tags
-
-There's nothing magical about the way tags can be assigned to entities while
-avoiding a performance hit at runtime. Nonetheless, the syntax can be annoying
-and that's why a more user-friendly shortcut is provided to do it.<br/>
-This shortcut is the alias template `entt::tag`.
-
-If used in combination with hashed strings, it helps to use tags where types
-would be required otherwise. As an example:
-
-```cpp
-registry.assign<entt::tag<"enemy"_hs>>(entity);
-```
 
 ### Actor
 

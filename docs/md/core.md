@@ -14,6 +14,9 @@
 * [Monostate](#monostate)
 * [Type info](#type-info)
   * [Almost unique identifiers](#almost-unique-identifiers)
+* [Traits](#traits)
+  * [Member class type](#member-class-type)
+  * [Tags](#tags)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -256,3 +259,38 @@ many others. As already mentioned above, since users have full control over
 their types, this problem is in any case easy to solve and should not worry too
 much.<br/>
 In all likelihood, it will never happen to run into a conflict anyway.
+
+# Traits
+
+This section contains a handful of utilities and traits not present in the
+standard template library but which can be useful in everyday life.
+
+## Member class type
+
+The `auto` template parameter introduced with C++17 made it possible to simplify
+many class templates and template functions but also made the class type opaque
+when members are passed as template arguments.<br/>
+The purpose of this utility is to extract the class type in a few lines of code:
+
+```cpp
+template<typename Member>
+using clazz = entt::member_class_t<Member>;
+```
+
+## Tags
+
+Since in `EnTT` the type identified by `ENTT_ID_TYPE` is very important and
+widely used, there is a more user-friendly shortcut for the creation of integral
+constants based on it.<br/>
+This shortcut is the alias template `entt::tag`.
+
+If used in combination with hashed strings, it helps to use human-readable names
+where types would be required otherwise. As an example:
+
+```cpp
+registry.assign<entt::tag<"enemy"_hs>>(entity);
+```
+
+However, this isn't the only permitted use. Literally any value convertible to
+`ENTT_ID_TYPE` is a good candidate, such as the named constants of an unscoped
+enum.
