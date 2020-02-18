@@ -9,7 +9,6 @@
 #include "../core/type_traits.hpp"
 #include "sparse_set.hpp"
 #include "storage.hpp"
-#include "helper.hpp"
 #include "fwd.hpp"
 
 

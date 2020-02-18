@@ -19,7 +19,6 @@
 #include "sparse_set.hpp"
 #include "snapshot.hpp"
 #include "storage.hpp"
-#include "helper.hpp"
 #include "entity.hpp"
 #include "group.hpp"
 #include "view.hpp"
