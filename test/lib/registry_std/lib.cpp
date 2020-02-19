@@ -4,8 +4,8 @@
 
 ENTT_API void update_position(entt::registry &registry) {
     registry.view<position, velocity>().each([](auto &pos, auto &vel) {
-        pos.x += 16 * vel.dx;
-        pos.y += 16 * vel.dy;
+        pos.x += static_cast<int>(16 * vel.dx);
+        pos.y += static_cast<int>(16 * vel.dy);
     });
 }
 

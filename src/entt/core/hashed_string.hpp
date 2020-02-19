@@ -25,6 +25,7 @@ struct fnv1a_traits;
 
 template<>
 struct fnv1a_traits<std::uint32_t> {
+    using type = std::uint32_t;
     static constexpr std::uint32_t offset = 2166136261;
     static constexpr std::uint32_t prime = 16777619;
 };
@@ -32,6 +33,7 @@ struct fnv1a_traits<std::uint32_t> {
 
 template<>
 struct fnv1a_traits<std::uint64_t> {
+    using type = std::uint64_t;
     static constexpr std::uint64_t offset = 14695981039346656037ull;
     static constexpr std::uint64_t prime = 1099511628211ull;
 };
@@ -72,7 +74,7 @@ class basic_hashed_string {
         auto value = traits_type::offset;
 
         while(*curr != 0) {
-            value = (value ^ (*(curr++))) * traits_type::prime;
+            value = (value ^ static_cast<traits_type::type>(*(curr++))) * traits_type::prime;
         }
 
         return value;
