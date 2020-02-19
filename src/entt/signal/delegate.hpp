@@ -273,7 +273,7 @@ public:
      */
     explicit operator bool() const ENTT_NOEXCEPT {
         // no need to test also data
-        return fn;
+        return !(fn == nullptr);
     }
 
     /**

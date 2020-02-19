@@ -23,13 +23,13 @@ struct entt::type_info<Type> {
 };
 
 struct position {
-    int x{};
-    int y{};
+    int x;
+    int y;
 };
 
 struct velocity {
-    double dx{};
-    double dy{};
+    double dx;
+    double dy;
 };
 
 struct userdata {

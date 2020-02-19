@@ -533,8 +533,9 @@ public:
         bool valid = (node && node->type_id == internal::meta_info<Type>::resolve()->type_id);
 
         if(!valid) {
-            if(auto any = std::as_const(*this).convert<Type>(); (valid = static_cast<bool>(any))) {
+            if(auto any = std::as_const(*this).convert<Type>(); any) {
                 swap(any, *this);
+                valid = true;
             }
         }
 
@@ -566,7 +567,7 @@ public:
      * @return False if the container is empty, true otherwise.
      */
     explicit operator bool() const ENTT_NOEXCEPT {
-        return node;
+        return !(node == nullptr);
     }
 
     /**
@@ -696,7 +697,7 @@ struct meta_prop {
      * @return True if the meta object is valid, false otherwise.
      */
     explicit operator bool() const ENTT_NOEXCEPT {
-        return node;
+        return !(node == nullptr);
     }
 
 private:
@@ -734,7 +735,7 @@ struct meta_base {
      * @return True if the meta object is valid, false otherwise.
      */
     explicit operator bool() const ENTT_NOEXCEPT {
-        return node;
+        return !(node == nullptr);
     }
 
 private:
@@ -769,7 +770,7 @@ struct meta_conv {
      * @return True if the meta object is valid, false otherwise.
      */
     explicit operator bool() const ENTT_NOEXCEPT {
-        return node;
+        return !(node == nullptr);
     }
 
 private:
@@ -853,7 +854,7 @@ struct meta_ctor {
      * @return True if the meta object is valid, false otherwise.
      */
     explicit operator bool() const ENTT_NOEXCEPT {
-        return node;
+        return !(node == nullptr);
     }
 
 private:
@@ -996,7 +997,7 @@ struct meta_data {
      * @return True if the meta object is valid, false otherwise.
      */
     explicit operator bool() const ENTT_NOEXCEPT {
-        return node;
+        return !(node == nullptr);
     }
 
 private:
@@ -1113,7 +1114,7 @@ struct meta_func {
      * @return True if the meta object is valid, false otherwise.
      */
     explicit operator bool() const ENTT_NOEXCEPT {
-        return node;
+        return !(node == nullptr);
     }
 
 private:
@@ -1476,7 +1477,7 @@ public:
      * @return True if the meta object is valid, false otherwise.
      */
     explicit operator bool() const ENTT_NOEXCEPT {
-        return node;
+        return !(node == nullptr);
     }
 
     /**

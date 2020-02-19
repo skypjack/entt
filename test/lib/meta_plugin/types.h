@@ -4,13 +4,13 @@
 #include <entt/meta/meta.hpp>
 
 struct position {
-    int x{};
-    int y{};
+    int x;
+    int y;
 };
 
 struct velocity {
-    double dx{};
-    double dy{};
+    double dx;
+    double dy;
 };
 
 struct userdata {

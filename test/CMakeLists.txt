@@ -44,7 +44,7 @@ function(SETUP_TARGET TARGET_NAME)
         ${TARGET_NAME}
         PRIVATE
             $<$<NOT:$<PLATFORM_ID:Windows>>:-pedantic -fvisibility=hidden -Wall -Wshadow -Wno-deprecated-declarations>
-            $<$<PLATFORM_ID:Windows>:/EHsc /W1 /wd4996>
+            $<$<PLATFORM_ID:Windows>:/EHsc /W1 /wd4996 /w14800>
     )
 
     target_compile_options(

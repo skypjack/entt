@@ -388,7 +388,7 @@ class basic_continuous_loader {
     }
 
     template<typename Other, typename Type, typename Member>
-    void update(Other &instance, Member Type:: *member) {
+    void update([[maybe_unused]] Other &instance, [[maybe_unused]] Member Type:: *member) {
         if constexpr(!std::is_same_v<Other, Type>) {
             return;
         } else if constexpr(std::is_same_v<Member, Entity>) {
