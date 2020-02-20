@@ -3,8 +3,9 @@
 
 
 #include <type_traits>
-#include "../core/type_traits.hpp"
 #include "../config/config.h"
+#include "../core/type_traits.hpp"
+#include "../signal/delegate.hpp"
 #include "registry.hpp"
 #include "fwd.hpp"
 
@@ -109,6 +110,23 @@ as_group(basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<false, Entity>;
 /*! @copydoc as_group */
 template<typename Entity>
 as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>;
+
+
+
+/**
+ * @brief Helper to create a listener that directly invokes a member function.
+ * @tparam Member Member function to invoke on a component of the given type.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @param reg A registry that contains the given entity and its components.
+ * @param entt Entity from which to get the component.
+ */
+template<auto Member, typename Entity = entity>
+void invoke(basic_registry<Entity> &reg, const Entity entt) {
+    static_assert(std::is_member_function_pointer_v<decltype(Member)>);
+    delegate<void(basic_registry<Entity> &, const Entity)> func;
+    func.template connect<Member>(reg.template get<member_class_t<decltype(Member)>>(entt));
+    func(reg, entt);
+}
 
 
 }
