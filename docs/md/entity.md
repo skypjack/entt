@@ -19,6 +19,7 @@
   * [Helpers](#helpers)
     * [Null entity](#null-entity)
     * [Dependencies](#dependencies)
+    * [Invoke](#invoke)
     * [Actor](#actor)
     * [Context variables](#context-variables)
   * [Meet the runtime](#meet-the-runtime)
@@ -605,6 +606,20 @@ registry.on_construct<my_type>().disconnect<&entt::registry::assign_or_replace<a
 There are many other types of dependencies. In general, most of the functions
 that accept an entity as the first argument are good candidates for this
 purpose.
+
+### Invoke
+
+Sometimes it's useful to be able to directly invoke a member function of a
+component as a callback. It's already possible in practice but requires users to
+_extend_ their classes and this may not always be possible.<br/>
+The `invoke` helper allows to _propagate_ the signal in these cases:
+
+```cpp
+registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>();
+```
+
+All it does is pick up the _right_ component for the received entity and invoke
+the requested method, passing on the arguments if necessary.
 
 ### Actor
 
