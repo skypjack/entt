@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.2.2</span>
+   &#160;<span id="projectnumber">3.3.0</span>
    </div>
   </td>
  </tr>
@@ -74,44 +74,43 @@ $(function() {
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define ENTT_CORE_MONOSTATE_HPP</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160; </div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;cassert&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">template</span>&lt;ENTT_ID_TYPE&gt;</div>
-<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="structentt_1_1monostate.html">   24</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structentt_1_1monostate.html">monostate</a> {</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="structentt_1_1monostate.html#a2b2751ad1d49cbf5068fde7e0e8640ac">   31</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="structentt_1_1monostate.html#a2b2751ad1d49cbf5068fde7e0e8640ac">operator=</a>(Type val) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        value&lt;Type&gt; = val;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    }</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="structentt_1_1monostate.html#aac27bfe6d1feb94cc601cc38077f923a">   41</a></span>&#160;    <span class="keyword">operator</span> Type() const ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keywordflow">return</span> value&lt;Type&gt;;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">inline</span> <span class="keyword">static</span> ENTT_MAYBE_ATOMIC(Type) value{};</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;};</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">template</span>&lt;ENTT_ID_TYPE&gt;</div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="structentt_1_1monostate.html">   23</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structentt_1_1monostate.html">monostate</a> {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="structentt_1_1monostate.html#a2b2751ad1d49cbf5068fde7e0e8640ac">   30</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="structentt_1_1monostate.html#a2b2751ad1d49cbf5068fde7e0e8640ac">operator=</a>(Type val) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        value&lt;Type&gt; = val;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    }</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="structentt_1_1monostate.html#aac27bfe6d1feb94cc601cc38077f923a">   40</a></span>&#160;    <span class="keyword">operator</span> Type() const ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keywordflow">return</span> value&lt;Type&gt;;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">inline</span> <span class="keyword">static</span> ENTT_MAYBE_ATOMIC(Type) value{};</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;};</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="keyword">template</span>&lt;ENTT_ID_TYPE Value&gt;</div>
-<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="namespaceentt.html#ab43a13f7ee60bcb0d04a001f92b86fa2">   56</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="structentt_1_1monostate.html">monostate&lt;Value&gt;</a> <a class="code" href="namespaceentt.html#ab43a13f7ee60bcb0d04a001f92b86fa2">monostate_v</a> = {};</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">template</span>&lt;ENTT_ID_TYPE Value&gt;</div>
+<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="namespaceentt.html#ab43a13f7ee60bcb0d04a001f92b86fa2">   55</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="structentt_1_1monostate.html">monostate&lt;Value&gt;</a> <a class="code" href="namespaceentt.html#ab43a13f7ee60bcb0d04a001f92b86fa2">monostate_v</a> = {};</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;}</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;}</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#endif // ENTT_CORE_MONOSTATE_HPP</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="astructentt_1_1monostate_html"><div class="ttname"><a href="structentt_1_1monostate.html">entt::monostate</a></div><div class="ttdoc">Minimal implementation of the monostate pattern.</div><div class="ttdef"><b>Definition:</b> <a href="monostate_8hpp_source.html#l00024">monostate.hpp:24</a></div></div>
-<div class="ttc" id="astructentt_1_1monostate_html_a2b2751ad1d49cbf5068fde7e0e8640ac"><div class="ttname"><a href="structentt_1_1monostate.html#a2b2751ad1d49cbf5068fde7e0e8640ac">entt::monostate::operator=</a></div><div class="ttdeci">void operator=(Type val) const ENTT_NOEXCEPT</div><div class="ttdoc">Assigns a value of a specific type to a given key.</div><div class="ttdef"><b>Definition:</b> <a href="monostate_8hpp_source.html#l00031">monostate.hpp:31</a></div></div>
-<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00012">algorithm.hpp:12</a></div></div>
-<div class="ttc" id="anamespaceentt_html_ab43a13f7ee60bcb0d04a001f92b86fa2"><div class="ttname"><a href="namespaceentt.html#ab43a13f7ee60bcb0d04a001f92b86fa2">entt::monostate_v</a></div><div class="ttdeci">monostate&lt; Value &gt; monostate_v</div><div class="ttdoc">Helper variable template.</div><div class="ttdef"><b>Definition:</b> <a href="monostate_8hpp_source.html#l00056">monostate.hpp:56</a></div></div>
+<div class="ttc" id="astructentt_1_1monostate_html"><div class="ttname"><a href="structentt_1_1monostate.html">entt::monostate</a></div><div class="ttdoc">Minimal implementation of the monostate pattern.</div><div class="ttdef"><b>Definition:</b> <a href="monostate_8hpp_source.html#l00023">monostate.hpp:23</a></div></div>
+<div class="ttc" id="astructentt_1_1monostate_html_a2b2751ad1d49cbf5068fde7e0e8640ac"><div class="ttname"><a href="structentt_1_1monostate.html#a2b2751ad1d49cbf5068fde7e0e8640ac">entt::monostate::operator=</a></div><div class="ttdeci">void operator=(Type val) const ENTT_NOEXCEPT</div><div class="ttdoc">Assigns a value of a specific type to a given key.</div><div class="ttdef"><b>Definition:</b> <a href="monostate_8hpp_source.html#l00030">monostate.hpp:30</a></div></div>
+<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00013">algorithm.hpp:13</a></div></div>
+<div class="ttc" id="anamespaceentt_html_ab43a13f7ee60bcb0d04a001f92b86fa2"><div class="ttname"><a href="namespaceentt.html#ab43a13f7ee60bcb0d04a001f92b86fa2">entt::monostate_v</a></div><div class="ttdeci">monostate&lt; Value &gt; monostate_v</div><div class="ttdoc">Helper variable template.</div><div class="ttdef"><b>Definition:</b> <a href="monostate_8hpp_source.html#l00055">monostate.hpp:55</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

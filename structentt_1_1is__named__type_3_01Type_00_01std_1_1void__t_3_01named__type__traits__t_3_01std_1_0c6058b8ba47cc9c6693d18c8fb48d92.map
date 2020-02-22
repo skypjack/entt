@@ -1,4 +1,0 @@
-<map id="entt::is_named_type&lt; Type, std::void_t&lt; named_type_traits_t&lt; std::decay_t&lt; Type &gt; &gt; &gt; &gt;" name="entt::is_named_type&lt; Type, std::void_t&lt; named_type_traits_t&lt; std::decay_t&lt; Type &gt; &gt; &gt; &gt;">
-<area shape="rect" id="node1" title="Provides the member constant value to true if a given type has a name. In all other cases,..." alt="" coords="5,80,164,165"/>
-<area shape="rect" id="node2" title=" " alt="" coords="47,5,123,32"/>
-</map>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.2.2</span>
+   &#160;<span id="projectnumber">3.3.0</span>
    </div>
   </td>
  </tr>
@@ -78,24 +78,33 @@ $(function() {
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt;</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">class </span><a class="code" href="namespaceentt.html#a464a269b63d8c76395b0c54f33d3d6fb">delegate</a>;</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">class </span><a class="code" href="namespaceentt.html#a40a1dbbb903a3a90b4aa59250a9a68ed">delegate</a>;</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt;</div>
-<div class="line"><a name="l00014"></a><span class="lineno"><a class="line" href="classentt_1_1sink.html">   14</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1sink.html">sink</a>;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt;</div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="classentt_1_1sigh.html">   18</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1sigh.html">sigh</a>;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;}</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#endif // ENTT_SIGNAL_FWD_HPP</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">class </span>dispatcher;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">class </span>emitter;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">class </span>connection;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">struct </span>scoped_connection;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt;</div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classentt_1_1sink.html">   27</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1sink.html">sink</a>;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt;</div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="classentt_1_1sigh.html">   31</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1sigh.html">sigh</a>;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;}</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassentt_1_1sigh_html"><div class="ttname"><a href="classentt_1_1sigh.html">entt::sigh</a></div><div class="ttdoc">Unmanaged signal handler.</div><div class="ttdef"><b>Definition:</b> <a href="signal_2fwd_8hpp_source.html#l00018">fwd.hpp:18</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a464a269b63d8c76395b0c54f33d3d6fb"><div class="ttname"><a href="namespaceentt.html#a464a269b63d8c76395b0c54f33d3d6fb">entt::delegate</a></div><div class="ttdeci">delegate(connect_arg_t&lt; Function &gt;) ENTT_NOEXCEPT -&gt; delegate&lt; std::remove_pointer_t&lt; internal::to_function_pointer_t&lt; decltype(Function)&gt;&gt;&gt;</div><div class="ttdoc">Deduction guide.</div></div>
-<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00012">algorithm.hpp:12</a></div></div>
-<div class="ttc" id="aclassentt_1_1sink_html"><div class="ttname"><a href="classentt_1_1sink.html">entt::sink</a></div><div class="ttdoc">Sink class.</div><div class="ttdef"><b>Definition:</b> <a href="signal_2fwd_8hpp_source.html#l00014">fwd.hpp:14</a></div></div>
+<div class="ttc" id="aclassentt_1_1sigh_html"><div class="ttname"><a href="classentt_1_1sigh.html">entt::sigh</a></div><div class="ttdoc">Unmanaged signal handler.</div><div class="ttdef"><b>Definition:</b> <a href="signal_2fwd_8hpp_source.html#l00031">fwd.hpp:31</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a40a1dbbb903a3a90b4aa59250a9a68ed"><div class="ttname"><a href="namespaceentt.html#a40a1dbbb903a3a90b4aa59250a9a68ed">entt::delegate</a></div><div class="ttdeci">delegate(connect_arg_t&lt; Candidate &gt;) ENTT_NOEXCEPT -&gt; delegate&lt; std::remove_pointer_t&lt; internal::function_pointer_t&lt; decltype(Candidate)&gt;&gt;&gt;</div><div class="ttdoc">Deduction guide.</div></div>
+<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00013">algorithm.hpp:13</a></div></div>
+<div class="ttc" id="aclassentt_1_1sink_html"><div class="ttname"><a href="classentt_1_1sink.html">entt::sink</a></div><div class="ttdoc">Sink class.</div><div class="ttdef"><b>Definition:</b> <a href="signal_2fwd_8hpp_source.html#l00027">fwd.hpp:27</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

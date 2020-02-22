@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.2.2</span>
+   &#160;<span id="projectnumber">3.3.0</span>
    </div>
   </td>
  </tr>
@@ -90,10 +90,10 @@ using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a7b06b3a881b89c9d3b9829ccf111fae4"><td class="memItemLeft" align="right" valign="top"><a id="a7b06b3a881b89c9d3b9829ccf111fae4"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1scheduler.html#a7b06b3a881b89c9d3b9829ccf111fae4">scheduler</a> () ENTT_NOEXCEPT=default</td></tr>
-<tr class="memdesc:a7b06b3a881b89c9d3b9829ccf111fae4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
-<tr class="separator:a7b06b3a881b89c9d3b9829ccf111fae4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49a81e662dc26831f4a951a715705d6e"><td class="memItemLeft" align="right" valign="top"><a id="a49a81e662dc26831f4a951a715705d6e"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1scheduler.html#a49a81e662dc26831f4a951a715705d6e">scheduler</a> ()=default</td></tr>
+<tr class="memdesc:a49a81e662dc26831f4a951a715705d6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
+<tr class="separator:a49a81e662dc26831f4a951a715705d6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af582ffea72368a83ea4dd7d9e563f715"><td class="memItemLeft" align="right" valign="top"><a id="af582ffea72368a83ea4dd7d9e563f715"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classentt_1_1scheduler.html#af582ffea72368a83ea4dd7d9e563f715">scheduler</a> (<a class="el" href="classentt_1_1scheduler.html">scheduler</a> &amp;&amp;)=default</td></tr>
 <tr class="memdesc:af582ffea72368a83ea4dd7d9e563f715"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default move constructor. <br /></td></tr>
@@ -134,7 +134,7 @@ class entt::scheduler&lt; Delta &gt;</h3>
 <p>Each process is invoked once per tick. If a process terminates, it's removed automatically from the scheduler and it's never invoked again.<br  />
  A process can also have a child. In this case, the process is replaced with its child when it terminates if it returns with success. In case of errors, both the process and its child are discarded.</p>
 <p>Example of use (pseudocode):</p>
-<div class="fragment"><div class="line"><a class="code" href="classentt_1_1scheduler.html#a7b06b3a881b89c9d3b9829ccf111fae4">scheduler</a>.attach([](<span class="keyword">auto</span> delta, <span class="keywordtype">void</span> *, <span class="keyword">auto</span> succeed, <span class="keyword">auto</span> fail) {</div>
+<div class="fragment"><div class="line"><a class="code" href="classentt_1_1scheduler.html#a49a81e662dc26831f4a951a715705d6e">scheduler</a>.attach([](<span class="keyword">auto</span> delta, <span class="keywordtype">void</span> *, <span class="keyword">auto</span> succeed, <span class="keyword">auto</span> fail) {</div>
 <div class="line">    <span class="comment">// code</span></div>
 <div class="line">}).then&lt;my_process&gt;(arguments...);</div>
 </div><!-- fragment --><p>In order to invoke all scheduled processes, call the <code>update</code> member function passing it the elapsed time to forward to the tasks.</p>
@@ -220,7 +220,7 @@ template&lt;typename Proc , typename... Args&gt; </div>
 <p>Returned value is an opaque object that can be used to attach a child to the given process. The child is automatically scheduled when the process terminates and only if the process returns with success.</p>
 <p>Example of use (pseudocode):</p>
 <div class="fragment"><div class="line"><span class="comment">// schedules a task in the form of a process class</span></div>
-<div class="line"><a class="code" href="classentt_1_1scheduler.html#a7b06b3a881b89c9d3b9829ccf111fae4">scheduler</a>.attach&lt;my_process&gt;(arguments...)</div>
+<div class="line"><a class="code" href="classentt_1_1scheduler.html#a49a81e662dc26831f4a951a715705d6e">scheduler</a>.attach&lt;my_process&gt;(arguments...)</div>
 <div class="line"><span class="comment">// appends a child in the form of a lambda function</span></div>
 <div class="line">.then([](<span class="keyword">auto</span> delta, <span class="keywordtype">void</span> *, <span class="keyword">auto</span> succeed, <span class="keyword">auto</span> fail) {</div>
 <div class="line">    <span class="comment">// code</span></div>
@@ -290,7 +290,7 @@ template&lt;typename Func &gt; </div>
 </div><!-- fragment --><p>Returned value is an opaque object that can be used to attach a child to the given process. The child is automatically scheduled when the process terminates and only if the process returns with success.</p>
 <p>Example of use (pseudocode):</p>
 <div class="fragment"><div class="line"><span class="comment">// schedules a task in the form of a lambda function</span></div>
-<div class="line"><a class="code" href="classentt_1_1scheduler.html#a7b06b3a881b89c9d3b9829ccf111fae4">scheduler</a>.attach([](<span class="keyword">auto</span> delta, <span class="keywordtype">void</span> *, <span class="keyword">auto</span> succeed, <span class="keyword">auto</span> fail) {</div>
+<div class="line"><a class="code" href="classentt_1_1scheduler.html#a49a81e662dc26831f4a951a715705d6e">scheduler</a>.attach([](<span class="keyword">auto</span> delta, <span class="keywordtype">void</span> *, <span class="keyword">auto</span> succeed, <span class="keyword">auto</span> fail) {</div>
 <div class="line">    <span class="comment">// code</span></div>
 <div class="line">})</div>
 <div class="line"><span class="comment">// appends a child in the form of another lambda function</span></div>
@@ -500,7 +500,7 @@ template&lt;typename Delta&gt; </div>
 <li>src/entt/process/<a class="el" href="scheduler_8hpp_source.html">scheduler.hpp</a></li>
 </ul>
 </div><!-- contents -->
-<div class="ttc" id="aclassentt_1_1scheduler_html_a7b06b3a881b89c9d3b9829ccf111fae4"><div class="ttname"><a href="classentt_1_1scheduler.html#a7b06b3a881b89c9d3b9829ccf111fae4">entt::scheduler::scheduler</a></div><div class="ttdeci">scheduler() ENTT_NOEXCEPT=default</div><div class="ttdoc">Default constructor.</div></div>
+<div class="ttc" id="aclassentt_1_1scheduler_html_a49a81e662dc26831f4a951a715705d6e"><div class="ttname"><a href="classentt_1_1scheduler.html#a49a81e662dc26831f4a951a715705d6e">entt::scheduler::scheduler</a></div><div class="ttdeci">scheduler()=default</div><div class="ttdoc">Default constructor.</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

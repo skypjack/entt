@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.2.2</span>
+   &#160;<span id="projectnumber">3.3.0</span>
    </div>
   </td>
  </tr>
@@ -80,390 +80,381 @@ $(function() {
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;cstddef&gt;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;numeric&gt;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;../core/algorithm.hpp&quot;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;entity.hpp&quot;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;fwd.hpp&quot;</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;../core/algorithm.hpp&quot;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;entity.hpp&quot;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;fwd.hpp&quot;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Entity&gt;</div>
-<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html">   50</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> {</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">using</span> <a class="code" href="structentt_1_1entt__traits.html">traits_type</a> = <a class="code" href="structentt_1_1entt__traits.html">entt_traits&lt;std::underlying_type_t&lt;Entity&gt;</a>&gt;;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    static_assert(ENTT_PAGE_SIZE &amp;&amp; ((ENTT_PAGE_SIZE &amp; (ENTT_PAGE_SIZE - 1)) == 0));</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">auto</span> entt_per_page = ENTT_PAGE_SIZE / <span class="keyword">sizeof</span>(<span class="keyword">typename</span> traits_type::entity_type);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">class </span>iterator {</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classentt_1_1sparse__set.html">sparse_set</a>&lt;Entity&gt;;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keyword">using</span> direct_type = <span class="keyword">const</span> std::vector&lt;Entity&gt;;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keyword">using</span> index_type = <span class="keyword">typename</span> traits_type::difference_type;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        iterator(direct_type *ref, <span class="keyword">const</span> index_type idx) ENTT_NOEXCEPT</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;            : direct{ref}, <a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a>{idx}</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        {}</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keyword">using</span> difference_type = index_type;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keyword">using</span> value_type = Entity;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keyword">using</span> pointer = <span class="keyword">const</span> value_type *;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keyword">using</span> reference = <span class="keyword">const</span> value_type &amp;;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        <span class="keyword">using</span> iterator_category = std::random_access_iterator_tag;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        iterator() ENTT_NOEXCEPT = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        iterator &amp; operator++() ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;            <span class="keywordflow">return</span> --<a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a>, *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        }</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        iterator operator++(<span class="keywordtype">int</span>) ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            iterator orig = *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            <span class="keywordflow">return</span> ++(*this), orig;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        }</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        iterator &amp; operator--() ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            <span class="keywordflow">return</span> ++<a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a>, *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        }</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        iterator operator--(<span class="keywordtype">int</span>) ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;            iterator orig = *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;            <span class="keywordflow">return</span> --(*this), orig;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        }</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        iterator &amp; operator+=(<span class="keyword">const</span> difference_type value) ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            <a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a> -= value;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        }</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        iterator operator+(<span class="keyword">const</span> difference_type value) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            <span class="keywordflow">return</span> iterator{direct, <a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a>-value};</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        }</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        iterator &amp; operator-=(<span class="keyword">const</span> difference_type value) ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            <span class="keywordflow">return</span> (*<span class="keyword">this</span> += -value);</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        }</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        iterator operator-(<span class="keyword">const</span> difference_type value) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;            <span class="keywordflow">return</span> (*<span class="keyword">this</span> + -value);</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        }</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        difference_type operator-(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            <span class="keywordflow">return</span> other.index - <a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a>;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        }</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        reference operator[](<span class="keyword">const</span> difference_type value) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> pos = <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(<a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a>-value-1);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;            <span class="keywordflow">return</span> (*direct)[pos];</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        }</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        <span class="keywordtype">bool</span> operator==(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;            <span class="keywordflow">return</span> other.index == <a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a>;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        }</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="namespaceentt.html#a1a211752d12273a08015c524133e27c3">operator!=</a>(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;            <span class="keywordflow">return</span> !(*<span class="keyword">this</span> == other);</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        }</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        <span class="keywordtype">bool</span> operator&lt;(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a> &gt; other.index;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        }</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        <span class="keywordtype">bool</span> operator&gt;(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a> &lt; other.index;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        }</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <span class="keywordtype">bool</span> operator&lt;=(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;            <span class="keywordflow">return</span> !(*<span class="keyword">this</span> &gt; other);</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        }</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        <span class="keywordtype">bool</span> operator&gt;=(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;            <span class="keywordflow">return</span> !(*<span class="keyword">this</span> &lt; other);</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        }</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        pointer operator-&gt;() <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> pos = <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(<a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a>-1);</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;            <span class="keywordflow">return</span> &amp;(*direct)[pos];</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        }</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        reference operator*() <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;            <span class="keywordflow">return</span> *operator-&gt;();</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        }</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160; </div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        direct_type *direct;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        index_type <a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a>;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    };</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordtype">void</span> assure(<span class="keyword">const</span> std::size_t page) {</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        <span class="keywordflow">if</span>(!(page &lt; reverse.size())) {</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;            reverse.resize(page+1);</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        }</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160; </div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        <span class="keywordflow">if</span>(!reverse[page]) {</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;            reverse[page] = std::make_unique&lt;entity_type[]&gt;(entt_per_page);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;            <span class="comment">// null is safe in all cases for our purposes</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;            std::fill_n(reverse[page].<a class="code" href="namespaceentt.html#a8c24ecc5ab0055f9f2a4725c95afb29e">get</a>(), entt_per_page, <span class="keyword">null</span>);</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        }</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    }</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Entity&gt;</div>
+<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html">   49</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> {</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">using</span> <a class="code" href="structentt_1_1entt__traits.html">traits_type</a> = <a class="code" href="structentt_1_1entt__traits.html">entt_traits&lt;std::underlying_type_t&lt;Entity&gt;</a>&gt;;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    static_assert(ENTT_PAGE_SIZE &amp;&amp; ((ENTT_PAGE_SIZE &amp; (ENTT_PAGE_SIZE - 1)) == 0));</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">auto</span> entt_per_page = ENTT_PAGE_SIZE / <span class="keyword">sizeof</span>(<span class="keyword">typename</span> traits_type::entity_type);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">class </span>iterator {</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classentt_1_1sparse__set.html">sparse_set</a>&lt;Entity&gt;;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keyword">using</span> direct_type = std::vector&lt;Entity&gt;;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keyword">using</span> index_type = <span class="keyword">typename</span> traits_type::difference_type;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        iterator(<span class="keyword">const</span> direct_type *ref, <span class="keyword">const</span> index_type idx) ENTT_NOEXCEPT</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            : direct{ref}, <a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a>{idx}</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        {}</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="keyword">using</span> difference_type = index_type;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keyword">using</span> value_type = Entity;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keyword">using</span> pointer = <span class="keyword">const</span> value_type *;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keyword">using</span> reference = <span class="keyword">const</span> value_type &amp;;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keyword">using</span> iterator_category = std::random_access_iterator_tag;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        iterator() ENTT_NOEXCEPT = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        iterator &amp; operator++() ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;            <span class="keywordflow">return</span> --<a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a>, *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        iterator operator++(<span class="keywordtype">int</span>) ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;            iterator orig = *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            <span class="keywordflow">return</span> operator++(), orig;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        }</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        iterator &amp; operator--() ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            <span class="keywordflow">return</span> ++<a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a>, *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        }</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        iterator operator--(<span class="keywordtype">int</span>) ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;            iterator orig = *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;            <span class="keywordflow">return</span> operator--(), orig;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        }</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        iterator &amp; operator+=(<span class="keyword">const</span> difference_type value) ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;            <a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a> -= value;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        }</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        iterator operator+(<span class="keyword">const</span> difference_type value) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            <span class="keywordflow">return</span> iterator{direct, <a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a>-value};</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        }</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        iterator &amp; operator-=(<span class="keyword">const</span> difference_type value) ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;            <span class="keywordflow">return</span> (*<span class="keyword">this</span> += -value);</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        }</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        iterator operator-(<span class="keyword">const</span> difference_type value) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;            <span class="keywordflow">return</span> (*<span class="keyword">this</span> + -value);</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        }</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        difference_type operator-(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            <span class="keywordflow">return</span> other.index - <a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a>;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        }</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        reference operator[](<span class="keyword">const</span> difference_type value)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> pos = <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(<a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a>-value-1);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;            <span class="keywordflow">return</span> (*direct)[pos];</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        }</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        <span class="keywordtype">bool</span> operator==(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;            <span class="keywordflow">return</span> other.index == <a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a>;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        }</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="namespaceentt.html#a1a211752d12273a08015c524133e27c3">operator!=</a>(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;            <span class="keywordflow">return</span> !(*<span class="keyword">this</span> == other);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        }</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keywordtype">bool</span> operator&lt;(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a> &gt; other.index;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        }</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        <span class="keywordtype">bool</span> operator&gt;(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a> &lt; other.index;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        }</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        <span class="keywordtype">bool</span> operator&lt;=(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;            <span class="keywordflow">return</span> !(*<span class="keyword">this</span> &gt; other);</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        }</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        <span class="keywordtype">bool</span> operator&gt;=(<span class="keyword">const</span> iterator &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;            <span class="keywordflow">return</span> !(*<span class="keyword">this</span> &lt; other);</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        }</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160; </div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        pointer operator-&gt;()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> pos = <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(<a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a>-1);</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;            <span class="keywordflow">return</span> &amp;(*direct)[pos];</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        }</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        reference operator*()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;            <span class="keywordflow">return</span> *operator-&gt;();</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        }</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        <span class="keyword">const</span> direct_type *direct;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        index_type <a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a>;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    };</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keyword">auto</span> page(<span class="keyword">const</span> Entity <a class="code" href="namespaceentt.html">entt</a>) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        <span class="keywordflow">return</span> std::size_t{(to_integral(<a class="code" href="namespaceentt.html">entt</a>) &amp; traits_type::entity_mask) / entt_per_page};</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    }</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="keyword">auto</span> offset(<span class="keyword">const</span> Entity <a class="code" href="namespaceentt.html">entt</a>) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        <span class="keywordflow">return</span> std::size_t{to_integral(<a class="code" href="namespaceentt.html">entt</a>) &amp; (entt_per_page - 1)};</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    }</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    Entity * assure(<span class="keyword">const</span> std::size_t pos) {</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        <span class="keywordflow">if</span>(!(pos &lt; reverse.size())) {</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;            reverse.resize(pos+1);</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        }</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keyword">auto</span> map(<span class="keyword">const</span> Entity <a class="code" href="namespaceentt.html">entt</a>) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="classentt_1_1identifier.html">identifier</a> = to_integer(<a class="code" href="namespaceentt.html">entt</a>) &amp; traits_type::entity_mask;</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> page = <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(<a class="code" href="classentt_1_1identifier.html">identifier</a> / entt_per_page);</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> offset = <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(<a class="code" href="classentt_1_1identifier.html">identifier</a> &amp; (entt_per_page - 1));</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        <span class="keywordflow">return</span> std::make_pair(page, offset);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    }</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00178"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">  178</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> = Entity;</div>
-<div class="line"><a name="l00180"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">  180</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> = std::size_t;</div>
-<div class="line"><a name="l00182"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">  182</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> = iterator;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a8ef544aaed30126797f6f0b9a9f8b9e8">sparse_set</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
-<div class="line"><a name="l00191"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#af684a44e129f3aafd311814b5972378f">  191</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#af684a44e129f3aafd311814b5972378f">sparse_set</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> &amp;other)</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        : reverse{},</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;          direct{other.direct}</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    {</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        <span class="keywordflow">for</span>(<a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> pos{}, last = other.reverse.size(); pos &lt; last; ++pos) {</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;            <span class="keywordflow">if</span>(other.reverse[pos]) {</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;                assure(pos);</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;                std::copy_n(other.reverse[pos].get(), entt_per_page, reverse[pos].get());</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;            }</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        }</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    }</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160; </div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a8ef544aaed30126797f6f0b9a9f8b9e8">sparse_set</a>(<a class="code" href="classentt_1_1sparse__set.html#a8ef544aaed30126797f6f0b9a9f8b9e8">sparse_set</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classentt_1_1sparse__set.html#a74c49e0d205b6240bf14ac3003cfcbd1">~sparse_set</a>() ENTT_NOEXCEPT = default;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
-<div class="line"><a name="l00214"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a32a00ca96cc7e78089fb7120d144de34">  214</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> &amp; operator=(const <a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> &amp;other) {</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        <span class="keywordflow">if</span>(&amp;other != <span class="keyword">this</span>) {</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;            <span class="keyword">auto</span> tmp{other};</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;            *<span class="keyword">this</span> = std::move(tmp);</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        }</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    }</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> &amp; <a class="code" href="classentt_1_1sparse__set.html#a32a00ca96cc7e78089fb7120d144de34">operator=</a>(<a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
-<div class="line"><a name="l00234"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a8b4b9dd989877bc333fdc455fcd068d7">  234</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#a8b4b9dd989877bc333fdc455fcd068d7">reserve</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> cap) {</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        direct.reserve(cap);</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    }</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
-<div class="line"><a name="l00243"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a30267005e552fce0d2a9b4e4d70d6656">  243</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> <a class="code" href="classentt_1_1sparse__set.html#a30267005e552fce0d2a9b4e4d70d6656">capacity</a>() const ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        <span class="keywordflow">return</span> direct.capacity();</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    }</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
-<div class="line"><a name="l00248"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a75f5d70148a149e4cbc485c7a7b00dda">  248</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#a75f5d70148a149e4cbc485c7a7b00dda">shrink_to_fit</a>() {</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        <span class="comment">// conservative approach</span></div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="keywordflow">if</span>(direct.empty()) {</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;            reverse.clear();</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        }</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160; </div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        reverse.shrink_to_fit();</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        direct.shrink_to_fit();</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    }</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
-<div class="line"><a name="l00268"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#af79345df59154e5ea9e58b7efa7ff8f0">  268</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> <a class="code" href="classentt_1_1sparse__set.html#af79345df59154e5ea9e58b7efa7ff8f0">extent</a>() const ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        <span class="keywordflow">return</span> reverse.size() * entt_per_page;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    }</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160; </div>
-<div class="line"><a name="l00282"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a340dff7484f1e58feff58a5f0627e190">  282</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> <a class="code" href="classentt_1_1sparse__set.html#a340dff7484f1e58feff58a5f0627e190">size</a>() const ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        <span class="keywordflow">return</span> direct.size();</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    }</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160; </div>
-<div class="line"><a name="l00290"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#ae1a16cb354a9ed5ded92b6edcddce15e">  290</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1sparse__set.html#ae1a16cb354a9ed5ded92b6edcddce15e">empty</a>() const ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        <span class="keywordflow">return</span> direct.empty();</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    }</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160; </div>
-<div class="line"><a name="l00309"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a2eafe4975271769b08fe7f7d4924992f">  309</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> * <a class="code" href="classentt_1_1sparse__set.html#a2eafe4975271769b08fe7f7d4924992f">data</a>() const ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;        <span class="keywordflow">return</span> direct.data();</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    }</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160; </div>
-<div class="line"><a name="l00326"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a06743336f265989b48e106a3d3bd1562">  326</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> <a class="code" href="classentt_1_1sparse__set.html#a06743336f265989b48e106a3d3bd1562">begin</a>() const ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;        <span class="keyword">const</span> <span class="keyword">typename</span> traits_type::difference_type pos = direct.size();</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a>{&amp;direct, pos};</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    }</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160; </div>
-<div class="line"><a name="l00345"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">  345</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>() const ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a>{&amp;direct, {}};</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    }</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160; </div>
-<div class="line"><a name="l00355"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a0ed57521bb3279b5ed3cd397b65abf01">  355</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> <a class="code" href="classentt_1_1sparse__set.html#a0ed57521bb3279b5ed3cd397b65abf01">find</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classentt_1_1sparse__set.html#af4eb4faf1aa28d20717716bea7981f5b">has</a>(<a class="code" href="namespaceentt.html">entt</a>) ? --(<a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>() - <a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a>(<a class="code" href="namespaceentt.html">entt</a>)) : <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>();</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    }</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160; </div>
-<div class="line"><a name="l00364"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#af4eb4faf1aa28d20717716bea7981f5b">  364</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1sparse__set.html#af4eb4faf1aa28d20717716bea7981f5b">has</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        <span class="keyword">auto</span> [page, offset] = map(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;        <span class="comment">// testing against null permits to avoid accessing the direct vector</span></div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;        <span class="keywordflow">return</span> (page &lt; reverse.size() &amp;&amp; reverse[page] &amp;&amp; reverse[page][offset] != <span class="keyword">null</span>);</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    }</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160; </div>
-<div class="line"><a name="l00382"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">  382</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> <a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;        ENTT_ASSERT(<a class="code" href="classentt_1_1sparse__set.html#af4eb4faf1aa28d20717716bea7981f5b">has</a>(<a class="code" href="namespaceentt.html">entt</a>));</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        <span class="keyword">auto</span> [page, offset] = map(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(reverse[page][offset]);</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        <span class="keywordflow">if</span>(!reverse[pos]) {</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;            reverse[pos] = std::make_unique&lt;entity_type[]&gt;(entt_per_page);</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;            <span class="comment">// null is safe in all cases for our purposes</span></div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;            std::fill_n(reverse[pos].<a class="code" href="namespaceentt.html#a8c24ecc5ab0055f9f2a4725c95afb29e">get</a>(), entt_per_page, <span class="keyword">null</span>);</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        }</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        <span class="keywordflow">return</span> reverse[pos].get();</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    }</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00180"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">  180</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> = Entity;</div>
+<div class="line"><a name="l00182"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">  182</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> = std::size_t;</div>
+<div class="line"><a name="l00184"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">  184</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> = iterator;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160; </div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a8ef544aaed30126797f6f0b9a9f8b9e8">sparse_set</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
+<div class="line"><a name="l00193"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#af684a44e129f3aafd311814b5972378f">  193</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#af684a44e129f3aafd311814b5972378f">sparse_set</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> &amp;other)</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        : reverse{},</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;          direct{other.direct}</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    {</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        <span class="keywordflow">for</span>(<a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> pos{}, last = other.reverse.size(); pos &lt; last; ++pos) {</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;            <span class="keywordflow">if</span>(other.reverse[pos]) {</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;                std::copy_n(other.reverse[pos].get(), entt_per_page, assure(pos));</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;            }</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        }</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    }</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a8ef544aaed30126797f6f0b9a9f8b9e8">sparse_set</a>(<a class="code" href="classentt_1_1sparse__set.html#a8ef544aaed30126797f6f0b9a9f8b9e8">sparse_set</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classentt_1_1sparse__set.html#a2ea4731d5a2e22f4bd43f8e19ca39f58">~sparse_set</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
+<div class="line"><a name="l00215"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a32a00ca96cc7e78089fb7120d144de34">  215</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> &amp; <a class="code" href="classentt_1_1sparse__set.html#a32a00ca96cc7e78089fb7120d144de34">operator=</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> &amp;other) {</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        <span class="keywordflow">if</span>(&amp;other != <span class="keyword">this</span>) {</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;            <span class="keyword">auto</span> tmp{other};</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;            *<span class="keyword">this</span> = std::move(tmp);</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        }</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160; </div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    }</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> &amp; <a class="code" href="classentt_1_1sparse__set.html#a32a00ca96cc7e78089fb7120d144de34">operator=</a>(<a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160; </div>
+<div class="line"><a name="l00235"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a8b4b9dd989877bc333fdc455fcd068d7">  235</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#a8b4b9dd989877bc333fdc455fcd068d7">reserve</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> cap) {</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        direct.reserve(cap);</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    }</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
+<div class="line"><a name="l00244"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a30267005e552fce0d2a9b4e4d70d6656">  244</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> <a class="code" href="classentt_1_1sparse__set.html#a30267005e552fce0d2a9b4e4d70d6656">capacity</a>() const ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        <span class="keywordflow">return</span> direct.capacity();</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    }</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
+<div class="line"><a name="l00249"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a75f5d70148a149e4cbc485c7a7b00dda">  249</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#a75f5d70148a149e4cbc485c7a7b00dda">shrink_to_fit</a>() {</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="comment">// conservative approach</span></div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <span class="keywordflow">if</span>(direct.empty()) {</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;            reverse.clear();</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        }</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160; </div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        reverse.shrink_to_fit();</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        direct.shrink_to_fit();</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    }</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160; </div>
+<div class="line"><a name="l00269"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#af79345df59154e5ea9e58b7efa7ff8f0">  269</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> <a class="code" href="classentt_1_1sparse__set.html#af79345df59154e5ea9e58b7efa7ff8f0">extent</a>() const ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        <span class="keywordflow">return</span> reverse.size() * entt_per_page;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    }</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160; </div>
+<div class="line"><a name="l00283"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a340dff7484f1e58feff58a5f0627e190">  283</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> <a class="code" href="classentt_1_1sparse__set.html#a340dff7484f1e58feff58a5f0627e190">size</a>() const ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;        <span class="keywordflow">return</span> direct.size();</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    }</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160; </div>
+<div class="line"><a name="l00291"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#ae1a16cb354a9ed5ded92b6edcddce15e">  291</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1sparse__set.html#ae1a16cb354a9ed5ded92b6edcddce15e">empty</a>() const ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        <span class="keywordflow">return</span> direct.empty();</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    }</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160; </div>
+<div class="line"><a name="l00310"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a2eafe4975271769b08fe7f7d4924992f">  310</a></span>&#160;    <span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> * <a class="code" href="classentt_1_1sparse__set.html#a2eafe4975271769b08fe7f7d4924992f">data</a>() const ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;        <span class="keywordflow">return</span> direct.data();</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    }</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160; </div>
+<div class="line"><a name="l00327"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a06743336f265989b48e106a3d3bd1562">  327</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> <a class="code" href="classentt_1_1sparse__set.html#a06743336f265989b48e106a3d3bd1562">begin</a>() const ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;        <span class="keyword">const</span> <span class="keyword">typename</span> traits_type::difference_type pos = direct.size();</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a>{&amp;direct, pos};</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    }</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160; </div>
+<div class="line"><a name="l00346"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">  346</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>() const ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a>{&amp;direct, {}};</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;    }</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160; </div>
+<div class="line"><a name="l00356"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a92f989fbb8b105e3c60d5c09c02b64c2">  356</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> <a class="code" href="classentt_1_1sparse__set.html#a92f989fbb8b105e3c60d5c09c02b64c2">find</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classentt_1_1sparse__set.html#a45740d20df28710b87783d814abee1f7">has</a>(<a class="code" href="namespaceentt.html">entt</a>) ? --(<a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>() - <a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a>(<a class="code" href="namespaceentt.html">entt</a>)) : <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>();</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    }</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160; </div>
+<div class="line"><a name="l00365"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a45740d20df28710b87783d814abee1f7">  365</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1sparse__set.html#a45740d20df28710b87783d814abee1f7">has</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> curr = page(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;        <span class="comment">// testing against null permits to avoid accessing the direct vector</span></div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        <span class="keywordflow">return</span> (curr &lt; reverse.size() &amp;&amp; reverse[curr] &amp;&amp; reverse[curr][offset(<a class="code" href="namespaceentt.html">entt</a>)] != <span class="keyword">null</span>);</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    }</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160; </div>
+<div class="line"><a name="l00383"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">  383</a></span>&#160;    <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> <a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;        ENTT_ASSERT(<a class="code" href="classentt_1_1sparse__set.html#a45740d20df28710b87783d814abee1f7">has</a>(<a class="code" href="namespaceentt.html">entt</a>));</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(reverse[page(<a class="code" href="namespaceentt.html">entt</a>)][offset(<a class="code" href="namespaceentt.html">entt</a>)]);</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    }</div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160; </div>
 <div class="line"><a name="l00399"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a4f6d293b9bc7227de22c86722881083f">  399</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#a4f6d293b9bc7227de22c86722881083f">construct</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>) {</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;        ENTT_ASSERT(!<a class="code" href="classentt_1_1sparse__set.html#af4eb4faf1aa28d20717716bea7981f5b">has</a>(<a class="code" href="namespaceentt.html">entt</a>));</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;        <span class="keyword">auto</span> [page, offset] = map(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;        assure(page);</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;        reverse[page][offset] = <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a>(direct.size());</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;        direct.push_back(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    }</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160; </div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> It&gt;</div>
-<div class="line"><a name="l00421"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a642460f7f0ca8e42220c43c785467063">  421</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#a642460f7f0ca8e42220c43c785467063">batch</a>(It first, It last) {</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        std::for_each(first, last, [<span class="keyword">this</span>, next = direct.size()](<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html">entt</a>) <span class="keyword">mutable</span> {</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;            ENTT_ASSERT(!<a class="code" href="classentt_1_1sparse__set.html#af4eb4faf1aa28d20717716bea7981f5b">has</a>(<a class="code" href="namespaceentt.html">entt</a>));</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;            <span class="keyword">auto</span> [page, offset] = map(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;            assure(page);</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;            reverse[page][offset] = <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a>(next++);</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;        });</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160; </div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;        direct.insert(direct.end(), first, last);</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    }</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160; </div>
-<div class="line"><a name="l00443"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#ab69719626bee1add76096046db86a170">  443</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#ab69719626bee1add76096046db86a170">destroy</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>) {</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;        ENTT_ASSERT(<a class="code" href="classentt_1_1sparse__set.html#af4eb4faf1aa28d20717716bea7981f5b">has</a>(<a class="code" href="namespaceentt.html">entt</a>));</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;        <span class="keyword">auto</span> [from_page, from_offset] = map(<a class="code" href="namespaceentt.html">entt</a>);</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;        <span class="keyword">auto</span> [to_page, to_offset] = map(direct.back());</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;        direct[<a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(reverse[from_page][from_offset])] = <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a>(direct.back());</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;        reverse[to_page][to_offset] = reverse[from_page][from_offset];</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;        reverse[from_page][from_offset] = <span class="keyword">null</span>;</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;        direct.pop_back();</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    }</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160; </div>
-<div class="line"><a name="l00468"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a5ef14da059528647a5d72f2e2ce0d762">  468</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#a5ef14da059528647a5d72f2e2ce0d762">swap</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> lhs, <span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> rhs) ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;        <span class="keyword">auto</span> [src_page, src_offset] = map(lhs);</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;        <span class="keyword">auto</span> [dst_page, dst_offset] = map(rhs);</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;        <span class="keyword">auto</span> &amp;from = reverse[src_page][src_offset];</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;        <span class="keyword">auto</span> &amp;to = reverse[dst_page][dst_offset];</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;        std::swap(direct[<a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(from)], direct[<a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(to)]);</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;        std::swap(from, to);</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;    }</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160; </div>
-<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Compare, <span class="keyword">typename</span> Sort = <a class="code" href="structentt_1_1std__sort.html">std_sort</a>, <span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l00517"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#afae939a408911c573256cf0299d76828">  517</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#afae939a408911c573256cf0299d76828">sort</a>(<a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> first, <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> last, Compare compare, Sort algo = Sort{}, Args &amp;&amp;... args) {</div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;        ENTT_ASSERT(!(last &lt; first));</div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;        ENTT_ASSERT(!(last &gt; <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>()));</div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160; </div>
-<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> length = std::distance(first, last);</div>
-<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> skip = std::distance(last, <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>());</div>
-<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> to = direct.rend() - skip;</div>
-<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> from = to - length;</div>
-<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160; </div>
-<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;        algo(from, to, std::move(compare), std::forward&lt;Args&gt;(args)...);</div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160; </div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;        <span class="keywordflow">for</span>(<a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> pos = skip, <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a> = skip+length; pos &lt; <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>; ++pos) {</div>
-<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;            <span class="keyword">auto</span> [page, offset] = map(direct[pos]);</div>
-<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;            reverse[page][offset] = <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a>(pos);</div>
-<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;        }</div>
-<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;    }</div>
-<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160; </div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Apply, <span class="keyword">typename</span> Compare, <span class="keyword">typename</span> Sort = std_sort, <span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l00562"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a28b36afb6ae6f91d995ff259184d6515">  562</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#a28b36afb6ae6f91d995ff259184d6515">arrange</a>(<a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> first, <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> last, Apply apply, Compare compare, Sort algo = Sort{}, Args &amp;&amp;... args) {</div>
-<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;        ENTT_ASSERT(!(last &lt; first));</div>
-<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;        ENTT_ASSERT(!(last &gt; <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>()));</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;        ENTT_ASSERT(!<a class="code" href="classentt_1_1sparse__set.html#a45740d20df28710b87783d814abee1f7">has</a>(<a class="code" href="namespaceentt.html">entt</a>));</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;        assure(page(<a class="code" href="namespaceentt.html">entt</a>))[offset(<a class="code" href="namespaceentt.html">entt</a>)] = <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a>(direct.size());</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;        direct.push_back(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    }</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160; </div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> It&gt;</div>
+<div class="line"><a name="l00419"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a00e7d9777838f856ac4558a839d2069c">  419</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#a00e7d9777838f856ac4558a839d2069c">construct</a>(It first, It last) {</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;        std::for_each(first, last, [<span class="keyword">this</span>, next = direct.size()](<span class="keyword">const</span> <span class="keyword">auto</span> <a class="code" href="namespaceentt.html">entt</a>) <span class="keyword">mutable</span> {</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;            ENTT_ASSERT(!<a class="code" href="classentt_1_1sparse__set.html#a45740d20df28710b87783d814abee1f7">has</a>(<a class="code" href="namespaceentt.html">entt</a>));</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;            assure(page(<a class="code" href="namespaceentt.html">entt</a>))[offset(<a class="code" href="namespaceentt.html">entt</a>)] = <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a>(next++);</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;        });</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160; </div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;        direct.insert(direct.end(), first, last);</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    }</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160; </div>
+<div class="line"><a name="l00439"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#ab69719626bee1add76096046db86a170">  439</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#ab69719626bee1add76096046db86a170">destroy</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> <a class="code" href="namespaceentt.html">entt</a>) {</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;        ENTT_ASSERT(<a class="code" href="classentt_1_1sparse__set.html#a45740d20df28710b87783d814abee1f7">has</a>(<a class="code" href="namespaceentt.html">entt</a>));</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> curr = page(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> pos = offset(<a class="code" href="namespaceentt.html">entt</a>);</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;        direct[<a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(reverse[curr][pos])] = <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a>(direct.back());</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;        reverse[page(direct.back())][offset(direct.back())] = reverse[curr][pos];</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;        reverse[curr][pos] = <span class="keyword">null</span>;</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;        direct.pop_back();</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    }</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160; </div>
+<div class="line"><a name="l00464"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a7e6b341dd385fc5802f8ab5de2a2845c">  464</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#a7e6b341dd385fc5802f8ab5de2a2845c">swap</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> lhs, <span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> rhs) {</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;        <span class="keyword">auto</span> &amp;from = reverse[page(lhs)][offset(lhs)];</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;        <span class="keyword">auto</span> &amp;to = reverse[page(rhs)][offset(rhs)];</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;        std::swap(direct[<a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(from)], direct[<a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a>(to)]);</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;        std::swap(from, to);</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;    }</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160; </div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Compare, <span class="keyword">typename</span> Sort = <a class="code" href="structentt_1_1std__sort.html">std_sort</a>, <span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><a name="l00511"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#afae939a408911c573256cf0299d76828">  511</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#afae939a408911c573256cf0299d76828">sort</a>(<a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> first, <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> last, Compare compare, Sort algo = Sort{}, Args &amp;&amp;... args) {</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;        ENTT_ASSERT(!(last &lt; first));</div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;        ENTT_ASSERT(!(last &gt; <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>()));</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160; </div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> length = std::distance(first, last);</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> skip = std::distance(last, <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>());</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> to = direct.rend() - skip;</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> from = to - length;</div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160; </div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;        algo(from, to, std::move(compare), std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160; </div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;        <span class="keywordflow">for</span>(<a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> pos = skip, <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a> = skip+length; pos &lt; <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>; ++pos) {</div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;            reverse[page(direct[pos])][offset(direct[pos])] = <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a>(pos);</div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;        }</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;    }</div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160; </div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Apply, <span class="keyword">typename</span> Compare, <span class="keyword">typename</span> Sort = std_sort, <span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><a name="l00555"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a28b36afb6ae6f91d995ff259184d6515">  555</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#a28b36afb6ae6f91d995ff259184d6515">arrange</a>(<a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> first, <a class="code" href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">iterator_type</a> last, Apply apply, Compare compare, Sort algo = Sort{}, Args &amp;&amp;... args) {</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;        ENTT_ASSERT(!(last &lt; first));</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;        ENTT_ASSERT(!(last &gt; <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>()));</div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160; </div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> length = std::distance(first, last);</div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> skip = std::distance(last, <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>());</div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> to = direct.rend() - skip;</div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> from = to - length;</div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160; </div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;        algo(from, to, std::move(compare), std::forward&lt;Args&gt;(args)...);</div>
 <div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160; </div>
-<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> length = std::distance(first, last);</div>
-<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> skip = std::distance(last, <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>());</div>
-<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> to = direct.rend() - skip;</div>
-<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> from = to - length;</div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160; </div>
-<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;        algo(from, to, std::move(compare), std::forward&lt;Args&gt;(args)...);</div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160; </div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;        <span class="keywordflow">for</span>(<a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> pos = skip, <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a> = skip+length; pos &lt; <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>; ++pos) {</div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;            <span class="keyword">auto</span> curr = pos;</div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;            <span class="keyword">auto</span> next = <a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a>(direct[curr]);</div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160; </div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;            <span class="keywordflow">while</span>(curr != next) {</div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;                apply(direct[curr], direct[next]);</div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;                <span class="keyword">auto</span> [page, offset] = map(direct[curr]);</div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;                reverse[page][offset] = <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a>(curr);</div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160; </div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;                curr = next;</div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;                next = <a class="code" href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">index</a>(direct[curr]);</div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;            }</div>
-<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;        }</div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;    }</div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160; </div>
-<div class="line"><a name="l00608"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#ab0481dde89f07e9ca50d79777de898b6">  608</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#ab0481dde89f07e9ca50d79777de898b6">respect</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> &amp;other) ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> to = other.end();</div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;        <span class="keyword">auto</span> from = other.begin();</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;        <span class="keywordflow">for</span>(<a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> pos = skip, <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a> = skip+length; pos &lt; <a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>; ++pos) {</div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;            <span class="keyword">auto</span> curr = pos;</div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;            <span class="keyword">auto</span> next = <a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a>(direct[curr]);</div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160; </div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;            <span class="keywordflow">while</span>(curr != next) {</div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;                apply(direct[curr], direct[next]);</div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;                reverse[page(direct[curr])][offset(direct[curr])] = <a class="code" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a>(curr);</div>
+<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160; </div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;                curr = next;</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;                next = <a class="code" href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">index</a>(direct[curr]);</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;            }</div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;        }</div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;    }</div>
+<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160; </div>
+<div class="line"><a name="l00600"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#a1a683d1f8f52b1083cddd9938536a74a">  600</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#a1a683d1f8f52b1083cddd9938536a74a">respect</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1sparse__set.html">sparse_set</a> &amp;other) {</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> to = other.<a class="code" href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">end</a>();</div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;        <span class="keyword">auto</span> from = other.<a class="code" href="classentt_1_1sparse__set.html#a06743336f265989b48e106a3d3bd1562">begin</a>();</div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160; </div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;        <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> pos = direct.size() - 1;</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160; </div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;        <span class="keywordflow">while</span>(pos &amp;&amp; from != to) {</div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;            <span class="keywordflow">if</span>(<a class="code" href="classentt_1_1sparse__set.html#a45740d20df28710b87783d814abee1f7">has</a>(*from)) {</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;                <span class="keywordflow">if</span>(*from != direct[pos]) {</div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;                    <a class="code" href="classentt_1_1sparse__set.html#a7e6b341dd385fc5802f8ab5de2a2845c">swap</a>(direct[pos], *from);</div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;                }</div>
 <div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160; </div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;        <a class="code" href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">size_type</a> pos = direct.size() - 1;</div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160; </div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;        <span class="keywordflow">while</span>(pos &amp;&amp; from != to) {</div>
-<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;            <span class="keywordflow">if</span>(<a class="code" href="classentt_1_1sparse__set.html#af4eb4faf1aa28d20717716bea7981f5b">has</a>(*from)) {</div>
-<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;                <span class="keywordflow">if</span>(*from != direct[pos]) {</div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;                    <a class="code" href="classentt_1_1sparse__set.html#a5ef14da059528647a5d72f2e2ce0d762">swap</a>(direct[pos], *from);</div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;                }</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160; </div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;                --pos;</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;            }</div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160; </div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;            ++from;</div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;        }</div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;                --pos;</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;            }</div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160; </div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;            ++from;</div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;        }</div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    }</div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160; </div>
+<div class="line"><a name="l00622"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#ad9a691245be8914b0a2d3756a0fc02d9">  622</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#ad9a691245be8914b0a2d3756a0fc02d9">clear</a>() ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;        reverse.clear();</div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;        direct.clear();</div>
 <div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;    }</div>
 <div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160; </div>
-<div class="line"><a name="l00630"></a><span class="lineno"><a class="line" href="classentt_1_1sparse__set.html#abcf1b927ccc18fba0fef178d168c1fa7">  630</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1sparse__set.html#abcf1b927ccc18fba0fef178d168c1fa7">reset</a>() {</div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;        reverse.clear();</div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;        direct.clear();</div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;    }</div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;    std::vector&lt;std::unique_ptr&lt;entity_type[]&gt;&gt; reverse;</div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;    std::vector&lt;entity_type&gt; direct;</div>
+<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;};</div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160; </div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160; </div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;}</div>
 <div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160; </div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;    std::vector&lt;std::unique_ptr&lt;entity_type[]&gt;&gt; reverse;</div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;    std::vector&lt;entity_type&gt; direct;</div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;};</div>
-<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160; </div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160; </div>
-<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;}</div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160; </div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160; </div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;<span class="preprocessor">#endif // ENTT_ENTITY_SPARSE_SET_HPP</span></div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160; </div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a74c49e0d205b6240bf14ac3003cfcbd1"><div class="ttname"><a href="classentt_1_1sparse__set.html#a74c49e0d205b6240bf14ac3003cfcbd1">entt::sparse_set::~sparse_set</a></div><div class="ttdeci">virtual ~sparse_set() ENTT_NOEXCEPT=default</div><div class="ttdoc">Default destructor.</div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a06743336f265989b48e106a3d3bd1562"><div class="ttname"><a href="classentt_1_1sparse__set.html#a06743336f265989b48e106a3d3bd1562">entt::sparse_set::begin</a></div><div class="ttdeci">iterator_type begin() const ENTT_NOEXCEPT</div><div class="ttdoc">Returns an iterator to the beginning.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00326">sparse_set.hpp:326</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a69d6c1288f673c6f92d2b1b028d6aa75"><div class="ttname"><a href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">entt::sparse_set::end</a></div><div class="ttdeci">iterator_type end() const ENTT_NOEXCEPT</div><div class="ttdoc">Returns an iterator to the end.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00345">sparse_set.hpp:345</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a0ed57521bb3279b5ed3cd397b65abf01"><div class="ttname"><a href="classentt_1_1sparse__set.html#a0ed57521bb3279b5ed3cd397b65abf01">entt::sparse_set::find</a></div><div class="ttdeci">iterator_type find(const entity_type entt) const ENTT_NOEXCEPT</div><div class="ttdoc">Finds an entity.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00355">sparse_set.hpp:355</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html"><div class="ttname"><a href="classentt_1_1sparse__set.html">entt::sparse_set</a></div><div class="ttdoc">Basic sparse set implementation.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00050">sparse_set.hpp:50</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a8c24ecc5ab0055f9f2a4725c95afb29e"><div class="ttname"><a href="namespaceentt.html#a8c24ecc5ab0055f9f2a4725c95afb29e">entt::get</a></div><div class="ttdeci">constexpr get_t&lt; Type... &gt; get</div><div class="ttdoc">Variable template for lists of observed components.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2utility_8hpp_source.html#l00040">utility.hpp:40</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_afae939a408911c573256cf0299d76828"><div class="ttname"><a href="classentt_1_1sparse__set.html#afae939a408911c573256cf0299d76828">entt::sparse_set::sort</a></div><div class="ttdeci">void sort(iterator_type first, iterator_type last, Compare compare, Sort algo=Sort{}, Args &amp;&amp;... args)</div><div class="ttdoc">Sort elements according to the given comparison function.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00517">sparse_set.hpp:517</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a7e6b341dd385fc5802f8ab5de2a2845c"><div class="ttname"><a href="classentt_1_1sparse__set.html#a7e6b341dd385fc5802f8ab5de2a2845c">entt::sparse_set::swap</a></div><div class="ttdeci">virtual void swap(const entity_type lhs, const entity_type rhs)</div><div class="ttdoc">Swaps two entities in the internal packed array.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00464">sparse_set.hpp:464</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a92f989fbb8b105e3c60d5c09c02b64c2"><div class="ttname"><a href="classentt_1_1sparse__set.html#a92f989fbb8b105e3c60d5c09c02b64c2">entt::sparse_set::find</a></div><div class="ttdeci">iterator_type find(const entity_type entt) const</div><div class="ttdoc">Finds an entity.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00356">sparse_set.hpp:356</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a06743336f265989b48e106a3d3bd1562"><div class="ttname"><a href="classentt_1_1sparse__set.html#a06743336f265989b48e106a3d3bd1562">entt::sparse_set::begin</a></div><div class="ttdeci">iterator_type begin() const ENTT_NOEXCEPT</div><div class="ttdoc">Returns an iterator to the beginning.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00327">sparse_set.hpp:327</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a69d6c1288f673c6f92d2b1b028d6aa75"><div class="ttname"><a href="classentt_1_1sparse__set.html#a69d6c1288f673c6f92d2b1b028d6aa75">entt::sparse_set::end</a></div><div class="ttdeci">iterator_type end() const ENTT_NOEXCEPT</div><div class="ttdoc">Returns an iterator to the end.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00346">sparse_set.hpp:346</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a1a683d1f8f52b1083cddd9938536a74a"><div class="ttname"><a href="classentt_1_1sparse__set.html#a1a683d1f8f52b1083cddd9938536a74a">entt::sparse_set::respect</a></div><div class="ttdeci">void respect(const sparse_set &amp;other)</div><div class="ttdoc">Sort entities according to their order in another sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00600">sparse_set.hpp:600</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a2ea4731d5a2e22f4bd43f8e19ca39f58"><div class="ttname"><a href="classentt_1_1sparse__set.html#a2ea4731d5a2e22f4bd43f8e19ca39f58">entt::sparse_set::~sparse_set</a></div><div class="ttdeci">virtual ~sparse_set()=default</div><div class="ttdoc">Default destructor.</div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html"><div class="ttname"><a href="classentt_1_1sparse__set.html">entt::sparse_set</a></div><div class="ttdoc">Basic sparse set implementation.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00049">sparse_set.hpp:49</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a8c24ecc5ab0055f9f2a4725c95afb29e"><div class="ttname"><a href="namespaceentt.html#a8c24ecc5ab0055f9f2a4725c95afb29e">entt::get</a></div><div class="ttdeci">constexpr get_t&lt; Type... &gt; get</div><div class="ttdoc">Variable template for lists of observed components.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00041">fwd.hpp:41</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a45740d20df28710b87783d814abee1f7"><div class="ttname"><a href="classentt_1_1sparse__set.html#a45740d20df28710b87783d814abee1f7">entt::sparse_set::has</a></div><div class="ttdeci">bool has(const entity_type entt) const</div><div class="ttdoc">Checks if a sparse set contains an entity.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00365">sparse_set.hpp:365</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_afae939a408911c573256cf0299d76828"><div class="ttname"><a href="classentt_1_1sparse__set.html#afae939a408911c573256cf0299d76828">entt::sparse_set::sort</a></div><div class="ttdeci">void sort(iterator_type first, iterator_type last, Compare compare, Sort algo=Sort{}, Args &amp;&amp;... args)</div><div class="ttdoc">Sort elements according to the given comparison function.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00511">sparse_set.hpp:511</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a00e7d9777838f856ac4558a839d2069c"><div class="ttname"><a href="classentt_1_1sparse__set.html#a00e7d9777838f856ac4558a839d2069c">entt::sparse_set::construct</a></div><div class="ttdeci">void construct(It first, It last)</div><div class="ttdoc">Assigns one or more entities to a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00419">sparse_set.hpp:419</a></div></div>
 <div class="ttc" id="aclassentt_1_1sparse__set_html_a8ef544aaed30126797f6f0b9a9f8b9e8"><div class="ttname"><a href="classentt_1_1sparse__set.html#a8ef544aaed30126797f6f0b9a9f8b9e8">entt::sparse_set::sparse_set</a></div><div class="ttdeci">sparse_set()=default</div><div class="ttdoc">Default constructor.</div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_af79345df59154e5ea9e58b7efa7ff8f0"><div class="ttname"><a href="classentt_1_1sparse__set.html#af79345df59154e5ea9e58b7efa7ff8f0">entt::sparse_set::extent</a></div><div class="ttdeci">size_type extent() const ENTT_NOEXCEPT</div><div class="ttdoc">Returns the extent of a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00268">sparse_set.hpp:268</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a75f5d70148a149e4cbc485c7a7b00dda"><div class="ttname"><a href="classentt_1_1sparse__set.html#a75f5d70148a149e4cbc485c7a7b00dda">entt::sparse_set::shrink_to_fit</a></div><div class="ttdeci">void shrink_to_fit()</div><div class="ttdoc">Requests the removal of unused capacity.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00248">sparse_set.hpp:248</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_ab69719626bee1add76096046db86a170"><div class="ttname"><a href="classentt_1_1sparse__set.html#ab69719626bee1add76096046db86a170">entt::sparse_set::destroy</a></div><div class="ttdeci">void destroy(const entity_type entt)</div><div class="ttdoc">Removes an entity from a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00443">sparse_set.hpp:443</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_ae1a16cb354a9ed5ded92b6edcddce15e"><div class="ttname"><a href="classentt_1_1sparse__set.html#ae1a16cb354a9ed5ded92b6edcddce15e">entt::sparse_set::empty</a></div><div class="ttdeci">bool empty() const ENTT_NOEXCEPT</div><div class="ttdoc">Checks whether a sparse set is empty.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00290">sparse_set.hpp:290</a></div></div>
-<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00012">algorithm.hpp:12</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_af684a44e129f3aafd311814b5972378f"><div class="ttname"><a href="classentt_1_1sparse__set.html#af684a44e129f3aafd311814b5972378f">entt::sparse_set::sparse_set</a></div><div class="ttdeci">sparse_set(const sparse_set &amp;other)</div><div class="ttdoc">Copy constructor.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00191">sparse_set.hpp:191</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a2eafe4975271769b08fe7f7d4924992f"><div class="ttname"><a href="classentt_1_1sparse__set.html#a2eafe4975271769b08fe7f7d4924992f">entt::sparse_set::data</a></div><div class="ttdeci">const entity_type * data() const ENTT_NOEXCEPT</div><div class="ttdoc">Direct access to the internal packed array.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00309">sparse_set.hpp:309</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_afbdea531952ca6857abdfddf7866b5a2"><div class="ttname"><a href="classentt_1_1sparse__set.html#afbdea531952ca6857abdfddf7866b5a2">entt::sparse_set::index</a></div><div class="ttdeci">size_type index(const entity_type entt) const ENTT_NOEXCEPT</div><div class="ttdoc">Returns the position of an entity in a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00382">sparse_set.hpp:382</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a3d2138b0eb8c7ac968e9e38a9e981ec1"><div class="ttname"><a href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">entt::sparse_set::size_type</a></div><div class="ttdeci">std::size_t size_type</div><div class="ttdoc">Unsigned integer type.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00180">sparse_set.hpp:180</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_af79345df59154e5ea9e58b7efa7ff8f0"><div class="ttname"><a href="classentt_1_1sparse__set.html#af79345df59154e5ea9e58b7efa7ff8f0">entt::sparse_set::extent</a></div><div class="ttdeci">size_type extent() const ENTT_NOEXCEPT</div><div class="ttdoc">Returns the extent of a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00269">sparse_set.hpp:269</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a75f5d70148a149e4cbc485c7a7b00dda"><div class="ttname"><a href="classentt_1_1sparse__set.html#a75f5d70148a149e4cbc485c7a7b00dda">entt::sparse_set::shrink_to_fit</a></div><div class="ttdeci">void shrink_to_fit()</div><div class="ttdoc">Requests the removal of unused capacity.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00249">sparse_set.hpp:249</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_ab69719626bee1add76096046db86a170"><div class="ttname"><a href="classentt_1_1sparse__set.html#ab69719626bee1add76096046db86a170">entt::sparse_set::destroy</a></div><div class="ttdeci">void destroy(const entity_type entt)</div><div class="ttdoc">Removes an entity from a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00439">sparse_set.hpp:439</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_ae1a16cb354a9ed5ded92b6edcddce15e"><div class="ttname"><a href="classentt_1_1sparse__set.html#ae1a16cb354a9ed5ded92b6edcddce15e">entt::sparse_set::empty</a></div><div class="ttdeci">bool empty() const ENTT_NOEXCEPT</div><div class="ttdoc">Checks whether a sparse set is empty.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00291">sparse_set.hpp:291</a></div></div>
+<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00013">algorithm.hpp:13</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_af684a44e129f3aafd311814b5972378f"><div class="ttname"><a href="classentt_1_1sparse__set.html#af684a44e129f3aafd311814b5972378f">entt::sparse_set::sparse_set</a></div><div class="ttdeci">sparse_set(const sparse_set &amp;other)</div><div class="ttdoc">Copy constructor.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00193">sparse_set.hpp:193</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_ad9a691245be8914b0a2d3756a0fc02d9"><div class="ttname"><a href="classentt_1_1sparse__set.html#ad9a691245be8914b0a2d3756a0fc02d9">entt::sparse_set::clear</a></div><div class="ttdeci">void clear() ENTT_NOEXCEPT</div><div class="ttdoc">Clears a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00622">sparse_set.hpp:622</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a2eafe4975271769b08fe7f7d4924992f"><div class="ttname"><a href="classentt_1_1sparse__set.html#a2eafe4975271769b08fe7f7d4924992f">entt::sparse_set::data</a></div><div class="ttdeci">const entity_type * data() const ENTT_NOEXCEPT</div><div class="ttdoc">Direct access to the internal packed array.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00310">sparse_set.hpp:310</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a3d2138b0eb8c7ac968e9e38a9e981ec1"><div class="ttname"><a href="classentt_1_1sparse__set.html#a3d2138b0eb8c7ac968e9e38a9e981ec1">entt::sparse_set::size_type</a></div><div class="ttdeci">std::size_t size_type</div><div class="ttdoc">Unsigned integer type.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00182">sparse_set.hpp:182</a></div></div>
 <div class="ttc" id="aclassentt_1_1sparse__set_html_a4f6d293b9bc7227de22c86722881083f"><div class="ttname"><a href="classentt_1_1sparse__set.html#a4f6d293b9bc7227de22c86722881083f">entt::sparse_set::construct</a></div><div class="ttdeci">void construct(const entity_type entt)</div><div class="ttdoc">Assigns an entity to a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00399">sparse_set.hpp:399</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a1a211752d12273a08015c524133e27c3"><div class="ttname"><a href="namespaceentt.html#a1a211752d12273a08015c524133e27c3">entt::operator!=</a></div><div class="ttdeci">constexpr bool operator!=(const basic_hashed_string&lt; Char &gt; &amp;lhs, const basic_hashed_string&lt; Char &gt; &amp;rhs) ENTT_NOEXCEPT</div><div class="ttdoc">Compares two hashed strings.</div><div class="ttdef"><b>Definition:</b> <a href="hashed__string_8hpp_source.html#l00217">hashed_string.hpp:217</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a340dff7484f1e58feff58a5f0627e190"><div class="ttname"><a href="classentt_1_1sparse__set.html#a340dff7484f1e58feff58a5f0627e190">entt::sparse_set::size</a></div><div class="ttdeci">size_type size() const ENTT_NOEXCEPT</div><div class="ttdoc">Returns the number of elements in a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00282">sparse_set.hpp:282</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a30267005e552fce0d2a9b4e4d70d6656"><div class="ttname"><a href="classentt_1_1sparse__set.html#a30267005e552fce0d2a9b4e4d70d6656">entt::sparse_set::capacity</a></div><div class="ttdeci">size_type capacity() const ENTT_NOEXCEPT</div><div class="ttdoc">Returns the number of elements that a sparse set has currently allocated space for.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00243">sparse_set.hpp:243</a></div></div>
-<div class="ttc" id="aclassentt_1_1identifier_html"><div class="ttname"><a href="classentt_1_1identifier.html">entt::identifier</a></div><div class="ttdoc">Types identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="ident_8hpp_source.html#l00042">ident.hpp:42</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_af4eb4faf1aa28d20717716bea7981f5b"><div class="ttname"><a href="classentt_1_1sparse__set.html#af4eb4faf1aa28d20717716bea7981f5b">entt::sparse_set::has</a></div><div class="ttdeci">bool has(const entity_type entt) const ENTT_NOEXCEPT</div><div class="ttdoc">Checks if a sparse set contains an entity.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00364">sparse_set.hpp:364</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a642460f7f0ca8e42220c43c785467063"><div class="ttname"><a href="classentt_1_1sparse__set.html#a642460f7f0ca8e42220c43c785467063">entt::sparse_set::batch</a></div><div class="ttdeci">void batch(It first, It last)</div><div class="ttdoc">Assigns one or more entities to a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00421">sparse_set.hpp:421</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_ab0481dde89f07e9ca50d79777de898b6"><div class="ttname"><a href="classentt_1_1sparse__set.html#ab0481dde89f07e9ca50d79777de898b6">entt::sparse_set::respect</a></div><div class="ttdeci">void respect(const sparse_set &amp;other) ENTT_NOEXCEPT</div><div class="ttdoc">Sort entities according to their order in another sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00608">sparse_set.hpp:608</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_abcf1b927ccc18fba0fef178d168c1fa7"><div class="ttname"><a href="classentt_1_1sparse__set.html#abcf1b927ccc18fba0fef178d168c1fa7">entt::sparse_set::reset</a></div><div class="ttdeci">void reset()</div><div class="ttdoc">Resets a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00630">sparse_set.hpp:630</a></div></div>
-<div class="ttc" id="astructentt_1_1entt__traits_html"><div class="ttname"><a href="structentt_1_1entt__traits.html">entt::entt_traits</a></div><div class="ttdoc">Entity traits.</div><div class="ttdef"><b>Definition:</b> <a href="entity_8hpp_source.html#l00020">entity.hpp:20</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a32a00ca96cc7e78089fb7120d144de34"><div class="ttname"><a href="classentt_1_1sparse__set.html#a32a00ca96cc7e78089fb7120d144de34">entt::sparse_set::operator=</a></div><div class="ttdeci">sparse_set &amp; operator=(const sparse_set &amp;other)</div><div class="ttdoc">Copy assignment operator.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00214">sparse_set.hpp:214</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a8b4b9dd989877bc333fdc455fcd068d7"><div class="ttname"><a href="classentt_1_1sparse__set.html#a8b4b9dd989877bc333fdc455fcd068d7">entt::sparse_set::reserve</a></div><div class="ttdeci">void reserve(const size_type cap)</div><div class="ttdoc">Increases the capacity of a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00234">sparse_set.hpp:234</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a9a1dbe5ab2dbb098beae0bff56bbf780"><div class="ttname"><a href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entt::sparse_set&lt; entity_type &gt;::entity_type</a></div><div class="ttdeci">entity_type entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00178">sparse_set.hpp:178</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a580b210d5a24c49ca8c255646f3bb469"><div class="ttname"><a href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">entt::sparse_set&lt; entity_type &gt;::iterator_type</a></div><div class="ttdeci">iterator iterator_type</div><div class="ttdoc">Random access iterator type.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00182">sparse_set.hpp:182</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a28b36afb6ae6f91d995ff259184d6515"><div class="ttname"><a href="classentt_1_1sparse__set.html#a28b36afb6ae6f91d995ff259184d6515">entt::sparse_set::arrange</a></div><div class="ttdeci">void arrange(iterator_type first, iterator_type last, Apply apply, Compare compare, Sort algo=Sort{}, Args &amp;&amp;... args)</div><div class="ttdoc">Sort elements according to the given comparison function.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00562">sparse_set.hpp:562</a></div></div>
-<div class="ttc" id="aclassentt_1_1sparse__set_html_a5ef14da059528647a5d72f2e2ce0d762"><div class="ttname"><a href="classentt_1_1sparse__set.html#a5ef14da059528647a5d72f2e2ce0d762">entt::sparse_set::swap</a></div><div class="ttdeci">virtual void swap(const entity_type lhs, const entity_type rhs) ENTT_NOEXCEPT</div><div class="ttdoc">Swaps two entities in the internal packed array.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00468">sparse_set.hpp:468</a></div></div>
-<div class="ttc" id="astructentt_1_1std__sort_html"><div class="ttname"><a href="structentt_1_1std__sort.html">entt::std_sort</a></div><div class="ttdoc">Function object to wrap std::sort in a class type.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00023">algorithm.hpp:23</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a1a211752d12273a08015c524133e27c3"><div class="ttname"><a href="namespaceentt.html#a1a211752d12273a08015c524133e27c3">entt::operator!=</a></div><div class="ttdeci">constexpr bool operator!=(const basic_hashed_string&lt; Char &gt; &amp;lhs, const basic_hashed_string&lt; Char &gt; &amp;rhs) ENTT_NOEXCEPT</div><div class="ttdoc">Compares two hashed strings.</div><div class="ttdef"><b>Definition:</b> <a href="hashed__string_8hpp_source.html#l00226">hashed_string.hpp:226</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a17386e505ea87ccc100e23360c93aa46"><div class="ttname"><a href="classentt_1_1sparse__set.html#a17386e505ea87ccc100e23360c93aa46">entt::sparse_set::index</a></div><div class="ttdeci">size_type index(const entity_type entt) const</div><div class="ttdoc">Returns the position of an entity in a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00383">sparse_set.hpp:383</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a340dff7484f1e58feff58a5f0627e190"><div class="ttname"><a href="classentt_1_1sparse__set.html#a340dff7484f1e58feff58a5f0627e190">entt::sparse_set::size</a></div><div class="ttdeci">size_type size() const ENTT_NOEXCEPT</div><div class="ttdoc">Returns the number of elements in a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00283">sparse_set.hpp:283</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a30267005e552fce0d2a9b4e4d70d6656"><div class="ttname"><a href="classentt_1_1sparse__set.html#a30267005e552fce0d2a9b4e4d70d6656">entt::sparse_set::capacity</a></div><div class="ttdeci">size_type capacity() const ENTT_NOEXCEPT</div><div class="ttdoc">Returns the number of elements that a sparse set has currently allocated space for.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00244">sparse_set.hpp:244</a></div></div>
+<div class="ttc" id="astructentt_1_1entt__traits_html"><div class="ttname"><a href="structentt_1_1entt__traits.html">entt::entt_traits</a></div><div class="ttdoc">Entity traits.</div><div class="ttdef"><b>Definition:</b> <a href="entity_8hpp_source.html#l00021">entity.hpp:21</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a32a00ca96cc7e78089fb7120d144de34"><div class="ttname"><a href="classentt_1_1sparse__set.html#a32a00ca96cc7e78089fb7120d144de34">entt::sparse_set::operator=</a></div><div class="ttdeci">sparse_set &amp; operator=(const sparse_set &amp;other)</div><div class="ttdoc">Copy assignment operator.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00215">sparse_set.hpp:215</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a8b4b9dd989877bc333fdc455fcd068d7"><div class="ttname"><a href="classentt_1_1sparse__set.html#a8b4b9dd989877bc333fdc455fcd068d7">entt::sparse_set::reserve</a></div><div class="ttdeci">void reserve(const size_type cap)</div><div class="ttdoc">Increases the capacity of a sparse set.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00235">sparse_set.hpp:235</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a9a1dbe5ab2dbb098beae0bff56bbf780"><div class="ttname"><a href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entt::sparse_set&lt; entity_type &gt;::entity_type</a></div><div class="ttdeci">entity_type entity_type</div><div class="ttdoc">Underlying entity identifier.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00180">sparse_set.hpp:180</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a580b210d5a24c49ca8c255646f3bb469"><div class="ttname"><a href="classentt_1_1sparse__set.html#a580b210d5a24c49ca8c255646f3bb469">entt::sparse_set&lt; entity_type &gt;::iterator_type</a></div><div class="ttdeci">iterator iterator_type</div><div class="ttdoc">Random access iterator type.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00184">sparse_set.hpp:184</a></div></div>
+<div class="ttc" id="aclassentt_1_1sparse__set_html_a28b36afb6ae6f91d995ff259184d6515"><div class="ttname"><a href="classentt_1_1sparse__set.html#a28b36afb6ae6f91d995ff259184d6515">entt::sparse_set::arrange</a></div><div class="ttdeci">void arrange(iterator_type first, iterator_type last, Apply apply, Compare compare, Sort algo=Sort{}, Args &amp;&amp;... args)</div><div class="ttdoc">Sort elements according to the given comparison function.</div><div class="ttdef"><b>Definition:</b> <a href="sparse__set_8hpp_source.html#l00555">sparse_set.hpp:555</a></div></div>
+<div class="ttc" id="astructentt_1_1std__sort_html"><div class="ttname"><a href="structentt_1_1std__sort.html">entt::std_sort</a></div><div class="ttdoc">Function object to wrap std::sort in a class type.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00024">algorithm.hpp:24</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

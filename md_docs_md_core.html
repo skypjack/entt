@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.2.2</span>
+   &#160;<span id="projectnumber">3.3.0</span>
    </div>
   </td>
  </tr>
@@ -153,13 +153,64 @@ Monostate</h1>
 <div class="line"> </div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">bool</span> b = <a class="code" href="structentt_1_1monostate.html">entt::monostate</a>&lt;<span class="stringliteral">&quot;mykey&quot;</span>_hs&gt;{};</div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">int</span> i = <a class="code" href="structentt_1_1monostate.html">entt::monostate</a>&lt;<a class="code" href="classentt_1_1basic__hashed__string.html">entt::hashed_string</a>{<span class="stringliteral">&quot;mykey&quot;</span>}&gt;{};</div>
-</div><!-- fragment --> </div></div><!-- contents -->
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md8"></a>
+Type info</h1>
+<p>The <code>type_info</code> class template is meant to provide some basic information about types of all kinds.<br  />
+ Currently, the only information available is the numeric identifier associated with a given type:</p>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> <span class="keywordtype">id</span> = <a class="code" href="structentt_1_1type__info.html#a24c115a7d3906b5e855d6ba79dc46ff3">entt::type_info&lt;my_type&gt;::id</a>();</div>
+</div><!-- fragment --><p>In general, the <code>id</code> function is also <code>constexpr</code> but this isn't guaranteed for all compilers and platforms (although it's valid with the most well-known and popular compilers).<br  />
+ This function <b>can</b> use non-standard features of the language for its own purposes. This allows it to provide compile-time identifiers that remain stable between different runs. However, it's possible to force the use of standard features only by defining the macro <code>ENTT_STANDARD_CPP</code>. In this case, there is no guarantee that the identifiers are stable across executions though. Moreover, identifiers are generated at runtime and are no longer a compile-time thing.</p>
+<p>An external type system can also be used if needed. In fact, <code>type_info</code> can be specialized by type and is also <em>sfinae-friendly</em> in order to allow more refined specializations such as:</p>
+<div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Type&gt;</div>
+<div class="line"><span class="keyword">struct </span><a class="code" href="structentt_1_1type__info.html">entt::type_info</a>&lt;Type, std::void_d&lt;decltype(Type::custom_id())&gt;&gt; {</div>
+<div class="line">    <span class="keyword">static</span> constexpr ENTT_ID_TYPE <a class="code" href="structentt_1_1type__info.html#a24c115a7d3906b5e855d6ba79dc46ff3">id</a>() ENTT_NOEXCEPT {</div>
+<div class="line">        <span class="keywordflow">return</span> Type::custom_id();</div>
+<div class="line">    }</div>
+<div class="line">};</div>
+</div><!-- fragment --><p>Note that this class template and its specializations are widely used within <code>EnTT</code>. It also plays a very important role in making <code>EnTT</code> work transparently across boundaries.<br  />
+ Please refer to the dedicated section for more details.</p>
+<h2><a class="anchor" id="autotoc_md9"></a>
+Almost unique identifiers</h2>
+<p>Since the default non-standard, compile-time implementation makes use of hashed strings, it may happen that two types are assigned the same numeric identifier.<br  />
+ In fact, although this is quite rare, it's not entirely excluded.</p>
+<p>Another case where two types are assigned the same identifier is when classes from different contexts (for example two or more libraries loaded at runtime) have the same fully qualified name.<br  />
+ Since the default model is based on the name of the classes, if the types belong to the same namespace then their identifiers <em>could</em> be identical (they won't necessarily be the same though).</p>
+<p>Fortunately, there are several easy ways to deal with this:</p>
+<ul>
+<li>The most trivial one is to define the <code>ENTT_STANDARD_CPP</code> macro. Note that runtime identifiers don't suffer from the sam problem. However, this solution doesn't work well with a plugin system, where the libraries aren't linked.</li>
+<li>Another possibility is to specialize the <code>type_info</code> class for one of the conflicting types, in order to assign it a custom identifier. This is probably the easiest solution that also preserves the feature of the tool.</li>
+<li>A fully customized identifier generation policy (based for example on enum classes or preprocessing steps) may represent yet another option.</li>
+</ul>
+<p>These are just some examples of possible approaches to the problem but there are many others. As already mentioned above, since users have full control over their types, this problem is in any case easy to solve and should not worry too much.<br  />
+ In all likelihood, it will never happen to run into a conflict anyway.</p>
+<h1><a class="anchor" id="autotoc_md10"></a>
+Traits</h1>
+<p>This section contains a handful of utilities and traits not present in the standard template library but which can be useful in everyday life.</p>
+<h2><a class="anchor" id="autotoc_md11"></a>
+Member class type</h2>
+<p>The <code>auto</code> template parameter introduced with C++17 made it possible to simplify many class templates and template functions but also made the class type opaque when members are passed as template arguments.<br  />
+ The purpose of this utility is to extract the class type in a few lines of code:</p>
+<div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Member&gt;</div>
+<div class="line"><span class="keyword">using</span> clazz = <a class="code" href="namespaceentt.html#a49f19d031690e5ebfffd6c7a4f6bd364">entt::member_class_t&lt;Member&gt;</a>;</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md12"></a>
+Tags</h2>
+<p>Since in <code>EnTT</code> the type identified by <code>ENTT_ID_TYPE</code> is very important and widely used, there is a more user-friendly shortcut for the creation of integral constants based on it.<br  />
+ This shortcut is the alias template <code><a class="el" href="namespaceentt.html#a4f264daab30d8e01b88536aa43fe0c28" title="Alias template to ease the creation of named values.">entt::tag</a></code>.</p>
+<p>If used in combination with hashed strings, it helps to use human-readable names where types would be required otherwise. As an example:</p>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.assign&lt;<a class="code" href="namespaceentt.html#a4f264daab30d8e01b88536aa43fe0c28">entt::tag</a>&lt;<span class="stringliteral">&quot;enemy&quot;</span>_hs&gt;&gt;(entity);</div>
+</div><!-- fragment --><p>However, this isn't the only permitted use. Literally any value convertible to <code>ENTT_ID_TYPE</code> is a good candidate, such as the named constants of an unscoped enum. </p>
+</div></div><!-- contents -->
 </div><!-- PageDoc -->
-<div class="ttc" id="astructentt_1_1monostate_html"><div class="ttname"><a href="structentt_1_1monostate.html">entt::monostate</a></div><div class="ttdoc">Minimal implementation of the monostate pattern.</div><div class="ttdef"><b>Definition:</b> <a href="monostate_8hpp_source.html#l00024">monostate.hpp:24</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__hashed__string_html"><div class="ttname"><a href="classentt_1_1basic__hashed__string.html">entt::basic_hashed_string</a></div><div class="ttdoc">Zero overhead unique identifier.</div><div class="ttdef"><b>Definition:</b> <a href="hashed__string_8hpp_source.html#l00060">hashed_string.hpp:60</a></div></div>
-<div class="ttc" id="aclassentt_1_1basic__hashed__string_html_a7ee7dca5383cf4507949dc1261ca5efd"><div class="ttname"><a href="classentt_1_1basic__hashed__string.html#a7ee7dca5383cf4507949dc1261ca5efd">entt::basic_hashed_string::hash_type</a></div><div class="ttdeci">ENTT_ID_TYPE hash_type</div><div class="ttdoc">Unsigned integer type.</div><div class="ttdef"><b>Definition:</b> <a href="hashed__string_8hpp_source.html#l00078">hashed_string.hpp:78</a></div></div>
-<div class="ttc" id="aclassentt_1_1identifier_html"><div class="ttname"><a href="classentt_1_1identifier.html">entt::identifier</a></div><div class="ttdoc">Types identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="ident_8hpp_source.html#l00042">ident.hpp:42</a></div></div>
-<div class="ttc" id="aclassentt_1_1family_html"><div class="ttname"><a href="classentt_1_1family.html">entt::family</a></div><div class="ttdoc">Dynamic identifier generator.</div><div class="ttdef"><b>Definition:</b> <a href="family_8hpp_source.html#l00020">family.hpp:20</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a292643317d1dbb13e45824f757bd1086"><div class="ttname"><a href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">entt::registry</a></div><div class="ttdeci">basic_registry&lt; entity &gt; registry</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00084">fwd.hpp:84</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a4f264daab30d8e01b88536aa43fe0c28"><div class="ttname"><a href="namespaceentt.html#a4f264daab30d8e01b88536aa43fe0c28">entt::tag</a></div><div class="ttdeci">std::integral_constant&lt; ENTT_ID_TYPE, Value &gt; tag</div><div class="ttdoc">Alias template to ease the creation of named values.</div><div class="ttdef"><b>Definition:</b> <a href="type__traits_8hpp_source.html#l00209">type_traits.hpp:209</a></div></div>
+<div class="ttc" id="astructentt_1_1monostate_html"><div class="ttname"><a href="structentt_1_1monostate.html">entt::monostate</a></div><div class="ttdoc">Minimal implementation of the monostate pattern.</div><div class="ttdef"><b>Definition:</b> <a href="monostate_8hpp_source.html#l00023">monostate.hpp:23</a></div></div>
+<div class="ttc" id="astructentt_1_1type__info_html"><div class="ttname"><a href="structentt_1_1type__info.html">entt::type_info</a></div><div class="ttdoc">Types identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="type__info_8hpp_source.html#l00053">type_info.hpp:53</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__hashed__string_html"><div class="ttname"><a href="classentt_1_1basic__hashed__string.html">entt::basic_hashed_string</a></div><div class="ttdoc">Zero overhead unique identifier.</div><div class="ttdef"><b>Definition:</b> <a href="hashed__string_8hpp_source.html#l00063">hashed_string.hpp:63</a></div></div>
+<div class="ttc" id="aclassentt_1_1basic__hashed__string_html_a7ee7dca5383cf4507949dc1261ca5efd"><div class="ttname"><a href="classentt_1_1basic__hashed__string.html#a7ee7dca5383cf4507949dc1261ca5efd">entt::basic_hashed_string::hash_type</a></div><div class="ttdeci">ENTT_ID_TYPE hash_type</div><div class="ttdoc">Unsigned integer type.</div><div class="ttdef"><b>Definition:</b> <a href="hashed__string_8hpp_source.html#l00087">hashed_string.hpp:87</a></div></div>
+<div class="ttc" id="astructentt_1_1type__info_html_a24c115a7d3906b5e855d6ba79dc46ff3"><div class="ttname"><a href="structentt_1_1type__info.html#a24c115a7d3906b5e855d6ba79dc46ff3">entt::type_info::id</a></div><div class="ttdeci">static ENTT_ID_TYPE id() ENTT_NOEXCEPT</div><div class="ttdoc">Returns the numeric representation of a given type.</div><div class="ttdef"><b>Definition:</b> <a href="type__info_8hpp_source.html#l00069">type_info.hpp:69</a></div></div>
+<div class="ttc" id="aclassentt_1_1identifier_html"><div class="ttname"><a href="classentt_1_1identifier.html">entt::identifier</a></div><div class="ttdoc">Types identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="ident_8hpp_source.html#l00043">ident.hpp:43</a></div></div>
+<div class="ttc" id="aclassentt_1_1family_html"><div class="ttname"><a href="classentt_1_1family.html">entt::family</a></div><div class="ttdoc">Dynamic identifier generator.</div><div class="ttdef"><b>Definition:</b> <a href="family_8hpp_source.html#l00019">family.hpp:19</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a49f19d031690e5ebfffd6c7a4f6bd364"><div class="ttname"><a href="namespaceentt.html#a49f19d031690e5ebfffd6c7a4f6bd364">entt::member_class_t</a></div><div class="ttdeci">typename member_class&lt; Member &gt;::type member_class_t</div><div class="ttdoc">Helper type.</div><div class="ttdef"><b>Definition:</b> <a href="type__traits_8hpp_source.html#l00201">type_traits.hpp:201</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

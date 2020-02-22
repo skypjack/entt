@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.2.2</span>
+   &#160;<span id="projectnumber">3.3.0</span>
    </div>
   </td>
  </tr>
@@ -120,23 +120,25 @@ $(function() {
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">return</span> const_cast&lt;Resource *&gt;(std::as_const(*this).operator-&gt;());</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    }</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="classentt_1_1handle.html#a2c4264107321541019eeab88f4bac335">   96</a></span>&#160;    <span class="keyword">explicit</span> <span class="keyword">operator</span> bool()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> static_cast&lt;bool&gt;(resource); }</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    std::shared_ptr&lt;Resource&gt; resource;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;};</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;}</div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="classentt_1_1handle.html#a6a119640192d7f9202a64aea4f8f5cf9">   96</a></span>&#160;    <span class="keyword">explicit</span> <span class="keyword">operator</span> bool() const ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordflow">return</span> static_cast&lt;bool&gt;(resource);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    }</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    std::shared_ptr&lt;Resource&gt; resource;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;};</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="preprocessor">#endif // ENTT_RESOURCE_HANDLE_HPP</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;}</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="aclassentt_1_1handle_html_ad7f9d864894ae2c8835c9b95d95db841"><div class="ttname"><a href="classentt_1_1handle.html#ad7f9d864894ae2c8835c9b95d95db841">entt::handle::operator-&gt;</a></div><div class="ttdeci">Resource * operator-&gt;() ENTT_NOEXCEPT</div><div class="ttdoc">Gets a pointer to the managed resource.</div><div class="ttdef"><b>Definition:</b> <a href="handle_8hpp_source.html#l00088">handle.hpp:88</a></div></div>
 <div class="ttc" id="astructentt_1_1cache_html"><div class="ttname"><a href="structentt_1_1cache.html">entt::cache</a></div><div class="ttdoc">Simple cache for resources of a given type.</div><div class="ttdef"><b>Definition:</b> <a href="cache_8hpp_source.html#l00029">cache.hpp:29</a></div></div>
 <div class="ttc" id="aclassentt_1_1handle_html_a20a3b1865543ce4ad19262470c72d4e5"><div class="ttname"><a href="classentt_1_1handle.html#a20a3b1865543ce4ad19262470c72d4e5">entt::handle::operator*</a></div><div class="ttdeci">const Resource &amp; operator*() const ENTT_NOEXCEPT</div><div class="ttdoc">Gets a reference to the managed resource.</div><div class="ttdef"><b>Definition:</b> <a href="handle_8hpp_source.html#l00066">handle.hpp:66</a></div></div>
 <div class="ttc" id="aclassentt_1_1handle_html_ac084be205973fb5feedd3c5795955f97"><div class="ttname"><a href="classentt_1_1handle.html#ac084be205973fb5feedd3c5795955f97">entt::handle::handle</a></div><div class="ttdeci">handle() ENTT_NOEXCEPT=default</div><div class="ttdoc">Default constructor.</div></div>
-<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00012">algorithm.hpp:12</a></div></div>
+<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00013">algorithm.hpp:13</a></div></div>
 <div class="ttc" id="aclassentt_1_1handle_html_a73df220e891ca8418f5f5fd476997e13"><div class="ttname"><a href="classentt_1_1handle.html#a73df220e891ca8418f5f5fd476997e13">entt::handle::operator-&gt;</a></div><div class="ttdeci">const Resource * operator-&gt;() const ENTT_NOEXCEPT</div><div class="ttdoc">Gets a pointer to the managed resource.</div><div class="ttdef"><b>Definition:</b> <a href="handle_8hpp_source.html#l00082">handle.hpp:82</a></div></div>
 <div class="ttc" id="aclassentt_1_1handle_html_afa206e76d351ac2c502996e08f858612"><div class="ttname"><a href="classentt_1_1handle.html#afa206e76d351ac2c502996e08f858612">entt::handle::get</a></div><div class="ttdeci">const Resource &amp; get() const ENTT_NOEXCEPT</div><div class="ttdoc">Gets a reference to the managed resource.</div><div class="ttdef"><b>Definition:</b> <a href="handle_8hpp_source.html#l00049">handle.hpp:49</a></div></div>
 <div class="ttc" id="aclassentt_1_1handle_html_a7c67da714dbde0cd2f2a35143ea36f3b"><div class="ttname"><a href="classentt_1_1handle.html#a7c67da714dbde0cd2f2a35143ea36f3b">entt::handle::get</a></div><div class="ttdeci">Resource &amp; get() ENTT_NOEXCEPT</div><div class="ttdoc">Gets a reference to the managed resource.</div><div class="ttdef"><b>Definition:</b> <a href="handle_8hpp_source.html#l00055">handle.hpp:55</a></div></div>

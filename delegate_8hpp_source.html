@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.2.2</span>
+   &#160;<span id="projectnumber">3.3.0</span>
    </div>
   </td>
  </tr>
@@ -75,224 +75,225 @@ $(function() {
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160; </div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &lt;tuple&gt;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;cstring&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;cstddef&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;utility&gt;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;algorithm&gt;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;functional&gt;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;../config/config.h&quot;</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceentt.html">entt</a> {</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">namespace </span>internal {</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">namespace </span>internal {</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">auto</span> to_function_pointer(Ret(*)(Args...)) -&gt; Ret(*)(Args...);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">auto</span> function_pointer(Ret(*)(Args...)) -&gt; Ret(*)(Args...);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args, <span class="keyword">typename</span> Type, <span class="keyword">typename</span> Payload, <span class="keyword">typename</span> = std::enable_if_t&lt;std::is_convertible_v&lt;const Payload *, const Type *&gt;&gt;&gt;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">auto</span> to_function_pointer(Ret(*)(Type &amp;, Args...), <span class="keyword">const</span> Payload *) -&gt; Ret(*)(Args...);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ret, <span class="keyword">typename</span> Type, <span class="keyword">typename</span>... Args, <span class="keyword">typename</span> Other&gt;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">auto</span> function_pointer(Ret(*)(Type, Args...), Other &amp;&amp;) -&gt; Ret(*)(Args...);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args, <span class="keyword">typename</span> Type, <span class="keyword">typename</span> Payload, <span class="keyword">typename</span> = std::enable_if_t&lt;std::is_convertible_v&lt;const Payload *, const Type *&gt;&gt;&gt;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">auto</span> to_function_pointer(Ret(*)(Type *, Args...), <span class="keyword">const</span> Payload *) -&gt; Ret(*)(Args...);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Class, <span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args, <span class="keyword">typename</span>... Other&gt;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">auto</span> function_pointer(Ret(Class:: *)(Args...), Other &amp;&amp;...) -&gt; Ret(*)(Args...);</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Class, <span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">auto</span> to_function_pointer(Ret(Class:: *)(Args...), <span class="keyword">const</span> Class *) -&gt; Ret(*)(Args...);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Class, <span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args, <span class="keyword">typename</span>... Other&gt;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">auto</span> function_pointer(Ret(Class:: *)(Args...) <span class="keyword">const</span>, Other &amp;&amp;...) -&gt; Ret(*)(Args...);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Class, <span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">auto</span> to_function_pointer(Ret(Class:: *)(Args...) <span class="keyword">const</span>, <span class="keyword">const</span> Class *) -&gt; Ret(*)(Args...);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Class, <span class="keyword">typename</span> Type, <span class="keyword">typename</span>... Other&gt;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">auto</span> function_pointer(Type Class:: *, Other &amp;&amp;...) -&gt; Type(*)();</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Class, <span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">auto</span> to_function_pointer(Type Class:: *, <span class="keyword">const</span> Class *) -&gt; Type(*)();</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Type&gt;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">using</span> function_pointer_t = decltype(internal::function_pointer(std::declval&lt;Type&gt;()...));</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Type&gt;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">using</span> to_function_pointer_t = decltype(internal::to_function_pointer(std::declval&lt;Type&gt;()...));</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Class, <span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;constexpr <span class="keyword">auto</span> index_sequence_for(Ret(*)(Args...)) {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordflow">return</span> std::index_sequence_for&lt;Class..., Args...&gt;{};</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;constexpr <span class="keyword">auto</span> index_sequence_for(Ret(*)(Args...)) {</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordflow">return</span> std::index_sequence_for&lt;Args...&gt;{};</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;}</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;}</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="keyword">template</span>&lt;auto&gt;</div>
-<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="structentt_1_1connect__arg__t.html">   71</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structentt_1_1connect__arg__t.html">connect_arg_t</a> {};</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;}</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">template</span>&lt;auto&gt;</div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="structentt_1_1connect__arg__t.html">   66</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structentt_1_1connect__arg__t.html">connect_arg_t</a> {};</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="keyword">template</span>&lt;auto Func&gt;</div>
+<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="namespaceentt.html#af1e73acd6f3d892955819677dc2664b7">   71</a></span>&#160;constexpr <a class="code" href="structentt_1_1connect__arg__t.html">connect_arg_t&lt;Func&gt;</a> <a class="code" href="namespaceentt.html#af1e73acd6f3d892955819677dc2664b7">connect_arg</a>{};</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="keyword">template</span>&lt;auto Func&gt;</div>
-<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="namespaceentt.html#af1e73acd6f3d892955819677dc2664b7">   76</a></span>&#160;constexpr <a class="code" href="structentt_1_1connect__arg__t.html">connect_arg_t&lt;Func&gt;</a> <a class="code" href="namespaceentt.html#af1e73acd6f3d892955819677dc2664b7">connect_arg</a>{};</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt;</div>
-<div class="line"><a name="l00086"></a><span class="lineno"><a class="line" href="classentt_1_1delegate.html">   86</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1delegate.html">delegate</a>;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html">  103</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1delegate.html">delegate</a>&lt;Ret(Args...)&gt; {</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="keyword">using</span> proto_fn_type = Ret(<span class="keyword">const</span> <span class="keywordtype">void</span> *, std::tuple&lt;Args &amp;&amp;...&gt;);</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">auto</span> Function, std::size_t... Index&gt;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keywordtype">void</span> connect(std::index_sequence&lt;Index...&gt;) ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        static_assert(std::is_invocable_r_v&lt;Ret, decltype(Function), std::tuple_element_t&lt;Index, std::tuple&lt;Args...&gt;&gt;...&gt;);</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        data = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        fn = [](<span class="keyword">const</span> <span class="keywordtype">void</span> *, std::tuple&lt;Args &amp;&amp;...&gt; args) -&gt; Ret {</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            <span class="comment">// Ret(...) makes void(...) eat the return values to avoid errors</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            <span class="keywordflow">return</span> Ret(std::invoke(Function, std::forward&lt;std::tuple_element_t&lt;Index, std::tuple&lt;Args...&gt;&gt;&gt;(std::get&lt;Index&gt;(args))...));</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span>&gt;</div>
+<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="classentt_1_1delegate.html">   81</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1delegate.html">delegate</a>;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html">   97</a></span>&#160;<span class="keyword">class </span><a class="code" href="classentt_1_1delegate.html">delegate</a>&lt;Ret(Args...)&gt; {</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keyword">using</span> proto_fn_type = Ret(<span class="keyword">const</span> <span class="keywordtype">void</span> *, Args...);</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">auto</span> Candidate, std::size_t... Index&gt;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keyword">auto</span> wrap(std::index_sequence&lt;Index...&gt;) ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="keywordflow">return</span> [](<span class="keyword">const</span> <span class="keywordtype">void</span> *, Args... args) -&gt; Ret {</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> arguments = std::forward_as_tuple(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;            <span class="keywordflow">return</span> Ret(std::invoke(Candidate, std::forward&lt;std::tuple_element_t&lt;Index, std::tuple&lt;Args...&gt;&gt;&gt;(std::get&lt;Index&gt;(arguments))...));</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        };</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    }</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">auto</span> Candidate, <span class="keyword">typename</span> Type, std::size_t... Index&gt;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keyword">auto</span> wrap(Type &amp;, std::index_sequence&lt;Index...&gt;) ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        <span class="keywordflow">return</span> [](<span class="keyword">const</span> <span class="keywordtype">void</span> *payload, Args... args) -&gt; Ret {</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> arguments = std::forward_as_tuple(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            Type *curr = static_cast&lt;Type *&gt;(<span class="keyword">const_cast&lt;</span>std::conditional_t&lt;std::is_const_v&lt;Type&gt;, <span class="keyword">const </span><span class="keywordtype">void</span> *, <span class="keywordtype">void</span> *<span class="keyword">&gt;</span>&gt;(payload));</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            <span class="keywordflow">return</span> Ret(std::invoke(Candidate, *curr, std::forward&lt;std::tuple_element_t&lt;Index, std::tuple&lt;Args...&gt;&gt;&gt;(std::get&lt;Index&gt;(arguments))...));</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        };</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    }</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">auto</span> Candidate, <span class="keyword">typename</span> Type, std::size_t... Index&gt;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordtype">void</span> connect(Type &amp;value_or_instance, std::index_sequence&lt;Index...&gt;) ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        static_assert(std::is_invocable_r_v&lt;Ret, decltype(Candidate), Type &amp;, std::tuple_element_t&lt;Index, std::tuple&lt;Args...&gt;&gt;...&gt;);</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        data = &amp;value_or_instance;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        fn = [](<span class="keyword">const</span> <span class="keywordtype">void</span> *payload, std::tuple&lt;Args &amp;&amp;...&gt; args) -&gt; Ret {</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;            Type *curr = static_cast&lt;Type *&gt;(<span class="keyword">const_cast&lt;</span>std::conditional_t&lt;std::is_const_v&lt;Type&gt;, <span class="keyword">const </span><span class="keywordtype">void</span> *, <span class="keywordtype">void</span> *<span class="keyword">&gt;</span>&gt;(payload));</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;            <span class="comment">// Ret(...) makes void(...) eat the return values to avoid errors</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;            <span class="keywordflow">return</span> Ret(std::invoke(Candidate, *curr, std::forward&lt;std::tuple_element_t&lt;Index, std::tuple&lt;Args...&gt;&gt;&gt;(std::get&lt;Index&gt;(args))...));</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        };</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    }</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">auto</span> Candidate, <span class="keyword">typename</span> Type, std::size_t... Index&gt;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordtype">void</span> connect(Type *value_or_instance, std::index_sequence&lt;Index...&gt;) ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        static_assert(std::is_invocable_r_v&lt;Ret, decltype(Candidate), Type *, std::tuple_element_t&lt;Index, std::tuple&lt;Args...&gt;&gt;...&gt;);</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        data = value_or_instance;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        fn = [](<span class="keyword">const</span> <span class="keywordtype">void</span> *payload, std::tuple&lt;Args &amp;&amp;...&gt; args) -&gt; Ret {</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;            Type *curr = static_cast&lt;Type *&gt;(<span class="keyword">const_cast&lt;</span>std::conditional_t&lt;std::is_const_v&lt;Type&gt;, <span class="keyword">const </span><span class="keywordtype">void</span> *, <span class="keywordtype">void</span> *<span class="keyword">&gt;</span>&gt;(payload));</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;            <span class="comment">// Ret(...) makes void(...) eat the return values to avoid errors</span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;            <span class="keywordflow">return</span> Ret(std::invoke(Candidate, curr, std::forward&lt;std::tuple_element_t&lt;Index, std::tuple&lt;Args...&gt;&gt;&gt;(std::get&lt;Index&gt;(args))...));</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        };</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    }</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00143"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a235927a00f56e4b56dbfdc4e6cf5ddb4">  143</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a235927a00f56e4b56dbfdc4e6cf5ddb4">function_type</a> = Ret(Args...);</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
-<div class="line"><a name="l00146"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a5c4828a5df5ed1e8fd18465ff63eb73c">  146</a></span>&#160;    <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a5c4828a5df5ed1e8fd18465ff63eb73c">delegate</a>() ENTT_NOEXCEPT</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        : fn{<span class="keyword">nullptr</span>}, data{<span class="keyword">nullptr</span>}</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    {}</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keyword">template</span>&lt;auto Function&gt;</div>
-<div class="line"><a name="l00155"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#ad07c76f552619d55edc17a3722958215">  155</a></span>&#160;    <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#ad07c76f552619d55edc17a3722958215">delegate</a>(<a class="code" href="structentt_1_1connect__arg__t.html">connect_arg_t&lt;Function&gt;</a>) ENTT_NOEXCEPT</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keyword">auto</span> wrap(Type *, std::index_sequence&lt;Index...&gt;) ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        <span class="keywordflow">return</span> [](<span class="keyword">const</span> <span class="keywordtype">void</span> *payload, Args... args) -&gt; Ret {</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;            <span class="keyword">const</span> <span class="keyword">auto</span> arguments = std::forward_as_tuple(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;            Type *curr = static_cast&lt;Type *&gt;(<span class="keyword">const_cast&lt;</span>std::conditional_t&lt;std::is_const_v&lt;Type&gt;, <span class="keyword">const </span><span class="keywordtype">void</span> *, <span class="keywordtype">void</span> *<span class="keyword">&gt;</span>&gt;(payload));</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;            <span class="keywordflow">return</span> Ret(std::invoke(Candidate, curr, std::forward&lt;std::tuple_element_t&lt;Index, std::tuple&lt;Args...&gt;&gt;&gt;(std::get&lt;Index&gt;(arguments))...));</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        };</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    }</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00128"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a235927a00f56e4b56dbfdc4e6cf5ddb4">  128</a></span>&#160;    <span class="keyword">using</span> <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a235927a00f56e4b56dbfdc4e6cf5ddb4">function_type</a> = Ret(Args...);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00131"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a5c4828a5df5ed1e8fd18465ff63eb73c">  131</a></span>&#160;    <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a5c4828a5df5ed1e8fd18465ff63eb73c">delegate</a>() ENTT_NOEXCEPT</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        : fn{<span class="keyword">nullptr</span>}, data{<span class="keyword">nullptr</span>}</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    {}</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keyword">template</span>&lt;auto Cand<span class="keywordtype">id</span>ate&gt;</div>
+<div class="line"><a name="l00141"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#af4f480038e4c18d1ad106af3b26574da">  141</a></span>&#160;    <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#af4f480038e4c18d1ad106af3b26574da">delegate</a>(<a class="code" href="structentt_1_1connect__arg__t.html">connect_arg_t&lt;Candidate&gt;</a>) ENTT_NOEXCEPT</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        : <a class="code" href="classentt_1_1delegate.html">delegate</a>{}</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    {</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        connect&lt;Candidate&gt;();</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    }</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keyword">template</span>&lt;auto Cand<span class="keywordtype">id</span>ate, <span class="keyword">typename</span> Type&gt;</div>
+<div class="line"><a name="l00155"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a3f4b93ddb413740d3a06b223202dc7f5">  155</a></span>&#160;    <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a3f4b93ddb413740d3a06b223202dc7f5">delegate</a>(<a class="code" href="structentt_1_1connect__arg__t.html">connect_arg_t&lt;Candidate&gt;</a>, Type &amp;&amp;value_or_instance) ENTT_NOEXCEPT</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        : <a class="code" href="classentt_1_1delegate.html">delegate</a>{}</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    {</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        connect&lt;Function&gt;();</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        connect&lt;Candidate&gt;(std::forward&lt;Type&gt;(value_or_instance));</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    }</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keyword">template</span>&lt;auto Cand<span class="keywordtype">id</span>ate, <span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a name="l00169"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a24fbe634fda0fe5c67ec6deba0deaa66">  169</a></span>&#160;    <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a24fbe634fda0fe5c67ec6deba0deaa66">delegate</a>(<a class="code" href="structentt_1_1connect__arg__t.html">connect_arg_t&lt;Candidate&gt;</a>, Type &amp;value_or_instance) ENTT_NOEXCEPT</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        : <a class="code" href="classentt_1_1delegate.html">delegate</a>{}</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    {</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        connect&lt;Candidate&gt;(value_or_instance);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    }</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keyword">template</span>&lt;auto Cand<span class="keywordtype">id</span>ate, <span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a name="l00183"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a3c3391085b16cba9024b4bbb372f7326">  183</a></span>&#160;    <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a3c3391085b16cba9024b4bbb372f7326">delegate</a>(<a class="code" href="structentt_1_1connect__arg__t.html">connect_arg_t&lt;Candidate&gt;</a>, Type *value_or_instance) ENTT_NOEXCEPT</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        : <a class="code" href="classentt_1_1delegate.html">delegate</a>{}</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    {</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        connect&lt;Candidate&gt;(value_or_instance);</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    }</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160; </div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="keyword">template</span>&lt;auto Function&gt;</div>
-<div class="line"><a name="l00194"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a6e732abcbc4aa9b8899c92d8f21e55a6">  194</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a6e732abcbc4aa9b8899c92d8f21e55a6">connect</a>() ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        connect&lt;Function&gt;(internal::index_sequence_for(internal::to_function_pointer_t&lt;decltype(Function)&gt;{}));</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    }</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="keyword">template</span>&lt;auto Cand<span class="keywordtype">id</span>ate, <span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a name="l00214"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#aae828d209ffe33590c2bb8e4b37f47ef">  214</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#aae828d209ffe33590c2bb8e4b37f47ef">connect</a>(Type &amp;value_or_instance) ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        connect&lt;Candidate&gt;(value_or_instance, internal::index_sequence_for(internal::to_function_pointer_t&lt;decltype(Candidate), Type *&gt;{}));</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    }</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="keyword">template</span>&lt;auto Cand<span class="keywordtype">id</span>ate, <span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a name="l00234"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#afcdce5ab5ae55520cce86f3f79b38e9c">  234</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#afcdce5ab5ae55520cce86f3f79b38e9c">connect</a>(Type *value_or_instance) ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        connect&lt;Candidate&gt;(value_or_instance, internal::index_sequence_for(internal::to_function_pointer_t&lt;decltype(Candidate), Type *&gt;{}));</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    }</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
-<div class="line"><a name="l00243"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0d81bb1bde6abd78914cd0a07084bcd7">  243</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0d81bb1bde6abd78914cd0a07084bcd7">reset</a>() ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        fn = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        data = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    }</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
-<div class="line"><a name="l00252"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a3e0495b7612d458cbc59dc4b657d586f">  252</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">void</span> * <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a3e0495b7612d458cbc59dc4b657d586f">instance</a>() const ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        <span class="keywordflow">return</span> data;</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    }</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160; </div>
-<div class="line"><a name="l00270"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0e53caedb53810bc96aa71bce199c990">  270</a></span>&#160;    Ret <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0e53caedb53810bc96aa71bce199c990">operator()</a>(Args... args)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        ENTT_ASSERT(fn);</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;        <span class="keywordflow">return</span> fn(data, std::forward_as_tuple(std::forward&lt;Args&gt;(args)...));</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    }</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
-<div class="line"><a name="l00279"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a73e1029cbb6359d803a6cc06b82f80d7">  279</a></span>&#160;    <span class="keyword">explicit</span> <span class="keyword">operator</span> bool() const ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        <span class="comment">// no need to test also data</span></div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;        <span class="keywordflow">return</span> fn;</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    }</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160; </div>
-<div class="line"><a name="l00289"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a54ca30c9a3f7a9662363c48db4e86aae">  289</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a54ca30c9a3f7a9662363c48db4e86aae">operator==</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1delegate.html">delegate</a>&lt;Ret(Args...)&gt; &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        <span class="keywordflow">return</span> fn == other.fn &amp;&amp; data == other.data;</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    }</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keyword">template</span>&lt;auto Cand<span class="keywordtype">id</span>ate&gt;</div>
+<div class="line"><a name="l00166"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a6e732abcbc4aa9b8899c92d8f21e55a6">  166</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a6e732abcbc4aa9b8899c92d8f21e55a6">connect</a>() ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        data = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        <span class="keywordflow">if</span> constexpr(std::is_invocable_r_v&lt;Ret, decltype(Candidate), Args...&gt;) {</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;            fn = [](<span class="keyword">const</span> <span class="keywordtype">void</span> *, Args... args) -&gt; Ret {</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;                <span class="keywordflow">return</span> Ret(std::invoke(Candidate, std::forward&lt;Args&gt;(args)...));</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;            };</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr(std::is_member_pointer_v&lt;decltype(Candidate)&gt;) {</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;            fn = wrap&lt;Candidate&gt;(internal::index_sequence_for&lt;std::tuple_element_t&lt;0, std::tuple&lt;Args...&gt;&gt;&gt;(internal::function_pointer_t&lt;decltype(Candidate)&gt;{}));</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;            fn = wrap&lt;Candidate&gt;(internal::index_sequence_for(internal::function_pointer_t&lt;decltype(Candidate)&gt;{}));</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        }</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    }</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keyword">template</span>&lt;auto Cand<span class="keywordtype">id</span>ate, <span class="keyword">typename</span> Type&gt;</div>
+<div class="line"><a name="l00196"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#aae828d209ffe33590c2bb8e4b37f47ef">  196</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#aae828d209ffe33590c2bb8e4b37f47ef">connect</a>(Type &amp;value_or_instance) ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        data = &amp;value_or_instance;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        <span class="keywordflow">if</span> constexpr(std::is_invocable_r_v&lt;Ret, decltype(Candidate), Type &amp;, Args...&gt;) {</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;            fn = [](<span class="keyword">const</span> <span class="keywordtype">void</span> *payload, Args... args) -&gt; Ret {</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;                Type *curr = static_cast&lt;Type *&gt;(<span class="keyword">const_cast&lt;</span>std::conditional_t&lt;std::is_const_v&lt;Type&gt;, <span class="keyword">const </span><span class="keywordtype">void</span> *, <span class="keywordtype">void</span> *<span class="keyword">&gt;</span>&gt;(payload));</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;                <span class="keywordflow">return</span> Ret(std::invoke(Candidate, *curr, std::forward&lt;Args&gt;(args)...));</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;            };</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;            fn = wrap&lt;Candidate&gt;(value_or_instance, internal::index_sequence_for(internal::function_pointer_t&lt;decltype(Candidate), Type&gt;{}));</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        }</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    }</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="keyword">template</span>&lt;auto Cand<span class="keywordtype">id</span>ate, <span class="keyword">typename</span> Type&gt;</div>
+<div class="line"><a name="l00220"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#afcdce5ab5ae55520cce86f3f79b38e9c">  220</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#afcdce5ab5ae55520cce86f3f79b38e9c">connect</a>(Type *value_or_instance) ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        data = value_or_instance;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        <span class="keywordflow">if</span> constexpr(std::is_invocable_r_v&lt;Ret, decltype(Candidate), Type *, Args...&gt;) {</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;            fn = [](<span class="keyword">const</span> <span class="keywordtype">void</span> *payload, Args... args) -&gt; Ret {</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;                Type *curr = static_cast&lt;Type *&gt;(<span class="keyword">const_cast&lt;</span>std::conditional_t&lt;std::is_const_v&lt;Type&gt;, <span class="keyword">const </span><span class="keywordtype">void</span> *, <span class="keywordtype">void</span> *<span class="keyword">&gt;</span>&gt;(payload));</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;                <span class="keywordflow">return</span> Ret(std::invoke(Candidate, curr, std::forward&lt;Args&gt;(args)...));</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;            };</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;            fn = wrap&lt;Candidate&gt;(value_or_instance, internal::index_sequence_for(internal::function_pointer_t&lt;decltype(Candidate), Type&gt;{}));</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        }</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    }</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160; </div>
+<div class="line"><a name="l00238"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0d81bb1bde6abd78914cd0a07084bcd7">  238</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0d81bb1bde6abd78914cd0a07084bcd7">reset</a>() ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        fn = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;        data = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    }</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
+<div class="line"><a name="l00247"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a3e0495b7612d458cbc59dc4b657d586f">  247</a></span>&#160;    <span class="keyword">const</span> <span class="keywordtype">void</span> * <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a3e0495b7612d458cbc59dc4b657d586f">instance</a>() const ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        <span class="keywordflow">return</span> data;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    }</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160; </div>
+<div class="line"><a name="l00265"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0e53caedb53810bc96aa71bce199c990">  265</a></span>&#160;    Ret <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0e53caedb53810bc96aa71bce199c990">operator()</a>(Args... args)<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        ENTT_ASSERT(fn);</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        <span class="keywordflow">return</span> fn(data, std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    }</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
+<div class="line"><a name="l00274"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a73e1029cbb6359d803a6cc06b82f80d7">  274</a></span>&#160;    <span class="keyword">explicit</span> <span class="keyword">operator</span> bool() const ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        <span class="comment">// no need to test also data</span></div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;        <span class="keywordflow">return</span> !(fn == <span class="keyword">nullptr</span>);</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    }</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160; </div>
+<div class="line"><a name="l00284"></a><span class="lineno"><a class="line" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a54ca30c9a3f7a9662363c48db4e86aae">  284</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a54ca30c9a3f7a9662363c48db4e86aae">operator==</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1delegate.html">delegate</a>&lt;Ret(Args...)&gt; &amp;other) <span class="keyword">const</span> ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;        <span class="keywordflow">return</span> fn == other.fn &amp;&amp; data == other.data;</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    }</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    proto_fn_type *fn;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">void</span> *data;</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;};</div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160; </div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    proto_fn_type *fn;</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">void</span> *data;</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;};</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160; </div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160; </div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l00308"></a><span class="lineno"><a class="line" href="namespaceentt.html#a656b2ec80abf493ce1924b314d13fd18">  308</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="namespaceentt.html#a1a211752d12273a08015c524133e27c3">operator!=</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1delegate.html">delegate</a>&lt;Ret(Args...)&gt; &amp;lhs, <span class="keyword">const</span> <a class="code" href="classentt_1_1delegate.html">delegate</a>&lt;Ret(Args...)&gt; &amp;rhs) ENTT_NOEXCEPT {</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="keywordflow">return</span> !(lhs == rhs);</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;}</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160; </div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160; </div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="keyword">template</span>&lt;auto Function&gt;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<a class="code" href="namespaceentt.html#a464a269b63d8c76395b0c54f33d3d6fb">delegate</a>(connect_arg_t&lt;Function&gt;) ENTT_NOEXCEPT</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;-&gt; <a class="code" href="namespaceentt.html#a464a269b63d8c76395b0c54f33d3d6fb">delegate</a>&lt;std::remove_pointer_t&lt;internal::to_function_pointer_t&lt;decltype(Function)&gt;&gt;&gt;;</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160; </div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160; </div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Ret, <span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><a name="l00303"></a><span class="lineno"><a class="line" href="namespaceentt.html#a656b2ec80abf493ce1924b314d13fd18">  303</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="namespaceentt.html#a1a211752d12273a08015c524133e27c3">operator!=</a>(<span class="keyword">const</span> <a class="code" href="classentt_1_1delegate.html">delegate</a>&lt;Ret(Args...)&gt; &amp;lhs, <span class="keyword">const</span> <a class="code" href="classentt_1_1delegate.html">delegate</a>&lt;Ret(Args...)&gt; &amp;rhs) ENTT_NOEXCEPT {</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    <span class="keywordflow">return</span> !(lhs == rhs);</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;}</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160; </div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160; </div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;<span class="keyword">template</span>&lt;auto Cand<span class="keywordtype">id</span>ate&gt;</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;<a class="code" href="namespaceentt.html#a40a1dbbb903a3a90b4aa59250a9a68ed">delegate</a>(connect_arg_t&lt;Candidate&gt;) ENTT_NOEXCEPT</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;-&gt; <a class="code" href="namespaceentt.html#a40a1dbbb903a3a90b4aa59250a9a68ed">delegate</a>&lt;std::remove_pointer_t&lt;internal::function_pointer_t&lt;decltype(Candidate)&gt;&gt;&gt;;</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160; </div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160; </div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<span class="keyword">template</span>&lt;auto Cand<span class="keywordtype">id</span>ate, <span class="keyword">typename</span> Type&gt;</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<a class="code" href="namespaceentt.html#a40a1dbbb903a3a90b4aa59250a9a68ed">delegate</a>(connect_arg_t&lt;Candidate&gt;, Type &amp;&amp;) ENTT_NOEXCEPT</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;-&gt; <a class="code" href="namespaceentt.html#a40a1dbbb903a3a90b4aa59250a9a68ed">delegate</a>&lt;std::remove_pointer_t&lt;internal::function_pointer_t&lt;decltype(Candidate), Type&gt;&gt;&gt;;</div>
 <div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160; </div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;<span class="keyword">template</span>&lt;auto Cand<span class="keywordtype">id</span>ate, <span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;<a class="code" href="namespaceentt.html#a464a269b63d8c76395b0c54f33d3d6fb">delegate</a>(connect_arg_t&lt;Candidate&gt;, Type &amp;) ENTT_NOEXCEPT</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;-&gt; <a class="code" href="namespaceentt.html#a464a269b63d8c76395b0c54f33d3d6fb">delegate</a>&lt;std::remove_pointer_t&lt;internal::to_function_pointer_t&lt;decltype(Candidate), Type *&gt;&gt;&gt;;</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160; </div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160; </div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="keyword">template</span>&lt;auto Cand<span class="keywordtype">id</span>ate, <span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;<a class="code" href="namespaceentt.html#a464a269b63d8c76395b0c54f33d3d6fb">delegate</a>(connect_arg_t&lt;Candidate&gt;, Type *) ENTT_NOEXCEPT</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;-&gt; <a class="code" href="namespaceentt.html#a464a269b63d8c76395b0c54f33d3d6fb">delegate</a>&lt;std::remove_pointer_t&lt;internal::to_function_pointer_t&lt;decltype(Candidate), Type *&gt;&gt;&gt;;</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160; </div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160; </div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;}</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160; </div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160; </div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;<span class="preprocessor">#endif // ENTT_SIGNAL_DELEGATE_HPP</span></div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160; </div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;}</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160; </div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160; </div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_ad07c76f552619d55edc17a3722958215"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#ad07c76f552619d55edc17a3722958215">entt::delegate&lt; Ret(Args...)&gt;::delegate</a></div><div class="ttdeci">delegate(connect_arg_t&lt; Function &gt;) ENTT_NOEXCEPT</div><div class="ttdoc">Constructs a delegate and connects a free function to it.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00155">delegate.hpp:155</a></div></div>
-<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a0d81bb1bde6abd78914cd0a07084bcd7"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0d81bb1bde6abd78914cd0a07084bcd7">entt::delegate&lt; Ret(Args...)&gt;::reset</a></div><div class="ttdeci">void reset() ENTT_NOEXCEPT</div><div class="ttdoc">Resets a delegate.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00243">delegate.hpp:243</a></div></div>
-<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_aae828d209ffe33590c2bb8e4b37f47ef"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#aae828d209ffe33590c2bb8e4b37f47ef">entt::delegate&lt; Ret(Args...)&gt;::connect</a></div><div class="ttdeci">void connect(Type &amp;value_or_instance) ENTT_NOEXCEPT</div><div class="ttdoc">Connects a member function for a given instance or a free function with payload to a delegate.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00214">delegate.hpp:214</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a464a269b63d8c76395b0c54f33d3d6fb"><div class="ttname"><a href="namespaceentt.html#a464a269b63d8c76395b0c54f33d3d6fb">entt::delegate</a></div><div class="ttdeci">delegate(connect_arg_t&lt; Function &gt;) ENTT_NOEXCEPT -&gt; delegate&lt; std::remove_pointer_t&lt; internal::to_function_pointer_t&lt; decltype(Function)&gt;&gt;&gt;</div><div class="ttdoc">Deduction guide.</div></div>
-<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a0e53caedb53810bc96aa71bce199c990"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0e53caedb53810bc96aa71bce199c990">entt::delegate&lt; Ret(Args...)&gt;::operator()</a></div><div class="ttdeci">Ret operator()(Args... args) const</div><div class="ttdoc">Triggers a delegate.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00270">delegate.hpp:270</a></div></div>
-<div class="ttc" id="anamespaceentt_html_af1e73acd6f3d892955819677dc2664b7"><div class="ttname"><a href="namespaceentt.html#af1e73acd6f3d892955819677dc2664b7">entt::connect_arg</a></div><div class="ttdeci">constexpr connect_arg_t&lt; Func &gt; connect_arg</div><div class="ttdoc">Constant of type connect_arg_t used to disambiguate calls.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00076">delegate.hpp:76</a></div></div>
-<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a24fbe634fda0fe5c67ec6deba0deaa66"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a24fbe634fda0fe5c67ec6deba0deaa66">entt::delegate&lt; Ret(Args...)&gt;::delegate</a></div><div class="ttdeci">delegate(connect_arg_t&lt; Candidate &gt;, Type &amp;value_or_instance) ENTT_NOEXCEPT</div><div class="ttdoc">Constructs a delegate and connects a member for a given instance or a free function with payload.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00169">delegate.hpp:169</a></div></div>
-<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a5c4828a5df5ed1e8fd18465ff63eb73c"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a5c4828a5df5ed1e8fd18465ff63eb73c">entt::delegate&lt; Ret(Args...)&gt;::delegate</a></div><div class="ttdeci">delegate() ENTT_NOEXCEPT</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00146">delegate.hpp:146</a></div></div>
-<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a6e732abcbc4aa9b8899c92d8f21e55a6"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a6e732abcbc4aa9b8899c92d8f21e55a6">entt::delegate&lt; Ret(Args...)&gt;::connect</a></div><div class="ttdeci">void connect() ENTT_NOEXCEPT</div><div class="ttdoc">Connects a free function to a delegate.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00194">delegate.hpp:194</a></div></div>
-<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00012">algorithm.hpp:12</a></div></div>
-<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a235927a00f56e4b56dbfdc4e6cf5ddb4"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a235927a00f56e4b56dbfdc4e6cf5ddb4">entt::delegate&lt; Ret(Args...)&gt;::function_type</a></div><div class="ttdeci">Ret(Args...) function_type</div><div class="ttdoc">Function type of the delegate.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00143">delegate.hpp:143</a></div></div>
-<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a3e0495b7612d458cbc59dc4b657d586f"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a3e0495b7612d458cbc59dc4b657d586f">entt::delegate&lt; Ret(Args...)&gt;::instance</a></div><div class="ttdeci">const void * instance() const ENTT_NOEXCEPT</div><div class="ttdoc">Returns the instance or the payload linked to a delegate, if any.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00252">delegate.hpp:252</a></div></div>
-<div class="ttc" id="anamespaceentt_html_a1a211752d12273a08015c524133e27c3"><div class="ttname"><a href="namespaceentt.html#a1a211752d12273a08015c524133e27c3">entt::operator!=</a></div><div class="ttdeci">constexpr bool operator!=(const basic_hashed_string&lt; Char &gt; &amp;lhs, const basic_hashed_string&lt; Char &gt; &amp;rhs) ENTT_NOEXCEPT</div><div class="ttdoc">Compares two hashed strings.</div><div class="ttdef"><b>Definition:</b> <a href="hashed__string_8hpp_source.html#l00217">hashed_string.hpp:217</a></div></div>
-<div class="ttc" id="astructentt_1_1connect__arg__t_html"><div class="ttname"><a href="structentt_1_1connect__arg__t.html">entt::connect_arg_t</a></div><div class="ttdoc">Used to wrap a function or a member of a specified type.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00071">delegate.hpp:71</a></div></div>
-<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a3c3391085b16cba9024b4bbb372f7326"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a3c3391085b16cba9024b4bbb372f7326">entt::delegate&lt; Ret(Args...)&gt;::delegate</a></div><div class="ttdeci">delegate(connect_arg_t&lt; Candidate &gt;, Type *value_or_instance) ENTT_NOEXCEPT</div><div class="ttdoc">Constructs a delegate and connects a member for a given instance or a free function with payload.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00183">delegate.hpp:183</a></div></div>
-<div class="ttc" id="aclassentt_1_1delegate_html"><div class="ttname"><a href="classentt_1_1delegate.html">entt::delegate</a></div><div class="ttdoc">Basic delegate implementation.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00086">delegate.hpp:86</a></div></div>
-<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a54ca30c9a3f7a9662363c48db4e86aae"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a54ca30c9a3f7a9662363c48db4e86aae">entt::delegate&lt; Ret(Args...)&gt;::operator==</a></div><div class="ttdeci">bool operator==(const delegate&lt; Ret(Args...)&gt; &amp;other) const ENTT_NOEXCEPT</div><div class="ttdoc">Compares the contents of two delegates.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00289">delegate.hpp:289</a></div></div>
-<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_afcdce5ab5ae55520cce86f3f79b38e9c"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#afcdce5ab5ae55520cce86f3f79b38e9c">entt::delegate&lt; Ret(Args...)&gt;::connect</a></div><div class="ttdeci">void connect(Type *value_or_instance) ENTT_NOEXCEPT</div><div class="ttdoc">Connects a member function for a given instance or a free function with payload to a delegate.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00234">delegate.hpp:234</a></div></div>
+<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a0d81bb1bde6abd78914cd0a07084bcd7"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0d81bb1bde6abd78914cd0a07084bcd7">entt::delegate&lt; Ret(Args...)&gt;::reset</a></div><div class="ttdeci">void reset() ENTT_NOEXCEPT</div><div class="ttdoc">Resets a delegate.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00238">delegate.hpp:238</a></div></div>
+<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_aae828d209ffe33590c2bb8e4b37f47ef"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#aae828d209ffe33590c2bb8e4b37f47ef">entt::delegate&lt; Ret(Args...)&gt;::connect</a></div><div class="ttdeci">void connect(Type &amp;value_or_instance) ENTT_NOEXCEPT</div><div class="ttdoc">Connects a free function with payload or a bound member to a delegate.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00196">delegate.hpp:196</a></div></div>
+<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a0e53caedb53810bc96aa71bce199c990"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a0e53caedb53810bc96aa71bce199c990">entt::delegate&lt; Ret(Args...)&gt;::operator()</a></div><div class="ttdeci">Ret operator()(Args... args) const</div><div class="ttdoc">Triggers a delegate.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00265">delegate.hpp:265</a></div></div>
+<div class="ttc" id="anamespaceentt_html_af1e73acd6f3d892955819677dc2664b7"><div class="ttname"><a href="namespaceentt.html#af1e73acd6f3d892955819677dc2664b7">entt::connect_arg</a></div><div class="ttdeci">constexpr connect_arg_t&lt; Func &gt; connect_arg</div><div class="ttdoc">Constant of type connect_arg_t used to disambiguate calls.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00071">delegate.hpp:71</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a40a1dbbb903a3a90b4aa59250a9a68ed"><div class="ttname"><a href="namespaceentt.html#a40a1dbbb903a3a90b4aa59250a9a68ed">entt::delegate</a></div><div class="ttdeci">delegate(connect_arg_t&lt; Candidate &gt;) ENTT_NOEXCEPT -&gt; delegate&lt; std::remove_pointer_t&lt; internal::function_pointer_t&lt; decltype(Candidate)&gt;&gt;&gt;</div><div class="ttdoc">Deduction guide.</div></div>
+<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a5c4828a5df5ed1e8fd18465ff63eb73c"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a5c4828a5df5ed1e8fd18465ff63eb73c">entt::delegate&lt; Ret(Args...)&gt;::delegate</a></div><div class="ttdeci">delegate() ENTT_NOEXCEPT</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00131">delegate.hpp:131</a></div></div>
+<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a6e732abcbc4aa9b8899c92d8f21e55a6"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a6e732abcbc4aa9b8899c92d8f21e55a6">entt::delegate&lt; Ret(Args...)&gt;::connect</a></div><div class="ttdeci">void connect() ENTT_NOEXCEPT</div><div class="ttdoc">Connects a free function or an unbound member to a delegate.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00166">delegate.hpp:166</a></div></div>
+<div class="ttc" id="anamespaceentt_html"><div class="ttname"><a href="namespaceentt.html">entt</a></div><div class="ttdoc">EnTT default namespace.</div><div class="ttdef"><b>Definition:</b> <a href="algorithm_8hpp_source.html#l00013">algorithm.hpp:13</a></div></div>
+<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a235927a00f56e4b56dbfdc4e6cf5ddb4"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a235927a00f56e4b56dbfdc4e6cf5ddb4">entt::delegate&lt; Ret(Args...)&gt;::function_type</a></div><div class="ttdeci">Ret(Args...) function_type</div><div class="ttdoc">Function type of the delegate.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00128">delegate.hpp:128</a></div></div>
+<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a3e0495b7612d458cbc59dc4b657d586f"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a3e0495b7612d458cbc59dc4b657d586f">entt::delegate&lt; Ret(Args...)&gt;::instance</a></div><div class="ttdeci">const void * instance() const ENTT_NOEXCEPT</div><div class="ttdoc">Returns the instance or the payload linked to a delegate, if any.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00247">delegate.hpp:247</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a1a211752d12273a08015c524133e27c3"><div class="ttname"><a href="namespaceentt.html#a1a211752d12273a08015c524133e27c3">entt::operator!=</a></div><div class="ttdeci">constexpr bool operator!=(const basic_hashed_string&lt; Char &gt; &amp;lhs, const basic_hashed_string&lt; Char &gt; &amp;rhs) ENTT_NOEXCEPT</div><div class="ttdoc">Compares two hashed strings.</div><div class="ttdef"><b>Definition:</b> <a href="hashed__string_8hpp_source.html#l00226">hashed_string.hpp:226</a></div></div>
+<div class="ttc" id="astructentt_1_1connect__arg__t_html"><div class="ttname"><a href="structentt_1_1connect__arg__t.html">entt::connect_arg_t</a></div><div class="ttdoc">Used to wrap a function or a member of a specified type.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00066">delegate.hpp:66</a></div></div>
+<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a3f4b93ddb413740d3a06b223202dc7f5"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a3f4b93ddb413740d3a06b223202dc7f5">entt::delegate&lt; Ret(Args...)&gt;::delegate</a></div><div class="ttdeci">delegate(connect_arg_t&lt; Candidate &gt;, Type &amp;&amp;value_or_instance) ENTT_NOEXCEPT</div><div class="ttdoc">Constructs a delegate and connects a free function with payload or a bound member.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00155">delegate.hpp:155</a></div></div>
+<div class="ttc" id="aclassentt_1_1delegate_html"><div class="ttname"><a href="classentt_1_1delegate.html">entt::delegate</a></div><div class="ttdoc">Basic delegate implementation.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00081">delegate.hpp:81</a></div></div>
+<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_af4f480038e4c18d1ad106af3b26574da"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#af4f480038e4c18d1ad106af3b26574da">entt::delegate&lt; Ret(Args...)&gt;::delegate</a></div><div class="ttdeci">delegate(connect_arg_t&lt; Candidate &gt;) ENTT_NOEXCEPT</div><div class="ttdoc">Constructs a delegate and connects a free function or an unbound member.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00141">delegate.hpp:141</a></div></div>
+<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_a54ca30c9a3f7a9662363c48db4e86aae"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#a54ca30c9a3f7a9662363c48db4e86aae">entt::delegate&lt; Ret(Args...)&gt;::operator==</a></div><div class="ttdeci">bool operator==(const delegate&lt; Ret(Args...)&gt; &amp;other) const ENTT_NOEXCEPT</div><div class="ttdoc">Compares the contents of two delegates.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00284">delegate.hpp:284</a></div></div>
+<div class="ttc" id="aclassentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4_html_afcdce5ab5ae55520cce86f3f79b38e9c"><div class="ttname"><a href="classentt_1_1delegate_3_01Ret_07Args_8_8_8_08_4.html#afcdce5ab5ae55520cce86f3f79b38e9c">entt::delegate&lt; Ret(Args...)&gt;::connect</a></div><div class="ttdeci">void connect(Type *value_or_instance) ENTT_NOEXCEPT</div><div class="ttdoc">Connects a free function with payload or a bound member to a delegate.</div><div class="ttdef"><b>Definition:</b> <a href="delegate_8hpp_source.html#l00220">delegate.hpp:220</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

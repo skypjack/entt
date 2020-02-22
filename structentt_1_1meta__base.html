@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.2.2</span>
+   &#160;<span id="projectnumber">3.3.0</span>
    </div>
   </td>
  </tr>
@@ -96,14 +96,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad19d5a997c91281da3674a6b17d011bd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__base.html#ad19d5a997c91281da3674a6b17d011bd">operator bool</a> () const ENTT_NOEXCEPT</td></tr>
 <tr class="memdesc:ad19d5a997c91281da3674a6b17d011bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if a meta object is valid, false otherwise.  <a href="structentt_1_1meta__base.html#ad19d5a997c91281da3674a6b17d011bd">More...</a><br /></td></tr>
 <tr class="separator:ad19d5a997c91281da3674a6b17d011bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6469955ac7550d5396cf185795c07a15"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structentt_1_1meta__base.html#a6469955ac7550d5396cf185795c07a15">operator==</a> (const <a class="el" href="structentt_1_1meta__base.html">meta_base</a> &amp;other) const ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:a6469955ac7550d5396cf185795c07a15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if two meta objects refer to the same node.  <a href="structentt_1_1meta__base.html#a6469955ac7550d5396cf185795c07a15">More...</a><br /></td></tr>
-<tr class="separator:a6469955ac7550d5396cf185795c07a15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Opaque container for meta base classes. </p>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00830">830</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00709">709</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a7138b13e8dc1d75ad4e47ef89780eda4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7138b13e8dc1d75ad4e47ef89780eda4">&#9670;&nbsp;</a></span>meta_base()</h2>
@@ -137,7 +134,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00832">832</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00711">711</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -175,7 +172,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An opaque pointer to the base type. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00850">850</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00729">729</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -205,44 +202,7 @@ Public Member Functions</h2></td></tr>
 <p>Returns true if a meta object is valid, false otherwise. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the meta object is valid, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00858">858</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a6469955ac7550d5396cf185795c07a15"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6469955ac7550d5396cf185795c07a15">&#9670;&nbsp;</a></span>operator==()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool entt::meta_base::operator== </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structentt_1_1meta__base.html">meta_base</a> &amp;&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Checks if two meta objects refer to the same node. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">other</td><td>The meta object with which to compare. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True if the two meta objects refer to the same node, false otherwise. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00863">863</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l00737">737</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -272,7 +232,7 @@ Public Member Functions</h2></td></tr>
 <p>Returns the meta type to which a meta object belongs. </p>
 <dl class="section return"><dt>Returns</dt><dd>The meta type to which the meta object belongs. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01790">1790</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01514">1514</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>
@@ -302,7 +262,7 @@ Public Member Functions</h2></td></tr>
 <p>Returns the meta type of the underlying object. </p>
 <dl class="section return"><dt>Returns</dt><dd>The meta type of the underlying object, if any. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01795">1795</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="meta_8hpp_source.html#l01519">1519</a> of file <a class="el" href="meta_8hpp_source.html">meta.hpp</a>.</p>
 
 </div>
 </div>

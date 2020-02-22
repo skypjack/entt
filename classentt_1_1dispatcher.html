@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.2.2</span>
+   &#160;<span id="projectnumber">3.3.0</span>
    </div>
   </td>
  </tr>
@@ -68,7 +68,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classentt_1_1dispatcher-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -81,20 +80,12 @@ $(function() {
 
 <p><code>#include &lt;<a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
-Public Types</h2></td></tr>
-<tr class="memitem:a9ab3b084146a292b2dd2411cea452273"><td class="memTemplParams" colspan="2"><a id="a9ab3b084146a292b2dd2411cea452273"></a>
-template&lt;typename Event &gt; </td></tr>
-<tr class="memitem:a9ab3b084146a292b2dd2411cea452273"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1dispatcher.html#a9ab3b084146a292b2dd2411cea452273">sink_type</a> = typename signal_wrapper&lt; Event &gt;::<a class="el" href="classentt_1_1dispatcher.html#a9ab3b084146a292b2dd2411cea452273">sink_type</a></td></tr>
-<tr class="memdesc:a9ab3b084146a292b2dd2411cea452273"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of sink for the given event. <br /></td></tr>
-<tr class="separator:a9ab3b084146a292b2dd2411cea452273"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:afedd59083875621a11510b00c84c8878"><td class="memTemplParams" colspan="2">template&lt;typename Event &gt; </td></tr>
-<tr class="memitem:afedd59083875621a11510b00c84c8878"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classentt_1_1dispatcher.html#a9ab3b084146a292b2dd2411cea452273">sink_type</a>&lt; Event &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1dispatcher.html#afedd59083875621a11510b00c84c8878">sink</a> () ENTT_NOEXCEPT</td></tr>
-<tr class="memdesc:afedd59083875621a11510b00c84c8878"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a sink object for the given event.  <a href="classentt_1_1dispatcher.html#afedd59083875621a11510b00c84c8878">More...</a><br /></td></tr>
-<tr class="separator:afedd59083875621a11510b00c84c8878"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fd52abaeed110ec526918c255f6fcfa"><td class="memTemplParams" colspan="2">template&lt;typename Event &gt; </td></tr>
+<tr class="memitem:a0fd52abaeed110ec526918c255f6fcfa"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1dispatcher.html#a0fd52abaeed110ec526918c255f6fcfa">sink</a> ()</td></tr>
+<tr class="memdesc:a0fd52abaeed110ec526918c255f6fcfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a sink object for the given event.  <a href="classentt_1_1dispatcher.html#a0fd52abaeed110ec526918c255f6fcfa">More...</a><br /></td></tr>
+<tr class="separator:a0fd52abaeed110ec526918c255f6fcfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3d3eae7004c63f0232b09f2770c4ebd"><td class="memTemplParams" colspan="2">template&lt;typename Event , typename... Args&gt; </td></tr>
 <tr class="memitem:ac3d3eae7004c63f0232b09f2770c4ebd"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1dispatcher.html#ac3d3eae7004c63f0232b09f2770c4ebd">trigger</a> (Args &amp;&amp;... args)</td></tr>
 <tr class="memdesc:ac3d3eae7004c63f0232b09f2770c4ebd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Triggers an immediate event of the given type.  <a href="classentt_1_1dispatcher.html#ac3d3eae7004c63f0232b09f2770c4ebd">More...</a><br /></td></tr>
@@ -111,10 +102,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1e0a488354698cbf3cba82396ac4b76e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1dispatcher.html#a1e0a488354698cbf3cba82396ac4b76e">enqueue</a> (Event &amp;&amp;event)</td></tr>
 <tr class="memdesc:a1e0a488354698cbf3cba82396ac4b76e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enqueues an event of the given type.  <a href="classentt_1_1dispatcher.html#a1e0a488354698cbf3cba82396ac4b76e">More...</a><br /></td></tr>
 <tr class="separator:a1e0a488354698cbf3cba82396ac4b76e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83958d3ca4b5ec11eca0c3b8eb591822"><td class="memTemplParams" colspan="2">template&lt;typename... Event&gt; </td></tr>
-<tr class="memitem:a83958d3ca4b5ec11eca0c3b8eb591822"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1dispatcher.html#a83958d3ca4b5ec11eca0c3b8eb591822">discard</a> ()</td></tr>
-<tr class="memdesc:a83958d3ca4b5ec11eca0c3b8eb591822"><td class="mdescLeft">&#160;</td><td class="mdescRight">Discards all the events queued so far.  <a href="classentt_1_1dispatcher.html#a83958d3ca4b5ec11eca0c3b8eb591822">More...</a><br /></td></tr>
-<tr class="separator:a83958d3ca4b5ec11eca0c3b8eb591822"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7aacb035fbf90406fca1ccd10f28be86"><td class="memTemplParams" colspan="2">template&lt;typename... Event&gt; </td></tr>
+<tr class="memitem:a7aacb035fbf90406fca1ccd10f28be86"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1dispatcher.html#a7aacb035fbf90406fca1ccd10f28be86">clear</a> ()</td></tr>
+<tr class="memdesc:a7aacb035fbf90406fca1ccd10f28be86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Discards all the events queued so far.  <a href="classentt_1_1dispatcher.html#a7aacb035fbf90406fca1ccd10f28be86">More...</a><br /></td></tr>
+<tr class="separator:a7aacb035fbf90406fca1ccd10f28be86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aabed6fd7fa4027dcfa3afc7bc20f2784"><td class="memTemplParams" colspan="2">template&lt;typename Event &gt; </td></tr>
 <tr class="memitem:aabed6fd7fa4027dcfa3afc7bc20f2784"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1dispatcher.html#aabed6fd7fa4027dcfa3afc7bc20f2784">update</a> ()</td></tr>
 <tr class="memdesc:aabed6fd7fa4027dcfa3afc7bc20f2784"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delivers all the pending events of the given type.  <a href="classentt_1_1dispatcher.html#aabed6fd7fa4027dcfa3afc7bc20f2784">More...</a><br /></td></tr>
@@ -129,10 +120,10 @@ Public Member Functions</h2></td></tr>
  Listeners are provided in the form of member functions. For each event of type <code>Event</code>, listeners are such that they can be invoked with an argument of type <code>const Event &amp;</code>, no matter what the return type is.</p>
 <p>The types of the instances are <code>Class &amp;</code>. Users must guarantee that the lifetimes of the objects overcome the one of the dispatcher itself to avoid crashes. </p>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00033">33</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00031">31</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a83958d3ca4b5ec11eca0c3b8eb591822"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a83958d3ca4b5ec11eca0c3b8eb591822">&#9670;&nbsp;</a></span>discard()</h2>
+<a id="a7aacb035fbf90406fca1ccd10f28be86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7aacb035fbf90406fca1ccd10f28be86">&#9670;&nbsp;</a></span>clear()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -143,7 +134,7 @@ template&lt;typename... Event&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void entt::dispatcher::discard </td>
+          <td class="memname">void entt::dispatcher::clear </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -165,7 +156,7 @@ template&lt;typename... Event&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00224">224</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00187">187</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -211,7 +202,7 @@ template&lt;typename Event , typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00197">197</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00160">160</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -256,12 +247,12 @@ template&lt;typename Event &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00211">211</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00174">174</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
-<a id="afedd59083875621a11510b00c84c8878"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afedd59083875621a11510b00c84c8878">&#9670;&nbsp;</a></span>sink()</h2>
+<a id="a0fd52abaeed110ec526918c255f6fcfa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fd52abaeed110ec526918c255f6fcfa">&#9670;&nbsp;</a></span>sink()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -272,7 +263,7 @@ template&lt;typename Event &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classentt_1_1dispatcher.html#a9ab3b084146a292b2dd2411cea452273">sink_type</a>&lt;Event&gt; entt::dispatcher::sink </td>
+          <td class="memname">auto entt::dispatcher::sink </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -298,7 +289,7 @@ template&lt;typename Event &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A temporary sink object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00153">153</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00116">116</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -344,7 +335,7 @@ template&lt;typename Event , typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00168">168</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00131">131</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -389,7 +380,7 @@ template&lt;typename Event &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00182">182</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00145">145</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -427,7 +418,7 @@ template&lt;typename Event &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00246">246</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00207">207</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -457,7 +448,7 @@ template&lt;typename Event &gt; </div>
 <p>Delivers all the pending events. </p>
 <p>This method is blocking and it doesn't return until all the events are delivered to the registered listeners. It's responsibility of the users to reduce at a minimum the time spent in the bodies of the listeners. </p>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00257">257</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00218">218</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
