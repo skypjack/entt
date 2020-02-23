@@ -400,12 +400,6 @@ public:
         return meta_factory<Type, Type>{&node->prop};
     }
 
-    /*! @copydoc alias */
-    [[deprecated("Use ::alias instead")]]
-    auto type(const ENTT_ID_TYPE value) ENTT_NOEXCEPT {
-        return alias(value);
-    }
-
     /**
      * @brief Assigns a meta base to a meta type.
      *
