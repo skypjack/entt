@@ -110,11 +110,11 @@ class basic_registry {
     };
 
     struct pool_data {
-        ENTT_ID_TYPE type_id;
-        std::unique_ptr<sparse_set<Entity>> pool;
-        void(* assure)(basic_registry &, const sparse_set<Entity> &);
-        void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
-        void(* stamp)(basic_registry &, const Entity, const sparse_set<Entity> &, const Entity);
+        ENTT_ID_TYPE type_id{};
+        std::unique_ptr<sparse_set<Entity>> pool{};
+        void(* assure)(basic_registry &, const sparse_set<Entity> &){};
+        void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity){};
+        void(* stamp)(basic_registry &, const Entity, const sparse_set<Entity> &, const Entity){};
     };
 
     template<typename...>
