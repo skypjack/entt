@@ -16,6 +16,10 @@ struct non_default_constructible {
     int value;
 };
 
+struct aggregate {
+    int value{};
+};
+
 struct listener {
     template<typename Component>
     static void sort(entt::registry &registry) {
@@ -254,6 +258,14 @@ TEST(Registry, Functionalities) {
 
     ASSERT_EQ(registry.capacity<int>(), entt::registry::size_type{});
     ASSERT_EQ(registry.capacity<char>(), entt::registry::size_type{});
+}
+
+TEST(Registry, AssignOrReplaceAggregates) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    auto &instance = registry.assign_or_replace<aggregate>(entity, 42);
+
+    ASSERT_EQ(instance.value, 42);
 }
 
 TEST(Registry, Identifiers) {

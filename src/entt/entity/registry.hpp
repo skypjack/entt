@@ -717,7 +717,7 @@ public:
         auto &cpool = assure<Component>();
 
         return cpool.has(entity)
-                ? (cpool.replace(*this, entity, [args = std::forward_as_tuple(std::forward<Args>(args)...)](auto &&component) { component = std::make_from_tuple<Component>(std::move(args)); }), cpool.get(entity))
+                ? (cpool.replace(*this, entity, [&args...](auto &&component) { component = Component{std::forward<Args>(args)...}; }), cpool.get(entity))
                 : cpool.assign(*this, entity, std::forward<Args>(args)...);
     }
 
