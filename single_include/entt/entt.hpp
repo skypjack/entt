@@ -1462,7 +1462,7 @@ using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
  */
 #define ENTT_OPAQUE_TYPE(clazz, type)\
     enum class clazz: type {};\
-    constexpr auto to_integral(const clazz id) ENTT_NOEXCEPT {\
+    constexpr auto to_integer(const clazz id) ENTT_NOEXCEPT {\
         return static_cast<std::underlying_type_t<clazz>>(id);\
     }\
     static_assert(true)
@@ -2819,7 +2819,7 @@ using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
  */
 #define ENTT_OPAQUE_TYPE(clazz, type)\
     enum class clazz: type {};\
-    constexpr auto to_integral(const clazz id) ENTT_NOEXCEPT {\
+    constexpr auto to_integer(const clazz id) ENTT_NOEXCEPT {\
         return static_cast<std::underlying_type_t<clazz>>(id);\
     }\
     static_assert(true)
@@ -3943,7 +3943,7 @@ public:
 
     template<typename Entity>
     constexpr bool operator==(const Entity entity) const ENTT_NOEXCEPT {
-        return (to_integral(entity) & traits_type<Entity>::entity_mask) == to_integral(static_cast<Entity>(*this));
+        return (to_integer(entity) & traits_type<Entity>::entity_mask) == to_integer(static_cast<Entity>(*this));
     }
 
     template<typename Entity>
@@ -4256,11 +4256,11 @@ class sparse_set {
     };
 
     auto page(const Entity entt) const ENTT_NOEXCEPT {
-        return std::size_t{(to_integral(entt) & traits_type::entity_mask) / entt_per_page};
+        return std::size_t{(to_integer(entt) & traits_type::entity_mask) / entt_per_page};
     }
 
     auto offset(const Entity entt) const ENTT_NOEXCEPT {
-        return std::size_t{to_integral(entt) & (entt_per_page - 1)};
+        return std::size_t{to_integer(entt) & (entt_per_page - 1)};
     }
 
     Entity * assure(const std::size_t pos) {
@@ -8333,7 +8333,7 @@ public:
         auto curr = destroyed;
 
         for(; curr != null; --sz) {
-            curr = entities[to_integral(curr) & traits_type::entity_mask];
+            curr = entities[to_integer(curr) & traits_type::entity_mask];
         }
 
         return sz;
@@ -8478,7 +8478,7 @@ public:
      * @return True if the identifier is valid, false otherwise.
      */
     bool valid(const entity_type entity) const {
-        const auto pos = size_type(to_integral(entity) & traits_type::entity_mask);
+        const auto pos = size_type(to_integer(entity) & traits_type::entity_mask);
         return (pos < entities.size() && entities[pos] == entity);
     }
 
@@ -8488,7 +8488,7 @@ public:
      * @return The entity identifier without the version.
      */
     static entity_type entity(const entity_type entity) ENTT_NOEXCEPT {
-        return entity_type{to_integral(entity) & traits_type::entity_mask};
+        return entity_type{to_integer(entity) & traits_type::entity_mask};
     }
 
     /**
@@ -8497,7 +8497,7 @@ public:
      * @return The version stored along with the given entity identifier.
      */
     static version_type version(const entity_type entity) ENTT_NOEXCEPT {
-        return version_type(to_integral(entity) >> traits_type::entity_shift);
+        return version_type(to_integer(entity) >> traits_type::entity_shift);
     }
 
     /**
@@ -8514,9 +8514,9 @@ public:
      * @return Actual version for the given entity identifier.
      */
     version_type current(const entity_type entity) const {
-        const auto pos = size_type(to_integral(entity) & traits_type::entity_mask);
+        const auto pos = size_type(to_integer(entity) & traits_type::entity_mask);
         ENTT_ASSERT(pos < entities.size());
-        return version_type(to_integral(entities[pos]) >> traits_type::entity_shift);
+        return version_type(to_integer(entities[pos]) >> traits_type::entity_shift);
     }
 
     /**
@@ -8535,11 +8535,11 @@ public:
         if(destroyed == null) {
             entt = entities.emplace_back(entity_type(entities.size()));
             // traits_type::entity_mask is reserved to allow for null identifiers
-            ENTT_ASSERT(to_integral(entt) < traits_type::entity_mask);
+            ENTT_ASSERT(to_integer(entt) < traits_type::entity_mask);
         } else {
-            const auto curr = to_integral(destroyed);
-            const auto version = to_integral(entities[curr]) & (traits_type::version_mask << traits_type::entity_shift);
-            destroyed = entity_type{to_integral(entities[curr]) & traits_type::entity_mask};
+            const auto curr = to_integer(destroyed);
+            const auto version = to_integer(entities[curr]) & (traits_type::version_mask << traits_type::entity_shift);
+            destroyed = entity_type{to_integer(entities[curr]) & traits_type::entity_mask};
             entt = entities[curr] = entity_type{curr | version};
         }
 
@@ -8561,7 +8561,7 @@ public:
         ENTT_ASSERT(hint != null);
         entity_type entt;
 
-        if(const auto req = (to_integral(hint) & traits_type::entity_mask); !(req < entities.size())) {
+        if(const auto req = (to_integer(hint) & traits_type::entity_mask); !(req < entities.size())) {
             entities.reserve(req + 1);
 
             for(auto pos = entities.size(); pos < req; ++pos) {
@@ -8570,12 +8570,12 @@ public:
             }
 
             entt = entities.emplace_back(hint);
-        } else if(const auto curr = (to_integral(entities[req]) & traits_type::entity_mask); req == curr) {
+        } else if(const auto curr = (to_integer(entities[req]) & traits_type::entity_mask); req == curr) {
             entt = create();
         } else {
             auto *it = &destroyed;
-            for(; (to_integral(*it) & traits_type::entity_mask) != req; it = &entities[to_integral(*it) & traits_type::entity_mask]);
-            *it = entity_type{curr | (to_integral(*it) & (traits_type::version_mask << traits_type::entity_shift))};
+            for(; (to_integer(*it) & traits_type::entity_mask) != req; it = &entities[to_integer(*it) & traits_type::entity_mask]);
+            *it = entity_type{curr | (to_integer(*it) & (traits_type::version_mask << traits_type::entity_shift))};
             entt = entities[req] = hint;
         }
 
@@ -8629,9 +8629,9 @@ public:
         ENTT_ASSERT(orphan(entity));
 
         // lengthens the implicit list of destroyed entities
-        const auto entt = to_integral(entity) & traits_type::entity_mask;
-        const auto version = ((to_integral(entity) >> traits_type::entity_shift) + 1) << traits_type::entity_shift;
-        entities[entt] = entity_type{to_integral(destroyed) | version};
+        const auto entt = to_integer(entity) & traits_type::entity_mask;
+        const auto version = ((to_integer(entity) >> traits_type::entity_shift) + 1) << traits_type::entity_shift;
+        entities[entt] = entity_type{to_integer(destroyed) | version};
         destroyed = entity_type{entt};
     }
 
@@ -8731,9 +8731,9 @@ public:
         destroyed = null;
 
         for(std::size_t pos{}, end = entities.size(); pos < end; ++pos) {
-            if((to_integral(entities[pos]) & traits_type::entity_mask) != pos) {
-                const auto version = to_integral(entities[pos]) & (traits_type::version_mask << traits_type::entity_shift);
-                entities[pos] = entity_type{to_integral(destroyed) | version};
+            if((to_integer(entities[pos]) & traits_type::entity_mask) != pos) {
+                const auto version = to_integer(entities[pos]) & (traits_type::version_mask << traits_type::entity_shift);
+                entities[pos] = entity_type{to_integer(destroyed) | version};
                 destroyed = entity_type(pos);
             }
         }
@@ -9067,7 +9067,7 @@ public:
             }
         } else {
             for(auto pos = entities.size(); pos; --pos) {
-                if(const auto entt = entities[pos - 1]; (to_integral(entt) & traits_type::entity_mask) == (pos - 1)) {
+                if(const auto entt = entities[pos - 1]; (to_integer(entt) & traits_type::entity_mask) == (pos - 1)) {
                     func(entt);
                 }
             }
@@ -9654,14 +9654,14 @@ public:
     entt::basic_snapshot<Entity> snapshot() const {
         using follow_fn_type = entity_type(const basic_registry &, const entity_type);
 
-        const auto head = to_integral(destroyed);
-        const entity_type seed = (destroyed == null) ? destroyed : entity_type{head | (to_integral(entities[head]) & (traits_type::version_mask << traits_type::entity_shift))};
+        const auto head = to_integer(destroyed);
+        const entity_type seed = (destroyed == null) ? destroyed : entity_type{head | (to_integer(entities[head]) & (traits_type::version_mask << traits_type::entity_shift))};
 
         follow_fn_type *follow = [](const basic_registry &reg, const entity_type entity) -> entity_type {
             const auto &others = reg.entities;
-            const auto entt = to_integral(entity) & traits_type::entity_mask;
-            const auto curr = to_integral(others[entt]) & traits_type::entity_mask;
-            return entity_type{curr | (to_integral(others[curr]) & (traits_type::version_mask << traits_type::entity_shift))};
+            const auto entt = to_integer(entity) & traits_type::entity_mask;
+            const auto curr = to_integer(others[entt]) & traits_type::entity_mask;
+            return entity_type{curr | (to_integer(others[curr]) & (traits_type::version_mask << traits_type::entity_shift))};
         };
 
         return { this, seed, follow };
@@ -9686,7 +9686,7 @@ public:
         using force_fn_type = void(basic_registry &, const entity_type, const bool);
 
         force_fn_type *force = [](basic_registry &reg, const entity_type entity, const bool drop) {
-            const auto entt = to_integral(entity) & traits_type::entity_mask;
+            const auto entt = to_integer(entity) & traits_type::entity_mask;
             auto &others = reg.entities;
 
             if(!(entt < others.size())) {
@@ -9699,8 +9699,8 @@ public:
 
             if(drop) {
                 reg.destroy(entity);
-                const auto version = to_integral(entity) & (traits_type::version_mask << traits_type::entity_shift);
-                others[entt] = entity_type{(to_integral(others[entt]) & traits_type::entity_mask) | version};
+                const auto version = to_integer(entity) & (traits_type::version_mask << traits_type::entity_shift);
+                others[entt] = entity_type{(to_integer(others[entt]) & traits_type::entity_mask) | version};
             }
         };
 
@@ -11590,7 +11590,7 @@ using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
  */
 #define ENTT_OPAQUE_TYPE(clazz, type)\
     enum class clazz: type {};\
-    constexpr auto to_integral(const clazz id) ENTT_NOEXCEPT {\
+    constexpr auto to_integer(const clazz id) ENTT_NOEXCEPT {\
         return static_cast<std::underlying_type_t<clazz>>(id);\
     }\
     static_assert(true)

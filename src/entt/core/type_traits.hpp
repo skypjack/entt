@@ -215,13 +215,17 @@ using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
 /**
  * @brief Defines an enum class to use for opaque identifiers and a dedicate
  * `to_integer` function to convert the identifiers to their underlying type.
+ * Note that the deprecated to_integral() is the misspelt version of to_integer().
  * @param clazz The name to use for the enum class.
  * @param type The underlying type for the enum class.
  */
 #define ENTT_OPAQUE_TYPE(clazz, type)\
     enum class clazz: type {};\
-    constexpr auto to_integral(const clazz id) ENTT_NOEXCEPT {\
+    constexpr auto to_integer(const clazz id) ENTT_NOEXCEPT {\
         return static_cast<std::underlying_type_t<clazz>>(id);\
+    }\
+    [[deprecated("This function was misspelt. Use entt::to_integer() instead.")]] constexpr auto to_integral(const clazz id) ENTT_NOEXCEPT {\
+        return to_integer(id);\
     }\
     static_assert(true)
 
