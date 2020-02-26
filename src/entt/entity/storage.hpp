@@ -330,7 +330,7 @@ public:
 
     /**
      * @brief Assigns one or more entities to a storage and constructs their
-     * objects with from a given instance.
+     * objects from a given instance.
      *
      * @warning
      * Attempting to assign an entity that already belongs to the storage
