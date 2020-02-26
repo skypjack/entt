@@ -192,14 +192,13 @@ class basic_registry {
             for(index = {}; index < length && pools[index].type_id != type_info<Component>::id(); ++index);
 
             if(index == pools.size()) {
-                auto &&pdata = pools.emplace_back();
-
-                pdata.type_id = type_info<Component>::id();
-                pdata.pool.reset(new pool_handler<Component>());
-
-                pdata.remove = [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
-                    static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
-                };
+                pools.push_back(pool_data{
+                    type_info<Component>::id(),
+                    std::unique_ptr<sparse_set<entity_type>>{new pool_handler<Component>()},
+                    [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
+                        static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
+                    }
+                });
             }
         }
 
