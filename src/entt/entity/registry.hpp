@@ -164,24 +164,9 @@ class basic_registry {
         bool (* exclude)(const ENTT_ID_TYPE) ENTT_NOEXCEPT;
     };
 
-    struct basic_variable {
-        virtual ~basic_variable() = default;
-        virtual ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT = 0;
-    };
-
-    template<typename Type>
-    struct variable_handler: basic_variable {
-        static_assert(std::is_same_v<Type, std::decay_t<Type>>);
-        Type value;
-
-        template<typename... Args>
-        variable_handler(Args &&... args)
-            : value{std::forward<Args>(args)...}
-        {}
-
-        ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT override {
-            return type_info<Type>::id();
-        }
+    struct variable_data {
+        ENTT_ID_TYPE type_id;
+        std::unique_ptr<void, void(*)(void *)> value;
     };
 
     template<typename Component>
@@ -1587,8 +1572,8 @@ public:
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
         unset<Type>();
-        vars.emplace_back(new variable_handler<Type>{std::forward<Args>(args)...});
-        return static_cast<variable_handler<Type> &>(*vars.back()).value;
+        vars.push_back(variable_data{type_info<Type>::id(), { new Type{std::forward<Args>(args)...}, [](void *instance) { delete static_cast<Type *>(instance); } }});
+        return *static_cast<Type *>(vars.back().value.get());
     }
 
     /**
@@ -1597,8 +1582,8 @@ public:
      */
     template<typename Type>
     void unset() {
-        vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &&handler) {
-            return handler->type_id() == type_info<Type>::id();
+        vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &&var) {
+            return var.type_id == type_info<Type>::id();
         }), vars.end());
     }
 
@@ -1627,8 +1612,8 @@ public:
      */
     template<typename Type>
     const Type * try_ctx() const {
-        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&handler) { return handler->type_id() == type_info<Type>::id(); });
-        return it == vars.cend() ? nullptr : &static_cast<const variable_handler<Type> &>(*it->get()).value;
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&var) { return var.type_id == type_info<Type>::id(); });
+        return it == vars.cend() ? nullptr : static_cast<const Type *>(it->value.get());
     }
 
     /*! @copydoc try_ctx */
@@ -1685,15 +1670,15 @@ public:
     template<typename Func>
     void ctx(Func func) const {
         for(auto pos = vars.size(); pos; --pos) {
-            func(vars[pos-1]->type_id());
+            func(vars[pos-1].type_id);
         }
     }
 
 private:
     std::vector<group_data> groups{};
     mutable std::vector<pool_data> pools{};
-    std::vector<std::unique_ptr<basic_variable>> vars{};
     std::vector<entity_type> entities{};
+    std::vector<variable_data> vars{};
     entity_type destroyed{null};
 };
 
