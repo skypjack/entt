@@ -47,8 +47,6 @@ class basic_registry {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>);
         std::size_t super{};
 
-        using storage<Entity, Component>::storage;
-
         auto on_construct() ENTT_NOEXCEPT {
             return sink{construction};
         }
