@@ -53,14 +53,6 @@ TEST(SparseSet, Functionalities) {
     ASSERT_TRUE(std::is_move_constructible_v<decltype(set)>);
     ASSERT_TRUE(std::is_move_assignable_v<decltype(set)>);
 
-    entt::sparse_set<entt::entity> cpy{set};
-    set = cpy;
-
-    ASSERT_FALSE(set.empty());
-    ASSERT_FALSE(cpy.empty());
-    ASSERT_EQ(set.index(entt::entity{42}), 0u);
-    ASSERT_EQ(cpy.index(entt::entity{42}), 0u);
-
     entt::sparse_set<entt::entity> other{std::move(set)};
 
     set = std::move(other);

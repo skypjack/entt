@@ -9,7 +9,6 @@
 * add examples (and credits) from @alanjfs :)
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...> (see #342)
 * observer: user defined filters (eg .replace<T, &function> or .group<T, U, &func>)
-* use underlying_type as entity type within pools and registry? it would make different registries work together flawlessy
 * can we write a bool conv func for entt::entity that silently compares it to null?
 * reset... reset everywhere...
 * is it possible to make 0 the entity null?
@@ -17,7 +16,6 @@
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none
 * review prepare after clone and the others have been removed
-* remove copy-ctor/op from sparse set and storage (it doesn't make much sense)
 
 * WIP:
  - deprecate snapshot, loader, ...
