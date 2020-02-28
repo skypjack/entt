@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.3.0</span>
+   &#160;<span id="projectnumber">3.3.1</span>
    </div>
   </td>
  </tr>
@@ -118,9 +118,9 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><p>Basic dispatcher implementation. </p>
 <p>A dispatcher can be used either to trigger an immediate event or to enqueue events to be published all together once per tick.<br  />
  Listeners are provided in the form of member functions. For each event of type <code>Event</code>, listeners are such that they can be invoked with an argument of type <code>const Event &amp;</code>, no matter what the return type is.</p>
-<p>The types of the instances are <code>Class &amp;</code>. Users must guarantee that the lifetimes of the objects overcome the one of the dispatcher itself to avoid crashes. </p>
+<p>The dispatcher creates instances of the <code>sigh</code> class internally. Refer to the documentation of the latter for more details. </p>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00031">31</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00030">30</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a7aacb035fbf90406fca1ccd10f28be86"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7aacb035fbf90406fca1ccd10f28be86">&#9670;&nbsp;</a></span>clear()</h2>
@@ -156,7 +156,7 @@ template&lt;typename... Event&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00187">187</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00186">186</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -202,7 +202,7 @@ template&lt;typename Event , typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00160">160</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00159">159</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -247,7 +247,7 @@ template&lt;typename Event &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00174">174</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00173">173</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -289,7 +289,7 @@ template&lt;typename Event &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A temporary sink object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00116">116</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00115">115</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -335,7 +335,7 @@ template&lt;typename Event , typename... Args&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00131">131</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00130">130</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -380,7 +380,7 @@ template&lt;typename Event &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00145">145</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00144">144</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -418,7 +418,7 @@ template&lt;typename Event &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00207">207</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00206">206</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>
@@ -448,7 +448,7 @@ template&lt;typename Event &gt; </div>
 <p>Delivers all the pending events. </p>
 <p>This method is blocking and it doesn't return until all the events are delivered to the registered listeners. It's responsibility of the users to reduce at a minimum the time spent in the bodies of the listeners. </p>
 
-<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00218">218</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dispatcher_8hpp_source.html#l00217">217</a> of file <a class="el" href="dispatcher_8hpp_source.html">dispatcher.hpp</a>.</p>
 
 </div>
 </div>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.3.0</span>
+   &#160;<span id="projectnumber">3.3.1</span>
    </div>
   </td>
  </tr>
@@ -476,11 +476,11 @@ template&lt;auto Candidate, typename Type &gt; </div>
 </div><div class="memdoc">
 
 <p>Connects a free function with payload or a bound member to a signal. </p>
-<p>The signal isn't responsible for the connected object or the payload. Users must always guarantee that the lifetime of the instance overcomes the one of the delegate. On the other side, the signal handler performs checks to avoid multiple connections for the same function.<br  />
- When used to connect a free function with payload, its signature must be such that the instance is the first argument before the ones used to define the delegate itself.</p>
+<p>The signal isn't responsible for the connected object or the payload. Users must always guarantee that the lifetime of the instance overcomes the one of the signal. On the other side, the signal handler performs checks to avoid multiple connections for the same function.<br  />
+ When used to connect a free function with payload, its signature must be such that the instance is the first argument before the ones used to define the signal itself.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Candidate</td><td>Function or member to connect to the delegate. </td></tr>
+    <tr><td class="paramname">Candidate</td><td>Function or member to connect to the signal. </td></tr>
     <tr><td class="paramname">Type</td><td>Type of class or type of payload. </td></tr>
   </table>
   </dd>
@@ -527,7 +527,7 @@ template&lt;auto Candidate&gt; </div>
 <p>Disconnects a free function or an unbound member from a signal. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Candidate</td><td>Function or member to disconnect from the delegate. </td></tr>
+    <tr><td class="paramname">Candidate</td><td>Function or member to disconnect from the signal. </td></tr>
   </table>
   </dd>
 </dl>
@@ -567,7 +567,7 @@ template&lt;auto Candidate, typename Type &gt; </div>
 <p>Disconnects a free function with payload or a bound member from a signal. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">Candidate</td><td>Function or member to disconnect from the delegate. </td></tr>
+    <tr><td class="paramname">Candidate</td><td>Function or member to disconnect from the signal. </td></tr>
     <tr><td class="paramname">Type</td><td>Type of class or type of payload. </td></tr>
   </table>
   </dd>

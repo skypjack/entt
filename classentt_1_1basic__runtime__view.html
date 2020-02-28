@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.3.0</span>
+   &#160;<span id="projectnumber">3.3.1</span>
    </div>
   </td>
  </tr>
@@ -142,7 +142,7 @@ class entt::basic_runtime_view&lt; Entity &gt;</h3>
 </ul>
 <p>In all the other cases, modifying the pools of the given components in any way invalidates all the iterators and using them results in undefined behavior.</p>
 <dl class="section note"><dt>Note</dt><dd>Views share references to the underlying data structures of the registry that generated them. Therefore any change to the entities and to the components made by means of the registry are immediately reflected by the views, unless a pool was missing when the view was built (in this case, the view won't have a valid reference and won't be updated accordingly).</dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>Lifetime of a view must overcome the one of the registry that generated it. In any other case, attempting to use a view results in undefined behavior.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Lifetime of a view must not overcome that of the registry that generated it. In any other case, attempting to use a view results in undefined behavior.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Entity</td><td>A valid entity type (see <a class="el" href="structentt_1_1entt__traits.html" title="Entity traits.">entt_traits</a> for more details). </td></tr>

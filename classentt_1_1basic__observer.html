@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.3.0</span>
+   &#160;<span id="projectnumber">3.3.1</span>
    </div>
   </td>
  </tr>
@@ -183,7 +183,7 @@ class entt::basic_observer&lt; Entity &gt;</h3>
 <li>The entity currently pointed is destroyed.</li>
 </ul>
 <p>In all the other cases, modifying the pools of the given components in any way invalidates all the iterators and using them results in undefined behavior.</p>
-<dl class="section warning"><dt>Warning</dt><dd>Lifetime of an observer doesn't necessarily have to overcome the one of the registry to which it is connected. However, the observer must be disconnected from the registry before being destroyed to avoid crashes due to dangling pointers.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Lifetime of an observer doesn't necessarily have to overcome that of the registry to which it is connected. However, the observer must be disconnected from the registry before being destroyed to avoid crashes due to dangling pointers.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Entity</td><td>A valid entity type (see <a class="el" href="structentt_1_1entt__traits.html" title="Entity traits.">entt_traits</a> for more details). </td></tr>

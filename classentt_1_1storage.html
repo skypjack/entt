@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.3.0</span>
+   &#160;<span id="projectnumber">3.3.1</span>
    </div>
   </td>
  </tr>
@@ -186,7 +186,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:a649509ba225d8ddc583c965036327b5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a913b64ff22aa8c338fef691cb867e1cb"><td class="memTemplParams" colspan="2">template&lt;typename It &gt; </td></tr>
 <tr class="memitem:a913b64ff22aa8c338fef691cb867e1cb"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if_t&lt; std::is_same_v&lt; typename std::iterator_traits&lt; It &gt;::value_type, <a class="el" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> &gt;, void &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1storage.html#a913b64ff22aa8c338fef691cb867e1cb">construct</a> (It first, It last, const <a class="el" href="classentt_1_1storage.html#a631919f749405616e64372326052a285">object_type</a> &amp;value={})</td></tr>
-<tr class="memdesc:a913b64ff22aa8c338fef691cb867e1cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns one or more entities to a storage and constructs their objects with from a given instance.  <a href="classentt_1_1storage.html#a913b64ff22aa8c338fef691cb867e1cb">More...</a><br /></td></tr>
+<tr class="memdesc:a913b64ff22aa8c338fef691cb867e1cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns one or more entities to a storage and constructs their objects from a given instance.  <a href="classentt_1_1storage.html#a913b64ff22aa8c338fef691cb867e1cb">More...</a><br /></td></tr>
 <tr class="separator:a913b64ff22aa8c338fef691cb867e1cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa48abd2dc99fcbed4766e3f5a8e91b1"><td class="memTemplParams" colspan="2">template&lt;typename EIt , typename CIt &gt; </td></tr>
 <tr class="memitem:aaa48abd2dc99fcbed4766e3f5a8e91b1"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if_t&lt; std::is_same_v&lt; typename std::iterator_traits&lt; EIt &gt;::value_type, <a class="el" href="classentt_1_1sparse__set.html#a9a1dbe5ab2dbb098beae0bff56bbf780">entity_type</a> &gt;, void &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classentt_1_1storage.html#aaa48abd2dc99fcbed4766e3f5a8e91b1">construct</a> (EIt first, EIt last, CIt value)</td></tr>
@@ -618,7 +618,7 @@ template&lt;typename It &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Assigns one or more entities to a storage and constructs their objects with from a given instance. </p>
+<p>Assigns one or more entities to a storage and constructs their objects from a given instance. </p>
 <dl class="section warning"><dt>Warning</dt><dd>Attempting to assign an entity that already belongs to the storage results in undefined behavior.<br  />
  An assertion will abort the execution at runtime in debug mode if the storage already contains the given entity.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>

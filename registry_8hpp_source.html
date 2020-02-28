@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.3.0</span>
+   &#160;<span id="projectnumber">3.3.1</span>
    </div>
   </td>
  </tr>
@@ -172,11 +172,11 @@ $(function() {
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    };</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keyword">struct </span>pool_data {</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        ENTT_ID_TYPE type_id;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        std::unique_ptr&lt;sparse_set&lt;Entity&gt;&gt; pool;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        void(* assure)(<a class="code" href="classentt_1_1basic__registry.html#a0998b4125d8d2c92817dccac31e7f652">basic_registry</a> &amp;, <span class="keyword">const</span> sparse_set&lt;Entity&gt; &amp;);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        void(* <a class="code" href="classentt_1_1basic__registry.html#a44f5eac6fa4d1999a121f55e67a36c24">remove</a>)(sparse_set&lt;Entity&gt; &amp;, <a class="code" href="classentt_1_1basic__registry.html#a0998b4125d8d2c92817dccac31e7f652">basic_registry</a> &amp;, <span class="keyword">const</span> Entity);</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        void(* <a class="code" href="classentt_1_1basic__registry.html#a0777105d99163dcdb0576e85ac95363b">stamp</a>)(<a class="code" href="classentt_1_1basic__registry.html#a0998b4125d8d2c92817dccac31e7f652">basic_registry</a> &amp;, <span class="keyword">const</span> Entity, <span class="keyword">const</span> sparse_set&lt;Entity&gt; &amp;, <span class="keyword">const</span> Entity);</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        ENTT_ID_TYPE type_id{};</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        std::unique_ptr&lt;sparse_set&lt;Entity&gt;&gt; pool{};</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        void(* assure)(<a class="code" href="classentt_1_1basic__registry.html#a0998b4125d8d2c92817dccac31e7f652">basic_registry</a> &amp;, <span class="keyword">const</span> sparse_set&lt;Entity&gt; &amp;){};</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        void(* <a class="code" href="classentt_1_1basic__registry.html#a44f5eac6fa4d1999a121f55e67a36c24">remove</a>)(sparse_set&lt;Entity&gt; &amp;, <a class="code" href="classentt_1_1basic__registry.html#a0998b4125d8d2c92817dccac31e7f652">basic_registry</a> &amp;, <span class="keyword">const</span> Entity){};</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        void(* <a class="code" href="classentt_1_1basic__registry.html#a0777105d99163dcdb0576e85ac95363b">stamp</a>)(<a class="code" href="classentt_1_1basic__registry.html#a0998b4125d8d2c92817dccac31e7f652">basic_registry</a> &amp;, <span class="keyword">const</span> Entity, <span class="keyword">const</span> sparse_set&lt;Entity&gt; &amp;, <span class="keyword">const</span> Entity){};</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    };</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span>...&gt;</div>
@@ -511,7 +511,7 @@ $(function() {
 <div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;        <span class="keyword">auto</span> &amp;cpool = assure&lt;Component&gt;();</div>
 <div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160; </div>
 <div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;        <span class="keywordflow">return</span> cpool.has(<a class="code" href="classentt_1_1basic__registry.html#a5d07b2e0105da47d25ceef530d91bb8b">entity</a>)</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;                ? (cpool.replace(*<span class="keyword">this</span>, <a class="code" href="classentt_1_1basic__registry.html#a5d07b2e0105da47d25ceef530d91bb8b">entity</a>, [args = std::forward_as_tuple(std::forward&lt;Args&gt;(args)...)](<span class="keyword">auto</span> &amp;&amp;component) { component = std::make_from_tuple&lt;Component&gt;(std::move(args)); }), cpool.get(<a class="code" href="classentt_1_1basic__registry.html#a5d07b2e0105da47d25ceef530d91bb8b">entity</a>))</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;                ? (cpool.replace(*<span class="keyword">this</span>, <a class="code" href="classentt_1_1basic__registry.html#a5d07b2e0105da47d25ceef530d91bb8b">entity</a>, [&amp;args...](<span class="keyword">auto</span> &amp;&amp;component) { component = Component{std::forward&lt;Args&gt;(args)...}; }), cpool.get(<a class="code" href="classentt_1_1basic__registry.html#a5d07b2e0105da47d25ceef530d91bb8b">entity</a>))</div>
 <div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;                : cpool.assign(*<span class="keyword">this</span>, <a class="code" href="classentt_1_1basic__registry.html#a5d07b2e0105da47d25ceef530d91bb8b">entity</a>, std::forward&lt;Args&gt;(args)...);</div>
 <div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;    }</div>
 <div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160; </div>
