@@ -24,9 +24,8 @@ namespace entt {
  * type `Event`, listeners are such that they can be invoked with an argument of
  * type `const Event &`, no matter what the return type is.
  *
- * The types of the instances are `Class &`. Users must guarantee that the
- * lifetimes of the objects overcome the one of the dispatcher itself to avoid
- * crashes.
+ * The dispatcher creates instances of the `sigh` class internally. Refer to the
+ * documentation of the latter for more details.
  */
 class dispatcher {
     struct basic_pool {

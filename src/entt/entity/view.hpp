@@ -55,7 +55,7 @@ class basic_view;
  * made by means of the registry are immediately reflected by views.
  *
  * @warning
- * Lifetime of a view must overcome the one of the registry that generated it.
+ * Lifetime of a view must not overcome that of the registry that generated it.
  * In any other case, attempting to use a view results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -559,7 +559,7 @@ private:
  * made by means of the registry are immediately reflected by views.
  *
  * @warning
- * Lifetime of a view must overcome the one of the registry that generated it.
+ * Lifetime of a view must not overcome that of the registry that generated it.
  * In any other case, attempting to use a view results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).

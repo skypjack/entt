@@ -159,7 +159,7 @@ constexpr basic_collector<> collector{};
  * behavior.
  *
  * @warning
- * Lifetime of an observer doesn't necessarily have to overcome the one of the
+ * Lifetime of an observer doesn't necessarily have to overcome that of the
  * registry to which it is connected. However, the observer must be disconnected
  * from the registry before being destroyed to avoid crashes due to dangling
  * pointers.

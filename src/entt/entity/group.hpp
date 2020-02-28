@@ -54,7 +54,7 @@ class basic_group;
  * all of them because they _share_ entities and components).
  *
  * @warning
- * Lifetime of a group must overcome the one of the registry that generated it.
+ * Lifetime of a group must not overcome that of the registry that generated it.
  * In any other case, attempting to use a group results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -484,7 +484,7 @@ private:
  * of them because they share the underlying data structure).
  *
  * @warning
- * Lifetime of a group must overcome the one of the registry that generated it.
+ * Lifetime of a group must not overcome that of the registry that generated it.
  * In any other case, attempting to use a group results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
