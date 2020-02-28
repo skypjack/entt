@@ -9,7 +9,6 @@
 #include <type_traits>
 #include "../config/config.h"
 #include "sparse_set.hpp"
-#include "entity.hpp"
 #include "fwd.hpp"
 
 
