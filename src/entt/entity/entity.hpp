@@ -159,6 +159,10 @@ constexpr bool operator!=(const Entity entity, null other) ENTT_NOEXCEPT {
  */
 
 
+/*! @brief Alias declaration for the most common use case. */
+ENTT_OPAQUE_TYPE(entity, ENTT_ID_TYPE);
+
+
 /**
  * @brief Compile-time constant for null entities.
  *
