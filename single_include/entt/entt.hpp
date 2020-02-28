@@ -61,10 +61,10 @@
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -971,10 +971,10 @@ struct ENTT_TYPE_ID_API type_info {
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -1526,10 +1526,10 @@ using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -1626,10 +1626,10 @@ using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -2328,10 +2328,10 @@ struct ENTT_TYPE_ID_API type_info {
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -2885,10 +2885,10 @@ using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -3675,13 +3675,13 @@ public:
      *
      * The signal isn't responsible for the connected object or the payload.
      * Users must always guarantee that the lifetime of the instance overcomes
-     * the one  of the delegate. On the other side, the signal handler performs
+     * the one of the signal. On the other side, the signal handler performs
      * checks to avoid multiple connections for the same function.<br/>
      * When used to connect a free function with payload, its signature must be
      * such that the instance is the first argument before the ones used to
-     * define the delegate itself.
+     * define the signal itself.
      *
-     * @tparam Candidate Function or member to connect to the delegate.
+     * @tparam Candidate Function or member to connect to the signal.
      * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized connection object.
@@ -3701,7 +3701,7 @@ public:
 
     /**
      * @brief Disconnects a free function or an unbound member from a signal.
-     * @tparam Candidate Function or member to disconnect from the delegate.
+     * @tparam Candidate Function or member to disconnect from the signal.
      */
     template<auto Candidate>
     void disconnect() {
@@ -3714,7 +3714,7 @@ public:
     /**
      * @brief Disconnects a free function with payload or a bound member from a
      * signal.
-     * @tparam Candidate Function or member to disconnect from the delegate.
+     * @tparam Candidate Function or member to disconnect from the signal.
      * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
@@ -4779,7 +4779,7 @@ namespace entt {
  * have a valid reference and won't be updated accordingly).
  *
  * @warning
- * Lifetime of a view must overcome the one of the registry that generated it.
+ * Lifetime of a view must not overcome that of the registry that generated it.
  * In any other case, attempting to use a view results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -5941,7 +5941,7 @@ public:
 
     /**
      * @brief Assigns one or more entities to a storage and constructs their
-     * objects with from a given instance.
+     * objects from a given instance.
      *
      * @warning
      * Attempting to assign an entity that already belongs to the storage
@@ -6392,7 +6392,7 @@ class basic_group;
  * all of them because they _share_ entities and components).
  *
  * @warning
- * Lifetime of a group must overcome the one of the registry that generated it.
+ * Lifetime of a group must not overcome that of the registry that generated it.
  * In any other case, attempting to use a group results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -6822,7 +6822,7 @@ private:
  * of them because they share the underlying data structure).
  *
  * @warning
- * Lifetime of a group must overcome the one of the registry that generated it.
+ * Lifetime of a group must not overcome that of the registry that generated it.
  * In any other case, attempting to use a group results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -7291,7 +7291,7 @@ class basic_view;
  * made by means of the registry are immediately reflected by views.
  *
  * @warning
- * Lifetime of a view must overcome the one of the registry that generated it.
+ * Lifetime of a view must not overcome that of the registry that generated it.
  * In any other case, attempting to use a view results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -7795,7 +7795,7 @@ private:
  * made by means of the registry are immediately reflected by views.
  *
  * @warning
- * Lifetime of a view must overcome the one of the registry that generated it.
+ * Lifetime of a view must not overcome that of the registry that generated it.
  * In any other case, attempting to use a view results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
@@ -8160,11 +8160,11 @@ class basic_registry {
     };
 
     struct pool_data {
-        ENTT_ID_TYPE type_id;
-        std::unique_ptr<sparse_set<Entity>> pool;
-        void(* assure)(basic_registry &, const sparse_set<Entity> &);
-        void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity);
-        void(* stamp)(basic_registry &, const Entity, const sparse_set<Entity> &, const Entity);
+        ENTT_ID_TYPE type_id{};
+        std::unique_ptr<sparse_set<Entity>> pool{};
+        void(* assure)(basic_registry &, const sparse_set<Entity> &){};
+        void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity){};
+        void(* stamp)(basic_registry &, const Entity, const sparse_set<Entity> &, const Entity){};
     };
 
     template<typename...>
@@ -8767,7 +8767,7 @@ public:
         auto &cpool = assure<Component>();
 
         return cpool.has(entity)
-                ? (cpool.replace(*this, entity, [args = std::forward_as_tuple(std::forward<Args>(args)...)](auto &&component) { component = std::make_from_tuple<Component>(std::move(args)); }), cpool.get(entity))
+                ? (cpool.replace(*this, entity, [&args...](auto &&component) { component = Component{std::forward<Args>(args)...}; }), cpool.get(entity))
                 : cpool.assign(*this, entity, std::forward<Args>(args)...);
     }
 
@@ -10109,11 +10109,9 @@ private:
 
 
 #include <type_traits>
-// #include "../config/config.h"
-
 // #include "../core/type_traits.hpp"
 
-// #include "../signal/delegate.hpp"
+// #include "../config/config.h"
 
 // #include "registry.hpp"
 
@@ -10221,23 +10219,6 @@ as_group(basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<false, Entity>;
 /*! @copydoc as_group */
 template<typename Entity>
 as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>;
-
-
-
-/**
- * @brief Helper to create a listener that directly invokes a member function.
- * @tparam Member Member function to invoke on a component of the given type.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @param reg A registry that contains the given entity and its components.
- * @param entt Entity from which to get the component.
- */
-template<auto Member, typename Entity = entity>
-void invoke(basic_registry<Entity> &reg, const Entity entt) {
-    static_assert(std::is_member_function_pointer_v<decltype(Member)>);
-    delegate<void(basic_registry<Entity> &, const Entity)> func;
-    func.template connect<Member>(reg.template get<member_class_t<decltype(Member)>>(entt));
-    func(reg, entt);
-}
 
 
 }
@@ -10413,7 +10394,7 @@ constexpr basic_collector<> collector{};
  * behavior.
  *
  * @warning
- * Lifetime of an observer doesn't necessarily have to overcome the one of the
+ * Lifetime of an observer doesn't necessarily have to overcome that of the
  * registry to which it is connected. However, the observer must be disconnected
  * from the registry before being destroyed to avoid crashes due to dangling
  * pointers.
@@ -10761,10 +10742,10 @@ private:
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -10946,10 +10927,10 @@ private:
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -11023,10 +11004,10 @@ private:
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -11099,10 +11080,10 @@ private:
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -14615,10 +14596,10 @@ resolve(Op op) {
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -15331,10 +15312,10 @@ private:
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -15849,10 +15830,10 @@ private:
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -16256,10 +16237,10 @@ delegate(connect_arg_t<Candidate>, Type &&) ENTT_NOEXCEPT
 
 #ifndef ENTT_DISABLE_ETO
 #   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) std::is_empty_v<Type>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
 #else
 #   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_empty_v<Type>)
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
 #endif
 
 
@@ -17102,13 +17083,13 @@ public:
      *
      * The signal isn't responsible for the connected object or the payload.
      * Users must always guarantee that the lifetime of the instance overcomes
-     * the one  of the delegate. On the other side, the signal handler performs
+     * the one of the signal. On the other side, the signal handler performs
      * checks to avoid multiple connections for the same function.<br/>
      * When used to connect a free function with payload, its signature must be
      * such that the instance is the first argument before the ones used to
-     * define the delegate itself.
+     * define the signal itself.
      *
-     * @tparam Candidate Function or member to connect to the delegate.
+     * @tparam Candidate Function or member to connect to the signal.
      * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized connection object.
@@ -17128,7 +17109,7 @@ public:
 
     /**
      * @brief Disconnects a free function or an unbound member from a signal.
-     * @tparam Candidate Function or member to disconnect from the delegate.
+     * @tparam Candidate Function or member to disconnect from the signal.
      */
     template<auto Candidate>
     void disconnect() {
@@ -17141,7 +17122,7 @@ public:
     /**
      * @brief Disconnects a free function with payload or a bound member from a
      * signal.
-     * @tparam Candidate Function or member to disconnect from the delegate.
+     * @tparam Candidate Function or member to disconnect from the signal.
      * @tparam Type Type of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
@@ -17223,9 +17204,8 @@ namespace entt {
  * type `Event`, listeners are such that they can be invoked with an argument of
  * type `const Event &`, no matter what the return type is.
  *
- * The types of the instances are `Class &`. Users must guarantee that the
- * lifetimes of the objects overcome the one of the dispatcher itself to avoid
- * crashes.
+ * The dispatcher creates instances of the `sigh` class internally. Refer to the
+ * documentation of the latter for more details.
  */
 class dispatcher {
     struct basic_pool {
