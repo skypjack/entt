@@ -81,15 +81,8 @@ add_library(EnTT::EnTT ALIAS EnTT)
 target_include_directories(
     EnTT
     INTERFACE
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${EnTT_SOURCE_DIR}/src>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-)
-
-target_compile_definitions(
-    EnTT
-    INTERFACE
-        $<$<AND:$<CONFIG:Debug>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:DEBUG>
-        $<$<AND:$<CONFIG:Release>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:RELEASE>
 )
 
 if(USE_ASAN)
@@ -193,16 +186,15 @@ endif()
 # AOB
 #
 
-set(
-    AOB_SOURCES
-    .github/workflows/build.yml
-    .github/workflows/coverage.yml
-    .github/FUNDING.yml
-    AUTHORS
-    CONTRIBUTING.md
-    LICENSE
-    README.md
-    TODO
+add_custom_target(
+    aob
+    SOURCES
+        .github/workflows/build.yml
+        .github/workflows/coverage.yml
+        .github/FUNDING.yml
+        AUTHORS
+        CONTRIBUTING.md
+        LICENSE
+        README.md
+        TODO
 )
-
-add_custom_target(aob SOURCES ${AOB_SOURCES})
