@@ -620,10 +620,19 @@ public:
      * @param args Parameters to use to initialize the component.
      * @return A reference to the newly created component.
      */
-    template<typename Component, typename... Args>
+    template<typename Component = void, typename... Args>
     decltype(auto) assign(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
-        return assure<Component>().assign(*this, entity, std::forward<Args>(args)...);
+		if constexpr (std::is_same_v<Component, void> && sizeof...(Args) > 1) {
+			static_assert((!std::is_lvalue_reference_v<Args> && ...), "registry.assign(...) does not accept lvalue reference");
+			return std::tuple<std::remove_cv_t<std::remove_reference_t<Args>>&...>{ assure<Args>().assign(*this, entity, std::forward<Args>(args))... };
+		} else if constexpr (std::is_same_v<Component, void> && sizeof...(Args) == 1) {
+			static_assert((!std::is_lvalue_reference_v<Args> && ...), "registry.assign(...) does not accept lvalue reference");
+			return (assure<Args>().assign(*this, entity, std::forward<Args>(args)),...);
+		}
+		else {
+			return assure<Component>().assign(*this, entity, std::forward<Args>(args)...);
+		}
     }
 
     /**
