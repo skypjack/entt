@@ -100,6 +100,57 @@ TEST(Registry, Context) {
     ASSERT_EQ(registry.try_ctx<float>(), nullptr);
 }
 
+TEST(Registry, Assign) {
+	{
+		entt::registry registry;
+
+		const auto e0 = registry.create();
+
+		auto&& v1 = registry.assign(e0, int{ 5 });
+		auto&& v2 = registry.assign(e0, char{ 'c' });
+
+		ASSERT_TRUE(registry.has<>(e0));
+
+		ASSERT_EQ(registry.size<int>(), entt::registry::size_type{ 1 });
+		ASSERT_EQ(registry.size<char>(), entt::registry::size_type{ 1 });
+		ASSERT_FALSE(registry.empty<int>());
+		ASSERT_FALSE(registry.empty<char>());
+
+		ASSERT_TRUE(registry.has<int>(e0));
+		ASSERT_TRUE(registry.has<char>(e0));
+
+		ASSERT_EQ(registry.get<int>(e0), 5);
+		ASSERT_EQ(registry.get<char>(e0), 'c');
+
+		ASSERT_EQ(v1, 5);
+		ASSERT_EQ(v2, 'c');
+	}
+	{
+		entt::registry registry;
+
+		const auto e0 = registry.create();
+
+		const int const_int{ 5 };
+		auto&&[v1, v2] = registry.assign(e0, int{ const_int }, char{ 'c' });
+
+		ASSERT_TRUE(registry.has<>(e0));
+
+		ASSERT_EQ(registry.size<int>(), entt::registry::size_type{ 1 });
+		ASSERT_EQ(registry.size<char>(), entt::registry::size_type{ 1 });
+		ASSERT_FALSE(registry.empty<int>());
+		ASSERT_FALSE(registry.empty<char>());
+
+		ASSERT_TRUE(registry.has<int>(e0));
+		ASSERT_TRUE(registry.has<char>(e0));
+
+		ASSERT_EQ(registry.get<int>(e0), 5);
+		ASSERT_EQ(registry.get<char>(e0), 'c');
+
+		ASSERT_EQ(v1, 5);
+		ASSERT_EQ(v2, 'c');
+	}
+}
+
 TEST(Registry, Functionalities) {
     entt::registry registry;
 
