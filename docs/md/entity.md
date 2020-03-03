@@ -989,9 +989,15 @@ In particular:
   void operator()(entt::entity);
   ```
 
-  Where `entt::entity` is the type of the entities used by the registry. Note
-  that all the member functions of the snapshot class make also an initial call
-  to this endpoint to save the _size_ of the set they are going to store.<br/>
+  Where `entt::entity` is the type of the entities used by the registry.<br/>
+  Note that all member functions of the snapshot class make also an initial call
+  to store aside the _size_ of the set they are going to store. In this case,
+  the expected function type for the function call operator is:
+
+  ```cpp
+  void operator()(std::underlying_type_t<entt::entity>);
+  ```
+
   In addition, an archive must accept a pair of entity and component for each
   type to be serialized. Therefore, given a type `T`, the archive must contain a
   function call operator with the following signature:
@@ -1012,12 +1018,18 @@ In particular:
 
   Where `entt::entity` is the type of the entities used by the registry. Each
   time the function is invoked, the archive must read the next element from the
-  underlying storage and copy it in the given variable. Note that all the member
-  functions of a loader class make also an initial call to this endpoint to read
-  the _size_ of the set they are going to load.<br/>
-  In addition, the archive must accept a pair of entity and component for each
-  type to be restored. Therefore, given a type `T`, the archive must contain a
-  function call operator with the following signature:
+  underlying storage and copy it in the given variable.<br/>
+  Note that all member functions of a loader class make also an initial call to
+  read the _size_ of the set they are going to load. In this case, the expected
+  function type for the function call operator is:
+
+  ```cpp
+  void operator()(std::underlying_type_t<entt::entity> &);
+  ```
+
+  In addition, the archive must accept a pair of references to an entity and its
+  component for each type to be restored. Therefore, given a type `T`, the
+  archive must contain a function call operator with the following signature:
 
   ```cpp
   void operator()(entt::entity &, T &);
