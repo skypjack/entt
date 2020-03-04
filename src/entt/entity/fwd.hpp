@@ -2,7 +2,7 @@
 #define ENTT_ENTITY_FWD_HPP
 
 
-#include "../config/config.h"
+#include "../core/fwd.hpp"
 
 
 namespace entt {
@@ -44,8 +44,8 @@ class basic_snapshot_loader;
 template<typename>
 class basic_continuous_loader;
 
-/*! @brief Alias declaration for the most common use case. */
-enum class entity: ENTT_ID_TYPE;
+/*! @class entity */
+enum class entity: id_type;
 
 /*! @brief Alias declaration for the most common use case. */
 using registry = basic_registry<entity>;

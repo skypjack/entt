@@ -3,10 +3,11 @@
 
 
 #include <memory>
-#include <utility>
 #include <type_traits>
 #include <unordered_map>
+#include <utility>
 #include "../config/config.h"
+#include "../core/fwd.hpp"
 #include "handle.hpp"
 #include "loader.hpp"
 #include "fwd.hpp"
@@ -31,8 +32,6 @@ struct cache {
     using size_type = std::size_t;
     /*! @brief Type of resources managed by a cache. */
     using resource_type = Resource;
-    /*! @brief Unique identifier type for resources. */
-    using id_type = ENTT_ID_TYPE;
 
     /*! @brief Default constructor. */
     cache() = default;

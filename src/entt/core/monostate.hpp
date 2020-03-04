@@ -3,6 +3,7 @@
 
 
 #include "../config/config.h"
+#include "fwd.hpp"
 
 
 namespace entt {
@@ -19,7 +20,7 @@ namespace entt {
  * both during an assignment and when they try to read back their data.
  * Otherwise, they can incur in unexpected results.
  */
-template<ENTT_ID_TYPE>
+template<id_type>
 struct monostate {
     /**
      * @brief Assigns a value of a specific type to a given key.
@@ -51,7 +52,7 @@ private:
  * @brief Helper variable template.
  * @tparam Value Value used to differentiate between different variables.
  */
-template<ENTT_ID_TYPE Value>
+template<id_type Value>
 inline monostate<Value> monostate_v = {};
 
 

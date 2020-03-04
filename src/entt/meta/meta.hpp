@@ -3,10 +3,11 @@
 
 
 #include <cstddef>
-#include <utility>
 #include <functional>
 #include <type_traits>
+#include <utility>
 #include "../config/config.h"
+#include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 
@@ -71,7 +72,7 @@ struct meta_dtor_node {
 
 
 struct meta_data_node {
-    ENTT_ID_TYPE alias;
+    id_type alias;
     meta_type_node * const parent;
     meta_data_node * next;
     meta_prop_node * prop;
@@ -85,7 +86,7 @@ struct meta_data_node {
 
 struct meta_func_node {
     using size_type = std::size_t;
-    ENTT_ID_TYPE alias;
+    id_type alias;
     meta_type_node * const parent;
     meta_func_node * next;
     meta_prop_node * prop;
@@ -100,8 +101,8 @@ struct meta_func_node {
 
 struct meta_type_node {
     using size_type = std::size_t;
-    const ENTT_ID_TYPE type_id;
-    ENTT_ID_TYPE alias;
+    const id_type type_id;
+    id_type alias;
     meta_type_node * next;
     meta_prop_node * prop;
     const bool is_void;
@@ -870,7 +871,7 @@ struct meta_data {
     {}
 
     /*! @copydoc meta_type::alias */
-    ENTT_ID_TYPE alias() const ENTT_NOEXCEPT {
+    id_type alias() const ENTT_NOEXCEPT {
         return node->alias;
     }
 
@@ -1010,7 +1011,7 @@ struct meta_func {
     {}
 
     /*! @copydoc meta_type::alias */
-    ENTT_ID_TYPE alias() const ENTT_NOEXCEPT {
+    id_type alias() const ENTT_NOEXCEPT {
         return node->alias;
     }
 
@@ -1136,7 +1137,7 @@ public:
      * @brief Returns the id of the underlying type.
      * @return The id of the underlying type.
      */
-    ENTT_ID_TYPE id() const ENTT_NOEXCEPT {
+    id_type id() const ENTT_NOEXCEPT {
         return node->type_id;
     }
 
@@ -1144,7 +1145,7 @@ public:
      * @brief Returns the alias assigned to a given meta object.
      * @return The alias assigned to the meta object.
      */
-    ENTT_ID_TYPE alias() const ENTT_NOEXCEPT {
+    id_type alias() const ENTT_NOEXCEPT {
         return node->alias;
     }
 
@@ -1290,7 +1291,7 @@ public:
      * @param alias Unique identifier.
      * @return The meta base associated with the given alias, if any.
      */
-    meta_base base(const ENTT_ID_TYPE alias) const {
+    meta_base base(const id_type alias) const {
         return internal::find_if<&internal::meta_type_node::base>([alias](const auto *curr) {
             return curr->type()->alias == alias;
         }, node);
@@ -1361,7 +1362,7 @@ public:
      * @param alias Unique identifier.
      * @return The meta data associated with the given alias, if any.
      */
-    meta_data data(const ENTT_ID_TYPE alias) const {
+    meta_data data(const id_type alias) const {
         return internal::find_if<&internal::meta_type_node::data>([alias](const auto *curr) {
             return curr->alias == alias;
         }, node);
@@ -1389,7 +1390,7 @@ public:
      * @param alias Unique identifier.
      * @return The meta function associated with the given alias, if any.
      */
-    meta_func func(const ENTT_ID_TYPE alias) const {
+    meta_func func(const id_type alias) const {
         return internal::find_if<&internal::meta_type_node::func>([alias](const auto *curr) {
             return curr->alias == alias;
         }, node);
