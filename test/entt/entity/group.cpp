@@ -167,6 +167,7 @@ TEST(NonOwningGroup, Each) {
     ASSERT_EQ(cnt, std::size_t{0});
 }
 
+
 TEST(NonOwningGroup, Sort) {
     entt::registry registry;
     auto group = registry.group(entt::get<const int, unsigned int>);
@@ -521,6 +522,22 @@ TEST(NonOwningGroup, SignalRace) {
     registry.assign<double>(entity);
 
     ASSERT_EQ(registry.group(entt::get<int, double>).size(), 1u);
+}
+
+TEST(OwningGroup, AfterFact) {
+    entt::registry registry;
+
+    struct Tag1 {int v{0};};
+    struct Tag2 : Tag1 {};
+
+    for (int i = 0; i < 30; ++i) {
+        auto id = registry.create();
+        if (i % 2 == 0) registry.assign<Tag1>(id, 0);
+        if (i % 3 == 0) registry.assign<Tag2>(id, 1);
+    }
+
+    auto group = registry.group<Tag1, Tag2>();
+    ASSERT_EQ(group.size(), 30 / 6);
 }
 
 TEST(OwningGroup, Functionalities) {
