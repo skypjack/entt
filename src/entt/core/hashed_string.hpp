@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include "../config/config.h"
+#include "fwd.hpp"
 
 
 namespace entt {
@@ -61,7 +62,7 @@ struct fnv1a_traits<std::uint64_t> {
  */
 template<typename Char>
 class basic_hashed_string {
-    using traits_type = internal::fnv1a_traits<ENTT_ID_TYPE>;
+    using traits_type = internal::fnv1a_traits<id_type>;
 
     struct const_wrapper {
         // non-explicit constructor on purpose
@@ -70,7 +71,7 @@ class basic_hashed_string {
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    static constexpr ENTT_ID_TYPE helper(const Char *curr) ENTT_NOEXCEPT {
+    static constexpr id_type helper(const Char *curr) ENTT_NOEXCEPT {
         auto value = traits_type::offset;
 
         while(*curr != 0) {
@@ -84,7 +85,7 @@ public:
     /*! @brief Character type. */
     using value_type = Char;
     /*! @brief Unsigned integer type. */
-    using hash_type = ENTT_ID_TYPE;
+    using hash_type = id_type;
 
     /**
      * @brief Returns directly the numeric representation of a string.
@@ -122,7 +123,7 @@ public:
      * @return The numeric representation of the string.
      */
     static hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
-        ENTT_ID_TYPE partial{traits_type::offset};
+        id_type partial{traits_type::offset};
         while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
         return partial;
     }

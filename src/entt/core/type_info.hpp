@@ -5,6 +5,7 @@
 #include "../config/config.h"
 #include "../core/attribute.h"
 #include "hashed_string.hpp"
+#include "fwd.hpp"
 
 
 #ifndef ENTT_PRETTY_FUNCTION
@@ -28,8 +29,8 @@ namespace internal {
 
 
 struct ENTT_API type_id_generator {
-    static ENTT_ID_TYPE next() ENTT_NOEXCEPT {
-        static ENTT_ID_TYPE value{};
+    static id_type next() ENTT_NOEXCEPT {
+        static id_type value{};
         return value++;
     }
 };
@@ -56,18 +57,18 @@ struct ENTT_TYPE_ID_API type_info {
      * @return The numeric representation of the given type.
      */
 #if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
-    static constexpr ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+    static constexpr id_type id() ENTT_NOEXCEPT {
         constexpr auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION_CONSTEXPR);
         return value;
     }
 #elif defined ENTT_PRETTY_FUNCTION
-    static ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+    static id_type id() ENTT_NOEXCEPT {
         static const auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
         return value;
     }
 #else
-    static ENTT_ID_TYPE id() ENTT_NOEXCEPT {
-        static const ENTT_ID_TYPE value = internal::type_id_generator::next();
+    static id_type id() ENTT_NOEXCEPT {
+        static const id_type value = internal::type_id_generator::next();
         return value;
     }
 #endif

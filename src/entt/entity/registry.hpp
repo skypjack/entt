@@ -2,28 +2,29 @@
 #define ENTT_ENTITY_REGISTRY_HPP
 
 
-#include <tuple>
-#include <vector>
-#include <memory>
-#include <utility>
+#include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <algorithm>
+#include <memory>
+#include <tuple>
 #include <type_traits>
+#include <utility>
+#include <vector>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
+#include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../signal/sigh.hpp"
+#include "entity.hpp"
+#include "fwd.hpp"
+#include "group.hpp"
 #include "runtime_view.hpp"
-#include "sparse_set.hpp"
 #include "snapshot.hpp"
+#include "sparse_set.hpp"
 #include "storage.hpp"
 #include "utility.hpp"
-#include "entity.hpp"
-#include "group.hpp"
 #include "view.hpp"
-#include "fwd.hpp"
 
 
 namespace entt {
@@ -109,7 +110,7 @@ class basic_registry {
     };
 
     struct pool_data {
-        ENTT_ID_TYPE type_id{};
+        id_type type_id{};
         std::unique_ptr<sparse_set<Entity>> pool{};
         void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity){};
     };
@@ -160,13 +161,13 @@ class basic_registry {
     struct group_data {
         std::size_t size;
         std::unique_ptr<void, void(*)(void *)> group;
-        bool (* owned)(const ENTT_ID_TYPE) ENTT_NOEXCEPT;
-        bool (* get)(const ENTT_ID_TYPE) ENTT_NOEXCEPT;
-        bool (* exclude)(const ENTT_ID_TYPE) ENTT_NOEXCEPT;
+        bool (* owned)(const id_type) ENTT_NOEXCEPT;
+        bool (* get)(const id_type) ENTT_NOEXCEPT;
+        bool (* exclude)(const id_type) ENTT_NOEXCEPT;
     };
 
     struct variable_data {
-        ENTT_ID_TYPE type_id;
+        id_type type_id;
         std::unique_ptr<void, void(*)(void *)> value;
     };
 
@@ -1294,9 +1295,9 @@ public:
             group_data candidate = {
                 size,
                 { new handler_type{}, [](void *instance) { delete static_cast<handler_type *>(instance); } },
-                []([[maybe_unused]] const ENTT_ID_TYPE ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Owned>>::id()) || ...); },
-                []([[maybe_unused]] const ENTT_ID_TYPE ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Get>>::id()) || ...); },
-                []([[maybe_unused]] const ENTT_ID_TYPE ctype) ENTT_NOEXCEPT { return ((ctype == type_info<Exclude>::id()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Owned>>::id()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Get>>::id()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_info<Exclude>::id()) || ...); },
             };
 
             handler = static_cast<handler_type *>(candidate.group.get());
@@ -1508,7 +1509,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const ENTT_ID_TYPE);
+     * void(const id_type);
      * @endcode
      *
      * Returned identifiers are those of the components owned by the entity.
@@ -1538,7 +1539,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const ENTT_ID_TYPE);
+     * void(const id_type);
      * @endcode
      *
      * Returned identifiers are those of the components managed by the registry.
@@ -1654,7 +1655,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const ENTT_ID_TYPE);
+     * void(const id_type);
      * @endcode
      *
      * Returned identifiers are those of the context variables currently set.

@@ -6,7 +6,8 @@
 #include <utility>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/hashed_string.hpp"
+#include "hashed_string.hpp"
+#include "fwd.hpp"
 
 
 namespace entt {
@@ -203,10 +204,10 @@ using member_class_t = typename member_class<Member>::type;
 
 /**
  * @brief Alias template to ease the creation of named values.
- * @tparam Value A constant value at least convertible to `ENTT_ID_TYPE`.
+ * @tparam Value A constant value at least convertible to `id_type`.
  */
-template<ENTT_ID_TYPE Value>
-using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
+template<id_type Value>
+using tag = std::integral_constant<id_type, Value>;
 
 
 }

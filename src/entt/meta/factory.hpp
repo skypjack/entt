@@ -2,17 +2,18 @@
 #define ENTT_META_FACTORY_HPP
 
 
-#include <tuple>
 #include <array>
 #include <cstddef>
-#include <utility>
 #include <functional>
+#include <tuple>
 #include <type_traits>
+#include <utility>
 #include "../config/config.h"
+#include "../core/fwd.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
-#include "policy.hpp"
 #include "meta.hpp"
+#include "policy.hpp"
 
 
 namespace entt {
@@ -378,7 +379,7 @@ class meta_factory<Type> {
     }
 
     template<typename Node>
-    bool exists(const ENTT_ID_TYPE alias, const Node *node) ENTT_NOEXCEPT {
+    bool exists(const id_type alias, const Node *node) ENTT_NOEXCEPT {
         return node && (node->alias == alias || exists(alias, node->next));
     }
 
@@ -388,7 +389,7 @@ public:
      * @param value Unique identifier.
      * @return An extended meta factory for the given type.
      */
-    auto alias(const ENTT_ID_TYPE value) ENTT_NOEXCEPT {
+    auto alias(const id_type value) ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
 
         ENTT_ASSERT(!exists(value, *internal::meta_info<>::global));
@@ -612,7 +613,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Data, typename Policy = as_is_t>
-    auto data(const ENTT_ID_TYPE alias) ENTT_NOEXCEPT {
+    auto data(const id_type alias) ENTT_NOEXCEPT {
         auto * const type = internal::meta_info<Type>::resolve();
         internal::meta_data_node *curr = nullptr;
 
@@ -697,7 +698,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
-    auto data(const ENTT_ID_TYPE alias) ENTT_NOEXCEPT {
+    auto data(const id_type alias) ENTT_NOEXCEPT {
         using underlying_type = std::invoke_result_t<decltype(Getter), Type &>;
         static_assert(std::is_invocable_v<decltype(Setter), Type &, underlying_type>);
         auto * const type = internal::meta_info<Type>::resolve();
@@ -737,7 +738,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_is_t>
-    auto func(const ENTT_ID_TYPE alias) ENTT_NOEXCEPT {
+    auto func(const id_type alias) ENTT_NOEXCEPT {
         using helper_type = internal::meta_function_helper_t<decltype(Candidate)>;
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -849,7 +850,7 @@ inline meta_type resolve() ENTT_NOEXCEPT {
  * @param alias Unique identifier.
  * @return The meta type associated with the given alias, if any.
  */
-inline meta_type resolve(const ENTT_ID_TYPE alias) ENTT_NOEXCEPT {
+inline meta_type resolve(const id_type alias) ENTT_NOEXCEPT {
     return internal::find_if([alias](const auto *curr) {
         return curr->alias == alias;
     }, *internal::meta_info<>::global);

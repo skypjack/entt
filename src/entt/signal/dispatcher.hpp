@@ -2,12 +2,13 @@
 #define ENTT_SIGNAL_DISPATCHER_HPP
 
 
-#include <vector>
-#include <memory>
 #include <cstddef>
-#include <utility>
+#include <memory>
 #include <type_traits>
+#include <utility>
+#include <vector>
 #include "../config/config.h"
+#include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "sigh.hpp"
 
@@ -32,7 +33,7 @@ class dispatcher {
         virtual ~basic_pool() = default;
         virtual void publish() = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
-        virtual ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT = 0;
+        virtual id_type type_id() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
@@ -68,7 +69,7 @@ class dispatcher {
             events.emplace_back(std::forward<Args>(args)...);
         }
 
-        ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT override {
+        id_type type_id() const ENTT_NOEXCEPT override {
             return type_info<Event>::id();
         }
 
