@@ -16,6 +16,8 @@
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none
 * review prepare after clone and the others have been removed
+* !(has<T>(e) || ...) -> !any<T...>(e)
+* review pool<T>::remove, ::assign
 
 * WIP:
  - deprecate snapshot, loader, ...

@@ -1120,3 +1120,16 @@ TEST(OwningGroup, SignalRace) {
 
     ASSERT_EQ(registry.group<int>(entt::get<double>).size(), 1u);
 }
+
+TEST(OwningGroup, AfterFact) {
+    entt::registry registry;
+
+    for(std::size_t i{}; i < 30u; ++i) {
+        auto entity = registry.create();
+        if(!(i % 2u)) registry.assign<int>(entity);
+        if(!(i % 3u)) registry.assign<char>(entity);
+    }
+
+    // thanks to @pgruenbacher for pointing out this corner case
+    ASSERT_EQ((registry.group<int, char>().size()), 5u);
+}
