@@ -130,7 +130,7 @@ struct basic_actor {
      */
     template<typename... Component>
     bool has() const {
-        return (reg->template has<Component>(entt) && ...);
+        return reg->template has<Component...>(entt);
     }
 
     /**
