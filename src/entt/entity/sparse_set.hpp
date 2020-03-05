@@ -52,7 +52,7 @@ class sparse_set {
     static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0));
     static constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(typename traits_type::entity_type);
 
-    class iterator {
+    class iterator final {
         friend class sparse_set<Entity>;
 
         using direct_type = std::vector<Entity>;
