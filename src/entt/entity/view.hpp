@@ -78,7 +78,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     using unchecked_type = std::array<const sparse_set<Entity> *, (sizeof...(Component) - 1)>;
     using filter_type = std::array<const sparse_set<Entity> *, sizeof...(Exclude)>;
 
-    class iterator {
+    class iterator final {
         friend class basic_view<Entity, exclude_t<Exclude...>, Component...>;
 
         iterator(const sparse_set<Entity> *candidate, unchecked_type other, filter_type ignore, underlying_iterator_type curr) ENTT_NOEXCEPT

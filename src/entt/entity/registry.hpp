@@ -45,7 +45,7 @@ class basic_registry {
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     template<typename Component>
-    struct pool_handler: storage<Entity, Component> {
+    struct pool_handler final: storage<Entity, Component> {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>);
         std::size_t super{};
 

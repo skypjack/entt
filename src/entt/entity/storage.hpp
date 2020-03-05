@@ -52,7 +52,7 @@ class storage: public sparse_set<Entity> {
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     template<bool Const>
-    class iterator {
+    class iterator final {
         friend class storage<Entity, Type>;
 
         using instance_type = std::conditional_t<Const, const std::vector<Type>, std::vector<Type>>;
@@ -489,7 +489,7 @@ class storage<Entity, Type, std::enable_if_t<ENTT_ENABLE_ETO(Type)>>: public spa
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
     using underlying_type = sparse_set<Entity>;
 
-    class iterator {
+    class iterator final {
         friend class storage<Entity, Type>;
 
         using index_type = typename traits_type::difference_type;

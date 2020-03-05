@@ -37,7 +37,7 @@ class dispatcher {
     };
 
     template<typename Event>
-    struct pool_handler: basic_pool {
+    struct pool_handler final: basic_pool {
         using signal_type = sigh<void(const Event &)>;
         using sink_type = typename signal_type::sink_type;
 

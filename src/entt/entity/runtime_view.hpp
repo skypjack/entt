@@ -60,7 +60,7 @@ class basic_runtime_view {
 
     using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
 
-    class iterator {
+    class iterator final {
         friend class basic_runtime_view<Entity>;
 
         using direct_type = std::vector<const sparse_set<Entity> *>;
