@@ -178,6 +178,7 @@ add_custom_target(
     SOURCES
         .github/workflows/build.yml
         .github/workflows/coverage.yml
+        .github/workflows/deploy.yml
         .github/FUNDING.yml
         AUTHORS
         CONTRIBUTING.md

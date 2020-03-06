@@ -20,6 +20,8 @@
 Next:
 * review pool<T>::remove, ::assign
 * replace observer class with observer functions
+* workflow to update the single include file automatically
+* workflow to update the doc automatically
 
 * WIP:
  - deprecate snapshot, loader, ...
