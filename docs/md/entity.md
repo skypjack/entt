@@ -765,7 +765,7 @@ the type identifiers and their opaque functions for stamping. As an example:
 ```
 template<typename Type>
 void stamp(const entt::registry &from, const entt::entity src, entt::registry &to, const entt::entity dst) {
-    to.assign_or_replace<Type>(dst, from.get_or_assign<Type>(src));
+    to.assign_or_replace<Type>(dst, from.get<Type>(src));
 }
 ```
 
