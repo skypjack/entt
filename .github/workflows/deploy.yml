@@ -1,0 +1,42 @@
+name: deploy
+
+on:
+  release:
+    types: published
+
+jobs:
+
+  homebrew-entt:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    env:
+      GH_REPO: homebrew-entt
+      FORMULA: entt.rb
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: 'v3.3.1'
+    - name: Clone repository
+      working-directory: build
+      env:
+        PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      run: |
+        git clone https://$GITHUB_ACTOR:$PERSONAL_ACCESS_TOKEN@github.com/$GITHUB_ACTOR/$GH_REPO.git
+    - name: Prepare formula
+      working-directory: build
+      run: |
+        cd $GH_REPO
+        curl "https://github.com/${{ github.repository }}/archive/${{ github.ref }}.tar.gz" --location --fail --silent --show-error --output archive.tar.gz
+        sed -i -e '/url/s/".*"/"'$(echo "https://github.com/${{ github.repository }}/archive/${{ github.ref }}.tar.gz" | sed -e 's/[\/&]/\\&/g')'"/' $FORMULA
+        sed -i -e '/sha256/s/".*"/"'$(openssl sha256 archive.tar.gz | cut -d " " -f 2)'"/' $FORMULA
+    - name: Update remote
+      working-directory: build
+      run: |
+        cd $GH_REPO
+        git config --local user.email "action@github.com"
+        git config --local user.name "$GITHUB_ACTOR"
+        git add $FORMULA
+        git commit -m "Update to ${{ github.ref }}"
+        git push origin master
