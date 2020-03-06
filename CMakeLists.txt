@@ -100,16 +100,28 @@ target_compile_features(EnTT INTERFACE cxx_std_17)
 # Install EnTT
 #
 
+include(CMakePackageConfigHelpers)
+
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     set(CUSTOM_INSTALL_CONFIGDIR cmake)
 else()
     set(CUSTOM_INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/entt)
 endif()
 
-install(DIRECTORY src/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(TARGETS EnTT EXPORT EnTTTargets)
 
-export(EXPORT EnTTTargets FILE ${EnTT_BINARY_DIR}/EnTTTargets.cmake)
+configure_package_config_file(
+    ${EnTT_SOURCE_DIR}/cmake/in/EnTTConfig.cmake.in
+    EnTTConfig.cmake
+    INSTALL_DESTINATION ${CUSTOM_INSTALL_CONFIGDIR}
+    PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+)
+
+write_basic_package_version_file(
+    EnTTConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
 
 install(
     EXPORT EnTTTargets
@@ -118,39 +130,14 @@ install(
     NAMESPACE EnTT::
 )
 
-#
-# Build tree package config file
-#
-
-configure_file(cmake/in/EnTTBuildConfig.cmake.in EnTTConfig.cmake @ONLY)
-
-include(CMakePackageConfigHelpers)
-
-#
-# Install tree package config file
-#
-
-configure_package_config_file(
-    cmake/in/EnTTConfig.cmake.in
-    ${CUSTOM_INSTALL_CONFIGDIR}/EnTTConfig.cmake
-    INSTALL_DESTINATION ${CUSTOM_INSTALL_CONFIGDIR}
-    PATH_VARS CMAKE_INSTALL_INCLUDEDIR
-)
-
-write_basic_package_version_file(
-    ${EnTT_BINARY_DIR}/EnTTConfigVersion.cmake
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY AnyNewerVersion
-)
-
 install(
     FILES
-        ${EnTT_BINARY_DIR}/${CUSTOM_INSTALL_CONFIGDIR}/EnTTConfig.cmake
-        ${EnTT_BINARY_DIR}/EnTTConfigVersion.cmake
+        ${PROJECT_BINARY_DIR}/EnTTConfig.cmake
+        ${PROJECT_BINARY_DIR}/EnTTConfigVersion.cmake
     DESTINATION ${CUSTOM_INSTALL_CONFIGDIR}
 )
 
-export(PACKAGE EnTT)
+install(DIRECTORY src/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 #
 # Tests
