@@ -1133,3 +1133,24 @@ TEST(OwningGroup, AfterFact) {
     // thanks to @pgruenbacher for pointing out this corner case
     ASSERT_EQ((registry.group<int, char>().size()), 5u);
 }
+
+
+
+TEST(OwningGroup, AfterFact2) {
+
+    entt::registry registry;
+    {
+      auto id = registry.create();
+      registry.assign<int>(id, 3);
+    }
+    {
+      auto id = registry.create();
+      registry.assign<char>(id);
+      registry.assign<int>(id, 2);
+    }
+
+    registry.group<char, int>().each([](auto id, const auto& s, const auto& t) {
+      ASSERT_EQ(t, 2);
+    });
+
+}
