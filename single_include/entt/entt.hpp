@@ -4288,40 +4288,11 @@ public:
     /*! @brief Default constructor. */
     sparse_set() = default;
 
-    /**
-     * @brief Copy constructor.
-     * @param other The instance to copy from.
-     */
-    sparse_set(const sparse_set &other)
-        : reverse{},
-          direct{other.direct}
-    {
-        for(size_type pos{}, last = other.reverse.size(); pos < last; ++pos) {
-            if(other.reverse[pos]) {
-                std::copy_n(other.reverse[pos].get(), entt_per_page, assure(pos));
-            }
-        }
-    }
-
     /*! @brief Default move constructor. */
     sparse_set(sparse_set &&) = default;
 
     /*! @brief Default destructor. */
     virtual ~sparse_set() = default;
-
-    /**
-     * @brief Copy assignment operator.
-     * @param other The instance to copy from.
-     * @return This sparse set.
-     */
-    sparse_set & operator=(const sparse_set &other) {
-        if(&other != this) {
-            auto tmp{other};
-            *this = std::move(tmp);
-        }
-
-        return *this;
-    }
 
     /*! @brief Default move assignment operator. @return This sparse set. */
     sparse_set & operator=(sparse_set &&) = default;
@@ -8097,8 +8068,6 @@ class basic_registry {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>);
         std::size_t super{};
 
-        using storage<Entity, Component>::storage;
-
         auto on_construct() ENTT_NOEXCEPT {
             return sink{construction};
         }
@@ -9456,13 +9425,9 @@ public:
                     handler->current.construct(entity);
                 }
             } else {
-                const auto curr = view<Owned..., Get...>(exclude<Exclude...>);
-
                 // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-                std::for_each(std::make_reverse_iterator(curr.end()), std::make_reverse_iterator(curr.begin()), [cpools, handler](const auto entity) {
-                    if(const auto pos = handler->current; !(std::get<0>(cpools).index(entity) < ++handler->current)) {
-                        (std::get<pool_handler<std::decay_t<Owned>> &>(cpools).swap(std::get<pool_handler<std::decay_t<Owned>> &>(cpools).data()[pos], entity), ...);
-                    }
+                std::for_each(std::get<0>(cpools).data(), std::get<0>(cpools).data() + std::get<0>(cpools).size(), [this, handler](const auto entity) {
+                    handler->template maybe_valid_if<std::tuple_element_t<0, std::tuple<std::decay_t<Owned>...>>>(*this, entity);
                 });
             }
         }
@@ -10024,7 +9989,7 @@ struct basic_actor {
      */
     template<typename... Component>
     bool has() const {
-        return (reg->template has<Component>(entt) && ...);
+        return reg->template has<Component...>(entt);
     }
 
     /**
@@ -10412,7 +10377,7 @@ class basic_observer {
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, AnyOf>> {
         template<std::size_t Index>
         static void maybe_valid_if(basic_observer &obs, const basic_registry<Entity> &reg, const Entity entt) {
-            if(reg.template has<Require...>(entt) && !(reg.template has<Reject>(entt) || ...)) {
+            if(reg.template has<Require...>(entt) && !reg.template any<Reject...>(entt)) {
                 if(auto *comp = obs.view.try_get(entt); !comp) {
                     obs.view.construct(entt);
                 }
@@ -10448,7 +10413,7 @@ class basic_observer {
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, type_list<NoneOf...>, AllOf...>> {
         template<std::size_t Index>
         static void maybe_valid_if(basic_observer &obs, const basic_registry<Entity> &reg, const Entity entt) {
-            if(reg.template has<AllOf..., Require...>(entt) && !(reg.template has<NoneOf>(entt) || ...) && !(reg.template has<Reject>(entt) || ...)) {
+            if(reg.template has<AllOf..., Require...>(entt) && !reg.template any<NoneOf..., Reject...>(entt)) {
                 if(auto *comp = obs.view.try_get(entt); !comp) {
                     obs.view.construct(entt);
                 }
