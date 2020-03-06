@@ -1121,7 +1121,7 @@ TEST(OwningGroup, SignalRace) {
     ASSERT_EQ(registry.group<int>(entt::get<double>).size(), 1u);
 }
 
-TEST(OwningGroup, AfterFact) {
+TEST(OwningGroup, StableLateInitialization) {
     entt::registry registry;
 
     for(std::size_t i{}; i < 30u; ++i) {
@@ -1132,4 +1132,21 @@ TEST(OwningGroup, AfterFact) {
 
     // thanks to @pgruenbacher for pointing out this corner case
     ASSERT_EQ((registry.group<int, char>().size()), 5u);
+}
+
+TEST(OwningGroup, PreventEarlyOptOut) {
+    entt::registry registry;
+
+    registry.assign<int>(registry.create(), 3);
+
+    const auto entity = registry.create();
+    registry.assign<char>(entity, 'c');
+    registry.assign<int>(entity, 2);
+
+    // thanks to @pgruenbacher for pointing out this corner case
+    registry.group<char, int>().each([entity](const auto entt, const auto &c, const auto &i) {
+        ASSERT_EQ(entity, entt);
+        ASSERT_EQ(c, 'c');
+        ASSERT_EQ(i, 2);
+    });
 }
