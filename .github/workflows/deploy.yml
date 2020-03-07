@@ -37,4 +37,4 @@ jobs:
         git config --local user.name "$GITHUB_ACTOR"
         git add $FORMULA
         git commit -m "Update to ${{ github.ref }}"
-        git push --dry-run origin master
+        git push origin master

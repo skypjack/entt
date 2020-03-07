@@ -19,9 +19,6 @@
 
 Next:
 * replace observer class with observer functions
-* workflow to update the single include file automatically
-* workflow to update the doc automatically
-* unlock deploy.yml
 
 * WIP:
  - deprecate snapshot, loader, ...
