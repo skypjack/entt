@@ -74,7 +74,7 @@ class basic_registry {
             this->construct(first, last, std::forward<Value>(value));
 
             if(!construction.empty()) {
-                std::for_each(first, last, [this, &owner](const auto entt) { construction.publish(owner, entt); });
+                while(first != last) { construction.publish(owner, *(first++)); }
             }
         }
 
@@ -87,13 +87,12 @@ class basic_registry {
         void remove(basic_registry &owner, It first, It last) {
             if(std::distance(first, last) == std::distance(this->begin(), this->end())) {
                 if(!destruction.empty()) {
-                    std::for_each(first, last, [this, &owner](const auto entt) { destruction.publish(owner, entt); });
+                    while(first != last) { destruction.publish(owner, *(first++)); }
                 }
 
                 this->clear();
             } else {
-                // useless this-> used to suppress a warning with clang
-                std::for_each(first, last, [this, &owner](const auto entt) { this->remove(owner, entt); });
+                while(first != last) { this->remove(owner, *(first++)); }
             }
         }
 
@@ -564,8 +563,7 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
-        // useless this-> used to suppress a warning with clang
-        std::for_each(first, last, [this](const auto entity) { this->destroy(entity); });
+        while(first != last) { destroy(*(first++)); }
     }
 
     /**
@@ -1343,9 +1341,9 @@ public:
                 }
             } else {
                 // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-                std::for_each(std::get<0>(cpools).data(), std::get<0>(cpools).data() + std::get<0>(cpools).size(), [this, handler](const auto entity) {
-                    handler->template maybe_valid_if<std::tuple_element_t<0, std::tuple<std::decay_t<Owned>...>>>(*this, entity);
-                });
+                for(auto *first = std::get<0>(cpools).data(), *last = first + std::get<0>(cpools).size(); first != last; ++first) {
+                    handler->template maybe_valid_if<std::tuple_element_t<0, std::tuple<std::decay_t<Owned>...>>>(*this, *first);
+                }
             }
         }
 
