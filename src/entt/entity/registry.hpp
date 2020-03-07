@@ -219,7 +219,6 @@ public:
      */
     template<typename Component>
     void prepare() {
-        ENTT_ASSERT(std::none_of(pools.cbegin(), pools.cend(), [](auto &&pdata) { return pdata.type_id == type_info<Component>::id(); }));
         assure<Component>();
     }
 
