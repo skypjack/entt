@@ -97,9 +97,10 @@ class basic_registry {
         }
 
         template<typename... Func>
-        void replace(basic_registry &owner, const Entity entt, Func &&... func) {
+        decltype(auto) replace(basic_registry &owner, const Entity entt, Func &&... func) {
             (std::forward<Func>(func)(this->get(entt)), ...);
             update.publish(owner, entt);
+            return this->get(entt);
         }
 
     private:
@@ -707,11 +708,12 @@ public:
      * @tparam Func Types of the function objects to invoke.
      * @param entity A valid entity identifier.
      * @param func Valid function objects.
+     * @return A reference to the replaced component.
      */
     template<typename Component, typename... Func>
-    void replace(const entity_type entity, Func &&... func) {
+    decltype(auto) replace(const entity_type entity, Func &&... func) {
         ENTT_ASSERT(valid(entity));
-        assure<Component>().replace(*this, entity, std::forward<Func>(func)...);
+        return assure<Component>().replace(*this, entity, std::forward<Func>(func)...);
     }
 
     /**
