@@ -704,6 +704,13 @@ public:
      * Temporary objects are returned for empty types though. Capture them by
      * copy or by const reference if needed.
      *
+     * @warning
+     * Attempting to use an invalid entity or to replace a component of an
+     * entity that doesn't own it results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity doesn't own an instance of the given
+     * component.
+     *
      * @tparam Component Type of component to replace.
      * @tparam Func Types of the function objects to invoke.
      * @param entity A valid entity identifier.

@@ -18,6 +18,7 @@
 
 Next:
 * replace observer class with observer functions
+* patch rather than replace, emplace rather then assign (when we have args... ofc)
 
 * WIP:
  - deprecate snapshot, loader, ...
