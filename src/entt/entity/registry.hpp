@@ -631,6 +631,11 @@ public:
     /**
      * @brief Assigns entities to an empty registry.
      *
+     * This function is intended for use in conjunction with `raw`.<br/>
+     * Don't try to inject ranges of randomly generated entities because there
+     * is no guarantee that the registry will continue to function properly in
+     * this case.
+     *
      * @warning
      * An assertion will abort the execution at runtime in debug mode if all
      * pools aren't empty. Groups and context variables are ignored.
