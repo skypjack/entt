@@ -228,11 +228,15 @@ This function is overloaded and accepts also a couple of iterators in order to:
   registry.assign<position>(first, last, instances);
   ```
 
-If an entity already has the given component, the `replace` member function
-template can be used to edit it in-place:
+If an entity already has the given component, the `replace` and `patch` member
+function templates can be used to updated it:
 
 ```cpp
-registry.replace<position>(entity, [](auto &pos) { pos.x = pos.y = 0.; });
+// replaces the component in-place
+registry.patch<position>(entity, [](auto &pos) { pos.x = pos.y = 0.; });
+
+// constructs a new instance from a list of arguments and replaces the component
+registry.replace<position>(entity, 0., 0.);
 ```
 
 When it's unknown whether an entity already owns an instance of a component,

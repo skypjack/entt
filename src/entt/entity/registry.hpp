@@ -693,7 +693,7 @@ public:
     }
 
     /**
-     * @brief Replaces the given component for an entity.
+     * @brief Replaces the given component for an entity in-place.
      *
      * The signature of the functions should be equivalent to the following:
      *
@@ -718,9 +718,46 @@ public:
      * @return A reference to the replaced component.
      */
     template<typename Component, typename... Func>
-    decltype(auto) replace(const entity_type entity, Func &&... func) {
+    [[deprecated("use registry::patch instead")]]
+    decltype(auto) patch(const entity_type entity, Func &&... func) {
         ENTT_ASSERT(valid(entity));
         return assure<Component>().replace(*this, entity, std::forward<Func>(func)...);
+    }
+
+    /*! @copydoc patch */
+    template<typename Component, typename... Func>
+    [[deprecated("use registry::patch instead")]]
+    auto replace(const entity_type entity, Func &&... func)
+    -> decltype((func(assure<Component>().get(entity)), ...), assure<Component>().get(entity)) {
+        return patch<Component>(entity, std::forward<Func>(func)...);
+    }
+
+    /**
+     * @brief Replaces the given component for an entity.
+     *
+     * A new instance of the given component is created and initialized with the
+     * arguments provided (the component must have a proper constructor or be of
+     * aggregate type). Then the component is assigned to the given entity.
+     *
+     * @warning
+     * Attempting to use an invalid entity or to replace a component of an
+     * entity that doesn't own it results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity doesn't own an instance of the given
+     * component.
+     *
+     * @tparam Component Type of component to replace.
+     * @tparam Args Types of arguments to use to construct the component.
+     * @param entity A valid entity identifier.
+     * @param args Parameters to use to initialize the component.
+     * @return A reference to the component being replaced.
+     */
+    template<typename Component, typename... Args>
+    auto replace(const entity_type entity, Args &&... args)
+    -> decltype(std::enable_if_t<sizeof...(Args) != 0>(), Component{std::forward<Args>(args)...}, assure<Component>().get(entity)) {
+        return patch<Component>(entity, [args = std::forward_as_tuple(std::forward<Args>(args)...)](auto &&component) {
+            component = std::make_from_tuple<Component>(std::move(args));
+        });
     }
 
     /**

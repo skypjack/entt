@@ -181,7 +181,8 @@ TEST(Registry, Functionalities) {
     ASSERT_NE(&registry.get<int>(e0), &registry.get<int>(e2));
     ASSERT_NE(&registry.get<char>(e0), &registry.get<char>(e2));
 
-    ASSERT_EQ(registry.replace<int>(e0, [](auto &instance) { instance = 3; }), 3);
+    ASSERT_EQ(registry.replace<int>(e0, [](auto &instance) { instance = 2; }), 2);
+    ASSERT_EQ(registry.replace<int>(e0, 3), 3);
 
     ASSERT_NO_THROW(registry.assign_or_replace<int>(e0, 1));
     ASSERT_NO_THROW(registry.assign_or_replace<int>(e1, 1));
