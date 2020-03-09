@@ -53,7 +53,7 @@ class basic_registry {
             return sink{construction};
         }
 
-        auto on_replace() ENTT_NOEXCEPT {
+        auto on_update() ENTT_NOEXCEPT {
             return sink{update};
         }
 
@@ -97,7 +97,7 @@ class basic_registry {
         }
 
         template<typename... Func>
-        decltype(auto) replace(basic_registry &owner, const Entity entt, Func &&... func) {
+        decltype(auto) patch(basic_registry &owner, const Entity entt, Func &&... func) {
             (std::forward<Func>(func)(this->get(entt)), ...);
             update.publish(owner, entt);
             return this->get(entt);
@@ -688,12 +688,12 @@ public:
         auto &cpool = assure<Component>();
 
         return cpool.has(entity)
-                ? (cpool.replace(*this, entity, [&args...](auto &&component) { component = Component{std::forward<Args>(args)...}; }), cpool.get(entity))
+                ? (cpool.patch(*this, entity, [&args...](auto &&component) { component = Component{std::forward<Args>(args)...}; }), cpool.get(entity))
                 : cpool.assign(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
-     * @brief Replaces the given component for an entity in-place.
+     * @brief Patches the given component for an entity.
      *
      * The signature of the functions should be equivalent to the following:
      *
@@ -705,23 +705,23 @@ public:
      * copy or by const reference if needed.
      *
      * @warning
-     * Attempting to use an invalid entity or to replace a component of an
-     * entity that doesn't own it results in undefined behavior.<br/>
+     * Attempting to use an invalid entity or to patch a component of an entity
+     * that doesn't own it results in undefined behavior.<br/>
      * An assertion will abort the execution at runtime in debug mode in case of
      * invalid entity or if the entity doesn't own an instance of the given
      * component.
      *
-     * @tparam Component Type of component to replace.
+     * @tparam Component Type of component to patch.
      * @tparam Func Types of the function objects to invoke.
      * @param entity A valid entity identifier.
      * @param func Valid function objects.
-     * @return A reference to the replaced component.
+     * @return A reference to the patched component.
      */
     template<typename Component, typename... Func>
     [[deprecated("use registry::patch instead")]]
     decltype(auto) patch(const entity_type entity, Func &&... func) {
         ENTT_ASSERT(valid(entity));
-        return assure<Component>().replace(*this, entity, std::forward<Func>(func)...);
+        return assure<Component>().patch(*this, entity, std::forward<Func>(func)...);
     }
 
     /*! @copydoc patch */
@@ -1082,7 +1082,7 @@ public:
      *
      * A sink is an opaque object used to connect listeners to components.<br/>
      * The sink returned by this function can be used to receive notifications
-     * whenever an instance of the given component is explicitly replaced.
+     * whenever an instance of the given component is explicitly updated.
      *
      * The function type for a listener is equivalent to:
      *
@@ -1090,7 +1090,7 @@ public:
      * void(registry<Entity> &, Entity, Component &);
      * @endcode
      *
-     * Listeners are invoked **before** the component has been replaced.
+     * Listeners are invoked **before** the component has been updated.
      *
      * @note
      * Empty types aren't explicitly instantiated. Therefore, temporary objects
@@ -1103,8 +1103,15 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
+    auto on_update() {
+        return assure<Component>().on_update();
+    }
+
+    /*! @copydoc on_update */
+    template<typename Component>
+    [[deprecated("use registry::on_update instead")]]
     auto on_replace() {
-        return assure<Component>().on_replace();
+        return on_update<Component>();
     }
 
     /**

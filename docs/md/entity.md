@@ -229,7 +229,7 @@ This function is overloaded and accepts also a couple of iterators in order to:
   ```
 
 If an entity already has the given component, the `replace` and `patch` member
-function templates can be used to updated it:
+function templates can be used to update it:
 
 ```cpp
 // replaces the component in-place
@@ -250,7 +250,7 @@ This is a slightly faster alternative for the following snippet:
 
 ```cpp
 if(registry.has<comp>(entity)) {
-    registry.replace<velocity>(entity, [](auto &vel) { vel.dx = vel.dy = 0.; });
+    registry.replace<velocity>(entity, 0., 0.);
 } else {
     registry.assign<velocity>(entity, 0., 0.);
 }
@@ -342,7 +342,7 @@ registry.on_construct<position>().disconnect<&my_class::member>(instance);
 ```
 
 To be notified when components are destroyed, use the `on_destroy` member
-function instead. Finally, the `on_replace` member function will return a sink
+function instead. Finally, the `on_update` member function will return a sink
 to which to connect listeners to observe changes.
 
 The function type of a listener should be equivalent to the following:

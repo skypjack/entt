@@ -198,14 +198,14 @@ class basic_observer {
         static void connect(basic_observer &obs, basic_registry<Entity> &reg) {
             (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(obs), ...);
             (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(obs), ...);
-            reg.template on_replace<AnyOf>().template connect<&maybe_valid_if<Index>>(obs);
+            reg.template on_update<AnyOf>().template connect<&maybe_valid_if<Index>>(obs);
             reg.template on_destroy<AnyOf>().template connect<&discard_if<Index>>(obs);
         }
 
         static void disconnect(basic_observer &obs, basic_registry<Entity> &reg) {
             (reg.template on_destroy<Require>().disconnect(obs), ...);
             (reg.template on_construct<Reject>().disconnect(obs), ...);
-            reg.template on_replace<AnyOf>().disconnect(obs);
+            reg.template on_update<AnyOf>().disconnect(obs);
             reg.template on_destroy<AnyOf>().disconnect(obs);
         }
     };
