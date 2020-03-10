@@ -317,7 +317,7 @@ public:
      * @param args Parameters to use to construct an object for the entity.
      */
     template<typename... Args>
-    void construct(const entity_type entt, Args &&... args) {
+    void emplace(const entity_type entt, Args &&... args) {
         if constexpr(std::is_aggregate_v<object_type>) {
             instances.push_back(Type{std::forward<Args>(args)...});
         } else {
@@ -326,6 +326,13 @@ public:
 
         // entity goes after component in case constructor throws
         underlying_type::construct(entt);
+    }
+
+    /*! @copydoc emplace */
+    template<typename... Args>
+    [[deprecated("use ::emplace instead")]]
+    void construct(const entity_type entt, Args &&... args) {
+        emplace(entt, std::forward<Args>(args)...);
     }
 
     /**
@@ -344,11 +351,18 @@ public:
      * @param value An instance of the object to construct.
      */
     template<typename It>
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    construct(It first, It last, const object_type &value = {}) {
+    void insert(It first, It last, const object_type &value = {}) {
         instances.insert(instances.end(), std::distance(first, last), value);
         // entities go after components in case constructors throw
         underlying_type::construct(first, last);
+    }
+
+    /*! @copydoc insert */
+    template<typename It>
+    [[deprecated("use ::insert instead")]]
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
+    construct(It first, It last, const object_type &value = {}) {
+        insert(std::move(first), std::move(last), value);
     }
 
     /**
@@ -364,11 +378,18 @@ public:
      * @param value An iterator to the first element of the range of objects.
      */
     template<typename EIt, typename CIt>
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<EIt>::value_type, entity_type>, void>
-    construct(EIt first, EIt last, CIt value) {
+    void insert(EIt first, EIt last, CIt value) {
         instances.insert(instances.end(), value, value + std::distance(first, last));
         // entities go after components in case constructors throw
         underlying_type::construct(first, last);
+    }
+
+    /*! @copydoc insert */
+    template<typename EIt, typename CIt>
+    [[deprecated("use ::insert instead")]]
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<EIt>::value_type, entity_type>, void>
+    construct(EIt first, EIt last, CIt value) {
+        insert(std::move(first), std::move(last), std::move(value));
     }
 
     /**
@@ -675,9 +696,17 @@ public:
      * @param entt A valid entity identifier.
      */
     template<typename... Args>
-    void construct(const entity_type entt, Args &&...) {
+    void emplace(const entity_type entt, Args &&...) {
         underlying_type::construct(entt);
     }
+
+    /*! @copydoc emplace */
+    template<typename... Args>
+    [[deprecated("use ::emplace instead")]]
+    void construct(const entity_type entt, Args &&... args) {
+        emplace(entt, std::forward<Args>(args)...);
+    }
+
 
     /**
      * @brief Assigns one or more entities to a storage.
@@ -693,9 +722,16 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    construct(It first, It last, const object_type & = {}) {
+    void insert(It first, It last, const object_type & = {}) {
         underlying_type::construct(first, last);
+    }
+
+    /*! @copydoc insert */
+    template<typename It>
+    [[deprecated("use ::insert instead")]]
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
+    construct(It first, It last, const object_type &value = {}) {
+        insert(std::move(first), std::move(last), value);
     }
 
     /*! @copydoc storage::sort */
