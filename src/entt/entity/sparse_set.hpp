@@ -367,10 +367,16 @@ public:
      *
      * @param entt A valid entity identifier.
      */
-    void construct(const entity_type entt) {
+    void emplace(const entity_type entt) {
         ENTT_ASSERT(!has(entt));
         assure(page(entt))[offset(entt)] = entity_type(direct.size());
         direct.push_back(entt);
+    }
+
+    /*! @copydoc emplace */
+    [[deprecated("use ::emplace instead")]]
+    void construct(const entity_type entt) {
+        emplace(entt);
     }
 
     /**
@@ -387,13 +393,20 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    void construct(It first, It last) {
+    void insert(It first, It last) {
         std::for_each(first, last, [this, next = direct.size()](const auto entt) mutable {
             ENTT_ASSERT(!has(entt));
             assure(page(entt))[offset(entt)] = entity_type(next++);
         });
 
         direct.insert(direct.end(), first, last);
+    }
+
+    /*! @copydoc insert */
+    template<typename It>
+    [[deprecated("use ::insert instead")]]
+    void construct(It first, It last) {
+        insert(std::move(first), std::move(last));
     }
 
     /**
