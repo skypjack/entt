@@ -18,7 +18,7 @@
 
 Next:
 * replace observer class with observer functions
-* patch rather than replace, emplace rather then assign (when we have args... ofc)
+* get(cmp, entity) -> void *, set(cmp, entity, void *)
 
 * WIP:
  - deprecate snapshot, loader, ...
