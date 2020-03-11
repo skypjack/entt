@@ -62,15 +62,14 @@ class basic_registry {
         }
 
         template<typename... Args>
-        decltype(auto) assign(basic_registry &owner, const Entity entt, Args &&... args) {
+        decltype(auto) emplace(basic_registry &owner, const Entity entt, Args &&... args) {
             this->construct(entt, std::forward<Args>(args)...);
             construction.publish(owner, entt);
             return this->get(entt);
         }
 
         template<typename It, typename Value>
-        std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, Entity>, void>
-        assign(basic_registry &owner, It first, It last, Value &&value) {
+        void insert(basic_registry &owner, It first, It last, Value &&value) {
             this->construct(first, last, std::forward<Value>(value));
 
             if(!construction.empty()) {
@@ -589,7 +588,7 @@ public:
     template<typename Component, typename... Args>
     decltype(auto) assign(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
-        return assure<Component>().assign(*this, entity, std::forward<Args>(args)...);
+        return assure<Component>().emplace(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -607,7 +606,7 @@ public:
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
     assign(It first, It last, const Component &value = {}) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        assure<Component>().assign(*this, first, last, value);
+        assure<Component>().insert(*this, first, last, value);
     }
 
     /**
@@ -626,7 +625,7 @@ public:
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<EIt>::value_type, entity_type>, void>
     assign(EIt first, EIt last, CIt value) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        assure<Component>().assign(*this, first, last, value);
+        assure<Component>().insert(*this, first, last, value);
     }
 
     /**
@@ -689,7 +688,7 @@ public:
 
         return cpool.has(entity)
                 ? (cpool.patch(*this, entity, [&args...](auto &&component) { component = Component{std::forward<Args>(args)...}; }), cpool.get(entity))
-                : cpool.assign(*this, entity, std::forward<Args>(args)...);
+                : cpool.emplace(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -922,7 +921,7 @@ public:
     decltype(auto) get_or_assign(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
         auto &cpool = assure<Component>();
-        return cpool.has(entity) ? cpool.get(entity) : cpool.assign(*this, entity, std::forward<Args>(args)...);
+        return cpool.has(entity) ? cpool.get(entity) : cpool.emplace(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
