@@ -700,7 +700,10 @@ public:
         underlying_type::construct(entt);
     }
 
-    /*! @copydoc emplace */
+    /**
+     * @copydoc emplace
+     * @param args Parameters to use to construct an object for the entity.
+     */
     template<typename... Args>
     [[deprecated("use ::emplace instead")]]
     void construct(const entity_type entt, Args &&... args) {
@@ -726,7 +729,10 @@ public:
         underlying_type::construct(first, last);
     }
 
-    /*! @copydoc insert */
+    /**
+     * @copydoc insert
+     * @param value An instance of the object to construct.
+     */
     template<typename It>
     [[deprecated("use ::insert instead")]]
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
