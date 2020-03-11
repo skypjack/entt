@@ -212,6 +212,8 @@ meta_any invoke([[maybe_unused]] meta_any instance, meta_any *args, std::index_s
     [[maybe_unused]] const auto direct = std::make_tuple([](meta_any *any, auto *value) {
         using arg_type = std::remove_reference_t<decltype(*value)>;
 
+        if constexpr (std::is_same_v<arg_type, entt::meta_any>)
+            return any;
         if(!value && any->convert<arg_type>()) {
             value = any->try_cast<arg_type>();
         }
