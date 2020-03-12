@@ -609,7 +609,7 @@ public:
      * @param last An iterator past the last element of the range of entities.
      * @param value An instance of the component to assign.
      */
-    template<typename Component, typename It>
+    template<typename It, typename Component>
     void insert(It first, It last, const Component &value = {}) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
         assure<Component>().insert(*this, first, last, value);
@@ -637,6 +637,7 @@ public:
      */
     template<typename Component, typename EIt, typename CIt>
     void insert(EIt first, EIt last, CIt value) {
+        static_assert(std::is_constructible_v<Component, typename std::iterator_traits<CIt>::value_type>);
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
         assure<Component>().insert(*this, first, last, value);
     }
