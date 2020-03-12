@@ -946,10 +946,17 @@ public:
      * @return Reference to the component owned by the entity.
      */
     template<typename Component, typename... Args>
-    decltype(auto) get_or_assign(const entity_type entity, Args &&... args) {
+    decltype(auto) get_or_emplace(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
         auto &cpool = assure<Component>();
         return cpool.has(entity) ? cpool.get(entity) : cpool.emplace(*this, entity, std::forward<Args>(args)...);
+    }
+
+    /*! @copydoc get_or_emplace */
+    template<typename Component, typename... Args>
+    [[deprecated("use ::get_or_emplace instead")]]
+    decltype(auto) get_or_assign(const entity_type entity, Args &&... args) {
+        return get_or_emplace<Component>(entity, std::forward<Args>(args)...);
     }
 
     /**

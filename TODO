@@ -19,7 +19,6 @@
 Next:
 * replace observer class with observer functions
 * get(cmp, entity) -> void *, set(cmp, entity, void *)
-* get_or_assign -> get_or_emplace
 
 * WIP:
  - deprecate snapshot, loader, ...
