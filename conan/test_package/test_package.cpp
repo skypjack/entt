@@ -43,8 +43,8 @@ int main() {
 
     for(auto i = 0; i < 10; ++i) {
         auto entity = registry.create();
-        registry.assign<position>(entity, i * 1.f, i * 1.f);
-        if(i % 2 == 0) { registry.assign<velocity>(entity, i * .1f, i * .1f); }
+        registry.emplace<position>(entity, i * 1.f, i * 1.f);
+        if(i % 2 == 0) { registry.emplace<velocity>(entity, i * .1f, i * .1f); }
     }
 
     update(dt, registry);

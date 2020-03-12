@@ -360,6 +360,27 @@ struct radix_sort {
 
 // #include "../config/config.h"
 
+// #include "fwd.hpp"
+#ifndef ENTT_CORE_FWD_HPP
+#define ENTT_CORE_FWD_HPP
+
+
+// #include "../config/config.h"
+
+
+
+namespace entt {
+
+
+/*! @brief Alias declaration for type identifiers. */
+using id_type = ENTT_ID_TYPE;
+
+
+}
+
+
+#endif
+
 
 
 namespace entt {
@@ -374,11 +395,11 @@ namespace entt {
  */
 template<typename...>
 class family {
-    inline static ENTT_MAYBE_ATOMIC(ENTT_ID_TYPE) identifier{};
+    inline static ENTT_MAYBE_ATOMIC(id_type) identifier{};
 
 public:
     /*! @brief Unsigned integer type. */
-    using family_type = ENTT_ID_TYPE;
+    using family_type = id_type;
 
     /*! @brief Statically generated unique identifier for the given type. */
     template<typename... Type>
@@ -400,6 +421,8 @@ public:
 #include <cstddef>
 #include <cstdint>
 // #include "../config/config.h"
+
+// #include "fwd.hpp"
 
 
 
@@ -457,7 +480,7 @@ struct fnv1a_traits<std::uint64_t> {
  */
 template<typename Char>
 class basic_hashed_string {
-    using traits_type = internal::fnv1a_traits<ENTT_ID_TYPE>;
+    using traits_type = internal::fnv1a_traits<id_type>;
 
     struct const_wrapper {
         // non-explicit constructor on purpose
@@ -466,7 +489,7 @@ class basic_hashed_string {
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    static constexpr ENTT_ID_TYPE helper(const Char *curr) ENTT_NOEXCEPT {
+    static constexpr id_type helper(const Char *curr) ENTT_NOEXCEPT {
         auto value = traits_type::offset;
 
         while(*curr != 0) {
@@ -480,7 +503,7 @@ public:
     /*! @brief Character type. */
     using value_type = Char;
     /*! @brief Unsigned integer type. */
-    using hash_type = ENTT_ID_TYPE;
+    using hash_type = id_type;
 
     /**
      * @brief Returns directly the numeric representation of a string.
@@ -518,7 +541,7 @@ public:
      * @return The numeric representation of the string.
      */
     static hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
-        ENTT_ID_TYPE partial{traits_type::offset};
+        id_type partial{traits_type::offset};
         while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
         return partial;
     }
@@ -668,6 +691,8 @@ constexpr entt::hashed_wstring operator"" ENTT_HWS_SUFFIX(const wchar_t *str, st
 #include <type_traits>
 // #include "../config/config.h"
 
+// #include "fwd.hpp"
+
 
 
 namespace entt {
@@ -705,14 +730,14 @@ class identifier {
     using tuple_type = std::tuple<std::decay_t<Types>...>;
 
     template<typename Type, std::size_t... Indexes>
-    static constexpr ENTT_ID_TYPE get(std::index_sequence<Indexes...>) {
+    static constexpr id_type get(std::index_sequence<Indexes...>) {
         static_assert(std::disjunction_v<std::is_same<Type, Types>...>);
-        return (0 + ... + (std::is_same_v<Type, std::tuple_element_t<Indexes, tuple_type>> ? ENTT_ID_TYPE(Indexes) : ENTT_ID_TYPE{}));
+        return (0 + ... + (std::is_same_v<Type, std::tuple_element_t<Indexes, tuple_type>> ? id_type(Indexes) : id_type{}));
     }
 
 public:
     /*! @brief Unsigned integer type. */
-    using identifier_type = ENTT_ID_TYPE;
+    using identifier_type = id_type;
 
     /*! @brief Statically generated unique identifier for the given type. */
     template<typename Type>
@@ -732,6 +757,8 @@ public:
 
 // #include "../config/config.h"
 
+// #include "fwd.hpp"
+
 
 
 namespace entt {
@@ -748,7 +775,7 @@ namespace entt {
  * both during an assignment and when they try to read back their data.
  * Otherwise, they can incur in unexpected results.
  */
-template<ENTT_ID_TYPE>
+template<id_type>
 struct monostate {
     /**
      * @brief Assigns a value of a specific type to a given key.
@@ -780,7 +807,7 @@ private:
  * @brief Helper variable template.
  * @tparam Value Value used to differentiate between different variables.
  */
-template<ENTT_ID_TYPE Value>
+template<id_type Value>
 inline monostate<Value> monostate_v = {};
 
 
@@ -833,6 +860,8 @@ inline monostate<Value> monostate_v = {};
 
 // #include "hashed_string.hpp"
 
+// #include "fwd.hpp"
+
 
 
 #ifndef ENTT_PRETTY_FUNCTION
@@ -856,8 +885,8 @@ namespace internal {
 
 
 struct ENTT_API type_id_generator {
-    static ENTT_ID_TYPE next() ENTT_NOEXCEPT {
-        static ENTT_ID_TYPE value{};
+    static id_type next() ENTT_NOEXCEPT {
+        static id_type value{};
         return value++;
     }
 };
@@ -884,18 +913,18 @@ struct ENTT_TYPE_ID_API type_info {
      * @return The numeric representation of the given type.
      */
 #if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
-    static constexpr ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+    static constexpr id_type id() ENTT_NOEXCEPT {
         constexpr auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION_CONSTEXPR);
         return value;
     }
 #elif defined ENTT_PRETTY_FUNCTION
-    static ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+    static id_type id() ENTT_NOEXCEPT {
         static const auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
         return value;
     }
 #else
-    static ENTT_ID_TYPE id() ENTT_NOEXCEPT {
-        static const ENTT_ID_TYPE value = internal::type_id_generator::next();
+    static id_type id() ENTT_NOEXCEPT {
+        static const id_type value = internal::type_id_generator::next();
         return value;
     }
 #endif
@@ -917,337 +946,9 @@ struct ENTT_TYPE_ID_API type_info {
 #include <type_traits>
 // #include "../config/config.h"
 
-// #include "../core/hashed_string.hpp"
-#ifndef ENTT_CORE_HASHED_STRING_HPP
-#define ENTT_CORE_HASHED_STRING_HPP
+// #include "hashed_string.hpp"
 
-
-#include <cstddef>
-#include <cstdint>
-// #include "../config/config.h"
-#ifndef ENTT_CONFIG_CONFIG_H
-#define ENTT_CONFIG_CONFIG_H
-
-
-#ifndef ENTT_NOEXCEPT
-#   define ENTT_NOEXCEPT noexcept
-#endif
-
-
-#ifndef ENTT_HS_SUFFIX
-#   define ENTT_HS_SUFFIX _hs
-#endif
-
-
-#ifndef ENTT_HWS_SUFFIX
-#   define ENTT_HWS_SUFFIX _hws
-#endif
-
-
-#ifndef ENTT_USE_ATOMIC
-#   define ENTT_MAYBE_ATOMIC(Type) Type
-#else
-#   include <atomic>
-#   define ENTT_MAYBE_ATOMIC(Type) std::atomic<Type>
-#endif
-
-
-#ifndef ENTT_ID_TYPE
-#   include <cstdint>
-#   define ENTT_ID_TYPE std::uint32_t
-#endif
-
-
-#ifndef ENTT_PAGE_SIZE
-#   define ENTT_PAGE_SIZE 32768
-#endif
-
-
-#ifndef ENTT_ASSERT
-#   include <cassert>
-#   define ENTT_ASSERT(condition) assert(condition)
-#endif
-
-
-#ifndef ENTT_DISABLE_ETO
-#   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
-#else
-#   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
-#endif
-
-
-#ifndef ENTT_STANDARD_CPP
-#   if defined _MSC_VER
-#      define ENTT_PRETTY_FUNCTION __FUNCSIG__
-#      define ENTT_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
-#   elif defined __clang__ || (defined __GNUC__ && __GNUC__ > 8)
-#      define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#      define ENTT_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
-#   elif defined __GNUC__
-#      define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#   endif
-#endif
-
-
-#endif
-
-
-
-namespace entt {
-
-
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
-
-namespace internal {
-
-
-template<typename>
-struct fnv1a_traits;
-
-
-template<>
-struct fnv1a_traits<std::uint32_t> {
-    using type = std::uint32_t;
-    static constexpr std::uint32_t offset = 2166136261;
-    static constexpr std::uint32_t prime = 16777619;
-};
-
-
-template<>
-struct fnv1a_traits<std::uint64_t> {
-    using type = std::uint64_t;
-    static constexpr std::uint64_t offset = 14695981039346656037ull;
-    static constexpr std::uint64_t prime = 1099511628211ull;
-};
-
-
-}
-
-
-/**
- * Internal details not to be documented.
- * @endcond TURN_OFF_DOXYGEN
- */
-
-
-/**
- * @brief Zero overhead unique identifier.
- *
- * A hashed string is a compile-time tool that allows users to use
- * human-readable identifers in the codebase while using their numeric
- * counterparts at runtime.<br/>
- * Because of that, a hashed string can also be used in constant expressions if
- * required.
- *
- * @tparam Char Character type.
- */
-template<typename Char>
-class basic_hashed_string {
-    using traits_type = internal::fnv1a_traits<ENTT_ID_TYPE>;
-
-    struct const_wrapper {
-        // non-explicit constructor on purpose
-        constexpr const_wrapper(const Char *curr) ENTT_NOEXCEPT: str{curr} {}
-        const Char *str;
-    };
-
-    // Fowler–Noll–Vo hash function v. 1a - the good
-    static constexpr ENTT_ID_TYPE helper(const Char *curr) ENTT_NOEXCEPT {
-        auto value = traits_type::offset;
-
-        while(*curr != 0) {
-            value = (value ^ static_cast<traits_type::type>(*(curr++))) * traits_type::prime;
-        }
-
-        return value;
-    }
-
-public:
-    /*! @brief Character type. */
-    using value_type = Char;
-    /*! @brief Unsigned integer type. */
-    using hash_type = ENTT_ID_TYPE;
-
-    /**
-     * @brief Returns directly the numeric representation of a string.
-     *
-     * Forcing template resolution avoids implicit conversions. An
-     * human-readable identifier can be anything but a plain, old bunch of
-     * characters.<br/>
-     * Example of use:
-     * @code{.cpp}
-     * const auto value = basic_hashed_string<char>::to_value("my.png");
-     * @endcode
-     *
-     * @tparam N Number of characters of the identifier.
-     * @param str Human-readable identifer.
-     * @return The numeric representation of the string.
-     */
-    template<std::size_t N>
-    static constexpr hash_type value(const value_type (&str)[N]) ENTT_NOEXCEPT {
-        return helper(str);
-    }
-
-    /**
-     * @brief Returns directly the numeric representation of a string.
-     * @param wrapper Helps achieving the purpose by relying on overloading.
-     * @return The numeric representation of the string.
-     */
-    static hash_type value(const_wrapper wrapper) ENTT_NOEXCEPT {
-        return helper(wrapper.str);
-    }
-
-    /**
-     * @brief Returns directly the numeric representation of a string view.
-     * @param str Human-readable identifer.
-     * @param size Length of the string to hash.
-     * @return The numeric representation of the string.
-     */
-    static hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
-        ENTT_ID_TYPE partial{traits_type::offset};
-        while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
-        return partial;
-    }
-
-    /*! @brief Constructs an empty hashed string. */
-    constexpr basic_hashed_string() ENTT_NOEXCEPT
-        : str{nullptr}, hash{}
-    {}
-
-    /**
-     * @brief Constructs a hashed string from an array of const characters.
-     *
-     * Forcing template resolution avoids implicit conversions. An
-     * human-readable identifier can be anything but a plain, old bunch of
-     * characters.<br/>
-     * Example of use:
-     * @code{.cpp}
-     * basic_hashed_string<char> hs{"my.png"};
-     * @endcode
-     *
-     * @tparam N Number of characters of the identifier.
-     * @param curr Human-readable identifer.
-     */
-    template<std::size_t N>
-    constexpr basic_hashed_string(const value_type (&curr)[N]) ENTT_NOEXCEPT
-        : str{curr}, hash{helper(curr)}
-    {}
-
-    /**
-     * @brief Explicit constructor on purpose to avoid constructing a hashed
-     * string directly from a `const value_type *`.
-     * @param wrapper Helps achieving the purpose by relying on overloading.
-     */
-    explicit constexpr basic_hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
-        : str{wrapper.str}, hash{helper(wrapper.str)}
-    {}
-
-    /**
-     * @brief Returns the human-readable representation of a hashed string.
-     * @return The string used to initialize the instance.
-     */
-    constexpr const value_type * data() const ENTT_NOEXCEPT {
-        return str;
-    }
-
-    /**
-     * @brief Returns the numeric representation of a hashed string.
-     * @return The numeric representation of the instance.
-     */
-    constexpr hash_type value() const ENTT_NOEXCEPT {
-        return hash;
-    }
-
-    /*! @copydoc data */
-    constexpr operator const value_type *() const ENTT_NOEXCEPT { return data(); }
-
-    /**
-     * @brief Returns the numeric representation of a hashed string.
-     * @return The numeric representation of the instance.
-     */
-    constexpr operator hash_type() const ENTT_NOEXCEPT { return value(); }
-
-    /**
-     * @brief Compares two hashed strings.
-     * @param other Hashed string with which to compare.
-     * @return True if the two hashed strings are identical, false otherwise.
-     */
-    constexpr bool operator==(const basic_hashed_string &other) const ENTT_NOEXCEPT {
-        return hash == other.hash;
-    }
-
-private:
-    const value_type *str;
-    hash_type hash;
-};
-
-
-/**
- * @brief Deduction guide.
- *
- * It allows to deduce the character type of the hashed string directly from a
- * human-readable identifer provided to the constructor.
- *
- * @tparam Char Character type.
- * @tparam N Number of characters of the identifier.
- * @param str Human-readable identifer.
- */
-template<typename Char, std::size_t N>
-basic_hashed_string(const Char (&str)[N]) ENTT_NOEXCEPT
--> basic_hashed_string<Char>;
-
-
-/**
- * @brief Compares two hashed strings.
- * @tparam Char Character type.
- * @param lhs A valid hashed string.
- * @param rhs A valid hashed string.
- * @return True if the two hashed strings are identical, false otherwise.
- */
-template<typename Char>
-constexpr bool operator!=(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
-
-
-/*! @brief Aliases for common character types. */
-using hashed_string = basic_hashed_string<char>;
-
-
-/*! @brief Aliases for common character types. */
-using hashed_wstring = basic_hashed_string<wchar_t>;
-
-
-}
-
-
-/**
- * @brief User defined literal for hashed strings.
- * @param str The literal without its suffix.
- * @return A properly initialized hashed string.
- */
-constexpr entt::hashed_string operator"" ENTT_HS_SUFFIX(const char *str, std::size_t) ENTT_NOEXCEPT {
-    return entt::hashed_string{str};
-}
-
-
-/**
- * @brief User defined literal for hashed wstrings.
- * @param str The literal without its suffix.
- * @return A properly initialized hashed wstring.
- */
-constexpr entt::hashed_wstring operator"" ENTT_HWS_SUFFIX(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
-    return entt::hashed_wstring{str};
-}
-
-
-#endif
+// #include "fwd.hpp"
 
 
 
@@ -1445,10 +1146,10 @@ using member_class_t = typename member_class<Member>::type;
 
 /**
  * @brief Alias template to ease the creation of named values.
- * @tparam Value A constant value at least convertible to `ENTT_ID_TYPE`.
+ * @tparam Value A constant value at least convertible to `id_type`.
  */
-template<ENTT_ID_TYPE Value>
-using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
+template<id_type Value>
+using tag = std::integral_constant<id_type, Value>;
 
 
 }
@@ -1553,14 +1254,14 @@ using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
 #define ENTT_ENTITY_REGISTRY_HPP
 
 
-#include <tuple>
-#include <vector>
-#include <memory>
-#include <utility>
+#include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <algorithm>
+#include <memory>
+#include <tuple>
 #include <type_traits>
+#include <utility>
+#include <vector>
 // #include "../config/config.h"
 
 // #include "../core/algorithm.hpp"
@@ -1883,6 +1584,27 @@ struct radix_sort {
 
 #endif
 
+// #include "../core/fwd.hpp"
+#ifndef ENTT_CORE_FWD_HPP
+#define ENTT_CORE_FWD_HPP
+
+
+// #include "../config/config.h"
+
+
+
+namespace entt {
+
+
+/*! @brief Alias declaration for type identifiers. */
+using id_type = ENTT_ID_TYPE;
+
+
+}
+
+
+#endif
+
 // #include "../core/type_info.hpp"
 #ifndef ENTT_CORE_TYPE_INFO_HPP
 #define ENTT_CORE_TYPE_INFO_HPP
@@ -1934,6 +1656,8 @@ struct radix_sort {
 #include <cstdint>
 // #include "../config/config.h"
 
+// #include "fwd.hpp"
+
 
 
 namespace entt {
@@ -1990,7 +1714,7 @@ struct fnv1a_traits<std::uint64_t> {
  */
 template<typename Char>
 class basic_hashed_string {
-    using traits_type = internal::fnv1a_traits<ENTT_ID_TYPE>;
+    using traits_type = internal::fnv1a_traits<id_type>;
 
     struct const_wrapper {
         // non-explicit constructor on purpose
@@ -1999,7 +1723,7 @@ class basic_hashed_string {
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    static constexpr ENTT_ID_TYPE helper(const Char *curr) ENTT_NOEXCEPT {
+    static constexpr id_type helper(const Char *curr) ENTT_NOEXCEPT {
         auto value = traits_type::offset;
 
         while(*curr != 0) {
@@ -2013,7 +1737,7 @@ public:
     /*! @brief Character type. */
     using value_type = Char;
     /*! @brief Unsigned integer type. */
-    using hash_type = ENTT_ID_TYPE;
+    using hash_type = id_type;
 
     /**
      * @brief Returns directly the numeric representation of a string.
@@ -2051,7 +1775,7 @@ public:
      * @return The numeric representation of the string.
      */
     static hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
-        ENTT_ID_TYPE partial{traits_type::offset};
+        id_type partial{traits_type::offset};
         while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
         return partial;
     }
@@ -2190,6 +1914,8 @@ constexpr entt::hashed_wstring operator"" ENTT_HWS_SUFFIX(const wchar_t *str, st
 
 #endif
 
+// #include "fwd.hpp"
+
 
 
 #ifndef ENTT_PRETTY_FUNCTION
@@ -2213,8 +1939,8 @@ namespace internal {
 
 
 struct ENTT_API type_id_generator {
-    static ENTT_ID_TYPE next() ENTT_NOEXCEPT {
-        static ENTT_ID_TYPE value{};
+    static id_type next() ENTT_NOEXCEPT {
+        static id_type value{};
         return value++;
     }
 };
@@ -2241,18 +1967,18 @@ struct ENTT_TYPE_ID_API type_info {
      * @return The numeric representation of the given type.
      */
 #if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
-    static constexpr ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+    static constexpr id_type id() ENTT_NOEXCEPT {
         constexpr auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION_CONSTEXPR);
         return value;
     }
 #elif defined ENTT_PRETTY_FUNCTION
-    static ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+    static id_type id() ENTT_NOEXCEPT {
         static const auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
         return value;
     }
 #else
-    static ENTT_ID_TYPE id() ENTT_NOEXCEPT {
-        static const ENTT_ID_TYPE value = internal::type_id_generator::next();
+    static id_type id() ENTT_NOEXCEPT {
+        static const id_type value = internal::type_id_generator::next();
         return value;
     }
 #endif
@@ -2274,337 +2000,9 @@ struct ENTT_TYPE_ID_API type_info {
 #include <type_traits>
 // #include "../config/config.h"
 
-// #include "../core/hashed_string.hpp"
-#ifndef ENTT_CORE_HASHED_STRING_HPP
-#define ENTT_CORE_HASHED_STRING_HPP
+// #include "hashed_string.hpp"
 
-
-#include <cstddef>
-#include <cstdint>
-// #include "../config/config.h"
-#ifndef ENTT_CONFIG_CONFIG_H
-#define ENTT_CONFIG_CONFIG_H
-
-
-#ifndef ENTT_NOEXCEPT
-#   define ENTT_NOEXCEPT noexcept
-#endif
-
-
-#ifndef ENTT_HS_SUFFIX
-#   define ENTT_HS_SUFFIX _hs
-#endif
-
-
-#ifndef ENTT_HWS_SUFFIX
-#   define ENTT_HWS_SUFFIX _hws
-#endif
-
-
-#ifndef ENTT_USE_ATOMIC
-#   define ENTT_MAYBE_ATOMIC(Type) Type
-#else
-#   include <atomic>
-#   define ENTT_MAYBE_ATOMIC(Type) std::atomic<Type>
-#endif
-
-
-#ifndef ENTT_ID_TYPE
-#   include <cstdint>
-#   define ENTT_ID_TYPE std::uint32_t
-#endif
-
-
-#ifndef ENTT_PAGE_SIZE
-#   define ENTT_PAGE_SIZE 32768
-#endif
-
-
-#ifndef ENTT_ASSERT
-#   include <cassert>
-#   define ENTT_ASSERT(condition) assert(condition)
-#endif
-
-
-#ifndef ENTT_DISABLE_ETO
-#   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
-#else
-#   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
-#endif
-
-
-#ifndef ENTT_STANDARD_CPP
-#   if defined _MSC_VER
-#      define ENTT_PRETTY_FUNCTION __FUNCSIG__
-#      define ENTT_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
-#   elif defined __clang__ || (defined __GNUC__ && __GNUC__ > 8)
-#      define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#      define ENTT_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
-#   elif defined __GNUC__
-#      define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#   endif
-#endif
-
-
-#endif
-
-
-
-namespace entt {
-
-
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
-
-namespace internal {
-
-
-template<typename>
-struct fnv1a_traits;
-
-
-template<>
-struct fnv1a_traits<std::uint32_t> {
-    using type = std::uint32_t;
-    static constexpr std::uint32_t offset = 2166136261;
-    static constexpr std::uint32_t prime = 16777619;
-};
-
-
-template<>
-struct fnv1a_traits<std::uint64_t> {
-    using type = std::uint64_t;
-    static constexpr std::uint64_t offset = 14695981039346656037ull;
-    static constexpr std::uint64_t prime = 1099511628211ull;
-};
-
-
-}
-
-
-/**
- * Internal details not to be documented.
- * @endcond TURN_OFF_DOXYGEN
- */
-
-
-/**
- * @brief Zero overhead unique identifier.
- *
- * A hashed string is a compile-time tool that allows users to use
- * human-readable identifers in the codebase while using their numeric
- * counterparts at runtime.<br/>
- * Because of that, a hashed string can also be used in constant expressions if
- * required.
- *
- * @tparam Char Character type.
- */
-template<typename Char>
-class basic_hashed_string {
-    using traits_type = internal::fnv1a_traits<ENTT_ID_TYPE>;
-
-    struct const_wrapper {
-        // non-explicit constructor on purpose
-        constexpr const_wrapper(const Char *curr) ENTT_NOEXCEPT: str{curr} {}
-        const Char *str;
-    };
-
-    // Fowler–Noll–Vo hash function v. 1a - the good
-    static constexpr ENTT_ID_TYPE helper(const Char *curr) ENTT_NOEXCEPT {
-        auto value = traits_type::offset;
-
-        while(*curr != 0) {
-            value = (value ^ static_cast<traits_type::type>(*(curr++))) * traits_type::prime;
-        }
-
-        return value;
-    }
-
-public:
-    /*! @brief Character type. */
-    using value_type = Char;
-    /*! @brief Unsigned integer type. */
-    using hash_type = ENTT_ID_TYPE;
-
-    /**
-     * @brief Returns directly the numeric representation of a string.
-     *
-     * Forcing template resolution avoids implicit conversions. An
-     * human-readable identifier can be anything but a plain, old bunch of
-     * characters.<br/>
-     * Example of use:
-     * @code{.cpp}
-     * const auto value = basic_hashed_string<char>::to_value("my.png");
-     * @endcode
-     *
-     * @tparam N Number of characters of the identifier.
-     * @param str Human-readable identifer.
-     * @return The numeric representation of the string.
-     */
-    template<std::size_t N>
-    static constexpr hash_type value(const value_type (&str)[N]) ENTT_NOEXCEPT {
-        return helper(str);
-    }
-
-    /**
-     * @brief Returns directly the numeric representation of a string.
-     * @param wrapper Helps achieving the purpose by relying on overloading.
-     * @return The numeric representation of the string.
-     */
-    static hash_type value(const_wrapper wrapper) ENTT_NOEXCEPT {
-        return helper(wrapper.str);
-    }
-
-    /**
-     * @brief Returns directly the numeric representation of a string view.
-     * @param str Human-readable identifer.
-     * @param size Length of the string to hash.
-     * @return The numeric representation of the string.
-     */
-    static hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
-        ENTT_ID_TYPE partial{traits_type::offset};
-        while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
-        return partial;
-    }
-
-    /*! @brief Constructs an empty hashed string. */
-    constexpr basic_hashed_string() ENTT_NOEXCEPT
-        : str{nullptr}, hash{}
-    {}
-
-    /**
-     * @brief Constructs a hashed string from an array of const characters.
-     *
-     * Forcing template resolution avoids implicit conversions. An
-     * human-readable identifier can be anything but a plain, old bunch of
-     * characters.<br/>
-     * Example of use:
-     * @code{.cpp}
-     * basic_hashed_string<char> hs{"my.png"};
-     * @endcode
-     *
-     * @tparam N Number of characters of the identifier.
-     * @param curr Human-readable identifer.
-     */
-    template<std::size_t N>
-    constexpr basic_hashed_string(const value_type (&curr)[N]) ENTT_NOEXCEPT
-        : str{curr}, hash{helper(curr)}
-    {}
-
-    /**
-     * @brief Explicit constructor on purpose to avoid constructing a hashed
-     * string directly from a `const value_type *`.
-     * @param wrapper Helps achieving the purpose by relying on overloading.
-     */
-    explicit constexpr basic_hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
-        : str{wrapper.str}, hash{helper(wrapper.str)}
-    {}
-
-    /**
-     * @brief Returns the human-readable representation of a hashed string.
-     * @return The string used to initialize the instance.
-     */
-    constexpr const value_type * data() const ENTT_NOEXCEPT {
-        return str;
-    }
-
-    /**
-     * @brief Returns the numeric representation of a hashed string.
-     * @return The numeric representation of the instance.
-     */
-    constexpr hash_type value() const ENTT_NOEXCEPT {
-        return hash;
-    }
-
-    /*! @copydoc data */
-    constexpr operator const value_type *() const ENTT_NOEXCEPT { return data(); }
-
-    /**
-     * @brief Returns the numeric representation of a hashed string.
-     * @return The numeric representation of the instance.
-     */
-    constexpr operator hash_type() const ENTT_NOEXCEPT { return value(); }
-
-    /**
-     * @brief Compares two hashed strings.
-     * @param other Hashed string with which to compare.
-     * @return True if the two hashed strings are identical, false otherwise.
-     */
-    constexpr bool operator==(const basic_hashed_string &other) const ENTT_NOEXCEPT {
-        return hash == other.hash;
-    }
-
-private:
-    const value_type *str;
-    hash_type hash;
-};
-
-
-/**
- * @brief Deduction guide.
- *
- * It allows to deduce the character type of the hashed string directly from a
- * human-readable identifer provided to the constructor.
- *
- * @tparam Char Character type.
- * @tparam N Number of characters of the identifier.
- * @param str Human-readable identifer.
- */
-template<typename Char, std::size_t N>
-basic_hashed_string(const Char (&str)[N]) ENTT_NOEXCEPT
--> basic_hashed_string<Char>;
-
-
-/**
- * @brief Compares two hashed strings.
- * @tparam Char Character type.
- * @param lhs A valid hashed string.
- * @param rhs A valid hashed string.
- * @return True if the two hashed strings are identical, false otherwise.
- */
-template<typename Char>
-constexpr bool operator!=(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
-
-
-/*! @brief Aliases for common character types. */
-using hashed_string = basic_hashed_string<char>;
-
-
-/*! @brief Aliases for common character types. */
-using hashed_wstring = basic_hashed_string<wchar_t>;
-
-
-}
-
-
-/**
- * @brief User defined literal for hashed strings.
- * @param str The literal without its suffix.
- * @return A properly initialized hashed string.
- */
-constexpr entt::hashed_string operator"" ENTT_HS_SUFFIX(const char *str, std::size_t) ENTT_NOEXCEPT {
-    return entt::hashed_string{str};
-}
-
-
-/**
- * @brief User defined literal for hashed wstrings.
- * @param str The literal without its suffix.
- * @return A properly initialized hashed wstring.
- */
-constexpr entt::hashed_wstring operator"" ENTT_HWS_SUFFIX(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
-    return entt::hashed_wstring{str};
-}
-
-
-#endif
+// #include "fwd.hpp"
 
 
 
@@ -2802,10 +2200,10 @@ using member_class_t = typename member_class<Member>::type;
 
 /**
  * @brief Alias template to ease the creation of named values.
- * @tparam Value A constant value at least convertible to `ENTT_ID_TYPE`.
+ * @tparam Value A constant value at least convertible to `id_type`.
  */
-template<ENTT_ID_TYPE Value>
-using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
+template<id_type Value>
+using tag = std::integral_constant<id_type, Value>;
 
 
 }
@@ -3782,34 +3180,6 @@ sink(sigh<Ret(Args...)> &) ENTT_NOEXCEPT -> sink<Ret(Args...)>;
 
 #endif
 
-// #include "runtime_view.hpp"
-#ifndef ENTT_ENTITY_RUNTIME_VIEW_HPP
-#define ENTT_ENTITY_RUNTIME_VIEW_HPP
-
-
-#include <iterator>
-#include <vector>
-#include <utility>
-#include <algorithm>
-#include <type_traits>
-// #include "../config/config.h"
-
-// #include "sparse_set.hpp"
-#ifndef ENTT_ENTITY_SPARSE_SET_HPP
-#define ENTT_ENTITY_SPARSE_SET_HPP
-
-
-#include <algorithm>
-#include <iterator>
-#include <utility>
-#include <vector>
-#include <memory>
-#include <cstddef>
-#include <type_traits>
-// #include "../config/config.h"
-
-// #include "../core/algorithm.hpp"
-
 // #include "entity.hpp"
 #ifndef ENTT_ENTITY_ENTITY_HPP
 #define ENTT_ENTITY_ENTITY_HPP
@@ -3820,6 +3190,8 @@ sink(sigh<Ret(Args...)> &) ENTT_NOEXCEPT -> sink<Ret(Args...)>;
 // #include "../config/config.h"
 
 // #include "../core/type_traits.hpp"
+
+// #include "../core/fwd.hpp"
 
 
 
@@ -3974,6 +3346,10 @@ constexpr bool operator!=(const Entity entity, null other) ENTT_NOEXCEPT {
  */
 
 
+/*! @brief Default entity identifier. */
+ENTT_OPAQUE_TYPE(entity, id_type);
+
+
 /**
  * @brief Compile-time constant for null entities.
  *
@@ -3994,45 +3370,11 @@ constexpr auto null = internal::null{};
 #define ENTT_ENTITY_FWD_HPP
 
 
-// #include "../config/config.h"
-
-// #include "../core/type_traits.hpp"
+// #include "../core/fwd.hpp"
 
 
 
 namespace entt {
-
-
-/**
- * @brief Alias for exclusion lists.
- * @tparam Type List of types.
- */
-template<typename... Type>
-struct exclude_t: type_list<Type...> {};
-
-
-/**
- * @brief Variable template for exclusion lists.
- * @tparam Type List of types.
- */
-template<typename... Type>
-constexpr exclude_t<Type...> exclude{};
-
-
-/**
- * @brief Alias for lists of observed components.
- * @tparam Type List of types.
- */
-template<typename... Type>
-struct get_t: type_list<Type...>{};
-
-
-/**
- * @brief Variable template for lists of observed components.
- * @tparam Type List of types.
- */
-template<typename... Type>
-constexpr get_t<Type...> get{};
 
 
 /*! @class basic_registry */
@@ -4071,8 +3413,8 @@ class basic_snapshot_loader;
 template<typename>
 class basic_continuous_loader;
 
-/*! @brief Alias declaration for the most common use case. */
-ENTT_OPAQUE_TYPE(entity, ENTT_ID_TYPE);
+/*! @class entity */
+enum class entity: id_type;
 
 /*! @brief Alias declaration for the most common use case. */
 using registry = basic_registry<entity>;
@@ -4115,6 +3457,38 @@ using group = basic_group<entity, Types...>;
 
 #endif
 
+// #include "group.hpp"
+#ifndef ENTT_ENTITY_GROUP_HPP
+#define ENTT_ENTITY_GROUP_HPP
+
+
+#include <tuple>
+#include <utility>
+#include <type_traits>
+// #include "../config/config.h"
+
+// #include "../core/type_traits.hpp"
+
+// #include "sparse_set.hpp"
+#ifndef ENTT_ENTITY_SPARSE_SET_HPP
+#define ENTT_ENTITY_SPARSE_SET_HPP
+
+
+#include <algorithm>
+#include <iterator>
+#include <utility>
+#include <vector>
+#include <memory>
+#include <cstddef>
+#include <type_traits>
+// #include "../config/config.h"
+
+// #include "../core/algorithm.hpp"
+
+// #include "entity.hpp"
+
+// #include "fwd.hpp"
+
 
 
 namespace entt {
@@ -4154,7 +3528,7 @@ class sparse_set {
     static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0));
     static constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(typename traits_type::entity_type);
 
-    class iterator {
+    class iterator final {
         friend class sparse_set<Entity>;
 
         using direct_type = std::vector<Entity>;
@@ -4469,10 +3843,16 @@ public:
      *
      * @param entt A valid entity identifier.
      */
-    void construct(const entity_type entt) {
+    void emplace(const entity_type entt) {
         ENTT_ASSERT(!has(entt));
         assure(page(entt))[offset(entt)] = entity_type(direct.size());
         direct.push_back(entt);
+    }
+
+    /*! @copydoc emplace */
+    [[deprecated("use ::emplace instead")]]
+    void construct(const entity_type entt) {
+        emplace(entt);
     }
 
     /**
@@ -4489,13 +3869,20 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    void construct(It first, It last) {
+    void insert(It first, It last) {
         std::for_each(first, last, [this, next = direct.size()](const auto entt) mutable {
             ENTT_ASSERT(!has(entt));
             assure(page(entt))[offset(entt)] = entity_type(next++);
         });
 
         direct.insert(direct.end(), first, last);
+    }
+
+    /*! @copydoc insert */
+    template<typename It>
+    [[deprecated("use ::insert instead")]]
+    void construct(It first, It last) {
+        insert(std::move(first), std::move(last));
     }
 
     /**
@@ -4708,873 +4095,6 @@ private:
 
 #endif
 
-// #include "entity.hpp"
-
-// #include "fwd.hpp"
-
-
-
-namespace entt {
-
-
-/**
- * @brief Runtime view.
- *
- * Runtime views iterate over those entities that have at least all the given
- * components in their bags. During initialization, a runtime view looks at the
- * number of entities available for each component and picks up a reference to
- * the smallest set of candidate entities in order to get a performance boost
- * when iterate.<br/>
- * Order of elements during iterations are highly dependent on the order of the
- * underlying data structures. See sparse_set and its specializations for more
- * details.
- *
- * @b Important
- *
- * Iterators aren't invalidated if:
- *
- * * New instances of the given components are created and assigned to entities.
- * * The entity currently pointed is modified (as an example, if one of the
- *   given components is removed from the entity to which the iterator points).
- * * The entity currently pointed is destroyed.
- *
- * In all the other cases, modifying the pools of the given components in any
- * way invalidates all the iterators and using them results in undefined
- * behavior.
- *
- * @note
- * Views share references to the underlying data structures of the registry that
- * generated them. Therefore any change to the entities and to the components
- * made by means of the registry are immediately reflected by the views, unless
- * a pool was missing when the view was built (in this case, the view won't
- * have a valid reference and won't be updated accordingly).
- *
- * @warning
- * Lifetime of a view must not overcome that of the registry that generated it.
- * In any other case, attempting to use a view results in undefined behavior.
- *
- * @tparam Entity A valid entity type (see entt_traits for more details).
- */
-template<typename Entity>
-class basic_runtime_view {
-    /*! @brief A registry is allowed to create views. */
-    friend class basic_registry<Entity>;
-
-    using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
-
-    class iterator {
-        friend class basic_runtime_view<Entity>;
-
-        using direct_type = std::vector<const sparse_set<Entity> *>;
-
-        iterator(const direct_type *all, underlying_iterator_type curr) ENTT_NOEXCEPT
-            : pools{all},
-              it{curr}
-        {
-            if(it != (*pools)[0]->end() && !valid()) {
-                ++(*this);
-            }
-        }
-
-        bool valid() const {
-            return std::all_of(pools->begin()++, pools->end(), [entt = *it](const auto *curr) {
-                return curr->has(entt);
-            });
-        }
-
-    public:
-        using difference_type = typename underlying_iterator_type::difference_type;
-        using value_type = typename underlying_iterator_type::value_type;
-        using pointer = typename underlying_iterator_type::pointer;
-        using reference = typename underlying_iterator_type::reference;
-        using iterator_category = std::bidirectional_iterator_tag;
-
-        iterator() ENTT_NOEXCEPT = default;
-
-        iterator & operator++() {
-            while(++it != (*pools)[0]->end() && !valid());
-            return *this;
-        }
-
-        iterator operator++(int) {
-            iterator orig = *this;
-            return operator++(), orig;
-        }
-
-        iterator & operator--() ENTT_NOEXCEPT {
-            while(--it != (*pools)[0]->begin() && !valid());
-            return *this;
-        }
-
-        iterator operator--(int) ENTT_NOEXCEPT {
-            iterator orig = *this;
-            return operator--(), orig;
-        }
-
-        bool operator==(const iterator &other) const ENTT_NOEXCEPT {
-            return other.it == it;
-        }
-
-        bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
-            return !(*this == other);
-        }
-
-        pointer operator->() const {
-            return it.operator->();
-        }
-
-        reference operator*() const {
-            return *operator->();
-        }
-
-    private:
-        const direct_type *pools;
-        underlying_iterator_type it;
-    };
-
-    basic_runtime_view(std::vector<const sparse_set<Entity> *> others) ENTT_NOEXCEPT
-        : pools{std::move(others)}
-    {
-        const auto it = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
-            return (!lhs && rhs) || (lhs && rhs && lhs->size() < rhs->size());
-        });
-
-        // brings the best candidate (if any) on front of the vector
-        std::rotate(pools.begin(), it, pools.end());
-    }
-
-    bool valid() const {
-        return !pools.empty() && pools.front();
-    }
-
-public:
-    /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
-    /*! @brief Unsigned integer type. */
-    using size_type = std::size_t;
-    /*! @brief Input iterator type. */
-    using iterator_type = iterator;
-
-    /**
-     * @brief Estimates the number of entities that have the given components.
-     * @return Estimated number of entities that have the given components.
-     */
-    size_type size() const {
-        return valid() ? pools.front()->size() : size_type{};
-    }
-
-    /**
-     * @brief Checks if the view is definitely empty.
-     * @return True if the view is definitely empty, false otherwise.
-     */
-    bool empty() const {
-        return !valid() || pools.front()->empty();
-    }
-
-    /**
-     * @brief Returns an iterator to the first entity that has the given
-     * components.
-     *
-     * The returned iterator points to the first entity that has the given
-     * components. If the view is empty, the returned iterator will be equal to
-     * `end()`.
-     *
-     * @note
-     * Input iterators stay true to the order imposed to the underlying data
-     * structures.
-     *
-     * @return An iterator to the first entity that has the given components.
-     */
-    iterator_type begin() const {
-        iterator_type it{};
-
-        if(valid()) {
-            it = { &pools, pools[0]->begin() };
-        }
-
-        return it;
-    }
-
-    /**
-     * @brief Returns an iterator that is past the last entity that has the
-     * given components.
-     *
-     * The returned iterator points to the entity following the last entity that
-     * has the given components. Attempting to dereference the returned iterator
-     * results in undefined behavior.
-     *
-     * @note
-     * Input iterators stay true to the order imposed to the underlying data
-     * structures.
-     *
-     * @return An iterator to the entity following the last entity that has the
-     * given components.
-     */
-    iterator_type end() const {
-        iterator_type it{};
-
-        if(valid()) {
-            it = { &pools, pools[0]->end() };
-        }
-
-        return it;
-    }
-
-    /**
-     * @brief Checks if a view contains an entity.
-     * @param entt A valid entity identifier.
-     * @return True if the view contains the given entity, false otherwise.
-     */
-    bool contains(const entity_type entt) const {
-        return valid() && std::all_of(pools.cbegin(), pools.cend(), [entt](const auto *view) {
-            return view->find(entt) != view->end();
-        });
-    }
-
-    /**
-     * @brief Iterates entities and applies the given function object to them.
-     *
-     * The function object is invoked for each entity. It is provided only with
-     * the entity itself. To get the components, users can use the registry with
-     * which the view was built.<br/>
-     * The signature of the function should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(const entity_type);
-     * @endcode
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void each(Func func) const {
-        for(const auto entity: *this) {
-            func(entity);
-        }
-    }
-
-private:
-    std::vector<const sparse_set<Entity> *> pools;
-};
-
-
-}
-
-
-#endif
-
-// #include "sparse_set.hpp"
-
-// #include "snapshot.hpp"
-#ifndef ENTT_ENTITY_SNAPSHOT_HPP
-#define ENTT_ENTITY_SNAPSHOT_HPP
-
-
-#include <array>
-#include <cstddef>
-#include <utility>
-#include <iterator>
-#include <type_traits>
-#include <unordered_map>
-// #include "../config/config.h"
-
-// #include "entity.hpp"
-
-// #include "fwd.hpp"
-
-
-
-namespace entt {
-
-
-/**
- * @brief Utility class to create snapshots from a registry.
- *
- * A _snapshot_ can be either a dump of the entire registry or a narrower
- * selection of components of interest.<br/>
- * This type can be used in both cases if provided with a correctly configured
- * output archive.
- *
- * @tparam Entity A valid entity type (see entt_traits for more details).
- */
-template<typename Entity>
-class basic_snapshot {
-    /*! @brief A registry is allowed to create snapshots. */
-    friend class basic_registry<Entity>;
-
-    using follow_fn_type = Entity(const basic_registry<Entity> &, const Entity);
-    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
-
-    basic_snapshot(const basic_registry<Entity> *source, Entity init, follow_fn_type *fn) ENTT_NOEXCEPT
-        : reg{source},
-          seed{init},
-          follow{fn}
-    {}
-
-    template<typename Component, typename Archive, typename It>
-    void get(Archive &archive, std::size_t sz, It first, It last) const {
-        archive(typename traits_type::entity_type(sz));
-
-        while(first != last) {
-            const auto entt = *(first++);
-
-            if(reg->template has<Component>(entt)) {
-                if constexpr(std::is_empty_v<Component>) {
-                    archive(entt);
-                } else {
-                    archive(entt, reg->template get<Component>(entt));
-                }
-            }
-        }
-    }
-
-    template<typename... Component, typename Archive, typename It, std::size_t... Indexes>
-    void component(Archive &archive, It first, It last, std::index_sequence<Indexes...>) const {
-        std::array<std::size_t, sizeof...(Indexes)> size{};
-        auto begin = first;
-
-        while(begin != last) {
-            const auto entt = *(begin++);
-            ((reg->template has<Component>(entt) ? ++size[Indexes] : size[Indexes]), ...);
-        }
-
-        (get<Component>(archive, size[Indexes], first, last), ...);
-    }
-
-public:
-    /*! @brief Default move constructor. */
-    basic_snapshot(basic_snapshot &&) = default;
-
-    /*! @brief Default move assignment operator. @return This snapshot. */
-    basic_snapshot & operator=(basic_snapshot &&) = default;
-
-    /**
-     * @brief Puts aside all the entities that are still in use.
-     *
-     * Entities are serialized along with their versions. Destroyed entities are
-     * not taken in consideration by this function.
-     *
-     * @tparam Archive Type of output archive.
-     * @param archive A valid reference to an output archive.
-     * @return An object of this type to continue creating the snapshot.
-     */
-    template<typename Archive>
-    const basic_snapshot & entities(Archive &archive) const {
-        archive(typename traits_type::entity_type(reg->alive()));
-        reg->each([&archive](const auto entt) { archive(entt); });
-        return *this;
-    }
-
-    /**
-     * @brief Puts aside destroyed entities.
-     *
-     * Entities are serialized along with their versions. Entities that are
-     * still in use are not taken in consideration by this function.
-     *
-     * @tparam Archive Type of output archive.
-     * @param archive A valid reference to an output archive.
-     * @return An object of this type to continue creating the snapshot.
-     */
-    template<typename Archive>
-    const basic_snapshot & destroyed(Archive &archive) const {
-        auto size = reg->size() - reg->alive();
-        archive(typename traits_type::entity_type(size));
-
-        if(size) {
-            auto curr = seed;
-            archive(curr);
-
-            for(--size; size; --size) {
-                curr = follow(*reg, curr);
-                archive(curr);
-            }
-        }
-
-        return *this;
-    }
-
-    /**
-     * @brief Puts aside the given components.
-     *
-     * Each instance is serialized together with the entity to which it belongs.
-     * Entities are serialized along with their versions.
-     *
-     * @tparam Component Types of components to serialize.
-     * @tparam Archive Type of output archive.
-     * @param archive A valid reference to an output archive.
-     * @return An object of this type to continue creating the snapshot.
-     */
-    template<typename... Component, typename Archive>
-    const basic_snapshot & component(Archive &archive) const {
-        (component<Component>(archive, reg->template data<Component>(), reg->template data<Component>() + reg->template size<Component>()), ...);
-        return *this;
-    }
-
-    /**
-     * @brief Puts aside the given components for the entities in a range.
-     *
-     * Each instance is serialized together with the entity to which it belongs.
-     * Entities are serialized along with their versions.
-     *
-     * @tparam Component Types of components to serialize.
-     * @tparam Archive Type of output archive.
-     * @tparam It Type of input iterator.
-     * @param archive A valid reference to an output archive.
-     * @param first An iterator to the first element of the range to serialize.
-     * @param last An iterator past the last element of the range to serialize.
-     * @return An object of this type to continue creating the snapshot.
-     */
-    template<typename... Component, typename Archive, typename It>
-    const basic_snapshot & component(Archive &archive, It first, It last) const {
-        component<Component...>(archive, first, last, std::index_sequence_for<Component...>{});
-        return *this;
-    }
-
-private:
-    const basic_registry<Entity> *reg;
-    const Entity seed;
-    follow_fn_type *follow;
-};
-
-
-/**
- * @brief Utility class to restore a snapshot as a whole.
- *
- * A snapshot loader requires that the destination registry be empty and loads
- * all the data at once while keeping intact the identifiers that the entities
- * originally had.<br/>
- * An example of use is the implementation of a save/restore utility.
- *
- * @tparam Entity A valid entity type (see entt_traits for more details).
- */
-template<typename Entity>
-class basic_snapshot_loader {
-    /*! @brief A registry is allowed to create snapshot loaders. */
-    friend class basic_registry<Entity>;
-
-    using force_fn_type = void(basic_registry<Entity> &, const Entity, const bool);
-    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
-
-    basic_snapshot_loader(basic_registry<Entity> *source, force_fn_type *fn) ENTT_NOEXCEPT
-        : reg{source},
-          force{fn}
-    {
-        // to restore a snapshot as a whole requires a clean registry
-        ENTT_ASSERT(reg->empty());
-    }
-
-    template<typename Archive>
-    void assure(Archive &archive, bool discard) const {
-        typename traits_type::entity_type length{};
-        archive(length);
-
-        while(length--) {
-            Entity entt{};
-            archive(entt);
-            force(*reg, entt, discard);
-        }
-    }
-
-    template<typename Type, typename Archive, typename... Args>
-    void assign(Archive &archive, Args... args) const {
-        typename traits_type::entity_type length{};
-        archive(length);
-
-        while(length--) {
-            static constexpr auto discard = false;
-            Entity entt{};
-
-            if constexpr(std::is_empty_v<Type>) {
-                archive(entt);
-                force(*reg, entt, discard);
-                reg->template assign<Type>(args..., entt);
-            } else {
-                Type instance{};
-                archive(entt, instance);
-                force(*reg, entt, discard);
-                reg->template assign<Type>(args..., entt, std::as_const(instance));
-            }
-        }
-    }
-
-public:
-    /*! @brief Default move constructor. */
-    basic_snapshot_loader(basic_snapshot_loader &&) = default;
-
-    /*! @brief Default move assignment operator. @return This loader. */
-    basic_snapshot_loader & operator=(basic_snapshot_loader &&) = default;
-
-    /**
-     * @brief Restores entities that were in use during serialization.
-     *
-     * This function restores the entities that were in use during serialization
-     * and gives them the versions they originally had.
-     *
-     * @tparam Archive Type of input archive.
-     * @param archive A valid reference to an input archive.
-     * @return A valid loader to continue restoring data.
-     */
-    template<typename Archive>
-    const basic_snapshot_loader & entities(Archive &archive) const {
-        static constexpr auto discard = false;
-        assure(archive, discard);
-        return *this;
-    }
-
-    /**
-     * @brief Restores entities that were destroyed during serialization.
-     *
-     * This function restores the entities that were destroyed during
-     * serialization and gives them the versions they originally had.
-     *
-     * @tparam Archive Type of input archive.
-     * @param archive A valid reference to an input archive.
-     * @return A valid loader to continue restoring data.
-     */
-    template<typename Archive>
-    const basic_snapshot_loader & destroyed(Archive &archive) const {
-        static constexpr auto discard = true;
-        assure(archive, discard);
-        return *this;
-    }
-
-    /**
-     * @brief Restores components and assigns them to the right entities.
-     *
-     * The template parameter list must be exactly the same used during
-     * serialization. In the event that the entity to which the component is
-     * assigned doesn't exist yet, the loader will take care to create it with
-     * the version it originally had.
-     *
-     * @tparam Component Types of components to restore.
-     * @tparam Archive Type of input archive.
-     * @param archive A valid reference to an input archive.
-     * @return A valid loader to continue restoring data.
-     */
-    template<typename... Component, typename Archive>
-    const basic_snapshot_loader & component(Archive &archive) const {
-        (assign<Component>(archive), ...);
-        return *this;
-    }
-
-    /**
-     * @brief Destroys those entities that have no components.
-     *
-     * In case all the entities were serialized but only part of the components
-     * was saved, it could happen that some of the entities have no components
-     * once restored.<br/>
-     * This functions helps to identify and destroy those entities.
-     *
-     * @return A valid loader to continue restoring data.
-     */
-    const basic_snapshot_loader & orphans() const {
-        reg->orphans([this](const auto entt) {
-            reg->destroy(entt);
-        });
-
-        return *this;
-    }
-
-private:
-    basic_registry<Entity> *reg;
-    force_fn_type *force;
-};
-
-
-/**
- * @brief Utility class for _continuous loading_.
- *
- * A _continuous loader_ is designed to load data from a source registry to a
- * (possibly) non-empty destination. The loader can accomodate in a registry
- * more than one snapshot in a sort of _continuous loading_ that updates the
- * destination one step at a time.<br/>
- * Identifiers that entities originally had are not transferred to the target.
- * Instead, the loader maps remote identifiers to local ones while restoring a
- * snapshot.<br/>
- * An example of use is the implementation of a client-server applications with
- * the requirement of transferring somehow parts of the representation side to
- * side.
- *
- * @tparam Entity A valid entity type (see entt_traits for more details).
- */
-template<typename Entity>
-class basic_continuous_loader {
-    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
-
-    void destroy(Entity entt) {
-        const auto it = remloc.find(entt);
-
-        if(it == remloc.cend()) {
-            const auto local = reg->create();
-            remloc.emplace(entt, std::make_pair(local, true));
-            reg->destroy(local);
-        }
-    }
-
-    void restore(Entity entt) {
-        const auto it = remloc.find(entt);
-
-        if(it == remloc.cend()) {
-            const auto local = reg->create();
-            remloc.emplace(entt, std::make_pair(local, true));
-        } else {
-            remloc[entt].first = reg->valid(remloc[entt].first) ? remloc[entt].first : reg->create();
-            // set the dirty flag
-            remloc[entt].second = true;
-        }
-    }
-
-    template<typename Container>
-    auto update(int, Container &container)
-    -> decltype(typename Container::mapped_type{}, void()) {
-        // map like container
-        Container other;
-
-        for(auto &&pair: container) {
-            using first_type = std::remove_const_t<typename std::decay_t<decltype(pair)>::first_type>;
-            using second_type = typename std::decay_t<decltype(pair)>::second_type;
-
-            if constexpr(std::is_same_v<first_type, Entity> && std::is_same_v<second_type, Entity>) {
-                other.emplace(map(pair.first), map(pair.second));
-            } else if constexpr(std::is_same_v<first_type, Entity>) {
-                other.emplace(map(pair.first), std::move(pair.second));
-            } else {
-                static_assert(std::is_same_v<second_type, Entity>);
-                other.emplace(std::move(pair.first), map(pair.second));
-            }
-        }
-
-        std::swap(container, other);
-    }
-
-    template<typename Container>
-    auto update(char, Container &container)
-    -> decltype(typename Container::value_type{}, void()) {
-        // vector like container
-        static_assert(std::is_same_v<typename Container::value_type, Entity>);
-
-        for(auto &&entt: container) {
-            entt = map(entt);
-        }
-    }
-
-    template<typename Other, typename Type, typename Member>
-    void update([[maybe_unused]] Other &instance, [[maybe_unused]] Member Type:: *member) {
-        if constexpr(!std::is_same_v<Other, Type>) {
-            return;
-        } else if constexpr(std::is_same_v<Member, Entity>) {
-            instance.*member = map(instance.*member);
-        } else {
-            // maybe a container? let's try...
-            update(0, instance.*member);
-        }
-    }
-
-    template<typename Archive>
-    void assure(Archive &archive, void(basic_continuous_loader:: *member)(Entity)) {
-        typename traits_type::entity_type length{};
-        archive(length);
-
-        while(length--) {
-            Entity entt{};
-            archive(entt);
-            (this->*member)(entt);
-        }
-    }
-
-    template<typename Component>
-    void reset() {
-        for(auto &&ref: remloc) {
-            const auto local = ref.second.first;
-
-            if(reg->valid(local)) {
-                reg->template remove_if_exists<Component>(local);
-            }
-        }
-    }
-
-    template<typename Other, typename Archive, typename... Type, typename... Member>
-    void assign(Archive &archive, [[maybe_unused]] Member Type:: *... member) {
-        typename traits_type::entity_type length{};
-        archive(length);
-
-        while(length--) {
-            Entity entt{};
-
-            if constexpr(std::is_empty_v<Other>) {
-                archive(entt);
-                restore(entt);
-                reg->template assign_or_replace<Other>(map(entt));
-            } else {
-                Other instance{};
-                archive(entt, instance);
-                (update(instance, member), ...);
-                restore(entt);
-                reg->template assign_or_replace<Other>(map(entt), std::as_const(instance));
-            }
-        }
-    }
-
-public:
-    /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
-
-    /**
-     * @brief Constructs a loader that is bound to a given registry.
-     * @param source A valid reference to a registry.
-     */
-    basic_continuous_loader(basic_registry<entity_type> &source) ENTT_NOEXCEPT
-        : reg{&source}
-    {}
-
-    /*! @brief Default move constructor. */
-    basic_continuous_loader(basic_continuous_loader &&) = default;
-
-    /*! @brief Default move assignment operator. @return This loader. */
-    basic_continuous_loader & operator=(basic_continuous_loader &&) = default;
-
-    /**
-     * @brief Restores entities that were in use during serialization.
-     *
-     * This function restores the entities that were in use during serialization
-     * and creates local counterparts for them if required.
-     *
-     * @tparam Archive Type of input archive.
-     * @param archive A valid reference to an input archive.
-     * @return A non-const reference to this loader.
-     */
-    template<typename Archive>
-    basic_continuous_loader & entities(Archive &archive) {
-        assure(archive, &basic_continuous_loader::restore);
-        return *this;
-    }
-
-    /**
-     * @brief Restores entities that were destroyed during serialization.
-     *
-     * This function restores the entities that were destroyed during
-     * serialization and creates local counterparts for them if required.
-     *
-     * @tparam Archive Type of input archive.
-     * @param archive A valid reference to an input archive.
-     * @return A non-const reference to this loader.
-     */
-    template<typename Archive>
-    basic_continuous_loader & destroyed(Archive &archive) {
-        assure(archive, &basic_continuous_loader::destroy);
-        return *this;
-    }
-
-    /**
-     * @brief Restores components and assigns them to the right entities.
-     *
-     * The template parameter list must be exactly the same used during
-     * serialization. In the event that the entity to which the component is
-     * assigned doesn't exist yet, the loader will take care to create a local
-     * counterpart for it.<br/>
-     * Members can be either data members of type entity_type or containers of
-     * entities. In both cases, the loader will visit them and update the
-     * entities by replacing each one with its local counterpart.
-     *
-     * @tparam Component Type of component to restore.
-     * @tparam Archive Type of input archive.
-     * @tparam Type Types of components to update with local counterparts.
-     * @tparam Member Types of members to update with their local counterparts.
-     * @param archive A valid reference to an input archive.
-     * @param member Members to update with their local counterparts.
-     * @return A non-const reference to this loader.
-     */
-    template<typename... Component, typename Archive, typename... Type, typename... Member>
-    basic_continuous_loader & component(Archive &archive, Member Type:: *... member) {
-        (reset<Component>(), ...);
-        (assign<Component>(archive, member...), ...);
-        return *this;
-    }
-
-    /**
-     * @brief Helps to purge entities that no longer have a conterpart.
-     *
-     * Users should invoke this member function after restoring each snapshot,
-     * unless they know exactly what they are doing.
-     *
-     * @return A non-const reference to this loader.
-     */
-    basic_continuous_loader & shrink() {
-        auto it = remloc.begin();
-
-        while(it != remloc.cend()) {
-            const auto local = it->second.first;
-            bool &dirty = it->second.second;
-
-            if(dirty) {
-                dirty = false;
-                ++it;
-            } else {
-                if(reg->valid(local)) {
-                    reg->destroy(local);
-                }
-
-                it = remloc.erase(it);
-            }
-        }
-
-        return *this;
-    }
-
-    /**
-     * @brief Destroys those entities that have no components.
-     *
-     * In case all the entities were serialized but only part of the components
-     * was saved, it could happen that some of the entities have no components
-     * once restored.<br/>
-     * This functions helps to identify and destroy those entities.
-     *
-     * @return A non-const reference to this loader.
-     */
-    basic_continuous_loader & orphans() {
-        reg->orphans([this](const auto entt) {
-            reg->destroy(entt);
-        });
-
-        return *this;
-    }
-
-    /**
-     * @brief Tests if a loader knows about a given entity.
-     * @param entt An entity identifier.
-     * @return True if `entity` is managed by the loader, false otherwise.
-     */
-    bool has(entity_type entt) const ENTT_NOEXCEPT {
-        return (remloc.find(entt) != remloc.cend());
-    }
-
-    /**
-     * @brief Returns the identifier to which an entity refers.
-     * @param entt An entity identifier.
-     * @return The local identifier if any, the null entity otherwise.
-     */
-    entity_type map(entity_type entt) const ENTT_NOEXCEPT {
-        const auto it = remloc.find(entt);
-        entity_type other = null;
-
-        if(it != remloc.cend()) {
-            other = it->second.first;
-        }
-
-        return other;
-    }
-
-private:
-    std::unordered_map<entity_type, std::pair<entity_type, bool>> remloc;
-    basic_registry<entity_type> *reg;
-};
-
-
-}
-
-
-#endif
-
 // #include "storage.hpp"
 #ifndef ENTT_ENTITY_STORAGE_HPP
 #define ENTT_ENTITY_STORAGE_HPP
@@ -5634,7 +4154,7 @@ class storage: public sparse_set<Entity> {
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     template<bool Const>
-    class iterator {
+    class iterator final {
         friend class storage<Entity, Type>;
 
         using instance_type = std::conditional_t<Const, const std::vector<Type>, std::vector<Type>>;
@@ -5899,7 +4419,7 @@ public:
      * @param args Parameters to use to construct an object for the entity.
      */
     template<typename... Args>
-    void construct(const entity_type entt, Args &&... args) {
+    void emplace(const entity_type entt, Args &&... args) {
         if constexpr(std::is_aggregate_v<object_type>) {
             instances.push_back(Type{std::forward<Args>(args)...});
         } else {
@@ -5908,6 +4428,13 @@ public:
 
         // entity goes after component in case constructor throws
         underlying_type::construct(entt);
+    }
+
+    /*! @copydoc emplace */
+    template<typename... Args>
+    [[deprecated("use ::emplace instead")]]
+    void construct(const entity_type entt, Args &&... args) {
+        emplace(entt, std::forward<Args>(args)...);
     }
 
     /**
@@ -5926,11 +4453,18 @@ public:
      * @param value An instance of the object to construct.
      */
     template<typename It>
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    construct(It first, It last, const object_type &value = {}) {
+    void insert(It first, It last, const object_type &value = {}) {
         instances.insert(instances.end(), std::distance(first, last), value);
         // entities go after components in case constructors throw
         underlying_type::construct(first, last);
+    }
+
+    /*! @copydoc insert */
+    template<typename It>
+    [[deprecated("use ::insert instead")]]
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
+    construct(It first, It last, const object_type &value = {}) {
+        insert(std::move(first), std::move(last), value);
     }
 
     /**
@@ -5946,11 +4480,18 @@ public:
      * @param value An iterator to the first element of the range of objects.
      */
     template<typename EIt, typename CIt>
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<EIt>::value_type, entity_type>, void>
-    construct(EIt first, EIt last, CIt value) {
+    void insert(EIt first, EIt last, CIt value) {
         instances.insert(instances.end(), value, value + std::distance(first, last));
         // entities go after components in case constructors throw
         underlying_type::construct(first, last);
+    }
+
+    /*! @copydoc insert */
+    template<typename EIt, typename CIt>
+    [[deprecated("use ::insert instead")]]
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<EIt>::value_type, entity_type>, void>
+    construct(EIt first, EIt last, CIt value) {
+        insert(std::move(first), std::move(last), std::move(value));
     }
 
     /**
@@ -6071,7 +4612,7 @@ class storage<Entity, Type, std::enable_if_t<ENTT_ENABLE_ETO(Type)>>: public spa
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
     using underlying_type = sparse_set<Entity>;
 
-    class iterator {
+    class iterator final {
         friend class storage<Entity, Type>;
 
         using index_type = typename traits_type::difference_type;
@@ -6257,9 +4798,20 @@ public:
      * @param entt A valid entity identifier.
      */
     template<typename... Args>
-    void construct(const entity_type entt, Args &&...) {
+    void emplace(const entity_type entt, Args &&...) {
         underlying_type::construct(entt);
     }
+
+    /**
+     * @copydoc emplace
+     * @param args Parameters to use to construct an object for the entity.
+     */
+    template<typename... Args>
+    [[deprecated("use ::emplace instead")]]
+    void construct(const entity_type entt, Args &&... args) {
+        emplace(entt, std::forward<Args>(args)...);
+    }
+
 
     /**
      * @brief Assigns one or more entities to a storage.
@@ -6275,9 +4827,19 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    construct(It first, It last, const object_type & = {}) {
+    void insert(It first, It last, const object_type & = {}) {
         underlying_type::construct(first, last);
+    }
+
+    /**
+     * @copydoc insert
+     * @param value An instance of the object to construct.
+     */
+    template<typename It>
+    [[deprecated("use ::insert instead")]]
+    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
+    construct(It first, It last, const object_type &value = {}) {
+        insert(std::move(first), std::move(last), value);
     }
 
     /*! @copydoc storage::sort */
@@ -6299,23 +4861,56 @@ public:
 
 #endif
 
-// #include "entity.hpp"
+// #include "utility.hpp"
+#ifndef ENTT_ENTITY_UTILITY_HPP
+#define ENTT_ENTITY_UTILITY_HPP
 
-// #include "group.hpp"
-#ifndef ENTT_ENTITY_GROUP_HPP
-#define ENTT_ENTITY_GROUP_HPP
-
-
-#include <tuple>
-#include <utility>
-#include <type_traits>
-// #include "../config/config.h"
 
 // #include "../core/type_traits.hpp"
 
-// #include "sparse_set.hpp"
 
-// #include "storage.hpp"
+
+namespace entt {
+
+
+/**
+ * @brief Alias for exclusion lists.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+struct exclude_t: type_list<Type...> {};
+
+
+/**
+ * @brief Variable template for exclusion lists.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+constexpr exclude_t<Type...> exclude{};
+
+
+/**
+ * @brief Alias for lists of observed components.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+struct get_t: type_list<Type...>{};
+
+
+/**
+ * @brief Variable template for lists of observed components.
+ * @tparam Type List of types.
+ */
+template<typename... Type>
+constexpr get_t<Type...> get{};
+
+
+}
+
+
+#endif
+
+// #include "entity.hpp"
 
 // #include "fwd.hpp"
 
@@ -7198,6 +5793,889 @@ private:
 
 #endif
 
+// #include "runtime_view.hpp"
+#ifndef ENTT_ENTITY_RUNTIME_VIEW_HPP
+#define ENTT_ENTITY_RUNTIME_VIEW_HPP
+
+
+#include <iterator>
+#include <vector>
+#include <utility>
+#include <algorithm>
+#include <type_traits>
+// #include "../config/config.h"
+
+// #include "sparse_set.hpp"
+
+// #include "fwd.hpp"
+
+
+
+namespace entt {
+
+
+/**
+ * @brief Runtime view.
+ *
+ * Runtime views iterate over those entities that have at least all the given
+ * components in their bags. During initialization, a runtime view looks at the
+ * number of entities available for each component and picks up a reference to
+ * the smallest set of candidate entities in order to get a performance boost
+ * when iterate.<br/>
+ * Order of elements during iterations are highly dependent on the order of the
+ * underlying data structures. See sparse_set and its specializations for more
+ * details.
+ *
+ * @b Important
+ *
+ * Iterators aren't invalidated if:
+ *
+ * * New instances of the given components are created and assigned to entities.
+ * * The entity currently pointed is modified (as an example, if one of the
+ *   given components is removed from the entity to which the iterator points).
+ * * The entity currently pointed is destroyed.
+ *
+ * In all the other cases, modifying the pools of the given components in any
+ * way invalidates all the iterators and using them results in undefined
+ * behavior.
+ *
+ * @note
+ * Views share references to the underlying data structures of the registry that
+ * generated them. Therefore any change to the entities and to the components
+ * made by means of the registry are immediately reflected by the views, unless
+ * a pool was missing when the view was built (in this case, the view won't
+ * have a valid reference and won't be updated accordingly).
+ *
+ * @warning
+ * Lifetime of a view must not overcome that of the registry that generated it.
+ * In any other case, attempting to use a view results in undefined behavior.
+ *
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
+template<typename Entity>
+class basic_runtime_view {
+    /*! @brief A registry is allowed to create views. */
+    friend class basic_registry<Entity>;
+
+    using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
+
+    class iterator final {
+        friend class basic_runtime_view<Entity>;
+
+        using direct_type = std::vector<const sparse_set<Entity> *>;
+
+        iterator(const direct_type *all, underlying_iterator_type curr) ENTT_NOEXCEPT
+            : pools{all},
+              it{curr}
+        {
+            if(it != (*pools)[0]->end() && !valid()) {
+                ++(*this);
+            }
+        }
+
+        bool valid() const {
+            return std::all_of(pools->begin()++, pools->end(), [entt = *it](const auto *curr) {
+                return curr->has(entt);
+            });
+        }
+
+    public:
+        using difference_type = typename underlying_iterator_type::difference_type;
+        using value_type = typename underlying_iterator_type::value_type;
+        using pointer = typename underlying_iterator_type::pointer;
+        using reference = typename underlying_iterator_type::reference;
+        using iterator_category = std::bidirectional_iterator_tag;
+
+        iterator() ENTT_NOEXCEPT = default;
+
+        iterator & operator++() {
+            while(++it != (*pools)[0]->end() && !valid());
+            return *this;
+        }
+
+        iterator operator++(int) {
+            iterator orig = *this;
+            return operator++(), orig;
+        }
+
+        iterator & operator--() ENTT_NOEXCEPT {
+            while(--it != (*pools)[0]->begin() && !valid());
+            return *this;
+        }
+
+        iterator operator--(int) ENTT_NOEXCEPT {
+            iterator orig = *this;
+            return operator--(), orig;
+        }
+
+        bool operator==(const iterator &other) const ENTT_NOEXCEPT {
+            return other.it == it;
+        }
+
+        bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
+            return !(*this == other);
+        }
+
+        pointer operator->() const {
+            return it.operator->();
+        }
+
+        reference operator*() const {
+            return *operator->();
+        }
+
+    private:
+        const direct_type *pools;
+        underlying_iterator_type it;
+    };
+
+    basic_runtime_view(std::vector<const sparse_set<Entity> *> others) ENTT_NOEXCEPT
+        : pools{std::move(others)}
+    {
+        const auto it = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
+            return (!lhs && rhs) || (lhs && rhs && lhs->size() < rhs->size());
+        });
+
+        // brings the best candidate (if any) on front of the vector
+        std::rotate(pools.begin(), it, pools.end());
+    }
+
+    bool valid() const {
+        return !pools.empty() && pools.front();
+    }
+
+public:
+    /*! @brief Underlying entity identifier. */
+    using entity_type = Entity;
+    /*! @brief Unsigned integer type. */
+    using size_type = std::size_t;
+    /*! @brief Input iterator type. */
+    using iterator_type = iterator;
+
+    /**
+     * @brief Estimates the number of entities that have the given components.
+     * @return Estimated number of entities that have the given components.
+     */
+    size_type size() const {
+        return valid() ? pools.front()->size() : size_type{};
+    }
+
+    /**
+     * @brief Checks if the view is definitely empty.
+     * @return True if the view is definitely empty, false otherwise.
+     */
+    bool empty() const {
+        return !valid() || pools.front()->empty();
+    }
+
+    /**
+     * @brief Returns an iterator to the first entity that has the given
+     * components.
+     *
+     * The returned iterator points to the first entity that has the given
+     * components. If the view is empty, the returned iterator will be equal to
+     * `end()`.
+     *
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the first entity that has the given components.
+     */
+    iterator_type begin() const {
+        iterator_type it{};
+
+        if(valid()) {
+            it = { &pools, pools[0]->begin() };
+        }
+
+        return it;
+    }
+
+    /**
+     * @brief Returns an iterator that is past the last entity that has the
+     * given components.
+     *
+     * The returned iterator points to the entity following the last entity that
+     * has the given components. Attempting to dereference the returned iterator
+     * results in undefined behavior.
+     *
+     * @note
+     * Input iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the entity following the last entity that has the
+     * given components.
+     */
+    iterator_type end() const {
+        iterator_type it{};
+
+        if(valid()) {
+            it = { &pools, pools[0]->end() };
+        }
+
+        return it;
+    }
+
+    /**
+     * @brief Checks if a view contains an entity.
+     * @param entt A valid entity identifier.
+     * @return True if the view contains the given entity, false otherwise.
+     */
+    bool contains(const entity_type entt) const {
+        return valid() && std::all_of(pools.cbegin(), pools.cend(), [entt](const auto *view) {
+            return view->find(entt) != view->end();
+        });
+    }
+
+    /**
+     * @brief Iterates entities and applies the given function object to them.
+     *
+     * The function object is invoked for each entity. It is provided only with
+     * the entity itself. To get the components, users can use the registry with
+     * which the view was built.<br/>
+     * The signature of the function should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * void(const entity_type);
+     * @endcode
+     *
+     * @tparam Func Type of the function object to invoke.
+     * @param func A valid function object.
+     */
+    template<typename Func>
+    void each(Func func) const {
+        for(const auto entity: *this) {
+            func(entity);
+        }
+    }
+
+private:
+    std::vector<const sparse_set<Entity> *> pools;
+};
+
+
+}
+
+
+#endif
+
+// #include "snapshot.hpp"
+#ifndef ENTT_ENTITY_SNAPSHOT_HPP
+#define ENTT_ENTITY_SNAPSHOT_HPP
+
+
+#include <array>
+#include <cstddef>
+#include <utility>
+#include <iterator>
+#include <type_traits>
+#include <unordered_map>
+// #include "../config/config.h"
+
+// #include "entity.hpp"
+
+// #include "fwd.hpp"
+
+
+
+namespace entt {
+
+
+/**
+ * @brief Utility class to create snapshots from a registry.
+ *
+ * A _snapshot_ can be either a dump of the entire registry or a narrower
+ * selection of components of interest.<br/>
+ * This type can be used in both cases if provided with a correctly configured
+ * output archive.
+ *
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
+template<typename Entity>
+class basic_snapshot {
+    /*! @brief A registry is allowed to create snapshots. */
+    friend class basic_registry<Entity>;
+
+    using follow_fn_type = Entity(const basic_registry<Entity> &, const Entity);
+    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
+
+    basic_snapshot(const basic_registry<Entity> *source, Entity init, follow_fn_type *fn) ENTT_NOEXCEPT
+        : reg{source},
+          seed{init},
+          follow{fn}
+    {}
+
+    template<typename Component, typename Archive, typename It>
+    void get(Archive &archive, std::size_t sz, It first, It last) const {
+        archive(typename traits_type::entity_type(sz));
+
+        while(first != last) {
+            const auto entt = *(first++);
+
+            if(reg->template has<Component>(entt)) {
+                if constexpr(std::is_empty_v<Component>) {
+                    archive(entt);
+                } else {
+                    archive(entt, reg->template get<Component>(entt));
+                }
+            }
+        }
+    }
+
+    template<typename... Component, typename Archive, typename It, std::size_t... Indexes>
+    void component(Archive &archive, It first, It last, std::index_sequence<Indexes...>) const {
+        std::array<std::size_t, sizeof...(Indexes)> size{};
+        auto begin = first;
+
+        while(begin != last) {
+            const auto entt = *(begin++);
+            ((reg->template has<Component>(entt) ? ++size[Indexes] : size[Indexes]), ...);
+        }
+
+        (get<Component>(archive, size[Indexes], first, last), ...);
+    }
+
+public:
+    /*! @brief Default move constructor. */
+    basic_snapshot(basic_snapshot &&) = default;
+
+    /*! @brief Default move assignment operator. @return This snapshot. */
+    basic_snapshot & operator=(basic_snapshot &&) = default;
+
+    /**
+     * @brief Puts aside all the entities that are still in use.
+     *
+     * Entities are serialized along with their versions. Destroyed entities are
+     * not taken in consideration by this function.
+     *
+     * @tparam Archive Type of output archive.
+     * @param archive A valid reference to an output archive.
+     * @return An object of this type to continue creating the snapshot.
+     */
+    template<typename Archive>
+    const basic_snapshot & entities(Archive &archive) const {
+        archive(typename traits_type::entity_type(reg->alive()));
+        reg->each([&archive](const auto entt) { archive(entt); });
+        return *this;
+    }
+
+    /**
+     * @brief Puts aside destroyed entities.
+     *
+     * Entities are serialized along with their versions. Entities that are
+     * still in use are not taken in consideration by this function.
+     *
+     * @tparam Archive Type of output archive.
+     * @param archive A valid reference to an output archive.
+     * @return An object of this type to continue creating the snapshot.
+     */
+    template<typename Archive>
+    const basic_snapshot & destroyed(Archive &archive) const {
+        auto size = reg->size() - reg->alive();
+        archive(typename traits_type::entity_type(size));
+
+        if(size) {
+            auto curr = seed;
+            archive(curr);
+
+            for(--size; size; --size) {
+                curr = follow(*reg, curr);
+                archive(curr);
+            }
+        }
+
+        return *this;
+    }
+
+    /**
+     * @brief Puts aside the given components.
+     *
+     * Each instance is serialized together with the entity to which it belongs.
+     * Entities are serialized along with their versions.
+     *
+     * @tparam Component Types of components to serialize.
+     * @tparam Archive Type of output archive.
+     * @param archive A valid reference to an output archive.
+     * @return An object of this type to continue creating the snapshot.
+     */
+    template<typename... Component, typename Archive>
+    const basic_snapshot & component(Archive &archive) const {
+        (component<Component>(archive, reg->template data<Component>(), reg->template data<Component>() + reg->template size<Component>()), ...);
+        return *this;
+    }
+
+    /**
+     * @brief Puts aside the given components for the entities in a range.
+     *
+     * Each instance is serialized together with the entity to which it belongs.
+     * Entities are serialized along with their versions.
+     *
+     * @tparam Component Types of components to serialize.
+     * @tparam Archive Type of output archive.
+     * @tparam It Type of input iterator.
+     * @param archive A valid reference to an output archive.
+     * @param first An iterator to the first element of the range to serialize.
+     * @param last An iterator past the last element of the range to serialize.
+     * @return An object of this type to continue creating the snapshot.
+     */
+    template<typename... Component, typename Archive, typename It>
+    const basic_snapshot & component(Archive &archive, It first, It last) const {
+        component<Component...>(archive, first, last, std::index_sequence_for<Component...>{});
+        return *this;
+    }
+
+private:
+    const basic_registry<Entity> *reg;
+    const Entity seed;
+    follow_fn_type *follow;
+};
+
+
+/**
+ * @brief Utility class to restore a snapshot as a whole.
+ *
+ * A snapshot loader requires that the destination registry be empty and loads
+ * all the data at once while keeping intact the identifiers that the entities
+ * originally had.<br/>
+ * An example of use is the implementation of a save/restore utility.
+ *
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
+template<typename Entity>
+class basic_snapshot_loader {
+    /*! @brief A registry is allowed to create snapshot loaders. */
+    friend class basic_registry<Entity>;
+
+    using force_fn_type = void(basic_registry<Entity> &, const Entity, const bool);
+    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
+
+    basic_snapshot_loader(basic_registry<Entity> *source, force_fn_type *fn) ENTT_NOEXCEPT
+        : reg{source},
+          force{fn}
+    {
+        // to restore a snapshot as a whole requires a clean registry
+        ENTT_ASSERT(reg->empty());
+    }
+
+    template<typename Archive>
+    void assure(Archive &archive, bool discard) const {
+        typename traits_type::entity_type length{};
+        archive(length);
+
+        while(length--) {
+            Entity entt{};
+            archive(entt);
+            force(*reg, entt, discard);
+        }
+    }
+
+    template<typename Type, typename Archive, typename... Args>
+    void assign(Archive &archive, Args... args) const {
+        typename traits_type::entity_type length{};
+        archive(length);
+
+        while(length--) {
+            static constexpr auto discard = false;
+            Entity entt{};
+
+            if constexpr(std::is_empty_v<Type>) {
+                archive(entt);
+                force(*reg, entt, discard);
+                reg->template assign<Type>(args..., entt);
+            } else {
+                Type instance{};
+                archive(entt, instance);
+                force(*reg, entt, discard);
+                reg->template assign<Type>(args..., entt, std::as_const(instance));
+            }
+        }
+    }
+
+public:
+    /*! @brief Default move constructor. */
+    basic_snapshot_loader(basic_snapshot_loader &&) = default;
+
+    /*! @brief Default move assignment operator. @return This loader. */
+    basic_snapshot_loader & operator=(basic_snapshot_loader &&) = default;
+
+    /**
+     * @brief Restores entities that were in use during serialization.
+     *
+     * This function restores the entities that were in use during serialization
+     * and gives them the versions they originally had.
+     *
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A valid loader to continue restoring data.
+     */
+    template<typename Archive>
+    const basic_snapshot_loader & entities(Archive &archive) const {
+        static constexpr auto discard = false;
+        assure(archive, discard);
+        return *this;
+    }
+
+    /**
+     * @brief Restores entities that were destroyed during serialization.
+     *
+     * This function restores the entities that were destroyed during
+     * serialization and gives them the versions they originally had.
+     *
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A valid loader to continue restoring data.
+     */
+    template<typename Archive>
+    const basic_snapshot_loader & destroyed(Archive &archive) const {
+        static constexpr auto discard = true;
+        assure(archive, discard);
+        return *this;
+    }
+
+    /**
+     * @brief Restores components and assigns them to the right entities.
+     *
+     * The template parameter list must be exactly the same used during
+     * serialization. In the event that the entity to which the component is
+     * assigned doesn't exist yet, the loader will take care to create it with
+     * the version it originally had.
+     *
+     * @tparam Component Types of components to restore.
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A valid loader to continue restoring data.
+     */
+    template<typename... Component, typename Archive>
+    const basic_snapshot_loader & component(Archive &archive) const {
+        (assign<Component>(archive), ...);
+        return *this;
+    }
+
+    /**
+     * @brief Destroys those entities that have no components.
+     *
+     * In case all the entities were serialized but only part of the components
+     * was saved, it could happen that some of the entities have no components
+     * once restored.<br/>
+     * This functions helps to identify and destroy those entities.
+     *
+     * @return A valid loader to continue restoring data.
+     */
+    const basic_snapshot_loader & orphans() const {
+        reg->orphans([this](const auto entt) {
+            reg->destroy(entt);
+        });
+
+        return *this;
+    }
+
+private:
+    basic_registry<Entity> *reg;
+    force_fn_type *force;
+};
+
+
+/**
+ * @brief Utility class for _continuous loading_.
+ *
+ * A _continuous loader_ is designed to load data from a source registry to a
+ * (possibly) non-empty destination. The loader can accomodate in a registry
+ * more than one snapshot in a sort of _continuous loading_ that updates the
+ * destination one step at a time.<br/>
+ * Identifiers that entities originally had are not transferred to the target.
+ * Instead, the loader maps remote identifiers to local ones while restoring a
+ * snapshot.<br/>
+ * An example of use is the implementation of a client-server applications with
+ * the requirement of transferring somehow parts of the representation side to
+ * side.
+ *
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
+template<typename Entity>
+class basic_continuous_loader {
+    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
+
+    void destroy(Entity entt) {
+        const auto it = remloc.find(entt);
+
+        if(it == remloc.cend()) {
+            const auto local = reg->create();
+            remloc.emplace(entt, std::make_pair(local, true));
+            reg->destroy(local);
+        }
+    }
+
+    void restore(Entity entt) {
+        const auto it = remloc.find(entt);
+
+        if(it == remloc.cend()) {
+            const auto local = reg->create();
+            remloc.emplace(entt, std::make_pair(local, true));
+        } else {
+            remloc[entt].first = reg->valid(remloc[entt].first) ? remloc[entt].first : reg->create();
+            // set the dirty flag
+            remloc[entt].second = true;
+        }
+    }
+
+    template<typename Container>
+    auto update(int, Container &container)
+    -> decltype(typename Container::mapped_type{}, void()) {
+        // map like container
+        Container other;
+
+        for(auto &&pair: container) {
+            using first_type = std::remove_const_t<typename std::decay_t<decltype(pair)>::first_type>;
+            using second_type = typename std::decay_t<decltype(pair)>::second_type;
+
+            if constexpr(std::is_same_v<first_type, Entity> && std::is_same_v<second_type, Entity>) {
+                other.emplace(map(pair.first), map(pair.second));
+            } else if constexpr(std::is_same_v<first_type, Entity>) {
+                other.emplace(map(pair.first), std::move(pair.second));
+            } else {
+                static_assert(std::is_same_v<second_type, Entity>);
+                other.emplace(std::move(pair.first), map(pair.second));
+            }
+        }
+
+        std::swap(container, other);
+    }
+
+    template<typename Container>
+    auto update(char, Container &container)
+    -> decltype(typename Container::value_type{}, void()) {
+        // vector like container
+        static_assert(std::is_same_v<typename Container::value_type, Entity>);
+
+        for(auto &&entt: container) {
+            entt = map(entt);
+        }
+    }
+
+    template<typename Other, typename Type, typename Member>
+    void update([[maybe_unused]] Other &instance, [[maybe_unused]] Member Type:: *member) {
+        if constexpr(!std::is_same_v<Other, Type>) {
+            return;
+        } else if constexpr(std::is_same_v<Member, Entity>) {
+            instance.*member = map(instance.*member);
+        } else {
+            // maybe a container? let's try...
+            update(0, instance.*member);
+        }
+    }
+
+    template<typename Archive>
+    void assure(Archive &archive, void(basic_continuous_loader:: *member)(Entity)) {
+        typename traits_type::entity_type length{};
+        archive(length);
+
+        while(length--) {
+            Entity entt{};
+            archive(entt);
+            (this->*member)(entt);
+        }
+    }
+
+    template<typename Component>
+    void reset() {
+        for(auto &&ref: remloc) {
+            const auto local = ref.second.first;
+
+            if(reg->valid(local)) {
+                reg->template remove_if_exists<Component>(local);
+            }
+        }
+    }
+
+    template<typename Other, typename Archive, typename... Type, typename... Member>
+    void assign(Archive &archive, [[maybe_unused]] Member Type:: *... member) {
+        typename traits_type::entity_type length{};
+        archive(length);
+
+        while(length--) {
+            Entity entt{};
+
+            if constexpr(std::is_empty_v<Other>) {
+                archive(entt);
+                restore(entt);
+                reg->template assign_or_replace<Other>(map(entt));
+            } else {
+                Other instance{};
+                archive(entt, instance);
+                (update(instance, member), ...);
+                restore(entt);
+                reg->template assign_or_replace<Other>(map(entt), std::as_const(instance));
+            }
+        }
+    }
+
+public:
+    /*! @brief Underlying entity identifier. */
+    using entity_type = Entity;
+
+    /**
+     * @brief Constructs a loader that is bound to a given registry.
+     * @param source A valid reference to a registry.
+     */
+    basic_continuous_loader(basic_registry<entity_type> &source) ENTT_NOEXCEPT
+        : reg{&source}
+    {}
+
+    /*! @brief Default move constructor. */
+    basic_continuous_loader(basic_continuous_loader &&) = default;
+
+    /*! @brief Default move assignment operator. @return This loader. */
+    basic_continuous_loader & operator=(basic_continuous_loader &&) = default;
+
+    /**
+     * @brief Restores entities that were in use during serialization.
+     *
+     * This function restores the entities that were in use during serialization
+     * and creates local counterparts for them if required.
+     *
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A non-const reference to this loader.
+     */
+    template<typename Archive>
+    basic_continuous_loader & entities(Archive &archive) {
+        assure(archive, &basic_continuous_loader::restore);
+        return *this;
+    }
+
+    /**
+     * @brief Restores entities that were destroyed during serialization.
+     *
+     * This function restores the entities that were destroyed during
+     * serialization and creates local counterparts for them if required.
+     *
+     * @tparam Archive Type of input archive.
+     * @param archive A valid reference to an input archive.
+     * @return A non-const reference to this loader.
+     */
+    template<typename Archive>
+    basic_continuous_loader & destroyed(Archive &archive) {
+        assure(archive, &basic_continuous_loader::destroy);
+        return *this;
+    }
+
+    /**
+     * @brief Restores components and assigns them to the right entities.
+     *
+     * The template parameter list must be exactly the same used during
+     * serialization. In the event that the entity to which the component is
+     * assigned doesn't exist yet, the loader will take care to create a local
+     * counterpart for it.<br/>
+     * Members can be either data members of type entity_type or containers of
+     * entities. In both cases, the loader will visit them and update the
+     * entities by replacing each one with its local counterpart.
+     *
+     * @tparam Component Type of component to restore.
+     * @tparam Archive Type of input archive.
+     * @tparam Type Types of components to update with local counterparts.
+     * @tparam Member Types of members to update with their local counterparts.
+     * @param archive A valid reference to an input archive.
+     * @param member Members to update with their local counterparts.
+     * @return A non-const reference to this loader.
+     */
+    template<typename... Component, typename Archive, typename... Type, typename... Member>
+    basic_continuous_loader & component(Archive &archive, Member Type:: *... member) {
+        (reset<Component>(), ...);
+        (assign<Component>(archive, member...), ...);
+        return *this;
+    }
+
+    /**
+     * @brief Helps to purge entities that no longer have a conterpart.
+     *
+     * Users should invoke this member function after restoring each snapshot,
+     * unless they know exactly what they are doing.
+     *
+     * @return A non-const reference to this loader.
+     */
+    basic_continuous_loader & shrink() {
+        auto it = remloc.begin();
+
+        while(it != remloc.cend()) {
+            const auto local = it->second.first;
+            bool &dirty = it->second.second;
+
+            if(dirty) {
+                dirty = false;
+                ++it;
+            } else {
+                if(reg->valid(local)) {
+                    reg->destroy(local);
+                }
+
+                it = remloc.erase(it);
+            }
+        }
+
+        return *this;
+    }
+
+    /**
+     * @brief Destroys those entities that have no components.
+     *
+     * In case all the entities were serialized but only part of the components
+     * was saved, it could happen that some of the entities have no components
+     * once restored.<br/>
+     * This functions helps to identify and destroy those entities.
+     *
+     * @return A non-const reference to this loader.
+     */
+    basic_continuous_loader & orphans() {
+        reg->orphans([this](const auto entt) {
+            reg->destroy(entt);
+        });
+
+        return *this;
+    }
+
+    /**
+     * @brief Tests if a loader knows about a given entity.
+     * @param entt An entity identifier.
+     * @return True if `entity` is managed by the loader, false otherwise.
+     */
+    bool has(entity_type entt) const ENTT_NOEXCEPT {
+        return (remloc.find(entt) != remloc.cend());
+    }
+
+    /**
+     * @brief Returns the identifier to which an entity refers.
+     * @param entt An entity identifier.
+     * @return The local identifier if any, the null entity otherwise.
+     */
+    entity_type map(entity_type entt) const ENTT_NOEXCEPT {
+        const auto it = remloc.find(entt);
+        entity_type other = null;
+
+        if(it != remloc.cend()) {
+            other = it->second.first;
+        }
+
+        return other;
+    }
+
+private:
+    std::unordered_map<entity_type, std::pair<entity_type, bool>> remloc;
+    basic_registry<entity_type> *reg;
+};
+
+
+}
+
+
+#endif
+
+// #include "sparse_set.hpp"
+
+// #include "storage.hpp"
+
+// #include "utility.hpp"
+
 // #include "view.hpp"
 #ifndef ENTT_ENTITY_VIEW_HPP
 #define ENTT_ENTITY_VIEW_HPP
@@ -7216,6 +6694,8 @@ private:
 // #include "sparse_set.hpp"
 
 // #include "storage.hpp"
+
+// #include "utility.hpp"
 
 // #include "entity.hpp"
 
@@ -7283,9 +6763,8 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
     using unchecked_type = std::array<const sparse_set<Entity> *, (sizeof...(Component) - 1)>;
     using filter_type = std::array<const sparse_set<Entity> *, sizeof...(Exclude)>;
-    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
-    class iterator {
+    class iterator final {
         friend class basic_view<Entity, exclude_t<Exclude...>, Component...>;
 
         iterator(const sparse_set<Entity> *candidate, unchecked_type other, filter_type ignore, underlying_iterator_type curr) ENTT_NOEXCEPT
@@ -8042,8 +7521,6 @@ private:
 
 #endif
 
-// #include "fwd.hpp"
-
 
 
 namespace entt {
@@ -8064,7 +7541,7 @@ class basic_registry {
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     template<typename Component>
-    struct pool_handler: storage<Entity, Component> {
+    struct pool_handler final: storage<Entity, Component> {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>);
         std::size_t super{};
 
@@ -8072,7 +7549,7 @@ class basic_registry {
             return sink{construction};
         }
 
-        auto on_replace() ENTT_NOEXCEPT {
+        auto on_update() ENTT_NOEXCEPT {
             return sink{update};
         }
 
@@ -8081,19 +7558,18 @@ class basic_registry {
         }
 
         template<typename... Args>
-        decltype(auto) assign(basic_registry &owner, const Entity entt, Args &&... args) {
+        decltype(auto) emplace(basic_registry &owner, const Entity entt, Args &&... args) {
             this->construct(entt, std::forward<Args>(args)...);
             construction.publish(owner, entt);
             return this->get(entt);
         }
 
-        template<typename It, typename... Value>
-        std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, Entity>, void>
-        assign(basic_registry &owner, It first, It last, Value &&... value) {
-            this->construct(first, last, std::forward<Value>(value)...);
+        template<typename It, typename Value>
+        void insert(basic_registry &owner, It first, It last, Value &&value) {
+            this->construct(first, last, std::forward<Value>(value));
 
             if(!construction.empty()) {
-                std::for_each(first, last, [this, &owner](const auto entt) { construction.publish(owner, entt); });
+                while(first != last) { construction.publish(owner, *(first++)); }
             }
         }
 
@@ -8106,20 +7582,20 @@ class basic_registry {
         void remove(basic_registry &owner, It first, It last) {
             if(std::distance(first, last) == std::distance(this->begin(), this->end())) {
                 if(!destruction.empty()) {
-                    std::for_each(first, last, [this, &owner](const auto entt) { destruction.publish(owner, entt); });
+                    while(first != last) { destruction.publish(owner, *(first++)); }
                 }
 
                 this->clear();
             } else {
-                // useless this-> used to suppress a warning with clang
-                std::for_each(first, last, [this, &owner](const auto entt) { this->remove(owner, entt); });
+                while(first != last) { this->remove(owner, *(first++)); }
             }
         }
 
         template<typename... Func>
-        void replace(basic_registry &owner, const Entity entt, Func &&... func) {
+        decltype(auto) patch(basic_registry &owner, const Entity entt, Func &&... func) {
             (std::forward<Func>(func)(this->get(entt)), ...);
             update.publish(owner, entt);
+            return this->get(entt);
         }
 
     private:
@@ -8129,11 +7605,9 @@ class basic_registry {
     };
 
     struct pool_data {
-        ENTT_ID_TYPE type_id{};
+        id_type type_id{};
         std::unique_ptr<sparse_set<Entity>> pool{};
-        void(* assure)(basic_registry &, const sparse_set<Entity> &){};
         void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity){};
-        void(* stamp)(basic_registry &, const Entity, const sparse_set<Entity> &, const Entity){};
     };
 
     template<typename...>
@@ -8182,29 +7656,14 @@ class basic_registry {
     struct group_data {
         std::size_t size;
         std::unique_ptr<void, void(*)(void *)> group;
-        bool (* owned)(const ENTT_ID_TYPE) ENTT_NOEXCEPT;
-        bool (* get)(const ENTT_ID_TYPE) ENTT_NOEXCEPT;
-        bool (* exclude)(const ENTT_ID_TYPE) ENTT_NOEXCEPT;
+        bool (* owned)(const id_type) ENTT_NOEXCEPT;
+        bool (* get)(const id_type) ENTT_NOEXCEPT;
+        bool (* exclude)(const id_type) ENTT_NOEXCEPT;
     };
 
-    struct basic_variable {
-        virtual ~basic_variable() = default;
-        virtual ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT = 0;
-    };
-
-    template<typename Type>
-    struct variable_handler: basic_variable {
-        static_assert(std::is_same_v<Type, std::decay_t<Type>>);
-        Type value;
-
-        template<typename... Args>
-        variable_handler(Args &&... args)
-            : value{std::forward<Args>(args)...}
-        {}
-
-        ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT override {
-            return type_info<Type>::id();
-        }
+    struct variable_data {
+        id_type type_id;
+        std::unique_ptr<void, void(*)(void *)> value;
     };
 
     template<typename Component>
@@ -8215,28 +7674,13 @@ class basic_registry {
             for(index = {}; index < length && pools[index].type_id != type_info<Component>::id(); ++index);
 
             if(index == pools.size()) {
-                auto &&pdata = pools.emplace_back();
-
-                pdata.type_id = type_info<Component>::id();
-                pdata.pool.reset(new pool_handler<Component>());
-
-                pdata.remove = [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
-                    static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
-                };
-
-                if constexpr(std::is_copy_constructible_v<std::decay_t<Component>>) {
-                    pdata.assure = [](basic_registry &other, const sparse_set<entity_type> &cpool) {
-                        if constexpr(ENTT_ENABLE_ETO(Component)) {
-                            other.assure<Component>().assign(other, cpool.begin(), cpool.end());
-                        } else {
-                            other.assure<Component>().assign(other, cpool.begin(), cpool.end(), static_cast<const pool_handler<Component> &>(cpool).cbegin());
-                        }
-                    };
-
-                    pdata.stamp = [](basic_registry &other, const entity_type dst, const sparse_set<entity_type> &cpool, const entity_type src) {
-                        other.assign_or_replace<Component>(dst, static_cast<const pool_handler<Component> &>(cpool).get(src));
-                    };
-                }
+                pools.push_back(pool_data{
+                    type_info<Component>::id(),
+                    std::unique_ptr<sparse_set<entity_type>>{new pool_handler<Component>()},
+                    [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
+                        static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
+                    }
+                });
             }
         }
 
@@ -8271,7 +7715,6 @@ public:
      */
     template<typename Component>
     void prepare() {
-        ENTT_ASSERT(std::none_of(pools.cbegin(), pools.cend(), [](auto &&pdata) { return pdata.type_id == type_info<Component>::id(); }));
         assure<Component>();
     }
 
@@ -8615,8 +8058,7 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
-        // useless this-> used to suppress a warning with clang
-        std::for_each(first, last, [this](const auto entity) { this->destroy(entity); });
+        while(first != last) { destroy(*(first++)); }
     }
 
     /**
@@ -8640,15 +8082,22 @@ public:
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    decltype(auto) assign(const entity_type entity, Args &&... args) {
+    decltype(auto) emplace(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
-        return assure<Component>().assign(*this, entity, std::forward<Args>(args)...);
+        return assure<Component>().emplace(*this, entity, std::forward<Args>(args)...);
+    }
+
+    /*! @copydoc emplace */
+    template<typename Component, typename... Args>
+    [[deprecated("use ::emplace instead")]]
+    decltype(auto) assign(const entity_type entity, Args &&... args) {
+        return emplace<Component>(entity, std::forward<Args>(args)...);
     }
 
     /**
      * @brief Assigns each entity in a range the given component.
      *
-     * @sa assign
+     * @sa emplace
      *
      * @tparam Component Type of component to create.
      * @tparam It Type of input iterator.
@@ -8657,16 +8106,23 @@ public:
      * @param value An instance of the component to assign.
      */
     template<typename Component, typename It>
+    void insert(It first, It last, const Component &value = {}) {
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
+        assure<Component>().insert(*this, first, last, value);
+    }
+
+    /*! @copydoc insert */
+    template<typename Component, typename It>
+    [[deprecated("use ::insert instead")]]
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
     assign(It first, It last, const Component &value = {}) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        assure<Component>().assign(*this, first, last, value);
+        return insert(std::move(first), std::move(last), value);
     }
 
     /**
      * @brief Assigns each entity in a range the given components.
      *
-     * @sa assign
+     * @sa emplace
      *
      * @tparam Component Type of component to create.
      * @tparam EIt Type of input iterator.
@@ -8676,14 +8132,26 @@ public:
      * @param value An iterator to the first element of the range of components.
      */
     template<typename Component, typename EIt, typename CIt>
+    void insert(EIt first, EIt last, CIt value) {
+        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
+        assure<Component>().insert(*this, first, last, value);
+    }
+
+    /*! @copydoc insert */
+    template<typename Component, typename EIt, typename CIt>
+    [[deprecated("use ::insert instead")]]
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<EIt>::value_type, entity_type>, void>
     assign(EIt first, EIt last, CIt value) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        assure<Component>().assign(*this, first, last, value);
+        return insert<Component>(std::move(first), std::move(last), std::move(value));
     }
 
     /**
      * @brief Assigns entities to an empty registry.
+     *
+     * This function is intended for use in conjunction with `raw`.<br/>
+     * Don't try to inject ranges of randomly generated entities because there
+     * is no guarantee that the registry will continue to function properly in
+     * this case.
      *
      * @warning
      * An assertion will abort the execution at runtime in debug mode if all
@@ -8714,7 +8182,7 @@ public:
      * Equivalent to the following snippet (pseudocode):
      *
      * @code{.cpp}
-     * auto &component = registry.has<Component>(entity) ? registry.replace<Component>(entity, args...) : registry.assign<Component>(entity, args...);
+     * auto &component = registry.has<Component>(entity) ? registry.replace<Component>(entity, args...) : registry.emplace<Component>(entity, args...);
      * @endcode
      *
      * Prefer this function anyway because it has slightly better performance.
@@ -8731,17 +8199,24 @@ public:
      * @return A reference to the newly created component.
      */
     template<typename Component, typename... Args>
-    decltype(auto) assign_or_replace(const entity_type entity, Args &&... args) {
+    decltype(auto) emplace_or_replace(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
         auto &cpool = assure<Component>();
 
         return cpool.has(entity)
-                ? (cpool.replace(*this, entity, [&args...](auto &&component) { component = Component{std::forward<Args>(args)...}; }), cpool.get(entity))
-                : cpool.assign(*this, entity, std::forward<Args>(args)...);
+                ? (cpool.patch(*this, entity, [&args...](auto &&component) { component = Component{std::forward<Args>(args)...}; }), cpool.get(entity))
+                : cpool.emplace(*this, entity, std::forward<Args>(args)...);
+    }
+
+    /*! @copydoc emplace_or_replace */
+    template<typename Component, typename... Args>
+    [[deprecated("use ::emplace_or_replace instead")]]
+    decltype(auto) assign_or_replace(const entity_type entity, Args &&... args) {
+        return emplace_or_replace<Component>(entity, std::forward<Args>(args)...);
     }
 
     /**
-     * @brief Replaces the given component for an entity.
+     * @brief Patches the given component for an entity.
      *
      * The signature of the functions should be equivalent to the following:
      *
@@ -8752,20 +8227,36 @@ public:
      * Temporary objects are returned for empty types though. Capture them by
      * copy or by const reference if needed.
      *
-     * @tparam Component Type of component to replace.
+     * @warning
+     * Attempting to use an invalid entity or to patch a component of an entity
+     * that doesn't own it results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity doesn't own an instance of the given
+     * component.
+     *
+     * @tparam Component Type of component to patch.
      * @tparam Func Types of the function objects to invoke.
      * @param entity A valid entity identifier.
      * @param func Valid function objects.
+     * @return A reference to the patched component.
      */
     template<typename Component, typename... Func>
-    auto replace(const entity_type entity, Func &&... func)
-    -> decltype(std::enable_if_t<sizeof...(Func) != 0>(), (func(std::declval<Component &>()), ...), void()) {
+    [[deprecated("use registry::patch instead")]]
+    decltype(auto) patch(const entity_type entity, Func &&... func) {
         ENTT_ASSERT(valid(entity));
-        assure<Component>().replace(*this, entity, std::forward<Func>(func)...);
+        return assure<Component>().patch(*this, entity, std::forward<Func>(func)...);
+    }
+
+    /*! @copydoc patch */
+    template<typename Component, typename... Func>
+    [[deprecated("use registry::patch instead")]]
+    auto replace(const entity_type entity, Func &&... func)
+    -> decltype((func(assure<Component>().get(entity)), ...), assure<Component>().get(entity)) {
+        return patch<Component>(entity, std::forward<Func>(func)...);
     }
 
     /**
-     * @copybrief replace
+     * @brief Replaces the given component for an entity.
      *
      * A new instance of the given component is created and initialized with the
      * arguments provided (the component must have a proper constructor or be of
@@ -8785,14 +8276,11 @@ public:
      * @return A reference to the component being replaced.
      */
     template<typename Component, typename... Args>
-    [[deprecated("use in-place replace instead")]]
     auto replace(const entity_type entity, Args &&... args)
-    -> decltype(Component{std::forward<Args>(args)...}, assure<Component>().get(entity)) {
-        replace<Component>(entity, [args = std::forward_as_tuple(std::forward<Args>(args)...)](auto &&component) {
+    -> decltype(std::enable_if_t<sizeof...(Args) != 0>(), Component{std::forward<Args>(args)...}, assure<Component>().get(entity)) {
+        return patch<Component>(entity, [args = std::forward_as_tuple(std::forward<Args>(args)...)](auto &&component) {
             component = std::make_from_tuple<Component>(std::move(args));
         });
-
-        return assure<Component>().get(entity);
     }
 
     /**
@@ -8937,7 +8425,7 @@ public:
      * Equivalent to the following snippet (pseudocode):
      *
      * @code{.cpp}
-     * auto &component = registry.has<Component>(entity) ? registry.get<Component>(entity) : registry.assign<Component>(entity, args...);
+     * auto &component = registry.has<Component>(entity) ? registry.get<Component>(entity) : registry.emplace<Component>(entity, args...);
      * @endcode
      *
      * Prefer this function anyway because it has slightly better performance.
@@ -8957,7 +8445,7 @@ public:
     decltype(auto) get_or_assign(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
         auto &cpool = assure<Component>();
-        return cpool.has(entity) ? cpool.get(entity) : cpool.assign(*this, entity, std::forward<Args>(args)...);
+        return cpool.has(entity) ? cpool.get(entity) : cpool.emplace(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -9117,7 +8605,7 @@ public:
      *
      * A sink is an opaque object used to connect listeners to components.<br/>
      * The sink returned by this function can be used to receive notifications
-     * whenever an instance of the given component is explicitly replaced.
+     * whenever an instance of the given component is explicitly updated.
      *
      * The function type for a listener is equivalent to:
      *
@@ -9125,7 +8613,7 @@ public:
      * void(registry<Entity> &, Entity, Component &);
      * @endcode
      *
-     * Listeners are invoked **before** the component has been replaced.
+     * Listeners are invoked **before** the component has been updated.
      *
      * @note
      * Empty types aren't explicitly instantiated. Therefore, temporary objects
@@ -9138,8 +8626,15 @@ public:
      * @return A temporary sink object.
      */
     template<typename Component>
+    auto on_update() {
+        return assure<Component>().on_update();
+    }
+
+    /*! @copydoc on_update */
+    template<typename Component>
+    [[deprecated("use registry::on_update instead")]]
     auto on_replace() {
-        return assure<Component>().on_replace();
+        return on_update<Component>();
     }
 
     /**
@@ -9378,9 +8873,9 @@ public:
             group_data candidate = {
                 size,
                 { new handler_type{}, [](void *instance) { delete static_cast<handler_type *>(instance); } },
-                []([[maybe_unused]] const ENTT_ID_TYPE ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Owned>>::id()) || ...); },
-                []([[maybe_unused]] const ENTT_ID_TYPE ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Get>>::id()) || ...); },
-                []([[maybe_unused]] const ENTT_ID_TYPE ctype) ENTT_NOEXCEPT { return ((ctype == type_info<Exclude>::id()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Owned>>::id()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Get>>::id()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_info<Exclude>::id()) || ...); },
             };
 
             handler = static_cast<handler_type *>(candidate.group.get());
@@ -9426,9 +8921,9 @@ public:
                 }
             } else {
                 // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
-                std::for_each(std::get<0>(cpools).data(), std::get<0>(cpools).data() + std::get<0>(cpools).size(), [this, handler](const auto entity) {
-                    handler->template maybe_valid_if<std::tuple_element_t<0, std::tuple<std::decay_t<Owned>...>>>(*this, entity);
-                });
+                for(auto *first = std::get<0>(cpools).data(), *last = first + std::get<0>(cpools).size(); first != last; ++first) {
+                    handler->template maybe_valid_if<std::tuple_element_t<0, std::tuple<std::decay_t<Owned>...>>>(*this, *first);
+                }
             }
         }
 
@@ -9517,96 +9012,6 @@ public:
     }
 
     /**
-     * @brief Returns a full or partial copy of a registry.
-     *
-     * The components must be copyable for obvious reasons. The entities
-     * maintain their versions once copied.<br/>
-     * If no components are provided, the registry will try to clone all the
-     * existing pools. The ones for non-copyable types won't be cloned.
-     *
-     * This feature supports exclusion lists. The excluded types have higher
-     * priority than those indicated for cloning. An excluded type will never be
-     * cloned.
-     *
-     * @note
-     * There isn't an efficient way to know if all the entities are assigned at
-     * least one component once copied. Therefore, there may be orphans. It is
-     * up to the caller to clean up the registry if necessary.
-     *
-     * @note
-     * Listeners and groups aren't copied. It is up to the caller to connect the
-     * listeners of interest to the new registry and to set up groups.
-     *
-     * @warning
-     * Attempting to clone components that aren't copyable results in unexpected
-     * behaviors.<br/>
-     * A static assertion will abort the compilation when the components
-     * provided aren't copy constructible. Otherwise, an assertion will abort
-     * the execution at runtime in debug mode in case one or more pools cannot
-     * be cloned.
-     *
-     * @tparam Component Types of components to clone.
-     * @tparam Exclude Types of components not to be cloned.
-     * @return A fresh copy of the registry.
-     */
-    template<typename... Component, typename... Exclude>
-    [[deprecated("use ::visit and custom (eventually erased) functions instead")]]
-    basic_registry clone(exclude_t<Exclude...> = {}) const {
-        basic_registry other;
-
-        other.destroyed = destroyed;
-        other.entities = entities;
-
-        std::for_each(pools.cbegin(), pools.cend(), [&other](auto &&pdata) {
-            if constexpr(sizeof...(Component) == 0) {
-                if(pdata.assure && ((pdata.type_id != type_info<Exclude>::id()) && ...)) {
-                    pdata.assure(other, *pdata.pool);
-                }
-            } else {
-                static_assert(sizeof...(Exclude) == 0 && std::conjunction_v<std::is_copy_constructible<Component>...>);
-                if(pdata.assure && ((pdata.type_id == type_info<Component>::id()) || ...)) {
-                    pdata.assure(other, *pdata.pool);
-                }
-            }
-        });
-
-        return other;
-    }
-
-    /**
-     * @brief Stamps an entity onto another entity.
-     *
-     * This function supports exclusion lists. An excluded type will never be
-     * copied.
-     *
-     * @warning
-     * Attempting to copy components that aren't copyable results in unexpected
-     * behaviors.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case
-     * one or more types cannot be copied.
-     *
-     * @warning
-     * Attempting to use invalid entities results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entities.
-     *
-     * @tparam Exclude Types of components not to be copied.
-     * @param dst A valid entity identifier to copy to.
-     * @param other The registry that owns the source entity.
-     * @param src A valid entity identifier to be copied.
-     */
-    template<typename... Exclude>
-    [[deprecated("use ::visit and custom (eventually erased) functions instead")]]
-    void stamp(const entity_type dst, const basic_registry &other, const entity_type src, exclude_t<Exclude...> = {}) {
-        std::for_each(other.pools.cbegin(), other.pools.cend(), [this, dst, src](auto &&pdata) {
-            if(((pdata.type_id != type_info<Exclude>::id()) && ...) && pdata.pool->has(src)) {
-                ENTT_ASSERT(pdata.stamp);
-                pdata.stamp(*this, dst, *pdata.pool, src);
-            }
-        });
-    }
-
-    /**
      * @brief Returns a temporary object to use to create snapshots.
      *
      * A snapshot is either a full or a partial dump of a registry.<br/>
@@ -9682,7 +9087,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const ENTT_ID_TYPE);
+     * void(const id_type);
      * @endcode
      *
      * Returned identifiers are those of the components owned by the entity.
@@ -9712,7 +9117,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const ENTT_ID_TYPE);
+     * void(const id_type);
      * @endcode
      *
      * Returned identifiers are those of the components managed by the registry.
@@ -9747,8 +9152,8 @@ public:
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
         unset<Type>();
-        vars.emplace_back(new variable_handler<Type>{std::forward<Args>(args)...});
-        return static_cast<variable_handler<Type> &>(*vars.back()).value;
+        vars.push_back(variable_data{type_info<Type>::id(), { new Type{std::forward<Args>(args)...}, [](void *instance) { delete static_cast<Type *>(instance); } }});
+        return *static_cast<Type *>(vars.back().value.get());
     }
 
     /**
@@ -9757,8 +9162,8 @@ public:
      */
     template<typename Type>
     void unset() {
-        vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &&handler) {
-            return handler->type_id() == type_info<Type>::id();
+        vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &&var) {
+            return var.type_id == type_info<Type>::id();
         }), vars.end());
     }
 
@@ -9787,8 +9192,8 @@ public:
      */
     template<typename Type>
     const Type * try_ctx() const {
-        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&handler) { return handler->type_id() == type_info<Type>::id(); });
-        return it == vars.cend() ? nullptr : &static_cast<const variable_handler<Type> &>(*it->get()).value;
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&var) { return var.type_id == type_info<Type>::id(); });
+        return it == vars.cend() ? nullptr : static_cast<const Type *>(it->value.get());
     }
 
     /*! @copydoc try_ctx */
@@ -9828,7 +9233,7 @@ public:
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const ENTT_ID_TYPE);
+     * void(const id_type);
      * @endcode
      *
      * Returned identifiers are those of the context variables currently set.
@@ -9845,15 +9250,15 @@ public:
     template<typename Func>
     void ctx(Func func) const {
         for(auto pos = vars.size(); pos; --pos) {
-            func(vars[pos-1]->type_id());
+            func(vars[pos-1].type_id);
         }
     }
 
 private:
     std::vector<group_data> groups{};
     mutable std::vector<pool_data> pools{};
-    std::vector<std::unique_ptr<basic_variable>> vars{};
     std::vector<entity_type> entities{};
+    std::vector<variable_data> vars{};
     entity_type destroyed{null};
 };
 
@@ -10074,9 +9479,11 @@ private:
 
 
 #include <type_traits>
+// #include "../config/config.h"
+
 // #include "../core/type_traits.hpp"
 
-// #include "../config/config.h"
+// #include "../signal/delegate.hpp"
 
 // #include "registry.hpp"
 
@@ -10186,6 +9593,23 @@ template<typename Entity>
 as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>;
 
 
+
+/**
+ * @brief Helper to create a listener that directly invokes a member function.
+ * @tparam Member Member function to invoke on a component of the given type.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @param reg A registry that contains the given entity and its components.
+ * @param entt Entity from which to get the component.
+ */
+template<auto Member, typename Entity = entity>
+void invoke(basic_registry<Entity> &reg, const Entity entt) {
+    static_assert(std::is_member_function_pointer_v<decltype(Member)>);
+    delegate<void(basic_registry<Entity> &, const Entity)> func;
+    func.template connect<Member>(reg.template get<member_class_t<decltype(Member)>>(entt));
+    func(reg, entt);
+}
+
+
 }
 
 
@@ -10208,6 +9632,8 @@ as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>
 // #include "registry.hpp"
 
 // #include "storage.hpp"
+
+// #include "utility.hpp"
 
 // #include "entity.hpp"
 
@@ -10397,14 +9823,14 @@ class basic_observer {
         static void connect(basic_observer &obs, basic_registry<Entity> &reg) {
             (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(obs), ...);
             (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(obs), ...);
-            reg.template on_replace<AnyOf>().template connect<&maybe_valid_if<Index>>(obs);
+            reg.template on_update<AnyOf>().template connect<&maybe_valid_if<Index>>(obs);
             reg.template on_destroy<AnyOf>().template connect<&discard_if<Index>>(obs);
         }
 
         static void disconnect(basic_observer &obs, basic_registry<Entity> &reg) {
             (reg.template on_destroy<Require>().disconnect(obs), ...);
             (reg.template on_construct<Reject>().disconnect(obs), ...);
-            reg.template on_replace<AnyOf>().disconnect(obs);
+            reg.template on_update<AnyOf>().disconnect(obs);
             reg.template on_destroy<AnyOf>().disconnect(obs);
         }
     };
@@ -10651,6 +10077,8 @@ private:
 
 // #include "entity/storage.hpp"
 
+// #include "entity/utility.hpp"
+
 // #include "entity/view.hpp"
 
 // #include "locator/locator.hpp"
@@ -10839,89 +10267,12 @@ private:
 #define ENTT_META_FACTORY_HPP
 
 
-#include <tuple>
 #include <array>
 #include <cstddef>
-#include <utility>
 #include <functional>
+#include <tuple>
 #include <type_traits>
-// #include "../config/config.h"
-#ifndef ENTT_CONFIG_CONFIG_H
-#define ENTT_CONFIG_CONFIG_H
-
-
-#ifndef ENTT_NOEXCEPT
-#   define ENTT_NOEXCEPT noexcept
-#endif
-
-
-#ifndef ENTT_HS_SUFFIX
-#   define ENTT_HS_SUFFIX _hs
-#endif
-
-
-#ifndef ENTT_HWS_SUFFIX
-#   define ENTT_HWS_SUFFIX _hws
-#endif
-
-
-#ifndef ENTT_USE_ATOMIC
-#   define ENTT_MAYBE_ATOMIC(Type) Type
-#else
-#   include <atomic>
-#   define ENTT_MAYBE_ATOMIC(Type) std::atomic<Type>
-#endif
-
-
-#ifndef ENTT_ID_TYPE
-#   include <cstdint>
-#   define ENTT_ID_TYPE std::uint32_t
-#endif
-
-
-#ifndef ENTT_PAGE_SIZE
-#   define ENTT_PAGE_SIZE 32768
-#endif
-
-
-#ifndef ENTT_ASSERT
-#   include <cassert>
-#   define ENTT_ASSERT(condition) assert(condition)
-#endif
-
-
-#ifndef ENTT_DISABLE_ETO
-#   include <type_traits>
-#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
-#else
-#   // sfinae-friendly definition
-#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
-#endif
-
-
-#ifndef ENTT_STANDARD_CPP
-#   if defined _MSC_VER
-#      define ENTT_PRETTY_FUNCTION __FUNCSIG__
-#      define ENTT_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
-#   elif defined __clang__ || (defined __GNUC__ && __GNUC__ > 8)
-#      define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#      define ENTT_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
-#   elif defined __GNUC__
-#      define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#   endif
-#endif
-
-
-#endif
-
-// #include "../core/type_traits.hpp"
-#ifndef ENTT_CORE_TYPE_TRAITS_HPP
-#define ENTT_CORE_TYPE_TRAITS_HPP
-
-
-#include <cstddef>
 #include <utility>
-#include <type_traits>
 // #include "../config/config.h"
 #ifndef ENTT_CONFIG_CONFIG_H
 #define ENTT_CONFIG_CONFIG_H
@@ -10991,13 +10342,11 @@ private:
 
 #endif
 
-// #include "../core/hashed_string.hpp"
-#ifndef ENTT_CORE_HASHED_STRING_HPP
-#define ENTT_CORE_HASHED_STRING_HPP
+// #include "../core/fwd.hpp"
+#ifndef ENTT_CORE_FWD_HPP
+#define ENTT_CORE_FWD_HPP
 
 
-#include <cstddef>
-#include <cstdint>
 // #include "../config/config.h"
 #ifndef ENTT_CONFIG_CONFIG_H
 #define ENTT_CONFIG_CONFIG_H
@@ -11072,6 +10421,41 @@ private:
 namespace entt {
 
 
+/*! @brief Alias declaration for type identifiers. */
+using id_type = ENTT_ID_TYPE;
+
+
+}
+
+
+#endif
+
+// #include "../core/type_traits.hpp"
+#ifndef ENTT_CORE_TYPE_TRAITS_HPP
+#define ENTT_CORE_TYPE_TRAITS_HPP
+
+
+#include <cstddef>
+#include <utility>
+#include <type_traits>
+// #include "../config/config.h"
+
+// #include "hashed_string.hpp"
+#ifndef ENTT_CORE_HASHED_STRING_HPP
+#define ENTT_CORE_HASHED_STRING_HPP
+
+
+#include <cstddef>
+#include <cstdint>
+// #include "../config/config.h"
+
+// #include "fwd.hpp"
+
+
+
+namespace entt {
+
+
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
@@ -11123,7 +10507,7 @@ struct fnv1a_traits<std::uint64_t> {
  */
 template<typename Char>
 class basic_hashed_string {
-    using traits_type = internal::fnv1a_traits<ENTT_ID_TYPE>;
+    using traits_type = internal::fnv1a_traits<id_type>;
 
     struct const_wrapper {
         // non-explicit constructor on purpose
@@ -11132,7 +10516,7 @@ class basic_hashed_string {
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    static constexpr ENTT_ID_TYPE helper(const Char *curr) ENTT_NOEXCEPT {
+    static constexpr id_type helper(const Char *curr) ENTT_NOEXCEPT {
         auto value = traits_type::offset;
 
         while(*curr != 0) {
@@ -11146,7 +10530,7 @@ public:
     /*! @brief Character type. */
     using value_type = Char;
     /*! @brief Unsigned integer type. */
-    using hash_type = ENTT_ID_TYPE;
+    using hash_type = id_type;
 
     /**
      * @brief Returns directly the numeric representation of a string.
@@ -11184,7 +10568,7 @@ public:
      * @return The numeric representation of the string.
      */
     static hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
-        ENTT_ID_TYPE partial{traits_type::offset};
+        id_type partial{traits_type::offset};
         while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
         return partial;
     }
@@ -11322,6 +10706,8 @@ constexpr entt::hashed_wstring operator"" ENTT_HWS_SUFFIX(const wchar_t *str, st
 
 
 #endif
+
+// #include "fwd.hpp"
 
 
 
@@ -11519,10 +10905,10 @@ using member_class_t = typename member_class<Member>::type;
 
 /**
  * @brief Alias template to ease the creation of named values.
- * @tparam Value A constant value at least convertible to `ENTT_ID_TYPE`.
+ * @tparam Value A constant value at least convertible to `id_type`.
  */
-template<ENTT_ID_TYPE Value>
-using tag = std::integral_constant<ENTT_ID_TYPE, Value>;
+template<id_type Value>
+using tag = std::integral_constant<id_type, Value>;
 
 
 }
@@ -11652,45 +11038,18 @@ private:
 
 #endif
 
-// #include "policy.hpp"
-#ifndef ENTT_META_POLICY_HPP
-#define ENTT_META_POLICY_HPP
-
-
-namespace entt {
-
-
-/*! @brief Empty class type used to request the _as alias_ policy. */
-struct as_alias_t {};
-
-
-/*! @brief Disambiguation tag. */
-constexpr as_alias_t as_alias;
-
-
-/*! @brief Empty class type used to request the _as-is_ policy. */
-struct as_is_t {};
-
-
-/*! @brief Empty class type used to request the _as void_ policy. */
-struct as_void_t {};
-
-
-}
-
-
-#endif
-
 // #include "meta.hpp"
 #ifndef ENTT_META_META_HPP
 #define ENTT_META_META_HPP
 
 
 #include <cstddef>
-#include <utility>
 #include <functional>
 #include <type_traits>
+#include <utility>
 // #include "../config/config.h"
+
+// #include "../core/fwd.hpp"
 
 // #include "../core/type_info.hpp"
 #ifndef ENTT_CORE_TYPE_INFO_HPP
@@ -11735,269 +11094,8 @@ struct as_void_t {};
 #endif
 
 // #include "hashed_string.hpp"
-#ifndef ENTT_CORE_HASHED_STRING_HPP
-#define ENTT_CORE_HASHED_STRING_HPP
 
-
-#include <cstddef>
-#include <cstdint>
-// #include "../config/config.h"
-
-
-
-namespace entt {
-
-
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
-
-namespace internal {
-
-
-template<typename>
-struct fnv1a_traits;
-
-
-template<>
-struct fnv1a_traits<std::uint32_t> {
-    using type = std::uint32_t;
-    static constexpr std::uint32_t offset = 2166136261;
-    static constexpr std::uint32_t prime = 16777619;
-};
-
-
-template<>
-struct fnv1a_traits<std::uint64_t> {
-    using type = std::uint64_t;
-    static constexpr std::uint64_t offset = 14695981039346656037ull;
-    static constexpr std::uint64_t prime = 1099511628211ull;
-};
-
-
-}
-
-
-/**
- * Internal details not to be documented.
- * @endcond TURN_OFF_DOXYGEN
- */
-
-
-/**
- * @brief Zero overhead unique identifier.
- *
- * A hashed string is a compile-time tool that allows users to use
- * human-readable identifers in the codebase while using their numeric
- * counterparts at runtime.<br/>
- * Because of that, a hashed string can also be used in constant expressions if
- * required.
- *
- * @tparam Char Character type.
- */
-template<typename Char>
-class basic_hashed_string {
-    using traits_type = internal::fnv1a_traits<ENTT_ID_TYPE>;
-
-    struct const_wrapper {
-        // non-explicit constructor on purpose
-        constexpr const_wrapper(const Char *curr) ENTT_NOEXCEPT: str{curr} {}
-        const Char *str;
-    };
-
-    // Fowler–Noll–Vo hash function v. 1a - the good
-    static constexpr ENTT_ID_TYPE helper(const Char *curr) ENTT_NOEXCEPT {
-        auto value = traits_type::offset;
-
-        while(*curr != 0) {
-            value = (value ^ static_cast<traits_type::type>(*(curr++))) * traits_type::prime;
-        }
-
-        return value;
-    }
-
-public:
-    /*! @brief Character type. */
-    using value_type = Char;
-    /*! @brief Unsigned integer type. */
-    using hash_type = ENTT_ID_TYPE;
-
-    /**
-     * @brief Returns directly the numeric representation of a string.
-     *
-     * Forcing template resolution avoids implicit conversions. An
-     * human-readable identifier can be anything but a plain, old bunch of
-     * characters.<br/>
-     * Example of use:
-     * @code{.cpp}
-     * const auto value = basic_hashed_string<char>::to_value("my.png");
-     * @endcode
-     *
-     * @tparam N Number of characters of the identifier.
-     * @param str Human-readable identifer.
-     * @return The numeric representation of the string.
-     */
-    template<std::size_t N>
-    static constexpr hash_type value(const value_type (&str)[N]) ENTT_NOEXCEPT {
-        return helper(str);
-    }
-
-    /**
-     * @brief Returns directly the numeric representation of a string.
-     * @param wrapper Helps achieving the purpose by relying on overloading.
-     * @return The numeric representation of the string.
-     */
-    static hash_type value(const_wrapper wrapper) ENTT_NOEXCEPT {
-        return helper(wrapper.str);
-    }
-
-    /**
-     * @brief Returns directly the numeric representation of a string view.
-     * @param str Human-readable identifer.
-     * @param size Length of the string to hash.
-     * @return The numeric representation of the string.
-     */
-    static hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
-        ENTT_ID_TYPE partial{traits_type::offset};
-        while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
-        return partial;
-    }
-
-    /*! @brief Constructs an empty hashed string. */
-    constexpr basic_hashed_string() ENTT_NOEXCEPT
-        : str{nullptr}, hash{}
-    {}
-
-    /**
-     * @brief Constructs a hashed string from an array of const characters.
-     *
-     * Forcing template resolution avoids implicit conversions. An
-     * human-readable identifier can be anything but a plain, old bunch of
-     * characters.<br/>
-     * Example of use:
-     * @code{.cpp}
-     * basic_hashed_string<char> hs{"my.png"};
-     * @endcode
-     *
-     * @tparam N Number of characters of the identifier.
-     * @param curr Human-readable identifer.
-     */
-    template<std::size_t N>
-    constexpr basic_hashed_string(const value_type (&curr)[N]) ENTT_NOEXCEPT
-        : str{curr}, hash{helper(curr)}
-    {}
-
-    /**
-     * @brief Explicit constructor on purpose to avoid constructing a hashed
-     * string directly from a `const value_type *`.
-     * @param wrapper Helps achieving the purpose by relying on overloading.
-     */
-    explicit constexpr basic_hashed_string(const_wrapper wrapper) ENTT_NOEXCEPT
-        : str{wrapper.str}, hash{helper(wrapper.str)}
-    {}
-
-    /**
-     * @brief Returns the human-readable representation of a hashed string.
-     * @return The string used to initialize the instance.
-     */
-    constexpr const value_type * data() const ENTT_NOEXCEPT {
-        return str;
-    }
-
-    /**
-     * @brief Returns the numeric representation of a hashed string.
-     * @return The numeric representation of the instance.
-     */
-    constexpr hash_type value() const ENTT_NOEXCEPT {
-        return hash;
-    }
-
-    /*! @copydoc data */
-    constexpr operator const value_type *() const ENTT_NOEXCEPT { return data(); }
-
-    /**
-     * @brief Returns the numeric representation of a hashed string.
-     * @return The numeric representation of the instance.
-     */
-    constexpr operator hash_type() const ENTT_NOEXCEPT { return value(); }
-
-    /**
-     * @brief Compares two hashed strings.
-     * @param other Hashed string with which to compare.
-     * @return True if the two hashed strings are identical, false otherwise.
-     */
-    constexpr bool operator==(const basic_hashed_string &other) const ENTT_NOEXCEPT {
-        return hash == other.hash;
-    }
-
-private:
-    const value_type *str;
-    hash_type hash;
-};
-
-
-/**
- * @brief Deduction guide.
- *
- * It allows to deduce the character type of the hashed string directly from a
- * human-readable identifer provided to the constructor.
- *
- * @tparam Char Character type.
- * @tparam N Number of characters of the identifier.
- * @param str Human-readable identifer.
- */
-template<typename Char, std::size_t N>
-basic_hashed_string(const Char (&str)[N]) ENTT_NOEXCEPT
--> basic_hashed_string<Char>;
-
-
-/**
- * @brief Compares two hashed strings.
- * @tparam Char Character type.
- * @param lhs A valid hashed string.
- * @param rhs A valid hashed string.
- * @return True if the two hashed strings are identical, false otherwise.
- */
-template<typename Char>
-constexpr bool operator!=(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
-
-
-/*! @brief Aliases for common character types. */
-using hashed_string = basic_hashed_string<char>;
-
-
-/*! @brief Aliases for common character types. */
-using hashed_wstring = basic_hashed_string<wchar_t>;
-
-
-}
-
-
-/**
- * @brief User defined literal for hashed strings.
- * @param str The literal without its suffix.
- * @return A properly initialized hashed string.
- */
-constexpr entt::hashed_string operator"" ENTT_HS_SUFFIX(const char *str, std::size_t) ENTT_NOEXCEPT {
-    return entt::hashed_string{str};
-}
-
-
-/**
- * @brief User defined literal for hashed wstrings.
- * @param str The literal without its suffix.
- * @return A properly initialized hashed wstring.
- */
-constexpr entt::hashed_wstring operator"" ENTT_HWS_SUFFIX(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
-    return entt::hashed_wstring{str};
-}
-
-
-#endif
+// #include "fwd.hpp"
 
 
 
@@ -12022,8 +11120,8 @@ namespace internal {
 
 
 struct ENTT_API type_id_generator {
-    static ENTT_ID_TYPE next() ENTT_NOEXCEPT {
-        static ENTT_ID_TYPE value{};
+    static id_type next() ENTT_NOEXCEPT {
+        static id_type value{};
         return value++;
     }
 };
@@ -12050,18 +11148,18 @@ struct ENTT_TYPE_ID_API type_info {
      * @return The numeric representation of the given type.
      */
 #if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
-    static constexpr ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+    static constexpr id_type id() ENTT_NOEXCEPT {
         constexpr auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION_CONSTEXPR);
         return value;
     }
 #elif defined ENTT_PRETTY_FUNCTION
-    static ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+    static id_type id() ENTT_NOEXCEPT {
         static const auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
         return value;
     }
 #else
-    static ENTT_ID_TYPE id() ENTT_NOEXCEPT {
-        static const ENTT_ID_TYPE value = internal::type_id_generator::next();
+    static id_type id() ENTT_NOEXCEPT {
+        static const id_type value = internal::type_id_generator::next();
         return value;
     }
 #endif
@@ -12137,7 +11235,7 @@ struct meta_dtor_node {
 
 
 struct meta_data_node {
-    ENTT_ID_TYPE alias;
+    id_type alias;
     meta_type_node * const parent;
     meta_data_node * next;
     meta_prop_node * prop;
@@ -12151,7 +11249,7 @@ struct meta_data_node {
 
 struct meta_func_node {
     using size_type = std::size_t;
-    ENTT_ID_TYPE alias;
+    id_type alias;
     meta_type_node * const parent;
     meta_func_node * next;
     meta_prop_node * prop;
@@ -12166,8 +11264,8 @@ struct meta_func_node {
 
 struct meta_type_node {
     using size_type = std::size_t;
-    const ENTT_ID_TYPE type_id;
-    ENTT_ID_TYPE alias;
+    const id_type type_id;
+    id_type alias;
     meta_type_node * next;
     meta_prop_node * prop;
     const bool is_void;
@@ -12936,14 +12034,8 @@ struct meta_data {
     {}
 
     /*! @copydoc meta_type::alias */
-    ENTT_ID_TYPE alias() const ENTT_NOEXCEPT {
+    id_type alias() const ENTT_NOEXCEPT {
         return node->alias;
-    }
-
-    /*! @copydoc alias*/
-    [[deprecated("Use ::alias instead")]]
-    ENTT_ID_TYPE identifier() const ENTT_NOEXCEPT {
-        return alias();
     }
 
     /*! @copydoc meta_base::parent */
@@ -13082,14 +12174,8 @@ struct meta_func {
     {}
 
     /*! @copydoc meta_type::alias */
-    ENTT_ID_TYPE alias() const ENTT_NOEXCEPT {
+    id_type alias() const ENTT_NOEXCEPT {
         return node->alias;
-    }
-
-    /*! @copydoc alias */
-    [[deprecated("Use ::alias instead")]]
-    ENTT_ID_TYPE identifier() const ENTT_NOEXCEPT {
-        return alias();
     }
 
     /*! @copydoc meta_base::parent */
@@ -13214,7 +12300,7 @@ public:
      * @brief Returns the id of the underlying type.
      * @return The id of the underlying type.
      */
-    ENTT_ID_TYPE id() const ENTT_NOEXCEPT {
+    id_type id() const ENTT_NOEXCEPT {
         return node->type_id;
     }
 
@@ -13222,14 +12308,8 @@ public:
      * @brief Returns the alias assigned to a given meta object.
      * @return The alias assigned to the meta object.
      */
-    ENTT_ID_TYPE alias() const ENTT_NOEXCEPT {
+    id_type alias() const ENTT_NOEXCEPT {
         return node->alias;
-    }
-
-    /*! @copydoc alias */
-    [[deprecated("Use ::alias instead")]]
-    ENTT_ID_TYPE identifier() const ENTT_NOEXCEPT {
-        return alias();
     }
 
     /**
@@ -13374,7 +12454,7 @@ public:
      * @param alias Unique identifier.
      * @return The meta base associated with the given alias, if any.
      */
-    meta_base base(const ENTT_ID_TYPE alias) const {
+    meta_base base(const id_type alias) const {
         return internal::find_if<&internal::meta_type_node::base>([alias](const auto *curr) {
             return curr->type()->alias == alias;
         }, node);
@@ -13445,7 +12525,7 @@ public:
      * @param alias Unique identifier.
      * @return The meta data associated with the given alias, if any.
      */
-    meta_data data(const ENTT_ID_TYPE alias) const {
+    meta_data data(const id_type alias) const {
         return internal::find_if<&internal::meta_type_node::data>([alias](const auto *curr) {
             return curr->alias == alias;
         }, node);
@@ -13473,7 +12553,7 @@ public:
      * @param alias Unique identifier.
      * @return The meta function associated with the given alias, if any.
      */
-    meta_func func(const ENTT_ID_TYPE alias) const {
+    meta_func func(const id_type alias) const {
         return internal::find_if<&internal::meta_type_node::func>([alias](const auto *curr) {
             return curr->alias == alias;
         }, node);
@@ -13630,6 +12710,35 @@ inline meta_type meta_func::ret() const ENTT_NOEXCEPT {
 inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
     return index < size() ? node->arg(index) : nullptr;
 }
+
+
+}
+
+
+#endif
+
+// #include "policy.hpp"
+#ifndef ENTT_META_POLICY_HPP
+#define ENTT_META_POLICY_HPP
+
+
+namespace entt {
+
+
+/*! @brief Empty class type used to request the _as alias_ policy. */
+struct as_alias_t {};
+
+
+/*! @brief Disambiguation tag. */
+constexpr as_alias_t as_alias;
+
+
+/*! @brief Empty class type used to request the _as-is_ policy. */
+struct as_is_t {};
+
+
+/*! @brief Empty class type used to request the _as void_ policy. */
+struct as_void_t {};
 
 
 }
@@ -14002,7 +13111,7 @@ class meta_factory<Type> {
     }
 
     template<typename Node>
-    bool exists(const ENTT_ID_TYPE alias, const Node *node) ENTT_NOEXCEPT {
+    bool exists(const id_type alias, const Node *node) ENTT_NOEXCEPT {
         return node && (node->alias == alias || exists(alias, node->next));
     }
 
@@ -14012,7 +13121,7 @@ public:
      * @param value Unique identifier.
      * @return An extended meta factory for the given type.
      */
-    auto alias(const ENTT_ID_TYPE value) ENTT_NOEXCEPT {
+    auto alias(const id_type value) ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
 
         ENTT_ASSERT(!exists(value, *internal::meta_info<>::global));
@@ -14022,12 +13131,6 @@ public:
         *internal::meta_info<>::global = node;
 
         return meta_factory<Type, Type>{&node->prop};
-    }
-
-    /*! @copydoc alias */
-    [[deprecated("Use ::alias instead")]]
-    auto type(const ENTT_ID_TYPE value) ENTT_NOEXCEPT {
-        return alias(value);
     }
 
     /**
@@ -14242,7 +13345,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Data, typename Policy = as_is_t>
-    auto data(const ENTT_ID_TYPE alias) ENTT_NOEXCEPT {
+    auto data(const id_type alias) ENTT_NOEXCEPT {
         auto * const type = internal::meta_info<Type>::resolve();
         internal::meta_data_node *curr = nullptr;
 
@@ -14327,7 +13430,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
-    auto data(const ENTT_ID_TYPE alias) ENTT_NOEXCEPT {
+    auto data(const id_type alias) ENTT_NOEXCEPT {
         using underlying_type = std::invoke_result_t<decltype(Getter), Type &>;
         static_assert(std::is_invocable_v<decltype(Setter), Type &, underlying_type>);
         auto * const type = internal::meta_info<Type>::resolve();
@@ -14367,7 +13470,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_is_t>
-    auto func(const ENTT_ID_TYPE alias) ENTT_NOEXCEPT {
+    auto func(const id_type alias) ENTT_NOEXCEPT {
         using helper_type = internal::meta_function_helper_t<decltype(Candidate)>;
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -14479,7 +13582,7 @@ inline meta_type resolve() ENTT_NOEXCEPT {
  * @param alias Unique identifier.
  * @return The meta type associated with the given alias, if any.
  */
-inline meta_type resolve(const ENTT_ID_TYPE alias) ENTT_NOEXCEPT {
+inline meta_type resolve(const id_type alias) ENTT_NOEXCEPT {
     return internal::find_if([alias](const auto *curr) {
         return curr->alias == alias;
     }, *internal::meta_info<>::global);
@@ -15227,9 +14330,9 @@ private:
 
 
 #include <memory>
-#include <utility>
 #include <type_traits>
 #include <unordered_map>
+#include <utility>
 // #include "../config/config.h"
 #ifndef ENTT_CONFIG_CONFIG_H
 #define ENTT_CONFIG_CONFIG_H
@@ -15295,6 +14398,94 @@ private:
 #      define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
 #   endif
 #endif
+
+
+#endif
+
+// #include "../core/fwd.hpp"
+#ifndef ENTT_CORE_FWD_HPP
+#define ENTT_CORE_FWD_HPP
+
+
+// #include "../config/config.h"
+#ifndef ENTT_CONFIG_CONFIG_H
+#define ENTT_CONFIG_CONFIG_H
+
+
+#ifndef ENTT_NOEXCEPT
+#   define ENTT_NOEXCEPT noexcept
+#endif
+
+
+#ifndef ENTT_HS_SUFFIX
+#   define ENTT_HS_SUFFIX _hs
+#endif
+
+
+#ifndef ENTT_HWS_SUFFIX
+#   define ENTT_HWS_SUFFIX _hws
+#endif
+
+
+#ifndef ENTT_USE_ATOMIC
+#   define ENTT_MAYBE_ATOMIC(Type) Type
+#else
+#   include <atomic>
+#   define ENTT_MAYBE_ATOMIC(Type) std::atomic<Type>
+#endif
+
+
+#ifndef ENTT_ID_TYPE
+#   include <cstdint>
+#   define ENTT_ID_TYPE std::uint32_t
+#endif
+
+
+#ifndef ENTT_PAGE_SIZE
+#   define ENTT_PAGE_SIZE 32768
+#endif
+
+
+#ifndef ENTT_ASSERT
+#   include <cassert>
+#   define ENTT_ASSERT(condition) assert(condition)
+#endif
+
+
+#ifndef ENTT_DISABLE_ETO
+#   include <type_traits>
+#   define ENTT_ENABLE_ETO(Type) (std::is_default_constructible_v<Type> && std::is_empty_v<Type>)
+#else
+#   // sfinae-friendly definition
+#   define ENTT_ENABLE_ETO(Type) (false && std::is_void_v<Type>)
+#endif
+
+
+#ifndef ENTT_STANDARD_CPP
+#   if defined _MSC_VER
+#      define ENTT_PRETTY_FUNCTION __FUNCSIG__
+#      define ENTT_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
+#   elif defined __clang__ || (defined __GNUC__ && __GNUC__ > 8)
+#      define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#      define ENTT_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
+#   elif defined __GNUC__
+#      define ENTT_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#   endif
+#endif
+
+
+#endif
+
+
+
+namespace entt {
+
+
+/*! @brief Alias declaration for type identifiers. */
+using id_type = ENTT_ID_TYPE;
+
+
+}
 
 
 #endif
@@ -15526,8 +14717,6 @@ struct cache {
     using size_type = std::size_t;
     /*! @brief Type of resources managed by a cache. */
     using resource_type = Resource;
-    /*! @brief Unique identifier type for resources. */
-    using id_type = ENTT_ID_TYPE;
 
     /*! @brief Default constructor. */
     cache() = default;
@@ -16143,16 +15332,16 @@ delegate(connect_arg_t<Candidate>, Type &&) ENTT_NOEXCEPT
 #define ENTT_SIGNAL_DISPATCHER_HPP
 
 
-#include <vector>
-#include <memory>
 #include <cstddef>
-#include <utility>
+#include <memory>
 #include <type_traits>
+#include <utility>
+#include <vector>
 // #include "../config/config.h"
 
-// #include "../core/type_info.hpp"
-#ifndef ENTT_CORE_TYPE_INFO_HPP
-#define ENTT_CORE_TYPE_INFO_HPP
+// #include "../core/fwd.hpp"
+#ifndef ENTT_CORE_FWD_HPP
+#define ENTT_CORE_FWD_HPP
 
 
 // #include "../config/config.h"
@@ -16224,6 +15413,27 @@ delegate(connect_arg_t<Candidate>, Type &&) ENTT_NOEXCEPT
 
 #endif
 
+
+
+namespace entt {
+
+
+/*! @brief Alias declaration for type identifiers. */
+using id_type = ENTT_ID_TYPE;
+
+
+}
+
+
+#endif
+
+// #include "../core/type_info.hpp"
+#ifndef ENTT_CORE_TYPE_INFO_HPP
+#define ENTT_CORE_TYPE_INFO_HPP
+
+
+// #include "../config/config.h"
+
 // #include "../core/attribute.h"
 #ifndef ENTT_CORE_ATTRIBUTE_H
 #define ENTT_CORE_ATTRIBUTE_H
@@ -16267,6 +15477,8 @@ delegate(connect_arg_t<Candidate>, Type &&) ENTT_NOEXCEPT
 #include <cstddef>
 #include <cstdint>
 // #include "../config/config.h"
+
+// #include "fwd.hpp"
 
 
 
@@ -16324,7 +15536,7 @@ struct fnv1a_traits<std::uint64_t> {
  */
 template<typename Char>
 class basic_hashed_string {
-    using traits_type = internal::fnv1a_traits<ENTT_ID_TYPE>;
+    using traits_type = internal::fnv1a_traits<id_type>;
 
     struct const_wrapper {
         // non-explicit constructor on purpose
@@ -16333,7 +15545,7 @@ class basic_hashed_string {
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    static constexpr ENTT_ID_TYPE helper(const Char *curr) ENTT_NOEXCEPT {
+    static constexpr id_type helper(const Char *curr) ENTT_NOEXCEPT {
         auto value = traits_type::offset;
 
         while(*curr != 0) {
@@ -16347,7 +15559,7 @@ public:
     /*! @brief Character type. */
     using value_type = Char;
     /*! @brief Unsigned integer type. */
-    using hash_type = ENTT_ID_TYPE;
+    using hash_type = id_type;
 
     /**
      * @brief Returns directly the numeric representation of a string.
@@ -16385,7 +15597,7 @@ public:
      * @return The numeric representation of the string.
      */
     static hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
-        ENTT_ID_TYPE partial{traits_type::offset};
+        id_type partial{traits_type::offset};
         while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
         return partial;
     }
@@ -16524,6 +15736,8 @@ constexpr entt::hashed_wstring operator"" ENTT_HWS_SUFFIX(const wchar_t *str, st
 
 #endif
 
+// #include "fwd.hpp"
+
 
 
 #ifndef ENTT_PRETTY_FUNCTION
@@ -16547,8 +15761,8 @@ namespace internal {
 
 
 struct ENTT_API type_id_generator {
-    static ENTT_ID_TYPE next() ENTT_NOEXCEPT {
-        static ENTT_ID_TYPE value{};
+    static id_type next() ENTT_NOEXCEPT {
+        static id_type value{};
         return value++;
     }
 };
@@ -16575,18 +15789,18 @@ struct ENTT_TYPE_ID_API type_info {
      * @return The numeric representation of the given type.
      */
 #if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
-    static constexpr ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+    static constexpr id_type id() ENTT_NOEXCEPT {
         constexpr auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION_CONSTEXPR);
         return value;
     }
 #elif defined ENTT_PRETTY_FUNCTION
-    static ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+    static id_type id() ENTT_NOEXCEPT {
         static const auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
         return value;
     }
 #else
-    static ENTT_ID_TYPE id() ENTT_NOEXCEPT {
-        static const ENTT_ID_TYPE value = internal::type_id_generator::next();
+    static id_type id() ENTT_NOEXCEPT {
+        static const id_type value = internal::type_id_generator::next();
         return value;
     }
 #endif
@@ -17177,11 +16391,11 @@ class dispatcher {
         virtual ~basic_pool() = default;
         virtual void publish() = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
-        virtual ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT = 0;
+        virtual id_type type_id() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
-    struct pool_handler: basic_pool {
+    struct pool_handler final: basic_pool {
         using signal_type = sigh<void(const Event &)>;
         using sink_type = typename signal_type::sink_type;
 
@@ -17213,7 +16427,7 @@ class dispatcher {
             events.emplace_back(std::forward<Args>(args)...);
         }
 
-        ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT override {
+        id_type type_id() const ENTT_NOEXCEPT override {
             return type_info<Event>::id();
         }
 
@@ -17380,15 +16594,17 @@ private:
 #define ENTT_SIGNAL_EMITTER_HPP
 
 
-#include <type_traits>
-#include <functional>
 #include <algorithm>
-#include <utility>
-#include <memory>
-#include <vector>
-#include <list>
+#include <functional>
 #include <iterator>
+#include <list>
+#include <memory>
+#include <type_traits>
+#include <utility>
+#include <vector>
 // #include "../config/config.h"
+
+// #include "../core/fwd.hpp"
 
 // #include "../core/type_info.hpp"
 
@@ -17424,11 +16640,11 @@ class emitter {
         virtual ~basic_pool() = default;
         virtual bool empty() const ENTT_NOEXCEPT = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
-        virtual ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT = 0;
+        virtual id_type type_id() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
-    struct pool_handler: basic_pool {
+    struct pool_handler final: basic_pool {
         using listener_type = std::function<void(const Event &, Derived &)>;
         using element_type = std::pair<bool, listener_type>;
         using container_type = std::list<element_type>;
@@ -17493,7 +16709,7 @@ class emitter {
             on_list.remove_if([](auto &&element) { return element.first; });
         }
 
-        ENTT_ID_TYPE type_id() const ENTT_NOEXCEPT override {
+        id_type type_id() const ENTT_NOEXCEPT override {
             return type_info<Event>::id();
         }
 

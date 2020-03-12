@@ -6,7 +6,7 @@
 [![GitHub version](https://badge.fury.io/gh/skypjack%2Fentt.svg)](https://github.com/skypjack/entt/releases)
 [![Build Status](https://github.com/skypjack/entt/workflows/build/badge.svg)](https://github.com/skypjack/entt/actions)
 [![Coverage](https://codecov.io/gh/skypjack/entt/branch/master/graph/badge.svg)](https://codecov.io/gh/skypjack/entt)
-[![Try online](https://img.shields.io/badge/try-online-brightgreen)](https://godbolt.org/z/v8txVr)
+[![Try online](https://img.shields.io/badge/try-online-brightgreen)](https://godbolt.org/z/cOUcm1)
 [![Gitter chat](https://badges.gitter.im/skypjack/entt.png)](https://gitter.im/skypjack/entt)
 [![Donate](https://img.shields.io/badge/donate-paypal-blue.svg)](https://www.paypal.me/skypjack)
 [![Patreon](https://img.shields.io/badge/become-patron-red.svg)](https://www.patreon.com/bePatron?c=1772573)
@@ -153,8 +153,8 @@ int main() {
 
     for(auto i = 0; i < 10; ++i) {
         auto entity = registry.create();
-        registry.assign<position>(entity, i * 1.f, i * 1.f);
-        if(i % 2 == 0) { registry.assign<velocity>(entity, i * .1f, i * .1f); }
+        registry.emplace<position>(entity, i * 1.f, i * 1.f);
+        if(i % 2 == 0) { registry.emplace<velocity>(entity, i * .1f, i * .1f); }
     }
 
     update(dt, registry);

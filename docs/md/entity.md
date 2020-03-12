@@ -193,39 +193,40 @@ auto curr = registry.current(entity);
 Components can be assigned to or removed from entities at any time. As for the
 entities, the registry offers a set of functions to use to work with components.
 
-The `assign` member function template creates, initializes and assigns to an
+The `emplace` member function template creates, initializes and assigns to an
 entity the given component. It accepts a variable number of arguments to use to
 construct the component itself if present:
 
 ```cpp
-registry.assign<position>(entity, 0., 0.);
+registry.emplace<position>(entity, 0., 0.);
 
 // ...
 
-auto &velocity = registry.assign<velocity>(entity);
+auto &velocity = registry.emplace<velocity>(entity);
 vel.dx = 0.;
 vel.dy = 0.;
 ```
 
-This function is overloaded and accepts also a couple of iterators in order to:
+Similarly, `insert` does it for multiple entities and accepts a range rather
+than a single entity in order to:
 
-* Assign the same component to multiple entities at once when a type is
-  specified as a template parameter or an instance is passed as an argument.
+* Assign the same component to all entities at once when a type is specified as
+  a template parameter or an instance is passed as an argument:
 
   ```cpp
   // default initialized type assigned by copy to all entities
-  registry.assign<position>(first, last);
+  registry.insert<position>(first, last);
 
   // user-defined instance assigned by copy to all entities
-  registry.assign(from, to, position{0., 0.});
+  registry.insert(from, to, position{0., 0.});
   ```
 
-* Assign a range of components to multiple entities when a range is provided
-  (the length of the range of components must be the same of that of entities):
+* Assign a range of components to the entities when a range is provided (the
+  length of the range of components must be the same of that of entities):
 
   ```cpp
   // first and last specify the range of entities, instances points to the first element of the range of components
-  registry.assign<position>(first, last, instances);
+  registry.insert<position>(first, last, instances);
   ```
 
 If an entity already has the given component, the `replace` and `patch` member
@@ -240,10 +241,10 @@ registry.replace<position>(entity, 0., 0.);
 ```
 
 When it's unknown whether an entity already owns an instance of a component,
-`assign_or_replace` is the function to use instead:
+`emplace_or_replace` is the function to use instead:
 
 ```cpp
-registry.assign_or_replace<position>(entity, 0., 0.);
+registry.emplace_or_replace<position>(entity, 0., 0.);
 ```
 
 This is a slightly faster alternative for the following snippet:
@@ -252,7 +253,7 @@ This is a slightly faster alternative for the following snippet:
 if(registry.has<comp>(entity)) {
     registry.replace<velocity>(entity, 0., 0.);
 } else {
-    registry.assign<velocity>(entity, 0., 0.);
+    registry.emplace<velocity>(entity, 0., 0.);
 }
 ```
 
@@ -591,7 +592,7 @@ For example, the following adds (or replaces) the component `a_type` whenever
 `my_type` is assigned to an entity:
 
 ```cpp
-registry.on_construct<my_type>().connect<&entt::registry::assign_or_replace<a_type>>();
+registry.on_construct<my_type>().connect<&entt::registry::emplace_or_replace<a_type>>();
 ```
 
 Similarly, the code shown below removes `a_type` from an entity whenever
@@ -604,7 +605,7 @@ registry.on_construct<my_type>().connect<&entt::registry::remove<a_type>>();
 A dependency can also be easily broken as follows:
 
 ```cpp
-registry.on_construct<my_type>().disconnect<&entt::registry::assign_or_replace<a_type>>();
+registry.on_construct<my_type>().disconnect<&entt::registry::emplace_or_replace<a_type>>();
 ```
 
 There are many other types of dependencies. In general, most of the functions
@@ -713,7 +714,7 @@ make difficult to define different _cloning policies_ for different types when
 required.<br/>
 This is why function definitions for cloning have been moved to the user space.
 The `visit` member function of the `registry` class can help filling the gap,
-along with the range-`assign` functionality.
+along with the `insert` functionality.
 
 A general purpose cloning function could be defined as:
 
@@ -721,9 +722,9 @@ A general purpose cloning function could be defined as:
 template<typename Type>
 void clone(const entt::registry &from, entt::registry &to) {
     if constexpr(ENTT_ENABLE_ETO(Type)) {
-        to.assign<Type>(from.data<Type>(), from.data<Type>() + from.size<Type>());
+        to.insert<Type>(from.data<Type>(), from.data<Type>() + from.size<Type>());
     } else {
-        to.assign<Type>(from.data<Type>(), from.data<Type>() + from.size<Type>(), from.raw<Type>());
+        to.insert<Type>(from.data<Type>(), from.data<Type>() + from.size<Type>(), from.raw<Type>());
     }
 }
 ```
@@ -788,7 +789,7 @@ the type identifiers and their opaque functions for stamping. As an example:
 ```
 template<typename Type>
 void stamp(const entt::registry &from, const entt::entity src, entt::registry &to, const entt::entity dst) {
-    to.assign_or_replace<Type>(dst, from.get<Type>(src));
+    to.emplace_or_replace<Type>(dst, from.get<Type>(src));
 }
 ```
 
@@ -1604,7 +1605,7 @@ Consider the following example:
 
 ```cpp
 registry.view<position>([&](const auto entity, auto &pos) {
-    registry.assign<position>(registry.create(), 0., 0.);
+    registry.emplace<position>(registry.create(), 0., 0.);
     pos.x = 0.; // warning: dangling pointer
 });
 ```

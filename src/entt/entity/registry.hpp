@@ -601,7 +601,7 @@ public:
     /**
      * @brief Assigns each entity in a range the given component.
      *
-     * @sa assign
+     * @sa emplace
      *
      * @tparam Component Type of component to create.
      * @tparam It Type of input iterator.
@@ -626,7 +626,7 @@ public:
     /**
      * @brief Assigns each entity in a range the given components.
      *
-     * @sa assign
+     * @sa emplace
      *
      * @tparam Component Type of component to create.
      * @tparam EIt Type of input iterator.
@@ -686,7 +686,7 @@ public:
      * Equivalent to the following snippet (pseudocode):
      *
      * @code{.cpp}
-     * auto &component = registry.has<Component>(entity) ? registry.replace<Component>(entity, args...) : registry.assign<Component>(entity, args...);
+     * auto &component = registry.has<Component>(entity) ? registry.replace<Component>(entity, args...) : registry.emplace<Component>(entity, args...);
      * @endcode
      *
      * Prefer this function anyway because it has slightly better performance.
@@ -929,7 +929,7 @@ public:
      * Equivalent to the following snippet (pseudocode):
      *
      * @code{.cpp}
-     * auto &component = registry.has<Component>(entity) ? registry.get<Component>(entity) : registry.assign<Component>(entity, args...);
+     * auto &component = registry.has<Component>(entity) ? registry.get<Component>(entity) : registry.emplace<Component>(entity, args...);
      * @endcode
      *
      * Prefer this function anyway because it has slightly better performance.
