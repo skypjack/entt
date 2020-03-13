@@ -694,16 +694,15 @@ public:
      *
      * @tparam Args Types of arguments to use to construct the object.
      * @param entt A valid entity identifier.
+     * @param args Parameters to use to construct an object for the entity.
      */
     template<typename... Args>
-    void emplace(const entity_type entt, Args &&...) {
+    void emplace(const entity_type entt, Args &&... args) {
+        [[maybe_unused]] object_type instance{std::forward<Args>(args)...};
         underlying_type::construct(entt);
     }
 
-    /**
-     * @copydoc emplace
-     * @param args Parameters to use to construct an object for the entity.
-     */
+    /*! @copydoc emplace */
     template<typename... Args>
     [[deprecated("use ::emplace instead")]]
     void construct(const entity_type entt, Args &&... args) {
