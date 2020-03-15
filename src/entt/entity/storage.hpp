@@ -709,7 +709,6 @@ public:
         emplace(entt, std::forward<Args>(args)...);
     }
 
-
     /**
      * @brief Assigns one or more entities to a storage.
      *

@@ -467,7 +467,8 @@ public:
      */
     template<typename Comp, typename Func>
     void each(Func func) const {
-        traverse<Comp>(std::move(func), type_list<Component...>{});
+        using non_empty_type = type_list_cat_t<std::conditional_t<ENTT_ENABLE_ETO(Component), type_list<>, type_list<Component>>...>;
+        traverse<Comp>(std::move(func), non_empty_type{});
     }
 
     /**
@@ -491,9 +492,9 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
+    [[deprecated("use ::each instead")]]
     void less(Func func) const {
-        const auto *view = candidate();
-        ((std::get<pool_type<Component> *>(pools) == view ? less<Component>(std::move(func)) : void()), ...);
+        each(std::move(func));
     }
 
     /**
@@ -524,9 +525,9 @@ public:
      * @param func A valid function object.
      */
     template<typename Comp, typename Func>
+    [[deprecated("use ::each instead")]]
     void less(Func func) const {
-        using non_empty_type = type_list_cat_t<std::conditional_t<ENTT_ENABLE_ETO(Component), type_list<>, type_list<Component>>...>;
-        traverse<Comp>(std::move(func), non_empty_type{});
+        each<Comp>(std::move(func));
     }
 
 private:
@@ -767,15 +768,27 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(std::is_invocable_v<Func, decltype(get({}))>) {
-            for(auto &&component: *pool) {
-                func(component);
+        if constexpr(ENTT_ENABLE_ETO(Component)) {
+            if constexpr(std::is_invocable_v<Func>) {
+                for(auto pos = pool->size(); pos; --pos) {
+                    func();
+                }
+            } else {
+                for(const auto entt: *this) {
+                    func(entt);
+                }
             }
         } else {
-            auto raw = pool->begin();
+            if constexpr(std::is_invocable_v<Func, decltype(get({}))>) {
+                for(auto &&component: *pool) {
+                    func(component);
+                }
+            } else {
+                auto raw = pool->begin();
 
-            for(const auto entt: *this) {
-                func(entt, *(raw++));
+                for(const auto entt: *this) {
+                    func(entt, *(raw++));
+                }
             }
         }
     }
@@ -809,20 +822,9 @@ public:
      * @param func A valid function object.
      */
     template<typename Func>
+    [[deprecated("use ::each instead")]]
     void less(Func func) const {
-        if constexpr(ENTT_ENABLE_ETO(Component)) {
-            if constexpr(std::is_invocable_v<Func>) {
-                for(auto pos = pool->size(); pos; --pos) {
-                    func();
-                }
-            } else {
-                for(const auto entt: *this) {
-                    func(entt);
-                }
-            }
-        } else {
-            each(std::move(func));
-        }
+        each(std::move(func));
     }
 
 private:

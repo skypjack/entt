@@ -15,12 +15,16 @@
 * document undocumented parts (entt::overload and a few others)
 * any-of rule for views/groups (eg entity has A and any of B/C/D)
   - get -> all, exclude -> none
-* review multi component views to reduce instantiations once empty types are gone...
 
 Next:
 * replace observer class with observer functions
 * get(cmp, entity) -> void *, set(cmp, entity, void *)
 * ENTT_ENABLE_ETO -> ENTT_IS_EMPTY (ignore default constructible)
+* review multi component views to reduce instantiations once empty types are gone...
+* update doc for empty types
+* avoid using deprecated functions all around
+* remove all is possible from storage<empty>
+* replace/emplace_or_replace/patch don't return
 
 * WIP:
  - deprecate snapshot, loader, ...
