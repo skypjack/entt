@@ -20,6 +20,7 @@
 Next:
 * replace observer class with observer functions
 * get(cmp, entity) -> void *, set(cmp, entity, void *)
+* ENTT_ENABLE_ETO -> ENTT_IS_EMPTY (ignore default constructible)
 
 * WIP:
  - deprecate snapshot, loader, ...
