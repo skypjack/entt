@@ -82,16 +82,9 @@ TEST(Storage, Functionalities) {
 
 TEST(Storage, EmptyType) {
     entt::storage<entt::entity, empty_type> pool;
-
-    pool.construct(entt::entity{42});
     pool.construct(entt::entity{99});
 
-    ASSERT_TRUE(pool.has(entt::entity{42}));
     ASSERT_TRUE(pool.has(entt::entity{99}));
-
-    auto &&component = pool.get(entt::entity{42});
-
-    ASSERT_TRUE((std::is_same_v<decltype(component), empty_type &&>));
 }
 
 TEST(Storage, BatchAdd) {
@@ -125,10 +118,6 @@ TEST(Storage, BatchAddEmptyType) {
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
-
-    auto &&component = pool.get(entities[0]);
-
-    ASSERT_TRUE((std::is_same_v<decltype(component), empty_type &&>));
 }
 
 TEST(Storage, AggregatesMustWork) {
@@ -227,52 +216,6 @@ TEST(Storage, ConstIterator) {
 
     ASSERT_GT(cend, cbegin);
     ASSERT_GE(cend, pool.cend());
-}
-
-TEST(Storage, IteratorEmptyType) {
-    using iterator_type = typename entt::storage<entt::entity, empty_type>::iterator_type;
-    entt::storage<entt::entity, empty_type> pool;
-    pool.construct(entt::entity{3});
-
-    iterator_type end{pool.begin()};
-    iterator_type begin{};
-    begin = pool.end();
-    std::swap(begin, end);
-
-    ASSERT_EQ(begin, pool.begin());
-    ASSERT_EQ(end, pool.end());
-    ASSERT_NE(begin, end);
-
-    ASSERT_EQ(begin++, pool.begin());
-    ASSERT_EQ(begin--, pool.end());
-
-    ASSERT_EQ(begin+1, pool.end());
-    ASSERT_EQ(end-1, pool.begin());
-
-    ASSERT_EQ(++begin, pool.end());
-    ASSERT_EQ(--begin, pool.begin());
-
-    ASSERT_EQ(begin += 1, pool.end());
-    ASSERT_EQ(begin -= 1, pool.begin());
-
-    ASSERT_EQ(begin + (end - begin), pool.end());
-    ASSERT_EQ(begin - (begin - end), pool.end());
-
-    ASSERT_EQ(end - (end - begin), pool.begin());
-    ASSERT_EQ(end + (begin - end), pool.begin());
-
-    ASSERT_EQ(pool.begin().operator->(), nullptr);
-
-    ASSERT_LT(begin, end);
-    ASSERT_LE(begin, pool.begin());
-
-    ASSERT_GT(end, begin);
-    ASSERT_GE(end, pool.end());
-
-    pool.construct(entt::entity{33});
-    auto &&component = *begin;
-
-    ASSERT_TRUE((std::is_same_v<decltype(component), empty_type &&>));
 }
 
 TEST(Storage, Raw) {
@@ -675,27 +618,6 @@ TEST(Storage, RespectUnordered) {
     ASSERT_EQ(*(rhs.data() + 3u), entt::entity{3});
     ASSERT_EQ(*(rhs.data() + 4u), entt::entity{4});
     ASSERT_EQ(*(rhs.data() + 5u), entt::entity{5});
-}
-
-TEST(Storage, RespectOverlapEmptyType) {
-    entt::storage<entt::entity, empty_type> lhs;
-    entt::storage<entt::entity, empty_type> rhs;
-
-    lhs.construct(entt::entity{3});
-    lhs.construct(entt::entity{12});
-    lhs.construct(entt::entity{42});
-
-    rhs.construct(entt::entity{12});
-
-    ASSERT_EQ(lhs.index(entt::entity{3}), 0u);
-    ASSERT_EQ(lhs.index(entt::entity{12}), 1u);
-    ASSERT_EQ(lhs.index(entt::entity{42}), 2u);
-
-    lhs.respect(rhs);
-
-    ASSERT_EQ(std::as_const(lhs).index(entt::entity{3}), 0u);
-    ASSERT_EQ(std::as_const(lhs).index(entt::entity{12}), 2u);
-    ASSERT_EQ(std::as_const(lhs).index(entt::entity{42}), 1u);
 }
 
 TEST(Storage, CanModifyDuringIteration) {

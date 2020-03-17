@@ -65,7 +65,10 @@ class basic_registry {
         decltype(auto) emplace(basic_registry &owner, const Entity entt, Args &&... args) {
             this->construct(entt, std::forward<Args>(args)...);
             construction.publish(owner, entt);
-            return this->get(entt);
+
+            if constexpr(!ENTT_ENABLE_ETO(Component)) {
+                return this->get(entt);
+            }
         }
 
         template<typename It, typename Value>
@@ -99,7 +102,18 @@ class basic_registry {
         decltype(auto) patch(basic_registry &owner, const Entity entt, Func &&... func) {
             (std::forward<Func>(func)(this->get(entt)), ...);
             update.publish(owner, entt);
-            return this->get(entt);
+
+            if constexpr(!ENTT_ENABLE_ETO(Component)) {
+                return this->get(entt);
+            }
+        }
+
+        decltype(auto) replace(basic_registry &owner, const Entity entt, [[maybe_unused]] Component &&component) {
+            if constexpr(ENTT_ENABLE_ETO(Component)) {
+                return patch(owner, entt);
+            } else {
+                return patch(owner, entt, [&component](auto &&curr) { curr = std::move(component); });
+            }
         }
 
     private:
@@ -513,6 +527,37 @@ public:
     }
 
     /**
+     * @brief Assigns entities to an empty registry.
+     *
+     * This function is intended for use in conjunction with `raw`.<br/>
+     * Don't try to inject ranges of randomly generated entities because there
+     * is no guarantee that the registry will continue to function properly in
+     * this case.
+     *
+     * @warning
+     * An assertion will abort the execution at runtime in debug mode if all
+     * pools aren't empty. Groups and context variables are ignored.
+     *
+     * @tparam It Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     */
+    template<typename It>
+    void assign(It first, It last) {
+        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [](auto &&cpool) { return cpool.pool->empty(); }));
+        entities.assign(first, last);
+        destroyed = null;
+
+        for(std::size_t pos{}, end = entities.size(); pos < end; ++pos) {
+            if((to_integral(entities[pos]) & traits_type::entity_mask) != pos) {
+                const auto version = to_integral(entities[pos]) & (traits_type::version_mask << traits_type::entity_shift);
+                entities[pos] = entity_type{to_integral(destroyed) | version};
+                destroyed = entity_type(pos);
+            }
+        }
+    }
+
+    /**
      * @brief Destroys an entity and lets the registry recycle the identifier.
      *
      * When an entity is destroyed, its version is updated and the identifier
@@ -651,37 +696,6 @@ public:
     }
 
     /**
-     * @brief Assigns entities to an empty registry.
-     *
-     * This function is intended for use in conjunction with `raw`.<br/>
-     * Don't try to inject ranges of randomly generated entities because there
-     * is no guarantee that the registry will continue to function properly in
-     * this case.
-     *
-     * @warning
-     * An assertion will abort the execution at runtime in debug mode if all
-     * pools aren't empty. Groups and context variables are ignored.
-     *
-     * @tparam It Type of input iterator.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     */
-    template<typename It>
-    void assign(It first, It last) {
-        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [](auto &&cpool) { return cpool.pool->empty(); }));
-        entities.assign(first, last);
-        destroyed = null;
-
-        for(std::size_t pos{}, end = entities.size(); pos < end; ++pos) {
-            if((to_integral(entities[pos]) & traits_type::entity_mask) != pos) {
-                const auto version = to_integral(entities[pos]) & (traits_type::version_mask << traits_type::entity_shift);
-                entities[pos] = entity_type{to_integral(destroyed) | version};
-                destroyed = entity_type(pos);
-            }
-        }
-    }
-
-    /**
      * @brief Assigns or replaces the given component for an entity.
      *
      * Equivalent to the following snippet (pseudocode):
@@ -709,7 +723,7 @@ public:
         auto &cpool = assure<Component>();
 
         return cpool.has(entity)
-                ? (cpool.patch(*this, entity, [&args...](auto &&component) { component = Component{std::forward<Args>(args)...}; }), cpool.get(entity))
+                ? cpool.replace(*this, entity, Component{std::forward<Args>(args)...})
                 : cpool.emplace(*this, entity, std::forward<Args>(args)...);
     }
 
@@ -746,7 +760,6 @@ public:
      * @return A reference to the patched component.
      */
     template<typename Component, typename... Func>
-    [[deprecated("use registry::patch instead")]]
     decltype(auto) patch(const entity_type entity, Func &&... func) {
         ENTT_ASSERT(valid(entity));
         return assure<Component>().patch(*this, entity, std::forward<Func>(func)...);
@@ -756,7 +769,7 @@ public:
     template<typename Component, typename... Func>
     [[deprecated("use registry::patch instead")]]
     auto replace(const entity_type entity, Func &&... func)
-    -> decltype((func(assure<Component>().get(entity)), ...), assure<Component>().get(entity)) {
+    -> decltype((func(std::declval<Component &>()), ...), patch<Component>(entity, std::forward<Func>(func)...)) {
         return patch<Component>(entity, std::forward<Func>(func)...);
     }
 
@@ -783,9 +796,7 @@ public:
     template<typename Component, typename... Args>
     auto replace(const entity_type entity, Args &&... args)
     -> decltype(std::enable_if_t<sizeof...(Args) != 0>(), Component{std::forward<Args>(args)...}, assure<Component>().get(entity)) {
-        return patch<Component>(entity, [args = std::forward_as_tuple(std::forward<Args>(args)...)](auto &&component) {
-            component = std::make_from_tuple<Component>(std::move(args));
-        });
+        return assure<Component>().replace(*this, entity, Component{std::forward<Args>(args)...});
     }
 
     /**
@@ -845,7 +856,12 @@ public:
     template<typename... Component>
     void remove_if_exists(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
-        ([this, entity](auto &&cpool) { if(cpool.has(entity)) { cpool.remove(*this, entity); } }(assure<Component>()), ...);
+
+        ([this, entity](auto &&cpool) {
+            if(cpool.has(entity)) {
+                cpool.remove(*this, entity);
+            }
+        }(assure<Component>()), ...);
     }
 
     /**
@@ -1005,7 +1021,9 @@ public:
             // useless this-> used to suppress a warning with clang
             each([this](const auto entity) { this->destroy(entity); });
         } else {
-            ([this](auto &&cpool) { cpool.remove(*this, cpool.sparse_set<entity_type>::begin(), cpool.sparse_set<entity_type>::end()); }(assure<Component>()), ...);
+            ([this](auto &&cpool) {
+                cpool.remove(*this, cpool.sparse_set<entity_type>::begin(), cpool.sparse_set<entity_type>::end());
+            }(assure<Component>()), ...);
         }
     }
 

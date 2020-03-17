@@ -260,7 +260,17 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.capacity<char>(), entt::registry::size_type{});
 }
 
-TEST(Registry, AssignOrReplaceAggregates) {
+TEST(Registry, ReplaceAggregate) {
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    registry.assign<aggregate>(entity, 0);
+    auto &instance = registry.replace<aggregate>(entity, 42);
+
+    ASSERT_EQ(instance.value, 42);
+}
+
+TEST(Registry, AssignOrReplaceAggregate) {
     entt::registry registry;
     const auto entity = registry.create();
     auto &instance = registry.assign_or_replace<aggregate>(entity, 42);
@@ -1310,7 +1320,7 @@ TEST(Registry, Constness) {
     entt::registry registry;
 
     ASSERT_TRUE((std::is_same_v<decltype(registry.assign<int>({})), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(registry.assign<empty_type>({})), empty_type>));
+    ASSERT_TRUE((std::is_same_v<decltype(registry.assign<empty_type>({})), void>));
 
     ASSERT_TRUE((std::is_same_v<decltype(registry.get<int>({})), int &>));
     ASSERT_TRUE((std::is_same_v<decltype(registry.get<int, char>({})), std::tuple<int &, char &>>));
