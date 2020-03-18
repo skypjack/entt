@@ -35,8 +35,8 @@ namespace entt {
  *
  * The registry is the core class of the entity-component framework.<br/>
  * It stores entities and arranges pools of components on a per request basis.
- * By means of a registry, users can manage entities and components and thus
- * create views or groups to iterate them.
+ * By means of a registry, users can manage entities and components, then create
+ * views or groups to iterate them.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
@@ -743,8 +743,10 @@ public:
      * void(Component &);
      * @endcode
      *
-     * Temporary objects are returned for empty types though. Capture them by
-     * copy or by const reference if needed.
+     * @note
+     * Empty types aren't explicitly instantiated and therefore they are never
+     * returned. However, this function can be used to trigger an update signal
+     * for them.
      *
      * @warning
      * Attempting to use an invalid entity or to patch a component of an entity
@@ -1115,11 +1117,6 @@ public:
      * Listeners are invoked **after** the component has been assigned to the
      * entity.
      *
-     * @note
-     * Empty types aren't explicitly instantiated. Therefore, temporary objects
-     * are returned through signals. They can be caught only by copy or with
-     * const references.
-     *
      * @sa sink
      *
      * @tparam Component Type of component of which to get the sink.
@@ -1144,11 +1141,6 @@ public:
      * @endcode
      *
      * Listeners are invoked **before** the component has been updated.
-     *
-     * @note
-     * Empty types aren't explicitly instantiated. Therefore, temporary objects
-     * are returned through signals. They can be caught only by copy or with
-     * const references.
      *
      * @sa sink
      *
@@ -1183,11 +1175,6 @@ public:
      *
      * Listeners are invoked **before** the component has been removed from the
      * entity.
-     *
-     * @note
-     * Empty types aren't explicitly instantiated. Therefore, temporary objects
-     * are returned through signals. They can be caught only by copy or with
-     * const references.
      *
      * @sa sink
      *

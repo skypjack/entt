@@ -37,9 +37,8 @@ namespace entt {
  * functions for that). Use `begin` and `end` instead.
  *
  * @warning
- * Empty types aren't explicitly instantiated. Temporary objects are returned in
- * place of the instances of the components and raw access isn't available for
- * them.
+ * Empty types aren't explicitly instantiated. Therefore, many of the functions
+ * normally available for non-empty types will not be available for empty ones.
  *
  * @sa sparse_set<Entity>
  *

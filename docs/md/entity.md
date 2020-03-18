@@ -1186,8 +1186,8 @@ The `each` member function is highly optimized. Unless users want to iterate
 only entities or get only some of the components, this should be the preferred
 approach. Note that the entity can also be excluded from the parameter list if
 not required, but this won't improve performance for multi component views.<br/>
-There exists an alternative version of `each` named `less` that works exactly as
-its counterpart but for the fact that it doesn't return empty components.
+Since they aren't explicitly instantiated, empty components aren't returned in
+any case.
 
 As a side note, in the case of single component views, `get` accepts but doesn't
 strictly require a template parameter, since the type is implicitly defined:
@@ -1679,12 +1679,12 @@ performance and memory usage. However, this also has consequences that are worth
 mentioning.
 
 When an empty type is detected, it's not instantiated in any case. Therefore,
-only the entities to which it's assigned are made available. All the iterators
-as well as the `get` member functions of the registry, the views and the groups
-will return temporary objects. Similarly, some functions such as `try_get` or
-the raw access to the list of components aren't available for this kind of
-types. Finally, the `sort` functionality accepts only callbacks that require to
-return entities rather than components:
+only the entities to which it's assigned are made available.<br/>
+There doesn't exist a way to _iterate_ empty types. Views and groups will never
+return instances of empty types (for example, during a call to `each`) and some
+functions such as `try_get` or the raw access to the list of components aren't
+available for them. Finally, the `sort` functionality accepts only callbacks
+that require to return entities rather than components:
 
 ```cpp
 registry.sort<empty_type>([](const entt::entity lhs, const entt::entity rhs) {
@@ -1693,18 +1693,14 @@ registry.sort<empty_type>([](const entt::entity lhs, const entt::entity rhs) {
 ```
 
 On the other hand, iterations are faster because only the entities to which the
-type is assigned are considered. Moreover, less memory is used, since there
-doesn't exist any instance of the component, no matter how many entities it is
-assigned to.
-
-For similar reasons, wherever a function type of a listener accepts a component,
-it cannot be caught by a non-const reference. Capture it by copy or by const
-reference instead.
+type is assigned are considered. Moreover, less memory is used, mainly because
+there doesn't exist any instance of the component, no matter how many entities
+it is assigned to.
 
 More in general, none of the features offered by the library is affected, but
 for the ones that require to return actual instances.<br/>
 This optimization can be disabled by defining the `ENTT_DISABLE_ETO` macro. In
-this case, the empty types will be treated like all other types, no matter what.
+this case, empty types will be treated like all other types, no matter what.
 
 # Multithreading
 
