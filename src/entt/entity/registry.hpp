@@ -771,7 +771,7 @@ public:
     template<typename Component, typename... Func>
     [[deprecated("use registry::patch instead")]]
     auto replace(const entity_type entity, Func &&... func)
-    -> decltype((func(std::declval<Component &>()), ...), patch<Component>(entity, std::forward<Func>(func)...)) {
+    -> decltype((func(std::declval<Component &>()), ...), assign<Component>(entity)) {
         return patch<Component>(entity, std::forward<Func>(func)...);
     }
 
