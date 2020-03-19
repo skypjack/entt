@@ -108,7 +108,7 @@ class basic_registry {
             }
         }
 
-        decltype(auto) replace(basic_registry &owner, const Entity entt, [[maybe_unused]] Component &&component) {
+        decltype(auto) replace(basic_registry &owner, const Entity entt, [[maybe_unused]] Component component) {
             if constexpr(ENTT_ENABLE_ETO(Component)) {
                 return patch(owner, entt);
             } else {
