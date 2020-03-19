@@ -14,6 +14,14 @@ namespace entt {
 
 
 /**
+ * @brief Wraps a static constant.
+ * @tparam Value A static constant.
+ */
+template<auto Value>
+using integral_constant = std::integral_constant<decltype(Value), Value>;
+
+
+/**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
  */
@@ -207,7 +215,7 @@ using member_class_t = typename member_class<Member>::type;
  * @tparam Value A constant value at least convertible to `id_type`.
  */
 template<id_type Value>
-using tag = std::integral_constant<id_type, Value>;
+using tag = integral_constant<Value>;
 
 
 }

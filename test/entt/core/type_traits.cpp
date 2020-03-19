@@ -1,7 +1,15 @@
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/config/config.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
+
+TEST(IntegralConstant, Functionalities) {
+    entt::integral_constant<3> constant;
+
+    ASSERT_TRUE((std::is_same_v<typename entt::integral_constant<3>::value_type, int>));
+    ASSERT_EQ(constant.value, 3);
+}
 
 TEST(Choice, Functionalities) {
     ASSERT_TRUE((std::is_base_of_v<entt::choice_t<0>, entt::choice_t<1>>));

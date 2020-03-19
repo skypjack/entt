@@ -5,6 +5,7 @@
 #include <utility>
 #include <type_traits>
 #include "../config/config.h"
+#include "../core/type_traits.hpp"
 
 
 namespace entt {
@@ -81,41 +82,37 @@ class process {
         FINISHED
     };
 
-    template<state value>
-    using state_value_t = std::integral_constant<state, value>;
-
     template<typename Target = Derived>
-    auto tick(int, state_value_t<state::UNINITIALIZED>)
+    auto next(integral_constant<state::UNINITIALIZED>)
     -> decltype(std::declval<Target>().init()) {
         static_cast<Target *>(this)->init();
     }
 
     template<typename Target = Derived>
-    auto tick(int, state_value_t<state::RUNNING>, Delta delta, void *data)
+    auto next(integral_constant<state::RUNNING>, Delta delta, void *data)
     -> decltype(std::declval<Target>().update(delta, data)) {
         static_cast<Target *>(this)->update(delta, data);
     }
 
     template<typename Target = Derived>
-    auto tick(int, state_value_t<state::SUCCEEDED>)
+    auto next(integral_constant<state::SUCCEEDED>)
     -> decltype(std::declval<Target>().succeeded()) {
         static_cast<Target *>(this)->succeeded();
     }
 
     template<typename Target = Derived>
-    auto tick(int, state_value_t<state::FAILED>)
+    auto next(integral_constant<state::FAILED>)
     -> decltype(std::declval<Target>().failed()) {
         static_cast<Target *>(this)->failed();
     }
 
     template<typename Target = Derived>
-    auto tick(int, state_value_t<state::ABORTED>)
+    auto next(integral_constant<state::ABORTED>)
     -> decltype(std::declval<Target>().aborted()) {
         static_cast<Target *>(this)->aborted();
     }
 
-    template<state value, typename... Args>
-    void tick(char, state_value_t<value>, Args &&...) const ENTT_NOEXCEPT {}
+    void next(...) const ENTT_NOEXCEPT {}
 
 protected:
     /**
@@ -233,11 +230,11 @@ public:
     void tick(const Delta delta, void *data = nullptr) {
         switch (current) {
         case state::UNINITIALIZED:
-            tick(0, state_value_t<state::UNINITIALIZED>{});
+            next(integral_constant<state::UNINITIALIZED>{});
             current = state::RUNNING;
             break;
         case state::RUNNING:
-            tick(0, state_value_t<state::RUNNING>{}, delta, data);
+            next(integral_constant<state::RUNNING>{}, delta, data);
             break;
         default:
             // suppress warnings
@@ -247,16 +244,16 @@ public:
         // if it's dead, it must be notified and removed immediately
         switch(current) {
         case state::SUCCEEDED:
-            tick(0, state_value_t<state::SUCCEEDED>{});
+            next(integral_constant<state::SUCCEEDED>{});
             current = state::FINISHED;
             break;
         case state::FAILED:
-            tick(0, state_value_t<state::FAILED>{});
+            next(integral_constant<state::FAILED>{});
             current = state::FINISHED;
             stopped = true;
             break;
         case state::ABORTED:
-            tick(0, state_value_t<state::ABORTED>{});
+            next(integral_constant<state::ABORTED>{});
             current = state::FINISHED;
             stopped = true;
             break;
