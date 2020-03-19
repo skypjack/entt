@@ -215,7 +215,7 @@ using member_class_t = typename member_class<Member>::type;
  * @tparam Value A constant value at least convertible to `id_type`.
  */
 template<id_type Value>
-using tag = integral_constant<Value>;
+using tag [[deprecated("use entt::integral_constant instead")]] = integral_constant<Value>;
 
 
 }
