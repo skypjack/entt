@@ -78,6 +78,8 @@ I hope this list can grow much more in the future:
     using OpenGL and Vulkan.
   * [Chrysalis](https://github.com/ivanhawkes/Chrysalis): action RPG SDK for
     CRYENGINE games.
+  * [LM-Engine](https://github.com/Lawrencemm/LM-Engine): the Vim of game
+    engines.
 
 * Articles and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
