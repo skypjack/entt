@@ -66,7 +66,7 @@ class basic_registry {
             this->construct(entt, std::forward<Args>(args)...);
             construction.publish(owner, entt);
 
-            if constexpr(!ENTT_ENABLE_ETO(Component)) {
+            if constexpr(!ENTT_IS_EMPTY(Component)) {
                 return this->get(entt);
             }
         }
@@ -103,13 +103,13 @@ class basic_registry {
             (std::forward<Func>(func)(this->get(entt)), ...);
             update.publish(owner, entt);
 
-            if constexpr(!ENTT_ENABLE_ETO(Component)) {
+            if constexpr(!ENTT_IS_EMPTY(Component)) {
                 return this->get(entt);
             }
         }
 
         decltype(auto) replace(basic_registry &owner, const Entity entt, [[maybe_unused]] Component component) {
-            if constexpr(ENTT_ENABLE_ETO(Component)) {
+            if constexpr(ENTT_IS_EMPTY(Component)) {
                 return patch(owner, entt);
             } else {
                 return patch(owner, entt, [&component](auto &&curr) { curr = std::move(component); });

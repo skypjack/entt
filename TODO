@@ -19,7 +19,6 @@
 Next:
 * replace observer class with observer functions
 * get(cmp, entity) -> void *, set(cmp, entity, void *)
-* ENTT_ENABLE_ETO -> ENTT_IS_EMPTY (ignore default constructible)
 * review multi component views to reduce instantiations once empty types are gone...
 * avoid using deprecated functions all around
 * accept fixed type iterators like std::container<T> does rather than all possible types
