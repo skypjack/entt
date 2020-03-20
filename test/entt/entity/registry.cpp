@@ -362,7 +362,7 @@ TEST(Registry, CreateManyEntitiesAtOnceWithListener) {
     registry.on_construct<empty_type>().connect<&listener::incr<empty_type>>(listener);
     registry.create(std::begin(entities), std::end(entities));
     registry.assign(std::begin(entities), std::end(entities), 'a');
-    registry.assign(std::begin(entities), std::end(entities), empty_type{});
+    registry.assign<empty_type>(std::begin(entities), std::end(entities));
 
     ASSERT_TRUE(registry.has<empty_type>(entities[0]));
     ASSERT_EQ(registry.get<char>(entities[2]), 'a');
@@ -815,8 +815,8 @@ TEST(Registry, NestedGroups) {
     entt::entity entities[10];
 
     registry.create(std::begin(entities), std::end(entities));
-    registry.assign(std::begin(entities), std::end(entities), int{});
-    registry.assign(std::begin(entities), std::end(entities), char{});
+    registry.assign<int>(std::begin(entities), std::end(entities));
+    registry.assign<char>(std::begin(entities), std::end(entities));
     const auto g1 = registry.group<int>(entt::get<char>, entt::exclude<double>);
 
     ASSERT_TRUE(g1.sortable());

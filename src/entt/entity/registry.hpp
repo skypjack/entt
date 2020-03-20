@@ -71,9 +71,9 @@ class basic_registry {
             }
         }
 
-        template<typename It, typename Value>
-        void insert(basic_registry &owner, It first, It last, Value &&value) {
-            storage<entity_type, Component>::insert(first, last, std::forward<Value>(value));
+        template<typename It, typename... Args>
+        void insert(basic_registry &owner, It first, It last, Args &&... args) {
+            storage<entity_type, Component>::insert(first, last, std::forward<Args>(args)...);
 
             if(!construction.empty()) {
                 while(first != last) { construction.publish(owner, *(first++)); }
@@ -648,14 +648,14 @@ public:
      *
      * @sa emplace
      *
-     * @tparam It Type of input iterator.
      * @tparam Component Type of component to create.
+     * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param value An instance of the component to assign.
      */
-    template<typename It, typename Component>
-    void insert(It first, It last, const Component &value) {
+    template<typename Component, typename It>
+    void insert(It first, It last, const Component &value = {}) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
         assure<Component>().insert(*this, first, last, value);
     }
@@ -664,7 +664,7 @@ public:
     template<typename Component, typename It>
     [[deprecated("use ::insert instead")]]
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    assign(It first, It last, const Component &value) {
+    assign(It first, It last, const Component &value = {}) {
         return insert(std::move(first), std::move(last), value);
     }
 
@@ -678,13 +678,14 @@ public:
      * @tparam CIt Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param value An iterator to the first element of the range of components.
+     * @param from An iterator to the first element of the range of components.
+     * @param to An iterator past the last element of the range of components.
      */
     template<typename Component, typename EIt, typename CIt>
-    void insert(EIt first, EIt last, CIt value) {
+    void insert(EIt first, EIt last, CIt from, CIt to) {
         static_assert(std::is_constructible_v<Component, typename std::iterator_traits<CIt>::value_type>);
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        assure<Component>().insert(*this, first, last, value);
+        assure<Component>().insert(*this, first, last, from, to);
     }
 
     /*! @copydoc insert */
@@ -692,7 +693,7 @@ public:
     [[deprecated("use ::insert instead")]]
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<EIt>::value_type, entity_type>, void>
     assign(EIt first, EIt last, CIt value) {
-        return insert<Component>(std::move(first), std::move(last), std::move(value));
+        return insert<Component>(std::move(first), std::move(last), value, value + std::distance(first, last));
     }
 
     /**

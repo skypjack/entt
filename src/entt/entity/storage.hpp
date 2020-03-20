@@ -351,7 +351,7 @@ public:
      * @param value An instance of the object to construct.
      */
     template<typename It>
-    void insert(It first, It last, const object_type &value) {
+    void insert(It first, It last, const object_type &value = {}) {
         instances.insert(instances.end(), std::distance(first, last), value);
         // entities go after components in case constructors throw
         underlying_type::insert(first, last);
@@ -361,7 +361,7 @@ public:
     template<typename It>
     [[deprecated("use ::insert instead")]]
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    construct(It first, It last, const object_type &value) {
+    construct(It first, It last, const object_type &value = {}) {
         insert(std::move(first), std::move(last), value);
     }
 
@@ -375,11 +375,12 @@ public:
      * @tparam CIt Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
-     * @param value An iterator to the first element of the range of objects.
+     * @param from An iterator to the first element of the range of objects.
+     * @param to An iterator past the last element of the range of objects.
      */
     template<typename EIt, typename CIt>
-    void insert(EIt first, EIt last, CIt value) {
-        instances.insert(instances.end(), value, value + std::distance(first, last));
+    void insert(EIt first, EIt last, CIt from, CIt to) {
+        instances.insert(instances.end(), from, to);
         // entities go after components in case constructors throw
         underlying_type::insert(first, last);
     }
@@ -558,7 +559,7 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    void insert(It first, It last, const object_type &) {
+    void insert(It first, It last, const object_type & = {}) {
         underlying_type::insert(first, last);
     }
 
@@ -569,7 +570,7 @@ public:
     template<typename It>
     [[deprecated("use ::insert instead")]]
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    construct(It first, It last, const object_type &value) {
+    construct(It first, It last, const object_type &value = {}) {
         insert(std::move(first), std::move(last), value);
     }
 };
