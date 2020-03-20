@@ -115,8 +115,8 @@ TEST(Benchmark, ConstructManyWithComponents) {
 
     timer timer;
     registry.create(entities.begin(), entities.end());
-    registry.assign<position>(entities.begin(), entities.end());
-    registry.assign<velocity>(entities.begin(), entities.end());
+    registry.assign(entities.begin(), entities.end(), position{});
+    registry.assign(entities.begin(), entities.end(), velocity{});
     timer.elapsed();
 }
 

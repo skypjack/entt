@@ -111,7 +111,7 @@ struct basic_actor {
      */
     template<typename Component, typename... Args>
     decltype(auto) assign(Args &&... args) {
-        return reg->template assign_or_replace<Component>(entt, std::forward<Args>(args)...);
+        return reg->template emplace_or_replace<Component>(entt, std::forward<Args>(args)...);
     }
 
     /**

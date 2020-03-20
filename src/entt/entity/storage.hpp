@@ -324,7 +324,7 @@ public:
         }
 
         // entity goes after component in case constructor throws
-        underlying_type::construct(entt);
+        underlying_type::emplace(entt);
     }
 
     /*! @copydoc emplace */
@@ -350,17 +350,17 @@ public:
      * @param value An instance of the object to construct.
      */
     template<typename It>
-    void insert(It first, It last, const object_type &value = {}) {
+    void insert(It first, It last, const object_type &value) {
         instances.insert(instances.end(), std::distance(first, last), value);
         // entities go after components in case constructors throw
-        underlying_type::construct(first, last);
+        underlying_type::insert(first, last);
     }
 
     /*! @copydoc insert */
     template<typename It>
     [[deprecated("use ::insert instead")]]
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    construct(It first, It last, const object_type &value = {}) {
+    construct(It first, It last, const object_type &value) {
         insert(std::move(first), std::move(last), value);
     }
 
@@ -380,7 +380,7 @@ public:
     void insert(EIt first, EIt last, CIt value) {
         instances.insert(instances.end(), value, value + std::distance(first, last));
         // entities go after components in case constructors throw
-        underlying_type::construct(first, last);
+        underlying_type::insert(first, last);
     }
 
     /*! @copydoc insert */
@@ -533,7 +533,7 @@ public:
     template<typename... Args>
     void emplace(const entity_type entt, Args &&... args) {
         [[maybe_unused]] object_type instance{std::forward<Args>(args)...};
-        underlying_type::construct(entt);
+        underlying_type::emplace(entt);
     }
 
     /*! @copydoc emplace */
@@ -557,8 +557,8 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    void insert(It first, It last, const object_type & = {}) {
-        underlying_type::construct(first, last);
+    void insert(It first, It last, const object_type &) {
+        underlying_type::insert(first, last);
     }
 
     /**
@@ -568,7 +568,7 @@ public:
     template<typename It>
     [[deprecated("use ::insert instead")]]
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    construct(It first, It last, const object_type &value = {}) {
+    construct(It first, It last, const object_type &value) {
         insert(std::move(first), std::move(last), value);
     }
 };

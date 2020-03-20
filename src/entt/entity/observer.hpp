@@ -180,7 +180,7 @@ class basic_observer {
         static void maybe_valid_if(basic_observer &obs, const basic_registry<Entity> &reg, const Entity entt) {
             if(reg.template has<Require...>(entt) && !reg.template any<Reject...>(entt)) {
                 if(auto *comp = obs.view.try_get(entt); !comp) {
-                    obs.view.construct(entt);
+                    obs.view.emplace(entt);
                 }
 
                 obs.view.get(entt) |= (1 << Index);
@@ -216,7 +216,7 @@ class basic_observer {
         static void maybe_valid_if(basic_observer &obs, const basic_registry<Entity> &reg, const Entity entt) {
             if(reg.template has<AllOf..., Require...>(entt) && !reg.template any<NoneOf..., Reject...>(entt)) {
                 if(auto *comp = obs.view.try_get(entt); !comp) {
-                    obs.view.construct(entt);
+                    obs.view.emplace(entt);
                 }
 
                 obs.view.get(entt) |= (1 << Index);

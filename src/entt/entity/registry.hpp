@@ -63,7 +63,7 @@ class basic_registry {
 
         template<typename... Args>
         decltype(auto) emplace(basic_registry &owner, const Entity entt, Args &&... args) {
-            this->construct(entt, std::forward<Args>(args)...);
+            storage<entity_type, Component>::emplace(entt, std::forward<Args>(args)...);
             construction.publish(owner, entt);
 
             if constexpr(!ENTT_IS_EMPTY(Component)) {
@@ -73,7 +73,7 @@ class basic_registry {
 
         template<typename It, typename Value>
         void insert(basic_registry &owner, It first, It last, Value &&value) {
-            this->construct(first, last, std::forward<Value>(value));
+            storage<entity_type, Component>::insert(first, last, std::forward<Value>(value));
 
             if(!construction.empty()) {
                 while(first != last) { construction.publish(owner, *(first++)); }
@@ -147,7 +147,7 @@ class basic_registry {
 
             if constexpr(sizeof...(Owned) == 0) {
                 if(is_valid && !current.has(entt)) {
-                    current.construct(entt);
+                    current.emplace(entt);
                 }
             } else {
                 if(is_valid && !(std::get<0>(cpools).index(entt) < current)) {
@@ -648,14 +648,14 @@ public:
      *
      * @sa emplace
      *
-     * @tparam Component Type of component to create.
      * @tparam It Type of input iterator.
+     * @tparam Component Type of component to create.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param value An instance of the component to assign.
      */
     template<typename It, typename Component>
-    void insert(It first, It last, const Component &value = {}) {
+    void insert(It first, It last, const Component &value) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
         assure<Component>().insert(*this, first, last, value);
     }
@@ -664,7 +664,7 @@ public:
     template<typename Component, typename It>
     [[deprecated("use ::insert instead")]]
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    assign(It first, It last, const Component &value = {}) {
+    assign(It first, It last, const Component &value) {
         return insert(std::move(first), std::move(last), value);
     }
 
@@ -1434,7 +1434,7 @@ public:
 
             if constexpr(sizeof...(Owned) == 0) {
                 for(const auto entity: view<Owned..., Get...>(entt::exclude<Exclude...>)) {
-                    handler->current.construct(entity);
+                    handler->current.emplace(entity);
                 }
             } else {
                 // we cannot iterate backwards because we want to leave behind valid entities in case of owned types

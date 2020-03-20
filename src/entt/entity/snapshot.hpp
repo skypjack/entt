@@ -216,12 +216,12 @@ class basic_snapshot_loader {
             if constexpr(std::is_empty_v<Type>) {
                 archive(entt);
                 force(*reg, entt, discard);
-                reg->template assign<Type>(args..., entt);
+                reg->template emplace<Type>(args..., entt);
             } else {
                 Type instance{};
                 archive(entt, instance);
                 force(*reg, entt, discard);
-                reg->template assign<Type>(args..., entt, std::as_const(instance));
+                reg->template emplace<Type>(args..., entt, std::as_const(instance));
             }
         }
     }
@@ -433,13 +433,13 @@ class basic_continuous_loader {
             if constexpr(std::is_empty_v<Other>) {
                 archive(entt);
                 restore(entt);
-                reg->template assign_or_replace<Other>(map(entt));
+                reg->template emplace_or_replace<Other>(map(entt));
             } else {
                 Other instance{};
                 archive(entt, instance);
                 (update(instance, member), ...);
                 restore(entt);
-                reg->template assign_or_replace<Other>(map(entt), std::as_const(instance));
+                reg->template emplace_or_replace<Other>(map(entt), std::as_const(instance));
             }
         }
     }
