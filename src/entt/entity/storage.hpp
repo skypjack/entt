@@ -57,8 +57,8 @@ class storage: public sparse_set<Entity> {
         using instance_type = std::conditional_t<Const, const std::vector<Type>, std::vector<Type>>;
         using index_type = typename traits_type::difference_type;
 
-        iterator(instance_type *ref, const index_type idx) ENTT_NOEXCEPT
-            : instances{ref}, index{idx}
+        iterator(instance_type &ref, const index_type idx) ENTT_NOEXCEPT
+            : instances{&ref}, index{idx}
         {}
 
     public:
@@ -94,7 +94,8 @@ class storage: public sparse_set<Entity> {
         }
 
         iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
-            return iterator{instances, index-value};
+            iterator copy = *this;
+            return (copy += value);
         }
 
         iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
@@ -221,7 +222,7 @@ public:
      */
     const_iterator_type cbegin() const ENTT_NOEXCEPT {
         const typename traits_type::difference_type pos = underlying_type::size();
-        return const_iterator_type{&instances, pos};
+        return const_iterator_type{instances, pos};
     }
 
     /*! @copydoc cbegin */
@@ -232,7 +233,7 @@ public:
     /*! @copydoc begin */
     iterator_type begin() ENTT_NOEXCEPT {
         const typename traits_type::difference_type pos = underlying_type::size();
-        return iterator_type{&instances, pos};
+        return iterator_type{instances, pos};
     }
 
     /**
@@ -250,7 +251,7 @@ public:
      * given type.
      */
     const_iterator_type cend() const ENTT_NOEXCEPT {
-        return const_iterator_type{&instances, {}};
+        return const_iterator_type{instances, {}};
     }
 
     /*! @copydoc cend */
@@ -260,7 +261,7 @@ public:
 
     /*! @copydoc end */
     iterator_type end() ENTT_NOEXCEPT {
-        return iterator_type{&instances, {}};
+        return iterator_type{instances, {}};
     }
 
     /**

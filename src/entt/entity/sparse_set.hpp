@@ -58,8 +58,8 @@ class sparse_set {
         using direct_type = std::vector<Entity>;
         using index_type = typename traits_type::difference_type;
 
-        iterator(const direct_type *ref, const index_type idx) ENTT_NOEXCEPT
-            : direct{ref}, index{idx}
+        iterator(const direct_type &ref, const index_type idx) ENTT_NOEXCEPT
+            : direct{&ref}, index{idx}
         {}
 
     public:
@@ -95,7 +95,8 @@ class sparse_set {
         }
 
         iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
-            return iterator{direct, index-value};
+            iterator copy = *this;
+            return (copy += value);
         }
 
         iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
@@ -297,7 +298,7 @@ public:
      */
     iterator_type begin() const ENTT_NOEXCEPT {
         const typename traits_type::difference_type pos = direct.size();
-        return iterator_type{&direct, pos};
+        return iterator_type{direct, pos};
     }
 
     /**
@@ -315,7 +316,7 @@ public:
      * internal packed array.
      */
     iterator_type end() const ENTT_NOEXCEPT {
-        return iterator_type{&direct, {}};
+        return iterator_type{direct, {}};
     }
 
     /**

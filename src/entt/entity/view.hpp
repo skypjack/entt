@@ -81,8 +81,8 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     class iterator final {
         friend class basic_view<Entity, exclude_t<Exclude...>, Component...>;
 
-        iterator(const sparse_set<Entity> *candidate, unchecked_type other, filter_type ignore, underlying_iterator_type curr) ENTT_NOEXCEPT
-            : view{candidate},
+        iterator(const sparse_set<Entity> &candidate, unchecked_type other, filter_type ignore, underlying_iterator_type curr) ENTT_NOEXCEPT
+            : view{&candidate},
               unchecked{other},
               filter{ignore},
               it{curr}
@@ -154,16 +154,16 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         : pools{&component..., &epool...}
     {}
 
-    const sparse_set<Entity> * candidate() const ENTT_NOEXCEPT {
-        return std::min({ static_cast<const sparse_set<Entity> *>(std::get<pool_type<Component> *>(pools))... }, [](const auto *lhs, const auto *rhs) {
+    const sparse_set<Entity> & candidate() const ENTT_NOEXCEPT {
+        return *std::min({ static_cast<const sparse_set<Entity> *>(std::get<pool_type<Component> *>(pools))... }, [](const auto *lhs, const auto *rhs) {
             return lhs->size() < rhs->size();
         });
     }
 
-    unchecked_type unchecked(const sparse_set<Entity> *view) const {
+    unchecked_type unchecked(const sparse_set<Entity> &view) const {
         std::size_t pos{};
         unchecked_type other{};
-        ((std::get<pool_type<Component> *>(pools) == view ? nullptr : (other[pos++] = std::get<pool_type<Component> *>(pools))), ...);
+        ((std::get<pool_type<Component> *>(pools) == &view ? nullptr : (other[pos++] = std::get<pool_type<Component> *>(pools))), ...);
         return other;
     }
 
@@ -306,9 +306,9 @@ public:
      * @return An iterator to the first entity that has the given components.
      */
     iterator_type begin() const {
-        const auto *view = candidate();
+        const auto &view = candidate();
         const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
-        return iterator_type{view, unchecked(view), ignore, view->begin()};
+        return iterator_type{view, unchecked(view), ignore, view.begin()};
     }
 
     /**
@@ -327,9 +327,9 @@ public:
      * given components.
      */
     iterator_type end() const {
-        const auto *view = candidate();
+        const auto &view = candidate();
         const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
-        return iterator_type{view, unchecked(view), ignore, view->end()};
+        return iterator_type{view, unchecked(view), ignore, view.end()};
     }
 
     /**
@@ -359,9 +359,9 @@ public:
      * iterator otherwise.
      */
     iterator_type find(const entity_type entt) const {
-        const auto *view = candidate();
+        const auto &view = candidate();
         const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
-        iterator_type it{view, unchecked(view), ignore, view->find(entt)};
+        iterator_type it{view, unchecked(view), ignore, view.find(entt)};
         return (it != end() && *it == entt) ? it : end();
     }
 
@@ -430,8 +430,8 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        const auto *view = candidate();
-        ((std::get<pool_type<Component> *>(pools) == view ? each<Component>(std::move(func)) : void()), ...);
+        const auto &view = candidate();
+        ((std::get<pool_type<Component> *>(pools) == &view ? each<Component>(std::move(func)) : void()), ...);
     }
 
     /**

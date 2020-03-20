@@ -65,8 +65,8 @@ class basic_runtime_view {
 
         using direct_type = std::vector<const sparse_set<Entity> *>;
 
-        iterator(const direct_type *all, underlying_iterator_type curr) ENTT_NOEXCEPT
-            : pools{all},
+        iterator(const direct_type &all, underlying_iterator_type curr) ENTT_NOEXCEPT
+            : pools{&all},
               it{curr}
         {
             if(it != (*pools)[0]->end() && !valid()) {
@@ -187,7 +187,7 @@ public:
         iterator_type it{};
 
         if(valid()) {
-            it = { &pools, pools[0]->begin() };
+            it = { pools, pools[0]->begin() };
         }
 
         return it;
@@ -212,7 +212,7 @@ public:
         iterator_type it{};
 
         if(valid()) {
-            it = { &pools, pools[0]->end() };
+            it = { pools, pools[0]->end() };
         }
 
         return it;
