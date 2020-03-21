@@ -191,7 +191,7 @@ class basic_registry {
         if(const auto length = pools.size(); !(index < length) || pools[index].type_id != type_info<Component>::id()) {
             for(index = {}; index < length && pools[index].type_id != type_info<Component>::id(); ++index);
 
-            if(index == pools.size()) {
+            if(index == length) {
                 pools.push_back(pool_data{
                     type_info<Component>::id(),
                     std::unique_ptr<sparse_set<entity_type>>{new pool_handler<Component>()},
