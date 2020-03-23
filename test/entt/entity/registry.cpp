@@ -1073,6 +1073,19 @@ TEST(Registry, Signals) {
     registry.assign<int>(e0);
     registry.assign<int>(e1);
 
+    registry.remove(e1);
+    ASSERT_EQ(listener.counter, 2);
+    ASSERT_EQ(listener.last, e1);
+
+    registry.remove(e1);
+    ASSERT_EQ(listener.counter, 2);
+    ASSERT_EQ(listener.last, e1);
+
+    registry.assign<empty_type>(e1);
+    registry.assign<int>(e1);
+    ASSERT_EQ(listener.counter, 4);
+    ASSERT_EQ(listener.last, e1);
+
     registry.destroy(e1);
 
     ASSERT_EQ(listener.counter, 2);
@@ -1211,7 +1224,24 @@ TEST(Registry, RangeRemove) {
 
     ASSERT_FALSE(registry.has<int>(e0));
     ASSERT_FALSE(registry.has<int>(e1));
+    ASSERT_TRUE(registry.has<char>(e1));
     ASSERT_TRUE(registry.has<int>(e2));
+
+    registry.assign<int>(e0);
+    registry.assign<double>(e2);
+
+    ASSERT_TRUE(registry.has<int>(e0));
+    ASSERT_TRUE(registry.has<char>(e1));
+    ASSERT_TRUE(registry.has<int>(e2));
+    ASSERT_TRUE(registry.has<double>(e2));
+
+    const auto view2 = registry.view<int>();
+    registry.remove(view2.begin(), view2.end());
+
+    ASSERT_FALSE(registry.has<int>(e0));
+    ASSERT_TRUE(registry.has<char>(e1));
+    ASSERT_FALSE(registry.has<int>(e2));
+    ASSERT_FALSE(registry.has<double>(e2));
 }
 
 TEST(Registry, NonOwningGroupInterleaved) {

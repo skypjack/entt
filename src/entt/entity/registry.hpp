@@ -578,16 +578,7 @@ public:
      * @param entity A valid entity identifier.
      */
     void destroy(const entity_type entity) {
-        ENTT_ASSERT(valid(entity));
-
-        for(auto pos = pools.size(); pos; --pos) {
-            if(auto &pdata = pools[pos-1]; pdata.pool->has(entity)) {
-                pdata.remove(*pdata.pool, *this, entity);
-            }
-        }
-
-        // just a way to protect users from listeners that attach components
-        ENTT_ASSERT(orphan(entity));
+        remove(entity);
 
         // lengthens the implicit list of destroyed entities
         const auto entt = to_integral(entity) & traits_type::entity_mask;
@@ -805,6 +796,8 @@ public:
     /**
      * @brief Removes the given components from an entity.
      *
+     * If no components are given all components the entity has will be removed.
+     *
      * @warning
      * Attempting to use an invalid entity or to remove a component from an
      * entity that doesn't own it results in undefined behavior.<br/>
@@ -812,13 +805,30 @@ public:
      * invalid entity or if the entity doesn't own an instance of the given
      * component.
      *
+     * @warning
+     * In case there are listeners that observe the destruction of components
+     * and assign other components to the entity in their bodies, the result of
+     * invoking this function may not be as expected. In the worst case, it
+     * could lead to undefined behavior. An assertion will abort the execution
+     * at runtime in debug mode if a violation is detected.
+     *
      * @tparam Component Types of components to remove.
      * @param entity A valid entity identifier.
      */
     template<typename... Component>
     void remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
-        (assure<Component>().remove(*this, entity), ...);
+        if constexpr(sizeof...(Component) == 0) {
+            for(auto pos = pools.size(); pos; --pos) {
+                if(auto &pdata = pools[pos-1]; pdata.pool->has(entity)) {
+                    pdata.remove(*pdata.pool, *this, entity);
+                }
+            }
+            ENTT_ASSERT(orphan(entity));
+        } else {
+            (assure<Component>().remove(*this, entity), ...);
+            ENTT_ASSERT(!any<Component...>(entity));
+        }
     }
 
     /**
@@ -833,8 +843,12 @@ public:
      */
     template<typename... Component, typename It>
     void remove(It first, It last) {
-        ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        (assure<Component>().remove(*this, first, last), ...);
+        if constexpr(sizeof...(Component) == 0) {
+            std::for_each(first, last, [this](const auto entity) { this->remove(entity); });
+        } else {
+            ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
+            (assure<Component>().remove(*this, first, last), ...);
+        }
     }
 
     /**
