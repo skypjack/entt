@@ -64,10 +64,10 @@ void pathological(Func func) {
     });
 }
 
-TEST(Benchmark, Construct) {
+TEST(Benchmark, Create) {
     entt::registry registry;
 
-    std::cout << "Constructing 1000000 entities" << std::endl;
+    std::cout << "Creating 1000000 entities" << std::endl;
 
     timer timer;
 
@@ -78,22 +78,22 @@ TEST(Benchmark, Construct) {
     timer.elapsed();
 }
 
-TEST(Benchmark, ConstructMany) {
+TEST(Benchmark, CreateMany) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
 
-    std::cout << "Constructing 1000000 entities at once" << std::endl;
+    std::cout << "Creating 1000000 entities at once" << std::endl;
 
     timer timer;
     registry.create(entities.begin(), entities.end());
     timer.elapsed();
 }
 
-TEST(Benchmark, ConstructManyAndAssignComponents) {
+TEST(Benchmark, CreateManyAndAssignComponents) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
 
-    std::cout << "Constructing 1000000 entities at once and assign components" << std::endl;
+    std::cout << "Creating 1000000 entities at once and assign components" << std::endl;
 
     timer timer;
 
@@ -107,11 +107,11 @@ TEST(Benchmark, ConstructManyAndAssignComponents) {
     timer.elapsed();
 }
 
-TEST(Benchmark, ConstructManyWithComponents) {
+TEST(Benchmark, CreateManyWithComponents) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
 
-    std::cout << "Constructing 1000000 entities at once with components" << std::endl;
+    std::cout << "Creating 1000000 entities at once with components" << std::endl;
 
     timer timer;
     registry.create(entities.begin(), entities.end());

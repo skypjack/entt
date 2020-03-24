@@ -22,9 +22,10 @@ Next:
 * replace observer class with observer functions
 * get(cmp, entity) -> void *, set(cmp, entity, void *)
 * review multi component views to reduce instantiations once empty types are gone...
-* accept fixed type iterators like std::container<T> does rather than all possible types
+* move signals down to the storage class?
 
 * WIP:
+ - introduce the component iterators for non-contiguous collections of entities (multi component views, observers, user defined collections)
  - deprecate snapshot, loader, ...
  - provide documentation to describe alternatives
 
