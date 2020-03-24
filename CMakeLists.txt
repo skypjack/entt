@@ -102,19 +102,10 @@ target_compile_features(EnTT INTERFACE cxx_std_17)
 
 include(CMakePackageConfigHelpers)
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-    set(CUSTOM_INSTALL_CONFIGDIR cmake)
-else()
-    set(CUSTOM_INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/entt)
-endif()
-
-install(TARGETS EnTT EXPORT EnTTTargets)
-
-configure_package_config_file(
-    ${EnTT_SOURCE_DIR}/cmake/in/EnTTConfig.cmake.in
-    EnTTConfig.cmake
-    INSTALL_DESTINATION ${CUSTOM_INSTALL_CONFIGDIR}
-    PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+install(
+    TARGETS EnTT
+    EXPORT EnTTTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 write_basic_package_version_file(
@@ -123,10 +114,17 @@ write_basic_package_version_file(
     COMPATIBILITY AnyNewerVersion
 )
 
+configure_package_config_file(
+    ${EnTT_SOURCE_DIR}/cmake/in/EnTTConfig.cmake.in
+    EnTTConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
+    PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+)
+
 install(
     EXPORT EnTTTargets
     FILE EnTTTargets.cmake
-    DESTINATION ${CUSTOM_INSTALL_CONFIGDIR}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
     NAMESPACE EnTT::
 )
 
@@ -134,7 +132,7 @@ install(
     FILES
         ${PROJECT_BINARY_DIR}/EnTTConfig.cmake
         ${PROJECT_BINARY_DIR}/EnTTConfigVersion.cmake
-    DESTINATION ${CUSTOM_INSTALL_CONFIGDIR}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
 )
 
 install(DIRECTORY src/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
