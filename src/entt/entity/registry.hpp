@@ -1138,10 +1138,10 @@ public:
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(registry<Entity> &, Entity, Component &);
+     * void(registry<Entity> &, Entity);
      * @endcode
      *
-     * Listeners are invoked **before** the component has been updated.
+     * Listeners are invoked **after** the component has been updated.
      *
      * @sa sink
      *
