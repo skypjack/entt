@@ -118,7 +118,12 @@ configure_package_config_file(
     ${EnTT_SOURCE_DIR}/cmake/in/EnTTConfig.cmake.in
     EnTTConfig.cmake
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/EnTT/cmake
-    PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+)
+
+export(
+    EXPORT EnTTTargets
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/EnTTTargets.cmake
+    NAMESPACE EnTT::
 )
 
 install(
@@ -136,6 +141,8 @@ install(
 )
 
 install(DIRECTORY src/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+export(PACKAGE EnTT)
 
 #
 # Tests
