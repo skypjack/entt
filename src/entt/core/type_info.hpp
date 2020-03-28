@@ -8,17 +8,9 @@
 #include "fwd.hpp"
 
 
-#ifndef ENTT_PRETTY_FUNCTION
-#   define ENTT_TYPE_ID_API ENTT_API
-#else
-#   define ENTT_TYPE_ID_API
-#endif
-
-
 namespace entt {
 
 
-#ifndef ENTT_PRETTY_FUNCTION
 /**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
@@ -28,9 +20,9 @@ namespace entt {
 namespace internal {
 
 
-struct ENTT_API type_id_generator {
+struct ENTT_API type_index {
     static id_type next() ENTT_NOEXCEPT {
-        static id_type value{};
+        static ENTT_MAYBE_ATOMIC(id_type) value{};
         return value++;
     }
 };
@@ -43,15 +35,23 @@ struct ENTT_API type_id_generator {
  * Internal details not to be documented.
  * @endcond TURN_OFF_DOXYGEN
  */
-#endif
 
 
 /**
- * @brief Types identifiers.
- * @tparam Type Type for which to generate an identifier.
+ * @brief Type info.
+ * @tparam Type Type for which to generate information.
  */
 template<typename Type, typename = void>
-struct ENTT_TYPE_ID_API type_info {
+struct ENTT_API type_info {
+    /**
+     * @brief Returns the sequential identifier of a given type.
+     * @return The sequential identifier of a given type.
+     */
+    static id_type index() ENTT_NOEXCEPT {
+        static const id_type value = internal::type_index::next();
+        return value;
+    }
+
     /**
      * @brief Returns the numeric representation of a given type.
      * @return The numeric representation of the given type.
@@ -68,8 +68,7 @@ struct ENTT_TYPE_ID_API type_info {
     }
 #else
     static id_type id() ENTT_NOEXCEPT {
-        static const id_type value = internal::type_id_generator::next();
-        return value;
+        return index();
     }
 #endif
 };
