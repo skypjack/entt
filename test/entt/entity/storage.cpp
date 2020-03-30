@@ -135,13 +135,13 @@ TEST(Storage, TypesFromStandardTemplateLibraryMustWork) {
 }
 
 TEST(Storage, Iterator) {
-    using iterator_type = typename entt::storage<entt::entity, boxed_int>::iterator_type;
+    using iterator = typename entt::storage<entt::entity, boxed_int>::iterator;
 
     entt::storage<entt::entity, boxed_int> pool;
     pool.construct(entt::entity{3}, 42);
 
-    iterator_type end{pool.begin()};
-    iterator_type begin{};
+    iterator end{pool.begin()};
+    iterator begin{};
     begin = pool.end();
     std::swap(begin, end);
 
@@ -177,13 +177,13 @@ TEST(Storage, Iterator) {
 }
 
 TEST(Storage, ConstIterator) {
-    using iterator_type = typename entt::storage<entt::entity, boxed_int>::const_iterator_type;
+    using iterator = typename entt::storage<entt::entity, boxed_int>::const_iterator;
 
     entt::storage<entt::entity, boxed_int> pool;
     pool.construct(entt::entity{3}, 42);
 
-    iterator_type cend{pool.cbegin()};
-    iterator_type cbegin{};
+    iterator cend{pool.cbegin()};
+    iterator cbegin{};
     cbegin = pool.cend();
     std::swap(cbegin, cend);
 

@@ -298,10 +298,10 @@ TEST(MultiComponentView, Iterator) {
     registry.assign<char>(entity);
 
     const auto view = registry.view<int, char>();
-    using iterator_type = typename decltype(view)::iterator_type;
+    using iterator = typename decltype(view)::iterator;
 
-    iterator_type end{view.begin()};
-    iterator_type begin{};
+    iterator end{view.begin()};
+    iterator begin{};
     begin = view.end();
     std::swap(begin, end);
 

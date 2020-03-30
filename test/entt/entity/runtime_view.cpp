@@ -57,10 +57,10 @@ TEST(RuntimeView, Iterator) {
 
     ENTT_ID_TYPE types[] = { entt::type_info<int>::id(), entt::type_info<char>::id() };
     auto view = registry.runtime_view(std::begin(types), std::end(types));
-    using iterator_type = typename decltype(view)::iterator_type;
+    using iterator = typename decltype(view)::iterator;
 
-    iterator_type end{view.begin()};
-    iterator_type begin{};
+    iterator end{view.begin()};
+    iterator begin{};
     begin = view.end();
     std::swap(begin, end);
 

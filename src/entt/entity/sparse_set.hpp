@@ -52,13 +52,13 @@ class sparse_set {
     static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0));
     static constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(typename traits_type::entity_type);
 
-    class iterator final {
+    class sparse_set_iterator final {
         friend class sparse_set<Entity>;
 
         using direct_type = std::vector<Entity>;
         using index_type = typename traits_type::difference_type;
 
-        iterator(const direct_type &ref, const index_type idx) ENTT_NOEXCEPT
+        sparse_set_iterator(const direct_type &ref, const index_type idx) ENTT_NOEXCEPT
             : direct{&ref}, index{idx}
         {}
 
@@ -69,45 +69,45 @@ class sparse_set {
         using reference = const value_type &;
         using iterator_category = std::random_access_iterator_tag;
 
-        iterator() ENTT_NOEXCEPT = default;
+        sparse_set_iterator() ENTT_NOEXCEPT = default;
 
-        iterator & operator++() ENTT_NOEXCEPT {
+        sparse_set_iterator & operator++() ENTT_NOEXCEPT {
             return --index, *this;
         }
 
-        iterator operator++(int) ENTT_NOEXCEPT {
+        sparse_set_iterator operator++(int) ENTT_NOEXCEPT {
             iterator orig = *this;
             return operator++(), orig;
         }
 
-        iterator & operator--() ENTT_NOEXCEPT {
+        sparse_set_iterator & operator--() ENTT_NOEXCEPT {
             return ++index, *this;
         }
 
-        iterator operator--(int) ENTT_NOEXCEPT {
-            iterator orig = *this;
+        sparse_set_iterator operator--(int) ENTT_NOEXCEPT {
+            sparse_set_iterator orig = *this;
             return operator--(), orig;
         }
 
-        iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
+        sparse_set_iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
             index -= value;
             return *this;
         }
 
-        iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
-            iterator copy = *this;
+        sparse_set_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+            sparse_set_iterator copy = *this;
             return (copy += value);
         }
 
-        iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
+        sparse_set_iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
             return (*this += -value);
         }
 
-        iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+        sparse_set_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
             return (*this + -value);
         }
 
-        difference_type operator-(const iterator &other) const ENTT_NOEXCEPT {
+        difference_type operator-(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
             return other.index - index;
         }
 
@@ -116,27 +116,27 @@ class sparse_set {
             return (*direct)[pos];
         }
 
-        bool operator==(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator==(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
             return other.index == index;
         }
 
-        bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator!=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
-        bool operator<(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator<(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
             return index > other.index;
         }
 
-        bool operator>(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator>(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
             return index < other.index;
         }
 
-        bool operator<=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator<=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
             return !(*this > other);
         }
 
-        bool operator>=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator>=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
             return !(*this < other);
         }
 
@@ -182,7 +182,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
-    using iterator_type = iterator;
+    using iterator = sparse_set_iterator;
 
     /*! @brief Default constructor. */
     sparse_set() = default;
@@ -296,9 +296,9 @@ public:
      *
      * @return An iterator to the first entity of the internal packed array.
      */
-    iterator_type begin() const ENTT_NOEXCEPT {
+    iterator begin() const ENTT_NOEXCEPT {
         const typename traits_type::difference_type pos = direct.size();
-        return iterator_type{direct, pos};
+        return iterator{direct, pos};
     }
 
     /**
@@ -315,8 +315,8 @@ public:
      * @return An iterator to the element following the last entity of the
      * internal packed array.
      */
-    iterator_type end() const ENTT_NOEXCEPT {
-        return iterator_type{direct, {}};
+    iterator end() const ENTT_NOEXCEPT {
+        return iterator{direct, {}};
     }
 
     /**
@@ -325,7 +325,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator_type find(const entity_type entt) const {
+    iterator find(const entity_type entt) const {
         return has(entt) ? --(end() - index(entt)) : end();
     }
 
@@ -493,7 +493,7 @@ public:
      * @param args Arguments to forward to the sort function object, if any.
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
-    void sort(iterator_type first, iterator_type last, Compare compare, Sort algo = Sort{}, Args &&... args) {
+    void sort(iterator first, iterator last, Compare compare, Sort algo = Sort{}, Args &&... args) {
         ENTT_ASSERT(!(last < first));
         ENTT_ASSERT(!(last > end()));
 
@@ -537,7 +537,7 @@ public:
      * @param args Arguments to forward to the sort function object, if any.
      */
     template<typename Apply, typename Compare, typename Sort = std_sort, typename... Args>
-    void arrange(iterator_type first, iterator_type last, Apply apply, Compare compare, Sort algo = Sort{}, Args &&... args) {
+    void arrange(iterator first, iterator last, Apply apply, Compare compare, Sort algo = Sort{}, Args &&... args) {
         ENTT_ASSERT(!(last < first));
         ENTT_ASSERT(!(last > end()));
 

@@ -72,16 +72,16 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     using pool_type = std::conditional_t<std::is_const_v<Comp>, const storage<Entity, std::remove_const_t<Comp>>, storage<Entity, Comp>>;
 
     template<typename Comp>
-    using component_iterator_type = decltype(std::declval<pool_type<Comp>>().begin());
+    using component_iterator = decltype(std::declval<pool_type<Comp>>().begin());
 
-    using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
+    using underlying_iterator = typename sparse_set<Entity>::iterator;
     using unchecked_type = std::array<const sparse_set<Entity> *, (sizeof...(Component) - 1)>;
     using filter_type = std::array<const sparse_set<Entity> *, sizeof...(Exclude)>;
 
-    class iterator final {
+    class view_iterator final {
         friend class basic_view<Entity, exclude_t<Exclude...>, Component...>;
 
-        iterator(const sparse_set<Entity> &candidate, unchecked_type other, filter_type ignore, underlying_iterator_type curr) ENTT_NOEXCEPT
+        view_iterator(const sparse_set<Entity> &candidate, unchecked_type other, filter_type ignore, underlying_iterator curr) ENTT_NOEXCEPT
             : view{&candidate},
               unchecked{other},
               filter{ignore},
@@ -98,39 +98,39 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         }
 
     public:
-        using difference_type = typename underlying_iterator_type::difference_type;
-        using value_type = typename underlying_iterator_type::value_type;
-        using pointer = typename underlying_iterator_type::pointer;
-        using reference = typename underlying_iterator_type::reference;
+        using difference_type = typename underlying_iterator::difference_type;
+        using value_type = typename underlying_iterator::value_type;
+        using pointer = typename underlying_iterator::pointer;
+        using reference = typename underlying_iterator::reference;
         using iterator_category = std::bidirectional_iterator_tag;
 
-        iterator() ENTT_NOEXCEPT = default;
+        view_iterator() ENTT_NOEXCEPT = default;
 
-        iterator & operator++() {
+        view_iterator & operator++() {
             while(++it != view->end() && !valid());
             return *this;
         }
 
-        iterator operator++(int) {
-            iterator orig = *this;
+        view_iterator operator++(int) {
+            view_iterator orig = *this;
             return operator++(), orig;
         }
 
-        iterator & operator--() ENTT_NOEXCEPT {
+        view_iterator & operator--() ENTT_NOEXCEPT {
             while(--it != view->begin() && !valid());
             return *this;
         }
 
-        iterator operator--(int) ENTT_NOEXCEPT {
-            iterator orig = *this;
+        view_iterator operator--(int) ENTT_NOEXCEPT {
+            view_iterator orig = *this;
             return operator--(), orig;
         }
 
-        bool operator==(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator==(const view_iterator &other) const ENTT_NOEXCEPT {
             return other.it == it;
         }
 
-        bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator!=(const view_iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
@@ -146,7 +146,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         const sparse_set<Entity> *view;
         unchecked_type unchecked;
         filter_type filter;
-        underlying_iterator_type it;
+        underlying_iterator it;
     };
 
     // we could use pool_type<Component> &..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
@@ -168,7 +168,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     }
 
     template<typename Comp, typename Other>
-    decltype(auto) get([[maybe_unused]] component_iterator_type<Comp> it, [[maybe_unused]] pool_type<Other> *cpool, [[maybe_unused]] const Entity entt) const {
+    decltype(auto) get([[maybe_unused]] component_iterator<Comp> it, [[maybe_unused]] pool_type<Other> *cpool, [[maybe_unused]] const Entity entt) const {
         if constexpr(std::is_same_v<Comp, Other>) {
             return *it;
         } else {
@@ -211,7 +211,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Input iterator type. */
-    using iterator_type = iterator;
+    using iterator = view_iterator;
 
     /**
      * @brief Returns the number of existing components of the given type.
@@ -305,10 +305,10 @@ public:
      *
      * @return An iterator to the first entity that has the given components.
      */
-    iterator_type begin() const {
+    iterator begin() const {
         const auto &view = candidate();
         const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
-        return iterator_type{view, unchecked(view), ignore, view.begin()};
+        return iterator{view, unchecked(view), ignore, view.begin()};
     }
 
     /**
@@ -326,10 +326,10 @@ public:
      * @return An iterator to the entity following the last entity that has the
      * given components.
      */
-    iterator_type end() const {
+    iterator end() const {
         const auto &view = candidate();
         const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
-        return iterator_type{view, unchecked(view), ignore, view.end()};
+        return iterator{view, unchecked(view), ignore, view.end()};
     }
 
     /**
@@ -358,10 +358,10 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator_type find(const entity_type entt) const {
+    iterator find(const entity_type entt) const {
         const auto &view = candidate();
         const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
-        iterator_type it{view, unchecked(view), ignore, view.find(entt)};
+        iterator it{view, unchecked(view), ignore, view.find(entt)};
         return (it != end() && *it == entt) ? it : end();
     }
 
@@ -561,7 +561,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Input iterator type. */
-    using iterator_type = typename sparse_set<Entity>::iterator_type;
+    using iterator = typename sparse_set<Entity>::iterator;
 
     /**
      * @brief Returns the number of entities that have the given component.
@@ -625,7 +625,7 @@ public:
      *
      * @return An iterator to the first entity that has the given component.
      */
-    iterator_type begin() const ENTT_NOEXCEPT {
+    iterator begin() const ENTT_NOEXCEPT {
         return pool->sparse_set<Entity>::begin();
     }
 
@@ -644,7 +644,7 @@ public:
      * @return An iterator to the entity following the last entity that has the
      * given component.
      */
-    iterator_type end() const ENTT_NOEXCEPT {
+    iterator end() const ENTT_NOEXCEPT {
         return pool->sparse_set<Entity>::end();
     }
 
@@ -674,7 +674,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator_type find(const entity_type entt) const {
+    iterator find(const entity_type entt) const {
         const auto it = pool->find(entt);
         return it != end() && *it == entt ? it : end();
     }

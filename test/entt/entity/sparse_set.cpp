@@ -139,13 +139,13 @@ TEST(SparseSet, BatchAdd) {
 }
 
 TEST(SparseSet, Iterator) {
-    using iterator_type = typename entt::sparse_set<entt::entity>::iterator_type;
+    using iterator = typename entt::sparse_set<entt::entity>::iterator;
 
     entt::sparse_set<entt::entity> set;
     set.construct(entt::entity{3});
 
-    iterator_type end{set.begin()};
-    iterator_type begin{};
+    iterator end{set.begin()};
+    iterator begin{};
     begin = set.end();
     std::swap(begin, end);
 

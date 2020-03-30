@@ -51,13 +51,13 @@ class storage: public sparse_set<Entity> {
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
     template<bool Const>
-    class iterator final {
+    class storage_iterator final {
         friend class storage<Entity, Type>;
 
         using instance_type = std::conditional_t<Const, const std::vector<Type>, std::vector<Type>>;
         using index_type = typename traits_type::difference_type;
 
-        iterator(instance_type &ref, const index_type idx) ENTT_NOEXCEPT
+        storage_iterator(instance_type &ref, const index_type idx) ENTT_NOEXCEPT
             : instances{&ref}, index{idx}
         {}
 
@@ -68,45 +68,45 @@ class storage: public sparse_set<Entity> {
         using reference = std::conditional_t<Const, const value_type &, value_type &>;
         using iterator_category = std::random_access_iterator_tag;
 
-        iterator() ENTT_NOEXCEPT = default;
+        storage_iterator() ENTT_NOEXCEPT = default;
 
-        iterator & operator++() ENTT_NOEXCEPT {
+        storage_iterator & operator++() ENTT_NOEXCEPT {
             return --index, *this;
         }
 
-        iterator operator++(int) ENTT_NOEXCEPT {
-            iterator orig = *this;
+        storage_iterator operator++(int) ENTT_NOEXCEPT {
+            storage_iterator orig = *this;
             return operator++(), orig;
         }
 
-        iterator & operator--() ENTT_NOEXCEPT {
+        storage_iterator & operator--() ENTT_NOEXCEPT {
             return ++index, *this;
         }
 
-        iterator operator--(int) ENTT_NOEXCEPT {
-            iterator orig = *this;
+        storage_iterator operator--(int) ENTT_NOEXCEPT {
+            storage_iterator orig = *this;
             return operator--(), orig;
         }
 
-        iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
+        storage_iterator & operator+=(const difference_type value) ENTT_NOEXCEPT {
             index -= value;
             return *this;
         }
 
-        iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
-            iterator copy = *this;
+        storage_iterator operator+(const difference_type value) const ENTT_NOEXCEPT {
+            storage_iterator copy = *this;
             return (copy += value);
         }
 
-        iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
+        storage_iterator & operator-=(const difference_type value) ENTT_NOEXCEPT {
             return (*this += -value);
         }
 
-        iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
+        storage_iterator operator-(const difference_type value) const ENTT_NOEXCEPT {
             return (*this + -value);
         }
 
-        difference_type operator-(const iterator &other) const ENTT_NOEXCEPT {
+        difference_type operator-(const storage_iterator &other) const ENTT_NOEXCEPT {
             return other.index - index;
         }
 
@@ -115,27 +115,27 @@ class storage: public sparse_set<Entity> {
             return (*instances)[pos];
         }
 
-        bool operator==(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator==(const storage_iterator &other) const ENTT_NOEXCEPT {
             return other.index == index;
         }
 
-        bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator!=(const storage_iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
-        bool operator<(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator<(const storage_iterator &other) const ENTT_NOEXCEPT {
             return index > other.index;
         }
 
-        bool operator>(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator>(const storage_iterator &other) const ENTT_NOEXCEPT {
             return index < other.index;
         }
 
-        bool operator<=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator<=(const storage_iterator &other) const ENTT_NOEXCEPT {
             return !(*this > other);
         }
 
-        bool operator>=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator>=(const storage_iterator &other) const ENTT_NOEXCEPT {
             return !(*this < other);
         }
 
@@ -161,9 +161,9 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
-    using iterator_type = iterator<false>;
+    using iterator = storage_iterator<false>;
     /*! @brief Constant random access iterator type. */
-    using const_iterator_type = iterator<true>;
+    using const_iterator = storage_iterator<true>;
 
     /**
      * @brief Increases the capacity of a storage.
@@ -220,20 +220,20 @@ public:
      *
      * @return An iterator to the first instance of the given type.
      */
-    const_iterator_type cbegin() const ENTT_NOEXCEPT {
+    const_iterator cbegin() const ENTT_NOEXCEPT {
         const typename traits_type::difference_type pos = underlying_type::size();
-        return const_iterator_type{instances, pos};
+        return const_iterator{instances, pos};
     }
 
     /*! @copydoc cbegin */
-    const_iterator_type begin() const ENTT_NOEXCEPT {
+    const_iterator begin() const ENTT_NOEXCEPT {
         return cbegin();
     }
 
     /*! @copydoc begin */
-    iterator_type begin() ENTT_NOEXCEPT {
+    iterator begin() ENTT_NOEXCEPT {
         const typename traits_type::difference_type pos = underlying_type::size();
-        return iterator_type{instances, pos};
+        return iterator{instances, pos};
     }
 
     /**
@@ -250,18 +250,18 @@ public:
      * @return An iterator to the element following the last instance of the
      * given type.
      */
-    const_iterator_type cend() const ENTT_NOEXCEPT {
-        return const_iterator_type{instances, {}};
+    const_iterator cend() const ENTT_NOEXCEPT {
+        return const_iterator{instances, {}};
     }
 
     /*! @copydoc cend */
-    const_iterator_type end() const ENTT_NOEXCEPT {
+    const_iterator end() const ENTT_NOEXCEPT {
         return cend();
     }
 
     /*! @copydoc end */
-    iterator_type end() ENTT_NOEXCEPT {
-        return iterator_type{instances, {}};
+    iterator end() ENTT_NOEXCEPT {
+        return iterator{instances, {}};
     }
 
     /**
@@ -474,7 +474,7 @@ public:
      * @param args Arguments to forward to the sort function object, if any.
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
-    void sort(iterator_type first, iterator_type last, Compare compare, Sort algo = Sort{}, Args &&... args) {
+    void sort(iterator first, iterator last, Compare compare, Sort algo = Sort{}, Args &&... args) {
         ENTT_ASSERT(!(last < first));
         ENTT_ASSERT(!(last > end()));
 

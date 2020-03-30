@@ -58,14 +58,14 @@ class basic_runtime_view {
     /*! @brief A registry is allowed to create views. */
     friend class basic_registry<Entity>;
 
-    using underlying_iterator_type = typename sparse_set<Entity>::iterator_type;
+    using underlying_iterator = typename sparse_set<Entity>::iterator;
 
-    class iterator final {
+    class view_iterator final {
         friend class basic_runtime_view<Entity>;
 
         using direct_type = std::vector<const sparse_set<Entity> *>;
 
-        iterator(const direct_type &all, underlying_iterator_type curr) ENTT_NOEXCEPT
+        view_iterator(const direct_type &all, underlying_iterator curr) ENTT_NOEXCEPT
             : pools{&all},
               it{curr}
         {
@@ -81,39 +81,39 @@ class basic_runtime_view {
         }
 
     public:
-        using difference_type = typename underlying_iterator_type::difference_type;
-        using value_type = typename underlying_iterator_type::value_type;
-        using pointer = typename underlying_iterator_type::pointer;
-        using reference = typename underlying_iterator_type::reference;
+        using difference_type = typename underlying_iterator::difference_type;
+        using value_type = typename underlying_iterator::value_type;
+        using pointer = typename underlying_iterator::pointer;
+        using reference = typename underlying_iterator::reference;
         using iterator_category = std::bidirectional_iterator_tag;
 
-        iterator() ENTT_NOEXCEPT = default;
+        view_iterator() ENTT_NOEXCEPT = default;
 
-        iterator & operator++() {
+        view_iterator & operator++() {
             while(++it != (*pools)[0]->end() && !valid());
             return *this;
         }
 
-        iterator operator++(int) {
-            iterator orig = *this;
+        view_iterator operator++(int) {
+            view_iterator orig = *this;
             return operator++(), orig;
         }
 
-        iterator & operator--() ENTT_NOEXCEPT {
+        view_iterator & operator--() ENTT_NOEXCEPT {
             while(--it != (*pools)[0]->begin() && !valid());
             return *this;
         }
 
-        iterator operator--(int) ENTT_NOEXCEPT {
-            iterator orig = *this;
+        view_iterator operator--(int) ENTT_NOEXCEPT {
+            view_iterator orig = *this;
             return operator--(), orig;
         }
 
-        bool operator==(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator==(const view_iterator &other) const ENTT_NOEXCEPT {
             return other.it == it;
         }
 
-        bool operator!=(const iterator &other) const ENTT_NOEXCEPT {
+        bool operator!=(const view_iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
@@ -127,7 +127,7 @@ class basic_runtime_view {
 
     private:
         const direct_type *pools;
-        underlying_iterator_type it;
+        underlying_iterator it;
     };
 
     basic_runtime_view(std::vector<const sparse_set<Entity> *> others) ENTT_NOEXCEPT
@@ -151,7 +151,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Input iterator type. */
-    using iterator_type = iterator;
+    using iterator = view_iterator;
 
     /**
      * @brief Estimates the number of entities that have the given components.
@@ -183,8 +183,8 @@ public:
      *
      * @return An iterator to the first entity that has the given components.
      */
-    iterator_type begin() const {
-        iterator_type it{};
+    iterator begin() const {
+        iterator it{};
 
         if(valid()) {
             it = { pools, pools[0]->begin() };
@@ -208,8 +208,8 @@ public:
      * @return An iterator to the entity following the last entity that has the
      * given components.
      */
-    iterator_type end() const {
-        iterator_type it{};
+    iterator end() const {
+        iterator it{};
 
         if(valid()) {
             it = { pools, pools[0]->end() };
