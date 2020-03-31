@@ -186,6 +186,7 @@ class basic_registry {
 
     template<typename Component>
     const pool_handler<Component> & assure() const {
+        static_assert(std::is_same_v<Component, std::decay_t<Component>>);
         static std::size_t index{pools.size()};
 
         if(const auto length = pools.size(); !(index < length) || pools[index].type_id != type_info<Component>::id()) {
