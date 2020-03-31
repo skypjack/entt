@@ -13,13 +13,13 @@
   * [Wide characters](wide-characters)
   * [Conflicts](#conflicts)
 * [Monostate](#monostate)
-* [Type info](#type-info)
-  * [Type identifier](#type-identifier)
+* [Type support](#type-support)
+  * [Type info](#type-info)
     * [Almost unique identifiers](#almost-unique-identifiers)
   * [Type index](#type-index)
-* [Traits](#traits)
-  * [Member class type](#member-class-type)
-  * [Integral constant](#integral-constant)
+  * [Type traits](#type-traits)
+    * [Member class type](#member-class-type)
+    * [Integral constant](#integral-constant)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -187,18 +187,20 @@ const bool b = entt::monostate<"mykey"_hs>{};
 const int i = entt::monostate<entt::hashed_string{"mykey"}>{};
 ```
 
-# Type info
+# Type support
 
-The `type_info` class template is meant to provide some basic information about
-types of all kinds.<br/>
-It's not a drop-in replacement for `std::type_info` but can provide similar
-information which are not implementation defined. Therefore, they can sometimes
-be even more reliable than those obtained otherwise.
+`EnTT` provides some basic information about types of all kinds.<br/>
+It also offers additional features that are not yet available in the standard
+library or that will never be.
 
-## Type identifier
+## Type info
 
-One of the available information is the numeric identifier associated with a
-given type:
+This class template isn't a drop-in replacement for `std::type_info` but can
+provide similar information which are not implementation defined at least.
+Therefore, they can sometimes be even more reliable than those obtained otherwise.
+
+Currently, the only information available is the numeric identifier associated
+with a given type:
 
 ```cpp
 auto id = entt::type_info<my_type>::id();
@@ -270,7 +272,7 @@ Types in `EnTT` are assigned also unique, sequential _indexes_ generated at
 runtime:
 
 ```cpp
-auto index = entt::type_info<my_type>::index();
+auto index = entt::type_index<my_type>::value();
 ```
 
 This value may differ from the numeric identifier of a type and isn't guaranteed
@@ -285,12 +287,31 @@ On the other hand, this leaves users with full powers over the `family` class
 and therefore the generation of custom runtime sequences of indices for their
 own purposes, if necessary.
 
-# Traits
+An external generator can also be used if needed. In fact, `type_index` can be
+specialized by type and is also _sfinae-friendly_ in order to allow more refined
+specializations such as:
 
-This section contains a handful of utilities and traits not present in the
-standard template library but which can be useful in everyday life.
+```cpp
+template<typename Type>
+struct entt::type_index<Type, std::void_d<decltype(Type::index())>> {
+    static id_type value() ENTT_NOEXCEPT {
+        return Type::index();
+    }
+};
+```
 
-## Member class type
+Note that indexes **must** still be generated sequentially in this case.<br/>
+The tool is widely used within `EnTT`. It also plays a very important role in
+making `EnTT` work nicely across boundaries in many cases. Generating indices
+not sequentially would break an assumption and would likely lead to undesired
+behaviors.
+
+## Type traits
+
+A handful of utilities and traits not present in the standard template library
+but which can be useful in everyday life.
+
+### Member class type
 
 The `auto` template parameter introduced with C++17 made it possible to simplify
 many class templates and template functions but also made the class type opaque
@@ -302,7 +323,7 @@ template<typename Member>
 using clazz = entt::member_class_t<Member>;
 ```
 
-## Integral constant
+### Integral constant
 
 Since `std::integral_constant` may be annoying because of its form that requires
 to specify both a type and a value of that type, there is a more user-friendly

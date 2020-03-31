@@ -17,6 +17,7 @@
   - get -> all, exclude -> none
 
 Next:
+* has -> contains and destroy -> erase for containers (mainly sparse_set and storage)?
 * registry::assure: open addressing or whatever to get rid of static variables and avoid reindexing in worst cases
 * meta, make it possible to reset nodes from meta types
 * replace observer class with observer functions

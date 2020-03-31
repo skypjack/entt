@@ -38,20 +38,28 @@ struct ENTT_API type_index {
 
 
 /**
+ * @brief Type index.
+ * @tparam Type Type for which to generate a sequential identifier.
+ */
+template<typename Type, typename = void>
+struct ENTT_API type_index {
+    /**
+     * @brief Returns the sequential identifier of a given type.
+     * @return The sequential identifier of a given type.
+     */
+    static id_type value() ENTT_NOEXCEPT {
+        static const id_type value = internal::type_index::next();
+        return value;
+    }
+};
+
+
+/**
  * @brief Type info.
  * @tparam Type Type for which to generate information.
  */
 template<typename Type, typename = void>
 struct ENTT_API type_info {
-    /**
-     * @brief Returns the sequential identifier of a given type.
-     * @return The sequential identifier of a given type.
-     */
-    static id_type index() ENTT_NOEXCEPT {
-        static const id_type value = internal::type_index::next();
-        return value;
-    }
-
     /**
      * @brief Returns the numeric representation of a given type.
      * @return The numeric representation of the given type.
@@ -68,7 +76,7 @@ struct ENTT_API type_info {
     }
 #else
     static id_type id() ENTT_NOEXCEPT {
-        return index();
+        return type_index<Type>::value();
     }
 #endif
 };
