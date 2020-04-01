@@ -45,7 +45,6 @@ class emitter {
         virtual ~basic_pool() = default;
         virtual bool empty() const ENTT_NOEXCEPT = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
-        virtual id_type type_id() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
@@ -114,10 +113,6 @@ class emitter {
             on_list.remove_if([](auto &&element) { return element.first; });
         }
 
-        id_type type_id() const ENTT_NOEXCEPT override {
-            return type_info<Event>::id();
-        }
-
     private:
         bool publishing{false};
         container_type once_list{};
@@ -127,14 +122,14 @@ class emitter {
     template<typename Event>
     const pool_handler<Event> & assure() const {
         static_assert(std::is_same_v<Event, std::decay_t<Event>>);
-        static std::size_t index{pools.size()};
+        const auto index = type_index<Event>::value();
 
-        if(const auto length = pools.size(); !(index < length) || pools[index]->type_id() != type_info<Event>::id()) {
-            for(index = {}; index < length && pools[index]->type_id() != type_info<Event>::id(); ++index);
+        if(!(index < pools.size())) {
+            pools.resize(index+1);
+        }
 
-            if(index == pools.size()) {
-                pools.emplace_back(new pool_handler<Event>{});
-            }
+        if(!pools[index]) {
+            pools[index].reset(new pool_handler<Event>{});
         }
 
         return static_cast<pool_handler<Event> &>(*pools[index]);
@@ -291,7 +286,9 @@ public:
      */
     void clear() ENTT_NOEXCEPT {
         for(auto &&cpool: pools) {
-            cpool->clear();
+            if(cpool) {
+                cpool->clear();
+            }
         }
     }
 
@@ -311,7 +308,7 @@ public:
      */
     bool empty() const ENTT_NOEXCEPT {
         return std::all_of(pools.cbegin(), pools.cend(), [](auto &&cpool) {
-            return cpool->empty();
+            return !cpool || cpool->empty();
         });
     }
 
