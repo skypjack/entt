@@ -1424,29 +1424,35 @@ TEST(Registry, Visit) {
     registry.assign<double>(other);
     registry.assign<char>(entity);
 
-    auto total = 0;
-    auto esize = 0;
-    auto osize = 0;
+    bool hasType[3]{};
 
-    registry.visit([&total](const auto component) {
-        ASSERT_TRUE(total != 0 || component == entt::type_info<char>::id());
-        ASSERT_TRUE(total != 1 || component == entt::type_info<double>::id());
-        ASSERT_TRUE(total != 2 || component == entt::type_info<int>::id());
-        ++total;
+    registry.visit([&hasType](const auto component) {
+        hasType[0] = hasType[0] || (component == entt::type_info<int>::id());
+        hasType[1] = hasType[1] || (component == entt::type_info<double>::id());
+        hasType[2] = hasType[2] || (component == entt::type_info<char>::id());
     });
 
-    registry.visit(entity, [&esize](const auto component) {
-        ASSERT_TRUE(esize != 0 || component == entt::type_info<char>::id());
-        ASSERT_TRUE(esize != 1 || component == entt::type_info<int>::id());
-        ++esize;
+    ASSERT_TRUE(hasType[0] && hasType[1] && hasType[2]);
+
+    hasType[0] = hasType[1] = hasType[2] = false;
+
+    registry.visit(entity, [&hasType](const auto component) {
+        hasType[0] = hasType[0] || (component == entt::type_info<int>::id());
+        hasType[1] = hasType[1] || (component == entt::type_info<double>::id());
+        hasType[2] = hasType[2] || (component == entt::type_info<char>::id());
     });
 
-    registry.visit(other, [&osize](const auto component) {
-        ASSERT_TRUE(osize != 0 || component == entt::type_info<double>::id());
-        ++osize;
+    ASSERT_TRUE(hasType[0] && !hasType[1] && hasType[2]);
+
+    hasType[0] = hasType[2] = false;
+
+    registry.visit(other, [&hasType](const auto component) {
+        hasType[0] = hasType[0] || (component == entt::type_info<int>::id());
+        hasType[1] = hasType[1] || (component == entt::type_info<double>::id());
+        hasType[2] = hasType[2] || (component == entt::type_info<char>::id());
     });
 
-    ASSERT_EQ(total, 3);
-    ASSERT_EQ(esize, 2);
-    ASSERT_EQ(osize, 1);
+    ASSERT_TRUE(!hasType[0] && hasType[1] && !hasType[2]);
+
+    hasType[1] = false;
 }

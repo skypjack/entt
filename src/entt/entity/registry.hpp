@@ -187,20 +187,18 @@ class basic_registry {
     template<typename Component>
     const pool_handler<Component> & assure() const {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>);
-        static std::size_t index{pools.size()};
+        const auto index = type_index<Component>::value();
 
-        if(const auto length = pools.size(); !(index < length) || pools[index].type_id != type_info<Component>::id()) {
-            for(index = {}; index < length && pools[index].type_id != type_info<Component>::id(); ++index);
+        if(!(index < pools.size())) {
+            pools.resize(index+1);
+        }
 
-            if(index == length) {
-                pools.push_back(pool_data{
-                    type_info<Component>::id(),
-                    std::unique_ptr<sparse_set<entity_type>>{new pool_handler<Component>()},
-                    [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
-                        static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
-                    }
-                });
-            }
+        if(auto &&cpool = pools[index]; !cpool.pool) {
+            cpool.type_id = type_info<Component>::id();
+            cpool.pool.reset(new pool_handler<Component>());
+            cpool.remove = [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
+                static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
+            };
         }
 
         return static_cast<pool_handler<Component> &>(*pools[index].pool);
@@ -545,7 +543,7 @@ public:
      */
     template<typename It>
     void assign(It first, It last) {
-        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [](auto &&cpool) { return cpool.pool->empty(); }));
+        ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [](auto &&pdata) { return !pdata.pool || pdata.pool->empty(); }));
         entities.assign(first, last);
         destroyed = null;
 
@@ -582,7 +580,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         for(auto pos = pools.size(); pos; --pos) {
-            if(auto &pdata = pools[pos-1]; pdata.pool->has(entity)) {
+            if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->has(entity)) {
                 pdata.remove(*pdata.pool, *this, entity);
             }
         }
@@ -1072,7 +1070,7 @@ public:
      */
     bool orphan(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
-        return std::none_of(pools.cbegin(), pools.cend(), [entity](auto &&pdata) { return pdata.pool->has(entity); });
+        return std::none_of(pools.cbegin(), pools.cend(), [entity](auto &&pdata) { return pdata.pool && pdata.pool->has(entity); });
     }
 
     /**
@@ -1523,7 +1521,7 @@ public:
         std::vector<const sparse_set<Entity> *> selected(std::distance(first, last));
 
         std::transform(first, last, selected.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.type_id == ctype; });
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.type_id == ctype; });
             return it == pools.cend() ? nullptr : it->pool.get();
         });
 
@@ -1624,7 +1622,7 @@ public:
     template<typename Func>
     void visit(entity_type entity, Func func) const {
         for(auto pos = pools.size(); pos; --pos) {
-            if(auto &pdata = pools[pos-1]; pdata.pool->has(entity)) {
+            if(const auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->has(entity)) {
                 func(pdata.type_id);
             }
         }
@@ -1653,7 +1651,9 @@ public:
     template<typename Func>
     void visit(Func func) const {
         for(auto pos = pools.size(); pos; --pos) {
-            func(pools[pos-1].type_id);
+            if(const auto &pdata = pools[pos-1]; pdata.pool) {
+                func(pdata.type_id);
+            }
         }
     }
 
