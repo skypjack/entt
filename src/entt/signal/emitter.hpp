@@ -45,6 +45,7 @@ class emitter {
         virtual ~basic_pool() = default;
         virtual bool empty() const ENTT_NOEXCEPT = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
+        virtual id_type type_id() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
@@ -111,6 +112,10 @@ class emitter {
             publishing = false;
 
             on_list.remove_if([](auto &&element) { return element.first; });
+        }
+
+        id_type type_id() const ENTT_NOEXCEPT override {
+            return type_info<Event>::id();
         }
 
     private:
