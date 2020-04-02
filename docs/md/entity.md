@@ -1699,8 +1699,8 @@ it is assigned to.
 
 More in general, none of the features offered by the library is affected, but
 for the ones that require to return actual instances.<br/>
-This optimization can be disabled by defining the `ENTT_DISABLE_ETO` macro. In
-this case, empty types will be treated like all other types, no matter what.
+This optimization can be disabled by defining the `ENTT_NO_ETO` macro. In this
+case, empty types will be treated like all other types, no matter what.
 
 # Multithreading
 

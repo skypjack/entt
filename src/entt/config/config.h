@@ -42,7 +42,7 @@
 #endif
 
 
-#ifndef ENTT_DISABLE_ETO
+#ifndef ENTT_NO_ETO
 #   include <type_traits>
 #   define ENTT_IS_EMPTY(Type) std::is_empty_v<Type>
 #else
