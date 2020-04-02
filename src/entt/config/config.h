@@ -46,8 +46,9 @@
 #   include <type_traits>
 #   define ENTT_IS_EMPTY(Type) std::is_empty_v<Type>
 #else
+#   include <type_traits>
 #   // sfinae-friendly definition
-#   define ENTT_IS_EMPTY(Type) decltype(Type, bool{}){}
+#   define ENTT_IS_EMPTY(Type) (false && std::is_empty_v<Type>)
 #endif
 
 
