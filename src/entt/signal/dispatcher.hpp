@@ -33,6 +33,7 @@ class dispatcher {
         virtual ~basic_pool() = default;
         virtual void publish() = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
+        virtual id_type type_id() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
@@ -66,6 +67,10 @@ class dispatcher {
         template<typename... Args>
         void enqueue(Args &&... args) {
             events.emplace_back(std::forward<Args>(args)...);
+        }
+
+        id_type type_id() const ENTT_NOEXCEPT override {
+            return type_info<Event>::id();
         }
 
     private:
