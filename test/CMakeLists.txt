@@ -115,7 +115,6 @@ if(BUILD_LIB)
     SETUP_LIB_TEST(meta)
     SETUP_LIB_TEST(registry)
 
-    SETUP_LIB_TEST(emitter_std ENTT_STANDARD_CPP)
     SETUP_LIB_TEST(meta_std ENTT_STANDARD_CPP)
     SETUP_LIB_TEST(registry_std ENTT_STANDARD_CPP)
 
@@ -124,7 +123,6 @@ if(BUILD_LIB)
     SETUP_PLUGIN_TEST(meta_plugin)
     SETUP_PLUGIN_TEST(registry_plugin)
 
-    SETUP_PLUGIN_TEST(emitter_plugin_std ENTT_STANDARD_CPP)
     SETUP_PLUGIN_TEST(meta_plugin_std ENTT_STANDARD_CPP)
     SETUP_PLUGIN_TEST(registry_plugin_std ENTT_STANDARD_CPP)
 endif()

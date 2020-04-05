@@ -13,10 +13,4 @@ struct message {
 
 struct event {};
 
-struct emitter_proxy {
-    virtual ~emitter_proxy() = default;
-    virtual void publish(message) = 0;
-    virtual void publish(event) = 0;
-};
-
 #endif
