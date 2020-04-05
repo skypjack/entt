@@ -115,7 +115,7 @@ struct basic_collector<matcher<type_list<Reject...>, type_list<Require...>, Rule
 
 
 /*! @brief Variable template used to ease the definition of collectors. */
-constexpr basic_collector<> collector{};
+inline constexpr basic_collector<> collector{};
 
 
 /**

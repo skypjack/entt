@@ -171,7 +171,7 @@ ENTT_OPAQUE_TYPE(entity, id_type);
  * any allowed type. Similarly, there exist comparision operators between the
  * null entity and any other entity identifier.
  */
-constexpr auto null = internal::null{};
+inline constexpr auto null = internal::null{};
 
 
 }

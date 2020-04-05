@@ -44,7 +44,7 @@ struct choice_t<0> {};
  * @tparam N Number of choices available.
  */
 template<std::size_t N>
-constexpr choice_t<N> choice{};
+inline constexpr choice_t<N> choice{};
 
 
 /*! @brief A class to use to push around lists of types, nothing more. */
@@ -72,7 +72,7 @@ struct type_list_size<type_list<Type...>>
  * @tparam List Type list.
  */
 template<class List>
-constexpr auto type_list_size_v = type_list_size<List>::value;
+inline constexpr auto type_list_size_v = type_list_size<List>::value;
 
 
 /*! @brief Primary template isn't defined on purpose. */
@@ -176,7 +176,7 @@ struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() ==
  * @tparam Type Potentially equality comparable type.
  */
 template<class Type>
-constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
+inline constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
 
 
 /**

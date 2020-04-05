@@ -10,7 +10,7 @@ struct as_alias_t {};
 
 
 /*! @brief Disambiguation tag. */
-constexpr as_alias_t as_alias;
+inline constexpr as_alias_t as_alias;
 
 
 /*! @brief Empty class type used to request the _as-is_ policy. */
