@@ -115,8 +115,6 @@ if(BUILD_LIB)
     SETUP_LIB_TEST(meta)
     SETUP_LIB_TEST(registry)
 
-    SETUP_LIB_TEST(meta_std ENTT_STANDARD_CPP)
-
     SETUP_PLUGIN_TEST(dispatcher_plugin)
     SETUP_PLUGIN_TEST(emitter_plugin)
     SETUP_PLUGIN_TEST(meta_plugin)

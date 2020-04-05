@@ -25,9 +25,6 @@ Next:
 * move signals down to the storage class?
 
 * WIP:
- - update tests for fast/std paths
-
-* WIP:
  - introduce the component iterators for non-contiguous collections of entities (multi component views, observers, user defined collections)
  - deprecate snapshot, loader, ...
  - provide documentation to describe alternatives
