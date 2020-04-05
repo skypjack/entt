@@ -5,41 +5,74 @@
 -->
 # Table of Contents
 
-* [Introduction](#introduction)
-* [The EnTT way](#the-entt-way)
-* [Meta context](#meta-context)
-* [Memory management](#memory-management)
+* [Working across boundaries](#working-across-boundaries)
+  * [The EnTT way](#the-entt-way)
+  * [Meta context](#meta-context)
+  * [Memory management](#memory-management)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
 
-# Introduction
+# Working across boundaries
 
 `EnTT` has historically had a limit when used across boundaries on Windows in
 general and on GNU/Linux when default visibility was set to hidden. The
 limitation was mainly due to a custom utility used to assign unique, sequential
-identifiers to different types.<br/>
+identifiers with different types.<br/>
 Fortunately, nowadays using `EnTT` across boundaries is straightforward. In
 fact, everything just works transparently in almost all cases. There are only a
 few exceptions, easy to deal with anyway.
 
-# The EnTT way
+## The EnTT way
 
 Many classes in `EnTT` make extensive use of type erasure for their purposes.
 This isn't a problem in itself (in fact, it's the basis of an API so convenient
 to use). However, a way is needed to recognize the objects whose type has been
 erased on the other side of a boundary.<br/>
 The `type_info` class template is how identifiers are generated and thus made
-available to the rest of the library.
+available to the rest of the library. The `type_index` class template makes all
+types _indexable_ instead, so as to speed up the lookup.
 
-In general, this class doesn't arouse much interest. The only exception is in
-case of conflicts between identifiers (definitely uncommon though) or where the
-default solution proposed by `EnTT` isn't suitable for the user's purposes.<br/>
-The section dedicated to this core class contains all the details to get around
-the problem in a concise and elegant way. Please refer to the specific
-documentation.
+In general, these classes don't arouse much interest. The only exceptions are:
 
-# Meta context
+* When a conflict between identifiers occurs (definitely uncommon though) or
+  when the default solution proposed by `EnTT` isn't suitable for the user's
+  purposes.<br/>
+  The section dedicated to `type_info` contains all the details to get around
+  the problem in a concise and elegant way. Please refer to the specific
+  documentation.
+
+* When working with linked libraries that also export all required symbols.<br/>
+  Compile definitions `ENTT_API_EXPORT` and `ENTT_API_IMPORT` should be passed
+  respectively where there is a need to import or export the symbols defined by
+  `EnTT`, so as to make everything work nicely across boundaries.
+
+* When working with plugins or shared libraries that don't export any symbol. In
+  this case, `type_index` confuses the other classes by giving potentially wrong
+  information to them.<br/>
+  To avoid problems, it's required to provide a custom generator or to suppress
+  the index generation as a whole:
+
+  ```cpp
+  template<typename Type>
+  struct entt::type_index<Type> {};
+  ```
+
+  All classes that use `type_index` perform also a check on the possibility of
+  creating indexes for types. If it's not a viable solution, they fallback on
+  the type id provided by `type_info`. The latter makes everything stable across
+  boundaries.<br/>
+  This is why suppressing the generation of the indexes solves the problem. In
+  case it's still necessary to associate sequential indexes with types, users
+  can refer to the `family` class, although knowing that these will not be
+  stable across boundaries.
+
+For anyone who needs more details, the test suite contains multiple examples
+covering the most common cases.<br/>
+It goes without saying that it's impossible to cover all the possible cases.
+However, what is offered should hopefully serve as a basis for all of them.
+
+## Meta context
 
 The runtime reflection system deserves a special mention when it comes to using
 it across boundaries.<br/>
@@ -78,7 +111,7 @@ avoid dangling references. Otherwise, if a type is accessed from another space
 by name, there could be an attempt to address its parts that are no longer
 available.
 
-# Memory Management
+## Memory Management
 
 There is another subtle problem due to memory management that can lead to
 headaches.<br/>
