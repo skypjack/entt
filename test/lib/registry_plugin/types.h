@@ -11,10 +11,4 @@ struct velocity {
     double dy;
 };
 
-struct registry_proxy {
-    virtual ~registry_proxy() = default;
-    virtual void for_each(void(*)(position &, velocity &)) = 0;
-    virtual void assign(velocity) = 0;
-};
-
 #endif
