@@ -187,21 +187,40 @@ class basic_registry {
     template<typename Component>
     const pool_handler<Component> & assure() const {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>);
-        const auto index = type_index<Component>::value();
 
-        if(!(index < pools.size())) {
-            pools.resize(index+1);
+        if constexpr(has_type_index_v<Component>) {
+            const auto index = type_index<Component>::value();
+
+            if(!(index < pools.size())) {
+                pools.resize(index+1);
+            }
+
+            if(auto &&cpool = pools[index]; !cpool.pool) {
+                cpool.type_id = type_info<Component>::id();
+                cpool.pool.reset(new pool_handler<Component>());
+                cpool.remove = [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
+                    static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
+                };
+            }
+
+            return static_cast<pool_handler<Component> &>(*pools[index].pool);
+        } else {
+            sparse_set<entity_type> *cpool{nullptr};
+
+            if(auto it = std::find_if(pools.begin(), pools.end(), [id = type_info<Component>::id()](const auto &pdata) { return id == pdata.type_id; }); it == pools.cend()) {
+                cpool = pools.emplace_back(pool_data{
+                    type_info<Component>::id(),
+                    std::unique_ptr<sparse_set<entity_type>>{new pool_handler<Component>()},
+                    [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
+                        static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
+                    }
+                }).pool.get();
+            } else {
+                cpool = it->pool.get();
+            }
+
+            return static_cast<pool_handler<Component> &>(*cpool);
         }
-
-        if(auto &&cpool = pools[index]; !cpool.pool) {
-            cpool.type_id = type_info<Component>::id();
-            cpool.pool.reset(new pool_handler<Component>());
-            cpool.remove = [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
-                static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
-            };
-        }
-
-        return static_cast<pool_handler<Component> &>(*pools[index].pool);
     }
 
     template<typename Component>
