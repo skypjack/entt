@@ -55,6 +55,28 @@ struct ENTT_API type_index {
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is
+ * indexable, false otherwise.
+ * @tparam Type Potentially indexable type.
+ */
+template<typename, typename = void>
+struct has_type_index: std::false_type {};
+
+
+/*! @brief has_type_index */
+template<typename Type>
+struct has_type_index<Type, std::void_t<decltype(type_index<Type>::value())>>: std::true_type {};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially indexable type.
+ */
+template<typename Type>
+inline constexpr bool has_type_index_v = has_type_index<Type>::value;
+
+
+/**
  * @brief Type info.
  * @tparam Type Type for which to generate information.
  */
