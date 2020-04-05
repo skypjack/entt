@@ -127,17 +127,23 @@ class emitter {
     template<typename Event>
     const pool_handler<Event> & assure() const {
         static_assert(std::is_same_v<Event, std::decay_t<Event>>);
-        const auto index = type_index<Event>::value();
 
-        if(!(index < pools.size())) {
-            pools.resize(index+1);
+        if constexpr(has_type_index_v<Event>) {
+            const auto index = type_index<Event>::value();
+
+            if(!(index < pools.size())) {
+                pools.resize(index+1);
+            }
+
+            if(!pools[index]) {
+                pools[index].reset(new pool_handler<Event>{});
+            }
+
+            return static_cast<pool_handler<Event> &>(*pools[index]);
+        } else {
+            auto it = std::find_if(pools.begin(), pools.end(), [id = type_info<Event>::id()](const auto &cpool) { return id == cpool->type_id(); });
+            return static_cast<pool_handler<Event> &>(it == pools.cend() ? *pools.emplace_back(new pool_handler<Event>{}) : **it);
         }
-
-        if(!pools[index]) {
-            pools[index].reset(new pool_handler<Event>{});
-        }
-
-        return static_cast<pool_handler<Event> &>(*pools[index]);
     }
 
     template<typename Event>
