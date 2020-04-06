@@ -326,7 +326,7 @@ public:
      * iterator otherwise.
      */
     iterator find(const entity_type entt) const {
-        return has(entt) ? --(end() - index(entt)) : end();
+        return contains(entt) ? --(end() - index(entt)) : end();
     }
 
     /**
@@ -334,10 +334,16 @@ public:
      * @param entt A valid entity identifier.
      * @return True if the sparse set contains the entity, false otherwise.
      */
-    bool has(const entity_type entt) const {
+    bool contains(const entity_type entt) const {
         const auto curr = page(entt);
         // testing against null permits to avoid accessing the direct vector
         return (curr < reverse.size() && reverse[curr] && reverse[curr][offset(entt)] != null);
+    }
+
+    /*! @copydoc contains */
+    [[deprecated("use ::contains instead")]]
+    bool has(const entity_type entt) const {
+        return contains(entt);
     }
 
     /**
@@ -353,7 +359,7 @@ public:
      * @return The position of the entity in the sparse set.
      */
     size_type index(const entity_type entt) const {
-        ENTT_ASSERT(has(entt));
+        ENTT_ASSERT(contains(entt));
         return size_type(reverse[page(entt)][offset(entt)]);
     }
 
@@ -369,7 +375,7 @@ public:
      * @param entt A valid entity identifier.
      */
     void emplace(const entity_type entt) {
-        ENTT_ASSERT(!has(entt));
+        ENTT_ASSERT(!contains(entt));
         assure(page(entt))[offset(entt)] = entity_type(direct.size());
         direct.push_back(entt);
     }
@@ -396,7 +402,7 @@ public:
     template<typename It>
     void insert(It first, It last) {
         std::for_each(first, last, [this, next = direct.size()](const auto entt) mutable {
-            ENTT_ASSERT(!has(entt));
+            ENTT_ASSERT(!contains(entt));
             assure(page(entt))[offset(entt)] = entity_type(next++);
         });
 
@@ -422,7 +428,7 @@ public:
      * @param entt A valid entity identifier.
      */
     void destroy(const entity_type entt) {
-        ENTT_ASSERT(has(entt));
+        ENTT_ASSERT(contains(entt));
         const auto curr = page(entt);
         const auto pos = offset(entt);
         direct[size_type(reverse[curr][pos])] = entity_type(direct.back());
@@ -589,7 +595,7 @@ public:
         size_type pos = direct.size() - 1;
 
         while(pos && from != to) {
-            if(has(*from)) {
+            if(contains(*from)) {
                 if(*from != direct[pos]) {
                     swap(direct[pos], *from);
                 }

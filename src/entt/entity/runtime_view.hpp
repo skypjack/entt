@@ -76,7 +76,7 @@ class basic_runtime_view {
 
         bool valid() const {
             return std::all_of(pools->begin()++, pools->end(), [entt = *it](const auto *curr) {
-                return curr->has(entt);
+                return curr->contains(entt);
             });
         }
 

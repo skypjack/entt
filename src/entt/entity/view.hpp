@@ -93,8 +93,8 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         }
 
         bool valid() const {
-            return std::all_of(unchecked.cbegin(), unchecked.cend(), [entt = *it](const sparse_set<Entity> *curr) { return curr->has(entt); })
-                    && std::none_of(filter.cbegin(), filter.cend(), [entt = *it](const sparse_set<Entity> *curr) { return curr->has(entt); });
+            return std::all_of(unchecked.cbegin(), unchecked.cend(), [entt = *it](const sparse_set<Entity> *curr) { return curr->contains(entt); })
+                    && std::none_of(filter.cbegin(), filter.cend(), [entt = *it](const sparse_set<Entity> *curr) { return curr->contains(entt); });
         }
 
     public:
@@ -184,7 +184,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             for(const auto entt: static_cast<const sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
                 auto curr = it++;
 
-                if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->has(entt)) && ...) && (!std::get<pool_type<Exclude> *>(pools)->has(entt) && ...)) {
+                if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->contains(entt)) && ...) && (!std::get<pool_type<Exclude> *>(pools)->contains(entt) && ...)) {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
                         func(get<Comp, Type>(curr, std::get<pool_type<Type> *>(pools), entt)...);
                     } else {
@@ -194,7 +194,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             }
         } else {
             for(const auto entt: static_cast<const sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
-                if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->has(entt)) && ...) && (!std::get<pool_type<Exclude> *>(pools)->has(entt) && ...)) {
+                if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->contains(entt)) && ...) && (!std::get<pool_type<Exclude> *>(pools)->contains(entt) && ...)) {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
                         func(std::get<pool_type<Type> *>(pools)->get(entt)...);
                     } else {
@@ -371,8 +371,8 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     bool contains(const entity_type entt) const {
-        return (std::get<pool_type<Component> *>(pools)->has(entt) && ...)
-                && (!std::get<pool_type<Exclude> *>(pools)->has(entt) && ...);
+        return (std::get<pool_type<Component> *>(pools)->contains(entt) && ...)
+                && (!std::get<pool_type<Exclude> *>(pools)->contains(entt) && ...);
     }
 
     /**
@@ -694,7 +694,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     bool contains(const entity_type entt) const {
-        return pool->has(entt);
+        return pool->contains(entt);
     }
 
     /**

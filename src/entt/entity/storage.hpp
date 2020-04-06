@@ -291,7 +291,7 @@ public:
      * @return The object associated with the entity, if any.
      */
     const object_type * try_get(const entity_type entt) const {
-        return underlying_type::has(entt) ? (instances.data() + underlying_type::index(entt)) : nullptr;
+        return underlying_type::contains(entt) ? (instances.data() + underlying_type::index(entt)) : nullptr;
     }
 
     /*! @copydoc try_get */

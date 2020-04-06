@@ -141,12 +141,12 @@ class basic_registry {
             static_assert(std::disjunction_v<std::is_same<Owned, std::decay_t<Owned>>..., std::is_same<Get, std::decay_t<Get>>..., std::is_same<Exclude, std::decay_t<Exclude>>...>);
             [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...);
 
-            const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<pool_handler<Owned> &>(cpools).has(entt)) && ...)
-                    && ((std::is_same_v<Component, Get> || owner.assure<Get>().has(entt)) && ...)
-                    && ((std::is_same_v<Component, Exclude> || !owner.assure<Exclude>().has(entt)) && ...);
+            const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<pool_handler<Owned> &>(cpools).contains(entt)) && ...)
+                    && ((std::is_same_v<Component, Get> || owner.assure<Get>().contains(entt)) && ...)
+                    && ((std::is_same_v<Component, Exclude> || !owner.assure<Exclude>().contains(entt)) && ...);
 
             if constexpr(sizeof...(Owned) == 0) {
-                if(is_valid && !current.has(entt)) {
+                if(is_valid && !current.contains(entt)) {
                     current.emplace(entt);
                 }
             } else {
@@ -159,11 +159,11 @@ class basic_registry {
 
         void discard_if([[maybe_unused]] basic_registry &owner, const Entity entt) {
             if constexpr(sizeof...(Owned) == 0) {
-                if(current.has(entt)) {
+                if(current.contains(entt)) {
                     current.destroy(entt);
                 }
             } else {
-                if(const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...); std::get<0>(cpools).has(entt) && (std::get<0>(cpools).index(entt) < current)) {
+                if(const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < current)) {
                     const auto pos = --current;
                     (std::get<pool_handler<Owned> &>(cpools).swap(std::get<pool_handler<Owned> &>(cpools).data()[pos], entt), ...);
                 }
@@ -599,7 +599,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         for(auto pos = pools.size(); pos; --pos) {
-            if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->has(entity)) {
+            if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
                 pdata.remove(*pdata.pool, *this, entity);
             }
         }
@@ -741,7 +741,7 @@ public:
         ENTT_ASSERT(valid(entity));
         auto &cpool = assure<Component>();
 
-        return cpool.has(entity)
+        return cpool.contains(entity)
                 ? cpool.replace(*this, entity, Component{std::forward<Args>(args)...})
                 : cpool.emplace(*this, entity, std::forward<Args>(args)...);
     }
@@ -879,7 +879,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         ([this, entity](auto &&cpool) {
-            if(cpool.has(entity)) {
+            if(cpool.contains(entity)) {
                 cpool.remove(*this, entity);
             }
         }(assure<Component>()), ...);
@@ -900,7 +900,7 @@ public:
     template<typename... Component>
     bool has(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
-        return (assure<Component>().has(entity) && ...);
+        return (assure<Component>().contains(entity) && ...);
     }
 
     /**
@@ -919,7 +919,7 @@ public:
     template<typename... Component>
     bool any(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
-        return (assure<Component>().has(entity) || ...);
+        return (assure<Component>().contains(entity) || ...);
     }
 
     /**
@@ -987,7 +987,7 @@ public:
     decltype(auto) get_or_emplace(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
         auto &cpool = assure<Component>();
-        return cpool.has(entity) ? cpool.get(entity) : cpool.emplace(*this, entity, std::forward<Args>(args)...);
+        return cpool.contains(entity) ? cpool.get(entity) : cpool.emplace(*this, entity, std::forward<Args>(args)...);
     }
 
     /*! @copydoc get_or_emplace */
@@ -1089,7 +1089,7 @@ public:
      */
     bool orphan(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
-        return std::none_of(pools.cbegin(), pools.cend(), [entity](auto &&pdata) { return pdata.pool && pdata.pool->has(entity); });
+        return std::none_of(pools.cbegin(), pools.cend(), [entity](auto &&pdata) { return pdata.pool && pdata.pool->contains(entity); });
     }
 
     /**
@@ -1641,7 +1641,7 @@ public:
     template<typename Func>
     void visit(entity_type entity, Func func) const {
         for(auto pos = pools.size(); pos; --pos) {
-            if(const auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->has(entity)) {
+            if(const auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
                 func(pdata.type_id);
             }
         }

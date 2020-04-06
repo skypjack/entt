@@ -17,7 +17,7 @@
   - get -> all, exclude -> none
 
 Next:
-* has -> contains and destroy -> erase for containers (mainly sparse_set and storage)?
+* has -> contains and destroy -> erase for containers (sparse_set, storage, observer, snapshot)?
 * meta, make it possible to reset nodes from meta types
 * replace observer class with observer functions
 * get(cmp, entity) -> void *, set(cmp, entity, void *)
