@@ -105,18 +105,12 @@ cache.clear();
 
 Besides these member functions, a cache contains what is needed to load, use and
 discard resources of the given type.<br/>
-Before to explore this part of the interface, it makes sense to mention how
-resources are identified. The type of the identifiers to use is defined as:
+Before exploring this part of the interface, it makes sense to mention how
+resources are identified. They have type `id_type` and therefore they can be
+created explicitly as in the following example:
 
 ```cpp
-entt::cache<resource>::id_type
-```
-
-Where `id_type` is an alias for `entt::hashed_string::hash_type`. Therefore,
-resource identifiers are created explicitly as in the following example:
-
-```cpp
-constexpr auto identifier = entt::cache<resource>::id_type{"my/resource/identifier"_hs};
+constexpr auto identifier = "my/resource/identifier"_hs;
 // this is equivalent to the following
 constexpr auto hs = entt::hashed_string{"my/resource/identifier"};
 ```
