@@ -22,6 +22,14 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
 
 
 /**
+ * @brief Alias template to ease the creation of named values.
+ * @tparam Value A constant value at least convertible to `id_type`.
+ */
+template<id_type Value>
+using tag = integral_constant<Value>;
+
+
+/**
  * @brief Utility class to disambiguate overloaded functions.
  * @tparam N Number of choices available.
  */
@@ -208,14 +216,6 @@ public:
  */
 template<typename Member>
 using member_class_t = typename member_class<Member>::type;
-
-
-/**
- * @brief Alias template to ease the creation of named values.
- * @tparam Value A constant value at least convertible to `id_type`.
- */
-template<id_type Value>
-using tag [[deprecated("use entt::integral_constant instead")]] = integral_constant<Value>;
 
 
 }

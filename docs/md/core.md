@@ -20,6 +20,7 @@
   * [Type traits](#type-traits)
     * [Member class type](#member-class-type)
     * [Integral constant](#integral-constant)
+    * [Tag](#tag)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -223,7 +224,7 @@ specializations such as:
 ```cpp
 template<typename Type>
 struct entt::type_info<Type, std::void_d<decltype(Type::custom_id())>> {
-    static constexpr ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+    static constexpr entt::id_type id() ENTT_NOEXCEPT {
         return Type::custom_id();
     }
 };
@@ -294,7 +295,7 @@ specializations such as:
 ```cpp
 template<typename Type>
 struct entt::type_index<Type, std::void_d<decltype(Type::index())>> {
-    static id_type value() ENTT_NOEXCEPT {
+    static entt::id_type value() ENTT_NOEXCEPT {
         return Type::index();
     }
 };
@@ -341,3 +342,19 @@ as human-readable _names_ where actual types would be required otherwise:
 constexpr auto enemy_tag = entt::integral_constant<"enemy"_hs>;
 registry.emplace<enemy_tag>(entity);
 ```
+
+### Tag
+
+Since `id_type` is very important and widely used in `EnTT`, there is a more
+user-friendly shortcut for the creation of integral constants based on it.<br/>
+This shortcut is the alias template `entt::tag`.
+
+If used in combination with hashed strings, it helps to use human-readable names
+where types would be required otherwise. As an example:
+
+```cpp
+registry.assign<entt::tag<"enemy"_hs>>(entity);
+```
+
+However, this isn't the only permitted use. Literally any value convertible to
+`id_type` is a good candidate, such as the named constants of an unscoped enum.
