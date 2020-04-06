@@ -190,7 +190,7 @@ class basic_observer {
         template<std::size_t Index>
         static void discard_if(basic_observer &obs, const basic_registry<Entity> &, const Entity entt) {
             if(auto *value = obs.view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
-                obs.view.destroy(entt);
+                obs.view.erase(entt);
             }
         }
 
@@ -226,7 +226,7 @@ class basic_observer {
         template<std::size_t Index>
         static void discard_if(basic_observer &obs, const basic_registry<Entity> &, const Entity entt) {
             if(auto *value = obs.view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
-                obs.view.destroy(entt);
+                obs.view.erase(entt);
             }
         }
 

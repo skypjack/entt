@@ -404,11 +404,17 @@ public:
      *
      * @param entt A valid entity identifier.
      */
-    void destroy(const entity_type entt) {
+    void erase(const entity_type entt) {
         auto other = std::move(instances.back());
         instances[underlying_type::index(entt)] = std::move(other);
         instances.pop_back();
-        underlying_type::destroy(entt);
+        underlying_type::erase(entt);
+    }
+
+    /*! @copydoc erase */
+    [[deprecated("use ::erase instead")]]
+    void destroy(const entity_type entt) {
+        erase(entt);
     }
 
     /**

@@ -427,7 +427,7 @@ public:
      *
      * @param entt A valid entity identifier.
      */
-    void destroy(const entity_type entt) {
+    void erase(const entity_type entt) {
         ENTT_ASSERT(contains(entt));
         const auto curr = page(entt);
         const auto pos = offset(entt);
@@ -435,6 +435,12 @@ public:
         reverse[page(direct.back())][offset(direct.back())] = reverse[curr][pos];
         reverse[curr][pos] = null;
         direct.pop_back();
+    }
+
+    /*! @copydoc erase */
+    [[deprecated("use ::erase instead")]]
+    void destroy(const entity_type entt) {
+        erase(entt);
     }
 
     /**

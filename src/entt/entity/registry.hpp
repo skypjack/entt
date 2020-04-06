@@ -82,7 +82,7 @@ class basic_registry {
 
         void remove(basic_registry &owner, const Entity entt) {
             destruction.publish(owner, entt);
-            this->destroy(entt);
+            this->erase(entt);
         }
 
         template<typename It>
@@ -160,7 +160,7 @@ class basic_registry {
         void discard_if([[maybe_unused]] basic_registry &owner, const Entity entt) {
             if constexpr(sizeof...(Owned) == 0) {
                 if(current.contains(entt)) {
-                    current.destroy(entt);
+                    current.erase(entt);
                 }
             } else {
                 if(const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < current)) {
