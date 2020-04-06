@@ -573,8 +573,14 @@ public:
      * @param entt An entity identifier.
      * @return True if `entity` is managed by the loader, false otherwise.
      */
-    bool has(entity_type entt) const ENTT_NOEXCEPT {
+    bool contains(entity_type entt) const ENTT_NOEXCEPT {
         return (remloc.find(entt) != remloc.cend());
+    }
+
+    /*! @copydoc contains */
+    [[deprecated("use ::contains instead")]]
+    bool has(entity_type entt) const ENTT_NOEXCEPT {
+        return contains(entt);
     }
 
     /**
