@@ -737,7 +737,7 @@ between type identifiers and opaque methods for cloning:
 
 ```cpp
 using clone_fn_type = void(const entt::registry &, entt::registry &);
-std::unordered_map<ENTT_ID_TYPE, clone_fn_type *> clone_functions;
+std::unordered_map<entt::id_type, clone_fn_type *> clone_functions;
 
 // ...
 
@@ -799,7 +799,7 @@ dedicate system:
 
 ```cpp
 using stamp_fn_type = void(const entt::registry &, const entt::entity, entt::registry &, const entt::entity);
-std::unordered_map<ENTT_ID_TYPE, stamp_fn_type *> stamp_functions;
+std::unordered_map<entt::id_type, stamp_fn_type *> stamp_functions;
 
 // ...
 
