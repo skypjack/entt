@@ -527,7 +527,7 @@ TEST(Registry, Orphans) {
     ASSERT_EQ(tot, 1u);
     tot = {};
 
-    registry.each([&](auto entity) { registry.remove_if_exists<int>(entity); });
+    registry.each([&](auto entity) { registry.remove_all(entity); });
     registry.orphans([&](auto) { ++tot; });
     ASSERT_EQ(tot, 3u);
     registry.clear();
