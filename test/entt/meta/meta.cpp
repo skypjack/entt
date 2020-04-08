@@ -1718,6 +1718,25 @@ TEST_F(Meta, MetaTypeConstructCastAndConvert) {
     ASSERT_EQ(any.cast<derived_type>().c, 'c');
 }
 
+TEST_F(Meta, MetaTypeDetach) {
+    ASSERT_TRUE(entt::resolve("char"_hs));
+
+    entt::resolve([](auto type) {
+        if(type.alias() == "char"_hs) {
+            type.detach();
+        }
+    });
+
+    ASSERT_FALSE(entt::resolve("char"_hs));
+    ASSERT_EQ(entt::resolve<char>().alias(), "char"_hs);
+    ASSERT_EQ(entt::resolve<char>().prop(props::prop_int).value().cast<int>(), 42);
+    ASSERT_TRUE(entt::resolve<char>().data("value"_hs));
+
+    entt::meta_factory<char>().alias("char"_hs);
+
+    ASSERT_TRUE(entt::resolve("char"_hs));
+}
+
 TEST_F(Meta, MetaDataFromBase) {
     auto type = entt::resolve<concrete_type>();
     concrete_type instance;
@@ -1873,8 +1892,6 @@ TEST_F(Meta, Reset) {
     entt::meta<an_abstract_type>().reset();
     entt::meta<another_abstract_type>().reset();
     entt::meta<unsigned int>().reset();
-
-    ASSERT_EQ(*entt::internal::meta_info<>::global, nullptr);
 
     ASSERT_FALSE(entt::resolve("char"_hs));
     ASSERT_FALSE(entt::resolve("base"_hs));

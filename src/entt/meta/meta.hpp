@@ -227,6 +227,18 @@ template<>
 struct meta_node<> {
     inline static meta_type_node *local = nullptr;
     inline static meta_type_node **global = &local;
+
+    inline static void detach(const meta_type_node *node) ENTT_NOEXCEPT {
+        auto **it = global;
+
+        while(*it && *it != node) {
+            it = &(*it)->next;
+        }
+
+        if(*it) {
+            *it = (*it)->next;
+        }
+    }
 };
 
 
@@ -1471,6 +1483,11 @@ public:
      */
     bool operator==(const meta_type &other) const ENTT_NOEXCEPT {
         return (!node && !other.node) || (node && other.node && node->type_id == other.node->type_id);
+    }
+
+    /*! @brief Removes a meta object from the list of searchable types. */
+    void detach() ENTT_NOEXCEPT {
+        internal::meta_info<>::detach(node);
     }
 
 private:

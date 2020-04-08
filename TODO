@@ -17,7 +17,6 @@
   - get -> all, exclude -> none
 
 Next:
-* meta, make it possible to reset nodes from meta types
 * replace observer class with observer functions
 * get(cmp, entity) -> void *, set(cmp, entity, void *)
 * review multi component views to reduce instantiations once empty types are gone...
