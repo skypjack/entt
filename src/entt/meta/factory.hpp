@@ -865,7 +865,7 @@ inline meta_type resolve(const id_type alias) ENTT_NOEXCEPT {
 template<typename Op>
 inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
 resolve(Op op) {
-    internal::visit<meta_type>(std::move(op), *internal::meta_info<>::global);
+    internal::visit<meta_type>(op, *internal::meta_info<>::global);
 }
 
 

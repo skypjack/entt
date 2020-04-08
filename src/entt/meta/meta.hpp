@@ -130,7 +130,7 @@ struct meta_type_node {
 
 
 template<typename Type, typename Op, typename Node>
-void visit(Op op, Node *node) {
+void visit(Op &op, Node *node) {
     while(node) {
         op(Type{node});
         node = node->next;
@@ -139,7 +139,7 @@ void visit(Op op, Node *node) {
 
 
 template<auto Member, typename Type, typename Op>
-void visit(Op op, const internal::meta_type_node *node) {
+void visit(Op &op, const internal::meta_type_node *node) {
     if(node) {
         internal::visit<Type>(op, node->*Member);
         auto *next = node->base;
@@ -153,7 +153,7 @@ void visit(Op op, const internal::meta_type_node *node) {
 
 
 template<typename Op, typename Node>
-auto find_if(Op op, Node *node) {
+auto find_if(const Op &op, Node *node) {
     while(node && !op(node)) {
         node = node->next;
     }
@@ -163,7 +163,7 @@ auto find_if(Op op, Node *node) {
 
 
 template<auto Member, typename Op>
-auto find_if(Op op, const meta_type_node *node)
+auto find_if(const Op &op, const meta_type_node *node)
 -> decltype(find_if(op, node->*Member)) {
     decltype(find_if(op, node->*Member)) ret = nullptr;
 
@@ -836,7 +836,7 @@ struct meta_ctor {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const {
-        internal::visit<meta_prop>(std::move(op), node->prop);
+        internal::visit<meta_prop>(op, node->prop);
     }
 
     /**
@@ -973,7 +973,7 @@ struct meta_data {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const {
-        internal::visit<meta_prop>(std::move(op), node->prop);
+        internal::visit<meta_prop>(op, node->prop);
     }
 
     /**
@@ -1084,7 +1084,7 @@ struct meta_func {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const {
-        internal::visit<meta_prop>(std::move(op), node->prop);
+        internal::visit<meta_prop>(op, node->prop);
     }
 
     /**
@@ -1283,7 +1283,7 @@ public:
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_base>, void>
     base(Op op) const {
-        internal::visit<&internal::meta_type_node::base, meta_base>(std::move(op), node);
+        internal::visit<&internal::meta_type_node::base, meta_base>(op, node);
     }
 
     /**
@@ -1304,7 +1304,7 @@ public:
      */
     template<typename Op>
     void conv(Op op) const {
-        internal::visit<&internal::meta_type_node::conv, meta_conv>(std::move(op), node);
+        internal::visit<&internal::meta_type_node::conv, meta_conv>(op, node);
     }
 
     /**
@@ -1327,7 +1327,7 @@ public:
      */
     template<typename Op>
     void ctor(Op op) const {
-        internal::visit<meta_ctor>(std::move(op), node->ctor);
+        internal::visit<meta_ctor>(op, node->ctor);
     }
 
     /**
@@ -1351,7 +1351,7 @@ public:
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_data>, void>
     data(Op op) const {
-        internal::visit<&internal::meta_type_node::data, meta_data>(std::move(op), node);
+        internal::visit<&internal::meta_type_node::data, meta_data>(op, node);
     }
 
     /**
@@ -1379,7 +1379,7 @@ public:
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_func>, void>
     func(Op op) const {
-        internal::visit<&internal::meta_type_node::func, meta_func>(std::move(op), node);
+        internal::visit<&internal::meta_type_node::func, meta_func>(op, node);
     }
 
     /**
@@ -1438,7 +1438,7 @@ public:
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
     prop(Op op) const {
-        internal::visit<&internal::meta_type_node::prop, meta_prop>(std::move(op), node);
+        internal::visit<&internal::meta_type_node::prop, meta_prop>(op, node);
     }
 
     /**
