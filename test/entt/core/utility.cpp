@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/utility.hpp>
 
-struct Functions {
+struct functions {
     static void foo(int) {}
     static void foo() {}
 
@@ -19,19 +19,19 @@ TEST(Utility, Identity) {
 }
 
 TEST(Utility, Overload) {
-    ASSERT_EQ(entt::overload<void(int)>(&Functions::foo), static_cast<void(*)(int)>(&Functions::foo));
-    ASSERT_EQ(entt::overload<void()>(&Functions::foo), static_cast<void(*)()>(&Functions::foo));
+    ASSERT_EQ(entt::overload<void(int)>(&functions::foo), static_cast<void(*)(int)>(&functions::foo));
+    ASSERT_EQ(entt::overload<void()>(&functions::foo), static_cast<void(*)()>(&functions::foo));
 
-    ASSERT_EQ(entt::overload<void(int)>(&Functions::bar), static_cast<void(Functions:: *)(int)>(&Functions::bar));
-    ASSERT_EQ(entt::overload<void()>(&Functions::bar), static_cast<void(Functions:: *)()>(&Functions::bar));
+    ASSERT_EQ(entt::overload<void(int)>(&functions::bar), static_cast<void(functions:: *)(int)>(&functions::bar));
+    ASSERT_EQ(entt::overload<void()>(&functions::bar), static_cast<void(functions:: *)()>(&functions::bar));
 
-    Functions instance;
+    functions instance;
 
-    ASSERT_NO_THROW(entt::overload<void(int)>(&Functions::foo)(0));
-    ASSERT_NO_THROW(entt::overload<void()>(&Functions::foo)());
+    ASSERT_NO_THROW(entt::overload<void(int)>(&functions::foo)(0));
+    ASSERT_NO_THROW(entt::overload<void()>(&functions::foo)());
 
-    ASSERT_NO_THROW((instance.*entt::overload<void(int)>(&Functions::bar))(0));
-    ASSERT_NO_THROW((instance.*entt::overload<void()>(&Functions::bar))());
+    ASSERT_NO_THROW((instance.*entt::overload<void(int)>(&functions::bar))(0));
+    ASSERT_NO_THROW((instance.*entt::overload<void()>(&functions::bar))());
 }
 
 TEST(Utility, Overloaded) {
@@ -51,7 +51,7 @@ TEST(Utility, Overloaded) {
 }
 
 TEST(Utility, YCombinator) {
-    entt::y_combinator gauss([](auto &&self, unsigned int value) -> unsigned int {
+    entt::y_combinator gauss([](const auto &self, auto value) -> unsigned int {
         return value ? (value + self(value-1u)) : 0;
     });
 

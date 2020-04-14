@@ -21,6 +21,7 @@
     * [Member class type](#member-class-type)
     * [Integral constant](#integral-constant)
     * [Tag](#tag)
+* [Utilities](#utilities)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -358,3 +359,74 @@ registry.assign<entt::tag<"enemy"_hs>>(entity);
 
 However, this isn't the only permitted use. Literally any value convertible to
 `id_type` is a good candidate, such as the named constants of an unscoped enum.
+
+# Utilities
+
+It's not possible to escape the temptation to add utilities of some kind to a
+library. In fact, `EnTT` also provides a handful of tools to simplify the
+life of developers:
+
+* `entt::identity`: the identity function object that will be available with
+  C++20. It returns its argument unchanged and nothing more. It's useful as a
+  sort of _do nothing_ function in template programming.
+
+* `entt::overload`: a tool to disambiguate different overloads from their
+  function type. It works with both free and member functions.<br/>
+  Consider the following definition:
+
+  ```cpp
+  struct clazz {
+      void bar(int) {}
+      void bar() {}
+  };
+  ```
+
+  This utility can be used to get the _right_ overload as:
+
+  ```cpp
+  auto *member = entt::overload<void(int)>(&clazz::bar);
+  ```
+
+  The line above is literally equivalent to:
+
+  ```cpp
+  auto *member = static_cast<void(clazz:: *)(int)>(&clazz::bar);
+  ```
+
+  Just easier to read and shorter to type.
+
+* `entt::overloaded`: a small class template used to create a new type with an
+  overloaded `operator()` from a bunch of lambdas or functors.<br/>
+  As an example:
+
+  ```cpp
+  entt::overloaded func{
+      [](int value) { /* ... */ },
+      [](char value) { /* ... */ }
+  };
+
+  func(42);
+  func('c');
+  ```
+
+  Rather useful when doing metaprogramming and having to pass to a function a
+  callable object that supports multiple types at once.
+
+* `entt::y_combinator`: this is a C++ implementation of **the** _y-combinator_.
+  If it's not clear what it is, there is probably no need for this utility.<br/>
+  Below is a small example to show its use:
+
+  ```cpp
+  entt::y_combinator gauss([](const auto &self, auto value) -> unsigned int {
+      return value ? (value + self(value-1u)) : 0;
+  });
+
+  const auto result = gauss(3u);
+  ```
+
+  Maybe convoluted at a first glance but certainly effective. Unfortunately,
+  the language doesn't make it possible to do much better.
+
+This is a rundown of the (actually few) utilities made available by `EnTT`. The
+list will probably grow over time but the size of each will remain rather small,
+as has been the case so far.
