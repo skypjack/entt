@@ -412,8 +412,8 @@ from the documentation of the library that first introduced this tool,
 In `EnTT`, this means to iterating over a reduced set of entities and components
 with respect to what would otherwise be returned from a view or a group.<br/>
 On these words, however, the similarities with the proposal of `Entitas` also
-end. The rules of language and the design of the library obviously impose and
-allow different things.
+end. The rules of the language and the design of the library obviously impose
+and allow different things.
 
 An `observer` is initialized with an instance of a registry and a set of rules
 that describes what are the entities to intercept. As an example:
