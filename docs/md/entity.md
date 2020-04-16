@@ -721,10 +721,14 @@ A general purpose cloning function could be defined as:
 ```cpp
 template<typename Type>
 void clone(const entt::registry &from, entt::registry &to) {
+    const auto *data = from.data<Type>();
+    const auto size = from.size<Type>();
+
     if constexpr(ENTT_IS_EMPTY(Type)) {
-        to.insert<Type>(from.data<Type>(), from.data<Type>() + from.size<Type>());
+        to.insert<Type>(data, data + size);
     } else {
-        to.insert<Type>(from.data<Type>(), from.data<Type>() + from.size<Type>(), from.raw<Type>());
+        const auto *raw = from.raw<Type>();
+        to.insert<Type>(data, data + size, raw, raw + size);
     }
 }
 ```
