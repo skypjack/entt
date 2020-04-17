@@ -4,18 +4,22 @@
 #include <entt/meta/meta.hpp>
 #include "types.h"
 
-ENTT_API void set_up(entt::meta_ctx);
+ENTT_API void set_up();
 ENTT_API void tear_down();
 ENTT_API entt::meta_any wrap_int(int);
 
 TEST(Lib, Meta) {
     ASSERT_FALSE(entt::resolve("position"_hs));
+    ASSERT_FALSE(entt::resolve("velocity"_hs));
 
-    set_up(entt::meta_ctx{});
+    set_up();
     entt::meta<double>().conv<int>();
 
     ASSERT_TRUE(entt::resolve("position"_hs));
     ASSERT_TRUE(entt::resolve("velocity"_hs));
+
+    ASSERT_EQ(entt::resolve<position>(), entt::resolve("position"_hs));
+    ASSERT_EQ(entt::resolve<velocity>(), entt::resolve("velocity"_hs));
 
     auto pos = entt::resolve("position"_hs).construct(42., 3.);
     auto vel = entt::resolve("velocity"_hs).ctor().invoke();

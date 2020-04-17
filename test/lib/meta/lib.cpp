@@ -8,9 +8,7 @@ position create_position(int x, int y) {
     return position{x, y};
 }
 
-ENTT_API void set_up(entt::meta_ctx ctx) {
-    entt::meta_ctx::bind(ctx);
-
+ENTT_API void set_up() {
     entt::meta<position>()
             .alias("position"_hs)
             .ctor<&create_position>()

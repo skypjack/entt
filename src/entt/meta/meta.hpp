@@ -191,44 +191,11 @@ bool compare(const void *lhs, const void *rhs) {
 }
 
 
-template<typename... Type>
-struct meta_node {
-    static_assert(std::is_same_v<Type..., std::remove_cv_t<std::remove_reference_t<Type>>...>);
-
-    inline static meta_type_node * resolve() ENTT_NOEXCEPT {
-        static meta_type_node node{
-            type_info<Type...>::id(),
-            {},
-            nullptr,
-            nullptr,
-            std::is_void_v<Type...>,
-            std::is_integral_v<Type...>,
-            std::is_floating_point_v<Type...>,
-            std::is_array_v<Type...>,
-            std::is_enum_v<Type...>,
-            std::is_union_v<Type...>,
-            std::is_class_v<Type...>,
-            std::is_pointer_v<Type...>,
-            std::is_pointer_v<Type...> && std::is_function_v<std::remove_pointer_t<Type>...>,
-            std::is_member_object_pointer_v<Type...>,
-            std::is_member_function_pointer_v<Type...>,
-            std::extent_v<Type...>,
-            &compare<Type...>, // workaround for an issue with VS2017
-            &meta_node<std::remove_const_t<std::remove_pointer_t<Type>>...>::resolve,
-            &meta_node<std::remove_const_t<std::remove_extent_t<Type>>...>::resolve
-        };
-
-        return &node;
-    }
-};
-
-
-template<>
-struct meta_node<> {
+struct ENTT_API meta_context {
     inline static meta_type_node *local = nullptr;
     inline static meta_type_node **global = &local;
 
-    inline static void detach(const meta_type_node *node) ENTT_NOEXCEPT {
+    static void detach(const meta_type_node *node) ENTT_NOEXCEPT {
         auto **it = global;
 
         while(*it && *it != node) {
@@ -238,6 +205,38 @@ struct meta_node<> {
         if(*it) {
             *it = (*it)->next;
         }
+    }
+};
+
+
+template<typename Type>
+struct ENTT_API meta_node {
+    static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>);
+
+    static meta_type_node * resolve() ENTT_NOEXCEPT {
+        static meta_type_node node{
+            type_info<Type>::id(),
+            {},
+            nullptr,
+            nullptr,
+            std::is_void_v<Type>,
+            std::is_integral_v<Type>,
+            std::is_floating_point_v<Type>,
+            std::is_array_v<Type>,
+            std::is_enum_v<Type>,
+            std::is_union_v<Type>,
+            std::is_class_v<Type>,
+            std::is_pointer_v<Type>,
+            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
+            std::is_member_object_pointer_v<Type>,
+            std::is_member_function_pointer_v<Type>,
+            std::extent_v<Type>,
+            &compare<Type>, // workaround for an issue with VS2017
+            &meta_node<std::remove_const_t<std::remove_pointer_t<Type>>>::resolve,
+            &meta_node<std::remove_const_t<std::remove_extent_t<Type>>>::resolve
+        };
+
+        return &node;
     }
 };
 
@@ -262,11 +261,11 @@ struct meta_ctx {
      * @param other A valid context to which to bind.
      */
     static void bind(meta_ctx other) ENTT_NOEXCEPT {
-        internal::meta_info<>::global = other.ctx;
+        internal::meta_context::global = other.ctx;
     }
 
 private:
-    internal::meta_type_node **ctx{&internal::meta_info<>::local};
+    internal::meta_type_node **ctx{&internal::meta_context::local};
 };
 
 
@@ -1487,7 +1486,7 @@ public:
 
     /*! @brief Removes a meta object from the list of searchable types. */
     void detach() ENTT_NOEXCEPT {
-        internal::meta_info<>::detach(node);
+        internal::meta_context::detach(node);
     }
 
 private:

@@ -392,11 +392,11 @@ public:
     auto alias(const id_type value) ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!exists(value, *internal::meta_info<>::global));
-        ENTT_ASSERT(!exists(node, *internal::meta_info<>::global));
+        ENTT_ASSERT(!exists(value, *internal::meta_context::global));
+        ENTT_ASSERT(!exists(node, *internal::meta_context::global));
         node->alias = value;
-        node->next = *internal::meta_info<>::global;
-        *internal::meta_info<>::global = node;
+        node->next = *internal::meta_context::global;
+        *internal::meta_context::global = node;
 
         return meta_factory<Type, Type>{&node->prop};
     }
@@ -779,7 +779,7 @@ public:
     auto reset() ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        internal::meta_info<>::detach(node);
+        internal::meta_context::detach(node);
 
         const auto unregister_all = y_combinator{
             [](auto &&self, auto **curr, auto... member) {
@@ -846,7 +846,7 @@ inline meta_type resolve() ENTT_NOEXCEPT {
 inline meta_type resolve(const id_type alias) ENTT_NOEXCEPT {
     return internal::find_if([alias](const auto *curr) {
         return curr->alias == alias;
-    }, *internal::meta_info<>::global);
+    }, *internal::meta_context::global);
 }
 
 
@@ -858,7 +858,7 @@ inline meta_type resolve(const id_type alias) ENTT_NOEXCEPT {
 template<typename Op>
 inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
 resolve(Op op) {
-    internal::visit<meta_type>(op, *internal::meta_info<>::global);
+    internal::visit<meta_type>(op, *internal::meta_context::global);
 }
 
 
