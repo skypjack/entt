@@ -195,20 +195,20 @@ class basic_registry {
                 pools.resize(index+1);
             }
 
-            if(auto &&cpool = pools[index]; !cpool.pool) {
-                cpool.type_id = type_info<Component>::id();
-                cpool.pool.reset(new pool_handler<Component>());
-                cpool.remove = [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
+            if(auto &&pdata = pools[index]; !pdata.pool) {
+                pdata.type_id = type_info<Component>::id();
+                pdata.pool.reset(new pool_handler<Component>());
+                pdata.remove = [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
                     static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
                 };
             }
 
             return static_cast<pool_handler<Component> &>(*pools[index].pool);
         } else {
-            sparse_set<entity_type> *cpool{nullptr};
+            sparse_set<entity_type> *candidate{nullptr};
 
             if(auto it = std::find_if(pools.begin(), pools.end(), [id = type_info<Component>::id()](const auto &pdata) { return id == pdata.type_id; }); it == pools.cend()) {
-                cpool = pools.emplace_back(pool_data{
+                candidate = pools.emplace_back(pool_data{
                     type_info<Component>::id(),
                     std::unique_ptr<sparse_set<entity_type>>{new pool_handler<Component>()},
                     [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
@@ -216,10 +216,10 @@ class basic_registry {
                     }
                 }).pool.get();
             } else {
-                cpool = it->pool.get();
+                candidate = it->pool.get();
             }
 
-            return static_cast<pool_handler<Component> &>(*cpool);
+            return static_cast<pool_handler<Component> &>(*candidate);
         }
     }
 
