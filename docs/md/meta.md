@@ -46,13 +46,13 @@ identifier is required, it's likely that a user defined literal is used as
 follows:
 
 ```cpp
-auto factory = entt::meta<my_type>().alias("reflected_type"_hs);
+auto factory = entt::meta<my_type>().type("reflected_type"_hs);
 ```
 
 For what it's worth, this is likely completely equivalent to:
 
 ```cpp
-auto factory = entt::meta<my_type>().alias(42);
+auto factory = entt::meta<my_type>().type(42);
 ```
 
 Obviously, human-readable identifiers are more convenient to use and highly
@@ -75,18 +75,21 @@ The returned value is a factory object to use to continue building the meta
 type. In order to make the type _visible_, users can assign it an identifier:
 
 ```cpp
-auto factory = entt::meta<my_type>().alias("reflected_type"_hs);
+auto factory = entt::meta<my_type>().type("reflected_type"_hs);
 ```
 
-When working with named types, it isn't even necessary to specify the
-identifier. In fact, it isn't allowed and it will trigger a compilation
-error.<br/>
+Or use the default one, that is, the built-in identifier for the given type:
+
+```cpp
+auto factory = entt::meta<my_type>().type();
+```
+
 Identifiers are important because users can retrieve meta types at runtime by
-searching for them by _name_ other than by type. On the other hand, there are
-cases in which users can be interested in adding features to a reflected type so
-that the reflection system can use it correctly under the hood, but they don't
-want to allow searching the type by _name_. In this case, it's sufficient not
-to invoke `type` and the type will not be searchable _by name_.
+searching for them by _name_ other than by type.<br/>
+On the other hand, there are cases in which users can be interested in adding
+features to a reflected type so that the reflection system can use it correctly
+under the hood, but they don't want to also make the type _searchable_. In this
+case, it's sufficient not to invoke `type`.
 
 A factory is such that all its member functions returns the factory itself or
 a decorated version of it. This object can be used to add the following:
@@ -490,7 +493,7 @@ object.<br/>
 Apparently, it's more difficult to say than to do:
 
 ```cpp
-entt::meta<my_type>().alias("reflected_type"_hs).prop("tooltip"_hs, "message");
+entt::meta<my_type>().type("reflected_type"_hs).prop("tooltip"_hs, "message");
 ```
 
 Properties are always in the key/value form. There are no restrictions on the
@@ -500,25 +503,25 @@ Multiple formats are supported when it comes to defining a property:
 * Properties as key/value pairs:
 
   ```cpp
-  entt::meta<my_type>().alias("reflected_type"_hs).prop("tooltip"_hs, "message");
+  entt::meta<my_type>().type("reflected_type"_hs).prop("tooltip"_hs, "message");
   ```
 
 * Properties as `std::pair`s:
 
   ```cpp
-  entt::meta<my_type>().alias("reflected_type"_hs).prop(std::make_pair("tooltip"_hs, "message"));
+  entt::meta<my_type>().type("reflected_type"_hs).prop(std::make_pair("tooltip"_hs, "message"));
   ```
 
 * Key only properties:
 
   ```cpp
-  entt::meta<my_type>().alias("reflected_type"_hs).prop(my_enum::key_only);
+  entt::meta<my_type>().type("reflected_type"_hs).prop(my_enum::key_only);
   ```
 
 * Properties as `std::tuple`s:
 
   ```cpp
-  entt::meta<my_type>().alias("reflected_type"_hs).prop(std::make_tuple(std::make_pair("tooltip"_hs, "message"), my_enum::key_only));
+  entt::meta<my_type>().type("reflected_type"_hs).prop(std::make_tuple(std::make_pair("tooltip"_hs, "message"), my_enum::key_only));
   ```
 
   A tuple contains one or more properties. All of them are treated individually.
@@ -526,7 +529,7 @@ Multiple formats are supported when it comes to defining a property:
 * Annotations:
 
   ```cpp
-  entt::meta<my_type>().alias("reflected_type"_hs).prop(&property_generator);
+  entt::meta<my_type>().type("reflected_type"_hs).prop(&property_generator);
   ```
 
   An annotation is an invocable object that returns one or more properties. All
@@ -537,7 +540,7 @@ each property to associate with the last meta object created:
 
 ```cpp
 entt::meta<my_type>()
-    .alias("reflected_type"_hs)
+    .type("reflected_type"_hs)
         .prop(entt::hashed_string{"Name"}, "Reflected Type")
     .data<&my_type::data_member>("member"_hs)
         .prop(std::make_pair("tooltip"_hs, "Member"))

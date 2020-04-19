@@ -10,6 +10,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/fwd.hpp"
+#include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
 #include "meta.hpp"
@@ -385,20 +386,26 @@ class meta_factory<Type> {
 
 public:
     /**
-     * @brief Extends a meta type by assigning it an alias.
-     * @param value Unique identifier.
+     * @brief Makes a meta type _searchable_.
+     * @param id Optional unique identifier.
      * @return An extended meta factory for the given type.
      */
-    auto alias(const id_type value) ENTT_NOEXCEPT {
+    auto type(const id_type id = type_info<Type>::id()) {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!exists(value, *internal::meta_context::global));
+        ENTT_ASSERT(!exists(id, *internal::meta_context::global));
         ENTT_ASSERT(!exists(node, *internal::meta_context::global));
-        node->alias = value;
+        node->alias = id;
         node->next = *internal::meta_context::global;
         *internal::meta_context::global = node;
 
         return meta_factory<Type, Type>{&node->prop};
+    }
+
+    /*! @copydoc type */
+    [[deprecated("use ::type instead")]]
+    auto alias(const id_type id) ENTT_NOEXCEPT {
+        return type(id);
     }
 
     /**
