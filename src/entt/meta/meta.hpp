@@ -72,7 +72,7 @@ struct meta_dtor_node {
 
 
 struct meta_data_node {
-    id_type alias;
+    id_type id;
     meta_type_node * const parent;
     meta_data_node * next;
     meta_prop_node * prop;
@@ -86,7 +86,7 @@ struct meta_data_node {
 
 struct meta_func_node {
     using size_type = std::size_t;
-    id_type alias;
+    id_type id;
     meta_type_node * const parent;
     meta_func_node * next;
     meta_prop_node * prop;
@@ -102,7 +102,7 @@ struct meta_func_node {
 struct meta_type_node {
     using size_type = std::size_t;
     const id_type type_id;
-    id_type alias;
+    id_type id;
     meta_type_node * next;
     meta_prop_node * prop;
     const bool is_void;
@@ -632,7 +632,7 @@ private:
  *
  * A handle doesn't perform copies and isn't responsible for the contained
  * object. It doesn't prolong the lifetime of the pointed instance.<br/>
- * Handles are used mainly to gnerate aliases for actual objects when needed.
+ * Handles are used mainly to generate aliases for actual objects when needed.
  */
 struct meta_handle {
     /*! @brief Default constructor. */
@@ -881,9 +881,15 @@ struct meta_data {
         : node{curr}
     {}
 
-    /*! @copydoc meta_type::alias */
+    /*! @copydoc meta_type::id */
+    id_type id() const ENTT_NOEXCEPT {
+        return node->id;
+    }
+
+    /*! @copydoc id */
+    [[deprecated("use ::id instead")]]
     id_type alias() const ENTT_NOEXCEPT {
-        return node->alias;
+        return id();
     }
 
     /*! @copydoc meta_base::parent */
@@ -1021,9 +1027,15 @@ struct meta_func {
         : node{curr}
     {}
 
-    /*! @copydoc meta_type::alias */
+    /*! @copydoc meta_type::id */
+    id_type id() const ENTT_NOEXCEPT {
+        return node->id;
+    }
+
+    /*! @copydoc id */
+    [[deprecated("use ::id instead")]]
     id_type alias() const ENTT_NOEXCEPT {
-        return node->alias;
+        return id();
     }
 
     /*! @copydoc meta_base::parent */
@@ -1153,11 +1165,17 @@ public:
     }
 
     /**
-     * @brief Returns the alias assigned to a given meta object.
-     * @return The alias assigned to the meta object.
+     * @brief Returns the identifier assigned to a given meta object.
+     * @return The identifier assigned to the meta object.
      */
+    id_type id() const ENTT_NOEXCEPT {
+        return node->id;
+    }
+
+    /*! @copydoc id */
+    [[deprecated("use ::id instead")]]
     id_type alias() const ENTT_NOEXCEPT {
-        return node->alias;
+        return id();
     }
 
     /**
@@ -1298,13 +1316,13 @@ public:
     }
 
     /**
-     * @brief Returns the meta base associated with a given alias.
-     * @param alias Unique identifier.
-     * @return The meta base associated with the given alias, if any.
+     * @brief Returns the meta base associated with a given identifier.
+     * @param id Unique identifier.
+     * @return The meta base associated with the given identifier, if any.
      */
-    meta_base base(const id_type alias) const {
-        return internal::find_if<&internal::meta_type_node::base>([alias](const auto *curr) {
-            return curr->type()->alias == alias;
+    meta_base base(const id_type id) const {
+        return internal::find_if<&internal::meta_type_node::base>([id](const auto *curr) {
+            return curr->type()->id == id;
         }, node);
     }
 
@@ -1366,16 +1384,16 @@ public:
     }
 
     /**
-     * @brief Returns the meta data associated with a given alias.
+     * @brief Returns the meta data associated with a given identifier.
      *
      * The meta data of the base classes will also be visited, if any.
      *
-     * @param alias Unique identifier.
-     * @return The meta data associated with the given alias, if any.
+     * @param id Unique identifier.
+     * @return The meta data associated with the given identifier, if any.
      */
-    meta_data data(const id_type alias) const {
-        return internal::find_if<&internal::meta_type_node::data>([alias](const auto *curr) {
-            return curr->alias == alias;
+    meta_data data(const id_type id) const {
+        return internal::find_if<&internal::meta_type_node::data>([id](const auto *curr) {
+            return curr->id == id;
         }, node);
     }
 
@@ -1394,16 +1412,16 @@ public:
     }
 
     /**
-     * @brief Returns the meta function associated with a given alias.
+     * @brief Returns the meta function associated with a given identifier.
      *
      * The meta functions of the base classes will also be visited, if any.
      *
-     * @param alias Unique identifier.
-     * @return The meta function associated with the given alias, if any.
+     * @param id Unique identifier.
+     * @return The meta function associated with the given identifier, if any.
      */
-    meta_func func(const id_type alias) const {
-        return internal::find_if<&internal::meta_type_node::func>([alias](const auto *curr) {
-            return curr->alias == alias;
+    meta_func func(const id_type id) const {
+        return internal::find_if<&internal::meta_type_node::func>([id](const auto *curr) {
+            return curr->id == id;
         }, node);
     }
 
