@@ -141,13 +141,13 @@ public:
 
 template<typename Entity>
 constexpr bool operator==(const Entity entity, null other) ENTT_NOEXCEPT {
-    return other == entity;
+    return other.operator==(entity);
 }
 
 
 template<typename Entity>
 constexpr bool operator!=(const Entity entity, null other) ENTT_NOEXCEPT {
-    return other != entity;
+    return !(other == entity);
 }
 
 
