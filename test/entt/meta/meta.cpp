@@ -1571,7 +1571,7 @@ TEST_F(Meta, MetaType) {
     ASSERT_TRUE(type);
     ASSERT_NE(type, entt::meta_type{});
     ASSERT_EQ(type.alias(), "derived"_hs);
-    ASSERT_EQ(type.id(), entt::type_info<derived_type>::id());
+    ASSERT_EQ(type.type_id(), entt::type_info<derived_type>::id());
 
     type.prop([](auto prop) {
         ASSERT_EQ(prop.key(), props::prop_int);
@@ -1795,7 +1795,7 @@ TEST_F(Meta, AbstractClass) {
     auto type = entt::resolve<an_abstract_type>();
     concrete_type instance;
 
-    ASSERT_EQ(type.id(), entt::type_info<an_abstract_type>::id());
+    ASSERT_EQ(type.type_id(), entt::type_info<an_abstract_type>::id());
     ASSERT_EQ(instance.i, 0);
 
     type.func("f"_hs).invoke(instance, 3);

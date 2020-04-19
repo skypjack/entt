@@ -1145,10 +1145,10 @@ public:
     {}
 
     /**
-     * @brief Returns the id of the underlying type.
-     * @return The id of the underlying type.
+     * @brief Returns the type id of the underlying type.
+     * @return The type id of the underlying type.
      */
-    id_type id() const ENTT_NOEXCEPT {
+    id_type type_id() const ENTT_NOEXCEPT {
         return node->type_id;
     }
 
