@@ -250,7 +250,7 @@ registry.emplace_or_replace<position>(entity, 0., 0.);
 This is a slightly faster alternative for the following snippet:
 
 ```cpp
-if(registry.has<comp>(entity)) {
+if(registry.has<velocity>(entity)) {
     registry.replace<velocity>(entity, 0., 0.);
 } else {
     registry.emplace<velocity>(entity, 0., 0.);
