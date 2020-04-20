@@ -289,6 +289,7 @@ struct Meta: ::testing::Test {
 
 TEST_F(Meta, Resolve) {
     ASSERT_EQ(entt::resolve<derived_type>(), entt::resolve("derived"_hs));
+    ASSERT_EQ(entt::resolve_if([](auto type) { return type.id() == "char"_hs; }), entt::resolve<char>());
 
     bool found = false;
 

@@ -846,6 +846,20 @@ inline meta_type resolve() ENTT_NOEXCEPT {
 
 
 /**
+ * @brief Returns the first meta type that satisfies specific criteria, if any.
+ * @tparam Func Type of the unary predicate to use to test the meta types.
+ * @param func Unary predicate which returns ​true for the required element.
+ * @return The first meta type satisfying the condition, if any.
+ */
+template<typename Func>
+inline meta_type resolve_if(Func func) ENTT_NOEXCEPT {
+    return internal::find_if([&func](const auto *curr) {
+        return func(meta_type{curr});
+    }, *internal::meta_context::global);
+}
+
+
+/**
  * @brief Returns the meta type associated with a given identifier.
  * @param id Unique identifier.
  * @return The meta type associated with the given id, if any.
