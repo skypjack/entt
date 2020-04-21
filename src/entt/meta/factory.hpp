@@ -860,14 +860,19 @@ inline meta_type resolve_if(Func func) ENTT_NOEXCEPT {
 
 
 /**
- * @brief Returns the meta type associated with a given identifier.
+ * @brief Returns the meta type associated with a given identifier, if any.
  * @param id Unique identifier.
- * @return The meta type associated with the given id, if any.
+ * @return The meta type associated with the given identifier, if any.
  */
+inline meta_type resolve_id(const id_type id) ENTT_NOEXCEPT {
+    return resolve_if([id](const auto type) { return type.id() == id; });
+}
+
+
+/*! @copydoc resolve_id */
+[[deprecated("use entt::resolve_id instead")]]
 inline meta_type resolve(const id_type id) ENTT_NOEXCEPT {
-    return internal::find_if([id](const auto *curr) {
-        return curr->id == id;
-    }, *internal::meta_context::global);
+    return resolve_id(id);
 }
 
 

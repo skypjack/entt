@@ -260,19 +260,18 @@ All this has the great merit that, unlike the vast majority of the things
 present in this library and closely linked to the compile-time, the reflection
 system stands in fact as a non-intrusive tool for the runtime.
 
-To search for a reflected type there are two options: by type or by _name_. In
-both cases, the search can be done by means of the `resolve` function:
+To search for a reflected type there are a few options:
 
 ```cpp
-// search for a reflected type by type
+// direct access to a reflected type
 auto by_type = entt::resolve<my_type>();
 
-// search for a reflected type by name
-auto by_name = entt::resolve("reflected_type"_hs);
+// search for a reflected type by identifier
+auto by_id = entt::resolve_id("reflected_type"_hs);
 ```
 
-There exits also a third overload of the `resolve` function to use to iterate
-all the reflected types at once:
+There exits also an overload of the `resolve` function to use to iterate all the
+reflected types at once:
 
 ```cpp
 resolve([](auto type) {
