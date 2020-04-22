@@ -2,6 +2,7 @@
 #include <entt/core/attribute.h>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
+#include <entt/meta/resolve.hpp>
 #include "types.h"
 
 ENTT_API void set_up();
