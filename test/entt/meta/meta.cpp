@@ -290,7 +290,8 @@ struct Meta: ::testing::Test {
 
 TEST_F(Meta, Resolve) {
     ASSERT_EQ(entt::resolve<derived_type>(), entt::resolve("derived"_hs));
-    ASSERT_EQ(entt::resolve_if([](auto type) { return type.id() == "char"_hs; }), entt::resolve<char>());
+    // it could be "char"_hs rather than entt::hashed_string::value("char") if it weren't for a bug in VS2017
+    ASSERT_EQ(entt::resolve_if([](auto type) { return type.id() == entt::hashed_string::value("char"); }), entt::resolve<char>());
 
     bool found = false;
 
