@@ -3405,13 +3405,13 @@ public:
 
 template<typename Entity>
 constexpr bool operator==(const Entity entity, null other) ENTT_NOEXCEPT {
-    return other == entity;
+    return other.operator==(entity);
 }
 
 
 template<typename Entity>
 constexpr bool operator!=(const Entity entity, null other) ENTT_NOEXCEPT {
-    return other != entity;
+    return !(other == entity);
 }
 
 
@@ -7573,20 +7573,20 @@ class basic_registry {
                 pools.resize(index+1);
             }
 
-            if(auto &&cpool = pools[index]; !cpool.pool) {
-                cpool.type_id = type_info<Component>::id();
-                cpool.pool.reset(new pool_handler<Component>());
-                cpool.remove = [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
+            if(auto &&pdata = pools[index]; !pdata.pool) {
+                pdata.type_id = type_info<Component>::id();
+                pdata.pool.reset(new pool_handler<Component>());
+                pdata.remove = [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
                     static_cast<pool_handler<Component> &>(cpool).remove(owner, entt);
                 };
             }
 
             return static_cast<pool_handler<Component> &>(*pools[index].pool);
         } else {
-            sparse_set<entity_type> *cpool{nullptr};
+            sparse_set<entity_type> *candidate{nullptr};
 
             if(auto it = std::find_if(pools.begin(), pools.end(), [id = type_info<Component>::id()](const auto &pdata) { return id == pdata.type_id; }); it == pools.cend()) {
-                cpool = pools.emplace_back(pool_data{
+                candidate = pools.emplace_back(pool_data{
                     type_info<Component>::id(),
                     std::unique_ptr<sparse_set<entity_type>>{new pool_handler<Component>()},
                     [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
@@ -7594,10 +7594,10 @@ class basic_registry {
                     }
                 }).pool.get();
             } else {
-                cpool = it->pool.get();
+                candidate = it->pool.get();
             }
 
-            return static_cast<pool_handler<Component> &>(*cpool);
+            return static_cast<pool_handler<Component> &>(*candidate);
         }
     }
 
@@ -10358,15 +10358,47 @@ using id_type = ENTT_ID_TYPE;
 
 #endif
 
-// #include "../core/type_traits.hpp"
-#ifndef ENTT_CORE_TYPE_TRAITS_HPP
-#define ENTT_CORE_TYPE_TRAITS_HPP
+// #include "../core/type_info.hpp"
+#ifndef ENTT_CORE_TYPE_INFO_HPP
+#define ENTT_CORE_TYPE_INFO_HPP
 
 
-#include <cstddef>
-#include <utility>
-#include <type_traits>
 // #include "../config/config.h"
+
+// #include "../core/attribute.h"
+#ifndef ENTT_CORE_ATTRIBUTE_H
+#define ENTT_CORE_ATTRIBUTE_H
+
+
+#ifndef ENTT_EXPORT
+#   if defined _WIN32 || defined __CYGWIN__ || defined _MSC_VER
+#       define ENTT_EXPORT __declspec(dllexport)
+#       define ENTT_IMPORT __declspec(dllimport)
+#       define ENTT_HIDDEN
+#   elif defined __GNUC__ && __GNUC__ >= 4
+#       define ENTT_EXPORT __attribute__((visibility("default")))
+#       define ENTT_IMPORT __attribute__((visibility("default")))
+#       define ENTT_HIDDEN __attribute__((visibility("hidden")))
+#   else /* Unsupported compiler */
+#       define ENTT_EXPORT
+#       define ENTT_IMPORT
+#       define ENTT_HIDDEN
+#   endif
+#endif
+
+
+#ifndef ENTT_API
+#   if defined ENTT_API_EXPORT
+#       define ENTT_API ENTT_EXPORT
+#   elif defined ENTT_API_IMPORT
+#       define ENTT_API ENTT_IMPORT
+#   else /* No API */
+#       define ENTT_API
+#   endif
+#endif
+
+
+#endif
 
 // #include "hashed_string.hpp"
 #ifndef ENTT_CORE_HASHED_STRING_HPP
@@ -10634,6 +10666,123 @@ constexpr entt::hashed_wstring operator"" ENTT_HWS_SUFFIX(const wchar_t *str, st
 
 
 #endif
+
+// #include "fwd.hpp"
+
+
+
+namespace entt {
+
+
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
+
+namespace internal {
+
+
+struct ENTT_API type_index {
+    static id_type next() ENTT_NOEXCEPT {
+        static ENTT_MAYBE_ATOMIC(id_type) value{};
+        return value++;
+    }
+};
+
+
+}
+
+
+/**
+ * Internal details not to be documented.
+ * @endcond TURN_OFF_DOXYGEN
+ */
+
+
+/**
+ * @brief Type index.
+ * @tparam Type Type for which to generate a sequential identifier.
+ */
+template<typename Type, typename = void>
+struct ENTT_API type_index {
+    /**
+     * @brief Returns the sequential identifier of a given type.
+     * @return The sequential identifier of a given type.
+     */
+    static id_type value() ENTT_NOEXCEPT {
+        static const id_type value = internal::type_index::next();
+        return value;
+    }
+};
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is
+ * indexable, false otherwise.
+ * @tparam Type Potentially indexable type.
+ */
+template<typename, typename = void>
+struct has_type_index: std::false_type {};
+
+
+/*! @brief has_type_index */
+template<typename Type>
+struct has_type_index<Type, std::void_t<decltype(type_index<Type>::value())>>: std::true_type {};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially indexable type.
+ */
+template<typename Type>
+inline constexpr bool has_type_index_v = has_type_index<Type>::value;
+
+
+/**
+ * @brief Type info.
+ * @tparam Type Type for which to generate information.
+ */
+template<typename Type, typename = void>
+struct ENTT_API type_info {
+    /**
+     * @brief Returns the numeric representation of a given type.
+     * @return The numeric representation of the given type.
+     */
+#if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
+    static constexpr id_type id() ENTT_NOEXCEPT {
+        constexpr auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION_CONSTEXPR);
+        return value;
+    }
+#elif defined ENTT_PRETTY_FUNCTION
+    static id_type id() ENTT_NOEXCEPT {
+        static const auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
+        return value;
+    }
+#else
+    static id_type id() ENTT_NOEXCEPT {
+        return type_index<Type>::value();
+    }
+#endif
+};
+
+
+}
+
+
+#endif
+
+// #include "../core/type_traits.hpp"
+#ifndef ENTT_CORE_TYPE_TRAITS_HPP
+#define ENTT_CORE_TYPE_TRAITS_HPP
+
+
+#include <cstddef>
+#include <utility>
+#include <type_traits>
+// #include "../config/config.h"
+
+// #include "hashed_string.hpp"
 
 // #include "fwd.hpp"
 
@@ -10988,153 +11137,6 @@ private:
 // #include "../core/fwd.hpp"
 
 // #include "../core/type_info.hpp"
-#ifndef ENTT_CORE_TYPE_INFO_HPP
-#define ENTT_CORE_TYPE_INFO_HPP
-
-
-// #include "../config/config.h"
-
-// #include "../core/attribute.h"
-#ifndef ENTT_CORE_ATTRIBUTE_H
-#define ENTT_CORE_ATTRIBUTE_H
-
-
-#ifndef ENTT_EXPORT
-#   if defined _WIN32 || defined __CYGWIN__ || defined _MSC_VER
-#       define ENTT_EXPORT __declspec(dllexport)
-#       define ENTT_IMPORT __declspec(dllimport)
-#       define ENTT_HIDDEN
-#   elif defined __GNUC__ && __GNUC__ >= 4
-#       define ENTT_EXPORT __attribute__((visibility("default")))
-#       define ENTT_IMPORT __attribute__((visibility("default")))
-#       define ENTT_HIDDEN __attribute__((visibility("hidden")))
-#   else /* Unsupported compiler */
-#       define ENTT_EXPORT
-#       define ENTT_IMPORT
-#       define ENTT_HIDDEN
-#   endif
-#endif
-
-
-#ifndef ENTT_API
-#   if defined ENTT_API_EXPORT
-#       define ENTT_API ENTT_EXPORT
-#   elif defined ENTT_API_IMPORT
-#       define ENTT_API ENTT_IMPORT
-#   else /* No API */
-#       define ENTT_API
-#   endif
-#endif
-
-
-#endif
-
-// #include "hashed_string.hpp"
-
-// #include "fwd.hpp"
-
-
-
-namespace entt {
-
-
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
-
-namespace internal {
-
-
-struct ENTT_API type_index {
-    static id_type next() ENTT_NOEXCEPT {
-        static ENTT_MAYBE_ATOMIC(id_type) value{};
-        return value++;
-    }
-};
-
-
-}
-
-
-/**
- * Internal details not to be documented.
- * @endcond TURN_OFF_DOXYGEN
- */
-
-
-/**
- * @brief Type index.
- * @tparam Type Type for which to generate a sequential identifier.
- */
-template<typename Type, typename = void>
-struct ENTT_API type_index {
-    /**
-     * @brief Returns the sequential identifier of a given type.
-     * @return The sequential identifier of a given type.
-     */
-    static id_type value() ENTT_NOEXCEPT {
-        static const id_type value = internal::type_index::next();
-        return value;
-    }
-};
-
-
-/**
- * @brief Provides the member constant `value` to true if a given type is
- * indexable, false otherwise.
- * @tparam Type Potentially indexable type.
- */
-template<typename, typename = void>
-struct has_type_index: std::false_type {};
-
-
-/*! @brief has_type_index */
-template<typename Type>
-struct has_type_index<Type, std::void_t<decltype(type_index<Type>::value())>>: std::true_type {};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potentially indexable type.
- */
-template<typename Type>
-inline constexpr bool has_type_index_v = has_type_index<Type>::value;
-
-
-/**
- * @brief Type info.
- * @tparam Type Type for which to generate information.
- */
-template<typename Type, typename = void>
-struct ENTT_API type_info {
-    /**
-     * @brief Returns the numeric representation of a given type.
-     * @return The numeric representation of the given type.
-     */
-#if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
-    static constexpr id_type id() ENTT_NOEXCEPT {
-        constexpr auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION_CONSTEXPR);
-        return value;
-    }
-#elif defined ENTT_PRETTY_FUNCTION
-    static id_type id() ENTT_NOEXCEPT {
-        static const auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
-        return value;
-    }
-#else
-    static id_type id() ENTT_NOEXCEPT {
-        return type_index<Type>::value();
-    }
-#endif
-};
-
-
-}
-
-
-#endif
 
 // #include "../core/type_traits.hpp"
 
@@ -11200,7 +11202,7 @@ struct meta_dtor_node {
 
 
 struct meta_data_node {
-    id_type alias;
+    id_type id;
     meta_type_node * const parent;
     meta_data_node * next;
     meta_prop_node * prop;
@@ -11214,7 +11216,7 @@ struct meta_data_node {
 
 struct meta_func_node {
     using size_type = std::size_t;
-    id_type alias;
+    id_type id;
     meta_type_node * const parent;
     meta_func_node * next;
     meta_prop_node * prop;
@@ -11230,7 +11232,7 @@ struct meta_func_node {
 struct meta_type_node {
     using size_type = std::size_t;
     const id_type type_id;
-    id_type alias;
+    id_type id;
     meta_type_node * next;
     meta_prop_node * prop;
     const bool is_void;
@@ -11319,44 +11321,11 @@ bool compare(const void *lhs, const void *rhs) {
 }
 
 
-template<typename... Type>
-struct meta_node {
-    static_assert(std::is_same_v<Type..., std::remove_cv_t<std::remove_reference_t<Type>>...>);
-
-    inline static meta_type_node * resolve() ENTT_NOEXCEPT {
-        static meta_type_node node{
-            type_info<Type...>::id(),
-            {},
-            nullptr,
-            nullptr,
-            std::is_void_v<Type...>,
-            std::is_integral_v<Type...>,
-            std::is_floating_point_v<Type...>,
-            std::is_array_v<Type...>,
-            std::is_enum_v<Type...>,
-            std::is_union_v<Type...>,
-            std::is_class_v<Type...>,
-            std::is_pointer_v<Type...>,
-            std::is_pointer_v<Type...> && std::is_function_v<std::remove_pointer_t<Type>...>,
-            std::is_member_object_pointer_v<Type...>,
-            std::is_member_function_pointer_v<Type...>,
-            std::extent_v<Type...>,
-            &compare<Type...>, // workaround for an issue with VS2017
-            &meta_node<std::remove_const_t<std::remove_pointer_t<Type>>...>::resolve,
-            &meta_node<std::remove_const_t<std::remove_extent_t<Type>>...>::resolve
-        };
-
-        return &node;
-    }
-};
-
-
-template<>
-struct meta_node<> {
+struct ENTT_API meta_context {
     inline static meta_type_node *local = nullptr;
     inline static meta_type_node **global = &local;
 
-    inline static void detach(const meta_type_node *node) ENTT_NOEXCEPT {
+    static void detach(const meta_type_node *node) ENTT_NOEXCEPT {
         auto **it = global;
 
         while(*it && *it != node) {
@@ -11366,6 +11335,38 @@ struct meta_node<> {
         if(*it) {
             *it = (*it)->next;
         }
+    }
+};
+
+
+template<typename Type>
+struct ENTT_API meta_node {
+    static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>);
+
+    static meta_type_node * resolve() ENTT_NOEXCEPT {
+        static meta_type_node node{
+            type_info<Type>::id(),
+            {},
+            nullptr,
+            nullptr,
+            std::is_void_v<Type>,
+            std::is_integral_v<Type>,
+            std::is_floating_point_v<Type>,
+            std::is_array_v<Type>,
+            std::is_enum_v<Type>,
+            std::is_union_v<Type>,
+            std::is_class_v<Type>,
+            std::is_pointer_v<Type>,
+            std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
+            std::is_member_object_pointer_v<Type>,
+            std::is_member_function_pointer_v<Type>,
+            std::extent_v<Type>,
+            &compare<Type>, // workaround for an issue with VS2017
+            &meta_node<std::remove_const_t<std::remove_pointer_t<Type>>>::resolve,
+            &meta_node<std::remove_const_t<std::remove_extent_t<Type>>>::resolve
+        };
+
+        return &node;
     }
 };
 
@@ -11390,11 +11391,11 @@ struct meta_ctx {
      * @param other A valid context to which to bind.
      */
     static void bind(meta_ctx other) ENTT_NOEXCEPT {
-        internal::meta_info<>::global = other.ctx;
+        internal::meta_context::global = other.ctx;
     }
 
 private:
-    internal::meta_type_node **ctx{&internal::meta_info<>::local};
+    internal::meta_type_node **ctx{&internal::meta_context::local};
 };
 
 
@@ -11761,7 +11762,7 @@ private:
  *
  * A handle doesn't perform copies and isn't responsible for the contained
  * object. It doesn't prolong the lifetime of the pointed instance.<br/>
- * Handles are used mainly to gnerate aliases for actual objects when needed.
+ * Handles are used mainly to generate aliases for actual objects when needed.
  */
 struct meta_handle {
     /*! @brief Default constructor. */
@@ -12010,9 +12011,15 @@ struct meta_data {
         : node{curr}
     {}
 
-    /*! @copydoc meta_type::alias */
+    /*! @copydoc meta_type::id */
+    id_type id() const ENTT_NOEXCEPT {
+        return node->id;
+    }
+
+    /*! @copydoc id */
+    [[deprecated("use ::id instead")]]
     id_type alias() const ENTT_NOEXCEPT {
-        return node->alias;
+        return id();
     }
 
     /*! @copydoc meta_base::parent */
@@ -12150,9 +12157,15 @@ struct meta_func {
         : node{curr}
     {}
 
-    /*! @copydoc meta_type::alias */
+    /*! @copydoc meta_type::id */
+    id_type id() const ENTT_NOEXCEPT {
+        return node->id;
+    }
+
+    /*! @copydoc id */
+    [[deprecated("use ::id instead")]]
     id_type alias() const ENTT_NOEXCEPT {
-        return node->alias;
+        return id();
     }
 
     /*! @copydoc meta_base::parent */
@@ -12274,19 +12287,25 @@ public:
     {}
 
     /**
-     * @brief Returns the id of the underlying type.
-     * @return The id of the underlying type.
+     * @brief Returns the type id of the underlying type.
+     * @return The type id of the underlying type.
      */
-    id_type id() const ENTT_NOEXCEPT {
+    id_type type_id() const ENTT_NOEXCEPT {
         return node->type_id;
     }
 
     /**
-     * @brief Returns the alias assigned to a given meta object.
-     * @return The alias assigned to the meta object.
+     * @brief Returns the identifier assigned to a given meta object.
+     * @return The identifier assigned to the meta object.
      */
+    id_type id() const ENTT_NOEXCEPT {
+        return node->id;
+    }
+
+    /*! @copydoc id */
+    [[deprecated("use ::id instead")]]
     id_type alias() const ENTT_NOEXCEPT {
-        return node->alias;
+        return id();
     }
 
     /**
@@ -12427,13 +12446,13 @@ public:
     }
 
     /**
-     * @brief Returns the meta base associated with a given alias.
-     * @param alias Unique identifier.
-     * @return The meta base associated with the given alias, if any.
+     * @brief Returns the meta base associated with a given identifier.
+     * @param id Unique identifier.
+     * @return The meta base associated with the given identifier, if any.
      */
-    meta_base base(const id_type alias) const {
-        return internal::find_if<&internal::meta_type_node::base>([alias](const auto *curr) {
-            return curr->type()->alias == alias;
+    meta_base base(const id_type id) const {
+        return internal::find_if<&internal::meta_type_node::base>([id](const auto *curr) {
+            return curr->type()->id == id;
         }, node);
     }
 
@@ -12495,16 +12514,16 @@ public:
     }
 
     /**
-     * @brief Returns the meta data associated with a given alias.
+     * @brief Returns the meta data associated with a given identifier.
      *
      * The meta data of the base classes will also be visited, if any.
      *
-     * @param alias Unique identifier.
-     * @return The meta data associated with the given alias, if any.
+     * @param id Unique identifier.
+     * @return The meta data associated with the given identifier, if any.
      */
-    meta_data data(const id_type alias) const {
-        return internal::find_if<&internal::meta_type_node::data>([alias](const auto *curr) {
-            return curr->alias == alias;
+    meta_data data(const id_type id) const {
+        return internal::find_if<&internal::meta_type_node::data>([id](const auto *curr) {
+            return curr->id == id;
         }, node);
     }
 
@@ -12523,16 +12542,16 @@ public:
     }
 
     /**
-     * @brief Returns the meta function associated with a given alias.
+     * @brief Returns the meta function associated with a given identifier.
      *
      * The meta functions of the base classes will also be visited, if any.
      *
-     * @param alias Unique identifier.
-     * @return The meta function associated with the given alias, if any.
+     * @param id Unique identifier.
+     * @return The meta function associated with the given identifier, if any.
      */
-    meta_func func(const id_type alias) const {
-        return internal::find_if<&internal::meta_type_node::func>([alias](const auto *curr) {
-            return curr->alias == alias;
+    meta_func func(const id_type id) const {
+        return internal::find_if<&internal::meta_type_node::func>([id](const auto *curr) {
+            return curr->id == id;
         }, node);
     }
 
@@ -12615,7 +12634,7 @@ public:
 
     /*! @brief Removes a meta object from the list of searchable types. */
     void detach() ENTT_NOEXCEPT {
-        internal::meta_info<>::detach(node);
+        internal::meta_context::detach(node);
     }
 
 private:
@@ -13093,26 +13112,32 @@ class meta_factory<Type> {
     }
 
     template<typename Node>
-    bool exists(const id_type alias, const Node *node) ENTT_NOEXCEPT {
-        return node && (node->alias == alias || exists(alias, node->next));
+    bool exists(const id_type id, const Node *node) ENTT_NOEXCEPT {
+        return node && (node->id == id || exists(id, node->next));
     }
 
 public:
     /**
-     * @brief Extends a meta type by assigning it an alias.
-     * @param value Unique identifier.
+     * @brief Makes a meta type _searchable_.
+     * @param id Optional unique identifier.
      * @return An extended meta factory for the given type.
      */
-    auto alias(const id_type value) ENTT_NOEXCEPT {
+    auto type(const id_type id = type_info<Type>::id()) {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!exists(value, *internal::meta_info<>::global));
-        ENTT_ASSERT(!exists(node, *internal::meta_info<>::global));
-        node->alias = value;
-        node->next = *internal::meta_info<>::global;
-        *internal::meta_info<>::global = node;
+        ENTT_ASSERT(!exists(id, *internal::meta_context::global));
+        ENTT_ASSERT(!exists(node, *internal::meta_context::global));
+        node->id = id;
+        node->next = *internal::meta_context::global;
+        *internal::meta_context::global = node;
 
         return meta_factory<Type, Type>{&node->prop};
+    }
+
+    /*! @copydoc type */
+    [[deprecated("use ::type instead")]]
+    auto alias(const id_type id) ENTT_NOEXCEPT {
+        return type(id);
     }
 
     /**
@@ -13241,7 +13266,7 @@ public:
         node.next = type->ctor;
         type->ctor = &node;
 
-        return meta_factory<Type, integral_constant<Func>>{&node.prop};
+        return meta_factory<Type, std::integral_constant<decltype(Func), Func>>{&node.prop};
     }
 
     /**
@@ -13323,11 +13348,11 @@ public:
      *
      * @tparam Data The actual variable to attach to the meta type.
      * @tparam Policy Optional policy (no policy set by default).
-     * @param alias Unique identifier.
+     * @param id Unique identifier.
      * @return An extended meta factory for the parent type.
      */
     template<auto Data, typename Policy = as_is_t>
-    auto data(const id_type alias) ENTT_NOEXCEPT {
+    auto data(const id_type id) ENTT_NOEXCEPT {
         auto * const type = internal::meta_info<Type>::resolve();
         internal::meta_data_node *curr = nullptr;
 
@@ -13382,13 +13407,13 @@ public:
             curr = &node;
         }
 
-        ENTT_ASSERT(!exists(alias, type->data));
+        ENTT_ASSERT(!exists(id, type->data));
         ENTT_ASSERT(!exists(curr, type->data));
-        curr->alias = alias;
+        curr->id = id;
         curr->next = type->data;
         type->data = curr;
 
-        return meta_factory<Type, integral_constant<Data>>{&curr->prop};
+        return meta_factory<Type, std::integral_constant<decltype(Data), Data>>{&curr->prop};
     }
 
     /**
@@ -13408,11 +13433,11 @@ public:
      * @tparam Setter The actual function to use as a setter.
      * @tparam Getter The actual function to use as a getter.
      * @tparam Policy Optional policy (no policy set by default).
-     * @param alias Unique identifier.
+     * @param id Unique identifier.
      * @return An extended meta factory for the parent type.
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
-    auto data(const id_type alias) ENTT_NOEXCEPT {
+    auto data(const id_type id) ENTT_NOEXCEPT {
         using underlying_type = std::invoke_result_t<decltype(Getter), Type &>;
         static_assert(std::is_invocable_v<decltype(Setter), Type &, underlying_type>);
         auto * const type = internal::meta_info<Type>::resolve();
@@ -13429,13 +13454,13 @@ public:
             &internal::getter<Type, Getter, Policy>
         };
 
-        ENTT_ASSERT(!exists(alias, type->data));
+        ENTT_ASSERT(!exists(id, type->data));
         ENTT_ASSERT(!exists(&node, type->data));
-        node.alias = alias;
+        node.id = id;
         node.next = type->data;
         type->data = &node;
 
-        return meta_factory<Type, integral_constant<Setter>, integral_constant<Getter>>{&node.prop};
+        return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
     }
 
     /**
@@ -13448,11 +13473,11 @@ public:
      *
      * @tparam Candidate The actual function to attach to the meta type.
      * @tparam Policy Optional policy (no policy set by default).
-     * @param alias Unique identifier.
+     * @param id Unique identifier.
      * @return An extended meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_is_t>
-    auto func(const id_type alias) ENTT_NOEXCEPT {
+    auto func(const id_type id) ENTT_NOEXCEPT {
         using helper_type = internal::meta_function_helper_t<decltype(Candidate)>;
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -13471,13 +13496,13 @@ public:
             }
         };
 
-        ENTT_ASSERT(!exists(alias, type->func));
+        ENTT_ASSERT(!exists(id, type->func));
         ENTT_ASSERT(!exists(&node, type->func));
-        node.alias = alias;
+        node.id = id;
         node.next = type->func;
         type->func = &node;
 
-        return meta_factory<Type, integral_constant<Candidate>>{&node.prop};
+        return meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
     }
 
     /**
@@ -13493,7 +13518,7 @@ public:
     auto reset() ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        internal::meta_info<>::detach(node);
+        internal::meta_context::detach(node);
 
         const auto unregister_all = y_combinator{
             [](auto &&self, auto **curr, auto... member) {
@@ -13513,7 +13538,7 @@ public:
         unregister_all(&node->data, &internal::meta_data_node::prop);
         unregister_all(&node->func, &internal::meta_func_node::prop);
 
-        node->alias = {};
+        node->id = {};
         node->next = nullptr;
         node->dtor = nullptr;
 
@@ -13541,6 +13566,26 @@ inline meta_factory<Type> meta() ENTT_NOEXCEPT {
 }
 
 
+}
+
+
+#endif
+
+// #include "meta/meta.hpp"
+
+// #include "meta/resolve.hpp"
+#ifndef ENTT_META_RESOLVE_HPP
+#define ENTT_META_RESOLVE_HPP
+
+
+#include <type_traits>
+// #include "meta.hpp"
+
+
+
+namespace entt {
+
+
 /**
  * @brief Returns the meta type associated with a given type.
  * @tparam Type Type to use to search for a meta type.
@@ -13553,14 +13598,33 @@ inline meta_type resolve() ENTT_NOEXCEPT {
 
 
 /**
- * @brief Returns the meta type associated with a given alias.
- * @param alias Unique identifier.
- * @return The meta type associated with the given alias, if any.
+ * @brief Returns the first meta type that satisfies specific criteria, if any.
+ * @tparam Func Type of the unary predicate to use to test the meta types.
+ * @param func Unary predicate which returns ​true for the required element.
+ * @return The first meta type satisfying the condition, if any.
  */
-inline meta_type resolve(const id_type alias) ENTT_NOEXCEPT {
-    return internal::find_if([alias](const auto *curr) {
-        return curr->alias == alias;
-    }, *internal::meta_info<>::global);
+template<typename Func>
+inline meta_type resolve_if(Func func) ENTT_NOEXCEPT {
+    return internal::find_if([&func](const auto *curr) {
+        return func(meta_type{curr});
+    }, *internal::meta_context::global);
+}
+
+
+/**
+ * @brief Returns the meta type associated with a given identifier, if any.
+ * @param id Unique identifier.
+ * @return The meta type associated with the given identifier, if any.
+ */
+inline meta_type resolve_id(const id_type id) ENTT_NOEXCEPT {
+    return resolve_if([id](const auto type) { return type.id() == id; });
+}
+
+
+/*! @copydoc resolve_id */
+[[deprecated("use entt::resolve_id instead")]]
+inline meta_type resolve(const id_type id) ENTT_NOEXCEPT {
+    return resolve_id(id);
 }
 
 
@@ -13572,7 +13636,7 @@ inline meta_type resolve(const id_type alias) ENTT_NOEXCEPT {
 template<typename Op>
 inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
 resolve(Op op) {
-    internal::visit<meta_type>(op, *internal::meta_info<>::global);
+    internal::visit<meta_type>(op, *internal::meta_context::global);
 }
 
 
@@ -13580,8 +13644,6 @@ resolve(Op op) {
 
 
 #endif
-
-// #include "meta/meta.hpp"
 
 // #include "meta/policy.hpp"
 

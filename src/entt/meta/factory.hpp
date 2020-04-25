@@ -534,7 +534,7 @@ public:
         node.next = type->ctor;
         type->ctor = &node;
 
-        return meta_factory<Type, integral_constant<Func>>{&node.prop};
+        return meta_factory<Type, std::integral_constant<decltype(Func), Func>>{&node.prop};
     }
 
     /**
@@ -681,7 +681,7 @@ public:
         curr->next = type->data;
         type->data = curr;
 
-        return meta_factory<Type, integral_constant<Data>>{&curr->prop};
+        return meta_factory<Type, std::integral_constant<decltype(Data), Data>>{&curr->prop};
     }
 
     /**
@@ -728,7 +728,7 @@ public:
         node.next = type->data;
         type->data = &node;
 
-        return meta_factory<Type, integral_constant<Setter>, integral_constant<Getter>>{&node.prop};
+        return meta_factory<Type, std::integral_constant<decltype(Setter), Setter>, std::integral_constant<decltype(Getter), Getter>>{&node.prop};
     }
 
     /**
@@ -770,7 +770,7 @@ public:
         node.next = type->func;
         type->func = &node;
 
-        return meta_factory<Type, integral_constant<Candidate>>{&node.prop};
+        return meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
     }
 
     /**
