@@ -266,17 +266,23 @@ To search for a reflected type there are a few options:
 // direct access to a reflected type
 auto by_type = entt::resolve<my_type>();
 
-// search for a reflected type by identifier
+// lookup of a reflected type by identifier
 auto by_id = entt::resolve_id("reflected_type"_hs);
+
+// lookup of a reflected type by type id
+auto by_type_id = entt::resolve_type(entt::type_info<my_type>::id());
 ```
 
 There exits also an overload of the `resolve` function to use to iterate all the
-reflected types at once:
+reflected types at once as well as a `resolve_if` function to use to perform
+more refined searches when needed:
 
 ```cpp
 resolve([](auto type) {
     // ...
 });
+
+auto by_lookup = resolve_if([](auto type) { return type.is_floating_point(); });
 ```
 
 In all cases, the returned value is an instance of `meta_type`. This kind of

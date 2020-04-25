@@ -44,6 +44,16 @@ inline meta_type resolve_id(const id_type id) ENTT_NOEXCEPT {
 }
 
 
+/**
+ * @brief Returns the meta type associated with a given type id, if any.
+ * @param id Unique identifier.
+ * @return The meta type associated with the given type id, if any.
+ */
+inline meta_type resolve_type(const id_type id) ENTT_NOEXCEPT {
+    return resolve_if([id](const auto type) { return type.type_id() == id; });
+}
+
+
 /*! @copydoc resolve_id */
 [[deprecated("use entt::resolve_id instead")]]
 inline meta_type resolve(const id_type id) ENTT_NOEXCEPT {
