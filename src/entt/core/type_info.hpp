@@ -86,14 +86,9 @@ struct ENTT_API type_info {
      * @brief Returns the numeric representation of a given type.
      * @return The numeric representation of the given type.
      */
-#if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
-    static constexpr id_type id() ENTT_NOEXCEPT {
-        constexpr auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION_CONSTEXPR);
-        return value;
-    }
-#elif defined ENTT_PRETTY_FUNCTION
-    static id_type id() ENTT_NOEXCEPT {
-        static const auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
+#if defined ENTT_PRETTY_FUNCTION
+    static ENTT_PRETTY_FUNCTION_CONSTEXPR() id_type id() ENTT_NOEXCEPT {
+        ENTT_PRETTY_FUNCTION_CONSTEXPR(static const) auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
         return value;
     }
 #else
