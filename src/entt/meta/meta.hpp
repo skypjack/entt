@@ -361,7 +361,6 @@ public:
         node = internal::meta_info<Type>::resolve();
 
         if constexpr(!std::is_void_v<Type>) {
-            static_assert(std::is_copy_constructible_v<Type>);
             using traits_type = type_traits<std::remove_cv_t<std::remove_reference_t<Type>>>;
             traits_type::instance(*this, std::forward<Args>(args)...);
             destroy_fn = &traits_type::destroy;
