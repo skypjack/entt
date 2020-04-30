@@ -42,7 +42,7 @@ message(VERBOSE "* ${PROJECT_NAME} v${PROJECT_VERSION} (${CMAKE_BUILD_TYPE})")
 message(VERBOSE "* Copyright (c) 2017-2020 Michele Caini <michele.caini@gmail.com>")
 message(VERBOSE "*")
 
-option(USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if availbale." OFF)
+option(USE_LIBCPP "Use libc++ by adding -stdlib=libc++ flag if availbale." ON)
 option(USE_ASAN "Use address sanitizer by adding -fsanitize=address -fno-omit-frame-pointer flags" OFF)
 
 #
