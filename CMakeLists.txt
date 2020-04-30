@@ -63,7 +63,7 @@ if(NOT WIN32 AND USE_LIBCPP)
     " HAS_LIBCPP)
 
     if(NOT HAS_LIBCPP)
-        message(WARNING "The option USE_LIBCPP is set (by default) but libc++ is not available. The flag will not be added to the target.")
+        message(VERBOSE "The option USE_LIBCPP is set (by default) but libc++ is not available. The flag will not be added to the target.")
     endif()
 
     cmake_pop_check_state()
