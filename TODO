@@ -17,10 +17,10 @@
   - get -> all, exclude -> none
 
 Next:
-* replace observer class with observer functions
+* add observer functions aside observer class
 * get(cmp, entity) -> void *, set(cmp, entity, void *)
 * review multi component views to reduce instantiations once empty types are gone...
-* move signals down to the storage class?
+* describe how to hook into the type system to eg auto-generate meta types on first use
 
 * WIP:
  - introduce the component iterators for non-contiguous collections of entities (multi component views, observers, user defined collections)

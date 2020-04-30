@@ -566,11 +566,19 @@ public:
     }
 
     /**
+     * @brief Aliasing constructor.
+     * @return A meta any that shares a reference to an unmanaged object.
+     */
+    meta_any ref() const ENTT_NOEXCEPT {
+        return meta_any{node, instance};
+    }
+
+    /**
      * @brief Indirection operator for aliasing construction.
-     * @return An alias to the contained object.
+     * @return A meta any that shares a reference to an unmanaged object.
      */
     meta_any operator *() const ENTT_NOEXCEPT {
-        return meta_any{node, instance};
+        return ref();
     }
 
     /**
@@ -631,7 +639,7 @@ private:
  *
  * A handle doesn't perform copies and isn't responsible for the contained
  * object. It doesn't prolong the lifetime of the pointed instance.<br/>
- * Handles are used mainly to generate aliases for actual objects when needed.
+ * Handles are used to generate meta references to actual objects when needed.
  */
 struct meta_handle {
     /*! @brief Default constructor. */
@@ -640,7 +648,7 @@ struct meta_handle {
     {}
 
     /**
-     * @brief Creates an alias for the actual object.
+     * @brief Creates a handle that points to an unmanaged object.
      * @tparam Type Type of object to use to initialize the container.
      * @param value An instance of an object to use to initialize the container.
      */

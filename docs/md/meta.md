@@ -231,16 +231,26 @@ In other words, whenever `meta_any` intercepts a `reference_wrapper`, it acts as
 a reference to the original instance rather than making a copy of it. The
 contained object is never destroyed and users must ensure that its lifetime
 exceeds that of the container.<br/>
-Similarly, to create a copy that works as a light reference for the managed
-object, it's possible to dereference a given `meta_any`:
+Similarly, to create a copy that works as a _light_ reference for the managed
+object, it's possible to _dereference_ a given `meta_any` so as to invoke its
+aliasing constructor:
 
 ```cpp
+// aliasing constructor
+entt::meta_any ref = any.ref();
+```
+
+This is also equivalent to:
+
+```cpp
+// indirection operator
 entt::meta_any ref = *any;
 ```
 
-It doesn't matter if the starting container actually holds an object or acts as
-a reference for unmanaged elements, the new instance thus created won't create
-copies and will only serve as a reference for the original item.<br/>
+In both cases, it doesn't matter if the starting container actually holds an
+object or acts as a reference for unmanaged elements, the new instance thus
+created won't create copies and will only serve as a reference for the original
+item.<br/>
 It means that, starting from the example above, both `ref` and` any` will point
 to the same object, whether it's initially contained in `any` or already an
 unmanaged one. This is particularly useful for passing instances of `meta_any`
