@@ -440,10 +440,10 @@ There are a few alternatives available at the moment:
   entt::meta<my_type>().func<&my_type::member_function, entt::as_void_t>("member"_hs);
   ```
 
-* The _as-alias_ policy, associated with the type `entt::as_alias_t`.<br/>
-  It allows to build wrappers that act as aliases for the objects that generated
-  them. Modifying the object contained in the wrapper for which the _aliasing_
-  was requested will make it possible to directly modify the instance used to
+* The _as-ref_ policy, associated with the type `entt::as_ref_t`.<br/>
+  It allows to build wrappers that act as references to unmanaged objects.
+  Modifying the object contained in the wrapper for which the _reference_ was
+  requested will make it possible to directly modify the instance used to
   initialize the wrapper itself.<br/>
   This policy works with constructors (for example, when objects are taken from
   an external container rather than created on demand), data members and
@@ -452,7 +452,7 @@ There are a few alternatives available at the moment:
   As an example of use:
 
   ```cpp
-  entt::meta<my_type>().data<&my_type::data_member, entt::as_alias_t>("member"_hs);
+  entt::meta<my_type>().data<&my_type::data_member, entt::as_ref_t>("member"_hs);
   ```
 
 Some uses are rather trivial, but it's useful to note that there are some less

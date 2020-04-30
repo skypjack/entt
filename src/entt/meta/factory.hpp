@@ -159,7 +159,7 @@ meta_any getter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any in
     auto dispatch = [](auto &&value) {
         if constexpr(std::is_same_v<Policy, as_void_t>) {
             return meta_any{std::in_place_type<void>, std::forward<decltype(value)>(value)};
-        } else if constexpr(std::is_same_v<Policy, as_alias_t>) {
+        } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
             return meta_any{std::ref(std::forward<decltype(value)>(value))};
         } else {
             static_assert(std::is_same_v<Policy, as_is_t>);
@@ -203,7 +203,7 @@ meta_any invoke([[maybe_unused]] meta_any instance, meta_any *args, std::index_s
         if constexpr(std::is_void_v<typename helper_type::return_type> || std::is_same_v<Policy, as_void_t>) {
             std::invoke(Candidate, *params...);
             return meta_any{std::in_place_type<void>};
-        } else if constexpr(std::is_same_v<Policy, as_alias_t>) {
+        } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
             return meta_any{std::ref(std::invoke(Candidate, *params...))};
         } else {
             static_assert(std::is_same_v<Policy, as_is_t>);
