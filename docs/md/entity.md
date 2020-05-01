@@ -419,7 +419,7 @@ An `observer` is initialized with an instance of a registry and a set of rules
 that describes what are the entities to intercept. As an example:
 
 ```cpp
-entt::observer observer{registry, entt::collector.replace<sprite>()};
+entt::observer observer{registry, entt::collector.update<sprite>()};
 ```
 
 The class is default constructible and can be reconfigured at any time by means
@@ -466,11 +466,11 @@ rules) to use with an `observer` instead.<br/>
 There are two types of `matcher`s:
 
 * Observing matcher: an observer will return at least all the living entities
-  for which one or more of the given components have been explicitly replaced
-  and not yet destroyed.
+  for which one or more of the given components have been updated and not yet
+  destroyed.
 
   ```cpp
-  entt::collector.replace<sprite>();
+  entt::collector.update<sprite>();
   ```
 
 * Grouping matcher: an observer will return at least all the living entities
@@ -484,22 +484,21 @@ There are two types of `matcher`s:
   A grouping matcher supports also exclusion lists as well as single components.
 
 Roughly speaking, an observing matcher intercepts the entities for which the
-given components are replaced (as in `registry::replace`) while a grouping
-matcher tracks the entities that have assigned the given components since the
-last time one asked.<br/>
+given components are updated while a grouping matcher tracks the entities that
+have assigned the given components since the last time one asked.<br/>
 If an entity already has all the components except one and the missing type is
 assigned to it, the entity is intercepted by a grouping matcher.
 
 In addition, a matcher can be filtered with a `where` clause:
 
 ```cpp
-entt::collector.replace<sprite>().where<position>(entt::exclude<velocity>);
+entt::collector.update<sprite>().where<position>(entt::exclude<velocity>);
 ```
 
 This clause introduces a way to intercept entities if and only if they are
 already part of a hypothetical group. If they are not, they aren't returned by
 the observer, no matter if they matched the given rule.<br/>
-In the example above, whenever the component `sprite` of an entity is replaced,
+In the example above, whenever the component `sprite` of an entity is updated,
 the observer probes the entity itself to verify that it has at least `position`
 and has not `velocity` before to store it aside. If one of the two conditions of
 the filter isn't respected, the entity is discared, no matter what.

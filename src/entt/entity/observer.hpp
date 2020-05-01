@@ -61,8 +61,15 @@ struct basic_collector<> {
      * @return The updated collector.
      */
     template<typename AnyOf>
-    static constexpr auto replace() ENTT_NOEXCEPT {
+    static constexpr auto update() ENTT_NOEXCEPT {
         return basic_collector<matcher<type_list<>, type_list<>, AnyOf>>{};
+    }
+
+    /*! @copydoc update */
+    template<typename AnyOf>
+    [[deprecated("use ::update instead")]]
+    static constexpr auto replace() ENTT_NOEXCEPT {
+        return update<AnyOf>();
     }
 };
 
@@ -96,9 +103,17 @@ struct basic_collector<matcher<type_list<Reject...>, type_list<Require...>, Rule
      * @return The updated collector.
      */
     template<typename AnyOf>
-    static constexpr auto replace() ENTT_NOEXCEPT {
+    static constexpr auto update() ENTT_NOEXCEPT {
         return basic_collector<matcher<type_list<>, type_list<>, AnyOf>, current_type, Other...>{};
     }
+
+    /*! @copydoc update */
+    template<typename AnyOf>
+    [[deprecated("use ::update instead")]]
+    static constexpr auto replace() ENTT_NOEXCEPT {
+        return update<AnyOf>();
+    }
+
 
     /**
      * @brief Updates the filter of the last added matcher.
@@ -130,8 +145,8 @@ inline constexpr basic_collector<> collector{};
  * collector:
  *
  * * Observing matcher: an observer will return at least all the living entities
- *   for which one or more of the given components have been explicitly
- *   replaced and not yet destroyed.
+ *   for which one or more of the given components have been updated and not yet
+ *   destroyed.
  * * Grouping matcher: an observer will return at least all the living entities
  *   that would have entered the given group if it existed and that would have
  *   not yet left it.
