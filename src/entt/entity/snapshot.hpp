@@ -412,7 +412,7 @@ class basic_continuous_loader {
     }
 
     template<typename Component>
-    void reset() {
+    void remove_if_exists() {
         for(auto &&ref: remloc) {
             const auto local = ref.second.first;
 
@@ -515,7 +515,7 @@ public:
      */
     template<typename... Component, typename Archive, typename... Type, typename... Member>
     basic_continuous_loader & component(Archive &archive, Member Type:: *... member) {
-        (reset<Component>(), ...);
+        (remove_if_exists<Component>(), ...);
         (assign<Component>(archive, member...), ...);
         return *this;
     }
