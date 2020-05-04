@@ -210,17 +210,18 @@ class basic_snapshot_loader {
         archive(length);
 
         while(length--) {
-            static constexpr auto discard = false;
             Entity entt{};
 
             if constexpr(std::is_empty_v<Type>) {
                 archive(entt);
-                force(*reg, entt, discard);
+                const auto entity = reg->valid(entt) ? entt : reg->create(entt);
+                ENTT_ASSERT(entity == entt);
                 reg->template emplace<Type>(args..., entt);
             } else {
                 Type instance{};
                 archive(entt, instance);
-                force(*reg, entt, discard);
+                const auto entity = reg->valid(entt) ? entt : reg->create(entt);
+                ENTT_ASSERT(entity == entt);
                 reg->template emplace<Type>(args..., entt, std::as_const(instance));
             }
         }
