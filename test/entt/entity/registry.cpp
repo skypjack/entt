@@ -380,24 +380,40 @@ TEST(Registry, CreateWithHint) {
 
     registry.destroy(e2);
 
-    ASSERT_EQ(registry.version(e2), 0);
-    ASSERT_EQ(registry.current(e2), 1);
+    ASSERT_EQ(registry.version(e2), entt::registry::version_type{});
+    ASSERT_EQ(registry.current(e2), entt::registry::version_type{1});
 
     e2 = registry.create();
     auto e1 = registry.create(entt::entity{2});
 
     ASSERT_EQ(registry.entity(e2), entt::entity{2});
-    ASSERT_EQ(registry.version(e2), 1);
+    ASSERT_EQ(registry.version(e2), entt::registry::version_type{1});
 
     ASSERT_EQ(registry.entity(e1), entt::entity{1});
-    ASSERT_EQ(registry.version(e1), 0);
+    ASSERT_EQ(registry.version(e1), entt::registry::version_type{});
 
     registry.destroy(e1);
     registry.destroy(e2);
     auto e0 = registry.create(entt::entity{0});
 
     ASSERT_EQ(e0, entt::entity{0});
-    ASSERT_EQ(registry.version(e0), 0);
+    ASSERT_EQ(registry.version(e0), entt::registry::version_type{});
+}
+
+TEST(Registry, DestroyWithVersion) {
+    entt::registry registry;
+
+    const auto e0 = registry.create();
+    const auto e1 = registry.create();
+
+    ASSERT_EQ(registry.current(e0), entt::registry::version_type{});
+    ASSERT_EQ(registry.current(e1), entt::registry::version_type{});
+
+    registry.destroy(e0);
+    registry.destroy(e1, 3);
+
+    ASSERT_EQ(registry.current(e0), entt::registry::version_type{1});
+    ASSERT_EQ(registry.current(e1), entt::registry::version_type{3});
 }
 
 TEST(Registry, CreateDestroyEntities) {
@@ -448,16 +464,10 @@ TEST(Registry, CreateDestroyCornerCase) {
 
 TEST(Registry, VersionOverflow) {
     entt::registry registry;
-
     const auto entity = registry.create();
-    registry.destroy(entity);
 
-    ASSERT_EQ(registry.version(entity), entt::registry::version_type{});
-
-    for(auto i = entt::entt_traits<std::underlying_type_t<entt::entity>>::version_mask; i; --i) {
-        ASSERT_NE(registry.current(entity), registry.version(entity));
-        registry.destroy(registry.create());
-    }
+    registry.destroy(entity, entt::entt_traits<std::underlying_type_t<entt::entity>>::version_mask);
+    registry.destroy(registry.create());
 
     ASSERT_EQ(registry.current(entity), registry.version(entity));
 }

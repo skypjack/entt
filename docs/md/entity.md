@@ -176,7 +176,8 @@ registry.destroy(view.begin(), view.end());
 
 When an entity is destroyed, the registry can freely reuse it internally with a
 slightly different identifier. In particular, the version of an entity is
-increased after destruction.<br/>
+increased after destruction (unless the overload that forces a version is used
+instead of the default one).<br/>
 Users can probe an identifier to know the information it carries:
 
 ```cpp

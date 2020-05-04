@@ -575,7 +575,7 @@ public:
     }
 
     /**
-     * @brief Destroys an entity and lets the registry recycle the identifier.
+     * @brief Destroys an entity.
      *
      * When an entity is destroyed, its version is updated and the identifier
      * can be recycled at any time.
@@ -585,11 +585,25 @@ public:
      * @param entity A valid entity identifier.
      */
     void destroy(const entity_type entity) {
+        destroy(entity, (to_integral(entity) >> traits_type::entity_shift) + 1);
+    }
+
+    /**
+     * @brief Destroys an entity.
+     *
+     * If the entity isn't already destroyed, the suggested version is used
+     * instead of the implicitly generated one.
+     *
+     * @sa remove_all
+     *
+     * @param entity A valid entity identifier.
+     * @param version A desired version upon destruction.
+     */
+    void destroy(const entity_type entity, const version_type version) {
         remove_all(entity);
         // lengthens the implicit list of destroyed entities
         const auto entt = to_integral(entity) & traits_type::entity_mask;
-        const auto version = ((to_integral(entity) >> traits_type::entity_shift) + 1) << traits_type::entity_shift;
-        entities[entt] = entity_type{to_integral(destroyed) | version};
+        entities[entt] = entity_type{to_integral(destroyed) | (version << traits_type::entity_shift)};
         destroyed = entity_type{entt};
     }
 
