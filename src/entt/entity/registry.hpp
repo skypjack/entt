@@ -1580,20 +1580,9 @@ public:
      *
      * @return A temporary object to use to take snasphosts.
      */
+    [[deprecated("basic_snapshot has now a constructor that accepts a reference to a registry")]]
     entt::basic_snapshot<Entity> snapshot() const {
-        using follow_fn_type = entity_type(const basic_registry &, const entity_type);
-
-        const auto head = to_integral(destroyed);
-        const entity_type seed = (destroyed == null) ? destroyed : entity_type{head | (to_integral(entities[head]) & (traits_type::version_mask << traits_type::entity_shift))};
-
-        follow_fn_type *follow = [](const basic_registry &reg, const entity_type entity) -> entity_type {
-            const auto &others = reg.entities;
-            const auto entt = to_integral(entity) & traits_type::entity_mask;
-            const auto curr = to_integral(others[entt]) & traits_type::entity_mask;
-            return entity_type{curr | (to_integral(others[curr]) & (traits_type::version_mask << traits_type::entity_shift))};
-        };
-
-        return { this, seed, follow };
+        return { *this };
     }
 
     /**
@@ -1611,33 +1600,9 @@ public:
      *
      * @return A temporary object to use to load snasphosts.
      */
+    [[deprecated("basic_snapshot_loader has now a constructor that accepts a reference to a registry")]]
     basic_snapshot_loader<Entity> loader() {
-        using force_fn_type = void(basic_registry &, const entity_type, const bool);
-
-        force_fn_type *force = [](basic_registry &reg, const entity_type entity, const bool drop) {
-            const auto entt = to_integral(entity) & traits_type::entity_mask;
-            auto &others = reg.entities;
-
-            if(!(entt < others.size())) {
-                auto curr = others.size();
-                others.resize(entt + 1);
-                std::generate(others.data() + curr, others.data() + entt, [&curr]() { return entity_type(curr++); });
-            }
-
-            others[entt] = entity;
-
-            if(drop) {
-                reg.destroy(entity);
-                const auto version = to_integral(entity) & (traits_type::version_mask << traits_type::entity_shift);
-                others[entt] = entity_type{(to_integral(others[entt]) & traits_type::entity_mask) | version};
-            }
-        };
-
-        clear();
-        entities.clear();
-        destroyed = null;
-
-        return { this, force };
+        return { *this };
     }
 
     /**
