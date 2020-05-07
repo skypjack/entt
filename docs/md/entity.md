@@ -845,42 +845,32 @@ suitable for local save/restore functionalities while the latter is suitable for
 creating client-server applications and for transferring somehow parts of the
 representation side to side.
 
-To take a snapshot of the registry, use the `snapshot` member function. It
-returns a temporary object properly initialized to _save_ the whole registry or
-parts of it.
-
-Example of use:
+To take a snapshot of a registry, use the `snapshot` class:
 
 ```cpp
 output_archive output;
 
-registry.snapshot()
+snapshot{registry}
     .entities(output)
-    .destroyed(output)
     .component<a_component, another_component>(output);
 ```
 
-It isn't necessary to invoke all these functions each and every time. What
-functions to use in which case mostly depends on the goal and there is not a
-golden rule to do that.
+It isn't necessary to invoke all functions each and every time. What functions
+to use in which case mostly depends on the goal and there is not a golden rule
+for that.
 
-The `entities` member function asks the registry to serialize all the entities
-that are still in use along with their versions. On the other side, the
-`destroyed` member function tells to the registry to serialize the entities that
-have been destroyed and are no longer in use.<br/>
-These two functions can be used to save and restore the whole set of entities
-with the versions they had during serialization.
-
-The `component` member function is a function template the aim of which is to
-store aside components. The presence of a template parameter list is a
-consequence of a couple of design choices from the past and in the present:
+The `entities` member function makes the snapshot serialize all entities (both
+those still alive and those destroyed) along with their versions.<br/>
+On the other hand, the `component` member function is a function template the
+aim of which is to store aside components. The presence of a template parameter
+list is a consequence of a couple of design choices from the past and in the
+present:
 
 * First of all, there is no reason to force a user to serialize all the
   components at once and most of the times it isn't desiderable. As an example,
   in case the stuff for the HUD in a game is put into the registry for some
   reasons, its components can be freely discarded during a serialization step
-  because probably the software already knows how to reconstruct the HUD
-  correctly from scratch.
+  because probably the software already knows how to reconstruct them correctly.
 
 * Furthermore, the registry makes heavy use of _type-erasure_ techniques
   internally and doesn't know at any time what component types it contains.
@@ -897,7 +887,7 @@ As an example:
 const auto view = registry.view<serialize>();
 output_archive output;
 
-registry.snapshot().component<a_component, another_component>(output, view.cbegin(), view.cend());
+snapshot{registry}.component<a_component, another_component>(output, view.cbegin(), view.cend());
 ```
 
 Note that `component` stores items along with entities. It means that it works
@@ -912,28 +902,24 @@ The following sections describe both loaders and archives in details.
 A snapshot loader requires that the destination registry be empty and loads all
 the data at once while keeping intact the identifiers that the entities
 originally had.<br/>
-To do that, the registry offers a member function named `loader` that returns a
-temporary object properly initialized to _restore_ a snapshot.
-
-Example of use:
+To use it, just pass to the constructor a valid registry:
 
 ```cpp
 input_archive input;
 
-registry.loader()
+snapshot_loader{registry}
     .entities(input)
-    .destroyed(input)
     .component<a_component, another_component>(input)
     .orphans();
 ```
 
-It isn't necessary to invoke all these functions each and every time. What
-functions to use in which case mostly depends on the goal and there is not a
-golden rule to do that. For obvious reasons, what is important is that the data
-are restored in exactly the same order in which they were serialized.
+It isn't necessary to invoke all functions each and every time. What functions
+to use in which case mostly depends on the goal and there is not a golden rule
+for that. For obvious reasons, what is important is that the data are restored
+in exactly the same order in which they were serialized.
 
-The `entities` and `destroyed` member functions restore the sets of entities and
-the versions that the entities originally had at the source.
+The `entities` member function restores the sets of entities and the versions
+that they originally had at the source.
 
 The `component` member function restores all and only the components specified
 and assigns them to the right entities. Note that the template parameter list
@@ -950,18 +936,16 @@ entities and thus update their versions.
 
 A continuous loader is designed to load data from a source registry to a
 (possibly) non-empty destination. The loader can accommodate in a registry more
-than one snapshot in a sort of _continuous loading_ that updates the
-destination one step at a time.<br/>
+than one snapshot in a sort of _continuous loading_ that updates the destination
+one step at a time.<br/>
 Identifiers that entities originally had are not transferred to the target.
 Instead, the loader maps remote identifiers to local ones while restoring a
 snapshot. Because of that, this kind of loader offers a way to update
 automatically identifiers that are part of components (as an example, as data
 members or gathered in a container).<br/>
-Another difference with the snapshot loader is that the continuous loader does
-not need to work with the private data structures of a registry. Furthermore, it
-has an internal state that must persist over time. Therefore, there is no reason
-to create it by means of a registry, or to limit its lifetime to that of a
-temporary object.
+Another difference with the snapshot loader is that the continuous loader has an
+internal state that must persist over time. Therefore, there is no reason to
+limit its lifetime to that of a temporary object.
 
 Example of use:
 
@@ -970,22 +954,20 @@ entt::continuous_loader<entt::entity> loader{registry};
 input_archive input;
 
 loader.entities(input)
-    .destroyed(input)
     .component<a_component, another_component, dirty_component>(input, &dirty_component::parent, &dirty_component::child)
     .orphans()
     .shrink();
 ```
 
-It isn't necessary to invoke all these functions each and every time. What
-functions to use in which case mostly depends on the goal and there is not a
-golden rule to do that. For obvious reasons, what is important is that the data
-are restored in exactly the same order in which they were serialized.
+It isn't necessary to invoke all functions each and every time. What functions
+to use in which case mostly depends on the goal and there is not a golden rule
+for that. For obvious reasons, what is important is that the data are restored
+in exactly the same order in which they were serialized.
 
-The `entities` and `destroyed` member functions restore groups of entities and
-map each entity to a local counterpart when required. In other terms, for each
-remote entity identifier not yet registered by the loader, the latter creates a
-local identifier so that it can keep the local entity in sync with the remote
-one.
+The `entities` member function restores groups of entities and maps each entity
+to a local counterpart when required. In other terms, for each remote entity
+identifier not yet registered by the loader, it creates a local identifier so
+that it can keep the local entity in sync with the remote one.
 
 The `component` member function restores all and only the components specified
 and assigns them to the right entities.<br/>

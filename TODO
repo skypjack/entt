@@ -22,5 +22,5 @@ Next:
  - introduce the component iterators for non-contiguous collections of entities (multi component views, observers, user defined collections)
 
 * WIP: snapshot rework
- - snapshot: use entity injection to load all entities at once
+ - snapshot: support for range-based archives
  - update documentation to describe alternatives
