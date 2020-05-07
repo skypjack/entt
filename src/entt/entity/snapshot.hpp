@@ -234,13 +234,13 @@ public:
         typename traits_type::entity_type length{};
 
         archive(length);
-        std::vector<entity_type> entities(length);
+        std::vector<entity_type> all(length);
 
         for(decltype(length) pos{}; pos < length; ++pos) {
-            archive(entities[pos]);
+            archive(all[pos]);
         }
 
-        reg->assign(entities.cbegin(), entities.cend());
+        reg->assign(all.cbegin(), all.cend());
 
         return *this;
     }
