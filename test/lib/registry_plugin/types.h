@@ -11,4 +11,6 @@ struct velocity {
     double dy;
 };
 
+struct tag {};
+
 #endif

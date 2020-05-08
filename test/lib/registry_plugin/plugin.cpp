@@ -12,13 +12,16 @@ CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
         [ctx]() {
             auto &registry = *static_cast<entt::registry *>(ctx->userdata);
 
-            const auto view = registry.view<position>();
-            registry.assign(view.begin(), view.end(), velocity{1., 1.});
+            const auto position_view = registry.view<position>(entt::exclude<tag>);
+            registry.assign(position_view.begin(), position_view.end(), velocity{1., 1.});
 
             registry.view<position, velocity>().each([](auto &pos, auto &vel) {
                 pos.x += static_cast<int>(16 * vel.dx);
                 pos.y += static_cast<int>(16 * vel.dy);
             });
+
+            const auto tag_view = registry.view<tag>();
+            registry.destroy(tag_view.begin(), tag_view.end());
         }();
         break;
     case CR_CLOSE:
