@@ -893,12 +893,6 @@ struct meta_data {
         return node->id;
     }
 
-    /*! @copydoc id */
-    [[deprecated("use ::id instead")]]
-    id_type alias() const ENTT_NOEXCEPT {
-        return id();
-    }
-
     /*! @copydoc meta_base::parent */
     inline meta_type parent() const ENTT_NOEXCEPT;
 
@@ -1039,12 +1033,6 @@ struct meta_func {
         return node->id;
     }
 
-    /*! @copydoc id */
-    [[deprecated("use ::id instead")]]
-    id_type alias() const ENTT_NOEXCEPT {
-        return id();
-    }
-
     /*! @copydoc meta_base::parent */
     inline meta_type parent() const ENTT_NOEXCEPT;
 
@@ -1177,12 +1165,6 @@ public:
      */
     id_type id() const ENTT_NOEXCEPT {
         return node->id;
-    }
-
-    /*! @copydoc id */
-    [[deprecated("use ::id instead")]]
-    id_type alias() const ENTT_NOEXCEPT {
-        return id();
     }
 
     /**

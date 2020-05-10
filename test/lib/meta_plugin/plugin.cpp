@@ -10,13 +10,13 @@ position create_position(int x, int y) {
 
 void set_up() {
     entt::meta<position>()
-            .alias("position"_hs)
+            .type("position"_hs)
             .ctor<&create_position>()
             .data<&position::x>("x"_hs)
             .data<&position::y>("y"_hs);
 
     entt::meta<velocity>()
-            .alias("velocity"_hs)
+            .type("velocity"_hs)
             .ctor<>()
             .data<&velocity::dx>("dx"_hs)
             .data<&velocity::dy>("dy"_hs);

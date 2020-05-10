@@ -54,13 +54,6 @@ inline meta_type resolve_type(const id_type id) ENTT_NOEXCEPT {
 }
 
 
-/*! @copydoc resolve_id */
-[[deprecated("use entt::resolve_id instead")]]
-inline meta_type resolve(const id_type id) ENTT_NOEXCEPT {
-    return resolve_id(id);
-}
-
-
 /**
  * @brief Iterates all the reflected types.
  * @tparam Op Type of the function object to invoke.

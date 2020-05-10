@@ -403,11 +403,6 @@ public:
     }
 
     /*! @copydoc type */
-    [[deprecated("use ::type instead")]]
-    auto alias(const id_type id) ENTT_NOEXCEPT {
-        return type(id);
-    }
-
     /**
      * @brief Assigns a meta base to a meta type.
      *
