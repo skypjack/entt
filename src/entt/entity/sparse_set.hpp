@@ -342,12 +342,6 @@ public:
         return (curr < sparse.size() && sparse[curr] && sparse[curr][offset(entt)] != null);
     }
 
-    /*! @copydoc contains */
-    [[deprecated("use ::contains instead")]]
-    bool has(const entity_type entt) const {
-        return contains(entt);
-    }
-
     /**
      * @brief Returns the position of an entity in a sparse set.
      *
@@ -382,12 +376,6 @@ public:
         packed.push_back(entt);
     }
 
-    /*! @copydoc emplace */
-    [[deprecated("use ::emplace instead")]]
-    void construct(const entity_type entt) {
-        emplace(entt);
-    }
-
     /**
      * @brief Assigns one or more entities to a sparse set.
      *
@@ -413,13 +401,6 @@ public:
         }
     }
 
-    /*! @copydoc insert */
-    template<typename It>
-    [[deprecated("use ::insert instead")]]
-    void construct(It first, It last) {
-        insert(std::move(first), std::move(last));
-    }
-
     /**
      * @brief Removes an entity from a sparse set.
      *
@@ -439,12 +420,6 @@ public:
         sparse[page(packed.back())][offset(packed.back())] = sparse[curr][pos];
         sparse[curr][pos] = null;
         packed.pop_back();
-    }
-
-    /*! @copydoc erase */
-    [[deprecated("use ::erase instead")]]
-    void destroy(const entity_type entt) {
-        erase(entt);
     }
 
     /**

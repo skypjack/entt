@@ -30,8 +30,8 @@ TEST(Storage, Functionalities) {
     ASSERT_EQ(pool.size(), 0u);
     ASSERT_EQ(std::as_const(pool).begin(), std::as_const(pool).end());
     ASSERT_EQ(pool.begin(), pool.end());
-    ASSERT_FALSE(pool.has(entt::entity{0}));
-    ASSERT_FALSE(pool.has(entt::entity{41}));
+    ASSERT_FALSE(pool.contains(entt::entity{0}));
+    ASSERT_FALSE(pool.contains(entt::entity{41}));
 
     pool.construct(entt::entity{41}, 3);
 
@@ -39,8 +39,8 @@ TEST(Storage, Functionalities) {
     ASSERT_EQ(pool.size(), 1u);
     ASSERT_NE(std::as_const(pool).begin(), std::as_const(pool).end());
     ASSERT_NE(pool.begin(), pool.end());
-    ASSERT_FALSE(pool.has(entt::entity{0}));
-    ASSERT_TRUE(pool.has(entt::entity{41}));
+    ASSERT_FALSE(pool.contains(entt::entity{0}));
+    ASSERT_TRUE(pool.contains(entt::entity{41}));
     ASSERT_EQ(pool.get(entt::entity{41}), 3);
     ASSERT_EQ(*pool.try_get(entt::entity{41}), 3);
     ASSERT_EQ(pool.try_get(entt::entity{99}), nullptr);
@@ -51,8 +51,8 @@ TEST(Storage, Functionalities) {
     ASSERT_EQ(pool.size(), 0u);
     ASSERT_EQ(std::as_const(pool).begin(), std::as_const(pool).end());
     ASSERT_EQ(pool.begin(), pool.end());
-    ASSERT_FALSE(pool.has(entt::entity{0}));
-    ASSERT_FALSE(pool.has(entt::entity{41}));
+    ASSERT_FALSE(pool.contains(entt::entity{0}));
+    ASSERT_FALSE(pool.contains(entt::entity{41}));
 
     pool.construct(entt::entity{41}, 12);
 
@@ -66,8 +66,8 @@ TEST(Storage, Functionalities) {
     ASSERT_EQ(pool.size(), 0u);
     ASSERT_EQ(std::as_const(pool).begin(), std::as_const(pool).end());
     ASSERT_EQ(pool.begin(), pool.end());
-    ASSERT_FALSE(pool.has(entt::entity{0}));
-    ASSERT_FALSE(pool.has(entt::entity{41}));
+    ASSERT_FALSE(pool.contains(entt::entity{0}));
+    ASSERT_FALSE(pool.contains(entt::entity{41}));
 
     ASSERT_EQ(pool.capacity(), 42);
 
@@ -84,7 +84,7 @@ TEST(Storage, EmptyType) {
     entt::storage<entt::entity, empty_type> pool;
     pool.construct(entt::entity{99});
 
-    ASSERT_TRUE(pool.has(entt::entity{99}));
+    ASSERT_TRUE(pool.contains(entt::entity{99}));
 }
 
 TEST(Storage, BatchAdd) {
@@ -95,8 +95,8 @@ TEST(Storage, BatchAdd) {
     entities[1] = entt::entity{42};
     pool.construct(std::begin(entities), std::end(entities), {});
 
-    ASSERT_TRUE(pool.has(entities[0]));
-    ASSERT_TRUE(pool.has(entities[1]));
+    ASSERT_TRUE(pool.contains(entities[0]));
+    ASSERT_TRUE(pool.contains(entities[1]));
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
@@ -113,8 +113,8 @@ TEST(Storage, BatchAddEmptyType) {
 
     pool.construct(std::begin(entities), std::end(entities));
 
-    ASSERT_TRUE(pool.has(entities[0]));
-    ASSERT_TRUE(pool.has(entities[1]));
+    ASSERT_TRUE(pool.contains(entities[0]));
+    ASSERT_TRUE(pool.contains(entities[1]));
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 2u);
