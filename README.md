@@ -325,6 +325,20 @@ Note that benchmarks are not part of this set.
   brew install skypjack/entt/entt
   ```
 
+* [`build2`](https://build2.org), build toolchain for developing and packaging C and C++ code.
+   - Package: [`entt`](https://cppget.org/entt)
+     - To add this package to your `build2` project, add this line in it's `manifest` file (for example for any version compatible with 3.x):
+     ```
+     depends: entt ^3.0.0 
+     ```
+     - Make sure your configurations knows a repository providing the package (see below) so that this package can be found automatically by `build2`.
+   - Repositories URL to acquire the package ([can be used through `bpkg add-repo` or added in your project's `repositories.manifest`](https://build2.org/build2-toolchain/doc/build2-toolchain-intro.xhtml#guide-repositories)):
+     - [`cppget.org`](https://cppget.org) (open-source community central repository): **https://pkg.cppget.org/1/stable**
+     - [Package's sources repository](https://github.com/build2-packaging/entt): **https://github.com/build2-packaging/entt.git** or **ssh://git@github.com/build2-packaging/entt.git**
+       - Feel free to report [issues with this package](https://github.com/build2-packaging/entt).
+ 
+ 
+
 Consider this list a work in progress and help me to make it longer.
 
 <!--
