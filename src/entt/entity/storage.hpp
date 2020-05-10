@@ -331,13 +331,6 @@ public:
         underlying_type::emplace(entt);
     }
 
-    /*! @copydoc emplace */
-    template<typename... Args>
-    [[deprecated("use ::emplace instead")]]
-    void construct(const entity_type entt, Args &&... args) {
-        emplace(entt, std::forward<Args>(args)...);
-    }
-
     /**
      * @brief Assigns one or more entities to a storage and constructs their
      * objects from a given instance.
@@ -360,14 +353,6 @@ public:
         underlying_type::insert(first, last);
     }
 
-    /*! @copydoc insert */
-    template<typename It>
-    [[deprecated("use ::insert instead")]]
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    construct(It first, It last, const object_type &value = {}) {
-        insert(std::move(first), std::move(last), value);
-    }
-
     /**
      * @brief Assigns one or more entities to a storage and constructs their
      * objects from a given range.
@@ -388,14 +373,6 @@ public:
         underlying_type::insert(first, last);
     }
 
-    /*! @copydoc insert */
-    template<typename EIt, typename CIt>
-    [[deprecated("use ::insert instead")]]
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<EIt>::value_type, entity_type>, void>
-    construct(EIt first, EIt last, CIt value) {
-        insert(std::move(first), std::move(last), std::move(value));
-    }
-
     /**
      * @brief Removes an entity from a storage and destroys its object.
      *
@@ -412,12 +389,6 @@ public:
         instances[underlying_type::index(entt)] = std::move(other);
         instances.pop_back();
         underlying_type::erase(entt);
-    }
-
-    /*! @copydoc erase */
-    [[deprecated("use ::erase instead")]]
-    void destroy(const entity_type entt) {
-        erase(entt);
     }
 
     /**
@@ -547,13 +518,6 @@ public:
         underlying_type::emplace(entt);
     }
 
-    /*! @copydoc emplace */
-    template<typename... Args>
-    [[deprecated("use ::emplace instead")]]
-    void construct(const entity_type entt, Args &&... args) {
-        emplace(entt, std::forward<Args>(args)...);
-    }
-
     /**
      * @brief Assigns one or more entities to a storage.
      *
@@ -570,17 +534,6 @@ public:
     template<typename It>
     void insert(It first, It last, const object_type & = {}) {
         underlying_type::insert(first, last);
-    }
-
-    /**
-     * @copydoc insert
-     * @param value An instance of the object to construct.
-     */
-    template<typename It>
-    [[deprecated("use ::insert instead")]]
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    construct(It first, It last, const object_type &value = {}) {
-        insert(std::move(first), std::move(last), value);
     }
 };
 

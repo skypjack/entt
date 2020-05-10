@@ -16,7 +16,7 @@ struct throwing_component {
 
     [[noreturn]] throwing_component() { throw constructor_exception{}; }
 
-    // necessary to avoid the short-circuit construct() logic for empty objects
+    // necessary to disable the empty type optimization
     int data;
 };
 
@@ -33,7 +33,7 @@ TEST(Storage, Functionalities) {
     ASSERT_FALSE(pool.contains(entt::entity{0}));
     ASSERT_FALSE(pool.contains(entt::entity{41}));
 
-    pool.construct(entt::entity{41}, 3);
+    pool.emplace(entt::entity{41}, 3);
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(pool.size(), 1u);
@@ -45,7 +45,7 @@ TEST(Storage, Functionalities) {
     ASSERT_EQ(*pool.try_get(entt::entity{41}), 3);
     ASSERT_EQ(pool.try_get(entt::entity{99}), nullptr);
 
-    pool.destroy(entt::entity{41});
+    pool.erase(entt::entity{41});
 
     ASSERT_TRUE(pool.empty());
     ASSERT_EQ(pool.size(), 0u);
@@ -54,7 +54,7 @@ TEST(Storage, Functionalities) {
     ASSERT_FALSE(pool.contains(entt::entity{0}));
     ASSERT_FALSE(pool.contains(entt::entity{41}));
 
-    pool.construct(entt::entity{41}, 12);
+    pool.emplace(entt::entity{41}, 12);
 
     ASSERT_EQ(pool.get(entt::entity{41}), 12);
     ASSERT_EQ(*pool.try_get(entt::entity{41}), 12);
@@ -82,7 +82,7 @@ TEST(Storage, Functionalities) {
 
 TEST(Storage, EmptyType) {
     entt::storage<entt::entity, empty_type> pool;
-    pool.construct(entt::entity{99});
+    pool.emplace(entt::entity{99});
 
     ASSERT_TRUE(pool.contains(entt::entity{99}));
 }
@@ -93,7 +93,7 @@ TEST(Storage, BatchAdd) {
 
     entities[0] = entt::entity{3};
     entities[1] = entt::entity{42};
-    pool.construct(std::begin(entities), std::end(entities), {});
+    pool.insert(std::begin(entities), std::end(entities), {});
 
     ASSERT_TRUE(pool.contains(entities[0]));
     ASSERT_TRUE(pool.contains(entities[1]));
@@ -111,7 +111,7 @@ TEST(Storage, BatchAddEmptyType) {
     entities[0] = entt::entity{3};
     entities[1] = entt::entity{42};
 
-    pool.construct(std::begin(entities), std::end(entities));
+    pool.insert(std::begin(entities), std::end(entities));
 
     ASSERT_TRUE(pool.contains(entities[0]));
     ASSERT_TRUE(pool.contains(entities[1]));
@@ -123,22 +123,22 @@ TEST(Storage, BatchAddEmptyType) {
 TEST(Storage, AggregatesMustWork) {
     struct aggregate_type { int value; };
     // the goal of this test is to enforce the requirements for aggregate types
-    entt::storage<entt::entity, aggregate_type>{}.construct(entt::entity{0}, 42);
+    entt::storage<entt::entity, aggregate_type>{}.emplace(entt::entity{0}, 42);
 }
 
 TEST(Storage, TypesFromStandardTemplateLibraryMustWork) {
     // see #37 - this test shouldn't crash, that's all
     entt::storage<entt::entity, std::unordered_set<int>> pool;
-    pool.construct(entt::entity{0});
+    pool.emplace(entt::entity{0});
     pool.get(entt::entity{0}).insert(42);
-    pool.destroy(entt::entity{0});
+    pool.erase(entt::entity{0});
 }
 
 TEST(Storage, Iterator) {
     using iterator = typename entt::storage<entt::entity, boxed_int>::iterator;
 
     entt::storage<entt::entity, boxed_int> pool;
-    pool.construct(entt::entity{3}, 42);
+    pool.emplace(entt::entity{3}, 42);
 
     iterator end{pool.begin()};
     iterator begin{};
@@ -180,7 +180,7 @@ TEST(Storage, ConstIterator) {
     using iterator = typename entt::storage<entt::entity, boxed_int>::const_iterator;
 
     entt::storage<entt::entity, boxed_int> pool;
-    pool.construct(entt::entity{3}, 42);
+    pool.emplace(entt::entity{3}, 42);
 
     iterator cend{pool.cbegin()};
     iterator cbegin{};
@@ -221,9 +221,9 @@ TEST(Storage, ConstIterator) {
 TEST(Storage, Raw) {
     entt::storage<entt::entity, int> pool;
 
-    pool.construct(entt::entity{3}, 3);
-    pool.construct(entt::entity{12}, 6);
-    pool.construct(entt::entity{42}, 9);
+    pool.emplace(entt::entity{3}, 3);
+    pool.emplace(entt::entity{12}, 6);
+    pool.emplace(entt::entity{42}, 9);
 
     ASSERT_EQ(pool.get(entt::entity{3}), 3);
     ASSERT_EQ(std::as_const(pool).get(entt::entity{12}), 6);
@@ -237,11 +237,11 @@ TEST(Storage, Raw) {
 TEST(Storage, SortOrdered) {
     entt::storage<entt::entity, boxed_int> pool;
 
-    pool.construct(entt::entity{12}, boxed_int{12});
-    pool.construct(entt::entity{42}, boxed_int{9});
-    pool.construct(entt::entity{7}, boxed_int{6});
-    pool.construct(entt::entity{3}, boxed_int{3});
-    pool.construct(entt::entity{9}, boxed_int{1});
+    pool.emplace(entt::entity{12}, boxed_int{12});
+    pool.emplace(entt::entity{42}, boxed_int{9});
+    pool.emplace(entt::entity{7}, boxed_int{6});
+    pool.emplace(entt::entity{3}, boxed_int{3});
+    pool.emplace(entt::entity{9}, boxed_int{1});
 
     ASSERT_EQ(pool.get(entt::entity{12}).value, 12);
     ASSERT_EQ(pool.get(entt::entity{42}).value, 9);
@@ -279,11 +279,11 @@ TEST(Storage, SortOrdered) {
 TEST(Storage, SortReverse) {
     entt::storage<entt::entity, boxed_int> pool;
 
-    pool.construct(entt::entity{12}, boxed_int{1});
-    pool.construct(entt::entity{42}, boxed_int{3});
-    pool.construct(entt::entity{7}, boxed_int{6});
-    pool.construct(entt::entity{3}, boxed_int{9});
-    pool.construct(entt::entity{9}, boxed_int{12});
+    pool.emplace(entt::entity{12}, boxed_int{1});
+    pool.emplace(entt::entity{42}, boxed_int{3});
+    pool.emplace(entt::entity{7}, boxed_int{6});
+    pool.emplace(entt::entity{3}, boxed_int{9});
+    pool.emplace(entt::entity{9}, boxed_int{12});
 
     ASSERT_EQ(pool.get(entt::entity{12}).value, 1);
     ASSERT_EQ(pool.get(entt::entity{42}).value, 3);
@@ -321,11 +321,11 @@ TEST(Storage, SortReverse) {
 TEST(Storage, SortUnordered) {
     entt::storage<entt::entity, boxed_int> pool;
 
-    pool.construct(entt::entity{12}, boxed_int{6});
-    pool.construct(entt::entity{42}, boxed_int{3});
-    pool.construct(entt::entity{7}, boxed_int{1});
-    pool.construct(entt::entity{3}, boxed_int{9});
-    pool.construct(entt::entity{9}, boxed_int{12});
+    pool.emplace(entt::entity{12}, boxed_int{6});
+    pool.emplace(entt::entity{42}, boxed_int{3});
+    pool.emplace(entt::entity{7}, boxed_int{1});
+    pool.emplace(entt::entity{3}, boxed_int{9});
+    pool.emplace(entt::entity{9}, boxed_int{12});
 
     ASSERT_EQ(pool.get(entt::entity{12}).value, 6);
     ASSERT_EQ(pool.get(entt::entity{42}).value, 3);
@@ -363,11 +363,11 @@ TEST(Storage, SortUnordered) {
 TEST(Storage, SortRange) {
     entt::storage<entt::entity, boxed_int> pool;
 
-    pool.construct(entt::entity{12}, boxed_int{6});
-    pool.construct(entt::entity{42}, boxed_int{3});
-    pool.construct(entt::entity{7}, boxed_int{1});
-    pool.construct(entt::entity{3}, boxed_int{9});
-    pool.construct(entt::entity{9}, boxed_int{12});
+    pool.emplace(entt::entity{12}, boxed_int{6});
+    pool.emplace(entt::entity{42}, boxed_int{3});
+    pool.emplace(entt::entity{7}, boxed_int{1});
+    pool.emplace(entt::entity{3}, boxed_int{9});
+    pool.emplace(entt::entity{9}, boxed_int{12});
 
     ASSERT_EQ(pool.get(entt::entity{12}).value, 6);
     ASSERT_EQ(pool.get(entt::entity{42}).value, 3);
@@ -430,9 +430,9 @@ TEST(Storage, RespectDisjoint) {
     entt::storage<entt::entity, int> lhs;
     entt::storage<entt::entity, int> rhs;
 
-    lhs.construct(entt::entity{3}, 3);
-    lhs.construct(entt::entity{12}, 6);
-    lhs.construct(entt::entity{42}, 9);
+    lhs.emplace(entt::entity{3}, 3);
+    lhs.emplace(entt::entity{12}, 6);
+    lhs.emplace(entt::entity{42}, 9);
 
     ASSERT_EQ(std::as_const(lhs).get(entt::entity{3}), 3);
     ASSERT_EQ(std::as_const(lhs).get(entt::entity{12}), 6);
@@ -457,10 +457,10 @@ TEST(Storage, RespectOverlap) {
     entt::storage<entt::entity, int> lhs;
     entt::storage<entt::entity, int> rhs;
 
-    lhs.construct(entt::entity{3}, 3);
-    lhs.construct(entt::entity{12}, 6);
-    lhs.construct(entt::entity{42}, 9);
-    rhs.construct(entt::entity{12}, 6);
+    lhs.emplace(entt::entity{3}, 3);
+    lhs.emplace(entt::entity{12}, 6);
+    lhs.emplace(entt::entity{42}, 9);
+    rhs.emplace(entt::entity{12}, 6);
 
     ASSERT_EQ(std::as_const(lhs).get(entt::entity{3}), 3);
     ASSERT_EQ(std::as_const(lhs).get(entt::entity{12}), 6);
@@ -486,11 +486,11 @@ TEST(Storage, RespectOrdered) {
     entt::storage<entt::entity, int> lhs;
     entt::storage<entt::entity, int> rhs;
 
-    lhs.construct(entt::entity{1}, 0);
-    lhs.construct(entt::entity{2}, 0);
-    lhs.construct(entt::entity{3}, 0);
-    lhs.construct(entt::entity{4}, 0);
-    lhs.construct(entt::entity{5}, 0);
+    lhs.emplace(entt::entity{1}, 0);
+    lhs.emplace(entt::entity{2}, 0);
+    lhs.emplace(entt::entity{3}, 0);
+    lhs.emplace(entt::entity{4}, 0);
+    lhs.emplace(entt::entity{5}, 0);
 
     ASSERT_EQ(lhs.get(entt::entity{1}), 0);
     ASSERT_EQ(lhs.get(entt::entity{2}), 0);
@@ -498,12 +498,12 @@ TEST(Storage, RespectOrdered) {
     ASSERT_EQ(lhs.get(entt::entity{4}), 0);
     ASSERT_EQ(lhs.get(entt::entity{5}), 0);
 
-    rhs.construct(entt::entity{6}, 0);
-    rhs.construct(entt::entity{1}, 0);
-    rhs.construct(entt::entity{2}, 0);
-    rhs.construct(entt::entity{3}, 0);
-    rhs.construct(entt::entity{4}, 0);
-    rhs.construct(entt::entity{5}, 0);
+    rhs.emplace(entt::entity{6}, 0);
+    rhs.emplace(entt::entity{1}, 0);
+    rhs.emplace(entt::entity{2}, 0);
+    rhs.emplace(entt::entity{3}, 0);
+    rhs.emplace(entt::entity{4}, 0);
+    rhs.emplace(entt::entity{5}, 0);
 
     ASSERT_EQ(rhs.get(entt::entity{6}), 0);
     ASSERT_EQ(rhs.get(entt::entity{1}), 0);
@@ -532,11 +532,11 @@ TEST(Storage, RespectReverse) {
     entt::storage<entt::entity, int> lhs;
     entt::storage<entt::entity, int> rhs;
 
-    lhs.construct(entt::entity{1}, 0);
-    lhs.construct(entt::entity{2}, 0);
-    lhs.construct(entt::entity{3}, 0);
-    lhs.construct(entt::entity{4}, 0);
-    lhs.construct(entt::entity{5}, 0);
+    lhs.emplace(entt::entity{1}, 0);
+    lhs.emplace(entt::entity{2}, 0);
+    lhs.emplace(entt::entity{3}, 0);
+    lhs.emplace(entt::entity{4}, 0);
+    lhs.emplace(entt::entity{5}, 0);
 
     ASSERT_EQ(lhs.get(entt::entity{1}), 0);
     ASSERT_EQ(lhs.get(entt::entity{2}), 0);
@@ -544,12 +544,12 @@ TEST(Storage, RespectReverse) {
     ASSERT_EQ(lhs.get(entt::entity{4}), 0);
     ASSERT_EQ(lhs.get(entt::entity{5}), 0);
 
-    rhs.construct(entt::entity{5}, 0);
-    rhs.construct(entt::entity{4}, 0);
-    rhs.construct(entt::entity{3}, 0);
-    rhs.construct(entt::entity{2}, 0);
-    rhs.construct(entt::entity{1}, 0);
-    rhs.construct(entt::entity{6}, 0);
+    rhs.emplace(entt::entity{5}, 0);
+    rhs.emplace(entt::entity{4}, 0);
+    rhs.emplace(entt::entity{3}, 0);
+    rhs.emplace(entt::entity{2}, 0);
+    rhs.emplace(entt::entity{1}, 0);
+    rhs.emplace(entt::entity{6}, 0);
 
     ASSERT_EQ(rhs.get(entt::entity{5}), 0);
     ASSERT_EQ(rhs.get(entt::entity{4}), 0);
@@ -578,11 +578,11 @@ TEST(Storage, RespectUnordered) {
     entt::storage<entt::entity, int> lhs;
     entt::storage<entt::entity, int> rhs;
 
-    lhs.construct(entt::entity{1}, 0);
-    lhs.construct(entt::entity{2}, 0);
-    lhs.construct(entt::entity{3}, 0);
-    lhs.construct(entt::entity{4}, 0);
-    lhs.construct(entt::entity{5}, 0);
+    lhs.emplace(entt::entity{1}, 0);
+    lhs.emplace(entt::entity{2}, 0);
+    lhs.emplace(entt::entity{3}, 0);
+    lhs.emplace(entt::entity{4}, 0);
+    lhs.emplace(entt::entity{5}, 0);
 
     ASSERT_EQ(lhs.get(entt::entity{1}), 0);
     ASSERT_EQ(lhs.get(entt::entity{2}), 0);
@@ -590,12 +590,12 @@ TEST(Storage, RespectUnordered) {
     ASSERT_EQ(lhs.get(entt::entity{4}), 0);
     ASSERT_EQ(lhs.get(entt::entity{5}), 0);
 
-    rhs.construct(entt::entity{3}, 0);
-    rhs.construct(entt::entity{2}, 0);
-    rhs.construct(entt::entity{6}, 0);
-    rhs.construct(entt::entity{1}, 0);
-    rhs.construct(entt::entity{4}, 0);
-    rhs.construct(entt::entity{5}, 0);
+    rhs.emplace(entt::entity{3}, 0);
+    rhs.emplace(entt::entity{2}, 0);
+    rhs.emplace(entt::entity{6}, 0);
+    rhs.emplace(entt::entity{1}, 0);
+    rhs.emplace(entt::entity{4}, 0);
+    rhs.emplace(entt::entity{5}, 0);
 
     ASSERT_EQ(rhs.get(entt::entity{3}), 0);
     ASSERT_EQ(rhs.get(entt::entity{2}), 0);
@@ -622,7 +622,7 @@ TEST(Storage, RespectUnordered) {
 
 TEST(Storage, CanModifyDuringIteration) {
     entt::storage<entt::entity, int> pool;
-    pool.construct(entt::entity{0}, 42);
+    pool.emplace(entt::entity{0}, 42);
 
     ASSERT_EQ(pool.capacity(), (entt::storage<entt::entity, int>::size_type{1}));
 
@@ -639,8 +639,8 @@ TEST(Storage, CanModifyDuringIteration) {
 TEST(Storage, ReferencesGuaranteed) {
     entt::storage<entt::entity, boxed_int> pool;
 
-    pool.construct(entt::entity{0}, 0);
-    pool.construct(entt::entity{1}, 1);
+    pool.emplace(entt::entity{0}, 0);
+    pool.emplace(entt::entity{1}, 1);
 
     ASSERT_EQ(pool.get(entt::entity{0}).value, 0);
     ASSERT_EQ(pool.get(entt::entity{1}).value, 1);
@@ -674,7 +674,7 @@ TEST(Storage, ConstructorExceptionDoesNotAddToStorage) {
     entt::storage<entt::entity, throwing_component> pool;
 
     try {
-        pool.construct(entt::entity{0});
+        pool.emplace(entt::entity{0});
     } catch (const throwing_component::constructor_exception &) {
         ASSERT_TRUE(pool.empty());
     }
