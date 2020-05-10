@@ -64,13 +64,6 @@ struct basic_collector<> {
     static constexpr auto update() ENTT_NOEXCEPT {
         return basic_collector<matcher<type_list<>, type_list<>, AnyOf>>{};
     }
-
-    /*! @copydoc update */
-    template<typename AnyOf>
-    [[deprecated("use ::update instead")]]
-    static constexpr auto replace() ENTT_NOEXCEPT {
-        return update<AnyOf>();
-    }
 };
 
 /**
@@ -106,14 +99,6 @@ struct basic_collector<matcher<type_list<Reject...>, type_list<Require...>, Rule
     static constexpr auto update() ENTT_NOEXCEPT {
         return basic_collector<matcher<type_list<>, type_list<>, AnyOf>, current_type, Other...>{};
     }
-
-    /*! @copydoc update */
-    template<typename AnyOf>
-    [[deprecated("use ::update instead")]]
-    static constexpr auto replace() ENTT_NOEXCEPT {
-        return update<AnyOf>();
-    }
-
 
     /**
      * @brief Updates the filter of the last added matcher.

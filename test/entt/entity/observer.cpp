@@ -134,7 +134,7 @@ TEST(Observer, AllOfFiltered) {
 
 TEST(Observer, Observe) {
     entt::registry registry;
-    entt::observer observer{registry, entt::collector.replace<int>().replace<char>()};
+    entt::observer observer{registry, entt::collector.update<int>().update<char>()};
     const auto entity = registry.create();
 
     ASSERT_TRUE(observer.empty());
@@ -168,7 +168,7 @@ TEST(Observer, Observe) {
 
 TEST(Observer, ObserveFiltered) {
     constexpr auto collector =  entt::collector
-            .replace<int>().where<char>(entt::exclude<double>);
+            .update<int>().where<char>(entt::exclude<double>);
 
     entt::registry registry;
     entt::observer observer{registry, collector};
@@ -215,7 +215,7 @@ TEST(Observer, AllOfObserve) {
     entt::observer observer{};
     const auto entity = registry.create();
 
-    observer.connect(registry, entt::collector.group<int>().replace<char>());
+    observer.connect(registry, entt::collector.group<int>().update<char>());
 
     ASSERT_TRUE(observer.empty());
 
@@ -287,8 +287,8 @@ TEST(Observer, Each) {
 
 TEST(Observer, MultipleFilters) {
     constexpr auto collector =  entt::collector
-            .replace<int>().where<char>()
-            .replace<double>().where<float>();
+            .update<int>().where<char>()
+            .update<double>().where<float>();
 
     entt::registry registry;
     entt::observer observer{registry, collector};
