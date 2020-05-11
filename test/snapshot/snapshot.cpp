@@ -42,19 +42,19 @@ TEST(Snapshot, Full) {
     entt::registry destination;
 
     auto e0 = source.create();
-    source.assign<position>(e0, 16.f, 16.f);
+    source.emplace<position>(e0, 16.f, 16.f);
 
     source.destroy(source.create());
 
     auto e1 = source.create();
-    source.assign<position>(e1, .8f, .0f);
-    source.assign<relationship>(e1, e0);
+    source.emplace<position>(e1, .8f, .0f);
+    source.emplace<relationship>(e1, e0);
 
     auto e2 = source.create();
 
     auto e3 = source.create();
-    source.assign<timer>(e3, 1000, 100);
-    source.assign<entt::tag<"empty"_hs>>(e3);
+    source.emplace<timer>(e3, 1000, 100);
+    source.emplace<entt::tag<"empty"_hs>>(e3);
 
     source.destroy(e2);
     auto v2 = source.current(e2);
@@ -106,21 +106,21 @@ TEST(Snapshot, Continuous) {
     }
 
     auto e0 = source.create();
-    source.assign<position>(e0, 0.f, 0.f);
-    source.assign<relationship>(e0, e0);
+    source.emplace<position>(e0, 0.f, 0.f);
+    source.emplace<relationship>(e0, e0);
 
     auto e1 = source.create();
-    source.assign<position>(e1, 1.f, 1.f);
-    source.assign<relationship>(e1, e0);
+    source.emplace<position>(e1, 1.f, 1.f);
+    source.emplace<relationship>(e1, e0);
 
     auto e2 = source.create();
-    source.assign<position>(e2, .2f, .2f);
-    source.assign<relationship>(e2, e0);
+    source.emplace<position>(e2, .2f, .2f);
+    source.emplace<relationship>(e2, e0);
 
     auto e3 = source.create();
-    source.assign<timer>(e3, 1000, 1000);
-    source.assign<relationship>(e3, e2);
-    source.assign<entt::tag<"empty"_hs>>(e3);
+    source.emplace<timer>(e3, 1000, 1000);
+    source.emplace<relationship>(e3, e2);
+    source.emplace<entt::tag<"empty"_hs>>(e3);
 
     {
         // output finishes flushing its contents when it goes out of scope

@@ -646,13 +646,6 @@ public:
         return assure<Component>().emplace(*this, entity, std::forward<Args>(args)...);
     }
 
-    /*! @copydoc emplace */
-    template<typename Component, typename... Args>
-    [[deprecated("use ::emplace instead")]]
-    decltype(auto) assign(const entity_type entity, Args &&... args) {
-        return emplace<Component>(entity, std::forward<Args>(args)...);
-    }
-
     /**
      * @brief Assigns each entity in a range the given component.
      *
@@ -668,14 +661,6 @@ public:
     void insert(It first, It last, const Component &value = {}) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
         assure<Component>().insert(*this, first, last, value);
-    }
-
-    /*! @copydoc insert */
-    template<typename Component, typename It>
-    [[deprecated("use ::insert instead")]]
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::value_type, entity_type>, void>
-    assign(It first, It last, const Component &value = {}) {
-        return insert(std::move(first), std::move(last), value);
     }
 
     /**
@@ -696,14 +681,6 @@ public:
         static_assert(std::is_constructible_v<Component, typename std::iterator_traits<CIt>::value_type>);
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
         assure<Component>().insert(*this, first, last, from, to);
-    }
-
-    /*! @copydoc insert */
-    template<typename Component, typename EIt, typename CIt>
-    [[deprecated("use ::insert instead")]]
-    std::enable_if_t<std::is_same_v<typename std::iterator_traits<EIt>::value_type, entity_type>, void>
-    assign(EIt first, EIt last, CIt value) {
-        return insert<Component>(std::move(first), std::move(last), value, value + std::distance(first, last));
     }
 
     /**
@@ -736,13 +713,6 @@ public:
         return cpool.contains(entity)
                 ? cpool.replace(*this, entity, Component{std::forward<Args>(args)...})
                 : cpool.emplace(*this, entity, std::forward<Args>(args)...);
-    }
-
-    /*! @copydoc emplace_or_replace */
-    template<typename Component, typename... Args>
-    [[deprecated("use ::emplace_or_replace instead")]]
-    decltype(auto) assign_or_replace(const entity_type entity, Args &&... args) {
-        return emplace_or_replace<Component>(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -778,14 +748,6 @@ public:
         return assure<Component>().patch(*this, entity, std::forward<Func>(func)...);
     }
 
-    /*! @copydoc patch */
-    template<typename Component, typename... Func>
-    [[deprecated("use registry::patch instead")]]
-    auto replace(const entity_type entity, Func &&... func)
-    -> decltype((func(std::declval<Component &>()), ...), assign<Component>(entity)) {
-        return patch<Component>(entity, std::forward<Func>(func)...);
-    }
-
     /**
      * @brief Replaces the given component for an entity.
      *
@@ -807,8 +769,7 @@ public:
      * @return A reference to the component being replaced.
      */
     template<typename Component, typename... Args>
-    auto replace(const entity_type entity, Args &&... args)
-    -> decltype(std::enable_if_t<sizeof...(Args) != 0>(), Component{std::forward<Args>(args)...}, assure<Component>().get(entity)) {
+    decltype(auto) replace(const entity_type entity, Args &&... args) {
         return assure<Component>().replace(*this, entity, Component{std::forward<Args>(args)...});
     }
 
@@ -1009,13 +970,6 @@ public:
         return cpool.contains(entity) ? cpool.get(entity) : cpool.emplace(*this, entity, std::forward<Args>(args)...);
     }
 
-    /*! @copydoc get_or_emplace */
-    template<typename Component, typename... Args>
-    [[deprecated("use ::get_or_emplace instead")]]
-    decltype(auto) get_or_assign(const entity_type entity, Args &&... args) {
-        return get_or_emplace<Component>(entity, std::forward<Args>(args)...);
-    }
-
     /**
      * @brief Returns pointers to the given components for an entity.
      *
@@ -1188,13 +1142,6 @@ public:
     template<typename Component>
     auto on_update() {
         return assure<Component>().on_update();
-    }
-
-    /*! @copydoc on_update */
-    template<typename Component>
-    [[deprecated("use registry::on_update instead")]]
-    auto on_replace() {
-        return on_update<Component>();
     }
 
     /**

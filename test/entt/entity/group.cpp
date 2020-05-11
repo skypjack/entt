@@ -24,11 +24,11 @@ TEST(NonOwningGroup, Functionalities) {
     ASSERT_TRUE((cgroup.empty<const int, const char>()));
 
     const auto e0 = registry.create();
-    registry.assign<char>(e0);
+    registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1);
+    registry.emplace<char>(e1);
 
     ASSERT_FALSE(group.empty());
     ASSERT_FALSE((group.empty<int>()));
@@ -42,7 +42,7 @@ TEST(NonOwningGroup, Functionalities) {
     ASSERT_EQ(group.size<int>(), typename decltype(group)::size_type{1});
     ASSERT_EQ(cgroup.size<const char>(), typename decltype(group)::size_type{2});
 
-    registry.assign<int>(e0);
+    registry.emplace<int>(e0);
 
     ASSERT_EQ(group.size(), typename decltype(group)::size_type{2});
     ASSERT_EQ(group.size<int>(), typename decltype(group)::size_type{2});
@@ -94,12 +94,12 @@ TEST(NonOwningGroup, ElementAccess) {
     auto cgroup = std::as_const(registry).group(entt::get<const int, const char>);
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0);
-    registry.assign<char>(e0);
+    registry.emplace<int>(e0);
+    registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1);
+    registry.emplace<char>(e1);
 
     for(typename decltype(group)::size_type i{}; i < group.size(); ++i) {
         ASSERT_EQ(group[i], i ? e0 : e1);
@@ -112,12 +112,12 @@ TEST(NonOwningGroup, Contains) {
     auto group = registry.group(entt::get<int, char>);
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0);
-    registry.assign<char>(e0);
+    registry.emplace<int>(e0);
+    registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1);
+    registry.emplace<char>(e1);
 
     registry.destroy(e0);
 
@@ -129,13 +129,13 @@ TEST(NonOwningGroup, Empty) {
     entt::registry registry;
 
     const auto e0 = registry.create();
-    registry.assign<double>(e0);
-    registry.assign<int>(e0);
-    registry.assign<float>(e0);
+    registry.emplace<double>(e0);
+    registry.emplace<int>(e0);
+    registry.emplace<float>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<char>(e1);
-    registry.assign<float>(e1);
+    registry.emplace<char>(e1);
+    registry.emplace<float>(e1);
 
     ASSERT_TRUE(registry.group(entt::get<char, int, float>).empty());
     ASSERT_TRUE(registry.group(entt::get<double, char, int, float>).empty());
@@ -146,12 +146,12 @@ TEST(NonOwningGroup, Each) {
     auto group = registry.group(entt::get<int, char>);
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0);
-    registry.assign<char>(e0);
+    registry.emplace<int>(e0);
+    registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1);
+    registry.emplace<char>(e1);
 
     auto cgroup = std::as_const(registry).group(entt::get<const int, const char>);
     std::size_t cnt = 0;
@@ -176,14 +176,14 @@ TEST(NonOwningGroup, Sort) {
     const auto e2 = registry.create();
     const auto e3 = registry.create();
 
-    registry.assign<unsigned int>(e0, 0u);
-    registry.assign<unsigned int>(e1, 1u);
-    registry.assign<unsigned int>(e2, 2u);
-    registry.assign<unsigned int>(e3, 3u);
+    registry.emplace<unsigned int>(e0, 0u);
+    registry.emplace<unsigned int>(e1, 1u);
+    registry.emplace<unsigned int>(e2, 2u);
+    registry.emplace<unsigned int>(e3, 3u);
 
-    registry.assign<int>(e0, 0);
-    registry.assign<int>(e1, 1);
-    registry.assign<int>(e2, 2);
+    registry.emplace<int>(e0, 0);
+    registry.emplace<int>(e1, 1);
+    registry.emplace<int>(e2, 2);
 
     ASSERT_EQ(*(group.raw<unsigned int>() + 0u), 0u);
     ASSERT_EQ(*(group.raw<unsigned int>() + 1u), 1u);
@@ -246,14 +246,14 @@ TEST(NonOwningGroup, SortAsAPool) {
     auto uval = 0u;
     auto ival = 0;
 
-    registry.assign<unsigned int>(e0, uval++);
-    registry.assign<unsigned int>(e1, uval++);
-    registry.assign<unsigned int>(e2, uval++);
-    registry.assign<unsigned int>(e3, uval+1);
+    registry.emplace<unsigned int>(e0, uval++);
+    registry.emplace<unsigned int>(e1, uval++);
+    registry.emplace<unsigned int>(e2, uval++);
+    registry.emplace<unsigned int>(e3, uval+1);
 
-    registry.assign<int>(e0, ival++);
-    registry.assign<int>(e1, ival++);
-    registry.assign<int>(e2, ival++);
+    registry.emplace<int>(e0, ival++);
+    registry.emplace<int>(e1, ival++);
+    registry.emplace<int>(e2, ival++);
 
     for(auto entity: group) {
         ASSERT_EQ(group.get<unsigned int>(entity), --uval);
@@ -282,14 +282,14 @@ TEST(NonOwningGroup, IndexRebuiltOnDestroy) {
     const auto e0 = registry.create();
     const auto e1 = registry.create();
 
-    registry.assign<unsigned int>(e0, 0u);
-    registry.assign<unsigned int>(e1, 1u);
+    registry.emplace<unsigned int>(e0, 0u);
+    registry.emplace<unsigned int>(e1, 1u);
 
-    registry.assign<int>(e0, 0);
-    registry.assign<int>(e1, 1);
+    registry.emplace<int>(e0, 0);
+    registry.emplace<int>(e1, 1);
 
     registry.destroy(e0);
-    registry.assign<int>(registry.create(), 42);
+    registry.emplace<int>(registry.create(), 42);
 
     ASSERT_EQ(group.size(), typename decltype(group)::size_type{1});
     ASSERT_EQ(group[{}], e1);
@@ -310,8 +310,8 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
     ASSERT_EQ(group.size(), decltype(group.size()){0});
 
     const auto entity = registry.create();
-    registry.assign<int>(entity, 0);
-    registry.assign<char>(entity, 'c');
+    registry.emplace<int>(entity, 0);
+    registry.emplace<char>(entity, 'c');
 
     ASSERT_EQ(group.size(), decltype(group.size()){1});
 
@@ -332,20 +332,20 @@ TEST(NonOwningGroup, Find) {
     auto group = registry.group(entt::get<int, const char>);
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0);
-    registry.assign<char>(e0);
+    registry.emplace<int>(e0);
+    registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1);
+    registry.emplace<char>(e1);
 
     const auto e2 = registry.create();
-    registry.assign<int>(e2);
-    registry.assign<char>(e2);
+    registry.emplace<int>(e2);
+    registry.emplace<char>(e2);
 
     const auto e3 = registry.create();
-    registry.assign<int>(e3);
-    registry.assign<char>(e3);
+    registry.emplace<int>(e3);
+    registry.emplace<char>(e3);
 
     registry.remove<int>(e1);
 
@@ -365,8 +365,8 @@ TEST(NonOwningGroup, Find) {
     const auto e4 = registry.create();
     registry.destroy(e4);
     const auto e5 = registry.create();
-    registry.assign<int>(e5);
-    registry.assign<char>(e5);
+    registry.emplace<int>(e5);
+    registry.emplace<char>(e5);
 
     ASSERT_NE(group.find(e5), group.end());
     ASSERT_EQ(group.find(e4), group.end());
@@ -376,20 +376,20 @@ TEST(NonOwningGroup, ExcludedComponents) {
     entt::registry registry;
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0, 0);
+    registry.emplace<int>(e0, 0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1, 1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1, 1);
+    registry.emplace<char>(e1);
 
     const auto group = registry.group(entt::get<int>, entt::exclude<char>);
 
     const auto e2 = registry.create();
-    registry.assign<int>(e2, 2);
+    registry.emplace<int>(e2, 2);
 
     const auto e3 = registry.create();
-    registry.assign<int>(e3, 3);
-    registry.assign<char>(e3);
+    registry.emplace<int>(e3, 3);
+    registry.emplace<char>(e3);
 
     for(const auto entity: group) {
         ASSERT_TRUE(entity == e0 || entity == e2);
@@ -401,8 +401,8 @@ TEST(NonOwningGroup, ExcludedComponents) {
         }
     }
 
-    registry.assign<char>(e0);
-    registry.assign<char>(e2);
+    registry.emplace<char>(e0);
+    registry.emplace<char>(e2);
 
     ASSERT_TRUE(group.empty());
 
@@ -425,14 +425,14 @@ TEST(NonOwningGroup, EmptyAndNonEmptyTypes) {
     const auto group = registry.group(entt::get<int, empty_type>);
 
     const auto e0 = registry.create();
-    registry.assign<empty_type>(e0);
-    registry.assign<int>(e0);
+    registry.emplace<empty_type>(e0);
+    registry.emplace<int>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<empty_type>(e1);
-    registry.assign<int>(e1);
+    registry.emplace<empty_type>(e1);
+    registry.emplace<int>(e1);
 
-    registry.assign<int>(registry.create());
+    registry.emplace<int>(registry.create());
 
     for(const auto entity: group) {
         ASSERT_TRUE(entity == e0 || entity == e1);
@@ -451,8 +451,8 @@ TEST(NonOwningGroup, TrackEntitiesOnComponentDestruction) {
     const auto cgroup = std::as_const(registry).group(entt::get<const int>, entt::exclude<char>);
 
     const auto entity = registry.create();
-    registry.assign<int>(entity);
-    registry.assign<char>(entity);
+    registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
 
     ASSERT_TRUE(group.empty());
     ASSERT_TRUE(cgroup.empty());
@@ -467,9 +467,9 @@ TEST(NonOwningGroup, Less) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.assign<int>(entity);
-    registry.assign<char>(entity);
-    registry.assign<entt::tag<"empty"_hs>>(entity);
+    registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
+    registry.emplace<entt::tag<"empty"_hs>>(entity);
 
     registry.group(entt::get<int, char, entt::tag<"empty"_hs>>).less([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
@@ -495,15 +495,15 @@ TEST(NonOwningGroup, FrontBack) {
     ASSERT_EQ(group.back(), static_cast<entt::entity>(entt::null));
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0);
-    registry.assign<char>(e0);
+    registry.emplace<int>(e0);
+    registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1);
+    registry.emplace<char>(e1);
 
     const auto entity = registry.create();
-    registry.assign<char>(entity);
+    registry.emplace<char>(entity);
 
     ASSERT_EQ(group.front(), e1);
     ASSERT_EQ(group.back(), e0);
@@ -511,11 +511,11 @@ TEST(NonOwningGroup, FrontBack) {
 
 TEST(NonOwningGroup, SignalRace) {
     entt::registry registry;
-    registry.on_construct<double>().connect<&entt::registry::assign_or_replace<int>>();
+    registry.on_construct<double>().connect<&entt::registry::emplace_or_replace<int>>();
     registry.group(entt::get<int, double>);
 
     auto entity = registry.create();
-    registry.assign<double>(entity);
+    registry.emplace<double>(entity);
 
     ASSERT_EQ(registry.group(entt::get<int, double>).size(), 1u);
 }
@@ -530,11 +530,11 @@ TEST(OwningGroup, Functionalities) {
     ASSERT_TRUE((cgroup.empty<const int, const char>()));
 
     const auto e0 = registry.create();
-    registry.assign<char>(e0);
+    registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1);
+    registry.emplace<char>(e1);
 
     ASSERT_FALSE(group.empty());
     ASSERT_FALSE((group.empty<int>()));
@@ -548,7 +548,7 @@ TEST(OwningGroup, Functionalities) {
     ASSERT_EQ(group.size<int>(), typename decltype(group)::size_type{1});
     ASSERT_EQ(cgroup.size<const char>(), typename decltype(group)::size_type{2});
 
-    registry.assign<int>(e0);
+    registry.emplace<int>(e0);
 
     ASSERT_EQ(group.size(), typename decltype(group)::size_type{2});
     ASSERT_EQ(group.size<int>(), typename decltype(group)::size_type{2});
@@ -597,12 +597,12 @@ TEST(OwningGroup, ElementAccess) {
     auto cgroup = std::as_const(registry).group<const int>(entt::get<const char>);
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0);
-    registry.assign<char>(e0);
+    registry.emplace<int>(e0);
+    registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1);
+    registry.emplace<char>(e1);
 
     for(typename decltype(group)::size_type i{}; i < group.size(); ++i) {
         ASSERT_EQ(group[i], i ? e0 : e1);
@@ -615,12 +615,12 @@ TEST(OwningGroup, Contains) {
     auto group = registry.group<int>(entt::get<char>);
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0);
-    registry.assign<char>(e0);
+    registry.emplace<int>(e0);
+    registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1);
+    registry.emplace<char>(e1);
 
     registry.destroy(e0);
 
@@ -632,13 +632,13 @@ TEST(OwningGroup, Empty) {
     entt::registry registry;
 
     const auto e0 = registry.create();
-    registry.assign<double>(e0);
-    registry.assign<int>(e0);
-    registry.assign<float>(e0);
+    registry.emplace<double>(e0);
+    registry.emplace<int>(e0);
+    registry.emplace<float>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<char>(e1);
-    registry.assign<float>(e1);
+    registry.emplace<char>(e1);
+    registry.emplace<float>(e1);
 
     ASSERT_TRUE((registry.group<char, int>(entt::get<float>).empty()));
     ASSERT_TRUE((registry.group<double, float>(entt::get<char, int>).empty()));
@@ -649,12 +649,12 @@ TEST(OwningGroup, Each) {
     auto group = registry.group<int>(entt::get<char>);
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0);
-    registry.assign<char>(e0);
+    registry.emplace<int>(e0);
+    registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1);
+    registry.emplace<char>(e1);
 
     auto cgroup = std::as_const(registry).group<const int>(entt::get<const char>);
     std::size_t cnt = 0;
@@ -677,17 +677,17 @@ TEST(OwningGroup, SortOrdered) {
     entt::entity entities[5]{};
     registry.create(std::begin(entities), std::end(entities));
 
-    registry.assign<boxed_int>(entities[0], 12);
-    registry.assign<char>(entities[0], 'a');
+    registry.emplace<boxed_int>(entities[0], 12);
+    registry.emplace<char>(entities[0], 'a');
 
-    registry.assign<boxed_int>(entities[1], 9);
-    registry.assign<char>(entities[1], 'b');
+    registry.emplace<boxed_int>(entities[1], 9);
+    registry.emplace<char>(entities[1], 'b');
 
-    registry.assign<boxed_int>(entities[2], 6);
-    registry.assign<char>(entities[2], 'c');
+    registry.emplace<boxed_int>(entities[2], 6);
+    registry.emplace<char>(entities[2], 'c');
 
-    registry.assign<boxed_int>(entities[3], 1);
-    registry.assign<boxed_int>(entities[4], 2);
+    registry.emplace<boxed_int>(entities[3], 1);
+    registry.emplace<boxed_int>(entities[4], 2);
 
     group.sort([&group](const entt::entity lhs, const entt::entity rhs) {
         return group.get<boxed_int>(lhs).value < group.get<boxed_int>(rhs).value;
@@ -724,17 +724,17 @@ TEST(OwningGroup, SortReverse) {
     entt::entity entities[5]{};
     registry.create(std::begin(entities), std::end(entities));
 
-    registry.assign<boxed_int>(entities[0], 6);
-    registry.assign<char>(entities[0], 'a');
+    registry.emplace<boxed_int>(entities[0], 6);
+    registry.emplace<char>(entities[0], 'a');
 
-    registry.assign<boxed_int>(entities[1], 9);
-    registry.assign<char>(entities[1], 'b');
+    registry.emplace<boxed_int>(entities[1], 9);
+    registry.emplace<char>(entities[1], 'b');
 
-    registry.assign<boxed_int>(entities[2], 12);
-    registry.assign<char>(entities[2], 'c');
+    registry.emplace<boxed_int>(entities[2], 12);
+    registry.emplace<char>(entities[2], 'c');
 
-    registry.assign<boxed_int>(entities[3], 1);
-    registry.assign<boxed_int>(entities[4], 2);
+    registry.emplace<boxed_int>(entities[3], 1);
+    registry.emplace<boxed_int>(entities[4], 2);
 
     group.sort<boxed_int>([](const auto &lhs, const auto &rhs) {
         return lhs.value < rhs.value;
@@ -771,23 +771,23 @@ TEST(OwningGroup, SortUnordered) {
     entt::entity entities[7]{};
     registry.create(std::begin(entities), std::end(entities));
 
-    registry.assign<boxed_int>(entities[0], 6);
-    registry.assign<char>(entities[0], 'c');
+    registry.emplace<boxed_int>(entities[0], 6);
+    registry.emplace<char>(entities[0], 'c');
 
-    registry.assign<boxed_int>(entities[1], 3);
-    registry.assign<char>(entities[1], 'b');
+    registry.emplace<boxed_int>(entities[1], 3);
+    registry.emplace<char>(entities[1], 'b');
 
-    registry.assign<boxed_int>(entities[2], 1);
-    registry.assign<char>(entities[2], 'a');
+    registry.emplace<boxed_int>(entities[2], 1);
+    registry.emplace<char>(entities[2], 'a');
 
-    registry.assign<boxed_int>(entities[3], 9);
-    registry.assign<char>(entities[3], 'd');
+    registry.emplace<boxed_int>(entities[3], 9);
+    registry.emplace<char>(entities[3], 'd');
 
-    registry.assign<boxed_int>(entities[4], 12);
-    registry.assign<char>(entities[4], 'e');
+    registry.emplace<boxed_int>(entities[4], 12);
+    registry.emplace<char>(entities[4], 'e');
 
-    registry.assign<boxed_int>(entities[5], 4);
-    registry.assign<boxed_int>(entities[6], 5);
+    registry.emplace<boxed_int>(entities[5], 4);
+    registry.emplace<boxed_int>(entities[6], 5);
 
     group.sort<char>([](const auto lhs, const auto rhs) {
         return lhs < rhs;
@@ -832,13 +832,13 @@ TEST(OwningGroup, SortWithExclusionList) {
     entt::entity entities[5]{};
     registry.create(std::begin(entities), std::end(entities));
 
-    registry.assign<boxed_int>(entities[0], 0);
-    registry.assign<boxed_int>(entities[1], 1);
-    registry.assign<boxed_int>(entities[2], 2);
-    registry.assign<boxed_int>(entities[3], 3);
-    registry.assign<boxed_int>(entities[4], 4);
+    registry.emplace<boxed_int>(entities[0], 0);
+    registry.emplace<boxed_int>(entities[1], 1);
+    registry.emplace<boxed_int>(entities[2], 2);
+    registry.emplace<boxed_int>(entities[3], 3);
+    registry.emplace<boxed_int>(entities[4], 4);
 
-    registry.assign<char>(entities[2]);
+    registry.emplace<char>(entities[2]);
 
     group.sort([](const entt::entity lhs, const entt::entity rhs) {
         return lhs < rhs;
@@ -869,14 +869,14 @@ TEST(OwningGroup, IndexRebuiltOnDestroy) {
     const auto e0 = registry.create();
     const auto e1 = registry.create();
 
-    registry.assign<unsigned int>(e0, 0u);
-    registry.assign<unsigned int>(e1, 1u);
+    registry.emplace<unsigned int>(e0, 0u);
+    registry.emplace<unsigned int>(e1, 1u);
 
-    registry.assign<int>(e0, 0);
-    registry.assign<int>(e1, 1);
+    registry.emplace<int>(e0, 0);
+    registry.emplace<int>(e1, 1);
 
     registry.destroy(e0);
-    registry.assign<int>(registry.create(), 42);
+    registry.emplace<int>(registry.create(), 42);
 
     ASSERT_EQ(group.size(), typename decltype(group)::size_type{1});
     ASSERT_EQ(group[{}], e1);
@@ -897,10 +897,10 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     ASSERT_EQ(group.size(), decltype(group.size()){0});
 
     const auto entity = registry.create();
-    registry.assign<int>(entity, 0);
-    registry.assign<char>(entity, 'c');
-    registry.assign<double>(entity, 0.);
-    registry.assign<float>(entity, 0.f);
+    registry.emplace<int>(entity, 0);
+    registry.emplace<char>(entity, 'c');
+    registry.emplace<double>(entity, 0.);
+    registry.emplace<float>(entity, 0.f);
 
     ASSERT_EQ(group.size(), decltype(group.size()){1});
 
@@ -927,20 +927,20 @@ TEST(OwningGroup, Find) {
     auto group = registry.group<int>(entt::get<const char>);
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0);
-    registry.assign<char>(e0);
+    registry.emplace<int>(e0);
+    registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1);
+    registry.emplace<char>(e1);
 
     const auto e2 = registry.create();
-    registry.assign<int>(e2);
-    registry.assign<char>(e2);
+    registry.emplace<int>(e2);
+    registry.emplace<char>(e2);
 
     const auto e3 = registry.create();
-    registry.assign<int>(e3);
-    registry.assign<char>(e3);
+    registry.emplace<int>(e3);
+    registry.emplace<char>(e3);
 
     registry.remove<int>(e1);
 
@@ -960,8 +960,8 @@ TEST(OwningGroup, Find) {
     const auto e4 = registry.create();
     registry.destroy(e4);
     const auto e5 = registry.create();
-    registry.assign<int>(e5);
-    registry.assign<char>(e5);
+    registry.emplace<int>(e5);
+    registry.emplace<char>(e5);
 
     ASSERT_NE(group.find(e5), group.end());
     ASSERT_EQ(group.find(e4), group.end());
@@ -971,20 +971,20 @@ TEST(OwningGroup, ExcludedComponents) {
     entt::registry registry;
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0, 0);
+    registry.emplace<int>(e0, 0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1, 1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1, 1);
+    registry.emplace<char>(e1);
 
     const auto group = registry.group<int>(entt::exclude<char, double>);
 
     const auto e2 = registry.create();
-    registry.assign<int>(e2, 2);
+    registry.emplace<int>(e2, 2);
 
     const auto e3 = registry.create();
-    registry.assign<int>(e3, 3);
-    registry.assign<double>(e3);
+    registry.emplace<int>(e3, 3);
+    registry.emplace<double>(e3);
 
     for(const auto entity: group) {
         ASSERT_TRUE(entity == e0 || entity == e2);
@@ -996,8 +996,8 @@ TEST(OwningGroup, ExcludedComponents) {
         }
     }
 
-    registry.assign<char>(e0);
-    registry.assign<double>(e2);
+    registry.emplace<char>(e0);
+    registry.emplace<double>(e2);
 
     ASSERT_TRUE(group.empty());
 
@@ -1020,14 +1020,14 @@ TEST(OwningGroup, EmptyAndNonEmptyTypes) {
     const auto group = registry.group<int>(entt::get<empty_type>);
 
     const auto e0 = registry.create();
-    registry.assign<empty_type>(e0);
-    registry.assign<int>(e0);
+    registry.emplace<empty_type>(e0);
+    registry.emplace<int>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<empty_type>(e1);
-    registry.assign<int>(e1);
+    registry.emplace<empty_type>(e1);
+    registry.emplace<int>(e1);
 
-    registry.assign<int>(registry.create());
+    registry.emplace<int>(registry.create());
 
     for(const auto entity: group) {
         ASSERT_TRUE(entity == e0 || entity == e1);
@@ -1046,8 +1046,8 @@ TEST(OwningGroup, TrackEntitiesOnComponentDestruction) {
     const auto cgroup = std::as_const(registry).group<const int>(entt::exclude<char>);
 
     const auto entity = registry.create();
-    registry.assign<int>(entity);
-    registry.assign<char>(entity);
+    registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
 
     ASSERT_TRUE(group.empty());
     ASSERT_TRUE(cgroup.empty());
@@ -1062,9 +1062,9 @@ TEST(OwningGroup, Less) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.assign<int>(entity);
-    registry.assign<char>(entity);
-    registry.assign<entt::tag<"empty"_hs>>(entity);
+    registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
+    registry.emplace<entt::tag<"empty"_hs>>(entity);
 
     registry.group<int>(entt::get<char, entt::tag<"empty"_hs>>).less([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
@@ -1090,15 +1090,15 @@ TEST(OwningGroup, FrontBack) {
     ASSERT_EQ(group.back(), static_cast<entt::entity>(entt::null));
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0);
-    registry.assign<char>(e0);
+    registry.emplace<int>(e0);
+    registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.assign<int>(e1);
-    registry.assign<char>(e1);
+    registry.emplace<int>(e1);
+    registry.emplace<char>(e1);
 
     const auto entity = registry.create();
-    registry.assign<char>(entity);
+    registry.emplace<char>(entity);
 
     ASSERT_EQ(group.front(), e1);
     ASSERT_EQ(group.back(), e0);
@@ -1106,11 +1106,11 @@ TEST(OwningGroup, FrontBack) {
 
 TEST(OwningGroup, SignalRace) {
     entt::registry registry;
-    registry.on_construct<double>().connect<&entt::registry::assign_or_replace<int>>();
+    registry.on_construct<double>().connect<&entt::registry::emplace_or_replace<int>>();
     registry.group<int>(entt::get<double>);
 
     auto entity = registry.create();
-    registry.assign<double>(entity);
+    registry.emplace<double>(entity);
 
     ASSERT_EQ(registry.group<int>(entt::get<double>).size(), 1u);
 }
@@ -1120,8 +1120,8 @@ TEST(OwningGroup, StableLateInitialization) {
 
     for(std::size_t i{}; i < 30u; ++i) {
         auto entity = registry.create();
-        if(!(i % 2u)) registry.assign<int>(entity);
-        if(!(i % 3u)) registry.assign<char>(entity);
+        if(!(i % 2u)) registry.emplace<int>(entity);
+        if(!(i % 3u)) registry.emplace<char>(entity);
     }
 
     // thanks to @pgruenbacher for pointing out this corner case
@@ -1131,11 +1131,11 @@ TEST(OwningGroup, StableLateInitialization) {
 TEST(OwningGroup, PreventEarlyOptOut) {
     entt::registry registry;
 
-    registry.assign<int>(registry.create(), 3);
+    registry.emplace<int>(registry.create(), 3);
 
     const auto entity = registry.create();
-    registry.assign<char>(entity, 'c');
-    registry.assign<int>(entity, 2);
+    registry.emplace<char>(entity, 'c');
+    registry.emplace<int>(entity, 2);
 
     // thanks to @pgruenbacher for pointing out this corner case
     registry.group<char, int>().each([entity](const auto entt, const auto &c, const auto &i) {

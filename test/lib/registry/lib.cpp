@@ -9,11 +9,11 @@ ENTT_API void update_position(entt::registry &registry) {
     });
 }
 
-ENTT_API void assign_velocity(entt::registry &registry) {
+ENTT_API void emplace_velocity(entt::registry &registry) {
     // forces the creation of the pool for the velocity component
     registry.prepare<velocity>();
 
     for(auto entity: registry.view<position>()) {
-        registry.assign<velocity>(entity, 1., 1.);
+        registry.emplace<velocity>(entity, 1., 1.);
     }
 }

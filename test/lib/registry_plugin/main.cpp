@@ -14,10 +14,10 @@ TEST(Lib, Registry) {
 
     for(auto i = 0; i < 3; ++i) {
         const auto entity = registry.create();
-        registry.assign<position>(entity, i, i);
+        registry.emplace<position>(entity, i, i);
 
         if(i % 2) {
-            registry.assign<tag>(entity);
+            registry.emplace<tag>(entity);
         }
     }
 

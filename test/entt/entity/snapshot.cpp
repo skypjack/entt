@@ -68,18 +68,18 @@ TEST(Snapshot, Dump) {
     entt::registry registry;
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0, 42);
-    registry.assign<char>(e0, 'c');
-    registry.assign<double>(e0, .1);
+    registry.emplace<int>(e0, 42);
+    registry.emplace<char>(e0, 'c');
+    registry.emplace<double>(e0, .1);
 
     const auto e1 = registry.create();
 
     const auto e2 = registry.create();
-    registry.assign<int>(e2, 3);
+    registry.emplace<int>(e2, 3);
 
     const auto e3 = registry.create();
-    registry.assign<a_component>(e3);
-    registry.assign<char>(e3, '0');
+    registry.emplace<a_component>(e3);
+    registry.emplace<char>(e3, '0');
 
     registry.destroy(e1);
     auto v1 = registry.current(e1);
@@ -134,17 +134,17 @@ TEST(Snapshot, Partial) {
     entt::registry registry;
 
     const auto e0 = registry.create();
-    registry.assign<int>(e0, 42);
-    registry.assign<char>(e0, 'c');
-    registry.assign<double>(e0, .1);
+    registry.emplace<int>(e0, 42);
+    registry.emplace<char>(e0, 'c');
+    registry.emplace<double>(e0, .1);
 
     const auto e1 = registry.create();
 
     const auto e2 = registry.create();
-    registry.assign<int>(e2, 3);
+    registry.emplace<int>(e2, 3);
 
     const auto e3 = registry.create();
-    registry.assign<char>(e3, '0');
+    registry.emplace<char>(e3, '0');
 
     registry.destroy(e1);
     auto v1 = registry.current(e1);
@@ -206,10 +206,10 @@ TEST(Snapshot, Iterator) {
 
     for(auto i = 0; i < 50; ++i) {
         const auto entity = registry.create();
-        registry.assign<another_component>(entity, i, i);
+        registry.emplace<another_component>(entity, i, i);
 
         if(i % 2) {
-            registry.assign<a_component>(entity);
+            registry.emplace<a_component>(entity);
         }
     }
 
@@ -271,13 +271,13 @@ TEST(Snapshot, Continuous) {
         entity = src.create();
         entities.push_back(entity);
 
-        src.assign<a_component>(entity);
-        src.assign<another_component>(entity, i, i);
+        src.emplace<a_component>(entity);
+        src.emplace<another_component>(entity, i, i);
 
         if(i % 2) {
-            src.assign<what_a_component>(entity, entity);
+            src.emplace<what_a_component>(entity, entity);
         } else {
-            src.assign<map_component>(entity);
+            src.emplace<map_component>(entity);
         }
     }
 
@@ -294,8 +294,8 @@ TEST(Snapshot, Continuous) {
     });
 
     entity = dst.create();
-    dst.assign<a_component>(entity);
-    dst.assign<another_component>(entity, -1, -1);
+    dst.emplace<a_component>(entity);
+    dst.emplace<another_component>(entity, -1, -1);
 
     entt::snapshot{src}.entities(output).component<a_component, another_component, what_a_component, map_component>(output);
 
@@ -525,10 +525,10 @@ TEST(Snapshot, SyncDataMembers) {
     auto child = src.create();
 
 
-    src.assign<what_a_component>(parent, entt::null);
-    src.assign<what_a_component>(child, parent).quux.push_back(child);
+    src.emplace<what_a_component>(parent, entt::null);
+    src.emplace<what_a_component>(child, parent).quux.push_back(child);
 
-    src.assign<map_component>(
+    src.emplace<map_component>(
         child,
         decltype(map_component::keys){{{ child, 10 }}},
         decltype(map_component::values){{{ 10, child }}},

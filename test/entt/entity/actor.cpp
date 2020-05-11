@@ -43,8 +43,8 @@ TEST(Actor, FromEntity) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.assign<int>(entity, 42);
-    registry.assign<char>(entity, 'c');
+    registry.emplace<int>(entity, 42);
+    registry.emplace<char>(entity, 'c');
 
     entt::actor actor{entity, registry};
 

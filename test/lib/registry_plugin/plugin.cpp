@@ -13,7 +13,7 @@ CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
             auto &registry = *static_cast<entt::registry *>(ctx->userdata);
 
             const auto position_view = registry.view<position>(entt::exclude<tag>);
-            registry.assign(position_view.begin(), position_view.end(), velocity{1., 1.});
+            registry.insert(position_view.begin(), position_view.end(), velocity{1., 1.});
 
             registry.view<position, velocity>().each([](auto &pos, auto &vel) {
                 pos.x += static_cast<int>(16 * vel.dx);
