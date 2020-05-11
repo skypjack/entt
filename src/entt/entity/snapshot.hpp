@@ -108,15 +108,6 @@ public:
     }
 
     /**
-     * @brief Deprecated function. Currently, it does nothing.
-     * @tparam Archive Type of output archive.
-     * @return An object of this type to continue creating the snapshot.
-     */
-    template<typename Archive>
-    [[deprecated("use ::entities instead, it exports now also destroyed entities")]]
-    const basic_snapshot & destroyed(Archive &) const { return *this; }
-
-    /**
      * @brief Puts aside the given components.
      *
      * Each instance is serialized together with the entity to which it belongs.
@@ -244,15 +235,6 @@ public:
 
         return *this;
     }
-
-    /**
-     * @brief Deprecated function. Currently, it does nothing.
-     * @tparam Archive Type of input archive.
-     * @return A valid loader to continue restoring data.
-     */
-    template<typename Archive>
-    [[deprecated("use ::entities instead, it imports now also destroyed entities")]]
-    const basic_snapshot_loader & destroyed(Archive &) const { return *this; }
 
     /**
      * @brief Restores components and assigns them to the right entities.
@@ -467,15 +449,6 @@ public:
     }
 
     /**
-     * @brief Deprecated function. Currently, it does nothing.
-     * @tparam Archive Type of input archive.
-     * @return A non-const reference to this loader.
-     */
-    template<typename Archive>
-    [[deprecated("use ::entities instead, it imports now also destroyed entities")]]
-    basic_continuous_loader & destroyed(Archive &) { return *this; }
-
-    /**
      * @brief Restores components and assigns them to the right entities.
      *
      * The template parameter list must be exactly the same used during
@@ -556,12 +529,6 @@ public:
      */
     bool contains(entity_type entt) const ENTT_NOEXCEPT {
         return (remloc.find(entt) != remloc.cend());
-    }
-
-    /*! @copydoc contains */
-    [[deprecated("use ::contains instead")]]
-    bool has(entity_type entt) const ENTT_NOEXCEPT {
-        return contains(entt);
     }
 
     /**

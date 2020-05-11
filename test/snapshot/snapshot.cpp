@@ -62,13 +62,11 @@ TEST(Snapshot, Full) {
     {
         // output finishes flushing its contents when it goes out of scope
         cereal::JSONOutputArchive output{storage};
-        entt::snapshot{source}.entities(output).destroyed(output)
-            .component<position, timer, relationship, entt::tag<"empty"_hs>>(output);
+        entt::snapshot{source}.entities(output).component<position, timer, relationship, entt::tag<"empty"_hs>>(output);
     }
 
     cereal::JSONInputArchive input{storage};
-    entt::snapshot_loader{destination}.entities(input).destroyed(input)
-        .component<position, timer, relationship, entt::tag<"empty"_hs>>(input);
+    entt::snapshot_loader{destination}.entities(input).component<position, timer, relationship, entt::tag<"empty"_hs>>(input);
 
     ASSERT_TRUE(destination.valid(e0));
     ASSERT_TRUE(destination.has<position>(e0));
@@ -137,7 +135,7 @@ TEST(Snapshot, Continuous) {
             .component<timer, entt::tag<"empty"_hs>>(input);
 
     ASSERT_FALSE(destination.valid(e0));
-    ASSERT_TRUE(loader.has(e0));
+    ASSERT_TRUE(loader.contains(e0));
 
     auto l0 = loader.map(e0);
 
@@ -149,7 +147,7 @@ TEST(Snapshot, Continuous) {
     ASSERT_EQ(destination.get<relationship>(l0).parent, l0);
 
     ASSERT_FALSE(destination.valid(e1));
-    ASSERT_TRUE(loader.has(e1));
+    ASSERT_TRUE(loader.contains(e1));
 
     auto l1 = loader.map(e1);
 
@@ -161,7 +159,7 @@ TEST(Snapshot, Continuous) {
     ASSERT_EQ(destination.get<relationship>(l1).parent, l0);
 
     ASSERT_FALSE(destination.valid(e2));
-    ASSERT_TRUE(loader.has(e2));
+    ASSERT_TRUE(loader.contains(e2));
 
     auto l2 = loader.map(e2);
 
@@ -173,7 +171,7 @@ TEST(Snapshot, Continuous) {
     ASSERT_EQ(destination.get<relationship>(l2).parent, l0);
 
     ASSERT_FALSE(destination.valid(e3));
-    ASSERT_TRUE(loader.has(e3));
+    ASSERT_TRUE(loader.contains(e3));
 
     auto l3 = loader.map(e3);
 

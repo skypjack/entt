@@ -98,11 +98,7 @@ TEST(Snapshot, Dump) {
     output_archive<storage_type> output{storage};
     input_archive<storage_type> input{storage};
 
-    entt::snapshot{registry}
-        .entities(output)
-        .destroyed(output)
-        .component<int, char, double, a_component, another_component>(output);
-
+    entt::snapshot{registry}.entities(output).component<int, char, double, a_component, another_component>(output);
     registry.clear();
 
     ASSERT_FALSE(registry.valid(e0));
@@ -110,11 +106,7 @@ TEST(Snapshot, Dump) {
     ASSERT_FALSE(registry.valid(e2));
     ASSERT_FALSE(registry.valid(e3));
 
-    entt::snapshot_loader{registry}
-        .entities(input)
-        .destroyed(input)
-        .component<int, char, double, a_component, another_component>(input)
-        .orphans();
+    entt::snapshot_loader{registry}.entities(input).component<int, char, double, a_component, another_component>(input).orphans();
 
     ASSERT_TRUE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -169,11 +161,7 @@ TEST(Snapshot, Partial) {
     output_archive<storage_type> output{storage};
     input_archive<storage_type> input{storage};
 
-    entt::snapshot{registry}
-        .entities(output)
-        .destroyed(output)
-        .component<char, int>(output);
-
+    entt::snapshot{registry}.entities(output).component<char, int>(output);
     registry.clear();
 
     ASSERT_FALSE(registry.valid(e0));
@@ -181,10 +169,7 @@ TEST(Snapshot, Partial) {
     ASSERT_FALSE(registry.valid(e2));
     ASSERT_FALSE(registry.valid(e3));
 
-    entt::snapshot_loader{registry}
-        .entities(input)
-        .destroyed(input)
-        .component<char, int>(input);
+    entt::snapshot_loader{registry}.entities(input).component<char, int>(input);
 
     ASSERT_TRUE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -198,10 +183,7 @@ TEST(Snapshot, Partial) {
     ASSERT_EQ(registry.get<int>(e2), 3);
     ASSERT_EQ(registry.get<char>(e3), '0');
 
-    entt::snapshot{registry}
-        .entities(output)
-        .destroyed(output);
-
+    entt::snapshot{registry}.entities(output);
     registry.clear();
 
     ASSERT_FALSE(registry.valid(e0));
@@ -209,10 +191,7 @@ TEST(Snapshot, Partial) {
     ASSERT_FALSE(registry.valid(e2));
     ASSERT_FALSE(registry.valid(e3));
 
-    entt::snapshot_loader{registry}
-        .entities(input)
-        .destroyed(input)
-        .orphans();
+    entt::snapshot_loader{registry}.entities(input).orphans();
 
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -318,13 +297,9 @@ TEST(Snapshot, Continuous) {
     dst.assign<a_component>(entity);
     dst.assign<another_component>(entity, -1, -1);
 
-    entt::snapshot{src}
-       .entities(output)
-       .destroyed(output)
-       .component<a_component, another_component, what_a_component, map_component>(output);
+    entt::snapshot{src}.entities(output).component<a_component, another_component, what_a_component, map_component>(output);
 
     loader.entities(input)
-        .destroyed(input)
         .component<a_component, another_component, what_a_component, map_component>(
             input,
             &what_a_component::bar,
@@ -382,13 +357,9 @@ TEST(Snapshot, Continuous) {
 
     auto size = dst.size();
 
-    entt::snapshot{src}
-        .entities(output)
-        .destroyed(output)
-        .component<a_component, what_a_component, map_component, another_component>(output);
+    entt::snapshot{src}.entities(output).component<a_component, what_a_component, map_component, another_component>(output);
 
     loader.entities(input)
-        .destroyed(input)
         .component<a_component, what_a_component, map_component, another_component>(
             input,
             &what_a_component::bar,
@@ -415,13 +386,9 @@ TEST(Snapshot, Continuous) {
         component.bar = entity;
     });
 
-    entt::snapshot{src}
-        .entities(output)
-        .destroyed(output)
-        .component<what_a_component, map_component, a_component, another_component>(output);
+    entt::snapshot{src}.entities(output).component<what_a_component, map_component, a_component, another_component>(output);
 
     loader.entities(input)
-        .destroyed(input)
         .component<what_a_component, map_component, a_component, another_component>(
             input,
             &what_a_component::bar,
@@ -443,13 +410,9 @@ TEST(Snapshot, Continuous) {
     src.destroy(entity);
     loader.shrink();
 
-    entt::snapshot{src}
-        .entities(output)
-        .destroyed(output)
-        .component<a_component, another_component, what_a_component, map_component>(output);
+    entt::snapshot{src}.entities(output).component<a_component, another_component, what_a_component, map_component>(output);
 
     loader.entities(input)
-        .destroyed(input)
         .component<a_component, another_component, what_a_component, map_component>(
             input,
             &what_a_component::bar,
@@ -463,7 +426,7 @@ TEST(Snapshot, Continuous) {
         ASSERT_FALSE(dst.valid(component.bar));
     });
 
-    ASSERT_FALSE(loader.has(entity));
+    ASSERT_FALSE(loader.contains(entity));
 
     entity = src.create();
 
@@ -474,13 +437,9 @@ TEST(Snapshot, Continuous) {
     dst.clear<a_component>();
     a_component_cnt = src.size<a_component>();
 
-    entt::snapshot{src}
-        .entities(output)
-        .destroyed(output)
-        .component<a_component, what_a_component, map_component, another_component>(output);
+    entt::snapshot{src}.entities(output).component<a_component, what_a_component, map_component, another_component>(output);
 
     loader.entities(input)
-        .destroyed(input)
         .component<a_component, what_a_component, map_component, another_component>(
             input,
             &what_a_component::bar,
@@ -495,13 +454,9 @@ TEST(Snapshot, Continuous) {
     src.clear<a_component>();
     a_component_cnt = {};
 
-    entt::snapshot{src}
-        .entities(output)
-        .destroyed(output)
-        .component<what_a_component, map_component, a_component, another_component>(output);
+    entt::snapshot{src}.entities(output).component<what_a_component, map_component, a_component, another_component>(output);
 
     loader.entities(input)
-        .destroyed(input)
         .component<what_a_component, map_component, a_component, another_component>(
             input,
             &what_a_component::bar,
