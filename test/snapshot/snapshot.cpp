@@ -3,6 +3,7 @@
 #include <vector>
 #include <cereal/archives/json.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/snapshot.hpp>
 #include <entt/entity/helper.hpp>
 
 struct position {
@@ -61,13 +62,13 @@ TEST(Snapshot, Full) {
     {
         // output finishes flushing its contents when it goes out of scope
         cereal::JSONOutputArchive output{storage};
-        source.snapshot().entities(output).destroyed(output)
-                .component<position, timer, relationship, entt::tag<"empty"_hs>>(output);
+        entt::snapshot{source}.entities(output).destroyed(output)
+            .component<position, timer, relationship, entt::tag<"empty"_hs>>(output);
     }
 
     cereal::JSONInputArchive input{storage};
-    destination.loader().entities(input).destroyed(input)
-            .component<position, timer, relationship, entt::tag<"empty"_hs>>(input);
+    entt::snapshot_loader{destination}.entities(input).destroyed(input)
+        .component<position, timer, relationship, entt::tag<"empty"_hs>>(input);
 
     ASSERT_TRUE(destination.valid(e0));
     ASSERT_TRUE(destination.has<position>(e0));
@@ -126,7 +127,7 @@ TEST(Snapshot, Continuous) {
     {
         // output finishes flushing its contents when it goes out of scope
         cereal::JSONOutputArchive output{storage};
-        source.snapshot().entities(output).component<position, relationship, timer, entt::tag<"empty"_hs>>(output);
+        entt::snapshot{source}.entities(output).component<position, relationship, timer, entt::tag<"empty"_hs>>(output);
     }
 
     cereal::JSONInputArchive input{storage};

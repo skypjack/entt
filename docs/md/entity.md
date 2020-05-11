@@ -850,7 +850,7 @@ To take a snapshot of a registry, use the `snapshot` class:
 ```cpp
 output_archive output;
 
-snapshot{registry}
+entt::snapshot{registry}
     .entities(output)
     .component<a_component, another_component>(output);
 ```
@@ -887,7 +887,7 @@ As an example:
 const auto view = registry.view<serialize>();
 output_archive output;
 
-snapshot{registry}.component<a_component, another_component>(output, view.cbegin(), view.cend());
+entt::snapshot{registry}.component<a_component, another_component>(output, view.cbegin(), view.cend());
 ```
 
 Note that `component` stores items along with entities. It means that it works
@@ -907,7 +907,7 @@ To use it, just pass to the constructor a valid registry:
 ```cpp
 input_archive input;
 
-snapshot_loader{registry}
+entt::snapshot_loader{registry}
     .entities(input)
     .component<a_component, another_component>(input)
     .orphans();
@@ -950,7 +950,7 @@ limit its lifetime to that of a temporary object.
 Example of use:
 
 ```cpp
-entt::continuous_loader<entt::entity> loader{registry};
+entt::continuous_loader loader{registry};
 input_archive input;
 
 loader.entities(input)

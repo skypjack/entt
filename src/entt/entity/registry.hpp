@@ -20,7 +20,6 @@
 #include "fwd.hpp"
 #include "group.hpp"
 #include "runtime_view.hpp"
-#include "snapshot.hpp"
 #include "sparse_set.hpp"
 #include "storage.hpp"
 #include "utility.hpp"
@@ -1565,41 +1564,6 @@ public:
         });
 
         return { std::move(selected) };
-    }
-
-    /**
-     * @brief Returns a temporary object to use to create snapshots.
-     *
-     * A snapshot is either a full or a partial dump of a registry.<br/>
-     * It can be used to save and restore its internal state or to keep two or
-     * more instances of this class in sync, as an example in a client-server
-     * architecture.
-     *
-     * @return A temporary object to use to take snasphosts.
-     */
-    [[deprecated("basic_snapshot has now a constructor that accepts a reference to a registry")]]
-    entt::basic_snapshot<Entity> snapshot() const {
-        return { *this };
-    }
-
-    /**
-     * @brief Returns a temporary object to use to load snapshots.
-     *
-     * A snapshot is either a full or a partial dump of a registry.<br/>
-     * It can be used to save and restore its internal state or to keep two or
-     * more instances of this class in sync, as an example in a client-server
-     * architecture.
-     *
-     * @note
-     * The loader returned by this function requires that the registry be empty.
-     * In case it isn't, all the data will be automatically deleted before to
-     * return.
-     *
-     * @return A temporary object to use to load snasphosts.
-     */
-    [[deprecated("basic_snapshot_loader has now a constructor that accepts a reference to a registry")]]
-    basic_snapshot_loader<Entity> loader() {
-        return { *this };
     }
 
     /**

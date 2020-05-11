@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/entity/registry.hpp>
+#include <entt/entity/snapshot.hpp>
 #include <entt/entity/entity.hpp>
 
 template<typename Storage>
@@ -97,10 +98,10 @@ TEST(Snapshot, Dump) {
     output_archive<storage_type> output{storage};
     input_archive<storage_type> input{storage};
 
-    registry.snapshot()
-            .entities(output)
-            .destroyed(output)
-            .component<int, char, double, a_component, another_component>(output);
+    entt::snapshot{registry}
+        .entities(output)
+        .destroyed(output)
+        .component<int, char, double, a_component, another_component>(output);
 
     registry.clear();
 
@@ -109,11 +110,11 @@ TEST(Snapshot, Dump) {
     ASSERT_FALSE(registry.valid(e2));
     ASSERT_FALSE(registry.valid(e3));
 
-    registry.loader()
-            .entities(input)
-            .destroyed(input)
-            .component<int, char, double, a_component, another_component>(input)
-            .orphans();
+    entt::snapshot_loader{registry}
+        .entities(input)
+        .destroyed(input)
+        .component<int, char, double, a_component, another_component>(input)
+        .orphans();
 
     ASSERT_TRUE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -168,10 +169,10 @@ TEST(Snapshot, Partial) {
     output_archive<storage_type> output{storage};
     input_archive<storage_type> input{storage};
 
-    registry.snapshot()
-            .entities(output)
-            .destroyed(output)
-            .component<char, int>(output);
+    entt::snapshot{registry}
+        .entities(output)
+        .destroyed(output)
+        .component<char, int>(output);
 
     registry.clear();
 
@@ -180,10 +181,10 @@ TEST(Snapshot, Partial) {
     ASSERT_FALSE(registry.valid(e2));
     ASSERT_FALSE(registry.valid(e3));
 
-    registry.loader()
-            .entities(input)
-            .destroyed(input)
-            .component<char, int>(input);
+    entt::snapshot_loader{registry}
+        .entities(input)
+        .destroyed(input)
+        .component<char, int>(input);
 
     ASSERT_TRUE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -197,9 +198,9 @@ TEST(Snapshot, Partial) {
     ASSERT_EQ(registry.get<int>(e2), 3);
     ASSERT_EQ(registry.get<char>(e3), '0');
 
-    registry.snapshot()
-            .entities(output)
-            .destroyed(output);
+    entt::snapshot{registry}
+        .entities(output)
+        .destroyed(output);
 
     registry.clear();
 
@@ -208,10 +209,10 @@ TEST(Snapshot, Partial) {
     ASSERT_FALSE(registry.valid(e2));
     ASSERT_FALSE(registry.valid(e3));
 
-    registry.loader()
-            .entities(input)
-            .destroyed(input)
-            .orphans();
+    entt::snapshot_loader{registry}
+        .entities(input)
+        .destroyed(input)
+        .orphans();
 
     ASSERT_FALSE(registry.valid(e0));
     ASSERT_FALSE(registry.valid(e1));
@@ -246,9 +247,9 @@ TEST(Snapshot, Iterator) {
     const auto view = registry.view<a_component>();
     const auto size = view.size();
 
-    registry.snapshot().component<another_component>(output, view.begin(), view.end());
+    entt::snapshot{registry}.component<another_component>(output, view.begin(), view.end());
     registry.clear();
-    registry.loader().component<another_component>(input);
+    entt::snapshot_loader{registry}.component<another_component>(input);
 
     ASSERT_EQ(registry.view<another_component>().size(), size);
 
@@ -317,7 +318,7 @@ TEST(Snapshot, Continuous) {
     dst.assign<a_component>(entity);
     dst.assign<another_component>(entity, -1, -1);
 
-    src.snapshot()
+    entt::snapshot{src}
        .entities(output)
        .destroyed(output)
        .component<a_component, another_component, what_a_component, map_component>(output);
@@ -381,7 +382,7 @@ TEST(Snapshot, Continuous) {
 
     auto size = dst.size();
 
-    src.snapshot()
+    entt::snapshot{src}
         .entities(output)
         .destroyed(output)
         .component<a_component, what_a_component, map_component, another_component>(output);
@@ -414,7 +415,7 @@ TEST(Snapshot, Continuous) {
         component.bar = entity;
     });
 
-    src.snapshot()
+    entt::snapshot{src}
         .entities(output)
         .destroyed(output)
         .component<what_a_component, map_component, a_component, another_component>(output);
@@ -442,7 +443,7 @@ TEST(Snapshot, Continuous) {
     src.destroy(entity);
     loader.shrink();
 
-    src.snapshot()
+    entt::snapshot{src}
         .entities(output)
         .destroyed(output)
         .component<a_component, another_component, what_a_component, map_component>(output);
@@ -473,7 +474,7 @@ TEST(Snapshot, Continuous) {
     dst.clear<a_component>();
     a_component_cnt = src.size<a_component>();
 
-    src.snapshot()
+    entt::snapshot{src}
         .entities(output)
         .destroyed(output)
         .component<a_component, what_a_component, map_component, another_component>(output);
@@ -494,7 +495,7 @@ TEST(Snapshot, Continuous) {
     src.clear<a_component>();
     a_component_cnt = {};
 
-    src.snapshot()
+    entt::snapshot{src}
         .entities(output)
         .destroyed(output)
         .component<what_a_component, map_component, a_component, another_component>(output);
@@ -531,7 +532,7 @@ TEST(Snapshot, MoreOnShrink) {
     input_archive<storage_type> input{storage};
 
     auto entity = src.create();
-    src.snapshot().entities(output);
+    entt::snapshot{src}.entities(output);
     loader.entities(input).shrink();
 
     ASSERT_TRUE(dst.valid(entity));
@@ -579,7 +580,7 @@ TEST(Snapshot, SyncDataMembers) {
         decltype(map_component::both){{{ child, child }}}
     );
 
-    src.snapshot().entities(output).component<what_a_component, map_component>(output);
+    entt::snapshot{src}.entities(output).component<what_a_component, map_component>(output);
 
     loader.entities(input).component<what_a_component, map_component>(
         input,
