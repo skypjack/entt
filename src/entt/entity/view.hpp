@@ -456,56 +456,6 @@ public:
         traverse<Comp>(std::move(func), non_empty_type{});
     }
 
-    /**
-     * @brief Iterates entities and components and applies the given function
-     * object to them.
-     *
-     * The function object is invoked for each entity. It is provided with the
-     * entity itself and a set of references to non-empty components. The
-     * _constness_ of the components is as requested.<br/>
-     * The signature of the function must be equivalent to one of the following
-     * forms:
-     *
-     * @code{.cpp}
-     * void(const entity_type, Type &...);
-     * void(Type &...);
-     * @endcode
-     *
-     * @note
-     * Empty types aren't explicitly instantiated and therefore they are never
-     * returned during iterations.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    [[deprecated("use ::each instead")]]
-    void less(Func func) const {
-        each(std::move(func));
-    }
-
-    /**
-     * @brief Iterates entities and components and applies the given function
-     * object to them.
-     *
-     * The pool of the suggested component is used to lead the iterations. The
-     * returned entities will therefore respect the order of the pool associated
-     * with that type.<br/>
-     * It is no longer guaranteed that the performance is the best possible, but
-     * there will be greater control over the order of iteration.
-     *
-     * @sa less
-     *
-     * @tparam Comp Type of component to use to enforce the iteration order.
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Comp, typename Func>
-    [[deprecated("use ::each instead")]]
-    void less(Func func) const {
-        each<Comp>(std::move(func));
-    }
-
 private:
     const std::tuple<pool_type<Component> *..., pool_type<Exclude> *...> pools;
 };
@@ -766,13 +716,6 @@ public:
                 }
             }
         }
-    }
-
-    /*! @copydoc each */
-    template<typename Func>
-    [[deprecated("use ::each instead")]]
-    void less(Func func) const {
-        each(std::move(func));
     }
 
 private:
