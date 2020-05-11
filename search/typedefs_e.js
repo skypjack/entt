@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['value_5ftype_656',['value_type',['../classentt_1_1basic__hashed__string.html#ad4e8f181e92b9218747ac43fe24c4cbc',1,'entt::basic_hashed_string']]],
-  ['version_5ftype_657',['version_type',['../structentt_1_1entt__traits_3_01std_1_1uint16__t_01_4.html#ab37d10c3be3d59159a63c0bd1e9e2924',1,'entt::entt_traits&lt; std::uint16_t &gt;::version_type()'],['../structentt_1_1entt__traits_3_01std_1_1uint32__t_01_4.html#aee59dc7455ea0be015e699c3e46a22d1',1,'entt::entt_traits&lt; std::uint32_t &gt;::version_type()'],['../structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#aeac4d9172940a9dec0682860ac176725',1,'entt::entt_traits&lt; std::uint64_t &gt;::version_type()'],['../classentt_1_1basic__registry.html#aae2197c81e29459bbe3fa7984656a2b6',1,'entt::basic_registry::version_type()']]],
-  ['view_658',['view',['../namespaceentt.html#af2118c00dea16193aee017d1408beb53',1,'entt']]]
+  ['value_5ftype_689',['value_type',['../classentt_1_1basic__hashed__string.html#ad4e8f181e92b9218747ac43fe24c4cbc',1,'entt::basic_hashed_string']]],
+  ['version_5ftype_690',['version_type',['../structentt_1_1entt__traits_3_01std_1_1uint16__t_01_4.html#ab37d10c3be3d59159a63c0bd1e9e2924',1,'entt::entt_traits&lt; std::uint16_t &gt;::version_type()'],['../structentt_1_1entt__traits_3_01std_1_1uint32__t_01_4.html#aee59dc7455ea0be015e699c3e46a22d1',1,'entt::entt_traits&lt; std::uint32_t &gt;::version_type()'],['../structentt_1_1entt__traits_3_01std_1_1uint64__t_01_4.html#aeac4d9172940a9dec0682860ac176725',1,'entt::entt_traits&lt; std::uint64_t &gt;::version_type()'],['../classentt_1_1basic__registry.html#ae29d4ad92df752c02c11c1b227e823ff',1,'entt::basic_registry::version_type()']]],
+  ['view_691',['view',['../namespaceentt.html#af2118c00dea16193aee017d1408beb53',1,'entt']]]
 ];

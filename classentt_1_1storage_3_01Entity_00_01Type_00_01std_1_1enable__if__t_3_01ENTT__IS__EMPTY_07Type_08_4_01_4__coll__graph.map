@@ -1,0 +1,4 @@
+<map id="entt::storage&lt; Entity, Type, std::enable_if_t&lt; ENTT_IS_EMPTY(Type)&gt; &gt;" name="entt::storage&lt; Entity, Type, std::enable_if_t&lt; ENTT_IS_EMPTY(Type)&gt; &gt;">
+<area shape="rect" id="node1" title="Basic storage implementation." alt="" coords="5,80,224,136"/>
+<area shape="rect" id="node2" href="$classentt_1_1sparse__set.html" title="Basic sparse set implementation." alt="" coords="17,5,212,32"/>
+</map>
