@@ -26,8 +26,9 @@ add the [#entt](https://github.com/topics/entt) tag to your _topics_! :+1:
 
 Do you want to **keep up with changes** or do you have a **question** that
 doesn't require you to open an issue?<br/>
-Join the [gitter channel](https://gitter.im/skypjack/entt) and meet other users
-like you. The more we are, the better for everyone.
+Join the [gitter channel](https://gitter.im/skypjack/entt) or the
+[discord server](https://discord.gg/5BjPWBd) and meet other users like you. The
+more we are, the better for everyone.
 
 Wondering why your **debug build** is so slow on Windows or how to represent a
 **hierarchy** with components?<br/>
