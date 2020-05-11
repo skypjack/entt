@@ -339,34 +339,6 @@ public:
     }
 
     /**
-     * @brief Iterates entities and components and applies the given function
-     * object to them.
-     *
-     * The function object is invoked for each entity. It is provided with the
-     * entity itself and a set of references to non-empty components. The
-     * _constness_ of the components is as requested.<br/>
-     * The signature of the function must be equivalent to one of the following
-     * forms:
-     *
-     * @code{.cpp}
-     * void(const entity_type, Type &...);
-     * void(Type &...);
-     * @endcode
-     *
-     * @note
-     * Empty types aren't explicitly instantiated and therefore they are never
-     * returned during iterations.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    [[deprecated("use ::each instead")]]
-    void less(Func func) const {
-        each(std::move(func));
-    }
-
-    /**
      * @brief Sort a group according to the given comparison function.
      *
      * Sort the group so that iterating it with a couple of iterators returns
@@ -775,34 +747,6 @@ public:
         using owned_type_list = type_list_cat_t<std::conditional_t<ENTT_IS_EMPTY(Owned), type_list<>, type_list<Owned>>...>;
         using get_type_list = type_list_cat_t<std::conditional_t<ENTT_IS_EMPTY(Get), type_list<>, type_list<Get>>...>;
         traverse(std::move(func), owned_type_list{}, get_type_list{});
-    }
-
-    /**
-     * @brief Iterates entities and components and applies the given function
-     * object to them.
-     *
-     * The function object is invoked for each entity. It is provided with the
-     * entity itself and a set of references to non-empty components. The
-     * _constness_ of the components is as requested.<br/>
-     * The signature of the function must be equivalent to one of the following
-     * forms:
-     *
-     * @code{.cpp}
-     * void(const entity_type, Type &...);
-     * void(Type &...);
-     * @endcode
-     *
-     * @note
-     * Empty types aren't explicitly instantiated and therefore they are never
-     * returned during iterations.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    [[deprecated("use ::each instead")]]
-    void less(Func func) const {
-        each(std::move(func));
     }
 
     /**

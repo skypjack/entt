@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <type_traits>
 #include <gtest/gtest.h>
-#include <entt/entity/helper.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/group.hpp>
 
@@ -463,28 +462,28 @@ TEST(NonOwningGroup, TrackEntitiesOnComponentDestruction) {
     ASSERT_FALSE(cgroup.empty());
 }
 
-TEST(NonOwningGroup, Less) {
+TEST(NonOwningGroup, EachWithEmptyTypes) {
     entt::registry registry;
     const auto entity = registry.create();
 
     registry.emplace<int>(entity);
     registry.emplace<char>(entity);
-    registry.emplace<entt::tag<"empty"_hs>>(entity);
+    registry.emplace<empty_type>(entity);
 
-    registry.group(entt::get<int, char, entt::tag<"empty"_hs>>).less([entity](const auto entt, int, char) {
+    registry.group(entt::get<int, char, empty_type>).each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
-    registry.group(entt::get<int, entt::tag<"empty"_hs>, char>).less([check = true](int, char) mutable {
+    registry.group(entt::get<int, empty_type, char>).each([check = true](int, char) mutable {
         ASSERT_TRUE(check);
         check = false;
     });
 
-    registry.group(entt::get<entt::tag<"empty"_hs>, int, char>).less([entity](const auto entt, int, char) {
+    registry.group(entt::get<empty_type, int, char>).each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
-    registry.group(entt::get<int, char, double>).less([](const auto, int, char, double) { FAIL(); });
+    registry.group(entt::get<int, char, double>).each([](const auto, int, char, double) { FAIL(); });
 }
 
 TEST(NonOwningGroup, FrontBack) {
@@ -1058,28 +1057,28 @@ TEST(OwningGroup, TrackEntitiesOnComponentDestruction) {
     ASSERT_FALSE(cgroup.empty());
 }
 
-TEST(OwningGroup, Less) {
+TEST(OwningGroup, EachWithEmptyTypes) {
     entt::registry registry;
     const auto entity = registry.create();
 
     registry.emplace<int>(entity);
     registry.emplace<char>(entity);
-    registry.emplace<entt::tag<"empty"_hs>>(entity);
+    registry.emplace<empty_type>(entity);
 
-    registry.group<int>(entt::get<char, entt::tag<"empty"_hs>>).less([entity](const auto entt, int, char) {
+    registry.group<int>(entt::get<char, empty_type>).each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
-    registry.group<char>(entt::get<entt::tag<"empty"_hs>, int>).less([check = true](int, char) mutable {
+    registry.group<char>(entt::get<empty_type, int>).each([check = true](int, char) mutable {
         ASSERT_TRUE(check);
         check = false;
     });
 
-    registry.group<entt::tag<"empty"_hs>>(entt::get<int, char>).less([entity](const auto entt, int, char) {
+    registry.group<empty_type>(entt::get<int, char>).each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
-    registry.group<double>(entt::get<int, char>).less([](const auto, double, int, char) { FAIL(); });
+    registry.group<double>(entt::get<int, char>).each([](const auto, double, int, char) { FAIL(); });
 }
 
 TEST(OwningGroup, FrontBack) {
