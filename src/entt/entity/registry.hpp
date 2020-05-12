@@ -826,16 +826,15 @@ public:
      *
      * @tparam Component Types of components to remove.
      * @param entity A valid entity identifier.
+     * @return The number of components actually removed.
      */
     template<typename... Component>
-    void remove_if_exists(const entity_type entity) {
+    size_type remove_if_exists(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
 
-        ([this, entity](auto &&cpool) {
-            if(cpool.contains(entity)) {
-                cpool.remove(*this, entity);
-            }
-        }(assure<Component>()), ...);
+        return ([this, entity](auto &&cpool) {
+            return cpool.contains(entity) ? (cpool.remove(*this, entity), true) : false;
+        }(assure<Component>()) + ... + size_type{});
     }
 
     /**

@@ -244,8 +244,8 @@ TEST(Registry, Functionalities) {
 
     registry.emplace<int>(e4);
 
-    ASSERT_NO_THROW(registry.remove_if_exists<int>(e4));
-    ASSERT_NO_THROW(registry.remove_if_exists<int>(e5));
+    ASSERT_EQ(registry.remove_if_exists<int>(e4), 1u);
+    ASSERT_EQ(registry.remove_if_exists<int>(e5), 0u);
 
     ASSERT_EQ(registry.size<int>(), entt::registry::size_type{0});
     ASSERT_EQ(registry.size<char>(), entt::registry::size_type{0});
