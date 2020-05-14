@@ -98,21 +98,18 @@ class basic_registry {
         }
 
         template<typename... Func>
-        decltype(auto) patch(basic_registry &owner, const Entity entt, Func &&... func) {
-            (std::forward<Func>(func)(this->get(entt)), ...);
-            update.publish(owner, entt);
-
-            if constexpr(!ENTT_IS_EMPTY(Component)) {
+        decltype(auto) patch(basic_registry &owner, const Entity entt, [[maybe_unused]] Func &&... func) {
+            if constexpr(ENTT_IS_EMPTY(Component)) {
+                update.publish(owner, entt);
+            } else {
+                (std::forward<Func>(func)(this->get(entt)), ...);
+                update.publish(owner, entt);
                 return this->get(entt);
             }
         }
 
-        decltype(auto) replace(basic_registry &owner, const Entity entt, [[maybe_unused]] Component component) {
-            if constexpr(ENTT_IS_EMPTY(Component)) {
-                return patch(owner, entt);
-            } else {
-                return patch(owner, entt, [&component](auto &&curr) { curr = std::move(component); });
-            }
+        decltype(auto) replace(basic_registry &owner, const Entity entt, Component component) {
+            return patch(owner, entt, [&component](auto &&curr) { curr = std::move(component); });
         }
 
     private:
@@ -186,6 +183,7 @@ class basic_registry {
     template<typename Component>
     const pool_handler<Component> & assure() const {
         static_assert(std::is_same_v<Component, std::decay_t<Component>>);
+        const sparse_set<entity_type> *cpool;
 
         if constexpr(has_type_index_v<Component>) {
             const auto index = type_index<Component>::value();
@@ -202,12 +200,10 @@ class basic_registry {
                 };
             }
 
-            return static_cast<pool_handler<Component> &>(*pools[index].pool);
+            cpool = pools[index].pool.get();
         } else {
-            sparse_set<entity_type> *candidate{nullptr};
-
-            if(auto it = std::find_if(pools.begin(), pools.end(), [id = type_info<Component>::id()](const auto &pdata) { return id == pdata.type_id; }); it == pools.cend()) {
-                candidate = pools.emplace_back(pool_data{
+            if(const auto it = std::find_if(pools.cbegin(), pools.cend(), [id = type_info<Component>::id()](const auto &pdata) { return id == pdata.type_id; }); it == pools.cend()) {
+                cpool = pools.emplace_back(pool_data{
                     type_info<Component>::id(),
                     std::unique_ptr<sparse_set<entity_type>>{new pool_handler<Component>()},
                     [](sparse_set<entity_type> &cpool, basic_registry &owner, const entity_type entt) {
@@ -215,11 +211,11 @@ class basic_registry {
                     }
                 }).pool.get();
             } else {
-                candidate = it->pool.get();
+                cpool = it->pool.get();
             }
-
-            return static_cast<pool_handler<Component> &>(*candidate);
         }
+
+        return *static_cast<const pool_handler<Component> *>(cpool);
     }
 
     template<typename Component>
