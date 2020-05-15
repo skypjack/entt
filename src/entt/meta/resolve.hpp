@@ -21,6 +21,17 @@ inline meta_type resolve() ENTT_NOEXCEPT {
 
 
 /**
+ * @brief Iterates all the reflected types.
+ * @tparam Op Type of the function object to invoke.
+ * @param op A valid function object.
+ */
+template<typename Op>
+void resolve(Op op) {
+    internal::visit<meta_type>(op, *internal::meta_context::global);
+}
+
+
+/**
  * @brief Returns the first meta type that satisfies specific criteria, if any.
  * @tparam Func Type of the unary predicate to use to test the meta types.
  * @param func Unary predicate which returns ​true for the required element.
@@ -51,18 +62,6 @@ inline meta_type resolve_id(const id_type id) ENTT_NOEXCEPT {
  */
 inline meta_type resolve_type(const id_type id) ENTT_NOEXCEPT {
     return resolve_if([id](const auto type) { return type.type_id() == id; });
-}
-
-
-/**
- * @brief Iterates all the reflected types.
- * @tparam Op Type of the function object to invoke.
- * @param op A valid function object.
- */
-template<typename Op>
-inline std::enable_if_t<std::is_invocable_v<Op, meta_type>, void>
-resolve(Op op) {
-    internal::visit<meta_type>(op, *internal::meta_context::global);
 }
 
 
