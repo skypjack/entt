@@ -68,8 +68,17 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     /*! @brief A registry is allowed to create views. */
     friend class basic_registry<Entity>;
 
+    // I could have used std::conditional_t ...
     template<typename Comp>
-    using pool_type = std::conditional_t<std::is_const_v<Comp>, const storage<Entity, std::remove_const_t<Comp>>, storage<Entity, Comp>>;
+    struct pool { using type = storage<Entity, Comp>; };
+
+    // ... if only MSVC didn't have a bug ...
+    template<typename Comp>
+    struct pool<const Comp> { using type = const storage<Entity, std::remove_const_t<Comp>>; };
+
+    // ... that forces me to do the same in a worse way! :(
+    template<typename Comp>
+    using pool_type = typename pool<Comp>::type;
 
     template<typename Comp>
     using component_iterator = decltype(std::declval<pool_type<Comp>>().begin());
