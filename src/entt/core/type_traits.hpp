@@ -221,14 +221,20 @@ using member_class_t = typename member_class<Member>::type;
 }
 
 
-/**
- * @brief Defines an enum class to use for opaque identifiers and a dedicate
- * `to_integer` function to convert the identifiers to their underlying type.
- * @param clazz The name to use for the enum class.
- * @param type The underlying type for the enum class.
- */
 #define ENTT_OPAQUE_TYPE(clazz, type)\
+    /**\
+     * @brief Defines an enum class to use for opaque identifiers and a\
+     * dedicate `to_integer` function to convert the identifiers to their\
+     * underlying type.\
+     * @param clazz The name to use for the enum class.\
+     * @param type The underlying type for the enum class.\
+     */\
     enum class clazz: type {};\
+    /**\
+     * @brief Converts an opaque type value to its underlying type.\
+     * @param id The value to convert.\
+     * @return The integral representation of the given value.
+     */\
     constexpr auto to_integral(const clazz id) ENTT_NOEXCEPT {\
         return static_cast<std::underlying_type_t<clazz>>(id);\
     }\
