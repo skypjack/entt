@@ -149,8 +149,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         underlying_iterator it;
     };
 
-    // we could use pool_type<Component> &..., but vs complains about it and refuses to compile for unknown reasons (likely a bug)
-    basic_view(storage<Entity, std::remove_const_t<Component>> &... component, storage<Entity, std::remove_const_t<Exclude>> &... epool) ENTT_NOEXCEPT
+    basic_view(pool_type<Component> &... component, pool_type<Exclude> &... epool) ENTT_NOEXCEPT
         : pools{&component..., &epool...}
     {}
 

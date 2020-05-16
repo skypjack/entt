@@ -1295,16 +1295,16 @@ public:
      * @return A newly created view.
      */
     template<typename... Component, typename... Exclude>
-    entt::basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) {
+    entt::basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) const {
         static_assert(sizeof...(Component) > 0);
         return { assure<std::decay_t<Component>>()..., assure<Exclude>()... };
     }
 
     /*! @copydoc view */
     template<typename... Component, typename... Exclude>
-    entt::basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) const {
-        static_assert(std::conjunction_v<std::is_const<Component>...>);
-        return const_cast<basic_registry *>(this)->view<Component...>(exclude<Exclude...>);
+    entt::basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) {
+        static_assert(sizeof...(Component) > 0);
+        return { assure<std::decay_t<Component>>()..., assure<Exclude>()... };
     }
 
     /**
