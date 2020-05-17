@@ -158,8 +158,8 @@ public:
      * valid range, even if the container is empty.
      *
      * @note
-     * There are no guarantees on the order of the components. Use `begin` and
-     * `end` if you want to iterate the group in the expected order.
+     * Components are in the reverse order as returned by the `begin`/`end`
+     * iterators.
      *
      * @tparam Component Type of component in which one is interested.
      * @return A pointer to the array of components.
@@ -177,8 +177,8 @@ public:
      * valid range, even if the container is empty.
      *
      * @note
-     * There are no guarantees on the order of the entities. Use `begin` and
-     * `end` if you want to iterate the group in the expected order.
+     * Entities are in the reverse order as returned by the `begin`/`end`
+     * iterators.
      *
      * @tparam Component Type of component in which one is interested.
      * @return A pointer to the array of entities.
@@ -195,8 +195,8 @@ public:
      * always a valid range, even if the container is empty.
      *
      * @note
-     * There are no guarantees on the order of the entities. Use `begin` and
-     * `end` if you want to iterate the group in the expected order.
+     * Entities are in the reverse order as returned by the `begin`/`end`
+     * iterators.
      *
      * @return A pointer to the array of entities.
      */
@@ -373,11 +373,6 @@ public:
      * * An iterator to the first element of the range to sort.
      * * An iterator past the last element of the range to sort.
      * * A comparison function to use to compare the elements.
-     *
-     * @note
-     * Attempting to iterate elements using a raw pointer returned by a call to
-     * either `data` or `raw` gives no guarantees on the order, even though
-     * `sort` has been invoked.
      *
      * @tparam Component Optional types of components to compare.
      * @tparam Compare Type of comparison function object.
@@ -573,8 +568,8 @@ public:
      * the instances that are part of the group itself.
      *
      * @note
-     * There are no guarantees on the order of the components. Use `begin` and
-     * `end` if you want to iterate the group in the expected order.
+     * Components are in the reverse order as returned by the `begin`/`end`
+     * iterators.
      *
      * @tparam Component Type of component in which one is interested.
      * @return A pointer to the array of components.
@@ -595,8 +590,8 @@ public:
      * contains the entities that are part of the group itself.
      *
      * @note
-     * There are no guarantees on the order of the entities. Use `begin` and
-     * `end` if you want to iterate the group in the expected order.
+     * Entities are in the reverse order as returned by the `begin`/`end`
+     * iterators.
      *
      * @tparam Component Type of component in which one is interested.
      * @return A pointer to the array of entities.
@@ -613,8 +608,8 @@ public:
      * always a valid range, even if the container is empty.
      *
      * @note
-     * There are no guarantees on the order of the entities. Use `begin` and
-     * `end` if you want to iterate the group in the expected order.
+     * Entities are in the reverse order as returned by the `begin`/`end`
+     * iterators.
      *
      * @return A pointer to the array of entities.
      */
@@ -802,11 +797,6 @@ public:
      * * An iterator to the first element of the range to sort.
      * * An iterator past the last element of the range to sort.
      * * A comparison function to use to compare the elements.
-     *
-     * @note
-     * Attempting to iterate elements using a raw pointer returned by a call to
-     * either `data` or `raw` gives no guarantees on the order, even though
-     * `sort` has been invoked.
      *
      * @tparam Component Optional types of components to compare.
      * @tparam Compare Type of comparison function object.

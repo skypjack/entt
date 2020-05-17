@@ -360,8 +360,8 @@ public:
      * `[raw<Component>(), raw<Component>() + size<Component>()]` is always a
      * valid range, even if the container is empty.
      *
-     * There are no guarantees on the order of the components. Use a view if you
-     * want to iterate entities and components in the expected order.
+     * Components are in the reverse order as imposed by the sorting
+     * functionalities.
      *
      * @note
      * Empty components aren't explicitly instantiated. Therefore, this function
@@ -388,8 +388,8 @@ public:
      * `[data<Component>(), data<Component>() + size<Component>()]` is always a
      * valid range, even if the container is empty.
      *
-     * There are no guarantees on the order of the entities. Use a view if you
-     * want to iterate entities and components in the expected order.
+     * Entities are in the reverse order as imposed by the sorting
+     * functionalities.
      *
      * @tparam Component Type of component in which one is interested.
      * @return A pointer to the array of entities.

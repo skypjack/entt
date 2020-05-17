@@ -31,10 +31,9 @@ namespace entt {
  * iterators.
  *
  * @note
- * Internal data structures arrange elements to maximize performance. Because of
- * that, there are no guarantees that elements have the expected order when
- * iterate directly the internal packed array (see `raw` and `size` member
- * functions for that). Use `begin` and `end` instead.
+ * Internal data structures arrange elements to maximize performance. There are
+ * no guarantees that objects are returned in the insertion order when iterate
+ * a storage. Do not make assumption on the order in any case.
  *
  * @warning
  * Empty types aren't explicitly instantiated. Therefore, many of the functions
@@ -194,11 +193,8 @@ public:
      * always a valid range, even if the container is empty.
      *
      * @note
-     * There are no guarantees on the order, even though either `sort` or
-     * `respect` has been previously invoked. Internal data structures arrange
-     * elements to maximize performance. Accessing them directly gives a
-     * performance boost but less guarantees. Use `begin` and `end` if you want
-     * to iterate the storage in the expected order.
+     * Objects are in the reverse order as returned by the `begin`/`end`
+     * iterators.
      *
      * @return A pointer to the array of objects.
      */
@@ -433,11 +429,6 @@ public:
      * * An iterator to the first element of the range to sort.
      * * An iterator past the last element of the range to sort.
      * * A comparison function to use to compare the elements.
-     *
-     * @note
-     * Attempting to iterate elements using a raw pointer returned by a call to
-     * either `data` or `raw` gives no guarantees on the order, even though
-     * `sort` has been invoked.
      *
      * @warning
      * Empty types are never instantiated. Therefore, only comparison function

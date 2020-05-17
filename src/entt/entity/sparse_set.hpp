@@ -33,14 +33,9 @@ namespace entt {
  * purpose of the framework.
  *
  * @note
- * There are no guarantees that entities are returned in the insertion order
- * when iterate a sparse set. Do not make assumption on the order in any case.
- *
- * @note
- * Internal data structures arrange elements to maximize performance. Because of
- * that, there are no guarantees that elements have the expected order when
- * iterate directly the internal packed array (see `data` and `size` member
- * functions for that). Use `begin` and `end` instead.
+ * Internal data structures arrange elements to maximize performance. There are
+ * no guarantees that entities are returned in the insertion order when iterate
+ * a sparse set. Do not make assumption on the order in any case.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
@@ -273,11 +268,8 @@ public:
      * always a valid range, even if the container is empty.
      *
      * @note
-     * There are no guarantees on the order, even though `respect` has been
-     * previously invoked. Internal data structures arrange elements to maximize
-     * performance. Accessing them directly gives a performance boost but less
-     * guarantees. Use `begin` and `end` if you want to iterate the sparse set
-     * in the expected order.
+     * Entities are in the reverse order as returned by the `begin`/`end`
+     * iterators.
      *
      * @return A pointer to the internal packed array.
      */
@@ -469,11 +461,6 @@ public:
      * * An iterator past the last element of the range to sort.
      * * A comparison function to use to compare the elements.
      *
-     * @note
-     * Attempting to iterate elements using a raw pointer returned by a call to
-     * `data` gives no guarantees on the order, even though `sort` has been
-     * invoked.
-     *
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
@@ -565,11 +552,6 @@ public:
      * Iterating the sparse set with a couple of iterators returns elements in
      * the expected order after a call to `respect`. See `begin` and `end` for
      * more details.
-     *
-     * @note
-     * Attempting to iterate elements using a raw pointer returned by a call to
-     * `data` gives no guarantees on the order, even though `respect` has been
-     * invoked.
      *
      * @param other The sparse sets that imposes the order of the entities.
      */

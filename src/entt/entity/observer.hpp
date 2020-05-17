@@ -353,8 +353,8 @@ public:
      * always a valid range, even if the container is empty.
      *
      * @note
-     * There are no guarantees on the order of the entities. Use `begin` and
-     * `end` if you want to iterate the observer in the expected order.
+     * Entities are in the reverse order as returned by the `begin`/`end`
+     * iterators.
      *
      * @return A pointer to the array of entities.
      */
