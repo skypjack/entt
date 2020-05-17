@@ -68,11 +68,19 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
     /*! @brief A registry is allowed to create groups. */
     friend class basic_registry<Entity>;
 
+    // I could have used std::conditional_t ...
     template<typename Component>
-    using pool_type = std::conditional_t<std::is_const_v<Component>, const storage<Entity, std::remove_const_t<Component>>, storage<Entity, Component>>;
+    struct pool { using type = storage<Entity, Component>; };
 
-    // we could use pool_type<Type> &..., but vs complains about it and refuses to compile for unknown reasons (most likely a bug)
-    basic_group(sparse_set<Entity> &ref, storage<Entity, std::remove_const_t<Get>> &... gpool) ENTT_NOEXCEPT
+    // ... if only MSVC didn't have a bug ...
+    template<typename Component>
+    struct pool<const Component> { using type = const storage<Entity, std::remove_const_t<Component>>; };
+
+    // ... that forces me to do the same in a worse way! :(
+    template<typename Component>
+    using pool_type = typename pool<Component>::type;
+
+    basic_group(sparse_set<Entity> &ref, pool_type<Get> &... gpool) ENTT_NOEXCEPT
         : handler{&ref},
           pools{&gpool...}
     {}
@@ -473,14 +481,22 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
     /*! @brief A registry is allowed to create groups. */
     friend class basic_registry<Entity>;
 
+    // I could have used std::conditional_t ...
     template<typename Component>
-    using pool_type = std::conditional_t<std::is_const_v<Component>, const storage<Entity, std::remove_const_t<Component>>, storage<Entity, Component>>;
+    struct pool { using type = storage<Entity, Component>; };
+
+    // ... if only MSVC didn't have a bug ...
+    template<typename Component>
+    struct pool<const Component> { using type = const storage<Entity, std::remove_const_t<Component>>; };
+
+    // ... that forces me to do the same in a worse way! :(
+    template<typename Component>
+    using pool_type = typename pool<Component>::type;
 
     template<typename Component>
     using component_iterator = decltype(std::declval<pool_type<Component>>().begin());
 
-    // we could use pool_type<Type> &..., but vs complains about it and refuses to compile for unknown reasons (most likely a bug)
-    basic_group(const std::size_t &ref, const std::size_t &extent, storage<Entity, std::remove_const_t<Owned>> &... opool, storage<Entity, std::remove_const_t<Get>> &... gpool) ENTT_NOEXCEPT
+    basic_group(const std::size_t &ref, const std::size_t &extent, pool_type<Owned> &... opool, pool_type<Get> &... gpool) ENTT_NOEXCEPT
         : pools{&opool..., &gpool...},
           length{&extent},
           super{&ref}
