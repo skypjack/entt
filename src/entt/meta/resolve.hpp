@@ -27,7 +27,7 @@ inline meta_type resolve() ENTT_NOEXCEPT {
  */
 template<typename Op>
 void resolve(Op op) {
-    internal::visit<meta_type>(op, *internal::meta_context::global);
+    internal::visit<meta_type>(op, *internal::meta_context::global());
 }
 
 
@@ -41,7 +41,7 @@ template<typename Func>
 inline meta_type resolve_if(Func func) ENTT_NOEXCEPT {
     return internal::find_if([&func](const auto *curr) {
         return func(meta_type{curr});
-    }, *internal::meta_context::global);
+    }, *internal::meta_context::global());
 }
 
 

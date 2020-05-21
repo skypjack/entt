@@ -393,11 +393,11 @@ public:
     auto type(const id_type id = type_info<Type>::id()) {
         auto * const node = internal::meta_info<Type>::resolve();
 
-        ENTT_ASSERT(!exists(id, *internal::meta_context::global));
-        ENTT_ASSERT(!exists(node, *internal::meta_context::global));
+        ENTT_ASSERT(!exists(id, *internal::meta_context::global()));
+        ENTT_ASSERT(!exists(node, *internal::meta_context::global()));
         node->id = id;
-        node->next = *internal::meta_context::global;
-        *internal::meta_context::global = node;
+        node->next = *internal::meta_context::global();
+        *internal::meta_context::global() = node;
 
         return meta_factory<Type, Type>{&node->prop};
     }

@@ -1879,7 +1879,7 @@ TEST_F(Meta, PropertiesAndCornerCases) {
 }
 
 TEST_F(Meta, Reset) {
-    ASSERT_NE(*entt::internal::meta_context::global, nullptr);
+    ASSERT_NE(*entt::internal::meta_context::global(), nullptr);
 
     entt::meta<char>().reset();
     entt::meta<concrete_type>().reset();
@@ -1909,7 +1909,7 @@ TEST_F(Meta, Reset) {
     ASSERT_FALSE(entt::resolve_id("another_abstract_type"_hs));
     ASSERT_FALSE(entt::resolve_id("concrete"_hs));
 
-    ASSERT_EQ(*entt::internal::meta_context::global, nullptr);
+    ASSERT_EQ(*entt::internal::meta_context::global(), nullptr);
 
     Meta::SetUpAfterUnregistration();
     entt::meta_any any{42.};
