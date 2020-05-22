@@ -372,7 +372,7 @@ the messages that are still pending are sent to the listeners at once:
 
 ```cpp
 // emits all the events of the given type at once
-dispatcher.update<my_event>();
+dispatcher.update<an_event>();
 
 // emits all the events queued so far at once
 dispatcher.update();

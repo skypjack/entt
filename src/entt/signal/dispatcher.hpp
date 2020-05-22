@@ -66,7 +66,11 @@ class dispatcher {
 
         template<typename... Args>
         void enqueue(Args &&... args) {
-            events.emplace_back(std::forward<Args>(args)...);
+            if constexpr(std::is_aggregate_v<Event>) {
+                events.push_back(Event{std::forward<Args>(args)...});
+            } else {
+                events.emplace_back(std::forward<Args>(args)...);
+            }
         }
 
         id_type type_id() const ENTT_NOEXCEPT override {
