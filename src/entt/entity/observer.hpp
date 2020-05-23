@@ -257,7 +257,7 @@ class basic_observer {
 
     template<typename... Matcher, std::size_t... Index>
     void connect(basic_registry<Entity> &reg, std::index_sequence<Index...>) {
-        static_assert(sizeof...(Matcher) < std::numeric_limits<payload_type>::digits);
+        static_assert(sizeof...(Matcher) < std::numeric_limits<payload_type>::digits, "Too many matchers");
         (matcher_handler<Matcher>::template connect<Index>(*this, reg), ...);
         release = &basic_observer::disconnect<Matcher...>;
     }
@@ -408,8 +408,6 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        static_assert(std::is_invocable_v<Func, entity_type>);
-
         for(const auto entity: *this) {
             func(entity);
         }

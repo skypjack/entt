@@ -126,7 +126,7 @@ class emitter {
 
     template<typename Event>
     const pool_handler<Event> & assure() const {
-        static_assert(std::is_same_v<Event, std::decay_t<Event>>);
+        static_assert(std::is_same_v<Event, std::decay_t<Event>>, "Invalid event type");
 
         if constexpr(has_type_index_v<Event>) {
             const auto index = type_index<Event>::value();
@@ -187,7 +187,7 @@ public:
 
     /*! @brief Default destructor. */
     virtual ~emitter() {
-        static_assert(std::is_base_of_v<emitter<Derived>, Derived>);
+        static_assert(std::is_base_of_v<emitter<Derived>, Derived>, "Incorrect use of the class template");
     }
 
     /*! @brief Default move constructor. */

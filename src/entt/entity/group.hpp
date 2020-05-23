@@ -385,7 +385,7 @@ public:
     template<typename... Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
         if constexpr(sizeof...(Component) == 0) {
-            static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>);
+            static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
             handler->sort(handler->begin(), handler->end(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
         }  else if constexpr(sizeof...(Component) == 1) {
             handler->sort(handler->begin(), handler->end(), [this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
@@ -812,7 +812,7 @@ public:
         auto *cpool = std::get<0>(pools);
 
         if constexpr(sizeof...(Component) == 0) {
-            static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>);
+            static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
             cpool->sort(cpool->end()-*length, cpool->end(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else if constexpr(sizeof...(Component) == 1) {
             cpool->sort(cpool->end()-*length, cpool->end(), [this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {

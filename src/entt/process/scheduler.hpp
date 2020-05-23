@@ -63,7 +63,7 @@ class scheduler {
 
         template<typename Proc, typename... Args>
         continuation then(Args &&... args) {
-            static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>);
+            static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
             auto proc = typename process_handler::instance_type{new Proc{std::forward<Args>(args)...}, &scheduler::deleter<Proc>};
             handler->next.reset(new process_handler{std::move(proc), &scheduler::update<Proc>, &scheduler::abort<Proc>, nullptr});
             handler = handler->next.get();
@@ -175,7 +175,7 @@ public:
      */
     template<typename Proc, typename... Args>
     auto attach(Args &&... args) {
-        static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>);
+        static_assert(std::is_base_of_v<process<Proc, Delta>, Proc>, "Invalid process type");
         auto proc = typename process_handler::instance_type{new Proc{std::forward<Args>(args)...}, &scheduler::deleter<Proc>};
         process_handler handler{std::move(proc), &scheduler::update<Proc>, &scheduler::abort<Proc>, nullptr};
         // forces the process to exit the uninitialized state

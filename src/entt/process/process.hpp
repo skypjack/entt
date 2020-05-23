@@ -169,7 +169,7 @@ public:
 
     /*! @brief Default destructor. */
     virtual ~process() {
-        static_assert(std::is_base_of_v<process, Derived>);
+        static_assert(std::is_base_of_v<process, Derived>, "Incorrect use of the class template");
     }
 
     /**

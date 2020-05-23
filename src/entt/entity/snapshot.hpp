@@ -336,7 +336,7 @@ class basic_continuous_loader {
             } else if constexpr(std::is_same_v<first_type, entity_type>) {
                 other.emplace(map(pair.first), std::move(pair.second));
             } else {
-                static_assert(std::is_same_v<second_type, entity_type>);
+                static_assert(std::is_same_v<second_type, entity_type>, "Neither the key nor the value are of entity type");
                 other.emplace(std::move(pair.first), map(pair.second));
             }
         }
@@ -348,7 +348,7 @@ class basic_continuous_loader {
     auto update(char, Container &container)
     -> decltype(typename Container::value_type{}, void()) {
         // vector like container
-        static_assert(std::is_same_v<typename Container::value_type, entity_type>);
+        static_assert(std::is_same_v<typename Container::value_type, entity_type>, "Invalid value type");
 
         for(auto &&entt: container) {
             entt = map(entt);

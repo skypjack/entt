@@ -46,8 +46,7 @@ namespace entt {
  */
 template<typename Entity, typename Type, typename = std::void_t<>>
 class storage: public sparse_set<Entity> {
-    static_assert(std::is_move_constructible_v<Type>);
-    static_assert(std::is_move_assignable_v<Type>);
+    static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "The managed type must be at least move constructible and assignable");
 
     using underlying_type = sparse_set<Entity>;
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;

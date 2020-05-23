@@ -96,7 +96,7 @@ bool setter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any index,
         if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
             using helper_type = meta_function_helper_t<decltype(Data)>;
             using data_type = std::tuple_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>;
-            static_assert(std::is_invocable_v<decltype(Data), Type &, data_type>);
+            static_assert(std::is_invocable_v<decltype(Data), Type &, data_type>, "Invalid function or member function");
             auto * const clazz = instance.try_cast<Type>();
             auto * const direct = value.try_cast<data_type>();
 
@@ -106,7 +106,7 @@ bool setter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any index,
             }
         } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
-            static_assert(std::is_invocable_v<decltype(Data), Type *>);
+            static_assert(std::is_invocable_v<decltype(Data), Type *>, "Invalid data member");
             auto * const clazz = instance.try_cast<Type>();
 
             if constexpr(std::is_array_v<data_type>) {
@@ -127,7 +127,7 @@ bool setter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any index,
                 }
             }
         } else {
-            static_assert(std::is_pointer_v<decltype(Data)>);
+            static_assert(std::is_pointer_v<decltype(Data)>, "Invalid pointer to data type");
             using data_type = std::remove_cv_t<std::remove_reference_t<decltype(*Data)>>;
 
             if constexpr(std::is_array_v<data_type>) {
@@ -162,18 +162,18 @@ meta_any getter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any in
         } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
             return meta_any{std::ref(std::forward<decltype(value)>(value))};
         } else {
-            static_assert(std::is_same_v<Policy, as_is_t>);
+            static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
             return meta_any{std::forward<decltype(value)>(value)};
         }
     };
 
     if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
-        static_assert(std::is_invocable_v<decltype(Data), Type &>);
+        static_assert(std::is_invocable_v<decltype(Data), Type &>, "Invalid function or member function");
         auto * const clazz = instance.try_cast<Type>();
         return clazz ? dispatch(std::invoke(Data, *clazz)) : meta_any{};
     } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
         using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
-        static_assert(std::is_invocable_v<decltype(Data), Type *>);
+        static_assert(std::is_invocable_v<decltype(Data), Type *>, "Invalid data member");
         auto * const clazz = instance.try_cast<Type>();
 
         if constexpr(std::is_array_v<data_type>) {
@@ -183,7 +183,7 @@ meta_any getter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any in
             return clazz ? dispatch(std::invoke(Data, clazz)) : meta_any{};
         }
     } else {
-        static_assert(std::is_pointer_v<std::decay_t<decltype(Data)>>);
+        static_assert(std::is_pointer_v<std::decay_t<decltype(Data)>>, "Invalid pointer to data type");
 
         if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
             auto * const idx = index.try_cast<std::size_t>();
@@ -206,7 +206,7 @@ meta_any invoke([[maybe_unused]] meta_any instance, meta_any *args, std::index_s
         } else if constexpr(std::is_same_v<Policy, as_ref_t>) {
             return meta_any{std::ref(std::invoke(Candidate, *params...))};
         } else {
-            static_assert(std::is_same_v<Policy, as_is_t>);
+            static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
             return meta_any{std::invoke(Candidate, *params...)};
         }
     };
@@ -402,7 +402,6 @@ public:
         return meta_factory<Type, Type>{&node->prop};
     }
 
-    /*! @copydoc type */
     /**
      * @brief Assigns a meta base to a meta type.
      *
@@ -413,7 +412,7 @@ public:
      */
     template<typename Base>
     auto base() ENTT_NOEXCEPT {
-        static_assert(std::is_base_of_v<Base, Type>);
+        static_assert(std::is_base_of_v<Base, Type>, "Invalid base type");
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_base_node node{
@@ -443,7 +442,7 @@ public:
      */
     template<typename To>
     auto conv() ENTT_NOEXCEPT {
-        static_assert(std::is_convertible_v<Type, To>);
+        static_assert(std::is_convertible_v<Type, To>, "Could not convert to the required type");
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_conv_node node{
@@ -511,7 +510,7 @@ public:
     template<auto Func, typename Policy = as_is_t>
     auto ctor() ENTT_NOEXCEPT {
         using helper_type = internal::meta_function_helper_t<decltype(Func)>;
-        static_assert(std::is_same_v<typename helper_type::return_type, Type>);
+        static_assert(std::is_same_v<typename helper_type::return_type, Type>, "The function doesn't return an object of the required type");
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_ctor_node node{
@@ -583,7 +582,7 @@ public:
      */
     template<auto Func>
     auto dtor() ENTT_NOEXCEPT {
-        static_assert(std::is_invocable_v<decltype(Func), Type &>);
+        static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_dtor_node node{
@@ -620,7 +619,7 @@ public:
         internal::meta_data_node *curr = nullptr;
 
         if constexpr(std::is_same_v<Type, decltype(Data)>) {
-            static_assert(std::is_same_v<Policy, as_is_t>);
+            static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
 
             static internal::meta_data_node node{
                 {},
@@ -652,7 +651,6 @@ public:
 
             curr = &node;
         } else {
-            static_assert(std::is_pointer_v<std::decay_t<decltype(Data)>>);
             using data_type = std::remove_pointer_t<std::decay_t<decltype(Data)>>;
 
             static internal::meta_data_node node{
@@ -702,7 +700,7 @@ public:
     template<auto Setter, auto Getter, typename Policy = as_is_t>
     auto data(const id_type id) ENTT_NOEXCEPT {
         using underlying_type = std::invoke_result_t<decltype(Getter), Type &>;
-        static_assert(std::is_invocable_v<decltype(Setter), Type &, underlying_type>);
+        static_assert(std::is_invocable_v<decltype(Setter), Type &, underlying_type>, "Invalid setter and/or getter");
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_data_node node{

@@ -45,7 +45,7 @@ class basic_registry {
 
     template<typename Component>
     struct pool_handler final: storage<Entity, Component> {
-        static_assert(std::is_same_v<Component, std::decay_t<Component>>);
+        static_assert(std::is_same_v<Component, std::decay_t<Component>>, "Invalid component type");
         std::size_t super{};
 
         auto on_construct() ENTT_NOEXCEPT {
@@ -129,12 +129,11 @@ class basic_registry {
 
     template<typename... Exclude, typename... Get, typename... Owned>
     struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
-        static_assert(std::conjunction_v<std::is_same<Owned, std::decay_t<Owned>>..., std::is_same<Get, std::decay_t<Get>>..., std::is_same<Exclude, std::decay_t<Exclude>>...>);
+        static_assert(std::conjunction_v<std::is_same<Owned, std::decay_t<Owned>>..., std::is_same<Get, std::decay_t<Get>>..., std::is_same<Exclude, std::decay_t<Exclude>>...>, "One or more component types are invalid");
         std::conditional_t<sizeof...(Owned) == 0, sparse_set<Entity>, std::size_t> current{};
 
         template<typename Component>
         void maybe_valid_if(basic_registry &owner, const Entity entt) {
-            static_assert(std::disjunction_v<std::is_same<Owned, std::decay_t<Owned>>..., std::is_same<Get, std::decay_t<Get>>..., std::is_same<Exclude, std::decay_t<Exclude>>...>);
             [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...);
 
             const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<pool_handler<Owned> &>(cpools).contains(entt)) && ...)
@@ -182,7 +181,6 @@ class basic_registry {
 
     template<typename Component>
     const pool_handler<Component> & assure() const {
-        static_assert(std::is_same_v<Component, std::decay_t<Component>>);
         const sparse_set<entity_type> *cpool;
 
         if constexpr(has_type_index_v<Component>) {
@@ -674,7 +672,7 @@ public:
      */
     template<typename Component, typename EIt, typename CIt>
     void insert(EIt first, EIt last, CIt from, CIt to) {
-        static_assert(std::is_constructible_v<Component, typename std::iterator_traits<CIt>::value_type>);
+        static_assert(std::is_constructible_v<Component, typename std::iterator_traits<CIt>::value_type>, "Invalid value type");
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
         assure<Component>().insert(*this, first, last, from, to);
     }
@@ -1035,8 +1033,6 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        static_assert(std::is_invocable_v<Func, entity_type>);
-
         if(destroyed == null) {
             for(auto pos = entities.size(); pos; --pos) {
                 func(entities[pos-1]);
@@ -1078,8 +1074,6 @@ public:
      */
     template<typename Func>
     void orphans(Func func) const {
-        static_assert(std::is_invocable_v<Func, entity_type>);
-
         each([this, &func](const auto entity) {
             if(orphan(entity)) {
                 func(entity);
@@ -1296,14 +1290,14 @@ public:
      */
     template<typename... Component, typename... Exclude>
     entt::basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) const {
-        static_assert(sizeof...(Component) > 0);
+        static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
         return { assure<std::decay_t<Component>>()..., assure<Exclude>()... };
     }
 
     /*! @copydoc view */
     template<typename... Component, typename... Exclude>
     entt::basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) {
-        static_assert(sizeof...(Component) > 0);
+        static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
         return { assure<std::decay_t<Component>>()..., assure<Exclude>()... };
     }
 
@@ -1347,8 +1341,8 @@ public:
      */
     template<typename... Owned, typename... Get, typename... Exclude>
     entt::basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) {
-        static_assert(sizeof...(Owned) + sizeof...(Get) > 0);
-        static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1);
+        static_assert(sizeof...(Owned) + sizeof...(Get) > 0, "Exclusion-only views are not supported");
+        static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1, "Single component groups are not allowed");
 
         using handler_type = group_handler<exclude_t<Exclude...>, get_t<std::decay_t<Get>...>, std::decay_t<Owned>...>;
 
@@ -1443,7 +1437,7 @@ public:
      */
     template<typename... Owned, typename... Get, typename... Exclude>
     entt::basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) const {
-        static_assert(std::conjunction_v<std::is_const<Owned>..., std::is_const<Get>...>);
+        static_assert(std::conjunction_v<std::is_const<Owned>..., std::is_const<Get>...>, "Invalid non-const type");
         return const_cast<basic_registry *>(this)->group<Owned...>(entt::get<Get...>, exclude<Exclude...>);
     }
 
@@ -1472,7 +1466,7 @@ public:
      */
     template<typename... Owned, typename... Exclude>
     entt::basic_group<Entity, exclude_t<Exclude...>, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) const {
-        static_assert(std::conjunction_v<std::is_const<Owned>...>);
+        static_assert(std::conjunction_v<std::is_const<Owned>...>, "Invalid non-const type");
         return const_cast<basic_registry *>(this)->group<Owned...>(exclude<Exclude...>);
     }
 

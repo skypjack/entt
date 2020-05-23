@@ -405,7 +405,7 @@ public:
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Comp) == 0) {
-            static_assert(sizeof...(Component) == 1);
+            static_assert(sizeof...(Component) == 1, "Invalid component type");
             return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
         } else if constexpr(sizeof...(Comp) == 1) {
             return (std::get<pool_type<Comp> *>(pools)->get(entt), ...);
@@ -672,7 +672,7 @@ public:
      */
     template<typename Comp = Component>
     decltype(auto) get(const entity_type entt) const {
-        static_assert(std::is_same_v<Comp, Component>);
+        static_assert(std::is_same_v<Comp, Component>, "Invalid component type");
         ENTT_ASSERT(contains(entt));
         return pool->get(entt);
     }

@@ -92,7 +92,7 @@ struct cache {
      */
     template<typename Loader, typename... Args>
     entt::handle<Resource> load(const id_type id, Args &&... args) {
-        static_assert(std::is_base_of_v<loader<Loader, Resource>, Loader>);
+        static_assert(std::is_base_of_v<loader<Loader, Resource>, Loader>, "Invalid loader type");
         entt::handle<Resource> resource{};
 
         if(auto it = resources.find(id); it == resources.cend()) {

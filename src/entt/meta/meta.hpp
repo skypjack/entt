@@ -222,7 +222,7 @@ struct ENTT_API meta_context {
 
 template<typename Type>
 struct ENTT_API meta_node {
-    static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>);
+    static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
 
     static meta_type_node * resolve() ENTT_NOEXCEPT {
         static meta_type_node node{
@@ -670,7 +670,7 @@ struct meta_handle {
         if constexpr(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>) {
             any = *value;
         } else {
-            static_assert(std::is_lvalue_reference_v<Type>);
+            static_assert(std::is_lvalue_reference_v<Type>, "Lvalue reference required");
             any = std::ref(value);
         }
     }

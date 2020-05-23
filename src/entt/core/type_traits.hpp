@@ -193,7 +193,7 @@ inline constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::v
  */
 template<typename Member>
 class member_class {
-    static_assert(std::is_member_pointer_v<Member>);
+    static_assert(std::is_member_pointer_v<Member>, "Invalid pointer type to non-static member object or function");
 
     template<typename Class, typename Ret, typename... Args>
     static Class * clazz(Ret(Class:: *)(Args...));

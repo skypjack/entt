@@ -122,7 +122,7 @@ as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>
  */
 template<auto Member, typename Entity = entity>
 void invoke(basic_registry<Entity> &reg, const Entity entt) {
-    static_assert(std::is_member_function_pointer_v<decltype(Member)>);
+    static_assert(std::is_member_function_pointer_v<decltype(Member)>, "Invalid pointer to non-static member function");
     delegate<void(basic_registry<Entity> &, const Entity)> func;
     func.template connect<Member>(reg.template get<member_class_t<decltype(Member)>>(entt));
     func(reg, entt);
