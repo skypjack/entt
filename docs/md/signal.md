@@ -7,6 +7,8 @@
 
 * [Introduction](#introduction)
 * [Delegate](#delegate)
+  * [Runtime arguments](#runtime-arguments)
+  * [Lambda support](#lambda-support)
 * [Signals](#signals)
 * [Event dispatcher](#event-dispatcher)
 * [Event emitter](#event-emitter)
@@ -63,7 +65,7 @@ As an example of use:
 int f(int i) { return i; }
 
 struct my_struct {
-    int f(const int &i) { return i }
+    int f(const int &i) const { return i; }
 };
 
 // bind a free function to the delegate
@@ -142,10 +144,10 @@ delegate. As long as a listener can be invoked with the given arguments to yield
 a result that is convertible to the given result type, everything works just
 fine.
 
-As a side note, note that members of a class may or may not be associated with
-instances. If they are not, the first argument of the function type must be that
-of the class on which the members operate and an instance of this class must
-obviously be passed when invoking the delegate:
+As a side note, members of classes may or may not be associated with instances.
+If they are not, the first argument of the function type must be that of the
+class on which the members operate and an instance of this class must obviously
+be passed when invoking the delegate:
 
 ```
 entt::delegate<void(my_struct &, int)> delegate;
@@ -159,6 +161,79 @@ In this case, it's not possible to deduce the function type since the first
 argument doesn't necessarily have to be a reference (for example, it can be a
 pointer, as well as a const reference).<br/>
 Therefore, the function type must be declared explicitly for unbound members.
+
+## Runtime arguments
+
+The `delegate` class is meant to be used primarily with template arguments.
+However, as a consequence of its design, it can also offer minimal support for
+runtime arguments.<br/>
+When used in this modality, some feature aren't supported though. In particular:
+
+* Curried functions aren't accepted.
+* Functions with an argument list that differs from that of the delegate aren't
+  supported.
+* Return type and types of arguments **must** coincide with those of the
+  delegate and _being at least convertible_ isn't enough anymore.
+
+Moreover, for a given function type `Ret(Args...)`, the signature of the
+functions connected at runtime must necessarily be `Ret(const void *, Args...)`.
+
+Runtime arguments can be passed both to the constructor of a delegate and to the
+`connect` member function. An optional parameter is also accepted in both cases.
+This argument is used to pass arbitrary user data back and forth as a
+`const void *` upon invocation.<br/>
+To connect a function to a delegate _in the hard way_:
+
+```cpp
+int func(const void *ptr, int i) { return *static_cast<const int *>(ptr) * i; }
+const int value = 42;
+
+// use the constructor ...
+entt::delegate delegate{&func, &value};
+
+// ... or the connect member function
+delegate.connect(&func, &value);
+```
+
+The type of the delegate is deduced from the function if possible. In this case,
+since the first argument is an implementation detail, the deduced function type
+is `int(int)`.<br/>
+Invoking a delegate built in this way follows the same rules as previously
+explained.
+
+## Lambda support
+
+In general, the `delegate` class doesn't fully support lambda functions in all
+their nuances. The reason is pretty simple: a `delegate` isn't a drop-in
+replacement for an `std::function`. Instead, it tries to overcome the problems
+with the latter.<br/>
+That being said, non-capturing lambda functions are supported, even though some
+feature aren't available in this case.
+
+This is a logical consequence of the support for connecting functions at
+runtime. Therefore, lambda functions undergo the same rules and
+limitations.<br/>
+In fact, since non-capturing lambda functions decay to pointers to functions,
+they can be used with a `delegate` as if they were _normal functions_ with
+optional payload:
+
+```cpp
+my_struct instance;
+
+// use the constructor ...
+entt::delegate delegate{+[](const void *ptr, int value) {
+    return static_cast<const my_struct *>(ptr)->f(value);
+}, &instance};
+
+// ... or the connect member function
+delegate.connect([](const void *ptr, int value) {
+    return static_cast<const my_struct *>(ptr)->f(value);
+}, &instance);
+```
+
+As above, the first parameter (`const void *`) isn't part of the function type
+of the delegate and is used to dispatch arbitrary user data back and forth. In
+other terms, the function type of the delegate above is `int(int)`.
 
 # Signals
 

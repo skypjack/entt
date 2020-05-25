@@ -95,8 +95,6 @@ class delegate;
  */
 template<typename Ret, typename... Args>
 class delegate<Ret(Args...)> {
-    using proto_fn_type = Ret(const void *, Args...);
-
     template<auto Candidate, std::size_t... Index>
     auto wrap(std::index_sequence<Index...>) ENTT_NOEXCEPT {
         return [](const void *, Args... args) -> Ret {
@@ -124,8 +122,12 @@ class delegate<Ret(Args...)> {
     }
 
 public:
+    /*! @brief Function type of the expected target. */
+    using target_type = Ret(const void *, Args...);
     /*! @brief Function type of the delegate. */
     using function_type = Ret(Args...);
+    /*! @brief Return type of the delegate. */
+    using result_type = Ret;
 
     /*! @brief Default constructor. */
     delegate() ENTT_NOEXCEPT
@@ -159,6 +161,18 @@ public:
     }
 
     /**
+     * @brief Constructs a delegate and connects an user defined function with
+     * optional payload.
+     * @param function Function to connect to the delegate.
+     * @param payload User defined arbitrary data.
+     */
+    delegate(target_type *function, const void *payload = nullptr) ENTT_NOEXCEPT
+        : delegate{}
+    {
+        connect(function, payload);
+    }
+
+    /**
      * @brief Connects a free function or an unbound member to a delegate.
      * @tparam Candidate Function or member to connect to the delegate.
      */
@@ -183,7 +197,7 @@ public:
      *
      * The delegate isn't responsible for the connected object or the payload.
      * Users must always guarantee that the lifetime of the instance overcomes
-     * the one  of the delegate.<br/>
+     * the one of the delegate.<br/>
      * When used to connect a free function with payload, its signature must be
      * such that the instance is the first argument before the ones used to
      * define the delegate itself.
@@ -228,6 +242,24 @@ public:
         } else {
             fn = wrap<Candidate>(value_or_instance, internal::index_sequence_for(internal::function_pointer_t<decltype(Candidate), Type>{}));
         }
+    }
+
+    /**
+     * @brief Connects an user defined function with optional payload to a
+     * delegate.
+     *
+     * The delegate isn't responsible for the connected object or the payload.
+     * Users must always guarantee that the lifetime of an instance overcomes
+     * the one of the delegate.<br/>
+     * The payload is returned as the first argument to the target function in
+     * all cases.
+     *
+     * @param function Function to connect to the delegate.
+     * @param payload User defined arbitrary data.
+     */
+    void connect(target_type *function, const void *payload = nullptr) ENTT_NOEXCEPT {
+        fn = function;
+        data = payload;
     }
 
     /**
@@ -286,7 +318,7 @@ public:
     }
 
 private:
-    proto_fn_type *fn;
+    target_type *fn;
     const void *data;
 };
 
@@ -322,6 +354,12 @@ delegate(connect_arg_t<Candidate>) ENTT_NOEXCEPT
 template<auto Candidate, typename Type>
 delegate(connect_arg_t<Candidate>, Type &&) ENTT_NOEXCEPT
 -> delegate<std::remove_pointer_t<internal::function_pointer_t<decltype(Candidate), Type>>>;
+
+
+/*! @brief Deduction guide. */
+template<typename Ret, typename... Args>
+delegate(Ret(*)(const void *, Args...), const void * = nullptr) ENTT_NOEXCEPT
+-> delegate<Ret(Args...)>;
 
 
 }

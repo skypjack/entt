@@ -48,6 +48,7 @@ struct const_nonconst_noexcept {
 TEST(Delegate, Functionalities) {
     entt::delegate<int(int)> ff_del;
     entt::delegate<int(int)> mf_del;
+    entt::delegate<int(int)> lf_del;
     delegate_functor functor;
 
     ASSERT_FALSE(ff_del);
@@ -56,30 +57,43 @@ TEST(Delegate, Functionalities) {
 
     ff_del.connect<&delegate_function>();
     mf_del.connect<&delegate_functor::operator()>(functor);
+    lf_del.connect([](const void *ptr, int value) {
+        return static_cast<const delegate_functor *>(ptr)->identity(value);
+    });
 
     ASSERT_TRUE(ff_del);
     ASSERT_TRUE(mf_del);
+    ASSERT_TRUE(lf_del);
 
     ASSERT_EQ(ff_del(3), 9);
     ASSERT_EQ(mf_del(3), 6);
+    ASSERT_EQ(lf_del(3), 3);
 
     ff_del.reset();
 
     ASSERT_FALSE(ff_del);
-    ASSERT_TRUE(mf_del);
 
     ASSERT_EQ(ff_del, entt::delegate<int(int)>{});
     ASSERT_NE(mf_del, entt::delegate<int(int)>{});
+    ASSERT_NE(lf_del, entt::delegate<int(int)>{});
+
     ASSERT_NE(ff_del, mf_del);
+    ASSERT_NE(ff_del, lf_del);
+    ASSERT_NE(mf_del, lf_del);
 
     mf_del.reset();
 
     ASSERT_FALSE(ff_del);
     ASSERT_FALSE(mf_del);
+    ASSERT_TRUE(lf_del);
 
     ASSERT_EQ(ff_del, entt::delegate<int(int)>{});
     ASSERT_EQ(mf_del, entt::delegate<int(int)>{});
+    ASSERT_NE(lf_del, entt::delegate<int(int)>{});
+
     ASSERT_EQ(ff_del, mf_del);
+    ASSERT_NE(ff_del, lf_del);
+    ASSERT_NE(mf_del, lf_del);
 }
 
 TEST(Delegate, DataMembers) {
@@ -167,6 +181,20 @@ TEST(Delegate, Comparison) {
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
 
+    lhs.connect([](const void *ptr, int value) { return static_cast<const delegate_functor *>(ptr)->identity(value); }, &functor);
+
+    ASSERT_NE(lhs, (entt::delegate<int(int)>{[](const void *ptr, int value) { return static_cast<const delegate_functor *>(ptr)->identity(value); }, &functor}));
+    ASSERT_TRUE(lhs != rhs);
+    ASSERT_FALSE(lhs == rhs);
+    ASSERT_NE(lhs, rhs);
+
+    rhs.connect([](const void *ptr, int value) { return static_cast<const delegate_functor *>(ptr)->identity(value); }, &functor);
+
+    ASSERT_NE(rhs, (entt::delegate<int(int)>{[](const void *ptr, int value) { return static_cast<const delegate_functor *>(ptr)->identity(value); }, &functor}));
+    ASSERT_TRUE(lhs != rhs);
+    ASSERT_FALSE(lhs == rhs);
+    ASSERT_NE(lhs, rhs);
+
     lhs.reset();
 
     ASSERT_EQ(lhs, (entt::delegate<int(int)>{}));
@@ -219,6 +247,7 @@ TEST(Delegate, DeductionGuide) {
     entt::delegate data_member_u{entt::connect_arg<&const_nonconst_noexcept::u>, functor};
     entt::delegate data_member_v{entt::connect_arg<&const_nonconst_noexcept::v>, &functor};
     entt::delegate data_member_v_const{entt::connect_arg<&const_nonconst_noexcept::v>, &std::as_const(functor)};
+    entt::delegate lambda{+[](const void *, int) { return 0; }};
 
     static_assert(std::is_same_v<typename decltype(func)::function_type, int(const int &)>);
     static_assert(std::is_same_v<typename decltype(curried_func_with_ref)::function_type, int(int)>);
@@ -234,6 +263,7 @@ TEST(Delegate, DeductionGuide) {
     static_assert(std::is_same_v<typename decltype(data_member_u)::function_type, int()>);
     static_assert(std::is_same_v<typename decltype(data_member_v)::function_type, const int()>);
     static_assert(std::is_same_v<typename decltype(data_member_v_const)::function_type, const int()>);
+    static_assert(std::is_same_v<typename decltype(lambda)::function_type, int(int)>);
 
     ASSERT_TRUE(func);
     ASSERT_TRUE(curried_func_with_ref);
@@ -249,6 +279,7 @@ TEST(Delegate, DeductionGuide) {
     ASSERT_TRUE(data_member_u);
     ASSERT_TRUE(data_member_v);
     ASSERT_TRUE(data_member_v_const);
+    ASSERT_TRUE(lambda);
 }
 
 TEST(Delegate, ConstInstance) {
