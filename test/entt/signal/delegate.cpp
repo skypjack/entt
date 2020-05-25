@@ -181,16 +181,16 @@ TEST(Delegate, Comparison) {
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
 
-    lhs.connect([](const void *ptr, int value) { return static_cast<const delegate_functor *>(ptr)->identity(value); }, &functor);
+    lhs.connect([](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->identity(val); }, &functor);
 
-    ASSERT_NE(lhs, (entt::delegate<int(int)>{[](const void *ptr, int value) { return static_cast<const delegate_functor *>(ptr)->identity(value); }, &functor}));
+    ASSERT_NE(lhs, (entt::delegate<int(int)>{[](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->identity(val); }, &functor}));
     ASSERT_TRUE(lhs != rhs);
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
 
-    rhs.connect([](const void *ptr, int value) { return static_cast<const delegate_functor *>(ptr)->identity(value); }, &functor);
+    rhs.connect([](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->identity(val); }, &functor);
 
-    ASSERT_NE(rhs, (entt::delegate<int(int)>{[](const void *ptr, int value) { return static_cast<const delegate_functor *>(ptr)->identity(value); }, &functor}));
+    ASSERT_NE(rhs, (entt::delegate<int(int)>{[](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->identity(val); }, &functor}));
     ASSERT_TRUE(lhs != rhs);
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
