@@ -182,15 +182,15 @@ meta_any getter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any in
         } else {
             return clazz ? dispatch(std::invoke(Data, clazz)) : meta_any{};
         }
-    } else {
-        static_assert(std::is_pointer_v<std::decay_t<decltype(Data)>>, "Invalid pointer to data type");
-
+    } else if constexpr(std::is_pointer_v<std::decay_t<decltype(Data)>>) {
         if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
             auto * const idx = index.try_cast<std::size_t>();
             return idx ? dispatch((*Data)[*idx]) : meta_any{};
         } else {
             return dispatch(*Data);
         }
+    } else {
+        return dispatch(Data);
     }
 }
 
@@ -619,8 +619,6 @@ public:
         internal::meta_data_node *curr = nullptr;
 
         if constexpr(std::is_same_v<Type, decltype(Data)>) {
-            static_assert(std::is_same_v<Policy, as_is_t>, "Policy not supported");
-
             static internal::meta_data_node node{
                 {},
                 type,
@@ -629,8 +627,8 @@ public:
                 true,
                 true,
                 &internal::meta_info<Type>::resolve,
-                [](meta_any, meta_any, meta_any) { return false; },
-                [](meta_any, meta_any) -> meta_any { return Data; }
+                &internal::setter<true, Type, Data>,
+                &internal::getter<Type, Data, Policy>
             };
 
             curr = &node;
