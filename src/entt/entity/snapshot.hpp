@@ -184,7 +184,7 @@ class basic_snapshot_loader {
                 archive(entt, instance);
                 const auto entity = reg->valid(entt) ? entt : reg->create(entt);
                 ENTT_ASSERT(entity == entt);
-                reg->template emplace<Type>(args..., entt, std::as_const(instance));
+                reg->template emplace<Type>(args..., entt, std::move(instance));
             }
         }
     }
@@ -395,7 +395,7 @@ class basic_continuous_loader {
                 archive(entt, instance);
                 (update(instance, member), ...);
                 restore(entt);
-                reg->template emplace_or_replace<Other>(map(entt), std::as_const(instance));
+                reg->template emplace_or_replace<Other>(map(entt), std::move(instance));
             }
         }
     }
