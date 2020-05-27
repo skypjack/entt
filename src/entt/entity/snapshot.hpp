@@ -166,25 +166,28 @@ class basic_snapshot_loader {
 
     using traits_type = entt_traits<std::underlying_type_t<Entity>>;
 
-    template<typename Type, typename Archive, typename... Args>
-    void assign(Archive &archive, Args... args) const {
+    template<typename Type, typename Archive>
+    void assign(Archive &archive) const {
         typename traits_type::entity_type length{};
         archive(length);
 
-        while(length--) {
-            entity_type entt{};
+        entity_type entt{};
 
-            if constexpr(std::is_empty_v<Type>) {
+        if constexpr(std::is_empty_v<Type>) {
+            while(length--) {
                 archive(entt);
                 const auto entity = reg->valid(entt) ? entt : reg->create(entt);
                 ENTT_ASSERT(entity == entt);
-                reg->template emplace<Type>(args..., entt);
-            } else {
-                Type instance{};
+                reg->template emplace<Type>(entity);
+            }
+        } else {
+            Type instance{};
+
+            while(length--) {
                 archive(entt, instance);
                 const auto entity = reg->valid(entt) ? entt : reg->create(entt);
                 ENTT_ASSERT(entity == entt);
-                reg->template emplace<Type>(args..., entt, std::as_const(instance));
+                reg->template emplace<Type>(entity, std::move(instance));
             }
         }
     }
@@ -383,19 +386,22 @@ class basic_continuous_loader {
         typename traits_type::entity_type length{};
         archive(length);
 
-        while(length--) {
-            entity_type entt{};
+        entity_type entt{};
 
-            if constexpr(std::is_empty_v<Other>) {
+        if constexpr(std::is_empty_v<Other>) {
+            while(length--) {
                 archive(entt);
                 restore(entt);
                 reg->template emplace_or_replace<Other>(map(entt));
-            } else {
-                Other instance{};
+            }
+        } else {
+            Other instance{};
+
+            while(length--) {
                 archive(entt, instance);
                 (update(instance, member), ...);
                 restore(entt);
-                reg->template emplace_or_replace<Other>(map(entt), std::as_const(instance));
+                reg->template emplace_or_replace<Other>(map(entt), std::move(instance));
             }
         }
     }

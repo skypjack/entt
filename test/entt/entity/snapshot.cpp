@@ -8,6 +8,19 @@
 #include <entt/entity/snapshot.hpp>
 #include <entt/entity/entity.hpp>
 
+struct noncopyable_component {
+    noncopyable_component(): value{} {}
+    explicit noncopyable_component(int v): value{v} {}
+
+    noncopyable_component(const noncopyable_component &) = delete;
+    noncopyable_component(noncopyable_component &&) = default;
+
+    noncopyable_component& operator=(const noncopyable_component &) = delete;
+    noncopyable_component& operator=(noncopyable_component &&) = default;
+
+    int value;
+};
+
 template<typename Storage>
 struct output_archive {
     output_archive(Storage &instance)
@@ -17,6 +30,10 @@ struct output_archive {
     template<typename... Value>
     void operator()(const Value &... value) {
         (std::get<std::queue<Value>>(storage).push(value), ...);
+    }
+
+    void operator()(const entt::entity &entity, const noncopyable_component &instance) {
+        (*this)(entity, instance.value);
     }
 
 private:
@@ -38,6 +55,10 @@ struct input_archive {
         };
 
         (assign(value), ...);
+    }
+
+    void operator()(entt::entity &entity, noncopyable_component &instance) {
+        (*this)(entity, instance.value);
     }
 
 private:
@@ -207,6 +228,7 @@ TEST(Snapshot, Iterator) {
     for(auto i = 0; i < 50; ++i) {
         const auto entity = registry.create();
         registry.emplace<another_component>(entity, i, i);
+        registry.emplace<noncopyable_component>(entity, i);
 
         if(i % 2) {
             registry.emplace<a_component>(entity);
@@ -216,7 +238,8 @@ TEST(Snapshot, Iterator) {
     using storage_type = std::tuple<
         std::queue<typename traits_type::entity_type>,
         std::queue<entt::entity>,
-        std::queue<another_component>
+        std::queue<another_component>,
+        std::queue<int>
     >;
 
     storage_type storage;
@@ -226,9 +249,9 @@ TEST(Snapshot, Iterator) {
     const auto view = registry.view<a_component>();
     const auto size = view.size();
 
-    entt::snapshot{registry}.component<another_component>(output, view.begin(), view.end());
+    entt::snapshot{registry}.component<another_component, noncopyable_component>(output, view.begin(), view.end());
     registry.clear();
-    entt::snapshot_loader{registry}.component<another_component>(input);
+    entt::snapshot_loader{registry}.component<another_component, noncopyable_component>(input);
 
     ASSERT_EQ(registry.view<another_component>().size(), size);
 
@@ -254,6 +277,7 @@ TEST(Snapshot, Continuous) {
         std::queue<another_component>,
         std::queue<what_a_component>,
         std::queue<map_component>,
+        std::queue<int>,
         std::queue<double>
     >;
 
@@ -273,6 +297,7 @@ TEST(Snapshot, Continuous) {
 
         src.emplace<a_component>(entity);
         src.emplace<another_component>(entity, i, i);
+        src.emplace<noncopyable_component>(entity, i);
 
         if(i % 2) {
             src.emplace<what_a_component>(entity, entity);
@@ -296,11 +321,12 @@ TEST(Snapshot, Continuous) {
     entity = dst.create();
     dst.emplace<a_component>(entity);
     dst.emplace<another_component>(entity, -1, -1);
+    dst.emplace<noncopyable_component>(entity, -1);
 
-    entt::snapshot{src}.entities(output).component<a_component, another_component, what_a_component, map_component>(output);
+    entt::snapshot{src}.entities(output).component<a_component, another_component, what_a_component, map_component, noncopyable_component>(output);
 
     loader.entities(input)
-        .component<a_component, another_component, what_a_component, map_component>(
+        .component<a_component, another_component, what_a_component, map_component, noncopyable_component>(
             input,
             &what_a_component::bar,
             &what_a_component::quux,
@@ -313,6 +339,7 @@ TEST(Snapshot, Continuous) {
     decltype(dst.size()) another_component_cnt{};
     decltype(dst.size()) what_a_component_cnt{};
     decltype(dst.size()) map_component_cnt{};
+    decltype(dst.size()) noncopyable_component_cnt{};
 
     dst.each([&dst, &a_component_cnt](auto entt) {
         ASSERT_TRUE(dst.has<a_component>(entt));
@@ -351,6 +378,11 @@ TEST(Snapshot, Continuous) {
         ++map_component_cnt;
     });
 
+    dst.view<noncopyable_component>().each([&dst, &noncopyable_component_cnt](auto, const auto &component) {
+        ++noncopyable_component_cnt;
+        ASSERT_EQ(component.value, (dst.size<noncopyable_component>() - noncopyable_component_cnt - 1));
+    });
+
     src.view<another_component>().each([](auto, auto &component) {
         component.value = 2 * component.key;
     });
@@ -375,6 +407,7 @@ TEST(Snapshot, Continuous) {
     ASSERT_EQ(dst.size<another_component>(), another_component_cnt);
     ASSERT_EQ(dst.size<what_a_component>(), what_a_component_cnt);
     ASSERT_EQ(dst.size<map_component>(), map_component_cnt);
+    ASSERT_EQ(dst.size<noncopyable_component>(), noncopyable_component_cnt);
 
     dst.view<another_component>().each([](auto, auto &component) {
         ASSERT_EQ(component.value, component.key < 0 ? -1 : (2 * component.key));
