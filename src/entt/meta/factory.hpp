@@ -705,7 +705,6 @@ public:
     template<auto Setter, auto Getter, typename Policy = as_is_t>
     auto data(const id_type id) ENTT_NOEXCEPT {
         using underlying_type = std::invoke_result_t<decltype(Getter), Type &>;
-        static_assert(std::is_invocable_v<decltype(Setter), Type &, underlying_type>, "Invalid setter and/or getter");
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_data_node node{
@@ -715,7 +714,14 @@ public:
             nullptr,
             false,
             &internal::meta_info<underlying_type>::resolve,
-            &internal::setter<Type, Setter>,
+            []() -> decltype(internal::meta_data_node::set) {
+                if constexpr(Setter == nullptr) {
+                    return Setter;
+                } else {
+                    static_assert(std::is_invocable_v<decltype(Setter), Type &, underlying_type>, "Invalid setter");
+                    return &internal::setter<Type, Setter>;
+                }
+            }(),
             &internal::getter<Type, Getter, Policy>
         };
 

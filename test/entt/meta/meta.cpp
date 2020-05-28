@@ -241,7 +241,9 @@ struct Meta: ::testing::Test {
                 .data<&setter_getter_type::static_setter, &setter_getter_type::static_getter>("x"_hs)
                 .data<&setter_getter_type::setter, &setter_getter_type::getter>("y"_hs)
                 .data<&setter_getter_type::static_setter, &setter_getter_type::getter>("z"_hs)
-                .data<&setter_getter_type::setter_with_ref, &setter_getter_type::getter_with_ref>("w"_hs);
+                .data<&setter_getter_type::setter_with_ref, &setter_getter_type::getter_with_ref>("w"_hs)
+                .data<nullptr, &setter_getter_type::getter>("z_ro"_hs)
+                .data<nullptr, &setter_getter_type::value>("value"_hs);
 
         entt::meta<an_abstract_type>()
                 .type("an_abstract_type"_hs)
@@ -1255,6 +1257,36 @@ TEST_F(Meta, MetaDataSetterGetterMixed) {
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
     ASSERT_TRUE(data.set(instance, 42));
     ASSERT_EQ(data.get(instance).cast<int>(), 42);
+}
+
+TEST_F(Meta, MetaDataSetterGetterReadOnly) {
+    auto data = entt::resolve<setter_getter_type>().data("z_ro"_hs);
+    setter_getter_type instance{};
+
+    ASSERT_TRUE(data);
+    ASSERT_EQ(data.parent(), entt::resolve_id("setter_getter"_hs));
+    ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.id(), "z_ro"_hs);
+    ASSERT_TRUE(data.is_const());
+    ASSERT_FALSE(data.is_static());
+    ASSERT_EQ(data.get(instance).cast<int>(), 0);
+    ASSERT_FALSE(data.set(instance, 42));
+    ASSERT_EQ(data.get(instance).cast<int>(), 0);
+}
+
+TEST_F(Meta, MetaDataSetterGetterReadOnlyDataMember) {
+    auto data = entt::resolve<setter_getter_type>().data("value"_hs);
+    setter_getter_type instance{};
+
+    ASSERT_TRUE(data);
+    ASSERT_EQ(data.parent(), entt::resolve_id("setter_getter"_hs));
+    ASSERT_EQ(data.type(), entt::resolve<int>());
+    ASSERT_EQ(data.id(), "value"_hs);
+    ASSERT_TRUE(data.is_const());
+    ASSERT_FALSE(data.is_static());
+    ASSERT_EQ(data.get(instance).cast<int>(), 0);
+    ASSERT_FALSE(data.set(instance, 42));
+    ASSERT_EQ(data.get(instance).cast<int>(), 0);
 }
 
 TEST_F(Meta, MetaDataArrayStatic) {
