@@ -76,7 +76,6 @@ struct meta_data_node {
     meta_type_node * const parent;
     meta_data_node * next;
     meta_prop_node * prop;
-    const bool is_const;
     const bool is_static;
     meta_type_node *(* const type)() ENTT_NOEXCEPT;
     bool(* const set)(meta_any, meta_any, meta_any);
@@ -912,7 +911,7 @@ struct meta_data {
      * @return True if the meta data is constant, false otherwise.
      */
     bool is_const() const ENTT_NOEXCEPT {
-        return node->is_const;
+        return (node->set == nullptr);
     }
 
     /**
@@ -942,7 +941,7 @@ struct meta_data {
      */
     template<typename Type>
     bool set(meta_handle instance, Type &&value) const {
-        return node->set(*instance, {}, std::forward<Type>(value));
+        return node->set && node->set(*instance, {}, std::forward<Type>(value));
     }
 
     /**
@@ -963,7 +962,7 @@ struct meta_data {
     template<typename Type>
     bool set(meta_handle instance, std::size_t index, Type &&value) const {
         ENTT_ASSERT(index < node->type()->extent);
-        return node->set(*instance, index, std::forward<Type>(value));
+        return node->set && node->set(*instance, index, std::forward<Type>(value));
     }
 
     /**
