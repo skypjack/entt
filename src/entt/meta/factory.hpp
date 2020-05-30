@@ -613,34 +613,21 @@ public:
      */
     template<auto Data, typename Policy = as_is_t>
     auto data(const id_type id) ENTT_NOEXCEPT {
-        auto * const type = internal::meta_info<Type>::resolve();
-        internal::meta_data_node *curr = nullptr;
+        if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
+            return data<Data, Data, Policy>(id);
+        } else {
+            using data_type = std::remove_pointer_t<std::decay_t<decltype(Data)>>;
+            auto * const type = internal::meta_info<Type>::resolve();
 
-        if constexpr(std::is_same_v<Type, decltype(Data)>) {
             static internal::meta_data_node node{
                 {},
                 type,
                 nullptr,
                 nullptr,
                 true,
-                &internal::meta_info<Type>::resolve,
-                nullptr,
-                &internal::getter<Type, Data, Policy>
-            };
-
-            curr = &node;
-        } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
-            using data_type = std::remove_reference_t<decltype(std::declval<Type>().*Data)>;
-
-            static internal::meta_data_node node{
-                {},
-                type,
-                nullptr,
-                nullptr,
-                !std::is_member_object_pointer_v<decltype(Data)>,
                 &internal::meta_info<data_type>::resolve,
                 []() -> decltype(internal::meta_data_node::set) {
-                    if constexpr(std::is_const_v<data_type>) {
+                    if constexpr(std::is_same_v<Type, data_type> || std::is_const_v<data_type>) {
                         return nullptr;
                     } else {
                         return &internal::setter<Type, Data>;
@@ -649,37 +636,14 @@ public:
                 &internal::getter<Type, Data, Policy>
             };
 
-            curr = &node;
-        } else {
-            using data_type = std::remove_pointer_t<std::decay_t<decltype(Data)>>;
+            ENTT_ASSERT(!exists(id, type->data));
+            ENTT_ASSERT(!exists(&node, type->data));
+            node.id = id;
+            node.next = type->data;
+            type->data = &node;
 
-            static internal::meta_data_node node{
-                {},
-                type,
-                nullptr,
-                nullptr,
-                !std::is_member_object_pointer_v<decltype(Data)>,
-                &internal::meta_info<data_type>::resolve,
-                []() -> decltype(internal::meta_data_node::set) {
-                    if constexpr(std::is_const_v<data_type>) {
-                        return nullptr;
-                    } else {
-                        return &internal::setter<Type, Data>;
-                    }
-                }(),
-                &internal::getter<Type, Data, Policy>
-            };
-
-            curr = &node;
+            return meta_factory<Type, std::integral_constant<decltype(Data), Data>>{&node.prop};
         }
-
-        ENTT_ASSERT(!exists(id, type->data));
-        ENTT_ASSERT(!exists(curr, type->data));
-        curr->id = id;
-        curr->next = type->data;
-        type->data = curr;
-
-        return meta_factory<Type, std::integral_constant<decltype(Data), Data>>{&curr->prop};
     }
 
     /**
@@ -704,7 +668,7 @@ public:
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
     auto data(const id_type id) ENTT_NOEXCEPT {
-        using underlying_type = std::invoke_result_t<decltype(Getter), Type &>;
+        using underlying_type = std::remove_reference_t<std::invoke_result_t<decltype(Getter), Type &>>;
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_data_node node{
@@ -715,10 +679,9 @@ public:
             false,
             &internal::meta_info<underlying_type>::resolve,
             []() -> decltype(internal::meta_data_node::set) {
-                if constexpr(Setter == nullptr) {
-                    return Setter;
+                if constexpr(Setter == nullptr || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>)) {
+                    return nullptr;
                 } else {
-                    static_assert(std::is_invocable_v<decltype(Setter), Type &, underlying_type>, "Invalid setter");
                     return &internal::setter<Type, Setter>;
                 }
             }(),
