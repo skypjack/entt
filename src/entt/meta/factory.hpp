@@ -679,7 +679,7 @@ public:
             false,
             &internal::meta_info<underlying_type>::resolve,
             []() -> decltype(internal::meta_data_node::set) {
-                if constexpr(Setter == nullptr || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>)) {
+                if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t>  || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>)) {
                     return nullptr;
                 } else {
                     return &internal::setter<Type, Setter>;
