@@ -133,9 +133,15 @@ a decorated version of it. This object can be used to add the following:
   This function requires as an argument the identifier to give to the meta data
   once created. Users can then access meta data at runtime by searching for them
   by _name_.<br/>
-  Data members can be set also by means of a couple of functions, namely a
-  setter and a getter. Setters and getters can be either free functions, member
-  functions or mixed ones, as long as they respect the required signatures.<br/>
+  Data members can also be defined by means of a _setter_ and _getter_. Setters
+  and getters can be either free functions, class members or a mix of them, as
+  long as they respect the required signatures. This approach is also convenient
+  to create a read-only variable from a non-const data member:
+
+  ```cpp
+  entt::meta<my_type>().data<nullptr, &my_type::data_member>("member"_hs);
+  ```
+
   Refer to the inline documentation for all the details.
 
 * _Member functions_. Both real member functions of the underlying type and free
