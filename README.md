@@ -338,11 +338,11 @@ Note that benchmarks are not part of this set.
   package can be found by `build2`:
 
   * [`cppget.org`](https://cppget.org), the open-source community central
-    repository, accessible as https://pkg.cppget.org/1/stable
+    repository, accessible as `https://pkg.cppget.org/1/stable`.
 
   * [Package source repository](https://github.com/build2-packaging/entt):
-    accessible as either https://github.com/build2-packaging/entt.git or
-    ssh://git@github.com/build2-packaging/entt.git
+    accessible as either `https://github.com/build2-packaging/entt.git` or
+    `ssh://git@github.com/build2-packaging/entt.git`.
     Feel free to [report issues](https://github.com/build2-packaging/entt) with
     this package.
 
