@@ -122,10 +122,10 @@ class delegate<Ret(Args...)> {
     }
 
 public:
-    /*! @brief Function type of the expected target. */
-    using target_type = Ret(const void *, Args...);
+    /*! @brief Function type of the contained target. */
+    using function_type = Ret(const void *, Args...);
     /*! @brief Function type of the delegate. */
-    using function_type = Ret(Args...);
+    using type = Ret(Args...);
     /*! @brief Return type of the delegate. */
     using result_type = Ret;
 
@@ -166,7 +166,7 @@ public:
      * @param function Function to connect to the delegate.
      * @param payload User defined arbitrary data.
      */
-    delegate(target_type *function, const void *payload = nullptr) ENTT_NOEXCEPT
+    delegate(function_type *function, const void *payload = nullptr) ENTT_NOEXCEPT
         : delegate{}
     {
         connect(function, payload);
@@ -257,7 +257,7 @@ public:
      * @param function Function to connect to the delegate.
      * @param payload User defined arbitrary data.
      */
-    void connect(target_type *function, const void *payload = nullptr) ENTT_NOEXCEPT {
+    void connect(function_type *function, const void *payload = nullptr) ENTT_NOEXCEPT {
         fn = function;
         data = payload;
     }
@@ -318,7 +318,7 @@ public:
     }
 
 private:
-    target_type *fn;
+    function_type *fn;
     const void *data;
 };
 

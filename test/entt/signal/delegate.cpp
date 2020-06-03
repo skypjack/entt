@@ -249,21 +249,21 @@ TEST(Delegate, DeductionGuide) {
     entt::delegate data_member_v_const{entt::connect_arg<&const_nonconst_noexcept::v>, &std::as_const(functor)};
     entt::delegate lambda{+[](const void *, int) { return 0; }};
 
-    static_assert(std::is_same_v<typename decltype(func)::function_type, int(const int &)>);
-    static_assert(std::is_same_v<typename decltype(curried_func_with_ref)::function_type, int(int)>);
-    static_assert(std::is_same_v<typename decltype(curried_func_with_const_ref)::function_type, int(int)>);
-    static_assert(std::is_same_v<typename decltype(curried_func_with_ptr)::function_type, int(int)>);
-    static_assert(std::is_same_v<typename decltype(curried_func_with_const_ptr)::function_type, int(int)>);
-    static_assert(std::is_same_v<typename decltype(member_func_f)::function_type, void()>);
-    static_assert(std::is_same_v<typename decltype(member_func_g)::function_type, void()>);
-    static_assert(std::is_same_v<typename decltype(member_func_h)::function_type, void()>);
-    static_assert(std::is_same_v<typename decltype(member_func_h_const)::function_type, void()>);
-    static_assert(std::is_same_v<typename decltype(member_func_i)::function_type, void()>);
-    static_assert(std::is_same_v<typename decltype(member_func_i_const)::function_type, void()>);
-    static_assert(std::is_same_v<typename decltype(data_member_u)::function_type, int()>);
-    static_assert(std::is_same_v<typename decltype(data_member_v)::function_type, const int()>);
-    static_assert(std::is_same_v<typename decltype(data_member_v_const)::function_type, const int()>);
-    static_assert(std::is_same_v<typename decltype(lambda)::function_type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(func)::type, int(const int &)>);
+    static_assert(std::is_same_v<typename decltype(curried_func_with_ref)::type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(curried_func_with_const_ref)::type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(curried_func_with_ptr)::type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(curried_func_with_const_ptr)::type, int(int)>);
+    static_assert(std::is_same_v<typename decltype(member_func_f)::type, void()>);
+    static_assert(std::is_same_v<typename decltype(member_func_g)::type, void()>);
+    static_assert(std::is_same_v<typename decltype(member_func_h)::type, void()>);
+    static_assert(std::is_same_v<typename decltype(member_func_h_const)::type, void()>);
+    static_assert(std::is_same_v<typename decltype(member_func_i)::type, void()>);
+    static_assert(std::is_same_v<typename decltype(member_func_i_const)::type, void()>);
+    static_assert(std::is_same_v<typename decltype(data_member_u)::type, int()>);
+    static_assert(std::is_same_v<typename decltype(data_member_v)::type, const int()>);
+    static_assert(std::is_same_v<typename decltype(data_member_v_const)::type, const int()>);
+    static_assert(std::is_same_v<typename decltype(lambda)::type, int(int)>);
 
     ASSERT_TRUE(func);
     ASSERT_TRUE(curried_func_with_ref);
