@@ -55,6 +55,8 @@ function(SETUP_TARGET TARGET_NAME)
             $<$<AND:$<CONFIG:Debug>,$<PLATFORM_ID:Windows>>:/Od>
             $<$<AND:$<CONFIG:Release>,$<PLATFORM_ID:Windows>>:/O2>
     )
+
+    target_compile_definitions(${TARGET_NAME} PRIVATE ENTT_STANDALONE)
 endfunction()
 
 add_library(odr OBJECT odr.cpp)
@@ -65,7 +67,6 @@ function(SETUP_BASIC_TEST TEST_NAME TEST_SOURCES)
     target_link_libraries(${TEST_NAME} PRIVATE GTest::Main Threads::Threads)
     SETUP_TARGET(${TEST_NAME})
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
-    target_compile_definitions(${TEST_NAME} PRIVATE ENTT_STANDALONE)
 endfunction()
 
 function(SETUP_LIB_TEST TEST_NAME)
