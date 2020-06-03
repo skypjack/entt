@@ -198,8 +198,9 @@ library or that will never be.
 ## Type info
 
 This class template isn't a drop-in replacement for `std::type_info` but can
-provide similar information which are not implementation defined at least.
-Therefore, they can sometimes be even more reliable than those obtained otherwise.
+provide similar information which are not implementation defined at least.<br/>
+Therefore, they can sometimes be even more reliable than those obtained
+otherwise.
 
 Currently, the only information available is the numeric identifier associated
 with a given type:
@@ -212,11 +213,11 @@ In general, the `id` function is also `constexpr` but this isn't guaranteed for
 all compilers and platforms (although it's valid with the most well-known and
 popular ones).<br/>
 This function **can** use non-standard features of the language for its own
-purposes. This allows it to provide compile-time identifiers that remain stable
-across different runs. However, it's possible to force the use of standard
-features only by defining the macro `ENTT_STANDARD_CPP`. In this case, there is
-no guarantee that the identifiers are stable across executions though. Moreover,
-identifiers are generated at runtime and are no longer a compile-time thing.
+purposes. This makes it possible to provide compile-time identifiers that remain
+stable across different runs. In all cases, users can prevent the library from
+using these features by means of the `ENTT_STANDARD_CPP` definition. In this
+case, there is no guarantee that identifiers remain stable across executions.
+Moreover, they are generated at runtime and are no longer a compile-time thing.
 
 An external type system can also be used if needed. In fact, `type_info` can be
 specialized by type and is also _sfinae-friendly_ in order to allow more refined
@@ -303,10 +304,8 @@ struct entt::type_index<Type, std::void_d<decltype(Type::index())>> {
 ```
 
 Note that indexes **must** still be generated sequentially in this case.<br/>
-The tool is widely used within `EnTT`. It also plays a very important role in
-making `EnTT` work nicely across boundaries in many cases. Generating indices
-not sequentially would break an assumption and would likely lead to undesired
-behaviors.
+The tool is widely used within `EnTT`. Generating indices not sequentially would
+break an assumption and would likely lead to undesired behaviors.
 
 ## Type traits
 

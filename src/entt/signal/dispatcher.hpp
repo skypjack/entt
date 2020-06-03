@@ -86,7 +86,7 @@ class dispatcher {
     pool_handler<Event> & assure() {
         static_assert(std::is_same_v<Event, std::decay_t<Event>>, "Invalid event type");
 
-        if constexpr(has_type_index_v<Event>) {
+        if constexpr(ENTT_FAST_PATH(has_type_index_v<Event>)) {
             const auto index = type_index<Event>::value();
 
             if(!(index < pools.size())) {

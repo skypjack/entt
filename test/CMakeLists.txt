@@ -65,6 +65,7 @@ function(SETUP_BASIC_TEST TEST_NAME TEST_SOURCES)
     target_link_libraries(${TEST_NAME} PRIVATE GTest::Main Threads::Threads)
     SETUP_TARGET(${TEST_NAME})
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+    target_compile_definitions(${TEST_NAME} PRIVATE ENTT_STANDALONE)
 endfunction()
 
 function(SETUP_LIB_TEST TEST_NAME)

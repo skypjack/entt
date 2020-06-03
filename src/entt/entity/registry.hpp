@@ -183,7 +183,7 @@ class basic_registry {
     const pool_handler<Component> & assure() const {
         const sparse_set<entity_type> *cpool;
 
-        if constexpr(has_type_index_v<Component>) {
+        if constexpr(ENTT_FAST_PATH(has_type_index_v<Component>)) {
             const auto index = type_index<Component>::value();
 
             if(!(index < pools.size())) {

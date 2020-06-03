@@ -7,6 +7,7 @@
 
 * [Introduction](#introduction)
 * [Definitions](#definitions)
+  * [ENTT_STANDALONE](#entt_standalone)
   * [ENTT_NOEXCEPT](#entt_noexcept)
   * [ENTT_HS_SUFFIX and ENTT_HWS_SUFFIX](#entt_hs_suffix_and_entt_hws_suffix)
   * [ENTT_USE_ATOMIC](#entt_use_atomic)
@@ -36,6 +37,14 @@ within the compilation units, if preferred).<br/>
 Each parameter can result in internal library definitions. It's not recommended
 to try to also modify these definitions, since there is no guarantee that they
 will remain stable over time unlike the options below.
+
+## ENTT_STANDALONE
+
+`EnTT` is designed in such a way that it works (almost) everywhere out of the
+box. However, this is the result of many refinements over time and a compromise
+regarding some optimizations.<br/>
+It's worth noting that users can get a small performance boost by passing this
+definition to the compiler when the library is used in a standalone application.
 
 ## ENTT_NOEXCEPT
 
@@ -96,5 +105,5 @@ dedicated storage for them.
 After many adventures, `EnTT` finally works fine across boundaries.<br/>
 To do this, the library mixes some non-standard language features with others
 that are perfectly compliant.<br/>
-This definition will make the library use only standard techniques, that is,
-functionalities that are fully compliant with the standard C++.
+This definition will prevent the library from using non-standard techniques,
+that is, functionalities that aren't fully compliant with the standard C++.
