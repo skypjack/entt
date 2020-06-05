@@ -198,26 +198,59 @@ library or that will never be.
 ## Type info
 
 This class template isn't a drop-in replacement for `std::type_info` but can
-provide similar information which are not implementation defined at least.<br/>
+provide similar information which are not implementation defined and don't
+require to enable RTTI.<br/>
 Therefore, they can sometimes be even more reliable than those obtained
 otherwise.
 
-Currently, the only information available is the numeric identifier associated
-with a given type:
+Currently, there are a couple of information available:
 
-```cpp
-auto id = entt::type_info<my_type>::id();
-```
+* The numeric identifier associated with a given type:
 
-In general, the `id` function is also `constexpr` but this isn't guaranteed for
-all compilers and platforms (although it's valid with the most well-known and
-popular ones).<br/>
-This function **can** use non-standard features of the language for its own
-purposes. This makes it possible to provide compile-time identifiers that remain
-stable across different runs. In all cases, users can prevent the library from
-using these features by means of the `ENTT_STANDARD_CPP` definition. In this
-case, there is no guarantee that identifiers remain stable across executions.
-Moreover, they are generated at runtime and are no longer a compile-time thing.
+  ```cpp
+  auto id = entt::type_info<my_type>::id();
+  ```
+
+  In general, the `id` function is also `constexpr` but this isn't guaranteed
+  for all compilers and platforms (although it's valid with the most well-known
+  and popular ones).
+
+  This function **can** use non-standard features of the language for its own
+  purposes. This makes it possible to provide compile-time identifiers that
+  remain stable across different runs.<br/>
+  In all cases, users can prevent the library from using these features by means
+  of the `ENTT_STANDARD_CPP` definition. In this case, there is no guarantee
+  that identifiers remain stable across executions. Moreover, they are generated
+  at runtime and are no longer a compile-time thing.
+
+* The _name_ associated with a given type:
+
+  ```cpp
+  auto name = entt::type_info<my_type>::name();
+  ```
+
+  The name associated with a type is extracted from some information generally
+  made available by the compiler in use. Therefore, it may differ depending on
+  the compiler and may be empty in the event that this information isn't
+  available.<br/>
+  For example, given the following class:
+
+  ```cpp
+  struct my_type { /* ... */ };
+  ```
+
+  The name is `my_type` when compiled with GCC or CLang and `struct my_type`
+  when MSVC is in use.<br/>
+  Most of the time the name is also retrieved at compile-time and is therefore
+  always returned through an `std::string_view`. Users can easily access it and
+  modify it as needed, for example by removing the word `struct` to standardize
+  the result. `EnTT` won't do this for obvious reasons, since it requires
+  copying and creating a new string potentially at runtime.
+
+  This function **can** use non-standard features of the language for its own
+  purposes. As for the numeric identifier, users can prevent the library from
+  using non-standard features by means of the `ENTT_STANDARD_CPP` definition. In
+  this case, the name will be empty by default.
 
 An external type system can also be used if needed. In fact, `type_info` can be
 specialized by type and is also _sfinae-friendly_ in order to allow more refined
@@ -225,9 +258,13 @@ specializations such as:
 
 ```cpp
 template<typename Type>
-struct entt::type_info<Type, std::void_d<decltype(Type::custom_id())>> {
+struct entt::type_info<Type, std::enable_if_t<has_custom_data_v<Type>>> {
     static constexpr entt::id_type id() ENTT_NOEXCEPT {
         return Type::custom_id();
+    }
+
+    static constexpr std::string_view name() ENTT_NOEXCEPT {
+        return Type::custom_name();
     }
 };
 ```
