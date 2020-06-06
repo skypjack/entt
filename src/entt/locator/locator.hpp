@@ -35,7 +35,7 @@ struct service_locator {
      * @brief Tests if a valid service implementation is set.
      * @return True if the service is set, false otherwise.
      */
-    static bool empty() ENTT_NOEXCEPT {
+    [[nodiscard]] static bool empty() ENTT_NOEXCEPT {
         return !static_cast<bool>(service);
     }
 
@@ -49,7 +49,7 @@ struct service_locator {
      *
      * @return A reference to the service implementation currently set, if any.
      */
-    static std::weak_ptr<Service> get() ENTT_NOEXCEPT {
+    [[nodiscard]] static std::weak_ptr<Service> get() ENTT_NOEXCEPT {
         return service;
     }
 
@@ -67,7 +67,7 @@ struct service_locator {
      *
      * @return A reference to the service implementation currently set, if any.
      */
-    static Service & ref() ENTT_NOEXCEPT {
+    [[nodiscard]] static Service & ref() ENTT_NOEXCEPT {
         return *service;
     }
 
