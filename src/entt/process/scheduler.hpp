@@ -80,7 +80,7 @@ class scheduler {
     };
 
     template<typename Proc>
-    static bool update(process_handler &handler, const Delta delta, void *data) {
+    [[nodiscard]] static bool update(process_handler &handler, const Delta delta, void *data) {
         auto *process = static_cast<Proc *>(handler.instance.get());
         process->tick(delta, data);
 
@@ -126,7 +126,7 @@ public:
      * @brief Number of processes currently scheduled.
      * @return Number of processes currently scheduled.
      */
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return handlers.size();
     }
 
@@ -134,7 +134,7 @@ public:
      * @brief Returns true if at least a process is currently scheduled.
      * @return True if there are scheduled processes, false otherwise.
      */
-    bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
         return handlers.empty();
     }
 

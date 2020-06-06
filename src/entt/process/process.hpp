@@ -84,31 +84,31 @@ class process {
 
     template<typename Target = Derived>
     auto next(integral_constant<state::UNINITIALIZED>)
-    -> decltype(std::declval<Target>().init()) {
+    -> decltype(std::declval<Target>().init(), void()) {
         static_cast<Target *>(this)->init();
     }
 
     template<typename Target = Derived>
     auto next(integral_constant<state::RUNNING>, Delta delta, void *data)
-    -> decltype(std::declval<Target>().update(delta, data)) {
+    -> decltype(std::declval<Target>().update(delta, data), void()) {
         static_cast<Target *>(this)->update(delta, data);
     }
 
     template<typename Target = Derived>
     auto next(integral_constant<state::SUCCEEDED>)
-    -> decltype(std::declval<Target>().succeeded()) {
+    -> decltype(std::declval<Target>().succeeded(), void()) {
         static_cast<Target *>(this)->succeeded();
     }
 
     template<typename Target = Derived>
     auto next(integral_constant<state::FAILED>)
-    -> decltype(std::declval<Target>().failed()) {
+    -> decltype(std::declval<Target>().failed(), void()) {
         static_cast<Target *>(this)->failed();
     }
 
     template<typename Target = Derived>
     auto next(integral_constant<state::ABORTED>)
-    -> decltype(std::declval<Target>().aborted()) {
+    -> decltype(std::declval<Target>().aborted(), void()) {
         static_cast<Target *>(this)->aborted();
     }
 
@@ -194,7 +194,7 @@ public:
      * @brief Returns true if a process is either running or paused.
      * @return True if the process is still alive, false otherwise.
      */
-    bool alive() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool alive() const ENTT_NOEXCEPT {
         return current == state::RUNNING || current == state::PAUSED;
     }
 
@@ -202,7 +202,7 @@ public:
      * @brief Returns true if a process is already terminated.
      * @return True if the process is terminated, false otherwise.
      */
-    bool dead() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool dead() const ENTT_NOEXCEPT {
         return current == state::FINISHED;
     }
 
@@ -210,7 +210,7 @@ public:
      * @brief Returns true if a process is currently paused.
      * @return True if the process is paused, false otherwise.
      */
-    bool paused() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool paused() const ENTT_NOEXCEPT {
         return current == state::PAUSED;
     }
 
@@ -218,7 +218,7 @@ public:
      * @brief Returns true if a process terminated with errors.
      * @return True if the process terminated with errors, false otherwise.
      */
-    bool rejected() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool rejected() const ENTT_NOEXCEPT {
         return stopped;
     }
 
