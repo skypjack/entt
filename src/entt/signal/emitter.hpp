@@ -55,7 +55,7 @@ class emitter {
         using container_type = std::list<element_type>;
         using connection_type = typename container_type::iterator;
 
-        bool empty() const ENTT_NOEXCEPT override {
+        [[nodiscard]] bool empty() const ENTT_NOEXCEPT override {
             auto pred = [](auto &&element) { return element.first; };
 
             return std::all_of(once_list.cbegin(), once_list.cend(), pred) &&
@@ -114,7 +114,7 @@ class emitter {
             on_list.remove_if([](auto &&element) { return element.first; });
         }
 
-        id_type type_id() const ENTT_NOEXCEPT override {
+        [[nodiscard]] id_type type_id() const ENTT_NOEXCEPT override {
             return type_info<Event>::id();
         }
 
@@ -125,7 +125,7 @@ class emitter {
     };
 
     template<typename Event>
-    const pool_handler<Event> & assure() const {
+    [[nodiscard]] const pool_handler<Event> & assure() const {
         static_assert(std::is_same_v<Event, std::decay_t<Event>>, "Invalid event type");
 
         if constexpr(ENTT_FAST_PATH(has_type_index_v<Event>)) {
@@ -147,7 +147,7 @@ class emitter {
     }
 
     template<typename Event>
-    pool_handler<Event> & assure() {
+    [[nodiscard]] pool_handler<Event> & assure() {
         return const_cast<pool_handler<Event> &>(std::as_const(*this).template assure<Event>());
     }
 
@@ -309,7 +309,7 @@ public:
      * @return True if there are no listeners registered, false otherwise.
      */
     template<typename Event>
-    bool empty() const {
+    [[nodiscard]] bool empty() const {
         return assure<Event>().empty();
     }
 
@@ -317,7 +317,7 @@ public:
      * @brief Checks if there are listeners registered with the event emitter.
      * @return True if there are no listeners registered, false otherwise.
      */
-    bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
         return std::all_of(pools.cbegin(), pools.cend(), [](auto &&cpool) {
             return !cpool || cpool->empty();
         });

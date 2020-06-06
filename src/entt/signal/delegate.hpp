@@ -47,7 +47,7 @@ using function_pointer_t = decltype(internal::function_pointer(std::declval<Type
 
 
 template<typename... Class, typename Ret, typename... Args>
-constexpr auto index_sequence_for(Ret(*)(Args...)) {
+[[nodiscard]] constexpr auto index_sequence_for(Ret(*)(Args...)) {
     return std::index_sequence_for<Class..., Args...>{};
 }
 
@@ -96,7 +96,7 @@ class delegate;
 template<typename Ret, typename... Args>
 class delegate<Ret(Args...)> {
     template<auto Candidate, std::size_t... Index>
-    auto wrap(std::index_sequence<Index...>) ENTT_NOEXCEPT {
+    [[nodiscard]] auto wrap(std::index_sequence<Index...>) ENTT_NOEXCEPT {
         return [](const void *, Args... args) -> Ret {
             const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
             return Ret(std::invoke(Candidate, std::forward<std::tuple_element_t<Index, std::tuple<Args...>>>(std::get<Index>(arguments))...));
@@ -104,7 +104,7 @@ class delegate<Ret(Args...)> {
     }
 
     template<auto Candidate, typename Type, std::size_t... Index>
-    auto wrap(Type &, std::index_sequence<Index...>) ENTT_NOEXCEPT {
+    [[nodiscard]] auto wrap(Type &, std::index_sequence<Index...>) ENTT_NOEXCEPT {
         return [](const void *payload, Args... args) -> Ret {
             const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
             Type *curr = static_cast<Type *>(const_cast<std::conditional_t<std::is_const_v<Type>, const void *, void *>>(payload));
@@ -113,7 +113,7 @@ class delegate<Ret(Args...)> {
     }
 
     template<auto Candidate, typename Type, std::size_t... Index>
-    auto wrap(Type *, std::index_sequence<Index...>) ENTT_NOEXCEPT {
+    [[nodiscard]] auto wrap(Type *, std::index_sequence<Index...>) ENTT_NOEXCEPT {
         return [](const void *payload, Args... args) -> Ret {
             const auto arguments = std::forward_as_tuple(std::forward<Args>(args)...);
             Type *curr = static_cast<Type *>(const_cast<std::conditional_t<std::is_const_v<Type>, const void *, void *>>(payload));
@@ -276,7 +276,7 @@ public:
      * @brief Returns the instance or the payload linked to a delegate, if any.
      * @return An opaque pointer to the underlying data.
      */
-    const void * instance() const ENTT_NOEXCEPT {
+    [[nodiscard]] const void * instance() const ENTT_NOEXCEPT {
         return data;
     }
 
@@ -303,7 +303,7 @@ public:
      * @brief Checks whether a delegate actually stores a listener.
      * @return False if the delegate is empty, true otherwise.
      */
-    explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         // no need to test also data
         return !(fn == nullptr);
     }
@@ -313,7 +313,7 @@ public:
      * @param other Delegate with which to compare.
      * @return False if the two contents differ, true otherwise.
      */
-    bool operator==(const delegate<Ret(Args...)> &other) const ENTT_NOEXCEPT {
+    [[nodiscard]] bool operator==(const delegate<Ret(Args...)> &other) const ENTT_NOEXCEPT {
         return fn == other.fn && data == other.data;
     }
 
@@ -332,7 +332,7 @@ private:
  * @return True if the two contents differ, false otherwise.
  */
 template<typename Ret, typename... Args>
-bool operator!=(const delegate<Ret(Args...)> &lhs, const delegate<Ret(Args...)> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] bool operator!=(const delegate<Ret(Args...)> &lhs, const delegate<Ret(Args...)> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 

@@ -77,7 +77,7 @@ public:
      * @brief Number of listeners connected to the signal.
      * @return Number of listeners currently connected.
      */
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return calls.size();
     }
 
@@ -85,7 +85,7 @@ public:
      * @brief Returns false if at least a listener is connected to the signal.
      * @return True if the signal has no listeners connected, false otherwise.
      */
-    bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
         return calls.empty();
     }
 
@@ -166,7 +166,7 @@ public:
      * @brief Checks whether a connection is properly initialized.
      * @return True if the connection is properly initialized, false otherwise.
      */
-    explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return static_cast<bool>(disconnect);
     }
 
@@ -233,7 +233,7 @@ struct scoped_connection {
      * @brief Checks whether a scoped connection is properly initialized.
      * @return True if the connection is properly initialized, false otherwise.
      */
-    explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return static_cast<bool>(conn);
     }
 
@@ -290,7 +290,7 @@ public:
      * @brief Returns false if at least a listener is connected to the sink.
      * @return True if the sink has no listeners connected, false otherwise.
      */
-    bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
         return signal->calls.empty();
     }
 
@@ -301,7 +301,7 @@ public:
      * @return A properly initialized sink object.
      */
     template<auto Function>
-    sink before() {
+    [[nodiscard]] sink before() {
         delegate<Ret(Args...)> call{};
         call.template connect<Function>();
 
@@ -322,7 +322,7 @@ public:
      * @return A properly initialized sink object.
      */
     template<auto Candidate, typename Type>
-    sink before(Type &&value_or_instance) {
+    [[nodiscard]] sink before(Type &&value_or_instance) {
         delegate<Ret(Args...)> call{};
         call.template connect<Candidate>(std::forward<Type>(value_or_instance));
 
@@ -342,7 +342,7 @@ public:
      * @return A properly initialized sink object.
      */
     template<typename Type>
-    sink before(Type &value_or_instance) {
+    [[nodiscard]] sink before(Type &value_or_instance) {
         return before(&value_or_instance);
     }
 
@@ -354,7 +354,7 @@ public:
      * @return A properly initialized sink object.
      */
     template<typename Type>
-    sink before(Type *value_or_instance) {
+    [[nodiscard]] sink before(Type *value_or_instance) {
         sink other{*this};
 
         if(value_or_instance) {
@@ -373,7 +373,7 @@ public:
      * @brief Returns a sink that connects before anything else.
      * @return A properly initialized sink object.
      */
-    sink before() {
+    [[nodiscard]] sink before() {
         sink other{*this};
         other.offset = signal->calls.size();
         return other;

@@ -33,7 +33,7 @@ class dispatcher {
         virtual ~basic_pool() = default;
         virtual void publish() = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
-        virtual id_type type_id() const ENTT_NOEXCEPT = 0;
+        [[nodiscard]] virtual id_type type_id() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
@@ -55,7 +55,7 @@ class dispatcher {
             events.clear();
         }
 
-        sink_type sink() ENTT_NOEXCEPT {
+        [[nodiscard]] sink_type sink() ENTT_NOEXCEPT {
             return entt::sink{signal};
         }
 
@@ -73,7 +73,7 @@ class dispatcher {
             }
         }
 
-        id_type type_id() const ENTT_NOEXCEPT override {
+        [[nodiscard]] id_type type_id() const ENTT_NOEXCEPT override {
             return type_info<Event>::id();
         }
 
@@ -83,7 +83,7 @@ class dispatcher {
     };
 
     template<typename Event>
-    pool_handler<Event> & assure() {
+    [[nodiscard]] pool_handler<Event> & assure() {
         static_assert(std::is_same_v<Event, std::decay_t<Event>>, "Invalid event type");
 
         if constexpr(ENTT_FAST_PATH(has_type_index_v<Event>)) {
@@ -123,7 +123,7 @@ public:
      * @return A temporary sink object.
      */
     template<typename Event>
-    auto sink() {
+    [[nodiscard]] auto sink() {
         return assure<Event>().sink();
     }
 
