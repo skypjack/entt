@@ -46,7 +46,7 @@ struct cache {
      * @brief Number of resources managed by a cache.
      * @return Number of resources currently stored.
      */
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return resources.size();
     }
 
@@ -54,7 +54,7 @@ struct cache {
      * @brief Returns true if a cache contains no resources, false otherwise.
      * @return True if the cache contains no resources, false otherwise.
      */
-    bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
         return resources.empty();
     }
 
@@ -148,7 +148,7 @@ struct cache {
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    entt::handle<Resource> temp(Args &&... args) const {
+    [[nodiscard]] entt::handle<Resource> temp(Args &&... args) const {
         return { Loader{}.get(std::forward<Args>(args)...) };
     }
 
@@ -165,7 +165,7 @@ struct cache {
      * @param id Unique resource identifier.
      * @return A handle for the given resource.
      */
-    entt::handle<Resource> handle(const id_type id) const {
+    [[nodiscard]] entt::handle<Resource> handle(const id_type id) const {
         auto it = resources.find(id);
         return { it == resources.end() ? nullptr : it->second };
     }
@@ -175,7 +175,7 @@ struct cache {
      * @param id Unique resource identifier.
      * @return True if the cache contains the resource, false otherwise.
      */
-    bool contains(const id_type id) const {
+    [[nodiscard]] bool contains(const id_type id) const {
         return (resources.find(id) != resources.cend());
     }
 

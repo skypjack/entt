@@ -53,7 +53,7 @@ class loader {
      * @return The resource just loaded or an empty pointer in case of errors.
      */
     template<typename... Args>
-    std::shared_ptr<Resource> get(Args &&... args) const {
+    [[nodiscard]] std::shared_ptr<Resource> get(Args &&... args) const {
         return static_cast<const Loader *>(this)->load(std::forward<Args>(args)...);
     }
 };
