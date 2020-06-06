@@ -111,41 +111,41 @@ class storage: public sparse_set<Entity> {
             return other.index - index;
         }
 
-        reference operator[](const difference_type value) const ENTT_NOEXCEPT {
+        [[nodiscard]] reference operator[](const difference_type value) const ENTT_NOEXCEPT {
             const auto pos = size_type(index-value-1);
             return (*instances)[pos];
         }
 
-        bool operator==(const storage_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator==(const storage_iterator &other) const ENTT_NOEXCEPT {
             return other.index == index;
         }
 
-        bool operator!=(const storage_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator!=(const storage_iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
-        bool operator<(const storage_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator<(const storage_iterator &other) const ENTT_NOEXCEPT {
             return index > other.index;
         }
 
-        bool operator>(const storage_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator>(const storage_iterator &other) const ENTT_NOEXCEPT {
             return index < other.index;
         }
 
-        bool operator<=(const storage_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator<=(const storage_iterator &other) const ENTT_NOEXCEPT {
             return !(*this > other);
         }
 
-        bool operator>=(const storage_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator>=(const storage_iterator &other) const ENTT_NOEXCEPT {
             return !(*this < other);
         }
 
-        pointer operator->() const ENTT_NOEXCEPT {
+        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
             const auto pos = size_type(index-1);
             return &(*instances)[pos];
         }
 
-        reference operator*() const ENTT_NOEXCEPT {
+        [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
             return *operator->();
         }
 
@@ -197,12 +197,12 @@ public:
      *
      * @return A pointer to the array of objects.
      */
-    const object_type * raw() const ENTT_NOEXCEPT {
+    [[nodiscard]] const object_type * raw() const ENTT_NOEXCEPT {
         return instances.data();
     }
 
     /*! @copydoc raw */
-    object_type * raw() ENTT_NOEXCEPT {
+    [[nodiscard]] object_type * raw() ENTT_NOEXCEPT {
         return const_cast<object_type *>(std::as_const(*this).raw());
     }
 
@@ -218,18 +218,18 @@ public:
      *
      * @return An iterator to the first instance of the given type.
      */
-    const_iterator cbegin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator cbegin() const ENTT_NOEXCEPT {
         const typename traits_type::difference_type pos = underlying_type::size();
         return const_iterator{instances, pos};
     }
 
     /*! @copydoc cbegin */
-    const_iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator begin() const ENTT_NOEXCEPT {
         return cbegin();
     }
 
     /*! @copydoc begin */
-    iterator begin() ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() ENTT_NOEXCEPT {
         const typename traits_type::difference_type pos = underlying_type::size();
         return iterator{instances, pos};
     }
@@ -248,17 +248,17 @@ public:
      * @return An iterator to the element following the last instance of the
      * given type.
      */
-    const_iterator cend() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator cend() const ENTT_NOEXCEPT {
         return const_iterator{instances, {}};
     }
 
     /*! @copydoc cend */
-    const_iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] const_iterator end() const ENTT_NOEXCEPT {
         return cend();
     }
 
     /*! @copydoc end */
-    iterator end() ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() ENTT_NOEXCEPT {
         return iterator{instances, {}};
     }
 
@@ -274,12 +274,12 @@ public:
      * @param entt A valid entity identifier.
      * @return The object associated with the entity.
      */
-    const object_type & get(const entity_type entt) const {
+    [[nodiscard]] const object_type & get(const entity_type entt) const {
         return instances[underlying_type::index(entt)];
     }
 
     /*! @copydoc get */
-    object_type & get(const entity_type entt) {
+    [[nodiscard]] object_type & get(const entity_type entt) {
         return const_cast<object_type &>(std::as_const(*this).get(entt));
     }
 
@@ -288,12 +288,12 @@ public:
      * @param entt A valid entity identifier.
      * @return The object associated with the entity, if any.
      */
-    const object_type * try_get(const entity_type entt) const {
+    [[nodiscard]] const object_type * try_get(const entity_type entt) const {
         return underlying_type::contains(entt) ? (instances.data() + underlying_type::index(entt)) : nullptr;
     }
 
     /*! @copydoc try_get */
-    object_type * try_get(const entity_type entt) {
+    [[nodiscard]] object_type * try_get(const entity_type entt) {
         return const_cast<object_type *>(std::as_const(*this).try_get(entt));
     }
 

@@ -106,41 +106,41 @@ class sparse_set {
             return other.index - index;
         }
 
-        reference operator[](const difference_type value) const {
+        [[nodiscard]] reference operator[](const difference_type value) const {
             const auto pos = size_type(index-value-1);
             return (*packed)[pos];
         }
 
-        bool operator==(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator==(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
             return other.index == index;
         }
 
-        bool operator!=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator!=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
-        bool operator<(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator<(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
             return index > other.index;
         }
 
-        bool operator>(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator>(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
             return index < other.index;
         }
 
-        bool operator<=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator<=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
             return !(*this > other);
         }
 
-        bool operator>=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator>=(const sparse_set_iterator &other) const ENTT_NOEXCEPT {
             return !(*this < other);
         }
 
-        pointer operator->() const {
+        [[nodiscard]] pointer operator->() const {
             const auto pos = size_type(index-1);
             return &(*packed)[pos];
         }
 
-        reference operator*() const {
+        [[nodiscard]] reference operator*() const {
             return *operator->();
         }
 
@@ -149,15 +149,15 @@ class sparse_set {
         index_type index;
     };
 
-    auto page(const Entity entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] auto page(const Entity entt) const ENTT_NOEXCEPT {
         return std::size_t{(to_integral(entt) & traits_type::entity_mask) / entt_per_page};
     }
 
-    auto offset(const Entity entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] auto offset(const Entity entt) const ENTT_NOEXCEPT {
         return std::size_t{to_integral(entt) & (entt_per_page - 1)};
     }
 
-    page_type & assure(const std::size_t pos) {
+    [[nodiscard]] page_type & assure(const std::size_t pos) {
         if(!(pos < sparse.size())) {
             sparse.resize(pos+1);
         }
@@ -210,7 +210,7 @@ public:
      * allocated space for.
      * @return Capacity of the sparse set.
      */
-    size_type capacity() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT {
         return packed.capacity();
     }
 
@@ -235,7 +235,7 @@ public:
      *
      * @return Extent of the sparse set.
      */
-    size_type extent() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type extent() const ENTT_NOEXCEPT {
         return sparse.size() * entt_per_page;
     }
 
@@ -249,7 +249,7 @@ public:
      *
      * @return Number of elements.
      */
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return packed.size();
     }
 
@@ -257,7 +257,7 @@ public:
      * @brief Checks whether a sparse set is empty.
      * @return True if the sparse set is empty, false otherwise.
      */
-    bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
         return packed.empty();
     }
 
@@ -273,7 +273,7 @@ public:
      *
      * @return A pointer to the internal packed array.
      */
-    const entity_type * data() const ENTT_NOEXCEPT {
+    [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
         return packed.data();
     }
 
@@ -290,7 +290,7 @@ public:
      *
      * @return An iterator to the first entity of the internal packed array.
      */
-    iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
         const typename traits_type::difference_type pos = packed.size();
         return iterator{packed, pos};
     }
@@ -309,7 +309,7 @@ public:
      * @return An iterator to the element following the last entity of the
      * internal packed array.
      */
-    iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return iterator{packed, {}};
     }
 
@@ -319,7 +319,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator find(const entity_type entt) const {
+    [[nodiscard]] iterator find(const entity_type entt) const {
         return contains(entt) ? --(end() - index(entt)) : end();
     }
 
@@ -328,7 +328,7 @@ public:
      * @param entt A valid entity identifier.
      * @return True if the sparse set contains the entity, false otherwise.
      */
-    bool contains(const entity_type entt) const {
+    [[nodiscard]] bool contains(const entity_type entt) const {
         const auto curr = page(entt);
         // testing against null permits to avoid accessing the packed array
         return (curr < sparse.size() && sparse[curr] && sparse[curr][offset(entt)] != null);
@@ -346,7 +346,7 @@ public:
      * @param entt A valid entity identifier.
      * @return The position of the entity in the sparse set.
      */
-    size_type index(const entity_type entt) const {
+    [[nodiscard]] size_type index(const entity_type entt) const {
         ENTT_ASSERT(contains(entt));
         return size_type(sparse[page(entt)][offset(entt)]);
     }

@@ -74,7 +74,7 @@ class basic_runtime_view {
             }
         }
 
-        bool valid() const {
+        [[nodiscard]] bool valid() const {
             return std::all_of(pools->begin()++, pools->end(), [entt = *it](const auto *curr) {
                 return curr->contains(entt);
             });
@@ -109,19 +109,19 @@ class basic_runtime_view {
             return operator--(), orig;
         }
 
-        bool operator==(const view_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator==(const view_iterator &other) const ENTT_NOEXCEPT {
             return other.it == it;
         }
 
-        bool operator!=(const view_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator!=(const view_iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
-        pointer operator->() const {
+        [[nodiscard]] pointer operator->() const {
             return it.operator->();
         }
 
-        reference operator*() const {
+        [[nodiscard]] reference operator*() const {
             return *operator->();
         }
 
@@ -141,7 +141,7 @@ class basic_runtime_view {
         std::rotate(pools.begin(), it, pools.end());
     }
 
-    bool valid() const {
+    [[nodiscard]] bool valid() const {
         return !pools.empty() && pools.front();
     }
 
@@ -157,7 +157,7 @@ public:
      * @brief Estimates the number of entities that have the given components.
      * @return Estimated number of entities that have the given components.
      */
-    size_type size() const {
+    [[nodiscard]] size_type size() const {
         return valid() ? pools.front()->size() : size_type{};
     }
 
@@ -165,7 +165,7 @@ public:
      * @brief Checks if the view is definitely empty.
      * @return True if the view is definitely empty, false otherwise.
      */
-    bool empty() const {
+    [[nodiscard]] bool empty() const {
         return !valid() || pools.front()->empty();
     }
 
@@ -183,7 +183,7 @@ public:
      *
      * @return An iterator to the first entity that has the given components.
      */
-    iterator begin() const {
+    [[nodiscard]] iterator begin() const {
         iterator it{};
 
         if(valid()) {
@@ -208,7 +208,7 @@ public:
      * @return An iterator to the entity following the last entity that has the
      * given components.
      */
-    iterator end() const {
+    [[nodiscard]] iterator end() const {
         iterator it{};
 
         if(valid()) {
@@ -223,7 +223,7 @@ public:
      * @param entt A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
-    bool contains(const entity_type entt) const {
+    [[nodiscard]] bool contains(const entity_type entt) const {
         return valid() && std::all_of(pools.cbegin(), pools.cend(), [entt](const auto *view) {
             return view->find(entt) != view->end();
         });

@@ -129,7 +129,7 @@ struct basic_actor {
      * @return True if the actor has all the components, false otherwise.
      */
     template<typename... Component>
-    bool has() const {
+    [[nodiscard]] bool has() const {
         return reg->template has<Component...>(entt);
     }
 
@@ -139,13 +139,13 @@ struct basic_actor {
      * @return References to the components owned by the actor.
      */
     template<typename... Component>
-    decltype(auto) get() const {
+    [[nodiscard]] decltype(auto) get() const {
         return std::as_const(*reg).template get<Component...>(entt);
     }
 
     /*! @copydoc get */
     template<typename... Component>
-    decltype(auto) get() {
+    [[nodiscard]] decltype(auto) get() {
         return reg->template get<Component...>(entt);
     }
 
@@ -155,13 +155,13 @@ struct basic_actor {
      * @return Pointers to the components owned by the actor.
      */
     template<typename... Component>
-    auto try_get() const {
+    [[nodiscard]] auto try_get() const {
         return std::as_const(*reg).template try_get<Component...>(entt);
     }
 
     /*! @copydoc try_get */
     template<typename... Component>
-    auto try_get() {
+    [[nodiscard]] auto try_get() {
         return reg->template try_get<Component...>(entt);
     }
 
@@ -169,12 +169,12 @@ struct basic_actor {
      * @brief Returns a reference to the underlying registry.
      * @return A reference to the underlying registry.
      */
-    const registry_type & backend() const ENTT_NOEXCEPT {
+    [[nodiscard]] const registry_type & backend() const ENTT_NOEXCEPT {
         return *reg;
     }
 
     /*! @copydoc backend */
-    registry_type & backend() ENTT_NOEXCEPT {
+    [[nodiscard]] registry_type & backend() ENTT_NOEXCEPT {
         return const_cast<registry_type &>(std::as_const(*this).backend());
     }
 
@@ -182,7 +182,7 @@ struct basic_actor {
      * @brief Returns the entity associated with an actor.
      * @return The entity associated with the actor.
      */
-    entity_type entity() const ENTT_NOEXCEPT {
+    [[nodiscard]] entity_type entity() const ENTT_NOEXCEPT {
         return entt;
     }
 
@@ -190,7 +190,7 @@ struct basic_actor {
      * @brief Checks if an actor refers to a valid entity or not.
      * @return True if the actor refers to a valid entity, false otherwise.
      */
-    explicit operator bool() const {
+    [[nodiscard]] explicit operator bool() const {
         return reg && reg->valid(entt);
     }
 

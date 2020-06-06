@@ -55,7 +55,8 @@ TEST(Registry, Context) {
 
     registry.set<char>();
     registry.set<int>();
-    registry.ctx_or_set<double>();
+    // suppress the warning due to the [[nodiscard]] attribute
+    static_cast<void>(registry.ctx_or_set<double>());
 
     ASSERT_NE(registry.try_ctx<char>(), nullptr);
     ASSERT_NE(registry.try_ctx<int>(), nullptr);

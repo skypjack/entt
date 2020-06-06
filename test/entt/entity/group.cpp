@@ -511,12 +511,12 @@ TEST(NonOwningGroup, FrontBack) {
 TEST(NonOwningGroup, SignalRace) {
     entt::registry registry;
     registry.on_construct<double>().connect<&entt::registry::emplace_or_replace<int>>();
-    registry.group(entt::get<int, double>);
+    const auto group = registry.group(entt::get<int, double>);
 
     auto entity = registry.create();
     registry.emplace<double>(entity);
 
-    ASSERT_EQ(registry.group(entt::get<int, double>).size(), 1u);
+    ASSERT_EQ(group.size(), 1u);
 }
 
 TEST(OwningGroup, Functionalities) {
@@ -1106,12 +1106,12 @@ TEST(OwningGroup, FrontBack) {
 TEST(OwningGroup, SignalRace) {
     entt::registry registry;
     registry.on_construct<double>().connect<&entt::registry::emplace_or_replace<int>>();
-    registry.group<int>(entt::get<double>);
+    const auto group = registry.group<int>(entt::get<double>);
 
     auto entity = registry.create();
     registry.emplace<double>(entity);
 
-    ASSERT_EQ(registry.group<int>(entt::get<double>).size(), 1u);
+    ASSERT_EQ(group.size(), 1u);
 }
 
 TEST(OwningGroup, StableLateInitialization) {

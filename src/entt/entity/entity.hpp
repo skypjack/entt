@@ -115,38 +115,38 @@ class null {
 
 public:
     template<typename Entity>
-    constexpr operator Entity() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr operator Entity() const ENTT_NOEXCEPT {
         return Entity{traits_type<Entity>::entity_mask};
     }
 
-    constexpr bool operator==(null) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator==(null) const ENTT_NOEXCEPT {
         return true;
     }
 
-    constexpr bool operator!=(null) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator!=(null) const ENTT_NOEXCEPT {
         return false;
     }
 
     template<typename Entity>
-    constexpr bool operator==(const Entity entity) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator==(const Entity entity) const ENTT_NOEXCEPT {
         return (to_integral(entity) & traits_type<Entity>::entity_mask) == to_integral(static_cast<Entity>(*this));
     }
 
     template<typename Entity>
-    constexpr bool operator!=(const Entity entity) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator!=(const Entity entity) const ENTT_NOEXCEPT {
         return !(entity == *this);
     }
 };
 
 
 template<typename Entity>
-constexpr bool operator==(const Entity entity, null other) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const Entity entity, null other) ENTT_NOEXCEPT {
     return other.operator==(entity);
 }
 
 
 template<typename Entity>
-constexpr bool operator!=(const Entity entity, null other) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const Entity entity, null other) ENTT_NOEXCEPT {
     return !(other == entity);
 }
 

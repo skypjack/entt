@@ -533,7 +533,7 @@ public:
      * @param entt An entity identifier.
      * @return True if `entity` is managed by the loader, false otherwise.
      */
-    bool contains(entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] bool contains(entity_type entt) const ENTT_NOEXCEPT {
         return (remloc.find(entt) != remloc.cend());
     }
 
@@ -542,7 +542,7 @@ public:
      * @param entt An entity identifier.
      * @return The local identifier if any, the null entity otherwise.
      */
-    entity_type map(entity_type entt) const ENTT_NOEXCEPT {
+    [[nodiscard]] entity_type map(entity_type entt) const ENTT_NOEXCEPT {
         const auto it = remloc.find(entt);
         entity_type other = null;
 

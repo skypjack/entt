@@ -101,7 +101,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             }
         }
 
-        bool valid() const {
+        [[nodiscard]] bool valid() const {
             return std::all_of(unchecked.cbegin(), unchecked.cend(), [entt = *it](const sparse_set<Entity> *curr) { return curr->contains(entt); })
                     && std::none_of(filter.cbegin(), filter.cend(), [entt = *it](const sparse_set<Entity> *curr) { return curr->contains(entt); });
         }
@@ -135,19 +135,19 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             return operator--(), orig;
         }
 
-        bool operator==(const view_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator==(const view_iterator &other) const ENTT_NOEXCEPT {
             return other.it == it;
         }
 
-        bool operator!=(const view_iterator &other) const ENTT_NOEXCEPT {
+        [[nodiscard]] bool operator!=(const view_iterator &other) const ENTT_NOEXCEPT {
             return !(*this == other);
         }
 
-        pointer operator->() const {
+        [[nodiscard]] pointer operator->() const {
             return it.operator->();
         }
 
-        reference operator*() const {
+        [[nodiscard]] reference operator*() const {
             return *operator->();
         }
 
@@ -162,13 +162,13 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         : pools{&component..., &epool...}
     {}
 
-    const sparse_set<Entity> & candidate() const ENTT_NOEXCEPT {
+    [[nodiscard]] const sparse_set<Entity> & candidate() const ENTT_NOEXCEPT {
         return *std::min({ static_cast<const sparse_set<Entity> *>(std::get<pool_type<Component> *>(pools))... }, [](const auto *lhs, const auto *rhs) {
             return lhs->size() < rhs->size();
         });
     }
 
-    unchecked_type unchecked(const sparse_set<Entity> &view) const {
+    [[nodiscard]] unchecked_type unchecked(const sparse_set<Entity> &view) const {
         std::size_t pos{};
         unchecked_type other{};
         ((std::get<pool_type<Component> *>(pools) == &view ? nullptr : (other[pos++] = std::get<pool_type<Component> *>(pools))), ...);
@@ -176,7 +176,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     }
 
     template<typename Comp, typename Other>
-    decltype(auto) get([[maybe_unused]] component_iterator<Comp> it, [[maybe_unused]] pool_type<Other> *cpool, [[maybe_unused]] const Entity entt) const {
+    [[nodiscard]] decltype(auto) get([[maybe_unused]] component_iterator<Comp> it, [[maybe_unused]] pool_type<Other> *cpool, [[maybe_unused]] const Entity entt) const {
         if constexpr(std::is_same_v<Comp, Other>) {
             return *it;
         } else {
@@ -230,7 +230,7 @@ public:
      * @return Number of existing components of the given type.
      */
     template<typename Comp>
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return std::get<pool_type<Comp> *>(pools)->size();
     }
 
@@ -238,7 +238,7 @@ public:
      * @brief Estimates the number of entities iterated by the view.
      * @return Estimated number of entities iterated by the view.
      */
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return std::min({ std::get<pool_type<Component> *>(pools)->size()... });
     }
 
@@ -253,7 +253,7 @@ public:
      * @return True if the view or the pools are empty, false otherwise.
      */
     template<typename... Comp>
-    bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
         if constexpr(sizeof...(Comp) == 0) {
             return (std::get<pool_type<Component> *>(pools)->empty() || ...);
         } else {
@@ -276,7 +276,7 @@ public:
      * @return A pointer to the array of components.
      */
     template<typename Comp>
-    Comp * raw() const ENTT_NOEXCEPT {
+    [[nodiscard]] Comp * raw() const ENTT_NOEXCEPT {
         return std::get<pool_type<Comp> *>(pools)->raw();
     }
 
@@ -295,7 +295,7 @@ public:
      * @return A pointer to the array of entities.
      */
     template<typename Comp>
-    const entity_type * data() const ENTT_NOEXCEPT {
+    [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
         return std::get<pool_type<Comp> *>(pools)->data();
     }
 
@@ -313,7 +313,7 @@ public:
      *
      * @return An iterator to the first entity that has the given components.
      */
-    iterator begin() const {
+    [[nodiscard]] iterator begin() const {
         const auto &view = candidate();
         const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
         return iterator{view, unchecked(view), ignore, view.begin()};
@@ -334,7 +334,7 @@ public:
      * @return An iterator to the entity following the last entity that has the
      * given components.
      */
-    iterator end() const {
+    [[nodiscard]] iterator end() const {
         const auto &view = candidate();
         const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
         return iterator{view, unchecked(view), ignore, view.end()};
@@ -345,7 +345,7 @@ public:
      * @return The first entity that has the given components if one exists, the
      * null entity otherwise.
      */
-    entity_type front() const {
+    [[nodiscard]] entity_type front() const {
         const auto it = begin();
         return it != end() ? *it : null;
     }
@@ -355,7 +355,7 @@ public:
      * @return The last entity that has the given components if one exists, the
      * null entity otherwise.
      */
-    entity_type back() const {
+    [[nodiscard]] entity_type back() const {
         const auto it = std::make_reverse_iterator(end());
         return it != std::make_reverse_iterator(begin()) ? *it : null;
     }
@@ -366,7 +366,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator find(const entity_type entt) const {
+    [[nodiscard]] iterator find(const entity_type entt) const {
         const auto &view = candidate();
         const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
         iterator it{view, unchecked(view), ignore, view.find(entt)};
@@ -378,7 +378,7 @@ public:
      * @param entt A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
-    bool contains(const entity_type entt) const {
+    [[nodiscard]] bool contains(const entity_type entt) const {
         return (std::get<pool_type<Component> *>(pools)->contains(entt) && ...)
                 && (!std::get<pool_type<Exclude> *>(pools)->contains(entt) && ...);
     }
@@ -401,7 +401,7 @@ public:
      * @return The components assigned to the entity.
      */
     template<typename... Comp>
-    decltype(auto) get([[maybe_unused]] const entity_type entt) const {
+    [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Comp) == 0) {
@@ -525,7 +525,7 @@ public:
      * @brief Returns the number of entities that have the given component.
      * @return Number of entities that have the given component.
      */
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return pool->size();
     }
 
@@ -533,7 +533,7 @@ public:
      * @brief Checks whether a view is empty.
      * @return True if the view is empty, false otherwise.
      */
-    bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
         return pool->empty();
     }
 
@@ -549,7 +549,7 @@ public:
      *
      * @return A pointer to the array of components.
      */
-    raw_type * raw() const ENTT_NOEXCEPT {
+    [[nodiscard]] raw_type * raw() const ENTT_NOEXCEPT {
         return pool->raw();
     }
 
@@ -565,7 +565,7 @@ public:
      *
      * @return A pointer to the array of entities.
      */
-    const entity_type * data() const ENTT_NOEXCEPT {
+    [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
         return pool->data();
     }
 
@@ -583,7 +583,7 @@ public:
      *
      * @return An iterator to the first entity that has the given component.
      */
-    iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
         return pool->sparse_set<Entity>::begin();
     }
 
@@ -602,7 +602,7 @@ public:
      * @return An iterator to the entity following the last entity that has the
      * given component.
      */
-    iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return pool->sparse_set<Entity>::end();
     }
 
@@ -611,7 +611,7 @@ public:
      * @return The first entity that has the given component if one exists, the
      * null entity otherwise.
      */
-    entity_type front() const {
+    [[nodiscard]] entity_type front() const {
         const auto it = begin();
         return it != end() ? *it : null;
     }
@@ -621,7 +621,7 @@ public:
      * @return The last entity that has the given component if one exists, the
      * null entity otherwise.
      */
-    entity_type back() const {
+    [[nodiscard]] entity_type back() const {
         const auto it = std::make_reverse_iterator(end());
         return it != std::make_reverse_iterator(begin()) ? *it : null;
     }
@@ -632,7 +632,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator find(const entity_type entt) const {
+    [[nodiscard]] iterator find(const entity_type entt) const {
         const auto it = pool->find(entt);
         return it != end() && *it == entt ? it : end();
     }
@@ -642,7 +642,7 @@ public:
      * @param pos Position of the element to return.
      * @return The identifier that occupies the given position.
      */
-    entity_type operator[](const size_type pos) const {
+    [[nodiscard]] entity_type operator[](const size_type pos) const {
         return begin()[pos];
     }
 
@@ -651,7 +651,7 @@ public:
      * @param entt A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
      */
-    bool contains(const entity_type entt) const {
+    [[nodiscard]] bool contains(const entity_type entt) const {
         return pool->contains(entt);
     }
 
@@ -671,7 +671,7 @@ public:
      * @return The component assigned to the entity.
      */
     template<typename Comp = Component>
-    decltype(auto) get(const entity_type entt) const {
+    [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         static_assert(std::is_same_v<Comp, Component>, "Invalid component type");
         ENTT_ASSERT(contains(entt));
         return pool->get(entt);

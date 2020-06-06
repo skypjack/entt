@@ -148,7 +148,7 @@ TEST(Benchmark, IterateSingleComponent1M) {
         registry.emplace<position>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
         registry.view<position>().each(func);
         timer.elapsed();
@@ -169,7 +169,7 @@ TEST(Benchmark, IterateSingleComponentRuntime1M) {
         registry.emplace<position>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         ENTT_ID_TYPE types[] = { entt::type_info<position>::id() };
 
         timer timer;
@@ -193,7 +193,7 @@ TEST(Benchmark, IterateTwoComponents1M) {
         registry.emplace<velocity>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
         registry.view<position, velocity>().each(func);
         timer.elapsed();
@@ -218,7 +218,7 @@ TEST(Benchmark, IterateTwoComponents1MHalf) {
         }
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
         registry.view<position, velocity>().each(func);
         timer.elapsed();
@@ -243,7 +243,7 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
         }
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
         registry.view<position, velocity>().each(func);
         timer.elapsed();
@@ -256,7 +256,7 @@ TEST(Benchmark, IterateTwoComponents1MOne) {
 
 TEST(Benchmark, IterateTwoComponentsNonOwningGroup1M) {
     entt::registry registry;
-    registry.group<>(entt::get<position, velocity>);
+    const auto group = registry.group<>(entt::get<position, velocity>);
 
     std::cout << "Iterating over 1000000 entities, two components, non owning group" << std::endl;
 
@@ -266,9 +266,9 @@ TEST(Benchmark, IterateTwoComponentsNonOwningGroup1M) {
         registry.emplace<velocity>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
-        registry.group<>(entt::get<position, velocity>).each(func);
+        group.each(func);
         timer.elapsed();
     };
 
@@ -279,7 +279,7 @@ TEST(Benchmark, IterateTwoComponentsNonOwningGroup1M) {
 
 TEST(Benchmark, IterateTwoComponentsFullOwningGroup1M) {
     entt::registry registry;
-    registry.group<position, velocity>();
+    const auto group = registry.group<position, velocity>();
 
     std::cout << "Iterating over 1000000 entities, two components, full owning group" << std::endl;
 
@@ -289,9 +289,9 @@ TEST(Benchmark, IterateTwoComponentsFullOwningGroup1M) {
         registry.emplace<velocity>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
-        registry.group<position, velocity>().each(func);
+        group.each(func);
         timer.elapsed();
     };
 
@@ -302,7 +302,7 @@ TEST(Benchmark, IterateTwoComponentsFullOwningGroup1M) {
 
 TEST(Benchmark, IterateTwoComponentsPartialOwningGroup1M) {
     entt::registry registry;
-    registry.group<position>(entt::get<velocity>);
+    const auto group = registry.group<position>(entt::get<velocity>);
 
     std::cout << "Iterating over 1000000 entities, two components, partial owning group" << std::endl;
 
@@ -312,9 +312,9 @@ TEST(Benchmark, IterateTwoComponentsPartialOwningGroup1M) {
         registry.emplace<velocity>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
-        registry.group<position>(entt::get<velocity>).each(func);
+        group.each(func);
         timer.elapsed();
     };
 
@@ -334,7 +334,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1M) {
         registry.emplace<velocity>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         ENTT_ID_TYPE types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id()
@@ -365,7 +365,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
         }
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         ENTT_ID_TYPE types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id()
@@ -396,7 +396,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
         }
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         ENTT_ID_TYPE types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id()
@@ -425,7 +425,7 @@ TEST(Benchmark, IterateThreeComponents1M) {
         registry.emplace<comp<0>>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
         registry.view<position, velocity, comp<0>>().each(func);
         timer.elapsed();
@@ -451,7 +451,7 @@ TEST(Benchmark, IterateThreeComponents1MHalf) {
         }
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
         registry.view<position, velocity, comp<0>>().each(func);
         timer.elapsed();
@@ -477,7 +477,7 @@ TEST(Benchmark, IterateThreeComponents1MOne) {
         }
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
         registry.view<position, velocity, comp<0>>().each(func);
         timer.elapsed();
@@ -490,7 +490,7 @@ TEST(Benchmark, IterateThreeComponents1MOne) {
 
 TEST(Benchmark, IterateThreeComponentsNonOwningGroup1M) {
     entt::registry registry;
-    registry.group<>(entt::get<position, velocity, comp<0>>);
+    const auto group = registry.group<>(entt::get<position, velocity, comp<0>>);
 
     std::cout << "Iterating over 1000000 entities, three components, non owning group" << std::endl;
 
@@ -501,9 +501,9 @@ TEST(Benchmark, IterateThreeComponentsNonOwningGroup1M) {
         registry.emplace<comp<0>>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
-        registry.group<>(entt::get<position, velocity, comp<0>>).each(func);
+        group.each(func);
         timer.elapsed();
     };
 
@@ -514,7 +514,7 @@ TEST(Benchmark, IterateThreeComponentsNonOwningGroup1M) {
 
 TEST(Benchmark, IterateThreeComponentsFullOwningGroup1M) {
     entt::registry registry;
-    registry.group<position, velocity, comp<0>>();
+    const auto group = registry.group<position, velocity, comp<0>>();
 
     std::cout << "Iterating over 1000000 entities, three components, full owning group" << std::endl;
 
@@ -525,9 +525,9 @@ TEST(Benchmark, IterateThreeComponentsFullOwningGroup1M) {
         registry.emplace<comp<0>>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
-        registry.group<position, velocity, comp<0>>().each(func);
+        group.each(func);
         timer.elapsed();
     };
 
@@ -538,7 +538,7 @@ TEST(Benchmark, IterateThreeComponentsFullOwningGroup1M) {
 
 TEST(Benchmark, IterateThreeComponentsPartialOwningGroup1M) {
     entt::registry registry;
-    registry.group<position, velocity>(entt::get<comp<0>>);
+    const auto group = registry.group<position, velocity>(entt::get<comp<0>>);
 
     std::cout << "Iterating over 1000000 entities, three components, partial owning group" << std::endl;
 
@@ -549,9 +549,9 @@ TEST(Benchmark, IterateThreeComponentsPartialOwningGroup1M) {
         registry.emplace<comp<0>>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
-        registry.group<position, velocity>(entt::get<comp<0>>).each(func);
+        group.each(func);
         timer.elapsed();
     };
 
@@ -572,7 +572,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1M) {
         registry.emplace<comp<0>>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         ENTT_ID_TYPE types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id(),
@@ -606,7 +606,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
         }
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         ENTT_ID_TYPE types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id(),
@@ -640,7 +640,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
         }
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         ENTT_ID_TYPE types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id(),
@@ -673,7 +673,7 @@ TEST(Benchmark, IterateFiveComponents1M) {
         registry.emplace<comp<2>>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
         registry.view<position, velocity, comp<0>, comp<1>, comp<2>>().each(func);
         timer.elapsed();
@@ -701,7 +701,7 @@ TEST(Benchmark, IterateFiveComponents1MHalf) {
         }
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
         registry.view<position, velocity, comp<0>, comp<1>, comp<2>>().each(func);
         timer.elapsed();
@@ -729,7 +729,7 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
         }
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
         registry.view<position, velocity, comp<0>, comp<1>, comp<2>>().each(func);
         timer.elapsed();
@@ -742,7 +742,7 @@ TEST(Benchmark, IterateFiveComponents1MOne) {
 
 TEST(Benchmark, IterateFiveComponentsNonOwningGroup1M) {
     entt::registry registry;
-    registry.group<>(entt::get<position, velocity, comp<0>, comp<1>, comp<2>>);
+    const auto group = registry.group<>(entt::get<position, velocity, comp<0>, comp<1>, comp<2>>);
 
     std::cout << "Iterating over 1000000 entities, five components, non owning group" << std::endl;
 
@@ -755,9 +755,9 @@ TEST(Benchmark, IterateFiveComponentsNonOwningGroup1M) {
         registry.emplace<comp<2>>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
-        registry.group<>(entt::get<position, velocity, comp<0>, comp<1>, comp<2>>).each(func);
+        group.each(func);
         timer.elapsed();
     };
 
@@ -768,7 +768,7 @@ TEST(Benchmark, IterateFiveComponentsNonOwningGroup1M) {
 
 TEST(Benchmark, IterateFiveComponentsFullOwningGroup1M) {
     entt::registry registry;
-    registry.group<position, velocity, comp<0>, comp<1>, comp<2>>();
+    const auto group = registry.group<position, velocity, comp<0>, comp<1>, comp<2>>();
 
     std::cout << "Iterating over 1000000 entities, five components, full owning group" << std::endl;
 
@@ -781,9 +781,9 @@ TEST(Benchmark, IterateFiveComponentsFullOwningGroup1M) {
         registry.emplace<comp<2>>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
-        registry.group<position, velocity, comp<0>, comp<1>, comp<2>>().each(func);
+        group.each(func);
         timer.elapsed();
     };
 
@@ -794,7 +794,7 @@ TEST(Benchmark, IterateFiveComponentsFullOwningGroup1M) {
 
 TEST(Benchmark, IterateFiveComponentsPartialFourOfFiveOwningGroup1M) {
     entt::registry registry;
-    registry.group<position, velocity, comp<0>, comp<1>>(entt::get<comp<2>>);
+    const auto group = registry.group<position, velocity, comp<0>, comp<1>>(entt::get<comp<2>>);
 
     std::cout << "Iterating over 1000000 entities, five components, partial (4 of 5) owning group" << std::endl;
 
@@ -807,9 +807,9 @@ TEST(Benchmark, IterateFiveComponentsPartialFourOfFiveOwningGroup1M) {
         registry.emplace<comp<2>>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
-        registry.group<position, velocity, comp<0>, comp<1>>(entt::get<comp<2>>).each(func);
+        group.each(func);
         timer.elapsed();
     };
 
@@ -820,7 +820,7 @@ TEST(Benchmark, IterateFiveComponentsPartialFourOfFiveOwningGroup1M) {
 
 TEST(Benchmark, IterateFiveComponentsPartialThreeOfFiveOwningGroup1M) {
     entt::registry registry;
-    registry.group<position, velocity, comp<0>>(entt::get<comp<1>, comp<2>>);
+    const auto group = registry.group<position, velocity, comp<0>>(entt::get<comp<1>, comp<2>>);
 
     std::cout << "Iterating over 1000000 entities, five components, partial (3 of 5) owning group" << std::endl;
 
@@ -833,9 +833,9 @@ TEST(Benchmark, IterateFiveComponentsPartialThreeOfFiveOwningGroup1M) {
         registry.emplace<comp<2>>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         timer timer;
-        registry.group<position, velocity, comp<0>>(entt::get<comp<1>, comp<2>>).each(func);
+        group.each(func);
         timer.elapsed();
     };
 
@@ -858,7 +858,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1M) {
         registry.emplace<comp<2>>(entity);
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         ENTT_ID_TYPE types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id(),
@@ -898,7 +898,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
         }
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         ENTT_ID_TYPE types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id(),
@@ -938,7 +938,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
         }
     }
 
-    auto test = [&registry](auto func) {
+    auto test = [&](auto func) {
         ENTT_ID_TYPE types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id(),

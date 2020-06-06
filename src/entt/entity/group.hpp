@@ -110,7 +110,7 @@ public:
      * @return Number of existing components of the given type.
      */
     template<typename Component>
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return std::get<pool_type<Component> *>(pools)->size();
     }
 
@@ -118,7 +118,7 @@ public:
      * @brief Returns the number of entities that have the given components.
      * @return Number of entities that have the given components.
      */
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return handler->size();
     }
 
@@ -127,7 +127,7 @@ public:
      * allocated space for.
      * @return Capacity of the group.
      */
-    size_type capacity() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type capacity() const ENTT_NOEXCEPT {
         return handler->capacity();
     }
 
@@ -142,7 +142,7 @@ public:
      * @return True if the group or the pools are empty, false otherwise.
      */
     template<typename... Component>
-    bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 0) {
             return handler->empty();
         } else {
@@ -165,7 +165,7 @@ public:
      * @return A pointer to the array of components.
      */
     template<typename Component>
-    Component * raw() const ENTT_NOEXCEPT {
+    [[nodiscard]] Component * raw() const ENTT_NOEXCEPT {
         return std::get<pool_type<Component> *>(pools)->raw();
     }
 
@@ -184,7 +184,7 @@ public:
      * @return A pointer to the array of entities.
      */
     template<typename Component>
-    const entity_type * data() const ENTT_NOEXCEPT {
+    [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
         return std::get<pool_type<Component> *>(pools)->data();
     }
 
@@ -200,7 +200,7 @@ public:
      *
      * @return A pointer to the array of entities.
      */
-    const entity_type * data() const ENTT_NOEXCEPT {
+    [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
         return handler->data();
     }
 
@@ -218,7 +218,7 @@ public:
      *
      * @return An iterator to the first entity that has the given components.
      */
-    iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
         return handler->begin();
     }
 
@@ -237,7 +237,7 @@ public:
      * @return An iterator to the entity following the last entity that has the
      * given components.
      */
-    iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return handler->end();
     }
 
@@ -246,7 +246,7 @@ public:
      * @return The first entity that has the given components if one exists, the
      * null entity otherwise.
      */
-    entity_type front() const {
+    [[nodiscard]] entity_type front() const {
         const auto it = begin();
         return it != end() ? *it : null;
     }
@@ -256,7 +256,7 @@ public:
      * @return The last entity that has the given components if one exists, the
      * null entity otherwise.
      */
-    entity_type back() const {
+    [[nodiscard]] entity_type back() const {
         const auto it = std::make_reverse_iterator(end());
         return it != std::make_reverse_iterator(begin()) ? *it : null;
     }
@@ -267,7 +267,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator find(const entity_type entt) const {
+    [[nodiscard]] iterator find(const entity_type entt) const {
         const auto it = handler->find(entt);
         return it != end() && *it == entt ? it : end();
     }
@@ -277,7 +277,7 @@ public:
      * @param pos Position of the element to return.
      * @return The identifier that occupies the given position.
      */
-    entity_type operator[](const size_type pos) const {
+    [[nodiscard]] entity_type operator[](const size_type pos) const {
         return begin()[pos];
     }
 
@@ -286,7 +286,7 @@ public:
      * @param entt A valid entity identifier.
      * @return True if the group contains the given entity, false otherwise.
      */
-    bool contains(const entity_type entt) const {
+    [[nodiscard]] bool contains(const entity_type entt) const {
         return handler->contains(entt);
     }
 
@@ -308,7 +308,7 @@ public:
      * @return The components assigned to the entity.
      */
     template<typename... Component>
-    decltype(auto) get([[maybe_unused]] const entity_type entt) const {
+    [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Component) == 1) {
@@ -531,7 +531,7 @@ public:
      * @return Number of existing components of the given type.
      */
     template<typename Component>
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return std::get<pool_type<Component> *>(pools)->size();
     }
 
@@ -539,7 +539,7 @@ public:
      * @brief Returns the number of entities that have the given components.
      * @return Number of entities that have the given components.
      */
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return *length;
     }
 
@@ -549,7 +549,7 @@ public:
      * @return True if the group or the pools are empty, false otherwise.
      */
     template<typename... Component>
-    bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
         if constexpr(sizeof...(Component) == 0) {
             return !*length;
         } else {
@@ -575,7 +575,7 @@ public:
      * @return A pointer to the array of components.
      */
     template<typename Component>
-    Component * raw() const ENTT_NOEXCEPT {
+    [[nodiscard]] Component * raw() const ENTT_NOEXCEPT {
         return std::get<pool_type<Component> *>(pools)->raw();
     }
 
@@ -597,7 +597,7 @@ public:
      * @return A pointer to the array of entities.
      */
     template<typename Component>
-    const entity_type * data() const ENTT_NOEXCEPT {
+    [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
         return std::get<pool_type<Component> *>(pools)->data();
     }
 
@@ -613,7 +613,7 @@ public:
      *
      * @return A pointer to the array of entities.
      */
-    const entity_type * data() const ENTT_NOEXCEPT {
+    [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
         return std::get<0>(pools)->data();
     }
 
@@ -631,7 +631,7 @@ public:
      *
      * @return An iterator to the first entity that has the given components.
      */
-    iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
         return std::get<0>(pools)->sparse_set<entity_type>::end() - *length;
     }
 
@@ -650,7 +650,7 @@ public:
      * @return An iterator to the entity following the last entity that has the
      * given components.
      */
-    iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return std::get<0>(pools)->sparse_set<entity_type>::end();
     }
 
@@ -659,7 +659,7 @@ public:
      * @return The first entity that has the given components if one exists, the
      * null entity otherwise.
      */
-    entity_type front() const {
+    [[nodiscard]] entity_type front() const {
         const auto it = begin();
         return it != end() ? *it : null;
     }
@@ -669,7 +669,7 @@ public:
      * @return The last entity that has the given components if one exists, the
      * null entity otherwise.
      */
-    entity_type back() const {
+    [[nodiscard]] entity_type back() const {
         const auto it = std::make_reverse_iterator(end());
         return it != std::make_reverse_iterator(begin()) ? *it : null;
     }
@@ -680,7 +680,7 @@ public:
      * @return An iterator to the given entity if it's found, past the end
      * iterator otherwise.
      */
-    iterator find(const entity_type entt) const {
+    [[nodiscard]] iterator find(const entity_type entt) const {
         const auto it = std::get<0>(pools)->find(entt);
         return it != end() && it >= begin() && *it == entt ? it : end();
     }
@@ -690,7 +690,7 @@ public:
      * @param pos Position of the element to return.
      * @return The identifier that occupies the given position.
      */
-    entity_type operator[](const size_type pos) const {
+    [[nodiscard]] entity_type operator[](const size_type pos) const {
         return begin()[pos];
     }
 
@@ -699,7 +699,7 @@ public:
      * @param entt A valid entity identifier.
      * @return True if the group contains the given entity, false otherwise.
      */
-    bool contains(const entity_type entt) const {
+    [[nodiscard]] bool contains(const entity_type entt) const {
         return std::get<0>(pools)->contains(entt) && (std::get<0>(pools)->index(entt) < (*length));
     }
 
@@ -721,7 +721,7 @@ public:
      * @return The components assigned to the entity.
      */
     template<typename... Component>
-    decltype(auto) get([[maybe_unused]] const entity_type entt) const {
+    [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Component) == 1) {
@@ -764,7 +764,7 @@ public:
      * @brief Checks whether the group can be sorted.
      * @return True if the group can be sorted, false otherwise.
      */
-    bool sortable() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool sortable() const ENTT_NOEXCEPT {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         return *super == size;
     }

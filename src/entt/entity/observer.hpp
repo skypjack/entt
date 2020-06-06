@@ -334,7 +334,7 @@ public:
      * @brief Returns the number of elements in an observer.
      * @return Number of elements.
      */
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return view.size();
     }
 
@@ -342,7 +342,7 @@ public:
      * @brief Checks whether an observer is empty.
      * @return True if the observer is empty, false otherwise.
      */
-    bool empty() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
         return view.empty();
     }
 
@@ -358,7 +358,7 @@ public:
      *
      * @return A pointer to the array of entities.
      */
-    const entity_type * data() const ENTT_NOEXCEPT {
+    [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
         return view.data();
     }
 
@@ -370,7 +370,7 @@ public:
      *
      * @return An iterator to the first entity of the observer.
      */
-    iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
         return view.sparse_set<entity_type>::begin();
     }
 
@@ -384,7 +384,7 @@ public:
      * @return An iterator to the entity following the last entity of the
      * observer.
      */
-    iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return view.sparse_set<entity_type>::end();
     }
 
