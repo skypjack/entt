@@ -41,7 +41,7 @@ struct meta_function_helper<Ret(Args...)> {
     static constexpr std::index_sequence_for<Args...> index_sequence{};
     static constexpr auto is_const = false;
 
-    static auto arg(typename internal::meta_func_node::size_type index) ENTT_NOEXCEPT {
+    [[nodiscard]] static auto arg(typename internal::meta_func_node::size_type index) ENTT_NOEXCEPT {
         return std::array<meta_type_node *, sizeof...(Args)>{{meta_info<Args>::resolve()...}}[index];
     }
 };
@@ -76,7 +76,7 @@ using meta_function_helper_t = decltype(to_meta_function_helper(std::declval<Can
 
 
 template<typename Type, typename... Args, std::size_t... Indexes>
-meta_any construct(meta_any * const args, std::index_sequence<Indexes...>) {
+[[nodiscard]] meta_any construct(meta_any * const args, std::index_sequence<Indexes...>) {
     [[maybe_unused]] auto direct = std::make_tuple((args+Indexes)->try_cast<Args>()...);
     meta_any any{};
 
@@ -89,7 +89,7 @@ meta_any construct(meta_any * const args, std::index_sequence<Indexes...>) {
 
 
 template<typename Type, auto Data>
-bool setter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any index, [[maybe_unused]] meta_any value) {
+[[nodiscard]] bool setter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any index, [[maybe_unused]] meta_any value) {
     bool accepted = false;
 
     if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
@@ -153,7 +153,7 @@ bool setter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any index,
 
 
 template<typename Type, auto Data, typename Policy>
-meta_any getter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any index) {
+[[nodiscard]] meta_any getter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any index) {
     auto dispatch = [](auto &&value) {
         if constexpr(std::is_same_v<Policy, as_void_t>) {
             return meta_any{std::in_place_type<void>, std::forward<decltype(value)>(value)};
@@ -194,7 +194,7 @@ meta_any getter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any in
 
 
 template<typename Type, auto Candidate, typename Policy, std::size_t... Indexes>
-meta_any invoke([[maybe_unused]] meta_any instance, meta_any *args, std::index_sequence<Indexes...>) {
+[[nodiscard]] meta_any invoke([[maybe_unused]] meta_any instance, meta_any *args, std::index_sequence<Indexes...>) {
     using helper_type = meta_function_helper_t<decltype(Candidate)>;
 
     auto dispatch = [](auto *... params) {
@@ -256,7 +256,7 @@ class meta_factory;
  */
 template<typename Type, typename... Spec>
 class meta_factory<Type, Spec...>: public meta_factory<Type> {
-    bool exists(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
+    [[nodiscard]] bool exists(const meta_any &key, const internal::meta_prop_node *node) ENTT_NOEXCEPT {
         return node && (node->key() == key || exists(key, node->next));
     }
 
@@ -793,7 +793,7 @@ public:
  * @return An meta factory for the given type.
  */
 template<typename Type>
-inline meta_factory<Type> meta() ENTT_NOEXCEPT {
+[[nodiscard]] meta_factory<Type> meta() ENTT_NOEXCEPT {
     auto * const node = internal::meta_info<Type>::resolve();
     // extended meta factory to allow assigning properties to opaque meta types
     return meta_factory<Type, Type>{&node->prop};

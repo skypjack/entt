@@ -15,7 +15,7 @@ namespace entt {
  * @return The meta type associated with the given type, if any.
  */
 template<typename Type>
-inline meta_type resolve() ENTT_NOEXCEPT {
+[[nodiscard]] meta_type resolve() ENTT_NOEXCEPT {
     return internal::meta_info<Type>::resolve();
 }
 
@@ -38,7 +38,7 @@ void resolve(Op op) {
  * @return The first meta type satisfying the condition, if any.
  */
 template<typename Func>
-inline meta_type resolve_if(Func func) ENTT_NOEXCEPT {
+[[nodiscard]] meta_type resolve_if(Func func) ENTT_NOEXCEPT {
     return internal::find_if([&func](const auto *curr) {
         return func(meta_type{curr});
     }, *internal::meta_context::global());
@@ -50,7 +50,7 @@ inline meta_type resolve_if(Func func) ENTT_NOEXCEPT {
  * @param id Unique identifier.
  * @return The meta type associated with the given identifier, if any.
  */
-inline meta_type resolve_id(const id_type id) ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type resolve_id(const id_type id) ENTT_NOEXCEPT {
     return resolve_if([id](const auto type) { return type.id() == id; });
 }
 
@@ -60,7 +60,7 @@ inline meta_type resolve_id(const id_type id) ENTT_NOEXCEPT {
  * @param id Unique identifier.
  * @return The meta type associated with the given type id, if any.
  */
-inline meta_type resolve_type(const id_type id) ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type resolve_type(const id_type id) ENTT_NOEXCEPT {
     return resolve_if([id](const auto type) { return type.type_id() == id; });
 }
 

@@ -1532,10 +1532,10 @@ TEST_F(Meta, MetaFuncStaticRetVoid) {
     ASSERT_EQ(any.type(), entt::resolve<void>());
     ASSERT_EQ(func_type::value, 42);
 
-    func.prop([](auto *prop) {
+    func.prop([](auto prop) {
         ASSERT_TRUE(prop);
-        ASSERT_EQ(prop->key(), props::prop_bool);
-        ASSERT_FALSE(prop->value().template cast<bool>());
+        ASSERT_EQ(prop.key(), props::prop_bool);
+        ASSERT_FALSE(prop.value().template cast<bool>());
     });
 
     ASSERT_FALSE(func.prop(props::prop_int));

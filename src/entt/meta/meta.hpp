@@ -181,7 +181,7 @@ auto find_if(const Op &op, const meta_type_node *node)
 
 
 template<typename Type>
-bool compare(const void *lhs, const void *rhs) {
+[[nodiscard]] bool compare(const void *lhs, const void *rhs) {
     if constexpr(!std::is_function_v<Type> && is_equality_comparable_v<Type>) {
         return *static_cast<const Type *>(lhs) == *static_cast<const Type *>(rhs);
     } else {
@@ -195,12 +195,12 @@ struct ENTT_API meta_context {
     //     inline static meta_type_node *local = nullptr;
     //     inline static meta_type_node **global = &local;
 
-    static meta_type_node * & local() ENTT_NOEXCEPT {
+    [[nodiscard]] static meta_type_node * & local() ENTT_NOEXCEPT {
         static meta_type_node *chain = nullptr;
         return chain;
     }
 
-    static meta_type_node ** & global() ENTT_NOEXCEPT {
+    [[nodiscard]] static meta_type_node ** & global() ENTT_NOEXCEPT {
         static meta_type_node **chain = &local();
         return chain;
     }
@@ -223,7 +223,7 @@ template<typename Type>
 struct ENTT_API meta_node {
     static_assert(std::is_same_v<Type, std::remove_cv_t<std::remove_reference_t<Type>>>, "Invalid type");
 
-    static meta_type_node * resolve() ENTT_NOEXCEPT {
+    [[nodiscard]] static meta_type_node * resolve() ENTT_NOEXCEPT {
         static meta_type_node node{
             type_info<Type>::id(),
             {},
@@ -459,18 +459,18 @@ public:
      * @brief Returns the meta type of the underlying object.
      * @return The meta type of the underlying object, if any.
      */
-    inline meta_type type() const ENTT_NOEXCEPT;
+    [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
      * @brief Returns an opaque pointer to the contained instance.
      * @return An opaque pointer the contained instance, if any.
      */
-    const void * data() const ENTT_NOEXCEPT {
+    [[nodiscard]] const void * data() const ENTT_NOEXCEPT {
         return instance;
     }
 
     /*! @copydoc data */
-    void * data() ENTT_NOEXCEPT {
+    [[nodiscard]] void * data() ENTT_NOEXCEPT {
         return const_cast<void *>(std::as_const(*this).data());
     }
 
@@ -480,7 +480,7 @@ public:
      * @return A (possibly null) pointer to the contained instance.
      */
     template<typename Type>
-    const Type * try_cast() const {
+    [[nodiscard]] const Type * try_cast() const {
         void *ret = nullptr;
 
         if(const auto type_id = internal::meta_info<Type>::resolve()->type_id; node && node->type_id == type_id) {
@@ -494,7 +494,7 @@ public:
 
     /*! @copydoc try_cast */
     template<typename Type>
-    Type * try_cast() {
+    [[nodiscard]] Type * try_cast() {
         return const_cast<Type *>(std::as_const(*this).try_cast<Type>());
     }
 
@@ -513,7 +513,7 @@ public:
      * @return A reference to the contained instance.
      */
     template<typename Type>
-    const Type & cast() const {
+    [[nodiscard]] const Type & cast() const {
         auto * const actual = try_cast<Type>();
         ENTT_ASSERT(actual);
         return *actual;
@@ -521,7 +521,7 @@ public:
 
     /*! @copydoc cast */
     template<typename Type>
-    Type & cast() {
+    [[nodiscard]] Type & cast() {
         return const_cast<Type &>(std::as_const(*this).cast<Type>());
     }
 
@@ -532,7 +532,7 @@ public:
      * one otherwise.
      */
     template<typename Type>
-    meta_any convert() const {
+    [[nodiscard]] meta_any convert() const {
         meta_any any{};
 
         if(const auto type_id = internal::meta_info<Type>::resolve()->type_id; node && node->type_id == type_id) {
@@ -579,7 +579,7 @@ public:
      * @brief Aliasing constructor.
      * @return A meta any that shares a reference to an unmanaged object.
      */
-    meta_any ref() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_any ref() const ENTT_NOEXCEPT {
         return meta_any{node, instance};
     }
 
@@ -587,7 +587,7 @@ public:
      * @brief Indirection operator for aliasing construction.
      * @return A meta any that shares a reference to an unmanaged object.
      */
-    meta_any operator *() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_any operator *() const ENTT_NOEXCEPT {
         return ref();
     }
 
@@ -595,7 +595,7 @@ public:
      * @brief Returns false if a container is empty, true otherwise.
      * @return False if the container is empty, true otherwise.
      */
-    explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
     }
 
@@ -605,7 +605,7 @@ public:
      * @return False if the two containers differ in their content, true
      * otherwise.
      */
-    bool operator==(const meta_any &other) const {
+    [[nodiscard]] bool operator==(const meta_any &other) const {
         return (!node && !other.node) || (node && other.node && node->type_id == other.node->type_id && node->compare(instance, other.instance));
     }
 
@@ -645,6 +645,17 @@ private:
 
 
 /**
+ * @brief Checks if two containers differ in their content.
+ * @param lhs A meta any object, either empty or not.
+ * @param rhs A meta any object, either empty or not.
+ * @return True if the two containers differ in their content, false otherwise.
+ */
+[[nodiscard]] inline bool operator!=(const meta_any &lhs, const meta_any &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
+
+
+/**
  * @brief Opaque pointers to instances of any type.
  *
  * A handle doesn't perform copies and isn't responsible for the contained
@@ -675,24 +686,13 @@ struct meta_handle {
     }
 
     /*! @copydoc meta_any::operator* */
-    meta_any operator *() const {
+    [[nodiscard]] meta_any operator *() const {
         return any;
     }
 
 private:
     meta_any any;
 };
-
-
-/**
- * @brief Checks if two containers differ in their content.
- * @param lhs A meta any object, either empty or not.
- * @param rhs A meta any object, either empty or not.
- * @return True if the two containers differ in their content, false otherwise.
- */
-inline bool operator!=(const meta_any &lhs, const meta_any &rhs) ENTT_NOEXCEPT {
-    return !(lhs == rhs);
-}
 
 
 /*! @brief Opaque container for meta properties of any type. */
@@ -709,7 +709,7 @@ struct meta_prop {
      * @brief Returns the stored key.
      * @return A meta any containing the key stored with the given property.
      */
-    meta_any key() const {
+    [[nodiscard]] meta_any key() const {
         return node->key();
     }
 
@@ -717,7 +717,7 @@ struct meta_prop {
      * @brief Returns the stored value.
      * @return A meta any containing the value stored with the given property.
      */
-    meta_any value() const {
+    [[nodiscard]] meta_any value() const {
         return node->value();
     }
 
@@ -725,7 +725,7 @@ struct meta_prop {
      * @brief Returns true if a meta object is valid, false otherwise.
      * @return True if the meta object is valid, false otherwise.
      */
-    explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
     }
 
@@ -745,17 +745,17 @@ struct meta_base {
      * @brief Returns the meta type to which a meta object belongs.
      * @return The meta type to which the meta object belongs.
      */
-    inline meta_type parent() const ENTT_NOEXCEPT;
+    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /*! @copydoc meta_any::type */
-    inline meta_type type() const ENTT_NOEXCEPT;
+    [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
      * @brief Casts an instance from a parent type to a base type.
      * @param instance The instance to cast.
      * @return An opaque pointer to the base type.
      */
-    void * cast(void *instance) const ENTT_NOEXCEPT {
+    [[nodiscard]] void * cast(void *instance) const ENTT_NOEXCEPT {
         return node->cast(instance);
     }
 
@@ -763,7 +763,7 @@ struct meta_base {
      * @brief Returns true if a meta object is valid, false otherwise.
      * @return True if the meta object is valid, false otherwise.
      */
-    explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
     }
 
@@ -780,17 +780,17 @@ struct meta_conv {
     {}
 
     /*! @copydoc meta_base::parent */
-    inline meta_type parent() const ENTT_NOEXCEPT;
+    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /*! @copydoc meta_any::type */
-    inline meta_type type() const ENTT_NOEXCEPT;
+    [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
      * @brief Converts an instance to a given type.
      * @param instance The instance to convert.
      * @return An opaque pointer to the instance to convert.
      */
-    meta_any convert(const void *instance) const {
+    [[nodiscard]] meta_any convert(const void *instance) const {
         return node->conv(instance);
     }
 
@@ -798,7 +798,7 @@ struct meta_conv {
      * @brief Returns true if a meta object is valid, false otherwise.
      * @return True if the meta object is valid, false otherwise.
      */
-    explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
     }
 
@@ -818,13 +818,13 @@ struct meta_ctor {
     {}
 
     /*! @copydoc meta_base::parent */
-    inline meta_type parent() const ENTT_NOEXCEPT;
+    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
      * @brief Returns the number of arguments accepted by a meta constructor.
      * @return The number of arguments accepted by the meta constructor.
      */
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return node->size;
     }
 
@@ -833,7 +833,7 @@ struct meta_ctor {
      * @param index The index of the argument of which to return the meta type.
      * @return The meta type of the i-th argument of a meta constructor, if any.
      */
-    meta_type arg(size_type index) const ENTT_NOEXCEPT;
+    [[nodiscard]] meta_type arg(size_type index) const ENTT_NOEXCEPT;
 
     /**
      * @brief Creates an instance of the underlying type, if possible.
@@ -847,7 +847,7 @@ struct meta_ctor {
      * @return A meta any containing the new instance, if any.
      */
     template<typename... Args>
-    meta_any invoke([[maybe_unused]] Args &&... args) const {
+    [[nodiscard]] meta_any invoke([[maybe_unused]] Args &&... args) const {
         if constexpr(sizeof...(Args) == 0) {
             return sizeof...(Args) == size() ? node->invoke(nullptr) : meta_any{};
         } else {
@@ -862,7 +862,7 @@ struct meta_ctor {
      * @param op A valid function object.
      */
     template<typename Op>
-    std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
+    std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
     prop(Op op) const {
         internal::visit<meta_prop>(op, node->prop);
     }
@@ -872,7 +872,7 @@ struct meta_ctor {
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
-    meta_prop prop(meta_any key) const {
+    [[nodiscard]] meta_prop prop(meta_any key) const {
         return internal::find_if([key = std::move(key)](const auto *curr) {
             return curr->key() == key;
         }, node->prop);
@@ -882,7 +882,7 @@ struct meta_ctor {
      * @brief Returns true if a meta object is valid, false otherwise.
      * @return True if the meta object is valid, false otherwise.
      */
-    explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
     }
 
@@ -899,18 +899,18 @@ struct meta_data {
     {}
 
     /*! @copydoc meta_type::id */
-    id_type id() const ENTT_NOEXCEPT {
+    [[nodiscard]] id_type id() const ENTT_NOEXCEPT {
         return node->id;
     }
 
     /*! @copydoc meta_base::parent */
-    inline meta_type parent() const ENTT_NOEXCEPT;
+    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
      * @brief Indicates whether a given meta data is constant or not.
      * @return True if the meta data is constant, false otherwise.
      */
-    bool is_const() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
         return (node->set == nullptr);
     }
 
@@ -918,12 +918,12 @@ struct meta_data {
      * @brief Indicates whether a given meta data is static or not.
      * @return True if the meta data is static, false otherwise.
      */
-    bool is_static() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
         return node->is_static;
     }
 
     /*! @copydoc meta_any::type */
-    inline meta_type type() const ENTT_NOEXCEPT;
+    [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
      * @brief Sets the value of the variable enclosed by a given meta type.
@@ -974,7 +974,7 @@ struct meta_data {
      * @param instance An opaque instance of the underlying type.
      * @return A meta any containing the value of the underlying variable.
      */
-    meta_any get(meta_handle instance) const {
+    [[nodiscard]] meta_any get(meta_handle instance) const {
         return node->get(*instance, {});
     }
 
@@ -988,7 +988,7 @@ struct meta_data {
      * @param index Position of the underlying element to get.
      * @return A meta any containing the value of the underlying element.
      */
-    meta_any get(meta_handle instance, std::size_t index) const {
+    [[nodiscard]] meta_any get(meta_handle instance, std::size_t index) const {
         ENTT_ASSERT(index < node->type()->extent);
         return node->get(*instance, index);
     }
@@ -999,7 +999,7 @@ struct meta_data {
      * @param op A valid function object.
      */
     template<typename Op>
-    std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
+    std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
     prop(Op op) const {
         internal::visit<meta_prop>(op, node->prop);
     }
@@ -1009,7 +1009,7 @@ struct meta_data {
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
-    meta_prop prop(meta_any key) const {
+    [[nodiscard]] meta_prop prop(meta_any key) const {
         return internal::find_if([key = std::move(key)](const auto *curr) {
             return curr->key() == key;
         }, node->prop);
@@ -1019,7 +1019,7 @@ struct meta_data {
      * @brief Returns true if a meta object is valid, false otherwise.
      * @return True if the meta object is valid, false otherwise.
      */
-    explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
     }
 
@@ -1039,18 +1039,18 @@ struct meta_func {
     {}
 
     /*! @copydoc meta_type::id */
-    id_type id() const ENTT_NOEXCEPT {
+    [[nodiscard]] id_type id() const ENTT_NOEXCEPT {
         return node->id;
     }
 
     /*! @copydoc meta_base::parent */
-    inline meta_type parent() const ENTT_NOEXCEPT;
+    [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
      * @brief Returns the number of arguments accepted by a meta function.
      * @return The number of arguments accepted by the meta function.
      */
-    size_type size() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
         return node->size;
     }
 
@@ -1058,7 +1058,7 @@ struct meta_func {
      * @brief Indicates whether a given meta function is constant or not.
      * @return True if the meta function is constant, false otherwise.
      */
-    bool is_const() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
         return node->is_const;
     }
 
@@ -1066,7 +1066,7 @@ struct meta_func {
      * @brief Indicates whether a given meta function is static or not.
      * @return True if the meta function is static, false otherwise.
      */
-    bool is_static() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
         return node->is_static;
     }
 
@@ -1074,14 +1074,14 @@ struct meta_func {
      * @brief Returns the meta type of the return type of a meta function.
      * @return The meta type of the return type of the meta function.
      */
-    inline meta_type ret() const ENTT_NOEXCEPT;
+    [[nodiscard]] inline meta_type ret() const ENTT_NOEXCEPT;
 
     /**
      * @brief Returns the meta type of the i-th argument of a meta function.
      * @param index The index of the argument of which to return the meta type.
      * @return The meta type of the i-th argument of a meta function, if any.
      */
-    inline meta_type arg(size_type index) const ENTT_NOEXCEPT;
+    [[nodiscard]] inline meta_type arg(size_type index) const ENTT_NOEXCEPT;
 
     /**
      * @brief Invokes the underlying function, if possible.
@@ -1110,7 +1110,7 @@ struct meta_func {
      * @param op A valid function object.
      */
     template<typename Op>
-    std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
+    std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
     prop(Op op) const {
         internal::visit<meta_prop>(op, node->prop);
     }
@@ -1120,7 +1120,7 @@ struct meta_func {
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
-    meta_prop prop(meta_any key) const {
+    [[nodiscard]] meta_prop prop(meta_any key) const {
         return internal::find_if([key = std::move(key)](const auto *curr) {
             return curr->key() == key;
         }, node->prop);
@@ -1130,7 +1130,7 @@ struct meta_func {
      * @brief Returns true if a meta object is valid, false otherwise.
      * @return True if the meta object is valid, false otherwise.
      */
-    explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
     }
 
@@ -1142,7 +1142,7 @@ private:
 /*! @brief Opaque container for meta types. */
 class meta_type {
     template<typename... Args, std::size_t... Indexes>
-    auto ctor(std::index_sequence<Indexes...>) const {
+    [[nodiscard]] auto ctor(std::index_sequence<Indexes...>) const {
         return internal::find_if([](const auto *candidate) {
             return candidate->size == sizeof...(Args) && ([](auto *from, auto *to) {
                 return (from->type_id == to->type_id)
@@ -1165,7 +1165,7 @@ public:
      * @brief Returns the type id of the underlying type.
      * @return The type id of the underlying type.
      */
-    id_type type_id() const ENTT_NOEXCEPT {
+    [[nodiscard]] id_type type_id() const ENTT_NOEXCEPT {
         return node->type_id;
     }
 
@@ -1173,7 +1173,7 @@ public:
      * @brief Returns the identifier assigned to a given meta object.
      * @return The identifier assigned to the meta object.
      */
-    id_type id() const ENTT_NOEXCEPT {
+    [[nodiscard]] id_type id() const ENTT_NOEXCEPT {
         return node->id;
     }
 
@@ -1181,7 +1181,7 @@ public:
      * @brief Indicates whether a given meta type refers to void or not.
      * @return True if the underlying type is void, false otherwise.
      */
-    bool is_void() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_void() const ENTT_NOEXCEPT {
         return node->is_void;
     }
 
@@ -1190,7 +1190,7 @@ public:
      * not.
      * @return True if the underlying type is an integral type, false otherwise.
      */
-    bool is_integral() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_integral() const ENTT_NOEXCEPT {
         return node->is_integral;
     }
 
@@ -1200,7 +1200,7 @@ public:
      * @return True if the underlying type is a floating-point type, false
      * otherwise.
      */
-    bool is_floating_point() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_floating_point() const ENTT_NOEXCEPT {
         return node->is_floating_point;
     }
 
@@ -1209,7 +1209,7 @@ public:
      * not.
      * @return True if the underlying type is an array type, false otherwise.
      */
-    bool is_array() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_array() const ENTT_NOEXCEPT {
         return node->is_array;
     }
 
@@ -1217,7 +1217,7 @@ public:
      * @brief Indicates whether a given meta type refers to an enum or not.
      * @return True if the underlying type is an enum, false otherwise.
      */
-    bool is_enum() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_enum() const ENTT_NOEXCEPT {
         return node->is_enum;
     }
 
@@ -1225,7 +1225,7 @@ public:
      * @brief Indicates whether a given meta type refers to an union or not.
      * @return True if the underlying type is an union, false otherwise.
      */
-    bool is_union() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_union() const ENTT_NOEXCEPT {
         return node->is_union;
     }
 
@@ -1233,7 +1233,7 @@ public:
      * @brief Indicates whether a given meta type refers to a class or not.
      * @return True if the underlying type is a class, false otherwise.
      */
-    bool is_class() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_class() const ENTT_NOEXCEPT {
         return node->is_class;
     }
 
@@ -1241,7 +1241,7 @@ public:
      * @brief Indicates whether a given meta type refers to a pointer or not.
      * @return True if the underlying type is a pointer, false otherwise.
      */
-    bool is_pointer() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_pointer() const ENTT_NOEXCEPT {
         return node->is_pointer;
     }
 
@@ -1251,7 +1251,7 @@ public:
      * @return True if the underlying type is a function pointer, false
      * otherwise.
      */
-    bool is_function_pointer() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_function_pointer() const ENTT_NOEXCEPT {
         return node->is_function_pointer;
     }
 
@@ -1261,7 +1261,7 @@ public:
      * @return True if the underlying type is a pointer to data member, false
      * otherwise.
      */
-    bool is_member_object_pointer() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_member_object_pointer() const ENTT_NOEXCEPT {
         return node->is_member_object_pointer;
     }
 
@@ -1271,7 +1271,7 @@ public:
      * @return True if the underlying type is a pointer to member function,
      * false otherwise.
      */
-    bool is_member_function_pointer() const ENTT_NOEXCEPT {
+    [[nodiscard]] bool is_member_function_pointer() const ENTT_NOEXCEPT {
         return node->is_member_function_pointer;
     }
 
@@ -1281,7 +1281,7 @@ public:
      * @return The number of elements of the array if the underlying type is an
      * array type, 0 otherwise.
      */
-    size_type extent() const ENTT_NOEXCEPT {
+    [[nodiscard]] size_type extent() const ENTT_NOEXCEPT {
         return node->extent;
     }
 
@@ -1290,7 +1290,7 @@ public:
      * @return The meta type for which the pointer is defined or this meta type
      * if it doesn't refer to a pointer type.
      */
-    meta_type remove_pointer() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_type remove_pointer() const ENTT_NOEXCEPT {
         return node->remove_pointer();
     }
 
@@ -1299,7 +1299,7 @@ public:
      * @return The meta type for which the array is defined or this meta type
      * if it doesn't refer to an array type.
      */
-    meta_type remove_extent() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_type remove_extent() const ENTT_NOEXCEPT {
         return node->remove_extent();
     }
 
@@ -1309,7 +1309,7 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    std::enable_if_t<std::is_invocable_v<Op, meta_base>, void>
+    std::enable_if_t<std::is_invocable_v<Op, meta_base>>
     base(Op op) const {
         internal::visit<&internal::meta_type_node::base, meta_base>(op, node);
     }
@@ -1319,7 +1319,7 @@ public:
      * @param id Unique identifier.
      * @return The meta base associated with the given identifier, if any.
      */
-    meta_base base(const id_type id) const {
+    [[nodiscard]] meta_base base(const id_type id) const {
         return internal::find_if<&internal::meta_type_node::base>([id](const auto *curr) {
             return curr->type()->id == id;
         }, node);
@@ -1342,7 +1342,7 @@ public:
      * any.
      */
     template<typename Type>
-    meta_conv conv() const {
+    [[nodiscard]] meta_conv conv() const {
         return internal::find_if<&internal::meta_type_node::conv>([type_id = internal::meta_info<Type>::resolve()->type_id](const auto *curr) {
             return curr->type()->type_id == type_id;
         }, node);
@@ -1364,7 +1364,7 @@ public:
      * @return The requested meta constructor, if any.
      */
     template<typename... Args>
-    meta_ctor ctor() const {
+    [[nodiscard]] meta_ctor ctor() const {
         return ctor<Args...>(std::index_sequence_for<Args...>{});
     }
 
@@ -1377,7 +1377,7 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    std::enable_if_t<std::is_invocable_v<Op, meta_data>, void>
+    std::enable_if_t<std::is_invocable_v<Op, meta_data>>
     data(Op op) const {
         internal::visit<&internal::meta_type_node::data, meta_data>(op, node);
     }
@@ -1390,7 +1390,7 @@ public:
      * @param id Unique identifier.
      * @return The meta data associated with the given identifier, if any.
      */
-    meta_data data(const id_type id) const {
+    [[nodiscard]] meta_data data(const id_type id) const {
         return internal::find_if<&internal::meta_type_node::data>([id](const auto *curr) {
             return curr->id == id;
         }, node);
@@ -1405,7 +1405,7 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    std::enable_if_t<std::is_invocable_v<Op, meta_func>, void>
+    std::enable_if_t<std::is_invocable_v<Op, meta_func>>
     func(Op op) const {
         internal::visit<&internal::meta_type_node::func, meta_func>(op, node);
     }
@@ -1418,7 +1418,7 @@ public:
      * @param id Unique identifier.
      * @return The meta function associated with the given identifier, if any.
      */
-    meta_func func(const id_type id) const {
+    [[nodiscard]] meta_func func(const id_type id) const {
         return internal::find_if<&internal::meta_type_node::func>([id](const auto *curr) {
             return curr->id == id;
         }, node);
@@ -1436,7 +1436,7 @@ public:
      * @return A meta any containing the new instance, if any.
      */
     template<typename... Args>
-    meta_any construct(Args &&... args) const {
+    [[nodiscard]] meta_any construct(Args &&... args) const {
         auto construct_if = [this](meta_any *params) {
             meta_any any{};
 
@@ -1464,7 +1464,7 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    std::enable_if_t<std::is_invocable_v<Op, meta_prop>, void>
+    std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
     prop(Op op) const {
         internal::visit<&internal::meta_type_node::prop, meta_prop>(op, node);
     }
@@ -1477,7 +1477,7 @@ public:
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
-    meta_prop prop(meta_any key) const {
+    [[nodiscard]] meta_prop prop(meta_any key) const {
         return internal::find_if<&internal::meta_type_node::prop>([key = std::move(key)](const auto *curr) {
             return curr->key() == key;
         }, node);
@@ -1487,7 +1487,7 @@ public:
      * @brief Returns true if a meta object is valid, false otherwise.
      * @return True if the meta object is valid, false otherwise.
      */
-    explicit operator bool() const ENTT_NOEXCEPT {
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
     }
 
@@ -1497,7 +1497,7 @@ public:
      * @return True if the two meta objects refer to the same type, false
      * otherwise.
      */
-    bool operator==(const meta_type &other) const ENTT_NOEXCEPT {
+    [[nodiscard]] bool operator==(const meta_type &other) const ENTT_NOEXCEPT {
         return (!node && !other.node) || (node && other.node && node->type_id == other.node->type_id);
     }
 
@@ -1517,67 +1517,67 @@ private:
  * @param rhs A meta object, either valid or not.
  * @return False if the two meta objects refer to the same node, true otherwise.
  */
-inline bool operator!=(const meta_type &lhs, const meta_type &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] inline bool operator!=(const meta_type &lhs, const meta_type &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
 
-inline meta_type meta_any::type() const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_any::type() const ENTT_NOEXCEPT {
     return node;
 }
 
 
-inline meta_type meta_base::parent() const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_base::parent() const ENTT_NOEXCEPT {
     return node->parent;
 }
 
 
-inline meta_type meta_base::type() const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_base::type() const ENTT_NOEXCEPT {
     return node->type();
 }
 
 
-inline meta_type meta_conv::parent() const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_conv::parent() const ENTT_NOEXCEPT {
     return node->parent;
 }
 
 
-inline meta_type meta_conv::type() const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_conv::type() const ENTT_NOEXCEPT {
     return node->type();
 }
 
 
-inline meta_type meta_ctor::parent() const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_ctor::parent() const ENTT_NOEXCEPT {
     return node->parent;
 }
 
 
-inline meta_type meta_ctor::arg(size_type index) const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_ctor::arg(size_type index) const ENTT_NOEXCEPT {
     return index < size() ? node->arg(index) : nullptr;
 }
 
 
-inline meta_type meta_data::parent() const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_data::parent() const ENTT_NOEXCEPT {
     return node->parent;
 }
 
 
-inline meta_type meta_data::type() const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_data::type() const ENTT_NOEXCEPT {
     return node->type();
 }
 
 
-inline meta_type meta_func::parent() const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_func::parent() const ENTT_NOEXCEPT {
     return node->parent;
 }
 
 
-inline meta_type meta_func::ret() const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_func::ret() const ENTT_NOEXCEPT {
     return node->ret();
 }
 
 
-inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
     return index < size() ? node->arg(index) : nullptr;
 }
 
