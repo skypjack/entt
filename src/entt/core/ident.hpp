@@ -45,7 +45,7 @@ class identifier {
     using tuple_type = std::tuple<std::decay_t<Types>...>;
 
     template<typename Type, std::size_t... Indexes>
-    static constexpr id_type get(std::index_sequence<Indexes...>) {
+    [[nodiscard]] static constexpr id_type get(std::index_sequence<Indexes...>) {
         static_assert(std::disjunction_v<std::is_same<Type, Types>...>, "Invalid type");
         return (0 + ... + (std::is_same_v<Type, std::tuple_element_t<Indexes, tuple_type>> ? id_type(Indexes) : id_type{}));
     }

@@ -71,7 +71,7 @@ class basic_hashed_string {
     };
 
     // Fowler–Noll–Vo hash function v. 1a - the good
-    static constexpr id_type helper(const Char *curr) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr id_type helper(const Char *curr) ENTT_NOEXCEPT {
         auto value = traits_type::offset;
 
         while(*curr != 0) {
@@ -103,7 +103,7 @@ public:
      * @return The numeric representation of the string.
      */
     template<std::size_t N>
-    static constexpr hash_type value(const value_type (&str)[N]) ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr hash_type value(const value_type (&str)[N]) ENTT_NOEXCEPT {
         return helper(str);
     }
 
@@ -112,7 +112,7 @@ public:
      * @param wrapper Helps achieving the purpose by relying on overloading.
      * @return The numeric representation of the string.
      */
-    static hash_type value(const_wrapper wrapper) ENTT_NOEXCEPT {
+    [[nodiscard]] static hash_type value(const_wrapper wrapper) ENTT_NOEXCEPT {
         return helper(wrapper.str);
     }
 
@@ -122,7 +122,7 @@ public:
      * @param size Length of the string to hash.
      * @return The numeric representation of the string.
      */
-    static hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
+    [[nodiscard]] static hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
         id_type partial{traits_type::offset};
         while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
         return partial;
@@ -165,7 +165,7 @@ public:
      * @brief Returns the human-readable representation of a hashed string.
      * @return The string used to initialize the instance.
      */
-    constexpr const value_type * data() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr const value_type * data() const ENTT_NOEXCEPT {
         return str;
     }
 
@@ -173,25 +173,25 @@ public:
      * @brief Returns the numeric representation of a hashed string.
      * @return The numeric representation of the instance.
      */
-    constexpr hash_type value() const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr hash_type value() const ENTT_NOEXCEPT {
         return hash;
     }
 
     /*! @copydoc data */
-    constexpr operator const value_type *() const ENTT_NOEXCEPT { return data(); }
+    [[nodiscard]] constexpr operator const value_type *() const ENTT_NOEXCEPT { return data(); }
 
     /**
      * @brief Returns the numeric representation of a hashed string.
      * @return The numeric representation of the instance.
      */
-    constexpr operator hash_type() const ENTT_NOEXCEPT { return value(); }
+    [[nodiscard]] constexpr operator hash_type() const ENTT_NOEXCEPT { return value(); }
 
     /**
      * @brief Compares two hashed strings.
      * @param other Hashed string with which to compare.
      * @return True if the two hashed strings are identical, false otherwise.
      */
-    constexpr bool operator==(const basic_hashed_string &other) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator==(const basic_hashed_string &other) const ENTT_NOEXCEPT {
         return hash == other.hash;
     }
 
@@ -224,7 +224,7 @@ basic_hashed_string(const Char (&str)[N]) ENTT_NOEXCEPT
  * @return True if the two hashed strings are identical, false otherwise.
  */
 template<typename Char>
-constexpr bool operator!=(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const basic_hashed_string<Char> &lhs, const basic_hashed_string<Char> &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }
 
@@ -245,7 +245,7 @@ using hashed_wstring = basic_hashed_string<wchar_t>;
  * @param str The literal without its suffix.
  * @return A properly initialized hashed string.
  */
-constexpr entt::hashed_string operator"" ENTT_HS_SUFFIX(const char *str, std::size_t) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr entt::hashed_string operator"" ENTT_HS_SUFFIX(const char *str, std::size_t) ENTT_NOEXCEPT {
     return entt::hashed_string{str};
 }
 
@@ -255,7 +255,7 @@ constexpr entt::hashed_string operator"" ENTT_HS_SUFFIX(const char *str, std::si
  * @param str The literal without its suffix.
  * @return A properly initialized hashed wstring.
  */
-constexpr entt::hashed_wstring operator"" ENTT_HWS_SUFFIX(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr entt::hashed_wstring operator"" ENTT_HWS_SUFFIX(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
     return entt::hashed_wstring{str};
 }
 

@@ -18,7 +18,7 @@ struct identity {
      * @return The submitted value as-is.
      */
     template<class Type>
-    constexpr Type && operator()(Type &&value) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr Type && operator()(Type &&value) const ENTT_NOEXCEPT {
         return std::forward<Type>(value);
     }
 };
@@ -32,7 +32,7 @@ struct identity {
  * @return Pointer to the member.
  */
 template<typename Type, typename Class>
-constexpr auto overload(Type Class:: *member) ENTT_NOEXCEPT { return member; }
+[[nodiscard]] constexpr auto overload(Type Class:: *member) ENTT_NOEXCEPT { return member; }
 
 
 /**
@@ -42,7 +42,7 @@ constexpr auto overload(Type Class:: *member) ENTT_NOEXCEPT { return member; }
  * @return Pointer to the function.
  */
 template<typename Func>
-constexpr auto overload(Func *func) ENTT_NOEXCEPT { return func; }
+[[nodiscard]] constexpr auto overload(Func *func) ENTT_NOEXCEPT { return func; }
 
 
 /**

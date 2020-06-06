@@ -22,7 +22,7 @@ namespace internal {
 
 
 struct ENTT_API type_index {
-    static id_type next() ENTT_NOEXCEPT {
+    [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
         return value++;
     }
@@ -30,7 +30,7 @@ struct ENTT_API type_index {
 
 
 template<typename Type>
-constexpr auto type_name() ENTT_NOEXCEPT {
+[[nodiscard]] constexpr auto type_name() ENTT_NOEXCEPT {
 #if defined ENTT_PRETTY_FUNCTION
     std::string_view pretty_function{ENTT_PRETTY_FUNCTION};
     auto first = pretty_function.find_first_not_of(' ', pretty_function.find_first_of(ENTT_PRETTY_FUNCTION_PREFIX)+1);
@@ -61,7 +61,7 @@ struct ENTT_API type_index {
      * @brief Returns the sequential identifier of a given type.
      * @return The sequential identifier of a given type.
      */
-    static id_type value() ENTT_NOEXCEPT {
+    [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
         static const id_type value = internal::type_index::next();
         return value;
     }
@@ -101,17 +101,17 @@ struct type_info {
      * @return The numeric representation of the given type.
      */
 #if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
-    static constexpr id_type id() ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr id_type id() ENTT_NOEXCEPT {
         constexpr auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
         return value;
     }
 #elif defined ENTT_PRETTY_FUNCTION
-    static id_type id() ENTT_NOEXCEPT {
+    [[nodiscard]] static id_type id() ENTT_NOEXCEPT {
         static const auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
         return value;
     }
 #else
-    static id_type id() ENTT_NOEXCEPT {
+    [[nodiscard]] static id_type id() ENTT_NOEXCEPT {
         return type_index<Type>::value();
     }
 #endif
@@ -121,17 +121,17 @@ struct type_info {
      * @return The name of the given type.
      */
 #if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
-    static constexpr std::string_view name() ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr std::string_view name() ENTT_NOEXCEPT {
         constexpr auto value = internal::type_name<Type>();
         return value;
     }
 #elif defined ENTT_PRETTY_FUNCTION
-    static std::string_view name() ENTT_NOEXCEPT {
+    [[nodiscard]] static std::string_view name() ENTT_NOEXCEPT {
         static const auto value = internal::type_name<Type>();
         return value;
     }
 #else
-    static constexpr std::string_view name() ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr std::string_view name() ENTT_NOEXCEPT {
         return internal::type_name<Type>();
     }
 #endif

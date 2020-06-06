@@ -6,7 +6,6 @@
 #include <utility>
 #include <type_traits>
 #include "../config/config.h"
-#include "hashed_string.hpp"
 #include "fwd.hpp"
 
 
@@ -235,7 +234,7 @@ using member_class_t = typename member_class<Member>::type;
      * @param id The value to convert.\
      * @return The integral representation of the given value.
      */\
-    constexpr auto to_integral(const clazz id) ENTT_NOEXCEPT {\
+    [[nodiscard]] constexpr auto to_integral(const clazz id) ENTT_NOEXCEPT {\
         return static_cast<std::underlying_type_t<clazz>>(id);\
     }\
     static_assert(true)
