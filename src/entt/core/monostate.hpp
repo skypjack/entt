@@ -38,7 +38,7 @@ struct monostate {
      * @return Stored value, if any.
      */
     template<typename Type>
-    [[nodiscard]] operator Type() const ENTT_NOEXCEPT {
+    operator Type() const ENTT_NOEXCEPT {
         return value<Type>;
     }
 

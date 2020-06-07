@@ -36,7 +36,7 @@ struct as_view {
      * @return A newly created view.
      */
     template<typename Exclude, typename... Component>
-    [[nodiscard]] operator entt::basic_view<Entity, Exclude, Component...>() const {
+    operator entt::basic_view<Entity, Exclude, Component...>() const {
         return reg.template view<Component...>(Exclude{});
     }
 
@@ -86,7 +86,7 @@ struct as_group {
      * @return A newly created group.
      */
     template<typename Exclude, typename Get, typename... Owned>
-    [[nodiscard]] operator entt::basic_group<Entity, Exclude, Get, Owned...>() const {
+    operator entt::basic_group<Entity, Exclude, Get, Owned...>() const {
         return reg.template group<Owned...>(Get{}, Exclude{});
     }
 

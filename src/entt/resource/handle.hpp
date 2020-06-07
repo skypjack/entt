@@ -57,16 +57,24 @@ public:
     }
 
     /*! @copydoc get */
-    [[nodiscard]] operator const Resource & () const ENTT_NOEXCEPT { return get(); }
+    [[nodiscard]] operator const Resource & () const ENTT_NOEXCEPT {
+        return get();
+    }
 
     /*! @copydoc get */
-    [[nodiscard]] operator Resource & () ENTT_NOEXCEPT { return get(); }
+    [[nodiscard]] operator Resource & () ENTT_NOEXCEPT {
+        return get();
+    }
 
     /*! @copydoc get */
-    [[nodiscard]] const Resource & operator *() const ENTT_NOEXCEPT { return get(); }
+    [[nodiscard]] const Resource & operator *() const ENTT_NOEXCEPT {
+        return get();
+    }
 
     /*! @copydoc get */
-    [[nodiscard]] Resource & operator *() ENTT_NOEXCEPT { return get(); }
+    [[nodiscard]] Resource & operator *() ENTT_NOEXCEPT {
+        return get();
+    }
 
     /**
      * @brief Gets a pointer to the managed resource.
