@@ -1210,8 +1210,8 @@ public:
      */
     template<typename Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
+        ENTT_ASSERT(sortable<Component>());
         auto &cpool = assure<Component>();
-        ENTT_ASSERT(!cpool.super);
         cpool.sort(cpool.begin(), cpool.end(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 
@@ -1252,9 +1252,8 @@ public:
      */
     template<typename To, typename From>
     void sort() {
-        auto &cpool = assure<To>();
-        ENTT_ASSERT(!cpool.super);
-        cpool.respect(assure<From>());
+        ENTT_ASSERT(sortable<To>());
+        assure<To>().respect(assure<From>());
     }
 
     /**
@@ -1310,7 +1309,7 @@ public:
      */
     template<typename... Component>
     [[nodiscard]] bool sortable() const {
-        return !(assure<Component>().super || ...);
+        return std::none_of(groups.cbegin(), groups.cend(), [](auto &&gdata) { return (gdata.owned(type_info<std::decay_t<Component>>::id()) || ...); });
     }
 
     /**
