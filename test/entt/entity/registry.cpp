@@ -830,13 +830,13 @@ TEST(Registry, NestedGroups) {
     registry.insert<char>(std::begin(entities), std::end(entities));
     const auto g1 = registry.group<int>(entt::get<char>, entt::exclude<double>);
 
-    ASSERT_TRUE(g1.sortable());
+    ASSERT_TRUE(registry.sortable(g1));
     ASSERT_EQ(g1.size(), 10u);
 
     const auto g2 = registry.group<int>(entt::get<char>);
 
-    ASSERT_TRUE(g1.sortable());
-    ASSERT_FALSE(g2.sortable());
+    ASSERT_TRUE(registry.sortable(g1));
+    ASSERT_FALSE(registry.sortable(g2));
     ASSERT_EQ(g1.size(), 10u);
     ASSERT_EQ(g2.size(), 10u);
 
@@ -864,9 +864,9 @@ TEST(Registry, NestedGroups) {
 
     const auto g3= registry.group<int, float>(entt::get<char>, entt::exclude<double>);
 
-    ASSERT_FALSE(g1.sortable());
-    ASSERT_FALSE(g2.sortable());
-    ASSERT_TRUE(g3.sortable());
+    ASSERT_FALSE(registry.sortable(g1));
+    ASSERT_FALSE(registry.sortable(g2));
+    ASSERT_TRUE(registry.sortable(g3));
 
     ASSERT_EQ(g1.size(), 0u);
     ASSERT_EQ(g2.size(), 5u);

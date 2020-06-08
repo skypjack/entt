@@ -491,10 +491,9 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
     template<typename Component>
     using component_iterator = decltype(std::declval<pool_type<Component>>().begin());
 
-    basic_group(const std::size_t &ref, const std::size_t &extent, pool_type<Owned> &... opool, pool_type<Get> &... gpool) ENTT_NOEXCEPT
+    basic_group(const std::size_t &extent, pool_type<Owned> &... opool, pool_type<Get> &... gpool) ENTT_NOEXCEPT
         : pools{&opool..., &gpool...},
-          length{&extent},
-          super{&ref}
+          length{&extent}
     {}
 
     template<typename Func, typename... Strong, typename... Weak>
@@ -761,15 +760,6 @@ public:
     }
 
     /**
-     * @brief Checks whether the group can be sorted.
-     * @return True if the group can be sorted, false otherwise.
-     */
-    [[nodiscard]] bool sortable() const ENTT_NOEXCEPT {
-        constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
-        return *super == size;
-    }
-
-    /**
      * @brief Sort a group according to the given comparison function.
      *
      * Sort the group so that iterating it with a couple of iterators returns
@@ -808,7 +798,6 @@ public:
      */
     template<typename... Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
-        ENTT_ASSERT(sortable());
         auto *cpool = std::get<0>(pools);
 
         if constexpr(sizeof...(Component) == 0) {
@@ -836,7 +825,6 @@ public:
 private:
     const std::tuple<pool_type<Owned> *..., pool_type<Get> *...> pools;
     const size_type *length;
-    const size_type *super;
 };
 
 
