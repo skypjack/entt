@@ -12,6 +12,7 @@
   * [All or nothing](#all-or-nothing)
   * [Stateless systems](#stateless-systems)
 * [Vademecum](#vademecum)
+* [Pools](#pools)
 * [The Registry, the Entity and the Component](#the-registry-the-entity-and-the-component)
   * [Observe changes](#observe-changes)
     * [They call me Reactive System](#they-call-me-reactive-system)
@@ -139,6 +140,22 @@ The following sections explain in short how to use the entity-component system,
 the core part of the whole library.<br/>
 The project is composed of many other classes in addition to those describe
 below. For more details, please refer to the inline documentation.
+
+# Pools
+
+In `EnTT`, pools of components are made available through a specialized version
+of a sparse set.
+
+Each pool contains all the instances of a single component, as well as all the
+entities to which it's assigned. Sparse arrays are also _paged_ to avoid wasting
+memory in some cases while packed arrays are not for obvious reasons.<br/>
+Pools also make available at any time a pointer to the packed lists of entities
+and components they contain, in addition to the number of elements in use. For
+this reason, pools can rearrange their items in order to keep the internal
+arrays tightly packed and maximize performance.
+
+At the moment, it's possible to specialize pools within certain limits, although
+a more flexible and user-friendly model is under development.
 
 # The Registry, the Entity and the Component
 
