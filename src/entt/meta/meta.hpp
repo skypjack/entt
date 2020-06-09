@@ -267,7 +267,7 @@ struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> 
 /*! @brief Opaque container for a meta context. */
 struct meta_ctx {
     /**
-     * @brief Binds the meta system to the given context.
+     * @brief Binds the meta system to a given context.
      * @param other A valid context to which to bind.
      */
     static void bind(meta_ctx other) ENTT_NOEXCEPT {
@@ -707,7 +707,7 @@ struct meta_prop {
 
     /**
      * @brief Returns the stored key.
-     * @return A meta any containing the key stored with the given property.
+     * @return A meta any containing the key stored with the property.
      */
     [[nodiscard]] meta_any key() const {
         return node->key();
@@ -715,7 +715,7 @@ struct meta_prop {
 
     /**
      * @brief Returns the stored value.
-     * @return A meta any containing the value stored with the given property.
+     * @return A meta any containing the value stored with the property.
      */
     [[nodiscard]] meta_any value() const {
         return node->value();
@@ -786,7 +786,7 @@ struct meta_conv {
     [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Converts an instance to a given type.
+     * @brief Converts an instance to the underlying type.
      * @param instance The instance to convert.
      * @return An opaque pointer to the instance to convert.
      */
@@ -907,7 +907,7 @@ struct meta_data {
     [[nodiscard]] inline meta_type parent() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Indicates whether a given meta data is constant or not.
+     * @brief Indicates whether a meta data is constant or not.
      * @return True if the meta data is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
@@ -915,7 +915,7 @@ struct meta_data {
     }
 
     /**
-     * @brief Indicates whether a given meta data is static or not.
+     * @brief Indicates whether a meta data is static or not.
      * @return True if the meta data is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
@@ -926,7 +926,7 @@ struct meta_data {
     [[nodiscard]] inline meta_type type() const ENTT_NOEXCEPT;
 
     /**
-     * @brief Sets the value of the variable enclosed by a given meta type.
+     * @brief Sets the value of a given variable.
      *
      * It must be possible to cast the instance to the parent type of the meta
      * data. Otherwise, invoking the setter results in an undefined
@@ -945,7 +945,7 @@ struct meta_data {
     }
 
     /**
-     * @brief Sets the i-th element of an array enclosed by a given meta type.
+     * @brief Sets the i-th element of a given array.
      *
      * It must be possible to cast the instance to the parent type of the meta
      * data. Otherwise, invoking the setter results in an undefined
@@ -966,7 +966,7 @@ struct meta_data {
     }
 
     /**
-     * @brief Gets the value of the variable enclosed by a given meta type.
+     * @brief Gets the value of a given variable.
      *
      * It must be possible to cast the instance to the parent type of the meta
      * data. Otherwise, invoking the getter results in an undefined behavior.
@@ -979,7 +979,7 @@ struct meta_data {
     }
 
     /**
-     * @brief Gets the i-th element of an array enclosed by a given meta type.
+     * @brief Gets the i-th element of a given array.
      *
      * It must be possible to cast the instance to the parent type of the meta
      * data. Otherwise, invoking the getter results in an undefined behavior.
@@ -1055,7 +1055,7 @@ struct meta_func {
     }
 
     /**
-     * @brief Indicates whether a given meta function is constant or not.
+     * @brief Indicates whether a meta function is constant or not.
      * @return True if the meta function is constant, false otherwise.
      */
     [[nodiscard]] bool is_const() const ENTT_NOEXCEPT {
@@ -1063,7 +1063,7 @@ struct meta_func {
     }
 
     /**
-     * @brief Indicates whether a given meta function is static or not.
+     * @brief Indicates whether a meta function is static or not.
      * @return True if the meta function is static, false otherwise.
      */
     [[nodiscard]] bool is_static() const ENTT_NOEXCEPT {
@@ -1170,7 +1170,7 @@ public:
     }
 
     /**
-     * @brief Returns the identifier assigned to a given meta object.
+     * @brief Returns the identifier assigned to a meta object.
      * @return The identifier assigned to the meta object.
      */
     [[nodiscard]] id_type id() const ENTT_NOEXCEPT {
@@ -1178,7 +1178,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a given meta type refers to void or not.
+     * @brief Indicates whether a meta type refers to void or not.
      * @return True if the underlying type is void, false otherwise.
      */
     [[nodiscard]] bool is_void() const ENTT_NOEXCEPT {
@@ -1186,8 +1186,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a given meta type refers to an integral type or
-     * not.
+     * @brief Indicates whether a meta type refers to an integral type or not.
      * @return True if the underlying type is an integral type, false otherwise.
      */
     [[nodiscard]] bool is_integral() const ENTT_NOEXCEPT {
@@ -1195,8 +1194,8 @@ public:
     }
 
     /**
-     * @brief Indicates whether a given meta type refers to a floating-point
-     * type or not.
+     * @brief Indicates whether a meta type refers to a floating-point type or
+     * not.
      * @return True if the underlying type is a floating-point type, false
      * otherwise.
      */
@@ -1205,8 +1204,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a given meta type refers to an array type or
-     * not.
+     * @brief Indicates whether a meta type refers to an array type or not.
      * @return True if the underlying type is an array type, false otherwise.
      */
     [[nodiscard]] bool is_array() const ENTT_NOEXCEPT {
@@ -1214,7 +1212,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a given meta type refers to an enum or not.
+     * @brief Indicates whether a meta type refers to an enum or not.
      * @return True if the underlying type is an enum, false otherwise.
      */
     [[nodiscard]] bool is_enum() const ENTT_NOEXCEPT {
@@ -1222,7 +1220,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a given meta type refers to an union or not.
+     * @brief Indicates whether a meta type refers to an union or not.
      * @return True if the underlying type is an union, false otherwise.
      */
     [[nodiscard]] bool is_union() const ENTT_NOEXCEPT {
@@ -1230,7 +1228,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a given meta type refers to a class or not.
+     * @brief Indicates whether a meta type refers to a class or not.
      * @return True if the underlying type is a class, false otherwise.
      */
     [[nodiscard]] bool is_class() const ENTT_NOEXCEPT {
@@ -1238,7 +1236,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a given meta type refers to a pointer or not.
+     * @brief Indicates whether a meta type refers to a pointer or not.
      * @return True if the underlying type is a pointer, false otherwise.
      */
     [[nodiscard]] bool is_pointer() const ENTT_NOEXCEPT {
@@ -1246,8 +1244,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a given meta type refers to a function pointer
-     * or not.
+     * @brief Indicates whether a meta type refers to a function pointer or not.
      * @return True if the underlying type is a function pointer, false
      * otherwise.
      */
@@ -1256,8 +1253,8 @@ public:
     }
 
     /**
-     * @brief Indicates whether a given meta type refers to a pointer to data
-     * member or not.
+     * @brief Indicates whether a meta type refers to a pointer to data member
+     * or not.
      * @return True if the underlying type is a pointer to data member, false
      * otherwise.
      */
@@ -1266,7 +1263,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a given meta type refers to a pointer to member
+     * @brief Indicates whether a meta type refers to a pointer to member
      * function or not.
      * @return True if the underlying type is a pointer to member function,
      * false otherwise.
@@ -1276,8 +1273,8 @@ public:
     }
 
     /**
-     * @brief If a given meta type refers to an array type, provides the number
-     * of elements of the array.
+     * @brief If a meta type refers to an array type, provides the number of
+     * elements of the array.
      * @return The number of elements of the array if the underlying type is an
      * array type, 0 otherwise.
      */

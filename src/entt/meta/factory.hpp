@@ -790,7 +790,7 @@ public:
  * dedicated factory.
  *
  * @tparam Type Type to reflect.
- * @return An meta factory for the given type.
+ * @return A meta factory for the given type.
  */
 template<typename Type>
 [[nodiscard]] meta_factory<Type> meta() ENTT_NOEXCEPT {
