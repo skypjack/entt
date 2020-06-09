@@ -1473,12 +1473,12 @@ In fact, given a list of component types involved by a group, the greater the
 number of those owned, the greater the performance of the group itself.
 
 As a side note, it's no longer possible to sort all groups when defining nested
-ones. This is because the most restrictive groups share the elements with the
+ones. This is because the most restrictive group shares its elements with the
 less restrictive ones and ordering the latter would invalidate the former.<br/>
 However, given a family of nested groups, it's still possible to sort the most
 restrictive of them. To prevent users from having to remember which of their
-groups is the most restrictive, they offer the `sortable` member function to
-know if their items can be sorted or not.
+groups is the most restrictive, the registry class offers the `sortable` member
+function to know if a group can be sorted or not.
 
 ## Types: const, non-const and all in between
 
