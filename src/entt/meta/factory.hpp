@@ -13,6 +13,7 @@
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
 #include "../core/utility.hpp"
+#include "internal.hpp"
 #include "meta.hpp"
 #include "policy.hpp"
 
