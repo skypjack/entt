@@ -33,6 +33,7 @@ struct Meta: ::testing::Test {
     static void SetUpTestCase() {
         entt::meta<double>().conv<int>();
         entt::meta<derived_t>().base<base_t>();
+
         entt::meta<clazz_t>().type("clazz"_hs)
                 .ctor<const base_t &, int>()
                 .ctor<const int &, char>().prop(3, false)
