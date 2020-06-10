@@ -9,21 +9,6 @@
 #include <entt/meta/resolve.hpp>
 #include "fixture.h"
 
-TEST_F(Meta, Resolve) {
-    ASSERT_EQ(entt::resolve<derived_type>(), entt::resolve_id("derived"_hs));
-    ASSERT_EQ(entt::resolve<derived_type>(), entt::resolve_type(entt::type_info<derived_type>::id()));
-    // it could be "char"_hs rather than entt::hashed_string::value("char") if it weren't for a bug in VS2017
-    ASSERT_EQ(entt::resolve_if([](auto type) { return type.id() == entt::hashed_string::value("char"); }), entt::resolve<char>());
-
-    bool found = false;
-
-    entt::resolve([&found](auto type) {
-        found = found || type == entt::resolve<derived_type>();
-    });
-
-    ASSERT_TRUE(found);
-}
-
 TEST_F(Meta, MetaAnySBO) {
     entt::meta_any any{'c'};
 
