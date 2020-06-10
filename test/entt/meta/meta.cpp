@@ -9,16 +9,6 @@
 #include <entt/meta/resolve.hpp>
 #include "fixture.h"
 
-TEST_F(Meta, MetaBase) {
-    auto base = entt::resolve<derived_type>().base("base"_hs);
-    derived_type derived{};
-
-    ASSERT_TRUE(base);
-    ASSERT_EQ(base.parent(), entt::resolve_id("derived"_hs));
-    ASSERT_EQ(base.type(), entt::resolve<base_type>());
-    ASSERT_EQ(base.cast(&derived), static_cast<base_type *>(&derived));
-}
-
 TEST_F(Meta, MetaConv) {
     auto conv = entt::resolve<double>().conv<int>();
     double value = 3.;
