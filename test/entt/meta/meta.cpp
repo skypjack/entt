@@ -9,14 +9,6 @@
 #include <entt/meta/resolve.hpp>
 #include "fixture.h"
 
-TEST_F(Meta, MetaProp) {
-    auto prop = entt::resolve<char>().prop(props::prop_int);
-
-    ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), props::prop_int);
-    ASSERT_EQ(prop.value(), 42);
-}
-
 TEST_F(Meta, MetaBase) {
     auto base = entt::resolve<derived_type>().base("base"_hs);
     derived_type derived{};
@@ -947,18 +939,6 @@ TEST_F(Meta, MetaFuncFromBase) {
     base.func("g"_hs).invoke(instance, 3);
 
     ASSERT_EQ(instance.i, -3);
-}
-
-TEST_F(Meta, MetaPropFromBase) {
-    auto type = entt::resolve<concrete_type>();
-    auto prop_bool = type.prop(props::prop_bool);
-    auto prop_int = type.prop(props::prop_int);
-
-    ASSERT_TRUE(prop_bool);
-    ASSERT_TRUE(prop_int);
-
-    ASSERT_FALSE(prop_bool.value().cast<bool>());
-    ASSERT_EQ(prop_int.value().cast<int>(), 42);
 }
 
 TEST_F(Meta, AbstractClass) {

@@ -794,7 +794,7 @@ public:
  * @return A meta factory for the given type.
  */
 template<typename Type>
-[[nodiscard]] meta_factory<Type> meta() ENTT_NOEXCEPT {
+[[nodiscard]] auto meta() ENTT_NOEXCEPT {
     auto * const node = internal::meta_info<Type>::resolve();
     // extended meta factory to allow assigning properties to opaque meta types
     return meta_factory<Type, Type>{&node->prop};
