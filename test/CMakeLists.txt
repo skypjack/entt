@@ -178,6 +178,7 @@ SETUP_BASIC_TEST(locator entt/locator/locator.cpp)
 # Test meta
 
 list(APPEND TEST_META_SOURCES entt/meta/meta.cpp entt/meta/fixture.cpp)
+SETUP_BASIC_TEST(meta_any entt/meta/meta_any.cpp)
 SETUP_BASIC_TEST(meta_basic entt/meta/meta_basic.cpp)
 SETUP_BASIC_TEST(meta "${TEST_META_SOURCES}")
 
