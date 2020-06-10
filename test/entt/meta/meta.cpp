@@ -9,51 +9,6 @@
 #include <entt/meta/resolve.hpp>
 #include "fixture.h"
 
-TEST_F(Meta, MetaConv) {
-    auto conv = entt::resolve<double>().conv<int>();
-    double value = 3.;
-
-    ASSERT_TRUE(conv);
-    ASSERT_EQ(conv.parent(), entt::resolve<double>());
-    ASSERT_EQ(conv.type(), entt::resolve<int>());
-
-    auto any = conv.convert(&value);
-
-    ASSERT_TRUE(any);
-    ASSERT_EQ(any.type(), entt::resolve<int>());
-    ASSERT_EQ(any.cast<int>(), 3);
-}
-
-TEST_F(Meta, MetaConvAsFreeFunctions) {
-    auto conv = entt::resolve<derived_type>().conv<int>();
-    derived_type derived{derived_type{}, 42, 'c'};
-
-    ASSERT_TRUE(conv);
-    ASSERT_EQ(conv.parent(), entt::resolve<derived_type>());
-    ASSERT_EQ(conv.type(), entt::resolve<int>());
-
-    auto any = conv.convert(&derived);
-
-    ASSERT_TRUE(any);
-    ASSERT_EQ(any.type(), entt::resolve<int>());
-    ASSERT_EQ(any.cast<int>(), 42);
-}
-
-TEST_F(Meta, MetaConvAsMemberFunctions) {
-    auto conv = entt::resolve<derived_type>().conv<char>();
-    derived_type derived{derived_type{}, 42, 'c'};
-
-    ASSERT_TRUE(conv);
-    ASSERT_EQ(conv.parent(), entt::resolve<derived_type>());
-    ASSERT_EQ(conv.type(), entt::resolve<char>());
-
-    auto any = conv.convert(&derived);
-
-    ASSERT_TRUE(any);
-    ASSERT_EQ(any.type(), entt::resolve<char>());
-    ASSERT_EQ(any.cast<char>(), 'c');
-}
-
 TEST_F(Meta, MetaCtor) {
     auto ctor = entt::resolve<derived_type>().ctor<const base_type &, int, char>();
 
