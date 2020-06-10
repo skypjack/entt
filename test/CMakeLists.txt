@@ -181,6 +181,7 @@ SETUP_BASIC_TEST(meta_any entt/meta/meta_any.cpp)
 SETUP_BASIC_TEST(meta_base entt/meta/meta_base.cpp)
 SETUP_BASIC_TEST(meta_basic entt/meta/meta_basic.cpp)
 SETUP_BASIC_TEST(meta_conv entt/meta/meta_conv.cpp)
+SETUP_BASIC_TEST(meta_ctor entt/meta/meta_ctor.cpp)
 SETUP_BASIC_TEST(meta_prop entt/meta/meta_prop.cpp)
 
 list(APPEND TEST_META_SOURCES entt/meta/meta.cpp entt/meta/fixture.cpp)
