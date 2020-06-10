@@ -70,7 +70,7 @@ function(SETUP_BASIC_TEST TEST_NAME TEST_SOURCES)
 endfunction()
 
 function(SETUP_LIB_TEST TEST_NAME)
-    add_library(_${TEST_NAME} SHARED lib/${TEST_NAME}/lib.cpp)
+    add_library(_${TEST_NAME} SHARED $<TARGET_OBJECTS:odr> lib/${TEST_NAME}/lib.cpp)
     SETUP_TARGET(_${TEST_NAME})
     SETUP_BASIC_TEST(lib_${TEST_NAME} lib/${TEST_NAME}/main.cpp)
     target_compile_definitions(_${TEST_NAME} PRIVATE ENTT_API_EXPORT ${ARGV1})
@@ -79,7 +79,7 @@ function(SETUP_LIB_TEST TEST_NAME)
 endfunction()
 
 function(SETUP_PLUGIN_TEST TEST_NAME)
-    add_library(_${TEST_NAME} MODULE lib/${TEST_NAME}/plugin.cpp)
+    add_library(_${TEST_NAME} MODULE $<TARGET_OBJECTS:odr> lib/${TEST_NAME}/plugin.cpp)
     SETUP_TARGET(_${TEST_NAME})
     SETUP_BASIC_TEST(lib_${TEST_NAME} lib/${TEST_NAME}/main.cpp)
     target_include_directories(_${TEST_NAME} PRIVATE ${cr_INCLUDE_DIR})
@@ -177,7 +177,8 @@ SETUP_BASIC_TEST(locator entt/locator/locator.cpp)
 
 # Test meta
 
-SETUP_BASIC_TEST(meta entt/meta/meta.cpp)
+list(APPEND TEST_META_SOURCES entt/meta/meta.cpp entt/meta/fixture.cpp)
+SETUP_BASIC_TEST(meta "${TEST_META_SOURCES}")
 
 # Test process
 
