@@ -27,7 +27,9 @@ template<typename Type>
  */
 template<typename Op>
 void resolve(Op op) {
-    internal::visit<meta_type>(op, *internal::meta_context::global());
+    for(auto &&curr: internal::meta_range{*internal::meta_context::global()}) {
+        op(meta_type{&curr});
+    }
 }
 
 
@@ -39,9 +41,9 @@ void resolve(Op op) {
  */
 template<typename Func>
 [[nodiscard]] meta_type resolve_if(Func func) ENTT_NOEXCEPT {
-    return internal::find_if([&func](const auto *curr) {
-        return func(meta_type{curr});
-    }, *internal::meta_context::global());
+    internal::meta_range range{*internal::meta_context::global()};
+    const auto it = std::find_if(range.cbegin(), range.cend(), [&func](const auto &curr) { return func(meta_type{&curr}); });
+    return it == range.cend() ? nullptr : it.operator->();
 }
 
 

@@ -2,6 +2,7 @@
 #define ENTT_META_INTERNAL_HPP
 
 
+#include <algorithm>
 #include <cstddef>
 #include <type_traits>
 #include "../core/attribute.h"
@@ -126,51 +127,113 @@ struct meta_type_node {
 };
 
 
-template<typename Type, typename Op, typename Node>
-void visit(Op &op, Node *node) {
-    while(node) {
-        op(Type{node});
-        node = node->next;
+template<typename Node>
+struct meta_iterator {
+    using difference_type = std::ptrdiff_t;
+    using value_type = Node;
+    using pointer = value_type *;
+    using reference = value_type &;
+    using iterator_category = std::forward_iterator_tag;
+
+    meta_iterator() ENTT_NOEXCEPT = default;
+
+    meta_iterator(Node *head) ENTT_NOEXCEPT
+        : node{head}
+    {}
+
+    meta_iterator & operator++() ENTT_NOEXCEPT {
+        return node = node->next, *this;
     }
-}
+
+    meta_iterator operator++(int) ENTT_NOEXCEPT {
+        meta_iterator orig = *this;
+        return operator++(), orig;
+    }
+
+    [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
+        return other.node == node;
+    }
+
+    [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this == other);
+    }
+
+    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+        return node;
+    }
+
+    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+        return *operator->();
+    }
+
+private:
+    Node *node{nullptr};
+};
+
+
+template<typename Node>
+struct meta_range {
+    using iterator = meta_iterator<Node>;
+    using const_iterator = meta_iterator<const Node>;
+
+    meta_range() ENTT_NOEXCEPT = default;
+
+    meta_range(Node *head)
+        : node{head}
+    {}
+
+    iterator begin() ENTT_NOEXCEPT {
+        return iterator{node};
+    }
+
+    const_iterator begin() const ENTT_NOEXCEPT {
+        return const_iterator{node};
+    }
+
+    const_iterator cbegin() const ENTT_NOEXCEPT {
+        return begin();
+    }
+
+    iterator end() ENTT_NOEXCEPT {
+        return iterator{};
+    }
+
+    const_iterator end() const ENTT_NOEXCEPT {
+        return const_iterator{};
+    }
+
+    const_iterator cend() const ENTT_NOEXCEPT {
+        return end();
+    }
+
+private:
+    Node *node{nullptr};
+};
 
 
 template<auto Member, typename Type, typename Op>
 void visit(Op &op, const internal::meta_type_node *node) {
-    if(node) {
-        internal::visit<Type>(op, node->*Member);
-        auto *next = node->base;
-
-        while(next) {
-            visit<Member, Type>(op, next->type());
-            next = next->next;
-        }
-    }
-}
-
-
-template<typename Op, typename Node>
-auto find_if(const Op &op, Node *node) {
-    while(node && !op(node)) {
-        node = node->next;
+    for(auto &&curr: meta_range{node->*Member}) {
+        op(Type{&curr});
     }
 
-    return node;
+    for(auto &&base: meta_range{node->base}) {
+        visit<Member, Type>(op, base.type());
+    }
 }
 
 
 template<auto Member, typename Op>
 auto find_if(const Op &op, const meta_type_node *node)
--> decltype(find_if(op, node->*Member)) {
-    decltype(find_if(op, node->*Member)) ret = nullptr;
+-> std::decay_t<decltype(node->*Member)> {
+    std::decay_t<decltype(node->*Member)> ret = nullptr;
+    meta_range range{node->*Member};
 
-    if(node) {
-        ret = find_if(op, node->*Member);
-        auto *next = node->base;
+    if(ret = std::find_if(range.begin(), range.end(), [&op](const auto &curr) { return op(&curr); }).operator->(); !ret) {
+        meta_range base{node->base};
 
-        while(next && !ret) {
-            ret = find_if<Member>(op, next->type());
-            next = next->next;
+        for(auto first = base.begin(), last = base.end(); first != last && !ret; ++first) {
+            ret = find_if<Member>(op, first->type());
         }
     }
 

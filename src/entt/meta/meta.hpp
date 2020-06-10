@@ -2,6 +2,7 @@
 #define ENTT_META_META_HPP
 
 
+#include <algorithm>
 #include <cstddef>
 #include <functional>
 #include <type_traits>
@@ -222,10 +223,12 @@ public:
     [[nodiscard]] const Type * try_cast() const {
         void *ret = nullptr;
 
-        if(const auto type_id = internal::meta_info<Type>::resolve()->type_id; node && node->type_id == type_id) {
-            ret = instance;
-        } else if(const auto *base = internal::find_if<&internal::meta_type_node::base>([type_id](const auto *curr) { return curr->type()->type_id == type_id; }, node); base) {
-            ret = base->cast(instance);
+        if(node) {
+            if(const auto type_id = internal::meta_info<Type>::resolve()->type_id; node->type_id == type_id) {
+                ret = instance;
+            } else if(const auto *base = internal::find_if<&internal::meta_type_node::base>([type_id](const auto *curr) { return curr->type()->type_id == type_id; }, node); base) {
+                ret = base->cast(instance);
+            }
         }
 
         return static_cast<const Type *>(ret);
@@ -274,10 +277,12 @@ public:
     [[nodiscard]] meta_any convert() const {
         meta_any any{};
 
-        if(const auto type_id = internal::meta_info<Type>::resolve()->type_id; node && node->type_id == type_id) {
-            any = *this;
-        } else if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([type_id](const auto *curr) { return curr->type()->type_id == type_id; }, node); conv) {
-            any = conv->conv(instance);
+        if(node) {
+            if(const auto type_id = internal::meta_info<Type>::resolve()->type_id; node->type_id == type_id) {
+                any = *this;
+            } else if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([type_id](const auto *curr) { return curr->type()->type_id == type_id; }, node); conv) {
+                any = conv->conv(instance);
+            }
         }
 
         return any;
@@ -603,7 +608,9 @@ struct meta_ctor {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
     prop(Op op) const {
-        internal::visit<meta_prop>(op, node->prop);
+        for(auto &&curr: internal::meta_range{node->prop}) {
+            op(meta_prop{&curr});
+        }
     }
 
     /**
@@ -612,9 +619,8 @@ struct meta_ctor {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::find_if([key = std::move(key)](const auto *curr) {
-            return curr->key() == key;
-        }, node->prop);
+        internal::meta_range range{node->prop};
+        return std::find_if(range.cbegin(), range.cend(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
     }
 
     /**
@@ -740,7 +746,9 @@ struct meta_data {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
     prop(Op op) const {
-        internal::visit<meta_prop>(op, node->prop);
+        for(auto &&curr: internal::meta_range{node->prop}) {
+            op(meta_prop{&curr});
+        }
     }
 
     /**
@@ -749,9 +757,8 @@ struct meta_data {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::find_if([key = std::move(key)](const auto *curr) {
-            return curr->key() == key;
-        }, node->prop);
+        internal::meta_range range{node->prop};
+        return std::find_if(range.cbegin(), range.cend(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
     }
 
     /**
@@ -851,7 +858,9 @@ struct meta_func {
     template<typename Op>
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
     prop(Op op) const {
-        internal::visit<meta_prop>(op, node->prop);
+        for(auto &&curr: internal::meta_range{node->prop}) {
+            op(meta_prop{&curr});
+        }
     }
 
     /**
@@ -860,9 +869,8 @@ struct meta_func {
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::find_if([key = std::move(key)](const auto *curr) {
-            return curr->key() == key;
-        }, node->prop);
+        internal::meta_range range{node->prop};
+        return std::find_if(range.cbegin(), range.cend(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
     }
 
     /**
@@ -882,13 +890,15 @@ private:
 class meta_type {
     template<typename... Args, std::size_t... Indexes>
     [[nodiscard]] auto ctor(std::index_sequence<Indexes...>) const {
-        return internal::find_if([](const auto *candidate) {
-            return candidate->size == sizeof...(Args) && ([](auto *from, auto *to) {
+        internal::meta_range range{node->ctor};
+
+        return std::find_if(range.cbegin(), range.cend(), [](const auto &candidate) {
+            return candidate.size == sizeof...(Args) && ([](auto *from, auto *to) {
                 return (from->type_id == to->type_id)
                         || internal::find_if<&internal::meta_type_node::base>([to](const auto *curr) { return curr->type()->type_id == to->type_id; }, from)
                         || internal::find_if<&internal::meta_type_node::conv>([to](const auto *curr) { return curr->type()->type_id == to->type_id; }, from);
-            }(internal::meta_info<Args>::resolve(), candidate->arg(Indexes)) && ...);
-        }, node->ctor);
+            }(internal::meta_info<Args>::resolve(), candidate.arg(Indexes)) && ...);
+        }).operator->();
     }
 
 public:
@@ -1091,7 +1101,9 @@ public:
      */
     template<typename Op>
     void ctor(Op op) const {
-        internal::visit<meta_ctor>(op, node->ctor);
+        for(auto &&curr: internal::meta_range{node->ctor}) {
+            op(meta_ctor{&curr});
+        }
     }
 
     /**
