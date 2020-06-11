@@ -30,4 +30,4 @@ jobs:
       run: |
         wget https://codecov.io/bash -O codecov
         chmod +x codecov
-        ./codecov -t $CODECOV_TOKEN -B $GITHUB_REF -s test/
+        ./codecov -t $CODECOV_TOKEN -B $GITHUB_REF -s .
