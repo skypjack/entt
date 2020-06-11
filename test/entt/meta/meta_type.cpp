@@ -208,6 +208,7 @@ TEST_F(MetaType, Data) {
 
 TEST_F(MetaType, Func) {
     auto type = entt::resolve<clazz_t>();
+    clazz_t instance{};
     int counter{};
 
     type.func([&counter](auto) {
@@ -217,6 +218,8 @@ TEST_F(MetaType, Func) {
     ASSERT_EQ(counter, 2);
     ASSERT_TRUE(type.func("member"_hs));
     ASSERT_TRUE(type.func("func"_hs));
+    ASSERT_TRUE(type.func("member"_hs).invoke(instance));
+    ASSERT_TRUE(type.func("func"_hs).invoke({}));
 }
 
 TEST_F(MetaType, Construct) {

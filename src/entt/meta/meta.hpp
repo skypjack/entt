@@ -1099,7 +1099,7 @@ public:
     }
 
     /**
-     * @brief Iterates all the meta bases of a meta type.
+     * @brief Iterates all top-level meta bases of a meta type.
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
      */
@@ -1108,7 +1108,6 @@ public:
     std::enable_if_t<std::is_invocable_v<Op, meta_base>>
     base(Op op) const {
         for(auto curr: base()) {
-            curr.type().base(op);
             op(curr);
         }
     }
@@ -1135,7 +1134,7 @@ public:
     }
 
     /**
-     * @brief Iterates all the meta conversion functions of a meta type.
+     * @brief Iterates all top-level meta conversion functions of a meta type.
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
      */
@@ -1144,10 +1143,6 @@ public:
     void conv(Op op) const {
         for(auto curr: conv()) {
             op(curr);
-        }
-
-        for(auto curr: base()) {
-            curr.type().conv(op);
         }
     }
 
@@ -1173,7 +1168,7 @@ public:
     }
 
     /**
-     * @brief Iterates all the meta constructors of a meta type.
+     * @brief Iterates all top-level meta constructors of a meta type.
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
      */
@@ -1182,10 +1177,6 @@ public:
     void ctor(Op op) const {
         for(auto curr: ctor()) {
             op(curr);
-        }
-
-        for(auto curr: base()) {
-            curr.type().ctor(op);
         }
     }
 
@@ -1208,10 +1199,7 @@ public:
     }
 
     /**
-     * @brief Iterates all the meta data of a meta type.
-     *
-     * The meta data of the base classes will also be returned, if any.
-     *
+     * @brief Iterates all top-level meta data of a meta type.
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
      */
@@ -1221,10 +1209,6 @@ public:
     data(Op op) const {
         for(auto curr: data()) {
             op(curr);
-        }
-
-        for(auto curr: base()) {
-            curr.type().data(op);
         }
     }
 
@@ -1251,10 +1235,7 @@ public:
     }
 
     /**
-     * @brief Iterates all the meta functions of a meta type.
-     *
-     * The meta functions of the base classes will also be returned, if any.
-     *
+     * @brief Iterates all top-level meta functions of a meta type.
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
      */
@@ -1264,10 +1245,6 @@ public:
     func(Op op) const {
         for(auto curr: func()) {
             op(curr);
-        }
-
-        for(auto curr: base()) {
-            curr.type().func(op);
         }
     }
 
@@ -1325,10 +1302,7 @@ public:
     }
 
     /**
-     * @brief Iterates all meta properties assigned to a meta type.
-     *
-     * Properties of the base classes will also be returned, if any.
-     *
+     * @brief Iterates all top-level meta properties assigned to a meta type.
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
      */
@@ -1338,10 +1312,6 @@ public:
     prop(Op op) const {
         for(auto curr: prop()) {
             op(curr);
-        }
-
-        for(auto curr: base()) {
-            curr.type().prop(op);
         }
     }
 

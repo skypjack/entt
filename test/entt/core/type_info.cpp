@@ -15,12 +15,10 @@ TEST(TypeInfo, Name) {
 
     ASSERT_TRUE((entt::type_info<entt::integral_constant<3>>::name() == std::string_view{"std::integral_constant<int, 3>"})
                 || (entt::type_info<entt::integral_constant<3>>::name() == std::string_view{"std::__1::integral_constant<int, 3>"})
-                || (entt::type_info<entt::integral_constant<3>>::name() == std::string_view{"struct std::integral_constant<int,3>"}))
-            << "Type name: " << entt::type_info<entt::integral_constant<3>>::name();
+                || (entt::type_info<entt::integral_constant<3>>::name() == std::string_view{"struct std::integral_constant<int,3>"}));
 
     ASSERT_TRUE(((entt::type_info<entt::type_list<entt::type_list<int, char>, double>>::name()) == std::string_view{"entt::type_list<entt::type_list<int, char>, double>"})
-                || ((entt::type_info<entt::type_list<entt::type_list<int, char>, double>>::name()) == std::string_view{"struct entt::type_list<struct entt::type_list<int,char>,double>"}))
-            << "Type name: " << entt::type_info<entt::integral_constant<3>>::name();
+                || ((entt::type_info<entt::type_list<entt::type_list<int, char>, double>>::name()) == std::string_view{"struct entt::type_list<struct entt::type_list<int,char>,double>"}));
 }
 
 TEST(TypeIndex, Functionalities) {
