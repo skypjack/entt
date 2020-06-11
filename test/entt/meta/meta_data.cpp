@@ -11,6 +11,7 @@ struct base_t {
     }
 
     inline static int counter = 0;
+    int value{3};
 };
 
 struct derived_t: base_t {};
@@ -64,7 +65,7 @@ enum class property_t {
 struct Meta: ::testing::Test {
     static void SetUpTestCase() {
         entt::meta<double>().conv<int>();
-        entt::meta<base_t>().dtor<&base_t::destroy>();
+        entt::meta<base_t>().dtor<&base_t::destroy>().data<&base_t::value>("value"_hs);
         entt::meta<derived_t>().base<base_t>().dtor<&derived_t::destroy>();
 
         entt::meta<clazz_t>().type("clazz"_hs)
@@ -423,4 +424,15 @@ TEST_F(Meta, MetaDataAsRef) {
 
     ASSERT_NE(instance.h, 3);
     ASSERT_EQ(instance.i, 3);
+}
+
+TEST_F(Meta, MetaDataFromBase) {
+    auto type = entt::resolve<derived_t>();
+    derived_t instance;
+
+    ASSERT_TRUE(type.data("value"_hs));
+
+    ASSERT_EQ(instance.value, 3);
+    ASSERT_TRUE(type.data("value"_hs).set(instance, 42));
+    ASSERT_EQ(instance.value, 42);
 }
