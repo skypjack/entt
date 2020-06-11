@@ -11,7 +11,12 @@ struct base_t {
         ++counter;
     }
 
+    void func(int v) {
+        value = v;
+    }
+
     inline static int counter = 0;
+    int value{3};
 };
 
 struct derived_t: base_t {};
@@ -56,7 +61,7 @@ struct func_t {
 struct Meta: ::testing::Test {
     static void SetUpTestCase() {
         entt::meta<double>().conv<int>();
-        entt::meta<base_t>().dtor<&base_t::destroy>();
+        entt::meta<base_t>().dtor<&base_t::destroy>().func<&base_t::func>("func"_hs);
         entt::meta<derived_t>().base<base_t>().dtor<&derived_t::destroy>();
 
         entt::meta<func_t>().type("func"_hs)
@@ -309,4 +314,17 @@ TEST_F(Meta, MetaFuncByReference) {
     ASSERT_EQ(func.invoke({}, *any).cast<int>(), 6);
     ASSERT_EQ(any.cast<int>(), 6);
     ASSERT_EQ(value, 8);
+}
+
+TEST_F(Meta, MetaFuncFromBase) {
+    auto type = entt::resolve<derived_t>();
+    derived_t instance;
+
+    ASSERT_TRUE(type.func("func"_hs));
+    ASSERT_EQ(type.func("func"_hs).parent(), entt::resolve<base_t>());
+    ASSERT_EQ(instance.value, 3);
+
+    type.func("func"_hs).invoke(instance, 42);
+
+    ASSERT_EQ(instance.value, 42);
 }

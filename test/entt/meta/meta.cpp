@@ -9,33 +9,6 @@
 #include <entt/meta/resolve.hpp>
 #include "fixture.h"
 
-TEST_F(Meta, MetaFuncFromBase) {
-    auto type = entt::resolve<concrete_type>();
-    auto base = entt::resolve<an_abstract_type>();
-    concrete_type instance;
-
-    ASSERT_TRUE(type.func("f"_hs));
-    ASSERT_TRUE(type.func("g"_hs));
-    ASSERT_TRUE(type.func("h"_hs));
-
-    ASSERT_EQ(type.func("f"_hs).parent(), entt::resolve<concrete_type>());
-    ASSERT_EQ(type.func("g"_hs).parent(), entt::resolve<an_abstract_type>());
-    ASSERT_EQ(type.func("h"_hs).parent(), entt::resolve<another_abstract_type>());
-
-    ASSERT_EQ(instance.i, 0);
-    ASSERT_EQ(instance.j, char{});
-
-    type.func("f"_hs).invoke(instance, 3);
-    type.func("h"_hs).invoke(instance, 'c');
-
-    ASSERT_EQ(instance.i, 9);
-    ASSERT_EQ(instance.j, 'c');
-
-    base.func("g"_hs).invoke(instance, 3);
-
-    ASSERT_EQ(instance.i, -3);
-}
-
 TEST_F(Meta, AbstractClass) {
     auto type = entt::resolve<an_abstract_type>();
     concrete_type instance;
