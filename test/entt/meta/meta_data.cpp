@@ -56,7 +56,7 @@ struct array_t {
     int local[3];
 };
 
-enum class properties {
+enum class property_t {
     random,
     value
 };
@@ -70,8 +70,8 @@ struct Meta: ::testing::Test {
         entt::meta<clazz_t>().type("clazz"_hs)
                 .data<&clazz_t::i, entt::as_ref_t>("i"_hs).prop(3, 0)
                 .data<&clazz_t::j>("j"_hs).prop(true, 1)
-                .data<&clazz_t::h>("h"_hs).prop(properties::random, 2)
-                .data<&clazz_t::k>("k"_hs).prop(properties::value, 3)
+                .data<&clazz_t::h>("h"_hs).prop(property_t::random, 2)
+                .data<&clazz_t::k>("k"_hs).prop(property_t::value, 3)
                 .data<&clazz_t::base>("base"_hs)
                 .data<&clazz_t::i, entt::as_void_t>("void"_hs);
 
@@ -167,17 +167,17 @@ TEST_F(Meta, MetaDataStatic) {
     ASSERT_EQ(data.get({}).cast<int>(), 42);
 
     data.prop([](auto prop) {
-        ASSERT_EQ(prop.key(), properties::random);
+        ASSERT_EQ(prop.key(), property_t::random);
         ASSERT_EQ(prop.value(), 2);
     });
 
-    ASSERT_FALSE(data.prop(properties::value));
+    ASSERT_FALSE(data.prop(property_t::value));
     ASSERT_FALSE(data.prop('c'));
 
-    auto prop = data.prop(properties::random);
+    auto prop = data.prop(property_t::random);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::random);
+    ASSERT_EQ(prop.key(), property_t::random);
     ASSERT_EQ(prop.value(), 2);
 }
 
@@ -195,17 +195,17 @@ TEST_F(Meta, MetaDataConstStatic) {
     ASSERT_EQ(data.get({}).cast<int>(), 3);
 
     data.prop([](auto prop) {
-        ASSERT_EQ(prop.key(), properties::value);
+        ASSERT_EQ(prop.key(), property_t::value);
         ASSERT_EQ(prop.value(), 3);
     });
 
-    ASSERT_FALSE(data.prop(properties::random));
+    ASSERT_FALSE(data.prop(property_t::random));
     ASSERT_FALSE(data.prop('c'));
 
-    auto prop = data.prop(properties::value);
+    auto prop = data.prop(property_t::value);
 
     ASSERT_TRUE(prop);
-    ASSERT_EQ(prop.key(), properties::value);
+    ASSERT_EQ(prop.key(), property_t::value);
     ASSERT_EQ(prop.value(), 3);
 }
 
