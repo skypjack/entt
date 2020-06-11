@@ -187,9 +187,6 @@ SETUP_BASIC_TEST(meta_func entt/meta/meta_func.cpp)
 SETUP_BASIC_TEST(meta_prop entt/meta/meta_prop.cpp)
 SETUP_BASIC_TEST(meta_type entt/meta/meta_type.cpp)
 
-list(APPEND TEST_META_SOURCES entt/meta/meta.cpp entt/meta/fixture.cpp)
-SETUP_BASIC_TEST(meta "${TEST_META_SOURCES}")
-
 # Test process
 
 SETUP_BASIC_TEST(process entt/process/process.cpp)

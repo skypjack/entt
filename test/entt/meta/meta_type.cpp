@@ -57,7 +57,8 @@ union union_t {
 
 struct Meta: ::testing::Test {
     static void SetUpTestCase() {
-        entt::meta<double>().conv<int>();
+        entt::meta<double>().type("double"_hs).conv<int>().data<&set<double>, &get<double>>("var"_hs);
+        entt::meta<unsigned int>().data<0u>("min"_hs).data<100u>("max"_hs);
         entt::meta<base_t>().type("base"_hs).data<&base_t::value>("value"_hs);
         entt::meta<derived_t>().type("derived"_hs).base<base_t>();
         entt::meta<abstract_t>().func<&abstract_t::func>("func"_hs);
@@ -68,13 +69,13 @@ struct Meta: ::testing::Test {
                     .prop(property_t::random, 0)
                     .prop(property_t::value, 3)
                 .data<property_t::value>("value"_hs)
-                    .prop(std::make_tuple(std::make_pair(property_t::random, true), std::make_pair(property_t::value, 0), std::make_pair(property_t::key_only, 3)))
+                    .prop(std::make_tuple(std::make_pair(property_t::random, true), std::make_pair(property_t::value, 0), property_t::key_only))
                     .prop(property_t::list)
                 .data<property_t::key_only>("key_only"_hs)
                     .prop([]() { return property_t::key_only; })
-                .data<&set<property_t>, &get<property_t>>("wrap"_hs)
                 .data<property_t::list>("list"_hs)
-                   .props(std::make_pair(property_t::random, false), std::make_pair(property_t::value, 0), property_t::key_only);
+                   .props(std::make_pair(property_t::random, false), std::make_pair(property_t::value, 0), property_t::key_only)
+                .data<&set<property_t>, &get<property_t>>("var"_hs);
 
         entt::meta<clazz_t>()
                 .type("clazz"_hs)
@@ -270,4 +271,112 @@ TEST_F(Meta, AbstractClass) {
 
     ASSERT_EQ(instance.base_t::value, 'c');
     ASSERT_EQ(instance.value, 42);
+}
+
+TEST_F(Meta, EnumAndNamedConstants) {
+    auto type = entt::resolve<property_t>();
+
+    ASSERT_TRUE(type.data("random"_hs));
+    ASSERT_TRUE(type.data("value"_hs));
+
+    ASSERT_EQ(type.data("random"_hs).type(), type);
+    ASSERT_EQ(type.data("value"_hs).type(), type);
+
+    ASSERT_FALSE(type.data("random"_hs).set({}, property_t::value));
+    ASSERT_FALSE(type.data("value"_hs).set({}, property_t::random));
+
+    ASSERT_EQ(type.data("random"_hs).get({}).cast<property_t>(), property_t::random);
+    ASSERT_EQ(type.data("value"_hs).get({}).cast<property_t>(), property_t::value);
+}
+
+TEST_F(Meta, ArithmeticTypeAndNamedConstants) {
+    auto type = entt::resolve<unsigned int>();
+
+    ASSERT_TRUE(type.data("min"_hs));
+    ASSERT_TRUE(type.data("max"_hs));
+
+    ASSERT_EQ(type.data("min"_hs).type(), type);
+    ASSERT_EQ(type.data("max"_hs).type(), type);
+
+    ASSERT_FALSE(type.data("min"_hs).set({}, 100u));
+    ASSERT_FALSE(type.data("max"_hs).set({}, 0u));
+
+    ASSERT_EQ(type.data("min"_hs).get({}).cast<unsigned int>(), 0u);
+    ASSERT_EQ(type.data("max"_hs).get({}).cast<unsigned int>(), 100u);
+}
+
+TEST_F(Meta, Variables) {
+    auto p_data = entt::resolve<property_t>().data("var"_hs);
+    auto d_data = entt::resolve_id("double"_hs).data("var"_hs);
+
+    property_t prop{property_t::key_only};
+    double d = 3.;
+
+    p_data.set(prop, property_t::random);
+    d_data.set(d, 42.);
+
+    ASSERT_EQ(p_data.get(prop).cast<property_t>(), property_t::random);
+    ASSERT_EQ(d_data.get(d).cast<double>(), 42.);
+    ASSERT_EQ(prop, property_t::random);
+    ASSERT_EQ(d, 42.);
+}
+
+TEST_F(Meta, PropertiesAndCornerCases) {
+    auto type = entt::resolve<property_t>();
+
+    ASSERT_EQ(type.data("random"_hs).prop(property_t::random).value().cast<int>(), 0);
+    ASSERT_EQ(type.data("random"_hs).prop(property_t::value).value().cast<int>(), 3);
+
+    ASSERT_EQ(type.data("value"_hs).prop(property_t::random).value().cast<bool>(), true);
+    ASSERT_EQ(type.data("value"_hs).prop(property_t::value).value().cast<int>(), 0);
+    ASSERT_TRUE(type.data("value"_hs).prop(property_t::key_only));
+    ASSERT_FALSE(type.data("value"_hs).prop(property_t::key_only).value());
+
+    ASSERT_TRUE(type.data("key_only"_hs).prop(property_t::key_only));
+    ASSERT_FALSE(type.data("key_only"_hs).prop(property_t::key_only).value());
+
+    ASSERT_EQ(type.data("list"_hs).prop(property_t::random).value().cast<bool>(), false);
+    ASSERT_EQ(type.data("list"_hs).prop(property_t::value).value().cast<int>(), 0);
+    ASSERT_TRUE(type.data("list"_hs).prop(property_t::key_only));
+    ASSERT_FALSE(type.data("list"_hs).prop(property_t::key_only).value());
+}
+
+TEST_F(Meta, ResetAndReRegistrationAfterReset) {
+    ASSERT_NE(*entt::internal::meta_context::global(), nullptr);
+
+    entt::meta<double>().reset();
+    entt::meta<unsigned int>().reset();
+    entt::meta<base_t>().reset();
+    entt::meta<derived_t>().reset();
+    entt::meta<abstract_t>().reset();
+    entt::meta<concrete_t>().reset();
+    entt::meta<property_t>().reset();
+    entt::meta<clazz_t>().reset();
+
+    ASSERT_FALSE(entt::resolve_id("double"_hs));
+    ASSERT_FALSE(entt::resolve_id("base"_hs));
+    ASSERT_FALSE(entt::resolve_id("derived"_hs));
+    ASSERT_FALSE(entt::resolve_id("clazz"_hs));
+
+    ASSERT_EQ(*entt::internal::meta_context::global(), nullptr);
+
+    ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
+    ASSERT_FALSE(entt::resolve<clazz_t>().ctor());
+    ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
+    ASSERT_FALSE(entt::resolve<clazz_t>().func("member"_hs));
+
+    entt::meta<double>().type("double"_hs).conv<float>();
+    entt::meta_any any{42.};
+
+    ASSERT_TRUE(any);
+    ASSERT_FALSE(any.convert<int>());
+    ASSERT_TRUE(any.convert<float>());
+
+    ASSERT_FALSE(entt::resolve_id("derived"_hs));
+    ASSERT_TRUE(entt::resolve_id("double"_hs));
+
+    entt::meta<property_t>().data<property_t::random>("rand"_hs).prop(property_t::value, 42).prop(property_t::random, 3);
+
+    ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::value));
+    ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(property_t::random));
 }
