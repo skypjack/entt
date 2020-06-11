@@ -30,17 +30,16 @@ namespace entt {
 namespace internal {
 
 
-template<typename>
+template<typename, bool = false>
 struct meta_function_helper;
 
 
-template<typename Ret, typename... Args>
-struct meta_function_helper<Ret(Args...)> {
+template<typename Ret, typename... Args, bool Const>
+struct meta_function_helper<Ret(Args...), Const> {
     using return_type = std::remove_cv_t<std::remove_reference_t<Ret>>;
     using args_type = std::tuple<std::remove_cv_t<std::remove_reference_t<Args>>...>;
 
-    static constexpr std::index_sequence_for<Args...> index_sequence{};
-    static constexpr auto is_const = false;
+    static constexpr auto is_const = Const;
 
     [[nodiscard]] static auto arg(typename internal::meta_func_node::size_type index) ENTT_NOEXCEPT {
         return std::array<meta_type_node *, sizeof...(Args)>{{meta_info<Args>::resolve()...}}[index];
@@ -48,10 +47,9 @@ struct meta_function_helper<Ret(Args...)> {
 };
 
 
-template<typename Ret, typename... Args>
-struct meta_function_helper<Ret(Args...) const>: meta_function_helper<Ret(Args...)> {
-    static constexpr auto is_const = true;
-};
+template<typename Ret, typename... Args, typename Class>
+constexpr meta_function_helper<Ret(Args...), true>
+to_meta_function_helper(Ret(Class:: *)(Args...) const);
 
 
 template<typename Ret, typename... Args, typename Class>
@@ -59,17 +57,9 @@ constexpr meta_function_helper<Ret(Args...)>
 to_meta_function_helper(Ret(Class:: *)(Args...));
 
 
-template<typename Ret, typename... Args, typename Class>
-constexpr meta_function_helper<Ret(Args...) const>
-to_meta_function_helper(Ret(Class:: *)(Args...) const);
-
-
 template<typename Ret, typename... Args>
 constexpr meta_function_helper<Ret(Args...)>
 to_meta_function_helper(Ret(*)(Args...));
-
-
-constexpr void to_meta_function_helper(...);
 
 
 template<typename Candidate>
@@ -79,13 +69,9 @@ using meta_function_helper_t = decltype(to_meta_function_helper(std::declval<Can
 template<typename Type, typename... Args, std::size_t... Indexes>
 [[nodiscard]] meta_any construct(meta_any * const args, std::index_sequence<Indexes...>) {
     [[maybe_unused]] auto direct = std::make_tuple((args+Indexes)->try_cast<Args>()...);
-    meta_any any{};
-
-    if(((std::get<Indexes>(direct) || (args+Indexes)->convert<Args>()) && ...)) {
-        any = Type{(std::get<Indexes>(direct) ? *std::get<Indexes>(direct) : (args+Indexes)->cast<Args>())...};
-    }
-
-    return any;
+    return ((std::get<Indexes>(direct) || (args+Indexes)->convert<Args>()) && ...)
+            ? Type{(std::get<Indexes>(direct) ? *std::get<Indexes>(direct) : (args+Indexes)->cast<Args>())...}
+            : meta_any{};
 }
 
 
@@ -516,10 +502,10 @@ public:
             type,
             nullptr,
             nullptr,
-            helper_type::index_sequence.size(),
+            std::tuple_size_v<typename helper_type::args_type>,
             &helper_type::arg,
             [](meta_any * const any) {
-                return internal::invoke<Type, Func, Policy>({}, any, helper_type::index_sequence);
+                return internal::invoke<Type, Func, Policy>({}, any, std::make_index_sequence<std::tuple_size_v<typename helper_type::args_type>>{});
             }
         };
 
@@ -549,10 +535,10 @@ public:
             type,
             nullptr,
             nullptr,
-            helper_type::index_sequence.size(),
+            std::tuple_size_v<typename helper_type::args_type>,
             &helper_type::arg,
             [](meta_any * const any) {
-                return internal::construct<Type, std::remove_cv_t<std::remove_reference_t<Args>>...>(any, helper_type::index_sequence);
+                return internal::construct<Type, std::remove_cv_t<std::remove_reference_t<Args>>...>(any, std::make_index_sequence<std::tuple_size_v<typename helper_type::args_type>>{});
             }
         };
 
@@ -721,13 +707,13 @@ public:
             type,
             nullptr,
             nullptr,
-            helper_type::index_sequence.size(),
+            std::tuple_size_v<typename helper_type::args_type>,
             helper_type::is_const,
             !std::is_member_function_pointer_v<decltype(Candidate)>,
             &internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename helper_type::return_type>>::resolve,
             &helper_type::arg,
             [](meta_any instance, meta_any *args) {
-                return internal::invoke<Type, Candidate, Policy>(std::move(instance), args, helper_type::index_sequence);
+                return internal::invoke<Type, Candidate, Policy>(std::move(instance), args, std::make_index_sequence<std::tuple_size_v<typename helper_type::args_type>>{});
             }
         };
 
