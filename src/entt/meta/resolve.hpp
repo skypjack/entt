@@ -2,8 +2,10 @@
 #define ENTT_META_RESOLVE_HPP
 
 
-#include <type_traits>
+#include <algorithm>
+#include "ctx.hpp"
 #include "meta.hpp"
+#include "range.hpp"
 
 
 namespace entt {
@@ -21,14 +23,24 @@ template<typename Type>
 
 
 /**
+ * @brief Returns a range to use to visit all meta types.
+ * @return An iterable range to use to visit all meta types.
+ */
+inline meta_range<meta_type> resolve() {
+    return *internal::meta_context::global();
+}
+
+
+/**
  * @brief Iterates all the reflected types.
  * @tparam Op Type of the function object to invoke.
  * @param op A valid function object.
  */
 template<typename Op>
+[[deprecated("use resolve() and entt::meta_range<meta_type> instead")]]
 void resolve(Op op) {
-    for(auto &&curr: internal::meta_range{*internal::meta_context::global()}) {
-        op(meta_type{&curr});
+    for(auto curr: resolve()) {
+        op(curr);
     }
 }
 
@@ -40,10 +52,10 @@ void resolve(Op op) {
  * @return The first meta type satisfying the condition, if any.
  */
 template<typename Func>
+[[deprecated("use std::find_if and entt::meta_range<meta_type> instead")]]
 [[nodiscard]] meta_type resolve_if(Func func) ENTT_NOEXCEPT {
     internal::meta_range range{*internal::meta_context::global()};
-    const auto it = std::find_if(range.cbegin(), range.cend(), [&func](const auto &curr) { return func(meta_type{&curr}); });
-    return it == range.cend() ? nullptr : it.operator->();
+    return std::find_if(range.cbegin(), range.cend(), [&func](const auto &curr) { return func(meta_type{&curr}); }).operator->();
 }
 
 
@@ -53,7 +65,8 @@ template<typename Func>
  * @return The meta type associated with the given identifier, if any.
  */
 [[nodiscard]] inline meta_type resolve_id(const id_type id) ENTT_NOEXCEPT {
-    return resolve_if([id](const auto type) { return type.id() == id; });
+    internal::meta_range range{*internal::meta_context::global()};
+    return std::find_if(range.cbegin(), range.cend(), [id](const auto &curr) { return curr.id == id; }).operator->();
 }
 
 
@@ -63,7 +76,8 @@ template<typename Func>
  * @return The meta type associated with the given type id, if any.
  */
 [[nodiscard]] inline meta_type resolve_type(const id_type id) ENTT_NOEXCEPT {
-    return resolve_if([id](const auto type) { return type.type_id() == id; });
+    internal::meta_range range{*internal::meta_context::global()};
+    return std::find_if(range.cbegin(), range.cend(), [id](const auto &curr) { return curr.type_id == id; }).operator->();
 }
 
 
