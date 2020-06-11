@@ -55,7 +55,7 @@ template<typename Func>
 [[deprecated("use std::find_if and entt::meta_range<meta_type> instead")]]
 [[nodiscard]] meta_type resolve_if(Func func) ENTT_NOEXCEPT {
     internal::meta_range range{*internal::meta_context::global()};
-    return std::find_if(range.cbegin(), range.cend(), [&func](const auto &curr) { return func(meta_type{&curr}); }).operator->();
+    return std::find_if(range.begin(), range.end(), [&func](const auto &curr) { return func(meta_type{&curr}); }).operator->();
 }
 
 
@@ -66,7 +66,7 @@ template<typename Func>
  */
 [[nodiscard]] inline meta_type resolve_id(const id_type id) ENTT_NOEXCEPT {
     internal::meta_range range{*internal::meta_context::global()};
-    return std::find_if(range.cbegin(), range.cend(), [id](const auto &curr) { return curr.id == id; }).operator->();
+    return std::find_if(range.begin(), range.end(), [id](const auto &curr) { return curr.id == id; }).operator->();
 }
 
 
@@ -77,7 +77,7 @@ template<typename Func>
  */
 [[nodiscard]] inline meta_type resolve_type(const id_type id) ENTT_NOEXCEPT {
     internal::meta_range range{*internal::meta_context::global()};
-    return std::find_if(range.cbegin(), range.cend(), [id](const auto &curr) { return curr.type_id == id; }).operator->();
+    return std::find_if(range.begin(), range.end(), [id](const auto &curr) { return curr.type_id == id; }).operator->();
 }
 
 

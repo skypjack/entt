@@ -642,7 +642,7 @@ struct meta_ctor {
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
         internal::meta_range range{node->prop};
-        return std::find_if(range.cbegin(), range.cend(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
+        return std::find_if(range.begin(), range.end(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
     }
 
     /**
@@ -789,7 +789,7 @@ struct meta_data {
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
         internal::meta_range range{node->prop};
-        return std::find_if(range.cbegin(), range.cend(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
+        return std::find_if(range.begin(), range.end(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
     }
 
     /**
@@ -909,7 +909,7 @@ struct meta_func {
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
         internal::meta_range range{node->prop};
-        return std::find_if(range.cbegin(), range.cend(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
+        return std::find_if(range.begin(), range.end(), [&key](const auto &curr) { return curr.key() == key; }).operator->();
     }
 
     /**
@@ -931,7 +931,7 @@ class meta_type {
     [[nodiscard]] auto ctor(std::index_sequence<Indexes...>) const {
         internal::meta_range range{node->ctor};
 
-        return std::find_if(range.cbegin(), range.cend(), [](const auto &candidate) {
+        return std::find_if(range.begin(), range.end(), [](const auto &candidate) {
             return candidate.size == sizeof...(Args) && ([](auto *from, auto *to) {
                 return (from->type_id == to->type_id)
                         || internal::find_if<&node_type::base>([to](const auto *curr) { return curr->type()->type_id == to->type_id; }, from)

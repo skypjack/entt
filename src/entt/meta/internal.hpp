@@ -128,53 +128,51 @@ struct meta_type_node {
 
 
 template<typename Node>
-struct meta_iterator {
-    using difference_type = std::ptrdiff_t;
-    using value_type = Node;
-    using pointer = value_type *;
-    using reference = value_type &;
-    using iterator_category = std::forward_iterator_tag;
+class meta_range {
+    struct range_iterator {
+        using difference_type = std::ptrdiff_t;
+        using value_type = Node;
+        using pointer = value_type *;
+        using reference = value_type &;
+        using iterator_category = std::forward_iterator_tag;
 
-    meta_iterator() ENTT_NOEXCEPT = default;
+        range_iterator() ENTT_NOEXCEPT = default;
 
-    meta_iterator(Node *head) ENTT_NOEXCEPT
-        : node{head}
-    {}
+        range_iterator(Node *head) ENTT_NOEXCEPT
+            : node{head}
+        {}
 
-    meta_iterator & operator++() ENTT_NOEXCEPT {
-        return node = node->next, *this;
-    }
+        range_iterator & operator++() ENTT_NOEXCEPT {
+            return node = node->next, *this;
+        }
 
-    meta_iterator operator++(int) ENTT_NOEXCEPT {
-        meta_iterator orig = *this;
-        return operator++(), orig;
-    }
+        range_iterator operator++(int) ENTT_NOEXCEPT {
+            range_iterator orig = *this;
+            return operator++(), orig;
+        }
 
-    [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
-        return other.node == node;
-    }
+        [[nodiscard]] bool operator==(const range_iterator &other) const ENTT_NOEXCEPT {
+            return other.node == node;
+        }
 
-    [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this == other);
-    }
+        [[nodiscard]] bool operator!=(const range_iterator &other) const ENTT_NOEXCEPT {
+            return !(*this == other);
+        }
 
-    [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-        return node;
-    }
+        [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
+            return node;
+        }
 
-    [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-        return *operator->();
-    }
+        [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
+            return *operator->();
+        }
 
-private:
-    Node *node{nullptr};
-};
+    private:
+        Node *node{nullptr};
+    };
 
-
-template<typename Node>
-struct meta_range {
-    using iterator = meta_iterator<Node>;
-    using const_iterator = meta_iterator<const Node>;
+public:
+    using iterator = range_iterator;
 
     meta_range() ENTT_NOEXCEPT = default;
 
@@ -182,28 +180,12 @@ struct meta_range {
         : node{head}
     {}
 
-    iterator begin() ENTT_NOEXCEPT {
+    iterator begin() const ENTT_NOEXCEPT {
         return iterator{node};
     }
 
-    const_iterator begin() const ENTT_NOEXCEPT {
-        return const_iterator{node};
-    }
-
-    const_iterator cbegin() const ENTT_NOEXCEPT {
-        return begin();
-    }
-
-    iterator end() ENTT_NOEXCEPT {
+    iterator end() const ENTT_NOEXCEPT {
         return iterator{};
-    }
-
-    const_iterator end() const ENTT_NOEXCEPT {
-        return const_iterator{};
-    }
-
-    const_iterator cend() const ENTT_NOEXCEPT {
-        return end();
     }
 
 private:
