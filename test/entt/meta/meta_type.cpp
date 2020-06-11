@@ -55,7 +55,7 @@ union union_t {
     double d;
 };
 
-struct Meta: ::testing::Test {
+struct MetaType: ::testing::Test {
     static void SetUpTestCase() {
         entt::meta<double>().type("double"_hs).conv<int>().data<&set<double>, &get<double>>("var"_hs);
         entt::meta<unsigned int>().data<0u>("min"_hs).data<100u>("max"_hs);
@@ -87,7 +87,22 @@ struct Meta: ::testing::Test {
     }
 };
 
-TEST_F(Meta, MetaType) {
+TEST_F(MetaType, Resolve) {
+    ASSERT_EQ(entt::resolve<double>(), entt::resolve_id("double"_hs));
+    ASSERT_EQ(entt::resolve<double>(), entt::resolve_type(entt::type_info<double>::id()));
+    // it could be "char"_hs rather than entt::hashed_string::value("char") if it weren't for a bug in VS2017
+    ASSERT_EQ(entt::resolve_if([](auto type) { return type.id() == entt::hashed_string::value("clazz"); }), entt::resolve<clazz_t>());
+
+    bool found = false;
+
+    entt::resolve([&found](auto type) {
+        found = found || type == entt::resolve<double>();
+    });
+
+    ASSERT_TRUE(found);
+}
+
+TEST_F(MetaType, Functionalities) {
     auto type = entt::resolve<clazz_t>();
 
     ASSERT_TRUE(type);
@@ -110,7 +125,7 @@ TEST_F(Meta, MetaType) {
     ASSERT_EQ(prop.value(), 42);
 }
 
-TEST_F(Meta, MetaTypeTraits) {
+TEST_F(MetaType, Traits) {
     ASSERT_TRUE(entt::resolve<void>().is_void());
     ASSERT_TRUE(entt::resolve<bool>().is_integral());
     ASSERT_TRUE(entt::resolve<double>().is_floating_point());
@@ -123,19 +138,19 @@ TEST_F(Meta, MetaTypeTraits) {
     ASSERT_TRUE(entt::resolve<decltype(&clazz_t::member)>().is_member_function_pointer());
 }
 
-TEST_F(Meta, MetaTypeRemovePointer) {
+TEST_F(MetaType, RemovePointer) {
     ASSERT_EQ(entt::resolve<void *>().remove_pointer(), entt::resolve<void>());
     ASSERT_EQ(entt::resolve<int(*)(char, double)>().remove_pointer(), entt::resolve<int(char, double)>());
     ASSERT_EQ(entt::resolve<derived_t>().remove_pointer(), entt::resolve<derived_t>());
 }
 
-TEST_F(Meta, MetaTypeRemoveExtent) {
+TEST_F(MetaType, RemoveExtent) {
     ASSERT_EQ(entt::resolve<int[3]>().remove_extent(), entt::resolve<int>());
     ASSERT_EQ(entt::resolve<int[3][3]>().remove_extent(), entt::resolve<int[3]>());
     ASSERT_EQ(entt::resolve<derived_t>().remove_extent(), entt::resolve<derived_t>());
 }
 
-TEST_F(Meta, MetaTypeBase) {
+TEST_F(MetaType, Base) {
     auto type = entt::resolve<derived_t>();
     bool iterate = false;
 
@@ -148,7 +163,7 @@ TEST_F(Meta, MetaTypeBase) {
     ASSERT_EQ(type.base("base"_hs).type(), entt::resolve<base_t>());
 }
 
-TEST_F(Meta, MetaTypeConv) {
+TEST_F(MetaType, Conv) {
     auto type = entt::resolve<double>();
     bool iterate = false;
 
@@ -165,7 +180,7 @@ TEST_F(Meta, MetaTypeConv) {
     ASSERT_FALSE(type.conv<char>());
 }
 
-TEST_F(Meta, MetaTypeCtor) {
+TEST_F(MetaType, Ctor) {
     auto type = entt::resolve<clazz_t>();
     int counter{};
 
@@ -179,7 +194,7 @@ TEST_F(Meta, MetaTypeCtor) {
     ASSERT_TRUE((type.ctor<const derived_t &, double>()));
 }
 
-TEST_F(Meta, MetaTypeData) {
+TEST_F(MetaType, Data) {
     auto type = entt::resolve<clazz_t>();
     int counter{};
 
@@ -191,7 +206,7 @@ TEST_F(Meta, MetaTypeData) {
     ASSERT_TRUE(type.data("value"_hs));
 }
 
-TEST_F(Meta, MetaTypeFunc) {
+TEST_F(MetaType, Func) {
     auto type = entt::resolve<clazz_t>();
     int counter{};
 
@@ -204,43 +219,43 @@ TEST_F(Meta, MetaTypeFunc) {
     ASSERT_TRUE(type.func("func"_hs));
 }
 
-TEST_F(Meta, MetaTypeConstruct) {
+TEST_F(MetaType, Construct) {
     auto any = entt::resolve<clazz_t>().construct(base_t{}, 42);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().value, 42);
 }
 
-TEST_F(Meta, MetaTypeConstructNoArgs) {
+TEST_F(MetaType, ConstructNoArgs) {
     // this should work, no other tests required
     auto any = entt::resolve<clazz_t>().construct();
 
     ASSERT_TRUE(any);
 }
 
-TEST_F(Meta, MetaTypeConstructMetaAnyArgs) {
+TEST_F(MetaType, ConstructMetaAnyArgs) {
     auto any = entt::resolve<clazz_t>().construct(entt::meta_any{base_t{}}, entt::meta_any{42});
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().value, 42);
 }
 
-TEST_F(Meta, MetaTypeConstructInvalidArgs) {
+TEST_F(MetaType, ConstructInvalidArgs) {
     ASSERT_FALSE(entt::resolve<clazz_t>().construct(base_t{}, 'c'));
 }
 
-TEST_F(Meta, MetaTypeLessArgs) {
+TEST_F(MetaType, LessArgs) {
     ASSERT_FALSE(entt::resolve<clazz_t>().construct(base_t{}));
 }
 
-TEST_F(Meta, MetaTypeConstructCastAndConvert) {
+TEST_F(MetaType, ConstructCastAndConvert) {
     auto any = entt::resolve<clazz_t>().construct(derived_t{}, 42.);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().value, 42);
 }
 
-TEST_F(Meta, MetaTypeDetach) {
+TEST_F(MetaType, Detach) {
     ASSERT_TRUE(entt::resolve_id("clazz"_hs));
 
     entt::resolve([](auto type) {
@@ -259,7 +274,7 @@ TEST_F(Meta, MetaTypeDetach) {
     ASSERT_TRUE(entt::resolve_id("clazz"_hs));
 }
 
-TEST_F(Meta, AbstractClass) {
+TEST_F(MetaType, AbstractClass) {
     auto type = entt::resolve<abstract_t>();
     concrete_t instance;
 
@@ -273,7 +288,7 @@ TEST_F(Meta, AbstractClass) {
     ASSERT_EQ(instance.value, 42);
 }
 
-TEST_F(Meta, EnumAndNamedConstants) {
+TEST_F(MetaType, EnumAndNamedConstants) {
     auto type = entt::resolve<property_t>();
 
     ASSERT_TRUE(type.data("random"_hs));
@@ -289,7 +304,7 @@ TEST_F(Meta, EnumAndNamedConstants) {
     ASSERT_EQ(type.data("value"_hs).get({}).cast<property_t>(), property_t::value);
 }
 
-TEST_F(Meta, ArithmeticTypeAndNamedConstants) {
+TEST_F(MetaType, ArithmeticTypeAndNamedConstants) {
     auto type = entt::resolve<unsigned int>();
 
     ASSERT_TRUE(type.data("min"_hs));
@@ -305,7 +320,7 @@ TEST_F(Meta, ArithmeticTypeAndNamedConstants) {
     ASSERT_EQ(type.data("max"_hs).get({}).cast<unsigned int>(), 100u);
 }
 
-TEST_F(Meta, Variables) {
+TEST_F(MetaType, Variables) {
     auto p_data = entt::resolve<property_t>().data("var"_hs);
     auto d_data = entt::resolve_id("double"_hs).data("var"_hs);
 
@@ -321,7 +336,7 @@ TEST_F(Meta, Variables) {
     ASSERT_EQ(d, 42.);
 }
 
-TEST_F(Meta, PropertiesAndCornerCases) {
+TEST_F(MetaType, PropertiesAndCornerCases) {
     auto type = entt::resolve<property_t>();
 
     ASSERT_EQ(type.data("random"_hs).prop(property_t::random).value().cast<int>(), 0);
@@ -341,7 +356,7 @@ TEST_F(Meta, PropertiesAndCornerCases) {
     ASSERT_FALSE(type.data("list"_hs).prop(property_t::key_only).value());
 }
 
-TEST_F(Meta, ResetAndReRegistrationAfterReset) {
+TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_NE(*entt::internal::meta_context::global(), nullptr);
 
     entt::meta<double>().reset();

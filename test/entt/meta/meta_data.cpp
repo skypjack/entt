@@ -62,7 +62,7 @@ enum class property_t {
     value
 };
 
-struct Meta: ::testing::Test {
+struct MetaData: ::testing::Test {
     static void SetUpTestCase() {
         entt::meta<double>().conv<int>();
         entt::meta<base_t>().dtor<&base_t::destroy>().data<&base_t::value>("value"_hs);
@@ -96,7 +96,7 @@ struct Meta: ::testing::Test {
     }
 };
 
-TEST_F(Meta, MetaData) {
+TEST_F(MetaData, Functionalities) {
     auto data = entt::resolve<clazz_t>().data("i"_hs);
     clazz_t instance{};
 
@@ -125,7 +125,7 @@ TEST_F(Meta, MetaData) {
     ASSERT_EQ(prop.value(), 0);
 }
 
-TEST_F(Meta, MetaDataConst) {
+TEST_F(MetaData, Const) {
     auto data = entt::resolve<clazz_t>().data("j"_hs);
     clazz_t instance{};
 
@@ -154,7 +154,7 @@ TEST_F(Meta, MetaDataConst) {
     ASSERT_EQ(prop.value(), 1);
 }
 
-TEST_F(Meta, MetaDataStatic) {
+TEST_F(MetaData, Static) {
     auto data = entt::resolve<clazz_t>().data("h"_hs);
 
     ASSERT_TRUE(data);
@@ -182,7 +182,7 @@ TEST_F(Meta, MetaDataStatic) {
     ASSERT_EQ(prop.value(), 2);
 }
 
-TEST_F(Meta, MetaDataConstStatic) {
+TEST_F(MetaData, ConstStatic) {
     auto data = entt::resolve<clazz_t>().data("k"_hs);
 
     ASSERT_TRUE(data);
@@ -210,7 +210,7 @@ TEST_F(Meta, MetaDataConstStatic) {
     ASSERT_EQ(prop.value(), 3);
 }
 
-TEST_F(Meta, MetaDataGetMetaAnyArg) {
+TEST_F(MetaData, GetMetaAnyArg) {
     entt::meta_any any{clazz_t{}};
     any.cast<clazz_t>().i = 99;
     const auto value = entt::resolve<clazz_t>().data("i"_hs).get(any);
@@ -220,12 +220,12 @@ TEST_F(Meta, MetaDataGetMetaAnyArg) {
     ASSERT_EQ(value.cast<int>(), 99);
 }
 
-TEST_F(Meta, MetaDataGetInvalidArg) {
+TEST_F(MetaData, GetInvalidArg) {
     auto instance = 0;
     ASSERT_FALSE(entt::resolve<clazz_t>().data("i"_hs).get(instance));
 }
 
-TEST_F(Meta, MetaDataSetMetaAnyArg) {
+TEST_F(MetaData, SetMetaAnyArg) {
     entt::meta_any any{clazz_t{}};
     entt::meta_any value{42};
 
@@ -234,11 +234,11 @@ TEST_F(Meta, MetaDataSetMetaAnyArg) {
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
 }
 
-TEST_F(Meta, MetaDataSetInvalidArg) {
+TEST_F(MetaData, SetInvalidArg) {
     ASSERT_FALSE(entt::resolve<clazz_t>().data("i"_hs).set({}, 'c'));
 }
 
-TEST_F(Meta, MetaDataSetCast) {
+TEST_F(MetaData, SetCast) {
     clazz_t instance{};
 
     ASSERT_EQ(base_t::counter, 0);
@@ -246,7 +246,7 @@ TEST_F(Meta, MetaDataSetCast) {
     ASSERT_EQ(base_t::counter, 1);
 }
 
-TEST_F(Meta, MetaDataSetConvert) {
+TEST_F(MetaData, SetConvert) {
     clazz_t instance{};
 
     ASSERT_EQ(instance.i, 0);
@@ -254,7 +254,7 @@ TEST_F(Meta, MetaDataSetConvert) {
     ASSERT_EQ(instance.i, 3);
 }
 
-TEST_F(Meta, MetaDataSetterGetterAsFreeFunctions) {
+TEST_F(MetaData, SetterGetterAsFreeFunctions) {
     auto data = entt::resolve<setter_getter_t>().data("x"_hs);
     setter_getter_t instance{};
 
@@ -269,7 +269,7 @@ TEST_F(Meta, MetaDataSetterGetterAsFreeFunctions) {
     ASSERT_EQ(data.get(instance).cast<int>(), 42);
 }
 
-TEST_F(Meta, MetaDataSetterGetterAsMemberFunctions) {
+TEST_F(MetaData, SetterGetterAsMemberFunctions) {
     auto data = entt::resolve<setter_getter_t>().data("y"_hs);
     setter_getter_t instance{};
 
@@ -284,7 +284,7 @@ TEST_F(Meta, MetaDataSetterGetterAsMemberFunctions) {
     ASSERT_EQ(data.get(instance).cast<int>(), 42);
 }
 
-TEST_F(Meta, MetaDataSetterGetterWithRefAsMemberFunctions) {
+TEST_F(MetaData, SetterGetterWithRefAsMemberFunctions) {
     auto data = entt::resolve<setter_getter_t>().data("w"_hs);
     setter_getter_t instance{};
 
@@ -299,7 +299,7 @@ TEST_F(Meta, MetaDataSetterGetterWithRefAsMemberFunctions) {
     ASSERT_EQ(data.get(instance).cast<int>(), 42);
 }
 
-TEST_F(Meta, MetaDataSetterGetterMixed) {
+TEST_F(MetaData, SetterGetterMixed) {
     auto data = entt::resolve<setter_getter_t>().data("z"_hs);
     setter_getter_t instance{};
 
@@ -314,7 +314,7 @@ TEST_F(Meta, MetaDataSetterGetterMixed) {
     ASSERT_EQ(data.get(instance).cast<int>(), 42);
 }
 
-TEST_F(Meta, MetaDataSetterGetterReadOnly) {
+TEST_F(MetaData, SetterGetterReadOnly) {
     auto data = entt::resolve<setter_getter_t>().data("z_ro"_hs);
     setter_getter_t instance{};
 
@@ -329,7 +329,7 @@ TEST_F(Meta, MetaDataSetterGetterReadOnly) {
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
 }
 
-TEST_F(Meta, MetaDataSetterGetterReadOnlyDataMember) {
+TEST_F(MetaData, SetterGetterReadOnlyDataMember) {
     auto data = entt::resolve<setter_getter_t>().data("value"_hs);
     setter_getter_t instance{};
 
@@ -344,7 +344,7 @@ TEST_F(Meta, MetaDataSetterGetterReadOnlyDataMember) {
     ASSERT_EQ(data.get(instance).cast<int>(), 0);
 }
 
-TEST_F(Meta, MetaDataArrayStatic) {
+TEST_F(MetaData, ArrayStatic) {
     auto data = entt::resolve<array_t>().data("global"_hs);
 
     array_t::global[0] = 3;
@@ -372,7 +372,7 @@ TEST_F(Meta, MetaDataArrayStatic) {
     ASSERT_EQ(data.get({}, 2).cast<int>(), 9);
 }
 
-TEST_F(Meta, MetaDataArray) {
+TEST_F(MetaData, Array) {
     auto data = entt::resolve<array_t>().data("local"_hs);
     array_t instance;
 
@@ -401,7 +401,7 @@ TEST_F(Meta, MetaDataArray) {
     ASSERT_EQ(data.get(instance, 2).cast<int>(), 9);
 }
 
-TEST_F(Meta, MetaDataAsVoid) {
+TEST_F(MetaData, AsVoid) {
     auto data = entt::resolve<clazz_t>().data("void"_hs);
     clazz_t instance{};
 
@@ -410,7 +410,7 @@ TEST_F(Meta, MetaDataAsVoid) {
     ASSERT_EQ(data.get(instance), entt::meta_any{std::in_place_type<void>});
 }
 
-TEST_F(Meta, MetaDataAsRef) {
+TEST_F(MetaData, AsRef) {
     clazz_t instance{};
 
     auto h_data = entt::resolve<clazz_t>().data("h"_hs);
@@ -426,7 +426,7 @@ TEST_F(Meta, MetaDataAsRef) {
     ASSERT_EQ(instance.i, 3);
 }
 
-TEST_F(Meta, MetaDataFromBase) {
+TEST_F(MetaData, FromBase) {
     auto type = entt::resolve<derived_t>();
     derived_t instance;
 

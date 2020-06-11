@@ -40,7 +40,7 @@ struct unmanageable_t {
     unmanageable_t & operator=(unmanageable_t &&) = delete;
 };
 
-struct Meta: ::testing::Test {
+struct MetaAny: ::testing::Test {
     static void SetUpTestCase() {
         entt::meta<double>().conv<int>();
         entt::meta<empty_t>().dtor<&empty_t::destroy>();
@@ -52,7 +52,7 @@ struct Meta: ::testing::Test {
     }
 };
 
-TEST_F(Meta, MetaAnySBO) {
+TEST_F(MetaAny, SBO) {
     entt::meta_any any{'c'};
 
     ASSERT_TRUE(any);
@@ -63,7 +63,7 @@ TEST_F(Meta, MetaAnySBO) {
     ASSERT_NE(entt::meta_any{'h'}, any);
 }
 
-TEST_F(Meta, MetaAnyNoSBO) {
+TEST_F(MetaAny, NoSBO) {
     int value = 42;
     fat_t instance{&value};
     entt::meta_any any{instance};
@@ -76,7 +76,7 @@ TEST_F(Meta, MetaAnyNoSBO) {
     ASSERT_NE(fat_t{}, any);
 }
 
-TEST_F(Meta, MetaAnyEmpty) {
+TEST_F(MetaAny, Empty) {
     entt::meta_any any{};
 
     ASSERT_FALSE(any);
@@ -87,7 +87,7 @@ TEST_F(Meta, MetaAnyEmpty) {
     ASSERT_NE(entt::meta_any{'c'}, any);
 }
 
-TEST_F(Meta, MetaAnySBOInPlaceTypeConstruction) {
+TEST_F(MetaAny, SBOInPlaceTypeConstruction) {
     entt::meta_any any{std::in_place_type<int>, 42};
 
     ASSERT_TRUE(any);
@@ -99,7 +99,7 @@ TEST_F(Meta, MetaAnySBOInPlaceTypeConstruction) {
     ASSERT_NE(entt::meta_any{3}, any);
 }
 
-TEST_F(Meta, MetaAnySBOAsAliasConstruction) {
+TEST_F(MetaAny, SBOAsAliasConstruction) {
     int value = 3;
     int other = 42;
     entt::meta_any any{std::ref(value)};
@@ -114,7 +114,7 @@ TEST_F(Meta, MetaAnySBOAsAliasConstruction) {
     ASSERT_EQ(entt::meta_any{3}, any);
 }
 
-TEST_F(Meta, MetaAnySBOCopyConstruction) {
+TEST_F(MetaAny, SBOCopyConstruction) {
     entt::meta_any any{42};
     entt::meta_any other{any};
 
@@ -126,7 +126,7 @@ TEST_F(Meta, MetaAnySBOCopyConstruction) {
     ASSERT_NE(other, entt::meta_any{0});
 }
 
-TEST_F(Meta, MetaAnySBOCopyAssignment) {
+TEST_F(MetaAny, SBOCopyAssignment) {
     entt::meta_any any{42};
     entt::meta_any other{3};
 
@@ -140,7 +140,7 @@ TEST_F(Meta, MetaAnySBOCopyAssignment) {
     ASSERT_NE(other, entt::meta_any{0});
 }
 
-TEST_F(Meta, MetaAnySBOMoveConstruction) {
+TEST_F(MetaAny, SBOMoveConstruction) {
     entt::meta_any any{42};
     entt::meta_any other{std::move(any)};
 
@@ -152,7 +152,7 @@ TEST_F(Meta, MetaAnySBOMoveConstruction) {
     ASSERT_NE(other, entt::meta_any{0});
 }
 
-TEST_F(Meta, MetaAnySBOMoveAssignment) {
+TEST_F(MetaAny, SBOMoveAssignment) {
     entt::meta_any any{42};
     entt::meta_any other{3};
 
@@ -166,7 +166,7 @@ TEST_F(Meta, MetaAnySBOMoveAssignment) {
     ASSERT_NE(other, entt::meta_any{0});
 }
 
-TEST_F(Meta, MetaAnySBODirectAssignment) {
+TEST_F(MetaAny, SBODirectAssignment) {
     entt::meta_any any{};
     any = 42;
 
@@ -176,7 +176,7 @@ TEST_F(Meta, MetaAnySBODirectAssignment) {
     ASSERT_NE(entt::meta_any{0}, any);
 }
 
-TEST_F(Meta, MetaAnyNoSBOInPlaceTypeConstruction) {
+TEST_F(MetaAny, NoSBOInPlaceTypeConstruction) {
     int value = 42;
     fat_t instance{&value};
     entt::meta_any any{std::in_place_type<fat_t>, instance};
@@ -190,7 +190,7 @@ TEST_F(Meta, MetaAnyNoSBOInPlaceTypeConstruction) {
     ASSERT_NE(entt::meta_any{fat_t{}}, any);
 }
 
-TEST_F(Meta, MetaAnyNoSBOAsAliasConstruction) {
+TEST_F(MetaAny, NoSBOAsAliasConstruction) {
     int value = 3;
     fat_t instance{&value};
     entt::meta_any any{std::ref(instance)};
@@ -204,7 +204,7 @@ TEST_F(Meta, MetaAnyNoSBOAsAliasConstruction) {
     ASSERT_NE(entt::meta_any{fat_t{}}, any);
 }
 
-TEST_F(Meta, MetaAnyNoSBOCopyConstruction) {
+TEST_F(MetaAny, NoSBOCopyConstruction) {
     int value = 42;
     fat_t instance{&value};
     entt::meta_any any{instance};
@@ -218,7 +218,7 @@ TEST_F(Meta, MetaAnyNoSBOCopyConstruction) {
     ASSERT_NE(other, fat_t{});
 }
 
-TEST_F(Meta, MetaAnyNoSBOCopyAssignment) {
+TEST_F(MetaAny, NoSBOCopyAssignment) {
     int value = 42;
     fat_t instance{&value};
     entt::meta_any any{instance};
@@ -234,7 +234,7 @@ TEST_F(Meta, MetaAnyNoSBOCopyAssignment) {
     ASSERT_NE(other, fat_t{});
 }
 
-TEST_F(Meta, MetaAnyNoSBOMoveConstruction) {
+TEST_F(MetaAny, NoSBOMoveConstruction) {
     int value = 42;
     fat_t instance{&value};
     entt::meta_any any{instance};
@@ -248,7 +248,7 @@ TEST_F(Meta, MetaAnyNoSBOMoveConstruction) {
     ASSERT_NE(other, fat_t{});
 }
 
-TEST_F(Meta, MetaAnyNoSBOMoveAssignment) {
+TEST_F(MetaAny, NoSBOMoveAssignment) {
     int value = 42;
     fat_t instance{&value};
     entt::meta_any any{instance};
@@ -264,7 +264,7 @@ TEST_F(Meta, MetaAnyNoSBOMoveAssignment) {
     ASSERT_NE(other, fat_t{});
 }
 
-TEST_F(Meta, MetaAnyNoSBODirectAssignment) {
+TEST_F(MetaAny, NoSBODirectAssignment) {
     int value = 42;
     entt::meta_any any{};
     any = fat_t{&value};
@@ -275,7 +275,7 @@ TEST_F(Meta, MetaAnyNoSBODirectAssignment) {
     ASSERT_NE(fat_t{}, any);
 }
 
-TEST_F(Meta, MetaAnyVoidInPlaceTypeConstruction) {
+TEST_F(MetaAny, VoidInPlaceTypeConstruction) {
     entt::meta_any any{std::in_place_type<void>};
 
     ASSERT_TRUE(any);
@@ -286,7 +286,7 @@ TEST_F(Meta, MetaAnyVoidInPlaceTypeConstruction) {
     ASSERT_NE(entt::meta_any{3}, any);
 }
 
-TEST_F(Meta, MetaAnyVoidCopyConstruction) {
+TEST_F(MetaAny, VoidCopyConstruction) {
     entt::meta_any any{std::in_place_type<void>};
     entt::meta_any other{any};
 
@@ -296,7 +296,7 @@ TEST_F(Meta, MetaAnyVoidCopyConstruction) {
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
 }
 
-TEST_F(Meta, MetaAnyVoidCopyAssignment) {
+TEST_F(MetaAny, VoidCopyAssignment) {
     entt::meta_any any{std::in_place_type<void>};
     entt::meta_any other{std::in_place_type<void>};
 
@@ -308,7 +308,7 @@ TEST_F(Meta, MetaAnyVoidCopyAssignment) {
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
 }
 
-TEST_F(Meta, MetaAnyVoidMoveConstruction) {
+TEST_F(MetaAny, VoidMoveConstruction) {
     entt::meta_any any{std::in_place_type<void>};
     entt::meta_any other{std::move(any)};
 
@@ -318,7 +318,7 @@ TEST_F(Meta, MetaAnyVoidMoveConstruction) {
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
 }
 
-TEST_F(Meta, MetaAnyVoidMoveAssignment) {
+TEST_F(MetaAny, VoidMoveAssignment) {
     entt::meta_any any{std::in_place_type<void>};
     entt::meta_any other{std::in_place_type<void>};
 
@@ -330,7 +330,7 @@ TEST_F(Meta, MetaAnyVoidMoveAssignment) {
     ASSERT_EQ(other, entt::meta_any{std::in_place_type<void>});
 }
 
-TEST_F(Meta, MetaAnySBOMoveInvalidate) {
+TEST_F(MetaAny, SBOMoveInvalidate) {
     entt::meta_any any{42};
     entt::meta_any other{std::move(any)};
     entt::meta_any valid = std::move(other);
@@ -340,7 +340,7 @@ TEST_F(Meta, MetaAnySBOMoveInvalidate) {
     ASSERT_TRUE(valid);
 }
 
-TEST_F(Meta, MetaAnyNoSBOMoveInvalidate) {
+TEST_F(MetaAny, NoSBOMoveInvalidate) {
     int value = 42;
     fat_t instance{&value};
     entt::meta_any any{instance};
@@ -352,7 +352,7 @@ TEST_F(Meta, MetaAnyNoSBOMoveInvalidate) {
     ASSERT_TRUE(valid);
 }
 
-TEST_F(Meta, MetaAnyVoidMoveInvalidate) {
+TEST_F(MetaAny, VoidMoveInvalidate) {
     entt::meta_any any{std::in_place_type<void>};
     entt::meta_any other{std::move(any)};
     entt::meta_any valid = std::move(other);
@@ -362,24 +362,24 @@ TEST_F(Meta, MetaAnyVoidMoveInvalidate) {
     ASSERT_TRUE(valid);
 }
 
-TEST_F(Meta, MetaAnySBODestruction) {
+TEST_F(MetaAny, SBODestruction) {
     ASSERT_EQ(empty_t::counter, 0);
     { entt::meta_any any{empty_t{}}; }
     ASSERT_EQ(empty_t::counter, 1);
 }
 
-TEST_F(Meta, MetaAnyNoSBODestruction) {
+TEST_F(MetaAny, NoSBODestruction) {
     ASSERT_EQ(fat_t::counter, 0);
     { entt::meta_any any{fat_t{}}; }
     ASSERT_EQ(fat_t::counter, 1);
 }
 
-TEST_F(Meta, MetaAnyVoidDestruction) {
+TEST_F(MetaAny, VoidDestruction) {
     // just let asan tell us if everything is ok here
     [[maybe_unused]] entt::meta_any any{std::in_place_type<void>};
 }
 
-TEST_F(Meta, MetaAnyEmplace) {
+TEST_F(MetaAny, Emplace) {
     entt::meta_any any{};
     any.emplace<int>(42);
 
@@ -392,7 +392,7 @@ TEST_F(Meta, MetaAnyEmplace) {
     ASSERT_NE(entt::meta_any{3}, any);
 }
 
-TEST_F(Meta, MetaAnyEmplaceVoid) {
+TEST_F(MetaAny, EmplaceVoid) {
     entt::meta_any any{};
     any.emplace<void>();
 
@@ -402,7 +402,7 @@ TEST_F(Meta, MetaAnyEmplaceVoid) {
     ASSERT_EQ(any, (entt::meta_any{std::in_place_type<void>}));
 }
 
-TEST_F(Meta, MetaAnySBOSwap) {
+TEST_F(MetaAny, SBOSwap) {
     entt::meta_any lhs{'c'};
     entt::meta_any rhs{42};
 
@@ -414,7 +414,7 @@ TEST_F(Meta, MetaAnySBOSwap) {
     ASSERT_EQ(rhs.cast<char>(), 'c');
 }
 
-TEST_F(Meta, MetaAnyNoSBOSwap) {
+TEST_F(MetaAny, NoSBOSwap) {
     int i, j;
     entt::meta_any lhs{fat_t{&i}};
     entt::meta_any rhs{fat_t{&j}};
@@ -425,7 +425,7 @@ TEST_F(Meta, MetaAnyNoSBOSwap) {
     ASSERT_EQ(rhs.cast<fat_t>().bar, &i);
 }
 
-TEST_F(Meta, MetaAnyVoidSwap) {
+TEST_F(MetaAny, VoidSwap) {
     entt::meta_any lhs{std::in_place_type<void>};
     entt::meta_any rhs{std::in_place_type<void>};
     const auto *pre = lhs.data();
@@ -435,7 +435,7 @@ TEST_F(Meta, MetaAnyVoidSwap) {
     ASSERT_EQ(pre, lhs.data());
 }
 
-TEST_F(Meta, MetaAnySBOWithNoSBOSwap) {
+TEST_F(MetaAny, SBOWithNoSBOSwap) {
     int value = 42;
     entt::meta_any lhs{fat_t{&value}};
     entt::meta_any rhs{'c'};
@@ -449,7 +449,7 @@ TEST_F(Meta, MetaAnySBOWithNoSBOSwap) {
     ASSERT_EQ(rhs.cast<fat_t>().bar, &value);
 }
 
-TEST_F(Meta, MetaAnySBOWithEmptySwap) {
+TEST_F(MetaAny, SBOWithEmptySwap) {
     entt::meta_any lhs{'c'};
     entt::meta_any rhs{};
 
@@ -464,7 +464,7 @@ TEST_F(Meta, MetaAnySBOWithEmptySwap) {
     ASSERT_EQ(lhs.cast<char>(), 'c');
 }
 
-TEST_F(Meta, MetaAnySBOWithVoidSwap) {
+TEST_F(MetaAny, SBOWithVoidSwap) {
     entt::meta_any lhs{'c'};
     entt::meta_any rhs{std::in_place_type<void>};
 
@@ -474,7 +474,7 @@ TEST_F(Meta, MetaAnySBOWithVoidSwap) {
     ASSERT_EQ(rhs.cast<char>(), 'c');
 }
 
-TEST_F(Meta, MetaAnyNoSBOWithEmptySwap) {
+TEST_F(MetaAny, NoSBOWithEmptySwap) {
     int i;
     entt::meta_any lhs{fat_t{&i}};
     entt::meta_any rhs{};
@@ -488,7 +488,7 @@ TEST_F(Meta, MetaAnyNoSBOWithEmptySwap) {
     ASSERT_EQ(lhs.cast<fat_t>().bar, &i);
 }
 
-TEST_F(Meta, MetaAnyNoSBOWithVoidSwap) {
+TEST_F(MetaAny, NoSBOWithVoidSwap) {
     int i;
     entt::meta_any lhs{fat_t{&i}};
     entt::meta_any rhs{std::in_place_type<void>};
@@ -502,7 +502,7 @@ TEST_F(Meta, MetaAnyNoSBOWithVoidSwap) {
     ASSERT_EQ(lhs.cast<fat_t>().bar, &i);
 }
 
-TEST_F(Meta, MetaAnyComparable) {
+TEST_F(MetaAny, Comparable) {
     entt::meta_any any{'c'};
 
     ASSERT_EQ(any, any);
@@ -517,7 +517,7 @@ TEST_F(Meta, MetaAnyComparable) {
     ASSERT_TRUE(entt::meta_any{} != any);
 }
 
-TEST_F(Meta, MetaAnyNotComparable) {
+TEST_F(MetaAny, NotComparable) {
     entt::meta_any any{not_comparable_t{}};
 
     ASSERT_EQ(any, any);
@@ -529,7 +529,7 @@ TEST_F(Meta, MetaAnyNotComparable) {
     ASSERT_TRUE(entt::meta_any{} != any);
 }
 
-TEST_F(Meta, MetaAnyCompareVoid) {
+TEST_F(MetaAny, CompareVoid) {
     entt::meta_any any{std::in_place_type<void>};
 
     ASSERT_EQ(any, any);
@@ -544,7 +544,7 @@ TEST_F(Meta, MetaAnyCompareVoid) {
     ASSERT_TRUE(entt::meta_any{} != any);
 }
 
-TEST_F(Meta, MetaAnyTryCast) {
+TEST_F(MetaAny, TryCast) {
     entt::meta_any any{fat_t{}};
 
     ASSERT_TRUE(any);
@@ -556,7 +556,7 @@ TEST_F(Meta, MetaAnyTryCast) {
     ASSERT_EQ(std::as_const(any).try_cast<fat_t>(), any.data());
 }
 
-TEST_F(Meta, MetaAnyCast) {
+TEST_F(MetaAny, Cast) {
     entt::meta_any any{fat_t{}};
 
     ASSERT_TRUE(any);
@@ -568,7 +568,7 @@ TEST_F(Meta, MetaAnyCast) {
     ASSERT_EQ(std::as_const(any).try_cast<fat_t>(), any.data());
 }
 
-TEST_F(Meta, MetaAnyConvert) {
+TEST_F(MetaAny, Convert) {
     entt::meta_any any{42.};
 
     ASSERT_TRUE(any);
@@ -582,7 +582,7 @@ TEST_F(Meta, MetaAnyConvert) {
     ASSERT_EQ(any.cast<int>(), 42);
 }
 
-TEST_F(Meta, MetaAnyConstConvert) {
+TEST_F(MetaAny, ConstConvert) {
     const entt::meta_any any{42.};
 
     ASSERT_TRUE(any);
@@ -600,7 +600,7 @@ TEST_F(Meta, MetaAnyConstConvert) {
     ASSERT_EQ(other.cast<int>(), 42);
 }
 
-TEST_F(Meta, MetaAnyUnmanageableType) {
+TEST_F(MetaAny, UnmanageableType) {
     unmanageable_t instance;
     entt::meta_any any{std::ref(instance)};
     entt::meta_any other = any;

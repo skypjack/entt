@@ -17,14 +17,14 @@ struct clazz_t {
     char c{};
 };
 
-struct Meta: ::testing::Test {
+struct MetaConv: ::testing::Test {
     static void SetUpTestCase() {
         entt::meta<double>().conv<int>();
         entt::meta<clazz_t>().conv<&clazz_t::f>().conv<&clazz_t::g>();
     }
 };
 
-TEST_F(Meta, MetaConv) {
+TEST_F(MetaConv, Functionalities) {
     auto conv = entt::resolve<double>().conv<int>();
     double value = 3.;
 
@@ -39,7 +39,7 @@ TEST_F(Meta, MetaConv) {
     ASSERT_EQ(any.cast<int>(), 3);
 }
 
-TEST_F(Meta, MetaConvAsFreeFunctions) {
+TEST_F(MetaConv, AsFreeFunctions) {
     auto conv = entt::resolve<clazz_t>().conv<int>();
     clazz_t clazz{42, 'c'};
 
@@ -54,7 +54,7 @@ TEST_F(Meta, MetaConvAsFreeFunctions) {
     ASSERT_EQ(any.cast<int>(), 42);
 }
 
-TEST_F(Meta, MetaConvAsMemberFunctions) {
+TEST_F(MetaConv, AsMemberFunctions) {
     auto conv = entt::resolve<clazz_t>().conv<char>();
     clazz_t clazz{42, 'c'};
 

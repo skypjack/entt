@@ -7,14 +7,14 @@
 struct base_t {};
 struct derived_t: base_t {};
 
-struct Meta: ::testing::Test {
+struct MetaBase: ::testing::Test {
     static void SetUpTestCase() {
         entt::meta<base_t>().type("base"_hs);
         entt::meta<derived_t>().type("derived"_hs).base<base_t>();
     }
 };
 
-TEST_F(Meta, MetaBase) {
+TEST_F(MetaBase, Functionalities) {
     auto base = entt::resolve<derived_t>().base("base"_hs);
     derived_t derived{};
 

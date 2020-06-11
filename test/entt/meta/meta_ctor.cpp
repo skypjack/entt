@@ -29,7 +29,7 @@ struct clazz_t {
     char c{};
 };
 
-struct Meta: ::testing::Test {
+struct MetaCtor: ::testing::Test {
     static void SetUpTestCase() {
         entt::meta<double>().conv<int>();
         entt::meta<derived_t>().base<base_t>();
@@ -42,7 +42,7 @@ struct Meta: ::testing::Test {
     }
 };
 
-TEST_F(Meta, MetaCtor) {
+TEST_F(MetaCtor, Functionalities) {
     auto ctor = entt::resolve<clazz_t>().ctor<const int &, char>();
 
     ASSERT_TRUE(ctor);
@@ -75,7 +75,7 @@ TEST_F(Meta, MetaCtor) {
     ASSERT_FALSE(prop.value().template cast<bool>());
 }
 
-TEST_F(Meta, MetaCtorFunc) {
+TEST_F(MetaCtor, Func) {
     auto ctor = entt::resolve<clazz_t>().ctor<int>();
 
     ASSERT_TRUE(ctor);
@@ -107,7 +107,7 @@ TEST_F(Meta, MetaCtorFunc) {
     ASSERT_EQ(prop.value(), 42);
 }
 
-TEST_F(Meta, MetaCtorMetaAnyArgs) {
+TEST_F(MetaCtor, MetaAnyArgs) {
     auto any = entt::resolve<clazz_t>().ctor<int, char>().invoke(entt::meta_any{42}, entt::meta_any{'c'});
 
     ASSERT_TRUE(any);
@@ -115,12 +115,12 @@ TEST_F(Meta, MetaCtorMetaAnyArgs) {
     ASSERT_EQ(any.cast<clazz_t>().c, 'c');
 }
 
-TEST_F(Meta, MetaCtorInvalidArgs) {
+TEST_F(MetaCtor, InvalidArgs) {
     auto ctor = entt::resolve<clazz_t>().ctor<int, char>();
     ASSERT_FALSE(ctor.invoke('c', 42));
 }
 
-TEST_F(Meta, MetaCtorCastAndConvert) {
+TEST_F(MetaCtor, CastAndConvert) {
     auto any = entt::resolve<clazz_t>().ctor<const base_t &, int>().invoke(derived_t{{'c'}}, 42.);
 
     ASSERT_TRUE(any);
@@ -128,7 +128,7 @@ TEST_F(Meta, MetaCtorCastAndConvert) {
     ASSERT_EQ(any.cast<clazz_t>().c, 'c');
 }
 
-TEST_F(Meta, MetaCtorFuncMetaAnyArgs) {
+TEST_F(MetaCtor, FuncMetaAnyArgs) {
     auto any = entt::resolve<clazz_t>().ctor<base_t, int>().invoke(entt::meta_any{base_t{'c'}}, entt::meta_any{42});
 
     ASSERT_TRUE(any);
@@ -136,12 +136,12 @@ TEST_F(Meta, MetaCtorFuncMetaAnyArgs) {
     ASSERT_EQ(any.cast<clazz_t>().c, 'c');
 }
 
-TEST_F(Meta, MetaCtorFuncInvalidArgs) {
+TEST_F(MetaCtor, FuncInvalidArgs) {
     auto ctor = entt::resolve<clazz_t>().ctor<const base_t &, int>();
     ASSERT_FALSE(ctor.invoke(base_t{}, 'c'));
 }
 
-TEST_F(Meta, MetaCtorFuncCastAndConvert) {
+TEST_F(MetaCtor, FuncCastAndConvert) {
     auto any = entt::resolve<clazz_t>().ctor<base_t, int, int>().invoke(derived_t{{'c'}}, 3., 3);
 
     ASSERT_TRUE(any);

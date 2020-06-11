@@ -8,7 +8,7 @@ struct base_1_t {};
 struct base_2_t {};
 struct derived_t: base_1_t, base_2_t {};
 
-struct Meta: ::testing::Test {
+struct MetaProp: ::testing::Test {
     static void SetUpTestCase() {
         entt::meta<base_1_t>().prop("int"_hs, 42);
         entt::meta<base_2_t>().prop("bool"_hs, false);
@@ -16,7 +16,7 @@ struct Meta: ::testing::Test {
     }
 };
 
-TEST_F(Meta, MetaProp) {
+TEST_F(MetaProp, Functionalities) {
     auto prop = entt::resolve<base_1_t>().prop("int"_hs);
 
     ASSERT_TRUE(prop);
@@ -24,7 +24,7 @@ TEST_F(Meta, MetaProp) {
     ASSERT_EQ(prop.value(), 42);
 }
 
-TEST_F(Meta, MetaPropFromBase) {
+TEST_F(MetaProp, FromBase) {
     auto type = entt::resolve<derived_t>();
     auto prop_bool = type.prop("bool"_hs);
     auto prop_int = type.prop("int"_hs);
