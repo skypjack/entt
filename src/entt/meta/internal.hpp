@@ -211,18 +211,6 @@ private:
 };
 
 
-template<auto Member, typename Type, typename Op>
-void visit(Op &op, const internal::meta_type_node *node) {
-    for(auto &&curr: meta_range{node->*Member}) {
-        op(Type{&curr});
-    }
-
-    for(auto &&base: meta_range{node->base}) {
-        visit<Member, Type>(op, base.type());
-    }
-}
-
-
 template<auto Member, typename Op>
 auto find_if(const Op &op, const meta_type_node *node)
 -> std::decay_t<decltype(node->*Member)> {

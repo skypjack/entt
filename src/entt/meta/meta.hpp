@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <iterator>
 #include <functional>
 #include <type_traits>
 #include <utility>
@@ -11,6 +12,7 @@
 #include "../core/fwd.hpp"
 #include "ctx.hpp"
 #include "internal.hpp"
+#include "range.hpp"
 
 
 namespace entt {
@@ -431,7 +433,7 @@ struct meta_handle {
 
     /*! @copydoc meta_any::operator* */
     [[nodiscard]] meta_any operator *() const {
-        return any;
+        return *any;
     }
 
 private:
@@ -441,11 +443,14 @@ private:
 
 /*! @brief Opaque container for meta properties of any type. */
 struct meta_prop {
+    /*! @brief Node type. */
+    using node_type = internal::meta_prop_node;
+
     /**
      * @brief Constructs an instance from a given node.
      * @param curr The underlying node with which to construct the instance.
      */
-    meta_prop(const internal::meta_prop_node *curr = nullptr) ENTT_NOEXCEPT
+    meta_prop(const node_type *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
@@ -474,14 +479,17 @@ struct meta_prop {
     }
 
 private:
-    const internal::meta_prop_node *node;
+    const node_type *node;
 };
 
 
 /*! @brief Opaque container for meta base classes. */
 struct meta_base {
+    /*! @brief Node type. */
+    using node_type = internal::meta_base_node;
+
     /*! @copydoc meta_prop::meta_prop */
-    meta_base(const internal::meta_base_node *curr = nullptr) ENTT_NOEXCEPT
+    meta_base(const node_type *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
@@ -512,14 +520,17 @@ struct meta_base {
     }
 
 private:
-    const internal::meta_base_node *node;
+    const node_type *node;
 };
 
 
 /*! @brief Opaque container for meta conversion functions. */
 struct meta_conv {
+    /*! @brief Node type. */
+    using node_type = internal::meta_conv_node;
+
     /*! @copydoc meta_prop::meta_prop */
-    meta_conv(const internal::meta_conv_node *curr = nullptr) ENTT_NOEXCEPT
+    meta_conv(const node_type *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
@@ -547,17 +558,19 @@ struct meta_conv {
     }
 
 private:
-    const internal::meta_conv_node *node;
+    const node_type *node;
 };
 
 
 /*! @brief Opaque container for meta constructors. */
 struct meta_ctor {
+    /*! @brief Node type. */
+    using node_type = internal::meta_ctor_node;
     /*! @brief Unsigned integer type. */
-    using size_type = typename internal::meta_ctor_node::size_type;
+    using size_type = typename node_type::size_type;
 
     /*! @copydoc meta_prop::meta_prop */
-    meta_ctor(const internal::meta_ctor_node *curr = nullptr) ENTT_NOEXCEPT
+    meta_ctor(const node_type *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
@@ -601,15 +614,24 @@ struct meta_ctor {
     }
 
     /**
-     * @brief Iterates all the properties assigned to a meta constructor.
+     * @brief Returns a range to use to visit all meta properties.
+     * @return An iterable range to use to visit all meta properties.
+     */
+    meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
+        return node->prop;
+    }
+
+    /**
+     * @brief Iterates all meta properties assigned to a meta constructor.
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
      */
     template<typename Op>
+    [[deprecated("use prop() and entt::meta_range<meta_prop> instead")]]
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
     prop(Op op) const {
-        for(auto &&curr: internal::meta_range{node->prop}) {
-            op(meta_prop{&curr});
+        for(auto curr: prop()) {
+            op(curr);
         }
     }
 
@@ -632,14 +654,17 @@ struct meta_ctor {
     }
 
 private:
-    const internal::meta_ctor_node *node;
+    const node_type *node;
 };
 
 
 /*! @brief Opaque container for meta data. */
 struct meta_data {
+    /*! @brief Node type. */
+    using node_type = internal::meta_data_node;
+
     /*! @copydoc meta_prop::meta_prop */
-    meta_data(const internal::meta_data_node *curr = nullptr) ENTT_NOEXCEPT
+    meta_data(const node_type *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
@@ -738,16 +763,22 @@ struct meta_data {
         return node->get(*instance, index);
     }
 
+    /*! @copydoc meta_ctor::prop */
+    meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
+        return node->prop;
+    }
+
     /**
-     * @brief Iterates all the properties assigned to a meta data.
+     * @brief Iterates all meta properties assigned to a meta data.
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
      */
     template<typename Op>
+    [[deprecated("use prop() and entt::meta_range<meta_prop> instead")]]
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
     prop(Op op) const {
-        for(auto &&curr: internal::meta_range{node->prop}) {
-            op(meta_prop{&curr});
+        for(auto curr: prop()) {
+            op(curr);
         }
     }
 
@@ -770,17 +801,19 @@ struct meta_data {
     }
 
 private:
-    const internal::meta_data_node *node;
+    const node_type *node;
 };
 
 
 /*! @brief Opaque container for meta functions. */
 struct meta_func {
+    /*! @brief Node type. */
+    using node_type = internal::meta_func_node;
     /*! @brief Unsigned integer type. */
-    using size_type = typename internal::meta_func_node::size_type;
+    using size_type = typename node_type::size_type;
 
     /*! @copydoc meta_prop::meta_prop */
-    meta_func(const internal::meta_func_node *curr = nullptr) ENTT_NOEXCEPT
+    meta_func(const node_type *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
@@ -850,16 +883,22 @@ struct meta_func {
         return sizeof...(Args) == size() ? node->invoke(arguments[0], &arguments[sizeof...(Args) != 0]) : meta_any{};
     }
 
+    /*! @copydoc meta_ctor::prop */
+    meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
+        return node->prop;
+    }
+
     /**
-     * @brief Iterates all the properties assigned to a meta function.
+     * @brief Iterates all meta properties assigned to a meta function.
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
      */
     template<typename Op>
+    [[deprecated("use prop() and entt::meta_range<meta_prop> instead")]]
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
     prop(Op op) const {
-        for(auto &&curr: internal::meta_range{node->prop}) {
-            op(meta_prop{&curr});
+        for(auto curr: prop()) {
+            op(curr);
         }
     }
 
@@ -882,7 +921,7 @@ struct meta_func {
     }
 
 private:
-    const internal::meta_func_node *node;
+    const node_type *node;
 };
 
 
@@ -895,18 +934,20 @@ class meta_type {
         return std::find_if(range.cbegin(), range.cend(), [](const auto &candidate) {
             return candidate.size == sizeof...(Args) && ([](auto *from, auto *to) {
                 return (from->type_id == to->type_id)
-                        || internal::find_if<&internal::meta_type_node::base>([to](const auto *curr) { return curr->type()->type_id == to->type_id; }, from)
-                        || internal::find_if<&internal::meta_type_node::conv>([to](const auto *curr) { return curr->type()->type_id == to->type_id; }, from);
+                        || internal::find_if<&node_type::base>([to](const auto *curr) { return curr->type()->type_id == to->type_id; }, from)
+                        || internal::find_if<&node_type::conv>([to](const auto *curr) { return curr->type()->type_id == to->type_id; }, from);
             }(internal::meta_info<Args>::resolve(), candidate.arg(Indexes)) && ...);
         }).operator->();
     }
 
 public:
+    /*! @brief Node type. */
+    using node_type = internal::meta_type_node;
     /*! @brief Unsigned integer type. */
-    using size_type = typename internal::meta_type_node::size_type;
+    using size_type = typename node_type::size_type;
 
     /*! @copydoc meta_prop::meta_prop */
-    meta_type(const internal::meta_type_node *curr = nullptr) ENTT_NOEXCEPT
+    meta_type(const node_type *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
@@ -1050,14 +1091,26 @@ public:
     }
 
     /**
+     * @brief Returns a range to use to visit top-level meta bases.
+     * @return An iterable range to use to visit top-level meta bases.
+     */
+    meta_range<meta_base> base() const ENTT_NOEXCEPT {
+        return node->base;
+    }
+
+    /**
      * @brief Iterates all the meta bases of a meta type.
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
      */
     template<typename Op>
+    [[deprecated("use base() and entt::meta_range<meta_base> instead")]]
     std::enable_if_t<std::is_invocable_v<Op, meta_base>>
     base(Op op) const {
-        internal::visit<&internal::meta_type_node::base, meta_base>(op, node);
+        for(auto curr: base()) {
+            curr.type().base(op);
+            op(curr);
+        }
     }
 
     /**
@@ -1066,9 +1119,19 @@ public:
      * @return The meta base associated with the given identifier, if any.
      */
     [[nodiscard]] meta_base base(const id_type id) const {
-        return internal::find_if<&internal::meta_type_node::base>([id](const auto *curr) {
+        return internal::find_if<&node_type::base>([id](const auto *curr) {
             return curr->type()->id == id;
         }, node);
+    }
+
+    /**
+     * @brief Returns a range to use to visit top-level meta conversion
+     * functions.
+     * @return An iterable range to use to visit top-level meta conversion
+     * functions.
+     */
+    meta_range<meta_conv> conv() const ENTT_NOEXCEPT {
+        return node->conv;
     }
 
     /**
@@ -1077,8 +1140,15 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
+    [[deprecated("use conv() and entt::meta_range<meta_conv> instead")]]
     void conv(Op op) const {
-        internal::visit<&internal::meta_type_node::conv, meta_conv>(op, node);
+        for(auto curr: conv()) {
+            op(curr);
+        }
+
+        for(auto curr: base()) {
+            curr.type().conv(op);
+        }
     }
 
     /**
@@ -1089,9 +1159,17 @@ public:
      */
     template<typename Type>
     [[nodiscard]] meta_conv conv() const {
-        return internal::find_if<&internal::meta_type_node::conv>([type_id = internal::meta_info<Type>::resolve()->type_id](const auto *curr) {
+        return internal::find_if<&node_type::conv>([type_id = internal::meta_info<Type>::resolve()->type_id](const auto *curr) {
             return curr->type()->type_id == type_id;
         }, node);
+    }
+
+    /**
+     * @brief Returns a range to use to visit top-level meta constructors.
+     * @return An iterable range to use to visit top-level meta constructors.
+     */
+    meta_range<meta_ctor> ctor() const ENTT_NOEXCEPT {
+        return node->ctor;
     }
 
     /**
@@ -1100,9 +1178,14 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
+    [[deprecated("use ctor() and entt::meta_range<meta_ctor> instead")]]
     void ctor(Op op) const {
-        for(auto &&curr: internal::meta_range{node->ctor}) {
-            op(meta_ctor{&curr});
+        for(auto curr: ctor()) {
+            op(curr);
+        }
+
+        for(auto curr: base()) {
+            curr.type().ctor(op);
         }
     }
 
@@ -1117,6 +1200,14 @@ public:
     }
 
     /**
+     * @brief Returns a range to use to visit top-level meta data.
+     * @return An iterable range to use to visit top-level meta data.
+     */
+    meta_range<meta_data> data() const ENTT_NOEXCEPT {
+        return node->data;
+    }
+
+    /**
      * @brief Iterates all the meta data of a meta type.
      *
      * The meta data of the base classes will also be returned, if any.
@@ -1125,9 +1216,16 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
+    [[deprecated("use ctor() and entt::meta_range<meta_ctor> instead")]]
     std::enable_if_t<std::is_invocable_v<Op, meta_data>>
     data(Op op) const {
-        internal::visit<&internal::meta_type_node::data, meta_data>(op, node);
+        for(auto curr: data()) {
+            op(curr);
+        }
+
+        for(auto curr: base()) {
+            curr.type().data(op);
+        }
     }
 
     /**
@@ -1139,9 +1237,17 @@ public:
      * @return The meta data associated with the given identifier, if any.
      */
     [[nodiscard]] meta_data data(const id_type id) const {
-        return internal::find_if<&internal::meta_type_node::data>([id](const auto *curr) {
+        return internal::find_if<&node_type::data>([id](const auto *curr) {
             return curr->id == id;
         }, node);
+    }
+
+    /**
+     * @brief Returns a range to use to visit top-level meta functions.
+     * @return An iterable range to use to visit top-level meta functions.
+     */
+    meta_range<meta_func> func() const ENTT_NOEXCEPT {
+        return node->func;
     }
 
     /**
@@ -1153,9 +1259,16 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
+    [[deprecated("use ctor() and entt::meta_range<meta_ctor> instead")]]
     std::enable_if_t<std::is_invocable_v<Op, meta_func>>
     func(Op op) const {
-        internal::visit<&internal::meta_type_node::func, meta_func>(op, node);
+        for(auto curr: func()) {
+            op(curr);
+        }
+
+        for(auto curr: base()) {
+            curr.type().func(op);
+        }
     }
 
     /**
@@ -1167,7 +1280,7 @@ public:
      * @return The meta function associated with the given identifier, if any.
      */
     [[nodiscard]] meta_func func(const id_type id) const {
-        return internal::find_if<&internal::meta_type_node::func>([id](const auto *curr) {
+        return internal::find_if<&node_type::func>([id](const auto *curr) {
             return curr->id == id;
         }, node);
     }
@@ -1188,7 +1301,7 @@ public:
         auto construct_if = [this](meta_any *params) {
             meta_any any{};
 
-            internal::find_if<&internal::meta_type_node::ctor>([params, &any](const auto *curr) {
+            internal::find_if<&node_type::ctor>([params, &any](const auto *curr) {
                 return (curr->size == sizeof...(args)) && (any = curr->invoke(params));
             }, node);
 
@@ -1204,29 +1317,44 @@ public:
     }
 
     /**
-     * @brief Iterates all the properties assigned to a meta type.
+     * @brief Returns a range to use to visit top-level meta properties.
+     * @return An iterable range to use to visit top-level meta properties.
+     */
+    meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
+        return node->prop;
+    }
+
+    /**
+     * @brief Iterates all meta properties assigned to a meta type.
      *
-     * The properties of the base classes will also be returned, if any.
+     * Properties of the base classes will also be returned, if any.
      *
      * @tparam Op Type of the function object to invoke.
      * @param op A valid function object.
      */
     template<typename Op>
+    [[deprecated("use prop() and entt::meta_range<meta_prop> instead")]]
     std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
     prop(Op op) const {
-        internal::visit<&internal::meta_type_node::prop, meta_prop>(op, node);
+        for(auto curr: prop()) {
+            op(curr);
+        }
+
+        for(auto curr: base()) {
+            curr.type().prop(op);
+        }
     }
 
     /**
      * @brief Returns the property associated with a given key.
      *
-     * The properties of the base classes will also be visited, if any.
+     * Properties of the base classes will also be visited, if any.
      *
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
      */
     [[nodiscard]] meta_prop prop(meta_any key) const {
-        return internal::find_if<&internal::meta_type_node::prop>([key = std::move(key)](const auto *curr) {
+        return internal::find_if<&node_type::prop>([key = std::move(key)](const auto *curr) {
             return curr->key() == key;
         }, node);
     }
@@ -1255,7 +1383,7 @@ public:
     }
 
 private:
-    const internal::meta_type_node *node;
+    const node_type *node;
 };
 
 

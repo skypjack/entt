@@ -189,7 +189,7 @@ TEST_F(MetaType, Ctor) {
     });
 
     ASSERT_EQ(counter, 2);
-    ASSERT_TRUE((type.ctor()));
+    ASSERT_TRUE((type.ctor<>()));
     ASSERT_TRUE((type.ctor<const base_t &, int>()));
     ASSERT_TRUE((type.ctor<const derived_t &, double>()));
 }
@@ -376,7 +376,7 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_EQ(*entt::internal::meta_context::global(), nullptr);
 
     ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
-    ASSERT_FALSE(entt::resolve<clazz_t>().ctor());
+    ASSERT_FALSE(entt::resolve<clazz_t>().ctor<>());
     ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
     ASSERT_FALSE(entt::resolve<clazz_t>().func("member"_hs));
 

@@ -24,6 +24,7 @@
 #include "meta/factory.hpp"
 #include "meta/internal.hpp"
 #include "meta/meta.hpp"
+#include "meta/range.hpp"
 #include "meta/resolve.hpp"
 #include "meta/policy.hpp"
 #include "process/process.hpp"

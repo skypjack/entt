@@ -23,7 +23,7 @@ TEST(Lib, Meta) {
     ASSERT_TRUE(entt::resolve_id("velocity"_hs));
 
     auto pos = entt::resolve_id("position"_hs).construct(42., 3.);
-    auto vel = entt::resolve_id("velocity"_hs).ctor().invoke();
+    auto vel = entt::resolve_id("velocity"_hs).ctor<>().invoke();
 
     ASSERT_TRUE(pos && vel);
 
