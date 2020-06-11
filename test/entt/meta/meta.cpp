@@ -9,22 +9,6 @@
 #include <entt/meta/resolve.hpp>
 #include "fixture.h"
 
-TEST_F(Meta, AbstractClass) {
-    auto type = entt::resolve<an_abstract_type>();
-    concrete_type instance;
-
-    ASSERT_EQ(type.type_id(), entt::type_info<an_abstract_type>::id());
-    ASSERT_EQ(instance.i, 0);
-
-    type.func("f"_hs).invoke(instance, 3);
-
-    ASSERT_EQ(instance.i, 3);
-
-    type.func("g"_hs).invoke(instance, 3);
-
-    ASSERT_EQ(instance.i, -3);
-}
-
 TEST_F(Meta, EnumAndNamedConstants) {
     auto type = entt::resolve<props>();
 

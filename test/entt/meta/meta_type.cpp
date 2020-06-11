@@ -14,8 +14,21 @@ Type get(Type &prop) {
     return prop;
 }
 
-struct base_t {};
+struct base_t { char value{'c'}; };
 struct derived_t: base_t {};
+
+struct abstract_t {
+    virtual ~abstract_t() = default;
+    virtual void func(int) = 0;
+};
+
+struct concrete_t: base_t, abstract_t {
+    void func(int v) override {
+        value = v;
+    }
+
+    int value{3};
+};
 
 struct clazz_t {
     clazz_t() = default;
@@ -45,8 +58,10 @@ union union_t {
 struct Meta: ::testing::Test {
     static void SetUpTestCase() {
         entt::meta<double>().conv<int>();
-        entt::meta<base_t>().type("base"_hs);
+        entt::meta<base_t>().type("base"_hs).data<&base_t::value>("value"_hs);
         entt::meta<derived_t>().type("derived"_hs).base<base_t>();
+        entt::meta<abstract_t>().func<&abstract_t::func>("func"_hs);
+        entt::meta<concrete_t>().base<base_t>().base<abstract_t>();
 
         entt::meta<property_t>()
                 .data<property_t::random>("random"_hs)
@@ -241,4 +256,18 @@ TEST_F(Meta, MetaTypeDetach) {
     entt::meta<clazz_t>().type("clazz"_hs);
 
     ASSERT_TRUE(entt::resolve_id("clazz"_hs));
+}
+
+TEST_F(Meta, AbstractClass) {
+    auto type = entt::resolve<abstract_t>();
+    concrete_t instance;
+
+    ASSERT_EQ(type.type_id(), entt::type_info<abstract_t>::id());
+    ASSERT_EQ(instance.base_t::value, 'c');
+    ASSERT_EQ(instance.value, 3);
+
+    type.func("func"_hs).invoke(instance, 42);
+
+    ASSERT_EQ(instance.base_t::value, 'c');
+    ASSERT_EQ(instance.value, 42);
 }
