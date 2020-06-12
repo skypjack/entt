@@ -419,7 +419,7 @@ struct meta_handle {
      * @tparam Type Type of object to use to initialize the container.
      * @param value An instance of an object to use to initialize the container.
      */
-    template<typename Type>
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_handle>>>
     meta_handle(Type &&value) ENTT_NOEXCEPT
         : meta_handle{}
     {
