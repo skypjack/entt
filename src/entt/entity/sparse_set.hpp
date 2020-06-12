@@ -163,7 +163,7 @@ class sparse_set {
         }
 
         if(!sparse[pos]) {
-            sparse[pos] = std::make_unique<entity_type[]>(entt_per_page);
+            sparse[pos].reset(new entity_type[entt_per_page]);
             // null is safe in all cases for our purposes
             for(auto *first = sparse[pos].get(), *last = first + entt_per_page; first != last; ++first) {
                 *first = null;
