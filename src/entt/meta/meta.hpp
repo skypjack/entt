@@ -711,28 +711,7 @@ struct meta_data {
      */
     template<typename Type>
     bool set(meta_handle instance, Type &&value) const {
-        return node->set && node->set(*instance, {}, std::forward<Type>(value));
-    }
-
-    /**
-     * @brief Sets the i-th element of a given array.
-     *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the setter results in an undefined
-     * behavior.<br/>
-     * The type of the value must be such that a cast or conversion to the array
-     * type is possible. Otherwise, invoking the setter does nothing.
-     *
-     * @tparam Type Type of value to assign.
-     * @param instance An opaque instance of the underlying type.
-     * @param index Position of the underlying element to set.
-     * @param value Parameter to use to set the underlying element.
-     * @return True in case of success, false otherwise.
-     */
-    template<typename Type>
-    bool set(meta_handle instance, std::size_t index, Type &&value) const {
-        ENTT_ASSERT(index < node->type()->extent);
-        return node->set && node->set(*instance, index, std::forward<Type>(value));
+        return node->set && node->set(*instance, std::forward<Type>(value));
     }
 
     /**
@@ -745,22 +724,7 @@ struct meta_data {
      * @return A meta any containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(meta_handle instance) const {
-        return node->get(*instance, {});
-    }
-
-    /**
-     * @brief Gets the i-th element of a given array.
-     *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the getter results in an undefined behavior.
-     *
-     * @param instance An opaque instance of the underlying type.
-     * @param index Position of the underlying element to get.
-     * @return A meta any containing the value of the underlying element.
-     */
-    [[nodiscard]] meta_any get(meta_handle instance, std::size_t index) const {
-        ENTT_ASSERT(index < node->type()->extent);
-        return node->get(*instance, index);
+        return node->get(*instance);
     }
 
     /*! @copydoc meta_ctor::prop */

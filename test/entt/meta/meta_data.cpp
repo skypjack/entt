@@ -54,7 +54,7 @@ struct setter_getter_t {
 
 struct array_t {
     static inline int global[3];
-    int local[3];
+    int local[5];
 };
 
 enum class property_t {
@@ -347,10 +347,6 @@ TEST_F(MetaData, SetterGetterReadOnlyDataMember) {
 TEST_F(MetaData, ArrayStatic) {
     auto data = entt::resolve<array_t>().data("global"_hs);
 
-    array_t::global[0] = 3;
-    array_t::global[1] = 5;
-    array_t::global[2] = 7;
-
     ASSERT_TRUE(data);
     ASSERT_EQ(data.parent(), entt::resolve_id("array"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int[3]>());
@@ -359,46 +355,22 @@ TEST_F(MetaData, ArrayStatic) {
     ASSERT_TRUE(data.is_static());
     ASSERT_TRUE(data.type().is_array());
     ASSERT_EQ(data.type().extent(), 3);
-    ASSERT_EQ(data.get({}, 0).cast<int>(), 3);
-    ASSERT_EQ(data.get({}, 1).cast<int>(), 5);
-    ASSERT_EQ(data.get({}, 2).cast<int>(), 7);
-    ASSERT_FALSE(data.set({}, 0, 'c'));
-    ASSERT_EQ(data.get({}, 0).cast<int>(), 3);
-    ASSERT_TRUE(data.set({}, 0, data.get({}, 0).cast<int>()+2));
-    ASSERT_TRUE(data.set({}, 1, data.get({}, 1).cast<int>()+2));
-    ASSERT_TRUE(data.set({}, 2, data.get({}, 2).cast<int>()+2));
-    ASSERT_EQ(data.get({}, 0).cast<int>(), 5);
-    ASSERT_EQ(data.get({}, 1).cast<int>(), 7);
-    ASSERT_EQ(data.get({}, 2).cast<int>(), 9);
+    ASSERT_FALSE(data.get({}));
 }
 
 TEST_F(MetaData, Array) {
     auto data = entt::resolve<array_t>().data("local"_hs);
     array_t instance;
 
-    instance.local[0] = 3;
-    instance.local[1] = 5;
-    instance.local[2] = 7;
-
     ASSERT_TRUE(data);
     ASSERT_EQ(data.parent(), entt::resolve_id("array"_hs));
-    ASSERT_EQ(data.type(), entt::resolve<int[3]>());
+    ASSERT_EQ(data.type(), entt::resolve<int[5]>());
     ASSERT_EQ(data.id(), "local"_hs);
     ASSERT_FALSE(data.is_const());
     ASSERT_FALSE(data.is_static());
     ASSERT_TRUE(data.type().is_array());
-    ASSERT_EQ(data.type().extent(), 3);
-    ASSERT_EQ(data.get(instance, 0).cast<int>(), 3);
-    ASSERT_EQ(data.get(instance, 1).cast<int>(), 5);
-    ASSERT_EQ(data.get(instance, 2).cast<int>(), 7);
-    ASSERT_FALSE(data.set(instance, 0, 'c'));
-    ASSERT_EQ(data.get(instance, 0).cast<int>(), 3);
-    ASSERT_TRUE(data.set(instance, 0, data.get(instance, 0).cast<int>()+2));
-    ASSERT_TRUE(data.set(instance, 1, data.get(instance, 1).cast<int>()+2));
-    ASSERT_TRUE(data.set(instance, 2, data.get(instance, 2).cast<int>()+2));
-    ASSERT_EQ(data.get(instance, 0).cast<int>(), 5);
-    ASSERT_EQ(data.get(instance, 1).cast<int>(), 7);
-    ASSERT_EQ(data.get(instance, 2).cast<int>(), 9);
+    ASSERT_EQ(data.type().extent(), 5);
+    ASSERT_FALSE(data.get(instance));
 }
 
 TEST_F(MetaData, AsVoid) {

@@ -76,59 +76,35 @@ template<typename Type, typename... Args, std::size_t... Indexes>
 
 
 template<typename Type, auto Data>
-[[nodiscard]] bool setter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any index, [[maybe_unused]] meta_any value) {
+[[nodiscard]] bool setter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any value) {
     bool accepted = false;
 
     if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
         using helper_type = meta_function_helper_t<decltype(Data)>;
         using data_type = std::tuple_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>;
-        static_assert(std::is_invocable_v<decltype(Data), Type &, data_type>, "Invalid function or member function");
-        auto * const clazz = instance.try_cast<Type>();
-        auto * const direct = value.try_cast<data_type>();
 
-        if(clazz && (direct || value.convert<data_type>())) {
-            std::invoke(Data, *clazz, direct ? *direct : value.cast<data_type>());
-            accepted = true;
+        if(auto * const clazz = instance.try_cast<Type>(); clazz) {
+            if(auto * const direct = value.try_cast<data_type>(); direct || value.convert<data_type>()) {
+                std::invoke(Data, *clazz, direct ? *direct : value.cast<data_type>());
+                accepted = true;
+            }
         }
     } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
         using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
-        static_assert(std::is_invocable_v<decltype(Data), Type *>, "Invalid data member");
-        auto * const clazz = instance.try_cast<Type>();
 
-        if constexpr(std::is_array_v<data_type>) {
-            using underlying_type = std::remove_extent_t<data_type>;
-            auto * const direct = value.try_cast<underlying_type>();
-            auto * const idx = index.try_cast<std::size_t>();
-
-            if(clazz && idx && (direct || value.convert<underlying_type>())) {
-                std::invoke(Data, clazz)[*idx] = direct ? *direct : value.cast<underlying_type>();
-                accepted = true;
-            }
-        } else {
-            auto * const direct = value.try_cast<data_type>();
-
-            if(clazz && (direct || value.convert<data_type>())) {
-                std::invoke(Data, clazz) = (direct ? *direct : value.cast<data_type>());
-                accepted = true;
+        if constexpr(!std::is_array_v<data_type>) {
+            if(auto * const clazz = instance.try_cast<Type>(); clazz) {
+                if(auto * const direct = value.try_cast<data_type>(); direct || value.convert<data_type>()) {
+                    std::invoke(Data, clazz) = (direct ? *direct : value.cast<data_type>());
+                    accepted = true;
+                }
             }
         }
     } else {
-        static_assert(std::is_pointer_v<decltype(Data)>, "Invalid pointer to data type");
         using data_type = std::remove_cv_t<std::remove_reference_t<decltype(*Data)>>;
 
-        if constexpr(std::is_array_v<data_type>) {
-            using underlying_type = std::remove_extent_t<data_type>;
-            auto * const direct = value.try_cast<underlying_type>();
-            auto * const idx = index.try_cast<std::size_t>();
-
-            if(idx && (direct || value.convert<underlying_type>())) {
-                (*Data)[*idx] = (direct ? *direct : value.cast<underlying_type>());
-                accepted = true;
-            }
-        } else {
-            auto * const direct = value.try_cast<data_type>();
-
-            if(direct || value.convert<data_type>()) {
+        if constexpr(!std::is_array_v<data_type>) {
+            if(auto * const direct = value.try_cast<data_type>(); direct || value.convert<data_type>()) {
                 *Data = (direct ? *direct : value.cast<data_type>());
                 accepted = true;
             }
@@ -140,7 +116,7 @@ template<typename Type, auto Data>
 
 
 template<typename Type, auto Data, typename Policy>
-[[nodiscard]] meta_any getter([[maybe_unused]] meta_any instance, [[maybe_unused]] meta_any index) {
+[[nodiscard]] meta_any getter([[maybe_unused]] meta_any instance) {
     auto dispatch = [](auto &&value) {
         if constexpr(std::is_same_v<Policy, as_void_t>) {
             return meta_any{std::in_place_type<void>, std::forward<decltype(value)>(value)};
@@ -153,24 +129,18 @@ template<typename Type, auto Data, typename Policy>
     };
 
     if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
-        static_assert(std::is_invocable_v<decltype(Data), Type &>, "Invalid function or member function");
         auto * const clazz = instance.try_cast<Type>();
         return clazz ? dispatch(std::invoke(Data, *clazz)) : meta_any{};
     } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
-        using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
-        static_assert(std::is_invocable_v<decltype(Data), Type *>, "Invalid data member");
-        auto * const clazz = instance.try_cast<Type>();
-
-        if constexpr(std::is_array_v<data_type>) {
-            auto * const idx = index.try_cast<std::size_t>();
-            return (clazz && idx) ? dispatch(std::invoke(Data, clazz)[*idx]) : meta_any{};
+        if constexpr(std::is_array_v<std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>>) {
+            return meta_any{};
         } else {
+            auto * const clazz = instance.try_cast<Type>();
             return clazz ? dispatch(std::invoke(Data, clazz)) : meta_any{};
         }
     } else if constexpr(std::is_pointer_v<std::decay_t<decltype(Data)>>) {
         if constexpr(std::is_array_v<std::remove_pointer_t<decltype(Data)>>) {
-            auto * const idx = index.try_cast<std::size_t>();
-            return idx ? dispatch((*Data)[*idx]) : meta_any{};
+            return meta_any{};
         } else {
             return dispatch(*Data);
         }
@@ -666,7 +636,7 @@ public:
             false,
             &internal::meta_info<underlying_type>::resolve,
             []() -> decltype(internal::meta_data_node::set) {
-                if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t>  || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>)) {
+                if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>)) {
                     return nullptr;
                 } else {
                     return &internal::setter<Type, Setter>;

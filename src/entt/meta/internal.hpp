@@ -77,8 +77,8 @@ struct meta_data_node {
     meta_prop_node * prop;
     const bool is_static;
     meta_type_node *(* const type)() ENTT_NOEXCEPT;
-    bool(* const set)(meta_any, meta_any, meta_any);
-    meta_any(* const get)(meta_any, meta_any);
+    bool(* const set)(meta_any, meta_any);
+    meta_any(* const get)(meta_any);
 };
 
 
