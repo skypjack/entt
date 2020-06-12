@@ -1028,12 +1028,23 @@ public:
 
     /**
      * @brief If a meta type refers to an array type, provides the number of
-     * elements of the array.
-     * @return The number of elements of the array if the underlying type is an
-     * array type, 0 otherwise.
+     * dimensions of the array.
+     * @return The number of dimensions of the array if the underlying type is
+     * an array type, 0 otherwise.
      */
-    [[nodiscard]] size_type extent() const ENTT_NOEXCEPT {
-        return node->extent;
+    [[nodiscard]] size_type rank() const ENTT_NOEXCEPT {
+        return node->rank;
+    }
+
+    /**
+     * @brief If a meta type refers to an array type, provides the number of
+     * elements along the given dimension of the array.
+     * @param dim
+     * @return The number of elements along the given dimension of the array if
+     * the underlying type is an array type, 0 otherwise.
+     */
+    [[nodiscard]] size_type extent(size_type dim = {}) const ENTT_NOEXCEPT {
+        return node->extent(dim);
     }
 
     /**
