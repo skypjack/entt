@@ -1049,7 +1049,7 @@ public:
     /**
      * @brief If a meta type refers to an array type, provides the number of
      * elements along the given dimension of the array.
-     * @param dim
+     * @param dim The dimension of which to return the number of elements.
      * @return The number of elements along the given dimension of the array if
      * the underlying type is an array type, 0 otherwise.
      */
