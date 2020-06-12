@@ -333,7 +333,7 @@ public:
      * @brief Indirection operator for aliasing construction.
      * @return A meta any that shares a reference to an unmanaged object.
      */
-    [[nodiscard]] meta_any operator *() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_any operator*() const ENTT_NOEXCEPT {
         return ref();
     }
 
@@ -432,8 +432,8 @@ struct meta_handle {
     }
 
     /*! @copydoc meta_any::operator* */
-    [[nodiscard]] meta_any operator *() const {
-        return *any;
+    [[nodiscard]] meta_any operator*() const {
+        return any;
     }
 
 private:
@@ -711,7 +711,7 @@ struct meta_data {
      */
     template<typename Type>
     bool set(meta_handle instance, Type &&value) const {
-        return node->set && node->set(*instance, std::forward<Type>(value));
+        return node->set && node->set(std::move(instance), std::forward<Type>(value));
     }
 
     /**
@@ -724,7 +724,7 @@ struct meta_data {
      * @return A meta any containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(meta_handle instance) const {
-        return node->get(*instance);
+        return node->get(std::move(instance));
     }
 
     /*! @copydoc meta_ctor::prop */
@@ -843,8 +843,18 @@ struct meta_func {
      */
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&... args) const {
-        meta_any arguments[]{*instance, std::forward<Args>(args)...};
-        return sizeof...(Args) == size() ? node->invoke(arguments[0], &arguments[sizeof...(Args) != 0]) : meta_any{};
+        meta_any any{};
+
+        if(sizeof...(Args) == size()) {
+            if constexpr(sizeof...(Args) == 0) {
+                any = node->invoke(std::move(instance), nullptr);
+            } else {
+                meta_any arguments[]{std::forward<Args>(args)...};
+                any = node->invoke(std::move(instance), arguments);
+            }
+        }
+
+        return any;
     }
 
     /*! @copydoc meta_ctor::prop */
