@@ -1,3 +1,5 @@
+#include <vector>
+#include <map>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
@@ -127,21 +129,45 @@ TEST_F(MetaType, Functionalities) {
 
 TEST_F(MetaType, Traits) {
     ASSERT_TRUE(entt::resolve<void>().is_void());
+    ASSERT_FALSE(entt::resolve<int>().is_void());
+
     ASSERT_TRUE(entt::resolve<bool>().is_integral());
+    ASSERT_FALSE(entt::resolve<double>().is_integral());
+
     ASSERT_TRUE(entt::resolve<double>().is_floating_point());
-    ASSERT_TRUE(entt::resolve<int[3]>().is_array());
+    ASSERT_FALSE(entt::resolve<int>().is_floating_point());
+
+    ASSERT_TRUE(entt::resolve<int[5]>().is_array());
+    ASSERT_TRUE(entt::resolve<int[5][3]>().is_array());
+    ASSERT_FALSE(entt::resolve<int>().is_array());
+
     ASSERT_TRUE(entt::resolve<property_t>().is_enum());
+    ASSERT_FALSE(entt::resolve<char>().is_enum());
+
     ASSERT_TRUE(entt::resolve<union_t>().is_union());
+    ASSERT_FALSE(entt::resolve<derived_t>().is_union());
+
     ASSERT_TRUE(entt::resolve<derived_t>().is_class());
+    ASSERT_FALSE(entt::resolve<union_t>().is_class());
+
     ASSERT_TRUE(entt::resolve<int *>().is_pointer());
+    ASSERT_FALSE(entt::resolve<int>().is_pointer());
+
     ASSERT_TRUE(entt::resolve<decltype(&clazz_t::func)>().is_function_pointer());
+    ASSERT_FALSE(entt::resolve<decltype(&clazz_t::member)>().is_function_pointer());
+
     ASSERT_TRUE(entt::resolve<decltype(&clazz_t::value)>().is_member_object_pointer());
+    ASSERT_FALSE(entt::resolve<decltype(&clazz_t::member)>().is_member_object_pointer());
+
     ASSERT_TRUE(entt::resolve<decltype(&clazz_t::member)>().is_member_function_pointer());
+    ASSERT_FALSE(entt::resolve<decltype(&clazz_t::value)>().is_member_function_pointer());
+
+    ASSERT_EQ(entt::resolve<int>().rank(), 0u);
     ASSERT_EQ(entt::resolve<int[5][3]>().rank(), 2u);
+    ASSERT_EQ(entt::resolve<int>().extent(), 0u);
     ASSERT_EQ(entt::resolve<int[5][3]>().extent(), 5u);
     ASSERT_EQ(entt::resolve<int[5][3]>().extent(1u), 3u);
     ASSERT_EQ(entt::resolve<int[5][3]>().extent(2u), 0u);
-
 }
 
 TEST_F(MetaType, RemovePointer) {

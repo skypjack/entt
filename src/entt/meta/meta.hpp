@@ -3,6 +3,7 @@
 
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <iterator>
 #include <functional>
@@ -605,12 +606,8 @@ struct meta_ctor {
      */
     template<typename... Args>
     [[nodiscard]] meta_any invoke([[maybe_unused]] Args &&... args) const {
-        if constexpr(sizeof...(Args) == 0) {
-            return sizeof...(Args) == size() ? node->invoke(nullptr) : meta_any{};
-        } else {
-            meta_any arguments[]{std::forward<Args>(args)...};
-            return sizeof...(Args) == size() ? node->invoke(arguments) : meta_any{};
-        }
+        std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
+        return sizeof...(Args) == size() ? node->invoke(arguments.data()) : meta_any{};
     }
 
     /**
@@ -846,12 +843,8 @@ struct meta_func {
         meta_any any{};
 
         if(sizeof...(Args) == size()) {
-            if constexpr(sizeof...(Args) == 0) {
-                any = node->invoke(std::move(instance), nullptr);
-            } else {
-                meta_any arguments[]{std::forward<Args>(args)...};
-                any = node->invoke(std::move(instance), arguments);
-            }
+            std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
+            any = node->invoke(std::move(instance), arguments.data());
         }
 
         return any;
@@ -1270,12 +1263,8 @@ public:
             return any;
         };
 
-        if constexpr(sizeof...(Args) == 0) {
-            return construct_if(nullptr);
-        } else {
-            meta_any arguments[]{std::forward<Args>(args)...};
-            return construct_if(arguments);
-        }
+        std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
+        return construct_if(arguments.data());
     }
 
     /**
