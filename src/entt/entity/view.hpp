@@ -158,8 +158,9 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         underlying_iterator it;
     };
 
-    basic_view(pool_type<Component> &... component, pool_type<Exclude> &... epool) ENTT_NOEXCEPT
-        : pools{&component..., &epool...}
+    basic_view(pool_type<Component> &... component, unpack_as_t<const sparse_set<Entity>, Exclude> &... epool) ENTT_NOEXCEPT
+        : pools{&component...},
+          filter{&epool...}
     {}
 
     [[nodiscard]] const sparse_set<Entity> & candidate() const ENTT_NOEXCEPT {
@@ -315,8 +316,7 @@ public:
      */
     [[nodiscard]] iterator begin() const {
         const auto &view = candidate();
-        const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
-        return iterator{view, unchecked(view), ignore, view.begin()};
+        return iterator{view, unchecked(view), filter, view.begin()};
     }
 
     /**
@@ -336,8 +336,7 @@ public:
      */
     [[nodiscard]] iterator end() const {
         const auto &view = candidate();
-        const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
-        return iterator{view, unchecked(view), ignore, view.end()};
+        return iterator{view, unchecked(view), filter, view.end()};
     }
 
     /**
@@ -368,8 +367,7 @@ public:
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
         const auto &view = candidate();
-        const filter_type ignore{std::get<pool_type<Exclude> *>(pools)...};
-        iterator it{view, unchecked(view), ignore, view.find(entt)};
+        iterator it{view, unchecked(view), filter, view.find(entt)};
         return (it != end() && *it == entt) ? it : end();
     }
 
@@ -380,7 +378,7 @@ public:
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
         return (std::get<pool_type<Component> *>(pools)->contains(entt) && ...)
-                && (!std::get<pool_type<Exclude> *>(pools)->contains(entt) && ...);
+                && std::none_of(filter.begin(), filter.end(), [entt](const auto *cpool) { return cpool->contains(entt); });
     }
 
     /**
@@ -465,7 +463,8 @@ public:
     }
 
 private:
-    const std::tuple<pool_type<Component> *..., pool_type<Exclude> *...> pools;
+    const std::tuple<pool_type<Component> *...> pools;
+    filter_type filter;
 };
 
 

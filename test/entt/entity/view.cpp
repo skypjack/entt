@@ -510,8 +510,6 @@ TEST(MultiComponentView, ExcludedComponents) {
     registry.emplace<int>(e1, 1);
     registry.emplace<char>(e1);
 
-    const auto view = registry.view<int>(entt::exclude<char>);
-
     const auto e2 = registry.create();
     registry.emplace<int>(e2, 2);
 
@@ -519,11 +517,13 @@ TEST(MultiComponentView, ExcludedComponents) {
     registry.emplace<int>(e3, 3);
     registry.emplace<char>(e3);
 
+    const auto view = std::as_const(registry).view<const int>(entt::exclude<char>);
+
     for(const auto entity: view) {
         ASSERT_TRUE(entity == e0 || entity == e2);
 
         if(entity == e0) {
-            ASSERT_EQ(view.get<int>(e0), 0);
+            ASSERT_EQ(view.get<const int>(e0), 0);
         } else if(entity == e2) {
             ASSERT_EQ(view.get(e2), 2);
         }
@@ -540,7 +540,7 @@ TEST(MultiComponentView, ExcludedComponents) {
         if(entity == e1) {
             ASSERT_EQ(view.get(e1), 1);
         } else if(entity == e3) {
-            ASSERT_EQ(view.get<int>(e3), 3);
+            ASSERT_EQ(view.get<const int>(e3), 3);
         }
     }
 }
