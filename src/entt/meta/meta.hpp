@@ -43,15 +43,16 @@ class meta_any {
         }
 
         static void destroy(meta_any &any) {
-            const auto * const node = internal::meta_info<Type>::resolve();
-            if(node->dtor) { node->dtor->invoke(any.instance); }
+            if(const auto * const node = internal::meta_info<Type>::resolve(); node->dtor) {
+                node->dtor->invoke(any.instance);
+            }
+
             delete static_cast<Type *>(any.instance);
         }
 
         static void copy(meta_any &to, const meta_any &from) {
-            auto *instance = new Type{*static_cast<const Type *>(from.instance)};
-            new (&to.storage) Type *{instance};
-            to.instance = instance;
+            to.instance = new Type{*static_cast<const Type *>(from.instance)};
+            new (&to.storage) Type *{static_cast<Type *>(to.instance)};
         }
 
         static void steal(meta_any &to, meta_any &from) {
@@ -68,8 +69,10 @@ class meta_any {
         }
 
         static void destroy(meta_any &any) {
-            const auto * const node = internal::meta_info<Type>::resolve();
-            if(node->dtor) { node->dtor->invoke(any.instance); }
+            if(const auto * const node = internal::meta_info<Type>::resolve(); node->dtor) {
+                node->dtor->invoke(any.instance);
+            }
+
             static_cast<Type *>(any.instance)->~Type();
         }
 
@@ -114,11 +117,10 @@ public:
         node = internal::meta_info<Type>::resolve();
 
         if constexpr(!std::is_void_v<Type>) {
-            using traits_type = type_traits<std::remove_cv_t<std::remove_reference_t<Type>>>;
-            traits_type::instance(*this, std::forward<Args>(args)...);
-            destroy_fn = &traits_type::destroy;
-            copy_fn = &traits_type::copy;
-            steal_fn = &traits_type::steal;
+            type_traits<Type>::instance(*this, std::forward<Args>(args)...);
+            destroy_fn = &type_traits<Type>::destroy;
+            copy_fn = &type_traits<Type>::copy;
+            steal_fn = &type_traits<Type>::steal;
         }
     }
 
@@ -158,10 +160,6 @@ public:
 
     /**
      * @brief Move constructor.
-     *
-     * After move construction, instances that have been moved from are placed
-     * in a valid but unspecified state.
-     *
      * @param other The instance to move from.
      */
     meta_any(meta_any &&other)

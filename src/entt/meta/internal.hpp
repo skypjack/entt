@@ -2,8 +2,8 @@
 #define ENTT_META_INTERNAL_HPP
 
 
-#include <algorithm>
 #include <cstddef>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 #include "../core/attribute.h"
@@ -200,13 +200,19 @@ template<auto Member, typename Op>
 auto find_if(const Op &op, const meta_type_node *node)
 -> std::decay_t<decltype(node->*Member)> {
     std::decay_t<decltype(node->*Member)> ret = nullptr;
-    meta_range range{node->*Member};
 
-    if(ret = std::find_if(range.begin(), range.end(), [&op](const auto &curr) { return op(&curr); }).operator->(); !ret) {
-        meta_range base{node->base};
+    for(auto &&curr: meta_range{node->*Member}) {
+        if(op(&curr)) {
+            ret = &curr;
+            break;
+        }
+    }
 
-        for(auto first = base.begin(), last = base.end(); first != last && !ret; ++first) {
-            ret = find_if<Member>(op, first->type());
+    if(!ret) {
+        for(auto &&curr: meta_range{node->base}) {
+            if(ret = find_if<Member>(op, curr.type()); ret) {
+                break;
+            }
         }
     }
 
