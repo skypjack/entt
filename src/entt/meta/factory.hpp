@@ -330,12 +330,12 @@ private:
 template<typename Type>
 class meta_factory<Type> {
     template<typename Node>
-    bool exists(const Node *candidate, const Node *node) ENTT_NOEXCEPT {
+    static bool exists(const Node *candidate, const Node *node) ENTT_NOEXCEPT {
         return node && (node == candidate || exists(candidate, node->next));
     }
 
     template<typename Node>
-    bool exists(const id_type id, const Node *node) ENTT_NOEXCEPT {
+    static bool exists(const id_type id, const Node *node) ENTT_NOEXCEPT {
         return node && (node->id == id || exists(id, node->next));
     }
 
@@ -345,7 +345,7 @@ public:
      * @param id Optional unique identifier.
      * @return An extended meta factory for the given type.
      */
-    auto type(const id_type id = type_info<Type>::id()) {
+    static auto type(const id_type id = type_info<Type>::id()) {
         auto * const node = internal::meta_info<Type>::resolve();
 
         ENTT_ASSERT(!exists(id, *internal::meta_context::global()));
@@ -366,7 +366,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename Base>
-    auto base() ENTT_NOEXCEPT {
+    static auto base() ENTT_NOEXCEPT {
         static_assert(std::is_base_of_v<Base, Type>, "Invalid base type");
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -396,7 +396,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<typename To>
-    auto conv() ENTT_NOEXCEPT {
+    static auto conv() ENTT_NOEXCEPT {
         static_assert(std::is_convertible_v<Type, To>, "Could not convert to the required type");
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -429,7 +429,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Candidate>
-    auto conv() ENTT_NOEXCEPT {
+    static auto conv() ENTT_NOEXCEPT {
         using conv_type = std::invoke_result_t<decltype(Candidate), Type &>;
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -463,7 +463,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Func, typename Policy = as_is_t>
-    auto ctor() ENTT_NOEXCEPT {
+    static auto ctor() ENTT_NOEXCEPT {
         using helper_type = internal::meta_function_helper_t<decltype(Func)>;
         static_assert(std::is_same_v<typename helper_type::return_type, Type>, "The function doesn't return an object of the required type");
         auto * const type = internal::meta_info<Type>::resolve();
@@ -497,7 +497,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<typename... Args>
-    auto ctor() ENTT_NOEXCEPT {
+    static auto ctor() ENTT_NOEXCEPT {
         using helper_type = internal::meta_function_helper_t<Type(*)(Args...)>;
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -536,7 +536,7 @@ public:
      * @return A meta factory for the parent type.
      */
     template<auto Func>
-    auto dtor() ENTT_NOEXCEPT {
+    static auto dtor() ENTT_NOEXCEPT {
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -569,7 +569,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Data, typename Policy = as_is_t>
-    auto data(const id_type id) ENTT_NOEXCEPT {
+    static auto data(const id_type id) ENTT_NOEXCEPT {
         if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
             return data<Data, Data, Policy>(id);
         } else {
@@ -624,7 +624,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Setter, auto Getter, typename Policy = as_is_t>
-    auto data(const id_type id) ENTT_NOEXCEPT {
+    static auto data(const id_type id) ENTT_NOEXCEPT {
         using underlying_type = std::remove_reference_t<std::invoke_result_t<decltype(Getter), Type &>>;
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -668,7 +668,7 @@ public:
      * @return An extended meta factory for the parent type.
      */
     template<auto Candidate, typename Policy = as_is_t>
-    auto func(const id_type id) ENTT_NOEXCEPT {
+    static auto func(const id_type id) ENTT_NOEXCEPT {
         using helper_type = internal::meta_function_helper_t<decltype(Candidate)>;
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -706,7 +706,7 @@ public:
      *
      * @return An extended meta factory for the given type.
      */
-    auto reset() ENTT_NOEXCEPT {
+    static auto reset() ENTT_NOEXCEPT {
         auto * const node = internal::meta_info<Type>::resolve();
 
         internal::meta_context::detach(node);
