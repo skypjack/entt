@@ -13,6 +13,24 @@ namespace entt {
 
 
 /**
+ * @brief Using declaration to be used to _repeat_ the same type a number of
+ * times equal to the size of a given parameter pack.
+ * @tparam Type A type to repeat.
+ */
+template<typename Type, typename>
+using unpack_as_t = Type;
+
+
+/**
+ * @brief Helper variable template to be used to _repeat_ the same value a
+ * number of times equal to the size of a given parameter pack.
+ * @tparam Value A value to repeat.
+ */
+template<auto Value, typename>
+inline constexpr auto unpack_as_v = Value;
+
+
+/**
  * @brief Wraps a static constant.
  * @tparam Value A static constant.
  */

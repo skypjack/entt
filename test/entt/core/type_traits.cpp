@@ -4,6 +4,20 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
 
+TEST(Unpack, AsType) {
+    ASSERT_EQ([](auto &&... args) {
+        return [](entt::unpack_as_t<int, decltype(args)>... value) {
+            return (value + ... + 0);
+        };
+    }('c', 42., true)(1, 2, 3), 6);
+}
+
+TEST(Unpack, AsValue) {
+    ASSERT_EQ([](auto &&... args) {
+        return (entt::unpack_as_v<2, decltype(args)> + ... + 0);
+    }('c', 42., true), 6);
+}
+
 TEST(IntegralConstant, Functionalities) {
     entt::integral_constant<3> constant;
 
