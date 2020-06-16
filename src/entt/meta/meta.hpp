@@ -20,10 +20,60 @@ namespace entt {
 
 
 class meta_type;
+class meta_any;
+
+
+/*! @brief Proxy object for containers of any type. */
+class meta_container {
+    /*! @brief A meta_any is allowed to create proxies. */
+    friend class meta_any;
+
+    struct meta_iterator;
+
+    struct meta_view {
+        [[nodiscard]] virtual std::size_t size(void *) const ENTT_NOEXCEPT = 0;
+        [[nodiscard]] virtual bool insert(void *, meta_any, meta_any) = 0;
+        [[nodiscard]] virtual bool erase(void *, meta_any) = 0;
+        [[nodiscard]] virtual meta_any begin(void *) const ENTT_NOEXCEPT = 0;
+        [[nodiscard]] virtual meta_any end(void *) const ENTT_NOEXCEPT = 0;
+        [[nodiscard]] virtual meta_any find(void *, meta_any) const ENTT_NOEXCEPT = 0;
+        [[nodiscard]] virtual meta_any value(meta_any) const ENTT_NOEXCEPT = 0;
+        virtual void incr(meta_any) const ENTT_NOEXCEPT = 0;
+    };
+
+    meta_container(meta_view *impl, void *container)
+        : view{impl},
+          instance{container}
+    {}
+
+public:
+    /*! @brief Unsigned integer type. */
+    using size_type = std::size_t;
+    /*! @brief Input iterator type. */
+    using iterator = meta_iterator;
+
+    /*! @brief Default constructor. */
+    meta_container()
+        : view{},
+          instance{}
+    {}
+
+    [[nodiscard]] inline size_type size() const ENTT_NOEXCEPT;
+    inline bool insert(meta_any, meta_any);
+    inline bool erase(meta_any);
+    [[nodiscard]] inline iterator begin();
+    [[nodiscard]] inline iterator end();
+    [[nodiscard]] inline iterator operator[](meta_any pos_or_key);
+    [[nodiscard]] inline explicit operator bool() const ENTT_NOEXCEPT;
+
+private:
+    meta_view *view;
+    void *instance;
+};
 
 
 /**
- * @brief Opaque container for values of any type.
+ * @brief Opaque wrapper for values of any type.
  *
  * This class uses a technique called small buffer optimization (SBO) to get rid
  * of memory allocations if possible. This should improve overall performance.
@@ -86,12 +136,158 @@ class meta_any {
         }
     };
 
-    meta_any(const internal::meta_type_node *curr, void *ref) ENTT_NOEXCEPT
-        : meta_any{}
-    {
-        node = curr;
-        instance = ref;
-    }
+    template<typename, typename = void>
+    struct container_view {
+        [[nodiscard]] static meta_container::meta_view * instance() {
+            return nullptr;
+        }
+    };
+
+    template<typename Type>
+    struct container_view<Type, std::enable_if_t<is_sequence_container_v<Type>>>: meta_container::meta_view {
+        [[nodiscard]] static meta_container::meta_view * instance() {
+            static container_view common{};
+            return &common;
+        }
+
+        [[nodiscard]] std::size_t size(void *container) const ENTT_NOEXCEPT override {
+            return static_cast<Type *>(container)->size();
+        }
+
+        [[nodiscard]] bool insert(void *container, meta_any it, meta_any value) override {
+            bool ret = false;
+
+            if constexpr(is_dynamic_sequence_container_v<Type>) {
+                if(auto *iter = it.try_cast<typename Type::iterator>(); iter) {
+                    if(const auto *curr = value.try_cast<typename Type::value_type>(); curr) {
+                        *iter = static_cast<Type *>(container)->insert(*iter, *curr);
+                        ret = true;
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        [[nodiscard]] bool erase(void *container, meta_any it) override {
+            bool ret = false;
+
+            if constexpr(is_dynamic_sequence_container_v<Type>) {
+                if(auto *iter = it.try_cast<typename Type::iterator>(); iter) {
+                    *iter = static_cast<Type *>(container)->erase(*iter);
+                    ret = true;
+                }
+            }
+
+            return ret;
+        }
+
+        [[nodiscard]] meta_any begin(void *container) const ENTT_NOEXCEPT override {
+            return static_cast<Type *>(container)->begin();
+        }
+
+        [[nodiscard]] meta_any end(void *container) const ENTT_NOEXCEPT override {
+            return static_cast<Type *>(container)->end();
+        }
+
+        [[nodiscard]] meta_any value(meta_any it) const ENTT_NOEXCEPT override {
+            return std::ref(*it.cast<typename Type::iterator>());
+        }
+
+        [[nodiscard]] meta_any find(void *container, meta_any idx) const ENTT_NOEXCEPT override {
+            meta_any any{};
+
+            if(const auto *curr = idx.try_cast<std::size_t>(); curr) {
+                any = std::next(static_cast<Type *>(container)->begin(), *curr);
+            }
+
+            return any;
+        }
+
+        void incr(meta_any it) const ENTT_NOEXCEPT override {
+            ++it.cast<typename Type::iterator>();
+        }
+    };
+
+    template<typename Type>
+    struct container_view<Type, std::enable_if_t<is_associative_container_v<Type>>>: meta_container::meta_view {
+        [[nodiscard]] static meta_container::meta_view * instance() {
+            static container_view common{};
+            return &common;
+        }
+
+        [[nodiscard]] std::size_t size(void *container) const ENTT_NOEXCEPT override {
+            return static_cast<Type *>(container)->size();
+        }
+
+        [[nodiscard]] bool insert(void *container, meta_any key, meta_any value) override {
+            bool ret = false;
+
+            if constexpr(is_key_only_associative_container_v<Type>) {
+                if(const auto *curr = key.try_cast<typename Type::key_type>(); curr) {
+                    static_cast<Type *>(container)->insert(*curr);
+                    ret = true;
+                }
+            } else {
+                if(const auto *k_curr = key.try_cast<typename Type::key_type>(); k_curr) {
+                    if(const auto *v_curr = value.try_cast<typename Type::mapped_type>(); v_curr) {
+                        static_cast<Type *>(container)->insert(std::make_pair(*k_curr, *v_curr));
+                        ret = true;
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        [[nodiscard]] bool erase(void *container, meta_any key) override {
+            bool ret = false;
+
+            if(const auto *curr = key.try_cast<typename Type::key_type>(); curr) {
+                static_cast<Type *>(container)->erase(*curr);
+                ret = true;
+            }
+
+            return ret;
+        }
+
+        [[nodiscard]] meta_any begin(void *container) const ENTT_NOEXCEPT override {
+            return static_cast<Type *>(container)->begin();
+        }
+
+        [[nodiscard]] meta_any end(void *container) const ENTT_NOEXCEPT override {
+            return static_cast<Type *>(container)->end();
+        }
+
+        [[nodiscard]] meta_any value(meta_any it) const ENTT_NOEXCEPT override {
+            if constexpr(is_key_only_associative_container_v<Type>) {
+                return *it.cast<typename Type::iterator>();
+            } else {
+                return std::ref(*it.cast<typename Type::iterator>());
+            }
+        }
+
+        [[nodiscard]] meta_any find(void *container, meta_any key) const ENTT_NOEXCEPT override {
+            meta_any any{};
+
+            if constexpr(is_key_only_associative_container_v<Type>) {
+                if(const auto *curr = key.try_cast<typename Type::key_type>(); curr) {
+                    auto *cont = static_cast<Type *>(container);
+                    any = std::find(cont->begin(), cont->end(), *curr);
+                }
+            } else {
+                if(const auto *curr = key.try_cast<typename Type::key_type>(); curr) {
+                    any = static_cast<Type *>(container)->find(*curr);
+                }
+            }
+
+            return any;
+        }
+
+        void incr(meta_any it) const ENTT_NOEXCEPT override {
+            it.cast<typename Type::iterator>().operator++();
+        }
+    };
 
 public:
     /*! @brief Default constructor. */
@@ -101,12 +297,13 @@ public:
           node{},
           destroy_fn{},
           copy_fn{},
-          steal_fn{}
+          steal_fn{},
+          cview{}
     {}
 
     /**
      * @brief Constructs a meta any by directly initializing the new object.
-     * @tparam Type Type of object to use to initialize the container.
+     * @tparam Type Type of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -121,23 +318,28 @@ public:
             destroy_fn = &type_traits<Type>::destroy;
             copy_fn = &type_traits<Type>::copy;
             steal_fn = &type_traits<Type>::steal;
+            cview = container_view<Type>::instance();
         }
     }
 
     /**
      * @brief Constructs a meta any that holds an unmanaged object.
-     * @tparam Type Type of object to use to initialize the container.
-     * @param value An instance of an object to use to initialize the container.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
     meta_any(std::reference_wrapper<Type> value)
-        : meta_any{internal::meta_info<Type>::resolve(), &value.get()}
-    {}
+        : meta_any{}
+    {
+        node = internal::meta_info<Type>::resolve();
+        instance = &value.get();
+        cview = container_view<Type>::instance();
+    }
 
     /**
      * @brief Constructs a meta any from a given value.
-     * @tparam Type Type of object to use to initialize the container.
-     * @param value An instance of an object to use to initialize the container.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>>>
     meta_any(Type &&value)
@@ -156,6 +358,7 @@ public:
         destroy_fn = other.destroy_fn;
         copy_fn = other.copy_fn;
         steal_fn = other.steal_fn;
+        cview = other.cview;
     }
 
     /**
@@ -177,8 +380,8 @@ public:
 
     /**
      * @brief Assignment operator.
-     * @tparam Type Type of object to use to initialize the container.
-     * @param value An instance of an object to use to initialize the container.
+     * @tparam Type Type of object to use to initialize the wrapper.
+     * @param value An instance of an object to use to initialize the wrapper.
      * @return This meta any object.
      */
     template<typename Type>
@@ -309,9 +512,8 @@ public:
     }
 
     /**
-     * @brief Replaces the contained object by initializing a new instance
-     * directly.
-     * @tparam Type Type of object to use to initialize the container.
+     * @brief Replaces the contained object by creating a new instance directly.
+     * @tparam Type Type of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -325,7 +527,19 @@ public:
      * @return A meta any that shares a reference to an unmanaged object.
      */
     [[nodiscard]] meta_any ref() const ENTT_NOEXCEPT {
-        return meta_any{node, instance};
+        meta_any alias{};
+        alias.node = node;
+        alias.instance = instance;
+        alias.cview = cview;
+        return alias;
+    }
+
+    /**
+     * @brief Returns a container view.
+     * @return A container view for the underlying object.
+     */
+    [[nodiscard]] meta_container view() const ENTT_NOEXCEPT {
+        return { cview, instance };
     }
 
     /**
@@ -337,18 +551,17 @@ public:
     }
 
     /**
-     * @brief Returns false if a container is empty, true otherwise.
-     * @return False if the container is empty, true otherwise.
+     * @brief Returns false if a wrapper is empty, true otherwise.
+     * @return False if the wrapper is empty, true otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(node == nullptr);
     }
 
     /**
-     * @brief Checks if two containers differ in their content.
-     * @param other Container with which to compare.
-     * @return False if the two containers differ in their content, true
-     * otherwise.
+     * @brief Checks if two wrappers differ in their content.
+     * @param other Wrapper with which to compare.
+     * @return False if the two objects differ in their content, true otherwise.
      */
     [[nodiscard]] bool operator==(const meta_any &other) const {
         return (!node && !other.node) || (node && other.node && node->type_id == other.node->type_id && node->compare(instance, other.instance));
@@ -377,6 +590,7 @@ public:
         std::swap(lhs.destroy_fn, rhs.destroy_fn);
         std::swap(lhs.copy_fn, rhs.copy_fn);
         std::swap(lhs.steal_fn, rhs.steal_fn);
+        std::swap(lhs.cview, rhs.cview);
     }
 
 private:
@@ -386,17 +600,193 @@ private:
     destroy_fn_type *destroy_fn;
     copy_fn_type *copy_fn;
     steal_fn_type *steal_fn;
+    meta_container::meta_view *cview;
 };
 
 
 /**
- * @brief Checks if two containers differ in their content.
+ * @brief Checks if two wrappers differ in their content.
  * @param lhs A meta any object, either empty or not.
  * @param rhs A meta any object, either empty or not.
- * @return True if the two containers differ in their content, false otherwise.
+ * @return True if the two wrappers differ in their content, false otherwise.
  */
 [[nodiscard]] inline bool operator!=(const meta_any &lhs, const meta_any &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
+}
+
+
+/*! @brief Opaque iterator for meta containers. */
+struct meta_container::meta_iterator {
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
+    /*! @brief Type of elements returned by the iterator. */
+    using value_type = meta_any;
+    /*! @brief Pointer type, `void` on purpose. */
+    using pointer = void;
+    /*! @brief Reference type, it is **not** an actual reference. */
+    using reference = value_type;
+    /*! @brief Iterator category. */
+    using iterator_category = std::input_iterator_tag;
+
+    /*! @brief Default constructor. */
+    meta_iterator() ENTT_NOEXCEPT = default;
+
+    /**
+     * @brief Constructs a meta iterator that wraps an actual iterator.
+     * @param ref A proxy object that _knows_ how to use the wrapped iterator.
+     * @param iter The actual iterator, properly wrapped.
+     */
+    meta_iterator(meta_container::meta_view *ref, meta_any iter)
+        : view{ref},
+          it{std::move(iter)}
+    {}
+
+    /*! @brief Pre-increment operator. @return This iterator. */
+    meta_iterator & operator++() ENTT_NOEXCEPT {
+        return view->incr(handle()), *this;
+    }
+
+    /*! @brief Post-increment operator. @return This iterator. */
+    meta_iterator operator++(int) ENTT_NOEXCEPT {
+        iterator orig = *this;
+        return view->incr(handle()), orig;
+    }
+
+    /**
+     * @brief Checks if two meta iterators refer to the same element.
+     * @param other The meta iterator with which to compare.
+     * @return True if the two meta iterators refer to the same element, false
+     * otherwise.
+     */
+    [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
+        return it == other.it;
+    }
+
+    /**
+     * @brief Checks if two meta iterators refer to the same element.
+     * @param other The meta iterator with which to compare.
+     * @return False if the two meta iterators refer to the same element, true
+     * otherwise.
+     */
+    [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this == other);
+    }
+
+    /**
+     * @brief Indirection operator.
+     * @return The element to which the meta pointer points.
+     */
+    [[nodiscard]] reference operator*() const {
+        return view->value(handle());
+    }
+
+    /**
+     * @brief Returns a handle to the underlying iterator.
+     * @return The actual iterator, properly wrapped.
+     */
+    [[nodiscard]] meta_any handle() const ENTT_NOEXCEPT {
+        return *it;
+    }
+
+    /**
+     * @brief Returns false if an iterator is invalid, true otherwise.
+     * @return False if the iterator is invalid, true otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return static_cast<bool>(it);
+    }
+
+private:
+    meta_container::meta_view *view;
+    entt::meta_any it;
+};
+
+
+/**
+ * @brief Returns the number of elements.
+ * @return Number of elements.
+ */
+[[nodiscard]] meta_container::size_type meta_container::size() const ENTT_NOEXCEPT {
+    return view->size(instance);
+}
+
+
+/**
+ * @brief Inserts an element in the container.
+ *
+ * In case of sequence containers, the first parameter must be a valid iterator
+ * handle. In case of associative containers, the type of the key must be such
+ * that a cast or conversion to the key type of the container is possible.<br/>
+ * The type of the value must be such that a cast or conversion to the value
+ * type of the container is possible.
+ *
+ * @param it_or_key A valid iterator handle in case of sequence containers, a
+ * key in case of associative containers.
+ * @param value The element to insert in the container.
+ * @return True in case of success, false otherwise.
+ */
+inline bool meta_container::insert(meta_any it_or_key, meta_any value = {}) {
+    return view->insert(instance, std::move(it_or_key), std::move(value));
+}
+
+
+/**
+ * @brief Erases an element from the container.
+ *
+ * In case of sequence containers, the parameter must be a valid iterator
+ * handle. In case of associative containers, the type of the key must be such
+ * that a cast or conversion to the key type of the container is possible.
+ *
+ * @param it_or_key A valid iterator handle in case of sequence containers, a
+ * key in case of associative containers.
+ * @return True in case of success, false otherwise.
+ */
+inline bool meta_container::erase(meta_any it_or_key) {
+    return view->erase(instance, std::move(it_or_key));
+}
+
+
+/**
+ * @brief Returns an iterator to the first element of the container.
+ * @return An iterator to the first element of the container.
+ */
+[[nodiscard]] inline meta_container::iterator meta_container::begin() {
+    return {view, view->begin(instance)};
+}
+
+
+/**
+ * @brief Returns an iterator that is past the last element of the container.
+ * @return An iterator that is past the last element of the container.
+ */
+[[nodiscard]] inline meta_container::iterator meta_container::end() {
+    return {view, view->end(instance)};
+}
+
+
+/**
+ * @brief Returns an iterator to the required element.
+ *
+ * In case of sequence containers, the parameter must be a valid position (no
+ * bounds checking is performed) and such that a cast or conversion to size_type
+ * is possible. In case of associative containers, the type of the key must be
+ * such that a cast or conversion to the key type of the container is possible.
+ *
+ * @param pos_or_key A valid position in case of sequence containers, a key in
+ * case of associative containers.
+ * @return An iterator to the required element.
+ */
+[[nodiscard]] inline meta_container::iterator meta_container::operator[](meta_any pos_or_key) {
+    return {view, view->find(instance, std::move(pos_or_key))};
+}
+
+
+/**
+ * @brief Returns true if a meta container is valid, false otherwise.
+ * @return True if the meta container is valid, false otherwise.
+ */
+[[nodiscard]] meta_container::operator bool() const ENTT_NOEXCEPT {
+    return view;
 }
 
 
@@ -415,8 +805,8 @@ struct meta_handle {
 
     /**
      * @brief Creates a handle that points to an unmanaged object.
-     * @tparam Type Type of object to use to initialize the container.
-     * @param value An instance of an object to use to initialize the container.
+     * @tparam Type Type of object to use to initialize the handle.
+     * @param value An instance of an object to use to initialize the handle.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_handle>>>
     meta_handle(Type &&value) ENTT_NOEXCEPT
@@ -440,7 +830,7 @@ private:
 };
 
 
-/*! @brief Opaque container for meta properties of any type. */
+/*! @brief Opaque wrapper for meta properties of any type. */
 struct meta_prop {
     /*! @brief Node type. */
     using node_type = internal::meta_prop_node;
@@ -482,7 +872,7 @@ private:
 };
 
 
-/*! @brief Opaque container for meta base classes. */
+/*! @brief Opaque wrapper for meta base classes. */
 struct meta_base {
     /*! @brief Node type. */
     using node_type = internal::meta_base_node;
@@ -523,7 +913,7 @@ private:
 };
 
 
-/*! @brief Opaque container for meta conversion functions. */
+/*! @brief Opaque wrapper for meta conversion functions. */
 struct meta_conv {
     /*! @brief Node type. */
     using node_type = internal::meta_conv_node;
@@ -561,7 +951,7 @@ private:
 };
 
 
-/*! @brief Opaque container for meta constructors. */
+/*! @brief Opaque wrapper for meta constructors. */
 struct meta_ctor {
     /*! @brief Node type. */
     using node_type = internal::meta_ctor_node;
@@ -596,7 +986,7 @@ struct meta_ctor {
      *
      * To create a valid instance, the parameters must be such that a cast or
      * conversion to the required types is possible. Otherwise, an empty and
-     * thus invalid container is returned.
+     * thus invalid wrapper is returned.
      *
      * @tparam Args Types of arguments to use to construct the instance.
      * @param args Parameters to use to construct the instance.
@@ -653,7 +1043,7 @@ private:
 };
 
 
-/*! @brief Opaque container for meta data. */
+/*! @brief Opaque wrapper for meta data. */
 struct meta_data {
     /*! @brief Node type. */
     using node_type = internal::meta_data_node;
@@ -764,7 +1154,7 @@ private:
 };
 
 
-/*! @brief Opaque container for meta functions. */
+/*! @brief Opaque wrapper for meta functions. */
 struct meta_func {
     /*! @brief Node type. */
     using node_type = internal::meta_func_node;
@@ -826,7 +1216,7 @@ struct meta_func {
      *
      * To invoke a meta function, the parameters must be such that a cast or
      * conversion to the required types is possible. Otherwise, an empty and
-     * thus invalid container is returned.<br/>
+     * thus invalid wrapper is returned.<br/>
      * It must be possible to cast the instance to the parent type of the meta
      * function. Otherwise, invoking the underlying function results in an
      * undefined behavior.
@@ -890,7 +1280,7 @@ private:
 };
 
 
-/*! @brief Opaque container for meta types. */
+/*! @brief Opaque wrapper for meta types. */
 class meta_type {
     template<typename... Args, std::size_t... Indexes>
     [[nodiscard]] auto ctor(std::index_sequence<Indexes...>) const {
@@ -933,7 +1323,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a meta type refers to void or not.
+     * @brief Checks whether a type refers to void or not.
      * @return True if the underlying type is void, false otherwise.
      */
     [[nodiscard]] bool is_void() const ENTT_NOEXCEPT {
@@ -941,7 +1331,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a meta type refers to an integral type or not.
+     * @brief Checks whether a type refers to an integral type or not.
      * @return True if the underlying type is an integral type, false otherwise.
      */
     [[nodiscard]] bool is_integral() const ENTT_NOEXCEPT {
@@ -949,8 +1339,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a meta type refers to a floating-point type or
-     * not.
+     * @brief Checks whether a type refers to a floating-point type or not.
      * @return True if the underlying type is a floating-point type, false
      * otherwise.
      */
@@ -959,7 +1348,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a meta type refers to an array type or not.
+     * @brief Checks whether a type refers to an array type or not.
      * @return True if the underlying type is an array type, false otherwise.
      */
     [[nodiscard]] bool is_array() const ENTT_NOEXCEPT {
@@ -967,7 +1356,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a meta type refers to an enum or not.
+     * @brief Checks whether a type refers to an enum or not.
      * @return True if the underlying type is an enum, false otherwise.
      */
     [[nodiscard]] bool is_enum() const ENTT_NOEXCEPT {
@@ -975,7 +1364,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a meta type refers to an union or not.
+     * @brief Checks whether a type refers to an union or not.
      * @return True if the underlying type is an union, false otherwise.
      */
     [[nodiscard]] bool is_union() const ENTT_NOEXCEPT {
@@ -983,7 +1372,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a meta type refers to a class or not.
+     * @brief Checks whether a type refers to a class or not.
      * @return True if the underlying type is a class, false otherwise.
      */
     [[nodiscard]] bool is_class() const ENTT_NOEXCEPT {
@@ -991,7 +1380,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a meta type refers to a pointer or not.
+     * @brief Checks whether a type refers to a pointer or not.
      * @return True if the underlying type is a pointer, false otherwise.
      */
     [[nodiscard]] bool is_pointer() const ENTT_NOEXCEPT {
@@ -999,7 +1388,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a meta type refers to a function pointer or not.
+     * @brief Checks whether a type refers to a function pointer or not.
      * @return True if the underlying type is a function pointer, false
      * otherwise.
      */
@@ -1008,8 +1397,7 @@ public:
     }
 
     /**
-     * @brief Indicates whether a meta type refers to a pointer to data member
-     * or not.
+     * @brief Checks whether a type refers to a pointer to data member or not.
      * @return True if the underlying type is a pointer to data member, false
      * otherwise.
      */
@@ -1018,8 +1406,8 @@ public:
     }
 
     /**
-     * @brief Indicates whether a meta type refers to a pointer to member
-     * function or not.
+     * @brief Checks whether a type refers to a pointer to member function or
+     * not.
      * @return True if the underlying type is a pointer to member function,
      * false otherwise.
      */
@@ -1028,7 +1416,25 @@ public:
     }
 
     /**
-     * @brief If a meta type refers to an array type, provides the number of
+     * @brief Checks whether a type refers to a sequence container or not.
+     * @return True if the underlying type is a sequence container, false
+     * otherwise.
+     */
+    [[nodiscard]] bool is_sequence_container() const ENTT_NOEXCEPT {
+        return node->is_sequence_container;
+    }
+
+    /**
+     * @brief Checks whether a type refers to an associative container or not.
+     * @return True if the underlying type is an associative container, false
+     * otherwise.
+     */
+    [[nodiscard]] bool is_associative_container() const ENTT_NOEXCEPT {
+        return node->is_associative_container;
+    }
+
+    /**
+     * @brief If a type refers to an array type, provides the number of
      * dimensions of the array.
      * @return The number of dimensions of the array if the underlying type is
      * an array type, 0 otherwise.
@@ -1038,8 +1444,8 @@ public:
     }
 
     /**
-     * @brief If a meta type refers to an array type, provides the number of
-     * elements along the given dimension of the array.
+     * @brief If a type refers to an array type, provides the number of elements
+     * along the given dimension of the array.
      * @param dim The dimension of which to return the number of elements.
      * @return The number of elements along the given dimension of the array if
      * the underlying type is an array type, 0 otherwise.
@@ -1243,7 +1649,7 @@ public:
      *
      * To create a valid instance, the parameters must be such that a cast or
      * conversion to the required types is possible. Otherwise, an empty and
-     * thus invalid container is returned.
+     * thus invalid wrapper is returned.
      *
      * @tparam Args Types of arguments to use to construct the instance.
      * @param args Parameters to use to construct the instance.

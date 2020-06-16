@@ -162,6 +162,12 @@ TEST_F(MetaType, Traits) {
     ASSERT_TRUE(entt::resolve<decltype(&clazz_t::member)>().is_member_function_pointer());
     ASSERT_FALSE(entt::resolve<decltype(&clazz_t::value)>().is_member_function_pointer());
 
+    ASSERT_TRUE(entt::resolve<std::vector<int>>().is_sequence_container());
+    ASSERT_FALSE((entt::resolve<std::map<int, char>>().is_sequence_container()));
+
+    ASSERT_TRUE((entt::resolve<std::map<int, char>>().is_associative_container()));
+    ASSERT_FALSE(entt::resolve<std::vector<int>>().is_associative_container());
+
     ASSERT_EQ(entt::resolve<int>().rank(), 0u);
     ASSERT_EQ(entt::resolve<int[5][3]>().rank(), 2u);
     ASSERT_EQ(entt::resolve<int>().extent(), 0u);
