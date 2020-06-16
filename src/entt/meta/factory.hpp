@@ -117,7 +117,7 @@ template<typename Type, auto Data>
 
 template<typename Type, auto Data, typename Policy>
 [[nodiscard]] meta_any getter([[maybe_unused]] meta_handle instance) {
-    auto dispatch = [](auto &&value) {
+    [[maybe_unused]] auto dispatch = [](auto &&value) {
         if constexpr(std::is_same_v<Policy, as_void_t>) {
             return meta_any{std::in_place_type<void>, std::forward<decltype(value)>(value)};
         } else if constexpr(std::is_same_v<Policy, as_ref_t>) {

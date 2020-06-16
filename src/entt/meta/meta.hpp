@@ -786,7 +786,7 @@ inline bool meta_container::erase(meta_any it_or_key) {
  * @return True if the meta container is valid, false otherwise.
  */
 meta_container::operator bool() const ENTT_NOEXCEPT {
-    return view;
+    return (view != nullptr);
 }
 
 
