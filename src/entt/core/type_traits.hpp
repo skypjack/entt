@@ -205,6 +205,126 @@ inline constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::v
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is a
+ * container, false otherwise.
+ * @tparam Type Potentially container type.
+ */
+template<typename Type, typename = void>
+struct is_container: std::false_type {};
+
+
+/*! @copydoc is_container */
+template<typename Type>
+struct is_container<Type, std::void_t<decltype(begin(std::declval<Type>()), end(std::declval<Type>()))>>
+        : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially container type.
+ */
+template<typename Type>
+inline constexpr auto is_container_v = is_container<Type>::value;
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is an
+ * associative container, false otherwise.
+ * @tparam Type Potentially associative container type.
+ */
+template<typename, typename = void>
+struct is_associative_container: std::false_type {};
+
+
+/*! @copydoc is_associative_container */
+template<typename Type>
+struct is_associative_container<Type, std::void_t<typename Type::key_type>>
+        : is_container<Type>
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially associative container type.
+ */
+template<typename Type>
+inline constexpr auto is_associative_container_v = is_associative_container<Type>::value;
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is a
+ * key-only associative container, false otherwise.
+ * @tparam Type Potentially key-only associative container type.
+ */
+template<typename, typename = void>
+struct is_key_only_associative_container: std::false_type {};
+
+
+/*! @copydoc is_associative_container */
+template<typename Type>
+struct is_key_only_associative_container<Type, std::enable_if_t<std::is_same_v<typename Type::key_type, typename Type::value_type>>>
+        : is_associative_container<Type>
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially key-only associative container type.
+ */
+template<typename Type>
+inline constexpr auto is_key_only_associative_container_v = is_key_only_associative_container<Type>::value;
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is a
+ * sequence container, false otherwise.
+ * @tparam Type Potentially sequence container type.
+ */
+template<typename, typename = void>
+struct is_sequence_container: std::false_type {};
+
+
+/*! @copydoc is_sequence_container */
+template<typename Type>
+struct is_sequence_container<Type, std::enable_if_t<!is_associative_container_v<Type>>>
+        : is_container<Type>
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially sequence container type.
+ */
+template<typename Type>
+inline constexpr auto is_sequence_container_v = is_sequence_container<Type>::value;
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is a
+ * dynamic sequence container, false otherwise.
+ * @tparam Type Potentially dynamic sequence container type.
+ */
+template<typename, typename = void>
+struct is_dynamic_sequence_container: std::false_type {};
+
+
+/*! @copydoc is_dynamic_sequence_container */
+template<typename Type>
+struct is_dynamic_sequence_container<Type, std::void_t<decltype(std::declval<Type>().insert({}, std::declval<typename Type::value_type>()))>>
+        : is_sequence_container<Type>
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially dynamic sequence container type.
+ */
+template<typename Type>
+inline constexpr auto is_dynamic_sequence_container_v = is_dynamic_sequence_container<Type>::value;
+
+
+/**
  * @brief Extracts the class of a non-static member object or function.
  * @tparam Member A pointer to a non-static member object or function.
  */
