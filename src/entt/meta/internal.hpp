@@ -116,6 +116,7 @@ struct meta_type_node {
     const bool is_function_pointer;
     const bool is_member_object_pointer;
     const bool is_member_function_pointer;
+    const bool is_dereferenceable;
     const bool is_sequence_container;
     const bool is_associative_container;
     const size_type rank;
@@ -259,6 +260,7 @@ public:
             std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
             std::is_member_object_pointer_v<Type>,
             std::is_member_function_pointer_v<Type>,
+            is_dereferenceable_v<Type>,
             is_sequence_container_v<Type>,
             is_associative_container_v<Type>,
             std::rank_v<Type>,

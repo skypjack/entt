@@ -1,5 +1,6 @@
-#include <vector>
 #include <map>
+#include <memory>
+#include <vector>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
@@ -161,6 +162,10 @@ TEST_F(MetaType, Traits) {
 
     ASSERT_TRUE(entt::resolve<decltype(&clazz_t::member)>().is_member_function_pointer());
     ASSERT_FALSE(entt::resolve<decltype(&clazz_t::value)>().is_member_function_pointer());
+
+    ASSERT_TRUE(entt::resolve<int *>().is_dereferenceable());
+    ASSERT_TRUE(entt::resolve<std::shared_ptr<int>>().is_dereferenceable());
+    ASSERT_FALSE(entt::resolve<int>().is_dereferenceable());
 
     ASSERT_TRUE(entt::resolve<std::vector<int>>().is_sequence_container());
     ASSERT_FALSE((entt::resolve<std::map<int, char>>().is_sequence_container()));

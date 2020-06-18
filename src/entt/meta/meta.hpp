@@ -1416,6 +1416,14 @@ public:
     }
 
     /**
+     * @brief Checks whether a type is dereferenceable or not.
+     * @return True if the underlying type is dereferenceable, false otherwise.
+     */
+    [[nodiscard]] bool is_dereferenceable() const ENTT_NOEXCEPT {
+        return node->is_dereferenceable;
+    }
+
+    /**
      * @brief Checks whether a type refers to a sequence container or not.
      * @return True if the underlying type is a sequence container, false
      * otherwise.
