@@ -10,6 +10,7 @@
 * [Reflection in a nutshell](#reflection-in-a-nutshell)
   * [Any as in any type](#any-as-in-any-type)
   * [Enjoy the runtime](#enjoy-the-runtime)
+  * [Container support](#container-support)
   * [Policies: the more, the less](#policies-the-more-the-less)
   * [Named constants and enums](#named-constants-and-enums)
   * [Properties and meta objects](#properties-and-meta-objects)
@@ -28,7 +29,7 @@ allocations. In one word: unsatisfactory.<br/>
 I finally decided to write a built-in, non-intrusive and macro-free runtime
 reflection system for `EnTT`. Maybe I didn't do better than others or maybe yes,
 time will tell me, but at least I can model this tool around the library to
-which it belongs and not vice versa.
+which it belongs and not the opposite.
 
 # Names and identifiers
 
@@ -40,7 +41,7 @@ This means that users can assign any type of identifier to the meta objects, as
 long as they are numeric. It doesn't matter if they are generated at runtime, at
 compile-time or with custom functions.
 
-However, the examples in the following sections are all based on the
+That being said, the examples in the following sections are all based on the
 `hashed_string` class as provided by this library. Therefore, where an
 identifier is required, it's likely that a user defined literal is used as
 follows:
@@ -411,6 +412,152 @@ plethora of functions in addition to those listed whose purposes and uses go
 unfortunately beyond the scope of this document.<br/>
 I invite anyone interested in the subject to look at the code, experiment and
 read the inline documentation to get the best out of this powerful tool.
+
+## Container support
+
+The meta module offers minimal support for containers of all types.<br/>
+Here _containers_ doesn't necessarily mean those offered by the C++ standard
+library. As long as the user defined containers are subject to the following
+rules, they will be automatically intercepted by the reflection system:
+
+* A type is generally considered a container if the `begin`/`end` functions
+  exist and are resolvable through unqualified lookup.
+
+* A type is considered an associative container if it's a container **and** it
+  has a public alias declaration called `key_type`.
+
+* A type is considered a key-only associative container if it's an associative
+  container **and** the public alias declarations `key_type` and `value_type`
+  refer to the same type.
+
+* A type is considered a sequence container if it's a container and it's not an
+  associative container.
+
+* A type is considered a dynamic sequence container if it's a sequence container
+  **and** it offers an `insert` member function that accepts an iterator and a
+  value to insert.
+
+In addition to the above points, a container must exhibit a set of features that
+comply with the standard library guidelines. For example, it must offer a `size`
+method and a public alias declaration called `value_type`.
+
+Proxy objects for containers are returned by the `view` member function of the
+`meta_any` class:
+
+```cpp
+std::vector<int> vec{1, 2, 3};
+entt::meta_any any{std::ref(vec)};
+entt::meta_container view = any.view();
+```
+
+Users aren't expected to _reflect_ containers explicitly. It's sufficient to
+assign a container to a `meta_any` object to be able to get its proxy. A proxy
+is also contextually convertible to bool to know if it's valid. For example,
+invalid proxies are returned when the wrapped object isn't a container.<br/>
+To find out if an instance of `meta_any` contains a container or not, simply
+query the associated meta type. The latter exposes some methods such as for
+example `is_sequence_container` and `is_associative_container` which allow users
+to _explore_ the underlying type.
+
+All proxy objects offer the same interface, although the available features
+differ from case to case. In particular:
+
+* The `size` member function returns the number of elements in the container as
+  an unsigned integer value:
+
+  ```cpp
+  const auto size = view.size();
+  ```
+
+* The `begin` and `end` member functions return opaque iterators that can be
+  used to iterate the container directly:
+
+  ```cpp
+  for(entt::meta_any element: view) {
+      // ...
+  }
+  ```
+
+  In all cases, given an underlying container of type `C`, the returned element
+  contains an object of type `C::value_type` which therefore depends on the
+  actual container.<br/>
+  All meta iterators are input iterators and don't offer an indirection operator
+  on purpose.
+
+* The `insert` member function can be used to add elements to the container. It
+  accepts a couple of erased objects that take on different meaning depending on
+  the type of container.<br/>
+  In case of sequence containers, the first argument is a handle to the actual
+  iterator before which the element will be inserted while the second argument
+  is the element to insert:
+
+  ```cpp
+  auto last = view.end();
+  // appends an integer to the container
+  view.insert(last.handle(), 42);
+  ```
+
+  As for associative containers instead, the two arguments are respectively the
+  key and the value to be inserted:
+
+  ```cpp
+  view.insert("key"_hs, "value");
+  ```
+
+  This function returns a boolean value to indicate whether the operation was
+  successful or not. Note that a call to `insert` may silently fail in case of
+  fixed size containers or whether the arguments aren't at least convertible to
+  the required types.
+
+* The `erase` member function can be used to remove elements from the container.
+  It accepts a single argument that takes on different meaning depending on the
+  type of container.<br/>
+  In case of sequence containers, the argument is a handle to the actual
+  iterator to the element to remove:
+
+  ```cpp
+  auto first = view.begin();
+  // removes the first element from the container
+  view.erase(first);
+  ```
+
+  As for associative containers instead, the argument is the key to be removed:
+
+  ```cpp
+  view.erase("key"_hs);
+  ```
+
+  This function returns a boolean value to indicate whether the operation was
+  successful or not. Note that a call to `erase` may silently fail in case of
+  fixed size containers or whether the argument isn't at least convertible to
+  the required type.
+
+* The `operator[]` can be used to access elements in a container. It accepts a
+  single argument that takes on different meaning depending on the type of
+  container.<br/>
+  In case of sequence containers, the argument is the position of the element to
+  return:
+
+  ```cpp
+  for(std::size_t pos{}, last = view.size(); pos < last; ++pos) {
+      entt::meta_any value = view[pos];
+      // ...
+  }
+  ```
+
+  As for associative containers instead, the argument is the key of the element
+  to return:
+
+  ```cpp
+  entt::meta_any value = view["key"_hs];
+  ```
+
+  In both cases, the function returns an instance of `meta_any` that directly
+  refers to the actual element. This object may be invalid, for example when
+  the argument isn't at least convertible to the required type.
+
+Container support is deliberately minimal but theoretically sufficient to
+satisfy all needs.
 
 ## Policies: the more, the less
 
