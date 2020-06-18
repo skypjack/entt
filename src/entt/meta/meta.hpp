@@ -712,14 +712,16 @@ struct meta_handle {
     }
 
     /*! @copydoc meta_any::operator* */
-    [[nodiscard]] meta_any ref() const {
+    [[nodiscard]] meta_any operator*() const {
         return any;
     }
 
-    /*! @copydoc meta_any::operator* */
-    [[deprecated("use ::ref instead")]]
-    [[nodiscard]] meta_any operator*() const {
-        return any;
+    /**
+     * @brief Arrow operator for accessing the contained opaque object.
+     * @return A meta any that shares a reference to an unmanaged object.
+     */
+    [[nodiscard]] meta_any * operator->() {
+        return &any;
     }
 
 private:
