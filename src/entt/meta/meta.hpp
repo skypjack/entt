@@ -79,63 +79,6 @@ private:
  * of memory allocations if possible. This should improve overall performance.
  */
 class meta_any {
-    using storage_type = std::aligned_storage_t<sizeof(void *), alignof(void *)>;
-    using copy_fn_type = void(meta_any &, const meta_any &);
-    using steal_fn_type = void(meta_any &, meta_any &);
-    using destroy_fn_type = void(meta_any &);
-
-    template<typename Type, typename = std::void_t<>>
-    struct type_traits {
-        template<typename... Args>
-        static void instance(meta_any &any, Args &&... args) {
-            any.instance = new Type{std::forward<Args>(args)...};
-            new (&any.storage) Type *{static_cast<Type *>(any.instance)};
-        }
-
-        static void destroy(meta_any &any) {
-            if(const auto * const node = internal::meta_info<Type>::resolve(); node->dtor) {
-                node->dtor->invoke(any.instance);
-            }
-
-            delete static_cast<Type *>(any.instance);
-        }
-
-        static void copy(meta_any &to, const meta_any &from) {
-            to.instance = new Type{*static_cast<const Type *>(from.instance)};
-            new (&to.storage) Type *{static_cast<Type *>(to.instance)};
-        }
-
-        static void steal(meta_any &to, meta_any &from) {
-            new (&to.storage) Type *{static_cast<Type *>(from.instance)};
-            to.instance = from.instance;
-        }
-    };
-
-    template<typename Type>
-    struct type_traits<Type, std::enable_if_t<sizeof(Type) <= sizeof(void *) && std::is_nothrow_move_constructible_v<Type>>> {
-        template<typename... Args>
-        static void instance(meta_any &any, Args &&... args) {
-            any.instance = new (&any.storage) Type{std::forward<Args>(args)...};
-        }
-
-        static void destroy(meta_any &any) {
-            if(const auto * const node = internal::meta_info<Type>::resolve(); node->dtor) {
-                node->dtor->invoke(any.instance);
-            }
-
-            static_cast<Type *>(any.instance)->~Type();
-        }
-
-        static void copy(meta_any &to, const meta_any &from) {
-            to.instance = new (&to.storage) Type{*static_cast<const Type *>(from.instance)};
-        }
-
-        static void steal(meta_any &to, meta_any &from) {
-            to.instance = new (&to.storage) Type{std::move(*static_cast<Type *>(from.instance))};
-            destroy(from);
-        }
-    };
-
     template<typename, typename = void>
     struct container_view {
         [[nodiscard]] static meta_container::meta_view * instance() {
@@ -293,11 +236,7 @@ public:
     /*! @brief Default constructor. */
     meta_any() ENTT_NOEXCEPT
         : storage{},
-          instance{},
           node{},
-          destroy_fn{},
-          copy_fn{},
-          steal_fn{},
           cview{}
     {}
 
@@ -309,18 +248,10 @@ public:
      */
     template<typename Type, typename... Args>
     explicit meta_any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
-        : meta_any{}
-    {
-        node = internal::meta_info<Type>::resolve();
-
-        if constexpr(!std::is_void_v<Type>) {
-            type_traits<Type>::instance(*this, std::forward<Args>(args)...);
-            destroy_fn = &type_traits<Type>::destroy;
-            copy_fn = &type_traits<Type>::copy;
-            steal_fn = &type_traits<Type>::steal;
-            cview = container_view<Type>::instance();
-        }
-    }
+        : storage(std::in_place_type<Type>, std::forward<Args>(args)...),
+          node{internal::meta_info<Type>::resolve()},
+          cview{container_view<Type>::instance()}
+    {}
 
     /**
      * @brief Constructs a meta any that holds an unmanaged object.
@@ -329,12 +260,10 @@ public:
      */
     template<typename Type>
     meta_any(std::reference_wrapper<Type> value)
-        : meta_any{}
-    {
-        node = internal::meta_info<Type>::resolve();
-        instance = &value.get();
-        cview = container_view<Type>::instance();
-    }
+        : storage{value},
+          node{internal::meta_info<Type>::resolve()},
+          cview{container_view<Type>::instance()}
+    {}
 
     /**
      * @brief Constructs a meta any from a given value.
@@ -351,15 +280,10 @@ public:
      * @param other The instance to copy from.
      */
     meta_any(const meta_any &other)
-        : meta_any{}
-    {
-        node = other.node;
-        (other.copy_fn ? other.copy_fn : [](meta_any &to, const meta_any &from) { to.instance = from.instance; })(*this, other);
-        destroy_fn = other.destroy_fn;
-        copy_fn = other.copy_fn;
-        steal_fn = other.steal_fn;
-        cview = other.cview;
-    }
+        : storage{other.storage},
+          node{other.node},
+          cview{other.cview}
+    {}
 
     /**
      * @brief Move constructor.
@@ -373,8 +297,8 @@ public:
 
     /*! @brief Frees the internal storage, whatever it means. */
     ~meta_any() {
-        if(destroy_fn) {
-            destroy_fn(*this);
+        if(node && node->dtor) {
+            node->dtor->invoke(storage.data());
         }
     }
 
@@ -410,12 +334,12 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] const void * data() const ENTT_NOEXCEPT {
-        return instance;
+        return storage.data();
     }
 
     /*! @copydoc data */
     [[nodiscard]] void * data() ENTT_NOEXCEPT {
-        return const_cast<void *>(std::as_const(*this).data());
+        return storage.data();
     }
 
     /**
@@ -425,13 +349,13 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type * try_cast() const {
-        void *ret = nullptr;
+        const void *ret = nullptr;
 
         if(node) {
             if(const auto type_id = internal::meta_info<Type>::resolve()->type_id; node->type_id == type_id) {
-                ret = instance;
+                ret = storage.data();
             } else if(const auto *base = internal::find_if<&internal::meta_type_node::base>([type_id](const auto *curr) { return curr->type()->type_id == type_id; }, node); base) {
-                ret = base->cast(instance);
+                ret = base->cast(storage.data());
             }
         }
 
@@ -485,7 +409,7 @@ public:
             if(const auto type_id = internal::meta_info<Type>::resolve()->type_id; node->type_id == type_id) {
                 any = *this;
             } else if(const auto * const conv = internal::find_if<&internal::meta_type_node::conv>([type_id](const auto *curr) { return curr->type()->type_id == type_id; }, node); conv) {
-                any = conv->conv(instance);
+                any = conv->conv(storage.data());
             }
         }
 
@@ -527,19 +451,19 @@ public:
      * @return A meta any that shares a reference to an unmanaged object.
      */
     [[nodiscard]] meta_any ref() const ENTT_NOEXCEPT {
-        meta_any alias{};
-        alias.node = node;
-        alias.instance = instance;
-        alias.cview = cview;
-        return alias;
+        meta_any other{};
+        other.node = node;
+        other.storage = storage.ref();
+        other.cview = cview;
+        return other;
     }
 
     /**
      * @brief Returns a container view.
      * @return A container view for the underlying object.
      */
-    [[nodiscard]] meta_container view() const ENTT_NOEXCEPT {
-        return { cview, instance };
+    [[nodiscard]] meta_container view() ENTT_NOEXCEPT {
+        return { cview, storage.data() };
     }
 
     /**
@@ -564,7 +488,7 @@ public:
      * @return False if the two objects differ in their content, true otherwise.
      */
     [[nodiscard]] bool operator==(const meta_any &other) const {
-        return (!node && !other.node) || (node && other.node && node->type_id == other.node->type_id && node->compare(instance, other.instance));
+        return (!node && !other.node) || (node && other.node && node->type_id == other.node->type_id && node->compare(storage.data(), other.storage.data()));
     }
 
     /**
@@ -573,33 +497,14 @@ public:
      * @param rhs A valid meta any object.
      */
     friend void swap(meta_any &lhs, meta_any &rhs) {
-        if(lhs.steal_fn && rhs.steal_fn) {
-            meta_any buffer{};
-            lhs.steal_fn(buffer, lhs);
-            rhs.steal_fn(lhs, rhs);
-            lhs.steal_fn(rhs, buffer);
-        } else if(lhs.steal_fn) {
-            lhs.steal_fn(rhs, lhs);
-        } else if(rhs.steal_fn) {
-            rhs.steal_fn(lhs, rhs);
-        } else {
-            std::swap(lhs.instance, rhs.instance);
-        }
-
         std::swap(lhs.node, rhs.node);
-        std::swap(lhs.destroy_fn, rhs.destroy_fn);
-        std::swap(lhs.copy_fn, rhs.copy_fn);
-        std::swap(lhs.steal_fn, rhs.steal_fn);
+        std::swap(lhs.storage, rhs.storage);
         std::swap(lhs.cview, rhs.cview);
     }
 
 private:
-    storage_type storage;
-    void *instance;
+    internal::meta_storage storage;
     const internal::meta_type_node *node;
-    destroy_fn_type *destroy_fn;
-    copy_fn_type *copy_fn;
-    steal_fn_type *steal_fn;
     meta_container::meta_view *cview;
 };
 
@@ -896,7 +801,7 @@ struct meta_base {
      * @param instance The instance to cast.
      * @return An opaque pointer to the base type.
      */
-    [[nodiscard]] void * cast(void *instance) const ENTT_NOEXCEPT {
+    [[nodiscard]] const void * cast(const void *instance) const ENTT_NOEXCEPT {
         return node->cast(instance);
     }
 

@@ -374,8 +374,8 @@ public:
             type,
             nullptr,
             &internal::meta_info<Base>::resolve,
-            [](void *instance) ENTT_NOEXCEPT -> void * {
-                return static_cast<Base *>(static_cast<Type *>(instance));
+            [](const void *instance) ENTT_NOEXCEPT -> const void * {
+                return static_cast<const Base *>(static_cast<const Type *>(instance));
             }
         };
 
