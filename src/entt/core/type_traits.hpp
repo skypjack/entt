@@ -193,7 +193,9 @@ struct is_equality_comparable: std::false_type {};
 
 /*! @copydoc is_equality_comparable */
 template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>: std::true_type {};
+struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
+        : std::true_type
+{};
 
 
 /**
@@ -322,6 +324,30 @@ struct is_dynamic_sequence_container<Type, std::void_t<decltype(std::declval<Typ
  */
 template<typename Type>
 inline constexpr auto is_dynamic_sequence_container_v = is_dynamic_sequence_container<Type>::value;
+
+
+/**
+ * @brief Provides the member constant `value` to true if a given type is
+ * dereferenceable, false otherwise.
+ * @tparam Type Potentially dereferenceable type.
+ */
+template<typename Type, typename = void>
+struct is_dereferenceable: std::false_type {};
+
+
+/*! @copydoc is_dereferenceable */
+template<typename Type>
+struct is_dereferenceable<Type, std::void_t<decltype(*std::declval<Type>())>>
+        : std::true_type
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potentially dereferenceable type.
+ */
+template<typename Type>
+inline constexpr auto is_dereferenceable_v = is_dereferenceable<Type>::value;
 
 
 /**

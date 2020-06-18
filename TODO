@@ -30,3 +30,4 @@ Next:
  - remove internal::find_if
  - add meta_handle::operator-> that returns a meta_any * (easier to use directly)
  - use a dedicate class template to specialize meta views for a better support to customizations
+ - remove operator* from meta_any, meta_handle

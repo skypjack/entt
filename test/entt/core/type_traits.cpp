@@ -1,5 +1,6 @@
 #include <array>
 #include <map>
+#include <memory>
 #include <set>
 #include <type_traits>
 #include <vector>
@@ -51,7 +52,7 @@ TEST(TypeTraits, IsEqualityComparable) {
     ASSERT_FALSE(entt::is_equality_comparable_v<void>);
 }
 
-TEST(TypeTraits, IsContainerType) {
+TEST(TypeTraits, IsContainer) {
     ASSERT_TRUE(entt::is_container_v<std::vector<int>>);
     ASSERT_FALSE(entt::is_associative_container_v<std::vector<int>>);
     ASSERT_FALSE(entt::is_key_only_associative_container_v<std::vector<int>>);
@@ -75,6 +76,13 @@ TEST(TypeTraits, IsContainerType) {
     ASSERT_TRUE(entt::is_key_only_associative_container_v<std::set<int>>);
     ASSERT_FALSE(entt::is_sequence_container_v<std::set<int>>);
     ASSERT_FALSE(entt::is_dynamic_sequence_container_v<std::set<int>>);
+}
+
+TEST(TypeTraits, IsDereferenceable) {
+    ASSERT_TRUE(entt::is_dereferenceable_v<int *>);
+    ASSERT_TRUE(entt::is_dereferenceable_v<std::shared_ptr<int>>);
+    ASSERT_TRUE(entt::is_dereferenceable_v<std::unique_ptr<int>>);
+    ASSERT_FALSE(entt::is_dereferenceable_v<int>);
 }
 
 TEST(TypeTraits, MemberClass) {
