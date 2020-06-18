@@ -228,12 +228,6 @@ struct meta_ctor_node {
 };
 
 
-struct meta_dtor_node {
-    meta_type_node * const parent;
-    void(* const invoke)(void *);
-};
-
-
 struct meta_data_node {
     id_type id;
     meta_type_node * const parent;
@@ -289,9 +283,9 @@ struct meta_type_node {
     meta_base_node *base{nullptr};
     meta_conv_node *conv{nullptr};
     meta_ctor_node *ctor{nullptr};
-    meta_dtor_node *dtor{nullptr};
     meta_data_node *data{nullptr};
     meta_func_node *func{nullptr};
+    void(* dtor)(void *){nullptr};
 };
 
 

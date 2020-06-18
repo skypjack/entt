@@ -540,17 +540,13 @@ public:
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
         auto * const type = internal::meta_info<Type>::resolve();
 
-        static internal::meta_dtor_node node{
-            type,
-            [](void *instance) {
-                if(instance) {
-                    std::invoke(Func, *static_cast<Type *>(instance));
-                }
+        ENTT_ASSERT(!type->dtor);
+
+        type->dtor = [](void *instance) {
+            if(instance) {
+                std::invoke(Func, *static_cast<Type *>(instance));
             }
         };
-
-        ENTT_ASSERT(!type->dtor);
-        type->dtor = &node;
 
         return meta_factory<Type>{};
     }

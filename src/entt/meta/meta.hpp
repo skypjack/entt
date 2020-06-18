@@ -294,7 +294,7 @@ public:
     /*! @brief Frees the internal storage, whatever it means. */
     ~meta_any() {
         if(node && node->dtor) {
-            node->dtor->invoke(storage.data());
+            node->dtor(storage.data());
         }
     }
 
