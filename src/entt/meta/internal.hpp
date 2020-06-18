@@ -135,11 +135,6 @@ public:
         }
     }
 
-    template<typename Type>
-    meta_storage & operator=(Type &&value) {
-        return (*this = meta_storage{std::forward<Type>(value)});
-    }
-
     meta_storage & operator=(meta_storage other) {
         swap(other, *this);
         return *this;

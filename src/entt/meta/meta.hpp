@@ -31,13 +31,13 @@ class meta_container {
     struct meta_iterator;
 
     struct meta_view {
-        [[nodiscard]] virtual std::size_t size(void *) const ENTT_NOEXCEPT = 0;
+        [[nodiscard]] virtual std::size_t size(const void *) const ENTT_NOEXCEPT = 0;
         [[nodiscard]] virtual bool insert(void *, meta_any, meta_any) = 0;
         [[nodiscard]] virtual bool erase(void *, meta_any) = 0;
         [[nodiscard]] virtual meta_any begin(void *) const ENTT_NOEXCEPT = 0;
         [[nodiscard]] virtual meta_any end(void *) const ENTT_NOEXCEPT = 0;
         [[nodiscard]] virtual meta_any find(void *, meta_any) const ENTT_NOEXCEPT = 0;
-        [[nodiscard]] virtual meta_any value(meta_any) const ENTT_NOEXCEPT = 0;
+        [[nodiscard]] virtual meta_any dereference(meta_any) const ENTT_NOEXCEPT = 0;
         virtual void incr(meta_any) const ENTT_NOEXCEPT = 0;
     };
 
@@ -93,8 +93,8 @@ class meta_any {
             return &common;
         }
 
-        [[nodiscard]] std::size_t size(void *container) const ENTT_NOEXCEPT override {
-            return static_cast<Type *>(container)->size();
+        [[nodiscard]] std::size_t size(const void *container) const ENTT_NOEXCEPT override {
+            return static_cast<const Type *>(container)->size();
         }
 
         [[nodiscard]] bool insert(void *container, meta_any it, meta_any value) override {
@@ -133,7 +133,7 @@ class meta_any {
             return static_cast<Type *>(container)->end();
         }
 
-        [[nodiscard]] meta_any value(meta_any it) const ENTT_NOEXCEPT override {
+        [[nodiscard]] meta_any dereference(meta_any it) const ENTT_NOEXCEPT override {
             return std::ref(*it.cast<typename Type::iterator>());
         }
 
@@ -159,8 +159,8 @@ class meta_any {
             return &common;
         }
 
-        [[nodiscard]] std::size_t size(void *container) const ENTT_NOEXCEPT override {
-            return static_cast<Type *>(container)->size();
+        [[nodiscard]] std::size_t size(const void *container) const ENTT_NOEXCEPT override {
+            return static_cast<const Type *>(container)->size();
         }
 
         [[nodiscard]] bool insert(void *container, meta_any key, meta_any value) override {
@@ -202,7 +202,7 @@ class meta_any {
             return static_cast<Type *>(container)->end();
         }
 
-        [[nodiscard]] meta_any value(meta_any it) const ENTT_NOEXCEPT override {
+        [[nodiscard]] meta_any dereference(meta_any it) const ENTT_NOEXCEPT override {
             if constexpr(is_key_only_associative_container_v<Type>) {
                 return *it.cast<typename Type::iterator>();
             } else {
@@ -279,11 +279,7 @@ public:
      * @brief Copy constructor.
      * @param other The instance to copy from.
      */
-    meta_any(const meta_any &other)
-        : storage{other.storage},
-          node{other.node},
-          cview{other.cview}
-    {}
+    meta_any(const meta_any &other) = default;
 
     /**
      * @brief Move constructor.
@@ -300,17 +296,6 @@ public:
         if(node && node->dtor) {
             node->dtor->invoke(storage.data());
         }
-    }
-
-    /**
-     * @brief Assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
-     * @param value An instance of an object to use to initialize the wrapper.
-     * @return This meta any object.
-     */
-    template<typename Type>
-    meta_any & operator=(Type &&value) {
-        return (*this = meta_any{std::forward<Type>(value)});
     }
 
     /**
@@ -443,7 +428,7 @@ public:
      */
     template<typename Type, typename... Args>
     void emplace(Args &&... args) {
-        *this = meta_any{std::in_place_type_t<Type>{}, std::forward<Args>(args)...};
+        *this = meta_any{std::in_place_type<Type>, std::forward<Args>(args)...};
     }
 
     /**
@@ -582,7 +567,7 @@ struct meta_container::meta_iterator {
      * @return The element to which the meta pointer points.
      */
     [[nodiscard]] reference operator*() const {
-        return view->value(handle());
+        return view->dereference(handle());
     }
 
     /**
