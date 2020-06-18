@@ -1,3 +1,4 @@
+#include <memory>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
@@ -620,4 +621,59 @@ TEST_F(MetaAny, UnmanageableType) {
 
     ASSERT_TRUE(std::as_const(any).convert<unmanageable_t>());
     ASSERT_FALSE(std::as_const(any).convert<int>());
+}
+
+TEST_F(MetaAny, DereferenceOperatorInvalidType) {
+    int value = 0;
+    entt::meta_any any{value};
+
+    ASSERT_FALSE(any.type().is_pointer());
+    ASSERT_FALSE(any.type().is_dereferenceable());
+    ASSERT_EQ(any.type(), entt::resolve<int>());
+
+    auto deref = *any;
+
+    ASSERT_FALSE(deref);
+}
+
+TEST_F(MetaAny, DereferenceOperatorRawPointer) {
+    int value = 0;
+    entt::meta_any any{&value};
+
+    ASSERT_TRUE(any.type().is_pointer());
+    ASSERT_TRUE(any.type().is_dereferenceable());
+    ASSERT_EQ(any.type(), entt::resolve<int *>());
+
+    auto deref = *any;
+
+    ASSERT_TRUE(deref);
+    ASSERT_FALSE(deref.type().is_pointer());
+    ASSERT_FALSE(deref.type().is_dereferenceable());
+    ASSERT_EQ(deref.type(), entt::resolve<int>());
+
+    deref.cast<int>() = 42;
+
+    ASSERT_EQ(*any.cast<int *>(), 42);
+    ASSERT_EQ(value, 42);
+}
+
+TEST_F(MetaAny, DereferenceOperatorSmartPointer) {
+    auto value = std::make_shared<int>(0);
+    entt::meta_any any{value};
+
+    ASSERT_FALSE(any.type().is_pointer());
+    ASSERT_TRUE(any.type().is_dereferenceable());
+    ASSERT_EQ(any.type(), entt::resolve<std::shared_ptr<int>>());
+
+    auto deref = *any;
+
+    ASSERT_TRUE(deref);
+    ASSERT_FALSE(deref.type().is_pointer());
+    ASSERT_FALSE(deref.type().is_dereferenceable());
+    ASSERT_EQ(deref.type(), entt::resolve<int>());
+
+    deref.cast<int>() = 42;
+
+    ASSERT_EQ(*any.cast<std::shared_ptr<int>>(), 42);
+    ASSERT_EQ(*value, 42);
 }

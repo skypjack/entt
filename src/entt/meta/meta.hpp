@@ -37,7 +37,7 @@ class meta_container {
         [[nodiscard]] virtual meta_any begin(void *) const ENTT_NOEXCEPT = 0;
         [[nodiscard]] virtual meta_any end(void *) const ENTT_NOEXCEPT = 0;
         [[nodiscard]] virtual meta_any find(void *, meta_any) const ENTT_NOEXCEPT = 0;
-        [[nodiscard]] virtual meta_any dereference(meta_any) const ENTT_NOEXCEPT = 0;
+        [[nodiscard]] virtual meta_any deref(meta_any) const ENTT_NOEXCEPT = 0;
         virtual void incr(meta_any) const ENTT_NOEXCEPT = 0;
     };
 
@@ -79,6 +79,8 @@ private:
  * of memory allocations if possible. This should improve overall performance.
  */
 class meta_any {
+    using dereference_operator_type = meta_any(meta_any &);
+
     template<typename, typename = void>
     struct container_view {
         [[nodiscard]] static meta_container::meta_view * instance() {
@@ -133,7 +135,7 @@ class meta_any {
             return static_cast<Type *>(container)->end();
         }
 
-        [[nodiscard]] meta_any dereference(meta_any it) const ENTT_NOEXCEPT override {
+        [[nodiscard]] meta_any deref(meta_any it) const ENTT_NOEXCEPT override {
             return std::ref(*it.cast<typename Type::iterator>());
         }
 
@@ -202,7 +204,7 @@ class meta_any {
             return static_cast<Type *>(container)->end();
         }
 
-        [[nodiscard]] meta_any dereference(meta_any it) const ENTT_NOEXCEPT override {
+        [[nodiscard]] meta_any deref(meta_any it) const ENTT_NOEXCEPT override {
             if constexpr(is_key_only_associative_container_v<Type>) {
                 return *it.cast<typename Type::iterator>();
             } else {
@@ -232,11 +234,27 @@ class meta_any {
         }
     };
 
+    template<typename Type>
+    static meta_any dereference_operator(meta_any &any) {
+        meta_any other{};
+
+        if constexpr(is_dereferenceable_v<Type>) {
+            if constexpr(std::is_const_v<std::remove_reference_t<decltype(*std::declval<Type>())>>) {
+                other = *any.cast<Type>();
+            } else {
+                other = std::ref(*any.cast<Type>());
+            }
+        }
+
+        return other;
+    }
+
 public:
     /*! @brief Default constructor. */
     meta_any() ENTT_NOEXCEPT
         : storage{},
           node{},
+          deref{},
           cview{}
     {}
 
@@ -250,6 +268,7 @@ public:
     explicit meta_any(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
         : storage(std::in_place_type<Type>, std::forward<Args>(args)...),
           node{internal::meta_info<Type>::resolve()},
+          deref{&dereference_operator<Type>},
           cview{container_view<Type>::instance()}
     {}
 
@@ -262,6 +281,7 @@ public:
     meta_any(std::reference_wrapper<Type> value)
         : storage{value},
           node{internal::meta_info<Type>::resolve()},
+          deref{&dereference_operator<Type>},
           cview{container_view<Type>::instance()}
     {}
 
@@ -439,6 +459,7 @@ public:
         meta_any other{};
         other.node = node;
         other.storage = storage.ref();
+        other.deref = deref;
         other.cview = cview;
         return other;
     }
@@ -452,12 +473,12 @@ public:
     }
 
     /**
-     * @brief Indirection operator for aliasing construction.
-     * @return A meta any that shares a reference to an unmanaged object.
+     * @brief Indirection operator for dereferencing opaque objects.
+     * @return A meta any that shares a reference to an unmanaged object if the
+     * wrapped element is dereferenceable, an invalid meta any otherwise.
      */
-    [[deprecated("use ::ref instead")]]
-    [[nodiscard]] meta_any operator*() const ENTT_NOEXCEPT {
-        return ref();
+    [[nodiscard]] meta_any operator*() ENTT_NOEXCEPT {
+        return deref(*this);
     }
 
     /**
@@ -485,12 +506,14 @@ public:
     friend void swap(meta_any &lhs, meta_any &rhs) {
         std::swap(lhs.node, rhs.node);
         std::swap(lhs.storage, rhs.storage);
+        std::swap(lhs.deref, rhs.deref);
         std::swap(lhs.cview, rhs.cview);
     }
 
 private:
     internal::meta_storage storage;
     const internal::meta_type_node *node;
+    dereference_operator_type *deref;
     meta_container::meta_view *cview;
 };
 
@@ -568,7 +591,7 @@ struct meta_container::meta_iterator {
      * @return The element to which the meta pointer points.
      */
     [[nodiscard]] reference operator*() const {
-        return view->dereference(handle());
+        return view->deref(handle());
     }
 
     /**
@@ -711,13 +734,16 @@ struct meta_handle {
         }
     }
 
-    /*! @copydoc meta_any::operator* */
+    /**
+     * @brief Dereference operator for accessing the contained opaque object.
+     * @return A meta any that shares a reference to an unmanaged object.
+     */
     [[nodiscard]] meta_any operator*() const {
         return any;
     }
 
     /**
-     * @brief Arrow operator for accessing the contained opaque object.
+     * @brief Access operator for accessing the contained opaque object.
      * @return A meta any that shares a reference to an unmanaged object.
      */
     [[nodiscard]] meta_any * operator->() {
