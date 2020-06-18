@@ -99,7 +99,7 @@ TEST_F(MetaAny, SBOInPlaceTypeConstruction) {
     ASSERT_NE(entt::meta_any{3}, any);
 }
 
-TEST_F(MetaAny, SBOAsAliasConstruction) {
+TEST_F(MetaAny, SBOAsRefConstruction) {
     int value = 3;
     int other = 42;
     entt::meta_any any{std::ref(value)};
@@ -190,7 +190,7 @@ TEST_F(MetaAny, NoSBOInPlaceTypeConstruction) {
     ASSERT_NE(entt::meta_any{fat_t{}}, any);
 }
 
-TEST_F(MetaAny, NoSBOAsAliasConstruction) {
+TEST_F(MetaAny, NoSBOAsRefConstruction) {
     int value = 3;
     fat_t instance{&value};
     entt::meta_any any{std::ref(instance)};

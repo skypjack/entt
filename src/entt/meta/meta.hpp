@@ -455,6 +455,7 @@ public:
      * @brief Indirection operator for aliasing construction.
      * @return A meta any that shares a reference to an unmanaged object.
      */
+    [[deprecated("use ::ref instead")]]
     [[nodiscard]] meta_any operator*() const ENTT_NOEXCEPT {
         return ref();
     }
@@ -575,7 +576,7 @@ struct meta_container::meta_iterator {
      * @return The actual iterator, properly wrapped.
      */
     [[nodiscard]] meta_any handle() const ENTT_NOEXCEPT {
-        return *it;
+        return it.ref();
     }
 
     /**
@@ -703,7 +704,7 @@ struct meta_handle {
         : meta_handle{}
     {
         if constexpr(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>) {
-            any = *value;
+            any = value.ref();
         } else {
             static_assert(std::is_lvalue_reference_v<Type>, "Lvalue reference required");
             any = std::ref(value);
@@ -711,6 +712,12 @@ struct meta_handle {
     }
 
     /*! @copydoc meta_any::operator* */
+    [[nodiscard]] meta_any ref() const {
+        return any;
+    }
+
+    /*! @copydoc meta_any::operator* */
+    [[deprecated("use ::ref instead")]]
     [[nodiscard]] meta_any operator*() const {
         return any;
     }

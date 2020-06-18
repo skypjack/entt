@@ -227,7 +227,7 @@ different type than the one contained, so as to be able to handle the new
 instance.
 
 A particularly interesting feature of this class is that it can also be used as
-an opaque container for unmanaged objects:
+an opaque container for non-const unmanaged objects:
 
 ```cpp
 int value;
@@ -238,33 +238,25 @@ In other words, whenever `meta_any` intercepts a `reference_wrapper`, it acts as
 a reference to the original instance rather than making a copy of it. The
 contained object is never destroyed and users must ensure that its lifetime
 exceeds that of the container.<br/>
-Similarly, to create a copy that works as a _light_ reference for the managed
-object, it's possible to _dereference_ a given `meta_any` so as to invoke its
-aliasing constructor:
+Similarly, it's possible to create non-owning copies of `meta_any` from existing
+ones:
 
 ```cpp
 // aliasing constructor
 entt::meta_any ref = any.ref();
 ```
 
-This is also equivalent to:
-
-```cpp
-// indirection operator
-entt::meta_any ref = *any;
-```
-
-In both cases, it doesn't matter if the starting container actually holds an
-object or acts as a reference for unmanaged elements, the new instance thus
-created won't create copies and will only serve as a reference for the original
-item.<br/>
+In this case, it doesn't matter if the starting container actually holds an
+object or acts already as a reference for unmanaged elements, the new instance
+thus created won't create copies and will only serve as a reference for the
+original item.<br/>
 It means that, starting from the example above, both `ref` and` any` will point
 to the same object, whether it's initially contained in `any` or already an
 unmanaged one. This is particularly useful for passing instances of `meta_any`
 belonging to the external context by reference to a function or a constructor
 rather than making copies of them.
 
-The `meta_any` class has also a `type` member function that returns the meta
+The `meta_any` class also has a `type` member function that returns the meta
 type of the contained value, if any. The member functions `try_cast`, `cast` and
 `convert` are then used to know if the underlying object has a given type as a
 base or if it can be converted implicitly to it.

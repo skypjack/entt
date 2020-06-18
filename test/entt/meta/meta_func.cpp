@@ -295,7 +295,7 @@ TEST_F(MetaFunc, AsVoid) {
     ASSERT_EQ(instance.value, 42);
 }
 
-TEST_F(MetaFunc, AsAlias) {
+TEST_F(MetaFunc, AsRef) {
     func_t instance{};
     auto func = entt::resolve<func_t>().func("a"_hs);
     func.invoke(instance).cast<int>() = 3;
