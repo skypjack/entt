@@ -6,6 +6,7 @@
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
+#include <entt/meta/container.hpp>
 
 template<typename Type>
 void set(Type &prop, Type value) {

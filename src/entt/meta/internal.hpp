@@ -12,6 +12,7 @@
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "type_traits.hpp"
 
 
 namespace entt {
@@ -419,8 +420,8 @@ public:
             std::is_member_object_pointer_v<Type>,
             std::is_member_function_pointer_v<Type>,
             is_dereferenceable_v<Type>,
-            is_sequence_container_v<Type>,
-            is_associative_container_v<Type>,
+            has_meta_sequence_container_traits_v<Type>,
+            has_meta_associative_container_traits_v<Type>,
             std::rank_v<Type>,
             [](meta_type_node::size_type dim) {
                 return extent(dim, std::make_index_sequence<std::rank_v<Type>>{});

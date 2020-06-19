@@ -14,6 +14,7 @@
 #include "ctx.hpp"
 #include "internal.hpp"
 #include "range.hpp"
+#include "type_traits.hpp"
 
 
 namespace entt {
@@ -21,53 +22,99 @@ namespace entt {
 
 class meta_type;
 class meta_any;
+class meta_iterator;
 
 
-/*! @brief Proxy object for containers of any type. */
-class meta_container {
-    /*! @brief A meta_any is allowed to create proxies. */
-    friend class meta_any;
-
-    struct meta_iterator;
-
-    struct meta_view {
-        [[nodiscard]] virtual std::size_t size(const void *) const ENTT_NOEXCEPT = 0;
-        [[nodiscard]] virtual bool insert(void *, meta_any, meta_any) = 0;
-        [[nodiscard]] virtual bool erase(void *, meta_any) = 0;
-        [[nodiscard]] virtual meta_any begin(void *) const ENTT_NOEXCEPT = 0;
-        [[nodiscard]] virtual meta_any end(void *) const ENTT_NOEXCEPT = 0;
-        [[nodiscard]] virtual meta_any find(void *, meta_any) const ENTT_NOEXCEPT = 0;
-        [[nodiscard]] virtual meta_any deref(meta_any) const ENTT_NOEXCEPT = 0;
-        virtual void incr(meta_any) const ENTT_NOEXCEPT = 0;
-    };
-
-    meta_container(meta_view *impl, void *container)
-        : view{impl},
-          instance{container}
-    {}
+/*! @brief Proxy object for sequence containers. */
+class meta_sequence_container {
+    template<typename>
+    struct meta_sequence_container_proxy;
 
 public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Input iterator type. */
+    /*! @brief Meta iterator type. */
     using iterator = meta_iterator;
 
-    /*! @brief Default constructor. */
-    meta_container()
-        : view{},
-          instance{}
-    {}
+    template<typename Type>
+    meta_sequence_container(Type &);
 
-    [[nodiscard]] inline size_type size() const ENTT_NOEXCEPT;
-    inline bool insert(meta_any, meta_any);
-    inline bool erase(meta_any);
-    [[nodiscard]] inline iterator begin();
-    [[nodiscard]] inline iterator end();
-    [[nodiscard]] inline iterator operator[](meta_any pos_or_key);
-    [[nodiscard]] inline explicit operator bool() const ENTT_NOEXCEPT;
+    inline meta_sequence_container();
+
+    inline meta_type value_type() const ENTT_NOEXCEPT;
+    inline size_type size() const ENTT_NOEXCEPT;
+    inline bool clear();
+    inline iterator begin();
+    inline iterator end();
+    inline std::pair<iterator, bool> insert(iterator, meta_any);
+    inline std::pair<iterator, bool> erase(iterator);
+    inline meta_any operator[](size_type);
+
+    inline explicit operator bool() const ENTT_NOEXCEPT;
 
 private:
-    meta_view *view;
+    meta_type(* value_type_fn)();
+    size_type(* size_fn)(const void *);
+    bool(* clear_fn)(void *);
+    iterator(* begin_fn)(void *);
+    iterator(* end_fn)(void *);
+    std::pair<iterator, bool>(* insert_fn)(void *, iterator, meta_any);
+    std::pair<iterator, bool>(* erase_fn)(void *, iterator);
+    meta_any(* get_fn)(void *, size_type);
+    void *instance;
+};
+
+
+/*! @brief Proxy object for associative containers. */
+class meta_associative_container {
+    template<typename, typename = void>
+    struct has_mapped_type: std::false_type {};
+
+    template<typename Type>
+    struct has_mapped_type<Type, std::void_t<typename meta_associative_container_traits_t<Type>::mapped_type>>
+            : std::true_type
+    {};
+
+    template<typename>
+    struct meta_associative_container_proxy;
+
+public:
+    /*! @brief Unsigned integer type. */
+    using size_type = std::size_t;
+    /*! @brief Meta iterator type. */
+    using iterator = meta_iterator;
+
+    template<typename Type>
+    meta_associative_container(Type &);
+
+    inline meta_associative_container();
+
+    inline bool key_only() const ENTT_NOEXCEPT;
+    inline meta_type key_type() const ENTT_NOEXCEPT;
+    inline meta_type mapped_type() const ENTT_NOEXCEPT;
+    inline meta_type value_type() const ENTT_NOEXCEPT;
+    inline size_type size() const ENTT_NOEXCEPT;
+    inline bool clear();
+    inline iterator begin();
+    inline iterator end();
+    inline bool insert(meta_any, meta_any);
+    inline bool erase(meta_any);
+    inline iterator find(meta_any);
+
+    inline explicit operator bool() const ENTT_NOEXCEPT;
+
+private:
+    bool key_only_container;
+    meta_type(* key_type_fn)();
+    meta_type(* mapped_type_fn)();
+    meta_type(* value_type_fn)();
+    size_type(* size_fn)(const void *);
+    bool(* clear_fn)(void *);
+    iterator(* begin_fn)(void *);
+    iterator(* end_fn)(void *);
+    bool(* insert_fn)(void *, meta_any, meta_any);
+    bool(* erase_fn)(void *, meta_any);
+    iterator(* find_fn)(void *, meta_any);
     void *instance;
 };
 
@@ -80,159 +127,6 @@ private:
  */
 class meta_any {
     using dereference_operator_type = meta_any(meta_any &);
-
-    template<typename, typename = void>
-    struct container_view {
-        [[nodiscard]] static meta_container::meta_view * instance() {
-            return nullptr;
-        }
-    };
-
-    template<typename Type>
-    struct container_view<Type, std::enable_if_t<is_sequence_container_v<Type>>>: meta_container::meta_view {
-        [[nodiscard]] static meta_container::meta_view * instance() {
-            static container_view common{};
-            return &common;
-        }
-
-        [[nodiscard]] std::size_t size(const void *container) const ENTT_NOEXCEPT override {
-            return static_cast<const Type *>(container)->size();
-        }
-
-        [[nodiscard]] bool insert(void *container, meta_any it, meta_any value) override {
-            bool ret = false;
-
-            if constexpr(is_dynamic_sequence_container_v<Type>) {
-                if(auto *iter = it.try_cast<typename Type::iterator>(); iter) {
-                    if(const auto *curr = value.try_cast<typename Type::value_type>(); curr) {
-                        *iter = static_cast<Type *>(container)->insert(*iter, *curr);
-                        ret = true;
-                    }
-                }
-            }
-
-            return ret;
-        }
-
-        [[nodiscard]] bool erase(void *container, meta_any it) override {
-            bool ret = false;
-
-            if constexpr(is_dynamic_sequence_container_v<Type>) {
-                if(auto *iter = it.try_cast<typename Type::iterator>(); iter) {
-                    *iter = static_cast<Type *>(container)->erase(*iter);
-                    ret = true;
-                }
-            }
-
-            return ret;
-        }
-
-        [[nodiscard]] meta_any begin(void *container) const ENTT_NOEXCEPT override {
-            return static_cast<Type *>(container)->begin();
-        }
-
-        [[nodiscard]] meta_any end(void *container) const ENTT_NOEXCEPT override {
-            return static_cast<Type *>(container)->end();
-        }
-
-        [[nodiscard]] meta_any deref(meta_any it) const ENTT_NOEXCEPT override {
-            return std::ref(*it.cast<typename Type::iterator>());
-        }
-
-        [[nodiscard]] meta_any find(void *container, meta_any idx) const ENTT_NOEXCEPT override {
-            meta_any any{};
-
-            if(const auto *curr = idx.try_cast<std::size_t>(); curr) {
-                any = std::next(static_cast<Type *>(container)->begin(), *curr);
-            }
-
-            return any;
-        }
-
-        void incr(meta_any it) const ENTT_NOEXCEPT override {
-            ++it.cast<typename Type::iterator>();
-        }
-    };
-
-    template<typename Type>
-    struct container_view<Type, std::enable_if_t<is_associative_container_v<Type>>>: meta_container::meta_view {
-        [[nodiscard]] static meta_container::meta_view * instance() {
-            static container_view common{};
-            return &common;
-        }
-
-        [[nodiscard]] std::size_t size(const void *container) const ENTT_NOEXCEPT override {
-            return static_cast<const Type *>(container)->size();
-        }
-
-        [[nodiscard]] bool insert(void *container, meta_any key, meta_any value) override {
-            bool ret = false;
-
-            if constexpr(is_key_only_associative_container_v<Type>) {
-                if(const auto *curr = key.try_cast<typename Type::key_type>(); curr) {
-                    static_cast<Type *>(container)->insert(*curr);
-                    ret = true;
-                }
-            } else {
-                if(const auto *k_curr = key.try_cast<typename Type::key_type>(); k_curr) {
-                    if(const auto *v_curr = value.try_cast<typename Type::mapped_type>(); v_curr) {
-                        static_cast<Type *>(container)->insert(std::make_pair(*k_curr, *v_curr));
-                        ret = true;
-                    }
-                }
-            }
-
-            return ret;
-        }
-
-        [[nodiscard]] bool erase(void *container, meta_any key) override {
-            bool ret = false;
-
-            if(const auto *curr = key.try_cast<typename Type::key_type>(); curr) {
-                static_cast<Type *>(container)->erase(*curr);
-                ret = true;
-            }
-
-            return ret;
-        }
-
-        [[nodiscard]] meta_any begin(void *container) const ENTT_NOEXCEPT override {
-            return static_cast<Type *>(container)->begin();
-        }
-
-        [[nodiscard]] meta_any end(void *container) const ENTT_NOEXCEPT override {
-            return static_cast<Type *>(container)->end();
-        }
-
-        [[nodiscard]] meta_any deref(meta_any it) const ENTT_NOEXCEPT override {
-            if constexpr(is_key_only_associative_container_v<Type>) {
-                return *it.cast<typename Type::iterator>();
-            } else {
-                return std::ref(*it.cast<typename Type::iterator>());
-            }
-        }
-
-        [[nodiscard]] meta_any find(void *container, meta_any key) const ENTT_NOEXCEPT override {
-            meta_any any{};
-
-            if constexpr(is_key_only_associative_container_v<Type>) {
-                if(const auto *curr = key.try_cast<typename Type::key_type>(); curr) {
-                    auto *cont = static_cast<Type *>(container);
-                    any = std::find(cont->begin(), cont->end(), *curr);
-                }
-            } else {
-                if(const auto *curr = key.try_cast<typename Type::key_type>(); curr) {
-                    any = static_cast<Type *>(container)->find(*curr);
-                }
-            }
-
-            return any;
-        }
-
-        void incr(meta_any it) const ENTT_NOEXCEPT override {
-            it.cast<typename Type::iterator>().operator++();
-        }
-    };
 
     template<typename Type>
     static meta_any dereference_operator(meta_any &any) {
@@ -249,13 +143,32 @@ class meta_any {
         return other;
     }
 
+    template<typename Type>
+    [[nodiscard]] static auto * meta_sequence_container_factory() ENTT_NOEXCEPT {
+        if constexpr(has_meta_sequence_container_traits_v<Type>) {
+            return +[](void *container) -> meta_sequence_container { return *static_cast<Type *>(container); };
+        } else {
+            return static_cast<decltype(seq_factory)>(nullptr);
+        }
+    }
+
+    template<typename Type>
+    [[nodiscard]] static auto * meta_associative_container_factory() ENTT_NOEXCEPT {
+        if constexpr(has_meta_associative_container_traits_v<Type>) {
+            return +[](void *container) -> meta_associative_container { return *static_cast<Type *>(container); };
+        } else {
+            return static_cast<decltype(assoc_factory)>(nullptr);
+        }
+    }
+
 public:
     /*! @brief Default constructor. */
     meta_any() ENTT_NOEXCEPT
         : storage{},
           node{},
           deref{},
-          cview{}
+          seq_factory{nullptr},
+          assoc_factory{nullptr}
     {}
 
     /**
@@ -269,7 +182,8 @@ public:
         : storage(std::in_place_type<Type>, std::forward<Args>(args)...),
           node{internal::meta_info<Type>::resolve()},
           deref{&dereference_operator<Type>},
-          cview{container_view<Type>::instance()}
+          seq_factory{meta_sequence_container_factory<Type>()},
+          assoc_factory{meta_associative_container_factory<Type>()}
     {}
 
     /**
@@ -282,7 +196,8 @@ public:
         : storage{value},
           node{internal::meta_info<Type>::resolve()},
           deref{&dereference_operator<Type>},
-          cview{container_view<Type>::instance()}
+          seq_factory{meta_sequence_container_factory<Type>()},
+          assoc_factory{meta_associative_container_factory<Type>()}
     {}
 
     /**
@@ -460,16 +375,25 @@ public:
         other.node = node;
         other.storage = storage.ref();
         other.deref = deref;
-        other.cview = cview;
+        other.seq_factory = seq_factory;
+        other.assoc_factory = assoc_factory;
         return other;
     }
 
     /**
-     * @brief Returns a container view.
-     * @return A container view for the underlying object.
+     * @brief Returns a sequence container proxy.
+     * @return A sequence container proxy for the underlying object.
      */
-    [[nodiscard]] meta_container view() ENTT_NOEXCEPT {
-        return { cview, storage.data() };
+    [[nodiscard]] meta_sequence_container as_sequence_container() ENTT_NOEXCEPT {
+        return seq_factory ? seq_factory(storage.data()) : meta_sequence_container{};
+    }
+
+    /**
+     * @brief Returns an associative container proxy.
+     * @return An associative container proxy for the underlying object.
+     */
+    [[nodiscard]] meta_associative_container as_associative_container() ENTT_NOEXCEPT {
+        return assoc_factory ? assoc_factory(storage.data()) : meta_associative_container{};
     }
 
     /**
@@ -508,14 +432,16 @@ public:
         swap(lhs.node, rhs.node);
         swap(lhs.storage, rhs.storage);
         swap(lhs.deref, rhs.deref);
-        swap(lhs.cview, rhs.cview);
+        swap(lhs.seq_factory, rhs.seq_factory);
+        swap(lhs.assoc_factory, rhs.assoc_factory);
     }
 
 private:
     internal::meta_storage storage;
     const internal::meta_type_node *node;
     dereference_operator_type *deref;
-    meta_container::meta_view *cview;
+    meta_sequence_container(* seq_factory)(void *);
+    meta_associative_container(* assoc_factory)(void *);
 };
 
 
@@ -527,181 +453,6 @@ private:
  */
 [[nodiscard]] inline bool operator!=(const meta_any &lhs, const meta_any &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
-}
-
-
-/*! @brief Opaque iterator for meta containers. */
-struct meta_container::meta_iterator {
-    /*! @brief Signed integer type. */
-    using difference_type = std::ptrdiff_t;
-    /*! @brief Type of elements returned by the iterator. */
-    using value_type = meta_any;
-    /*! @brief Pointer type, `void` on purpose. */
-    using pointer = void;
-    /*! @brief Reference type, it is **not** an actual reference. */
-    using reference = value_type;
-    /*! @brief Iterator category. */
-    using iterator_category = std::input_iterator_tag;
-
-    /*! @brief Default constructor. */
-    meta_iterator() ENTT_NOEXCEPT = default;
-
-    /**
-     * @brief Constructs a meta iterator that wraps an actual iterator.
-     * @param ref A proxy object that _knows_ how to use the wrapped iterator.
-     * @param iter The actual iterator, properly wrapped.
-     */
-    meta_iterator(meta_container::meta_view *ref, meta_any iter)
-        : view{ref},
-          it{std::move(iter)}
-    {}
-
-    /*! @brief Pre-increment operator. @return This iterator. */
-    meta_iterator & operator++() ENTT_NOEXCEPT {
-        return view->incr(handle()), *this;
-    }
-
-    /*! @brief Post-increment operator. @return This iterator. */
-    meta_iterator operator++(int) ENTT_NOEXCEPT {
-        iterator orig = *this;
-        return view->incr(handle()), orig;
-    }
-
-    /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return True if the two meta iterators refer to the same element, false
-     * otherwise.
-     */
-    [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
-        return it == other.it;
-    }
-
-    /**
-     * @brief Checks if two meta iterators refer to the same element.
-     * @param other The meta iterator with which to compare.
-     * @return False if the two meta iterators refer to the same element, true
-     * otherwise.
-     */
-    [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
-        return !(*this == other);
-    }
-
-    /**
-     * @brief Indirection operator.
-     * @return The element to which the meta pointer points.
-     */
-    [[nodiscard]] reference operator*() const {
-        return view->deref(handle());
-    }
-
-    /**
-     * @brief Returns a handle to the underlying iterator.
-     * @return The actual iterator, properly wrapped.
-     */
-    [[nodiscard]] meta_any handle() const ENTT_NOEXCEPT {
-        return it.ref();
-    }
-
-    /**
-     * @brief Returns false if an iterator is invalid, true otherwise.
-     * @return False if the iterator is invalid, true otherwise.
-     */
-    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return static_cast<bool>(it);
-    }
-
-private:
-    meta_container::meta_view *view;
-    entt::meta_any it;
-};
-
-
-/**
- * @brief Returns the number of elements.
- * @return Number of elements.
- */
-[[nodiscard]] meta_container::size_type meta_container::size() const ENTT_NOEXCEPT {
-    return view->size(instance);
-}
-
-
-/**
- * @brief Inserts an element in the container.
- *
- * In case of sequence containers, the first parameter must be a valid iterator
- * handle. In case of associative containers, the type of the key must be such
- * that a cast or conversion to the key type of the container is possible.<br/>
- * The type of the value must be such that a cast or conversion to the value
- * type of the container is possible.
- *
- * @param it_or_key A valid iterator handle in case of sequence containers, a
- * key in case of associative containers.
- * @param value The element to insert in the container.
- * @return True in case of success, false otherwise.
- */
-inline bool meta_container::insert(meta_any it_or_key, meta_any value = {}) {
-    return view->insert(instance, std::move(it_or_key), std::move(value));
-}
-
-
-/**
- * @brief Erases an element from the container.
- *
- * In case of sequence containers, the parameter must be a valid iterator
- * handle. In case of associative containers, the type of the key must be such
- * that a cast or conversion to the key type of the container is possible.
- *
- * @param it_or_key A valid iterator handle in case of sequence containers, a
- * key in case of associative containers.
- * @return True in case of success, false otherwise.
- */
-inline bool meta_container::erase(meta_any it_or_key) {
-    return view->erase(instance, std::move(it_or_key));
-}
-
-
-/**
- * @brief Returns an iterator to the first element of the container.
- * @return An iterator to the first element of the container.
- */
-[[nodiscard]] inline meta_container::iterator meta_container::begin() {
-    return {view, view->begin(instance)};
-}
-
-
-/**
- * @brief Returns an iterator that is past the last element of the container.
- * @return An iterator that is past the last element of the container.
- */
-[[nodiscard]] inline meta_container::iterator meta_container::end() {
-    return {view, view->end(instance)};
-}
-
-
-/**
- * @brief Returns an iterator to the required element.
- *
- * In case of sequence containers, the parameter must be a valid position (no
- * bounds checking is performed) and such that a cast or conversion to size_type
- * is possible. In case of associative containers, the type of the key must be
- * such that a cast or conversion to the key type of the container is possible.
- *
- * @param pos_or_key A valid position in case of sequence containers, a key in
- * case of associative containers.
- * @return An iterator to the required element.
- */
-[[nodiscard]] inline meta_container::iterator meta_container::operator[](meta_any pos_or_key) {
-    return {view, view->find(instance, std::move(pos_or_key))};
-}
-
-
-/**
- * @brief Returns true if a meta container is valid, false otherwise.
- * @return True if the meta container is valid, false otherwise.
- */
-meta_container::operator bool() const ENTT_NOEXCEPT {
-    return (view != nullptr);
 }
 
 
@@ -1737,6 +1488,494 @@ private:
 
 [[nodiscard]] inline meta_type meta_func::arg(size_type index) const ENTT_NOEXCEPT {
     return index < size() ? node->arg(index) : nullptr;
+}
+
+
+/*! @brief Opaque iterator for meta containers. */
+class meta_iterator {
+    template<typename Type>
+    static void incr(meta_any any) {
+        ++any.cast<typename Type::iterator>();
+    }
+
+    template<typename Type>
+    static meta_any deref(meta_any any) {
+        if constexpr(std::is_const_v<std::remove_reference_t<decltype(*std::declval<typename Type::iterator>())>>) {
+            return *any.cast<typename Type::iterator>();
+        } else {
+            return std::ref(*any.cast<typename Type::iterator>());
+        }
+    }
+
+public:
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
+    /*! @brief Type of elements returned by the iterator. */
+    using value_type = meta_any;
+    /*! @brief Pointer type, `void` on purpose. */
+    using pointer = void;
+    /*! @brief Reference type, it is **not** an actual reference. */
+    using reference = value_type;
+    /*! @brief Iterator category. */
+    using iterator_category = std::input_iterator_tag;
+
+    /*! @brief Default constructor. */
+    meta_iterator() ENTT_NOEXCEPT
+        : next_fn{nullptr},
+          get_fn{nullptr},
+          it{}
+    {}
+
+    /**
+     * @brief Constructs a meta iterator from a given iterator.
+     * @tparam Type Type of container to which the iterator belongs.
+     * @param iter The actual iterator with which to build the meta iterator.
+     */
+    template<typename Type>
+    meta_iterator(std::in_place_type_t<Type>, typename Type::iterator iter)
+        : next_fn{&incr<Type>},
+          get_fn{&deref<Type>},
+          it{std::move(iter)}
+    {}
+
+    /*! @brief Pre-increment operator. @return This iterator. */
+    meta_iterator & operator++() ENTT_NOEXCEPT {
+        return next_fn(it.ref()), *this;
+    }
+
+    /*! @brief Post-increment operator. @return This iterator. */
+    meta_iterator operator++(int) ENTT_NOEXCEPT {
+        meta_iterator orig = *this;
+        return next_fn(it.ref()), orig;
+    }
+
+    /**
+     * @brief Checks if two meta iterators refer to the same element.
+     * @param other The meta iterator with which to compare.
+     * @return True if the two meta iterators refer to the same element, false
+     * otherwise.
+     */
+    [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
+        return it == other.it;
+    }
+
+    /**
+     * @brief Checks if two meta iterators refer to the same element.
+     * @param other The meta iterator with which to compare.
+     * @return False if the two meta iterators refer to the same element, true
+     * otherwise.
+     */
+    [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this == other);
+    }
+
+    /**
+     * @brief Indirection operator.
+     * @return The element to which the meta pointer points.
+     */
+    [[nodiscard]] reference operator*() const {
+        return get_fn(it.ref());
+    }
+
+    /**
+     * @brief Returns a handle to the underlying iterator.
+     * @return The actual iterator, properly wrapped.
+     */
+    [[nodiscard]] meta_any handle() const ENTT_NOEXCEPT {
+        return it.ref();
+    }
+
+    /**
+     * @brief Returns false if an iterator is invalid, true otherwise.
+     * @return False if the iterator is invalid, true otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return static_cast<bool>(it);
+    }
+
+private:
+    void(* next_fn)(meta_any);
+    meta_any(* get_fn)(meta_any);
+    entt::meta_any it;
+};
+
+
+template<typename Type>
+struct meta_sequence_container::meta_sequence_container_proxy {
+    static meta_type value_type() {
+        return internal::meta_info<typename meta_sequence_container_traits_t<Type>::value_type>::resolve();
+    }
+
+    static meta_sequence_container::size_type size(const void *container) {
+        return meta_sequence_container_traits_t<Type>::size(*static_cast<const Type *>(container));
+    }
+
+    static bool clear(void *container) {
+        return meta_sequence_container_traits_t<Type>::clear(*static_cast<Type *>(container));
+    }
+
+    static iterator begin(void *container) {
+        return iterator{std::in_place_type<Type>, meta_sequence_container_traits_t<Type>::begin(*static_cast<Type *>(container))};
+    }
+
+    static iterator end(void *container) {
+        return iterator{std::in_place_type<Type>, meta_sequence_container_traits_t<Type>::end(*static_cast<Type *>(container))};
+    }
+
+    static std::pair<iterator, bool> insert(void *container, iterator it, meta_any any) {
+        std::pair<typename meta_sequence_container_traits_t<Type>::iterator, bool> ret{{}, false};
+
+        if(const auto *value = any.try_cast<typename meta_sequence_container_traits_t<Type>::value_type>(); value) {
+            ret = meta_sequence_container_traits_t<Type>::insert(*static_cast<Type *>(container), it.handle().cast<typename meta_sequence_container_traits_t<Type>::iterator>(), *value);
+        }
+
+        return {iterator{std::in_place_type<Type>, std::move(ret.first)}, ret.second};
+    }
+
+    static std::pair<iterator, bool> erase(void *container, iterator it) {
+        auto ret = meta_sequence_container_traits_t<Type>::erase(*static_cast<Type *>(container), it.handle().cast<typename meta_sequence_container_traits_t<Type>::iterator>());
+        return {iterator{std::in_place_type<Type>, std::move(ret.first)}, ret.second};
+    }
+
+    static meta_any get(void *container, meta_sequence_container::size_type pos) {
+        return std::ref(meta_sequence_container_traits_t<Type>::get(*static_cast<Type *>(container), pos));
+    }
+};
+
+
+/**
+ * @brief Construct a proxy object for sequence containers.
+ * @tparam Type Type of container to wrap.
+ * @param container The container to wrap.
+ */
+template<typename Type>
+meta_sequence_container::meta_sequence_container(Type &container)
+    : value_type_fn{&meta_sequence_container_proxy<Type>::value_type},
+      size_fn{&meta_sequence_container_proxy<Type>::size},
+      clear_fn{&meta_sequence_container_proxy<Type>::clear},
+      begin_fn{&meta_sequence_container_proxy<Type>::begin},
+      end_fn{&meta_sequence_container_proxy<Type>::end},
+      insert_fn{&meta_sequence_container_proxy<Type>::insert},
+      erase_fn{&meta_sequence_container_proxy<Type>::erase},
+      get_fn{&meta_sequence_container_proxy<Type>::get},
+      instance{&container}
+{}
+
+
+/*! @brief Default constructor. */
+inline meta_sequence_container::meta_sequence_container()
+    : value_type_fn{nullptr},
+      size_fn{nullptr},
+      clear_fn{nullptr},
+      begin_fn{nullptr},
+      end_fn{nullptr},
+      insert_fn{nullptr},
+      erase_fn{nullptr},
+      get_fn{nullptr},
+      instance{nullptr}
+{}
+
+
+/**
+ * @brief Returns the value meta type of the wrapped container type.
+ * @return The value meta type of the wrapped container type.
+ */
+inline meta_type meta_sequence_container::value_type() const ENTT_NOEXCEPT {
+    return value_type_fn();
+}
+
+
+/**
+ * @brief Returns the size of the wrapped container.
+ * @return The size of the wrapped container.
+ */
+inline meta_sequence_container::size_type meta_sequence_container::size() const ENTT_NOEXCEPT {
+    return size_fn(instance);
+}
+
+
+/**
+ * @brief Clears the content of the wrapped container.
+ * @return True in case of success, false otherwise.
+ */
+inline bool meta_sequence_container::clear() {
+    return clear_fn(instance);
+}
+
+
+/**
+ * @brief Returns a meta iterator to the first element of the wrapped container.
+ * @return A meta iterator to the first element of the wrapped container.
+ */
+inline meta_sequence_container::iterator meta_sequence_container::begin() {
+    return begin_fn(instance);
+}
+
+
+/**
+ * @brief Returns a meta iterator that is past the last element of the wrapped
+ * container.
+ * @return A meta iterator that is past the last element of the wrapped
+ * container.
+ */
+inline meta_sequence_container::iterator meta_sequence_container::end() {
+    return end_fn(instance);
+}
+
+
+/**
+ * @brief Inserts an element at a specified location of the wrapped container.
+ * @param it Meta iterator before which the element will be inserted.
+ * @param value Element value to insert.
+ * @return A pair consisting of a meta iterator to the inserted element (in
+ * case of success) and a bool denoting whether the insertion took place.
+ */
+inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_container::insert(iterator it, meta_any value) {
+    return insert_fn(instance, it, value.ref());
+}
+
+
+/**
+ * @brief Removes the specified element from the wrapped container.
+ * @param it Meta iterator to the element to remove.
+ * @return A pair consisting of a meta iterator following the last removed
+ * element (in case of success) and a bool denoting whether the insertion
+ * took place.
+ */
+inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_container::erase(iterator it) {
+    return erase_fn(instance, it);
+}
+
+
+/**
+ * @brief Returns a reference to the element at a specified location of the
+ * wrapped container (no bounds checking is performed).
+ * @param pos The position of the element to return.
+ * @return A reference to the requested element properly wrapped.
+ */
+inline meta_any meta_sequence_container::operator[](size_type pos) {
+    return get_fn(instance, pos);
+}
+
+
+/**
+ * @brief Returns false if a proxy is invalid, true otherwise.
+ * @return False if the proxy is invalid, true otherwise.
+ */
+inline meta_sequence_container::operator bool() const ENTT_NOEXCEPT {
+    return (instance != nullptr);
+}
+
+
+template<typename Type>
+struct meta_associative_container::meta_associative_container_proxy {
+    static constexpr auto has_mapped_type = meta_associative_container::has_mapped_type<Type>::value;
+
+    static meta_type key_type() {
+        return internal::meta_info<typename meta_associative_container_traits_t<Type>::key_type>::resolve();
+    }
+
+    static meta_type mapped_type() {
+        if constexpr(has_mapped_type) {
+            return internal::meta_info<typename meta_associative_container_traits_t<Type>::mapped_type>::resolve();
+        } else {
+            return meta_type{};
+        }
+    }
+
+    static meta_type value_type() {
+        return internal::meta_info<typename meta_associative_container_traits_t<Type>::value_type>::resolve();
+    }
+
+    static meta_associative_container::size_type size(const void *container) {
+        return meta_associative_container_traits_t<Type>::size(*static_cast<const Type *>(container));
+    }
+
+    static bool clear(void *container) {
+        return meta_associative_container_traits_t<Type>::clear(*static_cast<Type *>(container));
+    }
+
+    static iterator begin(void *container) {
+        return iterator{std::in_place_type<Type>, meta_associative_container_traits_t<Type>::begin(*static_cast<Type *>(container))};
+    }
+
+    static iterator end(void *container) {
+        return iterator{std::in_place_type<Type>, meta_associative_container_traits_t<Type>::end(*static_cast<Type *>(container))};
+    }
+
+    static bool insert(void *container, meta_any key, meta_any value) {
+        bool ret = false;
+
+        if(const auto *k_ptr = key.try_cast<typename meta_associative_container_traits_t<Type>::key_type>(); k_ptr) {
+            if constexpr(has_mapped_type) {
+                if(auto *m_ptr = value.try_cast<typename meta_associative_container_traits_t<Type>::mapped_type>(); m_ptr) {
+                    ret = meta_associative_container_traits_t<Type>::insert(*static_cast<Type *>(container), *k_ptr, *m_ptr);
+                }
+            } else {
+                ret = meta_associative_container_traits_t<Type>::insert(*static_cast<Type *>(container), *k_ptr);
+            }
+        }
+
+        return ret;
+    }
+
+    static bool erase(void *container, meta_any key) {
+        bool ret = false;
+
+        if(const auto *k_ptr = key.try_cast<typename meta_associative_container_traits_t<Type>::key_type>(); k_ptr) {
+            ret = meta_associative_container_traits_t<Type>::erase(*static_cast<Type *>(container), *k_ptr);
+        }
+
+        return ret;
+    }
+
+    static iterator find(void *container, meta_any key) {
+        iterator ret{};
+
+        if(const auto *k_ptr = key.try_cast<typename meta_associative_container_traits_t<Type>::key_type>(); k_ptr) {
+            ret = iterator{std::in_place_type<Type>, meta_associative_container_traits_t<Type>::find(*static_cast<Type *>(container), *k_ptr)};
+        }
+
+        return ret;
+    }
+};
+
+
+/**
+ * @brief Construct a proxy object for associative containers.
+ * @tparam Type Type of container to wrap.
+ * @param container The container to wrap.
+ */
+template<typename Type>
+meta_associative_container::meta_associative_container(Type &container)
+    : key_only_container{!meta_associative_container_proxy<Type>::has_mapped_type},
+      key_type_fn{&meta_associative_container_proxy<Type>::key_type},
+      mapped_type_fn{&meta_associative_container_proxy<Type>::mapped_type},
+      value_type_fn{&meta_associative_container_proxy<Type>::value_type},
+      size_fn{&meta_associative_container_proxy<Type>::size},
+      clear_fn{&meta_associative_container_proxy<Type>::clear},
+      begin_fn{&meta_associative_container_proxy<Type>::begin},
+      end_fn{&meta_associative_container_proxy<Type>::end},
+      insert_fn{&meta_associative_container_proxy<Type>::insert},
+      erase_fn{&meta_associative_container_proxy<Type>::erase},
+      find_fn{&meta_associative_container_proxy<Type>::find},
+      instance{&container}
+{}
+
+
+/*! @brief Default constructor. */
+inline meta_associative_container::meta_associative_container()
+    : key_only_container{false},
+      key_type_fn{nullptr},
+      mapped_type_fn{nullptr},
+      value_type_fn{nullptr},
+      size_fn{nullptr},
+      clear_fn{nullptr},
+      begin_fn{nullptr},
+      end_fn{nullptr},
+      insert_fn{nullptr},
+      erase_fn{nullptr},
+      find_fn{nullptr},
+      instance{nullptr}
+{}
+
+
+/**
+ * @brief Returns true if the associative container is also key-only, false
+ * otherwise.
+ * @return True if the associative container is also key-only, false otherwise.
+ */
+inline bool meta_associative_container::key_only() const ENTT_NOEXCEPT {
+    return key_only_container;
+}
+
+
+/**
+ * @brief Returns the key meta type of the wrapped container type.
+ * @return The key meta type of the wrapped container type.
+ */
+inline meta_type meta_associative_container::key_type() const ENTT_NOEXCEPT {
+    return key_type_fn();
+}
+
+
+/**
+ * @brief Returns the mapped meta type of the wrapped container type.
+ * @return The mapped meta type of the wrapped container type.
+ */
+inline meta_type meta_associative_container::mapped_type() const ENTT_NOEXCEPT {
+    return mapped_type_fn();
+}
+
+
+/*! @copydoc meta_sequence_container::value_type */
+inline meta_type meta_associative_container::value_type() const ENTT_NOEXCEPT {
+    return value_type_fn();
+}
+
+
+/*! @copydoc meta_sequence_container::size */
+inline meta_associative_container::size_type meta_associative_container::size() const ENTT_NOEXCEPT {
+    return size_fn(instance);
+}
+
+
+/*! @copydoc meta_sequence_container::clear */
+inline bool meta_associative_container::clear() {
+    return clear_fn(instance);
+}
+
+
+/*! @copydoc meta_sequence_container::begin */
+inline meta_associative_container::iterator meta_associative_container::begin() {
+    return begin_fn(instance);
+}
+
+
+/*! @copydoc meta_sequence_container::end */
+inline meta_associative_container::iterator meta_associative_container::end() {
+    return end_fn(instance);
+}
+
+
+/**
+ * @brief Inserts an element (a key/value pair) into the wrapped container.
+ * @param key The key of the element to insert.
+ * @param value The value of the element to insert.
+ * @return A bool denoting whether the insertion took place.
+ */
+inline bool meta_associative_container::insert(meta_any key, meta_any value = {}) {
+    return insert_fn(instance, key.ref(), value.ref());
+}
+
+
+/**
+ * @brief Removes the specified element from the wrapped container.
+ * @param key The key of the element to remove.
+ * @return A bool denoting whether the removal took place.
+ */
+inline bool meta_associative_container::erase(meta_any key) {
+    return erase_fn(instance, key.ref());
+}
+
+
+/**
+ * @brief Returns an iterator to the element with key equivalent to a given
+ * one, if any.
+ * @param key The key of the element to search.
+ * @return An iterator to the element with the given key, if any.
+ */
+inline meta_associative_container::iterator meta_associative_container::find(meta_any key) {
+    return find_fn(instance, key.ref());
+}
+
+
+/**
+ * @brief Returns false if a proxy is invalid, true otherwise.
+ * @return False if the proxy is invalid, true otherwise.
+ */
+inline meta_associative_container::operator bool() const ENTT_NOEXCEPT {
+    return (instance != nullptr);
 }
 
 

@@ -31,3 +31,5 @@ Next:
  - use a dedicate class template to specialize meta views for a better support to customizations
  - add const meta container support to meta any
  - meta_any deref fails if operator* returns a temporary
+ - remove container detector from type traits (is broken)
+ - remove dereferenceable detector from type traits (is broken)
