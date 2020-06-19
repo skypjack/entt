@@ -219,9 +219,13 @@ template<typename Entity>
 class basic_handle {
 public:
     /*! @brief Type of registry used internally. */
-    using registry_type = basic_registry<Entity>;
+    using registry_type = std::conditional_t<
+        std::is_const_v<Entity>,
+        const basic_registry<std::remove_const_t<Entity>>,
+        basic_registry<Entity>
+    >;
     /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
+    using entity_type = std::remove_const_t<Entity>;
 
     basic_handle() ENTT_NOEXCEPT
         : entt{entt::null}, reg{nullptr}
@@ -239,12 +243,25 @@ public:
         ENTT_ASSERT(ref.valid(entity));
     }
     
+    using actor_type = std::conditional_t<
+        std::is_const_v<Entity>,
+        const basic_actor<std::remove_const_t<Entity>>,
+        basic_actor<Entity>
+    >;
+    
     /**
      * @brief Constructs a handle from an actor.
      * @param actor An actor to construct from.
      */
-    basic_handle(basic_actor<Entity> &actor) ENTT_NOEXCEPT
+    basic_handle(actor_type &actor) ENTT_NOEXCEPT
         : entt{actor.entity()}, reg{&actor.backend()} {}
+
+    /**
+     * @brief Constructs a const handle from a non-const handle.
+     * @param handle A handle to construct from.
+     */
+    basic_handle(basic_handle<entity_type> handle) ENTT_NOEXCEPT
+        : entt{handle.entity()}, reg{&handle.backend()} {}
 
     /**
      * @brief Assigns the given component to a handle.
@@ -262,6 +279,7 @@ public:
      */
     template<typename Component, typename... Args>
     decltype(auto) assign(Args &&... args) const {
+        static_assert(!std::is_const_v<Entity>);
         return reg->template emplace_or_replace<Component>(entt, std::forward<Args>(args)...);
     }
 
@@ -271,113 +289,9 @@ public:
      */
     template<typename Component>
     void remove() const {
+        static_assert(!std::is_const_v<Entity>);
         reg->template remove<Component>(entt);
     }
-
-    /**
-     * @brief Checks if a handle has the given components.
-     * @tparam Component Components for which to perform the check.
-     * @return True if the handle has all the components, false otherwise.
-     */
-    template<typename... Component>
-    [[nodiscard]] bool has() const {
-        return reg->template has<Component...>(entt);
-    }
-
-    /**
-     * @brief Returns references to the given components for a handle.
-     * @tparam Component Types of components to get.
-     * @return References to the components owned by the handle.
-     */
-    template<typename... Component>
-    [[nodiscard]] decltype(auto) get() const {
-        return reg->template get<Component...>(entt);
-    }
-
-    /**
-     * @brief Returns pointers to the given components for a handle.
-     * @tparam Component Types of components to get.
-     * @return Pointers to the components owned by the handle.
-     */
-    template<typename... Component>
-    [[nodiscard]] auto try_get() const {
-        return reg->template try_get<Component...>(entt);
-    }
-
-    /**
-     * @brief Returns a reference to the underlying registry.
-     * @return A reference to the underlying registry.
-     */
-    [[nodiscard]] registry_type & backend() const ENTT_NOEXCEPT {
-        return *reg;
-    }
-
-    /**
-     * @brief Returns the entity associated with a handle.
-     * @return The entity associated with the handle.
-     */
-    [[nodiscard]] entity_type entity() const ENTT_NOEXCEPT {
-        return entt;
-    }
-
-    /**
-     * @brief Checks if a handle refers to a valid entity or not.
-     * @return True if the handle refers to a valid entity, false otherwise.
-     */
-    [[nodiscard]] explicit operator bool() const {
-        return reg && reg->valid(entt);
-    }
-
-private:
-    entity_type entt;
-    registry_type *reg;
-};
-
-
-/**
- * @brief Non-owning handle to a const entity.
- *
- * Tiny wrapper around an entity and a const registry.
- *
- * @tparam Entity A valid entity type (see entt_traits for more details).
- */
-template<typename Entity>
-class basic_handle<const Entity> {
-public:
-    /*! @brief Type of registry used internally. */
-    using registry_type = const basic_registry<Entity>;
-    /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
-
-    basic_handle() ENTT_NOEXCEPT
-        : entt{entt::null}, reg{nullptr}
-    {}
-
-    /**
-     * @brief Constructs a handle from a given entity.
-     * @param entity A valid entity identifier.
-     * @param ref An instance of the registry class.
-     */
-    explicit basic_handle(entity_type entity, registry_type &ref) ENTT_NOEXCEPT
-        : entt{entity}, reg{&ref}
-    {
-        // Does this assertion really make sense?
-        ENTT_ASSERT(ref.valid(entity));
-    }
-    
-    /**
-     * @brief Constructs a handle from an actor.
-     * @param actor An actor to construct from.
-     */
-    basic_handle(const basic_actor<Entity> &actor) ENTT_NOEXCEPT
-        : entt{actor.entity()}, reg{&actor.backend()} {}
-    
-    /**
-     * @brief Constructs a const handle from a non-const handle.
-     * @param handle A handle to construct from.
-     */
-    basic_handle(basic_handle<Entity> handle) ENTT_NOEXCEPT
-        : entt{handle.entity()}, reg{&handle.backend()} {}
 
     /**
      * @brief Checks if a handle has the given components.
