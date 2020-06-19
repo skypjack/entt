@@ -32,7 +32,7 @@ public:
     using entity_type = Entity;
 
     basic_actor() ENTT_NOEXCEPT
-        : entt{entt::null}, reg{nullptr}
+        : entt{null}, reg{nullptr}
     {}
 
     /**
@@ -218,17 +218,23 @@ basic_actor(Entity, basic_registry<Entity> &) -> basic_actor<Entity>;
 template<typename Entity>
 class basic_handle {
 public:
+    /*! @brief Underlying entity identifier. */
+    using entity_type = std::remove_const_t<Entity>;
     /*! @brief Type of registry used internally. */
     using registry_type = std::conditional_t<
         std::is_const_v<Entity>,
-        const basic_registry<std::remove_const_t<Entity>>,
-        basic_registry<Entity>
+        const basic_registry<entity_type>,
+        basic_registry<entity_type>
     >;
-    /*! @brief Underlying entity identifier. */
-    using entity_type = std::remove_const_t<Entity>;
+    /*! @brief Type of actor that can be used to construct a handle. */
+    using actor_type = std::conditional_t<
+        std::is_const_v<Entity>,
+        const basic_actor<entity_type>,
+        basic_actor<entity_type>
+    >;
 
     basic_handle() ENTT_NOEXCEPT
-        : entt{entt::null}, reg{nullptr}
+        : entt{null}, reg{nullptr}
     {}
 
     /**
@@ -242,12 +248,6 @@ public:
         // Does this assertion really make sense?
         ENTT_ASSERT(ref.valid(entity));
     }
-    
-    using actor_type = std::conditional_t<
-        std::is_const_v<Entity>,
-        const basic_actor<std::remove_const_t<Entity>>,
-        basic_actor<Entity>
-    >;
     
     /**
      * @brief Constructs a handle from an actor.
