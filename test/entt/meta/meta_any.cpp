@@ -636,6 +636,27 @@ TEST_F(MetaAny, DereferenceOperatorInvalidType) {
     ASSERT_FALSE(deref);
 }
 
+TEST_F(MetaAny, DereferenceOperatorConstType) {
+    const int value = 0;
+    entt::meta_any any{&value};
+
+    ASSERT_TRUE(any.type().is_pointer());
+    ASSERT_TRUE(any.type().is_dereferenceable());
+    ASSERT_EQ(any.type(), entt::resolve<const int *>());
+
+    auto deref = *any;
+
+    ASSERT_TRUE(deref);
+    ASSERT_FALSE(deref.type().is_pointer());
+    ASSERT_FALSE(deref.type().is_dereferenceable());
+    ASSERT_EQ(deref.type(), entt::resolve<int>());
+
+    deref.cast<int>() = 42;
+
+    ASSERT_EQ(*any.cast<const int *>(), 0);
+    ASSERT_EQ(value, 0);
+}
+
 TEST_F(MetaAny, DereferenceOperatorRawPointer) {
     int value = 0;
     entt::meta_any any{&value};

@@ -164,6 +164,8 @@ public:
     }
 
     friend void swap(meta_storage &lhs, meta_storage &rhs) {
+        using std::swap;
+
         if(lhs.steal_fn && rhs.steal_fn) {
             meta_storage buffer{};
             lhs.steal_fn(buffer, lhs);
@@ -174,12 +176,12 @@ public:
         } else if(rhs.steal_fn) {
             rhs.steal_fn(lhs, rhs);
         } else {
-            std::swap(lhs.instance, rhs.instance);
+            swap(lhs.instance, rhs.instance);
         }
 
-        std::swap(lhs.destroy_fn, rhs.destroy_fn);
-        std::swap(lhs.copy_fn, rhs.copy_fn);
-        std::swap(lhs.steal_fn, rhs.steal_fn);
+        swap(lhs.destroy_fn, rhs.destroy_fn);
+        swap(lhs.copy_fn, rhs.copy_fn);
+        swap(lhs.steal_fn, rhs.steal_fn);
     }
 
 private:

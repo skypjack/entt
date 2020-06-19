@@ -504,10 +504,11 @@ public:
      * @param rhs A valid meta any object.
      */
     friend void swap(meta_any &lhs, meta_any &rhs) {
-        std::swap(lhs.node, rhs.node);
-        std::swap(lhs.storage, rhs.storage);
-        std::swap(lhs.deref, rhs.deref);
-        std::swap(lhs.cview, rhs.cview);
+        using std::swap;
+        swap(lhs.node, rhs.node);
+        swap(lhs.storage, rhs.storage);
+        swap(lhs.deref, rhs.deref);
+        swap(lhs.cview, rhs.cview);
     }
 
 private:

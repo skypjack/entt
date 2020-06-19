@@ -28,7 +28,6 @@ Next:
  - meta: update doc
  - static constexpr -> inline constexpr
  - remove internal::find_if
- - add meta_handle::operator-> that returns a meta_any * (easier to use directly)
  - use a dedicate class template to specialize meta views for a better support to customizations
- - remove operator* from meta_any, meta_handle
  - add const meta container support to meta any
+ - meta_any deref fails if operator* returns a temporary
