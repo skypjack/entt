@@ -28,9 +28,13 @@ class basic_group;
 template<typename>
 class basic_observer;
 
-/*! @struct basic_actor */
-template <typename>
-struct basic_actor;
+/*! @class basic_actor */
+template<typename>
+class basic_actor;
+
+/*! @class basic_handle */
+template<typename>
+class basic_handle;
 
 /*! @class basic_snapshot */
 template<typename>
@@ -55,6 +59,12 @@ using observer = basic_observer<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using actor = basic_actor<entity>;
+
+/*! @brief Alias declaration for the most common use case. */
+using handle_grr = basic_handle<entity>;
+
+/*! @brief Alias declaration for the most common use case. */
+using const_handle_grr = basic_handle<const entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using snapshot = basic_snapshot<entity>;
