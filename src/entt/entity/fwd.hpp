@@ -32,9 +32,9 @@ class basic_observer;
 template<typename>
 class basic_actor;
 
-/*! @class basic_handle */
+/*! @class basic_proxy */
 template<typename>
-class basic_handle;
+class basic_proxy;
 
 /*! @class basic_snapshot */
 template<typename>
@@ -61,10 +61,10 @@ using observer = basic_observer<entity>;
 using actor = basic_actor<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
-using handle_grr = basic_handle<entity>;
+using proxy = basic_proxy<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
-using const_handle_grr = basic_handle<const entity>;
+using const_proxy = basic_proxy<const entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using snapshot = basic_snapshot<entity>;

@@ -209,14 +209,14 @@ basic_actor(Entity, basic_registry<Entity> &) -> basic_actor<Entity>;
 
 
 /**
- * @brief Non-owning handle to an entity.
+ * @brief Non-owning proxy to an entity.
  *
  * Tiny wrapper around an entity and a registry.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class basic_handle {
+class basic_proxy {
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = std::remove_const_t<Entity>;
@@ -226,23 +226,23 @@ public:
         const basic_registry<entity_type>,
         basic_registry<entity_type>
     >;
-    /*! @brief Type of actor that can be used to construct a handle. */
+    /*! @brief Type of actor that can be used to construct a proxy. */
     using actor_type = std::conditional_t<
         std::is_const_v<Entity>,
         const basic_actor<entity_type>,
         basic_actor<entity_type>
     >;
 
-    basic_handle() ENTT_NOEXCEPT
+    basic_proxy() ENTT_NOEXCEPT
         : entt{null}, reg{nullptr}
     {}
 
     /**
-     * @brief Constructs a handle from a given entity.
+     * @brief Constructs a proxy from a given entity.
      * @param entity A valid entity identifier.
      * @param ref An instance of the registry class.
      */
-    explicit basic_handle(entity_type entity, registry_type &ref) ENTT_NOEXCEPT
+    explicit basic_proxy(entity_type entity, registry_type &ref) ENTT_NOEXCEPT
         : entt{entity}, reg{&ref}
     {
         // Does this assertion really make sense?
@@ -250,26 +250,26 @@ public:
     }
     
     /**
-     * @brief Constructs a handle from an actor.
+     * @brief Constructs a proxy from an actor.
      * @param actor An actor to construct from.
      */
-    basic_handle(actor_type &actor) ENTT_NOEXCEPT
+    basic_proxy(actor_type &actor) ENTT_NOEXCEPT
         : entt{actor.entity()}, reg{&actor.backend()} {}
 
     /**
-     * @brief Constructs a const handle from a non-const handle.
-     * @param handle A handle to construct from.
+     * @brief Constructs a const proxy from a non-const proxy.
+     * @param proxy A proxy to construct from.
      */
-    basic_handle(basic_handle<entity_type> handle) ENTT_NOEXCEPT
-        : entt{handle.entity()}, reg{&handle.backend()} {}
+    basic_proxy(basic_proxy<entity_type> proxy) ENTT_NOEXCEPT
+        : entt{proxy.entity()}, reg{&proxy.backend()} {}
 
     /**
-     * @brief Assigns the given component to a handle.
+     * @brief Assigns the given component to a proxy.
      *
      * A new instance of the given component is created and initialized with the
      * arguments provided (the component must have a proper constructor or be of
-     * aggregate type). Then the component is assigned to the handle.<br/>
-     * In case the handle already has a component of the given type, it's
+     * aggregate type). Then the component is assigned to the proxy.<br/>
+     * In case the proxy already has a component of the given type, it's
      * replaced with the new one.
      *
      * @tparam Component Type of the component to create.
@@ -284,7 +284,7 @@ public:
     }
 
     /**
-     * @brief Removes the given component from a handle.
+     * @brief Removes the given component from a proxy.
      * @tparam Component Type of the component to remove.
      */
     template<typename Component>
@@ -294,9 +294,9 @@ public:
     }
 
     /**
-     * @brief Checks if a handle has the given components.
+     * @brief Checks if a proxy has the given components.
      * @tparam Component Components for which to perform the check.
-     * @return True if the handle has all the components, false otherwise.
+     * @return True if the proxy has all the components, false otherwise.
      */
     template<typename... Component>
     [[nodiscard]] bool has() const {
@@ -304,9 +304,9 @@ public:
     }
 
     /**
-     * @brief Returns references to the given components for a handle.
+     * @brief Returns references to the given components for a proxy.
      * @tparam Component Types of components to get.
-     * @return References to the components owned by the handle.
+     * @return References to the components owned by the proxy.
      */
     template<typename... Component>
     [[nodiscard]] decltype(auto) get() const {
@@ -314,9 +314,9 @@ public:
     }
 
     /**
-     * @brief Returns pointers to the given components for a handle.
+     * @brief Returns pointers to the given components for a proxy.
      * @tparam Component Types of components to get.
-     * @return Pointers to the components owned by the handle.
+     * @return Pointers to the components owned by the proxy.
      */
     template<typename... Component>
     [[nodiscard]] auto try_get() const {
@@ -332,16 +332,16 @@ public:
     }
 
     /**
-     * @brief Returns the entity associated with a handle.
-     * @return The entity associated with the handle.
+     * @brief Returns the entity associated with a proxy.
+     * @return The entity associated with the proxy.
      */
     [[nodiscard]] entity_type entity() const ENTT_NOEXCEPT {
         return entt;
     }
 
     /**
-     * @brief Checks if a handle refers to a valid entity or not.
-     * @return True if the handle refers to a valid entity, false otherwise.
+     * @brief Checks if a proxy refers to a valid entity or not.
+     * @return True if the proxy refers to a valid entity, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const {
         return reg && reg->valid(entt);
@@ -354,16 +354,16 @@ private:
 
 
 template<typename Entity>
-basic_handle(Entity, basic_registry<Entity> &) -> basic_handle<Entity>;
+basic_proxy(Entity, basic_registry<Entity> &) -> basic_proxy<Entity>;
 
 template<typename Entity>
-basic_handle(Entity, const basic_registry<Entity> &) -> basic_handle<const Entity>;
+basic_proxy(Entity, const basic_registry<Entity> &) -> basic_proxy<const Entity>;
 
 template<typename Entity>
-basic_handle(basic_actor<Entity> &) -> basic_handle<Entity>;
+basic_proxy(basic_actor<Entity> &) -> basic_proxy<Entity>;
 
 template<typename Entity>
-basic_handle(const basic_actor<Entity> &) -> basic_handle<const Entity>;
+basic_proxy(const basic_actor<Entity> &) -> basic_proxy<const Entity>;
 
 
 }
