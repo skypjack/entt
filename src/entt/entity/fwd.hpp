@@ -28,10 +28,6 @@ class basic_group;
 template<typename>
 class basic_observer;
 
-/*! @class basic_actor */
-template<typename>
-class basic_actor;
-
 /*! @class basic_proxy */
 template<typename>
 class basic_proxy;
@@ -56,9 +52,6 @@ using registry = basic_registry<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using observer = basic_observer<entity>;
-
-/*! @brief Alias declaration for the most common use case. */
-using actor = basic_actor<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using proxy = basic_proxy<entity>;

@@ -159,11 +159,11 @@ SETUP_BASIC_TEST(utility entt/core/utility.cpp)
 
 # Test entity
 
-SETUP_BASIC_TEST(actor entt/entity/actor.cpp)
 SETUP_BASIC_TEST(entity entt/entity/entity.cpp)
 SETUP_BASIC_TEST(group entt/entity/group.cpp)
 SETUP_BASIC_TEST(helper entt/entity/helper.cpp)
 SETUP_BASIC_TEST(observer entt/entity/observer.cpp)
+SETUP_BASIC_TEST(proxy entt/entity/proxy.cpp)
 SETUP_BASIC_TEST(registry entt/entity/registry.cpp)
 SETUP_BASIC_TEST(runtime_view entt/entity/runtime_view.cpp)
 SETUP_BASIC_TEST(snapshot entt/entity/snapshot.cpp)
