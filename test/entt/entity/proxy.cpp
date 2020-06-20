@@ -99,8 +99,8 @@ TEST(Proxy, Lifetime) {
     ASSERT_FALSE(registry.empty<int>());
     ASSERT_FALSE(registry.empty());
 
-    registry.each([proxy](const auto entity) {
-        ASSERT_EQ(proxy->entity(), entity);
+    registry.each([proxy](const auto e) {
+        ASSERT_EQ(proxy->entity(), e);
     });
 
     delete proxy;

@@ -52,8 +52,10 @@ public:
      * @brief Constructs a const proxy from a non-const proxy.
      * @param proxy A proxy to construct from.
      */
-    basic_proxy(basic_proxy<entity_type> proxy) ENTT_NOEXCEPT
-        : entt{proxy.entity()}, reg{&proxy.backend()} {}
+    basic_proxy(basic_proxy<entity_type> other) ENTT_NOEXCEPT
+        : entt{other.entity()}, reg{&other.backend()} {}
+    
+    basic_proxy(const basic_proxy<Entity> &) = default;
 
     /**
      * @brief Assigns the given component to a proxy.
