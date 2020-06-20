@@ -41,7 +41,7 @@ public:
      * @param entity A valid entity identifier.
      * @param ref An instance of the registry class.
      */
-    explicit basic_proxy(entity_type entity, registry_type &ref) ENTT_NOEXCEPT
+    basic_proxy(entity_type entity, registry_type &ref) ENTT_NOEXCEPT
         : entt{entity}, reg{&ref}
     {
         // Does this assertion really make sense?
@@ -50,12 +50,10 @@ public:
     
     /**
      * @brief Constructs a const proxy from a non-const proxy.
-     * @param proxy A proxy to construct from.
      */
-    basic_proxy(basic_proxy<entity_type> other) ENTT_NOEXCEPT
-        : entt{other.entity()}, reg{&other.backend()} {}
-    
-    basic_proxy(const basic_proxy<Entity> &) = default;
+    operator basic_proxy<const Entity>() const ENTT_NOEXCEPT {
+        return {entt, *reg};
+    }
 
     /**
      * @brief Assigns the given component to a proxy.
