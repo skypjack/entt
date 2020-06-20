@@ -645,6 +645,8 @@ the requested method, passing on the arguments if necessary.
 
 ### Actor
 
+**This class is deprecated and will be removed in a later release.**
+
 The `actor` class is designed for those who don't feel immediately comfortable
 working with components or for those who are migrating a project and want to
 approach it one step at a time.
