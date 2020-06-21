@@ -22,7 +22,7 @@ namespace entt {
  * @tparam Args Other arguments.
  */
 template<typename Type, typename... Args>
-struct meta_sequence_container_traits_t<std::vector<Type, Args...>> {
+struct meta_sequence_container_traits<std::vector<Type, Args...>> {
     /*! @brief Iterator type of the sequence container. */
     using iterator = typename std::vector<Type, Args...>::iterator;
     /*! @brief Unsigned integer type. */
@@ -119,7 +119,7 @@ struct meta_sequence_container_traits_t<std::vector<Type, Args...>> {
  * @tparam N The number of elements.
  */
 template<typename Type, auto N>
-struct meta_sequence_container_traits_t<std::array<Type, N>> {
+struct meta_sequence_container_traits<std::array<Type, N>> {
     /*! @brief Iterator type of the sequence container. */
     using iterator = typename std::array<Type, N>::iterator;
     /*! @brief Unsigned integer type. */
@@ -208,7 +208,7 @@ struct meta_sequence_container_traits_t<std::array<Type, N>> {
  * @tparam Args Other arguments.
  */
 template<typename Key, typename Value, typename... Args>
-struct meta_associative_container_traits_t<std::map<Key, Value, Args...>> {
+struct meta_associative_container_traits<std::map<Key, Value, Args...>> {
     /*! @brief Iterator type of the associative container. */
     using iterator = typename std::map<Key, Value, Args...>::iterator;
     /*! @brief Unsigned integer type. */
@@ -299,7 +299,7 @@ struct meta_associative_container_traits_t<std::map<Key, Value, Args...>> {
  * @tparam Args Other arguments.
  */
 template<typename Key, typename Value, typename... Args>
-struct meta_associative_container_traits_t<std::unordered_map<Key, Value, Args...>> {
+struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>> {
     /*! @brief Iterator type of the associative container. */
     using iterator = typename std::unordered_map<Key, Value, Args...>::iterator;
     /*! @brief Unsigned integer type. */
@@ -388,7 +388,7 @@ struct meta_associative_container_traits_t<std::unordered_map<Key, Value, Args..
  * @tparam Args Other arguments.
  */
 template<typename Key, typename... Args>
-struct meta_associative_container_traits_t<std::set<Key, Args...>> {
+struct meta_associative_container_traits<std::set<Key, Args...>> {
     /*! @brief Iterator type of the associative container. */
     using iterator = typename std::set<Key, Args...>::iterator;
     /*! @brief Unsigned integer type. */
@@ -474,7 +474,7 @@ struct meta_associative_container_traits_t<std::set<Key, Args...>> {
  * @tparam Args Other arguments.
  */
 template<typename Key, typename... Args>
-struct meta_associative_container_traits_t<std::unordered_set<Key, Args...>> {
+struct meta_associative_container_traits<std::unordered_set<Key, Args...>> {
     /*! @brief Iterator type of the associative container. */
     using iterator = typename std::unordered_set<Key, Args...>::iterator;
     /*! @brief Unsigned integer type. */

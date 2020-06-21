@@ -13,7 +13,7 @@ namespace entt {
  * sequence containers.
  */
 template<typename>
-struct meta_sequence_container_traits_t;
+struct meta_sequence_container_traits;
 
 
 /**
@@ -21,7 +21,7 @@ struct meta_sequence_container_traits_t;
  * associative containers.
  */
 template<typename>
-struct meta_associative_container_traits_t;
+struct meta_associative_container_traits;
 
 
 /**
@@ -35,7 +35,7 @@ struct has_meta_sequence_container_traits: std::false_type {};
 
 /*! @copydoc has_meta_sequence_container_traits */
 template<typename Type>
-struct has_meta_sequence_container_traits<Type, std::void_t<typename meta_sequence_container_traits_t<Type>::value_type>>
+struct has_meta_sequence_container_traits<Type, std::void_t<typename meta_sequence_container_traits<Type>::value_type>>
         : std::true_type
 {};
 
@@ -59,7 +59,7 @@ struct has_meta_associative_container_traits: std::false_type {};
 
 /*! @copydoc has_meta_associative_container_traits */
 template<typename Type>
-struct has_meta_associative_container_traits<Type, std::void_t<typename meta_associative_container_traits_t<Type>::key_type>>
+struct has_meta_associative_container_traits<Type, std::void_t<typename meta_associative_container_traits<Type>::key_type>>
         : std::true_type
 {};
 
