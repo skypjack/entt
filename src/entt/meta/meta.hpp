@@ -134,7 +134,7 @@ class meta_any {
     [[nodiscard]] static meta_any dereference_operator(meta_any &any) {
         meta_any other{};
 
-        if constexpr(is_dereferenceable_v<Type>) {
+        if constexpr(is_meta_pointer_like_v<Type>) {
             if constexpr(std::is_const_v<std::remove_reference_t<decltype(*std::declval<Type>())>>) {
                 other = *any.cast<Type>();
             } else {
@@ -1095,11 +1095,12 @@ public:
     }
 
     /**
-     * @brief Checks whether a type is dereferenceable or not.
-     * @return True if the underlying type is dereferenceable, false otherwise.
+     * @brief Checks whether a type is a pointer-like type or not.
+     * @return True if the underlying type is a pointer-like one, false
+     * otherwise.
      */
-    [[nodiscard]] bool is_dereferenceable() const ENTT_NOEXCEPT {
-        return node->is_dereferenceable;
+    [[nodiscard]] bool is_pointer_like() const ENTT_NOEXCEPT {
+        return node->is_pointer_like;
     }
 
     /**
