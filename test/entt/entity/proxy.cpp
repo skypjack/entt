@@ -37,41 +37,54 @@ TEST(Proxy, Construction) {
     ASSERT_EQ(&cregistry, &proxy4.registry());
     ASSERT_EQ(entity, proxy4.entity());
     ASSERT_TRUE(proxy4);
+    
+    static_assert(std::is_same_v<entt::registry &, decltype(proxy2.registry())>);
+    static_assert(std::is_same_v<const entt::registry &, decltype(proxy4.registry())>);
 }
 
 TEST(Proxy, Component) {
+    // There's no need to test these functions thoroughly as the registry tests
+    // already do that. We merely need to check that the functions exist.
+
     entt::registry registry;
     const auto entity = registry.create();
     entt::proxy proxy{entity, registry};
-
-    ASSERT_TRUE(registry.empty<int>());
-    ASSERT_FALSE(registry.empty());
-    ASSERT_FALSE(proxy.has<int>());
-
-    auto &cint = proxy.emplace<int>();
-    auto &cchar = proxy.emplace<char>();
-
-    ASSERT_EQ(&cint, &proxy.get<int>());
-    ASSERT_EQ(&cchar, &std::as_const(proxy).get<char>());
-    ASSERT_EQ(&cint, &std::get<0>(proxy.get<int, char>()));
-    ASSERT_EQ(&cchar, &std::get<1>(proxy.get<int, char>()));
-    ASSERT_EQ(&cint, std::get<0>(proxy.try_get<int, char, double>()));
-    ASSERT_EQ(&cchar, std::get<1>(proxy.try_get<int, char, double>()));
-    ASSERT_EQ(nullptr, std::get<2>(proxy.try_get<int, char, double>()));
-    ASSERT_EQ(nullptr, proxy.try_get<double>());
-    ASSERT_EQ(&cchar, proxy.try_get<char>());
-    ASSERT_EQ(&cint, proxy.try_get<int>());
-
+    
+    ASSERT_EQ(1, proxy.emplace<int>(1));
+    ASSERT_EQ(2, proxy.emplace_or_replace<int>(2));
+    ASSERT_EQ(3, proxy.emplace_or_replace<long>(3));
+    
+    const auto patched = proxy.patch<int>([](auto &comp) {
+      comp = 4;
+    });
+    ASSERT_EQ(4, patched);
+    
+    ASSERT_EQ(5, proxy.replace<long>(5));
+    ASSERT_TRUE((proxy.has<int, long>()));
+    
+    ASSERT_FALSE(registry.empty<long>());
+    proxy.remove<long>();
+    ASSERT_TRUE(registry.empty<long>());
+    ASSERT_EQ(0, proxy.remove_if_exists<long>());
+    
+    proxy.visit([](auto id) {
+      ASSERT_EQ(entt::type_info<int>::id(), id);
+    });
+    ASSERT_TRUE((proxy.any<int, long>()));
+    ASSERT_FALSE((proxy.has<int, long>()));
+    
     ASSERT_FALSE(registry.empty<int>());
-    ASSERT_FALSE(registry.empty());
-    ASSERT_TRUE((proxy.has<int, char>()));
-    ASSERT_FALSE(proxy.has<double>());
-
-    proxy.remove<int>();
-
+    ASSERT_FALSE(proxy.orphan());
+    proxy.remove_all();
     ASSERT_TRUE(registry.empty<int>());
-    ASSERT_FALSE(registry.empty());
-    ASSERT_FALSE(proxy.has<int>());
+    ASSERT_TRUE(proxy.orphan());
+    
+    ASSERT_EQ(6, proxy.get_or_emplace<int>(6));
+    ASSERT_EQ(6, proxy.get_or_emplace<int>(7));
+    ASSERT_EQ(6, proxy.get<int>());
+    
+    ASSERT_EQ(6, *proxy.try_get<int>());
+    ASSERT_EQ(nullptr, proxy.try_get<long>());
 }
 
 TEST(Proxy, FromEntity) {

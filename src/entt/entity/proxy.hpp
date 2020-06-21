@@ -46,6 +46,31 @@ public:
     operator basic_proxy<const Entity>() const ENTT_NOEXCEPT {
         return {entt, *reg};
     }
+    
+    /**
+     * @brief Returns a reference to the underlying registry.
+     * @return A reference to the underlying registry.
+     */
+    [[nodiscard]] registry_type & registry() const ENTT_NOEXCEPT {
+        ENTT_ASSERT(reg);
+        return *reg;
+    }
+
+    /**
+     * @brief Returns the entity associated with a proxy.
+     * @return The entity associated with the proxy.
+     */
+    [[nodiscard]] entity_type entity() const ENTT_NOEXCEPT {
+        return entt;
+    }
+
+    /**
+     * @brief Checks if a proxy refers to a valid entity or not.
+     * @return True if the proxy refers to a valid entity, false otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const {
+        return reg && reg->valid(entt);
+    }
 
     /**
      * @sa basic_registry::emplace
@@ -141,7 +166,7 @@ public:
      * @sa basic_registry::get_or_emplace
      */
     template<typename Component, typename... Args>
-    decltype(auto) get_or_emplace(Args &&... args) const {
+    [[nodiscard]] decltype(auto) get_or_emplace(Args &&... args) const {
         ENTT_ASSERT(reg);
         return reg->template get_or_emplace<Component>(entt, std::forward<Args>(args)...);
     }
@@ -170,31 +195,6 @@ public:
     void visit(Func &&func) const {
         ENTT_ASSERT(reg);
         reg->visit(entt, std::forward<Func>(func));
-    }
-
-    /**
-     * @brief Returns a reference to the underlying registry.
-     * @return A reference to the underlying registry.
-     */
-    [[nodiscard]] registry_type & registry() const ENTT_NOEXCEPT {
-        ENTT_ASSERT(reg);
-        return *reg;
-    }
-
-    /**
-     * @brief Returns the entity associated with a proxy.
-     * @return The entity associated with the proxy.
-     */
-    [[nodiscard]] entity_type entity() const ENTT_NOEXCEPT {
-        return entt;
-    }
-
-    /**
-     * @brief Checks if a proxy refers to a valid entity or not.
-     * @return True if the proxy refers to a valid entity, false otherwise.
-     */
-    [[nodiscard]] explicit operator bool() const {
-        return reg && reg->valid(entt);
     }
 
 private:
