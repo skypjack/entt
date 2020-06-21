@@ -25,11 +25,7 @@ Next:
  - update documentation to describe alternatives
 
 * WIP:
- - meta: update doc
  - static constexpr -> inline constexpr
  - remove internal::find_if
  - add const meta container support to meta any
- - meta_any deref fails if operator* returns a temporary
- - remove dereferenceable detector from type traits (is broken)
- - update meta.md
  - review _t
