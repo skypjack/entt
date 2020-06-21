@@ -40,6 +40,16 @@ struct meta_sequence_container_traits_t<std::vector<Type, Args...>> {
     }
 
     /**
+     * @brief Resizes a given container to contain a certain number of elements.
+     * @param vec The container to resize.
+     * @param sz The new size of the container.
+     * @return True in case of success, false otherwise.
+     */
+    [[nodiscard]] static bool resize(std::vector<Type, Args...> &vec, size_type sz) ENTT_NOEXCEPT {
+        return (vec.resize(sz), true);
+    }
+
+    /**
      * @brief Clears the content of a given container.
      * @param vec The container of which to clear the content.
      * @return True in case of success, false otherwise.
@@ -130,7 +140,15 @@ struct meta_sequence_container_traits_t<std::array<Type, N>> {
      * @brief Does nothing.
      * @return False to indicate failure in all cases.
      */
-    [[nodiscard]] static bool clear(std::array<Type, N> &) {
+    [[nodiscard]] static bool resize(const std::array<Type, N> &, size_type) ENTT_NOEXCEPT {
+        return false;
+    }
+
+    /**
+     * @brief Does nothing.
+     * @return False to indicate failure in all cases.
+     */
+    [[nodiscard]] static bool clear(const std::array<Type, N> &) {
         return false;
     }
 
@@ -157,7 +175,7 @@ struct meta_sequence_container_traits_t<std::array<Type, N>> {
      * @return A pair consisting of an invalid iterator and a false value to
      * indicate failure in all cases.
      */
-    [[nodiscard]] static std::pair<iterator, bool> insert(std::array<Type, N> &, iterator, const Type &) {
+    [[nodiscard]] static std::pair<iterator, bool> insert(const std::array<Type, N> &, iterator, const Type &) {
         return { {}, false };
     }
 
@@ -166,7 +184,7 @@ struct meta_sequence_container_traits_t<std::array<Type, N>> {
      * @return A pair consisting of an invalid iterator and a false value to
      * indicate failure in all cases.
      */
-    [[nodiscard]] static std::pair<iterator, bool> erase(std::array<Type, N> &, iterator) {
+    [[nodiscard]] static std::pair<iterator, bool> erase(const std::array<Type, N> &, iterator) {
         return { {}, false };
     }
 

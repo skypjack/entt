@@ -18,14 +18,21 @@ TEST(MetaSequenceContainer, Empty) {
 }
 
 TEST(MetaSequenceContainer, StdVector) {
-    std::vector<int> vec{2, 3, 4};
+    std::vector<int> vec{};
     entt::meta_any any{std::ref(vec)};
 
     auto view = any.as_sequence_container();
 
     ASSERT_TRUE(view);
     ASSERT_EQ(view.value_type(), entt::resolve<int>());
+    ASSERT_EQ(view.size(), 0u);
+
+    ASSERT_TRUE(view.resize(3u));
     ASSERT_EQ(view.size(), 3u);
+
+    view[0].cast<int>() = 2;
+    view[1].cast<int>() = 3;
+    view[2].cast<int>() = 4;
 
     auto first = view.begin();
     const auto last = view.end();
@@ -61,14 +68,10 @@ TEST(MetaSequenceContainer, StdVector) {
     ASSERT_TRUE(ret.second);
     ASSERT_EQ(view.size(), 4u);
     ASSERT_EQ((*ret.first).cast<int>(), 1);
-
-    view[0].cast<int>() = 5;
-
-    ASSERT_EQ((*view.begin()).cast<int>(), 5);
 }
 
 TEST(MetaSequenceContainer, StdArray) {
-    std::array<int, 3> arr{2, 3, 4};
+    std::array<int, 3> arr{};
     entt::meta_any any{std::ref(arr)};
 
     auto view = any.as_sequence_container();
@@ -76,6 +79,13 @@ TEST(MetaSequenceContainer, StdArray) {
     ASSERT_TRUE(view);
     ASSERT_EQ(view.value_type(), entt::resolve<int>());
     ASSERT_EQ(view.size(), 3u);
+
+    ASSERT_FALSE(view.resize(5u));
+    ASSERT_EQ(view.size(), 3u);
+
+    view[0].cast<int>() = 2;
+    view[1].cast<int>() = 3;
+    view[2].cast<int>() = 4;
 
     auto first = view.begin();
     const auto last = view.end();
@@ -108,14 +118,9 @@ TEST(MetaSequenceContainer, StdArray) {
     it = view.begin();
     ret = view.erase(it);
 
-
     ASSERT_FALSE(ret.second);
     ASSERT_EQ(view.size(), 3u);
     ASSERT_EQ((*it).cast<int>(), 2);
-
-    view[0].cast<int>() = 5;
-
-    ASSERT_EQ((*view.begin()).cast<int>(), 5);
 }
 
 TEST(MetaAssociativeContainer, StdMap) {
