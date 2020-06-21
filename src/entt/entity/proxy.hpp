@@ -27,18 +27,13 @@ public:
         basic_registry<entity_type>
     >;
 
-    /**
-     * @brief Default constructor.
-     *
-     * Constructs a null proxy. Use the boolean conversion operator to check for
-     * null.
-     */
+    /*! @brief Default constructor. */
     basic_proxy() ENTT_NOEXCEPT
         : reg{nullptr}, entt{null}
     {}
 
     /**
-     * @brief Constructs a proxy from a given entity.
+     * @brief Constructs a proxy from a given registry and entity.
      * @param ref An instance of the registry class.
      * @param entity A valid entity identifier.
      */
@@ -182,9 +177,17 @@ private:
 };
 
 
+/**
+ * @brief Deduction guide.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
 template<typename Entity>
 basic_proxy(basic_registry<Entity> &, Entity) -> basic_proxy<Entity>;
 
+/**
+ * @brief Deduction guide.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ */
 template<typename Entity>
 basic_proxy(const basic_registry<Entity> &, Entity) -> basic_proxy<const Entity>;
 
