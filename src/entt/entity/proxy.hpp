@@ -2,12 +2,7 @@
 #define ENTT_ENTITY_PROXY_HPP
 
 
-#include <utility>
-#include <type_traits>
-#include "../config/config.h"
 #include "registry.hpp"
-#include "entity.hpp"
-#include "fwd.hpp"
 
 
 namespace entt {
@@ -43,10 +38,7 @@ public:
      */
     basic_proxy(entity_type entity, registry_type &ref) ENTT_NOEXCEPT
         : entt{entity}, reg{&ref}
-    {
-        // Does this assertion really make sense?
-        ENTT_ASSERT(ref.valid(entity));
-    }
+    {}
     
     /**
      * @brief Constructs a const proxy from a non-const proxy.
@@ -56,70 +48,136 @@ public:
     }
 
     /**
-     * @brief Assigns the given component to a proxy.
-     *
-     * A new instance of the given component is created and initialized with the
-     * arguments provided (the component must have a proper constructor or be of
-     * aggregate type). Then the component is assigned to the proxy.<br/>
-     * In case the proxy already has a component of the given type, it's
-     * replaced with the new one.
-     *
-     * @tparam Component Type of the component to create.
-     * @tparam Args Types of arguments to use to construct the component.
-     * @param args Parameters to use to initialize the component.
-     * @return A reference to the newly created component.
+     * @sa basic_registry::emplace
      */
     template<typename Component, typename... Args>
-    decltype(auto) assign(Args &&... args) const {
-        static_assert(!std::is_const_v<Entity>);
+    decltype(auto) emplace(Args &&... args) const {
+        ENTT_ASSERT(reg);
+        return reg->template emplace<Component>(entt, std::forward<Args>(args)...);
+    }
+    
+    /**
+     * @sa basic_registry::emplace_or_replace
+     */
+    template<typename Component, typename... Args>
+    decltype(auto) emplace_or_replace(Args &&... args) const {
+        ENTT_ASSERT(reg);
         return reg->template emplace_or_replace<Component>(entt, std::forward<Args>(args)...);
     }
-
+    
     /**
-     * @brief Removes the given component from a proxy.
-     * @tparam Component Type of the component to remove.
+     * @sa basic_registry::patch
      */
-    template<typename Component>
+    template<typename Component, typename... Func>
+    decltype(auto) patch(Func &&... func) const {
+        ENTT_ASSERT(reg);
+        return reg->template patch<Component>(entt, std::forward<Func>(func)...);
+    }
+    
+    /**
+     * @sa basic_registry::replace
+     */
+    template<typename Component, typename... Args>
+    decltype(auto) replace(Args &&... args) const {
+        ENTT_ASSERT(reg);
+        return reg->template replace<Component>(entt, std::forward<Args>(args)...);
+    }
+    
+    /**
+     * @sa basic_registry::remove
+     */
+    template<typename... Components>
     void remove() const {
-        static_assert(!std::is_const_v<Entity>);
-        reg->template remove<Component>(entt);
+        ENTT_ASSERT(reg);
+        reg->template remove<Components...>(entt);
     }
-
+    
     /**
-     * @brief Checks if a proxy has the given components.
-     * @tparam Component Components for which to perform the check.
-     * @return True if the proxy has all the components, false otherwise.
+     * @sa basic_registry::remove_if_exists
      */
-    template<typename... Component>
-    [[nodiscard]] bool has() const {
-        return reg->template has<Component...>(entt);
+    template<typename... Components>
+    decltype(auto) remove_if_exists() const {
+        ENTT_ASSERT(reg);
+        return reg->template remove_if_exists<Components...>(entt);
     }
-
+    
     /**
-     * @brief Returns references to the given components for a proxy.
-     * @tparam Component Types of components to get.
-     * @return References to the components owned by the proxy.
+     * @sa basic_registry::remove_all
      */
-    template<typename... Component>
+    template<typename = void>
+    void remove_all() const {
+        ENTT_ASSERT(reg);
+        reg->remove_all(entt);
+    }
+    
+    /**
+     * @sa basic_registry::has
+     */
+    template<typename... Components>
+    [[nodiscard]] decltype(auto) has() const {
+        ENTT_ASSERT(reg);
+        return reg->template has<Components...>(entt);
+    }
+    
+    /**
+     * @sa basic_registry::any
+     */
+    template<typename... Components>
+    [[nodiscard]] decltype(auto) any() const {
+        ENTT_ASSERT(reg);
+        return reg->template any<Components...>(entt);
+    }
+    
+    /**
+     * @sa basic_registry::get
+     */
+    template<typename... Components>
     [[nodiscard]] decltype(auto) get() const {
-        return reg->template get<Component...>(entt);
+        ENTT_ASSERT(reg);
+        return reg->template get<Components...>(entt);
     }
-
+    
     /**
-     * @brief Returns pointers to the given components for a proxy.
-     * @tparam Component Types of components to get.
-     * @return Pointers to the components owned by the proxy.
+     * @sa basic_registry::get_or_emplace
      */
-    template<typename... Component>
-    [[nodiscard]] auto try_get() const {
-        return reg->template try_get<Component...>(entt);
+    template<typename Component, typename... Args>
+    decltype(auto) get_or_emplace(Args &&... args) const {
+        ENTT_ASSERT(reg);
+        return reg->template get_or_emplace<Component>(entt, std::forward<Args>(args)...);
+    }
+    
+    /**
+     * @sa basic_registry::try_get
+     */
+    template<typename... Components>
+    [[nodiscard]] decltype(auto) try_get() const {
+        ENTT_ASSERT(reg);
+        return reg->template try_get<Components...>(entt);
+    }
+    
+    /**
+     * @sa basic_registry::orphan
+     */
+    [[nodiscard]] bool orphan() const {
+        ENTT_ASSERT(reg);
+        return reg->orphan(entt);
+    }
+    
+    /**
+     * @sa basic_registry::visit
+     */
+    template<typename Func>
+    void visit(Func &&func) const {
+        ENTT_ASSERT(reg);
+        reg->visit(entt, std::forward<Func>(func));
     }
 
     /**
      * @brief Returns a reference to the underlying registry.
      * @return A reference to the underlying registry.
      */
-    [[nodiscard]] registry_type & backend() const ENTT_NOEXCEPT {
+    [[nodiscard]] registry_type & registry() const ENTT_NOEXCEPT {
+        ENTT_ASSERT(reg);
         return *reg;
     }
 

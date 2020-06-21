@@ -26,7 +26,7 @@ TEST(Proxy, Construction) {
     ASSERT_TRUE(entt::null == proxy1.entity());
     ASSERT_FALSE(proxy1);
     
-    ASSERT_EQ(&registry, &proxy2.backend());
+    ASSERT_EQ(&registry, &proxy2.registry());
     ASSERT_EQ(entity, proxy2.entity());
     ASSERT_TRUE(proxy2);
     
@@ -34,7 +34,7 @@ TEST(Proxy, Construction) {
     ASSERT_TRUE(entt::null == proxy3.entity());
     ASSERT_FALSE(proxy3);
     
-    ASSERT_EQ(&cregistry, &proxy4.backend());
+    ASSERT_EQ(&cregistry, &proxy4.registry());
     ASSERT_EQ(entity, proxy4.entity());
     ASSERT_TRUE(proxy4);
 }
@@ -48,8 +48,8 @@ TEST(Proxy, Component) {
     ASSERT_FALSE(registry.empty());
     ASSERT_FALSE(proxy.has<int>());
 
-    auto &cint = proxy.assign<int>();
-    auto &cchar = proxy.assign<char>();
+    auto &cint = proxy.emplace<int>();
+    auto &cchar = proxy.emplace<char>();
 
     ASSERT_EQ(&cint, &proxy.get<int>());
     ASSERT_EQ(&cchar, &std::as_const(proxy).get<char>());
@@ -94,7 +94,7 @@ TEST(Proxy, Lifetime) {
     entt::registry registry;
     const auto entity = registry.create();
     auto *proxy = new entt::proxy{entity, registry};
-    proxy->assign<int>();
+    proxy->emplace<int>();
 
     ASSERT_FALSE(registry.empty<int>());
     ASSERT_FALSE(registry.empty());
@@ -124,7 +124,7 @@ TEST(Proxy, DeductionGuides) {
 }
 
 void add_int(entt::proxy proxy, int i) {
-    proxy.assign<int>(i);
+    proxy.emplace<int>(i);
 }
 
 int get_int(entt::const_proxy proxy) {
