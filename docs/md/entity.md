@@ -21,6 +21,7 @@
     * [Null entity](#null-entity)
     * [Dependencies](#dependencies)
     * [Invoke](#invoke)
+    * [Proxy](#proxy)
     * [Actor](#actor)
     * [Context variables](#context-variables)
   * [Meet the runtime](#meet-the-runtime)
@@ -642,6 +643,27 @@ registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>();
 
 All it does is pick up the _right_ component for the received entity and invoke
 the requested method, passing on the arguments if necessary.
+
+### Proxy
+
+A `proxy` is a thin wrapper around an entity and a registry. It provides the
+same functions that the registry offers for working with components, such as
+`emplace`, `get`, `patch`, `remove`, etc. The difference being that the entity
+is implicitly passed to the registry.
+
+This class is non-owning, meaning that it can be freely copied and moved around
+without affecting the entity (in fact, `proxy` happens to be trivially
+copyable). An implication of this is that mutability becomes part of the type.
+We have `entt::proxy` and `entt::const_proxy`. A `proxy` stores a non-const
+pointer to the registry so it can do all the things that can be done with a
+non-const registry. However, a `const_proxy` stores a const pointer to the
+registry so it has a restricted set of functionalities. As you might expect, a
+`proxy` is implicitly convertible to a `const_proxy` but not the other way
+around.
+
+This class is intended to simplify function signatures. If you have a function
+that takes a registry and entity, and does most of its work on that entity, you
+might want to consider using a `proxy` or `const_proxy`.
 
 ### Actor
 

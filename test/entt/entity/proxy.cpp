@@ -1,4 +1,3 @@
-#include <functional>
 #include <gtest/gtest.h>
 #include <entt/entity/proxy.hpp>
 #include <entt/entity/registry.hpp>
