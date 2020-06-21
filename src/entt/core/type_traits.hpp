@@ -207,30 +207,6 @@ inline constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::v
 
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
- * dereferenceable, false otherwise.
- * @tparam Type Potentially dereferenceable type.
- */
-template<typename Type, typename = void>
-struct is_dereferenceable: std::false_type {};
-
-
-/*! @copydoc is_dereferenceable */
-template<typename Type>
-struct is_dereferenceable<Type, std::void_t<decltype(*std::declval<Type>())>>
-        : std::true_type
-{};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potentially dereferenceable type.
- */
-template<typename Type>
-inline constexpr auto is_dereferenceable_v = is_dereferenceable<Type>::value;
-
-
-/**
  * @brief Extracts the class of a non-static member object or function.
  * @tparam Member A pointer to a non-static member object or function.
  */

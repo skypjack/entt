@@ -52,13 +52,6 @@ TEST(TypeTraits, IsEqualityComparable) {
     ASSERT_FALSE(entt::is_equality_comparable_v<void>);
 }
 
-TEST(TypeTraits, IsDereferenceable) {
-    ASSERT_TRUE(entt::is_dereferenceable_v<int *>);
-    ASSERT_TRUE(entt::is_dereferenceable_v<std::shared_ptr<int>>);
-    ASSERT_TRUE(entt::is_dereferenceable_v<std::unique_ptr<int>>);
-    ASSERT_FALSE(entt::is_dereferenceable_v<int>);
-}
-
 TEST(TypeTraits, MemberClass) {
     struct clazz {
         char foo(int) { return {}; }
