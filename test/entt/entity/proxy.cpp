@@ -17,9 +17,9 @@ TEST(Proxy, Construction) {
     const auto entity = registry.create();
     
     entt::proxy proxy1;
-    entt::proxy proxy2{entity, registry};
+    entt::proxy proxy2{registry, entity};
     entt::const_proxy proxy3;
-    entt::const_proxy proxy4{entity, cregistry};
+    entt::const_proxy proxy4{cregistry, entity};
     
     // ASSERT_EQ(entt::null, proxy1.entity());
     ASSERT_TRUE(entt::null == proxy1.entity());
@@ -47,7 +47,7 @@ TEST(Proxy, Component) {
 
     entt::registry registry;
     const auto entity = registry.create();
-    entt::proxy proxy{entity, registry};
+    entt::proxy proxy{registry, entity};
     
     ASSERT_EQ(1, proxy.emplace<int>(1));
     ASSERT_EQ(2, proxy.emplace_or_replace<int>(2));
@@ -93,7 +93,7 @@ TEST(Proxy, FromEntity) {
     registry.emplace<int>(entity, 42);
     registry.emplace<char>(entity, 'c');
 
-    entt::proxy proxy{entity, registry};
+    entt::proxy proxy{registry, entity};
 
     ASSERT_TRUE(proxy);
     ASSERT_EQ(entity, proxy.entity());
@@ -105,7 +105,7 @@ TEST(Proxy, FromEntity) {
 TEST(Proxy, Lifetime) {
     entt::registry registry;
     const auto entity = registry.create();
-    auto *proxy = new entt::proxy{entity, registry};
+    auto *proxy = new entt::proxy{registry, entity};
     proxy->emplace<int>();
 
     ASSERT_FALSE(registry.empty<int>());
@@ -128,8 +128,8 @@ TEST(Proxy, DeductionGuides) {
     const auto &cregistry = registry;
     const my_entity entity = registry.create();
 
-    entt::basic_proxy proxy1{entity, registry};
-    entt::basic_proxy proxy2{entity, cregistry};
+    entt::basic_proxy proxy1{registry, entity};
+    entt::basic_proxy proxy2{cregistry, entity};
     
     static_assert(std::is_same_v<decltype(proxy1), entt::basic_proxy<my_entity>>);
     static_assert(std::is_same_v<decltype(proxy2), entt::basic_proxy<const my_entity>>);
@@ -146,7 +146,7 @@ int get_int(entt::const_proxy proxy) {
 TEST(Proxy, ImplicitConversions) {
     entt::registry registry;
     const auto entity = registry.create();
-    const entt::proxy proxy{entity, registry};
+    const entt::proxy proxy{registry, entity};
 
     add_int(proxy, 42);
     ASSERT_EQ(42, get_int(proxy));
