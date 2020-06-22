@@ -78,13 +78,13 @@ inline constexpr auto has_meta_associative_container_traits_v = has_meta_associa
  * @tparam Type Potentially key-only meta associative container type.
  */
 template<typename, typename = void>
-struct is_key_only_meta_associative_container: std::false_type {};
+struct is_key_only_meta_associative_container: std::true_type {};
 
 
 /*! @copydoc is_key_only_meta_associative_container */
 template<typename Type>
 struct is_key_only_meta_associative_container<Type, std::void_t<typename meta_associative_container_traits<Type>::mapped_type>>
-        : std::true_type
+        : std::false_type
 {};
 
 

@@ -137,15 +137,15 @@ TEST(MetaAssociativeContainer, StdMap) {
     ASSERT_TRUE(first != last);
 
     ASSERT_NE(first, last);
-    ASSERT_EQ(((*(first++)).cast<std::pair<const int, char>>()), (std::pair<const int, char>{2, 'c'}));
-    ASSERT_EQ(((*(++first++)).cast<std::pair<const int, char>>()), (std::pair<const int, char>{4, 'e'}));
+    ASSERT_EQ((*(first++)).first.cast<int>(), 2);
+    ASSERT_EQ((*(++first)).second.cast<char>(), 'e');
     ASSERT_NE(first++, last);
     ASSERT_EQ(first, last);
 
     ASSERT_TRUE(first == last);
     ASSERT_FALSE(first != last);
 
-    ASSERT_EQ(((*view.find(3)).cast<std::pair<const int, char>>()), (std::pair<const int, char>{3, 'd'}));
+    ASSERT_EQ((*view.find(3)).second.cast<char>(), 'd');
 
     ASSERT_FALSE(view.insert('a', 'a'));
     ASSERT_FALSE(view.insert(1, 1));
@@ -154,16 +154,16 @@ TEST(MetaAssociativeContainer, StdMap) {
     ASSERT_TRUE(view.insert(1, 'b'));
 
     ASSERT_EQ(view.size(), 5u);
-    ASSERT_EQ(((*view.find(0)).cast<std::pair<const int, char>>()), (std::pair<const int, char>{0, 'a'}));
-    ASSERT_EQ(((*view.find(1)).cast<std::pair<const int, char>>()), (std::pair<const int, char>{1, 'b'}));
+    ASSERT_EQ((*view.find(0)).second.cast<char>(), 'a');
+    ASSERT_EQ((*view.find(1)).second.cast<char>(), 'b');
 
     ASSERT_TRUE(view.erase(0));
     ASSERT_EQ(view.size(), 4u);
     ASSERT_EQ(view.find(0), view.end());
 
-    (*view.find(1)).cast<std::pair<const int, char>>().second = 'f';
+    (*view.find(1)).second.cast<char>() = 'f';
 
-    ASSERT_EQ(((*view.find(1)).cast<std::pair<const int, char>>()), (std::pair<const int, char>{1, 'f'}));
+    ASSERT_EQ((*view.find(1)).second.cast<char>(), 'f');
 }
 
 TEST(MetaAssociativeContainer, StdSet) {
@@ -182,15 +182,16 @@ TEST(MetaAssociativeContainer, StdSet) {
     ASSERT_TRUE(first != last);
 
     ASSERT_NE(first, last);
-    ASSERT_EQ((*(first++)).cast<int>(), 2);
-    ASSERT_EQ((*(++first++)).cast<int>(), 4);
+    ASSERT_FALSE((*first).second);
+    ASSERT_EQ((*(first++)).first.cast<int>(), 2);
+    ASSERT_EQ((*(++first)).first.cast<int>(), 4);
     ASSERT_NE(first++, last);
     ASSERT_EQ(first, last);
 
     ASSERT_TRUE(first == last);
     ASSERT_FALSE(first != last);
 
-    ASSERT_EQ((*view.find(3)).cast<int>(), 3);
+    ASSERT_EQ((*view.find(3)).first.cast<int>(), 3);
 
     ASSERT_FALSE(view.insert('0'));
 
@@ -198,14 +199,14 @@ TEST(MetaAssociativeContainer, StdSet) {
     ASSERT_TRUE(view.insert(1));
 
     ASSERT_EQ(view.size(), 5u);
-    ASSERT_EQ((*view.find(0)).cast<int>(), 0);
-    ASSERT_EQ((*view.find(1)).cast<int>(), 1);
+    ASSERT_EQ((*view.find(0)).first.cast<int>(), 0);
+    ASSERT_EQ((*view.find(1)).first.cast<int>(), 1);
 
     ASSERT_TRUE(view.erase(0));
     ASSERT_EQ(view.size(), 4u);
     ASSERT_EQ(view.find(0), view.end());
 
-    (*view.find(1)).cast<int>() = 42;
+    (*view.find(1)).first.cast<int>() = 42;
 
-    ASSERT_EQ((*view.find(1)).cast<int>(), 1);
+    ASSERT_EQ((*view.find(1)).first.cast<int>(), 1);
 }

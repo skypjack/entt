@@ -585,16 +585,22 @@ differences in behavior in the case of key-only containers. In particular:
   used to iterate the container directly:
 
   ```cpp
-  for(entt::meta_any element: view) {
+  for(std::pair<entt::meta_any, entt::meta_any> element: view) {
       // ...
   }
   ```
 
   In all cases, given an underlying container of type `C`, the returned element
-  contains an object of type `C::value_type` which therefore depends on the
-  actual container.<br/>
+  is a key-value pair where the key has type `C::key_type` and the value has
+  type `C::mapped_type`. Since key-only containers don't have a mapped type,
+  their _value_ is nothing more than an invalid `meta_any` object.<br/>
   All meta iterators are input iterators and don't offer an indirection operator
   on purpose.
+
+  While the accessed key is usually constant in the associative containers and
+  is therefore returned by copy, the value (if any) is wrapped by an instance of
+  `meta_any` that directly refers to the actual element. Modifying it will then
+  directly modify the element inside the container.
 
 * The `insert` member function can be used to add elements to the container. It
   accepts two arguments, respectively the key and the value to be inserted:

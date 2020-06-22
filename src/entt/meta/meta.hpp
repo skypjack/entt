@@ -22,13 +22,14 @@ namespace entt {
 
 class meta_type;
 class meta_any;
-class meta_iterator;
 
 
 /*! @brief Proxy object for sequence containers. */
 class meta_sequence_container {
     template<typename>
     struct meta_sequence_container_proxy;
+
+    class meta_iterator;
 
 public:
     /*! @brief Unsigned integer type. */
@@ -71,6 +72,8 @@ private:
 class meta_associative_container {
     template<typename>
     struct meta_associative_container_proxy;
+
+    class meta_iterator;
 
 public:
     /*! @brief Unsigned integer type. */
@@ -1486,8 +1489,11 @@ private:
 }
 
 
-/*! @brief Opaque iterator for meta containers. */
-class meta_iterator {
+/*! @brief Opaque iterator for meta sequence containers. */
+class meta_sequence_container::meta_iterator {
+    /*! @brief A meta sequence container can access the underlying iterator. */
+    friend class meta_sequence_container;
+
     template<typename Type>
     static void incr(meta_any any) {
         ++any.cast<typename Type::iterator>();
@@ -1518,7 +1524,7 @@ public:
     meta_iterator() ENTT_NOEXCEPT
         : next_fn{nullptr},
           get_fn{nullptr},
-          it{}
+          handle{}
     {}
 
     /**
@@ -1530,18 +1536,18 @@ public:
     meta_iterator(std::in_place_type_t<Type>, typename Type::iterator iter)
         : next_fn{&incr<Type>},
           get_fn{&deref<Type>},
-          it{std::move(iter)}
+          handle{std::move(iter)}
     {}
 
     /*! @brief Pre-increment operator. @return This iterator. */
     meta_iterator & operator++() ENTT_NOEXCEPT {
-        return next_fn(it.ref()), *this;
+        return next_fn(handle.ref()), *this;
     }
 
     /*! @brief Post-increment operator. @return This iterator. */
     meta_iterator operator++(int) ENTT_NOEXCEPT {
         meta_iterator orig = *this;
-        return next_fn(it.ref()), orig;
+        return next_fn(handle.ref()), orig;
     }
 
     /**
@@ -1551,7 +1557,7 @@ public:
      * otherwise.
      */
     [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
-        return it == other.it;
+        return handle == other.handle;
     }
 
     /**
@@ -1569,15 +1575,7 @@ public:
      * @return The element to which the meta pointer points.
      */
     [[nodiscard]] reference operator*() const {
-        return get_fn(it.ref());
-    }
-
-    /**
-     * @brief Returns a handle to the underlying iterator.
-     * @return The actual iterator, properly wrapped.
-     */
-    [[nodiscard]] meta_any handle() const ENTT_NOEXCEPT {
-        return it.ref();
+        return get_fn(handle.ref());
     }
 
     /**
@@ -1585,13 +1583,13 @@ public:
      * @return False if the iterator is invalid, true otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return static_cast<bool>(it);
+        return static_cast<bool>(handle);
     }
 
 private:
     void(* next_fn)(meta_any);
     meta_any(* get_fn)(meta_any);
-    entt::meta_any it;
+    entt::meta_any handle;
 };
 
 
@@ -1625,14 +1623,14 @@ struct meta_sequence_container::meta_sequence_container_proxy {
         std::pair<typename meta_sequence_container_traits<Type>::iterator, bool> ret{{}, false};
 
         if(const auto *value = any.try_cast<typename meta_sequence_container_traits<Type>::value_type>(); value) {
-            ret = meta_sequence_container_traits<Type>::insert(*static_cast<Type *>(container), it.handle().cast<typename meta_sequence_container_traits<Type>::iterator>(), *value);
+            ret = meta_sequence_container_traits<Type>::insert(*static_cast<Type *>(container), it.handle.cast<typename meta_sequence_container_traits<Type>::iterator>(), *value);
         }
 
         return {iterator{std::in_place_type<Type>, std::move(ret.first)}, ret.second};
     }
 
     [[nodiscard]] static std::pair<iterator, bool> erase(void *container, iterator it) {
-        auto ret = meta_sequence_container_traits<Type>::erase(*static_cast<Type *>(container), it.handle().cast<typename meta_sequence_container_traits<Type>::iterator>());
+        auto ret = meta_sequence_container_traits<Type>::erase(*static_cast<Type *>(container), it.handle.cast<typename meta_sequence_container_traits<Type>::iterator>());
         return {iterator{std::in_place_type<Type>, std::move(ret.first)}, ret.second};
     }
 
@@ -1778,6 +1776,123 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 }
 
 
+/*! @brief Opaque iterator for meta associative containers. */
+class meta_associative_container::meta_iterator {
+    template<typename Type>
+    static void incr(meta_any any) {
+        ++any.cast<typename Type::iterator>();
+    }
+
+    template<typename Type>
+    [[nodiscard]] static meta_any key(meta_any any) {
+        if constexpr(is_key_only_meta_associative_container_v<Type>) {
+            return *any.cast<typename Type::iterator>();
+        } else {
+            return any.cast<typename Type::iterator>()->first;
+        }
+    }
+
+    template<typename Type>
+    [[nodiscard]] static meta_any value(meta_any any) {
+        if constexpr(is_key_only_meta_associative_container_v<Type>) {
+            return meta_any{};
+        } else {
+            if constexpr(std::is_const_v<std::remove_reference_t<decltype(std::declval<typename Type::iterator>()->second)>>) {
+                return any.cast<typename Type::iterator>().second;
+            } else {
+                return std::ref(any.cast<typename Type::iterator>()->second);
+            }
+        }
+    }
+
+public:
+    /*! @brief Signed integer type. */
+    using difference_type = std::ptrdiff_t;
+    /*! @brief Type of elements returned by the iterator. */
+    using value_type = std::pair<meta_any, meta_any>;
+    /*! @brief Pointer type, `void` on purpose. */
+    using pointer = void;
+    /*! @brief Reference type, it is **not** an actual reference. */
+    using reference = value_type;
+    /*! @brief Iterator category. */
+    using iterator_category = std::input_iterator_tag;
+
+    /*! @brief Default constructor. */
+    meta_iterator() ENTT_NOEXCEPT
+        : next_fn{nullptr},
+          key_fn{nullptr},
+          value_fn{nullptr},
+          handle{}
+    {}
+
+    /**
+     * @brief Constructs a meta iterator from a given iterator.
+     * @tparam Type Type of container to which the iterator belongs.
+     * @param iter The actual iterator with which to build the meta iterator.
+     */
+    template<typename Type>
+    meta_iterator(std::in_place_type_t<Type>, typename Type::iterator iter)
+        : next_fn{&incr<Type>},
+          key_fn{&key<Type>},
+          value_fn{&value<Type>},
+          handle{std::move(iter)}
+    {}
+
+    /*! @brief Pre-increment operator. @return This iterator. */
+    meta_iterator & operator++() ENTT_NOEXCEPT {
+        return next_fn(handle.ref()), *this;
+    }
+
+    /*! @brief Post-increment operator. @return This iterator. */
+    meta_iterator operator++(int) ENTT_NOEXCEPT {
+        meta_iterator orig = *this;
+        return next_fn(handle.ref()), orig;
+    }
+
+    /**
+     * @brief Checks if two meta iterators refer to the same element.
+     * @param other The meta iterator with which to compare.
+     * @return True if the two meta iterators refer to the same element, false
+     * otherwise.
+     */
+    [[nodiscard]] bool operator==(const meta_iterator &other) const ENTT_NOEXCEPT {
+        return handle == other.handle;
+    }
+
+    /**
+     * @brief Checks if two meta iterators refer to the same element.
+     * @param other The meta iterator with which to compare.
+     * @return False if the two meta iterators refer to the same element, true
+     * otherwise.
+     */
+    [[nodiscard]] bool operator!=(const meta_iterator &other) const ENTT_NOEXCEPT {
+        return !(*this == other);
+    }
+
+    /**
+     * @brief Indirection operator.
+     * @return The element to which the meta pointer points.
+     */
+    [[nodiscard]] reference operator*() const {
+        return { key_fn(handle.ref()), value_fn(handle.ref()) };
+    }
+
+    /**
+     * @brief Returns false if an iterator is invalid, true otherwise.
+     * @return False if the iterator is invalid, true otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return static_cast<bool>(handle);
+    }
+
+private:
+    void(* next_fn)(meta_any);
+    meta_any(* key_fn)(meta_any);
+    meta_any(* value_fn)(meta_any);
+    entt::meta_any handle;
+};
+
+
 template<typename Type>
 struct meta_associative_container::meta_associative_container_proxy {
     [[nodiscard]] static meta_type key_type() {
@@ -1786,9 +1901,9 @@ struct meta_associative_container::meta_associative_container_proxy {
 
     [[nodiscard]] static meta_type mapped_type() {
         if constexpr(is_key_only_meta_associative_container_v<Type>) {
-            return internal::meta_info<typename meta_associative_container_traits<Type>::mapped_type>::resolve();
-        } else {
             return meta_type{};
+        } else {
+            return internal::meta_info<typename meta_associative_container_traits<Type>::mapped_type>::resolve();
         }
     }
 
@@ -1817,11 +1932,11 @@ struct meta_associative_container::meta_associative_container_proxy {
 
         if(const auto *k_ptr = key.try_cast<typename meta_associative_container_traits<Type>::key_type>(); k_ptr) {
             if constexpr(is_key_only_meta_associative_container_v<Type>) {
+                ret = meta_associative_container_traits<Type>::insert(*static_cast<Type *>(container), *k_ptr);
+            } else {
                 if(auto *m_ptr = value.try_cast<typename meta_associative_container_traits<Type>::mapped_type>(); m_ptr) {
                     ret = meta_associative_container_traits<Type>::insert(*static_cast<Type *>(container), *k_ptr, *m_ptr);
                 }
-            } else {
-                ret = meta_associative_container_traits<Type>::insert(*static_cast<Type *>(container), *k_ptr);
             }
         }
 
