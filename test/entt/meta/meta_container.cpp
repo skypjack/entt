@@ -66,6 +66,9 @@ TEST(MetaSequenceContainer, StdVector) {
     ASSERT_TRUE(ret.second);
     ASSERT_EQ(view.size(), 4u);
     ASSERT_EQ((*ret.first).cast<int>(), 1);
+
+    ASSERT_TRUE(view.clear());
+    ASSERT_EQ(view.size(), 0u);
 }
 
 TEST(MetaSequenceContainer, StdArray) {
@@ -119,6 +122,20 @@ TEST(MetaSequenceContainer, StdArray) {
     ASSERT_FALSE(ret.second);
     ASSERT_EQ(view.size(), 3u);
     ASSERT_EQ((*it).cast<int>(), 2);
+
+    ASSERT_FALSE(view.clear());
+    ASSERT_EQ(view.size(), 3u);
+}
+
+TEST(MetaAssociativeContainer, Empty) {
+    entt::meta_associative_container container{};
+
+    ASSERT_FALSE(container);
+
+    entt::meta_any any{std::map<int, char>{}};
+    container = any.as_associative_container();
+
+    ASSERT_TRUE(container);
 }
 
 TEST(MetaAssociativeContainer, StdMap) {
@@ -128,6 +145,9 @@ TEST(MetaAssociativeContainer, StdMap) {
     auto view = any.as_associative_container();
 
     ASSERT_TRUE(view);
+    ASSERT_EQ(view.key_type(), entt::resolve<int>());
+    ASSERT_EQ(view.mapped_type(), entt::resolve<char>());
+    ASSERT_EQ(view.value_type(), (entt::resolve<std::pair<const int, char>>()));
     ASSERT_EQ(view.size(), 3u);
 
     auto first = view.begin();
@@ -164,6 +184,9 @@ TEST(MetaAssociativeContainer, StdMap) {
     (*view.find(1)).second.cast<char>() = 'f';
 
     ASSERT_EQ((*view.find(1)).second.cast<char>(), 'f');
+
+    ASSERT_TRUE(view.clear());
+    ASSERT_EQ(view.size(), 0u);
 }
 
 TEST(MetaAssociativeContainer, StdSet) {
@@ -173,6 +196,9 @@ TEST(MetaAssociativeContainer, StdSet) {
     auto view = any.as_associative_container();
 
     ASSERT_TRUE(view);
+    ASSERT_EQ(view.key_type(), entt::resolve<int>());
+    ASSERT_EQ(view.mapped_type(), entt::meta_type{});
+    ASSERT_EQ(view.value_type(), entt::resolve<int>());
     ASSERT_EQ(view.size(), 3u);
 
     auto first = view.begin();
@@ -209,4 +235,7 @@ TEST(MetaAssociativeContainer, StdSet) {
     (*view.find(1)).first.cast<int>() = 42;
 
     ASSERT_EQ((*view.find(1)).first.cast<int>(), 1);
+
+    ASSERT_TRUE(view.clear());
+    ASSERT_EQ(view.size(), 0u);
 }
