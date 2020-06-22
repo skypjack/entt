@@ -25,7 +25,6 @@ Next:
  - update documentation to describe alternatives
 
 * WIP:
- - static constexpr -> inline constexpr
  - remove internal::find_if
  - add const meta container support to meta any
  - review _t

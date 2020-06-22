@@ -5,6 +5,8 @@ conan/test_package/build
 *.user
 .idea
 .vscode
+.vs
+CMakeSettings.json
 
 # Bazel
 /bazel-*

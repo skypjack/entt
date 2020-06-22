@@ -106,8 +106,8 @@ TEST(MetaSequenceContainer, StdArray) {
     auto ret = view.insert(it, 0);
 
     ASSERT_FALSE(ret.second);
-    ASSERT_FALSE(view.insert(ret.first, 'c').second);
-    ASSERT_FALSE(view.insert(++ret.first, 1).second);
+    ASSERT_FALSE(view.insert(it, 'c').second);
+    ASSERT_FALSE(view.insert(++it, 1).second);
 
     ASSERT_EQ(view.size(), 3u);
     ASSERT_EQ((*view.begin()).cast<int>(), 2);
