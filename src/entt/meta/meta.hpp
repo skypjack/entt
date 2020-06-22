@@ -69,14 +69,6 @@ private:
 
 /*! @brief Proxy object for associative containers. */
 class meta_associative_container {
-    template<typename, typename = void>
-    struct has_mapped_type: std::false_type {};
-
-    template<typename Type>
-    struct has_mapped_type<Type, std::void_t<typename meta_associative_container_traits<Type>::mapped_type>>
-            : std::true_type
-    {};
-
     template<typename>
     struct meta_associative_container_proxy;
 
@@ -1788,14 +1780,12 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 
 template<typename Type>
 struct meta_associative_container::meta_associative_container_proxy {
-    static constexpr auto has_mapped_type = meta_associative_container::has_mapped_type<Type>::value;
-
     [[nodiscard]] static meta_type key_type() {
         return internal::meta_info<typename meta_associative_container_traits<Type>::key_type>::resolve();
     }
 
     [[nodiscard]] static meta_type mapped_type() {
-        if constexpr(has_mapped_type) {
+        if constexpr(is_key_only_meta_associative_container_v<Type>) {
             return internal::meta_info<typename meta_associative_container_traits<Type>::mapped_type>::resolve();
         } else {
             return meta_type{};
@@ -1826,7 +1816,7 @@ struct meta_associative_container::meta_associative_container_proxy {
         bool ret = false;
 
         if(const auto *k_ptr = key.try_cast<typename meta_associative_container_traits<Type>::key_type>(); k_ptr) {
-            if constexpr(has_mapped_type) {
+            if constexpr(is_key_only_meta_associative_container_v<Type>) {
                 if(auto *m_ptr = value.try_cast<typename meta_associative_container_traits<Type>::mapped_type>(); m_ptr) {
                     ret = meta_associative_container_traits<Type>::insert(*static_cast<Type *>(container), *k_ptr, *m_ptr);
                 }
@@ -1867,7 +1857,7 @@ struct meta_associative_container::meta_associative_container_proxy {
  */
 template<typename Type>
 meta_associative_container::meta_associative_container(Type &container)
-    : key_only_container{!meta_associative_container_proxy<Type>::has_mapped_type},
+    : key_only_container{!is_key_only_meta_associative_container_v<Type>},
       key_type_fn{&meta_associative_container_proxy<Type>::key_type},
       mapped_type_fn{&meta_associative_container_proxy<Type>::mapped_type},
       value_type_fn{&meta_associative_container_proxy<Type>::value_type},
