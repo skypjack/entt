@@ -156,7 +156,7 @@ template<typename Entity>
 
 /**
  * Internal details not to be documented.
- * @endcond TURN_OFF_DOXYGEN
+ * @endcond
  */
 
 

@@ -55,7 +55,7 @@ struct choice_t
         // Unfortunately, doxygen cannot parse such a construct.
         /*! @cond TURN_OFF_DOXYGEN */
         : choice_t<N-1>
-        /*! @endcond TURN_OFF_DOXYGEN */
+        /*! @endcond */
 {};
 
 
@@ -241,18 +241,18 @@ using member_class_t = typename member_class<Member>::type;
 
 
 #define ENTT_OPAQUE_TYPE(clazz, type)\
-    /**\
-     * @brief Defines an enum class to use for opaque identifiers and a\
-     * dedicate `to_integer` function to convert the identifiers to their\
-     * underlying type.\
-     * @param clazz The name to use for the enum class.\
-     * @param type The underlying type for the enum class.\
+    /*!\
+       @brief Defines an enum class to use for opaque identifiers and a\
+       dedicate `to_integral` function to convert the identifiers to their\
+       underlying type.\
+       @param clazz The name to use for the enum class.\
+       @param type The underlying type for the enum class.\
      */\
     enum class clazz: type {};\
-    /**\
-     * @brief Converts an opaque type value to its underlying type.\
-     * @param id The value to convert.\
-     * @return The integral representation of the given value.
+    /*!\
+       @brief Converts an opaque type value to its underlying type.\
+       @param id The value to convert.\
+       @return The integral representation of the given value.
      */\
     [[nodiscard]] constexpr auto to_integral(const clazz id) ENTT_NOEXCEPT {\
         return static_cast<std::underlying_type_t<clazz>>(id);\

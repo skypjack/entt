@@ -45,7 +45,7 @@ struct fnv1a_traits<std::uint64_t> {
 
 /**
  * Internal details not to be documented.
- * @endcond TURN_OFF_DOXYGEN
+ * @endcond
  */
 
 

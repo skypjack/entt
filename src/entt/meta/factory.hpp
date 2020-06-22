@@ -190,7 +190,7 @@ template<typename Type, auto Candidate, typename Policy, std::size_t... Indexes>
 
 /**
  * Internal details not to be documented.
- * @endcond TURN_OFF_DOXYGEN
+ * @endcond
  */
 
 

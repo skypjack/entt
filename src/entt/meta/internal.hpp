@@ -445,7 +445,7 @@ struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> 
 
 /**
  * Internal details not to be documented.
- * @endcond TURN_OFF_DOXYGEN
+ * @endcond
  */
 
 
