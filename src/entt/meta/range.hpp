@@ -74,7 +74,7 @@ public:
      * @brief Returns an iterator to the beginning.
      * @return An iterator to the first meta object of the range.
      */
-    iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
         return iterator{node};
     }
 
@@ -83,7 +83,7 @@ public:
      * @return An iterator to the element following the last meta object of the
      * range.
      */
-    iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return iterator{};
     }
 

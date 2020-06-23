@@ -127,17 +127,15 @@ class meta_any {
 
     template<typename Type>
     [[nodiscard]] static meta_any dereference_operator(meta_any &any) {
-        meta_any other{};
-
         if constexpr(is_meta_pointer_like_v<Type>) {
             if constexpr(std::is_const_v<std::remove_reference_t<decltype(*std::declval<Type>())>>) {
-                other = *any.cast<Type>();
+                return *any.cast<Type>();
             } else {
-                other = std::ref(*any.cast<Type>());
+                return std::ref(*any.cast<Type>());
             }
+        } else {
+            return {};
         }
-
-        return other;
     }
 
     template<typename Type>
@@ -676,7 +674,7 @@ struct meta_ctor {
      * @brief Returns a range to use to visit all meta properties.
      * @return An iterable range to use to visit all meta properties.
      */
-    meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
     }
 
@@ -787,7 +785,7 @@ struct meta_data {
     }
 
     /*! @copydoc meta_ctor::prop */
-    meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
     }
 
@@ -913,7 +911,7 @@ struct meta_func {
     }
 
     /*! @copydoc meta_ctor::prop */
-    meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
     }
 
@@ -1159,7 +1157,7 @@ public:
      * @brief Returns a range to use to visit top-level meta bases.
      * @return An iterable range to use to visit top-level meta bases.
      */
-    meta_range<meta_base> base() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_range<meta_base> base() const ENTT_NOEXCEPT {
         return node->base;
     }
 
@@ -1194,7 +1192,7 @@ public:
      * @return An iterable range to use to visit top-level meta conversion
      * functions.
      */
-    meta_range<meta_conv> conv() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_range<meta_conv> conv() const ENTT_NOEXCEPT {
         return node->conv;
     }
 
@@ -1228,7 +1226,7 @@ public:
      * @brief Returns a range to use to visit top-level meta constructors.
      * @return An iterable range to use to visit top-level meta constructors.
      */
-    meta_range<meta_ctor> ctor() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_range<meta_ctor> ctor() const ENTT_NOEXCEPT {
         return node->ctor;
     }
 
@@ -1259,7 +1257,7 @@ public:
      * @brief Returns a range to use to visit top-level meta data.
      * @return An iterable range to use to visit top-level meta data.
      */
-    meta_range<meta_data> data() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_range<meta_data> data() const ENTT_NOEXCEPT {
         return node->data;
     }
 
@@ -1295,7 +1293,7 @@ public:
      * @brief Returns a range to use to visit top-level meta functions.
      * @return An iterable range to use to visit top-level meta functions.
      */
-    meta_range<meta_func> func() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_range<meta_func> func() const ENTT_NOEXCEPT {
         return node->func;
     }
 
@@ -1358,7 +1356,7 @@ public:
      * @brief Returns a range to use to visit top-level meta properties.
      * @return An iterable range to use to visit top-level meta properties.
      */
-    meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
+    [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
     }
 

@@ -26,7 +26,7 @@ template<typename Type>
  * @brief Returns a range to use to visit all meta types.
  * @return An iterable range to use to visit all meta types.
  */
-inline meta_range<meta_type> resolve() {
+[[nodiscard]] inline meta_range<meta_type> resolve() {
     return *internal::meta_context::global();
 }
 

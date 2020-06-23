@@ -345,11 +345,11 @@ public:
         : node{head}
     {}
 
-    iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
         return iterator{node};
     }
 
-    iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return iterator{};
     }
 
