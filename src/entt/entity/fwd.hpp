@@ -44,7 +44,7 @@ class basic_snapshot_loader;
 template<typename>
 class basic_continuous_loader;
 
-/*! @class entity */
+/*! @enum entity */
 enum class entity: id_type;
 
 /*! @brief Alias declaration for the most common use case. */
