@@ -1,10 +1,18 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/container.hpp>
+#include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 
-TEST(MetaSequenceContainer, Empty) {
+struct MetaContainer: ::testing::Test {
+    static void SetUpTestCase() {
+        entt::meta<double>().conv<int>();
+        entt::meta<int>().conv<char>();
+    }
+};
+
+TEST_F(MetaContainer, EmptySequenceContainer) {
     entt::meta_sequence_container container{};
 
     ASSERT_FALSE(container);
@@ -15,7 +23,7 @@ TEST(MetaSequenceContainer, Empty) {
     ASSERT_TRUE(container);
 }
 
-TEST(MetaSequenceContainer, StdVector) {
+TEST_F(MetaContainer, StdVector) {
     std::vector<int> vec{};
     entt::meta_any any{std::ref(vec)};
 
@@ -54,7 +62,7 @@ TEST(MetaSequenceContainer, StdVector) {
 
     ASSERT_TRUE(ret.second);
     ASSERT_FALSE(view.insert(ret.first, 'c').second);
-    ASSERT_TRUE(view.insert(++ret.first, 1).second);
+    ASSERT_TRUE(view.insert(++ret.first, 1.).second);
 
     ASSERT_EQ(view.size(), 5u);
     ASSERT_EQ((*view.begin()).cast<int>(), 0);
@@ -71,7 +79,7 @@ TEST(MetaSequenceContainer, StdVector) {
     ASSERT_EQ(view.size(), 0u);
 }
 
-TEST(MetaSequenceContainer, StdArray) {
+TEST_F(MetaContainer, StdArray) {
     std::array<int, 3> arr{};
     entt::meta_any any{std::ref(arr)};
 
@@ -127,7 +135,7 @@ TEST(MetaSequenceContainer, StdArray) {
     ASSERT_EQ(view.size(), 3u);
 }
 
-TEST(MetaAssociativeContainer, Empty) {
+TEST_F(MetaContainer, EmptyAssociativeContainer) {
     entt::meta_associative_container container{};
 
     ASSERT_FALSE(container);
@@ -138,7 +146,7 @@ TEST(MetaAssociativeContainer, Empty) {
     ASSERT_TRUE(container);
 }
 
-TEST(MetaAssociativeContainer, StdMap) {
+TEST_F(MetaContainer, StdMap) {
     std::map<int, char> map{{2, 'c'}, {3, 'd'}, {4, 'e'}};
     entt::meta_any any{std::ref(map)};
 
@@ -169,10 +177,10 @@ TEST(MetaAssociativeContainer, StdMap) {
     ASSERT_EQ((*view.find(3)).second.cast<char>(), 'd');
 
     ASSERT_FALSE(view.insert('a', 'a'));
-    ASSERT_FALSE(view.insert(1, 1));
+    ASSERT_FALSE(view.insert(1, 1.));
 
     ASSERT_TRUE(view.insert(0, 'a'));
-    ASSERT_TRUE(view.insert(1, 'b'));
+    ASSERT_TRUE(view.insert(1., static_cast<int>('b')));
 
     ASSERT_EQ(view.size(), 5u);
     ASSERT_EQ((*view.find(0)).second.cast<char>(), 'a');
@@ -190,7 +198,7 @@ TEST(MetaAssociativeContainer, StdMap) {
     ASSERT_EQ(view.size(), 0u);
 }
 
-TEST(MetaAssociativeContainer, StdSet) {
+TEST_F(MetaContainer, StdSet) {
     std::set<int> set{2, 3, 4};
     entt::meta_any any{std::ref(set)};
 

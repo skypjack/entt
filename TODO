@@ -26,5 +26,4 @@ Next:
 
 * WIP:
  - remove internal::find_if
- - add const meta container support to meta any
- - review _t
+ - add cast_or_convert to meta_any, clean up codebase

@@ -1619,11 +1619,12 @@ struct meta_sequence_container::meta_sequence_container_proxy {
         return iterator{std::in_place_type<Type>, meta_sequence_container_traits<Type>::end(*static_cast<Type *>(container))};
     }
 
-    [[nodiscard]] static std::pair<iterator, bool> insert(void *container, iterator it, meta_any any) {
+    [[nodiscard]] static std::pair<iterator, bool> insert(void *container, iterator it, meta_any value) {
+        using v_type = typename meta_sequence_container_traits<Type>::value_type;
         std::pair<typename meta_sequence_container_traits<Type>::iterator, bool> ret{{}, false};
 
-        if(const auto *value = any.try_cast<typename meta_sequence_container_traits<Type>::value_type>(); value) {
-            ret = meta_sequence_container_traits<Type>::insert(*static_cast<Type *>(container), it.handle.cast<typename meta_sequence_container_traits<Type>::iterator>(), *value);
+        if(const auto *v_ptr = value.try_cast<v_type>(); v_ptr || value.convert<v_type>()) {
+            ret = meta_sequence_container_traits<Type>::insert(*static_cast<Type *>(container), it.handle.cast<typename meta_sequence_container_traits<Type>::iterator>(), v_ptr ? *v_ptr : value.cast<v_type>());
         }
 
         return {iterator{std::in_place_type<Type>, std::move(ret.first)}, ret.second};
@@ -1928,14 +1929,17 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool insert(void *container, meta_any key, meta_any value) {
+        using k_type = typename meta_associative_container_traits<Type>::key_type;
         bool ret = false;
 
-        if(const auto *k_ptr = key.try_cast<typename meta_associative_container_traits<Type>::key_type>(); k_ptr) {
+        if(const auto *k_ptr = key.try_cast<k_type>(); k_ptr || key.convert<k_type>()) {
             if constexpr(is_key_only_meta_associative_container_v<Type>) {
-                ret = meta_associative_container_traits<Type>::insert(*static_cast<Type *>(container), *k_ptr);
+                ret = meta_associative_container_traits<Type>::insert(*static_cast<Type *>(container), k_ptr ? *k_ptr : key.cast<k_type>());
             } else {
-                if(auto *m_ptr = value.try_cast<typename meta_associative_container_traits<Type>::mapped_type>(); m_ptr) {
-                    ret = meta_associative_container_traits<Type>::insert(*static_cast<Type *>(container), *k_ptr, *m_ptr);
+                using m_type = typename meta_associative_container_traits<Type>::mapped_type;
+
+                if(auto *m_ptr = value.try_cast<m_type>(); m_ptr || value.convert<m_type>()) {
+                    ret = meta_associative_container_traits<Type>::insert(*static_cast<Type *>(container), k_ptr ? *k_ptr : key.cast<k_type>(), m_ptr ? *m_ptr : value.cast<m_type>());
                 }
             }
         }
