@@ -7,6 +7,7 @@
 [![Build Status](https://github.com/skypjack/entt/workflows/build/badge.svg)](https://github.com/skypjack/entt/actions)
 [![Coverage](https://codecov.io/gh/skypjack/entt/branch/master/graph/badge.svg)](https://codecov.io/gh/skypjack/entt)
 [![Try online](https://img.shields.io/badge/try-online-brightgreen)](https://godbolt.org/z/cOUcm1)
+[![Documentation](https://img.shields.io/badge/docs-docsforge-blue)](http://entt.docsforge.com/)
 [![Gitter chat](https://badges.gitter.im/skypjack/entt.png)](https://gitter.im/skypjack/entt)
 [![Discord channel](https://img.shields.io/discord/707607951396962417?logo=discord)](https://discord.gg/5BjPWBd)
 [![Donate](https://img.shields.io/badge/donate-paypal-blue.svg)](https://www.paypal.me/skypjack)
@@ -269,8 +270,11 @@ The API reference will be created in HTML format within the directory
 <!--
 @cond TURN_OFF_DOXYGEN
 -->
-It's also available [online](https://skypjack.github.io/entt/) for the latest
-version, that is the last stable tag.<br/>
+The same version is also available [online](https://skypjack.github.io/entt/)
+for the latest release, that is the last stable tag. If you are looking for
+something more pleasing to the eye, consider reading the nice-looking version
+available on [docsforge](https://entt.docsforge.com/): same documentation, much
+more pleasant to read.<br/>
 Moreover, there exists a [wiki](https://github.com/skypjack/entt/wiki) dedicated
 to the project where users can find all related documentation pages.
 <!--
