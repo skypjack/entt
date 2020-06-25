@@ -21,7 +21,7 @@ namespace entt {
  * @code{.cpp}
  * struct my_resource {};
  *
- * struct my_loader: entt::loader<my_loader, my_resource> {
+ * struct my_loader: entt::resource_loader<my_loader, my_resource> {
  *     std::shared_ptr<my_resource> load(int) const {
  *         // use the integer value somehow
  *         return std::make_shared<my_resource>();
@@ -42,9 +42,9 @@ namespace entt {
  * @tparam Resource Type of resource for which to use the loader.
  */
 template<typename Loader, typename Resource>
-class loader {
+class resource_loader {
     /*! @brief Resource loaders are friends of their caches. */
-    friend struct cache<Resource>;
+    friend struct resource_cache<Resource>;
 
     /**
      * @brief Loads the resource and returns it.
