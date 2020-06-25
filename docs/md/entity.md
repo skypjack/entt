@@ -21,7 +21,6 @@
     * [Null entity](#null-entity)
     * [Dependencies](#dependencies)
     * [Invoke](#invoke)
-    * [Actor](#actor)
     * [Context variables](#context-variables)
   * [Meet the runtime](#meet-the-runtime)
     * [Cloning a registry](#cloning-a-registry)
@@ -642,25 +641,6 @@ registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>();
 
 All it does is pick up the _right_ component for the received entity and invoke
 the requested method, passing on the arguments if necessary.
-
-### Actor
-
-The `actor` class is designed for those who don't feel immediately comfortable
-working with components or for those who are migrating a project and want to
-approach it one step at a time.
-
-This class acts as a thin wrapper for an entity and for all its components. It's
-constructed with a registry and is in charge of the destruction of the entity
-when it goes out of the scope.<br/>
-An actor offers all the functionalities required to work with components, such
-as the `assign` and` remove` member functions, but also `has`,` get`, `try_get`
-and so on.
-
-My advice isn't to use the `actor` class to hide entities and components behind
-a more object-oriented interface. Instead, users should rely on it only where
-strictly necessary. In all other cases, it's highly advisable to become familiar
-with the model of `EnTT` and work directly with the registry, the views and the
-groups, rather than with a tool that could introduce a performance degradation.
 
 ### Context variables
 
