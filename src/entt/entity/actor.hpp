@@ -24,15 +24,14 @@ namespace entt {
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class [[deprecated("Consider using entt::basic_proxy")]] basic_actor {
-public:
+struct basic_actor {
     /*! @brief Type of registry used internally. */
     using registry_type = basic_registry<Entity>;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
 
     basic_actor() ENTT_NOEXCEPT
-        : entt{null}, reg{nullptr}
+        : entt{entt::null}, reg{nullptr}
     {}
 
     /**

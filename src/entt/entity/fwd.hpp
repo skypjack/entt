@@ -28,9 +28,9 @@ class basic_group;
 template<typename>
 class basic_observer;
 
-/*! @class basic_actor */
-template<typename>
-class basic_actor;
+/*! @struct basic_actor */
+template <typename>
+struct basic_actor;
 
 /*! @class basic_proxy */
 template<typename>
@@ -58,7 +58,7 @@ using registry = basic_registry<entity>;
 using observer = basic_observer<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
-using actor [[deprecated("Consider using entt::proxy")]] = basic_actor<entity>;
+using actor = basic_actor<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using proxy = basic_proxy<entity>;
