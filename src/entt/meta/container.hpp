@@ -45,7 +45,7 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>> {
      * @param sz The new size of the container.
      * @return True in case of success, false otherwise.
      */
-    [[nodiscard]] static bool resize(std::vector<Type, Args...> &vec, size_type sz) ENTT_NOEXCEPT {
+    [[nodiscard]] static bool resize(std::vector<Type, Args...> &vec, size_type sz) {
         return (vec.resize(sz), true);
     }
 
@@ -140,7 +140,7 @@ struct meta_sequence_container_traits<std::array<Type, N>> {
      * @brief Does nothing.
      * @return False to indicate failure in all cases.
      */
-    [[nodiscard]] static bool resize(const std::array<Type, N> &, size_type) ENTT_NOEXCEPT {
+    [[nodiscard]] static bool resize(const std::array<Type, N> &, size_type) {
         return false;
     }
 
