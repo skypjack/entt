@@ -104,10 +104,10 @@ TEST_F(MetaFunc, Functionalities) {
     ASSERT_EQ(any.cast<int>(), 4);
     ASSERT_EQ(func_t::value, 3);
 
-    func.prop([](auto prop) {
-        ASSERT_EQ(prop.key(), true);
-        ASSERT_FALSE(prop.value().template cast<bool>());
-    });
+    for(auto curr: func.prop()) {
+        ASSERT_EQ(curr.key(), true);
+        ASSERT_FALSE(curr.value().template cast<bool>());
+    }
 
     ASSERT_FALSE(func.prop(false));
     ASSERT_FALSE(func.prop('c'));
@@ -141,10 +141,10 @@ TEST_F(MetaFunc, Const) {
     ASSERT_EQ(any.type(), entt::resolve<int>());
     ASSERT_EQ(any.cast<int>(), 16);
 
-    func.prop([](auto prop) {
-        ASSERT_EQ(prop.key(), true);
-        ASSERT_FALSE(prop.value().template cast<bool>());
-    });
+    for(auto curr: func.prop()) {
+        ASSERT_EQ(curr.key(), true);
+        ASSERT_FALSE(curr.value().template cast<bool>());
+    }
 
     ASSERT_FALSE(func.prop(false));
     ASSERT_FALSE(func.prop('c'));
@@ -176,10 +176,10 @@ TEST_F(MetaFunc, RetVoid) {
     ASSERT_EQ(any.type(), entt::resolve<void>());
     ASSERT_EQ(func_t::value, 25);
 
-    func.prop([](auto prop) {
-        ASSERT_EQ(prop.key(), true);
-        ASSERT_FALSE(prop.value().template cast<bool>());
-    });
+    for(auto curr: func.prop()) {
+        ASSERT_EQ(curr.key(), true);
+        ASSERT_FALSE(curr.value().template cast<bool>());
+    }
 
     ASSERT_FALSE(func.prop(false));
     ASSERT_FALSE(func.prop('c'));
@@ -213,10 +213,10 @@ TEST_F(MetaFunc, Static) {
     ASSERT_EQ(any.type(), entt::resolve<int>());
     ASSERT_EQ(any.cast<int>(), 6);
 
-    func.prop([](auto prop) {
-        ASSERT_EQ(prop.key(), true);
-        ASSERT_FALSE(prop.value().template cast<bool>());
-    });
+    for(auto curr: func.prop()) {
+        ASSERT_EQ(curr.key(), true);
+        ASSERT_FALSE(curr.value().template cast<bool>());
+    }
 
     ASSERT_FALSE(func.prop(false));
     ASSERT_FALSE(func.prop('c'));
@@ -247,11 +247,11 @@ TEST_F(MetaFunc, StaticRetVoid) {
     ASSERT_EQ(any.type(), entt::resolve<void>());
     ASSERT_EQ(func_t::value, 42);
 
-    func.prop([](auto prop) {
-        ASSERT_TRUE(prop);
-        ASSERT_EQ(prop.key(), true);
-        ASSERT_FALSE(prop.value().template cast<bool>());
-    });
+    for(auto curr: func.prop()) {
+        ASSERT_TRUE(curr);
+        ASSERT_EQ(curr.key(), true);
+        ASSERT_FALSE(curr.value().template cast<bool>());
+    }
 
     ASSERT_FALSE(func.prop(false));
     ASSERT_FALSE(func.prop('c'));

@@ -95,14 +95,19 @@ struct MetaType: ::testing::Test {
 TEST_F(MetaType, Resolve) {
     ASSERT_EQ(entt::resolve<double>(), entt::resolve_id("double"_hs));
     ASSERT_EQ(entt::resolve<double>(), entt::resolve_type(entt::type_info<double>::id()));
+
+    auto range = entt::resolve();
     // it could be "char"_hs rather than entt::hashed_string::value("char") if it weren't for a bug in VS2017
-    ASSERT_EQ(entt::resolve_if([](auto type) { return type.id() == entt::hashed_string::value("clazz"); }), entt::resolve<clazz_t>());
+    const auto it = std::find_if(range.begin(), range.end(), [](auto type) { return type.id() == entt::hashed_string::value("clazz"); });
+
+    ASSERT_NE(it, range.end());
+    ASSERT_EQ(*it, entt::resolve<clazz_t>());
 
     bool found = false;
 
-    entt::resolve([&found](auto type) {
-        found = found || type == entt::resolve<double>();
-    });
+    for(auto curr: entt::resolve()) {
+        found = found || curr == entt::resolve<double>();
+    }
 
     ASSERT_TRUE(found);
 }
@@ -115,10 +120,10 @@ TEST_F(MetaType, Functionalities) {
     ASSERT_EQ(type.id(), "clazz"_hs);
     ASSERT_EQ(type.type_id(), entt::type_info<clazz_t>::id());
 
-    type.prop([](auto prop) {
-        ASSERT_EQ(prop.key(), property_t::value);
-        ASSERT_EQ(prop.value(), 42);
-    });
+    for(auto curr: type.prop()) {
+        ASSERT_EQ(curr.key(), property_t::value);
+        ASSERT_EQ(curr.value(), 42);
+    }
 
     ASSERT_FALSE(type.prop(property_t::key_only));
     ASSERT_FALSE(type.prop("property"_hs));
@@ -199,10 +204,10 @@ TEST_F(MetaType, Base) {
     auto type = entt::resolve<derived_t>();
     bool iterate = false;
 
-    type.base([&iterate](auto base) {
-        ASSERT_EQ(base.type(), entt::resolve<base_t>());
+    for(auto curr: type.base()) {
+        ASSERT_EQ(curr.type(), entt::resolve<base_t>());
         iterate = true;
-    });
+    }
 
     ASSERT_TRUE(iterate);
     ASSERT_EQ(type.base("base"_hs).type(), entt::resolve<base_t>());
@@ -212,10 +217,10 @@ TEST_F(MetaType, Conv) {
     auto type = entt::resolve<double>();
     bool iterate = false;
 
-    type.conv([&iterate](auto conv) {
-        ASSERT_EQ(conv.type(), entt::resolve<int>());
+    for(auto curr: type.conv()) {
+        ASSERT_EQ(curr.type(), entt::resolve<int>());
         iterate = true;
-    });
+    }
 
     ASSERT_TRUE(iterate);
 
@@ -229,9 +234,9 @@ TEST_F(MetaType, Ctor) {
     auto type = entt::resolve<clazz_t>();
     int counter{};
 
-    type.ctor([&counter](auto) {
+    for([[maybe_unused]] auto curr: type.ctor()) {
         ++counter;
-    });
+    }
 
     ASSERT_EQ(counter, 2);
     ASSERT_TRUE((type.ctor<>()));
@@ -243,9 +248,9 @@ TEST_F(MetaType, Data) {
     auto type = entt::resolve<clazz_t>();
     int counter{};
 
-    type.data([&counter](auto) {
+    for([[maybe_unused]] auto curr: type.data()) {
         ++counter;
-    });
+    }
 
     ASSERT_EQ(counter, 1);
     ASSERT_TRUE(type.data("value"_hs));
@@ -256,9 +261,9 @@ TEST_F(MetaType, Func) {
     clazz_t instance{};
     int counter{};
 
-    type.func([&counter](auto) {
+    for([[maybe_unused]] auto curr: type.func()) {
         ++counter;
-    });
+    }
 
     ASSERT_EQ(counter, 2);
     ASSERT_TRUE(type.func("member"_hs));
@@ -306,11 +311,12 @@ TEST_F(MetaType, ConstructCastAndConvert) {
 TEST_F(MetaType, Detach) {
     ASSERT_TRUE(entt::resolve_id("clazz"_hs));
 
-    entt::resolve([](auto type) {
-        if(type.id() == "clazz"_hs) {
-            type.detach();
+    for(auto curr: entt::resolve()) {
+        if(curr.id() == "clazz"_hs) {
+            curr.detach();
+            break;
         }
-    });
+    }
 
     ASSERT_FALSE(entt::resolve_id("clazz"_hs));
     ASSERT_EQ(entt::resolve<clazz_t>().id(), "clazz"_hs);

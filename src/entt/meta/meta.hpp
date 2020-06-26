@@ -679,20 +679,6 @@ struct meta_ctor {
     }
 
     /**
-     * @brief Iterates all meta properties assigned to a meta constructor.
-     * @tparam Op Type of the function object to invoke.
-     * @param op A valid function object.
-     */
-    template<typename Op>
-    [[deprecated("use prop() and entt::meta_range<meta_prop> instead")]]
-    std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
-    prop(Op op) const {
-        for(auto curr: prop()) {
-            op(curr);
-        }
-    }
-
-    /**
      * @brief Returns the property associated with a given key.
      * @param key The key to use to search for a property.
      * @return The property associated with the given key, if any.
@@ -787,20 +773,6 @@ struct meta_data {
     /*! @copydoc meta_ctor::prop */
     [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
-    }
-
-    /**
-     * @brief Iterates all meta properties assigned to a meta data.
-     * @tparam Op Type of the function object to invoke.
-     * @param op A valid function object.
-     */
-    template<typename Op>
-    [[deprecated("use prop() and entt::meta_range<meta_prop> instead")]]
-    std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
-    prop(Op op) const {
-        for(auto curr: prop()) {
-            op(curr);
-        }
     }
 
     /**
@@ -911,20 +883,6 @@ struct meta_func {
     /*! @copydoc meta_ctor::prop */
     [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
-    }
-
-    /**
-     * @brief Iterates all meta properties assigned to a meta function.
-     * @tparam Op Type of the function object to invoke.
-     * @param op A valid function object.
-     */
-    template<typename Op>
-    [[deprecated("use prop() and entt::meta_range<meta_prop> instead")]]
-    std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
-    prop(Op op) const {
-        for(auto curr: prop()) {
-            op(curr);
-        }
     }
 
     /**
@@ -1160,20 +1118,6 @@ public:
     }
 
     /**
-     * @brief Iterates all top-level meta bases of a meta type.
-     * @tparam Op Type of the function object to invoke.
-     * @param op A valid function object.
-     */
-    template<typename Op>
-    [[deprecated("use base() and entt::meta_range<meta_base> instead")]]
-    std::enable_if_t<std::is_invocable_v<Op, meta_base>>
-    base(Op op) const {
-        for(auto curr: base()) {
-            op(curr);
-        }
-    }
-
-    /**
      * @brief Returns the meta base associated with a given identifier.
      * @param id Unique identifier.
      * @return The meta base associated with the given identifier, if any.
@@ -1192,19 +1136,6 @@ public:
      */
     [[nodiscard]] meta_range<meta_conv> conv() const ENTT_NOEXCEPT {
         return node->conv;
-    }
-
-    /**
-     * @brief Iterates all top-level meta conversion functions of a meta type.
-     * @tparam Op Type of the function object to invoke.
-     * @param op A valid function object.
-     */
-    template<typename Op>
-    [[deprecated("use conv() and entt::meta_range<meta_conv> instead")]]
-    void conv(Op op) const {
-        for(auto curr: conv()) {
-            op(curr);
-        }
     }
 
     /**
@@ -1229,19 +1160,6 @@ public:
     }
 
     /**
-     * @brief Iterates all top-level meta constructors of a meta type.
-     * @tparam Op Type of the function object to invoke.
-     * @param op A valid function object.
-     */
-    template<typename Op>
-    [[deprecated("use ctor() and entt::meta_range<meta_ctor> instead")]]
-    void ctor(Op op) const {
-        for(auto curr: ctor()) {
-            op(curr);
-        }
-    }
-
-    /**
      * @brief Returns the meta constructor that accepts a given list of types of
      * arguments.
      * @return The requested meta constructor, if any.
@@ -1257,20 +1175,6 @@ public:
      */
     [[nodiscard]] meta_range<meta_data> data() const ENTT_NOEXCEPT {
         return node->data;
-    }
-
-    /**
-     * @brief Iterates all top-level meta data of a meta type.
-     * @tparam Op Type of the function object to invoke.
-     * @param op A valid function object.
-     */
-    template<typename Op>
-    [[deprecated("use ctor() and entt::meta_range<meta_ctor> instead")]]
-    std::enable_if_t<std::is_invocable_v<Op, meta_data>>
-    data(Op op) const {
-        for(auto curr: data()) {
-            op(curr);
-        }
     }
 
     /**
@@ -1293,20 +1197,6 @@ public:
      */
     [[nodiscard]] meta_range<meta_func> func() const ENTT_NOEXCEPT {
         return node->func;
-    }
-
-    /**
-     * @brief Iterates all top-level meta functions of a meta type.
-     * @tparam Op Type of the function object to invoke.
-     * @param op A valid function object.
-     */
-    template<typename Op>
-    [[deprecated("use ctor() and entt::meta_range<meta_ctor> instead")]]
-    std::enable_if_t<std::is_invocable_v<Op, meta_func>>
-    func(Op op) const {
-        for(auto curr: func()) {
-            op(curr);
-        }
     }
 
     /**
@@ -1352,20 +1242,6 @@ public:
      */
     [[nodiscard]] meta_range<meta_prop> prop() const ENTT_NOEXCEPT {
         return node->prop;
-    }
-
-    /**
-     * @brief Iterates all top-level meta properties assigned to a meta type.
-     * @tparam Op Type of the function object to invoke.
-     * @param op A valid function object.
-     */
-    template<typename Op>
-    [[deprecated("use prop() and entt::meta_range<meta_prop> instead")]]
-    std::enable_if_t<std::is_invocable_v<Op, meta_prop>>
-    prop(Op op) const {
-        for(auto curr: prop()) {
-            op(curr);
-        }
     }
 
     /**
