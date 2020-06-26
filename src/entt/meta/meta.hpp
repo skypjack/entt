@@ -1817,20 +1817,22 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static bool erase(void *container, meta_any key) {
+        using k_type = typename meta_associative_container_traits<Type>::key_type;
         bool ret = false;
 
-        if(const auto *k_ptr = key.try_cast<typename meta_associative_container_traits<Type>::key_type>(); k_ptr) {
-            ret = meta_associative_container_traits<Type>::erase(*static_cast<Type *>(container), *k_ptr);
+        if(const auto *k_ptr = key.try_cast<typename meta_associative_container_traits<Type>::key_type>(); k_ptr || key.convert<k_type>()) {
+            ret = meta_associative_container_traits<Type>::erase(*static_cast<Type *>(container), k_ptr ? *k_ptr : key.cast<k_type>());
         }
 
         return ret;
     }
 
     [[nodiscard]] static iterator find(void *container, meta_any key) {
+        using k_type = typename meta_associative_container_traits<Type>::key_type;
         iterator ret{};
 
-        if(const auto *k_ptr = key.try_cast<typename meta_associative_container_traits<Type>::key_type>(); k_ptr) {
-            ret = iterator{std::in_place_type<Type>, meta_associative_container_traits<Type>::find(*static_cast<Type *>(container), *k_ptr)};
+        if(const auto *k_ptr = key.try_cast<typename meta_associative_container_traits<Type>::key_type>(); k_ptr || key.convert<k_type>()) {
+            ret = iterator{std::in_place_type<Type>, meta_associative_container_traits<Type>::find(*static_cast<Type *>(container), k_ptr ? *k_ptr : key.cast<k_type>())};
         }
 
         return ret;

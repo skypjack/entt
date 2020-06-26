@@ -184,7 +184,7 @@ TEST_F(MetaContainer, StdMap) {
 
     ASSERT_EQ(view.size(), 5u);
     ASSERT_EQ((*view.find(0)).second.cast<char>(), 'a');
-    ASSERT_EQ((*view.find(1)).second.cast<char>(), 'b');
+    ASSERT_EQ((*view.find(1.)).second.cast<char>(), 'b');
 
     ASSERT_TRUE(view.erase(0));
     ASSERT_EQ(view.size(), 4u);
@@ -194,6 +194,7 @@ TEST_F(MetaContainer, StdMap) {
 
     ASSERT_EQ((*view.find(1)).second.cast<char>(), 'f');
 
+    ASSERT_TRUE(view.erase(1.));
     ASSERT_TRUE(view.clear());
     ASSERT_EQ(view.size(), 0u);
 }
@@ -236,7 +237,7 @@ TEST_F(MetaContainer, StdSet) {
 
     ASSERT_EQ(view.size(), 5u);
     ASSERT_EQ((*view.find(0)).first.cast<int>(), 0);
-    ASSERT_EQ((*view.find(1)).first.cast<int>(), 1);
+    ASSERT_EQ((*view.find(1.)).first.cast<int>(), 1);
 
     ASSERT_TRUE(view.erase(0));
     ASSERT_EQ(view.size(), 4u);
@@ -246,6 +247,7 @@ TEST_F(MetaContainer, StdSet) {
 
     ASSERT_EQ((*view.find(1)).first.cast<int>(), 1);
 
+    ASSERT_TRUE(view.erase(1.));
     ASSERT_TRUE(view.clear());
     ASSERT_EQ(view.size(), 0u);
 }
