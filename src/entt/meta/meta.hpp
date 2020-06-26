@@ -37,10 +37,27 @@ public:
     /*! @brief Meta iterator type. */
     using iterator = meta_iterator;
 
-    template<typename Type>
-    meta_sequence_container(Type &);
+    /*! @brief Default constructor. */
+    meta_sequence_container() = default;
 
-    inline meta_sequence_container();
+    /**
+     * @brief Construct a proxy object for sequence containers.
+     * @tparam Type Type of container to wrap.
+     * @param container The container to wrap.
+     */
+    template<typename Type>
+    meta_sequence_container(Type *container)
+        : value_type_fn{&meta_sequence_container_proxy<Type>::value_type},
+          size_fn{&meta_sequence_container_proxy<Type>::size},
+          resize_fn{&meta_sequence_container_proxy<Type>::resize},
+          clear_fn{&meta_sequence_container_proxy<Type>::clear},
+          begin_fn{&meta_sequence_container_proxy<Type>::begin},
+          end_fn{&meta_sequence_container_proxy<Type>::end},
+          insert_fn{&meta_sequence_container_proxy<Type>::insert},
+          erase_fn{&meta_sequence_container_proxy<Type>::erase},
+          get_fn{&meta_sequence_container_proxy<Type>::get},
+          instance{container}
+    {}
 
     [[nodiscard]] inline meta_type value_type() const ENTT_NOEXCEPT;
     [[nodiscard]] inline size_type size() const ENTT_NOEXCEPT;
@@ -81,10 +98,29 @@ public:
     /*! @brief Meta iterator type. */
     using iterator = meta_iterator;
 
-    template<typename Type>
-    meta_associative_container(Type &);
+    /*! @brief Default constructor. */
+    meta_associative_container() = default;
 
-    inline meta_associative_container();
+    /**
+     * @brief Construct a proxy object for associative containers.
+     * @tparam Type Type of container to wrap.
+     * @param container The container to wrap.
+     */
+    template<typename Type>
+    meta_associative_container(Type *container)
+        : key_only_container{is_key_only_meta_associative_container_v<Type>},
+          key_type_fn{&meta_associative_container_proxy<Type>::key_type},
+          mapped_type_fn{&meta_associative_container_proxy<Type>::mapped_type},
+          value_type_fn{&meta_associative_container_proxy<Type>::value_type},
+          size_fn{&meta_associative_container_proxy<Type>::size},
+          clear_fn{&meta_associative_container_proxy<Type>::clear},
+          begin_fn{&meta_associative_container_proxy<Type>::begin},
+          end_fn{&meta_associative_container_proxy<Type>::end},
+          insert_fn{&meta_associative_container_proxy<Type>::insert},
+          erase_fn{&meta_associative_container_proxy<Type>::erase},
+          find_fn{&meta_associative_container_proxy<Type>::find},
+          instance{container}
+    {}
 
     [[nodiscard]] inline bool key_only() const ENTT_NOEXCEPT;
     [[nodiscard]] inline meta_type key_type() const ENTT_NOEXCEPT;
@@ -141,7 +177,7 @@ class meta_any {
     template<typename Type>
     [[nodiscard]] static meta_sequence_container meta_sequence_container_factory([[maybe_unused]] void *container) ENTT_NOEXCEPT {
         if constexpr(has_meta_sequence_container_traits_v<Type>) {
-            return *static_cast<Type *>(container);
+            return static_cast<Type *>(container);
         } else {
             return {};
         }
@@ -150,7 +186,7 @@ class meta_any {
     template<typename Type>
     [[nodiscard]] static meta_associative_container meta_associative_container_factory([[maybe_unused]] void *container) ENTT_NOEXCEPT {
         if constexpr(has_meta_associative_container_traits_v<Type>) {
-            return *static_cast<Type *>(container);
+            return static_cast<Type *>(container);
         } else {
             return {};
         }
@@ -1510,41 +1546,6 @@ struct meta_sequence_container::meta_sequence_container_proxy {
 
 
 /**
- * @brief Construct a proxy object for sequence containers.
- * @tparam Type Type of container to wrap.
- * @param container The container to wrap.
- */
-template<typename Type>
-meta_sequence_container::meta_sequence_container(Type &container)
-    : value_type_fn{&meta_sequence_container_proxy<Type>::value_type},
-      size_fn{&meta_sequence_container_proxy<Type>::size},
-      resize_fn{&meta_sequence_container_proxy<Type>::resize},
-      clear_fn{&meta_sequence_container_proxy<Type>::clear},
-      begin_fn{&meta_sequence_container_proxy<Type>::begin},
-      end_fn{&meta_sequence_container_proxy<Type>::end},
-      insert_fn{&meta_sequence_container_proxy<Type>::insert},
-      erase_fn{&meta_sequence_container_proxy<Type>::erase},
-      get_fn{&meta_sequence_container_proxy<Type>::get},
-      instance{&container}
-{}
-
-
-/*! @brief Default constructor. */
-inline meta_sequence_container::meta_sequence_container()
-    : value_type_fn{nullptr},
-      size_fn{nullptr},
-      resize_fn{nullptr},
-      clear_fn{nullptr},
-      begin_fn{nullptr},
-      end_fn{nullptr},
-      insert_fn{nullptr},
-      erase_fn{nullptr},
-      get_fn{nullptr},
-      instance{nullptr}
-{}
-
-
-/**
  * @brief Returns the value meta type of the wrapped container type.
  * @return The value meta type of the wrapped container type.
  */
@@ -1835,45 +1836,6 @@ struct meta_associative_container::meta_associative_container_proxy {
         return ret;
     }
 };
-
-
-/**
- * @brief Construct a proxy object for associative containers.
- * @tparam Type Type of container to wrap.
- * @param container The container to wrap.
- */
-template<typename Type>
-meta_associative_container::meta_associative_container(Type &container)
-    : key_only_container{is_key_only_meta_associative_container_v<Type>},
-      key_type_fn{&meta_associative_container_proxy<Type>::key_type},
-      mapped_type_fn{&meta_associative_container_proxy<Type>::mapped_type},
-      value_type_fn{&meta_associative_container_proxy<Type>::value_type},
-      size_fn{&meta_associative_container_proxy<Type>::size},
-      clear_fn{&meta_associative_container_proxy<Type>::clear},
-      begin_fn{&meta_associative_container_proxy<Type>::begin},
-      end_fn{&meta_associative_container_proxy<Type>::end},
-      insert_fn{&meta_associative_container_proxy<Type>::insert},
-      erase_fn{&meta_associative_container_proxy<Type>::erase},
-      find_fn{&meta_associative_container_proxy<Type>::find},
-      instance{&container}
-{}
-
-
-/*! @brief Default constructor. */
-inline meta_associative_container::meta_associative_container()
-    : key_only_container{false},
-      key_type_fn{nullptr},
-      mapped_type_fn{nullptr},
-      value_type_fn{nullptr},
-      size_fn{nullptr},
-      clear_fn{nullptr},
-      begin_fn{nullptr},
-      end_fn{nullptr},
-      insert_fn{nullptr},
-      erase_fn{nullptr},
-      find_fn{nullptr},
-      instance{nullptr}
-{}
 
 
 /**
