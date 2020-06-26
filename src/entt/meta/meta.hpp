@@ -139,20 +139,20 @@ class meta_any {
     }
 
     template<typename Type>
-    [[nodiscard]] static auto * meta_sequence_container_factory() ENTT_NOEXCEPT {
+    [[nodiscard]] static meta_sequence_container meta_sequence_container_factory([[maybe_unused]] void *container) ENTT_NOEXCEPT {
         if constexpr(has_meta_sequence_container_traits_v<Type>) {
-            return +[](void *container) -> meta_sequence_container { return *static_cast<Type *>(container); };
+            return *static_cast<Type *>(container);
         } else {
-            return static_cast<decltype(seq_factory)>(nullptr);
+            return {};
         }
     }
 
     template<typename Type>
-    [[nodiscard]] static auto * meta_associative_container_factory() ENTT_NOEXCEPT {
+    [[nodiscard]] static meta_associative_container meta_associative_container_factory([[maybe_unused]] void *container) ENTT_NOEXCEPT {
         if constexpr(has_meta_associative_container_traits_v<Type>) {
-            return +[](void *container) -> meta_associative_container { return *static_cast<Type *>(container); };
+            return *static_cast<Type *>(container);
         } else {
-            return static_cast<decltype(assoc_factory)>(nullptr);
+            return {};
         }
     }
 
@@ -177,8 +177,8 @@ public:
         : storage(std::in_place_type<Type>, std::forward<Args>(args)...),
           node{internal::meta_info<Type>::resolve()},
           deref{&dereference_operator<Type>},
-          seq_factory{meta_sequence_container_factory<Type>()},
-          assoc_factory{meta_associative_container_factory<Type>()}
+          seq_factory{&meta_sequence_container_factory<Type>},
+          assoc_factory{&meta_associative_container_factory<Type>}
     {}
 
     /**
@@ -191,8 +191,8 @@ public:
         : storage{value},
           node{internal::meta_info<Type>::resolve()},
           deref{&dereference_operator<Type>},
-          seq_factory{meta_sequence_container_factory<Type>()},
-          assoc_factory{meta_associative_container_factory<Type>()}
+          seq_factory{&meta_sequence_container_factory<Type>},
+          assoc_factory{&meta_associative_container_factory<Type>}
     {}
 
     /**
@@ -380,7 +380,7 @@ public:
      * @return A sequence container proxy for the underlying object.
      */
     [[nodiscard]] meta_sequence_container as_sequence_container() ENTT_NOEXCEPT {
-        return seq_factory ? seq_factory(storage.data()) : meta_sequence_container{};
+        return seq_factory(storage.data());
     }
 
     /**
@@ -388,7 +388,7 @@ public:
      * @return An associative container proxy for the underlying object.
      */
     [[nodiscard]] meta_associative_container as_associative_container() ENTT_NOEXCEPT {
-        return assoc_factory ? assoc_factory(storage.data()) : meta_associative_container{};
+        return assoc_factory(storage.data());
     }
 
     /**
@@ -424,8 +424,8 @@ public:
      */
     friend void swap(meta_any &lhs, meta_any &rhs) {
         using std::swap;
-        swap(lhs.node, rhs.node);
         swap(lhs.storage, rhs.storage);
+        swap(lhs.node, rhs.node);
         swap(lhs.deref, rhs.deref);
         swap(lhs.seq_factory, rhs.seq_factory);
         swap(lhs.assoc_factory, rhs.assoc_factory);
@@ -900,14 +900,12 @@ struct meta_func {
      */
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&... args) const {
-        meta_any any{};
-
         if(sizeof...(Args) == size()) {
             std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
-            any = node->invoke(std::move(instance), arguments.data());
+            return node->invoke(std::move(instance), arguments.data());
+        } else {
+            return meta_any{};
         }
-
-        return any;
     }
 
     /*! @copydoc meta_ctor::prop */
@@ -1338,18 +1336,14 @@ public:
      */
     template<typename... Args>
     [[nodiscard]] meta_any construct(Args &&... args) const {
-        auto construct_if = [this](meta_any *params) {
-            meta_any any{};
-
-            internal::find_if<&node_type::ctor>([params, &any](const auto *curr) {
-                return (curr->size == sizeof...(args)) && (any = curr->invoke(params));
-            }, node);
-
-            return any;
-        };
-
         std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
-        return construct_if(arguments.data());
+        meta_any any{};
+
+        internal::find_if<&node_type::ctor>([&arguments, &any](const auto *curr) {
+            return (curr->size == sizeof...(args)) && (any = curr->invoke(arguments.data()));
+        }, node);
+
+        return any;
     }
 
     /**
