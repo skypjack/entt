@@ -1267,7 +1267,7 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    [[deprecated("use data() and entt::meta_range<meta_data> instead")]]
+    [[deprecated("use ctor() and entt::meta_range<meta_ctor> instead")]]
     std::enable_if_t<std::is_invocable_v<Op, meta_data>>
     data(Op op) const {
         for(auto curr: data()) {
@@ -1303,7 +1303,7 @@ public:
      * @param op A valid function object.
      */
     template<typename Op>
-    [[deprecated("use func() and entt::meta_range<meta_func> instead")]]
+    [[deprecated("use ctor() and entt::meta_range<meta_ctor> instead")]]
     std::enable_if_t<std::is_invocable_v<Op, meta_func>>
     func(Op op) const {
         for(auto curr: func()) {
