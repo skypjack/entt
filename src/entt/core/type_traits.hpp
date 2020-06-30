@@ -55,7 +55,7 @@ struct choice_t
         // Unfortunately, doxygen cannot parse such a construct.
         /*! @cond TURN_OFF_DOXYGEN */
         : choice_t<N-1>
-        /*! @endcond TURN_OFF_DOXYGEN */
+        /*! @endcond */
 {};
 
 
@@ -193,7 +193,9 @@ struct is_equality_comparable: std::false_type {};
 
 /*! @copydoc is_equality_comparable */
 template<typename Type>
-struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>: std::true_type {};
+struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
+        : std::true_type
+{};
 
 
 /**
@@ -202,126 +204,6 @@ struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() ==
  */
 template<class Type>
 inline constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
-
-
-/**
- * @brief Provides the member constant `value` to true if a given type is a
- * container, false otherwise.
- * @tparam Type Potentially container type.
- */
-template<typename Type, typename = void>
-struct is_container: std::false_type {};
-
-
-/*! @copydoc is_container */
-template<typename Type>
-struct is_container<Type, std::void_t<decltype(begin(std::declval<Type>()), end(std::declval<Type>()))>>
-        : std::true_type
-{};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potentially container type.
- */
-template<typename Type>
-inline constexpr auto is_container_v = is_container<Type>::value;
-
-
-/**
- * @brief Provides the member constant `value` to true if a given type is an
- * associative container, false otherwise.
- * @tparam Type Potentially associative container type.
- */
-template<typename, typename = void>
-struct is_associative_container: std::false_type {};
-
-
-/*! @copydoc is_associative_container */
-template<typename Type>
-struct is_associative_container<Type, std::void_t<typename Type::key_type>>
-        : is_container<Type>
-{};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potentially associative container type.
- */
-template<typename Type>
-inline constexpr auto is_associative_container_v = is_associative_container<Type>::value;
-
-
-/**
- * @brief Provides the member constant `value` to true if a given type is a
- * key-only associative container, false otherwise.
- * @tparam Type Potentially key-only associative container type.
- */
-template<typename, typename = void>
-struct is_key_only_associative_container: std::false_type {};
-
-
-/*! @copydoc is_associative_container */
-template<typename Type>
-struct is_key_only_associative_container<Type, std::enable_if_t<std::is_same_v<typename Type::key_type, typename Type::value_type>>>
-        : is_associative_container<Type>
-{};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potentially key-only associative container type.
- */
-template<typename Type>
-inline constexpr auto is_key_only_associative_container_v = is_key_only_associative_container<Type>::value;
-
-
-/**
- * @brief Provides the member constant `value` to true if a given type is a
- * sequence container, false otherwise.
- * @tparam Type Potentially sequence container type.
- */
-template<typename, typename = void>
-struct is_sequence_container: std::false_type {};
-
-
-/*! @copydoc is_sequence_container */
-template<typename Type>
-struct is_sequence_container<Type, std::enable_if_t<!is_associative_container_v<Type>>>
-        : is_container<Type>
-{};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potentially sequence container type.
- */
-template<typename Type>
-inline constexpr auto is_sequence_container_v = is_sequence_container<Type>::value;
-
-
-/**
- * @brief Provides the member constant `value` to true if a given type is a
- * dynamic sequence container, false otherwise.
- * @tparam Type Potentially dynamic sequence container type.
- */
-template<typename, typename = void>
-struct is_dynamic_sequence_container: std::false_type {};
-
-
-/*! @copydoc is_dynamic_sequence_container */
-template<typename Type>
-struct is_dynamic_sequence_container<Type, std::void_t<decltype(std::declval<Type>().insert({}, std::declval<typename Type::value_type>()))>>
-        : is_sequence_container<Type>
-{};
-
-
-/**
- * @brief Helper variable template.
- * @tparam Type Potentially dynamic sequence container type.
- */
-template<typename Type>
-inline constexpr auto is_dynamic_sequence_container_v = is_dynamic_sequence_container<Type>::value;
 
 
 /**
@@ -359,18 +241,18 @@ using member_class_t = typename member_class<Member>::type;
 
 
 #define ENTT_OPAQUE_TYPE(clazz, type)\
-    /**\
-     * @brief Defines an enum class to use for opaque identifiers and a\
-     * dedicate `to_integer` function to convert the identifiers to their\
-     * underlying type.\
-     * @param clazz The name to use for the enum class.\
-     * @param type The underlying type for the enum class.\
+    /*!\
+       @brief Defines an enum class to use for opaque identifiers and a\
+       dedicate `to_integral` function to convert the identifiers to their\
+       underlying type.\
+       @param clazz The name to use for the enum class.\
+       @param type The underlying type for the enum class.\
      */\
     enum class clazz: type {};\
-    /**\
-     * @brief Converts an opaque type value to its underlying type.\
-     * @param id The value to convert.\
-     * @return The integral representation of the given value.
+    /*!\
+       @brief Converts an opaque type value to its underlying type.\
+       @param id The value to convert.\
+       @return The integral representation of the given value.
      */\
     [[nodiscard]] constexpr auto to_integral(const clazz id) ENTT_NOEXCEPT {\
         return static_cast<std::underlying_type_t<clazz>>(id);\

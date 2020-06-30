@@ -27,20 +27,20 @@ namespace entt {
  * @tparam Resource Type of resources managed by a cache.
  */
 template<typename Resource>
-struct cache {
+struct resource_cache {
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Type of resources managed by a cache. */
     using resource_type = Resource;
 
     /*! @brief Default constructor. */
-    cache() = default;
+    resource_cache() = default;
 
     /*! @brief Default move constructor. */
-    cache(cache &&) = default;
+    resource_cache(resource_cache &&) = default;
 
     /*! @brief Default move assignment operator. @return This cache. */
-    cache & operator=(cache &&) = default;
+    resource_cache & operator=(resource_cache &&) = default;
 
     /**
      * @brief Number of resources managed by a cache.
@@ -91,9 +91,9 @@ struct cache {
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    entt::handle<Resource> load(const id_type id, Args &&... args) {
-        static_assert(std::is_base_of_v<loader<Loader, Resource>, Loader>, "Invalid loader type");
-        entt::handle<Resource> resource{};
+    resource_handle<Resource> load(const id_type id, Args &&... args) {
+        static_assert(std::is_base_of_v<resource_loader<Loader, Resource>, Loader>, "Invalid loader type");
+        resource_handle<Resource> resource{};
 
         if(auto it = resources.find(id); it == resources.cend()) {
             if(auto instance = Loader{}.get(std::forward<Args>(args)...); instance) {
@@ -131,7 +131,7 @@ struct cache {
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    entt::handle<Resource> reload(const id_type id, Args &&... args) {
+    resource_handle<Resource> reload(const id_type id, Args &&... args) {
         return (discard(id), load<Loader>(id, std::forward<Args>(args)...));
     }
 
@@ -148,7 +148,7 @@ struct cache {
      * @return A handle for the given resource.
      */
     template<typename Loader, typename... Args>
-    [[nodiscard]] entt::handle<Resource> temp(Args &&... args) const {
+    [[nodiscard]] resource_handle<Resource> temp(Args &&... args) const {
         return { Loader{}.get(std::forward<Args>(args)...) };
     }
 
@@ -160,12 +160,12 @@ struct cache {
      * cache contains the resource itself. Otherwise the returned handle is
      * uninitialized and accessing it results in undefined behavior.
      *
-     * @sa handle
+     * @sa resource_handle
      *
      * @param id Unique resource identifier.
      * @return A handle for the given resource.
      */
-    [[nodiscard]] entt::handle<Resource> handle(const id_type id) const {
+    [[nodiscard]] resource_handle<Resource> handle(const id_type id) const {
         auto it = resources.find(id);
         return { it == resources.end() ? nullptr : it->second };
     }
@@ -202,9 +202,9 @@ struct cache {
      * forms:
      *
      * @code{.cpp}
-     * void(const id_type);
-     * void(handle<Resource>);
-     * void(const id_type, handle<Resource>);
+     * void(const entt::id_type);
+     * void(entt::resource_handle<Resource>);
+     * void(const entt::id_type, entt::resource_handle<Resource>);
      * @endcode
      *
      * @tparam Func Type of the function object to invoke.
@@ -220,10 +220,10 @@ struct cache {
 
             if constexpr(std::is_invocable_v<Func, id_type>) {
                 func(curr->first);
-            } else if constexpr(std::is_invocable_v<Func, entt::handle<Resource>>) {
-                func(entt::handle{ curr->second });
+            } else if constexpr(std::is_invocable_v<Func, resource_handle<Resource>>) {
+                func(resource_handle{ curr->second });
             } else {
-                func(curr->first, entt::handle{ curr->second });
+                func(curr->first, resource_handle{ curr->second });
             }
         }
     }

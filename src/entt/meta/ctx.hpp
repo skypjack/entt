@@ -53,7 +53,7 @@ struct ENTT_API meta_context {
 
 /**
  * Internal details not to be documented.
- * @endcond TURN_OFF_DOXYGEN
+ * @endcond
  */
 
 

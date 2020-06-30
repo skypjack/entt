@@ -60,10 +60,10 @@ TEST_F(MetaCtor, Functionalities) {
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
     ASSERT_EQ(any.cast<clazz_t>().c, 'c');
 
-    ctor.prop([](auto prop) {
-        ASSERT_EQ(prop.key(), 3);
-        ASSERT_FALSE(prop.value().template cast<bool>());
-    });
+    for(auto curr: ctor.prop()) {
+        ASSERT_EQ(curr.key(), 3);
+        ASSERT_FALSE(curr.value().template cast<bool>());
+    }
 
     ASSERT_FALSE(ctor.prop(2));
     ASSERT_FALSE(ctor.prop('c'));
@@ -92,10 +92,10 @@ TEST_F(MetaCtor, Func) {
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
     ASSERT_EQ(any.cast<clazz_t>().c, 'c');
 
-    ctor.prop([](auto prop) {
-        ASSERT_EQ(prop.key(), 'c');
-        ASSERT_EQ(prop.value(), 42);
-    });
+    for(auto curr: ctor.prop()) {
+        ASSERT_EQ(curr.key(), 'c');
+        ASSERT_EQ(curr.value(), 42);
+    }
 
     ASSERT_FALSE(ctor.prop('d'));
     ASSERT_FALSE(ctor.prop(3));

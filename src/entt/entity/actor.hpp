@@ -24,7 +24,7 @@ namespace entt {
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-struct basic_actor {
+struct [[deprecated("Consider using the handle class instead")]] basic_actor {
     /*! @brief Type of registry used internally. */
     using registry_type = basic_registry<Entity>;
     /*! @brief Underlying entity identifier. */

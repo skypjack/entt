@@ -48,7 +48,7 @@ class basic_snapshot_loader;
 template<typename>
 class basic_continuous_loader;
 
-/*! @class entity */
+/*! @enum entity */
 enum class entity: id_type;
 
 /*! @brief Alias declaration for the most common use case. */
@@ -58,7 +58,7 @@ using registry = basic_registry<entity>;
 using observer = basic_observer<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
-using actor = basic_actor<entity>;
+using actor [[deprecated("Consider using the handle class instead")]] = basic_actor<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using proxy = basic_proxy<entity>;

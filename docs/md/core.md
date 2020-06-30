@@ -347,7 +347,10 @@ break an assumption and would likely lead to undesired behaviors.
 ## Type traits
 
 A handful of utilities and traits not present in the standard template library
-but which can be useful in everyday life.
+but which can be useful in everyday life.<br/>
+This list **is not** exhaustive and contains only some of the most useful
+classes. Refer to the inline documentation for more information on the features
+offered by this module.
 
 ### Member class type
 

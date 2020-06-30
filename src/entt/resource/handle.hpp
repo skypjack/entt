@@ -24,17 +24,17 @@ namespace entt {
  * @tparam Resource Type of resource managed by a handle.
  */
 template<typename Resource>
-class handle {
+class resource_handle {
     /*! @brief Resource handles are friends of their caches. */
-    friend struct cache<Resource>;
+    friend struct resource_cache<Resource>;
 
-    handle(std::shared_ptr<Resource> res) ENTT_NOEXCEPT
+    resource_handle(std::shared_ptr<Resource> res) ENTT_NOEXCEPT
         : resource{std::move(res)}
     {}
 
 public:
     /*! @brief Default constructor. */
-    handle() ENTT_NOEXCEPT = default;
+    resource_handle() ENTT_NOEXCEPT = default;
 
     /**
      * @brief Gets a reference to the managed resource.

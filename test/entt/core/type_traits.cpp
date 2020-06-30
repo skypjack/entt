@@ -1,5 +1,6 @@
 #include <array>
 #include <map>
+#include <memory>
 #include <set>
 #include <type_traits>
 #include <vector>
@@ -49,32 +50,6 @@ TEST(TypeTraits, TypeList) {
 TEST(TypeTraits, IsEqualityComparable) {
     ASSERT_TRUE(entt::is_equality_comparable_v<int>);
     ASSERT_FALSE(entt::is_equality_comparable_v<void>);
-}
-
-TEST(TypeTraits, IsContainerType) {
-    ASSERT_TRUE(entt::is_container_v<std::vector<int>>);
-    ASSERT_FALSE(entt::is_associative_container_v<std::vector<int>>);
-    ASSERT_FALSE(entt::is_key_only_associative_container_v<std::vector<int>>);
-    ASSERT_TRUE(entt::is_sequence_container_v<std::vector<int>>);
-    ASSERT_TRUE(entt::is_dynamic_sequence_container_v<std::vector<int>>);
-
-    ASSERT_TRUE((entt::is_container_v<std::array<int, 3>>));
-    ASSERT_FALSE((entt::is_associative_container_v<std::array<int, 3>>));
-    ASSERT_FALSE((entt::is_key_only_associative_container_v<std::array<int, 3>>));
-    ASSERT_TRUE((entt::is_sequence_container_v<std::array<int, 3>>));
-    ASSERT_FALSE((entt::is_dynamic_sequence_container_v<std::array<int, 3>>));
-
-    ASSERT_TRUE((entt::is_container_v<std::map<int, char>>));
-    ASSERT_TRUE((entt::is_associative_container_v<std::map<int, char>>));
-    ASSERT_FALSE((entt::is_key_only_associative_container_v<std::map<int, char>>));
-    ASSERT_FALSE((entt::is_sequence_container_v<std::map<int, char>>));
-    ASSERT_FALSE((entt::is_dynamic_sequence_container_v<std::map<int, char>>));
-
-    ASSERT_TRUE(entt::is_container_v<std::set<int>>);
-    ASSERT_TRUE(entt::is_associative_container_v<std::set<int>>);
-    ASSERT_TRUE(entt::is_key_only_associative_container_v<std::set<int>>);
-    ASSERT_FALSE(entt::is_sequence_container_v<std::set<int>>);
-    ASSERT_FALSE(entt::is_dynamic_sequence_container_v<std::set<int>>);
 }
 
 TEST(TypeTraits, MemberClass) {

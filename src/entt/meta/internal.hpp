@@ -3,6 +3,7 @@
 
 
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -11,6 +12,7 @@
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
 #include "../core/type_traits.hpp"
+#include "type_traits.hpp"
 
 
 namespace entt {
@@ -29,6 +31,169 @@ struct meta_handle;
 namespace internal {
 
 
+class meta_storage {
+    using storage_type = std::aligned_storage_t<sizeof(void *), alignof(void *)>;
+    using copy_fn_type = void(meta_storage &, const meta_storage &);
+    using steal_fn_type = void(meta_storage &, meta_storage &);
+    using destroy_fn_type = void(meta_storage &);
+
+    template<typename Type, typename = std::void_t<>>
+    struct type_traits {
+        template<typename... Args>
+        static void instance(meta_storage &buffer, Args &&... args) {
+            buffer.instance = new Type{std::forward<Args>(args)...};
+            new (&buffer.storage) Type *{static_cast<Type *>(buffer.instance)};
+        }
+
+        static void destroy(meta_storage &buffer) {
+            delete static_cast<Type *>(buffer.instance);
+        }
+
+        static void copy(meta_storage &to, const meta_storage &from) {
+            to.instance = new Type{*static_cast<const Type *>(from.instance)};
+            new (&to.storage) Type *{static_cast<Type *>(to.instance)};
+        }
+
+        static void steal(meta_storage &to, meta_storage &from) {
+            new (&to.storage) Type *{static_cast<Type *>(from.instance)};
+            to.instance = from.instance;
+        }
+    };
+
+    template<typename Type>
+    struct type_traits<Type, std::enable_if_t<sizeof(Type) <= sizeof(void *) && std::is_nothrow_move_constructible_v<Type>>> {
+        template<typename... Args>
+        static void instance(meta_storage &buffer, Args &&... args) {
+            buffer.instance = new (&buffer.storage) Type{std::forward<Args>(args)...};
+        }
+
+        static void destroy(meta_storage &buffer) {
+            static_cast<Type *>(buffer.instance)->~Type();
+        }
+
+        static void copy(meta_storage &to, const meta_storage &from) {
+            to.instance = new (&to.storage) Type{*static_cast<const Type *>(from.instance)};
+        }
+
+        static void steal(meta_storage &to, meta_storage &from) {
+            to.instance = new (&to.storage) Type{std::move(*static_cast<Type *>(from.instance))};
+            destroy(from);
+        }
+    };
+
+public:
+    /*! @brief Default constructor. */
+    meta_storage() ENTT_NOEXCEPT
+        : storage{},
+          instance{},
+          destroy_fn{},
+          copy_fn{},
+          steal_fn{}
+    {}
+
+    template<typename Type, typename... Args>
+    explicit meta_storage(std::in_place_type_t<Type>, [[maybe_unused]] Args &&... args)
+        : meta_storage{}
+    {
+        if constexpr(!std::is_void_v<Type>) {
+            type_traits<Type>::instance(*this, std::forward<Args>(args)...);
+            destroy_fn = &type_traits<Type>::destroy;
+            copy_fn = &type_traits<Type>::copy;
+            steal_fn = &type_traits<Type>::steal;
+        }
+    }
+
+    template<typename Type>
+    meta_storage(std::reference_wrapper<Type> value)
+        : meta_storage{}
+    {
+        instance = &value.get();
+    }
+
+    template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_storage>>>
+    meta_storage(Type &&value)
+        : meta_storage{std::in_place_type<std::remove_cv_t<std::remove_reference_t<Type>>>, std::forward<Type>(value)}
+    {}
+
+    meta_storage(const meta_storage &other)
+        : meta_storage{}
+    {
+        (other.copy_fn ? other.copy_fn : [](auto &to, const auto &from) { to.instance = from.instance; })(*this, other);
+        destroy_fn = other.destroy_fn;
+        copy_fn = other.copy_fn;
+        steal_fn = other.steal_fn;
+    }
+
+    meta_storage(meta_storage &&other)
+        : meta_storage{}
+    {
+        swap(*this, other);
+    }
+
+    ~meta_storage() {
+        if(destroy_fn) {
+            destroy_fn(*this);
+        }
+    }
+
+    meta_storage & operator=(meta_storage other) {
+        swap(other, *this);
+        return *this;
+    }
+
+    [[nodiscard]] const void * data() const ENTT_NOEXCEPT {
+        return instance;
+    }
+
+    [[nodiscard]] void * data() ENTT_NOEXCEPT {
+        return const_cast<void *>(std::as_const(*this).data());
+    }
+
+    template<typename Type, typename... Args>
+    void emplace(Args &&... args) {
+        *this = meta_storage{std::in_place_type<Type>, std::forward<Args>(args)...};
+    }
+
+    [[nodiscard]] meta_storage ref() const ENTT_NOEXCEPT {
+        meta_storage other{};
+        other.instance = instance;
+        return other;
+    }
+
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return !(instance == nullptr);
+    }
+
+    friend void swap(meta_storage &lhs, meta_storage &rhs) {
+        using std::swap;
+
+        if(lhs.steal_fn && rhs.steal_fn) {
+            meta_storage buffer{};
+            lhs.steal_fn(buffer, lhs);
+            rhs.steal_fn(lhs, rhs);
+            lhs.steal_fn(rhs, buffer);
+        } else if(lhs.steal_fn) {
+            lhs.steal_fn(rhs, lhs);
+        } else if(rhs.steal_fn) {
+            rhs.steal_fn(lhs, rhs);
+        } else {
+            swap(lhs.instance, rhs.instance);
+        }
+
+        swap(lhs.destroy_fn, rhs.destroy_fn);
+        swap(lhs.copy_fn, rhs.copy_fn);
+        swap(lhs.steal_fn, rhs.steal_fn);
+    }
+
+private:
+    storage_type storage;
+    void *instance;
+    destroy_fn_type *destroy_fn;
+    copy_fn_type *copy_fn;
+    steal_fn_type *steal_fn;
+};
+
+
 struct meta_type_node;
 
 
@@ -43,7 +208,7 @@ struct meta_base_node {
     meta_type_node * const parent;
     meta_base_node * next;
     meta_type_node *(* const type)() ENTT_NOEXCEPT;
-    void *(* const cast)(void *) ENTT_NOEXCEPT;
+    const void *(* const cast)(const void *) ENTT_NOEXCEPT;
 };
 
 
@@ -63,12 +228,6 @@ struct meta_ctor_node {
     const size_type size;
     meta_type_node *(* const arg)(size_type) ENTT_NOEXCEPT;
     meta_any(* const invoke)(meta_any * const);
-};
-
-
-struct meta_dtor_node {
-    meta_type_node * const parent;
-    void(* const invoke)(void *);
 };
 
 
@@ -116,6 +275,7 @@ struct meta_type_node {
     const bool is_function_pointer;
     const bool is_member_object_pointer;
     const bool is_member_function_pointer;
+    const bool is_pointer_like;
     const bool is_sequence_container;
     const bool is_associative_container;
     const size_type rank;
@@ -126,9 +286,9 @@ struct meta_type_node {
     meta_base_node *base{nullptr};
     meta_conv_node *conv{nullptr};
     meta_ctor_node *ctor{nullptr};
-    meta_dtor_node *dtor{nullptr};
     meta_data_node *data{nullptr};
     meta_func_node *func{nullptr};
+    void(* dtor)(void *){nullptr};
 };
 
 
@@ -185,11 +345,11 @@ public:
         : node{head}
     {}
 
-    iterator begin() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
         return iterator{node};
     }
 
-    iterator end() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return iterator{};
     }
 
@@ -259,8 +419,9 @@ public:
             std::is_pointer_v<Type> && std::is_function_v<std::remove_pointer_t<Type>>,
             std::is_member_object_pointer_v<Type>,
             std::is_member_function_pointer_v<Type>,
-            is_sequence_container_v<Type>,
-            is_associative_container_v<Type>,
+            is_meta_pointer_like_v<Type>,
+            has_meta_sequence_container_traits_v<Type>,
+            has_meta_associative_container_traits_v<Type>,
             std::rank_v<Type>,
             [](meta_type_node::size_type dim) {
                 return extent(dim, std::make_index_sequence<std::rank_v<Type>>{});
@@ -284,7 +445,7 @@ struct meta_info: meta_node<std::remove_cv_t<std::remove_reference_t<Type>>...> 
 
 /**
  * Internal details not to be documented.
- * @endcond TURN_OFF_DOXYGEN
+ * @endcond
  */
 
 

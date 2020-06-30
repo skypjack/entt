@@ -83,7 +83,7 @@ template<typename Type, auto Data>
         using helper_type = meta_function_helper_t<decltype(Data)>;
         using data_type = std::tuple_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>;
 
-        if(auto * const clazz = (*instance).try_cast<Type>(); clazz) {
+        if(auto * const clazz = instance->try_cast<Type>(); clazz) {
             if(auto * const direct = value.try_cast<data_type>(); direct || value.convert<data_type>()) {
                 std::invoke(Data, *clazz, direct ? *direct : value.cast<data_type>());
                 accepted = true;
@@ -93,7 +93,7 @@ template<typename Type, auto Data>
         using data_type = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>;
 
         if constexpr(!std::is_array_v<data_type>) {
-            if(auto * const clazz = (*instance).try_cast<Type>(); clazz) {
+            if(auto * const clazz = instance->try_cast<Type>(); clazz) {
                 if(auto * const direct = value.try_cast<data_type>(); direct || value.convert<data_type>()) {
                     std::invoke(Data, clazz) = (direct ? *direct : value.cast<data_type>());
                     accepted = true;
@@ -129,13 +129,13 @@ template<typename Type, auto Data, typename Policy>
     };
 
     if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
-        auto * const clazz = (*instance).try_cast<Type>();
+        auto * const clazz = instance->try_cast<Type>();
         return clazz ? dispatch(std::invoke(Data, *clazz)) : meta_any{};
     } else if constexpr(std::is_member_object_pointer_v<decltype(Data)>) {
         if constexpr(std::is_array_v<std::remove_cv_t<std::remove_reference_t<decltype(std::declval<Type>().*Data)>>>) {
             return meta_any{};
         } else {
-            auto * const clazz = (*instance).try_cast<Type>();
+            auto * const clazz = instance->try_cast<Type>();
             return clazz ? dispatch(std::invoke(Data, clazz)) : meta_any{};
         }
     } else if constexpr(std::is_pointer_v<std::decay_t<decltype(Data)>>) {
@@ -179,7 +179,7 @@ template<typename Type, auto Candidate, typename Policy, std::size_t... Indexes>
     if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Candidate)>>>) {
         return (std::get<Indexes>(direct) && ...) ? dispatch(std::get<Indexes>(direct)...) : meta_any{};
     } else {
-        auto * const clazz = (*instance).try_cast<Type>();
+        auto * const clazz = instance->try_cast<Type>();
         return (clazz && (std::get<Indexes>(direct) && ...)) ? dispatch(clazz, std::get<Indexes>(direct)...) : meta_any{};
     }
 }
@@ -190,7 +190,7 @@ template<typename Type, auto Candidate, typename Policy, std::size_t... Indexes>
 
 /**
  * Internal details not to be documented.
- * @endcond TURN_OFF_DOXYGEN
+ * @endcond
  */
 
 
@@ -374,8 +374,8 @@ public:
             type,
             nullptr,
             &internal::meta_info<Base>::resolve,
-            [](void *instance) ENTT_NOEXCEPT -> void * {
-                return static_cast<Base *>(static_cast<Type *>(instance));
+            [](const void *instance) ENTT_NOEXCEPT -> const void * {
+                return static_cast<const Base *>(static_cast<const Type *>(instance));
             }
         };
 
@@ -540,17 +540,13 @@ public:
         static_assert(std::is_invocable_v<decltype(Func), Type &>, "The function doesn't accept an object of the type provided");
         auto * const type = internal::meta_info<Type>::resolve();
 
-        static internal::meta_dtor_node node{
-            type,
-            [](void *instance) {
-                if(instance) {
-                    std::invoke(Func, *static_cast<Type *>(instance));
-                }
+        ENTT_ASSERT(!type->dtor);
+
+        type->dtor = [](void *instance) {
+            if(instance) {
+                std::invoke(Func, *static_cast<Type *>(instance));
             }
         };
-
-        ENTT_ASSERT(!type->dtor);
-        type->dtor = &node;
 
         return meta_factory<Type>{};
     }
@@ -683,7 +679,7 @@ public:
             &internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename helper_type::return_type>>::resolve,
             &helper_type::arg,
             [](meta_handle instance, meta_any *args) {
-                return internal::invoke<Type, Candidate, Policy>(std::move(instance), args, std::make_index_sequence<std::tuple_size_v<typename helper_type::args_type>>{});
+                return internal::invoke<Type, Candidate, Policy>(*instance, args, std::make_index_sequence<std::tuple_size_v<typename helper_type::args_type>>{});
             }
         };
 

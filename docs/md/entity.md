@@ -22,7 +22,6 @@
     * [Dependencies](#dependencies)
     * [Invoke](#invoke)
     * [Proxy](#proxy)
-    * [Actor](#actor)
     * [Context variables](#context-variables)
   * [Meet the runtime](#meet-the-runtime)
     * [Cloning a registry](#cloning-a-registry)
@@ -664,25 +663,6 @@ around.
 This class is intended to simplify function signatures. If you have a function
 that takes a registry and entity, and does most of its work on that entity, you
 might want to consider using a `proxy` or `const_proxy`.
-
-### Actor
-
-The `actor` class is designed for those who don't feel immediately comfortable
-working with components or for those who are migrating a project and want to
-approach it one step at a time.
-
-This class acts as a thin wrapper for an entity and for all its components. It's
-constructed with a registry and is in charge of the destruction of the entity
-when it goes out of the scope.<br/>
-An actor offers all the functionalities required to work with components, such
-as the `assign` and` remove` member functions, but also `has`,` get`, `try_get`
-and so on.
-
-My advice isn't to use the `actor` class to hide entities and components behind
-a more object-oriented interface. Instead, users should rely on it only where
-strictly necessary. In all other cases, it's highly advisable to become familiar
-with the model of `EnTT` and work directly with the registry, the views and the
-groups, rather than with a tool that could introduce a performance degradation.
 
 ### Context variables
 
