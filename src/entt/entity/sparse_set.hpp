@@ -44,7 +44,7 @@ class sparse_set {
     static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
     static constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(Entity);
 
-    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
+    using traits_type = entt_traits<Entity>;
     using page_type = std::unique_ptr<Entity[]>;
 
     class sparse_set_iterator final {

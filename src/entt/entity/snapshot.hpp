@@ -32,7 +32,7 @@ class basic_snapshot {
     /*! @brief A registry is allowed to create snapshots. */
     friend class basic_registry<Entity>;
 
-    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
+    using traits_type = entt_traits<Entity>;
 
     template<typename Component, typename Archive, typename It>
     void get(Archive &archive, std::size_t sz, It first, It last) const {
@@ -164,7 +164,7 @@ class basic_snapshot_loader {
     /*! @brief A registry is allowed to create snapshot loaders. */
     friend class basic_registry<Entity>;
 
-    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
+    using traits_type = entt_traits<Entity>;
 
     template<typename Type, typename Archive>
     void assign(Archive &archive) const {
@@ -299,7 +299,7 @@ private:
  */
 template<typename Entity>
 class basic_continuous_loader {
-    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
+    using traits_type = entt_traits<Entity>;
 
     void destroy(Entity entt) {
         const auto it = remloc.find(entt);

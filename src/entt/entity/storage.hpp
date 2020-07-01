@@ -49,7 +49,7 @@ class storage: public sparse_set<Entity> {
     static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "The managed type must be at least move constructible and assignable");
 
     using underlying_type = sparse_set<Entity>;
-    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
+    using traits_type = entt_traits<Entity>;
 
     template<bool Const>
     class storage_iterator final {
@@ -478,7 +478,7 @@ private:
 /*! @copydoc storage */
 template<typename Entity, typename Type>
 class storage<Entity, Type, std::enable_if_t<ENTT_IS_EMPTY(Type)>>: public sparse_set<Entity> {
-    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
+    using traits_type = entt_traits<Entity>;
     using underlying_type = sparse_set<Entity>;
 
 public:

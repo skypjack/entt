@@ -41,7 +41,7 @@ namespace entt {
  */
 template<typename Entity>
 class basic_registry {
-    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
+    using traits_type = entt_traits<Entity>;
 
     template<typename Component>
     struct pool_handler final: storage<Entity, Component> {

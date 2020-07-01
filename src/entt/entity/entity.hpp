@@ -18,8 +18,18 @@ namespace entt {
  * Primary template isn't defined on purpose. All the specializations give a
  * compile-time error unless the template parameter is an accepted entity type.
  */
-template<typename>
+template<typename, typename = void>
 struct entt_traits;
+
+
+/**
+ * @brief Entity traits for enumeration types.
+ * @tparam Type The type to check.
+ */
+template<typename Type>
+struct entt_traits<Type, std::enable_if_t<std::is_enum_v<Type>>>
+        : entt_traits<std::underlying_type_t<Type>>
+{};
 
 
 /**
@@ -111,7 +121,7 @@ namespace internal {
 
 class null {
     template<typename Entity>
-    using traits_type = entt_traits<std::underlying_type_t<Entity>>;
+    using traits_type = entt_traits<Entity>;
 
 public:
     template<typename Entity>
