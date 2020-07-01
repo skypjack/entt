@@ -124,6 +124,25 @@ struct basic_dynamic_associative_container {
 
 
 /**
+ * @brief Basic STL-compatible sequence container traits
+ * @tparam Container The type of the container.
+ */
+template<typename Container>
+struct basic_sequence_container {
+    /**
+     * @brief Returns a reference to the element at the specified location of the
+     * given container (no bounds checking is performed).
+     * @param cont The container from which to get the element.
+     * @param pos The position of the element to return.
+     * @return A reference to the requested element.
+     */
+    [[nodiscard]] static typename Container::value_type & get(Container &cont, typename Container::size_type pos) {
+        return cont[pos];
+    }
+};
+
+
+/**
  * @brief STL-compatible dynamic associative key-only container traits
  * @tparam Container The type of the container.
  */
@@ -173,7 +192,8 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>>
     : detail::trait_composition<
           std::vector<Type, Args...>,
           detail::basic_container,
-          detail::basic_dynamic_container> {
+          detail::basic_dynamic_container,
+          detail::basic_sequence_container> {
     /**
      * @brief Resizes a given container to contain a certain number of elements.
      * @param vec The container to resize.
@@ -207,17 +227,6 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>>
     [[nodiscard]] static std::pair<typename meta_sequence_container_traits::iterator, bool> erase(std::vector<Type, Args...> &vec, typename meta_sequence_container_traits::iterator it) {
         return { vec.erase(it), true };
     }
-
-    /**
-     * @brief Returns a reference to the element at a specified location of a
-     * given container (no bounds checking is performed).
-     * @param vec The container from which to get the element.
-     * @param pos The position of the element to return.
-     * @return A reference to the requested element.
-     */
-    [[nodiscard]] static Type & get(std::vector<Type, Args...> &vec, typename meta_sequence_container_traits::size_type pos) {
-        return vec[pos];
-    }
 };
 
 
@@ -227,7 +236,11 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>>
  * @tparam N The number of elements.
  */
 template<typename Type, auto N>
-struct meta_sequence_container_traits<std::array<Type, N>>: detail::basic_container<std::array<Type, N>> {
+struct meta_sequence_container_traits<std::array<Type, N>>
+    : detail::trait_composition<
+          std::array<Type, N>,
+          detail::basic_container,
+          detail::basic_sequence_container> {
     /**
      * @brief Does nothing.
      * @return False to indicate failure in all cases.
@@ -260,17 +273,6 @@ struct meta_sequence_container_traits<std::array<Type, N>>: detail::basic_contai
      */
     [[nodiscard]] static std::pair<typename meta_sequence_container_traits::iterator, bool> erase(const std::array<Type, N> &, typename meta_sequence_container_traits::iterator) {
         return { {}, false };
-    }
-
-    /**
-     * @brief Returns a reference to the element at a specified location of a
-     * given container (no bounds checking is performed).
-     * @param arr The container from which to get the element.
-     * @param pos The position of the element to return.
-     * @return A reference to the requested element.
-     */
-    [[nodiscard]] static Type & get(std::array<Type, N> &arr, typename meta_sequence_container_traits::size_type pos) {
-        return arr[pos];
     }
 };
 
