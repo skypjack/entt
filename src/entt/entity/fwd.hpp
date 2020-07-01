@@ -44,8 +44,8 @@ class basic_snapshot_loader;
 template<typename>
 class basic_continuous_loader;
 
-/*! @enum entity */
-enum class entity: id_type;
+/*! @brief Default entity identifier. */
+enum class entity: id_type {};
 
 /*! @brief Alias declaration for the most common use case. */
 using registry = basic_registry<entity>;

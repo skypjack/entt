@@ -5,8 +5,6 @@
 #include <cstdint>
 #include <type_traits>
 #include "../config/config.h"
-#include "../core/type_traits.hpp"
-#include "../core/fwd.hpp"
 
 
 namespace entt {
@@ -180,10 +178,6 @@ template<typename Entity>
  * Internal details not to be documented.
  * @endcond
  */
-
-
-/*! @brief Default entity identifier. */
-ENTT_OPAQUE_TYPE(entity, id_type);
 
 
 /**

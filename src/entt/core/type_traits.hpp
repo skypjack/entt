@@ -240,13 +240,4 @@ using member_class_t = typename member_class<Member>::type;
 }
 
 
-#define ENTT_OPAQUE_TYPE(clazz, type)\
-    /**\
-       @brief Defines an enum class to use for opaque identifiers.\
-       @param clazz The name to use for the enum class.\
-       @param type The underlying type for the enum class.\
-     */\
-    enum class clazz: type {}
-
-
 #endif
