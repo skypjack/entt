@@ -464,10 +464,12 @@ TEST(Registry, CreateDestroyCornerCase) {
 }
 
 TEST(Registry, VersionOverflow) {
+    using traits_type = entt::entt_traits<entt::entity>;
+
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.destroy(entity, entt::entt_traits<entt::entity>::version_mask);
+    registry.destroy(entity, typename traits_type::version_type(traits_type::version_mask));
     registry.destroy(registry.create());
 
     ASSERT_EQ(registry.current(entity), registry.version(entity));

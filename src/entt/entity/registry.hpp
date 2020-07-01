@@ -578,7 +578,7 @@ public:
      * @param entity A valid entity identifier.
      */
     void destroy(const entity_type entity) {
-        destroy(entity, (to_integral(entity) >> traits_type::entity_shift) + 1);
+        destroy(entity, version_type((to_integral(entity) >> traits_type::entity_shift) + 1));
     }
 
     /**
