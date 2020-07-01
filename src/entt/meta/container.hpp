@@ -141,6 +141,25 @@ struct dynamic_associative_key_only_container {
 };
 
 
+/**
+ * @brief STL-compatible dynamic key-value associative container traits
+ * @tparam Container The type of the container.
+ */
+template<typename Container>
+struct dynamic_associative_key_value_container {
+    /**
+     * @brief Inserts an element (a key/value pair) into the given container.
+     * @param map The container in which to insert the element.
+     * @param key The key of the element to insert.
+     * @param value The value of the element to insert.
+     * @return A bool denoting whether the insertion took place.
+     */
+    [[nodiscard]] static bool insert(Container &cont, const typename Container::key_type &key, const typename Container::mapped_type &value) {
+        return cont.insert(std::make_pair(key, value)).second;
+    }
+};
+
+
 }
 
 
@@ -269,20 +288,10 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>>
           detail::basic_container,
           detail::basic_associative_container,
           detail::basic_dynamic_container,
-          detail::basic_dynamic_associative_container> {
+          detail::basic_dynamic_associative_container,
+          detail::dynamic_associative_key_value_container> {
     /*! @brief Mapped type of the sequence container. */
     using mapped_type = typename std::map<Key, Value, Args...>::mapped_type;
-
-    /**
-     * @brief Inserts an element (a key/value pair) into a given container.
-     * @param map The container in which to insert the element.
-     * @param key The key of the element to insert.
-     * @param value The value of the element to insert.
-     * @return A bool denoting whether the insertion took place.
-     */
-    [[nodiscard]] static bool insert(std::map<Key, Value, Args...> &map, const typename meta_associative_container_traits::key_type &key, const mapped_type &value) {
-        return map.insert(std::make_pair(key, value)).second;
-    }
 };
 
 
@@ -300,20 +309,10 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
           detail::basic_container,
           detail::basic_associative_container,
           detail::basic_dynamic_container,
-          detail::basic_dynamic_associative_container> {
+          detail::basic_dynamic_associative_container,
+          detail::dynamic_associative_key_value_container> {
     /*! @brief Mapped type of the sequence container. */
     using mapped_type = typename std::unordered_map<Key, Value, Args...>::mapped_type;
-
-    /**
-     * @brief Inserts an element (a key/value pair) into a given container.
-     * @param map The container in which to insert the element.
-     * @param key The key of the element to insert.
-     * @param value The value of the element to insert.
-     * @return A bool denoting whether the insertion took place.
-     */
-    [[nodiscard]] static bool insert(std::unordered_map<Key, Value, Args...> &map, const typename meta_associative_container_traits::key_type &key, const mapped_type &value) {
-        return map.insert(std::make_pair(key, value)).second;
-    }
 };
 
 
