@@ -123,6 +123,24 @@ struct basic_dynamic_associative_container {
 };
 
 
+/**
+ * @brief STL-compatible dynamic associative key-only container traits
+ * @tparam Container The type of the container.
+ */
+template<typename Container>
+struct dynamic_associative_key_only_container {
+    /**
+     * @brief Inserts an element into the given container.
+     * @param cont The container in which to insert the element.
+     * @param key The element to insert.
+     * @return A bool denoting whether the insertion took place.
+     */
+    [[nodiscard]] static bool insert(Container &cont, const typename Container::key_type &key) {
+        return cont.insert(key).second;
+    }
+};
+
+
 }
 
 
@@ -311,16 +329,8 @@ struct meta_associative_container_traits<std::set<Key, Args...>>
           detail::basic_container,
           detail::basic_associative_container,
           detail::basic_dynamic_container,
-          detail::basic_dynamic_associative_container> {
-    /**
-     * @brief Inserts an element into a given container.
-     * @param set The container in which to insert the element.
-     * @param key The element to insert.
-     * @return A bool denoting whether the insertion took place.
-     */
-    [[nodiscard]] static bool insert(std::set<Key, Args...> &set, const typename meta_associative_container_traits::key_type &key) {
-        return set.insert(key).second;
-    }
+          detail::basic_dynamic_associative_container,
+          detail::dynamic_associative_key_only_container> {
 };
 
 
@@ -337,16 +347,8 @@ struct meta_associative_container_traits<std::unordered_set<Key, Args...>>
           detail::basic_container,
           detail::basic_associative_container,
           detail::basic_dynamic_container,
-          detail::basic_dynamic_associative_container> {
-    /**
-     * @brief Inserts an element into a given container.
-     * @param set The container in which to insert the element.
-     * @param key The element to insert.
-     * @return A bool denoting whether the insertion took place.
-     */
-    [[nodiscard]] static bool insert(std::unordered_set<Key, Args...> &set, const typename meta_associative_container_traits::key_type &key) {
-        return set.insert(key).second;
-    }
+          detail::basic_dynamic_associative_container,
+          detail::dynamic_associative_key_only_container> {
 };
 
 
