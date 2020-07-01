@@ -16,36 +16,72 @@
 namespace entt {
 
 
+namespace detail {
+
+
+template<typename Container, template<typename> class... Trait>
+struct trait_composition: public Trait<Container>... {};
+
+
+/**
+ * @brief Basic STL-compatible container traits
+ * @tparam Container The type of the container.
+ */
+template<typename Container>
+struct basic_container {
+    /*! @brief Iterator type of the container. */
+    using iterator = typename Container::iterator;
+    /*! @brief Unsigned integer type. */
+    using size_type = typename Container::size_type;
+    /*! @brief Value type of the container. */
+    using value_type = typename Container::value_type;
+
+    /**
+     * @brief Returns the size of the given container.
+     * @param cont The container for which to return the size.
+     * @return The size of the given container.
+     */
+    [[nodiscard]] static size_type size(const Container &cont) ENTT_NOEXCEPT {
+        return cont.size();
+    }
+
+    /**
+     * @brief Returns an iterator to the first element of the given container.
+     * @param cont The container for which to return the iterator.
+     * @return An iterator to the first element of the given container.
+     */
+    [[nodiscard]] static iterator begin(Container &cont) {
+        return cont.begin();
+    }
+
+    /**
+     * @brief Returns an iterator past the last element of the given container.
+     * @param cont The container for which to return the iterator.
+     * @return An iterator past the last element of the given container.
+     */
+    [[nodiscard]] static iterator end(Container &cont) {
+        return cont.end();
+    }
+};
+
+
+}
+
+
 /**
  * @brief Meta sequence container traits for `std::vector`s of any type.
  * @tparam Type The type of elements.
  * @tparam Args Other arguments.
  */
 template<typename Type, typename... Args>
-struct meta_sequence_container_traits<std::vector<Type, Args...>> {
-    /*! @brief Iterator type of the sequence container. */
-    using iterator = typename std::vector<Type, Args...>::iterator;
-    /*! @brief Unsigned integer type. */
-    using size_type = typename std::vector<Type, Args...>::size_type;
-    /*! @brief Value type of the sequence container. */
-    using value_type = typename std::vector<Type, Args...>::value_type;
-
-    /**
-     * @brief Returns the size of given a container.
-     * @param vec The container of which to return the size.
-     * @return The size of the given container.
-     */
-    [[nodiscard]] static size_type size(const std::vector<Type, Args...> &vec) ENTT_NOEXCEPT {
-        return vec.size();
-    }
-
+struct meta_sequence_container_traits<std::vector<Type, Args...>>: detail::basic_container<std::vector<Type, Args...>> {
     /**
      * @brief Resizes a given container to contain a certain number of elements.
      * @param vec The container to resize.
      * @param sz The new size of the container.
      * @return True in case of success, false otherwise.
      */
-    [[nodiscard]] static bool resize(std::vector<Type, Args...> &vec, size_type sz) {
+    [[nodiscard]] static bool resize(std::vector<Type, Args...> &vec, typename meta_sequence_container_traits::size_type sz) {
         return (vec.resize(sz), true);
     }
 
@@ -59,24 +95,6 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>> {
     }
 
     /**
-     * @brief Returns an iterator to the first element of a given container.
-     * @param vec The container of which to return the iterator.
-     * @return An iterator to the first element of the given container.
-     */
-    [[nodiscard]] static iterator begin(std::vector<Type, Args...> &vec) {
-        return vec.begin();
-    }
-
-    /**
-     * @brief Returns an iterator past the last element of a given container.
-     * @param vec The container of which to return the iterator.
-     * @return An iterator past the last element of the given container.
-     */
-    [[nodiscard]] static iterator end(std::vector<Type, Args...> &vec) {
-        return vec.end();
-    }
-
-    /**
      * @brief Inserts an element at a specified location of a given container.
      * @param vec The container in which to insert the element.
      * @param it Iterator before which the element will be inserted.
@@ -84,7 +102,7 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>> {
      * @return A pair consisting of an iterator to the inserted element (in case
      * of success) and a bool denoting whether the insertion took place.
      */
-    [[nodiscard]] static std::pair<iterator, bool> insert(std::vector<Type, Args...> &vec, iterator it, const Type &value) {
+    [[nodiscard]] static std::pair<typename meta_sequence_container_traits::iterator, bool> insert(std::vector<Type, Args...> &vec, typename meta_sequence_container_traits::iterator it, const Type &value) {
         return { vec.insert(it, value), true };
     }
 
@@ -96,7 +114,7 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>> {
      * element (in case of success) and a bool denoting whether the insertion
      * took place.
      */
-    [[nodiscard]] static std::pair<iterator, bool> erase(std::vector<Type, Args...> &vec, iterator it) {
+    [[nodiscard]] static std::pair<typename meta_sequence_container_traits::iterator, bool> erase(std::vector<Type, Args...> &vec, typename meta_sequence_container_traits::iterator it) {
         return { vec.erase(it), true };
     }
 
@@ -107,7 +125,7 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>> {
      * @param pos The position of the element to return.
      * @return A reference to the requested element.
      */
-    [[nodiscard]] static Type & get(std::vector<Type, Args...> &vec, size_type pos) {
+    [[nodiscard]] static Type & get(std::vector<Type, Args...> &vec, typename meta_sequence_container_traits::size_type pos) {
         return vec[pos];
     }
 };
@@ -119,28 +137,12 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>> {
  * @tparam N The number of elements.
  */
 template<typename Type, auto N>
-struct meta_sequence_container_traits<std::array<Type, N>> {
-    /*! @brief Iterator type of the sequence container. */
-    using iterator = typename std::array<Type, N>::iterator;
-    /*! @brief Unsigned integer type. */
-    using size_type = typename std::array<Type, N>::size_type;
-    /*! @brief Value type of the sequence container. */
-    using value_type = typename std::array<Type, N>::value_type;
-
-    /**
-     * @brief Returns the size of given a container.
-     * @param arr The container of which to return the size.
-     * @return The size of the given container.
-     */
-    [[nodiscard]] static size_type size(const std::array<Type, N> &arr) ENTT_NOEXCEPT {
-        return arr.size();
-    }
-
+struct meta_sequence_container_traits<std::array<Type, N>>: detail::basic_container<std::array<Type, N>> {
     /**
      * @brief Does nothing.
      * @return False to indicate failure in all cases.
      */
-    [[nodiscard]] static bool resize(const std::array<Type, N> &, size_type) {
+    [[nodiscard]] static bool resize(const std::array<Type, N> &, typename meta_sequence_container_traits::size_type) {
         return false;
     }
 
@@ -153,29 +155,11 @@ struct meta_sequence_container_traits<std::array<Type, N>> {
     }
 
     /**
-     * @brief Returns an iterator to the first element of a given container.
-     * @param arr The container of which to return the iterator.
-     * @return An iterator to the first element of the given container.
-     */
-    [[nodiscard]] static iterator begin(std::array<Type, N> &arr) {
-        return arr.begin();
-    }
-
-    /**
-     * @brief Returns an iterator past the last element of a given container.
-     * @param arr The container of which to return the iterator.
-     * @return An iterator past the last element of the given container.
-     */
-    [[nodiscard]] static iterator end(std::array<Type, N> &arr) {
-        return arr.end();
-    }
-
-    /**
      * @brief Does nothing.
      * @return A pair consisting of an invalid iterator and a false value to
      * indicate failure in all cases.
      */
-    [[nodiscard]] static std::pair<iterator, bool> insert(const std::array<Type, N> &, iterator, const Type &) {
+    [[nodiscard]] static std::pair<typename meta_sequence_container_traits::iterator, bool> insert(const std::array<Type, N> &, typename meta_sequence_container_traits::iterator, const Type &) {
         return { {}, false };
     }
 
@@ -184,7 +168,7 @@ struct meta_sequence_container_traits<std::array<Type, N>> {
      * @return A pair consisting of an invalid iterator and a false value to
      * indicate failure in all cases.
      */
-    [[nodiscard]] static std::pair<iterator, bool> erase(const std::array<Type, N> &, iterator) {
+    [[nodiscard]] static std::pair<typename meta_sequence_container_traits::iterator, bool> erase(const std::array<Type, N> &, typename meta_sequence_container_traits::iterator) {
         return { {}, false };
     }
 
@@ -195,7 +179,7 @@ struct meta_sequence_container_traits<std::array<Type, N>> {
      * @param pos The position of the element to return.
      * @return A reference to the requested element.
      */
-    [[nodiscard]] static Type & get(std::array<Type, N> &arr, size_type pos) {
+    [[nodiscard]] static Type & get(std::array<Type, N> &arr, typename meta_sequence_container_traits::size_type pos) {
         return arr[pos];
     }
 };
@@ -208,26 +192,11 @@ struct meta_sequence_container_traits<std::array<Type, N>> {
  * @tparam Args Other arguments.
  */
 template<typename Key, typename Value, typename... Args>
-struct meta_associative_container_traits<std::map<Key, Value, Args...>> {
-    /*! @brief Iterator type of the associative container. */
-    using iterator = typename std::map<Key, Value, Args...>::iterator;
-    /*! @brief Unsigned integer type. */
-    using size_type = typename std::map<Key, Value, Args...>::size_type;
+struct meta_associative_container_traits<std::map<Key, Value, Args...>>: detail::basic_container<std::map<Key, Value, Args...>> {
     /*! @brief Key type of the sequence container. */
     using key_type = typename std::map<Key, Value, Args...>::key_type;
     /*! @brief Mapped type of the sequence container. */
     using mapped_type = typename std::map<Key, Value, Args...>::mapped_type;
-    /*! @brief Value type of the sequence container. */
-    using value_type = typename std::map<Key, Value, Args...>::value_type;
-
-    /**
-     * @brief Returns the size of given a container.
-     * @param map The container of which to return the size.
-     * @return The size of the given container.
-     */
-    [[nodiscard]] static size_type size(const std::map<Key, Value, Args...> &map) ENTT_NOEXCEPT {
-        return map.size();
-    }
 
     /**
      * @brief Clears the content of a given container.
@@ -236,24 +205,6 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>> {
      */
     [[nodiscard]] static bool clear(std::map<Key, Value, Args...> &map) {
         return map.clear(), true;
-    }
-
-    /**
-     * @brief Returns an iterator to the first element of a given container.
-     * @param map The container of which to return the iterator.
-     * @return An iterator to the first element of the given container.
-     */
-    [[nodiscard]] static iterator begin(std::map<Key, Value, Args...> &map) {
-        return map.begin();
-    }
-
-    /**
-     * @brief Returns an iterator past the last element of a given container.
-     * @param map The container of which to return the iterator.
-     * @return An iterator past the last element of the given container.
-     */
-    [[nodiscard]] static iterator end(std::map<Key, Value, Args...> &map) {
-        return map.end();
     }
 
     /**
@@ -285,7 +236,7 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>> {
      * @param key The key of the element to search.
      * @return An iterator to the element with the given key, if any.
      */
-    [[nodiscard]] static iterator find(std::map<Key, Value, Args...> &map, const key_type &key) {
+    [[nodiscard]] static typename meta_associative_container_traits::iterator find(std::map<Key, Value, Args...> &map, const key_type &key) {
         return map.find(key);
     }
 };
@@ -299,26 +250,11 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>> {
  * @tparam Args Other arguments.
  */
 template<typename Key, typename Value, typename... Args>
-struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>> {
-    /*! @brief Iterator type of the associative container. */
-    using iterator = typename std::unordered_map<Key, Value, Args...>::iterator;
-    /*! @brief Unsigned integer type. */
-    using size_type = typename std::unordered_map<Key, Value, Args...>::size_type;
+struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>>: detail::basic_container<std::unordered_map<Key, Value, Args...>>{
     /*! @brief Key type of the sequence container. */
     using key_type = typename std::unordered_map<Key, Value, Args...>::key_type;
     /*! @brief Mapped type of the sequence container. */
     using mapped_type = typename std::unordered_map<Key, Value, Args...>::mapped_type;
-    /*! @brief Value type of the sequence container. */
-    using value_type = typename std::unordered_map<Key, Value, Args...>::value_type;
-
-    /**
-     * @brief Returns the size of given a container.
-     * @param map The container of which to return the size.
-     * @return The size of the given container.
-     */
-    [[nodiscard]] static size_type size(const std::unordered_map<Key, Value, Args...> &map) ENTT_NOEXCEPT {
-        return map.size();
-    }
 
     /**
      * @brief Clears the content of a given container.
@@ -327,24 +263,6 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
      */
     [[nodiscard]] static bool clear(std::unordered_map<Key, Value, Args...> &map) {
         return map.clear(), true;
-    }
-
-    /**
-     * @brief Returns an iterator to the first element of a given container.
-     * @param map The container of which to return the iterator.
-     * @return An iterator to the first element of the given container.
-     */
-    [[nodiscard]] static iterator begin(std::unordered_map<Key, Value, Args...> &map) {
-        return map.begin();
-    }
-
-    /**
-     * @brief Returns an iterator past the last element of a given container.
-     * @param map The container of which to return the iterator.
-     * @return An iterator past the last element of the given container.
-     */
-    [[nodiscard]] static iterator end(std::unordered_map<Key, Value, Args...> &map) {
-        return map.end();
     }
 
     /**
@@ -376,7 +294,7 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
      * @param key The key of the element to search.
      * @return An iterator to the element with the given key, if any.
      */
-    [[nodiscard]] static iterator find(std::unordered_map<Key, Value, Args...> &map, const key_type &key) {
+    [[nodiscard]] static typename meta_associative_container_traits::iterator find(std::unordered_map<Key, Value, Args...> &map, const key_type &key) {
         return map.find(key);
     }
 };
@@ -388,24 +306,9 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
  * @tparam Args Other arguments.
  */
 template<typename Key, typename... Args>
-struct meta_associative_container_traits<std::set<Key, Args...>> {
-    /*! @brief Iterator type of the associative container. */
-    using iterator = typename std::set<Key, Args...>::iterator;
-    /*! @brief Unsigned integer type. */
-    using size_type = typename std::set<Key, Args...>::size_type;
+struct meta_associative_container_traits<std::set<Key, Args...>>: detail::basic_container<std::set<Key, Args...>> {
     /*! @brief Key type of the sequence container. */
     using key_type = typename std::set<Key, Args...>::key_type;
-    /*! @brief Value type of the sequence container. */
-    using value_type = typename std::set<Key, Args...>::value_type;
-
-    /**
-     * @brief Returns the size of given a container.
-     * @param set The container of which to return the size.
-     * @return The size of the given container.
-     */
-    [[nodiscard]] static size_type size(const std::set<Key, Args...> &set) ENTT_NOEXCEPT {
-        return set.size();
-    }
 
     /**
      * @brief Clears the content of a given container.
@@ -414,24 +317,6 @@ struct meta_associative_container_traits<std::set<Key, Args...>> {
      */
     [[nodiscard]] static bool clear(std::set<Key, Args...> &set) {
         return set.clear(), true;
-    }
-
-    /**
-     * @brief Returns an iterator to the first element of a given container.
-     * @param set The container of which to return the iterator.
-     * @return An iterator to the first element of the given container.
-     */
-    [[nodiscard]] static iterator begin(std::set<Key, Args...> &set) {
-        return set.begin();
-    }
-
-    /**
-     * @brief Returns an iterator past the last element of a given container.
-     * @param set The container of which to return the iterator.
-     * @return An iterator past the last element of the given container.
-     */
-    [[nodiscard]] static iterator end(std::set<Key, Args...> &set) {
-        return set.end();
     }
 
     /**
@@ -461,7 +346,7 @@ struct meta_associative_container_traits<std::set<Key, Args...>> {
      * @param key The element to search.
      * @return An iterator to the given element, if any.
      */
-    [[nodiscard]] static iterator find(std::set<Key, Args...> &set, const key_type &key) {
+    [[nodiscard]] static typename meta_associative_container_traits::iterator find(std::set<Key, Args...> &set, const key_type &key) {
         return set.find(key);
     }
 };
@@ -474,24 +359,9 @@ struct meta_associative_container_traits<std::set<Key, Args...>> {
  * @tparam Args Other arguments.
  */
 template<typename Key, typename... Args>
-struct meta_associative_container_traits<std::unordered_set<Key, Args...>> {
-    /*! @brief Iterator type of the associative container. */
-    using iterator = typename std::unordered_set<Key, Args...>::iterator;
-    /*! @brief Unsigned integer type. */
-    using size_type = typename std::unordered_set<Key, Args...>::size_type;
+struct meta_associative_container_traits<std::unordered_set<Key, Args...>>: detail::basic_container<std::unordered_set<Key, Args...>> {
     /*! @brief Key type of the sequence container. */
     using key_type = typename std::unordered_set<Key, Args...>::key_type;
-    /*! @brief Value type of the sequence container. */
-    using value_type = typename std::unordered_set<Key, Args...>::value_type;
-
-    /**
-     * @brief Returns the size of given a container.
-     * @param set The container of which to return the size.
-     * @return The size of the given container.
-     */
-    [[nodiscard]] static size_type size(const std::unordered_set<Key, Args...> &set) ENTT_NOEXCEPT {
-        return set.size();
-    }
 
     /**
      * @brief Clears the content of a given container.
@@ -500,24 +370,6 @@ struct meta_associative_container_traits<std::unordered_set<Key, Args...>> {
      */
     [[nodiscard]] static bool clear(std::unordered_set<Key, Args...> &set) {
         return set.clear(), true;
-    }
-
-    /**
-     * @brief Returns an iterator to the first element of a given container.
-     * @param set The container of which to return the iterator.
-     * @return An iterator to the first element of the given container.
-     */
-    [[nodiscard]] static iterator begin(std::unordered_set<Key, Args...> &set) {
-        return set.begin();
-    }
-
-    /**
-     * @brief Returns an iterator past the last element of a given container.
-     * @param set The container of which to return the iterator.
-     * @return An iterator past the last element of the given container.
-     */
-    [[nodiscard]] static iterator end(std::unordered_set<Key, Args...> &set) {
-        return set.end();
     }
 
     /**
@@ -547,7 +399,7 @@ struct meta_associative_container_traits<std::unordered_set<Key, Args...>> {
      * @param key The element to search.
      * @return An iterator to the given element, if any.
      */
-    [[nodiscard]] static iterator find(std::unordered_set<Key, Args...> &set, const key_type &key) {
+    [[nodiscard]] static typename meta_associative_container_traits::iterator find(std::unordered_set<Key, Args...> &set, const key_type &key) {
         return set.find(key);
     }
 };
