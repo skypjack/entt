@@ -111,6 +111,18 @@ struct entt_traits<std::uint64_t> {
 
 
 /**
+ * @brief Converts an entity type to its underlying type.
+ * @tparam Entity The value type.
+ * @param entity The value to convert.
+ * @return The integral representation of the given value.
+ */
+template<typename Entity>
+[[nodiscard]] constexpr auto to_integral(const Entity entity) ENTT_NOEXCEPT {
+    return static_cast<typename entt_traits<Entity>::entity_type>(entity);
+}
+
+
+/**
  * @cond TURN_OFF_DOXYGEN
  * Internal details not to be documented.
  */
