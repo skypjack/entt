@@ -179,6 +179,48 @@ struct dynamic_associative_key_value_container {
 };
 
 
+/**
+ * @brief STL-compatible dynamic sequence container traits
+ * @tparam Container The type of the container.
+ */
+template<typename Container>
+struct dynamic_sequence_container {
+    /**
+     * @brief Resizes the given container to contain the given number of elements.
+     * @param cont The container to resize.
+     * @param sz The new size of the container.
+     * @return True in case of success, false otherwise.
+     */
+    [[nodiscard]] static bool resize(Container &cont, typename Container::size_type sz) {
+        return (cont.resize(sz), true);
+    }
+
+    /**
+     * @brief Inserts an element at the specified location of the given container.
+     * @param cont The container into which to insert the element.
+     * @param it Iterator before which the element will be inserted.
+     * @param value Element value to insert.
+     * @return A pair consisting of an iterator to the inserted element (in case
+     * of success) and a bool denoting whether the insertion took place.
+     */
+    [[nodiscard]] static std::pair<typename Container::iterator, bool> insert(Container &cont, typename Container::iterator it, const typename Container::value_type &value) {
+        return { cont.insert(it, value), true };
+    }
+
+    /**
+     * @brief Removes the element at the specified location from the given container.
+     * @param cont The container from which to remove the element.
+     * @param it Iterator to the element to remove.
+     * @return A pair consisting of an iterator following the last removed
+     * element (in case of success) and a bool denoting whether the insertion
+     * took place.
+     */
+    [[nodiscard]] static std::pair<typename Container::iterator, bool> erase(Container &cont, typename Container::iterator it) {
+        return { cont.erase(it), true };
+    }
+};
+
+
 }
 
 
@@ -193,40 +235,8 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>>
           std::vector<Type, Args...>,
           detail::basic_container,
           detail::basic_dynamic_container,
-          detail::basic_sequence_container> {
-    /**
-     * @brief Resizes a given container to contain a certain number of elements.
-     * @param vec The container to resize.
-     * @param sz The new size of the container.
-     * @return True in case of success, false otherwise.
-     */
-    [[nodiscard]] static bool resize(std::vector<Type, Args...> &vec, typename meta_sequence_container_traits::size_type sz) {
-        return (vec.resize(sz), true);
-    }
-
-    /**
-     * @brief Inserts an element at a specified location of a given container.
-     * @param vec The container in which to insert the element.
-     * @param it Iterator before which the element will be inserted.
-     * @param value Element value to insert.
-     * @return A pair consisting of an iterator to the inserted element (in case
-     * of success) and a bool denoting whether the insertion took place.
-     */
-    [[nodiscard]] static std::pair<typename meta_sequence_container_traits::iterator, bool> insert(std::vector<Type, Args...> &vec, typename meta_sequence_container_traits::iterator it, const Type &value) {
-        return { vec.insert(it, value), true };
-    }
-
-    /**
-     * @brief Removes the specified element from a given container.
-     * @param vec The container from which to remove the element.
-     * @param it Iterator to the element to remove.
-     * @return A pair consisting of an iterator following the last removed
-     * element (in case of success) and a bool denoting whether the insertion
-     * took place.
-     */
-    [[nodiscard]] static std::pair<typename meta_sequence_container_traits::iterator, bool> erase(std::vector<Type, Args...> &vec, typename meta_sequence_container_traits::iterator it) {
-        return { vec.erase(it), true };
-    }
+          detail::basic_sequence_container,
+          detail::dynamic_sequence_container> {
 };
 
 
