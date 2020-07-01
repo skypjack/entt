@@ -65,6 +65,28 @@ struct basic_container {
 };
 
 
+/**
+ * @brief Basic STL-compatible associative container traits
+ * @tparam Container The type of the container.
+ */
+template<typename Container>
+struct basic_associative_container {
+    /*! @brief Key type of the sequence container. */
+    using key_type = typename Container::key_type;
+
+    /**
+     * @brief Returns an iterator to the element with key equivalent to a given
+     * one, if any.
+     * @param map The container in which to search for the element.
+     * @param key The key of the element to search.
+     * @return An iterator to the element with the given key, if any.
+     */
+    [[nodiscard]] static typename Container::iterator find(Container &cont, const key_type &key) {
+        return cont.find(key);
+    }
+};
+
+
 }
 
 
@@ -192,9 +214,11 @@ struct meta_sequence_container_traits<std::array<Type, N>>: detail::basic_contai
  * @tparam Args Other arguments.
  */
 template<typename Key, typename Value, typename... Args>
-struct meta_associative_container_traits<std::map<Key, Value, Args...>>: detail::basic_container<std::map<Key, Value, Args...>> {
-    /*! @brief Key type of the sequence container. */
-    using key_type = typename std::map<Key, Value, Args...>::key_type;
+struct meta_associative_container_traits<std::map<Key, Value, Args...>>
+    : detail::trait_composition<
+          std::map<Key, Value, Args...>,
+          detail::basic_container,
+          detail::basic_associative_container> {
     /*! @brief Mapped type of the sequence container. */
     using mapped_type = typename std::map<Key, Value, Args...>::mapped_type;
 
@@ -214,7 +238,7 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>>: detail:
      * @param value The value of the element to insert.
      * @return A bool denoting whether the insertion took place.
      */
-    [[nodiscard]] static bool insert(std::map<Key, Value, Args...> &map, const key_type &key, const mapped_type &value) {
+    [[nodiscard]] static bool insert(std::map<Key, Value, Args...> &map, const typename meta_associative_container_traits::key_type &key, const mapped_type &value) {
         return map.insert(std::make_pair(key, value)).second;
     }
 
@@ -224,20 +248,9 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>>: detail:
      * @param key The key of the element to remove.
      * @return A bool denoting whether the removal took place.
      */
-    [[nodiscard]] static bool erase(std::map<Key, Value, Args...> &map, const key_type &key) {
+    [[nodiscard]] static bool erase(std::map<Key, Value, Args...> &map, const typename meta_associative_container_traits::key_type &key) {
         const auto sz = map.size();
         return map.erase(key) != sz;
-    }
-
-    /**
-     * @brief Returns an iterator to the element with key equivalent to a given
-     * one, if any.
-     * @param map The container in which to search for the element.
-     * @param key The key of the element to search.
-     * @return An iterator to the element with the given key, if any.
-     */
-    [[nodiscard]] static typename meta_associative_container_traits::iterator find(std::map<Key, Value, Args...> &map, const key_type &key) {
-        return map.find(key);
     }
 };
 
@@ -250,9 +263,11 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>>: detail:
  * @tparam Args Other arguments.
  */
 template<typename Key, typename Value, typename... Args>
-struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>>: detail::basic_container<std::unordered_map<Key, Value, Args...>>{
-    /*! @brief Key type of the sequence container. */
-    using key_type = typename std::unordered_map<Key, Value, Args...>::key_type;
+struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>>
+    : detail::trait_composition<
+          std::unordered_map<Key, Value, Args...>,
+          detail::basic_container,
+          detail::basic_associative_container> {
     /*! @brief Mapped type of the sequence container. */
     using mapped_type = typename std::unordered_map<Key, Value, Args...>::mapped_type;
 
@@ -272,7 +287,7 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
      * @param value The value of the element to insert.
      * @return A bool denoting whether the insertion took place.
      */
-    [[nodiscard]] static bool insert(std::unordered_map<Key, Value, Args...> &map, const key_type &key, const mapped_type &value) {
+    [[nodiscard]] static bool insert(std::unordered_map<Key, Value, Args...> &map, const typename meta_associative_container_traits::key_type &key, const mapped_type &value) {
         return map.insert(std::make_pair(key, value)).second;
     }
 
@@ -282,20 +297,9 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
      * @param key The key of the element to remove.
      * @return A bool denoting whether the removal took place.
      */
-    [[nodiscard]] static bool erase(std::unordered_map<Key, Value, Args...> &map, const key_type &key) {
+    [[nodiscard]] static bool erase(std::unordered_map<Key, Value, Args...> &map, const typename meta_associative_container_traits::key_type &key) {
         const auto sz = map.size();
         return map.erase(key) != sz;
-    }
-
-    /**
-     * @brief Returns an iterator to the element with key equivalent to a given
-     * one, if any.
-     * @param map The container in which to search for the element.
-     * @param key The key of the element to search.
-     * @return An iterator to the element with the given key, if any.
-     */
-    [[nodiscard]] static typename meta_associative_container_traits::iterator find(std::unordered_map<Key, Value, Args...> &map, const key_type &key) {
-        return map.find(key);
     }
 };
 
@@ -306,10 +310,11 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
  * @tparam Args Other arguments.
  */
 template<typename Key, typename... Args>
-struct meta_associative_container_traits<std::set<Key, Args...>>: detail::basic_container<std::set<Key, Args...>> {
-    /*! @brief Key type of the sequence container. */
-    using key_type = typename std::set<Key, Args...>::key_type;
-
+struct meta_associative_container_traits<std::set<Key, Args...>>
+    : detail::trait_composition<
+          std::set<Key, Args...>,
+          detail::basic_container,
+          detail::basic_associative_container> {
     /**
      * @brief Clears the content of a given container.
      * @param set The container of which to clear the content.
@@ -325,7 +330,7 @@ struct meta_associative_container_traits<std::set<Key, Args...>>: detail::basic_
      * @param key The element to insert.
      * @return A bool denoting whether the insertion took place.
      */
-    [[nodiscard]] static bool insert(std::set<Key, Args...> &set, const key_type &key) {
+    [[nodiscard]] static bool insert(std::set<Key, Args...> &set, const typename meta_associative_container_traits::key_type &key) {
         return set.insert(key).second;
     }
 
@@ -335,19 +340,9 @@ struct meta_associative_container_traits<std::set<Key, Args...>>: detail::basic_
      * @param key The element to remove.
      * @return A bool denoting whether the removal took place.
      */
-    [[nodiscard]] static bool erase(std::set<Key, Args...> &set, const key_type &key) {
+    [[nodiscard]] static bool erase(std::set<Key, Args...> &set, const typename meta_associative_container_traits::key_type &key) {
         const auto sz = set.size();
         return set.erase(key) != sz;
-    }
-
-    /**
-     * @brief Returns an iterator to a given element, if any.
-     * @param set The container in which to search for the element.
-     * @param key The element to search.
-     * @return An iterator to the given element, if any.
-     */
-    [[nodiscard]] static typename meta_associative_container_traits::iterator find(std::set<Key, Args...> &set, const key_type &key) {
-        return set.find(key);
     }
 };
 
@@ -359,10 +354,11 @@ struct meta_associative_container_traits<std::set<Key, Args...>>: detail::basic_
  * @tparam Args Other arguments.
  */
 template<typename Key, typename... Args>
-struct meta_associative_container_traits<std::unordered_set<Key, Args...>>: detail::basic_container<std::unordered_set<Key, Args...>> {
-    /*! @brief Key type of the sequence container. */
-    using key_type = typename std::unordered_set<Key, Args...>::key_type;
-
+struct meta_associative_container_traits<std::unordered_set<Key, Args...>>
+    : detail::trait_composition<
+          std::unordered_set<Key, Args...>,
+          detail::basic_container,
+          detail::basic_associative_container> {
     /**
      * @brief Clears the content of a given container.
      * @param set The container of which to clear the content.
@@ -378,7 +374,7 @@ struct meta_associative_container_traits<std::unordered_set<Key, Args...>>: deta
      * @param key The element to insert.
      * @return A bool denoting whether the insertion took place.
      */
-    [[nodiscard]] static bool insert(std::unordered_set<Key, Args...> &set, const key_type &key) {
+    [[nodiscard]] static bool insert(std::unordered_set<Key, Args...> &set, const typename meta_associative_container_traits::key_type &key) {
         return set.insert(key).second;
     }
 
@@ -388,19 +384,9 @@ struct meta_associative_container_traits<std::unordered_set<Key, Args...>>: deta
      * @param key The element to remove.
      * @return A bool denoting whether the removal took place.
      */
-    [[nodiscard]] static bool erase(std::unordered_set<Key, Args...> &set, const key_type &key) {
+    [[nodiscard]] static bool erase(std::unordered_set<Key, Args...> &set, const typename meta_associative_container_traits::key_type &key) {
         const auto sz = set.size();
         return set.erase(key) != sz;
-    }
-
-    /**
-     * @brief Returns an iterator to a given element, if any.
-     * @param set The container in which to search for the element.
-     * @param key The element to search.
-     * @return An iterator to the given element, if any.
-     */
-    [[nodiscard]] static typename meta_associative_container_traits::iterator find(std::unordered_set<Key, Args...> &set, const key_type &key) {
-        return set.find(key);
     }
 };
 
