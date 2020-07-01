@@ -104,6 +104,25 @@ struct basic_dynamic_container {
 };
 
 
+/**
+ * @brief Basic STL-compatible dynamic associative container traits
+ * @tparam Container The type of the container.
+ */
+template<typename Container>
+struct basic_dynamic_associative_container {
+    /**
+     * @brief Removes the specified element from the given container.
+     * @param cont The container from which to remove the element.
+     * @param key The element to remove.
+     * @return A bool denoting whether the removal took place.
+     */
+    [[nodiscard]] static bool erase(Container &cont, const typename Container::key_type &key) {
+        const auto sz = cont.size();
+        return cont.erase(key) != sz;
+    }
+};
+
+
 }
 
 
@@ -231,7 +250,8 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>>
           std::map<Key, Value, Args...>,
           detail::basic_container,
           detail::basic_associative_container,
-          detail::basic_dynamic_container> {
+          detail::basic_dynamic_container,
+          detail::basic_dynamic_associative_container> {
     /*! @brief Mapped type of the sequence container. */
     using mapped_type = typename std::map<Key, Value, Args...>::mapped_type;
 
@@ -244,17 +264,6 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>>
      */
     [[nodiscard]] static bool insert(std::map<Key, Value, Args...> &map, const typename meta_associative_container_traits::key_type &key, const mapped_type &value) {
         return map.insert(std::make_pair(key, value)).second;
-    }
-
-    /**
-     * @brief Removes the specified element from a given container.
-     * @param map The container from which to remove the element.
-     * @param key The key of the element to remove.
-     * @return A bool denoting whether the removal took place.
-     */
-    [[nodiscard]] static bool erase(std::map<Key, Value, Args...> &map, const typename meta_associative_container_traits::key_type &key) {
-        const auto sz = map.size();
-        return map.erase(key) != sz;
     }
 };
 
@@ -272,7 +281,8 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
           std::unordered_map<Key, Value, Args...>,
           detail::basic_container,
           detail::basic_associative_container,
-          detail::basic_dynamic_container> {
+          detail::basic_dynamic_container,
+          detail::basic_dynamic_associative_container> {
     /*! @brief Mapped type of the sequence container. */
     using mapped_type = typename std::unordered_map<Key, Value, Args...>::mapped_type;
 
@@ -285,17 +295,6 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
      */
     [[nodiscard]] static bool insert(std::unordered_map<Key, Value, Args...> &map, const typename meta_associative_container_traits::key_type &key, const mapped_type &value) {
         return map.insert(std::make_pair(key, value)).second;
-    }
-
-    /**
-     * @brief Removes the specified element from a given container.
-     * @param map The container from which to remove the element.
-     * @param key The key of the element to remove.
-     * @return A bool denoting whether the removal took place.
-     */
-    [[nodiscard]] static bool erase(std::unordered_map<Key, Value, Args...> &map, const typename meta_associative_container_traits::key_type &key) {
-        const auto sz = map.size();
-        return map.erase(key) != sz;
     }
 };
 
@@ -311,7 +310,8 @@ struct meta_associative_container_traits<std::set<Key, Args...>>
           std::set<Key, Args...>,
           detail::basic_container,
           detail::basic_associative_container,
-          detail::basic_dynamic_container> {
+          detail::basic_dynamic_container,
+          detail::basic_dynamic_associative_container> {
     /**
      * @brief Inserts an element into a given container.
      * @param set The container in which to insert the element.
@@ -320,17 +320,6 @@ struct meta_associative_container_traits<std::set<Key, Args...>>
      */
     [[nodiscard]] static bool insert(std::set<Key, Args...> &set, const typename meta_associative_container_traits::key_type &key) {
         return set.insert(key).second;
-    }
-
-    /**
-     * @brief Removes the specified element from a given container.
-     * @param set The container from which to remove the element.
-     * @param key The element to remove.
-     * @return A bool denoting whether the removal took place.
-     */
-    [[nodiscard]] static bool erase(std::set<Key, Args...> &set, const typename meta_associative_container_traits::key_type &key) {
-        const auto sz = set.size();
-        return set.erase(key) != sz;
     }
 };
 
@@ -347,7 +336,8 @@ struct meta_associative_container_traits<std::unordered_set<Key, Args...>>
           std::unordered_set<Key, Args...>,
           detail::basic_container,
           detail::basic_associative_container,
-          detail::basic_dynamic_container> {
+          detail::basic_dynamic_container,
+          detail::basic_dynamic_associative_container> {
     /**
      * @brief Inserts an element into a given container.
      * @param set The container in which to insert the element.
@@ -356,17 +346,6 @@ struct meta_associative_container_traits<std::unordered_set<Key, Args...>>
      */
     [[nodiscard]] static bool insert(std::unordered_set<Key, Args...> &set, const typename meta_associative_container_traits::key_type &key) {
         return set.insert(key).second;
-    }
-
-    /**
-     * @brief Removes the specified element from a given container.
-     * @param set The container from which to remove the element.
-     * @param key The element to remove.
-     * @return A bool denoting whether the removal took place.
-     */
-    [[nodiscard]] static bool erase(std::unordered_set<Key, Args...> &set, const typename meta_associative_container_traits::key_type &key) {
-        const auto sz = set.size();
-        return set.erase(key) != sz;
     }
 };
 
