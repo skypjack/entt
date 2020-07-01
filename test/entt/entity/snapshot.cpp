@@ -84,7 +84,7 @@ struct map_component {
 };
 
 TEST(Snapshot, Dump) {
-    using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
+    using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry;
 
@@ -150,7 +150,7 @@ TEST(Snapshot, Dump) {
 }
 
 TEST(Snapshot, Partial) {
-    using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
+    using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry;
 
@@ -221,7 +221,7 @@ TEST(Snapshot, Partial) {
 }
 
 TEST(Snapshot, Iterator) {
-    using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
+    using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry;
 
@@ -261,7 +261,7 @@ TEST(Snapshot, Iterator) {
 }
 
 TEST(Snapshot, Continuous) {
-    using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
+    using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry src;
     entt::registry dst;
@@ -503,7 +503,7 @@ TEST(Snapshot, Continuous) {
 }
 
 TEST(Snapshot, MoreOnShrink) {
-    using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
+    using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry src;
     entt::registry dst;
@@ -531,7 +531,7 @@ TEST(Snapshot, MoreOnShrink) {
 }
 
 TEST(Snapshot, SyncDataMembers) {
-    using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
+    using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry src;
     entt::registry dst;

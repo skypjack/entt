@@ -467,7 +467,7 @@ TEST(Registry, VersionOverflow) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.destroy(entity, entt::entt_traits<std::underlying_type_t<entt::entity>>::version_mask);
+    registry.destroy(entity, entt::entt_traits<entt::entity>::version_mask);
     registry.destroy(registry.create());
 
     ASSERT_EQ(registry.current(entity), registry.version(entity));

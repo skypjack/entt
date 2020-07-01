@@ -5,7 +5,7 @@
 #include <entt/entity/registry.hpp>
 
 TEST(Entity, Null) {
-    using traits_type = entt::entt_traits<std::underlying_type_t<entt::entity>>;
+    using traits_type = entt::entt_traits<entt::entity>;
 
     entt::registry registry{};
     const auto entity = registry.create();
