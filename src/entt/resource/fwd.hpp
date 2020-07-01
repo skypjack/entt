@@ -7,15 +7,15 @@ namespace entt {
 
 /*! @struct cache */
 template<typename>
-struct cache;
+struct resource_cache;
 
 /*! @class handle */
 template<typename>
-class handle;
+class resource_handle;
 
 /*! @class loader */
 template<typename, typename>
-class loader;
+class resource_loader;
 
 
 }

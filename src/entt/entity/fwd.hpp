@@ -54,7 +54,7 @@ using registry = basic_registry<entity>;
 using observer = basic_observer<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
-using actor = basic_actor<entity>;
+using actor [[deprecated("Consider using the handle class instead")]] = basic_actor<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using snapshot = basic_snapshot<entity>;
