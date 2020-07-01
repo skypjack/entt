@@ -75,14 +75,31 @@ struct basic_associative_container {
     using key_type = typename Container::key_type;
 
     /**
-     * @brief Returns an iterator to the element with key equivalent to a given
+     * @brief Returns an iterator to the element with key equivalent to the given
      * one, if any.
-     * @param map The container in which to search for the element.
+     * @param cont The container in which to search for the element.
      * @param key The key of the element to search.
      * @return An iterator to the element with the given key, if any.
      */
     [[nodiscard]] static typename Container::iterator find(Container &cont, const key_type &key) {
         return cont.find(key);
+    }
+};
+
+
+/**
+ * @brief Basic STL-compatible dynamic container traits
+ * @tparam Container The type of the container.
+ */
+template<typename Container>
+struct basic_dynamic_container {
+    /**
+     * @brief Clears the content of the given container.
+     * @param cont The container for which to clear the content.
+     * @return True in case of success, false otherwise.
+     */
+    [[nodiscard]] static bool clear(Container &cont) {
+        return cont.clear(), true;
     }
 };
 
@@ -96,7 +113,11 @@ struct basic_associative_container {
  * @tparam Args Other arguments.
  */
 template<typename Type, typename... Args>
-struct meta_sequence_container_traits<std::vector<Type, Args...>>: detail::basic_container<std::vector<Type, Args...>> {
+struct meta_sequence_container_traits<std::vector<Type, Args...>>
+    : detail::trait_composition<
+          std::vector<Type, Args...>,
+          detail::basic_container,
+          detail::basic_dynamic_container> {
     /**
      * @brief Resizes a given container to contain a certain number of elements.
      * @param vec The container to resize.
@@ -105,15 +126,6 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>>: detail::basic
      */
     [[nodiscard]] static bool resize(std::vector<Type, Args...> &vec, typename meta_sequence_container_traits::size_type sz) {
         return (vec.resize(sz), true);
-    }
-
-    /**
-     * @brief Clears the content of a given container.
-     * @param vec The container of which to clear the content.
-     * @return True in case of success, false otherwise.
-     */
-    [[nodiscard]] static bool clear(std::vector<Type, Args...> &vec) {
-        return vec.clear(), true;
     }
 
     /**
@@ -218,18 +230,10 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>>
     : detail::trait_composition<
           std::map<Key, Value, Args...>,
           detail::basic_container,
-          detail::basic_associative_container> {
+          detail::basic_associative_container,
+          detail::basic_dynamic_container> {
     /*! @brief Mapped type of the sequence container. */
     using mapped_type = typename std::map<Key, Value, Args...>::mapped_type;
-
-    /**
-     * @brief Clears the content of a given container.
-     * @param map The container of which to clear the content.
-     * @return True in case of success, false otherwise.
-     */
-    [[nodiscard]] static bool clear(std::map<Key, Value, Args...> &map) {
-        return map.clear(), true;
-    }
 
     /**
      * @brief Inserts an element (a key/value pair) into a given container.
@@ -267,18 +271,10 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
     : detail::trait_composition<
           std::unordered_map<Key, Value, Args...>,
           detail::basic_container,
-          detail::basic_associative_container> {
+          detail::basic_associative_container,
+          detail::basic_dynamic_container> {
     /*! @brief Mapped type of the sequence container. */
     using mapped_type = typename std::unordered_map<Key, Value, Args...>::mapped_type;
-
-    /**
-     * @brief Clears the content of a given container.
-     * @param map The container of which to clear the content.
-     * @return True in case of success, false otherwise.
-     */
-    [[nodiscard]] static bool clear(std::unordered_map<Key, Value, Args...> &map) {
-        return map.clear(), true;
-    }
 
     /**
      * @brief Inserts an element (a key/value pair) into a given container.
@@ -314,16 +310,8 @@ struct meta_associative_container_traits<std::set<Key, Args...>>
     : detail::trait_composition<
           std::set<Key, Args...>,
           detail::basic_container,
-          detail::basic_associative_container> {
-    /**
-     * @brief Clears the content of a given container.
-     * @param set The container of which to clear the content.
-     * @return True in case of success, false otherwise.
-     */
-    [[nodiscard]] static bool clear(std::set<Key, Args...> &set) {
-        return set.clear(), true;
-    }
-
+          detail::basic_associative_container,
+          detail::basic_dynamic_container> {
     /**
      * @brief Inserts an element into a given container.
      * @param set The container in which to insert the element.
@@ -358,16 +346,8 @@ struct meta_associative_container_traits<std::unordered_set<Key, Args...>>
     : detail::trait_composition<
           std::unordered_set<Key, Args...>,
           detail::basic_container,
-          detail::basic_associative_container> {
-    /**
-     * @brief Clears the content of a given container.
-     * @param set The container of which to clear the content.
-     * @return True in case of success, false otherwise.
-     */
-    [[nodiscard]] static bool clear(std::unordered_set<Key, Args...> &set) {
-        return set.clear(), true;
-    }
-
+          detail::basic_associative_container,
+          detail::basic_dynamic_container> {
     /**
      * @brief Inserts an element into a given container.
      * @param set The container in which to insert the element.
