@@ -197,7 +197,7 @@ TEST(NonOwningGroup, Sort) {
     ASSERT_EQ(*(group.data() + 2u), e2);
 
     group.sort([](const entt::entity lhs, const entt::entity rhs) {
-        return std::underlying_type_t<entt::entity>(lhs) < std::underlying_type_t<entt::entity>(rhs);
+        return entt::to_integral(lhs) < entt::to_integral(rhs);
     });
 
     ASSERT_EQ(*(group.raw<unsigned int>() + 0u), 0u);

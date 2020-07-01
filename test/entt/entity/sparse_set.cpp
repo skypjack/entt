@@ -74,7 +74,7 @@ TEST(SparseSet, Functionalities) {
 
 TEST(SparseSet, Pagination) {
     entt::sparse_set<entt::entity> set;
-    constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(std::underlying_type_t<entt::entity>);
+    constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(entt::entity);
 
     ASSERT_EQ(set.extent(), 0);
 
