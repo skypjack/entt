@@ -221,6 +221,48 @@ struct dynamic_sequence_container {
 };
 
 
+/**
+ * @brief STL-compatible fixed sequence container traits
+ * @tparam Container The type of the container.
+ */
+template<typename Container>
+struct fixed_sequence_container {
+    /**
+     * @brief Does nothing.
+     * @return False to indicate failure in all cases.
+     */
+    [[nodiscard]] static bool resize(const Container &, typename Container::size_type) {
+        return false;
+    }
+
+    /**
+     * @brief Does nothing.
+     * @return False to indicate failure in all cases.
+     */
+    [[nodiscard]] static bool clear(const Container &) {
+        return false;
+    }
+
+    /**
+     * @brief Does nothing.
+     * @return A pair consisting of an invalid iterator and a false value to
+     * indicate failure in all cases.
+     */
+    [[nodiscard]] static std::pair<typename Container::iterator, bool> insert(const Container &, typename Container::iterator, const typename Container::value_type &) {
+        return { {}, false };
+    }
+
+    /**
+     * @brief Does nothing.
+     * @return A pair consisting of an invalid iterator and a false value to
+     * indicate failure in all cases.
+     */
+    [[nodiscard]] static std::pair<typename Container::iterator, bool> erase(const Container &, typename Container::iterator) {
+        return { {}, false };
+    }
+};
+
+
 }
 
 
@@ -250,40 +292,8 @@ struct meta_sequence_container_traits<std::array<Type, N>>
     : detail::trait_composition<
           std::array<Type, N>,
           detail::basic_container,
-          detail::basic_sequence_container> {
-    /**
-     * @brief Does nothing.
-     * @return False to indicate failure in all cases.
-     */
-    [[nodiscard]] static bool resize(const std::array<Type, N> &, typename meta_sequence_container_traits::size_type) {
-        return false;
-    }
-
-    /**
-     * @brief Does nothing.
-     * @return False to indicate failure in all cases.
-     */
-    [[nodiscard]] static bool clear(const std::array<Type, N> &) {
-        return false;
-    }
-
-    /**
-     * @brief Does nothing.
-     * @return A pair consisting of an invalid iterator and a false value to
-     * indicate failure in all cases.
-     */
-    [[nodiscard]] static std::pair<typename meta_sequence_container_traits::iterator, bool> insert(const std::array<Type, N> &, typename meta_sequence_container_traits::iterator, const Type &) {
-        return { {}, false };
-    }
-
-    /**
-     * @brief Does nothing.
-     * @return A pair consisting of an invalid iterator and a false value to
-     * indicate failure in all cases.
-     */
-    [[nodiscard]] static std::pair<typename meta_sequence_container_traits::iterator, bool> erase(const std::array<Type, N> &, typename meta_sequence_container_traits::iterator) {
-        return { {}, false };
-    }
+          detail::basic_sequence_container,
+          detail::fixed_sequence_container>{
 };
 
 
