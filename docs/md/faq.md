@@ -100,25 +100,21 @@ performance from this component.
 
 Custom entity identifiers are definitely a good idea in two cases at least:
 
-* If `std::uint32_t` isn't large enough as an underlying type.
+* If `std::uint32_t` is too large or isn't large enough for your purposes, since
+  this is the underlying type of `entt::entity`.
 * If you want to avoid conflicts when using multiple registries.
 
-These identifiers are nothing more than enum classes with some salt.<br/>
-To simplify the creation of new identifiers, `EnTT` provides the macro
-`ENTT_OPAQUE_TYPE` that accepts two arguments:
-
-* The name you want to give to the new identifier (watch out for namespaces).
-* The underlying type to use (either `std::uint16_t`, `std::uint32_t`
-  or `std::uint64_t`).
-
-In fact, this is the definition of `entt::entity`:
+Identifiers can be defined through enum classes and custom types for which a
+specialization of `entt_traits` exists. For this purpose, `entt_traits` is also
+defined as a _sfinae-friendly_ class template.<br/>
+In fact, this is a definition equivalent to that of `entt::entity`:
 
 ```cpp
-ENTT_OPAQUE_TYPE(entity, std::uint32_t)
+enum class entity: std::uint32_t {};
 ```
 
-The use of this macro is highly recommended, so as not to run into problems if
-the requirements for the identifiers should change in the future.
+In theory, integral types can also be used as entity identifiers, even though
+this may break in future and isn't recommended in general.
 
 ## Warning C4307: integral constant overflow
 

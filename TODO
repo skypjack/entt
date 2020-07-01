@@ -3,13 +3,10 @@
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects (remove runtime views, welcome reflection)
-* add opaque input iterators to views and groups that return tuples <entity, T &...> (proxy), multi-pass guaranteed
 * allow to replace std:: with custom implementations
 * custom (decoupled) pools ==> N-buffering, shared components, multi-model, hibitsets, and so on
 * add examples (and credits) from @alanjfs :)
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...> (see #342)
-* can we write a bool conv func for entt::entity that silently compares it to null?
-* is it possible to make 0 the entity null?
 * update documentation for meta, it contains less than half of the actual feature
 
 Next:
@@ -23,7 +20,3 @@ Next:
 * WIP: snapshot rework
  - snapshot: support for range-based archives
  - update documentation to describe alternatives
-
-* WIP:
- - remove internal::find_if
- - add cast_or_convert to meta_any, clean up codebase

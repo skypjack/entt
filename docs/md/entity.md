@@ -162,13 +162,16 @@ A registry can store and manage entities, as well as create views and groups to
 iterate the underlying data structures.<br/>
 The class template `basic_registry` lets users decide what's the preferred type
 to represent an entity. Because `std::uint32_t` is large enough for almost all
-the cases, there exists also the type `entt::entity` for it and the alias
-`entt::registry` for `entt::basic_registry<entt::entity>`.
+the cases, there exists also the enum class `entt::entity` that _wraps_ it and
+the alias `entt::registry` for `entt::basic_registry<entt::entity>`.
 
 Entities are represented by _entity identifiers_. An entity identifier carries
 information about the entity itself and its version.<br/>
-User defined identifiers can be introduced by means of the `ENTT_OPAQUE_TYPE`
-macro if needed.
+User defined identifiers can be introduced by means of enum classes and custom
+types for which a specialization of `entt_traits` exists. For this purpose,
+`entt_traits` is also defined as a _sfinae-friendly_ class template. In theory,
+integral types can also be used as entity identifiers, even though this may
+break in future and isn't recommended in general.
 
 A registry is used both to construct and to destroy entities:
 
