@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_ENTITY_HPP
 
 
+#include <cstddef>
 #include <cstdint>
 #include <type_traits>
 #include "../config/config.h"
@@ -48,11 +49,11 @@ struct entt_traits<std::uint16_t> {
     using difference_type = std::int32_t;
 
     /*! @brief Mask to use to get the entity number out of an identifier. */
-    static constexpr std::uint16_t entity_mask = 0xFFF;
+    static constexpr entity_type entity_mask = 0xFFF;
     /*! @brief Mask to use to get the version out of an identifier. */
-    static constexpr std::uint16_t version_mask = 0xF;
+    static constexpr entity_type version_mask = 0xF;
     /*! @brief Extent of the entity number within an identifier. */
-    static constexpr auto entity_shift = 12;
+    static constexpr std::size_t entity_shift = 12u;
 };
 
 
@@ -74,11 +75,11 @@ struct entt_traits<std::uint32_t> {
     using difference_type = std::int64_t;
 
     /*! @brief Mask to use to get the entity number out of an identifier. */
-    static constexpr std::uint32_t entity_mask = 0xFFFFF;
+    static constexpr entity_type entity_mask = 0xFFFFF;
     /*! @brief Mask to use to get the version out of an identifier. */
-    static constexpr std::uint32_t version_mask = 0xFFF;
+    static constexpr entity_type version_mask = 0xFFF;
     /*! @brief Extent of the entity number within an identifier. */
-    static constexpr auto entity_shift = 20;
+    static constexpr std::size_t entity_shift = 20u;
 };
 
 
@@ -100,11 +101,11 @@ struct entt_traits<std::uint64_t> {
     using difference_type = std::int64_t;
 
     /*! @brief Mask to use to get the entity number out of an identifier. */
-    static constexpr std::uint64_t entity_mask = 0xFFFFFFFF;
+    static constexpr entity_type entity_mask = 0xFFFFFFFF;
     /*! @brief Mask to use to get the version out of an identifier. */
-    static constexpr std::uint64_t version_mask = 0xFFFFFFFF;
+    static constexpr entity_type version_mask = 0xFFFFFFFF;
     /*! @brief Extent of the entity number within an identifier. */
-    static constexpr auto entity_shift = 32;
+    static constexpr std::size_t entity_shift = 32u;
 };
 
 
@@ -129,14 +130,10 @@ template<typename Entity>
 namespace internal {
 
 
-class null {
-    template<typename Entity>
-    using traits_type = entt_traits<Entity>;
-
-public:
+struct null {
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const ENTT_NOEXCEPT {
-        return Entity{traits_type<Entity>::entity_mask};
+        return Entity{entt_traits<Entity>::entity_mask};
     }
 
     [[nodiscard]] constexpr bool operator==(null) const ENTT_NOEXCEPT {
@@ -149,7 +146,7 @@ public:
 
     template<typename Entity>
     [[nodiscard]] constexpr bool operator==(const Entity entity) const ENTT_NOEXCEPT {
-        return (to_integral(entity) & traits_type<Entity>::entity_mask) == to_integral(static_cast<Entity>(*this));
+        return (to_integral(entity) & entt_traits<Entity>::entity_mask) == to_integral(static_cast<Entity>(*this));
     }
 
     template<typename Entity>

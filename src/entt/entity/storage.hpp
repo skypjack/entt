@@ -478,7 +478,6 @@ private:
 /*! @copydoc storage */
 template<typename Entity, typename Type>
 class storage<Entity, Type, std::enable_if_t<ENTT_IS_EMPTY(Type)>>: public sparse_set<Entity> {
-    using traits_type = entt_traits<Entity>;
     using underlying_type = sparse_set<Entity>;
 
 public:

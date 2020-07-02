@@ -95,6 +95,12 @@ if(BUILD_BENCHMARK)
     SETUP_BASIC_TEST(benchmark benchmark/benchmark.cpp)
 endif()
 
+# Test example
+
+if(BUILD_EXAMPLE)
+    SETUP_BASIC_TEST(custom_identifier example/custom_identifier.cpp)
+endif()
+
 # Test lib
 
 if(BUILD_LIB)
