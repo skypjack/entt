@@ -170,7 +170,7 @@ TEST(Benchmark, IterateSingleComponentRuntime1M) {
     }
 
     auto test = [&](auto func) {
-        ENTT_ID_TYPE types[] = { entt::type_info<position>::id() };
+        entt::id_type types[] = { entt::type_info<position>::id() };
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -335,7 +335,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1M) {
     }
 
     auto test = [&](auto func) {
-        ENTT_ID_TYPE types[] = {
+        entt::id_type types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id()
         };
@@ -366,7 +366,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
     }
 
     auto test = [&](auto func) {
-        ENTT_ID_TYPE types[] = {
+        entt::id_type types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id()
         };
@@ -397,7 +397,7 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
     }
 
     auto test = [&](auto func) {
-        ENTT_ID_TYPE types[] = {
+        entt::id_type types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id()
         };
@@ -573,7 +573,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1M) {
     }
 
     auto test = [&](auto func) {
-        ENTT_ID_TYPE types[] = {
+        entt::id_type types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id(),
             entt::type_info<comp<0>>::id()
@@ -607,7 +607,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
     }
 
     auto test = [&](auto func) {
-        ENTT_ID_TYPE types[] = {
+        entt::id_type types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id(),
             entt::type_info<comp<0>>::id()
@@ -641,7 +641,7 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
     }
 
     auto test = [&](auto func) {
-        ENTT_ID_TYPE types[] = {
+        entt::id_type types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id(),
             entt::type_info<comp<0>>::id()
@@ -859,7 +859,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1M) {
     }
 
     auto test = [&](auto func) {
-        ENTT_ID_TYPE types[] = {
+        entt::id_type types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id(),
             entt::type_info<comp<0>>::id(),
@@ -899,7 +899,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
     }
 
     auto test = [&](auto func) {
-        ENTT_ID_TYPE types[] = {
+        entt::id_type types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id(),
             entt::type_info<comp<0>>::id(),
@@ -939,7 +939,7 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
     }
 
     auto test = [&](auto func) {
-        ENTT_ID_TYPE types[] = {
+        entt::id_type types[] = {
             entt::type_info<position>::id(),
             entt::type_info<velocity>::id(),
             entt::type_info<comp<0>>::id(),
