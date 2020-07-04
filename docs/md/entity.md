@@ -21,6 +21,7 @@
     * [Null entity](#null-entity)
     * [Dependencies](#dependencies)
     * [Invoke](#invoke)
+    * [Handle](#handle)
     * [Context variables](#context-variables)
   * [Meet the runtime](#meet-the-runtime)
     * [Cloning a registry](#cloning-a-registry)
@@ -644,6 +645,37 @@ registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>();
 
 All it does is pick up the _right_ component for the received entity and invoke
 the requested method, passing on the arguments if necessary.
+
+### Handle
+
+A handle is a thin wrapper around an entity and a registry. It provides the same
+functions that the registry offers for working with components, such as
+`emplace`, `get`, `patch`, `remove` and so on. The difference being that the
+entity is implicitly passed to the registry.<br/>
+A handle is also non-owning, meaning that it can be freely copied and moved
+around without affecting its entity (in fact, handles happen to be trivially
+copyable). An implication of this is that mutability becomes part of the
+type.
+
+There are two aliases that use `entt::entity` as their default entity:
+`entt::handle` and `entt::const_handle`. Users can also easily create their own
+aliases for custom identifiers as:
+
+```cpp
+using my_handle = entt::basic_handle<my_identifier>;
+using my_const_handle = entt::basic_handle<const my_identifier>;
+```
+
+Handles are also implicitly convertible to const handles out of the box but not
+the other way around.<br/>
+A handle stores a non-const pointer to a registry and therefore it can do all
+the things that can be done with a non-const registry. On the other hand, a
+const handles store const pointers to registries and offer a restricted set of
+functionalities.
+
+This class is intended to simplify function signatures. In case of functions
+that take a registry and an entity and do most of their work on that entity,
+users might want to consider using handles, either const or non-const.
 
 ### Context variables
 
