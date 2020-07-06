@@ -121,34 +121,51 @@ template<typename Entity>
 }
 
 
-/**
- * @cond TURN_OFF_DOXYGEN
- * Internal details not to be documented.
- */
-
-
-namespace internal {
-
-
-struct null {
+/*! @brief Null object for all entity identifiers.  */
+struct null_t {
+    /**
+     * @brief Converts the null object to identifiers of any type.
+     * @tparam Entity Type of entity identifier.
+     * @return The null representation for the given identifier.
+     */
     template<typename Entity>
     [[nodiscard]] constexpr operator Entity() const ENTT_NOEXCEPT {
         return Entity{entt_traits<Entity>::entity_mask};
     }
 
-    [[nodiscard]] constexpr bool operator==(null) const ENTT_NOEXCEPT {
+    /**
+     * @brief Compares two null objects.
+     * @return True in all cases.
+     */
+    [[nodiscard]] constexpr bool operator==(null_t) const ENTT_NOEXCEPT {
         return true;
     }
 
-    [[nodiscard]] constexpr bool operator!=(null) const ENTT_NOEXCEPT {
+    /**
+     * @brief Compares two null objects.
+     * @return False in all cases.
+     */
+    [[nodiscard]] constexpr bool operator!=(null_t) const ENTT_NOEXCEPT {
         return false;
     }
 
+    /**
+     * @brief Compares a null object and an entity identifier of any type.
+     * @tparam Entity Type of entity identifier.
+     * @param entity Entity identifier with which to compare.
+     * @return False if the two elements differ, true otherwise.
+     */
     template<typename Entity>
     [[nodiscard]] constexpr bool operator==(const Entity entity) const ENTT_NOEXCEPT {
         return (to_integral(entity) & entt_traits<Entity>::entity_mask) == to_integral(static_cast<Entity>(*this));
     }
 
+    /**
+     * @brief Compares a null object and an entity identifier of any type.
+     * @tparam Entity Type of entity identifier.
+     * @param entity Entity identifier with which to compare.
+     * @return True if the two elements differ, false otherwise.
+     */
     template<typename Entity>
     [[nodiscard]] constexpr bool operator!=(const Entity entity) const ENTT_NOEXCEPT {
         return !(entity == *this);
@@ -156,18 +173,29 @@ struct null {
 };
 
 
+/**
+ * @brief Compares a null object and an entity identifier of any type.
+ * @tparam Entity Type of entity identifier.
+ * @param entity Entity identifier with which to compare.
+ * @param other A null object yet to be converted.
+ * @return False if the two elements differ, true otherwise.
+ */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator==(const Entity entity, null other) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const Entity entity, null_t other) ENTT_NOEXCEPT {
     return other.operator==(entity);
 }
 
 
+/**
+ * @brief Compares a null object and an entity identifier of any type.
+ * @tparam Entity Type of entity identifier.
+ * @param entity Entity identifier with which to compare.
+ * @param other A null object yet to be converted.
+ * @return True if the two elements differ, false otherwise.
+ */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator!=(const Entity entity, null other) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const Entity entity, null_t other) ENTT_NOEXCEPT {
     return !(other == entity);
-}
-
-
 }
 
 
@@ -184,7 +212,7 @@ template<typename Entity>
  * any allowed type. Similarly, there exist comparision operators between the
  * null entity and any other entity identifier.
  */
-inline constexpr auto null = internal::null{};
+inline constexpr null_t null{};
 
 
 }
