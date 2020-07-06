@@ -39,7 +39,7 @@ TEST(BasicHandle, Construction) {
     static_assert(std::is_same_v<entt::registry &, decltype(handle.registry())>);
     static_assert(std::is_same_v<const entt::registry &, decltype(chandle.registry())>);
 
-    handle = static_cast<entt::entity>(entt::null);
+    handle = entt::null;
 
     ASSERT_TRUE(entt::null == handle.entity());
     ASSERT_NE(entity, handle);

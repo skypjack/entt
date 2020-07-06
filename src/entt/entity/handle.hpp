@@ -47,6 +47,14 @@ struct basic_handle {
     }
 
     /**
+     * @brief Assigns the null object to a handle.
+     * @return This handle.
+     */
+    basic_handle & operator=(null_t) ENTT_NOEXCEPT {
+        return (*this = static_cast<entity_type>(null));
+    }
+
+    /**
      * @brief Constructs a const handle from a non-const one.
      * @return A const handle referring to the same entity.
      */
