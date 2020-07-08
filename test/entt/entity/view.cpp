@@ -108,15 +108,28 @@ TEST(SingleComponentView, Each) {
     registry.emplace<int>(registry.create());
 
     auto view = registry.view<int>();
+    auto cview = std::as_const(registry).view<const int>();
     std::size_t cnt = 0;
 
     view.each([&cnt](auto, int &) { ++cnt; });
     view.each([&cnt](int &) { ++cnt; });
 
-    ASSERT_EQ(cnt, std::size_t{4});
+    for([[maybe_unused]] auto curr: view.each()) {
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ++cnt;
+    }
 
-    std::as_const(view).each([&cnt](auto, const int &) { --cnt; });
-    std::as_const(view).each([&cnt](const int &) { --cnt; });
+    ASSERT_EQ(cnt, std::size_t{6});
+
+    cview.each([&cnt](auto, const int &) { --cnt; });
+    cview.each([&cnt](const int &) { --cnt; });
+
+    for([[maybe_unused]] auto curr: cview.each()) {
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, const int &>));
+        --cnt;
+    }
 
     ASSERT_EQ(cnt, std::size_t{0});
 }
@@ -149,6 +162,16 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     cview.each([](auto &&i) {
         ASSERT_TRUE((std::is_same_v<decltype(i), const int &>));
     });
+
+    for(auto curr: view.each()) {
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+    }
+
+    for(auto curr: cview.each()) {
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, const int &>));
+    }
 }
 
 TEST(SingleComponentView, Find) {
@@ -191,7 +214,7 @@ TEST(SingleComponentView, Find) {
     ASSERT_EQ(view.find(e4), view.end());
 }
 
-TEST(SingleComponentView, EachWithEmptyTypes) {
+TEST(SingleComponentView, EmptyTypes) {
     entt::registry registry;
     auto create = [&](auto... component) {
         const auto entt = registry.create();
@@ -211,6 +234,12 @@ TEST(SingleComponentView, EachWithEmptyTypes) {
         check = false;
     });
 
+    for(auto curr: registry.view<empty_type>().each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 1);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
+
     registry.view<int>().each([entity](const auto entt, int) {
         ASSERT_EQ(entity, entt);
     });
@@ -219,6 +248,13 @@ TEST(SingleComponentView, EachWithEmptyTypes) {
         ASSERT_TRUE(check);
         check = false;
     });
+
+    for(auto curr: registry.view<int>().each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 2);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
 }
 
 TEST(SingleComponentView, FrontBack) {
@@ -375,10 +411,24 @@ TEST(MultiComponentView, Each) {
     view.each([&cnt](auto, int &, char &) { ++cnt; });
     view.each([&cnt](int &, char &) { ++cnt; });
 
-    ASSERT_EQ(cnt, std::size_t{4});
+    for(auto curr: view.each()) {
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ++cnt;
+    }
+
+    ASSERT_EQ(cnt, std::size_t{6});
 
     cview.each([&cnt](auto, const int &, const char &) { --cnt; });
     cview.each([&cnt](const int &, const char &) { --cnt; });
+
+    for(auto curr: cview.each()) {
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, const int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, const char &>));
+        --cnt;
+    }
 
     ASSERT_EQ(cnt, std::size_t{0});
 }
@@ -407,6 +457,26 @@ TEST(MultiComponentView, EachWithSuggestedType) {
     registry.view<int, char>().each<int>([value = 0](const auto curr, const auto) mutable {
         ASSERT_EQ(curr, value++);
     });
+
+    registry.sort<int>([](const auto lhs, const auto rhs) {
+        return lhs > rhs;
+    });
+
+    auto value = registry.view<int, char>().size();
+
+    for(auto curr: registry.view<int, char>().each()) {
+        ASSERT_EQ(std::get<1>(curr), --value);
+    }
+
+    registry.sort<int>([](const auto lhs, const auto rhs) {
+        return lhs < rhs;
+    });
+
+    value = {};
+
+    for(auto curr: registry.view<int, char>().each<int>()) {
+        ASSERT_EQ(std::get<1>(curr), value++);
+    }
 }
 
 TEST(MultiComponentView, EachWithHoles) {
@@ -429,6 +499,12 @@ TEST(MultiComponentView, EachWithHoles) {
         ASSERT_EQ(c, '0');
         ASSERT_EQ(i, 0);
     });
+
+    for(auto curr: view.each()) {
+        ASSERT_EQ(std::get<0>(curr), e0);
+        ASSERT_EQ(std::get<1>(curr), '0');
+        ASSERT_EQ(std::get<2>(curr), 0);
+    }
 }
 
 TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
@@ -453,6 +529,12 @@ TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
         ASSERT_TRUE((std::is_same_v<decltype(i), int &>));
         ASSERT_TRUE((std::is_same_v<decltype(c), const char &>));
     });
+
+    for(auto curr: view.each()) {
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, const char &>));
+    }
 }
 
 TEST(MultiComponentView, Find) {
@@ -545,7 +627,7 @@ TEST(MultiComponentView, ExcludedComponents) {
     }
 }
 
-TEST(MultiComponentView, EachWithEmptyTypes) {
+TEST(MultiComponentView, EmptyTypes) {
     entt::registry registry;
 
     const auto entity = registry.create();
@@ -562,27 +644,76 @@ TEST(MultiComponentView, EachWithEmptyTypes) {
         ASSERT_EQ(entity, entt);
     });
 
+    for(auto curr: registry.view<int, char, empty_type>().each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
+
     registry.view<int, empty_type, char>().each([check = true](int, char) mutable {
         ASSERT_TRUE(check);
         check = false;
     });
 
+    for(auto curr: registry.view<int, empty_type, char>().each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
+
     registry.view<empty_type, int, char>().each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
+    for(auto curr: registry.view<empty_type, int, char>().each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
+
     registry.view<empty_type, int, char>().each<empty_type>([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
+
+    for(auto curr: registry.view<empty_type, int, char>().each<empty_type>()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
 
     registry.view<int, empty_type, char>().each<empty_type>([check = true](int, char) mutable {
         ASSERT_TRUE(check);
         check = false;
     });
 
+    for(auto curr: registry.view<int, empty_type, char>().each<empty_type>()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
+
     registry.view<int, char, double>().each([entity](const auto entt, int, char, double) {
         ASSERT_EQ(entity, entt);
     });
+
+    for(auto curr: registry.view<int, char, double>().each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 4);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<3, decltype(curr)>, double &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
 }
 
 TEST(MultiComponentView, FrontBack) {
