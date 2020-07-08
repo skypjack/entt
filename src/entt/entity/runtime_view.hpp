@@ -150,7 +150,7 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Input iterator type. */
+    /*! @brief Bidirectional iterator type. */
     using iterator = view_iterator;
 
     /**
@@ -178,7 +178,7 @@ public:
      * `end()`.
      *
      * @note
-     * Input iterators stay true to the order imposed to the underlying data
+     * Iterators stay true to the order imposed to the underlying data
      * structures.
      *
      * @return An iterator to the first entity that has the given components.
@@ -202,7 +202,7 @@ public:
      * results in undefined behavior.
      *
      * @note
-     * Input iterators stay true to the order imposed to the underlying data
+     * Iterators stay true to the order imposed to the underlying data
      * structures.
      *
      * @return An iterator to the entity following the last entity that has the

@@ -267,7 +267,7 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Input iterator type. */
+    /*! @brief Random access iterator type. */
     using iterator = typename sparse_set<Entity>::iterator;
 
     /*! @brief Default constructor. */
