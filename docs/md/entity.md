@@ -1192,18 +1192,25 @@ for(auto entity: view) {
 }
 ```
 
-Or rely on the `each` member function to iterate both entities and components:
+Or rely on the `each` member functions to iterate both entities and components:
 
 ```cpp
+// through a callback
 registry.view<position, velocity>().each([](auto entity, auto &pos, auto &vel) {
     // ...
 });
+
+// using an input iterator
+for(auto &&[entity, pos, vel]: registry.view<position, velocity>().each()) {
+    // ...
+}
 ```
 
-The `each` member function is highly optimized. Unless users want to iterate
+The `each` member functions are highly optimized. Unless users want to iterate
 only entities or get only some of the components, this should be the preferred
-approach. Note that the entity can also be excluded from the parameter list if
-not required, but this won't improve performance for multi component views.<br/>
+approach. Note that entities can also be excluded from the parameter list when
+received through a callback and this can improve even further the performance
+during iterations.<br/>
 Since they aren't explicitly instantiated, empty components aren't returned in
 any case.
 
@@ -1335,18 +1342,27 @@ for(auto entity: group) {
 }
 ```
 
-Or rely on the `each` member function to iterate both entities and components:
+Or rely on the `each` member functions to iterate both entities and components:
 
 ```cpp
+// through a callback
 registry.group<position>(entt::get<velocity>).each([](auto entity, auto &pos, auto &vel) {
     // ...
 });
+
+// using an input iterator
+for(auto &&[entity, pos, vel]: registry.group<position>(entt::get<velocity>).each()) {
+    // ...
+}
 ```
 
-The `each` member function is highly optimized. Unless users want to iterate
-only entities, this should be the preferred approach. Note that the entity can
-also be excluded from the parameter list if not required and it can improve even
-further the performance during iterations.
+The `each` member functions are highly optimized. Unless users want to iterate
+only entities or get only some of the components, this should be the preferred
+approach. Note that entities can also be excluded from the parameter list when
+received through a callback and this can improve even further the performance
+during iterations.<br/>
+Since they aren't explicitly instantiated, empty components aren't returned in
+any case.
 
 **Note**: prefer the `get` member function of a group instead of that of a
 registry during iterations to get the types iterated by the group itself.
