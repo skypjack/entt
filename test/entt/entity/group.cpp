@@ -158,10 +158,24 @@ TEST(NonOwningGroup, Each) {
     group.each([&cnt](auto, int &, char &) { ++cnt; });
     group.each([&cnt](int &, char &) { ++cnt; });
 
-    ASSERT_EQ(cnt, std::size_t{4});
+    for(auto curr: group.each()) {
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ++cnt;
+    }
+
+    ASSERT_EQ(cnt, std::size_t{6});
 
     cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
     cgroup.each([&cnt](const int &, const char &) { --cnt; });
+
+    for(auto curr: cgroup.each()) {
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, const int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, const char &>));
+        --cnt;
+    }
 
     ASSERT_EQ(cnt, std::size_t{0});
 }
@@ -300,6 +314,12 @@ TEST(NonOwningGroup, IndexRebuiltOnDestroy) {
         ASSERT_EQ(ivalue, 1);
         ASSERT_EQ(uivalue, 1u);
     });
+
+    for(auto curr: group.each()) {
+        ASSERT_EQ(std::get<0>(curr), e1);
+        ASSERT_EQ(std::get<1>(curr), 1);
+        ASSERT_EQ(std::get<2>(curr), 1u);
+    }
 }
 
 TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
@@ -324,6 +344,12 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
         ASSERT_TRUE((std::is_same_v<decltype(i), int &>));
         ASSERT_TRUE((std::is_same_v<decltype(c), const char &>));
     });
+
+    for(auto curr: group.each()) {
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, const char &>));
+    }
 }
 
 TEST(NonOwningGroup, Find) {
@@ -441,6 +467,13 @@ TEST(NonOwningGroup, EmptyAndNonEmptyTypes) {
         ASSERT_TRUE(entity == e0 || entity == e1);
     });
 
+    for(auto curr: group.each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 2);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE(std::get<0>(curr) == e0 || std::get<0>(curr) == e1);
+    }
+
     ASSERT_EQ(group.size(), typename decltype(group)::size_type{2});
 }
 
@@ -462,7 +495,7 @@ TEST(NonOwningGroup, TrackEntitiesOnComponentDestruction) {
     ASSERT_FALSE(cgroup.empty());
 }
 
-TEST(NonOwningGroup, EachWithEmptyTypes) {
+TEST(NonOwningGroup, EmptyTypes) {
     entt::registry registry;
     const auto entity = registry.create();
 
@@ -474,16 +507,49 @@ TEST(NonOwningGroup, EachWithEmptyTypes) {
         ASSERT_EQ(entity, entt);
     });
 
+    for(auto curr: registry.group(entt::get<int, char, empty_type>).each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
+
     registry.group(entt::get<int, empty_type, char>).each([check = true](int, char) mutable {
         ASSERT_TRUE(check);
         check = false;
     });
 
+    for(auto curr: registry.group(entt::get<int, empty_type, char>).each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
+
     registry.group(entt::get<empty_type, int, char>).each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
+    for(auto curr: registry.group(entt::get<empty_type, int, char>).each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
+
     registry.group(entt::get<int, char, double>).each([](const auto, int, char, double) { FAIL(); });
+
+    for(auto curr: registry.group(entt::get<int, char, double>).each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 4);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<3, decltype(curr)>, double &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
 }
 
 TEST(NonOwningGroup, FrontBack) {
@@ -661,10 +727,24 @@ TEST(OwningGroup, Each) {
     group.each([&cnt](auto, int &, char &) { ++cnt; });
     group.each([&cnt](int &, char &) { ++cnt; });
 
-    ASSERT_EQ(cnt, std::size_t{4});
+    for(auto curr: group.each()) {
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ++cnt;
+    }
+
+    ASSERT_EQ(cnt, std::size_t{6});
 
     cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
     cgroup.each([&cnt](const int &, const char &) { --cnt; });
+
+    for(auto curr: cgroup.each()) {
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, const int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, const char &>));
+        --cnt;
+    }
 
     ASSERT_EQ(cnt, std::size_t{0});
 }
@@ -887,6 +967,12 @@ TEST(OwningGroup, IndexRebuiltOnDestroy) {
         ASSERT_EQ(ivalue, 1);
         ASSERT_EQ(uivalue, 1u);
     });
+
+    for(auto curr: group.each()) {
+        ASSERT_EQ(std::get<0>(curr), e1);
+        ASSERT_EQ(std::get<1>(curr), 1);
+        ASSERT_EQ(std::get<2>(curr), 1u);
+    }
 }
 
 TEST(OwningGroup, ConstNonConstAndAllInBetween) {
@@ -919,6 +1005,12 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
         ASSERT_TRUE((std::is_same_v<decltype(d), double &>));
         ASSERT_TRUE((std::is_same_v<decltype(f), const float &>));
     });
+
+    for(auto curr: group.each()) {
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, const char &>));
+    }
 }
 
 TEST(OwningGroup, Find) {
@@ -1036,6 +1128,13 @@ TEST(OwningGroup, EmptyAndNonEmptyTypes) {
         ASSERT_TRUE(entity == e0 || entity == e1);
     });
 
+    for(auto curr: group.each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 2);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE(std::get<0>(curr) == e0 || std::get<0>(curr) == e1);
+    }
+
     ASSERT_EQ(group.size(), typename decltype(group)::size_type{2});
 }
 
@@ -1057,7 +1156,7 @@ TEST(OwningGroup, TrackEntitiesOnComponentDestruction) {
     ASSERT_FALSE(cgroup.empty());
 }
 
-TEST(OwningGroup, EachWithEmptyTypes) {
+TEST(OwningGroup, EmptyTypes) {
     entt::registry registry;
     const auto entity = registry.create();
 
@@ -1069,16 +1168,49 @@ TEST(OwningGroup, EachWithEmptyTypes) {
         ASSERT_EQ(entity, entt);
     });
 
+    for(auto curr: registry.group<int>(entt::get<char, empty_type>).each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
+
     registry.group<char>(entt::get<empty_type, int>).each([check = true](int, char) mutable {
         ASSERT_TRUE(check);
         check = false;
     });
 
+    for(auto curr: registry.group<char>(entt::get<empty_type, int>).each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, char &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, int &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
+
     registry.group<empty_type>(entt::get<int, char>).each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
+    for(auto curr: registry.group<empty_type>(entt::get<int, char>).each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
+
     registry.group<double>(entt::get<int, char>).each([](const auto, double, int, char) { FAIL(); });
+
+    for(auto curr: registry.group<double>(entt::get<int, char>).each()) {
+        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 4);
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, double &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, int &>));
+        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<3, decltype(curr)>, char &>));
+        ASSERT_EQ(entity, std::get<0>(curr));
+    }
 }
 
 TEST(OwningGroup, FrontBack) {
