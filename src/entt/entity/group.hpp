@@ -87,9 +87,9 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
             friend class group_range;
 
             using it_type = typename sparse_set<Entity>::iterator;
-            using pool_type = decltype(std::tuple_cat(std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<pool_type<Get> *>>>()...));
+            using ref_type = decltype(std::tuple_cat(std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<pool_type<Get> *>>>()...));
 
-            range_iterator(it_type from, pool_type ref) ENTT_NOEXCEPT
+            range_iterator(it_type from, ref_type ref) ENTT_NOEXCEPT
                 : it{from},
                   pools{ref}
             {}
@@ -129,7 +129,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
 
         private:
             it_type it;
-            pool_type pools;
+            ref_type pools;
         };
 
         group_range(const sparse_set<Entity> &ref, std::tuple<pool_type<Get> *...> gpools)
