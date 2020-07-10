@@ -98,10 +98,13 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
             using difference_type = std::ptrdiff_t;
             using value_type = decltype(std::tuple_cat(
                 std::declval<std::tuple<Entity>>(),
-                std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<Get &>>>()...
+                std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<Get>>>()...
             ));
             using pointer = void;
-            using reference = value_type;
+            using reference = decltype(std::tuple_cat(
+                std::declval<std::tuple<Entity>>(),
+                std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<Get &>>>()...
+            ));
             using iterator_category = std::input_iterator_tag;
 
             range_iterator() ENTT_NOEXCEPT = default;
@@ -611,11 +614,15 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
             using difference_type = std::ptrdiff_t;
             using value_type = decltype(std::tuple_cat(
                 std::declval<std::tuple<Entity>>(),
+                std::declval<std::conditional_t<ENTT_IS_EMPTY(Owned), std::tuple<>, std::tuple<Owned>>>()...,
+                std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<Get>>>()...
+            ));
+            using pointer = void;
+            using reference = decltype(std::tuple_cat(
+                std::declval<std::tuple<Entity>>(),
                 std::declval<std::conditional_t<ENTT_IS_EMPTY(Owned), std::tuple<>, std::tuple<Owned &>>>()...,
                 std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<Get &>>>()...
             ));
-            using pointer = void;
-            using reference = value_type;
             using iterator_category = std::input_iterator_tag;
 
             range_iterator() ENTT_NOEXCEPT = default;

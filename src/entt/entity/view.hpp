@@ -175,10 +175,13 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             using difference_type = std::ptrdiff_t;
             using value_type = decltype(std::tuple_cat(
                 std::declval<std::tuple<Entity>>(),
-                std::declval<std::conditional_t<ENTT_IS_EMPTY(Component), std::tuple<>, std::tuple<Component &>>>()...
+                std::declval<std::conditional_t<ENTT_IS_EMPTY(Component), std::tuple<>, std::tuple<Component>>>()...
             ));
             using pointer = void;
-            using reference = value_type;
+            using reference = decltype(std::tuple_cat(
+                std::declval<std::tuple<Entity>>(),
+                std::declval<std::conditional_t<ENTT_IS_EMPTY(Component), std::tuple<>, std::tuple<Component &>>>()...
+            ));
             using iterator_category = std::input_iterator_tag;
 
             range_iterator() ENTT_NOEXCEPT = default;
@@ -645,9 +648,9 @@ class basic_view<Entity, exclude_t<>, Component> {
 
         public:
             using difference_type = std::ptrdiff_t;
-            using value_type = std::conditional_t<ENTT_IS_EMPTY(Component), std::tuple<Entity>, std::tuple<Entity, Component &>>;
+            using value_type = std::conditional_t<ENTT_IS_EMPTY(Component), std::tuple<Entity>, std::tuple<Entity, Component>>;
             using pointer = void;
-            using reference = value_type;
+            using reference = std::conditional_t<ENTT_IS_EMPTY(Component), std::tuple<Entity>, std::tuple<Entity, Component &>>;
             using iterator_category = std::input_iterator_tag;
 
             range_iterator() ENTT_NOEXCEPT = default;
