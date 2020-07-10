@@ -583,7 +583,7 @@ public:
     template<typename Comp>
     [[nodiscard]] auto each() const ENTT_NOEXCEPT {
         const sparse_set<entity_type> &view = *std::get<pool_type<Comp> *>(pools);
-        return view_range{iterator{view, unchecked(view), filter, view.begin()}, iterator{view, unchecked(view), filter, view.begin()}, pools};
+        return view_range{iterator{view, unchecked(view), filter, view.begin()}, iterator{view, unchecked(view), filter, view.end()}, pools};
     }
 
 private:
