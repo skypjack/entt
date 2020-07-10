@@ -114,9 +114,9 @@ TEST(SingleComponentView, Each) {
     view.each([&cnt](auto, int &) { ++cnt; });
     view.each([&cnt](int &) { ++cnt; });
 
-    for([[maybe_unused]] auto curr: view.each()) {
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+    for(auto &&[entt, iv]: view.each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), int &>);
         ++cnt;
     }
 
@@ -125,9 +125,9 @@ TEST(SingleComponentView, Each) {
     cview.each([&cnt](auto, const int &) { --cnt; });
     cview.each([&cnt](const int &) { --cnt; });
 
-    for([[maybe_unused]] auto curr: cview.each()) {
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, const int &>));
+    for(auto &&[entt, iv]: cview.each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), const int &>);
         --cnt;
     }
 
@@ -147,30 +147,30 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     ASSERT_EQ(view.size(), decltype(view.size()){1});
     ASSERT_EQ(cview.size(), decltype(cview.size()){1});
 
-    ASSERT_TRUE((std::is_same_v<typename decltype(view)::raw_type, int>));
-    ASSERT_TRUE((std::is_same_v<typename decltype(cview)::raw_type, const int>));
+    static_assert(std::is_same_v<typename decltype(view)::raw_type, int>);
+    static_assert(std::is_same_v<typename decltype(cview)::raw_type, const int>);
 
-    ASSERT_TRUE((std::is_same_v<decltype(view.get({})), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(view.raw()), int *>));
-    ASSERT_TRUE((std::is_same_v<decltype(cview.get({})), const int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(cview.raw()), const int *>));
+    static_assert(std::is_same_v<decltype(view.get({})), int &>);
+    static_assert(std::is_same_v<decltype(view.raw()), int *>);
+    static_assert(std::is_same_v<decltype(cview.get({})), const int &>);
+    static_assert(std::is_same_v<decltype(cview.raw()), const int *>);
 
     view.each([](auto &&i) {
-        ASSERT_TRUE((std::is_same_v<decltype(i), int &>));
+        static_assert(std::is_same_v<decltype(i), int &>);
     });
 
     cview.each([](auto &&i) {
-        ASSERT_TRUE((std::is_same_v<decltype(i), const int &>));
+        static_assert(std::is_same_v<decltype(i), const int &>);
     });
 
-    for(auto curr: view.each()) {
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
+    for(auto &&[entt, iv]: view.each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), int &>);
     }
 
-    for(auto curr: cview.each()) {
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, const int &>));
+    for(auto &&[entt, iv]: cview.each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), const int &>);
     }
 }
 
@@ -234,10 +234,9 @@ TEST(SingleComponentView, EmptyTypes) {
         check = false;
     });
 
-    for(auto curr: registry.view<empty_type>().each()) {
-        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 1);
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_EQ(entity, std::get<0>(curr));
+    for(auto &&[entt]: registry.view<empty_type>().each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        ASSERT_EQ(entity, entt);
     }
 
     registry.view<int>().each([entity](const auto entt, int) {
@@ -249,11 +248,10 @@ TEST(SingleComponentView, EmptyTypes) {
         check = false;
     });
 
-    for(auto curr: registry.view<int>().each()) {
-        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 2);
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
-        ASSERT_EQ(entity, std::get<0>(curr));
+    for(auto &&[entt, iv]: registry.view<int>().each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), int &>);
+        ASSERT_EQ(entity, entt);
     }
 }
 
@@ -411,10 +409,10 @@ TEST(MultiComponentView, Each) {
     view.each([&cnt](auto, int &, char &) { ++cnt; });
     view.each([&cnt](int &, char &) { ++cnt; });
 
-    for(auto curr: view.each()) {
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
+    for(auto &&[entt, iv, cv]: view.each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), int &>);
+        static_assert(std::is_same_v<decltype(cv), char &>);
         ++cnt;
     }
 
@@ -423,10 +421,10 @@ TEST(MultiComponentView, Each) {
     cview.each([&cnt](auto, const int &, const char &) { --cnt; });
     cview.each([&cnt](const int &, const char &) { --cnt; });
 
-    for(auto curr: cview.each()) {
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, const int &>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, const char &>));
+    for(auto &&[entt, iv, cv]: cview.each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), const int &>);
+        static_assert(std::is_same_v<decltype(cv), const char &>);
         --cnt;
     }
 
@@ -519,21 +517,21 @@ TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
 
     ASSERT_EQ(view.size(), decltype(view.size()){1});
 
-    ASSERT_TRUE((std::is_same_v<decltype(view.get<int>({})), int &>));
-    ASSERT_TRUE((std::is_same_v<decltype(view.get<const char>({})), const char &>));
-    ASSERT_TRUE((std::is_same_v<decltype(view.get<int, const char>({})), std::tuple<int &, const char &>>));
-    ASSERT_TRUE((std::is_same_v<decltype(view.raw<const char>()), const char *>));
-    ASSERT_TRUE((std::is_same_v<decltype(view.raw<int>()), int *>));
+    static_assert(std::is_same_v<decltype(view.get<int>({})), int &>);
+    static_assert(std::is_same_v<decltype(view.get<const char>({})), const char &>);
+    static_assert(std::is_same_v<decltype(view.get<int, const char>({})), std::tuple<int &, const char &>>);
+    static_assert(std::is_same_v<decltype(view.raw<const char>()), const char *>);
+    static_assert(std::is_same_v<decltype(view.raw<int>()), int *>);
 
     view.each([](auto &&i, auto &&c) {
-        ASSERT_TRUE((std::is_same_v<decltype(i), int &>));
-        ASSERT_TRUE((std::is_same_v<decltype(c), const char &>));
+        static_assert(std::is_same_v<decltype(i), int &>);
+        static_assert(std::is_same_v<decltype(c), const char &>);
     });
 
-    for(auto curr: view.each()) {
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, const char &>));
+    for(auto &&[entt, iv, cv]: view.each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), int &>);
+        static_assert(std::is_same_v<decltype(cv), const char &>);
     }
 }
 
@@ -644,12 +642,11 @@ TEST(MultiComponentView, EmptyTypes) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto curr: registry.view<int, char, empty_type>().each()) {
-        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
-        ASSERT_EQ(entity, std::get<0>(curr));
+    for(auto &&[entt, iv, cv]: registry.view<int, char, empty_type>().each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), int &>);
+        static_assert(std::is_same_v<decltype(cv), char &>);
+        ASSERT_EQ(entity, entt);
     }
 
     registry.view<int, empty_type, char>().each([check = true](int, char) mutable {
@@ -657,36 +654,33 @@ TEST(MultiComponentView, EmptyTypes) {
         check = false;
     });
 
-    for(auto curr: registry.view<int, empty_type, char>().each()) {
-        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
-        ASSERT_EQ(entity, std::get<0>(curr));
+    for(auto &&[entt, iv, cv]: registry.view<int, empty_type, char>().each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), int &>);
+        static_assert(std::is_same_v<decltype(cv), char &>);
+        ASSERT_EQ(entity, entt);
     }
 
     registry.view<empty_type, int, char>().each([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto curr: registry.view<empty_type, int, char>().each()) {
-        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
-        ASSERT_EQ(entity, std::get<0>(curr));
+    for(auto &&[entt, iv, cv]: registry.view<empty_type, int, char>().each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), int &>);
+        static_assert(std::is_same_v<decltype(cv), char &>);
+        ASSERT_EQ(entity, entt);
     }
 
     registry.view<empty_type, int, char>().each<empty_type>([entity](const auto entt, int, char) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto curr: registry.view<empty_type, int, char>().each<empty_type>()) {
-        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
-        ASSERT_EQ(entity, std::get<0>(curr));
+    for(auto &&[entt, iv, cv]: registry.view<empty_type, int, char>().each<empty_type>()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), int &>);
+        static_assert(std::is_same_v<decltype(cv), char &>);
+        ASSERT_EQ(entity, entt);
     }
 
     registry.view<int, empty_type, char>().each<empty_type>([check = true](int, char) mutable {
@@ -694,25 +688,23 @@ TEST(MultiComponentView, EmptyTypes) {
         check = false;
     });
 
-    for(auto curr: registry.view<int, empty_type, char>().each<empty_type>()) {
-        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 3);
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
-        ASSERT_EQ(entity, std::get<0>(curr));
+    for(auto &&[entt, iv, cv]: registry.view<int, empty_type, char>().each<empty_type>()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), int &>);
+        static_assert(std::is_same_v<decltype(cv), char &>);
+        ASSERT_EQ(entity, entt);
     }
 
     registry.view<int, char, double>().each([entity](const auto entt, int, char, double) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto curr: registry.view<int, char, double>().each()) {
-        ASSERT_EQ(std::tuple_size_v<decltype(curr)>, 4);
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<0, decltype(curr)>, entt::entity>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<1, decltype(curr)>, int &>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<2, decltype(curr)>, char &>));
-        ASSERT_TRUE((std::is_same_v<std::tuple_element_t<3, decltype(curr)>, double &>));
-        ASSERT_EQ(entity, std::get<0>(curr));
+    for(auto &&[entt, iv, cv, dv]: registry.view<int, char, double>().each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+        static_assert(std::is_same_v<decltype(iv), int &>);
+        static_assert(std::is_same_v<decltype(cv), char &>);
+        static_assert(std::is_same_v<decltype(dv), double &>);
+        ASSERT_EQ(entity, entt);
     }
 }
 
