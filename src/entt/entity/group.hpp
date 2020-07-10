@@ -667,11 +667,11 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
         [[nodiscard]] auto begin() const ENTT_NOEXCEPT {
             return range_iterator{
                 std::get<0>(pools)->sparse_set<Entity>::end() - *length,
-                std::tuple_cat([this](auto *cpool) {
+                std::tuple_cat([length = *length](auto *cpool) {
                     if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
                         return std::make_tuple();
                     } else {
-                        return std::make_tuple(cpool->end() - *length);
+                        return std::make_tuple(cpool->end() - length);
                     }
                 }(std::get<pool_type<Owned> *>(pools))...),
                 std::tuple_cat([](auto *cpool) {
