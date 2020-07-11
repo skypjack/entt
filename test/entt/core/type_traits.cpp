@@ -66,5 +66,5 @@ TEST(TypeTraits, MemberClass) {
 
 TEST(TypeTraits, Tag) {
     ASSERT_EQ(entt::tag<"foobar"_hs>::value, entt::hashed_string::value("foobar"));
-    ASSERT_TRUE((std::is_same_v<typename entt::tag<"foobar"_hs>::value_type, ENTT_ID_TYPE>));
+    ASSERT_TRUE((std::is_same_v<typename entt::tag<"foobar"_hs>::value_type, entt::id_type>));
 }

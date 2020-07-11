@@ -12,12 +12,12 @@ struct type_id;
 #define ASSIGN_TYPE_ID(clazz)\
     template<>\
     struct type_id<clazz>\
-        : std::integral_constant<ENTT_ID_TYPE, entt::basic_hashed_string<std::remove_cv_t<std::remove_pointer_t<std::decay_t<decltype(#clazz)>>>>{#clazz}>\
+        : std::integral_constant<entt::id_type, entt::basic_hashed_string<std::remove_cv_t<std::remove_pointer_t<std::decay_t<decltype(#clazz)>>>>{#clazz}>\
     {}
 
 template<typename Type>
 struct entt::type_info<Type> {
-    static constexpr ENTT_ID_TYPE id() ENTT_NOEXCEPT {
+    static constexpr entt::id_type id() ENTT_NOEXCEPT {
         return type_id<Type>::value;
     }
 };
