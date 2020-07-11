@@ -19,6 +19,7 @@
   * [Sorting: is it possible?](#sorting-is-it-possible)
   * [Helpers](#helpers)
     * [Null entity](#null-entity)
+    * [To entity](#to-entity)
     * [Dependencies](#dependencies)
     * [Invoke](#invoke)
     * [Handle](#handle)
@@ -602,6 +603,20 @@ Be aware that `entt::null` and entity 0 aren't the same thing. Likewise, a zero
 initialized entity isn't the same as `entt::null`. Therefore, although
 `entt::entity{}` is in some sense an alias for entity 0, none of them can be
 used to create a null entity.
+
+### To entity
+
+Sometimes it's useful to get the entity from a component instance.<br/>
+This is what the `entt::to_entity` helper does. It accepts a registry and an
+instance of a component and returns the entity associated with the latter:
+
+```cpp
+const auto entity = entt::to_entity(registry, position);
+```
+
+This utility doesn't perform any check on the validity of the component.
+Therefore, trying to take the entity of an invalid element or of an instance
+that isn't associated with the given registry can result in undefined behavior.
 
 ### Dependencies
 

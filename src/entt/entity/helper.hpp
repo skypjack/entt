@@ -129,6 +129,20 @@ void invoke(basic_registry<Entity> &reg, const Entity entt) {
 }
 
 
+/**
+ * @brief Returns the entity associated with a given component.
+ * @tparam Entity A valid entity type (see entt_traits for more details).
+ * @tparam Component Type of component.
+ * @param reg A registry that contains the given entity and its components.
+ * @param component A valid component instance.
+ * @return The entity associated with the given component.
+ */
+template<typename Entity, typename Component>
+Entity to_entity(const basic_registry<Entity> &reg, const Component &component) {
+    return *(reg.template data<Component>() + (&component - reg.template raw<Component>()));
+}
+
+
 }
 
 
