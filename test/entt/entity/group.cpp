@@ -537,7 +537,7 @@ TEST(NonOwningGroup, EmptyTypes) {
     }
 
     registry.group(entt::get<int, char, double>).each([](const auto, int, char, double) { FAIL(); });
-    for([[maybe_unused]] auto &&[entt, iv, cv, dv]: registry.group(entt::get<int, char, double>).each()) { FAIL(); }
+    for([[maybe_unused]] auto curr: registry.group(entt::get<int, char, double>).each()) { FAIL(); }
 }
 
 TEST(NonOwningGroup, FrontBack) {
