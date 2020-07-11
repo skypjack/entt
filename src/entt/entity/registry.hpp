@@ -838,8 +838,7 @@ public:
      * In case there are listeners that observe the destruction of components
      * and assign other components to the entity in their bodies, the result of
      * invoking this function may not be as expected. In the worst case, it
-     * could lead to undefined behavior. An assertion will abort the execution
-     * at runtime in debug mode if a violation is detected.
+     * could lead to undefined behavior.
      *
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.<br/>
@@ -1217,8 +1216,7 @@ public:
      *
      * Runtime views are to be used when users want to construct a view from
      * some external inputs and don't know at compile-time what are the required
-     * components.<br/>
-     * This is particularly well suited to plugin systems and mods in general.
+     * components.
      *
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of components.

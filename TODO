@@ -20,4 +20,3 @@ Next:
 * WIP: snapshot rework
  - snapshot: support for range-based archives
  - update documentation to describe alternatives
- - storage::object_type -> value_type
