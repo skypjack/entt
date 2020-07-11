@@ -20,3 +20,7 @@ Next:
 * WIP: snapshot rework
  - snapshot: support for range-based archives
  - update documentation to describe alternatives
+
+* WIP:
+ - custom pools.
+ - the Perfect Model.

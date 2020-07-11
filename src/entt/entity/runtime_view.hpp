@@ -63,10 +63,9 @@ class basic_runtime_view {
     class view_iterator final {
         friend class basic_runtime_view<Entity>;
 
-        using direct_type = std::vector<const sparse_set<Entity> *>;
-
-        view_iterator(const direct_type &all, underlying_iterator curr) ENTT_NOEXCEPT
-            : pools{&all},
+        view_iterator(const std::vector<const sparse_set<Entity> *> &cpools, const std::vector<const sparse_set<Entity> *> &exclude, underlying_iterator curr) ENTT_NOEXCEPT
+            : pools{&cpools},
+              filter{&exclude},
               it{curr}
         {
             if(it != (*pools)[0]->end() && !valid()) {
@@ -75,9 +74,8 @@ class basic_runtime_view {
         }
 
         [[nodiscard]] bool valid() const {
-            return std::all_of(pools->begin()++, pools->end(), [entt = *it](const auto *curr) {
-                return curr->contains(entt);
-            });
+            return std::all_of(pools->begin()++, pools->end(), [entt = *it](const auto *curr) { return curr->contains(entt); })
+                    && std::none_of(filter->cbegin(), filter->cend(), [entt = *it](const auto *curr) { return curr && curr->contains(entt); });
         }
 
     public:
@@ -126,12 +124,14 @@ class basic_runtime_view {
         }
 
     private:
-        const direct_type *pools;
+        const std::vector<const sparse_set<Entity> *> *pools;
+        const std::vector<const sparse_set<Entity> *> *filter;
         underlying_iterator it;
     };
 
-    basic_runtime_view(std::vector<const sparse_set<Entity> *> others) ENTT_NOEXCEPT
-        : pools{std::move(others)}
+    basic_runtime_view(std::vector<const sparse_set<Entity> *> cpools, std::vector<const sparse_set<Entity> *> exclude) ENTT_NOEXCEPT
+        : pools{std::move(cpools)},
+          filter{std::move(exclude)}
     {
         const auto it = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
             return (!lhs && rhs) || (lhs && rhs && lhs->size() < rhs->size());
@@ -184,13 +184,7 @@ public:
      * @return An iterator to the first entity that has the given components.
      */
     [[nodiscard]] iterator begin() const {
-        iterator it{};
-
-        if(valid()) {
-            it = { pools, pools[0]->begin() };
-        }
-
-        return it;
+        return valid() ? iterator{pools, filter, pools[0]->begin()} : iterator{};
     }
 
     /**
@@ -209,13 +203,7 @@ public:
      * given components.
      */
     [[nodiscard]] iterator end() const {
-        iterator it{};
-
-        if(valid()) {
-            it = { pools, pools[0]->end() };
-        }
-
-        return it;
+        return valid() ? iterator{pools, filter, pools[0]->end()} : iterator{};
     }
 
     /**
@@ -224,9 +212,8 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
-        return valid() && std::all_of(pools.cbegin(), pools.cend(), [entt](const auto *view) {
-            return view->find(entt) != view->end();
-        });
+        return valid() && std::all_of(pools.cbegin(), pools.cend(), [entt](const auto *curr) { return curr->contains(entt); })
+                && std::none_of(filter.cbegin(), filter.cend(), [entt](const auto *curr) { return curr && curr->contains(entt); });
     }
 
     /**
@@ -253,6 +240,7 @@ public:
 
 private:
     std::vector<const sparse_set<Entity> *> pools;
+    std::vector<const sparse_set<Entity> *> filter;
 };
 
 

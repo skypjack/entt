@@ -1258,7 +1258,7 @@ going to return and to know whether it's empty or not. It's also possible to ask
 a runtime view if it contains a given entity.<br/>
 Refer to the inline documentation for all the details.
 
-Runtime view are extremely cheap to construct and should not be stored around in
+Runtime views are pretty cheap to construct and should not be stored around in
 any case. They should be used immediately after creation and then they should be
 thrown away. The reasons for this go far beyond the scope of this document.<br/>
 To iterate a runtime view, either use it in a range-for loop:
@@ -1289,13 +1289,18 @@ registry.runtime_view(std::cbegin(types), std::cend(types)).each([](auto entity)
 });
 ```
 
-Performance are exactly the same in both cases.
+Performance are exactly the same in both cases.<br/>
+Filtering entities by components is also supported for this kind of views:
+
+```cpp
+entt::component components[] = { entt::type_info<position>::id() };
+entt::component filter[] = { entt::type_info<velocity>::id() };
+auto view = registry.runtime_view(std::cbegin(components), std::cend(components), std::cbegin(filter), std::cend(filter));
+```
 
 **Note**: runtime views are meant for all those cases where users don't know at
-compile-time what components to use to iterate entities. This is particularly
-well suited to plugin systems and mods in general. Where possible, don't use
-runtime views, as their performance are slightly inferior to those of the other
-views.
+compile-time what components to _use_ to iterate entities. If possible, don't
+use runtime views as their performance are inferior to those of the other views.
 
 ## Groups
 

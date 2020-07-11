@@ -1218,21 +1218,36 @@ public:
      * some external inputs and don't know at compile-time what are the required
      * components.
      *
-     * @tparam It Type of input iterator.
-     * @param first An iterator to the first element of the range of components.
-     * @param last An iterator past the last element of the range of components.
+     * @tparam ItComp Type of input iterator for the components to use to
+     * construct the view.
+     * @tparam ItExcl Type of input iterator for the components to use to filter
+     * the view.
+     * @param first An iterator to the first element of the range of components
+     * to use to construct the view.
+     * @param last An iterator past the last element of the range of components
+     * to use to construct the view.
+     * @param from An iterator to the first element of the range of components
+     * to use to filter the view.
+     * @param to An iterator past the last element of the range of components to
+     * use to filter the view.
      * @return A newly created runtime view.
      */
-    template<typename It>
-    [[nodiscard]] entt::basic_runtime_view<Entity> runtime_view(It first, It last) const {
-        std::vector<const sparse_set<Entity> *> selected(std::distance(first, last));
+    template<typename ItComp, typename ItExcl = id_type *>
+    [[nodiscard]] entt::basic_runtime_view<Entity> runtime_view(ItComp first, ItComp last, ItExcl from = {}, ItExcl to = {}) const {
+        std::vector<const sparse_set<Entity> *> component(std::distance(first, last));
+        std::vector<const sparse_set<Entity> *> exclude(std::distance(from, to));
 
-        std::transform(first, last, selected.begin(), [this](const auto ctype) {
+        std::transform(first, last, component.begin(), [this](const auto ctype) {
             const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.type_id == ctype; });
             return it == pools.cend() ? nullptr : it->pool.get();
         });
 
-        return { std::move(selected) };
+        std::transform(from, to, exclude.begin(), [this](const auto ctype) {
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.type_id == ctype; });
+            return it == pools.cend() ? nullptr : it->pool.get();
+        });
+
+        return { std::move(component), std::move(exclude) };
     }
 
     /**
