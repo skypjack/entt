@@ -139,8 +139,6 @@ void invoke(basic_registry<Entity> &reg, const Entity entt) {
  */
 template<typename Entity, typename Component>
 Entity to_entity(const basic_registry<Entity> &reg, const Component &component) {
-    ENTT_ASSERT(!(reg.template raw<Component>() > &component));
-    ENTT_ASSERT(&component < (reg.template raw<Component>() + reg.template size<Component>()));
     return *(reg.template data<Component>() + (&component - reg.template raw<Component>()));
 }
 
