@@ -21,7 +21,7 @@
 namespace std {
 
 
-namespace detail {
+namespace internal {
 
 
 template<typename Func, typename... Args>
@@ -45,7 +45,7 @@ constexpr std::false_type is_invocable_r(...);
 
 
 template<typename Func, typename... Args>
-struct is_invocable: decltype(detail::is_invocable<Func, Args...>(0)) {};
+struct is_invocable: decltype(internal::is_invocable<Func, Args...>(0)) {};
 
 
 template<typename Func, typename... Argsv>
@@ -53,7 +53,7 @@ inline constexpr bool is_invocable_v = std::is_invocable<Func, Args...>::value;
 
 
 template<typename Ret, typename Func, typename... Args>
-struct is_invocable_r: decltype(detail::is_invocable_r<Ret, Func, Args...>(0)) {};
+struct is_invocable_r: decltype(internal::is_invocable_r<Ret, Func, Args...>(0)) {};
 
 
 template<typename Ret, typename Func, typename... Args>
