@@ -7,11 +7,11 @@
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
-#include "sparse_set.hpp"
-#include "storage.hpp"
-#include "utility.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
+#include "pool.hpp"
+#include "sparse_set.hpp"
+#include "utility.hpp"
 
 
 namespace entt {
@@ -68,17 +68,8 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
     /*! @brief A registry is allowed to create groups. */
     friend class basic_registry<Entity>;
 
-    // I could have used std::conditional_t ...
     template<typename Component>
-    struct pool { using type = storage<Entity, Component>; };
-
-    // ... if only MSVC didn't have a bug ...
-    template<typename Component>
-    struct pool<const Component> { using type = const storage<Entity, std::remove_const_t<Component>>; };
-
-    // ... that forces me to do the same in a worse way! :(
-    template<typename Component>
-    using pool_type = typename pool<Component>::type;
+    using pool_type = pool_t<Entity, Component>;
 
     class group_range {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>>;
@@ -579,17 +570,8 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
     /*! @brief A registry is allowed to create groups. */
     friend class basic_registry<Entity>;
 
-    // I could have used std::conditional_t ...
     template<typename Component>
-    struct pool { using type = storage<Entity, Component>; };
-
-    // ... if only MSVC didn't have a bug ...
-    template<typename Component>
-    struct pool<const Component> { using type = const storage<Entity, std::remove_const_t<Component>>; };
-
-    // ... that forces me to do the same in a worse way! :(
-    template<typename Component>
-    using pool_type = typename pool<Component>::type;
+    using pool_type = pool_t<Entity, Component>;
 
     template<typename Component>
     using component_iterator = decltype(std::declval<pool_type<Component>>().begin());
