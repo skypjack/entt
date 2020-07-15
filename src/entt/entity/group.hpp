@@ -98,8 +98,6 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
             ));
             using iterator_category = std::input_iterator_tag;
 
-            range_iterator() ENTT_NOEXCEPT = default;
-
             range_iterator & operator++() ENTT_NOEXCEPT {
                 return ++it, *this;
             }
@@ -122,8 +120,8 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
             }
 
         private:
-            it_type it;
-            ref_type pools;
+            it_type it{};
+            ref_type pools{};
         };
 
         group_range(const sparse_set<Entity> &ref, std::tuple<pool_type<Get> *...> gpools)
@@ -607,8 +605,6 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
             ));
             using iterator_category = std::input_iterator_tag;
 
-            range_iterator() ENTT_NOEXCEPT = default;
-
             range_iterator & operator++() ENTT_NOEXCEPT {
                 return ++it, std::apply([](auto &&... curr) { (++curr, ...); }, owned), *this;
             }
@@ -635,9 +631,9 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
             }
 
         private:
-            it_type it;
-            owned_type owned;
-            get_type get;
+            it_type it{};
+            owned_type owned{};
+            get_type get{};
         };
 
         group_range(std::tuple<pool_type<Owned> *..., pool_type<Get> *...> cpools, const std::size_t &extent)

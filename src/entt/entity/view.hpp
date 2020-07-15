@@ -175,8 +175,6 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             ));
             using iterator_category = std::input_iterator_tag;
 
-            range_iterator() ENTT_NOEXCEPT = default;
-
             range_iterator & operator++() ENTT_NOEXCEPT {
                 return ++it, *this;
             }
@@ -199,8 +197,8 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             }
 
         private:
-            view_iterator it;
-            const ref_type pools;
+            view_iterator it{};
+            const ref_type pools{};
         };
 
         view_range(view_iterator from, view_iterator to, std::tuple<pool_type<Component> *...> ref)
@@ -644,8 +642,6 @@ class basic_view<Entity, exclude_t<>, Component> {
             using reference = std::conditional_t<ENTT_IS_EMPTY(Component), std::tuple<Entity>, std::tuple<Entity, Component &>>;
             using iterator_category = std::input_iterator_tag;
 
-            range_iterator() ENTT_NOEXCEPT = default;
-
             range_iterator & operator++() ENTT_NOEXCEPT {
                 return std::apply([](auto &&... curr) { (++curr, ...); }, it), *this;
             }
@@ -668,7 +664,7 @@ class basic_view<Entity, exclude_t<>, Component> {
             }
 
         private:
-            it_type it;
+            it_type it{};
         };
 
         view_range(pool_type &ref)
