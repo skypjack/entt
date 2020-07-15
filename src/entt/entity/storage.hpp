@@ -478,7 +478,7 @@ private:
 /*! @copydoc storage */
 template<typename Entity, typename Type>
 // the useless decltype(...) helps to get around a quite impressive issue of VS2017
-class storage<Entity, Type, decltype(std::enable_if_t<ENTT_IS_EMPTY(Type)>())>: public sparse_set<Entity> {
+class storage<Entity, Type, std::enable_if_t<ENTT_IS_EMPTY(Type)>()>: public sparse_set<Entity> {
     using underlying_type = sparse_set<Entity>;
 
 public:
