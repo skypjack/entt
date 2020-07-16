@@ -474,7 +474,7 @@ public:
         entity_type entt;
 
         if(destroyed == null) {
-            entt = entities.emplace_back(entity_type(entities.size()));
+            entt = entities.emplace_back(entity_type(static_cast<typename traits_type::entity_type>(entities.size())));
             // traits_type::entity_mask is reserved to allow for null identifiers
             ENTT_ASSERT(to_integral(entt) < traits_type::entity_mask);
         } else {
@@ -507,7 +507,7 @@ public:
 
             for(auto pos = entities.size(); pos < req; ++pos) {
                 entities.emplace_back(destroyed);
-                destroyed = entity_type(pos);
+                destroyed = entity_type(static_cast<typename traits_type::entity_type>(pos));
             }
 
             entt = entities.emplace_back(hint);
@@ -562,7 +562,7 @@ public:
             if((to_integral(entities[pos]) & traits_type::entity_mask) != pos) {
                 const auto version = to_integral(entities[pos]) & (traits_type::version_mask << traits_type::entity_shift);
                 entities[pos] = entity_type{to_integral(destroyed) | version};
-                destroyed = entity_type(pos);
+                destroyed = entity_type(static_cast<typename traits_type::entity_type>(pos));
             }
         }
     }

@@ -364,7 +364,7 @@ public:
      */
     void emplace(const entity_type entt) {
         ENTT_ASSERT(!contains(entt));
-        assure(page(entt))[offset(entt)] = entity_type(packed.size());
+        assure(page(entt))[offset(entt)] = entity_type(static_cast<typename traits_type::entity_type>(packed.size()));
         packed.push_back(entt);
     }
 
@@ -383,7 +383,7 @@ public:
      */
     template<typename It>
     void insert(It first, It last) {
-        auto next = packed.size();
+        auto next = static_cast<typename traits_type::entity_type>(packed.size());
         packed.insert(packed.end(), first, last);
 
         while(first != last) {
@@ -408,7 +408,7 @@ public:
         ENTT_ASSERT(contains(entt));
         const auto curr = page(entt);
         const auto pos = offset(entt);
-        packed[size_type(sparse[curr][pos])] = entity_type(packed.back());
+        packed[size_type(sparse[curr][pos])] = packed.back();
         sparse[page(packed.back())][offset(packed.back())] = sparse[curr][pos];
         sparse[curr][pos] = null;
         packed.pop_back();
@@ -483,7 +483,7 @@ public:
         algo(from, to, std::move(compare), std::forward<Args>(args)...);
 
         for(size_type pos = skip, end = skip+length; pos < end; ++pos) {
-            sparse[page(packed[pos])][offset(packed[pos])] = entity_type(pos);
+            sparse[page(packed[pos])][offset(packed[pos])] = entity_type(static_cast<typename traits_type::entity_type>(pos));
         }
     }
 
@@ -532,7 +532,7 @@ public:
 
             while(curr != next) {
                 apply(packed[curr], packed[next]);
-                sparse[page(packed[curr])][offset(packed[curr])] = entity_type(curr);
+                sparse[page(packed[curr])][offset(packed[curr])] = entity_type(static_cast<typename traits_type::entity_type>(curr));
 
                 curr = next;
                 next = index(packed[curr]);
