@@ -48,7 +48,7 @@
 #else
 #   include <type_traits>
 #   // sfinae-friendly definition
-#   define ENTT_IS_EMPTY(Type) (std::is_empty_v<Type>, false)
+#   define ENTT_IS_EMPTY(Type) (void(std::is_empty_v<Type>), false)
 #endif
 
 
