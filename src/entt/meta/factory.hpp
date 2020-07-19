@@ -579,7 +579,7 @@ public:
                 nullptr,
                 true,
                 &internal::meta_info<data_type>::resolve,
-                []() -> decltype(internal::meta_data_node::set) {
+                []() -> std::remove_const_t<decltype(internal::meta_data_node::set)> {
                     if constexpr(std::is_same_v<Type, data_type> || std::is_const_v<data_type>) {
                         return nullptr;
                     } else {
@@ -631,7 +631,7 @@ public:
             nullptr,
             false,
             &internal::meta_info<underlying_type>::resolve,
-            []() -> decltype(internal::meta_data_node::set) {
+            []() -> std::remove_const_t<decltype(internal::meta_data_node::set)> {
                 if constexpr(std::is_same_v<decltype(Setter), std::nullptr_t> || (std::is_member_object_pointer_v<decltype(Setter)> && std::is_const_v<underlying_type>)) {
                     return nullptr;
                 } else {
