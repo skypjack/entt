@@ -32,6 +32,7 @@ class dispatcher {
     struct basic_pool {
         virtual ~basic_pool() = default;
         virtual void publish() = 0;
+        virtual void disconnect(void *) = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
         [[nodiscard]] virtual id_type type_id() const ENTT_NOEXCEPT = 0;
     };
@@ -49,6 +50,10 @@ class dispatcher {
             }
 
             events.erase(events.cbegin(), events.cbegin()+length);
+        }
+
+        void disconnect(void *instance) override {
+            sink().disconnect(instance);
         }
 
         void clear() ENTT_NOEXCEPT override {
@@ -183,6 +188,32 @@ public:
     template<typename Event>
     void enqueue(Event &&event) {
         assure<std::decay_t<Event>>().enqueue(std::forward<Event>(event));
+    }
+
+    /**
+     * @brief Utility function to disconnect everything related to a given value
+     * or instance from a dispatcher.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid object that fits the purpose.
+     */
+    template<typename Type>
+    void disconnect(Type &value_or_instance) {
+        disconnect(&value_or_instance);
+    }
+
+    /**
+     * @brief Utility function to disconnect everything related to a given value
+     * or instance from a dispatcher.
+     * @tparam Type Type of class or type of payload.
+     * @param value_or_instance A valid object that fits the purpose.
+     */
+    template<typename Type>
+    void disconnect(Type *value_or_instance) {
+        for(auto &&cpool: pools) {
+            if(cpool) {
+                cpool->disconnect(value_or_instance);
+            }
+        }
     }
 
     /**

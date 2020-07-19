@@ -81,3 +81,18 @@ TEST(Dispatcher, StopAndGo) {
 
     ASSERT_EQ(receiver.cnt, 2);
 }
+
+TEST(Dispatcher, OpaqueDisconnect) {
+    entt::dispatcher dispatcher;
+    receiver receiver;
+
+    dispatcher.sink<an_event>().connect<&receiver::receive>(receiver);
+    dispatcher.trigger<an_event>();
+
+    ASSERT_EQ(receiver.cnt, 1);
+
+    dispatcher.disconnect(receiver);
+    dispatcher.trigger<an_event>();
+
+    ASSERT_EQ(receiver.cnt, 1);
+}
