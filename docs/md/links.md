@@ -80,8 +80,11 @@ I hope this list can grow much more in the future:
     CRYENGINE games.
   * [LM-Engine](https://github.com/Lawrencemm/LM-Engine): the Vim of game
     engines.
+  * [TiltedOnline](https://github.com/tiltedphoques/TiltedOnline) by
+    [Tilted Phoques](https://github.com/tiltedphoques): Skyrim Together, a mod
+    intended to sync the player and the world state accross multiple clients.
 
-* Articles and blog posts:
+* Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
     [blog](https://skypjack.github.io/) are about `EnTT`, for those who want to
     know **more** on this project.
@@ -101,6 +104,11 @@ I hope this list can grow much more in the future:
   * [Creating Minecraft in One Week with C++ and Vulkan](https://vazgriz.com/189/creating-minecraft-in-one-week-with-c-and-vulkan/):
     a crack at recreating Minecraft in one week using a custom C++ engine and
     Vulkan ([code included](https://github.com/vazgriz/VoxelGame)).
+  * [Intro to EnTT](https://www.youtube.com/watch?v=D4hz0wEB978&feature=youtu.be):
+    [Game Engine series](https://www.youtube.com/c/TheChernoProject/videos) by
+    [The Cherno](https://github.com/TheCherno).
+  * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect):
+    project retrospect by [Eric Hildebrand](https://www.erichildebrand.net/).
 
 * Any Other Business:
   * [ArcGIS Runtime SDKs](https://developers.arcgis.com/arcgis-runtime/) by
