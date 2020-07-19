@@ -31,7 +31,7 @@ struct [[deprecated("Consider using the handle class instead")]] basic_actor {
     using entity_type = Entity;
 
     basic_actor() ENTT_NOEXCEPT
-        : entt{entt::null}, reg{nullptr}
+        : entt{null}, reg{nullptr}
     {}
 
     /**

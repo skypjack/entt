@@ -64,7 +64,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Sink type. */
-    using sink_type = entt::sink<Ret(Args...)>;
+    using sink_type = sink<Ret(Args...)>;
 
     /**
      * @brief Instance type when it comes to connecting member functions.

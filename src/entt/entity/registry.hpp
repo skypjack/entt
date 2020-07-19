@@ -1192,14 +1192,14 @@ public:
      * @return A newly created view.
      */
     template<typename... Component, typename... Exclude>
-    [[nodiscard]] entt::basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) const {
+    [[nodiscard]] basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) const {
         static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
         return { assure<std::decay_t<Component>>()..., assure<Exclude>()... };
     }
 
     /*! @copydoc view */
     template<typename... Component, typename... Exclude>
-    [[nodiscard]] entt::basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) {
+    [[nodiscard]] basic_view<Entity, exclude_t<Exclude...>, Component...> view(exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Component) > 0, "Exclusion-only views are not supported");
         return { assure<std::decay_t<Component>>()..., assure<Exclude>()... };
     }
@@ -1233,7 +1233,7 @@ public:
      * @return A newly created runtime view.
      */
     template<typename ItComp, typename ItExcl = id_type *>
-    [[nodiscard]] entt::basic_runtime_view<Entity> runtime_view(ItComp first, ItComp last, ItExcl from = {}, ItExcl to = {}) const {
+    [[nodiscard]] basic_runtime_view<Entity> runtime_view(ItComp first, ItComp last, ItExcl from = {}, ItExcl to = {}) const {
         std::vector<const sparse_set<Entity> *> component(std::distance(first, last));
         std::vector<const sparse_set<Entity> *> exclude(std::distance(from, to));
 
@@ -1278,7 +1278,7 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] entt::basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) {
+    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) {
         static_assert(sizeof...(Owned) + sizeof...(Get) > 0, "Exclusion-only views are not supported");
         static_assert(sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude) > 1, "Single component groups are not allowed");
 
@@ -1343,7 +1343,7 @@ public:
             (on_construct<Exclude>().before(discard_if).template connect<&handler_type::discard_if>(*handler), ...);
 
             if constexpr(sizeof...(Owned) == 0) {
-                for(const auto entity: view<Owned..., Get...>(entt::exclude<Exclude...>)) {
+                for(const auto entity: view<Owned..., Get...>(exclude<Exclude...>)) {
                     handler->current.emplace(entity);
                 }
             } else {
@@ -1372,9 +1372,9 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] entt::basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) const {
+    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> group(get_t<Get...>, exclude_t<Exclude...> = {}) const {
         static_assert(std::conjunction_v<std::is_const<Owned>..., std::is_const<Get>...>, "Invalid non-const type");
-        return const_cast<basic_registry *>(this)->group<Owned...>(entt::get<Get...>, exclude<Exclude...>);
+        return const_cast<basic_registry *>(this)->group<Owned...>(get_t<Get...>{}, exclude<Exclude...>);
     }
 
     /**
@@ -1387,8 +1387,8 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Exclude>
-    [[nodiscard]] entt::basic_group<Entity, exclude_t<Exclude...>, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) {
-        return group<Owned...>(entt::get<>, exclude<Exclude...>);
+    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) {
+        return group<Owned...>(get_t<>{}, exclude<Exclude...>);
     }
 
     /**
@@ -1401,7 +1401,7 @@ public:
      * @return A newly created group.
      */
     template<typename... Owned, typename... Exclude>
-    [[nodiscard]] entt::basic_group<Entity, exclude_t<Exclude...>, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) const {
+    [[nodiscard]] basic_group<Entity, exclude_t<Exclude...>, get_t<>, Owned...> group(exclude_t<Exclude...> = {}) const {
         static_assert(std::conjunction_v<std::is_const<Owned>...>, "Invalid non-const type");
         return const_cast<basic_registry *>(this)->group<Owned...>(exclude<Exclude...>);
     }
@@ -1425,7 +1425,7 @@ public:
      * @return True if the group can be sorted, false otherwise.
      */
     template<typename... Owned, typename... Get, typename... Exclude>
-    [[nodiscard]] bool sortable(const entt::basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> &) ENTT_NOEXCEPT {
+    [[nodiscard]] bool sortable(const basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> &) ENTT_NOEXCEPT {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         return std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
             return (0u + ... + gdata.owned(type_info<std::decay_t<Owned>>::id())) && (size < gdata.size);

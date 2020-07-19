@@ -1487,7 +1487,7 @@ public:
 private:
     void(* next_fn)(meta_any);
     meta_any(* get_fn)(meta_any);
-    entt::meta_any handle;
+    meta_any handle;
 };
 
 
@@ -1748,7 +1748,7 @@ private:
     void(* next_fn)(meta_any);
     meta_any(* key_fn)(meta_any);
     meta_any(* value_fn)(meta_any);
-    entt::meta_any handle;
+    meta_any handle;
 };
 
 

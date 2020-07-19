@@ -276,7 +276,7 @@ public:
      * @brief Constructs an extended factory from a given node.
      * @param target The underlying node to which to assign the properties.
      */
-    meta_factory(entt::internal::meta_prop_node **target) ENTT_NOEXCEPT
+    meta_factory(internal::meta_prop_node **target) ENTT_NOEXCEPT
         : curr{target}
     {}
 
@@ -319,7 +319,7 @@ public:
     }
 
 private:
-    entt::internal::meta_prop_node **curr;
+    internal::meta_prop_node **curr;
 };
 
 

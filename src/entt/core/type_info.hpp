@@ -102,12 +102,12 @@ struct type_info {
      */
 #if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
     [[nodiscard]] static constexpr id_type id() ENTT_NOEXCEPT {
-        constexpr auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
+        constexpr auto value = hashed_string::value(ENTT_PRETTY_FUNCTION);
         return value;
     }
 #elif defined ENTT_PRETTY_FUNCTION
     [[nodiscard]] static id_type id() ENTT_NOEXCEPT {
-        static const auto value = entt::hashed_string::value(ENTT_PRETTY_FUNCTION);
+        static const auto value = hashed_string::value(ENTT_PRETTY_FUNCTION);
         return value;
     }
 #else
