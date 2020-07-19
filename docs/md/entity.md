@@ -224,7 +224,7 @@ registry.emplace<position>(entity, 0., 0.);
 
 // ...
 
-auto &velocity = registry.emplace<velocity>(entity);
+auto &vel = registry.emplace<velocity>(entity);
 vel.dx = 0.;
 vel.dy = 0.;
 ```
