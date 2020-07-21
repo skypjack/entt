@@ -107,6 +107,9 @@ I hope this list can grow much more in the future:
   * [Intro to EnTT](https://www.youtube.com/watch?v=D4hz0wEB978&feature=youtu.be):
     [Game Engine series](https://www.youtube.com/c/TheChernoProject/videos) by
     [The Cherno](https://github.com/TheCherno).
+  * [Entities and Components](https://www.youtube.com/watch?v=-B1iu4QJTUc&feature=youtu.be):
+    [Game Engine series](https://www.youtube.com/c/TheChernoProject/videos) by
+    [The Cherno](https://github.com/TheCherno).
   * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect):
     project retrospect by [Eric Hildebrand](https://www.erichildebrand.net/).
 
