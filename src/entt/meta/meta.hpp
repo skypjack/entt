@@ -1698,7 +1698,7 @@ class meta_associative_container::meta_iterator {
             return meta_any{};
         } else {
             if constexpr(std::is_const_v<std::remove_reference_t<decltype(std::declval<typename Type::iterator>()->second)>>) {
-                return any.cast<typename Type::iterator>().second;
+                return any.cast<typename Type::iterator>()->second;
             } else {
                 return std::ref(any.cast<typename Type::iterator>()->second);
             }

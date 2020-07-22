@@ -25,3 +25,4 @@ Next:
  - custom pools.
  - the Perfect Model.
  - page size 0 -> page less mode
+ - test meta_associative_container::meta_iterator::value fro non-key-only, const value
