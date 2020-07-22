@@ -113,7 +113,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
         view_iterator operator++(int) {
             view_iterator orig = *this;
-            return operator++(), orig;
+            return ++(*this), orig;
         }
 
         view_iterator & operator--() ENTT_NOEXCEPT {
@@ -181,7 +181,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
             range_iterator operator++(int) ENTT_NOEXCEPT {
                 range_iterator orig = *this;
-                return ++it, orig;
+                return ++(*this), orig;
             }
 
             [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {

@@ -72,7 +72,7 @@ class sparse_set {
 
         sparse_set_iterator operator++(int) ENTT_NOEXCEPT {
             iterator orig = *this;
-            return operator++(), orig;
+            return ++(*this), orig;
         }
 
         sparse_set_iterator & operator--() ENTT_NOEXCEPT {

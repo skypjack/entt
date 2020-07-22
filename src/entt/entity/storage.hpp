@@ -77,7 +77,7 @@ class storage: public sparse_set<Entity> {
 
         storage_iterator operator++(int) ENTT_NOEXCEPT {
             storage_iterator orig = *this;
-            return operator++(), orig;
+            return ++(*this), orig;
         }
 
         storage_iterator & operator--() ENTT_NOEXCEPT {

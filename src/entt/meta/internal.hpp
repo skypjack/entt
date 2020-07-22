@@ -313,7 +313,7 @@ class meta_range {
 
         range_iterator operator++(int) ENTT_NOEXCEPT {
             range_iterator orig = *this;
-            return operator++(), orig;
+            return ++(*this), orig;
         }
 
         [[nodiscard]] bool operator==(const range_iterator &other) const ENTT_NOEXCEPT {

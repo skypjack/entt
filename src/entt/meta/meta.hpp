@@ -1481,7 +1481,7 @@ public:
     /*! @brief Post-increment operator. @return This iterator. */
     meta_iterator operator++(int) ENTT_NOEXCEPT {
         meta_iterator orig = *this;
-        return next_fn(handle.ref()), orig;
+        return ++(*this), orig;
     }
 
     /**
@@ -1741,7 +1741,7 @@ public:
     /*! @brief Post-increment operator. @return This iterator. */
     meta_iterator operator++(int) ENTT_NOEXCEPT {
         meta_iterator orig = *this;
-        return next_fn(handle.ref()), orig;
+        return ++(*this), orig;
     }
 
     /**

@@ -34,7 +34,7 @@ class meta_range {
 
         range_iterator operator++(int) ENTT_NOEXCEPT {
             range_iterator orig = *this;
-            return ++it, orig;
+            return ++(*this), orig;
         }
 
         [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {

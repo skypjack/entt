@@ -94,7 +94,7 @@ class basic_runtime_view {
 
         view_iterator operator++(int) {
             view_iterator orig = *this;
-            return operator++(), orig;
+            return ++(*this), orig;
         }
 
         view_iterator & operator--() ENTT_NOEXCEPT {
