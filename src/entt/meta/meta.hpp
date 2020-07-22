@@ -694,6 +694,19 @@ struct meta_ctor {
      * conversion to the required types is possible. Otherwise, an empty and
      * thus invalid wrapper is returned.
      *
+     * @param args Parameters to use to construct the instance.
+     * @param sz Number of parameters to use to construct the instance.
+     * @return A meta any containing the new instance, if any.
+     */
+    [[nodiscard]] meta_any invoke(meta_any * const args, const std::size_t sz) const {
+        return sz == size() ? node->invoke(args) : meta_any{};
+    }
+
+    /**
+     * @copybrief invoke
+     *
+     * @sa invoke
+     *
      * @tparam Args Types of arguments to use to construct the instance.
      * @param args Parameters to use to construct the instance.
      * @return A meta any containing the new instance, if any.
@@ -701,7 +714,7 @@ struct meta_ctor {
     template<typename... Args>
     [[nodiscard]] meta_any invoke([[maybe_unused]] Args &&... args) const {
         std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
-        return sizeof...(Args) == size() ? node->invoke(arguments.data()) : meta_any{};
+        return invoke(arguments.data(), sizeof...(Args));
     }
 
     /**
@@ -899,15 +912,29 @@ struct meta_func {
      * function. Otherwise, invoking the underlying function results in an
      * undefined behavior.
      *
+     * @param instance An opaque instance of the underlying type.
+     * @param args Parameters to use to invoke the function.
+     * @param sz Number of parameters to use to invoke the function.
+     * @return A meta any containing the returned value, if any.
+     */
+    [[nodiscard]] meta_any invoke(meta_handle instance, meta_any * const args, const std::size_t sz) const {
+        return sz == size() ? node->invoke(instance, args) : meta_any{};
+    }
+
+    /**
+     * @copybrief invoke
+     *
+     * @sa invoke
+     *
      * @tparam Args Types of arguments to use to invoke the function.
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
-     * @return A meta any containing the returned value, if any.
+     * @return A meta any containing the new instance, if any.
      */
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&... args) const {
         std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
-        return sizeof...(Args) == size() ? node->invoke(instance, arguments.data()) : meta_any{};
+        return invoke(instance, arguments.data(), sizeof...(Args));
     }
 
     /*! @copydoc meta_ctor::prop */
@@ -1250,6 +1277,25 @@ public:
      * conversion to the required types is possible. Otherwise, an empty and
      * thus invalid wrapper is returned.
      *
+     * @param args Parameters to use to construct the instance.
+     * @param sz Number of parameters to use to construct the instance.
+     * @return A meta any containing the new instance, if any.
+     */
+    [[nodiscard]] meta_any construct(meta_any * const args, const std::size_t sz) const {
+        meta_any any{};
+
+        internal::find_if<&node_type::ctor>([args, sz, &any](const auto *curr) {
+            return (curr->size == sz) && (any = curr->invoke(args));
+        }, node);
+
+        return any;
+    }
+
+    /**
+     * @copybrief construct
+     *
+     * @sa construct
+     *
      * @tparam Args Types of arguments to use to construct the instance.
      * @param args Parameters to use to construct the instance.
      * @return A meta any containing the new instance, if any.
@@ -1257,13 +1303,7 @@ public:
     template<typename... Args>
     [[nodiscard]] meta_any construct(Args &&... args) const {
         std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
-        meta_any any{};
-
-        internal::find_if<&node_type::ctor>([&arguments, &any](const auto *curr) {
-            return (curr->size == sizeof...(args)) && (any = curr->invoke(arguments.data()));
-        }, node);
-
-        return any;
+        return construct(arguments.data(), sizeof...(Args));
     }
 
     /**
