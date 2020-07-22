@@ -906,12 +906,8 @@ struct meta_func {
      */
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&... args) const {
-        if(sizeof...(Args) == size()) {
-            std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
-            return node->invoke(std::move(instance), arguments.data());
-        } else {
-            return meta_any{};
-        }
+        std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
+        return sizeof...(Args) == size() ? node->invoke(instance, arguments.data()) : meta_any{};
     }
 
     /*! @copydoc meta_ctor::prop */
