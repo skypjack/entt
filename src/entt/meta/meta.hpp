@@ -70,7 +70,6 @@ public:
     inline std::pair<iterator, bool> insert(iterator, meta_any);
     inline std::pair<iterator, bool> erase(iterator);
     [[nodiscard]] inline meta_any operator[](size_type);
-
     [[nodiscard]] inline explicit operator bool() const ENTT_NOEXCEPT;
 
 private:
@@ -137,7 +136,6 @@ public:
     inline bool insert(meta_any, meta_any);
     inline bool erase(meta_any);
     [[nodiscard]] inline iterator find(meta_any);
-
     [[nodiscard]] inline explicit operator bool() const ENTT_NOEXCEPT;
 
 private:
@@ -201,7 +199,7 @@ public:
     meta_any() ENTT_NOEXCEPT
         : storage{},
           node{},
-          deref{},
+          deref{nullptr},
           seq_factory{nullptr},
           assoc_factory{nullptr}
     {}
@@ -1432,17 +1430,17 @@ class meta_sequence_container::meta_iterator {
     /*! @brief A meta sequence container can access the underlying iterator. */
     friend class meta_sequence_container;
 
-    template<typename Type>
+    template<typename It>
     static void incr(meta_any any) {
-        ++any.cast<typename Type::iterator>();
+        ++any.cast<It>();
     }
 
-    template<typename Type>
+    template<typename It>
     [[nodiscard]] static meta_any deref(meta_any any) {
-        if constexpr(std::is_const_v<std::remove_reference_t<decltype(*std::declval<typename Type::iterator>())>>) {
-            return *any.cast<typename Type::iterator>();
+        if constexpr(std::is_const_v<std::remove_reference_t<decltype(*std::declval<It>())>>) {
+            return *any.cast<It>();
         } else {
-            return std::ref(*any.cast<typename Type::iterator>());
+            return std::ref(*any.cast<It>());
         }
     }
 
@@ -1463,13 +1461,13 @@ public:
 
     /**
      * @brief Constructs a meta iterator from a given iterator.
-     * @tparam Type Type of container to which the iterator belongs.
+     * @tparam It Type of actual iterator with which to build the meta iterator.
      * @param iter The actual iterator with which to build the meta iterator.
      */
-    template<typename Type>
-    meta_iterator(std::in_place_type_t<Type>, typename Type::iterator iter)
-        : next_fn{&incr<Type>},
-          get_fn{&deref<Type>},
+    template<typename It>
+    meta_iterator(It iter)
+        : next_fn{&incr<It>},
+          get_fn{&deref<It>},
           handle{std::move(iter)}
     {}
 
@@ -1548,17 +1546,17 @@ struct meta_sequence_container::meta_sequence_container_proxy {
     }
 
     [[nodiscard]] static iterator begin(void *container) {
-        return iterator{std::in_place_type<Type>, traits_type::begin(*static_cast<Type *>(container))};
+        return iterator{traits_type::begin(*static_cast<Type *>(container))};
     }
 
     [[nodiscard]] static iterator end(void *container) {
-        return iterator{std::in_place_type<Type>, traits_type::end(*static_cast<Type *>(container))};
+        return iterator{traits_type::end(*static_cast<Type *>(container))};
     }
 
     [[nodiscard]] static std::pair<iterator, bool> insert(void *container, iterator it, meta_any value) {
         if(const auto *v_ptr = value.try_cast<typename traits_type::value_type>(); v_ptr || value.convert<typename traits_type::value_type>()) {
             auto ret = traits_type::insert(*static_cast<Type *>(container), it.handle.cast<typename traits_type::iterator>(), v_ptr ? *v_ptr : value.cast<typename traits_type::value_type>());
-            return {iterator{std::in_place_type<Type>, std::move(ret.first)}, ret.second};
+            return {iterator{std::move(ret.first)}, ret.second};
         }
 
         return {};
@@ -1566,7 +1564,7 @@ struct meta_sequence_container::meta_sequence_container_proxy {
 
     [[nodiscard]] static std::pair<iterator, bool> erase(void *container, iterator it) {
         auto ret = traits_type::erase(*static_cast<Type *>(container), it.handle.cast<typename traits_type::iterator>());
-        return {iterator{std::in_place_type<Type>, std::move(ret.first)}, ret.second};
+        return {iterator{std::move(ret.first)}, ret.second};
     }
 
     [[nodiscard]] static meta_any get(void *container, size_type pos) {
@@ -1678,29 +1676,29 @@ inline std::pair<meta_sequence_container::iterator, bool> meta_sequence_containe
 
 /*! @brief Opaque iterator for meta associative containers. */
 class meta_associative_container::meta_iterator {
-    template<typename Type>
+    template<typename It>
     static void incr(meta_any any) {
-        ++any.cast<typename Type::iterator>();
+        ++any.cast<It>();
     }
 
-    template<typename Type>
+    template<bool KeyOnly, typename It>
     [[nodiscard]] static meta_any key(meta_any any) {
-        if constexpr(is_key_only_meta_associative_container_v<Type>) {
-            return *any.cast<typename Type::iterator>();
+        if constexpr(KeyOnly) {
+            return *any.cast<It>();
         } else {
-            return any.cast<typename Type::iterator>()->first;
+            return any.cast<It>()->first;
         }
     }
 
-    template<typename Type>
-    [[nodiscard]] static meta_any value(meta_any any) {
-        if constexpr(is_key_only_meta_associative_container_v<Type>) {
+    template<bool KeyOnly, typename It>
+    [[nodiscard]] static meta_any value([[maybe_unused]] meta_any any) {
+        if constexpr(KeyOnly) {
             return meta_any{};
         } else {
-            if constexpr(std::is_const_v<std::remove_reference_t<decltype(std::declval<typename Type::iterator>()->second)>>) {
-                return any.cast<typename Type::iterator>()->second;
+            if constexpr(std::is_const_v<std::remove_reference_t<decltype(std::declval<It>()->second)>>) {
+                return any.cast<It>()->second;
             } else {
-                return std::ref(any.cast<typename Type::iterator>()->second);
+                return std::ref(any.cast<It>()->second);
             }
         }
     }
@@ -1722,14 +1720,16 @@ public:
 
     /**
      * @brief Constructs a meta iterator from a given iterator.
-     * @tparam Type Type of container to which the iterator belongs.
+     * @tparam KeyOnly True if the associative container is also key-only, false
+     * otherwise.
+     * @tparam It Type of actual iterator with which to build the meta iterator.
      * @param iter The actual iterator with which to build the meta iterator.
      */
-    template<typename Type>
-    meta_iterator(std::in_place_type_t<Type>, typename Type::iterator iter)
-        : next_fn{&incr<Type>},
-          key_fn{&key<Type>},
-          value_fn{&value<Type>},
+    template<bool KeyOnly, typename It>
+    meta_iterator(std::integral_constant<bool, KeyOnly>, It iter)
+        : next_fn{&incr<It>},
+          key_fn{&key<KeyOnly, It>},
+          value_fn{&value<KeyOnly, It>},
           handle{std::move(iter)}
     {}
 
@@ -1817,11 +1817,11 @@ struct meta_associative_container::meta_associative_container_proxy {
     }
 
     [[nodiscard]] static iterator begin(void *container) {
-        return iterator{std::in_place_type<Type>, traits_type::begin(*static_cast<Type *>(container))};
+        return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::begin(*static_cast<Type *>(container))};
     }
 
     [[nodiscard]] static iterator end(void *container) {
-        return iterator{std::in_place_type<Type>, traits_type::end(*static_cast<Type *>(container))};
+        return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::end(*static_cast<Type *>(container))};
     }
 
     [[nodiscard]] static bool insert(void *container, meta_any key, meta_any value) {
@@ -1848,7 +1848,7 @@ struct meta_associative_container::meta_associative_container_proxy {
 
     [[nodiscard]] static iterator find(void *container, meta_any key) {
         if(const auto *k_ptr = key.try_cast<typename traits_type::key_type>(); k_ptr || key.convert<typename traits_type::key_type>()) {
-            return iterator{std::in_place_type<Type>, traits_type::find(*static_cast<Type *>(container), k_ptr ? *k_ptr : key.cast<typename traits_type::key_type>())};
+            return iterator{is_key_only_meta_associative_container<Type>{}, traits_type::find(*static_cast<Type *>(container), k_ptr ? *k_ptr : key.cast<typename traits_type::key_type>())};
         }
 
         return {};
