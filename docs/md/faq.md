@@ -128,7 +128,7 @@ here is a workaround in the form of a macro:
 
 ```cpp
 #if defined(_MSC_VER)
-#define HS(str) __pragma(warning(suppress:4307)) entt::hashed_string{str}\
+#define HS(str) __pragma(warning(suppress:4307)) entt::hashed_string{str}
 #else
 #define HS(str) entt::hashed_string{str}
 #endif
