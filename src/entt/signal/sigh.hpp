@@ -324,7 +324,7 @@ public:
     template<auto Candidate, typename Type>
     [[nodiscard]] sink before(Type &&value_or_instance) {
         delegate<Ret(Args...)> call{};
-        call.template connect<Candidate>(std::forward<Type>(value_or_instance));
+        call.template connect<Candidate>(value_or_instance);
 
         const auto &calls = signal->calls;
         const auto it = std::find(calls.cbegin(), calls.cend(), std::move(call));
@@ -454,7 +454,7 @@ public:
     void disconnect(Type &&value_or_instance) {
         auto &calls = signal->calls;
         delegate<Ret(Args...)> call{};
-        call.template connect<Candidate>(std::forward<Type>(value_or_instance));
+        call.template connect<Candidate>(value_or_instance);
         calls.erase(std::remove(calls.begin(), calls.end(), std::move(call)), calls.end());
     }
 
