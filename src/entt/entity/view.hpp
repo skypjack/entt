@@ -270,7 +270,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
                 auto curr = it++;
 
                 if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->contains(entt)) && ...)
-                         && std::none_of(filter.cbegin(), filter.cend(), [entt](const sparse_set<Entity> *curr) { return curr->contains(entt); }))
+                         && std::none_of(filter.cbegin(), filter.cend(), [entt](const sparse_set<Entity> *cpool) { return cpool->contains(entt); }))
                 {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
                         func(get<Comp, Type>(curr, std::get<pool_type<Type> *>(pools), entt)...);
@@ -282,7 +282,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         } else {
             for(const auto entt: static_cast<const sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
                 if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->contains(entt)) && ...)
-                        && std::none_of(filter.cbegin(), filter.cend(), [entt](const sparse_set<Entity> *curr) { return curr->contains(entt); }))
+                        && std::none_of(filter.cbegin(), filter.cend(), [entt](const sparse_set<Entity> *cpool) { return cpool->contains(entt); }))
                 {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
                         func(std::get<pool_type<Type> *>(pools)->get(entt)...);
