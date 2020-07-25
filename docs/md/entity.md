@@ -1229,6 +1229,13 @@ during iterations.<br/>
 Since they aren't explicitly instantiated, empty components aren't returned in
 any case.
 
+There is also a third method for iterating over entities and components for
+multi component views. It's a chunk based iteration and is made available by
+means of the `chunked` member function.<br/>
+Since this is a particular iteration method with fairly specific purposes, I
+recommend referring to the official documentation for more details and I won't
+further investigate the topic here.
+
 As a side note, in the case of single component views, `get` accepts but doesn't
 strictly require a template parameter, since the type is implicitly defined:
 

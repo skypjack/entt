@@ -729,3 +729,114 @@ TEST(MultiComponentView, FrontBack) {
     ASSERT_EQ(view.front(), e1);
     ASSERT_EQ(view.back(), e0);
 }
+
+TEST(MultiComponentView, ChunkedEmpty) {
+    entt::registry registry;
+    auto view = registry.view<const entt::id_type, const char>();
+
+    view.chunked([](auto...) { FAIL(); });
+
+    registry.emplace<entt::id_type>(registry.create());
+    registry.emplace<char>(registry.create());
+
+    view.chunked([](auto...) { FAIL(); });
+}
+
+TEST(MultiComponentView, ChunkedContiguous) {
+    entt::registry registry;
+    auto view = registry.view<const entt::id_type, const char>();
+
+    for(auto i = 0; i < 5; ++i) {
+        const auto entity = registry.create();
+        registry.emplace<entt::id_type>(entity, entt::to_integral(entity));
+        registry.emplace<char>(entity);
+    }
+
+    view.chunked([](auto *entity, auto *id, auto *, auto sz) {
+        ASSERT_EQ(sz, 5u);
+
+        for(decltype(sz) i{}; i < sz; ++i) {
+            ASSERT_EQ(entt::to_integral(*(entity + i)), *(id + i));
+        }
+    });
+}
+
+TEST(MultiComponentView, ChunkedSpread) {
+    entt::registry registry;
+    auto view = registry.view<const entt::id_type, const char>();
+
+    registry.emplace<entt::id_type>(registry.create());
+
+    for(auto i = 0; i < 3; ++i) {
+        const auto entity = registry.create();
+        registry.emplace<entt::id_type>(entity, entt::to_integral(entity));
+        registry.emplace<char>(entity);
+    }
+
+    registry.emplace<char>(registry.create());
+
+    for(auto i = 0; i < 3; ++i) {
+        const auto entity = registry.create();
+        registry.emplace<entt::id_type>(entity, entt::to_integral(entity));
+        registry.emplace<char>(entity);
+    }
+
+    registry.emplace<entt::id_type>(registry.create());
+    registry.emplace<entt::id_type>(registry.create());
+    registry.emplace<char>(registry.create());
+
+    view.chunked([](auto *entity, auto *id, auto *, auto sz) {
+        ASSERT_EQ(sz, 3u);
+
+        for(decltype(sz) i{}; i < sz; ++i) {
+            ASSERT_EQ(entt::to_integral(*(entity + i)), *(id + i));
+        }
+    });
+}
+
+TEST(MultiComponentView, ChunkedWithExcludedComponents) {
+    entt::registry registry;
+    auto view = registry.view<const entt::id_type, const char>(entt::exclude<double>);
+
+    registry.emplace<entt::id_type>(registry.create());
+
+    for(auto i = 0; i < 3; ++i) {
+        const auto entity = registry.create();
+        registry.emplace<entt::id_type>(entity, entt::to_integral(entity));
+        registry.emplace<char>(entity);
+    }
+
+    registry.emplace<char>(registry.create());
+
+    for(auto i = 0; i < 2; ++i) {
+        const auto entity = registry.create();
+        registry.emplace<entt::id_type>(entity, entt::to_integral(entity));
+        registry.emplace<char>(entity);
+        registry.emplace<double>(entity);
+    }
+
+    for(auto i = 0; i < 3; ++i) {
+        const auto entity = registry.create();
+        registry.emplace<entt::id_type>(entity, entt::to_integral(entity));
+        registry.emplace<char>(entity);
+    }
+
+    for(auto i = 0; i < 2; ++i) {
+        const auto entity = registry.create();
+        registry.emplace<entt::id_type>(entity, entt::to_integral(entity));
+        registry.emplace<char>(entity);
+        registry.emplace<double>(entity);
+    }
+
+    registry.emplace<entt::id_type>(registry.create());
+    registry.emplace<entt::id_type>(registry.create());
+    registry.emplace<char>(registry.create());
+
+    view.chunked([](auto *entity, auto *id, auto *, auto sz) {
+        ASSERT_EQ(sz, 3u);
+
+        for(decltype(sz) i{}; i < sz; ++i) {
+            ASSERT_EQ(entt::to_integral(*(entity + i)), *(id + i));
+        }
+    });
+}

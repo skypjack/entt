@@ -27,3 +27,4 @@ Next:
  - page size 0 -> page less mode
  - test meta_associative_container::meta_iterator::value fro non-key-only, const value
  - add ::reach and rev iterators to views and groups for raw, faster and unsafe iterations
+ - add example: 64 bit ids with 32 bits reserved for users' purposes
