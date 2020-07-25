@@ -240,7 +240,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     {}
 
     [[nodiscard]] const sparse_set<Entity> & candidate() const ENTT_NOEXCEPT {
-        return *std::min({ static_cast<const sparse_set<Entity> *>(std::get<pool_type<Component> *>(pools))... }, [](const auto *lhs, const auto *rhs) {
+        return *(std::min)({ static_cast<const sparse_set<Entity> *>(std::get<pool_type<Component> *>(pools))... }, [](const auto *lhs, const auto *rhs) {
             return lhs->size() < rhs->size();
         });
     }
@@ -303,7 +303,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         while(first != last) {
             if((std::get<pool_type<Component> *>(pools)->contains(*first) && ...) && std::none_of(filter.cbegin(), filter.cend(), [entt = *first](const sparse_set<Entity> *cpool) { return cpool->contains(entt); })) {
                 const auto base = *(first++);
-                const auto chunk = std::min({ (std::get<pool_type<Component> *>(pools)->size() - std::get<pool_type<Component> *>(pools)->index(base))... });
+                const auto chunk = (std::min)({ (std::get<pool_type<Component> *>(pools)->size() - std::get<pool_type<Component> *>(pools)->index(base))... });
                 size_type length{};
 
                 for(++length;
@@ -345,7 +345,7 @@ public:
      * @return Estimated number of entities iterated by the view.
      */
     [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return std::min({ std::get<pool_type<Component> *>(pools)->size()... });
+        return (std::min)({ std::get<pool_type<Component> *>(pools)->size()... });
     }
 
     /**
