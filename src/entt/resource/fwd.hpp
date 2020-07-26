@@ -5,15 +5,14 @@
 namespace entt {
 
 
-/*! @struct cache */
 template<typename>
 struct resource_cache;
 
-/*! @class handle */
+
 template<typename>
 class resource_handle;
 
-/*! @class loader */
+
 template<typename, typename>
 class resource_loader;
 
