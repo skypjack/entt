@@ -94,7 +94,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
         [[nodiscard]] bool valid() const {
             return std::all_of(unchecked.cbegin(), unchecked.cend(), [entt = *it](const sparse_set<Entity> *curr) { return curr->contains(entt); })
-                    && std::none_of(filter.cbegin(), filter.cend(), [entt = *it](const sparse_set<Entity> *curr) { return curr->contains(entt); });
+                    && (sizeof...(Exclude) == 0 || std::none_of(filter.cbegin(), filter.cend(), [entt = *it](const sparse_set<Entity> *cpool) { return cpool->contains(entt); }));
         }
 
     public:
@@ -270,7 +270,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
                 auto curr = it++;
 
                 if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->contains(entt)) && ...)
-                         && std::none_of(filter.cbegin(), filter.cend(), [entt](const sparse_set<Entity> *cpool) { return cpool->contains(entt); }))
+                         && (sizeof...(Exclude) == 0 || std::none_of(filter.cbegin(), filter.cend(), [entt](const sparse_set<Entity> *cpool) { return cpool->contains(entt); })))
                 {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
                         func(get<Comp, Type>(curr, std::get<pool_type<Type> *>(pools), entt)...);
@@ -282,7 +282,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         } else {
             for(const auto entt: static_cast<const sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
                 if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->contains(entt)) && ...)
-                        && std::none_of(filter.cbegin(), filter.cend(), [entt](const sparse_set<Entity> *cpool) { return cpool->contains(entt); }))
+                        && (sizeof...(Exclude) == 0 || std::none_of(filter.cbegin(), filter.cend(), [entt](const sparse_set<Entity> *cpool) { return cpool->contains(entt); })))
                 {
                     if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
                         func(std::get<pool_type<Type> *>(pools)->get(entt)...);
@@ -301,7 +301,9 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         auto first = view.data();
 
         while(first != last) {
-            if((std::get<pool_type<Component> *>(pools)->contains(*first) && ...) && std::none_of(filter.cbegin(), filter.cend(), [entt = *first](const sparse_set<Entity> *cpool) { return cpool->contains(entt); })) {
+            if((std::get<pool_type<Component> *>(pools)->contains(*first) && ...)
+                    && (sizeof...(Exclude) == 0 || std::none_of(filter.cbegin(), filter.cend(), [entt = *first](const sparse_set<Entity> *cpool) { return cpool->contains(entt); })))
+            {
                 const auto base = *(first++);
                 const auto chunk = (std::min)({ (std::get<pool_type<Component> *>(pools)->size() - std::get<pool_type<Component> *>(pools)->index(base))... });
                 size_type length{};
@@ -309,7 +311,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
                 for(++length;
                     length < chunk
                         && ((*(std::get<pool_type<Component> *>(pools)->data() + std::get<pool_type<Component> *>(pools)->index(base) + length) == *first) && ...)
-                        && std::none_of(filter.cbegin(), filter.cend(), [&first](const sparse_set<Entity> *cpool) { return cpool->contains(*first); });
+                        && (sizeof...(Exclude) == 0 || std::none_of(filter.cbegin(), filter.cend(), [entt = *first](const sparse_set<Entity> *cpool) { return cpool->contains(entt); }));
                     ++length, ++first);
 
                 func(view.data() + view.index(base), (std::get<pool_type<Type> *>(pools)->raw() + std::get<pool_type<Type> *>(pools)->index(base))..., length);
@@ -483,7 +485,7 @@ public:
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
         return (std::get<pool_type<Component> *>(pools)->contains(entt) && ...)
-                && std::none_of(filter.begin(), filter.end(), [entt](const auto *cpool) { return cpool->contains(entt); });
+                && (sizeof...(Exclude) == 0 || std::none_of(filter.begin(), filter.end(), [entt](const auto *cpool) { return cpool->contains(entt); }));
     }
 
     /**
