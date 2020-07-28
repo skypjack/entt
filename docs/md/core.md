@@ -393,7 +393,7 @@ If used in combination with hashed strings, it helps to use human-readable names
 where types would be required otherwise. As an example:
 
 ```cpp
-registry.assign<entt::tag<"enemy"_hs>>(entity);
+registry.emplace<entt::tag<"enemy"_hs>>(entity);
 ```
 
 However, this isn't the only permitted use. Literally any value convertible to
