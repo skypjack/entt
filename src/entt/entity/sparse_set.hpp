@@ -180,6 +180,8 @@ public:
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
     using iterator = sparse_set_iterator;
+    /*! @brief Reverse iterator type. */
+    using reverse_iterator = const entity_type *;
 
     /*! @brief Default constructor. */
     sparse_set() = default;
@@ -284,10 +286,6 @@ public:
      * array. If the sparse set is empty, the returned iterator will be equal to
      * `end()`.
      *
-     * @note
-     * Random access iterators stay true to the order imposed by a call to
-     * `respect`.
-     *
      * @return An iterator to the first entity of the internal packed array.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
@@ -302,15 +300,39 @@ public:
      * the internal packed array. Attempting to dereference the returned
      * iterator results in undefined behavior.
      *
-     * @note
-     * Random access iterators stay true to the order imposed by a call to
-     * `respect`.
-     *
      * @return An iterator to the element following the last entity of the
      * internal packed array.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return iterator{packed, {}};
+    }
+
+    /**
+     * @brief Returns a reverse iterator to the beginning.
+     *
+     * The returned iterator points to the first entity of the reversed internal
+     * packed array. If the sparse set is empty, the returned iterator will be
+     * equal to `rend()`.
+     *
+     * @return An iterator to the first entity of the reversed internal packed
+     * array.
+     */
+    [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
+        return packed.data();
+    }
+
+    /**
+     * @brief Returns a reverse iterator to the end.
+     *
+     * The returned iterator points to the element following the last entity in
+     * the reversed internal packed array. Attempting to dereference the
+     * returned iterator results in undefined behavior.
+     *
+     * @return An iterator to the element following the last entity of the
+     * reversed internal packed array.
+     */
+    [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
+        return rbegin() + packed.size();
     }
 
     /**

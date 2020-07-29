@@ -183,6 +183,50 @@ TEST(SparseSet, Iterator) {
     ASSERT_EQ(*begin.operator->(), entt::entity{3});
 }
 
+TEST(SparseSet, ReverseIterator) {
+    using reverse_iterator = typename entt::sparse_set<entt::entity>::reverse_iterator;
+
+    entt::sparse_set<entt::entity> set;
+    set.emplace(entt::entity{3});
+
+    reverse_iterator end{set.rbegin()};
+    reverse_iterator begin{};
+    begin = set.rend();
+    std::swap(begin, end);
+
+    ASSERT_EQ(begin, set.rbegin());
+    ASSERT_EQ(end, set.rend());
+    ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin++, set.rbegin());
+    ASSERT_EQ(begin--, set.rend());
+
+    ASSERT_EQ(begin+1, set.rend());
+    ASSERT_EQ(end-1, set.rbegin());
+
+    ASSERT_EQ(++begin, set.rend());
+    ASSERT_EQ(--begin, set.rbegin());
+
+    ASSERT_EQ(begin += 1, set.rend());
+    ASSERT_EQ(begin -= 1, set.rbegin());
+
+    ASSERT_EQ(begin + (end - begin), set.rend());
+    ASSERT_EQ(begin - (begin - end), set.rend());
+
+    ASSERT_EQ(end - (end - begin), set.rbegin());
+    ASSERT_EQ(end + (begin - end), set.rbegin());
+
+    ASSERT_EQ(begin[0], *set.rbegin());
+
+    ASSERT_LT(begin, end);
+    ASSERT_LE(begin, set.rbegin());
+
+    ASSERT_GT(end, begin);
+    ASSERT_GE(end, set.rend());
+
+    ASSERT_EQ(*begin, entt::entity{3});
+}
+
 TEST(SparseSet, Find) {
     entt::sparse_set<entt::entity> set;
     set.emplace(entt::entity{3});
