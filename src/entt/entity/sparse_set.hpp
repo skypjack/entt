@@ -370,7 +370,7 @@ public:
      */
     [[nodiscard]] size_type index(const entity_type entt) const {
         ENTT_ASSERT(contains(entt));
-        return size_type(sparse[page(entt)][offset(entt)]);
+        return size_type{to_integral(sparse[page(entt)][offset(entt)])};
     }
 
     /**
@@ -430,7 +430,7 @@ public:
         ENTT_ASSERT(contains(entt));
         const auto curr = page(entt);
         const auto pos = offset(entt);
-        packed[size_type(sparse[curr][pos])] = packed.back();
+        packed[size_type{to_integral(sparse[curr][pos])}] = packed.back();
         sparse[page(packed.back())][offset(packed.back())] = sparse[curr][pos];
         sparse[curr][pos] = null;
         packed.pop_back();
@@ -454,7 +454,7 @@ public:
     virtual void swap(const entity_type lhs, const entity_type rhs) {
         auto &from = sparse[page(lhs)][offset(lhs)];
         auto &to = sparse[page(rhs)][offset(rhs)];
-        std::swap(packed[size_type(from)], packed[size_type(to)]);
+        std::swap(packed[size_type{to_integral(from)}], packed[size_type{to_integral(to)}]);
         std::swap(from, to);
     }
 
