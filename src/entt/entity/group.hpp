@@ -130,7 +130,9 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
         {}
 
     public:
-        [[nodiscard]] auto begin() const ENTT_NOEXCEPT {
+        using iterator = range_iterator;
+
+        [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             return range_iterator{handler->begin(), std::tuple_cat([](auto *cpool) {
                 if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
                     return std::make_tuple();
@@ -140,7 +142,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
             }(std::get<pool_type<Get> *>(pools))...)};
         }
 
-        [[nodiscard]] auto end() const ENTT_NOEXCEPT {
+        [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             return range_iterator{handler->end(), std::tuple_cat([](auto *cpool) {
                 if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
                     return std::make_tuple();
@@ -642,7 +644,9 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
         {}
 
     public:
-        [[nodiscard]] auto begin() const ENTT_NOEXCEPT {
+        using iterator = range_iterator;
+
+        [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             return range_iterator{
                 std::get<0>(pools)->sparse_set<Entity>::end() - *length,
                 std::tuple_cat([length = *length](auto *cpool) {
@@ -662,7 +666,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
             };
         }
 
-        [[nodiscard]] auto end() const ENTT_NOEXCEPT {
+        [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             return range_iterator{
                 std::get<0>(pools)->sparse_set<Entity>::end(),
                 std::tuple_cat([](auto *cpool) {

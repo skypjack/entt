@@ -208,7 +208,9 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         {}
 
     public:
-        [[nodiscard]] auto begin() const ENTT_NOEXCEPT {
+        using iterator = range_iterator;
+
+        [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             return range_iterator{first, std::tuple_cat([](auto *cpool) {
                 if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
                     return std::make_tuple();
@@ -218,7 +220,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             }(std::get<pool_type<Component> *>(pools))...)};
         }
 
-        [[nodiscard]] auto end() const ENTT_NOEXCEPT {
+        [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             return range_iterator{last, std::tuple_cat([](auto *cpool) {
                 if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
                     return std::make_tuple();
@@ -741,7 +743,9 @@ class basic_view<Entity, exclude_t<>, Component> {
         {}
 
     public:
-        [[nodiscard]] auto begin() const ENTT_NOEXCEPT {
+        using iterator = range_iterator;
+
+        [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             if constexpr(ENTT_IS_EMPTY(Component)) {
                 return range_iterator{std::make_tuple(pool->sparse_set<entity_type>::begin())};
             } else {
@@ -749,7 +753,7 @@ class basic_view<Entity, exclude_t<>, Component> {
             }
         }
 
-        [[nodiscard]] auto end() const ENTT_NOEXCEPT {
+        [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             if constexpr(ENTT_IS_EMPTY(Component)) {
                 return range_iterator{std::make_tuple(pool->sparse_set<entity_type>::end())};
             } else {
