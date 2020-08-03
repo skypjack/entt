@@ -140,7 +140,7 @@ TEST(NonOwningGroup, Empty) {
     ASSERT_TRUE(registry.group(entt::get<double, char, int, float>).empty());
 }
 
-TEST(NonOwningGroup, Each) {
+TEST(NonOwningGroup, Proxy) {
     entt::registry registry;
     auto group = registry.group(entt::get<int, char>);
 
@@ -158,7 +158,7 @@ TEST(NonOwningGroup, Each) {
     group.each([&cnt](auto, int &, char &) { ++cnt; });
     group.each([&cnt](int &, char &) { ++cnt; });
 
-    for(auto &&[entt, iv, cv]: group.each()) {
+    for(auto &&[entt, iv, cv]: group.proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -170,7 +170,7 @@ TEST(NonOwningGroup, Each) {
     cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
     cgroup.each([&cnt](const int &, const char &) { --cnt; });
 
-    for(auto &&[entt, iv, cv]: cgroup.each()) {
+    for(auto &&[entt, iv, cv]: cgroup.proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), const int &>);
         static_assert(std::is_same_v<decltype(cv), const char &>);
@@ -315,7 +315,7 @@ TEST(NonOwningGroup, IndexRebuiltOnDestroy) {
         ASSERT_EQ(uivalue, 1u);
     });
 
-    for(auto curr: group.each()) {
+    for(auto curr: group.proxy()) {
         ASSERT_EQ(std::get<0>(curr), e1);
         ASSERT_EQ(std::get<1>(curr), 1);
         ASSERT_EQ(std::get<2>(curr), 1u);
@@ -345,7 +345,7 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
         static_assert(std::is_same_v<decltype(c), const char &>);
     });
 
-    for(auto &&[entt, iv, cv]: group.each()) {
+    for(auto &&[entt, iv, cv]: group.proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), const char &>);
@@ -467,7 +467,7 @@ TEST(NonOwningGroup, EmptyAndNonEmptyTypes) {
         ASSERT_TRUE(entity == e0 || entity == e1);
     });
 
-    for(auto &&[entt, iv]: group.each()) {
+    for(auto &&[entt, iv]: group.proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         ASSERT_TRUE(entt == e0 || entt == e1);
@@ -506,7 +506,7 @@ TEST(NonOwningGroup, EmptyTypes) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto &&[entt, iv, cv]: registry.group(entt::get<int, char, empty_type>).each()) {
+    for(auto &&[entt, iv, cv]: registry.group(entt::get<int, char, empty_type>).proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -518,7 +518,7 @@ TEST(NonOwningGroup, EmptyTypes) {
         check = false;
     });
 
-    for(auto &&[entt, iv, cv]: registry.group(entt::get<int, empty_type, char>).each()) {
+    for(auto &&[entt, iv, cv]: registry.group(entt::get<int, empty_type, char>).proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -529,7 +529,7 @@ TEST(NonOwningGroup, EmptyTypes) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto &&[entt, iv, cv]: registry.group(entt::get<empty_type, int, char>).each()) {
+    for(auto &&[entt, iv, cv]: registry.group(entt::get<empty_type, int, char>).proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -537,7 +537,7 @@ TEST(NonOwningGroup, EmptyTypes) {
     }
 
     registry.group(entt::get<int, char, double>).each([](const auto, int, char, double) { FAIL(); });
-    for([[maybe_unused]] auto curr: registry.group(entt::get<int, char, double>).each()) { FAIL(); }
+    for([[maybe_unused]] auto curr: registry.group(entt::get<int, char, double>).proxy()) { FAIL(); }
 }
 
 TEST(NonOwningGroup, FrontBack) {
@@ -697,7 +697,7 @@ TEST(OwningGroup, Empty) {
     ASSERT_TRUE((registry.group<double, float>(entt::get<char, int>).empty()));
 }
 
-TEST(OwningGroup, Each) {
+TEST(OwningGroup, Proxy) {
     entt::registry registry;
     auto group = registry.group<int>(entt::get<char>);
 
@@ -715,7 +715,7 @@ TEST(OwningGroup, Each) {
     group.each([&cnt](auto, int &, char &) { ++cnt; });
     group.each([&cnt](int &, char &) { ++cnt; });
 
-    for(auto &&[entt, iv, cv]: group.each()) {
+    for(auto &&[entt, iv, cv]: group.proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -727,7 +727,7 @@ TEST(OwningGroup, Each) {
     cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
     cgroup.each([&cnt](const int &, const char &) { --cnt; });
 
-    for(auto &&[entt, iv, cv]: cgroup.each()) {
+    for(auto &&[entt, iv, cv]: cgroup.proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), const int &>);
         static_assert(std::is_same_v<decltype(cv), const char &>);
@@ -956,7 +956,7 @@ TEST(OwningGroup, IndexRebuiltOnDestroy) {
         ASSERT_EQ(uivalue, 1u);
     });
 
-    for(auto curr: group.each()) {
+    for(auto curr: group.proxy()) {
         ASSERT_EQ(std::get<0>(curr), e1);
         ASSERT_EQ(std::get<1>(curr), 1);
         ASSERT_EQ(std::get<2>(curr), 1u);
@@ -994,7 +994,7 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
         static_assert(std::is_same_v<decltype(f), const float &>);
     });
 
-    for(auto &&[entt, iv, cv, dv, fv]: group.each()) {
+    for(auto &&[entt, iv, cv, dv, fv]: group.proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), const char &>);
@@ -1118,7 +1118,7 @@ TEST(OwningGroup, EmptyAndNonEmptyTypes) {
         ASSERT_TRUE(entity == e0 || entity == e1);
     });
 
-    for(auto &&[entt, iv]: group.each()) {
+    for(auto &&[entt, iv]: group.proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         ASSERT_TRUE(entt == e0 || entt == e1);
@@ -1157,7 +1157,7 @@ TEST(OwningGroup, EmptyTypes) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto &&[entt, iv, cv]: registry.group<int>(entt::get<char, empty_type>).each()) {
+    for(auto &&[entt, iv, cv]: registry.group<int>(entt::get<char, empty_type>).proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -1169,7 +1169,7 @@ TEST(OwningGroup, EmptyTypes) {
         check = false;
     });
 
-    for(auto &&[entt, cv, iv]: registry.group<char>(entt::get<empty_type, int>).each()) {
+    for(auto &&[entt, cv, iv]: registry.group<char>(entt::get<empty_type, int>).proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(cv), char &>);
         static_assert(std::is_same_v<decltype(iv), int &>);
@@ -1180,7 +1180,7 @@ TEST(OwningGroup, EmptyTypes) {
         ASSERT_EQ(entity, entt);
     });
 
-    for(auto &&[entt, iv, cv]: registry.group<empty_type>(entt::get<int, char>).each()) {
+    for(auto &&[entt, iv, cv]: registry.group<empty_type>(entt::get<int, char>).proxy()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
@@ -1188,7 +1188,7 @@ TEST(OwningGroup, EmptyTypes) {
     }
 
     registry.group<double>(entt::get<int, char>).each([](const auto, double, int, char) { FAIL(); });
-    for([[maybe_unused]] auto curr: registry.group<double>(entt::get<int, char>).each()) { FAIL(); }
+    for([[maybe_unused]] auto curr: registry.group<double>(entt::get<int, char>).proxy()) { FAIL(); }
 }
 
 TEST(OwningGroup, FrontBack) {

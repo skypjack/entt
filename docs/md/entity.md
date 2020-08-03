@@ -1207,7 +1207,8 @@ for(auto entity: view) {
 }
 ```
 
-Or rely on the `each` member functions to iterate both entities and components:
+Or rely on the `each` and `proxy` member functions to iterate both entities and
+components at once:
 
 ```cpp
 // through a callback
@@ -1216,7 +1217,7 @@ registry.view<position, velocity>().each([](auto entity, auto &pos, auto &vel) {
 });
 
 // using an input iterator
-for(auto &&[entity, pos, vel]: registry.view<position, velocity>().each()) {
+for(auto &&[entity, pos, vel]: registry.view<position, velocity>().proxy()) {
     // ...
 }
 ```
@@ -1369,7 +1370,8 @@ for(auto entity: group) {
 }
 ```
 
-Or rely on the `each` member functions to iterate both entities and components:
+Or rely on the `each` and `proxy` member functions to iterate both entities and
+components at once:
 
 ```cpp
 // through a callback
@@ -1378,7 +1380,7 @@ registry.group<position>(entt::get<velocity>).each([](auto entity, auto &pos, au
 });
 
 // using an input iterator
-for(auto &&[entity, pos, vel]: registry.group<position>(entt::get<velocity>).each()) {
+for(auto &&[entity, pos, vel]: registry.group<position>(entt::get<velocity>).proxy()) {
     // ...
 }
 ```

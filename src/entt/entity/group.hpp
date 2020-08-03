@@ -71,16 +71,16 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
     template<typename Component>
     using pool_type = pool_t<Entity, Component>;
 
-    class group_range {
+    class group_proxy {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>>;
 
-        class range_iterator {
-            friend class group_range;
+        class proxy_iterator {
+            friend class group_proxy;
 
             using it_type = typename sparse_set<Entity>::iterator;
             using ref_type = decltype(std::tuple_cat(std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<pool_type<Get> *>>>()...));
 
-            range_iterator(it_type from, ref_type ref) ENTT_NOEXCEPT
+            proxy_iterator(it_type from, ref_type ref) ENTT_NOEXCEPT
                 : it{from},
                   pools{ref}
             {}
@@ -98,12 +98,12 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
             ));
             using iterator_category = std::input_iterator_tag;
 
-            range_iterator & operator++() ENTT_NOEXCEPT {
+            proxy_iterator & operator++() ENTT_NOEXCEPT {
                 return ++it, *this;
             }
 
-            range_iterator operator++(int) ENTT_NOEXCEPT {
-                range_iterator orig = *this;
+            proxy_iterator operator++(int) ENTT_NOEXCEPT {
+                proxy_iterator orig = *this;
                 return ++(*this), orig;
             }
 
@@ -111,11 +111,11 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
                 return std::apply([entt = *it](auto *... cpool) { return reference{entt, cpool->get(entt)...}; }, pools);
             }
 
-            [[nodiscard]] bool operator==(const range_iterator &other) const ENTT_NOEXCEPT {
+            [[nodiscard]] bool operator==(const proxy_iterator &other) const ENTT_NOEXCEPT {
                 return other.it == it;
             }
 
-            [[nodiscard]] bool operator!=(const range_iterator &other) const ENTT_NOEXCEPT {
+            [[nodiscard]] bool operator!=(const proxy_iterator &other) const ENTT_NOEXCEPT {
                 return !(*this == other);
             }
 
@@ -124,16 +124,16 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
             ref_type pools{};
         };
 
-        group_range(const sparse_set<Entity> &ref, std::tuple<pool_type<Get> *...> gpools)
+        group_proxy(const sparse_set<Entity> &ref, std::tuple<pool_type<Get> *...> gpools)
             : handler{&ref},
               pools{gpools}
         {}
 
     public:
-        using iterator = range_iterator;
+        using iterator = proxy_iterator;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return range_iterator{handler->begin(), std::tuple_cat([](auto *cpool) {
+            return proxy_iterator{handler->begin(), std::tuple_cat([](auto *cpool) {
                 if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
                     return std::make_tuple();
                 } else {
@@ -143,7 +143,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return range_iterator{handler->end(), std::tuple_cat([](auto *cpool) {
+            return proxy_iterator{handler->end(), std::tuple_cat([](auto *cpool) {
                 if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
                     return std::make_tuple();
                 } else {
@@ -436,8 +436,8 @@ public:
      *
      * @return An iterable object to use to _visit_ the group.
      */
-    [[nodiscard]] auto each() const ENTT_NOEXCEPT {
-        return group_range{*handler, pools};
+    [[nodiscard]] auto proxy() const ENTT_NOEXCEPT {
+        return group_proxy{*handler, pools};
     }
 
     /**
@@ -576,17 +576,17 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
     template<typename Component>
     using component_iterator = decltype(std::declval<pool_type<Component>>().begin());
 
-    class group_range {
+    class group_proxy {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...>;
 
-        class range_iterator {
-            friend class group_range;
+        class proxy_iterator {
+            friend class group_proxy;
 
             using it_type = typename sparse_set<Entity>::iterator;
             using owned_type = decltype(std::tuple_cat(std::declval<std::conditional_t<ENTT_IS_EMPTY(Owned), std::tuple<>, std::tuple<component_iterator<Owned>>>>()...));
             using get_type = decltype(std::tuple_cat(std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<pool_type<Get> *>>>()...));
 
-            range_iterator(it_type from, owned_type oref, get_type gref) ENTT_NOEXCEPT
+            proxy_iterator(it_type from, owned_type oref, get_type gref) ENTT_NOEXCEPT
                 : it{from},
                   owned{oref},
                   get{gref}
@@ -607,12 +607,12 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
             ));
             using iterator_category = std::input_iterator_tag;
 
-            range_iterator & operator++() ENTT_NOEXCEPT {
+            proxy_iterator & operator++() ENTT_NOEXCEPT {
                 return ++it, std::apply([](auto &&... curr) { (++curr, ...); }, owned), *this;
             }
 
-            range_iterator operator++(int) ENTT_NOEXCEPT {
-                range_iterator orig = *this;
+            proxy_iterator operator++(int) ENTT_NOEXCEPT {
+                proxy_iterator orig = *this;
                 return ++(*this), orig;
             }
 
@@ -624,11 +624,11 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
                 );
             }
 
-            [[nodiscard]] bool operator==(const range_iterator &other) const ENTT_NOEXCEPT {
+            [[nodiscard]] bool operator==(const proxy_iterator &other) const ENTT_NOEXCEPT {
                 return other.it == it;
             }
 
-            [[nodiscard]] bool operator!=(const range_iterator &other) const ENTT_NOEXCEPT {
+            [[nodiscard]] bool operator!=(const proxy_iterator &other) const ENTT_NOEXCEPT {
                 return !(*this == other);
             }
 
@@ -638,16 +638,16 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
             get_type get{};
         };
 
-        group_range(std::tuple<pool_type<Owned> *..., pool_type<Get> *...> cpools, const std::size_t &extent)
+        group_proxy(std::tuple<pool_type<Owned> *..., pool_type<Get> *...> cpools, const std::size_t &extent)
             : pools{cpools},
               length{&extent}
         {}
 
     public:
-        using iterator = range_iterator;
+        using iterator = proxy_iterator;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return range_iterator{
+            return proxy_iterator{
                 std::get<0>(pools)->sparse_set<Entity>::end() - *length,
                 std::tuple_cat([length = *length](auto *cpool) {
                     if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
@@ -667,7 +667,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return range_iterator{
+            return proxy_iterator{
                 std::get<0>(pools)->sparse_set<Entity>::end(),
                 std::tuple_cat([](auto *cpool) {
                     if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
@@ -972,8 +972,8 @@ public:
      *
      * @return An iterable object to use to _visit_ the group.
      */
-    [[nodiscard]] auto each() const ENTT_NOEXCEPT {
-        return group_range{pools, *length};
+    [[nodiscard]] auto proxy() const ENTT_NOEXCEPT {
+        return group_proxy{pools, *length};
     }
 
     /**
