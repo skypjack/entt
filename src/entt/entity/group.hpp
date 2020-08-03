@@ -282,46 +282,43 @@ public:
     }
 
     /**
-     * @brief Returns an iterator to the first entity that has the given
-     * components.
+     * @brief Returns an iterator to the first entity of the group.
      *
-     * The returned iterator points to the first entity that has the given
-     * components. If the group is empty, the returned iterator will be equal to
-     * `end()`.
+     * The returned iterator points to the first entity of the group. If the
+     * group is empty, the returned iterator will be equal to `end()`.
      *
      * @note
      * Iterators stay true to the order imposed to the underlying data
      * structures.
      *
-     * @return An iterator to the first entity that has the given components.
+     * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
         return handler->begin();
     }
 
     /**
-     * @brief Returns an iterator that is past the last entity that has the
-     * given components.
+     * @brief Returns an iterator that is past the last entity of the group.
      *
-     * The returned iterator points to the entity following the last entity that
-     * has the given components. Attempting to dereference the returned iterator
-     * results in undefined behavior.
+     * The returned iterator points to the entity following the last entity of
+     * the group. Attempting to dereference the returned iterator results in
+     * undefined behavior.
      *
      * @note
      * Iterators stay true to the order imposed to the underlying data
      * structures.
      *
-     * @return An iterator to the entity following the last entity that has the
-     * given components.
+     * @return An iterator to the entity following the last entity of the
+     * group.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return handler->end();
     }
 
     /**
-     * @brief Returns the first entity that has the given components, if any.
-     * @return The first entity that has the given components if one exists, the
-     * null entity otherwise.
+     * @brief Returns the first entity of the group, if any.
+     * @return The first entity of the group if one exists, the null entity
+     * otherwise.
      */
     [[nodiscard]] entity_type front() const {
         const auto it = begin();
@@ -329,9 +326,9 @@ public:
     }
 
     /**
-     * @brief Returns the last entity that has the given components, if any.
-     * @return The last entity that has the given components if one exists, the
-     * null entity otherwise.
+     * @brief Returns the last entity of the group, if any.
+     * @return The last entity of the group if one exists, the null entity
+     * otherwise.
      */
     [[nodiscard]] entity_type back() const {
         const auto it = std::make_reverse_iterator(end());
@@ -817,46 +814,43 @@ public:
     }
 
     /**
-     * @brief Returns an iterator to the first entity that has the given
-     * components.
+     * @brief Returns an iterator to the first entity of the group.
      *
-     * The returned iterator points to the first entity that has the given
-     * components. If the group is empty, the returned iterator will be equal to
-     * `end()`.
+     * The returned iterator points to the first entity of the group. If the
+     * group is empty, the returned iterator will be equal to `end()`.
      *
      * @note
      * Iterators stay true to the order imposed to the underlying data
      * structures.
      *
-     * @return An iterator to the first entity that has the given components.
+     * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
         return std::get<0>(pools)->sparse_set<entity_type>::end() - *length;
     }
 
     /**
-     * @brief Returns an iterator that is past the last entity that has the
-     * given components.
+     * @brief Returns an iterator that is past the last entity of the group.
      *
-     * The returned iterator points to the entity following the last entity that
-     * has the given components. Attempting to dereference the returned iterator
-     * results in undefined behavior.
+     * The returned iterator points to the entity following the last entity of
+     * the group. Attempting to dereference the returned iterator results in
+     * undefined behavior.
      *
      * @note
      * Iterators stay true to the order imposed to the underlying data
      * structures.
      *
-     * @return An iterator to the entity following the last entity that has the
-     * given components.
+     * @return An iterator to the entity following the last entity of the
+     * group.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return std::get<0>(pools)->sparse_set<entity_type>::end();
     }
 
     /**
-     * @brief Returns the first entity that has the given components, if any.
-     * @return The first entity that has the given components if one exists, the
-     * null entity otherwise.
+     * @brief Returns the first entity of the group, if any.
+     * @return The first entity of the group if one exists, the null entity
+     * otherwise.
      */
     [[nodiscard]] entity_type front() const {
         const auto it = begin();
@@ -864,9 +858,9 @@ public:
     }
 
     /**
-     * @brief Returns the last entity that has the given components, if any.
-     * @return The last entity that has the given components if one exists, the
-     * null entity otherwise.
+     * @brief Returns the last entity of the group, if any.
+     * @return The last entity of the group if one exists, the null entity
+     * otherwise.
      */
     [[nodiscard]] entity_type back() const {
         const auto it = std::make_reverse_iterator(end());

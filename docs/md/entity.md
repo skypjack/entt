@@ -1222,11 +1222,9 @@ for(auto &&[entity, pos, vel]: registry.view<position, velocity>().proxy()) {
 }
 ```
 
-The `each` member functions are highly optimized. Unless users want to iterate
-only entities or get only some of the components, this should be the preferred
-approach. Note that entities can also be excluded from the parameter list when
-received through a callback and this can improve even further the performance
-during iterations.<br/>
+Note that entities can also be excluded from the parameter list when received
+through a callback and this can improve even further the performance during
+iterations.<br/>
 Since they aren't explicitly instantiated, empty components aren't returned in
 any case.
 
@@ -1385,11 +1383,9 @@ for(auto &&[entity, pos, vel]: registry.group<position>(entt::get<velocity>).pro
 }
 ```
 
-The `each` member functions are highly optimized. Unless users want to iterate
-only entities or get only some of the components, this should be the preferred
-approach. Note that entities can also be excluded from the parameter list when
-received through a callback and this can improve even further the performance
-during iterations.<br/>
+Note that entities can also be excluded from the parameter list when received
+through a callback and this can improve even further the performance during
+iterations.<br/>
 Since they aren't explicitly instantiated, empty components aren't returned in
 any case.
 

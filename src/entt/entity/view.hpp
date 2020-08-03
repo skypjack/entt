@@ -410,18 +410,16 @@ public:
     }
 
     /**
-     * @brief Returns an iterator to the first entity that has the given
-     * components.
+     * @brief Returns an iterator to the first entity of the view.
      *
-     * The returned iterator points to the first entity that has the given
-     * components. If the view is empty, the returned iterator will be equal to
-     * `end()`.
+     * The returned iterator points to the first entity of the view. If the
+     * view is empty, the returned iterator will be equal to `end()`.
      *
      * @note
      * Iterators stay true to the order imposed to the underlying data
      * structures.
      *
-     * @return An iterator to the first entity that has the given components.
+     * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const {
         const auto &view = candidate();
@@ -429,19 +427,17 @@ public:
     }
 
     /**
-     * @brief Returns an iterator that is past the last entity that has the
-     * given components.
+     * @brief Returns an iterator that is past the last entity of the view.
      *
-     * The returned iterator points to the entity following the last entity that
-     * has the given components. Attempting to dereference the returned iterator
-     * results in undefined behavior.
+     * The returned iterator points to the entity following the last entity of
+     * the view. Attempting to dereference the returned iterator results in
+     * undefined behavior.
      *
      * @note
      * Iterators stay true to the order imposed to the underlying data
      * structures.
      *
-     * @return An iterator to the entity following the last entity that has the
-     * given components.
+     * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const {
         const auto &view = candidate();
@@ -449,9 +445,9 @@ public:
     }
 
     /**
-     * @brief Returns the first entity that has the given components, if any.
-     * @return The first entity that has the given components if one exists, the
-     * null entity otherwise.
+     * @brief Returns the first entity of the view, if any.
+     * @return The first entity of the view if one exists, the null entity
+     * otherwise.
      */
     [[nodiscard]] entity_type front() const {
         const auto it = begin();
@@ -459,9 +455,9 @@ public:
     }
 
     /**
-     * @brief Returns the last entity that has the given components, if any.
-     * @return The last entity that has the given components if one exists, the
-     * null entity otherwise.
+     * @brief Returns the last entity of the view, if any.
+     * @return The last entity of the view if one exists, the null entity
+     * otherwise.
      */
     [[nodiscard]] entity_type back() const {
         const auto it = std::make_reverse_iterator(end());
@@ -828,46 +824,42 @@ public:
     }
 
     /**
-     * @brief Returns an iterator to the first entity that has the given
-     * component.
+     * @brief Returns an iterator to the first entity of the view.
      *
-     * The returned iterator points to the first entity that has the given
-     * component. If the view is empty, the returned iterator will be equal to
-     * `end()`.
+     * The returned iterator points to the first entity of the view. If the
+     * view is empty, the returned iterator will be equal to `end()`.
      *
      * @note
      * Iterators stay true to the order imposed to the underlying data
      * structures.
      *
-     * @return An iterator to the first entity that has the given component.
+     * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
         return pool->sparse_set<Entity>::begin();
     }
 
     /**
-     * @brief Returns an iterator that is past the last entity that has the
-     * given component.
+     * @brief Returns an iterator that is past the last entity of the view.
      *
-     * The returned iterator points to the entity following the last entity that
-     * has the given component. Attempting to dereference the returned iterator
-     * results in undefined behavior.
+     * The returned iterator points to the entity following the last entity of
+     * the view. Attempting to dereference the returned iterator results in
+     * undefined behavior.
      *
      * @note
      * Iterators stay true to the order imposed to the underlying data
      * structures.
      *
-     * @return An iterator to the entity following the last entity that has the
-     * given component.
+     * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return pool->sparse_set<Entity>::end();
     }
 
     /**
-     * @brief Returns the first entity that has the given component, if any.
-     * @return The first entity that has the given component if one exists, the
-     * null entity otherwise.
+     * @brief Returns the first entity of the view, if any.
+     * @return The first entity of the view if one exists, the null entity
+     * otherwise.
      */
     [[nodiscard]] entity_type front() const {
         const auto it = begin();
@@ -875,9 +867,9 @@ public:
     }
 
     /**
-     * @brief Returns the last entity that has the given component, if any.
-     * @return The last entity that has the given component if one exists, the
-     * null entity otherwise.
+     * @brief Returns the last entity of the view, if any.
+     * @return The last entity of the view if one exists, the null entity
+     * otherwise.
      */
     [[nodiscard]] entity_type back() const {
         const auto it = std::make_reverse_iterator(end());
