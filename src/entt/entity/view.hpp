@@ -412,8 +412,8 @@ public:
     /**
      * @brief Returns an iterator to the first entity of the view.
      *
-     * The returned iterator points to the first entity of the view. If the
-     * view is empty, the returned iterator will be equal to `end()`.
+     * The returned iterator points to the first entity of the view. If the view
+     * is empty, the returned iterator will be equal to `end()`.
      *
      * @note
      * Iterators stay true to the order imposed to the underlying data
@@ -826,8 +826,8 @@ public:
     /**
      * @brief Returns an iterator to the first entity of the view.
      *
-     * The returned iterator points to the first entity of the view. If the
-     * view is empty, the returned iterator will be equal to `end()`.
+     * The returned iterator points to the first entity of the view. If the view
+     * is empty, the returned iterator will be equal to `end()`.
      *
      * @note
      * Iterators stay true to the order imposed to the underlying data
