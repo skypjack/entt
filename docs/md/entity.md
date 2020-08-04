@@ -532,8 +532,11 @@ one.
 
 ## Sorting: is it possible?
 
-Sorting entities and components is possible with `EnTT`.<br/>
-There are two functions that respond to slightly different needs:
+Sorting entities and components is possible with `EnTT`. In particular, it's
+feasible with an in-place algorithm that doesn't require memory allocations nor
+anything else and is therefore particularly convenient.<br/>
+With this in mind, there are two functions that respond to slightly different
+needs:
 
 * Components can be sorted either directly:
 
