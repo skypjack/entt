@@ -81,13 +81,14 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     class view_iterator final {
         friend class basic_view<Entity, exclude_t<Exclude...>, Component...>;
 
-        view_iterator(const sparse_set<Entity> &candidate, unchecked_type other, filter_type ignore, underlying_iterator curr) ENTT_NOEXCEPT
-            : view{&candidate},
+        view_iterator(underlying_iterator from, underlying_iterator to, underlying_iterator curr, unchecked_type other, filter_type ignore) ENTT_NOEXCEPT
+            : first{from},
+              last{to},
+              it{curr},
               unchecked{other},
-              filter{ignore},
-              it{curr}
+              filter{ignore}
         {
-            if(it != view->end() && !valid()) {
+            if(it != last && !valid()) {
                 ++(*this);
             }
         }
@@ -107,7 +108,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         view_iterator() ENTT_NOEXCEPT = default;
 
         view_iterator & operator++() {
-            while(++it != view->end() && !valid());
+            while(++it != last && !valid());
             return *this;
         }
 
@@ -117,7 +118,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         }
 
         view_iterator & operator--() ENTT_NOEXCEPT {
-            while(--it != view->begin() && !valid());
+            while(--it != first && !valid());
             return *this;
         }
 
@@ -143,10 +144,11 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         }
 
     private:
-        const sparse_set<Entity> *view;
+        underlying_iterator first;
+        underlying_iterator last;
+        underlying_iterator it;
         unchecked_type unchecked;
         filter_type filter;
-        underlying_iterator it;
     };
 
     class view_proxy {
@@ -423,7 +425,7 @@ public:
      */
     [[nodiscard]] iterator begin() const {
         const auto &view = candidate();
-        return iterator{view, unchecked(view), filter, view.begin()};
+        return iterator{view.begin(), view.end(), view.begin(), unchecked(view), filter};
     }
 
     /**
@@ -441,7 +443,7 @@ public:
      */
     [[nodiscard]] iterator end() const {
         const auto &view = candidate();
-        return iterator{view, unchecked(view), filter, view.end()};
+        return iterator{view.begin(), view.end(), view.end(), unchecked(view), filter};
     }
 
     /**
@@ -472,7 +474,7 @@ public:
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
         const auto &view = candidate();
-        iterator it{view, unchecked(view), filter, view.find(entt)};
+        iterator it{view.begin(), view.end(), view.find(entt), unchecked(view), filter};
         return (it != end() && *it == entt) ? it : end();
     }
 
@@ -601,7 +603,7 @@ public:
     template<typename Comp>
     [[nodiscard]] auto proxy() const ENTT_NOEXCEPT {
         const sparse_set<entity_type> &view = *std::get<pool_type<Comp> *>(pools);
-        return view_proxy{iterator{view, unchecked(view), filter, view.begin()}, iterator{view, unchecked(view), filter, view.end()}, pools};
+        return view_proxy{iterator{view.begin(), view.end(), view.begin(), unchecked(view), filter}, iterator{view.begin(), view.end(), view.end(), unchecked(view), filter}, pools};
     }
 
     /**
