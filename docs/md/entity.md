@@ -366,7 +366,11 @@ registry.on_construct<position>().disconnect<&my_class::member>(instance);
 
 To be notified when components are destroyed, use the `on_destroy` member
 function instead. Finally, the `on_update` member function will return a sink
-to which to connect listeners to observe changes.
+to which to connect listeners to observe changes.<br/>
+In the last case, given the way C++ works, it's also necessary to use specific
+member functions to allow the signal to be triggered. In particular, listeners
+attached to `on_update` will only be invoked following a call to `replace` or
+`patch`.
 
 The function type of a listener should be equivalent to the following:
 
@@ -494,6 +498,10 @@ There are two types of `matcher`s:
   ```cpp
   entt::collector.update<sprite>();
   ```
+
+  _Updated_ in this case means that all listeners attached to `on_update` are
+  invoked. In order for this to happen, specific functions such as `patch` must
+  be used. Refer to the specific documentation for more details.
 
 * Grouping matcher: an observer will return at least all the living entities
   that would have entered the given group if it existed and that would have
