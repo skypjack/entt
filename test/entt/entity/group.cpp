@@ -30,13 +30,16 @@ TEST(NonOwningGroup, Functionalities) {
     registry.emplace<char>(e1);
 
     ASSERT_FALSE(group.empty());
-    ASSERT_FALSE((group.empty<int>()));
-    ASSERT_FALSE((cgroup.empty<const char>()));
-    ASSERT_NO_THROW((group.begin()++));
-    ASSERT_NO_THROW((++cgroup.begin()));
+    ASSERT_FALSE(group.empty<int>());
+    ASSERT_FALSE(cgroup.empty<const char>());
+    ASSERT_NO_THROW(group.begin()++);
+    ASSERT_NO_THROW(++cgroup.begin());
+    ASSERT_EQ(group.rbegin(), cgroup.rbegin());
 
     ASSERT_NE(group.begin(), group.end());
     ASSERT_NE(cgroup.begin(), cgroup.end());
+    ASSERT_NE(group.rbegin(), group.rend());
+    ASSERT_NE(cgroup.rbegin(), cgroup.rend());
     ASSERT_EQ(group.size(), typename decltype(group)::size_type{1});
     ASSERT_EQ(group.size<int>(), typename decltype(group)::size_type{1});
     ASSERT_EQ(cgroup.size<const char>(), typename decltype(group)::size_type{2});
@@ -78,6 +81,8 @@ TEST(NonOwningGroup, Functionalities) {
 
     ASSERT_EQ(group.begin(), group.end());
     ASSERT_EQ(cgroup.begin(), cgroup.end());
+    ASSERT_EQ(group.rbegin(), group.rend());
+    ASSERT_EQ(cgroup.rbegin(), cgroup.rend());
     ASSERT_TRUE(group.empty());
 
     ASSERT_TRUE(group.capacity());
@@ -590,13 +595,16 @@ TEST(OwningGroup, Functionalities) {
     registry.emplace<char>(e1);
 
     ASSERT_FALSE(group.empty());
-    ASSERT_FALSE((group.empty<int>()));
-    ASSERT_FALSE((cgroup.empty<const char>()));
-    ASSERT_NO_THROW((group.begin()++));
-    ASSERT_NO_THROW((++cgroup.begin()));
+    ASSERT_FALSE(group.empty<int>());
+    ASSERT_FALSE(cgroup.empty<const char>());
+    ASSERT_NO_THROW(group.begin()++);
+    ASSERT_NO_THROW(++cgroup.begin());
+    ASSERT_EQ(group.rbegin(), cgroup.rbegin());
 
     ASSERT_NE(group.begin(), group.end());
     ASSERT_NE(cgroup.begin(), cgroup.end());
+    ASSERT_NE(group.rbegin(), group.rend());
+    ASSERT_NE(cgroup.rbegin(), cgroup.rend());
     ASSERT_EQ(group.size(), typename decltype(group)::size_type{1});
     ASSERT_EQ(group.size<int>(), typename decltype(group)::size_type{1});
     ASSERT_EQ(cgroup.size<const char>(), typename decltype(group)::size_type{2});
@@ -641,6 +649,8 @@ TEST(OwningGroup, Functionalities) {
 
     ASSERT_EQ(group.begin(), group.end());
     ASSERT_EQ(cgroup.begin(), cgroup.end());
+    ASSERT_EQ(group.rbegin(), group.rend());
+    ASSERT_EQ(cgroup.rbegin(), cgroup.rend());
     ASSERT_TRUE(group.empty());
 }
 

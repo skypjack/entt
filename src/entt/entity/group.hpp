@@ -180,6 +180,8 @@ public:
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
     using iterator = typename sparse_set<Entity>::iterator;
+    /*! @brief Reversed iterator type. */
+    using reverse_iterator = typename sparse_set<Entity>::reverse_iterator;
 
     /**
      * @brief Returns the number of existing components of the given type.
@@ -316,6 +318,41 @@ public:
     }
 
     /**
+     * @brief Returns an iterator to the first entity of the reversed group.
+     *
+     * The returned iterator points to the first entity of the reversed group.
+     * If the group is empty, the returned iterator will be equal to `rend()`.
+     *
+     * @note
+     * Iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the first entity of the reversed group.
+     */
+    [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
+        return handler->rbegin();
+    }
+
+    /**
+     * @brief Returns an iterator that is past the last entity of the reversed
+     * group.
+     *
+     * The returned iterator points to the entity following the last entity of
+     * the reversed group. Attempting to dereference the returned iterator
+     * results in undefined behavior.
+     *
+     * @note
+     * Iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the entity following the last entity of the
+     * reversed group.
+     */
+    [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
+        return handler->rend();
+    }
+
+    /**
      * @brief Returns the first entity of the group, if any.
      * @return The first entity of the group if one exists, the null entity
      * otherwise.
@@ -331,8 +368,8 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type back() const {
-        const auto it = std::make_reverse_iterator(end());
-        return it != std::make_reverse_iterator(begin()) ? *it : null;
+        const auto it = rbegin();
+        return it != rend() ? *it : null;
     }
 
     /**
@@ -720,6 +757,8 @@ public:
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
     using iterator = typename sparse_set<Entity>::iterator;
+    /*! @brief Reversed iterator type. */
+    using reverse_iterator = typename sparse_set<Entity>::reverse_iterator;
 
     /**
      * @brief Returns the number of existing components of the given type.
@@ -848,6 +887,41 @@ public:
     }
 
     /**
+     * @brief Returns an iterator to the first entity of the reversed group.
+     *
+     * The returned iterator points to the first entity of the reversed group.
+     * If the group is empty, the returned iterator will be equal to `rend()`.
+     *
+     * @note
+     * Iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the first entity of the reversed group.
+     */
+    [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
+        return std::get<0>(pools)->sparse_set<entity_type>::rbegin();
+    }
+
+    /**
+     * @brief Returns an iterator that is past the last entity of the reversed
+     * group.
+     *
+     * The returned iterator points to the entity following the last entity of
+     * the reversed group. Attempting to dereference the returned iterator
+     * results in undefined behavior.
+     *
+     * @note
+     * Iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the entity following the last entity of the
+     * reversed group.
+     */
+    [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
+        return std::get<0>(pools)->sparse_set<entity_type>::rbegin() + *length;
+    }
+
+    /**
      * @brief Returns the first entity of the group, if any.
      * @return The first entity of the group if one exists, the null entity
      * otherwise.
@@ -863,8 +937,8 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type back() const {
-        const auto it = std::make_reverse_iterator(end());
-        return it != std::make_reverse_iterator(begin()) ? *it : null;
+        const auto it = rbegin();
+        return it != rend() ? *it : null;
     }
 
     /**
