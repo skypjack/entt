@@ -1599,6 +1599,7 @@ public:
      */
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
+        static_assert(!std::is_empty<Type>::value);
         unset<Type>();
         vars.push_back(variable_data{type_info<Type>::id(), { new Type{std::forward<Args>(args)...}, [](void *instance) { delete static_cast<Type *>(instance); } }});
         return *static_cast<Type *>(vars.back().value.get());
