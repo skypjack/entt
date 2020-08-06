@@ -109,7 +109,8 @@ I hope this list can grow much more in the future:
     - [Intro to EnTT](https://www.youtube.com/watch?v=D4hz0wEB978).
     - [Entities and Components](https://www.youtube.com/watch?v=-B1iu4QJTUc).
     - [The ENTITY Class](https://www.youtube.com/watch?v=GfSzeAcsBb0).
-    - [Camera Systems](https://www.youtube.com/watch?v=ubZn7BlrnTU)
+    - [Camera Systems](https://www.youtube.com/watch?v=ubZn7BlrnTU).
+    - [Scene Camera](https://www.youtube.com/watch?v=UKVFRRufKzo).
   * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect):
     project retrospect by [Eric Hildebrand](https://www.erichildebrand.net/).
 
