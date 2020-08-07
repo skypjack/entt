@@ -34,7 +34,8 @@ TEST(NonOwningGroup, Functionalities) {
     ASSERT_FALSE(cgroup.empty<const char>());
     ASSERT_NO_THROW(group.begin()++);
     ASSERT_NO_THROW(++cgroup.begin());
-    ASSERT_EQ(group.rbegin(), cgroup.rbegin());
+    ASSERT_NO_THROW(group.rbegin() + 1u);
+    ASSERT_NO_THROW(1u + cgroup.rbegin());
 
     ASSERT_NE(group.begin(), group.end());
     ASSERT_NE(cgroup.begin(), cgroup.end());
@@ -320,7 +321,7 @@ TEST(NonOwningGroup, IndexRebuiltOnDestroy) {
         ASSERT_EQ(uivalue, 1u);
     });
 
-    for(auto curr: group.proxy()) {
+    for(auto &&curr: group.proxy()) {
         ASSERT_EQ(std::get<0>(curr), e1);
         ASSERT_EQ(std::get<1>(curr), 1);
         ASSERT_EQ(std::get<2>(curr), 1u);
@@ -542,7 +543,7 @@ TEST(NonOwningGroup, EmptyTypes) {
     }
 
     registry.group(entt::get<int, char, double>).each([](const auto, int, char, double) { FAIL(); });
-    for([[maybe_unused]] auto curr: registry.group(entt::get<int, char, double>).proxy()) { FAIL(); }
+    for([[maybe_unused]] auto &&curr: registry.group(entt::get<int, char, double>).proxy()) { FAIL(); }
 }
 
 TEST(NonOwningGroup, FrontBack) {
@@ -599,7 +600,8 @@ TEST(OwningGroup, Functionalities) {
     ASSERT_FALSE(cgroup.empty<const char>());
     ASSERT_NO_THROW(group.begin()++);
     ASSERT_NO_THROW(++cgroup.begin());
-    ASSERT_EQ(group.rbegin(), cgroup.rbegin());
+    ASSERT_NO_THROW(group.rbegin() + 1u);
+    ASSERT_NO_THROW(1u + cgroup.rbegin());
 
     ASSERT_NE(group.begin(), group.end());
     ASSERT_NE(cgroup.begin(), cgroup.end());
@@ -966,7 +968,7 @@ TEST(OwningGroup, IndexRebuiltOnDestroy) {
         ASSERT_EQ(uivalue, 1u);
     });
 
-    for(auto curr: group.proxy()) {
+    for(auto &&curr: group.proxy()) {
         ASSERT_EQ(std::get<0>(curr), e1);
         ASSERT_EQ(std::get<1>(curr), 1);
         ASSERT_EQ(std::get<2>(curr), 1u);
@@ -1198,7 +1200,7 @@ TEST(OwningGroup, EmptyTypes) {
     }
 
     registry.group<double>(entt::get<int, char>).each([](const auto, double, int, char) { FAIL(); });
-    for([[maybe_unused]] auto curr: registry.group<double>(entt::get<int, char>).proxy()) { FAIL(); }
+    for([[maybe_unused]] auto &&curr: registry.group<double>(entt::get<int, char>).proxy()) { FAIL(); }
 }
 
 TEST(OwningGroup, FrontBack) {
