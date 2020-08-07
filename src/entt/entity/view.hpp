@@ -74,14 +74,14 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     template<typename Comp>
     using component_iterator = decltype(std::declval<pool_type<Comp>>().begin());
 
-    using underlying_iterator = typename sparse_set<Entity>::iterator;
     using unchecked_type = std::array<const sparse_set<Entity> *, (sizeof...(Component) - 1)>;
     using filter_type = std::array<const sparse_set<Entity> *, sizeof...(Exclude)>;
 
+    template<typename It>
     class view_iterator final {
         friend class basic_view<Entity, exclude_t<Exclude...>, Component...>;
 
-        view_iterator(underlying_iterator from, underlying_iterator to, underlying_iterator curr, unchecked_type other, filter_type ignore) ENTT_NOEXCEPT
+        view_iterator(It from, It to, It curr, unchecked_type other, filter_type ignore) ENTT_NOEXCEPT
             : first{from},
               last{to},
               it{curr},
@@ -99,10 +99,10 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         }
 
     public:
-        using difference_type = typename underlying_iterator::difference_type;
-        using value_type = typename underlying_iterator::value_type;
-        using pointer = typename underlying_iterator::pointer;
-        using reference = typename underlying_iterator::reference;
+        using difference_type = typename std::iterator_traits<It>::difference_type;
+        using value_type = typename std::iterator_traits<It>::value_type;
+        using pointer = typename std::iterator_traits<It>::pointer;
+        using reference = typename std::iterator_traits<It>::reference;
         using iterator_category = std::bidirectional_iterator_tag;
 
         view_iterator() ENTT_NOEXCEPT = default;
@@ -136,7 +136,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         }
 
         [[nodiscard]] pointer operator->() const {
-            return it.operator->();
+            return &*it;
         }
 
         [[nodiscard]] reference operator*() const {
@@ -144,9 +144,9 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         }
 
     private:
-        underlying_iterator first;
-        underlying_iterator last;
-        underlying_iterator it;
+        It first;
+        It last;
+        It it;
         unchecked_type unchecked;
         filter_type filter;
     };
@@ -154,12 +154,14 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
     class view_proxy {
         friend class basic_view<Entity, exclude_t<Exclude...>, Component...>;
 
+        using proxy_view_iterator = view_iterator<typename sparse_set<Entity>::iterator>;
+
         class proxy_iterator {
             friend class view_proxy;
 
             using ref_type = decltype(std::tuple_cat(std::declval<std::conditional_t<ENTT_IS_EMPTY(Component), std::tuple<>, std::tuple<pool_type<Component> *>>>()...));
 
-            proxy_iterator(view_iterator from, ref_type ref) ENTT_NOEXCEPT
+            proxy_iterator(proxy_view_iterator from, ref_type ref) ENTT_NOEXCEPT
                 : it{from},
                   pools{ref}
             {}
@@ -199,11 +201,11 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             }
 
         private:
-            view_iterator it{};
+            proxy_view_iterator it{};
             const ref_type pools{};
         };
 
-        view_proxy(view_iterator from, view_iterator to, std::tuple<pool_type<Component> *...> ref)
+        view_proxy(proxy_view_iterator from, proxy_view_iterator to, std::tuple<pool_type<Component> *...> ref)
             : first{from},
               last{to},
               pools{ref}
@@ -233,8 +235,8 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         }
 
     private:
-        view_iterator first;
-        view_iterator last;
+        proxy_view_iterator first;
+        proxy_view_iterator last;
         const std::tuple<pool_type<Component> *...> pools;
     };
 
@@ -331,7 +333,9 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Bidirectional iterator type. */
-    using iterator = view_iterator;
+    using iterator = view_iterator<typename sparse_set<entity_type>::iterator>;
+    /*! @brief Reverse iterator type. */
+    using reverse_iterator = view_iterator<typename sparse_set<entity_type>::reverse_iterator>;
 
     /**
      * @brief Returns the number of existing components of the given type.
@@ -447,6 +451,43 @@ public:
     }
 
     /**
+     * @brief Returns an iterator to the first entity of the reversed view.
+     *
+     * The returned iterator points to the first entity of the reversed view. If
+     * the view is empty, the returned iterator will be equal to `rend()`.
+     *
+     * @note
+     * Iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the first entity of the reversed view.
+     */
+    [[nodiscard]] reverse_iterator rbegin() const {
+        const auto& view = candidate();
+        return reverse_iterator{view.rbegin(), view.rend(), view.rbegin(), unchecked(view), filter};
+    }
+
+    /**
+     * @brief Returns an iterator that is past the last entity of the reversed
+     * view.
+     *
+     * The returned iterator points to the entity following the last entity of
+     * the reversed view. Attempting to dereference the returned iterator
+     * results in undefined behavior.
+     *
+     * @note
+     * Iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the entity following the last entity of the
+     * reversed view.
+     */
+    [[nodiscard]] reverse_iterator rend() const {
+        const auto& view = candidate();
+        return reverse_iterator{view.rbegin(), view.rend(), view.rend(), unchecked(view), filter};
+    }
+
+    /**
      * @brief Returns the first entity of the view, if any.
      * @return The first entity of the view if one exists, the null entity
      * otherwise.
@@ -462,8 +503,8 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type back() const {
-        const auto it = std::make_reverse_iterator(end());
-        return it != std::make_reverse_iterator(begin()) ? *it : null;
+        const auto it = rbegin();
+        return it != rend() ? *it : null;
     }
 
     /**
@@ -776,6 +817,8 @@ public:
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
     using iterator = typename sparse_set<Entity>::iterator;
+    /*! @brief Reversed iterator type. */
+    using reverse_iterator = typename sparse_set<Entity>::reverse_iterator;
 
     /**
      * @brief Returns the number of entities that have the given component.
@@ -859,6 +902,41 @@ public:
     }
 
     /**
+     * @brief Returns an iterator to the first entity of the reversed view.
+     *
+     * The returned iterator points to the first entity of the reversed view. If
+     * the view is empty, the returned iterator will be equal to `rend()`.
+     *
+     * @note
+     * Iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the first entity of the reversed view.
+     */
+    [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
+        return pool->sparse_set<Entity>::rbegin();
+    }
+
+    /**
+     * @brief Returns an iterator that is past the last entity of the reversed
+     * view.
+     *
+     * The returned iterator points to the entity following the last entity of
+     * the reversed view. Attempting to dereference the returned iterator
+     * results in undefined behavior.
+     *
+     * @note
+     * Iterators stay true to the order imposed to the underlying data
+     * structures.
+     *
+     * @return An iterator to the entity following the last entity of the
+     * reversed view.
+     */
+    [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
+        return pool->sparse_set<Entity>::rend();
+    }
+
+    /**
      * @brief Returns the first entity of the view, if any.
      * @return The first entity of the view if one exists, the null entity
      * otherwise.
@@ -874,8 +952,8 @@ public:
      * otherwise.
      */
     [[nodiscard]] entity_type back() const {
-        const auto it = std::make_reverse_iterator(end());
-        return it != std::make_reverse_iterator(begin()) ? *it : null;
+        const auto it = rbegin();
+        return it != rend() ? *it : null;
     }
 
     /**

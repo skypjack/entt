@@ -19,11 +19,15 @@ TEST(SingleComponentView, Functionalities) {
     registry.emplace<int>(e1);
     registry.emplace<char>(e1);
 
-    ASSERT_NO_THROW(registry.view<char>().begin()++);
-    ASSERT_NO_THROW(++registry.view<char>().begin());
+    ASSERT_NO_THROW(view.begin()++);
+    ASSERT_NO_THROW(++cview.begin());
+    ASSERT_NO_THROW(view.rbegin() + 1u);
+    ASSERT_NO_THROW(1u + cview.rbegin());
 
     ASSERT_NE(view.begin(), view.end());
     ASSERT_NE(cview.begin(), cview.end());
+    ASSERT_NE(view.rbegin(), view.rend());
+    ASSERT_NE(cview.rbegin(), cview.rend());
     ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
     ASSERT_FALSE(view.empty());
 
@@ -48,6 +52,7 @@ TEST(SingleComponentView, Functionalities) {
     registry.remove<char>(e1);
 
     ASSERT_EQ(view.begin(), view.end());
+    ASSERT_EQ(view.rbegin(), view.rend());
     ASSERT_TRUE(view.empty());
 }
 
@@ -99,6 +104,7 @@ TEST(SingleComponentView, Empty) {
 
     ASSERT_EQ(view.size(), entt::registry::size_type{0});
     ASSERT_EQ(view.begin(), view.end());
+    ASSERT_EQ(view.rbegin(), view.rend());
 }
 
 TEST(SingleComponentView, Proxy) {
@@ -293,16 +299,20 @@ TEST(MultiComponentView, Functionalities) {
 
     registry.emplace<char>(e1);
 
-    auto it = registry.view<int, char>().begin();
+    ASSERT_EQ(*view.begin(), e1);
+    ASSERT_EQ(*view.rbegin(), e1);
+    ASSERT_EQ(++view.begin(), (view.end()));
+    ASSERT_EQ(++view.rbegin(), (view.rend()));
 
-    ASSERT_EQ(*it, e1);
-    ASSERT_EQ(++it, (registry.view<int, char>().end()));
-
-    ASSERT_NO_THROW((registry.view<int, char>().begin()++));
-    ASSERT_NO_THROW((++registry.view<int, char>().begin()));
+    ASSERT_NO_THROW((view.begin()++));
+    ASSERT_NO_THROW((++cview.begin()));
+    ASSERT_NO_THROW(view.rbegin()++);
+    ASSERT_NO_THROW(++cview.rbegin());
 
     ASSERT_NE(view.begin(), view.end());
     ASSERT_NE(cview.begin(), cview.end());
+    ASSERT_NE(view.rbegin(), view.rend());
+    ASSERT_NE(cview.rbegin(), cview.rend());
     ASSERT_EQ(view.size(), decltype(view.size()){1});
     ASSERT_EQ(view.size<int>(), decltype(view.size()){1});
     ASSERT_EQ(cview.size<const char>(), decltype(view.size()){2});
@@ -354,6 +364,34 @@ TEST(MultiComponentView, Iterator) {
     ASSERT_EQ(*begin.operator->(), entity);
 }
 
+TEST(MultiComponentView, ReverseIterator) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
+
+    const auto view = registry.view<int, char>();
+    using iterator = typename decltype(view)::reverse_iterator;
+
+    iterator end{view.rbegin()};
+    iterator begin{};
+    begin = view.rend();
+    std::swap(begin, end);
+
+    ASSERT_EQ(begin, view.rbegin());
+    ASSERT_EQ(end, view.rend());
+    ASSERT_NE(begin, end);
+
+    ASSERT_EQ(begin++, view.rbegin());
+    ASSERT_EQ(begin--, view.rend());
+
+    ASSERT_EQ(++begin, view.rend());
+    ASSERT_EQ(--begin, view.rbegin());
+
+    ASSERT_EQ(*begin, entity);
+    ASSERT_EQ(*begin.operator->(), entity);
+}
+
 TEST(MultiComponentView, Contains) {
     entt::registry registry;
 
@@ -389,6 +427,7 @@ TEST(MultiComponentView, Empty) {
 
     ASSERT_EQ(view.size(), entt::registry::size_type{1});
     ASSERT_EQ(view.begin(), view.end());
+    ASSERT_EQ(view.rbegin(), view.rend());
 }
 
 TEST(MultiComponentView, Proxy) {
@@ -462,7 +501,7 @@ TEST(MultiComponentView, EachWithSuggestedType) {
 
     auto value = registry.view<int, char>().size();
 
-    for(auto curr: registry.view<int, char>().proxy()) {
+    for(auto &&curr: registry.view<int, char>().proxy()) {
         ASSERT_EQ(std::get<1>(curr), --value);
     }
 
@@ -472,7 +511,7 @@ TEST(MultiComponentView, EachWithSuggestedType) {
 
     value = {};
 
-    for(auto curr: registry.view<int, char>().proxy<int>()) {
+    for(auto &&curr: registry.view<int, char>().proxy<int>()) {
         ASSERT_EQ(std::get<1>(curr), value++);
     }
 }
@@ -498,7 +537,7 @@ TEST(MultiComponentView, EachWithHoles) {
         ASSERT_EQ(i, 0);
     });
 
-    for(auto curr: view.proxy()) {
+    for(auto &&curr: view.proxy()) {
         ASSERT_EQ(std::get<0>(curr), e0);
         ASSERT_EQ(std::get<1>(curr), '0');
         ASSERT_EQ(std::get<2>(curr), 0);
