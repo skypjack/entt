@@ -34,8 +34,8 @@ TEST(NonOwningGroup, Functionalities) {
     ASSERT_FALSE(cgroup.empty<const char>());
     ASSERT_NO_THROW(group.begin()++);
     ASSERT_NO_THROW(++cgroup.begin());
-    ASSERT_NO_THROW(group.rbegin() + 1u);
-    ASSERT_NO_THROW(1u + cgroup.rbegin());
+    ASSERT_NO_THROW([](auto it) { return it++; }(group.rbegin()));
+    ASSERT_NO_THROW([](auto it) { return ++it; }(cgroup.rbegin()));
 
     ASSERT_NE(group.begin(), group.end());
     ASSERT_NE(cgroup.begin(), cgroup.end());
@@ -600,8 +600,8 @@ TEST(OwningGroup, Functionalities) {
     ASSERT_FALSE(cgroup.empty<const char>());
     ASSERT_NO_THROW(group.begin()++);
     ASSERT_NO_THROW(++cgroup.begin());
-    ASSERT_NO_THROW(group.rbegin() + 1u);
-    ASSERT_NO_THROW(1u + cgroup.rbegin());
+    ASSERT_NO_THROW([](auto it) { return it++; }(group.rbegin()));
+    ASSERT_NO_THROW([](auto it) { return ++it; }(cgroup.rbegin()));
 
     ASSERT_NE(group.begin(), group.end());
     ASSERT_NE(cgroup.begin(), cgroup.end());

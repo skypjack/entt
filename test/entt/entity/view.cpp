@@ -21,8 +21,8 @@ TEST(SingleComponentView, Functionalities) {
 
     ASSERT_NO_THROW(view.begin()++);
     ASSERT_NO_THROW(++cview.begin());
-    ASSERT_NO_THROW(view.rbegin() + 1u);
-    ASSERT_NO_THROW(1u + cview.rbegin());
+    ASSERT_NO_THROW([](auto it) { return it++; }(view.rbegin()));
+    ASSERT_NO_THROW([](auto it) { return ++it; }(cview.rbegin()));
 
     ASSERT_NE(view.begin(), view.end());
     ASSERT_NE(cview.begin(), cview.end());
