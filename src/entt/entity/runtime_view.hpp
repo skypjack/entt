@@ -63,9 +63,9 @@ class basic_runtime_view {
     class view_iterator final {
         friend class basic_runtime_view<Entity>;
 
-        view_iterator(const std::vector<const sparse_set<Entity> *> &cpools, const std::vector<const sparse_set<Entity> *> &exclude, underlying_iterator curr) ENTT_NOEXCEPT
+        view_iterator(const std::vector<const sparse_set<Entity> *> &cpools, const std::vector<const sparse_set<Entity> *> &ignore, underlying_iterator curr) ENTT_NOEXCEPT
             : pools{&cpools},
-              filter{&exclude},
+              filter{&ignore},
               it{curr}
         {
             if(it != (*pools)[0]->end() && !valid()) {
