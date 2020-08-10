@@ -308,20 +308,15 @@ TEST_F(MetaType, ConstructCastAndConvert) {
     ASSERT_EQ(any.cast<clazz_t>().value, 42);
 }
 
-TEST_F(MetaType, Detach) {
+TEST_F(MetaType, Reset) {
     ASSERT_TRUE(entt::resolve_id("clazz"_hs));
 
-    for(auto curr: entt::resolve()) {
-        if(curr.id() == "clazz"_hs) {
-            curr.detach();
-            break;
-        }
-    }
+    entt::resolve_id("clazz"_hs).reset();
 
     ASSERT_FALSE(entt::resolve_id("clazz"_hs));
-    ASSERT_EQ(entt::resolve<clazz_t>().id(), "clazz"_hs);
-    ASSERT_EQ(entt::resolve<clazz_t>().prop(property_t::value).value().cast<int>(), 42);
-    ASSERT_TRUE(entt::resolve<clazz_t>().data("value"_hs));
+    ASSERT_NE(entt::resolve<clazz_t>().id(), "clazz"_hs);
+    ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
+    ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
 
     entt::meta<clazz_t>().type("clazz"_hs);
 
@@ -413,14 +408,14 @@ TEST_F(MetaType, PropertiesAndCornerCases) {
 TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_NE(*entt::internal::meta_context::global(), nullptr);
 
-    entt::meta<double>().reset();
-    entt::meta<unsigned int>().reset();
-    entt::meta<base_t>().reset();
-    entt::meta<derived_t>().reset();
-    entt::meta<abstract_t>().reset();
-    entt::meta<concrete_t>().reset();
-    entt::meta<property_t>().reset();
-    entt::meta<clazz_t>().reset();
+    entt::resolve<double>().reset();
+    entt::resolve<unsigned int>().reset();
+    entt::resolve<base_t>().reset();
+    entt::resolve<derived_t>().reset();
+    entt::resolve<abstract_t>().reset();
+    entt::resolve<concrete_t>().reset();
+    entt::resolve<property_t>().reset();
+    entt::resolve<clazz_t>().reset();
 
     ASSERT_FALSE(entt::resolve_id("double"_hs));
     ASSERT_FALSE(entt::resolve_id("base"_hs));

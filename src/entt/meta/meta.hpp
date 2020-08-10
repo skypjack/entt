@@ -11,6 +11,7 @@
 #include <utility>
 #include "../config/config.h"
 #include "../core/fwd.hpp"
+#include "../core/utility.hpp"
 #include "ctx.hpp"
 #include "internal.hpp"
 #include "range.hpp"
@@ -467,7 +468,7 @@ public:
 
 private:
     internal::meta_storage storage;
-    const internal::meta_type_node *node;
+    internal::meta_type_node *node;
     dereference_operator_type *deref;
     meta_sequence_container(* seq_factory)(void *);
     meta_associative_container(* assoc_factory)(void *);
@@ -985,7 +986,7 @@ public:
     using size_type = typename node_type::size_type;
 
     /*! @copydoc meta_prop::meta_prop */
-    meta_type(const node_type *curr = nullptr) ENTT_NOEXCEPT
+    meta_type(node_type *curr = nullptr) ENTT_NOEXCEPT
         : node{curr}
     {}
 
@@ -1344,13 +1345,51 @@ public:
         return (!node && !other.node) || (node && other.node && node->type_id == other.node->type_id);
     }
 
-    /*! @brief Removes a meta object from the list of searchable types. */
-    void detach() ENTT_NOEXCEPT {
-        internal::meta_context::detach(node);
+    /**
+     * @brief Resets a meta type and all its parts.
+     *
+     * This function resets a meta type and all its data members, member
+     * functions and properties, as well as its constructors, destructors and
+     * conversion functions if any.<br/>
+     * Base classes aren't reset but the link between the two types is removed.
+     * 
+     * The meta type is also removed from the list of searchable types.
+     */
+    void reset() ENTT_NOEXCEPT {
+        auto** it = internal::meta_context::global();
+
+        while (*it && *it != node) {
+            it = &(*it)->next;
+        }
+
+        if(*it) {
+            *it = (*it)->next;
+        }
+
+        const auto unregister_all = y_combinator{
+            [](auto &&self, auto **curr, auto... member) {
+                while(*curr) {
+                    auto *prev = *curr;
+                    (self(&(prev->*member)), ...);
+                    *curr = prev->next;
+                    prev->next = nullptr;
+                }
+            }
+        };
+        
+        unregister_all(&node->prop);
+        unregister_all(&node->base);
+        unregister_all(&node->conv);
+        unregister_all(&node->ctor, &internal::meta_ctor_node::prop);
+        unregister_all(&node->data, &internal::meta_data_node::prop);
+        unregister_all(&node->func, &internal::meta_func_node::prop);
+        
+        node->id = {};
+        node->dtor = nullptr;
     }
 
 private:
-    const node_type *node;
+    node_type *node;
 };
 
 

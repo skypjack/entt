@@ -4,7 +4,6 @@
 
 #include "../core/attribute.h"
 #include "../config/config.h"
-#include "internal.hpp"
 
 
 namespace entt {
@@ -17,6 +16,9 @@ namespace entt {
 
 
 namespace internal {
+
+
+struct meta_type_node;
 
 
 struct ENTT_API meta_context {
@@ -32,18 +34,6 @@ struct ENTT_API meta_context {
     [[nodiscard]] static meta_type_node ** & global() ENTT_NOEXCEPT {
         static meta_type_node **chain = &local();
         return chain;
-    }
-
-    static void detach(const meta_type_node *node) ENTT_NOEXCEPT {
-        auto **it = global();
-
-        while(*it && *it != node) {
-            it = &(*it)->next;
-        }
-
-        if(*it) {
-            *it = (*it)->next;
-        }
     }
 };
 

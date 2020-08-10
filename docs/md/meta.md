@@ -878,7 +878,7 @@ objects from it and making its identifier no longer visible. The underlying node
 will remain available though, as if it were implicitly generated:
 
 ```cpp
-entt::meta<my_type>().reset();
+entt::resolve<my_type>().reset();
 ```
 
 The type can be re-registered later with a completely different name and form.

@@ -2,6 +2,7 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
+#include <entt/meta/resolve.hpp>
 #include "types.h"
 
 position create_position(int x, int y) {
@@ -23,8 +24,8 @@ ENTT_API void set_up() {
 }
 
 ENTT_API void tear_down() {
-    entt::meta<position>().reset();
-    entt::meta<velocity>().reset();
+    entt::resolve<position>().reset();
+    entt::resolve<velocity>().reset();
 }
 
 ENTT_API entt::meta_any wrap_int(int value) {
