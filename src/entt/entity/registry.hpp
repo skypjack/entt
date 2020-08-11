@@ -1235,19 +1235,19 @@ public:
     template<typename ItComp, typename ItExcl = id_type *>
     [[nodiscard]] basic_runtime_view<Entity> runtime_view(ItComp first, ItComp last, ItExcl from = {}, ItExcl to = {}) const {
         std::vector<const sparse_set<Entity> *> component(std::distance(first, last));
-        std::vector<const sparse_set<Entity> *> exclude(std::distance(from, to));
+        std::vector<const sparse_set<Entity> *> filter(std::distance(from, to));
 
         std::transform(first, last, component.begin(), [this](const auto ctype) {
             const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.type_id == ctype; });
             return it == pools.cend() ? nullptr : it->pool.get();
         });
 
-        std::transform(from, to, exclude.begin(), [this](const auto ctype) {
+        std::transform(from, to, filter.begin(), [this](const auto ctype) {
             const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.type_id == ctype; });
             return it == pools.cend() ? nullptr : it->pool.get();
         });
 
-        return { std::move(component), std::move(exclude) };
+        return { std::move(component), std::move(filter) };
     }
 
     /**
