@@ -1050,7 +1050,7 @@ TEST(Benchmark, SortMulti) {
 
 TEST(Benchmark, AlmostSortedStdSort) {
     entt::registry registry;
-    entt::entity entities[3];
+    entt::entity entities[3]{};
 
     std::cout << "Sort 150000 entities, almost sorted, std::sort" << std::endl;
 
@@ -1080,7 +1080,7 @@ TEST(Benchmark, AlmostSortedStdSort) {
 
 TEST(Benchmark, AlmostSortedInsertionSort) {
     entt::registry registry;
-    entt::entity entities[3];
+    entt::entity entities[3]{};
 
     std::cout << "Sort 150000 entities, almost sorted, insertion sort" << std::endl;
 

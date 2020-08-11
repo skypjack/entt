@@ -31,8 +31,8 @@ TEST(Lib, Registry) {
     ASSERT_TRUE(registry.empty<tag>());
 
     registry.view<position>().each([](auto entity, auto &position) {
-        ASSERT_EQ(position.x, entt::to_integral(entity) + 16);
-        ASSERT_EQ(position.y, entt::to_integral(entity) + 16);
+        ASSERT_EQ(position.x, static_cast<int>(entt::to_integral(entity) + 16u));
+        ASSERT_EQ(position.y, static_cast<int>(entt::to_integral(entity) + 16u));
     });
 
     registry = {};

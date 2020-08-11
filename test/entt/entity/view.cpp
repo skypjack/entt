@@ -502,7 +502,7 @@ TEST(MultiComponentView, EachWithSuggestedType) {
     auto value = registry.view<int, char>().size();
 
     for(auto &&curr: registry.view<int, char>().proxy()) {
-        ASSERT_EQ(std::get<1>(curr), --value);
+        ASSERT_EQ(std::get<1>(curr), static_cast<int>(--value));
     }
 
     registry.sort<int>([](const auto lhs, const auto rhs) {
@@ -512,7 +512,7 @@ TEST(MultiComponentView, EachWithSuggestedType) {
     value = {};
 
     for(auto &&curr: registry.view<int, char>().proxy<int>()) {
-        ASSERT_EQ(std::get<1>(curr), value++);
+        ASSERT_EQ(std::get<1>(curr), static_cast<int>(value++));
     }
 }
 

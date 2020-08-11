@@ -65,7 +65,7 @@ TEST(BasicHandle, Component) {
     handle.remove<char>();
 
     ASSERT_TRUE(registry.empty<char>());
-    ASSERT_EQ(0, handle.remove_if_exists<char>());
+    ASSERT_EQ(0u, handle.remove_if_exists<char>());
 
     handle.visit([](auto id) { ASSERT_EQ(entt::type_info<int>::id(), id); });
 

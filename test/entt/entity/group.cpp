@@ -543,7 +543,7 @@ TEST(NonOwningGroup, EmptyTypes) {
     }
 
     registry.group(entt::get<int, char, double>).each([](const auto, int, char, double) { FAIL(); });
-    for([[maybe_unused]] auto &&curr: registry.group(entt::get<int, char, double>).proxy()) { FAIL(); }
+    ASSERT_EQ(registry.group(entt::get<int, char, double>).proxy().begin(), registry.group(entt::get<int, char, double>).proxy().end());
 }
 
 TEST(NonOwningGroup, FrontBack) {
@@ -1176,7 +1176,7 @@ TEST(OwningGroup, EmptyTypes) {
         ASSERT_EQ(entity, entt);
     }
 
-    registry.group<char>(entt::get<empty_type, int>).each([check = true](int, char) mutable {
+    registry.group<char>(entt::get<empty_type, int>).each([check = true](char, int) mutable {
         ASSERT_TRUE(check);
         check = false;
     });
@@ -1200,7 +1200,7 @@ TEST(OwningGroup, EmptyTypes) {
     }
 
     registry.group<double>(entt::get<int, char>).each([](const auto, double, int, char) { FAIL(); });
-    for([[maybe_unused]] auto &&curr: registry.group<double>(entt::get<int, char>).proxy()) { FAIL(); }
+    ASSERT_EQ(registry.group<double>(entt::get<int, char>).proxy().begin(), registry.group<double>(entt::get<int, char>).proxy().end());
 }
 
 TEST(OwningGroup, FrontBack) {

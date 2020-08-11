@@ -380,7 +380,7 @@ TEST(Snapshot, Continuous) {
 
     dst.view<noncopyable_component>().each([&dst, &noncopyable_component_cnt](auto, const auto &component) {
         ++noncopyable_component_cnt;
-        ASSERT_EQ(component.value, (dst.size<noncopyable_component>() - noncopyable_component_cnt - 1));
+        ASSERT_EQ(component.value, static_cast<int>(dst.size<noncopyable_component>() - noncopyable_component_cnt - 1u));
     });
 
     src.view<another_component>().each([](auto, auto &component) {

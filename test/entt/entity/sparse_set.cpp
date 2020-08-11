@@ -16,7 +16,7 @@ TEST(SparseSet, Functionalities) {
 
     set.reserve(42);
 
-    ASSERT_EQ(set.capacity(), 42);
+    ASSERT_EQ(set.capacity(), 42u);
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
     ASSERT_EQ(std::as_const(set).begin(), std::as_const(set).end());
@@ -76,7 +76,7 @@ TEST(SparseSet, Pagination) {
     entt::sparse_set<entt::entity> set;
     constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(entt::entity);
 
-    ASSERT_EQ(set.extent(), 0);
+    ASSERT_EQ(set.extent(), 0u);
 
     set.emplace(entt::entity{entt_per_page-1});
 
@@ -105,7 +105,7 @@ TEST(SparseSet, Pagination) {
 
     set.shrink_to_fit();
 
-    ASSERT_EQ(set.extent(), 0);
+    ASSERT_EQ(set.extent(), 0u);
 }
 
 TEST(SparseSet, BatchAdd) {

@@ -25,7 +25,7 @@ TEST(Storage, Functionalities) {
 
     pool.reserve(42);
 
-    ASSERT_EQ(pool.capacity(), 42);
+    ASSERT_EQ(pool.capacity(), 42u);
     ASSERT_TRUE(pool.empty());
     ASSERT_EQ(pool.size(), 0u);
     ASSERT_EQ(std::as_const(pool).begin(), std::as_const(pool).end());
@@ -69,11 +69,11 @@ TEST(Storage, Functionalities) {
     ASSERT_FALSE(pool.contains(entt::entity{0}));
     ASSERT_FALSE(pool.contains(entt::entity{41}));
 
-    ASSERT_EQ(pool.capacity(), 42);
+    ASSERT_EQ(pool.capacity(), 42u);
 
     pool.shrink_to_fit();
 
-    ASSERT_EQ(pool.capacity(), 0);
+    ASSERT_EQ(pool.capacity(), 0u);
 
     (void)entt::storage<entt::entity, int>{std::move(pool)};
     entt::storage<entt::entity, int> other;
