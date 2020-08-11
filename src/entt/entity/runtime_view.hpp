@@ -129,9 +129,9 @@ class basic_runtime_view {
         underlying_iterator it;
     };
 
-    basic_runtime_view(std::vector<const sparse_set<Entity> *> cpools, std::vector<const sparse_set<Entity> *> exclude) ENTT_NOEXCEPT
+    basic_runtime_view(std::vector<const sparse_set<Entity> *> cpools, std::vector<const sparse_set<Entity> *> epools) ENTT_NOEXCEPT
         : pools{std::move(cpools)},
-          filter{std::move(exclude)}
+          filter{std::move(epools)}
     {
         const auto it = std::min_element(pools.begin(), pools.end(), [](const auto *lhs, const auto *rhs) {
             return (!lhs && rhs) || (lhs && rhs && lhs->size() < rhs->size());
