@@ -61,6 +61,9 @@ constexpr meta_function_helper<Ret(Args...)>
 to_meta_function_helper(Ret(*)(Args...));
 
 
+constexpr void to_meta_function_helper(...);
+
+
 template<typename Candidate>
 using meta_function_helper_t = decltype(to_meta_function_helper(std::declval<Candidate>()));
 
