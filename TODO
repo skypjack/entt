@@ -4,26 +4,20 @@
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
 * meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects (remove runtime views, welcome reflection)
 * allow to replace std:: with custom implementations
-* custom (decoupled) pools ==> N-buffering, shared components, multi-model, hibitsets, and so on
 * add examples (and credits) from @alanjfs :)
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...> (see #342)
 * update documentation for meta, it contains less than half of the actual feature
 
-Next:
+WIP:
 * make it easier to hook into the type system and describe how to do that to eg auto-generate meta types on first use
-* review multi component views to reduce instantiations once empty types are gone...
 * add observer functions aside observer class
-
-* WIP:
  - introduce the component iterators for non-contiguous collections of entities (multi component views, observers, user defined collections)
-
-* WIP: snapshot rework
  - snapshot: support for range-based archives
- - update documentation to describe alternatives
-
-* WIP:
+ - update snapshot documentation to describe alternatives
  - custom pools.
  - the Perfect Model.
  - page size 0 -> page less mode
- - add ::reach and rev iterators to views and groups for raw, faster and unsafe iterations
+ - add ::reach and rev iterators to proxy objects for faster and unsafe iterations
  - add example: 64 bit ids with 32 bits reserved for users' purposes
+ - composable views and "faster views", deprecate non-owning groups
+ - offset instead of pages in the sparse set? top level mask for sparse sets?

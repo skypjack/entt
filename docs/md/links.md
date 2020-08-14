@@ -111,6 +111,7 @@ I hope this list can grow much more in the future:
     - [The ENTITY Class](https://www.youtube.com/watch?v=GfSzeAcsBb0).
     - [Camera Systems](https://www.youtube.com/watch?v=ubZn7BlrnTU).
     - [Scene Camera](https://www.youtube.com/watch?v=UKVFRRufKzo).
+    - [Native Scripting](https://www.youtube.com/watch?v=iIUhg88MK5M)
   * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect):
     project retrospect by [Eric Hildebrand](https://www.erichildebrand.net/).
 
