@@ -242,19 +242,20 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
     basic_view(pool_type<Component> &... component, unpack_as_t<const sparse_set<Entity>, Exclude> &... epool) ENTT_NOEXCEPT
         : pools{&component...},
+          view{candidate()},
           filter{&epool...}
     {}
 
-    [[nodiscard]] const sparse_set<Entity> & candidate() const ENTT_NOEXCEPT {
-        return *(std::min)({ static_cast<const sparse_set<Entity> *>(std::get<pool_type<Component> *>(pools))... }, [](const auto *lhs, const auto *rhs) {
+    [[nodiscard]] const sparse_set<Entity> * candidate() const ENTT_NOEXCEPT {
+        return (std::min)({ static_cast<const sparse_set<Entity> *>(std::get<pool_type<Component> *>(pools))... }, [](const auto *lhs, const auto *rhs) {
             return lhs->size() < rhs->size();
         });
     }
 
-    [[nodiscard]] unchecked_type unchecked(const sparse_set<Entity> &view) const {
+    [[nodiscard]] unchecked_type unchecked(const sparse_set<Entity> *view) const {
         std::size_t pos{};
         unchecked_type other{};
-        ((std::get<pool_type<Component> *>(pools) == &view ? nullptr : (other[pos++] = std::get<pool_type<Component> *>(pools))), ...);
+        ((std::get<pool_type<Component> *>(pools) == view ? nullptr : (other[pos++] = std::get<pool_type<Component> *>(pools))), ...);
         return other;
     }
 
@@ -302,9 +303,8 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
     template<typename Func, typename... Type>
     void iterate(Func func, type_list<Type...>) const {
-        const auto &view = candidate();
-        const auto last = view.data() + view.size();
-        auto first = view.data();
+        const auto last = view->data() + view->size();
+        auto first = view->data();
 
         while(first != last) {
             if((std::get<pool_type<Component> *>(pools)->contains(*first) && ...)
@@ -320,7 +320,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
                         && (sizeof...(Exclude) == 0 || std::none_of(filter.cbegin(), filter.cend(), [entt = *first](const sparse_set<Entity> *cpool) { return cpool->contains(entt); }));
                     ++length, ++first);
 
-                func(view.data() + view.index(base), (std::get<pool_type<Type> *>(pools)->raw() + std::get<pool_type<Type> *>(pools)->index(base))..., length);
+                func(view->data() + view->index(base), (std::get<pool_type<Type> *>(pools)->raw() + std::get<pool_type<Type> *>(pools)->index(base))..., length);
             } else {
                 ++first;
             }
@@ -428,8 +428,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const {
-        const auto &view = candidate();
-        return iterator{view.begin(), view.end(), view.begin(), unchecked(view), filter};
+        return iterator{view->begin(), view->end(), view->begin(), unchecked(view), filter};
     }
 
     /**
@@ -446,8 +445,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const {
-        const auto &view = candidate();
-        return iterator{view.begin(), view.end(), view.end(), unchecked(view), filter};
+        return iterator{view->begin(), view->end(), view->end(), unchecked(view), filter};
     }
 
     /**
@@ -463,8 +461,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const {
-        const auto& view = candidate();
-        return reverse_iterator{view.rbegin(), view.rend(), view.rbegin(), unchecked(view), filter};
+        return reverse_iterator{view->rbegin(), view->rend(), view->rbegin(), unchecked(view), filter};
     }
 
     /**
@@ -483,8 +480,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const {
-        const auto& view = candidate();
-        return reverse_iterator{view.rbegin(), view.rend(), view.rend(), unchecked(view), filter};
+        return reverse_iterator{view->rbegin(), view->rend(), view->rend(), unchecked(view), filter};
     }
 
     /**
@@ -514,8 +510,7 @@ public:
      * iterator otherwise.
      */
     [[nodiscard]] iterator find(const entity_type entt) const {
-        const auto &view = candidate();
-        iterator it{view.begin(), view.end(), view.find(entt), unchecked(view), filter};
+        iterator it{view->begin(), view->end(), view->find(entt), unchecked(view), filter};
         return (it != end() && *it == entt) ? it : end();
     }
 
@@ -584,8 +579,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        const auto &view = candidate();
-        ((std::get<pool_type<Component> *>(pools) == &view ? each<Component>(std::move(func)) : void()), ...);
+        ((std::get<pool_type<Component> *>(pools) == view ? each<Component>(std::move(func)) : void()), ...);
     }
 
     /**
@@ -643,8 +637,10 @@ public:
      */
     template<typename Comp>
     [[nodiscard]] auto proxy() const ENTT_NOEXCEPT {
-        const sparse_set<entity_type> &view = *std::get<pool_type<Comp> *>(pools);
-        return view_proxy{iterator{view.begin(), view.end(), view.begin(), unchecked(view), filter}, iterator{view.begin(), view.end(), view.end(), unchecked(view), filter}, pools};
+        const sparse_set<entity_type> *cpool = std::get<pool_type<Comp> *>(pools);
+        iterator first{cpool->begin(), cpool->end(), cpool->begin(), unchecked(cpool), filter};
+        iterator last{cpool->begin(), cpool->end(), cpool->end(), unchecked(cpool), filter};
+        return view_proxy{std::move(first), std::move(last), pools};
     }
 
     /**
@@ -687,6 +683,7 @@ public:
 
 private:
     const std::tuple<pool_type<Component> *...> pools;
+    const sparse_set<entity_type>* view;
     filter_type filter;
 };
 
