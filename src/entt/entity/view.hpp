@@ -579,6 +579,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
+        view = candidate();
         ((std::get<pool_type<Component> *>(pools) == view ? each<Component>(std::move(func)) : void()), ...);
     }
 
@@ -618,6 +619,7 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] auto proxy() const ENTT_NOEXCEPT {
+        view = candidate();
         return view_proxy{begin(), end(), pools};
     }
 
@@ -678,12 +680,13 @@ public:
     template<typename Func>
     void chunked(Func func) const {
         using non_empty_type = type_list_cat_t<std::conditional_t<ENTT_IS_EMPTY(Component), type_list<>, type_list<Component>>...>;
+        view = candidate();
         iterate(std::move(func), non_empty_type{});
     }
 
 private:
     const std::tuple<pool_type<Component> *...> pools;
-    const sparse_set<entity_type>* view;
+    mutable const sparse_set<entity_type>* view;
     filter_type filter;
 };
 
