@@ -146,7 +146,7 @@ TEST(NonOwningGroup, Empty) {
     ASSERT_TRUE(registry.group(entt::get<double, char, int, float>).empty());
 }
 
-TEST(NonOwningGroup, Proxy) {
+TEST(NonOwningGroup, EachAndProxy) {
     entt::registry registry;
     auto group = registry.group(entt::get<int, char>);
 
@@ -709,7 +709,7 @@ TEST(OwningGroup, Empty) {
     ASSERT_TRUE((registry.group<double, float>(entt::get<char, int>).empty()));
 }
 
-TEST(OwningGroup, Proxy) {
+TEST(OwningGroup, EachAndProxy) {
     entt::registry registry;
     auto group = registry.group<int>(entt::get<char>);
 

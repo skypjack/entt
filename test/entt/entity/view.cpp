@@ -107,7 +107,7 @@ TEST(SingleComponentView, Empty) {
     ASSERT_EQ(view.rbegin(), view.rend());
 }
 
-TEST(SingleComponentView, Proxy) {
+TEST(SingleComponentView, EachAndProxy) {
     entt::registry registry;
 
     registry.emplace<int>(registry.create());
@@ -430,7 +430,7 @@ TEST(MultiComponentView, Empty) {
     ASSERT_EQ(view.rbegin(), view.rend());
 }
 
-TEST(MultiComponentView, Proxy) {
+TEST(MultiComponentView, EachAndProxy) {
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -470,7 +470,7 @@ TEST(MultiComponentView, Proxy) {
     ASSERT_EQ(cnt, std::size_t{0});
 }
 
-TEST(MultiComponentView, EachWithSuggestedType) {
+TEST(MultiComponentView, EachAndProxyWithSuggestedType) {
     entt::registry registry;
 
     for(auto i = 0; i < 3; ++i) {
@@ -516,7 +516,7 @@ TEST(MultiComponentView, EachWithSuggestedType) {
     }
 }
 
-TEST(MultiComponentView, EachWithHoles) {
+TEST(MultiComponentView, EachAndProxyWithHoles) {
     entt::registry registry;
 
     const auto e0 = registry.create();
