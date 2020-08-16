@@ -107,7 +107,7 @@ class sparse_set {
         }
 
         [[nodiscard]] reference operator[](const difference_type value) const {
-            const auto pos = size_type(index-value-1);
+            const auto pos = size_type(index-value-1u);
             return (*packed)[pos];
         }
 
@@ -136,7 +136,7 @@ class sparse_set {
         }
 
         [[nodiscard]] pointer operator->() const {
-            const auto pos = size_type(index-1);
+            const auto pos = size_type(index-1u);
             return &(*packed)[pos];
         }
 

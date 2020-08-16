@@ -186,7 +186,7 @@ class basic_registry {
             const auto index = type_index<Component>::value();
 
             if(!(index < pools.size())) {
-                pools.resize(index+1);
+                pools.resize(size_type(index+1u));
             }
 
             if(auto &&pdata = pools[index]; !pdata.pool) {

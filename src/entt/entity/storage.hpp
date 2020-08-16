@@ -141,7 +141,7 @@ class storage: public sparse_set<Entity> {
         }
 
         [[nodiscard]] pointer operator->() const ENTT_NOEXCEPT {
-            const auto pos = size_type(index-1);
+            const auto pos = size_type(index-1u);
             return &(*instances)[pos];
         }
 
