@@ -207,6 +207,25 @@ inline constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::v
 
 
 /**
+ * @brief Provides the member constant `value` to true if a given type is empty
+ * and the empty type optimization is enabled, false otherwise.
+ * @tparam Type Potential empty type.
+ */
+template<typename Type, typename = void>
+struct is_eto_eligible
+    : ENTT_IS_EMPTY(Type)
+{};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Type Potential empty type.
+ */
+template<typename Type>
+inline constexpr auto is_eto_eligible_v = is_eto_eligible<Type>::value;
+
+
+/**
  * @brief Extracts the class of a non-static member object or function.
  * @tparam Member A pointer to a non-static member object or function.
  */

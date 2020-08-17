@@ -64,7 +64,7 @@ class basic_registry {
             storage<entity_type, Component>::emplace(entt, std::forward<Args>(args)...);
             construction.publish(owner, entt);
 
-            if constexpr(!ENTT_IS_EMPTY(Component)) {
+            if constexpr(!is_eto_eligible_v<Component>) {
                 return this->get(entt);
             }
         }
@@ -98,7 +98,7 @@ class basic_registry {
 
         template<typename... Func>
         decltype(auto) patch(basic_registry &owner, const Entity entt, [[maybe_unused]] Func &&... func) {
-            if constexpr(ENTT_IS_EMPTY(Component)) {
+            if constexpr(is_eto_eligible_v<Component>) {
                 update.publish(owner, entt);
             } else {
                 (std::forward<Func>(func)(this->get(entt)), ...);

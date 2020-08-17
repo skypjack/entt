@@ -10,8 +10,9 @@
 #include <type_traits>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
-#include "sparse_set.hpp"
+#include "../core/type_traits.hpp"
 #include "entity.hpp"
+#include "sparse_set.hpp"
 
 
 namespace entt {
@@ -521,8 +522,7 @@ private:
 
 /*! @copydoc storage */
 template<typename Entity, typename Type>
-// the useless decltype(...) helps to get around a quite impressive issue of VS2017
-class storage<Entity, Type, std::enable_if_t<ENTT_IS_EMPTY(Type)>()>: public sparse_set<Entity> {
+class storage<Entity, Type, std::enable_if_t<is_eto_eligible_v<Type>>>: public sparse_set<Entity> {
     using underlying_type = sparse_set<Entity>;
 
 public:

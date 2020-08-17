@@ -78,7 +78,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
             friend class group_proxy;
 
             using it_type = typename sparse_set<Entity>::iterator;
-            using ref_type = decltype(std::tuple_cat(std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<pool_type<Get> *>>>()...));
+            using ref_type = decltype(std::tuple_cat(std::declval<std::conditional_t<is_eto_eligible_v<Get>, std::tuple<>, std::tuple<pool_type<Get> *>>>()...));
 
             proxy_iterator(it_type from, ref_type ref) ENTT_NOEXCEPT
                 : it{from},
@@ -89,12 +89,12 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
             using difference_type = std::ptrdiff_t;
             using value_type = decltype(std::tuple_cat(
                 std::declval<std::tuple<Entity>>(),
-                std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<Get>>>()...
+                std::declval<std::conditional_t<is_eto_eligible_v<Get>, std::tuple<>, std::tuple<Get>>>()...
             ));
             using pointer = void;
             using reference = decltype(std::tuple_cat(
                 std::declval<std::tuple<Entity>>(),
-                std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<Get &>>>()...
+                std::declval<std::conditional_t<is_eto_eligible_v<Get>, std::tuple<>, std::tuple<Get &>>>()...
             ));
             using iterator_category = std::input_iterator_tag;
 
@@ -134,7 +134,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             return proxy_iterator{handler->begin(), std::tuple_cat([](auto *cpool) {
-                if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
+                if constexpr(is_eto_eligible_v<typename std::decay_t<decltype(*cpool)>::object_type>) {
                     return std::make_tuple();
                 } else {
                     return std::make_tuple(cpool);
@@ -144,7 +144,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             return proxy_iterator{handler->end(), std::tuple_cat([](auto *cpool) {
-                if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
+                if constexpr(is_eto_eligible_v<typename std::decay_t<decltype(*cpool)>::object_type>) {
                     return std::make_tuple();
                 } else {
                     return std::make_tuple(cpool);
@@ -453,7 +453,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        using get_type_list = type_list_cat_t<std::conditional_t<ENTT_IS_EMPTY(Get), type_list<>, type_list<Get>>...>;
+        using get_type_list = type_list_cat_t<std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<Get>>...>;
         traverse(std::move(func), get_type_list{});
     }
 
@@ -617,8 +617,8 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
             friend class group_proxy;
 
             using it_type = typename sparse_set<Entity>::iterator;
-            using owned_type = decltype(std::tuple_cat(std::declval<std::conditional_t<ENTT_IS_EMPTY(Owned), std::tuple<>, std::tuple<component_iterator<Owned>>>>()...));
-            using get_type = decltype(std::tuple_cat(std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<pool_type<Get> *>>>()...));
+            using owned_type = decltype(std::tuple_cat(std::declval<std::conditional_t<is_eto_eligible_v<Owned>, std::tuple<>, std::tuple<component_iterator<Owned>>>>()...));
+            using get_type = decltype(std::tuple_cat(std::declval<std::conditional_t<is_eto_eligible_v<Get>, std::tuple<>, std::tuple<pool_type<Get> *>>>()...));
 
             proxy_iterator(it_type from, owned_type oref, get_type gref) ENTT_NOEXCEPT
                 : it{from},
@@ -630,14 +630,14 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
             using difference_type = std::ptrdiff_t;
             using value_type = decltype(std::tuple_cat(
                 std::declval<std::tuple<Entity>>(),
-                std::declval<std::conditional_t<ENTT_IS_EMPTY(Owned), std::tuple<>, std::tuple<Owned>>>()...,
-                std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<Get>>>()...
+                std::declval<std::conditional_t<is_eto_eligible_v<Owned>, std::tuple<>, std::tuple<Owned>>>()...,
+                std::declval<std::conditional_t<is_eto_eligible_v<Get>, std::tuple<>, std::tuple<Get>>>()...
             ));
             using pointer = void;
             using reference = decltype(std::tuple_cat(
                 std::declval<std::tuple<Entity>>(),
-                std::declval<std::conditional_t<ENTT_IS_EMPTY(Owned), std::tuple<>, std::tuple<Owned &>>>()...,
-                std::declval<std::conditional_t<ENTT_IS_EMPTY(Get), std::tuple<>, std::tuple<Get &>>>()...
+                std::declval<std::conditional_t<is_eto_eligible_v<Owned>, std::tuple<>, std::tuple<Owned &>>>()...,
+                std::declval<std::conditional_t<is_eto_eligible_v<Get>, std::tuple<>, std::tuple<Get &>>>()...
             ));
             using iterator_category = std::input_iterator_tag;
 
@@ -684,14 +684,14 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
             return proxy_iterator{
                 std::get<0>(pools)->sparse_set<Entity>::end() - *length,
                 std::tuple_cat([length = *length](auto *cpool) {
-                    if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
+                    if constexpr(is_eto_eligible_v<typename std::decay_t<decltype(*cpool)>::object_type>) {
                         return std::make_tuple();
                     } else {
                         return std::make_tuple(cpool->end() - length);
                     }
                 }(std::get<pool_type<Owned> *>(pools))...),
                 std::tuple_cat([](auto *cpool) {
-                    if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
+                    if constexpr(is_eto_eligible_v<typename std::decay_t<decltype(*cpool)>::object_type>) {
                         return std::make_tuple();
                     } else {
                         return std::make_tuple(cpool);
@@ -704,14 +704,14 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
             return proxy_iterator{
                 std::get<0>(pools)->sparse_set<Entity>::end(),
                 std::tuple_cat([](auto *cpool) {
-                    if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
+                    if constexpr(is_eto_eligible_v<typename std::decay_t<decltype(*cpool)>::object_type>) {
                         return std::make_tuple();
                     } else {
                         return std::make_tuple(cpool->end());
                     }
                 }(std::get<pool_type<Owned> *>(pools))...),
                 std::tuple_cat([](auto *cpool) {
-                    if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
+                    if constexpr(is_eto_eligible_v<typename std::decay_t<decltype(*cpool)>::object_type>) {
                         return std::make_tuple();
                     } else {
                         return std::make_tuple(cpool);
@@ -1022,8 +1022,8 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        using owned_type_list = type_list_cat_t<std::conditional_t<ENTT_IS_EMPTY(Owned), type_list<>, type_list<Owned>>...>;
-        using get_type_list = type_list_cat_t<std::conditional_t<ENTT_IS_EMPTY(Get), type_list<>, type_list<Get>>...>;
+        using owned_type_list = type_list_cat_t<std::conditional_t<is_eto_eligible_v<Owned>, type_list<>, type_list<Owned>>...>;
+        using get_type_list = type_list_cat_t<std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<Get>>...>;
         traverse(std::move(func), owned_type_list{}, get_type_list{});
     }
 

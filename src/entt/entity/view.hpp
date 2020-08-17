@@ -159,7 +159,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
         class proxy_iterator {
             friend class view_proxy;
 
-            using ref_type = decltype(std::tuple_cat(std::declval<std::conditional_t<ENTT_IS_EMPTY(Component), std::tuple<>, std::tuple<pool_type<Component> *>>>()...));
+            using ref_type = decltype(std::tuple_cat(std::declval<std::conditional_t<is_eto_eligible_v<Component>, std::tuple<>, std::tuple<pool_type<Component> *>>>()...));
 
             proxy_iterator(proxy_view_iterator from, ref_type ref) ENTT_NOEXCEPT
                 : it{from},
@@ -170,12 +170,12 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
             using difference_type = std::ptrdiff_t;
             using value_type = decltype(std::tuple_cat(
                 std::declval<std::tuple<Entity>>(),
-                std::declval<std::conditional_t<ENTT_IS_EMPTY(Component), std::tuple<>, std::tuple<Component>>>()...
+                std::declval<std::conditional_t<is_eto_eligible_v<Component>, std::tuple<>, std::tuple<Component>>>()...
             ));
             using pointer = void;
             using reference = decltype(std::tuple_cat(
                 std::declval<std::tuple<Entity>>(),
-                std::declval<std::conditional_t<ENTT_IS_EMPTY(Component), std::tuple<>, std::tuple<Component &>>>()...
+                std::declval<std::conditional_t<is_eto_eligible_v<Component>, std::tuple<>, std::tuple<Component &>>>()...
             ));
             using iterator_category = std::input_iterator_tag;
 
@@ -216,7 +216,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             return proxy_iterator{first, std::tuple_cat([](auto *cpool) {
-                if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
+                if constexpr(is_eto_eligible_v<typename std::decay_t<decltype(*cpool)>::object_type>) {
                     return std::make_tuple();
                 } else {
                     return std::make_tuple(cpool);
@@ -226,7 +226,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             return proxy_iterator{last, std::tuple_cat([](auto *cpool) {
-                if constexpr(ENTT_IS_EMPTY(typename std::decay_t<decltype(*cpool)>::object_type)) {
+                if constexpr(is_eto_eligible_v<typename std::decay_t<decltype(*cpool)>::object_type>) {
                     return std::make_tuple();
                 } else {
                     return std::make_tuple(cpool);
@@ -601,7 +601,7 @@ public:
      */
     template<typename Comp, typename Func>
     void each(Func func) const {
-        using non_empty_type = type_list_cat_t<std::conditional_t<ENTT_IS_EMPTY(Component), type_list<>, type_list<Component>>...>;
+        using non_empty_type = type_list_cat_t<std::conditional_t<is_eto_eligible_v<Component>, type_list<>, type_list<Component>>...>;
         traverse<Comp>(std::move(func), non_empty_type{});
     }
 
@@ -679,7 +679,7 @@ public:
      */
     template<typename Func>
     void chunked(Func func) const {
-        using non_empty_type = type_list_cat_t<std::conditional_t<ENTT_IS_EMPTY(Component), type_list<>, type_list<Component>>...>;
+        using non_empty_type = type_list_cat_t<std::conditional_t<is_eto_eligible_v<Component>, type_list<>, type_list<Component>>...>;
         view = candidate();
         iterate(std::move(func), non_empty_type{});
     }
@@ -736,7 +736,7 @@ class basic_view<Entity, exclude_t<>, Component> {
             friend class view_proxy;
 
             using it_type = std::conditional_t<
-                ENTT_IS_EMPTY(Component),
+                is_eto_eligible_v<Component>,
                 std::tuple<typename sparse_set<Entity>::iterator>,
                 std::tuple<typename sparse_set<Entity>::iterator, decltype(std::declval<pool_type>().begin())>
             >;
@@ -747,9 +747,9 @@ class basic_view<Entity, exclude_t<>, Component> {
 
         public:
             using difference_type = std::ptrdiff_t;
-            using value_type = std::conditional_t<ENTT_IS_EMPTY(Component), std::tuple<Entity>, std::tuple<Entity, Component>>;
+            using value_type = std::conditional_t<is_eto_eligible_v<Component>, std::tuple<Entity>, std::tuple<Entity, Component>>;
             using pointer = void;
-            using reference = std::conditional_t<ENTT_IS_EMPTY(Component), std::tuple<Entity>, std::tuple<Entity, Component &>>;
+            using reference = std::conditional_t<is_eto_eligible_v<Component>, std::tuple<Entity>, std::tuple<Entity, Component &>>;
             using iterator_category = std::input_iterator_tag;
 
             proxy_iterator & operator++() ENTT_NOEXCEPT {
@@ -785,7 +785,7 @@ class basic_view<Entity, exclude_t<>, Component> {
         using iterator = proxy_iterator;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            if constexpr(ENTT_IS_EMPTY(Component)) {
+            if constexpr(is_eto_eligible_v<Component>) {
                 return proxy_iterator{std::make_tuple(pool->sparse_set<entity_type>::begin())};
             } else {
                 return proxy_iterator{std::make_tuple(pool->sparse_set<entity_type>::begin(), pool->begin())};
@@ -793,7 +793,7 @@ class basic_view<Entity, exclude_t<>, Component> {
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            if constexpr(ENTT_IS_EMPTY(Component)) {
+            if constexpr(is_eto_eligible_v<Component>) {
                 return proxy_iterator{std::make_tuple(pool->sparse_set<entity_type>::end())};
             } else {
                 return proxy_iterator{std::make_tuple(pool->sparse_set<entity_type>::end(), pool->end())};
@@ -1031,7 +1031,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(ENTT_IS_EMPTY(Component)) {
+        if constexpr(is_eto_eligible_v<Component>) {
             if constexpr(std::is_invocable_v<Func>) {
                 for(auto pos = pool->size(); pos; --pos) {
                     func();
