@@ -52,6 +52,7 @@ I hope this list can grow much more in the future:
     football game.
   * [DungeonSlayer](https://github.com/alohaeee/DungeonSlayer): 2D game made
     from scratch in C++.
+  * [3DGame](https://github.com/kwarkGorny/3DGame): 2.5D top-down space shooter.
 
 * Engines and the like:
   * [Fling Engine](https://github.com/flingengine/FlingEngine): a Vulkan game
