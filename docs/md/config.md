@@ -97,7 +97,7 @@ This option is meant to disable all controls.
 
 In order to reduce memory consumption and increase performance, empty types are
 never stored by the ECS module of `EnTT`.<br/>
-Use thi svariable to treat these types like all others and therefore to create a
+Use this variable to treat these types like all others and therefore to create a
 dedicated storage for them.
 
 ## ENTT_STANDARD_CPP
