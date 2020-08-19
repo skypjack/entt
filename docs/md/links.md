@@ -100,8 +100,10 @@ I hope this list can grow much more in the future:
   * [Conan Adventures (SFML and EnTT in C++)](https://leinnan.github.io/blog/conan-adventuressfml-and-entt-in-c.html):
     create projects in modern C++ using `SFML`, `EnTT`, `Conan` and `CMake`.
   * [Adding EnTT ECS to Chrysalis](https://www.tauradius.com/post/adding-an-ecs-to-chrysalis/):
-    a blog entry about the process followed and the results of the integration
-    of `EnTT` into `Chrysalis`.
+    a blog entry (and its 
+    [follow-up](https://www.tauradius.com/post/chrysalis-update-2020-08-02/)) 
+    about the integration of `EnTT` into `Chrysalis`, an action RPG SDK for
+    CRYENGINE games.
   * [Creating Minecraft in One Week with C++ and Vulkan](https://vazgriz.com/189/creating-minecraft-in-one-week-with-c-and-vulkan/):
     a crack at recreating Minecraft in one week using a custom C++ engine and
     Vulkan ([code included](https://github.com/vazgriz/VoxelGame)).
@@ -112,7 +114,8 @@ I hope this list can grow much more in the future:
     - [The ENTITY Class](https://www.youtube.com/watch?v=GfSzeAcsBb0).
     - [Camera Systems](https://www.youtube.com/watch?v=ubZn7BlrnTU).
     - [Scene Camera](https://www.youtube.com/watch?v=UKVFRRufKzo).
-    - [Native Scripting](https://www.youtube.com/watch?v=iIUhg88MK5M)
+    - [Native Scripting](https://www.youtube.com/watch?v=iIUhg88MK5M).
+    - [Native Scripting (now with virtual functions!)](https://www.youtube.com/watch?v=1cHEcrIn8IQ).
   * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect):
     project retrospect by [Eric Hildebrand](https://www.erichildebrand.net/).
 
