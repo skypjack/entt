@@ -102,10 +102,10 @@ Here is a brief, yet incomplete list of what it offers today:
 Consider this list a work in progress as well as the project. The whole API is
 fully documented in-code for those who are brave enough to read it.
 
-Currently, `EnTT` is tested on Linux, Microsoft Windows and OSX. It has proven
-to work also on both Android and iOS.<br/>
-Most likely it won't be problematic on other systems as well, but it hasn't been
-sufficiently tested so far.
+It is also known that `EnTT` (version 3) is used in **Minecraft**.<br/>
+Given that the game is available literally everywhere, I can confidently say 
+that the library has been sufficiently tested on every platform that can come to 
+mind.
 
 ## Code Example
 
