@@ -8,7 +8,7 @@ struct another_event {};
 struct one_more_event {};
 
 struct receiver {
-    static void forward(entt::dispatcher &dispatcher, const an_event &event) {
+    static void forward(entt::dispatcher &dispatcher, an_event &event) {
         dispatcher.enqueue(event);
     }
 

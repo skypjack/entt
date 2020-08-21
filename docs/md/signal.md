@@ -387,9 +387,9 @@ entt::dispatcher dispatcher{};
 ```
 
 In order to register an instance of a class to a dispatcher, its type must
-expose one or more member functions the arguments of which are such that
-`const E &` can be converted to them for each type of event `E`, no matter what
-the return value is.<br/>
+expose one or more member functions the arguments of which are such that `E &`
+can be converted to them for each type of event `E`, no matter what the return
+value is.<br/>
 The name of the member function aimed to receive the event must be provided to
 the `connect` member function of the sink in charge for the specific event:
 

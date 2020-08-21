@@ -23,7 +23,7 @@ namespace entt {
  * events to be published all together once per tick.<br/>
  * Listeners are provided in the form of member functions. For each event of
  * type `Event`, listeners are such that they can be invoked with an argument of
- * type `const Event &`, no matter what the return type is.
+ * type `Event &`, no matter what the return type is.
  *
  * The dispatcher creates instances of the `sigh` class internally. Refer to the
  * documentation of the latter for more details.
@@ -39,7 +39,7 @@ class dispatcher {
 
     template<typename Event>
     struct pool_handler final: basic_pool {
-        using signal_type = sigh<void(const Event &)>;
+        using signal_type = sigh<void(Event &)>;
         using sink_type = typename signal_type::sink_type;
 
         void publish() override {
@@ -66,7 +66,8 @@ class dispatcher {
 
         template<typename... Args>
         void trigger(Args &&... args) {
-            signal.publish(Event{std::forward<Args>(args)...});
+            Event instance{std::forward<Args>(args)...};
+            signal.publish(instance);
         }
 
         template<typename... Args>
@@ -115,9 +116,9 @@ public:
      *
      * A sink is an opaque object used to connect listeners to events.
      *
-     * The function type for a listener is:
+     * The function type for a listener is _compatible_ with:
      * @code{.cpp}
-     * void(const Event &);
+     * void(Event &);
      * @endcode
      *
      * The order of invocation of the listeners isn't guaranteed.
