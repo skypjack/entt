@@ -477,9 +477,9 @@ The full list of accepted types of events isn't required. Handlers are created
 internally on the fly and thus each type of event is accepted by default.
 
 Whenever an event is published, an emitter provides the listeners with a
-reference to itself along with a const reference to the event. Therefore
-listeners have an handy way to work with it without incurring in the need of
-capturing a reference to the emitter itself.<br/>
+reference to itself along with a reference to the event. Therefore listeners
+have an handy way to work with it without incurring in the need of capturing a
+reference to the emitter itself.<br/>
 In addition, an opaque object is returned each time a connection is established
 between an emitter and a listener, allowing the caller to disconnect them at a
 later time.<br/>
@@ -493,10 +493,10 @@ my_emitter emitter{};
 ```
 
 Listeners must be movable and callable objects (free functions, lambdas,
-functors, `std::function`s, whatever) whose function type is:
+functors, `std::function`s, whatever) whose function type is compatible with:
 
 ```cpp
-void(const Event &, my_emitter &)
+void(Event &, my_emitter &)
 ```
 
 Where `Event` is the type of event they want to listen.<br/>

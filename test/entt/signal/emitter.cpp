@@ -13,7 +13,7 @@ TEST(Emitter, Clear) {
 
     ASSERT_TRUE(emitter.empty());
 
-    emitter.on<foo_event>([](const auto &, const auto &){});
+    emitter.on<foo_event>([](auto &, const auto &){});
     emitter.once<quux_event>([](const auto &, const auto &){});
 
     ASSERT_FALSE(emitter.empty());
@@ -35,7 +35,7 @@ TEST(Emitter, Clear) {
     ASSERT_FALSE(emitter.empty<quux_event>());
     ASSERT_TRUE(emitter.empty<bar_event>());
 
-    emitter.on<foo_event>([](const auto &, const auto &){});
+    emitter.on<foo_event>([](auto &, const auto &){});
     emitter.on<bar_event>([](const auto &, const auto &){});
 
     ASSERT_FALSE(emitter.empty());
@@ -55,8 +55,8 @@ TEST(Emitter, ClearPublishing) {
 
     ASSERT_TRUE(emitter.empty());
 
-    emitter.once<foo_event>([](const auto &, auto &em){
-        em.template once<foo_event>([](const auto &, auto &){});
+    emitter.once<foo_event>([](auto &, auto &em){
+        em.template once<foo_event>([](auto &, auto &){});
         em.template clear<foo_event>();
     });
 
@@ -76,7 +76,7 @@ TEST(Emitter, ClearPublishing) {
 TEST(Emitter, On) {
     test_emitter emitter;
 
-    emitter.on<foo_event>([](const auto &, const auto &){});
+    emitter.on<foo_event>([](auto &, const auto &){});
 
     ASSERT_FALSE(emitter.empty());
     ASSERT_FALSE(emitter.empty<foo_event>());
@@ -104,7 +104,7 @@ TEST(Emitter, Once) {
 TEST(Emitter, OnceAndErase) {
     test_emitter emitter;
 
-    auto conn = emitter.once<foo_event>([](const auto &, const auto &){});
+    auto conn = emitter.once<foo_event>([](auto &, const auto &){});
 
     ASSERT_FALSE(emitter.empty());
     ASSERT_FALSE(emitter.empty<foo_event>());

@@ -33,9 +33,9 @@ namespace entt {
  * Pools for the type of events are created internally on the fly. It's not
  * required to specify in advance the full list of accepted types.<br/>
  * Moreover, whenever an event is published, an emitter provides the listeners
- * with a reference to itself along with a const reference to the event.
- * Therefore listeners have an handy way to work with it without incurring in
- * the need of capturing a reference to the emitter.
+ * with a reference to itself along with a reference to the event. Therefore
+ * listeners have an handy way to work with it without incurring in the need of 
+ * capturing a reference to the emitter.
  *
  * @tparam Derived Actual type of emitter that extends the class template.
  */
@@ -50,7 +50,7 @@ class emitter {
 
     template<typename Event>
     struct pool_handler final: basic_pool {
-        using listener_type = std::function<void(const Event &, Derived &)>;
+        using listener_type = std::function<void(Event &, Derived &)>;
         using element_type = std::pair<bool, listener_type>;
         using container_type = std::list<element_type>;
         using connection_type = typename container_type::iterator;
@@ -95,7 +95,7 @@ class emitter {
             }
         }
 
-        void publish(const Event &event, Derived &ref) {
+        void publish(Event &event, Derived &ref) {
             container_type swap_list;
             once_list.swap(swap_list);
 
@@ -209,7 +209,8 @@ public:
      */
     template<typename Event, typename... Args>
     void publish(Args &&... args) {
-        assure<Event>().publish(Event{std::forward<Args>(args)...}, *static_cast<Derived *>(this));
+        Event instance{std::forward<Args>(args)...};
+        assure<Event>().publish(instance, *static_cast<Derived *>(this));
     }
 
     /**
@@ -221,7 +222,7 @@ public:
      * to be used later to disconnect the listener if required.
      *
      * The listener is as a callable object that can be moved and the type of
-     * which is `void(const Event &, Derived &)`.
+     * which is _compatible_ with `void(Event &, Derived &)`.
      *
      * @note
      * Whenever an event is emitted, the emitter provides the listener with a
@@ -246,7 +247,7 @@ public:
      * to be used later to disconnect the listener if required.
      *
      * The listener is as a callable object that can be moved and the type of
-     * which is `void(const Event &, Derived &)`.
+     * which is _compatible_ with `void(Event &, Derived &)`.
      *
      * @note
      * Whenever an event is emitted, the emitter provides the listener with a
