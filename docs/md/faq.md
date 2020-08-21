@@ -13,6 +13,7 @@
   * [Warning C4307: integral constant overflow](#warning-C4307-integral-constant-overflow)
   * [Warning C4003: the min, the max and the macro](#warning-C4003-the-min-the-max-and-the-macro)
   * [The standard and the non-copyable types](#the-standard-and-the-non-copyable-types)
+  * [Which functions trigger which signals](#which-functions-trigger-which-signals)
 <!--
 @endcond TURN_OFF_DOXYGEN
 -->
@@ -194,3 +195,24 @@ struct type {
 ```
 
 Unfortunately, this will also disable aggregate initialization.
+
+## Which functions trigger which signals
+
+The `registry` class offers three signals that are emitted following specific
+operations. Maybe not everyone knows what these operations are, though.<br/>
+If this isn't clear, below you can find a _vademecum_ for this purpose:
+
+* `on_created` is invoked when a component is first added (neither modified nor 
+  replaced) to an entity.
+* `on_update` is called whenever an existing component is modified or replaced.
+* `on_destroyed` is called when a component is explicitly or implicitly removed 
+  from an entity.
+
+Among the most controversial functions can be found `emplace_or_replace` and
+`destroy`. However, following the above rules, it's quite simple to know what 
+will happen.<br/>
+In the first case, `on_created` is invoked if the entity has not the component,
+otherwise the latter is replaced and therefore `on_update` is triggered. As for
+the second case, components are removed from their entities and thus freed when
+they are recycled. It means that `on_destroyed` is triggered for every component 
+owned by the entity that is destroyed.

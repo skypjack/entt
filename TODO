@@ -22,3 +22,6 @@ WIP:
 * add example: 64 bit ids with 32 bits reserved for users' purposes
 * composable views and "faster views", deprecate non-owning groups
 * offset instead of pages in the sparse set? top level mask for sparse sets?
+* add meta dynamic cast (search base for T in parent, we have the meta type already)
+* make meta base/conv node work with storage/any
+* deprecate/remove meta_base, meta_conv, ...
