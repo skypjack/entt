@@ -132,7 +132,7 @@ class emitter {
             const auto index = type_index<Event>::value();
 
             if(!(index < pools.size())) {
-                pools.resize(index+1);
+                pools.resize(index+1u);
             }
 
             if(!pools[index]) {
