@@ -116,6 +116,7 @@ I hope this list can grow much more in the future:
     - [Scene Camera](https://www.youtube.com/watch?v=UKVFRRufKzo).
     - [Native Scripting](https://www.youtube.com/watch?v=iIUhg88MK5M).
     - [Native Scripting (now with virtual functions!)](https://www.youtube.com/watch?v=1cHEcrIn8IQ).
+    - [Scene Hierarchy Panel](https://www.youtube.com/watch?v=wziDnE8guvI).
   * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect):
     project retrospect by [Eric Hildebrand](https://www.erichildebrand.net/).
 
