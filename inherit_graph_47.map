@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structentt_1_1matcher.html" title="Grouping matcher." alt="" coords="5,5,153,32"/>
+<area shape="rect" id="node1" href="$structentt_1_1internal_1_1basic__container.html" title=" " alt="" coords="5,20,172,76"/>
+<area shape="rect" id="node2" href="$structentt_1_1internal_1_1container__traits.html" title=" " alt="" coords="220,5,487,91"/>
+<area shape="rect" id="node3" href="$structentt_1_1meta__sequence__container__traits_3_01std_1_1array_3_01Type_00_01N_01_4_01_4.html" title="Meta sequence container traits for std::arrays of any type." alt="" coords="535,20,701,76"/>
 </map>

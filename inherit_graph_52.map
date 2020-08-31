@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structentt_1_1meta__ctor.html" title="Opaque container for meta constructors." alt="" coords="5,5,128,32"/>
+<area shape="rect" id="node1" href="$structentt_1_1internal_1_1basic__container.html" title=" " alt="" coords="5,35,180,91"/>
+<area shape="rect" id="node2" href="$structentt_1_1internal_1_1container__traits.html" title=" " alt="" coords="228,5,487,120"/>
+<area shape="rect" id="node3" href="$structentt_1_1meta__sequence__container__traits_3_01std_1_1vector_3_01Type_00_01Args_8_8_8_01_4_01_4.html" title="Meta sequence container traits for std::vectors of any type." alt="" coords="535,35,729,91"/>
 </map>

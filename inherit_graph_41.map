@@ -1,5 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" title=" " alt="" coords="5,75,89,102"/>
-<area shape="rect" id="node2" href="$structentt_1_1has__type__index_3_01Type_00_01std_1_1void__t_3_01decltype_07type__index_3_01Type_01_4_1_1value_07_08_08_4_01_4.html" title="has_type_index" alt="" coords="159,5,330,76"/>
-<area shape="rect" id="node3" href="$structentt_1_1is__equality__comparable_3_01Type_00_01std_1_1void__t_3_01decltype_07std_1_1declva46aebf4c20f38cbd0108d1e297595736.html" title="Provides the member constant value to true if a given type is equality comparable,..." alt="" coords="137,100,352,171"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,207,96,233"/>
+<area shape="rect" id="node2" href="$structentt_1_1has__meta__associative__container__traits.html" title="Provides the member constant value to true if support for meta associative containers is enabled for ..." alt="" coords="161,5,377,61"/>
+<area shape="rect" id="node3" href="$structentt_1_1has__meta__sequence__container__traits.html" title="Provides the member constant value to true if support for meta sequence containers is enabled for the..." alt="" coords="175,85,364,141"/>
+<area shape="rect" id="node4" href="$structentt_1_1has__type__index.html" title="Provides the member constant value to true if a given type is indexable, false otherwise." alt="" coords="173,166,365,207"/>
+<area shape="rect" id="node5" href="$structentt_1_1is__equality__comparable.html" title="Provides the member constant value to true if a given type is equality comparable,..." alt="" coords="164,231,375,273"/>
+<area shape="rect" id="node6" href="$structentt_1_1is__key__only__meta__associative__container_3_01Type_00_01std_1_1void__t_3_01typen8fdfab51b1c3e3be6b1d16233dc1b887.html" title="Provides the member constant value to true if a meta associative container claims to wrap a key&#45;only ..." alt="" coords="144,297,395,383"/>
+<area shape="rect" id="node7" href="$structentt_1_1is__meta__pointer__like.html" title="Provides the member constant value to true if a given type is a pointer&#45;like type from the point of v..." alt="" coords="189,407,350,449"/>
 </map>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['member_5fclass_5ft_672',['member_class_t',['../namespaceentt.html#a49f19d031690e5ebfffd6c7a4f6bd364',1,'entt']]]
+  ['listener_831',['listener',['../classentt_1_1emitter.html#a1200216d9abb1adb18db6035d99b60da',1,'entt::emitter']]]
 ];
