@@ -61,10 +61,6 @@ using observer = basic_observer<entity>;
 
 
 /*! @brief Alias declaration for the most common use case. */
-using actor [[deprecated("Consider using the handle class instead")]] = basic_actor<entity>;
-
-
-/*! @brief Alias declaration for the most common use case. */
 using handle = basic_handle<entity>;
 
 
