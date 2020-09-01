@@ -212,9 +212,16 @@ class basic_observer {
 
     template<typename... Reject, typename... Require, typename... NoneOf, typename... AllOf>
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, type_list<NoneOf...>, AllOf...>> {
-        template<std::size_t Index>
+        template<std::size_t Index, typename... Ignore>
         static void maybe_valid_if(basic_observer &obs, const basic_registry<Entity> &reg, const Entity entt) {
-            if(reg.template has<AllOf..., Require...>(entt) && !reg.template any<NoneOf..., Reject...>(entt)) {
+            if([&reg, entt]() {
+                if constexpr(sizeof...(Ignore) == 0) {
+                    return reg.template has<AllOf..., Require...>(entt) && !reg.template any<NoneOf..., Reject...>(entt);
+                } else {
+                    return reg.template has<AllOf..., Require...>(entt) && ((std::is_same_v<Ignore..., NoneOf> || !reg.template any<NoneOf>(entt)) && ...) && !reg.template any<Reject...>(entt);
+                }
+            }())
+            {
                 if(auto *comp = obs.view.try_get(entt); !comp) {
                     obs.view.emplace(entt);
                 }
@@ -235,7 +242,7 @@ class basic_observer {
             (reg.template on_destroy<Require>().template connect<&discard_if<Index>>(obs), ...);
             (reg.template on_construct<Reject>().template connect<&discard_if<Index>>(obs), ...);
             (reg.template on_construct<AllOf>().template connect<&maybe_valid_if<Index>>(obs), ...);
-            (reg.template on_destroy<NoneOf>().template connect<&maybe_valid_if<Index>>(obs), ...);
+            (reg.template on_destroy<NoneOf>().template connect<&maybe_valid_if<Index, NoneOf>>(obs), ...);
             (reg.template on_destroy<AllOf>().template connect<&discard_if<Index>>(obs), ...);
             (reg.template on_construct<NoneOf>().template connect<&discard_if<Index>>(obs), ...);
         }

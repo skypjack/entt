@@ -340,3 +340,30 @@ TEST(Observer, MultipleFilters) {
 
     ASSERT_TRUE(observer.empty());
 }
+
+TEST(Observer, GroupCornerCase) {
+    constexpr auto add_collector =  entt::collector.group<int>(entt::exclude<char>);
+    constexpr auto remove_collector =  entt::collector.group<int, char>();
+
+    entt::registry registry;
+    entt::observer add_observer{registry, add_collector};
+    entt::observer remove_observer{registry, remove_collector};
+
+    const auto entity = registry.create();
+    registry.emplace<int>(entity);
+
+    ASSERT_FALSE(add_observer.empty());
+    ASSERT_TRUE(remove_observer.empty());
+
+    add_observer.clear();
+    registry.emplace<char>(entity);
+
+    ASSERT_TRUE(add_observer.empty());
+    ASSERT_FALSE(remove_observer.empty());
+
+    remove_observer.clear();
+    registry.remove<char>(entity);
+
+    ASSERT_FALSE(add_observer.empty());
+    ASSERT_TRUE(remove_observer.empty());
+}
