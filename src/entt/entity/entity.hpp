@@ -32,32 +32,6 @@ struct entt_traits<Type, std::enable_if_t<std::is_enum_v<Type>>>
 
 
 /**
- * @brief Entity traits for a 16 bits entity identifier.
- *
- * A 16 bits entity identifier guarantees:
- *
- * * 12 bits for the entity number (up to 4k entities).
- * * 4 bit for the version (resets in [0-15]).
- */
-template<>
-struct entt_traits<std::uint16_t> {
-    /*! @brief Underlying entity type. */
-    using entity_type = std::uint16_t;
-    /*! @brief Underlying version type. */
-    using version_type = std::uint8_t;
-    /*! @brief Difference type. */
-    using difference_type = std::int16_t;
-
-    /*! @brief Mask to use to get the entity number out of an identifier. */
-    static constexpr entity_type entity_mask = 0xFFF;
-    /*! @brief Mask to use to get the version out of an identifier. */
-    static constexpr entity_type version_mask = 0xF;
-    /*! @brief Extent of the entity number within an identifier. */
-    static constexpr std::size_t entity_shift = 12u;
-};
-
-
-/**
  * @brief Entity traits for a 32 bits entity identifier.
  *
  * A 32 bits entity identifier guarantees:
