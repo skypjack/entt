@@ -11,7 +11,7 @@ int curried_by_ref(const int &i, int j) {
 }
 
 int curried_by_ptr(const int *i, int j) {
-    return (*i)+j;
+    return (*i)*j;
 }
 
 int non_const_reference(int &i) {
@@ -181,16 +181,16 @@ TEST(Delegate, Comparison) {
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
 
-    lhs.connect([](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->identity(val); }, &functor);
+    lhs.connect([](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->identity(val) * val; }, &functor);
 
-    ASSERT_NE(lhs, (entt::delegate<int(int)>{[](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->identity(val); }, &functor}));
+    ASSERT_NE(lhs, (entt::delegate<int(int)>{[](const void *, int val) { return val + val; }, &functor}));
     ASSERT_TRUE(lhs != rhs);
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
 
-    rhs.connect([](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->identity(val); }, &functor);
+    rhs.connect([](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->identity(val) + val; }, &functor);
 
-    ASSERT_NE(rhs, (entt::delegate<int(int)>{[](const void *ptr, int val) { return static_cast<const delegate_functor *>(ptr)->identity(val); }, &functor}));
+    ASSERT_NE(rhs, (entt::delegate<int(int)>{[](const void *, int val) { return val * val; }, &functor}));
     ASSERT_TRUE(lhs != rhs);
     ASSERT_FALSE(lhs == rhs);
     ASSERT_NE(lhs, rhs);
@@ -329,7 +329,7 @@ TEST(Delegate, CurriedFunction) {
     delegate.connect<&curried_by_ptr>(&value);
 
     ASSERT_TRUE(delegate);
-    ASSERT_EQ(delegate(2), 5);
+    ASSERT_EQ(delegate(2), 6);
 }
 
 TEST(Delegate, Constructors) {
@@ -351,7 +351,7 @@ TEST(Delegate, Constructors) {
     ASSERT_EQ(5, ref(3));
 
     ASSERT_TRUE(ptr);
-    ASSERT_EQ(5, ref(3));
+    ASSERT_EQ(6, ptr(3));
 
     ASSERT_TRUE(member);
     ASSERT_EQ(6, member(3));
