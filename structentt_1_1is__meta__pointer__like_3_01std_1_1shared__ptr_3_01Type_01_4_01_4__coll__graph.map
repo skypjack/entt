@@ -1,4 +1,4 @@
 <map id="entt::is_meta_pointer_like&lt; std::shared_ptr&lt; Type &gt; &gt;" name="entt::is_meta_pointer_like&lt; std::shared_ptr&lt; Type &gt; &gt;">
-<area shape="rect" id="node1" title="Makes std::shared_ptrs of any type pointer&#45;like types for the meta system." alt="" coords="5,80,169,136"/>
-<area shape="rect" id="node2" title=" " alt="" coords="45,5,129,32"/>
+<area shape="rect" id="node1" title="Makes std::shared_ptrs of any type pointer&#45;like types for the meta system." alt="" coords="5,80,153,136"/>
+<area shape="rect" id="node2" title=" " alt="" coords="41,5,117,32"/>
 </map>
