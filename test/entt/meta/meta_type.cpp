@@ -270,6 +270,9 @@ TEST_F(MetaType, Func) {
     ASSERT_TRUE(type.func("func"_hs));
     ASSERT_TRUE(type.func("member"_hs).invoke(instance));
     ASSERT_TRUE(type.func("func"_hs).invoke({}));
+
+    ASSERT_TRUE(type.invoke("member"_hs, instance));
+    ASSERT_TRUE(type.invoke("func"_hs, {}));
 }
 
 TEST_F(MetaType, Construct) {

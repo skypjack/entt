@@ -297,6 +297,48 @@ public:
     }
 
     /**
+     * @copybrief invoke
+     *
+     * @sa invoke
+     *
+     * @param id identifier of function to invoke.
+     * @tparam Args Types of arguments to use to invoke the function.
+     * @param instance An opaque instance of the underlying type.
+     * @param args Parameters to use to invoke the function.
+     * @return A meta any containing the new instance, if any.
+     */
+    template<typename... Args>
+    meta_any invoke(const id_type id, Args &&... args) const;
+
+    /**
+     * @brief Sets the value of a given variable.
+     *
+     * It must be possible to cast the instance to the parent type of the meta
+     * data. Otherwise, invoking the setter results in an undefined
+     * behavior.<br/>
+     * The type of the value must be such that a cast or conversion to the type
+     * of the variable is possible. Otherwise, invoking the setter does nothing.
+     *
+     * @tparam Type Type of value to assign.
+     * @param id identifier of the variable to set.
+     * @param value Parameter to use to set the underlying variable.
+     * @return True in case of success, false otherwise.
+     */
+    template<typename Type>
+    bool set(const id_type id, Type &&value) const;
+
+    /**
+     * @brief Gets the value of a given variable.
+     *
+     * It must be possible to cast the instance to the parent type of the meta
+     * data. Otherwise, invoking the getter results in an undefined behavior.
+     *
+     * @param id identifier of the variable to get.
+     * @return A meta any containing the value of the underlying variable.
+     */
+    [[nodiscard]] meta_any get(const id_type id) const;
+
+    /**
      * @brief Tries to cast an instance to a given type.
      * @tparam Type Type to which to cast the instance.
      * @return A (possibly null) pointer to the contained instance.
@@ -1306,6 +1348,80 @@ public:
     }
 
     /**
+     * @brief Invokes the function with the given identifier, if possible.
+     *
+     * To invoke a meta function, the parameters must be such that a cast or
+     * conversion to the required types is possible. Otherwise, an empty and
+     * thus invalid wrapper is returned.<br/>
+     * It must be possible to cast the instance to the parent type of the meta
+     * function. Otherwise, invoking the underlying function results in an
+     * undefined behavior.
+     *
+     * @param id identifier of function to invoke.
+     * @param instance An opaque instance of the underlying type.
+     * @param args Parameters to use to invoke the function.
+     * @param sz Number of parameters to use to invoke the function.
+     * @return A meta any containing the returned value, if any.
+     */
+    [[nodiscard]] meta_any invoke(const id_type id, meta_handle instance, meta_any * const args, const std::size_t sz) const {
+        auto const f = func(id);
+        return f ? f.invoke(instance, args, sz) : meta_any{};
+    }
+
+    /**
+     * @copybrief invoke
+     *
+     * @sa invoke
+     *
+     * @param id identifier of function to invoke.
+     * @tparam Args Types of arguments to use to invoke the function.
+     * @param instance An opaque instance of the underlying type.
+     * @param args Parameters to use to invoke the function.
+     * @return A meta any containing the new instance, if any.
+     */
+    template<typename... Args>
+    meta_any invoke(const id_type id, meta_handle instance, Args &&... args) const {
+        std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
+        return invoke(id, instance, arguments.data(), sizeof...(Args));
+    }
+
+    /**
+     * @brief Sets the value of a given variable.
+     *
+     * It must be possible to cast the instance to the parent type of the meta
+     * data. Otherwise, invoking the setter results in an undefined
+     * behavior.<br/>
+     * The type of the value must be such that a cast or conversion to the type
+     * of the variable is possible. Otherwise, invoking the setter does nothing.
+     *
+     * @tparam Type Type of value to assign.
+     * @param id identifier of the variable to set.
+     * @param instance An opaque instance of the underlying type.
+     * @param value Parameter to use to set the underlying variable.
+     * @return True in case of success, false otherwise.
+     */
+    template<typename Type>
+    bool set(const id_type id, meta_handle instance, Type &&value) const {
+        auto const d = data(id);
+        return d ? d.set(std::move(instance), std::forward<Type>(value)) : false;
+    }
+
+    /**
+     * @brief Gets the value of a given variable.
+     *
+     * It must be possible to cast the instance to the parent type of the meta
+     * data. Otherwise, invoking the getter results in an undefined behavior.
+     *
+     * @param id identifier of the variable to get.
+     * @param instance An opaque instance of the underlying type.
+     * @return A meta any containing the value of the underlying variable.
+     */
+    [[nodiscard]] meta_any get(const id_type id, meta_handle instance) const {
+        auto const d = data(id);
+        return d ? d.get(std::move(instance)) : meta_any{};
+    }
+
+    /**
      * @brief Returns a range to use to visit top-level meta properties.
      * @return An iterable range to use to visit top-level meta properties.
      */
@@ -1406,6 +1522,23 @@ private:
 
 [[nodiscard]] inline meta_type meta_any::type() const ENTT_NOEXCEPT {
     return node;
+}
+
+
+template<typename... Args>
+meta_any meta_any::invoke(const id_type id, Args &&... args) const {
+    return type().invoke(id, *this, std::forward<Args>(args)...);
+}
+
+
+template<typename Type>
+bool meta_any::set(const id_type id, Type &&value) const {
+    return type().set(id, *this, std::forward<Type>(value));
+}
+
+
+[[nodiscard]] inline meta_any meta_any::get(const id_type id) const {
+    return type().get(id, *this);
 }
 
 
