@@ -5,6 +5,17 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 
+
+struct clazz_t {
+    clazz_t() = default;
+
+    void member(int i) { value = i; }
+    static void func() { c = 'd'; }
+
+	static inline char c = 'c';
+    int value = 0;
+};
+
 struct empty_t {
     virtual ~empty_t() = default;
     static void destroy(empty_t &) {
@@ -46,6 +57,12 @@ struct MetaAny: ::testing::Test {
         entt::meta<double>().conv<int>();
         entt::meta<empty_t>().dtor<&empty_t::destroy>();
         entt::meta<fat_t>().base<empty_t>().dtor<&fat_t::destroy>();
+
+        entt::meta<clazz_t>()
+                .type("clazz"_hs)
+                .data<&clazz_t::value>("value"_hs)
+                .func<&clazz_t::member>("member"_hs)
+                .func<&clazz_t::func>("func"_hs);
     }
 
     void SetUp() override {
@@ -621,4 +638,33 @@ TEST_F(MetaAny, UnmanageableType) {
 
     ASSERT_TRUE(std::as_const(any).convert<unmanageable_t>());
     ASSERT_FALSE(std::as_const(any).convert<int>());
+}
+
+TEST_F(MetaAny, FuncInvokeShortcut) {
+    clazz_t instance;
+    entt::meta_any any{std::ref(instance)};
+
+	ASSERT_TRUE(any.invoke("func"_hs));
+	ASSERT_TRUE(any.invoke("member"_hs, 42));
+	ASSERT_FALSE(any.invoke("non_existent"_hs, 42));
+
+	ASSERT_EQ(clazz_t::c, 'd');
+	ASSERT_EQ(instance.value, 42);
+}
+
+TEST_F(MetaAny, DataAccessShortcut) {
+    clazz_t instance;
+    entt::meta_any any{std::ref(instance)};
+
+	ASSERT_TRUE(any.set("value"_hs, 42));
+
+	auto const value_any = any.get("value"_hs);
+
+	ASSERT_EQ(instance.value, 42);
+	ASSERT_TRUE(value_any);
+	ASSERT_TRUE(value_any.try_cast<int>());
+	ASSERT_EQ(value_any.cast<int>(), 42);
+
+	ASSERT_FALSE(any.set("non_existent"_hs, 42));
+	ASSERT_FALSE(any.get("non_existent"_hs));
 }
