@@ -5,26 +5,22 @@
 #include <entt/entity/registry.hpp>
 
 TEST(BasicHandle, Assumptions) {
-    static_assert(std::is_trivially_copyable_v<entt::handle>);
-    static_assert(std::is_trivially_assignable_v<entt::handle, entt::handle>);
     static_assert(std::is_trivially_destructible_v<entt::handle>);
 
-    static_assert(std::is_trivially_copyable_v<entt::const_handle>);
-    static_assert(std::is_trivially_assignable_v<entt::const_handle, entt::const_handle>);
     static_assert(std::is_trivially_destructible_v<entt::const_handle>);
 }
 
 TEST(BasicHandle, DeductionGuide) {
-    static_assert(std::is_same_v<decltype(entt::basic_handle{std::declval<entt::registry &>(), {}}), entt::basic_handle<entt::entity>>);
-    static_assert(std::is_same_v<decltype(entt::basic_handle{std::declval<const entt::registry &>(), {}}), entt::basic_handle<const entt::entity>>);
+    static_assert(std::is_same_v<decltype(entt::basic_handle{std::declval<entt::registry *>(), {}}), entt::basic_handle<entt::entity>>);
+    static_assert(std::is_same_v<decltype(entt::basic_handle{std::declval<const entt::registry *>(), {}}), entt::basic_handle<const entt::entity>>);
 }
 
 TEST(BasicHandle, Construction) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    entt::handle handle{registry, entity};
-    entt::const_handle chandle{std::as_const(registry), entity};
+    entt::handle handle{&registry, entity};
+    entt::const_handle chandle{&std::as_const(registry), entity};
 
     ASSERT_FALSE(entt::null == handle.entity());
     ASSERT_EQ(entity, handle);
@@ -36,8 +32,8 @@ TEST(BasicHandle, Construction) {
 
     ASSERT_EQ(handle, chandle);
 
-    static_assert(std::is_same_v<entt::registry &, decltype(handle.registry())>);
-    static_assert(std::is_same_v<const entt::registry &, decltype(chandle.registry())>);
+    static_assert(std::is_same_v<entt::registry *, decltype(handle.registry())>);
+    static_assert(std::is_same_v<const entt::registry *, decltype(chandle.registry())>);
 
     handle = entt::null;
 
@@ -51,7 +47,7 @@ TEST(BasicHandle, Construction) {
 TEST(BasicHandle, Component) {
     entt::registry registry;
     const auto entity = registry.create();
-    entt::handle handle{registry, entity};
+    entt::handle handle{&registry, entity};
 
     ASSERT_EQ(3, handle.emplace<int>(3));
     ASSERT_EQ('c', handle.emplace_or_replace<char>('c'));
@@ -93,7 +89,7 @@ TEST(BasicHandle, FromEntity) {
     registry.emplace<int>(entity, 42);
     registry.emplace<char>(entity, 'c');
 
-    entt::handle handle{registry, entity};
+    entt::handle handle{&registry, entity};
 
     ASSERT_TRUE(handle);
     ASSERT_EQ(entity, handle.entity());
@@ -105,7 +101,7 @@ TEST(BasicHandle, FromEntity) {
 TEST(BasicHandle, Lifetime) {
     entt::registry registry;
     const auto entity = registry.create();
-    auto *handle = new entt::handle{registry, entity};
+    auto *handle = new entt::handle{&registry, entity};
     handle->emplace<int>();
 
     ASSERT_FALSE(registry.empty<int>());
@@ -123,7 +119,7 @@ TEST(BasicHandle, Lifetime) {
 
 TEST(BasicHandle, ImplicitConversions) {
     entt::registry registry;
-    const entt::handle handle{registry, registry.create()};
+    const entt::handle handle{&registry, registry.create()};
     const entt::const_handle chandle = handle;
 
     handle.emplace<int>(42);
