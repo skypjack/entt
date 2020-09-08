@@ -1468,7 +1468,7 @@ public:
      * functions and properties, as well as its constructors, destructors and
      * conversion functions if any.<br/>
      * Base classes aren't reset but the link between the two types is removed.
-     * 
+     *
      * The meta type is also removed from the list of searchable types.
      */
     void reset() ENTT_NOEXCEPT {
@@ -1492,14 +1492,14 @@ public:
                 }
             }
         };
-        
+
         unregister_all(&node->prop);
         unregister_all(&node->base);
         unregister_all(&node->conv);
         unregister_all(&node->ctor, &internal::meta_ctor_node::prop);
         unregister_all(&node->data, &internal::meta_data_node::prop);
         unregister_all(&node->func, &internal::meta_func_node::prop);
-        
+
         node->id = {};
         node->dtor = nullptr;
     }
