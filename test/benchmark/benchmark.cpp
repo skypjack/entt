@@ -120,6 +120,44 @@ TEST(Benchmark, CreateManyWithComponents) {
     timer.elapsed();
 }
 
+TEST(Benchmark, Recycle) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Recycling 1000000 entities" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+
+    registry.each([&registry](auto entity) {
+        registry.destroy(entity);
+    });
+
+    timer timer;
+
+    for(auto next = entities.size(); next; --next) {
+        registry.create();
+    }
+
+    timer.elapsed();
+}
+
+TEST(Benchmark, RecycleMany) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Recycling 1000000 entities" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+
+    registry.each([&registry](auto entity) {
+        registry.destroy(entity);
+    });
+
+    timer timer;
+    registry.create(entities.begin(), entities.end());
+    timer.elapsed();
+}
+
 TEST(Benchmark, Destroy) {
     entt::registry registry;
 
