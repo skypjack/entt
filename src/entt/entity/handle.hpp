@@ -110,7 +110,7 @@ struct basic_handle {
     * @return True if the handle refers to null registry and null entity, false otherwise.
     */
     bool operator==(null_t) const ENTT_NOEXCEPT {
-        return reg && entt != null;
+        return !reg || entt == null;
     }
 
     /**
