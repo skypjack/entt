@@ -220,6 +220,20 @@ class basic_registry {
         return const_cast<pool_handler<Component> &>(std::as_const(*this).template assure<Component>());
     }
 
+    Entity generate_identifier() {
+        // traits_type::entity_mask is reserved to allow for null identifiers
+        ENTT_ASSERT(static_cast<typename traits_type::entity_type>(entities.size()) < traits_type::entity_mask);
+        return entities.emplace_back(entity_type{static_cast<typename traits_type::entity_type>(entities.size())});
+    }
+
+    Entity recycle_identifier() {
+        ENTT_ASSERT(destroyed != null);
+        const auto curr = to_integral(destroyed);
+        const auto version = to_integral(entities[curr]) & (traits_type::version_mask << traits_type::entity_shift);
+        destroyed = entity_type{to_integral(entities[curr]) & traits_type::entity_mask};
+        return entities[curr] = entity_type{curr | version};
+    }
+
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -471,20 +485,7 @@ public:
      * @return A valid entity identifier.
      */
     entity_type create() {
-        entity_type entt;
-
-        if(destroyed == null) {
-            entt = entities.emplace_back(entity_type{static_cast<typename traits_type::entity_type>(entities.size())});
-            // traits_type::entity_mask is reserved to allow for null identifiers
-            ENTT_ASSERT(to_integral(entt) < traits_type::entity_mask);
-        } else {
-            const auto curr = to_integral(destroyed);
-            const auto version = to_integral(entities[curr]) & (traits_type::version_mask << traits_type::entity_shift);
-            destroyed = entity_type{to_integral(entities[curr]) & traits_type::entity_mask};
-            entt = entities[curr] = entity_type{curr | version};
-        }
-
-        return entt;
+        return destroyed == null ? generate_identifier() : recycle_identifier();
     }
 
     /**
@@ -534,7 +535,13 @@ public:
      */
     template<typename It>
     void create(It first, It last) {
-        std::generate(first, last, [this]() { return create(); });
+        while(destroyed != null && first != last) {
+            *(first++) = recycle_identifier();
+        }
+
+        while(first != last) {
+            *(first++) = generate_identifier();
+        }
     }
 
     /**
