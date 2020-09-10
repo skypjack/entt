@@ -27,17 +27,13 @@ struct listener {
     }
 
     template<typename Component>
-    void incr(const entt::registry &registry, entt::entity entity) {
-        ASSERT_TRUE(registry.valid(entity));
-        ASSERT_TRUE(registry.has<Component>(entity));
+    void incr(entt::entity entity) {
         last = entity;
         ++counter;
     }
 
     template<typename Component>
-    void decr(const entt::registry &registry, entt::entity entity) {
-        ASSERT_TRUE(registry.valid(entity));
-        ASSERT_TRUE(registry.has<Component>(entity));
+    void decr(entt::entity entity) {
         last = entity;
         --counter;
     }
@@ -1378,8 +1374,8 @@ TEST(Registry, Dependencies) {
     constexpr auto emplace_or_replace = &entt::registry::emplace_or_replace<double>;
     constexpr auto remove = &entt::registry::remove<double>;
 
-    registry.on_construct<int>().connect<emplace_or_replace>();
-    registry.on_destroy<int>().connect<remove>();
+    registry.on_construct<int>().connect<emplace_or_replace>(registry);
+    registry.on_destroy<int>().connect<remove>(registry);
     registry.emplace<double>(entity, .3);
 
     ASSERT_FALSE(registry.has<int>(entity));
@@ -1394,8 +1390,8 @@ TEST(Registry, Dependencies) {
 
     ASSERT_FALSE((registry.any<int, double>(entity)));
 
-    registry.on_construct<int>().disconnect<emplace_or_replace>();
-    registry.on_destroy<int>().disconnect<remove>();
+    registry.on_construct<int>().disconnect<emplace_or_replace>(registry);
+    registry.on_destroy<int>().disconnect<remove>(registry);
     registry.emplace<int>(entity);
 
     ASSERT_TRUE((registry.any<int, double>(entity)));
@@ -1404,7 +1400,7 @@ TEST(Registry, Dependencies) {
 
 TEST(Registry, StableEmplace) {
     entt::registry registry;
-    registry.on_construct<int>().connect<&listener::sort<int>>();
+    registry.on_construct<int>().connect<&listener::sort<int>>(registry);
     registry.emplace<int>(registry.create(), 0);
 
     ASSERT_EQ(registry.emplace<int>(registry.create(), 1), 1);

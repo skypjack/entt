@@ -60,9 +60,9 @@ class basic_registry {
         }
 
         template<typename... Args>
-        decltype(auto) emplace(basic_registry &owner, const Entity entt, Args &&... args) {
+        decltype(auto) emplace(const Entity entt, Args &&... args) {
             storage<entity_type, Component>::emplace(entt, std::forward<Args>(args)...);
-            construction.publish(owner, entt);
+            construction.publish(entt);
 
             if constexpr(!is_eto_eligible_v<Component>) {
                 return this->get(entt);
@@ -70,57 +70,57 @@ class basic_registry {
         }
 
         template<typename It, typename... Args>
-        void insert(basic_registry &owner, It first, It last, Args &&... args) {
+        void insert(It first, It last, Args &&... args) {
             storage<entity_type, Component>::insert(first, last, std::forward<Args>(args)...);
 
             if(!construction.empty()) {
-                while(first != last) { construction.publish(owner, *(first++)); }
+                while(first != last) { construction.publish(*(first++)); }
             }
         }
 
-        void remove(basic_registry &owner, const Entity entt) {
-            destruction.publish(owner, entt);
+        void remove(const Entity entt) {
+            destruction.publish(entt);
             this->erase(entt);
         }
 
         template<typename It>
-        void remove(basic_registry &owner, It first, It last) {
+        void remove(It first, It last) {
             if(std::distance(first, last) == std::distance(this->begin(), this->end())) {
                 if(!destruction.empty()) {
-                    while(first != last) { destruction.publish(owner, *(first++)); }
+                    while(first != last) { destruction.publish(*(first++)); }
                 }
 
                 this->clear();
             } else {
-                while(first != last) { this->remove(owner, *(first++)); }
+                while(first != last) { this->remove(*(first++)); }
             }
         }
 
         template<typename... Func>
-        decltype(auto) patch(basic_registry &owner, const Entity entt, [[maybe_unused]] Func &&... func) {
+        decltype(auto) patch(const Entity entt, [[maybe_unused]] Func &&... func) {
             if constexpr(is_eto_eligible_v<Component>) {
-                update.publish(owner, entt);
+                update.publish(entt);
             } else {
                 (std::forward<Func>(func)(this->get(entt)), ...);
-                update.publish(owner, entt);
+                update.publish(entt);
                 return this->get(entt);
             }
         }
 
-        decltype(auto) replace(basic_registry &owner, const Entity entt, Component component) {
-            return patch(owner, entt, [&component](auto &&curr) { curr = std::move(component); });
+        decltype(auto) replace(const Entity entt, Component component) {
+            return patch(entt, [&component](auto &&curr) { curr = std::move(component); });
         }
 
     private:
-        sigh<void(basic_registry &, const Entity)> construction{};
-        sigh<void(basic_registry &, const Entity)> destruction{};
-        sigh<void(basic_registry &, const Entity)> update{};
+        sigh<void(const Entity)> construction{};
+        sigh<void(const Entity)> destruction{};
+        sigh<void(const Entity)> update{};
     };
 
     struct pool_data {
         id_type type_id{};
         std::unique_ptr<sparse_set<Entity>> pool{};
-        void(* remove)(sparse_set<Entity> &, basic_registry &, const Entity){};
+        void(* remove)(sparse_set<Entity> &, const Entity){};
     };
 
     template<typename...>
@@ -130,14 +130,19 @@ class basic_registry {
     struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
         static_assert(std::conjunction_v<std::is_same<Owned, std::decay_t<Owned>>..., std::is_same<Get, std::decay_t<Get>>..., std::is_same<Exclude, std::decay_t<Exclude>>...>, "One or more component types are invalid");
         std::conditional_t<sizeof...(Owned) == 0, sparse_set<Entity>, std::size_t> current{};
+        basic_registry *owner;
+
+        group_handler(basic_registry &parent)
+            : owner{&parent}
+        {}
 
         template<typename Component>
-        void maybe_valid_if(basic_registry &owner, const Entity entt) {
-            [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...);
+        void maybe_valid_if(const Entity entt) {
+            [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner->assure<Owned>()...);
 
             const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<pool_handler<Owned> &>(cpools).contains(entt)) && ...)
-                    && ((std::is_same_v<Component, Get> || owner.assure<Get>().contains(entt)) && ...)
-                    && ((std::is_same_v<Component, Exclude> || !owner.assure<Exclude>().contains(entt)) && ...);
+                    && ((std::is_same_v<Component, Get> || owner->assure<Get>().contains(entt)) && ...)
+                    && ((std::is_same_v<Component, Exclude> || !owner->assure<Exclude>().contains(entt)) && ...);
 
             if constexpr(sizeof...(Owned) == 0) {
                 if(is_valid && !current.contains(entt)) {
@@ -151,13 +156,13 @@ class basic_registry {
             }
         }
 
-        void discard_if([[maybe_unused]] basic_registry &owner, const Entity entt) {
+        void discard_if(const Entity entt) {
             if constexpr(sizeof...(Owned) == 0) {
                 if(current.contains(entt)) {
                     current.erase(entt);
                 }
             } else {
-                if(const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < current)) {
+                if(const auto cpools = std::forward_as_tuple(owner->assure<Owned>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < current)) {
                     const auto pos = --current;
                     (std::get<pool_handler<Owned> &>(cpools).swap(std::get<pool_handler<Owned> &>(cpools).data()[pos], entt), ...);
                 }
@@ -192,8 +197,8 @@ class basic_registry {
             if(auto &&pdata = pools[index]; !pdata.pool) {
                 pdata.type_id = type_info<Component>::id();
                 pdata.pool.reset(new pool_handler<Component>());
-                pdata.remove = [](sparse_set<entity_type> &target, basic_registry &owner, const entity_type entt) {
-                    static_cast<pool_handler<Component> &>(target).remove(owner, entt);
+                pdata.remove = [](sparse_set<entity_type> &target, const entity_type entt) {
+                    static_cast<pool_handler<Component> &>(target).remove(entt);
                 };
             }
 
@@ -203,8 +208,8 @@ class basic_registry {
                 cpool = pools.emplace_back(pool_data{
                     type_info<Component>::id(),
                     std::unique_ptr<sparse_set<entity_type>>{new pool_handler<Component>()},
-                    [](sparse_set<entity_type> &target, basic_registry &owner, const entity_type entt) {
-                        static_cast<pool_handler<Component> &>(target).remove(owner, entt);
+                    [](sparse_set<entity_type> &target, const entity_type entt) {
+                        static_cast<pool_handler<Component> &>(target).remove(entt);
                     }
                 }).pool.get();
             } else {
@@ -644,7 +649,7 @@ public:
     template<typename Component, typename... Args>
     decltype(auto) emplace(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
-        return assure<Component>().emplace(*this, entity, std::forward<Args>(args)...);
+        return assure<Component>().emplace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -661,7 +666,7 @@ public:
     template<typename Component, typename It>
     void insert(It first, It last, const Component &value = {}) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        assure<Component>().insert(*this, first, last, value);
+        assure<Component>().insert(first, last, value);
     }
 
     /**
@@ -681,7 +686,7 @@ public:
     void insert(EIt first, EIt last, CIt from, CIt to) {
         static_assert(std::is_constructible_v<Component, typename std::iterator_traits<CIt>::value_type>, "Invalid value type");
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        assure<Component>().insert(*this, first, last, from, to);
+        assure<Component>().insert(first, last, from, to);
     }
 
     /**
@@ -712,8 +717,8 @@ public:
         auto &cpool = assure<Component>();
 
         return cpool.contains(entity)
-                ? cpool.replace(*this, entity, Component{std::forward<Args>(args)...})
-                : cpool.emplace(*this, entity, std::forward<Args>(args)...);
+                ? cpool.replace(entity, Component{std::forward<Args>(args)...})
+                : cpool.emplace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -746,7 +751,7 @@ public:
     template<typename Component, typename... Func>
     decltype(auto) patch(const entity_type entity, Func &&... func) {
         ENTT_ASSERT(valid(entity));
-        return assure<Component>().patch(*this, entity, std::forward<Func>(func)...);
+        return assure<Component>().patch(entity, std::forward<Func>(func)...);
     }
 
     /**
@@ -771,7 +776,7 @@ public:
      */
     template<typename Component, typename... Args>
     decltype(auto) replace(const entity_type entity, Args &&... args) {
-        return assure<Component>().replace(*this, entity, Component{std::forward<Args>(args)...});
+        return assure<Component>().replace(entity, Component{std::forward<Args>(args)...});
     }
 
     /**
@@ -790,7 +795,7 @@ public:
     template<typename... Component>
     void remove(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
-        (assure<Component>().remove(*this, entity), ...);
+        (assure<Component>().remove(entity), ...);
     }
 
     /**
@@ -806,7 +811,7 @@ public:
     template<typename... Component, typename It>
     void remove(It first, It last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        (assure<Component>().remove(*this, first, last), ...);
+        (assure<Component>().remove(first, last), ...);
     }
 
     /**
@@ -834,7 +839,7 @@ public:
         ENTT_ASSERT(valid(entity));
 
         return ([this, entity](auto &&cpool) {
-            return cpool.contains(entity) ? (cpool.remove(*this, entity), true) : false;
+            return cpool.contains(entity) ? (cpool.remove(entity), true) : false;
         }(assure<Component>()) + ... + size_type{});
     }
 
@@ -859,7 +864,7 @@ public:
 
         for(auto pos = pools.size(); pos; --pos) {
             if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
-                pdata.remove(*pdata.pool, *this, entity);
+                pdata.remove(*pdata.pool, entity);
             }
         }
     }
@@ -966,7 +971,7 @@ public:
     [[nodiscard]] decltype(auto) get_or_emplace(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
         auto &cpool = assure<Component>();
-        return cpool.contains(entity) ? cpool.get(entity) : cpool.emplace(*this, entity, std::forward<Args>(args)...);
+        return cpool.contains(entity) ? cpool.get(entity) : cpool.emplace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -1015,7 +1020,7 @@ public:
             each([this](const auto entity) { this->destroy(entity); });
         } else {
             ([this](auto &&cpool) {
-                cpool.remove(*this, cpool.sparse_set<entity_type>::begin(), cpool.sparse_set<entity_type>::end());
+                cpool.remove(cpool.sparse_set<entity_type>::begin(), cpool.sparse_set<entity_type>::end());
             }(assure<Component>()), ...);
         }
     }
@@ -1308,7 +1313,7 @@ public:
         if(!handler) {
             group_data candidate = {
                 size,
-                { new handler_type{}, [](void *instance) { delete static_cast<handler_type *>(instance); } },
+                { new handler_type{*this}, [](void *instance) { delete static_cast<handler_type *>(instance); } },
                 []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Owned>>::id()) || ...); },
                 []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Get>>::id()) || ...); },
                 []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_info<Exclude>::id()) || ...); },
@@ -1356,7 +1361,7 @@ public:
             } else {
                 // we cannot iterate backwards because we want to leave behind valid entities in case of owned types
                 for(auto *first = std::get<0>(cpools).data(), *last = first + std::get<0>(cpools).size(); first != last; ++first) {
-                    handler->template maybe_valid_if<std::tuple_element_t<0, std::tuple<std::decay_t<Owned>...>>>(*this, *first);
+                    handler->template maybe_valid_if<std::tuple_element_t<0, std::tuple<std::decay_t<Owned>...>>>(*first);
                 }
             }
         }
