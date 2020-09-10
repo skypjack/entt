@@ -1015,15 +1015,13 @@ public:
     /**
      * @brief Returns a sink object for the given component.
      *
-     * A sink is an opaque object used to connect listeners to components.<br/>
      * The sink returned by this function can be used to receive notifications
      * whenever a new instance of the given component is created and assigned to
-     * an entity.
-     *
+     * an entity.<br/>
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(registry<Entity> &, Entity);
+     * void(Entity);
      * @endcode
      *
      * Listeners are invoked **after** the component has been assigned to the
@@ -1042,14 +1040,12 @@ public:
     /**
      * @brief Returns a sink object for the given component.
      *
-     * A sink is an opaque object used to connect listeners to components.<br/>
      * The sink returned by this function can be used to receive notifications
-     * whenever an instance of the given component is explicitly updated.
-     *
+     * whenever an instance of the given component is explicitly updated.<br/>
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(registry<Entity> &, Entity);
+     * void(Entity);
      * @endcode
      *
      * Listeners are invoked **after** the component has been updated.
@@ -1067,15 +1063,13 @@ public:
     /**
      * @brief Returns a sink object for the given component.
      *
-     * A sink is an opaque object used to connect listeners to components.<br/>
      * The sink returned by this function can be used to receive notifications
      * whenever an instance of the given component is removed from an entity and
-     * thus destroyed.
-     *
+     * thus destroyed.<br/>
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(registry<Entity> &, Entity);
+     * void(Entity);
      * @endcode
      *
      * Listeners are invoked **before** the component has been removed from the

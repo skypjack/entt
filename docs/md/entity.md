@@ -364,7 +364,7 @@ registry.on_construct<position>().disconnect<&my_free_function>();
 registry.on_construct<position>().disconnect<&my_class::member>(instance);
 ```
 
-To be notified when components are destroyed, use the `on_destroy` member
+To be notified when a component is destroyed, use the `on_destroy` member
 function instead. Finally, the `on_update` member function will return a sink
 to which to connect listeners to observe changes.<br/>
 In the last case, given the way C++ works, it's also necessary to use specific
@@ -375,11 +375,8 @@ attached to `on_update` will only be invoked following a call to `replace` or
 The function type of a listener should be equivalent to the following:
 
 ```cpp
-void(entt::registry &, entt::entity);
+void(entt::entity);
 ```
-
-In all cases, listeners are provided with the registry that triggered the
-notification and the involved entity.
 
 Note also that:
 
@@ -633,25 +630,25 @@ that isn't associated with the given registry can result in undefined behavior.
 
 The `registry` class is designed to be able to create short circuits between its
 functions. This simplifies the definition of _dependencies_ between different
-operations.<br/>
+operations and registries.<br/>
 For example, the following adds (or replaces) the component `a_type` whenever
 `my_type` is assigned to an entity:
 
 ```cpp
-registry.on_construct<my_type>().connect<&entt::registry::emplace_or_replace<a_type>>();
+registry.on_construct<my_type>().connect<&entt::registry::emplace_or_replace<a_type>>(registry);
 ```
 
 Similarly, the code shown below removes `a_type` from an entity whenever
 `my_type` is assigned to it:
 
 ```cpp
-registry.on_construct<my_type>().connect<&entt::registry::remove<a_type>>();
+registry.on_construct<my_type>().connect<&entt::registry::remove<a_type>>(registry);
 ```
 
 A dependency can also be easily broken as follows:
 
 ```cpp
-registry.on_construct<my_type>().disconnect<&entt::registry::emplace_or_replace<a_type>>();
+registry.on_construct<my_type>().disconnect<&entt::registry::emplace_or_replace<a_type>>(registry);
 ```
 
 There are many other types of dependencies. In general, most of the functions
@@ -666,11 +663,13 @@ _extend_ their classes and this may not always be possible.<br/>
 The `invoke` helper allows to _propagate_ the signal in these cases:
 
 ```cpp
-registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>();
+registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>(registry);
 ```
 
 All it does is pick up the _right_ component for the received entity and invoke
-the requested method, passing on the arguments if necessary.
+the requested method, passing on the arguments if necessary.<br/>
+The registry is also supplied by the invoker directly to the function invoked as
+the first argument.
 
 ### Handle
 
