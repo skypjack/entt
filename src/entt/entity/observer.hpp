@@ -177,8 +177,8 @@ class basic_observer {
     template<typename... Reject, typename... Require, typename AnyOf>
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, AnyOf>> {
         template<std::size_t Index>
-        static void maybe_valid_if(basic_observer &obs, const basic_registry<Entity> &reg, const Entity entt) {
-            if(reg.template has<Require...>(entt) && !reg.template any<Reject...>(entt)) {
+        static void maybe_valid_if(basic_observer &obs, const Entity entt) {
+            if(obs.target->template has<Require...>(entt) && !obs.target->template any<Reject...>(entt)) {
                 if(auto *comp = obs.view.try_get(entt); !comp) {
                     obs.view.emplace(entt);
                 }
@@ -188,7 +188,7 @@ class basic_observer {
         }
 
         template<std::size_t Index>
-        static void discard_if(basic_observer &obs, const basic_registry<Entity> &, const Entity entt) {
+        static void discard_if(basic_observer &obs, const Entity entt) {
             if(auto *value = obs.view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
                 obs.view.erase(entt);
             }
@@ -213,12 +213,12 @@ class basic_observer {
     template<typename... Reject, typename... Require, typename... NoneOf, typename... AllOf>
     struct matcher_handler<matcher<type_list<Reject...>, type_list<Require...>, type_list<NoneOf...>, AllOf...>> {
         template<std::size_t Index, typename... Ignore>
-        static void maybe_valid_if(basic_observer &obs, const basic_registry<Entity> &reg, const Entity entt) {
-            if([&reg, entt]() {
+        static void maybe_valid_if(basic_observer &obs, const Entity entt) {
+            if([&obs, entt]() {
                 if constexpr(sizeof...(Ignore) == 0) {
-                    return reg.template has<AllOf..., Require...>(entt) && !reg.template any<NoneOf..., Reject...>(entt);
+                    return obs.target->template has<AllOf..., Require...>(entt) && !obs.target->template any<NoneOf..., Reject...>(entt);
                 } else {
-                    return reg.template has<AllOf..., Require...>(entt) && ((std::is_same_v<Ignore..., NoneOf> || !reg.template any<NoneOf>(entt)) && ...) && !reg.template any<Reject...>(entt);
+                    return obs.target->template has<AllOf..., Require...>(entt) && ((std::is_same_v<Ignore..., NoneOf> || !obs.target->template any<NoneOf>(entt)) && ...) && !obs.target->template any<Reject...>(entt);
                 }
             }())
             {
@@ -231,7 +231,7 @@ class basic_observer {
         }
 
         template<std::size_t Index>
-        static void discard_if(basic_observer &obs, const basic_registry<Entity> &, const Entity entt) {
+        static void discard_if(basic_observer &obs, const Entity entt) {
             if(auto *value = obs.view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
                 obs.view.erase(entt);
             }
