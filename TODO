@@ -15,13 +15,13 @@ WIP:
 * introduce the component iterators for non-contiguous collections of entities (multi component views, observers, user defined collections)
 * snapshot: support for range-based archives
 * update snapshot documentation to describe alternatives
-* custom pools.
-* the Perfect Model.
 * page size 0 -> page less mode
 * add ::reach and rev iterators to proxy objects for faster and unsafe iterations
 * add example: 64 bit ids with 32 bits reserved for users' purposes
 * composable views and "faster views", deprecate non-owning groups
-* offset instead of pages in the sparse set? top level mask for sparse sets?
 * add meta dynamic cast (search base for T in parent, we have the meta type already)
 * make meta base/conv node work with storage/any
 * deprecate/remove meta_base, meta_conv, ...
+* multi-type storage
+* return opaque type info object during a visit (id, name, and so on)
+* system executor
