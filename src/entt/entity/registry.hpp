@@ -64,7 +64,7 @@ class basic_registry {
         void maybe_valid_if(const Entity entt) {
             [[maybe_unused]] const auto cpools = std::forward_as_tuple(owner->assure<Owned>()...);
 
-            const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<default_pool<Entity, Owned> &>(cpools).contains(entt)) && ...)
+            const auto is_valid = ((std::is_same_v<Component, Owned> || std::get<pool_t<Entity, Owned> &>(cpools).contains(entt)) && ...)
                     && ((std::is_same_v<Component, Get> || owner->assure<Get>().contains(entt)) && ...)
                     && ((std::is_same_v<Component, Exclude> || !owner->assure<Exclude>().contains(entt)) && ...);
 
@@ -75,7 +75,7 @@ class basic_registry {
             } else {
                 if(is_valid && !(std::get<0>(cpools).index(entt) < current)) {
                     const auto pos = current++;
-                    (std::get<default_pool<Entity, Owned> &>(cpools).swap(std::get<default_pool<Entity, Owned> &>(cpools).data()[pos], entt), ...);
+                    (std::get<pool_t<Entity, Owned> &>(cpools).swap(std::get<pool_t<Entity, Owned> &>(cpools).data()[pos], entt), ...);
                 }
             }
         }
@@ -88,7 +88,7 @@ class basic_registry {
             } else {
                 if(const auto cpools = std::forward_as_tuple(owner->assure<Owned>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < current)) {
                     const auto pos = --current;
-                    (std::get<default_pool<Entity, Owned> &>(cpools).swap(std::get<default_pool<Entity, Owned> &>(cpools).data()[pos], entt), ...);
+                    (std::get<pool_t<Entity, Owned> &>(cpools).swap(std::get<pool_t<Entity, Owned> &>(cpools).data()[pos], entt), ...);
                 }
             }
         }
@@ -108,7 +108,7 @@ class basic_registry {
     };
 
     template<typename Component>
-    [[nodiscard]] const default_pool<Entity, Component> & assure() const {
+    [[nodiscard]] const pool_t<Entity, Component> & assure() const {
         const sparse_set<entity_type> *cpool;
 
         if constexpr(ENTT_FAST_PATH(has_type_index_v<Component>)) {
@@ -120,7 +120,7 @@ class basic_registry {
 
             if(auto &&pdata = pools[index]; !pdata.pool) {
                 pdata.type_id = type_info<Component>::id();
-                pdata.pool.reset(new default_pool<Entity, Component>());
+                pdata.pool.reset(new pool_t<Entity, Component>());
             }
 
             cpool = pools[index].pool.get();
@@ -128,19 +128,19 @@ class basic_registry {
             if(const auto it = std::find_if(pools.cbegin(), pools.cend(), [id = type_info<Component>::id()](const auto &pdata) { return id == pdata.type_id; }); it == pools.cend()) {
                 cpool = pools.emplace_back(pool_data{
                     type_info<Component>::id(),
-                    std::unique_ptr<sparse_set<entity_type>>{new default_pool<Entity, Component>()}
+                    std::unique_ptr<sparse_set<entity_type>>{new pool_t<Entity, Component>()}
                 }).pool.get();
             } else {
                 cpool = it->pool.get();
             }
         }
 
-        return *static_cast<const default_pool<Entity, Component> *>(cpool);
+        return *static_cast<const pool_t<Entity, Component> *>(cpool);
     }
 
     template<typename Component>
-    [[nodiscard]] default_pool<Entity, Component> & assure() {
-        return const_cast<default_pool<Entity, Component> &>(std::as_const(*this).template assure<Component>());
+    [[nodiscard]] pool_t<Entity, Component> & assure() {
+        return const_cast<pool_t<Entity, Component> &>(std::as_const(*this).template assure<Component>());
     }
 
     Entity generate_identifier() {
@@ -1285,9 +1285,9 @@ public:
         }
 
         if constexpr(sizeof...(Owned) == 0) {
-            return { handler->current, std::get<default_pool<Entity, std::decay_t<Get>> &>(cpools)... };
+            return { handler->current, std::get<pool_t<Entity, std::decay_t<Get>> &>(cpools)... };
         } else {
-            return { handler->current, std::get<default_pool<Entity, std::decay_t<Owned>> &>(cpools)... , std::get<default_pool<Entity, std::decay_t<Get>> &>(cpools)... };
+            return { handler->current, std::get<pool_t<Entity, std::decay_t<Owned>> &>(cpools)... , std::get<pool_t<Entity, std::decay_t<Get>> &>(cpools)... };
         }
     }
 
