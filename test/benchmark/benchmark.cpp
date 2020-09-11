@@ -120,6 +120,54 @@ TEST(Benchmark, CreateManyWithComponents) {
     timer.elapsed();
 }
 
+TEST(Benchmark, Remove) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Removing 1000000 components from their entities" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<int>(entities.begin(), entities.end());
+
+    timer timer;
+
+    for(auto entity: registry.view<int>()) {
+        registry.remove<int>(entity);
+    }
+
+    timer.elapsed();
+}
+
+TEST(Benchmark, RemoveMany) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Removing 999999 components from their entities at once" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<int>(entities.begin(), entities.end());
+
+    timer timer;
+    auto view = registry.view<int>();
+    registry.remove<int>(++view.begin(), view.end());
+    timer.elapsed();
+}
+
+TEST(Benchmark, RemoveAll) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Removing 1000000 components from their entities at once" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<int>(entities.begin(), entities.end());
+
+    timer timer;
+    auto view = registry.view<int>();
+    registry.remove<int>(view.begin(), view.end());
+    timer.elapsed();
+}
+
 TEST(Benchmark, Recycle) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
@@ -160,19 +208,34 @@ TEST(Benchmark, RecycleMany) {
 
 TEST(Benchmark, Destroy) {
     entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
 
     std::cout << "Destroying 1000000 entities" << std::endl;
 
-    for(std::uint64_t i = 0; i < 1000000L; i++) {
-        registry.create();
-    }
+    registry.create(entities.begin(), entities.end());
+    registry.insert<int>(entities.begin(), entities.end());
 
     timer timer;
 
-    registry.each([&registry](auto entity) {
+    for(auto entity: registry.view<int>()) {
         registry.destroy(entity);
-    });
+    }
 
+    timer.elapsed();
+}
+
+TEST(Benchmark, DestroyMany) {
+    entt::registry registry;
+    std::vector<entt::entity> entities(1000000);
+
+    std::cout << "Destroying 1000000 entities" << std::endl;
+
+    registry.create(entities.begin(), entities.end());
+    registry.insert<int>(entities.begin(), entities.end());
+
+    timer timer;
+    auto view = registry.view<int>();
+    registry.destroy(view.begin(), view.end());
     timer.elapsed();
 }
 

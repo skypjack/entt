@@ -408,10 +408,9 @@ public:
         auto next = static_cast<typename traits_type::entity_type>(packed.size());
         packed.insert(packed.end(), first, last);
 
-        while(first != last) {
-            const auto entt = *(first++);
-            ENTT_ASSERT(!contains(entt));
-            assure(page(entt))[offset(entt)] = entity_type{next++};
+        for(; first != last; ++first) {
+            ENTT_ASSERT(!contains(*first));
+            assure(page(*first))[offset(*first)] = entity_type{next++};
         }
     }
 

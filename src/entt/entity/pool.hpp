@@ -45,7 +45,9 @@ struct default_pool final: storage<Entity, Component> {
         storage<entity_type, Component>::insert(first, last, std::forward<Args>(args)...);
 
         if(!construction.empty()) {
-            while(first != last) { construction.publish(*(first++)); }
+            for(; first != last; ++first) {
+                construction.publish(*first);
+            }
         }
     }
 
@@ -58,12 +60,16 @@ struct default_pool final: storage<Entity, Component> {
     void erase(It first, It last) {
         if(std::distance(first, last) == std::distance(this->begin(), this->end())) {
             if(!destruction.empty()) {
-                while(first != last) { destruction.publish(*(first++)); }
+                for(; first != last; ++first) {
+                    destruction.publish(*first);
+                }
             }
 
             this->clear();
         } else {
-            while(first != last) { this->erase(*(first++)); }
+            for(; first != last; ++first) {
+                this->erase(*first);
+            }
         }
     }
 
