@@ -458,12 +458,12 @@ public:
      */
     template<typename It>
     void create(It first, It last) {
-        while(destroyed != null && first != last) {
-            *(first++) = recycle_identifier();
+        for(; destroyed != null && first != last; ++first) {
+            *first = recycle_identifier();
         }
 
-        while(first != last) {
-            *(first++) = generate_identifier();
+        for(; first != last; ++first) {
+            *first = generate_identifier();
         }
     }
 
@@ -541,7 +541,9 @@ public:
      */
     template<typename It>
     void destroy(It first, It last) {
-        while(first != last) { destroy(*(first++)); }
+        for(; first != last; ++first) {
+            destroy(*first);
+        }
     }
 
     /**
