@@ -143,7 +143,7 @@ namespace entt {
         * @param value a pointer to the new underlying registry.
         */
         void registry(registry_type * value) ENTT_NOEXCEPT {
-            reg = value
+            reg = value;
         }
 
         /**
