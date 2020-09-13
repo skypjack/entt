@@ -4,10 +4,16 @@
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
 #include <entt/signal/emitter.hpp>
+#include "type_context.h"
 #include "types.h"
 
 template<typename Type>
-struct entt::type_index<Type> {};
+struct entt::type_index<Type> {
+    [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
+        static const entt::id_type value = type_context::instance()->value(entt::type_info<Type>::id());
+        return value;
+    }
+};
 
 TEST(Lib, Emitter) {
     test_emitter emitter;
@@ -18,8 +24,12 @@ TEST(Lib, Emitter) {
     emitter.once<message>([&](message msg, test_emitter &) { value = msg.payload; });
 
     cr_plugin ctx;
-    ctx.userdata = &emitter;
     cr_plugin_load(ctx, PLUGIN);
+
+    ctx.userdata = type_context::instance();
+    cr_plugin_update(ctx);
+
+    ctx.userdata = &emitter;
     cr_plugin_update(ctx);
 
     ASSERT_EQ(value, 42);

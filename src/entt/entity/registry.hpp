@@ -105,39 +105,21 @@ class basic_registry {
 
     template<typename Component>
     [[nodiscard]] const pool_t<Entity, Component> & assure() const {
-        const sparse_set<entity_type> *curr;
-
-        if constexpr(ENTT_FAST_PATH(has_type_index_v<Component>)) {
-            const auto index = type_index<Component>::value();
-
-            if(!(index < pools.size())) {
-                pools.resize(size_type(index+1u));
-            }
-
-            if(auto &&pdata = pools[index]; !pdata.pool) {
-                pdata.type_id = type_info<Component>::id();
-                pdata.pool.reset(new pool_t<Entity, Component>{});
-                pdata.erase = +[](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
-                    static_cast<pool_t<Entity, Component> &>(cpool).erase(owner, entt);
-                };
-            }
-
-            curr = pools[index].pool.get();
-        } else {
-            if(const auto it = std::find_if(pools.cbegin(), pools.cend(), [id = type_info<Component>::id()](const auto &pdata) { return id == pdata.type_id; }); it == pools.cend()) {
-                curr = pools.emplace_back(pool_data{
-                    type_info<Component>::id(),
-                    std::unique_ptr<sparse_set<entity_type>>{new pool_t<Entity, Component>{}},
-                    +[](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
-                        static_cast<pool_t<Entity, Component> &>(cpool).erase(owner, entt);
-                    }
-                }).pool.get();
-            } else {
-                curr = it->pool.get();
-            }
+        const auto index = type_index<Component>::value();
+        
+        if(!(index < pools.size())) {
+            pools.resize(size_type(index)+1u);
         }
-
-        return *static_cast<const pool_t<Entity, Component> *>(curr);
+        
+        if(auto &&pdata = pools[index]; !pdata.pool) {
+            pdata.type_id = type_info<Component>::id();
+            pdata.pool.reset(new pool_t<Entity, Component>());
+            pdata.erase = +[](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
+                static_cast<pool_t<Entity, Component> &>(cpool).erase(owner, entt);
+            };
+        }
+        
+        return static_cast<const pool_t<Entity, Component> &>(*pools[index].pool);
     }
 
     template<typename Component>

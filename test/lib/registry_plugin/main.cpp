@@ -4,31 +4,35 @@
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
 #include <entt/entity/registry.hpp>
+#include "type_context.h"
 #include "types.h"
 
 template<typename Type>
-struct entt::type_index<Type> {};
+struct entt::type_index<Type> {
+    [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
+        static const entt::id_type value = type_context::instance()->value(entt::type_info<Type>::id());
+        return value;
+    }
+};
 
 TEST(Lib, Registry) {
     entt::registry registry;
 
     for(auto i = 0; i < 3; ++i) {
-        const auto entity = registry.create();
-        registry.emplace<position>(entity, i, i);
-
-        if(i % 2) {
-            registry.emplace<tag>(entity);
-        }
+        registry.emplace<position>(registry.create(), i, i);
     }
 
     cr_plugin ctx;
-    ctx.userdata = &registry;
     cr_plugin_load(ctx, PLUGIN);
+
+    ctx.userdata = type_context::instance();
+    cr_plugin_update(ctx);
+
+    ctx.userdata = &registry;
     cr_plugin_update(ctx);
 
     ASSERT_EQ(registry.size<position>(), registry.size<velocity>());
-    ASSERT_NE(registry.size<position>(), registry.size());
-    ASSERT_TRUE(registry.empty<tag>());
+    ASSERT_EQ(registry.size<position>(), registry.size());
 
     registry.view<position>().each([](auto entity, auto &position) {
         ASSERT_EQ(position.x, static_cast<int>(entt::to_integral(entity) + 16u));
