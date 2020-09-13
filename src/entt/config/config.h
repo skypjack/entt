@@ -70,11 +70,4 @@
 #endif
 
 
-#ifndef ENTT_STANDALONE
-#   define ENTT_FAST_PATH(...) false
-#else
-#   define ENTT_FAST_PATH(Cond) Cond
-#endif
-
-
 #endif

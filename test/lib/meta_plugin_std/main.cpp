@@ -13,8 +13,9 @@ TEST(Lib, Meta) {
     userdata ud{};
 
     cr_plugin ctx;
-    ctx.userdata = &ud;
     cr_plugin_load(ctx, PLUGIN);
+
+    ctx.userdata = &ud;
     cr_plugin_update(ctx);
 
     entt::meta<double>().conv<int>();

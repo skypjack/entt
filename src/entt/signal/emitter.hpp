@@ -50,6 +50,8 @@ class emitter {
 
     template<typename Event>
     struct pool_handler final: basic_pool {
+        static_assert(std::is_same_v<Event, std::decay_t<Event>>, "Invalid event type");
+
         using listener_type = std::function<void(Event &, Derived &)>;
         using element_type = std::pair<bool, listener_type>;
         using container_type = std::list<element_type>;
@@ -126,24 +128,17 @@ class emitter {
 
     template<typename Event>
     [[nodiscard]] const pool_handler<Event> & assure() const {
-        static_assert(std::is_same_v<Event, std::decay_t<Event>>, "Invalid event type");
-
-        if constexpr(ENTT_FAST_PATH(has_type_index_v<Event>)) {
-            const auto index = type_index<Event>::value();
-
-            if(!(index < pools.size())) {
-                pools.resize(index+1u);
-            }
-
-            if(!pools[index]) {
-                pools[index].reset(new pool_handler<Event>{});
-            }
-
-            return static_cast<pool_handler<Event> &>(*pools[index]);
-        } else {
-            auto it = std::find_if(pools.begin(), pools.end(), [id = type_info<Event>::id()](const auto &cpool) { return id == cpool->type_id(); });
-            return static_cast<pool_handler<Event> &>(it == pools.cend() ? *pools.emplace_back(new pool_handler<Event>{}) : **it);
+        const auto index = type_index<Event>::value();
+        
+        if(!(index < pools.size())) {
+            pools.resize(std::size_t(index)+1u);
         }
+        
+        if(!pools[index]) {
+            pools[index].reset(new pool_handler<Event>{});
+        }
+        
+        return static_cast<pool_handler<Event> &>(*pools[index]);
     }
 
     template<typename Event>
