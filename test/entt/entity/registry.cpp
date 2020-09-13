@@ -38,7 +38,7 @@ struct listener {
         --counter;
     }
 
-    entt::entity last;
+    entt::entity last{entt::null};
     int counter{0};
 };
 
