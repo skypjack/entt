@@ -21,12 +21,14 @@ CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
             context = static_cast<type_context *>(ctx->userdata);
         } else {
             // forces things to break
-            static_cast<entt::registry *>(ctx->userdata)->prepare<velocity>();
+            auto &registry = *static_cast<entt::registry *>(ctx->userdata);
+
+            registry.prepare<velocity>();
             
-            const auto view = static_cast<entt::registry *>(ctx->userdata)->view<position>();
-            static_cast<entt::registry *>(ctx->userdata)->insert(view.begin(), view.end(), velocity{1., 1.});
-            
-            static_cast<entt::registry *>(ctx->userdata)->view<position, velocity>().each([](auto &pos, auto &vel) {
+            const auto view = registry.view<position>();
+            registry.insert(view.begin(), view.end(), velocity{1., 1.});
+
+            registry.view<position, velocity>().each([](position &pos, velocity &vel) {
                 pos.x += static_cast<int>(16 * vel.dx);
                 pos.y += static_cast<int>(16 * vel.dy);
             });
