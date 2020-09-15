@@ -17,10 +17,10 @@ namespace entt {
  */
 template<typename Entity>
 struct basic_handle {
-    / *! @brief Underlying entity identifier.  */
+    /*! @brief Underlying entity identifier. */
     using entity_type = std::remove_const_t<Entity>;
 
-    / *! @brief Type of registry accepted by the handle.  */
+    /*! @brief Type of registry accepted by the handle. */
     using registry_type = std::conditional_t<
         std::is_const_v<Entity>,
         const basic_registry<entity_type>,
