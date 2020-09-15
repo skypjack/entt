@@ -119,15 +119,15 @@ TEST(BasicHandle, Comparison) {
     ASSERT_FALSE(handle1 != chandle2);
 
     handle2 = {};
-    chandle2 = {};
+    chandle1 = {};
 
-    ASSERT_NE(handle1, handle2);
-    ASSERT_FALSE(handle1 == handle2);
-    ASSERT_TRUE(handle1 != handle2);
+    ASSERT_EQ(handle1, handle2);
+    ASSERT_TRUE(handle1 == handle2);
+    ASSERT_FALSE(handle1 != handle2);
 
-    ASSERT_NE(chandle1, chandle2);
-    ASSERT_FALSE(chandle1 == chandle2);
-    ASSERT_TRUE(chandle1 != chandle2);
+    ASSERT_EQ(chandle1, chandle2);
+    ASSERT_TRUE(chandle1 == chandle2);
+    ASSERT_FALSE(chandle1 != chandle2);
 
     ASSERT_EQ(handle1, chandle1);
     ASSERT_TRUE(handle1 == chandle1);
@@ -137,9 +137,9 @@ TEST(BasicHandle, Comparison) {
     ASSERT_TRUE(handle2 == chandle2);
     ASSERT_FALSE(handle2 != chandle2);
 
-    ASSERT_NE(handle1, chandle2);
-    ASSERT_FALSE(handle1 == chandle2);
-    ASSERT_TRUE(handle1 != chandle2);
+    ASSERT_EQ(handle1, chandle2);
+    ASSERT_TRUE(handle1 == chandle2);
+    ASSERT_FALSE(handle1 != chandle2);
 
     entt::registry registry_b;
     const auto entity_b1 = registry.create();
@@ -157,13 +157,13 @@ TEST(BasicHandle, Comparison) {
     ASSERT_FALSE(chandle1 == chandle2);
     ASSERT_TRUE(chandle1 != chandle2);
 
-    ASSERT_NE(handle1, chandle1);
-    ASSERT_FALSE(handle1 == chandle1);
-    ASSERT_TRUE(handle1 != chandle1);
+    ASSERT_EQ(handle1, chandle1);
+    ASSERT_TRUE(handle1 == chandle1);
+    ASSERT_FALSE(handle1 != chandle1);
 
-    ASSERT_NE(handle2, chandle2);
-    ASSERT_FALSE(handle2 == chandle2);
-    ASSERT_TRUE(handle2 != chandle2);
+    ASSERT_EQ(handle2, chandle2);
+    ASSERT_TRUE(handle2 == chandle2);
+    ASSERT_FALSE(handle2 != chandle2);
 
     ASSERT_NE(handle1, chandle2);
     ASSERT_FALSE(handle1 == chandle2);
