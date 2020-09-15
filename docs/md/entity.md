@@ -674,10 +674,15 @@ the requested method, passing on the arguments if necessary.
 
 ### Handle
 
-A handle is a thin wrapper around an entity and a registry. It provides the same
-functions that the registry offers for working with components, such as
+A handle is a thin wrapper around an entity and a registry. It provides the
+same functions that the registry offers for working with components, such as
 `emplace`, `get`, `patch`, `remove` and so on. The difference being that the
 entity is implicitly passed to the registry.<br/>
+It's default constructible as an invalid handle that contains a null registry
+and a null entity. When it contains a null registry calling functions that
+delegate execution to the registry will cause a crash, so it's recommended to
+check the validity of the handle with implicit cast to `bool` when in doubt.
+<br/>
 A handle is also non-owning, meaning that it can be freely copied and moved
 around without affecting its entity (in fact, handles happen to be trivially
 copyable). An implication of this is that mutability becomes part of the
