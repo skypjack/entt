@@ -45,9 +45,7 @@ TEST(BasicHandle, Invalidation) {
     entt::handle handle;
 
     ASSERT_TRUE(nullptr == handle.registry());
-    ASSERT_EQ(handle.registry(), nullptr);
     ASSERT_TRUE(entt::null == handle.entity());
-    ASSERT_EQ(handle.entity(), entt::null);
     ASSERT_FALSE(handle);
 
     entt::registry registry;
@@ -56,17 +54,13 @@ TEST(BasicHandle, Invalidation) {
     handle = {registry, entity};
 
     ASSERT_FALSE(nullptr == handle.registry());
-    ASSERT_NE(handle.registry(), nullptr);
     ASSERT_FALSE(entt::null == handle.entity());
-    ASSERT_NE(handle.entity(), entt::null);
     ASSERT_TRUE(handle);
 
     handle = {};
 
     ASSERT_TRUE(nullptr == handle.registry());
-    ASSERT_EQ(handle.registry(), nullptr);
     ASSERT_TRUE(entt::null == handle.entity());
-    ASSERT_EQ(handle.entity(), entt::null);
     ASSERT_FALSE(handle);
 }
 
