@@ -34,7 +34,6 @@ class dispatcher {
         virtual void publish() = 0;
         virtual void disconnect(void *) = 0;
         virtual void clear() ENTT_NOEXCEPT = 0;
-        [[nodiscard]] virtual id_type type_id() const ENTT_NOEXCEPT = 0;
     };
 
     template<typename Event>
@@ -79,10 +78,6 @@ class dispatcher {
             } else {
                 events.emplace_back(std::forward<Args>(args)...);
             }
-        }
-
-        [[nodiscard]] id_type type_id() const ENTT_NOEXCEPT override {
-            return type_info<Event>::id();
         }
 
     private:
