@@ -270,9 +270,27 @@ TEST_F(MetaType, Func) {
     ASSERT_TRUE(type.func("func"_hs));
     ASSERT_TRUE(type.func("member"_hs).invoke(instance));
     ASSERT_TRUE(type.func("func"_hs).invoke({}));
+}
+
+TEST_F(MetaType, Invoke) {
+    auto type = entt::resolve<clazz_t>();
+    clazz_t instance{};
 
     ASSERT_TRUE(type.invoke("member"_hs, instance));
-    ASSERT_TRUE(type.invoke("func"_hs, {}));
+    ASSERT_FALSE(type.invoke("rebmem"_hs, {}));
+}
+
+TEST_F(MetaType, SetGet) {
+    auto type = entt::resolve<clazz_t>();
+    clazz_t instance{};
+
+    ASSERT_TRUE(type.set("value"_hs, instance, 42));
+    ASSERT_FALSE(type.set("eulav"_hs, instance, 3));
+    ASSERT_EQ(instance.value, 42);
+
+    ASSERT_FALSE(type.get("eulav"_hs, instance));
+    ASSERT_TRUE(type.get("value"_hs, instance));
+    ASSERT_EQ(type.get("value"_hs, instance).cast<int>(), 42);
 }
 
 TEST_F(MetaType, Construct) {
