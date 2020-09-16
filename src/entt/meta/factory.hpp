@@ -347,7 +347,7 @@ public:
      * @param id Optional unique identifier.
      * @return An extended meta factory for the given type.
      */
-    auto type(const id_type id = type_info<Type>::id()) {
+    auto type(const id_type id = type_hash<Type>::value()) {
         auto * const node = internal::meta_info<Type>::resolve();
 
         ENTT_ASSERT(!exists(id, *internal::meta_context::global()));

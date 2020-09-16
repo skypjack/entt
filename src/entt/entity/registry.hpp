@@ -43,7 +43,7 @@ class basic_registry {
     using traits_type = entt_traits<Entity>;
 
     struct pool_data {
-        id_type type_id{};
+        id_type type_hash{};
         std::unique_ptr<sparse_set<Entity>> pool{};
         void(* erase)(sparse_set<Entity> &, basic_registry &, const Entity);
     };
@@ -99,20 +99,20 @@ class basic_registry {
     };
 
     struct variable_data {
-        id_type type_id;
+        id_type type_hash;
         std::unique_ptr<void, void(*)(void *)> value;
     };
 
     template<typename Component>
     [[nodiscard]] const pool_t<Entity, Component> & assure() const {
-        const auto index = type_index<Component>::value();
+        const auto index = type_seq<Component>::value();
         
         if(!(index < pools.size())) {
             pools.resize(size_type(index)+1u);
         }
         
         if(auto &&pdata = pools[index]; !pdata.pool) {
-            pdata.type_id = type_info<Component>::id();
+            pdata.type_hash = type_hash<Component>::value();
             pdata.pool.reset(new pool_t<Entity, Component>());
             pdata.erase = +[](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
                 static_cast<pool_t<Entity, Component> &>(cpool).erase(owner, entt);
@@ -1148,12 +1148,12 @@ public:
         std::vector<const sparse_set<Entity> *> filter(std::distance(from, to));
 
         std::transform(first, last, component.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.type_id == ctype; });
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.type_hash == ctype; });
             return it == pools.cend() ? nullptr : it->pool.get();
         });
 
         std::transform(from, to, filter.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.type_id == ctype; });
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.type_hash == ctype; });
             return it == pools.cend() ? nullptr : it->pool.get();
         });
 
@@ -1200,9 +1200,9 @@ public:
 
         if(auto it = std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
             return gdata.size == size
-                && (gdata.owned(type_info<std::decay_t<Owned>>::id()) && ...)
-                && (gdata.get(type_info<std::decay_t<Get>>::id()) && ...)
-                && (gdata.exclude(type_info<Exclude>::id()) && ...);
+                && (gdata.owned(type_hash<std::decay_t<Owned>>::value()) && ...)
+                && (gdata.get(type_hash<std::decay_t<Get>>::value()) && ...)
+                && (gdata.exclude(type_hash<Exclude>::value()) && ...);
         }); it != groups.cend())
         {
             handler = static_cast<handler_type *>(it->group.get());
@@ -1212,9 +1212,9 @@ public:
             group_data candidate = {
                 size,
                 { new handler_type{}, [](void *instance) { delete static_cast<handler_type *>(instance); } },
-                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Owned>>::id()) || ...); },
-                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_info<std::decay_t<Get>>::id()) || ...); },
-                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_info<Exclude>::id()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::decay_t<Owned>>::value()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<std::decay_t<Get>>::value()) || ...); },
+                []([[maybe_unused]] const id_type ctype) ENTT_NOEXCEPT { return ((ctype == type_hash<Exclude>::value()) || ...); },
             };
 
             handler = static_cast<handler_type *>(candidate.group.get());
@@ -1226,17 +1226,17 @@ public:
                 groups.push_back(std::move(candidate));
             } else {
                 ENTT_ASSERT(std::all_of(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-                    const auto overlapping = (0u + ... + gdata.owned(type_info<std::decay_t<Owned>>::id()));
-                    const auto sz = overlapping + (0u + ... + gdata.get(type_info<std::decay_t<Get>>::id())) + (0u + ... + gdata.exclude(type_info<Exclude>::id()));
+                    const auto overlapping = (0u + ... + gdata.owned(type_hash<std::decay_t<Owned>>::value()));
+                    const auto sz = overlapping + (0u + ... + gdata.get(type_hash<std::decay_t<Get>>::value())) + (0u + ... + gdata.exclude(type_hash<Exclude>::value()));
                     return !overlapping || ((sz == size) || (sz == gdata.size));
                 }));
 
                 const auto next = std::find_if_not(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-                    return !(0u + ... + gdata.owned(type_info<std::decay_t<Owned>>::id())) || (size > gdata.size);
+                    return !(0u + ... + gdata.owned(type_hash<std::decay_t<Owned>>::value())) || (size > gdata.size);
                 });
 
                 const auto prev = std::find_if(std::make_reverse_iterator(next), groups.crend(), [](const auto &gdata) {
-                    return (0u + ... + gdata.owned(type_info<std::decay_t<Owned>>::id()));
+                    return (0u + ... + gdata.owned(type_hash<std::decay_t<Owned>>::value()));
                 });
 
                 maybe_valid_if = (next == groups.cend() ? maybe_valid_if : next->group.get());
@@ -1324,7 +1324,7 @@ public:
      */
     template<typename... Component>
     [[nodiscard]] bool sortable() const {
-        return std::none_of(groups.cbegin(), groups.cend(), [](auto &&gdata) { return (gdata.owned(type_info<std::decay_t<Component>>::id()) || ...); });
+        return std::none_of(groups.cbegin(), groups.cend(), [](auto &&gdata) { return (gdata.owned(type_hash<std::decay_t<Component>>::value()) || ...); });
     }
 
     /**
@@ -1338,7 +1338,7 @@ public:
     [[nodiscard]] bool sortable(const basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> &) ENTT_NOEXCEPT {
         constexpr auto size = sizeof...(Owned) + sizeof...(Get) + sizeof...(Exclude);
         return std::find_if(groups.cbegin(), groups.cend(), [size](const auto &gdata) {
-            return (0u + ... + gdata.owned(type_info<std::decay_t<Owned>>::id())) && (size < gdata.size);
+            return (0u + ... + gdata.owned(type_hash<std::decay_t<Owned>>::value())) && (size < gdata.size);
         }) == groups.cend();
     }
 
@@ -1448,7 +1448,7 @@ public:
      *
      * Returned identifiers are those of the components owned by the entity.
      *
-     * @sa type_info
+     * @sa type_hash
      *
      * @warning
      * It's not specified whether a component attached to or removed from the
@@ -1462,7 +1462,7 @@ public:
     void visit(entity_type entity, Func func) const {
         for(auto pos = pools.size(); pos; --pos) {
             if(const auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
-                func(pdata.type_id);
+                func(pdata.type_hash);
             }
         }
     }
@@ -1478,7 +1478,7 @@ public:
      *
      * Returned identifiers are those of the components managed by the registry.
      *
-     * @sa type_info
+     * @sa type_hash
      *
      * @warning
      * It's not specified whether a component for which a pool is created during
@@ -1491,7 +1491,7 @@ public:
     void visit(Func func) const {
         for(auto pos = pools.size(); pos; --pos) {
             if(const auto &pdata = pools[pos-1]; pdata.pool) {
-                func(pdata.type_id);
+                func(pdata.type_hash);
             }
         }
     }
@@ -1510,7 +1510,7 @@ public:
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
         unset<Type>();
-        vars.push_back(variable_data{type_info<Type>::id(), { new Type{std::forward<Args>(args)...}, [](void *instance) { delete static_cast<Type *>(instance); } }});
+        vars.push_back(variable_data{type_hash<Type>::value(), { new Type{std::forward<Args>(args)...}, [](void *instance) { delete static_cast<Type *>(instance); } }});
         return *static_cast<Type *>(vars.back().value.get());
     }
 
@@ -1521,7 +1521,7 @@ public:
     template<typename Type>
     void unset() {
         vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &&var) {
-            return var.type_id == type_info<Type>::id();
+            return var.type_hash == type_hash<Type>::value();
         }), vars.end());
     }
 
@@ -1550,7 +1550,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type * try_ctx() const {
-        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&var) { return var.type_id == type_info<Type>::id(); });
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&var) { return var.type_hash == type_hash<Type>::value(); });
         return it == vars.cend() ? nullptr : static_cast<const Type *>(it->value.get());
     }
 
@@ -1596,7 +1596,7 @@ public:
      *
      * Returned identifiers are those of the context variables currently set.
      *
-     * @sa type_info
+     * @sa type_hash
      *
      * @warning
      * It's not specified whether a context variable created during the visit is
@@ -1608,7 +1608,7 @@ public:
     template<typename Func>
     void ctx(Func func) const {
         for(auto pos = vars.size(); pos; --pos) {
-            func(vars[pos-1].type_id);
+            func(vars[pos-1].type_hash);
         }
     }
 

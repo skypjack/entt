@@ -64,7 +64,7 @@ TEST(Registry, Context) {
     auto count = 0;
 
     registry.ctx([&count](const auto var) {
-        ASSERT_EQ(var, entt::type_info<char>::id());
+        ASSERT_EQ(var, entt::type_hash<char>::value());
         ++count;
     });
 
@@ -1436,9 +1436,9 @@ TEST(Registry, Visit) {
     bool hasType[3]{};
 
     registry.visit([&hasType](const auto component) {
-        hasType[0] = hasType[0] || (component == entt::type_info<int>::id());
-        hasType[1] = hasType[1] || (component == entt::type_info<double>::id());
-        hasType[2] = hasType[2] || (component == entt::type_info<char>::id());
+        hasType[0] = hasType[0] || (component == entt::type_hash<int>::value());
+        hasType[1] = hasType[1] || (component == entt::type_hash<double>::value());
+        hasType[2] = hasType[2] || (component == entt::type_hash<char>::value());
     });
 
     ASSERT_TRUE(hasType[0] && hasType[1] && hasType[2]);
@@ -1446,9 +1446,9 @@ TEST(Registry, Visit) {
     hasType[0] = hasType[1] = hasType[2] = false;
 
     registry.visit(entity, [&hasType](const auto component) {
-        hasType[0] = hasType[0] || (component == entt::type_info<int>::id());
-        hasType[1] = hasType[1] || (component == entt::type_info<double>::id());
-        hasType[2] = hasType[2] || (component == entt::type_info<char>::id());
+        hasType[0] = hasType[0] || (component == entt::type_hash<int>::value());
+        hasType[1] = hasType[1] || (component == entt::type_hash<double>::value());
+        hasType[2] = hasType[2] || (component == entt::type_hash<char>::value());
     });
 
     ASSERT_TRUE(hasType[0] && !hasType[1] && hasType[2]);
@@ -1456,9 +1456,9 @@ TEST(Registry, Visit) {
     hasType[0] = hasType[2] = false;
 
     registry.visit(other, [&hasType](const auto component) {
-        hasType[0] = hasType[0] || (component == entt::type_info<int>::id());
-        hasType[1] = hasType[1] || (component == entt::type_info<double>::id());
-        hasType[2] = hasType[2] || (component == entt::type_info<char>::id());
+        hasType[0] = hasType[0] || (component == entt::type_hash<int>::value());
+        hasType[1] = hasType[1] || (component == entt::type_hash<double>::value());
+        hasType[2] = hasType[2] || (component == entt::type_hash<char>::value());
     });
 
     ASSERT_TRUE(!hasType[0] && hasType[1] && !hasType[2]);

@@ -123,7 +123,7 @@ class emitter {
 
     template<typename Event>
     [[nodiscard]] const pool_handler<Event> & assure() const {
-        const auto index = type_index<Event>::value();
+        const auto index = type_seq<Event>::value();
         
         if(!(index < pools.size())) {
             pools.resize(std::size_t(index)+1u);

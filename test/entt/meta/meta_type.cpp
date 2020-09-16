@@ -94,7 +94,7 @@ struct MetaType: ::testing::Test {
 
 TEST_F(MetaType, Resolve) {
     ASSERT_EQ(entt::resolve<double>(), entt::resolve_id("double"_hs));
-    ASSERT_EQ(entt::resolve<double>(), entt::resolve_type(entt::type_info<double>::id()));
+    ASSERT_EQ(entt::resolve<double>(), entt::resolve_type(entt::type_hash<double>::value()));
 
     auto range = entt::resolve();
     // it could be "char"_hs rather than entt::hashed_string::value("char") if it weren't for a bug in VS2017
@@ -118,7 +118,7 @@ TEST_F(MetaType, Functionalities) {
     ASSERT_TRUE(type);
     ASSERT_NE(type, entt::meta_type{});
     ASSERT_EQ(type.id(), "clazz"_hs);
-    ASSERT_EQ(type.type_id(), entt::type_info<clazz_t>::id());
+    ASSERT_EQ(type.hash(), entt::type_hash<clazz_t>::value());
 
     for(auto curr: type.prop()) {
         ASSERT_EQ(curr.key(), property_t::value);
@@ -348,7 +348,7 @@ TEST_F(MetaType, AbstractClass) {
     auto type = entt::resolve<abstract_t>();
     concrete_t instance;
 
-    ASSERT_EQ(type.type_id(), entt::type_info<abstract_t>::id());
+    ASSERT_EQ(type.hash(), entt::type_hash<abstract_t>::value());
     ASSERT_EQ(instance.base_t::value, 'c');
     ASSERT_EQ(instance.value, 3);
 
