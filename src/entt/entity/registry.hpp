@@ -758,7 +758,7 @@ public:
     size_type remove_if_exists(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
 
-        return ([this, entity](auto &&cpool) {
+        return ([entity](auto &&cpool) {
             return cpool.contains(entity) ? (cpool.erase(entity), true) : false;
         }(assure<Component>()) + ... + size_type{});
     }
@@ -939,7 +939,7 @@ public:
             // useless this-> used to suppress a warning with clang
             each([this](const auto entity) { this->destroy(entity); });
         } else {
-            ([this](auto &&cpool) {
+            ([](auto &&cpool) {
                 cpool.erase(cpool.sparse_set<entity_type>::begin(), cpool.sparse_set<entity_type>::end());
             }(assure<Component>()), ...);
         }
