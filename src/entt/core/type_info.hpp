@@ -21,7 +21,7 @@ namespace entt {
 namespace internal {
 
 
-struct ENTT_API type_seq {
+struct ENTT_API type_seq final {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
         return value++;
@@ -52,11 +52,11 @@ template<typename Type>
 
 
 /**
- * @brief Type index.
+ * @brief Type sequential identifier.
  * @tparam Type Type for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
-struct ENTT_API type_seq {
+struct ENTT_API type_seq final {
     /**
      * @brief Returns the sequential identifier of a given type.
      * @return The sequential identifier of a given type.
@@ -73,7 +73,7 @@ struct ENTT_API type_seq {
 * @tparam Type Type for which to generate a hash value.
 */
 template<typename Type, typename = void>
-struct type_hash {
+struct type_hash final {
     /**
     * @brief Returns the numeric representation of a given type.
     * @return The numeric representation of the given type.
@@ -97,11 +97,11 @@ struct type_hash {
 
 
 /**
-* @brief Type hash.
+* @brief Type name.
 * @tparam Type Type for which to generate a name.
 */
 template<typename Type, typename = void>
-struct type_name {
+struct type_name final {
     /**
     * @brief Returns the name of a given type.
     * @return The name of the given type.
@@ -122,6 +122,53 @@ struct type_name {
     }
 #endif
 };
+
+
+/*! @brief Implementation specific information about a type. */
+class type_info final {
+    using seq_fn = id_type() ENTT_NOEXCEPT;
+    using hash_fn = id_type() ENTT_NOEXCEPT;
+    using name_fn = std::string_view() ENTT_NOEXCEPT;
+
+    template<typename>
+    friend type_info type_id() ENTT_NOEXCEPT;
+
+    type_info(seq_fn *seq_func, hash_fn *hash_func, name_fn *name_func)
+        : seq{seq_func},
+          hash{hash_func},
+          name{name_func}
+    {}
+
+public:
+    /*! @brief Type sequential identifier. */
+    seq_fn * const seq;
+    /*! @brief Type hash. */
+    hash_fn * const hash;
+    /*! @brief Type name. */
+    name_fn * const name;
+};
+
+
+/**
+ * @brief Returns the type info object for a given type.
+ * @tparam Type Type for which to generate a type info object.
+ * @return The type info object for the given type.
+ */
+template<typename Type>
+type_info type_id() ENTT_NOEXCEPT {
+    return type_info{
+        &type_seq<std::decay_t<Type>>::value,
+        &type_hash<std::decay_t<Type>>::value,
+        &type_name<std::decay_t<Type>>::value,
+    };
+}
+
+
+/*! @copydoc type_id */
+template<typename Type>
+type_info type_id(Type &&) ENTT_NOEXCEPT {
+    return type_id<Type>();
+}
 
 
 }
