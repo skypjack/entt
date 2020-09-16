@@ -112,12 +112,12 @@ struct default_pool final: storage<Entity, Type> {
     * @return A reference to the newly created object.
     */
     template<typename... Args>
-    decltype(auto) emplace(const entity_type entt, Args &&... args) {
-        storage<entity_type, Type>::emplace(entt, std::forward<Args>(args)...);
-        construction.publish(entt);
+    decltype(auto) emplace(const entity_type entity, Args &&... args) {
+        storage<entity_type, Type>::emplace(entity, std::forward<Args>(args)...);
+        construction.publish(entity);
 
         if constexpr(!is_eto_eligible_v<object_type>) {
-            return this->get(entt);
+            return this->get(entity);
         }
     }
 
@@ -127,9 +127,10 @@ struct default_pool final: storage<Entity, Type> {
     * @sa emplace
     *
     * @tparam It Type of input iterator.
+    * @tparam Args Types of arguments to use to construct the object.
     * @param first An iterator to the first element of the range of entities.
     * @param last An iterator past the last element of the range of entities.
-    * @param value An instance of the type to assign.
+    * @param args Parameters to use to initialize the object.
     */
     template<typename It, typename... Args>
     void insert(It first, It last, Args &&... args) {
@@ -153,9 +154,9 @@ struct default_pool final: storage<Entity, Type> {
     *
     * @param entity A valid entity identifier.
     */
-    void erase(const entity_type entt) override {
-        destruction.publish(entt);
-        storage<entity_type, object_type>::erase(entt);
+    void erase(const entity_type entity) override {
+        destruction.publish(entity);
+        storage<entity_type, object_type>::erase(entity);
     }
 
     /**
@@ -210,13 +211,13 @@ struct default_pool final: storage<Entity, Type> {
     * @return A reference to the patched instance.
     */
     template<typename... Func>
-    decltype(auto) patch(const entity_type entt, [[maybe_unused]] Func &&... func) {
+    decltype(auto) patch(const entity_type entity, [[maybe_unused]] Func &&... func) {
         if constexpr(is_eto_eligible_v<object_type>) {
-            update.publish(entt);
+            update.publish(entity);
         } else {
-            (std::forward<Func>(func)(this->get(entt)), ...);
-            update.publish(entt);
-            return this->get(entt);
+            (std::forward<Func>(func)(this->get(entity)), ...);
+            update.publish(entity);
+            return this->get(entity);
         }
     }
 
@@ -233,13 +234,12 @@ struct default_pool final: storage<Entity, Type> {
     * An assertion will abort the execution at runtime in debug mode in case of
     * invalid entity or if the entity doesn't belong to the pool.
     *
-    * @tparam Args Types of arguments to use to construct the object.
     * @param entity A valid entity identifier.
-    * @param args Parameters to use to initialize the object.
+    * @param value An instance of the type to assign.
     * @return A reference to the object being replaced.
     */
-    decltype(auto) replace(const entity_type entt, object_type instance) {
-        return patch(entt, [&instance](auto &&curr) { curr = std::move(instance); });
+    decltype(auto) replace(const entity_type entity, object_type value) {
+        return patch(entity, [&value](auto &&curr) { curr = std::move(value); });
     }
 
 private:
