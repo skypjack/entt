@@ -7,8 +7,6 @@
 
 
 struct clazz_t {
-    clazz_t() = default;
-
     void member(int i) { value = i; }
     static void func() { c = 'd'; }
 
@@ -59,10 +57,10 @@ struct MetaAny: ::testing::Test {
         entt::meta<fat_t>().base<empty_t>().dtor<&fat_t::destroy>();
 
         entt::meta<clazz_t>()
-                .type("clazz"_hs)
-                .data<&clazz_t::value>("value"_hs)
-                .func<&clazz_t::member>("member"_hs)
-                .func<&clazz_t::func>("func"_hs);
+            .type("clazz"_hs)
+            .data<&clazz_t::value>("value"_hs)
+            .func<&clazz_t::member>("member"_hs)
+            .func<&clazz_t::func>("func"_hs);
     }
 
     void SetUp() override {
@@ -640,7 +638,7 @@ TEST_F(MetaAny, UnmanageableType) {
     ASSERT_FALSE(std::as_const(any).convert<int>());
 }
 
-TEST_F(MetaAny, FuncInvokeShortcut) {
+TEST_F(MetaAny, Invoke) {
     clazz_t instance;
     entt::meta_any any{std::ref(instance)};
 
@@ -652,18 +650,18 @@ TEST_F(MetaAny, FuncInvokeShortcut) {
 	ASSERT_EQ(instance.value, 42);
 }
 
-TEST_F(MetaAny, DataAccessShortcut) {
+TEST_F(MetaAny, SetGet) {
     clazz_t instance;
     entt::meta_any any{std::ref(instance)};
 
 	ASSERT_TRUE(any.set("value"_hs, 42));
 
-	auto const value_any = any.get("value"_hs);
+    const auto value = any.get("value"_hs);
 
-	ASSERT_EQ(instance.value, 42);
-	ASSERT_TRUE(value_any);
-	ASSERT_TRUE(value_any.try_cast<int>());
-	ASSERT_EQ(value_any.cast<int>(), 42);
+	ASSERT_TRUE(value);
+	ASSERT_TRUE(value.try_cast<int>());
+	ASSERT_EQ(value.cast<int>(), 42);
+    ASSERT_EQ(instance.value, 42);
 
 	ASSERT_FALSE(any.set("non_existent"_hs, 42));
 	ASSERT_FALSE(any.get("non_existent"_hs));

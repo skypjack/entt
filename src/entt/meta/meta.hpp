@@ -297,30 +297,28 @@ public:
     }
 
     /**
-     * @copybrief invoke
+     * @brief Invokes the underlying function, if possible.
      *
      * @sa invoke
      *
-     * @param id identifier of function to invoke.
      * @tparam Args Types of arguments to use to invoke the function.
-     * @param instance An opaque instance of the underlying type.
+     * @param id Unique identifier.
      * @param args Parameters to use to invoke the function.
-     * @return A meta any containing the new instance, if any.
+     * @return A meta any containing the returned value, if any.
      */
     template<typename... Args>
-    meta_any invoke(const id_type id, Args &&... args) const;
+    meta_any invoke(const id_type id, Args &&... args) const {
+        return type().invoke(id, *this, std::forward<Args>(args)...);
+    }
 
     /**
      * @brief Sets the value of a given variable.
      *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the setter results in an undefined
-     * behavior.<br/>
      * The type of the value must be such that a cast or conversion to the type
      * of the variable is possible. Otherwise, invoking the setter does nothing.
      *
      * @tparam Type Type of value to assign.
-     * @param id identifier of the variable to set.
+     * @param id Unique identifier.
      * @param value Parameter to use to set the underlying variable.
      * @return True in case of success, false otherwise.
      */
@@ -329,11 +327,7 @@ public:
 
     /**
      * @brief Gets the value of a given variable.
-     *
-     * It must be possible to cast the instance to the parent type of the meta
-     * data. Otherwise, invoking the getter results in an undefined behavior.
-     *
-     * @param id identifier of the variable to get.
+     * @param id Unique identifier.
      * @return A meta any containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(const id_type id) const;
@@ -958,7 +952,7 @@ struct meta_func {
      * @param sz Number of parameters to use to invoke the function.
      * @return A meta any containing the returned value, if any.
      */
-    [[nodiscard]] meta_any invoke(meta_handle instance, meta_any * const args, const std::size_t sz) const {
+    meta_any invoke(meta_handle instance, meta_any * const args, const std::size_t sz) const {
         return sz == size() ? node->invoke(instance, args) : meta_any{};
     }
 
@@ -1357,15 +1351,15 @@ public:
      * function. Otherwise, invoking the underlying function results in an
      * undefined behavior.
      *
-     * @param id identifier of function to invoke.
+     * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
      * @param sz Number of parameters to use to invoke the function.
      * @return A meta any containing the returned value, if any.
      */
-    [[nodiscard]] meta_any invoke(const id_type id, meta_handle instance, meta_any * const args, const std::size_t sz) const {
-        auto const f = func(id);
-        return f ? f.invoke(instance, args, sz) : meta_any{};
+    meta_any invoke(const id_type id, meta_handle instance, meta_any * const args, const std::size_t sz) const {
+        auto const candidate = func(id);
+        return candidate ? candidate.invoke(std::move(instance), args, sz) : meta_any{};
     }
 
     /**
@@ -1373,7 +1367,7 @@ public:
      *
      * @sa invoke
      *
-     * @param id identifier of function to invoke.
+     * @param id Unique identifier.
      * @tparam Args Types of arguments to use to invoke the function.
      * @param instance An opaque instance of the underlying type.
      * @param args Parameters to use to invoke the function.
@@ -1382,7 +1376,7 @@ public:
     template<typename... Args>
     meta_any invoke(const id_type id, meta_handle instance, Args &&... args) const {
         std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
-        return invoke(id, instance, arguments.data(), sizeof...(Args));
+        return invoke(id, std::move(instance), arguments.data(), sizeof...(Args));
     }
 
     /**
@@ -1395,15 +1389,15 @@ public:
      * of the variable is possible. Otherwise, invoking the setter does nothing.
      *
      * @tparam Type Type of value to assign.
-     * @param id identifier of the variable to set.
+     * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
      * @param value Parameter to use to set the underlying variable.
      * @return True in case of success, false otherwise.
      */
     template<typename Type>
     bool set(const id_type id, meta_handle instance, Type &&value) const {
-        auto const d = data(id);
-        return d ? d.set(std::move(instance), std::forward<Type>(value)) : false;
+        auto const candidate = data(id);
+        return candidate ? candidate.set(std::move(instance), std::forward<Type>(value)) : false;
     }
 
     /**
@@ -1412,13 +1406,13 @@ public:
      * It must be possible to cast the instance to the parent type of the meta
      * data. Otherwise, invoking the getter results in an undefined behavior.
      *
-     * @param id identifier of the variable to get.
+     * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
      * @return A meta any containing the value of the underlying variable.
      */
     [[nodiscard]] meta_any get(const id_type id, meta_handle instance) const {
-        auto const d = data(id);
-        return d ? d.get(std::move(instance)) : meta_any{};
+        auto const candidate = data(id);
+        return candidate ? candidate.get(std::move(instance)) : meta_any{};
     }
 
     /**
@@ -1522,12 +1516,6 @@ private:
 
 [[nodiscard]] inline meta_type meta_any::type() const ENTT_NOEXCEPT {
     return node;
-}
-
-
-template<typename... Args>
-meta_any meta_any::invoke(const id_type id, Args &&... args) const {
-    return type().invoke(id, *this, std::forward<Args>(args)...);
 }
 
 
