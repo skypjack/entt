@@ -43,13 +43,13 @@ template<typename Type>
 
 
 /**
- * @brief Returns the meta type associated with a given type id, if any.
+ * @brief Returns the meta type associated with a given type hash, if any.
  * @param id Unique identifier.
- * @return The meta type associated with the given type id, if any.
+ * @return The meta type associated with the given type hash, if any.
  */
 [[nodiscard]] inline meta_type resolve_type(const id_type id) ENTT_NOEXCEPT {
     internal::meta_range range{*internal::meta_context::global()};
-    return std::find_if(range.begin(), range.end(), [id](const auto &curr) { return curr.type_id == id; }).operator->();
+    return std::find_if(range.begin(), range.end(), [id](const auto &curr) { return curr.type_hash == id; }).operator->();
 }
 
 

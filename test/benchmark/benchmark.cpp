@@ -271,7 +271,7 @@ TEST(Benchmark, IterateSingleComponentRuntime1M) {
     }
 
     auto test = [&](auto func) {
-        entt::id_type types[] = { entt::type_info<position>::id() };
+        entt::id_type types[] = { entt::type_hash<position>::value() };
 
         timer timer;
         registry.runtime_view(std::begin(types), std::end(types)).each(func);
@@ -437,8 +437,8 @@ TEST(Benchmark, IterateTwoComponentsRuntime1M) {
 
     auto test = [&](auto func) {
         entt::id_type types[] = {
-            entt::type_info<position>::id(),
-            entt::type_info<velocity>::id()
+            entt::type_hash<position>::value(),
+            entt::type_hash<velocity>::value()
         };
 
         timer timer;
@@ -468,8 +468,8 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MHalf) {
 
     auto test = [&](auto func) {
         entt::id_type types[] = {
-            entt::type_info<position>::id(),
-            entt::type_info<velocity>::id()
+            entt::type_hash<position>::value(),
+            entt::type_hash<velocity>::value()
         };
 
         timer timer;
@@ -499,8 +499,8 @@ TEST(Benchmark, IterateTwoComponentsRuntime1MOne) {
 
     auto test = [&](auto func) {
         entt::id_type types[] = {
-            entt::type_info<position>::id(),
-            entt::type_info<velocity>::id()
+            entt::type_hash<position>::value(),
+            entt::type_hash<velocity>::value()
         };
 
         timer timer;
@@ -675,9 +675,9 @@ TEST(Benchmark, IterateThreeComponentsRuntime1M) {
 
     auto test = [&](auto func) {
         entt::id_type types[] = {
-            entt::type_info<position>::id(),
-            entt::type_info<velocity>::id(),
-            entt::type_info<comp<0>>::id()
+            entt::type_hash<position>::value(),
+            entt::type_hash<velocity>::value(),
+            entt::type_hash<comp<0>>::value()
         };
 
         timer timer;
@@ -709,9 +709,9 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MHalf) {
 
     auto test = [&](auto func) {
         entt::id_type types[] = {
-            entt::type_info<position>::id(),
-            entt::type_info<velocity>::id(),
-            entt::type_info<comp<0>>::id()
+            entt::type_hash<position>::value(),
+            entt::type_hash<velocity>::value(),
+            entt::type_hash<comp<0>>::value()
         };
 
         timer timer;
@@ -743,9 +743,9 @@ TEST(Benchmark, IterateThreeComponentsRuntime1MOne) {
 
     auto test = [&](auto func) {
         entt::id_type types[] = {
-            entt::type_info<position>::id(),
-            entt::type_info<velocity>::id(),
-            entt::type_info<comp<0>>::id()
+            entt::type_hash<position>::value(),
+            entt::type_hash<velocity>::value(),
+            entt::type_hash<comp<0>>::value()
         };
 
         timer timer;
@@ -961,11 +961,11 @@ TEST(Benchmark, IterateFiveComponentsRuntime1M) {
 
     auto test = [&](auto func) {
         entt::id_type types[] = {
-            entt::type_info<position>::id(),
-            entt::type_info<velocity>::id(),
-            entt::type_info<comp<0>>::id(),
-            entt::type_info<comp<1>>::id(),
-            entt::type_info<comp<2>>::id()
+            entt::type_hash<position>::value(),
+            entt::type_hash<velocity>::value(),
+            entt::type_hash<comp<0>>::value(),
+            entt::type_hash<comp<1>>::value(),
+            entt::type_hash<comp<2>>::value()
         };
 
         timer timer;
@@ -1001,11 +1001,11 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MHalf) {
 
     auto test = [&](auto func) {
         entt::id_type types[] = {
-            entt::type_info<position>::id(),
-            entt::type_info<velocity>::id(),
-            entt::type_info<comp<0>>::id(),
-            entt::type_info<comp<1>>::id(),
-            entt::type_info<comp<2>>::id()
+            entt::type_hash<position>::value(),
+            entt::type_hash<velocity>::value(),
+            entt::type_hash<comp<0>>::value(),
+            entt::type_hash<comp<1>>::value(),
+            entt::type_hash<comp<2>>::value()
         };
 
         timer timer;
@@ -1041,11 +1041,11 @@ TEST(Benchmark, IterateFiveComponentsRuntime1MOne) {
 
     auto test = [&](auto func) {
         entt::id_type types[] = {
-            entt::type_info<position>::id(),
-            entt::type_info<velocity>::id(),
-            entt::type_info<comp<0>>::id(),
-            entt::type_info<comp<1>>::id(),
-            entt::type_info<comp<2>>::id()
+            entt::type_hash<position>::value(),
+            entt::type_hash<velocity>::value(),
+            entt::type_hash<comp<0>>::value(),
+            entt::type_hash<comp<1>>::value(),
+            entt::type_hash<comp<2>>::value()
         };
 
         timer timer;

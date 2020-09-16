@@ -7,18 +7,18 @@
 #include <entt/meta/meta.hpp>
 
 template<typename>
-struct type_id;
+struct custom_type_hash;
 
 #define ASSIGN_TYPE_ID(clazz)\
     template<>\
-    struct type_id<clazz>\
+    struct custom_type_hash<clazz>\
         : std::integral_constant<entt::id_type, entt::basic_hashed_string<std::remove_cv_t<std::remove_pointer_t<std::decay_t<decltype(#clazz)>>>>{#clazz}>\
     {}
 
 template<typename Type>
-struct entt::type_info<Type> {
-    static constexpr entt::id_type id() ENTT_NOEXCEPT {
-        return type_id<Type>::value;
+struct entt::type_seq<Type> {
+    static constexpr entt::id_type value() ENTT_NOEXCEPT {
+        return custom_type_hash<Type>::value;
     }
 };
 

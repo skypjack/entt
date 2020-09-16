@@ -21,7 +21,7 @@ namespace entt {
 namespace internal {
 
 
-struct ENTT_API type_index {
+struct ENTT_API type_seq {
     [[nodiscard]] static id_type next() ENTT_NOEXCEPT {
         static ENTT_MAYBE_ATOMIC(id_type) value{};
         return value++;
@@ -56,60 +56,68 @@ template<typename Type>
  * @tparam Type Type for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
-struct ENTT_API type_index {
+struct ENTT_API type_seq {
     /**
      * @brief Returns the sequential identifier of a given type.
      * @return The sequential identifier of a given type.
      */
     [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
-        static const id_type value = internal::type_index::next();
+        static const id_type value = internal::type_seq::next();
         return value;
     }
 };
 
 
 /**
- * @brief Type info.
- * @tparam Type Type for which to generate information.
- */
+* @brief Type hash.
+* @tparam Type Type for which to generate a hash value.
+*/
 template<typename Type, typename = void>
-struct type_info {
+struct type_hash {
     /**
-     * @brief Returns the numeric representation of a given type.
-     * @return The numeric representation of the given type.
-     */
+    * @brief Returns the numeric representation of a given type.
+    * @return The numeric representation of the given type.
+    */
 #if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
-    [[nodiscard]] static constexpr id_type id() ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr id_type value() ENTT_NOEXCEPT {
         constexpr auto value = hashed_string::value(ENTT_PRETTY_FUNCTION);
         return value;
     }
 #elif defined ENTT_PRETTY_FUNCTION
-    [[nodiscard]] static id_type id() ENTT_NOEXCEPT {
+    [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
         static const auto value = hashed_string::value(ENTT_PRETTY_FUNCTION);
         return value;
     }
 #else
-    [[nodiscard]] static id_type id() ENTT_NOEXCEPT {
-        return type_index<Type>::value();
+    [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
+        return type_seq<Type>::value();
     }
 #endif
+};
 
+
+/**
+* @brief Type hash.
+* @tparam Type Type for which to generate a name.
+*/
+template<typename Type, typename = void>
+struct type_name {
     /**
-     * @brief Returns the name of a given type.
-     * @return The name of the given type.
-     */
+    * @brief Returns the name of a given type.
+    * @return The name of the given type.
+    */
 #if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
-    [[nodiscard]] static constexpr std::string_view name() ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         constexpr auto value = internal::type_name<Type>();
         return value;
     }
 #elif defined ENTT_PRETTY_FUNCTION
-    [[nodiscard]] static std::string_view name() ENTT_NOEXCEPT {
+    [[nodiscard]] static std::string_view value() ENTT_NOEXCEPT {
         static const auto value = internal::type_name<Type>();
         return value;
     }
 #else
-    [[nodiscard]] static constexpr std::string_view name() ENTT_NOEXCEPT {
+    [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         return internal::type_name<Type>();
     }
 #endif
