@@ -1,4 +1,5 @@
 #include <string_view>
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_info.hpp>
@@ -26,4 +27,20 @@ TEST(TypeName, Functionalities) {
 
     ASSERT_TRUE(((entt::type_name<entt::type_list<entt::type_list<int, char>, double>>::value()) == std::string_view{"entt::type_list<entt::type_list<int, char>, double>"})
         || ((entt::type_name<entt::type_list<entt::type_list<int, char>, double>>::value()) == std::string_view{"struct entt::type_list<struct entt::type_list<int,char>,double>"}));
+}
+
+TEST(TypeInfo, Functionalities) {
+    auto info = entt::type_id<int>();
+    auto other = entt::type_id(42);
+
+    static_assert(std::is_copy_constructible_v<decltype(info)>);
+    static_assert(std::is_move_constructible_v<decltype(info)>);
+
+    ASSERT_EQ(info.seq(), other.seq());
+    ASSERT_EQ(info.hash(), other.hash());
+    ASSERT_EQ(info.name(), other.name());
+
+    ASSERT_EQ(info.seq(), entt::type_seq<int>::value());
+    ASSERT_EQ(info.hash(), entt::type_hash<int>::value());
+    ASSERT_EQ(info.name(), entt::type_name<int>::value());
 }
