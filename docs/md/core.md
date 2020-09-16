@@ -16,7 +16,6 @@
 * [Type support](#type-support)
   * [Type info](#type-info)
     * [Almost unique identifiers](#almost-unique-identifiers)
-  * [Type index](#type-index)
   * [Type traits](#type-traits)
     * [Member class type](#member-class-type)
     * [Integral constant](#integral-constant)
@@ -211,23 +210,82 @@ library or that will never be.
 
 ## Type info
 
-This class template isn't a drop-in replacement for `std::type_info` but can
+The `type_info` class isn't a drop-in replacement for `std::type_info` but can
 provide similar information which are not implementation defined and don't
 require to enable RTTI.<br/>
 Therefore, they can sometimes be even more reliable than those obtained
 otherwise.
 
-Currently, there are a couple of information available:
+A type info object is an opaque class that is also copy and move constructible.
+This class is returned by the `type_id` function template:
 
-* The numeric identifier associated with a given type:
+```
+// generates an info object from a type ...
+auto info = entt::type_id<a_type>();
+
+// ... or directly from a variable
+auto other = entt::type_id(42);
+```
+
+These are the information made available by this object:
+
+* The unique, sequential identifier associated with a given type:
 
   ```cpp
-  auto id = entt::type_info<my_type>::id();
+  auto index = entt::type_id<a_type>().seq();
   ```
 
-  In general, the `id` function is also `constexpr` but this isn't guaranteed
-  for all compilers and platforms (although it's valid with the most well-known
-  and popular ones).
+  This is also an alias for the following:
+
+  ```cpp
+  auto index = entt::type_seq<a_type>::value();
+  ```
+
+  The returned value isn't guaranteed to be stable across different runs.
+  However, it can be very useful as index in associative and unordered
+  associative containers or for positional accesses in a vector or an array.
+  
+  So as not to conflict with the other tools available, the `family` class isn't
+  used to generate these indexes. Therefore, the numeric identifiers returned by
+  the two tools may differ.<br/>
+  On the other hand, this leaves users with full powers over the `family` class
+  and therefore the generation of custom runtime sequences of indices for their
+  own purposes, if necessary.
+  
+  An external generator can also be used if needed. In fact, `type_seq` can be
+  specialized by type and is also _sfinae-friendly_ in order to allow more
+  refined specializations such as:
+  
+  ```cpp
+  template<typename Type>
+  struct entt::type_seq<Type, std::void_d<decltype(Type::index())>> {
+      static entt::id_type value() ENTT_NOEXCEPT {
+          return Type::index();
+      }
+  };
+  ```
+  
+  Note that indexes **must** still be generated sequentially in this case.<br/>
+  The tool is widely used within `EnTT`. Generating indices not sequentially
+  would break an assumption and would likely lead to undesired behaviors.
+
+* The hash value associated with a given type:
+
+  ```cpp
+  auto hash = entt::type_id<a_type>().hash();
+  ```
+
+  This is also an alias for the following:
+
+  ```cpp
+  auto hash = entt::type_hash<a_type>::value();
+  ```
+
+  In general, the `value` function exposed by `type_hash` is also `constexpr`
+  but this isn't guaranteed for all compilers and platforms (although it's valid
+  with the most well-known and popular ones).<br/>
+  The `hash` function offered by the type info object isn't `constexpr` in any
+  case instead.
 
   This function **can** use non-standard features of the language for its own
   purposes. This makes it possible to provide compile-time identifiers that
@@ -237,10 +295,20 @@ Currently, there are a couple of information available:
   that identifiers remain stable across executions. Moreover, they are generated
   at runtime and are no longer a compile-time thing.
 
-* The _name_ associated with a given type:
+  As for `type_seq`, also `type_hash` is a _sfinae-friendly_ class that can be
+  specialized in order to customize its behavior globally or on a per-type or
+  per-traits basis.
+
+* The name associated with a given type:
 
   ```cpp
-  auto name = entt::type_info<my_type>::name();
+  auto name = entt::type_info<my_type>().name();
+  ```
+
+  This is also an alias for the following:
+
+  ```cpp
+  auto name = entt::type_name<a_type>::value();
   ```
 
   The name associated with a type is extracted from some information generally
@@ -262,52 +330,32 @@ Currently, there are a couple of information available:
   copying and creating a new string potentially at runtime.
 
   This function **can** use non-standard features of the language for its own
-  purposes. As for the numeric identifier, users can prevent the library from
-  using non-standard features by means of the `ENTT_STANDARD_CPP` definition. In
-  this case, the name will be empty by default.
+  purposes. Users can prevent the library from using non-standard features by
+  means of the `ENTT_STANDARD_CPP` definition. In this case, the name will be
+  empty by default.
 
-An external type system can also be used if needed. In fact, `type_info` can be
-specialized by type and is also _sfinae-friendly_ in order to allow more refined
-specializations such as:
-
-```cpp
-template<typename Type>
-struct entt::type_info<Type, std::enable_if_t<has_custom_data_v<Type>>> {
-    static constexpr entt::id_type id() ENTT_NOEXCEPT {
-        return Type::custom_id();
-    }
-
-    static constexpr std::string_view name() ENTT_NOEXCEPT {
-        return Type::custom_name();
-    }
-};
-```
-
-Note that this class template and its specializations are widely used within
-`EnTT`. It also plays a very important role in making `EnTT` work transparently
-across boundaries in many cases.<br/>
-Please refer to the dedicated section for more details.
+  As for `type_seq`, also `type_name` is a _sfinae-friendly_ class that can be
+  specialized in order to customize its behavior globally or on a per-type or
+  per-traits basis.
 
 ### Almost unique identifiers
 
-Since the default non-standard, compile-time implementation makes use of hashed
-strings, it may happen that two types are assigned the same numeric
-identifier.<br/>
+Since the default non-standard, compile-time implementation of `type_hash` makes
+use of hashed strings, it may happen that two types are assigned the same hash
+value.<br/>
 In fact, although this is quite rare, it's not entirely excluded.
 
 Another case where two types are assigned the same identifier is when classes
 from different contexts (for example two or more libraries loaded at runtime)
-have the same fully qualified name.<br/>
-If the types have the same name and belong to the same namespace then their
-identifiers _could_ be identical (they won't necessarily be the same though).
-
+have the same fully qualified name. In this case, also `type_name` will return
+the same value for the two types.<br/>
 Fortunately, there are several easy ways to deal with this:
 
 * The most trivial one is to define the `ENTT_STANDARD_CPP` macro. Runtime
   identifiers don't suffer from the same problem in fact. However, this solution
   doesn't work well with a plugin system, where the libraries aren't linked.
 
-* Another possibility is to specialize the `type_info` class for one of the
+* Another possibility is to specialize the `type_name` class for one of the
   conflicting types, in order to assign it a custom identifier. This is probably
   the easiest solution that also preserves the feature of the tool.
 
@@ -319,44 +367,6 @@ many others. As already mentioned above, since users have full control over
 their types, this problem is in any case easy to solve and should not worry too
 much.<br/>
 In all likelihood, it will never happen to run into a conflict anyway.
-
-## Type index
-
-Types in `EnTT` are assigned also unique, sequential _indexes_ generated at
-runtime:
-
-```cpp
-auto index = entt::type_index<my_type>::value();
-```
-
-This value may differ from the numeric identifier of a type and isn't guaranteed
-to be stable across different runs. However, it can be very useful as index in
-associative and unordered associative containers or for positional accesses in a
-vector or an array.
-
-So as not to conflict with the other tools available, the `family` class isn't
-used to generate these indexes. Therefore, the numeric identifiers returned by
-the two tools may differ.<br/>
-On the other hand, this leaves users with full powers over the `family` class
-and therefore the generation of custom runtime sequences of indices for their
-own purposes, if necessary.
-
-An external generator can also be used if needed. In fact, `type_index` can be
-specialized by type and is also _sfinae-friendly_ in order to allow more refined
-specializations such as:
-
-```cpp
-template<typename Type>
-struct entt::type_index<Type, std::void_d<decltype(Type::index())>> {
-    static entt::id_type value() ENTT_NOEXCEPT {
-        return Type::index();
-    }
-};
-```
-
-Note that indexes **must** still be generated sequentially in this case.<br/>
-The tool is widely used within `EnTT`. Generating indices not sequentially would
-break an assumption and would likely lead to undesired behaviors.
 
 ## Type traits
 
