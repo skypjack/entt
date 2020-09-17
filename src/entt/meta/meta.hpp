@@ -307,9 +307,7 @@ public:
      * @return A meta any containing the returned value, if any.
      */
     template<typename... Args>
-    meta_any invoke(const id_type id, Args &&... args) const {
-        return type().invoke(id, *this, std::forward<Args>(args)...);
-    }
+    meta_any invoke(const id_type id, Args &&... args) const;
 
     /**
      * @brief Sets the value of a given variable.
@@ -1516,6 +1514,12 @@ private:
 
 [[nodiscard]] inline meta_type meta_any::type() const ENTT_NOEXCEPT {
     return node;
+}
+
+
+template<typename... Args>
+meta_any meta_any::invoke(const id_type id, Args &&... args) const {
+    return type().invoke(id, *this, std::forward<Args>(args)...);
 }
 
 
