@@ -167,10 +167,14 @@ class meta_any {
     template<typename Type>
     [[nodiscard]] static meta_any dereference_operator(meta_any &any) {
         if constexpr(is_meta_pointer_like_v<Type>) {
-            if constexpr(std::is_const_v<std::remove_reference_t<decltype(*std::declval<Type>())>>) {
-                return *any.cast<Type>();
-            } else {
+            using pointed_type = std::remove_reference_t<decltype(*std::declval<Type>())>;
+
+            if constexpr(std::is_const_v<pointed_type> && std::is_copy_constructible_v<pointed_type>) {
+                return std::as_const(*any.cast<Type>());
+            } else if constexpr(!std::is_const_v<pointed_type>) {
                 return std::ref(*any.cast<Type>());
+            } else {
+                return {};
             }
         } else {
             return {};

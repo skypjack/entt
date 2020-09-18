@@ -5,7 +5,6 @@
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 
-
 struct clazz_t {
     void member(int i) { value = i; }
     static void func() { c = 'd'; }
