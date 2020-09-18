@@ -183,6 +183,34 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 
 
 /**
+ * @brief Provides the member constant `value` to true if a type list contains a
+ * given type, false otherwise.
+ * @tparam List Type list.
+ * @tparam Type Type to look for.
+ */
+template<typename List, typename Type>
+struct type_list_contains;
+
+
+/**
+* @copybrief type_list_contains
+* @tparam Type Types provided by the type list.
+* @tparam Other Type to look for.
+*/
+template<typename... Type, typename Other>
+struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
+
+
+/**
+* @brief Helper variable template.
+* @tparam List Type list.
+* @tparam Type Type to look for.
+*/
+template<class List, typename Type>
+inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
+
+
+/**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.

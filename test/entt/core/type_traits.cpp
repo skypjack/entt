@@ -26,30 +26,35 @@ TEST(TypeTraits, UnpackAsValue) {
 TEST(TypeTraits, IntegralConstant) {
     entt::integral_constant<3> constant;
 
-    ASSERT_TRUE((std::is_same_v<typename entt::integral_constant<3>::value_type, int>));
-    ASSERT_EQ(constant.value, 3);
+    static_assert(std::is_same_v<typename entt::integral_constant<3>::value_type, int>);
+    static_assert(constant.value == 3);
 }
 
 TEST(TypeTraits, Choice) {
-    ASSERT_TRUE((std::is_base_of_v<entt::choice_t<0>, entt::choice_t<1>>));
-    ASSERT_FALSE((std::is_base_of_v<entt::choice_t<1>, entt::choice_t<0>>));
+    static_assert(std::is_base_of_v<entt::choice_t<0>, entt::choice_t<1>>);
+    static_assert(!std::is_base_of_v<entt::choice_t<1>, entt::choice_t<0>>);
 }
 
 TEST(TypeTraits, TypeList) {
     using type = entt::type_list<int, char>;
     using other = entt::type_list<double>;
 
-    ASSERT_EQ(entt::type_list_size_v<type>, 2u);
-    ASSERT_EQ(entt::type_list_size_v<other>, 1u);
-    ASSERT_TRUE((std::is_same_v<entt::type_list_cat_t<type, other, type, other>, entt::type_list<int, char, double, int, char, double>>));
-    ASSERT_TRUE((std::is_same_v<entt::type_list_cat_t<type, other>, entt::type_list<int, char, double>>));
-    ASSERT_TRUE((std::is_same_v<entt::type_list_cat_t<type, type>, entt::type_list<int, char, int, char>>));
-    ASSERT_TRUE((std::is_same_v<entt::type_list_unique_t<entt::type_list_cat_t<type, type>>, entt::type_list<int, char>>));
+    static_assert(entt::type_list_size_v<type> == 2u);
+    static_assert(entt::type_list_size_v<other> == 1u);
+
+    static_assert(std::is_same_v<entt::type_list_cat_t<type, other, type, other>, entt::type_list<int, char, double, int, char, double>>);
+    static_assert(std::is_same_v<entt::type_list_cat_t<type, other>, entt::type_list<int, char, double>>);
+    static_assert(std::is_same_v<entt::type_list_cat_t<type, type>, entt::type_list<int, char, int, char>>);
+    static_assert(std::is_same_v<entt::type_list_unique_t<entt::type_list_cat_t<type, type>>, entt::type_list<int, char>>);
+
+    static_assert(entt::type_list_contains_v<type, int>);
+    static_assert(entt::type_list_contains_v<type, char>);
+    static_assert(!entt::type_list_contains_v<type, double>);
 }
 
 TEST(TypeTraits, IsEqualityComparable) {
-    ASSERT_TRUE(entt::is_equality_comparable_v<int>);
-    ASSERT_FALSE(entt::is_equality_comparable_v<void>);
+    static_assert(entt::is_equality_comparable_v<int>);
+    static_assert(!entt::is_equality_comparable_v<void>);
 }
 
 TEST(TypeTraits, MemberClass) {
@@ -59,12 +64,12 @@ TEST(TypeTraits, MemberClass) {
         bool quux;
     };
 
-    ASSERT_TRUE((std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::foo)>>));
-    ASSERT_TRUE((std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::bar)>>));
-    ASSERT_TRUE((std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::quux)>>));
+    static_assert(std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::foo)>>);
+    static_assert(std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::bar)>>);
+    static_assert(std::is_same_v<clazz, entt::member_class_t<decltype(&clazz::quux)>>);
 }
 
 TEST(TypeTraits, Tag) {
-    ASSERT_EQ(entt::tag<"foobar"_hs>::value, entt::hashed_string::value("foobar"));
-    ASSERT_TRUE((std::is_same_v<typename entt::tag<"foobar"_hs>::value_type, entt::id_type>));
+    static_assert(entt::tag<"foobar"_hs>::value == entt::hashed_string::value("foobar"));
+    static_assert(std::is_same_v<typename entt::tag<"foobar"_hs>::value_type, entt::id_type>);
 }
