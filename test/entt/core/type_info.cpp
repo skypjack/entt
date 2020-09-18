@@ -32,9 +32,13 @@ TEST(TypeName, Functionalities) {
 TEST(TypeInfo, Functionalities) {
     auto info = entt::type_id<int>();
     auto other = entt::type_id(42);
+    entt::type_info empty{};
 
+    static_assert(std::is_default_constructible_v<decltype(info)>);
     static_assert(std::is_copy_constructible_v<decltype(info)>);
     static_assert(std::is_move_constructible_v<decltype(info)>);
+    static_assert(std::is_copy_assignable_v<decltype(info)>);
+    static_assert(std::is_move_assignable_v<decltype(info)>);
 
     ASSERT_EQ(info.seq(), other.seq());
     ASSERT_EQ(info.hash(), other.hash());
@@ -43,4 +47,22 @@ TEST(TypeInfo, Functionalities) {
     ASSERT_EQ(info.seq(), entt::type_seq<int>::value());
     ASSERT_EQ(info.hash(), entt::type_hash<int>::value());
     ASSERT_EQ(info.name(), entt::type_name<int>::value());
+
+    ASSERT_FALSE(empty);
+    ASSERT_TRUE(info);
+    ASSERT_TRUE(other);
+
+    empty = info;
+
+    ASSERT_TRUE(empty);
+    ASSERT_EQ(empty.hash(), info.hash());
+
+    empty = {};
+
+    ASSERT_FALSE(empty);
+
+    empty = std::move(other);
+
+    ASSERT_TRUE(empty);
+    ASSERT_EQ(empty.hash(), other.hash());
 }

@@ -133,19 +133,64 @@ class type_info final {
     template<typename>
     friend type_info type_id() ENTT_NOEXCEPT;
 
-    type_info(seq_fn *seq_func, hash_fn *hash_func, name_fn *name_func)
-        : seq{seq_func},
-          hash{hash_func},
-          name{name_func}
+    type_info(seq_fn *seq_ptr, hash_fn *hash_ptr, name_fn *name_ptr)
+        : seq_func{seq_ptr},
+          hash_func{hash_ptr},
+          name_func{name_ptr}
     {}
 
 public:
-    /*! @brief Type sequential identifier. */
-    seq_fn * const seq;
-    /*! @brief Type hash. */
-    hash_fn * const hash;
-    /*! @brief Type name. */
-    name_fn * const name;
+    /*! Default constructor. */
+    type_info()
+        : type_info{nullptr, nullptr, nullptr}
+    {}
+
+    /*! Default copy constructor. */
+    type_info(const type_info &) = default;
+    /*! Default move constructor. */
+    type_info(type_info &&) = default;
+
+    /*! Default copy assignment operator. */
+    type_info & operator=(const type_info &) = default;
+    /*! Default move assignment operator. */
+    type_info & operator=(type_info &&) = default;
+
+    /**
+    * @brief Checks if a type info object is properly initialized.
+    * @return True if the object is properly initialized, false otherwise.
+    */
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return !(seq_func == nullptr);
+    }
+
+    /**
+     * @brief Type sequential identifier.
+     * @return Type sequential identifier.
+     */
+    [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
+        return seq_func();
+    }
+
+    /**
+     * @brief Type hash.
+     * @return Type hash.
+     */
+    [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
+        return hash_func();
+    }
+
+    /**
+    * @brief Type name.
+    * @return Type name.
+    */
+    [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
+        return name_func();
+    }
+
+private:
+    seq_fn *seq_func;
+    hash_fn *hash_func;
+    name_fn *name_func;
 };
 
 
