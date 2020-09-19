@@ -28,7 +28,7 @@ Many classes in `EnTT` make extensive use of type erasure for their purposes.
 This isn't a problem in itself (in fact, it's the basis of an API so convenient
 to use). However, a way is needed to recognize the objects whose type has been
 erased on the other side of a boundary.<br/>
-The `type_info` class template is how identifiers are generated and thus made
+The `type_hash` class template is how identifiers are generated and thus made
 available to the rest of the library. The `type_index` class template makes all
 types _indexable_ instead, so as to speed up the lookup.
 

@@ -302,7 +302,7 @@ These are the information made available by this object:
 * The name associated with a given type:
 
   ```cpp
-  auto name = entt::type_info<my_type>().name();
+  auto name = entt::type_id<my_type>().name();
   ```
 
   This is also an alias for the following:

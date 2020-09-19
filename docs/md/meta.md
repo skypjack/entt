@@ -280,7 +280,7 @@ auto by_type = entt::resolve<my_type>();
 auto by_id = entt::resolve_id("reflected_type"_hs);
 
 // lookup of a reflected type by type id
-auto by_type_id = entt::resolve_type(entt::type_info<my_type>::id());
+auto by_type_id = entt::resolve_type(entt::type_hash<my_type>::value());
 ```
 
 There exits also an overload of the `resolve` function to use to iterate all the
