@@ -42,5 +42,8 @@ I hope this list can grow much more in the future:
   * [Specs](https://github.com/amethyst/specs): a parallel ECS based mainly on
     hierarchical bitsets that allows different types of storage as needed.
 
+* Zig
+  * [zig-ecs](https://github.com/prime31/zig-ecs): a _zig-ification_ of `EnTT`.
+
 If you know of other resources out there that can be of interest for the reader,
 feel free to open an issue or a PR and I'll be glad to add them to this page.
