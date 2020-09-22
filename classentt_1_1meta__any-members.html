@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.1</span>
+   &#160;<span id="projectnumber">3.5.2</span>
    </div>
   </td>
  </tr>
@@ -82,6 +82,8 @@ $(function() {
   <tr class="even"><td class="entry"><a class="el" href="classentt_1_1meta__any.html#ae17943bd5357b90e35957316f5c8d86d">data</a>() const noexcept</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr><td class="entry"><a class="el" href="classentt_1_1meta__any.html#aae2926df37d471d5244905258555ec80">data</a>() noexcept</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a5b214afbab6c460f91fa050118bf1e86">emplace</a>(Args &amp;&amp;... args)</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a57e3fcd87f90240e6152324ab8e761dc">get</a>(const id_type id) const</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classentt_1_1meta__any.html#aa7149ea45d21a2152626cbaa91ed6f71">invoke</a>(const id_type id, Args &amp;&amp;... args) const</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="classentt_1_1meta__any.html#ade3c596ed12e4c6fb6c38fc9a43b77aa">meta_any</a>() noexcept</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a7d53cd9aca308797d0ddbb3d02fdaf35">meta_any</a>(std::in_place_type_t&lt; Type &gt;, [[maybe_unused]] Args &amp;&amp;... args)</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">explicit</span></td></tr>
   <tr><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a7c5f042e2e14803083d602d9d401c9cc">meta_any</a>(std::reference_wrapper&lt; Type &gt; value)</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
@@ -93,11 +95,12 @@ $(function() {
   <tr><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a80b825c89dc1509a9099d807b528b3aa">operator=</a>(meta_any other)</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a1bd17bffb75be10543e85c78185d765a">operator==</a>(const meta_any &amp;other) const</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a49d913960abe74185ea6c04b4fed1f88">ref</a>() const noexcept</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a939cebbfd07b49ed6365c302f838dc03">swap</a>(meta_any &amp;lhs, meta_any &amp;rhs)</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">friend</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classentt_1_1meta__any.html#aa545482520009cfd0b70c77269487213">try_cast</a>() const</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a92f9591ef0d0e8d146be79b2103efb33">try_cast</a>()</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a2097e0bc8ec091807a1213052bc761c7">type</a>() const noexcept</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a816dae3d4ed3e41fcb376ec5ec9c38c1">~meta_any</a>()</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classentt_1_1meta__any.html#af173946176799b03930f1e34988e32bd">set</a>(const id_type id, Type &amp;&amp;value) const</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a939cebbfd07b49ed6365c302f838dc03">swap</a>(meta_any &amp;lhs, meta_any &amp;rhs)</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">friend</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classentt_1_1meta__any.html#aa545482520009cfd0b70c77269487213">try_cast</a>() const</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a92f9591ef0d0e8d146be79b2103efb33">try_cast</a>()</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a2097e0bc8ec091807a1213052bc761c7">type</a>() const noexcept</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classentt_1_1meta__any.html#a816dae3d4ed3e41fcb376ec5ec9c38c1">~meta_any</a>()</td><td class="entry"><a class="el" href="classentt_1_1meta__any.html">entt::meta_any</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
 </table></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

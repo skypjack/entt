@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">EnTT
-   &#160;<span id="projectnumber">3.5.1</span>
+   &#160;<span id="projectnumber">3.5.2</span>
    </div>
   </td>
  </tr>
@@ -620,7 +620,7 @@ Runtime views</h2>
  Refer to the inline documentation for all the details.</p>
 <p>Runtime views are pretty cheap to construct and should not be stored around in any case. They should be used immediately after creation and then they should be thrown away. The reasons for this go far beyond the scope of this document.<br  />
  To iterate a runtime view, either use it in a range-for loop:</p>
-<div class="fragment"><div class="line">entt::component types[] = { <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;position&gt;::id</a>(), <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;velocity&gt;::id</a>() };</div>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a> types[] = { <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;position&gt;::id</a>(), <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;velocity&gt;::id</a>() };</div>
 <div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.runtime_view(std::cbegin(types), std::cend(types));</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> entity: view) {</div>
@@ -634,15 +634,15 @@ Runtime views</h2>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><p>Or rely on the <code>each</code> member function to iterate entities:</p>
-<div class="fragment"><div class="line">entt::component types[] = { <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;position&gt;::id</a>(), <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;velocity&gt;::id</a>() };</div>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a> types[] = { <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;position&gt;::id</a>(), <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;velocity&gt;::id</a>() };</div>
 <div class="line"> </div>
 <div class="line"><a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.runtime_view(std::cbegin(types), std::cend(types)).each([](<span class="keyword">auto</span> entity) {</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">});</div>
 </div><!-- fragment --><p>Performance are exactly the same in both cases.<br  />
  Filtering entities by components is also supported for this kind of views:</p>
-<div class="fragment"><div class="line">entt::component components[] = { <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;position&gt;::id</a>() };</div>
-<div class="line">entt::component filter[] = { <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;velocity&gt;::id</a>() };</div>
+<div class="fragment"><div class="line"><a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a> components[] = { <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;position&gt;::id</a>() };</div>
+<div class="line"><a class="code" href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a> filter[] = { <a class="code" href="structentt_1_1type__info.html#aefa2a63e4b4f41dbb783718bdc8c5a76">entt::type_info&lt;velocity&gt;::id</a>() };</div>
 <div class="line"><span class="keyword">auto</span> <a class="code" href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">view</a> = <a class="code" href="namespaceentt.html#a292643317d1dbb13e45824f757bd1086">registry</a>.runtime_view(std::cbegin(components), std::cend(components), std::cbegin(filter), std::cend(filter));</div>
 </div><!-- fragment --><p><b>Note</b>: runtime views are meant for all those cases where users don't know at compile-time what components to <em>use</em> to iterate entities. If possible, don't use runtime views as their performance are inferior to those of the other views.</p>
 <h2><a class="anchor" id="autotoc_md61"></a>
@@ -881,6 +881,7 @@ Beyond this document</h1>
 <div class="ttc" id="astructentt_1_1basic__handle_html"><div class="ttname"><a href="structentt_1_1basic__handle.html">entt::basic_handle</a></div><div class="ttdoc">Non-owning handle to an entity.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2handle_8hpp_source.html#l00019">handle.hpp:19</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a48dfbb2991c5a19c6e2578830f7e3eda"><div class="ttname"><a href="namespaceentt.html#a48dfbb2991c5a19c6e2578830f7e3eda">entt::observer</a></div><div class="ttdeci">basic_observer&lt; entity &gt; observer</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00060">fwd.hpp:60</a></div></div>
 <div class="ttc" id="anamespaceentt_html_af2118c00dea16193aee017d1408beb53"><div class="ttname"><a href="namespaceentt.html#af2118c00dea16193aee017d1408beb53">entt::view</a></div><div class="ttdeci">basic_view&lt; entity, Types... &gt; view</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00092">fwd.hpp:92</a></div></div>
+<div class="ttc" id="anamespaceentt_html_a13e040e7b38a8f86d1ab2f096f37b627"><div class="ttname"><a href="namespaceentt.html#a13e040e7b38a8f86d1ab2f096f37b627">entt::id_type</a></div><div class="ttdeci">std::uint32_t id_type</div><div class="ttdoc">Alias declaration for type identifiers.</div><div class="ttdef"><b>Definition:</b> <a href="core_2fwd_8hpp_source.html#l00012">fwd.hpp:12</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__registry_html_a747d182de87516a3445f8df77d65e815"><div class="ttname"><a href="classentt_1_1basic__registry.html#a747d182de87516a3445f8df77d65e815">entt::basic_registry::size</a></div><div class="ttdeci">size_type size() const</div><div class="ttdoc">Returns the number of existing components of the given type.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l00256">registry.hpp:256</a></div></div>
 <div class="ttc" id="anamespaceentt_html_a010d1bbf234dbca47e6755fc278e36b5"><div class="ttname"><a href="namespaceentt.html#a010d1bbf234dbca47e6755fc278e36b5">entt::group</a></div><div class="ttdeci">basic_group&lt; entity, Types... &gt; group</div><div class="ttdoc">Alias declaration for the most common use case.</div><div class="ttdef"><b>Definition:</b> <a href="entity_2fwd_8hpp_source.html#l00104">fwd.hpp:104</a></div></div>
 <div class="ttc" id="aclassentt_1_1basic__registry_html_aef8bac41fdb48e3c8c589dee21b96980"><div class="ttname"><a href="classentt_1_1basic__registry.html#aef8bac41fdb48e3c8c589dee21b96980">entt::basic_registry::visit</a></div><div class="ttdeci">void visit(entity_type entity, Func func) const</div><div class="ttdoc">Visits an entity and returns the types for its components.</div><div class="ttdef"><b>Definition:</b> <a href="registry_8hpp_source.html#l01552">registry.hpp:1552</a></div></div>
