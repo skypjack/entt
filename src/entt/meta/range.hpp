@@ -2,6 +2,8 @@
 #define ENTT_META_RANGE_HPP
 
 
+#include <cstddef>
+#include <iterator>
 #include "internal.hpp"
 
 
