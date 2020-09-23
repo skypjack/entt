@@ -115,7 +115,8 @@ human-readable identifiers in the codebase while using their numeric
 counterparts at runtime, thus without affecting performance.<br/>
 The class has an implicit `constexpr` constructor that chews a bunch of
 characters. Once created, all what one can do with it is getting back the
-original string or converting it into a number.<br/>
+original string through the `data` member function or converting the instance
+into a number.<br/>
 The good part is that a hashed string can be used wherever a constant expression
 is required and no _string-to-number_ conversion will take place at runtime if
 used carefully.
@@ -135,6 +136,19 @@ more user-friendly:
 
 ```cpp
 constexpr auto str = "text"_hs;
+```
+
+Finally, in case users need to create hashed strings at runtime, this class also
+offers the necessary functionalities:
+
+```
+std::string orig{"text"};
+
+// create a full-featured hashed string...
+entt::hashed_string str{orig.c_str()};
+
+// ... or compute only the unique identifier
+const auto hash = entt::hashed_string::value(orig.c_str());
 ```
 
 ## Wide characters
