@@ -378,6 +378,9 @@ The function type of a listener should be equivalent to the following:
 void(entt::registry &, entt::entity);
 ```
 
+In all cases, listeners are provided with the registry that triggered the
+notification and the involved entity.
+
 Note also that:
 
 * Listeners for the construction signals are invoked **after** components have
