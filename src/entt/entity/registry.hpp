@@ -43,7 +43,7 @@ class basic_registry {
     using traits_type = entt_traits<Entity>;
 
     struct pool_data {
-        id_type type_hash{};
+        type_info info{};
         std::unique_ptr<sparse_set<Entity>> pool{};
         void(* erase)(sparse_set<Entity> &, basic_registry &, const Entity);
     };
@@ -99,7 +99,7 @@ class basic_registry {
     };
 
     struct variable_data {
-        id_type type_hash;
+        type_info info;
         std::unique_ptr<void, void(*)(void *)> value;
     };
 
@@ -112,7 +112,7 @@ class basic_registry {
         }
         
         if(auto &&pdata = pools[index]; !pdata.pool) {
-            pdata.type_hash = type_hash<Component>::value();
+            pdata.info = type_id<Component>();
             pdata.pool.reset(new pool_t<Entity, Component>());
             pdata.erase = +[](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
                 static_cast<pool_t<Entity, Component> &>(cpool).erase(owner, entt);
@@ -1148,12 +1148,12 @@ public:
         std::vector<const sparse_set<Entity> *> filter(std::distance(from, to));
 
         std::transform(first, last, component.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.type_hash == ctype; });
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.info.hash() == ctype; });
             return it == pools.cend() ? nullptr : it->pool.get();
         });
 
         std::transform(from, to, filter.begin(), [this](const auto ctype) {
-            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.type_hash == ctype; });
+            const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.info.hash() == ctype; });
             return it == pools.cend() ? nullptr : it->pool.get();
         });
 
@@ -1438,17 +1438,17 @@ public:
     }
 
     /**
-     * @brief Visits an entity and returns the types for its components.
+     * @brief Visits an entity and returns the type info for its components.
      *
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const id_type);
+     * void(const type_info);
      * @endcode
      *
      * Returned identifiers are those of the components owned by the entity.
      *
-     * @sa type_hash
+     * @sa type_info
      *
      * @warning
      * It's not specified whether a component attached to or removed from the
@@ -1462,23 +1462,23 @@ public:
     void visit(entity_type entity, Func func) const {
         for(auto pos = pools.size(); pos; --pos) {
             if(const auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
-                func(pdata.type_hash);
+                func(pdata.info);
             }
         }
     }
 
     /**
-     * @brief Visits a registry and returns the types for its components.
+     * @brief Visits a registry and returns the type info for its components.
      *
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const id_type);
+     * void(const type_info);
      * @endcode
      *
      * Returned identifiers are those of the components managed by the registry.
      *
-     * @sa type_hash
+     * @sa type_info
      *
      * @warning
      * It's not specified whether a component for which a pool is created during
@@ -1491,7 +1491,7 @@ public:
     void visit(Func func) const {
         for(auto pos = pools.size(); pos; --pos) {
             if(const auto &pdata = pools[pos-1]; pdata.pool) {
-                func(pdata.type_hash);
+                func(pdata.info);
             }
         }
     }
@@ -1510,7 +1510,7 @@ public:
     template<typename Type, typename... Args>
     Type & set(Args &&... args) {
         unset<Type>();
-        vars.push_back(variable_data{type_hash<Type>::value(), { new Type{std::forward<Args>(args)...}, [](void *instance) { delete static_cast<Type *>(instance); } }});
+        vars.push_back(variable_data{type_id<Type>(), { new Type{std::forward<Args>(args)...}, [](void *instance) { delete static_cast<Type *>(instance); } }});
         return *static_cast<Type *>(vars.back().value.get());
     }
 
@@ -1521,7 +1521,7 @@ public:
     template<typename Type>
     void unset() {
         vars.erase(std::remove_if(vars.begin(), vars.end(), [](auto &&var) {
-            return var.type_hash == type_hash<Type>::value();
+            return var.info.hash() == type_hash<Type>::value();
         }), vars.end());
     }
 
@@ -1550,7 +1550,7 @@ public:
      */
     template<typename Type>
     [[nodiscard]] const Type * try_ctx() const {
-        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&var) { return var.type_hash == type_hash<Type>::value(); });
+        auto it = std::find_if(vars.cbegin(), vars.cend(), [](auto &&var) { return var.info.hash() == type_hash<Type>::value(); });
         return it == vars.cend() ? nullptr : static_cast<const Type *>(it->value.get());
     }
 
@@ -1586,17 +1586,18 @@ public:
     }
 
     /**
-     * @brief Visits a registry and returns the types for its context variables.
+     * @brief Visits a registry and returns the type info for its context
+     * variables.
      *
      * The signature of the function should be equivalent to the following:
      *
      * @code{.cpp}
-     * void(const id_type);
+     * void(const type_info);
      * @endcode
      *
      * Returned identifiers are those of the context variables currently set.
      *
-     * @sa type_hash
+     * @sa type_info
      *
      * @warning
      * It's not specified whether a context variable created during the visit is
@@ -1608,7 +1609,7 @@ public:
     template<typename Func>
     void ctx(Func func) const {
         for(auto pos = vars.size(); pos; --pos) {
-            func(vars[pos-1].type_hash);
+            func(vars[pos-1].info);
         }
     }
 
