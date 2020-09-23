@@ -8,6 +8,7 @@
 #include "../config/config.h"
 #include "../core/type_traits.hpp"
 #include "../signal/sigh.hpp"
+#include "fwd.hpp"
 #include "storage.hpp"
 
 
@@ -36,7 +37,7 @@ struct default_pool final: storage<Entity, Type> {
     * The function type for a listener is equivalent to:
     *
     * @code{.cpp}
-    * void(Entity);
+    * void(basic_registry<Entity> &, Entity);
     * @endcode
     *
     * Listeners are invoked **after** the object has been assigned to the
@@ -58,7 +59,7 @@ struct default_pool final: storage<Entity, Type> {
     * The function type for a listener is equivalent to:
     *
     * @code{.cpp}
-    * void(Entity);
+    * void(basic_registry<Entity> &, Entity);
     * @endcode
     *
     * Listeners are invoked **after** the object has been updated.
@@ -79,7 +80,7 @@ struct default_pool final: storage<Entity, Type> {
     * The function type for a listener is equivalent to:
     *
     * @code{.cpp}
-    * void(Entity);
+    * void(basic_registry<Entity> &, Entity);
     * @endcode
     *
     * Listeners are invoked **before** the object has been removed from the
@@ -107,14 +108,15 @@ struct default_pool final: storage<Entity, Type> {
     * invalid entity or if the entity already belongs to the pool.
     *
     * @tparam Args Types of arguments to use to construct the object.
+    * @param owner The registry that issued the request.
     * @param entity A valid entity identifier.
     * @param args Parameters to use to initialize the object.
     * @return A reference to the newly created object.
     */
     template<typename... Args>
-    decltype(auto) emplace(const entity_type entity, Args &&... args) {
+    decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entity, Args &&... args) {
         storage<entity_type, Type>::emplace(entity, std::forward<Args>(args)...);
-        construction.publish(entity);
+        construction.publish(owner, entity);
 
         if constexpr(!is_eto_eligible_v<object_type>) {
             return this->get(entity);
@@ -128,17 +130,18 @@ struct default_pool final: storage<Entity, Type> {
     *
     * @tparam It Type of input iterator.
     * @tparam Args Types of arguments to use to construct the object.
+    * @param owner The registry that issued the request.
     * @param first An iterator to the first element of the range of entities.
     * @param last An iterator past the last element of the range of entities.
     * @param args Parameters to use to initialize the object.
     */
     template<typename It, typename... Args>
-    void insert(It first, It last, Args &&... args) {
+    void insert(basic_registry<entity_type> &owner, It first, It last, Args &&... args) {
         storage<entity_type, object_type>::insert(first, last, std::forward<Args>(args)...);
 
         if(!construction.empty()) {
             for(; first != last; ++first) {
-                construction.publish(*first);
+                construction.publish(owner, *first);
             }
         }
     }
@@ -152,10 +155,11 @@ struct default_pool final: storage<Entity, Type> {
     * An assertion will abort the execution at runtime in debug mode in case of
     * invalid entity or if the entity doesn't belong to the pool.
     *
+    * @param owner The registry that issued the request.
     * @param entity A valid entity identifier.
     */
-    void erase(const entity_type entity) override {
-        destruction.publish(entity);
+    void erase(basic_registry<entity_type> &owner, const entity_type entity) {
+        destruction.publish(owner, entity);
         storage<entity_type, object_type>::erase(entity);
     }
 
@@ -165,22 +169,23 @@ struct default_pool final: storage<Entity, Type> {
     * @see remove
     *
     * @tparam It Type of input iterator.
+    * @param owner The registry that issued the request.
     * @param first An iterator to the first element of the range of entities.
     * @param last An iterator past the last element of the range of entities.
     */
     template<typename It>
-    void erase(It first, It last) {
+    void erase(basic_registry<entity_type> &owner, It first, It last) {
         if(std::distance(first, last) == std::distance(this->begin(), this->end())) {
             if(!destruction.empty()) {
                 for(; first != last; ++first) {
-                    destruction.publish(*first);
+                    destruction.publish(owner, *first);
                 }
             }
 
             this->clear();
         } else {
             for(; first != last; ++first) {
-                this->erase(*first);
+                this->erase(owner, *first);
             }
         }
     }
@@ -206,17 +211,18 @@ struct default_pool final: storage<Entity, Type> {
     * invalid entity or if the entity doesn't belong to the pool.
     *
     * @tparam Func Types of the function objects to invoke.
+    * @param owner The registry that issued the request.
     * @param entity A valid entity identifier.
     * @param func Valid function objects.
     * @return A reference to the patched instance.
     */
     template<typename... Func>
-    decltype(auto) patch(const entity_type entity, [[maybe_unused]] Func &&... func) {
+    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entity, [[maybe_unused]] Func &&... func) {
         if constexpr(is_eto_eligible_v<object_type>) {
-            update.publish(entity);
+            update.publish(owner, entity);
         } else {
             (std::forward<Func>(func)(this->get(entity)), ...);
-            update.publish(entity);
+            update.publish(owner, entity);
             return this->get(entity);
         }
     }
@@ -234,18 +240,19 @@ struct default_pool final: storage<Entity, Type> {
     * An assertion will abort the execution at runtime in debug mode in case of
     * invalid entity or if the entity doesn't belong to the pool.
     *
+    * @param owner The registry that issued the request.
     * @param entity A valid entity identifier.
     * @param value An instance of the type to assign.
     * @return A reference to the object being replaced.
     */
-    decltype(auto) replace(const entity_type entity, object_type value) {
-        return patch(entity, [&value](auto &&curr) { curr = std::move(value); });
+    decltype(auto) replace(basic_registry<entity_type> &owner, const entity_type entity, object_type value) {
+        return patch(owner, entity, [&value](auto &&curr) { curr = std::move(value); });
     }
 
 private:
-    sigh<void(const entity_type)> construction{};
-    sigh<void(const entity_type)> destruction{};
-    sigh<void(const entity_type)> update{};
+    sigh<void(basic_registry<entity_type> &, const entity_type)> construction{};
+    sigh<void(basic_registry<entity_type> &, const entity_type)> destruction{};
+    sigh<void(basic_registry<entity_type> &, const entity_type)> update{};
 };
 
 

@@ -375,7 +375,7 @@ attached to `on_update` will only be invoked following a call to `replace` or
 The function type of a listener should be equivalent to the following:
 
 ```cpp
-void(entt::entity);
+void(entt::registry &, entt::entity);
 ```
 
 Note also that:
@@ -630,25 +630,25 @@ that isn't associated with the given registry can result in undefined behavior.
 
 The `registry` class is designed to be able to create short circuits between its
 functions. This simplifies the definition of _dependencies_ between different
-operations and registries.<br/>
+operations.<br/>
 For example, the following adds (or replaces) the component `a_type` whenever
 `my_type` is assigned to an entity:
 
 ```cpp
-registry.on_construct<my_type>().connect<&entt::registry::emplace_or_replace<a_type>>(registry);
+registry.on_construct<my_type>().connect<&entt::registry::emplace_or_replace<a_type>>();
 ```
 
 Similarly, the code shown below removes `a_type` from an entity whenever
 `my_type` is assigned to it:
 
 ```cpp
-registry.on_construct<my_type>().connect<&entt::registry::remove<a_type>>(registry);
+registry.on_construct<my_type>().connect<&entt::registry::remove<a_type>>();
 ```
 
 A dependency can also be easily broken as follows:
 
 ```cpp
-registry.on_construct<my_type>().disconnect<&entt::registry::emplace_or_replace<a_type>>(registry);
+registry.on_construct<my_type>().disconnect<&entt::registry::emplace_or_replace<a_type>>();
 ```
 
 There are many other types of dependencies. In general, most of the functions
@@ -663,13 +663,11 @@ _extend_ their classes and this may not always be possible.<br/>
 The `invoke` helper allows to _propagate_ the signal in these cases:
 
 ```cpp
-registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>(registry);
+registry.on_construct<clazz>().connect<entt::invoke<&clazz::func>>();
 ```
 
 All it does is pick up the _right_ component for the received entity and invoke
-the requested method, passing on the arguments if necessary.<br/>
-The registry is also supplied by the invoker directly to the function invoked as
-the first argument.
+the requested method, passing on the arguments if necessary.
 
 ### Handle
 
