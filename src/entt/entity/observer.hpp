@@ -355,7 +355,7 @@ public:
     /**
      * @brief Direct access to the list of entities of the observer.
      *
-     * The returned pointer is such that range `[data(), data() + size()]` is
+     * The returned pointer is such that range `[data(), data() + size())` is
      * always a valid range, even if the container is empty.
      *
      * @note

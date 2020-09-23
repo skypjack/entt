@@ -294,7 +294,7 @@ public:
      * @brief Direct access to the list of components of a given pool.
      *
      * The returned pointer is such that range
-     * `[raw<Component>(), raw<Component>() + size<Component>()]` is always a
+     * `[raw<Component>(), raw<Component>() + size<Component>())` is always a
      * valid range, even if the container is empty.
      *
      * Components are in the reverse order as imposed by the sorting
@@ -322,7 +322,7 @@ public:
      * @brief Direct access to the list of entities of a given pool.
      *
      * The returned pointer is such that range
-     * `[data<Component>(), data<Component>() + size<Component>()]` is always a
+     * `[data<Component>(), data<Component>() + size<Component>())` is always a
      * valid range, even if the container is empty.
      *
      * Entities are in the reverse order as imposed by the sorting
@@ -339,7 +339,7 @@ public:
     /**
      * @brief Direct access to the list of entities of a registry.
      *
-     * The returned pointer is such that range `[data(), data() + size()]` is
+     * The returned pointer is such that range `[data(), data() + size())` is
      * always a valid range, even if the container is empty.
      *
      * @warning

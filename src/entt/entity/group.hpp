@@ -233,7 +233,7 @@ public:
      * @brief Direct access to the list of components of a given pool.
      *
      * The returned pointer is such that range
-     * `[raw<Component>(), raw<Component>() + size<Component>()]` is always a
+     * `[raw<Component>(), raw<Component>() + size<Component>())` is always a
      * valid range, even if the container is empty.
      *
      * @note
@@ -252,7 +252,7 @@ public:
      * @brief Direct access to the list of entities of a given pool.
      *
      * The returned pointer is such that range
-     * `[data<Component>(), data<Component>() + size<Component>()]` is always a
+     * `[data<Component>(), data<Component>() + size<Component>())` is always a
      * valid range, even if the container is empty.
      *
      * @note
@@ -270,7 +270,7 @@ public:
     /**
      * @brief Direct access to the list of entities.
      *
-     * The returned pointer is such that range `[data(), data() + size()]` is
+     * The returned pointer is such that range `[data(), data() + size())` is
      * always a valid range, even if the container is empty.
      *
      * @note
@@ -796,10 +796,10 @@ public:
      * @brief Direct access to the list of components of a given pool.
      *
      * The returned pointer is such that range
-     * `[raw<Component>(), raw<Component>() + size<Component>()]` is always a
+     * `[raw<Component>(), raw<Component>() + size<Component>())` is always a
      * valid range, even if the container is empty.<br/>
      * Moreover, in case the group owns the given component, the range
-     * `[raw<Component>(), raw<Component>() + size()]` is such that it contains
+     * `[raw<Component>(), raw<Component>() + size())` is such that it contains
      * the instances that are part of the group itself.
      *
      * @note
@@ -818,10 +818,10 @@ public:
      * @brief Direct access to the list of entities of a given pool.
      *
      * The returned pointer is such that range
-     * `[data<Component>(), data<Component>() + size<Component>()]` is always a
+     * `[data<Component>(), data<Component>() + size<Component>())` is always a
      * valid range, even if the container is empty.<br/>
      * Moreover, in case the group owns the given component, the range
-     * `[data<Component>(), data<Component>() + size()]` is such that it
+     * `[data<Component>(), data<Component>() + size())` is such that it
      * contains the entities that are part of the group itself.
      *
      * @note
@@ -839,7 +839,7 @@ public:
     /**
      * @brief Direct access to the list of entities.
      *
-     * The returned pointer is such that range `[data(), data() + size()]` is
+     * The returned pointer is such that range `[data(), data() + size())` is
      * always a valid range, even if the container is empty.
      *
      * @note
