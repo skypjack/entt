@@ -3,6 +3,7 @@
 
 
 #include <string_view>
+#include <type_traits>
 #include "../config/config.h"
 #include "../core/attribute.h"
 #include "hashed_string.hpp"
@@ -202,9 +203,9 @@ private:
 template<typename Type>
 type_info type_id() ENTT_NOEXCEPT {
     return type_info{
-        &type_seq<std::decay_t<Type>>::value,
-        &type_hash<std::decay_t<Type>>::value,
-        &type_name<std::decay_t<Type>>::value,
+        &type_seq<std::remove_reference_t<std::remove_const_t<Type>>>::value,
+        &type_hash<std::remove_reference_t<std::remove_const_t<Type>>>::value,
+        &type_name<std::remove_reference_t<std::remove_const_t<Type>>>::value,
     };
 }
 
@@ -212,7 +213,7 @@ type_info type_id() ENTT_NOEXCEPT {
 /*! @copydoc type_id */
 template<typename Type>
 type_info type_id(Type &&) ENTT_NOEXCEPT {
-    return type_id<Type>();
+    return type_id<std::remove_reference_t<Type>>();
 }
 
 
