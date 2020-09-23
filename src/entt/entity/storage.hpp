@@ -194,7 +194,7 @@ public:
     /**
      * @brief Direct access to the array of objects.
      *
-     * The returned pointer is such that range `[raw(), raw() + size()]` is
+     * The returned pointer is such that range `[raw(), raw() + size())` is
      * always a valid range, even if the container is empty.
      *
      * @note

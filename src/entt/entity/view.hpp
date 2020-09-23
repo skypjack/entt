@@ -390,7 +390,7 @@ public:
      * @brief Direct access to the list of components of a given pool.
      *
      * The returned pointer is such that range
-     * `[raw<Comp>(), raw<Comp>() + size<Comp>()]` is always a valid range, even
+     * `[raw<Comp>(), raw<Comp>() + size<Comp>())` is always a valid range, even
      * if the container is empty.
      *
      * @note
@@ -409,7 +409,7 @@ public:
      * @brief Direct access to the list of entities of a given pool.
      *
      * The returned pointer is such that range
-     * `[data<Comp>(), data<Comp>() + size<Comp>()]` is always a valid range,
+     * `[data<Comp>(), data<Comp>() + size<Comp>())` is always a valid range,
      * even if the container is empty.
      *
      * @note
@@ -848,7 +848,7 @@ public:
     /**
      * @brief Direct access to the list of components.
      *
-     * The returned pointer is such that range `[raw(), raw() + size()]` is
+     * The returned pointer is such that range `[raw(), raw() + size())` is
      * always a valid range, even if the container is empty.
      *
      * @note
@@ -864,7 +864,7 @@ public:
     /**
      * @brief Direct access to the list of entities.
      *
-     * The returned pointer is such that range `[data(), data() + size()]` is
+     * The returned pointer is such that range `[data(), data() + size())` is
      * always a valid range, even if the container is empty.
      *
      * @note
