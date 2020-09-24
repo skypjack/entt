@@ -149,7 +149,7 @@ If they are not, the first argument of the function type must be that of the
 class on which the members operate and an instance of this class must obviously
 be passed when invoking the delegate:
 
-```
+```cpp
 entt::delegate<void(my_struct &, int)> delegate;
 delegate.connect<&my_struct::f>();
 
