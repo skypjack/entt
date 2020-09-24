@@ -140,7 +140,7 @@ constexpr auto str = "text"_hs;
 Finally, in case users need to create hashed strings at runtime, this class also
 offers the necessary functionalities:
 
-```
+```cpp
 std::string orig{"text"};
 
 // create a full-featured hashed string...
@@ -219,7 +219,7 @@ otherwise.
 A type info object is an opaque class that is also copy and move constructible.
 This class is returned by the `type_id` function template:
 
-```
+```cpp
 // generates an info object from a type ...
 auto info = entt::type_id<a_type>();
 

@@ -848,7 +848,7 @@ even though it requires users to set up their own stamping functions.
 The best bet here is probably to define a reflection system or a mapping between
 the type identifiers and their opaque functions for stamping. As an example:
 
-```
+```cpp
 template<typename Type>
 void stamp(const entt::registry &from, const entt::entity src, entt::registry &to, const entt::entity dst) {
     to.emplace_or_replace<Type>(dst, from.get<Type>(src));
