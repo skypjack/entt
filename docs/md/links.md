@@ -84,6 +84,10 @@ I hope this list can grow much more in the future:
   * [TiltedOnline](https://github.com/tiltedphoques/TiltedOnline) by
     [Tilted Phoques](https://github.com/tiltedphoques): Skyrim Together, a mod
     intended to sync the player and the world state accross multiple clients.
+  * [Edyn](https://github.com/xissburg/edyn): a real-time physics engine
+    organized as an ECS.
+  * [Silvanus](https://github.com/hobbyistmaker/silvanus): Silvanus Fusion 360
+    Box Generator.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
