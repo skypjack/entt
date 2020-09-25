@@ -188,11 +188,31 @@ public:
         return name_func();
     }
 
+    /**
+    * @brief Compares the contents of two type info objects.
+    * @param other Object with which to compare.
+    * @return False if the two contents differ, true otherwise.
+    */
+    [[nodiscard]] bool operator==(const type_info &other) const ENTT_NOEXCEPT {
+        return hash_func == other.hash_func;
+    }
+
 private:
     seq_fn *seq_func;
     hash_fn *hash_func;
     name_fn *name_func;
 };
+
+
+/**
+* @brief Compares the contents of two type info objects.
+* @param lhs A type info object.
+* @param rhs A type info object.
+* @return True if the two contents differ, false otherwise.
+*/
+[[nodiscard]] inline bool operator!=(const type_info &lhs, const type_info &rhs) ENTT_NOEXCEPT {
+    return !(lhs == rhs);
+}
 
 
 /**
