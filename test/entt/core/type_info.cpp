@@ -40,6 +40,12 @@ TEST(TypeInfo, Functionalities) {
     static_assert(std::is_copy_assignable_v<decltype(info)>);
     static_assert(std::is_move_assignable_v<decltype(info)>);
 
+    ASSERT_EQ(info, other);
+    ASSERT_NE(info, empty);
+
+    ASSERT_TRUE(info == info);
+    ASSERT_FALSE(info != other);
+
     ASSERT_EQ(info.seq(), other.seq());
     ASSERT_EQ(info.hash(), other.hash());
     ASSERT_EQ(info.name(), other.name());
