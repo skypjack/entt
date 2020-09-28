@@ -28,30 +28,35 @@ struct basic_handle {
     >;
 
     /**
+     * @brief Constructs a default invalid handle.
+     */
+    basic_handle() ENTT_NOEXCEPT
+        : reg{nullptr}, entt{null}
+    {}
+
+    /**
      * @brief Constructs a handle from a given registry and entity.
      * @param ref An instance of the registry class.
      * @param value An entity identifier.
      */
-    basic_handle(registry_type &ref, entity_type value = null) ENTT_NOEXCEPT
+    basic_handle(registry_type &ref, entity_type value) ENTT_NOEXCEPT
         : reg{&ref}, entt{value}
     {}
 
     /**
-     * @brief Assigns an entity to a handle.
-     * @param value An entity identifier.
-     * @return This handle.
+     * @brief Compares two handles.
+     * @return True if both handles refer to the same registry and the same entity, false otherwise.
      */
-    basic_handle & operator=(const entity_type value) ENTT_NOEXCEPT {
-        entt = value;
-        return *this;
+    bool operator==(const basic_handle<entity_type> &other) const ENTT_NOEXCEPT {
+        return reg == other.registry() && entt == other.entity();
     }
 
     /**
-     * @brief Assigns the null object to a handle.
-     * @return This handle.
+     * @brief Compares two handles.
+     * @return False if both handles refer to the same registry and the same entity, true otherwise.
      */
-    basic_handle & operator=(null_t) ENTT_NOEXCEPT {
-        return (*this = static_cast<entity_type>(null));
+    bool operator!=(const basic_handle<entity_type> &other) const ENTT_NOEXCEPT {
+        return !( *this == other);
     }
 
     /**
@@ -59,7 +64,7 @@ struct basic_handle {
      * @return A const handle referring to the same entity.
      */
     [[nodiscard]] operator basic_handle<const entity_type>() const ENTT_NOEXCEPT {
-        return {*reg, entt};
+        return reg ? basic_handle<const entity_type>{ *reg, entt} : basic_handle<const entity_type>{};
     }
 
     /**
@@ -71,24 +76,32 @@ struct basic_handle {
     }
 
     /**
+     * @brief Checks if a handle refers to non-null registry pointer and entity.
+     * @return True if the handle refers to non-null registry and entity, false otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const {
+        return reg && entt != null;
+    }
+
+    /**
      * @brief Checks if a handle refers to a valid entity or not.
      * @return True if the handle refers to a valid entity, false otherwise.
      */
-    [[nodiscard]] explicit operator bool() const {
+    [[nodiscard]] bool valid() const {
         return reg->valid(entt);
     }
 
     /**
-     * @brief Returns a reference to the underlying registry.
-     * @return A reference to the underlying registry.
+     * @brief Returns a pointer to the underlying registry.
+     * @return A pointer to the underlying registry.
      */
-    [[nodiscard]] registry_type & registry() const ENTT_NOEXCEPT {
-        return *reg;
+    [[nodiscard]] registry_type  * registry() const ENTT_NOEXCEPT {
+        return reg;
     }
 
     /**
      * @brief Returns the entity associated with a handle.
-     * @return The entity associated with the handle.
+     * @param value he entity associated with the handle.
      */
     [[nodiscard]] entity_type entity() const ENTT_NOEXCEPT {
         return entt;
@@ -253,7 +266,7 @@ struct basic_handle {
     }
 
 private:
-    registry_type *reg;
+    registry_type  *reg;
     entity_type entt;
 };
 
