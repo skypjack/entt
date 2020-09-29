@@ -40,136 +40,75 @@ TEST(BasicHandle, Construction) {
     static_assert(std::is_same_v<const entt::registry *, decltype(chandle.registry())>);
 }
 
-
 TEST(BasicHandle, Invalidation) {
     entt::handle handle;
 
-    ASSERT_TRUE(nullptr == handle.registry());
-    ASSERT_TRUE(entt::null == handle.entity());
     ASSERT_FALSE(handle);
+    ASSERT_EQ(handle.registry(), nullptr);
+    ASSERT_EQ(handle.entity(), entt::entity{entt::null});
 
     entt::registry registry;
     const auto entity = registry.create();
 
-    handle = {registry, entity};
+    handle = { registry, entity };
 
-    ASSERT_FALSE(nullptr == handle.registry());
-    ASSERT_FALSE(entt::null == handle.entity());
     ASSERT_TRUE(handle);
+    ASSERT_NE(handle.registry(), nullptr);
+    ASSERT_NE(handle.entity(), entt::entity{entt::null});
 
     handle = {};
 
-    ASSERT_TRUE(nullptr == handle.registry());
-    ASSERT_TRUE(entt::null == handle.entity());
     ASSERT_FALSE(handle);
+    ASSERT_EQ(handle.registry(), nullptr);
+    ASSERT_EQ(handle.entity(), entt::entity{entt::null});
 }
-
 
 TEST(BasicHandle, Comparison) {
     entt::registry registry;
-    const auto entity1 = registry.create();
-    const auto entity2 = registry.create();
+    const auto entity = registry.create();
 
-    entt::handle handle1{registry, entity1};
-    entt::handle handle2{registry, entity2};
-    entt::const_handle chandle1 = handle1;
-    entt::const_handle chandle2 = handle2;
+    entt::handle handle{registry, entity};
+    entt::const_handle chandle = handle;
 
-    ASSERT_NE(handle1, handle2);
-    ASSERT_FALSE(handle1 == handle2);
-    ASSERT_TRUE(handle1 != handle2);
+    ASSERT_NE(handle, entt::handle{});
+    ASSERT_FALSE(handle == entt::handle{});
+    ASSERT_TRUE(handle != entt::handle{});
 
-    ASSERT_NE(chandle1, chandle2);
-    ASSERT_FALSE(chandle1 == chandle2);
-    ASSERT_TRUE(chandle1 != chandle2);
+    ASSERT_NE(chandle, entt::const_handle{});
+    ASSERT_FALSE(chandle == entt::const_handle{});
+    ASSERT_TRUE(chandle != entt::const_handle{});
 
-    ASSERT_EQ(handle1, chandle1);
-    ASSERT_TRUE(handle1 == chandle1);
-    ASSERT_FALSE(handle1 != chandle1);
+    ASSERT_EQ(handle, chandle);
+    ASSERT_TRUE(handle == chandle);
+    ASSERT_FALSE(handle != chandle);
 
-    ASSERT_EQ(handle2, chandle2);
-    ASSERT_TRUE(handle2 == chandle2);
-    ASSERT_FALSE(handle2 != chandle2);
+    ASSERT_EQ(entt::handle{}, entt::const_handle{});
+    ASSERT_TRUE(entt::handle{} == entt::const_handle{});
+    ASSERT_FALSE(entt::handle{} != entt::const_handle{});
 
-    ASSERT_NE(handle1, chandle2);
-    ASSERT_FALSE(handle1 == chandle2);
-    ASSERT_TRUE(handle1 != chandle2);
+    handle = {};
+    chandle = {};
 
-    handle1 = {};
-    chandle2 = {};
+    ASSERT_EQ(handle, entt::handle{});
+    ASSERT_TRUE(handle == entt::handle{});
+    ASSERT_FALSE(handle != entt::handle{});
 
-    ASSERT_NE(handle1, handle2);
-    ASSERT_FALSE(handle1 == handle2);
-    ASSERT_TRUE(handle1 != handle2);
+    ASSERT_EQ(chandle, entt::const_handle{});
+    ASSERT_TRUE(chandle == entt::const_handle{});
+    ASSERT_FALSE(chandle != entt::const_handle{});
 
-    ASSERT_NE(chandle1, chandle2);
-    ASSERT_FALSE(chandle1 == chandle2);
-    ASSERT_TRUE(chandle1 != chandle2);
+    entt::registry other;
+    const auto entt = other.create();
 
-    ASSERT_NE(handle1, chandle1);
-    ASSERT_FALSE(handle1 == chandle1);
-    ASSERT_TRUE(handle1 != chandle1);
+    handle = { registry, entity };
+    chandle = { other, entt };
 
-    ASSERT_NE(handle2, chandle2);
-    ASSERT_FALSE(handle2 == chandle2);
-    ASSERT_TRUE(handle2 != chandle2);
-
-    ASSERT_EQ(handle1, chandle2);
-    ASSERT_TRUE(handle1 == chandle2);
-    ASSERT_FALSE(handle1 != chandle2);
-
-    handle2 = {};
-    chandle1 = {};
-
-    ASSERT_EQ(handle1, handle2);
-    ASSERT_TRUE(handle1 == handle2);
-    ASSERT_FALSE(handle1 != handle2);
-
-    ASSERT_EQ(chandle1, chandle2);
-    ASSERT_TRUE(chandle1 == chandle2);
-    ASSERT_FALSE(chandle1 != chandle2);
-
-    ASSERT_EQ(handle1, chandle1);
-    ASSERT_TRUE(handle1 == chandle1);
-    ASSERT_FALSE(handle1 != chandle1);
-
-    ASSERT_EQ(handle2, chandle2);
-    ASSERT_TRUE(handle2 == chandle2);
-    ASSERT_FALSE(handle2 != chandle2);
-
-    ASSERT_EQ(handle1, chandle2);
-    ASSERT_TRUE(handle1 == chandle2);
-    ASSERT_FALSE(handle1 != chandle2);
-
-    entt::registry registry_b;
-    const auto entity_b1 = registry.create();
-
-    handle1 = {registry_b, entity_b1};
-    handle2 = {registry, entity1};
-    chandle1 = handle1;
-    chandle2 = handle2;
-
-    ASSERT_NE(handle1, handle2);
-    ASSERT_FALSE(handle1 == handle2);
-    ASSERT_TRUE(handle1 != handle2);
-
-    ASSERT_NE(chandle1, chandle2);
-    ASSERT_FALSE(chandle1 == chandle2);
-    ASSERT_TRUE(chandle1 != chandle2);
-
-    ASSERT_EQ(handle1, chandle1);
-    ASSERT_TRUE(handle1 == chandle1);
-    ASSERT_FALSE(handle1 != chandle1);
-
-    ASSERT_EQ(handle2, chandle2);
-    ASSERT_TRUE(handle2 == chandle2);
-    ASSERT_FALSE(handle2 != chandle2);
-
-    ASSERT_NE(handle1, chandle2);
-    ASSERT_FALSE(handle1 == chandle2);
-    ASSERT_TRUE(handle1 != chandle2);
+    ASSERT_NE(handle, chandle);
+    ASSERT_FALSE(chandle == handle);
+    ASSERT_TRUE(chandle != handle);
+    ASSERT_EQ(handle.entity(), chandle.entity());
+    ASSERT_NE(handle.registry(), chandle.registry());
 }
-
 
 TEST(BasicHandle, Component) {
     entt::registry registry;
