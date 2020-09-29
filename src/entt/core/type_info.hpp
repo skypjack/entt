@@ -141,19 +141,26 @@ class type_info final {
     {}
 
 public:
-    /*! Default constructor. */
+    /*! @brief Default constructor. */
     type_info()
         : type_info{nullptr, nullptr, nullptr}
     {}
 
-    /*! Default copy constructor. */
+    /*! @brief Default copy constructor. */
     type_info(const type_info &) = default;
-    /*! Default move constructor. */
+    /*! @brief Default move constructor. */
     type_info(type_info &&) = default;
 
-    /*! Default copy assignment operator. */
+    /**
+     * @brief Default copy assignment operator.
+     * @return This type info object.
+     */
     type_info & operator=(const type_info &) = default;
-    /*! Default move assignment operator. */
+
+    /**
+     * @brief Default move assignment operator.
+     * @return This type info object.
+     */
     type_info & operator=(type_info &&) = default;
 
     /**
