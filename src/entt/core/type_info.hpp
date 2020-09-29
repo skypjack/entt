@@ -134,7 +134,7 @@ class type_info final {
     template<typename>
     friend type_info type_id() ENTT_NOEXCEPT;
 
-    type_info(seq_fn *seq_ptr, hash_fn *hash_ptr, name_fn *name_ptr)
+    type_info(seq_fn *seq_ptr, hash_fn *hash_ptr, name_fn *name_ptr) ENTT_NOEXCEPT
         : seq_func{seq_ptr},
           hash_func{hash_ptr},
           name_func{name_ptr}
@@ -142,26 +142,26 @@ class type_info final {
 
 public:
     /*! @brief Default constructor. */
-    type_info()
+    type_info() ENTT_NOEXCEPT
         : type_info{nullptr, nullptr, nullptr}
     {}
 
     /*! @brief Default copy constructor. */
-    type_info(const type_info &) = default;
+    type_info(const type_info &) ENTT_NOEXCEPT = default;
     /*! @brief Default move constructor. */
-    type_info(type_info &&) = default;
+    type_info(type_info &&) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Default copy assignment operator.
      * @return This type info object.
      */
-    type_info & operator=(const type_info &) = default;
+    type_info & operator=(const type_info &) ENTT_NOEXCEPT = default;
 
     /**
      * @brief Default move assignment operator.
      * @return This type info object.
      */
-    type_info & operator=(type_info &&) = default;
+    type_info & operator=(type_info &&) ENTT_NOEXCEPT = default;
 
     /**
     * @brief Checks if a type info object is properly initialized.
