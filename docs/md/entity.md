@@ -1811,6 +1811,14 @@ are completely responsible for synchronization whether required. On the other
 hand, they could get away with it without having to resort to particular
 expedients.
 
+Finally, `EnTT` can be configured via a few compile-time definitions to make
+some of its parts implicitly thread-safe, roughly speaking only the ones that
+really make sense and can't be turned around.<br/>
+In particular, when multiple instances of objects referencing the type index
+generator (such as the `registry` class) are used in different threads, then it
+might be useful to define `ENTT_USE_ATOMIC`.<br/>
+See the relevant documentation for more information.
+
 ## Iterators
 
 A special mention is needed for the iterators returned by views and groups. Most
