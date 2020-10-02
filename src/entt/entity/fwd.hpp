@@ -8,7 +8,7 @@
 namespace entt {
 
 
-template <typename>
+template<typename>
 class basic_registry;
 
 
@@ -26,6 +26,10 @@ class basic_group;
 
 template<typename>
 class basic_observer;
+
+
+template<typename>
+class basic_organizer;
 
 
 template <typename>
@@ -58,6 +62,10 @@ using registry = basic_registry<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using observer = basic_observer<entity>;
+
+
+/*! @brief Alias declaration for the most common use case. */
+using organizer = basic_organizer<entity>;
 
 
 /*! @brief Alias declaration for the most common use case. */
