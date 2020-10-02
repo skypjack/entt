@@ -24,6 +24,7 @@
     * [Invoke](#invoke)
     * [Handle](#handle)
     * [Context variables](#context-variables)
+    * [Organizer](#organizer)
   * [Meet the runtime](#meet-the-runtime)
     * [Cloning a registry](#cloning-a-registry)
     * [Stamping an entity](#stamping-an-entity)
@@ -740,6 +741,140 @@ can be moved. The `set` member function either creates a new instance of the
 context variable or overwrites an already existing one if any. The `try_ctx`
 member function returns a pointer to the context variable if it exists,
 otherwise it returns a null pointer.
+
+### Organizer
+
+The `organizer` class template offers minimal support (but sufficient in many
+cases) for creating an execution graph from functions and their requirements on
+resources.<br/>
+The resulting tasks aren't executed in any case. This isn't the goal of this
+tool. Instead, they are returned to the user in the form of a graph that allows
+for safe execution.
+
+The functions are added in order of execution to the organizer. Free functions
+and member functions are supported as template parameters, however there is also
+the possibility to pass pointers to free functions or decayed lambdas as
+parameters to the `emplace` member function:
+
+```cpp
+entt::organizer organizer;
+
+// adds a free function to the organizer
+organizer.emplace<&free_function>();
+
+// adds a member function and an instance on which to invoke it to the organizer
+clazz instance;
+organizer.emplace<&clazz::member_function>(&instance);
+
+// adds a decayed lambda directly
+organizer.emplace(+[](const void *, entt::registry &) { /* ... */ });
+```
+
+As for free functions and member functions, these are the parameters that can be
+presented by their function types and that will be correctly handled:
+
+* A possibly constant reference to a registry. The one passed to the task when
+  it's run will also be passed to the function as-is.
+
+* An `entt::view` with any possible combination of types. It will be created
+  from the registry passed to the task and supplied directly to the function.
+
+* A possibly constant reference to any type `T`. It will be interpreted as
+  context variable, which will be created within the registry and passed to the
+  function.
+
+The function type for free functions and decayed lambdas passed as parameters to
+`emplace` is `void(const void *, entt::registry &)` instead. The registry is the
+same as provided to the task. The first parameter is an optional pointer to user
+defined data to provide upon registration:
+
+```cpp
+clazz instance;
+organizer.emplace(+[](const void *, entt::registry &) { /* ... */ }, &instance);
+```
+
+In all cases, it's also possible to associate a name with the task when creating
+it. For example:
+
+```cpp
+organizer.emplace<&free_function>("func");
+```
+
+When a function of any type is registered with the organizer, everything it
+accesses is considered a _resource_ (views are _unpacked_ and their types are
+treated as resources). The _constness_ of the type also dictates its access mode
+(RO/RW). In turn, this affects the resulting graph, since it influences the
+possibility of launching tasks in parallel.<br/>
+As for the registry, if a function doesn't explicitly request it or requires a
+constant reference to it, it's considered a read-only access. Otherwise, it's
+considered as read-write access. All functions will still have the registry
+among their resources.
+
+When registering a function, users can also require resources that aren't in the
+list of parameters of the function itself. These are declared as template
+parameters:
+
+```cpp
+organizer.emplace<&free_function, position, velocity>("func");
+```
+
+Similarly, users can override the access mode of a type again via template
+parameters:
+
+```cpp
+organizer.emplace<&free_function, const renderable>("func");
+```
+
+In this case, even if `renderable` appears among the parameters of the function
+as not constant, it will be treated as constant as regards the generation of the
+task graph.
+
+To generate the task graph, the organizer offers the `graph` member function:
+
+```cpp
+std::vector<entt::organizer::vertex> graph = organizer.graph();
+```
+
+The graph is returned in the form of an adjacency list. Each vertex offers the
+following features:
+
+* `ro_count` and `rw_count`: they return the number of resources accessed in
+  read-only or read-write mode.
+
+* `ro_dependency` and `rw_dependency`: useful for retrieving the type info
+  objects associated with the parameters of the underlying function.
+
+* `top_level`: indicates whether a node is a top level one, that is, it has no
+  entering edges.
+
+* `info`: returns the type info object associated with the underlying function.
+
+* `name`: returns the name associated with the given vertex if any, a null
+  pointer otherwise.
+
+* `callback`: a pointer to the function to execute and whose function type is
+  `void(const void *, entt::registry &)`.
+
+* `data`: optional data to provide to the callback.
+
+* `children`: the vertices reachable from the given node, in the form of indices
+  within the adjacency list.
+
+Since the creation of pools and resources within the registry isn't necessarily
+thread safe, each vertex also offers a `prepare` function which can be called to
+setup a registry for execution with the created graph:
+
+```cpp
+auto graph = organizer.graph();
+entt::registry registry;
+
+for(auto &&node: graph) {
+    node.prepare(registry);
+}
+```
+
+The actual scheduling of the tasks is the responsibility of the user, who can
+use the preferred tool.
 
 ## Meet the runtime
 

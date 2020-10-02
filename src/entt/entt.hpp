@@ -12,6 +12,7 @@
 #include "entity/handle.hpp"
 #include "entity/helper.hpp"
 #include "entity/observer.hpp"
+#include "entity/organizer.hpp"
 #include "entity/pool.hpp"
 #include "entity/registry.hpp"
 #include "entity/runtime_view.hpp"
