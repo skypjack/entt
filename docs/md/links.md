@@ -112,7 +112,8 @@ I hope this list can grow much more in the future:
     a crack at recreating Minecraft in one week using a custom C++ engine and
     Vulkan ([code included](https://github.com/vazgriz/VoxelGame)).
   * [Game Engine series](https://www.youtube.com/c/TheChernoProject/videos) by
-    [The Cherno](https://github.com/TheCherno):
+    [The Cherno](https://github.com/TheCherno) (not only about `EnTT` but also
+    on the use of an ECS in general):
     - [Intro to EnTT](https://www.youtube.com/watch?v=D4hz0wEB978).
     - [Entities and Components](https://www.youtube.com/watch?v=-B1iu4QJTUc).
     - [The ENTITY Class](https://www.youtube.com/watch?v=GfSzeAcsBb0).
@@ -123,6 +124,7 @@ I hope this list can grow much more in the future:
     - [Scene Hierarchy Panel](https://www.youtube.com/watch?v=wziDnE8guvI).
     - [Properties Panel](https://www.youtube.com/watch?v=NBpB0qscF3E).
     - [Camera Component UI](https://www.youtube.com/watch?v=RIMt_6agUiU).
+    - [Drawing Component UI](https://www.youtube.com/watch?v=u3yq8s3KuSE).
   * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect):
     project retrospect by [Eric Hildebrand](https://www.erichildebrand.net/).
 
