@@ -703,27 +703,27 @@ TEST(Registry, CleanViewAfterRemoveAndClear) {
     registry.emplace<int>(entity, 0);
     registry.emplace<char>(entity, 'c');
 
-    ASSERT_EQ(view.size(), entt::registry::size_type{1});
+    ASSERT_EQ(view.size_hint(), entt::registry::size_type{1});
 
     registry.remove<char>(entity);
 
-    ASSERT_EQ(view.size(), entt::registry::size_type{0});
+    ASSERT_EQ(view.size_hint(), entt::registry::size_type{0});
 
     registry.emplace<char>(entity, 'c');
 
-    ASSERT_EQ(view.size(), entt::registry::size_type{1});
+    ASSERT_EQ(view.size_hint(), entt::registry::size_type{1});
 
     registry.clear<int>();
 
-    ASSERT_EQ(view.size(), entt::registry::size_type{0});
+    ASSERT_EQ(view.size_hint(), entt::registry::size_type{0});
 
     registry.emplace<int>(entity, 0);
 
-    ASSERT_EQ(view.size(), entt::registry::size_type{1});
+    ASSERT_EQ(view.size_hint(), entt::registry::size_type{1});
 
     registry.clear();
 
-    ASSERT_EQ(view.size(), entt::registry::size_type{0});
+    ASSERT_EQ(view.size_hint(), entt::registry::size_type{0});
 }
 
 TEST(Registry, CleanNonOwningGroupViewAfterRemoveAndClear) {

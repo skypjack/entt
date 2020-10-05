@@ -343,15 +343,6 @@ public:
     }
 
     /**
-     * @brief Estimates the number of entities iterated by the view.
-     * @return Estimated number of entities iterated by the view.
-     */
-    [[deprecated("misleading name, use size_hint instead")]]
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return size_hint();
-    }
-
-    /**
      * @brief Direct access to the list of components of a given pool.
      *
      * The returned pointer is such that range

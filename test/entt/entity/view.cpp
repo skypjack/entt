@@ -304,7 +304,7 @@ TEST(MultiComponentView, Functionalities) {
     ASSERT_NE(cview.begin(), cview.end());
     ASSERT_NE(view.rbegin(), view.rend());
     ASSERT_NE(cview.rbegin(), cview.rend());
-    ASSERT_EQ(view.size(), decltype(view.size()){1});
+    ASSERT_EQ(view.size_hint(), decltype(view.size_hint()){1});
 
     registry.get<char>(e0) = '1';
     registry.get<char>(e1) = '2';
@@ -414,7 +414,7 @@ TEST(MultiComponentView, Empty) {
 
     auto view = registry.view<char, int, float>();
 
-    ASSERT_EQ(view.size(), entt::registry::size_type{1});
+    ASSERT_EQ(view.size_hint(), entt::registry::size_type{1});
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_EQ(view.rbegin(), view.rend());
 }
@@ -488,7 +488,7 @@ TEST(MultiComponentView, EachAndProxyWithSuggestedType) {
         return lhs > rhs;
     });
 
-    auto value = registry.view<int, char>().size();
+    auto value = registry.view<int, char>().size_hint();
 
     for(auto &&curr: registry.view<int, char>().proxy()) {
         ASSERT_EQ(std::get<1>(curr), static_cast<int>(--value));
@@ -537,13 +537,13 @@ TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
     entt::registry registry;
     auto view = registry.view<int, const char>();
 
-    ASSERT_EQ(view.size(), decltype(view.size()){0});
+    ASSERT_EQ(view.size_hint(), decltype(view.size_hint()){0});
 
     const auto entity = registry.create();
     registry.emplace<int>(entity, 0);
     registry.emplace<char>(entity, 'c');
 
-    ASSERT_EQ(view.size(), decltype(view.size()){1});
+    ASSERT_EQ(view.size_hint(), decltype(view.size_hint()){1});
 
     static_assert(std::is_same_v<decltype(view.get<int>({})), int &>);
     static_assert(std::is_same_v<decltype(view.get<const char>({})), const char &>);
