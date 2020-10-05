@@ -1306,8 +1306,8 @@ as a single component view. In fact, they walk through a packed array of
 components and return them one at a time.<br/>
 Single component views offer a bunch of functionalities to get the number of
 entities they are going to return and a raw access to the entity list as well as
-to the component list. It's also possible to ask a view if it contains a
-given entity.<br/>
+to the component list. It's also possible to ask a view if it contains a given
+entity.<br/>
 Refer to the inline documentation for all the details.
 
 Multi component views iterate entities that have at least all the given
@@ -1316,8 +1316,7 @@ entities available for each component and pick up a reference to the smallest
 set of candidates in order to speed up iterations.<br/>
 They offer fewer functionalities than single component views. In particular,
 a multi component view exposes utility functions to get the estimated number of
-entities it is going to return and to know whether it's empty or not. It's also
-possible to ask a view if it contains a given entity.<br/>
+entities it is going to return and to know if it contains a given entity.<br/>
 Refer to the inline documentation for all the details.
 
 There is no need to store views around for they are extremely cheap to
