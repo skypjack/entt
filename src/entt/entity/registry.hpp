@@ -621,8 +621,8 @@ public:
         auto &cpool = assure<Component>();
 
         return cpool.contains(entity)
-                ? cpool.replace(*this, entity, Component{std::forward<Args>(args)...})
-                : cpool.emplace(*this, entity, std::forward<Args>(args)...);
+            ? cpool.patch(*this, entity, [&args...](auto &curr) { curr = Component{std::forward<Args>(args)...}; })
+            : cpool.emplace(*this, entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -680,7 +680,7 @@ public:
      */
     template<typename Component, typename... Args>
     decltype(auto) replace(const entity_type entity, Args &&... args) {
-        return assure<Component>().replace(*this, entity, Component{std::forward<Args>(args)...});
+        return assure<Component>().patch(*this, entity, [&args...](auto &curr) { curr = Component{std::forward<Args>(args)...}; });
     }
 
     /**

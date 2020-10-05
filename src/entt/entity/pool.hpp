@@ -227,28 +227,6 @@ struct default_pool final: storage<Entity, Type> {
         }
     }
 
-    /**
-    * @brief Replaces the object associated with an entity in a pool.
-    *
-    * A new object is created and initialized with the arguments provided (the
-    * object type must have a proper constructor or be of aggregate type). Then
-    * the instance is assigned to the given entity.
-    *
-    * @warning
-    * Attempting to use an invalid entity or to replace an object of an entity
-    * that doesn't belong to the pool results in undefined behavior.<br/>
-    * An assertion will abort the execution at runtime in debug mode in case of
-    * invalid entity or if the entity doesn't belong to the pool.
-    *
-    * @param owner The registry that issued the request.
-    * @param entity A valid entity identifier.
-    * @param value An instance of the type to assign.
-    * @return A reference to the object being replaced.
-    */
-    decltype(auto) replace(basic_registry<entity_type> &owner, const entity_type entity, object_type value) {
-        return patch(owner, entity, [&value](auto &&curr) { curr = std::move(value); });
-    }
-
 private:
     sigh<void(basic_registry<entity_type> &, const entity_type)> construction{};
     sigh<void(basic_registry<entity_type> &, const entity_type)> destruction{};
