@@ -100,17 +100,17 @@ TEST(Registry, Context) {
 TEST(Registry, Functionalities) {
     entt::registry registry;
 
-    ASSERT_EQ(registry.size(), entt::registry::size_type{0});
-    ASSERT_EQ(registry.alive(), entt::registry::size_type{0});
+    ASSERT_EQ(registry.size(), 0u);
+    ASSERT_EQ(registry.alive(), 0u);
     ASSERT_NO_THROW((registry.reserve<int, char>(8)));
     ASSERT_NO_THROW(registry.reserve(42));
     ASSERT_TRUE(registry.empty());
 
-    ASSERT_EQ(registry.capacity(), entt::registry::size_type{42});
-    ASSERT_EQ(registry.capacity<int>(), entt::registry::size_type{8});
-    ASSERT_EQ(registry.capacity<char>(), entt::registry::size_type{8});
-    ASSERT_EQ(registry.size<int>(), entt::registry::size_type{0});
-    ASSERT_EQ(registry.size<char>(), entt::registry::size_type{0});
+    ASSERT_EQ(registry.capacity(), 42u);
+    ASSERT_EQ(registry.capacity<int>(), 8u);
+    ASSERT_EQ(registry.capacity<char>(), 8u);
+    ASSERT_EQ(registry.size<int>(), 0u);
+    ASSERT_EQ(registry.size<char>(), 0u);
     ASSERT_TRUE((registry.empty<int, char>()));
 
     registry.prepare<double>();
@@ -124,8 +124,8 @@ TEST(Registry, Functionalities) {
     ASSERT_TRUE(registry.has<>(e0));
     ASSERT_FALSE(registry.any<>(e1));
 
-    ASSERT_EQ(registry.size<int>(), entt::registry::size_type{1});
-    ASSERT_EQ(registry.size<char>(), entt::registry::size_type{1});
+    ASSERT_EQ(registry.size<int>(), 1u);
+    ASSERT_EQ(registry.size<char>(), 1u);
     ASSERT_FALSE(registry.empty<int>());
     ASSERT_FALSE(registry.empty<char>());
 
@@ -186,28 +186,28 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(static_cast<const entt::registry &>(registry).get<int>(e0), 1);
     ASSERT_EQ(static_cast<const entt::registry &>(registry).get<int>(e1), 1);
 
-    ASSERT_EQ(registry.size(), entt::registry::size_type{3});
-    ASSERT_EQ(registry.alive(), entt::registry::size_type{3});
+    ASSERT_EQ(registry.size(), 3u);
+    ASSERT_EQ(registry.alive(), 3u);
     ASSERT_FALSE(registry.empty());
 
-    ASSERT_EQ(registry.version(e2), entt::registry::version_type{0});
-    ASSERT_EQ(registry.current(e2), entt::registry::version_type{0});
+    ASSERT_EQ(registry.version(e2), 0u);
+    ASSERT_EQ(registry.current(e2), 0u);
     ASSERT_NO_THROW(registry.destroy(e2));
-    ASSERT_EQ(registry.version(e2), entt::registry::version_type{0});
-    ASSERT_EQ(registry.current(e2), entt::registry::version_type{1});
+    ASSERT_EQ(registry.version(e2), 0u);
+    ASSERT_EQ(registry.current(e2), 1u);
 
     ASSERT_TRUE(registry.valid(e0));
     ASSERT_TRUE(registry.valid(e1));
     ASSERT_FALSE(registry.valid(e2));
 
-    ASSERT_EQ(registry.size(), entt::registry::size_type{3});
-    ASSERT_EQ(registry.alive(), entt::registry::size_type{2});
+    ASSERT_EQ(registry.size(), 3u);
+    ASSERT_EQ(registry.alive(), 2u);
     ASSERT_FALSE(registry.empty());
 
     ASSERT_NO_THROW(registry.clear());
 
-    ASSERT_EQ(registry.size(), entt::registry::size_type{3});
-    ASSERT_EQ(registry.alive(), entt::registry::size_type{0});
+    ASSERT_EQ(registry.size(), 3u);
+    ASSERT_EQ(registry.alive(), 0u);
     ASSERT_TRUE(registry.empty());
 
     const auto e3 = registry.create();
@@ -215,8 +215,8 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.get_or_emplace<int>(e3, 3), 3);
     ASSERT_EQ(registry.get_or_emplace<char>(e3, 'c'), 'c');
 
-    ASSERT_EQ(registry.size<int>(), entt::registry::size_type{1});
-    ASSERT_EQ(registry.size<char>(), entt::registry::size_type{1});
+    ASSERT_EQ(registry.size<int>(), 1u);
+    ASSERT_EQ(registry.size<char>(), 1u);
     ASSERT_FALSE(registry.empty<int>());
     ASSERT_FALSE(registry.empty<char>());
     ASSERT_TRUE((registry.has<int, char>(e3)));
@@ -225,15 +225,15 @@ TEST(Registry, Functionalities) {
 
     ASSERT_NO_THROW(registry.clear<int>());
 
-    ASSERT_EQ(registry.size<int>(), entt::registry::size_type{0});
-    ASSERT_EQ(registry.size<char>(), entt::registry::size_type{1});
+    ASSERT_EQ(registry.size<int>(), 0u);
+    ASSERT_EQ(registry.size<char>(), 1u);
     ASSERT_TRUE(registry.empty<int>());
     ASSERT_FALSE(registry.empty<char>());
 
     ASSERT_NO_THROW(registry.clear());
 
-    ASSERT_EQ(registry.size<int>(), entt::registry::size_type{0});
-    ASSERT_EQ(registry.size<char>(), entt::registry::size_type{0});
+    ASSERT_EQ(registry.size<int>(), 0u);
+    ASSERT_EQ(registry.size<char>(), 0u);
     ASSERT_TRUE((registry.empty<int, char>()));
 
     const auto e4 = registry.create();
@@ -244,17 +244,17 @@ TEST(Registry, Functionalities) {
     ASSERT_EQ(registry.remove_if_exists<int>(e4), 1u);
     ASSERT_EQ(registry.remove_if_exists<int>(e5), 0u);
 
-    ASSERT_EQ(registry.size<int>(), entt::registry::size_type{0});
-    ASSERT_EQ(registry.size<char>(), entt::registry::size_type{0});
+    ASSERT_EQ(registry.size<int>(), 0u);
+    ASSERT_EQ(registry.size<char>(), 0u);
     ASSERT_TRUE(registry.empty<int>());
 
-    ASSERT_EQ(registry.capacity<int>(), entt::registry::size_type{8});
-    ASSERT_EQ(registry.capacity<char>(), entt::registry::size_type{8});
+    ASSERT_EQ(registry.capacity<int>(), 8u);
+    ASSERT_EQ(registry.capacity<char>(), 8u);
 
     registry.shrink_to_fit<int, char>();
 
-    ASSERT_EQ(registry.capacity<int>(), entt::registry::size_type{});
-    ASSERT_EQ(registry.capacity<char>(), entt::registry::size_type{});
+    ASSERT_EQ(registry.capacity<int>(), 0u);
+    ASSERT_EQ(registry.capacity<char>(), 0u);
 }
 
 TEST(Registry, ReplaceAggregate) {
@@ -703,27 +703,27 @@ TEST(Registry, CleanViewAfterRemoveAndClear) {
     registry.emplace<int>(entity, 0);
     registry.emplace<char>(entity, 'c');
 
-    ASSERT_EQ(view.size_hint(), entt::registry::size_type{1});
+    ASSERT_EQ(view.size_hint(), 1u);
 
     registry.remove<char>(entity);
 
-    ASSERT_EQ(view.size_hint(), entt::registry::size_type{0});
+    ASSERT_EQ(view.size_hint(), 0u);
 
     registry.emplace<char>(entity, 'c');
 
-    ASSERT_EQ(view.size_hint(), entt::registry::size_type{1});
+    ASSERT_EQ(view.size_hint(), 1u);
 
     registry.clear<int>();
 
-    ASSERT_EQ(view.size_hint(), entt::registry::size_type{0});
+    ASSERT_EQ(view.size_hint(), 0u);
 
     registry.emplace<int>(entity, 0);
 
-    ASSERT_EQ(view.size_hint(), entt::registry::size_type{1});
+    ASSERT_EQ(view.size_hint(), 1u);
 
     registry.clear();
 
-    ASSERT_EQ(view.size_hint(), entt::registry::size_type{0});
+    ASSERT_EQ(view.size_hint(), 0u);
 }
 
 TEST(Registry, CleanNonOwningGroupViewAfterRemoveAndClear) {
@@ -734,27 +734,27 @@ TEST(Registry, CleanNonOwningGroupViewAfterRemoveAndClear) {
     registry.emplace<int>(entity, 0);
     registry.emplace<char>(entity, 'c');
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{1});
+    ASSERT_EQ(group.size(), 1u);
 
     registry.remove<char>(entity);
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{0});
+    ASSERT_EQ(group.size(), 0u);
 
     registry.emplace<char>(entity, 'c');
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{1});
+    ASSERT_EQ(group.size(), 1u);
 
     registry.clear<int>();
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{0});
+    ASSERT_EQ(group.size(), 0u);
 
     registry.emplace<int>(entity, 0);
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{1});
+    ASSERT_EQ(group.size(), 1u);
 
     registry.clear();
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{0});
+    ASSERT_EQ(group.size(), 0u);
 }
 
 TEST(Registry, CleanFullOwningGroupViewAfterRemoveAndClear) {
@@ -765,27 +765,27 @@ TEST(Registry, CleanFullOwningGroupViewAfterRemoveAndClear) {
     registry.emplace<int>(entity, 0);
     registry.emplace<char>(entity, 'c');
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{1});
+    ASSERT_EQ(group.size(), 1u);
 
     registry.remove<char>(entity);
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{0});
+    ASSERT_EQ(group.size(), 0u);
 
     registry.emplace<char>(entity, 'c');
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{1});
+    ASSERT_EQ(group.size(), 1u);
 
     registry.clear<int>();
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{0});
+    ASSERT_EQ(group.size(), 0u);
 
     registry.emplace<int>(entity, 0);
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{1});
+    ASSERT_EQ(group.size(), 1u);
 
     registry.clear();
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{0});
+    ASSERT_EQ(group.size(), 0u);
 }
 
 TEST(Registry, CleanPartialOwningGroupViewAfterRemoveAndClear) {
@@ -796,27 +796,27 @@ TEST(Registry, CleanPartialOwningGroupViewAfterRemoveAndClear) {
     registry.emplace<int>(entity, 0);
     registry.emplace<char>(entity, 'c');
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{1});
+    ASSERT_EQ(group.size(), 1u);
 
     registry.remove<char>(entity);
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{0});
+    ASSERT_EQ(group.size(), 0u);
 
     registry.emplace<char>(entity, 'c');
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{1});
+    ASSERT_EQ(group.size(), 1u);
 
     registry.clear<int>();
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{0});
+    ASSERT_EQ(group.size(), 0u);
 
     registry.emplace<int>(entity, 0);
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{1});
+    ASSERT_EQ(group.size(), 1u);
 
     registry.clear();
 
-    ASSERT_EQ(group.size(), entt::registry::size_type{0});
+    ASSERT_EQ(group.size(), 0u);
 }
 
 TEST(Registry, NestedGroups) {

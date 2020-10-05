@@ -41,21 +41,21 @@ TEST(NonOwningGroup, Functionalities) {
     ASSERT_NE(cgroup.begin(), cgroup.end());
     ASSERT_NE(group.rbegin(), group.rend());
     ASSERT_NE(cgroup.rbegin(), cgroup.rend());
-    ASSERT_EQ(group.size(), typename decltype(group)::size_type{1});
-    ASSERT_EQ(group.size<int>(), typename decltype(group)::size_type{1});
-    ASSERT_EQ(cgroup.size<const char>(), typename decltype(group)::size_type{2});
+    ASSERT_EQ(group.size(), 1u);
+    ASSERT_EQ(group.size<int>(), 1u);
+    ASSERT_EQ(cgroup.size<const char>(), 2u);
 
     registry.emplace<int>(e0);
 
-    ASSERT_EQ(group.size(), typename decltype(group)::size_type{2});
-    ASSERT_EQ(group.size<int>(), typename decltype(group)::size_type{2});
-    ASSERT_EQ(cgroup.size<const char>(), typename decltype(group)::size_type{2});
+    ASSERT_EQ(group.size(), 2u);
+    ASSERT_EQ(group.size<int>(), 2u);
+    ASSERT_EQ(cgroup.size<const char>(), 2u);
 
     registry.remove<int>(e0);
 
-    ASSERT_EQ(group.size(), typename decltype(group)::size_type{1});
-    ASSERT_EQ(group.size<int>(), typename decltype(group)::size_type{1});
-    ASSERT_EQ(cgroup.size<const char>(), typename decltype(group)::size_type{2});
+    ASSERT_EQ(group.size(), 1u);
+    ASSERT_EQ(group.size<int>(), 1u);
+    ASSERT_EQ(cgroup.size<const char>(), 2u);
 
     registry.get<char>(e0) = '1';
     registry.get<char>(e1) = '2';
@@ -106,7 +106,7 @@ TEST(NonOwningGroup, ElementAccess) {
     registry.emplace<int>(e1);
     registry.emplace<char>(e1);
 
-    for(typename decltype(group)::size_type i{}; i < group.size(); ++i) {
+    for(auto i = 0u; i < group.size(); ++i) {
         ASSERT_EQ(group[i], i ? e0 : e1);
         ASSERT_EQ(cgroup[i], i ? e0 : e1);
     }
@@ -310,7 +310,7 @@ TEST(NonOwningGroup, IndexRebuiltOnDestroy) {
     registry.destroy(e0);
     registry.emplace<int>(registry.create(), 42);
 
-    ASSERT_EQ(group.size(), typename decltype(group)::size_type{1});
+    ASSERT_EQ(group.size(), 1u);
     ASSERT_EQ(group[{}], e1);
     ASSERT_EQ(group.get<int>(e1), 1);
     ASSERT_EQ(group.get<unsigned int>(e1), 1u);
@@ -479,7 +479,7 @@ TEST(NonOwningGroup, EmptyAndNonEmptyTypes) {
         ASSERT_TRUE(entt == e0 || entt == e1);
     }
 
-    ASSERT_EQ(group.size(), typename decltype(group)::size_type{2});
+    ASSERT_EQ(group.size(), 2u);
 }
 
 TEST(NonOwningGroup, TrackEntitiesOnComponentDestruction) {
@@ -607,21 +607,21 @@ TEST(OwningGroup, Functionalities) {
     ASSERT_NE(cgroup.begin(), cgroup.end());
     ASSERT_NE(group.rbegin(), group.rend());
     ASSERT_NE(cgroup.rbegin(), cgroup.rend());
-    ASSERT_EQ(group.size(), typename decltype(group)::size_type{1});
-    ASSERT_EQ(group.size<int>(), typename decltype(group)::size_type{1});
-    ASSERT_EQ(cgroup.size<const char>(), typename decltype(group)::size_type{2});
+    ASSERT_EQ(group.size(), 1u);
+    ASSERT_EQ(group.size<int>(), 1u);
+    ASSERT_EQ(cgroup.size<const char>(), 2u);
 
     registry.emplace<int>(e0);
 
-    ASSERT_EQ(group.size(), typename decltype(group)::size_type{2});
-    ASSERT_EQ(group.size<int>(), typename decltype(group)::size_type{2});
-    ASSERT_EQ(cgroup.size<const char>(), typename decltype(group)::size_type{2});
+    ASSERT_EQ(group.size(), 2u);
+    ASSERT_EQ(group.size<int>(), 2u);
+    ASSERT_EQ(cgroup.size<const char>(), 2u);
 
     registry.remove<int>(e0);
 
-    ASSERT_EQ(group.size(), typename decltype(group)::size_type{1});
-    ASSERT_EQ(group.size<int>(), typename decltype(group)::size_type{1});
-    ASSERT_EQ(cgroup.size<const char>(), typename decltype(group)::size_type{2});
+    ASSERT_EQ(group.size(), 1u);
+    ASSERT_EQ(group.size<int>(), 1u);
+    ASSERT_EQ(cgroup.size<const char>(), 2u);
 
     registry.get<char>(e0) = '1';
     registry.get<char>(e1) = '2';
@@ -669,7 +669,7 @@ TEST(OwningGroup, ElementAccess) {
     registry.emplace<int>(e1);
     registry.emplace<char>(e1);
 
-    for(typename decltype(group)::size_type i{}; i < group.size(); ++i) {
+    for(auto i = 0u; i < group.size(); ++i) {
         ASSERT_EQ(group[i], i ? e0 : e1);
         ASSERT_EQ(cgroup[i], i ? e0 : e1);
     }
@@ -957,7 +957,7 @@ TEST(OwningGroup, IndexRebuiltOnDestroy) {
     registry.destroy(e0);
     registry.emplace<int>(registry.create(), 42);
 
-    ASSERT_EQ(group.size(), typename decltype(group)::size_type{1});
+    ASSERT_EQ(group.size(), 1u);
     ASSERT_EQ(group[{}], e1);
     ASSERT_EQ(group.get<int>(e1), 1);
     ASSERT_EQ(group.get<unsigned int>(e1), 1u);
@@ -1136,7 +1136,7 @@ TEST(OwningGroup, EmptyAndNonEmptyTypes) {
         ASSERT_TRUE(entt == e0 || entt == e1);
     }
 
-    ASSERT_EQ(group.size(), typename decltype(group)::size_type{2});
+    ASSERT_EQ(group.size(), 2u);
 }
 
 TEST(OwningGroup, TrackEntitiesOnComponentDestruction) {

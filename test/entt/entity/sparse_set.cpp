@@ -749,12 +749,12 @@ TEST(SparseSet, CanModifyDuringIteration) {
     entt::sparse_set<entt::entity> set;
     set.emplace(entt::entity{0});
 
-    ASSERT_EQ(set.capacity(), entt::sparse_set<entt::entity>::size_type{1});
+    ASSERT_EQ(set.capacity(), 1u);
 
     const auto it = set.begin();
-    set.reserve(entt::sparse_set<entt::entity>::size_type{2});
+    set.reserve(2u);
 
-    ASSERT_EQ(set.capacity(), entt::sparse_set<entt::entity>::size_type{2});
+    ASSERT_EQ(set.capacity(), 2u);
 
     // this should crash with asan enabled if we break the constraint
     const auto entity = *it;

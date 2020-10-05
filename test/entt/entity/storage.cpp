@@ -708,12 +708,12 @@ TEST(Storage, CanModifyDuringIteration) {
     entt::storage<entt::entity, int> pool;
     pool.emplace(entt::entity{0}, 42);
 
-    ASSERT_EQ(pool.capacity(), (entt::storage<entt::entity, int>::size_type{1}));
+    ASSERT_EQ(pool.capacity(), 1u);
 
     const auto it = pool.cbegin();
-    pool.reserve(entt::storage<entt::entity, int>::size_type{2});
+    pool.reserve(2u);
 
-    ASSERT_EQ(pool.capacity(), (entt::storage<entt::entity, int>::size_type{2}));
+    ASSERT_EQ(pool.capacity(), 2u);
 
     // this should crash with asan enabled if we break the constraint
     const auto entity = *it;
