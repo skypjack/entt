@@ -45,7 +45,7 @@ TEST(Scheduler, Functionalities) {
     bool updated = false;
     bool aborted = false;
 
-    ASSERT_EQ(scheduler.size(), entt::scheduler<int>::size_type{});
+    ASSERT_EQ(scheduler.size(), 0u);
     ASSERT_TRUE(scheduler.empty());
 
     scheduler.attach<foo_process>(
@@ -53,7 +53,7 @@ TEST(Scheduler, Functionalities) {
                 [&aborted](){ aborted = true; }
     );
 
-    ASSERT_NE(scheduler.size(), entt::scheduler<int>::size_type{});
+    ASSERT_NE(scheduler.size(), 0u);
     ASSERT_FALSE(scheduler.empty());
 
     scheduler.update(0);
@@ -62,12 +62,12 @@ TEST(Scheduler, Functionalities) {
     ASSERT_TRUE(updated);
     ASSERT_TRUE(aborted);
 
-    ASSERT_NE(scheduler.size(), entt::scheduler<int>::size_type{});
+    ASSERT_NE(scheduler.size(), 0u);
     ASSERT_FALSE(scheduler.empty());
 
     scheduler.clear();
 
-    ASSERT_EQ(scheduler.size(), entt::scheduler<int>::size_type{});
+    ASSERT_EQ(scheduler.size(), 0u);
     ASSERT_TRUE(scheduler.empty());
 }
 

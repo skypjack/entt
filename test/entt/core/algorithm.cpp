@@ -13,8 +13,8 @@ TEST(Algorithm, StdSort) {
 
     sort(arr.begin(), arr.end());
 
-    for(typename decltype(arr)::size_type i = 0; i < (arr.size() - 1); ++i) {
-        ASSERT_LT(arr[i], arr[i+1]);
+    for(auto i = 0u; i < (arr.size() - 1u); ++i) {
+        ASSERT_LT(arr[i], arr[i+1u]);
     }
 }
 
@@ -27,8 +27,8 @@ TEST(Algorithm, StdSortBoxedInt) {
         return lhs.value > rhs.value;
     });
 
-    for(typename decltype(arr)::size_type i = 0; i < (arr.size() - 1); ++i) {
-        ASSERT_GT(arr[i].value, arr[i+1].value);
+    for(auto i = 0u; i < (arr.size() - 1u); ++i) {
+        ASSERT_GT(arr[i].value, arr[i+1u].value);
     }
 }
 
@@ -38,8 +38,8 @@ TEST(Algorithm, InsertionSort) {
 
     sort(arr.begin(), arr.end());
 
-    for(typename decltype(arr)::size_type i = 0; i < (arr.size() - 1); ++i) {
-        ASSERT_LT(arr[i], arr[i+1]);
+    for(auto i = 0u; i < (arr.size() - 1u); ++i) {
+        ASSERT_LT(arr[i], arr[i+1u]);
     }
 }
 
@@ -51,8 +51,8 @@ TEST(Algorithm, InsertionSortBoxedInt) {
         return lhs.value > rhs.value;
     });
 
-    for(typename decltype(arr)::size_type i = 0; i < (arr.size() - 1); ++i) {
-        ASSERT_GT(arr[i].value, arr[i+1].value);
+    for(auto i = 0u; i < (arr.size() - 1u); ++i) {
+        ASSERT_GT(arr[i].value, arr[i+1u].value);
     }
 }
 
@@ -71,8 +71,8 @@ TEST(Algorithm, RadixSort) {
         return value;
     });
 
-    for(typename decltype(arr)::size_type i = 0; i < (arr.size() - 1); ++i) {
-        ASSERT_LT(arr[i], arr[i+1]);
+    for(auto i = 0u; i < (arr.size() - 1u); ++i) {
+        ASSERT_LT(arr[i], arr[i+1u]);
     }
 }
 
@@ -84,8 +84,8 @@ TEST(Algorithm, RadixSortBoxedInt) {
         return instance.value;
     });
 
-    for(typename decltype(arr)::size_type i = 0; i < (arr.size() - 1); ++i) {
-        ASSERT_GT(arr[i].value, arr[i+1].value);
+    for(auto i = 0u; i < (arr.size() - 1u); ++i) {
+        ASSERT_GT(arr[i].value, arr[i+1u].value);
     }
 }
 

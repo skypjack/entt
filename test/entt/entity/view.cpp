@@ -28,12 +28,12 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_NE(cview.begin(), cview.end());
     ASSERT_NE(view.rbegin(), view.rend());
     ASSERT_NE(cview.rbegin(), cview.rend());
-    ASSERT_EQ(view.size(), typename decltype(view)::size_type{1});
+    ASSERT_EQ(view.size(), 1u);
     ASSERT_FALSE(view.empty());
 
     registry.emplace<char>(e0);
 
-    ASSERT_EQ(view.size(), typename decltype(view)::size_type{2});
+    ASSERT_EQ(view.size(), 2u);
 
     view.get<char>(e0) = '1';
     view.get(e1) = '2';
@@ -67,7 +67,7 @@ TEST(SingleComponentView, ElementAccess) {
     const auto e1 = registry.create();
     registry.emplace<int>(e1);
 
-    for(typename decltype(view)::size_type i{}; i < view.size(); ++i) {
+    for(auto i = 0u; i < view.size(); ++i) {
         ASSERT_EQ(view[i], i ? e0 : e1);
         ASSERT_EQ(cview[i], i ? e0 : e1);
     }
@@ -102,7 +102,7 @@ TEST(SingleComponentView, Empty) {
 
     auto view = registry.view<int>();
 
-    ASSERT_EQ(view.size(), entt::registry::size_type{0});
+    ASSERT_EQ(view.size(), 0u);
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_EQ(view.rbegin(), view.rend());
 }
@@ -414,7 +414,7 @@ TEST(MultiComponentView, Empty) {
 
     auto view = registry.view<char, int, float>();
 
-    ASSERT_EQ(view.size_hint(), entt::registry::size_type{1});
+    ASSERT_EQ(view.size_hint(), 1u);
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_EQ(view.rbegin(), view.rend());
 }
