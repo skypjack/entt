@@ -335,19 +335,6 @@ public:
     using reverse_iterator = view_iterator<typename sparse_set<entity_type>::reverse_iterator>;
 
     /**
-     * @brief Returns the number of existing components of the given type.
-     *
-     * This isn't the number of entities iterated by the view.
-     *
-     * @tparam Comp Type of component of which to return the size.
-     * @return Number of existing components of the given type.
-     */
-    template<typename Comp>
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return std::get<pool_type<Comp> *>(pools)->size();
-    }
-
-    /**
      * @brief Estimates the number of entities iterated by the view.
      * @return Estimated number of entities iterated by the view.
      */

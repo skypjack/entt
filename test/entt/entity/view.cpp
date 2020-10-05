@@ -314,8 +314,6 @@ TEST(MultiComponentView, Functionalities) {
     ASSERT_NE(view.rbegin(), view.rend());
     ASSERT_NE(cview.rbegin(), cview.rend());
     ASSERT_EQ(view.size(), decltype(view.size()){1});
-    ASSERT_EQ(view.size<int>(), decltype(view.size()){1});
-    ASSERT_EQ(cview.size<const char>(), decltype(view.size()){2});
 
     registry.get<char>(e0) = '1';
     registry.get<char>(e1) = '2';
