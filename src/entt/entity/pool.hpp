@@ -30,89 +30,89 @@ struct default_pool final: storage<Entity, Type> {
     using entity_type = Entity;
 
     /**
-    * @brief Returns a sink object.
-    *
-    * The sink returned by this function can be used to receive notifications
-    * whenever a new instance is created and assigned to an entity.<br/>
-    * The function type for a listener is equivalent to:
-    *
-    * @code{.cpp}
-    * void(basic_registry<Entity> &, Entity);
-    * @endcode
-    *
-    * Listeners are invoked **after** the object has been assigned to the
-    * entity.
-    *
-    * @sa sink
-    *
-    * @return A temporary sink object.
-    */
+     * @brief Returns a sink object.
+     *
+     * The sink returned by this function can be used to receive notifications
+     * whenever a new instance is created and assigned to an entity.<br/>
+     * The function type for a listener is equivalent to:
+     *
+     * @code{.cpp}
+     * void(basic_registry<Entity> &, Entity);
+     * @endcode
+     *
+     * Listeners are invoked **after** the object has been assigned to the
+     * entity.
+     *
+     * @sa sink
+     *
+     * @return A temporary sink object.
+     */
     [[nodiscard]] auto on_construct() ENTT_NOEXCEPT {
         return sink{construction};
     }
 
     /**
-    * @brief Returns a sink object for the given type.
-    *
-    * The sink returned by this function can be used to receive notifications
-    * whenever an instance is explicitly updated.<br/>
-    * The function type for a listener is equivalent to:
-    *
-    * @code{.cpp}
-    * void(basic_registry<Entity> &, Entity);
-    * @endcode
-    *
-    * Listeners are invoked **after** the object has been updated.
-    *
-    * @sa sink
-    *
-    * @return A temporary sink object.
-    */
+     * @brief Returns a sink object for the given type.
+     *
+     * The sink returned by this function can be used to receive notifications
+     * whenever an instance is explicitly updated.<br/>
+     * The function type for a listener is equivalent to:
+     *
+     * @code{.cpp}
+     * void(basic_registry<Entity> &, Entity);
+     * @endcode
+     *
+     * Listeners are invoked **after** the object has been updated.
+     *
+     * @sa sink
+     *
+     * @return A temporary sink object.
+     */
     [[nodiscard]] auto on_update() ENTT_NOEXCEPT {
         return sink{update};
     }
 
     /**
-    * @brief Returns a sink object for the given type.
-    *
-    * The sink returned by this function can be used to receive notifications
-    * whenever an instance is removed from an entity and thus destroyed.<br/>
-    * The function type for a listener is equivalent to:
-    *
-    * @code{.cpp}
-    * void(basic_registry<Entity> &, Entity);
-    * @endcode
-    *
-    * Listeners are invoked **before** the object has been removed from the
-    * entity.
-    *
-    * @sa sink
-    *
-    * @return A temporary sink object.
-    */
+     * @brief Returns a sink object for the given type.
+     *
+     * The sink returned by this function can be used to receive notifications
+     * whenever an instance is removed from an entity and thus destroyed.<br/>
+     * The function type for a listener is equivalent to:
+     *
+     * @code{.cpp}
+     * void(basic_registry<Entity> &, Entity);
+     * @endcode
+     *
+     * Listeners are invoked **before** the object has been removed from the
+     * entity.
+     *
+     * @sa sink
+     *
+     * @return A temporary sink object.
+     */
     [[nodiscard]] auto on_destroy() ENTT_NOEXCEPT {
         return sink{destruction};
     }
 
     /**
-    * @brief Assigns an entity to a pool.
-    *
-    * A new object is created and initialized with the arguments provided (the
-    * object type must have a proper constructor or be of aggregate type). Then
-    * the instance is assigned to the given entity.
-    *
-    * @warning
-    * Attempting to use an invalid entity or to assign an entity that already
-    * belongs to the pool results in undefined behavior.<br/>
-    * An assertion will abort the execution at runtime in debug mode in case of
-    * invalid entity or if the entity already belongs to the pool.
-    *
-    * @tparam Args Types of arguments to use to construct the object.
-    * @param owner The registry that issued the request.
-    * @param entity A valid entity identifier.
-    * @param args Parameters to use to initialize the object.
-    * @return A reference to the newly created object.
-    */
+     * @brief Assigns an entity to a pool.
+     *
+     * A new object is created and initialized with the arguments provided (the
+     * object type must have a proper constructor or be of aggregate type). Then
+     * the instance is assigned to the given entity.
+     *
+     * @warning
+     * Attempting to use an invalid entity or to assign an entity that already
+     * belongs to the pool results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity already belongs to the pool.
+     *
+     * @tparam Args Types of arguments to use to construct the object.
+     * @param owner The registry that issued the request.
+     * @param entity A valid entity identifier.
+     * @param args Parameters to use to initialize the object.
+     * @return A reference to the newly created object.
+     */
     template<typename... Args>
     decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entity, Args &&... args) {
         storage<entity_type, Type>::emplace(entity, std::forward<Args>(args)...);
@@ -124,17 +124,19 @@ struct default_pool final: storage<Entity, Type> {
     }
 
     /**
-    * @brief Assigns multiple entities to a pool.
-    *
-    * @sa emplace
-    *
-    * @tparam It Type of input iterator.
-    * @tparam Args Types of arguments to use to construct the object.
-    * @param owner The registry that issued the request.
-    * @param first An iterator to the first element of the range of entities.
-    * @param last An iterator past the last element of the range of entities.
-    * @param args Parameters to use to initialize the object.
-    */
+     * @brief Assigns multiple entities to a pool.
+     *
+     * @sa emplace
+     *
+     * @tparam It Type of input iterator.
+     * @tparam Args Types of arguments to use to construct the objects
+     * associated with the entities.
+     * @param owner The registry that issued the request.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     * @param args Parameters to use to initialize the objects associated with
+     * the entities.
+     */
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &owner, It first, It last, Args &&... args) {
         storage<entity_type, object_type>::insert(first, last, std::forward<Args>(args)...);
@@ -147,32 +149,32 @@ struct default_pool final: storage<Entity, Type> {
     }
 
     /**
-    * @brief Removes an entity from a pool.
-    *
-    * @warning
-    * Attempting to use an invalid entity or to remove an entity that doesn't
-    * belong to the pool results in undefined behavior.<br/>
-    * An assertion will abort the execution at runtime in debug mode in case of
-    * invalid entity or if the entity doesn't belong to the pool.
-    *
-    * @param owner The registry that issued the request.
-    * @param entity A valid entity identifier.
-    */
+     * @brief Removes an entity from a pool.
+     *
+     * @warning
+     * Attempting to use an invalid entity or to remove an entity that doesn't
+     * belong to the pool results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity doesn't belong to the pool.
+     *
+     * @param owner The registry that issued the request.
+     * @param entity A valid entity identifier.
+     */
     void erase(basic_registry<entity_type> &owner, const entity_type entity) {
         destruction.publish(owner, entity);
         storage<entity_type, object_type>::erase(entity);
     }
 
     /**
-    * @brief Removes multiple entities from a pool.
-    *
-    * @see remove
-    *
-    * @tparam It Type of input iterator.
-    * @param owner The registry that issued the request.
-    * @param first An iterator to the first element of the range of entities.
-    * @param last An iterator past the last element of the range of entities.
-    */
+     * @brief Removes multiple entities from a pool.
+     *
+     * @see remove
+     *
+     * @tparam It Type of input iterator.
+     * @param owner The registry that issued the request.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     */
     template<typename It>
     void erase(basic_registry<entity_type> &owner, It first, It last) {
         if(std::distance(first, last) == std::distance(this->begin(), this->end())) {
@@ -191,31 +193,31 @@ struct default_pool final: storage<Entity, Type> {
     }
 
     /**
-    * @brief Patches the given instance for an entity.
-    *
-    * The signature of the functions should be equivalent to the following:
-    *
-    * @code{.cpp}
-    * void(Type &);
-    * @endcode
-    *
-    * @note
-    * Empty types aren't explicitly instantiated and therefore they are never
-    * returned. However, this function can be used to trigger an update signal
-    * for them.
-    *
-    * @warning
-    * Attempting to use an invalid entity or to patch an object of an entity
-    * that doesn't belong to the pool results in undefined behavior.<br/>
-    * An assertion will abort the execution at runtime in debug mode in case of
-    * invalid entity or if the entity doesn't belong to the pool.
-    *
-    * @tparam Func Types of the function objects to invoke.
-    * @param owner The registry that issued the request.
-    * @param entity A valid entity identifier.
-    * @param func Valid function objects.
-    * @return A reference to the patched instance.
-    */
+     * @brief Patches the given instance for an entity.
+     *
+     * The signature of the functions should be equivalent to the following:
+     *
+     * @code{.cpp}
+     * void(Type &);
+     * @endcode
+     *
+     * @note
+     * Empty types aren't explicitly instantiated and therefore they are never
+     * returned. However, this function can be used to trigger an update signal
+     * for them.
+     *
+     * @warning
+     * Attempting to use an invalid entity or to patch an object of an entity
+     * that doesn't belong to the pool results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode in case of
+     * invalid entity or if the entity doesn't belong to the pool.
+     *
+     * @tparam Func Types of the function objects to invoke.
+     * @param owner The registry that issued the request.
+     * @param entity A valid entity identifier.
+     * @param func Valid function objects.
+     * @return A reference to the patched instance.
+     */
     template<typename... Func>
     decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entity, [[maybe_unused]] Func &&... func) {
         if constexpr(is_eto_eligible_v<object_type>) {
