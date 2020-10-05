@@ -343,44 +343,6 @@ public:
     }
 
     /**
-     * @brief Direct access to the list of components of a given pool.
-     *
-     * The returned pointer is such that range
-     * `[raw<Comp>(), raw<Comp>() + size<Comp>())` is always a valid range, even
-     * if the container is empty.
-     *
-     * @note
-     * Components are in the reverse order as returned by the `begin`/`end`
-     * iterators.
-     *
-     * @tparam Comp Type of component in which one is interested.
-     * @return A pointer to the array of components.
-     */
-    template<typename Comp>
-    [[nodiscard]] Comp * raw() const ENTT_NOEXCEPT {
-        return std::get<pool_type<Comp> *>(pools)->raw();
-    }
-
-    /**
-     * @brief Direct access to the list of entities of a given pool.
-     *
-     * The returned pointer is such that range
-     * `[data<Comp>(), data<Comp>() + size<Comp>())` is always a valid range,
-     * even if the container is empty.
-     *
-     * @note
-     * Entities are in the reverse order as returned by the `begin`/`end`
-     * iterators.
-     *
-     * @tparam Comp Type of component in which one is interested.
-     * @return A pointer to the array of entities.
-     */
-    template<typename Comp>
-    [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
-        return std::get<pool_type<Comp> *>(pools)->data();
-    }
-
-    /**
      * @brief Returns an iterator to the first entity of the view.
      *
      * The returned iterator points to the first entity of the view. If the view
