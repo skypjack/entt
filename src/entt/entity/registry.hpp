@@ -45,7 +45,7 @@ class basic_registry {
     struct pool_data {
         type_info info{};
         std::unique_ptr<sparse_set<Entity>> pool{};
-        void(* erase)(sparse_set<Entity> &, basic_registry &, const Entity);
+        void(* erase)(sparse_set<Entity> &, basic_registry &, const Entity *, const Entity *);
     };
 
     template<typename...>
@@ -114,8 +114,8 @@ class basic_registry {
         if(auto &&pdata = pools[index]; !pdata.pool) {
             pdata.info = type_id<Component>();
             pdata.pool.reset(new pool_t<Entity, Component>());
-            pdata.erase = +[](sparse_set<Entity> &cpool, basic_registry &owner, const Entity entt) {
-                static_cast<pool_t<Entity, Component> &>(cpool).erase(owner, entt);
+            pdata.erase = +[](sparse_set<Entity> &cpool, basic_registry &owner, const Entity *first, const Entity *last) {
+                static_cast<pool_t<Entity, Component> &>(cpool).erase(owner, first, last);
             };
         }
         
@@ -139,6 +139,12 @@ class basic_registry {
         const auto version = to_integral(entities[curr]) & (traits_type::version_mask << traits_type::entity_shift);
         destroyed = entity_type{to_integral(entities[curr]) & traits_type::entity_mask};
         return entities[curr] = entity_type{curr | version};
+    }
+
+    void release_entity(const Entity entity, const typename traits_type::version_type version) {
+        const auto entt = to_integral(entity) & traits_type::entity_mask;
+        entities[entt] = entity_type{to_integral(destroyed) | (typename traits_type::entity_type{version} << traits_type::entity_shift)};
+        destroyed = entity_type{entt};
     }
 
 public:
@@ -378,7 +384,7 @@ public:
     [[nodiscard]] version_type current(const entity_type entity) const {
         const auto pos = size_type(to_integral(entity) & traits_type::entity_mask);
         ENTT_ASSERT(pos < entities.size());
-        return version_type(to_integral(entities[pos]) >> traits_type::entity_shift);
+        return version(entities[pos]);
     }
 
     /**
@@ -411,11 +417,10 @@ public:
         entity_type entt;
 
         if(const auto req = (to_integral(hint) & traits_type::entity_mask); !(req < entities.size())) {
-            entities.reserve(req + 1);
+            entities.reserve(req + 1u);
 
             for(auto pos = entities.size(); pos < req; ++pos) {
-                entities.emplace_back(destroyed);
-                destroyed = entity_type{static_cast<typename traits_type::entity_type>(pos)};
+                release_entity(generate_identifier(), {});
             }
 
             entt = entities.emplace_back(hint);
@@ -474,9 +479,7 @@ public:
 
         for(std::size_t pos{}, end = entities.size(); pos < end; ++pos) {
             if((to_integral(entities[pos]) & traits_type::entity_mask) != pos) {
-                const auto version = to_integral(entities[pos]) & (traits_type::version_mask << traits_type::entity_shift);
-                entities[pos] = entity_type{to_integral(destroyed) | version};
-                destroyed = entity_type{static_cast<typename traits_type::entity_type>(pos)};
+                release_entity(entity_type{static_cast<typename traits_type::entity_type>(pos)}, version(entities[pos]));
             }
         }
     }
@@ -492,7 +495,7 @@ public:
      * @param entity A valid entity identifier.
      */
     void destroy(const entity_type entity) {
-        destroy(entity, version_type((to_integral(entity) >> traits_type::entity_shift) + 1));
+        destroy(entity, version(entity) + 1u);
     }
 
     /**
@@ -508,10 +511,7 @@ public:
      */
     void destroy(const entity_type entity, const version_type version) {
         remove_all(entity);
-        // lengthens the implicit list of destroyed entities
-        const auto entt = to_integral(entity) & traits_type::entity_mask;
-        entities[entt] = entity_type{to_integral(destroyed) | (typename traits_type::entity_type{version} << traits_type::entity_shift)};
-        destroyed = entity_type{entt};
+        release_entity(entity, version);
     }
 
     /**
@@ -765,10 +765,11 @@ public:
      */
     void remove_all(const entity_type entity) {
         ENTT_ASSERT(valid(entity));
+        entity_type wrap[1]{entity};
 
         for(auto pos = pools.size(); pos; --pos) {
             if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
-                pdata.erase(*pdata.pool, *this, entity);
+                pdata.erase(*pdata.pool, *this, std::begin(wrap), std::end(wrap));
             }
         }
     }
@@ -920,8 +921,17 @@ public:
     template<typename... Component>
     void clear() {
         if constexpr(sizeof...(Component) == 0) {
-            // useless this-> used to suppress a warning with clang
-            each([this](const auto entity) { this->destroy(entity); });
+            for(auto pos = pools.size(); pos; --pos) {
+                if(const auto &pdata = pools[pos-1]; pdata.pool) {
+                    pdata.erase(*pdata.pool, *this, pdata.pool->rbegin(), pdata.pool->rend());
+                }
+            }
+
+            for(auto pos = entities.size(); pos; --pos) {
+                if(const auto entt = entities[pos - 1]; (to_integral(entt) & traits_type::entity_mask) == (pos - 1)) {
+                    release_entity(entt, version(entt) + 1u);
+                }
+            }
         } else {
             ([this](auto &&cpool) {
                 cpool.erase(*this, cpool.sparse_set<entity_type>::begin(), cpool.sparse_set<entity_type>::end());
