@@ -283,20 +283,11 @@ TEST(MultiComponentView, Functionalities) {
     auto view = registry.view<int, char>();
     auto cview = std::as_const(registry).view<const int, const char>();
 
-    ASSERT_TRUE(view.empty());
-    ASSERT_TRUE((view.empty<int, char>()));
-    ASSERT_TRUE((cview.empty<const int, const char>()));
-
     const auto e0 = registry.create();
     registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
     registry.emplace<int>(e1);
-
-    ASSERT_FALSE(view.empty());
-    ASSERT_FALSE((view.empty<int>()));
-    ASSERT_FALSE((cview.empty<const char>()));
-
     registry.emplace<char>(e1);
 
     ASSERT_EQ(*view.begin(), e1);
