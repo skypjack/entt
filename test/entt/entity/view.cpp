@@ -315,14 +315,6 @@ TEST(MultiComponentView, Functionalities) {
         ASSERT_EQ(std::get<1>(view.get<int, char>(entity)), '2');
         ASSERT_EQ(cview.get<const char>(entity), '2');
     }
-
-    ASSERT_EQ(*(view.data<int>() + 0), e1);
-    ASSERT_EQ(*(view.data<char>() + 0), e0);
-    ASSERT_EQ(*(cview.data<const char>() + 1), e1);
-
-    ASSERT_EQ(*(view.raw<int>() + 0), 42);
-    ASSERT_EQ(*(view.raw<char>() + 0), '1');
-    ASSERT_EQ(*(cview.raw<const char>() + 1), '2');
 }
 
 TEST(MultiComponentView, Iterator) {
@@ -548,8 +540,6 @@ TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
     static_assert(std::is_same_v<decltype(view.get<int>({})), int &>);
     static_assert(std::is_same_v<decltype(view.get<const char>({})), const char &>);
     static_assert(std::is_same_v<decltype(view.get<int, const char>({})), std::tuple<int &, const char &>>);
-    static_assert(std::is_same_v<decltype(view.raw<const char>()), const char *>);
-    static_assert(std::is_same_v<decltype(view.raw<int>()), int *>);
 
     view.each([](auto &&i, auto &&c) {
         static_assert(std::is_same_v<decltype(i), int &>);
