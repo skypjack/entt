@@ -9,6 +9,13 @@
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/type_traits.hpp>
 
+TEST(TypeTraits, SizeOf) {
+    static_assert(entt::size_of_v<void> == 0u);
+    static_assert(entt::size_of_v<char> == sizeof(char));
+    static_assert(entt::size_of_v<int[]> == 0u);
+    static_assert(entt::size_of_v<int[3]> == sizeof(int[3]));
+}
+
 TEST(TypeTraits, UnpackAsType) {
     ASSERT_EQ([](auto &&... args) {
         return [](entt::unpack_as_t<int, decltype(args)>... value) {

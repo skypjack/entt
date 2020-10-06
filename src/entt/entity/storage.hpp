@@ -45,7 +45,7 @@ namespace entt {
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Type Type of objects assigned to the entities.
  */
-template<typename Entity, typename Type, typename = std::void_t<>>
+template<typename Entity, typename Type, typename = void>
 class storage: public sparse_set<Entity> {
     static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "The managed type must be at least move constructible and assignable");
 
@@ -170,7 +170,6 @@ public:
     using reverse_iterator = Type *;
     /*! @brief Constant reverse iterator type. */
     using const_reverse_iterator = const Type *;
-
 
     /**
      * @brief Increases the capacity of a storage.
