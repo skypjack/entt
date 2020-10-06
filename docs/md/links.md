@@ -88,6 +88,8 @@ I hope this list can grow much more in the future:
     organized as an ECS.
   * [Silvanus](https://github.com/hobbyistmaker/silvanus): Silvanus Fusion 360
     Box Generator.
+  * [MushMachine](https://github.com/MadeOfJelly/MushMachine): Engine...
+    vrooooommm.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
