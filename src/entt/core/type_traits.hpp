@@ -13,6 +13,30 @@ namespace entt {
 
 
 /**
+ * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
+ * @tparam Type The type of which to return the size.
+ * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
+ */
+template<typename Type, typename = void>
+struct size_of: std::integral_constant<std::size_t, 0u> {};
+
+
+/*! @copydoc size_of */
+template<typename Type>
+struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
+    : std::integral_constant<std::size_t, sizeof(Type)>
+{};
+
+
+/**
+* @brief Helper variable template.
+* @tparam Type The type of which to return the size.
+*/
+template<class Type>
+inline constexpr auto size_of_v = size_of<Type>::value;
+
+
+/**
  * @brief Using declaration to be used to _repeat_ the same type a number of
  * times equal to the size of a given parameter pack.
  * @tparam Type A type to repeat.
@@ -215,7 +239,7 @@ inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::val
  * equality comparable, false otherwise.
  * @tparam Type Potentially equality comparable type.
  */
-template<typename Type, typename = std::void_t<>>
+template<typename Type, typename = void>
 struct is_equality_comparable: std::false_type {};
 
 

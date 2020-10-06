@@ -17,6 +17,7 @@
   * [Type info](#type-info)
     * [Almost unique identifiers](#almost-unique-identifiers)
   * [Type traits](#type-traits)
+    * [Size of](#size-of)
     * [Member class type](#member-class-type)
     * [Integral constant](#integral-constant)
     * [Tag](#tag)
@@ -375,6 +376,18 @@ but which can be useful in everyday life.<br/>
 This list **is not** exhaustive and contains only some of the most useful
 classes. Refer to the inline documentation for more information on the features
 offered by this module.
+
+### Size of
+
+The standard operator `sizeof` complains when users provide it for example with
+function or incomplete types. On the other hand, it's guaranteed that its result
+is always nonzero, even if applied to an empty class type.<br/>
+This small class combines the two and offers an alternative to `sizeof` that
+works under all circumstances, returning zero if the type isn't supported:
+
+```cpp
+const auto size = entt::size_of_v<void>;
+```
 
 ### Member class type
 
