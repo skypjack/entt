@@ -65,14 +65,14 @@ struct MetaFunc: ::testing::Test {
         entt::meta<derived_t>().base<base_t>().dtor<&derived_t::destroy>();
 
         entt::meta<func_t>().type("func"_hs)
-                .func<entt::overload<int(const base_t &, int, int)>(&func_t::f)>("f3"_hs)
-                .func<entt::overload<int(int, int)>(&func_t::f)>("f2"_hs).prop(true, false)
-                .func<entt::overload<int(int) const>(&func_t::f)>("f1"_hs).prop(true, false)
-                .func<&func_t::g>("g"_hs).prop(true, false)
-                .func<&func_t::h>("h"_hs).prop(true, false)
-                .func<&func_t::k>("k"_hs).prop(true, false)
-                .func<&func_t::v, entt::as_void_t>("v"_hs)
-                .func<&func_t::a, entt::as_ref_t>("a"_hs);
+            .func<entt::overload<int(const base_t &, int, int)>(&func_t::f)>("f3"_hs)
+            .func<entt::overload<int(int, int)>(&func_t::f)>("f2"_hs).prop(true, false)
+            .func<entt::overload<int(int) const>(&func_t::f)>("f1"_hs).prop(true, false)
+            .func<&func_t::g>("g"_hs).prop(true, false)
+            .func<&func_t::h>("h"_hs).prop(true, false)
+            .func<&func_t::k>("k"_hs).prop(true, false)
+            .func<&func_t::v, entt::as_void_t>("v"_hs)
+            .func<&func_t::a, entt::as_ref_t>("a"_hs);
     }
 
     void SetUp() override {

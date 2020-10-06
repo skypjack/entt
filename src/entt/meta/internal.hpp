@@ -37,7 +37,7 @@ class meta_storage {
     using steal_fn_type = void(meta_storage &, meta_storage &);
     using destroy_fn_type = void(meta_storage &);
 
-    template<typename Type, typename = std::void_t<>>
+    template<typename Type, typename = void>
     struct type_traits {
         template<typename... Args>
         static void instance(meta_storage &buffer, Args &&... args) {
@@ -264,6 +264,7 @@ struct meta_type_node {
     id_type id;
     meta_type_node * next;
     meta_prop_node * prop;
+    const size_type size_of;
     const bool is_void;
     const bool is_integral;
     const bool is_floating_point;
@@ -408,6 +409,7 @@ public:
             {},
             nullptr,
             nullptr,
+            size_of_v<Type>,
             std::is_void_v<Type>,
             std::is_integral_v<Type>,
             std::is_floating_point_v<Type>,

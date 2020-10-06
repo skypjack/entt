@@ -35,10 +35,10 @@ struct MetaCtor: ::testing::Test {
         entt::meta<derived_t>().base<base_t>();
 
         entt::meta<clazz_t>().type("clazz"_hs)
-                .ctor<const base_t &, int>()
-                .ctor<const int &, char>().prop(3, false)
-                .ctor<entt::overload<clazz_t(int)>(&clazz_t::factory)>().prop('c', 42)
-                .ctor<entt::overload<clazz_t(base_t, int, int)>(&clazz_t::factory)>();
+            .ctor<const base_t &, int>()
+            .ctor<const int &, char>().prop(3, false)
+            .ctor<entt::overload<clazz_t(int)>(&clazz_t::factory)>().prop('c', 42)
+            .ctor<entt::overload<clazz_t(base_t, int, int)>(&clazz_t::factory)>();
     }
 };
 
