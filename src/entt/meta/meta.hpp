@@ -1045,6 +1045,14 @@ public:
     }
 
     /**
+    * @brief Returns the size of the underlying type if known.
+    * @return The size of the underlying type if known, 0 otherwise.
+    */
+    [[nodiscard]] size_type size_of() const ENTT_NOEXCEPT {
+        return node->size_of;
+    }
+
+    /**
      * @brief Checks whether a type refers to void or not.
      * @return True if the underlying type is void, false otherwise.
      */

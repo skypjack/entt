@@ -70,25 +70,25 @@ struct MetaType: ::testing::Test {
         entt::meta<concrete_t>().base<base_t>().base<abstract_t>();
 
         entt::meta<property_t>()
-                .data<property_t::random>("random"_hs)
-                    .prop(property_t::random, 0)
-                    .prop(property_t::value, 3)
-                .data<property_t::value>("value"_hs)
-                    .prop(std::make_tuple(std::make_pair(property_t::random, true), std::make_pair(property_t::value, 0), property_t::key_only))
-                    .prop(property_t::list)
-                .data<property_t::key_only>("key_only"_hs)
-                    .prop([]() { return property_t::key_only; })
-                .data<property_t::list>("list"_hs)
-                   .props(std::make_pair(property_t::random, false), std::make_pair(property_t::value, 0), property_t::key_only)
-                .data<&set<property_t>, &get<property_t>>("var"_hs);
+            .data<property_t::random>("random"_hs)
+                .prop(property_t::random, 0)
+                .prop(property_t::value, 3)
+            .data<property_t::value>("value"_hs)
+                .prop(std::make_tuple(std::make_pair(property_t::random, true), std::make_pair(property_t::value, 0), property_t::key_only))
+                .prop(property_t::list)
+            .data<property_t::key_only>("key_only"_hs)
+                .prop([]() { return property_t::key_only; })
+            .data<property_t::list>("list"_hs)
+               .props(std::make_pair(property_t::random, false), std::make_pair(property_t::value, 0), property_t::key_only)
+            .data<&set<property_t>, &get<property_t>>("var"_hs);
 
         entt::meta<clazz_t>()
-                .type("clazz"_hs)
-                    .prop(property_t::value, 42)
-                .ctor().ctor<const base_t &, int>()
-                .data<&clazz_t::value>("value"_hs)
-                .func<&clazz_t::member>("member"_hs)
-                .func<&clazz_t::func>("func"_hs);
+            .type("clazz"_hs)
+                .prop(property_t::value, 42)
+            .ctor().ctor<const base_t &, int>()
+            .data<&clazz_t::value>("value"_hs)
+            .func<&clazz_t::member>("member"_hs)
+            .func<&clazz_t::func>("func"_hs);
     }
 };
 
@@ -133,6 +133,13 @@ TEST_F(MetaType, Functionalities) {
     ASSERT_TRUE(prop);
     ASSERT_EQ(prop.key(), property_t::value);
     ASSERT_EQ(prop.value(), 42);
+}
+
+TEST_F(MetaType, SizeOf) {
+    ASSERT_EQ(entt::resolve<void>().size_of(), 0u);
+    ASSERT_EQ(entt::resolve<int>().size_of(), sizeof(int));
+    ASSERT_EQ(entt::resolve<int[]>().size_of(), 0u);
+    ASSERT_EQ(entt::resolve<int[3]>().size_of(), sizeof(int[3]));
 }
 
 TEST_F(MetaType, Traits) {

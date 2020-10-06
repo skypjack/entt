@@ -69,26 +69,26 @@ struct MetaData: ::testing::Test {
         entt::meta<derived_t>().base<base_t>().dtor<&derived_t::destroy>();
 
         entt::meta<clazz_t>().type("clazz"_hs)
-                .data<&clazz_t::i, entt::as_ref_t>("i"_hs).prop(3, 0)
-                .data<&clazz_t::j>("j"_hs).prop(true, 1)
-                .data<&clazz_t::h>("h"_hs).prop(property_t::random, 2)
-                .data<&clazz_t::k>("k"_hs).prop(property_t::value, 3)
-                .data<&clazz_t::base>("base"_hs)
-                .data<&clazz_t::i, entt::as_void_t>("void"_hs);
+            .data<&clazz_t::i, entt::as_ref_t>("i"_hs).prop(3, 0)
+            .data<&clazz_t::j>("j"_hs).prop(true, 1)
+            .data<&clazz_t::h>("h"_hs).prop(property_t::random, 2)
+            .data<&clazz_t::k>("k"_hs).prop(property_t::value, 3)
+            .data<&clazz_t::base>("base"_hs)
+            .data<&clazz_t::i, entt::as_void_t>("void"_hs);
 
         entt::meta<setter_getter_t>()
-                .type("setter_getter"_hs)
-                .data<&setter_getter_t::static_setter, &setter_getter_t::static_getter>("x"_hs)
-                .data<&setter_getter_t::setter, &setter_getter_t::getter>("y"_hs)
-                .data<&setter_getter_t::static_setter, &setter_getter_t::getter>("z"_hs)
-                .data<&setter_getter_t::setter_with_ref, &setter_getter_t::getter_with_ref>("w"_hs)
-                .data<nullptr, &setter_getter_t::getter>("z_ro"_hs)
-                .data<nullptr, &setter_getter_t::value>("value"_hs);
+            .type("setter_getter"_hs)
+            .data<&setter_getter_t::static_setter, &setter_getter_t::static_getter>("x"_hs)
+            .data<&setter_getter_t::setter, &setter_getter_t::getter>("y"_hs)
+            .data<&setter_getter_t::static_setter, &setter_getter_t::getter>("z"_hs)
+            .data<&setter_getter_t::setter_with_ref, &setter_getter_t::getter_with_ref>("w"_hs)
+            .data<nullptr, &setter_getter_t::getter>("z_ro"_hs)
+            .data<nullptr, &setter_getter_t::value>("value"_hs);
 
         entt::meta<array_t>()
-                .type("array"_hs)
-                .data<&array_t::global>("global"_hs)
-                .data<&array_t::local>("local"_hs);
+            .type("array"_hs)
+            .data<&array_t::global>("global"_hs)
+            .data<&array_t::local>("local"_hs);
     }
 
     void SetUp() override {
