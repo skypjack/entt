@@ -70,15 +70,15 @@ struct ENTT_API type_seq final {
 
 
 /**
-* @brief Type hash.
-* @tparam Type Type for which to generate a hash value.
-*/
+ * @brief Type hash.
+ * @tparam Type Type for which to generate a hash value.
+ */
 template<typename Type, typename = void>
 struct type_hash final {
     /**
-    * @brief Returns the numeric representation of a given type.
-    * @return The numeric representation of the given type.
-    */
+     * @brief Returns the numeric representation of a given type.
+     * @return The numeric representation of the given type.
+     */
 #if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
     [[nodiscard]] static constexpr id_type value() ENTT_NOEXCEPT {
         constexpr auto value = hashed_string::value(ENTT_PRETTY_FUNCTION);
@@ -98,15 +98,15 @@ struct type_hash final {
 
 
 /**
-* @brief Type name.
-* @tparam Type Type for which to generate a name.
-*/
+ * @brief Type name.
+ * @tparam Type Type for which to generate a name.
+ */
 template<typename Type, typename = void>
 struct type_name final {
     /**
-    * @brief Returns the name of a given type.
-    * @return The name of the given type.
-    */
+     * @brief Returns the name of a given type.
+     * @return The name of the given type.
+     */
 #if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
     [[nodiscard]] static constexpr std::string_view value() ENTT_NOEXCEPT {
         constexpr auto value = internal::type_name<Type>();
@@ -164,9 +164,9 @@ public:
     type_info & operator=(type_info &&) ENTT_NOEXCEPT = default;
 
     /**
-    * @brief Checks if a type info object is properly initialized.
-    * @return True if the object is properly initialized, false otherwise.
-    */
+     * @brief Checks if a type info object is properly initialized.
+     * @return True if the object is properly initialized, false otherwise.
+     */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
         return !(seq_func == nullptr);
     }
@@ -188,18 +188,18 @@ public:
     }
 
     /**
-    * @brief Type name.
-    * @return Type name.
-    */
+     * @brief Type name.
+     * @return Type name.
+     */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
         return name_func();
     }
 
     /**
-    * @brief Compares the contents of two type info objects.
-    * @param other Object with which to compare.
-    * @return False if the two contents differ, true otherwise.
-    */
+     * @brief Compares the contents of two type info objects.
+     * @param other Object with which to compare.
+     * @return False if the two contents differ, true otherwise.
+     */
     [[nodiscard]] bool operator==(const type_info &other) const ENTT_NOEXCEPT {
         return hash_func == other.hash_func;
     }
@@ -212,11 +212,11 @@ private:
 
 
 /**
-* @brief Compares the contents of two type info objects.
-* @param lhs A type info object.
-* @param rhs A type info object.
-* @return True if the two contents differ, false otherwise.
-*/
+ * @brief Compares the contents of two type info objects.
+ * @param lhs A type info object.
+ * @param rhs A type info object.
+ * @return True if the two contents differ, false otherwise.
+ */
 [[nodiscard]] inline bool operator!=(const type_info &lhs, const type_info &rhs) ENTT_NOEXCEPT {
     return !(lhs == rhs);
 }

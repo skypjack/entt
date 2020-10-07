@@ -102,9 +102,9 @@ resource<type_list<>, type_list<Req...>> to_resource();
 
 
 /**
-* Internal details not to be documented.
-* @endcond
-*/
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 
 /**

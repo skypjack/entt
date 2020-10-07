@@ -29,9 +29,9 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
 
 
 /**
-* @brief Helper variable template.
-* @tparam Type The type of which to return the size.
-*/
+ * @brief Helper variable template.
+ * @tparam Type The type of which to return the size.
+ */
 template<class Type>
 inline constexpr auto size_of_v = size_of<Type>::value;
 
@@ -217,19 +217,19 @@ struct type_list_contains;
 
 
 /**
-* @copybrief type_list_contains
-* @tparam Type Types provided by the type list.
-* @tparam Other Type to look for.
-*/
+ * @copybrief type_list_contains
+ * @tparam Type Types provided by the type list.
+ * @tparam Other Type to look for.
+ */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
 
 
 /**
-* @brief Helper variable template.
-* @tparam List Type list.
-* @tparam Type Type to look for.
-*/
+ * @brief Helper variable template.
+ * @tparam List Type list.
+ * @tparam Type Type to look for.
+ */
 template<class List, typename Type>
 inline constexpr auto type_list_contains_v = type_list_contains<List, Type>::value;
 
