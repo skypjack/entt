@@ -40,21 +40,23 @@ function(SETUP_TARGET TARGET_NAME)
     set_target_properties(${TARGET_NAME} PROPERTIES CXX_EXTENSIONS OFF)
     target_link_libraries(${TARGET_NAME} PRIVATE EnTT)
 
-    target_compile_options(
-        ${TARGET_NAME}
-        PRIVATE
-            $<$<NOT:$<PLATFORM_ID:Windows>>:-pedantic -fvisibility=hidden -Wall -Wshadow -Wno-deprecated-declarations>
-            $<$<PLATFORM_ID:Windows>:/EHsc /W1 /wd4996 /w14800>
-    )
-
-    target_compile_options(
-        ${TARGET_NAME}
-        PRIVATE
-            $<$<AND:$<CONFIG:Debug>,$<NOT:$<PLATFORM_ID:Windows>>>:-O0 -g>
-            $<$<AND:$<CONFIG:Release>,$<NOT:$<PLATFORM_ID:Windows>>>:-O2>
-            $<$<AND:$<CONFIG:Debug>,$<PLATFORM_ID:Windows>>:/Od>
-            $<$<AND:$<CONFIG:Release>,$<PLATFORM_ID:Windows>>:/O2>
-    )
+    if(MSVC)
+        target_compile_options(
+            ${TARGET_NAME}
+            PRIVATE
+                /EHsc /W1 /wd4996 /w14800
+                $<$<CONFIG:Debug>:/Od>
+                $<$<CONFIG:Release>:/O2>
+        )
+    else()
+        target_compile_options(
+            ${TARGET_NAME}
+            PRIVATE
+                -pedantic -fvisibility=hidden -Wall -Wshadow -Wno-deprecated-declarations
+                $<$<CONFIG:Debug>:-O0 -g>
+                $<$<CONFIG:Release>:-O2>
+        )
+    endif()
 
     target_compile_definitions(${TARGET_NAME} PRIVATE ENTT_STANDALONE ${ARGN})
 endfunction()
