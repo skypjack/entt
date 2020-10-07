@@ -348,9 +348,9 @@ public:
     }
 
     /**
-    * @brief Estimates the number of entities iterated by the view.
-    * @return Estimated number of entities iterated by the view.
-    */
+     * @brief Estimates the number of entities iterated by the view.
+     * @return Estimated number of entities iterated by the view.
+     */
     [[nodiscard]] size_type size_hint() const ENTT_NOEXCEPT {
         return (std::min)({ std::get<pool_type<Component> *>(pools)->size()... });
     }
