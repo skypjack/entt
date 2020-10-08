@@ -681,7 +681,7 @@ public:
             &internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename helper_type::return_type>>::resolve,
             &helper_type::arg,
             [](meta_handle instance, meta_any *args) {
-                return internal::invoke<Type, Candidate, Policy>(*instance, args, std::make_index_sequence<std::tuple_size_v<typename helper_type::args_type>>{});
+                return internal::invoke<Type, Candidate, Policy>(std::move(instance), args, std::make_index_sequence<std::tuple_size_v<typename helper_type::args_type>>{});
             }
         };
 
