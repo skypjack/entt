@@ -541,13 +541,12 @@ struct meta_handle {
      * @param value An instance of an object to use to initialize the handle.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_handle>>>
-    meta_handle(Type &&value) ENTT_NOEXCEPT
+    meta_handle(Type &value) ENTT_NOEXCEPT
         : meta_handle{}
     {
         if constexpr(std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, meta_any>) {
             any = value.ref();
         } else {
-            static_assert(std::is_lvalue_reference_v<Type>, "Lvalue reference required");
             any = std::ref(value);
         }
     }
@@ -955,7 +954,7 @@ struct meta_func {
      * @return A meta any containing the returned value, if any.
      */
     meta_any invoke(meta_handle instance, meta_any * const args, const std::size_t sz) const {
-        return sz == size() ? node->invoke(instance, args) : meta_any{};
+        return sz == size() ? node->invoke(std::move(instance), args) : meta_any{};
     }
 
     /**
@@ -971,7 +970,7 @@ struct meta_func {
     template<typename... Args>
     meta_any invoke(meta_handle instance, Args &&... args) const {
         std::array<meta_any, sizeof...(Args)> arguments{std::forward<Args>(args)...};
-        return invoke(instance, arguments.data(), sizeof...(Args));
+        return invoke(std::move(instance), arguments.data(), sizeof...(Args));
     }
 
     /*! @copydoc meta_ctor::prop */
