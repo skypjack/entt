@@ -381,8 +381,8 @@ public:
         track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
 
         vertices.push_back({
-            type_list_size_v<typename resource_type::ro>,
-            type_list_size_v<typename resource_type::rw>,
+            resource_type::ro::size,
+            resource_type::rw::size,
             name,
             nullptr,
             callback,
@@ -414,8 +414,8 @@ public:
         track_dependencies(vertices.size(), requires_registry, typename resource_type::ro{}, typename resource_type::rw{});
 
         vertices.push_back({
-            type_list_size_v<typename resource_type::ro>,
-            type_list_size_v<typename resource_type::rw>,
+            resource_type::ro::size,
+            resource_type::rw::size,
             name,
             &value_or_instance,
             callback,
@@ -443,8 +443,8 @@ public:
         track_dependencies(vertices.size(), true, typename resource_type::ro{}, typename resource_type::rw{});
 
         vertices.push_back({
-            type_list_size_v<typename resource_type::ro>,
-            type_list_size_v<typename resource_type::rw>,
+            resource_type::ro::size,
+            resource_type::rw::size,
             name,
             payload,
             func,
