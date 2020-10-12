@@ -453,8 +453,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        using get_type_list = type_list_cat_t<std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<Get>>...>;
-        traverse(std::move(func), get_type_list{});
+        traverse(std::move(func), (std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<Get>>{} + ...));
     }
 
     /**
@@ -1022,9 +1021,9 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        using owned_type_list = type_list_cat_t<std::conditional_t<is_eto_eligible_v<Owned>, type_list<>, type_list<Owned>>...>;
-        using get_type_list = type_list_cat_t<std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<Get>>...>;
-        traverse(std::move(func), owned_type_list{}, get_type_list{});
+        traverse(std::move(func),
+            (std::conditional_t<is_eto_eligible_v<Owned>, type_list<>, type_list<Owned>>{} + ...),
+            (type_list<>{} + ... + std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<Get>>{}));
     }
 
     /**
