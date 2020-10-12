@@ -96,44 +96,16 @@ template<std::size_t N>
 inline constexpr choice_t<N> choice{};
 
 
-/*! @brief A class to use to push around lists of types, nothing more. */
-template<typename...>
-struct type_list {};
-
-
-/*! @brief Primary template isn't defined on purpose. */
-template<typename>
-struct type_list_size;
-
-
 /**
- * @brief Compile-time number of elements in a type list.
+ * @brief A class to use to push around lists of types, nothing more.
  * @tparam Type Types provided by the type list.
  */
 template<typename... Type>
-struct type_list_size<type_list<Type...>>
-        : std::integral_constant<std::size_t, sizeof...(Type)>
-{};
-
-
-/**
- * @brief Helper variable template.
- * @tparam List Type list.
- */
-template<class List>
-inline constexpr auto type_list_size_v = type_list_size<List>::value;
-
-
-/*! @brief Primary template isn't defined on purpose. */
-template<typename...>
-struct type_list_cat;
-
-
-/*! @brief Concatenates multiple type lists. */
-template<>
-struct type_list_cat<> {
-    /*! @brief A type list composed by the types of all the type lists. */
-    using type = type_list<>;
+struct type_list {
+    /*! @brief Type list type. */
+    using type = type_list;
+    /*! @brief Compile-time number of elements in the type list. */
+    static constexpr auto size = sizeof...(Type);
 };
 
 
@@ -141,24 +113,10 @@ struct type_list_cat<> {
  * @brief Concatenates multiple type lists.
  * @tparam Type Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
- * @tparam List Other type lists, if any.
+ * @return A type list composed by the types of both the type lists.
  */
-template<typename... Type, typename... Other, typename... List>
-struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
-    /*! @brief A type list composed by the types of all the type lists. */
-    using type = typename type_list_cat<type_list<Type..., Other...>, List...>::type;
-};
-
-
-/**
- * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the type list.
- */
-template<typename... Type>
-struct type_list_cat<type_list<Type...>> {
-    /*! @brief A type list composed by the types of all the type lists. */
-    using type = type_list<Type...>;
-};
+template<typename... Type, typename... Other>
+constexpr type_list<Type..., Other...> operator+(type_list<Type...>, type_list<Other...>) { return {}; }
 
 
 /**
@@ -166,7 +124,7 @@ struct type_list_cat<type_list<Type...>> {
  * @tparam List Type lists to concatenate.
  */
 template<typename... List>
-using type_list_cat_t = typename type_list_cat<List...>::type;
+using type_list_cat_t = decltype((type_list<>{} + ... + List{}));
 
 
 /*! @brief Primary template isn't defined on purpose. */

@@ -46,9 +46,10 @@ TEST(TypeTraits, TypeList) {
     using type = entt::type_list<int, char>;
     using other = entt::type_list<double>;
 
-    static_assert(entt::type_list_size_v<type> == 2u);
-    static_assert(entt::type_list_size_v<other> == 1u);
+    static_assert(type::size == 2u);
+    static_assert(other::size == 1u);
 
+    static_assert(std::is_same_v<decltype(type{} + other{}), entt::type_list<int, char, double>>);
     static_assert(std::is_same_v<entt::type_list_cat_t<type, other, type, other>, entt::type_list<int, char, double, int, char, double>>);
     static_assert(std::is_same_v<entt::type_list_cat_t<type, other>, entt::type_list<int, char, double>>);
     static_assert(std::is_same_v<entt::type_list_cat_t<type, type>, entt::type_list<int, char, int, char>>);
