@@ -46,7 +46,7 @@ TEST_F(MetaCtor, Functionalities) {
     auto ctor = entt::resolve<clazz_t>().ctor<const int &, char>();
 
     ASSERT_TRUE(ctor);
-    ASSERT_EQ(ctor.parent(), entt::resolve_id("clazz"_hs));
+    ASSERT_EQ(ctor.parent(), entt::resolve("clazz"_hs));
     ASSERT_EQ(ctor.size(), 2u);
     ASSERT_EQ(ctor.arg(0u), entt::resolve<int>());
     ASSERT_EQ(ctor.arg(1u), entt::resolve<char>());
@@ -79,7 +79,7 @@ TEST_F(MetaCtor, Func) {
     auto ctor = entt::resolve<clazz_t>().ctor<int>();
 
     ASSERT_TRUE(ctor);
-    ASSERT_EQ(ctor.parent(), entt::resolve_id("clazz"_hs));
+    ASSERT_EQ(ctor.parent(), entt::resolve("clazz"_hs));
     ASSERT_EQ(ctor.size(), 1u);
     ASSERT_EQ(ctor.arg(0u), entt::resolve<int>());
     ASSERT_FALSE(ctor.arg(1u));

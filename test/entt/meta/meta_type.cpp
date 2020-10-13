@@ -93,8 +93,8 @@ struct MetaType: ::testing::Test {
 };
 
 TEST_F(MetaType, Resolve) {
-    ASSERT_EQ(entt::resolve<double>(), entt::resolve_id("double"_hs));
-    ASSERT_EQ(entt::resolve<double>(), entt::resolve_type(entt::type_hash<double>::value()));
+    ASSERT_EQ(entt::resolve<double>(), entt::resolve("double"_hs));
+    ASSERT_EQ(entt::resolve<double>(), entt::resolve(entt::type_id<double>()));
 
     auto range = entt::resolve();
     // it could be "char"_hs rather than entt::hashed_string::value("char") if it weren't for a bug in VS2017
@@ -118,7 +118,7 @@ TEST_F(MetaType, Functionalities) {
     ASSERT_TRUE(type);
     ASSERT_NE(type, entt::meta_type{});
     ASSERT_EQ(type.id(), "clazz"_hs);
-    ASSERT_EQ(type.hash(), entt::type_hash<clazz_t>::value());
+    ASSERT_EQ(type.info(), entt::type_id<clazz_t>());
 
     for(auto curr: type.prop()) {
         ASSERT_EQ(curr.key(), property_t::value);
@@ -337,25 +337,25 @@ TEST_F(MetaType, ConstructCastAndConvert) {
 }
 
 TEST_F(MetaType, Reset) {
-    ASSERT_TRUE(entt::resolve_id("clazz"_hs));
+    ASSERT_TRUE(entt::resolve("clazz"_hs));
 
-    entt::resolve_id("clazz"_hs).reset();
+    entt::resolve("clazz"_hs).reset();
 
-    ASSERT_FALSE(entt::resolve_id("clazz"_hs));
+    ASSERT_FALSE(entt::resolve("clazz"_hs));
     ASSERT_NE(entt::resolve<clazz_t>().id(), "clazz"_hs);
     ASSERT_FALSE(entt::resolve<clazz_t>().prop(property_t::value));
     ASSERT_FALSE(entt::resolve<clazz_t>().data("value"_hs));
 
     entt::meta<clazz_t>().type("clazz"_hs);
 
-    ASSERT_TRUE(entt::resolve_id("clazz"_hs));
+    ASSERT_TRUE(entt::resolve("clazz"_hs));
 }
 
 TEST_F(MetaType, AbstractClass) {
     auto type = entt::resolve<abstract_t>();
     concrete_t instance;
 
-    ASSERT_EQ(type.hash(), entt::type_hash<abstract_t>::value());
+    ASSERT_EQ(type.info(), entt::type_id<abstract_t>());
     ASSERT_EQ(instance.base_t::value, 'c');
     ASSERT_EQ(instance.value, 3);
 
@@ -399,7 +399,7 @@ TEST_F(MetaType, ArithmeticTypeAndNamedConstants) {
 
 TEST_F(MetaType, Variables) {
     auto p_data = entt::resolve<property_t>().data("var"_hs);
-    auto d_data = entt::resolve_id("double"_hs).data("var"_hs);
+    auto d_data = entt::resolve("double"_hs).data("var"_hs);
 
     property_t prop{property_t::key_only};
     double d = 3.;
@@ -445,10 +445,10 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     entt::resolve<property_t>().reset();
     entt::resolve<clazz_t>().reset();
 
-    ASSERT_FALSE(entt::resolve_id("double"_hs));
-    ASSERT_FALSE(entt::resolve_id("base"_hs));
-    ASSERT_FALSE(entt::resolve_id("derived"_hs));
-    ASSERT_FALSE(entt::resolve_id("clazz"_hs));
+    ASSERT_FALSE(entt::resolve("double"_hs));
+    ASSERT_FALSE(entt::resolve("base"_hs));
+    ASSERT_FALSE(entt::resolve("derived"_hs));
+    ASSERT_FALSE(entt::resolve("clazz"_hs));
 
     ASSERT_EQ(*entt::internal::meta_context::global(), nullptr);
 
@@ -464,8 +464,8 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     ASSERT_FALSE(any.convert<int>());
     ASSERT_TRUE(any.convert<float>());
 
-    ASSERT_FALSE(entt::resolve_id("derived"_hs));
-    ASSERT_TRUE(entt::resolve_id("double"_hs));
+    ASSERT_FALSE(entt::resolve("derived"_hs));
+    ASSERT_TRUE(entt::resolve("double"_hs));
 
     entt::meta<property_t>().data<property_t::random>("rand"_hs).prop(property_t::value, 42).prop(property_t::random, 3);
 

@@ -8,7 +8,7 @@
 #include "types.h"
 
 TEST(Lib, Meta) {
-    ASSERT_FALSE(entt::resolve_id("position"_hs));
+    ASSERT_FALSE(entt::resolve("position"_hs));
 
     userdata ud{};
 
@@ -20,11 +20,11 @@ TEST(Lib, Meta) {
 
     entt::meta<double>().conv<int>();
 
-    ASSERT_TRUE(entt::resolve_id("position"_hs));
-    ASSERT_TRUE(entt::resolve_id("velocity"_hs));
+    ASSERT_TRUE(entt::resolve("position"_hs));
+    ASSERT_TRUE(entt::resolve("velocity"_hs));
 
-    auto pos = entt::resolve_id("position"_hs).construct(42., 3.);
-    auto vel = entt::resolve_id("velocity"_hs).ctor<>().invoke();
+    auto pos = entt::resolve("position"_hs).construct(42., 3.);
+    auto vel = entt::resolve("velocity"_hs).ctor<>().invoke();
 
     ASSERT_TRUE(pos && vel);
 
@@ -48,6 +48,6 @@ TEST(Lib, Meta) {
 
     cr_plugin_close(ctx);
 
-    ASSERT_FALSE(entt::resolve_id("position"_hs));
-    ASSERT_FALSE(entt::resolve_id("velocity"_hs));
+    ASSERT_FALSE(entt::resolve("position"_hs));
+    ASSERT_FALSE(entt::resolve("velocity"_hs));
 }

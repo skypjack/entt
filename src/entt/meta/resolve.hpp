@@ -3,6 +3,7 @@
 
 
 #include <algorithm>
+#include "../core/type_info.hpp"
 #include "ctx.hpp"
 #include "meta.hpp"
 #include "range.hpp"
@@ -36,20 +37,21 @@ template<typename Type>
  * @param id Unique identifier.
  * @return The meta type associated with the given identifier, if any.
  */
-[[nodiscard]] inline meta_type resolve_id(const id_type id) ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type resolve(const id_type id) ENTT_NOEXCEPT {
     internal::meta_range range{*internal::meta_context::global()};
     return std::find_if(range.begin(), range.end(), [id](const auto &curr) { return curr.id == id; }).operator->();
 }
 
 
 /**
- * @brief Returns the meta type associated with a given type hash, if any.
- * @param id Unique identifier.
- * @return The meta type associated with the given type hash, if any.
+ * @brief Returns the meta type associated with a given type info object, if
+ * any.
+ * @param info The type info object of the requested type.
+ * @return The meta type associated with the given type info object, if any.
  */
-[[nodiscard]] inline meta_type resolve_type(const id_type id) ENTT_NOEXCEPT {
+[[nodiscard]] inline meta_type resolve(const type_info info) ENTT_NOEXCEPT {
     internal::meta_range range{*internal::meta_context::global()};
-    return std::find_if(range.begin(), range.end(), [id](const auto &curr) { return curr.type_hash == id; }).operator->();
+    return std::find_if(range.begin(), range.end(), [info](const auto &curr) { return curr.info == info; }).operator->();
 }
 
 

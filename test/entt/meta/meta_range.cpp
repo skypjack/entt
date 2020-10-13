@@ -20,9 +20,9 @@ TEST_F(MetaRange, Range) {
     ASSERT_TRUE(it != range.end());
     ASSERT_FALSE(it == range.end());
 
-    ASSERT_EQ((*it).hash(), entt::resolve<double>().hash());
-    ASSERT_EQ((*(++it)).hash(), entt::resolve_id("int"_hs).hash());
-    ASSERT_EQ((*it++).hash(), entt::resolve<int>().hash());
+    ASSERT_EQ((*it).info(), entt::resolve<double>().info());
+    ASSERT_EQ((*(++it)).info(), entt::resolve("int"_hs).info());
+    ASSERT_EQ((*it++).info(), entt::resolve<int>().info());
 
     ASSERT_EQ(it, range.end());
 }

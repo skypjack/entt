@@ -19,7 +19,7 @@ TEST_F(MetaBase, Functionalities) {
     derived_t derived{};
 
     ASSERT_TRUE(base);
-    ASSERT_EQ(base.parent(), entt::resolve_id("derived"_hs));
+    ASSERT_EQ(base.parent(), entt::resolve("derived"_hs));
     ASSERT_EQ(base.type(), entt::resolve<base_t>());
     ASSERT_EQ(base.cast(&derived), static_cast<base_t *>(&derived));
 }
