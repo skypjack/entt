@@ -30,15 +30,19 @@ TEST(TypeName, Functionalities) {
 }
 
 TEST(TypeInfo, Functionalities) {
+    static_assert(std::is_default_constructible_v<entt::type_info>);
+    static_assert(std::is_copy_constructible_v<entt::type_info>);
+    static_assert(std::is_move_constructible_v<entt::type_info>);
+    static_assert(std::is_copy_assignable_v<entt::type_info>);
+    static_assert(std::is_move_assignable_v<entt::type_info>);
+
+    ASSERT_EQ(entt::type_info{}, entt::type_info{});
+    ASSERT_NE(entt::type_id<int>(), entt::type_info{});
+    ASSERT_NE(entt::type_id<int>(), entt::type_id<char>());
+
     auto info = entt::type_id<int>();
     auto other = entt::type_id(42);
     entt::type_info empty{};
-
-    static_assert(std::is_default_constructible_v<decltype(info)>);
-    static_assert(std::is_copy_constructible_v<decltype(info)>);
-    static_assert(std::is_move_constructible_v<decltype(info)>);
-    static_assert(std::is_copy_assignable_v<decltype(info)>);
-    static_assert(std::is_move_assignable_v<decltype(info)>);
 
     ASSERT_EQ(info, other);
     ASSERT_NE(info, empty);

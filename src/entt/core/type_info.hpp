@@ -201,7 +201,7 @@ public:
      * @return False if the two contents differ, true otherwise.
      */
     [[nodiscard]] bool operator==(const type_info &other) const ENTT_NOEXCEPT {
-        return hash_func == other.hash_func;
+        return (!hash_func && !other.hash_func) || (hash_func && other.hash_func && hash_func() == other.hash_func());
     }
 
 private:
