@@ -260,7 +260,7 @@ struct meta_func_node {
 
 struct meta_type_node {
     using size_type = std::size_t;
-    const id_type type_hash;
+    const type_info info;
     id_type id;
     meta_type_node * next;
     meta_prop_node * prop;
@@ -405,7 +405,7 @@ class ENTT_API meta_node {
 public:
     [[nodiscard]] static meta_type_node * resolve() ENTT_NOEXCEPT {
         static meta_type_node node{
-            type_hash<Type>::value(),
+            type_id<Type>(),
             {},
             nullptr,
             nullptr,

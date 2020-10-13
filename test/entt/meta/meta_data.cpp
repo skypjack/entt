@@ -101,7 +101,7 @@ TEST_F(MetaData, Functionalities) {
     clazz_t instance{};
 
     ASSERT_TRUE(data);
-    ASSERT_EQ(data.parent(), entt::resolve_id("clazz"_hs));
+    ASSERT_EQ(data.parent(), entt::resolve("clazz"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.id(), "i"_hs);
     ASSERT_FALSE(data.is_const());
@@ -130,7 +130,7 @@ TEST_F(MetaData, Const) {
     clazz_t instance{};
 
     ASSERT_TRUE(data);
-    ASSERT_EQ(data.parent(), entt::resolve_id("clazz"_hs));
+    ASSERT_EQ(data.parent(), entt::resolve("clazz"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.id(), "j"_hs);
     ASSERT_TRUE(data.is_const());
@@ -158,7 +158,7 @@ TEST_F(MetaData, Static) {
     auto data = entt::resolve<clazz_t>().data("h"_hs);
 
     ASSERT_TRUE(data);
-    ASSERT_EQ(data.parent(), entt::resolve_id("clazz"_hs));
+    ASSERT_EQ(data.parent(), entt::resolve("clazz"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.id(), "h"_hs);
     ASSERT_FALSE(data.is_const());
@@ -186,7 +186,7 @@ TEST_F(MetaData, ConstStatic) {
     auto data = entt::resolve<clazz_t>().data("k"_hs);
 
     ASSERT_TRUE(data);
-    ASSERT_EQ(data.parent(), entt::resolve_id("clazz"_hs));
+    ASSERT_EQ(data.parent(), entt::resolve("clazz"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.id(), "k"_hs);
     ASSERT_TRUE(data.is_const());
@@ -259,7 +259,7 @@ TEST_F(MetaData, SetterGetterAsFreeFunctions) {
     setter_getter_t instance{};
 
     ASSERT_TRUE(data);
-    ASSERT_EQ(data.parent(), entt::resolve_id("setter_getter"_hs));
+    ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.id(), "x"_hs);
     ASSERT_FALSE(data.is_const());
@@ -274,7 +274,7 @@ TEST_F(MetaData, SetterGetterAsMemberFunctions) {
     setter_getter_t instance{};
 
     ASSERT_TRUE(data);
-    ASSERT_EQ(data.parent(), entt::resolve_id("setter_getter"_hs));
+    ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.id(), "y"_hs);
     ASSERT_FALSE(data.is_const());
@@ -289,7 +289,7 @@ TEST_F(MetaData, SetterGetterWithRefAsMemberFunctions) {
     setter_getter_t instance{};
 
     ASSERT_TRUE(data);
-    ASSERT_EQ(data.parent(), entt::resolve_id("setter_getter"_hs));
+    ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.id(), "w"_hs);
     ASSERT_FALSE(data.is_const());
@@ -304,7 +304,7 @@ TEST_F(MetaData, SetterGetterMixed) {
     setter_getter_t instance{};
 
     ASSERT_TRUE(data);
-    ASSERT_EQ(data.parent(), entt::resolve_id("setter_getter"_hs));
+    ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.id(), "z"_hs);
     ASSERT_FALSE(data.is_const());
@@ -319,7 +319,7 @@ TEST_F(MetaData, SetterGetterReadOnly) {
     setter_getter_t instance{};
 
     ASSERT_TRUE(data);
-    ASSERT_EQ(data.parent(), entt::resolve_id("setter_getter"_hs));
+    ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.id(), "z_ro"_hs);
     ASSERT_TRUE(data.is_const());
@@ -334,7 +334,7 @@ TEST_F(MetaData, SetterGetterReadOnlyDataMember) {
     setter_getter_t instance{};
 
     ASSERT_TRUE(data);
-    ASSERT_EQ(data.parent(), entt::resolve_id("setter_getter"_hs));
+    ASSERT_EQ(data.parent(), entt::resolve("setter_getter"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int>());
     ASSERT_EQ(data.id(), "value"_hs);
     ASSERT_TRUE(data.is_const());
@@ -348,7 +348,7 @@ TEST_F(MetaData, ArrayStatic) {
     auto data = entt::resolve<array_t>().data("global"_hs);
 
     ASSERT_TRUE(data);
-    ASSERT_EQ(data.parent(), entt::resolve_id("array"_hs));
+    ASSERT_EQ(data.parent(), entt::resolve("array"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int[3]>());
     ASSERT_EQ(data.id(), "global"_hs);
     ASSERT_FALSE(data.is_const());
@@ -363,7 +363,7 @@ TEST_F(MetaData, Array) {
     array_t instance;
 
     ASSERT_TRUE(data);
-    ASSERT_EQ(data.parent(), entt::resolve_id("array"_hs));
+    ASSERT_EQ(data.parent(), entt::resolve("array"_hs));
     ASSERT_EQ(data.type(), entt::resolve<int[5]>());
     ASSERT_EQ(data.id(), "local"_hs);
     ASSERT_FALSE(data.is_const());

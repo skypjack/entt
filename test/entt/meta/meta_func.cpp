@@ -85,7 +85,7 @@ TEST_F(MetaFunc, Functionalities) {
     func_t instance{};
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.parent(), entt::resolve_id("func"_hs));
+    ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "f2"_hs);
     ASSERT_EQ(func.size(), 2u);
     ASSERT_FALSE(func.is_const());
@@ -124,7 +124,7 @@ TEST_F(MetaFunc, Const) {
     func_t instance{};
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.parent(), entt::resolve_id("func"_hs));
+    ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "f1"_hs);
     ASSERT_EQ(func.size(), 1u);
     ASSERT_TRUE(func.is_const());
@@ -161,7 +161,7 @@ TEST_F(MetaFunc, RetVoid) {
     func_t instance{};
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.parent(), entt::resolve_id("func"_hs));
+    ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "g"_hs);
     ASSERT_EQ(func.size(), 1u);
     ASSERT_FALSE(func.is_const());
@@ -196,7 +196,7 @@ TEST_F(MetaFunc, Static) {
     func_t::value = 2;
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.parent(), entt::resolve_id("func"_hs));
+    ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "h"_hs);
     ASSERT_EQ(func.size(), 1u);
     ASSERT_FALSE(func.is_const());
@@ -232,7 +232,7 @@ TEST_F(MetaFunc, StaticRetVoid) {
     auto func = entt::resolve<func_t>().func("k"_hs);
 
     ASSERT_TRUE(func);
-    ASSERT_EQ(func.parent(), entt::resolve_id("func"_hs));
+    ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
     ASSERT_EQ(func.id(), "k"_hs);
     ASSERT_EQ(func.size(), 1u);
     ASSERT_FALSE(func.is_const());
