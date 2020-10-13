@@ -121,8 +121,8 @@ a decorated version of it. This object can be used to add the following:
 
 * _Data members_. Both real data members of the underlying type and static and
   global variables, as well as constants of any kind, can be attached to a meta
-  type. From a client's point of view, all the variables associated with the
-  reflected type will appear as if they were part of the type itself.<br/>
+  type. From the point of view of the client, all the variables associated with
+  the reflected type will appear as if they were part of the type itself.<br/>
   Use the `data` member function for this purpose:
 
   ```cpp
@@ -132,7 +132,7 @@ a decorated version of it. This object can be used to add the following:
       .data<&global_variable>("global"_hs);
   ```
 
-  This function requires as an argument the identifier to give to the meta data
+  The function requires as an argument the identifier to give to the meta data
   once created. Users can then access meta data at runtime by searching for them
   by _name_.<br/>
   Data members can also be defined by means of a _setter_ and _getter_. Setters
@@ -147,9 +147,9 @@ a decorated version of it. This object can be used to add the following:
   Refer to the inline documentation for all the details.
 
 * _Member functions_. Both real member functions of the underlying type and free
-  functions can be attached to a meta type. From a client's point of view, all
-  the functions associated with the reflected type will appear as if they were
-  part of the type itself.<br/>
+  functions can be attached to a meta type. From the point of view of the
+  client, all the functions associated with the reflected type will appear as if
+  they were part of the type itself.<br/>
   Use the `func` member function for this purpose:
 
   ```cpp
@@ -159,7 +159,7 @@ a decorated version of it. This object can be used to add the following:
       .func<&free_function>("free"_hs);
   ```
 
-  This function requires as an argument the identifier to give to the meta
+  The function requires as an argument the identifier to give to the meta
   function once created. Users can then access meta functions at runtime by
   searching for them by _name_.
 
@@ -284,15 +284,13 @@ auto by_type_id = entt::resolve_type(entt::type_hash<my_type>::value());
 ```
 
 There exits also an overload of the `resolve` function to use to iterate all the
-reflected types at once as well as a `resolve_if` function to use to perform
-more refined searches when needed:
+reflected types at once. It returns an iterable object that can be used in a
+range-for loop:
 
 ```cpp
-resolve([](auto type) {
+for(auto type: entt::resolve()) {
     // ...
-});
-
-auto by_lookup = resolve_if([](auto type) { return type.is_floating_point(); });
+}
 ```
 
 In all cases, the returned value is an instance of `meta_type`. This kind of
@@ -376,13 +374,13 @@ if(auto func = entt::resolve<my_type>().func("member"_hs); func) {
 }
 ```
 
-Furthermore, all meta objects can be iterated through an overload that accepts a
-callback through which to return them. As an example:
+Furthermore, all them are also returned by specific overloads that provide the
+caller with iterable objects. As an example:
 
 ```cpp
-entt::resolve<my_type>().data([](auto data) {
+for(auto data = entt::resolve<my_type>().data()) {
     // ...
-});
+}
 ```
 
 A meta type can be used to `construct` actual instances of the underlying
@@ -684,7 +682,7 @@ which refers to the pointed object and allows users to modify it directly.
 
 ## Policies: the more, the less
 
-Policies are a kind of compile-time directives that can be used when recording
+Policies are a kind of compile-time directives that can be used when registering
 reflection information.<br/>
 Their purpose is to require slightly different behavior than the default in some
 specific cases. For example, when reading a given data member, its value is
@@ -853,9 +851,9 @@ properties at once or to search a specific property by key:
 
 ```cpp
 // iterate all properties of a meta type
-entt::resolve<my_type>().prop([](auto prop) {
+for(auto prop: entt::resolve<my_type>().prop()) {
     // ...
-});
+}
 
 // search for a given property by name
 auto prop = entt::resolve<my_type>().prop("tooltip"_hs);
