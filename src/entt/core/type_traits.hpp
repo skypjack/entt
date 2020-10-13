@@ -119,12 +119,49 @@ template<typename... Type, typename... Other>
 constexpr type_list<Type..., Other...> operator+(type_list<Type...>, type_list<Other...>) { return {}; }
 
 
+/*! @brief Primary template isn't defined on purpose. */
+template<typename...>
+struct type_list_cat;
+
+
+/*! @brief Concatenates multiple type lists. */
+template<>
+struct type_list_cat<> {
+    /*! @brief A type list composed by the types of all the type lists. */
+    using type = type_list<>;
+};
+
+
+/**
+ * @brief Concatenates multiple type lists.
+ * @tparam Type Types provided by the first type list.
+ * @tparam Other Types provided by the second type list.
+ * @tparam List Other type lists, if any.
+ */
+template<typename... Type, typename... Other, typename... List>
+struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
+    /*! @brief A type list composed by the types of all the type lists. */
+    using type = typename type_list_cat<type_list<Type..., Other...>, List...>::type;
+};
+
+
+/**
+ * @brief Concatenates multiple type lists.
+ * @tparam Type Types provided by the type list.
+ */
+template<typename... Type>
+struct type_list_cat<type_list<Type...>> {
+    /*! @brief A type list composed by the types of all the type lists. */
+    using type = type_list<Type...>;
+};
+
+
 /**
  * @brief Helper type.
  * @tparam List Type lists to concatenate.
  */
 template<typename... List>
-using type_list_cat_t = decltype((type_list<>{} + ... + List{}));
+using type_list_cat_t = typename type_list_cat<List...>::type;
 
 
 /*! @brief Primary template isn't defined on purpose. */
