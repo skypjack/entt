@@ -4,12 +4,14 @@
 #include "type_context.h"
 #include "types.h"
 
-inline static type_context *context;
+struct ctx {
+    inline static type_context *ref;
+};
 
 template<typename Type>
 struct entt::type_seq<Type> {
     [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
-        static const entt::id_type value = context->value(entt::type_hash<Type>::value());
+        static const entt::id_type value = ctx::ref->value(entt::type_hash<Type>::value());
         return value;
     }
 };
@@ -17,8 +19,8 @@ struct entt::type_seq<Type> {
 CR_EXPORT int cr_main(cr_plugin *ctx, cr_op operation) {
     switch (operation) {
     case CR_STEP:
-        if(!context) {
-            context = static_cast<type_context *>(ctx->userdata);
+        if(!ctx::ref) {
+            ctx::ref = static_cast<type_context *>(ctx->userdata);
         } else {
             static_cast<test_emitter *>(ctx->userdata)->publish<event>();
             static_cast<test_emitter *>(ctx->userdata)->publish<message>(42);
