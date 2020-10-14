@@ -44,8 +44,8 @@ class basic_registry {
 
     struct pool_data {
         type_info info{};
-        std::unique_ptr<sparse_set<Entity>> pool{};
-        void(* erase)(sparse_set<Entity> &, basic_registry &, const Entity *, const Entity *);
+        std::unique_ptr<basic_sparse_set<Entity>> pool{};
+        void(* erase)(basic_sparse_set<Entity> &, basic_registry &, const Entity *, const Entity *);
     };
 
     template<typename...>
@@ -54,7 +54,7 @@ class basic_registry {
     template<typename... Exclude, typename... Get, typename... Owned>
     struct group_handler<exclude_t<Exclude...>, get_t<Get...>, Owned...> {
         static_assert(std::conjunction_v<std::is_same<Owned, std::decay_t<Owned>>..., std::is_same<Get, std::decay_t<Get>>..., std::is_same<Exclude, std::decay_t<Exclude>>...>, "One or more component types are invalid");
-        std::conditional_t<sizeof...(Owned) == 0, sparse_set<Entity>, std::size_t> current{};
+        std::conditional_t<sizeof...(Owned) == 0, basic_sparse_set<Entity>, std::size_t> current{};
 
         template<typename Component>
         void maybe_valid_if(basic_registry &owner, const Entity entt) {
@@ -114,7 +114,7 @@ class basic_registry {
         if(auto &&pdata = pools[index]; !pdata.pool) {
             pdata.info = type_id<Component>();
             pdata.pool.reset(new pool_t<Entity, Component>());
-            pdata.erase = +[](sparse_set<Entity> &cpool, basic_registry &owner, const Entity *first, const Entity *last) {
+            pdata.erase = +[](basic_sparse_set<Entity> &cpool, basic_registry &owner, const Entity *first, const Entity *last) {
                 static_cast<pool_t<Entity, Component> &>(cpool).erase(owner, first, last);
             };
         }
@@ -934,7 +934,7 @@ public:
             }
         } else {
             ([this](auto &&cpool) {
-                cpool.erase(*this, cpool.sparse_set<entity_type>::begin(), cpool.sparse_set<entity_type>::end());
+                cpool.erase(*this, cpool.basic_sparse_set<entity_type>::begin(), cpool.basic_sparse_set<entity_type>::end());
             }(assure<Component>()), ...);
         }
     }
@@ -1154,8 +1154,8 @@ public:
      */
     template<typename ItComp, typename ItExcl = id_type *>
     [[nodiscard]] basic_runtime_view<Entity> runtime_view(ItComp first, ItComp last, ItExcl from = {}, ItExcl to = {}) const {
-        std::vector<const sparse_set<Entity> *> component(std::distance(first, last));
-        std::vector<const sparse_set<Entity> *> filter(std::distance(from, to));
+        std::vector<const basic_sparse_set<Entity> *> component(std::distance(first, last));
+        std::vector<const basic_sparse_set<Entity> *> filter(std::distance(from, to));
 
         std::transform(first, last, component.begin(), [this](const auto ctype) {
             const auto it = std::find_if(pools.cbegin(), pools.cend(), [ctype](auto &&pdata) { return pdata.pool && pdata.info.hash() == ctype; });
