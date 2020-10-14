@@ -1159,7 +1159,7 @@ TEST(Registry, RangeDestroy) {
     ASSERT_FALSE(registry.valid(e2));
 }
 
-TEST(Registry, RangeEmplace) {
+TEST(Registry, Insert) {
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -1342,16 +1342,6 @@ TEST(Registry, Constness) {
 
     ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).try_get<int>({})), const int *>));
     ASSERT_TRUE((std::is_same_v<decltype(std::as_const(registry).try_get<int, char>({})), std::tuple<const int *, const char *>>));
-}
-
-TEST(Registry, BatchCreateAmbiguousCall) {
-    struct ambiguous { std::uint32_t foo; std::uint64_t bar; };
-    entt::registry registry;
-    const auto entity = registry.create();
-    std::uint32_t foo = 32u;
-    std::uint64_t bar = 64u;
-    // this should work, no other tests required
-    registry.emplace<ambiguous>(entity, foo, bar);
 }
 
 TEST(Registry, MoveOnlyComponent) {

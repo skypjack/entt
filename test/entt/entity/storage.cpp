@@ -87,7 +87,7 @@ TEST(Storage, EmptyType) {
     ASSERT_TRUE(pool.contains(entt::entity{99}));
 }
 
-TEST(Storage, BatchAdd) {
+TEST(Storage, Insert) {
     entt::storage<int> pool;
     entt::entity entities[2];
 
@@ -104,7 +104,7 @@ TEST(Storage, BatchAdd) {
     ASSERT_EQ(pool.get(entities[1]), 0);
 }
 
-TEST(Storage, BatchAddEmptyType) {
+TEST(Storage, InsertEmptyType) {
     entt::storage<empty_type> pool;
     entt::entity entities[2];
 
