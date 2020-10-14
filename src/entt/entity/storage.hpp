@@ -510,7 +510,7 @@ public:
     }
 
     /*! @brief Clears a storage. */
-    void clear() {
+    void clear() ENTT_NOEXCEPT {
         underlying_type::clear();
         instances.clear();
     }
