@@ -138,6 +138,39 @@ TEST(SparseSet, Insert) {
     ASSERT_EQ(set.data()[set.index(entt::entity{24})], entt::entity{24});
 }
 
+TEST(SparseSet, RangeErase) {
+    entt::sparse_set set;
+    entt::entity entities[3];
+
+    entities[0] = entt::entity{3};
+    entities[1] = entt::entity{42};
+    entities[2] = entt::entity{9};
+
+    set.insert(std::begin(entities), std::end(entities));
+    set.erase(set.begin(), set.end());
+
+    ASSERT_TRUE(set.empty());
+
+    set.insert(std::begin(entities), std::end(entities));
+    set.erase(set.rbegin(), set.rend());
+
+    ASSERT_TRUE(set.empty());
+
+    set.insert(std::begin(entities), std::end(entities));
+    set.erase(entities, entities + 2u);
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(*set.begin(), entt::entity{9});
+
+    set.clear();
+    set.insert(std::begin(entities), std::end(entities));
+    std::swap(entities[1], entities[2]);
+    set.erase(entities, entities + 2u);
+
+    ASSERT_FALSE(set.empty());
+    ASSERT_EQ(*set.begin(), entt::entity{42});
+}
+
 TEST(SparseSet, Iterator) {
     using iterator = typename entt::sparse_set::iterator;
 
