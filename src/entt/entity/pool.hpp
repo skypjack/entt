@@ -21,7 +21,7 @@ namespace entt {
  * @tparam Type Type of objects assigned to the entities.
  */
 template<typename Entity, typename Type>
-struct default_pool final: storage<Entity, Type> {
+struct default_pool final: basic_storage<Entity, Type> {
     static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Invalid object type");
 
     /*! @brief Type of the objects associated with the entities. */
@@ -115,7 +115,7 @@ struct default_pool final: storage<Entity, Type> {
      */
     template<typename... Args>
     decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entity, Args &&... args) {
-        storage<entity_type, Type>::emplace(entity, std::forward<Args>(args)...);
+        basic_storage<entity_type, Type>::emplace(entity, std::forward<Args>(args)...);
         construction.publish(owner, entity);
 
         if constexpr(!is_eto_eligible_v<object_type>) {
@@ -139,7 +139,7 @@ struct default_pool final: storage<Entity, Type> {
      */
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &owner, It first, It last, Args &&... args) {
-        storage<entity_type, object_type>::insert(first, last, std::forward<Args>(args)...);
+        basic_storage<entity_type, object_type>::insert(first, last, std::forward<Args>(args)...);
 
         if(!construction.empty()) {
             for(; first != last; ++first) {
@@ -162,7 +162,7 @@ struct default_pool final: storage<Entity, Type> {
      */
     void erase(basic_registry<entity_type> &owner, const entity_type entity) {
         destruction.publish(owner, entity);
-        storage<entity_type, object_type>::erase(entity);
+        basic_storage<entity_type, object_type>::erase(entity);
     }
 
     /**

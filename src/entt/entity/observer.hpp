@@ -436,7 +436,7 @@ public:
 
 private:
     delegate<void(basic_observer &)> release;
-    storage<entity_type, payload_type> view;
+    basic_storage<entity_type, payload_type> view;
 };
 
 

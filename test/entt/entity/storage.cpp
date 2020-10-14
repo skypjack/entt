@@ -21,7 +21,7 @@ struct throwing_component {
 };
 
 TEST(Storage, Functionalities) {
-    entt::storage<entt::entity, int> pool;
+    entt::storage<int> pool;
 
     pool.reserve(42);
 
@@ -75,20 +75,20 @@ TEST(Storage, Functionalities) {
 
     ASSERT_EQ(pool.capacity(), 0u);
 
-    (void)entt::storage<entt::entity, int>{std::move(pool)};
-    entt::storage<entt::entity, int> other;
+    (void)entt::storage<int>{std::move(pool)};
+    entt::storage<int> other;
     other = std::move(pool);
 }
 
 TEST(Storage, EmptyType) {
-    entt::storage<entt::entity, empty_type> pool;
+    entt::storage<empty_type> pool;
     pool.emplace(entt::entity{99});
 
     ASSERT_TRUE(pool.contains(entt::entity{99}));
 }
 
 TEST(Storage, BatchAdd) {
-    entt::storage<entt::entity, int> pool;
+    entt::storage<int> pool;
     entt::entity entities[2];
 
     entities[0] = entt::entity{3};
@@ -105,7 +105,7 @@ TEST(Storage, BatchAdd) {
 }
 
 TEST(Storage, BatchAddEmptyType) {
-    entt::storage<entt::entity, empty_type> pool;
+    entt::storage<empty_type> pool;
     entt::entity entities[2];
 
     entities[0] = entt::entity{3};
@@ -123,21 +123,21 @@ TEST(Storage, BatchAddEmptyType) {
 TEST(Storage, AggregatesMustWork) {
     struct aggregate_type { int value; };
     // the goal of this test is to enforce the requirements for aggregate types
-    entt::storage<entt::entity, aggregate_type>{}.emplace(entt::entity{0}, 42);
+    entt::storage<aggregate_type>{}.emplace(entt::entity{0}, 42);
 }
 
 TEST(Storage, TypesFromStandardTemplateLibraryMustWork) {
     // see #37 - this test shouldn't crash, that's all
-    entt::storage<entt::entity, std::unordered_set<int>> pool;
+    entt::storage<std::unordered_set<int>> pool;
     pool.emplace(entt::entity{0});
     pool.get(entt::entity{0}).insert(42);
     pool.erase(entt::entity{0});
 }
 
 TEST(Storage, Iterator) {
-    using iterator = typename entt::storage<entt::entity, boxed_int>::iterator;
+    using iterator = typename entt::storage<boxed_int>::iterator;
 
-    entt::storage<entt::entity, boxed_int> pool;
+    entt::storage<boxed_int> pool;
     pool.emplace(entt::entity{3}, 42);
 
     iterator end{pool.begin()};
@@ -177,9 +177,9 @@ TEST(Storage, Iterator) {
 }
 
 TEST(Storage, ConstIterator) {
-    using iterator = typename entt::storage<entt::entity, boxed_int>::const_iterator;
+    using iterator = typename entt::storage<boxed_int>::const_iterator;
 
-    entt::storage<entt::entity, boxed_int> pool;
+    entt::storage<boxed_int> pool;
     pool.emplace(entt::entity{3}, 42);
 
     iterator cend{pool.cbegin()};
@@ -219,9 +219,9 @@ TEST(Storage, ConstIterator) {
 }
 
 TEST(Storage, ReverseIterator) {
-    using reverse_iterator = typename entt::storage<entt::entity, boxed_int>::reverse_iterator;
+    using reverse_iterator = typename entt::storage<boxed_int>::reverse_iterator;
 
-    entt::storage<entt::entity, boxed_int> pool;
+    entt::storage<boxed_int> pool;
     pool.emplace(entt::entity{3}, 42);
 
     reverse_iterator end{pool.rbegin()};
@@ -261,9 +261,9 @@ TEST(Storage, ReverseIterator) {
 }
 
 TEST(Storage, ConstReverseIterator) {
-    using const_reverse_iterator = typename entt::storage<entt::entity, boxed_int>::const_reverse_iterator;
+    using const_reverse_iterator = typename entt::storage<boxed_int>::const_reverse_iterator;
 
-    entt::storage<entt::entity, boxed_int> pool;
+    entt::storage<boxed_int> pool;
     pool.emplace(entt::entity{3}, 42);
 
     const_reverse_iterator cend{pool.crbegin()};
@@ -303,7 +303,7 @@ TEST(Storage, ConstReverseIterator) {
 }
 
 TEST(Storage, Raw) {
-    entt::storage<entt::entity, int> pool;
+    entt::storage<int> pool;
 
     pool.emplace(entt::entity{3}, 3);
     pool.emplace(entt::entity{12}, 6);
@@ -319,7 +319,7 @@ TEST(Storage, Raw) {
 }
 
 TEST(Storage, SortOrdered) {
-    entt::storage<entt::entity, boxed_int> pool;
+    entt::storage<boxed_int> pool;
 
     pool.emplace(entt::entity{12}, boxed_int{12});
     pool.emplace(entt::entity{42}, boxed_int{9});
@@ -361,7 +361,7 @@ TEST(Storage, SortOrdered) {
 }
 
 TEST(Storage, SortReverse) {
-    entt::storage<entt::entity, boxed_int> pool;
+    entt::storage<boxed_int> pool;
 
     pool.emplace(entt::entity{12}, boxed_int{1});
     pool.emplace(entt::entity{42}, boxed_int{3});
@@ -403,7 +403,7 @@ TEST(Storage, SortReverse) {
 }
 
 TEST(Storage, SortUnordered) {
-    entt::storage<entt::entity, boxed_int> pool;
+    entt::storage<boxed_int> pool;
 
     pool.emplace(entt::entity{12}, boxed_int{6});
     pool.emplace(entt::entity{42}, boxed_int{3});
@@ -445,7 +445,7 @@ TEST(Storage, SortUnordered) {
 }
 
 TEST(Storage, SortRange) {
-    entt::storage<entt::entity, boxed_int> pool;
+    entt::storage<boxed_int> pool;
 
     pool.emplace(entt::entity{12}, boxed_int{6});
     pool.emplace(entt::entity{42}, boxed_int{3});
@@ -511,8 +511,8 @@ TEST(Storage, SortRange) {
 }
 
 TEST(Storage, RespectDisjoint) {
-    entt::storage<entt::entity, int> lhs;
-    entt::storage<entt::entity, int> rhs;
+    entt::storage<int> lhs;
+    entt::storage<int> rhs;
 
     lhs.emplace(entt::entity{3}, 3);
     lhs.emplace(entt::entity{12}, 6);
@@ -538,8 +538,8 @@ TEST(Storage, RespectDisjoint) {
 }
 
 TEST(Storage, RespectOverlap) {
-    entt::storage<entt::entity, int> lhs;
-    entt::storage<entt::entity, int> rhs;
+    entt::storage<int> lhs;
+    entt::storage<int> rhs;
 
     lhs.emplace(entt::entity{3}, 3);
     lhs.emplace(entt::entity{12}, 6);
@@ -567,8 +567,8 @@ TEST(Storage, RespectOverlap) {
 }
 
 TEST(Storage, RespectOrdered) {
-    entt::storage<entt::entity, int> lhs;
-    entt::storage<entt::entity, int> rhs;
+    entt::storage<int> lhs;
+    entt::storage<int> rhs;
 
     lhs.emplace(entt::entity{1}, 0);
     lhs.emplace(entt::entity{2}, 0);
@@ -613,8 +613,8 @@ TEST(Storage, RespectOrdered) {
 }
 
 TEST(Storage, RespectReverse) {
-    entt::storage<entt::entity, int> lhs;
-    entt::storage<entt::entity, int> rhs;
+    entt::storage<int> lhs;
+    entt::storage<int> rhs;
 
     lhs.emplace(entt::entity{1}, 0);
     lhs.emplace(entt::entity{2}, 0);
@@ -659,8 +659,8 @@ TEST(Storage, RespectReverse) {
 }
 
 TEST(Storage, RespectUnordered) {
-    entt::storage<entt::entity, int> lhs;
-    entt::storage<entt::entity, int> rhs;
+    entt::storage<int> lhs;
+    entt::storage<int> rhs;
 
     lhs.emplace(entt::entity{1}, 0);
     lhs.emplace(entt::entity{2}, 0);
@@ -705,7 +705,7 @@ TEST(Storage, RespectUnordered) {
 }
 
 TEST(Storage, CanModifyDuringIteration) {
-    entt::storage<entt::entity, int> pool;
+    entt::storage<int> pool;
     pool.emplace(entt::entity{0}, 42);
 
     ASSERT_EQ(pool.capacity(), 1u);
@@ -721,7 +721,7 @@ TEST(Storage, CanModifyDuringIteration) {
 }
 
 TEST(Storage, ReferencesGuaranteed) {
-    entt::storage<entt::entity, boxed_int> pool;
+    entt::storage<boxed_int> pool;
 
     pool.emplace(entt::entity{0}, 0);
     pool.emplace(entt::entity{1}, 1);
@@ -750,12 +750,12 @@ TEST(Storage, ReferencesGuaranteed) {
 
 TEST(Storage, MoveOnlyComponent) {
     // the purpose is to ensure that move only components are always accepted
-    entt::storage<entt::entity, std::unique_ptr<int>> pool;
+    entt::storage<std::unique_ptr<int>> pool;
     (void)pool;
 }
 
 TEST(Storage, ConstructorExceptionDoesNotAddToStorage) {
-    entt::storage<entt::entity, throwing_component> pool;
+    entt::storage<throwing_component> pool;
 
     try {
         pool.emplace(entt::entity{0});
