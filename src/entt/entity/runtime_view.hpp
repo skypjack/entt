@@ -54,7 +54,7 @@ namespace entt {
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class basic_runtime_view {
+class basic_runtime_view final {
     /*! @brief A registry is allowed to create views. */
     friend class basic_registry<Entity>;
 

@@ -64,7 +64,7 @@ class basic_group;
  * @tparam Get Type of components observed by the group.
  */
 template<typename Entity, typename... Exclude, typename... Get>
-class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
+class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
     /*! @brief A registry is allowed to create groups. */
     friend class basic_registry<Entity>;
 
@@ -599,7 +599,7 @@ private:
  * @tparam Owned Types of components owned by the group.
  */
 template<typename Entity, typename... Exclude, typename... Get, typename... Owned>
-class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
+class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final {
     /*! @brief A registry is allowed to create groups. */
     friend class basic_registry<Entity>;
 
