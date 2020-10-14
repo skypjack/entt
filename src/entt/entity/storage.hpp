@@ -358,9 +358,10 @@ public:
      * @tparam Args Types of arguments to use to construct the object.
      * @param entt A valid entity identifier.
      * @param args Parameters to use to construct an object for the entity.
+     * @return A reference to the newly created object.
      */
     template<typename... Args>
-    void emplace(const entity_type entt, Args &&... args) {
+    object_type & emplace(const entity_type entt, Args &&... args) {
         if constexpr(std::is_aggregate_v<object_type>) {
             instances.push_back(Type{std::forward<Args>(args)...});
         } else {
@@ -369,6 +370,7 @@ public:
 
         // entity goes after component in case constructor throws
         underlying_type::emplace(entt);
+        return instances.back();
     }
 
     /**

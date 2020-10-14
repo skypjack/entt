@@ -159,8 +159,7 @@ TEST(Storage, AggregatesMustWork) {
 TEST(Storage, TypesFromStandardTemplateLibraryMustWork) {
     // see #37 - this test shouldn't crash, that's all
     entt::storage<std::unordered_set<int>> pool;
-    pool.emplace(entt::entity{0});
-    pool.get(entt::entity{0}).insert(42);
+    pool.emplace(entt::entity{0}).insert(42);
     pool.erase(entt::entity{0});
 }
 
