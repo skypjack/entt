@@ -40,7 +40,7 @@ namespace entt {
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-class sparse_set {
+class basic_sparse_set {
     static_assert(ENTT_PAGE_SIZE && ((ENTT_PAGE_SIZE & (ENTT_PAGE_SIZE - 1)) == 0), "ENTT_PAGE_SIZE must be a power of two");
     static constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(Entity);
 
@@ -48,7 +48,7 @@ class sparse_set {
     using page_type = std::unique_ptr<Entity[]>;
 
     class sparse_set_iterator final {
-        friend class sparse_set<Entity>;
+        friend class basic_sparse_set<Entity>;
 
         using packed_type = std::vector<Entity>;
         using index_type = typename traits_type::difference_type;
@@ -184,16 +184,16 @@ public:
     using reverse_iterator = const entity_type *;
 
     /*! @brief Default constructor. */
-    sparse_set() = default;
+    basic_sparse_set() = default;
 
     /*! @brief Default move constructor. */
-    sparse_set(sparse_set &&) = default;
+    basic_sparse_set(basic_sparse_set &&) = default;
 
     /*! @brief Default destructor. */
-    virtual ~sparse_set() = default;
+    virtual ~basic_sparse_set() = default;
 
     /*! @brief Default move assignment operator. @return This sparse set. */
-    sparse_set & operator=(sparse_set &&) = default;
+    basic_sparse_set & operator=(basic_sparse_set &&) = default;
 
     /**
      * @brief Increases the capacity of a sparse set.
@@ -576,7 +576,7 @@ public:
      *
      * @param other The sparse sets that imposes the order of the entities.
      */
-    void respect(const sparse_set &other) {
+    void respect(const basic_sparse_set &other) {
         const auto to = other.end();
         auto from = other.begin();
 

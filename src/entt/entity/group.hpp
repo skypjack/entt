@@ -77,7 +77,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
         class proxy_iterator {
             friend class group_proxy;
 
-            using it_type = typename sparse_set<Entity>::iterator;
+            using it_type = typename basic_sparse_set<Entity>::iterator;
             using ref_type = decltype(std::tuple_cat(std::declval<std::conditional_t<is_eto_eligible_v<Get>, std::tuple<>, std::tuple<pool_type<Get> *>>>()...));
 
             proxy_iterator(it_type from, ref_type ref) ENTT_NOEXCEPT
@@ -124,7 +124,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
             ref_type pools{};
         };
 
-        group_proxy(const sparse_set<Entity> &ref, std::tuple<pool_type<Get> *...> gpools)
+        group_proxy(const basic_sparse_set<Entity> &ref, std::tuple<pool_type<Get> *...> gpools)
             : handler{&ref},
               pools{gpools}
         {}
@@ -153,11 +153,11 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> {
         }
 
     private:
-        const sparse_set<Entity> *handler;
+        const basic_sparse_set<Entity> *handler;
         std::tuple<pool_type<Get> *...> pools;
     };
 
-    basic_group(sparse_set<Entity> &ref, pool_type<Get> &... gpool) ENTT_NOEXCEPT
+    basic_group(basic_sparse_set<Entity> &ref, pool_type<Get> &... gpool) ENTT_NOEXCEPT
         : handler{&ref},
           pools{&gpool...}
     {}
@@ -179,9 +179,9 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
-    using iterator = typename sparse_set<Entity>::iterator;
+    using iterator = typename basic_sparse_set<Entity>::iterator;
     /*! @brief Reversed iterator type. */
-    using reverse_iterator = typename sparse_set<Entity>::reverse_iterator;
+    using reverse_iterator = typename basic_sparse_set<Entity>::reverse_iterator;
 
     /**
      * @brief Returns the number of existing components of the given type.
@@ -547,7 +547,7 @@ public:
     }
 
 private:
-    sparse_set<entity_type> *handler;
+    basic_sparse_set<entity_type> *handler;
     const std::tuple<pool_type<Get> *...> pools;
 };
 
@@ -615,7 +615,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
         class proxy_iterator {
             friend class group_proxy;
 
-            using it_type = typename sparse_set<Entity>::iterator;
+            using it_type = typename basic_sparse_set<Entity>::iterator;
             using owned_type = decltype(std::tuple_cat(std::declval<std::conditional_t<is_eto_eligible_v<Owned>, std::tuple<>, std::tuple<component_iterator<Owned>>>>()...));
             using get_type = decltype(std::tuple_cat(std::declval<std::conditional_t<is_eto_eligible_v<Get>, std::tuple<>, std::tuple<pool_type<Get> *>>>()...));
 
@@ -681,7 +681,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             return proxy_iterator{
-                std::get<0>(pools)->sparse_set<Entity>::end() - *length,
+                std::get<0>(pools)->basic_sparse_set<Entity>::end() - *length,
                 std::tuple_cat([length = *length](auto *cpool) {
                     if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::object_type>) {
                         return std::make_tuple();
@@ -701,7 +701,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             return proxy_iterator{
-                std::get<0>(pools)->sparse_set<Entity>::end(),
+                std::get<0>(pools)->basic_sparse_set<Entity>::end(),
                 std::tuple_cat([](auto *cpool) {
                     if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::object_type>) {
                         return std::make_tuple();
@@ -732,7 +732,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> {
     template<typename Func, typename... Strong, typename... Weak>
     void traverse(Func func, type_list<Strong...>, type_list<Weak...>) const {
         [[maybe_unused]] auto it = std::make_tuple((std::get<pool_type<Strong> *>(pools)->end() - *length)...);
-        [[maybe_unused]] auto data = std::get<0>(pools)->sparse_set<entity_type>::end() - *length;
+        [[maybe_unused]] auto data = std::get<0>(pools)->basic_sparse_set<entity_type>::end() - *length;
 
         for(auto next = *length; next; --next) {
             if constexpr(std::is_invocable_v<Func, decltype(get<Strong>({}))..., decltype(get<Weak>({}))...>) {
@@ -755,9 +755,9 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
-    using iterator = typename sparse_set<Entity>::iterator;
+    using iterator = typename basic_sparse_set<Entity>::iterator;
     /*! @brief Reversed iterator type. */
-    using reverse_iterator = typename sparse_set<Entity>::reverse_iterator;
+    using reverse_iterator = typename basic_sparse_set<Entity>::reverse_iterator;
 
     /**
      * @brief Returns the number of existing components of the given type.
@@ -864,7 +864,7 @@ public:
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->sparse_set<entity_type>::end() - *length;
+        return std::get<0>(pools)->basic_sparse_set<entity_type>::end() - *length;
     }
 
     /**
@@ -882,7 +882,7 @@ public:
      * group.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->sparse_set<entity_type>::end();
+        return std::get<0>(pools)->basic_sparse_set<entity_type>::end();
     }
 
     /**
@@ -898,7 +898,7 @@ public:
      * @return An iterator to the first entity of the reversed group.
      */
     [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->sparse_set<entity_type>::rbegin();
+        return std::get<0>(pools)->basic_sparse_set<entity_type>::rbegin();
     }
 
     /**
@@ -917,7 +917,7 @@ public:
      * reversed group.
      */
     [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-        return std::get<0>(pools)->sparse_set<entity_type>::rbegin() + *length;
+        return std::get<0>(pools)->basic_sparse_set<entity_type>::rbegin() + *length;
     }
 
     /**

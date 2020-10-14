@@ -276,7 +276,7 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
-    using iterator = typename sparse_set<Entity>::iterator;
+    using iterator = typename basic_sparse_set<Entity>::iterator;
 
     /*! @brief Default constructor. */
     basic_observer()
@@ -377,7 +377,7 @@ public:
      * @return An iterator to the first entity of the observer.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return view.sparse_set<entity_type>::begin();
+        return view.basic_sparse_set<entity_type>::begin();
     }
 
     /**
@@ -391,7 +391,7 @@ public:
      * observer.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return view.sparse_set<entity_type>::end();
+        return view.basic_sparse_set<entity_type>::end();
     }
 
     /*! @brief Clears the underlying container. */

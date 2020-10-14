@@ -12,7 +12,7 @@ struct empty_type {};
 struct boxed_int { int value; };
 
 TEST(SparseSet, Functionalities) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
 
     set.reserve(42);
 
@@ -53,7 +53,7 @@ TEST(SparseSet, Functionalities) {
     ASSERT_TRUE(std::is_move_constructible_v<decltype(set)>);
     ASSERT_TRUE(std::is_move_assignable_v<decltype(set)>);
 
-    entt::sparse_set<entt::entity> other{std::move(set)};
+    entt::sparse_set other{std::move(set)};
 
     set = std::move(other);
     other = std::move(set);
@@ -73,7 +73,7 @@ TEST(SparseSet, Functionalities) {
 }
 
 TEST(SparseSet, Pagination) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
     constexpr auto entt_per_page = ENTT_PAGE_SIZE / sizeof(entt::entity);
 
     ASSERT_EQ(set.extent(), 0u);
@@ -109,7 +109,7 @@ TEST(SparseSet, Pagination) {
 }
 
 TEST(SparseSet, BatchAdd) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
     entt::entity entities[2];
 
     entities[0] = entt::entity{3};
@@ -139,9 +139,9 @@ TEST(SparseSet, BatchAdd) {
 }
 
 TEST(SparseSet, Iterator) {
-    using iterator = typename entt::sparse_set<entt::entity>::iterator;
+    using iterator = typename entt::sparse_set::iterator;
 
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
     set.emplace(entt::entity{3});
 
     iterator end{set.begin()};
@@ -184,9 +184,9 @@ TEST(SparseSet, Iterator) {
 }
 
 TEST(SparseSet, ReverseIterator) {
-    using reverse_iterator = typename entt::sparse_set<entt::entity>::reverse_iterator;
+    using reverse_iterator = typename entt::sparse_set::reverse_iterator;
 
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
     set.emplace(entt::entity{3});
 
     reverse_iterator end{set.rbegin()};
@@ -228,7 +228,7 @@ TEST(SparseSet, ReverseIterator) {
 }
 
 TEST(SparseSet, Find) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
     set.emplace(entt::entity{3});
     set.emplace(entt::entity{42});
     set.emplace(entt::entity{99});
@@ -248,7 +248,7 @@ TEST(SparseSet, Find) {
 }
 
 TEST(SparseSet, Data) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
 
     set.emplace(entt::entity{3});
     set.emplace(entt::entity{12});
@@ -264,7 +264,7 @@ TEST(SparseSet, Data) {
 }
 
 TEST(SparseSet, SortOrdered) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
 
     set.emplace(entt::entity{42});
     set.emplace(entt::entity{12});
@@ -304,7 +304,7 @@ TEST(SparseSet, SortOrdered) {
 }
 
 TEST(SparseSet, SortReverse) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
 
     set.emplace(entt::entity{3});
     set.emplace(entt::entity{7});
@@ -344,7 +344,7 @@ TEST(SparseSet, SortReverse) {
 }
 
 TEST(SparseSet, SortUnordered) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
 
     set.emplace(entt::entity{9});
     set.emplace(entt::entity{7});
@@ -384,7 +384,7 @@ TEST(SparseSet, SortUnordered) {
 }
 
 TEST(SparseSet, SortRange) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
 
     set.emplace(entt::entity{9});
     set.emplace(entt::entity{7});
@@ -448,7 +448,7 @@ TEST(SparseSet, SortRange) {
 }
 
 TEST(SparseSet, ArrangOrdered) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
     entt::entity entities[5]{entt::entity{42}, entt::entity{12}, entt::entity{9}, entt::entity{7}, entt::entity{3}};
     set.insert(std::begin(entities), std::end(entities));
 
@@ -470,7 +470,7 @@ TEST(SparseSet, ArrangOrdered) {
 }
 
 TEST(SparseSet, ArrangeReverse) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
     entt::entity entities[5]{entt::entity{3}, entt::entity{7}, entt::entity{9}, entt::entity{12}, entt::entity{42}};
     set.insert(std::begin(entities), std::end(entities));
 
@@ -494,7 +494,7 @@ TEST(SparseSet, ArrangeReverse) {
 }
 
 TEST(SparseSet, ArrangeUnordered) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
     entt::entity entities[5]{entt::entity{9}, entt::entity{7}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
     set.insert(std::begin(entities), std::end(entities));
 
@@ -518,7 +518,7 @@ TEST(SparseSet, ArrangeUnordered) {
 }
 
 TEST(SparseSet, ArrangeRange) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
     entt::entity entities[5]{entt::entity{9}, entt::entity{7}, entt::entity{3}, entt::entity{12}, entt::entity{42}};
     set.insert(std::begin(entities), std::end(entities));
 
@@ -564,7 +564,7 @@ TEST(SparseSet, ArrangeRange) {
 }
 
 TEST(SparseSet, ArrangeCornerCase) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
     entt::entity entities[5]{entt::entity{0}, entt::entity{1}, entt::entity{4}, entt::entity{3}, entt::entity{2}};
     set.insert(std::begin(entities), std::end(entities));
 
@@ -586,8 +586,8 @@ TEST(SparseSet, ArrangeCornerCase) {
 }
 
 TEST(SparseSet, RespectDisjoint) {
-    entt::sparse_set<entt::entity> lhs;
-    entt::sparse_set<entt::entity> rhs;
+    entt::sparse_set lhs;
+    entt::sparse_set rhs;
 
     lhs.emplace(entt::entity{3});
     lhs.emplace(entt::entity{12});
@@ -605,8 +605,8 @@ TEST(SparseSet, RespectDisjoint) {
 }
 
 TEST(SparseSet, RespectOverlap) {
-    entt::sparse_set<entt::entity> lhs;
-    entt::sparse_set<entt::entity> rhs;
+    entt::sparse_set lhs;
+    entt::sparse_set rhs;
 
     lhs.emplace(entt::entity{3});
     lhs.emplace(entt::entity{12});
@@ -626,8 +626,8 @@ TEST(SparseSet, RespectOverlap) {
 }
 
 TEST(SparseSet, RespectOrdered) {
-    entt::sparse_set<entt::entity> lhs;
-    entt::sparse_set<entt::entity> rhs;
+    entt::sparse_set lhs;
+    entt::sparse_set rhs;
 
     lhs.emplace(entt::entity{1});
     lhs.emplace(entt::entity{2});
@@ -666,8 +666,8 @@ TEST(SparseSet, RespectOrdered) {
 }
 
 TEST(SparseSet, RespectReverse) {
-    entt::sparse_set<entt::entity> lhs;
-    entt::sparse_set<entt::entity> rhs;
+    entt::sparse_set lhs;
+    entt::sparse_set rhs;
 
     lhs.emplace(entt::entity{1});
     lhs.emplace(entt::entity{2});
@@ -706,8 +706,8 @@ TEST(SparseSet, RespectReverse) {
 }
 
 TEST(SparseSet, RespectUnordered) {
-    entt::sparse_set<entt::entity> lhs;
-    entt::sparse_set<entt::entity> rhs;
+    entt::sparse_set lhs;
+    entt::sparse_set rhs;
 
     lhs.emplace(entt::entity{1});
     lhs.emplace(entt::entity{2});
@@ -746,7 +746,7 @@ TEST(SparseSet, RespectUnordered) {
 }
 
 TEST(SparseSet, CanModifyDuringIteration) {
-    entt::sparse_set<entt::entity> set;
+    entt::sparse_set set;
     set.emplace(entt::entity{0});
 
     ASSERT_EQ(set.capacity(), 1u);
