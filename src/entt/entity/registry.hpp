@@ -705,7 +705,7 @@ public:
     /**
      * @brief Removes the given components from all the entities in a range.
      *
-     * @see remove
+     * @sa remove
      *
      * @tparam Component Types of components to remove.
      * @tparam It Type of input iterator.
