@@ -64,7 +64,7 @@ class basic_view;
  * @tparam Component Types of components iterated by the view.
  */
 template<typename Entity, typename... Exclude, typename... Component>
-class basic_view<Entity, exclude_t<Exclude...>, Component...> {
+class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
     /*! @brief A registry is allowed to create views. */
     friend class basic_registry<Entity>;
 
@@ -650,7 +650,7 @@ private:
  * @tparam Component Type of component iterated by the view.
  */
 template<typename Entity, typename Component>
-class basic_view<Entity, exclude_t<>, Component> {
+class basic_view<Entity, exclude_t<>, Component> final {
     /*! @brief A registry is allowed to create views. */
     friend class basic_registry<Entity>;
 
