@@ -108,7 +108,7 @@ TEST(SparseSet, Pagination) {
     ASSERT_EQ(set.extent(), 0u);
 }
 
-TEST(SparseSet, BatchAdd) {
+TEST(SparseSet, Insert) {
     entt::sparse_set set;
     entt::entity entities[2];
 
