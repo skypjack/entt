@@ -213,7 +213,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             return proxy_iterator{first, std::tuple_cat([](auto *cpool) {
-                if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::object_type>) {
+                if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
                     return std::make_tuple();
                 } else {
                     return std::make_tuple(cpool);
@@ -223,7 +223,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> {
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             return proxy_iterator{last, std::tuple_cat([](auto *cpool) {
-                if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::object_type>) {
+                if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
                     return std::make_tuple();
                 } else {
                     return std::make_tuple(cpool);

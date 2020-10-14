@@ -158,7 +158,7 @@ class basic_storage: public basic_sparse_set<Entity> {
 
 public:
     /*! @brief Type of the objects associated with the entities. */
-    using object_type = Type;
+    using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
@@ -203,13 +203,13 @@ public:
      *
      * @return A pointer to the array of objects.
      */
-    [[nodiscard]] const object_type * raw() const ENTT_NOEXCEPT {
+    [[nodiscard]] const value_type * raw() const ENTT_NOEXCEPT {
         return instances.data();
     }
 
     /*! @copydoc raw */
-    [[nodiscard]] object_type * raw() ENTT_NOEXCEPT {
-        return const_cast<object_type *>(std::as_const(*this).raw());
+    [[nodiscard]] value_type * raw() ENTT_NOEXCEPT {
+        return const_cast<value_type *>(std::as_const(*this).raw());
     }
 
     /**
@@ -319,13 +319,13 @@ public:
      * @param entt A valid entity identifier.
      * @return The object associated with the entity.
      */
-    [[nodiscard]] const object_type & get(const entity_type entt) const {
+    [[nodiscard]] const value_type & get(const entity_type entt) const {
         return instances[underlying_type::index(entt)];
     }
 
     /*! @copydoc get */
-    [[nodiscard]] object_type & get(const entity_type entt) {
-        return const_cast<object_type &>(std::as_const(*this).get(entt));
+    [[nodiscard]] value_type & get(const entity_type entt) {
+        return const_cast<value_type &>(std::as_const(*this).get(entt));
     }
 
     /**
@@ -333,13 +333,13 @@ public:
      * @param entt A valid entity identifier.
      * @return The object associated with the entity, if any.
      */
-    [[nodiscard]] const object_type * try_get(const entity_type entt) const {
+    [[nodiscard]] const value_type * try_get(const entity_type entt) const {
         return underlying_type::contains(entt) ? (instances.data() + underlying_type::index(entt)) : nullptr;
     }
 
     /*! @copydoc try_get */
-    [[nodiscard]] object_type * try_get(const entity_type entt) {
-        return const_cast<object_type *>(std::as_const(*this).try_get(entt));
+    [[nodiscard]] value_type * try_get(const entity_type entt) {
+        return const_cast<value_type *>(std::as_const(*this).try_get(entt));
     }
 
     /**
@@ -361,8 +361,8 @@ public:
      * @return A reference to the newly created object.
      */
     template<typename... Args>
-    object_type & emplace(const entity_type entt, Args &&... args) {
-        if constexpr(std::is_aggregate_v<object_type>) {
+    value_type & emplace(const entity_type entt, Args &&... args) {
+        if constexpr(std::is_aggregate_v<value_type>) {
             instances.push_back(Type{std::forward<Args>(args)...});
         } else {
             instances.emplace_back(std::forward<Args>(args)...);
@@ -389,7 +389,7 @@ public:
      * @param value An instance of the object to construct.
      */
     template<typename It>
-    void insert(It first, It last, const object_type &value = {}) {
+    void insert(It first, It last, const value_type &value = {}) {
         instances.insert(instances.end(), std::distance(first, last), value);
         // entities go after components in case constructors throw
         underlying_type::insert(first, last);
@@ -502,7 +502,7 @@ public:
             std::swap(instances[underlying_type::index(lhs)], instances[underlying_type::index(rhs)]);
         };
 
-        if constexpr(std::is_invocable_v<Compare, const object_type &, const object_type &>) {
+        if constexpr(std::is_invocable_v<Compare, const value_type &, const value_type &>) {
             underlying_type::arrange(from, to, std::move(apply), [this, compare = std::move(compare)](const auto lhs, const auto rhs) {
                 return compare(std::as_const(instances[underlying_type::index(lhs)]), std::as_const(instances[underlying_type::index(rhs)]));
             }, std::move(algo), std::forward<Args>(args)...);
@@ -518,7 +518,7 @@ public:
     }
 
 private:
-    std::vector<object_type> instances;
+    std::vector<value_type> instances;
 };
 
 
@@ -529,7 +529,7 @@ class basic_storage<Entity, Type, std::enable_if_t<is_eto_eligible_v<Type>>>: pu
 
 public:
     /*! @brief Type of the objects associated with the entities. */
-    using object_type = Type;
+    using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
@@ -550,7 +550,7 @@ public:
      */
     template<typename... Args>
     void emplace(const entity_type entt, Args &&... args) {
-        [[maybe_unused]] object_type instance{std::forward<Args>(args)...};
+        [[maybe_unused]] value_type instance{std::forward<Args>(args)...};
         underlying_type::emplace(entt);
     }
 
@@ -568,7 +568,7 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    void insert(It first, It last, const object_type & = {}) {
+    void insert(It first, It last, const value_type & = {}) {
         underlying_type::insert(first, last);
     }
 };
