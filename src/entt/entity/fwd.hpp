@@ -12,6 +12,10 @@ template<typename>
 class basic_sparse_set;
 
 
+template<typename, typename, typename>
+class basic_storage;
+
+
 template<typename>
 class basic_registry;
 
@@ -64,6 +68,14 @@ enum class entity: id_type {};
 using sparse_set = basic_sparse_set<entity>;
 
 
+/**
+ * @brief Alias declaration for the most common use case.
+ * @tparam Args Other template parameters.
+ */
+template<typename... Args>
+using storage = basic_storage<entity, Args...>;
+
+
 /*! @brief Alias declaration for the most common use case. */
 using registry = basic_registry<entity>;
 
@@ -98,10 +110,10 @@ using continuous_loader = basic_continuous_loader<entity>;
 
 /**
  * @brief Alias declaration for the most common use case.
- * @tparam Types Types of components iterated by the view.
+ * @tparam Args Other template parameters.
  */
-template<typename... Types>
-using view = basic_view<entity, Types...>;
+template<typename... Args>
+using view = basic_view<entity, Args...>;
 
 
 /*! @brief Alias declaration for the most common use case. */
@@ -110,10 +122,10 @@ using runtime_view = basic_runtime_view<entity>;
 
 /**
  * @brief Alias declaration for the most common use case.
- * @tparam Types Types of components iterated by the group.
+ * @tparam Args Other template parameters.
  */
-template<typename... Types>
-using group = basic_group<entity, Types...>;
+template<typename... Args>
+using group = basic_group<entity, Args...>;
 
 
 }
