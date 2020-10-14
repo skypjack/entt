@@ -424,7 +424,7 @@ public:
      *
      * @param entt A valid entity identifier.
      */
-    void erase(const entity_type entt) {
+    void erase(const entity_type entt) override {
         auto other = std::move(instances.back());
         instances[underlying_type::index(entt)] = std::move(other);
         instances.pop_back();
@@ -510,7 +510,7 @@ public:
     }
 
     /*! @brief Clears a storage. */
-    void clear() ENTT_NOEXCEPT {
+    void clear() ENTT_NOEXCEPT override {
         underlying_type::clear();
         instances.clear();
     }
