@@ -425,7 +425,7 @@ public:
      *
      * @param entt A valid entity identifier.
      */
-    void erase(const entity_type entt) {
+    virtual void erase(const entity_type entt) {
         ENTT_ASSERT(contains(entt));
         const auto curr = page(entt);
         const auto pos = offset(entt);
@@ -433,6 +433,24 @@ public:
         sparse[page(packed.back())][offset(packed.back())] = sparse[curr][pos];
         sparse[curr][pos] = null;
         packed.pop_back();
+    }
+
+    /**
+     * @brief Removes multiple entities from a pool.
+     * @tparam It Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     */
+    template<typename It>
+    void erase(It first, It last) {
+        if(std::distance(first, last) == packed.size()) {
+            // no validity check, let it be misused
+            clear();
+        } else {
+            for(; first != last; ++first) {
+                erase(*first);
+            }
+        }
     }
 
     /**
@@ -598,7 +616,7 @@ public:
     /**
      * @brief Clears a sparse set.
      */
-    void clear() ENTT_NOEXCEPT {
+    virtual void clear() ENTT_NOEXCEPT {
         sparse.clear();
         packed.clear();
     }

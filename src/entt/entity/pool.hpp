@@ -168,7 +168,7 @@ struct default_pool final: basic_storage<Entity, Type> {
     /**
      * @brief Removes multiple entities from a pool.
      *
-     * @see remove
+     * @see erase
      *
      * @tparam It Type of input iterator.
      * @param owner The registry that issued the request.
@@ -177,19 +177,13 @@ struct default_pool final: basic_storage<Entity, Type> {
      */
     template<typename It>
     void erase(basic_registry<entity_type> &owner, It first, It last) {
-        if(std::distance(first, last) == std::distance(this->begin(), this->end())) {
-            if(!destruction.empty()) {
-                for(; first != last; ++first) {
-                    destruction.publish(owner, *first);
-                }
-            }
-
-            this->clear();
-        } else {
-            for(; first != last; ++first) {
-                this->erase(owner, *first);
+        if(!destruction.empty()) {
+            for(auto it = first; it != last; ++it) {
+                destruction.publish(owner, *it);
             }
         }
+
+        basic_sparse_set<entity_type>::erase(first, last);
     }
 
     /**
