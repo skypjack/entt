@@ -1979,12 +1979,12 @@ knows what artifacts that are difficult to maintain over time.
 
 Unfortunately, because of the limitations of the current revision of the
 standard, the parallel `std::for_each` accepts only forward iterators. This
-means that the iterators provided by the library cannot return proxy objects as
-references and **must** return actual reference types instead.<br/>
+means that the default iterators provided by the library cannot return proxy
+objects as references and **must** return actual reference types instead.<br/>
 This may change in the future and the iterators will almost certainly return
-both the entities and a list of references to their components sooner or later.
-Multi-pass guarantee won't break in any case and the performance should even
-benefit from it further.
+both the entities and a list of references to their components by default sooner
+or later. Multi-pass guarantee won't break in any case and the performance
+should even benefit from it further.
 
 # Beyond this document
 
