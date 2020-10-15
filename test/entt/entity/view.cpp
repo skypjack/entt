@@ -1,3 +1,4 @@
+#include <tuple>
 #include <utility>
 #include <type_traits>
 #include <gtest/gtest.h>
@@ -623,7 +624,7 @@ TEST(MultiComponentView, ExcludedComponents) {
         if(entity == e0) {
             ASSERT_EQ(view.get<const int>(e0), 0);
         } else if(entity == e2) {
-            ASSERT_EQ(view.get(e2), 2);
+            ASSERT_EQ(std::get<0>(view.get(e2)), 2);
         }
     }
 
@@ -636,7 +637,7 @@ TEST(MultiComponentView, ExcludedComponents) {
         ASSERT_TRUE(entity == e1 || entity == e3);
 
         if(entity == e1) {
-            ASSERT_EQ(view.get(e1), 1);
+            ASSERT_EQ(std::get<0>(view.get(e1)), 1);
         } else if(entity == e3) {
             ASSERT_EQ(view.get<const int>(e3), 3);
         }
@@ -857,4 +858,11 @@ TEST(MultiComponentView, ChunkedWithExcludedComponents) {
             ASSERT_EQ(entt::to_integral(*(entity + i)), *(id + i));
         }
     });
+}
+
+TEST(MultiComponentView, ExtendedGet) {
+    using type = decltype(std::declval<entt::registry>().view<int, empty_type, char>().get({}));
+    static_assert(std::tuple_size_v<type> == 2u);
+    static_assert(std::is_same_v<std::tuple_element_t<0, type>, int &>);
+    static_assert(std::is_same_v<std::tuple_element_t<1, type>, char &>);
 }

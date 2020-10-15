@@ -419,10 +419,18 @@ public:
      * @return The components assigned to the entity.
      */
     template<typename... Component>
-    [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
+    [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         ENTT_ASSERT(contains(entt));
 
-        if constexpr(sizeof...(Component) == 1) {
+        if constexpr(sizeof...(Component) == 0) {
+            return std::tuple_cat([entt](auto *cpool) {
+                if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
+                    return std::make_tuple();
+                } else {
+                    return std::forward_as_tuple(cpool->get(entt));
+                }
+            }(std::get<pool_type<Get> *>(pools))...);
+        } else if constexpr(sizeof...(Component) == 1) {
             return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
         } else {
             return std::tuple<decltype(get<Component>({}))...>{get<Component>(entt)...};
@@ -987,10 +995,20 @@ public:
      * @return The components assigned to the entity.
      */
     template<typename... Component>
-    [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
+    [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         ENTT_ASSERT(contains(entt));
 
-        if constexpr(sizeof...(Component) == 1) {
+        if constexpr(sizeof...(Component) == 0) {
+            auto filter = [entt](auto *cpool) {
+                if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
+                    return std::make_tuple();
+                } else {
+                    return std::forward_as_tuple(cpool->get(entt));
+                }
+            };
+
+            return std::tuple_cat(filter(std::get<pool_type<Owned> *>(pools))..., filter(std::get<pool_type<Get> *>(pools))...);
+        } else if constexpr(sizeof...(Component) == 1) {
             return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
         } else {
             return std::tuple<decltype(get<Component>({}))...>{get<Component>(entt)...};
