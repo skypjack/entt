@@ -579,6 +579,13 @@ TEST(NonOwningGroup, SignalRace) {
     ASSERT_EQ(group.size(), 1u);
 }
 
+TEST(NonOwningGroup, ExtendedGet) {
+    using type = decltype(std::declval<entt::registry>().group(entt::get<int, empty_type, char>).get({}));
+    static_assert(std::tuple_size_v<type> == 2u);
+    static_assert(std::is_same_v<std::tuple_element_t<0, type>, int &>);
+    static_assert(std::is_same_v<std::tuple_element_t<1, type>, char &>);
+}
+
 TEST(OwningGroup, Functionalities) {
     entt::registry registry;
     auto group = registry.group<int>(entt::get<char>);
@@ -1264,4 +1271,11 @@ TEST(OwningGroup, PreventEarlyOptOut) {
         ASSERT_EQ(c, 'c');
         ASSERT_EQ(i, 2);
     });
+}
+
+TEST(OwningGroup, ExtendedGet) {
+    using type = decltype(std::declval<entt::registry>().group<int, empty_type>(entt::get<char>).get({}));
+    static_assert(std::tuple_size_v<type> == 2u);
+    static_assert(std::is_same_v<std::tuple_element_t<0, type>, int &>);
+    static_assert(std::is_same_v<std::tuple_element_t<1, type>, char &>);
 }

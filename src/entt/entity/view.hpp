@@ -474,8 +474,13 @@ public:
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Comp) == 0) {
-            static_assert(sizeof...(Component) == 1, "Invalid component type");
-            return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
+            return std::tuple_cat([entt](auto *cpool) {
+                if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
+                    return std::make_tuple();
+                } else {
+                    return std::forward_as_tuple(cpool->get(entt));
+                }
+            }(std::get<pool_type<Component> *>(pools))...);
         } else if constexpr(sizeof...(Comp) == 1) {
             return (std::get<pool_type<Comp> *>(pools)->get(entt), ...);
         } else {
