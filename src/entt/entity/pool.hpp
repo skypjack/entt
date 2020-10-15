@@ -21,13 +21,86 @@ namespace entt {
  * @tparam Type Type of objects assigned to the entities.
  */
 template<typename Entity, typename Type>
-struct default_pool final: basic_storage<Entity, Type> {
+struct storage_adapter: basic_storage<Entity, Type> {
     static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Invalid object type");
 
     /*! @brief Type of the objects associated with the entities. */
     using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
+
+    /**
+     * @brief Assigns entities to a pool.
+     * @tparam Args Types of arguments to use to construct the object.
+     * @param entity A valid entity identifier.
+     * @param args Parameters to use to initialize the object.
+     * @return A reference to the newly created object.
+     */
+    template<typename... Args>
+    decltype(auto) emplace(basic_registry<entity_type> &, const entity_type entity, Args &&... args) {
+        return basic_storage<entity_type, Type>::emplace(entity, std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Assigns entities to a pool.
+     * @tparam It Type of input iterator.
+     * @tparam Args Types of arguments to use to construct the objects
+     * associated with the entities.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     * @param args Parameters to use to initialize the objects associated with
+     * the entities.
+     */
+    template<typename It, typename... Args>
+    void insert(basic_registry<entity_type> &, It first, It last, Args &&... args) {
+        basic_storage<entity_type, value_type>::insert(first, last, std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Removes entities from a pool.
+     * @param entity A valid entity identifier.
+     */
+    void erase(basic_registry<entity_type> &, const entity_type entity) {
+        basic_storage<entity_type, value_type>::erase(entity);
+    }
+
+    /**
+     * @copybrief erase
+     * @tparam It Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     */
+    template<typename It>
+    void erase(basic_registry<entity_type> &, It first, It last) {
+        basic_sparse_set<entity_type>::erase(first, last);
+    }
+
+    /**
+     * @brief Patches the given instance for an entity.
+     * @tparam Func Types of the function objects to invoke.
+     * @param entity A valid entity identifier.
+     * @param func Valid function objects.
+     * @return A reference to the patched instance.
+     */
+    template<typename... Func>
+    decltype(auto) patch(basic_registry<entity_type> &, const entity_type entity, [[maybe_unused]] Func &&... func) {
+        auto &instance = this->get(entity);
+        (std::forward<Func>(func)(instance), ...);
+        return instance;
+    }
+};
+
+
+/**
+ * @brief Mixin type to use to add signal support to pools.
+ * @tparam Pool The type of the underlying pool.
+ */
+template<typename Pool>
+struct sigh_pool_mixin: Pool {
+    /*! @brief Underlying value type. */
+    using value_type = typename Pool::value_type;
+    /*! @brief Underlying entity identifier. */
+    using entity_type = typename Pool::entity_type;
 
     /**
      * @brief Returns a sink object.
@@ -37,7 +110,7 @@ struct default_pool final: basic_storage<Entity, Type> {
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(basic_registry<Entity> &, Entity);
+     * void(basic_registry<entity_type> &, entity_type);
      * @endcode
      *
      * Listeners are invoked **after** the object has been assigned to the
@@ -52,14 +125,14 @@ struct default_pool final: basic_storage<Entity, Type> {
     }
 
     /**
-     * @brief Returns a sink object for the given type.
+     * @brief Returns a sink object.
      *
      * The sink returned by this function can be used to receive notifications
      * whenever an instance is explicitly updated.<br/>
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(basic_registry<Entity> &, Entity);
+     * void(basic_registry<entity_type> &, entity_type);
      * @endcode
      *
      * Listeners are invoked **after** the object has been updated.
@@ -73,14 +146,14 @@ struct default_pool final: basic_storage<Entity, Type> {
     }
 
     /**
-     * @brief Returns a sink object for the given type.
+     * @brief Returns a sink object.
      *
      * The sink returned by this function can be used to receive notifications
      * whenever an instance is removed from an entity and thus destroyed.<br/>
      * The function type for a listener is equivalent to:
      *
      * @code{.cpp}
-     * void(basic_registry<Entity> &, Entity);
+     * void(basic_registry<entity_type> &, entity_type);
      * @endcode
      *
      * Listeners are invoked **before** the object has been removed from the
@@ -95,18 +168,7 @@ struct default_pool final: basic_storage<Entity, Type> {
     }
 
     /**
-     * @brief Assigns an entity to a pool.
-     *
-     * A new object is created and initialized with the arguments provided (the
-     * object type must have a proper constructor or be of aggregate type). Then
-     * the instance is assigned to the given entity.
-     *
-     * @warning
-     * Attempting to use an invalid entity or to assign an entity that already
-     * belongs to the pool results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity or if the entity already belongs to the pool.
-     *
+     * @copybrief storage_adapter::emplace
      * @tparam Args Types of arguments to use to construct the object.
      * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
@@ -115,7 +177,7 @@ struct default_pool final: basic_storage<Entity, Type> {
      */
     template<typename... Args>
     decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entity, Args &&... args) {
-        basic_storage<entity_type, Type>::emplace(entity, std::forward<Args>(args)...);
+        Pool::emplace(owner, entity, std::forward<Args>(args)...);
         construction.publish(owner, entity);
 
         if constexpr(!is_eto_eligible_v<value_type>) {
@@ -124,10 +186,7 @@ struct default_pool final: basic_storage<Entity, Type> {
     }
 
     /**
-     * @brief Assigns multiple entities to a pool.
-     *
-     * @sa emplace
-     *
+     * @copybrief storage_adapter::insert
      * @tparam It Type of input iterator.
      * @tparam Args Types of arguments to use to construct the objects
      * associated with the entities.
@@ -139,7 +198,7 @@ struct default_pool final: basic_storage<Entity, Type> {
      */
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &owner, It first, It last, Args &&... args) {
-        basic_storage<entity_type, value_type>::insert(first, last, std::forward<Args>(args)...);
+        Pool::insert(owner, first, last, std::forward<Args>(args)...);
 
         if(!construction.empty()) {
             for(; first != last; ++first) {
@@ -149,27 +208,17 @@ struct default_pool final: basic_storage<Entity, Type> {
     }
 
     /**
-     * @brief Removes an entity from a pool.
-     *
-     * @warning
-     * Attempting to use an invalid entity or to remove an entity that doesn't
-     * belong to the pool results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity or if the entity doesn't belong to the pool.
-     *
+     * @copybrief storage_adapter::erase
      * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
      */
     void erase(basic_registry<entity_type> &owner, const entity_type entity) {
         destruction.publish(owner, entity);
-        basic_storage<entity_type, value_type>::erase(entity);
+        Pool::erase(owner, entity);
     }
 
     /**
-     * @brief Removes multiple entities from a pool.
-     *
-     * @see erase
-     *
+     * @copybrief storage_adapter::erase
      * @tparam It Type of input iterator.
      * @param owner The registry that issued the request.
      * @param first An iterator to the first element of the range of entities.
@@ -183,29 +232,11 @@ struct default_pool final: basic_storage<Entity, Type> {
             }
         }
 
-        basic_sparse_set<entity_type>::erase(first, last);
+        Pool::erase(owner, first, last);
     }
 
     /**
-     * @brief Patches the given instance for an entity.
-     *
-     * The signature of the functions should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(Type &);
-     * @endcode
-     *
-     * @note
-     * Empty types aren't explicitly instantiated and therefore they are never
-     * returned. However, this function can be used to trigger an update signal
-     * for them.
-     *
-     * @warning
-     * Attempting to use an invalid entity or to patch an object of an entity
-     * that doesn't belong to the pool results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity or if the entity doesn't belong to the pool.
-     *
+     * @copybrief storage_adapter::patch
      * @tparam Func Types of the function objects to invoke.
      * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
@@ -217,7 +248,7 @@ struct default_pool final: basic_storage<Entity, Type> {
         if constexpr(is_eto_eligible_v<value_type>) {
             update.publish(owner, entity);
         } else {
-            (std::forward<Func>(func)(this->get(entity)), ...);
+            Pool::patch(owner, entity, std::forward<Func>(func)...);
             update.publish(owner, entity);
             return this->get(entity);
         }
@@ -247,7 +278,7 @@ private:
 template<typename Entity, typename Type, typename = void>
 struct pool {
     /*! @brief Resulting type after component-to-pool conversion. */
-    using type = default_pool<Entity, Type>;
+    using type = sigh_pool_mixin<storage_adapter<Entity, Type>>;
 };
 
 
