@@ -216,7 +216,7 @@ TEST_F(MetaData, GetMetaAnyArg) {
     const auto value = entt::resolve<clazz_t>().data("i"_hs).get(any);
 
     ASSERT_TRUE(value);
-    ASSERT_TRUE(value.cast<int>());
+    ASSERT_TRUE(static_cast<bool>(value.cast<int>()));
     ASSERT_EQ(value.cast<int>(), 99);
 }
 

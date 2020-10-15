@@ -256,7 +256,7 @@ TEST(Snapshot, Iterator) {
     ASSERT_EQ(registry.view<another_component>().size(), size);
 
     registry.view<another_component>().each([](const auto entity, const auto &) {
-        ASSERT_TRUE(entt::to_integral(entity) % 2);
+        ASSERT_NE(entt::to_integral(entity) % 2u, 0u);
     });
 }
 

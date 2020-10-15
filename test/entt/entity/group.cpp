@@ -86,11 +86,11 @@ TEST(NonOwningGroup, Functionalities) {
     ASSERT_EQ(cgroup.rbegin(), cgroup.rend());
     ASSERT_TRUE(group.empty());
 
-    ASSERT_TRUE(group.capacity());
+    ASSERT_NE(group.capacity(), 0u);
 
     group.shrink_to_fit();
 
-    ASSERT_FALSE(group.capacity());
+    ASSERT_EQ(group.capacity(), 0u);
 }
 
 TEST(NonOwningGroup, ElementAccess) {

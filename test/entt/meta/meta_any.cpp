@@ -658,7 +658,7 @@ TEST_F(MetaAny, SetGet) {
     const auto value = any.get("value"_hs);
 
 	ASSERT_TRUE(value);
-	ASSERT_TRUE(value.try_cast<int>());
+	ASSERT_NE(value.try_cast<int>(), nullptr);
 	ASSERT_EQ(value.cast<int>(), 42);
     ASSERT_EQ(instance.value, 42);
 

@@ -29,7 +29,7 @@ TEST(Lib, Meta) {
     ASSERT_TRUE(pos && vel);
 
     ASSERT_EQ(pos.type().data("x"_hs).type(), entt::resolve<int>());
-    ASSERT_TRUE(pos.type().data("y"_hs).get(pos).try_cast<int>());
+    ASSERT_NE(pos.type().data("y"_hs).get(pos).try_cast<int>(), nullptr);
     ASSERT_EQ(pos.type().data("x"_hs).get(pos).cast<int>(), 42);
     ASSERT_EQ(pos.type().data("y"_hs).get(pos).cast<int>(), 3);
 
