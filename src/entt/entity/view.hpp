@@ -545,7 +545,7 @@ public:
      *
      * @return An iterable object to use to _visit_ the view.
      */
-    [[nodiscard]] auto each() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
         return iterable_view{begin(), end(), pools};
     }
 
@@ -564,7 +564,7 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     template<typename Comp>
-    [[nodiscard]] auto each() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
         view = std::get<pool_type<Comp> *>(pools);
         return each();
     }
@@ -991,7 +991,7 @@ public:
      *
      * @return An iterable object to use to _visit_ the view.
      */
-    [[nodiscard]] auto each() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
         return iterable_view{*pool};
     }
 

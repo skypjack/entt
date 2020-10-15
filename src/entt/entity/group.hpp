@@ -469,7 +469,7 @@ public:
      *
      * @return An iterable object to use to _visit_ the group.
      */
-    [[nodiscard]] auto each() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterable_group each() const ENTT_NOEXCEPT {
         return iterable_group{*handler, pools};
     }
 
@@ -1039,7 +1039,7 @@ public:
      *
      * @return An iterable object to use to _visit_ the group.
      */
-    [[nodiscard]] auto each() const ENTT_NOEXCEPT {
+    [[nodiscard]] iterable_group each() const ENTT_NOEXCEPT {
         return iterable_group{pools, *length};
     }
 
