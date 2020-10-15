@@ -60,7 +60,7 @@ struct storage_adapter: basic_storage<Entity, Type> {
      * @brief Removes entities from a pool.
      * @param entity A valid entity identifier.
      */
-    void erase(basic_registry<entity_type> &, const entity_type entity) {
+    void remove(basic_registry<entity_type> &, const entity_type entity) {
         basic_storage<entity_type, value_type>::erase(entity);
     }
 
@@ -71,7 +71,7 @@ struct storage_adapter: basic_storage<Entity, Type> {
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    void erase(basic_registry<entity_type> &, It first, It last) {
+    void remove(basic_registry<entity_type> &, It first, It last) {
         basic_sparse_set<entity_type>::erase(first, last);
     }
 
@@ -212,9 +212,9 @@ struct sigh_pool_mixin: Pool {
      * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
      */
-    void erase(basic_registry<entity_type> &owner, const entity_type entity) {
+    void remove(basic_registry<entity_type> &owner, const entity_type entity) {
         destruction.publish(owner, entity);
-        Pool::erase(owner, entity);
+        Pool::remove(owner, entity);
     }
 
     /**
@@ -225,14 +225,14 @@ struct sigh_pool_mixin: Pool {
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    void erase(basic_registry<entity_type> &owner, It first, It last) {
+    void remove(basic_registry<entity_type> &owner, It first, It last) {
         if(!destruction.empty()) {
             for(auto it = first; it != last; ++it) {
                 destruction.publish(owner, *it);
             }
         }
 
-        Pool::erase(owner, first, last);
+        Pool::remove(owner, first, last);
     }
 
     /**
