@@ -528,8 +528,7 @@ public:
      */
     template<typename Comp, typename Func>
     void each(Func func) const {
-        using non_empty_type = type_list_cat_t<std::conditional_t<is_eto_eligible_v<Component>, type_list<>, type_list<Component>>...>;
-        traverse<Comp>(std::move(func), non_empty_type{});
+        traverse<Comp>(std::move(func), (std::conditional_t<is_eto_eligible_v<Component>, type_list<>, type_list<Component>>{} + ...));
     }
 
     /**
