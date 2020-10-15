@@ -443,7 +443,7 @@ public:
      */
     template<typename It>
     void erase(It first, It last) {
-        if(std::distance(first, last) == packed.size()) {
+        if(std::distance(first, last) == std::distance(packed.begin(), packed.end())) {
             // no validity check, let it be misused
             clear();
         } else {
