@@ -71,16 +71,16 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
     template<typename Component>
     using pool_type = pool_t<Entity, Component>;
 
-    class group_proxy {
+    class iterable_group {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>>;
 
-        class proxy_iterator {
-            friend class group_proxy;
+        class iterable_group_iterator {
+            friend class iterable_group;
 
             using it_type = typename basic_sparse_set<Entity>::iterator;
             using ref_type = decltype(std::tuple_cat(std::declval<std::conditional_t<is_eto_eligible_v<Get>, std::tuple<>, std::tuple<pool_type<Get> *>>>()...));
 
-            proxy_iterator(it_type from, ref_type ref) ENTT_NOEXCEPT
+            iterable_group_iterator(it_type from, ref_type ref) ENTT_NOEXCEPT
                 : it{from},
                   pools{ref}
             {}
@@ -98,12 +98,12 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
             ));
             using iterator_category = std::input_iterator_tag;
 
-            proxy_iterator & operator++() ENTT_NOEXCEPT {
+            iterable_group_iterator & operator++() ENTT_NOEXCEPT {
                 return ++it, *this;
             }
 
-            proxy_iterator operator++(int) ENTT_NOEXCEPT {
-                proxy_iterator orig = *this;
+            iterable_group_iterator operator++(int) ENTT_NOEXCEPT {
+                iterable_group_iterator orig = *this;
                 return ++(*this), orig;
             }
 
@@ -111,11 +111,11 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
                 return std::apply([entt = *it](auto *... cpool) { return reference{entt, cpool->get(entt)...}; }, pools);
             }
 
-            [[nodiscard]] bool operator==(const proxy_iterator &other) const ENTT_NOEXCEPT {
+            [[nodiscard]] bool operator==(const iterable_group_iterator &other) const ENTT_NOEXCEPT {
                 return other.it == it;
             }
 
-            [[nodiscard]] bool operator!=(const proxy_iterator &other) const ENTT_NOEXCEPT {
+            [[nodiscard]] bool operator!=(const iterable_group_iterator &other) const ENTT_NOEXCEPT {
                 return !(*this == other);
             }
 
@@ -124,16 +124,16 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
             ref_type pools{};
         };
 
-        group_proxy(const basic_sparse_set<Entity> &ref, std::tuple<pool_type<Get> *...> gpools)
+        iterable_group(const basic_sparse_set<Entity> &ref, std::tuple<pool_type<Get> *...> gpools)
             : handler{&ref},
               pools{gpools}
         {}
 
     public:
-        using iterator = proxy_iterator;
+        using iterator = iterable_group_iterator;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return proxy_iterator{handler->begin(), std::tuple_cat([](auto *cpool) {
+            return iterable_group_iterator{handler->begin(), std::tuple_cat([](auto *cpool) {
                 if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
                     return std::make_tuple();
                 } else {
@@ -143,7 +143,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return proxy_iterator{handler->end(), std::tuple_cat([](auto *cpool) {
+            return iterable_group_iterator{handler->end(), std::tuple_cat([](auto *cpool) {
                 if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
                     return std::make_tuple();
                 } else {
@@ -469,8 +469,8 @@ public:
      *
      * @return An iterable object to use to _visit_ the group.
      */
-    [[nodiscard]] auto proxy() const ENTT_NOEXCEPT {
-        return group_proxy{*handler, pools};
+    [[nodiscard]] auto each() const ENTT_NOEXCEPT {
+        return iterable_group{*handler, pools};
     }
 
     /**
@@ -609,17 +609,17 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
     template<typename Component>
     using component_iterator = decltype(std::declval<pool_type<Component>>().begin());
 
-    class group_proxy {
+    class iterable_group {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...>;
 
-        class proxy_iterator {
-            friend class group_proxy;
+        class iterable_group_iterator {
+            friend class iterable_group;
 
             using it_type = typename basic_sparse_set<Entity>::iterator;
             using owned_type = decltype(std::tuple_cat(std::declval<std::conditional_t<is_eto_eligible_v<Owned>, std::tuple<>, std::tuple<component_iterator<Owned>>>>()...));
             using get_type = decltype(std::tuple_cat(std::declval<std::conditional_t<is_eto_eligible_v<Get>, std::tuple<>, std::tuple<pool_type<Get> *>>>()...));
 
-            proxy_iterator(it_type from, owned_type oref, get_type gref) ENTT_NOEXCEPT
+            iterable_group_iterator(it_type from, owned_type oref, get_type gref) ENTT_NOEXCEPT
                 : it{from},
                   owned{oref},
                   get{gref}
@@ -640,12 +640,12 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
             ));
             using iterator_category = std::input_iterator_tag;
 
-            proxy_iterator & operator++() ENTT_NOEXCEPT {
+            iterable_group_iterator & operator++() ENTT_NOEXCEPT {
                 return ++it, std::apply([](auto &&... curr) { (++curr, ...); }, owned), *this;
             }
 
-            proxy_iterator operator++(int) ENTT_NOEXCEPT {
-                proxy_iterator orig = *this;
+            iterable_group_iterator operator++(int) ENTT_NOEXCEPT {
+                iterable_group_iterator orig = *this;
                 return ++(*this), orig;
             }
 
@@ -657,11 +657,11 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
                 );
             }
 
-            [[nodiscard]] bool operator==(const proxy_iterator &other) const ENTT_NOEXCEPT {
+            [[nodiscard]] bool operator==(const iterable_group_iterator &other) const ENTT_NOEXCEPT {
                 return other.it == it;
             }
 
-            [[nodiscard]] bool operator!=(const proxy_iterator &other) const ENTT_NOEXCEPT {
+            [[nodiscard]] bool operator!=(const iterable_group_iterator &other) const ENTT_NOEXCEPT {
                 return !(*this == other);
             }
 
@@ -671,16 +671,16 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
             get_type get{};
         };
 
-        group_proxy(std::tuple<pool_type<Owned> *..., pool_type<Get> *...> cpools, const std::size_t &extent)
+        iterable_group(std::tuple<pool_type<Owned> *..., pool_type<Get> *...> cpools, const std::size_t &extent)
             : pools{cpools},
               length{&extent}
         {}
 
     public:
-        using iterator = proxy_iterator;
+        using iterator = iterable_group_iterator;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return proxy_iterator{
+            return iterable_group_iterator{
                 std::get<0>(pools)->basic_sparse_set<Entity>::end() - *length,
                 std::tuple_cat([length = *length](auto *cpool) {
                     if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
@@ -700,7 +700,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return proxy_iterator{
+            return iterable_group_iterator{
                 std::get<0>(pools)->basic_sparse_set<Entity>::end(),
                 std::tuple_cat([](auto *cpool) {
                     if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
@@ -1039,8 +1039,8 @@ public:
      *
      * @return An iterable object to use to _visit_ the group.
      */
-    [[nodiscard]] auto proxy() const ENTT_NOEXCEPT {
-        return group_proxy{pools, *length};
+    [[nodiscard]] auto each() const ENTT_NOEXCEPT {
+        return iterable_group{pools, *length};
     }
 
     /**

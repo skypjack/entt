@@ -151,17 +151,17 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         filter_type filter;
     };
 
-    class view_proxy {
+    class iterable_view {
         friend class basic_view<Entity, exclude_t<Exclude...>, Component...>;
 
-        using proxy_view_iterator = view_iterator<typename basic_sparse_set<Entity>::iterator>;
+        using underlying_iterator = view_iterator<typename basic_sparse_set<Entity>::iterator>;
 
-        class proxy_iterator {
-            friend class view_proxy;
+        class iterable_view_iterator {
+            friend class iterable_view;
 
             using ref_type = decltype(std::tuple_cat(std::declval<std::conditional_t<is_eto_eligible_v<Component>, std::tuple<>, std::tuple<pool_type<Component> *>>>()...));
 
-            proxy_iterator(proxy_view_iterator from, ref_type ref) ENTT_NOEXCEPT
+            iterable_view_iterator(underlying_iterator from, ref_type ref) ENTT_NOEXCEPT
                 : it{from},
                   pools{ref}
             {}
@@ -176,12 +176,12 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
             using reference = value_type;
             using iterator_category = std::input_iterator_tag;
 
-            proxy_iterator & operator++() ENTT_NOEXCEPT {
+            iterable_view_iterator & operator++() ENTT_NOEXCEPT {
                 return ++it, *this;
             }
 
-            proxy_iterator operator++(int) ENTT_NOEXCEPT {
-                proxy_iterator orig = *this;
+            iterable_view_iterator operator++(int) ENTT_NOEXCEPT {
+                iterable_view_iterator orig = *this;
                 return ++(*this), orig;
             }
 
@@ -189,30 +189,30 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
                 return std::apply([entt = *it](auto *... cpool) { return reference{entt, cpool->get(entt)...}; }, pools);
             }
 
-            [[nodiscard]] bool operator==(const proxy_iterator &other) const ENTT_NOEXCEPT {
+            [[nodiscard]] bool operator==(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
                 return other.it == it;
             }
 
-            [[nodiscard]] bool operator!=(const proxy_iterator &other) const ENTT_NOEXCEPT {
+            [[nodiscard]] bool operator!=(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
                 return !(*this == other);
             }
 
         private:
-            proxy_view_iterator it{};
+            underlying_iterator it{};
             const ref_type pools{};
         };
 
-        view_proxy(proxy_view_iterator from, proxy_view_iterator to, std::tuple<pool_type<Component> *...> ref)
+        iterable_view(underlying_iterator from, underlying_iterator to, std::tuple<pool_type<Component> *...> ref)
             : first{from},
               last{to},
               pools{ref}
         {}
 
     public:
-        using iterator = proxy_iterator;
+        using iterator = iterable_view_iterator;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return proxy_iterator{first, std::tuple_cat([](auto *cpool) {
+            return iterable_view_iterator{first, std::tuple_cat([](auto *cpool) {
                 if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
                     return std::make_tuple();
                 } else {
@@ -222,7 +222,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return proxy_iterator{last, std::tuple_cat([](auto *cpool) {
+            return iterable_view_iterator{last, std::tuple_cat([](auto *cpool) {
                 if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
                     return std::make_tuple();
                 } else {
@@ -232,8 +232,8 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         }
 
     private:
-        proxy_view_iterator first;
-        proxy_view_iterator last;
+        underlying_iterator first;
+        underlying_iterator last;
         const std::tuple<pool_type<Component> *...> pools;
     };
 
@@ -545,9 +545,9 @@ public:
      *
      * @return An iterable object to use to _visit_ the view.
      */
-    [[nodiscard]] auto proxy() const ENTT_NOEXCEPT {
+    [[nodiscard]] auto each() const ENTT_NOEXCEPT {
         view = candidate();
-        return view_proxy{begin(), end(), pools};
+        return iterable_view{begin(), end(), pools};
     }
 
     /**
@@ -565,11 +565,11 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     template<typename Comp>
-    [[nodiscard]] auto proxy() const ENTT_NOEXCEPT {
+    [[nodiscard]] auto each() const ENTT_NOEXCEPT {
         const basic_sparse_set<entity_type> *cpool = std::get<pool_type<Comp> *>(pools);
         iterator first{cpool->begin(), cpool->end(), cpool->begin(), unchecked(cpool), filter};
         iterator last{cpool->begin(), cpool->end(), cpool->end(), unchecked(cpool), filter};
-        return view_proxy{std::move(first), std::move(last), pools};
+        return iterable_view{std::move(first), std::move(last), pools};
     }
 
     /**
@@ -656,11 +656,11 @@ class basic_view<Entity, exclude_t<>, Component> final {
 
     using pool_type = pool_t<Entity, Component>;
 
-    class view_proxy {
+    class iterable_view {
         friend class basic_view<Entity, exclude_t<>, Component>;
 
-        class proxy_iterator {
-            friend class view_proxy;
+        class iterable_view_iterator {
+            friend class iterable_view;
 
             using it_type = std::conditional_t<
                 is_eto_eligible_v<Component>,
@@ -668,7 +668,7 @@ class basic_view<Entity, exclude_t<>, Component> final {
                 std::tuple<typename basic_sparse_set<Entity>::iterator, decltype(std::declval<pool_type>().begin())>
             >;
 
-            proxy_iterator(it_type from) ENTT_NOEXCEPT
+            iterable_view_iterator(it_type from) ENTT_NOEXCEPT
                 : it{from}
             {}
 
@@ -679,12 +679,12 @@ class basic_view<Entity, exclude_t<>, Component> final {
             using reference = value_type;
             using iterator_category = std::input_iterator_tag;
 
-            proxy_iterator & operator++() ENTT_NOEXCEPT {
+            iterable_view_iterator & operator++() ENTT_NOEXCEPT {
                 return std::apply([](auto &&... curr) { (++curr, ...); }, it), *this;
             }
 
-            proxy_iterator operator++(int) ENTT_NOEXCEPT {
-                proxy_iterator orig = *this;
+            iterable_view_iterator operator++(int) ENTT_NOEXCEPT {
+                iterable_view_iterator orig = *this;
                 return ++(*this), orig;
             }
 
@@ -692,11 +692,11 @@ class basic_view<Entity, exclude_t<>, Component> final {
                 return std::apply([](auto &&... curr) { return reference{*curr...}; }, it);
             }
 
-            [[nodiscard]] bool operator==(const proxy_iterator &other) const ENTT_NOEXCEPT {
+            [[nodiscard]] bool operator==(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
                 return std::get<0>(other.it) == std::get<0>(it);
             }
 
-            [[nodiscard]] bool operator!=(const proxy_iterator &other) const ENTT_NOEXCEPT {
+            [[nodiscard]] bool operator!=(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
                 return !(*this == other);
             }
 
@@ -704,26 +704,26 @@ class basic_view<Entity, exclude_t<>, Component> final {
             it_type it{};
         };
 
-        view_proxy(pool_type &ref)
+        iterable_view(pool_type &ref)
             : pool{&ref}
         {}
 
     public:
-        using iterator = proxy_iterator;
+        using iterator = iterable_view_iterator;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             if constexpr(is_eto_eligible_v<Component>) {
-                return proxy_iterator{std::make_tuple(pool->basic_sparse_set<entity_type>::begin())};
+                return iterable_view_iterator{std::make_tuple(pool->basic_sparse_set<entity_type>::begin())};
             } else {
-                return proxy_iterator{std::make_tuple(pool->basic_sparse_set<entity_type>::begin(), pool->begin())};
+                return iterable_view_iterator{std::make_tuple(pool->basic_sparse_set<entity_type>::begin(), pool->begin())};
             }
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             if constexpr(is_eto_eligible_v<Component>) {
-                return proxy_iterator{std::make_tuple(pool->basic_sparse_set<entity_type>::end())};
+                return iterable_view_iterator{std::make_tuple(pool->basic_sparse_set<entity_type>::end())};
             } else {
-                return proxy_iterator{std::make_tuple(pool->basic_sparse_set<entity_type>::end(), pool->end())};
+                return iterable_view_iterator{std::make_tuple(pool->basic_sparse_set<entity_type>::end(), pool->end())};
             }
         }
 
@@ -996,8 +996,8 @@ public:
      *
      * @return An iterable object to use to _visit_ the view.
      */
-    [[nodiscard]] auto proxy() const ENTT_NOEXCEPT {
-        return view_proxy{*pool};
+    [[nodiscard]] auto each() const ENTT_NOEXCEPT {
+        return iterable_view{*pool};
     }
 
 private:
