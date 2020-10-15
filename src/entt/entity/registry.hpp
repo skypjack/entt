@@ -45,7 +45,7 @@ class basic_registry {
     struct pool_data {
         type_info info{};
         std::unique_ptr<basic_sparse_set<Entity>> pool{};
-        void(* erase)(basic_sparse_set<Entity> &, basic_registry &, const Entity *, const Entity *);
+        void(* erase)(basic_sparse_set<Entity> &, basic_registry &, const Entity *, const Entity *){};
     };
 
     template<typename...>
