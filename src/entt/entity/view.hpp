@@ -74,6 +74,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
     template<typename Comp>
     using component_iterator = decltype(std::declval<pool_type<Comp>>().begin());
 
+    using return_type = type_list_cat_t<std::conditional_t<is_eto_eligible_v<Component>, type_list<>, type_list<Component>>...>;
     using unchecked_type = std::array<const basic_sparse_set<Entity> *, (sizeof...(Component) - 1)>;
     using filter_type = std::array<const basic_sparse_set<Entity> *, sizeof...(Exclude)>;
 
@@ -506,8 +507,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        view = candidate();
-        ((std::get<pool_type<Component> *>(pools) == view ? each<Component>(std::move(func)) : void()), ...);
+        ((std::get<pool_type<Component> *>(pools) == view ? traverse<Component>(std::move(func), return_type{}) : void()), ...);
     }
 
     /**
@@ -528,7 +528,8 @@ public:
      */
     template<typename Comp, typename Func>
     void each(Func func) const {
-        traverse<Comp>(std::move(func), (std::conditional_t<is_eto_eligible_v<Component>, type_list<>, type_list<Component>>{} + ...));
+        view = std::get<pool_type<Comp> *>(pools);
+        traverse<Comp>(std::move(func), return_type{});
     }
 
     /**
@@ -545,7 +546,6 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] auto each() const ENTT_NOEXCEPT {
-        view = candidate();
         return iterable_view{begin(), end(), pools};
     }
 
@@ -565,10 +565,8 @@ public:
      */
     template<typename Comp>
     [[nodiscard]] auto each() const ENTT_NOEXCEPT {
-        const basic_sparse_set<entity_type> *cpool = std::get<pool_type<Comp> *>(pools);
-        iterator first{cpool->begin(), cpool->end(), cpool->begin(), unchecked(cpool), filter};
-        iterator last{cpool->begin(), cpool->end(), cpool->end(), unchecked(cpool), filter};
-        return iterable_view{std::move(first), std::move(last), pools};
+        view = std::get<pool_type<Comp> *>(pools);
+        return each();
     }
 
     /**
@@ -605,9 +603,7 @@ public:
      */
     template<typename Func>
     void chunked(Func func) const {
-        using non_empty_type = type_list_cat_t<std::conditional_t<is_eto_eligible_v<Component>, type_list<>, type_list<Component>>...>;
-        view = candidate();
-        iterate(std::move(func), non_empty_type{});
+        iterate(std::move(func), return_type{});
     }
 
 private:
