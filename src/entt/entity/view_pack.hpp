@@ -267,7 +267,7 @@ public:
      * @return A copy of the requested view from the pack.
      */
     template<typename Type>
-    [[nodiscard]] operator Type() const ENTT_NOEXCEPT {
+    operator Type() const ENTT_NOEXCEPT {
         return std::get<Type>(pack);
     }
 
