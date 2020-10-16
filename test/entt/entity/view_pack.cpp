@@ -34,13 +34,13 @@ TEST(ViewPack, Construction) {
 
 TEST(ViewPack, ShortestPool) {
     entt::registry registry;
-    entt::entity entities[3];
+    entt::entity entities[4];
 
     registry.create(std::begin(entities), std::end(entities));
 
     registry.insert<int>(std::begin(entities), std::end(entities));
     registry.insert<empty_type>(std::begin(entities), std::end(entities));
-    registry.insert<char>(std::rbegin(entities), std::rend(entities) - 1u);
+    registry.insert<char>(std::rbegin(entities) + 1u, std::rend(entities) - 1u);
 
     const auto tmp = registry.view<char>() | registry.view<empty_type>();
     const auto pack = tmp | registry.view<const int>();
@@ -95,13 +95,13 @@ TEST(ViewPack, ShortestPool) {
 
 TEST(ViewPack, LongestPool) {
     entt::registry registry;
-    entt::entity entities[3];
+    entt::entity entities[4];
 
     registry.create(std::begin(entities), std::end(entities));
 
     registry.insert<int>(std::begin(entities), std::end(entities));
     registry.insert<empty_type>(std::begin(entities), std::end(entities));
-    registry.insert<char>(std::rbegin(entities), std::rend(entities) - 1u);
+    registry.insert<char>(std::rbegin(entities) + 1u, std::rend(entities) - 1u);
 
     const auto pack = registry.view<int>() | registry.view<empty_type>() | registry.view<const char>();
 
