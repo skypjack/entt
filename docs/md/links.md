@@ -90,8 +90,10 @@ I hope this list can grow much more in the future:
     organized as an ECS.
   * [Silvanus](https://github.com/hobbyistmaker/silvanus): Silvanus Fusion 360
     Box Generator.
-  * [MushMachine](https://github.com/MadeOfJelly/MushMachine): Engine...
+  * [MushMachine](https://github.com/MadeOfJelly/MushMachine): engine...
     vrooooommm.
+  * [Lina Engine](https://github.com/inanevin/LinaEngine): an open-source,
+    modular, tiny and fast C++ game engine, aimed to develop 3D desktop games.
 
 * Articles, videos and blog posts:
   * [Some posts](https://skypjack.github.io/tags/#entt) on my personal
