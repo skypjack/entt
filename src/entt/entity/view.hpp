@@ -108,12 +108,12 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
 
         view_iterator() ENTT_NOEXCEPT = default;
 
-        view_iterator & operator++() {
+        view_iterator & operator++() ENTT_NOEXCEPT {
             while(++it != last && !valid());
             return *this;
         }
 
-        view_iterator operator++(int) {
+        view_iterator operator++(int) ENTT_NOEXCEPT {
             view_iterator orig = *this;
             return ++(*this), orig;
         }
