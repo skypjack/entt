@@ -135,7 +135,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             return iterable_group_iterator{handler->begin(), std::tuple_cat([](auto *cpool) {
                 if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                    return std::make_tuple();
+                    return std::tuple{};
                 } else {
                     return std::make_tuple(cpool);
                 }
@@ -145,7 +145,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             return iterable_group_iterator{handler->end(), std::tuple_cat([](auto *cpool) {
                 if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                    return std::make_tuple();
+                    return std::tuple{};
                 } else {
                     return std::make_tuple(cpool);
                 }
@@ -425,7 +425,7 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             return std::tuple_cat([entt](auto *cpool) {
                 if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                    return std::make_tuple();
+                    return std::tuple{};
                 } else {
                     return std::forward_as_tuple(cpool->get(entt));
                 }
@@ -433,7 +433,7 @@ public:
         } else if constexpr(sizeof...(Component) == 1) {
             return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple<decltype(get<Component>({}))...>{get<Component>(entt)...};
+            return std::forward_as_tuple(get<Component>(entt)...);
         }
     }
 
@@ -692,14 +692,14 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
                 std::get<0>(pools)->basic_sparse_set<Entity>::end() - *length,
                 std::tuple_cat([length = *length](auto *cpool) {
                     if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                        return std::make_tuple();
+                        return std::tuple{};
                     } else {
                         return std::make_tuple(cpool->end() - length);
                     }
                 }(std::get<pool_type<Owned> *>(pools))...),
                 std::tuple_cat([](auto *cpool) {
                     if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                        return std::make_tuple();
+                        return std::tuple{};
                     } else {
                         return std::make_tuple(cpool);
                     }
@@ -712,14 +712,14 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
                 std::get<0>(pools)->basic_sparse_set<Entity>::end(),
                 std::tuple_cat([](auto *cpool) {
                     if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                        return std::make_tuple();
+                        return std::tuple{};
                     } else {
                         return std::make_tuple(cpool->end());
                     }
                 }(std::get<pool_type<Owned> *>(pools))...),
                 std::tuple_cat([](auto *cpool) {
                     if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                        return std::make_tuple();
+                        return std::tuple{};
                     } else {
                         return std::make_tuple(cpool);
                     }
@@ -1001,7 +1001,7 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             auto filter = [entt](auto *cpool) {
                 if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                    return std::make_tuple();
+                    return std::tuple{};
                 } else {
                     return std::forward_as_tuple(cpool->get(entt));
                 }
@@ -1011,7 +1011,7 @@ public:
         } else if constexpr(sizeof...(Component) == 1) {
             return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple<decltype(get<Component>({}))...>{get<Component>(entt)...};
+            return std::forward_as_tuple(get<Component>(entt)...);
         }
     }
 

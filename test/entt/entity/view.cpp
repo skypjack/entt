@@ -37,10 +37,10 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_EQ(view.size(), 2u);
 
     view.get<char>(e0) = '1';
-    view.get(e1) = '2';
+    std::get<0>(view.get(e1)) = '2';
 
     for(auto entity: view) {
-        ASSERT_TRUE(cview.get<const char>(entity) == '1' || cview.get(entity) == '2');
+        ASSERT_TRUE(cview.get<const char>(entity) == '1' || std::get<const char &>(cview.get(entity)) == '2');
     }
 
     ASSERT_EQ(*(view.data() + 0), e1);
@@ -157,9 +157,11 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     static_assert(std::is_same_v<typename decltype(view)::raw_type, int>);
     static_assert(std::is_same_v<typename decltype(cview)::raw_type, const int>);
 
-    static_assert(std::is_same_v<decltype(view.get({})), int &>);
+    static_assert(std::is_same_v<decltype(view.get<int>({})), int &>);
+    static_assert(std::is_same_v<decltype(view.get({})), std::tuple<int &>>);
     static_assert(std::is_same_v<decltype(view.raw()), int *>);
-    static_assert(std::is_same_v<decltype(cview.get({})), const int &>);
+    static_assert(std::is_same_v<decltype(cview.get<const int>({})), const int &>);
+    static_assert(std::is_same_v<decltype(cview.get({})), std::tuple<const int &>>);
     static_assert(std::is_same_v<decltype(cview.raw()), const int *>);
 
     view.each([](auto &&i) {
@@ -178,6 +180,34 @@ TEST(SingleComponentView, ConstNonConstAndAllInBetween) {
     for(auto &&[entt, iv]: cview.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), const int &>);
+    }
+}
+
+TEST(SingleComponentView, ConstNonConstAndAllInBetweenWithEmptyType) {
+    entt::registry registry;
+    auto view = registry.view<empty_type>();
+    auto cview = std::as_const(registry).view<const empty_type>();
+
+    ASSERT_EQ(view.size(), decltype(view.size()){0});
+    ASSERT_EQ(cview.size(), decltype(cview.size()){0});
+
+    registry.emplace<empty_type>(registry.create());
+
+    ASSERT_EQ(view.size(), decltype(view.size()){1});
+    ASSERT_EQ(cview.size(), decltype(cview.size()){1});
+
+    static_assert(std::is_same_v<typename decltype(view)::raw_type, empty_type>);
+    static_assert(std::is_same_v<typename decltype(cview)::raw_type, const empty_type>);
+
+    static_assert(std::is_same_v<decltype(view.get({})), std::tuple<>>);
+    static_assert(std::is_same_v<decltype(cview.get({})), std::tuple<>>);
+
+    for(auto &&[entt]: view.each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
+    }
+
+    for(auto &&[entt]: cview.each()) {
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
     }
 }
 
@@ -528,12 +558,13 @@ TEST(MultiComponentView, EachWithHoles) {
 
 TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
     entt::registry registry;
-    auto view = registry.view<int, const char>();
+    auto view = registry.view<int, empty_type, const char>();
 
     ASSERT_EQ(view.size_hint(), decltype(view.size_hint()){0});
 
     const auto entity = registry.create();
     registry.emplace<int>(entity, 0);
+    registry.emplace<empty_type>(entity);
     registry.emplace<char>(entity, 'c');
 
     ASSERT_EQ(view.size_hint(), decltype(view.size_hint()){1});
@@ -541,6 +572,7 @@ TEST(MultiComponentView, ConstNonConstAndAllInBetween) {
     static_assert(std::is_same_v<decltype(view.get<int>({})), int &>);
     static_assert(std::is_same_v<decltype(view.get<const char>({})), const char &>);
     static_assert(std::is_same_v<decltype(view.get<int, const char>({})), std::tuple<int &, const char &>>);
+    static_assert(std::is_same_v<decltype(view.get({})), std::tuple<int &, const char &>>);
 
     view.each([](auto &&i, auto &&c) {
         static_assert(std::is_same_v<decltype(i), int &>);

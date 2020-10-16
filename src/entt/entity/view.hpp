@@ -215,7 +215,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             return iterable_view_iterator{first, std::tuple_cat([](auto *cpool) {
                 if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                    return std::make_tuple();
+                    return std::tuple{};
                 } else {
                     return std::make_tuple(cpool);
                 }
@@ -225,7 +225,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             return iterable_view_iterator{last, std::tuple_cat([](auto *cpool) {
                 if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                    return std::make_tuple();
+                    return std::tuple{};
                 } else {
                     return std::make_tuple(cpool);
                 }
@@ -476,7 +476,7 @@ public:
         if constexpr(sizeof...(Comp) == 0) {
             return std::tuple_cat([entt](auto *cpool) {
                 if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                    return std::make_tuple();
+                    return std::tuple{};
                 } else {
                     return std::forward_as_tuple(cpool->get(entt));
                 }
@@ -484,7 +484,7 @@ public:
         } else if constexpr(sizeof...(Comp) == 1) {
             return (std::get<pool_type<Comp> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple<decltype(get<Comp>({}))...>{get<Comp>(entt)...};
+            return std::forward_as_tuple(get<Comp>(entt)...);
         }
     }
 
@@ -919,19 +919,28 @@ public:
      * far better performance than its counterpart.
      *
      * @warning
-     * Attempting to use an entity that doesn't belong to the view results in
-     * undefined behavior.<br/>
+     * Attempting to use an invalid component type results in a compilation
+     * error. Attempting to use an entity that doesn't belong to the view
+     * results in undefined behavior.<br/>
      * An assertion will abort the execution at runtime in debug mode if the
      * view doesn't contain the given entity.
      *
+     * @tparam Comp Types of components to get.
      * @param entt A valid entity identifier.
      * @return The component assigned to the entity.
      */
-    template<typename Comp = Component>
+    template<typename... Comp>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
-        static_assert(std::is_same_v<Comp, Component>, "Invalid component type");
-        ENTT_ASSERT(contains(entt));
-        return pool->get(entt);
+        if constexpr(sizeof...(Comp) == 0) {
+            if constexpr(is_eto_eligible_v<Component>) {
+                return std::tuple{};
+            } else {
+                return std::forward_as_tuple(pool->get(entt));
+            }
+        } else {
+            static_assert(std::is_same_v<Comp..., Component>, "Invalid component type");
+            return pool->get(entt);
+        }
     }
 
     /**
@@ -969,7 +978,7 @@ public:
                 }
             }
         } else {
-            if constexpr(std::is_invocable_v<Func, decltype(get({}))>) {
+            if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>>) {
                 for(auto &&component: *pool) {
                     func(component);
                 }

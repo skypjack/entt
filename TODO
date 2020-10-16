@@ -10,6 +10,7 @@
 
 WIP:
 * HP: write documentation for custom storages and views!!
+* use extended get to remove is_eto_eligible checks from views and groups.
 * factory invoke: add support for external member functions as static meta functions
 * pagination doesn't work nicely across boundaries probably, give it a look. RO operations are fine, adding components maybe not.
 * make it easier to hook into the type system and describe how to do that to eg auto-generate meta types on first use

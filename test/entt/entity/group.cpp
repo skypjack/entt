@@ -330,12 +330,13 @@ TEST(NonOwningGroup, IndexRebuiltOnDestroy) {
 
 TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
     entt::registry registry;
-    auto group = registry.group(entt::get<int, const char>);
+    auto group = registry.group(entt::get<int, empty_type, const char>);
 
     ASSERT_EQ(group.size(), decltype(group.size()){0});
 
     const auto entity = registry.create();
     registry.emplace<int>(entity, 0);
+    registry.emplace<empty_type>(entity);
     registry.emplace<char>(entity, 'c');
 
     ASSERT_EQ(group.size(), decltype(group.size()){1});
@@ -343,6 +344,7 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
     static_assert(std::is_same_v<decltype(group.get<int>({})), int &>);
     static_assert(std::is_same_v<decltype(group.get<const char>({})), const char &>);
     static_assert(std::is_same_v<decltype(group.get<int, const char>({})), std::tuple<int &, const char &>>);
+    static_assert(std::is_same_v<decltype(group.get({})), std::tuple<int &, const char &>>);
     static_assert(std::is_same_v<decltype(group.raw<const char>()), const char *>);
     static_assert(std::is_same_v<decltype(group.raw<int>()), int *>);
 
@@ -984,13 +986,14 @@ TEST(OwningGroup, IndexRebuiltOnDestroy) {
 
 TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     entt::registry registry;
-    auto group = registry.group<int, const char>(entt::get<double, const float>);
+    auto group = registry.group<int, const char>(entt::get<empty_type, double, const float>);
 
     ASSERT_EQ(group.size(), decltype(group.size()){0});
 
     const auto entity = registry.create();
     registry.emplace<int>(entity, 0);
     registry.emplace<char>(entity, 'c');
+    registry.emplace<empty_type>(entity);
     registry.emplace<double>(entity, 0.);
     registry.emplace<float>(entity, 0.f);
 
@@ -1001,6 +1004,7 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     static_assert(std::is_same_v<decltype(group.get<double>({})), double &>);
     static_assert(std::is_same_v<decltype(group.get<const float>({})), const float &>);
     static_assert(std::is_same_v<decltype(group.get<int, const char, double, const float>({})), std::tuple<int &, const char &, double &, const float &>>);
+    static_assert(std::is_same_v<decltype(group.get({})), std::tuple<int &, const char &, double &, const float &>>);
     static_assert(std::is_same_v<decltype(group.raw<const float>()), const float *>);
     static_assert(std::is_same_v<decltype(group.raw<double>()), double *>);
     static_assert(std::is_same_v<decltype(group.raw<const char>()), const char *>);
