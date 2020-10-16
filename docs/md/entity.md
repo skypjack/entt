@@ -1343,15 +1343,18 @@ auto view = registry.view<position, velocity>(entt::exclude<renderable>);
 To iterate a view, either use it in a range-for loop:
 
 ```cpp
-auto view = registry.view<position, velocity>();
+auto view = registry.view<position, velocity, renderable>();
 
 for(auto entity: view) {
     // a component at a time ...
     auto &position = view.get<position>(entity);
     auto &velocity = view.get<velocity>(entity);
 
-    // ... or multiple components at once
+    // ... multiple components ...
     auto [pos, vel] = view.get<position, velocity>(entity);
+
+    // ... all components at once
+    auto [pos, vel, rend] = view.get(entity);
 
     // ...
 }
@@ -1386,13 +1389,15 @@ recommend referring to the official documentation for more details and I won't
 further investigate the topic here.
 
 As a side note, in the case of single component views, `get` accepts but doesn't
-strictly require a template parameter, since the type is implicitly defined:
+strictly require a template parameter, since the type is implicitly defined.
+However, when the type isn't specified, for consistency with the multi component
+view, the instance will be returned using a tuple:
 
 ```cpp
 auto view = registry.view<const renderable>();
 
 for(auto entity: view) {
-    const auto &renderable = view.get(entity);
+    auto [renderable] = view.get(entity);
     // ...
 }
 ```
@@ -1424,13 +1429,6 @@ entt::id_type types[] = { entt::type_hash<position>::value(), entt::type_hash<ve
 auto view = registry.runtime_view(std::cbegin(types), std::cend(types));
 
 for(auto entity: view) {
-    // a component at a time ...
-    auto &position = registry.get<position>(entity);
-    auto &velocity = registry.get<velocity>(entity);
-
-    // ... or multiple components at once
-    auto [pos, vel] = registry.get<position, velocity>(entity);
-
     // ...
 }
 ```
@@ -1504,15 +1502,18 @@ iterators whenever `begin` or `end` are invoked.
 To iterate groups, either use them in a range-for loop:
 
 ```cpp
-auto group = registry.group<position>(entt::get<velocity>);
+auto group = registry.group<position>(entt::get<velocity, renderable>);
 
 for(auto entity: group) {
     // a component at a time ...
     auto &position = group.get<position>(entity);
     auto &velocity = group.get<velocity>(entity);
 
-    // ... or multiple components at once
+    // ... multiple components ...
     auto [pos, vel] = group.get<position, velocity>(entity);
+
+    // ... all components at once
+    auto [pos, vel, rend] = group.get(entity);
 
     // ...
 }
