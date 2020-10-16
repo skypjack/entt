@@ -349,10 +349,6 @@ public:
      * The returned iterator points to the first entity of the view. If the view
      * is empty, the returned iterator will be equal to `end()`.
      *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
-     *
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const {
@@ -366,10 +362,6 @@ public:
      * the view. Attempting to dereference the returned iterator results in
      * undefined behavior.
      *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
-     *
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const {
@@ -381,10 +373,6 @@ public:
      *
      * The returned iterator points to the first entity of the reversed view. If
      * the view is empty, the returned iterator will be equal to `rend()`.
-     *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
      *
      * @return An iterator to the first entity of the reversed view.
      */
@@ -399,10 +387,6 @@ public:
      * The returned iterator points to the entity following the last entity of
      * the reversed view. Attempting to dereference the returned iterator
      * results in undefined behavior.
-     *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
      *
      * @return An iterator to the entity following the last entity of the
      * reversed view.

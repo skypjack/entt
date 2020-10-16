@@ -21,6 +21,7 @@
 #include "entity/storage.hpp"
 #include "entity/utility.hpp"
 #include "entity/view.hpp"
+#include "entity/view_pack.hpp"
 #include "locator/locator.hpp"
 #include "meta/container.hpp"
 #include "meta/ctx.hpp"
