@@ -244,7 +244,7 @@ public:
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(value, std::get<Other>(pack).get(entity)...))>) {
                     std::apply(func, std::tuple_cat(value, std::get<Other>(pack).get(entity)...));
                 } else {
-                    const auto args = std::apply([](const auto entity, auto &&... component) { return std::forward_as_tuple(component...); }, value);
+                    const auto args = std::apply([](const auto, auto &&... component) { return std::forward_as_tuple(component...); }, value);
                     std::apply(func, std::tuple_cat(args, std::get<Other>(pack).get(entity)...));
                 }
             }
