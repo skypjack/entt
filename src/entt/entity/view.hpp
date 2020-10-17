@@ -275,10 +275,10 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
                 if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->contains(entt)) && ...)
                         && (sizeof...(Exclude) == 0 || std::none_of(filter.cbegin(), filter.cend(), [entt](const basic_sparse_set<Entity> *cpool) { return cpool->contains(entt); })))
                 {
-                    if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
-                        func(get<Comp, Type>(it, std::get<pool_type<Type> *>(pools), entt)...);
-                    } else {
+                    if constexpr(std::is_invocable_v<Func, entity_type, decltype(get<Type>({}))...>) {
                         func(entt, get<Comp, Type>(it, std::get<pool_type<Type> *>(pools), entt)...);
+                    } else {
+                        func(get<Comp, Type>(it, std::get<pool_type<Type> *>(pools), entt)...);
                     }
                 }
 
@@ -289,10 +289,10 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
                 if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->contains(entt)) && ...)
                         && (sizeof...(Exclude) == 0 || std::none_of(filter.cbegin(), filter.cend(), [entt](const basic_sparse_set<Entity> *cpool) { return cpool->contains(entt); })))
                 {
-                    if constexpr(std::is_invocable_v<Func, decltype(get<Type>({}))...>) {
-                        func(std::get<pool_type<Type> *>(pools)->get(entt)...);
-                    } else {
+                    if constexpr(std::is_invocable_v<Func, entity_type, decltype(get<Type>({}))...>) {
                         func(entt, std::get<pool_type<Type> *>(pools)->get(entt)...);
+                    } else {
+                        func(std::get<pool_type<Type> *>(pools)->get(entt)...);
                     }
                 }
             }
@@ -952,25 +952,25 @@ public:
     template<typename Func>
     void each(Func func) const {
         if constexpr(is_eto_eligible_v<Component>) {
-            if constexpr(std::is_invocable_v<Func>) {
-                for(auto pos = pool->size(); pos; --pos) {
-                    func();
-                }
-            } else {
+            if constexpr(std::is_invocable_v<Func, entity_type>) {
                 for(const auto entt: *this) {
                     func(entt);
                 }
+            } else {
+                for(auto pos = pool->size(); pos; --pos) {
+                    func();
+                }
             }
         } else {
-            if constexpr(std::is_invocable_v<Func, std::add_lvalue_reference_t<Component>>) {
-                for(auto &&component: *pool) {
-                    func(component);
-                }
-            } else {
+            if constexpr(std::is_invocable_v<Func, entity_type, std::add_lvalue_reference_t<Component>>) {
                 auto raw = pool->begin();
 
                 for(const auto entt: *this) {
                     func(entt, *(raw++));
+                }
+            } else {
+                for(auto &&component: *pool) {
+                    func(component);
                 }
             }
         }
