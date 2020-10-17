@@ -5,6 +5,7 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include "../core/type_traits.hpp"
 #include "fwd.hpp"
 #include "utility.hpp"
 
@@ -18,8 +19,9 @@ namespace entt {
  * The view pack allows users to combine multiple views into a single iterable
  * object, while also giving them full control over which view should lead the
  * iteration.<br/>
- * Its intended primary use is for custom storage and views, but it can also be
- * very convenient in everyday use.
+ * This class returns all and only the entities present in all views. Its
+ * intended primary use is for custom storage and views, but it can also be very
+ * convenient in everyday use.
  *
  * @tparam View Type of the leading view of the pack.
  * @tparam Other Types of all other views of the pack.
@@ -235,11 +237,16 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        for(auto value: std::get<View>(pack).each()) {
+        for(const auto value: std::get<View>(pack).each()) {
             const auto entity = std::get<0>(value);
 
             if((std::get<Other>(pack).contains(entity) && ...)) {
-                std::apply(func, std::tuple_cat(value, std::get<Other>(pack).get(entity)...));
+                if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(value, std::get<Other>(pack).get(entity)...))>) {
+                    std::apply(func, std::tuple_cat(value, std::get<Other>(pack).get(entity)...));
+                } else {
+                    const auto args = std::apply([](const auto entity, auto &&... component) { return std::forward_as_tuple(component...); }, value);
+                    std::apply(func, std::tuple_cat(args, std::get<Other>(pack).get(entity)...));
+                }
             }
         }
     }

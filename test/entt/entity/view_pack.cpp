@@ -70,6 +70,11 @@ TEST(ViewPack, ShortestPool) {
         ASSERT_EQ(&iv, registry.try_get<int>(entt));
     });
 
+    pack.each([](auto &&cv, auto &&iv) {
+        static_assert(std::is_same_v<decltype(cv), char &>);
+        static_assert(std::is_same_v<decltype(iv), const int &>);
+    });
+
     auto eit = pack.each().begin();
 
     ASSERT_EQ(std::get<0>(*eit++), entities[1u]);
@@ -128,6 +133,11 @@ TEST(ViewPack, LongestPool) {
         ASSERT_EQ(entt::to_integral(entt), next--);
         ASSERT_EQ(&iv, registry.try_get<int>(entt));
         ASSERT_EQ(&cv, registry.try_get<char>(entt));
+    });
+
+    pack.each([](auto &&iv, auto &&cv) {
+        static_assert(std::is_same_v<decltype(iv), int &>);
+        static_assert(std::is_same_v<decltype(cv), const char &>);
     });
 
     auto eit = pack.each().begin();
