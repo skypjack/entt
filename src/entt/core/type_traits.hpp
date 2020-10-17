@@ -253,6 +253,56 @@ template<class Type>
 inline constexpr auto is_equality_comparable_v = is_equality_comparable<Type>::value;
 
 
+/*! @brief Same as std::is_invocable, but with tuples. */
+template<typename, typename>
+struct is_applicable: std::false_type {};
+
+
+/**
+ * @copybrief is_applicable
+ * @tparam Func A valid function type.
+ * @tparam Args The list of arguments to use to probe the function type.
+ */
+template<typename Func, typename... Args>
+struct is_applicable<Func, std::tuple<Args...>>: std::is_invocable<Func, Args...> {};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Func A valid function type.
+ * @tparam Args The list of arguments to use to probe the function type.
+ */
+template<typename Func, typename Args>
+inline constexpr auto is_applicable_v = is_applicable<Func, Args>::value;
+
+
+/*! @brief Same as std::is_invocable_r, but with tuples for arguments. */
+template<typename, typename, typename>
+struct is_applicable_r: std::false_type {};
+
+
+/**
+ * @copybrief is_applicable_r
+ * @tparam Ret The type to which the return type of the function should be
+ * convertible.
+ * @tparam Func A valid function type.
+ * @tparam Args The list of arguments to use to probe the function type.
+ */
+template<typename Ret, typename Func, typename... Args>
+struct is_applicable_r<Ret, Func, std::tuple<Args...>>: std::is_invocable_r<Ret, Func, Args...> {};
+
+
+/**
+ * @brief Helper variable template.
+ * @tparam Ret The type to which the return type of the function should be
+ * convertible.
+ * @tparam Func A valid function type.
+ * @tparam Args The list of arguments to use to probe the function type.
+ */
+template<typename Ret, typename Func, typename Args>
+inline constexpr auto is_applicable_r_v = is_applicable_r<Ret, Func, Args>::value;
+
+
 /**
  * @brief Provides the member constant `value` to true if a given type is empty
  * and the empty type optimization is enabled, false otherwise.

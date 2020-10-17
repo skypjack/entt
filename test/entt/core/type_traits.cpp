@@ -1,9 +1,5 @@
-#include <array>
-#include <map>
-#include <memory>
-#include <set>
+#include <tuple>
 #include <type_traits>
-#include <vector>
 #include <gtest/gtest.h>
 #include <entt/config/config.h>
 #include <entt/core/hashed_string.hpp>
@@ -63,6 +59,15 @@ TEST(TypeTraits, TypeList) {
 TEST(TypeTraits, IsEqualityComparable) {
     static_assert(entt::is_equality_comparable_v<int>);
     static_assert(!entt::is_equality_comparable_v<void>);
+}
+
+TEST(TypeTraits, IsApplicable) {
+    static_assert(entt::is_applicable_v<void(int, char), std::tuple<double, char>>);
+    static_assert(!entt::is_applicable_v<void(int, char), std::tuple<int>>);
+
+    static_assert(entt::is_applicable_r_v<float, int(int, char), std::tuple<double, char>>);
+    static_assert(!entt::is_applicable_r_v<float, void(int, char), std::tuple<double, char>>);
+    static_assert(!entt::is_applicable_r_v<int, int(int, char), std::tuple<void>>);
 }
 
 TEST(TypeTraits, MemberClass) {
