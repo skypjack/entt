@@ -165,10 +165,10 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
     template<typename Func, typename... Weak>
     void traverse(Func func, type_list<Weak...>) const {
         for(const auto entt: *handler) {
-            if constexpr(std::is_invocable_v<Func, decltype(get<Weak>({}))...>) {
-                func(std::get<pool_type<Weak> *>(pools)->get(entt)...);
-            } else {
+            if constexpr(std::is_invocable_v<Func, entity_type, decltype(get<Weak>({}))...>) {
                 func(entt, std::get<pool_type<Weak> *>(pools)->get(entt)...);
+            } else {
+                func(std::get<pool_type<Weak> *>(pools)->get(entt)...);
             }
         }
     }
@@ -743,16 +743,14 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
         [[maybe_unused]] auto data = std::get<0>(pools)->basic_sparse_set<entity_type>::end() - *length;
 
         for(auto next = *length; next; --next) {
-            if constexpr(std::is_invocable_v<Func, decltype(get<Strong>({}))..., decltype(get<Weak>({}))...>) {
-                if constexpr(sizeof...(Weak) == 0) {
-                    func(*(std::get<component_iterator<Strong>>(it)++)...);
-                } else {
-                    const auto entt = *(data++);
-                    func(*(std::get<component_iterator<Strong>>(it)++)..., std::get<pool_type<Weak> *>(pools)->get(entt)...);
-                }
-            } else {
+            if constexpr(std::is_invocable_v<Func, entity_type, decltype(get<Strong>({}))..., decltype(get<Weak>({}))...>) {
                 const auto entt = *(data++);
                 func(entt, *(std::get<component_iterator<Strong>>(it)++)..., std::get<pool_type<Weak> *>(pools)->get(entt)...);
+            } else if constexpr(sizeof...(Weak) == 0) {
+                func(*(std::get<component_iterator<Strong>>(it)++)...);
+            } else {
+                const auto entt = *(data++);
+                func(*(std::get<component_iterator<Strong>>(it)++)..., std::get<pool_type<Weak> *>(pools)->get(entt)...);
             }
         }
     }
