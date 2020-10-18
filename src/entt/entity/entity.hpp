@@ -111,7 +111,7 @@ struct null_t {
      * @brief Compares two null objects.
      * @return True in all cases.
      */
-    [[nodiscard]] constexpr bool operator==(null_t) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator==(const null_t &) const ENTT_NOEXCEPT {
         return true;
     }
 
@@ -119,7 +119,7 @@ struct null_t {
      * @brief Compares two null objects.
      * @return False in all cases.
      */
-    [[nodiscard]] constexpr bool operator!=(null_t) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator!=(const null_t &) const ENTT_NOEXCEPT {
         return false;
     }
 
@@ -130,7 +130,7 @@ struct null_t {
      * @return False if the two elements differ, true otherwise.
      */
     template<typename Entity>
-    [[nodiscard]] constexpr bool operator==(const Entity entity) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator==(const Entity &entity) const ENTT_NOEXCEPT {
         return (to_integral(entity) & entt_traits<Entity>::entity_mask) == to_integral(static_cast<Entity>(*this));
     }
 
@@ -141,7 +141,7 @@ struct null_t {
      * @return True if the two elements differ, false otherwise.
      */
     template<typename Entity>
-    [[nodiscard]] constexpr bool operator!=(const Entity entity) const ENTT_NOEXCEPT {
+    [[nodiscard]] constexpr bool operator!=(const Entity &entity) const ENTT_NOEXCEPT {
         return !(entity == *this);
     }
 };
@@ -155,7 +155,7 @@ struct null_t {
  * @return False if the two elements differ, true otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator==(const Entity entity, null_t other) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator==(const Entity &entity, const null_t &other) ENTT_NOEXCEPT {
     return other.operator==(entity);
 }
 
@@ -168,7 +168,7 @@ template<typename Entity>
  * @return True if the two elements differ, false otherwise.
  */
 template<typename Entity>
-[[nodiscard]] constexpr bool operator!=(const Entity entity, null_t other) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr bool operator!=(const Entity &entity, const null_t &other) ENTT_NOEXCEPT {
     return !(other == entity);
 }
 
