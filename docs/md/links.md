@@ -55,6 +55,9 @@ I hope this list can grow much more in the future:
   * [3DGame](https://github.com/kwarkGorny/3DGame): 2.5D top-down space shooter.
   * [Antkeeper](https://github.com/antkeeper/antkeeper-source): an ant colony
     simulation [game](https://antkeeper.com/).
+  * [TiltedOnline](https://github.com/tiltedphoques/TiltedOnline) by
+    [Tilted Phoques](https://github.com/tiltedphoques): Skyrim and Fallout 4 mod
+    to play online.
 
 * Engines and the like:
   * [Fling Engine](https://github.com/flingengine/FlingEngine): a Vulkan game
@@ -83,9 +86,6 @@ I hope this list can grow much more in the future:
     CRYENGINE games.
   * [LM-Engine](https://github.com/Lawrencemm/LM-Engine): the Vim of game
     engines.
-  * [TiltedOnline](https://github.com/tiltedphoques/TiltedOnline) by
-    [Tilted Phoques](https://github.com/tiltedphoques): Skyrim Together, a mod
-    intended to sync the player and the world state accross multiple clients.
   * [Edyn](https://github.com/xissburg/edyn): a real-time physics engine
     organized as an ECS.
   * [Silvanus](https://github.com/hobbyistmaker/silvanus): Silvanus Fusion 360
