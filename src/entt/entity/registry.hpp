@@ -694,12 +694,14 @@ public:
      * component.
      *
      * @tparam Component Types of components to remove.
+     * @tparam Args Types of arguments to forward to the storage classes.
      * @param entity A valid entity identifier.
+     * @param args Optional parameters to forward to the storage classes.
      */
-    template<typename... Component>
-    void remove(const entity_type entity) {
+    template<typename... Component, typename... Args>
+    void remove(const entity_type entity, Args &&... args) {
         ENTT_ASSERT(valid(entity));
-        (assure<Component>().remove(*this, entity), ...);
+        (assure<Component>().remove(*this, entity, std::forward<Args>(args)...), ...);
     }
 
     /**
