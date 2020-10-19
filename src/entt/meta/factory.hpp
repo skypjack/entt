@@ -29,15 +29,16 @@ namespace entt {
 namespace internal {
 
 
-template<typename, bool = false>
+template<typename, bool, bool>
 struct meta_function_helper;
 
 
-template<typename Ret, typename... Args, bool Const>
-struct meta_function_helper<Ret(Args...), Const> {
+template<typename Ret, typename... Args, bool Const, bool Static>
+struct meta_function_helper<Ret(Args...), Const, Static> {
     using return_type = std::remove_cv_t<std::remove_reference_t<Ret>>;
     using args_type = std::tuple<std::remove_cv_t<std::remove_reference_t<Args>>...>;
 
+    static constexpr auto is_static = Static;
     static constexpr auto is_const = Const;
 
     [[nodiscard]] static auto arg(typename internal::meta_func_node::size_type index) ENTT_NOEXCEPT {
@@ -46,26 +47,27 @@ struct meta_function_helper<Ret(Args...), Const> {
 };
 
 
-template<typename Ret, typename... Args, typename Class>
-constexpr meta_function_helper<Ret(Args...), true>
+template<typename Type, typename Ret, typename... Args, typename Class>
+constexpr meta_function_helper<std::conditional_t<std::is_same_v<Type, Class>, Ret(Args...), Ret(std::add_lvalue_reference_t<Class>, Args...)>, true, !std::is_same_v<Type, Class>>
 to_meta_function_helper(Ret(Class:: *)(Args...) const);
 
 
-template<typename Ret, typename... Args, typename Class>
-constexpr meta_function_helper<Ret(Args...)>
+template<typename Type, typename Ret, typename... Args, typename Class>
+constexpr meta_function_helper<std::conditional_t<std::is_same_v<Type, Class>, Ret(Args...), Ret(std::add_lvalue_reference_t<Class>, Args...)>, false, !std::is_same_v<Type, Class>>
 to_meta_function_helper(Ret(Class:: *)(Args...));
 
 
-template<typename Ret, typename... Args>
-constexpr meta_function_helper<Ret(Args...)>
+template<typename Type, typename Ret, typename... Args>
+constexpr meta_function_helper<Ret(Args...), false, true>
 to_meta_function_helper(Ret(*)(Args...));
 
 
+template<typename Type>
 constexpr void to_meta_function_helper(...);
 
 
-template<typename Candidate>
-using meta_function_helper_t = decltype(to_meta_function_helper(std::declval<Candidate>()));
+template<typename Type, typename Candidate>
+using meta_function_helper_t = decltype(to_meta_function_helper<Type>(std::declval<Candidate>()));
 
 
 template<typename Type, typename... Args, std::size_t... Indexes>
@@ -82,7 +84,7 @@ template<typename Type, auto Data>
     bool accepted = false;
 
     if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Data)>>> || std::is_member_function_pointer_v<decltype(Data)>) {
-        using helper_type = meta_function_helper_t<decltype(Data)>;
+        using helper_type = meta_function_helper_t<Type, decltype(Data)>;
         using data_type = std::tuple_element_t<!std::is_member_function_pointer_v<decltype(Data)>, typename helper_type::args_type>;
 
         if(auto * const clazz = instance->try_cast<Type>(); clazz) {
@@ -154,7 +156,7 @@ template<typename Type, auto Data, typename Policy>
 
 template<typename Type, auto Candidate, typename Policy, std::size_t... Indexes>
 [[nodiscard]] meta_any invoke([[maybe_unused]] meta_handle instance, meta_any *args, std::index_sequence<Indexes...>) {
-    using helper_type = meta_function_helper_t<decltype(Candidate)>;
+    using helper_type = meta_function_helper_t<Type, decltype(Candidate)>;
 
     auto dispatch = [](auto *... params) {
         if constexpr(std::is_void_v<typename helper_type::return_type> || std::is_same_v<Policy, as_void_t>) {
@@ -178,11 +180,11 @@ template<typename Type, auto Candidate, typename Policy, std::size_t... Indexes>
         return value;
     }(args+Indexes, (args+Indexes)->try_cast<std::tuple_element_t<Indexes, typename helper_type::args_type>>())...);
 
-    if constexpr(std::is_function_v<std::remove_reference_t<std::remove_pointer_t<decltype(Candidate)>>>) {
-        return (std::get<Indexes>(direct) && ...) ? dispatch(std::get<Indexes>(direct)...) : meta_any{};
-    } else {
+    if constexpr(std::is_invocable_v<decltype(Candidate), std::add_lvalue_reference_t<Type>, std::tuple_element_t<Indexes, typename helper_type::args_type>...>) {
         auto * const clazz = instance->try_cast<Type>();
         return (clazz && (std::get<Indexes>(direct) && ...)) ? dispatch(clazz, std::get<Indexes>(direct)...) : meta_any{};
+    } else {
+        return (std::get<Indexes>(direct) && ...) ? dispatch(std::get<Indexes>(direct)...) : meta_any{};
     }
 }
 
@@ -454,19 +456,19 @@ public:
     /**
      * @brief Assigns a meta constructor to a meta type.
      *
-     * Free functions can be assigned to meta types in the role of constructors.
-     * All that is required is that they return an instance of the underlying
-     * type.<br/>
+     * Both member functions and free function can be assigned to meta types in
+     * the role of constructors. All that is required is that they return an
+     * instance of the underlying type.<br/>
      * From a client's point of view, nothing changes if a constructor of a meta
-     * type is a built-in one or a free function.
+     * type is a built-in one or not.
      *
-     * @tparam Func The actual function to use as a constructor.
+     * @tparam Candidate The actual function to use as a constructor.
      * @tparam Policy Optional policy (no policy set by default).
      * @return An extended meta factory for the parent type.
      */
-    template<auto Func, typename Policy = as_is_t>
+    template<auto Candidate, typename Policy = as_is_t>
     auto ctor() ENTT_NOEXCEPT {
-        using helper_type = internal::meta_function_helper_t<decltype(Func)>;
+        using helper_type = internal::meta_function_helper_t<Type, decltype(Candidate)>;
         static_assert(std::is_same_v<typename helper_type::return_type, Type>, "The function doesn't return an object of the required type");
         auto * const type = internal::meta_info<Type>::resolve();
 
@@ -477,7 +479,7 @@ public:
             std::tuple_size_v<typename helper_type::args_type>,
             &helper_type::arg,
             [](meta_any * const any) {
-                return internal::invoke<Type, Func, Policy>({}, any, std::make_index_sequence<std::tuple_size_v<typename helper_type::args_type>>{});
+                return internal::invoke<Type, Candidate, Policy>({}, any, std::make_index_sequence<std::tuple_size_v<typename helper_type::args_type>>{});
             }
         };
 
@@ -485,7 +487,7 @@ public:
         node.next = type->ctor;
         type->ctor = &node;
 
-        return meta_factory<Type, std::integral_constant<decltype(Func), Func>>{&node.prop};
+        return meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
     }
 
     /**
@@ -500,7 +502,7 @@ public:
      */
     template<typename... Args>
     auto ctor() ENTT_NOEXCEPT {
-        using helper_type = internal::meta_function_helper_t<Type(*)(Args...)>;
+        using helper_type = internal::meta_function_helper_t<Type, Type(*)(Args...)>;
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_ctor_node node{
@@ -667,7 +669,7 @@ public:
      */
     template<auto Candidate, typename Policy = as_is_t>
     auto func(const id_type id) ENTT_NOEXCEPT {
-        using helper_type = internal::meta_function_helper_t<decltype(Candidate)>;
+        using helper_type = internal::meta_function_helper_t<Type, decltype(Candidate)>;
         auto * const type = internal::meta_info<Type>::resolve();
 
         static internal::meta_func_node node{
@@ -677,7 +679,7 @@ public:
             nullptr,
             std::tuple_size_v<typename helper_type::args_type>,
             helper_type::is_const,
-            !std::is_member_function_pointer_v<decltype(Candidate)>,
+            helper_type::is_static,
             &internal::meta_info<std::conditional_t<std::is_same_v<Policy, as_void_t>, void, typename helper_type::return_type>>::resolve,
             &helper_type::arg,
             [](meta_handle instance, meta_any *args) {

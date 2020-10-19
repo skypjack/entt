@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/utility.hpp>
+#include <entt/entity/registry.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
@@ -65,6 +66,7 @@ struct MetaFunc: ::testing::Test {
         entt::meta<derived_t>().base<base_t>().dtor<&derived_t::destroy>();
 
         entt::meta<func_t>().type("func"_hs)
+            .func<&entt::registry::emplace_or_replace<func_t>, entt::as_ref_t>("emplace"_hs)
             .func<entt::overload<int(const base_t &, int, int)>(&func_t::f)>("f3"_hs)
             .func<entt::overload<int(int, int)>(&func_t::f)>("f2"_hs).prop(true, false)
             .func<entt::overload<int(int) const>(&func_t::f)>("f1"_hs).prop(true, false)
@@ -327,4 +329,28 @@ TEST_F(MetaFunc, FromBase) {
     type.func("func"_hs).invoke(instance, 42);
 
     ASSERT_EQ(instance.value, 42);
+}
+
+TEST_F(MetaFunc, ExternalMemberFunction) {
+    auto func = entt::resolve<func_t>().func("emplace"_hs);
+
+    ASSERT_TRUE(func);
+    ASSERT_EQ(func.parent(), entt::resolve("func"_hs));
+    ASSERT_EQ(func.id(), "emplace"_hs);
+    ASSERT_EQ(func.size(), 2u);
+    ASSERT_FALSE(func.is_const());
+    ASSERT_TRUE(func.is_static());
+    ASSERT_EQ(func.ret(), entt::resolve<void>());
+    ASSERT_EQ(func.arg(0u), entt::resolve<entt::registry>());
+    ASSERT_EQ(func.arg(1u), entt::resolve<entt::entity>());
+    ASSERT_FALSE(func.arg(2u));
+
+    entt::registry registry;
+    const auto entity = registry.create();
+    
+    ASSERT_FALSE(registry.has<func_t>(entity));
+    
+    func.invoke({}, std::ref(registry), entity);
+    
+    ASSERT_TRUE(registry.has<func_t>(entity));
 }
