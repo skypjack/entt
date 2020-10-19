@@ -168,8 +168,9 @@ TEST_F(MetaCtor, ExternalMemberFunction) {
 
     ASSERT_FALSE(registry.has<clazz_t>(entity));
 
-    ctor.invoke(std::ref(registry), entity, 3, 'c');
+    const auto any = ctor.invoke(std::ref(registry), entity, 3, 'c');
 
+    ASSERT_TRUE(any);
     ASSERT_TRUE(registry.has<clazz_t>(entity));
     ASSERT_EQ(registry.get<clazz_t>(entity).i, 3);
     ASSERT_EQ(registry.get<clazz_t>(entity).c, 'c');
