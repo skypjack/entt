@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/core/utility.hpp>
+#include <entt/entity/registry.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
@@ -35,6 +36,7 @@ struct MetaCtor: ::testing::Test {
         entt::meta<derived_t>().base<base_t>();
 
         entt::meta<clazz_t>().type("clazz"_hs)
+            .ctor<&entt::registry::emplace_or_replace<clazz_t, const int &, const char &>, entt::as_ref_t>()
             .ctor<const base_t &, int>()
             .ctor<const int &, char>().prop(3, false)
             .ctor<entt::overload<clazz_t(int)>(&clazz_t::factory)>().prop('c', 42)
@@ -147,4 +149,28 @@ TEST_F(MetaCtor, FuncCastAndConvert) {
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 9);
     ASSERT_EQ(any.cast<clazz_t>().c, 'c');
+}
+
+TEST_F(MetaCtor, ExternalMemberFunction) {
+    auto ctor = entt::resolve<clazz_t>().ctor<entt::registry &, entt::entity, const int &, const char &>();
+
+    ASSERT_TRUE(ctor);
+    ASSERT_EQ(ctor.parent(), entt::resolve("clazz"_hs));
+    ASSERT_EQ(ctor.size(), 4u);
+    ASSERT_EQ(ctor.arg(0u), entt::resolve<entt::registry>());
+    ASSERT_EQ(ctor.arg(1u), entt::resolve<entt::entity>());
+    ASSERT_EQ(ctor.arg(2u), entt::resolve<int>());
+    ASSERT_EQ(ctor.arg(3u), entt::resolve<char>());
+    ASSERT_FALSE(ctor.arg(4u));
+
+    entt::registry registry;
+    const auto entity = registry.create();
+
+    ASSERT_FALSE(registry.has<clazz_t>(entity));
+
+    ctor.invoke(std::ref(registry), entity, 3, 'c');
+
+    ASSERT_TRUE(registry.has<clazz_t>(entity));
+    ASSERT_EQ(registry.get<clazz_t>(entity).i, 3);
+    ASSERT_EQ(registry.get<clazz_t>(entity).c, 'c');
 }
