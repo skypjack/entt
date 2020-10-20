@@ -58,10 +58,13 @@ struct storage_adapter: basic_storage<Entity, Type> {
 
     /**
      * @brief Removes entities from a pool.
+     * @tparam Args Types of arguments to forward to the underlying storage.
      * @param entity A valid entity identifier.
+     * @param args Optional parameters to forward to the underlying storage.
      */
-    void remove(basic_registry<entity_type> &, const entity_type entity) {
-        basic_storage<entity_type, value_type>::erase(entity);
+    template<typename... Args>
+    void remove(basic_registry<entity_type> &, const entity_type entity, Args &&... args) {
+        basic_storage<entity_type, value_type>::erase(entity, std::forward<Args>(args)...);
     }
 
     /**
