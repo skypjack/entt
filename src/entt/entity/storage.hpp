@@ -434,6 +434,17 @@ public:
     }
 
     /**
+     * @brief Removes multiple entities from a storage.
+     * @tparam It Type of input iterator.
+     * @param first An iterator to the first element of the range of entities.
+     * @param last An iterator past the last element of the range of entities.
+     */
+    template<typename It>
+    void erase(It first, It last) {
+        underlying_type::erase(first, last);
+    }
+
+    /**
      * @brief Swaps entities and objects in the internal packed arrays.
      *
      * @warning
