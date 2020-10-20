@@ -16,18 +16,17 @@ namespace entt {
 
 
 /**
- * @brief Default pool implementation.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Type Type of objects assigned to the entities.
+ * @brief Mixin type to use to wrap basic storage classes.
+ * @tparam Storage The type of the underlying storage.
  */
-template<typename Entity, typename Type>
-struct storage_adapter: basic_storage<Entity, Type> {
-    static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Invalid object type");
+template<typename Storage>
+struct storage_adapter: Storage {
+    static_assert(std::is_same_v<typename Storage::value_type, std::decay_t<typename Storage::value_type>>, "Invalid object type");
 
     /*! @brief Type of the objects associated with the entities. */
-    using value_type = Type;
+    using value_type = typename Storage::value_type;
     /*! @brief Underlying entity identifier. */
-    using entity_type = Entity;
+    using entity_type = typename Storage::entity_type;
 
     /**
      * @brief Assigns entities to a pool.
@@ -38,7 +37,7 @@ struct storage_adapter: basic_storage<Entity, Type> {
      */
     template<typename... Args>
     decltype(auto) emplace(basic_registry<entity_type> &, const entity_type entity, Args &&... args) {
-        return basic_storage<entity_type, Type>::emplace(entity, std::forward<Args>(args)...);
+        return Storage::emplace(entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -53,7 +52,7 @@ struct storage_adapter: basic_storage<Entity, Type> {
      */
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &, It first, It last, Args &&... args) {
-        basic_storage<entity_type, value_type>::insert(first, last, std::forward<Args>(args)...);
+        Storage::insert(first, last, std::forward<Args>(args)...);
     }
 
     /**
@@ -64,18 +63,18 @@ struct storage_adapter: basic_storage<Entity, Type> {
      */
     template<typename... Args>
     void remove(basic_registry<entity_type> &, const entity_type entity, Args &&... args) {
-        basic_storage<entity_type, value_type>::erase(entity, std::forward<Args>(args)...);
+        Storage::erase(entity, std::forward<Args>(args)...);
     }
 
     /**
-     * @copybrief erase
+     * @copybrief remove
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
     void remove(basic_registry<entity_type> &, It first, It last) {
-        basic_sparse_set<entity_type>::erase(first, last);
+        Storage::erase(first, last);
     }
 
     /**
@@ -211,7 +210,7 @@ struct sigh_pool_mixin: Pool {
     }
 
     /**
-     * @copybrief storage_adapter::erase
+     * @copybrief storage_adapter::remove
      * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
      */
@@ -221,7 +220,7 @@ struct sigh_pool_mixin: Pool {
     }
 
     /**
-     * @copybrief storage_adapter::erase
+     * @copybrief storage_adapter::remove
      * @tparam It Type of input iterator.
      * @param owner The registry that issued the request.
      * @param first An iterator to the first element of the range of entities.
@@ -281,7 +280,7 @@ private:
 template<typename Entity, typename Type, typename = void>
 struct pool {
     /*! @brief Resulting type after component-to-pool conversion. */
-    using type = sigh_pool_mixin<storage_adapter<Entity, Type>>;
+    using type = sigh_pool_mixin<storage_adapter<basic_storage<Entity, Type>>>;
 };
 
 
