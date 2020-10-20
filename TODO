@@ -10,8 +10,7 @@
 
 WIP:
 * HP: write documentation for custom storages and views!!
-* view pack: doc and plain function as an alias for operator|
-* reverse iterators, rbegin and rend for the view pack
+* view pack: plain function as an alias for operator|, reverse iterators, rbegin and rend
 * use extended get to remove is_eto_eligible checks from views and groups
 * pagination doesn't work nicely across boundaries probably, give it a look. RO operations are fine, adding components maybe not.
 * make it easier to hook into the type system and describe how to do that to eg auto-generate meta types on first use
@@ -26,6 +25,3 @@ WIP:
 * add meta dynamic cast (search base for T in parent, we have the meta type already)
 * make meta base/conv node work with storage/any
 * deprecate/remove meta_base, meta_conv, ...
-* multi-type storage
-* return opaque type info object during a visit (id, name, and so on)
-* system executor
