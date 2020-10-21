@@ -131,6 +131,7 @@ I hope this list can grow much more in the future:
     - [Properties Panel](https://www.youtube.com/watch?v=NBpB0qscF3E).
     - [Camera Component UI](https://www.youtube.com/watch?v=RIMt_6agUiU).
     - [Drawing Component UI](https://www.youtube.com/watch?v=u3yq8s3KuSE).
+    - [Transform Component UI](https://www.youtube.com/watch?v=8JqcXYbzPJc).
   * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect):
     project retrospect by [Eric Hildebrand](https://www.erichildebrand.net/).
 
