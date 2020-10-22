@@ -28,6 +28,7 @@ add_custom_target(
         md/references.md
         md/resource.md
         md/signal.md
+        md/unreal.md
         doxy.in
 )
 
