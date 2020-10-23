@@ -133,7 +133,8 @@ I hope this list can grow much more in the future:
     - [Drawing Component UI](https://www.youtube.com/watch?v=u3yq8s3KuSE).
     - [Transform Component UI](https://www.youtube.com/watch?v=8JqcXYbzPJc).
     - [Adding/Removing Entities and Components UI](https://www.youtube.com/watch?v=PsyGmsIgp9M).
-  * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect):
+    - [Saving and Loading Scenes](https://www.youtube.com/watch?v=IEiOP7Y-Mbc).
+  * [Ability Creator](https://www.erichildebrand.net/blog/ability-creator-project-retrospect).
     project retrospect by [Eric Hildebrand](https://www.erichildebrand.net/).
 
 * Any Other Business:
