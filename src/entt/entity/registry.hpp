@@ -889,6 +889,9 @@ public:
      * An assertion will abort the execution at runtime in debug mode in case of
      * invalid entity.
      *
+     * @note
+     * The registry retains ownership of the pointed-to components.
+     *
      * @tparam Component Types of components to get.
      * @param entity A valid entity identifier.
      * @return Pointers to the components owned by the entity.
