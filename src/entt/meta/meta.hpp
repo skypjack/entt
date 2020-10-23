@@ -1368,8 +1368,58 @@ public:
      * @return A meta any containing the returned value, if any.
      */
     meta_any invoke(const id_type id, meta_handle instance, meta_any * const args, const std::size_t sz) const {
-        auto const candidate = func(id);
-        return candidate ? candidate.invoke(std::move(instance), args, sz) : meta_any{};
+        const internal::meta_func_node* best_match{ nullptr };
+        internal::meta_func_node::size_type best_match_casts_required{0};
+
+        for (auto candidate = internal::find_if<&node_type::func>([id](const auto *curr) { return curr->id == id; }, node); candidate && (id == candidate->id); candidate = candidate->next) {
+            if (sz != candidate->size) {
+                continue;
+            }
+
+            node_type::size_type casts_required{ 0 };
+            bool match{ true };
+
+            for (node_type::size_type arg_idx = 0; arg_idx < sz; ++arg_idx) {
+                auto const& candidate_arg_type_info = candidate->arg (arg_idx)->info;
+                auto const arg_type = (args + arg_idx)->type();
+
+				ENTT_ASSERT(bool(candidate_arg_type_info));
+
+                if (candidate_arg_type_info == arg_type.info()) {
+                    continue;
+                }
+
+                if (auto const arg_convs = arg_type.conv();
+                    arg_convs.end () != std::find_if(
+                        arg_convs.begin(),
+                        arg_convs.end(),
+                        [candidate_arg_type_info](auto&& curr) {
+                            return curr.type().info() == candidate_arg_type_info;
+                        })) {
+                    casts_required++;
+                }
+                else {
+                    match = false;
+                    break;
+                }
+
+            }
+
+            if (!match) {
+                continue;
+            }
+
+            if ((0 < best_match_casts_required) && (casts_required == best_match_casts_required)) {
+                return meta_any{};
+            }
+
+            if (!best_match || (casts_required < best_match_casts_required)) {
+                best_match = candidate;
+                best_match_casts_required = casts_required;
+            }
+        }
+
+        return best_match ? best_match->invoke (instance, args) : meta_any{};
     }
 
     /**
