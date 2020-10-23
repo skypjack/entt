@@ -248,6 +248,14 @@ public:
     }
 
     /**
+     * @brief Reserves pools to prevent race conditions.
+     * @param count Number of pools to reserve.
+     */
+    void reservePools(size_t count) {
+        pools.reserve(count);
+    }
+
+    /**
      * @brief Returns the number of existing components of the given type.
      * @tparam Component Type of component of which to return the size.
      * @return Number of existing components of the given type.
