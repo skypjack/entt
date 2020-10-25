@@ -120,8 +120,8 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
             }
 
         private:
-            it_type it{};
-            ref_type pools{};
+            it_type it;
+            ref_type pools;
         };
 
         iterable_group(const basic_sparse_set<Entity> &ref, std::tuple<pool_type<Get> *...> gpools)
@@ -674,9 +674,9 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
             }
 
         private:
-            it_type it{};
-            owned_type owned{};
-            get_type get{};
+            it_type it;
+            owned_type owned;
+            get_type get;
         };
 
         iterable_group(std::tuple<pool_type<Owned> *..., pool_type<Get> *...> cpools, const std::size_t &extent)

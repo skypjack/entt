@@ -9,6 +9,8 @@
 * update documentation for meta, it contains less than half of the actual feature
 
 WIP:
+* split basic_view and view_t like sfinae-friendly class
+* add view-like functionalities to the view_pack
 * HP: write documentation for custom storages and views!!
 * view pack: plain function as an alias for operator|, reverse iterators, rbegin and rend
 * use extended get to remove is_eto_eligible checks from views and groups
