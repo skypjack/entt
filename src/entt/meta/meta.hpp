@@ -1005,14 +1005,14 @@ private:
 /*! @brief Opaque wrapper for meta types. */
 class meta_type {
     bool can_cast_or_convert(const meta_type type, const type_info info) const ENTT_NOEXCEPT {
-        for(auto conv: type.conv()) {
-            if(conv.type().info() == info) {
+        for(auto curr: type.conv()) {
+            if(curr.type().info() == info) {
                 return true;
             }
         }
 
-        for(auto base: type.base()) {
-            if(base.type().info() == info || can_cast_or_convert(base.type(), info)) {
+        for(auto curr: type.base()) {
+            if(curr.type().info() == info || can_cast_or_convert(curr.type(), info)) {
                 return true;
             }
         }
