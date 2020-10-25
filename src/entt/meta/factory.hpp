@@ -675,8 +675,8 @@ public:
         static internal::meta_func_node node{
             {},
             type,
-            nullptr, // parent
-            nullptr, // next
+            nullptr,
+            nullptr,
             std::tuple_size_v<typename helper_type::args_type>,
             helper_type::is_const,
             helper_type::is_static,
@@ -689,24 +689,13 @@ public:
 
         ENTT_ASSERT(!exists(&node, type->func));
 
-        if (exists(id, type->func)) {
-            auto const existing_overload =
-                internal::find_if<&std::decay_t<decltype(*type)>::func>(
-                    [id](const auto* curr) {
-                        return id == curr->id;
-                    }, type);
-
-            ENTT_ASSERT(existing_overload);
-
-            node.next = existing_overload->next;
-            existing_overload->next = &node;
-        }
-        else {
-            node.next = type->func;
-            type->func = &node;
-        }
+        internal::meta_func_node **it = &type->func;
+        for(; *it && (*it)->id != id; it = &(*it)->next);
+        for(; *it && (*it)->id == id && (*it)->size < node.size; it = &(*it)->next);
 
         node.id = id;
+        node.next = *it;
+        *it = &node;
 
         return meta_factory<Type, std::integral_constant<decltype(Candidate), Candidate>>{&node.prop};
     }
