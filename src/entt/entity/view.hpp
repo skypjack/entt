@@ -71,18 +71,14 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
     template<typename Comp>
     using pool_type = pool_t<Entity, Comp>;
 
-    template<typename Comp>
-    using component_iterator = decltype(std::declval<pool_type<Comp>>().begin());
-
     using return_type = type_list_cat_t<std::conditional_t<is_eto_eligible_v<Component>, type_list<>, type_list<Component>>...>;
     using unchecked_type = std::array<const basic_sparse_set<Entity> *, (sizeof...(Component) - 1)>;
-    using filter_type = std::array<const basic_sparse_set<Entity> *, sizeof...(Exclude)>;
 
     template<typename It>
     class view_iterator final {
         friend class basic_view<Entity, exclude_t<Exclude...>, Component...>;
 
-        view_iterator(It from, It to, It curr, unchecked_type other, filter_type ignore) ENTT_NOEXCEPT
+        view_iterator(It from, It to, It curr, unchecked_type other, const std::tuple<const pool_type<Exclude> *...> &ignore) ENTT_NOEXCEPT
             : first{from},
               last{to},
               it{curr},
@@ -95,8 +91,10 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         }
 
         [[nodiscard]] bool valid() const {
-            return std::all_of(unchecked.cbegin(), unchecked.cend(), [entt = *it](const basic_sparse_set<Entity> *curr) { return curr->contains(entt); })
-                    && (sizeof...(Exclude) == 0 || std::none_of(filter.cbegin(), filter.cend(), [entt = *it](const basic_sparse_set<Entity> *cpool) { return cpool->contains(entt); }));
+            const auto entt = *it;
+
+            return std::all_of(unchecked.cbegin(), unchecked.cend(), [entt](const basic_sparse_set<Entity> *curr) { return curr->contains(entt); })
+                && !(std::get<const pool_type<Exclude> *>(filter)->contains(entt) || ...);
         }
 
     public:
@@ -149,30 +147,24 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         It last;
         It it;
         unchecked_type unchecked;
-        filter_type filter;
+        std::tuple<const pool_type<Exclude> *...> filter;
     };
 
     class iterable_view {
         friend class basic_view<Entity, exclude_t<Exclude...>, Component...>;
 
-        using underlying_iterator = view_iterator<typename basic_sparse_set<Entity>::iterator>;
-
+        template<typename It>
         class iterable_view_iterator {
             friend class iterable_view;
 
-            using ref_type = decltype(std::tuple_cat(std::declval<std::conditional_t<is_eto_eligible_v<Component>, std::tuple<>, std::tuple<pool_type<Component> *>>>()...));
-
-            iterable_view_iterator(underlying_iterator from, ref_type ref) ENTT_NOEXCEPT
+            iterable_view_iterator(It from, const basic_view &parent) ENTT_NOEXCEPT
                 : it{from},
-                  pools{ref}
+                  view{parent}
             {}
 
         public:
             using difference_type = std::ptrdiff_t;
-            using value_type = decltype(std::tuple_cat(
-                std::declval<std::tuple<Entity>>(),
-                std::declval<std::conditional_t<is_eto_eligible_v<Component>, std::tuple<>, std::tuple<Component &>>>()...
-            ));
+            using value_type = decltype(std::tuple_cat(std::tuple<typename std::iterator_traits<It>::value_type>{}, std::declval<basic_view>().get({})));
             using pointer = void;
             using reference = value_type;
             using iterator_category = std::input_iterator_tag;
@@ -187,7 +179,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
             }
 
             [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-                return std::apply([entt = *it](auto *... cpool) { return reference{entt, cpool->get(entt)...}; }, pools);
+                return std::tuple_cat(std::make_tuple(*it), view.get(*it));
             }
 
             [[nodiscard]] bool operator==(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
@@ -199,49 +191,42 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
             }
 
         private:
-            underlying_iterator it{};
-            const ref_type pools{};
+            It it;
+            const basic_view view;
         };
 
-        iterable_view(underlying_iterator from, underlying_iterator to, std::tuple<pool_type<Component> *...> ref)
-            : first{from},
-              last{to},
-              pools{ref}
+        iterable_view(const basic_view &parent)
+            : view{parent}
         {}
 
     public:
-        using iterator = iterable_view_iterator;
+        using iterator = iterable_view_iterator<typename basic_view::iterator>;
+        using reverse_iterator = iterable_view_iterator<typename basic_view::reverse_iterator>;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return iterable_view_iterator{first, std::tuple_cat([](auto *cpool) {
-                if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                    return std::tuple{};
-                } else {
-                    return std::make_tuple(cpool);
-                }
-            }(std::get<pool_type<Component> *>(pools))...)};
+            return iterator{view.begin(), view};
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return iterable_view_iterator{last, std::tuple_cat([](auto *cpool) {
-                if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                    return std::tuple{};
-                } else {
-                    return std::make_tuple(cpool);
-                }
-            }(std::get<pool_type<Component> *>(pools))...)};
+            return iterator{view.end(), view};
+        }
+
+        [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
+            return reverse_iterator{view.rbegin(), view};
+        }
+
+        [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
+            return reverse_iterator{view.rend(), view};
         }
 
     private:
-        underlying_iterator first;
-        underlying_iterator last;
-        const std::tuple<pool_type<Component> *...> pools;
+        const basic_view view;
     };
 
-    basic_view(pool_type<Component> &... component, unpack_as_t<const basic_sparse_set<Entity>, Exclude> &... epool) ENTT_NOEXCEPT
+    basic_view(pool_type<Component> &... component, const pool_type<Exclude> &... epool) ENTT_NOEXCEPT
         : pools{&component...},
-          view{candidate()},
-          filter{&epool...}
+          filter{&epool...},
+          view{candidate()}
     {}
 
     [[nodiscard]] const basic_sparse_set<Entity> * candidate() const ENTT_NOEXCEPT {
@@ -257,9 +242,9 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         return other;
     }
 
-    template<typename Comp, typename Other>
-    [[nodiscard]] decltype(auto) get([[maybe_unused]] component_iterator<Comp> &it, [[maybe_unused]] pool_type<Other> *cpool, [[maybe_unused]] const Entity entt) const {
-        if constexpr(std::is_same_v<Comp, Other>) {
+    template<typename It, typename Pool>
+    [[nodiscard]] decltype(auto) get([[maybe_unused]] It &it, [[maybe_unused]] Pool *cpool, [[maybe_unused]] const Entity entt) const {
+        if constexpr(std::is_same_v<typename std::iterator_traits<It>::value_type, typename Pool::value_type>) {
             return *it;
         } else {
             return cpool->get(entt);
@@ -273,12 +258,12 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
 
             for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
                 if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->contains(entt)) && ...)
-                        && (sizeof...(Exclude) == 0 || std::none_of(filter.cbegin(), filter.cend(), [entt](const basic_sparse_set<Entity> *cpool) { return cpool->contains(entt); })))
+                    && !(std::get<const pool_type<Exclude> *>(filter)->contains(entt) || ...))
                 {
                     if constexpr(std::is_invocable_v<Func, entity_type, decltype(get<Type>({}))...>) {
-                        func(entt, get<Comp, Type>(it, std::get<pool_type<Type> *>(pools), entt)...);
+                        func(entt, get(it, std::get<pool_type<Type> *>(pools), entt)...);
                     } else {
-                        func(get<Comp, Type>(it, std::get<pool_type<Type> *>(pools), entt)...);
+                        func(get(it, std::get<pool_type<Type> *>(pools), entt)...);
                     }
                 }
 
@@ -287,7 +272,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         } else {
             for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
                 if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->contains(entt)) && ...)
-                        && (sizeof...(Exclude) == 0 || std::none_of(filter.cbegin(), filter.cend(), [entt](const basic_sparse_set<Entity> *cpool) { return cpool->contains(entt); })))
+                    && !(std::get<const pool_type<Exclude> *>(filter)->contains(entt) || ...))
                 {
                     if constexpr(std::is_invocable_v<Func, entity_type, decltype(get<Type>({}))...>) {
                         func(entt, std::get<pool_type<Type> *>(pools)->get(entt)...);
@@ -306,7 +291,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
 
         while(first != last) {
             if((std::get<pool_type<Component> *>(pools)->contains(*first) && ...)
-                    && (sizeof...(Exclude) == 0 || std::none_of(filter.cbegin(), filter.cend(), [entt = *first](const basic_sparse_set<Entity> *cpool) { return cpool->contains(entt); })))
+                && !(std::get<const pool_type<Exclude> *>(filter)->contains(*first) || ...))
             {
                 const auto base = *(first++);
                 const auto chunk = (std::min)({ (std::get<pool_type<Component> *>(pools)->size() - std::get<pool_type<Component> *>(pools)->index(base))... });
@@ -315,7 +300,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
                 for(++length;
                     length < chunk
                         && ((*(std::get<pool_type<Component> *>(pools)->data() + std::get<pool_type<Component> *>(pools)->index(base) + length) == *first) && ...)
-                        && (sizeof...(Exclude) == 0 || std::none_of(filter.cbegin(), filter.cend(), [entt = *first](const basic_sparse_set<Entity> *cpool) { return cpool->contains(entt); }));
+                        && !(std::get<const pool_type<Exclude> *>(filter)->contains(*first) || ...);
                     ++length, ++first);
 
                 func(view->data() + view->index(base), (std::get<pool_type<Type> *>(pools)->raw() + std::get<pool_type<Type> *>(pools)->index(base))..., length);
@@ -432,8 +417,7 @@ public:
      * @return True if the view contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
-        return (std::get<pool_type<Component> *>(pools)->contains(entt) && ...)
-                && (sizeof...(Exclude) == 0 || std::none_of(filter.begin(), filter.end(), [entt](const auto *cpool) { return cpool->contains(entt); }));
+        return (std::get<pool_type<Component> *>(pools)->contains(entt) && ...) && !(std::get<const pool_type<Exclude> *>(filter)->contains(entt) || ...);
     }
 
     /**
@@ -535,7 +519,7 @@ public:
      * @return An iterable object to use to _visit_ the view.
      */
     [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
-        return iterable_view{begin(), end(), pools};
+        return iterable_view{*this};
     }
 
     /**
@@ -555,7 +539,7 @@ public:
     template<typename Comp>
     [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
         view = std::get<pool_type<Comp> *>(pools);
-        return each();
+        return iterable_view{*this};
     }
 
     /**
@@ -597,8 +581,8 @@ public:
 
 private:
     const std::tuple<pool_type<Component> *...> pools;
+    const std::tuple<const pool_type<Exclude> *...> filter;
     mutable const basic_sparse_set<entity_type>* view;
-    filter_type filter;
 };
 
 
@@ -643,22 +627,17 @@ class basic_view<Entity, exclude_t<>, Component> final {
     class iterable_view {
         friend class basic_view<Entity, exclude_t<>, Component>;
 
+        template<typename It, typename... Other>
         class iterable_view_iterator {
             friend class iterable_view;
 
-            using it_type = std::conditional_t<
-                is_eto_eligible_v<Component>,
-                std::tuple<typename basic_sparse_set<Entity>::iterator>,
-                std::tuple<typename basic_sparse_set<Entity>::iterator, decltype(std::declval<pool_type>().begin())>
-            >;
-
-            iterable_view_iterator(it_type from) ENTT_NOEXCEPT
-                : it{from}
+            iterable_view_iterator(It from, Other... data) ENTT_NOEXCEPT
+                : it{from, data...}
             {}
 
         public:
             using difference_type = std::ptrdiff_t;
-            using value_type = std::conditional_t<is_eto_eligible_v<Component>, std::tuple<Entity>, std::tuple<Entity, Component &>>;
+            using value_type = std::tuple<typename std::iterator_traits<It>::value_type, decltype(*std::declval<Other>())...>;
             using pointer = void;
             using reference = value_type;
             using iterator_category = std::input_iterator_tag;
@@ -677,7 +656,7 @@ class basic_view<Entity, exclude_t<>, Component> final {
             }
 
             [[nodiscard]] bool operator==(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
-                return std::get<0>(other.it) == std::get<0>(it);
+                return std::get<It>(other.it) == std::get<It>(it);
             }
 
             [[nodiscard]] bool operator!=(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
@@ -685,7 +664,7 @@ class basic_view<Entity, exclude_t<>, Component> final {
             }
 
         private:
-            it_type it{};
+            std::tuple<It, Other...> it;
         };
 
         iterable_view(pool_type &ref)
@@ -693,21 +672,46 @@ class basic_view<Entity, exclude_t<>, Component> final {
         {}
 
     public:
-        using iterator = iterable_view_iterator;
+        using iterator = std::conditional_t<
+            is_eto_eligible_v<Component>,
+            iterable_view_iterator<typename basic_view::iterator>,
+            iterable_view_iterator<typename basic_view::iterator, decltype(std::declval<pool_type>().begin())>
+        >;
+        using reverse_iterator = std::conditional_t<
+            is_eto_eligible_v<Component>,
+            iterable_view_iterator<typename basic_view::reverse_iterator>,
+            iterable_view_iterator<typename basic_view::reverse_iterator, decltype(std::declval<pool_type>().rbegin())>
+        >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             if constexpr(is_eto_eligible_v<Component>) {
-                return iterable_view_iterator{std::make_tuple(pool->basic_sparse_set<entity_type>::begin())};
+                return iterator{pool->basic_sparse_set<entity_type>::begin()};
             } else {
-                return iterable_view_iterator{std::make_tuple(pool->basic_sparse_set<entity_type>::begin(), pool->begin())};
+                return iterator{pool->basic_sparse_set<entity_type>::begin(), pool->begin()};
             }
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             if constexpr(is_eto_eligible_v<Component>) {
-                return iterable_view_iterator{std::make_tuple(pool->basic_sparse_set<entity_type>::end())};
+                return iterator{pool->basic_sparse_set<entity_type>::end()};
             } else {
-                return iterable_view_iterator{std::make_tuple(pool->basic_sparse_set<entity_type>::end(), pool->end())};
+                return iterator{pool->basic_sparse_set<entity_type>::end(), pool->end()};
+            }
+        }
+
+        [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
+            if constexpr(is_eto_eligible_v<Component>) {
+                return reverse_iterator{pool->basic_sparse_set<entity_type>::rbegin()};
+            } else {
+                return reverse_iterator{pool->basic_sparse_set<entity_type>::rbegin(), pool->rbegin()};
+            }
+        }
+
+        [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
+            if constexpr(is_eto_eligible_v<Component>) {
+                return reverse_iterator{pool->basic_sparse_set<entity_type>::rend()};
+            } else {
+                return reverse_iterator{pool->basic_sparse_set<entity_type>::rend(), pool->rend()};
             }
         }
 
