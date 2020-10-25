@@ -362,24 +362,19 @@ private:
 template<auto Member, typename Op>
 auto find_if(const Op &op, const meta_type_node *node)
 -> std::decay_t<decltype(node->*Member)> {
-    std::decay_t<decltype(node->*Member)> ret = nullptr;
-
     for(auto &&curr: meta_range{node->*Member}) {
         if(op(&curr)) {
-            ret = &curr;
-            break;
+            return &curr;
         }
     }
 
-    if(!ret) {
-        for(auto &&curr: meta_range{node->base}) {
-            if(ret = find_if<Member>(op, curr.type()); ret) {
-                break;
-            }
+    for(auto &&curr: meta_range{node->base}) {
+        if(auto *ret = find_if<Member>(op, curr.type()); ret) {
+            return ret;
         }
     }
 
-    return ret;
+    return nullptr;
 }
 
 

@@ -735,7 +735,7 @@ struct meta_ctor {
      * @param sz Number of parameters to use to construct the instance.
      * @return A meta any containing the new instance, if any.
      */
-    [[nodiscard]] meta_any invoke(meta_any * const args, const std::size_t sz) const {
+    [[nodiscard]] meta_any invoke(meta_any * const args, const size_type sz) const {
         return sz == size() ? node->invoke(args) : meta_any{};
     }
 
@@ -954,7 +954,7 @@ struct meta_func {
      * @param sz Number of parameters to use to invoke the function.
      * @return A meta any containing the returned value, if any.
      */
-    meta_any invoke(meta_handle instance, meta_any * const args, const std::size_t sz) const {
+    meta_any invoke(meta_handle instance, meta_any * const args, const size_type sz) const {
         return sz == size() ? node->invoke(std::move(instance), args) : meta_any{};
     }
 
@@ -1004,17 +1004,20 @@ private:
 
 /*! @brief Opaque wrapper for meta types. */
 class meta_type {
-    template<typename... Args, std::size_t... Indexes>
-    [[nodiscard]] auto ctor(std::index_sequence<Indexes...>) const {
-        internal::meta_range range{node->ctor};
+    bool can_cast_or_convert(const meta_type type, const type_info info) const ENTT_NOEXCEPT {
+        for(auto conv: type.conv()) {
+            if(conv.type().info() == info) {
+                return true;
+            }
+        }
 
-        return std::find_if(range.begin(), range.end(), [](const auto &candidate) {
-            return candidate.size == sizeof...(Args) && ([](auto *from, auto *to) {
-                return (from->info == to->info)
-                        || internal::find_if<&node_type::base>([to](const auto *curr) { return curr->type()->info == to->info; }, from)
-                        || internal::find_if<&node_type::conv>([to](const auto *curr) { return curr->type()->info == to->info; }, from);
-            }(internal::meta_info<Args>::resolve(), candidate.arg(Indexes)) && ...);
-        }).operator->();
+        for(auto base: type.base()) {
+            if(base.type().info() == info || can_cast_or_convert(base.type(), info)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 public:
@@ -1268,7 +1271,13 @@ public:
      */
     template<typename... Args>
     [[nodiscard]] meta_ctor ctor() const {
-        return ctor<Args...>(std::index_sequence_for<Args...>{});
+        for(const auto &candidate: internal::meta_range{node->ctor}) {
+            if(size_type index{}; candidate.size == sizeof...(Args) && ([this](auto *from, auto *to) { return from->info == to->info || can_cast_or_convert(from, to->info); }(internal::meta_info<Args>::resolve(), candidate.arg(index++)) && ...)) {
+                return &candidate;
+            }
+        }
+
+        return nullptr;
     }
 
     /**
@@ -1304,7 +1313,9 @@ public:
     /**
      * @brief Returns the meta function associated with a given identifier.
      *
-     * The meta functions of the base classes will also be visited, if any.
+     * The meta functions of the base classes will also be visited, if any.<br/>
+     * In the case of overloaded meta functions, the first one with the required
+     * id will be returned.
      *
      * @param id Unique identifier.
      * @return The meta function associated with the given identifier, if any.
@@ -1326,7 +1337,7 @@ public:
      * @param sz Number of parameters to use to construct the instance.
      * @return A meta any containing the new instance, if any.
      */
-    [[nodiscard]] meta_any construct(meta_any * const args, const std::size_t sz) const {
+    [[nodiscard]] meta_any construct(meta_any * const args, const size_type sz) const {
         meta_any any{};
 
         internal::find_if<&node_type::ctor>([args, sz, &any](const auto *curr) {
@@ -1367,59 +1378,33 @@ public:
      * @param sz Number of parameters to use to invoke the function.
      * @return A meta any containing the returned value, if any.
      */
-    meta_any invoke(const id_type id, meta_handle instance, meta_any * const args, const std::size_t sz) const {
-        const internal::meta_func_node* best_match{ nullptr };
-        internal::meta_func_node::size_type best_match_casts_required{0};
+    meta_any invoke(const id_type id, meta_handle instance, meta_any * const args, const size_type sz) const {
+        const internal::meta_func_node* candidate{};
+        size_type extent{sz + 1u};
+        bool ambiguous{};
 
-        for (auto candidate = internal::find_if<&node_type::func>([id](const auto *curr) { return curr->id == id; }, node); candidate && (id == candidate->id); candidate = candidate->next) {
-            if (sz != candidate->size) {
-                continue;
+        for(auto *it = internal::find_if<&node_type::func>([id, sz](const auto *curr) { return curr->id == id && curr->size == sz; }, node); it && it->id == id && it->size == sz; it = it->next) {
+            size_type direct{};
+            size_type ext{};
+
+            for(size_type next{}; next < sz && next == (direct + ext); ++next) {
+                const auto type = args[next].type();
+                const auto req = it->arg(next)->info;
+                type.info() == req ? ++direct : (ext += can_cast_or_convert(type, req));
             }
 
-            node_type::size_type casts_required{ 0 };
-            bool match{ true };
-
-            for (node_type::size_type arg_idx = 0; arg_idx < sz; ++arg_idx) {
-                auto const& candidate_arg_type_info = candidate->arg (arg_idx)->info;
-                auto const arg_type = (args + arg_idx)->type();
-
-				ENTT_ASSERT(bool(candidate_arg_type_info));
-
-                if (candidate_arg_type_info == arg_type.info()) {
-                    continue;
+            if((direct + ext) == sz) {
+                if(ext < extent) {
+                    candidate = it;
+                    extent = ext;
+                    ambiguous = false;
+                } else if(ext == extent) {
+                    ambiguous = true;
                 }
-
-                if (auto const arg_convs = arg_type.conv();
-                    arg_convs.end () != std::find_if(
-                        arg_convs.begin(),
-                        arg_convs.end(),
-                        [candidate_arg_type_info](auto&& curr) {
-                            return curr.type().info() == candidate_arg_type_info;
-                        })) {
-                    casts_required++;
-                }
-                else {
-                    match = false;
-                    break;
-                }
-
-            }
-
-            if (!match) {
-                continue;
-            }
-
-            if ((0 < best_match_casts_required) && (casts_required == best_match_casts_required)) {
-                return meta_any{};
-            }
-
-            if (!best_match || (casts_required < best_match_casts_required)) {
-                best_match = candidate;
-                best_match_casts_required = casts_required;
             }
         }
 
-        return best_match ? best_match->invoke (instance, args) : meta_any{};
+        return (candidate && !ambiguous) ? candidate->invoke(instance, args) : meta_any{};
     }
 
     /**

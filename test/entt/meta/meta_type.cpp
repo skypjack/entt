@@ -49,7 +49,7 @@ struct clazz_t {
 };
 
 struct overloaded_func_t {
-    void e (int v) {
+    void e(int v) {
         value = v + v;
     }
 
@@ -59,19 +59,19 @@ struct overloaded_func_t {
 
     int f(int a, int b) {
         value = a;
-        return b*b;
+        return b * b;
     }
 
     int f(int v) const {
-        return v*v;
+        return v * v;
     }
 
-    float f (int a, float b) {
+    float f(int a, float b) {
         value = a;
         return b + b;
     }
 
-    void g (int v) {
+    void g(int v) {
         value = v * v;
     }
 
@@ -100,12 +100,12 @@ struct MetaType: ::testing::Test {
         entt::meta<concrete_t>().base<base_t>().base<abstract_t>();
 
         entt::meta<overloaded_func_t>().type("overloaded_func"_hs)
-                .func<&overloaded_func_t::e> ("e"_hs)
-                .func<entt::overload<int(const base_t &, int, int)>(&overloaded_func_t::f)>("f"_hs)
-                .func<entt::overload<int(int, int)>(&overloaded_func_t::f)>("f"_hs)
-                .func<entt::overload<int(int) const>(&overloaded_func_t::f)>("f"_hs)
-                .func<entt::overload<float (int, float)> (&overloaded_func_t::f)> ("f"_hs)
-                .func<&overloaded_func_t::g> ("g"_hs);
+            .func<&overloaded_func_t::e> ("e"_hs)
+            .func<entt::overload<int(const base_t &, int, int)>(&overloaded_func_t::f)>("f"_hs)
+            .func<entt::overload<int(int, int)>(&overloaded_func_t::f)>("f"_hs)
+            .func<entt::overload<int(int) const>(&overloaded_func_t::f)>("f"_hs)
+            .func<entt::overload<float(int, float)> (&overloaded_func_t::f)> ("f"_hs)
+            .func<&overloaded_func_t::g> ("g"_hs);
 
         entt::meta<property_t>()
             .data<property_t::random>("random"_hs)
@@ -326,54 +326,54 @@ TEST_F(MetaType, Invoke) {
 }
 
 TEST_F(MetaType, OverloadedFunc) {
-    entt::meta<float> ().conv<int>();
+    entt::meta<float>().conv<int>();
     entt::meta<double>().conv<float>();
 
-    auto type = entt::resolve<overloaded_func_t>();
+    const auto type = entt::resolve<overloaded_func_t>();
     overloaded_func_t instance{};
 
     ASSERT_TRUE(type.func("f"_hs));
     ASSERT_TRUE(type.func("e"_hs));
     ASSERT_TRUE(type.func("g"_hs));
 
-    auto const first_overload_result = type.invoke("f"_hs, instance, base_t{}, 1, 2);
+    const auto first = type.invoke("f"_hs, instance, base_t{}, 1, 2);
 
-    ASSERT_TRUE(first_overload_result);
-    ASSERT_EQ (overloaded_func_t::value, 1);
-    ASSERT_TRUE (first_overload_result.try_cast<int>());
-    ASSERT_EQ (first_overload_result.cast<int>(), 4);
+    ASSERT_TRUE(first);
+    ASSERT_EQ(overloaded_func_t::value, 1);
+    ASSERT_NE(first.try_cast<int>(), nullptr);
+    ASSERT_EQ(first.cast<int>(), 4);
 
-    auto const second_overload_result = type.invoke("f"_hs, instance, 3, 4);
+    const auto second = type.invoke("f"_hs, instance, 3, 4);
 
-    ASSERT_TRUE (second_overload_result);
-    ASSERT_EQ (overloaded_func_t::value, 3);
-    ASSERT_TRUE (second_overload_result.try_cast<int>());
-    ASSERT_EQ (second_overload_result.cast<int> (), 16);
+    ASSERT_TRUE(second);
+    ASSERT_EQ(overloaded_func_t::value, 3);
+    ASSERT_NE(second.try_cast<int>(), nullptr);
+    ASSERT_EQ(second.cast<int>(), 16);
 
-    auto const third_overload_result = type.invoke("f"_hs, instance, 5);
+    const auto third = type.invoke("f"_hs, instance, 5);
 
-    ASSERT_TRUE (third_overload_result);
-    ASSERT_EQ (overloaded_func_t::value, 3);
-    ASSERT_TRUE (third_overload_result.try_cast<int>());
-    ASSERT_EQ (third_overload_result.cast<int> (), 25);
+    ASSERT_TRUE(third);
+    ASSERT_EQ(overloaded_func_t::value, 3);
+    ASSERT_NE(third.try_cast<int>(), nullptr);
+    ASSERT_EQ(third.cast<int>(), 25);
 
-    auto const fourth_overload_result = type.invoke("f"_hs, instance, 6, 7.0f);
+    const auto fourth = type.invoke("f"_hs, instance, 6, 7.f);
 
-    ASSERT_TRUE (fourth_overload_result);
-    ASSERT_EQ (overloaded_func_t::value, 6);
-    ASSERT_TRUE (fourth_overload_result.try_cast<float>());
-    ASSERT_EQ (fourth_overload_result.cast<float> (), 14.0f);
+    ASSERT_TRUE(fourth);
+    ASSERT_EQ(overloaded_func_t::value, 6);
+    ASSERT_NE(fourth.try_cast<float>(), nullptr);
+    ASSERT_EQ(fourth.cast<float>(), 14.f);
 
-    auto const overload_with_cast_result = type.invoke("f"_hs, instance, 8, 9.0f);
+    const auto cast = type.invoke("f"_hs, instance, 8, 9.f);
 
-    ASSERT_TRUE (overload_with_cast_result);
-    ASSERT_EQ (overloaded_func_t::value, 8);
-    ASSERT_TRUE (overload_with_cast_result.try_cast<float>());
-    ASSERT_EQ (overload_with_cast_result.cast<float> (), 18);
+    ASSERT_TRUE(cast);
+    ASSERT_EQ(overloaded_func_t::value, 8);
+    ASSERT_NE(cast.try_cast<float>(), nullptr);
+    ASSERT_EQ(cast.cast<float>(), 18.f);
 
-    auto const ambiguous_overload_result = type.invoke("f"_hs, instance, 8, 9.0);
+    const auto ambiguous = type.invoke("f"_hs, instance, 8, 9.);
 
-    ASSERT_FALSE (ambiguous_overload_result);
+    ASSERT_FALSE(ambiguous);
 }
 
 TEST_F(MetaType, SetGet) {
