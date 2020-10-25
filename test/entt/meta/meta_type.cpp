@@ -49,8 +49,8 @@ struct clazz_t {
 };
 
 struct overloaded_func_t {
-    void e(int v) {
-        value = v + v;
+    int e(int v) const {
+        return v + v;
     }
 
     int f(const base_t &, int a, int b) {
@@ -59,20 +59,20 @@ struct overloaded_func_t {
 
     int f(int a, int b) {
         value = a;
-        return b * b;
+        return g(b);
     }
 
     int f(int v) const {
-        return v * v;
+        return g(v);
     }
 
     float f(int a, float b) {
         value = a;
-        return b + b;
+        return e(b);
     }
 
-    void g(int v) {
-        value = v * v;
+    int g(int v) const {
+        return v * v;
     }
 
     inline static int value = 0;
