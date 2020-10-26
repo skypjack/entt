@@ -469,10 +469,10 @@ TEST(MultiComponentView, Each) {
     cview.each([&cnt](const int &, const char &) { --cnt; });
     cview.each([&cnt](auto, const int &, const char &) { --cnt; });
 
-    for(auto &&[entt, iv, cv]: cview.each()) {
+    for(auto &&[entt, iv, cv]: view.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), const int &>);
-        static_assert(std::is_same_v<decltype(cv), const char &>);
+        static_assert(std::is_same_v<decltype(iv), int &>);
+        static_assert(std::is_same_v<decltype(cv), char &>);
         ASSERT_EQ(iv, --cnt);
     }
 
