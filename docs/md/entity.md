@@ -1408,10 +1408,10 @@ registry during iterations to get the types iterated by the view itself.
 
 ### View pack
 
-The view pack allows users to combine multiple views into a single iterable
-object, while also giving them full control over which view should lead the
-iteration.<br/>
-This class returns all and only the entities present in all views. Its intended
+The view pack allows users to combine multiple views into a single _view-like_
+iterable object, while also giving them full control over which view should lead
+the iteration.<br/>
+This object returns all and only the entities present in all views. Its intended
 primary use is for custom storage and views, but it can also be very convenient
 in everyday use.
 
@@ -1425,14 +1425,14 @@ auto pack = view | other;
 ```
 
 The return type is a specialization of the class template `entt::view_pack`.
-This is nothing more than an iterable object that combines two or more views
-into a single instance.<br/>
+This is nothing more than a _view-like_ iterable object that combines two or
+more views into a single instance.<br/>
 The first view used to create a pack will also be the same that will lead the
 iteration.
 
-A view pack offers functionalities similar to those of a view, at least as
-regards the possibilities of iteration. In particular, it only returns entities
-if iterated directly:
+A view pack offers functionalities similar to those of a multi component view,
+especially with regard to the possibilities of iteration. In particular, it only
+returns entities if iterated directly:
 
 ```cpp
 for(auto entt: pack) {

@@ -2,6 +2,7 @@
 #define ENTT_ENTITY_VIEW_PACK_HPP
 
 
+#include <iterator>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -28,14 +29,11 @@ namespace entt {
  */
 template<typename View, typename... Other>
 class view_pack {
-    using common_entity_type = std::common_type_t<typename View::entity_type, typename Other::entity_type...>;
-
+    template<typename It>
     class view_pack_iterator {
         friend class view_pack<View, Other...>;
 
-        using underlying_iterator = typename View::iterator;
-
-        view_pack_iterator(underlying_iterator from, underlying_iterator to, const std::tuple<View, Other...> &ref) ENTT_NOEXCEPT
+        view_pack_iterator(It from, It to, const std::tuple<View, Other...> &ref) ENTT_NOEXCEPT
             : it{from},
               last{to},
               pack{std::get<Other>(ref)...}
@@ -51,10 +49,10 @@ class view_pack {
         }
 
     public:
-        using difference_type = typename std::iterator_traits<underlying_iterator>::difference_type;
-        using value_type = decltype(*std::declval<underlying_iterator>());
-        using pointer = void;
-        using reference = value_type;
+        using difference_type = typename std::iterator_traits<It>::difference_type;
+        using value_type = typename std::iterator_traits<It>::value_type;
+        using pointer = typename std::iterator_traits<It>::pointer;
+        using reference = typename std::iterator_traits<It>::reference;
         using iterator_category = std::input_iterator_tag;
 
         view_pack_iterator & operator++() ENTT_NOEXCEPT {
@@ -80,8 +78,8 @@ class view_pack {
         }
 
     private:
-        underlying_iterator it;
-        const underlying_iterator last;
+        It it;
+        const It last;
         const std::tuple<Other...> pack;
     };
 
@@ -90,12 +88,11 @@ class view_pack {
 
         using iterable_view = decltype(std::declval<View>().each());
 
+        template<typename It>
         class iterable_view_pack_iterator {
             friend class iterable_view_pack;
 
-            using underlying_iterator = typename iterable_view::iterator;
-
-            iterable_view_pack_iterator(underlying_iterator from, underlying_iterator to, const std::tuple<Other...> &ref) ENTT_NOEXCEPT
+            iterable_view_pack_iterator(It from, It to, const std::tuple<Other...> &ref) ENTT_NOEXCEPT
                 : it{from},
                   last{to},
                   pack{ref}
@@ -111,8 +108,8 @@ class view_pack {
             }
 
         public:
-            using difference_type = typename std::iterator_traits<underlying_iterator>::difference_type;
-            using value_type = decltype(std::tuple_cat(*std::declval<underlying_iterator>(), std::declval<Other>().get({})...));
+            using difference_type = typename std::iterator_traits<It>::difference_type;
+            using value_type = decltype(std::tuple_cat(*std::declval<It>(), std::declval<Other>().get({})...));
             using pointer = void;
             using reference = value_type;
             using iterator_category = std::input_iterator_tag;
@@ -141,8 +138,8 @@ class view_pack {
             }
 
         private:
-            underlying_iterator it;
-            const underlying_iterator last;
+            It it;
+            const It last;
             const std::tuple<Other...> pack;
         };
 
@@ -152,7 +149,8 @@ class view_pack {
         {}
 
     public:
-        using iterator = iterable_view_pack_iterator;
+        using iterator = iterable_view_pack_iterator<typename iterable_view::iterator>;
+        using reverse_iterator = iterable_view_pack_iterator<typename iterable_view::reverse_iterator>;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             return { iterable.begin(), iterable.end(), pack };
@@ -162,6 +160,14 @@ class view_pack {
             return { iterable.end(), iterable.end(), pack };
         }
 
+        [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
+            return { iterable.rbegin(), iterable.rend(), pack };
+        }
+
+        [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
+            return { iterable.rend(), iterable.rend(), pack };
+        }
+
     private:
         iterable_view iterable;
         std::tuple<Other...> pack;
@@ -169,9 +175,13 @@ class view_pack {
 
 public:
     /*! @brief Underlying entity identifier. */
-    using entity_type = common_entity_type;
+    using entity_type = std::common_type_t<typename View::entity_type, typename Other::entity_type...>;
+    /*! @brief Underlying entity identifier. */
+    using size_type = std::common_type_t<typename View::size_type, typename Other::size_type...>;
     /*! @brief Input iterator type. */
-    using iterator = view_pack_iterator;
+    using iterator = view_pack_iterator<typename View::iterator>;
+    /*! @brief Reversed iterator type. */
+    using reverse_iterator = view_pack_iterator<typename View::reverse_iterator>;
 
     /**
      * @brief Constructs a pack from a bunch of views.
@@ -188,9 +198,6 @@ public:
      * The returned iterator points to the first entity of the pack. If the pack
      * is empty, the returned iterator will be equal to `end()`.
      *
-     * @note
-     * Iterators stay true to the order imposed by the first view of the pack.
-     *
      * @return An iterator to the first entity of the pack.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
@@ -204,13 +211,108 @@ public:
      * the pack. Attempting to dereference the returned iterator results in
      * undefined behavior.
      *
-     * @note
-     * Iterators stay true to the order imposed by the first view of the pack.
-     *
      * @return An iterator to the entity following the last entity of the pack.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
         return { std::get<View>(pack).end(), std::get<View>(pack).end(), pack };
+    }
+
+    /**
+     * @brief Returns an iterator to the first entity of the pack.
+     *
+     * The returned iterator points to the first entity of the reversed pack. If
+     * the pack is empty, the returned iterator will be equal to `rend()`.
+     *
+     * @return An iterator to the first entity of the pack.
+     */
+    [[nodiscard]] reverse_iterator rbegin() const {
+        return { std::get<View>(pack).rbegin(), std::get<View>(pack).rend(), pack };
+    }
+
+    /**
+     * @brief Returns an iterator that is past the last entity of the reversed
+     * pack.
+     *
+     * The returned iterator points to the entity following the last entity of
+     * the reversed pack. Attempting to dereference the returned iterator
+     * results in undefined behavior.
+     *
+     * @return An iterator to the entity following the last entity of the
+     * reversed pack.
+     */
+    [[nodiscard]] reverse_iterator rend() const {
+        return { std::get<View>(pack).rend(), std::get<View>(pack).rend(), pack };
+    }
+
+    /**
+     * @brief Returns the first entity of the pack, if any.
+     * @return The first entity of the pack if one exists, the null entity
+     * otherwise.
+     */
+    [[nodiscard]] entity_type front() const {
+        const auto it = begin();
+        return it != end() ? *it : null;
+    }
+
+    /**
+     * @brief Returns the last entity of the pack, if any.
+     * @return The last entity of the pack if one exists, the null entity
+     * otherwise.
+     */
+    [[nodiscard]] entity_type back() const {
+        const auto it = rbegin();
+        return it != rend() ? *it : null;
+    }
+
+    /**
+     * @brief Finds an entity.
+     * @param entt A valid entity identifier.
+     * @return An iterator to the given entity if it's found, past the end
+     * iterator otherwise.
+     */
+    [[nodiscard]] iterator find(const entity_type entt) const {
+        iterator it{std::get<View>(pack).find(entt), std::get<View>(pack).end(), pack};
+        return (it != end() && *it == entt) ? it : end();
+    }
+
+    /**
+     * @brief Checks if a pack contains an entity.
+     * @param entt A valid entity identifier.
+     * @return True if the pack contains the given entity, false otherwise.
+     */
+    [[nodiscard]] bool contains(const entity_type entt) const {
+        return std::apply([entt](auto &&... view) { return (view.contains(entt) && ...); }, pack);
+    }
+
+    /**
+     * @brief Returns the components assigned to the given entity.
+     *
+     * Prefer this function instead of `registry::get` during iterations. It has
+     * far better performance than its counterpart.
+     *
+     * @warning
+     * Attempting to use an invalid component type results in a compilation
+     * error. Attempting to use an entity that doesn't belong to the pack
+     * results in undefined behavior.<br/>
+     * An assertion will abort the execution at runtime in debug mode if the
+     * pack doesn't contain the given entity.
+     *
+     * @tparam Comp Types of components to get.
+     * @param entt A valid entity identifier.
+     * @return The components assigned to the entity.
+     */
+    template<typename... Comp>
+    [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
+        ENTT_ASSERT(contains(entt));
+        auto component = std::apply([entt](auto &&... view) { return std::tuple_cat(view.get(entt)...); }, pack);
+
+        if constexpr(sizeof...(Comp) == 0) {
+            return component;
+        } else if constexpr(sizeof...(Comp) == 1) {
+            return (std::get<std::add_lvalue_reference_t<Comp>>(component), ...);
+        } else {
+            return std::forward_as_tuple(std::get<std::add_lvalue_reference_t<Comp>>(component)...);
+        }
     }
 
     /**
