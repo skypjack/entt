@@ -164,7 +164,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
 
         public:
             using difference_type = std::ptrdiff_t;
-            using value_type = decltype(std::tuple_cat(std::tuple<typename std::iterator_traits<It>::value_type>{}, std::declval<basic_view>().get({})));
+            using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<basic_view>().get({})));
             using pointer = void;
             using reference = value_type;
             using iterator_category = std::input_iterator_tag;
@@ -627,17 +627,18 @@ class basic_view<Entity, exclude_t<>, Component> final {
     class iterable_view {
         friend class basic_view<Entity, exclude_t<>, Component>;
 
-        template<typename It, typename... Other>
+        template<typename... It>
         class iterable_view_iterator {
             friend class iterable_view;
 
-            iterable_view_iterator(It from, Other... data) ENTT_NOEXCEPT
-                : it{from, data...}
+            template<typename... Discard>
+            iterable_view_iterator(It... from, Discard...) ENTT_NOEXCEPT
+                : it{from...}
             {}
 
         public:
             using difference_type = std::ptrdiff_t;
-            using value_type = std::tuple<typename std::iterator_traits<It>::value_type, decltype(*std::declval<Other>())...>;
+            using value_type = decltype(std::tuple_cat(std::tuple<Entity>{}, std::declval<basic_view>().get({})));
             using pointer = void;
             using reference = value_type;
             using iterator_category = std::input_iterator_tag;
@@ -656,7 +657,7 @@ class basic_view<Entity, exclude_t<>, Component> final {
             }
 
             [[nodiscard]] bool operator==(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
-                return std::get<It>(other.it) == std::get<It>(it);
+                return std::get<0>(other.it) == std::get<0>(it);
             }
 
             [[nodiscard]] bool operator!=(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
@@ -664,7 +665,7 @@ class basic_view<Entity, exclude_t<>, Component> final {
             }
 
         private:
-            std::tuple<It, Other...> it;
+            std::tuple<It...> it;
         };
 
         iterable_view(pool_type &ref)
@@ -684,35 +685,19 @@ class basic_view<Entity, exclude_t<>, Component> final {
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            if constexpr(is_eto_eligible_v<Component>) {
-                return iterator{pool->basic_sparse_set<entity_type>::begin()};
-            } else {
-                return iterator{pool->basic_sparse_set<entity_type>::begin(), pool->begin()};
-            }
+            return iterator{pool->basic_sparse_set<entity_type>::begin(), pool->begin()};
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            if constexpr(is_eto_eligible_v<Component>) {
-                return iterator{pool->basic_sparse_set<entity_type>::end()};
-            } else {
-                return iterator{pool->basic_sparse_set<entity_type>::end(), pool->end()};
-            }
+            return iterator{pool->basic_sparse_set<entity_type>::end(), pool->end()};
         }
 
         [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            if constexpr(is_eto_eligible_v<Component>) {
-                return reverse_iterator{pool->basic_sparse_set<entity_type>::rbegin()};
-            } else {
-                return reverse_iterator{pool->basic_sparse_set<entity_type>::rbegin(), pool->rbegin()};
-            }
+            return reverse_iterator{pool->basic_sparse_set<entity_type>::rbegin(), pool->rbegin()};
         }
 
         [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            if constexpr(is_eto_eligible_v<Component>) {
-                return reverse_iterator{pool->basic_sparse_set<entity_type>::rend()};
-            } else {
-                return reverse_iterator{pool->basic_sparse_set<entity_type>::rend(), pool->rend()};
-            }
+            return reverse_iterator{pool->basic_sparse_set<entity_type>::rend(), pool->rend()};
         }
 
     private:
