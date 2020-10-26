@@ -106,11 +106,11 @@ class basic_registry {
     template<typename Component>
     [[nodiscard]] const pool_t<Entity, Component> & assure() const {
         const auto index = type_seq<Component>::value();
-        
+
         if(!(index < pools.size())) {
             pools.resize(size_type(index)+1u);
         }
-        
+
         if(auto &&pdata = pools[index]; !pdata.pool) {
             pdata.info = type_id<Component>();
             pdata.pool.reset(new pool_t<Entity, Component>());
@@ -118,7 +118,7 @@ class basic_registry {
                 static_cast<pool_t<Entity, Component> &>(cpool).remove(owner, first, last);
             };
         }
-        
+
         return static_cast<const pool_t<Entity, Component> &>(*pools[index].pool);
     }
 
