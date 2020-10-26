@@ -281,7 +281,7 @@ public:
      * @return True if the pack contains the given entity, false otherwise.
      */
     [[nodiscard]] bool contains(const entity_type entt) const {
-        return std::apply([entt](auto &&... view) { return (view.contains(entt) && ...); }, pack);
+        return std::get<View>(pack).contains(entt) && (std::get<Other>(pack).contains(entt) && ...);
     }
 
     /**
@@ -304,7 +304,7 @@ public:
     template<typename... Comp>
     [[nodiscard]] decltype(auto) get([[maybe_unused]] const entity_type entt) const {
         ENTT_ASSERT(contains(entt));
-        auto component = std::apply([entt](auto &&... view) { return std::tuple_cat(view.get(entt)...); }, pack);
+        auto component = std::tuple_cat(std::get<View>(pack).get(entt), std::get<Other>(pack).get(entt)...);
 
         if constexpr(sizeof...(Comp) == 0) {
             return component;
@@ -346,8 +346,7 @@ public:
                 if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(value, std::get<Other>(pack).get(entity)...))>) {
                     std::apply(func, std::tuple_cat(value, std::get<Other>(pack).get(entity)...));
                 } else {
-                    const auto args = std::apply([](const auto, auto &&... component) { return std::forward_as_tuple(std::forward<decltype(component)>(component)...); }, value);
-                    std::apply(func, std::tuple_cat(args, std::get<Other>(pack).get(entity)...));
+                    std::apply([&func](const auto, auto &&... component) { func(std::forward<decltype(component)>(component)...); }, std::tuple_cat(value, std::get<Other>(pack).get(entity)...));
                 }
             }
         }
