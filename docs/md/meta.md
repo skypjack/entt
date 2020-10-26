@@ -509,7 +509,7 @@ to case. In particular:
   ```cpp
   auto last = view.end();
   // appends an integer to the container
-  view.insert(last.handle(), 42);
+  view.insert(last, 42);
   ```
 
   This function returns a meta iterator pointing to the inserted element and a
