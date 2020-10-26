@@ -151,36 +151,34 @@ TEST(NonOwningGroup, Each) {
     auto group = registry.group(entt::get<int, char>);
 
     const auto e0 = registry.create();
-    registry.emplace<int>(e0);
+    registry.emplace<int>(e0, 0);
     registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.emplace<int>(e1);
+    registry.emplace<int>(e1, 1);
     registry.emplace<char>(e1);
 
     auto cgroup = std::as_const(registry).group(entt::get<const int, const char>);
     std::size_t cnt = 0;
 
+    for(auto first = cgroup.each().rbegin(), last = cgroup.each().rend(); first != last; ++first) {
+        static_assert(std::is_same_v<decltype(*first), std::tuple<entt::entity, const int &, const char &>>);
+        ASSERT_EQ(std::get<1>(*first), cnt++);
+    }
+
     group.each([&cnt](auto, int &, char &) { ++cnt; });
     group.each([&cnt](int &, char &) { ++cnt; });
+
+    ASSERT_EQ(cnt, std::size_t{6});
+
+    cgroup.each([&cnt](const int &, const char &) { --cnt; });
+    cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
 
     for(auto &&[entt, iv, cv]: group.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
-        ++cnt;
-    }
-
-    ASSERT_EQ(cnt, std::size_t{6});
-
-    cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
-    cgroup.each([&cnt](const int &, const char &) { --cnt; });
-
-    for(auto &&[entt, iv, cv]: cgroup.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), const int &>);
-        static_assert(std::is_same_v<decltype(cv), const char &>);
-        --cnt;
+        ASSERT_EQ(iv, --cnt);
     }
 
     ASSERT_EQ(cnt, std::size_t{0});
@@ -723,36 +721,34 @@ TEST(OwningGroup, Each) {
     auto group = registry.group<int>(entt::get<char>);
 
     const auto e0 = registry.create();
-    registry.emplace<int>(e0);
+    registry.emplace<int>(e0, 0);
     registry.emplace<char>(e0);
 
     const auto e1 = registry.create();
-    registry.emplace<int>(e1);
+    registry.emplace<int>(e1, 1);
     registry.emplace<char>(e1);
 
     auto cgroup = std::as_const(registry).group<const int>(entt::get<const char>);
     std::size_t cnt = 0;
 
+    for(auto first = cgroup.each().rbegin(), last = cgroup.each().rend(); first != last; ++first) {
+        static_assert(std::is_same_v<decltype(*first), std::tuple<entt::entity, const int &, const char &>>);
+        ASSERT_EQ(std::get<1>(*first), cnt++);
+    }
+
     group.each([&cnt](auto, int &, char &) { ++cnt; });
     group.each([&cnt](int &, char &) { ++cnt; });
+
+    ASSERT_EQ(cnt, std::size_t{6});
+
+    cgroup.each([&cnt](const int &, const char &) { --cnt; });
+    cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
 
     for(auto &&[entt, iv, cv]: group.each()) {
         static_assert(std::is_same_v<decltype(entt), entt::entity>);
         static_assert(std::is_same_v<decltype(iv), int &>);
         static_assert(std::is_same_v<decltype(cv), char &>);
-        ++cnt;
-    }
-
-    ASSERT_EQ(cnt, std::size_t{6});
-
-    cgroup.each([&cnt](auto, const int &, const char &) { --cnt; });
-    cgroup.each([&cnt](const int &, const char &) { --cnt; });
-
-    for(auto &&[entt, iv, cv]: cgroup.each()) {
-        static_assert(std::is_same_v<decltype(entt), entt::entity>);
-        static_assert(std::is_same_v<decltype(iv), const int &>);
-        static_assert(std::is_same_v<decltype(cv), const char &>);
-        --cnt;
+        ASSERT_EQ(iv, --cnt);
     }
 
     ASSERT_EQ(cnt, std::size_t{0});
