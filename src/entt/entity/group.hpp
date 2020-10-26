@@ -74,13 +74,17 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
     class iterable_group {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>>;
 
-        template<typename It>
-        class iterable_group_iterator {
+        template<typename, typename>
+        class iterable_group_iterator;
+
+        template<typename It, typename... GPool>
+        class iterable_group_iterator<It, type_list<GPool...>> {
             friend class iterable_group;
 
-            iterable_group_iterator(It from, const basic_group &parent) ENTT_NOEXCEPT
+            template<typename... Args>
+            iterable_group_iterator(It from, const std::tuple<Args...> &args) ENTT_NOEXCEPT
                 : it{from},
-                  group{parent}
+                  pools{std::get<GPool>(args)...}
             {}
 
         public:
@@ -100,7 +104,8 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
             }
 
             [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-                return std::tuple_cat(std::make_tuple(*it), group.get(*it));
+                const auto entt = *it;
+                return std::tuple_cat(std::make_tuple(entt), std::apply([entt](auto *... cpool) { return std::forward_as_tuple(cpool->get(entt)...); }, pools));
             }
 
             [[nodiscard]] bool operator==(const iterable_group_iterator &other) const ENTT_NOEXCEPT {
@@ -113,35 +118,43 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
 
         private:
             It it;
-            const basic_group group;
+            const std::tuple<GPool...> pools;
         };
 
-        iterable_group(const basic_group &parent)
-            : group{parent}
+        iterable_group(basic_sparse_set<Entity> &ref, const std::tuple<pool_type<Get> *...> &cpools)
+            : handler{&ref},
+              pools{cpools}
         {}
 
     public:
-        using iterator = iterable_group_iterator<typename basic_sparse_set<Entity>::iterator>;
-        using reverse_iterator = iterable_group_iterator<typename basic_sparse_set<Entity>::reverse_iterator>;
+        using iterator = iterable_group_iterator<
+            typename basic_sparse_set<Entity>::iterator,
+            type_list_cat_t<std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<pool_type<Get> *>>...>
+        >;
+        using reverse_iterator = iterable_group_iterator<
+            typename basic_sparse_set<Entity>::reverse_iterator,
+            type_list_cat_t<std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<pool_type<Get> *>>...>
+        >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return { group.begin(), group };
+            return { handler->begin(), pools };
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return { group.end(), group };
+            return { handler->end(), pools };
         }
 
         [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return { group.rbegin(), group };
+            return { handler->rbegin(), pools };
         }
 
         [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return { group.rend(), group };
+            return { handler->rend(), pools };
         }
 
     private:
-        const basic_group group;
+        basic_sparse_set<Entity> *handler;
+        const std::tuple<pool_type<Get> *...> pools;
     };
 
     basic_group(basic_sparse_set<Entity> &ref, pool_type<Get> &... gpool) ENTT_NOEXCEPT
@@ -449,7 +462,7 @@ public:
      * @return An iterable object to use to _visit_ the group.
      */
     [[nodiscard]] iterable_group each() const ENTT_NOEXCEPT {
-        return iterable_group{*this};
+        return iterable_group{*handler, pools};
     }
 
     /**
@@ -596,7 +609,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
             friend class iterable_group;
 
             template<typename... Args>
-            iterable_group_iterator(It from, std::tuple<Args...> args) ENTT_NOEXCEPT
+            iterable_group_iterator(It from, const std::tuple<Args...> &args) ENTT_NOEXCEPT
                 : it{from},
                   owned{std::get<OIt>(args)...},
                   get{std::get<GPool>(args)...}
