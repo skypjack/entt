@@ -34,7 +34,7 @@ namespace entt {
  * required to specify in advance the full list of accepted types.<br/>
  * Moreover, whenever an event is published, an emitter provides the listeners
  * with a reference to itself along with a reference to the event. Therefore
- * listeners have an handy way to work with it without incurring in the need of 
+ * listeners have an handy way to work with it without incurring in the need of
  * capturing a reference to the emitter.
  *
  * @tparam Derived Actual type of emitter that extends the class template.
@@ -124,15 +124,15 @@ class emitter {
     template<typename Event>
     [[nodiscard]] const pool_handler<Event> & assure() const {
         const auto index = type_seq<Event>::value();
-        
+
         if(!(index < pools.size())) {
             pools.resize(std::size_t(index)+1u);
         }
-        
+
         if(!pools[index]) {
             pools[index].reset(new pool_handler<Event>{});
         }
-        
+
         return static_cast<pool_handler<Event> &>(*pools[index]);
     }
 

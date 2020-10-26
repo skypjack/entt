@@ -88,15 +88,15 @@ class dispatcher {
     template<typename Event>
     [[nodiscard]] pool_handler<Event> & assure() {
         const auto index = type_seq<Event>::value();
-        
+
         if(!(index < pools.size())) {
             pools.resize(std::size_t(index)+1u);
         }
-        
+
         if(!pools[index]) {
             pools[index].reset(new pool_handler<Event>{});
         }
-        
+
         return static_cast<pool_handler<Event> &>(*pools[index]);
     }
 

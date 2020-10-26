@@ -73,7 +73,6 @@ TEST(ViewPack, Iterator) {
     registry.emplace<char>(entity);
 
     const auto pack = registry.view<int>() | registry.view<char>();
-    using iterator = typename decltype(pack)::iterator;
 
     ASSERT_NE(pack.begin(), pack.end());
     ASSERT_EQ(pack.begin()++, pack.begin());
@@ -88,7 +87,6 @@ TEST(ViewPack, ReverseIterator) {
     registry.emplace<char>(entity);
 
     const auto pack = registry.view<int>() | registry.view<char>();
-    using iterator = typename decltype(pack)::reverse_iterator;
 
     ASSERT_NE(pack.rbegin(), pack.rend());
     ASSERT_EQ(pack.rbegin()++, pack.rbegin());
@@ -327,16 +325,16 @@ TEST(ViewPack, ShortestPool) {
     ASSERT_FALSE(eit != pack.each().end());
 
     {
-	    std::size_t next{};
-	    
-	    for(const auto [entt, cv, iv]: pack.each()) {
-	        static_assert(std::is_same_v<decltype(entt), const entt::entity>);
-	        static_assert(std::is_same_v<decltype(cv), char &>);
-	        static_assert(std::is_same_v<decltype(iv), const int &>);
-	        ASSERT_EQ(entt::to_integral(entt), ++next);
-	        ASSERT_EQ(&cv, registry.try_get<char>(entt));
-	        ASSERT_EQ(&iv, registry.try_get<int>(entt));
-	    }
+        std::size_t next{};
+
+        for(const auto [entt, cv, iv]: pack.each()) {
+            static_assert(std::is_same_v<decltype(entt), const entt::entity>);
+            static_assert(std::is_same_v<decltype(cv), char &>);
+            static_assert(std::is_same_v<decltype(iv), const int &>);
+            ASSERT_EQ(entt::to_integral(entt), ++next);
+            ASSERT_EQ(&cv, registry.try_get<char>(entt));
+            ASSERT_EQ(&iv, registry.try_get<int>(entt));
+        }
     }
 }
 
@@ -354,7 +352,7 @@ TEST(ViewPack, LongestPool) {
 
     {
         std::size_t next{2u};
-        
+
         for(const auto entt: pack) {
             ASSERT_EQ(entt::to_integral(entt), next--);
             ASSERT_TRUE((registry.has<int, char>(entt)));
@@ -393,7 +391,7 @@ TEST(ViewPack, LongestPool) {
 
     {
         std::size_t next{2u};
-        
+
         for(const auto [entt, iv, cv]: pack.each()) {
             static_assert(std::is_same_v<decltype(entt), const entt::entity>);
             static_assert(std::is_same_v<decltype(iv), int &>);

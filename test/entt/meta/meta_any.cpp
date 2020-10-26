@@ -9,7 +9,7 @@ struct clazz_t {
     void member(int i) { value = i; }
     static void func() { c = 'd'; }
 
-	static inline char c = 'c';
+    static inline char c = 'c';
     int value = 0;
 };
 
@@ -641,27 +641,27 @@ TEST_F(MetaAny, Invoke) {
     clazz_t instance;
     entt::meta_any any{std::ref(instance)};
 
-	ASSERT_TRUE(any.invoke("func"_hs));
-	ASSERT_TRUE(any.invoke("member"_hs, 42));
-	ASSERT_FALSE(any.invoke("non_existent"_hs, 42));
+    ASSERT_TRUE(any.invoke("func"_hs));
+    ASSERT_TRUE(any.invoke("member"_hs, 42));
+    ASSERT_FALSE(any.invoke("non_existent"_hs, 42));
 
-	ASSERT_EQ(clazz_t::c, 'd');
-	ASSERT_EQ(instance.value, 42);
+    ASSERT_EQ(clazz_t::c, 'd');
+    ASSERT_EQ(instance.value, 42);
 }
 
 TEST_F(MetaAny, SetGet) {
     clazz_t instance;
     entt::meta_any any{std::ref(instance)};
 
-	ASSERT_TRUE(any.set("value"_hs, 42));
+    ASSERT_TRUE(any.set("value"_hs, 42));
 
     const auto value = any.get("value"_hs);
 
-	ASSERT_TRUE(value);
-	ASSERT_NE(value.try_cast<int>(), nullptr);
-	ASSERT_EQ(value.cast<int>(), 42);
+    ASSERT_TRUE(value);
+    ASSERT_NE(value.try_cast<int>(), nullptr);
+    ASSERT_EQ(value.cast<int>(), 42);
     ASSERT_EQ(instance.value, 42);
 
-	ASSERT_FALSE(any.set("non_existent"_hs, 42));
-	ASSERT_FALSE(any.get("non_existent"_hs));
+    ASSERT_FALSE(any.set("non_existent"_hs, 42));
+    ASSERT_FALSE(any.get("non_existent"_hs));
 }
