@@ -200,8 +200,8 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         {}
 
     public:
-        using iterator = iterable_view_iterator<typename basic_view::iterator>;
-        using reverse_iterator = iterable_view_iterator<typename basic_view::reverse_iterator>;
+        using iterator = iterable_view_iterator<view_iterator<typename basic_sparse_set<Entity>::iterator>>;
+        using reverse_iterator = iterable_view_iterator<view_iterator<typename basic_sparse_set<Entity>::reverse_iterator>>;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             return { view.begin(), view };
@@ -675,13 +675,13 @@ class basic_view<Entity, exclude_t<>, Component> final {
     public:
         using iterator = std::conditional_t<
             is_eto_eligible_v<Component>,
-            iterable_view_iterator<typename basic_view::iterator>,
-            iterable_view_iterator<typename basic_view::iterator, decltype(std::declval<pool_type>().begin())>
+            iterable_view_iterator<typename basic_sparse_set<Entity>::iterator>,
+            iterable_view_iterator<typename basic_sparse_set<Entity>::iterator, decltype(std::declval<pool_type>().begin())>
         >;
         using reverse_iterator = std::conditional_t<
             is_eto_eligible_v<Component>,
-            iterable_view_iterator<typename basic_view::reverse_iterator>,
-            iterable_view_iterator<typename basic_view::reverse_iterator, decltype(std::declval<pool_type>().rbegin())>
+            iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator>,
+            iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator, decltype(std::declval<pool_type>().rbegin())>
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
