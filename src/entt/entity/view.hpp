@@ -204,19 +204,19 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         using reverse_iterator = iterable_view_iterator<typename basic_view::reverse_iterator>;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return iterator{view.begin(), view};
+            return { view.begin(), view };
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return iterator{view.end(), view};
+            return { view.end(), view };
         }
 
         [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return reverse_iterator{view.rbegin(), view};
+            return { view.rbegin(), view };
         }
 
         [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return reverse_iterator{view.rend(), view};
+            return { view.rend(), view };
         }
 
     private:
@@ -337,7 +337,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const {
-        return iterator{view->begin(), view->end(), view->begin(), unchecked(view), filter};
+        return { view->begin(), view->end(), view->begin(), unchecked(view), filter };
     }
 
     /**
@@ -350,7 +350,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const {
-        return iterator{view->begin(), view->end(), view->end(), unchecked(view), filter};
+        return { view->begin(), view->end(), view->end(), unchecked(view), filter };
     }
 
     /**
@@ -362,7 +362,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const {
-        return reverse_iterator{view->rbegin(), view->rend(), view->rbegin(), unchecked(view), filter};
+        return { view->rbegin(), view->rend(), view->rbegin(), unchecked(view), filter };
     }
 
     /**
@@ -377,7 +377,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const {
-        return reverse_iterator{view->rbegin(), view->rend(), view->rend(), unchecked(view), filter};
+        return { view->rbegin(), view->rend(), view->rend(), unchecked(view), filter };
     }
 
     /**
@@ -685,19 +685,19 @@ class basic_view<Entity, exclude_t<>, Component> final {
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return iterator{pool->basic_sparse_set<entity_type>::begin(), pool->begin()};
+            return { pool->basic_sparse_set<entity_type>::begin(), pool->begin() };
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return iterator{pool->basic_sparse_set<entity_type>::end(), pool->end()};
+            return { pool->basic_sparse_set<entity_type>::end(), pool->end() };
         }
 
         [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return reverse_iterator{pool->basic_sparse_set<entity_type>::rbegin(), pool->rbegin()};
+            return { pool->basic_sparse_set<entity_type>::rbegin(), pool->rbegin() };
         }
 
         [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return reverse_iterator{pool->basic_sparse_set<entity_type>::rend(), pool->rend()};
+            return { pool->basic_sparse_set<entity_type>::rend(), pool->rend() };
         }
 
     private:
@@ -774,10 +774,6 @@ public:
      * The returned iterator points to the first entity of the view. If the view
      * is empty, the returned iterator will be equal to `end()`.
      *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
-     *
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
@@ -791,10 +787,6 @@ public:
      * the view. Attempting to dereference the returned iterator results in
      * undefined behavior.
      *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
-     *
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
@@ -806,10 +798,6 @@ public:
      *
      * The returned iterator points to the first entity of the reversed view. If
      * the view is empty, the returned iterator will be equal to `rend()`.
-     *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
      *
      * @return An iterator to the first entity of the reversed view.
      */
@@ -824,10 +812,6 @@ public:
      * The returned iterator points to the entity following the last entity of
      * the reversed view. Attempting to dereference the returned iterator
      * results in undefined behavior.
-     *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
      *
      * @return An iterator to the entity following the last entity of the
      * reversed view.

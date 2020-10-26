@@ -177,10 +177,6 @@ public:
      * components. If the view is empty, the returned iterator will be equal to
      * `end()`.
      *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
-     *
      * @return An iterator to the first entity that has the given components.
      */
     [[nodiscard]] iterator begin() const {
@@ -194,10 +190,6 @@ public:
      * The returned iterator points to the entity following the last entity that
      * has the given components. Attempting to dereference the returned iterator
      * results in undefined behavior.
-     *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
      *
      * @return An iterator to the entity following the last entity that has the
      * given components.
