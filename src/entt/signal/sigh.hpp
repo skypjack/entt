@@ -257,7 +257,7 @@ private:
  * The clear separation between a signal and a sink permits to store the former
  * as private data member without exposing the publish functionality to the
  * users of the class.
- * 
+ *
  * @warning
  * Lifetime of a sink must not overcome that of the signal to which it refers.
  * In any other case, attempting to use a sink results in undefined behavior.

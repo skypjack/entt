@@ -109,13 +109,13 @@ resource<type_list<>, type_list<Req...>> to_resource();
 
 /**
  * @brief Utility class for creating a static task graph.
- * 
+ *
  * This class offers minimal support (but sufficient in many cases) for creating
  * an execution graph from functions and their requirements on resources.<br/>
  * Note that the resulting tasks aren't executed in any case. This isn't the
  * goal of the tool. Instead, they are returned to the user in the form of a
  * graph that allows for safe execution.
- * 
+ *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
