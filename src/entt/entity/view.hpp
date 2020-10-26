@@ -644,7 +644,7 @@ class basic_view<Entity, exclude_t<>, Component> final {
             using iterator_category = std::input_iterator_tag;
 
             iterable_view_iterator & operator++() ENTT_NOEXCEPT {
-                return std::apply([](auto &&... curr) { (++curr, ...); }, it), *this;
+                return (++std::get<It>(it), ...), *this;
             }
 
             iterable_view_iterator operator++(int) ENTT_NOEXCEPT {
@@ -653,7 +653,7 @@ class basic_view<Entity, exclude_t<>, Component> final {
             }
 
             [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-                return std::apply([](auto &&... curr) { return reference{*curr...}; }, it);
+                return { *std::get<It>(it)... };
             }
 
             [[nodiscard]] bool operator==(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
