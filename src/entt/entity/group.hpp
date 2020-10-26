@@ -125,19 +125,19 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
         using reverse_iterator = iterable_group_iterator<typename basic_sparse_set<Entity>::reverse_iterator>;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return iterator{group.begin(), group};
+            return { group.begin(), group };
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return iterator{group.end(), group};
+            return { group.end(), group };
         }
 
         [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return reverse_iterator{group.rbegin(), group};
+            return { group.rbegin(), group };
         }
 
         [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return reverse_iterator{group.rend(), group};
+            return { group.rend(), group };
         }
 
     private:
@@ -276,10 +276,6 @@ public:
      * The returned iterator points to the first entity of the group. If the
      * group is empty, the returned iterator will be equal to `end()`.
      *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
-     *
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
@@ -292,10 +288,6 @@ public:
      * The returned iterator points to the entity following the last entity of
      * the group. Attempting to dereference the returned iterator results in
      * undefined behavior.
-     *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
      *
      * @return An iterator to the entity following the last entity of the
      * group.
@@ -310,10 +302,6 @@ public:
      * The returned iterator points to the first entity of the reversed group.
      * If the group is empty, the returned iterator will be equal to `rend()`.
      *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
-     *
      * @return An iterator to the first entity of the reversed group.
      */
     [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
@@ -327,10 +315,6 @@ public:
      * The returned iterator points to the entity following the last entity of
      * the reversed group. Attempting to dereference the returned iterator
      * results in undefined behavior.
-     *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
      *
      * @return An iterator to the entity following the last entity of the
      * reversed group.
@@ -674,28 +658,28 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-            return iterator{
+            return {
                 std::get<0>(pools)->basic_sparse_set<Entity>::end() - *length,
                 std::make_tuple((std::get<pool_type<Owned> *>(pools)->end() - *length)..., std::get<pool_type<Get> *>(pools)...)
             };
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-            return iterator{
+            return {
                 std::get<0>(pools)->basic_sparse_set<Entity>::end(),
                 std::make_tuple((std::get<pool_type<Owned> *>(pools)->end())..., std::get<pool_type<Get> *>(pools)...)
             };
         }
 
         [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-            return reverse_iterator{
+            return {
                 std::get<0>(pools)->basic_sparse_set<Entity>::rbegin(),
                 std::make_tuple((std::get<pool_type<Owned> *>(pools)->rbegin())..., std::get<pool_type<Get> *>(pools)...)
             };
         }
 
         [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-            return reverse_iterator{
+            return {
                 std::get<0>(pools)->basic_sparse_set<Entity>::rbegin() + *length,
                 std::make_tuple((std::get<pool_type<Owned> *>(pools)->rbegin() + *length)..., std::get<pool_type<Get> *>(pools)...)
             };
@@ -836,10 +820,6 @@ public:
      * The returned iterator points to the first entity of the group. If the
      * group is empty, the returned iterator will be equal to `end()`.
      *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
-     *
      * @return An iterator to the first entity of the group.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
@@ -852,10 +832,6 @@ public:
      * The returned iterator points to the entity following the last entity of
      * the group. Attempting to dereference the returned iterator results in
      * undefined behavior.
-     *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
      *
      * @return An iterator to the entity following the last entity of the
      * group.
@@ -870,10 +846,6 @@ public:
      * The returned iterator points to the first entity of the reversed group.
      * If the group is empty, the returned iterator will be equal to `rend()`.
      *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
-     *
      * @return An iterator to the first entity of the reversed group.
      */
     [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
@@ -887,10 +859,6 @@ public:
      * The returned iterator points to the entity following the last entity of
      * the reversed group. Attempting to dereference the returned iterator
      * results in undefined behavior.
-     *
-     * @note
-     * Iterators stay true to the order imposed to the underlying data
-     * structures.
      *
      * @return An iterator to the entity following the last entity of the
      * reversed group.

@@ -23,11 +23,11 @@ TEST(NonOwningGroup, Functionalities) {
     ASSERT_TRUE((cgroup.empty<const int, const char>()));
 
     const auto e0 = registry.create();
-    registry.emplace<char>(e0);
+    registry.emplace<char>(e0, '1');
 
     const auto e1 = registry.create();
-    registry.emplace<int>(e1);
-    registry.emplace<char>(e1);
+    registry.emplace<int>(e1, 42);
+    registry.emplace<char>(e1, '2');
 
     ASSERT_FALSE(group.empty());
     ASSERT_FALSE(group.empty<int>());
@@ -56,10 +56,6 @@ TEST(NonOwningGroup, Functionalities) {
     ASSERT_EQ(group.size(), 1u);
     ASSERT_EQ(group.size<int>(), 1u);
     ASSERT_EQ(cgroup.size<const char>(), 2u);
-
-    registry.get<char>(e0) = '1';
-    registry.get<char>(e1) = '2';
-    registry.get<int>(e1) = 42;
 
     for(auto entity: group) {
         ASSERT_EQ(std::get<0>(cgroup.get<const int, const char>(entity)), 42);
@@ -330,14 +326,14 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
     entt::registry registry;
     auto group = registry.group(entt::get<int, empty_type, const char>);
 
-    ASSERT_EQ(group.size(), decltype(group.size()){0});
+    ASSERT_EQ(group.size(), 0u);
 
     const auto entity = registry.create();
     registry.emplace<int>(entity, 0);
     registry.emplace<empty_type>(entity);
     registry.emplace<char>(entity, 'c');
 
-    ASSERT_EQ(group.size(), decltype(group.size()){1});
+    ASSERT_EQ(group.size(), 1u);
 
     static_assert(std::is_same_v<decltype(group.get<int>({})), int &>);
     static_assert(std::is_same_v<decltype(group.get<const char>({})), const char &>);
@@ -596,11 +592,11 @@ TEST(OwningGroup, Functionalities) {
     ASSERT_TRUE((cgroup.empty<const int, const char>()));
 
     const auto e0 = registry.create();
-    registry.emplace<char>(e0);
+    registry.emplace<char>(e0, '1');
 
     const auto e1 = registry.create();
-    registry.emplace<int>(e1);
-    registry.emplace<char>(e1);
+    registry.emplace<int>(e1, 42);
+    registry.emplace<char>(e1, '2');
 
     ASSERT_FALSE(group.empty());
     ASSERT_FALSE(group.empty<int>());
@@ -629,10 +625,6 @@ TEST(OwningGroup, Functionalities) {
     ASSERT_EQ(group.size(), 1u);
     ASSERT_EQ(group.size<int>(), 1u);
     ASSERT_EQ(cgroup.size<const char>(), 2u);
-
-    registry.get<char>(e0) = '1';
-    registry.get<char>(e1) = '2';
-    registry.get<int>(e1) = 42;
 
     ASSERT_EQ(*(cgroup.raw<const int>() + 0), 42);
     ASSERT_EQ(*(group.raw<int>() + 0), 42);
@@ -984,7 +976,7 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     entt::registry registry;
     auto group = registry.group<int, const char>(entt::get<empty_type, double, const float>);
 
-    ASSERT_EQ(group.size(), decltype(group.size()){0});
+    ASSERT_EQ(group.size(), 0u);
 
     const auto entity = registry.create();
     registry.emplace<int>(entity, 0);
@@ -993,7 +985,7 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     registry.emplace<double>(entity, 0.);
     registry.emplace<float>(entity, 0.f);
 
-    ASSERT_EQ(group.size(), decltype(group.size()){1});
+    ASSERT_EQ(group.size(), 1u);
 
     static_assert(std::is_same_v<decltype(group.get<int>({})), int &>);
     static_assert(std::is_same_v<decltype(group.get<const char>({})), const char &>);
