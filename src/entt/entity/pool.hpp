@@ -20,7 +20,7 @@ namespace entt {
  * @tparam Storage The type of the underlying storage.
  */
 template<typename Storage>
-struct storage_adapter: Storage {
+struct storage_adapter_mixin: Storage {
     static_assert(std::is_same_v<typename Storage::value_type, std::decay_t<typename Storage::value_type>>, "Invalid object type");
 
     /*! @brief Type of the objects associated with the entities. */
@@ -170,7 +170,7 @@ struct sigh_pool_mixin: Pool {
     }
 
     /**
-     * @copybrief storage_adapter::emplace
+     * @copybrief storage_adapter_mixin::emplace
      * @tparam Args Types of arguments to use to construct the object.
      * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
@@ -188,7 +188,7 @@ struct sigh_pool_mixin: Pool {
     }
 
     /**
-     * @copybrief storage_adapter::insert
+     * @copybrief storage_adapter_mixin::insert
      * @tparam It Type of input iterator.
      * @tparam Args Types of arguments to use to construct the objects
      * associated with the entities.
@@ -210,7 +210,7 @@ struct sigh_pool_mixin: Pool {
     }
 
     /**
-     * @copybrief storage_adapter::remove
+     * @copybrief storage_adapter_mixin::remove
      * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
      */
@@ -220,7 +220,7 @@ struct sigh_pool_mixin: Pool {
     }
 
     /**
-     * @copybrief storage_adapter::remove
+     * @copybrief storage_adapter_mixin::remove
      * @tparam It Type of input iterator.
      * @param owner The registry that issued the request.
      * @param first An iterator to the first element of the range of entities.
@@ -238,7 +238,7 @@ struct sigh_pool_mixin: Pool {
     }
 
     /**
-     * @copybrief storage_adapter::patch
+     * @copybrief storage_adapter_mixin::patch
      * @tparam Func Types of the function objects to invoke.
      * @param owner The registry that issued the request.
      * @param entity A valid entity identifier.
@@ -280,7 +280,7 @@ private:
 template<typename Entity, typename Type, typename = void>
 struct pool {
     /*! @brief Resulting type after component-to-pool conversion. */
-    using type = sigh_pool_mixin<storage_adapter<basic_storage<Entity, Type>>>;
+    using type = sigh_pool_mixin<storage_adapter_mixin<basic_storage<Entity, Type>>>;
 };
 
 

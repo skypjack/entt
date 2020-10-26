@@ -53,7 +53,7 @@ struct multi_instance_type { int value; };
 
 template<typename Entity>
 struct entt::pool<Entity, multi_instance_type> {
-    using type = storage_adapter<multi_instance_storage<Entity, multi_instance_type>>;
+    using type = storage_adapter_mixin<multi_instance_storage<Entity, multi_instance_type>>;
 };
 
 TEST(Example, MultiInstanceStorage) {
