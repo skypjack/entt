@@ -95,14 +95,14 @@ public:
     template<typename Archive>
     const basic_snapshot & entities(Archive &archive) const {
         const auto sz = reg->size();
-        auto first = reg->data();
-        const auto last = first + sz;
 
         archive(typename traits_type::entity_type(sz));
 
-        while(first != last) {
-            archive(*(first++));
+        for(auto first = reg->data(), last = first + sz; first != last; ++first) {
+            archive(*first);
         }
+
+        archive(reg->destroyed());
 
         return *this;
     }
@@ -234,7 +234,10 @@ public:
             archive(all[pos]);
         }
 
-        reg->assign(all.cbegin(), all.cend());
+        entity_type destroyed;
+        archive(destroyed);
+
+        reg->assign(all.cbegin(), all.cend(), destroyed);
 
         return *this;
     }
@@ -302,12 +305,10 @@ class basic_continuous_loader {
     using traits_type = entt_traits<Entity>;
 
     void destroy(Entity entt) {
-        const auto it = remloc.find(entt);
-
-        if(it == remloc.cend()) {
+        if(const auto it = remloc.find(entt); it == remloc.cend()) {
             const auto local = reg->create();
             remloc.emplace(entt, std::make_pair(local, true));
-            reg->destroy(local);
+            reg->destroy(local, 0u);
         }
     }
 
@@ -318,7 +319,10 @@ class basic_continuous_loader {
             const auto local = reg->create();
             remloc.emplace(entt, std::make_pair(local, true));
         } else {
-            remloc[entt].first = reg->valid(remloc[entt].first) ? remloc[entt].first : reg->create();
+            if(!reg->valid(remloc[entt].first)) {
+                remloc[entt].first = reg->create();
+            }
+
             // set the dirty flag
             remloc[entt].second = true;
         }
@@ -450,6 +454,9 @@ public:
                 destroy(entt);
             }
         }
+
+        // discards the head of the list of destroyed entities
+        archive(entt);
 
         return *this;
     }

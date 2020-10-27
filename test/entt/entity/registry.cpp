@@ -1404,7 +1404,8 @@ TEST(Registry, AssignEntities) {
     registry.destroy(entities[2]);
 
     entt::registry other;
-    other.assign(registry.data(), registry.data() + registry.size());
+    const auto *data = registry.data();
+    other.assign(data, data + registry.size(), registry.destroyed());
 
     ASSERT_EQ(registry.size(), other.size());
     ASSERT_TRUE(other.valid(entities[0]));
