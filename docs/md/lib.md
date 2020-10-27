@@ -29,7 +29,7 @@ This isn't a problem in itself (in fact, it's the basis of an API so convenient
 to use). However, a way is needed to recognize the objects whose type has been
 erased on the other side of a boundary.<br/>
 The `type_hash` class template is how identifiers are generated and thus made
-available to the rest of the library. The `type_index` class template makes all
+available to the rest of the library. The `type_seq` class template makes all
 types _indexable_ instead, so as to speed up the lookup.
 
 In general, these classes don't arouse much interest. The only exceptions are:
@@ -47,16 +47,16 @@ In general, these classes don't arouse much interest. The only exceptions are:
   `EnTT`, so as to make everything work nicely across boundaries.
 
 * When working with plugins or shared libraries that don't export any symbol. In
-  this case, `type_index` confuses the other classes by giving potentially wrong
+  this case, `type_seq` confuses the other classes by giving potentially wrong
   information to them.<br/>
   To avoid problems, it's required to provide a custom generator. Briefly, it's
-  necessary to specialize the `type_index` class and make it point to a context
+  necessary to specialize the `type_seq` class and make it point to a context
   that is also shared between the main application and the dynamically loaded
   libraries or plugins.<br/>
-  This will make the type system shared and available to the whole application,
-  not just to a particular tool such as the registry or the dispatcher. It means
-  that a call to `type_index::id()` will return the same identifier for the same
-  type from both sides of a boundary and can be used reliably for any purpose.
+  This will make the type system available to the whole application, not just to
+  a particular tool such as the registry or the dispatcher. It means that a call
+  to `type_seq::value()` will return the same identifier for the same type from
+  both sides of a boundary and can be used reliably for any purpose.
 
 For anyone who needs more details, the test suite contains multiple examples
 covering the most common cases (see the `lib` directory for all details).<br/>
