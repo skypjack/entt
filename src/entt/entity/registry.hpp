@@ -134,17 +134,17 @@ class basic_registry {
     }
 
     Entity recycle_identifier() {
-        ENTT_ASSERT(destroyed != null);
-        const auto curr = to_integral(destroyed);
+        ENTT_ASSERT(available != null);
+        const auto curr = to_integral(available);
         const auto version = to_integral(entities[curr]) & (traits_type::version_mask << traits_type::entity_shift);
-        destroyed = entity_type{to_integral(entities[curr]) & traits_type::entity_mask};
+        available = entity_type{to_integral(entities[curr]) & traits_type::entity_mask};
         return entities[curr] = entity_type{curr | version};
     }
 
     void release_entity(const Entity entity, const typename traits_type::version_type version) {
         const auto entt = to_integral(entity) & traits_type::entity_mask;
-        entities[entt] = entity_type{to_integral(destroyed) | (typename traits_type::entity_type{version} << traits_type::entity_shift)};
-        destroyed = entity_type{entt};
+        entities[entt] = entity_type{to_integral(available) | (typename traits_type::entity_type{version} << traits_type::entity_shift)};
+        available = entity_type{entt};
     }
 
 public:
@@ -198,7 +198,7 @@ public:
      */
     [[nodiscard]] size_type alive() const {
         auto sz = entities.size();
-        auto curr = destroyed;
+        auto curr = available;
 
         for(; curr != null; --sz) {
             curr = entities[to_integral(curr) & traits_type::entity_mask];
@@ -341,6 +341,18 @@ public:
     }
 
     /**
+     * @brief Returns the head of the list of destroyed entities.
+     * 
+     * This function is intended for use in conjunction with `assign`.<br/>
+     * The returned entity has an invalid identifier in all cases.
+     * 
+     * @return The head of the list of destroyed entities.
+     */
+    [[nodiscard]] entity_type destroyed() const ENTT_NOEXCEPT {
+        return available;
+    }
+
+    /**
      * @brief Checks if an entity identifier refers to a valid entity.
      * @param entity An entity identifier, either valid or not.
      * @return True if the identifier is valid, false otherwise.
@@ -398,7 +410,7 @@ public:
      * @return A valid entity identifier.
      */
     entity_type create() {
-        return destroyed == null ? generate_identifier() : recycle_identifier();
+        return available == null ? generate_identifier() : recycle_identifier();
     }
 
     /**
@@ -427,7 +439,7 @@ public:
         } else if(const auto curr = (to_integral(entities[req]) & traits_type::entity_mask); req == curr) {
             entt = create();
         } else {
-            auto *it = &destroyed;
+            auto *it = &available;
             for(; (to_integral(*it) & traits_type::entity_mask) != req; it = &entities[to_integral(*it) & traits_type::entity_mask]);
             *it = entity_type{curr | (to_integral(*it) & (traits_type::version_mask << traits_type::entity_shift))};
             entt = entities[req] = hint;
@@ -447,7 +459,7 @@ public:
      */
     template<typename It>
     void create(It first, It last) {
-        for(; destroyed != null && first != last; ++first) {
+        for(; available != null && first != last; ++first) {
             *first = recycle_identifier();
         }
 
@@ -459,9 +471,11 @@ public:
     /**
      * @brief Assigns entities to an empty registry.
      *
-     * This function is intended for use in conjunction with `raw`.<br/>
-     * Don't try to inject ranges of randomly generated entities. There is no
-     * guarantee that a registry will continue to work properly in this case.
+     * This function is intended for use in conjunction with `raw` and
+     * `assign`.<br/>
+     * Don't try to inject ranges of randomly generated entities nor the _wrong_
+     * head for the list of destroyed entities. There is no guarantee that a
+     * registry will continue to work properly in this case.
      *
      * @warning
      * An assertion will abort the execution at runtime in debug mode if all
@@ -470,18 +484,13 @@ public:
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
+     * @param destroyed The head of the list of destroyed entities.
      */
     template<typename It>
-    void assign(It first, It last) {
+    void assign(It first, It last, const entity_type destroyed) {
         ENTT_ASSERT(std::all_of(pools.cbegin(), pools.cend(), [](auto &&pdata) { return !pdata.pool || pdata.pool->empty(); }));
         entities.assign(first, last);
-        destroyed = null;
-
-        for(std::size_t pos{}, end = entities.size(); pos < end; ++pos) {
-            if((to_integral(entities[pos]) & traits_type::entity_mask) != pos) {
-                release_entity(entity_type{static_cast<typename traits_type::entity_type>(pos)}, version(entities[pos]));
-            }
-        }
+        available = destroyed;
     }
 
     /**
@@ -963,7 +972,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if(destroyed == null) {
+        if(available == null) {
             for(auto pos = entities.size(); pos; --pos) {
                 func(entities[pos-1]);
             }
@@ -1633,7 +1642,7 @@ private:
     mutable std::vector<pool_data> pools{};
     std::vector<entity_type> entities{};
     std::vector<variable_data> vars{};
-    entity_type destroyed{null};
+    entity_type available{null};
 };
 
 
