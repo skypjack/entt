@@ -97,7 +97,6 @@ endif()
 
 if(BUILD_EXAMPLE)
     SETUP_BASIC_TEST(custom_identifier example/custom_identifier.cpp)
-    SETUP_BASIC_TEST(multi_instance_storage example/multi_instance_storage.cpp)
 endif()
 
 # Test lib
