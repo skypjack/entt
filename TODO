@@ -17,11 +17,10 @@
   - ...
 
 WIP:
-* remove extended registry::remove, rename it to (basic) erase and document the handle way for extended operations
-* make view pack work also with groups
+* document the handle way for extended operations
+* make view pack work also with groups, add multi-type iterator (not only input iterators)
 * add exclude-only views to combine with packs
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
-* split basic_view and view_t like sfinae-friendly class
 * HP: write documentation for custom storages and views!!
 * view pack: plain function as an alias for operator|, reverse iterators, rbegin and rend
 * pagination doesn't work nicely across boundaries probably, give it a look. RO operations are fine, adding components maybe not.

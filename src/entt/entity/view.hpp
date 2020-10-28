@@ -319,6 +319,15 @@ public:
     using reverse_iterator = view_iterator<typename basic_sparse_set<entity_type>::reverse_iterator>;
 
     /**
+     * @brief Forces the type to use to drive iterations.
+     * @tparam Comp Type of component to use to drive the iteration.
+     */
+    template<typename Comp>
+    void use() const ENTT_NOEXCEPT {
+        view = std::get<pool_type<Comp> *>(pools);
+    }
+
+    /**
      * @brief Estimates the number of entities iterated by the view.
      * @return Estimated number of entities iterated by the view.
      */
@@ -493,13 +502,13 @@ public:
      *
      * @sa each
      *
-     * @tparam Comp Type of component to use to enforce the iteration order.
+     * @tparam Comp Type of component to use to drive the iteration.
      * @tparam Func Type of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Comp, typename Func>
     void each(Func func) const {
-        view = std::get<pool_type<Comp> *>(pools);
+        use<Comp>();
         traverse<Comp>(std::move(func), return_type{});
     }
 
@@ -531,12 +540,12 @@ public:
      *
      * @sa each
      *
-     * @tparam Comp Type of component to use to enforce the iteration order.
+     * @tparam Comp Type of component to use to drive the iteration.
      * @return An iterable object to use to _visit_ the view.
      */
     template<typename Comp>
     [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
-        view = std::get<pool_type<Comp> *>(pools);
+        use<Comp>();
         return iterable_view{*this};
     }
 
