@@ -57,13 +57,10 @@ struct storage_adapter_mixin: Storage {
 
     /**
      * @brief Removes entities from a pool.
-     * @tparam Args Types of arguments to forward to the underlying storage.
      * @param entity A valid entity identifier.
-     * @param args Optional parameters to forward to the underlying storage.
      */
-    template<typename... Args>
-    void remove(basic_registry<entity_type> &, const entity_type entity, Args &&... args) {
-        Storage::remove(entity, std::forward<Args>(args)...);
+    void remove(basic_registry<entity_type> &, const entity_type entity) {
+        Storage::remove(entity);
     }
 
     /**
@@ -73,8 +70,8 @@ struct storage_adapter_mixin: Storage {
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    void erase(basic_registry<entity_type> &, It first, It last) {
-        Storage::erase(first, last);
+    void remove(basic_registry<entity_type> &, It first, It last) {
+        Storage::remove(first, last);
     }
 
     /**
@@ -227,14 +224,14 @@ struct sigh_pool_mixin: Pool {
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    void erase(basic_registry<entity_type> &owner, It first, It last) {
+    void remove(basic_registry<entity_type> &owner, It first, It last) {
         if(!destruction.empty()) {
             for(auto it = first; it != last; ++it) {
                 destruction.publish(owner, *it);
             }
         }
 
-        Pool::erase(owner, first, last);
+        Pool::remove(owner, first, last);
     }
 
     /**

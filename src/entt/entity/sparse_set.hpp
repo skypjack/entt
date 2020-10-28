@@ -442,7 +442,7 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    void erase(It first, It last) {
+    void remove(It first, It last) {
         if(std::distance(first, last) == std::distance(packed.begin(), packed.end())) {
             // no validity check, let it be misused
             clear();

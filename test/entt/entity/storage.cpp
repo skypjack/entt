@@ -120,20 +120,20 @@ TEST(Storage, InsertEmptyType) {
     ASSERT_EQ(pool.size(), 2u);
 }
 
-TEST(Storage, Erase) {
+TEST(Storage, Remove) {
     entt::storage<int> pool;
     entt::sparse_set &base = pool;
 
     pool.emplace(entt::entity{3});
     pool.emplace(entt::entity{42});
-    base.erase(base.begin(), base.end());
+    base.remove(base.begin(), base.end());
 
     ASSERT_TRUE(pool.empty());
 
     pool.emplace(entt::entity{3}, 3);
     pool.emplace(entt::entity{42}, 42);
     pool.emplace(entt::entity{9}, 9);
-    base.erase(base.rbegin(), base.rbegin() + 2u);
+    base.remove(base.rbegin(), base.rbegin() + 2u);
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(*pool.begin(), 9);
@@ -144,7 +144,7 @@ TEST(Storage, Erase) {
     pool.emplace(entt::entity{9}, 9);
 
     entt::entity entities[2]{entt::entity{3}, entt::entity{9}};
-    base.erase(std::begin(entities), std::end(entities));
+    base.remove(std::begin(entities), std::end(entities));
 
     ASSERT_FALSE(pool.empty());
     ASSERT_EQ(*pool.begin(), 42);

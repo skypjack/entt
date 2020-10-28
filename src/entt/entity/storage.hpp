@@ -440,8 +440,8 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename It>
-    void erase(It first, It last) {
-        underlying_type::erase(first, last);
+    void remove(It first, It last) {
+        underlying_type::remove(first, last);
     }
 
     /**
