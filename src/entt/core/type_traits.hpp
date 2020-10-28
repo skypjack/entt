@@ -309,7 +309,7 @@ inline constexpr auto is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
  * @tparam Type Potential empty type.
  */
 template<typename Type, typename = void>
-struct is_eto_eligible
+struct is_empty
     : ENTT_IS_EMPTY(Type)
 {};
 
@@ -319,7 +319,7 @@ struct is_eto_eligible
  * @tparam Type Potential empty type.
  */
 template<typename Type>
-inline constexpr auto is_eto_eligible_v = is_eto_eligible<Type>::value;
+inline constexpr auto is_empty_v = is_empty<Type>::value;
 
 
 /**

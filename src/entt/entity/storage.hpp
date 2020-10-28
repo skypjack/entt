@@ -535,7 +535,7 @@ private:
 
 /*! @copydoc basic_storage */
 template<typename Entity, typename Type>
-class basic_storage<Entity, Type, std::enable_if_t<is_eto_eligible_v<Type>>>: public basic_sparse_set<Entity> {
+class basic_storage<Entity, Type, std::enable_if_t<is_empty_v<Type>>>: public basic_sparse_set<Entity> {
     using underlying_type = basic_sparse_set<Entity>;
 
 public:
