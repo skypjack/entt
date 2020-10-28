@@ -292,16 +292,11 @@ bool all = registry.has<position, velocity>(entity);
 bool any = registry.any<position, velocity>(entity);
 ```
 
-If the goal is to delete a single component from an entity that owns it or even
-multiple instances of a given type at once, the `remove` and `erase` member
-function templates are the way to go:
+If the goal is to delete a component from an entity that owns it, the `remove`
+member function template is the way to go:
 
 ```cpp
-// removes the component from its entity
 registry.remove<position>(entity);
-
-// removes multiple instances of the given type at once
-registry.remove<position>(std::cbegin(entities), std::cend(entities));
 ```
 
 When in doubt whether the entity owns the component, use the `remove_if_exists`

@@ -138,7 +138,7 @@ TEST(Benchmark, Remove) {
     timer.elapsed();
 }
 
-TEST(Benchmark, EraseMany) {
+TEST(Benchmark, RemoveMany) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
 
@@ -149,11 +149,11 @@ TEST(Benchmark, EraseMany) {
 
     timer timer;
     auto view = registry.view<int>();
-    registry.erase<int>(++view.begin(), view.end());
+    registry.remove<int>(++view.begin(), view.end());
     timer.elapsed();
 }
 
-TEST(Benchmark, EraseAll) {
+TEST(Benchmark, RemoveAll) {
     entt::registry registry;
     std::vector<entt::entity> entities(1000000);
 
@@ -164,7 +164,7 @@ TEST(Benchmark, EraseAll) {
 
     timer timer;
     auto view = registry.view<int>();
-    registry.erase<int>(view.begin(), view.end());
+    registry.remove<int>(view.begin(), view.end());
     timer.elapsed();
 }
 

@@ -138,7 +138,7 @@ TEST(SparseSet, Insert) {
     ASSERT_EQ(set.data()[set.index(entt::entity{24})], entt::entity{24});
 }
 
-TEST(SparseSet, Erase) {
+TEST(SparseSet, Remove) {
     entt::sparse_set set;
     entt::entity entities[3];
 
@@ -147,17 +147,17 @@ TEST(SparseSet, Erase) {
     entities[2] = entt::entity{9};
 
     set.insert(std::begin(entities), std::end(entities));
-    set.erase(set.begin(), set.end());
+    set.remove(set.begin(), set.end());
 
     ASSERT_TRUE(set.empty());
 
     set.insert(std::begin(entities), std::end(entities));
-    set.erase(set.rbegin(), set.rend());
+    set.remove(set.rbegin(), set.rend());
 
     ASSERT_TRUE(set.empty());
 
     set.insert(std::begin(entities), std::end(entities));
-    set.erase(entities, entities + 2u);
+    set.remove(entities, entities + 2u);
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(*set.begin(), entt::entity{9});
@@ -165,7 +165,7 @@ TEST(SparseSet, Erase) {
     set.clear();
     set.insert(std::begin(entities), std::end(entities));
     std::swap(entities[1], entities[2]);
-    set.erase(entities, entities + 2u);
+    set.remove(entities, entities + 2u);
 
     ASSERT_FALSE(set.empty());
     ASSERT_EQ(*set.begin(), entt::entity{42});
