@@ -45,7 +45,7 @@ TEST(Storage, Functionalities) {
     ASSERT_EQ(*pool.try_get(entt::entity{41}), 3);
     ASSERT_EQ(pool.try_get(entt::entity{99}), nullptr);
 
-    pool.erase(entt::entity{41});
+    pool.remove(entt::entity{41});
 
     ASSERT_TRUE(pool.empty());
     ASSERT_EQ(pool.size(), 0u);
@@ -120,7 +120,7 @@ TEST(Storage, InsertEmptyType) {
     ASSERT_EQ(pool.size(), 2u);
 }
 
-TEST(Storage, RangeErase) {
+TEST(Storage, Erase) {
     entt::storage<int> pool;
     entt::sparse_set &base = pool;
 
@@ -160,7 +160,7 @@ TEST(Storage, TypesFromStandardTemplateLibraryMustWork) {
     // see #37 - this test shouldn't crash, that's all
     entt::storage<std::unordered_set<int>> pool;
     pool.emplace(entt::entity{0}).insert(42);
-    pool.erase(entt::entity{0});
+    pool.remove(entt::entity{0});
 }
 
 TEST(Storage, Iterator) {

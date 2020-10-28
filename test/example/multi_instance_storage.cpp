@@ -22,9 +22,9 @@ struct multi_instance_storage: entt::basic_storage<Entity, std::vector<Type>> {
     using iterator = typename underlying_storage::iterator;
     using const_iterator = typename underlying_storage::const_iterator;
 
-    template<typename... Args>
-    void insert(Args &&...) = delete;
+    template<typename... Args> void insert(Args &&...) = delete;
 
+    using underlying_storage::remove;
     using underlying_storage::erase;
 
     template<typename... Args>
@@ -38,12 +38,12 @@ struct multi_instance_storage: entt::basic_storage<Entity, std::vector<Type>> {
         return vec->emplace_back(Type{std::forward<Args>(args)...});
     }
 
-    void erase(const entity_type entt, const size_type index) {
+    void remove(const entity_type entt, const size_type index) {
         auto &vec = underlying_storage::get(entt);
         vec.erase(vec.begin() + index);
 
         if(vec.empty()) {
-            underlying_storage::erase(entt);
+            underlying_storage::remove(entt);
         }
     }
 };
