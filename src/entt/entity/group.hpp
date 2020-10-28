@@ -129,11 +129,11 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
     public:
         using iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::iterator,
-            type_list_cat_t<std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<Get>>...>
+            type_list_cat_t<std::conditional_t<is_empty_v<Get>, type_list<>, type_list<Get>>...>
         >;
         using reverse_iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::reverse_iterator,
-            type_list_cat_t<std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<Get>>...>
+            type_list_cat_t<std::conditional_t<is_empty_v<Get>, type_list<>, type_list<Get>>...>
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
@@ -408,7 +408,7 @@ public:
 
         if constexpr(sizeof...(Component) == 0) {
             return std::tuple_cat([entt](auto *cpool) {
-                if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
+                if constexpr(is_empty_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
                     return std::tuple{};
                 } else {
                     return std::forward_as_tuple(cpool->get(entt));
@@ -445,7 +445,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        traverse(std::move(func), (std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<Get>>{} + ...));
+        traverse(std::move(func), (std::conditional_t<is_empty_v<Get>, type_list<>, type_list<Get>>{} + ...));
     }
 
     /**
@@ -661,13 +661,13 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
     public:
         using iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::iterator,
-            type_list_cat_t<std::conditional_t<is_eto_eligible_v<Owned>, type_list<>, type_list<decltype(std::declval<pool_type<Owned>>().end())>>...>,
-            type_list_cat_t<std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<Get>>...>
+            type_list_cat_t<std::conditional_t<is_empty_v<Owned>, type_list<>, type_list<decltype(std::declval<pool_type<Owned>>().end())>>...>,
+            type_list_cat_t<std::conditional_t<is_empty_v<Get>, type_list<>, type_list<Get>>...>
         >;
         using reverse_iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::reverse_iterator,
-            type_list_cat_t<std::conditional_t<is_eto_eligible_v<Owned>, type_list<>, type_list<decltype(std::declval<pool_type<Owned>>().rbegin())>>...>,
-            type_list_cat_t<std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<Get>>...>
+            type_list_cat_t<std::conditional_t<is_empty_v<Owned>, type_list<>, type_list<decltype(std::declval<pool_type<Owned>>().rbegin())>>...>,
+            type_list_cat_t<std::conditional_t<is_empty_v<Get>, type_list<>, type_list<Get>>...>
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
@@ -957,7 +957,7 @@ public:
             auto filter = [entt, index = std::get<0>(pools)->index(entt)](auto *cpool) {
                 using value_type = typename std::remove_reference_t<decltype(*cpool)>::value_type;
 
-                if constexpr(is_eto_eligible_v<value_type>) {
+                if constexpr(is_empty_v<value_type>) {
                     return std::tuple{};
                 } else if constexpr((std::is_same_v<value_type, std::remove_const_t<Owned>> || ...)) {
                     return std::forward_as_tuple(cpool->raw()[index]);
@@ -999,8 +999,8 @@ public:
     template<typename Func>
     void each(Func func) const {
         traverse(std::move(func),
-            (std::conditional_t<is_eto_eligible_v<Owned>, type_list<>, type_list<Owned>>{} + ...),
-            (type_list<>{} + ... + std::conditional_t<is_eto_eligible_v<Get>, type_list<>, type_list<Get>>{}));
+            (std::conditional_t<is_empty_v<Owned>, type_list<>, type_list<Owned>>{} + ...),
+            (type_list<>{} + ... + std::conditional_t<is_empty_v<Get>, type_list<>, type_list<Get>>{}));
     }
 
     /**

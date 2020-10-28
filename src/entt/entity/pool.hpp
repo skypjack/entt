@@ -179,7 +179,7 @@ struct sigh_pool_mixin: Pool {
         Pool::emplace(owner, entity, std::forward<Args>(args)...);
         construction.publish(owner, entity);
 
-        if constexpr(!is_eto_eligible_v<value_type>) {
+        if constexpr(!is_empty_v<value_type>) {
             return this->get(entity);
         }
     }
@@ -244,7 +244,7 @@ struct sigh_pool_mixin: Pool {
      */
     template<typename... Func>
     decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entity, [[maybe_unused]] Func &&... func) {
-        if constexpr(is_eto_eligible_v<value_type>) {
+        if constexpr(is_empty_v<value_type>) {
             update.publish(owner, entity);
         } else {
             Pool::patch(owner, entity, std::forward<Func>(func)...);

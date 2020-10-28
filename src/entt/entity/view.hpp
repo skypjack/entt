@@ -71,7 +71,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
     template<typename Comp>
     using pool_type = pool_t<Entity, Comp>;
 
-    using return_type = type_list_cat_t<std::conditional_t<is_eto_eligible_v<Component>, type_list<>, type_list<Component>>...>;
+    using return_type = type_list_cat_t<std::conditional_t<is_empty_v<Component>, type_list<>, type_list<Component>>...>;
     using unchecked_type = std::array<const basic_sparse_set<Entity> *, (sizeof...(Component) - 1)>;
 
     template<typename It>
@@ -290,9 +290,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         auto first = view->data();
 
         while(first != last) {
-            if((std::get<pool_type<Component> *>(pools)->contains(*first) && ...)
-                && !(std::get<const pool_type<Exclude> *>(filter)->contains(*first) || ...))
-            {
+            if((std::get<pool_type<Component> *>(pools)->contains(*first) && ...) && !(std::get<const pool_type<Exclude> *>(filter)->contains(*first) || ...)) {
                 const auto base = *(first++);
                 const auto chunk = (std::min)({ (std::get<pool_type<Component> *>(pools)->size() - std::get<pool_type<Component> *>(pools)->index(base))... });
                 size_type length{};
@@ -443,7 +441,7 @@ public:
 
         if constexpr(sizeof...(Comp) == 0) {
             return std::tuple_cat([entt](auto *cpool) {
-                if constexpr(is_eto_eligible_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
+                if constexpr(is_empty_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
                     return std::tuple{};
                 } else {
                     return std::forward_as_tuple(cpool->get(entt));
@@ -674,12 +672,12 @@ class basic_view<Entity, exclude_t<>, Component> final {
 
     public:
         using iterator = std::conditional_t<
-            is_eto_eligible_v<Component>,
+            is_empty_v<Component>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::iterator>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::iterator, decltype(std::declval<pool_type>().begin())>
         >;
         using reverse_iterator = std::conditional_t<
-            is_eto_eligible_v<Component>,
+            is_empty_v<Component>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator, decltype(std::declval<pool_type>().rbegin())>
         >;
@@ -889,7 +887,7 @@ public:
     template<typename... Comp>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Comp) == 0) {
-            if constexpr(is_eto_eligible_v<Component>) {
+            if constexpr(is_empty_v<Component>) {
                 return std::tuple{};
             } else {
                 return std::forward_as_tuple(pool->get(entt));
@@ -924,7 +922,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(is_eto_eligible_v<Component>) {
+        if constexpr(is_empty_v<Component>) {
             if constexpr(std::is_invocable_v<Func, entity_type>) {
                 for(const auto entt: *this) {
                     func(entt);
