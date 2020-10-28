@@ -1195,7 +1195,7 @@ TEST(Registry, Insert) {
     ASSERT_EQ(registry.get<float>(e2), 2.f);
 }
 
-TEST(Registry, RangeRemove) {
+TEST(Registry, Erase) {
     entt::registry registry;
 
     const auto e0 = registry.create();
@@ -1216,7 +1216,7 @@ TEST(Registry, RangeRemove) {
     ASSERT_TRUE(registry.has<int>(e2));
 
     const auto view = registry.view<int, char>();
-    registry.remove<int>(view.begin(), view.end());
+    registry.erase<int>(view.begin(), view.end());
 
     ASSERT_FALSE(registry.has<int>(e0));
     ASSERT_FALSE(registry.has<int>(e1));

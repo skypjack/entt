@@ -36,7 +36,7 @@ TEST(SparseSet, Functionalities) {
     ASSERT_TRUE(set.contains(entt::entity{42}));
     ASSERT_EQ(set.index(entt::entity{42}), 0u);
 
-    set.erase(entt::entity{42});
+    set.remove(entt::entity{42});
 
     ASSERT_TRUE(set.empty());
     ASSERT_EQ(set.size(), 0u);
@@ -90,14 +90,14 @@ TEST(SparseSet, Pagination) {
     ASSERT_TRUE(set.contains(entt::entity{entt_per_page}));
     ASSERT_FALSE(set.contains(entt::entity{entt_per_page+1}));
 
-    set.erase(entt::entity{entt_per_page-1});
+    set.remove(entt::entity{entt_per_page-1});
 
     ASSERT_EQ(set.extent(), 2 * entt_per_page);
     ASSERT_FALSE(set.contains(entt::entity{entt_per_page-1}));
     ASSERT_TRUE(set.contains(entt::entity{entt_per_page}));
 
     set.shrink_to_fit();
-    set.erase(entt::entity{entt_per_page});
+    set.remove(entt::entity{entt_per_page});
 
     ASSERT_EQ(set.extent(), 2 * entt_per_page);
     ASSERT_FALSE(set.contains(entt::entity{entt_per_page-1}));
@@ -138,7 +138,7 @@ TEST(SparseSet, Insert) {
     ASSERT_EQ(set.data()[set.index(entt::entity{24})], entt::entity{24});
 }
 
-TEST(SparseSet, RangeErase) {
+TEST(SparseSet, Erase) {
     entt::sparse_set set;
     entt::entity entities[3];
 

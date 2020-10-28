@@ -45,7 +45,7 @@ class basic_registry {
     struct pool_data {
         type_info info{};
         std::unique_ptr<basic_sparse_set<Entity>> pool{};
-        void(* remove)(basic_sparse_set<Entity> &, basic_registry &, const Entity *, const Entity *){};
+        void(* erase)(basic_sparse_set<Entity> &, basic_registry &, const Entity *, const Entity *){};
     };
 
     template<typename...>
@@ -79,7 +79,7 @@ class basic_registry {
         void discard_if([[maybe_unused]] basic_registry &owner, const Entity entt) {
             if constexpr(sizeof...(Owned) == 0) {
                 if(current.contains(entt)) {
-                    current.erase(entt);
+                    current.remove(entt);
                 }
             } else {
                 if(const auto cpools = std::forward_as_tuple(owner.assure<Owned>()...); std::get<0>(cpools).contains(entt) && (std::get<0>(cpools).index(entt) < current)) {
@@ -114,8 +114,8 @@ class basic_registry {
         if(auto &&pdata = pools[index]; !pdata.pool) {
             pdata.info = type_id<Component>();
             pdata.pool.reset(new pool_t<Entity, Component>());
-            pdata.remove = +[](basic_sparse_set<Entity> &cpool, basic_registry &owner, const Entity *first, const Entity *last) {
-                static_cast<pool_t<Entity, Component> &>(cpool).remove(owner, first, last);
+            pdata.erase = +[](basic_sparse_set<Entity> &cpool, basic_registry &owner, const Entity *first, const Entity *last) {
+                static_cast<pool_t<Entity, Component> &>(cpool).erase(owner, first, last);
             };
         }
 
@@ -724,9 +724,9 @@ public:
      * @param last An iterator past the last element of the range of entities.
      */
     template<typename... Component, typename It>
-    void remove(It first, It last) {
+    void erase(It first, It last) {
         ENTT_ASSERT(std::all_of(first, last, [this](const auto entity) { return valid(entity); }));
-        (assure<Component>().remove(*this, first, last), ...);
+        (assure<Component>().erase(*this, first, last), ...);
     }
 
     /**
@@ -780,7 +780,7 @@ public:
 
         for(auto pos = pools.size(); pos; --pos) {
             if(auto &pdata = pools[pos-1]; pdata.pool && pdata.pool->contains(entity)) {
-                pdata.remove(*pdata.pool, *this, std::begin(wrap), std::end(wrap));
+                pdata.erase(*pdata.pool, *this, std::begin(wrap), std::end(wrap));
             }
         }
     }
@@ -937,7 +937,7 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             for(auto pos = pools.size(); pos; --pos) {
                 if(const auto &pdata = pools[pos-1]; pdata.pool) {
-                    pdata.remove(*pdata.pool, *this, pdata.pool->rbegin(), pdata.pool->rend());
+                    pdata.erase(*pdata.pool, *this, pdata.pool->rbegin(), pdata.pool->rend());
                 }
             }
 
@@ -948,7 +948,7 @@ public:
             }
         } else {
             ([this](auto &&cpool) {
-                cpool.remove(*this, cpool.basic_sparse_set<entity_type>::begin(), cpool.basic_sparse_set<entity_type>::end());
+                cpool.erase(*this, cpool.basic_sparse_set<entity_type>::begin(), cpool.basic_sparse_set<entity_type>::end());
             }(assure<Component>()), ...);
         }
     }

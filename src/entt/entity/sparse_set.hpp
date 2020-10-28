@@ -425,7 +425,7 @@ public:
      *
      * @param entt A valid entity identifier.
      */
-    virtual void erase(const entity_type entt) {
+    virtual void remove(const entity_type entt) {
         ENTT_ASSERT(contains(entt));
         const auto curr = page(entt);
         const auto pos = offset(entt);
@@ -448,7 +448,7 @@ public:
             clear();
         } else {
             for(; first != last; ++first) {
-                erase(*first);
+                remove(*first);
             }
         }
     }
