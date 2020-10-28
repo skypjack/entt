@@ -17,6 +17,7 @@
   - ...
 
 WIP:
+* remove extended registry::remove, rename it to (basic) erase and document the handle way for extended operations
 * make view pack work also with groups
 * add exclude-only views to combine with packs
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
