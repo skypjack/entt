@@ -469,6 +469,7 @@ TEST(Registry, VersionOverflow) {
     registry.destroy(registry.create());
 
     ASSERT_EQ(registry.current(entity), registry.version(entity));
+    ASSERT_EQ(registry.current(entity), typename traits_type::version_type{});
 }
 
 TEST(Registry, Each) {

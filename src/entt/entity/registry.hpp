@@ -429,7 +429,7 @@ public:
         entity_type entt;
 
         if(const auto req = (to_integral(hint) & traits_type::entity_mask); !(req < entities.size())) {
-            entities.reserve(req + 1u);
+            entities.reserve(size_type(req) + 1u);
 
             for(auto pos = entities.size(); pos < req; ++pos) {
                 release_entity(generate_identifier(), {});
@@ -504,7 +504,7 @@ public:
      * @param entity A valid entity identifier.
      */
     void destroy(const entity_type entity) {
-        destroy(entity, version(entity) + 1u);
+        destroy(entity, static_cast<typename traits_type::version_type>(version(entity) + 1u));
     }
 
     /**
