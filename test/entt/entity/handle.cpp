@@ -113,39 +113,56 @@ TEST(BasicHandle, Comparison) {
 TEST(BasicHandle, Component) {
     entt::registry registry;
     const auto entity = registry.create();
-    entt::handle handle{registry, entity};
+    entt::handle_view<int, char, double> handle{registry, entity};
 
     ASSERT_EQ(3, handle.emplace<int>(3));
     ASSERT_EQ('c', handle.emplace_or_replace<char>('c'));
+    ASSERT_EQ(.3, handle.emplace_or_replace<double>(.3));
 
     const auto &patched = handle.patch<int>([](auto &comp) { comp = 42; });
 
     ASSERT_EQ(42, patched);
     ASSERT_EQ('a', handle.replace<char>('a'));
-    ASSERT_TRUE((handle.has<int, char>()));
+    ASSERT_TRUE((handle.has<int, char, double>()));
+    ASSERT_EQ((std::make_tuple(42, 'a', .3)), (handle.get<int, char, double>()));
 
-    handle.remove<char>();
+    handle.remove<char, double>();
 
-    ASSERT_TRUE(registry.empty<char>());
-    ASSERT_EQ(0u, handle.remove_if_exists<char>());
+    ASSERT_TRUE((registry.empty<char, double>()));
+    ASSERT_EQ(0u, (handle.remove_if_exists<char, double>()));
 
     handle.visit([](auto info) { ASSERT_EQ(entt::type_hash<int>::value(), info.hash()); });
 
-    ASSERT_TRUE((handle.any<int, char>()));
-    ASSERT_FALSE((handle.has<int, char>()));
+    ASSERT_TRUE((handle.any<int, char, double>()));
+    ASSERT_FALSE((handle.has<int, char, double>()));
     ASSERT_FALSE(handle.orphan());
 
-    handle.remove_all();
+    handle.remove<int>();
 
     ASSERT_TRUE(registry.empty<int>());
     ASSERT_TRUE(handle.orphan());
-
+    
     ASSERT_EQ(42, handle.get_or_emplace<int>(42));
     ASSERT_EQ(42, handle.get_or_emplace<int>(1));
     ASSERT_EQ(42, handle.get<int>());
-
+    
     ASSERT_EQ(42, *handle.try_get<int>());
     ASSERT_EQ(nullptr, handle.try_get<char>());
+    ASSERT_EQ(nullptr, std::get<1>(handle.try_get<int, char, double>()));
+}
+
+TEST(BasicHandle, RemoveAll) {
+    entt::registry registry;
+    const auto entity = registry.create();
+    entt::handle handle{registry, entity};
+
+    ASSERT_EQ(3, handle.emplace<int>(3));
+    ASSERT_EQ('c', handle.emplace_or_replace<char>('c'));
+    ASSERT_TRUE((handle.has<int, char>()));
+
+    handle.remove_all();
+
+    ASSERT_FALSE((handle.any<int, char>()));
 }
 
 TEST(BasicHandle, FromEntity) {
