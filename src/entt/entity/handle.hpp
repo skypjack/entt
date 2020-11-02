@@ -2,6 +2,11 @@
 #define ENTT_ENTITY_HANDLE_HPP
 
 
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include "../config/config.h"
+#include "../core/type_traits.hpp"
 #include "fwd.hpp"
 #include "registry.hpp"
 
@@ -52,11 +57,20 @@ struct basic_handle {
 
     /**
      * @brief Constructs a const handle from a non-const one.
+     * @tparam Other A valid entity type (see entt_traits for more details).
+     * @tparam Args Scope of the handle to construct.
      * @return A const handle referring to the same registry and the same
      * entity.
      */
-    [[nodiscard]] operator basic_handle<const entity_type, Type...>() const ENTT_NOEXCEPT {
-        return reg ? basic_handle<const entity_type, Type...>{*reg, entt} : basic_handle<const entity_type, Type...>{};
+    template<typename Other, typename... Args>
+    [[nodiscard]] operator basic_handle<Other, Args...>() const ENTT_NOEXCEPT {
+        static_assert(
+            (std::is_same_v<Other, Entity> || std::is_same_v<std::remove_const_t<Other>, Entity>)
+            && (sizeof...(Type) == 0 || ((sizeof...(Args) != 0 && sizeof...(Args) <= sizeof...(Type)) && ... && (type_list_contains_v<type_list<Type...>, Args>))),
+            "Invalid conversion between different handles"
+        );
+
+        return reg ? basic_handle<Other, Args...>{*reg, entt} : basic_handle<Other, Args...>{};
     }
 
     /**
@@ -162,12 +176,8 @@ struct basic_handle {
      */
     template<typename... Component>
     void remove() const {
-        if constexpr(sizeof...(Type) == 0 || sizeof...(Component) == 1) {
-            static_assert(((sizeof...(Type) == 0) || ... || std::is_same_v<Component..., Type>));
-            reg->template remove<Component...>(entt);
-        } else {
-            (remove<Component>(), ...);
-        }
+        static_assert(sizeof...(Type) == 0 || (type_list_contains_v<type_list<Type...>, Component> && ...));
+        reg->template remove<Component...>(entt);
     }
 
     /**
@@ -178,12 +188,8 @@ struct basic_handle {
      */
     template<typename... Component>
     decltype(auto) remove_if_exists() const {
-        if constexpr(sizeof...(Type) == 0 || sizeof...(Component) == 1) {
-            static_assert(((sizeof...(Type) == 0) || ... || std::is_same_v<Component..., Type>));
-            return reg->template remove_if_exists<Component...>(entt);
-        } else {
-            return (remove_if_exists<Component>(), ...);
-        }
+        static_assert(sizeof...(Type) == 0 || (type_list_contains_v<type_list<Type...>, Component> && ...));
+        return reg->template remove_if_exists<Component...>(entt);
     }
 
     /**
@@ -226,12 +232,8 @@ struct basic_handle {
      */
     template<typename... Component>
     [[nodiscard]] decltype(auto) get() const {
-        if constexpr(sizeof...(Type) == 0 || sizeof...(Component) == 1) {
-            static_assert(((sizeof...(Type) == 0) || ... || std::is_same_v<Component..., Type>));
-            return reg->template get<Component...>(entt);
-        } else {
-            return std::forward_as_tuple(get<Component>()...);
-        }
+        static_assert(sizeof...(Type) == 0 || (type_list_contains_v<type_list<Type...>, Component> && ...));
+        return reg->template get<Component...>(entt);
     }
 
     /**
@@ -256,12 +258,8 @@ struct basic_handle {
      */
     template<typename... Component>
     [[nodiscard]] auto try_get() const {
-        if constexpr(sizeof...(Type) == 0 || sizeof...(Component) == 1) {
-            static_assert(((sizeof...(Type) == 0) || ... || std::is_same_v<Component..., Type>));
-            return reg->template try_get<Component...>(entt);
-        } else {
-            return std::make_tuple(this->try_get<Component>()...);
-        }
+        static_assert(sizeof...(Type) == 0 || (type_list_contains_v<type_list<Type...>, Component> && ...));
+        return reg->template try_get<Component...>(entt);
     }
 
     /**

@@ -204,9 +204,13 @@ TEST(BasicHandle, ImplicitConversions) {
     entt::registry registry;
     const entt::handle handle{registry, registry.create()};
     const entt::const_handle chandle = handle;
+    const entt::handle_view<int, char> vhandle = handle;
+    const entt::const_handle_view<int> cvhandle = vhandle;
 
     handle.emplace<int>(42);
 
     ASSERT_EQ(handle.get<int>(), chandle.get<int>());
-    ASSERT_EQ(chandle.get<int>(), 42);
+    ASSERT_EQ(chandle.get<int>(), vhandle.get<int>());
+    ASSERT_EQ(vhandle.get<int>(), cvhandle.get<int>());
+    ASSERT_EQ(cvhandle.get<int>(), 42);
 }
