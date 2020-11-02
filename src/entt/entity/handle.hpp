@@ -63,7 +63,7 @@ struct basic_handle {
      * entity.
      */
     template<typename Other, typename... Args>
-    [[nodiscard]] operator basic_handle<Other, Args...>() const ENTT_NOEXCEPT {
+    operator basic_handle<Other, Args...>() const ENTT_NOEXCEPT {
         static_assert(
             (std::is_same_v<Other, Entity> || std::is_same_v<std::remove_const_t<Other>, Entity>)
             && (sizeof...(Type) == 0 || ((sizeof...(Args) != 0 && sizeof...(Args) <= sizeof...(Type)) && ... && (type_list_contains_v<type_list<Type...>, Args>))),
