@@ -159,7 +159,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
 
             iterable_view_iterator(It from, const basic_view &parent) ENTT_NOEXCEPT
                 : it{from},
-                  view{&parent}
+                  view{parent}
             {}
 
         public:
@@ -179,7 +179,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
             }
 
             [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
-                return std::tuple_cat(std::make_tuple(*it), view->get(*it));
+                return std::tuple_cat(std::make_tuple(*it), view.get(*it));
             }
 
             [[nodiscard]] bool operator==(const iterable_view_iterator &other) const ENTT_NOEXCEPT {
@@ -192,7 +192,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
 
         private:
             It it;
-            const basic_view *view;
+            const basic_view view;
         };
 
         iterable_view(const basic_view &parent)

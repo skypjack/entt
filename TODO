@@ -17,10 +17,7 @@
   - ...
 
 WIP:
-* currently, the erased remove of pdata forces pools to implement a range remove because it uses this one
 * document the handle way for extended operations
-* runtime, named pools
-* faster destroy
 * make view pack work also with groups, add multi-type iterator (not only input iterators)
 * add exclude-only views to combine with packs
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
