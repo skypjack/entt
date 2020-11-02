@@ -44,7 +44,7 @@ template <typename>
 struct basic_actor;
 
 
-template<typename>
+template<typename, typename...>
 struct basic_handle;
 
 
@@ -94,6 +94,22 @@ using handle = basic_handle<entity>;
 
 /*! @brief Alias declaration for the most common use case. */
 using const_handle = basic_handle<const entity>;
+
+
+/**
+ * @brief Alias declaration for the most common use case.
+ * @tparam Args Other template parameters.
+ */
+template<typename... Args>
+using handle_view = basic_handle<entity, Args...>;
+
+
+/**
+ * @brief Alias declaration for the most common use case.
+ * @tparam Args Other template parameters.
+ */
+template<typename... Args>
+using const_handle_view = basic_handle<const entity, Args...>;
 
 
 /*! @brief Alias declaration for the most common use case. */
