@@ -386,9 +386,7 @@ public:
      * @warning
      * Attempting to use an entity that doesn't belong to the registry results
      * in undefined behavior. An entity belongs to the registry even if it has
-     * been previously destroyed and/or recycled.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * registry doesn't own the given entity.
+     * been previously destroyed and/or recycled.
      *
      * @param entity A valid entity identifier.
      * @return Actual version for the given entity identifier.
@@ -478,8 +476,7 @@ public:
      * registry will continue to work properly in this case.
      *
      * @warning
-     * An assertion will abort the execution at runtime in debug mode if all
-     * pools aren't empty.
+     * All pools must be empty for this to work properly.
      *
      * @tparam It Type of input iterator.
      * @param first An iterator to the first element of the range of entities.
@@ -548,10 +545,7 @@ public:
      *
      * @warning
      * Attempting to use an invalid entity or to assign a component to an entity
-     * that already owns it results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity or if the entity already owns an instance of the given
-     * component.
+     * that already owns it results in undefined behavior.
      *
      * @tparam Component Type of component to create.
      * @tparam Args Types of arguments to use to construct the component.
@@ -614,9 +608,7 @@ public:
      * Prefer this function anyway because it has slightly better performance.
      *
      * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
+     * Attempting to use an invalid entity results in undefined behavior.
      *
      * @tparam Component Type of component to assign or replace.
      * @tparam Args Types of arguments to use to construct the component.
@@ -650,10 +642,7 @@ public:
      *
      * @warning
      * Attempting to use an invalid entity or to patch a component of an entity
-     * that doesn't own it results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity or if the entity doesn't own an instance of the given
-     * component.
+     * that doesn't own it results in undefined behavior.
      *
      * @tparam Component Type of component to patch.
      * @tparam Func Types of the function objects to invoke.
@@ -676,10 +665,7 @@ public:
      *
      * @warning
      * Attempting to use an invalid entity or to replace a component of an
-     * entity that doesn't own it results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity or if the entity doesn't own an instance of the given
-     * component.
+     * entity that doesn't own it results in undefined behavior.
      *
      * @tparam Component Type of component to replace.
      * @tparam Args Types of arguments to use to construct the component.
@@ -697,10 +683,7 @@ public:
      *
      * @warning
      * Attempting to use an invalid entity or to remove a component from an
-     * entity that doesn't own it results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity or if the entity doesn't own an instance of the given
-     * component.
+     * entity that doesn't own it results in undefined behavior.
      *
      * @tparam Component Types of components to remove.
      * @param entity A valid entity identifier.
@@ -739,9 +722,7 @@ public:
      * Prefer this function anyway because it has slightly better performance.
      *
      * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
+     * Attempting to use an invalid entity results in undefined behavior.
      *
      * @tparam Component Types of components to remove.
      * @param entity A valid entity identifier.
@@ -766,9 +747,7 @@ public:
      * could lead to undefined behavior.
      *
      * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
+     * Attempting to use an invalid entity results in undefined behavior.
      *
      * @param entity A valid entity identifier.
      */
@@ -787,9 +766,7 @@ public:
      * @brief Checks if an entity has all the given components.
      *
      * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
+     * Attempting to use an invalid entity results in undefined behavior.
      *
      * @tparam Component Components for which to perform the check.
      * @param entity A valid entity identifier.
@@ -805,9 +782,7 @@ public:
      * @brief Checks if an entity has at least one of the given components.
      *
      * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
+     * Attempting to use an invalid entity results in undefined behavior.
      *
      * @tparam Component Components for which to perform the check.
      * @param entity A valid entity identifier.
@@ -825,10 +800,7 @@ public:
      *
      * @warning
      * Attempting to use an invalid entity or to get a component from an entity
-     * that doesn't own it results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity or if the entity doesn't own an instance of the given
-     * component.
+     * that doesn't own it results in undefined behavior.
      *
      * @tparam Component Types of components to get.
      * @param entity A valid entity identifier.
@@ -871,9 +843,7 @@ public:
      * Prefer this function anyway because it has slightly better performance.
      *
      * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
+     * Attempting to use an invalid entity results in undefined behavior.
      *
      * @tparam Component Type of component to get.
      * @tparam Args Types of arguments to use to construct the component.
@@ -892,9 +862,7 @@ public:
      * @brief Returns pointers to the given components for an entity.
      *
      * @warning
-     * Attempting to use an invalid entity results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid entity.
+     * Attempting to use an invalid entity results in undefined behavior.
      *
      * @note
      * The registry retains ownership of the pointed-to components.
@@ -1399,9 +1367,7 @@ public:
      * this member function.
      *
      * @warning
-     * Pools of components owned by a group cannot be sorted.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case
-     * the pool is owned by a group.
+     * Pools of components owned by a group cannot be sorted.
      *
      * @tparam Component Type of components to sort.
      * @tparam Compare Type of comparison function object.
@@ -1446,9 +1412,7 @@ public:
      * Any subsequent change to `B` won't affect the order in `A`.
      *
      * @warning
-     * Pools of components owned by a group cannot be sorted.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case
-     * the pool is owned by a group.
+     * Pools of components owned by a group cannot be sorted.
      *
      * @tparam To Type of components to sort.
      * @tparam From Type of components to use to sort.
@@ -1587,9 +1551,7 @@ public:
      *
      * @warning
      * Attempting to get a context variable that doesn't exist results in
-     * undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case of
-     * invalid requests.
+     * undefined behavior.
      *
      * @tparam Type Type of object to get.
      * @return A valid reference to the object in the context of the registry.
