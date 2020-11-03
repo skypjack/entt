@@ -17,19 +17,19 @@ namespace entt {
 
 /**
  * @brief Mixin type to use to wrap basic storage classes.
- * @tparam Storage The type of the underlying storage.
+ * @tparam Type The type of the underlying storage.
  */
-template<typename Storage>
-struct storage_adapter_mixin: Storage {
-    static_assert(std::is_same_v<typename Storage::value_type, std::decay_t<typename Storage::value_type>>, "Invalid object type");
+template<typename Type>
+struct storage_adapter_mixin: Type {
+    static_assert(std::is_same_v<typename Type::value_type, std::decay_t<typename Type::value_type>>, "Invalid object type");
 
     /*! @brief Type of the objects associated with the entities. */
-    using value_type = typename Storage::value_type;
+    using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename Storage::entity_type;
+    using entity_type = typename Type::entity_type;
 
     /**
-     * @brief Assigns entities to a pool.
+     * @brief Assigns entities to a storage.
      * @tparam Args Types of arguments to use to construct the object.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the object.
@@ -37,11 +37,11 @@ struct storage_adapter_mixin: Storage {
      */
     template<typename... Args>
     decltype(auto) emplace(basic_registry<entity_type> &, const entity_type entity, Args &&... args) {
-        return Storage::emplace(entity, std::forward<Args>(args)...);
+        return Type::emplace(entity, std::forward<Args>(args)...);
     }
 
     /**
-     * @brief Assigns entities to a pool.
+     * @brief Assigns entities to a storage.
      * @tparam It Type of input iterator.
      * @tparam Args Types of arguments to use to construct the objects
      * associated with the entities.
@@ -52,15 +52,15 @@ struct storage_adapter_mixin: Storage {
      */
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &, It first, It last, Args &&... args) {
-        Storage::insert(first, last, std::forward<Args>(args)...);
+        Type::insert(first, last, std::forward<Args>(args)...);
     }
 
     /**
-     * @brief Removes entities from a pool.
+     * @brief Removes entities from a storage.
      * @param entity A valid entity identifier.
      */
     void remove(basic_registry<entity_type> &, const entity_type entity) {
-        Storage::remove(entity);
+        Type::remove(entity);
     }
 
     /**
@@ -71,7 +71,7 @@ struct storage_adapter_mixin: Storage {
      */
     template<typename It>
     void remove(basic_registry<entity_type> &, It first, It last) {
-        Storage::remove(first, last);
+        Type::remove(first, last);
     }
 
     /**
@@ -91,15 +91,15 @@ struct storage_adapter_mixin: Storage {
 
 
 /**
- * @brief Mixin type to use to add signal support to pools.
- * @tparam Pool The type of the underlying pool.
+ * @brief Mixin type to use to add signal support to storage types.
+ * @tparam Type The type of the underlying storage.
  */
-template<typename Pool>
-struct sigh_pool_mixin: Pool {
+template<typename Type>
+struct sigh_storage_mixin: Type {
     /*! @brief Underlying value type. */
-    using value_type = typename Pool::value_type;
+    using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
-    using entity_type = typename Pool::entity_type;
+    using entity_type = typename Type::entity_type;
 
     /**
      * @brief Returns a sink object.
@@ -176,7 +176,7 @@ struct sigh_pool_mixin: Pool {
      */
     template<typename... Args>
     decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entity, Args &&... args) {
-        Pool::emplace(owner, entity, std::forward<Args>(args)...);
+        Type::emplace(owner, entity, std::forward<Args>(args)...);
         construction.publish(owner, entity);
 
         if constexpr(!is_empty_v<value_type>) {
@@ -197,7 +197,7 @@ struct sigh_pool_mixin: Pool {
      */
     template<typename It, typename... Args>
     void insert(basic_registry<entity_type> &owner, It first, It last, Args &&... args) {
-        Pool::insert(owner, first, last, std::forward<Args>(args)...);
+        Type::insert(owner, first, last, std::forward<Args>(args)...);
 
         if(!construction.empty()) {
             for(; first != last; ++first) {
@@ -213,7 +213,7 @@ struct sigh_pool_mixin: Pool {
      */
     void remove(basic_registry<entity_type> &owner, const entity_type entity) {
         destruction.publish(owner, entity);
-        Pool::remove(owner, entity);
+        Type::remove(owner, entity);
     }
 
     /**
@@ -231,7 +231,7 @@ struct sigh_pool_mixin: Pool {
             }
         }
 
-        Pool::remove(owner, first, last);
+        Type::remove(owner, first, last);
     }
 
     /**
@@ -247,7 +247,7 @@ struct sigh_pool_mixin: Pool {
         if constexpr(is_empty_v<value_type>) {
             update.publish(owner, entity);
         } else {
-            Pool::patch(owner, entity, std::forward<Func>(func)...);
+            Type::patch(owner, entity, std::forward<Func>(func)...);
             update.publish(owner, entity);
             return this->get(entity);
         }
@@ -261,8 +261,8 @@ private:
 
 
 /**
- * @brief Applies component-to-pool conversion and defines the resulting type as
- * the member typedef type.
+ * @brief Applies component-to-storage conversion and defines the resulting type
+ * as the member typedef type.
  *
  * Formally:
  *
@@ -275,17 +275,17 @@ private:
  * @tparam Type Type of objects assigned to the entities.
  */
 template<typename Entity, typename Type, typename = void>
-struct pool {
+struct pool_traits {
     /*! @brief Resulting type after component-to-pool conversion. */
-    using type = sigh_pool_mixin<storage_adapter_mixin<basic_storage<Entity, Type>>>;
+    using value_type = sigh_storage_mixin<storage_adapter_mixin<basic_storage<Entity, Type>>>;
 };
 
 
-/*! @copydoc pool */
+/*! @copydoc pool_traits */
 template<typename Entity, typename Type>
-struct pool<Entity, const Type> {
+struct pool_traits<Entity, const Type> {
     /*! @brief Resulting type after component-to-pool conversion. */
-    using type = std::add_const_t<typename pool<Entity, std::remove_const_t<Type>>::type>;
+    using value_type = std::add_const_t<typename pool_traits<Entity, std::remove_const_t<Type>>::value_type>;
 };
 
 
@@ -295,7 +295,7 @@ struct pool<Entity, const Type> {
  * @tparam Type Type of objects assigned to the entities.
  */
 template<typename Entity, typename Type>
-using pool_t = typename pool<Entity, Type>::type;
+using pool_t = typename pool_traits<Entity, Type>::value_type;
 
 
 }
