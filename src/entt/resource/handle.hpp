@@ -40,9 +40,7 @@ public:
      * @brief Gets a reference to the managed resource.
      *
      * @warning
-     * The behavior is undefined if the handle doesn't contain a resource.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * handle is empty.
+     * The behavior is undefined if the handle doesn't contain a resource.
      *
      * @return A reference to the managed resource.
      */
@@ -80,9 +78,7 @@ public:
      * @brief Gets a pointer to the managed resource.
      *
      * @warning
-     * The behavior is undefined if the handle doesn't contain a resource.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * handle is empty.
+     * The behavior is undefined if the handle doesn't contain a resource.
      *
      * @return A pointer to the managed resource or `nullptr` if the handle
      * contains no resource at all.

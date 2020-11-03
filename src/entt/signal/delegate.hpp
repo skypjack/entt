@@ -281,9 +281,7 @@ public:
      *
      * @warning
      * Attempting to trigger an invalid delegate results in undefined
-     * behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * delegate has not yet been set.
+     * behavior.
      *
      * @param args Arguments to use to invoke the underlying function.
      * @return The value returned by the underlying function.

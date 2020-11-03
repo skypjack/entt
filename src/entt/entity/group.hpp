@@ -394,9 +394,7 @@ public:
      * @warning
      * Attempting to use an invalid component type results in a compilation
      * error. Attempting to use an entity that doesn't belong to the group
-     * results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * group doesn't contain the given entity.
+     * results in undefined behavior.
      *
      * @tparam Component Types of components to get.
      * @param entt A valid entity identifier.
@@ -941,9 +939,7 @@ public:
      * @warning
      * Attempting to use an invalid component type results in a compilation
      * error. Attempting to use an entity that doesn't belong to the group
-     * results in undefined behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode if the
-     * group doesn't contain the given entity.
+     * results in undefined behavior.
      *
      * @tparam Component Types of components to get.
      * @param entt A valid entity identifier.

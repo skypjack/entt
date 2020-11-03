@@ -366,9 +366,7 @@ public:
      *
      * @warning
      * Attempting to perform a cast that isn't viable results in undefined
-     * behavior.<br/>
-     * An assertion will abort the execution at runtime in debug mode in case
-     * the cast is not feasible.
+     * behavior.
      *
      * @tparam Type Type to which to cast the instance.
      * @return A reference to the contained instance.
