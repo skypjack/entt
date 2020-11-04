@@ -903,7 +903,7 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             for(auto pos = pools.size(); pos; --pos) {
                 if(const auto &pdata = pools[pos-1]; pdata.pool) {
-                    pdata.remove(*pdata.pool, *this, pdata.pool->rbegin(), pdata.pool->rend());
+                    pdata.remove(*pdata.pool, *this, pdata.pool->data(), pdata.pool->data() + pdata.pool->size());
                 }
             }
 
