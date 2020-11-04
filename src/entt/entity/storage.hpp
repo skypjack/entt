@@ -418,7 +418,7 @@ public:
      *
      * @param entt A valid entity identifier.
      */
-    void remove(const entity_type entt) override {
+    void remove(const entity_type entt) final {
         auto other = std::move(instances.back());
         instances[underlying_type::index(entt)] = std::move(other);
         instances.pop_back();
@@ -446,7 +446,7 @@ public:
      * @param lhs A valid entity identifier.
      * @param rhs A valid entity identifier.
      */
-    void swap(const entity_type lhs, const entity_type rhs) override {
+    void swap(const entity_type lhs, const entity_type rhs) final {
         std::swap(instances[underlying_type::index(lhs)], instances[underlying_type::index(rhs)]);
         underlying_type::swap(lhs, rhs);
     }
@@ -513,7 +513,7 @@ public:
     }
 
     /*! @brief Clears a storage. */
-    void clear() ENTT_NOEXCEPT override {
+    void clear() ENTT_NOEXCEPT final {
         underlying_type::clear();
         instances.clear();
     }
