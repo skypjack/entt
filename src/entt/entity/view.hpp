@@ -150,11 +150,11 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         std::tuple<const pool_type<Exclude> *...> filter;
     };
 
-    class iterable_view {
+    class iterable_view final {
         friend class basic_view<Entity, exclude_t<Exclude...>, Component...>;
 
         template<typename It>
-        class iterable_view_iterator {
+        class iterable_view_iterator final {
             friend class iterable_view;
 
             iterable_view_iterator(It from, const basic_view &parent) ENTT_NOEXCEPT

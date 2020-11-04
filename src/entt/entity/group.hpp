@@ -71,14 +71,14 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
     template<typename Component>
     using pool_type = pool_t<Entity, Component>;
 
-    class iterable_group {
+    class iterable_group final {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>>;
 
         template<typename, typename>
         class iterable_group_iterator;
 
         template<typename It, typename... Type>
-        class iterable_group_iterator<It, type_list<Type...>> {
+        class iterable_group_iterator<It, type_list<Type...>> final {
             friend class iterable_group;
 
             template<typename... Args>
@@ -596,14 +596,14 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
     template<typename Component>
     using pool_type = pool_t<Entity, Component>;
 
-    class iterable_group {
+    class iterable_group final {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...>;
 
         template<typename, typename, typename>
         class iterable_group_iterator;
 
         template<typename It, typename... OIt, typename... Type>
-        class iterable_group_iterator<It, type_list<OIt...>, type_list<Type...>> {
+        class iterable_group_iterator<It, type_list<OIt...>, type_list<Type...>> final {
             friend class iterable_group;
 
             template<typename... Other>
