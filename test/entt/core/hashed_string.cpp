@@ -4,6 +4,11 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 
+TEST(BasicHashedString, DeductionGuide) {
+    static_assert(std::is_same_v<decltype(entt::basic_hashed_string{"foo"}), entt::hashed_string>);
+    static_assert(std::is_same_v<decltype(entt::basic_hashed_string{L"foo"}), entt::hashed_wstring>);
+}
+
 TEST(HashedString, Functionalities) {
     using hash_type = entt::hashed_string::hash_type;
 
@@ -39,28 +44,26 @@ TEST(HashedString, Empty) {
     ASSERT_EQ(static_cast<const char *>(hs), nullptr);
 }
 
-TEST(HashedString, Constexprness) {
-    using hash_type = entt::hashed_string::hash_type;
-    // how would you test a constexpr otherwise?
-    (void)std::integral_constant<hash_type, entt::hashed_string{"quux"}>{};
-    (void)std::integral_constant<hash_type, "quux"_hs>{};
-    ASSERT_TRUE(true);
-}
-
-TEST(HashedString, ToValue) {
-    using hash_type = entt::hashed_string::hash_type;
-
+TEST(HashedString, Correctness) {
     const char *foobar = "foobar";
+    std::string_view view{"foobar__", 6};
 
+    ASSERT_EQ(entt::hashed_string{foobar}, 0xbf9cf968);
     ASSERT_EQ(entt::hashed_string::value(foobar), 0xbf9cf968);
-    // how would you test a constexpr otherwise?
-    (void)std::integral_constant<hash_type, entt::hashed_string::value("quux")>{};
+    ASSERT_EQ(entt::hashed_string::value(view.data(), view.size()), 0xbf9cf968);
 }
 
-TEST(HashedString, StringView) {
-    std::string str{"__foobar__"};
-    std::string_view view{str.data()+2, 6};
-    ASSERT_EQ(entt::hashed_string::value(view.data(), view.size()), 0xbf9cf968);
+TEST(HashedString, Constexprness) {
+    constexpr std::string_view view{"foobar__", 6};
+
+    static_assert(entt::hashed_string{"quux"} == "quux"_hs);
+    static_assert(entt::hashed_string{"foobar"} == 0xbf9cf968);
+
+    static_assert(entt::hashed_string::value("quux") == "quux"_hs);
+    static_assert(entt::hashed_string::value("foobar") == 0xbf9cf968);
+
+    static_assert(entt::hashed_string::value("quux", 4) == "quux"_hs);
+    static_assert(entt::hashed_string::value(view.data(), view.size()) == 0xbf9cf968);
 }
 
 TEST(HashedWString, Functionalities) {
@@ -98,31 +101,24 @@ TEST(HashedWString, Empty) {
     ASSERT_EQ(static_cast<const wchar_t *>(hws), nullptr);
 }
 
-TEST(HashedWString, Constexprness) {
-    using hash_type = entt::hashed_wstring::hash_type;
-    // how would you test a constexpr otherwise?
-    (void)std::integral_constant<hash_type, entt::hashed_wstring{L"quux"}>{};
-    (void)std::integral_constant<hash_type, L"quux"_hws>{};
-    ASSERT_TRUE(true);
-}
-
-TEST(HashedWString, ToValue) {
-    using hash_type = entt::hashed_wstring::hash_type;
-
+TEST(HashedWString, Correctness) {
     const wchar_t *foobar = L"foobar";
+    std::wstring_view view{L"foobar__", 6};
 
+    ASSERT_EQ(entt::hashed_wstring{foobar}, 0xbf9cf968);
     ASSERT_EQ(entt::hashed_wstring::value(foobar), 0xbf9cf968);
-    // how would you test a constexpr otherwise?
-    (void)std::integral_constant<hash_type, entt::hashed_wstring::value(L"quux")>{};
-}
-
-TEST(HashedWString, StringView) {
-    std::wstring str{L"__foobar__"};
-    std::wstring_view view{str.data()+2, 6};
     ASSERT_EQ(entt::hashed_wstring::value(view.data(), view.size()), 0xbf9cf968);
 }
 
-TEST(BasicHashedString, DeductionGuide) {
-    static_assert(std::is_same_v<decltype(entt::basic_hashed_string{"foo"}), entt::hashed_string>);
-    static_assert(std::is_same_v<decltype(entt::basic_hashed_string{L"foo"}), entt::hashed_wstring>);
+TEST(HashedWString, Constexprness) {
+    constexpr std::wstring_view view{L"foobar__", 6};
+
+    static_assert(entt::hashed_wstring{L"quux"} == L"quux"_hws);
+    static_assert(entt::hashed_wstring{L"foobar"} == 0xbf9cf968);
+
+    static_assert(entt::hashed_wstring::value(L"quux") == L"quux"_hws);
+    static_assert(entt::hashed_wstring::value(L"foobar") == 0xbf9cf968);
+
+    static_assert(entt::hashed_wstring::value(L"quux", 4) == L"quux"_hws);
+    static_assert(entt::hashed_wstring::value(view.data(), view.size()) == 0xbf9cf968);
 }
