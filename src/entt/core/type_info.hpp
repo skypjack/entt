@@ -81,12 +81,13 @@ struct type_hash final {
      */
 #if defined ENTT_PRETTY_FUNCTION_CONSTEXPR
     [[nodiscard]] static constexpr id_type value() ENTT_NOEXCEPT {
-        constexpr auto value = hashed_string::value(ENTT_PRETTY_FUNCTION);
+        constexpr auto stripped = internal::type_name<Type>();
+        constexpr auto value = hashed_string::value(stripped.data(), stripped.size());
         return value;
     }
 #elif defined ENTT_PRETTY_FUNCTION
     [[nodiscard]] static id_type value() ENTT_NOEXCEPT {
-        static const auto value = hashed_string::value(ENTT_PRETTY_FUNCTION);
+        static const auto value = [](const auto stripped) { return hashed_string::value(stripped.data(), stripped.size()); }(internal::type_name<Type>());
         return value;
     }
 #else
@@ -127,24 +128,18 @@ struct type_name final {
 
 /*! @brief Implementation specific information about a type. */
 class type_info final {
-    using seq_fn = id_type() ENTT_NOEXCEPT;
-    using hash_fn = id_type() ENTT_NOEXCEPT;
-    using name_fn = std::string_view() ENTT_NOEXCEPT;
-
     template<typename>
     friend type_info type_id() ENTT_NOEXCEPT;
 
-    type_info(seq_fn *seq_ptr, hash_fn *hash_ptr, name_fn *name_ptr) ENTT_NOEXCEPT
-        : seq_func{seq_ptr},
-          hash_func{hash_ptr},
-          name_func{name_ptr}
+    type_info(id_type seq_v, id_type hash_v, std::string_view name_v) ENTT_NOEXCEPT
+        : seq_value{seq_v},
+          hash_value{hash_v},
+          name_value{name_v}
     {}
 
 public:
     /*! @brief Default constructor. */
-    type_info() ENTT_NOEXCEPT
-        : type_info{nullptr, nullptr, nullptr}
-    {}
+    type_info() ENTT_NOEXCEPT = default;
 
     /*! @brief Default copy constructor. */
     type_info(const type_info &) ENTT_NOEXCEPT = default;
@@ -168,7 +163,7 @@ public:
      * @return True if the object is properly initialized, false otherwise.
      */
     [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
-        return !(seq_func == nullptr);
+        return !name_value.empty();
     }
 
     /**
@@ -176,7 +171,7 @@ public:
      * @return Type sequential identifier.
      */
     [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
-        return seq_func();
+        return seq_value;
     }
 
     /**
@@ -184,7 +179,7 @@ public:
      * @return Type hash.
      */
     [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
-        return hash_func();
+        return hash_value;
     }
 
     /**
@@ -192,7 +187,7 @@ public:
      * @return Type name.
      */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
-        return name_func();
+        return name_value;
     }
 
     /**
@@ -201,13 +196,13 @@ public:
      * @return False if the two contents differ, true otherwise.
      */
     [[nodiscard]] bool operator==(const type_info &other) const ENTT_NOEXCEPT {
-        return (!hash_func && !other.hash_func) || (hash_func && other.hash_func && hash_func() == other.hash_func());
+        return hash_value == other.hash_value;
     }
 
 private:
-    seq_fn *seq_func;
-    hash_fn *hash_func;
-    name_fn *name_func;
+    id_type seq_value;
+    id_type hash_value;
+    std::string_view name_value;
 };
 
 
@@ -230,9 +225,9 @@ private:
 template<typename Type>
 type_info type_id() ENTT_NOEXCEPT {
     return type_info{
-        &type_seq<std::remove_reference_t<std::remove_const_t<Type>>>::value,
-        &type_hash<std::remove_reference_t<std::remove_const_t<Type>>>::value,
-        &type_name<std::remove_reference_t<std::remove_const_t<Type>>>::value,
+        type_seq<std::remove_reference_t<std::remove_const_t<Type>>>::value(),
+        type_hash<std::remove_reference_t<std::remove_const_t<Type>>>::value(),
+        type_name<std::remove_reference_t<std::remove_const_t<Type>>>::value()
     };
 }
 
@@ -240,7 +235,7 @@ type_info type_id() ENTT_NOEXCEPT {
 /*! @copydoc type_id */
 template<typename Type>
 type_info type_id(Type &&) ENTT_NOEXCEPT {
-    return type_id<std::remove_reference_t<Type>>();
+    return type_id<Type>();
 }
 
 
