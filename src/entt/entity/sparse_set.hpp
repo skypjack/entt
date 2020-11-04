@@ -149,6 +149,8 @@ class basic_sparse_set {
         index_type index;
     };
 
+    virtual void swap(const std::size_t, const std::size_t) {}
+
     [[nodiscard]] auto page(const Entity entt) const ENTT_NOEXCEPT {
         return size_type{(to_integral(entt) & traits_type::entity_mask) / entt_per_page};
     }
@@ -466,11 +468,8 @@ public:
     }
 
     /**
-     * @brief Sort elements according to the given comparison function.
-     *
-     * Sort the elements so that iterating the range with a couple of iterators
-     * returns them in the expected order. See `begin` and `end` for more
-     * details.
+     * @brief Sort the first count elements according to the given comparison
+     * function.
      *
      * The comparison function object must return `true` if the first element
      * is _less_ than the second one, `false` otherwise. The signature of the
@@ -483,7 +482,7 @@ public:
      * Moreover, the comparison function object shall induce a
      * _strict weak ordering_ on the values.
      *
-     * The sort function oject must offer a member function template
+     * The sort function object must offer a member function template
      * `operator()` that accepts three arguments:
      *
      * * An iterator to the first element of the range to sort.
@@ -493,80 +492,46 @@ public:
      * @tparam Compare Type of comparison function object.
      * @tparam Sort Type of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
-     * @param first An iterator to the first element of the range to sort.
-     * @param last An iterator past the last element of the range to sort.
+     * @param count Number of elements to sort.
      * @param compare A valid comparison function object.
      * @param algo A valid sort function object.
      * @param args Arguments to forward to the sort function object, if any.
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
-    void sort(iterator first, iterator last, Compare compare, Sort algo = Sort{}, Args &&... args) {
-        ENTT_ASSERT(!(last < first));
-        ENTT_ASSERT(!(last > end()));
+    void sort_n(const size_type count, Compare compare, Sort algo = Sort{}, Args &&... args) {
+        ENTT_ASSERT(!(count > size()));
 
-        const auto length = std::distance(first, last);
-        const auto skip = std::distance(last, end());
-        const auto to = packed.rend() - skip;
-        const auto from = to - length;
+        algo(packed.rend() - count, packed.rend(), std::move(compare), std::forward<Args>(args)...);
 
-        algo(from, to, std::move(compare), std::forward<Args>(args)...);
-
-        for(size_type pos = skip, end = skip+length; pos < end; ++pos) {
-            sparse[page(packed[pos])][offset(packed[pos])] = entity_type{static_cast<typename traits_type::entity_type>(pos)};
-        }
-    }
-
-    /**
-     * @brief Sort elements according to the given comparison function.
-     *
-     * @sa sort
-     *
-     * This function is a slightly slower version of `sort` that invokes the
-     * caller to indicate which entities are swapped.<br/>
-     * It's recommended when the caller wants to sort its own data structures to
-     * align them with the order induced in the sparse set.
-     *
-     * The signature of the callback should be equivalent to the following:
-     *
-     * @code{.cpp}
-     * bool(const Entity, const Entity);
-     * @endcode
-     *
-     * @tparam Apply Type of function object to invoke to notify the caller.
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
-     * @tparam Args Types of arguments to forward to the sort function object.
-     * @param first An iterator to the first element of the range to sort.
-     * @param last An iterator past the last element of the range to sort.
-     * @param apply A valid function object to use as a callback.
-     * @param compare A valid comparison function object.
-     * @param algo A valid sort function object.
-     * @param args Arguments to forward to the sort function object, if any.
-     */
-    template<typename Apply, typename Compare, typename Sort = std_sort, typename... Args>
-    void arrange(iterator first, iterator last, Apply apply, Compare compare, Sort algo = Sort{}, Args &&... args) {
-        ENTT_ASSERT(!(last < first));
-        ENTT_ASSERT(!(last > end()));
-
-        const auto length = std::distance(first, last);
-        const auto skip = std::distance(last, end());
-        const auto to = packed.rend() - skip;
-        const auto from = to - length;
-
-        algo(from, to, std::move(compare), std::forward<Args>(args)...);
-
-        for(size_type pos = skip, end = skip+length; pos < end; ++pos) {
+        for(size_type pos{}; pos < count; ++pos) {
             auto curr = pos;
             auto next = index(packed[curr]);
 
             while(curr != next) {
-                apply(packed[curr], packed[next]);
+                swap(next, index(packed[next]));
                 sparse[page(packed[curr])][offset(packed[curr])] = entity_type{static_cast<typename traits_type::entity_type>(curr)};
 
                 curr = next;
                 next = index(packed[curr]);
             }
         }
+    }
+
+    /**
+     * @brief Sort all elements according to the given comparison function.
+     * 
+     * @sa sort_n
+     *
+     * @tparam Compare Type of comparison function object.
+     * @tparam Sort Type of sort function object.
+     * @tparam Args Types of arguments to forward to the sort function object.
+     * @param compare A valid comparison function object.
+     * @param algo A valid sort function object.
+     * @param args Arguments to forward to the sort function object, if any.
+     */
+    template<typename Compare, typename Sort = std_sort, typename... Args>
+    void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
+        sort_n(size(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 
     /**
