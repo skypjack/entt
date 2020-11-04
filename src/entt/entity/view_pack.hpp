@@ -30,7 +30,7 @@ namespace entt {
 template<typename View, typename... Other>
 class view_pack {
     template<typename It>
-    class view_pack_iterator {
+    class view_pack_iterator final {
         friend class view_pack<View, Other...>;
 
         view_pack_iterator(It from, It to, const std::tuple<View, Other...> &ref) ENTT_NOEXCEPT
@@ -83,13 +83,13 @@ class view_pack {
         const std::tuple<Other...> pack;
     };
 
-    class iterable_view_pack {
+    class iterable_view_pack final {
         friend class view_pack<View, Other...>;
 
         using iterable_view = decltype(std::declval<View>().each());
 
         template<typename It>
-        class iterable_view_pack_iterator {
+        class iterable_view_pack_iterator final {
             friend class iterable_view_pack;
 
             iterable_view_pack_iterator(It from, It to, const std::tuple<Other...> &ref) ENTT_NOEXCEPT
