@@ -88,6 +88,18 @@ public:
     using hash_type = id_type;
 
     /**
+     * @brief Returns directly the numeric representation of a string view.
+     * @param str Human-readable identifer.
+     * @param size Length of the string to hash.
+     * @return The numeric representation of the string.
+     */
+    [[nodiscard]] static constexpr hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
+        id_type partial{traits_type::offset};
+        while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
+        return partial;
+    }
+
+    /**
      * @brief Returns directly the numeric representation of a string.
      *
      * Forcing template resolution avoids implicit conversions. An
@@ -114,18 +126,6 @@ public:
      */
     [[nodiscard]] static hash_type value(const_wrapper wrapper) ENTT_NOEXCEPT {
         return helper(wrapper.str);
-    }
-
-    /**
-     * @brief Returns directly the numeric representation of a string view.
-     * @param str Human-readable identifer.
-     * @param size Length of the string to hash.
-     * @return The numeric representation of the string.
-     */
-    [[nodiscard]] static hash_type value(const value_type *str, std::size_t size) ENTT_NOEXCEPT {
-        id_type partial{traits_type::offset};
-        while(size--) { partial = (partial^(str++)[0])*traits_type::prime; }
-        return partial;
     }
 
     /*! @brief Constructs an empty hashed string. */
