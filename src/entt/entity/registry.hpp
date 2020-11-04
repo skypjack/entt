@@ -1380,8 +1380,7 @@ public:
     template<typename Component, typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
         ENTT_ASSERT(sortable<Component>());
-        auto &cpool = assure<Component>();
-        cpool.sort(cpool.begin(), cpool.end(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+        assure<Component>().sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 
     /**

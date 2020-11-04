@@ -503,13 +503,13 @@ public:
     void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
         if constexpr(sizeof...(Component) == 0) {
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-            handler->sort(handler->begin(), handler->end(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+            handler->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
         }  else if constexpr(sizeof...(Component) == 1) {
-            handler->sort(handler->begin(), handler->end(), [this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
+            handler->sort([this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
                 return compare((std::get<pool_type<Component> *>(pools)->get(lhs), ...), (std::get<pool_type<Component> *>(pools)->get(rhs), ...));
             }, std::move(algo), std::forward<Args>(args)...);
         } else {
-            handler->sort(handler->begin(), handler->end(), [this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
+            handler->sort([this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
                 return compare(std::tuple<decltype(get<Component>({}))...>{std::get<pool_type<Component> *>(pools)->get(lhs)...}, std::tuple<decltype(get<Component>({}))...>{std::get<pool_type<Component> *>(pools)->get(rhs)...});
             }, std::move(algo), std::forward<Args>(args)...);
         }
@@ -1059,13 +1059,13 @@ public:
 
         if constexpr(sizeof...(Component) == 0) {
             static_assert(std::is_invocable_v<Compare, const entity_type, const entity_type>, "Invalid comparison function");
-            cpool->sort(cpool->end()-*length, cpool->end(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+            cpool->sort_n(*length, std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else if constexpr(sizeof...(Component) == 1) {
-            cpool->sort(cpool->end()-*length, cpool->end(), [this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
+            cpool->sort_n(*length, [this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
                 return compare((std::get<pool_type<Component> *>(pools)->get(lhs), ...), (std::get<pool_type<Component> *>(pools)->get(rhs), ...));
             }, std::move(algo), std::forward<Args>(args)...);
         } else {
-            cpool->sort(cpool->end()-*length, cpool->end(), [this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
+            cpool->sort_n(*length, [this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
                 return compare(std::tuple<decltype(get<Component>({}))...>{std::get<pool_type<Component> *>(pools)->get(lhs)...}, std::tuple<decltype(get<Component>({}))...>{std::get<pool_type<Component> *>(pools)->get(rhs)...});
             }, std::move(algo), std::forward<Args>(args)...);
         }
