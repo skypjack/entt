@@ -46,8 +46,6 @@ TEST(Storage, Functionalities) {
     ASSERT_FALSE(pool.contains(entt::entity{0}));
     ASSERT_TRUE(pool.contains(entt::entity{41}));
     ASSERT_EQ(pool.get(entt::entity{41}), 3);
-    ASSERT_EQ(*pool.try_get(entt::entity{41}), 3);
-    ASSERT_EQ(pool.try_get(entt::entity{99}), nullptr);
 
     pool.remove(entt::entity{41});
 
@@ -61,8 +59,6 @@ TEST(Storage, Functionalities) {
     pool.emplace(entt::entity{41}, 12);
 
     ASSERT_EQ(pool.get(entt::entity{41}), 12);
-    ASSERT_EQ(*pool.try_get(entt::entity{41}), 12);
-    ASSERT_EQ(pool.try_get(entt::entity{99}), nullptr);
 
     pool.clear();
 

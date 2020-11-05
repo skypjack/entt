@@ -180,7 +180,7 @@ class basic_observer {
         template<std::size_t Index>
         static void maybe_valid_if(basic_observer &obs, basic_registry<Entity> &reg, const Entity entt) {
             if(reg.template has<Require...>(entt) && !reg.template any<Reject...>(entt)) {
-                if(auto *comp = obs.view.try_get(entt); !comp) {
+                if(!obs.view.contains(entt)) {
                     obs.view.emplace(entt);
                 }
 
@@ -190,7 +190,7 @@ class basic_observer {
 
         template<std::size_t Index>
         static void discard_if(basic_observer &obs, basic_registry<Entity> &, const Entity entt) {
-            if(auto *value = obs.view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
+            if(obs.view.contains(entt) && !(obs.view.get(entt) &= (~(1 << Index)))) {
                 obs.view.remove(entt);
             }
         }
@@ -223,7 +223,7 @@ class basic_observer {
                 }
             }())
             {
-                if(auto *comp = obs.view.try_get(entt); !comp) {
+                if(!obs.view.contains(entt)) {
                     obs.view.emplace(entt);
                 }
 
@@ -233,7 +233,7 @@ class basic_observer {
 
         template<std::size_t Index>
         static void discard_if(basic_observer &obs, basic_registry<Entity> &, const Entity entt) {
-            if(auto *value = obs.view.try_get(entt); value && !(*value &= (~(1 << Index)))) {
+            if(obs.view.contains(entt) && !(obs.view.get(entt) &= (~(1 << Index)))) {
                 obs.view.remove(entt);
             }
         }

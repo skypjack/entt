@@ -340,20 +340,6 @@ public:
     }
 
     /**
-     * @brief Returns a pointer to the object associated with an entity, if any.
-     * @param entt A valid entity identifier.
-     * @return The object associated with the entity, if any.
-     */
-    [[nodiscard]] const value_type * try_get(const entity_type entt) const {
-        return underlying_type::contains(entt) ? (instances.data() + underlying_type::index(entt)) : nullptr;
-    }
-
-    /*! @copydoc try_get */
-    [[nodiscard]] value_type * try_get(const entity_type entt) {
-        return const_cast<value_type *>(std::as_const(*this).try_get(entt));
-    }
-
-    /**
      * @brief Assigns an entity to a storage and constructs its object.
      *
      * This version accept both types that can be constructed in place directly

@@ -876,7 +876,8 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return (assure<Component>().try_get(entity), ...);
+            auto &cpool = assure<Component...>();
+            return cpool.contains(entity) ? &cpool.get(entity) : nullptr;
         } else {
             return std::make_tuple(try_get<Component>(entity)...);
         }
@@ -888,7 +889,8 @@ public:
         ENTT_ASSERT(valid(entity));
 
         if constexpr(sizeof...(Component) == 1) {
-            return (assure<Component>().try_get(entity), ...);
+            auto &cpool = assure<Component...>();
+            return cpool.contains(entity) ? &cpool.get(entity) : nullptr;
         } else {
             return std::make_tuple(try_get<Component>(entity)...);
         }
