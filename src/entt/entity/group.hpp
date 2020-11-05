@@ -69,7 +69,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
     friend class basic_registry<Entity>;
 
     template<typename Component>
-    using pool_type = pool_t<Entity, Component>;
+    using storage_type = storage_t<Entity, Component>;
 
     class iterable_group final {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>>;
@@ -79,7 +79,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
             friend class iterable_group;
 
             template<typename... Args>
-            iterable_group_iterator(It from, const std::tuple<pool_type<Get> *...> &args) ENTT_NOEXCEPT
+            iterable_group_iterator(It from, const std::tuple<storage_type<Get> *...> &args) ENTT_NOEXCEPT
                 : it{from},
                   pools{args}
             {}
@@ -102,7 +102,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
 
             [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
                 const auto entt = *it;
-                return std::tuple_cat(std::make_tuple(entt), std::get<pool_type<Get> *>(pools)->get_as_tuple(entt)...);
+                return std::tuple_cat(std::make_tuple(entt), std::get<storage_type<Get> *>(pools)->get_as_tuple(entt)...);
             }
 
             [[nodiscard]] bool operator==(const iterable_group_iterator &other) const ENTT_NOEXCEPT {
@@ -115,10 +115,10 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
 
         private:
             It it;
-            const std::tuple<pool_type<Get> *...> pools;
+            const std::tuple<storage_type<Get> *...> pools;
         };
 
-        iterable_group(basic_sparse_set<Entity> &ref, const std::tuple<pool_type<Get> *...> &cpools)
+        iterable_group(basic_sparse_set<Entity> &ref, const std::tuple<storage_type<Get> *...> &cpools)
             : handler{&ref},
               pools{cpools}
         {}
@@ -145,10 +145,10 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
 
     private:
         basic_sparse_set<Entity> *handler;
-        const std::tuple<pool_type<Get> *...> pools;
+        const std::tuple<storage_type<Get> *...> pools;
     };
 
-    basic_group(basic_sparse_set<Entity> &ref, pool_type<Get> &... gpool) ENTT_NOEXCEPT
+    basic_group(basic_sparse_set<Entity> &ref, storage_type<Get> &... gpool) ENTT_NOEXCEPT
         : handler{&ref},
           pools{&gpool...}
     {}
@@ -170,7 +170,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return std::get<pool_type<Component> *>(pools)->size();
+        return std::get<storage_type<Component> *>(pools)->size();
     }
 
     /**
@@ -205,7 +205,7 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             return handler->empty();
         } else {
-            return (std::get<pool_type<Component> *>(pools)->empty() && ...);
+            return (std::get<storage_type<Component> *>(pools)->empty() && ...);
         }
     }
 
@@ -225,7 +225,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] Component * raw() const ENTT_NOEXCEPT {
-        return std::get<pool_type<Component> *>(pools)->raw();
+        return std::get<storage_type<Component> *>(pools)->raw();
     }
 
     /**
@@ -244,7 +244,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
-        return std::get<pool_type<Component> *>(pools)->data();
+        return std::get<storage_type<Component> *>(pools)->data();
     }
 
     /**
@@ -385,11 +385,11 @@ public:
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Component) == 0) {
-            return std::tuple_cat(std::get<pool_type<Get> *>(pools)->get_as_tuple(entt)...);
+            return std::tuple_cat(std::get<storage_type<Get> *>(pools)->get_as_tuple(entt)...);
         } else if constexpr(sizeof...(Component) == 1) {
-            return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
+            return (std::get<storage_type<Component> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple_cat(std::get<pool_type<Component> *>(pools)->get_as_tuple(entt)...);
+            return std::tuple_cat(std::get<storage_type<Component> *>(pools)->get_as_tuple(entt)...);
         }
     }
 
@@ -486,11 +486,11 @@ public:
             handler->sort(std::move(compare), std::move(algo), std::forward<Args>(args)...);
         }  else if constexpr(sizeof...(Component) == 1) {
             handler->sort([this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
-                return compare((std::get<pool_type<Component> *>(pools)->get(lhs), ...), (std::get<pool_type<Component> *>(pools)->get(rhs), ...));
+                return compare((std::get<storage_type<Component> *>(pools)->get(lhs), ...), (std::get<storage_type<Component> *>(pools)->get(rhs), ...));
             }, std::move(algo), std::forward<Args>(args)...);
         } else {
             handler->sort([this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
-                return compare(std::tuple<decltype(get<Component>({}))...>{std::get<pool_type<Component> *>(pools)->get(lhs)...}, std::tuple<decltype(get<Component>({}))...>{std::get<pool_type<Component> *>(pools)->get(rhs)...});
+                return compare(std::forward_as_tuple(std::get<storage_type<Component> *>(pools)->get(lhs)...), std::forward_as_tuple(std::get<storage_type<Component> *>(pools)->get(rhs)...));
             }, std::move(algo), std::forward<Args>(args)...);
         }
     }
@@ -513,12 +513,12 @@ public:
      */
     template<typename Component>
     void sort() const {
-        handler->respect(*std::get<pool_type<Component> *>(pools));
+        handler->respect(*std::get<storage_type<Component> *>(pools));
     }
 
 private:
     basic_sparse_set<entity_type> *handler;
-    const std::tuple<pool_type<Get> *...> pools;
+    const std::tuple<storage_type<Get> *...> pools;
 };
 
 
@@ -574,7 +574,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
     friend class basic_registry<Entity>;
 
     template<typename Component>
-    using pool_type = pool_t<Entity, Component>;
+    using storage_type = storage_t<Entity, Component>;
 
     class iterable_group final {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...>;
@@ -587,7 +587,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
             friend class iterable_group;
 
             template<typename... Other>
-            iterable_group_iterator(It from, const std::tuple<Other...> &other, const std::tuple<pool_type<Get> *...> &cpools) ENTT_NOEXCEPT
+            iterable_group_iterator(It from, const std::tuple<Other...> &other, const std::tuple<storage_type<Get> *...> &cpools) ENTT_NOEXCEPT
                 : it{from},
                   owned{std::get<OIt>(other)...},
                   get{cpools}
@@ -613,7 +613,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
                 return std::tuple_cat(
                     std::make_tuple(*it),
                     std::forward_as_tuple(*std::get<OIt>(owned)...),
-                    std::get<pool_type<Get> *>(get)->get_as_tuple(*it)...
+                    std::get<storage_type<Get> *>(get)->get_as_tuple(*it)...
                 );
             }
 
@@ -628,10 +628,10 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
         private:
             It it;
             std::tuple<OIt...> owned;
-            std::tuple<pool_type<Get> *...> get;
+            std::tuple<storage_type<Get> *...> get;
         };
 
-        iterable_group(std::tuple<pool_type<Owned> *..., pool_type<Get> *...> cpools, const std::size_t &extent)
+        iterable_group(std::tuple<storage_type<Owned> *..., storage_type<Get> *...> cpools, const std::size_t &extent)
             : pools{cpools},
               length{&extent}
         {}
@@ -639,51 +639,51 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
     public:
         using iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::iterator,
-            type_list_cat_t<std::conditional_t<std::tuple_size_v<decltype(std::declval<pool_type<Owned>>().get_as_tuple({}))> == 0, type_list<>, type_list<decltype(std::declval<pool_type<Owned>>().end())>>...>
+            type_list_cat_t<std::conditional_t<std::tuple_size_v<decltype(std::declval<storage_type<Owned>>().get_as_tuple({}))> == 0, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().end())>>...>
         >;
         using reverse_iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::reverse_iterator,
-            type_list_cat_t<std::conditional_t<std::tuple_size_v<decltype(std::declval<pool_type<Owned>>().get_as_tuple({}))> == 0, type_list<>, type_list<decltype(std::declval<pool_type<Owned>>().rbegin())>>...>
+            type_list_cat_t<std::conditional_t<std::tuple_size_v<decltype(std::declval<storage_type<Owned>>().get_as_tuple({}))> == 0, type_list<>, type_list<decltype(std::declval<storage_type<Owned>>().rbegin())>>...>
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             return {
                 std::get<0>(pools)->basic_sparse_set<Entity>::end() - *length,
-                std::make_tuple((std::get<pool_type<Owned> *>(pools)->end() - *length)...),
-                std::make_tuple(std::get<pool_type<Get> *>(pools)...)
+                std::make_tuple((std::get<storage_type<Owned> *>(pools)->end() - *length)...),
+                std::make_tuple(std::get<storage_type<Get> *>(pools)...)
             };
         }
 
         [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
             return {
                 std::get<0>(pools)->basic_sparse_set<Entity>::end(),
-                std::make_tuple((std::get<pool_type<Owned> *>(pools)->end())...),
-                std::make_tuple(std::get<pool_type<Get> *>(pools)...)
+                std::make_tuple((std::get<storage_type<Owned> *>(pools)->end())...),
+                std::make_tuple(std::get<storage_type<Get> *>(pools)...)
             };
         }
 
         [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
             return {
                 std::get<0>(pools)->basic_sparse_set<Entity>::rbegin(),
-                std::make_tuple((std::get<pool_type<Owned> *>(pools)->rbegin())...),
-                std::make_tuple(std::get<pool_type<Get> *>(pools)...)
+                std::make_tuple((std::get<storage_type<Owned> *>(pools)->rbegin())...),
+                std::make_tuple(std::get<storage_type<Get> *>(pools)...)
             };
         }
 
         [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
             return {
                 std::get<0>(pools)->basic_sparse_set<Entity>::rbegin() + *length,
-                std::make_tuple((std::get<pool_type<Owned> *>(pools)->rbegin() + *length)...),
-                std::make_tuple(std::get<pool_type<Get> *>(pools)...)
+                std::make_tuple((std::get<storage_type<Owned> *>(pools)->rbegin() + *length)...),
+                std::make_tuple(std::get<storage_type<Get> *>(pools)...)
             };
         }
 
     private:
-        const std::tuple<pool_type<Owned> *..., pool_type<Get> *...> pools;
+        const std::tuple<storage_type<Owned> *..., storage_type<Get> *...> pools;
         const std::size_t *length;
     };
 
-    basic_group(const std::size_t &extent, pool_type<Owned> &... opool, pool_type<Get> &... gpool) ENTT_NOEXCEPT
+    basic_group(const std::size_t &extent, storage_type<Owned> &... opool, storage_type<Get> &... gpool) ENTT_NOEXCEPT
         : pools{&opool..., &gpool...},
           length{&extent}
     {}
@@ -705,7 +705,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return std::get<pool_type<Component> *>(pools)->size();
+        return std::get<storage_type<Component> *>(pools)->size();
     }
 
     /**
@@ -726,7 +726,7 @@ public:
         if constexpr(sizeof...(Component) == 0) {
             return !*length;
         } else {
-            return (std::get<pool_type<Component> *>(pools)->empty() && ...);
+            return (std::get<storage_type<Component> *>(pools)->empty() && ...);
         }
     }
 
@@ -749,7 +749,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] Component * raw() const ENTT_NOEXCEPT {
-        return std::get<pool_type<Component> *>(pools)->raw();
+        return std::get<storage_type<Component> *>(pools)->raw();
     }
 
     /**
@@ -771,7 +771,7 @@ public:
      */
     template<typename Component>
     [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
-        return std::get<pool_type<Component> *>(pools)->data();
+        return std::get<storage_type<Component> *>(pools)->data();
     }
 
     /**
@@ -920,9 +920,9 @@ public:
                 }
             };
 
-            return std::tuple_cat(filter(std::get<pool_type<Owned> *>(pools))..., filter(std::get<pool_type<Get> *>(pools))...);
+            return std::tuple_cat(filter(std::get<storage_type<Owned> *>(pools))..., filter(std::get<storage_type<Get> *>(pools))...);
         } else if constexpr(sizeof...(Component) == 1) {
-            return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
+            return (std::get<storage_type<Component> *>(pools)->get(entt), ...);
         } else {
             return std::forward_as_tuple(get<Component>(entt)...);
         }
@@ -958,10 +958,10 @@ public:
             } else {
                 return std::make_tuple(cpool->end() - length);
             }
-        }(std::get<pool_type<Owned> *>(pools))...);
+        }(std::get<storage_type<Owned> *>(pools))...);
 
         for(const auto entt: *this) {
-            auto args = std::tuple_cat(std::apply([](auto &&... curr) { return std::forward_as_tuple(*curr++...); }, owned), std::get<pool_type<Get> *>(pools)->get_as_tuple(entt)...);
+            auto args = std::tuple_cat(std::apply([](auto &&... curr) { return std::forward_as_tuple(*curr++...); }, owned), std::get<storage_type<Get> *>(pools)->get_as_tuple(entt)...);
 
             if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::make_tuple(entt), get({})))>) {
                 std::apply(func, std::tuple_cat(std::make_tuple(entt), args));
@@ -1034,11 +1034,11 @@ public:
             cpool->sort_n(*length, std::move(compare), std::move(algo), std::forward<Args>(args)...);
         } else if constexpr(sizeof...(Component) == 1) {
             cpool->sort_n(*length, [this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
-                return compare((std::get<pool_type<Component> *>(pools)->get(lhs), ...), (std::get<pool_type<Component> *>(pools)->get(rhs), ...));
+                return compare((std::get<storage_type<Component> *>(pools)->get(lhs), ...), (std::get<storage_type<Component> *>(pools)->get(rhs), ...));
             }, std::move(algo), std::forward<Args>(args)...);
         } else {
             cpool->sort_n(*length, [this, compare = std::move(compare)](const entity_type lhs, const entity_type rhs) {
-                return compare(std::tuple<decltype(get<Component>({}))...>{std::get<pool_type<Component> *>(pools)->get(lhs)...}, std::tuple<decltype(get<Component>({}))...>{std::get<pool_type<Component> *>(pools)->get(rhs)...});
+                return compare(std::forward_as_tuple(std::get<storage_type<Component> *>(pools)->get(lhs)...), std::forward_as_tuple(std::get<storage_type<Component> *>(pools)->get(rhs)...));
             }, std::move(algo), std::forward<Args>(args)...);
         }
 
@@ -1048,11 +1048,11 @@ public:
                 [[maybe_unused]] const auto entt = head->data()[pos];
                 (other->swap(other->data()[pos], entt), ...);
             }
-        }(std::get<pool_type<Owned> *>(pools)...);
+        }(std::get<storage_type<Owned> *>(pools)...);
     }
 
 private:
-    const std::tuple<pool_type<Owned> *..., pool_type<Get> *...> pools;
+    const std::tuple<storage_type<Owned> *..., storage_type<Get> *...> pools;
     const size_type *length;
 };
 

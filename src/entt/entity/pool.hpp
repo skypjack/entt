@@ -275,27 +275,27 @@ private:
  * @tparam Type Type of objects assigned to the entities.
  */
 template<typename Entity, typename Type, typename = void>
-struct pool_traits {
-    /*! @brief Resulting type after component-to-pool conversion. */
+struct storage_traits {
+    /*! @brief Resulting type after component-to-storage conversion. */
     using value_type = sigh_storage_mixin<storage_adapter_mixin<basic_storage<Entity, Type>>>;
 };
 
 
-/*! @copydoc pool_traits */
+/*! @copydoc storage_traits */
 template<typename Entity, typename Type>
-struct pool_traits<Entity, const Type> {
-    /*! @brief Resulting type after component-to-pool conversion. */
-    using value_type = std::add_const_t<typename pool_traits<Entity, std::remove_const_t<Type>>::value_type>;
+struct storage_traits<Entity, const Type> {
+    /*! @brief Resulting type after component-to-storage conversion. */
+    using value_type = std::add_const_t<typename storage_traits<Entity, std::remove_const_t<Type>>::value_type>;
 };
 
 
 /**
- * @brief Alias declaration to use to make component-to-pool conversions.
+ * @brief Alias declaration to use to make component-to-storage conversions.
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Type Type of objects assigned to the entities.
  */
 template<typename Entity, typename Type>
-using pool_t = typename pool_traits<Entity, Type>::value_type;
+using storage_t = typename storage_traits<Entity, Type>::value_type;
 
 
 }
