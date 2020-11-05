@@ -139,7 +139,9 @@ class type_info final {
 
 public:
     /*! @brief Default constructor. */
-    type_info() ENTT_NOEXCEPT = default;
+    type_info() ENTT_NOEXCEPT
+        : type_info({}, {}, {})
+    {}
 
     /*! @brief Default copy constructor. */
     type_info(const type_info &) ENTT_NOEXCEPT = default;
