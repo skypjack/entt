@@ -74,17 +74,14 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
     class iterable_group final {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>>;
 
-        template<typename, typename>
-        class iterable_group_iterator;
-
-        template<typename It, typename... Type>
-        class iterable_group_iterator<It, type_list<Type...>> final {
+        template<typename It>
+        class iterable_group_iterator final {
             friend class iterable_group;
 
             template<typename... Args>
             iterable_group_iterator(It from, const std::tuple<pool_type<Get> *...> &args) ENTT_NOEXCEPT
                 : it{from},
-                  pools{std::get<pool_type<Type> *>(args)...}
+                  pools{args}
             {}
 
         public:
@@ -105,7 +102,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
 
             [[nodiscard]] reference operator*() const ENTT_NOEXCEPT {
                 const auto entt = *it;
-                return std::tuple_cat(std::make_tuple(entt), std::forward_as_tuple(std::get<pool_type<Type> *>(pools)->get(entt)...));
+                return std::tuple_cat(std::make_tuple(entt), std::get<pool_type<Get> *>(pools)->get_as_tuple(entt)...);
             }
 
             [[nodiscard]] bool operator==(const iterable_group_iterator &other) const ENTT_NOEXCEPT {
@@ -118,7 +115,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
 
         private:
             It it;
-            const std::tuple<pool_type<Type> *...> pools;
+            const std::tuple<pool_type<Get> *...> pools;
         };
 
         iterable_group(basic_sparse_set<Entity> &ref, const std::tuple<pool_type<Get> *...> &cpools)
@@ -127,14 +124,8 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
         {}
 
     public:
-        using iterator = iterable_group_iterator<
-            typename basic_sparse_set<Entity>::iterator,
-            type_list_cat_t<std::conditional_t<is_empty_v<Get>, type_list<>, type_list<Get>>...>
-        >;
-        using reverse_iterator = iterable_group_iterator<
-            typename basic_sparse_set<Entity>::reverse_iterator,
-            type_list_cat_t<std::conditional_t<is_empty_v<Get>, type_list<>, type_list<Get>>...>
-        >;
+        using iterator = iterable_group_iterator<typename basic_sparse_set<Entity>::iterator>;
+        using reverse_iterator = iterable_group_iterator<typename basic_sparse_set<Entity>::reverse_iterator>;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
             return { handler->begin(), pools };
@@ -161,17 +152,6 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
         : handler{&ref},
           pools{&gpool...}
     {}
-
-    template<typename Func, typename... Weak>
-    void traverse(Func func, type_list<Weak...>) const {
-        for(const auto entt: *handler) {
-            if constexpr(std::is_invocable_v<Func, entity_type, decltype(get<Weak>({}))...>) {
-                func(entt, std::get<pool_type<Weak> *>(pools)->get(entt)...);
-            } else {
-                func(std::get<pool_type<Weak> *>(pools)->get(entt)...);
-            }
-        }
-    }
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -405,17 +385,11 @@ public:
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Component) == 0) {
-            return std::tuple_cat([entt](auto *cpool) {
-                if constexpr(is_empty_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                    return std::tuple{};
-                } else {
-                    return std::forward_as_tuple(cpool->get(entt));
-                }
-            }(std::get<pool_type<Get> *>(pools))...);
+            return std::tuple_cat(std::get<pool_type<Get> *>(pools)->get_as_tuple(entt)...);
         } else if constexpr(sizeof...(Component) == 1) {
             return (std::get<pool_type<Component> *>(pools)->get(entt), ...);
         } else {
-            return std::forward_as_tuple(get<Component>(entt)...);
+            return std::tuple_cat(std::get<pool_type<Component> *>(pools)->get_as_tuple(entt)...);
         }
     }
 
@@ -443,7 +417,13 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        traverse(std::move(func), (std::conditional_t<is_empty_v<Get>, type_list<>, type_list<Get>>{} + ...));
+        for(const auto entt: *handler) {
+            if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::make_tuple(entt), get({})))>) {
+                std::apply(func, std::tuple_cat(std::make_tuple(entt), get(entt)));
+            } else {
+                std::apply(func, get(entt));
+            }
+        }
     }
 
     /**
@@ -599,18 +579,18 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
     class iterable_group final {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...>;
 
-        template<typename, typename, typename>
+        template<typename, typename>
         class iterable_group_iterator;
 
-        template<typename It, typename... OIt, typename... Type>
-        class iterable_group_iterator<It, type_list<OIt...>, type_list<Type...>> final {
+        template<typename It, typename... OIt>
+        class iterable_group_iterator<It, type_list<OIt...>> final {
             friend class iterable_group;
 
             template<typename... Other>
             iterable_group_iterator(It from, const std::tuple<Other...> &other, const std::tuple<pool_type<Get> *...> &cpools) ENTT_NOEXCEPT
                 : it{from},
                   owned{std::get<OIt>(other)...},
-                  get{std::get<pool_type<Type> *>(cpools)...}
+                  get{cpools}
             {}
 
         public:
@@ -633,7 +613,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
                 return std::tuple_cat(
                     std::make_tuple(*it),
                     std::forward_as_tuple(*std::get<OIt>(owned)...),
-                    std::forward_as_tuple(std::get<pool_type<Type> *>(get)->get(*it)...)
+                    std::get<pool_type<Get> *>(get)->get_as_tuple(*it)...
                 );
             }
 
@@ -648,7 +628,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
         private:
             It it;
             std::tuple<OIt...> owned;
-            std::tuple<pool_type<Type> *...> get;
+            std::tuple<pool_type<Get> *...> get;
         };
 
         iterable_group(std::tuple<pool_type<Owned> *..., pool_type<Get> *...> cpools, const std::size_t &extent)
@@ -659,13 +639,11 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
     public:
         using iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::iterator,
-            type_list_cat_t<std::conditional_t<is_empty_v<Owned>, type_list<>, type_list<decltype(std::declval<pool_type<Owned>>().end())>>...>,
-            type_list_cat_t<std::conditional_t<is_empty_v<Get>, type_list<>, type_list<Get>>...>
+            type_list_cat_t<std::conditional_t<std::tuple_size_v<decltype(std::declval<pool_type<Owned>>().get_as_tuple({}))> == 0, type_list<>, type_list<decltype(std::declval<pool_type<Owned>>().end())>>...>
         >;
         using reverse_iterator = iterable_group_iterator<
             typename basic_sparse_set<Entity>::reverse_iterator,
-            type_list_cat_t<std::conditional_t<is_empty_v<Owned>, type_list<>, type_list<decltype(std::declval<pool_type<Owned>>().rbegin())>>...>,
-            type_list_cat_t<std::conditional_t<is_empty_v<Get>, type_list<>, type_list<Get>>...>
+            type_list_cat_t<std::conditional_t<std::tuple_size_v<decltype(std::declval<pool_type<Owned>>().get_as_tuple({}))> == 0, type_list<>, type_list<decltype(std::declval<pool_type<Owned>>().rbegin())>>...>
         >;
 
         [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
@@ -709,22 +687,6 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
         : pools{&opool..., &gpool...},
           length{&extent}
     {}
-
-    template<typename Func, typename... Strong, typename... Weak>
-    void traverse(Func func, type_list<Strong...>, type_list<Weak...>) const {
-        [[maybe_unused]] auto it = std::make_tuple((std::get<pool_type<Strong> *>(pools)->end() - *length)...);
-        [[maybe_unused]] auto data = std::get<0>(pools)->basic_sparse_set<entity_type>::end() - *length;
-
-        for(auto next = *length; next; --next) {
-            const auto entt = *(data++);
-
-            if constexpr(std::is_invocable_v<Func, entity_type, decltype(get<Strong>({}))..., decltype(get<Weak>({}))...>) {
-                func(entt, *(std::get<decltype(std::get<pool_type<Strong> *>(pools)->end())>(it)++)..., std::get<pool_type<Weak> *>(pools)->get(entt)...);
-            } else {
-                func(*(std::get<decltype(std::get<pool_type<Strong> *>(pools)->end())>(it)++)..., std::get<pool_type<Weak> *>(pools)->get(entt)...);
-            }
-        }
-    }
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -951,14 +913,10 @@ public:
 
         if constexpr(sizeof...(Component) == 0) {
             auto filter = [entt, index = std::get<0>(pools)->index(entt)](auto *cpool) {
-                using value_type = typename std::remove_reference_t<decltype(*cpool)>::value_type;
-
-                if constexpr(is_empty_v<value_type>) {
-                    return std::tuple{};
-                } else if constexpr((std::is_same_v<value_type, std::remove_const_t<Owned>> || ...)) {
+                if constexpr(std::tuple_size_v<decltype(cpool->get_as_tuple({}))> != 0 && (std::is_same_v<typename std::remove_reference_t<decltype(*cpool)>::value_type, std::remove_const_t<Owned>> || ...)) {
                     return std::forward_as_tuple(cpool->raw()[index]);
                 } else {
-                    return std::forward_as_tuple(cpool->get(entt));
+                    return cpool->get_as_tuple(entt);
                 }
             };
 
@@ -994,9 +952,23 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        traverse(std::move(func),
-            (std::conditional_t<is_empty_v<Owned>, type_list<>, type_list<Owned>>{} + ...),
-            (type_list<>{} + ... + std::conditional_t<is_empty_v<Get>, type_list<>, type_list<Get>>{}));
+        auto owned = std::tuple_cat([length = *length](auto *cpool) {
+            if constexpr(std::tuple_size_v<decltype(cpool->get_as_tuple({}))> == 0) {
+                return std::make_tuple();
+            } else {
+                return std::make_tuple(cpool->end() - length);
+            }
+        }(std::get<pool_type<Owned> *>(pools))...);
+
+        for(const auto entt: *this) {
+            auto args = std::tuple_cat(std::apply([](auto &&... curr) { return std::forward_as_tuple(*curr++...); }, owned), std::get<pool_type<Get> *>(pools)->get_as_tuple(entt)...);
+
+            if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::make_tuple(entt), get({})))>) {
+                std::apply(func, std::tuple_cat(std::make_tuple(entt), args));
+            } else {
+                std::apply(func, args);
+            }
+        }
     }
 
     /**

@@ -3,13 +3,15 @@
 
 
 #include <array>
-#include <vector>
 #include <cstddef>
-#include <utility>
 #include <iterator>
+#include <tuple>
 #include <type_traits>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 #include "../config/config.h"
+#include "../core/type_traits.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 
@@ -36,17 +38,14 @@ class basic_snapshot {
 
     template<typename Component, typename Archive, typename It>
     void get(Archive &archive, std::size_t sz, It first, It last) const {
+        const auto view = reg->view<std::add_const_t<Component>>();
         archive(typename traits_type::entity_type(sz));
 
         while(first != last) {
             const auto entt = *(first++);
 
             if(reg->template has<Component>(entt)) {
-                if constexpr(std::is_empty_v<Component>) {
-                    archive(entt);
-                } else {
-                    archive(entt, reg->template get<Component>(entt));
-                }
+                std::apply(archive, std::tuple_cat(std::make_tuple(entt), view.get(entt)));
             }
         }
     }
@@ -173,7 +172,7 @@ class basic_snapshot_loader {
 
         entity_type entt{};
 
-        if constexpr(std::is_empty_v<Type>) {
+        if constexpr(std::tuple_size_v<decltype(reg->view<Type>().get({}))> == 0) {
             while(length--) {
                 archive(entt);
                 const auto entity = reg->valid(entt) ? entt : reg->create(entt);
@@ -392,7 +391,7 @@ class basic_continuous_loader {
 
         entity_type entt{};
 
-        if constexpr(std::is_empty_v<Other>) {
+        if constexpr(std::tuple_size_v<decltype(reg->view<Other>().get({}))> == 0) {
             while(length--) {
                 archive(entt);
                 restore(entt);

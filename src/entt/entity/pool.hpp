@@ -179,7 +179,7 @@ struct sigh_storage_mixin: Type {
         Type::emplace(owner, entity, std::forward<Args>(args)...);
         construction.publish(owner, entity);
 
-        if constexpr(!is_empty_v<value_type>) {
+        if constexpr(std::tuple_size_v<decltype(Type::get_as_tuple({}))> != 0) {
             return this->get(entity);
         }
     }
@@ -244,7 +244,7 @@ struct sigh_storage_mixin: Type {
      */
     template<typename... Func>
     decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entity, [[maybe_unused]] Func &&... func) {
-        if constexpr(is_empty_v<value_type>) {
+        if constexpr(std::tuple_size_v<decltype(Type::get_as_tuple({}))> == 0) {
             update.publish(owner, entity);
         } else {
             Type::patch(owner, entity, std::forward<Func>(func)...);

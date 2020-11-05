@@ -71,7 +71,6 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
     template<typename Comp>
     using pool_type = pool_t<Entity, Comp>;
 
-    using return_type = type_list_cat_t<std::conditional_t<is_empty_v<Component>, type_list<>, type_list<Component>>...>;
     using unchecked_type = std::array<const basic_sparse_set<Entity> *, (sizeof...(Component) - 1)>;
 
     template<typename It>
@@ -230,7 +229,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
     {}
 
     [[nodiscard]] const basic_sparse_set<Entity> * candidate() const ENTT_NOEXCEPT {
-        return (std::min)({ static_cast<const basic_sparse_set<Entity> *>(std::get<pool_type<Component> *>(pools))... }, [](const auto *lhs, const auto *rhs) {
+        return (std::min)({ static_cast<const basic_sparse_set<entity_type> *>(std::get<pool_type<Component> *>(pools))... }, [](const auto *lhs, const auto *rhs) {
             return lhs->size() < rhs->size();
         });
     }
@@ -243,43 +242,43 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
     }
 
     template<typename It, typename Pool>
-    [[nodiscard]] decltype(auto) get([[maybe_unused]] It &it, [[maybe_unused]] Pool *cpool, [[maybe_unused]] const Entity entt) const {
+    [[nodiscard]] auto get_as_tuple([[maybe_unused]] It &it, [[maybe_unused]] Pool *cpool, [[maybe_unused]] const Entity entt) const {
         if constexpr(std::is_same_v<typename std::iterator_traits<It>::value_type, typename Pool::value_type>) {
-            return *it;
+            return std::forward_as_tuple(*it);
         } else {
-            return cpool->get(entt);
+            return cpool->get_as_tuple(entt);
         }
     }
 
-    template<typename Comp, typename Func, typename... Type>
-    void traverse(Func func, type_list<Type...>) const {
-        if constexpr(std::disjunction_v<std::is_same<Comp, Type>...>) {
+    template<typename Comp, typename Func>
+    void traverse(Func func) const {
+        if constexpr(std::tuple_size_v<decltype(std::declval<pool_type<Comp>>().get_as_tuple({}))> == 0) {
+            for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
+                if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->contains(entt)) && ...)
+                    && !(std::get<const pool_type<Exclude> *>(filter)->contains(entt) || ...))
+                {
+                    if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::make_tuple(entt), get({})))>) {
+                        std::apply(func, std::tuple_cat(std::make_tuple(entt), get(entt)));
+                    } else {
+                        std::apply(func, get(entt));
+                    }
+                }
+            }
+        } else {
             auto it = std::get<pool_type<Comp> *>(pools)->begin();
 
             for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
                 if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->contains(entt)) && ...)
                     && !(std::get<const pool_type<Exclude> *>(filter)->contains(entt) || ...))
                 {
-                    if constexpr(std::is_invocable_v<Func, entity_type, decltype(get<Type>({}))...>) {
-                        func(entt, get(it, std::get<pool_type<Type> *>(pools), entt)...);
+                    if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::make_tuple(entt), get({})))>) {
+                        std::apply(func, std::tuple_cat(std::make_tuple(entt), get_as_tuple(it, std::get<pool_type<Component> *>(pools), entt)...));
                     } else {
-                        func(get(it, std::get<pool_type<Type> *>(pools), entt)...);
+                        std::apply(func, std::tuple_cat(get_as_tuple(it, std::get<pool_type<Component> *>(pools), entt)...));
                     }
                 }
 
                 ++it;
-            }
-        } else {
-            for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<pool_type<Comp> *>(pools))) {
-                if(((std::is_same_v<Comp, Component> || std::get<pool_type<Component> *>(pools)->contains(entt)) && ...)
-                    && !(std::get<const pool_type<Exclude> *>(filter)->contains(entt) || ...))
-                {
-                    if constexpr(std::is_invocable_v<Func, entity_type, decltype(get<Type>({}))...>) {
-                        func(entt, std::get<pool_type<Type> *>(pools)->get(entt)...);
-                    } else {
-                        func(std::get<pool_type<Type> *>(pools)->get(entt)...);
-                    }
-                }
             }
         }
     }
@@ -423,17 +422,11 @@ public:
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Comp) == 0) {
-            return std::tuple_cat([entt](auto *cpool) {
-                if constexpr(is_empty_v<typename std::remove_reference_t<decltype(*cpool)>::value_type>) {
-                    return std::tuple{};
-                } else {
-                    return std::forward_as_tuple(cpool->get(entt));
-                }
-            }(std::get<pool_type<Component> *>(pools))...);
+            return std::tuple_cat(std::get<pool_type<Component> *>(pools)->get_as_tuple(entt)...);
         } else if constexpr(sizeof...(Comp) == 1) {
             return (std::get<pool_type<Comp> *>(pools)->get(entt), ...);
         } else {
-            return std::forward_as_tuple(get<Comp>(entt)...);
+            return std::tuple_cat(std::get<pool_type<Comp> *>(pools)->get_as_tuple(entt)...);
         }
     }
 
@@ -461,7 +454,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        ((std::get<pool_type<Component> *>(pools) == view ? traverse<Component>(std::move(func), return_type{}) : void()), ...);
+        ((std::get<pool_type<Component> *>(pools) == view ? traverse<Component>(std::move(func)) : void()), ...);
     }
 
     /**
@@ -483,7 +476,7 @@ public:
     template<typename Comp, typename Func>
     void each(Func func) const {
         use<Comp>();
-        traverse<Comp>(std::move(func), return_type{});
+        traverse<Comp>(std::move(func));
     }
 
     /**
@@ -618,12 +611,12 @@ class basic_view<Entity, exclude_t<>, Component> final {
 
     public:
         using iterator = std::conditional_t<
-            is_empty_v<Component>,
+            std::tuple_size_v<decltype(std::declval<pool_type>().get_as_tuple({}))> == 0,
             iterable_view_iterator<typename basic_sparse_set<Entity>::iterator>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::iterator, decltype(std::declval<pool_type>().begin())>
         >;
         using reverse_iterator = std::conditional_t<
-            is_empty_v<Component>,
+            std::tuple_size_v<decltype(std::declval<pool_type>().get_as_tuple({}))> == 0,
             iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator, decltype(std::declval<pool_type>().rbegin())>
         >;
@@ -721,7 +714,7 @@ public:
      * @return An iterator to the first entity of the view.
      */
     [[nodiscard]] iterator begin() const ENTT_NOEXCEPT {
-        return pool->basic_sparse_set<Entity>::begin();
+        return pool->basic_sparse_set<entity_type>::begin();
     }
 
     /**
@@ -734,7 +727,7 @@ public:
      * @return An iterator to the entity following the last entity of the view.
      */
     [[nodiscard]] iterator end() const ENTT_NOEXCEPT {
-        return pool->basic_sparse_set<Entity>::end();
+        return pool->basic_sparse_set<entity_type>::end();
     }
 
     /**
@@ -746,7 +739,7 @@ public:
      * @return An iterator to the first entity of the reversed view.
      */
     [[nodiscard]] reverse_iterator rbegin() const ENTT_NOEXCEPT {
-        return pool->basic_sparse_set<Entity>::rbegin();
+        return pool->basic_sparse_set<entity_type>::rbegin();
     }
 
     /**
@@ -761,7 +754,7 @@ public:
      * reversed view.
      */
     [[nodiscard]] reverse_iterator rend() const ENTT_NOEXCEPT {
-        return pool->basic_sparse_set<Entity>::rend();
+        return pool->basic_sparse_set<entity_type>::rend();
     }
 
     /**
@@ -831,11 +824,7 @@ public:
     template<typename... Comp>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Comp) == 0) {
-            if constexpr(is_empty_v<Component>) {
-                return std::tuple{};
-            } else {
-                return std::forward_as_tuple(pool->get(entt));
-            }
+            return pool->get_as_tuple(entt);
         } else {
             static_assert(std::is_same_v<Comp..., Component>, "Invalid component type");
             return pool->get(entt);
@@ -866,27 +855,25 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(is_empty_v<Component>) {
-            if constexpr(std::is_invocable_v<Func, entity_type>) {
-                for(const auto entt: *this) {
-                    func(entt);
-                }
-            } else {
+        if constexpr(std::tuple_size_v<decltype(pool->get_as_tuple({}))> == 0) {
+            if constexpr(std::is_invocable_v<Func>) {
                 for(auto pos = pool->size(); pos; --pos) {
                     func();
                 }
-            }
-        } else {
-            if constexpr(std::is_invocable_v<Func, entity_type, std::add_lvalue_reference_t<Component>>) {
-                auto raw = pool->begin();
-
-                for(const auto entt: *this) {
-                    func(entt, *(raw++));
-                }
             } else {
-                for(auto &&component: *pool) {
+                for(auto &&component: *this) {
                     func(component);
                 }
+            }
+        } else if constexpr(std::is_invocable_v<Func, entity_type, std::add_lvalue_reference_t<Component>>) {
+            auto raw = pool->begin();
+
+            for(const auto entt: *this) {
+                func(entt, *(raw++));
+            }
+        } else {
+            for(auto &&component: *pool) {
+                func(component);
             }
         }
     }
