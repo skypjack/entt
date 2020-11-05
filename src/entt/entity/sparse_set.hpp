@@ -174,6 +174,8 @@ class basic_sparse_set {
     }
 
     virtual void swap_at(const std::size_t, const std::size_t) {}
+    virtual void swap_and_pop(const std::size_t) {}
+    virtual void clear_all() {}
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -419,14 +421,18 @@ public:
      *
      * @param entt A valid entity identifier.
      */
-    virtual void remove(const entity_type entt) {
+    void remove(const entity_type entt) {
         ENTT_ASSERT(contains(entt));
-        const auto curr = page(entt);
-        const auto pos = offset(entt);
-        packed[size_type{to_integral(sparse[curr][pos])}] = packed.back();
-        sparse[page(packed.back())][offset(packed.back())] = sparse[curr][pos];
-        sparse[curr][pos] = null;
+        auto &ref = sparse[page(entt)][offset(entt)];
+        const auto pos = size_type{to_integral(ref)};
+        const auto other = packed.back();
+
+        sparse[page(other)][offset(other)] = ref;
+        packed[pos] = other;
+        ref = null;
+
         packed.pop_back();
+        swap_and_pop(pos);
     }
 
     /**
@@ -463,9 +469,9 @@ public:
     void swap(const entity_type lhs, const entity_type rhs) {
         const auto from = index(lhs);
         const auto to = index(rhs);
-        swap_at(from, to);
         std::swap(sparse[page(lhs)][offset(lhs)], sparse[page(rhs)][offset(rhs)]);
         std::swap(packed[from], packed[to]);
+        swap_at(from, to);
     }
 
     /**
@@ -569,12 +575,11 @@ public:
         }
     }
 
-    /**
-     * @brief Clears a sparse set.
-     */
-    virtual void clear() ENTT_NOEXCEPT {
+    /*! @brief Clears a sparse set. */
+    void clear() ENTT_NOEXCEPT {
         sparse.clear();
         packed.clear();
+        clear_all();
     }
 
 private:

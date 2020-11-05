@@ -160,6 +160,15 @@ class basic_storage: public basic_sparse_set<Entity> {
         std::swap(instances[lhs], instances[rhs]);
     }
 
+    void swap_and_pop(const std::size_t pos) final {
+        instances[pos] = std::move(instances.back());
+        instances.pop_back();
+    }
+
+    void clear_all() ENTT_NOEXCEPT final {
+        instances.clear();
+    }
+
 public:
     /*! @brief Type of the objects associated with the entities. */
     using value_type = Type;
@@ -414,33 +423,6 @@ public:
     }
 
     /**
-     * @brief Removes an entity from a storage and destroys its object.
-     *
-     * @warning
-     * Attempting to use an entity that doesn't belong to the storage results in
-     * undefined behavior.
-     *
-     * @param entt A valid entity identifier.
-     */
-    void remove(const entity_type entt) final {
-        auto other = std::move(instances.back());
-        instances[underlying_type::index(entt)] = std::move(other);
-        instances.pop_back();
-        underlying_type::remove(entt);
-    }
-
-    /**
-     * @brief Removes multiple entities from a storage.
-     * @tparam It Type of input iterator.
-     * @param first An iterator to the first element of the range of entities.
-     * @param last An iterator past the last element of the range of entities.
-     */
-    template<typename It>
-    void remove(It first, It last) {
-        underlying_type::remove(first, last);
-    }
-
-    /**
      * @brief Sort elements according to the given comparison function.
      *
      * The comparison function object must return `true` if the first element
@@ -501,12 +483,6 @@ public:
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
         sort_n(size(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
-    }
-
-    /*! @brief Clears a storage. */
-    void clear() ENTT_NOEXCEPT final {
-        underlying_type::clear();
-        instances.clear();
     }
 
 private:
