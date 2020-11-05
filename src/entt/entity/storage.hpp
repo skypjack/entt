@@ -3,11 +3,12 @@
 
 
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
+#include <tuple>
+#include <type_traits>
 #include <utility>
 #include <vector>
-#include <cstddef>
-#include <type_traits>
 #include "../config/config.h"
 #include "../core/algorithm.hpp"
 #include "../core/type_traits.hpp"
@@ -340,6 +341,26 @@ public:
     }
 
     /**
+    * @brief Returns the object associated with an entity as a tuple suitable
+    * for merging in a multi-type get.
+    *
+    * @warning
+    * Attempting to use an entity that doesn't belong to the storage results in
+    * undefined behavior.
+    *
+    * @param entt A valid entity identifier.
+    * @return The object associated with the entity as a tuple.
+    */
+    [[nodiscard]] std::tuple<const value_type &> get_as_tuple(const entity_type entt) const {
+        return { instances[underlying_type::index(entt)] };
+    }
+
+    /*! @copydoc get_as_tuple */
+    [[nodiscard]] std::tuple<value_type &> get_as_tuple(const entity_type entt) {
+        return { instances[underlying_type::index(entt)] };
+    }
+
+    /**
      * @brief Assigns an entity to a storage and constructs its object.
      *
      * This version accept both types that can be constructed in place directly
@@ -488,6 +509,27 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
+
+    /**
+    * @brief Returns the object associated with an entity as a tuple suitable
+    * for merging in a multi-type get.
+    *
+    * @warning
+    * Attempting to use an entity that doesn't belong to the storage results in
+    * undefined behavior.
+    *
+    * @param entt A valid entity identifier.
+    * @return The object associated with the entity as a tuple.
+    */
+    [[nodiscard]] std::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const {
+        ENTT_ASSERT(contains(entt));
+        return {};
+    }
+
+    /*! @copydoc get_as_tuple */
+    [[nodiscard]] std::tuple<> get_as_tuple(const entity_type entt) {
+        return std::as_const(*this).get_as_tuple(entt);
+    }
 
     /**
      * @brief Assigns an entity to a storage and constructs its object.
