@@ -149,8 +149,6 @@ class basic_sparse_set {
         index_type index;
     };
 
-    virtual void swap(const std::size_t, const std::size_t) {}
-
     [[nodiscard]] auto page(const Entity entt) const ENTT_NOEXCEPT {
         return size_type{(to_integral(entt) & traits_type::entity_mask) / entt_per_page};
     }
@@ -174,6 +172,8 @@ class basic_sparse_set {
 
         return sparse[pos];
     }
+
+    virtual void swap_at(const std::size_t, const std::size_t) {}
 
 public:
     /*! @brief Underlying entity identifier. */
@@ -460,11 +460,12 @@ public:
      * @param lhs A valid entity identifier.
      * @param rhs A valid entity identifier.
      */
-    virtual void swap(const entity_type lhs, const entity_type rhs) {
-        auto &from = sparse[page(lhs)][offset(lhs)];
-        auto &to = sparse[page(rhs)][offset(rhs)];
-        std::swap(packed[size_type{to_integral(from)}], packed[size_type{to_integral(to)}]);
-        std::swap(from, to);
+    void swap(const entity_type lhs, const entity_type rhs) {
+        const auto from = index(lhs);
+        const auto to = index(rhs);
+        swap_at(from, to);
+        std::swap(sparse[page(lhs)][offset(lhs)], sparse[page(rhs)][offset(rhs)]);
+        std::swap(packed[from], packed[to]);
     }
 
     /**
@@ -508,7 +509,7 @@ public:
             auto next = index(packed[curr]);
 
             while(curr != next) {
-                swap(next, index(packed[next]));
+                swap_at(next, index(packed[next]));
                 sparse[page(packed[curr])][offset(packed[curr])] = entity_type{static_cast<typename traits_type::entity_type>(curr)};
 
                 curr = next;

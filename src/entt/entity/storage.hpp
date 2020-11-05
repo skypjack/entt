@@ -156,7 +156,7 @@ class basic_storage: public basic_sparse_set<Entity> {
         index_type index;
     };
 
-    void swap(const std::size_t lhs, const std::size_t rhs) final {
+    void swap_at(const std::size_t lhs, const std::size_t rhs) final {
         std::swap(instances[lhs], instances[rhs]);
     }
 
@@ -438,21 +438,6 @@ public:
     template<typename It>
     void remove(It first, It last) {
         underlying_type::remove(first, last);
-    }
-
-    /**
-     * @brief Swaps entities and objects in the internal packed arrays.
-     *
-     * @warning
-     * Attempting to swap entities that don't belong to the sparse set results
-     * in undefined behavior.
-     *
-     * @param lhs A valid entity identifier.
-     * @param rhs A valid entity identifier.
-     */
-    void swap(const entity_type lhs, const entity_type rhs) final {
-        swap(underlying_type::index(lhs), underlying_type::index(rhs));
-        underlying_type::swap(lhs, rhs);
     }
 
     /**
