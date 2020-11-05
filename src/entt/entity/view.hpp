@@ -284,30 +284,6 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         }
     }
 
-    template<typename Func, typename... Type>
-    void iterate(Func func, type_list<Type...>) const {
-        const auto last = view->data() + view->size();
-        auto first = view->data();
-
-        while(first != last) {
-            if((std::get<pool_type<Component> *>(pools)->contains(*first) && ...) && !(std::get<const pool_type<Exclude> *>(filter)->contains(*first) || ...)) {
-                const auto base = *(first++);
-                const auto chunk = (std::min)({ (std::get<pool_type<Component> *>(pools)->size() - std::get<pool_type<Component> *>(pools)->index(base))... });
-                size_type length{};
-
-                for(++length;
-                    length < chunk
-                        && ((*(std::get<pool_type<Component> *>(pools)->data() + std::get<pool_type<Component> *>(pools)->index(base) + length) == *first) && ...)
-                        && !(std::get<const pool_type<Exclude> *>(filter)->contains(*first) || ...);
-                    ++length, ++first);
-
-                func(view->data() + view->index(base), (std::get<pool_type<Type> *>(pools)->raw() + std::get<pool_type<Type> *>(pools)->index(base))..., length);
-            } else {
-                ++first;
-            }
-        }
-    }
-
 public:
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -545,43 +521,6 @@ public:
     [[nodiscard]] iterable_view each() const ENTT_NOEXCEPT {
         use<Comp>();
         return iterable_view{*this};
-    }
-
-    /**
-     * @brief Chunked iteration for entities and components
-     *
-     * Chunked iteration tries to spot chunks in the sets of entities and
-     * components and return them one at a time along with their sizes.<br/>
-     * This type of iteration is intended where it's known a priori that the
-     * creation of entities and components takes place in chunk, which is
-     * actually quite common. In this case, various optimizations can be applied
-     * downstream to obtain even better performances from the views.
-     *
-     * The signature of the function must be equivalent to the following:
-     *
-     * @code{.cpp}
-     * void(const entity_type *, Type *..., size_type);
-     * @endcode
-     *
-     * The arguments are as follows:
-     *
-     * * A pointer to the entities belonging to the chunk.
-     * * Pointers to the components associated with the returned entities.
-     * * The length of the chunk.
-     *
-     * Note that the callback can be invoked 0 or more times and no guarantee is
-     * given on the order of the elements.
-     *
-     * @note
-     * Empty types aren't explicitly instantiated and therefore they are never
-     * returned during iterations.
-     *
-     * @tparam Func Type of the function object to invoke.
-     * @param func A valid function object.
-     */
-    template<typename Func>
-    void chunked(Func func) const {
-        iterate(std::move(func), return_type{});
     }
 
 private:
