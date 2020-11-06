@@ -241,18 +241,18 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         return other;
     }
 
-    template<typename It, typename Pool>
-    [[nodiscard]] auto get_as_tuple([[maybe_unused]] It &it, [[maybe_unused]] Pool *cpool, [[maybe_unused]] const Entity entt) const {
-        if constexpr(std::is_same_v<typename std::iterator_traits<It>::value_type, typename Pool::value_type>) {
+    template<typename Comp, typename It>
+    [[nodiscard]] auto dispatch_get([[maybe_unused]] It &it, [[maybe_unused]] const Entity entt) const {
+        if constexpr(std::is_same_v<typename std::iterator_traits<It>::value_type, typename storage_type<Comp>::value_type>) {
             return std::forward_as_tuple(*it);
         } else {
-            return cpool->get_as_tuple(entt);
+            return get_as_tuple(*std::get<storage_type<Comp> *>(pools), entt);
         }
     }
 
     template<typename Comp, typename Func>
     void traverse(Func func) const {
-        if constexpr(std::tuple_size_v<decltype(std::declval<storage_type<Comp>>().get_as_tuple({}))> == 0) {
+        if constexpr(std::is_same_v<typename storage_type<Comp>::storage_category, empty_storage_tag>) {
             for(const auto entt: static_cast<const basic_sparse_set<entity_type> &>(*std::get<storage_type<Comp> *>(pools))) {
                 if(((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
                     && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
@@ -272,9 +272,9 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
                     && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
                 {
                     if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::make_tuple(entt), get({})))>) {
-                        std::apply(func, std::tuple_cat(std::make_tuple(entt), get_as_tuple(it, std::get<storage_type<Component> *>(pools), entt)...));
+                        std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Component>(it, entt)...));
                     } else {
-                        std::apply(func, std::tuple_cat(get_as_tuple(it, std::get<storage_type<Component> *>(pools), entt)...));
+                        std::apply(func, std::tuple_cat(dispatch_get<Component>(it, entt)...));
                     }
                 }
 
@@ -422,12 +422,11 @@ public:
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Comp) == 0) {
-            return std::tuple_cat(std::get<storage_type<Component> *>(pools)->get_as_tuple(entt)...);
+            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Component> *>(pools), entt)...);
         } else if constexpr(sizeof...(Comp) == 1) {
             return (std::get<storage_type<Comp> *>(pools)->get(entt), ...);
         } else {
-            return std::tuple_cat(std::get<storage_type<Comp> *>(pools)->get_as_tuple(entt)...);
-        }
+            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Comp> *>(pools), entt)...);        }
     }
 
     /**
@@ -611,12 +610,12 @@ class basic_view<Entity, exclude_t<>, Component> final {
 
     public:
         using iterator = std::conditional_t<
-            std::tuple_size_v<decltype(std::declval<storage_type>().get_as_tuple({}))> == 0,
+            std::is_same_v<typename storage_type::storage_category, empty_storage_tag>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::iterator>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::iterator, decltype(std::declval<storage_type>().begin())>
         >;
         using reverse_iterator = std::conditional_t<
-            std::tuple_size_v<decltype(std::declval<storage_type>().get_as_tuple({}))> == 0,
+            std::is_same_v<typename storage_type::storage_category, empty_storage_tag>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator>,
             iterable_view_iterator<typename basic_sparse_set<Entity>::reverse_iterator, decltype(std::declval<storage_type>().rbegin())>
         >;
@@ -824,7 +823,11 @@ public:
     template<typename... Comp>
     [[nodiscard]] decltype(auto) get(const entity_type entt) const {
         if constexpr(sizeof...(Comp) == 0) {
-            return pool->get_as_tuple(entt);
+            if constexpr(std::is_same_v<typename storage_type::storage_category, empty_storage_tag>) {
+                return std::make_tuple();
+            } else {
+                return std::forward_as_tuple(pool->get(entt));
+            }
         } else {
             static_assert(std::is_same_v<Comp..., Component>, "Invalid component type");
             return pool->get(entt);
@@ -855,7 +858,7 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        if constexpr(std::tuple_size_v<decltype(pool->get_as_tuple({}))> == 0) {
+        if constexpr(std::is_same_v<typename storage_type::storage_category, empty_storage_tag>) {
             if constexpr(std::is_invocable_v<Func>) {
                 for(auto pos = pool->size(); pos; --pos) {
                     func();
@@ -865,7 +868,7 @@ public:
                     func(component);
                 }
             }
-        } else if constexpr(std::is_invocable_v<Func, entity_type, std::add_lvalue_reference_t<Component>>) {
+        } else if constexpr(is_applicable_v<Func, decltype(*each().begin())>) {
             auto raw = pool->begin();
 
             for(const auto entt: *this) {
