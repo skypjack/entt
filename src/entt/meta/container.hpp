@@ -16,9 +16,11 @@
 namespace entt {
 
 
-namespace internal {
-
-
+/**
+ * @brief Container traits.
+ * @tparam Container Type of the underlying container.
+ * @tparam Trait Traits associated with the underlying container.
+ */
 template<typename Container, template<typename> class... Trait>
 struct container_traits: public Trait<Container>... {};
 
@@ -263,9 +265,6 @@ struct fixed_sequence_container {
 };
 
 
-}
-
-
 /**
  * @brief Meta sequence container traits for `std::vector`s of any type.
  * @tparam Type The type of elements.
@@ -273,12 +272,12 @@ struct fixed_sequence_container {
  */
 template<typename Type, typename... Args>
 struct meta_sequence_container_traits<std::vector<Type, Args...>>
-        : internal::container_traits<
+        : container_traits<
             std::vector<Type, Args...>,
-            internal::basic_container,
-            internal::basic_dynamic_container,
-            internal::basic_sequence_container,
-            internal::dynamic_sequence_container
+            basic_container,
+            basic_dynamic_container,
+            basic_sequence_container,
+            dynamic_sequence_container
         >
 {};
 
@@ -290,11 +289,11 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>>
  */
 template<typename Type, auto N>
 struct meta_sequence_container_traits<std::array<Type, N>>
-        : internal::container_traits<
+        : container_traits<
             std::array<Type, N>,
-            internal::basic_container,
-            internal::basic_sequence_container,
-            internal::fixed_sequence_container
+            basic_container,
+            basic_sequence_container,
+            fixed_sequence_container
         >
 {};
 
@@ -307,13 +306,13 @@ struct meta_sequence_container_traits<std::array<Type, N>>
  */
 template<typename Key, typename Value, typename... Args>
 struct meta_associative_container_traits<std::map<Key, Value, Args...>>
-        : internal::container_traits<
+        : container_traits<
             std::map<Key, Value, Args...>,
-            internal::basic_container,
-            internal::basic_associative_container,
-            internal::basic_dynamic_container,
-            internal::basic_dynamic_associative_container,
-            internal::dynamic_associative_key_value_container
+            basic_container,
+            basic_associative_container,
+            basic_dynamic_container,
+            basic_dynamic_associative_container,
+            dynamic_associative_key_value_container
         >
 {
     /*! @brief Mapped type of the sequence container. */
@@ -330,13 +329,13 @@ struct meta_associative_container_traits<std::map<Key, Value, Args...>>
  */
 template<typename Key, typename Value, typename... Args>
 struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>>
-        : internal::container_traits<
+        : container_traits<
             std::unordered_map<Key, Value, Args...>,
-            internal::basic_container,
-            internal::basic_associative_container,
-            internal::basic_dynamic_container,
-            internal::basic_dynamic_associative_container,
-            internal::dynamic_associative_key_value_container
+            basic_container,
+            basic_associative_container,
+            basic_dynamic_container,
+            basic_dynamic_associative_container,
+            dynamic_associative_key_value_container
         >
 {
     /*! @brief Mapped type of the sequence container. */
@@ -351,13 +350,13 @@ struct meta_associative_container_traits<std::unordered_map<Key, Value, Args...>
  */
 template<typename Key, typename... Args>
 struct meta_associative_container_traits<std::set<Key, Args...>>
-        : internal::container_traits<
+        : container_traits<
             std::set<Key, Args...>,
-            internal::basic_container,
-            internal::basic_associative_container,
-            internal::basic_dynamic_container,
-            internal::basic_dynamic_associative_container,
-            internal::dynamic_associative_key_only_container
+            basic_container,
+            basic_associative_container,
+            basic_dynamic_container,
+            basic_dynamic_associative_container,
+            dynamic_associative_key_only_container
         >
 {};
 
@@ -370,13 +369,13 @@ struct meta_associative_container_traits<std::set<Key, Args...>>
  */
 template<typename Key, typename... Args>
 struct meta_associative_container_traits<std::unordered_set<Key, Args...>>
-        : internal::container_traits<
+        : container_traits<
             std::unordered_set<Key, Args...>,
-            internal::basic_container,
-            internal::basic_associative_container,
-            internal::basic_dynamic_container,
-            internal::basic_dynamic_associative_container,
-            internal::dynamic_associative_key_only_container
+            basic_container,
+            basic_associative_container,
+            basic_dynamic_container,
+            basic_dynamic_associative_container,
+            dynamic_associative_key_only_container
         >
 {};
 
