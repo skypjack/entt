@@ -21,6 +21,12 @@
 namespace entt {
 
 
+/*! @brief Empty storage category tag. */
+struct empty_storage_tag {};
+/*! @brief Dense storage category tag. */
+struct dense_storage_tag: empty_storage_tag {};
+
+
 /**
  * @brief Basic storage implementation.
  *
@@ -186,6 +192,8 @@ public:
     using reverse_iterator = Type *;
     /*! @brief Constant reverse iterator type. */
     using const_reverse_iterator = const Type *;
+    /*! @brief Storage category. */
+    using storage_category = dense_storage_tag;
 
     /**
      * @brief Increases the capacity of a storage.
@@ -342,26 +350,6 @@ public:
     }
 
     /**
-    * @brief Returns the object associated with an entity as a tuple suitable
-    * for merging in a multi-type get.
-    *
-    * @warning
-    * Attempting to use an entity that doesn't belong to the storage results in
-    * undefined behavior.
-    *
-    * @param entt A valid entity identifier.
-    * @return The object associated with the entity as a tuple.
-    */
-    [[nodiscard]] std::tuple<const value_type &> get_as_tuple(const entity_type entt) const {
-        return { instances[underlying_type::index(entt)] };
-    }
-
-    /*! @copydoc get_as_tuple */
-    [[nodiscard]] std::tuple<value_type &> get_as_tuple(const entity_type entt) {
-        return { instances[underlying_type::index(entt)] };
-    }
-
-    /**
      * @brief Assigns an entity to a storage and constructs its object.
      *
      * This version accept both types that can be constructed in place directly
@@ -510,27 +498,8 @@ public:
     using entity_type = Entity;
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-
-    /**
-    * @brief Returns the object associated with an entity as a tuple suitable
-    * for merging in a multi-type get.
-    *
-    * @warning
-    * Attempting to use an entity that doesn't belong to the storage results in
-    * undefined behavior.
-    *
-    * @param entt A valid entity identifier.
-    * @return The object associated with the entity as a tuple.
-    */
-    [[nodiscard]] std::tuple<> get_as_tuple([[maybe_unused]] const entity_type entt) const {
-        ENTT_ASSERT(contains(entt));
-        return {};
-    }
-
-    /*! @copydoc get_as_tuple */
-    [[nodiscard]] std::tuple<> get_as_tuple(const entity_type entt) {
-        return std::as_const(*this).get_as_tuple(entt);
-    }
+    /*! @brief Storage category. */
+    using storage_category = empty_storage_tag;
 
     /**
      * @brief Assigns an entity to a storage and constructs its object.
@@ -579,6 +548,8 @@ struct storage_adapter_mixin: Type {
     using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
+    /*! @brief Storage category. */
+    using storage_category = typename Type::storage_category;
 
     /**
      * @brief Assigns entities to a storage.
@@ -647,39 +618,13 @@ struct storage_adapter_mixin: Type {
  * @tparam Type The type of the underlying storage.
  */
 template<typename Type>
-class sigh_storage_mixin: public Type {
-    template<typename... Args>
-    auto dispatch_emplace(int, basic_registry<typename Type::entity_type> &owner, const typename Type::entity_type entity, Args &&... args)
-    -> std::enable_if_t<std::is_void_v<decltype(std::declval<Type>().emplace(owner, entity, std::forward<Args>(args)...))>> {
-        Type::emplace(owner, entity, std::forward<Args>(args)...);
-        construction.publish(owner, entity);
-    }
-
-    template<typename... Args>
-    decltype(auto) dispatch_emplace(double, basic_registry<typename Type::entity_type> &owner, const typename Type::entity_type entity, Args &&... args) {
-        Type::emplace(owner, entity, std::forward<Args>(args)...);
-        construction.publish(owner, entity);
-        return this->get(entity);
-    }
-
-    template<typename... Func>
-    auto dispatch_patch(int, basic_registry<typename Type::entity_type> &owner, const typename Type::entity_type entity, Func &&... func)
-    -> decltype(std::declval<Type>().patch(owner, entity, std::forward<Func>(func)...)) {
-        Type::patch(owner, entity, std::forward<Func>(func)...);
-        update.publish(owner, entity);
-        return this->get(entity);
-    }
-
-    template<typename... Func>
-    void dispatch_patch(double, basic_registry<typename Type::entity_type> &owner, const typename Type::entity_type entity, Func &&...) {
-        update.publish(owner, entity);
-    }
-
-public:
+struct sigh_storage_mixin: Type {
     /*! @brief Underlying value type. */
     using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
+    /*! @brief Storage category. */
+    using storage_category = typename Type::storage_category;
 
     /**
      * @brief Returns a sink object.
@@ -756,7 +701,12 @@ public:
      */
     template<typename... Args>
     decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entity, Args &&... args) {
-        return dispatch_emplace(0, owner, entity, std::forward<Args>(args)...);
+        Type::emplace(owner, entity, std::forward<Args>(args)...);
+        construction.publish(owner, entity);
+
+        if constexpr(!std::is_same_v<storage_category, empty_storage_tag>) {
+            return this->get(entity);
+        }
     }
 
     /**
@@ -818,8 +768,14 @@ public:
      * @return A reference to the patched instance.
      */
     template<typename... Func>
-    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entity, Func &&... func) {
-        return dispatch_patch(0, owner, entity, std::forward<Func>(func)...);
+    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entity, [[maybe_unused]] Func &&... func) {
+        if constexpr(std::is_same_v<storage_category, empty_storage_tag>) {
+            update.publish(owner, entity);
+        } else {
+            Type::patch(owner, entity, std::forward<Func>(func)...);
+            update.publish(owner, entity);
+            return this->get(entity);
+        }
     }
 
 private:
@@ -856,6 +812,24 @@ struct storage_traits<Entity, const Type> {
     /*! @brief Resulting type after component-to-storage conversion. */
     using storage_type = std::add_const_t<typename storage_traits<Entity, std::remove_const_t<Type>>::storage_type>;
 };
+
+
+/**
+ * @brief Gets the element associated with an entity from a storage, if any.
+ * @tparam Type Storage type.
+ * @param container A valid instance of a storage class.
+ * @param entity A valid entity identifier.
+ * @return A possibly empty tuple containing the requested element.
+ */
+template<typename Type>
+[[nodiscard]] auto get_as_tuple([[maybe_unused]] Type &container, [[maybe_unused]] const typename Type::entity_type entity) {
+    if constexpr(std::is_same_v<typename Type::storage_category, empty_storage_tag>) {
+        return std::make_tuple();
+    } else {
+        static_assert(std::is_same_v<typename Type::storage_category, dense_storage_tag>, "Unknown storage category");
+        return std::forward_as_tuple(container.get(entity));
+    }
+}
 
 
 }
