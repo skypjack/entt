@@ -40,10 +40,6 @@ template<typename>
 class basic_organizer;
 
 
-template <typename>
-struct basic_actor;
-
-
 template<typename, typename...>
 struct basic_handle;
 
