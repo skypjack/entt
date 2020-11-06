@@ -14,6 +14,7 @@
 #include "../core/type_traits.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
+#include "registry.hpp"
 
 
 namespace entt {
@@ -31,9 +32,6 @@ namespace entt {
  */
 template<typename Entity>
 class basic_snapshot {
-    /*! @brief A registry is allowed to create snapshots. */
-    friend class basic_registry<Entity>;
-
     using traits_type = entt_traits<Entity>;
 
     template<typename Component, typename Archive, typename It>
@@ -160,9 +158,6 @@ private:
  */
 template<typename Entity>
 class basic_snapshot_loader {
-    /*! @brief A registry is allowed to create snapshot loaders. */
-    friend class basic_registry<Entity>;
-
     using traits_type = entt_traits<Entity>;
 
     template<typename Type, typename Archive>
