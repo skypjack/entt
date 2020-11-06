@@ -418,7 +418,7 @@ public:
     template<typename Func>
     void each(Func func) const {
         for(const auto entt: *handler) {
-            if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::make_tuple(entt), get({})))>) {
+            if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_group>().get({})))>) {
                 std::apply(func, std::tuple_cat(std::make_tuple(entt), get(entt)));
             } else {
                 std::apply(func, get(entt));
@@ -912,19 +912,11 @@ public:
         ENTT_ASSERT(contains(entt));
 
         if constexpr(sizeof...(Component) == 0) {
-            auto filter = [entt, index = std::get<0>(pools)->index(entt)]([[maybe_unused]] auto *cpool) {
-                if constexpr(std::is_same_v<typename std::remove_reference_t<decltype(*cpool)>::storage_category, empty_storage_tag>) {
-                    return std::make_tuple();
-                } else {
-                    return std::forward_as_tuple(cpool->raw()[index]);
-                }
-            };
-
-            return std::tuple_cat(filter(std::get<storage_type<Owned> *>(pools))..., get_as_tuple(*std::get<storage_type<Get> *>(pools), entt)...);
+            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Owned> *>(pools), entt)..., get_as_tuple(*std::get<storage_type<Get> *>(pools), entt)...);
         } else if constexpr(sizeof...(Component) == 1) {
             return (std::get<storage_type<Component> *>(pools)->get(entt), ...);
         } else {
-            return std::forward_as_tuple(get<Component>(entt)...);
+            return std::tuple_cat(get_as_tuple(*std::get<storage_type<Component> *>(pools), entt)...);
         }
     }
 
@@ -952,21 +944,11 @@ public:
      */
     template<typename Func>
     void each(Func func) const {
-        auto owned = std::tuple_cat([length = *length](auto *cpool) {
-            if constexpr(std::is_same_v<typename std::remove_reference_t<decltype(*cpool)>::storage_category, empty_storage_tag>) {
-                return std::make_tuple();
-            } else {
-                return std::make_tuple(cpool->end() - length);
-            }
-        }(std::get<storage_type<Owned> *>(pools))...);
-
-        for(const auto entt: *this) {
-            auto args = std::tuple_cat(std::apply([](auto &&... curr) { return std::forward_as_tuple(*curr++...); }, owned), get_as_tuple(*std::get<storage_type<Get> *>(pools), entt)...);
-
-            if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::make_tuple(entt), get({})))>) {
-                std::apply(func, std::tuple_cat(std::make_tuple(entt), args));
-            } else {
+        for(auto args: each()) {
+            if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_group>().get({})))>) {
                 std::apply(func, args);
+            } else {
+                std::apply([&func](auto, auto &&... less) { func(std::forward<decltype(less)>(less)...); }, args);
             }
         }
     }

@@ -478,7 +478,7 @@ public:
      */
     template<typename Compare, typename Sort = std_sort, typename... Args>
     void sort(Compare compare, Sort algo = Sort{}, Args &&... args) {
-        sort_n(size(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
+        sort_n(this->size(), std::move(compare), std::move(algo), std::forward<Args>(args)...);
     }
 
 private:
