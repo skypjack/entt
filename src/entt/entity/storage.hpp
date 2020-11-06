@@ -829,7 +829,7 @@ private:
 template<typename Entity, typename Type, typename = void>
 struct storage_traits {
     /*! @brief Resulting type after component-to-storage conversion. */
-    using value_type = sigh_storage_mixin<storage_adapter_mixin<basic_storage<Entity, Type>>>;
+    using storage_type = sigh_storage_mixin<storage_adapter_mixin<basic_storage<Entity, Type>>>;
 };
 
 
@@ -837,17 +837,8 @@ struct storage_traits {
 template<typename Entity, typename Type>
 struct storage_traits<Entity, const Type> {
     /*! @brief Resulting type after component-to-storage conversion. */
-    using value_type = std::add_const_t<typename storage_traits<Entity, std::remove_const_t<Type>>::value_type>;
+    using storage_type = std::add_const_t<typename storage_traits<Entity, std::remove_const_t<Type>>::storage_type>;
 };
-
-
-/**
- * @brief Alias declaration to use to make component-to-storage conversions.
- * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Type Type of objects assigned to the entities.
- */
-template<typename Entity, typename Type>
-using storage_t = typename storage_traits<Entity, Type>::value_type;
 
 
 }
