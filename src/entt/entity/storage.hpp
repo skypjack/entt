@@ -647,7 +647,35 @@ struct storage_adapter_mixin: Type {
  * @tparam Type The type of the underlying storage.
  */
 template<typename Type>
-struct sigh_storage_mixin: Type {
+class sigh_storage_mixin: public Type {
+    template<typename... Args>
+    auto dispatch_emplace(int, basic_registry<typename Type::entity_type> &owner, const typename Type::entity_type entity, Args &&... args)
+    -> std::enable_if_t<std::is_void_v<decltype(std::declval<Type>().emplace(owner, entity, std::forward<Args>(args)...))>> {
+        Type::emplace(owner, entity, std::forward<Args>(args)...);
+        construction.publish(owner, entity);
+    }
+
+    template<typename... Args>
+    decltype(auto) dispatch_emplace(double, basic_registry<typename Type::entity_type> &owner, const typename Type::entity_type entity, Args &&... args) {
+        Type::emplace(owner, entity, std::forward<Args>(args)...);
+        construction.publish(owner, entity);
+        return this->get(entity);
+    }
+
+    template<typename... Func>
+    auto dispatch_patch(int, basic_registry<typename Type::entity_type> &owner, const typename Type::entity_type entity, Func &&... func)
+    -> decltype(std::declval<Type>().patch(owner, entity, std::forward<Func>(func)...)) {
+        Type::patch(owner, entity, std::forward<Func>(func)...);
+        update.publish(owner, entity);
+        return this->get(entity);
+    }
+
+    template<typename... Func>
+    void dispatch_patch(double, basic_registry<typename Type::entity_type> &owner, const typename Type::entity_type entity, Func &&...) {
+        update.publish(owner, entity);
+    }
+
+public:
     /*! @brief Underlying value type. */
     using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
@@ -728,12 +756,7 @@ struct sigh_storage_mixin: Type {
      */
     template<typename... Args>
     decltype(auto) emplace(basic_registry<entity_type> &owner, const entity_type entity, Args &&... args) {
-        Type::emplace(owner, entity, std::forward<Args>(args)...);
-        construction.publish(owner, entity);
-
-        if constexpr(std::tuple_size_v<decltype(Type::get_as_tuple({}))> != 0) {
-            return this->get(entity);
-        }
+        return dispatch_emplace(0, owner, entity, std::forward<Args>(args)...);
     }
 
     /**
@@ -795,14 +818,8 @@ struct sigh_storage_mixin: Type {
      * @return A reference to the patched instance.
      */
     template<typename... Func>
-    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entity, [[maybe_unused]] Func &&... func) {
-        if constexpr(std::tuple_size_v<decltype(Type::get_as_tuple({}))> == 0) {
-            update.publish(owner, entity);
-        } else {
-            Type::patch(owner, entity, std::forward<Func>(func)...);
-            update.publish(owner, entity);
-            return this->get(entity);
-        }
+    decltype(auto) patch(basic_registry<entity_type> &owner, const entity_type entity, Func &&... func) {
+        return dispatch_patch(0, owner, entity, std::forward<Func>(func)...);
     }
 
 private:
