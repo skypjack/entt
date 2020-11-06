@@ -815,7 +815,7 @@ public:
         if constexpr(sizeof...(Component) == 1) {
             return (assure<Component>().get(entity), ...);
         } else {
-            return std::tuple_cat(assure<Component>().get_as_tuple(entity)...);
+            return std::forward_as_tuple(assure<Component>().get(entity)...);
         }
     }
 
@@ -827,7 +827,7 @@ public:
         if constexpr(sizeof...(Component) == 1) {
             return (assure<Component>().get(entity), ...);
         } else {
-            return std::tuple_cat(assure<Component>().get_as_tuple(entity)...);
+            return std::forward_as_tuple(assure<Component>().get(entity)...);
         }
     }
 
