@@ -69,7 +69,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
     friend class basic_registry<Entity>;
 
     template<typename Comp>
-    using storage_type = storage_t<Entity, Comp>;
+    using storage_type = typename storage_traits<Entity, Comp>::storage_type;
 
     using unchecked_type = std::array<const basic_sparse_set<Entity> *, (sizeof...(Component) - 1)>;
 
@@ -559,7 +559,7 @@ class basic_view<Entity, exclude_t<>, Component> final {
     /*! @brief A registry is allowed to create views. */
     friend class basic_registry<Entity>;
 
-    using storage_type = storage_t<Entity, Component>;
+    using storage_type = typename storage_traits<Entity, Component>::storage_type;
 
     class iterable_view {
         friend class basic_view<Entity, exclude_t<>, Component>;
