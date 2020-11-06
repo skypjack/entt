@@ -36,7 +36,7 @@ class basic_snapshot {
 
     template<typename Component, typename Archive, typename It>
     void get(Archive &archive, std::size_t sz, It first, It last) const {
-        const auto view = reg->view<std::add_const_t<Component>>();
+        const auto view = reg->template view<std::add_const_t<Component>>();
         archive(typename traits_type::entity_type(sz));
 
         while(first != last) {
@@ -167,7 +167,7 @@ class basic_snapshot_loader {
 
         entity_type entt{};
 
-        if constexpr(std::tuple_size_v<decltype(reg->view<Type>().get({}))> == 0) {
+        if constexpr(std::tuple_size_v<decltype(reg->template view<Type>().get({}))> == 0) {
             while(length--) {
                 archive(entt);
                 const auto entity = reg->valid(entt) ? entt : reg->create(entt);
@@ -386,7 +386,7 @@ class basic_continuous_loader {
 
         entity_type entt{};
 
-        if constexpr(std::tuple_size_v<decltype(reg->view<Other>().get({}))> == 0) {
+        if constexpr(std::tuple_size_v<decltype(reg->template view<Other>().get({}))> == 0) {
             while(length--) {
                 archive(entt);
                 restore(entt);

@@ -237,7 +237,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
     [[nodiscard]] unchecked_type unchecked(const basic_sparse_set<Entity> *cpool) const {
         std::size_t pos{};
         unchecked_type other{};
-        ((std::get<storage_type<Component> *>(pools) == cpool ? nullptr : (other[pos] = std::get<storage_type<Component> *>(pools), other[pos++])), ...);
+        (static_cast<void>(std::get<storage_type<Component> *>(pools) == cpool ? nullptr : (other[pos] = std::get<storage_type<Component> *>(pools), other[pos++])), ...);
         return other;
     }
 
@@ -257,7 +257,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
                 if(((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
                     && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
                 {
-                    if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::make_tuple(entt), get({})))>) {
+                    if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                         std::apply(func, std::tuple_cat(std::make_tuple(entt), get(entt)));
                     } else {
                         std::apply(func, get(entt));
@@ -271,7 +271,7 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
                 if(((std::is_same_v<Comp, Component> || std::get<storage_type<Component> *>(pools)->contains(entt)) && ...)
                     && !(std::get<const storage_type<Exclude> *>(filter)->contains(entt) || ...))
                 {
-                    if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::make_tuple(entt), get({})))>) {
+                    if constexpr(is_applicable_v<Func, decltype(std::tuple_cat(std::tuple<entity_type>{}, std::declval<basic_view>().get({})))>) {
                         std::apply(func, std::tuple_cat(std::make_tuple(entt), dispatch_get<Component>(it, entt)...));
                     } else {
                         std::apply(func, std::tuple_cat(dispatch_get<Component>(it, entt)...));

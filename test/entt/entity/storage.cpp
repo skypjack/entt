@@ -350,7 +350,7 @@ TEST(Storage, Raw) {
 TEST(Storage, SortOrdered) {
     entt::storage<boxed_int> pool;
     entt::entity entities[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
-    boxed_int values[5u]{12, 9, 6, 3, 1};
+    boxed_int values[5u]{{12}, {9}, {6}, {3}, {1}};
 
     pool.insert(std::begin(entities), std::end(entities), std::begin(values), std::end(values));
     pool.sort([](auto lhs, auto rhs) { return lhs.value < rhs.value; });
@@ -362,7 +362,7 @@ TEST(Storage, SortOrdered) {
 TEST(Storage, SortReverse) {
     entt::storage<boxed_int> pool;
     entt::entity entities[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
-    boxed_int values[5u]{1, 3, 6, 9, 12};
+    boxed_int values[5u]{{1}, {3}, {6}, {9}, {12}};
 
     pool.insert(std::begin(entities), std::end(entities), std::begin(values), std::end(values));
     pool.sort([](auto lhs, auto rhs) { return lhs.value < rhs.value; });
@@ -374,7 +374,7 @@ TEST(Storage, SortReverse) {
 TEST(Storage, SortUnordered) {
     entt::storage<boxed_int> pool;
     entt::entity entities[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
-    boxed_int values[5u]{6, 3, 1, 9, 12};
+    boxed_int values[5u]{{6}, {3}, {1}, {9}, {12}};
 
     pool.insert(std::begin(entities), std::end(entities), std::begin(values), std::end(values));
     pool.sort([](auto lhs, auto rhs) { return lhs.value < rhs.value; });
@@ -399,7 +399,7 @@ TEST(Storage, SortUnordered) {
 TEST(Storage, SortRange) {
     entt::storage<boxed_int> pool;
     entt::entity entities[5u]{entt::entity{12}, entt::entity{42}, entt::entity{7}, entt::entity{3}, entt::entity{9}};
-    boxed_int values[5u]{3, 6, 1, 9, 12};
+    boxed_int values[5u]{{3}, {6}, {1}, {9}, {12}};
 
     pool.insert(std::begin(entities), std::end(entities), std::begin(values), std::end(values));
     pool.sort_n(0u, [](auto lhs, auto rhs) { return lhs.value < rhs.value; });
