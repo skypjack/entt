@@ -393,7 +393,7 @@ const auto size = entt::size_of_v<void>;
 
 ### Is applicable
 
-The standard library offers the great `std::is_invocable? trait in several
+The standard library offers the great `std::is_invocable` trait in several
 forms. This takes a function type and a series of arguments and returns true if
 the condition is satisfied.<br/>
 Moreover, users are also provided with `std::apply`, a tool for combining
