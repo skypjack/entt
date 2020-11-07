@@ -70,6 +70,13 @@ TEST(TypeTraits, IsApplicable) {
     static_assert(!entt::is_applicable_r_v<int, int(int, char), std::tuple<void>>);
 }
 
+TEST(TypeTraits, ConstnessAs) {
+    static_assert(std::is_same_v<entt::constness_as_t<int, char>, int>);
+    static_assert(std::is_same_v<entt::constness_as_t<const int, char>, int>);
+    static_assert(std::is_same_v<entt::constness_as_t<int, const char>, const int>);
+    static_assert(std::is_same_v<entt::constness_as_t<const int, const char>, const int>);
+}
+
 TEST(TypeTraits, MemberClass) {
     struct clazz {
         char foo(int) { return {}; }

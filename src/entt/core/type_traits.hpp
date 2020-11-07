@@ -63,7 +63,7 @@ using integral_constant = std::integral_constant<decltype(Value), Value>;
 
 
 /**
- * @brief Alias template to ease the creation of named values.
+ * @brief Alias template to facilitate the creation of named values.
  * @tparam Value A constant value at least convertible to `id_type`.
  */
 template<id_type Value>
@@ -320,6 +320,33 @@ struct is_empty
  */
 template<typename Type>
 inline constexpr auto is_empty_v = is_empty<Type>::value;
+
+
+/**
+ * @brief Transcribes the constness of a type to another type.
+ * @tparam To The type to which to transcribe the constness.
+ * @tparam From The type from which to transcribe the constness.
+ */
+template<typename To, typename From>
+struct constness_as {
+    using type = std::remove_const_t<To>;
+};
+
+
+/*! @copydoc constness_as */
+template<typename To, typename From>
+struct constness_as<To, const From> {
+    using type = std::add_const_t<To>;
+};
+
+
+/**
+ * @brief Alias template to facilitate the transcription of the constness.
+ * @tparam To The type to which to transcribe the constness.
+ * @tparam From The type from which to transcribe the constness.
+ */
+template<typename To, typename From>
+using constness_as_t = typename constness_as<To, From>::type;
 
 
 /**
