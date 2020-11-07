@@ -18,6 +18,8 @@
     * [Almost unique identifiers](#almost-unique-identifiers)
   * [Type traits](#type-traits)
     * [Size of](#size-of)
+    * [Is applicable](#is-applicable)
+    * [Constness as][#constness-as]
     * [Member class type](#member-class-type)
     * [Integral constant](#integral-constant)
     * [Tag](#tag)
@@ -388,6 +390,36 @@ works under all circumstances, returning zero if the type isn't supported:
 ```cpp
 const auto size = entt::size_of_v<void>;
 ```
+
+### Is applicable
+
+The standard library offers the great `std::is_invocable? trait in several
+forms. This takes a function type and a series of arguments and returns true if
+the condition is satisfied.<br/>
+Moreover, users are also provided with `std::apply`, a tool for combining
+invocable elements and tuples of arguments.
+
+It would therefore be a good idea to have a variant of `std::is_invocable` that
+also accepts its arguments in the form of a tuple, to complete the offer:
+
+```cpp
+constexpr bool result = entt::is_applicable<Func, std::tuple<a_type, another_type>>;
+```
+
+This trait is built on top of `std::is_invocable` and does nothing but unpack a
+tuple and simplify the code at the call site.
+
+### Constness as
+
+An utility to easily transfer the constness of a type to another type:
+
+```cpp
+// type is const dst_type because of the constness of src_type
+using type = entt::constness_as_t<dst_type, const src_type>;
+```
+
+The trait is subject to the rules of the language. Therefore, for example,
+transferring constness between references won't give the desired effect.
 
 ### Member class type
 
