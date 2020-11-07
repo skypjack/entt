@@ -329,6 +329,7 @@ inline constexpr auto is_empty_v = is_empty<Type>::value;
  */
 template<typename To, typename From>
 struct constness_as {
+    /*! @brief The type resulting from the transcription of the constness */
     using type = std::remove_const_t<To>;
 };
 
@@ -336,6 +337,7 @@ struct constness_as {
 /*! @copydoc constness_as */
 template<typename To, typename From>
 struct constness_as<To, const From> {
+    /*! @brief The type resulting from the transcription of the constness */
     using type = std::add_const_t<To>;
 };
 
