@@ -27,7 +27,7 @@ struct basic_handle {
     /*! @brief Underlying entity identifier. */
     using entity_type = std::remove_const_t<Entity>;
     /*! @brief Type of registry accepted by the handle. */
-    using registry_type = std::conditional_t<std::is_const_v<Entity>, const basic_registry<entity_type>, basic_registry<entity_type>>;
+    using registry_type = constness_as_t<basic_registry<entity_type>, Entity>;
 
     /*! @brief Constructs an invalid handle. */
     basic_handle() ENTT_NOEXCEPT
