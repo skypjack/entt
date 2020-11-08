@@ -15,13 +15,14 @@ namespace entt {
 
 /**
  * @brief Converts a registry to a view.
- * @tparam Const Constness of the accepted registry.
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
-template<bool Const, typename Entity>
+template<typename Entity>
 struct as_view {
+    /*! @brief Underlying entity identifier. */
+    using entity_type = std::remove_const_t<Entity>;
     /*! @brief Type of registry to convert. */
-    using registry_type = std::conditional_t<Const, const basic_registry<Entity>, basic_registry<Entity>>;
+    using registry_type = constness_as_t<basic_registry<entity_type>, Entity>;
 
     /**
      * @brief Constructs a converter for a given registry.
@@ -36,7 +37,7 @@ struct as_view {
      * @return A newly created view.
      */
     template<typename Exclude, typename... Component>
-    operator basic_view<Entity, Exclude, Component...>() const {
+    operator basic_view<entity_type, Exclude, Component...>() const {
         return reg.template view<Component...>(Exclude{});
     }
 
@@ -54,23 +55,24 @@ private:
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-as_view(basic_registry<Entity> &) ENTT_NOEXCEPT -> as_view<false, Entity>;
+as_view(basic_registry<Entity> &) ENTT_NOEXCEPT -> as_view<Entity>;
 
 
 /*! @copydoc as_view */
 template<typename Entity>
-as_view(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_view<true, Entity>;
+as_view(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_view<const Entity>;
 
 
 /**
  * @brief Converts a registry to a group.
- * @tparam Const Constness of the accepted registry.
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
-template<bool Const, typename Entity>
+template<typename Entity>
 struct as_group {
+    /*! @brief Underlying entity identifier. */
+    using entity_type = std::remove_const_t<Entity>;
     /*! @brief Type of registry to convert. */
-    using registry_type = std::conditional_t<Const, const basic_registry<Entity>, basic_registry<Entity>>;
+    using registry_type = constness_as_t<basic_registry<entity_type>, Entity>;
 
     /**
      * @brief Constructs a converter for a given registry.
@@ -86,7 +88,7 @@ struct as_group {
      * @return A newly created group.
      */
     template<typename Exclude, typename Get, typename... Owned>
-    operator basic_group<Entity, Exclude, Get, Owned...>() const {
+    operator basic_group<entity_type, Exclude, Get, Owned...>() const {
         return reg.template group<Owned...>(Get{}, Exclude{});
     }
 
@@ -104,12 +106,12 @@ private:
  * @tparam Entity A valid entity type (see entt_traits for more details).
  */
 template<typename Entity>
-as_group(basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<false, Entity>;
+as_group(basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<Entity>;
 
 
 /*! @copydoc as_group */
 template<typename Entity>
-as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<true, Entity>;
+as_group(const basic_registry<Entity> &) ENTT_NOEXCEPT -> as_group<const Entity>;
 
 
 
