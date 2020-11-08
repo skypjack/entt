@@ -14,6 +14,7 @@
 #include "../core/algorithm.hpp"
 #include "../core/fwd.hpp"
 #include "../core/type_info.hpp"
+#include "../core/type_traits.hpp"
 #include "entity.hpp"
 #include "fwd.hpp"
 #include "group.hpp"
@@ -42,7 +43,7 @@ class basic_registry {
     using traits_type = entt_traits<Entity>;
 
     template<typename Component>
-    using storage_type = typename storage_traits<Entity, Component>::storage_type;
+    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
 
     struct pool_data {
         type_info info{};

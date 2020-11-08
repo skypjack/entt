@@ -69,7 +69,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
     friend class basic_registry<Entity>;
 
     template<typename Component>
-    using storage_type = typename storage_traits<Entity, Component>::storage_type;
+    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
 
     class iterable_group final {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>>;
@@ -574,7 +574,7 @@ class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...> final 
     friend class basic_registry<Entity>;
 
     template<typename Component>
-    using storage_type = typename storage_traits<Entity, Component>::storage_type;
+    using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
 
     class iterable_group final {
         friend class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>, Owned...>;

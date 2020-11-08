@@ -806,14 +806,6 @@ struct storage_traits {
 };
 
 
-/*! @copydoc storage_traits */
-template<typename Entity, typename Type>
-struct storage_traits<Entity, const Type> {
-    /*! @brief Resulting type after component-to-storage conversion. */
-    using storage_type = std::add_const_t<typename storage_traits<Entity, std::remove_const_t<Type>>::storage_type>;
-};
-
-
 /**
  * @brief Gets the element associated with an entity from a storage, if any.
  * @tparam Type Storage type.
