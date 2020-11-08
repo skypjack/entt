@@ -61,11 +61,11 @@ class basic_storage: public basic_sparse_set<Entity> {
     using underlying_type = basic_sparse_set<Entity>;
     using traits_type = entt_traits<Entity>;
 
-    template<bool Const>
+    template<typename Value>
     class storage_iterator final {
         friend class basic_storage<Entity, Type>;
 
-        using instance_type = std::conditional_t<Const, const std::vector<Type>, std::vector<Type>>;
+        using instance_type = constness_as_t<std::vector<Type>, Value>;
         using index_type = typename traits_type::difference_type;
 
         storage_iterator(instance_type &ref, const index_type idx) ENTT_NOEXCEPT
@@ -74,9 +74,9 @@ class basic_storage: public basic_sparse_set<Entity> {
 
     public:
         using difference_type = index_type;
-        using value_type = Type;
-        using pointer = std::conditional_t<Const, const value_type *, value_type *>;
-        using reference = std::conditional_t<Const, const value_type &, value_type &>;
+        using value_type = Value;
+        using pointer = value_type *;
+        using reference = value_type &;
         using iterator_category = std::random_access_iterator_tag;
 
         storage_iterator() ENTT_NOEXCEPT = default;
@@ -185,9 +185,9 @@ public:
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
     /*! @brief Random access iterator type. */
-    using iterator = storage_iterator<false>;
+    using iterator = storage_iterator<Type>;
     /*! @brief Constant random access iterator type. */
-    using const_iterator = storage_iterator<true>;
+    using const_iterator = storage_iterator<const Type>;
     /*! @brief Reverse iterator type. */
     using reverse_iterator = Type *;
     /*! @brief Constant reverse iterator type. */
