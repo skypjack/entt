@@ -69,6 +69,12 @@ TEST(NonOwningGroup, Functionalities) {
     group.shrink_to_fit();
 
     ASSERT_EQ(group.capacity(), 0u);
+
+    decltype(group) invalid{};
+
+    ASSERT_TRUE(group);
+    ASSERT_TRUE(cgroup);
+    ASSERT_FALSE(invalid);
 }
 
 TEST(NonOwningGroup, ElementAccess) {
@@ -601,6 +607,12 @@ TEST(OwningGroup, Functionalities) {
     ASSERT_EQ(group.rbegin(), group.rend());
     ASSERT_EQ(cgroup.rbegin(), cgroup.rend());
     ASSERT_TRUE(group.empty());
+
+    decltype(group) invalid{};
+
+    ASSERT_TRUE(group);
+    ASSERT_TRUE(cgroup);
+    ASSERT_FALSE(invalid);
 }
 
 TEST(OwningGroup, ElementAccess) {
