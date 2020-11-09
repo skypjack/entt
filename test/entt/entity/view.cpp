@@ -55,6 +55,12 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_EQ(view.begin(), view.end());
     ASSERT_EQ(view.rbegin(), view.rend());
     ASSERT_TRUE(view.empty());
+
+    decltype(view) invalid{};
+
+    ASSERT_TRUE(view);
+    ASSERT_TRUE(cview);
+    ASSERT_FALSE(invalid);
 }
 
 TEST(SingleComponentView, ElementAccess) {
@@ -349,6 +355,12 @@ TEST(MultiComponentView, Functionalities) {
         ASSERT_EQ(std::get<1>(view.get<int, char>(entity)), '2');
         ASSERT_EQ(cview.get<const char>(entity), '2');
     }
+
+    decltype(view) invalid{};
+
+    ASSERT_TRUE(view);
+    ASSERT_TRUE(cview);
+    ASSERT_FALSE(invalid);
 }
 
 TEST(MultiComponentView, Iterator) {
