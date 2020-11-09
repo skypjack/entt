@@ -163,6 +163,11 @@ public:
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename basic_sparse_set<Entity>::reverse_iterator;
 
+    /*! @brief Default constructor to use to create empty, invalid groups. */
+    basic_group() ENTT_NOEXCEPT
+        : handler{}
+    {}
+
     /**
      * @brief Returns the number of entities that have the given components.
      * @return Number of entities that have the given components.
@@ -296,6 +301,14 @@ public:
      */
     [[nodiscard]] entity_type operator[](const size_type pos) const {
         return begin()[pos];
+    }
+
+    /**
+     * @brief Checks if a group is properly initialized.
+     * @return True if the group is properly initialized, false otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return handler != nullptr;
     }
 
     /**
@@ -640,6 +653,11 @@ public:
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename basic_sparse_set<Entity>::reverse_iterator;
 
+    /*! @brief Default constructor to use to create empty, invalid groups. */
+    basic_group() ENTT_NOEXCEPT
+        : length{}
+    {}
+
     /**
      * @brief Returns the number of entities that have the given components.
      * @return Number of entities that have the given components.
@@ -778,6 +796,14 @@ public:
      */
     [[nodiscard]] entity_type operator[](const size_type pos) const {
         return begin()[pos];
+    }
+
+    /**
+     * @brief Checks if a group is properly initialized.
+     * @return True if the group is properly initialized, false otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return length != nullptr;
     }
 
     /**
