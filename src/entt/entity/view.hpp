@@ -65,9 +65,6 @@ class basic_view;
  */
 template<typename Entity, typename... Exclude, typename... Component>
 class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
-    /*! @brief A registry is allowed to create views. */
-    friend class basic_registry<Entity>;
-
     template<typename Comp>
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Comp>>::storage_type, Comp>;
 
@@ -222,12 +219,6 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         const basic_view view;
     };
 
-    basic_view(storage_type<Component> &... component, const storage_type<Exclude> &... epool) ENTT_NOEXCEPT
-        : pools{&component...},
-          filter{&epool...},
-          view{candidate()}
-    {}
-
     [[nodiscard]] const basic_sparse_set<Entity> * candidate() const ENTT_NOEXCEPT {
         return (std::min)({ static_cast<const basic_sparse_set<entity_type> *>(std::get<storage_type<Component> *>(pools))... }, [](const auto *lhs, const auto *rhs) {
             return lhs->size() < rhs->size();
@@ -292,6 +283,17 @@ public:
     using iterator = view_iterator<typename basic_sparse_set<entity_type>::iterator>;
     /*! @brief Reverse iterator type. */
     using reverse_iterator = view_iterator<typename basic_sparse_set<entity_type>::reverse_iterator>;
+
+    /**
+     * @brief Constructs a multi-type view from a set of storage classes.
+     * @param component The storage for the types to iterate.
+     * @param epool The storage for the types used to filter the view.
+     */
+    basic_view(storage_type<Component> &... component, const storage_type<Exclude> &... epool) ENTT_NOEXCEPT
+        : pools{&component...},
+          filter{&epool...},
+          view{candidate()}
+    {}
 
     /**
      * @brief Forces the type to use to drive iterations.
@@ -555,9 +557,6 @@ private:
  */
 template<typename Entity, typename Component>
 class basic_view<Entity, exclude_t<>, Component> final {
-    /*! @brief A registry is allowed to create views. */
-    friend class basic_registry<Entity>;
-
     using storage_type = constness_as_t<typename storage_traits<Entity, std::remove_const_t<Component>>::storage_type, Component>;
 
     class iterable_view {
@@ -640,10 +639,6 @@ class basic_view<Entity, exclude_t<>, Component> final {
         storage_type *pool;
     };
 
-    basic_view(storage_type &ref) ENTT_NOEXCEPT
-        : pool{&ref}
-    {}
-
 public:
     /*! @brief Type of component iterated by the view. */
     using raw_type = Component;
@@ -655,6 +650,14 @@ public:
     using iterator = typename basic_sparse_set<Entity>::iterator;
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename basic_sparse_set<Entity>::reverse_iterator;
+
+    /**
+     * @brief Constructs a single-type view from a storage class.
+     * @param ref The storage for the type to iterate.
+     */
+    basic_view(storage_type &ref) ENTT_NOEXCEPT
+        : pool{&ref}
+    {}
 
     /**
      * @brief Returns the number of entities that have the given component.
@@ -901,6 +904,16 @@ public:
 private:
     storage_type *pool;
 };
+
+
+/**
+ * @brief Deduction guide.
+ * @tparam Storage Type of storage classes used to create the view.
+ * @param storage The storage for the types to iterate.
+ */
+template<typename... Storage>
+basic_view(Storage &... storage) ENTT_NOEXCEPT
+-> basic_view<std::common_type_t<typename Storage::entity_type...>, entt::exclude_t<>, constness_as_t<typename Storage::value_type, Storage>...>;
 
 
 }
