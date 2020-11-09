@@ -284,6 +284,11 @@ public:
     /*! @brief Reverse iterator type. */
     using reverse_iterator = view_iterator<typename basic_sparse_set<entity_type>::reverse_iterator>;
 
+    /*! @brief Default constructor to use to create empty, invalid views. */
+    basic_view() ENTT_NOEXCEPT
+        : view{}
+    {}
+
     /**
      * @brief Constructs a multi-type view from a set of storage classes.
      * @param component The storage for the types to iterate.
@@ -393,6 +398,14 @@ public:
     [[nodiscard]] iterator find(const entity_type entt) const {
         iterator it{view->begin(), view->end(), view->find(entt), unchecked(view), filter};
         return (it != end() && *it == entt) ? it : end();
+    }
+
+    /**
+     * @brief Checks if a view is properly initialized.
+     * @return True if the view is properly initialized, false otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return std::get<0>(pools) != nullptr;
     }
 
     /**
@@ -520,7 +533,7 @@ public:
 private:
     const std::tuple<storage_type<Component> *...> pools;
     const std::tuple<const storage_type<Exclude> *...> filter;
-    mutable const basic_sparse_set<entity_type>* view;
+    mutable const basic_sparse_set<entity_type> *view;
 };
 
 
@@ -650,6 +663,11 @@ public:
     using iterator = typename basic_sparse_set<Entity>::iterator;
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename basic_sparse_set<Entity>::reverse_iterator;
+
+    /*! @brief Default constructor to use to create empty, invalid views. */
+    basic_view() ENTT_NOEXCEPT
+        : pool{}
+    {}
 
     /**
      * @brief Constructs a single-type view from a storage class.
@@ -792,6 +810,14 @@ public:
     }
 
     /**
+     * @brief Checks if a view is properly initialized.
+     * @return True if the view is properly initialized, false otherwise.
+     */
+    [[nodiscard]] explicit operator bool() const ENTT_NOEXCEPT {
+        return pool != nullptr;
+    }
+
+    /**
      * @brief Checks if a view contains an entity.
      * @param entt A valid entity identifier.
      * @return True if the view contains the given entity, false otherwise.
@@ -894,7 +920,7 @@ public:
     }
 
 private:
-    storage_type *pool;
+    storage_type * const pool;
 };
 
 
