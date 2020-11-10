@@ -55,10 +55,6 @@ TEST(NonOwningGroup, Functionalities) {
 
     ASSERT_EQ(*(group.data() + 0), e1);
 
-    ASSERT_EQ(*(group.data<int>() + 0), e1);
-    ASSERT_EQ(*(group.data<char>() + 0), e0);
-    ASSERT_EQ(*(cgroup.data<const char>() + 1), e1);
-
     ASSERT_EQ(*(group.raw<int>() + 0), 42);
     ASSERT_EQ(*(group.raw<char>() + 0), '1');
     ASSERT_EQ(*(cgroup.raw<const char>() + 1), '2');
@@ -615,10 +611,6 @@ TEST(OwningGroup, Functionalities) {
     }
 
     ASSERT_EQ(*(group.data() + 0), e1);
-
-    ASSERT_EQ(*(group.data<int>() + 0), e1);
-    ASSERT_EQ(*(group.data<char>() + 0), e0);
-    ASSERT_EQ(*(cgroup.data<const char>() + 1), e1);
 
     ASSERT_EQ(*(group.raw<int>() + 0), 42);
     ASSERT_EQ(*(group.raw<char>() + 0), '1');
