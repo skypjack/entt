@@ -681,10 +681,6 @@ public:
      * The returned pointer is such that range `[raw(), raw() + size())` is
      * always a valid range, even if the container is empty.
      *
-     * @note
-     * Components are in the reverse order as returned by the `begin`/`end`
-     * iterators.
-     *
      * @return A pointer to the array of components.
      */
     [[nodiscard]] raw_type * raw() const ENTT_NOEXCEPT {
@@ -696,10 +692,6 @@ public:
      *
      * The returned pointer is such that range `[data(), data() + size())` is
      * always a valid range, even if the container is empty.
-     *
-     * @note
-     * Entities are in the reverse order as returned by the `begin`/`end`
-     * iterators.
      *
      * @return A pointer to the array of entities.
      */
