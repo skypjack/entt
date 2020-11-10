@@ -186,17 +186,11 @@ public:
     }
 
     /**
-     * @brief Checks whether a group or some pools are empty.
-     * @tparam Component Types of components in which one is interested.
-     * @return True if the group or the pools are empty, false otherwise.
+     * @brief Checks whether a group is empty.
+     * @return True if the group is empty, false otherwise.
      */
-    template<typename... Component>
     [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
-        if constexpr(sizeof...(Component) == 0) {
-            return handler->empty();
-        } else {
-            return (std::get<storage_type<Component> *>(pools)->empty() && ...);
-        }
+        return handler->empty();
     }
 
     /**
@@ -697,17 +691,11 @@ public:
     }
 
     /**
-     * @brief Checks whether a group or some pools are empty.
-     * @tparam Component Types of components in which one is interested.
-     * @return True if the group or the pools are empty, false otherwise.
+     * @brief Checks whether a group is empty.
+     * @return True if the group is empty, false otherwise.
      */
-    template<typename... Component>
     [[nodiscard]] bool empty() const ENTT_NOEXCEPT {
-        if constexpr(sizeof...(Component) == 0) {
-            return !*length;
-        } else {
-            return (std::get<storage_type<Component> *>(pools)->empty() && ...);
-        }
+        return !*length;
     }
 
     /**
