@@ -55,10 +55,6 @@ TEST(NonOwningGroup, Functionalities) {
 
     ASSERT_EQ(*(group.data() + 0), e1);
 
-    ASSERT_EQ(*(group.raw<int>() + 0), 42);
-    ASSERT_EQ(*(group.raw<char>() + 0), '1');
-    ASSERT_EQ(*(cgroup.raw<const char>() + 1), '2');
-
     registry.remove<char>(e0);
     registry.remove<char>(e1);
 
@@ -184,14 +180,6 @@ TEST(NonOwningGroup, Sort) {
     registry.emplace<int>(e1, 1);
     registry.emplace<int>(e2, 2);
 
-    ASSERT_EQ(*(group.raw<unsigned int>() + 0u), 0u);
-    ASSERT_EQ(*(group.raw<unsigned int>() + 1u), 1u);
-    ASSERT_EQ(*(group.raw<unsigned int>() + 2u), 2u);
-
-    ASSERT_EQ(*(group.raw<const int>() + 0u), 0);
-    ASSERT_EQ(*(group.raw<const int>() + 1u), 1);
-    ASSERT_EQ(*(group.raw<const int>() + 2u), 2);
-
     ASSERT_EQ(*(group.data() + 0u), e0);
     ASSERT_EQ(*(group.data() + 1u), e1);
     ASSERT_EQ(*(group.data() + 2u), e2);
@@ -199,14 +187,6 @@ TEST(NonOwningGroup, Sort) {
     group.sort([](const entt::entity lhs, const entt::entity rhs) {
         return entt::to_integral(lhs) < entt::to_integral(rhs);
     });
-
-    ASSERT_EQ(*(group.raw<unsigned int>() + 0u), 0u);
-    ASSERT_EQ(*(group.raw<unsigned int>() + 1u), 1u);
-    ASSERT_EQ(*(group.raw<unsigned int>() + 2u), 2u);
-
-    ASSERT_EQ(*(group.raw<const int>() + 0u), 0);
-    ASSERT_EQ(*(group.raw<const int>() + 1u), 1);
-    ASSERT_EQ(*(group.raw<const int>() + 2u), 2);
 
     ASSERT_EQ(*(group.data() + 0u), e2);
     ASSERT_EQ(*(group.data() + 1u), e1);
@@ -325,8 +305,7 @@ TEST(NonOwningGroup, ConstNonConstAndAllInBetween) {
     static_assert(std::is_same_v<decltype(group.get<const char>({})), const char &>);
     static_assert(std::is_same_v<decltype(group.get<int, const char>({})), std::tuple<int &, const char &>>);
     static_assert(std::is_same_v<decltype(group.get({})), std::tuple<int &, const char &>>);
-    static_assert(std::is_same_v<decltype(group.raw<const char>()), const char *>);
-    static_assert(std::is_same_v<decltype(group.raw<int>()), int *>);
+    static_assert(std::is_same_v<decltype(group.data()), const entt::entity *>);
 
     group.each([](auto &&i, auto &&c) {
         static_assert(std::is_same_v<decltype(i), int &>);
@@ -601,6 +580,7 @@ TEST(OwningGroup, Functionalities) {
     registry.remove<int>(e0);
 
     ASSERT_EQ(group.size(), 1u);
+
     ASSERT_EQ(*(cgroup.raw<const int>() + 0), 42);
     ASSERT_EQ(*(group.raw<int>() + 0), 42);
 
@@ -611,10 +591,7 @@ TEST(OwningGroup, Functionalities) {
     }
 
     ASSERT_EQ(*(group.data() + 0), e1);
-
     ASSERT_EQ(*(group.raw<int>() + 0), 42);
-    ASSERT_EQ(*(group.raw<char>() + 0), '1');
-    ASSERT_EQ(*(cgroup.raw<const char>() + 1), '2');
 
     registry.remove<char>(e0);
     registry.remove<char>(e1);
@@ -856,12 +833,6 @@ TEST(OwningGroup, SortUnordered) {
     ASSERT_EQ((group.raw<boxed_int>() + 5u)->value, 4);
     ASSERT_EQ((group.raw<boxed_int>() + 6u)->value, 5);
 
-    ASSERT_EQ(*(group.raw<char>() + 0u), 'c');
-    ASSERT_EQ(*(group.raw<char>() + 1u), 'b');
-    ASSERT_EQ(*(group.raw<char>() + 2u), 'a');
-    ASSERT_EQ(*(group.raw<char>() + 3u), 'd');
-    ASSERT_EQ(*(group.raw<char>() + 4u), 'e');
-
     ASSERT_EQ((group.get<boxed_int, char>(entities[0])), (std::make_tuple(boxed_int{6}, 'c')));
     ASSERT_EQ((group.get<boxed_int, char>(entities[1])), (std::make_tuple(boxed_int{3}, 'b')));
     ASSERT_EQ((group.get<boxed_int, char>(entities[2])), (std::make_tuple(boxed_int{1}, 'a')));
@@ -964,8 +935,7 @@ TEST(OwningGroup, ConstNonConstAndAllInBetween) {
     static_assert(std::is_same_v<decltype(group.get<const float>({})), const float &>);
     static_assert(std::is_same_v<decltype(group.get<int, const char, double, const float>({})), std::tuple<int &, const char &, double &, const float &>>);
     static_assert(std::is_same_v<decltype(group.get({})), std::tuple<int &, const char &, double &, const float &>>);
-    static_assert(std::is_same_v<decltype(group.raw<const float>()), const float *>);
-    static_assert(std::is_same_v<decltype(group.raw<double>()), double *>);
+    static_assert(std::is_same_v<decltype(group.data()), const entt::entity *>);
     static_assert(std::is_same_v<decltype(group.raw<const char>()), const char *>);
     static_assert(std::is_same_v<decltype(group.raw<int>()), int *>);
 
