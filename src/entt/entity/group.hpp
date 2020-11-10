@@ -164,16 +164,6 @@ public:
     using reverse_iterator = typename basic_sparse_set<Entity>::reverse_iterator;
 
     /**
-     * @brief Returns the number of existing components of the given type.
-     * @tparam Component Type of component of which to return the size.
-     * @return Number of existing components of the given type.
-     */
-    template<typename Component>
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return std::get<storage_type<Component> *>(pools)->size();
-    }
-
-    /**
      * @brief Returns the number of entities that have the given components.
      * @return Number of entities that have the given components.
      */
@@ -697,16 +687,6 @@ public:
     using iterator = typename basic_sparse_set<Entity>::iterator;
     /*! @brief Reversed iterator type. */
     using reverse_iterator = typename basic_sparse_set<Entity>::reverse_iterator;
-
-    /**
-     * @brief Returns the number of existing components of the given type.
-     * @tparam Component Type of component of which to return the size.
-     * @return Number of existing components of the given type.
-     */
-    template<typename Component>
-    [[nodiscard]] size_type size() const ENTT_NOEXCEPT {
-        return std::get<storage_type<Component> *>(pools)->size();
-    }
 
     /**
      * @brief Returns the number of entities that have the given components.
