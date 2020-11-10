@@ -19,8 +19,6 @@ TEST(NonOwningGroup, Functionalities) {
     auto cgroup = std::as_const(registry).group(entt::get<const int, const char>);
 
     ASSERT_TRUE(group.empty());
-    ASSERT_TRUE((group.empty<int, char>()));
-    ASSERT_TRUE((cgroup.empty<const int, const char>()));
 
     const auto e0 = registry.create();
     registry.emplace<char>(e0, '1');
@@ -30,8 +28,6 @@ TEST(NonOwningGroup, Functionalities) {
     registry.emplace<char>(e1, '2');
 
     ASSERT_FALSE(group.empty());
-    ASSERT_FALSE(group.empty<int>());
-    ASSERT_FALSE(cgroup.empty<const char>());
     ASSERT_NO_THROW(group.begin()++);
     ASSERT_NO_THROW(++cgroup.begin());
     ASSERT_NO_THROW([](auto it) { return it++; }(group.rbegin()));
@@ -582,8 +578,6 @@ TEST(OwningGroup, Functionalities) {
     auto cgroup = std::as_const(registry).group<const int>(entt::get<const char>);
 
     ASSERT_TRUE(group.empty());
-    ASSERT_TRUE((group.empty<int, char>()));
-    ASSERT_TRUE((cgroup.empty<const int, const char>()));
 
     const auto e0 = registry.create();
     registry.emplace<char>(e0, '1');
@@ -593,8 +587,6 @@ TEST(OwningGroup, Functionalities) {
     registry.emplace<char>(e1, '2');
 
     ASSERT_FALSE(group.empty());
-    ASSERT_FALSE(group.empty<int>());
-    ASSERT_FALSE(cgroup.empty<const char>());
     ASSERT_NO_THROW(group.begin()++);
     ASSERT_NO_THROW(++cgroup.begin());
     ASSERT_NO_THROW([](auto it) { return it++; }(group.rbegin()));
