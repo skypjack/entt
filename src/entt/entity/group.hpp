@@ -199,10 +199,6 @@ public:
      * The returned pointer is such that range `[data(), data() + size())` is
      * always a valid range, even if the container is empty.
      *
-     * @note
-     * Entities are in the reverse order as returned by the `begin`/`end`
-     * iterators.
-     *
      * @return A pointer to the array of entities.
      */
     [[nodiscard]] const entity_type * data() const ENTT_NOEXCEPT {
@@ -667,10 +663,6 @@ public:
      * `[raw<Component>(), raw<Component>() + size())` is always a valid range,
      * even if the container is empty.<br/>
      *
-     * @note
-     * Components are in the reverse order as returned by the `begin`/`end`
-     * iterators.
-     * 
      * @warning
      * This function is only available for owned types.
      *
@@ -688,10 +680,6 @@ public:
      *
      * The returned pointer is such that range `[data(), data() + size())` is
      * always a valid range, even if the container is empty.
-     *
-     * @note
-     * Entities are in the reverse order as returned by the `begin`/`end`
-     * iterators.
      *
      * @return A pointer to the array of entities.
      */
