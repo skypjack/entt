@@ -194,25 +194,6 @@ public:
     }
 
     /**
-     * @brief Direct access to the list of components of a given pool.
-     *
-     * The returned pointer is such that range
-     * `[raw<Component>(), raw<Component>() + size())` is always a valid range,
-     * even if the container is empty.
-     *
-     * @note
-     * Components are in the reverse order as returned by the `begin`/`end`
-     * iterators.
-     *
-     * @tparam Component Type of component in which one is interested.
-     * @return A pointer to the array of components.
-     */
-    template<typename Component>
-    [[nodiscard]] Component * raw() const ENTT_NOEXCEPT {
-        return std::get<storage_type<Component> *>(pools)->raw();
-    }
-
-    /**
      * @brief Direct access to the list of entities.
      *
      * The returned pointer is such that range `[data(), data() + size())` is
@@ -685,19 +666,20 @@ public:
      * The returned pointer is such that range
      * `[raw<Component>(), raw<Component>() + size())` is always a valid range,
      * even if the container is empty.<br/>
-     * Moreover, in case the group owns the given component, the range
-     * `[raw<Component>(), raw<Component>() + size())` is such that it contains
-     * the instances that are part of the group itself.
      *
      * @note
      * Components are in the reverse order as returned by the `begin`/`end`
      * iterators.
+     * 
+     * @warning
+     * This function is only available for owned types.
      *
      * @tparam Component Type of component in which one is interested.
      * @return A pointer to the array of components.
      */
     template<typename Component>
     [[nodiscard]] Component * raw() const ENTT_NOEXCEPT {
+        static_assert((std::is_same_v<Component, Owned> || ...));
         return std::get<storage_type<Component> *>(pools)->raw();
     }
 
