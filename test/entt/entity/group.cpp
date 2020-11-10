@@ -42,20 +42,14 @@ TEST(NonOwningGroup, Functionalities) {
     ASSERT_NE(group.rbegin(), group.rend());
     ASSERT_NE(cgroup.rbegin(), cgroup.rend());
     ASSERT_EQ(group.size(), 1u);
-    ASSERT_EQ(group.size<int>(), 1u);
-    ASSERT_EQ(cgroup.size<const char>(), 2u);
 
     registry.emplace<int>(e0);
 
     ASSERT_EQ(group.size(), 2u);
-    ASSERT_EQ(group.size<int>(), 2u);
-    ASSERT_EQ(cgroup.size<const char>(), 2u);
 
     registry.remove<int>(e0);
 
     ASSERT_EQ(group.size(), 1u);
-    ASSERT_EQ(group.size<int>(), 1u);
-    ASSERT_EQ(cgroup.size<const char>(), 2u);
 
     for(auto entity: group) {
         ASSERT_EQ(std::get<0>(cgroup.get<const int, const char>(entity)), 42);
@@ -611,21 +605,14 @@ TEST(OwningGroup, Functionalities) {
     ASSERT_NE(group.rbegin(), group.rend());
     ASSERT_NE(cgroup.rbegin(), cgroup.rend());
     ASSERT_EQ(group.size(), 1u);
-    ASSERT_EQ(group.size<int>(), 1u);
-    ASSERT_EQ(cgroup.size<const char>(), 2u);
 
     registry.emplace<int>(e0);
 
     ASSERT_EQ(group.size(), 2u);
-    ASSERT_EQ(group.size<int>(), 2u);
-    ASSERT_EQ(cgroup.size<const char>(), 2u);
 
     registry.remove<int>(e0);
 
     ASSERT_EQ(group.size(), 1u);
-    ASSERT_EQ(group.size<int>(), 1u);
-    ASSERT_EQ(cgroup.size<const char>(), 2u);
-
     ASSERT_EQ(*(cgroup.raw<const int>() + 0), 42);
     ASSERT_EQ(*(group.raw<int>() + 0), 42);
 
