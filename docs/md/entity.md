@@ -1765,12 +1765,12 @@ function to know if a group can be sorted or not.
 Views and groups as returned by a registry are generally valid. However, there
 are some exceptions where an invalid object might be returned.<br/>
 In these cases, they should be renewed as soon as possible. In fact, an invalid
-view or groups contains a broken reference to one or more pools and this will
+view or group contains a broken reference to one or more pools and this will
 never be fixed. The view or the group will continue to return no data, even if
 the pool for the pending reference is created in the registry in the meantime.
 
 There is only one case in which an invalid object can be returned, that is when
-the view or the groups is created from a constant reference to a registry in
+the view or the group is created from a constant reference to a registry in
 which the required pools haven't yet been created.<br/>
 Pools are typically created whenever any method is used on a non-const registry.
 This also means that creating views and groups from a non-const registry can
@@ -1780,9 +1780,8 @@ It's also perfectly fine to use an invalid view or group, to invoke `each` on
 them or to iterate them like any other object. The only difference from a valid
 view or group is that the invalid ones will always appear as _empty_.<br/>
 In general, when views and groups are created on the fly and used at the same
-time, then discarded immediately afterwards, it shouldn't even worry about
-whether or not they may be invalid. Therefore, this remains the recommended
-approach.
+time, then discarded immediately afterwards, it doesn't matter whether or not
+they may be invalid. Therefore, this remains the recommended approach.
 
 To know if a view or a group is properly initialized, both can be converted to
 bool explicitly and used in a guard.
