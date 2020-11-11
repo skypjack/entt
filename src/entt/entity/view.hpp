@@ -100,7 +100,9 @@ class basic_view<Entity, exclude_t<Exclude...>, Component...> final {
         using reference = typename std::iterator_traits<It>::reference;
         using iterator_category = std::bidirectional_iterator_tag;
 
-        view_iterator() ENTT_NOEXCEPT = default;
+        view_iterator() ENTT_NOEXCEPT
+            : view_iterator{{}, {}, {}, {}, {}}
+        {}
 
         view_iterator & operator++() ENTT_NOEXCEPT {
             while(++it != last && !valid());
@@ -581,7 +583,9 @@ class basic_view<Entity, exclude_t<>, Component> final {
         class iterable_view_iterator {
             friend class iterable_view;
 
-            iterable_view_iterator() ENTT_NOEXCEPT = default;
+            iterable_view_iterator() ENTT_NOEXCEPT
+                : iterable_view_iterator{It{}...}
+            {}
 
             template<typename... Discard>
             iterable_view_iterator(It... from, Discard...) ENTT_NOEXCEPT
