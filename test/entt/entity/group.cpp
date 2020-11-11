@@ -77,6 +77,41 @@ TEST(NonOwningGroup, Functionalities) {
     ASSERT_FALSE(invalid);
 }
 
+TEST(NonOwningGroup, Invalid) {
+    entt::registry registry{};
+    auto group = std::as_const(registry).group(entt::get<const empty_type, const int>);
+
+    const auto entity = registry.create();
+    registry.emplace<empty_type>(entity);
+    registry.emplace<int>(entity);
+
+    ASSERT_FALSE(group);
+
+    ASSERT_TRUE(group.empty());
+    ASSERT_EQ(group.size(), 0u);
+    ASSERT_EQ(group.capacity(), 0u);
+    ASSERT_NO_THROW(group.shrink_to_fit());
+
+    ASSERT_EQ(group.data(), nullptr);
+
+    ASSERT_EQ(group.begin(), group.end());
+    ASSERT_EQ(group.rbegin(), group.rend());
+
+    ASSERT_FALSE(group.contains(entity));
+    ASSERT_EQ(group.find(entity), group.end());
+    ASSERT_EQ(group.front(), entt::entity{entt::null});
+    ASSERT_EQ(group.back(), entt::entity{entt::null});
+
+    group.each([](const auto, const auto &) { FAIL(); });
+    group.each([](const auto &) { FAIL(); });
+
+    for(auto [entity, value]: group.each()) { FAIL(); }
+    for(auto first = group.each().rbegin(), last = group.each().rend(); first != last; ++first) { FAIL(); }
+
+    ASSERT_NO_THROW(group.sort([](const auto, const auto) { FAIL(), true; }));
+    ASSERT_NO_THROW(group.sort<const empty_type>());
+}
+
 TEST(NonOwningGroup, ElementAccess) {
     entt::registry registry;
     auto group = registry.group(entt::get<int, char>);
@@ -613,6 +648,37 @@ TEST(OwningGroup, Functionalities) {
     ASSERT_TRUE(group);
     ASSERT_TRUE(cgroup);
     ASSERT_FALSE(invalid);
+}
+
+TEST(OwningGroup, Invalid) {
+    entt::registry registry{};
+    auto group = std::as_const(registry).group<const int>(entt::get<const empty_type>);
+
+    const auto entity = registry.create();
+    registry.emplace<empty_type>(entity);
+    registry.emplace<int>(entity);
+
+    ASSERT_FALSE(group);
+
+    ASSERT_TRUE(group.empty());
+    ASSERT_EQ(group.size(), 0u);
+
+    ASSERT_EQ(group.raw<const int>(), nullptr);
+    ASSERT_EQ(group.data(), nullptr);
+
+    ASSERT_EQ(group.begin(), group.end());
+    ASSERT_EQ(group.rbegin(), group.rend());
+
+    ASSERT_FALSE(group.contains(entity));
+    ASSERT_EQ(group.find(entity), group.end());
+    ASSERT_EQ(group.front(), entt::entity{entt::null});
+    ASSERT_EQ(group.back(), entt::entity{entt::null});
+
+    group.each([](const auto, const auto &) { FAIL(); });
+    group.each([](const auto &) { FAIL(); });
+
+    for(auto [entity, value]: group.each()) { FAIL(); }
+    for(auto first = group.each().rbegin(), last = group.each().rend(); first != last; ++first) { FAIL(); }
 }
 
 TEST(OwningGroup, ElementAccess) {

@@ -701,16 +701,16 @@ TEST(Registry, CleanViewAfterRemoveAndClear) {
     auto view = registry.view<int, char>();
 
     const auto entity = registry.create();
-    registry.emplace<int>(entity, 0);
-    registry.emplace<char>(entity, 'c');
+    registry.emplace<int>(entity);
+    registry.emplace<char>(entity);
 
     ASSERT_EQ(view.size_hint(), 1u);
 
     registry.remove<char>(entity);
 
-    ASSERT_EQ(view.size_hint(), 0u);
+    ASSERT_EQ(view.size_hint(), 1u);
 
-    registry.emplace<char>(entity, 'c');
+    registry.emplace<char>(entity);
 
     ASSERT_EQ(view.size_hint(), 1u);
 
@@ -718,7 +718,7 @@ TEST(Registry, CleanViewAfterRemoveAndClear) {
 
     ASSERT_EQ(view.size_hint(), 0u);
 
-    registry.emplace<int>(entity, 0);
+    registry.emplace<int>(entity);
 
     ASSERT_EQ(view.size_hint(), 1u);
 

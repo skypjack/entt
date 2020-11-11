@@ -63,6 +63,45 @@ TEST(SingleComponentView, Functionalities) {
     ASSERT_FALSE(invalid);
 }
 
+TEST(SingleComponentView, Invalid) {
+    entt::registry registry{};
+    auto eview = std::as_const(registry).view<const empty_type>();
+    auto cview = std::as_const(registry).view<const int>();
+
+    const auto entity = registry.create();
+    registry.emplace<empty_type>(entity);
+    registry.emplace<int>(entity);
+
+    ASSERT_FALSE(cview);
+    ASSERT_FALSE(eview);
+
+    ASSERT_TRUE(cview.empty());
+    ASSERT_EQ(eview.size(), 0u);
+
+    ASSERT_EQ(cview.raw(), nullptr);
+    ASSERT_EQ(eview.data(), nullptr);
+
+    ASSERT_EQ(cview.begin(), cview.end());
+    ASSERT_EQ(eview.rbegin(), eview.rend());
+
+    ASSERT_FALSE(cview.contains(entity));
+    ASSERT_EQ(eview.find(entity), eview.end());
+    ASSERT_EQ(cview.front(), entt::entity{entt::null});
+    ASSERT_EQ(eview.back(), entt::entity{entt::null});
+
+    cview.each([](const auto, const auto &) { FAIL(); });
+    cview.each([](const auto &) { FAIL(); });
+
+    eview.each([](const auto) { FAIL(); });
+    eview.each([]() { FAIL(); });
+
+    for(auto [entity, value]: cview.each()) { FAIL(); }
+    for(auto first = cview.each().rbegin(), last = cview.each().rend(); first != last; ++first) { FAIL(); }
+
+    for(const auto entity: eview.each()) { FAIL(); }
+    for(auto first = eview.each().rbegin(), last = eview.each().rend(); first != last; ++first) { FAIL(); }
+}
+
 TEST(SingleComponentView, ElementAccess) {
     entt::registry registry;
     auto view = registry.view<int>();
@@ -361,6 +400,32 @@ TEST(MultiComponentView, Functionalities) {
     ASSERT_TRUE(view);
     ASSERT_TRUE(cview);
     ASSERT_FALSE(invalid);
+}
+
+TEST(MultiComponentView, Invalid) {
+    entt::registry registry{};
+    auto view = std::as_const(registry).view<const empty_type, const int>();
+
+    const auto entity = registry.create();
+    registry.emplace<empty_type>(entity);
+    registry.emplace<int>(entity);
+
+    ASSERT_FALSE(view);
+
+    ASSERT_EQ(view.size_hint(), 0u);
+
+    ASSERT_EQ(view.begin(), view.end());
+
+    ASSERT_FALSE(view.contains(entity));
+    ASSERT_EQ(view.find(entity), view.end());
+    ASSERT_EQ(view.front(), entt::entity{entt::null});
+    ASSERT_EQ(view.back(), entt::entity{entt::null});
+
+    view.each([](const auto, const auto &) { FAIL(); });
+    view.each([](const auto &) { FAIL(); });
+
+    for(auto [entity, value]: view.each()) { FAIL(); }
+    for(auto first = view.each().rbegin(), last = view.each().rend(); first != last; ++first) { FAIL(); }
 }
 
 TEST(MultiComponentView, Iterator) {
