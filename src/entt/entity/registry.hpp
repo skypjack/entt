@@ -800,7 +800,7 @@ public:
     template<typename... Component>
     [[nodiscard]] bool any(const entity_type entity) const {
         ENTT_ASSERT(valid(entity));
-        return [entity](auto *... cpool) { return ((cpool && cpool->contains(entity)) || ...); }(assure<Component>()...);
+        return (has<Component>(entity) || ...);
     }
 
     /**
