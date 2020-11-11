@@ -15,7 +15,7 @@ TEST(RuntimeView, Functionalities) {
     entt::id_type types[] = { entt::type_hash<int>::value(), entt::type_hash<char>::value() };
     auto view = registry.runtime_view(std::begin(types), std::end(types));
 
-    ASSERT_TRUE(view.empty());
+    ASSERT_EQ(view.size_hint(), 0u);
 
     const auto e0 = registry.create();
     registry.emplace<char>(e0);
@@ -23,7 +23,7 @@ TEST(RuntimeView, Functionalities) {
     const auto e1 = registry.create();
     registry.emplace<int>(e1);
 
-    ASSERT_FALSE(view.empty());
+    ASSERT_NE(view.size_hint(), 0u);
 
     registry.emplace<char>(e1);
 
@@ -169,12 +169,10 @@ TEST(RuntimeView, MissingPool) {
     entt::id_type types[] = { entt::type_hash<int>::value(), entt::type_hash<char>::value() };
     auto view = registry.runtime_view(std::begin(types), std::end(types));
 
-    ASSERT_TRUE(view.empty());
     ASSERT_EQ(view.size_hint(), 0u);
 
     registry.emplace<char>(e0);
 
-    ASSERT_TRUE(view.empty());
     ASSERT_EQ(view.size_hint(), 0u);
     ASSERT_FALSE(view.contains(e0));
 
@@ -192,7 +190,6 @@ TEST(RuntimeView, EmptyRange) {
     const entt::id_type *ptr = nullptr;
     auto view = registry.runtime_view(ptr, ptr);
 
-    ASSERT_TRUE(view.empty());
     ASSERT_EQ(view.size_hint(), 0u);
     ASSERT_FALSE(view.contains(e0));
 
@@ -215,7 +212,6 @@ TEST(RuntimeView, ExcludedComponents) {
     entt::id_type filter[] = { entt::type_hash<char>::value(), entt::type_hash<double>::value() };
     auto view = registry.runtime_view(std::begin(components), std::end(components), std::begin(filter), std::end(filter));
 
-    ASSERT_FALSE(view.empty());
     ASSERT_TRUE(view.contains(e0));
     ASSERT_FALSE(view.contains(e1));
 
