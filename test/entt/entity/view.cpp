@@ -95,10 +95,10 @@ TEST(SingleComponentView, Invalid) {
     eview.each([](const auto) { FAIL(); });
     eview.each([]() { FAIL(); });
 
-    for([[maybe_unused]] const auto all: cview.each()) { FAIL(); }
+    for([[maybe_unused]] auto all: cview.each()) { FAIL(); }
     for(auto first = cview.each().rbegin(), last = cview.each().rend(); first != last; ++first) { FAIL(); }
 
-    for([[maybe_unused]] const auto entt: eview.each()) { FAIL(); }
+    for([[maybe_unused]] auto entt: eview.each()) { FAIL(); }
     for(auto first = eview.each().rbegin(), last = eview.each().rend(); first != last; ++first) { FAIL(); }
 }
 
@@ -424,7 +424,7 @@ TEST(MultiComponentView, Invalid) {
     view.each([](const auto, const auto &) { FAIL(); });
     view.each([](const auto &) { FAIL(); });
 
-    for([[maybe_unused]] const auto all: view.each()) { FAIL(); }
+    for([[maybe_unused]] auto all: view.each()) { FAIL(); }
     for(auto first = view.each().rbegin(), last = view.each().rend(); first != last; ++first) { FAIL(); }
 }
 

@@ -105,7 +105,7 @@ TEST(NonOwningGroup, Invalid) {
     group.each([](const auto, const auto &) { FAIL(); });
     group.each([](const auto &) { FAIL(); });
 
-    for([[maybe_unused]] const auto all: group.each()) { FAIL(); }
+    for([[maybe_unused]] auto all: group.each()) { FAIL(); }
     for(auto first = group.each().rbegin(), last = group.each().rend(); first != last; ++first) { FAIL(); }
 
     ASSERT_NO_THROW(group.sort([](const auto, const auto) { FAIL(), true; }));
@@ -677,7 +677,7 @@ TEST(OwningGroup, Invalid) {
     group.each([](const auto, const auto &) { FAIL(); });
     group.each([](const auto &) { FAIL(); });
 
-    for([[maybe_unused]] const auto all: group.each()) { FAIL(); }
+    for([[maybe_unused]] auto all: group.each()) { FAIL(); }
     for(auto first = group.each().rbegin(), last = group.each().rend(); first != last; ++first) { FAIL(); }
 }
 
