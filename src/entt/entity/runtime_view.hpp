@@ -162,14 +162,6 @@ public:
     }
 
     /**
-     * @brief Checks if the view is definitely empty.
-     * @return True if the view is definitely empty, false otherwise.
-     */
-    [[nodiscard]] bool empty() const {
-        return !valid() || pools.front()->empty();
-    }
-
-    /**
      * @brief Returns an iterator to the first entity that has the given
      * components.
      *
