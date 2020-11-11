@@ -36,7 +36,7 @@ TEST(RuntimeView, Functionalities) {
     ASSERT_NO_THROW((++view.begin()));
 
     ASSERT_NE(view.begin(), view.end());
-    ASSERT_EQ(view.size(), decltype(view.size()){1});
+    ASSERT_EQ(view.size_hint(), 1u);
 
     registry.get<char>(e0) = '1';
     registry.get<char>(e1) = '2';
@@ -170,12 +170,12 @@ TEST(RuntimeView, MissingPool) {
     auto view = registry.runtime_view(std::begin(types), std::end(types));
 
     ASSERT_TRUE(view.empty());
-    ASSERT_EQ(view.size(), decltype(view.size()){0});
+    ASSERT_EQ(view.size_hint(), 0u);
 
     registry.emplace<char>(e0);
 
     ASSERT_TRUE(view.empty());
-    ASSERT_EQ(view.size(), decltype(view.size()){0});
+    ASSERT_EQ(view.size_hint(), 0u);
     ASSERT_FALSE(view.contains(e0));
 
     view.each([](auto) { FAIL(); });
@@ -193,7 +193,7 @@ TEST(RuntimeView, EmptyRange) {
     auto view = registry.runtime_view(ptr, ptr);
 
     ASSERT_TRUE(view.empty());
-    ASSERT_EQ(view.size(), decltype(view.size()){0});
+    ASSERT_EQ(view.size_hint(), 0u);
     ASSERT_FALSE(view.contains(e0));
 
     view.each([](auto) { FAIL(); });

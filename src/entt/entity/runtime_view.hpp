@@ -154,10 +154,10 @@ public:
     using iterator = view_iterator;
 
     /**
-     * @brief Estimates the number of entities that have the given components.
-     * @return Estimated number of entities that have the given components.
+     * @brief Estimates the number of entities iterated by the view.
+     * @return Estimated number of entities iterated by the view.
      */
-    [[nodiscard]] size_type size() const {
+    [[nodiscard]] size_type size_hint() const {
         return valid() ? pools.front()->size() : size_type{};
     }
 
