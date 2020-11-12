@@ -122,7 +122,7 @@ class emitter {
     };
 
     template<typename Event>
-    [[nodiscard]] const pool_handler<Event> & assure() const {
+    [[nodiscard]] pool_handler<Event> * assure() {
         const auto index = type_seq<Event>::value();
 
         if(!(index < pools.size())) {
@@ -133,12 +133,13 @@ class emitter {
             pools[index].reset(new pool_handler<Event>{});
         }
 
-        return static_cast<pool_handler<Event> &>(*pools[index]);
+        return static_cast<pool_handler<Event> *>(pools[index].get());
     }
 
     template<typename Event>
-    [[nodiscard]] pool_handler<Event> & assure() {
-        return const_cast<pool_handler<Event> &>(std::as_const(*this).template assure<Event>());
+    [[nodiscard]] const pool_handler<Event> * assure() const {
+        const auto index = type_seq<Event>::value();
+        return (!(index < pools.size()) || !pools[index]) ? nullptr : static_cast<const pool_handler<Event> *>(pools[index].get());
     }
 
 public:
@@ -200,7 +201,7 @@ public:
     template<typename Event, typename... Args>
     void publish(Args &&... args) {
         Event instance{std::forward<Args>(args)...};
-        assure<Event>().publish(instance, *static_cast<Derived *>(this));
+        assure<Event>()->publish(instance, *static_cast<Derived *>(this));
     }
 
     /**
@@ -225,7 +226,7 @@ public:
      */
     template<typename Event>
     connection<Event> on(listener<Event> instance) {
-        return assure<Event>().on(std::move(instance));
+        return assure<Event>()->on(std::move(instance));
     }
 
     /**
@@ -250,7 +251,7 @@ public:
      */
     template<typename Event>
     connection<Event> once(listener<Event> instance) {
-        return assure<Event>().once(std::move(instance));
+        return assure<Event>()->once(std::move(instance));
     }
 
     /**
@@ -264,7 +265,7 @@ public:
      */
     template<typename Event>
     void erase(connection<Event> conn) {
-        assure<Event>().erase(std::move(conn));
+        assure<Event>()->erase(std::move(conn));
     }
 
     /**
@@ -277,7 +278,7 @@ public:
      */
     template<typename Event>
     void clear() {
-        assure<Event>().clear();
+        assure<Event>()->clear();
     }
 
     /**
@@ -301,7 +302,8 @@ public:
      */
     template<typename Event>
     [[nodiscard]] bool empty() const {
-        return assure<Event>().empty();
+        const auto *cpool = assure<Event>();
+        return !cpool || cpool->empty();
     }
 
     /**
@@ -315,7 +317,7 @@ public:
     }
 
 private:
-    mutable std::vector<std::unique_ptr<basic_pool>> pools{};
+    std::vector<std::unique_ptr<basic_pool>> pools{};
 };
 
 
