@@ -25,12 +25,9 @@ WIP:
 * add exclude-only views to combine with packs
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * HP: write documentation for custom storages and views!!
-* use views within the registry, do not duplicate the logic for some operations
-* view pack: optimize it and iterate only first min size hint entities
 * view pack: plain function as an alias for operator|, reverse iterators, rbegin and rend
 * what about using hashed string rather than hash values for meta types?
 * pagination doesn't work nicely across boundaries probably, give it a look. RO operations are fine, adding components maybe not.
-* make it easier to hook into the type system and describe how to do that to eg auto-generate meta types on first use
 * add observer functions aside observer class
 * snapshot: support for range-based archives
 * update snapshot documentation to describe alternatives
