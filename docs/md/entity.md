@@ -1761,8 +1761,8 @@ function to know if a group can be sorted or not.
 ## Types: const, non-const and all in between
 
 The `registry` class offers two overloads when it comes to constructing views
-and groups: a const version and a non-const one. The former accepts both const
-and non-const types as template parameters, the latter accepts only const types
+and groups: a const version and a non-const one. The former accepts only const
+types as template parameters, the latter accepts both const and non-const types
 instead.<br/>
 It means that views and groups can be constructed from a const registry and they
 propagate the constness of the registry to the types involved. As an example:
