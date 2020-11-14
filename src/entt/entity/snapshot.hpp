@@ -302,7 +302,7 @@ class basic_continuous_loader {
         if(const auto it = remloc.find(entt); it == remloc.cend()) {
             const auto local = reg->create();
             remloc.emplace(entt, std::make_pair(local, true));
-            reg->destroy(local, 0u);
+            reg->destroy(local);
         }
     }
 
