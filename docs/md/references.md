@@ -27,6 +27,12 @@ I hope this list can grow much more in the future:
   * [EntityX](https://github.com/alecthomas/entityx): a bitset based ECS that
     uses a single large matrix of components indexed with entities.
 
+* C#
+  * [Entitas](https://github.com/sschmid/Entitas-CSharp): the ECS framework for
+    C# and Unity, where _reactive systems_ were invented.
+  * [Svelto.ECS](https://github.com/sebas77/Svelto.ECS): a very interesting
+    platform agnostic and table based ECS framework.
+
 * Go:
   * [gecs](https://github.com/tutumagi/gecs): a sparse sets based ECS inspired 
     by `EnTT`.
