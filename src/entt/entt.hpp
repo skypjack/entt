@@ -1,3 +1,4 @@
+#include "config/version.h"
 #include "core/algorithm.hpp"
 #include "core/attribute.h"
 #include "core/family.hpp"
