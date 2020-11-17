@@ -665,7 +665,7 @@ int value = 42;
 // meta type equivalent to that of int *
 entt::meta_any any{&value};
 
-if(any.type().is_meta_pointer_like()) {
+if(any.type().is_pointer_like()) {
     // meta type equivalent to that of int
     if(entt::meta_any ref = *any; ref) {
         // ...
