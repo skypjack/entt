@@ -137,9 +137,14 @@ There is also a _user defined literal_ dedicated to hashed strings to make them
 more user-friendly:
 
 ```cpp
+using namespace entt::literals;
 constexpr auto str = "text"_hs;
 ```
 
+To use it, remember that all user defined literals in `EnTT` are enclosed in the
+`entt::literals` namespace. Therefore, the entire namespace or selectively the
+literal of interest must be explicitly included before each use, a bit like
+`std::literals`.<br/>
 Finally, in case users need to create hashed strings at runtime, this class also
 offers the necessary functionalities:
 
@@ -152,6 +157,10 @@ entt::hashed_string str{orig.c_str()};
 // ... or compute only the unique identifier
 const auto hash = entt::hashed_string::value(orig.c_str());
 ```
+
+This possibility shouldn't be exploited in tight loops, since the computation
+takes place at runtime and no longer at compile-time and could therefore impact
+performance to some degrees.
 
 ## Wide characters
 

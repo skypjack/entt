@@ -3,6 +3,8 @@
 #include <entt/core/monostate.hpp>
 
 TEST(Monostate, Functionalities) {
+    using namespace entt::literals;
+
     const bool b_pre = entt::monostate<entt::hashed_string{"foobar"}>{};
     const int i_pre = entt::monostate<"foobar"_hs>{};
 

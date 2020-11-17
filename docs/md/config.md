@@ -8,7 +8,6 @@
 * [Introduction](#introduction)
 * [Definitions](#definitions)
   * [ENTT_NOEXCEPT](#entt_noexcept)
-  * [ENTT_HS_SUFFIX and ENTT_HWS_SUFFIX](#entt_hs_suffix_and_entt_hws_suffix)
   * [ENTT_USE_ATOMIC](#entt_use_atomic)
   * [ENTT_ID_TYPE](#entt_id_type)
   * [ENTT_PAGE_SIZE](#entt_page_size)
@@ -42,13 +41,6 @@ will remain stable over time unlike the options below.
 The purpose of this parameter is to suppress the use of `noexcept` by this
 library.<br/>
 To do this, simply define the variable without assigning any value to it.
-
-## ENTT_HS_SUFFIX and ENTT_HWS_SUFFIX
-
-The `hashed_string` class introduces the `_hs` and `_hws` suffixes to accompany
-its user defined literals.<br/>
-In the case of conflicts or even just to change these suffixes, it's possible to
-do so by associating new ones with these definitions.
 
 ## ENTT_USE_ATOMIC
 
@@ -93,8 +85,9 @@ dedicated storage for them.
 
 ## ENTT_STANDARD_CPP
 
-After many adventures, `EnTT` finally works fine across boundaries.<br/>
-To do this, the library mixes some non-standard language features with others
-that are perfectly compliant.<br/>
+`EnTT` mixes non-standard language features with others that are perfectly
+compliant to offer some of its functionalities.<br/>
 This definition will prevent the library from using non-standard techniques,
-that is, functionalities that aren't fully compliant with the standard C++.
+that is, functionalities that aren't fully compliant with the standard C++.<br/>
+While there are no known portability issues at the time of this writing, this
+should make the library fully portable anyway if needed.

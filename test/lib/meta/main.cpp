@@ -10,6 +10,8 @@ ENTT_API void tear_down();
 ENTT_API entt::meta_any wrap_int(int);
 
 TEST(Lib, Meta) {
+    using namespace entt::literals;
+
     ASSERT_FALSE(entt::resolve("position"_hs));
     ASSERT_FALSE(entt::resolve("velocity"_hs));
 

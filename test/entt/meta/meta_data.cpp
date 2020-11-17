@@ -64,6 +64,8 @@ enum class property_t {
 
 struct MetaData: ::testing::Test {
     static void SetUpTestCase() {
+        using namespace entt::literals;
+
         entt::meta<double>().conv<int>();
         entt::meta<base_t>().dtor<&base_t::destroy>().data<&base_t::value>("value"_hs);
         entt::meta<derived_t>().base<base_t>().dtor<&derived_t::destroy>();
@@ -97,6 +99,8 @@ struct MetaData: ::testing::Test {
 };
 
 TEST_F(MetaData, Functionalities) {
+    using namespace entt::literals;
+
     auto data = entt::resolve<clazz_t>().data("i"_hs);
     clazz_t instance{};
 
@@ -126,6 +130,8 @@ TEST_F(MetaData, Functionalities) {
 }
 
 TEST_F(MetaData, Const) {
+    using namespace entt::literals;
+
     auto data = entt::resolve<clazz_t>().data("j"_hs);
     clazz_t instance{};
 
@@ -155,6 +161,8 @@ TEST_F(MetaData, Const) {
 }
 
 TEST_F(MetaData, Static) {
+    using namespace entt::literals;
+
     auto data = entt::resolve<clazz_t>().data("h"_hs);
 
     ASSERT_TRUE(data);
@@ -183,6 +191,8 @@ TEST_F(MetaData, Static) {
 }
 
 TEST_F(MetaData, ConstStatic) {
+    using namespace entt::literals;
+
     auto data = entt::resolve<clazz_t>().data("k"_hs);
 
     ASSERT_TRUE(data);
@@ -211,6 +221,8 @@ TEST_F(MetaData, ConstStatic) {
 }
 
 TEST_F(MetaData, GetMetaAnyArg) {
+    using namespace entt::literals;
+
     entt::meta_any any{clazz_t{}};
     any.cast<clazz_t>().i = 99;
     const auto value = entt::resolve<clazz_t>().data("i"_hs).get(any);
@@ -221,11 +233,15 @@ TEST_F(MetaData, GetMetaAnyArg) {
 }
 
 TEST_F(MetaData, GetInvalidArg) {
+    using namespace entt::literals;
+
     auto instance = 0;
     ASSERT_FALSE(entt::resolve<clazz_t>().data("i"_hs).get(instance));
 }
 
 TEST_F(MetaData, SetMetaAnyArg) {
+    using namespace entt::literals;
+
     entt::meta_any any{clazz_t{}};
     entt::meta_any value{42};
 
@@ -235,10 +251,14 @@ TEST_F(MetaData, SetMetaAnyArg) {
 }
 
 TEST_F(MetaData, SetInvalidArg) {
+    using namespace entt::literals;
+
     ASSERT_FALSE(entt::resolve<clazz_t>().data("i"_hs).set({}, 'c'));
 }
 
 TEST_F(MetaData, SetCast) {
+    using namespace entt::literals;
+
     clazz_t instance{};
 
     ASSERT_EQ(base_t::counter, 0);
@@ -247,6 +267,8 @@ TEST_F(MetaData, SetCast) {
 }
 
 TEST_F(MetaData, SetConvert) {
+    using namespace entt::literals;
+
     clazz_t instance{};
 
     ASSERT_EQ(instance.i, 0);
@@ -255,6 +277,8 @@ TEST_F(MetaData, SetConvert) {
 }
 
 TEST_F(MetaData, SetterGetterAsFreeFunctions) {
+    using namespace entt::literals;
+
     auto data = entt::resolve<setter_getter_t>().data("x"_hs);
     setter_getter_t instance{};
 
@@ -270,6 +294,8 @@ TEST_F(MetaData, SetterGetterAsFreeFunctions) {
 }
 
 TEST_F(MetaData, SetterGetterAsMemberFunctions) {
+    using namespace entt::literals;
+
     auto data = entt::resolve<setter_getter_t>().data("y"_hs);
     setter_getter_t instance{};
 
@@ -285,6 +311,8 @@ TEST_F(MetaData, SetterGetterAsMemberFunctions) {
 }
 
 TEST_F(MetaData, SetterGetterWithRefAsMemberFunctions) {
+    using namespace entt::literals;
+
     auto data = entt::resolve<setter_getter_t>().data("w"_hs);
     setter_getter_t instance{};
 
@@ -300,6 +328,8 @@ TEST_F(MetaData, SetterGetterWithRefAsMemberFunctions) {
 }
 
 TEST_F(MetaData, SetterGetterMixed) {
+    using namespace entt::literals;
+
     auto data = entt::resolve<setter_getter_t>().data("z"_hs);
     setter_getter_t instance{};
 
@@ -315,6 +345,8 @@ TEST_F(MetaData, SetterGetterMixed) {
 }
 
 TEST_F(MetaData, SetterGetterReadOnly) {
+    using namespace entt::literals;
+
     auto data = entt::resolve<setter_getter_t>().data("z_ro"_hs);
     setter_getter_t instance{};
 
@@ -330,6 +362,8 @@ TEST_F(MetaData, SetterGetterReadOnly) {
 }
 
 TEST_F(MetaData, SetterGetterReadOnlyDataMember) {
+    using namespace entt::literals;
+
     auto data = entt::resolve<setter_getter_t>().data("value"_hs);
     setter_getter_t instance{};
 
@@ -345,6 +379,8 @@ TEST_F(MetaData, SetterGetterReadOnlyDataMember) {
 }
 
 TEST_F(MetaData, ArrayStatic) {
+    using namespace entt::literals;
+
     auto data = entt::resolve<array_t>().data("global"_hs);
 
     ASSERT_TRUE(data);
@@ -359,8 +395,10 @@ TEST_F(MetaData, ArrayStatic) {
 }
 
 TEST_F(MetaData, Array) {
+    using namespace entt::literals;
+
     auto data = entt::resolve<array_t>().data("local"_hs);
-    array_t instance;
+    array_t instance{};
 
     ASSERT_TRUE(data);
     ASSERT_EQ(data.parent(), entt::resolve("array"_hs));
@@ -374,6 +412,8 @@ TEST_F(MetaData, Array) {
 }
 
 TEST_F(MetaData, AsVoid) {
+    using namespace entt::literals;
+
     auto data = entt::resolve<clazz_t>().data("void"_hs);
     clazz_t instance{};
 
@@ -383,6 +423,8 @@ TEST_F(MetaData, AsVoid) {
 }
 
 TEST_F(MetaData, AsRef) {
+    using namespace entt::literals;
+
     clazz_t instance{};
 
     auto h_data = entt::resolve<clazz_t>().data("h"_hs);
@@ -399,6 +441,8 @@ TEST_F(MetaData, AsRef) {
 }
 
 TEST_F(MetaData, FromBase) {
+    using namespace entt::literals;
+
     auto type = entt::resolve<derived_t>();
     derived_t instance;
 

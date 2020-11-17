@@ -27,7 +27,7 @@ TEST(TypeTraits, UnpackAsValue) {
 }
 
 TEST(TypeTraits, IntegralConstant) {
-    entt::integral_constant<3> constant;
+    entt::integral_constant<3> constant{};
 
     static_assert(std::is_same_v<typename entt::integral_constant<3>::value_type, int>);
     static_assert(constant.value == 3);
@@ -90,6 +90,7 @@ TEST(TypeTraits, MemberClass) {
 }
 
 TEST(TypeTraits, Tag) {
+    using namespace entt::literals;
     static_assert(entt::tag<"foobar"_hs>::value == entt::hashed_string::value("foobar"));
     static_assert(std::is_same_v<typename entt::tag<"foobar"_hs>::value_type, entt::id_type>);
 }
