@@ -110,6 +110,8 @@ TEST(Resource, MutableHandle) {
 }
 
 TEST(Resource, Each) {
+    using namespace entt::literals;
+
     entt::resource_cache<resource> cache;
     cache.load<loader>("resource"_hs, 0);
 

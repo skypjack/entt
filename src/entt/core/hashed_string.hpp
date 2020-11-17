@@ -237,7 +237,7 @@ using hashed_string = basic_hashed_string<char>;
 using hashed_wstring = basic_hashed_string<wchar_t>;
 
 
-}
+inline namespace literals {
 
 
 /**
@@ -245,7 +245,7 @@ using hashed_wstring = basic_hashed_string<wchar_t>;
  * @param str The literal without its suffix.
  * @return A properly initialized hashed string.
  */
-[[nodiscard]] constexpr entt::hashed_string operator"" ENTT_HS_SUFFIX(const char *str, std::size_t) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr entt::hashed_string operator"" _hs(const char *str, std::size_t) ENTT_NOEXCEPT {
     return entt::hashed_string{str};
 }
 
@@ -255,8 +255,14 @@ using hashed_wstring = basic_hashed_string<wchar_t>;
  * @param str The literal without its suffix.
  * @return A properly initialized hashed wstring.
  */
-[[nodiscard]] constexpr entt::hashed_wstring operator"" ENTT_HWS_SUFFIX(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
+[[nodiscard]] constexpr entt::hashed_wstring operator"" _hws(const wchar_t *str, std::size_t) ENTT_NOEXCEPT {
     return entt::hashed_wstring{str};
+}
+
+
+}
+
+
 }
 
 

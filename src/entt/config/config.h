@@ -7,16 +7,6 @@
 #endif
 
 
-#ifndef ENTT_HS_SUFFIX
-#   define ENTT_HS_SUFFIX _hs
-#endif
-
-
-#ifndef ENTT_HWS_SUFFIX
-#   define ENTT_HWS_SUFFIX _hws
-#endif
-
-
 #ifndef ENTT_USE_ATOMIC
 #   define ENTT_MAYBE_ATOMIC(Type) Type
 #else

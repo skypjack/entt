@@ -8,6 +8,8 @@
 #include "types.h"
 
 TEST(Lib, Meta) {
+    using namespace entt::literals;
+
     ASSERT_FALSE(entt::resolve("position"_hs));
 
     userdata ud{};
