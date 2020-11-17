@@ -51,6 +51,8 @@ struct unmanageable_t {
 
 struct MetaAny: ::testing::Test {
     static void SetUpTestCase() {
+        using namespace entt::literals;
+
         entt::meta<double>().conv<int>();
         entt::meta<empty_t>().dtor<&empty_t::destroy>();
         entt::meta<fat_t>().base<empty_t>().dtor<&fat_t::destroy>();
@@ -430,7 +432,7 @@ TEST_F(MetaAny, SBOSwap) {
 }
 
 TEST_F(MetaAny, NoSBOSwap) {
-    int i, j;
+    int i{}, j{};
     entt::meta_any lhs{fat_t{&i}};
     entt::meta_any rhs{fat_t{&j}};
 
@@ -490,7 +492,7 @@ TEST_F(MetaAny, SBOWithVoidSwap) {
 }
 
 TEST_F(MetaAny, NoSBOWithEmptySwap) {
-    int i;
+    int i{};
     entt::meta_any lhs{fat_t{&i}};
     entt::meta_any rhs{};
 
@@ -504,7 +506,7 @@ TEST_F(MetaAny, NoSBOWithEmptySwap) {
 }
 
 TEST_F(MetaAny, NoSBOWithVoidSwap) {
-    int i;
+    int i{};
     entt::meta_any lhs{fat_t{&i}};
     entt::meta_any rhs{std::in_place_type<void>};
 
@@ -638,6 +640,8 @@ TEST_F(MetaAny, UnmanageableType) {
 }
 
 TEST_F(MetaAny, Invoke) {
+    using namespace entt::literals;
+
     clazz_t instance;
     entt::meta_any any{std::ref(instance)};
 
@@ -650,6 +654,8 @@ TEST_F(MetaAny, Invoke) {
 }
 
 TEST_F(MetaAny, SetGet) {
+    using namespace entt::literals;
+
     clazz_t instance;
     entt::meta_any any{std::ref(instance)};
 

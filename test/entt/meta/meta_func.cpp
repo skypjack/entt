@@ -61,6 +61,8 @@ struct func_t {
 
 struct MetaFunc: ::testing::Test {
     static void SetUpTestCase() {
+        using namespace entt::literals;
+
         entt::meta<double>().conv<int>();
         entt::meta<base_t>().dtor<&base_t::destroy>().func<&base_t::func>("func"_hs);
         entt::meta<derived_t>().base<base_t>().dtor<&derived_t::destroy>();
@@ -83,6 +85,8 @@ struct MetaFunc: ::testing::Test {
 };
 
 TEST_F(MetaFunc, Functionalities) {
+    using namespace entt::literals;
+
     auto func = entt::resolve<func_t>().func("f2"_hs);
     func_t instance{};
 
@@ -122,6 +126,8 @@ TEST_F(MetaFunc, Functionalities) {
 }
 
 TEST_F(MetaFunc, Const) {
+    using namespace entt::literals;
+
     auto func = entt::resolve<func_t>().func("f1"_hs);
     func_t instance{};
 
@@ -159,6 +165,8 @@ TEST_F(MetaFunc, Const) {
 }
 
 TEST_F(MetaFunc, RetVoid) {
+    using namespace entt::literals;
+
     auto func = entt::resolve<func_t>().func("g"_hs);
     func_t instance{};
 
@@ -194,6 +202,8 @@ TEST_F(MetaFunc, RetVoid) {
 }
 
 TEST_F(MetaFunc, Static) {
+    using namespace entt::literals;
+
     auto func = entt::resolve<func_t>().func("h"_hs);
     func_t::value = 2;
 
@@ -231,6 +241,8 @@ TEST_F(MetaFunc, Static) {
 }
 
 TEST_F(MetaFunc, StaticRetVoid) {
+    using namespace entt::literals;
+
     auto func = entt::resolve<func_t>().func("k"_hs);
 
     ASSERT_TRUE(func);
@@ -266,6 +278,8 @@ TEST_F(MetaFunc, StaticRetVoid) {
 }
 
 TEST_F(MetaFunc, MetaAnyArgs) {
+    using namespace entt::literals;
+
     func_t instance;
     auto any = entt::resolve<func_t>().func("f1"_hs).invoke(instance, 3);
 
@@ -275,11 +289,15 @@ TEST_F(MetaFunc, MetaAnyArgs) {
 }
 
 TEST_F(MetaFunc, InvalidArgs) {
+    using namespace entt::literals;
+
     int value = 3;
     ASSERT_FALSE(entt::resolve<func_t>().func("f1"_hs).invoke(value, 'c'));
 }
 
 TEST_F(MetaFunc, CastAndConvert) {
+    using namespace entt::literals;
+
     func_t instance;
     auto any = entt::resolve<func_t>().func("f3"_hs).invoke(instance, derived_t{}, 0, 3.);
 
@@ -289,6 +307,8 @@ TEST_F(MetaFunc, CastAndConvert) {
 }
 
 TEST_F(MetaFunc, AsVoid) {
+    using namespace entt::literals;
+
     auto func = entt::resolve<func_t>().func("v"_hs);
     func_t instance{};
 
@@ -298,6 +318,8 @@ TEST_F(MetaFunc, AsVoid) {
 }
 
 TEST_F(MetaFunc, AsRef) {
+    using namespace entt::literals;
+
     func_t instance{};
     auto func = entt::resolve<func_t>().func("a"_hs);
     func.invoke(instance).cast<int>() = 3;
@@ -307,6 +329,8 @@ TEST_F(MetaFunc, AsRef) {
 }
 
 TEST_F(MetaFunc, ByReference) {
+    using namespace entt::literals;
+
     auto func = entt::resolve<func_t>().func("h"_hs);
     func_t::value = 2;
     entt::meta_any any{3};
@@ -319,6 +343,8 @@ TEST_F(MetaFunc, ByReference) {
 }
 
 TEST_F(MetaFunc, FromBase) {
+    using namespace entt::literals;
+
     auto type = entt::resolve<derived_t>();
     derived_t instance;
 
@@ -332,6 +358,8 @@ TEST_F(MetaFunc, FromBase) {
 }
 
 TEST_F(MetaFunc, ExternalMemberFunction) {
+    using namespace entt::literals;
+
     auto func = entt::resolve<func_t>().func("emplace"_hs);
 
     ASSERT_TRUE(func);

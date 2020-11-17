@@ -10,6 +10,7 @@ TEST(BasicHashedString, DeductionGuide) {
 }
 
 TEST(HashedString, Functionalities) {
+    using namespace entt::literals;
     using hash_type = entt::hashed_string::hash_type;
 
     const char *bar = "bar";
@@ -54,6 +55,7 @@ TEST(HashedString, Correctness) {
 }
 
 TEST(HashedString, Constexprness) {
+    using namespace entt::literals;
     constexpr std::string_view view{"foobar__", 6};
 
     static_assert(entt::hashed_string{"quux"} == "quux"_hs);
@@ -67,6 +69,7 @@ TEST(HashedString, Constexprness) {
 }
 
 TEST(HashedWString, Functionalities) {
+    using namespace entt::literals;
     using hash_type = entt::hashed_wstring::hash_type;
 
     const wchar_t *bar = L"bar";
@@ -111,6 +114,7 @@ TEST(HashedWString, Correctness) {
 }
 
 TEST(HashedWString, Constexprness) {
+    using namespace entt::literals;
     constexpr std::wstring_view view{L"foobar__", 6};
 
     static_assert(entt::hashed_wstring{L"quux"} == L"quux"_hws);

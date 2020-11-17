@@ -9,12 +9,16 @@ struct derived_t: base_t {};
 
 struct MetaBase: ::testing::Test {
     static void SetUpTestCase() {
+        using namespace entt::literals;
+
         entt::meta<base_t>().type("base"_hs);
         entt::meta<derived_t>().type("derived"_hs).base<base_t>();
     }
 };
 
 TEST_F(MetaBase, Functionalities) {
+    using namespace entt::literals;
+
     auto base = entt::resolve<derived_t>().base("base"_hs);
     derived_t derived{};
 

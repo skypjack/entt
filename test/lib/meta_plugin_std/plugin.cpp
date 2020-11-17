@@ -10,6 +10,8 @@ position create_position(int x, int y) {
 }
 
 void set_up() {
+    using namespace entt::literals;
+
     entt::meta<position>()
             .type("position"_hs)
             .ctor<&create_position>()
