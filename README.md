@@ -113,11 +113,19 @@ mind.
 #include <entt/entt.hpp>
 #include <cstdint>
 
+// registry.emplace will forward arguments to the parameterized constructor
 struct position {
     float x;
     float y;
+    position(float x, float y)
+      : x(x), y(y)
+    {}
 };
 
+// As long as your component structs adhere to the rules of aggregate types,
+// registry.emplace will utilize aggregate initializatiion which sets property
+// values in the order in which they are declared in the structure.
+// See: https://en.cppreference.com/w/cpp/language/aggregate_initialization
 struct velocity {
     float dx;
     float dy;
@@ -155,7 +163,9 @@ int main() {
 
     for(auto i = 0; i < 10; ++i) {
         auto entity = registry.create();
+        // uses parameterized constructor
         registry.emplace<position>(entity, i * 1.f, i * 1.f);
+        // uses aggregate initialization
         if(i % 2 == 0) { registry.emplace<velocity>(entity, i * .1f, i * .1f); }
     }
 
