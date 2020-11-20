@@ -171,9 +171,11 @@ class meta_any {
             using pointed_type = std::remove_reference_t<decltype(*std::declval<Type>())>;
 
             if constexpr(std::is_const_v<pointed_type> && std::is_copy_constructible_v<pointed_type>) {
-                return std::as_const(*any.cast<Type>());
+                auto ptr = any.cast<Type>();
+                return ptr ? std::as_const(*ptr) : meta_any{};
             } else if constexpr(!std::is_const_v<pointed_type>) {
-                return std::ref(*any.cast<Type>());
+                auto ptr = any.cast<Type>();
+                return ptr ? std::ref(*ptr) : meta_any{};
             } else {
                 return {};
             }
