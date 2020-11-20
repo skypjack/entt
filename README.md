@@ -191,8 +191,8 @@ reasons.
 
 If you are interested, you can compile the `benchmark` test in release mode (to
 enable compiler optimizations, otherwise it would make little sense) by setting
-the `ENTT_BUILD_BENCHMARK` option of `CMake` to `ON`, then evaluate yourself whether
-you're satisfied with the results or not.
+the `ENTT_BUILD_BENCHMARK` option of `CMake` to `ON`, then evaluate yourself
+whether you're satisfied with the results or not.
 
 Honestly I got tired of updating the README file whenever there is an
 improvement.<br/>

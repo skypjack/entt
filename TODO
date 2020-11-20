@@ -17,6 +17,9 @@
   - ...
 
 WIP:
+* HP: inject the registry to pools rather than passing it every time (fake vtable prep)
+* HP: fake vtable, see dino:: for a reasonable and customizable (pay-per-use) approach
+* HP: meta any/meta container: reduce instantiations with a single function fake vtable
 * suppress warnings in meta.hpp (uninitialized members)
 * make view pack work also with groups, add multi-type iterator (not only input iterators)
 * add exclude-only views to combine with packs
