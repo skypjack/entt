@@ -150,6 +150,8 @@ export(PACKAGE EnTT)
 
 include(CTest)
 
+option(ENTT_BUILD_TESTING "Enable building tests." OFF)
+
 if(ENTT_BUILD_TESTING)
     option(ENTT_FIND_GTEST_PACKAGE "Enable finding gtest package." OFF)
     option(ENTT_BUILD_BENCHMARK "Build benchmark." OFF)
