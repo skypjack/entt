@@ -7,7 +7,7 @@ include(FetchContent)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-if(FIND_GTEST_PACKAGE)
+if(ENTT_FIND_GTEST_PACKAGE)
     find_package(GTest REQUIRED)
 else()
     FetchContent_Declare(
@@ -89,19 +89,19 @@ endfunction()
 
 # Test benchmark
 
-if(BUILD_BENCHMARK)
+if(ENTT_BUILD_BENCHMARK)
     SETUP_BASIC_TEST(benchmark benchmark/benchmark.cpp)
 endif()
 
 # Test example
 
-if(BUILD_EXAMPLE)
+if(ENTT_BUILD_EXAMPLE)
     SETUP_BASIC_TEST(custom_identifier example/custom_identifier.cpp)
 endif()
 
 # Test lib
 
-if(BUILD_LIB)
+if(ENTT_BUILD_LIB)
     FetchContent_Declare(
         cr
         GIT_REPOSITORY https://github.com/fungos/cr.git
@@ -131,7 +131,7 @@ endif()
 
 # Test snapshot
 
-if(BUILD_SNAPSHOT)
+if(ENTT_BUILD_SNAPSHOT)
     FetchContent_Declare(
         cereal
         GIT_REPOSITORY https://github.com/USCiLab/cereal.git

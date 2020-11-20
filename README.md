@@ -191,7 +191,7 @@ reasons.
 
 If you are interested, you can compile the `benchmark` test in release mode (to
 enable compiler optimizations, otherwise it would make little sense) by setting
-the `BUILD_BENCHMARK` option of `CMake` to `ON`, then evaluate yourself whether
+the `ENTT_BUILD_BENCHMARK` option of `CMake` to `ON`, then evaluate yourself whether
 you're satisfied with the results or not.
 
 Honestly I got tired of updating the README file whenever there is an
@@ -258,7 +258,7 @@ The documentation is based on [doxygen](http://www.doxygen.nl/).
 To build it:
 
     $ cd build
-    $ cmake .. -DBUILD_DOCS=ON
+    $ cmake .. -DENTT_BUILD_DOCS=ON
     $ make
 
 The API reference will be created in HTML format within the directory
@@ -285,12 +285,12 @@ to the project where users can find all related documentation pages.
 
 To compile and run the tests, `EnTT` requires *googletest*.<br/>
 `cmake` will download and compile the library before compiling anything else.
-In order to build the tests, set the CMake option `BUILD_TESTING` to `ON`.
+In order to build the tests, set the CMake option `ENTT_BUILD_TESTING` to `ON`.
 
 To build the most basic set of tests:
 
 * `$ cd build`
-* `$ cmake -DBUILD_TESTING=ON ..`
+* `$ cmake -DENTT_BUILD_TESTING=ON ..`
 * `$ make`
 * `$ make test`
 
