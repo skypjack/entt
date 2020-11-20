@@ -92,6 +92,8 @@ union union_t {
 
 struct MetaType: ::testing::Test {
     static void SetUpTestCase() {
+        using namespace entt::literals;
+
         entt::meta<double>().type("double"_hs).conv<int>().data<&set<double>, &get<double>>("var"_hs);
         entt::meta<unsigned int>().data<0u>("min"_hs).data<100u>("max"_hs);
         entt::meta<base_t>().type("base"_hs).data<&base_t::value>("value"_hs);
@@ -131,6 +133,8 @@ struct MetaType: ::testing::Test {
 };
 
 TEST_F(MetaType, Resolve) {
+    using namespace entt::literals;
+
     ASSERT_EQ(entt::resolve<double>(), entt::resolve("double"_hs));
     ASSERT_EQ(entt::resolve<double>(), entt::resolve(entt::type_id<double>()));
 
@@ -151,6 +155,8 @@ TEST_F(MetaType, Resolve) {
 }
 
 TEST_F(MetaType, Functionalities) {
+    using namespace entt::literals;
+
     auto type = entt::resolve<clazz_t>();
 
     ASSERT_TRUE(type);
@@ -246,6 +252,8 @@ TEST_F(MetaType, RemoveExtent) {
 }
 
 TEST_F(MetaType, Base) {
+    using namespace entt::literals;
+
     auto type = entt::resolve<derived_t>();
     bool iterate = false;
 
@@ -290,6 +298,8 @@ TEST_F(MetaType, Ctor) {
 }
 
 TEST_F(MetaType, Data) {
+    using namespace entt::literals;
+
     auto type = entt::resolve<clazz_t>();
     int counter{};
 
@@ -302,6 +312,8 @@ TEST_F(MetaType, Data) {
 }
 
 TEST_F(MetaType, Func) {
+    using namespace entt::literals;
+
     auto type = entt::resolve<clazz_t>();
     clazz_t instance{};
     int counter{};
@@ -318,6 +330,8 @@ TEST_F(MetaType, Func) {
 }
 
 TEST_F(MetaType, Invoke) {
+    using namespace entt::literals;
+
     auto type = entt::resolve<clazz_t>();
     clazz_t instance{};
 
@@ -326,6 +340,8 @@ TEST_F(MetaType, Invoke) {
 }
 
 TEST_F(MetaType, OverloadedFunc) {
+    using namespace entt::literals;
+
     entt::meta<float>().conv<int>();
     entt::meta<double>().conv<float>();
 
@@ -377,6 +393,8 @@ TEST_F(MetaType, OverloadedFunc) {
 }
 
 TEST_F(MetaType, SetGet) {
+    using namespace entt::literals;
+
     auto type = entt::resolve<clazz_t>();
     clazz_t instance{};
 
@@ -426,6 +444,8 @@ TEST_F(MetaType, ConstructCastAndConvert) {
 }
 
 TEST_F(MetaType, Reset) {
+    using namespace entt::literals;
+
     ASSERT_TRUE(entt::resolve("clazz"_hs));
 
     entt::resolve("clazz"_hs).reset();
@@ -441,6 +461,8 @@ TEST_F(MetaType, Reset) {
 }
 
 TEST_F(MetaType, AbstractClass) {
+    using namespace entt::literals;
+
     auto type = entt::resolve<abstract_t>();
     concrete_t instance;
 
@@ -455,6 +477,8 @@ TEST_F(MetaType, AbstractClass) {
 }
 
 TEST_F(MetaType, EnumAndNamedConstants) {
+    using namespace entt::literals;
+
     auto type = entt::resolve<property_t>();
 
     ASSERT_TRUE(type.data("random"_hs));
@@ -471,6 +495,8 @@ TEST_F(MetaType, EnumAndNamedConstants) {
 }
 
 TEST_F(MetaType, ArithmeticTypeAndNamedConstants) {
+    using namespace entt::literals;
+
     auto type = entt::resolve<unsigned int>();
 
     ASSERT_TRUE(type.data("min"_hs));
@@ -487,6 +513,8 @@ TEST_F(MetaType, ArithmeticTypeAndNamedConstants) {
 }
 
 TEST_F(MetaType, Variables) {
+    using namespace entt::literals;
+
     auto p_data = entt::resolve<property_t>().data("var"_hs);
     auto d_data = entt::resolve("double"_hs).data("var"_hs);
 
@@ -503,6 +531,8 @@ TEST_F(MetaType, Variables) {
 }
 
 TEST_F(MetaType, PropertiesAndCornerCases) {
+    using namespace entt::literals;
+
     auto type = entt::resolve<property_t>();
 
     ASSERT_EQ(type.data("random"_hs).prop(property_t::random).value().cast<int>(), 0);
@@ -523,6 +553,8 @@ TEST_F(MetaType, PropertiesAndCornerCases) {
 }
 
 TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
+    using namespace entt::literals;
+
     ASSERT_NE(*entt::internal::meta_context::global(), nullptr);
 
     entt::resolve<double>().reset();

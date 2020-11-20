@@ -36,6 +36,8 @@ void serialize(Archive &archive, relationship &relationship) {
 }
 
 TEST(Snapshot, Full) {
+    using namespace entt::literals;
+
     std::stringstream storage;
 
     entt::registry source;
@@ -91,6 +93,8 @@ TEST(Snapshot, Full) {
 }
 
 TEST(Snapshot, Continuous) {
+    using namespace entt::literals;
+
     std::stringstream storage;
 
     entt::registry source;

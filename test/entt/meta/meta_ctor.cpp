@@ -32,6 +32,8 @@ struct clazz_t {
 
 struct MetaCtor: ::testing::Test {
     static void SetUpTestCase() {
+        using namespace entt::literals;
+
         entt::meta<double>().conv<int>();
         entt::meta<derived_t>().base<base_t>();
 
@@ -45,6 +47,8 @@ struct MetaCtor: ::testing::Test {
 };
 
 TEST_F(MetaCtor, Functionalities) {
+    using namespace entt::literals;
+
     auto ctor = entt::resolve<clazz_t>().ctor<const int &, char>();
 
     ASSERT_TRUE(ctor);
@@ -78,6 +82,8 @@ TEST_F(MetaCtor, Functionalities) {
 }
 
 TEST_F(MetaCtor, Func) {
+    using namespace entt::literals;
+
     auto ctor = entt::resolve<clazz_t>().ctor<int>();
 
     ASSERT_TRUE(ctor);
@@ -152,6 +158,8 @@ TEST_F(MetaCtor, FuncCastAndConvert) {
 }
 
 TEST_F(MetaCtor, ExternalMemberFunction) {
+    using namespace entt::literals;
+
     auto ctor = entt::resolve<clazz_t>().ctor<entt::registry &, entt::entity, const int &, const char &>();
 
     ASSERT_TRUE(ctor);

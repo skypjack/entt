@@ -7,12 +7,16 @@
 
 struct MetaRange: ::testing::Test {
     static void SetUpTestCase() {
+        using namespace entt::literals;
+
         entt::meta<int>().type("int"_hs);
         entt::meta<double>().type("double"_hs);
     }
 };
 
 TEST_F(MetaRange, Range) {
+    using namespace entt::literals;
+
     entt::meta_range<entt::meta_type> range{entt::internal::meta_context::local()};
     auto it = range.begin();
 
