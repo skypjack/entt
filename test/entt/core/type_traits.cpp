@@ -70,6 +70,11 @@ TEST(TypeTraits, IsApplicable) {
     static_assert(!entt::is_applicable_r_v<int, int(int, char), std::tuple<void>>);
 }
 
+TEST(TypeTraits, IsComplete) {
+    static_assert(entt::is_complete_v<int>);
+    static_assert(!entt::is_complete_v<void>);
+}
+
 TEST(TypeTraits, ConstnessAs) {
     static_assert(std::is_same_v<entt::constness_as_t<int, char>, int>);
     static_assert(std::is_same_v<entt::constness_as_t<const int, char>, int>);
