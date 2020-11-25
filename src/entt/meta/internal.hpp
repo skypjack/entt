@@ -32,52 +32,55 @@ namespace internal {
 
 
 class meta_storage {
+    enum class operation { COPY, MOVE, DTOR };
+
     using storage_type = std::aligned_storage_t<sizeof(void *), alignof(void *)>;
-    using copy_fn_type = void(meta_storage &, const meta_storage &);
-    using steal_fn_type = void(meta_storage &, meta_storage &);
-    using destroy_fn_type = void(meta_storage &);
+    using vtable_type = void(const operation, meta_storage &, void *);
 
     template<typename Type, typename = void>
     struct type_traits {
         template<typename... Args>
-        static void instance(meta_storage &buffer, Args &&... args) {
+        static void ctor(meta_storage &buffer, Args &&... args) {
             buffer.instance = new Type{std::forward<Args>(args)...};
             new (&buffer.storage) Type *{static_cast<Type *>(buffer.instance)};
         }
 
-        static void destroy(meta_storage &buffer) {
-            delete static_cast<Type *>(buffer.instance);
-        }
-
-        static void copy(meta_storage &to, const meta_storage &from) {
-            to.instance = new Type{*static_cast<const Type *>(from.instance)};
-            new (&to.storage) Type *{static_cast<Type *>(to.instance)};
-        }
-
-        static void steal(meta_storage &to, meta_storage &from) {
-            new (&to.storage) Type *{static_cast<Type *>(from.instance)};
-            to.instance = from.instance;
+        static void vtable(const operation op, meta_storage &self, void *instance) {
+            switch(op) {
+            case operation::COPY:
+                self.instance = new Type{std::as_const(*static_cast<Type *>(instance))};
+                new (&self.storage) Type *{static_cast<Type *>(self.instance)};
+                break;
+            case operation::MOVE:
+                new (&self.storage) Type *{static_cast<Type *>(instance)};
+                self.instance = instance;
+                break;
+            case operation::DTOR:
+                delete static_cast<Type *>(instance);
+                break;
+            }
         }
     };
 
     template<typename Type>
     struct type_traits<Type, std::enable_if_t<sizeof(Type) <= sizeof(void *) && std::is_nothrow_move_constructible_v<Type>>> {
         template<typename... Args>
-        static void instance(meta_storage &buffer, Args &&... args) {
+        static void ctor(meta_storage &buffer, Args &&... args) {
             buffer.instance = new (&buffer.storage) Type{std::forward<Args>(args)...};
         }
 
-        static void destroy(meta_storage &buffer) {
-            static_cast<Type *>(buffer.instance)->~Type();
-        }
-
-        static void copy(meta_storage &to, const meta_storage &from) {
-            to.instance = new (&to.storage) Type{*static_cast<const Type *>(from.instance)};
-        }
-
-        static void steal(meta_storage &to, meta_storage &from) {
-            to.instance = new (&to.storage) Type{std::move(*static_cast<Type *>(from.instance))};
-            destroy(from);
+        static void vtable(const operation op, meta_storage &self, void *instance) {
+            switch(op) {
+            case operation::COPY:
+                self.instance = new (&self.storage) Type{std::as_const(*static_cast<Type *>(instance))};
+                break;
+            case operation::MOVE:
+                self.instance = new (&self.storage) Type{std::move(*static_cast<Type *>(instance))};
+                [[fallthrough]];
+            case operation::DTOR:
+                static_cast<Type *>(instance)->~Type();
+                break;
+            }
         }
     };
 
@@ -85,10 +88,8 @@ public:
     /*! @brief Default constructor. */
     meta_storage() ENTT_NOEXCEPT
         : storage{},
-          instance{},
-          destroy_fn{},
-          copy_fn{},
-          steal_fn{}
+          vtable{},
+          instance{}
     {}
 
     template<typename Type, typename... Args>
@@ -96,10 +97,8 @@ public:
         : meta_storage{}
     {
         if constexpr(!std::is_void_v<Type>) {
-            type_traits<Type>::instance(*this, std::forward<Args>(args)...);
-            destroy_fn = &type_traits<Type>::destroy;
-            copy_fn = &type_traits<Type>::copy;
-            steal_fn = &type_traits<Type>::steal;
+            type_traits<Type>::ctor(*this, std::forward<Args>(args)...);
+            vtable = &type_traits<Type>::vtable;
         }
     }
 
@@ -118,26 +117,32 @@ public:
     meta_storage(const meta_storage &other)
         : meta_storage{}
     {
-        (other.copy_fn ? other.copy_fn : [](auto &to, const auto &from) { to.instance = from.instance; })(*this, other);
-        destroy_fn = other.destroy_fn;
-        copy_fn = other.copy_fn;
-        steal_fn = other.steal_fn;
+        if(vtable = other.vtable; vtable) {
+            vtable(operation::COPY, *this, other.instance);
+        } else {
+            instance = other.instance;
+        }
     }
 
-    meta_storage(meta_storage &&other)
+    meta_storage(meta_storage &&other) ENTT_NOEXCEPT
         : meta_storage{}
     {
-        swap(*this, other);
+        if(vtable = other.vtable; vtable) {
+            vtable(operation::MOVE, *this, other.instance);
+            other.vtable = nullptr;
+        } else {
+            instance = other.instance;
+        }
     }
 
     ~meta_storage() {
-        if(destroy_fn) {
-            destroy_fn(*this);
+        if(vtable) {
+            vtable(operation::DTOR, *this, instance);
         }
     }
 
     meta_storage & operator=(meta_storage other) {
-        swap(other, *this);
+        swap(*this, other);
         return *this;
     }
 
@@ -165,32 +170,17 @@ public:
     }
 
     friend void swap(meta_storage &lhs, meta_storage &rhs) {
-        using std::swap;
-
-        if(lhs.steal_fn && rhs.steal_fn) {
-            meta_storage buffer{};
-            lhs.steal_fn(buffer, lhs);
-            rhs.steal_fn(lhs, rhs);
-            lhs.steal_fn(rhs, buffer);
-        } else if(lhs.steal_fn) {
-            lhs.steal_fn(rhs, lhs);
-        } else if(rhs.steal_fn) {
-            rhs.steal_fn(lhs, rhs);
-        } else {
-            swap(lhs.instance, rhs.instance);
-        }
-
-        swap(lhs.destroy_fn, rhs.destroy_fn);
-        swap(lhs.copy_fn, rhs.copy_fn);
-        swap(lhs.steal_fn, rhs.steal_fn);
+        meta_storage tmp{};
+        lhs.vtable ? lhs.vtable(operation::MOVE, tmp, lhs.instance) : std::swap(tmp.instance, lhs.instance);
+        rhs.vtable ? rhs.vtable(operation::MOVE, lhs, rhs.instance) : std::swap(lhs.instance, rhs.instance);
+        lhs.vtable ? lhs.vtable(operation::MOVE, rhs, tmp.instance) : std::swap(rhs.instance, tmp.instance);
+        std::swap(lhs.vtable, rhs.vtable);
     }
 
 private:
     storage_type storage;
+    vtable_type *vtable;
     void *instance;
-    destroy_fn_type *destroy_fn;
-    copy_fn_type *copy_fn;
-    steal_fn_type *steal_fn;
 };
 
 
