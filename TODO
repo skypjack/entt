@@ -2,7 +2,6 @@
 * custom allocators and EnTT allocator-aware in general (long term feature, I don't actually need it at the moment) - see #22
 * debugging tools (#60): the issue online already contains interesting tips on this, look at it
 * work stealing job system (see #100) + mt scheduler based on const awareness for types
-* meta: sort of meta view based on meta stuff to iterate entities, void * and meta info objects (remove runtime views, welcome reflection)
 * allow to replace std:: with custom implementations
 * add examples (and credits) from @alanjfs :)
 * static reflection, hint: template<> meta_type_t<Type>: meta_descriptor<name, func..., props..., etc...> (see #342)
@@ -19,17 +18,14 @@
   - ...
 
 WIP:
-* HP: headless view
-* HP: inject the registry to pools rather than passing it every time (fake vtable prep)
+* HP: headless (sparse set only) view
 * HP: fake vtable, see dino:: for a reasonable and customizable (pay-per-use) approach
-* HP: meta any/meta container: reduce instantiations with a single function fake vtable
 * HP: make view pack work also with groups, make packs input iterator only, add view adapter for external sources
 * HP: write documentation for custom storages and views!!
 * suppress warnings in meta.hpp (uninitialized members)
 * add exclude-only views to combine with packs
 * deprecate non-owning groups in favor of owning views and view packs, introduce lazy owning views
 * view pack: plain function as an alias for operator|, reverse iterators, rbegin and rend
-* what about using hashed string rather than hash values for meta types?
 * pagination doesn't work nicely across boundaries probably, give it a look. RO operations are fine, adding components maybe not.
 * add observer functions aside observer class
 * snapshot: support for range-based archives
